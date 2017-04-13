@@ -1,6 +1,7 @@
 import pytest
 import tarfile
 
+from copy import deepcopy
 from datetime import date
 from onegov.core.utils import module_path
 from onegov.election_day.collections import ArchivedResultCollection
@@ -60,6 +61,38 @@ HEADER_COLUMNS_SESAM_MAJORZ = (
     'Stimmen,'
     'Gewaehlt'
 )
+
+HEADER_COLUMNS_SESAM_PROPORZ = [
+    'Anzahl Sitze',
+    'Wahlkreis-Nr',
+    'Wahlkreisbezeichnung',
+    'Stimmberechtigte',
+    'Wahlzettel',
+    'Ungültige Wahlzettel',
+    'Leere Wahlzettel',
+    'Leere Stimmen',
+    'Listen-Nr',
+    'Parteibezeichnung',
+    'HLV-Nr',
+    'ULV-Nr',
+    'Anzahl Sitze Liste',
+    'Unveränderte Wahlzettel Liste',
+    'Veränderte Wahlzettel Liste',
+    'Kandidatenstimmen unveränderte Wahlzettel',
+    'Zusatzstimmen unveränderte Wahlzettel',
+    'Kandidatenstimmen veränderte Wahlzettel',
+    'Zusatzstimmen veränderte Wahlzettel',
+    'Kandidaten-Nr',
+    'Gewählt',
+    'Name',
+    'Vorname',
+    'Stimmen unveränderte Wahlzettel',
+    'Stimmen veränderte Wahlzettel',
+    'Stimmen Total aus Wahlzettel',
+    '01 FDP',
+    '02 CVP',
+    'Anzahl Gemeinden',
+]
 
 HEADER_COLUMNS_WABSTI_PROPORZ = (
     'Einheit_BFS,'
@@ -295,40 +328,10 @@ def test_upload_election_sesam_fail(election_day_app_gr):
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    headers = [
-        'Anzahl Sitze',
-        'Wahlkreis-Nr',
-        'Wahlkreisbezeichnung',
-        'Stimmberechtigte',
-        'Wahlzettel',
-        'Ungültige Wahlzettel',
-        'Leere Wahlzettel',
-        'Leere Stimmen',
-        'Listen-Nr',
-        'Parteibezeichnung',
-        'HLV-Nr',
-        'ULV-Nr',
-        'Anzahl Sitze Liste',
-        'Unveränderte Wahlzettel Liste',
-        'Veränderte Wahlzettel Liste',
-        'Kandidatenstimmen unveränderte Wahlzettel',
-        'Zusatzstimmen unveränderte Wahlzettel',
-        'Kandidatenstimmen veränderte Wahlzettel',
-        'Zusatzstimmen veränderte Wahlzettel',
-        'Kandidaten-Nr',
-        'Gewählt',
-        'Name',
-        'Vorname',
-        'Stimmen unveränderte Wahlzettel',
-        'Stimmen veränderte Wahlzettel',
-        'Stimmen Total aus Wahlzettel',
-        '01 FDP',
-        '02 CVP',
-        'Anzahl Gemeinden',
-    ]
-
     # no data
-    csv = '{}\r\n'.format(','.join(headers),).encode('utf-8')
+    csv = '{}\r\n'.format(
+        ','.join(HEADER_COLUMNS_SESAM_PROPORZ)
+    ).encode('utf-8')
 
     upload = client.get('/election/election/upload')
     upload.form['file_format'] = 'sesam'
@@ -340,7 +343,7 @@ def test_upload_election_sesam_fail(election_day_app_gr):
 
     # Invalid data
     csv = '\r\n'.join((
-        ','.join(headers),
+        ','.join(HEADER_COLUMNS_SESAM_PROPORZ),
         ','.join((
             'five',
             '1234',
@@ -388,7 +391,7 @@ def test_upload_election_sesam_fail(election_day_app_gr):
     assert archive.query().one().progress == (0, 0)
 
     csv = '\r\n'.join((
-        ','.join(headers),
+        ','.join(HEADER_COLUMNS_SESAM_PROPORZ),
         ','.join((
             '5',
             'xyzb',
@@ -436,6 +439,7 @@ def test_upload_election_sesam_fail(election_day_app_gr):
     assert archive.query().one().progress == (0, 0)
 
     # Missing headers
+    headers = deepcopy(HEADER_COLUMNS_SESAM_PROPORZ)
     headers.remove('Wahlkreis-Nr')
     csv = '{}\r\n'.format(','.join(headers),).encode('utf-8')
 
@@ -1828,7 +1832,23 @@ def test_upload_election_expats_proporz(election_day_app):
     new.form.submit()
 
     for id_ in (0, 9170):
-        # SESAM: todo
+        # SESAM
+        csv = '\n'.join((
+            ','.join(HEADER_COLUMNS_SESAM_PROPORZ),
+            (
+                '1,{},Auslandschweizer,14119,7462,196,77,273,1,ALG,,,0,80,'
+                '90,100,110,120,130,101,FALSE,Lustenberger,Andreas,0,0,0,0,'
+                '0,1 von 12'
+            ).format(id_),
+        )).encode('utf-8')
+
+        upload = client.get('/election/election/upload')
+        upload.form['file_format'] = 'sesam'
+        upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+        assert 'erfolgreich hochgeladen' in upload.form.submit()
+
+        result_sesam = client.get('/election/election/data-csv').text
+        assert 'Auslandschweizer,0' in result_sesam
 
         # Wabsti
         csv = '\n'.join((
