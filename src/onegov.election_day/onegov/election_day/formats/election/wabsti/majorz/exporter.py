@@ -127,7 +127,7 @@ def import_exporter_files(election, district, number, entities,
         except ValueError:
             line_errors.append(_("Invalid id"))
         else:
-            if entity_id not in entities:
+            if entity_id and entity_id not in entities:
                 continue
                 line_errors.append(
                     _("${name} is unknown", mapping={'name': entity_id}))
@@ -175,7 +175,7 @@ def import_exporter_files(election, district, number, entities,
         except ValueError:
             line_errors.append(_("Invalid id"))
         else:
-            if entity_id not in entities:
+            if entity_id and entity_id not in entities:
                 line_errors.append(
                     _("${name} is unknown", mapping={'name': entity_id}))
 

@@ -9,7 +9,6 @@ from onegov.election_day.models import ArchivedResult
 from onegov.election_day.utils import add_local_results
 from onegov.election_day.utils.media_generator import MediaGenerator
 from onegov.election_day.utils.sms_processor import SmsQueueProcessor
-from onegov.election_day.utils.wabsti_importer import WabstiImporter
 from pathlib import Path
 from raven import Client
 
@@ -144,7 +143,7 @@ def generate_media(pdf, svg, force, cleanup, sentry):
 
         lockfile = Path(os.path.join(
             app.configuration.get('lockfile_path', ''),
-            '.lock-{}-media'.format(app.schema)
+            '.lock-{}'.format(app.schema)
         ))
 
         try:
@@ -170,45 +169,3 @@ def generate_media(pdf, svg, force, cleanup, sentry):
             lockfile.unlink()
 
     return generate
-
-
-@cli.command('import-wabsti')
-@click.option('--sentry')
-def import_wabsti(sentry):
-    """ Import the files uploaded via FTP using WabstCExport.
-
-        onegov-election-day --select '/onegov_election_day/zg' import-wabsti
-
-    """
-    def import_(request, app):
-        lockfile = Path(os.path.join(
-            app.configuration.get('lockfile_path', ''),
-            '.lock-{}-import'.format(app.schema)
-        ))
-
-        try:
-            lockfile.touch(exist_ok=False)
-        except OSError:
-            pass
-        else:
-            try:
-                importer = WabstiImporter(app)
-                for error in importer.process():
-                    if error:
-                        if sentry:
-                            Client(sentry).captureMessage(error)
-                        log.error(error)
-
-            except Exception as e:
-                log.error(
-                    "An exception happened while importing wabsti files",
-                    exc_info=True
-                )
-                if sentry:
-                    Client(sentry).captureException()
-                raise(e)
-
-        finally:
-            lockfile.unlink()
-
-    return import_

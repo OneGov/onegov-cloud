@@ -93,7 +93,7 @@ def import_exporter_files(vote, district, number, entities,
             else:
                 added_entities.append(entity_id)
 
-            if entity_id not in entities:
+            if entity_id and entity_id not in entities:
                 line_errors.append(
                     _("${name} is unknown", mapping={'name': entity_id}))
 

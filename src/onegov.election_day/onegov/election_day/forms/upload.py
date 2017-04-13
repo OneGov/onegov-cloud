@@ -215,3 +215,59 @@ class UploadVoteForm(Form):
         else:
             self.type.choices = [('simple', _("Simple Vote"))]
             self.type.data = 'simple'
+
+
+class UploadWabstiVoteForm(Form):
+
+    sg_gemeinden = UploadField(
+        label="SG_Gemeinden",
+        validators=[
+            DataRequired(),
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        render_kw=dict(force_simple=True)
+    )
+
+
+class UploadWabstiMajorzElectionForm(Form):
+
+    wmstatic_gemeinden = UploadField(
+        label="WMStatic_Gemeinden",
+        validators=[
+            DataRequired(),
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        render_kw=dict(force_simple=True)
+    )
+
+    wm_gemeinden = UploadField(
+        label="WM_Gemeinden",
+        validators=[
+            DataRequired(),
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        render_kw=dict(force_simple=True)
+    )
+
+    wm_kandidaten = UploadField(
+        label="WM_Kandidaten",
+        validators=[
+            DataRequired(),
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        render_kw=dict(force_simple=True)
+    )
+
+    wm_kandidatengde = UploadField(
+        label="WM_KandidatenGde",
+        validators=[
+            DataRequired(),
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        render_kw=dict(force_simple=True)
+    )

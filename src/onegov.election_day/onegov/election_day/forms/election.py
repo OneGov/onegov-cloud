@@ -90,10 +90,19 @@ class ElectionForm(Form):
     upload_wabsti_district = StringField(
         label=_("Automatic upload (Wabsti): 'SortWahlkreis'"),
         validators=[
-            Optional(),
-            NumberRange(min=1)
+            InputRequired()
         ],
-        depends_on=('election_type', 'majorz'),
+        render_kw=dict(force_simple=True),
+        depends_on=('upload_type', 'wabsti'),
+    )
+
+    upload_wabsti_number = StringField(
+        label=_("Automatic upload (Wabsti): 'SortGeschaeft'"),
+        validators=[
+            InputRequired()
+        ],
+        render_kw=dict(force_simple=True),
+        depends_on=('upload_type', 'wabsti'),
     )
 
     def set_domain(self, principal):
@@ -128,7 +137,6 @@ class ElectionForm(Form):
         model.meta['upload_type'] = self.upload_type.data
         model.meta['upload_wabsti_district'] = self.upload_wabsti_district.data
         model.meta['upload_wabsti_number'] = self.upload_wabsti_number.data
-        model.meta['upload_wabsti_folder'] = self.upload_wabsti_folder.data
 
     def apply_model(self, model):
         self.election_de.data = model.title_translations['de_CH']
@@ -151,7 +159,4 @@ class ElectionForm(Form):
         )
         self.upload_wabsti_number.data = meta_data.get(
             'upload_wabsti_number', ''
-        )
-        self.upload_wabsti_folder.data = meta_data.get(
-            'upload_wabsti_folder', ''
         )
