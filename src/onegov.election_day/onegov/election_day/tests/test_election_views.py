@@ -221,7 +221,7 @@ def test_view_election_parties_historical(election_day_app_gr):
         csv_parties = ("Partei,Stimmen,Sitze\n" + results).encode('utf-8')
 
         mime = 'text/plain'
-        upload = client.get('/election/{}/upload'.format(id))
+        upload = client.get('/election/{}/upload'.format(id)).follow()
         upload.form['file_format'] = 'sesam'
         upload.form['results'] = Upload('data.csv', csv, mime)
         upload = upload.form.submit()

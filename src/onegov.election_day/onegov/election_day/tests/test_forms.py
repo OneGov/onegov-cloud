@@ -4,8 +4,10 @@ from datetime import date
 from onegov.ballot import Election, Vote
 from onegov.election_day.forms.election import ElectionForm
 from onegov.election_day.forms.subscribe import SubscribeForm
-from onegov.election_day.forms.upload import UploadElectionForm
 from onegov.election_day.forms.upload import UploadElectionPartyResultsForm
+from onegov.election_day.forms.upload import UploadElectionBaseForm
+from onegov.election_day.forms.upload import UploadMajorzElectionForm
+from onegov.election_day.forms.upload import UploadProporzElectionForm
 from onegov.election_day.forms.upload import UploadVoteForm
 from onegov.election_day.forms.validators import ValidPhoneNumber
 from onegov.election_day.forms.vote import VoteForm
@@ -307,73 +309,47 @@ def test_upload_election_form():
     cantonal_principal = Principal('be', None, None, canton='be')
     communal_principal = Principal('bern', None, None, municipality='351')
 
-    majorz_election = Election(type='majorz')
-    proporz_election = Election(type='proporz')
-
     # Test limitation of file formats
-    form = UploadElectionForm()
+    form = UploadElectionBaseForm()
     assert sorted(f[0] for f in form.file_format.choices) == [
         'internal', 'sesam', 'wabsti'
     ]
-    form.adjust(cantonal_principal, majorz_election)
+    form.adjust(cantonal_principal)
     assert sorted(f[0] for f in form.file_format.choices) == [
         'internal', 'sesam', 'wabsti'
     ]
-    form.adjust(communal_principal, majorz_election)
+    form.adjust(communal_principal)
     assert sorted(f[0] for f in form.file_format.choices) == [
         'internal'
     ]
 
-    # Test required fields
-    form = UploadElectionForm(DummyPostData({'file_format': 'internal'}))
+    # Test required fields (majorz)
+    form = UploadMajorzElectionForm(DummyPostData({'file_format': 'internal'}))
     form.results.data = {'mimetype': 'text/plain'}
     assert form.validate()
 
-    form = UploadElectionForm(DummyPostData({'file_format': 'sesam'}))
+    form = UploadMajorzElectionForm(DummyPostData({'file_format': 'sesam'}))
     form.results.data = {'mimetype': 'text/plain'}
     assert form.validate()
 
-    form = UploadElectionForm(DummyPostData({'file_format': 'wabsti'}))
+    form = UploadMajorzElectionForm(DummyPostData({'file_format': 'wabsti'}))
     form.results.data = {'mimetype': 'text/plain'}
     assert form.validate()
 
-    # test dynamic dependencies
-    def ff(x):
-        return 'file_format/{}'.format(x)
+    # Test required fields (proporz)
+    form = UploadProporzElectionForm(DummyPostData({
+        'file_format': 'internal'
+    }))
+    form.results.data = {'mimetype': 'text/plain'}
+    assert form.validate()
 
-    form = UploadElectionForm()
-    form.adjust(cantonal_principal, majorz_election)
-    assert form.connections.render_kw['data-depends-on'] == ff('none')
-    assert form.statistics.render_kw['data-depends-on'] == ff('none')
+    form = UploadProporzElectionForm(DummyPostData({'file_format': 'sesam'}))
+    form.results.data = {'mimetype': 'text/plain'}
+    assert form.validate()
 
-    assert form.elected.render_kw['data-depends-on'] == ff('wabsti')
-    assert form.complete.render_kw['data-depends-on'] == ff('wabsti')
-    assert form.majority.render_kw['data-depends-on'] == ff('!internal')
-
-    form.adjust(cantonal_principal, proporz_election)
-    assert form.connections.render_kw['data-depends-on'] == ff('wabsti')
-    assert form.statistics.render_kw['data-depends-on'] == ff('wabsti')
-
-    assert form.elected.render_kw['data-depends-on'] == ff('wabsti')
-    assert form.complete.render_kw['data-depends-on'] == ff('wabsti')
-    assert form.majority.render_kw['data-depends-on'] == ff('none')
-
-    form = UploadElectionForm()
-    form.adjust(cantonal_principal, proporz_election)
-    assert form.connections.render_kw['data-depends-on'] == ff('wabsti')
-    assert form.statistics.render_kw['data-depends-on'] == ff('wabsti')
-
-    assert form.elected.render_kw['data-depends-on'] == ff('wabsti')
-    assert form.complete.render_kw['data-depends-on'] == ff('wabsti')
-    assert form.majority.render_kw['data-depends-on'] == ff('none')
-
-    form.adjust(cantonal_principal, majorz_election)
-    assert form.connections.render_kw['data-depends-on'] == ff('none')
-    assert form.statistics.render_kw['data-depends-on'] == ff('none')
-
-    assert form.elected.render_kw['data-depends-on'] == ff('wabsti')
-    assert form.complete.render_kw['data-depends-on'] == ff('wabsti')
-    assert form.majority.render_kw['data-depends-on'] == ff('!internal')
+    form = UploadProporzElectionForm(DummyPostData({'file_format': 'wabsti'}))
+    form.results.data = {'mimetype': 'text/plain'}
+    assert form.validate()
 
 
 def test_upload_party_results_form():

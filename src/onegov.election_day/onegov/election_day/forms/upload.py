@@ -21,14 +21,14 @@ ALLOWED_MIME_TYPES = {
 MAX_FILE_SIZE = 10 * 1024 * 1024
 
 
-class UploadElectionForm(Form):
+class UploadElectionBaseForm(Form):
 
     file_format = RadioField(
         _("File format"),
         choices=[
-            ('sesam', _("SESAM")),
-            ('wabsti', _("Wabsti")),
             ('internal', _("OneGov Cloud")),
+            ('wabsti', _("Wabsti")),
+            ('sesam', _("SESAM")),
         ],
         validators=[
             InputRequired()
@@ -46,8 +46,8 @@ class UploadElectionForm(Form):
         render_kw=dict(force_simple=True)
     )
 
-    connections = UploadField(
-        label=_("List connections"),
+    elected = UploadField(
+        label=_("Elected Candidates"),
         validators=[
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
@@ -56,8 +56,38 @@ class UploadElectionForm(Form):
         render_kw=dict(force_simple=True)
     )
 
-    elected = UploadField(
-        label=_("Elected Candidates"),
+    complete = BooleanField(
+        label=_("Complete"),
+        depends_on=('file_format', 'wabsti'),
+        render_kw=dict(force_simple=True)
+    )
+
+    def adjust(self, principal):
+        """ Adjusts the form to the given principal """
+
+        if principal.domain == 'municipality':
+            self.file_format.choices = [
+                choice for choice in self.file_format.choices
+                if choice[0] != 'wabsti' and choice[0] != 'sesam'
+            ]
+
+
+class UploadMajorzElectionForm(UploadElectionBaseForm):
+
+    majority = IntegerField(
+        label=_("Absolute majority"),
+        depends_on=('file_format', '!internal'),
+        validators=[
+            Optional(),
+            NumberRange(min=1)
+        ]
+    )
+
+
+class UploadProporzElectionForm(UploadElectionBaseForm):
+
+    connections = UploadField(
+        label=_("List connections"),
         validators=[
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
@@ -75,49 +105,6 @@ class UploadElectionForm(Form):
         depends_on=('file_format', 'wabsti'),
         render_kw=dict(force_simple=True)
     )
-
-    complete = BooleanField(
-        label=_("Complete"),
-        depends_on=('file_format', 'wabsti'),
-        render_kw=dict(force_simple=True)
-    )
-
-    majority = IntegerField(
-        label=_("Absolute majority"),
-        depends_on=('file_format', '!internal'),
-        validators=[
-            Optional(),
-            NumberRange(min=1)
-        ]
-    )
-
-    def adjust(self, principal, election):
-        """ Adjusts the form to the given principal and election.
-
-        - Wabsti and SESAM format are removed if it is a communal instance.
-        - Connections and statistics are not used for majorz elections
-        - Absoulte majority is not used for proporz elections.
-
-        """
-
-        if principal.domain == 'municipality':
-            self.file_format.choices = [
-                choice for choice in self.file_format.choices
-                if choice[0] != 'wabsti' and choice[0] != 'sesam'
-            ]
-
-        if election.type == 'majorz':
-            self.connections.render_kw['data-depends-on'] = 'file_format/none'
-            self.statistics.render_kw['data-depends-on'] = 'file_format/none'
-            self.majority.render_kw['data-depends-on'] = (
-                'file_format/!internal'
-            )
-        else:
-            self.connections.render_kw['data-depends-on'] = (
-                'file_format/wabsti'
-            )
-            self.statistics.render_kw['data-depends-on'] = 'file_format/wabsti'
-            self.majority.render_kw['data-depends-on'] = 'file_format/none'
 
 
 class UploadElectionPartyResultsForm(Form):

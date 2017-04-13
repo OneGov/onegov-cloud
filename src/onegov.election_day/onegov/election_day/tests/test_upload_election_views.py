@@ -154,7 +154,7 @@ def test_upload_election_year_unavailable(election_day_app_gr):
     )
     csv = csv.encode('utf-8')
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'sesam'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
@@ -186,7 +186,7 @@ def test_upload_election_sesam_majorz(election_day_app_gr, tar_file):
     with tarfile.open(tar_file, 'r|gz') as f:
         csv = f.extractfile(f.next()).read()
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'sesam'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
@@ -209,7 +209,7 @@ def test_upload_election_sesam_majorz(election_day_app_gr, tar_file):
     )))
     assert archive.query().one().progress == (125, 125)
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'sesam'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
@@ -254,7 +254,7 @@ def test_upload_election_sesam_proporz(election_day_app_gr, tar_file):
     with tarfile.open(tar_file, 'r|gz') as f:
         csv = f.extractfile(f.next()).read()
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'sesam'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
@@ -283,7 +283,7 @@ def test_upload_election_sesam_proporz(election_day_app_gr, tar_file):
     )))
     assert archive.query().one().progress == (125, 125)
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'sesam'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
@@ -333,7 +333,7 @@ def test_upload_election_sesam_fail(election_day_app_gr):
         ','.join(HEADER_COLUMNS_SESAM_PROPORZ)
     ).encode('utf-8')
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'sesam'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
@@ -377,7 +377,7 @@ def test_upload_election_sesam_fail(election_day_app_gr):
         ))
     )).encode('utf-8')
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'sesam'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
@@ -425,7 +425,7 @@ def test_upload_election_sesam_fail(election_day_app_gr):
         ))
     )).encode('utf-8')
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'sesam'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
@@ -443,7 +443,7 @@ def test_upload_election_sesam_fail(election_day_app_gr):
     headers.remove('Wahlkreis-Nr')
     csv = '{}\r\n'.format(','.join(headers),).encode('utf-8')
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'sesam'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
@@ -474,7 +474,7 @@ def test_upload_election_wabsti_majorz(election_day_app_sg, tar_file):
     with tarfile.open(tar_file, 'r|gz') as f:
         csv = f.extractfile(f.next()).read()
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'wabsti'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
@@ -499,7 +499,7 @@ def test_upload_election_wabsti_majorz(election_day_app_sg, tar_file):
     assert archive.query().one().progress == (85, 0)
 
     elected = "ID,Name,Vorname\n3,Rechsteiner,Paul".encode('utf-8')
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'wabsti'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload.form['elected'] = Upload('elected.csv', elected, 'text/plain')
@@ -523,7 +523,7 @@ def test_upload_election_wabsti_majorz(election_day_app_sg, tar_file):
         "53'308", "36'282", "54'616"
     )))
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'wabsti'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload.form['elected'] = Upload('elected.csv', elected, 'text/plain')
@@ -600,7 +600,7 @@ def test_upload_election_wabsti_majorz_fail(election_day_app_gr):
     csv_result = '{}\r\n'.format(','.join(headers_result),).encode('utf-8')
     csv_elected = '{}\r\n'.format(','.join(headers_elected),).encode('utf-8')
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'wabsti'
     upload.form['results'] = Upload('data.csv', csv_result, 'text/plain')
     upload.form['elected'] = Upload('elected.csv', csv_elected, 'text/plain')
@@ -671,7 +671,7 @@ def test_upload_election_wabsti_majorz_fail(election_day_app_gr):
         ))
     )).encode('utf-8')
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'wabsti'
     upload.form['results'] = Upload('data.csv', csv_result, 'text/plain')
     upload.form['elected'] = Upload('elected.csv', csv_elected, 'text/plain')
@@ -689,7 +689,7 @@ def test_upload_election_wabsti_majorz_fail(election_day_app_gr):
     csv_result = '{}\r\n'.format(','.join(headers_result),).encode('utf-8')
     csv_elected = '{}\r\n'.format(','.join(headers_elected),).encode('utf-8')
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'wabsti'
     upload.form['results'] = Upload('data.csv', csv_result, 'text/plain')
     upload.form['elected'] = Upload('elected.csv', csv_elected, 'text/plain')
@@ -724,7 +724,7 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
         connections = f.extractfile(f.next()).read()
         stats = f.extractfile(f.next()).read()
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'wabsti'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
@@ -737,7 +737,7 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
     )))
     assert archive.query().one().progress == (11, 0)
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'wabsti'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload.form['connections'] = Upload('cons.csv', connections, 'text/plain')
@@ -770,7 +770,7 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
     elected = "ID,Name,Vorname\n401,Pfister,Gerhard\n"
     elected = elected + "601,Pezzatti,Bruno\n1501,Aeschi,Thomas\n"
     elected = elected.encode('utf-8')
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'wabsti'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload.form['connections'] = Upload('cons.csv', connections, 'text/plain')
@@ -801,7 +801,7 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
         "3'240", "10'174", "17'034"
     )))
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'wabsti'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload.form['connections'] = Upload('cons.csv', connections, 'text/plain')
@@ -855,7 +855,7 @@ def test_upload_election_majorz_roundtrip(election_day_app_gr, tar_file):
     with tarfile.open(tar_file, 'r|gz') as f:
         csv = f.extractfile(f.next()).read()
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'sesam'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
@@ -865,7 +865,7 @@ def test_upload_election_majorz_roundtrip(election_day_app_gr, tar_file):
 
     export = client.get('/election/election/data-csv').text.encode('utf-8')
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'internal'
     upload.form['results'] = Upload('data.csv', export, 'text/plain')
     upload = upload.form.submit()
@@ -877,7 +877,7 @@ def test_upload_election_majorz_roundtrip(election_day_app_gr, tar_file):
 
     assert export == second_export
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'sesam'
     upload.form['majority'] = '500'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
@@ -887,7 +887,7 @@ def test_upload_election_majorz_roundtrip(election_day_app_gr, tar_file):
 
     export = client.get('/election/election/data-csv').text.encode('utf-8')
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'internal'
     upload.form['results'] = Upload('data.csv', export, 'text/plain')
     upload = upload.form.submit()
@@ -922,7 +922,7 @@ def test_upload_election_proporz_roundtrip(election_day_app_gr, tar_file):
     with tarfile.open(tar_file, 'r|gz') as f:
         csv = f.extractfile(f.next()).read()
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'sesam'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
@@ -932,7 +932,7 @@ def test_upload_election_proporz_roundtrip(election_day_app_gr, tar_file):
 
     export = client.get('/election/election/data-csv').text.encode('utf-8')
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'internal'
     upload.form['results'] = Upload('data.csv', export, 'text/plain')
     upload = upload.form.submit()
@@ -944,7 +944,7 @@ def test_upload_election_proporz_roundtrip(election_day_app_gr, tar_file):
 
     assert export == second_export
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'internal'
     upload.form['results'] = Upload('data.csv', second_export, 'text/plain')
     upload = upload.form.submit()
@@ -1010,7 +1010,7 @@ def test_upload_election_onegov_ballot_fail(election_day_app_gr):
     # no data
     csv = '{}\r\n'.format(','.join(headers),).encode('utf-8')
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'internal'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
@@ -1054,7 +1054,7 @@ def test_upload_election_onegov_ballot_fail(election_day_app_gr):
         ))
     )).encode('utf-8')
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'internal'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
@@ -1071,7 +1071,7 @@ def test_upload_election_onegov_ballot_fail(election_day_app_gr):
     headers.remove('entity_id')
     csv = '{}\r\n'.format(','.join(headers),).encode('utf-8')
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'internal'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
@@ -1113,7 +1113,7 @@ def test_upload_election_invalidate_cache(election_day_app_gr):
         '13,0,2037,Party,1,0,1,5,1,Muster,Peter,1,False,40'
     )
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'internal'
     upload.form['results'] = Upload(
         'data.csv', csv.encode('utf-8'), 'text/plain'
@@ -1130,7 +1130,7 @@ def test_upload_election_invalidate_cache(election_day_app_gr):
 
     csv = csv.replace('1013', '1015')
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'internal'
     upload.form['results'] = Upload(
         'data.csv', csv.encode('utf-8'), 'text/plain'
@@ -1167,7 +1167,7 @@ def test_upload_election_temporary_results_majorz(election_day_app):
         '7,2 von 11,1702,Cham,9620,41,0,1,6,0,1,Hegglin,Peter,34,FALSE',
         '7,2 von 11,1702,Cham,9620,41,0,1,6,0,2,Hürlimann,Urs,28,FALSE',
     )).encode('utf-8')
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'sesam'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     assert 'erfolgreich hochgeladen' in upload.form.submit()
@@ -1221,7 +1221,7 @@ def test_upload_election_temporary_results_majorz(election_day_app):
             'Ungültige Stimmen,,0,9'
         )
     )).encode('utf-8')
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'wabsti'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     assert 'erfolgreich hochgeladen' in upload.form.submit()
@@ -1261,7 +1261,7 @@ def test_upload_election_temporary_results_majorz(election_day_app):
             '274,,,,0,,,Hürlimann,Urs,2,False,28'
         ),
     )).encode('utf-8')
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'internal'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     assert 'erfolgreich hochgeladen' in upload.form.submit()
@@ -1332,7 +1332,7 @@ def test_upload_election_temporary_results_proporz(election_day_app):
             'Schriber-Neiger,Hanni,105,2 von 11'
         ),
     )).encode('utf-8')
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'sesam'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     assert 'erfolgreich hochgeladen' in upload.form.submit()
@@ -1365,7 +1365,7 @@ def test_upload_election_temporary_results_proporz(election_day_app):
         '1702,Cham,9926,4863,0,161,50',
     )).encode('utf-8')
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'wabsti'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload.form['statistics'] = Upload('data.csv', csv_stat, 'text/plain')
@@ -1410,7 +1410,7 @@ def test_upload_election_temporary_results_proporz(election_day_app):
             'False,105'
         ),
     )).encode('utf-8')
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'internal'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     assert 'erfolgreich hochgeladen' in upload.form.submit()
@@ -1435,7 +1435,7 @@ def test_upload_election_available_formats_canton(election_day_app):
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     assert sorted([o[0] for o in upload.form['file_format'].options]) == [
         'internal', 'sesam', 'wabsti'
     ]
@@ -1448,7 +1448,7 @@ def test_upload_election_available_formats_canton(election_day_app):
     new.form['domain'] = 'canton'
     new.form.submit()
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     assert sorted([o[0] for o in upload.form['file_format'].options]) == [
         'internal', 'sesam', 'wabsti'
     ]
@@ -1468,7 +1468,7 @@ def test_upload_election_available_formats_municipality(election_day_app_bern):
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     assert [o[0] for o in upload.form['file_format'].options] == ['internal']
 
     new = client.get('/manage/elections/new-election')
@@ -1479,7 +1479,7 @@ def test_upload_election_available_formats_municipality(election_day_app_bern):
     new.form['domain'] = 'canton'
     new.form.submit()
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     assert [o[0] for o in upload.form['file_format'].options] == ['internal']
 
     new = client.get('/manage/elections/new-election')
@@ -1490,7 +1490,7 @@ def test_upload_election_available_formats_municipality(election_day_app_bern):
     new.form['domain'] = 'municipality'
     new.form.submit()
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     assert [o[0] for o in upload.form['file_format'].options] == ['internal']
 
 
@@ -1557,7 +1557,7 @@ def test_upload_communal_election(election_day_app_kriens):
         ),
     )).encode('utf-8')
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'internal'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     assert "erfolgreich hochgeladen" in upload.form.submit()
@@ -1688,7 +1688,7 @@ def test_upload_communal_election_districts(election_day_app_bern):
         ),
     )).encode('utf-8')
 
-    upload = client.get('/election/election/upload')
+    upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'internal'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     assert "erfolgreich hochgeladen" in upload.form.submit()
@@ -1757,7 +1757,7 @@ def test_upload_election_expats_majorz(election_day_app):
                 'Ungültige Stimmen,,0,9'
             ).format(id_)
         )).encode('utf-8')
-        upload = client.get('/election/election/upload')
+        upload = client.get('/election/election/upload').follow()
         upload.form['file_format'] = 'wabsti'
         upload.form['results'] = Upload('data.csv', csv, 'text/plain')
         assert 'erfolgreich hochgeladen' in upload.form.submit()
@@ -1807,7 +1807,7 @@ def test_upload_election_expats_majorz(election_day_app):
                 ',40,0,0,0,40,18,0,262,,,,0,,,Hürlimann,Urs,2,False,25'
             ).format(id_)
         )).encode('utf-8')
-        upload = client.get('/election/election/upload')
+        upload = client.get('/election/election/upload').follow()
         upload.form['file_format'] = 'internal'
         upload.form['results'] = Upload('data.csv', csv, 'text/plain')
         assert 'erfolgreich hochgeladen' in upload.form.submit()
@@ -1842,7 +1842,7 @@ def test_upload_election_expats_proporz(election_day_app):
             ).format(id_),
         )).encode('utf-8')
 
-        upload = client.get('/election/election/upload')
+        upload = client.get('/election/election/upload').follow()
         upload.form['file_format'] = 'sesam'
         upload.form['results'] = Upload('data.csv', csv, 'text/plain')
         assert 'erfolgreich hochgeladen' in upload.form.submit()
@@ -1865,7 +1865,7 @@ def test_upload_election_expats_proporz(election_day_app):
             '{},Auslandschweizer,14119,7462,77,196,122'.format(id_),
         )).encode('utf-8')
 
-        upload = client.get('/election/election/upload')
+        upload = client.get('/election/election/upload').follow()
         upload.form['file_format'] = 'wabsti'
         upload.form['results'] = Upload('data.csv', csv, 'text/plain')
         upload.form['statistics'] = Upload('data.csv', csv_stat, 'text/plain')
@@ -1883,7 +1883,7 @@ def test_upload_election_expats_proporz(election_day_app):
                 'Lustenberger,Andreas,101,False,948'
             ).format(id_)
         )).encode('utf-8')
-        upload = client.get('/election/election/upload')
+        upload = client.get('/election/election/upload').follow()
         upload.form['file_format'] = 'internal'
         upload.form['results'] = Upload('data.csv', csv, 'text/plain')
         assert 'erfolgreich hochgeladen' in upload.form.submit()
@@ -1916,7 +1916,7 @@ def test_upload_election_notify_hipchat(election_day_app):
     with patch('urllib.request.urlopen') as urlopen:
 
         # Hipchat not set
-        upload = client.get('/election/election/upload')
+        upload = client.get('/election/election/upload').follow()
         upload.form['file_format'] = 'sesam'
         upload.form['results'] = Upload('data.csv', csv, 'text/plain')
         assert 'erfolgreich hochgeladen' in upload.form.submit()
@@ -1928,7 +1928,7 @@ def test_upload_election_notify_hipchat(election_day_app):
         election_day_app.hipchat_token = 'abcd'
         election_day_app.hipchat_room_id = '1234'
 
-        upload = client.get('/election/election/upload')
+        upload = client.get('/election/election/upload').follow()
         upload.form['file_format'] = 'sesam'
         upload.form['results'] = Upload('data.csv', csv, 'text/plain')
         assert 'erfolgreich hochgeladen' in upload.form.submit()

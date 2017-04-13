@@ -135,7 +135,7 @@ def upload_majorz_election(client, create=True, canton='gr'):
         )
     csv = csv.encode('utf-8')
 
-    upload = client.get('/election/majorz-election/upload')
+    upload = client.get('/election/majorz-election/upload').follow()
     upload.form['file_format'] = 'sesam'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
@@ -205,7 +205,7 @@ def upload_proporz_election(client, create=True, canton='gr'):
         )
     csv = csv.encode('utf-8')
 
-    upload = client.get('/election/proporz-election/upload')
+    upload = client.get('/election/proporz-election/upload').follow()
     upload.form['file_format'] = 'sesam'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
