@@ -14,7 +14,7 @@ from onegov.election_day.forms import TriggerNotificationForm
 from onegov.election_day.layout import ManageElectionsLayout
 
 
-@ElectionDayApp.html(model=ElectionCollection, template='manage_elections.pt',
+@ElectionDayApp.html(model=ElectionCollection, template='manage/elections.pt',
                      permission=Private)
 def view_elections(self, request):
 

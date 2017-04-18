@@ -1,3 +1,5 @@
+from onegov.election_day.forms.data_source import DataSourceForm
+from onegov.election_day.forms.data_source import DataSourceItemForm
 from onegov.election_day.forms.election import ElectionForm
 from onegov.election_day.forms.subscribe import SubscribeForm
 from onegov.election_day.forms.upload import UploadElectionPartyResultsForm
@@ -19,6 +21,8 @@ class TriggerNotificationForm(Form):
 
 
 __all__ = [
+    'DataSourceForm',
+    'DataSourceItemForm',
     'DeleteForm',
     'ElectionForm',
     'SubscribeForm',
@@ -29,5 +33,5 @@ __all__ = [
     'UploadVoteForm',
     'UploadWabstiMajorzElectionForm',
     'UploadWabstiVoteForm',
-    'VoteForm'
+    'VoteForm',
 ]

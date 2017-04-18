@@ -1,0 +1,97 @@
+from onegov.election_day import _
+from onegov.form import Form
+from wtforms import RadioField, StringField
+from wtforms.validators import InputRequired
+
+
+UPLOAD_TYPES = (
+    ('vote', _("Vote")),
+    ('proporz', _("Election (proporz)")),
+    ('majorz', _("Election (majorz)")),
+)
+
+
+class DataSourceForm(Form):
+
+    name = StringField(
+        label=_("Name"),
+        validators=[
+            InputRequired()
+        ],
+    )
+
+    upload_type = RadioField(
+        _("Type"),
+        choices=list(UPLOAD_TYPES),
+        validators=[
+            InputRequired()
+        ],
+        default='vote'
+    )
+
+    def update_model(self, model):
+        model.name = self.name.data
+        model.type = self.upload_type.data
+
+    def apply_model(self, model):
+        self.name.data = model.name
+        self.upload_type.data = model.type
+
+
+class DataSourceItemForm(Form):
+
+    item = RadioField(
+        label="",
+        choices=[],
+        validators=[
+            InputRequired()
+        ]
+    )
+
+    district = StringField(
+        label=_("'SortWahlkreis'"),
+        validators=[
+            InputRequired()
+        ],
+        render_kw=dict(force_simple=True)
+    )
+
+    number = StringField(
+        label=_("'SortGeschaeft'"),
+        validators=[
+            InputRequired()
+        ],
+        render_kw=dict(force_simple=True)
+    )
+
+    callout = ''
+
+    def populate(self, source):
+        self.type = source.type
+        self.item.label.text = dict(UPLOAD_TYPES).get(self.type)
+        self.item.choices = [
+            (item.id, item.title) for item in source.query_candidates()
+        ]
+        if not self.item.choices:
+            if self.type == 'vote':
+                self.callout = _("No votes yet.")
+            else:
+                self.callout = _("No elections yet.")
+
+    def update_model(self, model):
+        if self.type == 'vote':
+            model.vote_id = self.item.data
+        else:
+            model.election_id = self.item.data
+
+        model.district = self.district.data
+        model.number = self.number.data
+
+    def apply_model(self, model):
+        if self.type == 'vote':
+            self.item.data = model.vote_id
+        else:
+            self.item.data = model.election_id
+
+        self.district.data = model.district
+        self.number.data = model.number

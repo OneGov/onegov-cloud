@@ -14,7 +14,7 @@ from onegov.election_day.forms import VoteForm
 from onegov.election_day.layout import ManageVotesLayout
 
 
-@ElectionDayApp.html(model=VoteCollection, template='manage_votes.pt',
+@ElectionDayApp.html(model=VoteCollection, template='manage/votes.pt',
                      permission=Private)
 def view_votes(self, request):
 

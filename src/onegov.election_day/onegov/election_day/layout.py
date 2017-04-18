@@ -9,6 +9,8 @@ from onegov.core.static import StaticFile
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day.collections import ArchivedResultCollection
+from onegov.election_day.collections import DataSourceCollection
+from onegov.election_day.collections import DataSourceItemCollection
 from onegov.election_day.collections import SubscriberCollection
 from onegov.election_day.utils import pdf_filename, svg_filename
 from onegov.user import Auth
@@ -419,6 +421,10 @@ class ManageLayout(DefaultLayout):
         class_ = 'active' if link == self.manage_model_link else ''
         menu.append((_("Elections"), link, class_))
 
+        link = self.request.link(DataSourceCollection(session))
+        class_ = 'active' if link == self.manage_model_link else ''
+        menu.append((_("Data sources"), link, class_))
+
         if self.principal.sms_notification:
             link = self.request.link(SubscriberCollection(session))
             class_ = 'active' if link == self.manage_model_link else ''
@@ -476,4 +482,46 @@ class ManageSubscribersLayout(ManageLayout):
         super().__init__(model, request)
         self.breadcrumbs.append(
             (_("Subscribers"), request.link(self.model), ''),
+        )
+
+
+class ManageDataSourcesLayout(ManageLayout):
+
+    @cached_property
+    def manage_model_link(self):
+        return self.request.link(
+            DataSourceCollection(self.request.app.session())
+        )
+
+    def __init__(self, model, request):
+        super().__init__(model, request)
+        self.breadcrumbs.append(
+            (_("Data sources"), request.link(self.model), ''),
+        )
+
+
+class ManageDataSourceItemsLayout(ManageLayout):
+
+    @cached_property
+    def manage_model_link(self):
+        return self.request.link(
+            DataSourceItemCollection(
+                self.request.app.session(),
+                self.model.id
+            )
+        )
+
+    def __init__(self, model, request):
+        super().__init__(model, request)
+        self.breadcrumbs.append(
+            (
+                _("Data sources"),
+                self.request.link(
+                    DataSourceCollection(self.request.app.session())
+                ),
+                ''
+            ),
+        )
+        self.breadcrumbs.append(
+            (_("Items"), request.link(self.model), ''),
         )

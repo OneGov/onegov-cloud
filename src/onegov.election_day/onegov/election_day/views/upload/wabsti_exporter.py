@@ -2,7 +2,6 @@ import transaction
 
 from base64 import b64decode
 from onegov.ballot import Election
-from onegov.ballot import Vote
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
@@ -13,16 +12,19 @@ from onegov.election_day.formats.vote.wabsti import \
 from onegov.election_day.formats.election.wabsti.majorz import \
     import_exporter_files as import_majorz
 from onegov.election_day.models import Principal
+from onegov.election_day.models import DataSource
 from webob.exc import HTTPForbidden
 
 
-def authenticate(request):
+def authenticated_source(request):
     try:
-        # todo: fix this
         token = b64decode(
             request.authorization[1]
         ).decode('utf-8').split(':')[1]
-        assert token == 'token'
+
+        query = request.app.session().query(DataSource)
+        query = query.filter(DataSource.token == token)
+        return query.one()
     except:
         raise HTTPForbidden()
 
@@ -48,7 +50,15 @@ def view_upload_wabsti_vote(self, request):
             http://localhost:8080/onegov_election_day/sg/upload-wabsti-vote
     """
 
-    authenticate(request)
+    data_source = authenticated_source(request)
+
+    if data_source.type != 'vote':
+        return {
+            'status': 'error',
+            'errors': {
+                'data_source': 'The data source is note configured properly'
+            }
+        }
 
     form = request.get_form(
         UploadWabstiVoteForm,
@@ -65,11 +75,8 @@ def view_upload_wabsti_vote(self, request):
     errors = {}
     session = request.app.session()
     archive = ArchivedResultCollection(session)
-    for vote in session.query(Vote):
-
-        if not (vote.meta or {}).get('upload_type') == 'wabsti':
-            continue
-
+    for item in data_source.items:
+        vote = item.item
         errors[vote.id] = []
         if not self.is_year_available(vote.date.year, self.use_maps):
             errors[vote.id].append({
@@ -77,17 +84,9 @@ def view_upload_wabsti_vote(self, request):
             })
             continue
 
-        district = vote.meta.get('upload_wabsti_district')
-        number = vote.meta.get('upload_wabsti_number')
-        if not district or not number:
-            errors[vote.id].append({
-                'message': 'The vote is note configured properly'
-            })
-            continue
-
         entities = self.entities.get(vote.date.year, {})
         errors[vote.id] = import_vote(
-            vote, district, number, entities,
+            vote, item.district, item.number, entities,
             form.sg_gemeinden.raw_data[0].file,
             form.sg_gemeinden.data['mimetype']
         )
@@ -125,7 +124,15 @@ def view_upload_wabsti_majorz(self, request):
             http://localhost:8080/onegov_election_day/sg/upload-wabsti-majorz
     """
 
-    authenticate(request)
+    data_source = authenticated_source(request)
+
+    if data_source.type != 'majorz':
+        return {
+            'status': 'error',
+            'errors': {
+                'data_source': 'The data source is note configured properly'
+            }
+        }
 
     form = request.get_form(
         UploadWabstiMajorzElectionForm,
@@ -142,10 +149,8 @@ def view_upload_wabsti_majorz(self, request):
     errors = {}
     session = request.app.session()
     archive = ArchivedResultCollection(session)
-    for election in session.query(Election).filter_by(type='majorz'):
-
-        if not (election.meta or {}).get('upload_type') == 'wabsti':
-            continue
+    for item in data_source.items:
+        election = item.item
 
         errors[election.id] = []
         if not self.is_year_available(election.date.year, self.use_maps):
@@ -154,17 +159,9 @@ def view_upload_wabsti_majorz(self, request):
             })
             continue
 
-        district = election.meta.get('upload_wabsti_district')
-        number = election.meta.get('upload_wabsti_number')
-        if not district or not number:
-            errors[election.id].append({
-                'message': 'The election is note configured properly'
-            })
-            continue
-
         entities = self.entities.get(election.date.year, {})
         errors[election.id] = import_majorz(
-            election, district, number, entities,
+            election, item.district, item.number, entities,
             form.wmstatic_gemeinden.raw_data[0].file,
             form.wmstatic_gemeinden.data['mimetype'],
             form.wm_gemeinden.raw_data[0].file,

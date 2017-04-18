@@ -56,36 +56,6 @@ class VoteForm(Form):
         label=_("Related link")
     )
 
-    upload_type = RadioField(
-        _("Upload"),
-        choices=[
-            ('manual', _("Manual")),
-            ('wabsti', _("Automatic (Wabsti)")),
-        ],
-        validators=[
-            InputRequired()
-        ],
-        default='manual'
-    )
-
-    upload_wabsti_district = StringField(
-        label=_("Automatic upload (Wabsti): 'SortWahlkreis'"),
-        validators=[
-            InputRequired()
-        ],
-        render_kw=dict(force_simple=True),
-        depends_on=('upload_type', 'wabsti'),
-    )
-
-    upload_wabsti_number = StringField(
-        label=_("Automatic upload (Wabsti): 'SortGeschaeft'"),
-        validators=[
-            InputRequired()
-        ],
-        render_kw=dict(force_simple=True),
-        depends_on=('upload_type', 'wabsti'),
-    )
-
     def set_domain(self, principal):
         self.domain.choices = [
             (key, text)
@@ -113,9 +83,6 @@ class VoteForm(Form):
             model.meta = {}
         model.meta['related_link'] = self.related_link.data
         model.meta['vote_type'] = self.vote_type.data
-        model.meta['upload_type'] = self.upload_type.data
-        model.meta['upload_wabsti_district'] = self.upload_wabsti_district.data
-        model.meta['upload_wabsti_number'] = self.upload_wabsti_number.data
 
     def apply_model(self, model):
         self.vote_de.data = model.title_translations['de_CH']
@@ -130,10 +97,3 @@ class VoteForm(Form):
         meta_data = model.meta or {}
         self.related_link.data = meta_data.get('related_link', '')
         self.vote_type.data = meta_data.get('vote_type', 'simple')
-        self.upload_type.data = meta_data.get('upload_type', 'manual')
-        self.upload_wabsti_district.data = meta_data.get(
-            'upload_wabsti_district', ''
-        )
-        self.upload_wabsti_number.data = meta_data.get(
-            'upload_wabsti_number', ''
-        )

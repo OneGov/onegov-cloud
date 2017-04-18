@@ -1,0 +1,65 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+
+        <div metal:use-macro="layout.macros['tab_menu']"></div>
+        <div metal:use-macro="layout.macros['breadcrumbs']"></div>
+
+        <div class="row manage-data-sources">
+            <div class="small-12 columns">
+
+                <div class="row">
+                    <div class="small-12 medium-6 columns">
+                        <h1 i18n:translate>Data sources</h1>
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <ul class="top-actions text-right">
+                            <li><a class="action-new" href="${new_source}" i18n:translate>New data source</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <p tal:condition="not:data_sources" i18n:translate>
+                    No data sources yet.
+                </p>
+
+                <table class="data_sources stackable" tal:condition="data_sources">
+                    <thead>
+                        <tr>
+                            <th i18n:translate>Source</th>
+                            <th i18n:translate>Type</th>
+                            <th i18n:translate>Token</th>
+                            <th i18n:translate>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr tal:repeat="data_source data_sources">
+                        <td>${data_source.name}</td>
+                        <td>${data_source.type}</td>
+                        <td>${data_source.token}</td>
+                        <td>
+                            <ul class="actions">
+                                <li>
+                                    <a i18n:translate class="action-delete" href="${request.link(data_source, 'delete')}">Delete</a>
+                                </li>
+                                <li>
+                                    <a i18n:translate class="action-edit" href="${request.link(data_source, 'edit')}">Edit</a>
+                                </li>
+                                <li>
+                                    <a i18n:translate class="action-generate-token" href="${request.link(data_source, 'generate-token')}">Regenerate token</a>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="pagination-centered">
+                    <div metal:use-macro="layout.macros['pagination']" tal:define="collection layout.model; current_page layout.model;" />
+                </div>
+
+            </div>
+        </div>
+    </tal:block>
+</div>

@@ -12,7 +12,7 @@ from onegov.election_day.models import Subscriber
 
 
 @ElectionDayApp.html(model=SubscriberCollection,
-                     template='manage_subsribers.pt',
+                     template='manage/subsribers.pt',
                      permission=Private)
 def view_subscribers(self, request):
 
