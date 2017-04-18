@@ -10,6 +10,7 @@ class DummyPrincipal(object):
         self.webhooks = []
         self.sms_notification = None
         self.domain = 'canton'
+        self.wabsti_import = False
 
 
 class DummyApp(object):

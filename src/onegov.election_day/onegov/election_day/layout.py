@@ -421,9 +421,10 @@ class ManageLayout(DefaultLayout):
         class_ = 'active' if link == self.manage_model_link else ''
         menu.append((_("Elections"), link, class_))
 
-        link = self.request.link(DataSourceCollection(session))
-        class_ = 'active' if link == self.manage_model_link else ''
-        menu.append((_("Data sources"), link, class_))
+        if self.principal.wabsti_import:
+            link = self.request.link(DataSourceCollection(session))
+            class_ = 'active' if link == self.manage_model_link else ''
+            menu.append((_("Data sources"), link, class_))
 
         if self.principal.sms_notification:
             link = self.request.link(SubscriberCollection(session))
