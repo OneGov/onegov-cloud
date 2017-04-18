@@ -31,6 +31,9 @@ Changelog
 - Fixs providing giving an invalid archive date throwing an error.
   [msom]
 
+- Improves the performance of the send-sms command.
+  [msom]
+
 1.7.5 (2017-04-07)
 ~~~~~~~~~~~~~~~~~~~
 
