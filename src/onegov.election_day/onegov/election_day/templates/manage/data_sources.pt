@@ -28,7 +28,7 @@
                 <table class="data_sources stackable" tal:condition="data_sources">
                     <thead>
                         <tr>
-                            <th i18n:translate>Source</th>
+                            <th i18n:translate>Name</th>
                             <th i18n:translate>Type</th>
                             <th i18n:translate>Token</th>
                             <th i18n:translate>Actions</th>
@@ -37,7 +37,7 @@
                     <tbody>
                     <tr tal:repeat="data_source data_sources">
                         <td>${data_source.name}</td>
-                        <td>${data_source.type}</td>
+                        <td>${labels.get(data_source.type)}</td>
                         <td>${data_source.token}</td>
                         <td>
                             <ul class="actions">
@@ -45,7 +45,7 @@
                                     <a i18n:translate class="action-delete" href="${request.link(data_source, 'delete')}">Delete</a>
                                 </li>
                                 <li>
-                                    <a i18n:translate class="action-edit" href="${request.link(data_source, 'edit')}">Edit</a>
+                                    <a i18n:translate class="action-manage" href="${request.link(data_source, 'manage')}">Manage</a>
                                 </li>
                                 <li>
                                     <a i18n:translate class="action-generate-token" href="${request.link(data_source, 'generate-token')}">Regenerate token</a>

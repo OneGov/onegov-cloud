@@ -1,14 +1,8 @@
 from onegov.election_day import _
+from onegov.election_day.models.data_source import UPLOAD_TYPE_LABELS
 from onegov.form import Form
 from wtforms import RadioField, StringField
 from wtforms.validators import InputRequired
-
-
-UPLOAD_TYPES = (
-    ('vote', _("Vote")),
-    ('proporz', _("Election (proporz)")),
-    ('majorz', _("Election (majorz)")),
-)
 
 
 class DataSourceForm(Form):
@@ -22,7 +16,7 @@ class DataSourceForm(Form):
 
     upload_type = RadioField(
         _("Type"),
-        choices=list(UPLOAD_TYPES),
+        choices=list(UPLOAD_TYPE_LABELS),
         validators=[
             InputRequired()
         ],
@@ -49,7 +43,7 @@ class DataSourceItemForm(Form):
     )
 
     district = StringField(
-        label=_("'SortWahlkreis'"),
+        label="'SortWahlkreis'",
         validators=[
             InputRequired()
         ],
@@ -57,7 +51,7 @@ class DataSourceItemForm(Form):
     )
 
     number = StringField(
-        label=_("'SortGeschaeft'"),
+        label="'SortGeschaeft'",
         validators=[
             InputRequired()
         ],
@@ -68,7 +62,7 @@ class DataSourceItemForm(Form):
 
     def populate(self, source):
         self.type = source.type
-        self.item.label.text = dict(UPLOAD_TYPES).get(self.type)
+        self.item.label.text = dict(UPLOAD_TYPE_LABELS).get(self.type)
         self.item.choices = [
             (item.id, item.title) for item in source.query_candidates()
         ]

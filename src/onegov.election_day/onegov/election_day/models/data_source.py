@@ -3,6 +3,7 @@ from onegov.ballot import Vote
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.election_day import _
 from sqlalchemy import Column
 from sqlalchemy import desc
 from sqlalchemy import Enum
@@ -12,6 +13,13 @@ from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from uuid import uuid4
+
+
+UPLOAD_TYPE_LABELS = (
+    ('vote', _("Vote")),
+    ('proporz', _("Election based on proportional representation")),
+    ('majorz', _("Election based on the simple majority system")),
+)
 
 
 class DataSource(Base, TimestampMixin):
@@ -46,6 +54,10 @@ class DataSource(Base, TimestampMixin):
         lazy="dynamic",
         backref=backref("source"),
     )
+
+    @property
+    def label(self):
+        return dict(UPLOAD_TYPE_LABELS).get(self.type)
 
     def query_candidates(self):
         """ Returns a list of available votes or elections matching the

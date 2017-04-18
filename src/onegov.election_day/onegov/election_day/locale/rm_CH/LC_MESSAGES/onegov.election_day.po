@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-10 13:31+0200\n"
+"POT-Creation-Date: 2017-04-18 16:20+0200\n"
 "PO-Revision-Date: 2017-03-29 13:10+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -52,11 +52,17 @@ msgstr "Votaziuns"
 msgid "Elections"
 msgstr "Elecziuns"
 
+msgid "Data sources"
+msgstr ""
+
 msgid "Manage"
 msgstr "Administrar"
 
 msgid "Subscribers"
 msgstr "Abunents"
+
+msgid "Mappings"
+msgstr ""
 
 #, python-format
 msgid "Missing columns: '${cols}'"
@@ -165,13 +171,17 @@ msgstr "Dapli vuschs entradas che persunas cun dretg da votar."
 msgid "Invalid ballot type"
 msgstr "Tip da votaziun nunvalaivel"
 
-msgid ""
-"The specified vote ('SortWahlkreis'/'SortGeschaeft') is not present in the "
-"data"
+msgid "Type"
+msgstr "Gener"
+
+msgid "Name"
 msgstr ""
 
-msgid "Upload"
-msgstr ""
+msgid "No votes yet."
+msgstr "I n'èn registradas anc naginas votaziuns."
+
+msgid "No elections yet."
+msgstr "I n'èn registradas anc naginas elecziuns."
 
 msgid "Election (German)"
 msgstr "Elecziun (tudestg)"
@@ -197,32 +207,17 @@ msgstr "Sezs"
 msgid "System"
 msgstr "Sistem"
 
-msgid "Type"
-msgstr "Gener"
-
 msgid "Related link"
 msgstr "Ulteriuras infurmaziuns"
 
-msgid "Automatic upload (Wabsti): 'SortWahlkreis'"
-msgstr ""
-
-msgid "Automatic upload (Wabsti): 'SortGeschaeft'"
-msgstr ""
-
-msgid "Automatic upload (Wabsti): Folder"
-msgstr ""
+msgid "Absolute majority"
+msgstr "Maioritad absoluta"
 
 msgid "Election based on proportional representation"
 msgstr "Elecziun da proporz"
 
-msgid "Majority system"
+msgid "Election based on the simple majority system"
 msgstr "Elecziun da maiorz"
-
-msgid "Manual"
-msgstr ""
-
-msgid "Automatic (Wabsti)"
-msgstr ""
 
 msgid "Phone number"
 msgstr "Numer da telefon"
@@ -233,20 +228,17 @@ msgstr "Format da la datoteca"
 msgid "Complete"
 msgstr "Resultat eruì cumplettamain"
 
-msgid "Absolute majority"
-msgstr "Maioritad absoluta"
-
 msgid "Vote number"
 msgstr "Numer dal project"
 
-msgid "SESAM"
-msgstr "SESAM"
+msgid "OneGov Cloud"
+msgstr "OneGov Cloud"
 
 msgid "Wabsti"
 msgstr "Wabsti"
 
-msgid "OneGov Cloud"
-msgstr "OneGov Cloud"
+msgid "SESAM"
+msgstr "SESAM"
 
 msgid "Default"
 msgstr "Standard"
@@ -271,6 +263,9 @@ msgstr "Votaziun (talian)"
 
 msgid "Vote (Romansh)"
 msgstr "Votaziun (rumantsch)"
+
+msgid "Vote"
+msgstr "Votaziun"
 
 #, python-format
 msgid "New results are available on ${url}"
@@ -320,9 +315,6 @@ msgstr "Annunzià"
 
 msgid "Updated"
 msgstr "Actualisà"
-
-msgid "Vote"
-msgstr "Votaziun"
 
 msgid "Result"
 msgstr "Resultat"
@@ -513,41 +505,8 @@ msgstr "Voss resultats n'han displaschaivlamain betg pudì vegnir chargiads si."
 msgid "Line"
 msgstr "Lingia"
 
-msgid "New Election"
-msgstr "Nova elecziun"
-
-msgid "No elections yet."
-msgstr "I n'èn registradas anc naginas elecziuns."
-
-msgid "Actions"
-msgstr "Acziuns"
-
-msgid "View"
-msgstr "Mussar"
-
-msgid "Edit"
-msgstr "Modifitgar"
-
 msgid "Upload results"
 msgstr "Chargiar si resultats"
-
-msgid "Trigger notifications"
-msgstr "Trametter communicaziuns als abunents"
-
-msgid "Delete"
-msgstr "Stizzar"
-
-msgid "No subscribers yet."
-msgstr "Anc nagins abunents."
-
-msgid "Locale"
-msgstr "Regiun linguistica"
-
-msgid "New Vote"
-msgstr "Nova votaziun"
-
-msgid "No votes yet."
-msgstr "I n'èn registradas anc naginas votaziuns."
 
 msgid "Your results were uploaded successfully."
 msgstr "Voss resultats èn vegnids chargiads si cun success."
@@ -669,6 +628,54 @@ msgstr "Cedels electorals nunvalaivels"
 msgid "Accounted Votes"
 msgstr "Vuschs valaivlas"
 
+msgid "New mapping"
+msgstr ""
+
+msgid "No mappings yet."
+msgstr ""
+
+msgid "Delete"
+msgstr "Stizzar"
+
+msgid "Edit"
+msgstr "Modifitgar"
+
+msgid "New data source"
+msgstr ""
+
+msgid "No data sources yet."
+msgstr ""
+
+msgid "Token"
+msgstr ""
+
+msgid "Actions"
+msgstr "Acziuns"
+
+msgid "Regenerate token"
+msgstr ""
+
+msgid "New Election"
+msgstr "Nova elecziun"
+
+msgid "View"
+msgstr "Mussar"
+
+msgid "Upload party results"
+msgstr ""
+
+msgid "Trigger notifications"
+msgstr "Trametter communicaziuns als abunents"
+
+msgid "No subscribers yet."
+msgstr "Anc nagins abunents."
+
+msgid "Locale"
+msgstr "Regiun linguistica"
+
+msgid "New Vote"
+msgstr "Nova votaziun"
+
 msgid "Empty"
 msgstr "Vid"
 
@@ -705,9 +712,18 @@ msgstr ""
 msgid "Blank list"
 msgstr "Glista en blanco"
 
+msgid "Do you really want to regenerate the token?"
+msgstr ""
+
 #, python-format
 msgid "Do you really want to delete \"${item}\"?"
 msgstr "Vulais Vus propi stizzar \"${item}\"?"
+
+msgid "Delete data source"
+msgstr ""
+
+msgid "Delete mapping"
+msgstr ""
 
 msgid "Delete election"
 msgstr "Stizzar l'elecziun"
@@ -731,6 +747,3 @@ msgstr "Stizzar la votaziun"
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "L'onn ${year} na vegn anc betg sustegnì"
-
-#~ msgid "This ballot has fewer results than the others"
-#~ msgstr "Quest project ha main resultats ch'ils auters projects."

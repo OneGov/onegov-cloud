@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-10 13:31+0200\n"
+"POT-Creation-Date: 2017-04-18 16:20+0200\n"
 "PO-Revision-Date: 2017-03-29 13:05+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -53,11 +53,17 @@ msgstr "Votazioni"
 msgid "Elections"
 msgstr "Elezioni"
 
+msgid "Data sources"
+msgstr ""
+
 msgid "Manage"
 msgstr "Amministrare"
 
 msgid "Subscribers"
 msgstr "Iscritti"
+
+msgid "Mappings"
+msgstr ""
 
 #, python-format
 msgid "Missing columns: '${cols}'"
@@ -165,13 +171,17 @@ msgstr "Il numero di voti espressi supera quello degli aventi diritto di voto"
 msgid "Invalid ballot type"
 msgstr "Tipo di scheda non valido"
 
-msgid ""
-"The specified vote ('SortWahlkreis'/'SortGeschaeft') is not present in the "
-"data"
+msgid "Type"
+msgstr "Tipo"
+
+msgid "Name"
 msgstr ""
 
-msgid "Upload"
-msgstr ""
+msgid "No votes yet."
+msgstr "Ancora nessun oggetto in votazione rilevato."
+
+msgid "No elections yet."
+msgstr "Ancora nessun oggetto in elezione rilevato."
 
 msgid "Election (German)"
 msgstr "Elezione (tedesco)"
@@ -197,32 +207,17 @@ msgstr "Mandati"
 msgid "System"
 msgstr "Sistema"
 
-msgid "Type"
-msgstr "Tipo"
-
 msgid "Related link"
 msgstr "Ulteriori informazioni"
 
-msgid "Automatic upload (Wabsti): 'SortWahlkreis'"
-msgstr ""
-
-msgid "Automatic upload (Wabsti): 'SortGeschaeft'"
-msgstr ""
-
-msgid "Automatic upload (Wabsti): Folder"
-msgstr ""
+msgid "Absolute majority"
+msgstr "Maggioranza assoluta"
 
 msgid "Election based on proportional representation"
-msgstr "Sistema proporzionale"
+msgstr "Elezione secondo il sistema proporzionale"
 
-msgid "Majority system"
-msgstr "Sistema maggioritario"
-
-msgid "Manual"
-msgstr ""
-
-msgid "Automatic (Wabsti)"
-msgstr ""
+msgid "Election based on the simple majority system"
+msgstr "Elezione secondo il sistema maggioritario"
 
 msgid "Phone number"
 msgstr "Numero di telefono"
@@ -233,20 +228,17 @@ msgstr "Formato del file"
 msgid "Complete"
 msgstr "Completo"
 
-msgid "Absolute majority"
-msgstr "Maggioranza assoluta"
-
 msgid "Vote number"
 msgstr "Numero di voti"
 
-msgid "SESAM"
-msgstr "SESAM"
+msgid "OneGov Cloud"
+msgstr "OneGov Cloud"
 
 msgid "Wabsti"
 msgstr "Wabsti"
 
-msgid "OneGov Cloud"
-msgstr "OneGov Cloud"
+msgid "SESAM"
+msgstr "SESAM"
 
 msgid "Default"
 msgstr "Predefinito"
@@ -271,6 +263,9 @@ msgstr "Votazione (italiano)"
 
 msgid "Vote (Romansh)"
 msgstr "Votazione (romancio)"
+
+msgid "Vote"
+msgstr "Progetto"
 
 #, python-format
 msgid "New results are available on ${url}"
@@ -320,9 +315,6 @@ msgstr "Comunicati"
 
 msgid "Updated"
 msgstr "Aggiornato"
-
-msgid "Vote"
-msgstr "Progetto"
 
 msgid "Result"
 msgstr "Risultato"
@@ -476,41 +468,8 @@ msgstr "I Suoi risultati non hanno potuto essere caricati."
 msgid "Line"
 msgstr "Riga"
 
-msgid "New Election"
-msgstr "Nuova elezione"
-
-msgid "No elections yet."
-msgstr "Ancora nessun oggetto in elezione rilevato."
-
-msgid "Actions"
-msgstr "Azioni"
-
-msgid "View"
-msgstr "Mostrare"
-
-msgid "Edit"
-msgstr "Elabora"
-
 msgid "Upload results"
 msgstr "Caricare risultati"
-
-msgid "Trigger notifications"
-msgstr "Attivazione delle notifiche"
-
-msgid "Delete"
-msgstr "Cancellare"
-
-msgid "No subscribers yet."
-msgstr "Non ci sono ancora degli iscritti…"
-
-msgid "Locale"
-msgstr "Località"
-
-msgid "New Vote"
-msgstr "Nuova votazione"
-
-msgid "No votes yet."
-msgstr "Ancora nessun oggetto in votazione rilevato."
 
 msgid "Your results were uploaded successfully."
 msgstr "I Suoi risultati sono stati caricati correttamente."
@@ -630,6 +589,54 @@ msgstr "Schede nulle"
 msgid "Accounted Votes"
 msgstr "Voti validi"
 
+msgid "New mapping"
+msgstr ""
+
+msgid "No mappings yet."
+msgstr ""
+
+msgid "Delete"
+msgstr "Cancellare"
+
+msgid "Edit"
+msgstr "Elabora"
+
+msgid "New data source"
+msgstr ""
+
+msgid "No data sources yet."
+msgstr ""
+
+msgid "Token"
+msgstr ""
+
+msgid "Actions"
+msgstr "Azioni"
+
+msgid "Regenerate token"
+msgstr ""
+
+msgid "New Election"
+msgstr "Nuova elezione"
+
+msgid "View"
+msgstr "Mostrare"
+
+msgid "Upload party results"
+msgstr ""
+
+msgid "Trigger notifications"
+msgstr "Attivazione delle notifiche"
+
+msgid "No subscribers yet."
+msgstr "Non ci sono ancora degli iscritti…"
+
+msgid "Locale"
+msgstr "Località"
+
+msgid "New Vote"
+msgstr "Nuova votazione"
+
 msgid "Empty"
 msgstr "Bianche"
 
@@ -663,9 +670,18 @@ msgstr ""
 msgid "Blank list"
 msgstr "Lista bianca"
 
+msgid "Do you really want to regenerate the token?"
+msgstr ""
+
 #, python-format
 msgid "Do you really want to delete \"${item}\"?"
 msgstr "Sei sicuro/a di voler eliminare \"${item}\"?"
+
+msgid "Delete data source"
+msgstr ""
+
+msgid "Delete mapping"
+msgstr ""
 
 msgid "Delete election"
 msgstr "Elimina elezione"
@@ -689,6 +705,3 @@ msgstr "Elimina votazione"
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "L'anno ${year} non viene ancora supportato"
-
-#~ msgid "This ballot has fewer results than the others"
-#~ msgstr "Questo progetto contiene meno risultati rispetto agli altri."

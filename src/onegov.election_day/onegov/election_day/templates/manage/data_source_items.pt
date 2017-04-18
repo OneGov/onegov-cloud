@@ -12,23 +12,23 @@
 
                 <div class="row">
                     <div class="small-12 medium-6 columns">
-                        <h1 i18n:translate>Data source items</h1>
+                        <h1 i18n:translate>Mappings</h1>
                     </div>
                     <div class="small-12 medium-6 columns">
                         <ul class="top-actions text-right">
-                            <li><a class="action-new" href="${new_item}" i18n:translate>New data source item</a></li>
+                            <li><a class="action-new" href="${new_item}" i18n:translate>New mapping</a></li>
                         </ul>
                     </div>
                 </div>
 
                 <p tal:condition="not:items" i18n:translate>
-                    No data source items yet.
+                    No mappings yet.
                 </p>
 
-                <table class="data_source_itemss stackable" tal:condition="items">
+                <table class="data_source_items stackable" tal:condition="items">
                     <thead>
                         <tr>
-                            <th i18n:translate>Source</th>
+                            <th>${item_name}</th>
                             <th><pre>SortWahlkreis</pre></th>
                             <th><pre>SortGeschaeft</pre></th>
                         </tr>

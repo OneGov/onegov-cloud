@@ -48,7 +48,7 @@ class ElectionForm(Form):
         label=_("System"),
         choices=[
             ('proporz', _("Election based on proportional representation")),
-            ('majorz', _("Majority system")),
+            ('majorz', _("Election based on the simple majority system")),
         ],
         validators=[
             InputRequired()

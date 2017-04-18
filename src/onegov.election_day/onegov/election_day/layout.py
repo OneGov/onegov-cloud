@@ -523,5 +523,5 @@ class ManageDataSourceItemsLayout(ManageLayout):
             ),
         )
         self.breadcrumbs.append(
-            (_("Items"), request.link(self.model), ''),
+            (_("Mappings"), request.link(self.model), ''),
         )

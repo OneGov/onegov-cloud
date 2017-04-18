@@ -10,10 +10,11 @@ from onegov.election_day.collections import DataSourceItemCollection
 from onegov.election_day.forms import DataSourceForm
 from onegov.election_day.forms import DataSourceItemForm
 from onegov.election_day.forms import DeleteForm
-from onegov.election_day.layout import ManageDataSourcesLayout
 from onegov.election_day.layout import ManageDataSourceItemsLayout
+from onegov.election_day.layout import ManageDataSourcesLayout
 from onegov.election_day.models import DataSource
 from onegov.election_day.models import DataSourceItem
+from onegov.election_day.models.data_source import UPLOAD_TYPE_LABELS
 from uuid import uuid4
 
 
@@ -27,7 +28,8 @@ def view_data_sources(self, request):
         'layout': ManageDataSourcesLayout(self, request),
         'title': _("Manage"),
         'data_sources': self.batch,
-        'new_source': request.link(self, 'new-source')
+        'new_source': request.link(self, 'new-source'),
+        'labels': dict(UPLOAD_TYPE_LABELS)
     }
 
 
@@ -55,9 +57,9 @@ def create_data_source(self, request, form):
     }
 
 
-@ElectionDayApp.view(model=DataSource, permission=Private, name='edit')
-def edit_data_source(self, request):
-    """ Edit the data source. Redirect to the list of data source items."""
+@ElectionDayApp.view(model=DataSource, permission=Private, name='manage')
+def manage_data_source(self, request):
+    """ Manage the data source. Redirect to the list of data source items."""
     layout = ManageDataSourceItemsLayout(self, request)
     return morepath.redirect(layout.manage_model_link)
 
@@ -124,6 +126,7 @@ def view_data_source_items(self, request):
         'layout': ManageDataSourceItemsLayout(self, request),
         'title': _("Manage"),
         'items': self.batch,
+        'item_name': self.source.label,
         'new_item': request.link(self, 'new-item')
     }
 
@@ -202,8 +205,8 @@ def delete_data_source_item(self, request, form):
         'layout': layout,
         'form': form,
         'title': self.name,
-        'subtitle': _("Delete data source item"),
-        'button_text': _("Delete data source item"),
+        'subtitle': _("Delete mapping"),
+        'button_text': _("Delete mapping"),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }
