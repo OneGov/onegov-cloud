@@ -1,7 +1,6 @@
 import transaction
 
 from base64 import b64decode
-from onegov.ballot import Election
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
