@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.8.0 (2017-04-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds support for the wabsti exporter format.
   [msom]
