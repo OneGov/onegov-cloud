@@ -4,6 +4,9 @@ Changelog
 - Updates the static data.
   [msom]
 
+- Fixes division by zero error for invalid party results.
+  [msom]
+
 1.8.0 (2017-04-18)
 ~~~~~~~~~~~~~~~~~~~
 

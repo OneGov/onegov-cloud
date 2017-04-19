@@ -23,7 +23,9 @@ def get_party_results(election):
                 'mandates': party.number_of_mandates,
                 'votes': {
                     'total': party.votes,
-                    'permille': int(round(1000 * (party.votes / total_votes)))
+                    'permille': int(
+                        round(1000 * (party.votes / (total_votes or 1)))
+                    )
                 }
             }
         }
