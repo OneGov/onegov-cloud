@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-18 16:20+0200\n"
-"PO-Revision-Date: 2017-04-18 16:35+0200\n"
+"POT-Creation-Date: 2017-04-19 10:20+0200\n"
+"PO-Revision-Date: 2017-04-19 10:21+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -53,14 +53,14 @@ msgstr "Votations"
 msgid "Elections"
 msgstr "Elections"
 
-msgid "Data sources"
-msgstr ""
-
 msgid "Manage"
 msgstr "Gérer"
 
 msgid "Subscribers"
 msgstr "Abonnés"
+
+msgid "Data sources"
+msgstr ""
 
 msgid "Mappings"
 msgstr ""
@@ -178,10 +178,10 @@ msgid "Name"
 msgstr "Nom"
 
 msgid "No votes yet."
-msgstr "Pas de votations actuellement"
+msgstr "Pas de votations actuellement."
 
 msgid "No elections yet."
-msgstr "Pas de elections actuellement"
+msgstr "Pas de elections actuellement."
 
 msgid "Election (German)"
 msgstr "Election (allemand)"
@@ -241,7 +241,7 @@ msgid "SESAM"
 msgstr "SESAM"
 
 msgid "Default"
-msgstr "défaut"
+msgstr "Défaut"
 
 msgid "Simple Vote"
 msgstr "Vote simple"
@@ -284,7 +284,7 @@ msgid "Elections &amp; Votes"
 msgstr "Elections et votations: données ouvertes"
 
 msgid "There are no elections or votes defined yet."
-msgstr "Il n'y a pas de élections ou votations définis actuellement"
+msgstr "Il n'y a pas de élections ou votations définis actuellement."
 
 msgid "Elections and votes on ${date}"
 msgstr "Elections et votes sur ${date}"
@@ -475,8 +475,8 @@ msgstr "Mettre à jour les résultats"
 msgid "Your results were uploaded successfully."
 msgstr "Vos résultats ont été correctement mis à jour."
 
-msgid "Click here to trigger the notifications"
-msgstr "Cliquez ici pour activer les notifications"
+msgid "Click here to trigger the notifications."
+msgstr "Cliquez ici pour activer les notifications."
 
 msgid "Click here to see the updated results page."
 msgstr "Cliquez pour voir la page des résultats mise à jour."

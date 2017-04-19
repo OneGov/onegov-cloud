@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-18 16:20+0200\n"
-"PO-Revision-Date: 2017-04-18 16:35+0200\n"
+"POT-Creation-Date: 2017-04-19 10:20+0200\n"
+"PO-Revision-Date: 2017-04-19 10:18+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -52,21 +52,21 @@ msgstr "Votaziuns"
 msgid "Elections"
 msgstr "Elecziuns"
 
-msgid "Data sources"
-msgstr ""
-
 msgid "Manage"
 msgstr "Administrar"
 
 msgid "Subscribers"
 msgstr "Abunents"
 
+msgid "Data sources"
+msgstr ""
+
 msgid "Mappings"
 msgstr ""
 
 #, python-format
 msgid "Missing columns: '${cols}'"
-msgstr "Colonnas che mancan ${cols}:"
+msgstr "Colonnas che mancan: '${cols}'"
 
 msgid ""
 "Could not find the expected columns, make sure all required columns exist "
@@ -139,10 +139,10 @@ msgid "${name} was found twice"
 msgstr "${name} è avant maun duas giadas"
 
 msgid "Could not read the elegible voters"
-msgstr "I n'è betg stà pussaivel da leger las 'persunas cun dretg da votar'"
+msgstr "I n'è betg stà pussaivel da leger las persunas cun dretg da votar"
 
 msgid "Could not read the invalid votes"
-msgstr "I n'è betg stà pussaivel da leger ils 'cedels da votar nunvalaivels'"
+msgstr "I n'è betg stà pussaivel da leger ils cedels da votar nunvalaivels"
 
 msgid "Elected Candidates"
 msgstr "Candidat(a)s elegid(a)s"
@@ -154,19 +154,19 @@ msgid "Missing municipality/district"
 msgstr "Lieu che manca"
 
 msgid "Could not read yeas"
-msgstr "I n'è betg stà pussaivel da leger las 'vuschs affirmativas'"
+msgstr "I n'è betg stà pussaivel da leger las vuschs affirmativas"
 
 msgid "Could not read nays"
-msgstr "I n'è betg stà pussaivel da leger las 'vuschs negativas'"
+msgstr "I n'è betg stà pussaivel da leger las vuschs negativas"
 
 msgid "Could not read the empty votes"
-msgstr "I n'è betg stà pussaivel da leger ils 'cedels da votar vids'"
+msgstr "I n'è betg stà pussaivel da leger ils cedels da votar vids"
 
 msgid "No elegible voters"
 msgstr "Naginas persunas cun dretg da votar"
 
 msgid "More cast votes than elegible voters"
-msgstr "Dapli vuschs entradas che persunas cun dretg da votar."
+msgstr "Dapli vuschs entradas che persunas cun dretg da votar"
 
 msgid "Invalid ballot type"
 msgstr "Tip da votaziun nunvalaivel"
@@ -175,7 +175,7 @@ msgid "Type"
 msgstr "Gener"
 
 msgid "Name"
-msgstr ""
+msgstr "Denominaziun"
 
 msgid "No votes yet."
 msgstr "I n'èn registradas anc naginas votaziuns."
@@ -497,7 +497,7 @@ msgid "The format of the data is described here:"
 msgstr "Il format da las datas è descrit qua:"
 
 msgid "Format Description"
-msgstr "descripziun dal format"
+msgstr "Descripziun dal format"
 
 msgid "Your results could not be uploaded."
 msgstr "Voss resultats n'han displaschaivlamain betg pudì vegnir chargiads si."
@@ -511,7 +511,7 @@ msgstr "Chargiar si resultats"
 msgid "Your results were uploaded successfully."
 msgstr "Voss resultats èn vegnids chargiads si cun success."
 
-msgid "Click here to trigger the notifications"
+msgid "Click here to trigger the notifications."
 msgstr "Cliccar qua per trametter communicaziuns als abunents."
 
 msgid "Click here to see the updated results page."
@@ -521,10 +521,10 @@ msgid "Please use the following format:"
 msgstr "Duvrai per plaschair il suandant format:"
 
 msgid "Embed"
-msgstr "incorporar"
+msgstr "Incorporar"
 
 msgid "Download"
-msgstr "telechargiar"
+msgstr "Telechargiar"
 
 msgid "Candidate"
 msgstr "Persuna che candidescha"

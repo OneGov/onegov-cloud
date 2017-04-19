@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-18 16:20+0200\n"
-"PO-Revision-Date: 2017-04-18 16:34+0200\n"
+"POT-Creation-Date: 2017-04-19 10:20+0200\n"
+"PO-Revision-Date: 2017-04-19 10:22+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -53,21 +53,21 @@ msgstr "Votazioni"
 msgid "Elections"
 msgstr "Elezioni"
 
-msgid "Data sources"
-msgstr ""
-
 msgid "Manage"
 msgstr "Amministrare"
 
 msgid "Subscribers"
 msgstr "Iscritti"
 
+msgid "Data sources"
+msgstr ""
+
 msgid "Mappings"
 msgstr ""
 
 #, python-format
 msgid "Missing columns: '${cols}'"
-msgstr "Colonne mancanti: ${cols}"
+msgstr "Colonne mancanti: '${cols}'"
 
 msgid ""
 "Could not find the expected columns, make sure all required columns exist "
@@ -474,8 +474,8 @@ msgstr "Caricare risultati"
 msgid "Your results were uploaded successfully."
 msgstr "I Suoi risultati sono stati caricati correttamente."
 
-msgid "Click here to trigger the notifications"
-msgstr "Clicca qui per attivare le notifiche"
+msgid "Click here to trigger the notifications."
+msgstr "Clicca qui per attivare le notifiche."
 
 msgid "Click here to see the updated results page."
 msgstr "Cliccare qui per visualizzare la pagina con i risultati aggiornati."
@@ -629,7 +629,7 @@ msgid "Trigger notifications"
 msgstr "Attivazione delle notifiche"
 
 msgid "No subscribers yet."
-msgstr "Non ci sono ancora degli iscritti…"
+msgstr "Non ci sono ancora degli iscritti."
 
 msgid "Locale"
 msgstr "Località"
