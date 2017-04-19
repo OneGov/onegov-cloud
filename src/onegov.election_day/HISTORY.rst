@@ -4,7 +4,10 @@ Changelog
 - Updates the static data.
   [msom]
 
-- Fixes division by zero error for invalid party results.
+- Fixes a division by zero error for invalid party results.
+  [msom]
+
+- Fixes the layout of majorz election factoids in the PDF.
   [msom]
 
 1.8.0 (2017-04-18)

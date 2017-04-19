@@ -254,7 +254,7 @@ class MediaGenerator():
                                     'counted': item.allocated_mandates,
                                     'total': item.number_of_mandates}
                             )),
-                            item.absolute_majority if majorz else ''
+                            item.absolute_majority if majorz else '',
                             ''
                         ],
                     ],
