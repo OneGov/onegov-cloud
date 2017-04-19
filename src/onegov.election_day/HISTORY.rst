@@ -30,7 +30,7 @@ Changelog
 - Use special, reserved numbers for expats.
   [msom]
 
-- Fixs providing giving an invalid archive date throwing an error.
+- Fixes providing giving an invalid archive date throwing an error.
   [msom]
 
 - Improves the performance of the send-sms command.
