@@ -39,6 +39,7 @@ def test_principal_load():
     assert principal.fetch == {}
     assert principal.webhooks == {}
     assert principal.sms_notification == None
+    assert principal.wabsti_import == False
 
     principal = Principal.from_yaml(textwrap.dedent("""
         name: Kanton Zug
@@ -48,6 +49,7 @@ def test_principal_load():
         base: 'http://www.zg.ch'
         analytics: "<script type=\\"text/javascript\\"></script>"
         use_maps: false
+        wabsti_import: true
         fetch:
             steinhausen:
                 - municipality
@@ -82,6 +84,7 @@ def test_principal_load():
         }
     }
     assert principal.sms_notification == 'https://wab.zg.ch'
+    assert principal.wabsti_import == True
 
     principal = Principal.from_yaml(textwrap.dedent("""
         name: Stadt Bern
@@ -106,6 +109,7 @@ def test_principal_load():
     assert principal.fetch == {}
     assert principal.webhooks == {}
     assert principal.sms_notification == None
+    assert principal.wabsti_import == False
 
     principal = Principal.from_yaml(textwrap.dedent("""
         name: Stadt Bern
@@ -131,6 +135,7 @@ def test_principal_load():
     assert principal.fetch == {}
     assert principal.webhooks == {}
     assert principal.sms_notification == None
+    assert principal.wabsti_import == False
 
 
 def test_principal_municipalities():

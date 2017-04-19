@@ -1,14 +1,21 @@
 from datetime import date
 from freezegun import freeze_time
-from onegov.ballot import Ballot, Election, Vote
+from onegov.ballot import Ballot
+from onegov.ballot import Election
+from onegov.ballot import Vote
+from onegov.ballot import ElectionCollection
+from onegov.ballot import VoteCollection
 from onegov.election_day.layout import ElectionsLayout
 from onegov.election_day.layout import Layout
+from onegov.election_day.layout import ManageDataSourceItemsLayout
+from onegov.election_day.layout import ManageDataSourcesLayout
 from onegov.election_day.layout import ManageElectionsLayout
-from onegov.election_day.layout import ManageLayout
 from onegov.election_day.layout import ManageSubscribersLayout
 from onegov.election_day.layout import ManageVotesLayout
 from onegov.election_day.layout import VotesLayout
-from onegov.election_day.models import Subscriber
+from onegov.election_day.collections import DataSourceCollection
+from onegov.election_day.collections import DataSourceItemCollection
+from onegov.election_day.collections import SubscriberCollection
 from onegov.election_day.tests import DummyRequest
 from unittest.mock import Mock
 
@@ -249,67 +256,103 @@ def test_votes_layout(session):
         assert layout.svg_name == 'vote-tie-breaker.svg'
 
 
-def test_manage_layout():
+def test_manage_layout(session):
     # Votes
-    layout = ManageLayout(Vote(), DummyRequest())
-    assert layout.manage_model_link == 'Vote/None'
-    assert layout.menu == [
-        ('Votes', 'VoteCollection/archive', ''),
-        ('Elections', 'ElectionCollection/archive', '')
-    ]
-
-    layout = ManageLayout(Vote(), DummyRequest())
-    layout.principal.sms_notification = 'http://example.com'
-    assert layout.menu == [
-        ('Votes', 'VoteCollection/archive', ''),
-        ('Elections', 'ElectionCollection/archive', ''),
-        ('Subscribers', 'SubscriberCollection/archive', '')
-    ]
-
-    layout = ManageVotesLayout(Vote(), DummyRequest())
+    layout = ManageVotesLayout(
+        VoteCollection(session),
+        DummyRequest()
+    )
     assert layout.manage_model_link == 'VoteCollection/archive'
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', 'active'),
         ('Elections', 'ElectionCollection/archive', '')
     ]
-
-    # Elections
-    layout = ManageLayout(Election(), DummyRequest())
-    assert layout.manage_model_link == 'Election/None'
-    assert layout.menu == [
-        ('Votes', 'VoteCollection/archive', ''),
-        ('Elections', 'ElectionCollection/archive', '')
+    assert layout.breadcrumbs == [
+        ('Manage', 'VoteCollection/archive', 'unavailable'),
+        ('Votes', 'VoteCollection/archive', '')
     ]
 
-    layout = ManageLayout(Election(), DummyRequest())
+    # ... with full menu
+    layout = ManageVotesLayout(
+        VoteCollection(session),
+        DummyRequest()
+    )
     layout.principal.sms_notification = 'http://example.com'
+    layout.principal.wabsti_import = True
     assert layout.menu == [
-        ('Votes', 'VoteCollection/archive', ''),
+        ('Votes', 'VoteCollection/archive', 'active'),
         ('Elections', 'ElectionCollection/archive', ''),
+        ('Data sources', 'DataSourceCollection/archive', ''),
         ('Subscribers', 'SubscriberCollection/archive', '')
     ]
+    assert layout.breadcrumbs == [
+        ('Manage', 'VoteCollection/archive', 'unavailable'),
+        ('Votes', 'VoteCollection/archive', '')
+    ]
 
-    layout = ManageElectionsLayout(Election(), DummyRequest())
+    # Elections
+    layout = ManageElectionsLayout(
+        ElectionCollection(session),
+        DummyRequest()
+    )
     assert layout.manage_model_link == 'ElectionCollection/archive'
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', ''),
         ('Elections', 'ElectionCollection/archive', 'active')
     ]
+    assert layout.breadcrumbs == [
+        ('Manage', 'VoteCollection/archive', 'unavailable'),
+        ('Elections', 'ElectionCollection/archive', '')
+    ]
 
-    # Subscribers
-    layout = ManageLayout(Subscriber(), DummyRequest())
-    layout.principal.sms_notification = 'http://example.com'
+    # Data sources
+    layout = ManageDataSourcesLayout(
+        DataSourceCollection(session),
+        DummyRequest()
+    )
+    layout.principal.wabsti_import = True
+    assert layout.manage_model_link == 'DataSourceCollection/archive'
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', ''),
         ('Elections', 'ElectionCollection/archive', ''),
-        ('Subscribers', 'SubscriberCollection/archive', '')
+        ('Data sources', 'DataSourceCollection/archive', 'active'),
+    ]
+    assert layout.breadcrumbs == [
+        ('Manage', 'VoteCollection/archive', 'unavailable'),
+        ('Data sources', 'DataSourceCollection/archive', '')
     ]
 
-    layout = ManageSubscribersLayout(Election(), DummyRequest())
+    # Data source items
+    layout = ManageDataSourceItemsLayout(
+        DataSourceItemCollection(session, 'source'),
+        DummyRequest()
+    )
+    layout.principal.wabsti_import = True
+    assert layout.manage_model_link == 'DataSourceItemCollection/source'
+    assert layout.menu == [
+        ('Votes', 'VoteCollection/archive', ''),
+        ('Elections', 'ElectionCollection/archive', ''),
+        ('Data sources', 'DataSourceCollection/archive', 'active'),
+    ]
+    assert layout.breadcrumbs == [
+        ('Manage', 'VoteCollection/archive', 'unavailable'),
+        ('Data sources', 'DataSourceCollection/archive', ''),
+        ('Mappings', 'DataSourceItemCollection/source', '')
+    ]
+
+    # Subscribers
+    layout = ManageSubscribersLayout(
+        SubscriberCollection(session),
+        DummyRequest()
+    )
     layout.principal.sms_notification = 'http://example.com'
     assert layout.manage_model_link == 'SubscriberCollection/archive'
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', ''),
         ('Elections', 'ElectionCollection/archive', ''),
         ('Subscribers', 'SubscriberCollection/archive', 'active')
+    ]
+    assert layout.breadcrumbs == [
+        ('Manage', 'VoteCollection/archive', 'unavailable'),
+        ('Subscribers', 'SubscriberCollection/archive', '')
     ]

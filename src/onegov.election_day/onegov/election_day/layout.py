@@ -423,7 +423,11 @@ class ManageLayout(DefaultLayout):
 
         if self.principal.wabsti_import:
             link = self.request.link(DataSourceCollection(session))
-            class_ = 'active' if link == self.manage_model_link else ''
+            active = (
+                link == self.manage_model_link or
+                isinstance(self.model, DataSourceItemCollection)
+            )
+            class_ = 'active' if active else ''
             menu.append((_("Data sources"), link, class_))
 
         if self.principal.sms_notification:
