@@ -93,20 +93,29 @@ It's important to test the code manually, to see visual flaws etc. One can use t
             - [ ] Upload a simple cantonal vote on a cantonal instance by using the standard format as described in the docs (VS, DC, IC, FS), e.g. for **GR**
                   - [ ] Check the empty vote results (RN)
                   - [ ] Upload temporary results (RT)
+                  - [ ] (Upload a roundtrip)
                   - [ ] Upload the completed results (RF)
+                  - [ ] (Upload a roundtrip)
             - [ ] Upload a complex cantonal vote on a cantonal instance by using the standard format as described in the docs (VC, DC, IC, FS), e.g. for **ZG**
                   - [ ] Check the empty vote results (RN)
                   - [ ] Upload temporary results (RT)
+                  - [ ] (Upload a roundtrip)
                   - [ ] Upload the completed results (RF)
+                  - [ ] (Upload a roundtrip)
             - [ ] Upload a simple communal vote on a communal instance by using the standard format as described in the docs (VS, DM, IM, FS), e.g. for **Wil**
                   - [ ] Check the empty vote results (RN)
                   - [ ] Upload temporary results (RT)
+                  - [ ] (Upload a roundtrip)
                   - [ ] Upload the completed results (RF)
+                  - [ ] (Upload a roundtrip)
+                  - [ ] Check if the results have been fetched on the connected cantonal instance (e.g. **SG**)
             - [ ] Upload a simple, federal vote on a cantonal instance using the wabsti format (VS, DC, IC, FW), e.g. for **SG**
                   - [ ] Check the empty vote results (RN)
-                  - [ ] *ToDo: Add templates for RT and RF*
-            - [ ] Does a round trip produce the same results?
-                  - [ ] For RT and RF of the above variants
+                  - [ ] Upload temporary results (RT)
+                  - [ ] (Upload a roundtrip)
+                  - [ ] Upload the completed results (RF)
+                  - [ ] (Upload a roundtrip)
+                  - [ ] Check if the results have been fetched on the connected communal instance (e.g. **Wil**)
       - [ ] Typical scenarios for uploading election results
             - [ ] *ToDo: Define typical scenarios*
             - [ ] Does a round trip produce the same results?
