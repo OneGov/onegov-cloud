@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-04-19 10:20+0200\n"
-"PO-Revision-Date: 2017-04-19 10:21+0200\n"
+"PO-Revision-Date: 2017-04-19 13:37+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -60,10 +60,10 @@ msgid "Subscribers"
 msgstr "Abonnés"
 
 msgid "Data sources"
-msgstr ""
+msgstr "Sources de données"
 
 msgid "Mappings"
-msgstr ""
+msgstr "Cartographie"
 
 #, python-format
 msgid "Missing columns: '${cols}'"
@@ -448,7 +448,7 @@ msgid "Cast Ballots"
 msgstr "Suffrages exprimés"
 
 msgid "Download a PDF with all the results:"
-msgstr ""
+msgstr "Télécharger tous les résultats dans un PDF :"
 
 msgid ""
 "The raw data used to display the results is available in the following "
@@ -591,10 +591,10 @@ msgid "Accounted Votes"
 msgstr "Votes comptés"
 
 msgid "New mapping"
-msgstr ""
+msgstr "Nouvelle cartographie"
 
 msgid "No mappings yet."
-msgstr ""
+msgstr "Aucune cartographie pour l'instant."
 
 msgid "Delete"
 msgstr "Supprimer"
@@ -603,10 +603,10 @@ msgid "Edit"
 msgstr "Editer"
 
 msgid "New data source"
-msgstr ""
+msgstr "Nouvelle source de données"
 
 msgid "No data sources yet."
-msgstr ""
+msgstr "Aucune source de données pour l'instant."
 
 msgid "Token"
 msgstr "Token"
@@ -615,7 +615,7 @@ msgid "Actions"
 msgstr "Actions"
 
 msgid "Regenerate token"
-msgstr ""
+msgstr "Renouveler le token"
 
 msgid "New Election"
 msgstr "Nouveau election"
@@ -624,7 +624,7 @@ msgid "View"
 msgstr "Voir"
 
 msgid "Upload party results"
-msgstr ""
+msgstr "Uploader les résultats par parti"
 
 msgid "Trigger notifications"
 msgstr "Activer les notifications"
@@ -672,17 +672,17 @@ msgid "Blank list"
 msgstr "Liste vierge"
 
 msgid "Do you really want to regenerate the token?"
-msgstr ""
+msgstr "Voulez-vous vraiment renouveler le token ?"
 
 #, python-format
 msgid "Do you really want to delete \"${item}\"?"
 msgstr "Voulez-vous vraiment supprimer \"${item}\" ?"
 
 msgid "Delete data source"
-msgstr ""
+msgstr "Supprimer la source de données"
 
 msgid "Delete mapping"
-msgstr ""
+msgstr "Supprimer la cartographie"
 
 msgid "Delete election"
 msgstr "Supprimer l'élection"

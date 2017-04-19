@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Updates translations.
+  [msom]
+
 - Updates the static data.
   [msom]
 

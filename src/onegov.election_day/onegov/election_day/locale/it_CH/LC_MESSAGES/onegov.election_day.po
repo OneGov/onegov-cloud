@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-04-19 10:20+0200\n"
-"PO-Revision-Date: 2017-04-19 10:22+0200\n"
+"PO-Revision-Date: 2017-04-19 13:34+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -60,10 +60,10 @@ msgid "Subscribers"
 msgstr "Iscritti"
 
 msgid "Data sources"
-msgstr ""
+msgstr "Origini dati"
 
 msgid "Mappings"
-msgstr ""
+msgstr "Mapping"
 
 #, python-format
 msgid "Missing columns: '${cols}'"
@@ -447,7 +447,7 @@ msgid "Cast Ballots"
 msgstr "Schede rientrate"
 
 msgid "Download a PDF with all the results:"
-msgstr ""
+msgstr "Scarica un PDF con tutti i risultati:"
 
 msgid ""
 "The raw data used to display the results is available in the following "
@@ -590,22 +590,22 @@ msgid "Accounted Votes"
 msgstr "Voti validi"
 
 msgid "New mapping"
-msgstr ""
+msgstr "Nuovo mapping"
 
 msgid "No mappings yet."
-msgstr ""
+msgstr "Nessun mapping per il momento."
 
 msgid "Delete"
-msgstr "Cancellare"
+msgstr "Elimina"
 
 msgid "Edit"
 msgstr "Elabora"
 
 msgid "New data source"
-msgstr ""
+msgstr "Nuova origine dati"
 
 msgid "No data sources yet."
-msgstr ""
+msgstr "Nessuna origine dati per il momento."
 
 msgid "Token"
 msgstr "Token"
@@ -614,7 +614,7 @@ msgid "Actions"
 msgstr "Azioni"
 
 msgid "Regenerate token"
-msgstr ""
+msgstr "Rigenera token"
 
 msgid "New Election"
 msgstr "Nuova elezione"
@@ -623,7 +623,7 @@ msgid "View"
 msgstr "Mostrare"
 
 msgid "Upload party results"
-msgstr ""
+msgstr "Carica risultati partito"
 
 msgid "Trigger notifications"
 msgstr "Attivazione delle notifiche"
@@ -671,17 +671,17 @@ msgid "Blank list"
 msgstr "Lista bianca"
 
 msgid "Do you really want to regenerate the token?"
-msgstr ""
+msgstr "Rigenerare il token?"
 
 #, python-format
 msgid "Do you really want to delete \"${item}\"?"
 msgstr "Sei sicuro/a di voler eliminare \"${item}\"?"
 
 msgid "Delete data source"
-msgstr ""
+msgstr "Elimina origine dati"
 
 msgid "Delete mapping"
-msgstr ""
+msgstr "Elimina mapping"
 
 msgid "Delete election"
 msgstr "Elimina elezione"
