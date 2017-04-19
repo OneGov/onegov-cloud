@@ -66,6 +66,7 @@ class DataSourceItemForm(Form):
         self.item.choices = [
             (item.id, item.title) for item in source.query_candidates()
         ]
+        self.callout = ''
         if not self.item.choices:
             if self.type == 'vote':
                 self.callout = _("No votes yet.")
