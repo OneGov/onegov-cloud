@@ -17,7 +17,26 @@ There is a [crawler](https://github.com/msom/crawler.elections) available which 
 ./run.py test
 ```
 
-## 2) Manual Tests
+## 2) POST-Upload
+
+Results can be uploaded using a POST request and the format of the WabstiCExport program.
+
+
+```
+curl http://.../upload-wabsti-vote
+	--user :[token]
+	--form "sg_gemeinden=@SG_Gemeinden.csv"
+
+curl http://.../upload-wabsti-majorz
+	--user :[token]
+	--form "sg_gemeinden=@SG_Gemeinden.csv"
+	--form "wmstatic_gemeinden=@WMStatic_Gemeinden.csv"
+	--form "wm_gemeinden=@WM_Gemeinden.csv"
+	--form "wm_kandidaten=@WM_Kandidaten.csv"
+	--form "wm_kandidatengde=@WM_KandidatenGde.csv"
+```
+
+## 3) Manual Tests
 
 It's important to test the code manually, to see visual flaws etc. One can use this checklist as an orientation what to check:
 
@@ -31,7 +50,7 @@ It's important to test the code manually, to see visual flaws etc. One can use t
       - [ ] The page of an individual date
       - [ ] The JSON views (`json` and `summary`)
       - [ ] The data exports
-- [ ] Does the backend looks OK?
+- [ ] Does the backend look OK?
       - [ ] Does the login and logout work?
       - [ ] Does the pagination work?
       - [ ] Can you create elections and votes?
@@ -39,11 +58,35 @@ It's important to test the code manually, to see visual flaws etc. One can use t
       - [ ] Can you delete elections and votes?
       - [ ] Does the sorting work?
 - [ ] Does the (SMS) notification work?
-- [ ] Do the (font end) views look OK on a mobile?
+- [ ] Do the (front end) views look OK on a mobile?
 - [ ] Are linked communal and cantonal instances working?
-      - [ ] Do the results get copied to the other instances?
+      - [ ] Do the results get copied to the other instances (`onegov-election-day fetch`)?
       - [ ] Do the links link to the full view on the other instance?
       - [ ] Are the communal results shown instead of the cantonal total on the communal instance?
+- [ ] Do the embedded maps and charts look ok?
+      - [ ] Ballot Maps
+      - [ ] Candidates Bar Charts
+      - [ ] List Bar Charts
+      - [ ] List Connection Charts
+      - [ ] Panachage Charts
+      - [ ] Party Charts
+- [ ] Are PDFs and SVGs created? (`onegov-election-day generate-media`)
+      - [ ] New Votes and Elections
+      - [ ] Changed Votes and Elections
+      - [ ] Do the PDFs look ok?
+            - [ ] Simple Votes
+            - [ ] Complex Votes
+            - [ ] Majorz Elections
+            - [ ] Proporz Elections with historical party data
+            - [ ] Proporz Elections with historical party data
+      - [ ] Do the SVGs look ok?
+            - [ ] Ballot Maps
+            - [ ] Candidates Bar Charts
+            - [ ] List Bar Charts
+            - [ ] List Connection Charts
+            - [ ] Panachage Charts
+            - [ ] Party Charts
+- [ ] Does the HipChat integration work?
 - [ ] Do the upload of results work?
       - [ ] Typcial scenarios for uploading vote results
             - [ ] Upload a simple cantonal vote on a cantonal instance by using the standard format as described in the docs (VS, DC, IC, FS), e.g. for **GR**
@@ -67,27 +110,6 @@ It's important to test the code manually, to see visual flaws etc. One can use t
             - [ ] *ToDo: Define typical scenarios*
             - [ ] Does a round trip produce the same results?
                   - [ ] For RT and RF of the above variants
-- [ ] Do the embedded maps and charts look ok?
-      - [ ] Ballot Maps
-      - [ ] Candidates Bar Charts
-      - [ ] List Bar Charts
-      - [ ] List Connection Charts
-      - [ ] Panachage Charts
-      - [ ] Party Charts
-- [ ] Do the PDFs look ok?
-      - [ ] Simple Votes 
-      - [ ] Complex Votes
-      - [ ] Majorz Elections
-      - [ ] Proporz Elections with historical party data
-      - [ ] Proporz Elections with historical party data
-- [ ] Do the SVGs look ok?
-      - [ ] Ballot Maps
-      - [ ] Candidates Bar Charts
-      - [ ] List Bar Charts
-      - [ ] List Connection Charts
-      - [ ] Panachage Charts
-      - [ ] Party Charts
-
 
 
 ### Upload Dimensions
@@ -147,4 +169,3 @@ There are a lot of different possiblities to upload results, here are the typica
     - **MS**: Missing majority (EM + FW/FM)
 
     ​
-
