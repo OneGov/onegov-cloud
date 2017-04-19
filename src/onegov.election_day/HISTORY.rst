@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Updates the static data.
+  [msom]
+
 1.8.0 (2017-04-18)
 ~~~~~~~~~~~~~~~~~~~
 
