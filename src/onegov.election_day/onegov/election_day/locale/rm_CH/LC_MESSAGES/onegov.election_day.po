@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-04-19 10:20+0200\n"
-"PO-Revision-Date: 2017-04-19 10:18+0200\n"
+"PO-Revision-Date: 2017-04-21 06:57+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -59,10 +59,10 @@ msgid "Subscribers"
 msgstr "Abunents"
 
 msgid "Data sources"
-msgstr ""
+msgstr "Funtaunas da datas"
 
 msgid "Mappings"
-msgstr ""
+msgstr "Attribuziuns"
 
 #, python-format
 msgid "Missing columns: '${cols}'"
@@ -484,7 +484,7 @@ msgid "Cast Ballots"
 msgstr "Cedels da votar entrads"
 
 msgid "Download a PDF with all the results:"
-msgstr ""
+msgstr "In PDF cun tut ils resultats pudais Vus chargiar giu qua:"
 
 msgid ""
 "The raw data used to display the results is available in the following "
@@ -629,10 +629,10 @@ msgid "Accounted Votes"
 msgstr "Vuschs valaivlas"
 
 msgid "New mapping"
-msgstr ""
+msgstr "Nova attribuziun"
 
 msgid "No mappings yet."
-msgstr ""
+msgstr "Anc naginas attribuziuns."
 
 msgid "Delete"
 msgstr "Stizzar"
@@ -641,10 +641,10 @@ msgid "Edit"
 msgstr "Modifitgar"
 
 msgid "New data source"
-msgstr ""
+msgstr "Nova funtauna da datas"
 
 msgid "No data sources yet."
-msgstr ""
+msgstr "Anc naginas funtaunas da datas."
 
 msgid "Token"
 msgstr "Token"
@@ -653,7 +653,7 @@ msgid "Actions"
 msgstr "Acziuns"
 
 msgid "Regenerate token"
-msgstr ""
+msgstr "Generar da nov il token"
 
 msgid "New Election"
 msgstr "Nova elecziun"
@@ -662,7 +662,7 @@ msgid "View"
 msgstr "Mussar"
 
 msgid "Upload party results"
-msgstr ""
+msgstr "Chargiar si ils resultats da las partidas"
 
 msgid "Trigger notifications"
 msgstr "Trametter communicaziuns als abunents"
@@ -713,17 +713,17 @@ msgid "Blank list"
 msgstr "Glista en blanco"
 
 msgid "Do you really want to regenerate the token?"
-msgstr ""
+msgstr "Vulais Vus propi generar da nov il token?"
 
 #, python-format
 msgid "Do you really want to delete \"${item}\"?"
 msgstr "Vulais Vus propi stizzar \"${item}\"?"
 
 msgid "Delete data source"
-msgstr ""
+msgstr "Stizzar la funtauna da datas"
 
 msgid "Delete mapping"
-msgstr ""
+msgstr "Stizzar l'attribuziun"
 
 msgid "Delete election"
 msgstr "Stizzar l'elecziun"
