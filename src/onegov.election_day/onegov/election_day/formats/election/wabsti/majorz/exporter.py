@@ -181,7 +181,7 @@ def import_exporter_files(election, district, number, entities,
 
             if entity_id not in added_entities:
                 added_entities[entity_id] = {
-                    'group': entities.get(entity_id, '')
+                    'group': entities.get(entity_id, {}).get('name', '')
                 }
 
         entity = added_entities[entity_id]
