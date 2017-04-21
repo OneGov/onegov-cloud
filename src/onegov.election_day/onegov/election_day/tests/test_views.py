@@ -710,3 +710,132 @@ def test_view_svg(election_day_app):
         'proporz-election-parties.svg',
         'vote-proposal.svg'
     ]
+
+
+def test_view_manage_data_sources(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+    login(client)
+
+    # Votes
+    # ... add data source
+    new = client.get('/manage/sources/new-source')
+    new.form['name'] = 'ds_vote'
+    new.form['upload_type'] = 'vote'
+    new.form.submit().follow()
+    assert 'ds_vote' in client.get('/manage/sources')
+
+    # ... regenerate token
+    manage = client.get('/manage/sources')
+    token = manage.pyquery('.data_sources td')[2].text
+    manage = manage.click('Token neu erzeugen').form.submit().follow()
+    assert token not in manage
+
+    # ... manage
+    manage = manage.click('Verwalten', href='data-source').follow()
+
+    assert 'Noch keine Abstimmungen erfasst' in manage.click('Neue Zuordnung')
+
+    new = client.get('/manage/votes/new-vote')
+    new.form['vote_de'] = "vote-1"
+    new.form['date'] = date(2013, 1, 1)
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    new = client.get('/manage/votes/new-vote')
+    new.form['vote_de'] = "vote-2"
+    new.form['date'] = date(2014, 1, 1)
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    new = manage.click('Neue Zuordnung')
+    assert all((x in new for x in ('vote-1', 'vote-2')))
+    new.form['district'] = '1111'
+    new.form['number'] = '2222'
+    new.form['item'] = 'vote-1'
+    manage = new.form.submit().follow()
+    assert all((x in manage for x in ('vote-1', '1111', '2222')))
+
+    edit = manage.click('Bearbeiten')
+    edit.form['district'] = '3333'
+    edit.form['number'] = '4444'
+    edit.form['item'] = 'vote-2'
+    manage = edit.form.submit().follow()
+    assert all((x not in manage for x in ('vote-1', '1111', '2222')))
+    assert all((x in manage for x in ('vote-2', '3333', '4444')))
+
+    manage = manage.click('Löschen').form.submit().follow()
+    assert 'Noch keine Zuordnungen' in manage
+
+    # ... delete data source
+    client.get('/manage/sources').click('Löschen').form.submit()
+    assert 'ds_vote' not in client.get('/manage/sources')
+    assert 'Noch keine Datenquellen' in client.get('/manage/sources')
+
+    # Majorz elections
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = "election-majorz"
+    new.form['date'] = date(2013, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'majorz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = "election-proporz"
+    new.form['date'] = date(2013, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    # ... add data source
+    new = client.get('/manage/sources/new-source')
+    new.form['name'] = 'ds_majorz'
+    new.form['upload_type'] = 'majorz'
+    new.form.submit().follow()
+    assert 'ds_majorz' in client.get('/manage/sources')
+
+    # ... manage
+    manage = client.get('/manage/sources')
+    manage = manage.click('Verwalten', href='data-source').follow()
+
+    new = manage.click('Neue Zuordnung')
+    assert 'election-majorz' in new
+    assert 'election-proporz' not in new
+    new.form['district'] = '4444'
+    new.form['number'] = '5555'
+    new.form['item'] = 'election-majorz'
+    manage = new.form.submit().follow()
+    assert all((x in manage for x in ('election-majorz', '4444', '5555')))
+
+    # ... delete data source
+    client.get('/manage/sources').click('Löschen').form.submit()
+    assert 'ds_majorz' not in client.get('/manage/sources')
+    assert 'Noch keine Datenquellen' in client.get('/manage/sources')
+
+    # Proporz elections
+    # ... add data source
+    new = client.get('/manage/sources/new-source')
+    new.form['name'] = 'ds_proporz'
+    new.form['upload_type'] = 'proporz'
+    new.form.submit().follow()
+    assert 'ds_proporz' in client.get('/manage/sources')
+
+    # ... manage
+    manage = client.get('/manage/sources')
+    manage = manage.click('Verwalten', href='data-source').follow()
+
+    new = manage.click('Neue Zuordnung')
+    assert 'election-majorz' not in new
+    assert 'election-proporz' in new
+    new.form['district'] = '6666'
+    new.form['number'] = '7777'
+    new.form['item'] = 'election-proporz'
+    manage = new.form.submit().follow()
+    assert all((x in manage for x in ('election-proporz', '6666', '7777')))
+
+    # ... delete data source
+    client.get('/manage/sources').click('Löschen').form.submit()
+    assert 'ds_proporz' not in client.get('/manage/sources')
+    assert 'Noch keine Datenquellen' in client.get('/manage/sources')

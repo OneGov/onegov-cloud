@@ -31,6 +31,7 @@ def create_election_day(request, canton="", municipality="", use_maps="false"):
         municipality: {}
         use_maps: {}
         color: '#000'
+        wabsti_import: true
     """.format(canton, municipality, use_maps)))
 
     app.session().add(User(
