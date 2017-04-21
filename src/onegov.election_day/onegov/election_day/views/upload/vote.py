@@ -29,13 +29,6 @@ def view_upload(self, request, form):
 
     form.adjust(request.app.principal, self)
 
-    # Remove wabsti for municipalities for the moment
-    if request.app.principal.domain == 'municipality':
-        form.file_format.choices = [
-            choice for choice in form.file_format.choices
-            if choice[0] != 'wabsti'
-        ]
-
     status = 'open'
     if form.submitted(request):
         principal = request.app.principal
