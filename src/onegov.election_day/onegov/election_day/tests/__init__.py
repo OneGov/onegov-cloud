@@ -12,6 +12,9 @@ class DummyPrincipal(object):
         self.domain = 'canton'
         self.wabsti_import = False
 
+    def label(self, type):
+        return '__{}'.format(type)
+
 
 class DummyApp(object):
     def __init__(self, session=None, application_id='application_id'):

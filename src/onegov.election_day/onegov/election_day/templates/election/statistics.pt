@@ -19,7 +19,7 @@
             <table class="ballot-results stackable sortable">
                 <thead>
                     <tr>
-                        <th i18n:translate="">Electoral District</th>
+                        <th i18n:translate="">${layout.principal.label('entity')}</th>
                         <th i18n:translate="" class="right-aligned">Elegible Voters</th>
                         <th i18n:translate="" class="right-aligned">Received Ballots</th>
                         <th i18n:translate="" class="right-aligned">Accounted Ballots</th>

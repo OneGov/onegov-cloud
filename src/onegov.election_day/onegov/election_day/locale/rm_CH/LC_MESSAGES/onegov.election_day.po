@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-21 12:08+0200\n"
+"POT-Creation-Date: 2017-04-21 14:26+0200\n"
 "PO-Revision-Date: 2017-04-21 06:57+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -18,9 +18,6 @@ msgstr "Glistas"
 
 msgid "Candidates"
 msgstr "Candidatas e candidats"
-
-msgid "Electoral Districts"
-msgstr "Circuls electorals"
 
 msgid "List connections"
 msgstr "Colliaziuns da glistas"
@@ -237,12 +234,6 @@ msgstr "Numer dal project"
 msgid "OneGov Cloud"
 msgstr "OneGov Cloud"
 
-msgid "Wabsti"
-msgstr "Wabsti"
-
-msgid "SESAM"
-msgstr "SESAM"
-
 msgid "Simple Vote"
 msgstr "Project da votaziun simpel"
 
@@ -251,9 +242,6 @@ msgstr "Project cun cuntraproposta"
 
 msgid "Default"
 msgstr "Standard"
-
-msgid "WabstiCExport"
-msgstr ""
 
 msgid "Not a valid phone number."
 msgstr "Numer da telefon nunvalaivel."
@@ -285,6 +273,24 @@ msgstr "Sin plaun chantunal"
 
 msgid "Communal"
 msgstr "Sin plaun communal"
+
+msgid "Electoral district"
+msgstr "Circul electoral"
+
+msgid "Electoral districts"
+msgstr "Circuls electorals"
+
+msgid "Quarter"
+msgstr "Quartier"
+
+msgid "Municipality"
+msgstr "Vischnanca"
+
+msgid "Quarters"
+msgstr "Quartiers"
+
+msgid "Municipalities"
+msgstr "Vischnancas"
 
 msgid "Elections &amp; Votes"
 msgstr "Elecziuns &amp; votaziuns"
@@ -587,9 +593,6 @@ msgstr "Total"
 
 msgid "The raw data is available as:"
 msgstr "Las datas nunelavuradas èn disponiblas en il suandant format:"
-
-msgid "Electoral District"
-msgstr "Circul electoral"
 
 #. Default: The diagram shows the origin of the list votes. The bars on the
 #. left correspond to the unchanged list votes (including the blank list), the

@@ -1565,7 +1565,8 @@ def test_upload_communal_election(election_day_app_kriens):
 
     result = client.get('/election/election').follow()
     assert '36.16' in result
-    assert 'Wahlkreise' not in result
+    assert 'Stadteile' not in result
+    assert 'Gemeinden' not in result
     assert '<td>Total' not in result
 
 
@@ -1698,7 +1699,7 @@ def test_upload_communal_election_districts(election_day_app_bern):
     assert '35.49' in result
 
     result = client.get('/election/election/statistics')
-    assert 'Wahlkreise' in result
+    assert 'Stadtteile' in result
     assert '<td>Total' in result
 
 

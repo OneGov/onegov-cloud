@@ -36,11 +36,11 @@
                 </div>
             </div>
 
-            <h4 tal:condition="use_maps" i18n:translate="">Electoral Districts</h4>
+            <h4 tal:condition="use_maps" i18n:translate="">${layout.principal.label('entities')}</h4>
             <table class="ballot-results stackable sortable">
                 <thead>
                     <tr>
-                        <th i18n:translate="" class="left-aligned">Electoral District</th>
+                        <th i18n:translate="" class="left-aligned">${layout.principal.label('entity')}</th>
                         <th i18n:translate="" class="left-aligned">Result</th>
                         <th i18n:translate="" class="right-aligned">Yeas</th>
                         <th i18n:translate="" class="right-aligned">Nays</th>

@@ -68,13 +68,13 @@ class UploadElectionBaseForm(Form):
             ]
         else:
             self.file_format.choices = [
-                ('internal', _("OneGov Cloud")),
-                ('sesam', _("SESAM")),
-                ('wabsti', _("Wabsti")),
+                ('internal', "OneGov Cloud"),
+                ('sesam', "SESAM"),
+                ('wabsti', "Wabsti"),
             ]
 
         if election.data_sources:
-            self.file_format.choices.append(('wabsti_c', _("WabstiCExport")))
+            self.file_format.choices.append(('wabsti_c', "WabstiCExport"))
 
 
 class UploadMajorzElectionForm(UploadElectionBaseForm):
@@ -240,17 +240,17 @@ class UploadVoteForm(Form):
         if principal.domain == 'municipality':
             self.file_format.choices = [
                 ('default', _("Default")),
-                ('internal', _("OneGov Cloud")),
+                ('internal', "OneGov Cloud"),
             ]
         else:
             self.file_format.choices = [
                 ('default', _("Default")),
-                ('internal', _("OneGov Cloud")),
-                ('wabsti', _("Wabsti")),
+                ('internal', "OneGov Cloud"),
+                ('wabsti', "Wabsti"),
             ]
 
         if vote.data_sources:
-            self.file_format.choices.append(('wabsti_c', _("WabstiCExport")))
+            self.file_format.choices.append(('wabsti_c', "WabstiCExport"))
 
         if (vote.meta or {}).get('vote_type', 'simple') == 'complex':
             self.type.choices = [('complex', _("Vote with Counter-Proposal"))]

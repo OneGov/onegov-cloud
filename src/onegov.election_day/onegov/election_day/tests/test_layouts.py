@@ -113,7 +113,7 @@ def test_elections_layout(session):
     assert layout.title('undefined') == ''
     assert layout.title('lists') == 'Lists'
     assert layout.title('candidates') == 'Candidates'
-    assert layout.title('districts') == 'Electoral Districts'
+    assert layout.title('districts') == '__entities'
     assert layout.title('connections') == 'List connections'
     assert layout.title('parties') == 'Parties'
     assert layout.title('statistics') == 'Election statistics'

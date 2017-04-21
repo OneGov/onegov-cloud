@@ -143,7 +143,7 @@ class ElectionsLayout(Layout):
         if tab == 'candidates':
             return _("Candidates")
         if tab == 'districts':
-            return _("Electoral Districts")
+            return self.principal.label('entities')
         if tab == 'connections':
             return _("List connections")
         if tab == 'parties':

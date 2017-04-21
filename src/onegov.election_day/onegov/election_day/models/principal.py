@@ -111,7 +111,18 @@ class Principal(object):
         return result
 
     @cached_property
+    def has_quarters(self):
+        """ Returns true if a communal instance has different quarters. """
+
+        if self.districts:
+            key = sorted(self.districts.keys())[-1]
+            return len(self.districts[key]) > 1
+
+        return False
+
+    @cached_property
     def districts(self):
+        # todo: rename me to quarters!
         result = {}
 
         if self.domain == 'municipality':
@@ -155,3 +166,17 @@ class Principal(object):
         if (len(self.webhooks) > 0) or self.sms_notification:
             return True
         return False
+
+    def label(self, value):
+        """ Returns the right label of the given thing. """
+
+        quarters = self.has_quarters
+        if value == 'entity':
+            return _("Quarter") if quarters else _("Municipality")
+        if value == 'entities':
+            return _("Quarters") if quarters else _("Municipalities")
+        if value == 'grouping' and not quarters:
+            return _("Electoral district")
+        if value == 'groupings' and not quarters:
+            return _("Electoral districts")
+        return ''

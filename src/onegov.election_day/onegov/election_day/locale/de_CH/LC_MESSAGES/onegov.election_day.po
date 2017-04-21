@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-21 12:08+0200\n"
+"POT-Creation-Date: 2017-04-21 14:26+0200\n"
 "PO-Revision-Date: 2017-04-18 16:12+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -19,9 +19,6 @@ msgstr "Listen"
 
 msgid "Candidates"
 msgstr "Kandidierende"
-
-msgid "Electoral Districts"
-msgstr "Wahlkreise"
 
 msgid "List connections"
 msgstr "Listenverbindungen"
@@ -237,12 +234,6 @@ msgstr "Vorlagen-Nummer"
 msgid "OneGov Cloud"
 msgstr "OneGov Cloud"
 
-msgid "Wabsti"
-msgstr "Wabsti"
-
-msgid "SESAM"
-msgstr "SESAM"
-
 msgid "Simple Vote"
 msgstr "Einfache Vorlage"
 
@@ -251,9 +242,6 @@ msgstr "Vorlage mit Gegenentwurf"
 
 msgid "Default"
 msgstr "Standard"
-
-msgid "WabstiCExport"
-msgstr ""
 
 msgid "Not a valid phone number."
 msgstr "Ungültige Telefonnummer."
@@ -285,6 +273,24 @@ msgstr "Kantonal"
 
 msgid "Communal"
 msgstr "Kommunal"
+
+msgid "Electoral district"
+msgstr "Wahlkreis"
+
+msgid "Electoral districts"
+msgstr "Wahlkreise"
+
+msgid "Quarter"
+msgstr "Stadtteil"
+
+msgid "Municipality"
+msgstr "Gemeinde"
+
+msgid "Quarters"
+msgstr "Stadtteile"
+
+msgid "Municipalities"
+msgstr "Gemeinden"
 
 msgid "Elections &amp; Votes"
 msgstr "Wahlen &amp; Abstimmungen"
@@ -551,9 +557,6 @@ msgstr "Total"
 
 msgid "The raw data is available as:"
 msgstr "Die Rohdaten sind in folgendem Format verfügbar:"
-
-msgid "Electoral District"
-msgstr "Wahlkreis"
 
 #. Default: The diagram shows the origin of the list votes. The bars on the
 #. left correspond to the unchanged list votes (including the blank list), the

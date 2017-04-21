@@ -149,6 +149,7 @@ class MediaGenerator():
 
     def generate_pdf(self, item, path, locale):
         """ Generates the PDF for an election or a vote. """
+        principal = self.app.principal
 
         with self.app.filestorage.open(path, 'wb') as f:
 
@@ -471,7 +472,7 @@ class MediaGenerator():
                 else:
                     pdf.table(
                         [[
-                            translate(_('Electoral District')),
+                            translate(principal.label('entity')),
                             translate(_('Turnout')),
                             translate(_('Elegible Voters')),
                             translate(_('Accounted Votes')),
@@ -492,7 +493,7 @@ class MediaGenerator():
                     pdf.spacer()
                     pdf.table(
                         [[
-                            translate(_('Electoral District')),
+                            translate(principal.label('entity')),
                             translate(_('Received Ballots')),
                             translate(_('Accounted Ballots')),
                             translate(_('Blank Ballots')),
@@ -606,7 +607,7 @@ class MediaGenerator():
                         pdf.spacer()
                         pdf.table(
                             [[
-                                translate(_('Electoral District')),
+                                translate(principal.label('entity')),
                                 translate(_('Result')),
                                 translate(_('Yes %')),
                                 translate(_('No %')),
@@ -629,7 +630,7 @@ class MediaGenerator():
                         pdf.pagebreak()
                         pdf.table(
                             [[
-                                translate(_('Electoral District')),
+                                translate(principal.label('entity')),
                                 translate(_('Empty')),
                                 translate(_('Invalid')),
                                 translate(_('Yes %')).replace('%', '').strip(),
