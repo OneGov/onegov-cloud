@@ -25,11 +25,7 @@ class UploadElectionBaseForm(Form):
 
     file_format = RadioField(
         _("File format"),
-        choices=[
-            ('internal', _("OneGov Cloud")),
-            ('wabsti', _("Wabsti")),
-            ('sesam', _("SESAM")),
-        ],
+        choices=[],
         validators=[
             InputRequired()
         ],
@@ -43,7 +39,8 @@ class UploadElectionBaseForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw=dict(force_simple=True),
+        depends_on=('file_format', '!wabsti_c'),
     )
 
     elected = UploadField(
@@ -62,17 +59,75 @@ class UploadElectionBaseForm(Form):
         render_kw=dict(force_simple=True)
     )
 
-    def adjust(self, principal):
-        """ Adjusts the form to the given principal """
+    def adjust(self, principal, election):
+        """ Adjusts the form to the given principal and election. """
 
         if principal.domain == 'municipality':
             self.file_format.choices = [
-                choice for choice in self.file_format.choices
-                if choice[0] != 'wabsti' and choice[0] != 'sesam'
+                ('internal', _("OneGov Cloud")),
             ]
+        else:
+            self.file_format.choices = [
+                ('internal', _("OneGov Cloud")),
+                ('sesam', _("SESAM")),
+                ('wabsti', _("Wabsti")),
+            ]
+
+        if election.data_sources:
+            self.file_format.choices.append(('wabsti_c', _("WabstiCExport")))
 
 
 class UploadMajorzElectionForm(UploadElectionBaseForm):
+
+    sg_gemeinden = UploadField(
+        label='SG_Gemeinden.csv',
+        validators=[
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        depends_on=('file_format', 'wabsti_c'),
+        render_kw=dict(force_simple=True)
+    )
+
+    wm_gemeinden = UploadField(
+        label='WM_Gemeinden.csv',
+        validators=[
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        depends_on=('file_format', 'wabsti_c'),
+        render_kw=dict(force_simple=True)
+    )
+
+    wm_kandidaten = UploadField(
+        label='WM_Kandidaten.csv',
+        validators=[
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        depends_on=('file_format', 'wabsti_c'),
+        render_kw=dict(force_simple=True)
+    )
+
+    wm_kandidatengde = UploadField(
+        label='WM_KandidatenGde.csv',
+        validators=[
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        depends_on=('file_format', 'wabsti_c'),
+        render_kw=dict(force_simple=True)
+    )
+
+    wmstatic_gemeinden = UploadField(
+        label='WMStatic_Gemeinden.csv',
+        validators=[
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        depends_on=('file_format', 'wabsti_c'),
+        render_kw=dict(force_simple=True)
+    )
 
     majority = IntegerField(
         label=_("Absolute majority"),
@@ -124,11 +179,7 @@ class UploadVoteForm(Form):
 
     file_format = RadioField(
         _("File format"),
-        choices=[
-            ('default', _("Default")),
-            ('wabsti', _("Wabsti")),
-            ('internal', _("OneGov Cloud")),
-        ],
+        choices=[],
         validators=[
             InputRequired()
         ],
@@ -149,7 +200,7 @@ class UploadVoteForm(Form):
     )
 
     proposal = UploadField(
-        label=_("Proposal"),
+        label=_("Proposal / Results / SG_Gemeinden.csv"),
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -190,12 +241,7 @@ class UploadVoteForm(Form):
     )
 
     def adjust(self, principal, vote):
-        """ Adjusts the form to the given principal and vote.
-
-        - Wabsti format is removed if it is a communal instance.
-        - The vote type (simple/complex) is copied from the vote
-
-        """
+        """ Adjusts the form to the given principal and vote. """
 
         if principal.domain == 'municipality':
             self.file_format.choices = [
@@ -205,9 +251,12 @@ class UploadVoteForm(Form):
         else:
             self.file_format.choices = [
                 ('default', _("Default")),
-                ('wabsti', _("Wabsti")),
                 ('internal', _("OneGov Cloud")),
+                ('wabsti', _("Wabsti")),
             ]
+
+        if vote.data_sources:
+            self.file_format.choices.append(('wabsti_c', _("WabstiCExport")))
 
         if (vote.meta or {}).get('vote_type', 'simple') == 'complex':
             self.type.choices = [('complex', _("Vote with Counter-Proposal"))]

@@ -107,24 +107,22 @@ class DataSourceItem(Base, TimestampMixin):
         Text, ForeignKey(Election.id), nullable=True
     )
 
+    election = relationship("Election", backref="data_sources")
+
     #: the vote
     vote_id = Column(
         Text, ForeignKey(Vote.id), nullable=True
     )
 
+    vote = relationship("Vote", backref="data_sources")
+
     @property
     def item(self):
         """ Returns the vote or election. """
-        session = object_session(self)
-
         if self.source.type == 'vote':
-            query = session.query(Vote)
-            query = query.filter(Vote.id == self.vote_id)
+            return self.vote
         else:
-            query = session.query(Election)
-            query = query.filter(Election.id == self.election_id)
-
-        return query.first()
+            return self.election
 
     @property
     def name(self):

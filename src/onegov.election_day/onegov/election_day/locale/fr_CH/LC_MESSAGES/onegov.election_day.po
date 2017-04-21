@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-19 10:20+0200\n"
+"POT-Creation-Date: 2017-04-21 12:08+0200\n"
 "PO-Revision-Date: 2017-04-19 13:37+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -228,6 +228,9 @@ msgstr "Format de fichier"
 msgid "Complete"
 msgstr "Terminé"
 
+msgid "Proposal / Results / SG_Gemeinden.csv"
+msgstr "Objet de la votation / Résultats / SG_Gemeinden.csv"
+
 msgid "Vote number"
 msgstr "Numéro de votation"
 
@@ -240,14 +243,17 @@ msgstr "Wabsti"
 msgid "SESAM"
 msgstr "SESAM"
 
-msgid "Default"
-msgstr "Défaut"
-
 msgid "Simple Vote"
 msgstr "Vote simple"
 
 msgid "Vote with Counter-Proposal"
 msgstr "Vote avec contre-projet"
+
+msgid "Default"
+msgstr "Défaut"
+
+msgid "WabstiCExport"
+msgstr ""
 
 msgid "Not a valid phone number."
 msgstr "N'est pas un numéro de téléphone valide."

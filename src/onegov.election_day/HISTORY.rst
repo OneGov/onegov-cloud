@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds options for manual upload of WabstiCExport files.
+  [msom]
+
 1.8.1 (2017-04-21)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-19 10:20+0200\n"
+"POT-Creation-Date: 2017-04-21 12:08+0200\n"
 "PO-Revision-Date: 2017-04-18 16:12+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -228,6 +228,9 @@ msgstr "Dateiformat"
 msgid "Complete"
 msgstr "Komplett ausgezählt"
 
+msgid "Proposal / Results / SG_Gemeinden.csv"
+msgstr "Vorlage / Resultate / SG_Gemeinden.csv"
+
 msgid "Vote number"
 msgstr "Vorlagen-Nummer"
 
@@ -240,14 +243,17 @@ msgstr "Wabsti"
 msgid "SESAM"
 msgstr "SESAM"
 
-msgid "Default"
-msgstr "Standard"
-
 msgid "Simple Vote"
 msgstr "Einfache Vorlage"
 
 msgid "Vote with Counter-Proposal"
 msgstr "Vorlage mit Gegenentwurf"
+
+msgid "Default"
+msgstr "Standard"
+
+msgid "WabstiCExport"
+msgstr ""
 
 msgid "Not a valid phone number."
 msgstr "Ungültige Telefonnummer."

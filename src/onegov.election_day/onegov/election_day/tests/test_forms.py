@@ -218,9 +218,7 @@ def test_upload_vote_form():
 
     # Test limitation of file formats
     form = UploadVoteForm()
-    assert sorted(f[0] for f in form.file_format.choices) == [
-        'default', 'internal', 'wabsti'
-    ]
+    assert sorted(f[0] for f in form.file_format.choices) == []
     form.adjust(cantonal_principal, simple_vote)
     assert sorted(f[0] for f in form.file_format.choices) == [
         'default', 'internal', 'wabsti'
@@ -229,6 +227,7 @@ def test_upload_vote_form():
     assert sorted(f[0] for f in form.file_format.choices) == [
         'default', 'internal'
     ]
+    # todo: test if wabsti_c is added when data sources are available
 
     # Test preseting of vote type
     form = UploadVoteForm()
@@ -312,45 +311,58 @@ def test_upload_election_form():
     cantonal_principal = Principal('be', None, None, canton='be')
     communal_principal = Principal('bern', None, None, municipality='351')
 
+    election = Election()
+
     # Test limitation of file formats
     form = UploadElectionBaseForm()
+    assert sorted(f[0] for f in form.file_format.choices) == []
+    form.adjust(cantonal_principal, election)
     assert sorted(f[0] for f in form.file_format.choices) == [
         'internal', 'sesam', 'wabsti'
     ]
-    form.adjust(cantonal_principal)
-    assert sorted(f[0] for f in form.file_format.choices) == [
-        'internal', 'sesam', 'wabsti'
-    ]
-    form.adjust(communal_principal)
+    form.adjust(communal_principal, election)
     assert sorted(f[0] for f in form.file_format.choices) == [
         'internal'
     ]
+    # todo: test if wabsti_c is added when data sources are available
 
     # Test required fields (majorz)
-    form = UploadMajorzElectionForm(DummyPostData({'file_format': 'internal'}))
+    form = UploadMajorzElectionForm()
+    form.adjust(cantonal_principal, election)
+    form.process(DummyPostData({'file_format': 'internal'}))
     form.results.data = {'mimetype': 'text/plain'}
     assert form.validate()
 
-    form = UploadMajorzElectionForm(DummyPostData({'file_format': 'sesam'}))
+    form = UploadMajorzElectionForm()
+    form.adjust(cantonal_principal, election)
+    form.process(DummyPostData({'file_format': 'sesam'}))
     form.results.data = {'mimetype': 'text/plain'}
     assert form.validate()
 
-    form = UploadMajorzElectionForm(DummyPostData({'file_format': 'wabsti'}))
+    form = UploadMajorzElectionForm()
+    form.adjust(cantonal_principal, election)
+    form.process(DummyPostData({'file_format': 'wabsti'}))
     form.results.data = {'mimetype': 'text/plain'}
     assert form.validate()
 
     # Test required fields (proporz)
-    form = UploadProporzElectionForm(DummyPostData({
+    form = UploadProporzElectionForm()
+    form.adjust(cantonal_principal, election)
+    form.process(DummyPostData({
         'file_format': 'internal'
     }))
     form.results.data = {'mimetype': 'text/plain'}
     assert form.validate()
 
-    form = UploadProporzElectionForm(DummyPostData({'file_format': 'sesam'}))
+    form = UploadProporzElectionForm()
+    form.adjust(cantonal_principal, election)
+    form.process(DummyPostData({'file_format': 'sesam'}))
     form.results.data = {'mimetype': 'text/plain'}
     assert form.validate()
 
-    form = UploadProporzElectionForm(DummyPostData({'file_format': 'wabsti'}))
+    form = UploadProporzElectionForm()
+    form.adjust(cantonal_principal, election)
+    form.process(DummyPostData({'file_format': 'wabsti'}))
     form.results.data = {'mimetype': 'text/plain'}
     assert form.validate()
 

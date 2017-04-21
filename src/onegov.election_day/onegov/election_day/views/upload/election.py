@@ -17,7 +17,8 @@ from onegov.election_day.formats.election.internal import (
     import_file as import_internal_file
 )
 from onegov.election_day.formats.election.wabsti.majorz import (
-    import_file as import_wabsti_file_majorz
+    import_file as import_wabsti_file_majorz,
+    import_exporter_files as import_exporter_files_majorz
 )
 from onegov.election_day.formats.election.wabsti.proporz import (
     import_file as import_wabsti_file_proporz
@@ -51,7 +52,7 @@ def view_upload_majorz_election(self, request, form):
 
     errors = []
 
-    form.adjust(request.app.principal)
+    form.adjust(request.app.principal, self)
 
     status = 'open'
     if form.submitted(request):
@@ -85,6 +86,25 @@ def view_upload_majorz_election(self, request, form):
                 self.absolute_majority = form.majority.data
                 if form.complete.data:
                     self.total_entities = self.counted_entities
+            elif form.file_format.data == 'wabsti_c':
+                for source in self.data_sources:
+                    errors.extend(
+                        import_exporter_files_majorz(
+                            self,
+                            source.district,
+                            source.number,
+                            entities,
+                            form.wmstatic_gemeinden.raw_data[0].file,
+                            form.wmstatic_gemeinden.data['mimetype'],
+                            form.wm_gemeinden.raw_data[0].file,
+                            form.wm_gemeinden.data['mimetype'],
+                            form.wm_kandidaten.raw_data[0].file,
+                            form.wm_kandidaten.data['mimetype'],
+                            form.wm_kandidatengde.raw_data[0].file,
+                            form.wm_kandidatengde.data['mimetype']
+                        )
+                    )
+                self.absolute_majority = form.majority.data
             else:
                 raise NotImplementedError("Unsupported import format")
 
@@ -127,7 +147,7 @@ def view_upload(self, request, form):
 
     errors = []
 
-    form.adjust(request.app.principal)
+    form.adjust(request.app.principal, self)
 
     status = 'open'
     if form.submitted(request):

@@ -17,7 +17,8 @@ from onegov.election_day.formats.vote.internal import (
     import_file as import_internal_file
 )
 from onegov.election_day.formats.vote.wabsti import (
-    import_file as import_wabsti_file
+    import_file as import_wabsti_file,
+    import_exporter_files
 )
 
 
@@ -50,11 +51,6 @@ def view_upload(self, request, form):
                     form.proposal.raw_data[0].file,
                     form.proposal.data['mimetype']
                 )
-                if not self.meta:
-                    self.meta = {}
-                self.meta['vote_type'] = 'simple'
-                if self.counter_proposal:
-                    self.meta['vote_type'] = 'complex'
             elif form.file_format.data == 'wabsti':
                 errors = import_wabsti_file(
                     entities,
@@ -64,11 +60,18 @@ def view_upload(self, request, form):
                     form.vote_number.data,
                     form.data['type'] == 'complex'
                 )
-                if not self.meta:
-                    self.meta = {}
-                self.meta['vote_type'] = 'simple'
-                if self.counter_proposal:
-                    self.meta['vote_type'] = 'complex'
+            elif form.file_format.data == 'wabsti_c':
+                for source in self.data_sources:
+                    errors.extend(
+                        import_exporter_files(
+                            self,
+                            source.district,
+                            source.number,
+                            entities,
+                            form.proposal.raw_data[0].file,
+                            form.proposal.data['mimetype']
+                        )
+                    )
             elif form.file_format.data == 'default':
                 if form.data['type'] == 'simple':
                     ballot_types = ('proposal', )
@@ -88,7 +91,6 @@ def view_upload(self, request, form):
                     )
             else:
                 raise NotImplementedError("Unsupported import format")
-
             archive = ArchivedResultCollection(request.app.session())
             archive.update(self, request)
 
@@ -96,6 +98,12 @@ def view_upload(self, request, form):
             status = 'error'
             transaction.abort()
         else:
+            if not self.meta:
+                self.meta = {}
+            self.meta['vote_type'] = 'simple'
+            if self.counter_proposal:
+                self.meta['vote_type'] = 'complex'
+
             status = 'success'
             request.app.pages_cache.invalidate()
             request.app.send_hipchat(
