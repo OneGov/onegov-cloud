@@ -79,17 +79,6 @@ class UploadElectionBaseForm(Form):
 
 class UploadMajorzElectionForm(UploadElectionBaseForm):
 
-    sg_gemeinden = UploadField(
-        label='SG_Gemeinden.csv',
-        validators=[
-            DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
-            FileSizeLimit(MAX_FILE_SIZE)
-        ],
-        depends_on=('file_format', 'wabsti_c'),
-        render_kw=dict(force_simple=True)
-    )
-
     wm_gemeinden = UploadField(
         label='WM_Gemeinden.csv',
         validators=[
