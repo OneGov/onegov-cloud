@@ -82,6 +82,7 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
     sg_gemeinden = UploadField(
         label='SG_Gemeinden.csv',
         validators=[
+            DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
@@ -92,6 +93,7 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
     wm_gemeinden = UploadField(
         label='WM_Gemeinden.csv',
         validators=[
+            DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
@@ -102,6 +104,7 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
     wm_kandidaten = UploadField(
         label='WM_Kandidaten.csv',
         validators=[
+            DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
@@ -112,6 +115,7 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
     wm_kandidatengde = UploadField(
         label='WM_KandidatenGde.csv',
         validators=[
+            DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
@@ -122,6 +126,7 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
     wmstatic_gemeinden = UploadField(
         label='WMStatic_Gemeinden.csv',
         validators=[
+            DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
