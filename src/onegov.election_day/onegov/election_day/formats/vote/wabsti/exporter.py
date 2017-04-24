@@ -144,9 +144,7 @@ def import_exporter_files(vote, district, number, entities,
         # Pass the line errors
         if line_errors:
             errors.extend(
-                FileImportError(
-                    error=err, line=line.rownumber, filename='results'
-                )
+                FileImportError(error=err, line=line.rownumber)
                 for err in line_errors
             )
             continue

@@ -9,14 +9,14 @@ from onegov.election_day.formats.election import clear_election
 from uuid import uuid4
 
 
-HEADERS_ENTITIES_STATIC = (
+HEADERS_WMSTATIC_GEMEINDEN = (
     'SortWahlkreis',  # provides the link to the election
     'SortGeschaeft',  # provides the link to the election
     'SortGemeinde',  # id (BFS)
     'SortGemeindeSub',  # id (BFS)
     'Stimmberechtigte',  # eligible votes
 )
-HEADERS_ENTITIES = (
+HEADERS_WM_GEMEINDEN = (
     'SortGemeinde',  # id (BFS)
     'SortGemeindeSub',  # id (BFS)
     'Stimmberechtigte',  # eligible votes
@@ -27,14 +27,14 @@ HEADERS_ENTITIES = (
     'StimmenLeer',  # blank votes
     'StimmenUngueltig',  # invalid votes
 )
-HEADERS_CANDIDATES = (
+HEADERS_WM_KANDIDATEN = (
     'SortGeschaeft',  # provides the link to the election
     'KNR',  # candidate id
     'Nachname',  # familiy name
     'Vorname',  # first name
     'Gewahlt',  # elected
 )
-HEADERS_CANDIDATE_RESULTS = (
+HEADERS_WM_KANDIDATENGDE = (
     'SortGeschaeft',  # provides the link to the election
     'SortGemeinde',  # id (BFS)
     'SortGemeindeSub',  # id (BFS)
@@ -63,10 +63,10 @@ def get_entity_id(line, entities):
 
 
 def import_exporter_files(election, district, number, entities,
-                          file_entities_static, mimetype_entities_static,
-                          file_entities, mimetype_entities,
-                          file_candidates, mimetype_candidates,
-                          file_candidate_results, mimetype_candidate_results):
+                          file_wmstatic_gemeinden, mimetype_wmstatic_gemeinden,
+                          file_wm_gemeinden, mimetype_wm_gemeinden,
+                          file_wm_kandidaten, mimetype_wm_kandidaten,
+                          file_wm_kandidatengde, mimetype_wm_kandidatengde):
     """ Tries to import the files in the given folder.
 
     We assume that the files there have been uploaded via FTP using the
@@ -77,33 +77,33 @@ def import_exporter_files(election, district, number, entities,
 
     # Read the files
     entities_static, error = load_csv(
-        file_entities_static, mimetype_entities_static,
-        expected_headers=HEADERS_ENTITIES_STATIC,
-        filename='entities_static'
+        file_wmstatic_gemeinden, mimetype_wmstatic_gemeinden,
+        expected_headers=HEADERS_WMSTATIC_GEMEINDEN,
+        filename='wmstatic_gemeinden'
     )
     if error:
         errors.append(error)
 
     entities_results, error = load_csv(
-        file_entities, mimetype_entities,
-        expected_headers=HEADERS_ENTITIES,
-        filename='entities_results'
+        file_wm_gemeinden, mimetype_wm_gemeinden,
+        expected_headers=HEADERS_WM_GEMEINDEN,
+        filename='wm_gemeinden'
     )
     if error:
         errors.append(error)
 
     candidates, error = load_csv(
-        file_candidates, mimetype_candidates,
-        expected_headers=HEADERS_CANDIDATES,
-        filename='candidates'
+        file_wm_kandidaten, mimetype_wm_kandidaten,
+        expected_headers=HEADERS_WM_KANDIDATEN,
+        filename='wm_kandidaten'
     )
     if error:
         errors.append(error)
 
     candidate_results, error = load_csv(
-        file_candidate_results, mimetype_candidate_results,
-        expected_headers=HEADERS_CANDIDATE_RESULTS,
-        filename='candidate_results'
+        file_wm_kandidatengde, mimetype_wm_kandidatengde,
+        expected_headers=HEADERS_WM_KANDIDATENGDE,
+        filename='wm_kandidatengde'
     )
     if error:
         errors.append(error)
