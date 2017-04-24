@@ -145,7 +145,8 @@ def import_exporter_files(election, district, number, entities,
         if line_errors:
             errors.extend(
                 FileImportError(
-                    error=err, line=line.rownumber, filename='entities_static'
+                    error=err, line=line.rownumber,
+                    filename='wmstatic_gemeinden'
                 )
                 for err in line_errors
             )
@@ -215,7 +216,7 @@ def import_exporter_files(election, district, number, entities,
         if line_errors:
             errors.extend(
                 FileImportError(
-                    error=err, line=line.rownumber, filename='entities_results'
+                    error=err, line=line.rownumber, filename='wm_gemeinden'
                 )
                 for err in line_errors
             )
@@ -248,7 +249,7 @@ def import_exporter_files(election, district, number, entities,
         if line_errors:
             errors.extend(
                 FileImportError(
-                    error=err, line=line.rownumber, filename='candidates'
+                    error=err, line=line.rownumber, filename='wm_kandidaten'
                 )
                 for err in line_errors
             )
@@ -278,7 +279,7 @@ def import_exporter_files(election, district, number, entities,
             errors.extend(
                 FileImportError(
                     error=err, line=line.rownumber,
-                    filename='candidate_results'
+                    filename='wm_kandidatengde'
                 )
                 for err in line_errors
             )
