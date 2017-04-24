@@ -49,7 +49,8 @@
             data-dataurl="${map_url}"
             data-left-hand="Yay"
             data-right-hand="Nay"
-            i18n:attributes="data-left-hand; data-right-hand"
+            data-expats="Expats"
+            i18n:attributes="data-left-hand; data-right-hand; data-expats"
             >
         </div>
     </body>

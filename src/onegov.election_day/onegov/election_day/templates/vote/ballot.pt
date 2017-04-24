@@ -19,7 +19,6 @@
             <div class="row" tal:condition="use_maps">
                 <div class="small-12 small-centered medium-8 large-6 columns map-container">
                     <div class="ballot-map"
-                        i18n:attributes="data-embed-link; data-left-hand; data-right-hand"
                         data-type="${ballot.type}"
                         data-canton="${layout.app.principal.canton}"
                         data-mapurl="${layout.get_topojson_link(layout.app.principal.id, vote.date.year)}"
@@ -28,6 +27,8 @@
                         data-embed-source="${request.link(ballot, name='map')}"
                         data-left-hand="Yay"
                         data-right-hand="Nay"
+                        data-expats="Expats"
+                        i18n:attributes="data-embed-link; data-left-hand; data-right-hand; data-expats"
                         >
                     </div>
                     <a class="svg-download" tal:condition="layout.svg_path" href="${layout.svg_link}">

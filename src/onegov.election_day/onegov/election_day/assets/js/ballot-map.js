@@ -8,13 +8,15 @@
                     var canton =  $(el).data('canton');
                     var yay = $(el).data('left-hand');
                     var nay = $(el).data('right-hand');
+                    var expats = $(el).data('expats');
                     var map = ballotMap({
                         mapdata: mapdata,
                         data: data,
                         canton: canton,
                         interactive: true,
                         yay: yay,
-                        nay: nay
+                        nay: nay,
+                        expats: expats
                     })(el);
 
                     var embed_link = $(el).data('embed-link');
