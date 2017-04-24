@@ -14,7 +14,6 @@ HEADERS_ENTITIES_STATIC = (
     'SortGeschaeft',  # provides the link to the election
     'SortGemeinde',  # id (BFS)
     'SortGemeindeSub',  # id (BFS)
-    'Gemeinde',  # group
     'Stimmberechtigte',  # eligible votes
 )
 HEADERS_ENTITIES = (
@@ -136,11 +135,6 @@ def import_exporter_files(election, district, number, entities,
                 line_errors.append(
                     _("${name} was found twice", mapping={'name': entity_id}))
 
-        # Parse the name of the entity
-        group = line.gemeinde.strip()
-        if not group:
-            group = entities.get(entity_id, {}).get('name', '')
-
         # Parse the elegible voters
         try:
             elegible_voters = int(line.stimmberechtigte or 0)
@@ -158,7 +152,7 @@ def import_exporter_files(election, district, number, entities,
             continue
         else:
             added_entities[entity_id] = {
-                'group': group,
+                'group': entities.get(entity_id, {}).get('name', ''),
                 'elegible_voters': elegible_voters
             }
 
