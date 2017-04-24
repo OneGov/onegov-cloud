@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Pour l'élection dimanche, les résultats seront publiés régulièrement sur les élections et les votes individuels. Avec la nouvelle application web *élections et votes*, ce sera effectué via une interface web, qui accepte les fichiers CSV ou Excel (XLS / XLSX) avec des résultats provisoires ou définitifs. Pour les fichiers Excel, soit la première feuille de travail soit, si elle est disponible la feuille de travail appelée « résultats » sera utilisée.  
+Pour l'élection dimanche, les résultats seront publiés régulièrement sur les élections et les votes individuels. Avec la nouvelle application web *élections et votes*, ce sera effectué via une interface web, qui accepte les fichiers CSV (UTF-8) ou Excel (XLS / XLSX) avec des résultats provisoires ou définitifs. Pour les fichiers Excel, soit la première feuille de travail soit, si elle est disponible la feuille de travail appelée « résultats » sera utilisée.  
 
 Dépendant de l'élection / du vote et du format, un nombre différent de fichiers est requis. Chacun de ces fichiers, indépendamment du format du fichier, se compose d'un en-tête et d'un nombre quelconque de lignes de résultats. L'en-tête contient le nom des colonnes et il est *obligatoire*.
 
