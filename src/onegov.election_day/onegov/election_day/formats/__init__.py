@@ -52,6 +52,11 @@ def load_csv(file, mimetype, expected_headers, filename=None):
                     _("The xls/xlsx file contains unsupported cells."),
                     filename=filename
                 )
+            except Exception:
+                error = FileImportError(
+                    _("Not a valid csv/xls/xlsx file."),
+                    filename=filename
+                )
         except XLRDError:
             error = FileImportError(
                 _("Not a valid xls/xlsx file."),
@@ -60,6 +65,11 @@ def load_csv(file, mimetype, expected_headers, filename=None):
         except NotImplementedError:
             error = FileImportError(
                 _("The xls/xlsx file contains unsupported cells."),
+                filename=filename
+            )
+        except Exception:
+            error = FileImportError(
+                _("Not a valid csv/xls/xlsx file."),
                 filename=filename
             )
 
@@ -104,6 +114,11 @@ def load_csv(file, mimetype, expected_headers, filename=None):
     except EmptyLineInFileError:
         error = FileImportError(
             _("The file contains an empty line."),
+            filename=filename
+        )
+    except Exception:
+        error = FileImportError(
+            _("Not a valid csv/xls/xlsx file."),
             filename=filename
         )
 

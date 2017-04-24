@@ -10,6 +10,8 @@ Changelog
 - Fixes wrong default group when uploading majorz elections.
   [msom]
 
+- Makes upload results views more robust.
+  [msom]
 
 1.8.1 (2017-04-21)
 ~~~~~~~~~~~~~~~~~~~
