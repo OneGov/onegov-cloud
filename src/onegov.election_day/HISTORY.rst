@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.8.3 (2017-04-24)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds translations and visualization of expats.
   [msom]
