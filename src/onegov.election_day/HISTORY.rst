@@ -4,6 +4,13 @@ Changelog
 - Adds options for manual upload of WabstiCExport files.
   [msom]
 
+- Tidies up usage of electoral districts somewhat.
+  [msom]
+
+- Fixes wrong default group when uploading majorz elections.
+  [msom]
+
+
 1.8.1 (2017-04-21)
 ~~~~~~~~~~~~~~~~~~~
 
