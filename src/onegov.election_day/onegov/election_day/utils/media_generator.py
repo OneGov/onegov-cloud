@@ -156,6 +156,9 @@ class MediaGenerator():
             def translate(content):
                 return self.translate(content, locale)
 
+            def format_group(item):
+                return item.group if item.entity_id else translate(_("Expats"))
+
             def draw_footer(canvas, doc):
                 canvas.saveState()
                 canvas.setFont('Helvetica', 9)
@@ -477,7 +480,7 @@ class MediaGenerator():
                             translate(_('Elegible Voters')),
                             translate(_('Accounted Votes')),
                         ]] + [[
-                            result.group,
+                            format_group(result),
                             '{0:.2f} %'.format(result.turnout),
                             result.elegible_voters,
                             result.accounted_votes,
@@ -500,7 +503,7 @@ class MediaGenerator():
                             translate(_('Invalid Ballots')),
 
                         ]] + [[
-                            result.group,
+                            format_group(result),
                             result.received_ballots or '0',
                             result.accounted_ballots or '0',
                             result.blank_ballots or '0',
@@ -612,7 +615,7 @@ class MediaGenerator():
                                 translate(_('Yes %')),
                                 translate(_('No %')),
                             ]] + [[
-                                result.group,
+                                format_group(result),
                                 translate(_('Accepted')) if result.accepted
                                 else translate(_('Rejected')),
                                 '{0:.2f}%'.format(result.yeas_percentage),
@@ -636,7 +639,7 @@ class MediaGenerator():
                                 translate(_('Yes %')).replace('%', '').strip(),
                                 translate(_('No %')).replace('%', '').strip(),
                             ]] + [[
-                                result.group,
+                                format_group(result),
                                 result.empty or '0',
                                 result.invalid or '0',
                                 result.yeas or '0',

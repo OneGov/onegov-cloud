@@ -111,6 +111,9 @@ class Layout(ChameleonLayout):
             for locale in sorted(self.app.locales)
         ]
 
+    def format_group(self, item):
+        return item.group if item.entity_id else _("Expats")
+
 
 class DefaultLayout(Layout):
     pass

@@ -66,11 +66,11 @@
 
                     <tr tal:repeat="result ballot.results" data-municipality-id="${result.entity_id}">
                         <tal:block condition="not: result.counted">
-                            <td tal:condition="layout.summarize">${result.group}</td>
+                            <td tal:condition="layout.summarize">${layout.format_group(result)}</td>
                             <td class="answer" colspan="7" i18n:translate="">Not yet counted.</td>
                         </tal:block>
                         <tal:block condition="result.counted">
-                            <td>${result.group}</td>
+                            <td>${layout.format_group(result)}</td>
                             <td class="answer accepted" tal:condition="result.accepted" i18n:translate="">Accepted</td>
                             <td class="answer rejected" tal:condition="not: result.accepted" i18n:translate="">Rejected</td>
                             <td class="right-aligned">${layout.format_number(result.yeas)}</td>

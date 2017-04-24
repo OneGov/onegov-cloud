@@ -114,7 +114,10 @@ def view_vote_json(self, request):
                             'cast_ballots': district.cast_ballots,
                             'turnout': district.turnout,
                             'counted': district.counted,
-                            'name': district.group,
+                            'name': (
+                                district.group if district.entity_id
+                                else 'Expats'
+                            ),
                             'id': district.entity_id,
                         } for district in ballot.results
                     ],

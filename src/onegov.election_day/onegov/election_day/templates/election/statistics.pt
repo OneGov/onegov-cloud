@@ -41,7 +41,7 @@
                         <td class="right-aligned" tal:condition="election.counted">${'{0:.2f}'.format(election.turnout)} %</td>
                     </tr>
                     <tr tal:repeat="result election.results">
-                        <td>${result.group}</td>
+                        <td>${layout.format_group(result)}</td>
                         <td class="right-aligned">${layout.format_number(result.elegible_voters)}</td>
                         <td class="right-aligned">${layout.format_number(result.received_ballots)}</td>
                         <td class="right-aligned">${layout.format_number(result.accounted_ballots)}</td>

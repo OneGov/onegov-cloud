@@ -70,7 +70,7 @@ def view_election_json(self, request):
                     'invalid_ballots': district.invalid_ballots,
                     'accounted_votes': district.accounted_votes,
                     'turnout': district.turnout,
-                    'name': district.group,
+                    'name': district.group if district.entity_id else 'Expats',
                     'id': district.entity_id,
                 } for district in self.results
             ],
