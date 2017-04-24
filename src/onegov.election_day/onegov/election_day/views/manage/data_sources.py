@@ -47,6 +47,7 @@ def create_data_source(self, request, form):
         data_source = DataSource()
         form.update_model(data_source)
         self.add(data_source)
+        layout = ManageDataSourceItemsLayout(data_source, request)
         return morepath.redirect(layout.manage_model_link)
 
     return {
