@@ -43,7 +43,7 @@
                 <tbody>
                     <tr tal:repeat="list lists">
                         <td>${list[0]}</td>
-                        <td class="right-aligned">${layout.format_number(list[1])}</td>
+                        <td class="right-aligned">${layout.format_number(list[1] or 0)}</td>
                         <td class="right-aligned">${list[3]}</td>
                     </tr>
                 </tbody>

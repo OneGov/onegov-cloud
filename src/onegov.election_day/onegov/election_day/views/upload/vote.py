@@ -3,12 +3,10 @@ import transaction
 
 from onegov.ballot import Vote
 from onegov.core.security import Private
-from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.forms import UploadVoteForm
 from onegov.election_day.layout import ManageVotesLayout
-from onegov.election_day.formats import FileImportError
 from onegov.election_day.formats.vote import BALLOT_TYPES
 from onegov.election_day.formats.vote.default import (
     import_file as import_default_file
@@ -20,6 +18,7 @@ from onegov.election_day.formats.vote.wabsti import (
     import_file as import_wabsti_file,
     import_exporter_files
 )
+from onegov.election_day.views.upload import unsupported_year_error
 
 
 @ElectionDayApp.form(model=Vote, name='upload', template='upload_vote.pt',
@@ -34,14 +33,7 @@ def view_upload(self, request, form):
     if form.submitted(request):
         principal = request.app.principal
         if not principal.is_year_available(self.date.year, principal.use_maps):
-            errors = [
-                FileImportError(
-                    _(
-                        "The year ${year} is not yet supported",
-                        mapping={'year': self.date.year}
-                    )
-                )
-            ]
+            errors = [unsupported_year_error(self.date.year)]
         else:
             entities = principal.entities.get(self.date.year, [])
             if form.file_format.data == 'internal':

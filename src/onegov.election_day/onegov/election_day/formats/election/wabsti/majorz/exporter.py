@@ -265,14 +265,13 @@ def import_exporter_files(election, district, number, entities,
         try:
             entity_id = get_entity_id(line, entities)
             candidate_id = line.knr
+            assert candidate_id in added_candidates
             votes = int(line.stimmen)
-        except ValueError:
+        except (ValueError, AssertionError):
             line_errors.append(_("Invalid candidate results"))
         else:
             if entity_id not in added_entities:
                 line_errors.append(_("Invalid entity values"))
-            if candidate_id not in added_candidates:
-                line_errors.append(_("Invalid candidate values"))
 
         # Pass the line errors
         if line_errors:

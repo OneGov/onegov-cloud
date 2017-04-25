@@ -6,12 +6,16 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.forms import UploadWabstiVoteForm
 from onegov.election_day.forms import UploadWabstiMajorzElectionForm
+from onegov.election_day.forms import UploadWabstiProporzElectionForm
 from onegov.election_day.formats.vote.wabsti import \
     import_exporter_files as import_vote
 from onegov.election_day.formats.election.wabsti.majorz import \
     import_exporter_files as import_majorz
+from onegov.election_day.formats.election.wabsti.proporz import \
+    import_exporter_files as import_proporz
 from onegov.election_day.models import Principal
 from onegov.election_day.models import DataSource
+from onegov.election_day.views.upload import unsupported_year_error
 from webob.exc import HTTPForbidden
 
 
@@ -78,9 +82,7 @@ def view_upload_wabsti_vote(self, request):
         vote = item.item
         errors[vote.id] = []
         if not self.is_year_available(vote.date.year, self.use_maps):
-            errors[vote.id].append({
-                'message': 'The year is not yet supported'
-            })
+            errors[vote.id].append(unsupported_year_error(vote.date.year))
             continue
 
         entities = self.entities.get(vote.date.year, {})
@@ -152,10 +154,10 @@ def view_upload_wabsti_majorz(self, request):
         election = item.item
 
         errors[election.id] = []
-        if not self.is_year_available(election.date.year, self.use_maps):
-            errors[election.id].append({
-                'message': 'The year is not yet supported'
-            })
+        if not self.is_year_available(election.date.year, False):
+            errors[election.id].append(
+                unsupported_year_error(election.date.year)
+            )
             continue
 
         entities = self.entities.get(election.date.year, {})
@@ -169,6 +171,96 @@ def view_upload_wabsti_majorz(self, request):
             form.wm_kandidaten.data['mimetype'],
             form.wm_kandidatengde.raw_data[0].file,
             form.wm_kandidatengde.data['mimetype'],
+        )
+        if not errors[election.id]:
+            archive.update(election, request)
+            request.app.send_hipchat(
+                self.name,
+                'New results available: <a href="{}">{}</a>'.format(
+                    request.link(election), election.title
+                )
+            )
+
+    interpolate_errors(errors)
+
+    if any(errors.values()):
+        transaction.abort()
+        return {'status': 'error', 'errors': errors}
+    else:
+        request.app.pages_cache.invalidate()
+        return {'status': 'success', 'errors': {}}
+
+
+@ElectionDayApp.json(model=Principal, name='upload-wabsti-proporz',
+                     permission=Public, request_method='POST')
+def view_upload_wabsti_proporz(self, request):
+    """ Upload election results using the WabstiCExportert 2.1.
+
+    Example usage:
+        curl
+            --user :<token>
+            --form "wpstatic_gemeinden=@WPStatic_Gemeinden.csv"
+            --form "wp_gemeinden=@WP_Gemeinden.csv"
+            --form "wp_listen=@WP_Listen.csv"
+            --form "wp_listengde=@WP_ListenGde.csv"
+            --form "wpstatic_kandidaten=@WPStatic_Kandidaten.csv"
+            --form "wp_kandidaten=@WP_Kandidaten.csv"
+            --form "wp_kandidatengde=@WP_KandidatenGde.csv"
+            http://localhost:8080/onegov_election_day/sg/upload-wabsti-proporz
+    """
+
+    data_source = authenticated_source(request)
+
+    if data_source.type != 'proporz':
+        return {
+            'status': 'error',
+            'errors': {
+                'data_source': 'The data source is note configured properly'
+            }
+        }
+
+    form = request.get_form(
+        UploadWabstiProporzElectionForm,
+        model=self,
+        i18n_support=False,
+        csrf_support=False
+    )
+    if not form.validate():
+        return {
+            'status': 'error',
+            'errors': form.errors
+        }
+
+    errors = {}
+    session = request.app.session()
+    archive = ArchivedResultCollection(session)
+    for item in data_source.items:
+        election = item.item
+
+        errors[election.id] = []
+        if not self.is_year_available(election.date.year, False):
+            errors[election.id].append(
+                unsupported_year_error(election.date.year)
+            )
+            continue
+
+        entities = self.entities.get(election.date.year, {})
+        errors[election.id] = import_proporz(
+            election, item.district, item.number, entities,
+            form.wpstatic_gemeinden.raw_data[0].file,
+            form.wpstatic_gemeinden.data['mimetype'],
+            form.wp_gemeinden.raw_data[0].file,
+            form.wp_gemeinden.data['mimetype'],
+            form.wp_listen.raw_data[0].file,
+            form.wp_listen.data['mimetype'],
+            form.wp_listengde.raw_data[0].file,
+            form.wp_listengde.data['mimetype'],
+            form.wpstatic_kandidaten.raw_data[0].file,
+            form.wpstatic_kandidaten.data['mimetype'],
+            form.wp_kandidaten.raw_data[0].file,
+            form.wp_kandidaten.data['mimetype'],
+            form.wp_kandidatengde.raw_data[0].file,
+            form.wp_kandidatengde.data['mimetype'],
         )
         if not errors[election.id]:
             archive.update(election, request)

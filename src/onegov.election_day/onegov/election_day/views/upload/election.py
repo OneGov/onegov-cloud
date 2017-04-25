@@ -4,10 +4,8 @@ import transaction
 
 from onegov.ballot import Election
 from onegov.core.security import Private
-from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
-from onegov.election_day.formats import FileImportError
 from onegov.election_day.formats.election import import_party_results_file
 from onegov.election_day.forms import UploadElectionPartyResultsForm
 from onegov.election_day.forms import UploadMajorzElectionForm
@@ -21,19 +19,13 @@ from onegov.election_day.formats.election.wabsti.majorz import (
     import_exporter_files as import_exporter_files_majorz
 )
 from onegov.election_day.formats.election.wabsti.proporz import (
-    import_file as import_wabsti_file_proporz
+    import_file as import_wabsti_file_proporz,
+    import_exporter_files as import_exporter_files_proporz
 )
 from onegov.election_day.formats.election.sesam import (
     import_file as import_sesam_file
 )
-
-
-def unsupported_year_error(year):
-    return FileImportError(
-        _(
-            "The year ${year} is not yet supported", mapping={'year': year}
-        )
-    )
+from onegov.election_day.views.upload import unsupported_year_error
 
 
 @ElectionDayApp.html(model=Election, name='upload', permission=Private)
@@ -185,6 +177,30 @@ def view_upload(self, request, form):
                 )
                 if form.complete.data:
                     self.total_entities = self.counted_entities
+            elif form.file_format.data == 'wabsti_c':
+                for source in self.data_sources:
+                    errors.extend(
+                        import_exporter_files_proporz(
+                            self,
+                            source.district,
+                            source.number,
+                            entities,
+                            form.wpstatic_gemeinden.raw_data[0].file,
+                            form.wpstatic_gemeinden.data['mimetype'],
+                            form.wp_gemeinden.raw_data[0].file,
+                            form.wp_gemeinden.data['mimetype'],
+                            form.wp_listen.raw_data[0].file,
+                            form.wp_listen.data['mimetype'],
+                            form.wp_listengde.raw_data[0].file,
+                            form.wp_listengde.data['mimetype'],
+                            form.wpstatic_kandidaten.raw_data[0].file,
+                            form.wpstatic_kandidaten.data['mimetype'],
+                            form.wp_kandidaten.raw_data[0].file,
+                            form.wp_kandidaten.data['mimetype'],
+                            form.wp_kandidatengde.raw_data[0].file,
+                            form.wp_kandidatengde.data['mimetype'],
+                        )
+                    )
             else:
                 raise NotImplementedError("Unsupported import format")
 

@@ -7,6 +7,7 @@ from onegov.election_day.forms.upload import UploadMajorzElectionForm
 from onegov.election_day.forms.upload import UploadProporzElectionForm
 from onegov.election_day.forms.upload import UploadVoteForm
 from onegov.election_day.forms.upload import UploadWabstiMajorzElectionForm
+from onegov.election_day.forms.upload import UploadWabstiProporzElectionForm
 from onegov.election_day.forms.upload import UploadWabstiVoteForm
 from onegov.election_day.forms.vote import VoteForm
 from onegov.form import Form
@@ -32,6 +33,7 @@ __all__ = [
     'UploadProporzElectionForm',
     'UploadVoteForm',
     'UploadWabstiMajorzElectionForm',
+    'UploadWabstiProporzElectionForm',
     'UploadWabstiVoteForm',
     'VoteForm',
 ]
