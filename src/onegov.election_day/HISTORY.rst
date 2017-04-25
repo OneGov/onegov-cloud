@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.8.4 (2017-04-25)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds support for WabstCExport proporz elections.
   [msom]
