@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Moves the period filter further up.
+  [href]
+
 - Increases the maximum allowed block-time from 90 to 360 minutes.
   [href]
 
