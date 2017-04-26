@@ -98,9 +98,10 @@ def import_exporter_files(vote, district, number, entities,
                     _("${name} is unknown", mapping={'name': entity_id}))
 
         # Check if the entity is counted
-        counted = True
-        if int(line.sperrung) == 0:
-            counted = False
+        try:
+            counted = False if int(line.sperrung or 0) == 0 else True
+        except ValueError:
+            line_errors.append(_("Invalid values"))
 
         # Parse the elegible voters
         try:

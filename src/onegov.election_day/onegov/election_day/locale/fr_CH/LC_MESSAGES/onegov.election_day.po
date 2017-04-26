@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-24 10:37+0200\n"
+"POT-Creation-Date: 2017-04-26 09:26+0200\n"
 "PO-Revision-Date: 2017-04-24 10:41+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -141,9 +141,6 @@ msgstr "${name} a été trouvé en double"
 msgid "Could not read the elegible voters"
 msgstr "Impossible de connaître les électeurs valides"
 
-msgid "Could not read the invalid votes"
-msgstr "Impossible de connaître les votes invalides"
-
 msgid "Elected Candidates"
 msgstr "Candidats élus"
 
@@ -161,6 +158,9 @@ msgstr "Impossible de lire les non"
 
 msgid "Could not read the empty votes"
 msgstr "Impossible de connaître les votes blancs"
+
+msgid "Could not read the invalid votes"
+msgstr "Impossible de connaître les votes invalides"
 
 msgid "No elegible voters"
 msgstr "Pas d'électeurs valides"

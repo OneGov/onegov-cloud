@@ -240,7 +240,10 @@ def import_exporter_files(election, district, number, entities,
         entity = added_entities[entity_id]
 
         # Check if the entity is counted
-        entity['counted'] = False if int(line.sperrung) == 0 else True
+        try:
+            entity['counted'] = False if int(line.sperrung or 0) == 0 else True
+        except ValueError:
+            line_errors.append(_("Invalid entity values"))
 
         # Parse the elegible voters
         try:
@@ -260,7 +263,7 @@ def import_exporter_files(election, district, number, entities,
             blank_ballots = int(line.stmleer or 0)
             invalid_ballots = int(line.stmungueltig or 0)
         except ValueError:
-            line_errors.append(_("Could not read the invalid votes"))
+            line_errors.append(_("Invalid entity values"))
         else:
             entity['received_ballots'] = received_ballots
             entity['blank_ballots'] = blank_ballots

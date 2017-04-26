@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-24 10:37+0200\n"
+"POT-Creation-Date: 2017-04-26 09:26+0200\n"
 "PO-Revision-Date: 2017-04-24 10:41+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -141,9 +141,6 @@ msgstr "${name} figura due volte"
 msgid "Could not read the elegible voters"
 msgstr "Impossibile leggere 'Aventi diritto di voto'"
 
-msgid "Could not read the invalid votes"
-msgstr "Impossibile leggere 'Schede nulle'"
-
 msgid "Elected Candidates"
 msgstr "Candidati eletti"
 
@@ -161,6 +158,9 @@ msgstr "Impossibile leggere 'NO'"
 
 msgid "Could not read the empty votes"
 msgstr "Impossibile leggere 'Schede bianche'"
+
+msgid "Could not read the invalid votes"
+msgstr "Impossibile leggere 'Schede nulle'"
 
 msgid "No elegible voters"
 msgstr "Nessun avente diritto di voto"

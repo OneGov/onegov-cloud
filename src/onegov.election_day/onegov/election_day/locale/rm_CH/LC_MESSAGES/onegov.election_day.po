@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-24 10:37+0200\n"
+"POT-Creation-Date: 2017-04-26 09:26+0200\n"
 "PO-Revision-Date: 2017-04-24 10:42+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -141,9 +141,6 @@ msgstr "${name} è avant maun duas giadas"
 msgid "Could not read the elegible voters"
 msgstr "I n'è betg stà pussaivel da leger las persunas cun dretg da votar"
 
-msgid "Could not read the invalid votes"
-msgstr "I n'è betg stà pussaivel da leger ils cedels da votar nunvalaivels"
-
 msgid "Elected Candidates"
 msgstr "Candidat(a)s elegid(a)s"
 
@@ -161,6 +158,9 @@ msgstr "I n'è betg stà pussaivel da leger las vuschs negativas"
 
 msgid "Could not read the empty votes"
 msgstr "I n'è betg stà pussaivel da leger ils cedels da votar vids"
+
+msgid "Could not read the invalid votes"
+msgstr "I n'è betg stà pussaivel da leger ils cedels da votar nunvalaivels"
 
 msgid "No elegible voters"
 msgstr "Naginas persunas cun dretg da votar"

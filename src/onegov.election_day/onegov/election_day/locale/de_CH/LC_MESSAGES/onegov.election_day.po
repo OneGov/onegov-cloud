@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-24 10:37+0200\n"
+"POT-Creation-Date: 2017-04-26 09:26+0200\n"
 "PO-Revision-Date: 2017-04-24 11:08+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -141,9 +141,6 @@ msgstr "${name} kommt zweimal vor"
 msgid "Could not read the elegible voters"
 msgstr "Konnte 'Stimmberechtigte' nicht lesen"
 
-msgid "Could not read the invalid votes"
-msgstr "Konnte 'Ungültige Stimmzettel' nicht lesen"
-
 msgid "Elected Candidates"
 msgstr "Gewählte Kandidierende"
 
@@ -161,6 +158,9 @@ msgstr "Konnte 'Nein Stimmen' nicht lesen"
 
 msgid "Could not read the empty votes"
 msgstr "Konnte 'Leere Stimmzettel' nicht lesen"
+
+msgid "Could not read the invalid votes"
+msgstr "Konnte 'Ungültige Stimmzettel' nicht lesen"
 
 msgid "No elegible voters"
 msgstr "Keine Stimmberechtigten"
