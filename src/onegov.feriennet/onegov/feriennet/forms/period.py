@@ -95,7 +95,7 @@ class PeriodForm(Form):
         fieldset=_("Bookings"),
         validators=[
             InputRequired(),
-            NumberRange(0, 90)
+            NumberRange(0, 360)
         ],
         default=0
     )

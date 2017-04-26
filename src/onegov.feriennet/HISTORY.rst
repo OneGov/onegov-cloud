@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Increases the maximum allowed block-time from 90 to 360 minutes.
+  [href]
+
 0.7.1 (2017-04-11)
 ~~~~~~~~~~~~~~~~~~~
 
