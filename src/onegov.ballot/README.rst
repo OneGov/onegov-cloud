@@ -3,7 +3,7 @@ Onegov Ballot
 
 Models ballot results for OneGov.
 
-.. image:: https://raw.githubusercontent.com/OneGov/onegov.ballot/master/docs/onegov.ballot.svg
+.. image:: https://raw.githubusercontent.com/OneGov/onegov.ballot/master/docs/onegov.ballot.png
 
 Run the Tests
 -------------
