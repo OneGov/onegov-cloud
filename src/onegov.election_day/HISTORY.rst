@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.8.5 (2017-04-26)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes parsing an error field in WabstCExport throwing an error.
   [msom]
