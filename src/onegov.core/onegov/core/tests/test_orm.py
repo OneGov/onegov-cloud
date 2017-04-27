@@ -18,6 +18,7 @@ from onegov.core.orm.mixins import (
 )
 from onegov.core.orm import orm_cached
 from onegov.core.orm.types import HSTORE, JSON, UTCDateTime, UUID
+from onegov.core.orm.types import LowercaseText
 from onegov.core.security import Private
 from onegov.core.utils import scan_morepath_modules
 from psycopg2.extensions import TransactionRollbackError
@@ -477,6 +478,31 @@ def test_uuid_type(postgres_dsn):
     transaction.commit()
 
     assert isinstance(session.query(Test).one().id, uuid.UUID)
+
+    mgr.dispose()
+
+
+def test_lowercase_text(postgres_dsn):
+    Base = declarative_base(cls=ModelBase)
+
+    class Test(Base):
+        __tablename__ = 'test'
+
+        id = Column(LowercaseText, primary_key=True)
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('testing')
+
+    session = mgr.session()
+
+    test = Test()
+    test.id = 'Foobar'
+    session.add(test)
+    transaction.commit()
+
+    assert session.query(Test).one().id == 'foobar'
+    assert session.query(Test).filter(Test.id == 'Foobar').one().id == 'foobar'
+    assert session.query(Test).filter(Test.id == 'foobar').one().id == 'foobar'
 
     mgr.dispose()
 

@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a lowercase text type for SQLAlchemy.
+  [href]
+
 0.39.0 (2017-04-07)
 ~~~~~~~~~~~~~~~~~~~
 
