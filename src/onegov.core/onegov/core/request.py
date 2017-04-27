@@ -184,9 +184,12 @@ class CoreRequest(IncludeRequest, ReturnToMixin):
             return None
 
         if app.filestorage.hasurl(path):
-            return app.filestorage.geturl(path)
-        else:
-            return self.link(app.modules.filestorage.FilestorageFile(path))
+            url = app.filestorage.geturl(path)
+
+            if not url.startswith('file://'):
+                return url
+
+        return self.link(app.modules.filestorage.FilestorageFile(path))
 
     @cached_property
     def theme_link(self):

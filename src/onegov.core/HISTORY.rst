@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes filestorage returning an url for local paths.
+  [href]
+
 - Adds a lowercase text type for SQLAlchemy.
   [href]
 
