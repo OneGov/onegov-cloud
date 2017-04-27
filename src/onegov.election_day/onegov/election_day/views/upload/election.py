@@ -86,6 +86,8 @@ def view_upload_majorz_election(self, request, form):
                             source.district,
                             source.number,
                             entities,
+                            form.wm_wahl.raw_data[0].file,
+                            form.wm_wahl.data['mimetype'],
                             form.wmstatic_gemeinden.raw_data[0].file,
                             form.wmstatic_gemeinden.data['mimetype'],
                             form.wm_gemeinden.raw_data[0].file,
@@ -96,7 +98,6 @@ def view_upload_majorz_election(self, request, form):
                             form.wm_kandidatengde.data['mimetype']
                         )
                     )
-                self.absolute_majority = form.majority.data
             else:
                 raise NotImplementedError("Unsupported import format")
 

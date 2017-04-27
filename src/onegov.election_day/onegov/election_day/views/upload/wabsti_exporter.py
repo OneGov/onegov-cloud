@@ -172,6 +172,8 @@ def view_upload_wabsti_majorz(self, request):
         entities = self.entities.get(election.date.year, {})
         errors[election.id] = import_majorz(
             election, item.district, item.number, entities,
+            form.wm_wahl.raw_data[0].file,
+            form.wm_wahl.data['mimetype'],
             form.wmstatic_gemeinden.raw_data[0].file,
             form.wmstatic_gemeinden.data['mimetype'],
             form.wm_gemeinden.raw_data[0].file,

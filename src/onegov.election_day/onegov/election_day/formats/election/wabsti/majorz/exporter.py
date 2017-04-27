@@ -8,7 +8,10 @@ from onegov.election_day.formats import load_csv
 from onegov.election_day.formats.election import clear_election
 from uuid import uuid4
 
-
+HEADERS_WM_WAHL = (
+    'SortGeschaeft',  # provides the link to the election
+    'AbsolutesMehr'
+)
 HEADERS_WMSTATIC_GEMEINDEN = (
     'SortWahlkreis',  # provides the link to the election
     'SortGeschaeft',  # provides the link to the election
@@ -63,6 +66,7 @@ def get_entity_id(line, entities):
 
 
 def import_exporter_files(election, district, number, entities,
+                          file_wm_wahl, mimetype_wmstatic_wahl,
                           file_wmstatic_gemeinden, mimetype_wmstatic_gemeinden,
                           file_wm_gemeinden, mimetype_wm_gemeinden,
                           file_wm_kandidaten, mimetype_wm_kandidaten,
@@ -76,7 +80,15 @@ def import_exporter_files(election, district, number, entities,
     errors = []
 
     # Read the files
-    entities_static, error = load_csv(
+    wm_wahl, error = load_csv(
+        file_wm_wahl, mimetype_wmstatic_wahl,
+        expected_headers=HEADERS_WM_WAHL,
+        filename='wm_wahl'
+    )
+    if error:
+        errors.append(error)
+
+    wmstatic_gemeinden, error = load_csv(
         file_wmstatic_gemeinden, mimetype_wmstatic_gemeinden,
         expected_headers=HEADERS_WMSTATIC_GEMEINDEN,
         filename='wmstatic_gemeinden'
@@ -84,7 +96,7 @@ def import_exporter_files(election, district, number, entities,
     if error:
         errors.append(error)
 
-    entities_results, error = load_csv(
+    wm_gemeinden, error = load_csv(
         file_wm_gemeinden, mimetype_wm_gemeinden,
         expected_headers=HEADERS_WM_GEMEINDEN,
         filename='wm_gemeinden'
@@ -92,7 +104,7 @@ def import_exporter_files(election, district, number, entities,
     if error:
         errors.append(error)
 
-    candidates, error = load_csv(
+    wm_kandidaten, error = load_csv(
         file_wm_kandidaten, mimetype_wm_kandidaten,
         expected_headers=HEADERS_WM_KANDIDATEN,
         filename='wm_kandidaten'
@@ -100,7 +112,7 @@ def import_exporter_files(election, district, number, entities,
     if error:
         errors.append(error)
 
-    candidate_results, error = load_csv(
+    wm_kandidatengde, error = load_csv(
         file_wm_kandidatengde, mimetype_wm_kandidatengde,
         expected_headers=HEADERS_WM_KANDIDATENGDE,
         filename='wm_kandidatengde'
@@ -111,10 +123,35 @@ def import_exporter_files(election, district, number, entities,
     if errors:
         return errors
 
-    # Read the results
-    added_entities = {}
+    # Parse the election
+    absolute_majority = None
+    for line in wm_wahl.lines:
+        line_errors = []
 
-    for line in entities_static.lines:
+        if not line_is_relevant(line, number):
+            continue
+
+        # Parse the absolute majority
+        try:
+            absolute_majority = int(line.absolutesmehr or 0)
+        except ValueError:
+            line_errors.append(_("Invalid values"))
+        else:
+            if absolute_majority == -1:
+                absolute_majority = None
+
+        if line_errors:
+            errors.extend(
+                FileImportError(
+                    error=err, line=line.rownumber, filename='wm_wahl'
+                )
+                for err in line_errors
+            )
+            continue
+
+    # Parse the entities
+    added_entities = {}
+    for line in wmstatic_gemeinden.lines:
         line_errors = []
 
         if not line_is_relevant(line, number, district=district):
@@ -141,7 +178,6 @@ def import_exporter_files(election, district, number, entities,
         except ValueError:
             line_errors.append(_("Could not read the elegible voters"))
 
-        # Pass the line errors
         if line_errors:
             errors.extend(
                 FileImportError(
@@ -151,13 +187,13 @@ def import_exporter_files(election, district, number, entities,
                 for err in line_errors
             )
             continue
-        else:
-            added_entities[entity_id] = {
-                'group': entities.get(entity_id, {}).get('name', ''),
-                'elegible_voters': elegible_voters
-            }
 
-    for line in entities_results.lines:
+        added_entities[entity_id] = {
+            'group': entities.get(entity_id, {}).get('name', ''),
+            'elegible_voters': elegible_voters
+        }
+
+    for line in wm_gemeinden.lines:
         line_errors = []
 
         # Why is there no 'SortGeschaeft'??!
@@ -215,7 +251,6 @@ def import_exporter_files(election, district, number, entities,
             entity['blank_votes'] = blank_votes
             entity['invalid_votes'] = invalid_votes
 
-        # Pass the line errors
         if line_errors:
             errors.extend(
                 FileImportError(
@@ -225,8 +260,9 @@ def import_exporter_files(election, district, number, entities,
             )
             continue
 
+    # Parse the candidates
     added_candidates = {}
-    for line in candidates.lines:
+    for line in wm_kandidaten.lines:
         line_errors = []
 
         if not line_is_relevant(line, number):
@@ -248,7 +284,6 @@ def import_exporter_files(election, district, number, entities,
                 elected=elected
             )
 
-        # Pass the line errors
         if line_errors:
             errors.extend(
                 FileImportError(
@@ -258,8 +293,9 @@ def import_exporter_files(election, district, number, entities,
             )
             continue
 
+    # Parse the candidate results
     added_results = {}
-    for line in candidate_results.lines:
+    for line in wm_kandidatengde.lines:
         line_errors = []
 
         if not line_is_relevant(line, number):
@@ -276,7 +312,6 @@ def import_exporter_files(election, district, number, entities,
             if entity_id not in added_entities:
                 line_errors.append(_("Invalid entity values"))
 
-        # Pass the line errors
         if line_errors:
             errors.extend(
                 FileImportError(
@@ -298,7 +333,8 @@ def import_exporter_files(election, district, number, entities,
         clear_election(election)
 
         election.counted_entities = len(added_results.keys())
-        election.total_entities = len(entities)
+        election.total_entities = max(len(entities), election.counted_entities)
+        election.absolute_majority = absolute_majority
 
         for candidate in added_candidates.values():
             election.candidates.append(candidate)

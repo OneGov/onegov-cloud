@@ -112,6 +112,17 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
         render_kw=dict(force_simple=True)
     )
 
+    wm_wahl = UploadField(
+        label="WM_Wahl",
+        validators=[
+            DataRequired(),
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        depends_on=('file_format', 'wabsti_c'),
+        render_kw=dict(force_simple=True)
+    )
+
     wmstatic_gemeinden = UploadField(
         label='WMStatic_Gemeinden.csv',
         validators=[
@@ -125,7 +136,7 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
 
     majority = IntegerField(
         label=_("Absolute majority"),
-        depends_on=('file_format', '!internal'),
+        depends_on=('file_format', 'wabsti'),  # actually wabsti OR sesam
         validators=[
             Optional(),
             NumberRange(min=1)
@@ -352,16 +363,6 @@ class UploadWabstiVoteForm(Form):
 
 class UploadWabstiMajorzElectionForm(Form):
 
-    wmstatic_gemeinden = UploadField(
-        label="WMStatic_Gemeinden",
-        validators=[
-            DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
-            FileSizeLimit(MAX_FILE_SIZE)
-        ],
-        render_kw=dict(force_simple=True)
-    )
-
     wm_gemeinden = UploadField(
         label="WM_Gemeinden",
         validators=[
@@ -384,6 +385,26 @@ class UploadWabstiMajorzElectionForm(Form):
 
     wm_kandidatengde = UploadField(
         label="WM_KandidatenGde",
+        validators=[
+            DataRequired(),
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        render_kw=dict(force_simple=True)
+    )
+
+    wm_wahl = UploadField(
+        label="WM_Wahl",
+        validators=[
+            DataRequired(),
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        render_kw=dict(force_simple=True)
+    )
+
+    wmstatic_gemeinden = UploadField(
+        label="WMStatic_Gemeinden",
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
