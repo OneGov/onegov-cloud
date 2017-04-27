@@ -187,9 +187,14 @@ class Election(Base, TimestampMixin, DerivedAttributes,
     @property
     def last_result_change(self):
         """ Gets the latest created/modified date of the election or amongst
-        the results of this election. This does not include changes made to
-        candidates, lists, list connections and children of election results
-        (such as candidate results, list results, ...).
+        the results of this election.
+
+        This does include changes made to the election itself (title, ...),
+        the candidate results and the party results.
+
+        This does not include changes made to candidates, lists, list
+        connections and children of election results such as candidate
+        results, list results, ...
 
         """
         last_changes = []
@@ -201,7 +206,14 @@ class Election(Base, TimestampMixin, DerivedAttributes,
         results = results.with_entities(ElectionResult.last_change)
         results = results.order_by(desc(ElectionResult.last_change))
         results = results.filter(ElectionResult.election_id == self.id)
+        last_change = results.first()
+        if last_change:
+            last_changes.append(last_change[0])
 
+        results = object_session(self).query(PartyResult)
+        results = results.with_entities(PartyResult.last_change)
+        results = results.order_by(desc(PartyResult.last_change))
+        results = results.filter(PartyResult.election_id == self.id)
         last_change = results.first()
         if last_change:
             last_changes.append(last_change[0])
