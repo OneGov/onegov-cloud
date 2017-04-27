@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Adds new columns (year, color, total votes) to party results.
+  [msom]
+
 1.3.2 (2017-04-27)
 ~~~~~~~~~~~~~~~~~~~
 

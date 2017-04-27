@@ -68,7 +68,9 @@ def test_election_create_all_models(session):
         election_id=election.id,
         number_of_mandates=0,
         votes=0,
-        name='Libertarian'
+        total_votes=100,
+        name='Libertarian',
+        color='black'
     )
 
     session.add(party_result)
@@ -486,10 +488,16 @@ def test_election_results(session):
 
     # Add party results
     election.party_results.append(
-        PartyResult(name='Republican Party', number_of_mandates=1, votes=10)
+        PartyResult(
+            name='Republican Party', number_of_mandates=1, votes=10,
+            total_votes=100, color='red'
+        )
     )
     election.party_results.append(
-        PartyResult(name='Democratic Party', number_of_mandates=1, votes=20)
+        PartyResult(
+            name='Democratic Party', number_of_mandates=1, votes=20,
+            total_votes=100, color='blue'
+        )
     )
 
     # Add panachage results

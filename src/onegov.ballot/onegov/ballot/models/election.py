@@ -835,7 +835,7 @@ class CandidateResult(Base, TimestampMixin):
 
 
 class PartyResult(Base, TimestampMixin):
-    """ The election result of a party in an election. """
+    """ The election result of a party in an election for a given year. """
 
     __tablename__ = 'party_results'
 
@@ -851,5 +851,14 @@ class PartyResult(Base, TimestampMixin):
     # votes
     votes = Column(Integer, nullable=False, default=lambda: 0)
 
+    # total votes
+    total_votes = Column(Integer, nullable=False, default=lambda: 0)
+
     #: name of the party
     name = Column(Text, nullable=False)
+
+    #: year
+    year = Column(Integer, nullable=False, default=lambda: 0)
+
+    #: color code
+    color = Column(Text, nullable=True)
