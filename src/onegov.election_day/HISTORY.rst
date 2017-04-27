@@ -4,6 +4,9 @@ Changelog
 - Allows to specify the language when uploading WabstiCExport files.
   [msom]
 
+- Adds missing expats label in the election districts view of majorz elections.
+  [msom]
+
 1.8.5 (2017-04-26)
 ~~~~~~~~~~~~~~~~~~~
 

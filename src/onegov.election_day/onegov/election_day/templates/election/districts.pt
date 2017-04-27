@@ -29,8 +29,9 @@
                         <td tal:repeat="candidate election.candidates" class="right-aligned">${layout.format_number(candidate.votes)}</td>
                     </tr>
                     <tr tal:repeat="result electoral">
-                        <td>${result[0]}</td>
-                        <td tal:repeat="candidate result[1]" class="right-aligned">${layout.format_number(candidate[1])}</td>
+                        <td tal:condition="result[0][0]">${result[0][1]}</td>
+                        <td tal:condition="not: result[0][0]" i18n:translate="">Expats</td>
+                        <td tal:repeat="candidate result[1]" class="right-aligned">${layout.format_number(candidate[2])}</td>
                     </tr>
                     <tr tal:repeat="entity missing_entities">
                         <td>${entity}</td>

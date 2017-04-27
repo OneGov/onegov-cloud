@@ -76,14 +76,18 @@ def get_candidate_electoral_results(election, session):
     if election.type != 'majorz':
         return []
 
-    result = session.query(ElectionResult.group, CandidateResult.votes)
+    result = session.query(
+        ElectionResult.entity_id,
+        ElectionResult.group,
+        CandidateResult.votes
+    )
     result = result.outerjoin(CandidateResult, Candidate)
     result = result.order_by(
         ElectionResult.group,
         Candidate.candidate_id
     )
     result = result.filter(ElectionResult.election_id == election.id)
-    result = groupbylist(result, lambda x: x[0])
+    result = groupbylist(result, lambda x: (x[0], x[1]))
 
     return result
 
