@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+1.3.2 (2017-04-27)
+~~~~~~~~~~~~~~~~~~~
 
 - Evaluates the party results for the last modification date of an election.
   [msom]
