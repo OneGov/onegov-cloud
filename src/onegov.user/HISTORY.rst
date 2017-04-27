@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.10.0 (2017-04-27)
+~~~~~~~~~~~~~~~~~~~
+
 - Forces all usernames to be lowercase.
   [href]
 
