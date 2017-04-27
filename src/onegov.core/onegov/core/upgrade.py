@@ -312,11 +312,13 @@ class UpgradeContext(object):
 
     def has_column(self, table, column):
         inspector = Inspector(self.operations_connection)
-        return column in {c['name'] for c in inspector.get_columns(table)}
+        return column in {c['name'] for c in inspector.get_columns(
+            table, schema=self.schema
+        )}
 
     def has_table(self, table):
         inspector = Inspector(self.operations_connection)
-        return table in inspector.get_table_names()
+        return table in inspector.get_table_names(schema=self.schema)
 
 
 class UpgradeRunner(object):

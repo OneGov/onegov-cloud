@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes has_table not working with schemas.
+  [href]
+
 - Fixes filestorage returning an url for local paths.
   [href]
 
