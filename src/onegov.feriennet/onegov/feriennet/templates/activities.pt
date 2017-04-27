@@ -68,14 +68,14 @@
             </div>
 
             <div class="columns medium-4 activity-list-search">
-                <div tal:condition="filters['states']|nothing" class="filter-states">
-                    <h2 i18n:translate>States</h2>
-                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['states']" />
-                </div>
-
                 <div tal:condition="filters['periods']|nothing" class="filter-periods">
                     <h2 i18n:translate>Periods</h2>
                     <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['periods']" />
+                </div>
+
+                <div tal:condition="filters['states']|nothing" class="filter-states">
+                    <h2 i18n:translate>States</h2>
+                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['states']" />
                 </div>
 
                 <div tal:condition="filters['own']|nothing" class="filter-own">
