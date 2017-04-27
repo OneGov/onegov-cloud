@@ -47,7 +47,7 @@ def line_is_relevant(line, domain, district, number):
 
 
 def import_exporter_files(vote, district, number, entities,
-                          file, mimetype):
+                          file_sg_gemeinden, mimetype):
     """ Tries to import the files in the given folder.
 
     We assume that the file has been generate using WabstiCExport 2.1.
@@ -56,7 +56,10 @@ def import_exporter_files(vote, district, number, entities,
     errors = []
 
     # Read the file
-    results, error = load_csv(file, mimetype, expected_headers=HEADERS)
+    results, error = load_csv(
+        file_sg_gemeinden, mimetype, expected_headers=HEADERS,
+        filename='sg_gemeinden'
+    )
     if error:
         return [error]
 
@@ -145,7 +148,9 @@ def import_exporter_files(vote, district, number, entities,
         # Pass the line errors
         if line_errors:
             errors.extend(
-                FileImportError(error=err, line=line.rownumber)
+                FileImportError(
+                    error=err, line=line.rownumber, filename='sg_gemeinden'
+                )
                 for err in line_errors
             )
             continue
