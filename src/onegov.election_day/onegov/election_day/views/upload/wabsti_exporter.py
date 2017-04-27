@@ -32,13 +32,22 @@ def authenticated_source(request):
         raise HTTPForbidden()
 
 
-def interpolate_errors(errors):
+def interpolate_errors(errors, request):
+    locale = request.headers.get('Accept-Language') or 'en'
+    translator = request.app.translations.get(locale)
+
     for key, values in errors.items():
-        errors[key] = [{
-            'message': value.error.interpolate(),
-            'filename': value.filename,
-            'line': value.line
-        } for value in values]
+        errors[key] = []
+        for value in values:
+            content = value.error
+            translated = translator.gettext(content) if translator else content
+            translated = content.interpolate(translated)
+
+            errors[key].append({
+                'message': translated,
+                'filename': value.filename,
+                'line': value.line
+            })
 
 
 @ElectionDayApp.json(model=Principal, name='upload-wabsti-vote',
@@ -100,7 +109,7 @@ def view_upload_wabsti_vote(self, request):
                 )
             )
 
-    interpolate_errors(errors)
+    interpolate_errors(errors, request)
 
     if any(errors.values()):
         transaction.abort()
@@ -181,7 +190,7 @@ def view_upload_wabsti_majorz(self, request):
                 )
             )
 
-    interpolate_errors(errors)
+    interpolate_errors(errors, request)
 
     if any(errors.values()):
         transaction.abort()
@@ -271,7 +280,7 @@ def view_upload_wabsti_proporz(self, request):
                 )
             )
 
-    interpolate_errors(errors)
+    interpolate_errors(errors, request)
 
     if any(errors.values()):
         transaction.abort()

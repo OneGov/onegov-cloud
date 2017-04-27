@@ -1,13 +1,13 @@
 Changelog
 ---------
 
-- Improves party results.
+- Allows to specify the language when uploading WabstiCExport files.
   [msom]
 
 1.8.5 (2017-04-26)
 ~~~~~~~~~~~~~~~~~~~
 
-- Fixes parsing an error field in WabstCExport throwing an error.
+- Fixes parsing an error field in WabstCiExport throwing an error.
   [msom]
 
 1.8.4 (2017-04-25)
