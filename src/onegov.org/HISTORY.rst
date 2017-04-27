@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Ignore the case of e-mails when doing a password reset.
+  [href]
+
 0.5.1 (2017-04-11)
 ~~~~~~~~~~~~~~~~~~~
 

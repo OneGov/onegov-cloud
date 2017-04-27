@@ -52,7 +52,7 @@ setup(
         'onegov.search>=1.0.0',
         'onegov.shared',
         'onegov.ticket>=0.4.1',
-        'onegov.user',
+        'onegov.user>=0.10.0',
         'pillow',
         'purl',
         'python-dateutil',

@@ -33,10 +33,10 @@ class PasswordResetForm(Form):
         """
         data = request.load_url_safe_token(self.token.data, max_age=86400)
 
-        if not data:
+        if not data or not data.get('username'):
             return False
 
-        if not data.get('username') == self.email.data:
+        if data['username'].lower() != self.email.data.lower():
             return False
 
         users = UserCollection(request.app.session())
