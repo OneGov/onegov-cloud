@@ -77,8 +77,8 @@ def change_ownership_by_id(context, old_userid, new_userid):
     if context.has_table('tickets'):
         context.operations.execute("""
             UPDATE tickets
-            SET user_id = '{old_userid}'
-            WHERE user_id = '{new_userid}'
+            SET user_id = '{new_userid}'
+            WHERE user_id = '{old_userid}'
         """.format(old_userid=old_userid.hex, new_userid=new_userid.hex))
 
 
@@ -145,7 +145,7 @@ def force_lowercase_usernames(context):
                     remaining_data[key] = value
 
             # change the userids
-            change_ownership_by_id(context, remaining.id, other.id)
+            change_ownership_by_id(context, other.id, remaining.id)
 
             # change the username
             change_ownership_by_name(context, other.username, 'temp')
