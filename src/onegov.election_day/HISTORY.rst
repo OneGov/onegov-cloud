@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves party results.
+  [msom]
+
 1.8.5 (2017-04-26)
 ~~~~~~~~~~~~~~~~~~~
 

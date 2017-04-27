@@ -114,9 +114,13 @@ The raw data is available as CSV. The following fields are included:
 
 Name|Description
 ---|---
+`year`|The year of the election.
+`total_votes`|The total votes of the election.
 `name`|The name of the party.
+`color`|The color of the party.
 `mandates`|The number of mandates.
 `votes`|The number of votes.
+
 ## Resultats da la votaziun
 
 ### Resultats elavurads

@@ -297,9 +297,13 @@ Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
 Name|Beschreibung
 ---|---
-`Partei`|Der Name der Partei.
-`Stimmen`|Die Anzahl Stimmen.
-`Sitze`|Die Anzahl Sitze.
+`year`|Das Jahr der Wahl.
+`total_votes`|Die Gesamtanzahl der Stimmen der Wahl.
+`name`|Der Name der Partei.
+`color`|Die Farbe der Partei.
+`mandates`|Die Anzahl Mandate der Partei.
+`votes`|Die Anzahl Stimmen der Partei.
+
 
 ### Template
 

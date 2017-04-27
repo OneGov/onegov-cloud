@@ -220,11 +220,12 @@ def upload_proporz_election(client, create=True, canton='gr'):
 
 def upload_party_results(client, create=True, canton='gr'):
     csv_parties = (
-        "Partei,Sitze,Stimmen\n"
-        "BDP,1,60387\n"
-        "CVP,1,49117\n"
-        "FDP,0,35134\n"
+        "year,total_votes,name,color,mandates,votes\n"
+        "2015,11270,BDP,,1,60387\n"
+        "2015,11270,CVP,,1,49117\n"
+        "2015,11270,FDP,,0,35134\n"
     ).encode('utf-8')
+
     upload = client.get('/election/proporz-election/upload-party-results')
     upload.form['parties'] = Upload('parties.csv', csv_parties, 'text/plain')
     upload = upload.form.submit()

@@ -1,5 +1,6 @@
 from morepath.request import Response
 from onegov.ballot import Election
+from onegov.ballot import PartyResult
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layout import DefaultLayout, ElectionsLayout
@@ -14,48 +15,28 @@ def get_party_results(election):
     if election.type != 'proporz' or not election.party_results.first():
         return [], {}
 
-    year = str(election.date.year)
-    years = [year]
-    total_votes = election.accounted_votes
-    parties = {
-        party.name: {
-            year: {
-                'mandates': party.number_of_mandates,
-                'votes': {
-                    'total': party.votes,
-                    'permille': int(
-                        round(1000 * (party.votes / (total_votes or 1)))
-                    )
-                }
-            }
+    session = object_session(election)
+
+    # Get the totals votes per year
+    query = session.query(PartyResult.year, PartyResult.total_votes)
+    query = query.filter(PartyResult.election_id == election.id).distinct()
+    totals = dict(query)
+    years = sorted((str(key) for key in totals.keys()), reverse=True)
+
+    parties = {}
+    for result in election.party_results:
+        party = parties.setdefault(result.name, {})
+        year = party.setdefault(str(result.year), {})
+        year['color'] = result.color
+        year['mandates'] = result.number_of_mandates
+        year['votes'] = {
+            'total': result.votes,
+            'permille': int(
+                round(1000 * (result.votes / (totals.get(result.year) or 1)))
+            )
         }
-        for party in election.party_results
-    }
 
-    historical = object_session(election).query(Election)
-    historical = historical.filter(
-        Election.type == 'proporz',
-        Election.domain == election.domain,
-        Election.number_of_mandates == election.number_of_mandates,
-        Election.date < election.date
-    )
-
-    for past_election in historical:
-        year = str(past_election.date.year)
-        years.append(year)
-        total_votes = election.accounted_votes
-        for party in past_election.party_results:
-            if party.name not in parties:
-                parties[party.name] = {}
-            parties[party.name][year] = {
-                'mandates': party.number_of_mandates,
-                'votes': {
-                    'total': party.votes,
-                    'permille': int(round(1000 * party.votes / total_votes))
-                }
-            }
-
-    return sorted(set(years)), parties
+    return years, parties
 
 
 def get_party_deltas(election, years, parties):

@@ -157,7 +157,10 @@ def test_view_election_parties(election_day_app_gr):
 
     export = client.get('/election/proporz-election/data-parties').text
     assert export == (
-        'name,votes,mandates\r\nBDP,60387,1\r\nCVP,49117,1\r\nFDP,35134,0\r\n'
+        "year,total_votes,name,color,mandates,votes\r\n"
+        "2015,11270,BDP,#0571b0,1,60387\r\n"
+        "2015,11270,CVP,#0571b0,1,49117\r\n"
+        "2015,11270,FDP,#0571b0,0,35134\r\n"
     )
 
 

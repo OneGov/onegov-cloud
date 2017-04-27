@@ -298,9 +298,12 @@ The following columns will be evaluated and should exist:
 
 Num|Descripziun
 ---|---
-`Partei`|The name of the party.
-`Stimmen`|The number of votes.
-`Sitze`|The number of mandates.
+`year`|The year of the election.
+`total_votes`|The total votes of the election.
+`name`|The name of the party.
+`color`|The color of the party.
+`mandates`|The number of mandates.
+`votes`|The number of votes.
 
 ### Template
 

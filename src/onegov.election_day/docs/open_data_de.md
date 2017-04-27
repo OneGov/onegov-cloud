@@ -113,9 +113,12 @@ Die Rohdaten sind als CSV verfügbar. Die folgenden Felder sind enthalten:
 
 Name|Description
 ---|---
+`year`|Das Jahr der Wahl.
+`total_votes`|Die Gesamtanzahl der Stimmen der Wahl.
 `name`|Der Name der Partei.
-`mandates`|Die Anzahl gewonnener Sitze.
-`votes`|Die Anzahl erhaltener Stimmen.
+`color`|Die Farbe der Partei.
+`mandates`|Die Anzahl Mandate der Partei.
+`votes`|Die Anzahl Stimmen der Partei.
 
 ## Abstimmungsresultate
 
