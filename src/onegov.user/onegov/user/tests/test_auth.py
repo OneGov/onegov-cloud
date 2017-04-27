@@ -19,7 +19,7 @@ def test_auth_login(session):
     assert not auth.login(username='AzureDiamonb', password='hunter2')
 
     identity = auth.login(username='AzureDiamond', password='hunter2')
-    assert identity.userid == 'AzureDiamond'
+    assert identity.userid == 'azurediamond'
     assert identity.role == 'irc-user'
     assert identity.application_id == 'my-app'
 
@@ -200,7 +200,7 @@ def test_auth_integration(session):
     response = client.get('/auth?username=AzureDiamond&password=hunter2')
     assert response.status_code == 302
     assert response.location == 'http://localhost/go'
-    assert response.headers['Set-Cookie'].startswith('userid=AzureDiamond')
+    assert response.headers['Set-Cookie'].startswith('userid=azurediamond')
 
     response = client.get('/auth/logout')
     assert response.status_code == 302

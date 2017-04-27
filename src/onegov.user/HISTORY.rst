@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Forces all usernames to be lowercase.
+  [href]
+
 0.9.0 (2017-01-20)
 ~~~~~~~~~~~~~~~~~~~
 

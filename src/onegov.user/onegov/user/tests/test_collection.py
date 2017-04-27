@@ -160,3 +160,17 @@ def test_user_by_role(session):
     assert users.by_roles('admin', 'member').count() == 2
     assert users.by_roles('admin').count() == 1
     assert users.by_roles('member').count() == 1
+
+
+def test_user_lowercase(session):
+
+    users = UserCollection(session)
+    users.add('Admin@Foo.Bar', 'p@ssw0rd', role='admin')
+
+    assert users.by_username('Admin@Foo.Bar').username == 'admin@foo.bar'
+    assert users.by_username('admin@foo.bar').username == 'admin@foo.bar'
+
+    with pytest.raises(ExistingUserError) as e:
+        users.add('admin@foo.Bar', 'p@ssw0rd', role='admin')
+
+    assert e.value.message == 'admin@foo.Bar'

@@ -1,12 +1,12 @@
 from onegov.core.crypto import hash_password, verify_password
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import JSON, UUID
+from onegov.core.orm.types import JSON, UUID, LowercaseText
 from onegov.core.utils import remove_repeated_spaces
 from onegov.search import ORMSearchable
 from onegov.user.utils import is_valid_yubikey_format
 from onegov.user.utils import yubikey_otp_to_serial
-from sqlalchemy import Boolean, Column, Text, func
+from sqlalchemy import Boolean, Column, Index, Text, func
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import deferred
 from uuid import uuid4
@@ -32,7 +32,7 @@ class User(Base, TimestampMixin, ORMSearchable):
     id = Column(UUID, nullable=False, primary_key=True, default=uuid4)
 
     #: the username may be any string, but will usually be an email address
-    username = Column(Text, unique=True, nullable=False)
+    username = Column(LowercaseText, unique=True, nullable=False)
 
     #: the password is stored with the hashing algorithm defined by onegov.core
     password_hash = Column(Text, nullable=False)
@@ -72,6 +72,10 @@ class User(Base, TimestampMixin, ORMSearchable):
 
     #: true if the user is active
     active = Column(Boolean, nullable=False, default=True)
+
+    __table_args__ = (
+        Index('lowercase_username', func.lower(username), unique=True),
+    )
 
     @hybrid_property
     def title(self):
