@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.40.0 (2017-04-27)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes has_table not working with schemas.
   [href]
