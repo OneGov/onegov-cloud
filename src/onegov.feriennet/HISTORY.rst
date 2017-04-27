@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Forces all usernames to be in lowercase.
+  [href]
+
 - Moves the period filter further up.
   [href]
 

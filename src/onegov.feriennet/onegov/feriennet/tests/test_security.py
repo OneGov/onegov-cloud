@@ -15,13 +15,13 @@ def test_is_owner():
 
 def test_activity_query_policy(session):
     UserCollection(session).add(
-        username='Steven',
+        username='steven',
         password='hunter2',
         role='editor'
     )
 
     UserCollection(session).add(
-        username='Leland',
+        username='leland',
         password='hunter2',
         role='editor'
     )
@@ -31,55 +31,55 @@ def test_activity_query_policy(session):
     activities = [
         collection.add(
             title="Visit the Pet Cemetary",
-            username="Steven"
+            username="steven"
         ),
         collection.add(
             title="Shop at Needful Things",
-            username="Leland"
+            username="leland"
         )
     ]
 
     # admins see all
-    policy = ActivityQueryPolicy("Steven", 'admin')
+    policy = ActivityQueryPolicy("steven", 'admin')
     assert policy.granted_subset(collection.query()).count() == 2
 
-    policy = ActivityQueryPolicy("Leland", 'admin')
+    policy = ActivityQueryPolicy("leland", 'admin')
     assert policy.granted_subset(collection.query()).count() == 2
 
     # owners see their own
-    policy = ActivityQueryPolicy("Steven", 'editor')
+    policy = ActivityQueryPolicy("steven", 'editor')
     assert policy.granted_subset(collection.query()).count() == 1
 
-    policy = ActivityQueryPolicy("Leland", 'editor')
+    policy = ActivityQueryPolicy("leland", 'editor')
     assert policy.granted_subset(collection.query()).count() == 1
 
     # members only see accepted, even if they are the owner
-    policy = ActivityQueryPolicy("Steven", 'member')
+    policy = ActivityQueryPolicy("steven", 'member')
     assert policy.granted_subset(collection.query()).count() == 0
 
-    policy = ActivityQueryPolicy("Leland", 'member')
+    policy = ActivityQueryPolicy("leland", 'member')
     assert policy.granted_subset(collection.query()).count() == 0
 
     # proposed activites stay visible to owners but keep hidden from others
     activities[0].propose()
 
-    policy = ActivityQueryPolicy("Steven", 'editor')
+    policy = ActivityQueryPolicy("steven", 'editor')
     assert policy.granted_subset(collection.query()).count() == 1
 
-    policy = ActivityQueryPolicy("Leland", 'editor')
+    policy = ActivityQueryPolicy("leland", 'editor')
     assert policy.granted_subset(collection.query()).count() == 1
 
     # once an activity is accepted, it becomes public
     activities[0].accept()
     activities[0].durations = 1
 
-    policy = ActivityQueryPolicy("Steven", 'admin')
+    policy = ActivityQueryPolicy("steven", 'admin')
     assert policy.granted_subset(collection.query()).count() == 2
 
-    policy = ActivityQueryPolicy("Steven", 'editor')
+    policy = ActivityQueryPolicy("steven", 'editor')
     assert policy.granted_subset(collection.query()).count() == 1
 
-    policy = ActivityQueryPolicy("Steven", 'member')
+    policy = ActivityQueryPolicy("steven", 'member')
     assert policy.granted_subset(collection.query()).count() == 1
 
     policy = ActivityQueryPolicy(None, None)
@@ -89,13 +89,13 @@ def test_activity_query_policy(session):
     # unless the owner is not an editor or admin
     activities[0].archive()
 
-    policy = ActivityQueryPolicy("Steven", 'admin')
+    policy = ActivityQueryPolicy("steven", 'admin')
     assert policy.granted_subset(collection.query()).count() == 2
 
-    policy = ActivityQueryPolicy("Steven", 'editor')
+    policy = ActivityQueryPolicy("steven", 'editor')
     assert policy.granted_subset(collection.query()).count() == 1
 
-    policy = ActivityQueryPolicy("Steven", 'member')
+    policy = ActivityQueryPolicy("steven", 'member')
     assert policy.granted_subset(collection.query()).count() == 0
 
     policy = ActivityQueryPolicy(None, None)
