@@ -58,8 +58,10 @@ class MatchCollection(object):
             Occasion.spots.label('occasion_spots'),
             Occasion.age.label('occasion_age'),
             Occasion.order.label('occasion_order'),
+            Attendee.id.label('attendee_id'),
             Attendee.name.label('attendee_name'),
-            Attendee.age.label('attendee_age')
+            Attendee.age.label('attendee_age'),
+            Attendee.username.label('attendee_username'),
         )
         q = q.filter(Booking.period_id == self.period.id)
         q = q.filter(OccasionDate.id.in_(d.subquery()))
@@ -84,8 +86,10 @@ class MatchCollection(object):
             Occasion.spots.label('occasion_spots'),
             Occasion.age.label('occasion_age'),
             Occasion.order.label('occasion_order'),
+            literal_column('NULL').label('attendee_id'),
             literal_column('NULL').label('attendee_name'),
             literal_column('NULL').label('attendee_age'),
+            literal_column('NULL').label('attendee_username'),
         )
         e = e.filter(Occasion.period_id == self.period.id)
         e = e.filter(not_(

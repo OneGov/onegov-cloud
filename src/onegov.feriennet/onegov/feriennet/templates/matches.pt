@@ -83,11 +83,12 @@
                                         <th i18n:translate>Name</th>
                                         <th i18n:translate>Age</th>
                                         <th i18n:translate>State</th>
+                                        <th i18n:translate>Links</th>
                                     </tr>
                                 </thead>
                                 <tbody tal:condition="not:records['first'].booking_state">
                                     <tr class="booking booking-none">
-                                        <td colspan="4"><span i18n:translate>No bookings.</span></td>
+                                        <td colspan="5"><span i18n:translate>No bookings.</span></td>
                                     </tr>
                                 </tbody>
                                 <tbody tal:condition="records['first'].booking_state">
@@ -106,6 +107,14 @@
                                                     define="state record.booking_state"
                                                     metal:use-macro="layout.macros.confirmed_booking_state"
                                                 />
+                                            </td>
+                                            <td>
+                                                <ul class="single-line pipe-separated">
+                                                    <li
+                                                        tal:repeat="link record_links(record)"
+                                                        tal:content="structure link(request)"
+                                                    />
+                                                </ul>
                                             </td>
                                         </tr>
                                     </tal:block>

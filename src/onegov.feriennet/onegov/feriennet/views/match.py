@@ -1,3 +1,4 @@
+from onegov.activity import Attendee
 from onegov.activity import Booking, BookingCollection, Occasion
 from onegov.activity.matching import deferred_acceptance_from_database
 from onegov.core.security import Secret
@@ -39,6 +40,25 @@ def handle_matches(self, request, form):
     def activity_link(oid):
         return request.class_link(Occasion, {'id': oid})
 
+    def record_links(record):
+        yield Link(
+            self.period.wishlist_phase and _("Wishlist") or _("Bookings"),
+            request.class_link(
+                BookingCollection, {
+                    'period_id': self.period.id,
+                    'username': record.attendee_username
+                }
+            )
+        )
+
+        yield Link(
+            _("Attendee"), request.return_here(
+                request.class_link(
+                    Attendee, {'id': record.attendee_id}
+                )
+            )
+        )
+
     filters = {}
     filters['states'] = tuple(
         Link(
@@ -68,6 +88,7 @@ def handle_matches(self, request, form):
         'button_text': _("Run Matching"),
         'model': self,
         'filters': filters,
+        'record_links': record_links,
         'booking_link': lambda record, name=None: request.class_link(
             Booking, {'id': record.booking_id}, name
         )

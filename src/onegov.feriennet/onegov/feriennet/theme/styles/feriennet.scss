@@ -12,6 +12,20 @@
 }
 
 /*
+    Clickable headers are kept dark, but we ensure that the hover works.
+*/
+a > h1,
+a > h2,
+a > h3,
+a > h4,
+a > h5,
+a > h6 {
+    &:hover {
+        color: $anchor-font-color-hover;
+    }
+}
+
+/*
     hide the homepage settings
 */
 #fieldset-homepage {
@@ -75,6 +89,23 @@ form small {
 .newlines {
     white-space: pre-line;
     word-break: break-all;
+}
+
+/*
+    List items rendred on a single line
+*/
+ul.single-line {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+        display: inline;
+    }
+
+    &.pipe-separated li + li::before {
+        content: ' | ';
+    }
 }
 
 /*
@@ -974,7 +1005,17 @@ ul.tags {
 
         td:nth-child(2),
         th:nth-child(2) {
-            width: 40%;
+            width: 35%;
+        }
+
+        td:nth-child(3),
+        th:nth-child(3) {
+            width: 5%;
+        }
+
+        td:nth-child(5),
+        th:nth-child(5) {
+            width: 30%;
         }
 
         td {
@@ -1011,6 +1052,15 @@ ul.tags {
                 display: none;
             }
         }
+
+        td:last-child::before {
+            content: '';
+            display: none;
+        }
+
+        ul li {
+            font-size: .875rem;
+        }
     }
 
     .subtitle {
@@ -1038,7 +1088,7 @@ ul.tags {
 
     .matching-details {
         display: inline-block;
-        width: 75%;
+        width: 100%;
 
         button {
             float: right;

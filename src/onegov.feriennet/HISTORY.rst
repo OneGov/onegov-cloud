@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds links from the matching view to the attendee and its bookings/wishes.
+  [href]
+
 - Adds the ability to filter the matching view.
   [href]
 
