@@ -186,6 +186,8 @@ def view_upload(self, request, form):
                             source.district,
                             source.number,
                             entities,
+                            form.wp_wahl.raw_data[0].file,
+                            form.wp_wahl.data['mimetype'],
                             form.wpstatic_gemeinden.raw_data[0].file,
                             form.wpstatic_gemeinden.data['mimetype'],
                             form.wp_gemeinden.raw_data[0].file,

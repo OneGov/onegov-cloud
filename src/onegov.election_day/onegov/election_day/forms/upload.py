@@ -221,6 +221,17 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
         depends_on=('file_format', 'wabsti_c')
     )
 
+    wp_wahl = UploadField(
+        label="WP_Wahl",
+        validators=[
+            DataRequired(),
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        depends_on=('file_format', 'wabsti_c'),
+        render_kw=dict(force_simple=True)
+    )
+
     wpstatic_gemeinden = UploadField(
         label="WPStatic_Gemeinden",
         validators=[
@@ -416,8 +427,8 @@ class UploadWabstiMajorzElectionForm(Form):
 
 class UploadWabstiProporzElectionForm(Form):
 
-    wpstatic_gemeinden = UploadField(
-        label="WPStatic_Gemeinden",
+    wp_gemeinden = UploadField(
+        label="WP_Gemeinden",
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -426,8 +437,18 @@ class UploadWabstiProporzElectionForm(Form):
         render_kw=dict(force_simple=True)
     )
 
-    wp_gemeinden = UploadField(
-        label="WP_Gemeinden",
+    wp_kandidaten = UploadField(
+        label="WP_Kandidaten",
+        validators=[
+            DataRequired(),
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        render_kw=dict(force_simple=True)
+    )
+
+    wp_kandidatengde = UploadField(
+        label="WP_KandidatenGde",
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -456,28 +477,28 @@ class UploadWabstiProporzElectionForm(Form):
         render_kw=dict(force_simple=True)
     )
 
+    wp_wahl = UploadField(
+        label="WP_Wahl",
+        validators=[
+            DataRequired(),
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        render_kw=dict(force_simple=True)
+    )
+
+    wpstatic_gemeinden = UploadField(
+        label="WPStatic_Gemeinden",
+        validators=[
+            DataRequired(),
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        render_kw=dict(force_simple=True)
+    )
+
     wpstatic_kandidaten = UploadField(
         label="WPStatic_Kandidaten",
-        validators=[
-            DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
-            FileSizeLimit(MAX_FILE_SIZE)
-        ],
-        render_kw=dict(force_simple=True)
-    )
-
-    wp_kandidaten = UploadField(
-        label="WP_Kandidaten",
-        validators=[
-            DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
-            FileSizeLimit(MAX_FILE_SIZE)
-        ],
-        render_kw=dict(force_simple=True)
-    )
-
-    wp_kandidatengde = UploadField(
-        label="WP_KandidatenGde",
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),

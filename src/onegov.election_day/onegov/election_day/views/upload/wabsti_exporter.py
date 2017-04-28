@@ -214,13 +214,14 @@ def view_upload_wabsti_proporz(self, request):
         curl http://localhost:8080/onegov_election_day/xx/upload-wabsti-proporz
             --user :<token>
             --header "Accept-Language: de_CH"
-            --form "wpstatic_gemeinden=@WPStatic_Gemeinden.csv"
             --form "wp_gemeinden=@WP_Gemeinden.csv"
-            --form "wp_listen=@WP_Listen.csv"
-            --form "wp_listengde=@WP_ListenGde.csv"
-            --form "wpstatic_kandidaten=@WPStatic_Kandidaten.csv"
             --form "wp_kandidaten=@WP_Kandidaten.csv"
             --form "wp_kandidatengde=@WP_KandidatenGde.csv"
+            --form "wp_listen=@WP_Listen.csv"
+            --form "wp_listengde=@WP_ListenGde.csv"
+            --form "wp_wahl=@WP_Wahl.csv"
+            --form "wpstatic_gemeinden=@WPStatic_Gemeinden.csv"
+            --form "wpstatic_kandidaten=@WPStatic_Kandidaten.csv"
 
     """
 
@@ -262,6 +263,8 @@ def view_upload_wabsti_proporz(self, request):
         entities = self.entities.get(election.date.year, {})
         errors[election.id] = import_proporz(
             election, item.district, item.number, entities,
+            form.wp_wahl.raw_data[0].file,
+            form.wp_wahl.data['mimetype'],
             form.wpstatic_gemeinden.raw_data[0].file,
             form.wpstatic_gemeinden.data['mimetype'],
             form.wp_gemeinden.raw_data[0].file,

@@ -11,6 +11,10 @@ from onegov.election_day.formats.election import clear_election
 from uuid import uuid4
 
 
+HEADERS_WP_WAHL = (
+    'SortGeschaeft',  # provides the link to the election
+    'Ausmittlungsstand',  # complete
+)
 HEADERS_WPSTATIC_GEMEINDEN = (
     'SortWahlkreis',  # provides the link to the election
     'SortGeschaeft',  # provides the link to the election
@@ -92,6 +96,7 @@ def get_list_id(line):
 
 
 def import_exporter_files(election, district, number, entities,
+                          file_wp_wahl, mimetype_wp_wahl,
                           file_wpstatic_gemeinden, mimetype_wpstatic_gemeinden,
                           file_wp_gemeinden, mimetype_wp_gemeinden,
                           file_wp_listen, mimetype_wp_listen,
@@ -110,7 +115,15 @@ def import_exporter_files(election, district, number, entities,
     errors = []
 
     # Read the files
-    entities_static, error = load_csv(
+    wp_wahl, error = load_csv(
+        file_wp_wahl, mimetype_wp_wahl,
+        expected_headers=HEADERS_WP_WAHL,
+        filename='wp_wahl'
+    )
+    if error:
+        errors.append(error)
+
+    wpstatic_gemeinden, error = load_csv(
         file_wpstatic_gemeinden, mimetype_wpstatic_gemeinden,
         expected_headers=HEADERS_WPSTATIC_GEMEINDEN,
         filename='wpstatic_gemeinden'
@@ -118,7 +131,7 @@ def import_exporter_files(election, district, number, entities,
     if error:
         errors.append(error)
 
-    entities_results, error = load_csv(
+    wp_gemeinden, error = load_csv(
         file_wp_gemeinden, mimetype_wp_gemeinden,
         expected_headers=HEADERS_WP_GEMEINDEN,
         filename='wp_gemeinden'
@@ -126,7 +139,7 @@ def import_exporter_files(election, district, number, entities,
     if error:
         errors.append(error)
 
-    lists, error = load_csv(
+    wp_listen, error = load_csv(
         file_wp_listen, mimetype_wp_listen,
         expected_headers=HEADERS_WP_LISTEN,
         filename='wp_listen'
@@ -134,7 +147,7 @@ def import_exporter_files(election, district, number, entities,
     if error:
         errors.append(error)
 
-    list_results, error = load_csv(
+    wp_listengde, error = load_csv(
         file_wp_listengde, mimetype_wp_listengde,
         expected_headers=HEADERS_WP_LISTENGDE,
         filename='wp_listengde'
@@ -142,7 +155,7 @@ def import_exporter_files(election, district, number, entities,
     if error:
         errors.append(error)
 
-    candidates_static, error = load_csv(
+    wpstatic_kandidaten, error = load_csv(
         file_wpstatic_kandidaten, mimetype_wpstatic_kandidaten,
         expected_headers=HEADERS_WPSTATIC_KANDIDATEN,
         filename='wpstatic_kandidaten'
@@ -150,7 +163,7 @@ def import_exporter_files(election, district, number, entities,
     if error:
         errors.append(error)
 
-    candidates, error = load_csv(
+    wp_kandidaten, error = load_csv(
         file_wp_kandidaten, mimetype_wp_kandidaten,
         expected_headers=HEADERS_WP_KANDIDATEN,
         filename='wp_kandidaten'
@@ -158,7 +171,7 @@ def import_exporter_files(election, district, number, entities,
     if error:
         errors.append(error)
 
-    candidate_results, error = load_csv(
+    wp_kandidatengde, error = load_csv(
         file_wp_kandidatengde, mimetype_wp_kandidatengde,
         expected_headers=HEADERS_WP_KANDIDATENGDE,
         filename='wp_kandidatengde'
@@ -169,9 +182,32 @@ def import_exporter_files(election, district, number, entities,
     if errors:
         return errors
 
+    # Parse the election
+    complete = 0
+    for line in wp_wahl.lines:
+        line_errors = []
+
+        if not line_is_relevant(line, number):
+            continue
+
+        try:
+            complete = int(line.ausmittlungsstand or 0)
+            assert 0 <= complete <= 3
+        except (ValueError, AssertionError):
+            line_errors.append(_("Invalid values"))
+
+        if line_errors:
+            errors.extend(
+                FileImportError(
+                    error=err, line=line.rownumber, filename='wp_wahl'
+                )
+                for err in line_errors
+            )
+            continue
+
     # Parse the entities
     added_entities = {}
-    for line in entities_static.lines:
+    for line in wpstatic_gemeinden.lines:
         line_errors = []
 
         if not line_is_relevant(line, number, district=district):
@@ -213,7 +249,7 @@ def import_exporter_files(election, district, number, entities,
             'elegible_voters': elegible_voters
         }
 
-    for line in entities_results.lines:
+    for line in wp_gemeinden.lines:
         line_errors = []
 
         # Why is there no 'SortGeschaeft'??!
@@ -281,7 +317,7 @@ def import_exporter_files(election, district, number, entities,
 
     # Parse the lists
     added_lists = {}
-    for line in lists.lines:
+    for line in wp_listen.lines:
         line_errors = []
 
         if not line_is_relevant(line, number):
@@ -315,7 +351,7 @@ def import_exporter_files(election, district, number, entities,
 
     # Parse the list results
     added_list_results = {}
-    for line in list_results.lines:
+    for line in wp_listengde.lines:
         line_errors = []
 
         # Why is there no Sort Geschaeft?
@@ -359,7 +395,7 @@ def import_exporter_files(election, district, number, entities,
 
     # Parse the candidates
     added_candidates = {}
-    for line in candidates_static.lines:
+    for line in wpstatic_kandidaten.lines:
         line_errors = []
 
         if not line_is_relevant(line, number):
@@ -399,7 +435,7 @@ def import_exporter_files(election, district, number, entities,
             list_id=added_lists[list_id].id
         )
 
-    for line in candidates.lines:
+    for line in wp_kandidaten.lines:
         line_errors = []
 
         if not line_is_relevant(line, number):
@@ -425,7 +461,7 @@ def import_exporter_files(election, district, number, entities,
             continue
 
     added_results = {}
-    for line in candidate_results.lines:
+    for line in wp_kandidatengde.lines:
         line_errors = []
 
         # Why is there no Sort Geschaeft?
@@ -470,12 +506,17 @@ def import_exporter_files(election, district, number, entities,
     if errors:
         return errors
 
-    # import pdb; pdb.set_trace()
     if added_results:
         clear_election(election)
 
-        election.counted_entities = len(added_results.keys())
-        election.total_entities = max(len(entities), election.counted_entities)
+        election.counted_entities = sum([
+            1 for value in added_entities.values() if value['counted']
+        ])
+        election.total_entities = max(len(entities), len(added_results.keys()))
+        if complete == 1:
+            election.total_entities = 0
+        if complete == 2:
+            election.total_entities = election.counted_entities
 
         # todo:
         # for connection in connections.values():
