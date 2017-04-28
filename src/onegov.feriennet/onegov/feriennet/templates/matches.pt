@@ -116,9 +116,9 @@
                 </tal:block>
             </div>
             <div class="columns small-12 medium-4">
-                <div class="tag-filter-panel">
+                <div class="filter-panel">
                     <div>
-                        <h4 class="tag-filter-title" i18n:translate>State</h4>
+                        <h4 class="filter-title" i18n:translate>State</h4>
                         <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['states']" />
                     </div>
                 </div>

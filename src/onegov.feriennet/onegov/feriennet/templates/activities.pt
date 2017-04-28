@@ -67,39 +67,39 @@
                 </div>
             </div>
 
-            <div class="columns medium-4 tag-filter-panel">
+            <div class="columns medium-4 filter-panel">
                 <div tal:condition="filters['periods']|nothing" class="filter-periods">
-                    <h2 class="tag-filter-title" i18n:translate>Periods</h2>
+                    <h2 class="filter-title" i18n:translate>Periods</h2>
                     <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['periods']" />
                 </div>
 
                 <div tal:condition="filters['states']|nothing" class="filter-states">
-                    <h2 class="tag-filter-title" i18n:translate>States</h2>
+                    <h2 class="filter-title" i18n:translate>States</h2>
                     <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['states']" />
                 </div>
 
                 <div tal:condition="filters['own']|nothing" class="filter-own">
-                    <h2 class="tag-filter-title" i18n:translate>Advanced</h2>
+                    <h2 class="filter-title" i18n:translate>Advanced</h2>
                     <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['own']" />
                 </div>
 
                 <div tal:condition="filters['tags']|nothing" class="filter-tags">
-                    <h2 class="tag-filter-title" i18n:translate>Tags</h2>
+                    <h2 class="filter-title" i18n:translate>Tags</h2>
                     <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['tags']" />
                 </div>
 
                 <div tal:condition="filters['ages']|nothing" class="filter-ages">
-                    <h2 class="tag-filter-title" i18n:translate>Age</h2>
+                    <h2 class="filter-title" i18n:translate>Age</h2>
                     <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['ages']" />
                 </div>
 
                 <div tal:condition="filters['durations']|nothing" class="filter-durations">
-                    <h2 class="tag-filter-title" i18n:translate>Duration</h2>
+                    <h2 class="filter-title" i18n:translate>Duration</h2>
                     <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['durations']" />
                 </div>
 
                 <div tal:condition="filters['weeks']|nothing" class="filter-weeks">
-                    <h2 class="tag-filter-title" i18n:translate>Weeks</h2>
+                    <h2 class="filter-title" i18n:translate>Weeks</h2>
                     <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['weeks']" />
                 </div>
             </div>

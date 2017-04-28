@@ -190,8 +190,10 @@ form small {
     }
 }
 
-.tag-filter-panel {
-    .tag-filter-title {
+.filter-panel {
+    margin-bottom: 1rem;
+
+    .filter-title {
         border-bottom: 2px solid $primary-color;
         font-size: $h4-font-size - $h4-font-reduction;
         margin-bottom: 1rem;
@@ -877,11 +879,7 @@ ul.tags {
             }
         }
 
-        .other-users {
-            display: none;
-        }
-
-        .other-periods {
+        .filter-panel {
             display: none;
         }
     }
@@ -892,7 +890,7 @@ ul.tags {
 */
 .form-panel {
     border: 0;
-    margin-bottom: 0;
+    margin-bottom: 1rem;
     padding: 0;
 
     > h1,

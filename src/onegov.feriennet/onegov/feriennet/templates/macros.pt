@@ -381,28 +381,24 @@
 
 
 <metal:periods define-macro="periods" i18n:domain="onegov.feriennet">
-    <div class="row other-periods" tal:condition="len(periods) > 1">
-        <div class="columns small-12">
-            <h2 i18n:translate>Period</h2>
-            <select onchange="location = this.value;">
-                <option tal:repeat="p periods" value="${request.link(model.for_period(p))}" tal:attributes="selected p.id == period.id">
-                    ${p.title}
-                </option>
-            </select>
-        </div>
+    <div class="filter-panel" tal:condition="len(periods) > 1">
+        <h2 class="filter-title" i18n:translate>Period</h2>
+        <select onchange="location = this.value;">
+            <option tal:repeat="p periods" value="${request.link(model.for_period(p))}" tal:attributes="selected p.id == period.id">
+                ${p.title}
+            </option>
+        </select>
     </div>
 </metal:periods>
 
 
 <metal:users define-macro="users" i18n:domain="onegov.feriennet">
-    <div class="row other-users" tal:condition="request.is_admin and users">
-        <div class="columns small-12">
-            <h2 i18n:translate>User</h2>
-            <select onchange="location = this.value;">
-                <option tal:repeat="u users" value="${request.link(model.for_username(u.username))}" tal:attributes="selected u.id == user.id">
-                    ${u.title}
-                </option>
-            </select>
-        </div>
+    <div class="filter-panel" tal:condition="request.is_admin and users">
+        <h2 class="filter-title" i18n:translate>User</h2>
+        <select onchange="location = this.value;">
+            <option tal:repeat="u users" value="${request.link(model.for_username(u.username))}" tal:attributes="selected u.id == user.id">
+                ${u.title}
+            </option>
+        </select>
     </div>
 </metal:users>
