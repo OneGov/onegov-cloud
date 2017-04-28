@@ -10,6 +10,8 @@
         <div class="row manage-data-source-items">
             <div class="small-12 columns">
 
+                <h2><small>${source.name} / ${source.token}</small></h2>
+
                 <div class="row">
                     <div class="small-12 medium-6 columns">
                         <h1 i18n:translate>Mappings</h1>
