@@ -56,10 +56,11 @@ def view_upload_wabsti_vote(self, request):
     """ Upload vote results using the WabstiCExportert 2.1.
 
     Example usage:
-        curl
+        curl http://localhost:8080/onegov_election_day/xx/upload-wabsti-vote
             --user :<token>
+            --header "Accept-Language: de_CH"
             --form "sg_gemeinden=@SG_Gemeinden.csv"
-            http://localhost:8080/onegov_election_day/sg/upload-wabsti-vote
+
     """
 
     data_source = authenticated_source(request)
@@ -125,13 +126,15 @@ def view_upload_wabsti_majorz(self, request):
     """ Upload election results using the WabstiCExportert 2.1.
 
     Example usage:
-        curl
+        curl http://localhost:8080/onegov_election_day/xx/upload-wabsti-majorz
             --user :<token>
-            --form "wmstatic_gemeinden=@WMStatic_Gemeinden.csv"
+            --header "Accept-Language: de_CH"
             --form "wm_gemeinden=@WM_Gemeinden.csv"
             --form "wm_kandidaten=@WM_Kandidaten.csv"
             --form "wm_kandidatengde=@WM_KandidatenGde.csv"
-            http://localhost:8080/onegov_election_day/sg/upload-wabsti-majorz
+            --form "wm_wahl=@WM_Wahl.csv"
+            --form "wmstatic_gemeinden=@WMStatic_Gemeinden.csv"
+
     """
 
     data_source = authenticated_source(request)
@@ -208,8 +211,9 @@ def view_upload_wabsti_proporz(self, request):
     """ Upload election results using the WabstiCExportert 2.1.
 
     Example usage:
-        curl
+        curl http://localhost:8080/onegov_election_day/xx/upload-wabsti-proporz
             --user :<token>
+            --header "Accept-Language: de_CH"
             --form "wpstatic_gemeinden=@WPStatic_Gemeinden.csv"
             --form "wp_gemeinden=@WP_Gemeinden.csv"
             --form "wp_listen=@WP_Listen.csv"
@@ -217,7 +221,7 @@ def view_upload_wabsti_proporz(self, request):
             --form "wpstatic_kandidaten=@WPStatic_Kandidaten.csv"
             --form "wp_kandidaten=@WP_Kandidaten.csv"
             --form "wp_kandidatengde=@WP_KandidatenGde.csv"
-            http://localhost:8080/onegov_election_day/sg/upload-wabsti-proporz
+
     """
 
     data_source = authenticated_source(request)
