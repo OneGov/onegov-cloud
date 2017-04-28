@@ -10,7 +10,8 @@ from uuid import uuid4
 
 HEADERS_WM_WAHL = (
     'SortGeschaeft',  # provides the link to the election
-    'AbsolutesMehr'
+    'AbsolutesMehr',  # absolute majority
+    'Ausmittlungsstand',  # complete
 )
 HEADERS_WMSTATIC_GEMEINDEN = (
     'SortWahlkreis',  # provides the link to the election
@@ -125,6 +126,7 @@ def import_exporter_files(election, district, number, entities,
 
     # Parse the election
     absolute_majority = None
+    complete = 0
     for line in wm_wahl.lines:
         line_errors = []
 
@@ -134,7 +136,9 @@ def import_exporter_files(election, district, number, entities,
         # Parse the absolute majority
         try:
             absolute_majority = int(line.absolutesmehr or 0)
-        except ValueError:
+            complete = int(line.ausmittlungsstand or 0)
+            assert 0 <= complete <= 3
+        except (ValueError, AssertionError):
             line_errors.append(_("Invalid values"))
         else:
             if absolute_majority == -1:
@@ -332,9 +336,15 @@ def import_exporter_files(election, district, number, entities,
     if added_results:
         clear_election(election)
 
-        election.counted_entities = len(added_results.keys())
-        election.total_entities = max(len(entities), election.counted_entities)
         election.absolute_majority = absolute_majority
+        election.counted_entities = sum([
+            1 for value in added_entities.values() if value['counted']
+        ])
+        election.total_entities = max(len(entities), len(added_results.keys()))
+        if complete == 1:
+            election.total_entities = 0
+        if complete == 2:
+            election.total_entities = election.counted_entities
 
         for candidate in added_candidates.values():
             election.candidates.append(candidate)
