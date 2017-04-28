@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-04-11 09:42+0200\n"
+"POT-Creation-Date: 2017-04-28 14:31+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -603,9 +603,6 @@ msgstr "Bank Konto (IBAN)"
 
 msgid "Bank Beneficiary"
 msgstr "Bank Begünstigter"
-
-msgid "Payment"
-msgstr "Zahlungen"
 
 msgid "A beneficiary is required if a bank account is given."
 msgstr "Ein Begünstigter ist nötig wenn ein Bank Konto angegeben wird."
@@ -1419,6 +1416,18 @@ msgstr "Die Zuteilung wurde erfolgreich abgeschlossen"
 msgid "The matching run executed successfully"
 msgstr "Der Zuteilungs-Lauf wurde erfolgreich durchgeführt"
 
+msgid "Full"
+msgstr "Voll"
+
+msgid "Operable"
+msgstr "Genügend Teilnehmer"
+
+msgid "Unoperable"
+msgstr "Zu wenig Teilnehmer"
+
+msgid "Empty"
+msgstr "Leer"
+
 msgid "Mailing"
 msgstr "Versand"
 
@@ -1501,3 +1510,6 @@ msgstr ""
 
 msgid "Activate Period"
 msgstr "Periode Aktivieren"
+
+#~ msgid "Payment"
+#~ msgstr "Zahlungen"

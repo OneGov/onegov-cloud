@@ -128,8 +128,8 @@ def get_attendee(request, app, id):
 @FeriennetApp.path(
     model=MatchCollection,
     path='/zuteilungen',
-    converters=dict(period_id=UUID))
-def get_matches(request, app, period_id):
+    converters=dict(period_id=UUID, states=[str]))
+def get_matches(request, app, period_id, states=None):
     # the default period is the active period or the first we can find
     if not period_id:
         period = app.active_period or app.periods and app.periods[0]
@@ -139,7 +139,7 @@ def get_matches(request, app, period_id):
     if not period:
         return None
 
-    return MatchCollection(app.session(), period)
+    return MatchCollection(app.session(), period, states)
 
 
 @FeriennetApp.path(

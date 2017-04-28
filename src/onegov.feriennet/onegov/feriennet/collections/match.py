@@ -7,9 +7,10 @@ from sqlalchemy import func, literal_column, not_, distinct
 
 class MatchCollection(object):
 
-    def __init__(self, session, period):
+    def __init__(self, session, period, states=None):
         self.session = session
         self.period = period
+        self.states = set(states) if states else set()
 
     @property
     def period_id(self):
@@ -17,6 +18,25 @@ class MatchCollection(object):
 
     def for_period(self, period):
         return self.__class__(self.session, period)
+
+    def for_filter(self, state=None):
+
+        def toggle(collection, item):
+            if item is None:
+                return collection
+
+            if item in collection:
+                return collection - {item}
+            else:
+                return collection | {item}
+
+        toggled = (
+            toggle(collection, item) for collection, item in (
+                (self.states, state),
+            )
+        )
+
+        return self.__class__(self.session, self.period, *toggled)
 
     @property
     def base(self):
@@ -121,12 +141,18 @@ class MatchCollection(object):
 
         return sum(bits) / len(bits)
 
+    def include_in_output(self, occasion):
+        if not self.states:
+            return True
+
+        return occasion['state'] in self.states
+
     @property
     def occasions(self):
         occasions = OrderedDict()
 
         for oid, records in groupby(self.base, key=lambda r: r.occasion_id):
-            occasions[oid] = {
+            occasion = {
                 'first': None,
                 'accepted': [],
                 'other': [],
@@ -135,25 +161,30 @@ class MatchCollection(object):
 
             for ix, record in enumerate(records):
                 if ix == 0:
-                    occasions[oid]['first'] = record
+                    occasion['first'] = record
                 if record.booking_state == 'accepted':
-                    occasions[oid]['accepted'].append(record)
+                    occasion['accepted'].append(record)
                 else:
-                    occasions[oid]['other'].append(record)
+                    occasion['other'].append(record)
 
-            max_spots = occasions[oid]['first'].occasion_spots.upper - 1
-            min_spots = occasions[oid]['first'].occasion_spots.lower
+            max_spots = occasion['first'].occasion_spots.upper - 1
+            min_spots = occasion['first'].occasion_spots.lower
 
-            if len(occasions[oid]['accepted']) == 0:
-                occasions[oid]['state'] = 'empty'
+            if len(occasion['accepted']) == 0:
+                occasion['state'] = 'empty'
 
-            elif len(occasions[oid]['accepted']) < min_spots:
-                occasions[oid]['state'] = 'unoperable'
+            elif len(occasion['accepted']) < min_spots:
+                occasion['state'] = 'unoperable'
 
-            elif len(occasions[oid]['accepted']) < max_spots:
-                occasions[oid]['state'] = 'operable'
+            elif len(occasion['accepted']) < max_spots:
+                occasion['state'] = 'operable'
 
-            elif len(occasions[oid]['accepted']) >= max_spots:
-                occasions[oid]['state'] = 'full'
+            elif len(occasion['accepted']) >= max_spots:
+                occasion['state'] = 'full'
+
+            # not the most efficient way to do it, but at this time in the
+            # development process a safe and convenient one
+            if self.include_in_output(occasion):
+                occasions[oid] = occasion
 
         return occasions

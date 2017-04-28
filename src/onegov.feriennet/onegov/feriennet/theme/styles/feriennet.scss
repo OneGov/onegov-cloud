@@ -190,8 +190,8 @@ form small {
     }
 }
 
-.activity-list-search {
-    h2 {
+.tag-filter-panel {
+    .tag-filter-title {
         border-bottom: 2px solid $primary-color;
         font-size: $h4-font-size - $h4-font-reduction;
         margin-bottom: 1rem;
@@ -302,8 +302,8 @@ ul.tags {
         &::before {
             display: inline-block;
             left: 0;
-            margin-top: -1px;
             margin-right: 1ex;
+            margin-top: -1px;
             position: absolute;
             text-align: center;
             width: 1rem;
@@ -891,9 +891,26 @@ ul.tags {
     Form panel on the right
 */
 .form-panel {
-    padding: .5rem 1rem 1rem;
+    border: 0;
+    margin-bottom: 0;
+    padding: 0;
+
+    > h1,
+    > h2,
+    > h3,
+    > h4 {
+        border-bottom: 2px solid $primary-color;
+        font-size: $h4-font-size - $h4-font-reduction;
+        margin-bottom: 0;
+        padding-bottom: .875rem;
+    }
+
+    .form-panel-block {
+        padding: .75rem 0;
+    }
 
     form {
+
         #confirm {
             margin-bottom: .5rem;
         }
@@ -912,6 +929,10 @@ ul.tags {
         fieldset {
             border: 0;
             margin: .5rem 0 .75rem;
+
+            &:nth-child(2) {
+                margin-top: 0;
+            }
         }
 
         .field-confirm .label-text {

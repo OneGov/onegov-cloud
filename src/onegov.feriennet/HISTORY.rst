@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to filter the matching view.
+  [href]
+
 - Limits editors edit activites/occasions only in preview or proposed state.
   [href]
 

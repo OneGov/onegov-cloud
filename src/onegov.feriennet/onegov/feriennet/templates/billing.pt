@@ -114,36 +114,38 @@
                 <div class="side-panel form-panel">
                     <h4 i18n:translate>Billing</h4>
 
-                    <tal:block condition="period.active and period.booking_phase">
-                        <div metal:use-macro="layout.macros['form']" />
-                    </tal:block>
+                    <div class="form-panel-block">
+                        <tal:block condition="period.active and period.booking_phase">
+                            <div metal:use-macro="layout.macros['form']" />
+                        </tal:block>
 
-                    <tal:block condition="period.active and not period.confirmed">
-                        <p>
-                            <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
-                            <span i18n:translate>
-                                The matching of this period has not been confirmed yet.
-                            </span>
-                        </p>
-                    </tal:block>
+                        <tal:block condition="period.active and not period.confirmed">
+                            <p>
+                                <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
+                                <span i18n:translate>
+                                    The matching of this period has not been confirmed yet.
+                                </span>
+                            </p>
+                        </tal:block>
 
-                    <tal:block condition="not period.active and not period.finalized">
-                        <p>
-                            <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
-                            <span i18n:translate>
-                                This period is not active. Bills may only be created for the active period.
-                            </span>
-                        </p>
-                    </tal:block>
+                        <tal:block condition="not period.active and not period.finalized">
+                            <p>
+                                <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
+                                <span i18n:translate>
+                                    This period is not active. Bills may only be created for the active period.
+                                </span>
+                            </p>
+                        </tal:block>
 
-                    <tal:block condition="period.finalized">
-                        <p>
-                            <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
-                            <span i18n:translate>
-                                The billing for this period has been confirmed. You can still change the invoices manually but you can no longer generate them automatically.
-                            </span>
-                        </p>
-                    </tal:block>
+                        <tal:block condition="period.finalized">
+                            <p>
+                                <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
+                                <span i18n:translate>
+                                    The billing for this period has been confirmed. You can still change the invoices manually but you can no longer generate them automatically.
+                                </span>
+                            </p>
+                        </tal:block>
+                    </div>
                 </div>
 
                 <tal:block metal:use-macro="layout.macros.periods" />
