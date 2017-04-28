@@ -5,6 +5,7 @@ from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.const import VISIBLE_ACTIVITY_STATES
+from onegov.feriennet.const import OWNER_EDITABLE_STATES
 from onegov.feriennet.models import NotificationTemplate
 from onegov.org.models import ImageFileCollection, SiteCollection
 
@@ -79,7 +80,8 @@ def has_private_permission_activities(app, identity, model, permission):
     if identity.role != 'editor':
         return has_permission_logged_in(app, identity, model, permission)
 
-    return is_owner(identity.userid, model)
+    return is_owner(identity.userid, model) \
+        and model.state in OWNER_EDITABLE_STATES
 
 
 @FeriennetApp.permission_rule(model=Occasion, permission=Private)
@@ -90,7 +92,8 @@ def has_private_permission_occasions(app, identity, model, permission):
     if identity.role != 'editor':
         return has_permission_logged_in(app, identity, model, permission)
 
-    return is_owner(identity.userid, model.activity)
+    return is_owner(identity.userid, model.activity) \
+        and model.activity.state in OWNER_EDITABLE_STATES
 
 
 @FeriennetApp.permission_rule(

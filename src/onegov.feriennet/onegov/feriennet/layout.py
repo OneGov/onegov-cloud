@@ -1,7 +1,8 @@
 from cached_property import cached_property
-from onegov.activity import Activity, PeriodCollection
+from onegov.activity import Activity, PeriodCollection, Occasion
 from onegov.feriennet import _
 from onegov.feriennet import security
+from onegov.feriennet.const import OWNER_EDITABLE_STATES
 from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.org.elements import Link, ConfirmLink, DeleteLink
@@ -14,6 +15,22 @@ class DefaultLayout(BaseLayout):
     @property
     def is_owner(self):
         return security.is_owner(self.request.current_username, self.model)
+
+    @property
+    def is_editable(self):
+        if self.request.is_admin:
+            return True
+
+        if not self.request.is_organiser:
+            return False
+
+        if isinstance(self.model, Activity):
+            return self.model.state in OWNER_EDITABLE_STATES
+
+        if isinstance(self.model, Occasion):
+            return self.model.activity.state in OWNER_EDITABLE_STATES
+
+        return True
 
 
 class VacationActivityCollectionLayout(DefaultLayout):
@@ -130,7 +147,7 @@ class VacationActivityLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_admin or self.is_owner:
+        if self.is_editable:
             links = []
 
             if self.model.state == 'preview':

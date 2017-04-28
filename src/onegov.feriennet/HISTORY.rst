@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Limits editors edit activites/occasions only in preview or proposed state.
+  [href]
+
 0.8.0 (2017-04-28)
 ~~~~~~~~~~~~~~~~~~~
 

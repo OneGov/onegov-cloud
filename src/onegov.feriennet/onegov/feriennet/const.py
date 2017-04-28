@@ -17,3 +17,7 @@ VISIBLE_ACTIVITY_STATES = {
         'accepted',
     )
 }
+
+
+#: Describes the states an owner editor can edit
+OWNER_EDITABLE_STATES = ('preview', 'proposed')

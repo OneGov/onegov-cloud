@@ -248,7 +248,7 @@
                     <span i18n:translate>Independent of other occasions</span>
                 </div>
 
-                <div class="text-links" tal:condition="show_links and (request.is_admin or layout.is_owner)">
+                <div class="text-links" tal:condition="show_links and layout.is_editable">
                     <tal:block repeat="link occasion_links(occasion)">
                         <tal:block replace="structure link(request)" />
                     </tal:block>

@@ -1,9 +1,11 @@
 from onegov.activity import ActivityCollection
-from onegov.core.security import Public
+from onegov.core.security import Public, Private
 from onegov.core.utils import Bunch
 from onegov.feriennet.policy import ActivityQueryPolicy
 from onegov.feriennet.security import has_public_permission_logged_in
 from onegov.feriennet.security import has_public_permission_not_logged_in
+from onegov.feriennet.security import has_private_permission_activities
+from onegov.feriennet.security import has_private_permission_occasions
 from onegov.feriennet.security import is_owner
 from onegov.user import UserCollection
 
@@ -156,3 +158,37 @@ def test_activity_permission():
     assert not has_permission('owner', 'owner', 'member', 'proposed')
     assert has_permission('owner', 'owner', 'member', 'accepted')
     assert not has_permission('owner', 'owner', 'member', 'archived')
+
+
+def test_editor_permissions():
+
+    def has_activity_permission(owner, user, role, state):
+        return has_private_permission_activities(
+            app=None,
+            identity=Bunch(userid=user, role=role),
+            model=Bunch(state=state, username=owner),
+            permission=Private
+        )
+
+    def has_occasion_permission(owner, user, role, state):
+        return has_private_permission_occasions(
+            app=None,
+            identity=Bunch(userid=user, role=role),
+            model=Bunch(activity=Bunch(
+                state=state,
+                username=owner
+            )),
+            permission=Private
+        )
+
+    # editors only got rights if they are owners and the activity
+    # is in the preview/proposed state
+    assert has_activity_permission('owner', 'owner', 'editor', 'preview')
+    assert has_activity_permission('owner', 'owner', 'editor', 'proposed')
+    assert not has_activity_permission('owner', 'owner', 'editor', 'accepted')
+    assert not has_activity_permission('owner', 'owner', 'editor', 'archived')
+
+    assert has_occasion_permission('owner', 'owner', 'editor', 'preview')
+    assert has_occasion_permission('owner', 'owner', 'editor', 'proposed')
+    assert not has_occasion_permission('owner', 'owner', 'editor', 'accepted')
+    assert not has_occasion_permission('owner', 'owner', 'editor', 'archived')
