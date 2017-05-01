@@ -108,17 +108,14 @@
                                                     metal:use-macro="layout.macros.confirmed_booking_state"
                                                 />
                                             </td>
-                                            <td tal:define="action_id 'action-{}-{}'.format(oid, record.attendee_id)">
-                                                <a href="#" data-dropdown="${action_id}" aria-expanded="false" class="tiny button actions-button">
-                                                    <span class="show-for-sr" i18n:translate>Actions</span>
-                                                    <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
-                                                </a>
-                                                <ul id="${action_id}" data-dropdown-content class="f-dropdown" aria-hidden="true">
-                                                    <li
-                                                        tal:repeat="link record_links(record)"
-                                                        tal:content="structure link(request)"
-                                                    />
-                                                </ul>
+                                            <td>
+                                                <tal:block
+                                                    define="
+                                                        action_id 'action-{}-{}'.format(oid, record.attendee_id);
+                                                        links record_links(record)
+                                                    "
+                                                    metal:use-macro="layout.macros.actions_button"
+                                                />
                                             </td>
                                         </tr>
                                     </tal:block>

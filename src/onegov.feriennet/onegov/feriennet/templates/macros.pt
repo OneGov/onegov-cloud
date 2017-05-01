@@ -402,3 +402,17 @@
         </select>
     </div>
 </metal:users>
+
+
+<metal:actions_button define-macro="actions-button" i18n:domain="onegov.feriennet">
+    <a href="#" data-dropdown="${action_id}" aria-expanded="false" class="tiny button actions-button">
+        <span class="show-for-sr" i18n:translate>Actions</span>
+        <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+    </a>
+    <ul id="${action_id}" data-dropdown-content class="f-dropdown" aria-hidden="true">
+        <li
+            tal:repeat="link links"
+            tal:content="structure link(request)"
+        />
+    </ul>
+</metal:actions_button>

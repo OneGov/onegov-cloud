@@ -33,15 +33,13 @@
                             </tal:block>
 
                             <tal:block tal:define="actions tuple(invoice_actions(details))" tal:condition="actions">
-                                <a href="#" class="tiny button actions-button" data-dropdown="item-dropdown-${details.id}">
-                                    <span i18n:translate class="show-for-sr">Actions</span>
-                                    <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
-                                </a>
-                                <ul id="item-dropdown-${details.id}" class="small f-dropdown" data-dropdown-content>
-                                  <li tal:repeat="link actions">
-                                      <tal:block replace="structure link(request)" />
-                                  </li>
-                                </ul>
+                                <tal:block
+                                    define="
+                                        action_id 'item-dropdown-{}'.format(details.id);
+                                        links actions
+                                    "
+                                    metal:use-macro="layout.macros.actions_button"
+                                />
                             </tal:block>
                         </strong>
 
@@ -77,15 +75,13 @@
                                         </td>
                                         <td class="actions">
                                             <tal:block tal:define="actions tuple(item_actions(item))" tal:condition="actions">
-                                                <a href="#" class="tiny button actions-button" data-dropdown="item-dropdown-${details.id}-${groupid}-${repeat.item.index}">
-                                                    <span i18n:translate class="show-for-sr">Actions</span>
-                                                    <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
-                                                </a>
-                                                <ul id="item-dropdown-${details.id}-${groupid}-${repeat.item.index}" class="small f-dropdown" data-dropdown-content>
-                                                    <li tal:repeat="link actions">
-                                                        <tal:block replace="structure link(request)" />
-                                                    </li>
-                                                </ul>
+                                                <tal:block
+                                                    define="
+                                                        action_id 'item-dropdown-{}-{}-{}'.format(details.id, groupid, repeat.item.index);
+                                                        links actions
+                                                    "
+                                                    metal:use-macro="layout.macros.actions_button"
+                                                />
                                             </tal:block>
                                         </td>
                                     </tr>
