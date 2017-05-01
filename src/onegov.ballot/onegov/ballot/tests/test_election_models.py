@@ -857,6 +857,7 @@ def test_election_export(session):
             'election_type': 'majorz',
             'election_mandates': 1,
             'election_absolute_majority': 144,
+            'election_status': 'unknown',
             'election_counted_entities': 1,
             'election_total_entities': 2,
             'entity_name': 'group',
@@ -891,6 +892,7 @@ def test_election_export(session):
             'election_type': 'majorz',
             'election_mandates': 1,
             'election_absolute_majority': 144,
+            'election_status': 'unknown',
             'election_counted_entities': 1,
             'election_total_entities': 2,
             'entity_name': 'group',
@@ -944,3 +946,60 @@ def test_election_meta_data(session):
     election.meta['b'] = 2
     assert election.meta['a'] == 1
     assert election.meta['b'] == 2
+
+
+def test_election_status(session):
+    election = Election(
+        title='Election',
+        domain='federation',
+        type='majorz',
+        date=date(2015, 6, 14),
+        number_of_mandates=1
+    )
+    assert election.status is None
+    assert election.completed is False
+
+    session.add(election)
+    session.flush()
+
+    # Set status
+    election.status = 'unknown'
+    session.flush()
+    assert election.status == 'unknown'
+
+    election.status = 'interim'
+    session.flush()
+    assert election.status == 'interim'
+
+    election.status = 'final'
+    session.flush()
+    assert election.status == 'final'
+
+    election.status = None
+    session.flush()
+    assert election.status is None
+
+    # Test completed calcuation
+    for status in (None, 'unknown'):
+        election.status = status
+        for counted, total in (
+            (None, None), (0, 0), (None, 0), (0, None), (5, None), (None, 5),
+            (0, 5), (2, 5), (6, 5)
+        ):
+            election.counted_entities = counted
+            election.total_entities = total
+            assert election.completed == False
+
+        election.counted_entities = 5
+        election.total_entities = 5
+        assert election.completed == True
+
+    for status, completed in (('interim', False), ('final', True)):
+        election.status = status
+        for counted, total in (
+            (None, None), (0, 0), (None, 0), (0, None), (5, None), (None, 5),
+            (0, 5), (2, 5), (6, 5), (5, 5)
+        ):
+            election.counted_entities = counted
+            election.total_entities = total
+            assert election.completed == completed

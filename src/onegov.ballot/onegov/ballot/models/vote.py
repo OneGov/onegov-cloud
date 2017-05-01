@@ -1,14 +1,30 @@
 from collections import OrderedDict
-from onegov.ballot.models.common import DomainOfInfluenceMixin, MetaMixin
-from onegov.core.orm import Base, translation_hybrid
+from onegov.ballot.models.common import DomainOfInfluenceMixin
+from onegov.ballot.models.common import MetaMixin
+from onegov.ballot.models.common import StatusMixin
+from onegov.core.orm import Base
+from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import HSTORE, UUID
-from onegov.core.utils import normalize_for_url, increment_name
-from sqlalchemy import Boolean, Column, Date, Enum, ForeignKey, Integer, Text
-from sqlalchemy import select, func, case, desc
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import backref, relationship, object_session
+from onegov.core.orm.types import HSTORE
+from onegov.core.orm.types import UUID
+from onegov.core.utils import increment_name
+from onegov.core.utils import normalize_for_url
+from sqlalchemy import Boolean
+from sqlalchemy import case
+from sqlalchemy import Column
+from sqlalchemy import Date
+from sqlalchemy import desc
+from sqlalchemy import Enum
+from sqlalchemy import ForeignKey
+from sqlalchemy import func
+from sqlalchemy import Integer
+from sqlalchemy import select
+from sqlalchemy import Text
 from sqlalchemy_utils import observes
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import backref
+from sqlalchemy.orm import object_session
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
@@ -65,7 +81,7 @@ class DerivedBallotsCount(object):
 
 
 class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
-           MetaMixin):
+           MetaMixin, StatusMixin):
     """ A vote describes the issue being voted on. For example,
     "Vote for Net Neutrality" or "Vote for Basic Income".
 
@@ -290,6 +306,9 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
             ``federation`` for federal, ``canton`` for cantonal,
             ``municipality`` for communal votes.
 
+        * ``status``:
+            The status of the vote: ``unknown``, ``interim`` or ``final``.
+
         * ``type``:
             ``proposal`` (Vorschlag), ``counter-proposal`` (Gegenvorschlag) or
             ``tie-breaker`` (Stichfrage).
@@ -333,6 +352,7 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
                 row['date'] = self.date.isoformat()
                 row['shortcode'] = self.shortcode
                 row['domain'] = self.domain
+                row['status'] = self.status or 'unknown'
                 row['type'] = ballot.type
                 row['group'] = result.group
                 row['entity_id'] = result.entity_id

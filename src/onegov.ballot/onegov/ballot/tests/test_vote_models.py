@@ -578,6 +578,7 @@ def test_vote_export(session):
             'date': "2015-06-14",
             'shortcode': "FOO",
             'domain': "federation",
+            'status': "unknown",
             'type': "proposal",
             'counted': False,
             'group': "Bar Town",
@@ -593,6 +594,7 @@ def test_vote_export(session):
             'date': "2015-06-14",
             'shortcode': "FOO",
             'domain': "federation",
+            'status': "unknown",
             'type': "proposal",
             'counted': True,
             'group': "Foo Town",
@@ -608,6 +610,7 @@ def test_vote_export(session):
             'date': "2015-06-14",
             'shortcode': "FOO",
             'domain': "federation",
+            'status': "unknown",
             'type': "counter-proposal",
             'counted': False,
             'group': "Foo Town",
@@ -642,3 +645,141 @@ def test_vote_meta_data(session):
     vote.meta['b'] = 2
     assert vote.meta['a'] == 1
     assert vote.meta['b'] == 2
+
+
+def test_vote_status(session):
+    vote = Vote(
+        title="Vote",
+        domain='federation',
+        date=date(2015, 6, 14)
+    )
+    assert vote.status is None
+    assert vote.completed is False
+
+    session.add(vote)
+    session.flush()
+
+    # Set status
+    vote.status = 'unknown'
+    session.flush()
+    assert vote.status == 'unknown'
+
+    vote.status = 'interim'
+    session.flush()
+    assert vote.status == 'interim'
+
+    vote.status = 'final'
+    session.flush()
+    assert vote.status == 'final'
+
+    vote.status = None
+    session.flush()
+    assert vote.status is None
+
+    # Test completed calcuation
+    # ... empty vote
+    for status, completed in (
+        (None, False), ('unknown', False), ('interim', False), ('final', True)
+    ):
+        vote.status = status
+        assert vote.completed == completed
+
+    vote.ballots.append(Ballot(type='proposal'))
+    for status, completed in (
+        (None, False), ('unknown', False), ('interim', False), ('final', True)
+    ):
+        vote.status = status
+        assert vote.completed == completed
+
+    # ... vote with some results
+    vote.proposal.results.append(
+        BallotResult(
+            group='A',
+            counted=True,
+            yeas=100,
+            nays=50,
+            entity_id=1,
+        )
+    )
+    vote.proposal.results.append(
+        BallotResult(
+            group='B',
+            counted=False,
+            yeas=100,
+            nays=50,
+            entity_id=1,
+        )
+    )
+    for status, completed in (
+        (None, False), ('unknown', False), ('interim', False), ('final', True)
+    ):
+        vote.status = status
+        assert vote.completed == completed
+
+    # ... vote with all results
+    session.query(BallotResult).filter_by(group='B').one().counted = True
+    for status, completed in (
+        (None, True), ('unknown', True), ('interim', False), ('final', True)
+    ):
+        vote.status = status
+        assert vote.completed == completed
+
+    # ... complex vote with some results
+    vote.ballots.append(Ballot(type='counter-proposal'))
+    vote.ballots.append(Ballot(type='tie-breaker'))
+    for status, completed in (
+        (None, False), ('unknown', False), ('interim', False), ('final', True)
+    ):
+        vote.status = status
+        assert vote.completed == completed
+
+    vote.counter_proposal.results.append(
+        BallotResult(
+            group='C',
+            counted=True,
+            yeas=100,
+            nays=50,
+            entity_id=1,
+        )
+    )
+    vote.counter_proposal.results.append(
+        BallotResult(
+            group='D',
+            counted=False,
+            yeas=100,
+            nays=50,
+            entity_id=1,
+        )
+    )
+    vote.tie_breaker.results.append(
+        BallotResult(
+            group='E',
+            counted=True,
+            yeas=100,
+            nays=50,
+            entity_id=1,
+        )
+    )
+    vote.tie_breaker.results.append(
+        BallotResult(
+            group='F',
+            counted=False,
+            yeas=100,
+            nays=50,
+            entity_id=1,
+        )
+    )
+    for status, completed in (
+        (None, False), ('unknown', False), ('interim', False), ('final', True)
+    ):
+        vote.status = status
+        assert vote.completed == completed
+
+    # ... complex vote with all results
+    session.query(BallotResult).filter_by(group='D').one().counted = True
+    session.query(BallotResult).filter_by(group='F').one().counted = True
+    for status, completed in (
+        (None, True), ('unknown', True), ('interim', False), ('final', True)
+    ):
+        vote.status = status
+        assert vote.completed == completed

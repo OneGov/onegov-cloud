@@ -4,10 +4,13 @@ from sqlalchemy.ext.declarative import declared_attr
 
 
 class DomainOfInfluenceMixin(object):
+    """ Defines the defines the scope of the election or vote - eCH-0155 calls
+    this the domain of influence. Unlike eCH-0155 we refrain from putting this
+    in a separate model. We also only include domains we currently support.
 
-    #: defines the scope of the vote - eCH-0155 calls this the domain of
-    #: influence. Unlike eCH-0155 we refrain from putting this in a separate
-    #: model. We also only include domains we currently support.
+    """
+
+    #: scope of the election or vote
     @declared_attr
     def domain(cls):
         return Column(
@@ -32,3 +35,39 @@ class MetaMixin(object):
     @declared_attr
     def meta(cls):
         return Column(JSON, nullable=False, default=dict)
+
+
+class StatusMixin(object):
+    """ Mixin providing status indication for votes and elections."""
+
+    #: Status of the election or vote
+    @declared_attr
+    def status(cls):
+        return Column(
+            Enum(
+                'unknown',
+                'interim',
+                'final',
+                name='election_or_vote_status'
+            ),
+            nullable=True
+        )
+
+    @property
+    def completed(self):
+        """ Returns True, if the election or vote is completed.
+
+        The status is evaluated in the first place. If the status is not known,
+        it is guessed from the progress / counted fields.
+
+        """
+
+        if self.status == 'final':
+            return True
+        if self.status == 'interim':
+            return False
+
+        if self.progress[1] == 0:
+            return False
+
+        return self.counted

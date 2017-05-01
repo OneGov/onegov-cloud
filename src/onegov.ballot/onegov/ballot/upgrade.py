@@ -121,22 +121,34 @@ def add_municipality_domain(context):
     tmp_type.drop(context.operations.get_bind(), checkfirst=False)
 
 
-@upgrade_task('Add party resuts columns')
-def add_party_results_columns(context):
-    if not context.has_column('party_results', 'color'):
+@upgrade_task('Add status')
+def add_status_columns(context):
+    if not context.has_column('elections', 'status'):
         context.operations.add_column(
-            'party_results',
-            Column('color', Text())
+            'elections',
+            Column(
+                'status',
+                Enum(
+                    'unknown',
+                    'interim',
+                    'final',
+                    name='election_or_vote_status'
+                ),
+                nullable=True
+            )
         )
 
-    if not context.has_column('party_results', 'year'):
+    if not context.has_column('votes', 'status'):
         context.operations.add_column(
-            'party_results',
-            Column('year', Integer())
-        )
-
-    if not context.has_column('party_results', 'total_votes'):
-        context.operations.add_column(
-            'party_results',
-            Column('total_votes', Integer())
+            'votes',
+            Column(
+                'status',
+                Enum(
+                    'unknown',
+                    'interim',
+                    'final',
+                    name='election_or_vote_status'
+                ),
+                nullable=True
+            )
         )

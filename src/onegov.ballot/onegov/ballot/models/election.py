@@ -1,16 +1,32 @@
 from collections import OrderedDict
-from onegov.ballot.models.common import DomainOfInfluenceMixin, MetaMixin
-from onegov.core.orm import Base, translation_hybrid
+from itertools import groupby
+from onegov.ballot.models.common import DomainOfInfluenceMixin
+from onegov.ballot.models.common import MetaMixin
+from onegov.ballot.models.common import StatusMixin
+from onegov.core.orm import Base
+from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import HSTORE, UUID
-from onegov.core.utils import normalize_for_url, increment_name
-from sqlalchemy import Boolean, Column, Date, Enum, ForeignKey, Integer, Text
-from sqlalchemy import select, func, desc
+from onegov.core.orm.types import HSTORE
+from onegov.core.orm.types import UUID
+from onegov.core.utils import increment_name
+from onegov.core.utils import normalize_for_url
+from sqlalchemy import Boolean
+from sqlalchemy import Column
+from sqlalchemy import Date
+from sqlalchemy import desc
+from sqlalchemy import Enum
+from sqlalchemy import ForeignKey
+from sqlalchemy import func
+from sqlalchemy import Integer
+from sqlalchemy import select
+from sqlalchemy import Text
 from sqlalchemy_utils import observes
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import aliased, backref, relationship, object_session
+from sqlalchemy.orm import aliased
+from sqlalchemy.orm import backref
+from sqlalchemy.orm import object_session
+from sqlalchemy.orm import relationship
 from uuid import uuid4
-from itertools import groupby
 
 
 class DerivedAttributes(object):
@@ -38,7 +54,7 @@ class DerivedAttributes(object):
 
 
 class Election(Base, TimestampMixin, DerivedAttributes,
-               DomainOfInfluenceMixin, MetaMixin):
+               DomainOfInfluenceMixin, MetaMixin, StatusMixin):
 
     __tablename__ = 'elections'
 
@@ -286,6 +302,9 @@ class Election(Base, TimestampMixin, DerivedAttributes,
             The absolute majority.  Only relevant for elections based on
             majority system.
 
+        * ``election_status``:
+            The status of the election: ``unknown``, ``interim`` or ``final``.
+
         * ``election_counted_entities``:
             The number of already counted entities.
 
@@ -384,6 +403,7 @@ class Election(Base, TimestampMixin, DerivedAttributes,
             Election.type,
             Election.number_of_mandates,
             Election.absolute_majority,
+            Election.status,
             Election.counted_entities,
             Election.total_entities,
             ElectionResult.group,
@@ -478,40 +498,41 @@ class Election(Base, TimestampMixin, DerivedAttributes,
             row['election_type'] = result[4]
             row['election_mandates'] = result[5]
             row['election_absolute_majority'] = result[6]
-            row['election_counted_entities'] = result[7]
-            row['election_total_entities'] = result[8]
+            row['election_status'] = result[7] or 'unknown'
+            row['election_counted_entities'] = result[8]
+            row['election_total_entities'] = result[9]
 
-            row['entity_name'] = result[9]
-            row['entity_id'] = result[10]
-            row['entity_elegible_voters'] = result[11]
-            row['entity_received_ballots'] = result[12]
-            row['entity_blank_ballots'] = result[13]
-            row['entity_invalid_ballots'] = result[14]
-            row['entity_unaccounted_ballots'] = result[15]
-            row['entity_accounted_ballots'] = result[16]
-            row['entity_blank_votes'] = result[17]
-            row['entity_invalid_votes'] = result[18]
-            row['entity_accounted_votes'] = result[19]
+            row['entity_name'] = result[10]
+            row['entity_id'] = result[11]
+            row['entity_elegible_voters'] = result[12]
+            row['entity_received_ballots'] = result[13]
+            row['entity_blank_ballots'] = result[14]
+            row['entity_invalid_ballots'] = result[15]
+            row['entity_unaccounted_ballots'] = result[16]
+            row['entity_accounted_ballots'] = result[17]
+            row['entity_blank_votes'] = result[18]
+            row['entity_invalid_votes'] = result[19]
+            row['entity_accounted_votes'] = result[20]
 
-            row['list_name'] = result[20]
-            row['list_id'] = result[21]
-            row['list_number_of_mandates'] = result[22]
+            row['list_name'] = result[21]
+            row['list_id'] = result[22]
+            row['list_number_of_mandates'] = result[23]
             row['list_votes'] = list_results_grouped.get(
                 row['entity_id'], {}
             ).get(row['list_id'], 0)
 
-            row['list_connection'] = result[23]
-            row['list_connection_parent'] = result[24]
+            row['list_connection'] = result[24]
+            row['list_connection_parent'] = result[25]
 
-            row['candidate_family_name'] = result[25]
-            row['candidate_first_name'] = result[26]
-            row['candidate_id'] = result[27]
-            row['candidate_elected'] = result[28]
+            row['candidate_family_name'] = result[26]
+            row['candidate_first_name'] = result[27]
+            row['candidate_id'] = result[28]
+            row['candidate_elected'] = result[29]
             row['candidate_votes'] = result[0]
 
             for target_id in panachage_lists:
                 key = 'panachage_votes_from_list_{}'.format(target_id)
-                row[key] = panachage.get(result[21], {}).get(target_id)
+                row[key] = panachage.get(result[22], {}).get(target_id)
 
             rows.append(row)
 
