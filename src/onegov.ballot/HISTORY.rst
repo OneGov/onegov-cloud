@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+1.4.0 (2017-05-01)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a status (unknown, interim, final) to elections and votes.
   [msom]
