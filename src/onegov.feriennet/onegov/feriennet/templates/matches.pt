@@ -83,7 +83,7 @@
                                         <th i18n:translate>Name</th>
                                         <th i18n:translate>Age</th>
                                         <th i18n:translate>State</th>
-                                        <th i18n:translate>Links</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody tal:condition="not:records['first'].booking_state">
@@ -108,8 +108,12 @@
                                                     metal:use-macro="layout.macros.confirmed_booking_state"
                                                 />
                                             </td>
-                                            <td>
-                                                <ul class="single-line pipe-separated">
+                                            <td tal:define="action_id 'action-{}-{}'.format(oid, record.attendee_id)">
+                                                <a href="#" data-dropdown="${action_id}" aria-expanded="false" class="tiny button actions-button">
+                                                    <span class="show-for-sr" i18n:translate>Actions</span>
+                                                    <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+                                                </a>
+                                                <ul id="${action_id}" data-dropdown-content class="f-dropdown" aria-hidden="true">
                                                     <li
                                                         tal:repeat="link record_links(record)"
                                                         tal:content="structure link(request)"

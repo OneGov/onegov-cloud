@@ -1015,7 +1015,7 @@ ul.tags {
 
         td:nth-child(5),
         th:nth-child(5) {
-            width: 30%;
+            width: 5%;
         }
 
         td {
@@ -1088,9 +1088,9 @@ ul.tags {
 
     .matching-details {
         display: inline-block;
-        width: 100%;
+        width: 80%;
 
-        button {
+        > button {
             float: right;
             font-size: 1.2rem;
             height: 2.5rem;
@@ -1185,6 +1185,37 @@ ul.tags {
 }
 
 /*
+    Circular actions button
+*/
+.actions-button {
+    background-color: $select-bg-color;
+    border: 1px solid $input-border-color;
+    color: $input-font-color;
+    float: right;
+    font-size: 12px;
+    height: 24px;
+    line-height: 12px;
+    margin: 0;
+    padding: 5px !important;
+    width: 24px;
+
+    &:hover {
+        background-color: $select-hover-bg-color;
+        border-color: $input-focus-border-color;
+        color: $input-font-color;
+    }
+
+    + .f-dropdown li a {
+        font-size: .8rem;
+        font-weight: normal;
+    }
+
+    + .f-dropdown {
+        min-width: 200px;
+    }
+}
+
+/*
     Billing View
 */
 .bill {
@@ -1211,29 +1242,6 @@ ul.tags {
         right: 0;
         top: 0;
         width: 40px;
-    }
-
-    .circle.button {
-        background-color: $yellow-pastel;
-        border: 1px solid $yellow;
-        border-radius: 100px;
-        color: $body-font-color;
-        float: right;
-        font-size: 12px;
-        height: 24px;
-        line-height: 12px;
-        margin: 0;
-        padding: 5px;
-        width: 24px;
-
-        &:hover {
-            background-color: $yellow;
-        }
-
-        + .f-dropdown li a {
-            font-size: .8rem;
-            font-weight: normal;
-        }
     }
 
     .f-dropdown {
