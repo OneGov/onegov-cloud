@@ -229,7 +229,14 @@ def cancel_booking(self, request):
         score_function=self.period.scoring,
         cascade=False)
 
-    request.success(_("Your booking was cancelled successfully"))
+    request.success(_("The booking was cancelled successfully"))
+
+    @request.after
+    def update_matching(response):
+        response.headers.add('X-IC-Trigger', 'reload-from')
+        response.headers.add('X-IC-Trigger-Data', json.dumps({
+            'selector': '#{}'.format(self.occasion.id)
+        }))
 
 
 @FeriennetApp.view(

@@ -1,5 +1,8 @@
 Changelog
----------
+--------- 
+
+- Adds the ability to manage bokings/wishes on the matching view.
+  [href]
 
 - Adds links from the matching view to the attendee and its bookings/wishes.
   [href]

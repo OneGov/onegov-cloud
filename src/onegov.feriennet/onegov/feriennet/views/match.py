@@ -6,7 +6,7 @@ from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.forms import MatchForm
 from onegov.feriennet.layout import MatchCollectionLayout
-from onegov.org.elements import Link
+from onegov.org.elements import Link, ConfirmLink, DeleteLink
 
 
 @FeriennetApp.form(
@@ -40,6 +40,25 @@ def handle_matches(self, request, form):
     def activity_link(oid):
         return request.class_link(Occasion, {'id': oid})
 
+    def occasion_links(oid):
+        if self.period.finalized:
+            yield ConfirmLink(
+                text=_("Signup Attendee"),
+                url='#',
+                confirm=_(
+                    "The period has already been finalized. No new "
+                    "attendees may be added."
+                ),
+                classes=('confirm', )
+            )
+        else:
+            yield Link(
+                _("Signup Attendee"),
+                request.return_here(
+                    request.class_link(Occasion, {'id': oid}, 'anmelden')
+                )
+            )
+
     def record_links(record):
         yield Link(
             self.period.wishlist_phase and _("Wishlist") or _("Bookings"),
@@ -58,6 +77,57 @@ def handle_matches(self, request, form):
                 )
             )
         )
+
+        if self.period.wishlist_phase:
+            yield DeleteLink(
+                text=_("Remove Wish"),
+                url=layout.csrf_protected_url(
+                    request.class_link(Booking, {'id': record.booking_id})
+                ),
+                confirm=_(
+                    "Do you really want to remove ${attendee}'s wish?",
+                    mapping={
+                        'attendee': record.attendee_name
+                    }
+                ),
+                yes_button_text=_("Remove Wish"),
+                classes=('confirm', ),
+                target='#{}'.format(record.booking_id)
+            )
+        if self.period.booking_phase and record.booking_state != 'accepted':
+            yield DeleteLink(
+                text=_("Remove Booking"),
+                url=layout.csrf_protected_url(
+                    request.class_link(Booking, {'id': record.booking_id})
+                ),
+                confirm=_(
+                    "Do you really want to delete ${attendee}'s booking?",
+                    mapping={
+                        'attendee': record.attendee_name
+                    }
+                ),
+                yes_button_text=_("Remove Booking"),
+                classes=('confirm', ),
+                target='#{}'.format(record.booking_id)
+            )
+        if self.period.booking_phase and record.booking_state == 'accepted':
+            yield ConfirmLink(
+                text=_("Cancel Booking"),
+                url=layout.csrf_protected_url(
+                    request.class_link(
+                        Booking, {'id': record.booking_id}, 'absagen'
+                    )
+                ),
+                confirm=_(
+                    "Do you really want to cancel ${attendee}'s booking?",
+                    mapping={
+                        'attendee': record.attendee_name
+                    }
+                ),
+                extra_information=_("This cannot be undone."),
+                yes_button_text=_("Cancel Booking"),
+                classes=('confirm', )
+            )
 
     filters = {}
     filters['states'] = tuple(
@@ -89,6 +159,7 @@ def handle_matches(self, request, form):
         'model': self,
         'filters': filters,
         'record_links': record_links,
+        'occasion_links': occasion_links,
         'booking_link': lambda record, name=None: request.class_link(
             Booking, {'id': record.booking_id}, name
         )

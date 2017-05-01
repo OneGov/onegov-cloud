@@ -4,13 +4,8 @@ var handle_reload_from = function(_e, data) {
     var url = new Url(el.data('reload-from'));
     var url_selector = el.data('reload-from-selector');
 
-    var expand = el.find('.toggled').length > 0 && true || false;
-
-    if (!expand && _.has(url.query, 'expand')) {
-        delete url.query.expand;
-    } else if (expand) {
-        url.query.expand = '1';
-    }
+    var has_toggle = el.find('button[data-toggle]').length > 0;
+    var toggled = has_toggle && isToggled(el.find('.toggled'));
 
     // Nobody likes you IE
     url.query.ie_cache_workaround = new Date().getTime();
@@ -21,7 +16,16 @@ var handle_reload_from = function(_e, data) {
 
         loaded.on('reload-from', handle_reload_from);
         Intercooler.processNodes(loaded);
-        loaded.find('button[data-toggle]').toggleButton();
+
+        _.defer(function() {
+            loaded.find('a.confirm').confirmation();
+            setupRedirectAfter(loaded.find('a'));
+        });
+
+        if (has_toggle) {
+            var button = loaded.find('button[data-toggle]');
+            button.toggleButton(toggled);
+        }
     });
 };
 

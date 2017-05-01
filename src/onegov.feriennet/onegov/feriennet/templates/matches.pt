@@ -25,7 +25,7 @@
         <div class="row">
             <div class="columns small-12 medium-8">
                 <tal:block repeat="oid occasions">
-                    <div tal:define="records occasions[oid]" class="matched-occasion matched-state-${records['state']}">
+                    <div tal:define="records occasions[oid]" class="matched-occasion matched-state-${records['state']}" data-reload-from="${request.url}" data-reload-from-selector="#${oid}" id="${oid}">
                         <a href="${activity_link(oid)}">
                             <h3>${records['first'].activity_title}</h3>
                         </a>
@@ -83,7 +83,15 @@
                                         <th i18n:translate>Name</th>
                                         <th i18n:translate>Age</th>
                                         <th i18n:translate>State</th>
-                                        <th></th>
+                                        <th>
+                                            <tal:block
+                                                define="
+                                                    action_id 'action-{}'.format(oid);
+                                                    links occasion_links(oid)
+                                                "
+                                                metal:use-macro="layout.macros.actions_button"
+                                            />
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody tal:condition="not:records['first'].booking_state">
@@ -93,7 +101,7 @@
                                 </tbody>
                                 <tbody tal:condition="records['first'].booking_state">
                                     <tal:block repeat="kind ('accepted', 'other')">
-                                        <tr tal:repeat="record records[kind]" class="booking booking-${kind} ${record.booking_state}">
+                                        <tr tal:repeat="record records[kind]" class="booking booking-${kind} ${record.booking_state}" id="${record.booking_id}">
                                             <td>
                                                 <a tal:condition="not period.confirmed" ic-post-to="${booking_link(record, 'toggle-nobble')}">
                                                     <tal:block metal:use-macro="layout.macros['nobble']" />
