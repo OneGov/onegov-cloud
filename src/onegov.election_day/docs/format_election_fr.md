@@ -245,6 +245,7 @@ Les colonnes suivantes seront évaluées et devraient exister :
 Nom|Description
 ---|---
 `election_absolute_majority`|Majorité absolue de l'élection, seulement si c'est une élection Majorz.
+`election_status`|`unknown`, `interim` or `final`.
 `election_counted_entities`|Nombre de municipalités comptées. Si `election_counted_entities = election_total_entities`, on considère alors que l'élection est entièrement comptée.
 `election_total_entities`|Nombre total de municipalités. Si aucune information précise à propos de la situation de l'élection n'est possible (parce que l'élection a été importée par Wabsti), alors cette valeur est `0`.
 `entity_id`|Numéro BFS de la municipalité. A value of `0` can be used for expats.
@@ -276,10 +277,12 @@ Nom|Description
 
 ### Résultats temporaires
 
-On considère que l'élection n'est pas entièrement comptée, si « election_counted_municipalites » et « election_total_municipalites » ne correspondent pas. Si « election_total_municipalites = 0 », aucune information claire n'est alors possible à propos de la situation de l'élection (parce que l'élection a été importée par Wabsti).
-
 Les municipalités pas encore entièrement comptées ne sont pas incluses dans les fichiers.
 
+If the status is
+- `interim`, the whole election is considered not yet completed
+- `final`, the whole election is considered completed
+- `unknown`, the whole vote is considered completed, if `election_counted_entities` and `election_total_entities` match
 
 ### Modèle
 

@@ -64,7 +64,16 @@ def view_vote_json(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_result_change)
 
+    media = {'maps': {}}
+    if VotesLayout(self, request).pdf_path:
+        media['pdf'] = request.link(self, 'pdf')
+    if request.app.principal.use_maps:
+        for ballot in self.ballots:
+            if VotesLayout(self, request, tab=ballot.type).svg_path:
+                media['maps'][ballot.type] = request.link(ballot, 'svg')
+
     return {
+        'completed': self.completed,
         'date': self.date.isoformat(),
         'domain': self.domain,
         'last_modified': self.last_result_change.isoformat(),
@@ -130,14 +139,7 @@ def view_vote_json(self, request):
             for ballot in self.ballots if request.app.principal.use_maps
 
         },
-        'media': {
-            'pdf': request.link(self, 'pdf'),
-            'maps': {
-                ballot.type: request.link(ballot, 'svg')
-                for ballot in self.ballots if request.app.principal.use_maps
-
-            }
-        } if self.counted else {},
+        'media': media,
         'data': {
             'json': request.link(self, 'data-json'),
             'csv': request.link(self, 'data-csv'),

@@ -32,6 +32,7 @@ Name|Description
 `date`|The date (ISO 8601).
 `domain`|The domain of influence (federation, canton, ...).
 `url`|A link to the detailed view.
+`completed`|True, if the vote or election is completed.
 `progess`|An object containing the number already counted municipalities (`counted`) and the total number of municipalities (`total`).
 
 Vote results contain the following additional information:
@@ -76,6 +77,7 @@ Name|Description
 `election_type`|`proporz` for proportional, `majorz` for majority system.
 `election_mandates`|The number of mandates.
 `election_absolute_majority`|The absolute majority. Only relevant for elections based on majority system.
+`election_status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
 `election_counted_entities`|The number of already counted municipalities.
 `election_total_entities`|The total number of municipalities.
 `entity_name`|The name of the municipality.
@@ -153,6 +155,7 @@ Name|Description
 `date`|The date of the vote (an ISO 8601 date string).
 `shortcode`|Internal shortcode (defines the ordering of votes on the same day).
 `domain`|`federation` for federal, `canton` for cantonal votes.
+`status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
 `type`|`proposal`, `counter-proposal` or `tie-breaker`.
 `group`|The designation of the result. May be the district, the town's name divided by a slash, the city's name and the city's district divided by a slash or simply the town's name. This depends entirely on the canton.
 `entity_id`|The id of the municipality/locale. A value `0` represents the expats.

@@ -63,6 +63,7 @@ def test_get_election_summary(session):
         result = archive.update(election, request)
 
         expected = {
+            'completed': False,
             'date': '2011-01-01',
             'domain': 'federation',
             'elected': [],
@@ -94,6 +95,7 @@ def test_get_vote_summary(session):
 
         expected = {
             'answer': '',
+            'completed': False,
             'date': '2011-01-01',
             'domain': 'federation',
             'last_modified': '2014-01-01T12:00:00+00:00',

@@ -17,6 +17,13 @@ EXPATS = (
 )
 
 
+STATI = (
+    'unknown',
+    'interim',
+    'final',
+)
+
+
 class FileImportError(object):
     __slots__ = ['filename', 'line', 'error']
 

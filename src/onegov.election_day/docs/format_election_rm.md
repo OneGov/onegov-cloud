@@ -248,6 +248,7 @@ Las suandantas colonnas vegnan evaluadas e duessan esser avant maun:
 Num|Descripziun
 ---|---
 `election_absolute_majority`|Maioritad absoluta da l'elecziun, mo tar elecziuns da maiorz.
+`election_status`|`unknown`, `interim` or `final`.
 `election_counted_municipalites`|Dumber da las vischnancas ch'èn dumbradas ora. Sche `election_counted_municipalites = election_total_municipalites`, vala l'elecziun sco dumbrada ora cumplettamain.
 `election_total_municipalites`|Dumber total da vischnancas. Sch'i na po betg vegnir dada ina infurmaziun exacta davart il status da l'elecziun (damai che Wahlt è vegnì importà da Wabsti), è questa valur `0`.
 `entity_bfs_number`|Numer UST da la vischnanca. A value of `0` can be used for expats.
@@ -280,9 +281,12 @@ Num|Descripziun
 
 ### Resultats temporars
 
-L'elecziun vala sco anc betg dumbrada ora, sche `election_counted_municipalites` na correspunda betg a `election_total_municipalites`. En cas da `election_total_municipalites = 0`, na po betg vegnir dada ina infurmaziun exacta davart il status da l'elecziun (damai che Wahlt è vegnì importà da Wabsti).
-
 Las vischnancas che n'èn anc betg dumbradas ora n'èn betg cuntegnidas en las datas.
+
+If the status is
+- `interim`, the whole election is considered not yet completed
+- `final`, the whole election is considered completed
+- `unknown`, the whole vote is considered completed, if `election_counted_entities` and `election_total_entities` match
 
 ### Project
 

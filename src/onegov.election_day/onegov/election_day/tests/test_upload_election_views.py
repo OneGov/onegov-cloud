@@ -3,6 +3,7 @@ import tarfile
 
 from copy import deepcopy
 from datetime import date
+from onegov.ballot import Election
 from onegov.core.utils import module_path
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.tests import login
@@ -18,6 +19,7 @@ HEADER_COLUMNS_INTERNAL = (
     'election_type,'
     'election_mandates,'
     'election_absolute_majority,'
+    'election_status,'
     'election_counted_entities,'
     'election_total_entities,'
     'entity_name,'
@@ -477,6 +479,7 @@ def test_upload_election_wabsti_majorz(election_day_app_sg, tar_file):
     upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'wabsti'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload.form['complete'] = False
     upload = upload.form.submit()
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
@@ -485,6 +488,7 @@ def test_upload_election_wabsti_majorz(election_day_app_sg, tar_file):
     assert all((expected in results for expected in (
         "47.79 %", "304'850", "145'694"
     )))
+    assert "Noch nicht ausgezählt" in results
 
     results = client.get('/election/election/statistics')
     assert all((expected in results for expected in (
@@ -496,7 +500,7 @@ def test_upload_election_wabsti_majorz(election_day_app_sg, tar_file):
         "53'308", "36'282", "54'616"
     )))
 
-    assert archive.query().one().progress == (85, 0)
+    assert archive.query().one().progress == (85, 85)
 
     elected = "ID,Name,Vorname\n3,Rechsteiner,Paul".encode('utf-8')
     upload = client.get('/election/election/upload').follow()
@@ -512,6 +516,7 @@ def test_upload_election_wabsti_majorz(election_day_app_sg, tar_file):
     assert all((expected in results for expected in (
         "1 von 1", "304'850", "47.79 %", "85 von 85"
     )))
+    assert "Noch nicht ausgezählt" not in results
 
     results = client.get('/election/election/statistics')
     assert all((expected in results for expected in (
@@ -536,8 +541,9 @@ def test_upload_election_wabsti_majorz(election_day_app_sg, tar_file):
     assert all((expected in results for expected in (
         "1 von 1", "304'850", "47.79 %", "85 von 85"
     )))
-    results = client.get('/election/election/statistics')
+    assert "Noch nicht ausgezählt" not in results
 
+    results = client.get('/election/election/statistics')
     assert all((expected in results for expected in (
         "144'529", "942", "223", "145'694"
     )))
@@ -727,6 +733,7 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
     upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'wabsti'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload.form['complete'] = False
     upload = upload.form.submit()
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
@@ -735,7 +742,8 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
     assert all((expected in results for expected in (
         "3'240", "10'174", "17'034"
     )))
-    assert archive.query().one().progress == (11, 0)
+    assert "Noch nicht ausgezählt" in results
+    assert archive.query().one().progress == (11, 11)
 
     upload = client.get('/election/election/upload').follow()
     upload.form['file_format'] = 'wabsti'
@@ -751,6 +759,7 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
     assert all((expected in results for expected in (
         "11 von 11", "74'803", "40'200", "53.74 %"
     )))
+    assert "Noch nicht ausgezählt" not in results
 
     results = client.get('/election/election/statistics')
     assert all((expected in results for expected in (
@@ -785,6 +794,7 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
     assert all((expected in results for expected in (
         "11 von 11", "3 von 3", "74'803", "40'200", "53.74 %"
     )))
+    assert "Noch nicht ausgezählt" not in results
 
     results = client.get('/election/election/statistics')
     assert all((expected in results for expected in (
@@ -816,6 +826,7 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
     assert all((expected in results for expected in (
         "11 von 11", "3 von 3", "74'803", "40'200", "53.74 %"
     )))
+    assert "Noch nicht ausgezählt" not in results
 
     results = client.get('/election/election/statistics')
     assert all((expected in results for expected in (
@@ -981,6 +992,7 @@ def test_upload_election_onegov_ballot_fail(election_day_app_gr):
         'election_type',
         'election_mandates',
         'election_absolute_majority',
+        'election_status',
         'election_counted_entities',
         'election_total_entities',
         'entity_name',
@@ -1027,6 +1039,7 @@ def test_upload_election_onegov_ballot_fail(election_day_app_gr):
             'proporz',
             '1',
             '0',
+            'superfinal',
             'one',
             'one',
             'Town',
@@ -1065,6 +1078,7 @@ def test_upload_election_onegov_ballot_fail(election_day_app_gr):
     assert "Ungültige Listenresultate" in upload
     assert "Ungültige Kandidierendendaten" in upload
     assert "Ungültige Kandidierendenresultate" in upload
+    assert "Ungültiger Status" in upload
     assert archive.query().one().progress == (0, 0)
 
     # Missing headers
@@ -1099,7 +1113,7 @@ def test_upload_election_invalidate_cache(election_day_app_gr):
     # Invalid data
     csv = (
         'election_title,election_date,election_type,election_mandates,'
-        'election_absolute_majority,election_counted_entities,'
+        'election_absolute_majority,election_status,election_counted_entities,'
         'election_total_entities,entity_name,'
         'entity_id,entity_elegible_voters,'
         'entity_received_ballots,entity_blank_ballots,'
@@ -1109,7 +1123,7 @@ def test_upload_election_invalidate_cache(election_day_app_gr):
         'list_id,list_number_of_mandates,list_votes,list_connection,'
         'list_connection_parent,candidate_family_name,candidate_first_name,'
         'candidate_id,candidate_elected,candidate_votes\r\n'
-        'Election,2015-03-02,proporz,1,0,1,1,Town,3503,1013,428,2,16,18,410,'
+        'Election,2015-03-02,proporz,1,0,,1,1,Town,3503,1013,428,2,16,18,410,'
         '13,0,2037,Party,1,0,1,5,1,Muster,Peter,1,False,40'
     )
 
@@ -1225,7 +1239,9 @@ def test_upload_election_temporary_results_majorz(election_day_app):
     upload.form['file_format'] = 'wabsti'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     assert 'erfolgreich hochgeladen' in upload.form.submit()
-    assert archive.query().one().progress == (2, 0)
+
+    assert election_day_app.session().query(Election).one().status == 'interim'
+    assert archive.query().one().progress == (2, 11)
 
     result_wabsti = client.get('/election/election/data-csv').text
     assert 'Baar,1701,13567' in result_wabsti
@@ -1234,30 +1250,31 @@ def test_upload_election_temporary_results_majorz(election_day_app):
 
     upload.form['complete'] = True
     assert 'erfolgreich hochgeladen' in upload.form.submit()
-    assert archive.query().one().progress == (2, 2)
+    assert election_day_app.session().query(Election).one().status == 'final'
+    assert archive.query().one().progress == (2, 11)
 
     result_wabsti = client.get('/election/election/data-csv').text
-    assert '2,2,Baar,1701' in result_wabsti
+    assert '2,11,Baar,1701' in result_wabsti
 
-    assert result_sesam == result_wabsti.replace('2,2', '2,11')
+    assert result_sesam == result_wabsti.replace('final', 'unknown')
 
     # Onegov internal: misssing and number of municpalities
     csv = '\n'.join((
         HEADER_COLUMNS_INTERNAL,
         (
-            'majorz,2015-01-01,majorz,7,,2,11,Baar,1701,13567,40,0,0,0,40,18,'
+            'majorz,2015-01-01,majorz,7,,,2,11,Baar,1701,13567,40,0,0,0,40,18,'
             '0,262,,,,0,,,Hegglin,Peter,1,False,36'
         ),
         (
-            'majorz,2015-01-01,majorz,7,,2,11,Baar,1701,13567,40,0,0,0,40,18,'
+            'majorz,2015-01-01,majorz,7,,,2,11,Baar,1701,13567,40,0,0,0,40,18,'
             '0,262,,,,0,,,Hürlimann,Urs,2,False,25'
         ),
         (
-            'majorz,2015-01-01,majorz,7,,2,11,Cham,1702,9620,41,0,1,1,40,6,0,'
+            'majorz,2015-01-01,majorz,7,,,2,11,Cham,1702,9620,41,0,1,1,40,6,0,'
             '274,,,,0,,,Hegglin,Peter,1,False,34'
         ),
         (
-            'majorz,2015-01-01,majorz,7,,2,11,Cham,1702,9620,41,0,1,1,40,6,0,'
+            'majorz,2015-01-01,majorz,7,,,2,11,Cham,1702,9620,41,0,1,1,40,6,0,'
             '274,,,,0,,,Hürlimann,Urs,2,False,28'
         ),
     )).encode('utf-8')
@@ -1370,7 +1387,8 @@ def test_upload_election_temporary_results_proporz(election_day_app):
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload.form['statistics'] = Upload('data.csv', csv_stat, 'text/plain')
     assert 'erfolgreich hochgeladen' in upload.form.submit()
-    assert archive.query().one().progress == (2, 0)
+    assert election_day_app.session().query(Election).one().status == 'interim'
+    assert archive.query().one().progress == (2, 11)
 
     result_wabsti = client.get('/election/election/data-csv').text
     assert 'Baar,1701,14119' in result_wabsti
@@ -1379,33 +1397,34 @@ def test_upload_election_temporary_results_proporz(election_day_app):
 
     upload.form['complete'] = True
     assert 'erfolgreich hochgeladen' in upload.form.submit()
-    assert archive.query().one().progress == (2, 2)
+    assert election_day_app.session().query(Election).one().status == 'final'
+    assert archive.query().one().progress == (2, 11)
 
     result_wabsti = client.get('/election/election/data-csv').text
-    assert '2,2,Baar,1701' in result_wabsti
+    assert '2,11,Baar,1701' in result_wabsti
 
-    assert result_sesam == result_wabsti.replace('2,2', '2,11')
+    assert result_sesam == result_wabsti.replace('final', 'unknown')
 
     # Onegov internal: misssing and number of municpalities
     csv = '\n'.join((
         HEADER_COLUMNS_INTERNAL,
         (
-            'election,2015-01-01,proporz,2,,2,11,Baar,1701,14119,7462,77,196,'
+            'election,2015-01-01,proporz,2,,,2,11,Baar,1701,14119,7462,77,196,'
             '273,7189,122,0,14256,ALG,1,0,1435,,,Lustenberger,Andreas,101,'
             'False,948'
         ),
         (
-            'election,2015-01-01,proporz,2,,2,11,Baar,1701,14119,7462,77,196,'
+            'election,2015-01-01,proporz,2,,,2,11,Baar,1701,14119,7462,77,196,'
             '273,7189,122,0,14256,ALG,1,0,1435,,,Schriber-Neiger,Hanni,102,'
             'False,208'
         ),
         (
-            'election,2015-01-01,proporz,2,,2,11,Cham,1702,9926,4863,0,161,'
+            'election,2015-01-01,proporz,2,,,2,11,Cham,1702,9926,4863,0,161,'
             '161,4702,50,0,9354,ALG,1,0,533,,,Lustenberger,Andreas,101,'
             'False,290'
         ),
         (
-            'election,2015-01-01,proporz,2,,2,11,Cham,1702,9926,4863,0,161,'
+            'election,2015-01-01,proporz,2,,,2,11,Cham,1702,9926,4863,0,161,'
             '161,4702,50,0,9354,ALG,1,0,533,,,Schriber-Neiger,Hanni,102,'
             'False,105'
         ),
@@ -1512,6 +1531,7 @@ def test_upload_communal_election(election_day_app_kriens):
 
     headers = [
         'election_absolute_majority',
+        'election_status',
         'election_counted_entities',
         'election_total_entities',
         'entity_id',
@@ -1540,19 +1560,19 @@ def test_upload_communal_election(election_day_app_kriens):
     csv = '\r\n'.join((
         ','.join(headers),
         (
-            '3294,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
+            '3294,,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
             'Koch,Patrick,1,False,1621'
         ),
         (
-            '3294,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
+            '3294,,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
             'Konrad,Simon,2,False,1707'
         ),
         (
-            '3294,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
+            '3294,,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
             'Faé,Franco,3,False,3176'
         ),
         (
-            '3294,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
+            '3294,,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
             'Vereinzelte,,4,False,82'
         ),
     )).encode('utf-8')
@@ -1588,6 +1608,7 @@ def test_upload_communal_election_districts(election_day_app_bern):
 
     headers = [
         'election_absolute_majority',
+        'election_status',
         'election_counted_entities',
         'election_total_entities',
         'entity_id',
@@ -1616,76 +1637,76 @@ def test_upload_communal_election_districts(election_day_app_bern):
     csv = '\r\n'.join((
         ','.join(headers),
         (
-            '12606,6,6,1,Innere Stadt,15159,5522,265,503,0,0,,,,,,,'
-            'V1,N1,1,True,3596'
+            '12606,,6,6,1,Innere Stadt,15159,5522,265,503,0,0,,,,,,'
+            ',V1,N1,1,True,3596'
         ),
         (
-            '12606,6,6,2,Länggasse/Felsenau,9399,3342,161,333,0,0,,,,,,,'
-            'V1,N1,1,True,2139'
+            '12606,,6,6,2,Länggasse/Felsenau,9399,3342,161,333,0,0,,,,,,'
+            ',V1,N1,1,True,2139'
         ),
         (
-            '12606,6,6,3,Mattenhof/Weissenbühl,12599,4439,184,441,0,0,,,,,,,'
-            'V1,N1,1,True,2827'
+            '12606,,6,6,3,Mattenhof/Weissenbühl,12599,4439,184,441,0,0,,,,,,'
+            ',V1,N1,1,True,2827'
         ),
         (
-            '12606,6,6,4,Kirchenfeld/Schosshalde,18461,6487,289,624,0,0,,,,,,,'
-            'V1,N1,1,True,3647'
+            '12606,,6,6,4,Kirchenfeld/Schosshalde,18461,6487,289,624,0,0,,,,,,'
+            ',V1,N1,1,True,3647'
         ),
         (
-            '12606,6,6,5,Breitenrain/Lorraine,13880,4985,205,466,0,0,,,,,,,'
-            'V1,N1,1,True,3192'
+            '12606,,6,6,5,Breitenrain/Lorraine,13880,4985,205,466,0,0,,,,,,'
+            ',V1,N1,1,True,3192'
         ),
         (
-            '12606,6,6,6,Bümpliz/Bethlehem,12999,4506,170,430,0,0,,,,,,,'
-            'V1,N1,1,True,2227'
+            '12606,,6,6,6,Bümpliz/Bethlehem,12999,4506,170,430,0,0,,,,,,'
+            ',V1,N1,1,True,2227'
         ),
         (
-            '12606,6,6,1,Innere Stadt,15159,5522,265,503,0,0,,,,,,,'
-            'V2,N2,2,False,608'
+            '12606,,6,6,1,Innere Stadt,15159,5522,265,503,0,0,,,,,,'
+            ',V2,N2,2,False,608'
         ),
         (
-            '12606,6,6,2,Länggasse/Felsenau,9399,3342,161,333,0,0,,,,,,,'
-            'V2,N2,2,False,352'
+            '12606,,6,6,2,Länggasse/Felsenau,9399,3342,161,333,0,0,,,,,,'
+            ',V2,N2,2,False,352'
         ),
         (
-            '12606,6,6,3,Mattenhof/Weissenbühl,12599,4439,184,441,0,0,,,,,,,'
-            'V2,N2,2,False,466'
+            '12606,,6,6,3,Mattenhof/Weissenbühl,12599,4439,184,441,0,0,,,,,,'
+            ',V2,N2,2,False,466'
         ),
         (
-            '12606,6,6,4,Kirchenfeld/Schosshalde,18461,6487,289,624,0,0,,,,,,,'
-            'V2,N2,2,False,943'
+            '12606,,6,6,4,Kirchenfeld/Schosshalde,18461,6487,289,624,0,0,,,,,,'
+            ',V2,N2,2,False,943'
         ),
         (
-            '12606,6,6,5,Breitenrain/Lorraine,13880,4985,205,466,0,0,,,,,,,'
-            'V2,N2,2,False,489'
+            '12606,,6,6,5,Breitenrain/Lorraine,13880,4985,205,466,0,0,,,,,,'
+            ',V2,N2,2,False,489'
         ),
         (
-            '12606,6,6,6,Bümpliz/Bethlehem,12999,4506,170,430,0,0,,,,,,,'
-            'V2,N2,2,False,489'
+            '12606,,6,6,6,Bümpliz/Bethlehem,12999,4506,170,430,0,0,,,,,,'
+            ',V2,N2,2,False,489'
         ),
         (
-            '12606,6,6,1,Innere Stadt,15159,5522,265,503,0,0,,,,,,,'
-            'V3,N3,3,False,550'
+            '12606,,6,6,1,Innere Stadt,15159,5522,265,503,0,0,,,,,,'
+            ',V3,N3,3,False,550'
         ),
         (
-            '12606,6,6,2,Länggasse/Felsenau,9399,3342,161,333,0,0,,,,,,,'
-            'V3,N3,3,False,357'
+            '12606,,6,6,2,Länggasse/Felsenau,9399,3342,161,333,0,0,,,,,,'
+            ',V3,N3,3,False,357'
         ),
         (
-            '12606,6,6,3,Mattenhof/Weissenbühl,12599,4439,184,441,0,0,,,,,,,'
-            'V3,N3,3,False,521'
+            '12606,,6,6,3,Mattenhof/Weissenbühl,12599,4439,184,441,0,0,,,,,,'
+            ',V3,N3,3,False,521'
         ),
         (
-            '12606,6,6,4,Kirchenfeld/Schosshalde,18461,6487,289,624,0,0,,,,,,,'
-            'V3,N3,3,False,984'
+            '12606,,6,6,4,Kirchenfeld/Schosshalde,18461,6487,289,624,0,0,,,,,,'
+            ',V3,N3,3,False,984'
         ),
         (
-            '12606,6,6,5,Breitenrain/Lorraine,13880,4985,205,466,0,0,,,,,,,'
-            'V3,N3,3,False,633'
+            '12606,,6,6,5,Breitenrain/Lorraine,13880,4985,205,466,0,0,,,,,,'
+            ',V3,N3,3,False,633'
         ),
         (
-            '12606,6,6,6,Bümpliz/Bethlehem,12999,4506,170,430,0,0,,,,,,,'
-            'V3,N3,3,False,1190'
+            '12606,,6,6,6,Bümpliz/Bethlehem,12999,4506,170,430,0,0,,,,,,'
+            ',V3,N3,3,False,1190'
         ),
     )).encode('utf-8')
 
@@ -1774,6 +1795,7 @@ def test_upload_election_expats_majorz(election_day_app):
                 'election_type,'
                 'election_mandates,'
                 'election_absolute_majority,'
+                'election_status,'
                 'election_counted_entities,'
                 'election_total_entities,'
                 'entity_name,'
@@ -1800,11 +1822,11 @@ def test_upload_election_expats_majorz(election_day_app):
                 'candidate_votes'
             ),
             (
-                'majorz,2015-01-01,majorz,7,,1,12,Auslandschweizer,{},13567'
+                'majorz,2015-01-01,majorz,7,,,1,12,Auslandschweizer,{},13567'
                 ',40,0,0,0,40,18,0,262,,,,0,,,Hegglin,Peter,1,False,36'
             ).format(id_),
             (
-                'majorz,2015-01-01,majorz,7,,1,12,Auslandschweizer,{},13567'
+                'majorz,2015-01-01,majorz,7,,,1,12,Auslandschweizer,{},13567'
                 ',40,0,0,0,40,18,0,262,,,,0,,,Hürlimann,Urs,2,False,25'
             ).format(id_)
         )).encode('utf-8')
@@ -1815,7 +1837,9 @@ def test_upload_election_expats_majorz(election_day_app):
 
         result_onegov = client.get('/election/election/data-csv').text
 
-        assert result_onegov == result_wabsti.replace('1,0', '1,12')
+        assert result_onegov == result_wabsti.replace('1,11', '1,12').replace(
+            'interim', 'unknown'
+        )
 
 
 def test_upload_election_expats_proporz(election_day_app):
@@ -1879,7 +1903,7 @@ def test_upload_election_expats_proporz(election_day_app):
         csv = '\n'.join((
             HEADER_COLUMNS_INTERNAL,
             (
-                'election,2015-01-01,proporz,2,,1,12,Auslandschweizer,{},'
+                'election,2015-01-01,proporz,2,,,1,12,Auslandschweizer,{},'
                 '14119,7462,77,196,273,7189,122,0,14256,ALG,1,0,1435,,,'
                 'Lustenberger,Andreas,101,False,948'
             ).format(id_)
@@ -1891,7 +1915,9 @@ def test_upload_election_expats_proporz(election_day_app):
 
         result_onegov = client.get('/election/election/data-csv').text
 
-        assert result_onegov.replace('1,12', '1,0') == result_wabsti
+        assert result_onegov == result_wabsti.replace('1,11', '1,12').replace(
+            'interim', 'unknown'
+        )
 
 
 def test_upload_election_notify_hipchat(election_day_app):

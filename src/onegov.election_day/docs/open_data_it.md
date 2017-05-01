@@ -31,6 +31,7 @@ Nome|Descrizione
 `date`|La data (ISO 8601).
 `domain`|Il dominio di influenza (federazione, cantone, ...).
 `url`|Un collegamento alla visualizzazione dettagliata.
+`completed`|True, if the vote or election is completed.
 `progess`|Un oggetto contenente il numero dei comuni già contati (`counted`) e il numero totale di comuni (`total`).
 
 I risultati della votazione contengono le seguenti informazioni aggiuntive:
@@ -76,6 +77,7 @@ Nome|Descrizione
 `election_type`|`proporz` per il sistema proporzionale, `majorz` per il sistema maggioritario.
 `election_mandates`|Numero di mandati.
 `election_absolute_majority`|La maggioranza assoluta. Rilevante solo per le elezioni basate sul sistema di maggioranza.
+`election_status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
 `election_counted_entities`|Il numero di comuni già contati.
 `election_total_entities`|Il numero totale dei comuni.
 `entity_name`|Nome del comune.
@@ -152,7 +154,8 @@ Nome|Descrizione
 `title`|Titolo della votazione.
 `date`|Data della votazione (una stringa ISO 8601).
 `shortcode`|Abbreviazione interna (definisce l'ordine di diverse votazioni in un giorno).
-`domain`|`federation` per votazioni federali, `canton` per votazioni cantonali
+`domain`|`federation` per votazioni federali, `canton` per votazioni cantonali.
+`status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
 `type`|`proposal` (progetto), `counter-proposal` (controprogetto) or `tie-breaker` (domanda eventuale).
 `group`|Da dove viene il risultato. Si può trattare del distretto e del comune, separati da una barra, del nome della città e del nome del circolo, anch'essi separati da una barra, o del semplice nome di un comune. Tutto ciò dipende dal rispettivo Cantone.
 `entity_id`|ID del comune/dell'ubicazione. A value `0` represents the expats.

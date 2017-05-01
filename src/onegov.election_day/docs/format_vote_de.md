@@ -88,6 +88,7 @@ Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
 Name|Beschreibung
 ---|---
+`status`|`unknown`, `interim` or `final`.
 `type`|`proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag) or `tie-breaker` (Stichfrage).
 `group`|Woher das Resultat kommt. Das kann der Bezirk und die Gemeinde, getrennt mittels eines Schrägstrichs, der Name der Stadt und der Name des Kreises, ebenfalls getrennt mittels eines Schrägstrichts, oder ein einfacher Gemeinde Name sein. All dies hängt vom jeweiligen Kanton ab.
 `entity_id`|Die ID der Gemeinde. Der Wert `0` steht für Auslandschweizer.
@@ -104,6 +105,11 @@ Name|Beschreibung
 Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedinungen zutrifft:
 - `counted = false`
 - die Gemeinde ist nicht in den Resultaten enthalten
+
+Falls der Status
+- `interim` ist, gilt die Abstimmung als noch nicht abgeschlossen
+- `final` ist, gilt die Abstimmung als abgeschlossen
+- `unknown` ist, gilt die Abstimmung als abgeschlossen, falls alle (erwarteten) Gemeinden ausgezählt sind
 
 ### Vorlage
 

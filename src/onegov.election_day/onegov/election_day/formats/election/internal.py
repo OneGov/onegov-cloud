@@ -9,12 +9,14 @@ from onegov.election_day import _
 from onegov.election_day.formats import EXPATS
 from onegov.election_day.formats import FileImportError
 from onegov.election_day.formats import load_csv
+from onegov.election_day.formats import STATI
 from onegov.election_day.formats.election import clear_election
 from uuid import uuid4
 
 
 HEADERS = [
     'election_absolute_majority',
+    'election_status',
     'election_counted_entities',
     'election_total_entities',
     'entity_id',
@@ -43,14 +45,18 @@ def parse_election(line, errors):
     counted = 0
     total = 0
     absolute_majority = None
+    status = None
     try:
         if line.election_absolute_majority:
             absolute_majority = int(line.election_absolute_majority or 0)
         counted = int(line.election_counted_entities or 0)
         total = int(line.election_total_entities or 0)
+        status = line.election_status or 'unknown'
     except ValueError:
         errors.append(_("Invalid election values"))
-    return counted, total, absolute_majority
+    if status not in STATI:
+        errors.append(_("Invalid status"))
+    return counted, total, absolute_majority, status
 
 
 def parse_election_result(line, errors, entities):
@@ -228,11 +234,14 @@ def import_file(entities, election, file, mimetype):
     counted = 0
     total = 0
     absolute_majority = None
+    status = None
     for line in csv.lines:
         line_errors = []
 
         # Parse the line
-        counted, total, absolute_majority = parse_election(line, line_errors)
+        counted, total, absolute_majority, status = parse_election(
+            line, line_errors
+        )
         result = parse_election_result(line, line_errors, entities)
         candidate = parse_candidate(line, line_errors)
         candidate_result = parse_candidate_result(line, line_errors)
@@ -294,6 +303,7 @@ def import_file(entities, election, file, mimetype):
 
         if absolute_majority is not None:
             election.absolute_majority = absolute_majority
+        election.status = status
         election.counted_entities = counted
         election.total_entities = total
 

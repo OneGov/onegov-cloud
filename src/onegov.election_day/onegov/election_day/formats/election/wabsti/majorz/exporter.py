@@ -341,10 +341,11 @@ def import_exporter_files(election, district, number, entities,
             1 for value in added_entities.values() if value['counted']
         ])
         election.total_entities = max(len(entities), len(added_results.keys()))
+        election.status = 'unknown'
         if complete == 1:
-            election.total_entities = 0
+            election.status = 'interim'
         if complete == 2:
-            election.total_entities = election.counted_entities
+            election.status = 'final'
 
         for candidate in added_candidates.values():
             election.candidates.append(candidate)

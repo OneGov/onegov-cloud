@@ -704,7 +704,7 @@ class MediaGenerator():
         for locale in self.app.locales:
             for item in items:
                 filename = pdf_filename(item, locale)
-                if (self.force or filename not in existing) and item.counted:
+                if (self.force or filename not in existing) and item.completed:
                     path = '{}/{}'.format(self.pdf_dir, filename)
                     if fs.exists(path):
                         fs.remove(path)

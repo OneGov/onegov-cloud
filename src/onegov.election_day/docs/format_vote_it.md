@@ -84,6 +84,7 @@ Saranno prese in considerazione le seguenti colonne e devono essere presenti:
 
 Nome|Descrizione
 ---|---
+`status`|`unknown`, `interim` or `final`.
 `type`|`proposal` (progetto), `counter-proposal` (controprogetto) or `tie-breaker` (domanda eventuale).
 `group`|Da dove viene il risultato. Si può trattare del distretto e del comune, separati da una barra, del nome della città e del nome del circolo, anch'essi separati da una barra, o del semplice nome di un comune. Tutto ciò dipende dal rispettivo Cantone.
 `entity_id`|ID del comune/dell'ubicazione. A value `0` represents the expats.
@@ -100,6 +101,11 @@ Nome|Descrizione
 Municipalities are deemed not to have been counted yet if one of the following two conditions apply:
 - `counted = false`
 - the municipality is not included in the results
+
+If the status is
+- `interim`, the whole vote is considered not yet completed
+- `final`, the whole vote is considered completed
+- `unknown`, the whole vote is considered completed, if all (expected) municipalities are counted
 
 ### Modello
 

@@ -203,7 +203,7 @@ def import_file(entities, election, file, mimetype,
 
         election.number_of_mandates = mandates
         election.counted_entities = len(results)
-        election.total_entities = 0
+        election.total_entities = max(len(entities), len(results))
 
         for candidate in candidates.values():
             election.candidates.append(candidate)

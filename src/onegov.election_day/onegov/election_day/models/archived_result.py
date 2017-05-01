@@ -215,6 +215,18 @@ class ArchivedResult(Base, DomainOfInfluenceMixin, MetaMixin, TimestampMixin):
             self.meta = {}
         self.meta['counted'] = value
 
+    @property
+    def completed(self):
+        """ True, if the vote or election has been completed. """
+
+        return (self.meta or {}).get('completed', False)
+
+    @completed.setter
+    def completed(self, value):
+        if self.meta is None:
+            self.meta = {}
+        self.meta['completed'] = value
+
     def copy_from(self, source):
         self.date = source.date
         self.last_result_change = source.last_result_change

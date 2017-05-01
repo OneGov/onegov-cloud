@@ -28,15 +28,20 @@ def view_election_json(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_result_change)
 
+    media = {'charts': {}}
+    if ElectionsLayout(self, request).pdf_path:
+        media['pdf'] = request.link(self, 'pdf')
+    for tab in ('candidates', 'lists', 'connections', 'panachage', 'parties'):
+        if ElectionsLayout(self, request, tab=tab).svg_path:
+            media['charts'][tab] = request.link(self, '{}-svg'.format(tab))
+
     embed = {'candidates': request.link(self, 'candidates-chart')}
-    charts = {'candidates': request.link(self, 'candidates-svg')}
-    layout = ElectionsLayout(self, request)
     for item in ('lists', 'connections', 'panachage', 'parties'):
-        if layout.visible(item):
+        if ElectionsLayout(self, request).visible(item):
             embed[item] = request.link(self, '{}-chart'.format(item))
-            charts[item] = request.link(self, '{}-svg'.format(item))
 
     data = {
+        'completed': self.completed,
         'date': self.date.isoformat(),
         'domain': self.domain,
         'last_modified': self.last_result_change.isoformat(),
@@ -78,10 +83,7 @@ def view_election_json(self, request):
         'election_type': self.type,
         'url': request.link(self),
         'embed': embed,
-        'media': {
-            'pdf': request.link(self, 'pdf'),
-            'charts': charts
-        } if self.counted else {},
+        'media': media,
         'data': {
             'json': request.link(self, 'data-json'),
             'csv': request.link(self, 'data-csv'),

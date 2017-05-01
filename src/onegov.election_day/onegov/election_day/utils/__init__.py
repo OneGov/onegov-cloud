@@ -30,6 +30,7 @@ def get_election_summary(election, request, url=None):
         last_modified = last_modified.isoformat()
 
     return {
+        'completed': election.completed,
         'date': election.date.isoformat(),
         'domain': election.domain,
         'elected': election.elected_candidates,
@@ -59,6 +60,7 @@ def get_vote_summary(vote, request, url=None):
 
     summary = {
         'answer': vote.answer or "",
+        'completed': vote.completed,
         'date': vote.date.isoformat(),
         'domain': vote.domain,
         'last_modified': last_modified,

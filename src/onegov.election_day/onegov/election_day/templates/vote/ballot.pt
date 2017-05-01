@@ -1,10 +1,10 @@
-<div metal:use-macro="layout.base" i18n:domain="onegov.election_day" tal:define="counted layout.counted">
+<div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
     <tal:block metal:fill-slot="before-content">
         <div metal:use-macro="layout.macros['vote_header']" />
     </tal:block>
     <tal:block metal:fill-slot="content" tal:define="ballot layout.ballot">
 
-        <div metal:use-macro="layout.macros['temporary_results_callout']" tal:define="last_change vote.last_result_change; counted vote.ballots and counted" />
+        <div metal:use-macro="layout.macros['temporary_results_callout']" tal:define="item vote" />
 
         <tal:block tal:condition="layout.visible()">
 
@@ -54,9 +54,9 @@
                 <tbody>
                     <tr class="total static" tal:condition="layout.summarize">
                         <td i18n:translate="">Total</td>
-                        <td class="answer" tal:condition="not:counted" i18n:translate="">Not yet counted.</td>
-                        <td class="answer accepted" tal:condition="counted and ballot.accepted" i18n:translate="">Accepted</td>
-                        <td class="answer rejected" tal:condition="counted and not ballot.accepted" i18n:translate="">Rejected</td>
+                        <td class="answer" tal:condition="not:vote.completed" i18n:translate="">Not yet counted.</td>
+                        <td class="answer accepted" tal:condition="vote.completed and ballot.accepted" i18n:translate="">Accepted</td>
+                        <td class="answer rejected" tal:condition="vote.completed and not ballot.accepted" i18n:translate="">Rejected</td>
                         <td class="right-aligned">${layout.format_number(ballot.yeas)}</td>
                         <td class="right-aligned">${layout.format_number(ballot.nays)}</td>
                         <td class="right-aligned">${layout.format_number(ballot.empty)}</td>
@@ -85,9 +85,9 @@
 
                     <tr class="total static" tal:condition="layout.summarize">
                         <td i18n:translate="">Total</td>
-                        <td class="answer" tal:condition="not:counted" i18n:translate="">Not yet counted.</td>
-                        <td class="answer accepted" tal:condition="counted and ballot.accepted" i18n:translate="">Accepted</td>
-                        <td class="answer rejected" tal:condition="counted and not ballot.accepted" i18n:translate="">Rejected</td>
+                        <td class="answer" tal:condition="not:vote.completed" i18n:translate="">Not yet counted.</td>
+                        <td class="answer accepted" tal:condition="vote.completed and ballot.accepted" i18n:translate="">Accepted</td>
+                        <td class="answer rejected" tal:condition="vote.completed and not ballot.accepted" i18n:translate="">Rejected</td>
                         <td class="right-aligned">${layout.format_number(ballot.yeas)}</td>
                         <td class="right-aligned">${layout.format_number(ballot.nays)}</td>
                         <td class="right-aligned">${layout.format_number(ballot.empty)}</td>

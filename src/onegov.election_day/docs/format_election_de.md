@@ -247,6 +247,7 @@ Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 Name|Beschreibung
 ---|---
 `election_absolute_majority`|Absolutes Mehr der Wahl, nur falls Majorzwahl.
+`election_status`|`unknown`, `interim` oder `final`.
 `election_counted_entities`|Anzahl ausgezählter Gemeinden. Falls `election_counted_entities = election_total_entities` ist, gilt die Wahl als fertig ausgezählt.
 `election_total_entities`|Totale Anzahl Gemeinden. Falls keine eindeutige Auskunft über den Status der Wahl möglich ist (da die Wahl von Wabsti importiert wurde), ist dieser Wert `0`.
 `entity_id`|BFS Nummer der Gemeinde. Der Wert `0` kann für Auslandslebende verwendet werden.
@@ -270,7 +271,7 @@ Name|Beschreibung
 
 #### Panaschierdaten
 
-Die Resultaten können Panaschierdaten enthlaten, indem pro Liste eine Spalte hinzugefügt wird:
+Die Resultaten können Panaschierdaten enthalten, indem pro Liste eine Spalte hinzugefügt wird:
 
 Name|Beschreibung
 ---|---
@@ -278,9 +279,12 @@ Name|Beschreibung
 
 ### Temporäre Resultate
 
-Die Wahl gilt als noch nicht ausgezählt, falls `election_counted_municipalites` und `election_total_municipalites` nicht übereinstimmen. Falls `election_total_municipalites = 0` ist, ist keine eindeutige Auskunft über den Status der Wahl möglich ist (da die Wahl von Wabsti importiert wurde).
-
 Noch nicht ausgezählte Gemeinden sind nicht in den Daten enthalten.
+
+Falls der Status
+- `interim` ist, gilt die Abstimmung als noch nicht abgeschlossen
+- `final` ist, gilt die Abstimmung als abgeschlossen
+- `unknown` ist, gilt die Abstimmung als abgeschlossen, falls alle `election_counted_entities` und `election_total_entities` übereinstimmen
 
 
 ### Vorlage

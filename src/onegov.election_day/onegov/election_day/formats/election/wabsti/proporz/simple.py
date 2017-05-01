@@ -367,7 +367,7 @@ def import_file(entities, election, file, mimetype,
         clear_election(election)
 
         election.counted_entities = len(results)
-        election.total_entities = 0
+        election.total_entities = max(len(entities), len(results))
 
         for connection in connections.values():
             election.list_connections.append(connection)

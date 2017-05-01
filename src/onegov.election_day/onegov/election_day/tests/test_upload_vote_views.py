@@ -645,12 +645,12 @@ def test_upload_vote_temporary_results(election_day_app):
     # onegov: missing or counted=False
     csv = '\n'.join((
         (
-            'type,group,entity_id,counted,yeas,nays,invalid,empty,'
+            'status,type,group,entity_id,counted,yeas,nays,invalid,empty,'
             'elegible_voters'
         ),
-        'proposal,Baar,1701,False,0,0,0,0,0',
-        'proposal,Oberägeri,1706,True,811,1298,0,18,3560',
-        'proposal,Unterägeri,1709,True,1096,2083,1,18,5245',
+        ',proposal,Baar,1701,False,0,0,0,0,0',
+        ',proposal,Oberägeri,1706,True,811,1298,0,18,3560',
+        ',proposal,Unterägeri,1709,True,1096,2083,1,18,5245',
     )).encode('utf-8')
     upload = client.get('/vote/vote/upload')
     upload.form['file_format'] = 'internal'
@@ -855,10 +855,10 @@ def test_upload_vote_with_expats(election_day_app):
         # onegov
         csv = '\n'.join((
             (
-                'type,group,entity_id,counted,yeas,nays,invalid,empty,'
+                'status,type,group,entity_id,counted,yeas,nays,invalid,empty,'
                 'elegible_voters'
             ),
-            'proposal,Auslandschweizer,{},True,10,20,0,0,30'.format(id_),
+            ',proposal,Auslandschweizer,{},True,10,20,0,0,30'.format(id_),
         )).encode('utf-8')
         upload = client.get('/vote/vote/upload')
         upload.form['file_format'] = 'internal'

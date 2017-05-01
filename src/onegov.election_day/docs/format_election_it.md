@@ -245,6 +245,7 @@ Saranno prese in considerazione le seguenti colonne e devono essere presenti:
 Nome|Descrizione
 ---|---
 `election_absolute_majority`|Maggioranza assoluta delle elezioni, solo se elezione con sistema maggioritario.
+`election_status`|`unknown`, `interim` or `final`.
 `election_counted_entities`|Numero di comuni scrutinati. Se `election_counted_entities = election_total_entities`, allora l'elezione è considerata completamente scrutinata.
 `election_total_entities`|Numero totale dei comuni. Se non sono disponibili notizie certe sullo stato dell'elezione (perché l'elezione è stata importata da Wabsti) allora questo valore è `0`.
 `entity_id`|Numero BFS del comune. A value of `0` can be used for expats.
@@ -276,10 +277,12 @@ Nome|Descrizione
 
 ### Risultati temporanei
 
-L'elezione è considerata non ancora del tutto scrutinata se "election_counted_municipalites" e "election_total_municipalites" non corrispondono. Se "election_total_municipalites = 0" allora non è disponibile un'informazione certa sullo stato dell'elezione (perché l'elezione è stata importata da Wabsti).
-
 I comuni non ancora completamente scrutinati non sono inclusi nei file.
 
+If the status is
+- `interim`, the whole election is considered not yet completed
+- `final`, the whole election is considered completed
+- `unknown`, the whole vote is considered completed, if `election_counted_entities` and `election_total_entities` match
 
 ### Modello
 

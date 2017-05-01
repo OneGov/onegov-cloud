@@ -125,7 +125,6 @@ def test_elections_layout(session):
     assert not layout.proporz
     assert layout.main_view == 'Election/candidates'
     assert not layout.has_results
-    assert not layout.counted
     assert list(layout.menu) == []
 
     layout = ElectionsLayout(Election(type='proporz'), DummyRequest())
@@ -133,7 +132,6 @@ def test_elections_layout(session):
     assert layout.proporz
     assert layout.main_view == 'Election/lists'
     assert not layout.has_results
-    assert not layout.counted
     assert list(layout.menu) == []
 
     with freeze_time("2014-01-01 12:00"):
@@ -207,7 +205,6 @@ def test_votes_layout(session):
     assert layout.title('data') == 'Downloads'
 
     assert not layout.has_results
-    assert not layout.counted
     assert list(layout.menu) == []
 
     with freeze_time("2014-01-01 12:00"):

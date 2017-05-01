@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds status/completed to elections and votes.
+  [msom]
+
 - Allows to specify the language when uploading WabstiCExport files.
   [msom]
 

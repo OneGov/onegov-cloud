@@ -343,11 +343,16 @@ def test_archived_result(session):
     result.counted = True
     assert result.counted == True
 
+    assert result.completed == False
+    result.completed = True
+    assert result.completed == True
+
     assert result.meta == {
         'answer': 'rejected',
         'nays_percentage': 20.5,
         'yeas_percentage': 79.5,
         'counted': True,
+        'completed': True,
         'elected_candidates': [('Joe', 'Quimby')]
     }
 
@@ -384,11 +389,13 @@ def test_archived_result(session):
     assert copied.nays_percentage == 20.5
     assert copied.yeas_percentage == 79.5
     assert copied.counted == True
+    assert copied.completed == True
     assert copied.meta == {
         'answer': 'rejected',
         'nays_percentage': 20.5,
         'yeas_percentage': 79.5,
         'counted': True,
+        'completed': True,
         'elected_candidates': [('Joe', 'Quimby')]
     }
     assert copied.shortcode == 'shortcode'
@@ -586,6 +593,7 @@ def test_webhook_notification(session):
             assert headers['Content-length'] == len(data)
 
             assert json.loads(data.decode('utf-8')) == {
+                'completed': False,
                 'date': '2011-01-01',
                 'domain': 'federation',
                 'elected': [],
@@ -607,6 +615,7 @@ def test_webhook_notification(session):
 
             assert json.loads(data.decode('utf-8')) == {
                 'answer': '',
+                'completed': False,
                 'date': '2011-01-01',
                 'domain': 'federation',
                 'last_modified': '2008-01-01T00:00:00+00:00',

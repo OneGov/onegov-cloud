@@ -84,6 +84,7 @@ The following columns will be evaluated and should exist at the least:
 
 Name|Description
 ---|---
+`status`|`unknown`, `interim` or `final`.
 `type`|`proposal`, `counter-proposal` or `tie-breaker`.
 `group`|Where the result comes from. This can be the region and municipality (separated by a forward slash), the name of the city and name of the district (likewise separated by a forward slash) or a simple municipality name. This all depends on the respective canton.
 `entity_id`|The municipality number (BFS number). A value of `0` can be used for expats.
@@ -99,6 +100,11 @@ Name|Description
 Municipalities are deemed not to have been counted yet if one of the following two conditions apply:
 - `counted = false`
 - the municipality is not included in the results
+
+If the status is
+- `interim`, the whole vote is considered not yet completed
+- `final`, the whole vote is considered completed
+- `unknown`, the whole vote is considered completed, if all (expected) municipalities are counted
 
 ### Template
 

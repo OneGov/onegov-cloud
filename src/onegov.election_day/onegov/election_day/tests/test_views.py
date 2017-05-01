@@ -3,6 +3,7 @@ import transaction
 
 from datetime import date
 from freezegun import freeze_time
+from onegov.ballot import Ballot
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.models import Subscriber
 from onegov.election_day.tests import login
@@ -10,8 +11,8 @@ from onegov.election_day.tests import upload_majorz_election
 from onegov.election_day.tests import upload_proporz_election
 from onegov.election_day.tests import upload_vote
 from onegov.testing import utils
-from webtest import TestApp as Client
 from unittest.mock import patch
+from webtest import TestApp as Client
 
 
 COLUMNS = [
@@ -665,7 +666,9 @@ def test_view_svg(election_day_app):
     upload_proporz_election(client, canton='zg')
 
     paths = (
-        client.get('/vote/vote/json').json['media']['maps']['proposal'],
+        '/ballot/{}/svg'.format(
+            election_day_app.session().query(Ballot).one().id
+        ),
         '/election/majorz-election/candidates-svg',
         '/election/proporz-election/lists-svg',
         '/election/proporz-election/candidates-svg',

@@ -247,6 +247,7 @@ The following columns will be evaluated and should exist:
 Name|Description
 ---|---
 `election_absolute_majority`|Absolute majority of the election, only if Majorz election.
+`election_status`|`unknown`, `interim` or `final`.
 `election_counted_entities`|Number of counted municipalities. If `election_counted_entities = election_total_entities`, then the election is considered completely counted.
 `election_total_entities`|Total number of municipalities. If no definite information about the status of the election is possible (because the election was imported by Wabsti), then this value is `0`.
 `entity_id`|BFS number of the municipality. A value of `0` can be used for expats.
@@ -278,9 +279,13 @@ Name|Description
 
 ### Temporary results
 
-The election is considered not yet completely counted, if `election_counted_entities` and `election_total_entities` are not a match. If  `election_total_entities = 0`, then no clear information is possible about the status of the election (because the election was imported by Wabsti).
-
 Not yet completely counted municipalities are not included in the files.
+
+If the status is
+- `interim`, the whole election is considered not yet completed
+- `final`, the whole election is considered completed
+- `unknown`, the whole vote is considered completed, if `election_counted_entities` and `election_total_entities` match
+
 
 ### Template
 

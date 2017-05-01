@@ -76,8 +76,7 @@ def view_upload_majorz_election(self, request, form):
                     form.elected.data['mimetype'] if elected else None,
                 )
                 self.absolute_majority = form.majority.data
-                if form.complete.data:
-                    self.total_entities = self.counted_entities
+                self.status = 'final' if form.complete.data else 'interim'
             elif form.file_format.data == 'wabsti_c':
                 for source in self.data_sources:
                     errors.extend(
@@ -176,8 +175,7 @@ def view_upload(self, request, form):
                     form.statistics.raw_data[0].file if stats else None,
                     form.statistics.data['mimetype'] if stats else None
                 )
-                if form.complete.data:
-                    self.total_entities = self.counted_entities
+                self.status = 'final' if form.complete.data else 'interim'
             elif form.file_format.data == 'wabsti_c':
                 for source in self.data_sources:
                     errors.extend(

@@ -152,6 +152,8 @@ class ArchivedResultCollection(object):
         result.last_result_change = item.last_result_change
         result.meta = {}
         result.meta['id'] = item.id
+        result.meta['counted'] = item.counted
+        result.meta['completed'] = item.completed
 
         if isinstance(item, Election):
             result.type = 'election'
@@ -163,7 +165,6 @@ class ArchivedResultCollection(object):
             result.type = 'vote'
             result.counted_entities, result.total_entities = item.progress
             result.meta['answer'] = item.answer
-            result.meta['counted'] = item.counted
             result.meta['nays_percentage'] = item.nays_percentage
             result.meta['yeas_percentage'] = item.yeas_percentage
 

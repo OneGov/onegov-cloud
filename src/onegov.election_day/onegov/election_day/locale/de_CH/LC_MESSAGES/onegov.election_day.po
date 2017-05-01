@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-26 09:26+0200\n"
+"POT-Creation-Date: 2017-04-28 16:02+0200\n"
 "PO-Revision-Date: 2017-04-24 11:08+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -102,6 +102,9 @@ msgstr "Ungültige Werte"
 
 msgid "Results"
 msgstr "Resultate"
+
+msgid "Invalid status"
+msgstr "Ungültiger Status"
 
 msgid "Invalid election values"
 msgstr "Ungültige Wahldaten"

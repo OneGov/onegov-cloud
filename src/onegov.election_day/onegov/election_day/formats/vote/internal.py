@@ -4,12 +4,14 @@ from onegov.election_day import _
 from onegov.election_day.formats import EXPATS
 from onegov.election_day.formats import FileImportError
 from onegov.election_day.formats import load_csv
+from onegov.election_day.formats import STATI
 from onegov.election_day.formats.vote import BALLOT_TYPES
 from onegov.election_day.formats.vote import clear_ballot
 from onegov.election_day.formats.vote import guessed_group
 
 
 HEADERS = [
+    'status',
     'type',
     'group',
     'entity_id',
@@ -38,10 +40,15 @@ def import_file(entities, vote, file, mimetype):
     added_entity_ids = {}
     added_groups = {}
     ballot_types = set()
+    status = 'unknown'
 
     for line in csv.lines:
 
         line_errors = []
+
+        status = line.status or 'unknown'
+        if status not in STATI:
+            line_errors.append(_("Invalid status"))
 
         ballot_type = line.type
         if ballot_type not in BALLOT_TYPES:
@@ -162,6 +169,8 @@ def import_file(entities, vote, file, mimetype):
 
     if not any((len(results) for results in ballot_results.values())):
         return [FileImportError(_("No data found"))]
+
+    vote.status = status
 
     for ballot_type in ballot_types:
         remaining = (

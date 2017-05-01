@@ -198,12 +198,6 @@ class ElectionsLayout(Layout):
         return False
 
     @cached_property
-    def counted(self):
-        if self.has_results and self.model.counted:
-            return True
-        return False
-
-    @cached_property
     def summarize(self):
         return self.model.total_entities != 1
 
@@ -308,17 +302,16 @@ class VotesLayout(Layout):
 
     @cached_property
     def has_results(self):
-        if self.model.ballots.first():
+        proposal = self.model.ballots.first()
+        if not proposal:
+            return False
+        if proposal.results.first():
             return True
         return False
 
     @cached_property
     def counter_proposal(self):
         return self.model.counter_proposal
-
-    @cached_property
-    def counted(self):
-        return self.has_results and self.model.counted
 
     @cached_property
     def summarize(self):

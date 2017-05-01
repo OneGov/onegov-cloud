@@ -159,11 +159,11 @@
 </metal:tab_menu>
 
 <metal:temporary_results_callout define-macro="temporary_results_callout" i18n:domain="onegov.election_day">
-    <div class="panel callout radius" tal:condition="not:counted">
+    <div class="panel callout radius" tal:condition="not:item.completed">
          <h5 i18n:translate="">Not yet counted.</h5>
          <p>
              <span i18n:translate="">Last change</span>:
-             <strong>${layout.format_date(last_change, 'relative')}</strong>
+             <strong>${layout.format_date(item.last_change, 'relative')}</strong>
          </p>
     </div>
 </metal:temporary_results_callout>

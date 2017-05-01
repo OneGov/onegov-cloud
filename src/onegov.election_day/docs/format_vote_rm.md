@@ -86,6 +86,7 @@ Las suandantas colonnas vegnan evaluadas e ston almain esser avant maun:
 
 Num|Descripziun
 ---|---
+`status`|`unknown`, `interim` or `final`.
 `type`|`proposal` (proposta), `counter-proposal` (cuntraproposta) or "tie-breaker" (dumonda decisiva).
 `group`|La derivanza dal resultat. Quai po esser il district e la vischnanca, separads cun in stritg diagonal, il num da la citad ed il num dal circul, er separads cun in stritg diagonal, u simplamain il num da la vischnanca. Quai dependa dal chantun respectiv.
 `entity_id`|La ID da la vischnanca/dal lieu. A value `0` represents the expats.
@@ -102,6 +103,11 @@ Num|Descripziun
 Municipalities are deemed not to have been counted yet if one of the following two conditions apply:
 - `counted = false`
 - the municipality is not included in the results
+
+If the status is
+- `interim`, the whole vote is considered not yet completed
+- `final`, the whole vote is considered completed
+- `unknown`, the whole vote is considered completed, if all (expected) municipalities are counted
 
 ### Project
 

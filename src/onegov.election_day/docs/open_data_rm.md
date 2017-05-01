@@ -31,6 +31,7 @@ Num|Descripziun
 `date`|La data (ISO 8601).
 `domain`|Champ d'influenza (confederaziun, chantun, ...).
 `url`|In link a la vista detagliada.
+`completed`|True, if the vote or election is completed.
 `progess`|In object che cuntegna il dumber da las vischnancas dumbradas ora (`counted`) ed il dumber total da vischnancas (`total`).
 
 Ils resultats da la votaziun cuntegnan las suandantas infurmaziuns supplementaras:
@@ -76,6 +77,7 @@ Num|Descripziun
 `election_type`|`proporz` en cas d'ina elecziun da proporz, `majorz` en cas d'ina elecziun da maiorz
 `election_mandates`|Il dumber dals sezs.
 `election_absolute_majority`|La maioritad absoluta. Mo tar elecziuns da maiorz.
+`election_status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
 `election_counted_entities`|Il dumber da vischnancas ch'èn dumbradas ora.
 `election_total_entities`|Il dumber total da vischnancas.
 `entity_name`|Il num da la vischnanca/dal lieu
@@ -152,7 +154,8 @@ Num|Descripziun
 `title`|Titel da la votaziun.
 `date`|La data da la votaziun (sco segns ISO 8601).
 `shortcode`|Scursanida interna (definescha la successiun da pliras votaziuns che han lieu il medem di).
-`domain`|`federation` per votaziuns naziunalas, `canton` per votaziuns chantunalas
+`domain`|`federation` per votaziuns naziunalas, `canton` per votaziuns chantunalas.
+`status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
 `type`|`proposal` (proposta), `counter-proposal` (cuntraproposta) or "tie-breaker" (dumonda decisiva).
 `group`|La derivanza dal resultat. Quai po esser il district e la vischnanca, separads cun in stritg diagonal, il num da la citad ed il num dal circul, er separads cun in stritg diagonal, u simplamain il num da la vischnanca. Quai dependa dal chantun respectiv.
 `entity_id`|La ID da la vischnanca/dal lieu. A value `0` represents the expats.
