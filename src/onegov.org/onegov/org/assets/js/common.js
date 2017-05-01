@@ -1,13 +1,17 @@
 // intercooler has the abilty to redirect depending on response headers
 // we'd like for it to do the same with our own 'redirect-after' attribute
-$('a').on('success.ic', function(_event, el) {
-    var redirect_after = $(el).attr('redirect-after');
-    if (!_.isUndefined(redirect_after)) {
-        window.location = redirect_after;
-    }
+var setupRedirectAfter = function(elements) {
+    elements.on('success.ic', function(_event, el) {
+        var redirect_after = $(el).attr('redirect-after');
+        if (!_.isUndefined(redirect_after)) {
+            window.location = redirect_after;
+        }
 
-    return true;
-});
+        return true;
+    });
+};
+
+setupRedirectAfter($('a'));
 
 // show the new content placeholder when hovering over the add content dropdown
 $('.show-new-content-placeholder')

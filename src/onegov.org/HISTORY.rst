@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to force the button toggle state through javascript.
+  [href]
+
 0.5.2 (2017-04-27)
 ~~~~~~~~~~~~~~~~~~~
 

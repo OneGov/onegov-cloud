@@ -42,16 +42,22 @@ var clickToggled = function() {
     ensureToggled(button, target, !isToggled(target));
 };
 
-var ToggleButton = function(button) {
+var ToggleButton = function(button, toggled) {
     var target = $(button.data('toggle'));
-    var toggled = isToggled(target);
+    var toggle = null;
 
-    ensureToggled(button, target, toggled);
+    if (_.isUndefined(toggled)) {
+        toggle = isToggled(target);
+    } else {
+        toggle = toggled;
+    }
+
+    ensureToggled(button, target, toggle);
     button.click(clickToggled);
 };
 
-jQuery.fn.toggleButton = function() {
+jQuery.fn.toggleButton = function(toggled) {
     return this.each(function() {
-        ToggleButton($(this));
+        ToggleButton($(this), toggled);
     });
 };
