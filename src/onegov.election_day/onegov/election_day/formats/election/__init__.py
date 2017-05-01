@@ -19,6 +19,7 @@ def clear_election(election):
     election.counted_entities = 0
     election.total_entities = 0
     election.absolute_majority = None
+    election.status = None
 
     session = object_session(election)
     for connection in election.list_connections:
