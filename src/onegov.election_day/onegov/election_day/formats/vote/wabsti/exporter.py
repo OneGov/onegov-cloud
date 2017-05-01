@@ -221,7 +221,6 @@ def import_exporter_files(vote, district, number, entities,
         vote.status = 'interim'
     if complete == 2:
         vote.status = 'final'
-    import pdb; pdb.set_trace()
 
     for ballot_type in used_ballot_types:
         # Add the missing entities
