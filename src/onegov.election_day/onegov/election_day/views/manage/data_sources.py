@@ -127,7 +127,6 @@ def view_data_source_items(self, request):
         'layout': ManageDataSourceItemsLayout(self, request),
         'title': _("Manage"),
         'items': self.batch,
-        'source': self.source,
         'item_name': self.source.label,
         'source': self.source,
         'new_item': request.link(self, 'new-item')
