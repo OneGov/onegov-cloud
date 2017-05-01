@@ -60,8 +60,10 @@ def view_upload(self, request, form):
                             source.district,
                             source.number,
                             entities,
-                            form.proposal.raw_data[0].file,
-                            form.proposal.data['mimetype']
+                            form.sg_geschaefte.raw_data[0].file,
+                            form.sg_geschaefte.data['mimetype'],
+                            form.sg_gemeinden.raw_data[0].file,
+                            form.sg_gemeinden.data['mimetype']
                         )
                     )
             elif form.file_format.data == 'default':
@@ -90,6 +92,8 @@ def view_upload(self, request, form):
             status = 'error'
             transaction.abort()
         else:
+            # It might be that the vote type setting stored in the meta
+            # is overridden by the import (internal, wabsti, wabsti c)
             if not self.meta:
                 self.meta = {}
             self.meta['vote_type'] = 'simple'

@@ -231,8 +231,8 @@ msgstr "Dateiformat"
 msgid "Complete"
 msgstr "Komplett ausgezählt"
 
-msgid "Proposal / Results / SG_Gemeinden.csv"
-msgstr "Vorlage / Resultate / SG_Gemeinden.csv"
+msgid "Proposal / Results"
+msgstr "Vorlage / Resultate"
 
 msgid "Vote number"
 msgstr "Vorlagen-Nummer"

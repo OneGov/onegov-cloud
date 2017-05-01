@@ -288,18 +288,18 @@ class UploadVoteForm(Form):
         validators=[
             InputRequired()
         ],
-        depends_on=('file_format', '!internal'),
         default='simple'
     )
 
     proposal = UploadField(
-        label=_("Proposal / Results / SG_Gemeinden.csv"),
+        label=_("Proposal / Results"),
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw={'force_simple': True}
+        depends_on=('file_format', '!wabsti_c'),
+        render_kw=dict(force_simple=True)
     )
 
     counter_proposal = UploadField(
@@ -321,6 +321,28 @@ class UploadVoteForm(Form):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'default', 'type', 'complex'),
+        render_kw=dict(force_simple=True)
+    )
+
+    sg_gemeinden = UploadField(
+        label="SG_Gemeinden.csv",
+        validators=[
+            DataRequired(),
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        depends_on=('file_format', 'wabsti_c'),
+        render_kw=dict(force_simple=True)
+    )
+
+    sg_geschaefte = UploadField(
+        label="SG_Geschaefte.csv",
+        validators=[
+            DataRequired(),
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        depends_on=('file_format', 'wabsti_c'),
         render_kw=dict(force_simple=True)
     )
 
@@ -363,6 +385,16 @@ class UploadWabstiVoteForm(Form):
 
     sg_gemeinden = UploadField(
         label="SG_Gemeinden",
+        validators=[
+            DataRequired(),
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        render_kw=dict(force_simple=True)
+    )
+
+    sg_geschaefte = UploadField(
+        label="SG_Geschaefte.csv",
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),

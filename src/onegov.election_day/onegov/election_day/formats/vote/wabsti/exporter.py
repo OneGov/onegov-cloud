@@ -4,10 +4,17 @@ from onegov.election_day import _
 from onegov.election_day.formats import EXPATS
 from onegov.election_day.formats import FileImportError
 from onegov.election_day.formats import load_csv
-from onegov.election_day.formats.vote import clear_ballot
+from onegov.election_day.formats.vote import clear_vote
 
 
-HEADERS = (
+HEADERS_SG_GESCHAEFTE = (
+    'Art',  # domain
+    'SortWahlkreis',
+    'SortGeschaeft',  # vote number
+    'Ausmittlungsstand'
+)
+
+HEADERS_SG_GEMEINDEN = (
     'Art',  # domain
     'SortWahlkreis',
     'SortGeschaeft',  # vote number
@@ -47,7 +54,8 @@ def line_is_relevant(line, domain, district, number):
 
 
 def import_exporter_files(vote, district, number, entities,
-                          file_sg_gemeinden, mimetype):
+                          file_sg_geschaefte, mimetype_sg_geschaefte,
+                          file_sg_gemeinden, mimetype_sg_gemeinden):
     """ Tries to import the files in the given folder.
 
     We assume that the file has been generate using WabstiCExport 2.1.
@@ -55,9 +63,18 @@ def import_exporter_files(vote, district, number, entities,
     """
     errors = []
 
-    # Read the file
-    results, error = load_csv(
-        file_sg_gemeinden, mimetype, expected_headers=HEADERS,
+    # Read the files
+    sg_geschaefte, error = load_csv(
+        file_sg_geschaefte, mimetype_sg_geschaefte,
+        expected_headers=HEADERS_SG_GESCHAEFTE,
+        filename='sg_geschaefte'
+    )
+    if error:
+        return [error]
+
+    sg_gemeinden, error = load_csv(
+        file_sg_gemeinden, mimetype_sg_gemeinden,
+        expected_headers=HEADERS_SG_GEMEINDEN,
         filename='sg_gemeinden'
     )
     if error:
@@ -68,10 +85,33 @@ def import_exporter_files(vote, district, number, entities,
     if (vote.meta or {}).get('vote_typ', 'simple') == 'complex':
         used_ballot_types.extend(['counter-proposal', 'tie-breaker'])
 
-    # Read the results
+    # Parse the vote
+    complete = 0
+    for line in sg_geschaefte.lines:
+        line_errors = []
+
+        if not line_is_relevant(line, vote.domain, district, number):
+            continue
+
+        try:
+            complete = int(line.ausmittlungsstand or 0)
+            assert 0 <= complete <= 3
+        except (ValueError, AssertionError):
+            line_errors.append(_("Invalid values"))
+
+        if line_errors:
+            errors.extend(
+                FileImportError(
+                    error=err, line=line.rownumber, filename='sg_geschaefte'
+                )
+                for err in line_errors
+            )
+            continue
+
+    # Parse the results
     ballot_results = {key: [] for key in used_ballot_types}
     added_entities = []
-    for line in results.lines:
+    for line in sg_gemeinden.lines:
         line_errors = []
 
         if not line_is_relevant(line, vote.domain, district, number):
@@ -174,6 +214,15 @@ def import_exporter_files(vote, district, number, entities,
     if errors:
         return errors
 
+    clear_vote(vote)
+
+    vote.status = 'unknown'
+    if complete == 1:
+        vote.status = 'interim'
+    if complete == 2:
+        vote.status = 'final'
+    import pdb; pdb.set_trace()
+
     for ballot_type in used_ballot_types:
         # Add the missing entities
         remaining = (
@@ -196,8 +245,6 @@ def import_exporter_files(vote, district, number, entities,
             if not ballot:
                 ballot = Ballot(type=ballot_type)
                 vote.ballots.append(ballot)
-
-            clear_ballot(ballot)
 
             for result in ballot_results[ballot_type]:
                 ballot.results.append(result)

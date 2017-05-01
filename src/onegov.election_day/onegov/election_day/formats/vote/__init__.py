@@ -15,6 +15,14 @@ HEADERS = [
 ]
 
 
+def clear_vote(vote):
+    session = object_session(vote)
+    vote.status = None
+    for ballot in vote.ballots:
+        for result in ballot.results:
+            session.delete(result)
+
+
 def clear_ballot(ballot):
     session = object_session(ballot)
     for result in ballot.results:

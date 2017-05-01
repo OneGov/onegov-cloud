@@ -60,6 +60,7 @@ def view_upload_wabsti_vote(self, request):
             --user :<token>
             --header "Accept-Language: de_CH"
             --form "sg_gemeinden=@SG_Gemeinden.csv"
+            --form "sg_geschafte=@SG_Geschaefte.csv"
 
     """
 
@@ -98,6 +99,8 @@ def view_upload_wabsti_vote(self, request):
         entities = self.entities.get(vote.date.year, {})
         errors[vote.id] = import_vote(
             vote, item.district, item.number, entities,
+            form.sg_geschaefte.raw_data[0].file,
+            form.sg_geschaefte.data['mimetype'],
             form.sg_gemeinden.raw_data[0].file,
             form.sg_gemeinden.data['mimetype']
         )

@@ -204,6 +204,7 @@ def import_file(entities, vote, ballot_type, file, mimetype):
         return errors
 
     if ballot_results:
+        vote.status = None
         clear_ballot(ballot)
 
         for result in ballot_results:

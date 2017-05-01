@@ -10,6 +10,9 @@ Changelog
 - Parses the absolute majority when uploading WabstiCExport files.
   [msom]
 
+- Evaluates the completed field of WabstiCExport files.
+  [msom]
+
 - Adds missing expats label in the election districts view of majorz elections.
   [msom]
 

@@ -4,7 +4,7 @@ from onegov.election_day import _
 from onegov.election_day.formats import EXPATS
 from onegov.election_day.formats import FileImportError
 from onegov.election_day.formats import load_csv
-from onegov.election_day.formats.vote import clear_ballot
+from onegov.election_day.formats.vote import clear_vote
 from onegov.election_day.formats.vote import guessed_group
 
 
@@ -174,6 +174,8 @@ def import_file(entities, vote, file, mimetype, vote_number, complex):
     ):
         return [FileImportError(_("No data found"))]
 
+    clear_vote(vote)
+
     for ballot_type in used_ballot_types:
         remaining = (
             entities.keys() - added_entity_ids
@@ -195,8 +197,6 @@ def import_file(entities, vote, file, mimetype, vote_number, complex):
             if not ballot:
                 ballot = Ballot(type=ballot_type)
                 vote.ballots.append(ballot)
-
-            clear_ballot(ballot)
 
             for result in ballot_results[ballot_type]:
                 ballot.results.append(result)
