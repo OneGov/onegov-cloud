@@ -21,11 +21,11 @@
                     </div>
                 </div>
 
-                <p tal:condition="not:votes" i18n:translate>
+                <p tal:condition="not:groups" i18n:translate>
                     No votes yet.
                 </p>
 
-                <table class="votes stackable" tal:condition="votes">
+                <table class="votes stackable" tal:condition="groups">
                     <thead>
                         <tr>
                             <th i18n:translate>Vote</th>
@@ -36,33 +36,38 @@
                         </tr>
                     </thead>
                     <tbody>
-                    <tr tal:repeat="vote votes">
-                        <td>${vote.title}</td>
-                        <td><span class="shortcode" tal:condition="vote.shortcode">${vote.shortcode}</span></td>
-                        <td>${layout.format_date(vote.date, 'date')}</td>
-                        <td tal:condition="vote.domain == 'federation'" i18n:translate>Federal</td>
-                        <td tal:condition="vote.domain == 'canton'" i18n:translate>Cantonal</td>
-                        <td tal:condition="vote.domain == 'municipality'" i18n:translate>Communal</td>
-                        <td>
-                            <ul class="actions">
-                                <li>
-                                    <a i18n:translate="" class="action-view" href="${request.link(vote)}">View</a>
-                                </li>
-                                <li>
-                                    <a i18n:translate="" class="action-edit" href="${request.link(vote, 'edit')}">Edit</a>
-                                </li>
-                                <li>
-                                    <a i18n:translate="" class="action-upload" href="${request.link(vote, 'upload')}">Upload results</a>
-                                </li>
-                                <li tal:condition="layout.principal.notifications">
-                                    <a i18n:translate="" class="action-trigger" href="${request.link(vote, 'trigger')}">Trigger notifications</a>
-                                </li>
-                                <li>
-                                    <a i18n:translate="" class="action-delete" href="${request.link(vote, 'delete')}">Delete</a>
-                                </li>
-                            </ul>
-                        </td>
-                    </tr>
+                        <tal:block tal:repeat="group groups">
+                            <tal:block tal:repeat="vote group[1]">
+                                <tr tal:attributes="class python: 'divider' if repeat.vote.end else ''">
+                                    <td>${vote.title}</td>
+                                    <td><span class="shortcode" tal:condition="vote.shortcode">${vote.shortcode}</span></td>
+                                    <td>${layout.format_date(vote.date, 'date')}</td>
+                                    <td tal:condition="vote.domain == 'federation'" i18n:translate>Federal</td>
+                                    <td tal:condition="vote.domain == 'canton'" i18n:translate>Cantonal</td>
+                                    <td tal:condition="vote.domain == 'municipality'" i18n:translate>Communal</td>
+                                    <td>
+                                        <ul class="actions">
+                                            <li>
+                                                <a i18n:translate="" class="action-view" href="${request.link(vote)}">View</a>
+                                            </li>
+                                            <li>
+                                                <a i18n:translate="" class="action-edit" href="${request.link(vote, 'edit')}">Edit</a>
+                                            </li>
+                                            <li>
+                                                <a i18n:translate="" class="action-upload" href="${request.link(vote, 'upload')}">Upload results</a>
+                                            </li>
+                                            <li tal:condition="layout.principal.notifications">
+                                                <a i18n:translate="" class="action-trigger" href="${request.link(vote, 'trigger')}">Trigger notifications</a>
+                                            </li>
+                                            <li>
+                                                <a i18n:translate="" class="action-delete" href="${request.link(vote, 'delete')}">Delete</a>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </tal:block>
+                        </tal:block>
+                    </tbody>
                 </table>
 
                 <div class="pagination-centered">

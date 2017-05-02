@@ -4,6 +4,7 @@ import morepath
 
 from onegov.ballot import Vote, VoteCollection
 from onegov.core.security import Private
+from onegov.core.utils import groupbylist
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
@@ -21,7 +22,7 @@ def view_votes(self, request):
     return {
         'layout': ManageVotesLayout(self, request),
         'title': _("Manage"),
-        'votes': self.batch,
+        'groups': groupbylist(self.batch, key=lambda vote: vote.date),
         'new_vote': request.link(self, 'new-vote')
     }
 

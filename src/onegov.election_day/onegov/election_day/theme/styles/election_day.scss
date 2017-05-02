@@ -516,6 +516,10 @@ ul.breadcrumbs {
     padding-left: 0;
 }
 
+tr.divider {
+    border-bottom: 2px solid $base;
+}
+
 /*
     Manage view actions
 */

@@ -16,6 +16,9 @@ Changelog
 - Adds missing expats label in the election districts view of majorz elections.
   [msom]
 
+- Visually groups elections and votes in the backend.
+  [msom]
+
 1.8.5 (2017-04-26)
 ~~~~~~~~~~~~~~~~~~~
 
