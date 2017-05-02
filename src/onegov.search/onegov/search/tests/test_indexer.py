@@ -435,6 +435,10 @@ def test_type_mapping_registry():
     with pytest.raises(AssertionError):
         registry.register_type('page', {})
 
+    assert registry.registered_fields == {
+        'title', 'comment', 'es_suggestion', 'es_public'
+    }
+
 
 def test_indexer_process(es_client):
     mappings = TypeMappingRegistry()

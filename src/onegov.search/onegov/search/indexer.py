@@ -294,6 +294,14 @@ class TypeMappingRegistry(object):
         assert type_name not in self.mappings
         self.mappings[type_name] = TypeMapping(type_name, mapping, model)
 
+    @property
+    def registered_fields(self):
+        """ Goes through all the registered types and returns the a set with
+        all fields used by the mappings.
+
+        """
+        return {key for mapping in self for key in mapping.mapping.keys()}
+
 
 class IndexManager(object):
     """ Manages the creation/destruction of indices. The indices it creates
