@@ -56,10 +56,13 @@ class Search(Pagination):
         # make sure the title matches with a higher priority, otherwise the
         # "get lucky" functionality is not so lucky after all
         match_title = MatchPhrase(title={"query": query, "boost": 3})
+
+        # we *could* use Match here and include '_all' fields, but that
+        # yields us less exact results, probably because '_all' includes some
+        # metadata fields we have no use for
         match_rest = MultiMatch(query=query, fields=[
-            'title', 'lead', 'text', 'email', 'function', 'number',
-            'ticket_email', 'ticket_data', 'description', 'location',
-            'group', 'username', 'realname', 'organiser'
+            field for field in self.request.app.es_mappings.registered_fields
+            if not field.startswith('es_')
         ], fuzziness='1')
 
         search = search.query(match_title | match_rest)

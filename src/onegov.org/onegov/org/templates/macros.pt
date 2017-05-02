@@ -707,3 +707,44 @@
         </tal:block>
     </div>
 </metal:slider>
+
+
+<metal:search_result_users define-macro="search_result_users">
+    <a href="${request.return_here(request.link(result))}">${result.title}</a>
+    <ul>
+        <li>${translate(result.role.capitalize())}</li>
+    </ul>
+</metal:search_result_users>
+
+
+<metal:search_result_tickets define-macro="search_result_tickets">
+    <a href="${request.link(result)}">${result.number}</a>
+    <ul>
+        <li>${translate(result.group)}</li>
+        <li tal:content="structure result.title"></li>
+        <li tal:content="structure result.subtitle"></li>
+    </ul>
+</metal:search_result_tickets>
+
+
+<metal:search_result_events define-macro="search_result_events">
+    <a href="${request.link(result, 'latest')}">${result.title}</a>
+    <p tal:condition="result.description|nothing">
+        ${result.description[:160]}<tal:block condition="len(result.description) > 160">…</tal:block>
+    </p>
+</metal:search_result_events>
+
+
+<metal:search_result_people define-macro="search_result_people">
+    <a href="${request.link(result)}">${result.title}</a>
+    <p tal:condition="result.function|nothing">${result.function}</p>
+    <p tal:condition="not:result.function|nothing" i18n:translate="">People</p>
+</metal:search_result_people>
+
+
+<metal:search_result_default define-macro="search_result_default">
+    <a href="${request.link(result)}">${result.title}</a>
+    <tal:block condition="result.lead">
+        ${result.lead[:160]}<tal:block condition="len(result.lead) > 160">…</tal:block>
+    </tal:block>
+</metal:search_result_default>
