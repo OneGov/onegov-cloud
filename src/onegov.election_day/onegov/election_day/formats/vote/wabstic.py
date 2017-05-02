@@ -70,7 +70,7 @@ def import_vote_wabstic(vote, district, number, entities,
         filename='sg_geschaefte'
     )
     if error:
-        return [error]
+        errors.append(error)
 
     sg_gemeinden, error = load_csv(
         file_sg_gemeinden, mimetype_sg_gemeinden,
@@ -78,7 +78,10 @@ def import_vote_wabstic(vote, district, number, entities,
         filename='sg_gemeinden'
     )
     if error:
-        return [error]
+        errors.append(error)
+
+    if errors:
+        return errors
 
     # Get the vote type
     used_ballot_types = ['proposal']
