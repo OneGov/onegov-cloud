@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.6.0 (2017-05-02)
+~~~~~~~~~~~~~~~~~~~
+
 - Gives org applications the ability to require a complete userprofile.
   [href]
 
