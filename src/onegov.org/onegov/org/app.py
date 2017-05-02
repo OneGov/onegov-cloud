@@ -199,7 +199,7 @@ def get_require_complete_userprofile():
 
 @OrgApp.setting(section='org', name='is_complete_userprofile')
 def get_is_complete_userprofile_handler():
-    def is_complete_userprofile(username):
+    def is_complete_userprofile(request, username):
         return True
 
     return is_complete_userprofile

@@ -3345,7 +3345,7 @@ def test_send_ticket_email(org_app):
 def test_login_with_required_userprofile(org_app):
     # userprofile is not complete
     org_app.settings.org.require_complete_userprofile = True
-    org_app.settings.org.is_complete_userprofile = lambda username: False
+    org_app.settings.org.is_complete_userprofile = lambda r, u: False
 
     client = Client(org_app)
 
@@ -3367,7 +3367,7 @@ def test_login_with_required_userprofile(org_app):
 
     # userprofile is complete
     org_app.settings.org.require_complete_userprofile = True
-    org_app.settings.org.is_complete_userprofile = lambda username: True
+    org_app.settings.org.is_complete_userprofile = lambda r, u: True
 
     client = Client(org_app)
 
@@ -3380,7 +3380,7 @@ def test_login_with_required_userprofile(org_app):
 
     # completeness not required
     org_app.settings.org.require_complete_userprofile = False
-    org_app.settings.org.is_complete_userprofile = lambda username: True
+    org_app.settings.org.is_complete_userprofile = lambda r, u: True
 
     client = Client(org_app)
 

@@ -37,7 +37,9 @@ def handle_login(self, request, form):
         redirected_to_userprofile = False
 
         if org_settings.require_complete_userprofile:
-            if not org_settings.is_complete_userprofile(form.username.data):
+            username = form.username.data
+
+            if not org_settings.is_complete_userprofile(request, username):
                 redirected_to_userprofile = True
 
                 self.to = request.return_to(
