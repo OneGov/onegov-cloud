@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds elasticsearch indexing to the attendees (private only).
+  [href]
+
 0.8.2 (2017-04-11)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -3,6 +3,7 @@ from onegov.activity.models.booking import Booking
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.search import ORMSearchable
 from sqlalchemy import case, cast, func, select, and_, type_coerce
 from sqlalchemy import Column
 from sqlalchemy import Date
@@ -17,7 +18,7 @@ from sqlalchemy.orm import relationship, validates
 from uuid import uuid4
 
 
-class Attendee(Base, TimestampMixin):
+class Attendee(Base, TimestampMixin, ORMSearchable):
     """ Attendees are linked to zero to many bookings. Each booking
     has an attendee.
 
@@ -27,6 +28,18 @@ class Attendee(Base, TimestampMixin):
     """
 
     __tablename__ = 'attendees'
+
+    es_language = 'de'  # XXX add to database in the future
+    es_properties = {
+        'username': {'type': 'text'},
+        'name': {'type': 'text'},
+        'notes': {'type': 'localized'}
+    }
+    es_public = False
+
+    @property
+    def es_suggestion(self):
+        return self.name
 
     def __hash__(self):
         return hash(self.id)

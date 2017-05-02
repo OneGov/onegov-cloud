@@ -34,6 +34,7 @@ setup(
     install_requires=[
         'lxml',
         'onegov.core>=0.4.0',
+        'onegov.search',
         'onegov.user',
         'sedate',
         'sortedcontainers',
