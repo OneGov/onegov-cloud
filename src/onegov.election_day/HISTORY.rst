@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.8.6 (2017-05-02)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds status/completed to elections and votes.
   [msom]
