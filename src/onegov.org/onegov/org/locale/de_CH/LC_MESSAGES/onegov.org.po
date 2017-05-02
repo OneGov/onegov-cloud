@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-04-11 09:35+0200\n"
+"POT-Creation-Date: 2017-05-02 10:09+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1629,9 +1629,6 @@ msgstr ""
 "Ihr Konto wurde aktiviert. Sie können sich nun mit Ihren Benutzernamen und "
 "Passwort anmelden"
 
-msgid "You have been logged in."
-msgstr "Sie wurden eingeloggt."
-
 #, python-format
 msgid "Your ${org} Registration"
 msgstr "Ihre ${org} Registration"
@@ -1651,6 +1648,12 @@ msgstr "Ungültiger Aktivierungscode"
 
 msgid "Your account has already been activated."
 msgstr "Ihr Konto wurde bereits aktiviert."
+
+msgid "Your userprofile is incomplete. Please update it before you continue."
+msgstr "Ihr Benutzerprofil ist unvollständig. Bitte vervollständigen Sie es bevor Sie weiterfahren."
+
+msgid "You have been logged in."
+msgstr "Sie wurden eingeloggt."
 
 msgid "A user with this address already exists"
 msgstr "Ein Benutzer mit dieser E-Mail Adresse existiert bereits"

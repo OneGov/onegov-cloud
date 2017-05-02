@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Gives org applications the ability to require a complete userprofile.
+  [href]
+
 - Adds the ability to force the button toggle state through javascript.
   [href]
 

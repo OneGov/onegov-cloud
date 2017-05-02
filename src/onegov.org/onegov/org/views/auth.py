@@ -24,17 +24,38 @@ from purl import URL
 def handle_login(self, request, form):
     """ Handles the login requests. """
 
-    if not request.app.settings.org.enable_yubikey:
+    org_settings = request.app.settings.org
+
+    if not org_settings.enable_yubikey:
         form.delete_field('yubikey')
 
     if self.skippable(request):
         return self.redirect(request)
 
     if form.submitted(request):
+
+        redirected_to_userprofile = False
+
+        if org_settings.require_complete_userprofile:
+            if not org_settings.is_complete_userprofile(form.username.data):
+                redirected_to_userprofile = True
+
+                self.to = request.return_to(
+                    '/benutzerprofil',
+                    self.to
+                )
+
         response = self.login_to(request=request, **form.login_data)
 
         if response:
-            request.success(_("You have been logged in."))
+            if redirected_to_userprofile:
+                request.warning(_(
+                    "Your userprofile is incomplete. "
+                    "Please update it before you continue."
+                ))
+            else:
+                request.success(_("You have been logged in."))
+
             return response
 
         request.alert(_("Wrong e-mail address, password or yubikey."))
@@ -50,7 +71,7 @@ def handle_login(self, request, form):
         'password_reset_link': request.link(
             request.app.org, name='request-password'),
         'register_link': request.link(self, name='register'),
-        'may_register': request.app.settings.org.enable_user_registration,
+        'may_register': org_settings.enable_user_registration,
         'title': _('Login to ${org}', mapping={
             'org': request.app.org.title
         }),

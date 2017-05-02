@@ -3340,3 +3340,53 @@ def test_send_ticket_email(org_app):
     submit_reservation(admin, 'someone-else@example.org')
     assert len(org_app.smtp.outbox) == 1
     assert 'someone-else@example.org' == org_app.smtp.outbox[0]['To']
+
+
+def test_login_with_required_userprofile(org_app):
+    # userprofile is not complete
+    org_app.settings.org.require_complete_userprofile = True
+    org_app.settings.org.is_complete_userprofile = lambda username: False
+
+    client = Client(org_app)
+
+    page = client.get('/auth/login?to=/einstellungen')
+    page.form['username'] = 'admin@example.org'
+    page.form['password'] = 'wrong-password'
+    page = page.form.submit()
+
+    assert 'falsches Passwort' in page
+
+    page.form['password'] = 'hunter2'
+    page = page.form.submit().follow()
+
+    assert 'benutzerprofil' in page.request.url
+    assert "Ihr Benutzerprofil ist unvollständig" in page
+    page = page.form.submit().follow()
+
+    assert 'einstellungen' in page.request.url
+
+    # userprofile is complete
+    org_app.settings.org.require_complete_userprofile = True
+    org_app.settings.org.is_complete_userprofile = lambda username: True
+
+    client = Client(org_app)
+
+    page = client.get('/auth/login?to=/einstellungen')
+    page.form['username'] = 'admin@example.org'
+    page.form['password'] = 'hunter2'
+    page = page.form.submit()
+
+    assert 'einstellungen' in page.request.url
+
+    # completeness not required
+    org_app.settings.org.require_complete_userprofile = False
+    org_app.settings.org.is_complete_userprofile = lambda username: True
+
+    client = Client(org_app)
+
+    page = client.get('/auth/login?to=/einstellungen')
+    page.form['username'] = 'admin@example.org'
+    page.form['password'] = 'hunter2'
+    page = page.form.submit()
+
+    assert 'einstellungen' in page.request.url

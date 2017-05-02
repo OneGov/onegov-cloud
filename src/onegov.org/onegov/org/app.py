@@ -192,6 +192,19 @@ def get_status_mail_roles():
     return ('admin', 'editor')
 
 
+@OrgApp.setting(section='org', name='require_complete_userprofile')
+def get_require_complete_userprofile():
+    return False
+
+
+@OrgApp.setting(section='org', name='is_complete_userprofile')
+def get_is_complete_userprofile_handler():
+    def is_complete_userprofile(username):
+        return True
+
+    return is_complete_userprofile
+
+
 @OrgApp.webasset_path()
 def get_js_path():
     return 'assets/js'
