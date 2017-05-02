@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the userprofile to the indexed values.
+  [href]
+
 0.10.0 (2017-04-27)
 ~~~~~~~~~~~~~~~~~~~
 

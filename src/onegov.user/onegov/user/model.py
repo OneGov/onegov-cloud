@@ -19,14 +19,26 @@ class User(Base, TimestampMixin, ORMSearchable):
 
     es_language = 'de'  # XXX add to database in the future
     es_properties = {
-        'username': {'type': 'string'},
-        'realname': {'type': 'string'},
+        'username': {'type': 'text'},
+        'realname': {'type': 'text'},
+        'userprofile': {'type': 'text'}
     }
     es_public = False
 
     @property
     def es_suggestion(self):
         return (self.realname or self.username, self.username)
+
+    @property
+    def userprofile(self):
+        data = []
+
+        if self.data:
+            for value in self.data.values():
+                if value and isinstance(value, str):
+                    data.append(value)
+
+        return data
 
     #: the user id is a uuid because that's more secure (no id guessing)
     id = Column(UUID, nullable=False, primary_key=True, default=uuid4)
