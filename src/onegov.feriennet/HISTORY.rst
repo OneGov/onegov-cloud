@@ -1,5 +1,8 @@
 Changelog
---------- 
+---------
+
+- Adds the ability to search attendees and activity organisers.
+  [href]
 
 - Forces users update their profile after login and before booking.
   [href]

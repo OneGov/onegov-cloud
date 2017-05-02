@@ -42,10 +42,31 @@ class VacationActivity(Activity, CoordinatesExtension, ORMSearchable):
 
     @property
     def organiser(self):
-        return [
+        organiser = [
             self.user.username,
             self.user.realname
         ]
+
+        userprofile_keys = (
+            'organisation',
+            'address',
+            'zip_code',
+            'place',
+            'email',
+            'phone',
+            'emergency',
+            'website',
+            'bank_account',
+            'bank_beneficiary',
+        )
+
+        for key in userprofile_keys:
+            if not self.user.data:
+                continue
+            if self.user.data.get(key):
+                organiser.append(self.user.data[key])
+
+        return organiser
 
     def ordered_tags(self, request):
         tags = [request.translate(_(tag)) for tag in self.tags]

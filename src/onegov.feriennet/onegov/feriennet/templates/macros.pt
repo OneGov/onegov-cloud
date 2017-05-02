@@ -416,3 +416,9 @@
         />
     </ul>
 </metal:actions_button>
+
+
+<metal:search_result_attendees define-macro="search_result_attendees">
+    <a href="${request.link(result)}">${result.name}</a>
+    <p i18n:translate="">Attendee</p>
+</metal:search_result_attendees>
