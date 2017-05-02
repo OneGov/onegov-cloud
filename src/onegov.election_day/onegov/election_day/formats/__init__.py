@@ -1,132 +1,27 @@
-from onegov.core.csv import CSVFile, convert_xls_to_csv
-from onegov.core.errors import (
-    AmbiguousColumnsError,
-    DuplicateColumnNamesError,
-    EmptyFileError,
-    EmptyLineInFileError,
-    InvalidFormatError,
-    MissingColumnsError,
-)
-from onegov.election_day import _
-from xlrd import XLRDError
+from onegov.election_day.formats.election import import_election_internal
+from onegov.election_day.formats.election import import_election_sesam
+from onegov.election_day.formats.election import import_election_wabsti_majorz
+from onegov.election_day.formats.election import import_election_wabsti_proporz
+from onegov.election_day.formats.election import import_election_wabstic_majorz
+from onegov.election_day.formats.election \
+    import import_election_wabstic_proporz
+from onegov.election_day.formats.election import import_party_results
+from onegov.election_day.formats.vote.default import import_vote_default
+from onegov.election_day.formats.vote.internal import import_vote_internal
+from onegov.election_day.formats.vote.wabsti import import_vote_wabsti
+from onegov.election_day.formats.vote.wabstic import import_vote_wabstic
 
 
-EXPATS = (
-    # These are used by the BFS but not in the official data!
-    9170,  # sg
-)
-
-
-STATI = (
-    'unknown',
-    'interim',
-    'final',
-)
-
-
-class FileImportError(object):
-    __slots__ = ['filename', 'line', 'error']
-
-    def __init__(self, error, line=None, filename=None):
-        self.filename = filename
-        self.error = error
-        self.line = line
-
-
-def load_csv(file, mimetype, expected_headers, filename=None):
-    """ Loads the given file and returns it as CSV file.
-
-    :return: A tuple CSVFile, FileImportError.
-
-    """
-    csv = None
-    error = None
-    csvfile = file
-
-    if mimetype != 'text/plain':
-        try:
-            csvfile = convert_xls_to_csv(file, 'Resultate')
-        except IOError:
-            try:
-                csvfile = convert_xls_to_csv(file)
-            except XLRDError:
-                error = FileImportError(
-                    _("Not a valid xls/xlsx file."),
-                    filename=filename
-                )
-            except NotImplementedError:
-                error = FileImportError(
-                    _("The xls/xlsx file contains unsupported cells."),
-                    filename=filename
-                )
-            except Exception:
-                error = FileImportError(
-                    _("Not a valid csv/xls/xlsx file."),
-                    filename=filename
-                )
-        except XLRDError:
-            error = FileImportError(
-                _("Not a valid xls/xlsx file."),
-                filename=filename
-            )
-        except NotImplementedError:
-            error = FileImportError(
-                _("The xls/xlsx file contains unsupported cells."),
-                filename=filename
-            )
-        except Exception:
-            error = FileImportError(
-                _("Not a valid csv/xls/xlsx file."),
-                filename=filename
-            )
-
-    if error:
-        return csv, error
-
-    try:
-        csv = CSVFile(csvfile, expected_headers=expected_headers)
-        list(csv.lines)
-    except MissingColumnsError as e:
-        error = FileImportError(
-            _(
-                "Missing columns: '${cols}'",
-                mapping={'cols': ', '.join(e.columns)}
-            ),
-            filename=filename
-        )
-    except AmbiguousColumnsError:
-        error = FileImportError(
-            _(
-                "Could not find the expected columns, "
-                "make sure all required columns exist and that there are no "
-                "extra columns."
-            ),
-            filename=filename
-        )
-    except DuplicateColumnNamesError:
-        error = FileImportError(
-            _("Some column names appear twice."),
-            filename=filename
-        )
-    except InvalidFormatError:
-        error = FileImportError(
-            _("Not a valid csv/xls/xlsx file."),
-            filename=filename
-        )
-    except EmptyFileError:
-        error = FileImportError(
-            _("The csv/xls/xlsx file is empty."),
-            filename=filename
-        )
-    except EmptyLineInFileError:
-        error = FileImportError(
-            _("The file contains an empty line."),
-            filename=filename
-        )
-    except Exception:
-        error = FileImportError(
-            _("Not a valid csv/xls/xlsx file."),
-            filename=filename
-        )
-
-    return csv, error
+__all__ = [
+    'import_election_internal',
+    'import_election_sesam',
+    'import_election_wabsti_majorz',
+    'import_election_wabsti_proporz',
+    'import_election_wabstic_majorz',
+    'import_election_wabstic_proporz',
+    'import_party_results',
+    'import_vote_default',
+    'import_vote_internal',
+    'import_vote_wabsti',
+    'import_vote_wabstic',
+]

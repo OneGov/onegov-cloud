@@ -2,10 +2,10 @@ from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
 from onegov.ballot import ElectionResult
 from onegov.election_day import _
-from onegov.election_day.formats import EXPATS
-from onegov.election_day.formats import FileImportError
-from onegov.election_day.formats import load_csv
-from onegov.election_day.formats.election import clear_election
+from onegov.election_day.formats.common import EXPATS
+from onegov.election_day.formats.common import FileImportError
+from onegov.election_day.formats.common import load_csv
+from onegov.election_day.utils import clear_election
 from uuid import uuid4
 
 HEADERS_WM_WAHL = (
@@ -66,12 +66,14 @@ def get_entity_id(line, entities):
     return entity_id
 
 
-def import_exporter_files(election, district, number, entities,
-                          file_wm_wahl, mimetype_wmstatic_wahl,
-                          file_wmstatic_gemeinden, mimetype_wmstatic_gemeinden,
-                          file_wm_gemeinden, mimetype_wm_gemeinden,
-                          file_wm_kandidaten, mimetype_wm_kandidaten,
-                          file_wm_kandidatengde, mimetype_wm_kandidatengde):
+def import_election_wabstic_majorz(
+    election, district, number, entities,
+    file_wm_wahl, mimetype_wmstatic_wahl,
+    file_wmstatic_gemeinden, mimetype_wmstatic_gemeinden,
+    file_wm_gemeinden, mimetype_wm_gemeinden,
+    file_wm_kandidaten, mimetype_wm_kandidaten,
+    file_wm_kandidatengde, mimetype_wm_kandidatengde
+):
     """ Tries to import the files in the given folder.
 
     We assume that the files there have been uploaded via FTP using the

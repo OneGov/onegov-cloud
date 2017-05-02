@@ -5,19 +5,13 @@ from onegov.ballot import Vote
 from onegov.core.security import Private
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
+from onegov.election_day.formats import import_vote_default
+from onegov.election_day.formats import import_vote_internal
+from onegov.election_day.formats import import_vote_wabsti
+from onegov.election_day.formats import import_vote_wabstic
+from onegov.election_day.formats.common import BALLOT_TYPES
 from onegov.election_day.forms import UploadVoteForm
 from onegov.election_day.layout import ManageVotesLayout
-from onegov.election_day.formats.vote import BALLOT_TYPES
-from onegov.election_day.formats.vote.default import (
-    import_file as import_default_file
-)
-from onegov.election_day.formats.vote.internal import (
-    import_file as import_internal_file
-)
-from onegov.election_day.formats.vote.wabsti import (
-    import_file as import_wabsti_file,
-    import_exporter_files
-)
 from onegov.election_day.views.upload import unsupported_year_error
 
 
@@ -37,14 +31,14 @@ def view_upload(self, request, form):
         else:
             entities = principal.entities.get(self.date.year, [])
             if form.file_format.data == 'internal':
-                errors = import_internal_file(
+                errors = import_vote_internal(
                     entities,
                     self,
                     form.proposal.raw_data[0].file,
                     form.proposal.data['mimetype']
                 )
             elif form.file_format.data == 'wabsti':
-                errors = import_wabsti_file(
+                errors = import_vote_wabsti(
                     entities,
                     self,
                     form.proposal.raw_data[0].file,
@@ -55,7 +49,7 @@ def view_upload(self, request, form):
             elif form.file_format.data == 'wabsti_c':
                 for source in self.data_sources:
                     errors.extend(
-                        import_exporter_files(
+                        import_vote_wabstic(
                             self,
                             source.district,
                             source.number,
@@ -75,7 +69,7 @@ def view_upload(self, request, form):
                 for ballot_type in ballot_types:
                     field = getattr(form, ballot_type.replace('-', '_'))
                     errors.extend(
-                        import_default_file(
+                        import_vote_default(
                             entities,
                             self,
                             ballot_type,

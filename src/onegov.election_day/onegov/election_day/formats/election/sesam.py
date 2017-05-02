@@ -6,10 +6,10 @@ from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
 from onegov.ballot import PanachageResult
 from onegov.election_day import _
-from onegov.election_day.formats import EXPATS
-from onegov.election_day.formats import FileImportError
-from onegov.election_day.formats import load_csv
-from onegov.election_day.formats.election import clear_election
+from onegov.election_day.formats.common import EXPATS
+from onegov.election_day.formats.common import FileImportError
+from onegov.election_day.formats.common import load_csv
+from onegov.election_day.utils import clear_election
 from uuid import uuid4
 
 
@@ -234,7 +234,7 @@ def parse_connection(line, errors):
         return connection, subconnection
 
 
-def import_file(entities, election, file, mimetype):
+def import_election_sesam(entities, election, file, mimetype):
     """ Tries to import the given file (sesam format).
 
     :return:

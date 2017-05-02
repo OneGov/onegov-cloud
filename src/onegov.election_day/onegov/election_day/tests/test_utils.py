@@ -1,11 +1,13 @@
 from datetime import date, datetime
 from freezegun import freeze_time
-from io import BytesIO
 from mock import Mock
-from onegov.ballot import Election, Vote, Ballot, BallotResult
+from onegov.ballot import Ballot
+from onegov.ballot import BallotResult
+from onegov.ballot import Election
+from onegov.ballot import Vote
 from onegov.election_day.collections import ArchivedResultCollection
-from onegov.election_day.formats import load_csv
-from onegov.election_day.models import ArchivedResult, Principal
+from onegov.election_day.models import ArchivedResult
+from onegov.election_day.models import Principal
 from onegov.election_day.tests import DummyRequest
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import add_local_results
@@ -16,26 +18,6 @@ from onegov.election_day.utils import get_summary
 from onegov.election_day.utils import get_vote_summary
 from onegov.election_day.utils import pdf_filename
 from onegov.election_day.utils import svg_filename
-
-
-def test_load_csv():
-    result = load_csv(BytesIO(), 'text/plain', [])
-    assert result[1].error == 'The csv/xls/xlsx file is empty.'
-
-    result = load_csv(BytesIO(''.encode('utf-8')), 'text/plain', [])
-    assert result[1].error == 'The csv/xls/xlsx file is empty.'
-
-    result = load_csv(BytesIO('a,b,d'.encode('utf-8')), 'text/plain', ['c'])
-    assert 'Missing columns' in result[1].error
-
-    result = load_csv(BytesIO('a,a,b'.encode('utf-8')), 'text/plain', ['a'])
-    assert result[1].error == 'Some column names appear twice.'
-
-    result = load_csv(BytesIO('<html />'.encode('utf-8')), 'text/plain', ['a'])
-    assert result[1].error == 'Not a valid csv/xls/xlsx file.'
-
-    result = load_csv(BytesIO('a,b\n1,2'.encode('utf-8')), 'text/plain', ['a'])
-    assert result[1] is None
 
 
 def test_add_last_modified_header():
@@ -486,3 +468,7 @@ def test_svg_filename(session):
         assert svg_filename(ballot, 'chart', 'rm') == template.format(
             name='ballot', hash=str(ballot.id), locale='rm'
         )
+
+# todo: test_clear_ballot
+# todo: test_clear_election
+# todo: test_clear_vote

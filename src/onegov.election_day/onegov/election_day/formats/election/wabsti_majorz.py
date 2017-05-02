@@ -2,10 +2,10 @@ from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
 from onegov.ballot import ElectionResult
 from onegov.election_day import _
-from onegov.election_day.formats import EXPATS
-from onegov.election_day.formats import FileImportError
-from onegov.election_day.formats import load_csv
-from onegov.election_day.formats.election import clear_election
+from onegov.election_day.formats.common import EXPATS
+from onegov.election_day.formats.common import FileImportError
+from onegov.election_day.formats.common import load_csv
+from onegov.election_day.utils import clear_election
 from uuid import uuid4
 
 
@@ -125,8 +125,10 @@ def parse_candidates(line, errors):
     return results
 
 
-def import_file(entities, election, file, mimetype,
-                elected_file=None, elected_mimetype=None):
+def import_election_wabsti_majorz(
+    entities, election, file, mimetype,
+    elected_file=None, elected_mimetype=None
+):
     errors = []
     candidates = {}
     results = []

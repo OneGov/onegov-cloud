@@ -1,44 +1,12 @@
-from sqlalchemy.orm import object_session
+from onegov.election_day.formats.vote.default import import_vote_default
+from onegov.election_day.formats.vote.internal import import_vote_internal
+from onegov.election_day.formats.vote.wabsti import import_vote_wabsti
+from onegov.election_day.formats.vote.wabstic import import_vote_wabstic
 
 
-BALLOT_TYPES = {'proposal', 'counter-proposal', 'tie-breaker'}
-
-HEADERS = [
-    'Bezirk',
-    'ID',
-    'Name',
-    'Ja Stimmen',
-    'Nein Stimmen',
-    'Stimmberechtigte',
-    'Leere Stimmzettel',
-    'Ungültige Stimmzettel'
+__all__ = [
+    'import_vote_default',
+    'import_vote_internal',
+    'import_vote_wabsti',
+    'import_vote_wabstic',
 ]
-
-
-def clear_vote(vote):
-    session = object_session(vote)
-    vote.status = None
-    for ballot in vote.ballots:
-        for result in ballot.results:
-            session.delete(result)
-
-
-def clear_ballot(ballot):
-    session = object_session(ballot)
-    for result in ballot.results:
-        session.delete(result)
-
-
-def guessed_group(entity, other):
-    result = entity['name']
-
-    if other:
-        if '/' in other[0].group:
-            result = '/'.join(
-                p for p in (
-                    entity.get('district'),
-                    entity.get('name')
-                ) if p is not None
-            )
-
-    return result

@@ -1,12 +1,12 @@
 from onegov.ballot import Ballot
 from onegov.ballot import BallotResult
 from onegov.election_day import _
-from onegov.election_day.formats import EXPATS
-from onegov.election_day.formats import FileImportError
-from onegov.election_day.formats import load_csv
-from onegov.election_day.formats.vote import BALLOT_TYPES
-from onegov.election_day.formats.vote import clear_ballot
-from onegov.election_day.formats.vote import guessed_group
+from onegov.election_day.formats.common import EXPATS
+from onegov.election_day.formats.common import FileImportError
+from onegov.election_day.formats.common import load_csv
+from onegov.election_day.formats.common import BALLOT_TYPES
+from onegov.election_day.utils import clear_ballot
+from onegov.election_day.utils import guessed_group
 
 
 HEADERS = [
@@ -21,7 +21,7 @@ HEADERS = [
 ]
 
 
-def import_file(entities, vote, ballot_type, file, mimetype):
+def import_vote_default(entities, vote, ballot_type, file, mimetype):
     """ Tries to import the given csv, xls or xlsx file to the given ballot
     result type.
 

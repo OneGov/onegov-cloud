@@ -1,10 +1,10 @@
 from onegov.ballot import Ballot
 from onegov.ballot import BallotResult
 from onegov.election_day import _
-from onegov.election_day.formats import EXPATS
-from onegov.election_day.formats import FileImportError
-from onegov.election_day.formats import load_csv
-from onegov.election_day.formats.vote import clear_vote
+from onegov.election_day.formats.common import EXPATS
+from onegov.election_day.formats.common import FileImportError
+from onegov.election_day.formats.common import load_csv
+from onegov.election_day.utils import clear_vote
 
 
 HEADERS_SG_GESCHAEFTE = (
@@ -53,9 +53,9 @@ def line_is_relevant(line, domain, district, number):
     )
 
 
-def import_exporter_files(vote, district, number, entities,
-                          file_sg_geschaefte, mimetype_sg_geschaefte,
-                          file_sg_gemeinden, mimetype_sg_gemeinden):
+def import_vote_wabstic(vote, district, number, entities,
+                        file_sg_geschaefte, mimetype_sg_geschaefte,
+                        file_sg_gemeinden, mimetype_sg_gemeinden):
     """ Tries to import the files in the given folder.
 
     We assume that the file has been generate using WabstiCExport 2.1.

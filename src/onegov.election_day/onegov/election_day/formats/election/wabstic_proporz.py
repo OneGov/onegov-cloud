@@ -5,10 +5,10 @@ from onegov.ballot import List
 from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
 from onegov.election_day import _
-from onegov.election_day.formats import EXPATS
-from onegov.election_day.formats import FileImportError
-from onegov.election_day.formats import load_csv
-from onegov.election_day.formats.election import clear_election
+from onegov.election_day.formats.common import EXPATS
+from onegov.election_day.formats.common import FileImportError
+from onegov.election_day.formats.common import load_csv
+from onegov.election_day.utils import clear_election
 from uuid import uuid4
 
 
@@ -98,16 +98,17 @@ def get_list_id(line):
     return str(number)
 
 
-def import_exporter_files(election, district, number, entities,
-                          file_wp_wahl, mimetype_wp_wahl,
-                          file_wpstatic_gemeinden, mimetype_wpstatic_gemeinden,
-                          file_wp_gemeinden, mimetype_wp_gemeinden,
-                          file_wp_listen, mimetype_wp_listen,
-                          file_wp_listengde, mimetype_wp_listengde,
-                          file_wpstatic_kandidaten,
-                          mimetype_wpstatic_kandidaten,
-                          file_wp_kandidaten, mimetype_wp_kandidaten,
-                          file_wp_kandidatengde, mimetype_wp_kandidatengde):
+def import_election_wabstic_proporz(
+    election, district, number, entities,
+    file_wp_wahl, mimetype_wp_wahl,
+    file_wpstatic_gemeinden, mimetype_wpstatic_gemeinden,
+    file_wp_gemeinden, mimetype_wp_gemeinden,
+    file_wp_listen, mimetype_wp_listen,
+    file_wp_listengde, mimetype_wp_listengde,
+    file_wpstatic_kandidaten, mimetype_wpstatic_kandidaten,
+    file_wp_kandidaten, mimetype_wp_kandidaten,
+    file_wp_kandidatengde, mimetype_wp_kandidatengde
+):
     """ Tries to import the files in the given folder.
 
     We assume that the files there have been uploaded via FTP using the

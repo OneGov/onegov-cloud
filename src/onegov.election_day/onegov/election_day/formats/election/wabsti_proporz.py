@@ -6,10 +6,10 @@ from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
 from onegov.ballot import PanachageResult
 from onegov.election_day import _
-from onegov.election_day.formats import EXPATS
-from onegov.election_day.formats import FileImportError
-from onegov.election_day.formats import load_csv
-from onegov.election_day.formats.election import clear_election
+from onegov.election_day.formats.common import EXPATS
+from onegov.election_day.formats.common import FileImportError
+from onegov.election_day.formats.common import load_csv
+from onegov.election_day.utils import clear_election
 from uuid import uuid4
 
 
@@ -179,11 +179,12 @@ def parse_connection(line, errors):
         return id, connection, subconnection
 
 
-def import_file(entities, election, file, mimetype,
-                connections_file=None,
-                connections_mimetype=None,
-                elected_file=None, elected_mimetype=None,
-                statistics_file=None, statistics_mimetype=None):
+def import_election_wabsti_proporz(
+    entities, election, file, mimetype,
+    connections_file=None, connections_mimetype=None,
+    elected_file=None, elected_mimetype=None,
+    statistics_file=None, statistics_mimetype=None
+):
     errors = []
     candidates = {}
     lists = {}

@@ -7,12 +7,9 @@ from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.forms import UploadWabstiVoteForm
 from onegov.election_day.forms import UploadWabstiMajorzElectionForm
 from onegov.election_day.forms import UploadWabstiProporzElectionForm
-from onegov.election_day.formats.vote.wabsti import \
-    import_exporter_files as import_vote
-from onegov.election_day.formats.election.wabsti.majorz import \
-    import_exporter_files as import_majorz
-from onegov.election_day.formats.election.wabsti.proporz import \
-    import_exporter_files as import_proporz
+from onegov.election_day.formats import import_vote_wabstic
+from onegov.election_day.formats import import_election_wabstic_majorz
+from onegov.election_day.formats import import_election_wabstic_proporz
 from onegov.election_day.models import Principal
 from onegov.election_day.models import DataSource
 from onegov.election_day.views.upload import unsupported_year_error
@@ -97,7 +94,7 @@ def view_upload_wabsti_vote(self, request):
             continue
 
         entities = self.entities.get(vote.date.year, {})
-        errors[vote.id] = import_vote(
+        errors[vote.id] = import_vote_wabstic(
             vote, item.district, item.number, entities,
             form.sg_geschaefte.raw_data[0].file,
             form.sg_geschaefte.data['mimetype'],
@@ -176,7 +173,7 @@ def view_upload_wabsti_majorz(self, request):
             continue
 
         entities = self.entities.get(election.date.year, {})
-        errors[election.id] = import_majorz(
+        errors[election.id] = import_election_wabstic_majorz(
             election, item.district, item.number, entities,
             form.wm_wahl.raw_data[0].file,
             form.wm_wahl.data['mimetype'],
@@ -264,7 +261,7 @@ def view_upload_wabsti_proporz(self, request):
             continue
 
         entities = self.entities.get(election.date.year, {})
-        errors[election.id] = import_proporz(
+        errors[election.id] = import_election_wabstic_proporz(
             election, item.district, item.number, entities,
             form.wp_wahl.raw_data[0].file,
             form.wp_wahl.data['mimetype'],
