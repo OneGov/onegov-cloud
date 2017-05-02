@@ -1,6 +1,9 @@
 Changelog
 --------- 
 
+- Forces users update their profile after login and before booking.
+  [href]
+
 - Adds the ability to manage bokings/wishes on the matching view.
   [href]
 

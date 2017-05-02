@@ -7,6 +7,7 @@ from onegov.feriennet.theme import FeriennetTheme
 from onegov.org import OrgApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 from onegov.org.app import get_common_asset as get_org_common_asset
+from onegov.user import UserCollection
 
 
 class FeriennetApp(OrgApp):
@@ -51,6 +52,32 @@ def get_create_new_organisation_factory():
 @FeriennetApp.setting(section='org', name='status_mail_roles')
 def get_status_mail_roles():
     return ('admin', )
+
+
+@FeriennetApp.setting(section='org', name='require_complete_userprofile')
+def get_require_complete_userprofile():
+    return True
+
+
+@FeriennetApp.setting(section='org', name='is_complete_userprofile')
+def get_is_complete_userprofile_handler():
+    from onegov.feriennet.forms import UserProfileForm
+
+    def is_complete_userprofile(request, username, user=None):
+        user = user or UserCollection(
+            request.app.session()).by_username(username)
+
+        form = UserProfileForm()
+        form.request = request
+        form.model = user
+        form.process(obj=user)
+
+        for field_id, field in form._fields.items():
+            field.raw_data = field.data
+
+        return form.validate()
+
+    return is_complete_userprofile
 
 
 @FeriennetApp.setting(section='i18n', name='localedirs')

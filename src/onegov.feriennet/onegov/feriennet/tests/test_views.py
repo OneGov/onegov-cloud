@@ -25,6 +25,17 @@ def get_delete_link(page, index=0):
     return page.pyquery('a[ic-delete-from]')[index].attrib['ic-delete-from']
 
 
+def fill_out_profile(client):
+    profile = client.get('/benutzerprofil')
+    profile.form['salutation'] = 'mr'
+    profile.form['first_name'] = 'Scrooge'
+    profile.form['last_name'] = 'McDuck'
+    profile.form['zip_code'] = '1234'
+    profile.form['place'] = 'Duckburg'
+    profile.form['emergency'] = '0123 456 789 (Scrooge McDuck)'
+    profile.form.submit()
+
+
 def test_view_permissions():
     utils.assert_explicit_permissions(
         onegov.feriennet, onegov.feriennet.FeriennetApp)
@@ -728,7 +739,7 @@ def test_enroll_child(feriennet_app):
     login.form['username'] = 'member@example.org'
     login.form['password'] = 'hunter2'
     enroll = login.form.submit().follow()
-    assert "Teilnehmer Anmelden" in enroll
+    assert "Ihr Benutzerprofil ist unvollständig" in enroll
 
     # now that we're logged in, the login link automatically skips ahead
     enroll = activity.click("Anmelden").follow()
@@ -742,8 +753,13 @@ def test_enroll_child(feriennet_app):
     enroll.form['last_name'] = "Sawyer"
     enroll.form['birth_date'] = "2012-01-01"
     enroll.form['gender'] = 'male'
-    activity = enroll.form.submit().follow()
+    enroll = enroll.form.submit()
 
+    # before continuing, the user needs to fill his profile
+    assert "Ihr Benutzerprofil ist unvollständig" in enroll
+    fill_out_profile(client)
+
+    activity = enroll.form.submit().follow()
     assert "zu Tom\u00A0Sawyer's Wunschliste hinzugefügt" in activity
 
     # prevent double-subscriptions
@@ -882,6 +898,8 @@ def test_enroll_age_mismatch(feriennet_app):
 
     admin = Client(feriennet_app)
     admin.login_admin()
+
+    fill_out_profile(admin)
 
     page = admin.get('/angebot/retreat').click("Anmelden")
     page.form['first_name'] = "Tom"
@@ -1254,9 +1272,11 @@ def test_direct_booking_and_storno(feriennet_app):
 
     client = Client(feriennet_app)
     client.login_admin()
+    fill_out_profile(client)
 
     member = Client(feriennet_app)
     member.login('member@example.org', 'hunter2')
+    fill_out_profile(member)
 
     # in a confirmed period parents can book directly
     page = client.get('/angebot/foobar')
@@ -1283,12 +1303,12 @@ def test_direct_booking_and_storno(feriennet_app):
     assert "1 Plätze frei" in page
 
     # admins may do this for other members
-    url = page.click('Anmelden').pyquery('select option:last').val()
+    url = page.click('Anmelden').pyquery('select option:nth-child(2)').val()
     page = client.get(url)
 
     other_url = page.request.url
     assert "Mike" in page
-    assert "Für <strong>member@example.org</strong>" in page
+    assert "Für <strong>Scrooge McDuck</strong>" in page
 
     # members may not (simply ignores the other user)
     page = member.get('/angebot/foobar').click('Anmelden')
@@ -1348,6 +1368,7 @@ def test_cancel_occasion(feriennet_app):
 
     client = Client(feriennet_app)
     client.login_admin()
+    fill_out_profile(client)
 
     page = client.get('/angebot/foobar')
     assert "L&#246;schen" in page
@@ -1587,6 +1608,7 @@ def test_reactivate_cancelled_booking(feriennet_app):
 
     client = Client(feriennet_app)
     client.login_admin()
+    fill_out_profile(client)
 
     # by default we block conflicting bookings
     page = client.get('/angebot/foobar').click('Anmelden', index=0)
@@ -1941,3 +1963,32 @@ def test_deadline(feriennet_app):
 
     page = editor.get(page.request.url.replace('http://localhost', ''))
     assert "Der Anmeldeschluss wurde erreicht" in page.form.submit()
+
+
+def test_userprofile_login(feriennet_app):
+    client = Client(feriennet_app)
+
+    page = client.get('/auth/login?to=/einstellungen')
+    page.form['username'] = 'admin@example.org'
+    page.form['password'] = 'hunter2'
+    page = page.form.submit().follow()
+
+    assert "Ihr Benutzerprofil ist unvollständig" in page
+    page.form['salutation'] = 'mr'
+    page.form['first_name'] = 'Scrooge'
+    page.form['last_name'] = 'McDuck'
+    page.form['zip_code'] = '1234'
+    page.form['place'] = 'Duckburg'
+    page.form['emergency'] = '0123 456 789 (Scrooge McDuck)'
+    page = page.form.submit().follow()
+
+    assert 'einstellungen' in page.request.url
+
+    client = Client(feriennet_app)
+
+    page = client.get('/auth/login?to=/einstellungen')
+    page.form['username'] = 'admin@example.org'
+    page.form['password'] = 'hunter2'
+    page = page.form.submit().follow()
+
+    assert 'einstellungen' in page.request.url

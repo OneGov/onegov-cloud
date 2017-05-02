@@ -132,6 +132,11 @@ class AttendeeSignupForm(AttendeeBase):
     def is_new(self):
         return self.attendee.data == 'other'
 
+    @property
+    def is_complete_userprofile(self):
+        return self.request.app.settings.org.is_complete_userprofile(
+            self.request, username=None, user=self.user)
+
     @cached_property
     def user(self):
         users = UserCollection(self.request.app.session())
@@ -169,6 +174,21 @@ class AttendeeSignupForm(AttendeeBase):
 
         if not self.request.is_admin:
             self.delete_field('ignore_age')
+
+    def ensure_complete_userprofile(self):
+        if not self.is_complete_userprofile:
+            if self.user.username == self.request.current_username:
+                self.attendee.errors.append(_(
+                    "Your userprofile is not complete. It needs to be "
+                    "complete before signing up any attendees."
+                ))
+            else:
+                self.attendee.errors.append(_(
+                    "The user's userprofile is not complete. It needs to be "
+                    "complete before signing up any attendees."
+                ))
+
+            return False
 
     def ensure_no_duplicate_booking(self):
         if not self.is_new:
