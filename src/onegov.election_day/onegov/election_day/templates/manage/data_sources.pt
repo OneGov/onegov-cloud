@@ -31,7 +31,7 @@
                             <th i18n:translate>Name</th>
                             <th i18n:translate>Type</th>
                             <th i18n:translate>Token</th>
-                            <th i18n:translate>Actions</th>
+                            <th i18n:translate class="row-actions right-aligned">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -39,8 +39,8 @@
                         <td>${data_source.name}</td>
                         <td>${labels.get(data_source.type)}</td>
                         <td>${data_source.token}</td>
-                        <td>
-                            <ul class="actions">
+                        <td class="right-aligned">
+                            <ul class="actions" data-title="Actions" i18n:attributes="data-title">
                                 <li>
                                     <a i18n:translate class="action-delete" href="${request.link(data_source, 'delete')}">Delete</a>
                                 </li>

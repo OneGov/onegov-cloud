@@ -32,7 +32,7 @@
                             <th i18n:translate>Shortcode</th>
                             <th i18n:translate>Date</th>
                             <th i18n:translate>Type</th>
-                            <th i18n:translate>Actions</th>
+                            <th i18n:translate class="row-actions right-aligned">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -45,8 +45,8 @@
                                     <td tal:condition="vote.domain == 'federation'" i18n:translate>Federal</td>
                                     <td tal:condition="vote.domain == 'canton'" i18n:translate>Cantonal</td>
                                     <td tal:condition="vote.domain == 'municipality'" i18n:translate>Communal</td>
-                                    <td>
-                                        <ul class="actions">
+                                    <td class="right-aligned">
+                                        <ul class="actions" data-title="Actions" i18n:attributes="data-title">
                                             <li>
                                                 <a i18n:translate="" class="action-view" href="${request.link(vote)}">View</a>
                                             </li>

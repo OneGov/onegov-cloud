@@ -33,6 +33,7 @@
                             <th>${item_name}</th>
                             <th><pre>SortWahlkreis</pre></th>
                             <th><pre>SortGeschaeft</pre></th>
+                            <th i18n:translate class="row-actions right-aligned">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -40,8 +41,8 @@
                         <td>${item.name}</td>
                         <td>${item.district}</td>
                         <td>${item.number}</td>
-                        <td>
-                            <ul class="actions">
+                        <td class="right-aligned">
+                            <ul class="actions" data-title="Actions" i18n:attributes="data-title">
                                 <li>
                                     <a i18n:translate class="action-delete" href="${request.link(item, 'delete')}">Delete</a>
                                 </li>

@@ -523,12 +523,22 @@ tr.divider {
 /*
     Manage view actions
 */
+th.row-actions {
+    width: 200px;
+}
+
 ul.actions {
+    direction: rtl;
     list-style-type: circle;
+    margin: .2em 1.1em 1em 0;
 
     li {
         font-size: $table-row-font-size;
     }
+}
+
+.action-button {
+    margin-bottom: 0;
 }
 
 

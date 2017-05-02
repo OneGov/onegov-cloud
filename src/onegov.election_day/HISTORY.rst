@@ -19,6 +19,9 @@ Changelog
 - Visually groups elections and votes in the backend.
   [msom]
 
+- Groups backend actions to dropdowns.
+  [msom]
+
 1.8.5 (2017-04-26)
 ~~~~~~~~~~~~~~~~~~~
 
