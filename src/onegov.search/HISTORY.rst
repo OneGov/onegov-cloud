@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.0.1 (2017-05-02)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a helper function to retrieve the fields registered by the mappings.
   [href]
 
