@@ -4,6 +4,9 @@ Changelog
 0.6.1 (2017-05-02)
 ~~~~~~~~~~~~~~~~~~~
 
+- Make search more extendable by org applications.
+  [href]
+
 0.6.0 (2017-05-02)
 ~~~~~~~~~~~~~~~~~~~
 
