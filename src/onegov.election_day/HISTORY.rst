@@ -10,6 +10,9 @@ Changelog
 - Parses the absolute majority when uploading WabstiCExport files.
   [msom]
 
+- Parses the list connections when uploading WabstiCExport files.
+  [msom]
+
 - Evaluates the completed field of WabstiCExport files.
   [msom]
 

@@ -2,6 +2,7 @@ from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
 from onegov.ballot import ElectionResult
 from onegov.ballot import List
+from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
 from onegov.election_day import _
 from onegov.election_day.formats import EXPATS
@@ -36,7 +37,9 @@ HEADERS_WP_LISTEN = (
     'SortGeschaeft',  # provides the link to the election
     'ListNr',
     'ListCode',
-    'Sitze'
+    'Sitze',
+    'ListVerb',
+    'ListUntVerb',
 )
 HEADERS_WP_LISTENGDE = (
     'SortGemeinde',  # id (BFS)
@@ -317,6 +320,7 @@ def import_exporter_files(election, district, number, entities,
 
     # Parse the lists
     added_lists = {}
+    added_connections = {}
     for line in wp_listen.lines:
         line_errors = []
 
@@ -327,7 +331,11 @@ def import_exporter_files(election, district, number, entities,
             list_id = get_list_id(line)
             name = line.listcode
             number_of_mandates = int(line.sitze or 0)
-        except ValueError:
+            connection = line.listverb or None
+            subconnection = line.listuntverb or None
+            if subconnection:
+                assert connection
+        except (ValueError, AssertionError):
             line_errors.append(_("Invalid list values"))
         else:
             if list_id in added_lists:
@@ -342,11 +350,30 @@ def import_exporter_files(election, district, number, entities,
             )
             continue
 
+        connection_id = None
+        if connection:
+            parent_id = None
+            if subconnection:
+                parent_id = added_connections.setdefault(
+                    (connection, None),
+                    ListConnection(id=uuid4(), connection_id=connection)
+                ).id
+
+            connection_id = added_connections.setdefault(
+                (connection, subconnection),
+                ListConnection(
+                    id=uuid4(),
+                    parent_id=parent_id,
+                    connection_id=subconnection or connection,
+                )
+            ).id
+
         added_lists[list_id] = List(
             id=uuid4(),
             list_id=list_id,
             name=name,
-            number_of_mandates=number_of_mandates
+            number_of_mandates=number_of_mandates,
+            connection_id=connection_id
         )
 
     # Parse the list results
@@ -519,21 +546,14 @@ def import_exporter_files(election, district, number, entities,
         if complete == 2:
             election.status = 'final'
 
-        # todo:
-        # for connection in connections.values():
-        #     election.list_connections.append(connection)
-        # for connection in subconnections.values():
-        #     election.list_connections.append(connection)
+        for key in filter(lambda x: not x[1], added_connections.keys()):
+            election.list_connections.append(added_connections[key])
+        for key in filter(lambda x: x[1], added_connections.keys()):
+            election.list_connections.append(added_connections[key])
 
         for list_id, list_ in added_lists.items():
             if list_id != '999':
                 election.lists.append(list_)
-            # todo:
-            # if list_.list_id in panachage:
-            #     for source, votes in panachage[list_.list_id].items():
-            #         list_.panachage_results.append(
-            #             PanachageResult(source_list_id=source, votes=votes)
-            #         )
 
         for candidate in added_candidates.values():
             election.candidates.append(candidate)
