@@ -13,16 +13,15 @@ from pytest import mark
     module_path('onegov.election_day', 'tests/fixtures/wabstic_vote.tar.gz'),
 ])
 def test_import_wabstic_vote(session, tar_file):
-
     session.add(
         Vote(title='vote', domain='federation', date=date(2017, 2, 12))
     )
     session.flush()
     vote = session.query(Vote).one()
 
-    # The tar file contains vote results from the 12.02.2017:
-    #   3 federal votes (canton SG)
-    #   7 communal votes
+    # The tar file contains (modified) vote results from SG from the 12.02.2017
+    # with 2 federal votes, 1 cantonal vote, 6 simple communal votes and one
+    # complex communal vote
     with tarfile.open(tar_file, 'r|gz') as f:
         sgstatic_gemeinden = f.extractfile(f.next()).read()
         sgstatic_geschaefte = f.extractfile(f.next()).read()
@@ -32,14 +31,13 @@ def test_import_wabstic_vote(session, tar_file):
     assert sgstatic_gemeinden  # we don't need this file atm
     assert sgstatic_geschaefte  # we don't need this file atm
 
-    # Test cantonal results
+    # Test federal results
     principal = Principal('sg', '', '', canton='sg')
+    entities = principal.entities.get(vote.date.year, {})
     for number, yeas, completed in (
         ('1', 70821, True),
         ('2', 84247, False),
-        ('3', 57653, True)
     ):
-        entities = principal.entities.get(vote.date.year, {})
         errors = import_vote_wabstic(
             vote, '1', number, entities,
             BytesIO(sg_geschaefte), 'text/plain',
@@ -50,17 +48,27 @@ def test_import_wabstic_vote(session, tar_file):
         assert vote.ballots.one().results.count() == 78
         assert vote.yeas == yeas
 
+    # Test cantonal results
+    vote.domain = 'canton'
+    errors = import_vote_wabstic(
+        vote, '1', '3', entities,
+        BytesIO(sg_geschaefte), 'text/plain',
+        BytesIO(sg_gemeinden), 'text/plain'
+    )
+    assert not errors
+    assert vote.completed
+    assert vote.ballots.one().results.count() == 78
+    assert vote.yeas == 57653
+
     # Test communal results
     vote.domain = 'municipality'
     for district, number, entity_id, yeas in (
         ('3', '1', 3204, 1871),
         ('43', '1', 3292, 743),
         ('66', '1', 3352, 1167),
-        # todo: are the data wrong??
-        # ('68', '1', 3374, 189),
-        # ('68', '1', 3374, 337),
+        ('68', '1', 3374, 189),
+        ('68', '2', 3374, 337),
         ('69', '1', 3375, 365),
-        ('83', '1', 3402, 1596),
     ):
         principal = Principal(str(entity_id), '', '', municipality=entity_id)
         entities = principal.entities.get(vote.date.year, {})
@@ -90,3 +98,174 @@ def test_import_wabstic_vote(session, tar_file):
         assert not errors
         assert not vote.completed
         assert not vote.ballots.one().results.one().counted
+
+    # Test complex vote
+    vote.meta = {'vote_type': 'complex'}
+    principal = Principal(str(3402), '', '', municipality=3402)
+    entities = principal.entities.get(vote.date.year, {})
+    errors = import_vote_wabstic(
+        vote, '83', '1', entities,
+        BytesIO(sg_geschaefte), 'text/plain',
+        BytesIO(sg_gemeinden), 'text/plain'
+    )
+    assert not errors
+    assert vote.completed
+    assert vote.ballots.count() == 3
+    assert vote.proposal.yeas == 1596
+    assert vote.counter_proposal.yeas == 0
+    assert vote.tie_breaker.yeas == 0
+
+
+def test_import_wabstic_vote_errors(session):
+    session.add(
+        Vote(title='vote', domain='federation', date=date(2017, 2, 12))
+    )
+    session.flush()
+    vote = session.query(Vote).one()
+    principal = Principal('sg', '', '', canton='sg')
+    entities = principal.entities.get(vote.date.year, {})
+
+    # Test (missing) headers
+    errors = import_vote_wabstic(
+        vote, '0', '0', entities,
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'Art',
+                    'SortWahlkreis',
+                    'SortGeschaeft',
+                )),
+            ))
+        ).encode('utf-8')),
+        'text/plain',
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'SortWahlkreis',
+                    'SortGeschaeft',
+                    'SortGemeinde',
+                    'SortGemeindeSub',
+                    'Stimmberechtigte',
+                    'StmUngueltig',
+                    'StmHGJa',
+                    'StmHGNein',
+                    'StmHGOhneAw',
+                    'StmN1Ja',
+                    'StmN1Nein',
+                    'StmN1OhneAw',
+                    'StmN2Ja',
+                    'StmN2Nein',
+                    'StmN2OhneAw',
+                )),
+            ))
+        ).encode('utf-8')),
+        'text/plain'
+    )
+    assert [(e.filename, e.error.interpolate()) for e in errors] == [
+        ('sg_geschaefte', "Missing columns: 'Ausmittlungsstand'"),
+        ('sg_gemeinden', "Missing columns: 'Art, Sperrung'")
+    ]
+
+    # Test invalid values
+    errors = import_vote_wabstic(
+        vote, '0', '0', entities,
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'Art',
+                    'SortWahlkreis',
+                    'SortGeschaeft',
+                    'Ausmittlungsstand'
+                )),
+                ','.join((
+                    'Eidg',
+                    '0',
+                    '0',
+                    '4'
+                )),
+            ))
+        ).encode('utf-8')),
+        'text/plain',
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'Art',
+                    'SortWahlkreis',
+                    'SortGeschaeft',
+                    'SortGemeinde',
+                    'SortGemeindeSub',
+                    'Sperrung',
+                    'Stimmberechtigte',
+                    'StmUngueltig',
+                    'StmHGJa',
+                    'StmHGNein',
+                    'StmHGOhneAw',
+                    'StmN1Ja',
+                    'StmN1Nein',
+                    'StmN1OhneAw',
+                    'StmN2Ja',
+                    'StmN2Nein',
+                    'StmN2OhneAw',
+                )),
+                ','.join((
+                    'Eidg',
+                    '0',
+                    '0',
+                    '100',  # 'SortGemeinde',
+                    '200',  # 'SortGemeindeSub',
+                    'xxx',  # 'Sperrung',
+                    'aaa',  # 'Stimmberechtigte',
+                    'bbb',  # 'StmUngueltig',
+                    'ccc',  # 'StmHGJa',
+                    'ddd',  # 'StmHGNein',
+                    'eee',  # 'StmHGOhneAw',
+                    'fff',  # 'StmN1Ja',
+                    'ggg',  # 'StmN1Nein',
+                    'hhh',  # 'StmN1OhneAw',
+                    'iii',  # 'StmN2Ja',
+                    'jjj',  # 'StmN2Nein',
+                    'kkk',  # 'StmN2OhneAw',
+                )),
+                ','.join((
+                    'Eidg',
+                    '0',
+                    '0',
+                    'xxx',  # 'SortGemeinde',
+                    '200',  # 'SortGemeindeSub',
+                    'xxx',  # 'Sperrung',
+                    'aaa',  # 'Stimmberechtigte',
+                    'bbb',  # 'StmUngueltig',
+                    'ccc',  # 'StmHGJa',
+                    'ddd',  # 'StmHGNein',
+                    'eee',  # 'StmHGOhneAw',
+                    'fff',  # 'StmN1Ja',
+                    'ggg',  # 'StmN1Nein',
+                    'hhh',  # 'StmN1OhneAw',
+                    'iii',  # 'StmN2Ja',
+                    'jjj',  # 'StmN2Nein',
+                    'kkk',  # 'StmN2OhneAw',
+                )),
+            ))
+        ).encode('utf-8')),
+        'text/plain'
+    )
+    sorted([(e.filename, e.line, e.error.interpolate()) for e in errors])
+    assert sorted([
+        (e.filename, e.line, e.error.interpolate()) for e in errors
+    ]) == [
+        ('sg_gemeinden', 2, '100 is unknown'),
+        ('sg_gemeinden', 2, 'Could not read nays'),
+        ('sg_gemeinden', 2, 'Could not read the elegible voters'),
+        ('sg_gemeinden', 2, 'Could not read the empty votes'),
+        ('sg_gemeinden', 2, 'Could not read the invalid votes'),
+        ('sg_gemeinden', 2, 'Could not read yeas'),
+        ('sg_gemeinden', 2, 'Invalid values'),
+        ('sg_gemeinden', 3, 'Could not read nays'),
+        ('sg_gemeinden', 3, 'Could not read the elegible voters'),
+        ('sg_gemeinden', 3, 'Could not read the empty votes'),
+        ('sg_gemeinden', 3, 'Could not read the invalid votes'),
+        ('sg_gemeinden', 3, 'Could not read yeas'),
+        ('sg_gemeinden', 3, 'Invalid id'),
+        ('sg_gemeinden', 3, 'Invalid values'),
+        ('sg_geschaefte', 2, 'Invalid values')
+    ]
