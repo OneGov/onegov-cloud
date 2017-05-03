@@ -25,14 +25,15 @@ def get_delete_link(page, index=0):
     return page.pyquery('a[ic-delete-from]')[index].attrib['ic-delete-from']
 
 
-def fill_out_profile(client):
+def fill_out_profile(client, first_name="Scrooge", last_name="McDuck"):
     profile = client.get('/benutzerprofil')
     profile.form['salutation'] = 'mr'
-    profile.form['first_name'] = 'Scrooge'
-    profile.form['last_name'] = 'McDuck'
+    profile.form['first_name'] = first_name
+    profile.form['last_name'] = last_name
     profile.form['zip_code'] = '1234'
     profile.form['place'] = 'Duckburg'
-    profile.form['emergency'] = '0123 456 789 (Scrooge McDuck)'
+    profile.form['emergency'] = '0123 456 789 ({} {})'.format(
+        first_name, last_name)
     profile.form.submit()
 
 
@@ -1272,11 +1273,11 @@ def test_direct_booking_and_storno(feriennet_app):
 
     client = Client(feriennet_app)
     client.login_admin()
-    fill_out_profile(client)
+    fill_out_profile(client, "Scrooge", "McDuck")
 
     member = Client(feriennet_app)
     member.login('member@example.org', 'hunter2')
-    fill_out_profile(member)
+    fill_out_profile(member, "Zak", "McKracken")
 
     # in a confirmed period parents can book directly
     page = client.get('/angebot/foobar')
@@ -1303,12 +1304,14 @@ def test_direct_booking_and_storno(feriennet_app):
     assert "1 Plätze frei" in page
 
     # admins may do this for other members
-    url = page.click('Anmelden').pyquery('select option:nth-child(2)').val()
+    options = page.click('Anmelden').pyquery('select option')
+    url = next(
+        o.attrib['value'] for o in options if 'member' in o.attrib['value'])
     page = client.get(url)
 
     other_url = page.request.url
     assert "Mike" in page
-    assert "Für <strong>Scrooge McDuck</strong>" in page
+    assert "Für <strong>Zak McKracken</strong>" in page
 
     # members may not (simply ignores the other user)
     page = member.get('/angebot/foobar').click('Anmelden')
