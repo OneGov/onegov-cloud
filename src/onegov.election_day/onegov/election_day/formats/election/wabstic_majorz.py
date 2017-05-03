@@ -9,41 +9,41 @@ from onegov.election_day.utils import clear_election
 from uuid import uuid4
 
 HEADERS_WM_WAHL = (
-    'SortGeschaeft',  # provides the link to the election
-    'AbsolutesMehr',  # absolute majority
-    'Ausmittlungsstand',  # complete
+    'sortgeschaeft',  # provides the link to the election
+    'absolutesmehr',  # absolute majority
+    'ausmittlungsstand',  # complete
 )
 HEADERS_WMSTATIC_GEMEINDEN = (
-    'SortWahlkreis',  # provides the link to the election
-    'SortGeschaeft',  # provides the link to the election
-    'SortGemeinde',  # id (BFS)
-    'SortGemeindeSub',  # id (BFS)
-    'Stimmberechtigte',  # eligible votes
+    'sortwahlkreis',  # provides the link to the election
+    'sortgeschaeft',  # provides the link to the election
+    'sortgemeinde',  # id (BFS)
+    'sortgemeindesub',  # id (BFS)
+    'stimmberechtigte',  # eligible votes
 )
 HEADERS_WM_GEMEINDEN = (
-    'SortGemeinde',  # id (BFS)
-    'SortGemeindeSub',  # id (BFS)
-    'Stimmberechtigte',  # eligible votes
-    'Sperrung',  # counted
-    'StmAbgegeben',  # received ballots
-    'StmLeer',  # blank ballots
-    'StmUngueltig',  # invalid ballots
-    'StimmenLeer',  # blank votes
-    'StimmenUngueltig',  # invalid votes
+    'sortgemeinde',  # id (BFS)
+    'sortgemeindesub',  # id (BFS)
+    'stimmberechtigte',  # eligible votes
+    'sperrung',  # counted
+    'stmabgegeben',  # received ballots
+    'stmleer',  # blank ballots
+    'stmungueltig',  # invalid ballots
+    'stimmenleer',  # blank votes
+    'stimmenungueltig',  # invalid votes
 )
 HEADERS_WM_KANDIDATEN = (
-    'SortGeschaeft',  # provides the link to the election
-    'KNR',  # candidate id
-    'Nachname',  # familiy name
-    'Vorname',  # first name
-    'Gewahlt',  # elected
+    'sortgeschaeft',  # provides the link to the election
+    'knr',  # candidate id
+    'nachname',  # familiy name
+    'vorname',  # first name
+    'gewahlt',  # elected
 )
 HEADERS_WM_KANDIDATENGDE = (
-    'SortGeschaeft',  # provides the link to the election
-    'SortGemeinde',  # id (BFS)
-    'SortGemeindeSub',  # id (BFS)
-    'KNR',  # candidate id
-    'Stimmen',  # votes
+    'sortgeschaeft',  # provides the link to the election
+    'sortgemeinde',  # id (BFS)
+    'sortgemeindesub',  # id (BFS)
+    'knr',  # candidate id
+    'stimmen',  # votes
 )
 
 
@@ -68,7 +68,7 @@ def get_entity_id(line, entities):
 
 def import_election_wabstic_majorz(
     election, district, number, entities,
-    file_wm_wahl, mimetype_wmstatic_wahl,
+    file_wm_wahl, mimetype_wm_wahl,
     file_wmstatic_gemeinden, mimetype_wmstatic_gemeinden,
     file_wm_gemeinden, mimetype_wm_gemeinden,
     file_wm_kandidaten, mimetype_wm_kandidaten,
@@ -84,7 +84,7 @@ def import_election_wabstic_majorz(
 
     # Read the files
     wm_wahl, error = load_csv(
-        file_wm_wahl, mimetype_wmstatic_wahl,
+        file_wm_wahl, mimetype_wm_wahl,
         expected_headers=HEADERS_WM_WAHL,
         filename='wm_wahl'
     )
@@ -170,7 +170,6 @@ def import_election_wabstic_majorz(
             line_errors.append(_("Invalid id"))
         else:
             if entity_id and entity_id not in entities:
-                continue
                 line_errors.append(
                     _("${name} is unknown", mapping={'name': entity_id}))
 

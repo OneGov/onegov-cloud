@@ -8,30 +8,30 @@ from onegov.election_day.utils import clear_vote
 
 
 HEADERS_SG_GESCHAEFTE = (
-    'Art',  # domain
-    'SortWahlkreis',
-    'SortGeschaeft',  # vote number
-    'Ausmittlungsstand'
+    'art',  # domain
+    'sortwahlkreis',
+    'sortgeschaeft',  # vote number
+    'ausmittlungsstand'
 )
 
 HEADERS_SG_GEMEINDEN = (
-    'Art',  # domain
-    'SortWahlkreis',
-    'SortGeschaeft',  # vote number
-    'SortGemeinde',  # id (BFS)
-    'SortGemeindeSub',  # id (BFS)
-    'Sperrung',  # counted
-    'Stimmberechtigte',   # eligible votes
-    'StmUngueltig',  # invalid
-    'StmHGJa',  # yeas (proposal)
-    'StmHGNein',  # nays (proposal)
-    'StmHGOhneAw',  # empty (proposal)
-    'StmN1Ja',  # yeas (counter-proposal)
-    'StmN1Nein',  # nays (counter-proposal)
-    'StmN1OhneAw',  # empty (counter-proposal)
-    'StmN2Ja',  # yeas (tie-breaker)
-    'StmN2Nein',  # nays (tie-breaker)
-    'StmN2OhneAw',  # empty (tie-breaker)
+    'art',  # domain
+    'sortwahlkreis',
+    'sortgeschaeft',  # vote number
+    'sortgemeinde',  # id (BFS)
+    'sortgemeindesub',  # id (BFS)
+    'sperrung',  # counted
+    'stimmberechtigte',   # eligible votes
+    'stmungueltig',  # invalid
+    'stmhgja',  # yeas (proposal)
+    'stmhgnein',  # nays (proposal)
+    'stmhgohneaw',  # empty (proposal)
+    'stmn1ja',  # yeas (counter-proposal)
+    'stmn1nein',  # nays (counter-proposal)
+    'stmn1ohneaw',  # empty (counter-proposal)
+    'stmn2ja',  # yeas (tie-breaker)
+    'stmn2nein',  # nays (tie-breaker)
+    'stmn2ohneaw',  # empty (tie-breaker)
 )
 
 

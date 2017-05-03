@@ -116,7 +116,7 @@ def test_import_wabstic_vote(session, tar_file):
     assert vote.tie_breaker.yeas == 0
 
 
-def test_import_wabstic_vote_errors(session):
+def test_import_wabstic_vote_missing_headers(session):
     session.add(
         Vote(title='vote', domain='federation', date=date(2017, 2, 12))
     )
@@ -125,7 +125,6 @@ def test_import_wabstic_vote_errors(session):
     principal = Principal('sg', '', '', canton='sg')
     entities = principal.entities.get(vote.date.year, {})
 
-    # Test (missing) headers
     errors = import_vote_wabstic(
         vote, '0', '0', entities,
         BytesIO((
@@ -162,11 +161,20 @@ def test_import_wabstic_vote_errors(session):
         'text/plain'
     )
     assert [(e.filename, e.error.interpolate()) for e in errors] == [
-        ('sg_geschaefte', "Missing columns: 'Ausmittlungsstand'"),
-        ('sg_gemeinden', "Missing columns: 'Art, Sperrung'")
+        ('sg_geschaefte', "Missing columns: 'ausmittlungsstand'"),
+        ('sg_gemeinden', "Missing columns: 'art, sperrung'")
     ]
 
-    # Test invalid values
+
+def test_import_wabstic_vote_invalid_values(session):
+    session.add(
+        Vote(title='vote', domain='federation', date=date(2017, 2, 12))
+    )
+    session.flush()
+    vote = session.query(Vote).one()
+    principal = Principal('sg', '', '', canton='sg')
+    entities = principal.entities.get(vote.date.year, {})
+
     errors = import_vote_wabstic(
         vote, '0', '0', entities,
         BytesIO((
@@ -249,7 +257,6 @@ def test_import_wabstic_vote_errors(session):
         ).encode('utf-8')),
         'text/plain'
     )
-    sorted([(e.filename, e.line, e.error.interpolate()) for e in errors])
     assert sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
     ]) == [
