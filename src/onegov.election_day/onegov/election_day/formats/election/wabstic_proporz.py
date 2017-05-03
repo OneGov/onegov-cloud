@@ -13,56 +13,56 @@ from uuid import uuid4
 
 
 HEADERS_WP_WAHL = (
-    'SortGeschaeft',  # provides the link to the election
-    'Ausmittlungsstand',  # complete
+    'sortgeschaeft',  # provides the link to the election
+    'ausmittlungsstand',  # complete
 )
 HEADERS_WPSTATIC_GEMEINDEN = (
-    'SortWahlkreis',  # provides the link to the election
-    'SortGeschaeft',  # provides the link to the election
-    'SortGemeinde',  # id (BFS)
-    'SortGemeindeSub',  # id (BFS)
-    'Stimmberechtigte',  # eligible votes
+    'sortwahlkreis',  # provides the link to the election
+    'sortgeschaeft',  # provides the link to the election
+    'sortgemeinde',  # id (BFS)
+    'sortgemeindesub',  # id (BFS)
+    'stimmberechtigte',  # eligible votes
 )
 HEADERS_WP_GEMEINDEN = (
-    'SortGemeinde',  # id (BFS)
-    'SortGemeindeSub',  # id (BFS)
-    'Stimmberechtigte',  # eligible votes
-    'Sperrung',  # counted
-    'StmAbgegeben',  # received ballots
-    'StmLeer',  # blank ballots
-    'StmUngueltig',  # invalid ballots
-    'AnzWZAmtLeer',  # blank ballots
+    'sortgemeinde',  # id (BFS)
+    'sortgemeindesub',  # id (BFS)
+    'stimmberechtigte',  # eligible votes
+    'sperrung',  # counted
+    'stmabgegeben',  # received ballots
+    'stmleer',  # blank ballots
+    'stmungueltig',  # invalid ballots
+    'anzwzamtleer',  # blank ballots
 )
 HEADERS_WP_LISTEN = (
-    'SortGeschaeft',  # provides the link to the election
-    'ListNr',
-    'ListCode',
-    'Sitze',
-    'ListVerb',
-    'ListUntVerb',
+    'sortgeschaeft',  # provides the link to the election
+    'listnr',
+    'listcode',
+    'sitze',
+    'listverb',
+    'listuntverb',
 )
 HEADERS_WP_LISTENGDE = (
-    'SortGemeinde',  # id (BFS)
-    'SortGemeindeSub',  # id (BFS)
-    'ListNr',
-    'StimmenTotal',
+    'sortgemeinde',  # id (BFS)
+    'sortgemeindesub',  # id (BFS)
+    'listnr',
+    'stimmentotal',
 )
 HEADERS_WPSTATIC_KANDIDATEN = (
-    'SortGeschaeft',  # provides the link to the election
-    'KNR',  # candidate id
-    'Nachname',  # familiy name
-    'Vorname',  # first name
+    'sortgeschaeft',  # provides the link to the election
+    'knr',  # candidate id
+    'nachname',  # familiy name
+    'vorname',  # first name
 )
 HEADERS_WP_KANDIDATEN = (
-    'SortGeschaeft',  # provides the link to the election
-    'KNR',  # candidate id
-    'Gewahlt',  # elected
+    'sortgeschaeft',  # provides the link to the election
+    'knr',  # candidate id
+    'gewahlt',  # elected
 )
 HEADERS_WP_KANDIDATENGDE = (
-    'SortGemeinde',  # id (BFS)
-    'SortGemeindeSub',  # id (BFS)
-    'KNR',  # candidate id
-    'Stimmen',  # votes
+    'sortgemeinde',  # id (BFS)
+    'sortgemeindesub',  # id (BFS)
+    'knr',  # candidate id
+    'stimmen',  # votes
 )
 
 

@@ -28,7 +28,7 @@ def test_import_wabstic_majorz(session, tar_file):
     principal = Principal('sg', '', '', canton='sg')
     entities = principal.entities.get(election.date.year, {})
 
-    # The tar file contains (modified) results from SG from the 28.02.2016
+    # The tar file contains results from SG from the 28.02.2016
     with tarfile.open(tar_file, 'r|gz') as f:
         wmstatic_gemeinden = f.extractfile(f.next()).read()
         wm_gemeinden = f.extractfile(f.next()).read()
@@ -170,8 +170,8 @@ def test_import_wabstic_majorz_invalid_values(session):
                 )),
                 ','.join((
                     '0',
-                    'xxx',  # 'AbsolutesMehr',
-                    '4',  # 'Ausmittlungsstand',
+                    'xxx',  # AbsolutesMehr
+                    '4',  # Ausmittlungsstand
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
@@ -187,23 +187,23 @@ def test_import_wabstic_majorz_invalid_values(session):
                 ','.join((
                     '0',
                     '0',
-                    '100',  # 'SortGemeinde',
-                    '200',  # 'SortGemeindeSub',
-                    'xxx',  # 'Stimmberechtigte',
+                    '100',  # SortGemeinde
+                    '200',  # SortGemeindeSub
+                    'xxx',  # Stimmberechtigte
                 )),
                 ','.join((
                     '0',
                     '0',
-                    '3215',  # 'SortGemeinde',
-                    '200',  # 'SortGemeindeSub',
-                    '10',  # 'Stimmberechtigte',
+                    '3215',  # SortGemeinde
+                    '200',  # SortGemeindeSub
+                    '10',  # Stimmberechtigte
                 )),
                 ','.join((
                     '0',
                     '0',
-                    '3215',  # 'SortGemeinde',
-                    '200',  # 'SortGemeindeSub',
-                    '10',  # 'Stimmberechtigte',
+                    '3215',  # SortGemeinde
+                    '200',  # SortGemeindeSub
+                    '10',  # Stimmberechtigte
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
@@ -221,15 +221,15 @@ def test_import_wabstic_majorz_invalid_values(session):
                     'StimmenUngueltig',
                 )),
                 ','.join((
-                    '100',  # 'SortGemeinde',
-                    '200',  # 'SortGemeindeSub',
-                    'xxx',  # 'Stimmberechtigte',
-                    'xxx',  # 'Sperrung',
-                    'xxx',  # 'StmAbgegeben',
-                    'xxx',  # 'StmLeer',
-                    'xxx',  # 'StmUngueltig',
-                    'xxx',  # 'StimmenLeer',
-                    'xxx',  # 'StimmenUngueltig',
+                    '100',  # SortGemeinde
+                    '200',  # SortGemeindeSub
+                    'xxx',  # Stimmberechtigte
+                    'xxx',  # Sperrung
+                    'xxx',  # StmAbgegeben
+                    'xxx',  # StmLeer
+                    'xxx',  # StmUngueltig
+                    'xxx',  # StimmenLeer
+                    'xxx',  # StimmenUngueltig
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
@@ -244,10 +244,10 @@ def test_import_wabstic_majorz_invalid_values(session):
                 )),
                 ','.join((
                     '0',
-                    'xxx',  # 'KNR',
-                    'xxx',  # 'Nachname',
-                    'xxx',  # 'Vorname',
-                    'xxx',  # 'Gewahlt',
+                    'xxx',  # KNR
+                    'xxx',  # Nachname
+                    'xxx',  # Vorname
+                    'xxx',  # Gewahlt
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
@@ -262,23 +262,22 @@ def test_import_wabstic_majorz_invalid_values(session):
                 )),
                 ','.join((
                     '0',
-                    '100',  # 'SortGemeinde',
-                    '200',  # 'SortGemeindeSub',
-                    'yyy',  # 'KNR',
-                    'xxx',  # 'Stimmen',
+                    '100',  # SortGemeinde
+                    '200',  # SortGemeindeSub
+                    'yyy',  # KNR
+                    'xxx',  # Stimmen
                 )),
                 ','.join((
                     '0',
-                    '3256',  # 'SortGemeinde',
-                    '200',  # 'SortGemeindeSub',
-                    '100',  # 'KNR',
-                    '200',  # 'Stimmen',
+                    '3256',  # SortGemeinde
+                    '200',  # SortGemeindeSub
+                    '100',  # KNR
+                    '200',  # Stimmen
                 )),
 
             ))
         ).encode('utf-8')), 'text/plain'
     )
-    sorted([(e.filename, e.line, e.error.interpolate()) for e in errors])
     assert sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
     ]) == [
