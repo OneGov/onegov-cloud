@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.9.0 (2017-05-03)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to search attendees and activity organisers.
   [href]
 
