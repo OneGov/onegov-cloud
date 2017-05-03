@@ -186,5 +186,5 @@ def handle_send_notification(self, request, form):
         'preview_subject': variables.render(self.subject),
         'preview_body': variables.render(self.text),
         'edit_link': request.return_here(request.link(self, 'bearbeiten')),
-        'button_text': _("Send")
+        'button_text': _("Send E-Mail Now")
     }

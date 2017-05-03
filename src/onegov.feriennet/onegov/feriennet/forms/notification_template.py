@@ -4,6 +4,7 @@ from onegov.activity import Occasion, OccasionCollection
 from onegov.activity import Period
 from onegov.feriennet import _
 from onegov.feriennet.layout import DefaultLayout
+from onegov.feriennet.collections import BillingCollection
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.user import User, UserCollection
@@ -30,11 +31,28 @@ class NotificationTemplateForm(Form):
 class NotificationTemplateSendForm(Form):
 
     send_to = RadioField(
-        label=_("Send to"),
+        label=_("Send to (applies to active period only)"),
         choices=[
-            ('by_role', _("All users of a given role")),
+            ('myself', _(
+                "Myself"
+            )),
+            ('active_organisers', _(
+                "Organisers with an occasion"
+            )),
+            ('by_role', _(
+                "Users of a given role"
+            )),
+            ('with_wishlist', _(
+                "Users with wishes"
+            )),
+            ('with_bookings', _(
+                "Users with bookings"
+            )),
+            ('with_unpaid_bills', _(
+                "Users with unpaid bills"
+            )),
             ('by_occasion', _(
-                "All attendees of a given occasion in the current period"
+                "Users with attendees of a given occasion"
             )),
         ],
         default='by_role'
@@ -56,9 +74,17 @@ class NotificationTemplateSendForm(Form):
         depends_on=('send_to', 'by_occasion')
     )
 
+    state = MultiCheckboxField(
+        label=_("Useraccounts"),
+        choices=[
+            ('active', _("Active users")),
+            ('inactive', _("Inactive users")),
+        ],
+        default=['active'],
+    )
+
     def on_request(self):
         self.populate_occasion()
-        self.limit_send_to_choices_for_organisers()
 
     @property
     def has_choices(self):
@@ -66,31 +92,49 @@ class NotificationTemplateSendForm(Form):
 
     @property
     def recipients(self):
-        if self.request.is_organiser_only and self.send_to.data == 'by_role':
-            return None
+        if self.send_to.data == 'myself':
+            return [self.request.current_username]
 
-        if self.send_to.data == 'by_role':
-            return self.recipients_by_role(self.roles.data)
+        elif self.send_to.data == 'by_role':
+            recipients = self.recipients_by_role(self.roles.data)
 
         elif self.send_to.data == 'by_occasion':
-            return self.recipients_by_occasion(self.occasion.data)
+            recipients = self.recipients_by_occasion(self.occasion.data)
+
+        elif self.send_to.data == 'with_wishlist':
+            recipients = self.recipients_with_wishes()
+
+        elif self.send_to.data == 'with_bookings':
+            recipients = self.recipients_with_bookings()
+
+        elif self.send_to.data == 'active_organisers':
+            recipients = self.recipients_which_are_active_organisers()
+
+        elif self.send_to.data == 'with_unpaid_bills':
+            recipients = self.recipients_with_unpaid_bills()
 
         else:
             raise NotImplementedError
 
-    def limit_send_to_choices_for_organisers(self):
-        if self.request.is_organiser_only:
-            assert len(self.send_to.choices) == 2
-            self.send_to.choices = [
-                ('by_occasion', _(
-                    "All attendees of a given occasion in the current period"
-                ))
-            ]
-            self.send_to.data = 'by_occasion'
+        return [r for r in recipients if r in self.recipients_pool]
+
+    @property
+    def recipients_pool(self):
+        users = UserCollection(self.request.app.session())
+        users = users.query()
+
+        if self.state.data == ['active']:
+            users = users.filter(User.active == True)
+        elif self.state.data == ['inactive']:
+            users = users.filter(User.active == False)
+        elif self.state.data != ['active', 'inactive']:
+            return set()
+
+        return set(u.username for u in users.with_entities(User.username))
 
     def recipients_by_role(self, roles):
         if not roles:
-            return None
+            return []
 
         users = UserCollection(self.request.app.session())
 
@@ -98,7 +142,58 @@ class NotificationTemplateSendForm(Form):
         q = q.filter(User.active == True)
         q = q.with_entities(User.username)
 
-        return list(u.username for u in q)
+        return [u.username for u in q]
+
+    def recipients_with_wishes(self):
+        bookings = BookingCollection(self.request.app.session())
+        period = self.request.app.active_period
+
+        if not period.wishlist_phase:
+            return []
+
+        q = bookings.query()
+        q = q.join(Period)
+
+        q = q.filter(Period.active == True)
+        q = q.with_entities(distinct(Booking.username).label('username'))
+
+        return [b.username for b in q]
+
+    def recipients_with_bookings(self):
+        bookings = BookingCollection(self.request.app.session())
+        period = self.request.app.active_period
+
+        if period.wishlist_phase:
+            return []
+
+        q = bookings.query()
+        q = q.join(Period)
+
+        q = q.filter(Period.active == True)
+        q = q.with_entities(distinct(Booking.username).label('username'))
+
+        return [b.username for b in q]
+
+    def recipients_which_are_active_organisers(self):
+        occasions = OccasionCollection(self.request.app.session())
+
+        q = occasions.query()
+        q = q.join(Activity)
+        q = q.join(Period)
+        q = q.filter(Period.active == True)
+
+        q = q.with_entities(distinct(Activity.username).label('username'))
+
+        return [o.username for o in q]
+
+    def recipients_with_unpaid_bills(self):
+        period = self.request.app.active_period
+        billing = BillingCollection(self.request.app.session(), period)
+
+        return [
+            username for username, bill in billing.bills.items()
+            if not bill.paid
+        ]
 
     def recipients_by_occasion_query(self, occasions):
         bookings = BookingCollection(self.request.app.session())
@@ -123,7 +218,7 @@ class NotificationTemplateSendForm(Form):
         q = self.recipients_by_occasion_query(occasions)
         q = q.with_entities(distinct(Booking.username).label('username'))
 
-        return list(b.username for b in q)
+        return [b.username for b in q]
 
     def recipients_count_by_occasion(self, occasions):
         q = self.recipients_by_occasion_query(occasions)
@@ -140,9 +235,6 @@ class NotificationTemplateSendForm(Form):
         q = q.join(Period)
         q = q.filter(Period.active == True)
         q = q.order_by(Activity.name, Occasion.order)
-
-        if self.request.is_organiser_only:
-            q = q.filter(Activity.username == self.request.current_username)
 
         layout = DefaultLayout(self.model, self.request)
 

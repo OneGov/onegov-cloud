@@ -7,6 +7,7 @@ from onegov.activity import BookingCollection
 from onegov.activity import OccasionCollection
 from onegov.activity import PeriodCollection
 from onegov.core.utils import Bunch
+from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.forms import NotificationTemplateSendForm
 from onegov.feriennet.forms import VacationActivityForm
 from onegov.user import UserCollection
@@ -125,15 +126,23 @@ def test_notification_template_send_form(session):
     a1 = attendees.add(admin, 'Dustin', date(2000, 1, 1), 'male')
     a2 = attendees.add(admin, 'Mike', date(2000, 1, 1), 'female')
 
-    bookings.add(admin, a1, o1).state = 'accepted'
-    bookings.add(organiser, a2, o2).state = 'accepted'
+    b1 = bookings.add(admin, a1, o1)
+    b1.state = 'accepted'
+    b1.cost = 100
+
+    b2 = bookings.add(organiser, a2, o2)
+    b2.state = 'accepted'
+    b2.cost = 100
 
     transaction.commit()
 
     # create a mock request
     def request(admin):
         return Bunch(
-            app=Bunch(session=lambda: session),
+            app=Bunch(
+                session=lambda: session,
+                active_period=periods.query().one()
+            ),
             include=lambda *args: None,
             model=None,
             is_admin=admin,
@@ -159,17 +168,7 @@ def test_notification_template_send_form(session):
 
     assert form.has_choices
     assert len(form.occasion.choices) == 2
-    assert len(form.send_to.choices) == 2
-
-    # if the user is an organiser, the choices are limited
-    form = NotificationTemplateSendForm()
-    form.model = None
-    form.request = request(admin=False)
-    assert not form.has_choices
-
-    form.on_request()
-    assert len(form.occasion.choices) == 1
-    assert len(form.send_to.choices) == 1
+    assert len(form.send_to.choices) == 7
 
     # if the period is inactive, there are no occasions
     periods.query().one().active = False
@@ -215,3 +214,52 @@ def test_notification_template_send_form(session):
     transaction.commit()
 
     assert len(form.recipients_by_occasion(occasions)) == 1
+
+    # inactive users may be exluded
+    form.state.data = ['active']
+    assert len(form.recipients_pool) == 3
+
+    form.state.data = ['active', 'inactive']
+    assert len(form.recipients_pool) == 3
+
+    form.state.data = ['inactive']
+    assert len(form.recipients_pool) == 0
+
+    # bookings count towards the wishlist if the period is active,
+    period = periods.query().one()
+    period.active = True
+    period.confirmed = False
+
+    transaction.commit()
+
+    form.request = request(admin=True)
+
+    # do not count cancelled bookings...
+    assert len(form.recipients_with_wishes()) == 2
+    assert len(form.recipients_with_bookings()) == 0
+
+    # otherwise they count towards the bookings
+    period = periods.query().one()
+    period.confirmed = True
+
+    transaction.commit()
+
+    form.request = request(admin=True)
+    assert len(form.recipients_with_wishes()) == 0
+    assert len(form.recipients_with_bookings()) == 2
+
+    # count the active organisers
+    form.request = request(admin=True)
+    assert len(form.recipients_which_are_active_organisers()) == 2
+
+    # count the users with unpaid bills
+    form.request = request(admin=True)
+    assert len(form.recipients_with_unpaid_bills()) == 0
+
+    period = periods.query().one()
+    billing = BillingCollection(session, period)
+    billing.create_invoices()
+    transaction.commit()
+
+    form.request = request(admin=True)
+    assert len(form.recipients_with_unpaid_bills()) == 1

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds more target groups to send notifications to.
+  [href]
+
 0.9.0 (2017-05-03)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -30,4 +30,3 @@ var handle_reload_from = function(_e, data) {
 };
 
 $(document).on('reload-from', handle_reload_from);
-

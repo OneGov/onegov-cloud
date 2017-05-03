@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-05-02 11:35+0200\n"
+"POT-Creation-Date: 2017-05-03 14:54+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -314,12 +314,16 @@ msgstr "Junge"
 msgid ""
 "Your userprofile is not complete. It needs to be complete before signing up "
 "any attendees."
-msgstr "Ihr Benutzerprofil ist unvollständig. Es muss vollständig sein bevor Sie Teilnehmer anmelden können."
+msgstr ""
+"Ihr Benutzerprofil ist unvollständig. Es muss vollständig sein bevor Sie "
+"Teilnehmer anmelden können."
 
 msgid ""
 "The user's userprofile is not complete. It needs to be complete before "
 "signing up any attendees."
-msgstr "Das Benutzerprofil des Benutzers ist unvollständig. Es muss vollständig sein bevor Teilnehmer angemeldet werden können."
+msgstr ""
+"Das Benutzerprofil des Benutzers ist unvollständig. Es muss vollständig sein "
+"bevor Teilnehmer angemeldet werden können."
 
 #, python-format
 msgid "This occasion has already been booked by ${name}"
@@ -379,14 +383,17 @@ msgstr "Betreff"
 msgid "Message"
 msgstr "Mitteilung"
 
-msgid "Send to"
-msgstr "Empfänger"
+msgid "Send to (applies to active period only)"
+msgstr "Senden an (bezieht sich nur auf die aktive Periode)"
 
 msgid "Role"
 msgstr "Rolle"
 
 msgid "Occasion"
 msgstr "Durchführung"
+
+msgid "Useraccounts"
+msgstr "Benutzerkonten"
 
 #, python-format
 msgid "${title} (cancelled) <small>${dates}, ${count} Attendees</small>"
@@ -396,11 +403,26 @@ msgstr "${title} (abgesagt) <small>${dates}, ${count} Teilnehmer</small>"
 msgid "${title} <small>${dates}, ${count} Attendees</small>"
 msgstr "${title} <small>${dates}, ${count} Teilnehmer</small>"
 
-msgid "All users of a given role"
-msgstr "Alle Benutzer mit einer bestimmten Rolle"
+msgid "Myself"
+msgstr "Mich selbst"
 
-msgid "All attendees of a given occasion in the current period"
-msgstr "Alle Teilnehmer einer Durchführung in der aktuellen Periode"
+msgid "Users of a given role"
+msgstr "Benutzer mit einer bestimmten Rolle"
+
+msgid "Users with attendees of a given occasion"
+msgstr "Benutzer mit Teilnehmern einer bestimmten Durchführung"
+
+msgid "Users with wishes"
+msgstr "Benutzer mit Wünschen"
+
+msgid "Users with bookings"
+msgstr "Benutzer mit Buchungen"
+
+msgid "Organisers with an occasion"
+msgstr "Veranstalter mit Durchführungen"
+
+msgid "Users with unpaid bills"
+msgstr "Benutzer mit unbezahlten Rechnungen"
 
 msgid "Administrators"
 msgstr "Administratoren"
@@ -410,6 +432,12 @@ msgstr "Veranstalter"
 
 msgid "Members"
 msgstr "Mitglieder"
+
+msgid "Active users"
+msgstr "Aktive Benutzer"
+
+msgid "Inactive users"
+msgstr "Inaktive Benutzer"
 
 msgid "Dates"
 msgstr "Daten"
@@ -1156,8 +1184,8 @@ msgstr ""
 msgid "Edit"
 msgstr "Bearbeiten"
 
-msgid "Send"
-msgstr "Senden"
+msgid "Target Group"
+msgstr "Zielgruppe"
 
 msgid "There are no available recipients for your user account."
 msgstr "Es bestehen keine verfügbaren Empfänger für Ihren Benutzer"
@@ -1464,6 +1492,9 @@ msgstr "Leer"
 msgid "Mailing"
 msgstr "Versand"
 
+msgid "Send E-Mail Now"
+msgstr "E-Mail jetzt versenden"
+
 msgid "Successfully added a new notification template"
 msgstr "Die Mitteilungs-Vorlage wurde erfolgreich hinzugefügt"
 
@@ -1543,3 +1574,18 @@ msgstr ""
 
 msgid "Activate Period"
 msgstr "Periode Aktivieren"
+
+#~ msgid "Send to"
+#~ msgstr "Empfänger"
+
+#~ msgid "Users with attendees of some occasion"
+#~ msgstr "Benutzer mit Teilnehmern einer bestimmten Durchführung"
+
+#~ msgid "All attendees of a given occasion"
+#~ msgstr "Alle Teilnehmer einer bestimmten Durchführung"
+
+#~ msgid "Users with attendees of an occasion in the current period"
+#~ msgstr "Benutzer mit Teilnehmer einer Durchführung in der aktiven Periode"
+
+#~ msgid "Active Members"
+#~ msgstr "Aktive Mitglieder"
