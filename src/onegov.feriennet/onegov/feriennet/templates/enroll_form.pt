@@ -9,7 +9,7 @@
         </div>
 
         <div class="row">
-            <div class="columns small-12 medium-6 enroll-form">
+            <div class="columns small-12 medium-8 enroll-form">
                 <h2>${occasion.activity.title}</h2>
 
                 <div class="occasions">
@@ -23,14 +23,16 @@
                     </div>
                 </div>
             </div>
-            <div class="columns small-12 medium-6">
+            <div class="columns small-12 medium-4">
                 <tal:block condition="request.is_admin">
-                    <h2 i18n:translate>User</h2>
-                    <select onchange="location = this.value;">
-                        <option tal:repeat="user users" value="${form.for_username(user.username)}" tal:attributes="selected user.username == form.username">
-                            ${user.title}
-                        </option>
-                    </select>
+                    <div class="filter-panel">
+                        <h2 class="filter-title" i18n:translate>User</h2>
+                        <select onchange="location = this.value;">
+                            <option tal:repeat="user users" value="${form.for_username(user.username)}" tal:attributes="selected user.username == form.username">
+                                ${user.title}
+                            </option>
+                        </select>
+                    </div>
                 </tal:block>
             </div>
         </div>
