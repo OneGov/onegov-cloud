@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-28 16:02+0200\n"
-"PO-Revision-Date: 2017-04-28 16:03+0200\n"
+"POT-Creation-Date: 2017-05-04 09:40+0200\n"
+"PO-Revision-Date: 2017-05-04 09:41+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -94,12 +94,6 @@ msgstr "Fichier xls/xlsx non valide."
 msgid "The xls/xlsx file contains unsupported cells."
 msgstr "Le fichier xls/xlsx contient des cellules non supportées."
 
-msgid "Party results"
-msgstr "Résultats des partis"
-
-msgid "Invalid values"
-msgstr "Valeurs non valides"
-
 msgid "Results"
 msgstr "Résultats"
 
@@ -134,6 +128,18 @@ msgstr "Valeurs de connexion de liste non valides"
 msgid "No data found"
 msgstr "Pas de données trouvées"
 
+msgid "Party results"
+msgstr "Résultats des partis"
+
+msgid "Invalid values"
+msgstr "Valeurs non valides"
+
+msgid "Elected Candidates"
+msgstr "Candidats élus"
+
+msgid "Unknown candidate"
+msgstr "Candidat inconnu"
+
 msgid "Invalid id"
 msgstr "Mauvaise référence"
 
@@ -143,12 +149,6 @@ msgstr "${name} a été trouvé en double"
 
 msgid "Could not read the elegible voters"
 msgstr "Impossible de connaître les électeurs valides"
-
-msgid "Elected Candidates"
-msgstr "Candidats élus"
-
-msgid "Unknown candidate"
-msgstr "Candidat inconnu"
 
 msgid "Missing municipality/district"
 msgstr "Municipalité manquante/District manquant"
@@ -611,6 +611,9 @@ msgstr "Nouvelle cartographie"
 msgid "No mappings yet."
 msgstr "Aucune cartographie pour l'instant."
 
+msgid "Actions"
+msgstr "Actions"
+
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -625,9 +628,6 @@ msgstr "Aucune source de données pour l'instant."
 
 msgid "Token"
 msgstr "Token"
-
-msgid "Actions"
-msgstr "Actions"
 
 msgid "Regenerate token"
 msgstr "Renouveler le token"
@@ -721,3 +721,6 @@ msgstr "Supprimer la votation"
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "L'année ${year} n'est pas encore prise en charge"
+
+msgid "The data source is not configured properly"
+msgstr "La source de données n'est pas configurée correctement"

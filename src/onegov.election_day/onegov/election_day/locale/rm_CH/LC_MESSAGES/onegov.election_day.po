@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-28 16:02+0200\n"
+"POT-Creation-Date: 2017-05-04 09:40+0200\n"
 "PO-Revision-Date: 2017-04-28 16:04+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -94,12 +94,6 @@ msgstr "Nagina datoteca XLS/XLSX valaivla."
 msgid "The xls/xlsx file contains unsupported cells."
 msgstr "La datoteca XLS/XLSX cuntegna cellas betg sustegnidas."
 
-msgid "Party results"
-msgstr "Resultats da las partidas"
-
-msgid "Invalid values"
-msgstr "Valurs nunvalaivlas"
-
 msgid "Results"
 msgstr "Resultats"
 
@@ -134,6 +128,18 @@ msgstr "Datas nunvalaivlas da colliaziuns da glistas"
 msgid "No data found"
 msgstr "Chattà naginas datas"
 
+msgid "Party results"
+msgstr "Resultats da las partidas"
+
+msgid "Invalid values"
+msgstr "Valurs nunvalaivlas"
+
+msgid "Elected Candidates"
+msgstr "Candidat(a)s elegid(a)s"
+
+msgid "Unknown candidate"
+msgstr "Candidat(a) nunenconuschent(a)"
+
 msgid "Invalid id"
 msgstr "ID nunvalaivel"
 
@@ -143,12 +149,6 @@ msgstr "${name} è avant maun duas giadas"
 
 msgid "Could not read the elegible voters"
 msgstr "I n'è betg stà pussaivel da leger las persunas cun dretg da votar"
-
-msgid "Elected Candidates"
-msgstr "Candidat(a)s elegid(a)s"
-
-msgid "Unknown candidate"
-msgstr "Candidat(a) nunenconuschent(a)"
 
 msgid "Missing municipality/district"
 msgstr "Lieu che manca"
@@ -649,6 +649,9 @@ msgstr "Nova attribuziun"
 msgid "No mappings yet."
 msgstr "Anc naginas attribuziuns."
 
+msgid "Actions"
+msgstr "Acziuns"
+
 msgid "Delete"
 msgstr "Stizzar"
 
@@ -663,9 +666,6 @@ msgstr "Anc naginas funtaunas da datas."
 
 msgid "Token"
 msgstr "Token"
-
-msgid "Actions"
-msgstr "Acziuns"
 
 msgid "Regenerate token"
 msgstr "Generar da nov il token"
@@ -762,3 +762,6 @@ msgstr "Stizzar la votaziun"
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "L'onn ${year} na vegn anc betg sustegnì"
+
+msgid "The data source is not configured properly"
+msgstr ""

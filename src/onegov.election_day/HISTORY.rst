@@ -1,5 +1,12 @@
 Changelog
 ---------
+
+- Translates form errors when uploading WabstiCExport files.
+  [msom]
+
+- Adds tests.
+  [msom]
+
 1.8.6 (2017-05-02)
 ~~~~~~~~~~~~~~~~~~~
 

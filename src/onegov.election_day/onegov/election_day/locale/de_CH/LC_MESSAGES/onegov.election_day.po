@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-28 16:02+0200\n"
-"PO-Revision-Date: 2017-04-24 11:08+0200\n"
+"POT-Creation-Date: 2017-05-04 09:40+0200\n"
+"PO-Revision-Date: 2017-05-04 09:41+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -94,12 +94,6 @@ msgstr "Keine gültige XLS/XLSX Datei."
 msgid "The xls/xlsx file contains unsupported cells."
 msgstr "Die XLS/XLSX Datei enthält nicht unterstütze Zellen."
 
-msgid "Party results"
-msgstr "Parteiresultate"
-
-msgid "Invalid values"
-msgstr "Ungültige Werte"
-
 msgid "Results"
 msgstr "Resultate"
 
@@ -134,6 +128,18 @@ msgstr "Ungültige Listenverbindungsdaten"
 msgid "No data found"
 msgstr "Keine Daten gefunden"
 
+msgid "Party results"
+msgstr "Parteiresultate"
+
+msgid "Invalid values"
+msgstr "Ungültige Werte"
+
+msgid "Elected Candidates"
+msgstr "Gewählte Kandidierende"
+
+msgid "Unknown candidate"
+msgstr "Unbekannter Kandidierender"
+
 msgid "Invalid id"
 msgstr "Ungültige ID"
 
@@ -143,12 +149,6 @@ msgstr "${name} kommt zweimal vor"
 
 msgid "Could not read the elegible voters"
 msgstr "Konnte 'Stimmberechtigte' nicht lesen"
-
-msgid "Elected Candidates"
-msgstr "Gewählte Kandidierende"
-
-msgid "Unknown candidate"
-msgstr "Unbekannter Kandidierender"
 
 msgid "Missing municipality/district"
 msgstr "Fehlende Bezeichnung"
@@ -613,6 +613,9 @@ msgstr "Neue Zuordnung"
 msgid "No mappings yet."
 msgstr "Noch keine Zuordnungen."
 
+msgid "Actions"
+msgstr "Aktionen"
+
 msgid "Delete"
 msgstr "Löschen"
 
@@ -627,9 +630,6 @@ msgstr "Noch keine Datenquellen."
 
 msgid "Token"
 msgstr "Token"
-
-msgid "Actions"
-msgstr "Aktionen"
 
 msgid "Regenerate token"
 msgstr "Token neu erzeugen"
@@ -721,3 +721,6 @@ msgstr "Abstimmung löschen"
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "Das Jahr ${year} wird noch nicht unterstützt"
+
+msgid "The data source is not configured properly"
+msgstr "Die Datenquellekonfiguration ist ungültig"

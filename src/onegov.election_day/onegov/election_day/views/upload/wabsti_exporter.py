@@ -2,18 +2,25 @@ import transaction
 
 from base64 import b64decode
 from onegov.core.security import Public
+from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
-from onegov.election_day.forms import UploadWabstiVoteForm
-from onegov.election_day.forms import UploadWabstiMajorzElectionForm
-from onegov.election_day.forms import UploadWabstiProporzElectionForm
-from onegov.election_day.formats import import_vote_wabstic
 from onegov.election_day.formats import import_election_wabstic_majorz
 from onegov.election_day.formats import import_election_wabstic_proporz
-from onegov.election_day.models import Principal
+from onegov.election_day.formats import import_vote_wabstic
+from onegov.election_day.forms import UploadWabstiMajorzElectionForm
+from onegov.election_day.forms import UploadWabstiProporzElectionForm
+from onegov.election_day.forms import UploadWabstiVoteForm
 from onegov.election_day.models import DataSource
+from onegov.election_day.models import Principal
 from onegov.election_day.views.upload import unsupported_year_error
 from webob.exc import HTTPForbidden
+
+
+def set_locale(request):
+    locale = request.headers.get('Accept-Language') or 'en'
+    locale = locale if locale in request.app.locales else 'en'
+    request.locale = locale
 
 
 def authenticated_source(request):
@@ -29,19 +36,12 @@ def authenticated_source(request):
         raise HTTPForbidden()
 
 
-def interpolate_errors(errors, request):
-    locale = request.headers.get('Accept-Language') or 'en'
-    translator = request.app.translations.get(locale)
-
+def translate_errors(errors, request):
     for key, values in errors.items():
         errors[key] = []
         for value in values:
-            content = value.error
-            translated = translator.gettext(content) if translator else content
-            translated = content.interpolate(translated)
-
             errors[key].append({
-                'message': translated,
+                'message': request.translate(value.error),
                 'filename': value.filename,
                 'line': value.line
             })
@@ -60,21 +60,22 @@ def view_upload_wabsti_vote(self, request):
             --form "sg_geschafte=@SG_Geschaefte.csv"
 
     """
+    set_locale(request)
 
     data_source = authenticated_source(request)
-
     if data_source.type != 'vote':
         return {
             'status': 'error',
             'errors': {
-                'data_source': 'The data source is note configured properly'
+                'data_source': request.translate(_(
+                    'The data source is not configured properly'
+                ))
             }
         }
 
     form = request.get_form(
         UploadWabstiVoteForm,
         model=self,
-        i18n_support=False,
         csrf_support=False
     )
     if not form.validate():
@@ -110,7 +111,7 @@ def view_upload_wabsti_vote(self, request):
                 )
             )
 
-    interpolate_errors(errors, request)
+    translate_errors(errors, request)
 
     if any(errors.values()):
         transaction.abort()
@@ -136,21 +137,23 @@ def view_upload_wabsti_majorz(self, request):
             --form "wmstatic_gemeinden=@WMStatic_Gemeinden.csv"
 
     """
+    set_locale(request)
 
     data_source = authenticated_source(request)
-
     if data_source.type != 'majorz':
         return {
             'status': 'error',
             'errors': {
-                'data_source': 'The data source is note configured properly'
+                'data_source': request.translate(_(
+                    'The data source is not configured properly'
+                ))
             }
         }
 
     form = request.get_form(
         UploadWabstiMajorzElectionForm,
         model=self,
-        i18n_support=False,
+        i18n_support=True,
         csrf_support=False
     )
     if not form.validate():
@@ -195,7 +198,7 @@ def view_upload_wabsti_majorz(self, request):
                 )
             )
 
-    interpolate_errors(errors, request)
+    translate_errors(errors, request)
 
     if any(errors.values()):
         transaction.abort()
@@ -224,21 +227,22 @@ def view_upload_wabsti_proporz(self, request):
             --form "wpstatic_kandidaten=@WPStatic_Kandidaten.csv"
 
     """
+    set_locale(request)
 
     data_source = authenticated_source(request)
-
     if data_source.type != 'proporz':
         return {
             'status': 'error',
             'errors': {
-                'data_source': 'The data source is note configured properly'
+                'data_source': request.translate(_(
+                    'The data source is not configured properly'
+                ))
             }
         }
 
     form = request.get_form(
         UploadWabstiProporzElectionForm,
         model=self,
-        i18n_support=False,
         csrf_support=False
     )
     if not form.validate():
@@ -289,7 +293,7 @@ def view_upload_wabsti_proporz(self, request):
                 )
             )
 
-    interpolate_errors(errors, request)
+    translate_errors(errors, request)
 
     if any(errors.values()):
         transaction.abort()

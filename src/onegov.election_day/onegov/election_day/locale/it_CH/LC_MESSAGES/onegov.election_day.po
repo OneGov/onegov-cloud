@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-28 16:02+0200\n"
-"PO-Revision-Date: 2017-04-28 16:03+0200\n"
+"POT-Creation-Date: 2017-05-04 09:40+0200\n"
+"PO-Revision-Date: 2017-05-04 09:42+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -94,12 +94,6 @@ msgstr "Nessun file XLS/XLSX valido."
 msgid "The xls/xlsx file contains unsupported cells."
 msgstr "Il file xls/xlsx contiene celle non supportate."
 
-msgid "Party results"
-msgstr "Risultati del partito"
-
-msgid "Invalid values"
-msgstr "Valori non validi"
-
 msgid "Results"
 msgstr "Risultati"
 
@@ -134,6 +128,18 @@ msgstr "Valori della lista delle connessioni non validi"
 msgid "No data found"
 msgstr "Nessun dato trovato"
 
+msgid "Party results"
+msgstr "Risultati del partito"
+
+msgid "Invalid values"
+msgstr "Valori non validi"
+
+msgid "Elected Candidates"
+msgstr "Candidati eletti"
+
+msgid "Unknown candidate"
+msgstr "Candidato non conosciuto"
+
 msgid "Invalid id"
 msgstr "ID non valido"
 
@@ -143,12 +149,6 @@ msgstr "${name} figura due volte"
 
 msgid "Could not read the elegible voters"
 msgstr "Impossibile leggere 'Aventi diritto di voto'"
-
-msgid "Elected Candidates"
-msgstr "Candidati eletti"
-
-msgid "Unknown candidate"
-msgstr "Candidato non conosciuto"
 
 msgid "Missing municipality/district"
 msgstr "Località/Distretto mancante"
@@ -610,6 +610,9 @@ msgstr "Nuovo mapping"
 msgid "No mappings yet."
 msgstr "Nessun mapping per il momento."
 
+msgid "Actions"
+msgstr "Azioni"
+
 msgid "Delete"
 msgstr "Elimina"
 
@@ -624,9 +627,6 @@ msgstr "Nessuna origine dati per il momento."
 
 msgid "Token"
 msgstr "Token"
-
-msgid "Actions"
-msgstr "Azioni"
 
 msgid "Regenerate token"
 msgstr "Rigenera token"
@@ -720,3 +720,6 @@ msgstr "Elimina votazione"
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "L'anno ${year} non viene ancora supportato"
+
+msgid "The data source is not configured properly"
+msgstr "L'origine dati non è configurata correttamente"
