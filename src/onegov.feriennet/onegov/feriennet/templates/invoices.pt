@@ -3,12 +3,11 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
-
-    <tal:block condition="not: bills" i18n:translate>No bills created yet.</tal:block>
-
-    <div class="row" tal:condition="bills">
+    <div class="row">
         <div class="columns small-12 medium-8">
-            <div class="bills">
+            <tal:block condition="not: bills" i18n:translate>No bills created yet.</tal:block>
+            
+            <div class="bills" tal:condition="bills">
                 <div class="bill ${details.paid and 'paid' or 'unpaid'}" id="${details.id}" tal:repeat="(title, details) bills.items()">
                     <h3>${details.title}</h3>
 
@@ -59,10 +58,16 @@
                                         <span i18n:translate>Amount</span>
                                         <span>${'{:.2f}'.format(details.outstanding)} CHF</span>
                                     </li>
-                                    <li>
-                                        <span i18n:translate>Notice</span>
-                                        <span>${details.first.display_code}</span>
-                                    </li>
+                                    <tal:block switch="layout.org.bank_payment_order_type">
+                                        <li tal:case="string:esr">
+                                            <span i18n:translate>Reference Number</span>
+                                            <span>${details.first.display_esr_code}</span>
+                                        </li>
+                                        <li tal:case="default">
+                                            <span i18n:translate>Notice</span>
+                                            <span>${details.first.display_code}</span>
+                                        </li>
+                                    </tal:block>
                                 </ul>
                             </div>
                         </div>

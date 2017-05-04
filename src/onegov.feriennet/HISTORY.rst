@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for ESR payment orders.
+  [href]
+
 - Adds more target groups to send notifications to.
   [href]
 
