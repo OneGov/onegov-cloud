@@ -173,8 +173,16 @@ class MatchCollection(object):
 
             max_spots = occasion['first'].occasion_spots.upper - 1
             min_spots = occasion['first'].occasion_spots.lower
+            accepted = len(occasion['accepted'])
+            other = len(occasion['other'])
 
-            if len(occasion['accepted']) == 0:
+            if occasion['first'].occasion_cancelled:
+                occasion['state'] = 'cancelled'
+
+            elif (accepted + other) > max_spots:
+                occasion['state'] = 'overfull'
+
+            elif accepted == 0:
                 occasion['state'] = 'empty'
 
             elif len(occasion['accepted']) < min_spots:

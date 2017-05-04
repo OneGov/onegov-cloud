@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to filter overfull and cancelled occasions when matching.
+  [href]
+
 - Fixes a number of grammatical errors in German.
   [href]
 

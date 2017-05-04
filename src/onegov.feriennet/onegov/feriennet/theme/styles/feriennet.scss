@@ -1150,6 +1150,10 @@ ul.tags {
               $gray-pastel 30px
             );
 
+            .meter {
+                background-color: $red-light;
+            }
+
             .meter-text::before {
                 @include icon('\f00d');
                 color: $red;

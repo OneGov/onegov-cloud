@@ -136,10 +136,12 @@ def handle_matches(self, request, form):
             active=state in self.states,
             url=request.link(self.for_filter(state=state))
         ) for text, state in (
-            (_("Full"), 'full'),
-            (_("Operable"), 'operable'),
-            (_("Unoperable"), 'unoperable'),
-            (_("Empty"), 'empty')
+            (_("Too many attendees"), 'overfull'),
+            (_("Fully occupied"), 'full'),
+            (_("Enough attendees"), 'operable'),
+            (_("Not enough attendees"), 'unoperable'),
+            (_("No attendees"), 'empty'),
+            (_("Rescinded"), 'cancelled')
         )
     )
 
