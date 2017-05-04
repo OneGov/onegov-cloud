@@ -3,7 +3,7 @@ from decimal import Decimal
 from onegov.activity.collections import InvoiceItemCollection
 from onegov.activity.iso20022 import extract_transactions, extract_code
 from onegov.activity.iso20022 import match_camt_053_to_usernames
-from onegov.activity.utils import generate_xml
+from onegov.activity.utils import generate_xml, encode_invoice_code
 
 
 def test_extract_transactions(postfinance_xml):
@@ -114,7 +114,7 @@ def test_extract_code():
     assert extract_code('Code: q-70171-292fa') == 'q70171292fa'
 
 
-def test_invoice_matching_without_esr(session, owner, member):
+def test_invoice_matching(session, owner, member):
     items = InvoiceItemCollection(session)
 
     i1 = items.add(owner, '2017', 'Aaron', 'Billard', 250, 1)
@@ -246,6 +246,89 @@ def test_invoice_matching_without_esr(session, owner, member):
     assert transactions[0].username is None
     assert transactions[0].confidence == 0
     assert transactions[0].duplicate is True
+
+    # match against reference numbers
+    xml = generate_xml([
+        dict(amount='500.00 CHF', reference=encode_invoice_code(i1.code)),
+    ])
+
+    transactions = list(match_camt_053_to_usernames(xml, items, '2017'))
+
+    assert len(transactions) == 1
+    assert transactions[0].username == owner.username
+    assert transactions[0].confidence == 1.0
+
+    # match against a mix of reference numbers and codes
+    xml = generate_xml([
+        dict(amount='500.00 CHF', reference=encode_invoice_code(i1.code)),
+        dict(amount='250.00 CHF', note=i3.code),
+    ])
+
+    transactions = list(match_camt_053_to_usernames(xml, items, '2017'))
+
+    assert len(transactions) == 2
+    assert transactions[0].username == owner.username
+    assert transactions[0].confidence == 1.0
+    assert transactions[1].username == member.username
+    assert transactions[1].confidence == 1.0
+
+    # ignore invalid esr references
+    xml = generate_xml([
+        dict(amount='500.00 CHF', reference='booyah'),
+        dict(amount='250.00 CHF', note=i3.code),
+    ])
+
+    transactions = list(match_camt_053_to_usernames(xml, items, '2017'))
+
+    assert len(transactions) == 2
+    assert transactions[0].username == owner.username
+    assert transactions[0].confidence == 0.5
+    assert transactions[1].username == member.username
+    assert transactions[1].confidence == 1.0
+
+    # if a single transaction has both reference and code, then one is
+    # allowed to be faulty without a confidence penalty
+    xml = generate_xml([
+        dict(
+            amount='500.00 CHF',
+            reference=encode_invoice_code(i1.code),
+            note=i1.code
+        ),
+    ])
+
+    transactions = list(match_camt_053_to_usernames(xml, items, '2017'))
+
+    assert len(transactions) == 1
+    assert transactions[0].username == owner.username
+    assert transactions[0].confidence == 1.0
+
+    xml = generate_xml([
+        dict(
+            amount='500.00 CHF',
+            reference='000127131108141601011502061',
+            note=i1.code
+        ),
+    ])
+
+    transactions = list(match_camt_053_to_usernames(xml, items, '2017'))
+
+    assert len(transactions) == 1
+    assert transactions[0].username == owner.username
+    assert transactions[0].confidence == 1.0
+
+    xml = generate_xml([
+        dict(
+            amount='500.00 CHF',
+            reference=encode_invoice_code(i1.code),
+            note='qeb3afd0e43'
+        ),
+    ])
+
+    transactions = list(match_camt_053_to_usernames(xml, items, '2017'))
+
+    assert len(transactions) == 1
+    assert transactions[0].username == owner.username
+    assert transactions[0].confidence == 1.0
 
     # make sure paid transactions are matched as well (here we basically send
     # a separate bill which completes the outstanding amount)

@@ -6,6 +6,7 @@ from decimal import Decimal
 from itertools import groupby
 from lxml import etree
 from onegov.activity.models import InvoiceItem
+from onegov.activity.utils import encode_invoice_code
 from pprint import pformat
 
 
@@ -134,7 +135,7 @@ def extract_transactions(xml):
                 note=joined(d, 'RmtInf/Ustrd/text()'),
                 credit=first(d, 'CdtDbtInd/text()') == 'CRDT',
                 debitor=first(d, 'RltdPties/Dbtr/Nm/text()'),
-                debitor_account=first(d, 'RltdPties/DbtrAcct/Id/IBAN/text()')
+                debitor_account=first(d, 'RltdPties/DbtrAcct/Id/IBAN/text()'),
             )
 
 
@@ -211,7 +212,13 @@ def match_camt_053_to_usernames(xml, collection, invoice, currency='CHF'):
 
     # Sum up the items to virtual invoices
     invoices = []
-    Invoice = namedtuple('Invoice', ('username', 'code', 'amount'))
+    Invoice = namedtuple('Invoice', ('username', 'code', 'ref', 'amount'))
+
+    def encode(code):
+        try:
+            return encode_invoice_code(code)
+        except (RuntimeError, ValueError):
+            return None
 
     for username, items in groupby(q, key=lambda i: i.username):
         amount = Decimal('0.00')
@@ -222,11 +229,15 @@ def match_camt_053_to_usernames(xml, collection, invoice, currency='CHF'):
         invoices.append(Invoice(
             username=username,
             code=item.code,
+            ref=encode(item.code),
             amount=amount
         ))
 
     # Hash the invoices by code (duplicates are technically possible)
     by_code = defaultdict(list)
+
+    # hash the references as well
+    by_ref = defaultdict(list)
 
     # Hash the invoices by amount (dpulicates are probable)
     by_amount = defaultdict(list)
@@ -234,6 +245,7 @@ def match_camt_053_to_usernames(xml, collection, invoice, currency='CHF'):
     for invoice in invoices:
         by_code[invoice.code].append(invoice)
         by_amount[invoice.amount].append(invoice)
+        by_ref[invoice.ref].append(invoice)
 
     # go through the transactions, comparing amount and code for a match
     transactions = tuple(extract_transactions(xml))
@@ -271,17 +283,22 @@ def match_camt_053_to_usernames(xml, collection, invoice, currency='CHF'):
         if transaction.credit and transaction.currency == currency:
             code = transaction.code
             amnt = transaction.amount
+            ref = transaction.reference
 
             code_usernames = {i.username for i in by_code.get(code, tuple())}
             amnt_usernames = {i.username for i in by_amount.get(amnt, tuple())}
+            ref_usernames = {i.username for i in by_ref.get(ref, tuple())}
 
-            combined = code_usernames & amnt_usernames
+            combined = amnt_usernames & (code_usernames | ref_usernames)
 
             if len(combined) == 1:
                 transaction.username = next(u for u in combined)
                 transaction.confidence = 1.0
             elif len(code_usernames) == 1:
                 transaction.username = next(u for u in code_usernames)
+                transaction.confidence = 0.5
+            elif len(ref_usernames) == 1:
+                transaction.username = next(u for u in ref_usernames)
                 transaction.confidence = 0.5
             elif len(amnt_usernames) == 1:
                 transaction.username = next(u for u in amnt_usernames)
