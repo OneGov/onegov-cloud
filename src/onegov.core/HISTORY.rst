@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.40.1 (2017-05-04)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes translating messages with no present locale throwing an error. The
   message is new returned untranslated, if the locale is not present (fallback
