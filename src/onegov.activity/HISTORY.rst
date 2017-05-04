@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.8.4 (2017-05-04)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds support for ESR reference numbers in payments.
   [href]
 
