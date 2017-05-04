@@ -1,5 +1,4 @@
-import hashlib
-
+from onegov.activity import utils
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -59,19 +58,7 @@ class InvoiceItem(Base, TimestampMixin):
 
     @observes('invoice', 'username')
     def invoice_username_observer(self, invoice, username):
-        # there's no guarantee that this code is unique for an invoice, though
-        # the chance of it overlapping is very very small -> any algorithm
-        # doing some kind of matching has to account for this fact
-        #
-        # we can solve this by introducing a separate invoice record in the
-        # future
-        #
-        # the "q" at the beginning is used as a marker for regular expressions
-        # (so it's a "q", followed by [a-z0-9]{8})
-        self.code = 'q' + ''.join((
-            hashlib.sha1((invoice + username).encode('utf-8')).hexdigest()[:5],
-            hashlib.sha1(username.encode('utf-8')).hexdigest()[:5]
-        ))
+        self.code = utils.as_invoice_code(invoice, username)
 
     @validates('source')
     def validate_source(self, key, value):
@@ -81,13 +68,17 @@ class InvoiceItem(Base, TimestampMixin):
     @property
     def display_code(self):
         """ The item's code, formatted in a human readable format. """
-        code = self.code.upper()
+        return utils.format_invoice_code(self.code)
 
-        return '-'.join((
-            code[:1],
-            code[1:6],
-            code[6:]
-        ))
+    @property
+    def esr_code(self):
+        """ The item's code, formatted as ESR. """
+        return utils.encode_invoice_code(self.code)
+
+    @property
+    def display_esr_code(self):
+        """ The item's ESR formatted in a human readable format. """
+        return utils.format_esr_reference(self.esr_code)
 
     @property
     def discourage_changes(self):
