@@ -304,7 +304,10 @@ class CoreRequest(IncludeRequest, ReturnToMixin):
     def translator(self):
         """ Returns the translate function for basic string translations. """
         translator = self.get_translate()
-        return lambda text: text.interpolate(translator.gettext(text))
+        if translator:
+            return lambda text: text.interpolate(translator.gettext(text))
+
+        return lambda text: text.interpolate(text)
 
     @cached_property
     def default_locale(self):

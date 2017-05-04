@@ -1,5 +1,11 @@
 Changelog
 ---------
+
+- Fixes translating messages with no present locale throwing an error. The
+  message is new returned untranslated, if the locale is not present (fallback
+  to English).
+  [msom]
+
 0.40.0 (2017-04-27)
 ~~~~~~~~~~~~~~~~~~~
 
