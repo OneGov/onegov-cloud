@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-05-04 15:53+0200\n"
+"POT-Creation-Date: 2017-05-04 16:15+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -73,7 +73,7 @@ msgid "Matches"
 msgstr "Zuteilungen"
 
 msgid "Import Bank Statement"
-msgstr "Kontoauszug Importieren"
+msgstr "Kontoauszug importieren"
 
 msgid "Notification Templates"
 msgstr "Mitteilungs-Vorlagen"
@@ -85,10 +85,10 @@ msgid "New Notification Template"
 msgstr "Neue Mitteilungs-Vorlage"
 
 msgid "Edit Activity"
-msgstr "Angebot Bearbeiten"
+msgstr "Angebot bearbeiten"
 
 msgid "Discard Activity"
-msgstr "Angebot Verwerfen"
+msgstr "Angebot verwerfen"
 
 #, python-format
 msgid "Do you really want to discrd \"${title}\"?"
@@ -114,7 +114,7 @@ msgid "Show Ticket"
 msgstr "Zum Ticket"
 
 msgid "Request Publication"
-msgstr "Publikation Beantragen"
+msgstr "Publikation beantragen"
 
 msgid "Do you really want to request publication?"
 msgstr "Möchten Sie die Publikation wirklich beantragen?"
@@ -676,7 +676,7 @@ msgid "Do you really want to publish this activity?"
 msgstr "Möchten Sie dieses Angebot wirklich veröffentlichen?"
 
 msgid "Publish Activity"
-msgstr "Angebot Veröffentlichen"
+msgstr "Angebot veröffentlichen"
 
 msgid "Archive"
 msgstr "Archivieren"
@@ -690,7 +690,7 @@ msgstr ""
 "Öffentlichkeit versteckt."
 
 msgid "Archive Activity"
-msgstr "Angebot Archivieren"
+msgstr "Angebot archivieren"
 
 msgid "Title of the period."
 msgstr "Titel der Periode."
@@ -713,8 +713,8 @@ msgstr "Keine Angebote gefunden."
 msgid "Age"
 msgstr "Alter"
 
-msgid "${min_age} - ${max_age} years old"
-msgstr "${min_age} - ${max_age} Jahre alt"
+msgid "${min_age} - ${max_age} years"
+msgstr "${min_age} - ${max_age} Jahre"
 
 msgid "starting at ${price} CHF"
 msgstr "ab ${price} CHF"
@@ -785,7 +785,7 @@ msgid "${amount} unpaid"
 msgstr "${amount} Ausstehend"
 
 msgid "Show Details"
-msgstr "Details Anzeigen"
+msgstr "Details anzeigen"
 
 msgid "Booking Text"
 msgstr "Buchungstext"
@@ -1074,7 +1074,7 @@ msgid ""
 "you can signup for more activities than those."
 msgstr ""
 "Jedes Kind wird in bis zu ${count} Angebote eingeteilt. Für eine gute "
-"Einteilung können Sie ihr Kind jedoch für mehr als ${count} Angebote "
+"Zuteilung können Sie ihr Kind jedoch für mehr als ${count} Angebote "
 "anmelden."
 
 msgid ""
@@ -1087,9 +1087,7 @@ msgstr ""
 msgid ""
 "Between each booking we enforce ${minutes} minutes of block-time in which no "
 "other booking is permitted."
-msgstr ""
-"Zwischen allen Buchungen forcieren wir ${minutes} Minuten Blockzeit während "
-"der keine andere Buchungen möglich sind."
+msgstr Nötige Transferzeit zwischen zwei Durchführungen: ${minutes} Minuten."
 
 msgid "Open"
 msgstr "Offen"
@@ -1105,6 +1103,18 @@ msgstr "Abgelehnt"
 
 msgid "Blocked"
 msgstr "Blockiert"
+
+msgid ""
+"Your request will be processed shortly. To see the state of your process "
+"your may return to this page at any time. All information on this page has "
+"been sent to your e-mail address."
+msgstr ""
+"Ihr Anliegen wird in Kürze bearbeitet. Sie können jederzeit zu dieser Seite "
+"zurückkehren um den Status Ihrer Anfrage abzufragen. Alle Informationen auf "
+"dieser Seite wurde an Ihre E-Mail Adresse gesendet."
+
+msgid "Your request has been completed."
+msgstr "Ihr Anliegen wurde erfolgreich abgeschlossen."
 
 msgid "Dear Sir or Madam,"
 msgstr "Sehr geehrte Damen und Herren,"
@@ -1129,7 +1139,7 @@ msgstr "${operability} aller Durchführungen haben genug Teilnehmer."
 
 msgid "Marking bookings increases their priority during the next matching run."
 msgstr ""
-"Markierte Buchungen erhalten beim nächsten Zuweisungslauf eine höhere "
+"Markierte Buchungen erhalten beim nächsten Zuteilungs-Lauf eine höhere "
 "Priorität."
 
 msgid "Years"
@@ -1148,7 +1158,7 @@ msgid "Automatic Matching"
 msgstr "Automatische Zuteilung"
 
 msgid "Reset Matching"
-msgstr "Zuteilung Zurücksetzen"
+msgstr "Zuteilung zurücksetzen"
 
 msgid "This period is not active. Only the active period may be matched."
 msgstr ""
@@ -1280,7 +1290,7 @@ msgid "Do you really want to delete \"${title}\"?"
 msgstr "Möchten Sie \"${title}\" wirklich löschen?"
 
 msgid "Delete Occasion"
-msgstr "Durchführung Löschen"
+msgstr "Durchführung löschen"
 
 msgid "Reinstate"
 msgstr "Reaktivieren"
@@ -1293,7 +1303,7 @@ msgid "Previous attendees need to re-apply"
 msgstr "Vorherige Teilnehmer müssen sich neu anmelden"
 
 msgid "Reinstate Occasion"
-msgstr "Durchführung Reaktivieren"
+msgstr "Durchführung reaktivieren"
 
 msgid " 3 - 6 years"
 msgstr " 3 - 6 Jahre"
@@ -1326,7 +1336,7 @@ msgid "${count} already accepted bookings will be cancelled"
 msgstr "${count} bereits angenommene Buchungen werden storniert"
 
 msgid "Rescind Occasion"
-msgstr "Durchführung Absagen"
+msgstr "Durchführung absagen"
 
 msgid ""
 "There are no accepted bookings associated with this occasion, though there "
@@ -1337,7 +1347,7 @@ msgstr ""
 "gelöscht."
 
 msgid "Edit Attendee"
-msgstr "Teilnehmer Bearbeiten"
+msgstr "Teilnehmer bearbeiten"
 
 #, python-format
 msgid "Booking Limit of ${name}"
@@ -1348,7 +1358,7 @@ msgid "Billing for ${title}"
 msgstr "Fakturierung für ${title}"
 
 msgid "Create Bills"
-msgstr "Rechnungen Erstellen"
+msgstr "Rechnungen erstellen"
 
 #, python-format
 msgid "Imported ${count} payments"
@@ -1437,7 +1447,7 @@ msgid "Matches for ${title}"
 msgstr "Zuteilungen für ${title}"
 
 msgid "Run Matching"
-msgstr "Zuteilung Ausführen"
+msgstr "Zuteilung ausführen"
 
 msgid "The period was successfully reset"
 msgstr "Die Periode wurde erfolgreich zurückgesetzt"
@@ -1449,7 +1459,7 @@ msgid "The matching run executed successfully"
 msgstr "Der Zuteilungs-Lauf wurde erfolgreich durchgeführt"
 
 msgid "Signup Attendee"
-msgstr "Teilnehmer Anmelden"
+msgstr "Teilnehmer anmelden"
 
 msgid "The period has already been finalized. No new attendees may be added."
 msgstr ""
@@ -1457,7 +1467,7 @@ msgstr ""
 "mehr hinzugefügt werden."
 
 msgid "Remove Wish"
-msgstr "Wunsch Entfernen"
+msgstr "Wunsch entfernen"
 
 #, python-format
 msgid "Do you really want to remove ${attendee}'s wish?"
@@ -1500,13 +1510,13 @@ msgid "Successfully sent the e-mail to ${count} recipients"
 msgstr "Das E-Mail wurde erfolgreich an ${count} Empfänger gesendet"
 
 msgid "Delete Notification Template"
-msgstr "Mitteilungs-Vorlage Löschen"
+msgstr "Mitteilungs-Vorlage löschen"
 
 msgid "Enroll Attendee"
-msgstr "Teilnehmer Anmelden"
+msgstr "Teilnehmer anmelden"
 
 msgid "Edit Occasion"
-msgstr "Durchführung Bearbeiten"
+msgstr "Durchführung bearbeiten"
 
 #, python-format
 msgid "The booking for ${name} was succesfull"
@@ -1537,7 +1547,7 @@ msgstr ""
 "Die Periode konnte nicht gelöscht werden, da sie bereits verwendet wird"
 
 msgid "Delete Period"
-msgstr "Periode Löschen"
+msgstr "Periode löschen"
 
 msgid "Deactivate"
 msgstr "Deaktivieren"
@@ -1550,7 +1560,7 @@ msgid "This will hide all associated occasions"
 msgstr "Damit werden alle damit verbundenen Durchführungen versteckt"
 
 msgid "Deactivate Period"
-msgstr "Periode Deaktivieren"
+msgstr "Periode deaktivieren"
 
 msgid "Activate"
 msgstr "Aktivieren"
@@ -1567,4 +1577,4 @@ msgstr ""
 "Durchführungen werden publiziert"
 
 msgid "Activate Period"
-msgstr "Periode Aktivieren"
+msgstr "Periode aktivieren"

@@ -111,11 +111,10 @@ def view_activities(self, request):
         if active_period:
             filters['weeks'] = tuple(
                 Link(
-                    text=_("${nth}. Week (${start} - ${end})", mapping={
-                        'nth': nth,
-                        'start': layout.format_date(daterange[0], 'date'),
-                        'end': layout.format_date(daterange[1], 'date')
-                    }),
+                    text='{} - {}'.format(
+                        layout.format_date(daterange[0], 'date'),
+                        layout.format_date(daterange[1], 'date')
+                    ),
                     active=daterange in self.dateranges,
                     url=request.link(self.for_filter(daterange=daterange))
                 ) for nth, daterange in enumerate(

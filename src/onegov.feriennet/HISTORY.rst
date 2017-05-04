@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes a number of grammatical errors in German.
+  [href]
+
 - Switches to a generic enroll text that works for all children.
   [href]
 

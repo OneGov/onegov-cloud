@@ -198,7 +198,7 @@
                         <tal:block replace="occasion.age.lower" i18n:name='min_age' />
                         -
                         <tal:block replace="occasion.age.upper - 1" i18n:name='max_age' />
-                        years old
+                        years
                     </span>
                 </div>
 
@@ -372,7 +372,7 @@
 </metal:wishlist_booking_state>
 
 
-<metal:periods define-macro="periods" i18n:domain="onegov.feriennet">
+<metal:periods define-macro="periods" i18n:domain="onegov.feriennet" i18n:domain="onegov.feriennet">
     <div class="filter-panel" tal:condition="len(periods) > 1">
         <h2 class="filter-title" i18n:translate>Period</h2>
         <select onchange="location = this.value;">
@@ -384,7 +384,7 @@
 </metal:periods>
 
 
-<metal:users define-macro="users" i18n:domain="onegov.feriennet">
+<metal:users define-macro="users" i18n:domain="onegov.feriennet" i18n:domain="onegov.feriennet">
     <div class="filter-panel" tal:condition="request.is_admin and users">
         <h2 class="filter-title" i18n:translate>User</h2>
         <select onchange="location = this.value;">
@@ -396,7 +396,7 @@
 </metal:users>
 
 
-<metal:actions_button define-macro="actions-button" i18n:domain="onegov.feriennet">
+<metal:actions_button define-macro="actions-button" i18n:domain="onegov.feriennet" i18n:domain="onegov.feriennet">
     <a href="#" data-dropdown="${action_id}" aria-expanded="false" class="tiny button actions-button">
         <span class="show-for-sr" i18n:translate>Actions</span>
         <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
@@ -410,7 +410,20 @@
 </metal:actions_button>
 
 
-<metal:search_result_attendees define-macro="search_result_attendees">
+<metal:search_result_attendees define-macro="search_result_attendees" i18n:domain="onegov.feriennet">
     <a href="${request.link(result)}">${result.name}</a>
     <p i18n:translate="">Attendee</p>
 </metal:search_result_attendees>
+
+
+<metal:ticket_status_page_message define-macro="ticket_status_page_message" i18n:domain="onegov.feriennet">
+    <p i18n:translate tal:condition="ticket.state == 'open'">
+        Your request will be processed shortly. To see the state of
+        your process your may return to this page at any time.
+
+        All information on this page has been sent to your e-mail address.
+    </p>
+    <p i18n:translate tal:condition="ticket.state == 'closed'">
+        Your request has been completed.
+    </p>
+</metal:ticket_status_page_message>

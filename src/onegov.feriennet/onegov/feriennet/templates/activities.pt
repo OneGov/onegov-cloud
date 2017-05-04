@@ -29,7 +29,7 @@
                                         <tal:block replace="min_age" i18n:name='min_age' />
                                         -
                                         <tal:block replace="max_age" i18n:name='max_age' />
-                                        years old
+                                        years
                                     </span>
                                 </span>
                             </tal:block>
