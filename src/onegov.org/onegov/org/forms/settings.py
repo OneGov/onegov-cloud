@@ -12,10 +12,11 @@ from onegov.org.homepage_widgets import (
     XML_LINE_OFFSET
 )
 from onegov.org.theme import user_options
-from wtforms import HiddenField, StringField, TextAreaField, validators
+from wtforms import HiddenField, StringField, TextAreaField, RadioField
+from wtforms import ValidationError
+from wtforms import validators
 from wtforms.fields.html5 import EmailField, URLField
 from wtforms_components import ColorField
-from wtforms import ValidationError
 
 
 ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
@@ -50,8 +51,16 @@ class SettingsForm(Form):
         validators=[Stdnum(format='iban')]
     )
     bank_beneficiary = StringField(
-        label=_("Bank Beneficiary"),
+        label=_("Beneficiary"),
         fieldset=_("Payment"),
+    )
+    bank_payment_order_type = RadioField(
+        label=_("Payment Order"),
+        choices=[
+            ('basic', _("Basic")),
+            ('esr', _("With reference number (ESR)")),
+        ],
+        default='basic'
     )
     contact = TextAreaField(
         label=_("Contact"),

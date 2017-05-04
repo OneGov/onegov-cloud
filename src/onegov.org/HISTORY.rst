@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Adds a payment order setting to differentiate between basic and ESR payment
+  orders.
+  [href]
+
 0.6.1 (2017-05-02)
 ~~~~~~~~~~~~~~~~~~~
 

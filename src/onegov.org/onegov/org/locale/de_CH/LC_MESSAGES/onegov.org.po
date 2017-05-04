@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-05-02 10:09+0200\n"
+"POT-Creation-Date: 2017-05-04 14:09+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -647,8 +647,11 @@ msgstr "Bankkonto (IBAN)"
 msgid "Payment"
 msgstr "Zahlungen"
 
-msgid "Bank Beneficiary"
-msgstr "Bank Begünstigter"
+msgid "Beneficiary"
+msgstr "Begünstigter"
+
+msgid "Payment Order"
+msgstr "Einzahlungsschein"
 
 msgid "Contact"
 msgstr "Kontakt"
@@ -736,6 +739,12 @@ msgstr "Erweitert"
 
 msgid "A beneficiary is required if a bank account is given."
 msgstr "Ein Begünstigter ist nötig wenn ein Bank Konto angegeben wird."
+
+msgid "Basic"
+msgstr "Einfach"
+
+msgid "With reference number (ESR)"
+msgstr "Mit Referenznummer (ESR)"
 
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
@@ -1650,7 +1659,9 @@ msgid "Your account has already been activated."
 msgstr "Ihr Konto wurde bereits aktiviert."
 
 msgid "Your userprofile is incomplete. Please update it before you continue."
-msgstr "Ihr Benutzerprofil ist unvollständig. Bitte vervollständigen Sie es bevor Sie weiterfahren."
+msgstr ""
+"Ihr Benutzerprofil ist unvollständig. Bitte vervollständigen Sie es bevor "
+"Sie weiterfahren."
 
 msgid "You have been logged in."
 msgstr "Sie wurden eingeloggt."
@@ -1952,6 +1963,9 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "Bank Beneficiary"
+#~ msgstr "Bank Begünstigter"
 
 #~ msgid "Pending tickets"
 #~ msgstr "Tickets in Bearbeitung"
