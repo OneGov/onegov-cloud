@@ -61,20 +61,20 @@ def handle_matches(self, request, form):
 
     def record_links(record):
         yield Link(
+            _("Attendee"), request.return_here(
+                request.class_link(
+                    Attendee, {'id': record.attendee_id}
+                )
+            )
+        )
+
+        yield Link(
             self.period.wishlist_phase and _("Wishlist") or _("Bookings"),
             request.class_link(
                 BookingCollection, {
                     'period_id': self.period.id,
                     'username': record.attendee_username
                 }
-            )
-        )
-
-        yield Link(
-            _("Attendee"), request.return_here(
-                request.class_link(
-                    Attendee, {'id': record.attendee_id}
-                )
             )
         )
 
