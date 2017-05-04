@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Switches to a generic enroll text that works for all children.
+  [href]
+
 - Adds support for ESR payment orders.
   [href]
 

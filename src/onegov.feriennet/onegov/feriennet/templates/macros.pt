@@ -260,17 +260,9 @@
         </div>
 
         <div class="call-to-action" tal:condition="show_enroll">
-            <tal:block switch="age_bracket(occasion.age)">
-                <span tal:case="'young'" i18n:translate>
-                    Enroll your young child now.
-                </span>
-                <span tal:case="'teenager'" i18n:translate>
-                    Enroll your teenager now.
-                </span>
-                <span tal:case="default" i18n:translate>
-                    Enroll your child now.
-                </span>
-            </tal:block>
+            <span i18n:translate>
+                Enroll your child now.
+            </span>
 
             <tal:block switch="request.is_logged_in">
                 <a tal:case="True" class="button" href="${request.link(occasion, 'anmelden')}" i18n:translate>Enroll</a>

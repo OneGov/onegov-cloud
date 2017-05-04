@@ -297,14 +297,6 @@ def view_activity(self, request):
                 classes=('confirm', )
             )
 
-    def age_bracket(age):
-        if 13 <= age.lower:
-            return 'teenager'
-        elif (age.upper - 1) <= 7:
-            return 'young'
-        else:
-            return 'general'
-
     def show_enroll(occasion):
         if self.state != 'accepted':
             return False
@@ -340,7 +332,6 @@ def view_activity(self, request):
             activity=self,
             active_only=not request.is_organiser
         ),
-        'age_bracket': age_bracket,
     }
 
 
