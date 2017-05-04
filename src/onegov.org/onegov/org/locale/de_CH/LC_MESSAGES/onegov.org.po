@@ -998,7 +998,7 @@ msgid "No files uploaded yet"
 msgstr "Noch keine Dateien hochgeladen"
 
 msgid "You are trying to open a page for which you are not authorized."
-msgstr "Ihnen felt die nötige Berechtigung um diese Seite zu öffnen."
+msgstr "Ihnen fehlt die nötige Berechtigung um diese Seite zu öffnen."
 
 msgid "Please follow this link to login with a different user."
 msgstr ""
@@ -1324,7 +1324,7 @@ msgid "Click on the following link to set your account password:"
 msgstr "Bitte klicken Sie auf den folgenden Link um Ihr Passwort zu setzen:"
 
 msgid "Set Account Password"
-msgstr "Passwort Setzen"
+msgstr "Passwort setzen"
 
 msgid "To use your account you need the Yubikey with the serial ${number}"
 msgstr ""

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Gives subapplications the ability to override the ticket status text.
+  [href]
+
 0.6.2 (2017-05-04)
 ~~~~~~~~~~~~~~~~~~~
 

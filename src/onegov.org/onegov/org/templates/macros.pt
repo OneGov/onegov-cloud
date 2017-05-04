@@ -709,7 +709,7 @@
 </metal:slider>
 
 
-<metal:search_result_users define-macro="search_result_users">
+<metal:search_result_users define-macro="search_result_users" i18n:domain="onegov.org">
     <a href="${request.return_here(request.link(result))}">${result.title}</a>
     <ul>
         <li>${translate(result.role.capitalize())}</li>
@@ -717,7 +717,7 @@
 </metal:search_result_users>
 
 
-<metal:search_result_tickets define-macro="search_result_tickets">
+<metal:search_result_tickets define-macro="search_result_tickets" i18n:domain="onegov.org">
     <a href="${request.link(result)}">${result.number}</a>
     <ul>
         <li>${translate(result.group)}</li>
@@ -727,7 +727,7 @@
 </metal:search_result_tickets>
 
 
-<metal:search_result_events define-macro="search_result_events">
+<metal:search_result_events define-macro="search_result_events" i18n:domain="onegov.org">
     <a href="${request.link(result, 'latest')}">${result.title}</a>
     <p tal:condition="result.description|nothing">
         ${result.description[:160]}<tal:block condition="len(result.description) > 160">…</tal:block>
@@ -735,16 +735,32 @@
 </metal:search_result_events>
 
 
-<metal:search_result_people define-macro="search_result_people">
+<metal:search_result_people define-macro="search_result_people" i18n:domain="onegov.org">
     <a href="${request.link(result)}">${result.title}</a>
     <p tal:condition="result.function|nothing">${result.function}</p>
     <p tal:condition="not:result.function|nothing" i18n:translate="">People</p>
 </metal:search_result_people>
 
 
-<metal:search_result_default define-macro="search_result_default">
+<metal:search_result_default define-macro="search_result_default" i18n:domain="onegov.org">
     <a href="${request.link(result)}">${result.title}</a>
     <tal:block condition="result.lead">
         ${result.lead[:160]}<tal:block condition="len(result.lead) > 160">…</tal:block>
     </tal:block>
 </metal:search_result_default>
+
+
+<metal:ticket_status_page_message define-macro="ticket_status_page_message" i18n:domain="onegov.org">
+    <p i18n:translate tal:condition="ticket.state == 'open'">
+        Your request will be processed shortly. To see the state of
+        your process your may return to this page at any time.
+
+        All information on this page has been sent to your e-mail address.
+    </p>
+    <p i18n:translate tal:condition="ticket.state == 'closed'">
+        Your request has been completed. If you asked for documents to be
+        sent to your address, they should arrive shortly. If you asked to
+        pick up documents at the municipality, the are now ready to be
+        picked up.
+    </p>
+</metal:ticket_status_page_message>
