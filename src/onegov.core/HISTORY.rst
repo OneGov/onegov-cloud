@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.40.2 (2017-05-04)
+~~~~~~~~~~~~~~~~~~~
 
 - Moves the chunks function into the utils module.
   [href]
