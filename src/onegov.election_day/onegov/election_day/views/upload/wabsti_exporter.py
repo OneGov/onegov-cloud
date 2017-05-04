@@ -67,9 +67,9 @@ def view_upload_wabsti_vote(self, request):
         return {
             'status': 'error',
             'errors': {
-                'data_source': request.translate(_(
+                'data_source': [request.translate(_(
                     'The data source is not configured properly'
-                ))
+                ))]
             }
         }
 
@@ -144,9 +144,9 @@ def view_upload_wabsti_majorz(self, request):
         return {
             'status': 'error',
             'errors': {
-                'data_source': request.translate(_(
+                'data_source': [request.translate(_(
                     'The data source is not configured properly'
-                ))
+                ))]
             }
         }
 
@@ -234,9 +234,9 @@ def view_upload_wabsti_proporz(self, request):
         return {
             'status': 'error',
             'errors': {
-                'data_source': request.translate(_(
+                'data_source': [request.translate(_(
                     'The data source is not configured properly'
-                ))
+                ))]
             }
         }
 
