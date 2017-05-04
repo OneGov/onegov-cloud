@@ -6,7 +6,7 @@ import sedate
 
 from cached_property import cached_property
 from datetime import datetime
-from itertools import zip_longest
+from onegov.core import utils
 from purl import URL
 from pytz import timezone
 
@@ -73,21 +73,10 @@ class Layout(object):
         """ Returns the application behind the request. """
         return self.request.app
 
-    def chunks(self, iterable, n, fillvalue=None):
-        """ Iterates through an iterable, returning chunks with the given size.
+    def chunks(self, *args, **kwargs):
+        """ See :func:`onegov.core.utils.chunks`. """
 
-        For example::
-
-            chunks('ABCDEFG', 3, 'x') --> [
-                ('A', 'B', 'C'),
-                ('D', 'E', 'F'),
-                ('G', 'x', 'x')
-            ]
-
-        """
-
-        args = [iter(iterable)] * n
-        return zip_longest(fillvalue=fillvalue, *args)
+        return utils.chunks(*args, **kwargs)
 
     @cached_property
     def csrf_token(self):

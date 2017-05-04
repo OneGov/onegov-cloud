@@ -17,7 +17,7 @@ from cProfile import Profile
 from datetime import datetime
 from functools import lru_cache
 from importlib import import_module
-from itertools import groupby, tee
+from itertools import groupby, tee, zip_longest
 from onegov.core import log
 from purl import URL
 from threading import Thread
@@ -317,6 +317,23 @@ def pairwise(iterable):
     a, b = tee(iterable)
     next(b, None)
     return zip(a, b)
+
+
+def chunks(iterable, n, fillvalue=None):
+    """ Iterates through an iterable, returning chunks with the given size.
+
+    For example::
+
+        chunks('ABCDEFG', 3, 'x') --> [
+            ('A', 'B', 'C'),
+            ('D', 'E', 'F'),
+            ('G', 'x', 'x')
+        ]
+
+    """
+
+    args = [iter(iterable)] * n
+    return zip_longest(fillvalue=fillvalue, *args)
 
 
 def relative_url(absolute_url):

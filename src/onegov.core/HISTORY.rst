@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Moves the chunks function into the utils module.
+  [href]
+
 0.40.1 (2017-05-04)
 ~~~~~~~~~~~~~~~~~~~
 
