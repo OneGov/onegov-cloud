@@ -24,8 +24,8 @@ def es_org_app(request):
     yield create_org_app(request, use_elasticsearch=True)
 
 
-def create_org_app(request, use_elasticsearch):
-    app = create_app(OrgApp, request, use_elasticsearch=use_elasticsearch)
+def create_org_app(request, use_elasticsearch, cls=OrgApp):
+    app = create_app(cls, request, use_elasticsearch=use_elasticsearch)
     session = app.session()
 
     org = create_new_organisation(app, name="Govikon", create_files=False)

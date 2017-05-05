@@ -15,6 +15,7 @@ from onegov.org import utils
 from onegov.org.elements import DeleteLink, Link, LinkGroup
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models import (
+    ExportCollection,
     GeneralFileCollection,
     ImageFile,
     ImageFileCollection,
@@ -238,7 +239,7 @@ class Layout(ChameleonLayout):
                 if isinstance(value, date):
                     return self.format_date(value, 'date')
                 if isinstance(value, (list, tuple)):
-                    return ', '.join(value)
+                    return ', '.join(formatter(v) for v in value)
                 if isinstance(value, bool):
                     value = value and _("Yes") or _("No")
                 return default(value)
@@ -1270,3 +1271,13 @@ class UserManagementLayout(DefaultLayout):
                     )
                 )
             ]
+
+
+class ExportCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Exports"), self.request.class_link(ExportCollection))
+        ]

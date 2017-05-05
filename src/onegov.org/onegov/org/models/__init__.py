@@ -1,6 +1,7 @@
 from onegov.org.models.atoz import AtoZ
 from onegov.org.models.clipboard import Clipboard
 from onegov.org.models.editor import Editor
+from onegov.org.models.export import Export, ExportCollection
 from onegov.org.models.file import (
     GeneralFile,
     GeneralFileCollection,
@@ -53,6 +54,8 @@ __all__ = [
     'CustomFormDefinition',
     'DaypassResource',
     'Editor',
+    'Export',
+    'ExportCollection',
     'FormPersonMove',
     'GeneralFile',
     'GeneralFileCollection',

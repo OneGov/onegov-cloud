@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a generic export view and implementation using directives.
+  [href]
+
 - Improves the capability of the export formatter.
   [href]
 

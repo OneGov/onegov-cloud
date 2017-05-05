@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-05-04 14:09+0200\n"
+"POT-Creation-Date: 2017-05-05 14:50+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -133,6 +133,9 @@ msgstr "Fotoalben"
 msgid "Usermanagement"
 msgstr "Benutzerverwaltung"
 
+msgid "Exports"
+msgstr "Exporte"
+
 msgid "Delete"
 msgstr "Löschen"
 
@@ -153,6 +156,9 @@ msgstr "Formular löschen"
 
 msgid "New"
 msgstr "Neu"
+
+msgid "No"
+msgstr "Nein"
 
 msgid "Add"
 msgstr "Hinzufügen"
@@ -215,6 +221,9 @@ msgstr "Bilder auswählen"
 
 msgid "Delete photo album"
 msgstr "Fotoalbum löschen"
+
+msgid "Yes"
+msgstr "Ja"
 
 msgid "Accept ticket"
 msgstr "Ticket annehmen"
@@ -385,12 +394,6 @@ msgstr "Von"
 
 msgid "Until"
 msgstr "Bis zum"
-
-msgid "Yes"
-msgstr "Ja"
-
-msgid "No"
-msgstr "Nein"
 
 msgid "Exhibition"
 msgstr "Ausstellung"
@@ -982,6 +985,9 @@ msgstr ""
 msgid "Complete"
 msgstr "Abschliessen"
 
+msgid "No exports available."
+msgstr "Keine Exporte verfügbar."
+
 msgid "Upload"
 msgstr "Hochladen"
 
@@ -1173,6 +1179,24 @@ msgstr ""
 "Hier werden Bilder aus Ihren Fotoalben angezeigt. Dazu erstellen Sie einfach "
 "ein Fotoalbum, fügen ein paar Bilder hinzu und markieren das Album als auf "
 "der Startseite verfügbar."
+
+msgid ""
+"Your request will be processed shortly. To see the state of your process "
+"your may return to this page at any time. All information on this page has "
+"been sent to your e-mail address."
+msgstr ""
+"Ihre Anfrage wird in Kürze bearbeitet. Sie können jederzeit zu dieser Seite "
+"zurückkehren um den Status Ihrer Anfrage abzufragen. Alle Informationen auf "
+"dieser Seite wurde an Ihre E-Mail Adresse gesendet."
+
+msgid ""
+"Your request has been completed. If you asked for documents to be sent to "
+"your address, they should arrive shortly. If you asked to pick up documents "
+"at the municipality, the are now ready to be picked up."
+msgstr ""
+"Ihre Anfrage wurde erfolgreich abgeschlossen. Falls Sie Dokumente über den "
+"Postweg verlangt haben, sollten Sie in den kommenden Tagen Post erhalten. "
+"Falls Sie Dokumente am Schalter abholen wollten, so können Sie das jetzt tun."
 
 msgid "Dear Sir or Madam,"
 msgstr "Guten Tag"
@@ -1549,24 +1573,6 @@ msgstr "Reaktionszeit"
 
 msgid "Process Time"
 msgstr "Bearbeitungszeit"
-
-msgid ""
-"Your request will be processed shortly. To see the state of your process "
-"your may return to this page at any time. All information on this page has "
-"been sent to your e-mail address."
-msgstr ""
-"Ihre Anfrage wird in Kürze bearbeitet. Sie können jederzeit zu dieser Seite "
-"zurückkehren um den Status Ihrer Anfrage abzufragen. Alle Informationen auf "
-"dieser Seite wurde an Ihre E-Mail Adresse gesendet."
-
-msgid ""
-"Your request has been completed. If you asked for documents to be sent to "
-"your address, they should arrive shortly. If you asked to pick up documents "
-"at the municipality, the are now ready to be picked up."
-msgstr ""
-"Ihre Anfrage wurde erfolgreich abgeschlossen. Falls Sie Dokumente über den "
-"Postweg verlangt haben, sollten Sie in den kommenden Tagen Post erhalten. "
-"Falls Sie Dokumente am Schalter abholen wollten, so können Sie das jetzt tun."
 
 msgid "State:"
 msgstr "Status:"
@@ -1963,24 +1969,3 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
-
-#~ msgid "Bank Beneficiary"
-#~ msgstr "Bank Begünstigter"
-
-#~ msgid "Pending tickets"
-#~ msgstr "Tickets in Bearbeitung"
-
-#~ msgid "Open tickets"
-#~ msgstr "Offene Tickets"
-
-#~ msgid "Pending ticket"
-#~ msgstr "Ticket in Bearbeitung"
-
-#~ msgid "Open ticket"
-#~ msgstr "Offenes Ticket"
-
-#~ msgid "Open Ticket"
-#~ msgstr "Offenes Ticket"
-
-#~ msgid "Pending Ticket"
-#~ msgstr "Ticket in Bearbeitung"

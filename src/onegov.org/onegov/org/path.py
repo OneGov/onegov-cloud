@@ -29,6 +29,8 @@ from onegov.org.models import (
     AtoZPages,
     Clipboard,
     Editor,
+    Export,
+    ExportCollection,
     FormPersonMove,
     GeneralFileCollection,
     ImageFileCollection,
@@ -96,6 +98,16 @@ def get_files(app):
 @OrgApp.path(model=ImageFileCollection, path='/bilder')
 def get_images(app):
     return ImageFileCollection(app.session())
+
+
+@OrgApp.path(model=ExportCollection, path='/exporte')
+def get_exports(request, app):
+    return ExportCollection(app)
+
+
+@OrgApp.path(model=Export, path='/export/{id}')
+def get_export(request, app, id):
+    return ExportCollection(app).by_id(id)
 
 
 @OrgApp.path(model=FormCollection, path='/formulare')

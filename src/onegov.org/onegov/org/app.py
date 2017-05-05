@@ -28,6 +28,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
     #: org directives
     homepage_widget = directive(directives.HomepageWidgetAction)
+    export = directive(directives.ExportAction)
 
     def is_allowed_application_id(self, application_id):
         """ Stops onegov.server from ever passing the request to the org
