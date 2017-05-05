@@ -39,7 +39,8 @@ def view_export(self, request, form):
             for row in self.run(form, request.app.session())
         )
 
-        return form.as_export_response(rows, title=self.title)
+        return form.as_export_response(
+            rows, title=request.translate(self.title))
 
     return {
         'layout': layout,
