@@ -304,10 +304,10 @@ def test_activity_filter_tags(feriennet_app):
     assert "Learn How to Dance" in page
 
     # anyone can filter by week
-    page = editor.get('/angebote').click('2. Woche', index=0)
+    page = editor.get('/angebote').click('04.01.2016 - 10.01.2016', index=0)
     assert "Keine Angebote" in page
 
-    page = editor.get('/angebote').click('1. Woche', index=0)
+    page = editor.get('/angebote').click('01.01.2016 - 03.01.2016', index=0)
     assert "Learn How to Cook" in page
 
 
@@ -548,15 +548,15 @@ def test_occasions_form(feriennet_app):
 
     assert "keine Durchführungen" not in activity
     assert "4. Oktober 10:00 - 12:00" in activity
-    assert "10 - 20 Jahre alt" in activity
+    assert "10 - 20 Jahre" in activity
     assert "30 - 40 Teilnehmer" in activity
     assert "Franz Karl Weber" in activity
     assert "No griefers" in activity
 
-    occasion = activity.click("Bearbeiten", index=1)
+    occasion = activity.click("Bearbeiten")
     occasion.form['min_age'] = 15
     activity = occasion.form.submit().follow()
-    assert "15 - 20 Jahre alt" in activity
+    assert "15 - 20 Jahre" in activity
 
     editor.delete(get_delete_link(activity, index=1))
     assert "keine Durchführungen" in editor.get('/angebot/play-with-legos')
@@ -744,11 +744,11 @@ def test_enroll_child(feriennet_app):
 
     # now that we're logged in, the login link automatically skips ahead
     enroll = activity.click("Anmelden").follow()
-    assert "Teilnehmer Anmelden" in enroll
+    assert "Teilnehmer anmelden" in enroll
 
     # the link changes, but the result stays the same
     enroll = client.get('/angebot/retreat').click("Anmelden")
-    assert "Teilnehmer Anmelden" in enroll
+    assert "Teilnehmer anmelden" in enroll
 
     enroll.form['first_name'] = "Tom"
     enroll.form['last_name'] = "Sawyer"
@@ -1860,7 +1860,7 @@ def test_import_account_statement(feriennet_app):
     page.form['sure'] = 'yes'
     page = page.form.submit()
 
-    page = page.click('Kontoauszug Importieren')
+    page = page.click('Kontoauszug importieren')
     assert "kein Bankkonto" in page
 
     settings = page.click('Einstellungen', index=1)
@@ -1871,7 +1871,7 @@ def test_import_account_statement(feriennet_app):
     page = page.click('Rechnungen')
     code = page.pyquery('.invoice-items-payment li:last').text()
 
-    page = page.click('Fakturierung').click('Kontoauszug Importieren')
+    page = page.click('Fakturierung').click('Kontoauszug importieren')
     assert "kein Bankkonto" not in page
 
     xml = generate_xml([
@@ -1893,7 +1893,7 @@ def test_import_account_statement(feriennet_app):
     assert "1 Zahlungen wurden importiert" in page
     assert "unpaid" not in page
 
-    page = page.click('Fakturierung').click('Kontoauszug Importieren')
+    page = page.click('Fakturierung').click('Kontoauszug importieren')
     page.form['xml'] = Upload(
         'account.xml',
         xml.encode('utf-8'),
