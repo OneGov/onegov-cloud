@@ -91,7 +91,7 @@ class UserProfileForm(Form):
     )
 
     bank_beneficiary = StringField(
-        label=_("Bank Beneficiary"),
+        label=_("Beneficiary"),
     )
 
     daily_ticket_statistics = BooleanField(

@@ -3,6 +3,7 @@ from onegov.activity import InvoiceItemCollection
 from onegov.activity import PeriodCollection
 from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.collections import BillingCollection
+from onegov.feriennet.collections import ExportCollection
 from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.collections import OccasionAttendeeCollection
@@ -75,6 +76,16 @@ def get_admin_tools(request):
                             NotificationTemplateCollection
                         ),
                         classes=('show-notifications', )
+                    )
+                )
+
+                links.append(
+                    Link(
+                        text=_("Exports"),
+                        url=request.class_link(
+                            ExportCollection
+                        ),
+                        classes=('show-exports', )
                     )
                 )
 

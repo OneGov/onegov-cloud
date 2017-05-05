@@ -6,6 +6,8 @@ from onegov.feriennet.forms.bank_statement import BankStatementImportForm
 from onegov.feriennet.forms.billing import BillingForm
 from onegov.feriennet.forms.occasion import OccasionForm
 from onegov.feriennet.forms.period import PeriodForm
+from onegov.feriennet.forms.period import PeriodSelectForm
+from onegov.feriennet.forms.period import PeriodExportForm
 from onegov.feriennet.forms.userprofile import UserProfileForm
 from onegov.feriennet.forms.match import MatchForm
 
@@ -25,6 +27,8 @@ __all__ = [
     'NotificationTemplateSendForm',
     'OccasionForm',
     'PeriodForm',
+    'PeriodExportForm',
+    'PeriodSelectForm',
     'UserProfileForm',
     'VacationActivityForm'
 ]

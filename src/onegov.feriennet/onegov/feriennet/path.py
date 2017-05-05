@@ -5,6 +5,7 @@ from onegov.activity import Period, PeriodCollection
 from onegov.activity import Attendee, AttendeeCollection
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections import BillingCollection
+from onegov.feriennet.collections import ExportCollection
 from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.collections import OccasionAttendeeCollection
@@ -84,6 +85,13 @@ def get_periods(request, app):
     converters=dict(id=UUID))
 def get_period(request, app, id):
     return PeriodCollection(app.session()).by_id(id)
+
+
+@FeriennetApp.path(
+    model=ExportCollection,
+    path='/datenexport')
+def get_exports(request, app):
+    return ExportCollection()
 
 
 @FeriennetApp.path(

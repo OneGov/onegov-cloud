@@ -1,13 +1,50 @@
 from cached_property import cached_property
 from datetime import datetime
 from onegov.activity import Activity, Period, Occasion, OccasionDate
+from onegov.activity import PeriodCollection
 from onegov.core.utils import Bunch
 from onegov.feriennet import _
-from onegov.form import Form
+from onegov.form import Form, merge_forms
+from onegov.org.forms import ExportForm
 from sqlalchemy import distinct, func, or_, literal
-from wtforms.fields import StringField, RadioField
+from wtforms.fields import StringField, RadioField, SelectField
 from wtforms.fields.html5 import DateField, IntegerField, DecimalField
 from wtforms.validators import InputRequired, Optional, NumberRange
+
+
+class PeriodSelectForm(Form):
+
+    period = SelectField(
+        label=_("Period"),
+        validators=[InputRequired()],
+        default='0xdeadbeef')
+
+    @property
+    def period_choices(self):
+        q = PeriodCollection(self.request.app.session()).query()
+        q = q.with_entities(Period.id, Period.title)
+        q = q.order_by(Period.execution_start)
+
+        return [(row.id.hex, row.title) for row in q]
+
+    @property
+    def selected_period(self):
+        return PeriodCollection(self.request.app.session()).by_id(
+            self.period.data)
+
+    @property
+    def active_period(self):
+        return self.request.app.active_period
+
+    def on_request(self):
+        self.period.choices = self.period_choices
+
+        if self.period.data == '0xdeadbeef' and self.active_period:
+            self.period.data = self.active_period.id.hex
+
+
+class PeriodExportForm(merge_forms(PeriodSelectForm, ExportForm)):
+    pass
 
 
 class PeriodForm(Form):

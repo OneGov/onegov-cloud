@@ -167,6 +167,7 @@ ul.single-line {
     .show-activity::before { @include icon('\f135'); }
     .show-attendees::before { @include icon('\f0c0'); }
     .show-notifications::before { @include icon('\f003'); }
+    .show-exports::before { @include icon('\f019'); }
     .show-ticket::before { @include icon('\f145'); }
 }
 

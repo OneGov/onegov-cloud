@@ -2,9 +2,10 @@ from cached_property import cached_property
 from onegov.activity import Activity, PeriodCollection, Occasion
 from onegov.feriennet import _
 from onegov.feriennet import security
-from onegov.feriennet.const import OWNER_EDITABLE_STATES
+from onegov.feriennet.collections import ExportCollection
 from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.collections import VacationActivityCollection
+from onegov.feriennet.const import OWNER_EDITABLE_STATES
 from onegov.org.elements import Link, ConfirmLink, DeleteLink
 from onegov.org.layout import DefaultLayout as BaseLayout
 from onegov.ticket import TicketCollection
@@ -33,27 +34,58 @@ class DefaultLayout(BaseLayout):
         return True
 
 
+class ExportCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Exports"), self.request.class_link(ExportCollection)),
+        ]
+
+
 class VacationActivityCollectionLayout(DefaultLayout):
 
     @cached_property
     def breadcrumbs(self):
-        return (
+        return [
             Link(_("Homepage"), self.homepage_url),
-            Link(_("Activities"), self.request.link(self.model))
+            Link(_("Activities"), self.request.class_link(
+                VacationActivityCollection)),
+        ]
+
+    @property
+    def organiser_links(self):
+        yield Link(
+            text=_("Submit Activity"),
+            url=self.request.link(self.model, name='neu'),
+            classes=('new-activity', )
         )
+
+    @property
+    def admin_links(self):
+        if self.request.app.active_period:
+            yield Link(
+                text=_("Export Occasions"),
+                url=self.request.link(
+                    self.request.app.active_period, 'export-durchfuehrungen'),
+                classes=('export-link', )
+            )
 
     @cached_property
     def editbar_links(self):
         if not self.request.is_organiser:
             return None
 
-        return [
-            Link(
-                text=_("Submit Activity"),
-                url=self.request.link(self.model, name='neu'),
-                classes=('new-activity', )
-            )
-        ]
+        links = []
+
+        if self.request.is_organiser:
+            links.extend(self.organiser_links)
+
+        if self.request.is_admin:
+            links.extend(self.admin_links)
+
+        return links
 
 
 class BookingCollectionLayout(DefaultLayout):
