@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.7.0 (2017-05-05)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a generic export view and implementation using directives.
   [href]
 
