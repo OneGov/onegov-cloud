@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves the capability of the export formatter.
+  [href]
+
 - Gives subapplications the ability to override the ticket status text.
   [href]
 

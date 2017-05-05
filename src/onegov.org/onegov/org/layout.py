@@ -1,7 +1,7 @@
 import babel.dates
 
 from cached_property import cached_property
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from dateutil import rrule
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.layout import ChameleonLayout
@@ -222,8 +222,10 @@ class Layout(ChameleonLayout):
 
         """
         def default(value):
-            if isinstance(value, datetime):
+            if isinstance(value, (date, datetime)):
                 return value.isoformat()
+            if hasattr(value, 'domain'):
+                return self.request.translator(value)
             if isinstance(value, str):
                 return "\n".join(value.splitlines())  # normalize newlines
 
@@ -233,8 +235,12 @@ class Layout(ChameleonLayout):
             def formatter(value):
                 if isinstance(value, datetime):
                     return self.format_date(value, 'datetime')
+                if isinstance(value, date):
+                    return self.format_date(value, 'date')
                 if isinstance(value, (list, tuple)):
                     return ', '.join(value)
+                if isinstance(value, bool):
+                    value = value and _("Yes") or _("No")
                 return default(value)
         else:
             formatter = default
