@@ -3,7 +3,6 @@ from onegov.activity import InvoiceItemCollection
 from onegov.activity import PeriodCollection
 from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.collections import BillingCollection
-from onegov.feriennet.collections import ExportCollection
 from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.collections import OccasionAttendeeCollection
@@ -11,6 +10,7 @@ from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.layout import DefaultLayout
 from onegov.org.custom import get_global_tools as get_base_tools
 from onegov.org.elements import Link, LinkGroup
+from onegov.org.models import ExportCollection
 
 
 @FeriennetApp.template_variables()

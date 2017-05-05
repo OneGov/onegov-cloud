@@ -2,7 +2,6 @@ from cached_property import cached_property
 from onegov.activity import Activity, PeriodCollection, Occasion
 from onegov.feriennet import _
 from onegov.feriennet import security
-from onegov.feriennet.collections import ExportCollection
 from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.const import OWNER_EDITABLE_STATES
@@ -32,16 +31,6 @@ class DefaultLayout(BaseLayout):
             return self.model.activity.state in OWNER_EDITABLE_STATES
 
         return True
-
-
-class ExportCollectionLayout(DefaultLayout):
-
-    @cached_property
-    def breadcrumbs(self):
-        return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Exports"), self.request.class_link(ExportCollection)),
-        ]
 
 
 class VacationActivityCollectionLayout(DefaultLayout):
