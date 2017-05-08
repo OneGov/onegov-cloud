@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.8.6 (2017-05-08)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a relationship between invoice_item and user.
   [href]
 
