@@ -20,6 +20,11 @@ from time import sleep
 from unittest.mock import Mock, patch
 
 
+SUPPORTED_YEARS = list(range(2009, 2017 + 1))
+SUPPORTED_YEARS_MAP = list(range(2013, 2017 + 1))
+SUPPORTED_YEARS_NO_MAP = list(set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP))
+
+
 def test_principal_load():
     principal = Principal.from_yaml(textwrap.dedent("""
         name: Kanton Zug
@@ -142,13 +147,14 @@ def test_principal_load():
 
 
 def test_principal_municipalities():
+    # Bern (municipalitites have districts, not municipalitites)
     principal = Principal(
         name='Bern', municipality='351', logo=None, color=None
     )
     assert principal.municipalities == {}
 
+    # Canton Zug
     principal = Principal(name='Zug', canton='zg', logo=None, color=None)
-
     municipalities = {
         1701: {'name': 'Baar'},
         1702: {'name': 'Cham'},
@@ -162,42 +168,33 @@ def test_principal_municipalities():
         1710: {'name': 'Walchwil'},
         1711: {'name': 'Zug'},
     }
-
     assert principal.municipalities == {
-        2009: municipalities,
-        2010: municipalities,
-        2011: municipalities,
-        2012: municipalities,
-        2013: municipalities,
-        2014: municipalities,
-        2015: municipalities,
-        2016: municipalities,
-        2017: municipalities,
+        year: municipalities for year in SUPPORTED_YEARS
     }
 
+    # All cantons
     for canton in cantons:
         principal = Principal(
             name=canton, canton=canton, logo=None, color=None
         )
-
-        for year in range(2009, 2018):
+        for year in SUPPORTED_YEARS:
             assert principal.municipalities[year]
 
 
 def test_principal_districts():
+    # Canton Zug (cantons have municipalities, not districts)
     principal = Principal(name='Zug', canton='zg', logo=None, color=None)
     assert principal.districts == {}
 
+    # Municipality without districts
     principal = Principal(
         name='Kriens', municipality='1059', logo=None, color=None
     )
-
     assert principal.districts == {
-        year: {1059: {'name': 'Kriens'}} for year in range(
-            2009, date.today().year + 2
-        )
+        year: {1059: {'name': 'Kriens'}} for year in SUPPORTED_YEARS
     }
 
+    # Municipality with districts
     principal = Principal(
         name='Bern', municipality='351', logo=None, color=None
     )
@@ -209,14 +206,7 @@ def test_principal_districts():
         5: {'name': 'Breitenrain/Lorraine'},
         6: {'name': 'Bümpliz/Bethlehem'},
     }
-    assert principal.districts == {
-        2012: districts,
-        2013: districts,
-        2014: districts,
-        2015: districts,
-        2016: districts,
-        2017: districts
-    }
+    assert principal.districts == {year: districts for year in SUPPORTED_YEARS}
 
 
 def test_principal_entities():
@@ -235,40 +225,41 @@ def test_principal_entities():
 
 
 def test_principal_years_available():
+    # Municipality without districts/map
     principal = Principal(
         name='Kriens', municipality='1059', logo=None, color=None
     )
     assert not principal.is_year_available(2000)
-    assert not principal.is_year_available(2016)
     assert not principal.is_year_available(2000, map_required=False)
-    assert principal.is_year_available(2016, map_required=False)
+    for year in SUPPORTED_YEARS:
+        assert not principal.is_year_available(year)
+        assert principal.is_year_available(year, map_required=False)
 
+    # Municipality with districts/map
     principal = Principal(
         name='Bern', municipality='351', logo=None, color=None
     )
     assert not principal.is_year_available(2000)
-    assert principal.is_year_available(2016)
     assert not principal.is_year_available(2000, map_required=False)
-    assert principal.is_year_available(2016, map_required=False)
+    for year in SUPPORTED_YEARS_NO_MAP:
+        assert not principal.is_year_available(year)
+        assert principal.is_year_available(year, map_required=False)
+    for year in SUPPORTED_YEARS_MAP:
+        assert principal.is_year_available(year)
+        assert principal.is_year_available(year, map_required=False)
 
+    # Cantons
     for canton in cantons:
         principal = Principal(
             name=canton, canton=canton, logo=None, color=None
         )
 
-        for year in range(2009, 2013):
+        for year in SUPPORTED_YEARS_NO_MAP:
             assert not principal.is_year_available(year)
-        for year in range(2013, 2017):
-            assert principal.is_year_available(year)
-        for year in range(2009, 2017):
             assert principal.is_year_available(year, map_required=False)
-
-        if canton in ['gr', 'sg', 'sz', 'so', 'zg']:
-            assert principal.is_year_available(2017)
-            assert principal.is_year_available(2017, map_required=False)
-        else:
-            assert not principal.is_year_available(2017)
-            assert principal.is_year_available(2017, map_required=False)
+        for year in SUPPORTED_YEARS_MAP:
+            assert principal.is_year_available(year)
+            assert principal.is_year_available(year, map_required=False)
 
 
 def test_principal_notifications_enabled():
