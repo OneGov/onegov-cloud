@@ -81,3 +81,15 @@ class FeriennetExport(Export):
         yield _("User Bank Account"), user_data.get('bank_account', '')
         yield _("User Beneficiary"), user_data.get('bank_beneficiary', '')
         yield _("User Status E-Mail"), daily_email
+
+    def invoice_item_fields(self, item):
+        yield _("Invoice Item Group"), item.group
+        yield _("Invoice Item Text"), item.text
+        yield _("Invoice Item Code"), item.display_code
+        yield _("Invoice Item ESR"), item.display_esr_code
+        yield _("Invoice Item Paid"), item.paid
+        yield _("Invoice Item Transaction ID"), item.tid or ''
+        yield _("Invoice Item Source"), item.source or ''
+        yield _("Invoice Item Unit"), item.unit
+        yield _("Invoice Item Quantity"), item.quantity
+        yield _("Invoice Item Amount"), item.amount
