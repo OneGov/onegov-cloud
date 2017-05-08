@@ -113,7 +113,7 @@
                                             <td>
                                                 <tal:block
                                                     define="state record.booking_state"
-                                                    metal:use-macro="layout.macros.confirmed_booking_state"
+                                                    metal:use-macro="layout.macros.booking_state"
                                                 />
                                             </td>
                                             <td>

@@ -339,7 +339,7 @@
 </metal:hints>
 
 
-<metal:confirmed_booking_state define-macro="confirmed_booking_state" i18n:domain="onegov.feriennet">
+<metal:booking_state define-macro="booking_state" i18n:domain="onegov.feriennet">
     <tal:block switch="state">
         <div tal:case="'open'" class="state ${state}" i18n:translate>
             Open
@@ -357,19 +357,7 @@
             Blocked
         </div>
     </tal:block>
-</metal:confirmed_booking_state>
-
-
-<metal:wishlist_booking_state define-macro="wishlist_booking_state" i18n:domain="onegov.feriennet">
-    <tal:block switch="state">
-        <div tal:case="'cancelled'" class="state ${state}" i18n:translate>
-            Cancelled
-        </div>
-        <div tal:case="default" class="state open" i18n:translate>
-            Open
-        </div>
-    </tal:block>
-</metal:wishlist_booking_state>
+</metal:booking_state>
 
 
 <metal:periods define-macro="periods" i18n:domain="onegov.feriennet" i18n:domain="onegov.feriennet">

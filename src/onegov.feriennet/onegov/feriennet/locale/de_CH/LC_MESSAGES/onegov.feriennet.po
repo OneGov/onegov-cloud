@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-05-05 15:42+0200\n"
+"POT-Creation-Date: 2017-05-08 14:24+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -148,6 +148,122 @@ msgstr "Wichtige Termine des Ferienpasses"
 msgid "URL pointing to an opening hours page"
 msgstr "URL der auf die Seite der Termine zeigt"
 
+msgid "Activity Title"
+msgstr "Angebot Titel"
+
+msgid "Activity Lead"
+msgstr "Angebot Einleitung"
+
+msgid "Activity Text"
+msgstr "Angebot Text"
+
+msgid "Activity Status"
+msgstr "Angebot Status"
+
+msgid "Activity Location"
+msgstr "Angebot Ort"
+
+msgid "Booking State"
+msgstr "Buchung Status"
+
+msgid "Booking Priority"
+msgstr "Buchung Priorität"
+
+msgid "Booking Cost"
+msgstr "Buchung Kosten"
+
+msgid "Attendee First Name"
+msgstr "Teilnehmer Vorname"
+
+msgid "Attendee Last Name"
+msgstr "Teilnehmer Nachname"
+
+msgid "Attendee Birth Date"
+msgstr "Teilnehmer Geburtsdatum"
+
+msgid "Attendee Gender"
+msgstr "Teilnehmer Geschlecht"
+
+msgid "Attendee Notes"
+msgstr "Teilnehmer Bemerkungen"
+
+msgid "Attendee Booking-Limit"
+msgstr "Teilnehmer Buchungslimite"
+
+msgid "Occasion Rescinded"
+msgstr "Durchführung Abgesagt"
+
+msgid "Occasion Dates"
+msgstr "Durchführung Daten"
+
+msgid "Occasion Note"
+msgstr "Durchführung Bemerkung"
+
+msgid "Occasion Age"
+msgstr "Durchführung Alter"
+
+msgid "Occasion Spots"
+msgstr "Durchführung Plätze"
+
+msgid "Occasion Cost"
+msgstr "Durchführung Kosten"
+
+msgid "Occasion Meeting Point"
+msgstr "Durchführung Treffpunkt"
+
+msgid "Occasion May Overlap"
+msgstr "Durchführung darf überlappen"
+
+msgid "User Salutation"
+msgstr "Benutzer Anrede"
+
+msgid "User First Name"
+msgstr "Benutzer Vorname"
+
+msgid "User Last Name"
+msgstr "Benutzer Nachname"
+
+msgid "User Organisation"
+msgstr "Benutzer Organisation"
+
+msgid "User Address"
+msgstr "Benutzer Adresse"
+
+msgid "User Zipcode"
+msgstr "Benutzer PLZ"
+
+msgid "User Location"
+msgstr "Benutzer Ort"
+
+msgid "User E-Mail"
+msgstr "Benutzer E-Mail"
+
+msgid "User Phone"
+msgstr "Benutzer Telefon"
+
+msgid "User Emergency"
+msgstr "Benutzer Notfall"
+
+msgid "User Website"
+msgstr "Benutzer Webseite"
+
+msgid "User Bank Account"
+msgstr "Benutzer Bankkonto"
+
+msgid "User Beneficiary"
+msgstr "Benutzer Begünstigter"
+
+msgid "User Status E-Mail"
+msgstr "Benutzer Status E-Mail"
+
+msgid "Wishlist / Bookings"
+msgstr "Wunschliste / Buchungen"
+
+msgid ""
+"Exports wishlists or bookings, depending on the current state of the given "
+"period."
+msgstr "Exportiert Wünsche oder Buchungen, je nach Status der gewählten Periode."
+
 msgid "Accepted"
 msgstr "Angenommen"
 
@@ -163,32 +279,23 @@ msgstr "Beantragt"
 msgid "Published"
 msgstr "Veröffentlicht"
 
-msgid "Monday"
-msgstr "Montag"
-
-msgid "Tuesday"
-msgstr "Dienstag"
-
-msgid "Wednesday"
-msgstr "Mittwoch"
-
-msgid "Thursday"
-msgstr "Donnerstag"
-
-msgid "Friday"
-msgstr "Freitag"
-
-msgid "Saturday"
-msgstr "Samstag"
-
-msgid "Sunday"
-msgstr "Sonntag"
-
 msgid "Mr."
 msgstr "Herr"
 
 msgid "Ms."
 msgstr "Frau"
+
+msgid "Open"
+msgstr "Offen"
+
+msgid "Cancelled"
+msgstr "Storniert"
+
+msgid "Denied"
+msgstr "Abgelehnt"
+
+msgid "Blocked"
+msgstr "Blockiert"
 
 msgid "Occasions"
 msgstr "Durchführungen"
@@ -196,98 +303,20 @@ msgstr "Durchführungen"
 msgid "Exports activities with an occasion in the given period."
 msgstr "Exportiert Angebote mit Durchführungen in der gewählten Periode."
 
-msgid "Organiser Salutation"
-msgstr "Veranstalter Anrede"
-
-msgid "Organiser First Name"
-msgstr "Veranstalter Vorname"
-
-msgid "Organiser Last Name"
-msgstr "Veranstalter Nachname"
-
-msgid "Organiser Organisation"
-msgstr "Veranstalter Organisation"
-
-msgid "Organiser Address"
-msgstr "Veranstalter Adresse"
-
-msgid "Organiser Zipcode"
-msgstr "Veranstalter PLZ"
-
-msgid "Organiser Location"
-msgstr "Veranstalter Ort"
-
-msgid "Organiser E-Mail"
-msgstr "Veranstalter E-Mail"
-
-msgid "Organiser Phone"
-msgstr "Veranstalter Telefon"
-
-msgid "Organiser Emergency"
-msgstr "Veranstalter Notfall"
-
-msgid "Organiser Website"
-msgstr "Veranstalter Webseite"
-
-msgid "Organiser Bank Account"
-msgstr "Veranstalter Bankkonto"
-
-msgid "Organiser Beneficiary"
-msgstr "Veranstalter Begünstigter"
-
-msgid "Organiser Status E-Mail"
-msgstr "Veranstalter Status E-Mail"
-
 msgid "Title"
 msgstr "Titel"
-
-msgid "Lead"
-msgstr "Einleitung"
-
-msgid "Text"
-msgstr "Text"
-
-msgid "Status"
-msgstr "Status"
-
-msgid "Location"
-msgstr "Ort"
-
-msgid "Rescinded"
-msgstr "Abgesagt"
-
-msgid "Start"
-msgstr "Start"
-
-msgid "End"
-msgstr "Ende"
-
-msgid "Weekdays"
-msgstr "Wochentage"
-
-msgid "Note"
-msgstr "Bemerkung"
-
-msgid "Age"
-msgstr "Alter"
-
-msgid "Spots"
-msgstr "Plätze"
-
-msgid "Cost"
-msgstr "Kosten"
-
-msgid "Meeting Point"
-msgstr "Treffpunkt"
-
-msgid "May Overlap"
-msgstr "Kann überlappen"
 
 msgid "The title of the activity"
 msgstr "Der Titel des Angebots"
 
+msgid "Lead"
+msgstr "Einleitung"
+
 msgid "Describes briefly what this activity is about"
 msgstr "Beschreibt kurz um was es beim Angebot geht"
+
+msgid "Text"
+msgstr "Text"
 
 msgid "Tags"
 msgstr "Kategorien"
@@ -297,6 +326,9 @@ msgstr "Veranstalter"
 
 msgid "Administration"
 msgstr "Administration"
+
+msgid "Location"
+msgstr "Ort"
 
 msgid "Map"
 msgstr "Karte"
@@ -384,6 +416,9 @@ msgstr "Geburtsdatum"
 
 msgid "Gender"
 msgstr "Geschlecht"
+
+msgid "Note"
+msgstr "Bemerkung"
 
 msgid "Allergies, Disabilities, Particulars"
 msgstr "Allergien, Behinderungen, Besonderheiten"
@@ -568,6 +603,12 @@ msgstr "Inaktive Benutzer"
 msgid "Dates"
 msgstr "Daten"
 
+msgid "Meeting Point"
+msgstr "Treffpunkt"
+
+msgid "Cost"
+msgstr "Kosten"
+
 msgid "The amount paid to the organiser"
 msgstr "Der Betrag welcher dem Veranstalter gezahlt wird"
 
@@ -619,6 +660,12 @@ msgid ""
 "bookings."
 msgstr ""
 "Die Anzahl Plätze ist tiefer als die Anzahl bereits angenommener Buchungen."
+
+msgid "Start"
+msgstr "Start"
+
+msgid "End"
+msgstr "Ende"
 
 msgid "Add"
 msgstr "Hinzufügen"
@@ -817,6 +864,9 @@ msgstr "Link zur Startseite."
 
 msgid "No activites found."
 msgstr "Keine Angebote gefunden."
+
+msgid "Age"
+msgstr "Alter"
 
 msgid "${min_age} - ${max_age} years"
 msgstr "${min_age} - ${max_age} Jahre"
@@ -1095,6 +1145,9 @@ msgstr "Ticketstatus"
 msgid "Fully booked"
 msgstr "Ausgebucht"
 
+msgid "Rescinded"
+msgstr "Abgesagt"
+
 msgid "${count} spots available"
 msgstr "Noch ${count} Plätze frei"
 
@@ -1171,18 +1224,6 @@ msgid ""
 "Between each booking we enforce ${minutes} minutes of block-time in which no "
 "other booking is permitted."
 msgstr "Nötige Transferzeit zwischen zwei Durchführungen: ${minutes} Minuten."
-
-msgid "Open"
-msgstr "Offen"
-
-msgid "Cancelled"
-msgstr "Storniert"
-
-msgid "Denied"
-msgstr "Abgelehnt"
-
-msgid "Blocked"
-msgstr "Blockiert"
 
 msgid ""
 "Your request will be processed shortly. To see the state of your process "
@@ -1319,6 +1360,9 @@ msgstr "Ausführungs-Phase"
 
 msgid "Administrative Costs"
 msgstr "Administrative Kosten"
+
+msgid "Status"
+msgstr "Status"
 
 msgid "Completed"
 msgstr "Abgeschlossen"
