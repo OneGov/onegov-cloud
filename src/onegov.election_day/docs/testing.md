@@ -10,11 +10,13 @@ next election day) should be run before each election day.
 
 ### Unit-Tests
 
-The unit tests are run automatically after every commit using [Travis](https://travis-ci.org/OneGov/onegov.election_day).
+The unit tests are run automatically after every commit using
+[Travis](https://travis-ci.org/OneGov/onegov.election_day).
 
 ### Crawler
 
-There is a [crawler](https://github.com/msom/crawler.elections) available which allows to fetch all subpages of all known instances; run:
+There is a [crawler](https://github.com/msom/crawler.elections) available which
+allows to fetch all subpages of all known instances; run:
 
 ```
 ./run.py production
@@ -24,7 +26,8 @@ There is a [crawler](https://github.com/msom/crawler.elections) available which 
 2 POST-Upload
 -------------
 
-Results can be uploaded using a POST request and the format of the WabstiCExport program.
+Results can be uploaded using a POST request and the format of the WabstiCExport
+program, see [here](readme.md#curl-examples)
 
 
 ```
