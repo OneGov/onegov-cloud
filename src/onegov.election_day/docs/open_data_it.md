@@ -1,4 +1,5 @@
-# Elezioni & votazioni: Dati aperti
+Elezioni & votazioni: Dati aperti
+=================================
 
 ## Introduzione
 

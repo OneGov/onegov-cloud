@@ -1,22 +1,78 @@
-# Spécifications de format des élections
+(1) Spécifications de format des élections
+==========================================
 
 En ce qui concerne les formats de fichiers, les fichiers XLS et XLSX sont acceptés, ils sont générés par les programmes électoraux « élections (SESAM) » et « Wabsti élections et votes (VRSG) », ou par l'application web elle-même. Si une table est créée manuellement, le format de l'application web sera alors le plus facile.
 
 ## Contenu
 
-[SESAM Majorz](#sesam-majorz)
+1.1. [OneGov](#onegov)
+1.2. [SESAM Majorz](#sesam-majorz)
+1.3. [SESAM Proporz](#sesam-proporz)
+1.4. [Wabsti Majorz](#wabsti-majorz)
+1.5. [Wabsti Proporz](#wabsti-proporz)
+1.6. [WabstiCExport Majorz](#wabsticexport-majorz)
+1.7. [WabstiCExport Proporz](#wabsticexport-proporz)
+1.8. [Party results](#party-results)
 
-[SESAM Proporz](#sesam-proporz)
 
-[Wabsti Majorz](#wabsti-majorz)
+1.1 - Onegov
+------------
 
-[Wabsti Proporz](#wabsti-proporz)
+Le format, qui sera utilisé par l'application web pour l'exportation, se compose d'un seul fichier par élection. Une ligne est présente pour chaque municipalité et candidat.
 
-[OneGov](#onegov)
+### Colonnes
 
-[Party results](#party-results)
+Les colonnes suivantes seront évaluées et devraient exister :
 
-## SESAM Majorz
+Nom|Description
+---|---
+`election_absolute_majority`|Majorité absolue de l'élection, seulement si c'est une élection Majorz.
+`election_status`|`unknown`, `interim` or `final`.
+`election_counted_entities`|Nombre de municipalités comptées. Si `election_counted_entities = election_total_entities`, on considère alors que l'élection est entièrement comptée.
+`election_total_entities`|Nombre total de municipalités. Si aucune information précise à propos de la situation de l'élection n'est possible (parce que l'élection a été importée par Wabsti), alors cette valeur est `0`.
+`entity_id`|Numéro BFS de la municipalité. A value of `0` can be used for expats.
+`entity_name`|The name of the municipality.
+`entity_elegible_voters`|Nombre de personnes autorisées à voter dans la municipalité.
+`entity_received_ballots`|Nombre de bulletins soumis dans la municipalité.
+`entity_blank_ballots`|Nombre de bulletins vides dans la municipalité.
+`entity_invalid_ballots`|Nombre de bulletins non valides dans la municipalité.
+`entity_blank_votes`|Nombre de votes vides dans la municipalité.
+`entity_invalid_votes`|Nombre de votes non valides dans la municipalité. Zéro si c'est une élection Proporz.
+`list_name`|Nom de la liste de candidats. Uniquement avec les élections Proporz.
+`list_id`|Identifiant de la liste de candidats. Uniquement avec les élections Proporz.
+`list_number_of_mandates`|Nombre total de mandats de la liste. Uniquement avec les élections Proporz.
+`list_votes`|Nombre total de votes de liste. Uniquement avec les élections Proporz.
+`list_connection`|Identifiant de la connexion de liste. Uniquement avec les élections Proporz.
+`list_connection_parent`|Identifiant de la connexion de liste au niveau supérieur. Uniquement avec les élections Proporz et si c'est une connexion de sous-liste.
+`candidate_family_name`|Nom de famille du candidat.
+`candidate_first_name`|Prénom du candidat.
+`candidate_elected`|Vrai, si le candidat a été élu.
+`candidate_votes`|Nombre de votes de candidats dans la municipalité.
+
+#### Panachage results
+
+The results may contain panachage results by adding one column per list:
+
+Nom|Description
+---|---
+`panachage_votes_from_list_{XX}`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
+
+### Résultats temporaires
+
+Les municipalités pas encore entièrement comptées ne sont pas incluses dans les fichiers.
+
+If the status is
+- `interim`, the whole election is considered not yet completed
+- `final`, the whole election is considered completed
+- `unknown`, the whole vote is considered completed, if `election_counted_entities` and `election_total_entities` match
+
+### Modèle
+
+- [election_onegov_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_majorz.csv)
+- [election_onegov_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_proporz.csv)
+
+1.2 - SESAM Majorz
+------------------
 
 Le format d'exportation SESAM contient directement toutes les données requises. Il y a une ligne par candidat et municipalité.
 
@@ -48,9 +104,10 @@ On juge que l'élection n'est pas comptée si la quantité de municipalités com
 
 ### Modèle
 
-[election_sesam_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_sesam_majorz.csv)
+- [election_sesam_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_sesam_majorz.csv)
 
-## SESAM Proporz
+1.3 - SESAM Proporz
+-------------------
 
 Le format d'exportation SESAM contient directement toutes les données requises. Il y a une ligne par candidat et municipalité.
 
@@ -98,9 +155,10 @@ On juge que l'élection n'est pas comptée si la quantité de municipalités com
 
 ### Modèle
 
-[election_sesam_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_sesam_proporz.csv)
+- [election_sesam_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_sesam_proporz.csv)
 
-## Wabsti Majorz
+1.4 - Wabsti Majorz
+-------------------
 
 Le format de fichier nécessite deux diagrammes individuels : l'exportation des données et la liste des candidats élus.
 
@@ -151,11 +209,11 @@ Le format de fichier ne contient également aucune information sur l'état du co
 
 ### Modèles
 
-[election_wabsti_majorz_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_majorz_results.csv)
+- [election_wabsti_majorz_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_majorz_results.csv)
+- [election_wabsti_majorz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_majorz_candidates.csv)
 
-[election_wabsti_majorz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_majorz_candidates.csv)
-
-## Wabsti Proporz
+1.5 - Wabsti Proporz
+--------------------
 
 Le format de fichier nécessite quatre diagrammes individuels : l'exportation des données pour les résultats, l'exportation des données pour les statistiques, les connexions de liste et les candidats élus de liste.
 
@@ -225,72 +283,26 @@ Le format de fichier ne contient également aucune information sur l'état du co
 
 ### Modèles
 
-[election_wabsti_proporz_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_results.csv)
-
-[election_wabsti_proporz_statistics.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_statistics.csv)
-
-[election_wabsti_proporz_list_connections.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_list_connections.csv)
-
-[election_wabsti_proporz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_candidates.csv)
+- [election_wabsti_proporz_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_results.csv)
+- [election_wabsti_proporz_statistics.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_statistics.csv)
+- [election_wabsti_proporz_list_connections.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_list_connections.csv)
+- [election_wabsti_proporz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_candidates.csv)
 
 
-## OneGov
+1.6 - WabstiCExport Majorz
+--------------------------
 
-Le format, qui sera utilisé par l'application web pour l'exportation, se compose d'un seul fichier par élection. Une ligne est présente pour chaque municipalité et candidat.
+Version `2.2` is supported, please refer to the documentation provided by the exporter program for more information about the columns of the different files.
 
-### Colonnes
 
-Les colonnes suivantes seront évaluées et devraient exister :
+1.7 - WabstiCExport Proporz
+---------------------------
 
-Nom|Description
----|---
-`election_absolute_majority`|Majorité absolue de l'élection, seulement si c'est une élection Majorz.
-`election_status`|`unknown`, `interim` or `final`.
-`election_counted_entities`|Nombre de municipalités comptées. Si `election_counted_entities = election_total_entities`, on considère alors que l'élection est entièrement comptée.
-`election_total_entities`|Nombre total de municipalités. Si aucune information précise à propos de la situation de l'élection n'est possible (parce que l'élection a été importée par Wabsti), alors cette valeur est `0`.
-`entity_id`|Numéro BFS de la municipalité. A value of `0` can be used for expats.
-`entity_name`|The name of the municipality.
-`entity_elegible_voters`|Nombre de personnes autorisées à voter dans la municipalité.
-`entity_received_ballots`|Nombre de bulletins soumis dans la municipalité.
-`entity_blank_ballots`|Nombre de bulletins vides dans la municipalité.
-`entity_invalid_ballots`|Nombre de bulletins non valides dans la municipalité.
-`entity_blank_votes`|Nombre de votes vides dans la municipalité.
-`entity_invalid_votes`|Nombre de votes non valides dans la municipalité. Zéro si c'est une élection Proporz.
-`list_name`|Nom de la liste de candidats. Uniquement avec les élections Proporz.
-`list_id`|Identifiant de la liste de candidats. Uniquement avec les élections Proporz.
-`list_number_of_mandates`|Nombre total de mandats de la liste. Uniquement avec les élections Proporz.
-`list_votes`|Nombre total de votes de liste. Uniquement avec les élections Proporz.
-`list_connection`|Identifiant de la connexion de liste. Uniquement avec les élections Proporz.
-`list_connection_parent`|Identifiant de la connexion de liste au niveau supérieur. Uniquement avec les élections Proporz et si c'est une connexion de sous-liste.
-`candidate_family_name`|Nom de famille du candidat.
-`candidate_first_name`|Prénom du candidat.
-`candidate_elected`|Vrai, si le candidat a été élu.
-`candidate_votes`|Nombre de votes de candidats dans la municipalité.
+Version `2.2` is supported, please refer to the documentation provided by the exporter program for more information about the columns of the different files.
 
-#### Panachage results
 
-The results may contain panachage results by adding one column per list:
-
-Nom|Description
----|---
-`panachage_votes_from_list_{XX}`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
-
-### Résultats temporaires
-
-Les municipalités pas encore entièrement comptées ne sont pas incluses dans les fichiers.
-
-If the status is
-- `interim`, the whole election is considered not yet completed
-- `final`, the whole election is considered completed
-- `unknown`, the whole vote is considered completed, if `election_counted_entities` and `election_total_entities` match
-
-### Modèle
-
-[election_onegov_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_majorz.csv)
-
-[election_onegov_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_proporz.csv)
-
-## Party results
+1.8 - Party results
+-------------------
 
 Each (proporz) election may contain party results. These results are independent of the other results and typically contain the already aggregated results of the different lists of a party.
 
@@ -308,4 +320,4 @@ Nom|Description
 
 ### Template
 
-[election_party_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_party_results.csv)
+- [election_party_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_party_results.csv)

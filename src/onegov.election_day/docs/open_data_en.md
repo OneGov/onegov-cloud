@@ -1,4 +1,5 @@
-# Elections & Votes: Open Data
+Elections & Votes: Open Data
+============================
 
 ## Introduction
 

@@ -1,6 +1,8 @@
-# Elections & votes web application
+Elections & votes web application
+=================================
 
-## Introduction
+Introduction
+------------
 
 On election Sunday results will be published regularly on individual elections and votings. With the new *elections & votes* web application, this is done via a web interface, which accepts CSV (UTF-8) or Excel (XLS / XLSX) files with provisional or definitive results. For Excel files, either the first worksheet, or, if available, the worksheet named "results" will be used.
 
@@ -8,8 +10,8 @@ Depending on the election / vote and format, a different number of files is requ
 
 This document describes the format of these CSV/Excel files.
 
-## Content
+Content
+-------
 
-[Format Specification Elections](format_election_en.md)
-
-[Format Specification Votes](format_vote_en.md)
+1. [Format Specification Elections](format_election_en.md)
+2. [Format Specification Votes](format_vote_en.md)

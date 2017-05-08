@@ -1,4 +1,5 @@
-# Format Specificaziun Elecziuns
+(1) Format Specificaziun Elecziuns
+==================================
 
 Sco formats da datoteca vegnan acceptadas datotecas CSV, XLS u XLSX che vegnan generadas dals programs d'elecziun "Elecziuns (SESAM)" e "Wabsti Elecziuns e votaziuns (VRSG)", u da l'applicaziun web sezza. Sche la tabella duai vegnir fatga a maun, è il format da l'applicaziun web il pli simpel.
 
@@ -6,19 +7,74 @@ Ina "vischnanca" po er esser in district, in circul electoral e.u.v.
 
 ## Cuntegn
 
-[SESAM Maiorz](#sesam-maiorz)
+1.1. [OneGov](#onegov)
+1.2. [SESAM Maiorz](#sesam-maiorz)
+1.3. [SESAM Proporz](#sesam-proporz)
+1.4. [Wabsti Maiorz](#wabsti-maiorz)
+1.5. [Wabsti Proporz](#wabsti-proporz)
+1.6. [WabstiCExport Maiorz](#wabsticexport-maiorz)
+1.7. [WabstiCExport Proporz](#wabsticexport-proporz)
+1.8. [Party results](#party-results)
 
-[SESAM Proporz](#sesam-proporz)
+1.1 - Onegov
+------------
 
-[Wabsti Maiorz](#wabsti-maiorz)
+The format, which will be used by the web application for the export, consists of a single file per election. There is a row for each municipality and candidate.
 
-[Wabsti Proporz](#wabsti-proporz)
+### Colonnas
 
-[OneGov](#onegov)
+Las suandantas colonnas vegnan evaluadas e duessan esser avant maun:
 
-[Party results](#party-results)
+Num|Descripziun
+---|---
+`election_absolute_majority`|Maioritad absoluta da l'elecziun, mo tar elecziuns da maiorz.
+`election_status`|`unknown`, `interim` or `final`.
+`election_counted_municipalites`|Dumber da las vischnancas ch'èn dumbradas ora. Sche `election_counted_municipalites = election_total_municipalites`, vala l'elecziun sco dumbrada ora cumplettamain.
+`election_total_municipalites`|Dumber total da vischnancas. Sch'i na po betg vegnir dada ina infurmaziun exacta davart il status da l'elecziun (damai che Wahlt è vegnì importà da Wabsti), è questa valur `0`.
+`entity_bfs_number`|Numer UST da la vischnanca. A value of `0` can be used for expats.
+`entity_name`|The name of the municipality.
+`entity_elegible_voters`|Dumber da persunas cun dretg da votar da la vischnanca.
+`entity_received_ballots`|Dumber da cedels da votar consegnads da la vischnanca.
+`entity_blank_ballots`|Dumber da cedels da votar vids da la vischnanca.
+`entity_invalid_ballots`|Dumber da cedels da votar nunvalaivels da la vischnanca.
+`entity_blank_votes`|Dumber da vuschs vidas da la vischnanca.
+`entity_invalid_votes`|Dumber da vuschs nunvalaivlas da la vischnanca. Nulla en cas d'ina elecziun da proporz.
+`list_name`|Num da la glista da la candidata u dal candidat. Mo tar elecziuns da proporz.
+`list_id`|ID da la glista da la candidata u dal candidat. Mo tar elecziuns da proporz.
+`list_number_of_mandates`|Dumber total da mandats da la glista. Mo tar elecziuns da proporz.
+`list_votes`|Dumber total da vuschs da la glista. Mo tar elecziuns da proporz.
+`list_connection`|ID da la colliaziun da glistas. Mo tar elecziuns da proporz.
+`list_connection_parent`|ID da la colliaziun da glistas surordinada. Mo tar elecziuns da proporz e sch'i sa tracta d'ina sutcolliaziun da glistas.
+`candidate_family_name`|Num da famiglia da la candidata u dal candidat.
+`candidate_first_name`|Prenum da la candidata u dal candidat.
+`candidate_elected`|True, sche la candidata u il candidat è vegnì elegì.
+`candidate_votes`|Dumber da vuschs da candidat en la vischnanca.
 
-## SESAM Maiorz
+#### Panachage results
+
+The results may contain panachage results by adding one column per list:
+
+Num|Descripziun
+---|---
+`panachage_votes_from_list_{XX}`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
+
+
+### Resultats temporars
+
+Las vischnancas che n'èn anc betg dumbradas ora n'èn betg cuntegnidas en las datas.
+
+If the status is
+- `interim`, the whole election is considered not yet completed
+- `final`, the whole election is considered completed
+- `unknown`, the whole vote is considered completed, if `election_counted_entities` and `election_total_entities` match
+
+### Project
+
+- [election_onegov_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_majorz.csv)
+- [election_onegov_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_proporz.csv)
+
+1.2 SESAM Maiorz
+----------------
 
 Il format d'export SESAM cuntegna directamain tut las datas necessarias. I dat ina lingia per candidata u candidat e per vischnanca.
 
@@ -50,9 +106,10 @@ L'elecziun vala sco anc betg dumbrada ora, sch'il dumber da vischnancas dumbrada
 
 ### Project
 
-[election_sesam_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_sesam_majorz.csv)
+- [election_sesam_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_sesam_majorz.csv)
 
-## SESAM Proporz
+1.3 - SESAM Proporz
+-------------------
 
 Il format d'export SESAM cuntegna directamain tut las datas necessarias. I dat ina lingia per candidata u candidat e per vischnanca.
 
@@ -101,9 +158,10 @@ L'elecziun vala sco anc betg dumbrada ora, sch'il dumber da vischnancas dumbrada
 
 ### Project
 
-[election_sesam_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_sesam_proporz.csv)
+- [election_sesam_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_sesam_proporz.csv)
 
-## Wabsti Maiorz
+1.4 - Wabsti Maiorz
+-------------------
 
 Il format da datoteca premetta duas singulas tabellas: l'export da datas e la glista da las candidatas e dals candidats elegids.
 
@@ -154,11 +212,11 @@ Il format da datoteca na cuntegna naginas infurmaziuns definitivas, sch'ina sing
 
 ### Projects
 
-[election_wabsti_majorz_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_majorz_results.csv)
+- [election_wabsti_majorz_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_majorz_results.csv)
+- [election_wabsti_majorz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_majorz_candidates.csv)
 
-[election_wabsti_majorz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_majorz_candidates.csv)
-
-## Wabsti Proporz
+1.5 - Wabsti Proporz
+--------------------
 
 Il format da datoteca premetta quatter singulas tabellas: l'export da datas dals resultats, l'export da datas da las statisticas, las colliaziuns da glistas e la glista da las candidatas e dals candidats elegids.
 
@@ -228,73 +286,26 @@ Il format da datoteca na cuntegna naginas infurmaziuns definitivas, sch'ina sing
 
 ### Projects
 
-[election_wabsti_proporz_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_results.csv)
-
-[election_wabsti_proporz_statistics.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_statistics.csv)
-
-[election_wabsti_proporz_list_connections.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_list_connections.csv)
-
-[election_wabsti_proporz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_candidates.csv)
+- [election_wabsti_proporz_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_results.csv)
+- [election_wabsti_proporz_statistics.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_statistics.csv)
+- [election_wabsti_proporz_list_connections.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_list_connections.csv)
+- [election_wabsti_proporz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_candidates.csv)
 
 
-## OneGov
+1.6 - WabstiCExport Maiorz
+--------------------------
 
-The format, which will be used by the web application for the export, consists of a single file per election. There is a row for each municipality and candidate.
-
-### Colonnas
-
-Las suandantas colonnas vegnan evaluadas e duessan esser avant maun:
-
-Num|Descripziun
----|---
-`election_absolute_majority`|Maioritad absoluta da l'elecziun, mo tar elecziuns da maiorz.
-`election_status`|`unknown`, `interim` or `final`.
-`election_counted_municipalites`|Dumber da las vischnancas ch'èn dumbradas ora. Sche `election_counted_municipalites = election_total_municipalites`, vala l'elecziun sco dumbrada ora cumplettamain.
-`election_total_municipalites`|Dumber total da vischnancas. Sch'i na po betg vegnir dada ina infurmaziun exacta davart il status da l'elecziun (damai che Wahlt è vegnì importà da Wabsti), è questa valur `0`.
-`entity_bfs_number`|Numer UST da la vischnanca. A value of `0` can be used for expats.
-`entity_name`|The name of the municipality.
-`entity_elegible_voters`|Dumber da persunas cun dretg da votar da la vischnanca.
-`entity_received_ballots`|Dumber da cedels da votar consegnads da la vischnanca.
-`entity_blank_ballots`|Dumber da cedels da votar vids da la vischnanca.
-`entity_invalid_ballots`|Dumber da cedels da votar nunvalaivels da la vischnanca.
-`entity_blank_votes`|Dumber da vuschs vidas da la vischnanca.
-`entity_invalid_votes`|Dumber da vuschs nunvalaivlas da la vischnanca. Nulla en cas d'ina elecziun da proporz.
-`list_name`|Num da la glista da la candidata u dal candidat. Mo tar elecziuns da proporz.
-`list_id`|ID da la glista da la candidata u dal candidat. Mo tar elecziuns da proporz.
-`list_number_of_mandates`|Dumber total da mandats da la glista. Mo tar elecziuns da proporz.
-`list_votes`|Dumber total da vuschs da la glista. Mo tar elecziuns da proporz.
-`list_connection`|ID da la colliaziun da glistas. Mo tar elecziuns da proporz.
-`list_connection_parent`|ID da la colliaziun da glistas surordinada. Mo tar elecziuns da proporz e sch'i sa tracta d'ina sutcolliaziun da glistas.
-`candidate_family_name`|Num da famiglia da la candidata u dal candidat.
-`candidate_first_name`|Prenum da la candidata u dal candidat.
-`candidate_elected`|True, sche la candidata u il candidat è vegnì elegì.
-`candidate_votes`|Dumber da vuschs da candidat en la vischnanca.
-
-#### Panachage results
-
-The results may contain panachage results by adding one column per list:
-
-Num|Descripziun
----|---
-`panachage_votes_from_list_{XX}`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
+Version `2.2` is supported, please refer to the documentation provided by the exporter program for more information about the columns of the different files.
 
 
-### Resultats temporars
+1.7 - WabstiCExport Proporz
+---------------------------
 
-Las vischnancas che n'èn anc betg dumbradas ora n'èn betg cuntegnidas en las datas.
+Version `2.2` is supported, please refer to the documentation provided by the exporter program for more information about the columns of the different files.
 
-If the status is
-- `interim`, the whole election is considered not yet completed
-- `final`, the whole election is considered completed
-- `unknown`, the whole vote is considered completed, if `election_counted_entities` and `election_total_entities` match
 
-### Project
-
-[election_onegov_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_majorz.csv)
-
-[election_onegov_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_proporz.csv)
-
-## Party results
+1.8 - Party results
+-------------------
 
 Each (proporz) election may contain party results. These results are independent of the other results and typically contain the already aggregated results of the different lists of a party.
 
@@ -311,4 +322,4 @@ Num|Descripziun
 
 ### Template
 
-[election_party_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_party_results.csv)
+- [election_party_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_party_results.csv)

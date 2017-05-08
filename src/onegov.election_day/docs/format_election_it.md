@@ -1,22 +1,78 @@
-# Specifica Formato Elezioni
+(1) Specifica Formato Elezioni
+==============================
 
 Sono accettati come formati di file CSV, XLS o XLSX generati dai programmi elettorali "elezioni (SESAM)" e "Wabsti elezioni e voti (VRSG)" oppure dall'applicazione web stessa. Se una tabella deve essere creata a mano allora il formato dell'applicazione web è il più semplice.
 
 ## Contenuto
 
-[SESAM Sistema Maggioritario](#sesam-sistema-maggioritario)
+1.1. [OneGov](#onegov)
+1.2. [SESAM Sistema Maggioritario](#sesam-sistema-maggioritario)
+1.3. [SESAM Sistema Proporzionale](#sesam-sistema-proporzionale)
+1.4. [Wabsti Sistema Maggioritario](#wabsti-sistema-maggioritario)
+1.5. [Wabsti Sistema Proporzionale](#wabsti-sistema-proporzionale)
+1.6. [WabstiCExport Sistema Maggioritario](#wabsticexport-sistema-maggioritario)
+1.7. [WabstiCExport Sistema Proporzionale](#wabsticexport-sistema-proporzionale)
+1.8. [Party results](#party-results)
 
-[SESAM Sistema Proporzionale](#sesam-sistema-proporzionale)
 
-[Wabsti Sistema Maggioritario](#wabsti-sistema-maggioritario)
+1.1 - Onegov
+------------
 
-[Wabsti Sistema Proporzionale](#wabsti-sistema-proporzionale)
+Il formato che sarà utilizzato dall'applicazione web per l'esportazione è costituito da un unico file per ogni elezione. È presente una riga per ogni comune e candidato.
 
-[OneGov](#onegov)
+### Colonne
 
-[Party results](#party-results)
+Saranno prese in considerazione le seguenti colonne e devono essere presenti:
 
-## SESAM Sistema Maggioritario
+Nome|Descrizione
+---|---
+`election_absolute_majority`|Maggioranza assoluta delle elezioni, solo se elezione con sistema maggioritario.
+`election_status`|`unknown`, `interim` or `final`.
+`election_counted_entities`|Numero di comuni scrutinati. Se `election_counted_entities = election_total_entities`, allora l'elezione è considerata completamente scrutinata.
+`election_total_entities`|Numero totale dei comuni. Se non sono disponibili notizie certe sullo stato dell'elezione (perché l'elezione è stata importata da Wabsti) allora questo valore è `0`.
+`entity_id`|Numero BFS del comune. A value of `0` can be used for expats.
+`entity_name`|The name of the municipality.
+`entity_elegible_voters`|Numero di aventi diritto al voto nel Comune.
+`entity_received_ballots`|Numero di schede presentate nel Comune.
+`entity_blank_ballots`|Numero di schede bianche nel Comune.
+`entity_invalid_ballots`|Numero di schede nulle nel Comune.
+`entity_blank_votes`|Numero voti bianchi nel Comune.
+`entity_invalid_votes`|Numero di voti nulli nel Comune. Zero nel caso di elezione con sistema proporzionale.
+`list_name`|Nome della lista di candidati. Solo con elezioni con sistema proporzionale.
+`list_id`|ID della lista del candidato. Solo con elezioni con sistema proporzionale.
+`list_number_of_mandates`|Numero totale di mandati della lista. Solo con elezioni con sistema proporzionale.
+`list_votes`|Numero totale di voti di lista. Solo con elezioni con sistema proporzionale.
+`list_connection`|ID dell'apparentamento della lista. Solo con elezioni con sistema proporzionale.
+`list_connection_parent`|ID dell'apparentamento della lista di livello superiore. Solo con elezioni con sistema proporzionale e se è un apparentamento con una sottolista.
+`candidate_family_name`|Cognome del candidato.
+`candidate_first_name`|Nome del candidato.
+`candidate_elected`|Vero, se il candidato è stato eletto.
+`candidate_votes`|Numero di voti per il candidato nel Comune.
+
+#### Panachage results
+
+The results may contain panachage results by adding one column per list:
+
+Nome|Descrizione
+---|---
+`panachage_votes_from_list_{XX}`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
+
+### Risultati temporanei
+
+I comuni non ancora completamente scrutinati non sono inclusi nei file.
+
+If the status is
+- `interim`, the whole election is considered not yet completed
+- `final`, the whole election is considered completed
+- `unknown`, the whole vote is considered completed, if `election_counted_entities` and `election_total_entities` match
+
+### Modello
+
+- [election_onegov_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_majorz.csv)
+- [election_onegov_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_proporz.csv)
+
+1.2 - SESAM Sistema Maggioritario
+---------------------------------
 
 Il formato di esportazione SESAM contiene direttamente tutti i dati richiesti. È presente una linea per candidato e comune.
 
@@ -48,9 +104,10 @@ L'elezione è considerata non scrutinata se la quantità di comuni scrutinati in
 
 ### Modello
 
-[election_sesam_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_sesam_majorz.csv)
+- [election_sesam_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_sesam_majorz.csv)
 
-## SESAM Sistema Proporzionale
+1.3 - SESAM Sistema Proporzionale
+---------------------------------
 
 Il formato di esportazione SESAM contiene direttamente tutti i dati richiesti. È presente una linea per candidato e comune.
 
@@ -98,9 +155,10 @@ L'elezione è considerata non scrutinata se la quantità di comuni scrutinati in
 
 ### Modello
 
-[election_sesam_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_sesam_proporz.csv)
+- [election_sesam_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_sesam_proporz.csv)
 
-## Wabsti Sistema Maggioritario
+1.4 - Wabsti Sistema Maggioritario
+----------------------------------
 
 Il formato del file ha bisogno di due tabelle separate: l'esportazione dei dati e l'elenco dei candidati eletti.
 
@@ -151,11 +209,11 @@ Il formato del file, inoltre, non contiene alcuna informazione sul fatto che un 
 
 ### Modelli
 
-[election_wabsti_majorz_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_majorz_results.csv)
+- [election_wabsti_majorz_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_majorz_results.csv)
+- [election_wabsti_majorz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_majorz_candidates.csv)
 
-[election_wabsti_majorz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_majorz_candidates.csv)
-
-## Wabsti Sistema Proporzionale
+1.5 - Wabsti Sistema Proporzionale
+----------------------------------
 
 Il formato di file ha bisogno di quattro tabelle separate: l'esportazione dei dati dei risultati, l'esportazione dei dati di statistica, gli apparentamenti delle liste e i candidati di lista eletti.
 
@@ -225,72 +283,26 @@ Il formato del file, inoltre, non contiene alcuna informazione sul fatto che un 
 
 ### Modelli
 
-[election_wabsti_proporz_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_results.csv)
-
-[election_wabsti_proporz_statistics.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_statistics.csv)
-
-[election_wabsti_proporz_list_connections.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_list_connections.csv)
-
-[election_wabsti_proporz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_candidates.csv)
+- [election_wabsti_proporz_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_results.csv)
+- [election_wabsti_proporz_statistics.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_statistics.csv)
+- [election_wabsti_proporz_list_connections.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_list_connections.csv)
+- [election_wabsti_proporz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_candidates.csv)
 
 
-## OneGov
+1.6 - WabstiCExport Sistema Maggioritario
+-----------------------------------------
 
-Il formato che sarà utilizzato dall'applicazione web per l'esportazione è costituito da un unico file per ogni elezione. È presente una riga per ogni comune e candidato.
+Version `2.2` is supported, please refer to the documentation provided by the exporter program for more information about the columns of the different files.
 
-### Colonne
 
-Saranno prese in considerazione le seguenti colonne e devono essere presenti:
+1.7 - WabstiCExport Sistema Proporzionale
+-----------------------------------------
 
-Nome|Descrizione
----|---
-`election_absolute_majority`|Maggioranza assoluta delle elezioni, solo se elezione con sistema maggioritario.
-`election_status`|`unknown`, `interim` or `final`.
-`election_counted_entities`|Numero di comuni scrutinati. Se `election_counted_entities = election_total_entities`, allora l'elezione è considerata completamente scrutinata.
-`election_total_entities`|Numero totale dei comuni. Se non sono disponibili notizie certe sullo stato dell'elezione (perché l'elezione è stata importata da Wabsti) allora questo valore è `0`.
-`entity_id`|Numero BFS del comune. A value of `0` can be used for expats.
-`entity_name`|The name of the municipality.
-`entity_elegible_voters`|Numero di aventi diritto al voto nel Comune.
-`entity_received_ballots`|Numero di schede presentate nel Comune.
-`entity_blank_ballots`|Numero di schede bianche nel Comune.
-`entity_invalid_ballots`|Numero di schede nulle nel Comune.
-`entity_blank_votes`|Numero voti bianchi nel Comune.
-`entity_invalid_votes`|Numero di voti nulli nel Comune. Zero nel caso di elezione con sistema proporzionale.
-`list_name`|Nome della lista di candidati. Solo con elezioni con sistema proporzionale.
-`list_id`|ID della lista del candidato. Solo con elezioni con sistema proporzionale.
-`list_number_of_mandates`|Numero totale di mandati della lista. Solo con elezioni con sistema proporzionale.
-`list_votes`|Numero totale di voti di lista. Solo con elezioni con sistema proporzionale.
-`list_connection`|ID dell'apparentamento della lista. Solo con elezioni con sistema proporzionale.
-`list_connection_parent`|ID dell'apparentamento della lista di livello superiore. Solo con elezioni con sistema proporzionale e se è un apparentamento con una sottolista.
-`candidate_family_name`|Cognome del candidato.
-`candidate_first_name`|Nome del candidato.
-`candidate_elected`|Vero, se il candidato è stato eletto.
-`candidate_votes`|Numero di voti per il candidato nel Comune.
+Version `2.2` is supported, please refer to the documentation provided by the exporter program for more information about the columns of the different files.
 
-#### Panachage results
 
-The results may contain panachage results by adding one column per list:
-
-Nome|Descrizione
----|---
-`panachage_votes_from_list_{XX}`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
-
-### Risultati temporanei
-
-I comuni non ancora completamente scrutinati non sono inclusi nei file.
-
-If the status is
-- `interim`, the whole election is considered not yet completed
-- `final`, the whole election is considered completed
-- `unknown`, the whole vote is considered completed, if `election_counted_entities` and `election_total_entities` match
-
-### Modello
-
-[election_onegov_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_majorz.csv)
-
-[election_onegov_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_proporz.csv)
-
-## Party results
+1.8 - Party results
+-------------------
 
 Each (proporz) election may contain party results. These results are independent of the other results and typically contain the already aggregated results of the different lists of a party.
 
@@ -307,4 +319,4 @@ Nome|Descrizione
 
 ### Template
 
-[election_party_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_party_results.csv)
+- [election_party_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_party_results.csv)

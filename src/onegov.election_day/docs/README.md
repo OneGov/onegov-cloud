@@ -1,21 +1,25 @@
-# ongov.election_day
+ongov.election_day
+==================
 
-## Upload Formats
+Upload Formats
+--------------
 
-- EN: [Format Specification](format_en.md)
-- DE: [Format Spezifikation](format_de.md)
-- FR: [Spécifications de format](format_fr.md)
-- IT: [Specifica Formato](format_election_it.md)
+- EN: [Format Specification](format__en.md)
+- DE: [Format Spezifikation](format__de.md)
+- FR: [Spécifications de format](format__fr.md)
+- IT: [Specifica Formato](format__it.md)
 
-## Download Format
+Download Format
+---------------
 
 - EN: [Format Specification](open_data_en.md)
 - DE: [Format Spezifikation](open_data_de.md)
 - FR: [Spécifications de format](open_data_fr.md)
-- IT: [Specifica Formato](open_data_election_it.md)
-- RM: [Specifica Formato](open_data_election_rm.md)
+- IT: [Specifica Formato](open_data_it.md)
+- RM: [Specifica Formato](open_data_rm.md)
 
-## Embedding
+Embedding
+---------
 
 The web app containts different views which allows easy embedding of election
 and vote results on a different site:
@@ -35,3 +39,6 @@ as well. End the headerless mode with `{root_path}?headerful`.
 
 Both the special view and the pages in headerless mode include the
 https://github.com/davidjbradshaw/iframe-resizer.
+
+WabstiCExport
+-------------

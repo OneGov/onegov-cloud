@@ -1,4 +1,5 @@
-# Wahlen & Abstimmungen: Open Data
+Wahlen & Abstimmungen: Open Data
+================================
 
 ## Einleitung
 

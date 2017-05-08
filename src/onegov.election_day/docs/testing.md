@@ -1,14 +1,16 @@
-# Testing a new release
+Testing a new release
+=====================
 
 Before each new big release, the tests described in this document should be run. Alternatively, only the relevant tests (i.e. the scenarios which appear on the next election day) should be run before each election day.
 
-## 1) Automated Tests
+1 - Automated Tests
+-------------------
 
-### 1.1 Unit-Tests
+### 1.1 - Unit-Tests
 
 The unit tests are run automatically after every commit using [Travis](https://travis-ci.org/OneGov/onegov.election_day).
 
-### 1.2 Crawler
+### 1.2 - Crawler
 
 There is a [crawler](https://github.com/msom/crawler.elections) available which allows to fetch all subpages of all known instances; run:
 
@@ -17,7 +19,8 @@ There is a [crawler](https://github.com/msom/crawler.elections) available which 
 ./run.py test
 ```
 
-## 2) POST-Upload
+2 - POST-Upload
+---------------
 
 Results can be uploaded using a POST request and the format of the WabstiCExport program.
 
@@ -36,7 +39,8 @@ curl http://.../upload-wabsti-majorz
 	--form "wm_kandidatengde=@WM_KandidatenGde.csv"
 ```
 
-## 3) Manual Tests
+3 - Manual Tests
+----------------
 
 It's important to test the code manually, to see visual flaws etc. One can use this checklist as an orientation what to check:
 
@@ -122,7 +126,7 @@ It's important to test the code manually, to see visual flaws etc. One can use t
                   - [ ] For RT and RF of the above variants
 
 
-### Upload Dimensions
+### 3.1 - Upload Dimensions
 
 There are a lot of different possiblities to upload results, here are the typical dimension which should be considered for testing:
 

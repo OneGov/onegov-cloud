@@ -1,6 +1,8 @@
-# Wahlen & Abstimmungen Webapplikation
+Wahlen & Abstimmungen Webapplikation
+====================================
 
-## Einleitung
+Einleitung
+----------
 
 Am Abstimmungssonntag werden Resultate zu einzelnen Wahlen und Abstimmungen laufend publiziert. Bei der neuen *Wahlen & Abstimmungen* Webapplikation geschieht dies über ein Webinterface, das CSV (UTF-8) oder Excel (XLS/XLSX) Dateien mit provisorischen oder definitiven Resultaten entgegennimmt. Bei Excel Dateien wird entweder das erste Arbeitsblatt, oder, sofern vorhanden, das Arbeitsblatt mit dem Namen "Resultate" verwendet.
 
@@ -8,8 +10,8 @@ Je nach Wahl / Abstimmung und Format werden eine unterschiedliche Anzahl Dateien
 
 Dieses Dokument beschreibt das Format dieser CSV/Excel Dateien.
 
-## Inhalt
+Inhalt
+------
 
-[Format Spezifikation Wahlen](format_election_de.md)
-
-[Format Spezifikation Abstimmungen](format_vote_de.md)
+1. [Format Spezifikation Wahlen](format_election_de.md)
+2. [Format Spezifikation Abstimmungen](format_vote_de.md)
