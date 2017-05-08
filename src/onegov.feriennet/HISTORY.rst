@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.10.0 (2017-05-08)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a link from the matching view to the userprofile.
   [href]
 
