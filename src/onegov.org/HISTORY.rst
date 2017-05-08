@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.7.1 (2017-05-08)
+~~~~~~~~~~~~~~~~~~~
+
 - Further improves the capability of the export formatter.
   [href]
 
