@@ -4,7 +4,6 @@ from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.exports.base import FeriennetExport
 from onegov.feriennet.forms import PeriodExportForm
 from sqlalchemy.orm import joinedload, undefer
-from sqlalchemy.orm.strategy_options import Load
 
 
 @FeriennetApp.export(
