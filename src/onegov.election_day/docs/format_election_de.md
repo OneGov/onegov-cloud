@@ -7,16 +7,16 @@ Eine "Gemeinde" kann auch ein Bezirk, ein Wahlkreis etc. sein.
 
 ## Inhalt
 
-1. [OneGov](#onegov)
-2. [SESAM Majorz](#sesam-majorz)
-3. [SESAM Proporz](#sesam-proporz)
-4. [Wabsti Majorz](#wabsti-majorz)
-5. [Wabsti Proporz](#wabsti-proporz)
-6. [WabstiCExport Majorz](#wabsticexport-majorz)
-7. [WabstiCExport Proporz](#wabsticexport-proporz)
-8. [Parteiresultate](#parteiresultate)
+1. [OneGov](#1-onegov)
+2. [SESAM Majorz](#2-sesam-majorz)
+3. [SESAM Proporz](#3-sesam-proporz)
+4. [Wabsti Majorz](#4-wabsti-majorz)
+5. [Wabsti Proporz](#5-wabsti-proporz)
+6. [WabstiCExport Majorz](#6-wabsticexport-majorz)
+7. [WabstiCExport Proporz](#7-wabsticexport-proporz)
+8. [Parteiresultate](#8-parteiresultate)
 
-1 - OneGov
+1 OneGov
 ----------
 
 Das Format, welche von der Web-Applikation für den Export verwendet wird, besteht aus einer einzelnen Datei pro Wahl. Es gibt für jede Gemeinde und Kandidat eine Zeile.

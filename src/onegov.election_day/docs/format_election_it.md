@@ -5,14 +5,14 @@ Sono accettati come formati di file CSV, XLS o XLSX generati dai programmi elett
 
 ## Contenuto
 
-1. [OneGov](#onegov)
-2. [SESAM Sistema Maggioritario](#sesam-sistema-maggioritario)
-3. [SESAM Sistema Proporzionale](#sesam-sistema-proporzionale)
-4. [Wabsti Sistema Maggioritario](#wabsti-sistema-maggioritario)
-5. [Wabsti Sistema Proporzionale](#wabsti-sistema-proporzionale)
-6. [WabstiCExport Sistema Maggioritario](#wabsticexport-sistema-maggioritario)
-7. [WabstiCExport Sistema Proporzionale](#wabsticexport-sistema-proporzionale)
-8. [Party results](#party-results)
+1. [OneGov](#1-onegov)
+2. [SESAM Sistema Maggioritario](#2-sesam-sistema-maggioritario)
+3. [SESAM Sistema Proporzionale](#3-sesam-sistema-proporzionale)
+4. [Wabsti Sistema Maggioritario](#4-wabsti-sistema-maggioritario)
+5. [Wabsti Sistema Proporzionale](#5-wabsti-sistema-proporzionale)
+6. [WabstiCExport Sistema Maggioritario](#6-wabsticexport-sistema-maggioritario)
+7. [WabstiCExport Sistema Proporzionale](#7-wabsticexport-sistema-proporzionale)
+8. [Party results](#8-party-results)
 
 
 1 Onegov

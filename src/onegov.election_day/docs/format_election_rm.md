@@ -7,14 +7,14 @@ Ina "vischnanca" po er esser in district, in circul electoral e.u.v.
 
 ## Cuntegn
 
-1. [OneGov](#onegov)
-2. [SESAM Maiorz](#sesam-maiorz)
-3. [SESAM Proporz](#sesam-proporz)
-4. [Wabsti Maiorz](#wabsti-maiorz)
-5. [Wabsti Proporz](#wabsti-proporz)
-6. [WabstiCExport Maiorz](#wabsticexport-maiorz)
-7. [WabstiCExport Proporz](#wabsticexport-proporz)
-8. [Party results](#party-results)
+1. [OneGov](#1-onegov)
+2. [SESAM Maiorz](#2-sesam-maiorz)
+3. [SESAM Proporz](#3-sesam-proporz)
+4. [Wabsti Maiorz](#4-wabsti-maiorz)
+5. [Wabsti Proporz](#5-wabsti-proporz)
+6. [WabstiCExport Maiorz](#6-wabsticexport-maiorz)
+7. [WabstiCExport Proporz](#7-wabsticexport-proporz)
+8. [Party results](#8-party-results)
 
 1 Onegov
 --------

@@ -7,10 +7,10 @@ Ina "vischnanca" po er esser in district, in circul electoral e.u.v.
 
 ## Cuntegn
 
-1. [Standard format](#standard-format)
-2. [OneGov](#onegov)
-3. [Wabsti](#wabsti)
-4. [WabstiCExport](#wabsticexport)
+1. [Standard format](#1-standard-format)
+2. [OneGov](#2-onegov)
+3. [Wabsti](#3-wabsti)
+4. [WabstiCExport](#4-wabsticexport)
 
 
 1 Standard format
