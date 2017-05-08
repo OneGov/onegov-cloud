@@ -2,6 +2,7 @@ from onegov.feriennet import _
 from onegov.feriennet.exports.const import ACTIVITY_STATES
 from onegov.feriennet.exports.const import BOOKING_STATES
 from onegov.feriennet.exports.const import GENDERS
+from onegov.feriennet.exports.const import ROLES
 from onegov.feriennet.exports.const import SALUTATIONS
 from onegov.feriennet.utils import decode_name
 from onegov.org.models import Export
@@ -63,6 +64,9 @@ class FeriennetExport(Export):
         first_name, last_name = decode_name(user.realname)
         daily_email = bool(user_data.get('daily_ticket_statistics'))
 
+        yield _("User Login"), user.username
+        yield _("User Role"), ROLES[user.role]
+        yield _("User Active"), user.active
         yield _("User Salutation"), SALUTATIONS.get(salutation, '')
         yield _("User First Name"), first_name or ''
         yield _("User Last Name"), last_name or ''
@@ -70,7 +74,7 @@ class FeriennetExport(Export):
         yield _("User Address"), user_data.get('address', '')
         yield _("User Zipcode"), user_data.get('zip_code', '')
         yield _("User Location"), user_data.get('place', '')
-        yield _("User E-Mail"), user.username
+        yield _("User E-Mail"), user_data.get('e-mail', '')
         yield _("User Phone"), user_data.get('phone', '')
         yield _("User Emergency"), user_data.get('emergency', '')
         yield _("User Website"), user_data.get('website', '')

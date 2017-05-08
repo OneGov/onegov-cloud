@@ -26,3 +26,10 @@ GENDERS = {
     'male': _("Boy"),
     'female': _("Girl")
 }
+
+
+ROLES = {
+    'admin': _("Administrator"),
+    'editor': _("Editor"),
+    'member': _("Member"),
+}

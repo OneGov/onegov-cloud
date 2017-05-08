@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-05-08 14:24+0200\n"
+"POT-Creation-Date: 2017-05-08 14:40+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -214,6 +214,15 @@ msgstr "Durchführung Treffpunkt"
 msgid "Occasion May Overlap"
 msgstr "Durchführung darf überlappen"
 
+msgid "User Login"
+msgstr "Benutzer Login"
+
+msgid "User Role"
+msgstr "Benutzer Rolle"
+
+msgid "User Active"
+msgstr "Benutzer Aktiv"
+
 msgid "User Salutation"
 msgstr "Benutzer Anrede"
 
@@ -262,7 +271,8 @@ msgstr "Wunschliste / Buchungen"
 msgid ""
 "Exports wishlists or bookings, depending on the current state of the given "
 "period."
-msgstr "Exportiert Wünsche oder Buchungen, je nach Status der gewählten Periode."
+msgstr ""
+"Exportiert Wünsche oder Buchungen, je nach Status der gewählten Periode."
 
 msgid "Accepted"
 msgstr "Angenommen"
@@ -297,11 +307,29 @@ msgstr "Abgelehnt"
 msgid "Blocked"
 msgstr "Blockiert"
 
+msgid "Boy"
+msgstr "Junge"
+
+msgid "Girl"
+msgstr "Mädchen"
+
+msgid "Administrator"
+msgstr "Administrator"
+
+msgid "Member"
+msgstr "Mitglied"
+
 msgid "Occasions"
 msgstr "Durchführungen"
 
 msgid "Exports activities with an occasion in the given period."
 msgstr "Exportiert Angebote mit Durchführungen in der gewählten Periode."
+
+msgid "Users"
+msgstr "Benutzer"
+
+msgid "Exports user accounts."
+msgstr "Exportiert Benutzerkonten."
 
 msgid "Title"
 msgstr "Titel"
@@ -465,12 +493,6 @@ msgstr "Der Teilnehmer ist zu jung"
 
 msgid "The deadline has passed"
 msgstr "Der Anmeldeschluss wurde erreicht"
-
-msgid "Girl"
-msgstr "Mädchen"
-
-msgid "Boy"
-msgstr "Junge"
 
 msgid ""
 "Your userprofile is not complete. It needs to be complete before signing up "
