@@ -42,3 +42,88 @@ https://github.com/davidjbradshaw/iframe-resizer.
 
 WabstiCExport
 -------------
+
+The web app allows to upload results directly from the Wabsti export program.
+First add the election/vote(s), then a datasource (the token hereby generated
+is used for authentication later) and connect the election/votes using the
+parameters used in Wabsti.
+
+The files can then be uploaded by using a multipart-POST-request to
+- `{base_url}/upload-wabsti-vote` for votes with the fields
+  - `sg_gemeinden` (SG_Gemeinden.csv)
+  - `sg_geschaefte` (SG_Geschaefte.csv)
+  - `sgstatic_gemeinden` (SGStatic_Gemeinden.csv)
+  - `sgstatic_geschaefte` (SGStatic_Geschaefte.csv)
+- `{base_url}/upload-wabsti-majorz` for majorz elections with the fields
+  - `wm_gemeinden` (WM_Gemeinden.csv)
+  - `wm_kandidaten` (WM_Kandidaten.csv)
+  - `wm_kandidatengde` (WM_KandidatenGde.csv)
+  - `wm_wahl` (WM_Wahl.csv)
+  - `wmstatic_gemeinden` (WMStatic_Gemeinden.csv)
+- `{base_url}/upload-wabsti-proporz` for proporz elections with the fields
+  - `wp_gemeinden` (WP_Gemeinden.csv)
+  - `wp_kandidaten` (WP_Kandidaten.csv)
+  - `wp_kandidatengde` (WP_KandidatenGde.csv)
+  - `wp_listen` (WP_Listen.csv)
+  - `wp_listengde` (WP_ListenGde.csv)
+  - `wp_wahl` (WP_Wahl.csv)
+  - `wpstatic_gemeinden` (WPStatic_Gemeinden.csv)
+  - `wpstatic_kandidaten` (WPStatic_Kandidaten.csv)
+
+The token must be provided using the passwort part of HTTP basic authentication.
+An invalid authentication returns a `HTTP 403 Forbidden`, all other requests
+return a `HTTP 200 OK` together with a JSON body containing a status and a list
+of errors, for example:
+
+    {
+    	"status": "success",
+    	"errors": {}
+    }
+
+or
+
+    {
+        "status": "error",
+        "errors": {
+            "1": [{
+                "line": 2,
+                "filename": null,
+                "message": "1 is unknown"
+            }]
+        }
+    }
+
+It is possible to set the language used for the error messages by setting the
+`Accept-Language` header, possible values are: `de_CH`, `fr_CH`, `it_CH`, `rm_CH`.
+
+
+### cURL Examples
+
+    curl https://[base_url]/upload-wabsti-vote \
+      --user :[token] \
+      --header "Accept-Language: de_CH" \
+      --form "sg_gemeinden=@SG_Gemeinden.csv" \
+      --form "sg_geschaefte=@SG_Geschaefte.csv" \
+      --form "sgstatic_gemeinden=@SGStatic_Gemeinden.csv" \
+      --form "sgstatic_geschaefte=@SGStatic_Geschaefte.csv"
+
+    curl https://[base_url]/upload-wabsti-majorz \
+      --user :[token] \
+      --header "Accept-Language: de_CH" \
+      --form "wm_gemeinden=@WM_Gemeinden.csv" \
+      --form "wm_kandidaten=@WM_Kandidaten.csv" \
+      --form "wm_kandidatengde=@WM_KandidatenGde.csv" \
+      --form "wm_wahl=@WM_Wahl.csv" \
+      --form "wmstatic_gemeinden=@WMStatic_Gemeinden.csv"
+
+    curl https://[base_url]/upload-wabsti-proporz \
+      --user :[token] \
+      --header "Accept-Language: de_CH" \
+      --form "wp_gemeinden=@WP_Gemeinden.csv" \
+      --form "wp_kandidaten=@WP_Kandidaten.csv" \
+      --form "wp_kandidatengde=@WP_KandidatenGde.csv" \
+      --form "wp_listen=@WP_Listen.csv" \
+      --form "wp_listengde=@WP_ListenGde.csv" \
+      --form "wp_wahl=@WP_Wahl.csv" \
+      --form "wpstatic_gemeinden=@WPStatic_Gemeinden.csv" \
+      --form "wpstatic_kandidaten=@WPStatic_Kandidaten.csv"
