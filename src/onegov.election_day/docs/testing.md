@@ -27,22 +27,7 @@ allows to fetch all subpages of all known instances; run:
 -------------
 
 Results can be uploaded using a POST request and the format of the WabstiCExport
-program, see [here](readme.md#curl-examples)
-
-
-```
-curl http://.../upload-wabsti-vote
-	--user :[token]
-	--form "sg_gemeinden=@SG_Gemeinden.csv"
-
-curl http://.../upload-wabsti-majorz
-	--user :[token]
-	--form "sg_gemeinden=@SG_Gemeinden.csv"
-	--form "wmstatic_gemeinden=@WMStatic_Gemeinden.csv"
-	--form "wm_gemeinden=@WM_Gemeinden.csv"
-	--form "wm_kandidaten=@WM_Kandidaten.csv"
-	--form "wm_kandidatengde=@WM_KandidatenGde.csv"
-```
+program, see [here](README.md#curl-examples).
 
 3 Manual Tests
 --------------
