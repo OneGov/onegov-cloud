@@ -1,5 +1,5 @@
-2 - Format Spezifikation Abstimmungen
-=====================================
+Format Spezifikation Abstimmungen
+=================================
 
 Als Dateiformate werden Dateien akzeptiert, welche von Hand, vom Wahlprogrammen "Wabsti Wahlen und Abstimmungen (VRSG)" oder der Webapplikation selbst generiert werden.
 
@@ -8,14 +8,14 @@ Eine "Gemeinde" kann auch ein Bezirk, ein Wahlkreis etc. sein.
 Inhalt
 ------
 
-2.1. [Standardformat](#standardformat)
-2.2. [OneGov](#onegov)
-2.3. [Wabsti](#wabsti)
-2.4. [WabstiCExport](#wabsticexport)
+1. [Standardformat](#standardformat)
+2. [OneGov](#onegov)
+3. [Wabsti](#wabsti)
+4. [WabstiCExport](#wabsticexport)
 
 
-2.1 - Standardformat
---------------------
+1 Standardformat
+------------------
 
 Pro Abstimmungsvorlage besteht in der Regel eine CSV/Excel Datei. Beinhaltet die Abstimmung jedoch ein Gegenvorschlag und eine Stichfrage, dann müssen drei Dateien geliefert werden: Eine Datei mit den Resultaten der Abstimmung, eine Datei mit den Resultaten des Gegenvorschlags und eine Datei mit den Resultaten der Stichfrage.
 
@@ -45,8 +45,8 @@ Gemeinden gelten als noch nicht ausgezählt, falls die Gemeinde nicht in den Res
 - [vote_standard.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/vote_standard.csv)
 
 
-2.2 - OneGov
-------------
+2 OneGov
+--------
 
 Das Format, welche von der Web-Applikation für den Export verwendet wird, besteht aus einer einzelnen Datei pro Abstimmung. Es gibt für jede Gemeinde und Abstimmungstyp (Vorschlag, Gegenvorschlag, Stichfrage) eine Zeile.
 
@@ -84,8 +84,8 @@ Falls der Status
 - [vote_onegov.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/vote_onegov.csv)
 
 
-2.3 - Wabsti
-------------
+3 Wabsti
+--------
 
 Das Format des Wahlprogrammen "Wabsti Wahlen und Abstimmungen (VRSG)" besteht aus einer einzelnen Datei, welche alle Daten für mehrere Abstimmungen enthält. Es gibt für jede Abstimmung und Gemeinde eine Zeile.
 
@@ -120,7 +120,7 @@ Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bed
 - [vote_wabsti.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/vote_wabsti.csv)
 
 
-2.4 - WabstiCExport
--------------------
+4 WabstiCExport
+---------------
 
 Es wird die Version `2.2` wird unterstützt. Die verschiedenen Spalten der verschiedenen Dateien sind in der Dokumenation des Exporter-Programms definiert.

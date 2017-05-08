@@ -1,5 +1,5 @@
-(1) Format Spezifikation Wahlen
-===============================
+Format Spezifikation Wahlen
+============================
 
 Als Dateiformate werden CSV, XLS oder XLSX Dateien akzeptiert, welche von den Wahlprogrammen "Wahlen (SESAM)" und "Wabsti Wahlen und Abstimmungen (VRSG)", oder der Webapplikation selbst generiert werden. Falls eine Tabelle von Hand erstellt werden soll, ist das Format der Webapplikation am einfachsten.
 
@@ -7,17 +7,17 @@ Eine "Gemeinde" kann auch ein Bezirk, ein Wahlkreis etc. sein.
 
 ## Inhalt
 
-1.1. [OneGov](#onegov)
-1.2. [SESAM Majorz](#sesam-majorz)
-1.3. [SESAM Proporz](#sesam-proporz)
-1.4. [Wabsti Majorz](#wabsti-majorz)
-1.5. [Wabsti Proporz](#wabsti-proporz)
-1.6. [WabstiCExport Majorz](#wabsticexport-majorz)
-1.7. [WabstiCExport Proporz](#wabsticexport-proporz)
-1.8. [Parteiresultate](#parteiresultate)
+1. [OneGov](#onegov)
+2. [SESAM Majorz](#sesam-majorz)
+3. [SESAM Proporz](#sesam-proporz)
+4. [Wabsti Majorz](#wabsti-majorz)
+5. [Wabsti Proporz](#wabsti-proporz)
+6. [WabstiCExport Majorz](#wabsticexport-majorz)
+7. [WabstiCExport Proporz](#wabsticexport-proporz)
+8. [Parteiresultate](#parteiresultate)
 
-1.1 - OneGov
-------------
+1 - OneGov
+----------
 
 Das Format, welche von der Web-Applikation für den Export verwendet wird, besteht aus einer einzelnen Datei pro Wahl. Es gibt für jede Gemeinde und Kandidat eine Zeile.
 
@@ -73,8 +73,8 @@ Falls der Status
 - [election_onegov_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_majorz.csv)
 - [election_onegov_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_proporz.csv)
 
-1.2 SESAM Majorz
-----------------
+2 SESAM Majorz
+--------------
 
 Das SESAM-Export-Format enthält direkt alle benötigten Daten. Es gibt pro Kandidat und Gemeinde eine Zeile.
 
@@ -108,8 +108,8 @@ Die Wahl gilt als noch nicht ausgezählt, falls in `Anzahl Gemeinden` die Anzahl
 
 - [election_sesam_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_sesam_majorz.csv)
 
-1.3 SESAM Proporz
------------------
+3 SESAM Proporz
+---------------
 
 Das SESAM-Export-Format enthält direkt alle benötigten Daten. Es gibt pro Kandidat und Gemeinde eine Zeile.
 
@@ -159,8 +159,8 @@ Die Wahl gilt als noch nicht ausgezählt, falls in `Anzahl Gemeinden` die Anzahl
 
 - [election_sesam_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_sesam_proporz.csv)
 
-1.4 - Wabsti Majorz
---------------------
+4 Wabsti Majorz
+---------------
 
 Das Datenformat benötig zwei einzelne Tabellen: den Datenexport und die Liste der gewählten Kandidaten.
 
@@ -214,8 +214,8 @@ Das Datenformat enhält auch keine Information dazu, ob eine einzelne Gemeinde f
 - [election_wabsti_majorz_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_majorz_results.csv)
 - [election_wabsti_majorz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_majorz_candidates.csv)
 
-1.5 Wabsti Proporz
-------------------
+5 Wabsti Proporz
+----------------
 
 Das Datenformat benötig vier einzelne Tabellen: den Datenexport der Resultate, der Datenexport der Statistiken, die Listenverbindungen und die Liste der gewählten Kandidaten.
 
@@ -290,19 +290,19 @@ Das Datenformat enhält auch keine Information dazu, ob eine einzelne Gemeinde f
 - [electionwabsti_proporz_list_connections.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_list_connections)
 - [electionwabsti_proporz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_candidates.csv)
 
-1.6 - WabstiCExport Majorz
---------------------------
+6 WabstiCExport Majorz
+----------------------
 
 Es wird die Version `2.2` wird unterstützt. Die verschiedenen Spalten der verschiedenen Dateien sind in der Dokumenation des Exporter-Programms definiert.
 
-1.7 - WabstiCExport Proporz
----------------------------
+7 WabstiCExport Proporz
+-----------------------
 
 Es wird die Version `2.2` wird unterstützt. Die verschiedenen Spalten der verschiedenen Dateien sind in der Dokumenation des Exporter-Programms definiert.
 
 
-1.8 - Parteiresultate
----------------------
+8 Parteiresultate
+-----------------
 
 Jede Proporzwahl kann Parteiresultate enthalten. Diese sind unabhängig von den anderen Resultaten und beinhalten typischerweise die aggregierten Resultate der verschiedenen Listen einer einzelnen Partei.
 

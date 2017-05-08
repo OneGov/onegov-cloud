@@ -8,6 +8,7 @@ Upload Formats
 - DE: [Format Spezifikation](format__de.md)
 - FR: [Spécifications de format](format__fr.md)
 - IT: [Specifica Formato](format__it.md)
+- RM: [Format Specificaziun](format__rm.md)
 
 Download Format
 ---------------
@@ -49,18 +50,18 @@ is used for authentication later) and connect the election/votes using the
 parameters used in Wabsti.
 
 The files can then be uploaded by using a multipart-POST-request to
-- `{base_url}/upload-wabsti-vote` for votes with the fields
+- `[base_url]/upload-wabsti-vote` for votes with the fields
   - `sg_gemeinden` (SG_Gemeinden.csv)
   - `sg_geschaefte` (SG_Geschaefte.csv)
   - `sgstatic_gemeinden` (SGStatic_Gemeinden.csv)
   - `sgstatic_geschaefte` (SGStatic_Geschaefte.csv)
-- `{base_url}/upload-wabsti-majorz` for majorz elections with the fields
+- `[base_url]/upload-wabsti-majorz` for majorz elections with the fields
   - `wm_gemeinden` (WM_Gemeinden.csv)
   - `wm_kandidaten` (WM_Kandidaten.csv)
   - `wm_kandidatengde` (WM_KandidatenGde.csv)
   - `wm_wahl` (WM_Wahl.csv)
   - `wmstatic_gemeinden` (WMStatic_Gemeinden.csv)
-- `{base_url}/upload-wabsti-proporz` for proporz elections with the fields
+- `[base_url]/upload-wabsti-proporz` for proporz elections with the fields
   - `wp_gemeinden` (WP_Gemeinden.csv)
   - `wp_kandidaten` (WP_Kandidaten.csv)
   - `wp_kandidatengde` (WP_KandidatenGde.csv)

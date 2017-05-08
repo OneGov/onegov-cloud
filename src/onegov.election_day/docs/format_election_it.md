@@ -1,22 +1,22 @@
-(1) Specifica Formato Elezioni
-==============================
+Specifica Formato Elezioni
+==========================
 
 Sono accettati come formati di file CSV, XLS o XLSX generati dai programmi elettorali "elezioni (SESAM)" e "Wabsti elezioni e voti (VRSG)" oppure dall'applicazione web stessa. Se una tabella deve essere creata a mano allora il formato dell'applicazione web è il più semplice.
 
 ## Contenuto
 
-1.1. [OneGov](#onegov)
-1.2. [SESAM Sistema Maggioritario](#sesam-sistema-maggioritario)
-1.3. [SESAM Sistema Proporzionale](#sesam-sistema-proporzionale)
-1.4. [Wabsti Sistema Maggioritario](#wabsti-sistema-maggioritario)
-1.5. [Wabsti Sistema Proporzionale](#wabsti-sistema-proporzionale)
-1.6. [WabstiCExport Sistema Maggioritario](#wabsticexport-sistema-maggioritario)
-1.7. [WabstiCExport Sistema Proporzionale](#wabsticexport-sistema-proporzionale)
-1.8. [Party results](#party-results)
+1. [OneGov](#onegov)
+2. [SESAM Sistema Maggioritario](#sesam-sistema-maggioritario)
+3. [SESAM Sistema Proporzionale](#sesam-sistema-proporzionale)
+4. [Wabsti Sistema Maggioritario](#wabsti-sistema-maggioritario)
+5. [Wabsti Sistema Proporzionale](#wabsti-sistema-proporzionale)
+6. [WabstiCExport Sistema Maggioritario](#wabsticexport-sistema-maggioritario)
+7. [WabstiCExport Sistema Proporzionale](#wabsticexport-sistema-proporzionale)
+8. [Party results](#party-results)
 
 
-1.1 - Onegov
-------------
+1 Onegov
+--------
 
 Il formato che sarà utilizzato dall'applicazione web per l'esportazione è costituito da un unico file per ogni elezione. È presente una riga per ogni comune e candidato.
 
@@ -71,8 +71,8 @@ If the status is
 - [election_onegov_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_majorz.csv)
 - [election_onegov_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_proporz.csv)
 
-1.2 - SESAM Sistema Maggioritario
----------------------------------
+2 SESAM Sistema Maggioritario
+-----------------------------
 
 Il formato di esportazione SESAM contiene direttamente tutti i dati richiesti. È presente una linea per candidato e comune.
 
@@ -106,8 +106,8 @@ L'elezione è considerata non scrutinata se la quantità di comuni scrutinati in
 
 - [election_sesam_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_sesam_majorz.csv)
 
-1.3 - SESAM Sistema Proporzionale
----------------------------------
+3 SESAM Sistema Proporzionale
+-----------------------------
 
 Il formato di esportazione SESAM contiene direttamente tutti i dati richiesti. È presente una linea per candidato e comune.
 
@@ -157,8 +157,8 @@ L'elezione è considerata non scrutinata se la quantità di comuni scrutinati in
 
 - [election_sesam_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_sesam_proporz.csv)
 
-1.4 - Wabsti Sistema Maggioritario
-----------------------------------
+4 Wabsti Sistema Maggioritario
+------------------------------
 
 Il formato del file ha bisogno di due tabelle separate: l'esportazione dei dati e l'elenco dei candidati eletti.
 
@@ -212,8 +212,8 @@ Il formato del file, inoltre, non contiene alcuna informazione sul fatto che un 
 - [election_wabsti_majorz_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_majorz_results.csv)
 - [election_wabsti_majorz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_majorz_candidates.csv)
 
-1.5 - Wabsti Sistema Proporzionale
-----------------------------------
+5 Wabsti Sistema Proporzionale
+------------------------------
 
 Il formato di file ha bisogno di quattro tabelle separate: l'esportazione dei dati dei risultati, l'esportazione dei dati di statistica, gli apparentamenti delle liste e i candidati di lista eletti.
 
@@ -289,20 +289,20 @@ Il formato del file, inoltre, non contiene alcuna informazione sul fatto che un 
 - [election_wabsti_proporz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_candidates.csv)
 
 
-1.6 - WabstiCExport Sistema Maggioritario
------------------------------------------
+6 WabstiCExport Sistema Maggioritario
+-------------------------------------
 
 Version `2.2` is supported, please refer to the documentation provided by the exporter program for more information about the columns of the different files.
 
 
-1.7 - WabstiCExport Sistema Proporzionale
------------------------------------------
+7 WabstiCExport Sistema Proporzionale
+-------------------------------------
 
 Version `2.2` is supported, please refer to the documentation provided by the exporter program for more information about the columns of the different files.
 
 
-1.8 - Party results
--------------------
+8 Party results
+---------------
 
 Each (proporz) election may contain party results. These results are independent of the other results and typically contain the already aggregated results of the different lists of a party.
 
