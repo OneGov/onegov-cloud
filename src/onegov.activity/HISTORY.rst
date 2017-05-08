@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.8.5 (2017-05-08)
+~~~~~~~~~~~~~~~~~~~
+
 - Encodes the period bound booking state on the booking.
   [href]
 
