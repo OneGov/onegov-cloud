@@ -96,6 +96,19 @@ class Booking(Base, TimestampMixin):
     #: access the user linked to this booking
     user = relationship('User')
 
+    def period_bound_booking_state(self, period):
+        """ During pre-booking we don't show the actual state of the booking,
+        unless the occasion was cancelled, otherwise the user might see
+        accepted bookings at a point where those states are not confirmed yet.
+
+        This methods interprets the period/state accordingly.
+
+        """
+        if period.confirmed == True:
+            return self.state
+
+        return self.state == 'cancelled' and 'cancelled' or 'open'
+
     def provisional_booking_cost(self, period=None):
         """ The costs of the final booking, including the booking costs
         of the period (if not all-inclusive).
