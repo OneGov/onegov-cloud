@@ -3,6 +3,7 @@ import babel.dates
 from cached_property import cached_property
 from datetime import date, datetime, timedelta
 from dateutil import rrule
+from decimal import Decimal
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
@@ -222,18 +223,45 @@ class Layout(ChameleonLayout):
         the value ready for export.
 
         """
+
+        def is_daterange_list(value, datetype):
+            if isinstance(value, (list, tuple)):
+                return all(is_daterange(v, datetype) for v in value)
+
+            return False
+
+        def is_daterange(value, datetype):
+            if isinstance(value, (list, tuple)):
+                if len(value) == 2:
+                    if all(isinstance(v, datetype) for v in value):
+                        return True
+
+            return False
+
         def default(value):
+            if isinstance(value, Decimal):
+                return float(value)
             if isinstance(value, (date, datetime)):
                 return value.isoformat()
             if hasattr(value, 'domain'):
                 return self.request.translator(value)
             if isinstance(value, str):
                 return "\n".join(value.splitlines())  # normalize newlines
+            if isinstance(value, (list, tuple)):
+                return tuple(formatter(v) for v in value)
 
             return value
 
         if format == 'xlsx':
             def formatter(value):
+                if is_daterange_list(value, (date, datetime)):
+                    return '\n'.join(formatter(v) for v in value)
+                if is_daterange(value, datetime):
+                    return ' - '.join(
+                        self.format_date(v, 'datetime') for v in value)
+                if is_daterange(value, date):
+                    return ' - '.join(
+                        self.format_date(v, 'date') for v in value)
                 if isinstance(value, datetime):
                     return self.format_date(value, 'datetime')
                 if isinstance(value, date):
