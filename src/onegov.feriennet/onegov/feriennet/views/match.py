@@ -7,6 +7,7 @@ from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.forms import MatchForm
 from onegov.feriennet.layout import MatchCollectionLayout
 from onegov.org.elements import Link, ConfirmLink, DeleteLink
+from onegov.user import User, UserCollection
 
 
 @FeriennetApp.form(
@@ -17,6 +18,10 @@ from onegov.org.elements import Link, ConfirmLink, DeleteLink
 def handle_matches(self, request, form):
 
     layout = MatchCollectionLayout(self, request)
+
+    users = UserCollection(request.app.session()).query()
+    users = users.with_entities(User.username, User.id)
+    users = {u.username: u.id.hex for u in users}
 
     if form.submitted(request):
         assert self.period.active and not self.period.confirmed
@@ -60,6 +65,14 @@ def handle_matches(self, request, form):
             )
 
     def record_links(record):
+        yield Link(
+            _("User"), request.return_here(
+                request.class_link(
+                    User, {'id': users[record.attendee_username]}
+                )
+            )
+        )
+
         yield Link(
             _("Attendee"), request.return_here(
                 request.class_link(

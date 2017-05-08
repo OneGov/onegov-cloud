@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a link from the matching view to the userprofile.
+  [href]
+
 - Fixes an error caused by invalid credentials.
   [href]
 
