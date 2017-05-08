@@ -7,13 +7,15 @@ Ci sono alternative al formato JSON per tutte le visualizzazioni più importanti
 
 "Comune" si riferisce ad un distretto, una circoscrizione elettorale, etc.
 
-## Contenuti
+Contenuti
+---------
 
-1. [Riepilogo dei risultati](#riepilogo-dei-risultati)
-2. [Risultati dell'elezione](#risultati-dellelezione)
-3. [Risultati della votazione](#risultati-della-votazione)
+1. [Riepilogo dei risultati](#1-riepilogo-dei-risultati)
+2. [Risultati dell'elezione](#2-risultati-dellelezione)
+3. [Risultati della votazione](#3-risultati-della-votazione)
 
-## Riepilogo dei risultati
+1 Riepilogo dei risultati
+-------------------------
 
 ```
 URL (ultimo): /json
@@ -45,7 +47,8 @@ Nome|Descrizione
 `local` (*optional*)|Federal and cantonal votes within a communal instance may contain additionally the results of the municipality in the form of an object with `answer`, `yeas_percentage` and `nays_percentage`.
 
 
-## Risultati dell'elezione
+2 Risultati dell'elezione
+-------------------------
 
 ### Risultati elaborati
 
@@ -124,7 +127,8 @@ Name|Description
 `mandates`|The number of mandates.
 `votes`|The number of votes.
 
-## Risultati della votazione
+3 Risultati della votazione
+---------------------------
 
 ### Risultati elaborati
 

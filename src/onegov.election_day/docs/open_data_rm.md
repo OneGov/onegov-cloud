@@ -7,13 +7,17 @@ Per mintga pagina impurtanta datti in'alternativa JSON correspundenta.
 
 Tuts Responses cuntegnan il `Last-Modified` HTTP Header che infurmescha, cura ch'igl è vegnida fatga l'ultima midada (p.ex. cura ch'igl èn vegnids chargiads si l'ultima giada resultats d'ina elecziun u d'ina votaziun).
 
-## Cuntegn
+"Vischnanca" might refer to a district, ward, etc.
 
-1. [Survista dals resultats](#survista-dals-resultats)
-2. [Resultats da las elecziuns](#resultats-da-las-elecziuns)
-3. [Resultats da la votaziun](#resultats-da-la-votaziun)
+Cuntegn
+-------
 
-## Survista dals resultats
+1. [Survista dals resultats](#1-survista-dals-resultats)
+2. [Resultats da las elecziuns](#2-resultats-da-las-elecziuns)
+3. [Resultats da la votaziun](#3-resultats-da-la-votaziun)
+
+1 Survista dals resultats
+-------------------------
 
 ```
 URL (latest): /json
@@ -45,7 +49,8 @@ Num|Descripziun
 `local` (*optional*)|Federal and cantonal votes within a communal instance may contain additionally the results of the municipality in the form of an object with `answer`, `yeas_percentage` and `nays_percentage`.
 
 
-## Resultats da las elecziuns
+2 Resultats da las elecziuns
+----------------------------
 
 ### Resultats elavurads
 
@@ -124,7 +129,9 @@ Name|Description
 `mandates`|The number of mandates.
 `votes`|The number of votes.
 
-## Resultats da la votaziun
+
+3 Resultats da la votaziun
+--------------------------
 
 ### Resultats elavurads
 

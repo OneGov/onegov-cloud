@@ -8,13 +8,15 @@ There are JSON alternatives for all important views. All responses contain the `
 "Municipality" might refer to a district, ward, etc.
 
 
-## Contents
+Contents
+--------
 
-1. [Summarized results](#summarized-results)
-2. [Election results](#election-results)
-3. [Vote results](#vote-results)
+1. [Summarized results](#1-summarized-results)
+2. [Election results](#2-election-results)
+3. [Vote results](#3-vote-results)
 
-## Summarized results
+1 Summarized results
+--------------------
 
 ```
 URL (latest): /json
@@ -45,7 +47,8 @@ Name|Description
 `nays_percentage`|Nays percentage.
 `local` (*optional*)|Federal and cantonal votes within a communal instance may contain additionally the results of the municipality in the form of an object with `answer`, `yeas_percentage` and `nays_percentage`.
 
-## Election results
+2 Election results
+------------------
 
 ### Processed results
 
@@ -124,7 +127,8 @@ Name|Description
 `mandates`|The number of mandates.
 `votes`|The number of votes.
 
-## Vote results
+3 Vote results
+--------------
 
 ### Processed results
 

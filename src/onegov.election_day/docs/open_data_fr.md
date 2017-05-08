@@ -7,13 +7,15 @@ Il y a des alternatives JSON pour toutes les vues importantes. Toutes les répon
 
 «Municipalité» fait référence à un district, une circonscription électorale, etc.
 
-## Contenu
+Contenu
+-------
 
-1. [Résultats synthétisés](#résultats-synthétisés)
-2. [Résultats des élections](#résultats-des-élections)
-3. [Les résultats de la votation](#les-résultats-de-la-votation)
+1. [Résultats synthétisés](#1-résultats-synthétisés)
+2. [Résultats des élections](#2-résultats-des-élections)
+3. [Les résultats de la votation](#3-les-résultats-de-la-votation)
 
-## Résultats synthétisés
+1 Résultats synthétisés
+-----------------------
 
 ```
 URL (dernier): /json
@@ -45,7 +47,8 @@ Nom|Description
 `local` (*optional*)|Federal and cantonal votes within a communal instance may contain additionally the results of the municipality in the form of an object with `answer`, `yeas_percentage` and `nays_percentage`.
 
 
-## Résultats des élections
+2 Résultats des élections
+-------------------------
 
 ### Résultats transformés
 
@@ -124,7 +127,8 @@ Name|Description
 `mandates`|The number of mandates.
 `votes`|The number of votes.
 
-## Les résultats de la votation
+3 Les résultats de la votation
+------------------------------
 
 ### Résultats transformés
 
