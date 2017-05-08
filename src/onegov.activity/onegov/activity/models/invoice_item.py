@@ -2,13 +2,14 @@ from onegov.activity import utils
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.user import User
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Numeric
 from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import validates
+from sqlalchemy.orm import validates, relationship
 from sqlalchemy_utils import observes
 from uuid import uuid4
 
@@ -23,6 +24,7 @@ class InvoiceItem(Base, TimestampMixin):
 
     #: the user who is charged
     username = Column(Text, ForeignKey('users.username'), nullable=False)
+    user = relationship(User, backref="invoice_items")
 
     #: the invoice group (all items with the same text make one invoice)
     invoice = Column(Text, nullable=False)
