@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Fixes an error caused by invalid credentials.
+  [href]
+
+- Adds exports for activities, occasions, invoice items and users.
+  [href]
+
 - Adds the ability to filter overfull and cancelled occasions when matching.
   [href]
 

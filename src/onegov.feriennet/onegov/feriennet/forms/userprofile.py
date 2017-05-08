@@ -127,17 +127,19 @@ class UserProfileForm(Form):
     def populate_obj(self, model):
         super().populate_obj(model)
 
-        model.data = model.data or {}
-        model.realname = self.name
+        if model:
+            model.data = model.data or {}
+            model.realname = self.name
 
-        for key in self.extra_fields:
-            model.data[key] = self.data.get(key)
+            for key in self.extra_fields:
+                model.data[key] = self.data.get(key)
 
     def process_obj(self, model):
         super().process_obj(model)
 
-        modeldata = model.data or {}
-        self.name = model.realname
+        if model:
+            modeldata = model.data or {}
+            self.name = model.realname
 
-        for key in self.extra_fields:
-            getattr(self, key).data = modeldata.get(key)
+            for key in self.extra_fields:
+                getattr(self, key).data = modeldata.get(key)
