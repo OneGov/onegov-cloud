@@ -529,6 +529,10 @@ th.row-actions {
     width: 200px;
 }
 
+td.row-actions {
+    padding-right: 0;
+}
+
 ul.actions {
     direction: rtl;
     list-style-type: circle;

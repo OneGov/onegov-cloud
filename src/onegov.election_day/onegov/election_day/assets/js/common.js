@@ -19,10 +19,11 @@ $('ul.actions').each(function(index, element) {
     $(element).before(
         $('<a></a>')
             .attr('href', '#')
-            .attr('class', 'button split small action-button')
+            .attr('class', 'button split small action-button secondary')
             .on('click', function() { $(element).toggle(); return false; })
             .html($(this).data('title') + ' <span></span>')
     ).hide();
+    $(element).parent('td').addClass('row-actions');
 });
 
 // force all dropdowns to be rendered in the direction specified in the
