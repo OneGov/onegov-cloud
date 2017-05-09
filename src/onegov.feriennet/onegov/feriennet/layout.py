@@ -170,10 +170,10 @@ class VacationActivityLayout(DefaultLayout):
     def editbar_links(self):
         if self.is_editable:
             links = []
+            period = self.request.app.active_period
 
             if self.model.state == 'preview':
-
-                if self.model.occasions:
+                if period and self.model.has_occasion_in_period(period):
                     links.append(ConfirmLink(
                         text=_("Request Publication"),
                         url=self.request.link(self.model, name='beantragen'),
