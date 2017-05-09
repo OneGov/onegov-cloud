@@ -11,11 +11,11 @@ from onegov.core.utils import normalize_for_url
 from onegov.user import User
 from sqlalchemy import Column, Enum, Text, ForeignKey, Integer
 from sqlalchemy import event
-from sqlalchemy import func, distinct
+from sqlalchemy import func, distinct, exists, and_
 from sqlalchemy import Index
 from sqlalchemy.dialects.postgresql import HSTORE, ARRAY
 from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import object_session, relationship
 from sqlalchemy_utils import aggregated, observes, IntRangeType
 from uuid import uuid4
 
@@ -146,6 +146,16 @@ class Activity(Base, ContentMixin, TimestampMixin):
         self.state = 'archived'
 
         return self
+
+    def has_occasion_in_period(self, period):
+        q = object_session(self).query(
+            exists().where(and_(
+                Occasion.activity_id == self.id,
+                Occasion.period_id == period.id
+            ))
+        )
+
+        return q.scalar()
 
 
 @event.listens_for(Activity.__table__, 'after_create')

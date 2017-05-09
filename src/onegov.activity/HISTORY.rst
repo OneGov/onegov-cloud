@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a method to check if an activity has an occasion in a given period.
+  [href]
+
 - Adds helper methods for prebooking checks (before, during, after).
   [href]
 
