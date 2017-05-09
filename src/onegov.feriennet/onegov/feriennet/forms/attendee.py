@@ -226,13 +226,7 @@ class AttendeeSignupForm(AttendeeBase):
         if self.model.period.confirmed:
             return
 
-        start, end = (
-            self.model.period.prebooking_start,
-            self.model.period.prebooking_end
-        )
-        today = date.today()
-
-        if not (start <= today and today <= end):
+        if not self.model.period.is_currently_prebooking:
             self.attendee.errors.append(_(
                 "Cannot create a booking outside the prebooking period"
             ))

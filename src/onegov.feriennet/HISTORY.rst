@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes prebooking phase not starting exactly at 00:00.
+  [href]
+
 0.10.0 (2017-05-08)
 ~~~~~~~~~~~~~~~~~~~
 

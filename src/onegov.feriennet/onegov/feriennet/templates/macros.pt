@@ -299,43 +299,50 @@
 
 
 <metal:hints define-macro="period_hints" i18n:domain="onegov.feriennet">
-    <tal:block define="today layout.today()">
-        <div class="hint hint-prebooking" tal:condition="today < period.prebooking_start" i18n:translate>
+    <div tal:condition="period.is_prebooking_in_future"
+         class="hint hint-prebooking" i18n:translate>
             Prebooking begins on <strong tal:content="layout.format_date(period.prebooking_start, 'date_long')" i18n:name="date" />.
-        </div>
+    </div>
 
-        <div class="hint hint-prebooking" tal:condition="period.wishlist_phase and period.prebooking_start <= today and today <= period.prebooking_end" i18n:translate>
+    <div tal:condition="period.is_currently_prebooking"
+         class="hint hint-prebooking" i18n:translate>
             Prebooking is now active until <strong tal:content="layout.format_date(period.prebooking_end, 'date_long')" i18n:name="date" />.
-        </div>
+    </div>
 
-        <div class="hint hint-prebooking" tal:condition="today > period.prebooking_end or (period.prebooking_start <= today and not period.wishlist_phase) and not period.finalized" i18n:translate>
+    <div tal:condition="period.is_prebooking_in_past and not period.finalized"
+         class="hint hint-prebooking" i18n:translate>
             Prebooking has ended.
-        </div>
+    </div>
 
-        <div class="hint hint-finalized" tal:condition="period.finalized" i18n:translate>
+    <div tal:condition="period.finalized"
+         class="hint hint-finalized" i18n:translate>
             There cannot be any more bookings.
-        </div>
+    </div>
 
-        <div class="hint hint-deadline" tal:condition="not period.finalized and period.confirmed and period.deadline_date" i18n:translate>
+    <div tal:condition="not period.finalized and period.confirmed and period.deadline_date"
+         class="hint hint-deadline" i18n:translate>
             The deadline for last-minute bookings is the <tal:block i18n:name="date">${layout.format_date(period.deadline_date, 'date')}</tal:block>.
-        </div>
+    </div>
 
-        <div class="hint hint-deadline" tal:condition="not period.finalized and period.confirmed and period.deadline_days" i18n:translate>
+    <div tal:condition="not period.finalized and period.confirmed and period.deadline_days"
+         class="hint hint-deadline" i18n:translate>
             Last-minute bookings are possible up to <tal:block i18n:name="days">${period.deadline_days}</tal:block> before each occasion.
-        </div>
+    </div>
 
-        <div class="hint hint-max-activities" tal:condition="period.all_inclusive and period.max_bookings_per_attendee" i18n:translate>
+    <div tal:condition="period.all_inclusive and period.max_bookings_per_attendee"
+         class="hint hint-max-activities" i18n:translate>
             Each child is assigned up to <tal:block i18n:name="count" tal:replace="period.max_bookings_per_attendee" /> activities. To ensure a good matching you can signup for more activities than those.
-        </div>
+    </div>
 
-        <div class="hint hint-costs" tal:condition="period.all_inclusive and period.booking_cost" i18n:translate>
+    <div tal:condition="period.all_inclusive and period.booking_cost"
+         class="hint hint-costs" i18n:translate>
             The passport costs <tal:block i18n:name="amount" tal:replace="period.booking_cost" /> CHF per child. Individual activities may incur additional charges.
-        </div>
+    </div>
 
-        <div class="hint hint-minutes" tal:condition="period.minutes_between" i18n:translate>
+    <div tal:condition="period.minutes_between"
+         class="hint hint-minutes" i18n:translate>
             Between each booking we enforce <tal:block i18n:name="minutes" tal:replace="period.minutes_between" /> minutes of block-time in which no other booking is permitted.
-        </div>
-    </tal:block>
+    </div>
 </metal:hints>
 
 
