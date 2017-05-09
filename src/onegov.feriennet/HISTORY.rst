@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes bank_beneficiary on userprofile not being saved.
+  [href]
+
 - Fixes prebooking phase not starting exactly at 00:00.
   [href]
 

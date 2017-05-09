@@ -23,7 +23,8 @@ class UserProfileForm(Form):
         'website',
         'emergency',
         'daily_ticket_statistics',
-        'bank_account'
+        'bank_account',
+        'bank_beneficiary'
     )
 
     salutation = RadioField(
