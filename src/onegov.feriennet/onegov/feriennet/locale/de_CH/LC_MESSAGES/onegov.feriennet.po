@@ -491,7 +491,7 @@ msgid "Attendee"
 msgstr "Teilnehmer"
 
 msgid "Ignore Age Restriction"
-msgstr "Altersbeschränkung Ignorieren"
+msgstr "Altersbeschränkung ignorieren"
 
 msgid "Maximum number of bookings per period"
 msgstr "Maximale Anzahl Buchungen pro Periode"
