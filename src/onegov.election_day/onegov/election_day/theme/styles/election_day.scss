@@ -491,6 +491,10 @@ footer {
         color: $primary-color;
         margin-bottom: -1px;
         margin-left: -1px;
+
+        &:hover {
+            background-color: $white;
+        }
     }
 
     .tab-title.active > a {
