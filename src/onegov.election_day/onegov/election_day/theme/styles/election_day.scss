@@ -481,24 +481,26 @@ footer {
     Manage navigation
 */
 .tabs {
-    background-color: $snow;
-    border-bottom: 4px solid $gainsboro;
+    background-color: $white;
+    border-bottom: 1px solid $gainsboro;
     margin-bottom: 2em !important;
 
     .tab-title > a {
-        background-color: transparent;
+        background-color: $snow;
+        border: 1px solid $gainsboro;
+        color: $primary-color;
+        margin-bottom: -1px;
+        margin-left: -1px;
     }
 
     .tab-title.active > a {
-        background-color: $gainsboro;
+        background-color: $white;
+        color: $primary-color;
     }
 }
 
 @media #{$small-only} {
     .tabs {
-        border-bottom: 0;
-        border-left: 4px solid $gainsboro;
-
         li {
             width: 100%;
         }
