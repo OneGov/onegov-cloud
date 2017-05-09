@@ -1,0 +1,5 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
+    <tal:block metal:fill-slot="content">
+        <script>throw new Error('This is intentionally generated JavaScript error for testing.');</script>
+    </tal:block>
+</div>
