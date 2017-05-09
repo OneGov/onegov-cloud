@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Always shows the first date of any occasion in the matching view.
+  [href]
+
 - Hides the enroll button after the wishlist, but before the booking phase.
   [href]
 

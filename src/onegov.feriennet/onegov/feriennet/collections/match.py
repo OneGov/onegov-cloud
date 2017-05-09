@@ -42,6 +42,7 @@ class MatchCollection(object):
     def base(self):
         d = self.session.query(OccasionDate)
         d = d.with_entities(OccasionDate.id)
+        d = d.order_by(OccasionDate.occasion_id, OccasionDate.start)
         d = d.distinct(OccasionDate.occasion_id)
 
         q = self.session.query(Booking)
