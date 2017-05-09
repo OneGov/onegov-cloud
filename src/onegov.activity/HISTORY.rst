@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Consider all bookings for matchings except for the cancelled ones.
+  [href]
+
 - Adds a method to check if an activity has an occasion in a given period.
   [href]
 
