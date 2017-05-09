@@ -1,4 +1,6 @@
-from datetime import date
+import sedate
+
+from datetime import date, datetime
 from onegov.activity.models.booking import Booking
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
@@ -19,6 +21,10 @@ from uuid import uuid4
 class Period(Base, TimestampMixin):
 
     __tablename__ = 'periods'
+
+    # It's doubtful that the Ferienpass would ever run anywhere else but
+    # in Switzerland ;)
+    timezone = 'Europe/Zurich'
 
     #: The public id of this period
     id = Column(UUID, primary_key=True, default=uuid4)
@@ -160,11 +166,18 @@ class Period(Base, TimestampMixin):
         """ Returns the max_bookings_per_attendee limit if it applies. """
         return self.all_inclusive and self.max_bookings_per_attendee
 
+    def as_local_datetime(self, day):
+        return sedate.standardize_date(
+            datetime(day.year, day.month, day.day, 0, 0),
+            self.timezone
+        )
+
     @property
     def phase(self):
-        today = date.today()
+        local = self.as_local_datetime
+        today = local(date.today())
 
-        if not self.active or today < self.prebooking_start:
+        if not self.active or today < local(self.prebooking_start):
             return 'inactive'
 
         if not self.confirmed:
@@ -173,13 +186,13 @@ class Period(Base, TimestampMixin):
         if not self.finalized:
             return 'booking'
 
-        if today < self.execution_start:
+        if today < local(self.execution_start):
             return 'payment'
 
-        if self.execution_start <= today and today <= self.execution_end:
+        if local(self.execution_start) <= today <= local(self.execution_end):
             return 'execution'
 
-        if today > self.execution_end:
+        if today > local(self.execution_end):
             return 'archive'
 
     @property
@@ -201,6 +214,35 @@ class Period(Base, TimestampMixin):
     @property
     def archive_phase(self):
         return self.phase == 'archive'
+
+    @property
+    def is_prebooking_in_future(self):
+        today = self.as_local_datetime(date.today())
+        start = self.as_local_datetime(self.prebooking_start)
+
+        return today < start
+
+    @property
+    def is_currently_prebooking(self):
+        if not self.wishlist_phase:
+            return False
+
+        today = self.as_local_datetime(date.today())
+        start = self.as_local_datetime(self.prebooking_start)
+        end = self.as_local_datetime(self.prebooking_end)
+
+        return start <= today <= end
+
+    @property
+    def is_prebooking_in_past(self):
+        today = self.as_local_datetime(date.today())
+        start = self.as_local_datetime(self.prebooking_start)
+        end = self.as_local_datetime(self.prebooking_end)
+
+        if today > end:
+            return True
+
+        return start <= today and not self.wishlist_phase
 
     @property
     def scoring(self):

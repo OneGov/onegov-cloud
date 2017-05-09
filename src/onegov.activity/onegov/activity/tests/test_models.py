@@ -11,6 +11,7 @@ from onegov.activity import Booking, BookingCollection
 from onegov.activity import InvoiceItemCollection
 from onegov.activity import Occasion, OccasionDate
 from onegov.activity import OccasionCollection
+from onegov.activity import Period
 from onegov.activity import PeriodCollection
 from onegov.activity.models import DAYS
 from onegov.core.utils import Bunch
@@ -1914,3 +1915,34 @@ def test_deadline(session, collections, prebooking_period, owner):
     period.deadline_date = date(2017, 2, 23)
 
     assert occasion.deadline == date(2017, 2, 23)
+
+
+def test_prebooking_phases():
+    period = Period()
+
+    period.prebooking_start = date(2017, 5, 1)
+    period.prebooking_end = date(2017, 5, 2)
+
+    with freeze_time('2017-04-30 23:59:59'):
+        assert period.is_prebooking_in_future
+
+    with freeze_time('2017-05-01 00:00:00'):
+        assert not period.is_prebooking_in_future
+
+        period.active = False
+        assert not period.is_currently_prebooking
+
+        period.active = True
+        assert period.is_currently_prebooking
+
+    with freeze_time('2017-05-05 00:00:00'):
+        assert not period.is_prebooking_in_future
+        assert not period.is_currently_prebooking
+        assert period.is_prebooking_in_past
+
+    with freeze_time('2017-05-02 23:59:59'):
+        assert period.is_currently_prebooking
+
+        period.confirmed = True
+        assert not period.is_currently_prebooking
+        assert period.is_prebooking_in_past

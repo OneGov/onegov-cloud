@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds helper methods for prebooking checks (before, during, after).
+  [href]
+
 0.8.6 (2017-05-08)
 ~~~~~~~~~~~~~~~~~~~
 
