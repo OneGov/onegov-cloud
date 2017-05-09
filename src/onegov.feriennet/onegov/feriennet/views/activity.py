@@ -318,6 +318,10 @@ def view_activity(self, request):
         if not request.is_admin and date.today() >= occasion.deadline:
             return False
 
+        if occasion.period.wishlist_phase and\
+           occasion.period.is_prebooking_in_past:
+            return False
+
         return True
 
     return {

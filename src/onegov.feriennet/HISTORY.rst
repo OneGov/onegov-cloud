@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Hides the enroll button after the wishlist, but before the booking phase.
+  [href]
+
 - Fixes bank_beneficiary on userprofile not being saved.
   [href]
 
