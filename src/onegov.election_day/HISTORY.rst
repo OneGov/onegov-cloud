@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds sentry JavaScript error reporting support.
+  [msom]
+
 1.8.8 (2017-05-08)
 ~~~~~~~~~~~~~~~~~~~
 

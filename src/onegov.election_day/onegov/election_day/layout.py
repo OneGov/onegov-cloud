@@ -114,6 +114,10 @@ class Layout(ChameleonLayout):
     def format_group(self, item):
         return item.group if item.entity_id else _("Expats")
 
+    @cached_property
+    def sentry_js(self):
+        return self.app.sentry_js
+
 
 class DefaultLayout(Layout):
     pass

@@ -101,6 +101,9 @@ class ElectionDayApp(Framework):
         """ A five minute cache for pages. """
         return self.get_cache(self.application_id + ':5m', expiration_time=300)
 
+    def configure_sentry(self, **cfg):
+        self.sentry_js = cfg.get('sentry_js')
+
 
 @ElectionDayApp.static_directory()
 def get_static_directory():
