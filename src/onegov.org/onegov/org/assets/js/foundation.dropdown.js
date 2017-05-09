@@ -186,7 +186,7 @@
         return;
       }
 
-      this.close.call(this, this.S('[' + this.attr_name() + '-content]').not(dropdown));
+      this.close.call(this, this.S('.' + this.settings.active_class + '[' + this.attr_name() + '-content]').not(dropdown));
 
       if (dropdown.hasClass(this.settings.active_class)) {
         this.close.call(this, dropdown);

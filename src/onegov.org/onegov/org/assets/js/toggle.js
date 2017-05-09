@@ -35,11 +35,14 @@ var ensureToggled = function(button, target, toggled) {
     }
 };
 
-var clickToggled = function() {
+var clickToggled = function(e) {
     var button = $(this);
     var target = $(button.data('toggle'));
 
     ensureToggled(button, target, !isToggled(target));
+
+    e.preventDefault();
+    return false;
 };
 
 var ToggleButton = function(button, toggled) {

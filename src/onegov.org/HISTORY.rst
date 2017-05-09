@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes performance degradation on sites with lots of toggles/dropdowns.
+  [href]
+
 0.7.1 (2017-05-08)
 ~~~~~~~~~~~~~~~~~~~
 
