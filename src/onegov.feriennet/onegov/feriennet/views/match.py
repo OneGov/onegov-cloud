@@ -190,7 +190,8 @@ def reset_matching(self, request):
     assert self.period.active and not self.period.confirmed
 
     bookings = BookingCollection(request.app.session(), self.period_id)
-    for booking in bookings.query():
+
+    for booking in bookings.query().filter(Booking.state != 'cancelled'):
         booking.state = 'open'
 
     request.success(_("The period was successfully reset"))

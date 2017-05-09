@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Don't touch the cancelled bookings during matching reset.
+  [href]
+
 - Always shows the first date of any occasion in the matching view.
   [href]
 
