@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes hovering over lakes throwing an error.
+  [msom]
+
 1.8.9 (2017-05-09)
 ~~~~~~~~~~~~~~~~~~~
 

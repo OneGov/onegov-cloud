@@ -85,7 +85,8 @@
                                    ((b.x - p.x > p.x + p.width - b.x - b.width) ? 'w' : 'e');
                         })
                         .html(function(d) {
-                            if (isUndefined(d.properties.result.yeas_percentage)) {
+                            if (isUndefined(d.properties.result) ||
+                                isUndefined(d.properties.result.yeas_percentage)) {
                                 return '<strong>' + d.properties.name + '</strong>';
                             }
                             var yeas_percentage =  Math.round(d.properties.result.yeas_percentage * 100) / 100;
