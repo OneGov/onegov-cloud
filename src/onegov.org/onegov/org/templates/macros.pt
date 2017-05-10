@@ -76,16 +76,13 @@
     </ul>
 </metal:panel-links>
 
-<metal:content_footer define-macro="content_footer">
-    <!--! shown at the foot (but still inside) of #inner-content, this block
-    may be overwritten by other organisation apps -->
-</metal:content_footer>
-
 <metal:footer define-macro="footer">
-    <footer class="row footer">
-        <div class="small-12 columns">
-            <metal:block use-macro="layout.macros['footer_columns']" />
-            <metal:block use-macro="layout.macros['footer_links']" />
+    <footer>
+        <div class="row footer-content">
+            <div class="small-12 columns">
+                <metal:block use-macro="layout.macros['footer_columns']" />
+                <metal:block use-macro="layout.macros['footer_links']" />
+            </div>
         </div>
     </footer>
 </metal:footer>

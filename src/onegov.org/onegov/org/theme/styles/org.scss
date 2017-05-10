@@ -311,7 +311,7 @@ $footer-text-color: $steel;
 $footer-font-size: 13px;
 $footer-border-width: 0;
 
-footer {
+.footer-content {
     background-color: $topbar-bg-color;
 
     // accomplish the border with a box-shadow, as the border messes with
@@ -3298,7 +3298,7 @@ ul.search-results {
     .date-range-selector,
     .date-range-selector-result,
     .edit-bar,
-    .footer,
+    footer,
     .occurrence-exports,
     .occurrences-day-date,
     .occurrences-filter-tags,

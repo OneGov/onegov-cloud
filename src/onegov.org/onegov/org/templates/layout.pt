@@ -131,9 +131,6 @@
           </div>
         </div>
       </div>
-
-      <metal:b use-macro="layout.macros['content_footer']" />
-
       <div class="push"></div>
     </div>
     <metal:footer use-macro="layout.macros['footer']" />
