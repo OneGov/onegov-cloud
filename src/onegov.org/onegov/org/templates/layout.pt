@@ -131,45 +131,12 @@
           </div>
         </div>
       </div>
+
+      <metal:b use-macro="layout.macros['content_footer']" />
+
       <div class="push"></div>
     </div>
-    <footer class="row footer" tal:define="contact layout.org.meta.contact_html|nothing;
-                                           contact_url layout.org.meta.contact_url|nothing;
-                                           opening_hours layout.org.meta.opening_hours_html|nothing;
-                                           opening_hours_url layout.org.meta.opening_hours_url|nothing;
-                                           facebook layout.org.meta.facebook_url|nothing;
-                                           twitter layout.org.meta.twitter_url|nothing;">
-      <div class="small-12 columns">
-
-        <div class="row footer-columns" tal:condition="contact or contact_url or opening_hours or opening_hours_url or facebook or twitter">
-          <div class="small-12 medium-3 columns">
-            <h2 i18n:translate="" tal:condition="contact or contact_url">Contact</h2>
-            <div tal:content="structure layout.org.meta.contact_html" />
-            <a i18n:translate="" tal:condition="contact_url" tal:attributes="href contact_url">more…</a>
-          </div>
-          <div class="small-12 medium-5 columns">
-            <h2 i18n:translate="" tal:condition="opening_hours or opening_hours_url">Opening Hours</h2>
-            <div tal:content="structure layout.org.meta.opening_hours_html" />
-            <a i18n:translate="" tal:condition="opening_hours_url" tal:attributes="href opening_hours_url">more…</a>
-          </div>
-          <div class="small-12 medium-4 columns">
-            <h2 i18n:translate="" tal:condition="facebook or twitter">Social Media</h2>
-            <ul class="social-media-links" tal:condition="facebook or twitter">
-                <li tal:condition="facebook"><a tal:attributes="href facebook"><i class="fa fa-facebook-official fa-fw"></i> Facebook</a></li>
-                <li tal:condition="twitter"><a tal:attributes="href twitter"><i class="fa fa-twitter fa-fw"></i> Twitter</a></li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="row footer-links">
-          <div class="small-12 columns">
-            <a href="https://www.onegovcloud.ch">OneGov Cloud</a>
-            by
-            <a href="https://www.seantis.ch">Seantis GmbH</a>
-          </div>
-        </div>
-      </div>
-    </footer>
+    <metal:footer use-macro="layout.macros['footer']" />
     <tal:block tal:content="structure layout.org.meta.analytics_code|nothing" />
 </body>
 

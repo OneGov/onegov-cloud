@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Gives sub-applications more ways to customize the footer.
+  [href]
+
 - Fixes performance degradation on sites with lots of toggles/dropdowns.
   [href]
 

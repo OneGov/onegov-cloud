@@ -76,6 +76,89 @@
     </ul>
 </metal:panel-links>
 
+<metal:content_footer define-macro="content_footer">
+    <!--! shown at the foot (but still inside) of #inner-content, this block
+    may be overwritten by other organisation apps -->
+</metal:content_footer>
+
+<metal:footer define-macro="footer">
+    <footer class="row footer">
+        <div class="small-12 columns">
+            <metal:block use-macro="layout.macros['footer_columns']" />
+            <metal:block use-macro="layout.macros['footer_links']" />
+        </div>
+    </footer>
+</metal:footer>
+
+<metal:footer_columns define-macro="footer_columns">
+    <tal:block define="contact layout.org.meta.contact_html|nothing;
+                       contact_url layout.org.meta.contact_url|nothing;
+                       opening_hours layout.org.meta.opening_hours_html|nothing;
+                       opening_hours_url layout.org.meta.opening_hours_url|nothing;
+                       facebook layout.org.meta.facebook_url|nothing;
+                       twitter layout.org.meta.twitter_url|nothing;">
+        <div class="row footer-columns" tal:condition="any((
+            contact,
+            contact_url,
+            opening_hours,
+            opening_hours_url,
+            facebook,
+            twitter
+        ))">
+            <div class="small-12 medium-3 columns">
+                <metal:b use-macro="layout.macros['footer_contact']" />
+            </div>
+
+            <div class="small-12 medium-5 columns">
+                <metal:b use-macro="layout.macros['footer_opening_hours']" />
+            </div>
+
+            <div class="small-12 medium-4 columns">
+                <metal:b use-macro="layout.macros['footer_social_media']" />
+            </div>
+        </div>
+    </tal:block>
+</metal:footer_columns>
+
+<metal:footer_links define-macro="footer_links">
+    <div class="row footer-links">
+      <div class="small-12 columns">
+        <a href="https://www.onegovcloud.ch">OneGov Cloud</a>
+        by
+        <a href="https://www.seantis.ch">Seantis GmbH</a>
+      </div>
+    </div>
+</metal:footer_links>
+
+<metal:footer_contact define-macro="footer_contact">
+    <h2 i18n:translate tal:condition="contact or contact_url">Contact</h2>
+    <div tal:content="structure layout.org.meta.contact_html" />
+    <a i18n:translate tal:condition="contact_url" tal:attributes="href contact_url">more…</a>
+</metal:footer_contact>
+
+<metal:footer_opening_hours define-macro="footer_opening_hours">
+    <h2 i18n:translate tal:condition="opening_hours or opening_hours_url">Opening Hours</h2>
+    <div tal:content="structure layout.org.meta.opening_hours_html" />
+    <a i18n:translate tal:condition="opening_hours_url" tal:attributes="href opening_hours_url">more…</a>
+</metal:footer_opening_hours>
+
+<metal:footer_social_media define-macro="footer_social_media">
+    <h2 i18n:translate tal:condition="facebook or twitter">Social Media</h2>
+                
+    <ul class="social-media-links" tal:condition="facebook or twitter">
+        <li tal:condition="facebook">
+            <a tal:attributes="href facebook">
+                <i class="fa fa-facebook-official fa-fw"></i> Facebook
+            </a>
+        </li>
+        <li tal:condition="twitter">
+            <a tal:attributes="href twitter">
+                <i class="fa fa-twitter fa-fw"></i> Twitter
+            </a>
+        </li>
+    </ul>
+</metal:footer_social_media>
+
 <metal:panel define-macro="events-panel">
     <h2 i18n:translate>Events</h2>
     <metal:block use-macro="layout.macros['panel-links']" tal:define="panel events_panel"/>
@@ -170,7 +253,7 @@
           class="dropzone clearfix"
           method="POST"
           enctype="multipart/form-data">
-        <div class="dz-message" i18n:translate="">
+        <div class="dz-message" i18n:translate>
             Drop files to upload
         </div>
 
@@ -184,7 +267,7 @@
 
 <metal:newslist define-macro="newslist" i18n:domain="onegov.org">
     <div class="newslist" tal:condition="news">
-        <h2 i18n:translate="" tal:condition="not:hide_title|False">Latest news</h2>
+        <h2 i18n:translate tal:condition="not:hide_title|False">Latest news</h2>
 
         <div class="row news-list-item" tal:repeat="item news">
             <div class="small-12 columns">
@@ -409,7 +492,7 @@
     <div class="side-panel" tal:condition="ticket">
         <div class="field-display ticket-status-page">
             <div class="field-display-block">
-                <div class="field-display-label" i18n:translate="">Ticket Number</div>
+                <div class="field-display-label" i18n:translate>Ticket Number</div>
                 <div class="field-display-data ticket-number"><a href="${request.link(ticket)}">${ticket.number}</a></div>
             </div>
         </div>
@@ -488,42 +571,42 @@
 <metal:display_event define-macro="display_event" i18n:domain="onegov.org">
     <dl>
         <tal:block tal:condition="request.is_manager">
-            <dt i18n:translate="">State</dt>
-            <dd i18n:translate="" tal:condition="event.state == 'initiated'">Initiated</dd>
-            <dd i18n:translate="" tal:condition="event.state == 'submitted'">Submitted</dd>
-            <dd i18n:translate="" tal:condition="event.state == 'published'">Published</dd>
-            <dd i18n:translate="" tal:condition="event.state == 'withdrawn'">Withdrawn</dd>
+            <dt i18n:translate>State</dt>
+            <dd i18n:translate tal:condition="event.state == 'initiated'">Initiated</dd>
+            <dd i18n:translate tal:condition="event.state == 'submitted'">Submitted</dd>
+            <dd i18n:translate tal:condition="event.state == 'published'">Published</dd>
+            <dd i18n:translate tal:condition="event.state == 'withdrawn'">Withdrawn</dd>
         </tal:block>
         <tal:block tal:condition="request.is_manager" tal:define="submitter event.meta.get('submitter_email') if event.meta else ''">
-            <dt i18n:translate="">Submitter</dt>
+            <dt i18n:translate>Submitter</dt>
             <dd>${submitter}</dd>
         </tal:block>
-        <dt i18n:translate="">Title</dt>
+        <dt i18n:translate>Title</dt>
         <dd>${event.title}</dd>
-        <dt i18n:translate="">Description</dt>
+        <dt i18n:translate>Description</dt>
         <dd tal:content="structure event.description.replace('\n', '<br>')" />
-        <dt i18n:translate="">Location</dt>
+        <dt i18n:translate>Location</dt>
         <dd>${event.location}</dd>
-        <dt i18n:translate="" tal:condition="event.has_coordinates">Map</dt>
+        <dt i18n:translate tal:condition="event.has_coordinates">Map</dt>
         <dd tal:condition="event.has_coordinates">
             <div class="marker-map" data-map-type="thumbnail" data-lat="${event.lat}" data-lon="${event.lon}" data-zoom="${event.zoom}"></div>
         </dd>
-        <dt i18n:translate="">Organizer</dt>
+        <dt i18n:translate>Organizer</dt>
         <dd tal:content="event.organizer" />
-        <dt i18n:translate="">Tags</dt>
+        <dt i18n:translate>Tags</dt>
         <dd>
             <ul>
-                <li tal:repeat="tag event.tags" i18n:translate="">${tag}</li>
+                <li tal:repeat="tag event.tags" i18n:translate>${tag}</li>
             </ul>
         </dd>
-        <dt i18n:translate="">Date and time</dt>
+        <dt i18n:translate>Date and time</dt>
         <dd>
             <tal:block>${layout.format_date(event.localized_start, 'datetime')}-${layout.format_date(event.localized_end, 'time')}</tal:block>
             <tal:block tal:condition="request.is_manager">(${event.timezone})</tal:block>
         </dd>
-        <dt i18n:translate="">Recurrence</dt>
+        <dt i18n:translate>Recurrence</dt>
         <dd>${layout.format_recurrence(event.recurrence)}</dd>
-        <dt i18n:translate="">All dates</dt>
+        <dt i18n:translate>All dates</dt>
         <dd tal:define="occurrences event.occurrence_dates(localize=True)">
             <ul>
                 <li tal:repeat="occurrence occurrences">${layout.format_date(occurrence, 'weekday_long')} ${layout.format_date(occurrence, 'date')}</li>
@@ -574,14 +657,14 @@
                         <div class="occurrence-date show-for-sr">${layout.format_date(occurrence.localized_start, 'date')}</div>
                         <div class="occurrence-location">${occurrence.location}</div>
                         <div class="occurrence-time">${layout.format_date(occurrence.localized_start, 'time')} - ${layout.format_date(occurrence.localized_end, 'time')}</div>
-                        <div><span tal:repeat="tag occurrence.tags" class="blank-label" i18n:translate="">${tag}</span></div>
+                        <div><span tal:repeat="tag occurrence.tags" class="blank-label" i18n:translate>${tag}</span></div>
                     </div>
                     <div class="clearfix"></div>
                 </div>
             </div>
             <tal:block tal:define="global lastdaydate python: layout.format_date(occurrence.localized_start, 'date')" />
         </tal:block>
-        <div tal:condition="not occurrences" i18n:translate="">No events found.</div>
+        <div tal:condition="not occurrences" i18n:translate>No events found.</div>
     </tal:block>
 </metal:occurrences>
 
@@ -593,13 +676,13 @@
             <div class="row date-range-selector">
                 <div class="large-6 columns">
                     <div class="row collapse">
-                        <label i18n:translate="">From</label>
+                        <label i18n:translate>From</label>
                         <input class="small" name="start" type="date" value="${start}" placeholder="${layout.today().isoformat()}">
                     </div>
                 </div>
                 <div class="large-6 columns">
                     <div class="row collapse">
-                        <label i18n:translate="">To</label>
+                        <label i18n:translate>To</label>
                         <input class="small" name="end" type="date" value="${end}" placeholder="${layout.today().isoformat()}">
                     </div>
                 </div>
@@ -738,7 +821,7 @@
 <metal:search_result_people define-macro="search_result_people" i18n:domain="onegov.org">
     <a href="${request.link(result)}">${result.title}</a>
     <p tal:condition="result.function|nothing">${result.function}</p>
-    <p tal:condition="not:result.function|nothing" i18n:translate="">People</p>
+    <p tal:condition="not:result.function|nothing" i18n:translate>People</p>
 </metal:search_result_people>
 
 
