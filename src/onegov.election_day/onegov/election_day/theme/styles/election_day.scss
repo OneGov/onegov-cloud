@@ -482,35 +482,47 @@ footer {
 */
 .tabs {
     background-color: $white;
-    border-bottom: 1px solid $gainsboro;
+    border-bottom: 1px solid $aluminum;
     margin-bottom: 2em !important;
 
     .tab-title > a {
-        background-color: $snow;
-        border: 1px solid $gainsboro;
-        color: $primary-color;
-        margin-bottom: -1px;
-        margin-left: -1px;
+        background-color: $white;
+        border-bottom: 2px solid $white;
+        color: $aluminum;
+        position: relative;
+        z-index: 10;
 
         &:hover {
-            background-color: $white;
+            background-color: $snow;
+            border-bottom: 2px solid $snow;
         }
     }
 
     .tab-title.active > a {
-        background-color: $white;
-        color: $black;
+        border-bottom: 2px solid $primary-color;
+        color: $primary-color;
+
+        top: 1px;
+        z-index: 20;
+
     }
 }
 
 @media #{$small-only} {
     .tabs {
+        padding-bottom: 1px;
+
         li {
             width: 100%;
         }
 
         .tab-title a {
             padding-left: 1em;
+        }
+
+        .tab-title.active > a {
+            border-bottom: 0;
+            border-left: 2px solid $primary-color;
         }
     }
 }
