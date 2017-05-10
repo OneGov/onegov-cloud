@@ -78,6 +78,9 @@ class Occasion(Base, TimestampMixin):
     #: Days on which this occasion is active
     active_days = Column(ARRAY(Integer), nullable=False, default=list)
 
+    #: Weekdays on which this occasion is active
+    weekdays = Column(ARRAY(Integer), nullable=False, default=list)
+
     @aggregated('period', Column(Boolean, default=False))
     def active(self):
         return column('active')
@@ -131,10 +134,16 @@ class Occasion(Base, TimestampMixin):
                 for date in dates
                 for day in date.active_days
             ]
+            self.weekdays = list(set(
+                day
+                for date in dates
+                for day in date.weekdays
+            ))
         else:
             self.durations = 0
             self.order = -1
             self.active_days = []
+            self.weekdays = []
 
     @validates('dates')
     def validate_dates(self, key, date):

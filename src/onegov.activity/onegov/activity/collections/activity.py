@@ -18,7 +18,8 @@ class ActivityCollection(Pagination):
                  age_ranges=None,
                  owners=None,
                  period_ids=None,
-                 dateranges=None):
+                 dateranges=None,
+                 weekdays=None):
         self.session = session
         self.type = type
         self.page = page
@@ -30,6 +31,7 @@ class ActivityCollection(Pagination):
         self.owners = set(owners) if owners else set()
         self.period_ids = set(period_ids) if period_ids else set()
         self.dateranges = set(dateranges) if dateranges else set()
+        self.weekdays = set(weekdays) if weekdays else set()
 
     def __eq__(self, other):
         self.type == type and self.page == other.page
@@ -52,7 +54,8 @@ class ActivityCollection(Pagination):
             age_ranges=self.age_ranges,
             owners=self.owners,
             period_ids=self.period_ids,
-            dateranges=self.dateranges
+            dateranges=self.dateranges,
+            weekdays=self.weekdays
         )
 
     def contains_age_range(self, age_range):
@@ -133,6 +136,10 @@ class ActivityCollection(Pagination):
                 ))
             )
 
+        if self.weekdays:
+            query = query.filter(
+                model_class.weekdays.op('&&')(array(self.weekdays)))
+
         return query
 
     def for_filter(self,
@@ -142,7 +149,8 @@ class ActivityCollection(Pagination):
                    age_range=None,
                    owner=None,
                    period_id=None,
-                   daterange=None):
+                   daterange=None,
+                   weekday=None):
         """ Returns a new collection instance.
 
         The given tag is excluded if already in the list, included if not
@@ -173,7 +181,8 @@ class ActivityCollection(Pagination):
                 (self.age_ranges, age_range),
                 (self.owners, owner),
                 (self.period_ids, period_id),
-                (self.dateranges, daterange)
+                (self.dateranges, daterange),
+                (self.weekdays, weekday)
             )
         )
 

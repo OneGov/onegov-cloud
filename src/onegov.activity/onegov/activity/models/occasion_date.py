@@ -69,6 +69,14 @@ class OccasionDate(Base, TimestampMixin):
         for dt in sedate.dtrange(self.localized_start, self.localized_end):
             yield dt.date().toordinal()
 
+    @property
+    def weekdays(self):
+        return list({
+            dt.weekday() for dt in sedate.dtrange(
+                self.localized_start, self.localized_end
+            )
+        })
+
     @hybrid_property
     def duration_in_seconds(self):
         return (self.end - self.start).total_seconds()

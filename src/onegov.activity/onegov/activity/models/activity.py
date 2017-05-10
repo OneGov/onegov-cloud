@@ -85,6 +85,10 @@ class Activity(Base, ContentMixin, TimestampMixin):
     def active_days(self):
         return func.array_cat_agg(distinct(Occasion.active_days))
 
+    @aggregated('occasions', Column(ARRAY(Integer), default=list))
+    def weekdays(self):
+        return func.array_cat_agg(distinct(Occasion.weekdays))
+
     #: The occasions linked to this activity
     occasions = relationship(
         'Occasion',
@@ -112,6 +116,7 @@ class Activity(Base, ContentMixin, TimestampMixin):
 
     __table_args__ = (
         Index('inverted_active_days', 'active_days', postgresql_using='gin'),
+        Index('inverted_weekdays', 'weekdays', postgresql_using='gin'),
     )
 
     @observes('title')

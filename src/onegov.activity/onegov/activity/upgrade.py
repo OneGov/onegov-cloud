@@ -340,3 +340,32 @@ def remove_denied_activity_state(context):
         ALTER TABLE activities ALTER COLUMN state
         TYPE activity_state USING state::text::activity_state;
     """)
+
+
+@upgrade_task('Add weekdays')
+def add_weekdays(context):
+    if context.has_column('activities', 'weekdays'):
+        assert context.has_column('occasions', 'weekdays')
+        return
+
+    context.operations.add_column('activities', Column(
+        'weekdays', ARRAY(Integer), nullable=True
+    ))
+
+    context.operations.add_column('occasions', Column(
+        'weekdays', ARRAY(Integer), nullable=True
+    ))
+
+    context.session.flush()
+
+    # update dates
+    for occasion in context.session.query(Occasion):
+        occasion.on_date_change()
+
+
+@upgrade_task('Add weekdays index')
+def add_weekdays_index(context):
+    context.operations.create_index(
+        'inverted_weekdays', 'activities', ['weekdays'],
+        postgresql_using='gin'
+    )
