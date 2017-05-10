@@ -1,0 +1,15 @@
+# Platform Sponsors
+#
+# - Logos must not exceed 200px x 100px.
+# - The logos are stored in the static folder.
+# - The background color is set around the logo.
+# - Width and height must be supplied for quicker rendering.
+# - The top parameter may be used to nudge up and down.
+
+- name: Concordia
+  link: https://www.concordia.ch/
+  logo: sponsors/concordia.png
+  background: '#fff'
+  width: 200px
+  height: 48px
+  top: -5px

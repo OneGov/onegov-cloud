@@ -1,1 +1,0 @@
-All pictures are public domain. Please be sure to only use public domain pictures as we can't ensure that attribution on the actual sites is shown. 

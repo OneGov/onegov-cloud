@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds platform sponsoring.
+  [href]
+
 - Adds the ability to filter activities by weekday.
   [href]
 

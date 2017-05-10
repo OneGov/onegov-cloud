@@ -1,12 +1,14 @@
+from cached_property import cached_property
 from onegov.activity import Period, PeriodCollection
-from onegov.core.orm import orm_cached
 from onegov.core import utils
+from onegov.core.orm import orm_cached
 from onegov.feriennet.initial_content import create_new_organisation
 from onegov.feriennet.request import FeriennetRequest
+from onegov.feriennet.sponsors import load_sponsors
 from onegov.feriennet.theme import FeriennetTheme
 from onegov.org import OrgApp
-from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 from onegov.org.app import get_common_asset as get_org_common_asset
+from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 from onegov.user import UserCollection
 
 
@@ -27,6 +29,10 @@ class FeriennetApp(OrgApp):
         p = p.order_by(Period.execution_start)
 
         return p
+
+    @cached_property
+    def sponsors(self):
+        return load_sponsors(utils.module_path('onegov.feriennet', 'sponsors'))
 
 
 @FeriennetApp.template_directory()

@@ -172,6 +172,15 @@ ul.single-line {
 }
 
 /*
+    Footer logo
+*/
+.projuventute-logo {
+    display: block;
+    margin-bottom: 1.5rem;
+    padding-left: 1rem;
+}
+
+/*
     activities list
 */
 .activity-list-item {
@@ -1210,13 +1219,13 @@ ul.tags {
         color: $input-font-color;
     }
 
-    + .f-dropdown li a {
-        font-size: .8rem;
-        font-weight: normal;
-    }
-
     + .f-dropdown {
         min-width: 200px;
+
+        li a {
+            font-size: .8rem;
+            font-weight: normal;
+        }
     }
 }
 
@@ -1858,4 +1867,33 @@ ul.tags {
 
 .many-fields a.button {
     margin-bottom: 0;
+}
+
+/*
+    Sponsoring
+*/
+.sponsors {
+    border-top: 2px solid $smoke;
+    padding: 1.25rem 0 2.25rem;
+
+    h2 {
+        color: $charcoal;
+        font-size: 16px;
+        letter-spacing: 1px;
+        margin-bottom: 13px;
+        text-transform: uppercase;
+    }
+}
+
+.sponsor {
+    border: 2px solid $smoke;
+    line-height: 100px;
+    margin-bottom: 1rem;
+    padding: 5px;
+    text-align: center;
+
+    img {
+        position: relative;
+        vertical-align: middle;
+    }
 }
