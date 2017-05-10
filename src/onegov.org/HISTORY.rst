@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.7.2 (2017-05-10)
+~~~~~~~~~~~~~~~~~~~
+
 - Gives sub-applications more ways to customize the footer.
   [href]
 
