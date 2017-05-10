@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- No longer hides the enroll button if the occasion is full during prebooking.
+  [href]
+
 - Don't touch the cancelled bookings during matching reset.
   [href]
 

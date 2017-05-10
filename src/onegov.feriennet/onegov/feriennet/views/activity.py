@@ -306,7 +306,7 @@ def view_activity(self, request):
         if occasion.cancelled:
             return False
 
-        if occasion.full:
+        if occasion.full and occasion.period.phase != 'wishlist':
             return False
 
         if occasion.period.finalized:
