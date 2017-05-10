@@ -96,7 +96,7 @@
     <h2 i18n:translate>Platform</h2>
     <a href="https://www.projuventute.ch/" class="projuventute-logo">
         <img
-            src="${layout.static_file_path('projuventute.png')}"
+            src="${layout.static_file_path('projuventute.svg')}"
             alt="Pro Juventute Logo"
             i18n:attributes="alt"
             height="175px"
