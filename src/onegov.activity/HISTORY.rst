@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.8.7 (2017-05-10)
+~~~~~~~~~~~~~~~~~~~
+
 - Consider all bookings for matchings except for the cancelled ones.
   [href]
 
