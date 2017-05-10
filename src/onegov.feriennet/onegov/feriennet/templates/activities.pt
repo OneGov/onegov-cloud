@@ -102,6 +102,11 @@
                     <h2 class="filter-title" i18n:translate>Weeks</h2>
                     <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['weeks']" />
                 </div>
+
+                <div tal:condition="filters['weekdays']|nothing" class="filter-weekdays">
+                    <h2 class="filter-title" i18n:translate>Weekdays</h2>
+                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['weekdays']" />
+                </div>
             </div>
         </div>
     </tal:block>

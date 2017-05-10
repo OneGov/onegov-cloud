@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to filter activities by weekday.
+  [href]
+
 0.10.1 (2017-05-10)
 ~~~~~~~~~~~~~~~~~~~
 

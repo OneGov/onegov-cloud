@@ -34,6 +34,17 @@ ACTIVITY_STATE_TRANSLATIONS = {
 }
 
 
+WEEKDAYS = (
+    _("Mo"),
+    _("Tu"),
+    _("We"),
+    _("Th"),
+    _("Fr"),
+    _("Sa"),
+    _("Su")
+)
+
+
 def get_activity_form_class(model, request):
     if isinstance(model, VacationActivityCollection):
         model = VacationActivity()
@@ -125,6 +136,14 @@ def view_activities(self, request):
                     start=1
                 )
             )
+
+        filters['weekdays'] = tuple(
+            Link(
+                text=WEEKDAYS[weekday],
+                active=weekday in self.weekdays,
+                url=request.link(self.for_filter(weekday=weekday))
+            ) for weekday in range(0, 7)
+        )
 
         if request.is_organiser:
             if request.app.periods:

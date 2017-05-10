@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-05-08 15:19+0200\n"
+"POT-Creation-Date: 2017-05-10 10:38+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -268,14 +268,14 @@ msgstr "Benutzer Status E-Mail"
 msgid "Invoice Item Group"
 msgstr "Rechungsposition Gruppe"
 
+msgid "Invoice Item Text"
+msgstr "Rechungsposition Text"
+
 msgid "Invoice Item Code"
 msgstr "Rechnungsposition Code"
 
 msgid "Invoice Item ESR"
 msgstr "Rechnungsposition ESR"
-
-msgid "Invoice Item Text"
-msgstr "Rechungsposition Text"
 
 msgid "Invoice Item Paid"
 msgstr "Rechnungsposition Bezahlt"
@@ -953,6 +953,9 @@ msgstr "Dauer"
 msgid "Weeks"
 msgstr "Wochen"
 
+msgid "Weekdays"
+msgstr "Wochentage"
+
 msgid ""
 "This is a preview. Please edit it until you are satisifed with the result "
 "and then press \"Request Publication\". An administrator will then review "
@@ -1439,6 +1442,27 @@ msgstr "Aktiv"
 
 msgid "Inactive"
 msgstr "Inaktiv"
+
+msgid "Mo"
+msgstr "Mo"
+
+msgid "Tu"
+msgstr "Di"
+
+msgid "We"
+msgstr "Mi"
+
+msgid "Th"
+msgstr "Do"
+
+msgid "Fr"
+msgstr "Fr"
+
+msgid "Sa"
+msgstr "Sa"
+
+msgid "Su"
+msgstr "So"
 
 msgid "New Activity"
 msgstr "Neues Angebot"
