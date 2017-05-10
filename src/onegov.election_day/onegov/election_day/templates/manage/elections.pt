@@ -20,11 +20,11 @@
                     </div>
                 </div>
 
-                <p tal:condition="not:groups" i18n:translate>
+                <p tal:condition="not:elections" i18n:translate>
                     No elections yet.
                 </p>
 
-                <table class="elections stackable" tal:condition="groups">
+                <table class="elections stackable" tal:condition="elections">
                     <thead>
                         <tr>
                             <th i18n:translate>Election</th>
@@ -36,41 +36,39 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tal:block tal:repeat="group groups">
-                            <tal:block tal:repeat="election group[1]">
-                                <tr tal:attributes="class python: 'divider' if repeat.election.end else ''">
-                                    <td>${election.title}</td>
-                                    <td><span class="shortcode" tal:condition="election.shortcode">${election.shortcode}</span></td>
-                                    <td>${layout.format_date(election.date, 'date')}</td>
-                                    <td tal:condition="election.domain == 'federation'" i18n:translate>Federal</td>
-                                    <td tal:condition="election.domain == 'canton'" i18n:translate>Cantonal</td>
-                                    <td tal:condition="election.domain == 'municipality'" i18n:translate>Communal</td>
-                                    <td tal:condition="election.type == 'majorz'" i18n:translate>Election based on the simple majority system</td>
-                                    <td tal:condition="election.type == 'proporz'" i18n:translate>Election based on proportional representation</td>
-                                    <td class="right-aligned">
-                                        <ul class="actions" data-title="Actions" i18n:attributes="data-title">
-                                            <li>
-                                                <a i18n:translate="" class="action-view" href="${request.link(election)}">View</a>
-                                            </li>
-                                            <li>
-                                                <a i18n:translate="" class="action-edit" href="${request.link(election, 'edit')}">Edit</a>
-                                            </li>
-                                            <li>
-                                                <a i18n:translate="" class="action-upload" href="${request.link(election, 'upload')}">Upload results</a>
-                                            </li>
-                                            <li tal:condition="election.type == 'proporz'">
-                                                <a i18n:translate="" class="action-upload" href="${request.link(election, 'upload-party-results')}">Upload party results</a>
-                                            </li>
-                                            <li tal:condition="layout.principal.notifications">
-                                                <a i18n:translate="" class="action-trigger" href="${request.link(election, 'trigger')}">Trigger notifications</a>
-                                            </li>
-                                            <li>
-                                                <a i18n:translate="" class="action-delete" href="${request.link(election, 'delete')}">Delete</a>
-                                            </li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                            </tal:block>
+                        <tal:block tal:repeat="election elections">
+                            <tr>
+                                <td>${election.title}</td>
+                                <td><span class="shortcode" tal:condition="election.shortcode">${election.shortcode}</span></td>
+                                <td>${layout.format_date(election.date, 'date')}</td>
+                                <td tal:condition="election.domain == 'federation'" i18n:translate>Federal</td>
+                                <td tal:condition="election.domain == 'canton'" i18n:translate>Cantonal</td>
+                                <td tal:condition="election.domain == 'municipality'" i18n:translate>Communal</td>
+                                <td tal:condition="election.type == 'majorz'" i18n:translate>Election based on the simple majority system</td>
+                                <td tal:condition="election.type == 'proporz'" i18n:translate>Election based on proportional representation</td>
+                                <td class="right-aligned">
+                                    <ul class="actions" data-title="Actions" i18n:attributes="data-title">
+                                        <li>
+                                            <a i18n:translate="" class="action-view" href="${request.link(election)}">View</a>
+                                        </li>
+                                        <li>
+                                            <a i18n:translate="" class="action-edit" href="${request.link(election, 'edit')}">Edit</a>
+                                        </li>
+                                        <li>
+                                            <a i18n:translate="" class="action-upload" href="${request.link(election, 'upload')}">Upload results</a>
+                                        </li>
+                                        <li tal:condition="election.type == 'proporz'">
+                                            <a i18n:translate="" class="action-upload" href="${request.link(election, 'upload-party-results')}">Upload party results</a>
+                                        </li>
+                                        <li tal:condition="layout.principal.notifications">
+                                            <a i18n:translate="" class="action-trigger" href="${request.link(election, 'trigger')}">Trigger notifications</a>
+                                        </li>
+                                        <li>
+                                            <a i18n:translate="" class="action-delete" href="${request.link(election, 'delete')}">Delete</a>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
                         </tal:block>
                     </tbody>
                 </table>
