@@ -1888,12 +1888,18 @@ ul.tags {
 .sponsor {
     border: 2px solid $smoke;
     line-height: 100px;
-    margin-bottom: 1rem;
     padding: 5px;
     text-align: center;
 
     img {
         position: relative;
         vertical-align: middle;
+    }
+}
+
+
+@media #{$small-only} {
+    .sponsor {
+        margin-bottom: 1rem;
     }
 }

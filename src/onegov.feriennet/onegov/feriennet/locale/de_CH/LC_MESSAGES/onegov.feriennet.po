@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-05-10 15:25+0200\n"
+"POT-Creation-Date: 2017-05-10 16:15+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1175,7 +1175,10 @@ msgid "Notice"
 msgstr "Mitteilung"
 
 msgid "Platform Sponsors"
-msgstr "Platform Sponsoren"
+msgstr "Plattform Sponsoren"
+
+msgid "Platform"
+msgstr "Plattform"
 
 msgid "Pro Juventute Logo"
 msgstr "Pro Juventute Logo"
