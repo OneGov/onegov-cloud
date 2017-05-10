@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.10.1 (2017-05-10)
+~~~~~~~~~~~~~~~~~~~
+
 - No longer hides the enroll button if the occasion is full during prebooking.
   [href]
 
