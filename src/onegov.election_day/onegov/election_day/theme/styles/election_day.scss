@@ -275,13 +275,19 @@ table {
 
     .st-head-row {
         background-color: $white;
-        border-bottom: 5px solid $gainsboro;
+        border-bottom: 3px solid $gainsboro;
         font-size: 1.2em;
+        padding-top: 1.2em;
         text-align: center;
     }
 
     .stackable .answer {
         text-align: right;
+    }
+
+    table tr.total {
+        border: 0;
+        font-weight: bold;
     }
 }
 
