@@ -146,6 +146,13 @@ table {
         border-bottom: 1px solid $aluminum;
     }
 
+    tr.even,
+    tr.alt,
+    tr:nth-of-type(even) {
+        background: $white;
+    }
+
+
     th,
     td {
         padding: .5rem;
@@ -160,7 +167,7 @@ table {
     }
 
     tr.total {
-        border: 1px solid $aluminum;
+        border: 1px solid $iron;
         border-width: 1px 0;
         font-weight: bold;
     }
@@ -535,7 +542,7 @@ ul.breadcrumbs {
 }
 
 tr.divider {
-    border-bottom: 1px solid $base;
+    border-bottom: 1px solid $iron;
 }
 
 /*
