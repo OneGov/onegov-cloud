@@ -348,29 +348,11 @@ def test_generate_media(postgres_dsn, temporary_directory, session_manager):
     assert os.listdir(svg_path) == []
 
     add_vote(1)
-
-    generate_media = ['generate-media', '--no-svg']
-    assert run_command(cfg_path, 'govikon', generate_media).exit_code == 0
+    assert run_command(cfg_path, 'govikon', ['generate-media']).exit_code == 0
     assert len(os.listdir(pdf_path)) == 4
     assert os.listdir(svg_path) == []
 
     add_vote(2)
-
-    generate_media = ['generate-media', '--no-pdf']
-    assert run_command(cfg_path, 'govikon', generate_media).exit_code == 0
-    assert len(os.listdir(pdf_path)) == 4
-    assert os.listdir(svg_path) == []
-
-    add_vote(3)
     assert run_command(cfg_path, 'govikon', ['generate-media']).exit_code == 0
-    assert len(os.listdir(pdf_path)) == 12
+    assert len(os.listdir(pdf_path)) == 8
     assert os.listdir(svg_path) == []
-
-    file_path = os.path.join(pdf_path, os.listdir(pdf_path)[0])
-    ts = os.stat(file_path).st_mtime
-
-    generate_media = ['generate-media', '--force']
-    assert run_command(cfg_path, 'govikon', generate_media).exit_code == 0
-    assert len(os.listdir(pdf_path)) == 12
-    assert os.listdir(svg_path) == []
-    assert os.stat(file_path).st_mtime > ts

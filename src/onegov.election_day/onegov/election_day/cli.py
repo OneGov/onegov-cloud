@@ -123,22 +123,15 @@ def send_sms(group_context, username, password, originator, sentry):
 
 
 @cli.command('generate-media')
-@click.option('--pdf/--no-pdf', default=True)
-@click.option('--svg/--no-svg', default=True)
-@click.option('--force/--no-force', default=False)
-@click.option('--cleanup/--no-cleanup', default=True)
 @click.option('--sentry')
-def generate_media(pdf, svg, force, cleanup, sentry):
-    """ Generates the PDF and/or SVGs for the selected instances
+def generate_media(sentry):
+    """ Generates the PDF and/or SVGs for the selected instances. For example:
 
         onegov-election-day --select '/onegov_election_day/zg' generate-media
 
     """
     def generate(request, app):
         if not app.principal or not app.configuration.get('d3_renderer'):
-            return
-
-        if not pdf and not svg:
             return
 
         lockfile = Path(os.path.join(
@@ -152,11 +145,9 @@ def generate_media(pdf, svg, force, cleanup, sentry):
             pass
         else:
             try:
-                media_generator = MediaGenerator(app, force, cleanup)
-                if pdf:
-                    media_generator.create_pdfs()
-                if svg:
-                    media_generator.create_svgs()
+                media_generator = MediaGenerator(app)
+                media_generator.create_pdfs()
+                media_generator.create_svgs()
             except Exception as e:
                 log.error(
                     "An exception happened while generating media files",

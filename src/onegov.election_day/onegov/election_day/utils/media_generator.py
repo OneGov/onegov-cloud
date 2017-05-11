@@ -38,10 +38,8 @@ from onegov.election_day import log
 
 class MediaGenerator():
 
-    def __init__(self, app, force, cleanup):
+    def __init__(self, app):
         self.app = app
-        self.force = force
-        self.cleanup = cleanup
         self.pdf_dir = 'pdf'
         self.svg_dir = 'svg'
         self.renderer = app.configuration.get('d3_renderer').rstrip('/')
@@ -684,7 +682,7 @@ class MediaGenerator():
         """ Generates all PDFs for the given application.
 
         Only generates PDFs if not already generated since the last change of
-        the election or vote. Allows to force the re-creation of the PDF.
+        the election or vote.
 
         Optionally cleans up unused PDFs.
 
@@ -704,7 +702,7 @@ class MediaGenerator():
         for locale in self.app.locales:
             for item in items:
                 filename = pdf_filename(item, locale)
-                if (self.force or filename not in existing) and item.completed:
+                if filename not in existing and item.completed:
                     path = '{}/{}'.format(self.pdf_dir, filename)
                     if fs.exists(path):
                         fs.remove(path)
@@ -718,24 +716,23 @@ class MediaGenerator():
                         raise ex
 
         # Delete old PDFs
-        if self.cleanup:
-            existing = fs.listdir(self.pdf_dir)
-            existing = dict(groupbylist(
-                sorted(existing),
-                key=lambda a: a.split('.')[0]
-            ))
+        existing = fs.listdir(self.pdf_dir)
+        existing = dict(groupbylist(
+            sorted(existing),
+            key=lambda a: a.split('.')[0]
+        ))
 
-            # Delete orphaned files
-            created = [
-                pdf_filename(item, '').split('.')[0] for item in items
-            ]
-            for id in set(existing.keys()) - set(created):
-                self.remove(self.pdf_dir, existing[id])
+        # ... orphaned files
+        created = [
+            pdf_filename(item, '').split('.')[0] for item in items
+        ]
+        for id in set(existing.keys()) - set(created):
+            self.remove(self.pdf_dir, existing[id])
 
-            # Delete old files
-            for files in existing.values():
-                files = sorted(files, reverse=True)
-                self.remove(self.pdf_dir, files[len(self.app.locales):])
+        # ... old files
+        for files in existing.values():
+            files = sorted(files, reverse=True)
+            self.remove(self.pdf_dir, files[len(self.app.locales):])
 
     def generate_svg(self, item, type_, locale=None):
         """ Creates the requested SVG. """
@@ -752,7 +749,7 @@ class MediaGenerator():
         existing = self.app.filestorage.listdir(self.svg_dir)
         filename = svg_filename(item, type_, locale)
 
-        if not (self.force or filename not in existing):
+        if filename in existing:
             return None
 
         path = '{}/{}'.format(self.svg_dir, filename)
@@ -804,7 +801,7 @@ class MediaGenerator():
         """ Generates all SVGs for the given application.
 
         Only generates SVGs if not already generated since the last change of
-        the election or vote. Allows to force the re-creation of the SVG.
+        the election or vote.
 
         Optionally cleans up unused SVGs.
 
@@ -829,35 +826,34 @@ class MediaGenerator():
                     self.generate_svg(ballot, 'map', locale)
 
         # Delete old SVGs
-        if self.cleanup:
-            existing = fs.listdir(self.svg_dir)
-            existing = dict(groupbylist(
-                sorted(existing),
-                key=lambda a: a.split('.')[0]
-            ))
+        existing = fs.listdir(self.svg_dir)
+        existing = dict(groupbylist(
+            sorted(existing),
+            key=lambda a: a.split('.')[0]
+        ))
 
-            # Delete orphaned files
-            created = [
-                svg_filename(item, '', '').split('.')[0]
-                for item in
-                self.session.query(Election).all() +
-                self.session.query(Ballot).all() +
-                self.session.query(Vote).all()
-            ]
-            diff = set(existing.keys()) - set(created)
-            files = ['{}*'.format(file) for file in diff if file]
-            self.remove(self.svg_dir, files)
-            if '' in existing:
-                self.remove(self.svg_dir, existing[''])
+        # ... orphaned files
+        created = [
+            svg_filename(item, '', '').split('.')[0]
+            for item in
+            self.session.query(Election).all() +
+            self.session.query(Ballot).all() +
+            self.session.query(Vote).all()
+        ]
+        diff = set(existing.keys()) - set(created)
+        files = ['{}*'.format(file) for file in diff if file]
+        self.remove(self.svg_dir, files)
+        if '' in existing:
+            self.remove(self.svg_dir, existing[''])
 
-            # Delete old files
-            for files in existing.values():
-                if len(files):
-                    files = sorted(files, reverse=True)
-                    try:
-                        ts = str(int(files[0].split('.')[1]))
-                    except (IndexError, ValueError):
-                        pass
-                    else:
-                        files = [f for f in files if ts not in f]
-                        self.remove(self.svg_dir, files)
+        # ... old files
+        for files in existing.values():
+            if len(files):
+                files = sorted(files, reverse=True)
+                try:
+                    ts = str(int(files[0].split('.')[1]))
+                except (IndexError, ValueError):
+                    pass
+                else:
+                    files = [f for f in files if ts not in f]
+                    self.remove(self.svg_dir, files)

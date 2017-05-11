@@ -223,12 +223,12 @@ def add_vote(session, type_):
 
 
 def test_media_generator_scripts(election_day_app):
-    generator = MediaGenerator(election_day_app, False, False)
+    generator = MediaGenerator(election_day_app)
     assert len(generator.scripts)
 
 
 def test_media_generator_translatation(election_day_app):
-    generator = MediaGenerator(election_day_app, False, False)
+    generator = MediaGenerator(election_day_app)
 
     assert generator.translate(_('Election'), 'de_CH') == 'Wahl'
     assert generator.translate(_('Election'), 'fr_CH') == 'Election'
@@ -237,7 +237,7 @@ def test_media_generator_translatation(election_day_app):
 
 
 def test_get_chart(election_day_app):
-    generator = MediaGenerator(election_day_app, False, False)
+    generator = MediaGenerator(election_day_app)
 
     with patch('onegov.election_day.utils.media_generator.post',
                return_value=MagicMock(text='<svg></svg>')) as post:
@@ -317,7 +317,7 @@ def test_get_chart(election_day_app):
 
 
 def test_generate_pdf_election(session, election_day_app):
-    generator = MediaGenerator(election_day_app, False, False)
+    generator = MediaGenerator(election_day_app)
 
     # Majorz election
     election = add_majorz_election(session)
@@ -366,7 +366,7 @@ def test_generate_pdf_election(session, election_day_app):
 
 
 def test_generate_pdf_vote(session, election_day_app):
-    generator = MediaGenerator(election_day_app, False, False)
+    generator = MediaGenerator(election_day_app)
 
     # Simple vote
     vote = add_vote(session, 'simple')
@@ -425,7 +425,7 @@ def test_generate_pdf_long_title(session, election_day_app):
     )
     session.flush()
 
-    generator = MediaGenerator(election_day_app, False, False)
+    generator = MediaGenerator(election_day_app)
     with patch.object(generator, 'get_chart', return_value=pdf_chart()) as gc:
         generator.generate_pdf(vote, 'vote.pdf', 'de_CH')
 
@@ -436,7 +436,7 @@ def test_generate_pdf_long_title(session, election_day_app):
 
 def test_generate_svg(election_day_app, session):
 
-    generator = MediaGenerator(election_day_app, False, False)
+    generator = MediaGenerator(election_day_app)
 
     with raises(AssertionError):
         generator.generate_svg(None, 'things', 'de_CH')
@@ -474,11 +474,7 @@ def test_generate_svg(election_day_app, session):
         with freeze_time("2015-05-05 15:00"):
             generator.generate_svg(item, 'map', 'it_CH')
 
-        with freeze_time("2016-06-06 16:00"):
-            generator.force = True
-            generator.generate_svg(item, 'map', 'it_CH')
-
-        assert gc.call_count == 10  # 2 + 5 + 2 + 0 + 1
+        assert gc.call_count == 9  # 2 + 5 + 2 + 0
 
         ts = '1396620000'
         h1 = '41c18975bf916862ed817b7c569b6f242ca7ad9f86ca73bbabd8d9cb26858440'
@@ -498,7 +494,7 @@ def test_generate_svg(election_day_app, session):
 
 
 def test_create_pdfs(election_day_app):
-    generator = MediaGenerator(election_day_app, False, False)
+    generator = MediaGenerator(election_day_app)
     session = election_day_app.session()
     fs = election_day_app.filestorage
 
@@ -521,26 +517,12 @@ def test_create_pdfs(election_day_app):
         assert gc.call_count == 36
         assert len(fs.listdir('pdf')) == 12
 
-        generator.force = True
-
-        generator.create_pdfs()
-        assert gc.call_count == 72
-        assert len(fs.listdir('pdf')) == 12
-
-        generator.force = False
-
         fs.touch('pdf/somefile')
         fs.touch('pdf/some.file')
         fs.touch('pdf/.somefile')
 
         generator.create_pdfs()
-        assert gc.call_count == 72
-        assert len(fs.listdir('pdf')) == 15
-
-        generator.cleanup = True
-
-        generator.create_pdfs()
-        assert gc.call_count == 72
+        assert gc.call_count == 36
         assert len(fs.listdir('pdf')) == 12
 
         session.delete(vote)
@@ -548,26 +530,26 @@ def test_create_pdfs(election_day_app):
         session.flush()
 
         generator.create_pdfs()
-        assert gc.call_count == 72
+        assert gc.call_count == 36
         assert len(fs.listdir('pdf')) == 4
 
         majorz_election.title = 'Election'
         session.flush()
 
         generator.create_pdfs()
-        assert gc.call_count == 76
+        assert gc.call_count == 40
         assert len(fs.listdir('pdf')) == 4
 
         session.delete(majorz_election)
         session.flush()
 
         generator.create_pdfs()
-        assert gc.call_count == 76
+        assert gc.call_count == 40
         assert len(fs.listdir('pdf')) == 0
 
 
 def test_create_svgs(election_day_app):
-    generator = MediaGenerator(election_day_app, False, False)
+    generator = MediaGenerator(election_day_app)
     session = election_day_app.session()
     fs = election_day_app.filestorage
 
@@ -590,26 +572,12 @@ def test_create_svgs(election_day_app):
         assert gc.call_count == 18
         assert len(fs.listdir('svg')) == 18
 
-        generator.force = True
-
-        generator.create_svgs()
-        assert gc.call_count == 36
-        assert len(fs.listdir('svg')) == 18
-
-        generator.force = False
-
         fs.touch('svg/somefile')
         fs.touch('svg/some.file')
         fs.touch('svg/.somefile')
 
         generator.create_svgs()
-        assert gc.call_count == 36
-        assert len(fs.listdir('svg')) == 21
-
-        generator.cleanup = True
-
-        generator.create_svgs()
-        assert gc.call_count == 36
+        assert gc.call_count == 18
         assert len(fs.listdir('svg')) == 18
 
         session.delete(vote)
@@ -617,19 +585,19 @@ def test_create_svgs(election_day_app):
         session.flush()
 
         generator.create_svgs()
-        assert gc.call_count == 36
+        assert gc.call_count == 18
         assert len(fs.listdir('svg')) == 1
 
         majorz_election.title = 'Election'
         session.flush()
 
         generator.create_svgs()
-        assert gc.call_count == 37
+        assert gc.call_count == 19
         assert len(fs.listdir('svg')) == 1
 
         session.delete(majorz_election)
         session.flush()
 
         generator.create_svgs()
-        assert gc.call_count == 37
+        assert gc.call_count == 19
         assert len(fs.listdir('svg')) == 0
