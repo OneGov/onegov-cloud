@@ -182,6 +182,15 @@
     }
 
     /*
+        Rulers
+    */
+    hr {
+        border: 1px solid #ddd;
+        border-width: 1px 0 0 0;
+        margin-bottom: 20px;
+    }
+
+    /*
         Reservations
     */
 
@@ -245,6 +254,11 @@
                     <tr>
                         <td>
                             <div metal:define-slot="body"></div>
+                        </td>
+                    </tr>
+                    <tr tal:define="signature layout.macros['email_signature']|nothing" tal:condition="signature">
+                        <td>
+                            <metal:b use-macro="signature" />
                         </td>
                     </tr>
                 </table>
