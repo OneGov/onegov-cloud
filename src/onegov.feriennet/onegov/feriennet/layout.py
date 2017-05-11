@@ -51,16 +51,6 @@ class VacationActivityCollectionLayout(DefaultLayout):
             classes=('new-activity', )
         )
 
-    @property
-    def admin_links(self):
-        if self.request.app.active_period:
-            yield Link(
-                text=_("Export Occasions"),
-                url=self.request.link(
-                    self.request.app.active_period, 'export-durchfuehrungen'),
-                classes=('export-link', )
-            )
-
     @cached_property
     def editbar_links(self):
         if not self.request.is_organiser:
@@ -70,9 +60,6 @@ class VacationActivityCollectionLayout(DefaultLayout):
 
         if self.request.is_organiser:
             links.extend(self.organiser_links)
-
-        if self.request.is_admin:
-            links.extend(self.admin_links)
 
         return links
 

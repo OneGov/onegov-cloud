@@ -18,7 +18,7 @@
 <metal:tags define-macro="tags">
     <ul class="tags">
         <li tal:repeat="link tags">
-            <span tal:content="structure link(request)"
+            <span tal:content="structure link(layout)"
                 class="${link.active and 'active'} blank-label"
             />
         </li>
@@ -473,7 +473,7 @@
     <ul id="${action_id}" data-dropdown-content class="f-dropdown" aria-hidden="true">
         <li
             tal:repeat="link links"
-            tal:content="structure link(request)"
+            tal:content="structure link(layout)"
         />
     </ul>
 </metal:actions_button>

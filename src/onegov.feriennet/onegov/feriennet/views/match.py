@@ -1,3 +1,4 @@
+from functools import lru_cache
 from onegov.activity import Attendee
 from onegov.activity import Booking, BookingCollection, Occasion
 from onegov.activity.matching import deferred_acceptance_from_database
@@ -6,7 +7,10 @@ from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.forms import MatchForm
 from onegov.feriennet.layout import MatchCollectionLayout
-from onegov.org.elements import Link, ConfirmLink, DeleteLink
+from onegov.org.new_elements import Block
+from onegov.org.new_elements import Confirm
+from onegov.org.new_elements import Intercooler
+from onegov.org.new_elements import Link
 from onegov.user import User, UserCollection
 
 
@@ -47,99 +51,116 @@ def handle_matches(self, request, form):
 
     def occasion_links(oid):
         if self.period.finalized:
-            yield ConfirmLink(
+            yield Link(
                 text=_("Signup Attendee"),
-                url='#',
-                confirm=_(
-                    "The period has already been finalized. No new "
-                    "attendees may be added."
-                ),
-                classes=('confirm', )
+                traits=(
+                    Block(_(
+                        "The period has already been finalized. No new "
+                        "attendees may be added."
+                    ))
+                )
             )
         else:
             yield Link(
-                _("Signup Attendee"),
-                request.return_here(
+                text=_("Signup Attendee"),
+                url=request.return_here(
                     request.class_link(Occasion, {'id': oid}, 'anmelden')
                 )
             )
 
-    def record_links(record):
-        yield Link(
-            _("User"), request.return_here(
-                request.class_link(
-                    User, {'id': users[record.attendee_username]}
-                )
-            )
+    wishlist_phase = self.period.wishlist_phase
+    booking_phase = self.period.booking_phase
+
+    phase_title = wishlist_phase and _("Wishlist") or _("Bookings")
+
+    @lru_cache(maxsize=128)
+    def booking_link(username):
+        return request.class_link(
+            BookingCollection, {
+                'period_id': self.period.id,
+                'username': username
+            }
         )
 
-        yield Link(
-            _("Attendee"), request.return_here(
-                request.class_link(
-                    Attendee, {'id': record.attendee_id}
-                )
-            )
-        )
-
-        yield Link(
-            self.period.wishlist_phase and _("Wishlist") or _("Bookings"),
+    @lru_cache(maxsize=128)
+    def user_link(username):
+        return request.return_here(
             request.class_link(
-                BookingCollection, {
-                    'period_id': self.period.id,
-                    'username': record.attendee_username
-                }
+                User, {'id': users[username]}
             )
         )
 
-        if self.period.wishlist_phase:
-            yield DeleteLink(
+    @lru_cache(maxsize=128)
+    def attendee_link(attendee_id):
+        return request.return_here(
+            request.class_link(
+                Attendee, {'id': attendee_id}
+            )
+        )
+
+    def record_links(record):
+        yield Link(_("User"), user_link(record.attendee_username))
+        yield Link(_("Attendee"), attendee_link(record.attendee_id))
+        yield Link(phase_title, booking_link(record.attendee_username))
+
+        if wishlist_phase:
+            yield Link(
                 text=_("Remove Wish"),
                 url=layout.csrf_protected_url(
                     request.class_link(Booking, {'id': record.booking_id})
                 ),
-                confirm=_(
-                    "Do you really want to remove ${attendee}'s wish?",
-                    mapping={
-                        'attendee': record.attendee_name
-                    }
-                ),
-                yes_button_text=_("Remove Wish"),
-                classes=('confirm', ),
-                target='#{}'.format(record.booking_id)
+                traits=(
+                    Confirm(_(
+                        "Do you really want to remove ${attendee}'s wish?",
+                        mapping={
+                            'attendee': record.attendee_name
+                        }
+                    ), yes=_("Remove Wish")),
+                    Intercooler(
+                        request_method='DELETE',
+                        target='#{}'.format(record.booking_id)
+                    )
+                )
             )
-        if self.period.booking_phase and record.booking_state != 'accepted':
-            yield DeleteLink(
+
+        elif booking_phase and record.booking_state != 'accepted':
+            yield Link(
                 text=_("Remove Booking"),
                 url=layout.csrf_protected_url(
                     request.class_link(Booking, {'id': record.booking_id})
                 ),
-                confirm=_(
-                    "Do you really want to delete ${attendee}'s booking?",
-                    mapping={
-                        'attendee': record.attendee_name
-                    }
-                ),
-                yes_button_text=_("Remove Booking"),
-                classes=('confirm', ),
-                target='#{}'.format(record.booking_id)
+                traits=(
+                    Confirm(_(
+                        "Do you really want to delete ${attendee}'s booking?",
+                        mapping={
+                            'attendee': record.attendee_name
+                        }
+                    ), yes=_("Remove Booking")),
+                    Intercooler(
+                        request_method='DELETE',
+                        target='#{}'.format(record.booking_id)
+                    )
+                )
             )
-        if self.period.booking_phase and record.booking_state == 'accepted':
-            yield ConfirmLink(
+        elif booking_phase and record.booking_state == 'accepted':
+            yield Link(
                 text=_("Cancel Booking"),
                 url=layout.csrf_protected_url(
                     request.class_link(
                         Booking, {'id': record.booking_id}, 'absagen'
                     )
                 ),
-                confirm=_(
-                    "Do you really want to cancel ${attendee}'s booking?",
-                    mapping={
-                        'attendee': record.attendee_name
-                    }
-                ),
-                extra_information=_("This cannot be undone."),
-                yes_button_text=_("Cancel Booking"),
-                classes=('confirm', )
+                traits=(
+                    Confirm(_(
+                        "Do you really want to cancel ${attendee}'s booking?",
+                        mapping={
+                            'attendee': record.attendee_name
+                        }
+                    ), _("This cannot be undone."), yes=_("Cancel Booking")),
+                    Intercooler(
+                        request_method='POST',
+                    )
+                )
             )
 
     filters = {}
