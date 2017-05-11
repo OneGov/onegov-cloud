@@ -57,11 +57,7 @@ metal:define-macro="layout">
 
     <footer tal:condition="not request.browser_session.get('headerless')">
         <div class="row">
-            <div class="small-4 columns">
-                <span class="copyright">&copy; ${layout.copyright_year} ${layout.app.principal.name}</span> <a class="onegov-link" href="https://onegovcloud.ch">OneGov Cloud</a><br>
-                <a class="open-data-link" href="${layout.opendata_link}" i18n:translate>Open Data</a>
-            </div>
-            <div class="small-4 columns text-center">
+            <div class="small-12 medium-4 medium-push-4 columns text-center">
                 <ul class="locales">
                     <li tal:repeat="(name, url) layout.locales">
                         <a tal:condition="request.locale not in url" href="${url}">${name}</a>
@@ -69,13 +65,17 @@ metal:define-macro="layout">
                     </li>
                 </ul>
             </div>
-            <div class="small-4 columns text-right manage-links">
+            <div class="small-12 medium-4 medium-pull-4 columns small-only-text-center">
+                <span >&copy; ${layout.copyright_year} ${layout.app.principal.name}</span><br>
+                <a class="onegov-link" href="https://onegovcloud.ch">OneGov Cloud</a> | <a href="https://github.com/OneGov/onegov.election_day/blob/master/HISTORY.rst#changelog">v${layout.app_version}</a><br>
+                <a class="open-data-link" href="${layout.opendata_link}" i18n:translate>Open Data</a>
+            </div>
+            <div class="small-12 medium-4 columns small-only-text-center medium-text-right manage-links">
                 <a tal:condition="layout.login_link" href="${layout.login_link}" i18n:translate>Login</a>
                 <tal:block condition="layout.logout_link" >
                     <span i18n:translate>You are logged in: </span>
                     <a href="${layout.manage_link}" i18n:translate>Manage</a> |
                     <a href="${layout.logout_link}" i18n:translate>Logout</a><br>
-                    <a href="https://github.com/OneGov/onegov.election_day/blob/master/HISTORY.rst#changelog">v${layout.app_version}</a><br>
                 </tal:block>
             </div>
         </div>

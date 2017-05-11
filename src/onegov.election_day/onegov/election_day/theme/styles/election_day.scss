@@ -494,11 +494,6 @@ footer {
     font-size: 85%;
     margin-top: 2rem;
     padding: 1rem 0;
-
-    .copyright::after {
-        content: ' |';
-    }
-
 }
 
 
@@ -829,9 +824,6 @@ form {
     .open-data-link,
     .results-navigation a,
     .results-navigation h2::after,
-    .copyright::after {
-        display: none;
-    }
 
     p,
     td,
