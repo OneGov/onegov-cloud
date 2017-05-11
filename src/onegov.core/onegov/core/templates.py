@@ -160,7 +160,7 @@ def render_template(template, request, content, is_mail_template='infer'):
     return template.render(**variables)
 
 
-def render_macro(macro, request, content):
+def render_macro(macro, request, content, suppress_global_variables=True):
     """ Renders a :class:`chameleon.zpt.template.Macro` like this::
 
         layout.render_macro(layout.macros['my_macro'], **vars)
@@ -176,7 +176,9 @@ def render_macro(macro, request, content):
 
     """
 
-    variables = get_default_vars(request, content)
+    variables = get_default_vars(
+        request, content, suppress_global_variables=suppress_global_variables)
+
     variables.setdefault('__translate', variables['translate'])
     variables.setdefault('__convert', variables['translate'])
     variables.setdefault('__decode', decode_string)

@@ -7,7 +7,6 @@ import sedate
 from cached_property import cached_property
 from datetime import datetime
 from onegov.core import utils
-from purl import URL
 from pytz import timezone
 
 
@@ -84,11 +83,11 @@ class Layout(object):
         own thing automatically).
 
         """
-        return self.request.new_csrf_token()
+        return self.request.new_csrf_token().decode('utf-8')
 
     def csrf_protected_url(self, url):
         """ Adds a csrf token to the given url. """
-        return URL(url).query_param('csrf-token', self.csrf_token).as_string()
+        return utils.append_query_param(url, 'csrf-token', self.csrf_token)
 
     def format_date(self, dt, format):
         """ Takes a datetime and formats it according to local timezone and

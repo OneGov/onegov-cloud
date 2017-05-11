@@ -436,6 +436,17 @@ def makeopendir(fs, directory):
     return fs.opendir(directory)
 
 
+def append_query_param(url, key, value):
+    """ Appends a single query parameter to an url. This is faster than
+    using Purl, if and only if we only add one query param.
+
+    Also this function assumes that the value is already url encoded.
+
+    """
+    template = '?' in url and '{}&{}={}' or '{}?{}={}'
+    return template.format(url, key, value)
+
+
 class PostThread(Thread):
 
     """ POSTs the given data with the headers to the URL.

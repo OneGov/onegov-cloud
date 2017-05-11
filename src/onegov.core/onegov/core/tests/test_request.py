@@ -54,9 +54,6 @@ def test_return_to_mixin():
     assert r.return_here('https://example.org')\
         .startswith('https://example.org?return-to=')
 
-    assert not r.return_to('https://example.org?return-to=foobar', '/')\
-        .startswith('https://example.org?return-to=foobar')
-
     r.GET['return-to'] = 'http://phising'
     assert r.redirect('http://safe').location == 'http://safe'
 

@@ -3,6 +3,7 @@ import morepath
 
 from cached_property import cached_property
 from datetime import timedelta
+from functools import lru_cache
 from itsdangerous import (
     BadSignature,
     SignatureExpired,
@@ -16,7 +17,6 @@ from onegov.core import utils
 from onegov.core.crypto import random_token
 from webob.exc import HTTPForbidden
 from wtforms.csrf.session import SessionCSRF
-from purl import URL
 
 
 Message = collections.namedtuple('Message', ['text', 'type'])
@@ -61,10 +61,13 @@ class ReturnToMixin(object):
     def redirect_signer(self):
         return URLSafeSerializer(self.identity_secret, 'return-to')
 
-    def return_to(self, url, redirect):
-        signed = self.redirect_signer.dumps(redirect)
+    @lru_cache(maxsize=16)
+    def sign_url_for_redirect(self, url):
+        return self.redirect_signer.dumps(url)
 
-        return URL(url).query_param('return-to', signed).as_string()
+    def return_to(self, url, redirect):
+        signed = self.sign_url_for_redirect(redirect)
+        return utils.append_query_param(url, 'return-to', signed)
 
     def return_here(self, url):
         return self.return_to(url, self.url)
