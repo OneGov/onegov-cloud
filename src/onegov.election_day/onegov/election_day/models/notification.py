@@ -1,14 +1,19 @@
-import json
-
-from onegov.ballot.models import Election, Vote
+from json import dumps
+from onegov.ballot.models import Election
+from onegov.ballot.models import Vote
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UTCDateTime, UUID
+from onegov.core.orm.types import UTCDateTime
+from onegov.core.orm.types import UUID
 from onegov.core.utils import PostThread
 from onegov.election_day import _
 from onegov.election_day.models.subscriber import Subscriber
 from onegov.election_day.utils import get_summary
-from sqlalchemy import Column, ForeignKey, Text
+from sqlalchemy import Column
+from sqlalchemy import ForeignKey
+from sqlalchemy import Text
+from sqlalchemy.orm import backref
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
@@ -26,11 +31,17 @@ class Notification(Base, TimestampMixin):
     #: The last update of the corresponding election/vote
     last_change = Column(UTCDateTime, nullable=False)
 
-    #: The corresponding election
+    #: The corresponding election id
     election_id = Column(Text, ForeignKey(Election.id), nullable=True)
 
-    #: The corresponding vote
+    #: The corresponding election
+    election = relationship('Election', backref=backref('notifications'))
+
+    #: The corresponding vote id
     vote_id = Column(Text, ForeignKey(Vote.id), nullable=True)
+
+    #: The corresponding vote
+    vote = relationship('Vote', backref=backref('notifications'))
 
     def update_from_model(self, model):
         """ Copy """
@@ -65,7 +76,7 @@ class WebhookNotification(Notification):
         webhooks = request.app.principal.webhooks
         if webhooks:
             summary = get_summary(model, request)
-            data = json.dumps(summary).encode('utf-8')
+            data = dumps(summary).encode('utf-8')
             for url, headers in webhooks.items():
                 headers = headers or {}
                 headers['Content-Type'] = 'application/json; charset=utf-8'

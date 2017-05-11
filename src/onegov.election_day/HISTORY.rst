@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes sent notification prevents deleting votes and elections.
+  [msom]
+
 1.8.10 (2017-05-11)
 ~~~~~~~~~~~~~~~~~~~
 
