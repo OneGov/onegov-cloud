@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.7.3 (2017-05-11)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to define an email signature through macros.
   [href]
 
