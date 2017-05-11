@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.8.11 (2017-05-11)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes deleting an eletion or vote throwing an error when uploading
   WabstiCExport files.
