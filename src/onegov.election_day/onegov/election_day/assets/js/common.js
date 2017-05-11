@@ -5,10 +5,10 @@ $(document).foundation();
 $('.stackable').stacktable();
 
 // collapse tables whising to be collapsible
-$('.collapsible.collapsed tbody tr:not(.total):not(.sticky):not(.more)').hide();
+$('.collapsible.collapsed tbody tr:not(.total):not(.sticky-row):not(.more)').hide();
 $('.collapsible .more, .collapsible .less').click(function() {
     $(this).parents('table').toggleClass('collapsed');
-    $(this).parents('table').children('tbody').children('tr:not(.total):not(.sticky)').toggle();
+    $(this).parents('table').children('tbody').children('tr:not(.total):not(.sticky-row)').toggle();
 });
 
 // sort tables wishing to be sorted

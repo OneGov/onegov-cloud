@@ -32,7 +32,20 @@ class ElectionDayTheme(BaseTheme):
             'h2-font-reduction': 'rem-calc(12)',
             'callout-panel-bg': 'scale-color({}, $lightness: 75%)'.format(
                 options['primary-color']
-            )
+            ),
+            'topbar-bg-color': '#fff',
+            'topbar-dropdown-bg': '#fff',
+            'topbar-link-color': '#999',
+            'topbar-link-color-hover': '#999',
+            'topbar-link-color-active': options['primary-color'],
+            'topbar-link-color-active-hover': options['primary-color'],
+            'topbar-link-font-size': 'rem-calc(16)',
+            'topbar-link-bg-hover': '#f9f9f9',
+            'topbar-link-bg-active': '#fff',
+            'topbar-link-bg-active-hover': '#f9f9f9',
+            'topbar-link-padding': 'rem-calc(32)',
+            'topbar-menu-link-color': '#999',
+            'topbar-menu-icon-color': '#999',
         }
         _options.update(options)
 

@@ -151,11 +151,21 @@
 </metal:breadcrumbs>
 
 <metal:tab_menu define-macro="tab_menu">
-    <ul class="tabs" tal:condition="layout.menu">
-        <tal:block repeat="item layout.menu">
-            <li class="tab-title ${item[2]}"><a href="${item[1]}">${item[0]}</a></li>
-        </tal:block>
-    </ul>
+    <div class="tab-navigation clearfix" tal:condition="layout.menu">
+        <nav class="top-bar" data-topbar role="navigation">
+            <ul class="title-area">
+                <li class="name menu-icon"><span>${layout.title()}<span></li>
+                <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+            </ul>
+            <section class="top-bar-section">
+                <ul class="left">
+                    <tal:block repeat="item layout.menu">
+                        <li class="${item[2]}"><a href="${item[1]}">${item[0]}</a></li>
+                    </tal:block>
+                </ul>
+            </section>
+        </nav>
+    </div>
 </metal:tab_menu>
 
 <metal:temporary_results_callout define-macro="temporary_results_callout" i18n:domain="onegov.election_day">

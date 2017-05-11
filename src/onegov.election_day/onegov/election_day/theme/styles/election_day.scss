@@ -247,7 +247,7 @@ table {
         }
 
         &.collapsed {
-            tr.sticky {
+            tr.sticky-row {
                 background-color: $white;
             }
 
@@ -491,54 +491,78 @@ footer {
 
 
 /*
-    Manage navigation
+    Navigation
 */
-.tabs {
-    background-color: $white;
-    border-bottom: 1px solid $aluminum;
-    margin-bottom: 2em !important;
+.tab-navigation {
+    margin-bottom: 2em;
+    margin-top: 1em;
 
-    .tab-title > a {
-        background-color: $white;
-        border-bottom: 2px solid $white;
-        color: $aluminum;
-        position: relative;
-        z-index: 10;
+    .title-area {
+        border-bottom: 1px solid $aluminum;
 
-        &:hover {
-            background-color: $snow;
-            border-bottom: 2px solid $snow;
+        .name {
+            background: $white-smoke;
+
+            span {
+                padding-left: 1em;
+            }
         }
     }
 
-    .tab-title.active > a {
-        border-bottom: 2px solid $primary-color;
-        color: $primary-color;
-
-        top: 1px;
-        z-index: 20;
-
-    }
-}
-
-@media #{$small-only} {
-    .tabs {
-        padding-bottom: 1px;
-
-        li {
-            width: 100%;
+    .top-bar {
+        &:not(.expanded) {
+            border-bottom: 1px solid $aluminum;
         }
 
-        .tab-title a {
-            padding-left: 1em;
+        .title-area .name span {
+            color: $aluminum;
         }
 
-        .tab-title.active > a {
-            border-bottom: 0;
-            border-left: 2px solid $primary-color;
+        .left {
+            li.active {
+                border-left: 2px solid $primary-color;
+            }
         }
     }
 }
+
+@media #{$medium-up} {
+    .tab-navigation {
+        .top-bar {
+
+            &:not(.expanded) {
+                border-bottom: 0;
+            }
+
+            .title-area .name span {
+                display: none;
+            }
+
+            .left {
+                border-bottom: 1px solid $aluminum;
+                width: 100%;
+
+                li {
+                    border-bottom: 2px solid $white;
+                    position: relative;
+                    z-index: 10;
+
+                    &.active {
+                        border-bottom: 2px solid $primary-color;
+                        border-left: 0;
+                        top: 1px;
+                        z-index: 20;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+/*
+    Breadcrumbs
+*/
 
 ul.breadcrumbs {
     background: $white;
@@ -546,6 +570,10 @@ ul.breadcrumbs {
     margin-bottom: 2em;
     padding-left: 0;
 }
+
+/*
+    Backend views
+*/
 
 tr.divider {
     border-bottom: 1px solid $iron;

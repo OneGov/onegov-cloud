@@ -42,7 +42,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr tal:repeat="candidate candidates" tal:attributes="class 'sticky' if candidate[2] > 0 else ''">
+                    <tr tal:repeat="candidate candidates" tal:attributes="class 'sticky-row' if candidate[2] > 0 else ''">
                         <td>${candidate[0]} ${candidate[1]}</td>
                         <td class="right-aligned">${layout.format_number(candidate[3])}</td>
                         <td tal:condition="layout.proporz" class="right-aligned">${candidate[4]}</td>

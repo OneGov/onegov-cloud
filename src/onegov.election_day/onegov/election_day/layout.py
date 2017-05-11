@@ -22,6 +22,9 @@ class Layout(ChameleonLayout):
         super().__init__(model, request)
         self.request.include('common')
 
+    def title(self):
+        return ''
+
     @cached_property
     def app_version(self):
         return self.app.settings.core.theme.version
@@ -213,13 +216,13 @@ class ElectionsLayout(Layout):
 
     @cached_property
     def menu(self):
-        return (
+        return [
             (
                 self.title(tab),
                 self.request.link(self.model, tab),
                 'active' if self.tab == tab else ''
             ) for tab in self.all_tabs if self.visible(tab)
-        )
+        ]
 
     @cached_property
     def pdf_path(self):
@@ -436,6 +439,12 @@ class ManageLayout(DefaultLayout):
             menu.append((_("Subscribers"), link, class_))
 
         return menu
+
+    def title(self):
+        try:
+            return self.breadcrumbs[-1][0]
+        except (IndexError, TypeError):
+            return ''
 
     def __init__(self, model, request):
         super().__init__(model, request)
