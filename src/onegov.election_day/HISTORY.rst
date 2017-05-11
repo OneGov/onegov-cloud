@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Fixes deleting an eletion or vote throwing an error when uploading
+  WabstiCExport files.
+  [msom]
+
 - Fixes sent notification prevents deleting votes and elections.
   [msom]
 

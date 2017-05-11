@@ -63,7 +63,10 @@ def view_upload_wabsti_vote(self, request):
     set_locale(request)
 
     data_source = authenticated_source(request)
-    if data_source.type != 'vote':
+    if (
+        data_source.type != 'vote' or
+        not all((item.vote for item in data_source.items))
+    ):
         return {
             'status': 'error',
             'errors': {
@@ -89,6 +92,9 @@ def view_upload_wabsti_vote(self, request):
     archive = ArchivedResultCollection(session)
     for item in data_source.items:
         vote = item.item
+        if not vote:
+            continue
+
         errors[vote.id] = []
         if not self.is_year_available(vote.date.year, self.use_maps):
             errors[vote.id].append(unsupported_year_error(vote.date.year))
@@ -140,7 +146,10 @@ def view_upload_wabsti_majorz(self, request):
     set_locale(request)
 
     data_source = authenticated_source(request)
-    if data_source.type != 'majorz':
+    if (
+        data_source.type != 'majorz' or
+        not all((item.election for item in data_source.items))
+    ):
         return {
             'status': 'error',
             'errors': {
@@ -167,6 +176,8 @@ def view_upload_wabsti_majorz(self, request):
     archive = ArchivedResultCollection(session)
     for item in data_source.items:
         election = item.item
+        if not election:
+            continue
 
         errors[election.id] = []
         if not self.is_year_available(election.date.year, False):
@@ -230,7 +241,10 @@ def view_upload_wabsti_proporz(self, request):
     set_locale(request)
 
     data_source = authenticated_source(request)
-    if data_source.type != 'proporz':
+    if (
+        data_source.type != 'proporz' or
+        not all((item.election for item in data_source.items))
+    ):
         return {
             'status': 'error',
             'errors': {
@@ -256,6 +270,8 @@ def view_upload_wabsti_proporz(self, request):
     archive = ArchivedResultCollection(session)
     for item in data_source.items:
         election = item.item
+        if not election:
+            continue
 
         errors[election.id] = []
         if not self.is_year_available(election.date.year, False):
