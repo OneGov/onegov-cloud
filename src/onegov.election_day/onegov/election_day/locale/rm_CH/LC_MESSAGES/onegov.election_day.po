@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-04 09:40+0200\n"
+"POT-Creation-Date: 2017-05-12 11:31+0200\n"
 "PO-Revision-Date: 2017-04-28 16:04+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -701,6 +701,18 @@ msgid "Wrong username or password"
 msgstr ""
 "Il num da l'utilisadra u da l'utilisader n'è betg enconuschent u il pled-"
 "clav è sbaglià"
+
+msgid "Access Denied"
+msgstr ""
+
+msgid "You are trying to open a page for which you are not authorized."
+msgstr ""
+
+msgid "Page not Found"
+msgstr ""
+
+msgid "The page you are looking for could not be found."
+msgstr ""
 
 msgid ""
 "Successfully subscribed to the SMS services. You will receive an SMS every "
