@@ -355,7 +355,7 @@ $footer-border-width: 0;
 }
 
 @media #{$small-only} {
-    footer .columns > div {
+    .footer-columns > div {
         margin-bottom: 1rem;
     }
 }
