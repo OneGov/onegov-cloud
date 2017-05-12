@@ -54,11 +54,12 @@ It's important to test the code manually, to see visual flaws etc. One can use t
   - [ ] Does the sorting work?
 - [ ] Does the (SMS) notification work?
 - [ ] Do the (front end) views look OK on a mobile?
+- [ ] Does the headerless mode work? (`?headerless` / `?headerful`)
 - [ ] Are linked communal and cantonal instances working?
   - [ ] Do the results get copied to the other instances (`onegov-election-day fetch`)?
   - [ ] Do the links link to the full view on the other instance?
   - [ ] Are the communal results shown instead of the cantonal total on the communal instance?
-- [ ] Do the embedded maps and charts look ok?
+- [ ] Do the embedded maps and charts look ok? ([serve them!](https://gist.github.com/willurd/5720255))
   - [ ] Ballot Maps
   - [ ] Candidates Bar Charts
   - [ ] List Bar Charts

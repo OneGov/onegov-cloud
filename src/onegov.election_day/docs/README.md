@@ -32,14 +32,25 @@ and vote results on a different site:
 -   `{path_to_election}/panachage-chart`: The panachage sankey chart.
 -   `{path_to_election}/parties-chart`: The party results bar chart.
 
-Furthermore, the web app can be called in a headerless mode by browsing
+Make sure you serve the files with the embedding code with a web server!
+
+The views include the https://github.com/davidjbradshaw/iframe-resizer.
+
+
+Headerless Mode
+---------------
+
+The web app can be called in a headerless mode by browsing
 `{root_path}?headerless`. In headerless mode, both the header and footer are
 hidden. The headerless setting is stored in the browser session after the
-intial call which means that browsing all further links are in headerless mode
+initial call which means that browsing all further links are in headerless mode
 as well. End the headerless mode with `{root_path}?headerful`.
 
-Both the special view and the pages in headerless mode include the
-https://github.com/davidjbradshaw/iframe-resizer.
+To set the language, set the a cookie either by browsing to
+`{root_path}/locale/xx` or directly (`locale: xxx`). Valid options are `de_CH`,
+`fr_CH`, `it_CH` or `rm_CH`
+
+The views include the https://github.com/davidjbradshaw/iframe-resizer.
 
 WabstiCExport
 -------------
