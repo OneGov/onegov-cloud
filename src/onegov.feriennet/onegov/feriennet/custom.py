@@ -9,7 +9,7 @@ from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.layout import DefaultLayout
 from onegov.org.custom import get_global_tools as get_base_tools
-from onegov.org.elements import Link, LinkGroup
+from onegov.org.new_elements import Link, LinkGroup
 from onegov.org.models import ExportCollection
 
 
@@ -38,7 +38,7 @@ def get_admin_tools(request):
                 Link(
                     text=_("Periods"),
                     url=request.class_link(PeriodCollection),
-                    classes=('manage-periods', )
+                    attrs={'class': 'manage-periods'}
                 )
             )
 
@@ -47,7 +47,7 @@ def get_admin_tools(request):
                     Link(
                         text=_("Matching"),
                         url=request.class_link(MatchCollection),
-                        classes=('manage-matches', )
+                        attrs={'class': 'manage-matches'}
                     )
                 )
 
@@ -55,7 +55,7 @@ def get_admin_tools(request):
                     Link(
                         text=_("Billing"),
                         url=request.class_link(BillingCollection),
-                        classes=('manage-billing', )
+                        attrs={'class': 'manage-billing'}
                     )
                 )
 
@@ -64,7 +64,7 @@ def get_admin_tools(request):
                 Link(
                     text=_("Attendees"),
                     url=request.class_link(OccasionAttendeeCollection),
-                    classes=('show-attendees', )
+                    attrs={'class': 'show-attendees'}
                 )
             )
 
@@ -75,7 +75,7 @@ def get_admin_tools(request):
                         url=request.class_link(
                             NotificationTemplateCollection
                         ),
-                        classes=('show-notifications', )
+                        attrs={'class': 'show-notifications'}
                     )
                 )
 
@@ -85,7 +85,7 @@ def get_admin_tools(request):
                         url=request.class_link(
                             ExportCollection
                         ),
-                        classes=('show-exports', )
+                        attrs={'class': 'show-exports'}
                     )
                 )
 
@@ -115,17 +115,20 @@ def get_personal_tools(request):
         )
 
         if unpaid:
-            classes = ('with-count', 'alert', 'invoices-count')
-            attributes = {'data-count': str(unpaid)}
+            attributes = {
+                'data-count': str(unpaid),
+                'class': {'with-count', 'alert', 'invoices-count'}
+            }
         else:
-            classes = ('with-count', 'secondary', 'invoices-count')
-            attributes = {'data-count': '0'}
+            attributes = {
+                'data-count': '0',
+                'class': {'with-count', 'secondary', 'invoices-count'}
+            }
 
         yield Link(
             text=_("Invoices"),
             url=request.link(invoice_items),
-            classes=classes,
-            attributes=attributes
+            attrs=attributes
         )
 
         bookings = BookingCollection(session)
@@ -140,25 +143,31 @@ def get_personal_tools(request):
             count = bookings.booking_count(username, states)
 
             if count:
-                classes = (
-                    'with-count', period.confirmed and 'success' or 'info')
-                attributes = {'data-count': str(count)}
+                attributes = {
+                    'data-count': str(count),
+                    'class': {
+                        'with-count', period.confirmed and 'success' or 'info'
+                    }
+                }
             else:
-                classes = ('with-count', 'secondary')
-                attributes = {'data-count': '0'}
+                attributes = {
+                    'data-count': '0',
+                    'class': {'with-count', 'secondary'}
+                }
 
             yield Link(
                 text=period.confirmed and _("Bookings") or _("Wishlist"),
                 url=request.link(bookings),
-                classes=classes,
-                attributes=attributes
+                attrs=attributes
             )
         else:
             yield Link(
                 text=_("Wishlist"),
                 url=request.link(bookings),
-                classes=('with-count', 'secondary'),
-                attributes={'data-count': '0'}
+                attrs={
+                    'data-count': '0',
+                    'class': {'with-count', 'secondary'}
+                },
             )
 
 

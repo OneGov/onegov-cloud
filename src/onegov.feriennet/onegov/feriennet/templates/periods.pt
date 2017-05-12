@@ -52,7 +52,7 @@
                     </td>
                     <td>
                         <ul class="small dense">
-                            <li tal:repeat="link links(period)" tal:content="structure link(request)" />
+                            <li tal:repeat="link links(period)" tal:content="structure link(layout)" />
                         </ul>
                     </td>
                 </tr>

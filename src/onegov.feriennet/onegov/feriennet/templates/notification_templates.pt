@@ -22,7 +22,7 @@
                 </div>
 
                 <div class="text-links">
-                    <tal:block repeat="link get_links(notification)" replace="structure link(request)" />
+                    <tal:block repeat="link get_links(notification)" replace="structure link(layout)" />
                 </div>
             </li>
         </ul>

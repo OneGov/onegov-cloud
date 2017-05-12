@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves the speed by which the matches view is rendered.
+  [href]
+
 - Adds platform sponsoring.
   [href]
 

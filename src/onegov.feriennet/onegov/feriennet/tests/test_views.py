@@ -1428,7 +1428,7 @@ def test_cancel_occasion(feriennet_app):
     fill_out_profile(client)
 
     page = client.get('/angebot/foobar')
-    assert "L&#246;schen" in page
+    assert "Löschen" in page
     assert "Absagen" not in page
     assert "Reaktivieren" not in page
 
@@ -1436,7 +1436,7 @@ def test_cancel_occasion(feriennet_app):
     assert "Angenommen" in client.get('/meine-buchungen')
 
     page = client.get('/angebot/foobar')
-    assert "L&#246;schen" not in page
+    assert "Löschen" not in page
     assert "Absagen" in page
     assert "Reaktivieren" not in page
 
@@ -1444,7 +1444,7 @@ def test_cancel_occasion(feriennet_app):
     assert "Storniert" in client.get('/meine-buchungen')
 
     page = client.get('/angebot/foobar')
-    assert "L&#246;schen" not in page
+    assert "Löschen" not in page
     assert "Absagen" not in page
     assert "Reaktivieren" in page
 
@@ -1452,13 +1452,13 @@ def test_cancel_occasion(feriennet_app):
     assert "Storniert" in client.get('/meine-buchungen')
 
     page = client.get('/angebot/foobar')
-    assert "L&#246;schen" not in page
+    assert "Löschen" not in page
     assert "Absagen" in page
     assert "Reaktivieren" not in page
 
     client.delete(get_delete_link(client.get('/meine-buchungen')))
     page = client.get('/angebot/foobar')
-    assert "L&#246;schen" in page
+    assert "Löschen" in page
     assert "Absagen" not in page
     assert "Reaktivieren" not in page
 

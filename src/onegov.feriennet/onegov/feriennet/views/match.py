@@ -74,7 +74,7 @@ def handle_matches(self, request, form):
     phase_title = wishlist_phase and _("Wishlist") or _("Bookings")
 
     @lru_cache(maxsize=128)
-    def booking_link(username):
+    def bookings_link(username):
         return request.class_link(
             BookingCollection, {
                 'period_id': self.period.id,
@@ -101,7 +101,7 @@ def handle_matches(self, request, form):
     def record_links(record):
         yield Link(_("User"), user_link(record.attendee_username))
         yield Link(_("Attendee"), attendee_link(record.attendee_id))
-        yield Link(phase_title, booking_link(record.attendee_username))
+        yield Link(phase_title, bookings_link(record.attendee_username))
 
         if wishlist_phase:
             yield Link(

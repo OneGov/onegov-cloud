@@ -269,6 +269,6 @@ def view_billing_import(self, request, form):
         ),
         'model': self,
         'post_url': layout.csrf_protected_url(
-            URL(request.link(self, 'import-ausfuehren'))
+            request.link(self, 'import-ausfuehren')
         )
     }

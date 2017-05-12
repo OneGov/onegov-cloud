@@ -18,8 +18,8 @@ from onegov.feriennet.layout import VacationActivityCollectionLayout
 from onegov.feriennet.layout import VacationActivityFormLayout
 from onegov.feriennet.layout import VacationActivityLayout
 from onegov.feriennet.models import VacationActivity
-from onegov.org.elements import Link, ConfirmLink, DeleteLink
 from onegov.org.mail import send_html_mail
+from onegov.org.new_elements import Link, Confirm, Intercooler
 from onegov.ticket import TicketCollection
 from sqlalchemy import desc
 from sqlalchemy.orm import contains_eager
@@ -235,17 +235,23 @@ def view_activity(self, request):
 
     occasion_links = (
         lambda o: Link(text=_("Edit"), url=request.link(o, name='bearbeiten')),
-        lambda o: DeleteLink(
+        lambda o: Link(
             text=_("Delete"), url=layout.csrf_protected_url(request.link(o)),
-            confirm=_('Do you really want to delete "${title}"?', mapping={
-                'title': layout.format_datetime_range(
-                    o.dates[0].localized_start,
-                    o.dates[0].localized_end
+            traits=(
+                Confirm(
+                    _('Do you really want to delete "${title}"?', mapping={
+                        'title': layout.format_datetime_range(
+                            o.dates[0].localized_start,
+                            o.dates[0].localized_end
+                        ),
+                    }),
+                    yes=_("Delete Occasion")
                 ),
-            }),
-            redirect_after=request.link(self),
-            yes_button_text=_("Delete Occasion"),
-            classes=('confirm', )
+                Intercooler(
+                    request_method='DELETE',
+                    redirect_after=request.link(self)
+                ),
+            )
         )
     )
 
@@ -265,54 +271,71 @@ def view_activity(self, request):
         )
 
         if o.cancelled and not o.period.finalized:
-            yield ConfirmLink(
+            yield Link(
                 text=_("Reinstate"),
                 url=layout.csrf_protected_url(
                     request.link(o, name='reinstate')
                 ),
-                confirm=_((
-                    'Do you really want to reinstate "${title}"?'
-                ), mapping={
-                    'title': title
-                }),
-                extra_information=_("Previous attendees need to re-apply"),
-                redirect_after=request.link(self),
-                yes_button_text=_("Reinstate Occasion"),
-                classes=('confirm', )
+                traits=(
+                    Confirm(
+                        _(
+                            'Do you really want to reinstate "${title}"?',
+                            mapping={'title': title}
+                        ),
+                        _("Previous attendees need to re-apply"),
+                        _("Reinstate Occasion"),
+                    ),
+                    Intercooler(
+                        request_method="POST",
+                        redirect_after=request.link(self)
+                    )
+                )
             )
         elif o.id in occasion_ids_with_bookings and not o.period.finalized:
-            yield ConfirmLink(
+            yield Link(
                 text=_("Rescind"),
                 url=layout.csrf_protected_url(request.link(o, name='cancel')),
-                confirm=_((
-                    'Do you really want to rescind "${title}"?'
-                ), mapping={
-                    'title': title
-                }),
-                extra_information=_((
-                    "${count} already accepted bookings will be cancelled"
-                ), mapping={
-                    'count': o.attendee_count
-                }),
-                redirect_after=request.link(self),
-                yes_button_text=_("Rescind Occasion"),
-                classes=('confirm', )
+                traits=(
+                    Confirm(
+                        _(
+                            'Do you really want to rescind "${title}"?',
+                            mapping={'title': title}
+                        ),
+                        _(
+                            "${count} already accepted bookings will "
+                            "be cancelled", mapping={'count': o.attendee_count}
+                        ),
+                        _(
+                            "Rescind Occasion"
+                        )
+                    ),
+                    Intercooler(
+                        request_method="POST",
+                        redirect_after=request.link(self)
+                    )
+                )
             )
         elif o.id not in occasion_ids_with_bookings:
-            yield DeleteLink(
+            yield Link(
                 text=_("Delete"),
                 url=layout.csrf_protected_url(request.link(o)),
-                confirm=_('Do you really want to delete "${title}"?', mapping={
-                    'title': title
-                }),
-                extra_information=_((
-                    "There are no accepted bookings associated with this "
-                    "occasion, though there might be cancelled/blocked "
-                    "bookings which will be deleted."
-                )),
-                redirect_after=request.link(self),
-                yes_button_text=_("Delete Occasion"),
-                classes=('confirm', )
+                traits=(
+                    Confirm(
+                        _('Do you really want to delete "${title}"?', mapping={
+                            'title': title
+                        }),
+                        _((
+                            "There are no accepted bookings associated with "
+                            "this occasion, though there might be "
+                            "cancelled/blocked bookings which will be deleted."
+                        )),
+                        _("Delete Occasion")
+                    ),
+                    Intercooler(
+                        request_method="DELETE",
+                        redirect_after=request.link(self)
+                    )
+                )
             )
 
     def show_enroll(occasion):
