@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.8.9 (2017-05-12)
+~~~~~~~~~~~~~~~~~~~
+
 - The deadline is now inclusive (including the day it ends) for dates.
   [href]
 
