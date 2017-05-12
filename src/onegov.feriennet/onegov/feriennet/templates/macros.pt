@@ -28,10 +28,10 @@
 <metal:footer define-macro="footer">
     <footer>
         <div>
-            <metal:block use-macro="layout.macros['footer_sponsors']" />
             <div class="row footer-content">
                 <div class="small-12 columns">
                     <metal:block use-macro="layout.macros['footer_columns']" />
+                    <metal:block use-macro="layout.macros['footer_sponsors']" />
                     <metal:block use-macro="layout.macros['footer_links']" />
                 </div>
             </div>
@@ -73,18 +73,16 @@
 </metal:footer_columns>
 
 <metal:footer_sponsors define-macro="footer_sponsors" i18n:domain="onegov.feriennet">
-    <div class="sponsors" tal:condition="layout.app.sponsors">
-        <div class="row">
-            <div class="columns small-12">
-                <h2 i18n:translate>Platform Sponsors</h2>
+    <div class="row">
+        <div class="columns small-12">
+            <h2 i18n:translate>Platform Sponsors</h2>
 
-                <div tal:repeat="chunk layout.chunks(layout.app.sponsors, 4)" class="row sponsors-row">
-                    <div tal:repeat="sponsor chunk" class="columns small-12 medium-3 large-3 ${repeat.sponsor.end and 'end' or ''}">
-                        <div tal:condition="sponsor" class="sponsor" style="background-color: ${sponsor.background};">
-                            <a href="${sponsor.link}" title="${sponsor.name}">
-                                <img height="${sponsor.height}" width="${sponsor.width}" src="${sponsor.logo_path(request)}" style="top: ${sponsor.top};">
-                            </a>
-                        </div>
+            <div tal:repeat="chunk layout.chunks(layout.app.sponsors, 4)" class="row sponsors-row">
+                <div tal:repeat="sponsor chunk" class="columns small-12 medium-3 large-3 ${repeat.sponsor.end and 'end' or ''}">
+                    <div tal:condition="sponsor" class="sponsor" style="background-color: ${sponsor.background};">
+                        <a href="${sponsor.link}" title="${sponsor.name}">
+                            <img height="${sponsor.height}" width="${sponsor.width}" src="${sponsor.logo_path(request)}" style="top: ${sponsor.top};">
+                        </a>
                     </div>
                 </div>
             </div>
