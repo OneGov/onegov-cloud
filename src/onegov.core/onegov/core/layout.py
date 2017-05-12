@@ -83,7 +83,8 @@ class Layout(object):
         own thing automatically).
 
         """
-        return self.request.new_csrf_token().decode('utf-8')
+        token = self.request.new_csrf_token()
+        return token.decode('utf-8') if isinstance(token, bytes) else token
 
     def csrf_protected_url(self, url):
         """ Adds a csrf token to the given url. """
