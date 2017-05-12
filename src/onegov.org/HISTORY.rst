@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.8.1 (2017-05-12)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes footer margins not working.
   [href]
 
