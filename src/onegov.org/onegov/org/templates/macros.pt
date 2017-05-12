@@ -23,7 +23,7 @@
             </ul>
             <section class="top-bar-section">
                 <ul class="left">
-                    <li tal:repeat="link links" tal:content="structure link(request)" />
+                    <li tal:repeat="link links" tal:content="structure link(layout)" />
                 </ul>
             </section>
         </nav>
@@ -42,12 +42,12 @@
                         </button>
                         <ul id="${dropdown_id}" data-dropdown-content class="f-dropdown disable-scroll">
                             <li tal:repeat="link group.links">
-                                <tal:block replace="structure link(request)" />
+                                <tal:block replace="structure link(layout)" />
                             </li>
                         </ul>
                     </tal:block>
                     <tal:block condition="group.url|nothing" define="link group">
-                        <tal:block replace="structure link(request, ('tiny', 'button'))" />
+                        <tal:block replace="structure link(layout, ('tiny', 'button'))" />
                     </tal:block>
                 </tal:block>
             </div>
@@ -60,7 +60,7 @@
         <ul class="breadcrumbs" tal:condition="layout.breadcrumbs">
             <tal:block repeat="link layout.breadcrumbs">
                 <li tal:attributes="class repeat.link.end and 'current' or ''"
-                    tal:content="structure link(request)">
+                    tal:content="structure link(layout)">
                 </li>
             </tal:block>
         </ul>
@@ -70,7 +70,7 @@
 <metal:panel-links define-macro="panel-links">
     <ul class="panel-links">
         <li tal:repeat="link panel.links">
-            <tal:block content="structure link(request)" />
+            <tal:block content="structure link(layout)" />
             <small>${link.subtitle}</small>
         </li>
     </ul>
@@ -222,7 +222,7 @@
                             <h3>${tile.page.text}</h3>
                         </a>
                         <div class="child-links">
-                            <tal:block repeat="link tile.links" tal:content="structure link(request)" />
+                            <tal:block repeat="link tile.links" tal:content="structure link(layout)" />
                         </div>
                     </div>
                 </tal:block>
@@ -286,7 +286,6 @@
 
 <metal:hidden_page_hint define-macro="hidden_from_public_hint" i18n:domain="onegov.org">
     <tal:block condition="item.is_hidden_from_public|nothing">
-        <!--! Note, this snippet is duplicated in the Link class in elements.py -->
         <i title="This site is hidden from the general public" i18n:attributes="title" class="hidden-from-public-hint"></i>
     </tal:block>
 </metal:hidden_page_hint>
@@ -455,7 +454,7 @@
         <ul class="side-nav" data-sortable data-sortable-url="${layout.sortable_url_template}">
             <tal:block repeat="link layout.sidebar_links">
                 <li tal:define="is_group hasattr(link, 'links')" class="${is_group and 'active' or ''}" data-sortable-id="${request.is_manager and link.model.id}">
-                    <tal:block condition="not:is_group" replace="structure link(request)" />
+                    <tal:block condition="not:is_group" replace="structure link(layout)" />
                     <tal:block condition="is_group">
                         <a href="#" class="group-title">${link.title}
                             <metal:block use-macro="layout.macros['hidden_from_public_hint']" tal:define="item link"/>

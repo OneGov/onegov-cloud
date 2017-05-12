@@ -74,6 +74,10 @@ class Link(HiddenElementMixin):
     def __call__(self, request, extra_classes=None):
         """ Renders the element. """
 
+        # compatibility shim for new elements
+        if hasattr(request, 'request'):
+            request = request.request
+
         a = builder.A(request.translate(self.text))
 
         if self.request_method == 'GET':
@@ -173,7 +177,7 @@ class ConfirmLink(DeleteLink):
                  extra_information=None,
                  redirect_after=None,
                  request_method='POST',
-                 classes=('confirm', 'confirm-link')):
+                 classes=('confirm', )):
 
         super().__init__(
             text, url, confirm, yes_button_text, no_button_text,

@@ -16,7 +16,7 @@
                         <div class="small-12 columns">
                             <ul class="inline-list page-links">
                                 <li tal:repeat="link children">
-                                    <tal:block replace="structure link(request)" />
+                                    <tal:block replace="structure link(layout)" />
                                 </li>
                             </ul>
                         </div>

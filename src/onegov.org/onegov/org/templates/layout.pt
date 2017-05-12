@@ -41,12 +41,12 @@
                           <a href="#" data-dropdown="${dropdown_id}" class="dropdown ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
                           <ul id="${dropdown_id}" data-dropdown-content class="f-dropdown disable-scroll">
                               <li tal:repeat="link tool.links">
-                                  <tal:block replace="structure link(request)" />
+                                  <tal:block replace="structure link(layout)" />
                               </li>
                           </ul>
                     </tal:block>
-                    <tal:block condition="tool.url|nothing" define="link tool">
-                        <tal:block replace="structure link(request)" />
+                    <tal:block condition="tool.url|tool.id|nothing" define="link tool">
+                        <tal:block replace="structure link(layout)" />
                     </tal:block>
                 </li>
             </ul>

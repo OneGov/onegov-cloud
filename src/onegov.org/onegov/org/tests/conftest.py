@@ -3,9 +3,12 @@ import transaction
 import pytest
 
 from onegov.org import OrgApp
-from onegov.user import User
 from onegov.org.initial_content import create_new_organisation
+from onegov.org.layout import DefaultLayout
+from onegov.org.new_elements import Element
+from onegov.org.testing import Client
 from onegov.testing.utils import create_app
+from onegov.user import User
 
 
 @pytest.yield_fixture(scope='session')
@@ -51,3 +54,26 @@ def create_org_app(request, use_elasticsearch, cls=OrgApp):
     session.close_all()
 
     return app
+
+
+@pytest.yield_fixture(scope='function')
+def render_element(request):
+    class App(OrgApp):
+        pass
+
+    @App.path(path='/element', model=Element)
+    def get_element(app):
+        return app.element
+
+    @App.html(model=Element)
+    def render_element(self, request):
+        return self(DefaultLayout(getattr(self, 'model', None), request))
+
+    app = create_org_app(request, use_elasticsearch=False, cls=App)
+    client = Client(app)
+
+    def render(element):
+        app.element = element
+        return client.get('/element')
+
+    return render

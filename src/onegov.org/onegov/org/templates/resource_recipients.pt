@@ -31,7 +31,7 @@
                     </tal:block>
                 </div>
                 <div class="text-links">
-                    <tal:block repeat="link recipient_links(recipient)" replace="structure link(request)" />
+                    <tal:block repeat="link recipient_links(recipient)" replace="structure link(layout)" />
                 </div>
             </li>
         </ul>

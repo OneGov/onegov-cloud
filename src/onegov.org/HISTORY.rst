@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Introduces an improved elements model for link generation.
+  [href]
+
 0.7.3 (2017-05-11)
 ~~~~~~~~~~~~~~~~~~~
 

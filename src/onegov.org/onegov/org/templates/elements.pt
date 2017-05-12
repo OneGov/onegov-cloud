@@ -1,0 +1,16 @@
+<xml xmlns="http://www.w3.org/1999/xhtml" i18n:domain="onegov.org">
+
+<!--! A generic link element -->
+<metal:b define-macro="link">
+    <a tal:attributes="e.attrs">
+        ${e.text or ''}
+    </a>
+    <tal:b condition="e.is_hidden_from_public">
+        <metal:b
+            tal:define="item e.model"
+            use-macro="layout.macros['hidden_from_public_hint']"
+        />
+    </tal:b>
+</metal:b>
+
+</xml>

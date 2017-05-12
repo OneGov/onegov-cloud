@@ -402,6 +402,10 @@ class DefaultLayout(Layout):
             Link(r.title, self.request.link(r)) for r in self.root_pages
         )
 
+    @cached_property
+    def elements(self):
+        return self.template_loader['elements.pt']
+
 
 class DefaultMailLayout(Layout):
     """ A special layout for creating HTML E-Mails. """

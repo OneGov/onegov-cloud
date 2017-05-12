@@ -380,13 +380,14 @@ $footer-border-width: 0;
 /*
     Links in simple text style (side by side)
 */
-.text-links a:first-child:before {
-    content: '';
+.text-links a:first-child::before {
+    display: none;
 }
 
-.text-links a:before {
+.text-links a::before {
     color: $body-font-color;
     content: ' | ';
+    display: inline-block;
 }
 
 /*
