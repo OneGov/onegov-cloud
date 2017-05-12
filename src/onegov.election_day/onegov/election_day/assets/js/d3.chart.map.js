@@ -23,7 +23,7 @@
             legendHeight: 10,
             legendMargin: 30,
             fontSizePx: 14,
-            fontFamily: 'sans-serif',
+            fontFamily: 'sans-serif'
         };
 
         if (params) {
