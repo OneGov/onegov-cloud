@@ -1976,13 +1976,12 @@ def test_deadline(session, collections, prebooking_period, owner):
         activity=collections.activities.add("Sport", username=owner.username),
         period=period
     )
-
     assert occasion.deadline == period.execution_start.date()
+
     period.deadline_days = 1
+    assert occasion.deadline == (start - timedelta(days=2)).date()
 
-    assert occasion.deadline == (start - timedelta(days=1)).date()
     period.deadline_date = date(2017, 2, 23)
-
     assert occasion.deadline == date(2017, 2, 23)
 
 

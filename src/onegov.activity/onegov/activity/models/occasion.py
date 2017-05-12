@@ -170,9 +170,12 @@ class Occasion(Base, TimestampMixin):
     def max_spots(self):
         return self.spots.upper - 1
 
+    def is_past_deadline(self, date):
+        return date > self.deadline
+
     @property
     def deadline(self):
-        """ The date until which this occasion may be booked. """
+        """ The date until which this occasion may be booked (inclusive). """
         period = self.period
 
         if period.deadline_date is not None:
@@ -181,7 +184,7 @@ class Occasion(Base, TimestampMixin):
         min_date = min(d.start for d in self.dates)
 
         if period.deadline_days is not None:
-            return (min_date - timedelta(days=period.deadline_days)).date()
+            return (min_date - timedelta(days=period.deadline_days + 1)).date()
 
         return min_date.date()
 
