@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- The deadline is now inclusive (including the day it ends).
+  [href]
+
 - Improves the speed by which the matches view is rendered.
   [href]
 

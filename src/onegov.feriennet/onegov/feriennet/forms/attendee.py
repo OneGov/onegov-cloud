@@ -346,7 +346,7 @@ class AttendeeSignupForm(AttendeeBase):
         if self.request.is_admin:
             return True
 
-        if date.today() >= self.model.deadline:
+        if self.model.is_past_deadline(date.today()):
             self.attendee.errors.append(_("The deadline has passed"))
             return False
 

@@ -357,7 +357,7 @@ def view_activity(self, request):
         if occasion.period.phase not in ('wishlist', 'booking', 'execution'):
             return False
 
-        if not request.is_admin and date.today() >= occasion.deadline:
+        if not request.is_admin and occasion.is_past_deadline(date.today()):
             return False
 
         if occasion.period.wishlist_phase and\
