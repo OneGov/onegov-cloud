@@ -21,6 +21,7 @@ class Layout(ChameleonLayout):
     def __init__(self, model, request):
         super().__init__(model, request)
         self.request.include('common')
+        self.request.include('custom')
 
     def title(self):
         return ''
@@ -448,7 +449,7 @@ class ManageLayout(DefaultLayout):
 
     def __init__(self, model, request):
         super().__init__(model, request)
-        self.request.include('form')
+        self.request.include('backend_common')
         self.breadcrumbs = [
             (_("Manage"), super().manage_link, 'unavailable'),
         ]

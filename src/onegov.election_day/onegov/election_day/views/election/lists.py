@@ -53,8 +53,6 @@ def view_election_lists_chart(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_result_change)
 
-    request.include('charts')
-
     return {
         'model': self,
         'layout': DefaultLayout(self, request),
@@ -68,8 +66,6 @@ def view_election_lists_chart(self, request):
                      name='lists', permission=Public)
 def view_election_lists(self, request):
     """" The main view. """
-
-    request.include('charts')
 
     handle_headerless_params(request)
 

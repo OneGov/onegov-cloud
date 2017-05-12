@@ -132,8 +132,6 @@ def view_election_parties_chart(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_result_change)
 
-    request.include('charts')
-
     return {
         'model': self,
         'layout': DefaultLayout(self, request),
@@ -147,10 +145,6 @@ def view_election_parties_chart(self, request):
                      name='parties', permission=Public)
 def view_election_parties(self, request):
     """" The main view. """
-
-    request.include('charts')
-
-    handle_headerless_params(request)
 
     years, parties = get_party_results(self)
     deltas, results = get_party_deltas(self, years, parties)

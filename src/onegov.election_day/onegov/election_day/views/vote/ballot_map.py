@@ -20,8 +20,6 @@ def view_ballot_as_map(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.vote.last_result_change)
 
-    request.include('ballot_map')
-
     return {
         'model': self,
         'layout': DefaultLayout(self, request),

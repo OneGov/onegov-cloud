@@ -13,8 +13,6 @@ from onegov.election_day.utils import handle_headerless_params
 def view_vote_proposal(self, request):
     """" The main view. """
 
-    request.include('ballot_map')
-
     handle_headerless_params(request)
 
     return {
@@ -29,8 +27,6 @@ def view_vote_proposal(self, request):
 def view_vote_counter_proposal(self, request):
     """" The main view. """
 
-    request.include('ballot_map')
-
     handle_headerless_params(request)
 
     return {
@@ -44,8 +40,6 @@ def view_vote_counter_proposal(self, request):
                      name='tie-breaker')
 def view_vote_tie_breaker(self, request):
     """" The main view. """
-
-    request.include('ballot_map')
 
     handle_headerless_params(request)
 

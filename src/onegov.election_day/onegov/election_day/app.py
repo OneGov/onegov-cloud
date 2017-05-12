@@ -204,46 +204,51 @@ def get_webasset_output():
     return 'assets/bundles'
 
 
-@ElectionDayApp.webasset('form')
-def get_form_asset():
-    yield 'jquery.datetimepicker.css'
-    yield 'jquery.datetimepicker.js'
-    yield 'datetimepicker.js'
-    yield 'form_dependencies.js'
-
-
-@ElectionDayApp.webasset('charts')
-def get_bar_chart_asset():
-    yield 'd3.js'
-    yield 'd3.sankey.js'
-    yield 'd3.chart.bar.js'
-    yield 'd3.chart.grouped.js'
-    yield 'd3.chart.sankey.js'
-    yield 'jquery.js'
-    yield 'embed.js'
-    yield 'charts.js'
-
-
-@ElectionDayApp.webasset('ballot_map')
-def get_ballot_map_asset():
-    yield 'jquery.js'
-    yield 'topojson.js'
-    yield 'd3.js'
-    yield 'd3.tip.js'
-    yield 'd3.chart.map.js'
-    yield 'embed.js'
-    yield 'ballot-map.js'
-
-
 @ElectionDayApp.webasset('common')
 def get_common_asset():
+    # Common assets unlikely to change
     yield 'modernizr.js'
+
+    # jQuery
     yield 'jquery.js'
     yield 'jquery.tablesorter.js'
     yield 'jquery.tablesorter.staticRow.js'
+
+    # D3
+    yield 'd3.js'
+    yield 'topojson.js'
+    yield 'd3.tip.js'
+    yield 'd3.sankey.js'
+
+    # other frameworks
     yield 'fastclick.js'
     yield 'foundation.js'
     yield 'underscore.js'
     yield 'stacktable.js'
     yield 'iframeResizer.contentWindow.js'
+
+
+@ElectionDayApp.webasset('custom')
+def get_custom_asset():
+    # common code
     yield 'common.js'
+
+    # D3 charts
+    yield 'd3.chart.bar.js'
+    yield 'd3.chart.grouped.js'
+    yield 'd3.chart.map.js'
+    yield 'd3.chart.sankey.js'
+
+    # Chart initalization
+    yield 'embed.js'
+    yield 'charts.js'
+    yield 'ballot-map.js'
+
+
+@ElectionDayApp.webasset('backend_common')
+def get_backend_common_asset():
+    # Common assets unlikely to change, only used in the backend
+    yield 'jquery.datetimepicker.css'
+    yield 'jquery.datetimepicker.js'
+    yield 'datetimepicker.js'
+    yield 'form_dependencies.js'
