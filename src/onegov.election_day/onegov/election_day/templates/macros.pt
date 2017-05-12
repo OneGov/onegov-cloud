@@ -154,7 +154,7 @@
     <div class="tab-navigation clearfix" tal:condition="layout.menu">
         <nav class="top-bar" data-topbar role="navigation">
             <ul class="title-area">
-                <li class="name menu-icon"><span>${layout.title()}<span></li>
+                <li class="name menu-icon"><span>${layout.title()}</span></li>
                 <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
             </ul>
             <section class="top-bar-section">
