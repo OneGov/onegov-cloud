@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.40.3 (2017-05-12)
+~~~~~~~~~~~~~~~~~~~
 
 - Improves performance for pages with a lot of generated links.
   [href]
