@@ -54,6 +54,7 @@ It's important to test the code manually, to see visual flaws etc. One can use t
   - [ ] Does the sorting work?
 - [ ] Does the (SMS) notification work?
 - [ ] Do the (front end) views look OK on a mobile?
+- [ ] Do the (front end) views look OK on different browsers?
 - [ ] Does the headerless mode work? (`?headerless` / `?headerful`)
 - [ ] Are linked communal and cantonal instances working?
   - [ ] Do the results get copied to the other instances (`onegov-election-day fetch`)?
