@@ -179,7 +179,7 @@ def render_macro(macro, request, content, suppress_global_variables=True):
     if not hasattr(request, '_macro_variables'):
         variables = get_default_vars(
             request=request,
-            content=content,
+            content={},
             suppress_global_variables=suppress_global_variables
         )
 
@@ -187,12 +187,11 @@ def render_macro(macro, request, content, suppress_global_variables=True):
         variables.setdefault('__convert', variables['translate'])
         variables.setdefault('__decode', decode_string)
         variables.setdefault('target_language', None)
-        variables.update(content)
-
         request._macro_variables = variables
     else:
-        variables = request._macro_variables
+        variables = request._macro_variables.copy()
 
+    variables.update(content)
     variables['repeat'] = RepeatDict({})
 
     stream = list()

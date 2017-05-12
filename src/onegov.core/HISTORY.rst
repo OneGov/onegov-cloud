@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes macro caching being too agressive.
+  [href]
+
 0.40.3 (2017-05-12)
 ~~~~~~~~~~~~~~~~~~~
 
