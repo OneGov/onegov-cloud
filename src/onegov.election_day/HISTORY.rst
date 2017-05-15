@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.8.13 (2017-05-15)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes ballot map hovering issue.
   [msom]
