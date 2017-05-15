@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.8.12 (2017-05-15)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds exception views.
   [msom]
