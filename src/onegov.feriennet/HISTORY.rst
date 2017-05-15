@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes export not working if the period's cost was set to None.
+  [href]
+
 0.11.0 (2017-05-12)
 ~~~~~~~~~~~~~~~~~~~
 

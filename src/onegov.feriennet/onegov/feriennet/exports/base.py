@@ -43,9 +43,9 @@ class FeriennetExport(Export):
         if occasion.period.all_inclusive:
             cost = 0
         else:
-            cost = occasion.period.booking_cost
+            cost = occasion.period.booking_cost or 0
 
-        cost += occasion.cost or 0
+        cost = occasion.cost or 0
 
         yield _("Occasion Rescinded"), occasion.cancelled
         yield _("Occasion Dates"), dates
