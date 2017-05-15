@@ -141,8 +141,18 @@
                     });
                 if (interactive) {
                     municipalities
-                        .on('mouseover', tooltip.show)
-                        .on('mouseout', tooltip.hide)
+                        .on('mouseover.tooltip', tooltip.show)
+                        .on('mouseout.tooltip', tooltip.hide)
+                        .on('mouseover.highlight', function(d) {
+                            // http://stackoverflow.com/a/4006353/3690178
+                            if (!d3.select(this).classed('selected')) {
+                              d3.select(this).classed('selected', true);
+                              $(this).parent(this).prepend(this);
+                            }
+                        })
+                        .on('mouseout.highlight', function() {
+                            d3.select(this).classed('selected', false);
+                        })
                         .on('click', tooltip.show);
                 }
 
@@ -261,23 +271,6 @@
 
 
                 if (interactive) {
-                    // move each element up when it's selected (there's no z-index in
-                    // svg) and make sure the others are deselecte
-                    $(container).find('.municipality path').each(function(ix, path) {
-                        $(path).on('mouseenter', function() {
-                            $('.municipality path.selected').each(
-                                function() {
-                                    $(this).removeClass('selected');
-                                }
-                            );
-                            $(this).attr('class', $(this).attr('class') + ' selected');
-                            $(this).parent(this).prepend(this);
-                        });
-                        $(path).on('mouseleave', function() {
-                            $(this).attr('class', $(this).attr('class').replace('selected', ''));
-                        });
-                    });
-
                     // Add tooltips
                     svg.call(tooltip);
 
