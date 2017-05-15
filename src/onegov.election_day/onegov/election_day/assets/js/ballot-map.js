@@ -22,7 +22,8 @@
                     var embed_link = $(el).data('embed-link');
                     var embed_source = $(el).data('embed-source');
                     if (embed_link && embed_source) {
-                        appendEmbedCode(el, 500, map.height(), embed_source, embed_link);
+                        var ratio = map.width() / map.height();
+                        appendEmbedCode(el, 500, Math.floor(500 / ratio), embed_source, embed_link);
                     }
                 });
             });

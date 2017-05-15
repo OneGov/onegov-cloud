@@ -4,6 +4,9 @@ Changelog
 - Adds exception views.
   [msom]
 
+- Fixes height of maps in embedding code.
+  [msom]
+
 1.8.11 (2017-05-11)
 ~~~~~~~~~~~~~~~~~~~
 
