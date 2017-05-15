@@ -53,9 +53,11 @@ It's important to test the code manually, to see visual flaws etc. One can use t
   - [ ] Can you view/remove the subscribers?
   - [ ] Does the sorting work?
 - [ ] Does the (SMS) notification work?
-- [ ] Do the (front end) views look OK on a mobile?
-- [ ] Do the (front end) views look OK on different browsers?
+- [ ] Do the (front end) views look OK
+  - [ ] On different browsers?
+  - [ ] On a mobile?
 - [ ] Does the headerless mode work? (`?headerless` / `?headerful`)
+- [ ] Do the exception views (not found, unauthorized) work?
 - [ ] Are linked communal and cantonal instances working?
   - [ ] Do the results get copied to the other instances (`onegov-election-day fetch`)?
   - [ ] Do the links link to the full view on the other instance?
