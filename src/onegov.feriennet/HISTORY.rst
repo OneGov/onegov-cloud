@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.11.1 (2017-05-17)
+~~~~~~~~~~~~~~~~~~~
+
 - Shows the ESR participation number instead of the account if selected.
   [href]
 
