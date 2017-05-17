@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Shows the ESR participation number instead of the account if selected.
+  [href]
+
 - Changes the footer/sponsorship styles.
   [href]
 

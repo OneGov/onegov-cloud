@@ -41,8 +41,11 @@ def view_my_invoices(self, request):
             'user': user.title
         })
 
-    account = request.app.org.bank_account
-    account = account and iban.format(account)
+    if request.app.org.bank_payment_order_type == 'esr':
+        account = request.app.org.bank_esr_participant_number
+    else:
+        account = request.app.org.bank_account
+        account = account and iban.format(account)
 
     beneficiary = request.app.org.bank_beneficiary
 
