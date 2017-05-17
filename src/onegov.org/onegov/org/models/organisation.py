@@ -50,6 +50,7 @@ class Organisation(Base, TimestampMixin):
     bank_account = meta_property('bank_account')
     bank_beneficiary = meta_property('bank_beneficiary')
     bank_payment_order_type = meta_property('bank_payment_order_type')
+    bank_esr_participant_number = meta_property('bank_esr_participant_number')
 
     @contact.setter
     def contact(self, value):

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds an esr participation number to the bank account information.
+  [href]
+
 0.8.1 (2017-05-12)
 ~~~~~~~~~~~~~~~~~~~
 

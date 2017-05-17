@@ -56,11 +56,18 @@ class SettingsForm(Form):
     )
     bank_payment_order_type = RadioField(
         label=_("Payment Order"),
+        fieldset=_("Payment"),
         choices=[
             ('basic', _("Basic")),
             ('esr', _("With reference number (ESR)")),
         ],
         default='basic'
+    )
+    bank_esr_participant_number = StringField(
+        label=_("ESR participant number"),
+        fieldset=_("Payment"),
+        validators=[validators.InputRequired()],
+        depends_on=('bank_payment_order_type', 'esr')
     )
     contact = TextAreaField(
         label=_("Contact"),
