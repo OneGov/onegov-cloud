@@ -174,10 +174,32 @@ ul.single-line {
 /*
     Footer logo
 */
-.projuventute-logo {
+.pro-juventute-logo {
     display: block;
     margin-bottom: 1.5rem;
+    margin-top: .5rem;
     padding-left: 1rem;
+}
+
+.pro-juventute-ad-text > div {
+    margin-bottom: .5rem;
+    max-width: 70ex;
+}
+
+.sponsor-footer {
+    margin-top: .75rem !important;
+
+    h2 {
+        color: $body-font-color;
+    }
+
+    div {
+        color: $body-font-color;
+    }
+
+    a {
+        color: $primary-color;
+    }
 }
 
 /*

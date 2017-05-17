@@ -39,43 +39,51 @@
     </footer>
 </metal:footer>
 
-<metal:footer_columns define-macro="footer_columns">
-    <tal:block define="contact layout.org.meta.contact_html|nothing;
-                       contact_url layout.org.meta.contact_url|nothing;
-                       opening_hours layout.org.meta.opening_hours_html|nothing;
-                       opening_hours_url layout.org.meta.opening_hours_url|nothing;
-                       facebook layout.org.meta.facebook_url|nothing;
-                       twitter layout.org.meta.twitter_url|nothing;">
-        <div class="row footer-columns" tal:condition="any((
-            contact,
-            contact_url,
-            opening_hours,
-            opening_hours_url,
-            facebook,
-            twitter
-        ))">
-            <div class="small-12 medium-3 columns">
-                <metal:b use-macro="layout.macros['footer_projuventute']" />
-            </div>
-            <div class="small-12 medium-3 columns">
-                <metal:b use-macro="layout.macros['footer_contact']" />
-            </div>
+<metal:footer_sponsors define-macro="footer_sponsors" i18n:domain="onegov.feriennet">
+    <div class="row sponsor-footer">
+        <div class="columns small-12">
+            <h2 i18n:translate>Pro Juventute Feriennet</h2>
 
-            <div class="small-12 medium-4 columns">
-                <metal:b use-macro="layout.macros['footer_opening_hours']" />
-            </div>
-
-            <div class="small-12 medium-2 columns">
-                <metal:b use-macro="layout.macros['footer_social_media']" />
+            <div class="row">
+                <div class="columns small-12 medium-3">
+                    <a href="https://www.projuventute.ch/" class="pro-juventute-logo">
+                        <img src="${layout.static_file_path('projuventute.svg')}"
+                             alt="Pro Juventute Logo"
+                             i18n:attributes="alt"
+                             height="175px"
+                             width="151px"
+                        >
+                    </a>
+                </div>
+                <div class="columns small-12 medium-9 pro-juventute-ad-text">
+                    <div>
+                        <div i18n:translate>
+                            Feriennet is the professional booking platform for
+                            supervised vacation activities
+                        </div>
+                        <a href="http://feriennet.projuventute.ch">feriennet.projuventute.ch</a>
+                    </div>
+                    
+                    <div>
+                        <div i18n:translate>
+                            Other Pro Juventute offers
+                        </div>
+                        <a href="http://projuventute.ch">projuventute.ch</a>
+                    </div>
+                    
+                    <div>
+                        <div i18n:translate>
+                            Pro Juventute Feriennet could only be realised thanks to the
+                            generous support of our partners.
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </tal:block>
-</metal:footer_columns>
-
-<metal:footer_sponsors define-macro="footer_sponsors" i18n:domain="onegov.feriennet">
-    <div class="row">
+    </div>
+    <div class="row sponsor-footer">
         <div class="columns small-12">
-            <h2 i18n:translate>Platform Sponsors</h2>
+            <h2 i18n:translate>Feriennet Partner</h2>
 
             <div tal:repeat="chunk layout.chunks(layout.app.sponsors, 4)" class="row sponsors-row">
                 <div tal:repeat="sponsor chunk" class="columns small-12 medium-3 large-3 ${repeat.sponsor.end and 'end' or ''}">

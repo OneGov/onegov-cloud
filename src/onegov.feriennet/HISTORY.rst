@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Changes the footer/sponsorship styles.
+  [href]
+
 - Fixes export not working if the period's cost was set to None.
   [href]
 

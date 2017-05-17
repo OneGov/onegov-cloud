@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-05-11 10:00+0200\n"
+"POT-Creation-Date: 2017-05-17 14:07+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -86,9 +86,6 @@ msgstr "Angebot erfassen"
 
 msgid "New Notification Template"
 msgstr "Neue Mitteilungs-Vorlage"
-
-msgid "Export Occasions"
-msgstr "Durchführungen exportieren"
 
 msgid "Edit Activity"
 msgstr "Angebot bearbeiten"
@@ -1174,14 +1171,34 @@ msgstr "Bank-Überweisung"
 msgid "Notice"
 msgstr "Mitteilung"
 
-msgid "Platform Sponsors"
-msgstr "Plattform Sponsoren"
-
-msgid "Platform"
-msgstr "Plattform"
+msgid "Pro Juventute Feriennet"
+msgstr ""
 
 msgid "Pro Juventute Logo"
 msgstr "Pro Juventute Logo"
+
+msgid ""
+"Feriennet is the professional booking platform for supervised vacation "
+"activities"
+msgstr ""
+"Feriennet ist die professionelle Buchungsplattform für betreute "
+"Ferienangebote"
+
+msgid "Other Pro Juventute offers"
+msgstr "Weitere Angebote von Pro Juventute"
+
+msgid ""
+"Pro Juventute Feriennet could only be realised thanks to the generous "
+"support of our partners."
+msgstr ""
+"Pro Juventute Feriennet konnte nur dank der grosszügigen Unterstützung "
+"unserer Partner realisiert werden."
+
+msgid "Feriennet Partner"
+msgstr "Feriennet Partner"
+
+msgid "Platform"
+msgstr "Plattform"
 
 msgid "The activity associated with this ticket belongs to ${user}."
 msgstr "Das mit diesem Ticket verbundene Angebot gehört ${user}."
@@ -1500,25 +1517,8 @@ msgstr "Ein Ticket wurde eröffnet"
 msgid "Delete"
 msgstr "Löschen"
 
-#, python-format
-msgid "Do you really want to delete \"${title}\"?"
-msgstr "Möchten Sie \"${title}\" wirklich löschen?"
-
-msgid "Delete Occasion"
-msgstr "Durchführung löschen"
-
 msgid "Reinstate"
 msgstr "Reaktivieren"
-
-#, python-format
-msgid "Do you really want to reinstate \"${title}\"?"
-msgstr "Möchten Sie \"${title}\" wirklich reaktivieren?"
-
-msgid "Previous attendees need to re-apply"
-msgstr "Vorherige Teilnehmer müssen sich neu anmelden"
-
-msgid "Reinstate Occasion"
-msgstr "Durchführung reaktivieren"
 
 msgid " 3 - 6 years"
 msgstr " 3 - 6 Jahre"
@@ -1535,8 +1535,25 @@ msgstr "14 - 17 Jahre"
 msgid "Own"
 msgstr "Eigene"
 
+#, python-format
+msgid "Do you really want to delete \"${title}\"?"
+msgstr "Möchten Sie \"${title}\" wirklich löschen?"
+
 msgid "Rescind"
 msgstr "Absagen"
+
+msgid "Delete Occasion"
+msgstr "Durchführung löschen"
+
+#, python-format
+msgid "Do you really want to reinstate \"${title}\"?"
+msgstr "Möchten Sie \"${title}\" wirklich reaktivieren?"
+
+msgid "Previous attendees need to re-apply"
+msgstr "Vorherige Teilnehmer müssen sich neu anmelden"
+
+msgid "Reinstate Occasion"
+msgstr "Durchführung reaktivieren"
 
 #, python-format
 msgid "Do you really want to rescind \"${title}\"?"
@@ -1672,25 +1689,8 @@ msgstr "Der Zuteilungs-Lauf wurde erfolgreich durchgeführt"
 msgid "Signup Attendee"
 msgstr "Teilnehmer anmelden"
 
-msgid "The period has already been finalized. No new attendees may be added."
-msgstr ""
-"Die Periode wurde bereits abgeschlosse. Es können keine neuen Teilnehmer "
-"mehr hinzugefügt werden."
-
 msgid "Remove Wish"
 msgstr "Wunsch entfernen"
-
-#, python-format
-msgid "Do you really want to remove ${attendee}'s wish?"
-msgstr "Möchten Sie ${attendee}s Wunsch wirklich entfernen?"
-
-#, python-format
-msgid "Do you really want to delete ${attendee}'s booking?"
-msgstr "Möchten Sie ${attendee}s Buchung wirklich löschen?"
-
-#, python-format
-msgid "Do you really want to cancel ${attendee}'s booking?"
-msgstr "Möchten Sie ${attendee}s Buchung wirklich absagen?"
 
 msgid "Too many attendees"
 msgstr "Überbelegt"
@@ -1706,6 +1706,23 @@ msgstr "Unterbelegt"
 
 msgid "No attendees"
 msgstr "Unbelegt"
+
+msgid "The period has already been finalized. No new attendees may be added."
+msgstr ""
+"Die Periode wurde bereits abgeschlosse. Es können keine neuen Teilnehmer "
+"mehr hinzugefügt werden."
+
+#, python-format
+msgid "Do you really want to remove ${attendee}'s wish?"
+msgstr "Möchten Sie ${attendee}s Wunsch wirklich entfernen?"
+
+#, python-format
+msgid "Do you really want to delete ${attendee}'s booking?"
+msgstr "Möchten Sie ${attendee}s Buchung wirklich löschen?"
+
+#, python-format
+msgid "Do you really want to cancel ${attendee}'s booking?"
+msgstr "Möchten Sie ${attendee}s Buchung wirklich absagen?"
 
 msgid "Mailing"
 msgstr "Versand"
