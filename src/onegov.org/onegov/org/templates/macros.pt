@@ -127,13 +127,13 @@
     </div>
 </metal:footer_links>
 
-<metal:footer_contact define-macro="footer_contact">
+<metal:footer_contact define-macro="footer_contact" i18n:domain="onegov.org">
     <h2 i18n:translate tal:condition="contact or contact_url">Contact</h2>
     <div tal:content="structure layout.org.meta.contact_html" />
     <a i18n:translate tal:condition="contact_url" tal:attributes="href contact_url">more…</a>
 </metal:footer_contact>
 
-<metal:footer_opening_hours define-macro="footer_opening_hours">
+<metal:footer_opening_hours define-macro="footer_opening_hours" i18n:domain="onegov.org">
     <h2 i18n:translate tal:condition="opening_hours or opening_hours_url">Opening Hours</h2>
     <div tal:content="structure layout.org.meta.opening_hours_html" />
     <a i18n:translate tal:condition="opening_hours_url" tal:attributes="href opening_hours_url">more…</a>

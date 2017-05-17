@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-05-17 14:17+0200\n"
+"POT-Creation-Date: 2017-05-17 16:12+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1075,6 +1075,9 @@ msgstr "Passwort zurücksetzen"
 msgid "You are here"
 msgstr "Sie sind hier"
 
+msgid "more…"
+msgstr "mehr…"
+
 msgid "Submit"
 msgstr "Absenden"
 
@@ -1975,6 +1978,3 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
-
-#~ msgid "more…"
-#~ msgstr "mehr…"

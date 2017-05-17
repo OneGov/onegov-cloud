@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes missing translation of "more..." link.
+  [href]
+
 0.8.2 (2017-05-17)
 ~~~~~~~~~~~~~~~~~~~
 
