@@ -454,7 +454,7 @@ msgstr "Ausgezählt"
 #. Default: Voter turnout
 #.
 msgid "turnout_vote"
-msgstr "Stimmbeteilgung"
+msgstr "Stimmbeteiligung"
 
 #. Default: Elegible Voters
 #.
