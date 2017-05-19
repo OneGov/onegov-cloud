@@ -17,11 +17,11 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin):
     #: the public id of the payment provider
     id = Column(UUID, primary_key=True, default=uuid4)
 
-    #: the polymorphic name of the provider
-    name = Column(Text, nullable=True)
+    #: the polymorphic type of the provider
+    type = Column(Text, nullable=True)
 
     __mapper_args__ = {
-        'polymorphic_on': name
+        'polymorphic_on': type
     }
 
     payments = relationship(
