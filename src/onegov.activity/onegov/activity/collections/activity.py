@@ -34,7 +34,7 @@ class ActivityCollection(Pagination):
         self.weekdays = set(weekdays) if weekdays else set()
 
     def __eq__(self, other):
-        self.type == type and self.page == other.page
+        return self.type == other.type and self.page == other.page
 
     def subset(self):
         return self.query()
