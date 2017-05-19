@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.8.10 (2017-05-19)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes activity collection pagination not recognizing the active element.
   [href]
 
