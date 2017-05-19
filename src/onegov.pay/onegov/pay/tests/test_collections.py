@@ -2,7 +2,8 @@ from onegov.core.orm import Base
 from onegov.core.orm import SessionManager
 from onegov.core.orm.types import UUID
 from onegov.pay import Payable, PayableCollection
-from onegov.pay import Payment, PaymentCollection
+from onegov.pay import PaymentCollection
+from onegov.pay import PaymentProvider
 from sqlalchemy import Column
 from sqlalchemy import Text
 from sqlalchemy.ext.declarative import declarative_base
@@ -10,8 +11,10 @@ from uuid import uuid4
 
 
 def test_payment_collection_pagination(session):
+    provider = PaymentProvider()
+
     session.add_all(
-        Payment(amount=amount)
+        provider.payment(amount=amount)
         for amount in range(100, 2000, 100)
     )
 
@@ -24,7 +27,7 @@ def test_payment_collection_pagination(session):
 
 def test_payment_collection_crud(session):
     payments = PaymentCollection(session)
-    payment = payments.add(amount=100)
+    payment = payments.add(amount=100, provider=PaymentProvider())
 
     assert payment.amount == 100
     assert payments.query().count() == 1
@@ -54,15 +57,17 @@ def test_payable_collection(postgres_dsn):
     mgr.set_current_schema('foobar')
     session = mgr.session()
 
+    provider = PaymentProvider()
+
     carbonara = Order(title="Carbonara")
     coca_cola = Order(title="Coca Cola")
 
     the_wapo = Newspaper(title="The Washington Post")
     ny_times = Newspaper(title="The New York Times")
 
-    carbonara.payment = coca_cola.payment = Payment(amount=25)
-    the_wapo.payment = Payment(amount=4.50)
-    ny_times.payment = Payment(amount=5.50)
+    carbonara.payment = coca_cola.payment = provider.payment(amount=25)
+    the_wapo.payment = provider.payment(amount=4.50)
+    ny_times.payment = provider.payment(amount=5.50)
 
     session.add_all((carbonara, coca_cola, the_wapo, ny_times))
     session.flush()

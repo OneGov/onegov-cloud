@@ -3,7 +3,7 @@ import transaction
 
 from onegov.core.orm import Base, SessionManager
 from onegov.core.orm.types import UUID
-from onegov.pay.models import Payable, Payment
+from onegov.pay.models import Payable, Payment, PaymentProvider
 from sqlalchemy import Column
 from sqlalchemy import Text
 from sqlalchemy.ext.declarative import declarative_base
@@ -32,13 +32,15 @@ def test_payment_with_different_bases(postgres_dsn):
     mgr.set_current_schema('foobar')
     session = mgr.session()
 
+    provider = PaymentProvider()
+
     apple = Order(title="Apple")
     pizza = Order(title="Pizza")
     kebab = Order(title="Kebab")
     times = Subscription(title="Times")
 
-    apple.payment = Payment(amount=100)
-    pizza.payment = Payment(amount=200)
+    apple.payment = provider.payment(amount=100)
+    pizza.payment = provider.payment(amount=200)
     kebab.payment = apple.payment
     times.payment = pizza.payment
 
@@ -75,7 +77,7 @@ def test_payment_referential_integrity(postgres_dsn):
     mgr.set_current_schema('foobar')
     session = mgr.session()
 
-    apple = Order(title="Apple", payment=Payment(amount=100))
+    apple = Order(title="Apple", payment=PaymentProvider().payment(amount=100))
     session.add(apple)
     transaction.commit()
 
@@ -126,8 +128,10 @@ def test_backref(postgres_dsn):
     mgr.set_current_schema('foobar')
     session = mgr.session()
 
-    car = Product(title="Car", payment=Payment(amount=10000))
-    nut = Part(title="Nut", payment=Payment(amount=10))
+    provider = PaymentProvider()
+
+    car = Product(title="Car", payment=provider.payment(amount=10000))
+    nut = Part(title="Nut", payment=provider.payment(amount=10))
     session.add_all((car, nut))
     session.flush()
 

@@ -6,6 +6,7 @@ from onegov.pay.utils import QueryChain
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import Numeric
+from sqlalchemy import ForeignKey
 from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import joinedload
@@ -37,6 +38,11 @@ class Payment(Base, TimestampMixin, ContentMixin):
         Enum('open', 'paid', 'failed', 'cancelled', name='payment_state'),
         nullable=False,
         default='open'
+    )
+
+    #: the payment provider associated with the payment
+    provider_id = Column(
+        UUID, ForeignKey('payment_providers.id'), nullable=False
     )
 
     __mapper_args__ = {
