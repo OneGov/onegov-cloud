@@ -141,9 +141,9 @@ def test_backref(postgres_dsn):
     assert len(nut.payment.linked_parts) == 1
 
     assert car.payment.links.count() == 1
-    assert car.payment.links[0].title == "Car"
+    assert car.payment.links.first().title == "Car"
     assert nut.payment.links.count() == 1
-    assert nut.payment.links[0].title == "Nut"
+    assert nut.payment.links.first().title == "Nut"
 
     session.delete(nut.payment)
     nut.payment = car.payment

@@ -2,13 +2,14 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.pay.utils import QueryChain
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import Numeric
 from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import object_session
-from sqlalchemy_utils import QueryChain
 from uuid import uuid4
 
 
@@ -79,6 +80,8 @@ class Payment(Base, TimestampMixin, ContentMixin):
         session = object_session(self)
 
         return QueryChain(tuple(
-            session.query(cls).filter_by(payment=self)
+            session.query(cls)
+            .filter_by(payment=self)
+            .options(joinedload(cls.payment))
             for cls in self.registered_links.values()
         ))
