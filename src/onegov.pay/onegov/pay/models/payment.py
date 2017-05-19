@@ -7,6 +7,8 @@ from sqlalchemy import Enum
 from sqlalchemy import Numeric
 from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import object_session
+from sqlalchemy_utils import QueryChain
 from uuid import uuid4
 
 
@@ -71,3 +73,12 @@ class Payment(Base, TimestampMixin, ContentMixin):
 
         """
         Payment.registered_links[link_name] = linked_class
+
+    @property
+    def links(self):
+        session = object_session(self)
+
+        return QueryChain(tuple(
+            session.query(cls).filter_by(payment=self)
+            for cls in self.registered_links.values()
+        ))

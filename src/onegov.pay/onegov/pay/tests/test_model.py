@@ -140,6 +140,11 @@ def test_backref(postgres_dsn):
     assert len(nut.payment.linked_products) == 0
     assert len(nut.payment.linked_parts) == 1
 
+    assert car.payment.links.count() == 1
+    assert car.payment.links[0].title == "Car"
+    assert nut.payment.links.count() == 1
+    assert nut.payment.links[0].title == "Nut"
+
     session.delete(nut.payment)
     nut.payment = car.payment
     session.flush()
@@ -148,5 +153,8 @@ def test_backref(postgres_dsn):
     assert len(car.payment.linked_parts) == 1
     assert len(nut.payment.linked_products) == 1
     assert len(nut.payment.linked_parts) == 1
+
+    assert car.payment.links.count() == 2
+    assert {r.title for r in car.payment.links} == {"Car", "Nut"}
 
     mgr.dispose()
