@@ -4,12 +4,9 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from sqlalchemy import Column
 from sqlalchemy import Enum
-from sqlalchemy import event
 from sqlalchemy import Numeric
 from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import mapper
-from sqlalchemy.orm.attributes import InstrumentedAttribute
 from uuid import uuid4
 
 
@@ -18,7 +15,7 @@ class Payment(Base, TimestampMixin, ContentMixin):
 
     __tablename__ = 'payments'
 
-    linked_classes = []
+    registered_links = {}
 
     #: the public id of the payment
     id = Column(UUID, primary_key=True, default=uuid4)
@@ -54,30 +51,23 @@ class Payment(Base, TimestampMixin, ContentMixin):
         """
         return self.state == 'paid'
 
-    @classmethod
-    def register_link(cls, linked_class):
-        cls.linked_classes.append(linked_class)
+    @staticmethod
+    def register_link(link_name, linked_class):
+        """ The :class:`~onegov.pay.models.payable.Payable` class registers
+        all back-referenes through this method. This is useful for two reasons:
 
+        1. We gain the ability to query all the linked records in one query.
+           This is hard otherwise as each ``Payable`` class leads to its own
+           association table which needs to be queried separately.
 
-def reset_payment_class(cls):
-    cls.linked_classes = []
+        2. We are able to reset all created backreferences. This is necessary
+           during tests. SQLAlchemy keeps these references around and won't
+           let us re-register the same model multiple times (which outside
+           of tests is completely reasonable).
 
-    for attr in dir(cls):
-        if not attr.startswith('linked_'):
-            continue
-        if not isinstance(getattr(cls, attr), InstrumentedAttribute):
-            continue
+        Note that this is a staticmethod instead of a classmethod because
+        we want all links to be managed through the actual ``Payment`` class,
+        not through any of its subclasses.
 
-        delattr(cls, attr)
-        del cls.__mapper__._props[attr]
-
-    return cls
-
-
-@event.listens_for(mapper, 'before_configured')
-def before_payment_instrumented():
-    classes = [Payment]
-
-    while classes:
-        cls = reset_payment_class(classes.pop())
-        classes.extend(cls.__subclasses__())
+        """
+        Payment.registered_links[link_name] = linked_class

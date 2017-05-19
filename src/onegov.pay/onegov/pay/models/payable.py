@@ -14,29 +14,23 @@ class Payable(object):
 
     @declared_attr
     def payment(cls):
-        tablename = 'payments_for_{}'.format(cls.__tablename__)
-        key_name = '{}_id'.format(cls.__tablename__)
-        target_column = '{}.id'.format(cls.__tablename__)
+        name = 'payments_for_{}'.format(cls.__tablename__)
+        key = '{}_id'.format(cls.__tablename__)
+        target = '{}.id'.format(cls.__tablename__)
+        backref = 'linked_{}'.format(cls.__tablename__)
 
         payment_association = Table(
-            tablename,
+            name,
             cls.metadata,
-            Column(
-                key_name, ForeignKey(target_column),
-                primary_key=True,
-                nullable=False
-            ),
-            Column(
-                'payment_id', ForeignKey(Payment.id),
-                nullable=False
-            ))
+            Column(key, ForeignKey(target), primary_key=True, nullable=False),
+            Column('payment_id', ForeignKey(Payment.id), nullable=False))
 
-        Payment.register_link(cls)
+        Payment.register_link(backref, cls)
 
         return relationship(
             argument=Payment,
             secondary=payment_association,
-            uselist=False,
-            backref='linked_{}'.format(cls.__tablename__),
+            backref=backref,
             cascade=False,
+            uselist=False,
             passive_deletes=True)
