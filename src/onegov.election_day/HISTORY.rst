@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes parsing of empty votes when uploading WabstiCExport files.
+  [msom]
+
 1.8.14 (2017-05-18)
 ~~~~~~~~~~~~~~~~~~~
 
