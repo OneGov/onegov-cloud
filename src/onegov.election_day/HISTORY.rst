@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes format description link.
+  [msom]
+
 - Corrects phone number placeholder in subscriber form.
   [msom]
 
