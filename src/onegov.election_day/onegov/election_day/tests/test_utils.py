@@ -76,17 +76,17 @@ def test_get_vote_summary(session):
         result = archive.update(vote, request)
 
         expected = {
-            'answer': '',
+            'answer': None,
             'completed': False,
             'date': '2011-01-01',
             'domain': 'federation',
             'last_modified': '2014-01-01T12:00:00+00:00',
-            'nays_percentage': 100.0,
+            'nays_percentage': None,
             'progress': {'counted': 0.0, 'total': 0.0},
             'title': {'de_CH': 'Vote'},
             'type': 'vote',
             'url': 'Vote/vote',
-            'yeas_percentage': 0.0,
+            'yeas_percentage': None,
         }
         assert expected == get_vote_summary(vote, request)
         assert expected == get_vote_summary(result, None, request.link(vote))

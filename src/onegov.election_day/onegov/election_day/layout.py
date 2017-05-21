@@ -313,9 +313,7 @@ class VotesLayout(Layout):
         proposal = self.model.ballots.first()
         if not proposal:
             return False
-        if proposal.results.first():
-            return True
-        return False
+        return any((r.counted for r in proposal.results))
 
     @cached_property
     def counter_proposal(self):

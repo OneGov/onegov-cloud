@@ -66,22 +66,25 @@ def view_vote_json(self, request):
             if VotesLayout(self, request, tab=ballot.type).svg_path:
                 media['maps'][ballot.type] = request.link(ballot, 'svg')
 
+    counted = self.progress[0]
+    nays_percentage = self.nays_percentage if counted else None
+    yeas_percentage = self.yeas_percentage if counted else None
     return {
         'completed': self.completed,
         'date': self.date.isoformat(),
         'domain': self.domain,
         'last_modified': self.last_result_change.isoformat(),
         'progress': {
-            'counted': self.progress[0],
+            'counted': counted,
             'total': self.progress[1]
         },
         'related_link': (self.meta or {}).get('related_link', ''),
         'title': self.title_translations,
         'type': 'election',
-        'resuts': {
+        'results': {
             'answer': self.answer,
-            'nays_percentage': self.nays_percentage,
-            'yeas_percentage': self.yeas_percentage,
+            'nays_percentage': nays_percentage,
+            'yeas_percentage': yeas_percentage,
         },
         'ballots': [
             {

@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Ignores uncounted entities when uploading WabstiCExport vote results.
+- Hides results of empty votes in any case.
   [msom]
 
 1.8.15 (2017-05-19)

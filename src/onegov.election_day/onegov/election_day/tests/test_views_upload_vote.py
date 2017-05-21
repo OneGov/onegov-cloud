@@ -377,8 +377,6 @@ def test_upload_vote_unknown_result(election_day_app):
 
     r = upload.form.submit().click("Hier klicken")
 
-    assert "Noch nicht ausgezählt" in r.pyquery(
-        'tr[data-municipality-id="1711"]').text()
     assert archive.query().one().progress == (0, 11)
 
 

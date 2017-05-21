@@ -238,25 +238,30 @@
 
     <div class="clearfix"></div>
 
-    <div class="row percentages">
-        <div class="columns small-6">
-            <dl>
-                <dt i18n:translate="">Yeas</dt>
-                <dd class="accepted" >${'{0:.2f}'.format(vote.yeas_percentage)}%</dd>
-            </dl>
-        </div>
-        <div class="columns small-6 end">
-            <dl style="text-align: right;">
-                <dt i18n:translate="">Nays</dt>
-                <dd class="rejected" >${'{0:.2f}'.format(vote.nays_percentage)}%</dd>
-            </dl>
-        </div>
-    </div>
+    <tal:block tal:condition="layout.has_results">
+        <div class="row percentages">
+            <div class="columns small-6">
+                <dl>
+                    <dt i18n:translate="">Yeas</dt>
+                    <dd class="accepted" >${'{0:.2f}'.format(vote.yeas_percentage)}%</dd>
 
-    <div class="percentage">
-        <div class="yeas"></div>
-        <div class="nays right" style="width:${'{0:.2f}'.format(vote.nays_percentage)}%"></div>
-    </div>
+                </dl>
+            </div>
+            <div class="columns small-6 end">
+                <dl style="text-align: right;">
+                    <dt i18n:translate="">Nays</dt>
+                    <dd class="rejected" >${'{0:.2f}'.format(vote.nays_percentage)}%</dd>
+                </dl>
+            </div>
+        </div>
+        <div class="percentage">
+            <div class="yeas"></div>
+            <div class="nays right" style="width:${'{0:.2f}'.format(vote.nays_percentage)}%"></div>
+        </div>
+    </tal:block>
+    <tal:block tal:condition="not layout.has_results">
+        <hr />
+    </tal:block>
 </metal:vote_header>
 
 <metal:election_factoids define-macro="election_factoids" i18n:domain="onegov.election_day">

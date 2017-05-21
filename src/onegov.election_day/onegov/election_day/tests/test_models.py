@@ -605,17 +605,17 @@ def test_webhook_notification(session):
             assert headers['Content-length'] == len(data)
 
             assert json.loads(data.decode('utf-8')) == {
-                'answer': '',
+                'answer': None,
                 'completed': False,
                 'date': '2011-01-01',
                 'domain': 'federation',
                 'last_modified': '2008-01-01T00:00:00+00:00',
-                'nays_percentage': 100.0,
+                'nays_percentage': None,
                 'progress': {'counted': 0.0, 'total': 0.0},
                 'title': {'de_CH': 'Vote'},
                 'type': 'vote',
                 'url': 'Vote/vote',
-                'yeas_percentage': 0.0
+                'yeas_percentage': None
             }
 
 

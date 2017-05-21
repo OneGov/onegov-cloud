@@ -73,13 +73,19 @@
                                         <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request)" />
                                     </td>
                                     <td class="right-aligned">
-                                        ${layout.format_number(vote.display_yeas_percentage(request))}
+                                        <tal:block tal:condition="vote.progress[0]">
+                                            ${layout.format_number(vote.display_yeas_percentage(request))}
+                                        </tal:block>
                                     </td>
                                     <td class="right-aligned">
-                                        ${layout.format_number(vote.display_nays_percentage(request))}
+                                        <tal:block tal:condition="vote.progress[0]">
+                                            ${layout.format_number(vote.display_nays_percentage(request))}
+                                        </tal:block>
                                     </td>
                                     <td class="right-aligned" tal:condition="not: communal_instance">
-                                        <div metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" />
+                                        <tal:block tal:condition="vote.progress[0]">
+                                            <div metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" />
+                                        </tal:block>
                                     </td>
                                     <td class="right-aligned">
                                         ${layout.format_date(vote.last_result_change, 'datetime')}
