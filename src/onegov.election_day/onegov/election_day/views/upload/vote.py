@@ -25,6 +25,7 @@ def view_upload(self, request, form):
 
     status = 'open'
     if form.submitted(request):
+        session = request.app.session()
         principal = request.app.principal
         if not principal.is_year_available(self.date.year, principal.use_maps):
             errors = [unsupported_year_error(self.date.year)]
@@ -79,20 +80,28 @@ def view_upload(self, request, form):
                     )
             else:
                 raise NotImplementedError("Unsupported import format")
-            archive = ArchivedResultCollection(request.app.session())
+            archive = ArchivedResultCollection(session)
             archive.update(self, request)
 
         if errors:
             status = 'error'
             transaction.abort()
         else:
-            # It might be that the vote type setting stored in the meta
-            # is overridden by the import (internal, wabsti, wabsti c)
-            if not self.meta:
-                self.meta = {}
-            self.meta['vote_type'] = 'simple'
-            if self.counter_proposal:
-                self.meta['vote_type'] = 'complex'
+            if form.file_format.data == 'default':
+                if form.data['type'] == 'simple':
+                    # Clear the unused ballots
+                    if self.counter_proposal:
+                        session.delete(self.counter_proposal)
+                    if self.tie_breaker:
+                        session.delete(self.counter_proposal)
+            else:
+                # It might be that the vote type setting stored in the meta
+                # is overridden by the import (internal, wabsti, wabsti c)
+                if not self.meta:
+                    self.meta = {}
+                self.meta['vote_type'] = 'simple'
+                if self.counter_proposal:
+                    self.meta['vote_type'] = 'complex'
 
             status = 'success'
             request.app.pages_cache.invalidate()

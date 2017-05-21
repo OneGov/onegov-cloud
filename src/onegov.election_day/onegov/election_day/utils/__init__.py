@@ -248,13 +248,12 @@ def clear_election(election):
 
 
 def clear_vote(vote):
-    """ Clear the vote of all of its results. """
+    """ Clear the vote of all of its ballots. """
 
     session = object_session(vote)
     vote.status = None
     for ballot in vote.ballots:
-        for result in ballot.results:
-            session.delete(result)
+        session.delete(ballot)
 
 
 def clear_ballot(ballot):

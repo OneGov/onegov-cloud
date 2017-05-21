@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Fixes format description link.
+- Deletes superfluous ballots when uploading vote results.
   [msom]
 
 1.8.15 (2017-05-19)
