@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Deletes superfluous ballots when uploading vote results.
+  [msom]
+
 - Fixes format description link.
   [msom]
 
