@@ -30,6 +30,18 @@ Changelog
 
 - Corrects phone number placeholder in subscriber form.
   [msom]
+  
+- Fixes importing of expats (vote/internal).
+  [msom]
+
+- Deletes superfluous ballots when uploading vote results.
+  [msom]
+
+- Fixes format description link.
+  [msom]
+
+- Corrects phone number placeholder in subscriber form.
+  [msom]
 
 1.8.15 (2017-05-19)
 ~~~~~~~~~~~~~~~~~~~
