@@ -51,7 +51,7 @@ class Layout(ChameleonLayout):
         lang = (self.request.locale or 'en')[:2]
         return (
             "https://github.com/OneGov/onegov.election_day"
-            "/blob/master/docs/format_{}.md"
+            "/blob/master/docs/format__{}.md"
         ).format(lang)
 
     @cached_property

@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Corrects phone number placeholder in subscriber form.
+- Fixes format description link.
   [msom]
 
 1.8.15 (2017-05-19)
