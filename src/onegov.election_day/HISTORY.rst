@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Deletes superfluous ballots when uploading vote results.
+- Fixes importing of expats (vote/internal).
   [msom]
 
 1.8.15 (2017-05-19)

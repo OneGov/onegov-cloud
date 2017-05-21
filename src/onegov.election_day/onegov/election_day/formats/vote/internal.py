@@ -58,16 +58,6 @@ def import_vote_internal(entities, vote, file, mimetype):
         added_groups.setdefault(ballot_type, set())
         ballot_results.setdefault(ballot_type, [])
 
-        # the name of the entity
-        group = line.group.strip()
-        if not group:
-            line_errors.append(_("Missing municipality/district"))
-        if group in added_groups[ballot_type]:
-            line_errors.append(_("${name} was found twice", mapping={
-                'name': group
-            }))
-        added_groups[ballot_type].add(group)
-
         # the id of the entity
         try:
             entity_id = int(line.entity_id or 0)
@@ -90,6 +80,16 @@ def import_vote_internal(entities, vote, file, mimetype):
                     }))
             else:
                 added_entity_ids[ballot_type].add(entity_id)
+
+        # the name of the entity
+        group = line.group.strip()
+        if entity_id and not group:
+            line_errors.append(_("Missing municipality/district"))
+        if group in added_groups[ballot_type]:
+            line_errors.append(_("${name} was found twice", mapping={
+                'name': group
+            }))
+        added_groups[ballot_type].add(group)
 
         # Add the uncounted entity, but use the given group
         if line.counted.lower() != 'true':
