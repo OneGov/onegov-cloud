@@ -73,23 +73,23 @@ def test_layout_links():
 
     assert layout_de.format_description_link == (
         'https://github.com/OneGov/onegov.election_day/blob/master/docs/'
-        'format_de.md'
+        'format__de.md'
     )
     assert layout_en.format_description_link == (
         'https://github.com/OneGov/onegov.election_day/blob/master/docs/'
-        'format_en.md'
+        'format__en.md'
     )
     assert layout_fr.format_description_link == (
         'https://github.com/OneGov/onegov.election_day/blob/master/docs/'
-        'format_fr.md'
+        'format__fr.md'
     )
     assert layout_it.format_description_link == (
         'https://github.com/OneGov/onegov.election_day/blob/master/docs/'
-        'format_it.md'
+        'format__it.md'
     )
     assert layout_rm.format_description_link == (
         'https://github.com/OneGov/onegov.election_day/blob/master/docs/'
-        'format_rm.md'
+        'format__rm.md'
     )
 
     assert layout_de.login_link == 'Auth/login'
