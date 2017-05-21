@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Corrects phone number placeholder in subscriber form.
+  [msom]
+
 1.8.15 (2017-05-19)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -11,7 +11,7 @@ class SubscribeForm(Form):
 
     phone_number = StringField(
         label=_("Phone number"),
-        description="+417911122233",
+        description="+41791112233",
         validators=[
             InputRequired(),
             ValidPhoneNumber()
