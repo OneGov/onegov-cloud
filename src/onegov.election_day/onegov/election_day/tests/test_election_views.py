@@ -53,25 +53,6 @@ def test_view_election_candidates(election_day_app_gr):
     assert '/election/proporz-election/candidates' in chart
 
 
-def test_view_election_districts(election_day_app_gr):
-    client = Client(election_day_app_gr)
-    client.get('/locale/de_CH').follow()
-
-    login(client)
-    upload_majorz_election(client)
-    upload_proporz_election(client)
-
-    districts = client.get('/election/majorz-election/districts')
-    assert all((expected in districts for expected in (
-        "Engler Stefan", "20", "Schmid Martin", "18", "Grüsch"
-    )))
-
-    districts = client.get('/election/proporz-election/districts')
-    assert not any((expected in districts for expected in (
-        "Caluori Corina", "Casanova Angela"
-    )))
-
-
 def test_view_election_statistics(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()

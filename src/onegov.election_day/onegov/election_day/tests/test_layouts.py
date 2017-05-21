@@ -105,15 +105,14 @@ def test_elections_layout(session):
     layout = ElectionsLayout(None, DummyRequest())
 
     assert layout.all_tabs == (
-        'lists', 'candidates', 'districts', 'connections', 'parties',
-        'statistics', 'panachage', 'data'
+        'lists', 'candidates', 'connections', 'parties', 'statistics',
+        'panachage', 'data'
     )
 
     assert layout.title() == ''
     assert layout.title('undefined') == ''
     assert layout.title('lists') == 'Lists'
     assert layout.title('candidates') == 'Candidates'
-    assert layout.title('districts') == '__entities'
     assert layout.title('connections') == 'List connections'
     assert layout.title('parties') == 'Parties'
     assert layout.title('statistics') == 'Election statistics'

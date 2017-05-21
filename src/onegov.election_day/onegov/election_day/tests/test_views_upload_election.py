@@ -1720,7 +1720,7 @@ def test_upload_communal_election_districts(election_day_app_bern):
     assert '35.49' in result
 
     result = client.get('/election/election/statistics')
-    assert 'Stadtteile' in result
+    assert 'Stadtteil' in result
     assert '<td>Total' in result
 
 

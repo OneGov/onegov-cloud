@@ -138,7 +138,6 @@ class ElectionsLayout(Layout):
         return (
             'lists',
             'candidates',
-            'districts',
             'connections',
             'parties',
             'statistics',
@@ -153,8 +152,6 @@ class ElectionsLayout(Layout):
             return _("Lists")
         if tab == 'candidates':
             return _("Candidates")
-        if tab == 'districts':
-            return self.principal.label('entities')
         if tab == 'connections':
             return _("List connections")
         if tab == 'parties':
@@ -178,8 +175,6 @@ class ElectionsLayout(Layout):
             return self.proporz
         if tab == 'parties':
             return self.proporz and self.model.party_results.first()
-        if tab == 'districts':
-            return self.majorz and self.summarize
         if tab == 'connections':
             return self.proporz and self.model.list_connections.first()
         if tab == 'panachage':
