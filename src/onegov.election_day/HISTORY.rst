@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Fixes importing of expats (vote/internal).
+- Ignores uncounted entities when uploading WabstiCExport vote results.
   [msom]
 
 1.8.15 (2017-05-19)

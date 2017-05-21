@@ -149,6 +149,9 @@ def import_vote_wabstic(vote, district, number, entities,
             counted = False if int(line.sperrung or 0) == 0 else True
         except ValueError:
             line_errors.append(_("Invalid values"))
+        else:
+            if not counted:
+                continue
 
         # Parse the elegible voters
         try:
