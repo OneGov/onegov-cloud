@@ -3,7 +3,10 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.pay.models.payment import Payment
+from sqlalchemy import Boolean
 from sqlalchemy import Column
+from sqlalchemy import column
+from sqlalchemy import Index
 from sqlalchemy import Text
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -20,9 +23,19 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin):
     #: the polymorphic type of the provider
     type = Column(Text, nullable=True)
 
+    #: true if this is the default provider (can only ever be one)
+    default = Column(Boolean, nullable=False, default=False)
+
     __mapper_args__ = {
         'polymorphic_on': type
     }
+
+    __table_args__ = (
+        Index(
+            'only_one_default_provider', 'default',
+            unique=True, postgresql_where=column('default') == True
+        ),
+    )
 
     payments = relationship(
         'Payment',
@@ -42,3 +55,17 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin):
         payment.provider = self
 
         return payment
+
+    @property
+    def title(self):
+        """ The title of the payment provider (i.e. the product name). """
+        raise NotImplementedError
+
+    @property
+    def identity(self):
+        """ A list of values that uniquely identify the payment provider.
+
+        For example, a redacted list of secrets.
+
+        """
+        raise NotImplementedError

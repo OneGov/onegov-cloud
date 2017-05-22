@@ -33,6 +33,14 @@ class StripeConnect(PaymentProvider):
     #: The access token provieded by OAuth
     access_token = meta_property('access_token')
 
+    @property
+    def title(self):
+        return 'Stripe Connect'
+
+    @property
+    def identity(self):
+        return self.publishable_key
+
     def params(self, **p):
         assert self.client_id and self.client_secret
 

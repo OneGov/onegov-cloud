@@ -32,6 +32,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
+        'more.webassets',
         'onegov.core>=0.4.0',
         'pycurl',
         'stripe'
