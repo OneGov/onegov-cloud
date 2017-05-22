@@ -417,6 +417,26 @@ def test_subscriber_collection_pagination(session):
     assert len(SubscriberCollection(session, page=10).batch) == 0
 
 
+def test_subscriber_collection_term(session):
+
+    collection = SubscriberCollection(session)
+    for number in range(100):
+        collection.subscribe('+417911122{:02}'.format(number), 'de_CH')
+    assert collection.query().count() == 100
+
+    collection = SubscriberCollection(session, term='+417911122')
+    assert collection.query().count() == 100
+
+    collection = SubscriberCollection(session, term='+41791112200')
+    assert collection.query().one().phone_number == '+41791112200'
+
+    collection = SubscriberCollection(session, term='2200')
+    assert collection.query().one().phone_number == '+41791112200'
+
+    collection = SubscriberCollection(session, term='220')
+    assert collection.query().count() == 11
+
+
 def test_data_source_collection(session):
     collection = DataSourceCollection(session)
 

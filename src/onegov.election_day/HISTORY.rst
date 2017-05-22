@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds manage subscription search function.
+  [msom]
+
 - Removes the districs view of majorz elections.
   [msom]
 

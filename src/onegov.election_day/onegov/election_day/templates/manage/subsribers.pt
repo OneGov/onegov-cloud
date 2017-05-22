@@ -21,7 +21,7 @@
                         <form style="margin-top: 1em;">
                             <div class="row collapse">
                                 <div class="small-10 columns">
-                                    <input type="text" placeholder="filter" name="term" value="${term}"/>
+                                    <input type="text" name="term" value="${term}"/>
                                 </div>
                                 <div class="small-2 columns">
                                     <span class="postfix"><i class="fa fa-search" aria-hidden="true"></i></span>
