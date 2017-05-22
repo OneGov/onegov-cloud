@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.9.0 (2017-05-22)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds manage subscription search function.
   [msom]
