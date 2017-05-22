@@ -202,17 +202,17 @@ $global-tools-height: 2.5rem;
         text-align: center;
     }
 
-    .login:before { @include icon('\f090'); }
-    .logout:before { @include icon('\f08b'); }
-    .register:before { @include icon('\f234'); }
-    .user:before { @include icon('\f2bd'); }
-    .users:before { @include icon('\f0c0'); }
-    .profile:before { @include icon('\f2c3'); }
-    .management:before { @include icon('\f013'); }
-    .images:before { @include icon('\f03e'); }
-    .files:before { @include icon('\f016'); }
-    .settings:before { @include icon('\f1de'); }
-    .no-tickets:before { @include icon('\f145'); }
+    .login::before { @include icon('\f090'); }
+    .logout::before { @include icon('\f08b'); }
+    .register::before { @include icon('\f234'); }
+    .user::before { @include icon('\f2bd'); }
+    .users::before { @include icon('\f0c0'); }
+    .profile::before { @include icon('\f2c3'); }
+    .management::before { @include icon('\f013'); }
+    .images::before { @include icon('\f03e'); }
+    .files::before { @include icon('\f016'); }
+    .settings::before { @include icon('\f1de'); }
+    .no-tickets::before { @include icon('\f145'); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;
@@ -1161,39 +1161,39 @@ $editbar-bg-color: $topbar-link-bg-hover;
         font-size: .8rem;
     }
 
-    a:before {
+    a::before {
         display: inline-block;
         margin-right: 5px;
         text-align: center;
         width: 15px;
     }
 
-    .accept-link:before { @include icon($accept-link-icon); }
-    .cleanup-link:before { @include icon($cleanup-link-icon); }
-    .copy-link:before { @include icon($copy-link-icon); }
-    .delete-link:before { @include icon($delete-link-icon); }
-    .edit-link:before { @include icon($edit-link-icon); }
-    .export-link:before { @include icon($export-link-icon); }
-    .file-url:before { @include icon($file-link-icon); }
-    .image-url:before { @include icon($image-link-icon); }
-    .internal-url:before { @include icon($internal-link-icon); }
-    .manage-recipients:before { @include icon($manage-recipients); }
-    .manage-subscribers:before { @include icon($manage-subscribers); }
-    .new-daypass:before { @include icon($new-daypass-icon); }
-    .new-recipient:before { @include icon($new-recipient); }
-    .new-form:before { @include icon($new-form-icon); }
-    .new-link:before { @include icon($new-link-icon); }
-    .new-news:before { @include icon($new-news-icon); }
-    .new-newsletter:before { @include icon($new-newsletter-icon); }
-    .new-page:before { @include icon($new-page-icon); }
-    .new-person:before { @include icon($new-person-icon); }
-    .new-photo-album:before { @include icon($new-photo-album); }
-    .new-reservation:before { @include icon($new-reservation-icon); }
-    .new-room:before { @include icon($new-room-icon); }
-    .new-user:before { @include icon($new-user-icon); }
-    .paste-link:before { @include icon($paste-link-icon); }
-    .select:before { @include icon($select-icon); }
-    .send-link:before { @include icon($send-link-icon); }
+    .accept-link::before { @include icon($accept-link-icon); }
+    .cleanup-link::before { @include icon($cleanup-link-icon); }
+    .copy-link::before { @include icon($copy-link-icon); }
+    .delete-link::before { @include icon($delete-link-icon); }
+    .edit-link::before { @include icon($edit-link-icon); }
+    .export-link::before { @include icon($export-link-icon); }
+    .file-url::before { @include icon($file-link-icon); }
+    .image-url::before { @include icon($image-link-icon); }
+    .internal-url::before { @include icon($internal-link-icon); }
+    .manage-recipients::before { @include icon($manage-recipients); }
+    .manage-subscribers::before { @include icon($manage-subscribers); }
+    .new-daypass::before { @include icon($new-daypass-icon); }
+    .new-recipient::before { @include icon($new-recipient); }
+    .new-form::before { @include icon($new-form-icon); }
+    .new-link::before { @include icon($new-link-icon); }
+    .new-news::before { @include icon($new-news-icon); }
+    .new-newsletter::before { @include icon($new-newsletter-icon); }
+    .new-page::before { @include icon($new-page-icon); }
+    .new-person::before { @include icon($new-person-icon); }
+    .new-photo-album::before { @include icon($new-photo-album); }
+    .new-reservation::before { @include icon($new-reservation-icon); }
+    .new-room::before { @include icon($new-room-icon); }
+    .new-user::before { @include icon($new-user-icon); }
+    .paste-link::before { @include icon($paste-link-icon); }
+    .select::before { @include icon($select-icon); }
+    .send-link::before { @include icon($send-link-icon); }
     .occupancy-link::before { @include icon($occupancy-link-icon); }
     .upload::before { @include icon($upload-icon); }
 }
@@ -1795,7 +1795,7 @@ div#redactor-droparea {
 */
 $hidden-page-icon: '\f070';
 
-.hidden-from-public-hint:before {
+.hidden-from-public-hint::before {
     @include icon($hidden-page-icon);
     color: $alert-color;
 }
@@ -1838,7 +1838,7 @@ $person-email-icon: '\f003';
         margin-bottom: 0;
         margin-left: 0;
 
-        li:before {
+        li::before {
             margin-right: .5ex;
         }
     }
@@ -1864,17 +1864,17 @@ $person-email-icon: '\f003';
     }
 
     &.person-single-item {
-        .person-card-website:before {
+        .person-card-website::before {
             @include icon($person-website-icon);
             color: $primary-color;
         }
 
-        .person-card-phone:before {
+        .person-card-phone::before {
             @include icon($person-phone-icon);
             color: $primary-color;
         }
 
-        .person-card-email:before {
+        .person-card-email::before {
             @include icon($person-email-icon);
             color: $primary-color;
         }
@@ -3131,7 +3131,7 @@ ul.search-results {
             margin-left: .2rem;
             margin-top: .25rem;
 
-            &:before {
+            &::before {
                 @include icon('\f0d0');
                 color: $body-font-color;
                 margin-right: 1ex;
