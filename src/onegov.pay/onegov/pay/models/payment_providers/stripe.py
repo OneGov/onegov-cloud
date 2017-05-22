@@ -59,8 +59,8 @@ class StripeConnect(PaymentProvider):
         """
 
         if 'error' in request_params:
-            raise RuntimeError("Stripe denied the OAuth request ({})".format(
-                (request_params['error'], request_params['error_description'])
+            raise RuntimeError("Stripe OAuth request failed ({}: {})".format(
+                request_params['error'], request_params['error_description']
             ))
 
         self.authorization_code = request_params['code']
