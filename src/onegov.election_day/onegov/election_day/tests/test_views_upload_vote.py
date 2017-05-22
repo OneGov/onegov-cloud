@@ -884,6 +884,21 @@ def test_upload_vote_with_expats(election_day_app):
         result_wabsti = client.get('/vote/vote/data-csv').text
         assert result_standard == result_wabsti
 
+        # wabsti: ignore expats with no data
+        csv = '\n'.join((
+            (
+                'Vorlage-Nr.,Gemeinde,BfS-Nr.,StimmBet,Ja,Nein,ungültige SZ,'
+                'leere SZ,Stimmberechtigte,GegenvJa,GegenvNein,StichfrJa,'
+                'StichfrNein'
+            ),
+            '1,Auslandschweizer,{},100.0,0,0,0,0,0,0,0,0,0'.format(id_),
+        )).encode('utf-8')
+        upload = client.get('/vote/vote/upload')
+        upload.form['file_format'] = 'wabsti'
+        upload.form['vote_number'] = '1'
+        upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
+        assert 'Keine Daten gefunden' in upload.form.submit()
+
 
 def test_upload_vote_notify_hipchat(election_day_app):
     client = Client(election_day_app)

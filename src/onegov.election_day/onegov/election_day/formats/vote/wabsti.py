@@ -69,6 +69,7 @@ def import_vote_wabsti(entities, vote, file, mimetype, vote_number, complex):
         added_groups.add(group)
 
         # the id of the entity
+        entity_id = None
         try:
             entity_id = int(line.bfs_nr_ or 0)
         except ValueError:
@@ -114,6 +115,10 @@ def import_vote_wabsti(entities, vote, file, mimetype, vote_number, complex):
             elegible_voters = int(line.stimmberechtigte or 0)
         except ValueError:
             line_errors.append(_("Could not read the elegible voters"))
+        else:
+            # Ignore the expats if no eligible voters
+            if not entity_id and not elegible_voters:
+                continue
 
         # the empty votes
         try:

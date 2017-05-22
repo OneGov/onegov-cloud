@@ -122,6 +122,7 @@ def import_vote_wabstic(vote, district, number, entities,
             continue
 
         # Parse the id of the entity
+        entity_id = None
         try:
             entity_id = int(line.sortgemeinde or 0)
             sub_entity_id = int(line.sortgemeindesub or 0)
@@ -158,6 +159,10 @@ def import_vote_wabstic(vote, district, number, entities,
             elegible_voters = int(line.stimmberechtigte or 0)
         except ValueError:
             line_errors.append(_("Could not read the elegible voters"))
+        else:
+            # Ignore the expats if no eligible voters
+            if not entity_id and not elegible_voters:
+                continue
 
         # Parse the invalid votes
         try:

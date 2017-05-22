@@ -280,3 +280,8 @@ def test_import_wabstic_vote_invalid_values(session):
         ('sg_gemeinden', 3, 'Invalid values'),
         ('sg_geschaefte', 2, 'Invalid values')
     ]
+
+
+# todo: test expats
+
+# todo: test temporary results

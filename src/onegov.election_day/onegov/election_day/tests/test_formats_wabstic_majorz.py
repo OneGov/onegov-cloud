@@ -292,3 +292,8 @@ def test_import_wabstic_majorz_invalid_values(session):
         ('wmstatic_gemeinden', 2, 'Could not read the elegible voters'),
         ('wmstatic_gemeinden', 4, '3215 was found twice')
     ]
+
+
+# todo: test expats
+
+# todo: test temporary results

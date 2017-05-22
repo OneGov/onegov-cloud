@@ -358,3 +358,8 @@ def test_import_wabstic_proporz_invalid_values(session):
         ('wpstatic_kandidaten', 2, 'Invalid candidate values'),
         ('wpstatic_kandidaten', 2, 'Invalid candidate values')
     ]
+
+
+# todo: test expats
+
+# todo: test temporary results

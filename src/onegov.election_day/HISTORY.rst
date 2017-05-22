@@ -7,7 +7,10 @@ Changelog
 - Removes the districs view of majorz elections.
   [msom]
 
-- Hides results of empty votes in any case.
+- Hides results of empty votes (in any case).
+  [msom]
+
+- Ignores expats with no eligible voters when uploading Wabsti vote results.
   [msom]
 
 - Ignores uncounted entities when uploading WabstiCExport vote results.
