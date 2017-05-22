@@ -1,5 +1,5 @@
 from onegov.org import _, OrgApp
-from onegov.org.elements import Link, LinkGroup
+from onegov.org.new_elements import Link, LinkGroup
 from onegov.org.models import GeneralFileCollection, ImageFileCollection
 from onegov.ticket import TicketCollection
 from onegov.user.auth import Auth, UserCollection
@@ -18,53 +18,60 @@ def get_global_tools(request):
     if request.is_logged_in:
         yield LinkGroup(request.current_username, classes=('user', ), links=(
             Link(
-                _("User Profile"), classes=('profile', ), url=request.link(
+                _("User Profile"), request.link(
                     request.app.org, name='benutzerprofil'
-                )
+                ), attrs={'class': 'profile'}
             ),
             Link(
-                _("Logout"), classes=('logout', ), url=request.link(
+                _("Logout"), request.link(
                     Auth.from_request_path(request), name='logout'
-                )
+                ), attrs={'class': 'logout'}
             ),
         ))
     else:
-        yield Link(_("Login"), classes=('login', ), url=request.link(
-            Auth.from_request_path(request), name='login'
-        ))
+        yield Link(
+            _("Login"), request.link(
+                Auth.from_request_path(request), name='login'
+            ), attrs={'class': 'login'}
+        )
 
         if request.app.settings.org.enable_user_registration:
-            yield Link(_("Register"), classes=('register', ), url=request.link(
-                Auth.from_request_path(request), name='register'
-            ))
+            yield Link(
+                _("Register"), request.link(
+                    Auth.from_request_path(request), name='register'
+                ), attrs={'class': 'register'})
 
     # Management dropdown
     if request.is_manager:
         links = []
 
         links.append(
-            Link(_("Files"), classes=('files', ), url=request.class_link(
-                GeneralFileCollection
-            ))
+            Link(
+                _("Files"), request.class_link(GeneralFileCollection),
+                attrs={'class': 'files'}
+            )
         )
 
         links.append(
-            Link(_("Images"), classes=('images', ), url=request.class_link(
-                ImageFileCollection
-            ))
+            Link(
+                _("Images"), request.class_link(ImageFileCollection),
+                attrs={'class': 'images'}
+            )
         )
 
         if request.is_admin:
             links.append(
-                Link(_("Settings"), classes=('settings', ), url=request.link(
-                    request.app.org, 'einstellungen'
-                ))
+                Link(
+                    _("Settings"), request.link(
+                        request.app.org, 'einstellungen'
+                    ), attrs={'class': 'settings'}
+                )
             )
 
             links.append(
                 Link(
-                    _("Users"), classes=('users', ),
-                    url=request.class_link(UserCollection)
+                    _("Users"), request.class_link(UserCollection),
+                    attrs={'class': 'users'}
                 )
             )
 
@@ -80,33 +87,39 @@ def get_global_tools(request):
         links.append(
             Link(
                 _("Open Tickets"),
-                classes=('with-count', 'alert', 'open-tickets'),
-                url=request.class_link(
+                request.class_link(
                     TicketCollection, {'handler': 'ALL', 'state': 'open'}
                 ),
-                attributes={'data-count': str(ticket_count.open)}
+                attrs={
+                    'class': ('with-count', 'alert', 'open-tickets'),
+                    'data-count': str(ticket_count.open)
+                }
             )
         )
 
         links.append(
             Link(
                 _("Pending Tickets"),
-                classes=('with-count', 'info', 'pending-tickets'),
-                url=request.class_link(
+                request.class_link(
                     TicketCollection, {'handler': 'ALL', 'state': 'pending'}
                 ),
-                attributes={'data-count': str(ticket_count.pending)}
+                attrs={
+                    'class': ('with-count', 'info', 'pending-tickets'),
+                    'data-count': str(ticket_count.pending)
+                }
             )
         )
 
         links.append(
             Link(
                 _("Closed Tickets"),
-                classes=('with-count', 'secondary', 'closed-tickets'),
                 url=request.class_link(
                     TicketCollection, {'handler': 'ALL', 'state': 'closed'}
                 ),
-                attributes={'data-count': str(ticket_count.closed)}
+                attrs={
+                    'class': ('with-count', 'secondary', 'closed-tickets'),
+                    'data-count': str(ticket_count.closed),
+                }
             )
         )
 
