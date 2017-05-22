@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-05-17 16:12+0200\n"
+"POT-Creation-Date: 2017-05-22 15:02+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -53,6 +53,9 @@ msgstr "Einstellungen"
 
 msgid "Users"
 msgstr "Benutzer"
+
+msgid "Payment Provider"
+msgstr "Zahlungsanbieter"
 
 msgid "Tickets"
 msgstr "Tickets"
@@ -135,6 +138,9 @@ msgstr "Benutzerverwaltung"
 
 msgid "Exports"
 msgstr "Exporte"
+
+msgid "Payment Providers"
+msgstr "Zahlungsanbieter"
 
 msgid "Delete"
 msgstr "Löschen"
@@ -260,6 +266,9 @@ msgstr "Fotoalbum"
 
 msgid "User"
 msgstr "Benutzer"
+
+msgid "Stripe Connect"
+msgstr ""
 
 msgid "Not a valid color."
 msgstr "Ungültige Farbe."
@@ -1463,6 +1472,9 @@ msgstr "Veranstaltung melden"
 msgid "Submit your own event"
 msgstr "Einen eigenen Eintrag für den Veranstaltungskalender erfassen"
 
+msgid "No payment providers defined."
+msgstr "Keine Zahlungsanbieter definiert."
+
 msgid "No people added yet."
 msgstr "Es wurden noch keine Personen hinzugefügt."
 
@@ -1791,6 +1803,9 @@ msgstr "Veranstaltungs-Export"
 
 msgid "Exports all future events."
 msgstr "Exportiert alle zukünftigen Veranstaltungen."
+
+msgid "Your Stripe account was connected successfully."
+msgstr ""
 
 msgid "New person"
 msgstr "Neue Person"

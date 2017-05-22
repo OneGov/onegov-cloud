@@ -46,6 +46,7 @@ setup(
         'onegov.gis',
         'onegov.newsletter>=0.1.0',
         'onegov.page>=0.1.0',
+        'onegov.pay',
         'onegov.people>=0.0.7',
         'onegov.recipient',
         'onegov.reservation>=0.3.0',

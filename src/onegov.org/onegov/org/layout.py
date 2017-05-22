@@ -29,6 +29,7 @@ from onegov.org.models import (
     SiteCollection,
 )
 from onegov.org.theme.org_theme import user_options
+from onegov.pay import PaymentProviderCollection
 from onegov.reservation import ResourceCollection
 from onegov.people import PersonCollection
 from onegov.ticket import TicketCollection
@@ -1313,3 +1314,34 @@ class ExportCollectionLayout(DefaultLayout):
             Link(_("Homepage"), self.homepage_url),
             Link(_("Exports"), self.request.class_link(ExportCollection))
         ]
+
+
+class PaymentProviderLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Payment Providers"), self.request.class_link(
+                PaymentProviderCollection
+            ))
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_admin:
+            return [
+                LinkGroup(
+                    title=_("Add"),
+                    links=(
+                        Link(
+                            text=_("Stripe Connect"),
+                            url=self.request.class_link(
+                                PaymentProviderCollection,
+                                name='stripe-connect-oauth'
+                            ),
+                            classes=('new-stripe-connect', )
+                        ),
+                    )
+                )
+            ]

@@ -66,7 +66,7 @@ class OrgTheme(BaseTheme):
     @property
     def pre_imports(self):
         return [
-            'foundation-mods'
+            'foundation-mods',
         ]
 
     @property

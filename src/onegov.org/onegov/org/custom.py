@@ -1,6 +1,7 @@
 from onegov.org import _, OrgApp
-from onegov.org.new_elements import Link, LinkGroup
 from onegov.org.models import GeneralFileCollection, ImageFileCollection
+from onegov.org.new_elements import Link, LinkGroup
+from onegov.pay import PaymentProviderCollection
 from onegov.ticket import TicketCollection
 from onegov.user.auth import Auth, UserCollection
 
@@ -72,6 +73,14 @@ def get_global_tools(request):
                 Link(
                     _("Users"), request.class_link(UserCollection),
                     attrs={'class': 'users'}
+                )
+            )
+
+            links.append(
+                Link(
+                    _("Payment Provider"),
+                    request.class_link(PaymentProviderCollection),
+                    attrs={'class': 'payment'}
                 )
             )
 

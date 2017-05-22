@@ -207,6 +207,7 @@ $global-tools-height: 2.5rem;
     .register::before { @include icon('\f234'); }
     .user::before { @include icon('\f2bd'); }
     .users::before { @include icon('\f0c0'); }
+    .payment::before { @include icon('\f09d'); }
     .profile::before { @include icon('\f2c3'); }
     .management::before { @include icon('\f013'); }
     .images::before { @include icon('\f03e'); }
@@ -1105,10 +1106,12 @@ $new-link-icon: '\f0c1';
 $new-news-icon: '\f1ea';
 $new-newsletter-icon: '\f003';
 $new-page-icon: '\f0f6';
+$new-payment-icon: '\f09d';
 $new-person-icon: '\f007';
 $new-photo-album: '\f03e';
 $new-reservation-icon: '\f271';
 $new-room-icon: '\f015';
+$new-stripe-connect-icon: '\f1f5';
 $new-user-icon: '\f234';
 $paste-link-icon: '\f0ea';
 $select-icon: '\f14a';
@@ -1163,7 +1166,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
 
     a::before {
         display: inline-block;
-        margin-right: 5px;
+        margin-right: 1.5ex;
         text-align: center;
         width: 15px;
     }
@@ -1186,10 +1189,12 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .new-news::before { @include icon($new-news-icon); }
     .new-newsletter::before { @include icon($new-newsletter-icon); }
     .new-page::before { @include icon($new-page-icon); }
+    .new-payment::before { @include icon($new-payment-icon); }
     .new-person::before { @include icon($new-person-icon); }
     .new-photo-album::before { @include icon($new-photo-album); }
     .new-reservation::before { @include icon($new-reservation-icon); }
     .new-room::before { @include icon($new-room-icon); }
+    .new-stripe-connect::before { @include icon($new-stripe-connect-icon); }
     .new-user::before { @include icon($new-user-icon); }
     .paste-link::before { @include icon($paste-link-icon); }
     .select::before { @include icon($select-icon); }

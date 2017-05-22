@@ -14,6 +14,7 @@ from onegov.org.models import Topic, Organisation
 from onegov.org.request import OrgRequest
 from onegov.org.theme import OrgTheme
 from onegov.page import Page, PageCollection
+from onegov.pay import PayApp
 from onegov.reservation import LibresIntegration
 from onegov.search import ElasticsearchApp
 from onegov.ticket import TicketCollection
@@ -21,7 +22,7 @@ from sqlalchemy import desc
 
 
 class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
-             DepotApp):
+             DepotApp, PayApp):
 
     serve_static_files = True
     request_class = OrgRequest
