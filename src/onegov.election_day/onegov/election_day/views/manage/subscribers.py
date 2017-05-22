@@ -20,7 +20,8 @@ def view_subscribers(self, request):
         'layout': ManageSubscribersLayout(self, request),
         'title': _("Manage"),
         'count': self.query().count(),
-        'subscribers': self.batch
+        'subscribers': self.batch,
+        'term': self.term
     }
 
 

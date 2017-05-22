@@ -38,8 +38,8 @@ def get_manage_votes(app, page=0):
 
 
 @ElectionDayApp.path(model=SubscriberCollection, path='/manage/subscribers')
-def get_manage_subscribers(app, page=0):
-    return SubscriberCollection(app.session(), page=page)
+def get_manage_subscribers(app, page=0, term=None):
+    return SubscriberCollection(app.session(), page=page, term=term)
 
 
 @ElectionDayApp.path(model=DataSourceCollection,

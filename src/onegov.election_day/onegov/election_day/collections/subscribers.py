@@ -4,12 +4,13 @@ from onegov.election_day.models import Subscriber
 
 class SubscriberCollectionPagination(Pagination):
 
-    def __init__(self, session, page=0):
+    def __init__(self, session, page=0, term=None):
         self.session = session
         self.page = page
+        self.term = term
 
     def __eq__(self, other):
-        return self.page == other.page
+        return (self.page == other.page) and (self.term == other.term)
 
     def subset(self):
         return self.query().order_by(Subscriber.phone_number)
@@ -25,7 +26,11 @@ class SubscriberCollectionPagination(Pagination):
 class SubscriberCollection(SubscriberCollectionPagination):
 
     def query(self):
-        return self.session.query(Subscriber)
+        query = self.session.query(Subscriber)
+        if self.term:
+            query = query.filter(Subscriber.phone_number.contains(self.term))
+            self.batch_size = query.count()
+        return query
 
     def by_id(self, id):
         """ Returns the subscriber by id. """
