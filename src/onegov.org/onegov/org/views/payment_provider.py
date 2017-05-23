@@ -37,7 +37,7 @@ def new_stripe_connect_provider(self, request):
 
         org = request.app.org
 
-        return morepath.redirect(payment.oauth_url(handler, {
+        return morepath.redirect(payment.prepare_oauth_request(handler, {
             'email': org.reply_to,
             'url': request.link(org),
             'country': 'CH',
