@@ -58,24 +58,16 @@ class StripeConnect(PaymentProvider):
     def identity(self):
         return self.user_id
 
-    def params(self, **p):
-        assert self.client_id and self.client_secret
-
-        p.setdefault('client_id', self.client_id)
-        p.setdefault('client_secret', self.access_token or self.client_secret)
-
-        return p
-
     def oauth_url(self, redirect_uri, state=None, user_fields=None):
         """ Generates an oauth url to be shown in the browser. """
 
         return stripe.OAuth.authorize_url(
-            **self.params(
-                scope='read_write',
-                redirect_uri=redirect_uri,
-                stripe_user=user_fields,
-                state=state
-            )
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            scope='read_write',
+            redirect_uri=redirect_uri,
+            stripe_user=user_fields,
+            state=state
         )
 
     def prepare_oauth_request(self, redirect_uri, success_url, error_url,
@@ -135,14 +127,10 @@ class StripeConnect(PaymentProvider):
 
         self.authorization_code = request_params['code']
 
-        # this is one of the many places where we cannot provide the api
-        # key per request, and have to do it globally instead
         with stripe_api_key(self.client_secret):
             token = stripe.OAuth.token(
-                **self.params(
-                    grant_type='authorization_code',
-                    code=self.authorization_code,
-                )
+                grant_type='authorization_code',
+                code=self.authorization_code,
             )
 
         assert token['scope'] == 'read_write'
@@ -151,3 +139,7 @@ class StripeConnect(PaymentProvider):
         self.user_id = token['stripe_user_id']
         self.refresh_token = token['refresh_token']
         self.access_token = token['access_token']
+
+    def account(self):
+        with stripe_api_key(self.access_token):
+            return stripe.Account.retrieve(id=self.user_id)
