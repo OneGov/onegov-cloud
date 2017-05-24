@@ -495,7 +495,7 @@ class CoreRequest(IncludeRequest, ReturnToMixin):
 
         return self.browser_session['csrf_salt']
 
-    def new_csrf_token(self):
+    def new_csrf_token(self, salt=None):
         """ Returns a new CSRF token. A CSRF token can be verified
         using :meth:`is_valid_csrf_token`.
 
@@ -521,14 +521,16 @@ class CoreRequest(IncludeRequest, ReturnToMixin):
         if not self.is_logged_in:
             return ''
 
+        assert salt or self.csrf_salt
+        salt = salt or self.csrf_salt
+
         # use app.identity_secret here, because that's being used for
         # more.itsdangerous, which uses the same algorithm
-        assert self.csrf_salt
+        signer = TimestampSigner(self.identity_secret, salt=salt)
 
-        signer = TimestampSigner(self.identity_secret, salt=self.csrf_salt)
         return signer.sign(random_token())
 
-    def assert_valid_csrf_token(self, signed_value=None):
+    def assert_valid_csrf_token(self, signed_value=None, salt=None):
         """ Validates the given CSRF token and returns if it was
         created by :meth:`new_csrf_token`. If there's a mismatch, a 403 is
         raised.
@@ -538,14 +540,15 @@ class CoreRequest(IncludeRequest, ReturnToMixin):
 
         """
         signed_value = signed_value or self.params.get('csrf-token')
+        salt = salt or self.csrf_salt
 
         if not signed_value:
             raise HTTPForbidden()
 
-        if not self.csrf_salt:
+        if not salt:
             raise HTTPForbidden()
 
-        signer = TimestampSigner(self.identity_secret, salt=self.csrf_salt)
+        signer = TimestampSigner(self.identity_secret, salt=salt)
         try:
             signer.unsign(signed_value, max_age=self.app.csrf_time_limit)
         except (SignatureExpired, BadSignature):

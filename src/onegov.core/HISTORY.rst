@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the ability to override the csrf salt.
+  [href]
+
 0.40.4 (2017-05-12)
 ~~~~~~~~~~~~~~~~~~~
 
