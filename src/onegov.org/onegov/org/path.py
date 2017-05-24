@@ -52,6 +52,7 @@ from onegov.org.models import (
     Topic,
 )
 from onegov.page import PageCollection
+from onegov.pay import PaymentProvider
 from onegov.pay import PaymentProviderCollection
 from onegov.people import Person, PersonCollection
 from onegov.ticket import Ticket, TicketCollection
@@ -391,3 +392,11 @@ def get_resource_recipient(app, id):
     path='/zahlungsanbieter')
 def get_payment_provider_collection(app):
     return PaymentProviderCollection(app.session())
+
+
+@OrgApp.path(
+    model=PaymentProvider,
+    path='/zahlungsanbieter-eintrag/{id}',
+    converters=dict(id=UUID))
+def get_payment_provider(app, id):
+    return PaymentProviderCollection(app.session()).by_id(id)

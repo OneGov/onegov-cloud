@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-05-22 15:02+0200\n"
+"POT-Creation-Date: 2017-05-24 14:48+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1475,6 +1475,15 @@ msgstr "Einen eigenen Eintrag für den Veranstaltungskalender erfassen"
 msgid "No payment providers defined."
 msgstr "Keine Zahlungsanbieter definiert."
 
+msgid "Credit card payments:"
+msgstr "Kreditkarten Zahlungen:"
+
+msgid "Payouts:"
+msgstr "Auszahlungen:"
+
+msgid "Connection to account failed."
+msgstr "Verbindung zum Konto fehlgeschlagen."
+
 msgid "No people added yet."
 msgstr "Es wurden noch keine Personen hinzugefügt."
 
@@ -1805,7 +1814,34 @@ msgid "Exports all future events."
 msgstr "Exportiert alle zukünftigen Veranstaltungen."
 
 msgid "Your Stripe account was connected successfully."
-msgstr ""
+msgstr "Ihr Stripe Konto wurde erfolgreich verbunden."
+
+msgid "Your Stripe account could not be connected."
+msgstr "Ihr Stripe Konto konnte nicht verbunden werden."
+
+msgid "Changed the default payment provider."
+msgstr "Der Standard Zahlungsanbieter wurde verändert."
+
+msgid "The payment provider was deleted."
+msgstr "Der Zahlungsanbieter wurde gelöscht."
+
+msgid "As default"
+msgstr "Als Standard"
+
+msgid "Do you really want to delete this provider?"
+msgstr "Möchten Sie diesen Zahlungsanbieter wirklich löschen?"
+
+msgid "This cannot be undone."
+msgstr "Dies kann nicht rückgängig gemacht werden."
+
+msgid "Should this provider really be the new default?"
+msgstr "Soll dieser Zahlungsanbieter wirklich zum Standard gemacht werden?"
+
+msgid "All future payments will be switched."
+msgstr "Alle zukünftigen Zahlungen werden umgeschaltet."
+
+msgid "Make Default"
+msgstr "Als Standard"
 
 msgid "New person"
 msgstr "Neue Person"

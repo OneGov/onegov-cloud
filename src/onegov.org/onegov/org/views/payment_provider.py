@@ -4,6 +4,8 @@ from onegov.core.security import Public, Secret
 from onegov.org import _
 from onegov.org.app import OrgApp
 from onegov.org.layout import PaymentProviderLayout
+from onegov.org.new_elements import Link, Confirm, Intercooler
+from onegov.pay import PaymentProvider
 from onegov.pay import PaymentProviderCollection
 from onegov.pay.models.payment_providers import StripeConnect
 from purl import URL
@@ -14,10 +16,48 @@ from purl import URL
     permission=Secret,
     template='payment_providers.pt')
 def view_payment_providers(self, request):
+
+    layout = PaymentProviderLayout(self, request)
+
+    def links(provider):
+        if not provider.default:
+            yield Link(
+                _("As default"),
+                request.link(provider, 'default'),
+                traits=(
+                    Confirm(
+                        _("Should this provider really be the new default?"),
+                        _("All future payments will be switched."),
+                        _("Make Default"), _("Cancel")
+                    ),
+                    Intercooler(
+                        request_method='POST',
+                        redirect_after=request.link(self)
+                    )
+                )
+            )
+        yield Link(
+            _("Delete"),
+            layout.csrf_protected_url(request.link(provider)),
+            traits=(
+                Confirm(
+                    _("Do you really want to delete this provider?"),
+                    _("This cannot be undone."),
+                    _("Delete"), _("Cancel")
+                ),
+                Intercooler(
+                    request_method='DELETE',
+                    target='#' + provider.id.hex,
+                    redirect_after=request.link(self)
+                )
+            )
+        )
+
     return {
-        'providers': tuple(self.query()),
-        'layout': PaymentProviderLayout(self, request),
-        'title': _("Payment Provider")
+        'layout': layout,
+        'links': links,
+        'providers': tuple(self.query().order_by(PaymentProvider.created)),
+        'title': _("Payment Provider"),
     }
 
 
@@ -89,3 +129,28 @@ def new_stripe_connection_success(self, request):
 def new_stripe_connection_error(self, request):
     request.success(_("Your Stripe account could not be connected."))
     return morepath.redirect(request.link(self))
+
+
+@OrgApp.view(
+    model=PaymentProvider,
+    name='default',
+    permission=Secret,
+    request_method='POST')
+def handle_default_provider(self, request):
+    providers = PaymentProviderCollection(request.app.session())
+    providers.as_default(self)
+
+    request.success(_("Changed the default payment provider."))
+
+
+@OrgApp.view(
+    model=PaymentProvider,
+    permission=Secret,
+    request_method='DELETE')
+def delete_provider(self, request):
+    request.assert_valid_csrf_token()
+
+    providers = PaymentProviderCollection(request.app.session())
+    providers.delete(self)
+
+    request.success(_("The payment provider was deleted."))
