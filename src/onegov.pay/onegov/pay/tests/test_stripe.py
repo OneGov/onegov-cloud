@@ -14,18 +14,24 @@ def test_oauth_url():
     assert 'client_id=foo' in url
     assert 'client_secret=bar' in url
 
-    url = provider.oauth_url('https://foo', {'email': 'foo@bar.org'})
+    url = provider.oauth_url('https://foo', 'bar', {'email': 'foo@bar.org'})
+    assert 'state=bar' in url
     assert 'stripe_user%5Bemail%5D=foo%40bar.org' in url
 
 
 def test_process_oauth_response():
-    provider = StripeConnect(client_id='foo', client_secret='bar')
+    provider = StripeConnect(
+        client_id='foo',
+        client_secret='bar',
+        oauth_gateway='https://oauth.onegovcloud.ch/',
+        oauth_gateway_secret='foo',
+    )
 
     with pytest.raises(RuntimeError) as e:
         provider.process_oauth_response(
             {
                 'error': 'foo',
-                'error_description': 'bar'
+                'error_description': 'bar',
             }
         )
 
@@ -38,7 +44,10 @@ def test_process_oauth_response():
         'refresh_token': 'rtoken',
         'access_token': 'atoken',
     }):
-        provider.process_oauth_response({'code': '0xdeadbeef'})
+        provider.process_oauth_response({
+            'code': '0xdeadbeef',
+            'oauth_redirect_secret': 'foo'
+        })
 
         assert provider.publishable_key == 'pubkey'
         assert provider.user_id == 'uid'

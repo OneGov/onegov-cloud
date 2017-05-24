@@ -2,13 +2,18 @@ import json
 import pycurl
 import stripe
 
-from io import StringIO
+from contextlib import contextmanager
+from io import BytesIO
 from onegov.pay.models.payment_provider import PaymentProvider
 from onegov.core.orm.mixins import meta_property
 
 
-# We use pycurl because it's faster and more robust than anything else
-stripe.default_http_client = stripe.http_client.PycurlClient()
+@contextmanager
+def stripe_api_key(key):
+    old_key = stripe.api_key
+    stripe.api_key = key
+    yield
+    stripe.api_key = old_key
 
 
 class StripeConnect(PaymentProvider):
@@ -51,7 +56,7 @@ class StripeConnect(PaymentProvider):
 
     @property
     def identity(self):
-        return self.publishable_key
+        return self.user_id
 
     def params(self, **p):
         assert self.client_id and self.client_secret
@@ -73,7 +78,8 @@ class StripeConnect(PaymentProvider):
             )
         )
 
-    def prepare_oauth_request(self, redirect_uri, user_fields=None):
+    def prepare_oauth_request(self, redirect_uri, success_url, error_url,
+                              user_fields=None):
         """ Registers the oauth request with the oauth_gateway and returns
         an url that is ready to be used for the complete oauth request.
 
@@ -84,10 +90,13 @@ class StripeConnect(PaymentProvider):
 
         payload = {
             'url': redirect_uri,
-            'secret': self.oauth_gateway_secret
+            'secret': self.oauth_gateway_secret,
+            'method': 'GET',
+            'success_url': success_url,
+            'error_url': error_url
         }
 
-        body = StringIO()
+        body = BytesIO()
 
         c = pycurl.Curl()
         c.setopt(c.URL, register)
@@ -95,15 +104,20 @@ class StripeConnect(PaymentProvider):
         c.setopt(pycurl.POSTFIELDS, json.dumps(payload))
         c.setopt(pycurl.WRITEFUNCTION, body.write)
         c.perform()
+
+        status_code = c.getinfo(pycurl.RESPONSE_CODE)
         c.close()
 
-        assert c.getinfo(pycurl.RESPONSE_CODE) == 200
+        assert status_code == 200
 
         body.seek(0)
-        token = json.loads(body.read())['token']
+        token = json.loads(body.read().decode('utf-8'))['token']
 
         return self.oauth_url(
-            redirect_uri, state=token, user_fields=user_fields)
+            redirect_uri='{}/redirect'.format(self.oauth_gateway),
+            state=token,
+            user_fields=user_fields
+        )
 
     def process_oauth_response(self, request_params):
         """ Takes the parameters of an incoming oauth request and stores
@@ -121,12 +135,15 @@ class StripeConnect(PaymentProvider):
 
         self.authorization_code = request_params['code']
 
-        token = stripe.OAuth.token(
-            **self.params(
-                grant_type='authorization_code',
-                code=self.authorization_code,
+        # this is one of the many places where we cannot provide the api
+        # key per request, and have to do it globally instead
+        with stripe_api_key(self.client_secret):
+            token = stripe.OAuth.token(
+                **self.params(
+                    grant_type='authorization_code',
+                    code=self.authorization_code,
+                )
             )
-        )
 
         assert token['scope'] == 'read_write'
 

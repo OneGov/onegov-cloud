@@ -35,6 +35,9 @@ setup(
         'more.webassets',
         'onegov.core>=0.4.0',
         'pycurl',
+        # remove the reqeusts module once pycurl works again:
+        # https://github.com/stripe/stripe-python/issues/317
+        'requests',
         'stripe'
     ],
     extras_require=dict(
