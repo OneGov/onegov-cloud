@@ -8,3 +8,10 @@ class PaymentProviderCollection(GenericCollection):
     @property
     def model_class(self):
         return PaymentProvider
+
+    def as_default(self, provider):
+        for other in self.query():
+            other.default = False
+
+        self.session.flush()
+        provider.default = True
