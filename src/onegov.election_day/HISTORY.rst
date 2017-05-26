@@ -4,6 +4,9 @@ Changelog
 - Adds static data for 2002-2008.
   [msom]
 
+- Indicates the current archive page in the listing.
+  [msom]
+
 - Gets the entity names from the static data when uploading wabsti votes.
   [msom]
 

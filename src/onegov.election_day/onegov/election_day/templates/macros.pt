@@ -28,20 +28,6 @@
     </tal:block>
 </metal:navigation>
 
-<metal:archive define-macro="archive" i18n:domain="onegov.election_day">
-    <div class="row archive" tal:define="years layout.archive.get_years()" tal:condition="years">
-        <div class="columns small-12 small-centered">
-            <h1 i18n:translate="" tal:condition="not: h2|nothing">Archive</h1>
-            <h2 i18n:translate="" tal:condition="h2|nothing">Archive</h2>
-            <ul>
-                <li tal:repeat="date years">
-                    <a href="${request.link(layout.archive.for_date(date))}">${date}</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</metal:archive>
-
 <metal:search define-macro="form" i18n:domain="onegov.election_day">
     <form tal:attributes="action form.action" method="POST" enctype="multipart/form-data">
         <tal:block repeat="fieldset form.fieldsets">

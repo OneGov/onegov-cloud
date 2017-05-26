@@ -99,7 +99,18 @@
             </div>
         </div>
 
-        <div tal:define="h2 1" metal:use-macro="layout.macros['archive']" />
+        <div class="row archive" tal:define="years layout.archive.get_years()" tal:condition="years">
+            <div class="columns small-12 small-centered">
+                <h1 i18n:translate="" tal:condition="not: h2|nothing">Archive</h1>
+                <h2 i18n:translate="" tal:condition="h2|nothing">Archive</h2>
+                <ul>
+                    <li tal:repeat="year years">
+                        <span tal:condition="python: str(year) == date">${year}</span>
+                        <a tal:condition="python: str(year) != date" href="${request.link(layout.archive.for_date(year))}">${year}</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
 
         <div metal:use-macro="layout.macros['subscription_links']" />
     </tal:block>
