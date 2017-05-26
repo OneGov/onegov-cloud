@@ -563,6 +563,7 @@ def test_view_subscription(election_day_app):
 
     client.get('/locale/fr_CH').follow()
 
+    subscribe = client.get('/subscribe')
     subscribe.form['phone_number'] = '0791112233'
     subscribe = subscribe.form.submit()
     assert election_day_app.session().query(Subscriber).one().locale == 'fr_CH'
@@ -582,6 +583,7 @@ def test_view_subscription(election_day_app):
     unsubscribe = unsubscribe.form.submit()
     assert "SMS-Benachrichtigung wurde beendet." in unsubscribe
 
+    unsubscribe = client.get('/unsubscribe')
     unsubscribe.form['phone_number'] = '0791112233'
     unsubscribe = unsubscribe.form.submit()
     assert "SMS-Benachrichtigung wurde beendet." in unsubscribe
