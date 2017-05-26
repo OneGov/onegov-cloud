@@ -1,5 +1,15 @@
 Changelog
 ---------
+
+- Gets the entity names from the static data when uploading wabsti votes.
+  [msom]
+
+- Makes wabsti uploading more robust.
+  [msom]
+
+- Fixes parsing of empty votes when uploading complex wabsti votes.
+  [msom]
+
 1.9.0 (2017-05-22)
 ~~~~~~~~~~~~~~~~~~~
 

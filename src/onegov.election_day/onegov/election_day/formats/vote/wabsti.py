@@ -8,21 +8,23 @@ from onegov.election_day.utils import clear_vote
 from onegov.election_day.utils import guessed_group
 
 
-HEADERS = [
-    'Vorlage-Nr.',
-    'Gemeinde',
-    'BfS-Nr.',
-    'Stimmberechtigte',
-    'leere SZ',
-    'ungültige SZ',
-    'Ja',
-    'Nein',
-    'GegenvJa',
-    'GegenvNein',
-    'StichfrJa',
-    'StichfrNein',
-    'StimmBet',
-]
+HEADERS = (
+    'vorlage-nr.',
+    'bfs-nr.',
+    'stimmberechtigte',
+    'leere sz',
+    'ungultige sz',
+    'ja',
+    'nein',
+    'initoantw',
+    'gegenvja',
+    'gegenvnein',
+    'gegenvoantw',
+    'stichfrja',
+    'stichfrnein',
+    'stichfroantw',
+    'stimmbet',
+)
 
 
 def import_vote_wabsti(entities, vote, file, mimetype, vote_number, complex):
@@ -43,30 +45,30 @@ def import_vote_wabsti(entities, vote, file, mimetype, vote_number, complex):
     ballot_results = {key: [] for key in used_ballot_types}
     errors = []
     added_entity_ids = set()
-    added_groups = set()
-
     skipped = 0
 
     for line in csv.lines:
 
-        if int(line.vorlage_nr_ or 0) != vote_number:
-            continue
-
-        if not float(line.stimmbet or 0):
-            skipped += 1
-            continue
-
         line_errors = []
 
-        # the name of the entity
-        group = line.gemeinde.strip()
-        if not group:
-            line_errors.append(_("Missing municipality/district"))
-        if group in added_groups:
-            line_errors.append(_("${name} was found twice", mapping={
-                'name': group
-            }))
-        added_groups.add(group)
+        # Skip the results of other votes
+        try:
+            number = int(line.vorlage_nr_ or 0)
+        except ValueError:
+            line_errors.append(_("Invalid values"))
+        else:
+            if number != vote_number:
+                continue
+
+        # Skip not yet counted results
+        try:
+            turnout = float(line.stimmbet or 0)
+        except ValueError:
+            line_errors.append(_("Invalid values"))
+        else:
+            if not turnout:
+                skipped += 1
+                continue
 
         # the id of the entity
         entity_id = None
@@ -121,8 +123,12 @@ def import_vote_wabsti(entities, vote, file, mimetype, vote_number, complex):
                 continue
 
         # the empty votes
+        empty = {}
         try:
-            empty = int(line.leere_sz or 0)
+            e_ballots = int(line.leere_sz or 0)
+            empty['proposal'] = int(line.initoantw or 0) + e_ballots
+            empty['counter-proposal'] = int(line.gegenvoantw or 0) + e_ballots
+            empty['tie-breaker'] = int(line.stichfroantw or 0) + e_ballots
         except ValueError:
             line_errors.append(_("Could not read the empty votes"))
 
@@ -131,20 +137,6 @@ def import_vote_wabsti(entities, vote, file, mimetype, vote_number, complex):
             invalid = int(line.ungultige_sz or 0)
         except ValueError:
             line_errors.append(_("Could not read the invalid votes"))
-
-        # now let's do some sanity checks
-        try:
-            if not elegible_voters:
-                line_errors.append(_("No elegible voters"))
-            up = elegible_voters - empty - invalid
-            if (
-                ((yeas['proposal'] + nays['proposal']) > up) or
-                ((yeas['counter-proposal'] + nays['counter-proposal']) > up) or
-                ((yeas['tie-breaker'] + nays['tie-breaker']) > up)
-            ):
-                line_errors.append(_("More cast votes than elegible voters"))
-        except UnboundLocalError:
-            pass
 
         # pass the errors
         if line_errors:
@@ -159,13 +151,13 @@ def import_vote_wabsti(entities, vote, file, mimetype, vote_number, complex):
             for ballot_type in used_ballot_types:
                 ballot_results[ballot_type].append(
                     BallotResult(
-                        group=group,
+                        group=entities.get(entity_id, {}).get('name', ''),
                         counted=True,
                         yeas=yeas[ballot_type],
                         nays=nays[ballot_type],
                         elegible_voters=elegible_voters,
                         entity_id=entity_id,
-                        empty=empty,
+                        empty=empty[ballot_type],
                         invalid=invalid
                     )
                 )

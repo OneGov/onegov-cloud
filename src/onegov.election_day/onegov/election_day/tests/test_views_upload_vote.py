@@ -1,9 +1,5 @@
-import pytest
-import tarfile
-
 from datetime import date
 from onegov.ballot import VoteCollection
-from onegov.core.utils import module_path
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.tests import login
 from time import sleep
@@ -463,93 +459,52 @@ def test_upload_vote_roundtrip(election_day_app):
     assert export == second_export
 
 
-@pytest.mark.parametrize("tar_file", [
-    module_path('onegov.election_day', 'tests/fixtures/wabsti_vote.tar.gz'),
-])
-def test_upload_vote_wabsti(election_day_app_sg, tar_file):
-    archive = ArchivedResultCollection(election_day_app_sg.session())
-
-    client = Client(election_day_app_sg)
+# @pytest.mark.parametrize("tar_file", [
+#     module_path('onegov.election_day', 'tests/fixtures/wabsti_vote.tar.gz'),
+# ])
+# def test_upload_vote_wabsti(election_day_app_sg, tar_file):
+def test_upload_vote_wabsti(election_day_app):
+    client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
-
     login(client)
 
     new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = 'Bacon, yea or nay?'
-    new.form['date'] = date(2016, 6, 6)
+    new.form['vote_de'] = 'Vote'
+    new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
     new.form.submit()
-    assert archive.query().one().progress == (0, 0)
 
-    with tarfile.open(tar_file, 'r|gz') as f:
-        csv = f.extractfile(f.next()).read()
+    with patch(
+        'onegov.election_day.views.upload.vote.import_vote_wabsti'
+    ) as import_:
+        csv = 'csv'.encode('utf-8')
+        upload = client.get('/vote/vote/upload')
+        upload.form['file_format'] = 'wabsti'
+        upload.form['vote_number'] = '1'
+        upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
+        upload = upload.form.submit()
 
-    upload = client.get('/vote/bacon-yea-or-nay/upload')
-    upload.form['file_format'] = 'wabsti'
-    upload.form['vote_number'] = '3'
-    upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
-    upload = upload.form.submit()
+        assert import_.called
+        assert import_.call_args[0][4] == 1
+        assert import_.call_args[0][5] == False
 
-    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
-    assert archive.query().one().progress == (78, 78)
+    edit = client.get('/vote/vote/edit')
+    edit.form['vote_type'] = 'complex'
+    edit.form.submit()
 
-    results = upload.click("Hier klicken")
+    with patch(
+        'onegov.election_day.views.upload.vote.import_vote_wabsti'
+    ) as import_:
+        csv = 'csv'.encode('utf-8')
+        upload = client.get('/vote/vote/upload')
+        upload.form['file_format'] = 'wabsti'
+        upload.form['vote_number'] = '2'
+        upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
+        upload = upload.form.submit()
 
-    assert "37.31%" in results
-    assert "78 von 78" in results
-    assert "61.07 %" in results
-    assert "318'446" in results
-    assert "194'469" in results
-
-    upload = client.get('/vote/bacon-yea-or-nay/upload')
-    upload.form['file_format'] = 'wabsti'
-    upload.form['vote_number'] = '4'
-    upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
-    assert archive.query().one().progress == (3, 77)
-
-    results = upload.click("Hier klicken")
-
-    assert "3 von 77" in results
-    assert "40.30" in results
-
-    new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = 'Complex vote'
-    new.form['date'] = date(2016, 6, 6)
-    new.form['domain'] = 'federation'
-    new.form['vote_type'] = 'complex'
-    new.form.submit()
-
-    upload = client.get('/vote/complex-vote/upload')
-    upload.form['file_format'] = 'wabsti'
-    upload.form['vote_number'] = '3'
-    upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
-
-    results = upload.click("Hier klicken")
-
-    assert "Gegenentwurf" in results
-    assert "Stichfrage" in results
-    assert "answer rejected" in results
-
-    assert "37.31" in results
-    assert "61.07" in results
-    assert "53.00" in results
-    assert "47.00" in results
-
-    results = client.get('/vote/complex-vote/counter-proposal')
-    assert "<h3>Gegenentwurf</h3>" in results
-    assert "53.00" in results
-    assert "47.00" in results
-
-    results = client.get('/vote/complex-vote/tie-breaker')
-    assert "<h3>Stichfrage</h3>" in results
-    assert "45.96" in results
-    assert "54.04" in results
+        assert import_.called
+        assert import_.call_args[0][4] == 2
+        assert import_.call_args[0][5] == True
 
 
 def test_upload_vote_invalidate_cache(election_day_app):
@@ -658,27 +613,6 @@ def test_upload_vote_temporary_results(election_day_app):
 
     result_internal = client.get('/vote/vote/data-csv').text
     assert result_standard == result_internal
-
-    # wabsti: missing or stimmbet
-    csv = '\n'.join((
-        (
-            'Vorlage-Nr.,Gemeinde,BfS-Nr.,StimmBet,Ja,Nein,ungültige SZ,'
-            'leere SZ,Stimmberechtigte,GegenvJa,GegenvNein,StichfrJa,'
-            'StichfrNein'
-        ),
-        '1,Baar,1701,0.0,0,0,0,0,0,0,0,0,0',
-        '1,Oberägeri,1706,0.6,811,1298,0,18,3560,0,0,0,0',
-        '1,Unterägeri,1709,0.6,1096,2083,1,18,5245,0,0,0,0',
-    )).encode('utf-8')
-    upload = client.get('/vote/vote/upload')
-    upload.form['file_format'] = 'wabsti'
-    upload.form['vote_number'] = '1'
-    upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
-    assert 'erfolgreich hochgeladen' in upload.form.submit()
-    assert archive.query().one().progress == (2, 11)
-
-    result_wabsti = client.get('/vote/vote/data-csv').text
-    assert result_standard == result_wabsti
 
 
 def test_upload_vote_available_formats_canton(election_day_app):
@@ -865,39 +799,6 @@ def test_upload_vote_with_expats(election_day_app):
 
         result_internal = client.get('/vote/vote/data-csv').text
         assert result_standard == result_internal
-
-        # wabsti
-        csv = '\n'.join((
-            (
-                'Vorlage-Nr.,Gemeinde,BfS-Nr.,StimmBet,Ja,Nein,ungültige SZ,'
-                'leere SZ,Stimmberechtigte,GegenvJa,GegenvNein,StichfrJa,'
-                'StichfrNein'
-            ),
-            '1,Auslandschweizer,{},100.0,10,20,0,0,30,0,0,0,0'.format(id_),
-        )).encode('utf-8')
-        upload = client.get('/vote/vote/upload')
-        upload.form['file_format'] = 'wabsti'
-        upload.form['vote_number'] = '1'
-        upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
-        assert 'erfolgreich hochgeladen' in upload.form.submit()
-
-        result_wabsti = client.get('/vote/vote/data-csv').text
-        assert result_standard == result_wabsti
-
-        # wabsti: ignore expats with no data
-        csv = '\n'.join((
-            (
-                'Vorlage-Nr.,Gemeinde,BfS-Nr.,StimmBet,Ja,Nein,ungültige SZ,'
-                'leere SZ,Stimmberechtigte,GegenvJa,GegenvNein,StichfrJa,'
-                'StichfrNein'
-            ),
-            '1,Auslandschweizer,{},100.0,0,0,0,0,0,0,0,0,0'.format(id_),
-        )).encode('utf-8')
-        upload = client.get('/vote/vote/upload')
-        upload.form['file_format'] = 'wabsti'
-        upload.form['vote_number'] = '1'
-        upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
-        assert 'Keine Daten gefunden' in upload.form.submit()
 
 
 def test_upload_vote_notify_hipchat(election_day_app):

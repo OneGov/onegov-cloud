@@ -94,9 +94,12 @@ def view_upload(self, request, form):
                         session.delete(self.counter_proposal)
                     if self.tie_breaker:
                         session.delete(self.counter_proposal)
-            else:
+            elif (
+                form.file_format.data == 'internal' or
+                form.file_format.data == 'wabsti_c'
+            ):
                 # It might be that the vote type setting stored in the meta
-                # is overridden by the import (internal, wabsti, wabsti c)
+                # is overridden by the import (internal, wabsti c)
                 if not self.meta:
                     self.meta = {}
                 self.meta['vote_type'] = 'simple'
