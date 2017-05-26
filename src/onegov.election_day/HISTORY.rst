@@ -7,6 +7,9 @@ Changelog
 - Indicates the current archive page in the listing.
   [msom]
 
+- Changes back to election day link to breadcrumbs.
+  [msom]
+
 - Gets the entity names from the static data when uploading wabsti votes.
   [msom]
 

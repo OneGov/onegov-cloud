@@ -18,6 +18,8 @@ from onegov.user import Auth
 
 class Layout(ChameleonLayout):
 
+    day_long_format = 'dd. MMMM'
+
     def __init__(self, model, request):
         super().__init__(model, request)
         self.request.include('common')

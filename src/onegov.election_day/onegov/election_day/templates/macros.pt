@@ -178,9 +178,12 @@
 </metal:subscription_links>
 
 <metal:election_day_link define-macro="election_day_link" i18n:domain="onegov.election_day">
-    <div>
-        <a class="back-to-election-day" href="${request.link(layout.archive.for_date(date))}" tal:content="layout.format_date(date, 'date_long')" />
-    </div>
+    <nav role="navigation" aria-label="Aktuelle Seite">
+        <ul class="breadcrumbs back-links">
+            <li><a href="${request.link(layout.archive.for_date(date.year))}">${date.year}</a></li>
+            <li><a href="${request.link(layout.archive.for_date(date))}">${layout.format_date(date, 'day_long')}</a></li>
+        </ul>
+    </nav>
 </metal:election_day_link>
 
 

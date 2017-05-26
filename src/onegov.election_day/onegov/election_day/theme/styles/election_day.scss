@@ -727,17 +727,12 @@ form {
 /*
     Link back to canton site
 */
-.back-to-election-day {
-    display: inline-block;
-    font-size: .875rem;
-    font-weight: bold;
-    margin-bottom: .875rem;
+ul.breadcrumbs.back-links {
+    background-color: $white-smoke;
+    margin-bottom: 1em;
 
-    &::before {
-        content: '\f100 ';
-        font-family: 'FontAwesome';
-        font-weight: normal;
-        margin-right: 1ex;
+    > * {
+        font-size: .875rem;
     }
 }
 
