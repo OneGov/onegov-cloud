@@ -10,6 +10,9 @@ Changelog
 - Changes back to election day link to breadcrumbs.
   [msom]
 
+- Hides the subscribe/unsubscribe form after form submission.
+  [msom]
+
 - Gets the entity names from the static data when uploading wabsti votes.
   [msom]
 

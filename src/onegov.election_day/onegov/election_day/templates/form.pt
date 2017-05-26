@@ -10,7 +10,7 @@
              <p>${callout}</p>
         </div>
         <p tal:condition="message|nothing">${message}</p>
-        <div class="row">
+        <div tal:condition="show_form|True" class="row">
             <div class="small-12 columns">
                 <div tal:condition="form.error_message|form.errors|nothing" data-alert class="alert-box alert">
                     <tal:block tal:condition="not:form.error_message|nothing" i18n:translate>The form contains errors. Please check the fields marked in red.</tal:block>

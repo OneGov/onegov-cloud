@@ -31,7 +31,8 @@ def subscribe(self, request, form):
             "unsubscribe at any time."
         ),
         'cancel': layout.homepage_link,
-        'callout': callout
+        'callout': callout,
+        'show_form': False if callout else True
     }
 
 
@@ -54,5 +55,6 @@ def unsubscribe(self, request, form):
         'form': form,
         'title': _("Stop SMS subscription"),
         'cancel': layout.homepage_link,
-        'callout': callout
+        'callout': callout,
+        'show_form': False if callout else True
     }
