@@ -1,0 +1,966 @@
+{
+    "5001": {
+        "district": "Bellinzona",
+        "name": "Arbedo-Castione"
+    },
+    "5002": {
+        "district": "Bellinzona",
+        "name": "Bellinzona"
+    },
+    "5003": {
+        "district": "Bellinzona",
+        "name": "Cadenazzo"
+    },
+    "5004": {
+        "district": "Bellinzona",
+        "name": "Camorino"
+    },
+    "5005": {
+        "district": "Bellinzona",
+        "name": "Giubiasco"
+    },
+    "5006": {
+        "district": "Bellinzona",
+        "name": "Gnosca"
+    },
+    "5007": {
+        "district": "Bellinzona",
+        "name": "Gorduno"
+    },
+    "5008": {
+        "district": "Bellinzona",
+        "name": "Gudo"
+    },
+    "5009": {
+        "district": "Bellinzona",
+        "name": "Isone"
+    },
+    "5010": {
+        "district": "Bellinzona",
+        "name": "Lumino"
+    },
+    "5011": {
+        "district": "Bellinzona",
+        "name": "Medeglia"
+    },
+    "5012": {
+        "district": "Bellinzona",
+        "name": "Moleno"
+    },
+    "5013": {
+        "district": "Bellinzona",
+        "name": "Monte Carasso"
+    },
+    "5014": {
+        "district": "Bellinzona",
+        "name": "Pianezzo"
+    },
+    "5015": {
+        "district": "Bellinzona",
+        "name": "Preonzo"
+    },
+    "5016": {
+        "district": "Bellinzona",
+        "name": "Robasacco"
+    },
+    "5017": {
+        "district": "Bellinzona",
+        "name": "Sant'Antonino"
+    },
+    "5018": {
+        "district": "Bellinzona",
+        "name": "Sant'Antonio"
+    },
+    "5019": {
+        "district": "Bellinzona",
+        "name": "Sementina"
+    },
+    "5031": {
+        "district": "Blenio",
+        "name": "Aquila"
+    },
+    "5032": {
+        "district": "Blenio",
+        "name": "Campo (Blenio)"
+    },
+    "5033": {
+        "district": "Blenio",
+        "name": "Castro"
+    },
+    "5034": {
+        "district": "Blenio",
+        "name": "Corzoneso"
+    },
+    "5035": {
+        "district": "Blenio",
+        "name": "Dongio"
+    },
+    "5036": {
+        "district": "Blenio",
+        "name": "Ghirone"
+    },
+    "5037": {
+        "district": "Blenio",
+        "name": "Largario"
+    },
+    "5038": {
+        "district": "Blenio",
+        "name": "Leontica"
+    },
+    "5039": {
+        "district": "Blenio",
+        "name": "Lottigna"
+    },
+    "5040": {
+        "district": "Blenio",
+        "name": "Ludiano"
+    },
+    "5041": {
+        "district": "Blenio",
+        "name": "Malvaglia"
+    },
+    "5042": {
+        "district": "Blenio",
+        "name": "Marolta"
+    },
+    "5043": {
+        "district": "Blenio",
+        "name": "Olivone"
+    },
+    "5044": {
+        "district": "Blenio",
+        "name": "Ponto Valentino"
+    },
+    "5045": {
+        "district": "Blenio",
+        "name": "Prugiasco"
+    },
+    "5046": {
+        "district": "Blenio",
+        "name": "Semione"
+    },
+    "5047": {
+        "district": "Blenio",
+        "name": "Torre"
+    },
+    "5048": {
+        "district": "Blenio",
+        "name": "Acquarossa"
+    },
+    "5061": {
+        "district": "Leventina",
+        "name": "Airolo"
+    },
+    "5062": {
+        "district": "Leventina",
+        "name": "Anzonico"
+    },
+    "5063": {
+        "district": "Leventina",
+        "name": "Bedretto"
+    },
+    "5064": {
+        "district": "Leventina",
+        "name": "Bodio"
+    },
+    "5065": {
+        "district": "Leventina",
+        "name": "Calonico"
+    },
+    "5066": {
+        "district": "Leventina",
+        "name": "Calpiogna"
+    },
+    "5067": {
+        "district": "Leventina",
+        "name": "Campello"
+    },
+    "5068": {
+        "district": "Leventina",
+        "name": "Cavagnago"
+    },
+    "5069": {
+        "district": "Leventina",
+        "name": "Chiggiogna"
+    },
+    "5070": {
+        "district": "Leventina",
+        "name": "Chironico"
+    },
+    "5071": {
+        "district": "Leventina",
+        "name": "Dalpe"
+    },
+    "5072": {
+        "district": "Leventina",
+        "name": "Faido"
+    },
+    "5073": {
+        "district": "Leventina",
+        "name": "Giornico"
+    },
+    "5074": {
+        "district": "Leventina",
+        "name": "Mairengo"
+    },
+    "5075": {
+        "district": "Leventina",
+        "name": "Osco"
+    },
+    "5076": {
+        "district": "Leventina",
+        "name": "Personico"
+    },
+    "5077": {
+        "district": "Leventina",
+        "name": "Pollegio"
+    },
+    "5078": {
+        "district": "Leventina",
+        "name": "Prato (Leventina)"
+    },
+    "5079": {
+        "district": "Leventina",
+        "name": "Quinto"
+    },
+    "5080": {
+        "district": "Leventina",
+        "name": "Rossura"
+    },
+    "5081": {
+        "district": "Leventina",
+        "name": "Sobrio"
+    },
+    "5091": {
+        "district": "Locarno",
+        "name": "Ascona"
+    },
+    "5094": {
+        "district": "Locarno",
+        "name": "Borgnone"
+    },
+    "5095": {
+        "district": "Locarno",
+        "name": "Brione (Verzasca)"
+    },
+    "5096": {
+        "district": "Locarno",
+        "name": "Brione sopra Minusio"
+    },
+    "5097": {
+        "district": "Locarno",
+        "name": "Brissago"
+    },
+    "5098": {
+        "district": "Locarno",
+        "name": "Caviano"
+    },
+    "5099": {
+        "district": "Locarno",
+        "name": "Cavigliano"
+    },
+    "5101": {
+        "district": "Locarno",
+        "name": "Contone"
+    },
+    "5102": {
+        "district": "Locarno",
+        "name": "Corippo"
+    },
+    "5104": {
+        "district": "Locarno",
+        "name": "Cugnasco"
+    },
+    "5105": {
+        "district": "Locarno",
+        "name": "Frasco"
+    },
+    "5106": {
+        "district": "Locarno",
+        "name": "Gerra (Gambarogno)"
+    },
+    "5107": {
+        "district": "Locarno",
+        "name": "Gerra (Verzasca)"
+    },
+    "5108": {
+        "district": "Locarno",
+        "name": "Gordola"
+    },
+    "5109": {
+        "district": "Locarno",
+        "name": "Gresso"
+    },
+    "5110": {
+        "district": "Locarno",
+        "name": "Indemini"
+    },
+    "5111": {
+        "district": "Locarno",
+        "name": "Intragna"
+    },
+    "5112": {
+        "district": "Locarno",
+        "name": "Lavertezzo"
+    },
+    "5113": {
+        "district": "Locarno",
+        "name": "Locarno"
+    },
+    "5115": {
+        "district": "Locarno",
+        "name": "Losone"
+    },
+    "5116": {
+        "district": "Locarno",
+        "name": "Magadino"
+    },
+    "5117": {
+        "district": "Locarno",
+        "name": "Mergoscia"
+    },
+    "5118": {
+        "district": "Locarno",
+        "name": "Minusio"
+    },
+    "5119": {
+        "district": "Locarno",
+        "name": "Mosogno"
+    },
+    "5120": {
+        "district": "Locarno",
+        "name": "Muralto"
+    },
+    "5121": {
+        "district": "Locarno",
+        "name": "Orselina"
+    },
+    "5122": {
+        "district": "Locarno",
+        "name": "Palagnedra"
+    },
+    "5123": {
+        "district": "Locarno",
+        "name": "Piazzogna"
+    },
+    "5125": {
+        "district": "Locarno",
+        "name": "Ronco sopra Ascona"
+    },
+    "5127": {
+        "district": "Locarno",
+        "name": "San Nazzaro"
+    },
+    "5128": {
+        "district": "Locarno",
+        "name": "Sant'Abbondio"
+    },
+    "5129": {
+        "district": "Locarno",
+        "name": "Sonogno"
+    },
+    "5130": {
+        "district": "Locarno",
+        "name": "Tegna"
+    },
+    "5131": {
+        "district": "Locarno",
+        "name": "Tenero-Contra"
+    },
+    "5132": {
+        "district": "Locarno",
+        "name": "Vergeletto"
+    },
+    "5133": {
+        "district": "Locarno",
+        "name": "Verscio"
+    },
+    "5134": {
+        "district": "Locarno",
+        "name": "Vira (Gambarogno)"
+    },
+    "5135": {
+        "district": "Locarno",
+        "name": "Vogorno"
+    },
+    "5136": {
+        "district": "Locarno",
+        "name": "Onsernone"
+    },
+    "5137": {
+        "district": "Locarno",
+        "name": "Isorno"
+    },
+    "5141": {
+        "district": "Lugano",
+        "name": "Agno"
+    },
+    "5142": {
+        "district": "Lugano",
+        "name": "Agra"
+    },
+    "5143": {
+        "district": "Lugano",
+        "name": "Aranno"
+    },
+    "5144": {
+        "district": "Lugano",
+        "name": "Arogno"
+    },
+    "5145": {
+        "district": "Lugano",
+        "name": "Arosio"
+    },
+    "5146": {
+        "district": "Lugano",
+        "name": "Astano"
+    },
+    "5147": {
+        "district": "Lugano",
+        "name": "Barbengo"
+    },
+    "5148": {
+        "district": "Lugano",
+        "name": "Bedano"
+    },
+    "5149": {
+        "district": "Lugano",
+        "name": "Bedigliora"
+    },
+    "5150": {
+        "district": "Lugano",
+        "name": "Bidogno"
+    },
+    "5151": {
+        "district": "Lugano",
+        "name": "Bioggio"
+    },
+    "5153": {
+        "district": "Lugano",
+        "name": "Bironico"
+    },
+    "5154": {
+        "district": "Lugano",
+        "name": "Bissone"
+    },
+    "5155": {
+        "district": "Lugano",
+        "name": "Bogno"
+    },
+    "5156": {
+        "district": "Lugano",
+        "name": "Bosco Luganese"
+    },
+    "5158": {
+        "district": "Lugano",
+        "name": "Breganzona"
+    },
+    "5159": {
+        "district": "Lugano",
+        "name": "Breno"
+    },
+    "5160": {
+        "district": "Lugano",
+        "name": "Brusino Arsizio"
+    },
+    "5161": {
+        "district": "Lugano",
+        "name": "Cademario"
+    },
+    "5162": {
+        "district": "Lugano",
+        "name": "Cadempino"
+    },
+    "5163": {
+        "district": "Lugano",
+        "name": "Cadro"
+    },
+    "5165": {
+        "district": "Lugano",
+        "name": "Camignolo"
+    },
+    "5167": {
+        "district": "Lugano",
+        "name": "Canobbio"
+    },
+    "5168": {
+        "district": "Lugano",
+        "name": "Carabbia"
+    },
+    "5169": {
+        "district": "Lugano",
+        "name": "Carabietta"
+    },
+    "5170": {
+        "district": "Lugano",
+        "name": "Carona"
+    },
+    "5171": {
+        "district": "Lugano",
+        "name": "Caslano"
+    },
+    "5173": {
+        "district": "Lugano",
+        "name": "Certara"
+    },
+    "5174": {
+        "district": "Lugano",
+        "name": "Cimadera"
+    },
+    "5175": {
+        "district": "Lugano",
+        "name": "Cimo"
+    },
+    "5176": {
+        "district": "Lugano",
+        "name": "Comano"
+    },
+    "5177": {
+        "district": "Lugano",
+        "name": "Corticiasca"
+    },
+    "5178": {
+        "district": "Lugano",
+        "name": "Croglio"
+    },
+    "5179": {
+        "district": "Lugano",
+        "name": "Cureggia"
+    },
+    "5180": {
+        "district": "Lugano",
+        "name": "Cureglia"
+    },
+    "5181": {
+        "district": "Lugano",
+        "name": "Curio"
+    },
+    "5182": {
+        "district": "Lugano",
+        "name": "Davesco-Soragno"
+    },
+    "5183": {
+        "district": "Lugano",
+        "name": "Fescoggia"
+    },
+    "5184": {
+        "district": "Lugano",
+        "name": "Gandria"
+    },
+    "5185": {
+        "district": "Lugano",
+        "name": "Gentilino"
+    },
+    "5186": {
+        "district": "Lugano",
+        "name": "Grancia"
+    },
+    "5187": {
+        "district": "Lugano",
+        "name": "Gravesano"
+    },
+    "5188": {
+        "district": "Lugano",
+        "name": "Iseo"
+    },
+    "5189": {
+        "district": "Lugano",
+        "name": "Lamone"
+    },
+    "5191": {
+        "district": "Lugano",
+        "name": "Lugaggia"
+    },
+    "5192": {
+        "district": "Lugano",
+        "name": "Lugano"
+    },
+    "5193": {
+        "district": "Lugano",
+        "name": "Magliaso"
+    },
+    "5194": {
+        "district": "Lugano",
+        "name": "Manno"
+    },
+    "5195": {
+        "district": "Lugano",
+        "name": "Maroggia"
+    },
+    "5196": {
+        "district": "Lugano",
+        "name": "Massagno"
+    },
+    "5197": {
+        "district": "Lugano",
+        "name": "Melano"
+    },
+    "5198": {
+        "district": "Lugano",
+        "name": "Melide"
+    },
+    "5199": {
+        "district": "Lugano",
+        "name": "Mezzovico-Vira"
+    },
+    "5200": {
+        "district": "Lugano",
+        "name": "Miglieglia"
+    },
+    "5201": {
+        "district": "Lugano",
+        "name": "Montagnola"
+    },
+    "5202": {
+        "district": "Lugano",
+        "name": "Monteggio"
+    },
+    "5203": {
+        "district": "Lugano",
+        "name": "Morcote"
+    },
+    "5204": {
+        "district": "Lugano",
+        "name": "Mugena"
+    },
+    "5205": {
+        "district": "Lugano",
+        "name": "Muzzano"
+    },
+    "5206": {
+        "district": "Lugano",
+        "name": "Neggio"
+    },
+    "5207": {
+        "district": "Lugano",
+        "name": "Novaggio"
+    },
+    "5208": {
+        "district": "Lugano",
+        "name": "Origlio"
+    },
+    "5209": {
+        "district": "Lugano",
+        "name": "Pambio-Noranco"
+    },
+    "5210": {
+        "district": "Lugano",
+        "name": "Paradiso"
+    },
+    "5211": {
+        "district": "Lugano",
+        "name": "Pazzallo"
+    },
+    "5212": {
+        "district": "Lugano",
+        "name": "Ponte Capriasca"
+    },
+    "5213": {
+        "district": "Lugano",
+        "name": "Ponte Tresa"
+    },
+    "5214": {
+        "district": "Lugano",
+        "name": "Porza"
+    },
+    "5215": {
+        "district": "Lugano",
+        "name": "Pregassona"
+    },
+    "5216": {
+        "district": "Lugano",
+        "name": "Pura"
+    },
+    "5217": {
+        "district": "Lugano",
+        "name": "Rivera"
+    },
+    "5219": {
+        "district": "Lugano",
+        "name": "Rovio"
+    },
+    "5221": {
+        "district": "Lugano",
+        "name": "Savosa"
+    },
+    "5222": {
+        "district": "Lugano",
+        "name": "Sessa"
+    },
+    "5223": {
+        "district": "Lugano",
+        "name": "Sigirino"
+    },
+    "5224": {
+        "district": "Lugano",
+        "name": "Sonvico"
+    },
+    "5225": {
+        "district": "Lugano",
+        "name": "Sorengo"
+    },
+    "5226": {
+        "district": "Lugano",
+        "name": "Capriasca"
+    },
+    "5227": {
+        "district": "Lugano",
+        "name": "Torricella-Taverne"
+    },
+    "5229": {
+        "district": "Lugano",
+        "name": "Valcolla"
+    },
+    "5230": {
+        "district": "Lugano",
+        "name": "Vernate"
+    },
+    "5231": {
+        "district": "Lugano",
+        "name": "Vezia"
+    },
+    "5232": {
+        "district": "Lugano",
+        "name": "Vezio"
+    },
+    "5233": {
+        "district": "Lugano",
+        "name": "Vico Morcote"
+    },
+    "5234": {
+        "district": "Lugano",
+        "name": "Viganello"
+    },
+    "5235": {
+        "district": "Lugano",
+        "name": "Villa Luganese"
+    },
+    "5236": {
+        "district": "Lugano",
+        "name": "Collina d'Oro"
+    },
+    "5241": {
+        "district": "Mendrisio",
+        "name": "Arzo"
+    },
+    "5242": {
+        "district": "Mendrisio",
+        "name": "Balerna"
+    },
+    "5243": {
+        "district": "Mendrisio",
+        "name": "Besazio"
+    },
+    "5244": {
+        "district": "Mendrisio",
+        "name": "Bruzella"
+    },
+    "5245": {
+        "district": "Mendrisio",
+        "name": "Cabbio"
+    },
+    "5246": {
+        "district": "Mendrisio",
+        "name": "Caneggio"
+    },
+    "5247": {
+        "district": "Mendrisio",
+        "name": "Capolago"
+    },
+    "5248": {
+        "district": "Mendrisio",
+        "name": "Casima"
+    },
+    "5249": {
+        "district": "Mendrisio",
+        "name": "Castel San Pietro"
+    },
+    "5250": {
+        "district": "Mendrisio",
+        "name": "Chiasso"
+    },
+    "5251": {
+        "district": "Mendrisio",
+        "name": "Coldrerio"
+    },
+    "5252": {
+        "district": "Mendrisio",
+        "name": "Genestrerio"
+    },
+    "5253": {
+        "district": "Mendrisio",
+        "name": "Ligornetto"
+    },
+    "5254": {
+        "district": "Mendrisio",
+        "name": "Mendrisio"
+    },
+    "5255": {
+        "district": "Mendrisio",
+        "name": "Meride"
+    },
+    "5256": {
+        "district": "Mendrisio",
+        "name": "Monte"
+    },
+    "5257": {
+        "district": "Mendrisio",
+        "name": "Morbio Inferiore"
+    },
+    "5258": {
+        "district": "Mendrisio",
+        "name": "Morbio Superiore"
+    },
+    "5259": {
+        "district": "Mendrisio",
+        "name": "Muggio"
+    },
+    "5260": {
+        "district": "Mendrisio",
+        "name": "Novazzano"
+    },
+    "5262": {
+        "district": "Mendrisio",
+        "name": "Rancate"
+    },
+    "5263": {
+        "district": "Mendrisio",
+        "name": "Riva San Vitale"
+    },
+    "5264": {
+        "district": "Mendrisio",
+        "name": "Sagno"
+    },
+    "5265": {
+        "district": "Mendrisio",
+        "name": "Salorino"
+    },
+    "5266": {
+        "district": "Mendrisio",
+        "name": "Stabio"
+    },
+    "5267": {
+        "district": "Mendrisio",
+        "name": "Tremona"
+    },
+    "5268": {
+        "district": "Mendrisio",
+        "name": "Vacallo"
+    },
+    "5281": {
+        "district": "Riviera",
+        "name": "Biasca"
+    },
+    "5282": {
+        "district": "Riviera",
+        "name": "Claro"
+    },
+    "5283": {
+        "district": "Riviera",
+        "name": "Cresciano"
+    },
+    "5284": {
+        "district": "Riviera",
+        "name": "Iragna"
+    },
+    "5285": {
+        "district": "Riviera",
+        "name": "Lodrino"
+    },
+    "5286": {
+        "district": "Riviera",
+        "name": "Osogna"
+    },
+    "5301": {
+        "district": "Vallemaggia",
+        "name": "Aurigeno"
+    },
+    "5302": {
+        "district": "Vallemaggia",
+        "name": "Avegno"
+    },
+    "5303": {
+        "district": "Vallemaggia",
+        "name": "Bignasco"
+    },
+    "5304": {
+        "district": "Vallemaggia",
+        "name": "Bosco/Gurin"
+    },
+    "5305": {
+        "district": "Vallemaggia",
+        "name": "Broglio"
+    },
+    "5306": {
+        "district": "Vallemaggia",
+        "name": "Brontallo"
+    },
+    "5307": {
+        "district": "Vallemaggia",
+        "name": "Campo (Vallemaggia)"
+    },
+    "5308": {
+        "district": "Vallemaggia",
+        "name": "Cavergno"
+    },
+    "5309": {
+        "district": "Vallemaggia",
+        "name": "Cerentino"
+    },
+    "5310": {
+        "district": "Vallemaggia",
+        "name": "Cevio"
+    },
+    "5311": {
+        "district": "Vallemaggia",
+        "name": "Coglio"
+    },
+    "5312": {
+        "district": "Vallemaggia",
+        "name": "Fusio"
+    },
+    "5313": {
+        "district": "Vallemaggia",
+        "name": "Giumaglio"
+    },
+    "5314": {
+        "district": "Vallemaggia",
+        "name": "Gordevio"
+    },
+    "5315": {
+        "district": "Vallemaggia",
+        "name": "Linescio"
+    },
+    "5316": {
+        "district": "Vallemaggia",
+        "name": "Lodano"
+    },
+    "5317": {
+        "district": "Vallemaggia",
+        "name": "Maggia"
+    },
+    "5318": {
+        "district": "Vallemaggia",
+        "name": "Menzonio"
+    },
+    "5319": {
+        "district": "Vallemaggia",
+        "name": "Moghegno"
+    },
+    "5320": {
+        "district": "Vallemaggia",
+        "name": "Peccia"
+    },
+    "5321": {
+        "district": "Vallemaggia",
+        "name": "Prato-Sornico"
+    },
+    "5322": {
+        "district": "Vallemaggia",
+        "name": "Someo"
+    },
+    "5323": {
+        "district": "Vallemaggia",
+        "name": "Lavizzara"
+    }
+}

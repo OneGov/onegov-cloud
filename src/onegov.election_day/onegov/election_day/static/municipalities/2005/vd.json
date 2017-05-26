@@ -1,0 +1,1526 @@
+{
+    "5401": {
+        "district": "Aigle",
+        "name": "Aigle"
+    },
+    "5402": {
+        "district": "Aigle",
+        "name": "Bex"
+    },
+    "5403": {
+        "district": "Aigle",
+        "name": "Chessel"
+    },
+    "5404": {
+        "district": "Aigle",
+        "name": "Corbeyrier"
+    },
+    "5405": {
+        "district": "Aigle",
+        "name": "Gryon"
+    },
+    "5406": {
+        "district": "Aigle",
+        "name": "Lavey-Morcles"
+    },
+    "5407": {
+        "district": "Aigle",
+        "name": "Leysin"
+    },
+    "5408": {
+        "district": "Aigle",
+        "name": "Noville"
+    },
+    "5409": {
+        "district": "Aigle",
+        "name": "Ollon"
+    },
+    "5410": {
+        "district": "Aigle",
+        "name": "Ormont-Dessous"
+    },
+    "5411": {
+        "district": "Aigle",
+        "name": "Ormont-Dessus"
+    },
+    "5412": {
+        "district": "Aigle",
+        "name": "Rennaz"
+    },
+    "5413": {
+        "district": "Aigle",
+        "name": "Roche (VD)"
+    },
+    "5414": {
+        "district": "Aigle",
+        "name": "Villeneuve (VD)"
+    },
+    "5415": {
+        "district": "Aigle",
+        "name": "Yvorne"
+    },
+    "5421": {
+        "district": "Aubonne",
+        "name": "Apples"
+    },
+    "5422": {
+        "district": "Aubonne",
+        "name": "Aubonne"
+    },
+    "5423": {
+        "district": "Aubonne",
+        "name": "Ballens"
+    },
+    "5424": {
+        "district": "Aubonne",
+        "name": "Berolle"
+    },
+    "5425": {
+        "district": "Aubonne",
+        "name": "Bi\u00e8re"
+    },
+    "5426": {
+        "district": "Aubonne",
+        "name": "Bougy-Villars"
+    },
+    "5427": {
+        "district": "Aubonne",
+        "name": "F\u00e9chy"
+    },
+    "5428": {
+        "district": "Aubonne",
+        "name": "Gimel"
+    },
+    "5429": {
+        "district": "Aubonne",
+        "name": "Longirod"
+    },
+    "5430": {
+        "district": "Aubonne",
+        "name": "Marchissy"
+    },
+    "5431": {
+        "district": "Aubonne",
+        "name": "Mollens (VD)"
+    },
+    "5432": {
+        "district": "Aubonne",
+        "name": "Montherod"
+    },
+    "5433": {
+        "district": "Aubonne",
+        "name": "Pizy"
+    },
+    "5434": {
+        "district": "Aubonne",
+        "name": "Saint-George"
+    },
+    "5435": {
+        "district": "Aubonne",
+        "name": "Saint-Livres"
+    },
+    "5436": {
+        "district": "Aubonne",
+        "name": "Saint-Oyens"
+    },
+    "5437": {
+        "district": "Aubonne",
+        "name": "Saubraz"
+    },
+    "5451": {
+        "district": "Avenches",
+        "name": "Avenches"
+    },
+    "5452": {
+        "district": "Avenches",
+        "name": "Bellerive (VD)"
+    },
+    "5453": {
+        "district": "Avenches",
+        "name": "Chabrey"
+    },
+    "5455": {
+        "district": "Avenches",
+        "name": "Constantine"
+    },
+    "5456": {
+        "district": "Avenches",
+        "name": "Cudrefin"
+    },
+    "5457": {
+        "district": "Avenches",
+        "name": "Donatyre"
+    },
+    "5458": {
+        "district": "Avenches",
+        "name": "Faoug"
+    },
+    "5459": {
+        "district": "Avenches",
+        "name": "Montmagny"
+    },
+    "5460": {
+        "district": "Avenches",
+        "name": "Mur (VD)"
+    },
+    "5461": {
+        "district": "Avenches",
+        "name": "Oleyres"
+    },
+    "5462": {
+        "district": "Avenches",
+        "name": "Vallamand"
+    },
+    "5463": {
+        "district": "Avenches",
+        "name": "Villars-le-Grand"
+    },
+    "5471": {
+        "district": "Cossonay",
+        "name": "Bettens"
+    },
+    "5472": {
+        "district": "Cossonay",
+        "name": "Bournens"
+    },
+    "5473": {
+        "district": "Cossonay",
+        "name": "Boussens"
+    },
+    "5474": {
+        "district": "Cossonay",
+        "name": "La Chaux (Cossonay)"
+    },
+    "5475": {
+        "district": "Cossonay",
+        "name": "Chavannes-le-Veyron"
+    },
+    "5476": {
+        "district": "Cossonay",
+        "name": "Chevilly"
+    },
+    "5477": {
+        "district": "Cossonay",
+        "name": "Cossonay"
+    },
+    "5478": {
+        "district": "Cossonay",
+        "name": "Cottens (VD)"
+    },
+    "5479": {
+        "district": "Cossonay",
+        "name": "Cuarnens"
+    },
+    "5480": {
+        "district": "Cossonay",
+        "name": "Daillens"
+    },
+    "5481": {
+        "district": "Cossonay",
+        "name": "Dizy"
+    },
+    "5482": {
+        "district": "Cossonay",
+        "name": "Ecl\u00e9pens"
+    },
+    "5483": {
+        "district": "Cossonay",
+        "name": "Ferreyres"
+    },
+    "5484": {
+        "district": "Cossonay",
+        "name": "Gollion"
+    },
+    "5485": {
+        "district": "Cossonay",
+        "name": "Grancy"
+    },
+    "5486": {
+        "district": "Cossonay",
+        "name": "L'Isle"
+    },
+    "5487": {
+        "district": "Cossonay",
+        "name": "Lussery-Villars"
+    },
+    "5488": {
+        "district": "Cossonay",
+        "name": "Mauraz"
+    },
+    "5489": {
+        "district": "Cossonay",
+        "name": "Mex (VD)"
+    },
+    "5490": {
+        "district": "Cossonay",
+        "name": "Moiry"
+    },
+    "5491": {
+        "district": "Cossonay",
+        "name": "Mont-la-Ville"
+    },
+    "5492": {
+        "district": "Cossonay",
+        "name": "Montricher"
+    },
+    "5493": {
+        "district": "Cossonay",
+        "name": "Orny"
+    },
+    "5494": {
+        "district": "Cossonay",
+        "name": "Pampigny"
+    },
+    "5495": {
+        "district": "Cossonay",
+        "name": "Penthalaz"
+    },
+    "5496": {
+        "district": "Cossonay",
+        "name": "Penthaz"
+    },
+    "5497": {
+        "district": "Cossonay",
+        "name": "Pompaples"
+    },
+    "5498": {
+        "district": "Cossonay",
+        "name": "La Sarraz"
+    },
+    "5499": {
+        "district": "Cossonay",
+        "name": "Senarclens"
+    },
+    "5500": {
+        "district": "Cossonay",
+        "name": "S\u00e9very"
+    },
+    "5501": {
+        "district": "Cossonay",
+        "name": "Sullens"
+    },
+    "5503": {
+        "district": "Cossonay",
+        "name": "Vufflens-la-Ville"
+    },
+    "5511": {
+        "district": "Echallens",
+        "name": "Assens"
+    },
+    "5512": {
+        "district": "Echallens",
+        "name": "Bercher"
+    },
+    "5513": {
+        "district": "Echallens",
+        "name": "Bioley-Orjulaz"
+    },
+    "5514": {
+        "district": "Echallens",
+        "name": "Bottens"
+    },
+    "5515": {
+        "district": "Echallens",
+        "name": "Bretigny-sur-Morrens"
+    },
+    "5516": {
+        "district": "Echallens",
+        "name": "Cugy (VD)"
+    },
+    "5517": {
+        "district": "Echallens",
+        "name": "Dommartin"
+    },
+    "5518": {
+        "district": "Echallens",
+        "name": "Echallens"
+    },
+    "5519": {
+        "district": "Echallens",
+        "name": "Eclagnens"
+    },
+    "5520": {
+        "district": "Echallens",
+        "name": "Essertines-sur-Yverdon"
+    },
+    "5521": {
+        "district": "Echallens",
+        "name": "Etagni\u00e8res"
+    },
+    "5522": {
+        "district": "Echallens",
+        "name": "Fey"
+    },
+    "5523": {
+        "district": "Echallens",
+        "name": "Froideville"
+    },
+    "5524": {
+        "district": "Echallens",
+        "name": "Goumoens-la-Ville"
+    },
+    "5525": {
+        "district": "Echallens",
+        "name": "Goumoens-le-Jux"
+    },
+    "5526": {
+        "district": "Echallens",
+        "name": "Malapalud"
+    },
+    "5527": {
+        "district": "Echallens",
+        "name": "Morrens (VD)"
+    },
+    "5528": {
+        "district": "Echallens",
+        "name": "Naz"
+    },
+    "5529": {
+        "district": "Echallens",
+        "name": "Oulens-sous-Echallens"
+    },
+    "5530": {
+        "district": "Echallens",
+        "name": "Pailly"
+    },
+    "5531": {
+        "district": "Echallens",
+        "name": "Penth\u00e9r\u00e9az"
+    },
+    "5532": {
+        "district": "Echallens",
+        "name": "Poliez-le-Grand"
+    },
+    "5533": {
+        "district": "Echallens",
+        "name": "Poliez-Pittet"
+    },
+    "5534": {
+        "district": "Echallens",
+        "name": "Rueyres"
+    },
+    "5535": {
+        "district": "Echallens",
+        "name": "Saint-Barth\u00e9lemy (VD)"
+    },
+    "5536": {
+        "district": "Echallens",
+        "name": "Sugnens"
+    },
+    "5537": {
+        "district": "Echallens",
+        "name": "Villars-le-Terroir"
+    },
+    "5538": {
+        "district": "Echallens",
+        "name": "Villars-Tiercelin"
+    },
+    "5539": {
+        "district": "Echallens",
+        "name": "Vuarrens"
+    },
+    "5551": {
+        "district": "Grandson",
+        "name": "Bonvillars"
+    },
+    "5552": {
+        "district": "Grandson",
+        "name": "Bullet"
+    },
+    "5553": {
+        "district": "Grandson",
+        "name": "Champagne"
+    },
+    "5554": {
+        "district": "Grandson",
+        "name": "Concise"
+    },
+    "5555": {
+        "district": "Grandson",
+        "name": "Corcelles-pr\u00e8s-Concise"
+    },
+    "5556": {
+        "district": "Grandson",
+        "name": "Fiez"
+    },
+    "5557": {
+        "district": "Grandson",
+        "name": "Fontaines-sur-Grandson"
+    },
+    "5558": {
+        "district": "Grandson",
+        "name": "Fontanezier"
+    },
+    "5559": {
+        "district": "Grandson",
+        "name": "Giez"
+    },
+    "5560": {
+        "district": "Grandson",
+        "name": "Grandevent"
+    },
+    "5561": {
+        "district": "Grandson",
+        "name": "Grandson"
+    },
+    "5562": {
+        "district": "Grandson",
+        "name": "Mauborget"
+    },
+    "5563": {
+        "district": "Grandson",
+        "name": "Mutrux"
+    },
+    "5564": {
+        "district": "Grandson",
+        "name": "Novalles"
+    },
+    "5565": {
+        "district": "Grandson",
+        "name": "Onnens (VD)"
+    },
+    "5566": {
+        "district": "Grandson",
+        "name": "Provence"
+    },
+    "5567": {
+        "district": "Grandson",
+        "name": "Romairon"
+    },
+    "5568": {
+        "district": "Grandson",
+        "name": "Sainte-Croix"
+    },
+    "5569": {
+        "district": "Grandson",
+        "name": "Vaugondry"
+    },
+    "5570": {
+        "district": "Grandson",
+        "name": "Villars-Burquin"
+    },
+    "5581": {
+        "district": "Lausanne",
+        "name": "Belmont-sur-Lausanne"
+    },
+    "5582": {
+        "district": "Lausanne",
+        "name": "Cheseaux-sur-Lausanne"
+    },
+    "5583": {
+        "district": "Lausanne",
+        "name": "Crissier"
+    },
+    "5584": {
+        "district": "Lausanne",
+        "name": "Epalinges"
+    },
+    "5585": {
+        "district": "Lausanne",
+        "name": "Jouxtens-M\u00e9zery"
+    },
+    "5586": {
+        "district": "Lausanne",
+        "name": "Lausanne"
+    },
+    "5587": {
+        "district": "Lausanne",
+        "name": "Le Mont-sur-Lausanne"
+    },
+    "5588": {
+        "district": "Lausanne",
+        "name": "Paudex"
+    },
+    "5589": {
+        "district": "Lausanne",
+        "name": "Prilly"
+    },
+    "5590": {
+        "district": "Lausanne",
+        "name": "Pully"
+    },
+    "5591": {
+        "district": "Lausanne",
+        "name": "Renens (VD)"
+    },
+    "5592": {
+        "district": "Lausanne",
+        "name": "Romanel-sur-Lausanne"
+    },
+    "5601": {
+        "district": "Lavaux",
+        "name": "Chexbres"
+    },
+    "5602": {
+        "district": "Lavaux",
+        "name": "Cully"
+    },
+    "5603": {
+        "district": "Lavaux",
+        "name": "Epesses"
+    },
+    "5604": {
+        "district": "Lavaux",
+        "name": "Forel (Lavaux)"
+    },
+    "5605": {
+        "district": "Lavaux",
+        "name": "Grandvaux"
+    },
+    "5606": {
+        "district": "Lavaux",
+        "name": "Lutry"
+    },
+    "5607": {
+        "district": "Lavaux",
+        "name": "Puidoux"
+    },
+    "5608": {
+        "district": "Lavaux",
+        "name": "Riex"
+    },
+    "5609": {
+        "district": "Lavaux",
+        "name": "Rivaz"
+    },
+    "5610": {
+        "district": "Lavaux",
+        "name": "Saint-Saphorin (Lavaux)"
+    },
+    "5611": {
+        "district": "Lavaux",
+        "name": "Savigny"
+    },
+    "5612": {
+        "district": "Lavaux",
+        "name": "Villette (Lavaux)"
+    },
+    "5621": {
+        "district": "Morges",
+        "name": "Aclens"
+    },
+    "5622": {
+        "district": "Morges",
+        "name": "Bremblens"
+    },
+    "5623": {
+        "district": "Morges",
+        "name": "Buchillon"
+    },
+    "5624": {
+        "district": "Morges",
+        "name": "Bussigny-pr\u00e8s-Lausanne"
+    },
+    "5625": {
+        "district": "Morges",
+        "name": "Bussy-Chardonney"
+    },
+    "5627": {
+        "district": "Morges",
+        "name": "Chavannes-pr\u00e8s-Renens"
+    },
+    "5628": {
+        "district": "Morges",
+        "name": "Chigny"
+    },
+    "5629": {
+        "district": "Morges",
+        "name": "Clarmont"
+    },
+    "5630": {
+        "district": "Morges",
+        "name": "Colombier (VD)"
+    },
+    "5631": {
+        "district": "Morges",
+        "name": "Denens"
+    },
+    "5632": {
+        "district": "Morges",
+        "name": "Denges"
+    },
+    "5633": {
+        "district": "Morges",
+        "name": "Echandens"
+    },
+    "5634": {
+        "district": "Morges",
+        "name": "Echichens"
+    },
+    "5635": {
+        "district": "Morges",
+        "name": "Ecublens (VD)"
+    },
+    "5636": {
+        "district": "Morges",
+        "name": "Etoy"
+    },
+    "5637": {
+        "district": "Morges",
+        "name": "Lavigny"
+    },
+    "5638": {
+        "district": "Morges",
+        "name": "Lonay"
+    },
+    "5639": {
+        "district": "Morges",
+        "name": "Lully (VD)"
+    },
+    "5640": {
+        "district": "Morges",
+        "name": "Lussy-sur-Morges"
+    },
+    "5641": {
+        "district": "Morges",
+        "name": "Monnaz"
+    },
+    "5642": {
+        "district": "Morges",
+        "name": "Morges"
+    },
+    "5643": {
+        "district": "Morges",
+        "name": "Pr\u00e9verenges"
+    },
+    "5644": {
+        "district": "Morges",
+        "name": "Reverolle"
+    },
+    "5645": {
+        "district": "Morges",
+        "name": "Romanel-sur-Morges"
+    },
+    "5646": {
+        "district": "Morges",
+        "name": "Saint-Prex"
+    },
+    "5647": {
+        "district": "Morges",
+        "name": "Saint-Saphorin-sur-Morges"
+    },
+    "5648": {
+        "district": "Morges",
+        "name": "Saint-Sulpice (VD)"
+    },
+    "5649": {
+        "district": "Morges",
+        "name": "Tolochenaz"
+    },
+    "5650": {
+        "district": "Morges",
+        "name": "Vaux-sur-Morges"
+    },
+    "5651": {
+        "district": "Morges",
+        "name": "Villars-Sainte-Croix"
+    },
+    "5652": {
+        "district": "Morges",
+        "name": "Villars-sous-Yens"
+    },
+    "5653": {
+        "district": "Morges",
+        "name": "Vufflens-le-Ch\u00e2teau"
+    },
+    "5654": {
+        "district": "Morges",
+        "name": "Vullierens"
+    },
+    "5655": {
+        "district": "Morges",
+        "name": "Yens"
+    },
+    "5661": {
+        "district": "Moudon",
+        "name": "Boulens"
+    },
+    "5662": {
+        "district": "Moudon",
+        "name": "Brenles"
+    },
+    "5663": {
+        "district": "Moudon",
+        "name": "Bussy-sur-Moudon"
+    },
+    "5664": {
+        "district": "Moudon",
+        "name": "Chapelle-sur-Moudon"
+    },
+    "5665": {
+        "district": "Moudon",
+        "name": "Chavannes-sur-Moudon"
+    },
+    "5666": {
+        "district": "Moudon",
+        "name": "Chesalles-sur-Moudon"
+    },
+    "5667": {
+        "district": "Moudon",
+        "name": "Correvon"
+    },
+    "5668": {
+        "district": "Moudon",
+        "name": "Cremin"
+    },
+    "5669": {
+        "district": "Moudon",
+        "name": "Curtilles"
+    },
+    "5670": {
+        "district": "Moudon",
+        "name": "Denezy"
+    },
+    "5671": {
+        "district": "Moudon",
+        "name": "Dompierre (VD)"
+    },
+    "5672": {
+        "district": "Moudon",
+        "name": "Forel-sur-Lucens"
+    },
+    "5673": {
+        "district": "Moudon",
+        "name": "Hermenches"
+    },
+    "5674": {
+        "district": "Moudon",
+        "name": "Lovatens"
+    },
+    "5675": {
+        "district": "Moudon",
+        "name": "Lucens"
+    },
+    "5676": {
+        "district": "Moudon",
+        "name": "Martherenges"
+    },
+    "5677": {
+        "district": "Moudon",
+        "name": "Montaubion-Chardonney"
+    },
+    "5678": {
+        "district": "Moudon",
+        "name": "Moudon"
+    },
+    "5679": {
+        "district": "Moudon",
+        "name": "Neyruz-sur-Moudon"
+    },
+    "5680": {
+        "district": "Moudon",
+        "name": "Ogens"
+    },
+    "5681": {
+        "district": "Moudon",
+        "name": "Oulens-sur-Lucens"
+    },
+    "5682": {
+        "district": "Moudon",
+        "name": "Peyres-Possens"
+    },
+    "5683": {
+        "district": "Moudon",
+        "name": "Pr\u00e9vonloup"
+    },
+    "5684": {
+        "district": "Moudon",
+        "name": "Rossenges"
+    },
+    "5685": {
+        "district": "Moudon",
+        "name": "Saint-Cierges"
+    },
+    "5686": {
+        "district": "Moudon",
+        "name": "Sarzens"
+    },
+    "5687": {
+        "district": "Moudon",
+        "name": "Sottens"
+    },
+    "5688": {
+        "district": "Moudon",
+        "name": "Syens"
+    },
+    "5689": {
+        "district": "Moudon",
+        "name": "Thierrens"
+    },
+    "5690": {
+        "district": "Moudon",
+        "name": "Villars-le-Comte"
+    },
+    "5691": {
+        "district": "Moudon",
+        "name": "Villars-Mendraz"
+    },
+    "5692": {
+        "district": "Moudon",
+        "name": "Vucherens"
+    },
+    "5701": {
+        "district": "Nyon",
+        "name": "Arnex-sur-Nyon"
+    },
+    "5702": {
+        "district": "Nyon",
+        "name": "Arzier"
+    },
+    "5703": {
+        "district": "Nyon",
+        "name": "Bassins"
+    },
+    "5704": {
+        "district": "Nyon",
+        "name": "Begnins"
+    },
+    "5705": {
+        "district": "Nyon",
+        "name": "Bogis-Bossey"
+    },
+    "5706": {
+        "district": "Nyon",
+        "name": "Borex"
+    },
+    "5707": {
+        "district": "Nyon",
+        "name": "Chavannes-de-Bogis"
+    },
+    "5708": {
+        "district": "Nyon",
+        "name": "Chavannes-des-Bois"
+    },
+    "5709": {
+        "district": "Nyon",
+        "name": "Ch\u00e9serex"
+    },
+    "5710": {
+        "district": "Nyon",
+        "name": "Coinsins"
+    },
+    "5711": {
+        "district": "Nyon",
+        "name": "Commugny"
+    },
+    "5712": {
+        "district": "Nyon",
+        "name": "Coppet"
+    },
+    "5713": {
+        "district": "Nyon",
+        "name": "Crans-pr\u00e8s-C\u00e9ligny"
+    },
+    "5714": {
+        "district": "Nyon",
+        "name": "Crassier"
+    },
+    "5715": {
+        "district": "Nyon",
+        "name": "Duillier"
+    },
+    "5716": {
+        "district": "Nyon",
+        "name": "Eysins"
+    },
+    "5717": {
+        "district": "Nyon",
+        "name": "Founex"
+    },
+    "5718": {
+        "district": "Nyon",
+        "name": "Genolier"
+    },
+    "5719": {
+        "district": "Nyon",
+        "name": "Gingins"
+    },
+    "5720": {
+        "district": "Nyon",
+        "name": "Givrins"
+    },
+    "5721": {
+        "district": "Nyon",
+        "name": "Gland"
+    },
+    "5722": {
+        "district": "Nyon",
+        "name": "Grens"
+    },
+    "5723": {
+        "district": "Nyon",
+        "name": "Mies"
+    },
+    "5724": {
+        "district": "Nyon",
+        "name": "Nyon"
+    },
+    "5725": {
+        "district": "Nyon",
+        "name": "Prangins"
+    },
+    "5726": {
+        "district": "Nyon",
+        "name": "La Rippe"
+    },
+    "5727": {
+        "district": "Nyon",
+        "name": "Saint-Cergue"
+    },
+    "5728": {
+        "district": "Nyon",
+        "name": "Signy-Avenex"
+    },
+    "5729": {
+        "district": "Nyon",
+        "name": "Tannay"
+    },
+    "5730": {
+        "district": "Nyon",
+        "name": "Tr\u00e9lex"
+    },
+    "5731": {
+        "district": "Nyon",
+        "name": "Le Vaud"
+    },
+    "5732": {
+        "district": "Nyon",
+        "name": "Vich"
+    },
+    "5741": {
+        "district": "Orbe",
+        "name": "L'Abergement"
+    },
+    "5742": {
+        "district": "Orbe",
+        "name": "Agiez"
+    },
+    "5743": {
+        "district": "Orbe",
+        "name": "Arnex-sur-Orbe"
+    },
+    "5744": {
+        "district": "Orbe",
+        "name": "Ballaigues"
+    },
+    "5745": {
+        "district": "Orbe",
+        "name": "Baulmes"
+    },
+    "5746": {
+        "district": "Orbe",
+        "name": "Bavois"
+    },
+    "5747": {
+        "district": "Orbe",
+        "name": "Bofflens"
+    },
+    "5748": {
+        "district": "Orbe",
+        "name": "Bretonni\u00e8res"
+    },
+    "5749": {
+        "district": "Orbe",
+        "name": "Chavornay"
+    },
+    "5750": {
+        "district": "Orbe",
+        "name": "Les Cl\u00e9es"
+    },
+    "5751": {
+        "district": "Orbe",
+        "name": "Corcelles-sur-Chavornay"
+    },
+    "5752": {
+        "district": "Orbe",
+        "name": "Croy"
+    },
+    "5754": {
+        "district": "Orbe",
+        "name": "Juriens"
+    },
+    "5755": {
+        "district": "Orbe",
+        "name": "Lignerolle"
+    },
+    "5756": {
+        "district": "Orbe",
+        "name": "Montcherand"
+    },
+    "5757": {
+        "district": "Orbe",
+        "name": "Orbe"
+    },
+    "5758": {
+        "district": "Orbe",
+        "name": "La Praz"
+    },
+    "5759": {
+        "district": "Orbe",
+        "name": "Premier"
+    },
+    "5760": {
+        "district": "Orbe",
+        "name": "Rances"
+    },
+    "5761": {
+        "district": "Orbe",
+        "name": "Romainm\u00f4tier-Envy"
+    },
+    "5762": {
+        "district": "Orbe",
+        "name": "Sergey"
+    },
+    "5763": {
+        "district": "Orbe",
+        "name": "Valeyres-sous-Rances"
+    },
+    "5764": {
+        "district": "Orbe",
+        "name": "Vallorbe"
+    },
+    "5765": {
+        "district": "Orbe",
+        "name": "Vaulion"
+    },
+    "5766": {
+        "district": "Orbe",
+        "name": "Vuiteboeuf"
+    },
+    "5781": {
+        "district": "Oron",
+        "name": "Bussigny-sur-Oron"
+    },
+    "5782": {
+        "district": "Oron",
+        "name": "Carrouge (VD)"
+    },
+    "5783": {
+        "district": "Oron",
+        "name": "Ch\u00e2tillens"
+    },
+    "5784": {
+        "district": "Oron",
+        "name": "Chesalles-sur-Oron"
+    },
+    "5785": {
+        "district": "Oron",
+        "name": "Corcelles-le-Jorat"
+    },
+    "5786": {
+        "district": "Oron",
+        "name": "Les Cullayes"
+    },
+    "5787": {
+        "district": "Oron",
+        "name": "Ecoteaux"
+    },
+    "5788": {
+        "district": "Oron",
+        "name": "Essertes"
+    },
+    "5789": {
+        "district": "Oron",
+        "name": "Ferlens (VD)"
+    },
+    "5790": {
+        "district": "Oron",
+        "name": "Maracon"
+    },
+    "5791": {
+        "district": "Oron",
+        "name": "M\u00e9zi\u00e8res (VD)"
+    },
+    "5792": {
+        "district": "Oron",
+        "name": "Montpreveyres"
+    },
+    "5793": {
+        "district": "Oron",
+        "name": "Oron-la-Ville"
+    },
+    "5794": {
+        "district": "Oron",
+        "name": "Oron-le-Ch\u00e2tel"
+    },
+    "5795": {
+        "district": "Oron",
+        "name": "Pal\u00e9zieux"
+    },
+    "5796": {
+        "district": "Oron",
+        "name": "Peney-le-Jorat"
+    },
+    "5798": {
+        "district": "Oron",
+        "name": "Ropraz"
+    },
+    "5799": {
+        "district": "Oron",
+        "name": "Servion"
+    },
+    "5800": {
+        "district": "Oron",
+        "name": "Les Tavernes"
+    },
+    "5801": {
+        "district": "Oron",
+        "name": "Les Thioleyres"
+    },
+    "5802": {
+        "district": "Oron",
+        "name": "Vuibroye"
+    },
+    "5803": {
+        "district": "Oron",
+        "name": "Vulliens"
+    },
+    "5811": {
+        "district": "Payerne",
+        "name": "Cerniaz (VD)"
+    },
+    "5812": {
+        "district": "Payerne",
+        "name": "Champtauroz"
+    },
+    "5813": {
+        "district": "Payerne",
+        "name": "Chevroux"
+    },
+    "5814": {
+        "district": "Payerne",
+        "name": "Combremont-le-Grand"
+    },
+    "5815": {
+        "district": "Payerne",
+        "name": "Combremont-le-Petit"
+    },
+    "5816": {
+        "district": "Payerne",
+        "name": "Corcelles-pr\u00e8s-Payerne"
+    },
+    "5817": {
+        "district": "Payerne",
+        "name": "Grandcour"
+    },
+    "5818": {
+        "district": "Payerne",
+        "name": "Granges-pr\u00e8s-Marnand"
+    },
+    "5819": {
+        "district": "Payerne",
+        "name": "Henniez"
+    },
+    "5820": {
+        "district": "Payerne",
+        "name": "Marnand"
+    },
+    "5821": {
+        "district": "Payerne",
+        "name": "Missy"
+    },
+    "5822": {
+        "district": "Payerne",
+        "name": "Payerne"
+    },
+    "5823": {
+        "district": "Payerne",
+        "name": "Rossens (VD)"
+    },
+    "5824": {
+        "district": "Payerne",
+        "name": "Sassel"
+    },
+    "5825": {
+        "district": "Payerne",
+        "name": "S\u00e9deilles"
+    },
+    "5826": {
+        "district": "Payerne",
+        "name": "Seigneux"
+    },
+    "5827": {
+        "district": "Payerne",
+        "name": "Trey"
+    },
+    "5828": {
+        "district": "Payerne",
+        "name": "Treytorrens (Payerne)"
+    },
+    "5829": {
+        "district": "Payerne",
+        "name": "Villars-Bramard"
+    },
+    "5830": {
+        "district": "Payerne",
+        "name": "Villarzel"
+    },
+    "5841": {
+        "district": "Pays-d'Enhaut",
+        "name": "Ch\u00e2teau-d'Oex"
+    },
+    "5842": {
+        "district": "Pays-d'Enhaut",
+        "name": "Rossini\u00e8re"
+    },
+    "5843": {
+        "district": "Pays-d'Enhaut",
+        "name": "Rougemont"
+    },
+    "5851": {
+        "district": "Rolle",
+        "name": "Allaman"
+    },
+    "5852": {
+        "district": "Rolle",
+        "name": "Bursinel"
+    },
+    "5853": {
+        "district": "Rolle",
+        "name": "Bursins"
+    },
+    "5854": {
+        "district": "Rolle",
+        "name": "Burtigny"
+    },
+    "5855": {
+        "district": "Rolle",
+        "name": "Dully"
+    },
+    "5856": {
+        "district": "Rolle",
+        "name": "Essertines-sur-Rolle"
+    },
+    "5857": {
+        "district": "Rolle",
+        "name": "Gilly"
+    },
+    "5858": {
+        "district": "Rolle",
+        "name": "Luins"
+    },
+    "5859": {
+        "district": "Rolle",
+        "name": "Mont-sur-Rolle"
+    },
+    "5860": {
+        "district": "Rolle",
+        "name": "Perroy"
+    },
+    "5861": {
+        "district": "Rolle",
+        "name": "Rolle"
+    },
+    "5862": {
+        "district": "Rolle",
+        "name": "Tartegnin"
+    },
+    "5863": {
+        "district": "Rolle",
+        "name": "Vinzel"
+    },
+    "5871": {
+        "district": "La Vall\u00e9e",
+        "name": "L'Abbaye"
+    },
+    "5872": {
+        "district": "La Vall\u00e9e",
+        "name": "Le Chenit"
+    },
+    "5873": {
+        "district": "La Vall\u00e9e",
+        "name": "Le Lieu"
+    },
+    "5881": {
+        "district": "Vevey",
+        "name": "Blonay"
+    },
+    "5882": {
+        "district": "Vevey",
+        "name": "Chardonne"
+    },
+    "5883": {
+        "district": "Vevey",
+        "name": "Corseaux"
+    },
+    "5884": {
+        "district": "Vevey",
+        "name": "Corsier-sur-Vevey"
+    },
+    "5885": {
+        "district": "Vevey",
+        "name": "Jongny"
+    },
+    "5886": {
+        "district": "Vevey",
+        "name": "Montreux"
+    },
+    "5888": {
+        "district": "Vevey",
+        "name": "Saint-L\u00e9gier-La Chi\u00e9saz"
+    },
+    "5889": {
+        "district": "Vevey",
+        "name": "La Tour-de-Peilz"
+    },
+    "5890": {
+        "district": "Vevey",
+        "name": "Vevey"
+    },
+    "5891": {
+        "district": "Vevey",
+        "name": "Veytaux"
+    },
+    "5902": {
+        "district": "Yverdon",
+        "name": "Belmont-sur-Yverdon"
+    },
+    "5903": {
+        "district": "Yverdon",
+        "name": "Bioley-Magnoux"
+    },
+    "5904": {
+        "district": "Yverdon",
+        "name": "Chamblon"
+    },
+    "5905": {
+        "district": "Yverdon",
+        "name": "Champvent"
+    },
+    "5906": {
+        "district": "Yverdon",
+        "name": "Chan\u00e9az"
+    },
+    "5907": {
+        "district": "Yverdon",
+        "name": "Chavannes-le-Ch\u00eane"
+    },
+    "5908": {
+        "district": "Yverdon",
+        "name": "Ch\u00eane-P\u00e2quier"
+    },
+    "5909": {
+        "district": "Yverdon",
+        "name": "Cheseaux-Nor\u00e9az"
+    },
+    "5910": {
+        "district": "Yverdon",
+        "name": "Cronay"
+    },
+    "5911": {
+        "district": "Yverdon",
+        "name": "Cuarny"
+    },
+    "5912": {
+        "district": "Yverdon",
+        "name": "D\u00e9moret"
+    },
+    "5913": {
+        "district": "Yverdon",
+        "name": "Donneloye"
+    },
+    "5914": {
+        "district": "Yverdon",
+        "name": "Ependes (VD)"
+    },
+    "5915": {
+        "district": "Yverdon",
+        "name": "Essert-Pittet"
+    },
+    "5916": {
+        "district": "Yverdon",
+        "name": "Essert-sous-Champvent"
+    },
+    "5917": {
+        "district": "Yverdon",
+        "name": "Gossens"
+    },
+    "5918": {
+        "district": "Yverdon",
+        "name": "Gressy"
+    },
+    "5919": {
+        "district": "Yverdon",
+        "name": "Mathod"
+    },
+    "5920": {
+        "district": "Yverdon",
+        "name": "M\u00e9zery-pr\u00e8s-Donneloye"
+    },
+    "5921": {
+        "district": "Yverdon",
+        "name": "Molondin"
+    },
+    "5922": {
+        "district": "Yverdon",
+        "name": "Montagny-pr\u00e8s-Yverdon"
+    },
+    "5923": {
+        "district": "Yverdon",
+        "name": "Oppens"
+    },
+    "5924": {
+        "district": "Yverdon",
+        "name": "Orges"
+    },
+    "5925": {
+        "district": "Yverdon",
+        "name": "Orzens"
+    },
+    "5926": {
+        "district": "Yverdon",
+        "name": "Pomy"
+    },
+    "5927": {
+        "district": "Yverdon",
+        "name": "Prahins"
+    },
+    "5928": {
+        "district": "Yverdon",
+        "name": "Rovray"
+    },
+    "5929": {
+        "district": "Yverdon",
+        "name": "Suchy"
+    },
+    "5930": {
+        "district": "Yverdon",
+        "name": "Susc\u00e9vaz"
+    },
+    "5931": {
+        "district": "Yverdon",
+        "name": "Treycovagnes"
+    },
+    "5932": {
+        "district": "Yverdon",
+        "name": "Ursins"
+    },
+    "5933": {
+        "district": "Yverdon",
+        "name": "Valeyres-sous-Montagny"
+    },
+    "5934": {
+        "district": "Yverdon",
+        "name": "Valeyres-sous-Ursins"
+    },
+    "5935": {
+        "district": "Yverdon",
+        "name": "Villars-Epeney"
+    },
+    "5936": {
+        "district": "Yverdon",
+        "name": "Villars-sous-Champvent"
+    },
+    "5937": {
+        "district": "Yverdon",
+        "name": "Vugelles-La Mothe"
+    },
+    "5938": {
+        "district": "Yverdon",
+        "name": "Yverdon-les-Bains"
+    },
+    "5939": {
+        "district": "Yverdon",
+        "name": "Yvonand"
+    }
+}

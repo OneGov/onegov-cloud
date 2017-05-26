@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds static data for 2002-2008.
+  [msom]
+
 - Gets the entity names from the static data when uploading wabsti votes.
   [msom]
 

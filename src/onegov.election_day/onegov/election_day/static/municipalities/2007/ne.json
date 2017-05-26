@@ -1,0 +1,250 @@
+{
+    "6401": {
+        "district": "Boudry",
+        "name": "Auvernier"
+    },
+    "6402": {
+        "district": "Boudry",
+        "name": "Bevaix"
+    },
+    "6403": {
+        "district": "Boudry",
+        "name": "B\u00f4le"
+    },
+    "6404": {
+        "district": "Boudry",
+        "name": "Boudry"
+    },
+    "6405": {
+        "district": "Boudry",
+        "name": "Brot-Dessous"
+    },
+    "6406": {
+        "district": "Boudry",
+        "name": "Colombier (NE)"
+    },
+    "6407": {
+        "district": "Boudry",
+        "name": "Corcelles-Cormondr\u00e8che"
+    },
+    "6408": {
+        "district": "Boudry",
+        "name": "Cortaillod"
+    },
+    "6409": {
+        "district": "Boudry",
+        "name": "Fresens"
+    },
+    "6410": {
+        "district": "Boudry",
+        "name": "Gorgier"
+    },
+    "6411": {
+        "district": "Boudry",
+        "name": "Montalchez"
+    },
+    "6412": {
+        "district": "Boudry",
+        "name": "Peseux"
+    },
+    "6413": {
+        "district": "Boudry",
+        "name": "Rochefort"
+    },
+    "6414": {
+        "district": "Boudry",
+        "name": "Saint-Aubin-Sauges"
+    },
+    "6415": {
+        "district": "Boudry",
+        "name": "Vaumarcus"
+    },
+    "6421": {
+        "district": "La Chaux-de-Fonds",
+        "name": "La Chaux-de-Fonds"
+    },
+    "6422": {
+        "district": "La Chaux-de-Fonds",
+        "name": "Les Planchettes"
+    },
+    "6423": {
+        "district": "La Chaux-de-Fonds",
+        "name": "La Sagne"
+    },
+    "6431": {
+        "district": "Le Locle",
+        "name": "Les Brenets"
+    },
+    "6432": {
+        "district": "Le Locle",
+        "name": "La Br\u00e9vine"
+    },
+    "6433": {
+        "district": "Le Locle",
+        "name": "Brot-Plamboz"
+    },
+    "6434": {
+        "district": "Le Locle",
+        "name": "Le Cerneux-P\u00e9quignot"
+    },
+    "6435": {
+        "district": "Le Locle",
+        "name": "La Chaux-du-Milieu"
+    },
+    "6436": {
+        "district": "Le Locle",
+        "name": "Le Locle"
+    },
+    "6437": {
+        "district": "Le Locle",
+        "name": "Les Ponts-de-Martel"
+    },
+    "6451": {
+        "district": "Neuch\u00e2tel",
+        "name": "Cornaux"
+    },
+    "6452": {
+        "district": "Neuch\u00e2tel",
+        "name": "Cressier (NE)"
+    },
+    "6453": {
+        "district": "Neuch\u00e2tel",
+        "name": "Enges"
+    },
+    "6454": {
+        "district": "Neuch\u00e2tel",
+        "name": "Hauterive (NE)"
+    },
+    "6455": {
+        "district": "Neuch\u00e2tel",
+        "name": "Le Landeron"
+    },
+    "6456": {
+        "district": "Neuch\u00e2tel",
+        "name": "Ligni\u00e8res"
+    },
+    "6457": {
+        "district": "Neuch\u00e2tel",
+        "name": "Marin-Epagnier"
+    },
+    "6458": {
+        "district": "Neuch\u00e2tel",
+        "name": "Neuch\u00e2tel"
+    },
+    "6459": {
+        "district": "Neuch\u00e2tel",
+        "name": "Saint-Blaise"
+    },
+    "6460": {
+        "district": "Neuch\u00e2tel",
+        "name": "Thielle-Wavre"
+    },
+    "6471": {
+        "district": "Val-de-Ruz",
+        "name": "Boudevilliers"
+    },
+    "6472": {
+        "district": "Val-de-Ruz",
+        "name": "Cernier"
+    },
+    "6473": {
+        "district": "Val-de-Ruz",
+        "name": "Ch\u00e9zard-Saint-Martin"
+    },
+    "6474": {
+        "district": "Val-de-Ruz",
+        "name": "Coffrane"
+    },
+    "6475": {
+        "district": "Val-de-Ruz",
+        "name": "Dombresson"
+    },
+    "6476": {
+        "district": "Val-de-Ruz",
+        "name": "Engollon"
+    },
+    "6477": {
+        "district": "Val-de-Ruz",
+        "name": "Fenin-Vilars-Saules"
+    },
+    "6478": {
+        "district": "Val-de-Ruz",
+        "name": "Fontainemelon"
+    },
+    "6479": {
+        "district": "Val-de-Ruz",
+        "name": "Fontaines (NE)"
+    },
+    "6480": {
+        "district": "Val-de-Ruz",
+        "name": "Les Geneveys-sur-Coffrane"
+    },
+    "6481": {
+        "district": "Val-de-Ruz",
+        "name": "Les Hauts-Geneveys"
+    },
+    "6482": {
+        "district": "Val-de-Ruz",
+        "name": "Montmollin"
+    },
+    "6483": {
+        "district": "Val-de-Ruz",
+        "name": "Le P\u00e2quier (NE)"
+    },
+    "6484": {
+        "district": "Val-de-Ruz",
+        "name": "Savagnier"
+    },
+    "6485": {
+        "district": "Val-de-Ruz",
+        "name": "Valangin"
+    },
+    "6486": {
+        "district": "Val-de-Ruz",
+        "name": "Villiers"
+    },
+    "6501": {
+        "district": "Val-de-Travers",
+        "name": "Les Bayards"
+    },
+    "6502": {
+        "district": "Val-de-Travers",
+        "name": "Boveresse"
+    },
+    "6503": {
+        "district": "Val-de-Travers",
+        "name": "Buttes"
+    },
+    "6504": {
+        "district": "Val-de-Travers",
+        "name": "La C\u00f4te-aux-F\u00e9es"
+    },
+    "6505": {
+        "district": "Val-de-Travers",
+        "name": "Couvet"
+    },
+    "6506": {
+        "district": "Val-de-Travers",
+        "name": "Fleurier"
+    },
+    "6507": {
+        "district": "Val-de-Travers",
+        "name": "M\u00f4tiers (NE)"
+    },
+    "6508": {
+        "district": "Val-de-Travers",
+        "name": "Noiraigue"
+    },
+    "6509": {
+        "district": "Val-de-Travers",
+        "name": "Saint-Sulpice (NE)"
+    },
+    "6510": {
+        "district": "Val-de-Travers",
+        "name": "Travers"
+    },
+    "6511": {
+        "district": "Val-de-Travers",
+        "name": "Les Verri\u00e8res"
+    }
+}

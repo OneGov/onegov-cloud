@@ -1,0 +1,646 @@
+{
+    "6001": {
+        "district": "Brig",
+        "name": "Birgisch"
+    },
+    "6002": {
+        "district": "Brig",
+        "name": "Brig-Glis"
+    },
+    "6004": {
+        "district": "Brig",
+        "name": "Eggerberg"
+    },
+    "6006": {
+        "district": "Brig",
+        "name": "Mund"
+    },
+    "6007": {
+        "district": "Brig",
+        "name": "Naters"
+    },
+    "6008": {
+        "district": "Brig",
+        "name": "Ried-Brig"
+    },
+    "6009": {
+        "district": "Brig",
+        "name": "Simplon"
+    },
+    "6010": {
+        "district": "Brig",
+        "name": "Termen"
+    },
+    "6011": {
+        "district": "Brig",
+        "name": "Zwischbergen"
+    },
+    "6021": {
+        "district": "Conthey",
+        "name": "Ardon"
+    },
+    "6022": {
+        "district": "Conthey",
+        "name": "Chamoson"
+    },
+    "6023": {
+        "district": "Conthey",
+        "name": "Conthey"
+    },
+    "6024": {
+        "district": "Conthey",
+        "name": "Nendaz"
+    },
+    "6025": {
+        "district": "Conthey",
+        "name": "V\u00e9troz"
+    },
+    "6031": {
+        "district": "Entremont",
+        "name": "Bagnes"
+    },
+    "6032": {
+        "district": "Entremont",
+        "name": "Bourg-Saint-Pierre"
+    },
+    "6033": {
+        "district": "Entremont",
+        "name": "Liddes"
+    },
+    "6034": {
+        "district": "Entremont",
+        "name": "Orsi\u00e8res"
+    },
+    "6035": {
+        "district": "Entremont",
+        "name": "Sembrancher"
+    },
+    "6036": {
+        "district": "Entremont",
+        "name": "Voll\u00e8ges"
+    },
+    "6051": {
+        "district": "Goms",
+        "name": "Ausserbinn"
+    },
+    "6052": {
+        "district": "Goms",
+        "name": "Bellwald"
+    },
+    "6054": {
+        "district": "Goms",
+        "name": "Binn"
+    },
+    "6055": {
+        "district": "Goms",
+        "name": "Blitzingen"
+    },
+    "6056": {
+        "district": "Goms",
+        "name": "Ernen"
+    },
+    "6057": {
+        "district": "Goms",
+        "name": "Fiesch"
+    },
+    "6058": {
+        "district": "Goms",
+        "name": "Fieschertal"
+    },
+    "6059": {
+        "district": "Goms",
+        "name": "Geschinen"
+    },
+    "6060": {
+        "district": "Goms",
+        "name": "Gluringen"
+    },
+    "6061": {
+        "district": "Goms",
+        "name": "Lax"
+    },
+    "6062": {
+        "district": "Goms",
+        "name": "M\u00fchlebach"
+    },
+    "6063": {
+        "district": "Goms",
+        "name": "M\u00fcnster (VS)"
+    },
+    "6064": {
+        "district": "Goms",
+        "name": "Niederwald"
+    },
+    "6065": {
+        "district": "Goms",
+        "name": "Obergesteln"
+    },
+    "6066": {
+        "district": "Goms",
+        "name": "Oberwald"
+    },
+    "6067": {
+        "district": "Goms",
+        "name": "Reckingen (VS)"
+    },
+    "6070": {
+        "district": "Goms",
+        "name": "Steinhaus"
+    },
+    "6071": {
+        "district": "Goms",
+        "name": "Ulrichen"
+    },
+    "6073": {
+        "district": "Goms",
+        "name": "Grafschaft"
+    },
+    "6081": {
+        "district": "H\u00e9rens",
+        "name": "Les Agettes"
+    },
+    "6082": {
+        "district": "H\u00e9rens",
+        "name": "Ayent"
+    },
+    "6083": {
+        "district": "H\u00e9rens",
+        "name": "Evol\u00e8ne"
+    },
+    "6084": {
+        "district": "H\u00e9rens",
+        "name": "H\u00e9r\u00e9mence"
+    },
+    "6085": {
+        "district": "H\u00e9rens",
+        "name": "Mase"
+    },
+    "6086": {
+        "district": "H\u00e9rens",
+        "name": "Nax"
+    },
+    "6087": {
+        "district": "H\u00e9rens",
+        "name": "Saint-Martin (VS)"
+    },
+    "6088": {
+        "district": "H\u00e9rens",
+        "name": "Vernami\u00e8ge"
+    },
+    "6089": {
+        "district": "H\u00e9rens",
+        "name": "Vex"
+    },
+    "6101": {
+        "district": "Leuk",
+        "name": "Agarn"
+    },
+    "6102": {
+        "district": "Leuk",
+        "name": "Albinen"
+    },
+    "6103": {
+        "district": "Leuk",
+        "name": "Bratsch"
+    },
+    "6104": {
+        "district": "Leuk",
+        "name": "Ergisch"
+    },
+    "6105": {
+        "district": "Leuk",
+        "name": "Erschmatt"
+    },
+    "6107": {
+        "district": "Leuk",
+        "name": "Gampel"
+    },
+    "6109": {
+        "district": "Leuk",
+        "name": "Inden"
+    },
+    "6110": {
+        "district": "Leuk",
+        "name": "Leuk"
+    },
+    "6111": {
+        "district": "Leuk",
+        "name": "Leukerbad"
+    },
+    "6112": {
+        "district": "Leuk",
+        "name": "Oberems"
+    },
+    "6113": {
+        "district": "Leuk",
+        "name": "Salgesch"
+    },
+    "6114": {
+        "district": "Leuk",
+        "name": "Turtmann"
+    },
+    "6115": {
+        "district": "Leuk",
+        "name": "Unterems"
+    },
+    "6116": {
+        "district": "Leuk",
+        "name": "Varen"
+    },
+    "6117": {
+        "district": "Leuk",
+        "name": "Guttet-Feschel"
+    },
+    "6131": {
+        "district": "Martigny",
+        "name": "Bovernier"
+    },
+    "6132": {
+        "district": "Martigny",
+        "name": "Charrat"
+    },
+    "6133": {
+        "district": "Martigny",
+        "name": "Fully"
+    },
+    "6134": {
+        "district": "Martigny",
+        "name": "Is\u00e9rables"
+    },
+    "6135": {
+        "district": "Martigny",
+        "name": "Leytron"
+    },
+    "6136": {
+        "district": "Martigny",
+        "name": "Martigny"
+    },
+    "6137": {
+        "district": "Martigny",
+        "name": "Martigny-Combe"
+    },
+    "6139": {
+        "district": "Martigny",
+        "name": "Riddes"
+    },
+    "6140": {
+        "district": "Martigny",
+        "name": "Saillon"
+    },
+    "6141": {
+        "district": "Martigny",
+        "name": "Saxon"
+    },
+    "6142": {
+        "district": "Martigny",
+        "name": "Trient"
+    },
+    "6151": {
+        "district": "Monthey",
+        "name": "Champ\u00e9ry"
+    },
+    "6152": {
+        "district": "Monthey",
+        "name": "Collombey-Muraz"
+    },
+    "6153": {
+        "district": "Monthey",
+        "name": "Monthey"
+    },
+    "6154": {
+        "district": "Monthey",
+        "name": "Port-Valais"
+    },
+    "6155": {
+        "district": "Monthey",
+        "name": "Saint-Gingolph"
+    },
+    "6156": {
+        "district": "Monthey",
+        "name": "Troistorrents"
+    },
+    "6157": {
+        "district": "Monthey",
+        "name": "Val-d'Illiez"
+    },
+    "6158": {
+        "district": "Monthey",
+        "name": "Vionnaz"
+    },
+    "6159": {
+        "district": "Monthey",
+        "name": "Vouvry"
+    },
+    "6171": {
+        "district": "Raron",
+        "name": "Betten"
+    },
+    "6172": {
+        "district": "Raron",
+        "name": "Bister"
+    },
+    "6173": {
+        "district": "Raron",
+        "name": "Bitsch"
+    },
+    "6174": {
+        "district": "Raron",
+        "name": "Filet"
+    },
+    "6175": {
+        "district": "Raron",
+        "name": "Goppisberg"
+    },
+    "6176": {
+        "district": "Raron",
+        "name": "Greich"
+    },
+    "6177": {
+        "district": "Raron",
+        "name": "Grengiols"
+    },
+    "6178": {
+        "district": "Raron",
+        "name": "Martisberg"
+    },
+    "6179": {
+        "district": "Raron",
+        "name": "M\u00f6rel"
+    },
+    "6180": {
+        "district": "Raron",
+        "name": "Ried-M\u00f6rel"
+    },
+    "6181": {
+        "district": "Raron",
+        "name": "Riederalp"
+    },
+    "6191": {
+        "district": "Raron",
+        "name": "Ausserberg"
+    },
+    "6192": {
+        "district": "Raron",
+        "name": "Blatten"
+    },
+    "6193": {
+        "district": "Raron",
+        "name": "B\u00fcrchen"
+    },
+    "6194": {
+        "district": "Raron",
+        "name": "Eischoll"
+    },
+    "6195": {
+        "district": "Raron",
+        "name": "Ferden"
+    },
+    "6196": {
+        "district": "Raron",
+        "name": "Hohtenn"
+    },
+    "6197": {
+        "district": "Raron",
+        "name": "Kippel"
+    },
+    "6198": {
+        "district": "Raron",
+        "name": "Niedergesteln"
+    },
+    "6199": {
+        "district": "Raron",
+        "name": "Raron"
+    },
+    "6200": {
+        "district": "Raron",
+        "name": "Steg"
+    },
+    "6201": {
+        "district": "Raron",
+        "name": "Unterb\u00e4ch"
+    },
+    "6202": {
+        "district": "Raron",
+        "name": "Wiler (L\u00f6tschen)"
+    },
+    "6211": {
+        "district": "Saint-Maurice",
+        "name": "Collonges"
+    },
+    "6212": {
+        "district": "Saint-Maurice",
+        "name": "Dor\u00e9naz"
+    },
+    "6213": {
+        "district": "Saint-Maurice",
+        "name": "Evionnaz"
+    },
+    "6214": {
+        "district": "Saint-Maurice",
+        "name": "Finhaut"
+    },
+    "6215": {
+        "district": "Saint-Maurice",
+        "name": "Massongex"
+    },
+    "6216": {
+        "district": "Saint-Maurice",
+        "name": "Mex (VS)"
+    },
+    "6217": {
+        "district": "Saint-Maurice",
+        "name": "Saint-Maurice"
+    },
+    "6218": {
+        "district": "Saint-Maurice",
+        "name": "Salvan"
+    },
+    "6219": {
+        "district": "Saint-Maurice",
+        "name": "Vernayaz"
+    },
+    "6220": {
+        "district": "Saint-Maurice",
+        "name": "V\u00e9rossaz"
+    },
+    "6231": {
+        "district": "Sierre",
+        "name": "Ayer"
+    },
+    "6232": {
+        "district": "Sierre",
+        "name": "Chalais"
+    },
+    "6233": {
+        "district": "Sierre",
+        "name": "Chandolin"
+    },
+    "6234": {
+        "district": "Sierre",
+        "name": "Chermignon"
+    },
+    "6235": {
+        "district": "Sierre",
+        "name": "Chippis"
+    },
+    "6237": {
+        "district": "Sierre",
+        "name": "Grimentz"
+    },
+    "6238": {
+        "district": "Sierre",
+        "name": "Gr\u00f4ne"
+    },
+    "6239": {
+        "district": "Sierre",
+        "name": "Icogne"
+    },
+    "6240": {
+        "district": "Sierre",
+        "name": "Lens"
+    },
+    "6241": {
+        "district": "Sierre",
+        "name": "Mi\u00e8ge"
+    },
+    "6242": {
+        "district": "Sierre",
+        "name": "Mollens (VS)"
+    },
+    "6243": {
+        "district": "Sierre",
+        "name": "Montana"
+    },
+    "6244": {
+        "district": "Sierre",
+        "name": "Randogne"
+    },
+    "6245": {
+        "district": "Sierre",
+        "name": "Saint-Jean"
+    },
+    "6246": {
+        "district": "Sierre",
+        "name": "Saint-L\u00e9onard"
+    },
+    "6247": {
+        "district": "Sierre",
+        "name": "Saint-Luc"
+    },
+    "6248": {
+        "district": "Sierre",
+        "name": "Sierre"
+    },
+    "6249": {
+        "district": "Sierre",
+        "name": "Venth\u00f4ne"
+    },
+    "6250": {
+        "district": "Sierre",
+        "name": "Veyras"
+    },
+    "6251": {
+        "district": "Sierre",
+        "name": "Vissoie"
+    },
+    "6261": {
+        "district": "Sion",
+        "name": "Arbaz"
+    },
+    "6263": {
+        "district": "Sion",
+        "name": "Grimisuat"
+    },
+    "6264": {
+        "district": "Sion",
+        "name": "Salins"
+    },
+    "6265": {
+        "district": "Sion",
+        "name": "Savi\u00e8se"
+    },
+    "6266": {
+        "district": "Sion",
+        "name": "Sion"
+    },
+    "6267": {
+        "district": "Sion",
+        "name": "Veysonnaz"
+    },
+    "6281": {
+        "district": "Visp",
+        "name": "Baltschieder"
+    },
+    "6282": {
+        "district": "Visp",
+        "name": "Eisten"
+    },
+    "6283": {
+        "district": "Visp",
+        "name": "Embd"
+    },
+    "6285": {
+        "district": "Visp",
+        "name": "Gr\u00e4chen"
+    },
+    "6286": {
+        "district": "Visp",
+        "name": "Lalden"
+    },
+    "6287": {
+        "district": "Visp",
+        "name": "Randa"
+    },
+    "6288": {
+        "district": "Visp",
+        "name": "Saas Almagell"
+    },
+    "6289": {
+        "district": "Visp",
+        "name": "Saas Balen"
+    },
+    "6290": {
+        "district": "Visp",
+        "name": "Saas Fee"
+    },
+    "6291": {
+        "district": "Visp",
+        "name": "Saas Grund"
+    },
+    "6292": {
+        "district": "Visp",
+        "name": "St. Niklaus"
+    },
+    "6293": {
+        "district": "Visp",
+        "name": "Stalden (VS)"
+    },
+    "6294": {
+        "district": "Visp",
+        "name": "Staldenried"
+    },
+    "6295": {
+        "district": "Visp",
+        "name": "T\u00e4sch"
+    },
+    "6296": {
+        "district": "Visp",
+        "name": "T\u00f6rbel"
+    },
+    "6297": {
+        "district": "Visp",
+        "name": "Visp"
+    },
+    "6298": {
+        "district": "Visp",
+        "name": "Visperterminen"
+    },
+    "6299": {
+        "district": "Visp",
+        "name": "Zeneggen"
+    },
+    "6300": {
+        "district": "Visp",
+        "name": "Zermatt"
+    }
+}

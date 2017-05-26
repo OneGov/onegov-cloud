@@ -141,7 +141,7 @@ class Principal(object):
             if not result:
                 result = {
                     year: {int(self.id): {'name': self.name}}
-                    for year in range(2009, date.today().year + 1)
+                    for year in range(2002, date.today().year + 1)
                 }
 
         return result

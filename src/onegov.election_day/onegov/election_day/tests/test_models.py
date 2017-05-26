@@ -20,7 +20,7 @@ from time import sleep
 from unittest.mock import Mock, patch
 
 
-SUPPORTED_YEARS = list(range(2009, 2017 + 1))
+SUPPORTED_YEARS = list(range(2002, 2017 + 1))
 SUPPORTED_YEARS_MAP = list(range(2013, 2017 + 1))
 SUPPORTED_YEARS_NO_MAP = list(set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP))
 

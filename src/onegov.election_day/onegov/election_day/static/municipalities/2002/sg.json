@@ -1,0 +1,362 @@
+{
+    "3201": {
+        "district": "St. Gallen",
+        "name": "H\u00e4ggenschwil"
+    },
+    "3202": {
+        "district": "St. Gallen",
+        "name": "Muolen"
+    },
+    "3203": {
+        "district": "St. Gallen",
+        "name": "St. Gallen"
+    },
+    "3204": {
+        "district": "St. Gallen",
+        "name": "Wittenbach"
+    },
+    "3211": {
+        "district": "Rorschach",
+        "name": "Berg (SG)"
+    },
+    "3212": {
+        "district": "Rorschach",
+        "name": "Eggersriet"
+    },
+    "3213": {
+        "district": "Rorschach",
+        "name": "Goldach"
+    },
+    "3214": {
+        "district": "Rorschach",
+        "name": "M\u00f6rschwil"
+    },
+    "3215": {
+        "district": "Rorschach",
+        "name": "Rorschach"
+    },
+    "3216": {
+        "district": "Rorschach",
+        "name": "Rorschacherberg"
+    },
+    "3217": {
+        "district": "Rorschach",
+        "name": "Steinach"
+    },
+    "3218": {
+        "district": "Rorschach",
+        "name": "T\u00fcbach"
+    },
+    "3219": {
+        "district": "Rorschach",
+        "name": "Untereggen"
+    },
+    "3231": {
+        "district": "Unterrheintal",
+        "name": "Au (SG)"
+    },
+    "3232": {
+        "district": "Unterrheintal",
+        "name": "Balgach"
+    },
+    "3233": {
+        "district": "Unterrheintal",
+        "name": "Berneck"
+    },
+    "3234": {
+        "district": "Unterrheintal",
+        "name": "Diepoldsau"
+    },
+    "3235": {
+        "district": "Unterrheintal",
+        "name": "Rheineck"
+    },
+    "3236": {
+        "district": "Unterrheintal",
+        "name": "St. Margrethen"
+    },
+    "3237": {
+        "district": "Unterrheintal",
+        "name": "Thal"
+    },
+    "3238": {
+        "district": "Unterrheintal",
+        "name": "Widnau"
+    },
+    "3251": {
+        "district": "Oberrheintal",
+        "name": "Altst\u00e4tten"
+    },
+    "3252": {
+        "district": "Oberrheintal",
+        "name": "Eichberg"
+    },
+    "3253": {
+        "district": "Oberrheintal",
+        "name": "Marbach (SG)"
+    },
+    "3254": {
+        "district": "Oberrheintal",
+        "name": "Oberriet (SG)"
+    },
+    "3255": {
+        "district": "Oberrheintal",
+        "name": "Rebstein"
+    },
+    "3256": {
+        "district": "Oberrheintal",
+        "name": "R\u00fcthi (SG)"
+    },
+    "3271": {
+        "district": "Werdenberg",
+        "name": "Buchs (SG)"
+    },
+    "3272": {
+        "district": "Werdenberg",
+        "name": "Gams"
+    },
+    "3273": {
+        "district": "Werdenberg",
+        "name": "Grabs"
+    },
+    "3274": {
+        "district": "Werdenberg",
+        "name": "Sennwald"
+    },
+    "3275": {
+        "district": "Werdenberg",
+        "name": "Sevelen"
+    },
+    "3276": {
+        "district": "Werdenberg",
+        "name": "Wartau"
+    },
+    "3291": {
+        "district": "Sargans",
+        "name": "Bad Ragaz"
+    },
+    "3292": {
+        "district": "Sargans",
+        "name": "Flums"
+    },
+    "3293": {
+        "district": "Sargans",
+        "name": "Mels"
+    },
+    "3294": {
+        "district": "Sargans",
+        "name": "Pf\u00e4fers"
+    },
+    "3295": {
+        "district": "Sargans",
+        "name": "Quarten"
+    },
+    "3296": {
+        "district": "Sargans",
+        "name": "Sargans"
+    },
+    "3297": {
+        "district": "Sargans",
+        "name": "Vilters-Wangs"
+    },
+    "3298": {
+        "district": "Sargans",
+        "name": "Walenstadt"
+    },
+    "3311": {
+        "district": "Gaster",
+        "name": "Amden"
+    },
+    "3312": {
+        "district": "Gaster",
+        "name": "Benken (SG)"
+    },
+    "3313": {
+        "district": "Gaster",
+        "name": "Kaltbrunn"
+    },
+    "3314": {
+        "district": "Gaster",
+        "name": "Rieden"
+    },
+    "3315": {
+        "district": "Gaster",
+        "name": "Sch\u00e4nis"
+    },
+    "3316": {
+        "district": "Gaster",
+        "name": "Weesen"
+    },
+    "3331": {
+        "district": "See",
+        "name": "Ernetschwil"
+    },
+    "3332": {
+        "district": "See",
+        "name": "Eschenbach (SG)"
+    },
+    "3333": {
+        "district": "See",
+        "name": "Goldingen"
+    },
+    "3334": {
+        "district": "See",
+        "name": "Gommiswald"
+    },
+    "3335": {
+        "district": "See",
+        "name": "Jona"
+    },
+    "3336": {
+        "district": "See",
+        "name": "Rapperswil (SG)"
+    },
+    "3337": {
+        "district": "See",
+        "name": "St. Gallenkappel"
+    },
+    "3338": {
+        "district": "See",
+        "name": "Schmerikon"
+    },
+    "3339": {
+        "district": "See",
+        "name": "Uznach"
+    },
+    "3351": {
+        "district": "Obertoggenburg",
+        "name": "Alt St. Johann"
+    },
+    "3352": {
+        "district": "Obertoggenburg",
+        "name": "Ebnat-Kappel"
+    },
+    "3354": {
+        "district": "Obertoggenburg",
+        "name": "Krummenau"
+    },
+    "3355": {
+        "district": "Obertoggenburg",
+        "name": "Nesslau"
+    },
+    "3356": {
+        "district": "Obertoggenburg",
+        "name": "Stein (SG)"
+    },
+    "3357": {
+        "district": "Obertoggenburg",
+        "name": "Wildhaus"
+    },
+    "3371": {
+        "district": "Neutoggenburg",
+        "name": "Brunnadern"
+    },
+    "3372": {
+        "district": "Neutoggenburg",
+        "name": "Hemberg"
+    },
+    "3373": {
+        "district": "Neutoggenburg",
+        "name": "Krinau"
+    },
+    "3374": {
+        "district": "Neutoggenburg",
+        "name": "Lichtensteig"
+    },
+    "3375": {
+        "district": "Neutoggenburg",
+        "name": "Oberhelfenschwil"
+    },
+    "3376": {
+        "district": "Neutoggenburg",
+        "name": "St. Peterzell"
+    },
+    "3377": {
+        "district": "Neutoggenburg",
+        "name": "Wattwil"
+    },
+    "3391": {
+        "district": "Alttoggenburg",
+        "name": "B\u00fctschwil"
+    },
+    "3392": {
+        "district": "Alttoggenburg",
+        "name": "Kirchberg (SG)"
+    },
+    "3393": {
+        "district": "Alttoggenburg",
+        "name": "L\u00fctisburg"
+    },
+    "3394": {
+        "district": "Alttoggenburg",
+        "name": "Mosnang"
+    },
+    "3401": {
+        "district": "Untertoggenburg",
+        "name": "Degersheim"
+    },
+    "3402": {
+        "district": "Untertoggenburg",
+        "name": "Flawil"
+    },
+    "3403": {
+        "district": "Untertoggenburg",
+        "name": "Ganterschwil"
+    },
+    "3405": {
+        "district": "Untertoggenburg",
+        "name": "Jonschwil"
+    },
+    "3406": {
+        "district": "Untertoggenburg",
+        "name": "Mogelsberg"
+    },
+    "3407": {
+        "district": "Untertoggenburg",
+        "name": "Oberuzwil"
+    },
+    "3408": {
+        "district": "Untertoggenburg",
+        "name": "Uzwil"
+    },
+    "3421": {
+        "district": "Wil",
+        "name": "Bronschhofen"
+    },
+    "3422": {
+        "district": "Wil",
+        "name": "Niederb\u00fcren"
+    },
+    "3423": {
+        "district": "Wil",
+        "name": "Niederhelfenschwil"
+    },
+    "3424": {
+        "district": "Wil",
+        "name": "Oberb\u00fcren"
+    },
+    "3425": {
+        "district": "Wil",
+        "name": "Wil (SG)"
+    },
+    "3426": {
+        "district": "Wil",
+        "name": "Zuzwil (SG)"
+    },
+    "3441": {
+        "district": "Gossau",
+        "name": "Andwil (SG)"
+    },
+    "3442": {
+        "district": "Gossau",
+        "name": "Gaiserwald"
+    },
+    "3443": {
+        "district": "Gossau",
+        "name": "Gossau (SG)"
+    },
+    "3444": {
+        "district": "Gossau",
+        "name": "Waldkirch"
+    }
+}
