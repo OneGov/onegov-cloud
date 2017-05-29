@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.0.0 (2017-05-29)
+~~~~~~~~~~~~~~~~~~~
+
 - Removes sponsorships for now.
   [href]
 
