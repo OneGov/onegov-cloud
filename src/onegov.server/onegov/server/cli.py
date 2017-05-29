@@ -220,6 +220,14 @@ class WsgiProcess(multiprocessing.Process):
         print("Growth since last invocation:")
         objgraph.show_growth(limit=10)
 
+    def disable_systemwide_darwin_proxies(self):
+        # System-wide proxy settings on darwin need to be disabled, because
+        # it leads to crashes in our forked subprocess:
+        # https://bugs.python.org/issue27126
+        # https://bugs.python.org/issue13829
+        import urllib.request
+        urllib.request.proxy_bypass_macosx_sysconf = lambda host: None
+
     def run(self):
         # use the parent's process stdin to be able to provide pdb correctly
         if hasattr(self, 'stdin_fileno'):
@@ -237,6 +245,9 @@ class WsgiProcess(multiprocessing.Process):
         os.system("stty sane")
 
         try:
+            if sys.platform == 'darwin':
+                self.disable_systemwide_darwin_proxies()
+
             server = make_server(
                 self.host, self.port, self.app_factory(),
                 handler_class=CustomWSGIRequestHandler)
