@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-12 11:31+0200\n"
-"PO-Revision-Date: 2017-05-12 11:31+0200\n"
+"POT-Creation-Date: 2017-05-29 14:02+0200\n"
+"PO-Revision-Date: 2017-05-29 14:04+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -343,6 +343,9 @@ msgstr "Sì %"
 msgid "No %"
 msgstr "NO %"
 
+msgid "Archive"
+msgstr "Archivio"
+
 msgid "Yay"
 msgstr "SÌ"
 
@@ -353,8 +356,8 @@ msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Il modulo contiene errori. Controlli per favore i campi evidenziati in rosso."
 
-msgid "Back to the latest elections &amp; votes"
-msgstr "Ritorna alle elezioni &amp; votazioni attuali"
+msgid "Start"
+msgstr "Pagina iniziale"
 
 msgid "Open Data"
 msgstr "Dati aperti"
@@ -377,9 +380,6 @@ msgstr "Respinto"
 #, python-format
 msgid "${counted} of ${total}"
 msgstr "${counted} di ${total}"
-
-msgid "Archive"
-msgstr "Archivio"
 
 msgid "Cancel"
 msgstr "Annulla"

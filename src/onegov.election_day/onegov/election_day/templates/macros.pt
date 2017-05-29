@@ -180,6 +180,7 @@
 <metal:election_day_link define-macro="election_day_link" i18n:domain="onegov.election_day">
     <nav role="navigation" aria-label="Aktuelle Seite">
         <ul class="breadcrumbs back-links">
+            <li><a href="${layout.homepage_link}" i18n:translate>Start</a></li>
             <li><a href="${request.link(layout.archive.for_date(date.year))}">${date.year}</a></li>
             <li><a href="${request.link(layout.archive.for_date(date))}">${layout.format_date(date, 'day_long')}</a></li>
         </ul>

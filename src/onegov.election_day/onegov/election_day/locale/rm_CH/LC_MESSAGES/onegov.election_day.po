@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-12 11:31+0200\n"
-"PO-Revision-Date: 2017-04-28 16:04+0200\n"
+"POT-Creation-Date: 2017-05-29 14:02+0200\n"
+"PO-Revision-Date: 2017-05-29 14:04+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -343,6 +343,9 @@ msgstr "% GEA"
 msgid "No %"
 msgstr "% NA"
 
+msgid "Archive"
+msgstr "Archiv"
+
 msgid "Yay"
 msgstr "GEA"
 
@@ -354,8 +357,8 @@ msgstr ""
 "Il formular cuntegna sbagls. Controllai per plaschair ils champs marcads cun "
 "cotschen."
 
-msgid "Back to the latest elections &amp; votes"
-msgstr "Enavos a las elecziuns &amp; votaziuns actualas"
+msgid "Start"
+msgstr "Pagina iniziala"
 
 msgid "Open Data"
 msgstr "Open Data"
@@ -378,9 +381,6 @@ msgstr "Refusà"
 #, python-format
 msgid "${counted} of ${total}"
 msgstr "${counted} da ${total}"
-
-msgid "Archive"
-msgstr "Archiv"
 
 msgid "Cancel"
 msgstr "Interrumper"

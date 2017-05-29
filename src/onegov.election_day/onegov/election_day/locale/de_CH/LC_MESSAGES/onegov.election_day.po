@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-12 11:31+0200\n"
-"PO-Revision-Date: 2017-05-12 11:32+0200\n"
+"POT-Creation-Date: 2017-05-29 14:02+0200\n"
+"PO-Revision-Date: 2017-05-29 14:04+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -343,6 +343,9 @@ msgstr "JA %"
 msgid "No %"
 msgstr "NEIN %"
 
+msgid "Archive"
+msgstr "Archiv"
+
 msgid "Yay"
 msgstr "JA"
 
@@ -353,8 +356,8 @@ msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
 
-msgid "Back to the latest elections &amp; votes"
-msgstr "Zurück zu den aktuellen Wahlen &amp; Abstimmungen"
+msgid "Start"
+msgstr "Startseite"
 
 msgid "Open Data"
 msgstr "Open Data"
@@ -377,9 +380,6 @@ msgstr "Abgelehnt"
 #, python-format
 msgid "${counted} of ${total}"
 msgstr "${counted} von ${total}"
-
-msgid "Archive"
-msgstr "Archiv"
 
 msgid "Cancel"
 msgstr "Abbrechen"
