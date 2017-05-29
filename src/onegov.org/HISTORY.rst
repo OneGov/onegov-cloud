@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.8.3 (2017-05-29)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes wrong text-links margin.
   [href]
 
