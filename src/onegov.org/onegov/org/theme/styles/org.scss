@@ -387,7 +387,6 @@ $footer-border-width: 0;
 .text-links a::before {
     color: $body-font-color;
     content: ' | ';
-    display: inline-block;
 }
 
 /*

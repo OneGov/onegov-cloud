@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes wrong text-links margin.
+  [href]
+
 - Fixes missing translation of "more..." link.
   [href]
 
