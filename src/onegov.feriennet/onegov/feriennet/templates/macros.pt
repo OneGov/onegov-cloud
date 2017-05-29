@@ -31,7 +31,7 @@
             <div class="row footer-content">
                 <div class="small-12 columns">
                     <metal:block use-macro="layout.macros['footer_columns']" />
-                    <metal:block use-macro="layout.macros['footer_sponsors']" />
+                    <!--! <metal:block use-macro="layout.macros['footer_sponsors']" /> -->
                     <metal:block use-macro="layout.macros['footer_links']" />
                 </div>
             </div>

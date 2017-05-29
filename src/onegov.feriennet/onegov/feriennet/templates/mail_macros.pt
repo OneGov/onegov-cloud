@@ -7,7 +7,7 @@
 <body>
 
 <metal:reservations define-macro="email_signature" i18n:domain="onegov.feriennet">
-    <p>
+    <!--! <p>
         <hr />
     </p>
     <p style="text-align: center; margin-bottom: 0;">
@@ -19,6 +19,7 @@
             </tal:b>
         </span>
     </p>
+    -->
 </metal:reservations>
 
 </body>
