@@ -1,3 +1,4 @@
+from decimal import Decimal
 from pyparsing import (
     alphanums,
     Combine,
@@ -44,6 +45,16 @@ def as_int(tokens):
     return int(tokens[0]) if tokens else None
 
 
+def as_decimal(tokens):
+    """ Converts the token to decimal if possible. """
+    return Decimal('.'.join(tokens)) if tokens else None
+
+
+def as_uppercase(tokens):
+    """ Converts the token to uppercase if possible. """
+    return ''.join(tokens).upper() if tokens else None
+
+
 def rstrip(tokens):
     """ Strips whitetext on the right of the token. """
     return tokens[0].rstrip()
@@ -51,7 +62,7 @@ def rstrip(tokens):
 
 def unwrap(tokens):
     """ Unwraps grouped tokens. """
-    return tokens[0][0]
+    return tokens[0]
 
 
 def tag(**tags):
@@ -235,6 +246,37 @@ def fileinput():
     return parser
 
 
+def decimal():
+    """ Returns a decimal parser.
+
+    Decimal point is '.'.
+
+    For example:
+
+        0.00
+        123
+        11.1
+
+    """
+
+    return (numeric + Optional(Suppress('.') + numeric))\
+        .setParseAction(as_decimal)('decimal')
+
+
+def currency():
+    """ Returns a currency parser.
+
+    For example:
+
+        chf
+        USD
+        Cny
+
+    """
+
+    return Regex(r'[a-zA-Z]{3}').setParseAction(as_uppercase)('currency')
+
+
 def marker_box(characters):
     """ Returns a marker box:
 
@@ -246,9 +288,10 @@ def marker_box(characters):
     """
 
     check = mark_enclosed_in(characters)('checked')
-    label = with_whitespace_inside(text_without(characters))('label')
+    label = with_whitespace_inside(text_without(characters + '()'))('label')
+    price = enclosed_in(decimal() + currency(), '()')('price')
 
-    return check + label
+    return check + label + Optional(price)
 
 
 def radio():
@@ -266,7 +309,7 @@ def checkbox():
 
     Example::
         [x] Male
-        [] ] Female
+        [ ] Female
     """
     return marker_box('[]').setParseAction(tag(type='checkbox'))
 

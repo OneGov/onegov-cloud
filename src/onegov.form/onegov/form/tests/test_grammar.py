@@ -1,7 +1,10 @@
+from decimal import Decimal
 from onegov.form.parser.grammar import (
     checkbox,
     date,
     datetime,
+    decimal,
+    currency,
     email,
     field_identifier,
     fileinput,
@@ -181,3 +184,53 @@ def test_fileinput():
     f = field.parseString("*.png|*.jpg|*.gif")
     assert f.type == 'fileinput'
     assert f.extensions == ['png', 'jpg', 'gif']
+
+
+def test_prices():
+    field = radio()
+
+    f = field.parseString("( ) Default Choice (100 CHF)")
+    assert f.type == 'radio'
+    assert f.label == 'Default Choice'
+    assert not f.checked
+    assert f.price.decimal == Decimal('100.00')
+    assert f.price.currency == 'CHF'
+
+    f = field.parseString("(x) Luxurious Choice (200 CHF)")
+    assert f.type == 'radio'
+    assert f.label == 'Luxurious Choice'
+    assert f.checked
+    assert f.price.decimal == Decimal('200.00')
+    assert f.price.currency == 'CHF'
+
+    field = checkbox()
+
+    f = field.parseString("[x] Extra Luggage (150.50 USD)")
+    assert f.type == 'checkbox'
+    assert f.label == 'Extra Luggage'
+    assert f.checked
+    assert f.price.decimal == Decimal('150.50')
+    assert f.price.currency == 'USD'
+
+    f = field.parseString("[ ] Priority Boarding (15.00 USD)")
+    assert f.type == 'checkbox'
+    assert f.label == 'Priority Boarding'
+    assert not f.checked
+    assert f.price.decimal == Decimal('15.00')
+    assert f.price.currency == 'USD'
+
+
+def test_decimal():
+    field = decimal()
+
+    assert field.parseString('123.45')[0] == Decimal('123.45')
+    assert field.parseString('123')[0] == Decimal('123')
+    assert field.parseString('0.5')[0] == Decimal('0.5')
+
+
+def test_currency():
+    field = currency()
+
+    assert field.parseString('CHF')[0] == 'CHF'
+    assert field.parseString('usd')[0] == 'USD'
+    assert field.parseString('Cny')[0] == 'CNY'

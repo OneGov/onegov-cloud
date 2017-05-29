@@ -242,6 +242,25 @@ Just like radiobuttons, checkboxes may be nested to created dependencies::
         [ ] Olives
         [ ] Other
             Description = ___
+
+Pricing Information
+~~~~~~~~~~~~~~~~~~~
+
+Radio buttons and checkboxes may be priced. For example, the following order
+form can be modeled:
+
+    Node Size =
+        ( ) Small (20 USD)
+        (x) Medium (30 USD)
+        ( ) Large (40 USD)
+
+    Extras =
+        [x] Second IP Address (20 CHF)
+        [x] Backup (20 CHF)
+
+The additional pricing metadata can be used to provide simple order forms.
+As in any other form, dependencies are taken into account.
+
 """
 
 import pyparsing as pp
