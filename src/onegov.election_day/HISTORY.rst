@@ -16,6 +16,9 @@ Changelog
 - Centers the header for small sizes.
   [msom]
 
+- Allows to upload votes when no map data is available.
+  [msom]
+
 - Gets the entity names from the static data when uploading wabsti votes.
   [msom]
 

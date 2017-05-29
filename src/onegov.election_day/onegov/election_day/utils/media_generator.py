@@ -654,7 +654,7 @@ class MediaGenerator():
                         )
 
                     # Map
-                    if self.app.principal.use_maps:
+                    if self.app.principal.is_year_available(item.date.year):
                         pdf.pagebreak()
                         data = ballot.percentage_by_entity()
                         params = {
@@ -822,8 +822,9 @@ class MediaGenerator():
                 self.generate_svg(election, 'panachage')
         if self.app.principal.use_maps:
             for ballot in self.session.query(Ballot):
-                for locale in self.app.locales:
-                    self.generate_svg(ballot, 'map', locale)
+                if self.app.principal.is_year_available(ballot.vote.date.year):
+                    for locale in self.app.locales:
+                        self.generate_svg(ballot, 'map', locale)
 
         # Delete old SVGs
         existing = fs.listdir(self.svg_dir)

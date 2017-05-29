@@ -20,12 +20,13 @@ def view_ballot_as_map(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.vote.last_result_change)
 
+    show_map = request.app.principal.is_year_available(self.vote.date.year)
     return {
         'model': self,
         'layout': DefaultLayout(self, request),
         'data': {
             'map': request.link(self, name='by-entity')
-        } if request.app.principal.use_maps else {}
+        } if show_map else {}
     }
 
 

@@ -24,12 +24,16 @@ def view_upload(self, request, form):
     form.adjust(request.app.principal, self)
 
     status = 'open'
+    map_available = True
     if form.submitted(request):
         session = request.app.session()
         principal = request.app.principal
-        if not principal.is_year_available(self.date.year, principal.use_maps):
+        if not principal.is_year_available(self.date.year, False):
             errors = [unsupported_year_error(self.date.year)]
         else:
+            map_available = principal.is_year_available(
+                self.date.year, principal.use_maps
+            )
             entities = principal.entities.get(self.date.year, [])
             if form.file_format.data == 'internal':
                 errors = import_vote_internal(
@@ -125,5 +129,6 @@ def view_upload(self, request, form):
         'cancel': layout.manage_model_link,
         'errors': errors,
         'status': status,
-        'vote': self
+        'vote': self,
+        'map_available': map_available
     }

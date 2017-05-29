@@ -12,6 +12,10 @@
                 Your results were uploaded successfully.
             </div>
 
+            <div tal:condition="not: map_available" class="alert-box warning" i18n:translate="">
+                No map available for this year.
+            </div>
+
             <div tal:condition="layout.principal.notifications" class="panel callout radius">
                 <p>
                     <strong><a href="${request.link(vote, 'trigger')}" i18n:translate="">Click here to trigger the notifications.</a></strong>

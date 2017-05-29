@@ -16,7 +16,7 @@
 
             <h3 tal:content="layout.title()" tal:condition="layout.title()" />
 
-            <div class="row" tal:condition="use_maps">
+            <div class="row" tal:condition="show_map">
                 <div class="small-12 small-centered medium-8 large-6 columns map-container">
                     <div class="ballot-map"
                         data-type="${ballot.type}"
@@ -37,7 +37,7 @@
                 </div>
             </div>
 
-            <h4 tal:condition="use_maps" i18n:translate="">${layout.principal.label('entities')}</h4>
+            <h4 tal:condition="show_map" i18n:translate="">${layout.principal.label('entities')}</h4>
             <table class="ballot-results stackable sortable">
                 <thead>
                     <tr>

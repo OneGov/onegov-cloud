@@ -96,7 +96,7 @@ def view_upload_wabsti_vote(self, request):
             continue
 
         errors[vote.id] = []
-        if not self.is_year_available(vote.date.year, self.use_maps):
+        if not self.is_year_available(vote.date.year, False):
             errors[vote.id].append(unsupported_year_error(vote.date.year))
             continue
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-29 14:02+0200\n"
+"POT-Creation-Date: 2017-05-29 15:10+0200\n"
 "PO-Revision-Date: 2017-05-29 14:04+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -537,6 +537,9 @@ msgstr "Cliccai qua per mussar la pagina cun ils resultats actualisads."
 
 msgid "Please use the following format:"
 msgstr "Duvrai per plaschair il suandant format:"
+
+msgid "No map available for this year."
+msgstr ""
 
 msgid "Embed"
 msgstr "Incorporar"

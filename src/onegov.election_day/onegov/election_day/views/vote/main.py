@@ -18,7 +18,7 @@ def view_vote_proposal(self, request):
     return {
         'vote': self,
         'layout': VotesLayout(self, request),
-        'use_maps': request.app.principal.use_maps
+        'show_map': request.app.principal.is_year_available(self.date.year)
     }
 
 
@@ -32,7 +32,7 @@ def view_vote_counter_proposal(self, request):
     return {
         'vote': self,
         'layout': VotesLayout(self, request, 'counter-proposal'),
-        'use_maps': request.app.principal.use_maps
+        'show_map': request.app.principal.is_year_available(self.date.year)
     }
 
 
@@ -46,7 +46,7 @@ def view_vote_tie_breaker(self, request):
     return {
         'vote': self,
         'layout': VotesLayout(self, request, 'tie-breaker'),
-        'use_maps': request.app.principal.use_maps
+        'show_map': request.app.principal.is_year_available(self.date.year)
     }
 
 
@@ -58,10 +58,12 @@ def view_vote_json(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_result_change)
 
-    media = {'maps': {}}
+    show_map = request.app.principal.is_year_available(self.date.year)
+    media = {}
     if VotesLayout(self, request).pdf_path:
         media['pdf'] = request.link(self, 'pdf')
-    if request.app.principal.use_maps:
+    if show_map:
+        media['maps'] = {}
         for ballot in self.ballots:
             if VotesLayout(self, request, tab=ballot.type).svg_path:
                 media['maps'][ballot.type] = request.link(ballot, 'svg')
@@ -133,7 +135,7 @@ def view_vote_json(self, request):
         'url': request.link(self),
         'embed': {
             ballot.type: request.link(ballot, 'map')
-            for ballot in self.ballots if request.app.principal.use_maps
+            for ballot in self.ballots if show_map
 
         },
         'media': media,
