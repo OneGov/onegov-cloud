@@ -266,7 +266,7 @@ As in any other form, dependencies are taken into account.
 import pyparsing as pp
 import yaml
 
-from cgi import escape
+from html import escape
 from onegov.core.utils import Bunch
 from onegov.form.core import (
     FieldDependency,

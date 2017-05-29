@@ -2,7 +2,7 @@
 
 import humanize
 
-from cgi import escape
+from html import escape
 from onegov.form import log
 
 
