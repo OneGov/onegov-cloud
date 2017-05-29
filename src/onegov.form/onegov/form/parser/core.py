@@ -732,6 +732,58 @@ class WTFormsClassBuilder(object):
     def set_current_fieldset(self, label):
         self.current_fieldset = label
 
+    def validators_extend(self, validators, required, dependency):
+        if required:
+            if dependency is None:
+                self.validators_add_required(validators)
+            else:
+                self.validators_add_dependency(validators, dependency)
+        else:
+            self.validators_add_optional(validators)
+
+    def validators_add_required(self, validators):
+        # we use the DataRequired check instead of InputRequired, since
+        # InputRequired only works if the data comes over the wire. We
+        # also want to load forms with data from the database, where
+        # InputRequired will fail, but DataRequired will not.
+        #
+        # As a consequence, falsey values can't be submitted for now.
+        validators.insert(0, DataRequired())
+
+    def validators_add_dependency(self, validators, dependency):
+        # set the requried flag, even if it's not always required
+        # as it's better to show it too often, than not often enough
+        validator = If(dependency.fulfilled, DataRequired())
+        validator.field_flags = ('required', )
+        validators.insert(0, validator)
+
+    def validators_add_optional(self, validators):
+        validators.insert(0, Optional())
+
+    def mark_as_dependent(self, field_id, dependency):
+        field = getattr(self.form_class, field_id)
+        widget = field.kwargs.get('widget', field.field_class.widget)
+
+        field.kwargs['widget'] = with_options(
+            widget, **dependency.html_data
+        )
+
+    def get_unique_field_id(self, label, dependency):
+        # try to find a smart field_id that contains the dependency or the
+        # current fieldset name - if all fails, an error will be thrown,
+        # as field_ids *need* to be unique
+        if dependency:
+            field_id = dependency.field_id + '_' + label_to_field_id(label)
+        elif self.current_fieldset:
+            field_id = label_to_field_id(self.current_fieldset + ' ' + label)
+        else:
+            field_id = label_to_field_id(label)
+
+        if hasattr(self.form_class, field_id):
+            raise errors.DuplicateLabelError(label=label)
+
+        return field_id
+
     def add_field(self, field_class, label, required,
                   dependency=None, field_id=None, **kwargs):
         validators = kwargs.pop('validators', [])
@@ -740,41 +792,9 @@ class WTFormsClassBuilder(object):
         # that the label is properly html escaped. See also:
         # https://github.com/wtforms/wtforms/issues/315
         label = escape(label)
+        field_id = field_id or self.get_unique_field_id(label, dependency)
 
-        if required:
-
-            # we use the DataRequired check instead of InputRequired, since
-            # InputRequired only works if the data comes over the wire. We
-            # also want to load forms with data from the database, where
-            # InputRequired will fail, but DataRequired will not.
-            #
-            # As a consequence, falsey values can't be submitted for now.
-            if dependency is None:
-                validators.insert(0, DataRequired())
-            else:
-                # set the requried flag, even if it's not always required
-                # as it's better to show it too often, than not often enough
-                validator = If(dependency.fulfilled, DataRequired())
-                validator.field_flags = ('required', )
-
-                validators.insert(0, validator)
-        else:
-            validators.insert(0, Optional())
-
-        # try to find a smart field_id that contains the dependency or the
-        # current fieldset name - if all fails, an error will be thrown,
-        # as field_ids *need* to be unique
-        if field_id is None:
-            if dependency:
-                field_id = dependency.field_id + '_' + label_to_field_id(label)
-            elif self.current_fieldset:
-                field_id = label_to_field_id(
-                    self.current_fieldset + ' ' + label)
-            else:
-                field_id = label_to_field_id(label)
-
-        if hasattr(self.form_class, field_id):
-            raise errors.DuplicateLabelError(label=label)
+        self.validators_extend(validators, required, dependency)
 
         setattr(self.form_class, field_id, field_class(
             label=label,
@@ -784,11 +804,6 @@ class WTFormsClassBuilder(object):
         ))
 
         if dependency:
-            field = getattr(self.form_class, field_id)
-            widget = field.kwargs.get('widget', field.field_class.widget)
-
-            field.kwargs['widget'] = with_options(
-                widget, **dependency.html_data
-            )
+            self.mark_as_dependent(field_id, dependency)
 
         return field_id
