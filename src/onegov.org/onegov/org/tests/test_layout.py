@@ -9,7 +9,7 @@ from onegov.org import OrgApp
 from onegov.org.elements import Link
 from onegov.org.layout import (
     EventBaseLayout,
-    Layout,
+    DefaultLayout,
     PageLayout
 )
 from onegov.page import Page
@@ -39,15 +39,15 @@ class MockRequest(object):
 def test_layout():
     # basic tests that can be done by mocking
 
-    layout = Layout(MockModel(), MockRequest())
+    layout = DefaultLayout(MockModel(), MockRequest())
     layout.request.app = 'test'
     assert layout.app == 'test'
 
-    layout = Layout(MockModel(), MockRequest())
+    layout = DefaultLayout(MockModel(), MockRequest())
     layout.request.path_info = '/'
     assert layout.page_id == 'root'
 
-    layout = Layout(MockModel(), MockRequest())
+    layout = DefaultLayout(MockModel(), MockRequest())
     layout.request.path_info = '/foo/bar/'
     assert layout.page_id == 'foo-bar'
 
@@ -174,7 +174,7 @@ def test_template_layout(postgres_dsn):
 
     @App.html(model=Model, template='layout.pt')
     def view_model(self, request):
-        layout = Layout(self, request)
+        layout = DefaultLayout(self, request)
         layout.homepage_url = None
         layout.font_awesome_path = ''
         return {'layout': layout}
