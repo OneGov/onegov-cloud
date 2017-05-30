@@ -8,6 +8,11 @@ class MockField(object):
         self.type = type
         self.data = data
 
+        if isinstance(data, str):
+            self.choices = [(data, data)]
+        elif isinstance(data, list):
+            self.choices = [(c, c) for c in data]
+
 
 def test_render_textfields():
     assert render_field(MockField('StringField', 'asdf')) == 'asdf'

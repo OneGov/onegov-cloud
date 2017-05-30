@@ -109,7 +109,7 @@ class UploadFieldRenderer(BaseRenderer):
 class RadioFieldRenderer(BaseRenderer):
 
     def __call__(self, field):
-        return "✓ " + self.escape(field.data)
+        return "✓ " + self.escape(dict(field.choices)[field.data])
 
 
 @registry.register_for('MultiCheckboxField')
@@ -117,7 +117,8 @@ class MultiCheckboxFieldRenderer(BaseRenderer):
 
     def __call__(self, field):
         return "".join(
-            "✓ " + self.escape(value) + '<br>' for value in field.data
+            "✓ " + self.escape(dict(field.choices)[value]) + '<br>'
+            for value in field.data
         )[:-4]
 
 
