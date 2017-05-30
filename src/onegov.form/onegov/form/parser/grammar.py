@@ -296,9 +296,9 @@ def marker_box(characters):
 
     check = mark_enclosed_in(characters)('checked')
     label = with_whitespace_inside(text_without(characters + '()'))('label')
-    price = enclosed_in(decimal() + currency(), '()')('price')
+    pricing = enclosed_in(decimal() + currency(), '()')('pricing')
 
-    return check + label + Optional(price)
+    return check + label + Optional(pricing)
 
 
 def radio():

@@ -1,5 +1,6 @@
 import pytest
 
+from decimal import Decimal
 from onegov.form import Form, errors
 from onegov.form.parser import parse_form
 from textwrap import dedent
@@ -227,6 +228,36 @@ def test_parse_checkbox():
         ('Early Boarding', 'Early Boarding'),
     ]
     assert form.extras.default == ['Priority Seating', 'Early Boarding']
+
+
+def test_parse_radio_with_pricing():
+
+    text = dedent("""
+        Drink =
+            ( ) Coffee (2.50 CHF)
+            (x) Tea (1.50 CHF)
+    """)
+
+    form = parse_form(text)()
+    assert form.drink.pricing.rules == {
+        'Coffee': (Decimal(2.5), 'CHF'),
+        'Tea': (Decimal(1.5), 'CHF')
+    }
+
+
+def test_parse_checkbox_with_pricing():
+
+    text = dedent("""
+        Extras =
+            [ ] Bacon (2.50 CHF)
+            [x] Cheese (1.50 CHF)
+    """)
+
+    form = parse_form(text)()
+    assert form.extras.pricing.rules == {
+        'Bacon': (Decimal(2.5), 'CHF'),
+        'Cheese': (Decimal(1.5), 'CHF')
+    }
 
 
 def test_dependent_validation():

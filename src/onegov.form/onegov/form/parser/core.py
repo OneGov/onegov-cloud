@@ -549,17 +549,22 @@ def handle_block(builder, block, dependency=None):
         checked = [c.label for c in field.choices if c.checked]
         default = checked and checked[0] or None
 
+        pricing = {c.label: c.pricing for c in field.choices if c.pricing}
+
         field_id = builder.add_field(
             field_class=RadioField,
             label=identifier.label,
             dependency=dependency,
             required=identifier.required,
             choices=choices,
-            default=default
+            default=default,
+            pricing=pricing or None
         )
     elif field.type == 'checkbox':
         choices = [(c.label, c.label) for c in field.choices]
         default = [c.label for c in field.choices if c.checked]
+
+        pricing = {c.label: c.pricing for c in field.choices if c.pricing}
 
         field_id = builder.add_field(
             field_class=MultiCheckboxField,
@@ -567,7 +572,8 @@ def handle_block(builder, block, dependency=None):
             dependency=dependency,
             required=identifier.required,
             choices=choices,
-            default=default
+            default=default,
+            pricing=pricing or None
         )
     else:
         raise NotImplementedError
@@ -785,7 +791,7 @@ class WTFormsClassBuilder(object):
         return field_id
 
     def add_field(self, field_class, label, required,
-                  dependency=None, field_id=None, **kwargs):
+                  dependency=None, field_id=None, pricing=None, **kwargs):
         validators = kwargs.pop('validators', [])
 
         # labels in wtforms are not escaped correctly - for safety we make sure
@@ -800,6 +806,7 @@ class WTFormsClassBuilder(object):
             label=label,
             validators=validators,
             fieldset=self.current_fieldset,
+            pricing=pricing,
             **kwargs
         ))
 
