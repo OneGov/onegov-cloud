@@ -47,7 +47,13 @@ def as_int(tokens):
 
 def as_decimal(tokens):
     """ Converts the token to decimal if possible. """
-    return Decimal('.'.join(tokens)) if tokens else None
+    if tokens and tokens[0] == '-':
+        tokens = tokens[1:]
+        prefix = '-'
+    else:
+        prefix = '+'
+
+    return Decimal(prefix + '.'.join(tokens)) if tokens else None
 
 
 def as_uppercase(tokens):
@@ -256,10 +262,11 @@ def decimal():
         0.00
         123
         11.1
+        -10.0
 
     """
 
-    return (numeric + Optional(Suppress('.') + numeric))\
+    return (Optional('-') + numeric + Optional(Suppress('.') + numeric))\
         .setParseAction(as_decimal)('decimal')
 
 

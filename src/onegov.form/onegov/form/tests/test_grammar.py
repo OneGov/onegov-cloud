@@ -219,6 +219,13 @@ def test_prices():
     assert f.price.decimal == Decimal('15.00')
     assert f.price.currency == 'USD'
 
+    f = field.parseString("[ ] Discount (-5.00 USD)")
+    assert f.type == 'checkbox'
+    assert f.label == 'Discount'
+    assert not f.checked
+    assert f.price.decimal == Decimal('-5.00')
+    assert f.price.currency == 'USD'
+
 
 def test_decimal():
     field = decimal()
@@ -226,6 +233,7 @@ def test_decimal():
     assert field.parseString('123.45')[0] == Decimal('123.45')
     assert field.parseString('123')[0] == Decimal('123')
     assert field.parseString('0.5')[0] == Decimal('0.5')
+    assert field.parseString('-10.0')[0] == Decimal('-10.0')
 
 
 def test_currency():
