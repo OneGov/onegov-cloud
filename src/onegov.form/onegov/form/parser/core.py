@@ -810,7 +810,9 @@ class WTFormsClassBuilder(object):
         # labels in wtforms are not escaped correctly - for safety we make sure
         # that the label is properly html escaped. See also:
         # https://github.com/wtforms/wtforms/issues/315
-        label = escape(label)
+        # -> quotes are allowed because the label is rendered between tags,
+        # not as part of the attributes
+        label = escape(label, quote=False)
         field_id = field_id or self.get_unique_field_id(label, dependency)
 
         self.validators_extend(validators, required, dependency)
