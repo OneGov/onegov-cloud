@@ -2,6 +2,7 @@ import inspect
 import weakref
 
 from collections import OrderedDict
+from decimal import Decimal
 from itertools import groupby
 from onegov.form import utils
 from operator import itemgetter
@@ -78,6 +79,29 @@ class Form(BaseForm):
                 depends_on=('option', 'no')
             )
 
+    Pricing
+    -------
+
+    Pricing is a way to attach prices to certain form fields. A total price
+    is calcualted depending on the selections the user makes::
+
+        class MyForm(Form):
+
+            ticket_insurance = RadioField('Option', choices=[
+                ('yes', 'Yes'),
+                ('no', 'No')
+            ], pricing={
+                'yes': (10.0, 'CHF')
+            })
+
+            discount_code = TextField('Discount Code', pricing={
+                'CAMPAIGN2017': (-5.0, 'CHF')
+            })
+
+    Note that the pricing has no implicit meaning. This is simply a way to
+    attach prices and to get the total through the ``prices()`` and ``total()``
+    calls. What you do with these prices is up to you.
+
     """
 
     def __init__(self, *args, **kwargs):
@@ -88,7 +112,8 @@ class Form(BaseForm):
         # removing them in the process (so wtforms doesn't trip up).
         preprocessors = [
             self.process_fieldset(),
-            self.process_depends_on()
+            self.process_depends_on(),
+            self.process_pricing()
         ]
 
         for processor in preprocessors:
@@ -181,6 +206,61 @@ class Form(BaseForm):
             field.kwargs['render_kw'].update(field.depends_on.html_data)
 
         yield
+
+    def process_pricing(self):
+        """ Processes the pricing parameter on the fields, which adds the
+        ability to have fields associated with a price.
+
+        See :class:`Form` for more information.
+
+        """
+
+        pricings = {}
+
+        # move the pricing rule to the field class (happens once per class)
+        for field_id, field in self._unbound_fields:
+            if not hasattr(field, 'pricing'):
+                field.pricing = field.kwargs.pop('pricing', None)
+
+        # prepare the pricing rules
+        for field_id, field in self._unbound_fields:
+            if field.pricing:
+                pricings[field_id] = Pricing(field.pricing)
+
+        yield
+
+        # attach the pricing rules to the field instances
+        for field_id, pricing in pricings.items():
+            self._fields[field_id].pricing = pricing
+
+    def prices(self):
+        """ Returns the prices of all selected items depending on the
+        formdata. """
+
+        prices = []
+
+        for field_id, field in self._fields.items():
+            if not hasattr(field, 'pricing'):
+                continue
+
+            price = field.pricing.price(field)
+
+            if price is not None:
+                prices.append((field_id, price))
+
+        currencies = set(price[1] for _, price in prices)
+        assert len(currencies) <= 1, "Mixed currencies are not supported"
+
+        return prices
+
+    def total(self):
+        """ Returns the total amount of all prices. """
+        prices = self.prices()
+
+        if not prices:
+            return None
+
+        return sum(price[0] for field_id, price in prices), prices[0][1][1]
 
     def submitted(self, request):
         """ Returns true if the given request is a successful post request. """
@@ -496,6 +576,22 @@ class FieldDependency(object):
             for dep in self.dependencies
         ))
         return {'data-depends-on': value}
+
+
+class Pricing(object):
+    """ Defines pricing on a field, returning the correct price for the field
+    depending on its rule.
+
+    """
+
+    def __init__(self, rules):
+        self.rules = {
+            rule: (Decimal(value), currency)
+            for rule, (value, currency)in rules.items()
+        }
+
+    def price(self, field):
+        return self.rules.get(field.data, None)
 
 
 def merge_forms(*forms):

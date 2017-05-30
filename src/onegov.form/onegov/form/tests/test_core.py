@@ -1,3 +1,4 @@
+from decimal import Decimal
 from onegov.form import Form, merge_forms, with_options, move_fields
 from wtforms import RadioField, StringField, TextAreaField, validators
 from wtforms.fields.html5 import EmailField
@@ -413,3 +414,48 @@ def test_ensurances():
 
     assert form.ensure_foo_and_bar_called == 2
     assert form.ensure_foo_or_bar_called == 2
+
+
+def test_pricing():
+
+    class TestForm(Form):
+        ticket_insurance = RadioField('Option', choices=[
+            ('yes', 'Yes'),
+            ('no', 'No')
+        ], pricing={
+            'yes': (10.0, 'CHF'),
+        })
+
+        discount_code = StringField('Discount Code', pricing={
+            'FOO': (-5.0, 'CHF')
+        })
+
+    def post(data):
+        return DummyRequest(data).POST
+
+    form = TestForm(post({}))
+    assert form.total() is None
+    assert form.prices() == []
+
+    form = TestForm(post({'ticket_insurance': 'no'}))
+    assert form.total() is None
+    assert form.prices() == []
+
+    form = TestForm(post({'ticket_insurance': 'yes'}))
+    assert form.total() == (Decimal('10.0'), 'CHF')
+    assert form.prices() == [
+        ('ticket_insurance', (Decimal(10.0), 'CHF'))
+    ]
+
+    form = TestForm(post({'ticket_insurance': 'yes', 'discount_code': 'test'}))
+    assert form.total() == (Decimal('10.0'), 'CHF')
+    assert form.prices() == [
+        ('ticket_insurance', (Decimal(10.0), 'CHF'))
+    ]
+
+    form = TestForm(post({'ticket_insurance': 'yes', 'discount_code': 'FOO'}))
+    assert form.total() == (Decimal('5.0'), 'CHF')
+    assert form.prices() == [
+        ('ticket_insurance', (Decimal(10.0), 'CHF')),
+        ('discount_code', (Decimal(-5.0), 'CHF'))
+    ]
