@@ -3,7 +3,7 @@ import transaction
 
 from onegov.core.orm import Base, SessionManager
 from onegov.core.orm.types import UUID
-from onegov.pay.models import Payable, Payment, PaymentProvider
+from onegov.pay.models import Payable, Payment, PaymentProvider, ManualPayment
 from sqlalchemy import Column
 from sqlalchemy import Text
 from sqlalchemy.ext.declarative import declarative_base
@@ -80,6 +80,12 @@ def test_payment_referential_integrity(postgres_dsn):
     apple = Order(title="Apple", payment=PaymentProvider().payment(amount=100))
     session.add(apple)
     transaction.commit()
+
+    with pytest.raises(IntegrityError):
+        session.delete(session.query(PaymentProvider).one())
+        session.flush()
+
+    transaction.abort()
 
     # as a precaution we only allow deletion of elements after the payment
     # has been explicitly deleted
@@ -162,3 +168,26 @@ def test_backref(postgres_dsn):
     assert {r.title for r in car.payment.links} == {"Car", "Nut"}
 
     mgr.dispose()
+
+
+def test_manual_payment(postgres_dsn):
+
+    MyBase = declarative_base()
+
+    class Product(MyBase, Payable):
+        __tablename__ = 'products'
+
+        id = Column(UUID, primary_key=True, default=uuid4)
+        title = Column(Text)
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.bases.append(MyBase)
+    mgr.set_current_schema('foobar')
+    session = mgr.session()
+
+    car = Product(title="Car", payment=ManualPayment(amount=10000))
+    session.add(car)
+    session.flush()
+
+    payments = session.query(Payment).all()
+    assert [t.title for p in payments for t in p.linked_products] == ["Car"]

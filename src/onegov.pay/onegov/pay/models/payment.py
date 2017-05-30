@@ -40,9 +40,10 @@ class Payment(Base, TimestampMixin, ContentMixin):
         default='open'
     )
 
-    #: the payment provider associated with the payment
+    #: the payment provider associated with the payment, if it is missing it
+    #: means that the payment is out-of-band (say paid by cash)
     provider_id = Column(
-        UUID, ForeignKey('payment_providers.id'), nullable=False
+        UUID, ForeignKey('payment_providers.id'), nullable=True
     )
 
     __mapper_args__ = {
@@ -91,3 +92,12 @@ class Payment(Base, TimestampMixin, ContentMixin):
             .options(joinedload(cls.payment))
             for cls in self.registered_links.values()
         ))
+
+
+class ManualPayment(Payment):
+    """ A manual payment is a payment without associated payment provider.
+
+    For example, a payment paid in cash.
+
+    """
+    __mapper_args__ = {'polymorphic_identity': 'manual'}

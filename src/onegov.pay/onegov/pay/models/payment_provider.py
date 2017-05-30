@@ -40,7 +40,8 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin):
     payments = relationship(
         'Payment',
         order_by='Payment.created',
-        backref='provider'
+        backref='provider',
+        passive_deletes=True
     )
 
     @property

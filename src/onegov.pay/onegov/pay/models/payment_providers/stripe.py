@@ -16,6 +16,10 @@ def stripe_api_key(key):
     stripe.api_key = old_key
 
 
+# instantiate once to get keep-alive support
+stripe.default_http_client = stripe.http_client.RequestsClient()
+
+
 class StripeConnect(PaymentProvider):
 
     __mapper_args__ = {'polymorphic_identity': 'stripe_connect'}
