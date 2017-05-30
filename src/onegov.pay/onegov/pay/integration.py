@@ -1,4 +1,6 @@
 from more.webassets import WebassetsApp
+from onegov.core.orm import orm_cached
+from onegov.pay import PaymentProvider
 
 
 class PayApp(WebassetsApp):
@@ -30,3 +32,8 @@ class PayApp(WebassetsApp):
 
         self.payment_provider_defaults = cfg.get(
             'payment_provider_defaults', {})
+
+    @orm_cached(policy='on-table-change:payment_providers')
+    def default_payment_provider(self):
+        return self.session().query(PaymentProvider)\
+            .filter_by(default=True).first()
