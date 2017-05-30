@@ -443,6 +443,13 @@ def parse_form(text, base_class=Form):
     return form_class
 
 
+def format_pricing(pricing):
+    if not pricing:
+        return ''
+
+    return ' ({:.2f} {})'.format(pricing[0], pricing[1])
+
+
 def handle_block(builder, block, dependency=None):
     """ Takes the given parsed yaml block and adds it to the from builder. """
 
@@ -545,7 +552,10 @@ def handle_block(builder, block, dependency=None):
             ]
         )
     elif field.type == 'radio':
-        choices = [(c.label, c.label) for c in field.choices]
+        choices = [
+            (c.label, c.label + format_pricing(c.pricing))
+            for c in field.choices
+        ]
         checked = [c.label for c in field.choices if c.checked]
         default = checked and checked[0] or None
 
@@ -561,7 +571,10 @@ def handle_block(builder, block, dependency=None):
             pricing=pricing or None
         )
     elif field.type == 'checkbox':
-        choices = [(c.label, c.label) for c in field.choices]
+        choices = [
+            (c.label, c.label + format_pricing(c.pricing))
+            for c in field.choices
+        ]
         default = [c.label for c in field.choices if c.checked]
 
         pricing = {c.label: c.pricing for c in field.choices if c.pricing}
