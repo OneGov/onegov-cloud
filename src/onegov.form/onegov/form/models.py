@@ -9,6 +9,7 @@ from onegov.core.orm.types import JSON, UUID
 from onegov.form.display import render_field
 from onegov.form.parser import parse_form
 from onegov.search import ORMSearchable
+from onegov.pay import Payable
 from sedate import utcnow
 from sqlalchemy import Column, Enum, ForeignKey, Text
 from sqlalchemy.orm import (
@@ -103,7 +104,7 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, SearchableDefinition):
         return query.first() and True or False
 
 
-class FormSubmission(Base, TimestampMixin):
+class FormSubmission(Base, TimestampMixin, Payable):
     """ Defines a submitted form in the database. """
 
     __tablename__ = 'submissions'
