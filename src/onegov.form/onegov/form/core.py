@@ -587,10 +587,25 @@ class Pricing(object):
     def __init__(self, rules):
         self.rules = {
             rule: (Decimal(value), currency)
-            for rule, (value, currency)in rules.items()
+            for rule, (value, currency) in rules.items()
         }
 
     def price(self, field):
+        if isinstance(field.data, list):
+            total = None
+
+            for value in field.data:
+                price = self.rules.get(value, None)
+
+                if price is not None:
+                    total = (total or Decimal(0)) + price[0]
+                    currency = price[1]
+
+            if total is None:
+                return None
+            else:
+                return (total, currency)
+
         return self.rules.get(field.data, None)
 
 

@@ -9,7 +9,7 @@ from onegov.core.orm.types import JSON, UUID
 from onegov.form.display import render_field
 from onegov.form.parser import parse_form
 from onegov.search import ORMSearchable
-from onegov.pay import Payable
+from onegov.pay import Payable, ManualPayment
 from sedate import utcnow
 from sqlalchemy import Column, Enum, ForeignKey, Text
 from sqlalchemy.orm import (
@@ -79,6 +79,10 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, SearchableDefinition):
 
     #: content associated with the form
     text = content_property('text')
+
+    #: payment options ('manual' for out of band payments without cc, 'free'
+    #: for both manual and cc payments, 'cc' for forced cc payments)
+    payment_method = content_property('payment_method')
 
     __mapper_args__ = {
         "polymorphic_on": 'type'
@@ -161,6 +165,12 @@ class FormSubmission(Base, TimestampMixin, Payable):
 
         return parse_form(self.definition)
 
+    @property
+    def form_obj(self):
+        """ Returns a form instance containing the submission data. """
+
+        return self.form_class(data=self.data)
+
     @observes('definition')
     def definition_observer(self, definition):
         self.checksum = hash_definition(definition)
@@ -200,6 +210,28 @@ class FormSubmission(Base, TimestampMixin, Payable):
             # only set the date the first time around
             if not self.received:
                 self.received = utcnow()
+
+    def process_payment(self, provider=None, token=None):
+        """ Takes a request, optionally with the provider and the token
+        by the provider that can be used to charge the credit card and creates
+        a payment record if necessary.
+
+        Returns True if the payment was processed successfully. If there's no
+        price for the current form, the processing will be successful as well.
+
+        """
+
+        total = self.form_obj.total()
+
+        if not total:
+            return True
+
+        if self.form.payment_method == 'manual':
+            self.payment = ManualPayment(amount=total[0], currency=total[1])
+        else:
+            raise NotImplementedError
+
+        return True
 
 
 class PendingFormSubmission(FormSubmission):

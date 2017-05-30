@@ -191,7 +191,7 @@ class FormSubmissionCollection(object):
 
         assert submission.state == 'pending'
 
-        if not submission.form_class(data=submission.data).validate():
+        if not submission.form_obj.validate():
             raise UnableToComplete()
 
         submission.state = 'complete'
