@@ -98,6 +98,12 @@ class Handler(object):
 
         return tuple()
 
+    @property
+    def payment(self):
+        """ An optional link to a onegov.pay payment record. """
+
+        return None
+
     @classmethod
     def handle_extra_parameters(self, session, query, extra_parameters):
         """ Takes a dictionary of extra parameters and uses it to optionally

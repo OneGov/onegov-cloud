@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a generic payment property to ticket handlers.
+  [href]
+
 0.5.0 (2017-01-03)
 ~~~~~~~~~~~~~~~~~~~
 
