@@ -66,6 +66,10 @@ class FormSubmissionHandler(Handler):
         return self.submission.form.title
 
     @property
+    def payment(self):
+        return self.submission.payment
+
+    @property
     def extra_data(self):
         return self.submission and [
             v for v in self.submission.data.values()

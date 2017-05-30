@@ -5,7 +5,7 @@ from onegov.core.utils import Bunch, normalize_for_url
 from onegov.form import FormCollection, FormDefinition
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
-from onegov.org.forms import CustomDefinitionForm
+from onegov.org.forms import FormDefinitionForm
 from onegov.org.layout import FormEditorLayout
 from onegov.org.models import CustomFormDefinition
 from webob import exc
@@ -17,8 +17,8 @@ def get_form_class(model, request):
         model = CustomFormDefinition()
 
     form_classes = {
-        'builtin': CustomDefinitionForm,
-        'custom': CustomDefinitionForm
+        'builtin': FormDefinitionForm,
+        'custom': FormDefinitionForm
     }
 
     return model.with_content_extensions(form_classes[model.type], request)

@@ -140,6 +140,10 @@ def handle_complete_submission(self, request):
                     self.name, ensure_existance=False)
             ))
         else:
+            if not self.process_payment(request):
+                request.fail(_("Your payment could not be processed"))
+                return morepath.redirect(request.link(self))
+
             collection = FormCollection(request.app.session())
             collection.submissions.complete_submission(self)
 

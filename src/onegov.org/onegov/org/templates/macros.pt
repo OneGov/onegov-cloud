@@ -380,6 +380,16 @@
                 </div>
                 <div class="clearfix"></div>
             </div>
+            <tal:b define="price form.total()" condition="price">
+                <div class="field-display">
+                    <div class="field-display-block">
+                        <div class="field-display-label" i18n:translate>Total Amount</div>
+                        <div class="field-display-data">
+                            ${'{:.2f} {}'.format(*price)}
+                        </div>
+                    </div>
+                </div>
+            </tal:b>
         </tal:block>
     </div>
 </metal:display_form>
@@ -483,6 +493,21 @@
         Closed
     </div>
 </metal:ticket_status>
+
+<metal:payment_status define-macro="payment_status" i18n:domain="onegov.org">
+    <div i18n:translate tal:condition="payment.state == 'open'" class="payment-state-open">
+        Open
+    </div>
+    <div i18n:translate tal:condition="payment.state == 'paid'" class="payment-state-paid">
+        Paid
+    </div>
+    <div i18n:translate tal:condition="payment.state == 'failed'" class="payment-state-failed">
+        Failed
+    </div>
+    <div i18n:translate tal:condition="payment.state == 'cancelled'" class="payment-state-cancelled">
+        Rescinded
+    </div>
+</metal:payment_status>
 
 <metal:ticket_callout define-macro="ticket_callout" i18n:domain="onegov.org">
     <div class="side-panel" tal:condition="ticket">

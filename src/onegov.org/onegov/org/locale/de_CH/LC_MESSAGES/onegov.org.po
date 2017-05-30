@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-05-24 14:48+0200\n"
+"POT-Creation-Date: 2017-05-30 16:48+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -526,6 +526,24 @@ msgstr "Text"
 
 msgid "Definition"
 msgstr "Definition"
+
+msgid "Payment Method"
+msgstr "Zahlungsmethode"
+
+msgid ""
+"You need to setup a default payment provider to enable credit card payments"
+msgstr ""
+"Um Kreditkartenzahlungen zu aktivieren benötigen Sie einen Standard-"
+"Zahlungsanbieter"
+
+msgid "No credit card payments"
+msgstr "Keine Kreditkarten-Zahlungen"
+
+msgid "Credit card payments optional"
+msgstr "Kreditkarten-Zahlungen optional"
+
+msgid "Credit card payments required"
+msgstr "Kreditkarten-Zahlung erforderlich"
 
 msgid "Format"
 msgstr "Format"
@@ -1112,6 +1130,9 @@ msgstr ""
 "Diese Seite hat keine Einleitung. Die Einleitung ist wichtig für die Suche "
 "und Auflistungen."
 
+msgid "Total Amount"
+msgstr "Totalbetrag"
+
 msgid "Open"
 msgstr "Offen"
 
@@ -1120,6 +1141,15 @@ msgstr "In Bearbeitung"
 
 msgid "Closed"
 msgstr "Abgeschlossen"
+
+msgid "Paid"
+msgstr "Bezahlt"
+
+msgid "Failed"
+msgstr "Fehlgeschlagen"
+
+msgid "Rescinded"
+msgstr "Storniert"
 
 msgid "Ticket Number"
 msgstr "Ticket Nummer"
@@ -1586,6 +1616,9 @@ msgstr ""
 msgid "Ticket State"
 msgstr "Ticket Status"
 
+msgid "Payment State"
+msgstr "Zahlungsstatus"
+
 msgid "Owner"
 msgstr "Zuständig"
 
@@ -1762,6 +1795,9 @@ msgstr "Ein Formular mit diesem Namen existiert bereits"
 
 msgid "Added a new form"
 msgstr "Ein neues Formular wurd hinzugefügt"
+
+msgid "Your payment could not be processed"
+msgstr ""
 
 msgid "Select images"
 msgstr "Bilder auswählen"
@@ -2029,3 +2065,9 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "Cost"
+#~ msgstr "Kosten"
+
+#~ msgid "Sum"
+#~ msgstr "Summe"

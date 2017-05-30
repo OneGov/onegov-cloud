@@ -3,7 +3,7 @@ from onegov.org.forms.allocation import DaypassAllocationForm
 from onegov.org.forms.allocation import RoomAllocationEditForm
 from onegov.org.forms.allocation import RoomAllocationForm
 from onegov.org.forms.event import EventForm
-from onegov.org.forms.form_definition import CustomDefinitionForm
+from onegov.org.forms.form_definition import FormDefinitionForm
 from onegov.org.forms.generic import ExportForm, DateRangeForm
 from onegov.org.forms.imageset import ImageSetForm
 from onegov.org.forms.newsletter import NewsletterForm, NewsletterSendForm
@@ -23,12 +23,12 @@ from onegov.org.forms.userprofile import UserProfileForm
 
 
 __all__ = [
-    'CustomDefinitionForm',
+    'DateRangeForm',
     'DaypassAllocationEditForm',
     'DaypassAllocationForm',
     'EventForm',
-    'DateRangeForm',
     'ExportForm',
+    'FormDefinitionForm',
     'ImageSetForm',
     'LinkForm',
     'ManageUserForm',
