@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-05-31 11:33+0200\n"
+"POT-Creation-Date: 2017-05-31 13:49+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1511,14 +1511,8 @@ msgstr "Einen eigenen Eintrag für den Veranstaltungskalender erfassen"
 msgid "No payment providers defined."
 msgstr "Keine Zahlungsanbieter definiert."
 
-msgid "Credit card payments:"
-msgstr "Kreditkarten Zahlungen:"
-
-msgid "Payouts:"
-msgstr "Auszahlungen:"
-
-msgid "Connection to account failed."
-msgstr "Verbindung zum Konto fehlgeschlagen."
+msgid "Connected:"
+msgstr "Verbunden:"
 
 msgid "No people added yet."
 msgstr "Es wurden noch keine Personen hinzugefügt."
@@ -2071,6 +2065,15 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "Credit card payments:"
+#~ msgstr "Kreditkarten Zahlungen:"
+
+#~ msgid "Payouts:"
+#~ msgstr "Auszahlungen:"
+
+#~ msgid "Connection to account failed."
+#~ msgstr "Verbindung zum Konto fehlgeschlagen."
 
 #~ msgid "Cost"
 #~ msgstr "Kosten"

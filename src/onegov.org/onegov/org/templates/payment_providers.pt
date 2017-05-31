@@ -10,28 +10,11 @@
         <ul class="payment-providers" tal:condition="providers">
             <li tal:repeat="provider providers" class="payment-provider-${provider.type} ${provider.default and 'payment-provider-default' or ''}" id="${provider.id.hex}">
                 <h2>${provider.title}</h2>
-                <div tal:define="account provider.account()|None">
-                    <tal:b condition="account is not None">
-                        <div>
-                            <span>${account.business_name}</div>
-                        <div>
-                            <span i18n:translate>Credit card payments:</span>
-                            ${account.charges_enabled and '✔︎' or '✘'}
-                        </div>
-                        <div>
-                            <span i18n:translate>Payouts:</span>
-                            ${account.payouts_enabled and '✔︎' or '✘'}
-                        </div>
-                        <div class="text-links">
-                            <tal:b
-                                repeat="link links(provider)"
-                                content="structure link(layout)"
-                            />
-                        </div>
-                    </tal:b>
-                    <tal:b condition="account is None">
-                        <span i18n:translate>Connection to account failed.</span>
-                    </tal:b>
+                <div>
+                    <span>${provider.public_identity}</span>
+                <div>
+                    <span i18n:translate>Connected:</span>
+                    ${provider.connected and '✔︎' or '✘'}
                 </div>
             </li>
         </ul>
