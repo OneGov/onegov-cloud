@@ -21,7 +21,7 @@ def get_party_results(election):
     query = session.query(PartyResult.year, PartyResult.total_votes)
     query = query.filter(PartyResult.election_id == election.id).distinct()
     totals = dict(query)
-    years = sorted((str(key) for key in totals.keys()), reverse=True)
+    years = sorted((str(key) for key in totals.keys()))
 
     parties = {}
     for result in election.party_results:
