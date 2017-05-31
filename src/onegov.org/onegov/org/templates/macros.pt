@@ -164,7 +164,7 @@
 <metal:form define-macro="form">
     <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url; data-sitecollection-url layout.sitecollection_url;" class="${form.css_class|''}" method="${form.method|'POST'}" enctype="multipart/form-data">
         <tal:block repeat="fieldset form.fieldsets">
-            <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower()}">
+            <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower().replace(' ', '-')}">
                 <legend>${fieldset.label}</legend>
                 <div class="formfields">
                     <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
