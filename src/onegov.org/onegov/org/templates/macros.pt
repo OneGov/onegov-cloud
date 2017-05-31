@@ -46,7 +46,7 @@
                             </li>
                         </ul>
                     </tal:block>
-                    <tal:block condition="group.url|nothing" define="link group">
+                    <tal:block condition="group.url|group.attrs|nothing" define="link group">
                         <tal:block replace="structure link(layout, ('tiny', 'button'))" />
                     </tal:block>
                 </tal:block>

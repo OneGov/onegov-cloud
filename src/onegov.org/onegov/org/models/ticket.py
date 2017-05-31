@@ -6,7 +6,7 @@ from onegov.event import EventCollection
 from onegov.form import FormSubmissionCollection
 from onegov.reservation import Resource
 from onegov.org import _
-from onegov.org.elements import DeleteLink, Link, LinkGroup
+from onegov.org.new_elements import Link, LinkGroup, Confirm, Intercooler
 from onegov.org.layout import DefaultLayout, EventLayout
 from onegov.org.utils import correct_time_range
 from onegov.ticket import Ticket, Handler, handlers
@@ -92,7 +92,7 @@ class FormSubmissionHandler(Handler):
             Link(
                 text=_('Edit submission'),
                 url=request.return_here(edit_link),
-                classes=('edit-link', )
+                attrs={'class': 'edit-link'}
             )
         ]
 
@@ -245,29 +245,30 @@ class ReservationHandler(Handler):
                     url=request.return_here(
                         request.link(self.reservations[0], 'annehmen')
                     ),
-                    classes=('accept-link', )
+                    attrs={'class': 'accept-link'}
                 )
             )
 
         reject = LinkGroup(
             _("Reject reservations"),
-            [
-                DeleteLink(
-                    text=_("Reject all"),
-                    url=request.return_here(
-                        request.link(self.reservations[0], 'absagen')
+            [Link(
+                text=_("Reject all"),
+                url=request.return_here(
+                    request.link(self.reservations[0], 'absagen')
+                ),
+                attrs={'class': 'delete-link'},
+                traits=(
+                    Confirm(
+                        _("Do you really want to reject all reservations?"),
+                        _("Rejecting these reservations can't be undone."),
+                        _("Reject reservations")
                     ),
-                    confirm=_(
-                        "Do you really want to reject all reservations?"
-                    ),
-                    extra_information=_(
-                        "Rejecting these reservations can't be undone."
-                    ),
-                    yes_button_text=_("Reject reservations"),
-                    request_method='GET',
-                    redirect_after=request.url
+                    Intercooler(
+                        request_method='GET',
+                        redirect_after=request.url
+                    )
                 )
-            ],
+            )],
             right_side=False
         )
 
@@ -277,23 +278,24 @@ class ReservationHandler(Handler):
             link = request.return_here(link.as_string())
 
             title = self.get_reservation_title(reservation)
-            reject.links.append(
-                DeleteLink(
-                    text=_("Reject ${title}", mapping={'title': title}),
-                    url=link,
-                    confirm=_(
-                        "Do you really want to reject this reservation?"
-                    ),
-                    extra_information=_(
-                        "Rejecting ${title} can't be undone.", mapping={
+            reject.links.append(Link(
+                text=_("Reject ${title}", mapping={'title': title}),
+                url=link,
+                attrs={'class': 'delete-link'},
+                traits=(
+                    Confirm(
+                        _("Do you really want to reject this reservation?"),
+                        _("Rejecting ${title} can't be undone.", mapping={
                             'title': title
-                        }
+                        }),
+                        _("Reject reservation")
                     ),
-                    yes_button_text=_("Reject reservation"),
-                    request_method='GET',
-                    redirect_after=request.url
+                    Intercooler(
+                        request_method='GET',
+                        redirect_after=request.url
+                    )
                 )
-            )
+            ))
 
         links.append(reject)
 
@@ -372,32 +374,41 @@ class EventSubmissionHandler(Handler):
         })
 
     def get_links(self, request):
+
         if not self.event:
             return []
 
         links = []
+        layout = EventLayout(self.event, request)
+
         if self.event.state == 'submitted':
             links.append(Link(
                 text=_("Accept event"),
                 url=request.return_here(request.link(self.event, 'publish')),
-                classes=('accept-link', ),
+                attrs={'class': 'accept-link'},
             ))
 
-        links.append(DeleteLink(
+        links.append(Link(
             text=_("Reject event"),
-            url=request.link(self.event),
-            confirm=_("Do you really want to reject this event?"),
-            extra_information=_(
-                "Rejecting this event can't be undone."
-            ),
-            yes_button_text=_("Reject event"),
-            redirect_after=request.link(self.ticket)
+            url=layout.csrf_protected_url(request.link(self.event)),
+            attrs={'class': 'delete-link'},
+            traits=(
+                Confirm(
+                    _("Do you really want to reject this event?"),
+                    _("Rejecting this event can't be undone."),
+                    _("Reject event")
+                ),
+                Intercooler(
+                    request_method='DELETE',
+                    redirect_after=request.link(self.ticket)
+                )
+            )
         ))
 
         links.append(Link(
             text=_('Edit event'),
             url=request.return_here(request.link(self.event, 'bearbeiten')),
-            classes=('edit-link', )
+            attrs={'class': 'edit-link'}
         ))
 
         return links

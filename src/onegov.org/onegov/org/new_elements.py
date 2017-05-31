@@ -91,7 +91,10 @@ class Element(object):
 
         raise AttributeError(name)
 
-    def __call__(self, layout):
+    def __call__(self, layout, extra_classes=None):
+        if extra_classes:
+            self.attrs['class'].update(extra_classes)
+
         if self.attrs['class']:
             self.attrs['class'] = ' '.join(self.attrs['class'])
         else:
