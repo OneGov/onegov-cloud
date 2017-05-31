@@ -31,7 +31,7 @@
                         <figcaption i18n:translate="figcaption_parties">
                             The diagram shows the votes and mandates of the parties. The rimmed bars
                             (left scale) correspond to the number of seats, the colored bars (right scale)
-                            to the voices (percentages). The results of earlier elections are grayed out.
+                            to the voices (percentages).
                         </figcaption>
                     </figure>
                 </div>

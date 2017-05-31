@@ -97,6 +97,7 @@ def view_election_parties_data(self, request):
             front = parties[party].get(year, {}).get('mandates', 0)
             back = parties[party].get(year, {}).get('votes', {})
             back = back.get('permille', 0) / 10.0
+            color = parties[party].get(year, {}).get('color', '#999999')
             results.append({
                 'group': party,
                 'item': year,
@@ -104,7 +105,8 @@ def view_election_parties_data(self, request):
                     'front': front,
                     'back': back,
                 },
-                'active': year == str(self.date.year)
+                'active': year == str(self.date.year),
+                'color': color
             })
 
     return {

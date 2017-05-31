@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-29 15:10+0200\n"
+"POT-Creation-Date: 2017-05-31 11:42+0200\n"
 "PO-Revision-Date: 2017-05-29 14:04+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -128,11 +128,12 @@ msgstr "Datas nunvalaivlas da colliaziuns da glistas"
 msgid "No data found"
 msgstr "Chattà naginas datas"
 
-msgid "Party results"
-msgstr "Resultats da las partidas"
-
 msgid "Invalid values"
 msgstr "Valurs nunvalaivlas"
+
+#, python-format
+msgid "${name} was found twice"
+msgstr "${name} è avant maun duas giadas"
 
 msgid "Elected Candidates"
 msgstr "Candidat(a)s elegid(a)s"
@@ -142,10 +143,6 @@ msgstr "Candidat(a) nunenconuschent(a)"
 
 msgid "Invalid id"
 msgstr "ID nunvalaivel"
-
-#, python-format
-msgid "${name} was found twice"
-msgstr "${name} è avant maun duas giadas"
 
 msgid "Could not read the elegible voters"
 msgstr "I n'è betg stà pussaivel da leger las persunas cun dretg da votar"
@@ -230,6 +227,9 @@ msgstr "Format da la datoteca"
 
 msgid "Complete"
 msgstr "Resultat eruì cumplettamain"
+
+msgid "Party results"
+msgstr "Resultats da las partidas"
 
 msgid "Proposal / Results"
 msgstr "Project da votaziun / Resultats"
@@ -618,15 +618,13 @@ msgstr ""
 
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of seats, the colored bars (right
-#. scale) to the voices (percentages). The results of earlier elections are
-#. grayed out.
+#. scale) to the voices (percentages).
 #.
 msgid "figcaption_parties"
 msgstr ""
 "Il diagram mussa las vuschs gudagnadas ed ils sezs da las partidas. Las "
 "travs cun ur (scala sanestra) correspundan al dumber da sezs, las travs "
-"coluradas (scala dretga) a las quotas da vuschs en pertschients. Ils "
-"resultats d'anteriuras elecziuns èn colurads en grischs."
+"coluradas (scala dretga) a las quotas da vuschs en pertschients."
 
 msgid "Party"
 msgstr "Partida"

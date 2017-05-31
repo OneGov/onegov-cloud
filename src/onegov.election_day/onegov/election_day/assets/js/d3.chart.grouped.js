@@ -163,7 +163,11 @@
                             return height - options.axisHeight - scale.y.back(d.value.back) + 1;
                         })
                         .style('fill', function(d) {
+                            if (d.color) return d.color;
                             return d.active ? options.colorActive : options.colorInactive;
+                        })
+                        .style('fill-opacity', function(d) {
+                            if (d.color && !d.active) return 0.3;
                         });
 
                     // ... front

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-29 15:10+0200\n"
+"POT-Creation-Date: 2017-05-31 11:42+0200\n"
 "PO-Revision-Date: 2017-05-29 15:12+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -128,11 +128,12 @@ msgstr "Valeurs de connexion de liste non valides"
 msgid "No data found"
 msgstr "Pas de données trouvées"
 
-msgid "Party results"
-msgstr "Résultats des partis"
-
 msgid "Invalid values"
 msgstr "Valeurs non valides"
+
+#, python-format
+msgid "${name} was found twice"
+msgstr "${name} a été trouvé en double"
 
 msgid "Elected Candidates"
 msgstr "Candidats élus"
@@ -142,10 +143,6 @@ msgstr "Candidat inconnu"
 
 msgid "Invalid id"
 msgstr "Mauvaise référence"
-
-#, python-format
-msgid "${name} was found twice"
-msgstr "${name} a été trouvé en double"
 
 msgid "Could not read the elegible voters"
 msgstr "Impossible de connaître les électeurs valides"
@@ -230,6 +227,9 @@ msgstr "Format de fichier"
 
 msgid "Complete"
 msgstr "Terminé"
+
+msgid "Party results"
+msgstr "Résultats des partis"
 
 msgid "Proposal / Results"
 msgstr "Objet de la votation / Résultats"
@@ -580,15 +580,13 @@ msgstr ""
 
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of seats, the colored bars (right
-#. scale) to the voices (percentages). The results of earlier elections are
-#. grayed out.
+#. scale) to the voices (percentages).
 #.
 msgid "figcaption_parties"
 msgstr ""
 "Le diagramme montre les votes et les mandats des partis. Les barres à rebord "
 "(échelle de gauche) correspondent au nombre de sièges, les barres colorées "
-"(échelle de droite) aux voix (pourcentages). Les résultats des précédentes "
-"élections sont grisés."
+"(échelle de droite) aux voix (pourcentages)."
 
 msgid "Party"
 msgstr "Parti"
