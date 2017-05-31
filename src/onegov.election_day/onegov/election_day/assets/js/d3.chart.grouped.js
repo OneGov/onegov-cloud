@@ -305,7 +305,7 @@
                                     return 'translate(' + (width - options.tickWidth) + ',0)';
                                 });
                                 bar.front.attr('transform', function(d) {
-                                    return 'translate(' + (scale.x(d.group) + scale.dx(d.item) + 1) + ',' + scale.y.front(d.value.front) + ')';
+                                    return 'translate(' + (scale.x(d.group) + scale.dx(d.item)) + ',' + scale.y.front(d.value.front) + ')';
                                 });
                                 bar.back.attr('transform', function(d) {
                                     return 'translate(' + (scale.x(d.group) + scale.dx(d.item)) + ',' + scale.y.back(d.value.back) + ')';
