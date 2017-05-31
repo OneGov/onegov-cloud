@@ -63,10 +63,49 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin):
         raise NotImplementedError
 
     @property
-    def identity(self):
-        """ A list of values that uniquely identify the payment provider.
+    def public_identity(self):
+        """ The public identifier of this payment provider. For example, the
+        account name.
 
-        For example, a redacted list of secrets.
+        """
+        raise NotImplementedError
+
+    @property
+    def identity(self):
+        """ Uniquely identifies this payment provider amongst other providers
+        of the same type (say the private key of the api). Used to be able
+        to tell if a new oauth connection is the same as an existing one.
+
+        This identity is not meant to be displayed.
+
+        """
+        raise NotImplementedError
+
+    @property
+    def connected(self):
+        """ Returns True if the provider is properly hooked up to the
+        payment provider.
+
+        """
+
+    def checkout_button(self, amount, currency, **extra):
+        """ Renders a checkout button which will store the token for the
+        checkout as its own value if clicked.
+
+        """
+        raise NotImplementedError
+
+    def prepare_oauth_request(self, redirect_url, success_url, error_url,
+                              user_fields=None):
+        """ Registers the oauth request with the oauth_gateway and returns
+        an url that is ready to be used for the complete oauth request.
+
+        """
+        raise NotImplementedError
+
+    def process_oauth_response(self, request_params):
+        """ Processes the oauth response using the parameters passed by
+        the returning oauth request via the gateway.
 
         """
         raise NotImplementedError

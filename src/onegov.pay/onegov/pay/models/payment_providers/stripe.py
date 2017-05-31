@@ -2,6 +2,7 @@ import json
 import pycurl
 import stripe
 
+from cached_property import cached_property
 from contextlib import contextmanager
 from io import BytesIO
 from onegov.pay.models.payment_provider import PaymentProvider
@@ -59,8 +60,25 @@ class StripeConnect(PaymentProvider):
         return 'Stripe Connect'
 
     @property
+    def public_identity(self):
+        return self.account.business_name
+
+    @property
     def identity(self):
         return self.user_id
+
+    @cached_property
+    def account(self):
+        with stripe_api_key(self.access_token):
+            return stripe.Account.retrieve(id=self.user_id)
+
+    @property
+    def connected(self):
+        return self.account and True or False
+
+    def checkout_button(self, amount, currency, **extra):
+        """ Generates the html for the checkout button. """
+        pass
 
     def oauth_url(self, redirect_uri, state=None, user_fields=None):
         """ Generates an oauth url to be shown in the browser. """
@@ -74,7 +92,7 @@ class StripeConnect(PaymentProvider):
             state=state
         )
 
-    def prepare_oauth_request(self, redirect_uri, success_url, error_url,
+    def prepare_oauth_request(self, redirect_url, success_url, error_url,
                               user_fields=None):
         """ Registers the oauth request with the oauth_gateway and returns
         an url that is ready to be used for the complete oauth request.
@@ -85,7 +103,7 @@ class StripeConnect(PaymentProvider):
             self.oauth_gateway_auth)
 
         payload = {
-            'url': redirect_uri,
+            'url': redirect_url,
             'secret': self.oauth_gateway_secret,
             'method': 'GET',
             'success_url': success_url,
@@ -110,7 +128,7 @@ class StripeConnect(PaymentProvider):
         token = json.loads(body.read().decode('utf-8'))['token']
 
         return self.oauth_url(
-            redirect_uri='{}/redirect'.format(self.oauth_gateway),
+            redirect_url='{}/redirect'.format(self.oauth_gateway),
             state=token,
             user_fields=user_fields
         )
@@ -143,7 +161,3 @@ class StripeConnect(PaymentProvider):
         self.user_id = token['stripe_user_id']
         self.refresh_token = token['refresh_token']
         self.access_token = token['access_token']
-
-    def account(self):
-        with stripe_api_key(self.access_token):
-            return stripe.Account.retrieve(id=self.user_id)
