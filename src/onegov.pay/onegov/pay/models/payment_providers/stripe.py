@@ -4,6 +4,7 @@ import stripe
 
 from cached_property import cached_property
 from contextlib import contextmanager
+from html import escape
 from io import BytesIO
 from onegov.pay.models.payment_provider import PaymentProvider
 from onegov.core.orm.mixins import meta_property
@@ -76,9 +77,28 @@ class StripeConnect(PaymentProvider):
     def connected(self):
         return self.account and True or False
 
-    def checkout_button(self, amount, currency, **extra):
+    def checkout_button(self, label, amount, currency, **extra):
         """ Generates the html for the checkout button. """
-        pass
+
+        extra['amount'] = round(amount * 100, 0)
+        extra['currency'] = currency
+
+        attributes = (
+            (escape(str(key)), escape(str(value)))
+            for key, value in extra.items()
+        )
+
+        return """
+            <button
+                class="checkout-button stripe-connect"
+                {attributes}>{label}</button>
+        """.format(
+            label=escape(label),
+            attributes=' '.join(
+                'data-stripe-{}="{}"'.format(k, v)
+                for k, v in attributes
+            )
+        )
 
     def oauth_url(self, redirect_uri, state=None, user_fields=None):
         """ Generates an oauth url to be shown in the browser. """

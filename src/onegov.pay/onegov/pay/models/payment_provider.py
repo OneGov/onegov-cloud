@@ -88,7 +88,7 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin):
 
         """
 
-    def checkout_button(self, amount, currency, **extra):
+    def checkout_button(self, label, amount, currency, **extra):
         """ Renders a checkout button which will store the token for the
         checkout as its own value if clicked.
 
