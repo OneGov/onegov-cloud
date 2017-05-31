@@ -57,7 +57,7 @@
                                         <li>
                                             <a i18n:translate="" class="action-upload" href="${request.link(election, 'upload')}">Upload results</a>
                                         </li>
-                                        <li tal:condition="election.type == 'proporz'">
+                                        <li tal:condition="election.type == 'proporz' and election.completed">
                                             <a i18n:translate="" class="action-upload" href="${request.link(election, 'upload-party-results')}">Upload party results</a>
                                         </li>
                                         <li tal:condition="layout.principal.notifications">
