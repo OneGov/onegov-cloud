@@ -34,6 +34,22 @@
             if (params.interactive) interactive = params.interactive;
         }
 
+        var updateScales = function(scale) {
+            // Adjusts the x/dx scales to the current width. If there is not
+            // enough space to show all bars, layout all bars of one group
+            // to the same position.
+            scale.x.rangeRoundPoints([0, width], 1.0);
+            scale.simple = (width < data.groups.length * data.labels.length * options.barOuterWidth * 1.2);
+            if (scale.simple) {
+                scale.dx.range([-options.barOuterWidth/2]);
+            } else {
+                scale.dx.rangeRoundBands([
+                    -(data.labels.length * options.barOuterWidth)/2,
+                     (data.labels.length * options.barOuterWidth)/2
+                ]);
+            }
+        };
+
         var chart = function(container) {
 
             // Try to read a default width from the container if none is given
@@ -64,7 +80,8 @@
                     y: {
                         front: d3.scale.linear().range([height - options.axisHeight, 0]),
                         back: d3.scale.linear().range([height - options.axisHeight, 0])
-                    }
+                    },
+                    simple: false
                 };
 
                 var axis = {front: null, back: null, all: null};
@@ -74,17 +91,11 @@
                 if (data.results && data.labels && data.groups && data.maximum && data.axis_units) {
 
                     // Adjust the scales
-                    scale.x.domain(data.groups).rangeRoundPoints([0, width], 1.0);
-                    scale.dx
-                        .domain(data.labels)
-                        .rangeRoundBands(
-                            [
-                                -(data.labels.length * options.barOuterWidth)/2,
-                                (data.labels.length * options.barOuterWidth)/2
-                            ]
-                        );
+                    scale.x.domain(data.groups);
+                    scale.dx.domain(data.labels);
                     scale.y.front.domain([0, data.maximum.front]);
                     scale.y.back.domain([0, data.maximum.back]);
+                    updateScales(scale);
 
                     // Add the labels
                     label = canvas.selectAll('.label')
@@ -156,6 +167,9 @@
                         .attr('class', 'bar back')
                         .attr('transform', function(d) {
                             return 'translate(' + (scale.x(d.group) + scale.dx(d.item)) + ',' + scale.y.back(d.value.back) + ')';
+                        })
+                        .attr('visibility', function(d) {
+                            return (scale.simple && !d.active) ? 'hidden' : 'visible';
                         });
                     bar.back.append('rect')
                         .attr('width', options.barInnerWidth)
@@ -177,6 +191,9 @@
                         .attr('class', 'bar front')
                         .attr('transform', function(d) {
                             return 'translate(' + (scale.x(d.group) + scale.dx(d.item) + 1) + ',' + scale.y.front(d.value.front) + ')';
+                        })
+                        .attr('visibility', function(d) {
+                            return (scale.simple && !d.active) ? 'hidden' : 'visible';
                         });
                     bar.front.append('rect')
                         .attr('width', options.barInnerWidth - 2)
@@ -267,7 +284,13 @@
                                 // Resize
                                 width = $(container).width() - margin.left - margin.right;
                                 svg.attr('width', width + margin.left + margin.right);
-                                scale.x.rangeRoundPoints([0, width], 1.0);
+                                updateScales(scale);
+                                bar.front.attr('visibility', function(d) {
+                                    return (scale.simple && !d.active) ? 'hidden' : 'visible';
+                                });
+                                bar.back.attr('visibility', function(d) {
+                                    return (scale.simple && !d.active) ? 'hidden' : 'visible';
+                                });
 
                                 label.attr('transform', function(d) {
                                     return 'translate(' + scale.x(d) + ',' + height + ')';
