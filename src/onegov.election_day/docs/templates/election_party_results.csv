@@ -1,2 +1,12 @@
-Partei,Stimmen,Sitze
-BDP,60387,1
+name,color,year,total_votes,votes,mandates
+AL,#a74c97,2017,0,0,0
+BDP,#efb52c,2017,0,0,0
+CVP,#ff6300,2017,0,0,0
+EDU,#7f6b65,2017,0,0,0
+EVP,#e3c700,2017,0,0,0
+FDP,#4068c8,2017,0,0,0
+GLP,#aeca00,2017,0,0,0
+Grüne,#4abb3e,2017,0,0,0
+Piraten,#333333,2017,0,0,0
+SP,#db3c27,2017,0,0,0
+SVP,#3f841a,2017,0,0,0
