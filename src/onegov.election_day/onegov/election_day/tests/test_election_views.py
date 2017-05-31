@@ -107,6 +107,7 @@ def test_view_election_parties(election_day_app_gr):
     client.get('/locale/de_CH').follow()
     login(client)
 
+    # Majorz election
     upload_majorz_election(client)
 
     main = client.get('/election/majorz-election/parties')
@@ -119,6 +120,7 @@ def test_view_election_parties(election_day_app_gr):
     assert chart.status_code == 200
     assert '/election/majorz-election/parties' in chart
 
+    # Proporz election
     upload_proporz_election(client)
     upload_party_results(client)
 
@@ -144,115 +146,69 @@ def test_view_election_parties(election_day_app_gr):
         "2015,11270,FDP,#0571b0,0,35134\r\n"
     )
 
+    # Historical data
+    csv_parties = (
+        "year,total_votes,name,color,mandates,votes\r\n"
+        "2015,60000,BDP,#efb52c,1,10000\r\n"
+        "2015,60000,CVP,#ff6300,1,30000\r\n"
+        "2015,60000,FDP,#4068c8,0,20000\r\n"
+        "2011,40000,BDP,#efb52c,1,1000\r\n"
+        "2011,40000,CVP,#ff6300,1,15000\r\n"
+        "2011,40000,FDP,#4068c8,1,10000\r\n"
+    ).encode('utf-8')
 
-def test_view_election_parties_historical(election_day_app_gr):
-    client = Client(election_day_app_gr)
-    client.get('/locale/de_CH').follow()
-    login(client)
+    upload = client.get('/election/proporz-election/upload-party-results')
+    upload.form['parties'] = Upload('parties.csv', csv_parties, 'text/plain')
+    upload = upload.form.submit()
+    assert "erfolgreich hochgeladen" in upload
 
-    for id, year, domain, mandates, results in (
-        ('e1', 2014, 'federation', 5, 'BDP,153,5\r\nCVP,1,0\r\n'),
-        ('e2', 2015, 'federation', 5, 'BDP,123,4\r\nCVP,31,1\r\n'),
-        ('e3', 2016, 'federation', 5, 'BDP,92,3\r\nCVP,62,2\r\n'),
-        ('e4', 2013, 'federation', 4, 'BDP,62,2\r\nCVP,62,2\r\n'),
-        ('e5', 2012, 'canton', 5, 'BDP,92,3\r\nCVP,62,2\r\n')
-    ):
-        new = client.get('/manage/elections/new-election')
-        new.form['election_de'] = id
-        new.form['date'] = date(year, 1, 1)
-        new.form['mandates'] = mandates
-        new.form['election_type'] = 'proporz'
-        new.form['domain'] = domain
-        new.form.submit()
+    parties = client.get('/election/proporz-election/parties-data').json
+    assert parties['groups'] == ['BDP', 'CVP', 'FDP']
+    assert parties['labels'] == ['2011', '2015']
+    assert parties['maximum']['back'] == 100
+    assert parties['maximum']['front'] == 5
+    assert parties['results']
 
-        csv = (
-            "Anzahl Sitze,"
-            "Wahlkreis-Nr,"
-            "Wahlkreisbezeichnung,"
-            "Stimmberechtigte,"
-            "Wahlzettel,"
-            "Ungültige Wahlzettel,"
-            "Leere Wahlzettel,"
-            "Leere Stimmen,"
-            "Listen-Nr,"
-            "Parteibezeichnung,"
-            "HLV-Nr,"
-            "ULV-Nr,"
-            "Anzahl Sitze Liste,"
-            "Unveränderte Wahlzettel Liste,"
-            "Veränderte Wahlzettel Liste,"
-            "Kandidatenstimmen unveränderte Wahlzettel,"
-            "Zusatzstimmen unveränderte Wahlzettel,"
-            "Kandidatenstimmen veränderte Wahlzettel,"
-            "Zusatzstimmen veränderte Wahlzettel,"
-            "Kandidaten-Nr,"
-            "Gewählt,"
-            "Name,"
-            "Vorname,"
-            "Stimmen unveränderte Wahlzettel,"
-            "Stimmen veränderte Wahlzettel,"
-            "Stimmen Total aus Wahlzettel,"
-            "01 FDP,"
-            "02 CVP,"
-            " Anzahl Gemeinden\n"
-            "{},3503,Mutten,56,32,1,0,1,1,FDP,1,1,0,0,0,0,0,8,0,101,"
-            "nicht gewählt,Casanova,Angela,0,0,0,0,1,1 von 125\n"
-            "{},3503,Mutten,56,32,1,0,1,2,CVP,1,2,0,1,0,5,0,0,0,201,"
-            "nicht gewählt,Caluori,Corina,1,0,1,2,0,1 von 125\n".format(
-                mandates, mandates
-            )
-        ).encode('utf-8')
-        csv_parties = ("Partei,Stimmen,Sitze\n" + results).encode('utf-8')
+    parties = {
+        '{}-{}'.format(party['item'], party['group']): party
+        for party in parties['results']
+    }
+    assert parties['2011-BDP']['color'] == '#efb52c'
+    assert parties['2015-BDP']['color'] == '#efb52c'
+    assert parties['2011-CVP']['color'] == '#ff6300'
+    assert parties['2015-CVP']['color'] == '#ff6300'
+    assert parties['2011-FDP']['color'] == '#4068c8'
+    assert parties['2015-FDP']['color'] == '#4068c8'
 
-        mime = 'text/plain'
-        upload = client.get('/election/{}/upload'.format(id)).follow()
-        upload.form['file_format'] = 'sesam'
-        upload.form['results'] = Upload('data.csv', csv, mime)
-        upload = upload.form.submit()
-        assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+    assert parties['2011-BDP']['active'] == False
+    assert parties['2011-CVP']['active'] == False
+    assert parties['2011-FDP']['active'] == False
+    assert parties['2015-BDP']['active'] == True
+    assert parties['2015-CVP']['active'] == True
+    assert parties['2015-FDP']['active'] == True
 
-        upload = client.get('/election/{}/upload-party-results'.format(id))
-        upload.form['parties'] = Upload('parties.csv', csv_parties, mime)
-        upload = upload.form.submit()
-        assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+    assert parties['2011-BDP']['value']['front'] == 1
+    assert parties['2011-CVP']['value']['front'] == 1
+    assert parties['2011-FDP']['value']['front'] == 1
+    assert parties['2015-BDP']['value']['front'] == 1
+    assert parties['2015-CVP']['value']['front'] == 1
+    assert parties['2015-FDP']['value']['front'] == 0
 
-        export = client.get('/election/{}/data-parties'.format(id)).text
-        assert results in export
+    assert parties['2011-BDP']['value']['back'] == 2.5
+    assert parties['2011-CVP']['value']['back'] == 37.5
+    assert parties['2011-FDP']['value']['back'] == 25
+    assert parties['2015-BDP']['value']['back'] == 16.7
+    assert parties['2015-CVP']['value']['back'] == 50
+    assert parties['2015-FDP']['value']['back'] == 33.3
 
-    e1 = client.get('/election/e1/parties-data').json
-    e2 = client.get('/election/e2/parties-data').json
-    e3 = client.get('/election/e3/parties-data').json
-    e4 = client.get('/election/e4/parties-data').json
-    e5 = client.get('/election/e5/parties-data').json
+    results = client.get('/election/proporz-election/parties').text
+    assert all((
+        value in results
+        for value in ('2.5%', '37.5%', '25%', '16.7%', '50%', '33.3%')
+    ))
 
-    assert e1['groups'] == ['BDP', 'CVP']
-    assert e2['groups'] == ['BDP', 'CVP']
-    assert e3['groups'] == ['BDP', 'CVP']
-    assert e4['groups'] == ['BDP', 'CVP']
-    assert e5['groups'] == ['BDP', 'CVP']
-
-    assert e1['labels'] == ['2014']
-    assert e2['labels'] == ['2014', '2015']
-    assert e3['labels'] == ['2014', '2015', '2016']
-    assert e4['labels'] == ['2013']
-    assert e5['labels'] == ['2012']
-
-    e1 = client.get('/election/e1/parties')
-    e2 = client.get('/election/e2/parties')
-    e3 = client.get('/election/e3/parties')
-    e4 = client.get('/election/e4/parties')
-    e5 = client.get('/election/e5/parties')
-
-    assert 'Differenz' not in e1
-    assert 'Differenz' in e2
-    assert 'Differenz' in e3
-    assert 'Differenz' not in e4
-    assert 'Differenz' not in e5
-
-    assert '-19.5%' in e2
-    assert '19.5%' in e2
-    assert '-20.2%' in e3
-    assert '20.2%' in e3
+    export = client.get('/election/proporz-election/data-parties').text
+    assert export.encode('utf-8') == csv_parties
 
 
 def test_view_election_connections(election_day_app_gr):
