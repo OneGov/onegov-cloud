@@ -1,4 +1,3 @@
-from datetime import date
 from freezegun import freeze_time
 from onegov.election_day.tests import login
 from onegov.election_day.tests import upload_majorz_election
