@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-05-30 16:48+0200\n"
+"POT-Creation-Date: 2017-05-31 11:33+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -873,12 +873,6 @@ msgstr "Details zu Ihrer Reservation"
 msgid "Reject event"
 msgstr "Veranstaltung ablehnen"
 
-msgid "Do you really want to reject this event?"
-msgstr "Möchten Sie diese Veranstaltung wirklich absagen?"
-
-msgid "Rejecting this event can't be undone."
-msgstr "Eine Absage kann nicht rückgängig gemacht werden."
-
 msgid "Edit event"
 msgstr "Veranstaltung bearbeiten"
 
@@ -888,15 +882,33 @@ msgstr "Alle Reservationen annehmen"
 msgid "Reject all"
 msgstr "Alle absagen"
 
+#, python-format
+msgid "Reject ${title}"
+msgstr "${title} absagen"
+
+msgid "Edit details"
+msgstr "Details bearbeiten"
+
+msgid "Accept event"
+msgstr "Veranstaltung annehmen"
+
+msgid "Mark as paid"
+msgstr "Als bezahlt markieren"
+
+msgid "Mark as unpaid"
+msgstr "Als unbezahlt markieren"
+
+msgid "Do you really want to reject this event?"
+msgstr "Möchten Sie diese Veranstaltung wirklich absagen?"
+
+msgid "Rejecting this event can't be undone."
+msgstr "Eine Absage kann nicht rückgängig gemacht werden."
+
 msgid "Do you really want to reject all reservations?"
 msgstr "Möchten Sie wirklich alle Reservationen absagen?"
 
 msgid "Rejecting these reservations can't be undone."
 msgstr "Die Absage aller Reservationen kann nicht rückgängig gemacht werden."
-
-#, python-format
-msgid "Reject ${title}"
-msgstr "${title} absagen"
 
 msgid "Do you really want to reject this reservation?"
 msgstr "Möchten Sie diese Reservation wirklich absagen?"
@@ -907,12 +919,6 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 
 msgid "Reject reservation"
 msgstr "Reservation absagen"
-
-msgid "Edit details"
-msgstr "Details bearbeiten"
-
-msgid "Accept event"
-msgstr "Veranstaltung annehmen"
 
 msgid "Link"
 msgstr "Verknüpfung"

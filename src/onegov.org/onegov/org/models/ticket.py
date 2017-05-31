@@ -67,7 +67,7 @@ class FormSubmissionHandler(Handler):
 
     @property
     def payment(self):
-        return self.submission.payment
+        return self.submission and self.submission.payment
 
     @property
     def extra_data(self):
@@ -84,17 +84,58 @@ class FormSubmissionHandler(Handler):
         })
 
     def get_links(self, request):
+        payment = self.payment
+
+        links = []
+
+        if payment and payment.source == 'manual':
+            layout = DefaultLayout(self.submission, request)
+
+            if payment.state == 'open':
+                links.append(
+                    Link(
+                        text=_("Mark as paid"),
+                        url=layout.csrf_protected_url(
+                            request.link(self.payment, 'mark-as-paid'),
+                        ),
+                        attrs={'class': 'mark-as-paid'},
+                        traits=(
+                            Intercooler(
+                                request_method='POST',
+                                redirect_after=request.url,
+                            ),
+                        )
+                    )
+                )
+            else:
+                links.append(
+                    Link(
+                        text=_("Mark as unpaid"),
+                        url=layout.csrf_protected_url(
+                            request.link(self.payment, 'mark-as-unpaid'),
+                        ),
+                        attrs={'class': 'mark-as-unpaid'},
+                        traits=(
+                            Intercooler(
+                                request_method='POST',
+                                redirect_after=request.url,
+                            ),
+                        )
+                    )
+                )
 
         edit_link = URL(request.link(self.submission))
         edit_link = edit_link.query_param('edit', '').as_string()
 
-        return [
+        links.append(
             Link(
                 text=_('Edit submission'),
                 url=request.return_here(edit_link),
                 attrs={'class': 'edit-link'}
             )
-        ]
+        )
+
+        return links
 
 
 @handlers.registered_handler('RSV')

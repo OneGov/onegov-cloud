@@ -52,7 +52,7 @@ from onegov.org.models import (
     Topic,
 )
 from onegov.page import PageCollection
-from onegov.pay import PaymentProvider
+from onegov.pay import PaymentProvider, Payment, PaymentCollection
 from onegov.pay import PaymentProviderCollection
 from onegov.people import Person, PersonCollection
 from onegov.ticket import Ticket, TicketCollection
@@ -400,3 +400,11 @@ def get_payment_provider_collection(app):
     converters=dict(id=UUID))
 def get_payment_provider(app, id):
     return PaymentProviderCollection(app.session()).by_id(id)
+
+
+@OrgApp.path(
+    model=Payment,
+    path='/zahlung/{id}',
+    converters=dict(id=UUID))
+def get_payment(app, id):
+    return PaymentCollection(app.session()).by_id(id)

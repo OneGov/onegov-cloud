@@ -69,6 +69,9 @@ def new_stripe_connect_provider(self, request):
 
     # since the csrf token salt is different for unauthenticated requests
     # we need to specify a constant one here
+    # this means that any user could in theory get this token and then bypass
+    # our csrf protection. However that person would have to have an admin
+    # account on the same physical server (which limits the attack-surface)
     salt = 'stripe-connect-oauth'
 
     payment = StripeConnect(

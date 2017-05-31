@@ -1099,6 +1099,8 @@ $image-link-icon: '\f03e';
 $internal-link-icon: '\f0c1';
 $manage-recipients: '\f003';
 $manage-subscribers: '\f0c0';
+$mark-as-paid: '\f058';
+$mark-as-unpaid: '\f057';
 $new-daypass-icon: '\f145';
 $new-recipient: '\f1fa';
 $new-form-icon: '\f044';
@@ -1182,6 +1184,8 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .internal-url::before { @include icon($internal-link-icon); }
     .manage-recipients::before { @include icon($manage-recipients); }
     .manage-subscribers::before { @include icon($manage-subscribers); }
+    .mark-as-paid::before { @include icon($mark-as-paid); }
+    .mark-as-unpaid::before { @include icon($mark-as-unpaid); }
     .new-daypass::before { @include icon($new-daypass-icon); }
     .new-recipient::before { @include icon($new-recipient); }
     .new-form::before { @include icon($new-form-icon); }
