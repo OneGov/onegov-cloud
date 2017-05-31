@@ -190,34 +190,37 @@
                         .enter().append('g')
                         .attr('class', 'bar front')
                         .attr('transform', function(d) {
-                            return 'translate(' + (scale.x(d.group) + scale.dx(d.item) + 1) + ',' + scale.y.front(d.value.front) + ')';
+                            return 'translate(' + (scale.x(d.group) + scale.dx(d.item)) + ',' + scale.y.front(d.value.front) + ')';
                         })
                         .attr('visibility', function(d) {
                             return (scale.simple && !d.active) ? 'hidden' : 'visible';
                         });
                     bar.front.append('rect')
-                        .attr('width', options.barInnerWidth - 2)
+                        .attr('width', options.barInnerWidth - 1)
                         .attr('height', function(d) {
                             return height - options.axisHeight - scale.y.front(d.value.front) + 1;
                         })
                         .attr('fill-opacity', 0.0)
                         .attr('stroke', '#000')
                         .attr('stroke-dasharray', function(d) {
-                            return d.active ? 'initial' : '1 1';
+                            return d.active ? 'initial' : '2 2';
                         })
-                        .attr('stroke-width', 2);
+                        .attr('stroke-width', 1);
                     bar.front.each(function(d) {
                         if (data.maximum.front / data.groups.length < 5) {
                             var value = 0;
                             for (value = 1; value < d.value.front; ++value) {
                                 var y = scale.y.front(value) - scale.y.front(d.value.front);
                                 d3.select(this).append('line')
-                                    .attr('x1', 2)
+                                    .attr('x1', 0)
                                     .attr('y1', y)
-                                    .attr('x2', options.barInnerWidth - 4)
+                                    .attr('x2', options.barInnerWidth - 1)
                                     .attr('y2', y)
-                                    .attr('stroke-width', 2)
-                                    .attr('stroke', '#000');
+                                    .attr('stroke', '#000')
+                                    .attr('stroke-dasharray', function(d) {
+                                        return d.active ? 'initial' : '2 2';
+                                    })
+                                    .attr('stroke-width', 1);
                             }
                         }
                     });
