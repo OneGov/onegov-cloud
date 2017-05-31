@@ -152,3 +152,36 @@ def add_status_columns(context):
                 nullable=True
             )
         )
+
+
+@upgrade_task('Add status')
+def add_status_columns(context):
+    if not context.has_column('elections', 'status'):
+        context.operations.add_column(
+            'elections',
+            Column(
+                'status',
+                Enum(
+                    'unknown',
+                    'interim',
+                    'final',
+                    name='election_or_vote_status'
+                ),
+                nullable=True
+            )
+        )
+
+    if not context.has_column('votes', 'status'):
+        context.operations.add_column(
+            'votes',
+            Column(
+                'status',
+                Enum(
+                    'unknown',
+                    'interim',
+                    'final',
+                    name='election_or_vote_status'
+                ),
+                nullable=True
+            )
+        )
