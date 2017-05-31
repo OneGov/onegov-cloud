@@ -202,6 +202,9 @@
                         })
                         .attr('fill-opacity', 0.0)
                         .attr('stroke', '#000')
+                        .attr('stroke-dasharray', function(d) {
+                            return d.active ? 'initial' : '1 1';
+                        })
                         .attr('stroke-width', 2);
                     bar.front.each(function(d) {
                         if (data.maximum.front / data.groups.length < 5) {
