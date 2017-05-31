@@ -199,6 +199,160 @@ Changelog
 - Groups backend actions to dropdowns.
   [msom]
 
+1.10.0 (2017-05-29)
+~~~~~~~~~~~~~~~~~~~
+
+- Adds static data for 2002-2008.
+  [msom]
+
+- Indicates the current archive page in the listing.
+  [msom]
+
+- Changes back to election day link to breadcrumbs.
+  [msom]
+
+- Hides the subscribe/unsubscribe form after form submission.
+  [msom]
+
+- Centers the header for small sizes.
+  [msom]
+
+- Allows to upload votes when no map data is available.
+  [msom]
+
+- Gets the entity names from the static data when uploading wabsti votes.
+  [msom]
+
+- Makes wabsti uploading more robust.
+  [msom]
+
+- Fixes parsing of empty votes when uploading complex wabsti votes.
+  [msom]
+
+1.9.0 (2017-05-22)
+~~~~~~~~~~~~~~~~~~~
+
+- Adds manage subscription search function.
+  [msom]
+
+- Removes the districs view of majorz elections.
+  [msom]
+
+- Hides results of empty votes (in any case).
+  [msom]
+
+- Ignores expats with no eligible voters when uploading Wabsti vote results.
+  [msom]
+
+- Ignores uncounted entities when uploading WabstiCExport vote results.
+  [msom]
+
+- Deletes superfluous ballots when uploading vote results.
+  [msom]
+
+- Fixes the phone number placeholder in subscriber form.
+  [msom]
+
+- Fixes importing of expats (vote/internal).
+  [msom]
+
+- Fixes format description link.
+  [msom]
+
+1.8.15 (2017-05-19)
+~~~~~~~~~~~~~~~~~~~
+
+- Fixes parsing of empty votes when uploading WabstiCExport files.
+  [msom]
+
+1.8.14 (2017-05-18)
+~~~~~~~~~~~~~~~~~~~
+
+- Fixes typo.
+  [msom]
+
+1.8.13 (2017-05-15)
+~~~~~~~~~~~~~~~~~~~
+
+- Fixes ballot map hovering issue.
+  [msom]
+
+1.8.12 (2017-05-15)
+~~~~~~~~~~~~~~~~~~~
+
+- Adds exception views.
+  [msom]
+
+- Fixes height of maps in embedding code.
+  [msom]
+
+1.8.11 (2017-05-11)
+~~~~~~~~~~~~~~~~~~~
+
+- Fixes deleting an eletion or vote throwing an error when uploading
+  WabstiCExport files.
+  [msom]
+
+- Fixes sent notification prevents deleting votes and elections.
+  [msom]
+
+1.8.10 (2017-05-11)
+~~~~~~~~~~~~~~~~~~~
+
+- Fixes hovering over lakes throwing an error.
+  [msom]
+
+- Improves styling.
+  [msom]
+
+1.8.9 (2017-05-09)
+~~~~~~~~~~~~~~~~~~~
+
+- Adds sentry JavaScript error reporting support.
+  [msom]
+
+1.8.8 (2017-05-08)
+~~~~~~~~~~~~~~~~~~~
+
+- Adds mapdata for 2017.
+  [msom]
+
+1.8.7 (2017-05-04)
+~~~~~~~~~~~~~~~~~~~
+
+- Translates form errors when uploading WabstiCExport files.
+  [msom]
+
+- Adds tests.
+  [msom]
+
+1.8.6 (2017-05-02)
+~~~~~~~~~~~~~~~~~~~
+
+- Adds status/completed to elections and votes.
+  [msom]
+
+- Allows to specify the language when uploading WabstiCExport files.
+  [msom]
+
+- Parses the absolute majority when uploading WabstiCExport files.
+  [msom]
+
+- Parses the list connections when uploading WabstiCExport files.
+  [msom]
+
+- Evaluates the completed field of WabstiCExport files.
+  [msom]
+
+- Adds missing expats label in the election districts view of majorz elections.
+  [msom]
+
+- Visually groups elections and votes in the backend.
+  [msom]
+
+- Groups backend actions to dropdowns.
+  [msom]
+
 1.8.5 (2017-04-26)
 ~~~~~~~~~~~~~~~~~~~
 
