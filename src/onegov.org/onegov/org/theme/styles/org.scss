@@ -661,6 +661,10 @@ form {
         background: $warning-color;
     }
 
+    .cancel-button {
+        margin-right: 1rem;
+    }
+
     /*
         Ace code editor, which you don't want to touch. Huge pita to get to
         work right with custom styling (it'll look like it's working, but
