@@ -23,7 +23,46 @@
         <div class="row fieldset-display-submit" tal:condition="completable and not readonly">
             <div class="small-12 columns">
                 <form action="${complete_link}" method="POST">
-                    <input type="submit" value="Complete" class="button" i18n:attributes="value">
+                    <tal:b condition="price" switch="model.form.payment_method">
+                        <tal:b case="'manual'">
+                            <label style="display: none;">
+                                <input type="radio" name="payment_method" value="manual" checked>
+                            </label>
+                        </tal:b>
+                        <tal:b case="'cc'">
+                            <label style="display: none;">
+                                <input type="radio" name="payment_method" value="online" checked>
+                            </label>
+                        </tal:b>
+                        <tal:b case="'free'">
+                            <div class="field-display">
+                                <div class="field-display-block">
+                                    <div class="field-display-label" i18n:translate>Payment</div>
+                                    <div class="field-display-data">
+                                        <label class="common-text">
+                                            <input type="radio" name="payment_method" value="online" checked>
+                                            <span i18n:translate>Pay Online Now</span>
+                                        </label>
+                                        <label class="common-text">
+                                            <input type="radio" name="payment_method" value="manual">
+                                            <span i18n:translate>Pay Offline later</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </tal:b>
+
+                        <div data-depends-on="payment_method/online">
+                            <tal:b replace="structure checkout_button" />
+                        </div>
+                        <div data-depends-on="payment_method/manual">
+                            <input type="submit" value="Complete" class="button" i18n:attributes="value">
+                        </div>
+                    </tal:b>
+
+                    <tal:b condition="not price">
+                        <input type="submit" value="Complete" class="button" i18n:attributes="value">
+                    </tal:b>
                 </form>
                 <a href="${edit_link}" class="button secondary" i18n:translate="">Edit</a>
             </div>

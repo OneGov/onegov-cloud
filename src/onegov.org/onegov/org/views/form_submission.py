@@ -104,6 +104,9 @@ def handle_pending_submission(self, request):
     else:
         title = self.form.title
 
+    provider = request.app.default_payment_provider
+    price = form.total()
+
     return {
         'layout': FormSubmissionLayout(self, request, title),
         'title': title,
@@ -113,6 +116,14 @@ def handle_pending_submission(self, request):
         'complete_link': request.link(self, 'complete'),
         'is_pending': self.state == 'pending',
         'readonly': 'readonly' in request.GET,
+        'model': self,
+        'price': price,
+        'checkout_button': provider and provider.checkout_button(
+            label=request.translate(_("Pay Online and Complete")),
+            amount=price[0],
+            currency=price[1],
+            email=self.email
+        )
     }
 
 

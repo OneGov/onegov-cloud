@@ -35,7 +35,7 @@ def test_confirm_link(render_element):
         ),
     ), attrs={'class': 'foo'}))
 
-    assert result.pyquery('a').attr('data-confirm') == "Confirm?"
+    assert result.pyquery('a').attr('data-confirm') == "Bestätigen?"
     assert result.pyquery('a').attr('data-confirm-extra') == "Extra..."
     assert result.pyquery('a').attr('data-confirm-yes') == "Ja"
     assert result.pyquery('a').attr('data-confirm-no') == "Nein"

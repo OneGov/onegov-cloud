@@ -121,6 +121,15 @@ body {
 }
 
 /*
+    Normalized body text
+*/
+.common-text {
+    color: $body-font-color;
+    font-size: 1rem;
+    line-height: auto;
+}
+
+/*
     Heading sizes
 */
 .h1-size {
