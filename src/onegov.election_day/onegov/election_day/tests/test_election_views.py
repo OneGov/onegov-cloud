@@ -202,10 +202,17 @@ def test_view_election_parties(election_day_app_gr):
     assert parties['2015-FDP']['value']['back'] == 33.3
 
     results = client.get('/election/proporz-election/parties').text
-    assert all((
-        value in results
-        for value in ('2.5%', '37.5%', '25%', '16.7%', '50%', '33.3%')
-    ))
+    assert '2.5%' in results
+    assert '16.7%' in results
+    assert '14.2%' in results
+
+    assert '37.5%' in results
+    assert '50.0%' in results
+    assert '12.5%' in results
+
+    assert '25.0%' in results
+    assert '33.3%' in results
+    assert '8.3%' in results
 
     export = client.get('/election/proporz-election/data-parties').text
     assert export.encode('utf-8') == csv_parties
