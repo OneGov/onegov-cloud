@@ -205,6 +205,12 @@ Changelog
 - Groups backend actions to dropdowns.
   [msom]
 
+1.10.1 (2017-05-31)
+~~~~~~~~~~~~~~~~~~~
+
+- Improves performance of generating media.
+  [msom]
+
 1.10.0 (2017-05-29)
 ~~~~~~~~~~~~~~~~~~~
 
