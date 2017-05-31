@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves performance of generating media.
+  [msom]
+
 1.10.0 (2017-05-29)
 ~~~~~~~~~~~~~~~~~~~
 
