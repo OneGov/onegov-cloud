@@ -1,14 +1,16 @@
 import json
 import pycurl
 import stripe
+import transaction
 
 from cached_property import cached_property
 from contextlib import contextmanager
 from html import escape
 from io import BytesIO
 from onegov.core.orm.mixins import meta_property
-from onegov.pay.models.payment_provider import PaymentProvider
+from onegov.pay import log
 from onegov.pay.models.payment import Payment
+from onegov.pay.models.payment_provider import PaymentProvider
 from sqlalchemy.orm import object_session
 from uuid import UUID, uuid4, uuid5
 
@@ -29,8 +31,88 @@ stripe.default_http_client = stripe.http_client.RequestsClient()
 STRIPE_NAMESPACE = UUID('aebb1a32-282b-4521-838d-92a1136624d1')
 
 
+class StripeCaptureManager(object):
+    """ Captures an open stripe charge when the transaction finishes.
+
+    If there is an error during this step, it is logged, but the transaction
+    still continues successfully.
+
+    The user is then supposed to manually capture the charge.
+
+    """
+
+    transaction_manager = transaction.manager
+
+    def __init__(self, api_key, charge_id):
+        self.api_key = api_key
+        self.charge_id = charge_id
+
+    @classmethod
+    def capture_charge(cls, api_key, charge_id):
+        transaction.get().join(cls(api_key, charge_id))
+
+    def sortKey(self):
+        return 'charge'
+
+    def tpc_vote(self, transaction):
+        with stripe_api_key(self.api_key):
+            self.charge = stripe.Charge.retrieve(self.charge_id)
+
+    def tpc_finish(self, transaction):
+        try:
+            import pdb; pdb.set_trace()
+            with stripe_api_key(self.api_key):
+                self.charge.capture()
+        except:
+            # we can never fail or we might end up with an incosistent
+            # database -> so must swallow any errors and report them
+            log.exception("Stripe charge with capture id {} failed".format(
+                self.charge_id
+            ))
+
+    def commit(self, transaction):
+        pass
+
+    def abort(self, transaction):
+        pass
+
+    def tpc_begin(self, transaction):
+        pass
+
+    def tpc_abort(self, transaction):
+        pass
+
+
 class StripePayment(Payment):
     __mapper_args__ = {'polymorphic_identity': 'stripe_connect'}
+
+    @property
+    def remote_url(self):
+        if self.provider.livemode:
+            base = 'https://dashboard.stripe.com/payments/{}'
+        else:
+            base = 'https://dashboard.stripe.com/test/payments/{}'
+
+        return base.format(self.remote_id)
+
+    def sync(self, remote_obj=None):
+        charge = remote_obj or None
+
+        if not charge:
+            with stripe_api_key(self.provider.access_token):
+                charge = stripe.Charge.retrieve(self.remote_id)
+
+        if not charge.captured:
+            self.state = 'open'
+
+        elif charge.refunded:
+            self.state = 'cancelled'
+
+        elif charge.outcome['network_status'] != 'approved_by_network':
+            self.state = 'failed'
+
+        elif charge.captured and charge.paid:
+            self.state = 'paid'
 
 
 class StripeConnect(PaymentProvider):
@@ -66,6 +148,10 @@ class StripeConnect(PaymentProvider):
 
     #: The access token provieded by OAuth
     access_token = meta_property('access_token')
+
+    @property
+    def livemode(self):
+        return not self.access_token.startswith('sk_test')
 
     @property
     def payment_class(self):
@@ -114,6 +200,7 @@ class StripeConnect(PaymentProvider):
                 }
             )
 
+        StripeCaptureManager.capture_charge(self.access_token, charge.id)
         payment.remote_id = charge.id
 
         # we do *not* want to lose this information, so even though the

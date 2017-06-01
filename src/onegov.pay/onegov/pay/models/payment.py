@@ -96,6 +96,20 @@ class Payment(Base, TimestampMixin, ContentMixin):
             for cls in self.registered_links.values()
         ))
 
+    @property
+    def remote_url(self):
+        """ Returns the url of this object on the payment provider. """
+
+        raise NotImplementedError
+
+    def sync(self, remote_obj=None):
+        """ Updates the local payment information with the information from
+        the remote payment provider.
+
+        """
+
+        raise NotImplementedError
+
 
 class ManualPayment(Payment):
     """ A manual payment is a payment without associated payment provider.
@@ -104,3 +118,6 @@ class ManualPayment(Payment):
 
     """
     __mapper_args__ = {'polymorphic_identity': 'manual'}
+
+    def sync(self, remote_obj=None):
+        pass
