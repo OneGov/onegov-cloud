@@ -57,6 +57,13 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin):
 
         return payment
 
+    def charge(self, amount, currency, token):
+        """ Given a payment token, charges the customer and creates a payment
+        which is returned.
+
+        """
+        raise NotImplementedError
+
     @property
     def title(self):
         """ The title of the payment provider (i.e. the product name). """

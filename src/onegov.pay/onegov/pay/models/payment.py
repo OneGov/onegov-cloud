@@ -33,6 +33,9 @@ class Payment(Base, TimestampMixin, ContentMixin):
     #: the currency of the amount to pay
     currency = Column(Text, nullable=False, default='CHF')
 
+    #: remote id of the payment
+    remote_id = Column(Text, nullable=True)
+
     #: the state of the payment
     state = Column(
         Enum('open', 'paid', 'failed', 'cancelled', name='payment_state'),
