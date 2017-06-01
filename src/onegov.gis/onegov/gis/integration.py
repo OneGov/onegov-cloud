@@ -33,17 +33,17 @@ class MapboxApp(WebassetsApp):
         self.mapbox_token = cfg.get('mapbox_token', None)
 
 
-@WebassetsApp.webasset_path()
+@MapboxApp.webasset_path()
 def get_js_path():
     return 'assets/js'
 
 
-@WebassetsApp.webasset_path()
+@MapboxApp.webasset_path()
 def get_css_path():
     return 'assets/css'
 
 
-@WebassetsApp.webasset('leaflet', filters={'css': 'datauri'})
+@MapboxApp.webasset('leaflet', filters={'css': 'datauri'})
 def get_leaflet_asset():
     yield 'leaflet.css'
     yield 'leaflet-easybutton.css'
