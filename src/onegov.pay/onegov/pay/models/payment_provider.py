@@ -88,9 +88,15 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin):
 
         """
 
-    def checkout_button(self, label, amount, currency, **extra):
+    def checkout_button(self, label, amount, currency, action='submit',
+                        **extra):
         """ Renders a checkout button which will store the token for the
         checkout as its own value if clicked.
+
+        The action controls what happens after the token was successfully
+        retrieved. The following actions are supported:
+
+        - 'post': Submits the form surrounding the button.
 
         """
         raise NotImplementedError

@@ -77,28 +77,62 @@ class StripeConnect(PaymentProvider):
     def connected(self):
         return self.account and True or False
 
-    def checkout_button(self, label, amount, currency, **extra):
+    def charge(self, amount, currency, token):
+        session = object_session(self)
+
+        payment = self.payment(
+            id=uuid5(STRIPE_NAMESPACE, token),
+            amount=amount,
+            currency=currency,
+            state='open'
+        )
+
+        with stripe_api_key(self.access_token):
+            charge = stripe.Charge.create(
+                amount=round(amount * 100, 0),
+                currency=currency,
+                source=token,
+                capture=False,
+                idempotency_key=token,
+                metadata={
+                    'payment_id': payment.id.hex
+                }
+            )
+
+        payment.remote_id = charge.id
+
+        # we do *not* want to lose this information, so even though the
+        # caller should make sure the payment is stored, we make sure
+        session.add(payment)
+
+        return payment
+
+    def checkout_button(self, label, amount, currency, action='submit',
+                        **extra):
         """ Generates the html for the checkout button. """
 
         extra['amount'] = round(amount * 100, 0)
         extra['currency'] = currency
         extra['key'] = self.publishable_key
 
-        attributes = (
-            (escape(str(key)), escape(str(value)))
+        attrs = {
+            'data-stripe-{}'.format(key): str(value)
             for key, value in extra.items()
-        )
+        }
+        attrs['data-action'] = action
 
         return """
-            <button
-                class="checkout-button stripe-connect"
-                {attributes}>{label}</button>
+            <input type="hidden" name="payment_token" id="{target}">
+            <button class="checkout-button stripe-connect"
+                    data-target-id="{target}"
+                    {attrs}>{label}</button>
         """.format(
             label=escape(label),
-            attributes=' '.join(
-                'data-stripe-{}="{}"'.format(k, v)
-                for k, v in attributes
-            )
+            attrs=' '.join(
+                '{}="{}"'.format(escape(k), escape(v))
+                for k, v in attrs.items()
+            ),
+            target=uuid4().hex
         )
 
     def oauth_url(self, redirect_uri, state=None, user_fields=None):

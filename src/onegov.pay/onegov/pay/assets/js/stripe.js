@@ -21,10 +21,42 @@ var getStripeAttributes = function(button) {
     return attributes;
 };
 
+var findClosestParent = function(startElement, fn) {
+    var parent = startElement.parentElement;
+    if (parent) {
+        return fn(parent) ? parent : findClosestParent(parent, fn);
+    } else {
+        return null;
+    }
+};
+
+var handleSubmit = function(button) {
+    var form = findClosestParent(button, function(el) {
+        return el.tagName === 'FORM';
+    });
+
+    if (form !== null) {
+        form.submit();
+    }
+};
+
+var handleToken = function(token, button) {
+    var target = document.getElementById(button.getAttribute('data-target-id'));
+    target.setAttribute('value', token.id);
+
+    switch (button.getAttribute('data-action')) {
+        case 'submit':
+            handleSubmit(button);
+            break;
+        default:
+            break;
+    }
+};
+
 var setupCheckoutButton = function(button) {
     var config = {
         token: function(token) {
-            button.setAttribute('value', token.id);
+            handleToken(token, button);
         }
     };
 
