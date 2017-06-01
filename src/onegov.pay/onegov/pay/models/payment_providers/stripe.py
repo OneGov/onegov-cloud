@@ -112,7 +112,7 @@ class StripeConnect(PaymentProvider):
             state=state
         )
 
-    def prepare_oauth_request(self, redirect_url, success_url, error_url,
+    def prepare_oauth_request(self, redirect_uri, success_url, error_url,
                               user_fields=None):
         """ Registers the oauth request with the oauth_gateway and returns
         an url that is ready to be used for the complete oauth request.
@@ -122,8 +122,12 @@ class StripeConnect(PaymentProvider):
             self.oauth_gateway,
             self.oauth_gateway_auth)
 
+        assert self.oauth_gateway \
+            and self.oauth_gateway_auth \
+            and self.oauth_gateway_secret
+
         payload = {
-            'url': redirect_url,
+            'url': redirect_uri,
             'secret': self.oauth_gateway_secret,
             'method': 'GET',
             'success_url': success_url,
@@ -148,7 +152,7 @@ class StripeConnect(PaymentProvider):
         token = json.loads(body.read().decode('utf-8'))['token']
 
         return self.oauth_url(
-            redirect_url='{}/redirect'.format(self.oauth_gateway),
+            redirect_uri='{}/redirect'.format(self.oauth_gateway),
             state=token,
             user_fields=user_fields
         )
