@@ -319,6 +319,7 @@ def get_common_asset():
     yield 'confirm.jsx'
     yield 'typeahead.jsx'
     yield 'leaflet'
+    yield 'pay'
     yield 'moment.js'
     yield 'moment.de.js'
     yield 'jquery.datetimepicker.js'

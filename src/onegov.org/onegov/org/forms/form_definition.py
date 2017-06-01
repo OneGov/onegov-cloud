@@ -26,6 +26,7 @@ class FormDefinitionForm(Form):
     payment_method = RadioField(
         label=_("Payment Method"),
         default='manual',
+        validators=[validators.InputRequired()],
         choices=[
             ('manual', _("No credit card payments")),
             ('free', _("Credit card payments optional")),

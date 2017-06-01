@@ -119,10 +119,17 @@ def handle_pending_submission(self, request):
         'model': self,
         'price': price,
         'checkout_button': provider and provider.checkout_button(
-            label=request.translate(_("Pay Online and Complete")),
-            amount=price[0],
-            currency=price[1],
-            email=self.email
+            **{
+                'label': request.translate(_("Pay Online and Complete")),
+                'amount': price[0],
+                'currency': price[1],
+                'email': self.get_email_field_data(form),
+                'name': request.app.org.name,
+                'description': self.form.title,
+                'locale': request.locale.split('_')[0],
+                'image': request.app.org.square_logo_url,
+                'allowRememberMe': 'false'
+            }
         )
     }
 

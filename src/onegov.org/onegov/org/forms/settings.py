@@ -36,6 +36,12 @@ class SettingsForm(Form):
         fieldset=_("General"),
         render_kw={'class_': 'image-url'}
     )
+    square_logo_url = StringField(
+        label=_("Logo (Square)"),
+        description=_("URL pointing to the logo"),
+        fieldset=_("General"),
+        render_kw={'class_': 'image-url'}
+    )
     reply_to = EmailField(
         _("E-Mail Reply Address"), [validators.InputRequired()],
         description=_("Replies to automated e-mails go to this address."),
