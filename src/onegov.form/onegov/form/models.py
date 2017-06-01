@@ -171,6 +171,23 @@ class FormSubmission(Base, TimestampMixin, Payable):
 
         return self.form_class(data=self.data)
 
+    def get_email_field_data(self, form=None):
+        form = form or self.form_obj
+
+        email_fields = form.match_fields(
+            include_classes=(EmailField, ),
+            required=True,
+            limit=1
+        )
+        email_fields += form.match_fields(
+            include_classes=(EmailField, ),
+            required=False,
+            limit=1
+        )
+
+        if email_fields:
+            return form._fields[email_fields[0]].data
+
     @observes('definition')
     def definition_observer(self, definition):
         self.checksum = hash_definition(definition)
@@ -193,19 +210,7 @@ class FormSubmission(Base, TimestampMixin, Payable):
                     for id in title_fields
                 )
 
-            email_fields = form.match_fields(
-                include_classes=(EmailField, ),
-                required=True,
-                limit=1
-            )
-            email_fields += form.match_fields(
-                include_classes=(EmailField, ),
-                required=False,
-                limit=1
-            )
-
-            if email_fields:
-                self.email = form._fields[email_fields[0]].data
+            self.email = self.get_email_field_data(form=form)
 
             # only set the date the first time around
             if not self.received:
