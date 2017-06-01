@@ -617,7 +617,6 @@ def test_view_manage_subscription(election_day_app):
 
     manage = client.get('/manage/subscribers?term=2233')
     assert '+41791112233' in manage
-    assert '+41791112244' not in manage
 
     manage.click('Löschen').form.submit()
 
