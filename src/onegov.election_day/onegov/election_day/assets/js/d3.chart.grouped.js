@@ -41,7 +41,7 @@
             scale.x.rangeRoundPoints([0, width], 1.0);
             scale.simple = (width < data.groups.length * data.labels.length * options.barOuterWidth * 1.2);
             if (scale.simple) {
-                scale.dx.range([-options.barOuterWidth/2]);
+                scale.dx.range([-Math.round(options.barOuterWidth/2)]);
             } else {
                 scale.dx.rangeRoundBands([
                     -(data.labels.length * options.barOuterWidth)/2,
@@ -78,8 +78,8 @@
                     x: d3.scale.ordinal(),
                     dx: d3.scale.ordinal(),
                     y: {
-                        front: d3.scale.linear().range([height - options.axisHeight, 0]),
-                        back: d3.scale.linear().range([height - options.axisHeight, 0])
+                        front: d3.scale.linear().rangeRound([height - options.axisHeight, 0]),
+                        back: d3.scale.linear().rangeRound([height - options.axisHeight, 0])
                     },
                     simple: false
                 };
@@ -166,7 +166,7 @@
                         .enter().append('g')
                         .attr('class', 'bar back')
                         .attr('transform', function(d) {
-                            return 'translate(' + (scale.x(d.group) + scale.dx(d.item)) + ',' + scale.y.back(d.value.back) + ')';
+                            return 'translate(' + Math.round(scale.x(d.group) + scale.dx(d.item)) + ',' + scale.y.back(d.value.back) + ')';
                         })
                         .attr('visibility', function(d) {
                             return (scale.simple && !d.active) ? 'hidden' : 'visible';
@@ -190,7 +190,7 @@
                         .enter().append('g')
                         .attr('class', 'bar front')
                         .attr('transform', function(d) {
-                            return 'translate(' + (scale.x(d.group) + scale.dx(d.item)) + ',' + scale.y.front(d.value.front) + ')';
+                            return 'translate(' + Math.round(scale.x(d.group) + scale.dx(d.item)) + ',' + scale.y.front(d.value.front) + ')';
                         })
                         .attr('visibility', function(d) {
                             return (scale.simple && !d.active) ? 'hidden' : 'visible';
@@ -305,10 +305,10 @@
                                     return 'translate(' + (width - options.tickWidth) + ',0)';
                                 });
                                 bar.front.attr('transform', function(d) {
-                                    return 'translate(' + (scale.x(d.group) + scale.dx(d.item)) + ',' + scale.y.front(d.value.front) + ')';
+                                    return 'translate(' + Math.round(scale.x(d.group) + scale.dx(d.item)) + ',' + scale.y.front(d.value.front) + ')';
                                 });
                                 bar.back.attr('transform', function(d) {
-                                    return 'translate(' + (scale.x(d.group) + scale.dx(d.item)) + ',' + scale.y.back(d.value.back) + ')';
+                                    return 'translate(' + Math.round(scale.x(d.group) + scale.dx(d.item)) + ',' + scale.y.back(d.value.back) + ')';
                                 });
                             }
                         });
