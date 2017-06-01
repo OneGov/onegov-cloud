@@ -231,8 +231,22 @@ class FormSubmission(Base, TimestampMixin, Payable):
         if not total:
             return True
 
-        if self.form.payment_method == 'manual':
+        if self.form.payment_method == 'free':
+            payment_method = token and 'cc' or 'manual'
+        else:
+            payment_method = self.form.payment_method
+
+        if payment_method == 'manual':
             self.payment = ManualPayment(amount=total[0], currency=total[1])
+        elif payment_method == 'cc':
+            if not token:
+                return False
+
+            self.payment = provider.charge(
+                amount=total[0],
+                currency=total[1],
+                token=token
+            )
         else:
             raise NotImplementedError
 
