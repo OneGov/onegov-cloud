@@ -139,7 +139,8 @@ def handle_pending_submission(self, request):
 @OrgApp.view(model=CompleteFormSubmission, name='complete',
              permission=Private, request_method='POST')
 def handle_complete_submission(self, request):
-    form = request.get_form(self.form_class, data=self.data)
+    form = request.get_form(self.form_class)
+    form.process(data=self.data)
 
     # we're not really using a csrf protected form here (the complete form
     # button is basically just there so we can use a POST instead of a GET)
@@ -158,7 +159,10 @@ def handle_complete_submission(self, request):
                     self.name, ensure_existance=False)
             ))
         else:
-            if not self.process_payment(request):
+            provider = request.app.default_payment_provider
+            token = request.params.get('payment_token')
+
+            if not self.process_payment(provider, token):
                 request.fail(_("Your payment could not be processed"))
                 return morepath.redirect(request.link(self))
 
