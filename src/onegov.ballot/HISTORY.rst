@@ -3,7 +3,7 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
-1.4.0 (2017-05-01)
+1.5.0 (2017-06-01)
 ~~~~~~~~~~~~~~~~~~~
 
 - Adds a status (unknown, interim, final) to elections and votes.
