@@ -12,12 +12,12 @@ const results = [
   {"active": false, "group": "CCC", "value": {"front": 10, "back": 10}, "item": "1000"},
   {"active": true, "group": "CCC", "value": {"front": 10, "back": 10}, "item": "2000"},
   {"active": false, "group": "CCC", "value": {"front": 10, "back": 10}, "item": "3000"},
-  {"active": false, "group": "DDDD", "value": {"front": 25, "back": 30}, "item": "1000"},
-  {"active": true, "group": "DDDD", "value": {"front": 25, "back": 30}, "item": "2000"},
-  {"active": false, "group": "DDDD", "value": {"front": 25, "back": 30}, "item": "3000"},
-  {"active": false, "group": "EEEEE", "value": {"front": 50, "back": 40}, "item": "1000"},
-  {"active": true, "group": "EEEEE", "value": {"front": 50, "back": 40}, "item": "2000"},
-  {"active": false, "group": "EEEEE", "value": {"front": 50, "back": 40}, "item": "3000"},
+  {"active": false, "group": "DDDD", "value": {"front": 25, "back": 30}, "item": "1000", "color": "#ff6300"},
+  {"active": true, "group": "DDDD", "value": {"front": 25, "back": 30}, "item": "2000", "color": "#ff6300"},
+  {"active": false, "group": "DDDD", "value": {"front": 25, "back": 30}, "item": "3000", "color": "#ff6300"},
+  {"active": false, "group": "EEEEE", "value": {"front": 50, "back": 40}, "item": "1000", "color": "#4068c8"},
+  {"active": true, "group": "EEEEE", "value": {"front": 50, "back": 40}, "item": "2000", "color": "#4068c8"},
+  {"active": false, "group": "EEEEE", "value": {"front": 50, "back": 40}, "item": "3000", "color": "#4068c8"},
   {"active": false, "group": "FFFFFF", "value": {"front": 100, "back": 100}, "item": "1000"},
   {"active": true, "group": "FFFFFF", "value": {"front": 100, "back": 100}, "item": "2000"},
   {"active": false, "group": "FFFFFF", "value": {"front": 100, "back": 100}, "item": "3000"},
@@ -130,7 +130,7 @@ describe('Grouped bar chart', () => {
     expect(chart.width()).toBe(2000);
   });
 
-  it('renders a svg with wrong more groups and labels as in the data', () => {
+  it('renders a svg with more groups and labels as in the data', () => {
     var document = jsdom.jsdom();
     var chart = groupedChart({
       width: 700,
