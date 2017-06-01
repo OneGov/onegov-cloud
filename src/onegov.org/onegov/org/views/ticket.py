@@ -26,6 +26,9 @@ def view_ticket(self, request):
         handler.refresh()
         summary = handler.get_summary(request)
 
+    if self.handler.payment:
+        self.handler.payment.sync()
+
     return {
         'title': self.number,
         'layout': TicketLayout(self, request),

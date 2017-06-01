@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-06-01 12:04+0200\n"
+"POT-Creation-Date: 2017-06-01 17:28+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1157,8 +1157,14 @@ msgstr "Bezahlt"
 msgid "Failed"
 msgstr "Fehlgeschlagen"
 
-msgid "Rescinded"
-msgstr "Storniert"
+msgid "Refunded"
+msgstr "Rückerstattet"
+
+msgid "Manual"
+msgstr "Manuell"
+
+msgid "<dynamic element>"
+msgstr ""
 
 msgid "Ticket Number"
 msgstr "Ticket Nummer"
@@ -1628,6 +1634,9 @@ msgstr "Ticket Status"
 msgid "Payment State"
 msgstr "Zahlungsstatus"
 
+msgid "Payment Source"
+msgstr "Zahlungsherkunft"
+
 msgid "Owner"
 msgstr "Zuständig"
 
@@ -2077,18 +2086,3 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
-
-#~ msgid "Credit card payments:"
-#~ msgstr "Kreditkarten Zahlungen:"
-
-#~ msgid "Payouts:"
-#~ msgstr "Auszahlungen:"
-
-#~ msgid "Connection to account failed."
-#~ msgstr "Verbindung zum Konto fehlgeschlagen."
-
-#~ msgid "Cost"
-#~ msgstr "Kosten"
-
-#~ msgid "Sum"
-#~ msgstr "Summe"

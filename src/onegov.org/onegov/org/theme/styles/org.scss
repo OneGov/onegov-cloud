@@ -3606,3 +3606,52 @@ ul.recipients {
         }
     }
 }
+
+/*
+    Payment states
+*/
+.payment-state {
+    background-color: #fff;
+    display: inline-block;
+    padding: 2px 8px;
+
+    &.payment-state-open {
+        border: 1px solid $info-color;
+
+        &::before {
+            @include icon('\f059');
+            color: $info-color;
+            margin-right: .75ex;
+        }
+    }
+    
+    &.payment-state-paid {
+        border: 1px solid $success-color;
+
+        &::before {
+            @include icon('\f058');
+            color: $success-color;
+            margin-right: .75ex;
+        }
+    }
+
+    &.payment-state-failed {
+        border: 1px solid $alert-color;
+
+        &::before {
+            @include icon('\f057');
+            color: $alert-color;
+            margin-right: .75ex;
+        }
+    }
+
+    &.payment-state-cancelled {
+        border: 1px solid $warning-color;
+
+        &::before {
+            @include icon('\f06a');
+            color: $warning-color;
+            margin-right: .75ex;
+        }
+    }
+}

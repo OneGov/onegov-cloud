@@ -505,17 +505,28 @@
 </metal:ticket_status>
 
 <metal:payment_status define-macro="payment_status" i18n:domain="onegov.org">
-    <div i18n:translate tal:condition="payment.state == 'open'" class="payment-state-open">
+    <div i18n:translate tal:condition="payment.state == 'open'" class="payment-state payment-state-open">
         Open
     </div>
-    <div i18n:translate tal:condition="payment.state == 'paid'" class="payment-state-paid">
+    <div i18n:translate tal:condition="payment.state == 'paid'" class="payment-state payment-state-paid">
         Paid
     </div>
-    <div i18n:translate tal:condition="payment.state == 'failed'" class="payment-state-failed">
+    <div i18n:translate tal:condition="payment.state == 'failed'" class="payment-state payment-state-failed">
         Failed
     </div>
-    <div i18n:translate tal:condition="payment.state == 'cancelled'" class="payment-state-cancelled">
-        Rescinded
+    <div i18n:translate tal:condition="payment.state == 'cancelled'" class="payment-state payment-state-cancelled">
+        Refunded
+    </div>
+</metal:payment_status>
+
+<metal:payment_status define-macro="payment_source" i18n:domain="onegov.org">
+    <div i18n:translate tal:condition="payment.source == 'manual'">
+        Manual
+    </div>
+    <div tal:condition="payment.source == 'stripe_connect'">
+        <a href="${payment.remote_url}">
+            Stripe Connect
+        </a>
     </div>
 </metal:payment_status>
 
