@@ -37,3 +37,13 @@ class PayApp(WebassetsApp):
     def default_payment_provider(self):
         return self.session().query(PaymentProvider)\
             .filter_by(default=True).first()
+
+
+@PayApp.webasset_path()
+def get_js_path():
+    return 'assets/js'
+
+
+@PayApp.webasset('pay')
+def get_pay_assets():
+    yield 'stripe.js'

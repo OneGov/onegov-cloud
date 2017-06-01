@@ -82,6 +82,7 @@ class StripeConnect(PaymentProvider):
 
         extra['amount'] = round(amount * 100, 0)
         extra['currency'] = currency
+        extra['key'] = self.publishable_key
 
         attributes = (
             (escape(str(key)), escape(str(value)))
