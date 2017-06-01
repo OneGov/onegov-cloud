@@ -1,5 +1,5 @@
 from babel.dates import format_date
-from base64 import b64decode
+from base64 import b64decode, b64encode
 from copy import deepcopy
 from datetime import date
 from io import BytesIO, StringIO
@@ -34,6 +34,7 @@ from rjsmin import jsmin
 from shutil import copyfileobj
 from textwrap import shorten, wrap
 from onegov.election_day import log
+from os.path import basename
 
 
 class MediaGenerator():
@@ -44,6 +45,7 @@ class MediaGenerator():
         self.svg_dir = 'svg'
         self.renderer = app.configuration.get('d3_renderer').rstrip('/')
         self.session = self.app.session()
+        self.pdf_signing = self.app.principal.pdf_signing
 
         self.supported_charts = {
             'bar': {
@@ -144,6 +146,36 @@ class MediaGenerator():
         })
 
         return self.get_chart('map', fmt, data, width, params)
+
+    def sign_pdf(self, path):
+        if self.pdf_signing:
+            filename = basename(path)
+            with self.app.filestorage.open(path, 'rb') as f:
+                data = b64encode(f.read()).decode('utf-8')
+
+            try:
+                response = post(
+                    self.pdf_signing['url'],
+                    headers={
+                        'X-LEXWORK-LOGIN': self.pdf_signing['login'],
+                        'X-LEXWORK-PASSWORD': self.pdf_signing['password']
+                    },
+                    json={
+                        'pdf_signature_job': {
+                            'file_name': filename,
+                            'data': data,
+                            'reason_for_signature': self.pdf_signing['reason']
+                        }
+                    }
+                )
+                data = response.json()['result']['signed_data']
+            except Exception as e:
+                log.error("Could not sign PDF {}: {}".format(filename, e))
+                return
+
+            self.app.filestorage.remove(path)
+            with self.app.filestorage.open(path, 'wb') as f:
+                f.write(b64decode(data))
 
     def generate_pdf(self, item, path, locale):
         """ Generates the PDF for an election or a vote. """
@@ -708,6 +740,7 @@ class MediaGenerator():
                         fs.remove(path)
                     try:
                         self.generate_pdf(item, path, locale)
+                        self.sign_pdf(path)
                         log.info("{} created".format(filename))
                     except Exception as ex:
                         # Don't leave probably broken PDFs laying around

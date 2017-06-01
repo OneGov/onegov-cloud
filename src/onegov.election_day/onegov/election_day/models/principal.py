@@ -43,7 +43,8 @@ class Principal(object):
 
     def __init__(self, name, logo, color, canton=None, municipality=None,
                  base=None, analytics=None, use_maps=False, fetch=None,
-                 webhooks=None, sms_notification=None, wabsti_import=False):
+                 webhooks=None, sms_notification=None, wabsti_import=False,
+                 pdf_signing=None):
         assert (
             (canton in cantons and municipality is None) or
             (canton is None and municipality is not None)
@@ -61,6 +62,7 @@ class Principal(object):
         self.webhooks = webhooks or {}
         self.sms_notification = sms_notification
         self.wabsti_import = wabsti_import
+        self.pdf_signing = pdf_signing or {}
 
     @classmethod
     def from_yaml(cls, yaml_source):

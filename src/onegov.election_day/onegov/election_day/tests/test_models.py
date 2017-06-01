@@ -48,6 +48,7 @@ def test_principal_load():
     assert principal.webhooks == {}
     assert principal.sms_notification == None
     assert principal.wabsti_import == False
+    assert principal.pdf_signing == {}
 
     principal = Principal.from_yaml(textwrap.dedent("""
         name: Kanton Zug
@@ -64,10 +65,15 @@ def test_principal_load():
             baar:
                 - municipality
         webhooks:
-          'http://abc.com/1':
-          'http://abc.com/2':
-            My-Header: My-Value
+            'http://abc.com/1':
+            'http://abc.com/2':
+                My-Header: My-Value
         sms_notification: 'https://wab.zg.ch'
+        pdf_signing:
+            url: 'http://abc.com/3'
+            login: user
+            password: pass
+            reason: election and vote results
     """))
 
     assert principal.name == 'Kanton Zug'
@@ -93,6 +99,12 @@ def test_principal_load():
     }
     assert principal.sms_notification == 'https://wab.zg.ch'
     assert principal.wabsti_import == True
+    assert principal.pdf_signing == {
+        'url': 'http://abc.com/3',
+        'login': 'user',
+        'password': 'pass',
+        'reason': 'election and vote results'
+    }
 
     principal = Principal.from_yaml(textwrap.dedent("""
         name: Stadt Bern
@@ -118,6 +130,7 @@ def test_principal_load():
     assert principal.webhooks == {}
     assert principal.sms_notification == None
     assert principal.wabsti_import == False
+    assert principal.pdf_signing == {}
 
     principal = Principal.from_yaml(textwrap.dedent("""
         name: Stadt Bern
@@ -144,6 +157,7 @@ def test_principal_load():
     assert principal.webhooks == {}
     assert principal.sms_notification == None
     assert principal.wabsti_import == False
+    assert principal.pdf_signing == {}
 
 
 def test_principal_municipalities():

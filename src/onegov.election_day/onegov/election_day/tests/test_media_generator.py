@@ -434,6 +434,49 @@ def test_generate_pdf_long_title(session, election_day_app):
             assert len(PdfReader(f, decompress=False).pages) == 2
 
 
+def test_sign_pdf(session, election_day_app):
+    # No signing
+    generator = MediaGenerator(election_day_app)
+
+    with patch('onegov.election_day.utils.media_generator.post') as post:
+        generator.sign_pdf('vote.pdf')
+        assert not post.called
+
+    # signing
+    election_day_app.principal.pdf_signing = {
+        'url': 'http://abcd.ef/11',
+        'login': 'abcd',
+        'password': '1234',
+        'reason': 'why'
+    }
+    generator = MediaGenerator(election_day_app)
+
+    with election_day_app.filestorage.open('vote.pdf', 'w') as f:
+        f.write('PDF')
+
+    args = {
+        'json.return_value': {
+            'result': {'signed_data': 'U0lHTkVE'}
+        }
+    }
+    with patch('onegov.election_day.utils.media_generator.post',
+               return_value=MagicMock(**args)) as post:
+        generator.sign_pdf('vote.pdf')
+        assert post.called
+        assert post.call_args[0][0] == 'http://abcd.ef/11'
+        assert post.call_args[1]['headers']['X-LEXWORK-LOGIN'] == 'abcd'
+        assert post.call_args[1]['headers']['X-LEXWORK-PASSWORD'] == '1234'
+        assert post.call_args[1]['json'] == {
+            'pdf_signature_job': {
+                'file_name': 'vote.pdf',
+                'data': 'UERG',
+                'reason_for_signature': 'why'
+            }
+        }
+    with election_day_app.filestorage.open('vote.pdf', 'r') as f:
+        assert f.read() == 'SIGNED'
+
+
 def test_generate_svg(election_day_app, session):
 
     generator = MediaGenerator(election_day_app)
