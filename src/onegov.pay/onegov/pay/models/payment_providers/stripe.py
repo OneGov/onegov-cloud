@@ -168,6 +168,10 @@ class StripeConnect(PaymentProvider):
         return 'Stripe Connect'
 
     @property
+    def url(self):
+        return 'https://dashboard.stripe.com/'
+
+    @property
     def public_identity(self):
         return self.account.business_name
 

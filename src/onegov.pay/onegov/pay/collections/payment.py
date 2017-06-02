@@ -1,5 +1,8 @@
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.pay.models import Payment
+from sqlalchemy import desc
+from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import undefer
 
 
 class PaymentCollection(GenericCollection, Pagination):
@@ -29,7 +32,10 @@ class PaymentCollection(GenericCollection, Pagination):
         return self.source == other.source and self.page == other.page
 
     def subset(self):
-        return self.query()
+        q = self.query().order_by(desc(Payment.created))
+        q = q.options(joinedload(Payment.provider))
+        q = q.options(undefer(Payment.created))
+        return q
 
     @property
     def page_index(self, page):

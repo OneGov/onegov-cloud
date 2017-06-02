@@ -70,6 +70,11 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin):
         raise NotImplementedError
 
     @property
+    def url(self):
+        """ The url to the backend of the payment provider. """
+        raise NotImplementedError
+
+    @property
     def public_identity(self):
         """ The public identifier of this payment provider. For example, the
         account name.
