@@ -265,7 +265,7 @@ msgid "Vote (Romansh)"
 msgstr "Vote (roumain)"
 
 msgid "Vote"
-msgstr "Vote"
+msgstr "Votation"
 
 #, python-format
 msgid "New results are available on ${url}"
