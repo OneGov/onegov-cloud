@@ -390,18 +390,18 @@
                 </div>
                 <div class="clearfix"></div>
             </div>
-            <tal:b define="price form.total()" condition="price">
-                <div class="field-display">
-                    <div class="field-display-block">
-                        <div class="field-display-label" i18n:translate>Total Amount</div>
-                        <div class="field-display-data">
-                            ${'{:.2f} {}'.format(*price)}
-                        </div>
-                    </div>
-                </div>
-            </tal:b>
         </tal:block>
     </div>
+    <tal:b define="price form.total()" condition="price">
+        <div class="field-display">
+            <div class="field-display-block">
+                <div class="field-display-label" i18n:translate>Total Amount</div>
+                <div class="field-display-data">
+                    ${'{:.2f} {}'.format(*price)}
+                </div>
+            </div>
+        </div>
+    </tal:b>
 </metal:display_form>
 
 <metal:person_card define-macro="person_list_card" i18n:domain="onegov.org">

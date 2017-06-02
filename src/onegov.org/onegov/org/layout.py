@@ -29,7 +29,7 @@ from onegov.org.models import (
     SiteCollection,
 )
 from onegov.org.theme.org_theme import user_options
-from onegov.pay import PaymentProviderCollection
+from onegov.pay import PaymentCollection, PaymentProviderCollection
 from onegov.reservation import ResourceCollection
 from onegov.people import PersonCollection
 from onegov.ticket import TicketCollection
@@ -1331,6 +1331,11 @@ class PaymentProviderLayout(DefaultLayout):
     def editbar_links(self):
         if self.request.is_admin:
             return [
+                Link(
+                    text=_("Payments"),
+                    url=self.request.class_link(PaymentCollection),
+                    classes=('payments', )
+                ),
                 LinkGroup(
                     title=_("Add"),
                     links=(
@@ -1345,3 +1350,38 @@ class PaymentProviderLayout(DefaultLayout):
                     )
                 )
             ]
+
+
+class PaymentCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Payments"), self.request.class_link(
+                PaymentProviderCollection
+            ))
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        links = []
+
+        if self.request.is_admin:
+            links.append(
+                Link(
+                    text=_("Payment Provider"),
+                    url=self.request.class_link(PaymentProviderCollection),
+                    classes=('payment-provider', )
+                )
+            )
+
+        links.append(
+            Link(
+                text=_("Synchronise"),
+                url=self.request.class_link(PaymentCollection, name='sync'),
+                classes=('sync', )
+            )
+        )
+
+        return links

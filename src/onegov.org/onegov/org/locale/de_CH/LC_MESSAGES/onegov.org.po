@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-06-02 10:45+0200\n"
+"POT-Creation-Date: 2017-06-02 13:17+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -32,6 +32,9 @@ msgstr "Dateien"
 
 msgid "Images"
 msgstr "Bilder"
+
+msgid "Payments"
+msgstr "Zahlungen"
 
 msgid "Management"
 msgstr "Verwaltung"
@@ -162,6 +165,9 @@ msgstr "Formular löschen"
 
 msgid "New"
 msgstr "Neu"
+
+msgid "Synchronise"
+msgstr "Synchronisieren"
 
 msgid "No"
 msgstr "Nein"
@@ -919,7 +925,9 @@ msgstr "Möchten Sie die Zahlung wirklich einnehmen?"
 msgid ""
 "This usually happens automatically, so there is no reason not do capture the "
 "payment."
-msgstr "Dies passiert normalerweise automatisch. Sie können deshalb ohne Bedenken weiterfahren."
+msgstr ""
+"Dies passiert normalerweise automatisch. Sie können deshalb ohne Bedenken "
+"weiterfahren."
 
 msgid "Capture payment"
 msgstr "Zahlung einnehmen"
@@ -1547,6 +1555,12 @@ msgstr "Keine Zahlungsanbieter definiert."
 
 msgid "Connected:"
 msgstr "Verbunden:"
+
+msgid "Object"
+msgstr "Objekt"
+
+msgid "Amount"
+msgstr "Betrag"
 
 msgid "No people added yet."
 msgstr "Es wurden noch keine Personen hinzugefügt."

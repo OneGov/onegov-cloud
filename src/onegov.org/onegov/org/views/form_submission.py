@@ -202,3 +202,11 @@ def view_form_submission_file(self, request):
     response.content_encoding = 'gzip'
 
     return response
+
+
+@OrgApp.view(model=PendingFormSubmission, name='ticket', permission=Private)
+@OrgApp.view(model=CompleteFormSubmission, name='ticket', permission=Private)
+def view_ticket(self, request):
+    """ Redirects to the associated ticket for the given submission. """
+    ticket = TicketCollection(request.app.session()).by_handler_id(self.id.hex)
+    return morepath.redirect(request.link(ticket))

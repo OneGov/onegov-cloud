@@ -408,3 +408,10 @@ def get_payment_provider(app, id):
     converters=dict(id=UUID))
 def get_payment(app, id):
     return PaymentCollection(app.session()).by_id(id)
+
+
+@OrgApp.path(
+    model=PaymentCollection,
+    path='/zahlungen')
+def get_payments(app, source='*', page=0):
+    return PaymentCollection(app.session(), source, page)

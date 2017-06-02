@@ -217,6 +217,7 @@ $global-tools-height: 2.5rem;
     .user::before { @include icon('\f2bd'); }
     .users::before { @include icon('\f0c0'); }
     .payment::before { @include icon('\f09d'); }
+    .payment-provider::before { @include icon('\f283'); }
     .profile::before { @include icon('\f2c3'); }
     .management::before { @include icon('\f013'); }
     .images::before { @include icon('\f03e'); }
@@ -1131,8 +1132,11 @@ $new-user-icon: '\f234';
 $paste-link-icon: '\f0ea';
 $payment-capture-icon: '\f09d';
 $payment-refund-icon: '\f0e2';
+$payment-provider-icon: '\f283';
+$payments-icon: '\f09d';
 $select-icon: '\f14a';
 $send-link-icon: '\f1d9';
+$sync-icon: '\f021';
 $occupancy-link-icon: '\f022';
 $upload-icon: '\f0ee';
 
@@ -1202,7 +1206,6 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .mark-as-paid::before { @include icon($mark-as-paid); }
     .mark-as-unpaid::before { @include icon($mark-as-unpaid); }
     .new-daypass::before { @include icon($new-daypass-icon); }
-    .new-recipient::before { @include icon($new-recipient); }
     .new-form::before { @include icon($new-form-icon); }
     .new-link::before { @include icon($new-link-icon); }
     .new-news::before { @include icon($new-news-icon); }
@@ -1211,16 +1214,20 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .new-payment::before { @include icon($new-payment-icon); }
     .new-person::before { @include icon($new-person-icon); }
     .new-photo-album::before { @include icon($new-photo-album); }
+    .new-recipient::before { @include icon($new-recipient); }
     .new-reservation::before { @include icon($new-reservation-icon); }
     .new-room::before { @include icon($new-room-icon); }
     .new-stripe-connect::before { @include icon($new-stripe-connect-icon); }
     .new-user::before { @include icon($new-user-icon); }
+    .occupancy-link::before { @include icon($occupancy-link-icon); }
     .paste-link::before { @include icon($paste-link-icon); }
     .payment-capture::before { @include icon($payment-capture-icon); }
+    .payment-provider::before { @include icon($payment-provider-icon); }
     .payment-refund::before { @include icon($payment-refund-icon); }
+    .payments::before { @include icon($payments-icon); }
     .select::before { @include icon($select-icon); }
     .send-link::before { @include icon($send-link-icon); }
-    .occupancy-link::before { @include icon($occupancy-link-icon); }
+    .sync::before { @include icon($sync-icon); }
     .upload::before { @include icon($upload-icon); }
 }
 
@@ -3657,5 +3664,16 @@ ul.recipients {
             color: $warning-color;
             margin-right: .75ex;
         }
+    }
+}
+
+/*
+    Payments table
+*/
+.payments-table {
+    width: 100%;
+
+    td {
+        vertical-align: top;
     }
 }

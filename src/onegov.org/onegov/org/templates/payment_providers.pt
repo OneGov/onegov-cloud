@@ -9,7 +9,7 @@
 
         <ul class="payment-providers" tal:condition="providers">
             <li tal:repeat="provider providers" class="payment-provider-${provider.type} ${provider.default and 'payment-provider-default' or ''}" id="${provider.id.hex}">
-                <h2>${provider.title}</h2>
+                <h2><a href="${provider.url}">${provider.title}</a></h2>
                 <div>
                     <span>${provider.public_identity}</span>
                 <div>
