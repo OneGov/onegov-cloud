@@ -60,7 +60,6 @@ class StripeCaptureManager(object):
 
     def tpc_finish(self, transaction):
         try:
-            import pdb; pdb.set_trace()
             with stripe_api_key(self.api_key):
                 self.charge.capture()
         except:
@@ -95,12 +94,19 @@ class StripePayment(Payment):
 
         return base.format(self.remote_id)
 
-    def sync(self, remote_obj=None):
-        charge = remote_obj or None
+    @property
+    def charge(self):
+        with stripe_api_key(self.provider.access_token):
+            return stripe.Charge.retrieve(self.remote_id)
 
-        if not charge:
-            with stripe_api_key(self.provider.access_token):
-                charge = stripe.Charge.retrieve(self.remote_id)
+    def refund(self):
+        with stripe_api_key(self.provider.access_token):
+            refund = stripe.Refund.create(charge=self.remote_id)
+            self.state = 'cancelled'
+            return refund
+
+    def sync(self, remote_obj=None):
+        charge = remote_obj or self.charge
 
         if not charge.captured:
             self.state = 'open'
@@ -108,7 +114,7 @@ class StripePayment(Payment):
         elif charge.refunded:
             self.state = 'cancelled'
 
-        elif charge.outcome['network_status'] != 'approved_by_network':
+        elif charge.status == 'failed':
             self.state = 'failed'
 
         elif charge.captured and charge.paid:
