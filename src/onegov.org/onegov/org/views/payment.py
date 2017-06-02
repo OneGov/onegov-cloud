@@ -25,3 +25,27 @@ def mark_as_unpaid(self, request):
 
     assert self.source == 'manual'
     self.state = 'open'
+
+
+@OrgApp.view(
+    model=Payment,
+    name='capture',
+    request_method='POST',
+    permission=Private)
+def capture(self, request):
+    request.assert_valid_csrf_token()
+
+    assert self.source == 'stripe_connect'
+    self.charge.capture()
+
+
+@OrgApp.view(
+    model=Payment,
+    name='refund',
+    request_method='POST',
+    permission=Private)
+def refund(self, request):
+    request.assert_valid_csrf_token()
+
+    assert self.source == 'stripe_connect'
+    self.refund()

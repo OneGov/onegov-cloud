@@ -1129,6 +1129,8 @@ $new-room-icon: '\f015';
 $new-stripe-connect-icon: '\f1f5';
 $new-user-icon: '\f234';
 $paste-link-icon: '\f0ea';
+$payment-capture-icon: '\f09d';
+$payment-refund-icon: '\f0e2';
 $select-icon: '\f14a';
 $send-link-icon: '\f1d9';
 $occupancy-link-icon: '\f022';
@@ -1214,6 +1216,8 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .new-stripe-connect::before { @include icon($new-stripe-connect-icon); }
     .new-user::before { @include icon($new-user-icon); }
     .paste-link::before { @include icon($paste-link-icon); }
+    .payment-capture::before { @include icon($payment-capture-icon); }
+    .payment-refund::before { @include icon($payment-refund-icon); }
     .select::before { @include icon($select-icon); }
     .send-link::before { @include icon($send-link-icon); }
     .occupancy-link::before { @include icon($occupancy-link-icon); }
@@ -3611,7 +3615,7 @@ ul.recipients {
     Payment states
 */
 .payment-state {
-    background-color: #fff;
+    background-color: $white;
     display: inline-block;
     padding: 2px 8px;
 

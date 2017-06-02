@@ -89,40 +89,9 @@ class FormSubmissionHandler(Handler):
         links = []
 
         if payment and payment.source == 'manual':
-            layout = DefaultLayout(self.submission, request)
-
-            if payment.state == 'open':
-                links.append(
-                    Link(
-                        text=_("Mark as paid"),
-                        url=layout.csrf_protected_url(
-                            request.link(self.payment, 'mark-as-paid'),
-                        ),
-                        attrs={'class': 'mark-as-paid'},
-                        traits=(
-                            Intercooler(
-                                request_method='POST',
-                                redirect_after=request.url,
-                            ),
-                        )
-                    )
-                )
-            else:
-                links.append(
-                    Link(
-                        text=_("Mark as unpaid"),
-                        url=layout.csrf_protected_url(
-                            request.link(self.payment, 'mark-as-unpaid'),
-                        ),
-                        attrs={'class': 'mark-as-unpaid'},
-                        traits=(
-                            Intercooler(
-                                request_method='POST',
-                                redirect_after=request.url,
-                            ),
-                        )
-                    )
-                )
+            links.extend(self.get_manual_payment_links(payment, request))
+        if payment and payment.source == 'stripe_connect':
+            links.extend(self.get_stripe_payment_links(payment, request))
 
         edit_link = URL(request.link(self.submission))
         edit_link = edit_link.query_param('edit', '').as_string()
@@ -136,6 +105,89 @@ class FormSubmissionHandler(Handler):
         )
 
         return links
+
+    def get_manual_payment_links(self, payment, request):
+        layout = DefaultLayout(self.submission, request)
+
+        if payment.state == 'open':
+            yield Link(
+                text=_("Mark as paid"),
+                url=layout.csrf_protected_url(
+                    request.link(self.payment, 'mark-as-paid'),
+                ),
+                attrs={'class': 'mark-as-paid'},
+                traits=(
+                    Intercooler(
+                        request_method='POST',
+                        redirect_after=request.url,
+                    ),
+                )
+            )
+        else:
+            yield Link(
+                text=_("Mark as unpaid"),
+                url=layout.csrf_protected_url(
+                    request.link(self.payment, 'mark-as-unpaid'),
+                ),
+                attrs={'class': 'mark-as-unpaid'},
+                traits=(
+                    Intercooler(
+                        request_method='POST',
+                        redirect_after=request.url,
+                    ),
+                )
+            )
+
+    def get_stripe_payment_links(self, payment, request):
+        layout = DefaultLayout(self.submission, request)
+
+        if payment.state == 'open':
+            yield Link(
+                text=_("Capture Payment"),
+                url=layout.csrf_protected_url(
+                    request.link(self.payment, 'capture')
+                ),
+                attrs={'class': 'payment-capture'},
+                traits=(
+                    Confirm(
+                        _("Do you really want capture the payment?"),
+                        _(
+                            "This usually happens automatically, so there is "
+                            "no reason not do capture the payment."
+                        ),
+                        _("Capture payment")
+                    ),
+                    Intercooler(
+                        request_method='POST',
+                        redirect_after=request.url
+                    ),
+                )
+            )
+        elif payment.state == 'paid':
+            amount = '{:02f} {}'.format(payment.amount, payment.currency)
+
+            yield Link(
+                text=_("Refund Payment"),
+                url=layout.csrf_protected_url(
+                    request.link(self.payment, 'refund')
+                ),
+                attrs={'class': 'payment-refund'},
+                traits=(
+                    Confirm(
+                        _("Do you really want to refund ${amount}?", mapping={
+                            'amount': amount
+                        }),
+                        _("This cannot be undone."),
+                        _("Refund ${amount}", mapping={
+                            'amount': amount
+                        })
+                    ),
+                    Intercooler(
+                        request_method='POST',
+                        redirect_after=request.url
+                    )
+                )
+            )
 
 
 @handlers.registered_handler('RSV')

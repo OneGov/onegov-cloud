@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-06-01 17:28+0200\n"
+"POT-Creation-Date: 2017-06-02 10:45+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -879,6 +879,15 @@ msgstr "Veranstaltung ablehnen"
 msgid "Edit event"
 msgstr "Veranstaltung bearbeiten"
 
+msgid "Mark as paid"
+msgstr "Als bezahlt markieren"
+
+msgid "Mark as unpaid"
+msgstr "Als unbezahlt markieren"
+
+msgid "Capture Payment"
+msgstr "Zahlung Einnehmen"
+
 msgid "Accept all reservations"
 msgstr "Alle Reservationen annehmen"
 
@@ -895,17 +904,25 @@ msgstr "Details bearbeiten"
 msgid "Accept event"
 msgstr "Veranstaltung annehmen"
 
-msgid "Mark as paid"
-msgstr "Als bezahlt markieren"
-
-msgid "Mark as unpaid"
-msgstr "Als unbezahlt markieren"
+msgid "Refund Payment"
+msgstr "Zahlung Rückerstatten"
 
 msgid "Do you really want to reject this event?"
 msgstr "Möchten Sie diese Veranstaltung wirklich absagen?"
 
 msgid "Rejecting this event can't be undone."
 msgstr "Eine Absage kann nicht rückgängig gemacht werden."
+
+msgid "Do you really want capture the payment?"
+msgstr "Möchten Sie die Zahlung wirklich einnehmen?"
+
+msgid ""
+"This usually happens automatically, so there is no reason not do capture the "
+"payment."
+msgstr "Dies passiert normalerweise automatisch. Sie können deshalb ohne Bedenken weiterfahren."
+
+msgid "Capture payment"
+msgstr "Zahlung einnehmen"
 
 msgid "Do you really want to reject all reservations?"
 msgstr "Möchten Sie wirklich alle Reservationen absagen?"
@@ -922,6 +939,17 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 
 msgid "Reject reservation"
 msgstr "Reservation absagen"
+
+#, python-format
+msgid "Do you really want to refund ${amount}?"
+msgstr "Möchten Sie wirklich ${amount} rückerstatten?"
+
+msgid "This cannot be undone."
+msgstr "Dies kann nicht rückgängig gemacht werden."
+
+#, python-format
+msgid "Refund ${amount}"
+msgstr "${amount} rückerstatten"
 
 msgid "Link"
 msgstr "Verknüpfung"
@@ -1162,9 +1190,6 @@ msgstr "Rückerstattet"
 
 msgid "Manual"
 msgstr "Manuell"
-
-msgid "<dynamic element>"
-msgstr ""
 
 msgid "Ticket Number"
 msgstr "Ticket Nummer"
@@ -1814,11 +1839,11 @@ msgstr "Ein Formular mit diesem Namen existiert bereits"
 msgid "Added a new form"
 msgstr "Ein neues Formular wurd hinzugefügt"
 
-msgid "Your payment could not be processed"
-msgstr "Ihre Zahlung konnte nicht verarbeitet werden"
-
 msgid "Pay Online and Complete"
 msgstr "Online zahlen und abschliessen"
+
+msgid "Your payment could not be processed"
+msgstr "Ihre Zahlung konnte nicht verarbeitet werden"
 
 msgid "Select images"
 msgstr "Bilder auswählen"
@@ -1887,9 +1912,6 @@ msgstr "Als Standard"
 
 msgid "Do you really want to delete this provider?"
 msgstr "Möchten Sie diesen Zahlungsanbieter wirklich löschen?"
-
-msgid "This cannot be undone."
-msgstr "Dies kann nicht rückgängig gemacht werden."
 
 msgid "Should this provider really be the new default?"
 msgstr "Soll dieser Zahlungsanbieter wirklich zum Standard gemacht werden?"
