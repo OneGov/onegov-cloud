@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.11.0 (2017-06-06)
+~~~~~~~~~~~~~~~~~~~
 
 - Parses the party of candidates and displays them for majorz elections.
   [msom]
