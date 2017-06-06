@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.6.0 (2017-06-06)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds party field to candidate.
   [msom]
