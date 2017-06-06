@@ -1,5 +1,6 @@
 $accepted-color: #0571b0;
 $rejected-color: #ca0020;
+$footer-border-color: #d8d8d8;
 
 /*
     get rid of the jump that is introduced when switching from a site with
@@ -490,10 +491,13 @@ ul.opendata-download {
     Footer
 */
 footer {
-    border-top: 1px solid $white-smoke;
+    border-top: 1px solid $footer-border-color;
     font-size: 85%;
+    left: calc(100% - 100vw);
     margin-top: 2rem;
-    padding: 1rem 0;
+    padding: 1rem 0 1rem calc(100vw - 100%);
+    position: relative;
+    width: 100vw;
 }
 
 

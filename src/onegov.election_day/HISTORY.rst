@@ -4,6 +4,9 @@ Changelog
 - Improves the status callouts.
   [msom]
 
+- Makes the footer more visually more distinguishable from the content.
+  [msom]
+
 1.11.0 (2017-06-06)
 ~~~~~~~~~~~~~~~~~~~
 
