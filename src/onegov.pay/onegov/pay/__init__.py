@@ -2,6 +2,7 @@ import logging
 log = logging.getLogger('onegov.pay')  # noqa
 log.addHandler(logging.NullHandler())  # noqa
 
+from onegov.pay.errors import CARD_ERRORS
 from onegov.pay.models import ManualPayment
 from onegov.pay.models import Payable, Payment, PaymentProvider
 from onegov.pay.collections import PaymentCollection, PayableCollection
@@ -11,6 +12,7 @@ from onegov.pay.integration import PayApp
 
 __all__ = (
     'log',
+    'CARD_ERRORS',
     'ManualPayment',
     'Payable',
     'PayableCollection',
