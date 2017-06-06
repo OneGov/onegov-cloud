@@ -267,7 +267,7 @@ def decimal():
     """
 
     return (Optional('-') + numeric + Optional(Suppress('.') + numeric))\
-        .setParseAction(as_decimal)('decimal')
+        .setParseAction(as_decimal)('amount')
 
 
 def currency():

@@ -1,7 +1,7 @@
 import inspect
 import weakref
 
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 from decimal import Decimal
 from itertools import groupby
 from onegov.form import utils
@@ -248,7 +248,7 @@ class Form(BaseForm):
             if price is not None:
                 prices.append((field_id, price))
 
-        currencies = set(price[1] for _, price in prices)
+        currencies = set(price.currency for _, price in prices)
         assert len(currencies) <= 1, "Mixed currencies are not supported"
 
         return prices
@@ -260,7 +260,10 @@ class Form(BaseForm):
         if not prices:
             return None
 
-        return sum(price[0] for field_id, price in prices), prices[0][1][1]
+        return (
+            sum(price.amount for field_id, price in prices),
+            prices[0][1].currency
+        )
 
     def submitted(self, request):
         """ Returns true if the given request is a successful post request. """
@@ -578,6 +581,10 @@ class FieldDependency(object):
         return {'data-depends-on': value}
 
 
+# A single price
+Price = namedtuple('Price', ('amount', 'currency'))
+
+
 class Pricing(object):
     """ Defines pricing on a field, returning the correct price for the field
     depending on its rule.
@@ -586,7 +593,7 @@ class Pricing(object):
 
     def __init__(self, rules):
         self.rules = {
-            rule: (Decimal(value), currency)
+            rule: Price(Decimal(value), currency)
             for rule, (value, currency) in rules.items()
         }
 
@@ -598,8 +605,8 @@ class Pricing(object):
                 price = self.rules.get(value, None)
 
                 if price is not None:
-                    total = (total or Decimal(0)) + price[0]
-                    currency = price[1]
+                    total = (total or Decimal(0)) + price.amount
+                    currency = price.currency
 
             if total is None:
                 return None

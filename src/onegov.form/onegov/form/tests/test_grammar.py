@@ -193,14 +193,14 @@ def test_prices():
     assert f.type == 'radio'
     assert f.label == 'Default Choice'
     assert not f.checked
-    assert f.pricing.decimal == Decimal('100.00')
+    assert f.pricing.amount == Decimal('100.00')
     assert f.pricing.currency == 'CHF'
 
     f = field.parseString("(x) Luxurious Choice (200 CHF)")
     assert f.type == 'radio'
     assert f.label == 'Luxurious Choice'
     assert f.checked
-    assert f.pricing.decimal == Decimal('200.00')
+    assert f.pricing.amount == Decimal('200.00')
     assert f.pricing.currency == 'CHF'
 
     field = checkbox()
@@ -209,21 +209,21 @@ def test_prices():
     assert f.type == 'checkbox'
     assert f.label == 'Extra Luggage'
     assert f.checked
-    assert f.pricing.decimal == Decimal('150.50')
+    assert f.pricing.amount == Decimal('150.50')
     assert f.pricing.currency == 'USD'
 
     f = field.parseString("[ ] Priority Boarding (15.00 USD)")
     assert f.type == 'checkbox'
     assert f.label == 'Priority Boarding'
     assert not f.checked
-    assert f.pricing.decimal == Decimal('15.00')
+    assert f.pricing.amount == Decimal('15.00')
     assert f.pricing.currency == 'USD'
 
     f = field.parseString("[ ] Discount (-5.00 USD)")
     assert f.type == 'checkbox'
     assert f.label == 'Discount'
     assert not f.checked
-    assert f.pricing.decimal == Decimal('-5.00')
+    assert f.pricing.amount == Decimal('-5.00')
     assert f.pricing.currency == 'USD'
 
 

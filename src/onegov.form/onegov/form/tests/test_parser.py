@@ -258,6 +258,8 @@ def test_parse_checkbox_with_pricing():
         'Bacon': (Decimal(2.5), 'CHF'),
         'Cheese': (Decimal(1.5), 'CHF')
     }
+    assert form.extras.pricing.rules['Bacon'].amount == Decimal(2.5)
+    assert form.extras.pricing.rules['Bacon'].currency == 'CHF'
 
 
 def test_dependent_validation():
