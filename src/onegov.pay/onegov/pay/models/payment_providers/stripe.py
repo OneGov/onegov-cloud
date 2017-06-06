@@ -7,6 +7,7 @@ from cached_property import cached_property
 from contextlib import contextmanager
 from html import escape
 from io import BytesIO
+from onegov.core.utils import chunks
 from onegov.core.orm.mixins import meta_property
 from onegov.pay import log
 from onegov.pay.models.payment import Payment
@@ -332,3 +333,34 @@ class StripeConnect(PaymentProvider):
         self.user_id = token['stripe_user_id']
         self.refresh_token = token['refresh_token']
         self.access_token = token['access_token']
+
+    def sync(self):
+        session = object_session(self)
+
+        def payments(ids):
+            q = session.query(self.payment_class)
+            q = q.filter(self.payment_class.id.in_(ids))
+
+            return q
+
+        def charges(batch_size=100):
+            with stripe_api_key(self.access_token):
+                charges = stripe.Charge.list(limit=100)
+                charges = (c for c in charges.auto_paging_iter())
+                charges = (c for c in charges if 'payment_id' in c.metadata)
+
+                yield from chunks(charges, batch_size)
+
+        processed = 0
+
+        for batch in charges():
+            charges = {}
+
+            for charge in (c for c in batch if c):
+                charges[charge.metadata['payment_id']] = charge
+
+            for payment in payments(charges.keys()):
+                payment.sync(remote_obj=charges[payment.id.hex])
+                processed += 1
+
+        return processed

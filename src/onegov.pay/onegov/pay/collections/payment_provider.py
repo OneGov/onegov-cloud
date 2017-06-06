@@ -15,3 +15,12 @@ class PaymentProviderCollection(GenericCollection):
 
         self.session.flush()
         provider.default = True
+
+    def sync(self):
+        """ Syncs all payments with the related payment providers.
+
+        Returns the number of processed payments.
+
+        """
+
+        return sum(provider.sync() for provider in self.query())
