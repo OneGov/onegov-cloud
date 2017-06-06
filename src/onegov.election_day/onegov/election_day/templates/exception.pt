@@ -1,7 +1,7 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
     <tal:block metal:fill-slot="title">${title}</tal:block>
     <tal:block metal:fill-slot="content">
-        <div class="panel radius">
+        <div class="panel callout radius">
             <p i18n:translate="">${message}</p>
         </div>
     </tal:block>
