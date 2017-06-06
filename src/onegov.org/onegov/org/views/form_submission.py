@@ -109,8 +109,8 @@ def handle_pending_submission(self, request):
 
     checkout = {
         'label': request.translate(_("Pay Online and Complete")),
-        'amount': price[0],
-        'currency': price[1],
+        'amount': price.amount,
+        'currency': price.currency,
         'email': self.get_email_field_data(form),
         'name': request.app.org.name,
         'description': self.form.title,
