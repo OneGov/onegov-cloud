@@ -228,28 +228,28 @@
 
     <div class="clearfix"></div>
 
-    <tal:block tal:condition="layout.has_results">
+    <tal:block tal:condition="layout.has_results and ballot">
         <div class="row percentages">
             <div class="columns small-6">
                 <dl>
                     <dt i18n:translate="">Yeas</dt>
-                    <dd class="accepted" >${'{0:.2f}'.format(vote.yeas_percentage)}%</dd>
+                    <dd class="accepted" >${'{0:.2f}'.format(ballot.yeas_percentage)}%</dd>
 
                 </dl>
             </div>
             <div class="columns small-6 end">
                 <dl style="text-align: right;">
                     <dt i18n:translate="">Nays</dt>
-                    <dd class="rejected" >${'{0:.2f}'.format(vote.nays_percentage)}%</dd>
+                    <dd class="rejected" >${'{0:.2f}'.format(ballot.nays_percentage)}%</dd>
                 </dl>
             </div>
         </div>
         <div class="percentage">
             <div class="yeas"></div>
-            <div class="nays right" style="width:${'{0:.2f}'.format(vote.nays_percentage)}%"></div>
+            <div class="nays right" style="width:${'{0:.2f}'.format(ballot.nays_percentage)}%"></div>
         </div>
     </tal:block>
-    <tal:block tal:condition="not layout.has_results">
+    <tal:block tal:condition="not: layout.has_results and ballot">
         <hr />
     </tal:block>
 </metal:vote_header>
