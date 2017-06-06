@@ -1491,7 +1491,9 @@ class PaymentCollectionLayout(DefaultLayout):
         links.append(
             Link(
                 text=_("Synchronise"),
-                url=self.request.class_link(PaymentCollection, name='sync'),
+                url=self.request.class_link(
+                    PaymentProviderCollection, name='synchronisieren'
+                ),
                 attrs={'class': 'sync'}
             )
         )

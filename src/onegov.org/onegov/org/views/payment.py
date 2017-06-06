@@ -3,18 +3,33 @@ from onegov.org import OrgApp, _
 from onegov.org.layout import PaymentCollectionLayout
 from onegov.pay import Payment
 from onegov.pay import PaymentCollection
+from onegov.pay import PaymentProviderCollection
 
 
 @OrgApp.html(
     model=PaymentCollection,
     template='payments.pt',
-    permission=Private,)
+    permission=Private)
 def view_payments(self, request):
     return {
         'title': _("Payments"),
         'layout': PaymentCollectionLayout(self, request),
         'payments': self.batch
     }
+
+
+@OrgApp.view(
+    model=PaymentProviderCollection,
+    name='synchronisieren',
+    permission=Private)
+def sync_payments(self, request):
+    count = self.sync()
+
+    request.success(_("Successfully synchronised ${count} payments", {
+        'count': count
+    }))
+
+    return request.redirect(request.class_link(PaymentCollection))
 
 
 @OrgApp.view(
