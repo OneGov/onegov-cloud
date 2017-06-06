@@ -381,6 +381,9 @@ class Election(Base, TimestampMixin, DerivedAttributes,
         * ``candidate_elected``:
             True if the candidate has been elected.
 
+        * ``candidate_party``:
+            The name of the party of this candidate.
+
         * ``candidate_votes``:
             The number of votes this candidate got.
 
@@ -426,6 +429,7 @@ class Election(Base, TimestampMixin, DerivedAttributes,
             Candidate.first_name,
             Candidate.candidate_id,
             Candidate.elected,
+            Candidate.party,
         )
         results = results.outerjoin(CandidateResult.candidate)
         results = results.outerjoin(CandidateResult.election_result)
@@ -528,6 +532,7 @@ class Election(Base, TimestampMixin, DerivedAttributes,
             row['candidate_first_name'] = result[27]
             row['candidate_id'] = result[28]
             row['candidate_elected'] = result[29]
+            row['candidate_party'] = result[30]
             row['candidate_votes'] = result[0]
 
             for target_id in panachage_lists:
@@ -673,7 +678,7 @@ class List(Base, TimestampMixin):
 class Candidate(Base, TimestampMixin):
     """ A candidate. """
 
-    __tablename__ = 'candiates'
+    __tablename__ = 'candidates'
 
     summarized_properties = ['votes']
 
@@ -697,6 +702,9 @@ class Candidate(Base, TimestampMixin):
 
     #: the list this candidate belongs to
     list_id = Column(UUID, ForeignKey(List.id), nullable=True)
+
+    #: the party name
+    party = Column(Text, nullable=True)
 
     #: a candidate contains n results
     results = relationship(
@@ -838,7 +846,7 @@ class PanachageResult(Base, TimestampMixin):
 class CandidateResult(Base, TimestampMixin):
     """ The election result of a candidate in a single political entity. """
 
-    __tablename__ = 'candiate_results'
+    __tablename__ = 'candidate_results'
 
     #: identifies the candidate result
     id = Column(UUID, primary_key=True, default=uuid4)

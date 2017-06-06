@@ -185,3 +185,26 @@ def add_status_columns(context):
                 nullable=True
             )
         )
+
+
+@upgrade_task('Add party to candidate')
+def add_candidate_party_column(context):
+    table = 'candidates' if context.has_table('candidates') else 'candiates'
+    if not context.has_column(table, 'party'):
+        context.operations.add_column(
+            table,
+            Column('party', Text, nullable=True)
+        )
+
+
+@upgrade_task('Rename candidates tables')
+def rename_candidates_tables(context):
+    if context.has_table('candiates'):
+        context.operations.rename_table(
+            'candiates', 'candidates'
+        )
+
+    if context.has_table('candiate_results'):
+        context.operations.rename_table(
+            'candiate_results', 'candidate_results'
+        )

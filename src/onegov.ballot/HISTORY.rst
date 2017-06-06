@@ -1,8 +1,12 @@
 Changelog
 ---------
 
-Unreleased
-~~~~~~~~~~
+- Adds party field to candidate.
+  [msom]
+
+- Fixes spelling in candidates and candidates_results tables.
+  [msom]
+
 1.5.0 (2017-06-01)
 ~~~~~~~~~~~~~~~~~~~
 

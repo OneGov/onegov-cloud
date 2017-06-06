@@ -549,6 +549,7 @@ def test_election_results(session):
         list_id=list_1.id,
         family_name='Quimby',
         first_name='Joe',
+        party='Republican Party',
     )
     candidate_2 = Candidate(
         id=uuid4(),
@@ -557,6 +558,7 @@ def test_election_results(session):
         list_id=list_2.id,
         family_name='Nahasapeemapetilon',
         first_name='Apu',
+        party='Democratic Party',
     )
     candidate_3 = Candidate(
         id=uuid4(),
@@ -565,6 +567,7 @@ def test_election_results(session):
         list_id=list_3.id,
         family_name='Flanders',
         first_name='Ned',
+        party='Republican Party',
     )
     candidate_4 = Candidate(
         id=uuid4(),
@@ -573,6 +576,7 @@ def test_election_results(session):
         list_id=list_3.id,
         family_name='Lovejoy',
         first_name='Tim',
+        party='Republican Party',
     )
     candidate_5 = Candidate(
         id=uuid4(),
@@ -581,6 +585,7 @@ def test_election_results(session):
         list_id=list_4.id,
         family_name='Smithers',
         first_name='Waylon',
+        party='Democratic Party',
     )
     election.candidates.append(candidate_1)
     election.candidates.append(candidate_2)
@@ -675,6 +680,14 @@ def test_election_results(session):
     votes = session.query(Candidate.votes, Candidate.family_name)
     votes = votes.order_by(Candidate.votes)
     assert [vote[0] for vote in votes] == expected
+    assert sorted(set((
+        (c.party, c.list.name) for c in election.candidates
+    ))) == [
+        ('Democratic Party', 'Kwik-E-Major'),
+        ('Democratic Party', 'Partey B'),
+        ('Republican Party', 'Partey A'),
+        ('Republican Party', 'Quimby Again!')
+    ]
 
     assert sorted((c.votes for c in election.list_connections)) == []
 
@@ -785,6 +798,7 @@ def test_election_export(session):
         list_id=list_1.id,
         family_name='Quimby',
         first_name='Joe',
+        party='Republican Party',
     )
     candidate_2 = Candidate(
         id=uuid4(),
@@ -793,6 +807,7 @@ def test_election_export(session):
         list_id=list_2.id,
         family_name='Nahasapeemapetilon',
         first_name='Apu',
+        party='Democratic Party',
     )
     election.candidates.append(candidate_1)
     election.candidates.append(candidate_2)
@@ -881,6 +896,7 @@ def test_election_export(session):
             'candidate_first_name': 'Apu',
             'candidate_id': '2',
             'candidate_elected': False,
+            'candidate_party': 'Democratic Party',
             'candidate_votes': 111,
             'panachage_votes_from_list_1': None,
             'panachage_votes_from_list_2': None,
@@ -916,6 +932,7 @@ def test_election_export(session):
             'candidate_first_name': 'Joe',
             'candidate_id': '1',
             'candidate_elected': True,
+            'candidate_party': 'Republican Party',
             'candidate_votes': 520,
             'panachage_votes_from_list_1': None,
             'panachage_votes_from_list_2': 12,
