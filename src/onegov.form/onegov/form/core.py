@@ -260,7 +260,7 @@ class Form(BaseForm):
         if not prices:
             return None
 
-        return (
+        return Price(
             sum(price.amount for field_id, price in prices),
             prices[0][1].currency
         )
@@ -611,7 +611,7 @@ class Pricing(object):
             if total is None:
                 return None
             else:
-                return (total, currency)
+                return Price(total, currency)
 
         return self.rules.get(field.data, None)
 
