@@ -160,3 +160,21 @@ def generate_media(sentry):
             lockfile.unlink()
 
     return generate
+
+
+@cli.command('list-pdf-signing-reasons')
+@click.option('--sentry')
+def list_pdf_signing_reasons(sentry):
+    """ Lists the reasons usable for PDF signing. Example:
+
+        onegov-election-day --select '/onegov_election_day/zg'
+            list-pdf-signing-reasons
+
+    """
+    def list_reasons(request, app):
+        if not app.principal:
+            return
+
+        click.echo(MediaGenerator(app).signing_reasons())
+
+    return list_reasons

@@ -34,6 +34,7 @@ from os.path import basename
 from pdfdocument.document import MarkupParagraph
 from pytz import timezone
 from reportlab.lib.units import cm
+from requests import get
 from requests import post
 from rjsmin import jsmin
 from shutil import copyfileobj
@@ -150,6 +151,23 @@ class MediaGenerator():
 
         return self.get_chart('map', fmt, data, width, params)
 
+    def signing_reasons(self):
+        if not self.pdf_signing:
+            return []
+
+        response = get(
+            '{}/{}'.format(
+                self.pdf_signing['host'].rstrip('/'),
+                'admin_interface/pdf_signature_reasons.json'
+            ),
+            headers={
+                'X-LEXWORK-LOGIN': self.pdf_signing['login'],
+                'X-LEXWORK-PASSWORD': self.pdf_signing['password']
+            }
+        )
+        response.raise_for_status()
+        return response.json().get('result')
+
     def sign_pdf(self, path):
         if self.pdf_signing:
             filename = basename(path)
@@ -158,7 +176,10 @@ class MediaGenerator():
 
             try:
                 response = post(
-                    self.pdf_signing['url'],
+                    '{}/{}'.format(
+                        self.pdf_signing['host'].rstrip('/'),
+                        'admin_interface/pdf_signature_jobs.json'
+                    ),
                     headers={
                         'X-LEXWORK-LOGIN': self.pdf_signing['login'],
                         'X-LEXWORK-PASSWORD': self.pdf_signing['password']
