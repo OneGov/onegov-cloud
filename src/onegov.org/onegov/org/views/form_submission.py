@@ -165,7 +165,7 @@ def handle_complete_submission(self, request):
             token = request.params.get('payment_token')
 
             if not self.process_payment(provider, token):
-                request.fail(_("Your payment could not be processed"))
+                request.alert(_("Your payment could not be processed"))
                 return morepath.redirect(request.link(self))
 
             collection = FormCollection(request.app.session())
