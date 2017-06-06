@@ -159,8 +159,11 @@
          <h5 i18n:translate="">Not yet counted.</h5>
          <p>
              <span i18n:translate="">Last change</span>:
-             <strong>${layout.format_date(item.last_change, 'relative')}</strong>
+             <strong>${layout.format_date(item.last_change, 'relative')} / ${layout.format_date(item.last_change, 'datetime_long')}</strong>
          </p>
+    </div>
+    <div class="panel radius" tal:condition="item.completed">
+        <span i18n:translate="">Last change</span>: ${layout.format_date(item.last_change, 'datetime_long')}
     </div>
 </metal:temporary_results_callout>
 

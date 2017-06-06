@@ -1,5 +1,5 @@
-from babel.dates import format_date
-from base64 import b64decode, b64encode
+from babel.dates import format_date, format_time
+from base64 import b64decode
 from copy import deepcopy
 from datetime import date
 from io import BytesIO, StringIO
@@ -27,14 +27,14 @@ from onegov.election_day.views.election.parties import (
     get_party_results,
     get_party_deltas
 )
+from onegov.election_day import log
 from pdfdocument.document import MarkupParagraph
+from pytz import timezone
 from reportlab.lib.units import cm
 from requests import post
 from rjsmin import jsmin
 from shutil import copyfileobj
 from textwrap import shorten, wrap
-from onegov.election_day import log
-from os.path import basename
 
 
 class MediaGenerator():
@@ -243,6 +243,11 @@ class MediaGenerator():
                 ('ALIGN', (-2, 0), (-1, -1), 'RIGHT'),
             )
 
+            table_style_dates = pdf.style.table + (
+                ('ALIGN', (0, 0), (1, -1), 'LEFT'),
+                ('ALIGN', (-2, 0), (-1, -1), 'RIGHT'),
+            )
+
             def indent_style(level):
                 style = deepcopy(pdf.style.normal)
                 style.leftIndent = level * style.fontSize
@@ -250,7 +255,26 @@ class MediaGenerator():
 
             # Add Header
             pdf.h1(item.title_translations.get(locale) or item.title)
-            pdf.p(format_date(item.date, format='long', locale=locale))
+
+            # Add dates
+            changed = item.last_change
+            if getattr(changed, 'tzinfo', None) is not None:
+                tz = timezone('Europe/Zurich')
+                changed = tz.normalize(changed.astimezone(tz))
+
+            pdf.table(
+                [[
+                    format_date(item.date, format='long', locale=locale),
+                    '{}: {} {}'.format(
+                        translate(_('Last change')),
+                        format_date(changed, format='long', locale=locale),
+                        format_time(changed, format='short', locale=locale)
+
+                    )
+                ]],
+                'even',
+                style=table_style_dates
+            )
             pdf.spacer()
 
             # Election
