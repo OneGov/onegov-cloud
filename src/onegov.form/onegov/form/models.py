@@ -1,15 +1,16 @@
 import html
 
 from hashlib import md5
-from onegov.core.orm.types import UTCDateTime
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.orm.types import JSON, UUID
+from onegov.core.orm.types import UTCDateTime
+from onegov.form import log
 from onegov.form.display import render_field
 from onegov.form.parser import parse_form
+from onegov.pay import CARD_ERRORS, Payable, ManualPayment
 from onegov.search import ORMSearchable
-from onegov.pay import Payable, ManualPayment
 from sedate import utcnow
 from sqlalchemy import Column, Enum, ForeignKey, Text
 from sqlalchemy.orm import (
@@ -242,11 +243,22 @@ class FormSubmission(Base, TimestampMixin, Payable):
             if not token:
                 return False
 
-            self.payment = provider.charge(
-                amount=total[0],
-                currency=total[1],
-                token=token
-            )
+            try:
+                self.payment = provider.charge(
+                    amount=total[0],
+                    currency=total[1],
+                    token=token
+                )
+            except CARD_ERRORS:
+                log.exception(
+                    "Processing {} {} through {} with token {} failed".format(
+                        total[0],
+                        total[1],
+                        provider.title,
+                        token
+                    )
+                )
+                return False
         else:
             raise NotImplementedError
 
