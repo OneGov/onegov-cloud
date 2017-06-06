@@ -1,33 +1,36 @@
-from babel.dates import format_date, format_time
+from babel.dates import format_date
+from babel.dates import format_time
 from base64 import b64decode
+from base64 import b64encode
 from copy import deepcopy
 from datetime import date
-from io import BytesIO, StringIO
+from io import BytesIO
+from io import StringIO
 from json import loads
-from onegov.ballot import Ballot, Election, Vote
+from onegov.ballot import Ballot
+from onegov.ballot import Election
+from onegov.ballot import Vote
 from onegov.core.utils import groupbylist
 from onegov.core.utils import module_path
 from onegov.election_day import _
-from onegov.election_day.utils import pdf_filename, svg_filename
+from onegov.election_day import log
+from onegov.election_day.utils import pdf_filename
+from onegov.election_day.utils import svg_filename
 from onegov.election_day.utils.pdf import Pdf
 from onegov.election_day.views.election import get_candidates_results
 from onegov.election_day.views.election import get_connection_results
-from onegov.election_day.views.election.candidates import (
+from onegov.election_day.views.election.candidates import \
     view_election_candidates_data
-)
-from onegov.election_day.views.election.connections import (
+from onegov.election_day.views.election.connections import \
     view_election_connections_data
-)
 from onegov.election_day.views.election.lists import view_election_lists_data
-from onegov.election_day.views.election.panachage import (
+from onegov.election_day.views.election.panachage import \
     view_election_panachage_data
-)
-from onegov.election_day.views.election.parties import (
-    view_election_parties_data,
-    get_party_results,
-    get_party_deltas
-)
-from onegov.election_day import log
+from onegov.election_day.views.election.parties import get_party_deltas
+from onegov.election_day.views.election.parties import get_party_results
+from onegov.election_day.views.election.parties import \
+    view_election_parties_data
+from os.path import basename
 from pdfdocument.document import MarkupParagraph
 from pytz import timezone
 from reportlab.lib.units import cm
