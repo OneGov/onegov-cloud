@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-31 11:42+0200\n"
-"PO-Revision-Date: 2017-05-29 15:12+0200\n"
+"POT-Creation-Date: 2017-06-06 16:43+0200\n"
+"PO-Revision-Date: 2017-06-06 16:43+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -397,8 +397,11 @@ msgstr "Page suivante"
 msgid "You are here"
 msgstr "Vous êtes ici"
 
-msgid "Not yet counted."
-msgstr "Pas encore compté."
+msgid "No results yet"
+msgstr "Pas de résultats à l'heure actuelle"
+
+msgid "Intermediate results"
+msgstr "Résultats intermédiaires"
 
 msgid "Last change"
 msgstr "Actualisé"
@@ -519,6 +522,9 @@ msgstr "Candidat"
 msgid "single_votes"
 msgstr "Votes"
 
+msgid "Party"
+msgstr "Parti"
+
 msgid "List"
 msgstr "Liste"
 
@@ -588,9 +594,6 @@ msgstr ""
 "(échelle de gauche) correspondent au nombre de sièges, les barres colorées "
 "(échelle de droite) aux voix (pourcentages)."
 
-msgid "Party"
-msgstr "Parti"
-
 msgid "Difference"
 msgstr "Différence"
 
@@ -605,6 +608,9 @@ msgstr "Bulletins de vote non valides"
 
 msgid "Accounted Votes"
 msgstr "Votes comptés"
+
+msgid "Not yet counted."
+msgstr "Pas encore compté."
 
 msgid "New mapping"
 msgstr "Nouvelle cartographie"

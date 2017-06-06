@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-31 11:42+0200\n"
-"PO-Revision-Date: 2017-05-29 14:04+0200\n"
+"POT-Creation-Date: 2017-06-06 16:43+0200\n"
+"PO-Revision-Date: 2017-06-06 16:46+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 2.0.1\n"
+"X-Generator: Poedit 2.0.2\n"
 
 msgid "Expats"
 msgstr "Svizzers a l'exteriur"
@@ -433,8 +433,11 @@ msgstr "Proxima pagina"
 msgid "You are here"
 msgstr "Pagina actuala"
 
-msgid "Not yet counted."
-msgstr "Anc betg eruì il resultat."
+msgid "No results yet"
+msgstr "Anc nagins resultats avant maun"
+
+msgid "Intermediate results"
+msgstr "Resultats intermediars"
 
 msgid "Last change"
 msgstr "Actualisà"
@@ -555,6 +558,9 @@ msgstr "Persuna che candidescha"
 msgid "single_votes"
 msgstr "Vuschs"
 
+msgid "Party"
+msgstr "Partida"
+
 msgid "List"
 msgstr "Glista"
 
@@ -626,9 +632,6 @@ msgstr ""
 "travs cun ur (scala sanestra) correspundan al dumber da sezs, las travs "
 "coluradas (scala dretga) a las quotas da vuschs en pertschients."
 
-msgid "Party"
-msgstr "Partida"
-
 msgid "Difference"
 msgstr "Differenza"
 
@@ -643,6 +646,9 @@ msgstr "Cedels electorals nunvalaivels"
 
 msgid "Accounted Votes"
 msgstr "Vuschs valaivlas"
+
+msgid "Not yet counted."
+msgstr "Anc betg eruì il resultat."
 
 msgid "New mapping"
 msgstr "Nova attribuziun"

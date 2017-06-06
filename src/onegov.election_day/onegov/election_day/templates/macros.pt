@@ -154,10 +154,11 @@
     </div>
 </metal:tab_menu>
 
-<metal:temporary_results_callout define-macro="temporary_results_callout" i18n:domain="onegov.election_day">
+<metal:status_callout define-macro="status_callout" i18n:domain="onegov.election_day">
     <div class="panel callout radius" tal:condition="not:item.completed">
-         <h5 i18n:translate="">Not yet counted.</h5>
-         <p>
+         <h5 i18n:translate="" tal:condition="not layout.has_results">No results yet</h5>
+         <h5 i18n:translate="" tal:condition="layout.has_results">Intermediate results</h5>
+         <p tal:condition="layout.has_results">
              <span i18n:translate="">Last change</span>:
              <strong>${layout.format_date(item.last_change, 'relative')} / ${layout.format_date(item.last_change, 'datetime_long')}</strong>
          </p>
@@ -165,7 +166,7 @@
     <div class="panel radius" tal:condition="item.completed">
         <span i18n:translate="">Last change</span>: ${layout.format_date(item.last_change, 'datetime_long')}
     </div>
-</metal:temporary_results_callout>
+</metal:status_callout>
 
 <metal:subscription_links define-macro="subscription_links" i18n:domain="onegov.election_day">
     <div class="row subscription-links" tal:condition="python: not request.browser_session.get('headerless') and layout.principal.sms_notification">
