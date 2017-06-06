@@ -444,7 +444,7 @@ def test_sign_pdf(session, election_day_app):
 
     # signing
     election_day_app.principal.pdf_signing = {
-        'url': 'http://abcd.ef/11',
+        'host': 'http://abcd.ef',
         'login': 'abcd',
         'password': '1234',
         'reason': 'why'
@@ -463,7 +463,9 @@ def test_sign_pdf(session, election_day_app):
                return_value=MagicMock(**args)) as post:
         generator.sign_pdf('vote.pdf')
         assert post.called
-        assert post.call_args[0][0] == 'http://abcd.ef/11'
+        assert post.call_args[0][0] == (
+            'http://abcd.ef/admin_interface/pdf_signature_jobs.json'
+        )
         assert post.call_args[1]['headers']['X-LEXWORK-LOGIN'] == 'abcd'
         assert post.call_args[1]['headers']['X-LEXWORK-PASSWORD'] == '1234'
         assert post.call_args[1]['json'] == {
@@ -475,6 +477,39 @@ def test_sign_pdf(session, election_day_app):
         }
     with election_day_app.filestorage.open('vote.pdf', 'r') as f:
         assert f.read() == 'SIGNED'
+
+
+def test_get_pdf_signing_reasons(session, election_day_app):
+    # No signing
+    generator = MediaGenerator(election_day_app)
+
+    with patch('onegov.election_day.utils.media_generator.get') as get:
+        assert generator.signing_reasons() == []
+        assert not get.called
+
+    # signing
+    election_day_app.principal.pdf_signing = {
+        'host': 'http://abcd.ef',
+        'login': 'abcd',
+        'password': '1234',
+        'reason': 'why'
+    }
+    generator = MediaGenerator(election_day_app)
+
+    args = {
+        'json.return_value': {
+            'result': ['a', 'b', 'c']
+        }
+    }
+    with patch('onegov.election_day.utils.media_generator.get',
+               return_value=MagicMock(**args)) as get:
+        assert generator.signing_reasons() == ['a', 'b', 'c']
+        assert get.called
+        assert get.call_args[0][0] == (
+            'http://abcd.ef/admin_interface/pdf_signature_reasons.json'
+        )
+        assert get.call_args[1]['headers']['X-LEXWORK-LOGIN'] == 'abcd'
+        assert get.call_args[1]['headers']['X-LEXWORK-PASSWORD'] == '1234'
 
 
 def test_generate_svg(election_day_app, session):
