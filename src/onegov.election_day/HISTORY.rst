@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Parses the party of candidates and displays them for majorz elections.
+  [msom]
+
 - Improves party results.
   [msom]
 

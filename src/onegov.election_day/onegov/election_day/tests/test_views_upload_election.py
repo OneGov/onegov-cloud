@@ -43,6 +43,7 @@ HEADER_COLUMNS_INTERNAL = (
     'candidate_first_name,'
     'candidate_id,'
     'candidate_elected,'
+    'candidate_party,'
     'candidate_votes'
 )
 
@@ -1016,6 +1017,7 @@ def test_upload_election_onegov_ballot_fail(election_day_app_gr):
         'candidate_first_name',
         'candidate_id',
         'candidate_elected',
+        'candidate_party',
         'candidate_votes',
     ]
 
@@ -1063,6 +1065,7 @@ def test_upload_election_onegov_ballot_fail(election_day_app_gr):
             'Peter',
             'y',
             'False',
+            'Party',
             'forty',
         ))
     )).encode('utf-8')
@@ -1122,9 +1125,9 @@ def test_upload_election_invalidate_cache(election_day_app_gr):
         'entity_invalid_votes,entity_accounted_votes,list_name,'
         'list_id,list_number_of_mandates,list_votes,list_connection,'
         'list_connection_parent,candidate_family_name,candidate_first_name,'
-        'candidate_id,candidate_elected,candidate_votes\r\n'
+        'candidate_id,candidate_elected,canidate_party,candidate_votes\r\n'
         'Election,2015-03-02,proporz,1,0,,1,1,Town,3503,1013,428,2,16,18,410,'
-        '13,0,2037,Party,1,0,1,5,1,Muster,Peter,1,False,40'
+        '13,0,2037,Party,1,0,1,5,1,Muster,Peter,1,False,Party,40'
     )
 
     upload = client.get('/election/election/upload').follow()
@@ -1263,19 +1266,19 @@ def test_upload_election_temporary_results_majorz(election_day_app):
         HEADER_COLUMNS_INTERNAL,
         (
             'majorz,2015-01-01,majorz,7,,,2,11,Baar,1701,13567,40,0,0,0,40,18,'
-            '0,262,,,,0,,,Hegglin,Peter,1,False,36'
+            '0,262,,,,0,,,Hegglin,Peter,1,False,,36'
         ),
         (
             'majorz,2015-01-01,majorz,7,,,2,11,Baar,1701,13567,40,0,0,0,40,18,'
-            '0,262,,,,0,,,Hürlimann,Urs,2,False,25'
+            '0,262,,,,0,,,Hürlimann,Urs,2,False,,25'
         ),
         (
             'majorz,2015-01-01,majorz,7,,,2,11,Cham,1702,9620,41,0,1,1,40,6,0,'
-            '274,,,,0,,,Hegglin,Peter,1,False,34'
+            '274,,,,0,,,Hegglin,Peter,1,False,,34'
         ),
         (
             'majorz,2015-01-01,majorz,7,,,2,11,Cham,1702,9620,41,0,1,1,40,6,0,'
-            '274,,,,0,,,Hürlimann,Urs,2,False,28'
+            '274,,,,0,,,Hürlimann,Urs,2,False,,28'
         ),
     )).encode('utf-8')
     upload = client.get('/election/election/upload').follow()
@@ -1411,22 +1414,22 @@ def test_upload_election_temporary_results_proporz(election_day_app):
         (
             'election,2015-01-01,proporz,2,,,2,11,Baar,1701,14119,7462,77,196,'
             '273,7189,122,0,14256,ALG,1,0,1435,,,Lustenberger,Andreas,101,'
-            'False,948'
+            'False,,948'
         ),
         (
             'election,2015-01-01,proporz,2,,,2,11,Baar,1701,14119,7462,77,196,'
             '273,7189,122,0,14256,ALG,1,0,1435,,,Schriber-Neiger,Hanni,102,'
-            'False,208'
+            'False,,208'
         ),
         (
             'election,2015-01-01,proporz,2,,,2,11,Cham,1702,9926,4863,0,161,'
             '161,4702,50,0,9354,ALG,1,0,533,,,Lustenberger,Andreas,101,'
-            'False,290'
+            'False,,290'
         ),
         (
             'election,2015-01-01,proporz,2,,,2,11,Cham,1702,9926,4863,0,161,'
             '161,4702,50,0,9354,ALG,1,0,533,,,Schriber-Neiger,Hanni,102,'
-            'False,105'
+            'False,,105'
         ),
     )).encode('utf-8')
     upload = client.get('/election/election/upload').follow()
@@ -1552,6 +1555,7 @@ def test_upload_communal_election(election_day_app_kriens):
         'candidate_first_name',
         'candidate_id',
         'candidate_elected',
+        'candidate_party',
         'candidate_vote'
     ]
 
@@ -1561,19 +1565,19 @@ def test_upload_communal_election(election_day_app_kriens):
         ','.join(headers),
         (
             '3294,,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
-            'Koch,Patrick,1,False,1621'
+            'Koch,Patrick,1,False,,1621'
         ),
         (
             '3294,,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
-            'Konrad,Simon,2,False,1707'
+            'Konrad,Simon,2,False,,1707'
         ),
         (
             '3294,,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
-            'Faé,Franco,3,False,3176'
+            'Faé,Franco,3,False,,3176'
         ),
         (
             '3294,,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
-            'Vereinzelte,,4,False,82'
+            'Vereinzelte,,4,False,,82'
         ),
     )).encode('utf-8')
 
@@ -1629,6 +1633,7 @@ def test_upload_communal_election_districts(election_day_app_bern):
         'candidate_first_name',
         'candidate_id',
         'candidate_elected',
+        'candidate_party',
         'candidate_vote'
     ]
 
@@ -1638,75 +1643,75 @@ def test_upload_communal_election_districts(election_day_app_bern):
         ','.join(headers),
         (
             '12606,,6,6,1,Innere Stadt,15159,5522,265,503,0,0,,,,,,'
-            ',V1,N1,1,True,3596'
+            ',V1,N1,1,True,,3596'
         ),
         (
             '12606,,6,6,2,Länggasse/Felsenau,9399,3342,161,333,0,0,,,,,,'
-            ',V1,N1,1,True,2139'
+            ',V1,N1,1,True,,2139'
         ),
         (
             '12606,,6,6,3,Mattenhof/Weissenbühl,12599,4439,184,441,0,0,,,,,,'
-            ',V1,N1,1,True,2827'
+            ',V1,N1,1,True,,2827'
         ),
         (
             '12606,,6,6,4,Kirchenfeld/Schosshalde,18461,6487,289,624,0,0,,,,,,'
-            ',V1,N1,1,True,3647'
+            ',V1,N1,1,True,,3647'
         ),
         (
             '12606,,6,6,5,Breitenrain/Lorraine,13880,4985,205,466,0,0,,,,,,'
-            ',V1,N1,1,True,3192'
+            ',V1,N1,1,True,,3192'
         ),
         (
             '12606,,6,6,6,Bümpliz/Bethlehem,12999,4506,170,430,0,0,,,,,,'
-            ',V1,N1,1,True,2227'
+            ',V1,N1,1,True,,2227'
         ),
         (
             '12606,,6,6,1,Innere Stadt,15159,5522,265,503,0,0,,,,,,'
-            ',V2,N2,2,False,608'
+            ',V2,N2,2,False,,608'
         ),
         (
             '12606,,6,6,2,Länggasse/Felsenau,9399,3342,161,333,0,0,,,,,,'
-            ',V2,N2,2,False,352'
+            ',V2,N2,2,False,,352'
         ),
         (
             '12606,,6,6,3,Mattenhof/Weissenbühl,12599,4439,184,441,0,0,,,,,,'
-            ',V2,N2,2,False,466'
+            ',V2,N2,2,False,,466'
         ),
         (
             '12606,,6,6,4,Kirchenfeld/Schosshalde,18461,6487,289,624,0,0,,,,,,'
-            ',V2,N2,2,False,943'
+            ',V2,N2,2,False,,943'
         ),
         (
             '12606,,6,6,5,Breitenrain/Lorraine,13880,4985,205,466,0,0,,,,,,'
-            ',V2,N2,2,False,489'
+            ',V2,N2,2,False,,489'
         ),
         (
             '12606,,6,6,6,Bümpliz/Bethlehem,12999,4506,170,430,0,0,,,,,,'
-            ',V2,N2,2,False,489'
+            ',V2,N2,2,False,,489'
         ),
         (
             '12606,,6,6,1,Innere Stadt,15159,5522,265,503,0,0,,,,,,'
-            ',V3,N3,3,False,550'
+            ',V3,N3,3,False,,550'
         ),
         (
             '12606,,6,6,2,Länggasse/Felsenau,9399,3342,161,333,0,0,,,,,,'
-            ',V3,N3,3,False,357'
+            ',V3,N3,3,False,,357'
         ),
         (
             '12606,,6,6,3,Mattenhof/Weissenbühl,12599,4439,184,441,0,0,,,,,,'
-            ',V3,N3,3,False,521'
+            ',V3,N3,3,False,,521'
         ),
         (
             '12606,,6,6,4,Kirchenfeld/Schosshalde,18461,6487,289,624,0,0,,,,,,'
-            ',V3,N3,3,False,984'
+            ',V3,N3,3,False,,984'
         ),
         (
             '12606,,6,6,5,Breitenrain/Lorraine,13880,4985,205,466,0,0,,,,,,'
-            ',V3,N3,3,False,633'
+            ',V3,N3,3,False,,633'
         ),
         (
             '12606,,6,6,6,Bümpliz/Bethlehem,12999,4506,170,430,0,0,,,,,,'
-            ',V3,N3,3,False,1190'
+            ',V3,N3,3,False,,1190'
         ),
     )).encode('utf-8')
 
@@ -1819,15 +1824,16 @@ def test_upload_election_expats_majorz(election_day_app):
                 'candidate_first_name,'
                 'candidate_id,'
                 'candidate_elected,'
+                'candidate_party,'
                 'candidate_votes'
             ),
             (
                 'majorz,2015-01-01,majorz,7,,,1,12,Auslandschweizer,{},13567'
-                ',40,0,0,0,40,18,0,262,,,,0,,,Hegglin,Peter,1,False,36'
+                ',40,0,0,0,40,18,0,262,,,,0,,,Hegglin,Peter,1,False,,36'
             ).format(id_),
             (
                 'majorz,2015-01-01,majorz,7,,,1,12,Auslandschweizer,{},13567'
-                ',40,0,0,0,40,18,0,262,,,,0,,,Hürlimann,Urs,2,False,25'
+                ',40,0,0,0,40,18,0,262,,,,0,,,Hürlimann,Urs,2,False,,25'
             ).format(id_)
         )).encode('utf-8')
         upload = client.get('/election/election/upload').follow()
@@ -1905,7 +1911,7 @@ def test_upload_election_expats_proporz(election_day_app):
             (
                 'election,2015-01-01,proporz,2,,,1,12,Auslandschweizer,{},'
                 '14119,7462,77,196,273,7189,122,0,14256,ALG,1,0,1435,,,'
-                'Lustenberger,Andreas,101,False,948'
+                'Lustenberger,Andreas,101,False,,948'
             ).format(id_)
         )).encode('utf-8')
         upload = client.get('/election/election/upload').follow()

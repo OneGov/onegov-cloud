@@ -49,6 +49,7 @@ Name|Description
 `candidate_family_name`|Surname of the candidate.
 `candidate_first_name`|First name of the candidate.
 `candidate_elected`|True, if the candidate was elected.
+`candidate_party`|The name of the party.
 `candidate_votes`|Number of candidate votes in municipality.
 
 #### Panachage results

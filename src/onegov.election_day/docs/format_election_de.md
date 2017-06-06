@@ -48,6 +48,7 @@ Name|Beschreibung
 `candidate_family_name`|Nachnahme des Kandidierenden.
 `candidate_first_name`|Vorname des Kandidaten.
 `candidate_elected`|True, falls der Kandidierenden gewählt wurde.
+`candidate_party`|Der Name der Partei.
 `candidate_votes`|Anzahl Kandidierendenstimmen in der Gemeinde.
 
 #### Panaschierdaten

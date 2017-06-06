@@ -100,7 +100,8 @@ def view_election_json(self, request):
                 'family_name': candidate[0],
                 'first_name': candidate[1],
                 'elected': candidate[2],
-                'votes': candidate[3],
+                'party': candidate[3],
+                'votes': candidate[4],
             } for candidate in get_candidates_results(self, session)
         ]
 
@@ -110,9 +111,10 @@ def view_election_json(self, request):
                 'family_name': candidate[0],
                 'first_name': candidate[1],
                 'elected': candidate[2],
-                'votes': candidate[3],
-                'list_name': candidate[4],
-                'list_list_id': candidate[5]
+                'party': candidate[3],
+                'votes': candidate[4],
+                'list_name': candidate[5],
+                'list_list_id': candidate[6]
             } for candidate in get_candidates_results(self, session)
         ]
 

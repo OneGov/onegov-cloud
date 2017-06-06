@@ -38,6 +38,7 @@ HEADERS = [
     'candidate_id',
     'candidate_elected',
     'candidate_votes',
+    'candidate_party',
 ]
 
 
@@ -158,6 +159,7 @@ def parse_candidate(line, errors):
         family_name = line.candidate_family_name
         first_name = line.candidate_first_name
         elected = line.candidate_elected == 'True'
+        party = line.candidate_party
 
     except ValueError:
         errors.append(_("Invalid candidate values"))
@@ -167,7 +169,8 @@ def parse_candidate(line, errors):
             candidate_id=id,
             family_name=family_name,
             first_name=first_name,
-            elected=elected
+            elected=elected,
+            party=party
         )
 
 

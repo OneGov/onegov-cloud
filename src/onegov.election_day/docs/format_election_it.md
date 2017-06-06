@@ -47,6 +47,7 @@ Nome|Descrizione
 `candidate_family_name`|Cognome del candidato.
 `candidate_first_name`|Nome del candidato.
 `candidate_elected`|Vero, se il candidato è stato eletto.
+`candidate_party`|The name of the party.
 `candidate_votes`|Numero di voti per il candidato nel Comune.
 
 #### Panachage results

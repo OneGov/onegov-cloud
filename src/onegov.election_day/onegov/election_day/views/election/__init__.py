@@ -53,6 +53,7 @@ def get_candidates_results(election, session):
         Candidate.family_name,
         Candidate.first_name,
         Candidate.elected,
+        Candidate.party,
         Candidate.votes,
         List.name,
         List.list_id

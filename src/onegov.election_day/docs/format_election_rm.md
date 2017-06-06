@@ -48,6 +48,7 @@ Num|Descripziun
 `candidate_family_name`|Num da famiglia da la candidata u dal candidat.
 `candidate_first_name`|Prenum da la candidata u dal candidat.
 `candidate_elected`|True, sche la candidata u il candidat è vegnì elegì.
+`candidate_party`|The name of the party.
 `candidate_votes`|Dumber da vuschs da candidat en la vischnanca.
 
 #### Panachage results

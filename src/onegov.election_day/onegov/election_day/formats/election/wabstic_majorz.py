@@ -37,6 +37,7 @@ HEADERS_WM_KANDIDATEN = (
     'nachname',  # familiy name
     'vorname',  # first name
     'gewahlt',  # elected
+    'partei',  #
 )
 HEADERS_WM_KANDIDATENGDE = (
     'sortgeschaeft',  # provides the link to the election
@@ -278,6 +279,7 @@ def import_election_wabstic_majorz(
             family_name = line.nachname
             first_name = line.vorname
             elected = True if line.gewahlt == '1' else False
+            party = line.partei
         except ValueError:
             line_errors.append(_("Invalid candidate values"))
         else:
@@ -286,7 +288,8 @@ def import_election_wabstic_majorz(
                 candidate_id=candidate_id,
                 family_name=family_name,
                 first_name=first_name,
-                elected=elected
+                elected=elected,
+                party=party
             )
 
         if line_errors:

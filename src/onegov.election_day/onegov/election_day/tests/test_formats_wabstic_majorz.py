@@ -121,6 +121,7 @@ def test_import_wabstic_majorz_missing_headers(session):
                     'SortGeschaeft',
                     'Nachname',
                     'Gewahlt',
+                    'Partei',
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
@@ -241,6 +242,7 @@ def test_import_wabstic_majorz_invalid_values(session):
                     'Nachname',
                     'Vorname',
                     'Gewahlt',
+                    'Partei',
                 )),
                 ','.join((
                     '0',
@@ -248,6 +250,7 @@ def test_import_wabstic_majorz_invalid_values(session):
                     'xxx',  # Nachname
                     'xxx',  # Vorname
                     'xxx',  # Gewahlt
+                    'xxx',  # Partei
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
