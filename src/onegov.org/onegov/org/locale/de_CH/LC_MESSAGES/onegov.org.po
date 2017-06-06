@@ -152,7 +152,7 @@ msgid "This form can't be deleted."
 msgstr "Das Formular kann nicht gelöscht werden."
 
 msgid ""
-"The are submissions associated with the form. Those need to be removed first."
+"There are submissions associated with the form. Those need to be removed first."
 msgstr ""
 "Es existieren Eingaben die mit diesem Formular verknüpft sind. Löschen Sie "
 "diese Eingaben bevor Sie das Formular löschen."

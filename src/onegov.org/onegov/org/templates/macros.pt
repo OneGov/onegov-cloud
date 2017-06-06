@@ -482,7 +482,7 @@
                         <ul class="children" tal:condition="link.links"
                             data-sortable data-sortable-url="${layout.sortable_url_template}">
                             <li tal:repeat="child link.links" data-sortable-id="${request.is_manager and child.model.id}">
-                                <tal:block replace="structure child(request)" />
+                                <tal:block replace="structure child(layout)" />
                             </li>
                         </ul>
                     </tal:block>

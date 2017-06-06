@@ -6,7 +6,7 @@ import more.webassets
 
 from datetime import datetime
 from onegov.org import OrgApp
-from onegov.org.elements import Link
+from onegov.org.new_elements import Link
 from onegov.org.layout import (
     EventBaseLayout,
     DefaultLayout,
@@ -131,9 +131,9 @@ def test_page_layout_breadcrumbs(session):
     links = layout.breadcrumbs
     assert len(links) == 2
     assert links[0].text == 'Homepage'
-    assert links[0].url == 'http://nohost'
+    assert links[0].attrs['href'] == 'http://nohost'
     assert links[1].text == 'Grandma'
-    assert links[1].url == 'grandma'
+    assert links[1].attrs['href'] == 'grandma'
 
     layout = PageLayout(page.children[0], MockRequest())
     layout.homepage_url = 'http://nohost'
@@ -141,11 +141,11 @@ def test_page_layout_breadcrumbs(session):
     links = layout.breadcrumbs
     assert len(links) == 3
     assert links[0].text == 'Homepage'
-    assert links[0].url == 'http://nohost'
+    assert links[0].attrs['href'] == 'http://nohost'
     assert links[1].text == 'Grandma'
-    assert links[1].url == 'grandma'
+    assert links[1].attrs['href'] == 'grandma'
     assert links[2].text == 'Ma'
-    assert links[2].url == 'grandma/ma'
+    assert links[2].attrs['href'] == 'grandma/ma'
 
 
 def test_template_layout(postgres_dsn):

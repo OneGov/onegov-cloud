@@ -13,7 +13,8 @@ from onegov.form import FormCollection, FormSubmissionFile, render_field
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
-from onegov.org.elements import DeleteLink, Link, LinkGroup
+from onegov.org.new_elements import Link, LinkGroup
+from onegov.org.new_elements import Block, Confirm, Intercooler
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models import (
     ExportCollection,
@@ -566,27 +567,43 @@ class FormSubmissionLayout(DefaultLayout):
         edit_link = Link(
             text=_("Edit"),
             url=self.request.link(self.form, name='bearbeiten'),
-            classes=('edit-link', )
+            attrs={'class': 'edit-link'}
         )
 
         if self.form.has_submissions(with_state='complete'):
-            delete_link = DeleteLink(
+            delete_link = Link(
                 text=_("Delete"),
                 url=self.request.link(self.form),
-                confirm=_("This form can't be deleted."),
-                extra_information=_(
-                    "The are submissions associated with the form. "
-                    "Those need to be removed first."
+                attrs={'class': 'delete-link'},
+                traits=(
+                    Block(
+                        _("This form can't be deleted."),
+                        _(
+                            "There are submissions associated with the form. "
+                            "Those need to be removed first."
+                        )
+                    )
                 )
             )
 
         else:
-            delete_link = DeleteLink(
+            delete_link = Link(
                 text=_("Delete"),
-                url=self.request.link(self.form),
-                confirm=_("Do you really want to delete this form?"),
-                yes_button_text=_("Delete form"),
-                redirect_after=self.request.link(collection)
+                url=self.csrf_protected_url(
+                    self.request.link(self.form)
+                ),
+                attrs={'class': 'delete-link'},
+                traits=(
+                    Confirm(
+                        _("Do you really want to delete this form?"),
+                        _("This cannot be undone."),
+                        _("Delete form")
+                    ),
+                    Intercooler(
+                        request_method='DELETE',
+                        redirect_after=self.request.link(collection)
+                    )
+                )
             )
 
         return [
@@ -616,7 +633,7 @@ class FormCollectionLayout(DefaultLayout):
                                 self.model,
                                 name='neu'
                             ),
-                            classes=('new-form', )
+                            attrs={'class': 'new-form'}
                         )
                     ]
                 ),
@@ -645,7 +662,7 @@ class PersonCollectionLayout(DefaultLayout):
                                 self.model,
                                 name='neu'
                             ),
-                            classes=('new-person', )
+                            attrs={'class': 'new-person'}
                         )
                     ]
                 ),
@@ -673,15 +690,25 @@ class PersonLayout(DefaultLayout):
                 Link(
                     text=_("Edit"),
                     url=self.request.link(self.model, 'bearbeiten'),
-                    classes=('edit-link', )
+                    attrs={'class': 'edit-link'}
                 ),
-                DeleteLink(
+                Link(
                     text=_("Delete"),
-                    url=self.request.link(self.model),
-                    confirm=_(
-                        "Do you really want to delete this person?"),
-                    yes_button_text=_("Delete person"),
-                    redirect_after=self.request.link(self.collection)
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _("Do you really want to delete this person?"),
+                            _("This cannot be undone."),
+                            _("Delete person")
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(self.collection)
+                        )
+                    )
                 )
             ]
 
@@ -724,21 +751,21 @@ class TicketLayout(DefaultLayout):
                 links.append(Link(
                     text=_("Accept ticket"),
                     url=self.request.link(self.model, 'accept'),
-                    classes=('ticket-button', 'ticket-accept'),
+                    attrs={'class': ('ticket-button', 'ticket-accept')}
                 ))
 
             elif self.model.state == 'pending':
                 links.append(Link(
                     text=_("Close ticket"),
                     url=self.request.link(self.model, 'close'),
-                    classes=('ticket-button', 'ticket-close'),
+                    attrs={'class': ('ticket-button', 'ticket-close')}
                 ))
 
             elif self.model.state == 'closed':
                 links.append(Link(
                     text=_("Reopen ticket"),
                     url=self.request.link(self.model, 'reopen'),
-                    classes=('ticket-button', 'ticket-reopen'),
+                    attrs={'class': ('ticket-button', 'ticket-reopen')}
                 ))
 
             return links
@@ -760,7 +787,7 @@ class ResourcesLayout(DefaultLayout):
                 Link(
                     text=_("Recipients"),
                     url=self.request.class_link(ResourceRecipientCollection),
-                    classes=('manage-recipients', )
+                    attrs={'class': 'manage-recipients'}
                 ),
                 LinkGroup(
                     title=_("Add"),
@@ -771,7 +798,7 @@ class ResourcesLayout(DefaultLayout):
                                 self.model,
                                 name='neuer-raum'
                             ),
-                            classes=('new-room', )
+                            attrs={'class': 'new-room'}
                         ),
                         Link(
                             text=_("Daypass"),
@@ -779,7 +806,7 @@ class ResourcesLayout(DefaultLayout):
                                 self.model,
                                 name='neue-tageskarte'
                             ),
-                            classes=('new-daypass', )
+                            attrs={'class': 'new-daypass'}
                         )
                     ]
                 ),
@@ -815,7 +842,7 @@ class ResourceRecipientsLayout(DefaultLayout):
                                 self.model,
                                 name='neuer-empfaenger'
                             ),
-                            classes=('new-recipient', )
+                            attrs={'class': 'new-recipient'}
                         ),
                     ]
                 ),
@@ -869,45 +896,61 @@ class ResourceLayout(DefaultLayout):
     def editbar_links(self):
         if self.request.is_manager:
             if self.model.deletable:
-                delete_link = DeleteLink(
+                delete_link = Link(
                     text=_("Delete"),
-                    url=self.request.link(self.model),
-                    confirm=_("Do you really want to delete this resource?"),
-                    yes_button_text=_("Delete resource"),
-                    redirect_after=self.request.link(self.collection)
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _("Do you really want to delete this resource?"),
+                            _("This cannot be undone."),
+                            _("Delete resource")
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(self.collection)
+                        )
+                    )
                 )
 
             else:
-                delete_link = DeleteLink(
+                delete_link = Link(
                     text=_("Delete"),
                     url=self.request.link(self.model),
-                    confirm=_("This resource can't be deleted."),
-                    extra_information=_(
-                        "There are existing reservations associated "
-                        "with this resource"
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Block(
+                            _("This resource can't be deleted"),
+                            _(
+                                "There are existing reservations associated "
+                                "with this resource"
+                            )
+                        )
                     )
                 )
             return [
                 Link(
                     text=_("Edit"),
                     url=self.request.link(self.model, 'bearbeiten'),
-                    classes=('edit-link', )
+                    attrs={'class': 'edit-link'}
                 ),
                 delete_link,
                 Link(
                     text=_("Clean up"),
                     url=self.request.link(self.model, 'cleanup'),
-                    classes=('cleanup-link', 'calendar-dependent')
+                    attrs={'class': ('cleanup-link', 'calendar-dependent')}
                 ),
                 Link(
                     text=_("Occupancy"),
                     url=self.request.link(self.model, 'belegung'),
-                    classes=('occupancy-link', 'calendar-dependent')
+                    attrs={'class': ('occupancy-link', 'calendar-dependent')}
                 ),
                 Link(
                     text=_("Export"),
                     url=self.request.link(self.model, 'export'),
-                    classes=('export-link', 'calendar-dependent')
+                    attrs={'class': ('export-link', 'calendar-dependent')}
                 )
             ]
 
@@ -938,23 +981,38 @@ class AllocationEditFormLayout(DefaultLayout):
     def editbar_links(self):
         if self.request.is_manager:
             if self.model.availability == 100.0:
-                yield DeleteLink(
+                yield Link(
                     _("Delete"),
-                    self.request.link(self.model),
-                    confirm=_("Do you really want to delete this allocation?"),
-                    yes_button_text=_("Delete allocation"),
-                    redirect_after=self.request.link(self.collection)
+                    self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _("Do you really want to delete this allocation?"),
+                            _("This cannot be undone."),
+                            _("Delete allocation")
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(self.collection)
+                        )
+                    )
                 )
             else:
-                yield DeleteLink(
+                yield Link(
                     text=_("Delete"),
                     url=self.request.link(self.model),
-                    confirm=_("This resource can't be deleted."),
-                    extra_information=_(
-                        "There are existing reservations associated "
-                        "with this resource"
-                    ),
-                    redirect_after=self.request.link(self.collection)
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Block(
+                            _("This resource can't be deleted."),
+                            _(
+                                "There are existing reservations associated "
+                                "with this resource"
+                            )
+                        )
+                    )
                 )
 
 
@@ -1006,7 +1064,7 @@ class OccurrencesLayout(EventBaseLayout):
                 Link(
                     text=_("Export"),
                     url=self.request.link(self.model, 'export'),
-                    classes=('export-link', )
+                    attrs={'class': 'export-link'}
                 ),
             )
 
@@ -1034,24 +1092,41 @@ class OccurrenceLayout(EventBaseLayout):
                     self.request.link(self.model.event, 'bearbeiten'),
                     self.request.link(self.model.event)
                 ),
-                classes=('edit-link', )
+                attrs={'class': 'edit-link'}
             )
 
             if self.event_deletable(self.model.event):
-                delete_link = DeleteLink(
+                delete_link = Link(
                     text=_("Delete"),
-                    url=self.request.link(self.model.event),
-                    confirm=_("Do you really want to delete this event?"),
-                    yes_button_text=_("Delete event"),
-                    redirect_after=self.events_url
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model.event)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _("Do you really want to delete this event?"),
+                            _("This cannot be undone."),
+                            _("Delete event")
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.events_url
+                        )
+                    )
                 )
             else:
-                delete_link = DeleteLink(
+                delete_link = Link(
                     text=_("Delete"),
                     url=self.request.link(self.model.event),
-                    confirm=_("This event can't be deleted."),
-                    extra_information=_(
-                        "To remove this event, go to the ticket and reject it."
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Block(
+                            _("This event can't be deleted."),
+                            _(
+                                "To remove this event, go to the ticket "
+                                "and reject it."
+                            )
+                        )
                     )
                 )
 
@@ -1074,23 +1149,40 @@ class EventLayout(EventBaseLayout):
             edit_link = Link(
                 text=_("Edit"),
                 url=self.request.link(self.model, 'bearbeiten'),
-                classes=('edit-link', )
+                attrs={'class': 'edit-link'}
             )
             if self.event_deletable(self.model):
-                delete_link = DeleteLink(
+                delete_link = Link(
                     text=_("Delete"),
-                    url=self.request.link(self.model),
-                    confirm=_("Do you really want to delete this event?"),
-                    yes_button_text=_("Delete event"),
-                    redirect_after=self.events_url
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _("Do you really want to delete this event?"),
+                            _("This cannot be undone."),
+                            _("Delete event")
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.events_url
+                        )
+                    )
                 )
             else:
-                delete_link = DeleteLink(
+                delete_link = Link(
                     text=_("Delete"),
                     url=self.request.link(self.model),
-                    confirm=_("This event can't be deleted."),
-                    extra_information=_(
-                        "To remove this event, go to the ticket and reject it."
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Block(
+                            _("This event can't be deleted."),
+                            _(
+                                "To remove this event, go to the ticket "
+                                "and reject it."
+                            )
+                        )
                     )
                 )
 
@@ -1142,7 +1234,7 @@ class NewsletterLayout(DefaultLayout):
                 Link(
                     text=_("Subscribers"),
                     url=self.request.link(self.recipients),
-                    classes=('manage-subscribers', )
+                    attrs={'class': 'manage-subscribers'}
                 ),
                 LinkGroup(
                     title=_("Add"),
@@ -1153,7 +1245,7 @@ class NewsletterLayout(DefaultLayout):
                                 NewsletterCollection(self.app.session()),
                                 name='neu'
                             ),
-                            classes=('new-newsletter', )
+                            attrs={'class': 'new-newsletter'}
                         ),
                     ]
                 ),
@@ -1163,22 +1255,32 @@ class NewsletterLayout(DefaultLayout):
                 Link(
                     text=_("Send"),
                     url=self.request.link(self.model, 'senden'),
-                    classes=('send-link', )
+                    attrs={'class': 'send-link'}
                 ),
                 Link(
                     text=_("Edit"),
                     url=self.request.link(self.model, 'bearbeiten'),
-                    classes=('edit-link', )
+                    attrs={'class': 'edit-link'}
                 ),
-                DeleteLink(
+                Link(
                     text=_("Delete"),
-                    url=self.request.link(self.model),
-                    confirm=_(
-                        'Do you really want to delete "{}"?'.format(
-                            self.model.title
-                        )),
-                    yes_button_text=_("Delete newsletter"),
-                    redirect_after=self.request.link(self.collection)
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _('Do you really want to delete "{}"?'.format(
+                                self.model.title
+                            )),
+                            _("This cannot be undone."),
+                            _("Delete newsletter"),
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(self.collection)
+                        )
+                    )
                 )
             ]
 
@@ -1212,7 +1314,7 @@ class ImageSetCollectionLayout(DefaultLayout):
                 Link(
                     text=_("Manage images"),
                     url=self.request.link(ImageFileCollection(self.app)),
-                    classes=('upload', )
+                    attrs={'class': 'upload'}
                 ),
                 LinkGroup(
                     title=_("Add"),
@@ -1223,7 +1325,7 @@ class ImageSetCollectionLayout(DefaultLayout):
                                 self.model,
                                 name='neu'
                             ),
-                            classes=('new-photo-album', )
+                            attrs={'class': 'new-photo-album'}
                         )
                     ]
                 ),
@@ -1255,7 +1357,7 @@ class ImageSetLayout(DefaultLayout):
                 Link(
                     text=_("Choose images"),
                     url=self.request.link(self.model, 'auswahl'),
-                    classes=('select', )
+                    attrs={'class': 'select'}
                 ),
                 Link(
                     text=_("Edit"),
@@ -1263,17 +1365,27 @@ class ImageSetLayout(DefaultLayout):
                         self.model,
                         name='bearbeiten'
                     ),
-                    classes=('edit-link', )
+                    attrs={'class': 'edit-link'}
                 ),
-                DeleteLink(
+                Link(
                     text=_("Delete"),
-                    url=self.request.link(self.model),
-                    confirm=_(
-                        'Do you really want to delete "{}"?'.format(
-                            self.model.title
-                        )),
-                    yes_button_text=_("Delete photo album"),
-                    redirect_after=self.request.link(self.collection)
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _('Do you really want to delete "{}"?'.format(
+                                self.model.title
+                            )),
+                            _("This cannot be undone."),
+                            _("Delete photo album")
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(self.collection)
+                        )
+                    )
                 )
             ]
 
@@ -1299,7 +1411,7 @@ class UserManagementLayout(DefaultLayout):
                             url=self.request.class_link(
                                 UserCollection, name='neu'
                             ),
-                            classes=('new-user', )
+                            attrs={'class': 'new-user'}
                         ),
                     )
                 )
@@ -1334,7 +1446,7 @@ class PaymentProviderLayout(DefaultLayout):
                 Link(
                     text=_("Payments"),
                     url=self.request.class_link(PaymentCollection),
-                    classes=('payments', )
+                    attrs={'class': 'payments'}
                 ),
                 LinkGroup(
                     title=_("Add"),
@@ -1345,7 +1457,7 @@ class PaymentProviderLayout(DefaultLayout):
                                 PaymentProviderCollection,
                                 name='stripe-connect-oauth'
                             ),
-                            classes=('new-stripe-connect', )
+                            attrs={'class': 'new-stripe-connect'}
                         ),
                     )
                 )
@@ -1372,7 +1484,7 @@ class PaymentCollectionLayout(DefaultLayout):
                 Link(
                     text=_("Payment Provider"),
                     url=self.request.class_link(PaymentProviderCollection),
-                    classes=('payment-provider', )
+                    attrs={'class': 'payment-provider'}
                 )
             )
 
@@ -1380,7 +1492,7 @@ class PaymentCollectionLayout(DefaultLayout):
             Link(
                 text=_("Synchronise"),
                 url=self.request.class_link(PaymentCollection, name='sync'),
-                classes=('sync', )
+                attrs={'class': 'sync'}
             )
         )
 
