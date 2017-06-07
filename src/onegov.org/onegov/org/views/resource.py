@@ -5,11 +5,9 @@ from collections import OrderedDict, namedtuple
 from datetime import datetime, timedelta
 from isodate import parse_date, ISO8601Error
 from itertools import groupby
-from libres.db.models import Reservation
 from onegov.core.security import Public, Private
 from onegov.form import FormSubmission
-from onegov.reservation import ResourceCollection
-from onegov.reservation.models import Resource
+from onegov.reservation import ResourceCollection, Resource, Reservation
 from onegov.org import _, OrgApp, utils
 from onegov.org.elements import Link
 from onegov.org.forms import (

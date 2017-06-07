@@ -1,7 +1,6 @@
 """ Contains the paths to the different models served by onegov.org. """
 
 from datetime import date
-from libres.db.models import Allocation, Reservation
 from onegov.core.converters import extended_date_converter
 from onegov.event import (
     Event,
@@ -16,8 +15,6 @@ from onegov.form import (
     CompleteFormSubmission,
     PendingFormSubmission
 )
-from onegov.reservation import ResourceCollection
-from onegov.reservation.models import Resource
 from onegov.newsletter import (
     Newsletter,
     NewsletterCollection,
@@ -55,6 +52,10 @@ from onegov.page import PageCollection
 from onegov.pay import PaymentProvider, Payment, PaymentCollection
 from onegov.pay import PaymentProviderCollection
 from onegov.people import Person, PersonCollection
+from onegov.reservation import Allocation
+from onegov.reservation import Reservation
+from onegov.reservation import Resource
+from onegov.reservation import ResourceCollection
 from onegov.ticket import Ticket, TicketCollection
 from onegov.user import Auth, User, UserCollection
 from webob import exc

@@ -8,12 +8,11 @@ import transaction
 
 from contextlib import contextmanager
 from datetime import datetime, date, timedelta
-from libres.db.models import Reservation
 from libres.modules.errors import AffectedReservationError
 from lxml.html import document_fromstring
 from onegov.core.utils import Bunch
 from onegov.form import FormCollection, FormSubmission
-from onegov.reservation import ResourceCollection
+from onegov.reservation import ResourceCollection, Reservation
 from onegov.newsletter import RecipientCollection
 from onegov.org.testing import Client
 from onegov.org.testing import decode_map_value

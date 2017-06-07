@@ -1,10 +1,9 @@
 from cached_property import cached_property
-from libres.db.models import Allocation, Reservation
 from onegov.core import utils
 from onegov.core.templates import render_macro
 from onegov.event import EventCollection
 from onegov.form import FormSubmissionCollection
-from onegov.reservation import Resource
+from onegov.reservation import Allocation, Resource, Reservation
 from onegov.org import _
 from onegov.org.new_elements import Link, LinkGroup, Confirm, Intercooler
 from onegov.org.layout import DefaultLayout, EventLayout

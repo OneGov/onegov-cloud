@@ -4,11 +4,10 @@ import sedate
 import transaction
 
 from datetime import time
-from libres.db.models import Allocation, Reservation
 from libres.modules.errors import LibresError
 from onegov.core.security import Public, Private
 from onegov.form import FormCollection, merge_forms
-from onegov.reservation import Resource
+from onegov.reservation import Allocation, Reservation, Resource
 from onegov.org import utils
 from onegov.org.elements import Link
 from onegov.org.forms import ReservationForm

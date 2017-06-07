@@ -4,7 +4,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from onegov.core.upgrade import upgrade_task
 from onegov.form import FormDefinition
-from onegov.reservation.models import Resource
+from onegov.reservation import Resource
 from onegov.org.models import Organisation, Topic, News
 from onegov.org.utils import annotate_html
 

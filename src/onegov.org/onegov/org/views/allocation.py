@@ -1,9 +1,8 @@
 import morepath
 
-from libres.db.models import Allocation
 from libres.modules.errors import LibresError
 from onegov.core.security import Public, Private
-from onegov.reservation import Resource, ResourceCollection
+from onegov.reservation import Allocation, Resource, ResourceCollection
 from onegov.org import OrgApp, utils, _
 from onegov.org.elements import Link
 from onegov.org.forms import (
