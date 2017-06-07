@@ -7,6 +7,9 @@ Changelog
 - Makes the footer more visually more distinguishable from the content.
   [msom]
 
+- Fixes failing upgrade steps.
+  [msom]
+
 1.11.0 (2017-06-06)
 ~~~~~~~~~~~~~~~~~~~
 
