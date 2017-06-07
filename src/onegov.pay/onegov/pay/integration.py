@@ -1,6 +1,9 @@
 from more.webassets import WebassetsApp
 from onegov.core.orm import orm_cached
+from onegov.pay import log
 from onegov.pay import PaymentProvider
+from onegov.pay.errors import CARD_ERRORS
+from onegov.pay.models.payment import ManualPayment
 
 
 class PayApp(WebassetsApp):
@@ -47,3 +50,43 @@ def get_js_path():
 @PayApp.webasset('pay')
 def get_pay_assets():
     yield 'stripe.js'
+
+
+def process_payment(method, price, provider=None, token=None):
+        """ Processes a payment using various methods, returning the processed
+        payment or None.
+
+        Available methods:
+
+            'free': Payment may be done manually or by credit card
+            'cc': Payment must be done by credit card
+            'manual': Payment must be done manually
+
+        """
+
+        assert method in ('free', 'cc', 'manual') and price.amount > 0
+
+        if method == 'free':
+            method = token and 'cc' or 'manual'
+
+        if method == 'manual':
+            return ManualPayment(amount=price.amount, currency=price.currency)
+
+        if method == 'cc' and token:
+            try:
+                return provider.charge(
+                    amount=price.amount,
+                    currency=price.currency,
+                    token=token
+                )
+            except CARD_ERRORS:
+                log.exception(
+                    "Processing {} {} through {} with token {} failed".format(
+                        price.amount,
+                        price.currency,
+                        provider.title,
+                        token
+                    )
+                )
+
+        return None

@@ -7,7 +7,7 @@ from onegov.pay.models import ManualPayment
 from onegov.pay.models import Payable, Payment, PaymentProvider
 from onegov.pay.collections import PaymentCollection, PayableCollection
 from onegov.pay.collections import PaymentProviderCollection
-from onegov.pay.integration import PayApp
+from onegov.pay.integration import PayApp, process_payment
 
 
 __all__ = (
@@ -20,5 +20,6 @@ __all__ = (
     'Payment',
     'PaymentCollection',
     'PaymentProvider',
-    'PaymentProviderCollection'
+    'PaymentProviderCollection',
+    'process_payment'
 )
