@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.40.5 (2017-06-07)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a data property function.
   [href]
