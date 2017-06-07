@@ -187,14 +187,15 @@ def add_status_columns(context):
         )
 
 
-@upgrade_task('Add party to candidate')
+@upgrade_task('Add party to candidate', always_run=True)
 def add_candidate_party_column(context):
-    table = 'candidates' if context.has_table('candidates') else 'candiates'
-    if not context.has_column(table, 'party'):
-        context.operations.add_column(
-            table,
-            Column('party', Text, nullable=True)
-        )
+    for table in ['candidates', 'candiates']:
+        if context.has_table(table):
+            if not context.has_column(table, 'party'):
+                context.operations.add_column(
+                    table,
+                    Column('party', Text, nullable=True)
+                )
 
 
 @upgrade_task('Rename candidates tables')
