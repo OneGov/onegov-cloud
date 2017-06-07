@@ -201,8 +201,8 @@ def add_candidate_party_column(context):
 @upgrade_task('Rename candidates tables')
 def rename_candidates_tables(context):
     for old_name, new_name in (
-        ('candiates', 'candidates'),
         ('candiate_results', 'candidate_results'),
+        ('candiates', 'candidates'),
     ):
         if context.has_table(old_name):
             if context.has_table(new_name):

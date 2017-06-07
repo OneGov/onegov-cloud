@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes upgrade step.
+  [msom]
+
 1.6.2 (2017-06-07)
 ~~~~~~~~~~~~~~~~~~~
 
