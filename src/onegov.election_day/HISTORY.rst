@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes failing upgrade steps.
+  [msom]
+
 1.11.2 (2017-06-07)
 ~~~~~~~~~~~~~~~~~~~
 
