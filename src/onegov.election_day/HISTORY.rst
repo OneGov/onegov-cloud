@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes grouped bar chart.
+  [msom]
+
 1.11.3 (2017-06-07)
 ~~~~~~~~~~~~~~~~~~~
 

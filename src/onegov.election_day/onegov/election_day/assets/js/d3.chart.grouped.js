@@ -196,7 +196,7 @@
                             return (scale.simple && !d.active) ? 'hidden' : 'visible';
                         });
                     bar.front.append('rect')
-                        .attr('width', options.barInnerWidth - 1)
+                        .attr('width', options.barInnerWidth)
                         .attr('height', function(d) {
                             return height - options.axisHeight - scale.y.front(d.value.front) + 1;
                         })
