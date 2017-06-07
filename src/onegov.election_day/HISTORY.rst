@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.11.3 (2017-06-07)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes failing upgrade steps.
   [msom]
