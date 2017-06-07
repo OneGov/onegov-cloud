@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.11.1 (2017-06-07)
+~~~~~~~~~~~~~~~~~~~
 
 - Improves the status callouts.
   [msom]
