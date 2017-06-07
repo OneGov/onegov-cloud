@@ -32,7 +32,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'libres>=0.1.2',
+        'libres>=0.3.1',
         'onegov.core>=0.16.0',
         'onegov.form'
     ],

@@ -39,3 +39,15 @@ def add_resource_group_field(context):
         context.operations.add_column(
             'resources', Column('group', Text, nullable=True)
         )
+
+
+@upgrade_task('Add reservations/allocations type field')
+def add_reservations_allocations_type_field(context):
+
+    if run_upgrades(context):
+        context.operations.add_column(
+            'reservations', Column('type', Text, nullable=True)
+        )
+        context.operations.add_column(
+            'allocations', Column('type', Text, nullable=True)
+        )
