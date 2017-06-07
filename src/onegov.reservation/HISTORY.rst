@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.1 (2017-06-07)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds support for libres 0.3.1.
   [href]
 
