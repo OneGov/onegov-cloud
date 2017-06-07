@@ -2,6 +2,7 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from libres.db.models import Allocation, Reservation
 from onegov.core.upgrade import upgrade_task
 from onegov.reservation import LibresIntegration
 from sqlalchemy import Column, Text
@@ -51,3 +52,14 @@ def add_reservations_allocations_type_field(context):
         context.operations.add_column(
             'allocations', Column('type', Text, nullable=True)
         )
+
+
+@upgrade_task('Make reservations/allocations payable')
+def make_reservations_allocations_payable(context):
+
+    if run_upgrades(context):
+        for reservation in context.session.query(Reservation):
+            reservation.type = 'payable'
+
+        for allocation in context.session.query(Allocation):
+            allocation.type = 'priced'

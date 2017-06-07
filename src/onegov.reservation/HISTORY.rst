@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a custom allocation/reservation class.
+  [href]
+
 0.4.1 (2017-06-07)
 ~~~~~~~~~~~~~~~~~~~
 

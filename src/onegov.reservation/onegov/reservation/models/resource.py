@@ -5,6 +5,8 @@ from onegov.core.orm import ModelBase
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.form import parse_form
+from onegov.reservation.models.priced_allocation import PricedAllocation
+from onegov.reservation.models.payable_reservation import PayableReservation
 from sqlalchemy import Column, Text
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -93,7 +95,11 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
         assert self.id, "the id needs to be set"
         assert self.timezone, "the timezone needs to be set"
 
-        return new_scheduler(libres_context, self.id, self.timezone)
+        return new_scheduler(
+            libres_context, self.id, self.timezone,
+            allocation_cls=PricedAllocation,
+            reservation_cls=PayableReservation
+        )
 
     @property
     def scheduler(self):
