@@ -169,7 +169,8 @@ def handle_reservation_form(self, request, form):
 
     """
     reservations_query = self.bound_reservations(request)
-    reservations = reservations_query.all()
+    reservations = tuple(reservations_query)
+
     assert_access_only_if_there_are_reservations(reservations)
 
     # all reservations share a single token
@@ -181,10 +182,10 @@ def handle_reservation_form(self, request, form):
 
     # update the data if the form is submitted (even if invalid)
     if request.POST:
+
         # update the e-mail data
-        reservations_query.order_by(False).update(
-            {Reservation.email: form.email.data}
-        )
+        for reservation in reservations:
+            reservation.email = form.email.data
 
         # while we re at it, remove all expired sessions
         self.remove_expired_reservation_sessions()
