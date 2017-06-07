@@ -3,6 +3,7 @@ import weakref
 
 from collections import OrderedDict, namedtuple
 from decimal import Decimal
+from functools import total_ordering
 from itertools import groupby
 from onegov.form import utils
 from operator import itemgetter
@@ -581,8 +582,26 @@ class FieldDependency(object):
         return {'data-depends-on': value}
 
 
-# A single price
-Price = namedtuple('Price', ('amount', 'currency'))
+@total_ordering
+class Price(namedtuple('PriceBase', ('amount', 'currency'))):
+    """ A single price. """
+
+    def __new__(cls, amount, currency):
+        return super().__new__(cls, Decimal(amount), currency)
+
+    def __eq__(self, other):
+        return self.amount == other.amount and self.currency == other.currency
+
+    def __lt__(self, other):
+        return self.amount < other.amount
+
+    def __add__(self, other):
+        assert self.currency == other.currency
+        return self.__class__(self.amount + other.amount, self.currency)
+
+    def __sub__(self, other):
+        assert self.currency == other.currency
+        return self.__class__(self.amount - other.amount, self.currency)
 
 
 class Pricing(object):
