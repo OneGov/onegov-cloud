@@ -2,11 +2,13 @@ from libres import new_scheduler
 from libres.db.models import Allocation
 from libres.db.models.base import ORMBase
 from onegov.core.orm import ModelBase
+from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.form import parse_form
-from onegov.reservation.models.priced_allocation import PricedAllocation
+from onegov.pay import process_payment
 from onegov.reservation.models.payable_reservation import PayableReservation
+from onegov.reservation.models.priced_allocation import PricedAllocation
 from sqlalchemy import Column, Text
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -55,6 +57,9 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
     #: subclasses. See `<http://docs.sqlalchemy.org/en/improve_toc/
     #: orm/extensions/declarative/inheritance.html>`_.
     type = Column(Text, nullable=True)
+
+    #: the payment method
+    payment_method = content_property('payment_method')
 
     __mapper_args__ = {
         "polymorphic_on": 'type'
@@ -117,3 +122,24 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
             return None
 
         return parse_form(self.definition)
+
+    def price_of_reservation(self, token):
+        return sum(
+            r.price for r in
+            self.scheduler.queries.reservations_by_token(token)
+        )
+
+    def process_payment(self, reservation_token=None,
+                        provider=None, payment_token=None, extra=None):
+        """ Processes the payment for the given reservation token. """
+
+        price = self.price_of_reservation(reservation_token)
+
+        if extra:
+            price += extra
+
+        if price and price.amount > 0:
+            return process_payment(
+                self.payment_method, price, provider, payment_token)
+
+        return True
