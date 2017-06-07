@@ -489,7 +489,7 @@ def test_upload_election_wabsti_majorz(election_day_app_sg, tar_file):
     assert all((expected in results for expected in (
         "47.79 %", "304'850", "145'694"
     )))
-    assert "Noch nicht ausgezählt" in results
+    assert "Zwischenergebnisse" in results
 
     results = client.get('/election/election/statistics')
     assert all((expected in results for expected in (
@@ -517,7 +517,7 @@ def test_upload_election_wabsti_majorz(election_day_app_sg, tar_file):
     assert all((expected in results for expected in (
         "1 von 1", "304'850", "47.79 %", "85 von 85"
     )))
-    assert "Noch nicht ausgezählt" not in results
+    assert "Zwischenergebnisse" not in results
 
     results = client.get('/election/election/statistics')
     assert all((expected in results for expected in (
@@ -542,7 +542,7 @@ def test_upload_election_wabsti_majorz(election_day_app_sg, tar_file):
     assert all((expected in results for expected in (
         "1 von 1", "304'850", "47.79 %", "85 von 85"
     )))
-    assert "Noch nicht ausgezählt" not in results
+    assert "Zwischenergebnisse" not in results
 
     results = client.get('/election/election/statistics')
     assert all((expected in results for expected in (
@@ -743,7 +743,7 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
     assert all((expected in results for expected in (
         "3'240", "10'174", "17'034"
     )))
-    assert "Noch nicht ausgezählt" in results
+    assert "Zwischenergebnisse" in results
     assert archive.query().one().progress == (11, 11)
 
     upload = client.get('/election/election/upload').follow()
@@ -760,7 +760,7 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
     assert all((expected in results for expected in (
         "11 von 11", "74'803", "40'200", "53.74 %"
     )))
-    assert "Noch nicht ausgezählt" not in results
+    assert "Zwischenergebnisse" not in results
 
     results = client.get('/election/election/statistics')
     assert all((expected in results for expected in (
@@ -795,7 +795,7 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
     assert all((expected in results for expected in (
         "11 von 11", "3 von 3", "74'803", "40'200", "53.74 %"
     )))
-    assert "Noch nicht ausgezählt" not in results
+    assert "Zwischenergebnisse" not in results
 
     results = client.get('/election/election/statistics')
     assert all((expected in results for expected in (
@@ -827,7 +827,7 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
     assert all((expected in results for expected in (
         "11 von 11", "3 von 3", "74'803", "40'200", "53.74 %"
     )))
-    assert "Noch nicht ausgezählt" not in results
+    assert "Zwischenergebnisse" not in results
 
     results = client.get('/election/election/statistics')
     assert all((expected in results for expected in (
