@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a data property function.
+  [href]
+
 - Adds the ability to override the csrf salt.
   [href]
 

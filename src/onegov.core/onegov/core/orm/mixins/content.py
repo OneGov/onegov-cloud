@@ -76,5 +76,6 @@ def dictionary_based_property_factory(attribute):
     return dictionary_based_property
 
 
-meta_property = dictionary_based_property_factory('meta')
 content_property = dictionary_based_property_factory('content')
+data_property = dictionary_based_property_factory('data')
+meta_property = dictionary_based_property_factory('meta')
