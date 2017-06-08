@@ -589,6 +589,9 @@ class Price(namedtuple('PriceBase', ('amount', 'currency'))):
     def __new__(cls, amount, currency):
         return super().__new__(cls, Decimal(amount), currency)
 
+    def __bool__(self):
+        return self.amount and True or False
+
     def __lt__(self, other):
         return self.amount < other.amount
 
