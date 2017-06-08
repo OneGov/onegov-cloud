@@ -5,6 +5,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 from libres.db.models import Allocation, Reservation
 from onegov.core.upgrade import upgrade_task
 from onegov.reservation import LibresIntegration
+from onegov.reservation import Resource
 from sqlalchemy import Column, Text
 
 
@@ -63,3 +64,15 @@ def make_reservations_allocations_payable(context):
 
         for allocation in context.session.query(Allocation):
             allocation.type = 'custom'
+
+
+@upgrade_task('Set defaults on existing resources')
+def set_defaults_on_existing_reservation_resourcd_objects(context):
+
+    if run_upgrades(context):
+        for resource in context.session.query(Resource):
+            resource.payment_method = 'manual'
+            resource.pricing_method = 'free'
+            resource.price_per_hour = 0
+            resource.price_per_item = 0
+            resource.currency = 'CHF'

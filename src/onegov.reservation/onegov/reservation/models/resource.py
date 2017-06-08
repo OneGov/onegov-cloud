@@ -72,9 +72,16 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
     #: the payment method
     payment_method = content_property('payment_method')
 
+    #: the currency of the price to pay
     currency = content_property('currency')
+
+    #: the pricing method to use
     pricing_method = content_property('pricing_method')
+
+    #: the reservations cost a given amount per hour
     price_per_hour = content_property('price_per_hour')
+
+    #: the reservations cost a given amount per unit (allocations * quota)
     price_per_item = content_property('price_per_reservation')
 
     __mapper_args__ = {
