@@ -7,8 +7,7 @@ from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.form import parse_form
-from onegov.form.core import Price
-from onegov.pay import process_payment
+from onegov.pay import Price, process_payment
 from sqlalchemy import Column, Text
 from sqlalchemy.orm import relationship
 from uuid import uuid4

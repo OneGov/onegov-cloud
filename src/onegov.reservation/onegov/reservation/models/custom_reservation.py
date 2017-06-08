@@ -1,8 +1,7 @@
 from datetime import timedelta
 from libres.db.models import Reservation
 from onegov.core.orm import ModelBase
-from onegov.form.core import Price
-from onegov.pay import Payable
+from onegov.pay import Payable, Price
 from onegov.reservation.models.resource import Resource
 from sqlalchemy.orm import object_session
 
