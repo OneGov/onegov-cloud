@@ -371,7 +371,7 @@
 </metal:page_content>
 
 <metal:display_form define-macro="display_form" i18n:domain="onegov.org">
-    <div tal:repeat="fieldset form.fieldsets">
+    <div tal:condition="form" tal:repeat="fieldset form.fieldsets">
         <tal:block define="fields fieldset.non_empty_fields" condition="fields">
             <h2 tal:condition="fieldset.is_visible">${fieldset.label}</h2>
             <div class="field-display" tal:repeat="field fields.values()">
@@ -392,7 +392,7 @@
             </div>
         </tal:block>
     </div>
-    <tal:b define="price form.total()" condition="price">
+    <tal:b condition="price|nothing">
         <div class="field-display">
             <div class="field-display-block">
                 <div class="field-display-label" i18n:translate>Total Amount</div>
@@ -889,3 +889,49 @@
         picked up.
     </p>
 </metal:ticket_status_page_message>
+
+
+<metal:checkout_form define-macro="checkout_form" i18n:domain="onegov.org">
+    <form action="${complete_link}" method="POST">
+        <tal:b condition="price" switch="payment_method">
+            <tal:b case="'manual'">
+                <label style="display: none;">
+                    <input type="radio" name="payment_method" value="manual" checked>
+                </label>
+            </tal:b>
+            <tal:b case="'cc'">
+                <label style="display: none;">
+                    <input type="radio" name="payment_method" value="online" checked>
+                </label>
+            </tal:b>
+            <tal:b case="'free'">
+                <div class="field-display">
+                    <div class="field-display-block">
+                        <div class="field-display-label" i18n:translate>Payment</div>
+                        <div class="field-display-data">
+                            <label class="common-text">
+                                <input type="radio" name="payment_method" value="online" checked>
+                                <span i18n:translate>Pay Online Now</span>
+                            </label>
+                            <label class="common-text">
+                                <input type="radio" name="payment_method" value="manual">
+                                <span i18n:translate>Pay Offline later</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </tal:b>
+
+            <div data-depends-on="payment_method/online">
+                <tal:b replace="structure checkout_button" />
+            </div>
+            <div data-depends-on="payment_method/manual">
+                <input type="submit" value="Complete" class="button" i18n:attributes="value">
+            </div>
+        </tal:b>
+
+        <tal:b condition="not price">
+            <input type="submit" value="Complete" class="button" i18n:attributes="value">
+        </tal:b>
+    </form>
+</metal:checkout_form>

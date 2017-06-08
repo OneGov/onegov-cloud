@@ -1,11 +1,12 @@
-from onegov.form import Form
+from onegov.form import Form, merge_forms
 from onegov.form.validators import ValidFormDefinition
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
-from wtforms import RadioField, StringField, TextAreaField, validators
+from onegov.org.forms.generic import PaymentMethodForm
+from wtforms import StringField, TextAreaField, validators
 
 
-class FormDefinitionForm(Form):
+class FormDefinitionBaseForm(Form):
     """ Form to edit defined forms. """
 
     title = StringField(_("Title"), [validators.InputRequired()])
@@ -23,23 +24,9 @@ class FormDefinitionForm(Form):
         validators=[validators.InputRequired(), ValidFormDefinition()],
         render_kw={'rows': 32, 'data-editor': 'form'})
 
-    payment_method = RadioField(
-        label=_("Payment Method"),
-        default='manual',
-        validators=[validators.InputRequired()],
-        choices=[
-            ('manual', _("No credit card payments")),
-            ('free', _("Credit card payments optional")),
-            ('cc', _("Credit card payments required"))
-        ])
 
-    def ensure_valid_payment_method(self):
-        if self.payment_method.data == 'manual':
-            return
-
-        if not self.request.app.default_payment_provider:
-            self.payment_method.errors.append(_(
-                "You need to setup a default payment provider to enable "
-                "credit card payments"
-            ))
-            return False
+class FormDefinitionForm(merge_forms(
+    FormDefinitionBaseForm,
+    PaymentMethodForm
+)):
+    pass

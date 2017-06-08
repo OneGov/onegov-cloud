@@ -922,7 +922,7 @@ class ResourceLayout(DefaultLayout):
                     attrs={'class': 'delete-link'},
                     traits=(
                         Block(
-                            _("This resource can't be deleted"),
+                            _("This resource can't be deleted."),
                             _(
                                 "There are existing reservations associated "
                                 "with this resource"

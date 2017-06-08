@@ -89,3 +89,28 @@ class ExportForm(Form):
             )
 
         raise NotImplemented()
+
+
+class PaymentMethodForm(Form):
+
+    payment_method = RadioField(
+        label=_("Payment Method"),
+        fieldset=_("Payments"),
+        default='manual',
+        validators=[validators.InputRequired()],
+        choices=[
+            ('manual', _("No credit card payments")),
+            ('free', _("Credit card payments optional")),
+            ('cc', _("Credit card payments required"))
+        ])
+
+    def ensure_valid_payment_method(self):
+        if self.payment_method.data == 'manual':
+            return
+
+        if not self.request.app.default_payment_provider:
+            self.payment_method.errors.append(_(
+                "You need to setup a default payment provider to enable "
+                "credit card payments"
+            ))
+            return False

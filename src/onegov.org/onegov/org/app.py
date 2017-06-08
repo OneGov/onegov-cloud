@@ -139,6 +139,28 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     def theme_options(self):
         return self.org.theme_options or {}
 
+    def checkout_button(self, button_label, title, price, email, locale):
+        provider = self.default_payment_provider
+
+        if not provider:
+            return None
+
+        checkout = {
+            'label': button_label,
+            'amount': price and price.amount,
+            'currency': price and price.currency,
+            'email': email,
+            'name': self.org.name,
+            'description': title,
+            'locale': locale.split('_')[0],
+            'allowRememberMe': 'false'
+        }
+
+        if self.org.square_logo_url:
+            checkout['image'] = self.org.square_logo_url
+
+        return provider.checkout_button(**checkout)
+
 
 @OrgApp.webasset_path()
 def get_shared_assets_path():

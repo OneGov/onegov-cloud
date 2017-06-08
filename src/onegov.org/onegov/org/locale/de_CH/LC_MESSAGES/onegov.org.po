@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-06-02 13:17+0200\n"
+"POT-Creation-Date: 2017-06-08 11:54+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -51,14 +51,14 @@ msgstr "Abgeschlossene Tickets"
 msgid "Register"
 msgstr "Registrierung"
 
+msgid "Payment Provider"
+msgstr "Zahlungsanbieter"
+
 msgid "Settings"
 msgstr "Einstellungen"
 
 msgid "Users"
 msgstr "Benutzer"
-
-msgid "Payment Provider"
-msgstr "Zahlungsanbieter"
 
 msgid "Tickets"
 msgstr "Tickets"
@@ -148,21 +148,6 @@ msgstr "Zahlungsanbieter"
 msgid "Delete"
 msgstr "Löschen"
 
-msgid "This form can't be deleted."
-msgstr "Das Formular kann nicht gelöscht werden."
-
-msgid ""
-"There are submissions associated with the form. Those need to be removed first."
-msgstr ""
-"Es existieren Eingaben die mit diesem Formular verknüpft sind. Löschen Sie "
-"diese Eingaben bevor Sie das Formular löschen."
-
-msgid "Do you really want to delete this form?"
-msgstr "Möchten Sie das Formular wirklich löschen?"
-
-msgid "Delete form"
-msgstr "Formular löschen"
-
 msgid "New"
 msgstr "Neu"
 
@@ -172,29 +157,21 @@ msgstr "Synchronisieren"
 msgid "No"
 msgstr "Nein"
 
+msgid "This form can't be deleted."
+msgstr "Das Formular kann nicht gelöscht werden."
+
+msgid ""
+"There are submissions associated with the form. Those need to be removed "
+"first."
+msgstr ""
+"Es existieren Eingaben die mit diesem Formular verknüpft sind. Löschen Sie "
+"diese Eingaben bevor Sie das Formular löschen."
+
 msgid "Add"
 msgstr "Hinzufügen"
 
-msgid "Do you really want to delete this person?"
-msgstr "Möchten Sie die Person wirklich löschen?"
-
-msgid "Delete person"
-msgstr "Person löschen"
-
 msgid "Recipients"
 msgstr "Empfänger"
-
-msgid "Do you really want to delete this resource?"
-msgstr "Möchten Sie diese Reservations-Ressource wirklich löschen?"
-
-msgid "Delete resource"
-msgstr "Reservations-Ressource löschen"
-
-msgid "This resource can't be deleted."
-msgstr "Diese Reservations-Ressource kann nicht gelöscht werden."
-
-msgid "There are existing reservations associated with this resource"
-msgstr "Es existieren Reservationen für diese Reservations-Ressource"
 
 msgid "Clean up"
 msgstr "Aufräumen"
@@ -205,11 +182,35 @@ msgstr "Belegung"
 msgid "Export"
 msgstr "Export"
 
-msgid "Do you really want to delete this event?"
-msgstr "Möchten Sie die Veranstaltung wirklich löschen?"
+msgid "Send"
+msgstr "Senden"
 
-msgid "Delete event"
-msgstr "Veranstaltung löschen"
+msgid "Manage images"
+msgstr "Bilder verwalten"
+
+msgid "Choose images"
+msgstr "Bilder auswählen"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "Do you really want to delete this form?"
+msgstr "Möchten Sie das Formular wirklich löschen?"
+
+msgid "This cannot be undone."
+msgstr "Dies kann nicht rückgängig gemacht werden."
+
+msgid "Delete form"
+msgstr "Formular löschen"
+
+msgid "Accept ticket"
+msgstr "Ticket annehmen"
+
+msgid "This resource can't be deleted."
+msgstr "Diese Reservations-Ressource kann nicht gelöscht werden."
+
+msgid "There are existing reservations associated with this resource"
+msgstr "Es existieren Reservationen für diese Reservations-Ressource"
 
 msgid "This event can't be deleted."
 msgstr "Diese Veranstaltung kann nicht gelöscht werden."
@@ -219,35 +220,32 @@ msgstr ""
 "Sie können die Veranstaltung jedoch in der Ticketansicht absagen, um sie zu "
 "entfernen."
 
-msgid "Send"
-msgstr "Senden"
+msgid "Do you really want to delete this person?"
+msgstr "Möchten Sie die Person wirklich löschen?"
+
+msgid "Delete person"
+msgstr "Person löschen"
+
+msgid "Close ticket"
+msgstr "Ticket abschliessen"
+
+msgid "Do you really want to delete this resource?"
+msgstr "Möchten Sie diese Reservations-Ressource wirklich löschen?"
+
+msgid "Delete resource"
+msgstr "Reservations-Ressource löschen"
+
+msgid "Do you really want to delete this event?"
+msgstr "Möchten Sie die Veranstaltung wirklich löschen?"
+
+msgid "Delete event"
+msgstr "Veranstaltung löschen"
 
 msgid "Delete newsletter"
 msgstr "Newsletter löschen"
 
-msgid "Manage images"
-msgstr "Bilder verwalten"
-
-msgid "Choose images"
-msgstr "Bilder auswählen"
-
 msgid "Delete photo album"
 msgstr "Fotoalbum löschen"
-
-msgid "Yes"
-msgstr "Ja"
-
-msgid "Accept ticket"
-msgstr "Ticket annehmen"
-
-msgid "Do you really want to delete this allocation?"
-msgstr "Möchten Sie diese Einteilung wirklich löschen?"
-
-msgid "Delete allocation"
-msgstr "Einteilung löschen"
-
-msgid "Close ticket"
-msgstr "Ticket abschliessen"
 
 msgid "Form"
 msgstr "Formular"
@@ -266,6 +264,12 @@ msgstr "Tagskarte"
 
 msgid "E-Mail Recipient"
 msgstr "E-Mail Empfänger"
+
+msgid "Do you really want to delete this allocation?"
+msgstr "Möchten Sie diese Einteilung wirklich löschen?"
+
+msgid "Delete allocation"
+msgstr "Einteilung löschen"
 
 msgid "Photo Album"
 msgstr "Fotoalbum"
@@ -533,29 +537,20 @@ msgstr "Text"
 msgid "Definition"
 msgstr "Definition"
 
+msgid "Format"
+msgstr "Format"
+
 msgid "Payment Method"
 msgstr "Zahlungsmethode"
+
+msgid "The end date must be later than the start date"
+msgstr "Das End-Datum muss nach dem Start-Datum liegen"
 
 msgid ""
 "You need to setup a default payment provider to enable credit card payments"
 msgstr ""
 "Um Kreditkartenzahlungen zu aktivieren benötigen Sie einen Standard-"
 "Zahlungsanbieter"
-
-msgid "No credit card payments"
-msgstr "Keine Kreditkarten-Zahlungen"
-
-msgid "Credit card payments optional"
-msgstr "Kreditkarten-Zahlungen optional"
-
-msgid "Credit card payments required"
-msgstr "Kreditkarten-Zahlung erforderlich"
-
-msgid "Format"
-msgstr "Format"
-
-msgid "The end date must be later than the start date"
-msgstr "Das End-Datum muss nach dem Start-Datum liegen"
 
 msgid "CSV File"
 msgstr "CSV Datei"
@@ -565,6 +560,15 @@ msgstr "Excel Datei"
 
 msgid "JSON File"
 msgstr "JSON Datei"
+
+msgid "No credit card payments"
+msgstr "Keine Kreditkarten-Zahlungen"
+
+msgid "Credit card payments optional"
+msgstr "Kreditkarten-Zahlungen optional"
+
+msgid "Credit card payments required"
+msgstr "Kreditkarten-Zahlung erforderlich"
 
 msgid "Describes what this photo album is about"
 msgstr "Beschreibt kurz um was es bei dem Fotoalbum geht"
@@ -652,6 +656,30 @@ msgstr "Dient zur Gruppierung in der Übersicht"
 
 msgid "Extra Fields Definition"
 msgstr "Extra-Felder Definition"
+
+msgid "Price"
+msgstr "Preis"
+
+msgid "Price per item"
+msgstr "Preis pro Objekt"
+
+msgid "Price per hour"
+msgstr "Preis pro Stunde"
+
+msgid "Currency"
+msgstr "Währung"
+
+msgid "Free of charge"
+msgstr "Kostenlos"
+
+msgid "Per item"
+msgstr "Pro Objekt"
+
+msgid "Per hour"
+msgstr "Pro Stunde"
+
+msgid "The price must be larger than zero"
+msgstr "Der Preis muss grösser als Null sein"
 
 msgid "Name"
 msgstr "Name"
@@ -951,9 +979,6 @@ msgstr "Reservation absagen"
 #, python-format
 msgid "Do you really want to refund ${amount}?"
 msgstr "Möchten Sie wirklich ${amount} rückerstatten?"
-
-msgid "This cannot be undone."
-msgstr "Dies kann nicht rückgängig gemacht werden."
 
 #, python-format
 msgid "Refund ${amount}"
@@ -1562,6 +1587,9 @@ msgstr "Objekt"
 msgid "Amount"
 msgstr "Betrag"
 
+msgid "Created"
+msgstr "Erstellt"
+
 msgid "No people added yet."
 msgstr "Es wurden noch keine Personen hinzugefügt."
 
@@ -1678,9 +1706,6 @@ msgstr "Zahlungsherkunft"
 
 msgid "Owner"
 msgstr "Zuständig"
-
-msgid "Created"
-msgstr "Erstellt"
 
 msgid "Reaction Time"
 msgstr "Reaktionszeit"
@@ -1853,11 +1878,11 @@ msgstr "Ein Formular mit diesem Namen existiert bereits"
 msgid "Added a new form"
 msgstr "Ein neues Formular wurd hinzugefügt"
 
-msgid "Pay Online and Complete"
-msgstr "Online zahlen und abschliessen"
-
 msgid "Your payment could not be processed"
 msgstr "Ihre Zahlung konnte nicht verarbeitet werden"
+
+msgid "Pay Online and Complete"
+msgstr "Online zahlen und abschliessen"
 
 msgid "Select images"
 msgstr "Bilder auswählen"
@@ -1908,6 +1933,10 @@ msgstr "Veranstaltungs-Export"
 
 msgid "Exports all future events."
 msgstr "Exportiert alle zukünftigen Veranstaltungen."
+
+#, python-format
+msgid "Successfully synchronised ${count} payments"
+msgstr ""
 
 msgid "Your Stripe account was connected successfully."
 msgstr "Ihr Stripe Konto wurde erfolgreich verbunden."

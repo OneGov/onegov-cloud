@@ -104,22 +104,7 @@ def handle_pending_submission(self, request):
     else:
         title = self.form.title
 
-    provider = request.app.default_payment_provider
     price = form.total()
-
-    checkout = {
-        'label': request.translate(_("Pay Online and Complete")),
-        'amount': price and price.amount,
-        'currency': price and price.currency,
-        'email': self.get_email_field_data(form),
-        'name': request.app.org.name,
-        'description': title,
-        'locale': request.locale.split('_')[0],
-        'allowRememberMe': 'false'
-    }
-
-    if request.app.org.square_logo_url:
-        checkout['image'] = request.app.org.square_logo_url
 
     return {
         'layout': FormSubmissionLayout(self, request, title),
@@ -132,7 +117,13 @@ def handle_pending_submission(self, request):
         'readonly': 'readonly' in request.GET,
         'model': self,
         'price': price,
-        'checkout_button': provider and provider.checkout_button(**checkout)
+        'checkout_button': price and request.app.checkout_button(
+            button_label=request.translate(_("Pay Online and Complete")),
+            title=title,
+            price=price,
+            email=self.get_email_field_data(form),
+            locale=request.locale
+        )
     }
 
 
@@ -163,10 +154,13 @@ def handle_complete_submission(self, request):
         else:
             provider = request.app.default_payment_provider
             token = request.params.get('payment_token')
+            payment = self.process_payment(provider, token)
 
-            if not self.process_payment(provider, token):
+            if not payment:
                 request.alert(_("Your payment could not be processed"))
                 return morepath.redirect(request.link(self))
+            elif payment is not True:
+                self.payment = payment
 
             collection = FormCollection(request.app.session())
             collection.submissions.complete_submission(self)

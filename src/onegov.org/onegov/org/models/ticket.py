@@ -27,83 +27,15 @@ class EventSubmissionTicket(Ticket):
     es_type_name = 'event_tickets'
 
 
-@handlers.registered_handler('FRM')
-class FormSubmissionHandler(Handler):
+class PaymentLinksMixin(object):
 
-    handler_title = _("Form Submissions")
-
-    @cached_property
-    def collection(self):
-        return FormSubmissionCollection(self.session)
-
-    @cached_property
-    def submission(self):
-        return self.collection.by_id(self.id)
-
-    @cached_property
-    def form(self):
-        return self.submission.form_class(data=self.submission.data)
-
-    @property
-    def deleted(self):
-        return self.submission is None
-
-    @property
-    def email(self):
-        return self.submission.email
-
-    @property
-    def title(self):
-        return self.submission.title
-
-    @property
-    def subtitle(self):
-        return None
-
-    @property
-    def group(self):
-        return self.submission.form.title
-
-    @property
-    def payment(self):
-        return self.submission and self.submission.payment
-
-    @property
-    def extra_data(self):
-        return self.submission and [
-            v for v in self.submission.data.values()
-            if not utils.is_non_string_iterable(v)
-        ]
-
-    def get_summary(self, request):
-        layout = DefaultLayout(self.submission, request)
-        return render_macro(layout.macros['display_form'], request, {
-            'form': self.form,
-            'layout': layout
-        })
-
-    def get_links(self, request):
+    def extend_with_payment_links(self, links, request):
         payment = self.payment
-
-        links = []
 
         if payment and payment.source == 'manual':
             links.extend(self.get_manual_payment_links(payment, request))
         if payment and payment.source == 'stripe_connect':
             links.extend(self.get_stripe_payment_links(payment, request))
-
-        edit_link = URL(request.link(self.submission))
-        edit_link = edit_link.query_param('edit', '').as_string()
-
-        links.append(
-            Link(
-                text=_('Edit submission'),
-                url=request.return_here(edit_link),
-                attrs={'class': 'edit-link'}
-            )
-        )
-
-        return links
 
     def get_manual_payment_links(self, payment, request):
         layout = DefaultLayout(self.submission, request)
@@ -189,8 +121,82 @@ class FormSubmissionHandler(Handler):
             )
 
 
+@handlers.registered_handler('FRM')
+class FormSubmissionHandler(Handler, PaymentLinksMixin):
+
+    handler_title = _("Form Submissions")
+
+    @cached_property
+    def collection(self):
+        return FormSubmissionCollection(self.session)
+
+    @cached_property
+    def submission(self):
+        return self.collection.by_id(self.id)
+
+    @cached_property
+    def form(self):
+        return self.submission.form_class(data=self.submission.data)
+
+    @property
+    def deleted(self):
+        return self.submission is None
+
+    @property
+    def email(self):
+        return self.submission.email
+
+    @property
+    def title(self):
+        return self.submission.title
+
+    @property
+    def subtitle(self):
+        return None
+
+    @property
+    def group(self):
+        return self.submission.form.title
+
+    @property
+    def payment(self):
+        return self.submission and self.submission.payment
+
+    @property
+    def extra_data(self):
+        return self.submission and [
+            v for v in self.submission.data.values()
+            if not utils.is_non_string_iterable(v)
+        ]
+
+    def get_summary(self, request):
+        layout = DefaultLayout(self.submission, request)
+        return render_macro(layout.macros['display_form'], request, {
+            'form': self.form,
+            'layout': layout
+        })
+
+    def get_links(self, request):
+        links = []
+
+        self.extend_with_payment_links(links, request)
+
+        edit_link = URL(request.link(self.submission))
+        edit_link = edit_link.query_param('edit', '').as_string()
+
+        links.append(
+            Link(
+                text=_('Edit submission'),
+                url=request.return_here(edit_link),
+                attrs={'class': 'edit-link'}
+            )
+        )
+
+        return links
+
+
 @handlers.registered_handler('RSV')
-class ReservationHandler(Handler):
+class ReservationHandler(Handler, PaymentLinksMixin):
 
     handler_title = _("Reservations")
 
@@ -215,6 +221,10 @@ class ReservationHandler(Handler):
     @cached_property
     def submission(self):
         return FormSubmissionCollection(self.session).by_id(self.id)
+
+    @property
+    def payment(self):
+        return self.reservations and self.reservations[0].payment
 
     @property
     def deleted(self):
@@ -402,9 +412,11 @@ class ReservationHandler(Handler):
                 Link(
                     text=_('Edit details'),
                     url=link,
-                    classes=('edit-link', )
+                    attrs={'class': 'edit-link'}
                 )
             )
+
+        self.extend_with_payment_links(links, request)
 
         return links
 

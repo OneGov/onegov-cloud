@@ -263,6 +263,9 @@ def confirm_reservation(self, request):
         if failed
     )
 
+    price = self.price_of_reservation(
+        token, submission and submission.form_obj.total())
+
     return {
         'title': _("Confirm your reservation"),
         'layout': layout,
@@ -272,13 +275,21 @@ def confirm_reservation(self, request):
             utils.ReservationInfo(r, request) for r in reservations
         ],
         'failed_reservations': failed_reservations,
-        'finalize_link': request.link(self, 'abschluss'),
+        'complete_link': request.link(self, 'abschluss'),
         'edit_link': request.link(self, 'formular'),
+        'price': price,
+        'checkout_button': price and request.app.checkout_button(
+            button_label=request.translate(_("Pay Online and Complete")),
+            title=self.title,
+            price=price,
+            email=reservations[0].email,
+            locale=request.locale
+        )
     }
 
 
 @OrgApp.html(model=Resource, name='abschluss', permission=Public,
-             template='layout.pt')
+             template='layout.pt', request_method='POST')
 def finalize_reservation(self, request):
     reservations = self.bound_reservations(request).all()
     assert_access_only_if_there_are_reservations(reservations)
@@ -286,7 +297,23 @@ def finalize_reservation(self, request):
     session_id = self.bound_session_id(request)
     token = reservations[0].token.hex
 
+    forms = FormCollection(request.app.session())
+    submission = forms.submissions.by_id(token)
+
     try:
+        extra = submission and submission.form_obj.total() or None
+        provider = request.app.default_payment_provider
+        payment_token = request.params.get('payment_token')
+        payment = self.process_payment(token, provider, payment_token, extra)
+
+        if not payment:
+            request.alert(_("Your payment could not be processed"))
+            return morepath.redirect(request.link(self))
+
+        elif payment is not True:
+            for reservation in reservations:
+                reservation.payment = payment
+
         self.scheduler.queries.confirm_reservations_for_session(session_id)
         self.scheduler.approve_reservations(token)
 
@@ -299,9 +326,6 @@ def finalize_reservation(self, request):
 
         return morepath.redirect(url.as_string())
     else:
-        forms = FormCollection(request.app.session())
-        submission = forms.submissions.by_id(token)
-
         if submission:
             forms.submissions.complete_submission(submission)
 
