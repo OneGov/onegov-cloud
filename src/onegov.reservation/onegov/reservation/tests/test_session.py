@@ -9,6 +9,7 @@ from sqlalchemy import Column, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from uuid import uuid4
 from webtest import TestApp as Client
+from onegov.core.orm import Base as CoreBase
 
 
 def test_setup_database(postgres_dsn):
@@ -35,7 +36,8 @@ def test_setup_database(postgres_dsn):
     morepath.commit(App)
 
     app = App()
-    app.configure_application(dsn=postgres_dsn, base=Base)
+    app.configure_application(dsn=postgres_dsn, base=CoreBase)
+    app.session_manager.bases.append(Base)
     app.namespace = 'libres'
     app.set_application_id('libres/foo')
 
@@ -56,13 +58,12 @@ def test_setup_database(postgres_dsn):
 
     tables = set(r[0] for r in tables.fetchall())
 
-    assert tables == {
-        'documents',
-        'resources',
-        'allocations',
-        'reserved_slots',
-        'reservations'
-    }
+    assert 'documents' in tables
+    assert 'payments_for_reservations' in tables
+    assert 'resources' in tables
+    assert 'allocations' in tables
+    assert 'reserved_slots' in tables
+    assert 'reservations' in tables
 
     app.session_manager.dispose()
 
@@ -74,7 +75,8 @@ def test_libres_context(postgres_dsn):
         pass
 
     app = App()
-    app.configure_application(dsn=postgres_dsn, base=Base)
+    app.configure_application(dsn=postgres_dsn, base=CoreBase)
+    app.session_manager.bases.append(Base)
     app.namespace = 'libres'
     app.set_application_id('libres/foo')
     app.session_manager.set_current_schema('libres-foo')
@@ -86,12 +88,11 @@ def test_libres_context(postgres_dsn):
 
     tables = set(r[0] for r in tables.fetchall())
 
-    assert tables == {
-        'allocations',
-        'resources',
-        'reserved_slots',
-        'reservations'
-    }
+    assert 'payments_for_reservations' in tables
+    assert 'resources' in tables
+    assert 'allocations' in tables
+    assert 'reserved_slots' in tables
+    assert 'reservations' in tables
 
     scheduler = new_scheduler(app.libres_context, uuid4(), 'Europe/Zurich')
     assert scheduler.managed_allocations().count() == 0
@@ -137,7 +138,8 @@ def test_transaction_integration(postgres_dsn):
     morepath.commit(App)
 
     app = App()
-    app.configure_application(dsn=postgres_dsn, base=Base)
+    app.configure_application(dsn=postgres_dsn, base=CoreBase)
+    app.session_manager.bases.append(Base)
     app.namespace = 'libres'
     app.set_application_id('libres/foo')
 

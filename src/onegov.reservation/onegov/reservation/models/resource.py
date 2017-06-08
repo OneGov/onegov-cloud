@@ -125,8 +125,8 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
 
     def price_of_reservation(self, token):
         return sum(
-            r.price for r in
-            self.scheduler.queries.reservations_by_token(token)
+            r.price for r in self.scheduler.reservations_by_token(token)
+            if r.price
         )
 
     def process_payment(self, reservation_token=None,
