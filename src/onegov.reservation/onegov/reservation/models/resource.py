@@ -7,6 +7,7 @@ from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.form import parse_form
+from onegov.form.core import Price
 from onegov.pay import process_payment
 from sqlalchemy import Column, Text
 from sqlalchemy.orm import relationship
@@ -138,10 +139,8 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
         return parse_form(self.definition)
 
     def price_of_reservation(self, token, extra=None):
-        total = sum(
-            r.price for r in self.scheduler.reservations_by_token(token)
-            if r.price
-        )
+        reservations = self.scheduler.reservations_by_token(token)
+        total = sum((r.price for r in reservations if r.price), Price.zero())
 
         if extra and total:
             total += extra
