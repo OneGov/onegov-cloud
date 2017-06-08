@@ -596,12 +596,19 @@ class Price(namedtuple('PriceBase', ('amount', 'currency'))):
         return self.amount < other.amount
 
     def __add__(self, other):
-        assert self.currency == other.currency
-        return self.__class__(self.amount + other.amount, self.currency)
+        assert self.currency is None or self.currency == other.currency
+        return self.__class__(
+            self.amount + other.amount,
+            self.currency or other.currency
+        )
 
     def __sub__(self, other):
         assert self.currency == other.currency
         return self.__class__(self.amount - other.amount, self.currency)
+
+    @classmethod
+    def zero(cls):
+        return cls(0, None)
 
 
 class Pricing(object):
