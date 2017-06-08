@@ -1,6 +1,7 @@
+from collections import defaultdict
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.pay.models import Payment
-from sqlalchemy import desc
+from sqlalchemy import desc, or_
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import undefer
 
@@ -43,3 +44,23 @@ class PaymentCollection(GenericCollection, Pagination):
 
     def page_by_index(self, index):
         return self.__class__(self.session, self.source, index)
+
+    def payment_links_by_batch(self, batch=None):
+        """ A more efficient way of loading all links of the given batch
+        (compared to loading payment.links one by one).
+
+        """
+
+        batch = batch or self.batch
+        payment_links = defaultdict(list)
+
+        for cls in Payment.registered_links.values():
+            q = self.session.query(cls)
+            q = q.filter(
+                or_((cls.payment == payment) for payment in self.batch))
+            q = q.options(joinedload(cls.payment))
+
+            for link in q:
+                payment_links[link.payment.id].append(link)
+
+        return payment_links
