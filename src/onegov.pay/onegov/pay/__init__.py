@@ -8,6 +8,7 @@ from onegov.pay.models import Payable, Payment, PaymentProvider
 from onegov.pay.collections import PaymentCollection, PayableCollection
 from onegov.pay.collections import PaymentProviderCollection
 from onegov.pay.integration import PayApp, process_payment
+from onegov.pay.utils import Price
 
 
 __all__ = (
@@ -21,5 +22,6 @@ __all__ = (
     'PaymentCollection',
     'PaymentProvider',
     'PaymentProviderCollection',
+    'Price',
     'process_payment'
 )
