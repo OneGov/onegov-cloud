@@ -26,23 +26,39 @@
             <tbody>
                 <tr tal:repeat="payment payments">
                     <td>
-                        <tal:b repeat="link payment.links">
+                        <tal:b repeat="link payment_links[payment.id]">
                             <tal:b switch="link.__tablename__">
                                 <tal:b case="'submissions'">
-                                    <div>
-                                        <a href="${request.link(link, 'ticket')}">
-                                            <strong>${link.form.title}</strong>
-                                        </a>
-                                    </div>
-                                    <div>${link.title}</div>
+                                    <tal:b define="ticket get_ticket(link)">
+                                        <div>
+                                            <a href="${request.link(ticket)}">
+                                                <strong>${ticket.number}</strong>
+                                            </a>
+                                            <div>
+                                                ${link.title}
+                                            </div>
+                                        </div>
+                                    </tal:b>
+                                </tal:b>
+                                <tal:b case="'reservations'" condition="repeat.link.start">
+                                    <tal:b define="ticket get_ticket(link)">
+                                        <div>
+                                            <a href="${request.link(ticket)}">
+                                                <strong>${ticket.number}</strong>
+                                            </a>
+                                            <div>
+                                                ${link.title}
+                                            </div>
+                                        </div>
+                                    </tal:b>
                                 </tal:b>
                             </tal:b>
                         </tal:b>
                     </td>
                     <td>${'{0:2f}'.format(payment.amount)} ${payment.currency}</td>
                     <td>
-                        <span tal:condition="payment.provider">
-                            ${payment.provider.title}
+                        <span tal:condition="payment.provider_id">
+                            ${providers[payment.provider_id].title}
                         </span>
                         <span tal:condition="not:payment.provider" i18n:translate>
                             Manual

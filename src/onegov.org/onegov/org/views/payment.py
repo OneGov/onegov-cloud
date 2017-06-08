@@ -4,6 +4,7 @@ from onegov.org.layout import PaymentCollectionLayout
 from onegov.pay import Payment
 from onegov.pay import PaymentCollection
 from onegov.pay import PaymentProviderCollection
+from onegov.ticket import TicketCollection
 
 
 @OrgApp.html(
@@ -11,10 +12,31 @@ from onegov.pay import PaymentProviderCollection
     template='payments.pt',
     permission=Private)
 def view_payments(self, request):
+    session = request.app.session()
+    tickets = TicketCollection(session)
+
+    def ticket(link):
+        if link.__tablename__ == 'reservations':
+            return tickets.by_handler_id(link.token.hex)
+        elif link.__tablename__ == 'submissions':
+            return tickets.by_handler_id(link.id.hex)
+        else:
+            raise NotImplementedError
+
+    providers = {
+        provider.id: provider
+        for provider in PaymentProviderCollection(session).query()
+    }
+
+    payment_links = self.payment_links_by_batch()
+
     return {
         'title': _("Payments"),
         'layout': PaymentCollectionLayout(self, request),
-        'payments': self.batch
+        'payments': self.batch,
+        'get_ticket': ticket,
+        'providers': providers,
+        'payment_links': payment_links
     }
 
 

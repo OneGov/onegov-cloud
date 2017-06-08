@@ -7,7 +7,6 @@ from onegov.reservation import Allocation, Resource, Reservation
 from onegov.org import _
 from onegov.org.new_elements import Link, LinkGroup, Confirm, Intercooler
 from onegov.org.layout import DefaultLayout, EventLayout
-from onegov.org.utils import correct_time_range
 from onegov.ticket import Ticket, Handler, handlers
 from purl import URL
 
@@ -256,20 +255,7 @@ class ReservationHandler(Handler, PaymentLinksMixin):
         return ', '.join(parts)
 
     def get_reservation_title(self, reservation):
-        if self.resource.type == 'daypass':
-            template = '{start:%d.%m.%Y} ({quota})'
-        elif self.resource.type == 'room':
-            template = '{start:%d.%m.%Y} {start:%H:%M} - {end:%H:%M}'
-        else:
-            raise NotImplementedError
-
-        return correct_time_range(
-            template.format(
-                start=reservation.display_start(),
-                end=reservation.display_end(),
-                quota=reservation.quota
-            )
-        )
+        return self.resource.reservation_title(reservation)
 
     @property
     def subtitle(self):

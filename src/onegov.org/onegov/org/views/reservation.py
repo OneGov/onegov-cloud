@@ -435,3 +435,12 @@ def reject_reservation(self, request):
     # return none on intercooler js requests
     if not request.headers.get('X-IC-Request'):
         return request.redirect(request.link(self))
+
+
+@OrgApp.view(model=Reservation, name='ticket', permission=Private)
+def view_ticket(self, request):
+    """ Redirects to the associated ticket for the given reservation. """
+    ticket = TicketCollection(request.app.session())\
+        .by_handler_id(self.token.hex)
+
+    return morepath.redirect(request.link(ticket))

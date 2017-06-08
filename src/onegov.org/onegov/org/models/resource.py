@@ -11,6 +11,7 @@ from onegov.org.models.extensions import (
     HiddenFromPublicExtension,
     PersonLinkExtension,
 )
+from onegov.org.utils import correct_time_range
 from onegov.search import ORMSearchable
 from onegov.ticket import Ticket
 from sqlalchemy.sql.expression import cast
@@ -112,6 +113,15 @@ class SharedMethods(object):
 
         return query
 
+    def reservation_title(self, reservation):
+        return correct_time_range(
+            self.title_template.format(
+                start=reservation.display_start(),
+                end=reservation.display_end(),
+                quota=reservation.quota
+            )
+        )
+
 
 class SearchableResource(ORMSearchable):
 
@@ -143,6 +153,9 @@ class DaypassResource(Resource, HiddenFromPublicExtension, SearchableResource,
     # show or hide quota numbers in reports
     show_quota = True
 
+    # use to render the reservation title
+    title_template = '{start:%d.%m.%Y} ({quota})'
+
 
 class RoomResource(Resource, HiddenFromPublicExtension, SearchableResource,
                    ContactExtension, PersonLinkExtension,
@@ -156,3 +169,6 @@ class RoomResource(Resource, HiddenFromPublicExtension, SearchableResource,
 
     # show or hide quota numbers in reports
     show_quota = False
+
+    # used to render the reservation title
+    title_template = '{start:%d.%m.%Y} {start:%H:%M} - {end:%H:%M}'
