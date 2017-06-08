@@ -1349,7 +1349,7 @@ def test_reserve_allocation(org_app):
     formular.form['email'] = 'info@example.org'
     formular.form['note'] = 'Foobar'
 
-    ticket = formular.form.submit().follow().click('Abschliessen').follow()
+    ticket = formular.form.submit().follow().form.submit().follow()
 
     assert 'RSV-' in ticket.text
     assert len(org_app.smtp.outbox) == 1
@@ -1466,7 +1466,7 @@ def test_reserve_allocation_partially(org_app):
     formular = client.get('/ressource/tageskarte/formular')
     formular.form['email'] = 'info@example.org'
 
-    ticket = formular.form.submit().follow().click("Abschliessen").follow()
+    ticket = formular.form.submit().follow().form.submit().follow()
 
     assert 'RSV-' in ticket.text
     assert len(org_app.smtp.outbox) == 1
@@ -1525,7 +1525,7 @@ def test_reserve_no_definition(org_app):
     formular = client.get('/ressource/tageskarte/formular')
     formular.form['email'] = 'info@example.org'
 
-    ticket = formular.form.submit().follow().click('Abschliessen').follow()
+    ticket = formular.form.submit().follow().form.submit().follow()
 
     assert 'RSV-' in ticket.text
     assert len(org_app.smtp.outbox) == 1
@@ -1645,13 +1645,13 @@ def test_reserve_session_bound(org_app):
     formular.form['email'] = 'info@example.org'
 
     confirm = formular.form.submit().follow()
-    finalize_url = confirm.pyquery('a.button:first').attr('href')
+    complete_url = confirm.pyquery('form:last').attr('action')
 
     # make sure the finalize step can only be called by the original client
     c2 = Client(org_app)
 
-    assert c2.get(finalize_url, expect_errors=True).status_code == 403
-    assert client.get(finalize_url).follow().status_code == 200
+    assert c2.post(complete_url, expect_errors=True).status_code == 403
+    assert client.post(complete_url).follow().status_code == 200
 
 
 def test_delete_reservation_anonymous(org_app):
@@ -1725,10 +1725,9 @@ def test_reserve_in_parallel(org_app):
     f2 = formular.form.submit().follow()
 
     # one will win, one will lose
-    assert f1.click('Abschliessen').status_code == 302
-    assert "Der gewünschte Zeitraum ist nicht mehr verfügbar." in f2.click(
-        'Abschliessen'
-    ).follow()
+    assert f1.form.submit().status_code == 302
+    assert "Der gewünschte Zeitraum ist nicht mehr verfügbar."\
+        in f2.form.submit().follow()
 
 
 def test_occupancy_view(org_app):
@@ -1753,7 +1752,7 @@ def test_occupancy_view(org_app):
     assert reserve().json == {'success': True}
     formular = client.get('/ressource/tageskarte/formular')
     formular.form['email'] = 'info@example.org'
-    formular.form.submit().follow().click('Abschliessen')
+    formular.form.submit().follow().form.submit()
 
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
 
@@ -1793,7 +1792,7 @@ def test_reservation_export_view(org_app):
     formular.form['email'] = 'info@example.org'
     formular.form['vorname'] = 'Charlie'
     formular.form['nachname'] = 'Carson'
-    formular.form.submit().follow().click('Abschliessen')
+    formular.form.submit().follow().form.submit()
 
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
 
@@ -1861,7 +1860,7 @@ def test_reserve_session_separation(org_app):
     formular.form.submit()
 
     # make sure if we confirm one reservation, only one will be written
-    formular.form.submit().follow().click("Abschliessen").follow()
+    formular.form.submit().follow().form.submit().follow()
 
     resource = org_app.libres_resources.by_name('meeting-room')
     assert resource.scheduler.managed_reserved_slots().count() == 1
@@ -1965,7 +1964,7 @@ def test_reserve_multiple_allocations(org_app):
     assert "28. April 2016" in confirmation
     assert "29. April 2016" in confirmation
 
-    ticket = confirmation.click("Abschliessen").follow()
+    ticket = confirmation.form.submit().follow()
     assert 'RSV-' in ticket.text
     assert len(org_app.smtp.outbox) == 1
 
@@ -2043,7 +2042,7 @@ def test_reserve_and_deny_multiple_dates(org_app):
     formular.form['email'] = "info@example.org"
 
     confirmation = formular.form.submit().follow()
-    ticket = confirmation.click("Abschliessen").follow()
+    ticket = confirmation.form.submit().follow()
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
 
     # the resource needs to be refetched after the commit
@@ -2124,7 +2123,7 @@ def test_reserve_failing_multiple(org_app):
     # accept the first reservation session
     formular = c1.get('/ressource/tageskarte/formular')
     formular.form['email'] = "info@example.org"
-    formular.form.submit().follow().click("Abschliessen").follow()
+    formular.form.submit().follow().form.submit().follow()
 
     ticket = c1.get('/tickets/ALL/open').click('Annehmen').follow()
     ticket.click('Alle Reservationen annehmen')
@@ -2133,7 +2132,7 @@ def test_reserve_failing_multiple(org_app):
     formular = c2.get('/ressource/tageskarte/formular')
     formular.form['email'] = "info@example.org"
     confirmation = formular.form.submit().follow()
-    confirmation = confirmation.click("Abschliessen").follow()
+    confirmation = confirmation.form.submit().follow()
 
     assert 'failed_reservations' in confirmation.request.url
     assert 'class="reservation failed"' in confirmation
@@ -3329,7 +3328,7 @@ def test_send_ticket_email(org_app):
         formular = client.get('/ressource/tageskarte/formular')
         formular.form['email'] = email
 
-        formular.form.submit().follow().click("Abschliessen").follow()
+        formular.form.submit().follow().form.submit().follow()
 
     del org_app.smtp.outbox[:]
 
