@@ -1,3 +1,4 @@
+from functools import lru_cache
 from libres import new_scheduler
 from libres.db.models import Allocation
 from libres.db.models.base import ORMBase
@@ -7,11 +8,20 @@ from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.form import parse_form
 from onegov.pay import process_payment
-from onegov.reservation.models.payable_reservation import PayableReservation
-from onegov.reservation.models.priced_allocation import PricedAllocation
 from sqlalchemy import Column, Text
 from sqlalchemy.orm import relationship
 from uuid import uuid4
+
+
+@lru_cache(maxsize=1)
+def extra_scheduler_arguments():
+    from onegov.reservation.models import CustomReservation
+    from onegov.reservation.models import CustomAllocation
+
+    return dict(
+        allocation_cls=CustomAllocation,
+        reservation_cls=CustomReservation
+    )
 
 
 class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
@@ -61,6 +71,11 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
     #: the payment method
     payment_method = content_property('payment_method')
 
+    currency = content_property('currency')
+    pricing_method = content_property('pricing_method')
+    price_per_hour = content_property('price_per_hour')
+    price_per_item = content_property('price_per_reservation')
+
     __mapper_args__ = {
         "polymorphic_on": 'type'
     }
@@ -102,8 +117,7 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
 
         return new_scheduler(
             libres_context, self.id, self.timezone,
-            allocation_cls=PricedAllocation,
-            reservation_cls=PayableReservation
+            **extra_scheduler_arguments()
         )
 
     @property
@@ -123,20 +137,24 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
 
         return parse_form(self.definition)
 
-    def price_of_reservation(self, token):
-        return sum(
+    def price_of_reservation(self, token, extra=None):
+        total = sum(
             r.price for r in self.scheduler.reservations_by_token(token)
             if r.price
         )
+
+        if extra and total:
+            total += extra
+        elif extra:
+            total = extra
+
+        return total
 
     def process_payment(self, reservation_token=None,
                         provider=None, payment_token=None, extra=None):
         """ Processes the payment for the given reservation token. """
 
-        price = self.price_of_reservation(reservation_token)
-
-        if extra:
-            price += extra
+        price = self.price_of_reservation(reservation_token, extra)
 
         if price and price.amount > 0:
             return process_payment(

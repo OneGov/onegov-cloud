@@ -1,5 +1,5 @@
-from onegov.reservation.models.priced_allocation import PricedAllocation
-from onegov.reservation.models.payable_reservation import PayableReservation
 from onegov.reservation.models.resource import Resource
+from onegov.reservation.models.custom_allocation import CustomAllocation
+from onegov.reservation.models.custom_reservation import CustomReservation
 
-__all__ = ('PricedAllocation', 'PayableReservation', 'Resource')
+__all__ = ('CustomAllocation', 'CustomReservation', 'Resource')

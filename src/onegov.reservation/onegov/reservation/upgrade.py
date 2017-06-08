@@ -59,7 +59,7 @@ def make_reservations_allocations_payable(context):
 
     if run_upgrades(context):
         for reservation in context.session.query(Reservation):
-            reservation.type = 'payable'
+            reservation.type = 'custom'
 
         for allocation in context.session.query(Allocation):
-            allocation.type = 'priced'
+            allocation.type = 'custom'
