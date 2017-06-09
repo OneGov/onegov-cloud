@@ -130,6 +130,15 @@ body {
 }
 
 /*
+    The bank settings are hidden by default, they are currently only used
+    for onegov.feriennet and should probably replaced by something feriennet
+    specific.
+*/
+#einstellungen #fieldset-payment {
+    display: none;
+}
+
+/*
     Heading sizes
 */
 .h1-size {
