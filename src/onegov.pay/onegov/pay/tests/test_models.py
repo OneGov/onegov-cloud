@@ -4,6 +4,7 @@ import transaction
 from onegov.core.orm import Base, SessionManager
 from onegov.core.orm.types import UUID
 from onegov.pay.models import Payable, Payment, PaymentProvider, ManualPayment
+from onegov.pay.collections import PaymentCollection
 from sqlalchemy import Column
 from sqlalchemy import Text
 from sqlalchemy.ext.declarative import declarative_base
@@ -155,6 +156,8 @@ def test_backref(postgres_dsn):
     assert nut.payment.links.count() == 1
     assert nut.payment.links.first().title == "Nut"
 
+    assert len(PaymentCollection(session).payment_links_by_batch()) == 2
+
     session.delete(nut.payment)
     nut.payment = car.payment
     session.flush()
@@ -166,6 +169,8 @@ def test_backref(postgres_dsn):
 
     assert car.payment.links.count() == 2
     assert {r.title for r in car.payment.links} == {"Car", "Nut"}
+
+    assert len(PaymentCollection(session).payment_links_by_batch()) == 1
 
     mgr.dispose()
 
