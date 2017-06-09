@@ -81,9 +81,8 @@ def process_payment(method, price, provider=None, token=None):
                 )
             except CARD_ERRORS:
                 log.exception(
-                    "Processing {} {} through {} with token {} failed".format(
-                        price.amount,
-                        price.currency,
+                    "Processing {} through {} with token {} failed".format(
+                        price,
                         provider.title,
                         token
                     )
