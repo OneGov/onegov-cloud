@@ -146,7 +146,11 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
 
     def price_of_reservation(self, token, extra=None):
         reservations = self.scheduler.reservations_by_token(token)
-        total = sum((r.price for r in reservations if r.price), Price.zero())
+
+        prices = (r.price(self) for r in reservations)
+        prices = (p for p in prices if p)
+
+        total = sum(prices, Price.zero())
 
         if extra and total:
             total += extra

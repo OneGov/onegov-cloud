@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to price resources and use payments for reservations.
+  [href]
+
 - Adds a custom allocation/reservation class.
   [href]
 

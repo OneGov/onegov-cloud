@@ -14,8 +14,7 @@ class CustomReservation(Reservation, ModelBase, Payable):
         return object_session(self).query(Resource)\
             .filter_by(id=self.resource).one()
 
-    @property
-    def price(self):
+    def price(self, resource=None):
         """ Returns the price of the reservation.
 
         Even though one token may point to multiple reservations the price
@@ -25,21 +24,28 @@ class CustomReservation(Reservation, ModelBase, Payable):
 
         """
 
-        resource = self.resource_obj
+        resource = resource or self.resource_obj
 
         if resource.pricing_method not in ('per_hour', 'per_item'):
             return None
 
-        if resource.pricing_method == 'per_hour':
-            hours = 0
+        # technically we could have multiple allocations per reservation
+        # but in practice we don't use that feature. Each reservation
+        # links to exactly one allocation.
+        #
+        # As a result we can take a substantial shortcut here and calculate
+        # the price on the reservation itself instead of loading all
+        # allocations.
 
-            for a in self._target_allocations():
-                duration = (a.end + timedelta(microseconds=1) - a.start)
-                hours += duration.total_seconds() // 3600
+        if resource.pricing_method == 'per_hour':
+            duration = self.end + timedelta(microseconds=1) - self.start
+            hours = duration.total_seconds() // 3600
 
             return Price(hours * resource.price_per_hour, resource.currency)
 
         if resource.pricing_method == 'per_item':
-            count = self._target_allocations().count() * self.quota
+            count = self.quota
 
             return Price(count * resource.price_per_item, resource.currency)
+
+        raise NotImplementedError
