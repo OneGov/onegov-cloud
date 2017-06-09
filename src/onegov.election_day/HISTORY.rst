@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.12.0 (2017-06-09)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds support for opendata.swiss
   [msom]
