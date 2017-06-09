@@ -41,6 +41,12 @@ class Price(namedtuple('PriceBase', ('amount', 'currency'))):
         assert self.currency == other.currency
         return self.__class__(self.amount - other.amount, self.currency)
 
+    def __str__(self):
+        return '{:.2f} {}'.format(self.amount, self.currency)
+
+    def __repr__(self):
+        return 'Price({}, {})'.format(repr(self.amount), repr(self.currency))
+
     @classmethod
     def zero(cls):
         return cls(0, None)

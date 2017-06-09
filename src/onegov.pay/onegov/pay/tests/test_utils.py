@@ -19,3 +19,6 @@ def test_price():
         'amount': 10.0,
         'currency': 'CHF'
     }
+
+    assert str(Price(10, 'CHF')) == '10.00 CHF'
+    assert repr(Price(10, 'CHF')) == "Price(Decimal('10'), 'CHF')"
