@@ -4,16 +4,18 @@ See http://handbook.opendata.swiss/en/library/ch-dcat-ap for more information.
 
 """
 
-from io import BytesIO
-from onegov.ballot import Election
-from onegov.ballot import Vote
-from onegov.core.security import Public
-from onegov.election_day import _
-from onegov.election_day import ElectionDayApp
-from onegov.election_day.models import Principal
-from xml.etree.ElementTree import Element
-from xml.etree.ElementTree import ElementTree
 from xml.etree.ElementTree import SubElement
+from xml.etree.ElementTree import ElementTree
+from xml.etree.ElementTree import Element
+from onegov.election_day.models import Principal
+from onegov.election_day.layout import Layout
+from onegov.election_day import ElectionDayApp
+from onegov.election_day import _
+from onegov.core.utils import normalize_for_url
+from onegov.core.security import Public
+from onegov.ballot import Vote
+from onegov.ballot import Election
+from io import BytesIO
 
 
 def sub(parent, tag, attrib=None, text=None):
@@ -29,6 +31,7 @@ def view_rdf(self, request):
     def set_headers(response):
         response.headers['Content-Type'] = 'application/rdf+xml; charset=UTF-8'
 
+    layout = Layout(self, request)
     principal = request.app.principal
     domains = dict(principal.available_domains)
 
@@ -126,6 +129,15 @@ def view_rdf(self, request):
         sub(ds, 'dct:description', {'xml:lang': 'it'}, translate(des, 'it_CH'))
         sub(ds, 'dct:description', {'xml:lang': 'en'}, translate(des, 'en'))
 
+        # Format description
+        for lang in ('de', 'fr', 'it', 'en'):
+            label = translate(_("Format Description"), '{}_CH'.format(lang))
+            url = layout.get_opendata_link(lang)
+
+            fmt_des = sub(ds, 'dct:relation')
+            fmt_des = sub(fmt_des, 'rdf:Description', {'rdf:about': url})
+            sub(fmt_des, 'rdfs:label', {}, label)
+
         # Publisher
         pub = sub(ds, 'dct:publisher')
         pub = sub(pub, 'rdf:Description')
@@ -171,6 +183,7 @@ def view_rdf(self, request):
             for lang in ('de', 'fr', 'it', 'en'):
                 title = item.title_translations.get('{}_CH'.format(lang))
                 title = title or item.title
+                title = '{}.{}'.format(normalize_for_url(title), fmt)
                 sub(dist, 'dct:title', {'xml:lang': lang}, title)
 
             # Dates

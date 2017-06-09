@@ -40,13 +40,16 @@ class Layout(ChameleonLayout):
     def homepage_link(self):
         return self.request.link(self.principal)
 
-    @cached_property
-    def opendata_link(self):
-        lang = (self.request.locale or 'en')[:2]
+    def get_opendata_link(self, lang):
         return (
             "https://github.com/OneGov/onegov.election_day"
             "/blob/master/docs/open_data_{}.md"
         ).format(lang)
+
+    @cached_property
+    def opendata_link(self):
+        lang = (self.request.locale or 'en')[:2]
+        return self.get_opendata_link(lang)
 
     @cached_property
     def format_description_link(self):
