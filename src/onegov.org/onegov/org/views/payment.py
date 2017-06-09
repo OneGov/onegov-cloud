@@ -45,12 +45,8 @@ def view_payments(self, request):
     name='synchronisieren',
     permission=Private)
 def sync_payments(self, request):
-    count = self.sync()
-
-    request.success(_("Successfully synchronised ${count} payments", {
-        'count': count
-    }))
-
+    self.sync()
+    request.success(_("Successfully synchronised payments"))
     return request.redirect(request.class_link(PaymentCollection))
 
 

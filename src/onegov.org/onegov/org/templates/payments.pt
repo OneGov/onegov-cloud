@@ -13,6 +13,9 @@
                         Amount
                     </th>
                     <th i18n:translate>
+                        Fee
+                    </th>
+                    <th i18n:translate>
                         Payment Provider
                     </th>
                     <th i18n:translate>
@@ -20,6 +23,9 @@
                     </th>
                     <th i18n:translate>
                         Created
+                    </th>
+                    <th i18n:translate>
+                        Disbursed
                     </th>
                 </tr>
             </thead>
@@ -55,7 +61,12 @@
                             </tal:b>
                         </tal:b>
                     </td>
-                    <td>${'{0:2f}'.format(payment.amount)} ${payment.currency}</td>
+                    <td>${'{0:.2f}'.format(payment.amount)} ${payment.currency}</td>
+                    <td>
+                        <tal:b condition="payment.fee|nothing">
+                            ${'{0:.2f}'.format(payment.fee)} ${payment.currency}
+                        </tal:b>
+                    </td>
                     <td>
                         <span tal:condition="payment.provider_id">
                             ${providers[payment.provider_id].title}
@@ -69,6 +80,11 @@
                     </td>
                     <td>
                         ${layout.format_date(payment.created, 'datetime')}
+                    </td>
+                    <td>
+                        <tal:b condition="payment.payout_date|nothing">
+                            ${layout.format_date(payment.payout_date, 'date')}
+                        </tal:b>
                     </td>
                 </tr>
             </tbody>

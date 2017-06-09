@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-06-08 11:54+0200\n"
+"POT-Creation-Date: 2017-06-09 10:15+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1313,6 +1313,12 @@ msgstr ""
 "Postweg verlangt haben, sollten Sie in den kommenden Tagen Post erhalten. "
 "Falls Sie Dokumente am Schalter abholen wollten, so können Sie das jetzt tun."
 
+msgid "Pay Online Now"
+msgstr "Jetzt online bezahlen"
+
+msgid "Pay Offline later"
+msgstr "Später bezahlen"
+
 msgid "Dear Sir or Madam,"
 msgstr "Guten Tag"
 
@@ -1587,8 +1593,14 @@ msgstr "Objekt"
 msgid "Amount"
 msgstr "Betrag"
 
+msgid "Fee"
+msgstr "Gebühr"
+
 msgid "Created"
 msgstr "Erstellt"
+
+msgid "Disbursed"
+msgstr "Ausbezahlt"
 
 msgid "No people added yet."
 msgstr "Es wurden noch keine Personen hinzugefügt."
@@ -1672,12 +1684,6 @@ msgstr "Jetzt senden"
 
 msgid "The newsletter was already sent to the following addresses:"
 msgstr "Der Newsletter wurde bereits an die folgenden Empfänger gesendet:"
-
-msgid "Pay Online Now"
-msgstr "Jetzt online bezahlen"
-
-msgid "Pay Offline later"
-msgstr "Später bezahlen"
 
 msgid "Show"
 msgstr "Anzeigen"
@@ -1934,9 +1940,8 @@ msgstr "Veranstaltungs-Export"
 msgid "Exports all future events."
 msgstr "Exportiert alle zukünftigen Veranstaltungen."
 
-#, python-format
-msgid "Successfully synchronised ${count} payments"
-msgstr ""
+msgid "Successfully synchronised payments"
+msgstr "Synchronisierung erfolgreich"
 
 msgid "Your Stripe account was connected successfully."
 msgstr "Ihr Stripe Konto wurde erfolgreich verbunden."
