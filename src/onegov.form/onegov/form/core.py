@@ -234,6 +234,29 @@ class Form(BaseForm):
         for field_id, pricing in pricings.items():
             self._fields[field_id].pricing = pricing
 
+    def is_visible_through_dependencies(self, field_id):
+        """ Returns true if the given field id has visible because all of
+        it's parents are visible. A field is invisible if its dependency is
+        not met.
+
+        """
+
+        unbound_field = getattr(self.__class__, field_id)
+        depends_on = getattr(unbound_field, 'depends_on', None)
+
+        if not depends_on:
+            return True
+
+        bound_field = getattr(self, field_id)
+
+        if not depends_on.fulfilled(self, bound_field):
+            return False
+
+        return all(
+            self.is_visible_through_dependencies(d['field_id'])
+            for d in depends_on.dependencies
+        )
+
     def prices(self):
         """ Returns the prices of all selected items depending on the
         formdata. """
@@ -242,6 +265,9 @@ class Form(BaseForm):
 
         for field_id, field in self._fields.items():
             if not hasattr(field, 'pricing'):
+                continue
+
+            if not self.is_visible_through_dependencies(field_id):
                 continue
 
             price = field.pricing.price(field)

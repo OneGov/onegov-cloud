@@ -459,3 +459,92 @@ def test_pricing():
         ('ticket_insurance', (Decimal(10.0), 'CHF')),
         ('discount_code', (Decimal(-5.0), 'CHF'))
     ]
+
+
+def test_dependent_pricing():
+
+    class TestForm(Form):
+
+        give_donation = RadioField('Option', choices=[
+            ('yes', 'Yes'),
+            ('no', 'No')
+        ])
+
+        donation = RadioField('Option', choices=[
+            ('small', '10 CHF'),
+            ('big', '100 CHF'),
+        ], pricing={
+            'small': (10.0, 'CHF'),
+            'big': (100.0, 'CHF')
+        }, depends_on=(
+            'give_donation', 'yes'
+        ))
+
+    def post(data):
+        return DummyRequest(data).POST
+
+    form = TestForm(post({'give_donation': 'yes', 'donation': 'small'}))
+    assert form.total() == (Decimal('10.0'), 'CHF')
+    assert form.prices() == [
+        ('donation', (Decimal(10.0), 'CHF'))
+    ]
+
+    form = TestForm(post({'give_donation': 'yes', 'donation': 'big'}))
+    assert form.total() == (Decimal('100.0'), 'CHF')
+    assert form.prices() == [
+        ('donation', (Decimal(100.0), 'CHF'))
+    ]
+
+    form = TestForm(post({'give_donation': 'no', 'donation': 'small'}))
+    assert form.total() is None
+    assert form.prices() == []
+
+    form = TestForm(post({'give_donation': 'no', 'donation': 'big'}))
+    assert form.total() is None
+    assert form.prices() == []
+
+
+def test_nested_dependent_pricing():
+
+    class TestForm(Form):
+
+        give_donation = RadioField('Option', choices=[
+            ('yes', 'Yes'),
+            ('no', 'No')
+        ])
+
+        really_give = RadioField('Option', choices=[
+            ('yes', 'Yes'),
+            ('no', 'No')
+        ], depends_on=('give_donation', 'yes'))
+
+        donation = RadioField('Option', choices=[
+            ('small', '10 CHF'),
+            ('big', '100 CHF'),
+        ], pricing={
+            'small': (10.0, 'CHF'),
+            'big': (100.0, 'CHF')
+        }, depends_on=(
+            'really_give', 'yes'
+        ))
+
+    def post(data):
+        return DummyRequest(data).POST
+
+    assert TestForm(post({
+        'give_donation': 'no',
+        'really_give': 'yes',
+        'donation': 'small'
+    })).total() is None
+
+    assert TestForm(post({
+        'give_donation': 'yes',
+        'really_give': 'no',
+        'donation': 'small'
+    })).total() is None
+
+    assert TestForm(post({
+        'give_donation': 'yes',
+        'really_give': 'yes',
+        'donation': 'small'
+    })).total() == (Decimal(10.0), 'CHF')
