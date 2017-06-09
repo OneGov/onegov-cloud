@@ -58,65 +58,84 @@ def view_rdf(self, request):
             return text.interpolate(translator.gettext(text))
         return text.interpolate(text)
 
+    # todo: make this configurable on the principal
+    #  - kanton-zug
+    #  - Staatskanzlei Kanton Zug
+    publisher_id = principal.name.lower().replace(' ', '-')
+    publisher_name = 'Staatskanzlei {}'.format(principal.name)
+    publisher_mailto = 'mailto:{}'.format('xxx@yyy.zzz')
+
     for item in items:
+        is_vote = isinstance(item, Vote)
+
+        # IDs
+        item_id = '{}-{}'.format('vote' if is_vote else 'election', item.id)
         ds = sub(catalog, 'dcat:dataset')
-        ds = sub(ds, 'dcat:Dataset', {'rdf:about': item.id})
-        sub(ds, 'dct:identifier', {}, '{}@{}'.format(item.id, principal.name))
+        ds = sub(ds, 'dcat:Dataset', {
+            'rdf:about': 'http://{}/{}'.format(publisher_id, item_id)}
+        )
+        sub(ds, 'dct:identifier', {}, '{}@{}'.format(item_id, publisher_id))
+
+        # Dates
         sub(
             ds, 'dct:issued',
             {'rdf:datatype': 'http://www.w3.org/2001/XMLSchema#dateTime'},
-            item.created.isoformat()
+            item.created.replace(microsecond=0).isoformat()
         )
         sub(
             ds, 'dct:modified',
             {'rdf:datatype': 'http://www.w3.org/2001/XMLSchema#dateTime'},
-            item.last_result_change.isoformat()
+            item.last_result_change.replace(microsecond=0).isoformat()
         )
         sub(
             ds, 'dct:accrualPeriodicity',
             {'rdf:resource': 'http://purl.org/cld/freq/completelyIrregular'}
         )
+
+        # Theme
         sub(
             ds, 'dcat:theme',
             {'rdf:resource': 'http://opendata.swiss/themes/politics'}
         )
+
+        # Landing page
         sub(ds, 'dcat:landingPage', {}, request.link(item, 'data'))
 
-        type_ = _("Election") if isinstance(item, Election) else _("vo")
-        sub(ds, 'dcat:keyword', {'xml:lang': 'de'}, translate(type_, 'de_CH'))
-        sub(ds, 'dcat:keyword', {'xml:lang': 'fr'}, translate(type_, 'fr_CH'))
-        sub(ds, 'dcat:keyword', {'xml:lang': 'it'}, translate(type_, 'it_CH'))
-        sub(ds, 'dcat:keyword', {'xml:lang': 'en'}, translate(type_, 'en'))
+        # Keywords
+        for keyword in (
+            _("Vote") if is_vote else _("Election"),
+            domains[item.domain]
+        ):
+            for lang in ('de', 'fr', 'it', 'en'):
+                value = translate(keyword, '{}_CH'.format(lang)).lower()
+                sub(ds, 'dcat:keyword', {'xml:lang': lang}, value)
 
-        domain = domains[item.domain]
-        sub(ds, 'dcat:keyword', {'xml:lang': 'de'}, translate(domain, 'de_CH'))
-        sub(ds, 'dcat:keyword', {'xml:lang': 'fr'}, translate(domain, 'fr_CH'))
-        sub(ds, 'dcat:keyword', {'xml:lang': 'it'}, translate(domain, 'it_CH'))
-        sub(ds, 'dcat:keyword', {'xml:lang': 'en'}, translate(domain, 'en'))
-
+        # Title
         for lang in ('de', 'fr', 'it', 'en'):
             title = item.title_translations.get('{}_CH'.format(lang))
             title = title or item.title
             sub(ds, 'dct:title', {'xml:lang': lang}, title)
 
-        # Todo: add a generic description
-        #  e.g. Abstimungsresultate der eidgenössischen Abstimmung "xxx"
-        #  des Kantons St. Gallen
+        # Description
+        # Todo: Add a generic description a more generic description?
+        #  Schlussresultat der kantonalen Abstimmung "XXX" vom 1.1.2000,
+        #    Kanton Zug.
         des = _("Results")
         sub(ds, 'dct:description', {'xml:lang': 'en'}, translate(des, 'de_CH'))
         sub(ds, 'dct:description', {'xml:lang': 'fr'}, translate(des, 'fr_CH'))
         sub(ds, 'dct:description', {'xml:lang': 'it'}, translate(des, 'it_CH'))
         sub(ds, 'dct:description', {'xml:lang': 'en'}, translate(des, 'en'))
 
+        # Publisher
         pub = sub(ds, 'dct:publisher')
         pub = sub(pub, 'rdf:Description')
-        sub(pub, 'rdfs:label', {}, principal.name)
+        sub(pub, 'rdfs:label', {}, publisher_name)
         mail = sub(ds, 'dcat:contactPoint')
         mail = sub(mail, 'vcard:Organization')
-        sub(mail, 'vcard:fn', {}, principal.name)
-        # todo: Add email to instance
-        sub(mail, 'vcard:hasEmail', {'rdf:resource': 'mailto:xxx@yyy.zzz'})
+        sub(mail, 'vcard:fn', {}, publisher_name)
+        sub(mail, 'vcard:hasEmail', {'rdf:resource': publisher_mailto})
 
+        # Date
         date = sub(ds, 'dct:temporal')
         date = sub(date, 'dct:PeriodOfTime')
         sub(
@@ -130,6 +149,7 @@ def view_rdf(self, request):
             item.date.isoformat()
         )
 
+        # Distributions
         for fmt, media_type in (
             ('csv', 'text/csv'),
             ('xlsx', ('application/vnd.openxmlformats-officedocument'
@@ -137,20 +157,35 @@ def view_rdf(self, request):
             ('json', 'application/json'),
         ):
             url = request.link(item, 'data-{}'.format(fmt))
-            dist = sub(ds, 'dcat:distribution')
-            dist = sub(dist, 'dcat:Distribution', {'rdf:about': url})
 
-            sub(dist, 'dct:identifier', {}, url)
+            # IDs
+            dist = sub(ds, 'dcat:distribution')
+            dist = sub(dist, 'dcat:Distribution', {
+                'rdf:about': 'http://{}/{}/{}'.format(
+                    publisher_id, item_id, fmt
+                )
+            })
+            sub(dist, 'dct:identifier', {}, fmt)
+
+            # Title
+            for lang in ('de', 'fr', 'it', 'en'):
+                title = item.title_translations.get('{}_CH'.format(lang))
+                title = title or item.title
+                sub(dist, 'dct:title', {'xml:lang': lang}, title)
+
+            # Dates
             sub(
                 dist, 'dct:issued',
                 {'rdf:datatype': 'http://www.w3.org/2001/XMLSchema#dateTime'},
-                item.created.isoformat()
+                item.created.replace(microsecond=0).isoformat()
             )
             sub(
                 dist, 'dct:modified',
                 {'rdf:datatype': 'http://www.w3.org/2001/XMLSchema#dateTime'},
-                item.last_result_change.isoformat()
+                item.last_result_change.replace(microsecond=0).isoformat()
             )
+
+            # URLs
             sub(
                 dist, 'dcat:accessURL',
                 {'rdf:datatype': 'http://www.w3.org/2001/XMLSchema#anyURI'},
@@ -161,16 +196,16 @@ def view_rdf(self, request):
                 {'rdf:datatype': 'http://www.w3.org/2001/XMLSchema#anyURI'},
                 url
             )
+
+            # Legal
             sub(
                 dist, 'dct:rights',
                 {},
                 'NonCommercialAllowed-CommercialAllowed-ReferenceNotRequired'
             )
 
-            # todo: dct:license
-            # todo: dcat:byteSize
+            # Media Type
             sub(dist, 'dcat:mediaType', {}, media_type)
-            sub(dist, 'dcat:format', {}, fmt.upper())
 
     out = BytesIO()
     ElementTree(rdf).write(out, encoding='utf-8', xml_declaration=True)

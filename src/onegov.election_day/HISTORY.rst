@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Returns CSV exports as files.
+  [msom]
+
 - Fixes grouped bar chart.
   [msom]
 

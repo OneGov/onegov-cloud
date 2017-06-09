@@ -44,7 +44,13 @@ def view_election_data_as_csv(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_result_change)
 
-    return convert_list_of_dicts_to_csv(self.export())
+    return Response(
+        convert_list_of_dicts_to_csv(self.export()),
+        content_type='text/csv',
+        content_disposition='inline; filename={}.csv'.format(
+            normalize_for_url(self.title)
+        )
+    )
 
 
 @ElectionDayApp.view(model=Election, name='data-xlsx', permission=Public)
