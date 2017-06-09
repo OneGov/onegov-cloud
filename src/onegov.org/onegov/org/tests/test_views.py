@@ -3388,3 +3388,163 @@ def test_login_with_required_userprofile(org_app):
     page = page.form.submit()
 
     assert 'einstellungen' in page.request.url
+
+
+def test_manual_form_payment(org_app):
+    collection = FormCollection(org_app.session())
+    collection.definitions.add('Govikon Poster', definition=textwrap.dedent("""
+        E-Mail *= @@@
+
+        Posters *=
+            [ ] Local Businesses (0 CHF)
+            [ ] Executive Committee (10 CHF)
+            [ ] Town Square (20 CHF)
+
+        Delivery *=
+            ( ) Pickup (0 CHF)
+            ( ) Delivery (5 CHF)
+    """), type='custom')
+
+    transaction.commit()
+
+    client = Client(org_app)
+
+    page = client.get('/formular/govikon-poster')
+    assert '10.00 CHF' in page
+    assert '20.00 CHF' in page
+    assert '5.00 CHF' in page
+
+    page.form['e_mail'] = 'info@example.org'
+    select_checkbox(page, 'posters', "Executive Committee")
+    select_checkbox(page, 'posters', "Town Square")
+    page.form['delivery'] = 'Delivery'
+
+    page = page.form.submit().follow()
+    assert "Totalbetrag" in page
+    assert "35.00 CHF" in page
+
+    page = page.form.submit().follow()
+    assert "Ticket Status" in page
+
+    client.login_editor()
+    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+    client.post(page.pyquery('.mark-as-paid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Bezahlt"
+
+    client.post(page.pyquery('.mark-as-unpaid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+
+def test_manual_reservation_payment_with_extra(org_app):
+    client = Client(org_app)
+
+    # prepate the required data
+    resources = ResourceCollection(org_app.libres_context)
+    resource = resources.by_name('tageskarte')
+    resource.pricing_method = 'per_item'
+    resource.price_per_item = 15.00
+    resource.payment_method = 'manual'
+    resource.definition = textwrap.dedent("""
+        Donation =
+            (x) Yes (10 CHF)
+            ( ) No
+    """)
+
+    scheduler = resource.get_scheduler(org_app.libres_context)
+    allocations = scheduler.allocate(
+        dates=(
+            datetime(2017, 7, 9),
+            datetime(2017, 7, 9)
+        ),
+        whole_day=True,
+        quota=4
+    )
+
+    reserve = bound_reserve(client, allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    reserve(quota=2, whole_day=True)
+
+    page = client.get('/ressource/tageskarte/formular')
+    page.form['email'] = 'info@example.org'
+
+    page.form['donation'] = 'No'
+    assert '30.00' in page.form.submit().follow()
+
+    page.form['donation'] = 'Yes'
+    assert '40.00' in page.form.submit().follow()
+
+    ticket = page.form.submit().follow().form.submit().follow()
+    assert 'RSV-' in ticket.text
+
+    # mark it as paid
+    client.login_editor()
+    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+    client.post(page.pyquery('.mark-as-paid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Bezahlt"
+
+    client.post(page.pyquery('.mark-as-unpaid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+
+def test_manual_reservation_payment_without_extra(org_app):
+    client = Client(org_app)
+
+    # prepate the required data
+    resources = ResourceCollection(org_app.libres_context)
+    resource = resources.by_name('tageskarte')
+    resource.pricing_method = 'per_hour'
+    resource.price_per_hour = 10.00
+    resource.payment_method = 'manual'
+
+    scheduler = resource.get_scheduler(org_app.libres_context)
+    allocations = scheduler.allocate(
+        dates=(
+            datetime(2017, 7, 9, 10),
+            datetime(2017, 7, 9, 12)
+        )
+    )
+
+    reserve = bound_reserve(client, allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    reserve()
+
+    page = client.get('/ressource/tageskarte/formular')
+    page.form['email'] = 'info@example.org'
+    assert '20.00' in page.form.submit().follow()
+
+    ticket = page.form.submit().follow().form.submit().follow()
+    assert 'RSV-' in ticket.text
+
+    # mark it as paid
+    client.login_editor()
+    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+
+    assert page.pyquery('.payment-state').text() == "Offen"
+
+    client.post(page.pyquery('.mark-as-paid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Bezahlt"
+
+    client.post(page.pyquery('.mark-as-unpaid').attr('ic-post-to'))
+    page = client.get(page.request.url)
+
+    assert page.pyquery('.payment-state').text() == "Offen"
