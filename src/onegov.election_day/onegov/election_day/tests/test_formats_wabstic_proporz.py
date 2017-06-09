@@ -27,7 +27,7 @@ def test_import_wabstic_proporz(session, tar_file):
     session.flush()
     election = session.query(Election).one()
 
-    principal = Principal('sg', '', '', canton='sg')
+    principal = Principal(canton='sg')
     entities = principal.entities.get(election.date.year, {})
 
     # The tar file contains results from SG from the 18.10.2015
@@ -100,7 +100,7 @@ def test_import_wabstic_proporz_missing_headers(session):
     )
     session.flush()
     election = session.query(Election).one()
-    principal = Principal('sg', '', '', canton='sg')
+    principal = Principal(canton='sg')
     entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabstic_proporz(
@@ -200,7 +200,7 @@ def test_import_wabstic_proporz_invalid_values(session):
     )
     session.flush()
     election = session.query(Election).one()
-    principal = Principal('sg', '', '', canton='sg')
+    principal = Principal(canton='sg')
     entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabstic_proporz(

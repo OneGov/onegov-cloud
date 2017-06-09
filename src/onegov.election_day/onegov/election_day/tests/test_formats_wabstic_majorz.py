@@ -25,7 +25,7 @@ def test_import_wabstic_majorz(session, tar_file):
     session.flush()
     election = session.query(Election).one()
 
-    principal = Principal('sg', '', '', canton='sg')
+    principal = Principal(canton='sg')
     entities = principal.entities.get(election.date.year, {})
 
     # The tar file contains results from SG from the 28.02.2016
@@ -78,7 +78,7 @@ def test_import_wabstic_majorz_missing_headers(session):
     )
     session.flush()
     election = session.query(Election).one()
-    principal = Principal('sg', '', '', canton='sg')
+    principal = Principal(canton='sg')
     entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabstic_majorz(
@@ -157,7 +157,7 @@ def test_import_wabstic_majorz_invalid_values(session):
     )
     session.flush()
     election = session.query(Election).one()
-    principal = Principal('sg', '', '', canton='sg')
+    principal = Principal(canton='sg')
     entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabstic_majorz(

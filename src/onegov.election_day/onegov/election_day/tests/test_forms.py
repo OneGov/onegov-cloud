@@ -71,12 +71,12 @@ def test_vote_form_domains():
     form = VoteForm()
     assert form.domain.choices == None
 
-    form.set_domain(Principal('be', None, None, canton='be'))
+    form.set_domain(Principal(name='be', canton='be'))
     assert sorted(form.domain.choices) == [
         ('canton', 'Cantonal'), ('federation', 'Federal')
     ]
 
-    form.set_domain(Principal('bern', None, None, municipality='351'))
+    form.set_domain(Principal(name='bern', municipality='351'))
     assert sorted(form.domain.choices) == [
         ('canton', 'Cantonal'), ('federation', 'Federal'),
         ('municipality', 'Communal')
@@ -139,12 +139,12 @@ def test_election_form_domains():
     form = ElectionForm()
     assert ElectionForm().domain.choices == None
 
-    form.set_domain(Principal('be', None, None, canton='be'))
+    form.set_domain(Principal(name='be', canton='be'))
     assert sorted(form.domain.choices) == [
         ('canton', 'Cantonal'), ('federation', 'Federal')
     ]
 
-    form.set_domain(Principal('bern', None, None, municipality='351'))
+    form.set_domain(Principal(name='bern', municipality='351'))
     assert sorted(form.domain.choices) == [
         ('canton', 'Cantonal'), ('federation', 'Federal'),
         ('municipality', 'Communal')
@@ -208,8 +208,8 @@ def test_election_form_model(election_day_app):
 
 
 def test_upload_vote_form():
-    cantonal_principal = Principal('be', None, None, canton='be')
-    communal_principal = Principal('bern', None, None, municipality='351')
+    cantonal_principal = Principal(name='be', canton='be')
+    communal_principal = Principal(name='bern', municipality='351')
 
     simple_vote = Vote()
     simple_vote.meta = {'vote_type': 'simple'}
@@ -308,8 +308,8 @@ def test_upload_vote_form():
 
 
 def test_upload_election_form():
-    cantonal_principal = Principal('be', None, None, canton='be')
-    communal_principal = Principal('bern', None, None, municipality='351')
+    cantonal_principal = Principal(name='be', canton='be')
+    communal_principal = Principal(name='bern', municipality='351')
 
     election = Election()
 

@@ -32,7 +32,7 @@ def test_import_wabstic_vote(session, tar_file):
     assert sgstatic_geschaefte  # we don't need this file atm
 
     # Test federal results
-    principal = Principal('sg', '', '', canton='sg')
+    principal = Principal(name='sg', canton='sg')
     entities = principal.entities.get(vote.date.year, {})
     for number, yeas, completed in (
         ('1', 70821, True),
@@ -70,7 +70,7 @@ def test_import_wabstic_vote(session, tar_file):
         ('68', '2', 3374, 337),
         ('69', '1', 3375, 365),
     ):
-        principal = Principal(str(entity_id), '', '', municipality=entity_id)
+        principal = Principal(name=str(entity_id), municipality=entity_id)
         entities = principal.entities.get(vote.date.year, {})
         errors = import_vote_wabstic(
             vote, district, number, entities,
@@ -88,7 +88,7 @@ def test_import_wabstic_vote(session, tar_file):
         ('3', '5', 3204, 'municipality'),  # number missing
     ):
         vote.domain = domain
-        principal = Principal(str(entity_id), '', '', municipality=entity_id)
+        principal = Principal(name=str(entity_id), municipality=entity_id)
         entities = principal.entities.get(vote.date.year, {})
         errors = import_vote_wabstic(
             vote, district, number, entities,
@@ -101,7 +101,7 @@ def test_import_wabstic_vote(session, tar_file):
 
     # Test complex vote
     vote.meta = {'vote_type': 'complex'}
-    principal = Principal(str(3402), '', '', municipality=3402)
+    principal = Principal(name=str(3402), municipality=3402)
     entities = principal.entities.get(vote.date.year, {})
     errors = import_vote_wabstic(
         vote, '83', '1', entities,
@@ -122,7 +122,7 @@ def test_import_wabstic_vote_missing_headers(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Principal('sg', '', '', canton='sg')
+    principal = Principal(canton='sg')
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabstic(
@@ -173,7 +173,7 @@ def test_import_wabstic_vote_invalid_values(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Principal('sg', '', '', canton='sg')
+    principal = Principal(canton='sg')
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabstic(
