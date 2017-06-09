@@ -207,7 +207,8 @@ class ReservationInfo(object):
 
     __slots__ = ['resource', 'reservation', 'request', 'translate']
 
-    def __init__(self, reservation, request):
+    def __init__(self, resource, reservation, request):
+        self.resource = resource
         self.reservation = reservation
         self.request = request
         self.translate = request.translate
@@ -237,13 +238,19 @@ class ReservationInfo(object):
 
         return url.as_string()
 
+    @property
+    def price(self):
+        price = self.reservation.price(self.resource)
+        return price and price.as_dict()
+
     def as_dict(self):
         return {
             'date': self.date,
             'time': self.time,
             'delete': self.delete_link,
             'quota': self.reservation.quota,
-            'created': self.reservation.created.isoformat()
+            'created': self.reservation.created.isoformat(),
+            'price': self.price
         }
 
 

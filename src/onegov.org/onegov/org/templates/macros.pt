@@ -141,7 +141,7 @@
 
 <metal:footer_social_media define-macro="footer_social_media">
     <h2 i18n:translate tal:condition="facebook or twitter">Social Media</h2>
-                
+
     <ul class="social-media-links" tal:condition="facebook or twitter">
         <li tal:condition="facebook">
             <a tal:attributes="href facebook">
@@ -581,6 +581,9 @@
                     </span>
                     <span class="reservation-time">
                         ${info.time}
+                    </span>
+                    <span class="reservation-price" tal:condition="info.price">
+                        ${'{:.2f}'.format(info.price.amount)} ${info.price.currency}
                     </span>
                 </li>
             </ul>

@@ -3129,7 +3129,8 @@ ul.search-results {
     }
 
     a,
-    .reservation-time {
+    .reservation-time,
+    .reservation-price {
         display: block;
         margin-left: 1.4rem;
     }
@@ -3150,7 +3151,8 @@ ul.search-results {
             width: 24px;
         }
 
-        .reservation-time {
+        .reservation-time,
+        .reservation-price {
             margin-left: 2.3rem;
         }
     }

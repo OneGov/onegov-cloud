@@ -786,6 +786,11 @@ ReservationSelection = React.createClass({
                                             </a>
                                         </span>
                                         <span className="reservation-time">{r.time}</span>
+                                        {r.price && (
+                                            <span className="reservation-price">
+                                                {r.price.amount.toFixed(2)} {r.price.currency}
+                                            </span>
+                                        )}
                                         <a className="delete" onClick={boundClick}>{locale('Remove')}</a>
                                     </li>
                                 );

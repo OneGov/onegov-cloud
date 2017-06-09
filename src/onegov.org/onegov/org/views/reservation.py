@@ -231,7 +231,7 @@ def handle_reservation_form(self, request, form):
         'title': title,
         'form': form,
         'reservation_infos': [
-            utils.ReservationInfo(r, request) for r in reservations
+            utils.ReservationInfo(self, r, request) for r in reservations
         ],
         'resource': self,
         'button_text': _("Continue")
@@ -272,7 +272,7 @@ def confirm_reservation(self, request):
         'form': form,
         'resource': self,
         'reservation_infos': [
-            utils.ReservationInfo(r, request) for r in reservations
+            utils.ReservationInfo(self, r, request) for r in reservations
         ],
         'failed_reservations': failed_reservations,
         'complete_link': request.link(self, 'abschluss'),

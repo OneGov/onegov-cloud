@@ -263,7 +263,7 @@ def get_reservations(self, request):
 
     return {
         'reservations': [
-            utils.ReservationInfo(reservation, request).as_dict()
+            utils.ReservationInfo(self, reservation, request).as_dict()
             for reservation in reservations
         ],
         'prediction': prediction
