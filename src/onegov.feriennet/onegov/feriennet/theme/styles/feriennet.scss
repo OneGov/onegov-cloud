@@ -109,6 +109,15 @@ ul.single-line {
 }
 
 /*
+    The bank settings are hidden by default, they are currently only used
+    for onegov.feriennet and should probably replaced by something feriennet
+    specific.
+*/
+#einstellungen #fieldset-payment {
+    display: block;
+}
+
+/*
     Generic icons (experimental, might replace other approaches in the future)
 */
 @mixin generic-icon($icon) {
