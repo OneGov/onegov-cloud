@@ -3,7 +3,11 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
-        <table class="payments-table">
+        <p i18n:translate tal:condition="not payments">
+            No payments yet.
+        </p>
+
+        <table class="payments-table" tal:condition="payments">
             <thead>
                 <tr>
                     <th i18n:translate>
