@@ -28,9 +28,7 @@ SUPPORTED_YEARS_NO_MAP = list(set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP))
 def test_principal_load():
     principal = Principal.from_yaml(textwrap.dedent("""
         name: Kanton Zug
-        logo:
         canton: zg
-        color: '#000'
     """))
 
     assert principal.name == 'Kanton Zug'
@@ -49,12 +47,11 @@ def test_principal_load():
     assert principal.sms_notification == None
     assert principal.wabsti_import == False
     assert principal.pdf_signing == {}
+    assert principal.open_data == {}
 
     principal = Principal.from_yaml(textwrap.dedent("""
         name: Kanton Zug
-        logo:
         canton: zg
-        color: '#000'
         base: 'http://www.zg.ch'
         analytics: "<script type=\\"text/javascript\\"></script>"
         use_maps: false
@@ -74,6 +71,10 @@ def test_principal_load():
             login: user
             password: pass
             reason: election and vote results
+        open_data:
+            id: kanton-zug
+            name: Staatskanzlei Kanton Zug
+            mail: info@zg.ch
     """))
 
     assert principal.name == 'Kanton Zug'
@@ -105,12 +106,15 @@ def test_principal_load():
         'password': 'pass',
         'reason': 'election and vote results'
     }
+    assert principal.open_data == {
+        'id': 'kanton-zug',
+        'name': 'Staatskanzlei Kanton Zug',
+        'mail': 'info@zg.ch'
+    }
 
     principal = Principal.from_yaml(textwrap.dedent("""
         name: Stadt Bern
-        logo:
         municipality: '351'
-        color: '#000'
     """))
 
     assert principal.name == 'Stadt Bern'
@@ -134,9 +138,7 @@ def test_principal_load():
 
     principal = Principal.from_yaml(textwrap.dedent("""
         name: Stadt Bern
-        logo:
         municipality: '351'
-        color: '#000'
         use_maps: true
     """))
 
@@ -162,13 +164,11 @@ def test_principal_load():
 
 def test_principal_municipalities():
     # Bern (municipalitites have districts, not municipalitites)
-    principal = Principal(
-        name='Bern', municipality='351', logo=None, color=None
-    )
+    principal = Principal(name='Bern', municipality='351')
     assert principal.municipalities == {}
 
     # Canton Zug
-    principal = Principal(name='Zug', canton='zg', logo=None, color=None)
+    principal = Principal(name='Zug', canton='zg')
     municipalities = {
         1701: {'name': 'Baar'},
         1702: {'name': 'Cham'},
@@ -188,30 +188,24 @@ def test_principal_municipalities():
 
     # All cantons
     for canton in cantons:
-        principal = Principal(
-            name=canton, canton=canton, logo=None, color=None
-        )
+        principal = Principal(name=canton, canton=canton)
         for year in SUPPORTED_YEARS:
             assert principal.municipalities[year]
 
 
 def test_principal_districts():
     # Canton Zug (cantons have municipalities, not districts)
-    principal = Principal(name='Zug', canton='zg', logo=None, color=None)
+    principal = Principal(name='Zug', canton='zg')
     assert principal.districts == {}
 
     # Municipality without districts
-    principal = Principal(
-        name='Kriens', municipality='1059', logo=None, color=None
-    )
+    principal = Principal(name='Kriens', municipality='1059')
     assert principal.districts == {
         year: {1059: {'name': 'Kriens'}} for year in SUPPORTED_YEARS
     }
 
     # Municipality with districts
-    principal = Principal(
-        name='Bern', municipality='351', logo=None, color=None
-    )
+    principal = Principal(name='Bern', municipality='351')
     districts = {
         1: {'name': 'Innere Stadt'},
         2: {'name': 'Länggasse/Felsenau'},
@@ -224,25 +218,19 @@ def test_principal_districts():
 
 
 def test_principal_entities():
-    principal = Principal(name='Zug', canton='zg', logo=None, color=None)
+    principal = Principal(name='Zug', canton='zg')
     assert principal.entities == principal.municipalities
 
-    principal = Principal(
-        name='Kriens', municipality='1059', logo=None, color=None
-    )
+    principal = Principal(name='Kriens', municipality='1059')
     assert principal.entities == principal.districts
 
-    principal = Principal(
-        name='Bern', municipality='351', logo=None, color=None
-    )
+    principal = Principal(name='Bern', municipality='351')
     assert principal.entities == principal.districts
 
 
 def test_principal_years_available():
     # Municipality without districts/map
-    principal = Principal(
-        name='Kriens', municipality='1059', logo=None, color=None
-    )
+    principal = Principal(name='Kriens', municipality='1059')
     assert not principal.is_year_available(2000)
     assert not principal.is_year_available(2000, map_required=False)
     for year in SUPPORTED_YEARS:
@@ -250,9 +238,7 @@ def test_principal_years_available():
         assert principal.is_year_available(year, map_required=False)
 
     # Municipality with districts/map
-    principal = Principal(
-        name='Bern', municipality='351', logo=None, color=None
-    )
+    principal = Principal(name='Bern', municipality='351')
     assert not principal.is_year_available(2000)
     assert not principal.is_year_available(2000, map_required=False)
     for year in SUPPORTED_YEARS_NO_MAP:
@@ -264,9 +250,7 @@ def test_principal_years_available():
 
     # Cantons
     for canton in cantons:
-        principal = Principal(
-            name=canton, canton=canton, logo=None, color=None
-        )
+        principal = Principal(name=canton, canton=canton)
 
         for year in SUPPORTED_YEARS_NO_MAP:
             assert not principal.is_year_available(year)
@@ -278,21 +262,21 @@ def test_principal_years_available():
 
 def test_principal_notifications_enabled():
     assert Principal(
-        name='Kriens', municipality='1059', logo=None, color=None
+        name='Kriens', municipality='1059'
     ).notifications == False
 
     assert Principal(
-        name='Kriens', municipality='1059', logo=None, color=None,
+        name='Kriens', municipality='1059',
         webhooks={'a', 'b'}
     ).notifications == True
 
     assert Principal(
-        name='Kriens', municipality='1059', logo=None, color=None,
+        name='Kriens', municipality='1059',
         sms_notification='https://wab.kriens.ch'
     ).notifications == True
 
     assert Principal(
-        name='Kriens', municipality='1059', logo=None, color=None,
+        name='Kriens', municipality='1059',
         webhooks={'a', 'b'}, sms_notification='https://wab.kriens.ch'
     ).notifications == True
 

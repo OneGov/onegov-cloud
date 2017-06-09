@@ -4,18 +4,19 @@ See http://handbook.opendata.swiss/en/library/ch-dcat-ap for more information.
 
 """
 
-from xml.etree.ElementTree import SubElement
-from xml.etree.ElementTree import ElementTree
-from xml.etree.ElementTree import Element
-from onegov.election_day.models import Principal
-from onegov.election_day.layout import Layout
-from onegov.election_day import ElectionDayApp
-from onegov.election_day import _
-from onegov.core.utils import normalize_for_url
-from onegov.core.security import Public
-from onegov.ballot import Vote
-from onegov.ballot import Election
 from io import BytesIO
+from onegov.ballot import Election
+from onegov.ballot import Vote
+from onegov.core.security import Public
+from onegov.core.utils import normalize_for_url
+from onegov.election_day import _
+from onegov.election_day import ElectionDayApp
+from onegov.election_day.layout import Layout
+from onegov.election_day.models import Principal
+from webob.exc import HTTPNotImplemented
+from xml.etree.ElementTree import Element
+from xml.etree.ElementTree import ElementTree
+from xml.etree.ElementTree import SubElement
 
 
 def sub(parent, tag, attrib=None, text=None):
@@ -27,13 +28,18 @@ def sub(parent, tag, attrib=None, text=None):
 @ElectionDayApp.view(model=Principal, permission=Public, name='catalog.rdf')
 def view_rdf(self, request):
 
+    publisher_id = self.open_data.get('id')
+    publisher_name = self.open_data.get('name')
+    publisher_mail = self.open_data.get('mail')
+    if not publisher_id or not publisher_name or not publisher_mail:
+        raise HTTPNotImplemented()
+
     @request.after
     def set_headers(response):
         response.headers['Content-Type'] = 'application/rdf+xml; charset=UTF-8'
 
     layout = Layout(self, request)
-    principal = request.app.principal
-    domains = dict(principal.available_domains)
+    domains = dict(self.available_domains)
 
     rdf = Element('rdf:RDF', attrib={
         'xmlns:dct': 'http://purl.org/dc/terms/',
@@ -60,13 +66,6 @@ def view_rdf(self, request):
         if translator:
             return text.interpolate(translator.gettext(text))
         return text.interpolate(text)
-
-    # todo: make this configurable on the principal
-    #  - kanton-zug
-    #  - Staatskanzlei Kanton Zug
-    publisher_id = principal.name.lower().replace(' ', '-')
-    publisher_name = 'Staatskanzlei {}'.format(principal.name)
-    publisher_mailto = 'mailto:{}'.format('xxx@yyy.zzz')
 
     for item in items:
         is_vote = isinstance(item, Vote)
@@ -145,7 +144,9 @@ def view_rdf(self, request):
         mail = sub(ds, 'dcat:contactPoint')
         mail = sub(mail, 'vcard:Organization')
         sub(mail, 'vcard:fn', {}, publisher_name)
-        sub(mail, 'vcard:hasEmail', {'rdf:resource': publisher_mailto})
+        sub(mail, 'vcard:hasEmail', {
+            'rdf:resource': 'mailto:{}'.format('xxx@yyy.zzz')
+        })
 
         # Date
         date = sub(ds, 'dct:temporal')

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for opendata.swiss
+  [msom]
+
 - Returns CSV exports as files.
   [msom]
 

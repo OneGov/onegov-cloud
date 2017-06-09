@@ -236,8 +236,8 @@ def test_get_archive_links(session):
 def test_add_local_results(session):
     target = ArchivedResult(meta={})
 
-    be = Principal(name='BE', canton='be', logo=None, color=None)
-    bern = Principal(name='Bern', municipality='351', logo=None, color=None)
+    be = Principal(name='BE', canton='be')
+    bern = Principal(name='Bern', municipality='351')
 
     # wrong principal domain
     add_local_results(ArchivedResult(), target, be, session)

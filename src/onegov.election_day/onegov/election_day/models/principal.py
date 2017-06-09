@@ -41,10 +41,23 @@ class Principal(object):
 
     """
 
-    def __init__(self, name, logo, color, canton=None, municipality=None,
-                 base=None, analytics=None, use_maps=False, fetch=None,
-                 webhooks=None, sms_notification=None, wabsti_import=False,
-                 pdf_signing=None):
+    def __init__(
+        self,
+        canton=None,
+        municipality=None,
+        name=None,
+        logo=None,
+        color='#000',
+        base=None,
+        analytics=None,
+        use_maps=False,
+        fetch=None,
+        webhooks=None,
+        sms_notification=None,
+        wabsti_import=False,
+        pdf_signing=None,
+        open_data=None
+    ):
         assert (
             (canton in cantons and municipality is None) or
             (canton is None and municipality is not None)
@@ -63,6 +76,7 @@ class Principal(object):
         self.sms_notification = sms_notification
         self.wabsti_import = wabsti_import
         self.pdf_signing = pdf_signing or {}
+        self.open_data = open_data or {}
 
     @classmethod
     def from_yaml(cls, yaml_source):
