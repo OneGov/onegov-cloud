@@ -5,9 +5,9 @@ import transaction
 
 from cached_property import cached_property
 from contextlib import contextmanager
+from datetime import datetime
 from html import escape
 from io import BytesIO
-from onegov.core.utils import chunks
 from onegov.core.orm.mixins import meta_property
 from onegov.pay import log
 from onegov.pay.models.payment import Payment
@@ -83,8 +83,53 @@ class StripeCaptureManager(object):
         pass
 
 
+class StripeFeePolicy(object):
+    """ All stripe fee calculations in one place (should they ever change). """
+
+    @staticmethod
+    def from_amount(amount):
+        """ Gets the fee for the given amount. """
+
+        return round(float(amount) * 0.029 + 0.3, 2)
+
+    @staticmethod
+    def compensate(amount):
+        """ Increases the amount in such a way that the stripe fee is included
+        in the effective charge (that is, the user paying the charge is paying
+        the fee as well).
+
+        """
+
+        return round((float(amount) + 0.3) / (1 - 0.029), 2)
+
+
 class StripePayment(Payment):
     __mapper_args__ = {'polymorphic_identity': 'stripe_connect'}
+
+    fee_policy = StripeFeePolicy
+
+    #: the date of the payout
+    payout_date = meta_property('payout_date')
+
+    #: the id of the payout
+    payout_id = meta_property('payout_id')
+
+    #: the fee deducted by stripe
+    effective_fee = meta_property('effective_fee')
+
+    @property
+    def fee(self):
+        """ The calculated fee or the effective fee if available.
+
+        The effective fee is taken from the payout records. In practice
+        these values should always be the same.
+
+        """
+
+        if self.effective_fee:
+            return self.effective_fee
+
+        return self.fee_policy.from_amount(self.amount)
 
     @property
     def remote_url(self):
@@ -155,6 +200,9 @@ class StripeConnect(PaymentProvider):
 
     #: The access token provieded by OAuth
     access_token = meta_property('access_token')
+
+    #: The id of the latest processed balance transaction
+    latest_payout = meta_property('latest_payout')
 
     @property
     def livemode(self):
@@ -336,6 +384,10 @@ class StripeConnect(PaymentProvider):
 
     def sync(self):
         session = object_session(self)
+        self.sync_payment_states(session)
+        self.sync_payouts(session)
+
+    def sync_payment_states(self, session):
 
         def payments(ids):
             q = session.query(self.payment_class)
@@ -343,24 +395,61 @@ class StripeConnect(PaymentProvider):
 
             return q
 
-        def charges(batch_size=100):
-            with stripe_api_key(self.access_token):
-                charges = stripe.Charge.list(limit=100)
-                charges = (c for c in charges.auto_paging_iter())
-                charges = (c for c in charges if 'payment_id' in c.metadata)
+        charges = self.paged(
+            stripe.Charge.list,
+            limit=50,
+            include=lambda r: 'payment_id' in r.metadata
+        )
 
-                yield from chunks(charges, batch_size)
+        by_payment = {}
 
-        processed = 0
+        for charge in charges:
+            by_payment[charge.metadata['payment_id']] = charge
 
-        for batch in charges():
-            charges = {}
+        for payment in payments(by_payment.keys()):
+            payment.sync(remote_obj=by_payment[payment.id.hex])
 
-            for charge in (c for c in batch if c):
-                charges[charge.metadata['payment_id']] = charge
+    def sync_payouts(self, session):
 
-            for payment in payments(charges.keys()):
-                payment.sync(remote_obj=charges[payment.id.hex])
-                processed += 1
+        payouts = self.paged(stripe.Payout.list, limit=50, status='paid')
+        latest_payout = None
 
-        return processed
+        paid_charges = {}
+
+        for payout in payouts:
+            if latest_payout is None:
+                latest_payout = payout
+
+            if payout.id == self.latest_payout:
+                break
+
+            transactions = self.paged(
+                stripe.BalanceTransaction.list,
+                limit=50,
+                payout=payout.id,
+                type='charge'
+            )
+
+            for charge in transactions:
+                paid_charges[charge.source] = (
+                    datetime.fromtimestamp(payout.arrival_date),
+                    payout.id,
+                    charge.fee / 100
+                )
+
+        if paid_charges:
+            q = session.query(self.payment_class)
+            q = q.filter(self.payment_class.remote_id.in_(paid_charges.keys()))
+
+            for p in q:
+                p.payout_date, p.payout_id, p.fee = paid_charges[p.remote_id]
+
+        self.latest_payout = latest_payout.id
+
+    def paged(self, method, include=lambda record: True, **kwargs):
+        with stripe_api_key(self.access_token):
+            records = method(**kwargs)
+            records = (r for r in records.auto_paging_iter())
+            records = (r for r in records if include(r))
+
+            yield from records

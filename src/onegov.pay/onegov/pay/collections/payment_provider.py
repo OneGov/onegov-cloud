@@ -19,8 +19,7 @@ class PaymentProviderCollection(GenericCollection):
     def sync(self):
         """ Syncs all payments with the related payment providers.
 
-        Returns the number of processed payments.
-
         """
 
-        return sum(provider.sync() for provider in self.query())
+        for provider in self.query():
+            provider.sync()
