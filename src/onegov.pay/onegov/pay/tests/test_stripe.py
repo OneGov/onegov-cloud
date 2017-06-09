@@ -1,6 +1,12 @@
+import logging
 import pytest
+import transaction
 
-from onegov.pay.models.payment_providers import StripeConnect
+from onegov.pay.models.payment_providers.stripe import (
+    StripeConnect,
+    StripeFeePolicy,
+    StripeCaptureManager
+)
 from unittest import mock
 
 
@@ -53,3 +59,51 @@ def test_process_oauth_response():
         assert provider.user_id == 'uid'
         assert provider.refresh_token == 'rtoken'
         assert provider.access_token == 'atoken'
+
+
+def test_stripe_fee_policy():
+    assert StripeFeePolicy.from_amount(100) == 3.2
+    assert StripeFeePolicy.compensate(100) == 103.3
+    assert StripeFeePolicy.compensate(33.33) == 34.63
+
+
+def test_stripe_capture_good_charge():
+    class GoodCharge(object):
+        captured = False
+
+        def capture(self):
+            self.captured = True
+
+    charge = GoodCharge()
+
+    with mock.patch('stripe.Charge.retrieve', return_value=charge):
+        StripeCaptureManager.capture_charge('foo', 'bar')
+        assert not charge.captured
+
+        transaction.commit()
+        assert charge.captured
+
+
+def test_stripe_capture_evil_charge(capturelog):
+    capturelog.setLevel(logging.ERROR, logger='onegov.pay')
+
+    class EvilCharge(object):
+        def capture(self):
+            assert False
+
+    charge = EvilCharge()
+
+    with mock.patch('stripe.Charge.retrieve', return_value=charge):
+        StripeCaptureManager.capture_charge('foo', 'bar')
+
+        transaction.commit()
+        assert capturelog.records()[2].message\
+            == 'Stripe charge with capture id bar failed'
+
+
+def test_stripe_capture_negative_vote():
+    with mock.patch('stripe.Charge.retrieve', side_effect=AssertionError()):
+        StripeCaptureManager.capture_charge('foo', 'bar')
+
+        with pytest.raises(AssertionError):
+            transaction.commit()

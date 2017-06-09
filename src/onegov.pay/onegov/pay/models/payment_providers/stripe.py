@@ -86,21 +86,24 @@ class StripeCaptureManager(object):
 class StripeFeePolicy(object):
     """ All stripe fee calculations in one place (should they ever change). """
 
-    @staticmethod
-    def from_amount(amount):
+    percentage = 0.029
+    fixed = 0.3
+
+    @classmethod
+    def from_amount(cls, amount):
         """ Gets the fee for the given amount. """
 
-        return round(float(amount) * 0.029 + 0.3, 2)
+        return round(float(amount) * cls.percentage + cls.fixed, 2)
 
-    @staticmethod
-    def compensate(amount):
+    @classmethod
+    def compensate(cls, amount):
         """ Increases the amount in such a way that the stripe fee is included
         in the effective charge (that is, the user paying the charge is paying
         the fee as well).
 
         """
 
-        return round((float(amount) + 0.3) / (1 - 0.029), 2)
+        return round((float(amount) + cls.fixed) / (1 - cls.percentage), 2)
 
 
 class StripePayment(Payment):
