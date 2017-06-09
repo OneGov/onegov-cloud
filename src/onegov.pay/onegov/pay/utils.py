@@ -44,3 +44,9 @@ class Price(namedtuple('PriceBase', ('amount', 'currency'))):
     @classmethod
     def zero(cls):
         return cls(0, None)
+
+    def as_dict(self):
+        return {
+            'amount': float(self.amount),
+            'currency': self.currency
+        }
