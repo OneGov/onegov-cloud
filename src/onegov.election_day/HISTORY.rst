@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.12.1 (2017-06-12)
+~~~~~~~~~~~~~~~~~~~
 
 - Caches catalog view.
   [msom]
