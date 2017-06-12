@@ -3443,6 +3443,13 @@ def test_manual_form_payment(org_app):
 
     assert page.pyquery('.payment-state').text() == "Offen"
 
+    payments = client.get('/zahlungen')
+    assert "FRM-" in payments
+    assert "Manuell" in payments
+    assert "info@example.org" in payments
+    assert "35.00" in payments
+    assert "Offen" in payments
+
 
 def test_manual_reservation_payment_with_extra(org_app):
     client = Client(org_app)
@@ -3503,6 +3510,13 @@ def test_manual_reservation_payment_with_extra(org_app):
 
     assert page.pyquery('.payment-state').text() == "Offen"
 
+    payments = client.get('/zahlungen')
+    assert "RSV-" in payments
+    assert "Manuell" in payments
+    assert "info@example.org" in payments
+    assert "40.00" in payments
+    assert "Offen" in payments
+
 
 def test_manual_reservation_payment_without_extra(org_app):
     client = Client(org_app)
@@ -3550,6 +3564,13 @@ def test_manual_reservation_payment_without_extra(org_app):
     page = client.get(page.request.url)
 
     assert page.pyquery('.payment-state').text() == "Offen"
+
+    payments = client.get('/zahlungen')
+    assert "RSV-" in payments
+    assert "Manuell" in payments
+    assert "info@example.org" in payments
+    assert "20.00" in payments
+    assert "Offen" in payments
 
 
 def test_setup_stripe(org_app):
@@ -3648,3 +3669,10 @@ def test_stripe_form_payment(org_app):
         client.login_admin()
         ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
         assert "Bezahlt" in ticket
+
+    payments = client.get('/zahlungen')
+    assert "FRM-" in payments
+    assert "Stripe Connect" in payments
+    assert "info@example.org" in payments
+    assert "10.00 CHF" in payments
+    assert "0.59" in payments
