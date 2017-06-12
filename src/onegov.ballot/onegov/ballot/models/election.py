@@ -36,17 +36,20 @@ class DerivedAttributes(object):
 
     @hybrid_property
     def unaccounted_ballots(self):
-        """ number of unaccounted ballots """
+        """ The number of unaccounted ballots. """
+
         return self.blank_ballots + self.invalid_ballots
 
     @hybrid_property
     def accounted_ballots(self):
-        """ number of accounted ballots """
+        """ The number of accounted ballots. """
+
         return self.received_ballots - self.unaccounted_ballots
 
     @hybrid_property
     def turnout(self):
-        """ turnout of the election """
+        """ The turnout of the election. """
+
         if not self.elegible_voters:
             return 0
 
@@ -77,7 +80,7 @@ class Election(Base, TimestampMixin, DerivedAttributes,
     @observes('title_translations')
     def title_observer(self, translations):
         if not self.id:
-            id = normalize_for_url(self.title) or "election"
+            id = normalize_for_url(self.title) or 'election'
             session = object_session(self)
             while session.query(Election.id).filter(Election.id == id).first():
                 id = increment_name(id)
@@ -137,6 +140,7 @@ class Election(Base, TimestampMixin, DerivedAttributes,
     @property
     def counted(self):
         """ Checks if there are results for all entitites. """
+
         if self.total_entities and self.counted_entities:
             return self.total_entities == self.counted_entities
 
@@ -144,49 +148,50 @@ class Election(Base, TimestampMixin, DerivedAttributes,
 
     #: An election contains n list connections
     list_connections = relationship(
-        "ListConnection",
-        cascade="all, delete-orphan",
-        backref=backref("election"),
-        lazy="dynamic",
-        order_by="ListConnection.connection_id"
+        'ListConnection',
+        cascade='all, delete-orphan',
+        backref=backref('election'),
+        lazy='dynamic',
+        order_by='ListConnection.connection_id'
     )
 
     #: An election contains n lists
     lists = relationship(
-        "List",
-        cascade="all, delete-orphan",
-        backref=backref("election"),
-        lazy="dynamic",
+        'List',
+        cascade='all, delete-orphan',
+        backref=backref('election'),
+        lazy='dynamic',
     )
 
     #: An election contains n candidates
     candidates = relationship(
-        "Candidate",
-        cascade="all, delete-orphan",
-        backref=backref("election"),
-        lazy="dynamic",
-        order_by="Candidate.candidate_id",
+        'Candidate',
+        cascade='all, delete-orphan',
+        backref=backref('election'),
+        lazy='dynamic',
+        order_by='Candidate.candidate_id',
     )
 
     #: An election contains n results, one for each political entity
     results = relationship(
-        "ElectionResult",
-        cascade="all, delete-orphan",
-        backref=backref("election"),
-        lazy="dynamic",
-        order_by="ElectionResult.group",
+        'ElectionResult',
+        cascade='all, delete-orphan',
+        backref=backref('election'),
+        lazy='dynamic',
+        order_by='ElectionResult.group',
     )
 
     #: An election may contains n party results
     party_results = relationship(
-        "PartyResult",
-        cascade="all, delete-orphan",
-        backref=backref("election"),
-        lazy="dynamic",
+        'PartyResult',
+        cascade='all, delete-orphan',
+        backref=backref('election'),
+        lazy='dynamic',
     )
 
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
+
         return sum(getattr(result, attribute) for result in self.results)
 
     @staticmethod
@@ -195,6 +200,7 @@ class Election(Base, TimestampMixin, DerivedAttributes,
         as SQL expression.
 
         """
+
         expr = select([func.sum(getattr(ElectionResult, attribute))])
         expr = expr.where(ElectionResult.election_id == cls.id)
         expr = expr.label(attribute)
@@ -213,6 +219,7 @@ class Election(Base, TimestampMixin, DerivedAttributes,
         results, list results, ...
 
         """
+
         last_changes = []
 
         if self.last_change:
@@ -260,6 +267,7 @@ class Election(Base, TimestampMixin, DerivedAttributes,
     @property
     def has_panachage_data(self):
         """ Checks if there are panachage data available. """
+
         session = object_session(self)
 
         ids = session.query(List.id)
@@ -566,36 +574,39 @@ class ListConnection(Base, TimestampMixin):
 
     #: a list connection contains n lists
     lists = relationship(
-        "List",
-        cascade="all, delete-orphan",
-        backref=backref("connection"),
-        lazy="dynamic",
-        order_by="List.list_id"
+        'List',
+        cascade='all, delete-orphan',
+        backref=backref('connection'),
+        lazy='dynamic',
+        order_by='List.list_id'
     )
 
     #: a list connection contains n sub-connection
     children = relationship(
-        "ListConnection",
-        cascade="all, delete-orphan",
-        backref=backref("parent", remote_side='ListConnection.id'),
-        lazy="dynamic",
-        order_by="ListConnection.connection_id"
+        'ListConnection',
+        cascade='all, delete-orphan',
+        backref=backref('parent', remote_side='ListConnection.id'),
+        lazy='dynamic',
+        order_by='ListConnection.connection_id'
     )
 
     @property
     def total_votes(self):
         """ Returns the total number of votes. """
+
         return self.votes + sum(child.total_votes for child in self.children)
 
     @property
     def total_number_of_mandates(self):
         """ Returns the total number of mandates. """
+
         return self.number_of_mandates + sum(
             child.total_number_of_mandates for child in self.children
         )
 
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
+
         return sum(getattr(list, attribute) for list in self.lists)
 
     @staticmethod
@@ -604,6 +615,7 @@ class ListConnection(Base, TimestampMixin):
         as SQL expression.
 
         """
+
         expr = select([func.sum(getattr(List, attribute))])
         expr = expr.where(List.connection_id == cls.id)
         expr = expr.label(attribute)
@@ -637,30 +649,31 @@ class List(Base, TimestampMixin):
 
     #: a list contains n candidates
     candidates = relationship(
-        "Candidate",
-        cascade="all, delete-orphan",
-        backref=backref("list"),
-        lazy="dynamic",
+        'Candidate',
+        cascade='all, delete-orphan',
+        backref=backref('list'),
+        lazy='dynamic',
     )
 
     #: a list contains n results
     results = relationship(
-        "ListResult",
-        cascade="all, delete-orphan",
-        backref=backref("list"),
-        lazy="dynamic",
+        'ListResult',
+        cascade='all, delete-orphan',
+        backref=backref('list'),
+        lazy='dynamic',
     )
 
     #: a (proporz) list contains votes from other other lists
     panachage_results = relationship(
-        "PanachageResult",
-        cascade="all, delete-orphan",
-        backref=backref("list"),
-        lazy="dynamic"
+        'PanachageResult',
+        cascade='all, delete-orphan',
+        backref=backref('list'),
+        lazy='dynamic'
     )
 
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
+
         return sum(getattr(result, attribute) for result in self.results)
 
     @staticmethod
@@ -669,6 +682,7 @@ class List(Base, TimestampMixin):
         as SQL expression.
 
         """
+
         expr = select([func.sum(getattr(ListResult, attribute))])
         expr = expr.where(ListResult.list_id == cls.id)
         expr = expr.label(attribute)
@@ -708,10 +722,10 @@ class Candidate(Base, TimestampMixin):
 
     #: a candidate contains n results
     results = relationship(
-        "CandidateResult",
-        cascade="all, delete-orphan",
-        backref=backref("candidate"),
-        lazy="dynamic",
+        'CandidateResult',
+        cascade='all, delete-orphan',
+        backref=backref('candidate'),
+        lazy='dynamic',
     )
 
     def aggregate_results(self, attribute):
@@ -724,6 +738,7 @@ class Candidate(Base, TimestampMixin):
         as SQL expression.
 
         """
+
         expr = select([func.sum(getattr(CandidateResult, attribute))])
         expr = expr.where(CandidateResult.candidate_id == cls.id)
         expr = expr.label(attribute)
@@ -767,7 +782,8 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributes):
 
     @hybrid_property
     def accounted_votes(self):
-        """ number of accounted votes """
+        """ The number of accounted votes. """
+
         return (
             self.election.number_of_mandates * self.accounted_ballots -
             self.blank_votes - self.invalid_votes
@@ -775,11 +791,12 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributes):
 
     @accounted_votes.expression
     def accounted_votes(cls):
-        """ number of accounted votes """
+        """ The number of accounted votes. """
+
         # A bit of a hack :|
         number_of_mandates = select(
             [Election.number_of_mandates],
-            whereclause="elections.id = election_results.election_id"
+            whereclause='elections.id = election_results.election_id'
         )
         return (
             number_of_mandates * (
@@ -789,18 +806,18 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributes):
 
     #: an election result may contain n list results
     list_results = relationship(
-        "ListResult",
-        cascade="all, delete-orphan",
-        backref=backref("election_result"),
-        lazy="dynamic",
+        'ListResult',
+        cascade='all, delete-orphan',
+        backref=backref('election_result'),
+        lazy='dynamic',
     )
 
     #: an election result contains n candidate results
     candidate_results = relationship(
-        "CandidateResult",
-        cascade="all, delete-orphan",
-        backref=backref("election_result"),
-        lazy="dynamic",
+        'CandidateResult',
+        cascade='all, delete-orphan',
+        backref=backref('election_result'),
+        lazy='dynamic',
     )
 
 

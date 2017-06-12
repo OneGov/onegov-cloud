@@ -36,6 +36,7 @@ class DerivedAttributes(object):
     @hybrid_property
     def yeas_percentage(self):
         """ The percentage of yeas (discounts empty/invalid ballots). """
+
         return self.yeas / ((self.yeas + self.nays) or 1) * 100
 
     @yeas_percentage.expression
@@ -54,6 +55,7 @@ class DerivedAttributes(object):
     @hybrid_property
     def nays_percentage(self):
         """ The percentage of nays (discounts empty/invalid ballots). """
+
         return 100 - self.yeas_percentage
 
     @hybrid_property
@@ -108,10 +110,10 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
 
     #: a vote contains n ballots
     ballots = relationship(
-        "Ballot",
-        cascade="all, delete-orphan",
-        order_by="Ballot.type",
-        backref=backref("vote"),
+        'Ballot',
+        cascade='all, delete-orphan',
+        order_by='Ballot.type',
+        backref=backref('vote'),
         lazy='dynamic'
     )
 
@@ -138,7 +140,7 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
     @observes('title_translations')
     def title_observer(self, translations):
         if not self.id:
-            id = normalize_for_url(self.title) or "vote"
+            id = normalize_for_url(self.title) or 'vote'
             session = object_session(self)
             while session.query(Vote.id).filter(Vote.id == id).first():
                 id = increment_name(id)
@@ -190,6 +192,7 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
     @property
     def yeas_percentage(self):
         """ The percentage of yeas (discounts empty/invalid ballots). """
+
         # if we have no counter proposal, the yeas are a simple sum
         if not self.counter_proposal:
             subject = self
@@ -206,6 +209,7 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
     @property
     def nays_percentage(self):
         """ The percentage of nays (discounts empty/invalid ballots). """
+
         return 100 - self.yeas_percentage
 
     @property
@@ -238,6 +242,7 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
 
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
+
         return sum(getattr(ballot, attribute) for ballot in self.ballots)
 
     @staticmethod
@@ -246,6 +251,7 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
         as SQL expression.
 
         """
+
         expr = select([func.sum(getattr(Ballot, attribute))])
         expr = expr.where(Ballot.vote_id == cls.id)
         expr = expr.label(attribute)
@@ -258,6 +264,7 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
         results of this vote.
 
         """
+
         last_changes = []
         if self.last_change:
             last_changes.append(self.last_change)
@@ -411,16 +418,17 @@ class Ballot(Base, TimestampMixin, DerivedAttributes, DerivedBallotsCount):
 
     #: a ballot contains n results
     results = relationship(
-        "BallotResult",
-        cascade="all, delete-orphan",
-        backref=backref("ballot"),
+        'BallotResult',
+        cascade='all, delete-orphan',
+        backref=backref('ballot'),
         lazy='dynamic',
-        order_by="BallotResult.group",
+        order_by='BallotResult.group',
     )
 
     @hybrid_property
     def counted(self):
         """ True if all results have been counted. """
+
         return (
             sum(1 for r in self.results if r.counted) == self.results.count()
         )
@@ -451,6 +459,7 @@ class Ballot(Base, TimestampMixin, DerivedAttributes, DerivedBallotsCount):
 
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
+
         return sum(getattr(result, attribute) for result in self.results)
 
     @staticmethod
@@ -459,6 +468,7 @@ class Ballot(Base, TimestampMixin, DerivedAttributes, DerivedBallotsCount):
         as SQL expression.
 
         """
+
         expr = select([func.sum(getattr(BallotResult, attribute))])
         expr = expr.where(BallotResult.ballot_id == cls.id)
         expr = expr.label(attribute)
