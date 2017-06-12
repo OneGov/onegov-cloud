@@ -1,9 +1,13 @@
 Changelog
 ---------
+
+- Fixes wrong email address in opendata.swiss catalog.
+  [msom]
+
 1.12.0 (2017-06-09)
 ~~~~~~~~~~~~~~~~~~~
 
-- Adds support for opendata.swiss
+- Adds support for opendata.swiss.
   [msom]
 
 - Returns CSV exports as files.

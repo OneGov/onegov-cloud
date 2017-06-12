@@ -145,7 +145,7 @@ def view_rdf(self, request):
         mail = sub(mail, 'vcard:Organization')
         sub(mail, 'vcard:fn', {}, publisher_name)
         sub(mail, 'vcard:hasEmail', {
-            'rdf:resource': 'mailto:{}'.format('xxx@yyy.zzz')
+            'rdf:resource': 'mailto:{}'.format(publisher_mail)
         })
 
         # Date
