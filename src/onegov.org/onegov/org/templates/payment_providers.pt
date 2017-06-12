@@ -12,9 +12,13 @@
                 <h2><a href="${provider.url}">${provider.title}</a></h2>
                 <div>
                     <span>${provider.public_identity}</span>
+                </div>
                 <div>
                     <span i18n:translate>Connected:</span>
                     ${provider.connected and '✔︎' or '✘'}
+                </div>
+                <div class="text-links">
+                    <tal:b tal:repeat="link links(provider)" tal:replace="structure link(layout)" />
                 </div>
             </li>
         </ul>

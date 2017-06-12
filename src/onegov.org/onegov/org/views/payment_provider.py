@@ -27,7 +27,7 @@ def view_payment_providers(self, request):
                 traits=(
                     Confirm(
                         _("Should this provider really be the new default?"),
-                        _("All future payments will be switched."),
+                        _("All future payments will be redirected."),
                         _("Make Default"), _("Cancel")
                     ),
                     Intercooler(
