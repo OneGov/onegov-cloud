@@ -3646,7 +3646,7 @@ ul.recipients {
             margin-right: .75ex;
         }
     }
-    
+
     &.payment-state-paid {
         border: 1px solid $success-color;
 
@@ -3686,5 +3686,66 @@ ul.recipients {
 
     td {
         vertical-align: top;
+    }
+}
+
+/*
+    Apple Pay
+*/
+.apple-pay-button {
+    display: block;
+    height: 51px;
+    top: 3px;
+    width: 100%;
+}
+
+@supports (-webkit-appearance: -apple-pay-button) {
+    .apple-pay-button {
+        -webkit-appearance: -apple-pay-button;
+        -apple-pay-button-type: buy;
+    }
+
+    .apple-pay-button-black {
+        // scss-lint:disable ColorKeyword, ColorVariable
+        -apple-pay-button-style: black;
+    }
+
+    .apple-pay-button-white {
+        // scss-lint:disable ColorKeyword, ColorVariable
+        -apple-pay-button-style: white;
+    }
+
+    .apple-pay-button-white-with-line {
+        -apple-pay-button-style: white-outline;
+    }
+}
+
+@supports not (-webkit-appearance: -apple-pay-button) {
+    .apple-pay-button {
+        background-position: 50% 50%;
+        background-repeat: no-repeat;
+        background-size: 100% 60%;
+        border-radius: 5px;
+        box-sizing: border-box;
+        max-height: 64px;
+        min-height: 32px;
+        min-width: 200px;
+        padding: 0;
+    }
+
+    .apple-pay-button-black {
+        background-color: $black;
+        background-image: -webkit-named-image(apple-pay-logo-white);
+    }
+
+    .apple-pay-button-white {
+        background-color: $white;
+        background-image: -webkit-named-image(apple-pay-logo-black);
+    }
+
+    .apple-pay-button-white-with-line {
+        background-color: $white;
+        background-image: -webkit-named-image(apple-pay-logo-black);
+        border: .5px solid $black;
     }
 }
