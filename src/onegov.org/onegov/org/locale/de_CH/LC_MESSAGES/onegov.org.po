@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-06-12 13:26+0200\n"
+"POT-Creation-Date: 2017-06-12 15:04+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1586,6 +1586,9 @@ msgstr "Keine Zahlungsanbieter definiert."
 
 msgid "Connected:"
 msgstr "Verbunden:"
+
+msgid "Fee:"
+msgstr "Gebühr:"
 
 msgid "No payments yet."
 msgstr "Noch keine Zahlungen."

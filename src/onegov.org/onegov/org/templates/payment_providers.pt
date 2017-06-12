@@ -17,6 +17,16 @@
                     <span i18n:translate>Connected:</span>
                     ${provider.connected and '✔︎' or '✘'}
                 </div>
+                <div>
+                    <tal:b switch="provider.type">
+                        <tal:b case="'stripe_connect'">
+                            <span i18n:translate>Fee:</span>
+                            <span>
+                                ${'{:.02f}'.format(provider.fee_policy.percentage * 100)}% + ${'{:.02f}'.format(provider.fee_policy.fixed)}
+                            </span>
+                        </tal:b>
+                    </tal:b>
+                </div>
                 <div class="text-links">
                     <tal:b tal:repeat="link links(provider)" tal:replace="structure link(layout)" />
                 </div>
