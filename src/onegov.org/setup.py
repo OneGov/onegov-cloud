@@ -71,7 +71,8 @@ setup(
             'freezegun',
             'onegov.testing',
             'pyquery',
-            'pytest-localserver'
+            'pytest-localserver',
+            'requests-mock',
         ],
     ),
     entry_points={

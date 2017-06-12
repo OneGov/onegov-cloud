@@ -3,6 +3,7 @@ import onegov.core
 import onegov.org
 import pytest
 import re
+import requests_mock
 import textwrap
 import transaction
 
@@ -3548,3 +3549,38 @@ def test_manual_reservation_payment_without_extra(org_app):
     page = client.get(page.request.url)
 
     assert page.pyquery('.payment-state').text() == "Offen"
+
+
+def test_setup_stripe(org_app):
+    client = Client(org_app)
+    client.login_admin()
+
+    assert org_app.default_payment_provider is None
+
+    with requests_mock.Mocker() as m:
+        m.post('https://oauth.example.org/register/foo', json={
+            'token': '0xdeadbeef'
+        })
+
+        client.get('/zahlungsanbieter').click("Stripe Connect")
+
+        url = URL(m.request_history[0].json()['url'])
+        url = url.query_param('oauth_redirect_secret', 'bar')
+        url = url.query_param('code', 'api_key')
+
+        m.post('https://connect.stripe.com/oauth/token', json={
+            'scope': 'read_write',
+            'stripe_publishable_key': 'stripe_publishable_key',
+            'stripe_user_id': 'stripe_user_id',
+            'refresh_token': 'refresh_token',
+            'access_token': 'access_token',
+        })
+
+        client.get(url.as_string())
+
+    provider = org_app.default_payment_provider
+    assert provider.title == 'Stripe Connect'
+    assert provider.publishable_key == 'stripe_publishable_key'
+    assert provider.user_id == 'stripe_user_id'
+    assert provider.refresh_token == 'refresh_token'
+    assert provider.access_token == 'access_token'

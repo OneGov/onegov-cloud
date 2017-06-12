@@ -29,6 +29,17 @@ def es_org_app(request):
 
 def create_org_app(request, use_elasticsearch, cls=OrgApp):
     app = create_app(cls, request, use_elasticsearch=use_elasticsearch)
+    app.configure_payment_providers(**{
+        'payment_provider_defaults': {
+            'stripe_connect': {
+                'client_id': 'foo',
+                'client_secret': 'foo',
+                'oauth_gateway': 'https://oauth.example.org',
+                'oauth_gateway_auth': 'foo',
+                'oauth_gateway_secret': 'bar'
+            }
+        }
+    })
     session = app.session()
 
     org = create_new_organisation(app, name="Govikon", create_files=False)
