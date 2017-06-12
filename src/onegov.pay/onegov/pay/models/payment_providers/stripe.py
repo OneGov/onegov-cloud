@@ -172,6 +172,8 @@ class StripeConnect(PaymentProvider):
 
     __mapper_args__ = {'polymorphic_identity': 'stripe_connect'}
 
+    fee_policy = StripeFeePolicy
+
     #: The Stripe Connect client id
     client_id = meta_property('client_id')
 
