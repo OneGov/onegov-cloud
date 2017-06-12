@@ -70,6 +70,12 @@ def test_i18n(election_day_app):
 
 
 def test_pages_cache(election_day_app):
+    election_day_app.principal.open_data = {
+        'id': 'kanton-govikon',
+        'mail': 'info@govikon',
+        'name': 'Staatskanzlei Kanton Govikon'
+    }
+
     client = Client(election_day_app)
     client.get('/locale/de_CH')
 
@@ -88,6 +94,7 @@ def test_pages_cache(election_day_app):
 
     assert '0xdeadbeef' in anonymous.get('/')
     assert '0xdeadbeef' in anonymous.get('/vote/0xdeadbeef')
+    assert '0xdeadbeef' in anonymous.get('/catalog.rdf')
 
     edit = client.get('/vote/0xdeadbeef/edit')
     edit.form['vote_de'] = '0xdeadc0de'
@@ -97,6 +104,12 @@ def test_pages_cache(election_day_app):
     assert '0xdeadc0de' in anonymous.get('/')
     assert '0xdeadbeef' in anonymous.get('/vote/0xdeadbeef')
     assert '0xdeadc0de' in anonymous.get('/vote/0xdeadbeef', headers=[
+        ('Cache-Control', 'no-cache')
+    ])
+
+    assert '0xdeadc0de' in client.get('/catalog.rdf')
+    assert '0xdeadc0de' not in anonymous.get('/catalog.rdf')
+    assert '0xdeadc0de' in anonymous.get('/catalog.rdf', headers=[
         ('Cache-Control', 'no-cache')
     ])
 

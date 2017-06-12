@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Caches catalog view.
+  [msom]
+
 - Fixes wrong email address in opendata.swiss catalog.
   [msom]
 
