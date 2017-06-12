@@ -432,7 +432,7 @@ class StripeConnect(PaymentProvider):
             for p in q:
                 p.payout_date, p.payout_id, p.fee = paid_charges[p.remote_id]
 
-        self.latest_payout = latest_payout.id
+        self.latest_payout = latest_payout and latest_payout.id
 
     def paged(self, method, include=lambda record: True, **kwargs):
         with stripe_api_key(self.access_token):
