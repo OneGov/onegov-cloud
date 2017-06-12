@@ -90,7 +90,17 @@ def postgres():
 
     """
 
-    postgres = Postgresql()
+    # XXX our tests do not properly release open postgres connections, but
+    # I don't know yet where. The following configuration increases the
+    # number of allowed connections substantially as a work around.
+    postgres_args = ' '.join((
+        "-h 127.0.0.1",
+        "-F",
+        "-c logging_collector=off",
+        "-N 1024"
+    ))
+
+    postgres = Postgresql(postgres_args=postgres_args)
     yield postgres
     postgres.stop()
 
