@@ -223,7 +223,8 @@ class StripeConnect(PaymentProvider):
 
     @property
     def public_identity(self):
-        return self.account.business_name
+        account = self.account
+        return ' / '.join((account.business_name, account.email))
 
     @property
     def identity(self):
