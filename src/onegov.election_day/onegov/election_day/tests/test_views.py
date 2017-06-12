@@ -10,6 +10,7 @@ from onegov.election_day.tests import upload_vote
 from onegov.testing import utils
 from unittest.mock import patch
 from webtest import TestApp as Client
+from xml.etree.ElementTree import fromstring
 
 
 def test_view_permissions():
@@ -281,3 +282,62 @@ def test_view_svg(election_day_app):
         'proporz-election-parties.svg',
         'vote-proposal.svg'
     ]
+
+
+def test_opendata_catalog(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    # Not configured
+    response = client.get('/catalog.rdf', expect_errors=True)
+    assert response.status_code == 501
+
+    election_day_app.principal.open_data = {
+        'id': 'kanton-govikon',
+        'mail': 'info@govikon',
+        'name': 'Staatskanzlei Kanton Govikon'
+    }
+
+    # Empty
+    root = fromstring(client.get('/catalog.rdf').text)
+    assert root.tag.lower().endswith('rdf')
+    assert len(root[0].getchildren()) == 0
+
+    # With data
+    login(client)
+    upload_vote(client)
+    upload_majorz_election(client, canton='zg')
+    upload_proporz_election(client, canton='zg')
+
+    root = fromstring(client.get('/catalog.rdf').text)
+    assert set([
+        x[0][0].text
+        for x in root.findall('.//{http://purl.org/dc/terms/}publisher')
+    ]) == {'Staatskanzlei Kanton Govikon'}
+    assert set([
+        list(x.attrib.values())[0]
+        for x in root.findall('.//{http://www.w3.org/2006/vcard/ns#}hasEmail')
+    ]) == {'mailto:info@govikon'}
+    assert set([
+        x.text for x in root.findall('.//{http://purl.org/dc/terms/}title')
+    ]) == {
+        'Majorz Election',
+        'majorz-election.csv',
+        'majorz-election.json',
+        'majorz-election.xlsx',
+        'Proporz Election',
+        'proporz-election.csv',
+        'proporz-election.json',
+        'proporz-election.xlsx',
+        'vote.csv',
+        'vote.json',
+        'vote.xlsx',
+        'Vote',
+    }
+    assert set([
+        list(x[0].attrib.values())[0] for x in root[0]
+    ]) == {
+        'http://kanton-govikon/election-majorz-election',
+        'http://kanton-govikon/election-proporz-election',
+        'http://kanton-govikon/vote-vote',
+    }
