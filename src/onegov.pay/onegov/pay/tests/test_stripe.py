@@ -1,5 +1,6 @@
 import logging
 import pytest
+import requests_mock
 import transaction
 
 from onegov.pay.models.payment_providers.stripe import (
@@ -7,7 +8,9 @@ from onegov.pay.models.payment_providers.stripe import (
     StripeFeePolicy,
     StripeCaptureManager
 )
+from purl import URL
 from unittest import mock
+from urllib.parse import quote
 
 
 def test_oauth_url():
@@ -107,3 +110,30 @@ def test_stripe_capture_negative_vote():
 
         with pytest.raises(AssertionError):
             transaction.commit()
+
+
+def test_stripe_prepare_oauth_request():
+    stripe = StripeConnect()
+    stripe.oauth_gateway = 'https://oauth.example.org'
+    stripe.oauth_gateway_auth = 'gateway_auth'
+    stripe.oauth_gateway_secret = 'gateway_secret'
+    stripe.client_id = 'client_id'
+    stripe.client_secret = 'client_secret'
+
+    with requests_mock.Mocker() as m:
+        m.post('https://oauth.example.org/register/gateway_auth', json={
+            'token': '0xdeadbeef'
+        })
+
+        url = stripe.prepare_oauth_request(
+            redirect_uri='https://endpoint',
+            success_url='https://success',
+            error_url='https://error'
+        )
+
+        assert quote('https://oauth.example.org/redirect', safe='') in url
+
+        url = URL(url)
+        assert url.query_param('state') == '0xdeadbeef'
+        assert url.query_param('scope') == 'read_write'
+        assert url.query_param('client_id') == 'client_id'

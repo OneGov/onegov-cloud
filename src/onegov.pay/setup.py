@@ -34,6 +34,7 @@ setup(
     install_requires=[
         'more.webassets',
         'onegov.core>=0.4.0',
+        'purl',
         'requests',
         'stripe'
     ],
@@ -42,6 +43,7 @@ setup(
             'coverage',
             'onegov.testing',
             'pytest',
+            'requests-mock'
         ],
     ),
     entry_points={

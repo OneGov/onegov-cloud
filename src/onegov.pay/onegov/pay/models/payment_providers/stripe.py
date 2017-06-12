@@ -1,5 +1,4 @@
-import json
-import pycurl
+import requests
 import stripe
 import transaction
 
@@ -7,7 +6,6 @@ from cached_property import cached_property
 from contextlib import contextmanager
 from datetime import datetime
 from html import escape
-from io import BytesIO
 from onegov.core.orm.mixins import meta_property
 from onegov.pay import log
 from onegov.pay.models.payment import Payment
@@ -333,26 +331,12 @@ class StripeConnect(PaymentProvider):
             'error_url': error_url
         }
 
-        body = BytesIO()
-
-        c = pycurl.Curl()
-        c.setopt(c.URL, register)
-        c.setopt(c.POST, 1)
-        c.setopt(pycurl.POSTFIELDS, json.dumps(payload))
-        c.setopt(pycurl.WRITEFUNCTION, body.write)
-        c.perform()
-
-        status_code = c.getinfo(pycurl.RESPONSE_CODE)
-        c.close()
-
-        assert status_code == 200
-
-        body.seek(0)
-        token = json.loads(body.read().decode('utf-8'))['token']
+        response = requests.post(register, json=payload)
+        assert response.status_code == 200
 
         return self.oauth_url(
             redirect_uri='{}/redirect'.format(self.oauth_gateway),
-            state=token,
+            state=response.json()['token'],
             user_fields=user_fields
         )
 
