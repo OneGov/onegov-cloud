@@ -22,6 +22,7 @@ from onegov.org.testing import extract_href
 from onegov.org.testing import get_message
 from onegov.org.testing import select_checkbox
 from onegov.page import PageCollection
+from onegov.pay import PaymentProviderCollection
 from onegov.people import Person
 from onegov.testing import utils
 from onegov.ticket import TicketCollection
@@ -3584,3 +3585,66 @@ def test_setup_stripe(org_app):
     assert provider.user_id == 'stripe_user_id'
     assert provider.refresh_token == 'refresh_token'
     assert provider.access_token == 'access_token'
+
+
+def test_stripe_form_payment(org_app):
+    collection = FormCollection(org_app.session())
+    collection.definitions.add('Donate', definition=textwrap.dedent("""
+        E-Mail *= @@@
+
+        Donation *=
+            (x) Small (10 CHF)
+            ( ) Medium (100 CHF)
+    """), type='custom', payment_method='free')
+
+    providers = PaymentProviderCollection(org_app.session())
+    providers.add(type='stripe_connect', default=True, meta={
+        'publishable_key': '0xdeadbeef',
+        'access_token': 'foobar'
+    })
+
+    transaction.commit()
+
+    client = Client(org_app)
+
+    page = client.get('/formular/donate')
+    page.form['e_mail'] = 'info@example.org'
+    page = page.form.submit().follow()
+
+    assert "Totalbetrag" in page
+    assert "10.00 CHF" in page
+    assert "Online zahlen und abschliessen" in page
+
+    button = page.pyquery('.checkout-button')
+    assert button.attr('data-stripe-amount') == '1000'
+    assert button.attr('data-stripe-currency') == 'CHF'
+    assert button.attr('data-stripe-email') == 'info@example.org'
+    assert button.attr('data-stripe-description') == 'Donate'
+    assert button.attr('data-action') == 'submit'
+    assert button.attr('data-stripe-allowrememberme') == 'false'
+    assert button.attr('data-stripe-key') == '0xdeadbeef'
+
+    with requests_mock.Mocker() as m:
+        charge = {
+            'id': '123456'
+        }
+
+        m.post('https://api.stripe.com/v1/charges', json=charge)
+        m.get('https://api.stripe.com/v1/charges/123456', json=charge)
+        m.post('https://api.stripe.com/v1/charges/123456/capture', json=charge)
+
+        page.form['payment_token'] = 'foobar'
+        page.form.submit().follow()
+
+    with requests_mock.Mocker() as m:
+        m.get('https://api.stripe.com/v1/charges/123456', json={
+            'id': '123456',
+            'captured': True,
+            'refunded': False,
+            'paid': True,
+            'status': 'foobar'
+        })
+
+        client.login_admin()
+        ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+        assert "Bezahlt" in ticket
