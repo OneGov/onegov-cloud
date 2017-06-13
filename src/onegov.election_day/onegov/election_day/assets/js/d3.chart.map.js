@@ -192,8 +192,7 @@
                     globe = svg.append('g')
                         .attr(
                             'transform',
-                            'scale(' + bboxMap.width/230/10 + ') ' +
-                            'translate(0,-345)'
+                            'translate(0,' + Math.round(bboxMap.y + 3 / 4 * bboxMap.height) +  ')'
                         )
                         .property('__data__', {
                             'properties': {
@@ -201,6 +200,11 @@
                               'result': data[0]
                             }
                           }
+                        )
+                        .append('g')
+                        .attr(
+                            'transform',
+                            'scale(' + (bboxMap.width - bboxMap.x)/230/10 + ')'
                         );
 
                     globe.append('g')
@@ -226,14 +230,14 @@
 
                 // Add the the legend (we need to up/downscale the elements)
                 var unitScale = d3.scale.linear()
-                    .rangeRound([0, bboxMap.width / (width - margin.left - margin.right)]);
+                    .rangeRound([0, (bboxMap.width - bboxMap.x) / (width - margin.left - margin.right)]);
                 var legendValues = [80, 70, 60, 50.001, 49.999, 40, 30, 20];
                 var legendScale = d3.scale.ordinal()
                     .domain(legendValues)
-                    .rangeRoundBands([0.2 * bboxMap.width, 0.8 * bboxMap.width]);
+                    .rangeRoundBands([0.2 * (bboxMap.width - bboxMap.x), 0.8 * (bboxMap.width - bboxMap.x)]);
                 var legend = svg.append('g')
                     .attr('transform', function(d) {
-                        return 'translate(0,' + unitScale(options.legendMargin) + ')';
+                        return 'translate(0,' + Math.round(bboxMap.y + bboxMap.height + unitScale(options.legendMargin)) + ')';
                     });
                 var legendItems = legend.selectAll('.legend_item')
                     .data(legendValues).enter()
@@ -277,10 +281,10 @@
                     // Relayout on resize
                     d3.select(window).on('resize.ballotmap', function() {
                         width = $(container).width();
-                        unitScale.rangeRound([0, bboxMap.width / (width - margin.left - margin.right)]);
-                        legendScale.rangeRoundBands([0.2 * bboxMap.width, 0.8 * bboxMap.width]);
+                        unitScale.rangeRound([bboxMap.x, (bboxMap.width - bboxMap.x) / (width - margin.left - margin.right)]);
+                        legendScale.rangeRoundBands([0.2 * (bboxMap.width - bboxMap.x), 0.8 * (bboxMap.width - bboxMap.x)]);
                         legend.attr('transform', function(d) {
-                                return 'translate(0,' + unitScale(options.legendMargin) + ')';
+                                return 'translate(0,' + Math.round(bboxMap.y + bboxMap.height + unitScale(options.legendMargin)) + ')';
                             });
                         legendItems.attr('x', function(d) {return legendScale(d);})
                             .attr('width', legendScale.rangeBand())
