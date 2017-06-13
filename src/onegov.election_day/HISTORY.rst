@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds map data of SG for 2004-2012.
+  [msom]
+
 - Fixes ballot map scaling of legend and expats globe.
   [msom]
 

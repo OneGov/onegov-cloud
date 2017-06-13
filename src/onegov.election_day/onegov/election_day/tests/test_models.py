@@ -21,8 +21,14 @@ from unittest.mock import Mock, patch
 
 
 SUPPORTED_YEARS = list(range(2002, 2017 + 1))
+
 SUPPORTED_YEARS_MAP = list(range(2013, 2017 + 1))
 SUPPORTED_YEARS_NO_MAP = list(set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP))
+
+SUPPORTED_YEARS_MAP_SG = list(range(2004, 2017 + 1))
+SUPPORTED_YEARS_NO_MAP_SG = list(
+    set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP_SG)
+)
 
 
 def test_principal_load():
@@ -249,7 +255,7 @@ def test_principal_years_available():
         assert principal.is_year_available(year, map_required=False)
 
     # Cantons
-    for canton in cantons:
+    for canton in cantons - {'sg'}:
         principal = Principal(name=canton, canton=canton)
 
         for year in SUPPORTED_YEARS_NO_MAP:
@@ -258,6 +264,15 @@ def test_principal_years_available():
         for year in SUPPORTED_YEARS_MAP:
             assert principal.is_year_available(year)
             assert principal.is_year_available(year, map_required=False)
+
+    # Canton SG
+    principal = Principal(name='sg', canton='sg')
+    for year in SUPPORTED_YEARS_NO_MAP_SG:
+        assert not principal.is_year_available(year)
+        assert principal.is_year_available(year, map_required=False)
+    for year in SUPPORTED_YEARS_MAP_SG:
+        assert principal.is_year_available(year)
+        assert principal.is_year_available(year, map_required=False)
 
 
 def test_principal_notifications_enabled():
