@@ -16,8 +16,13 @@ class PayApp(WebassetsApp):
         """ Configures the preconfigured parameters for payment providers.
 
         Takes one dictionary for each availble provider. Available providers
-        can be found in the models/payment_providers folder. For example::
+        can be found in the models/payment_providers folder. Additionally,
+        it is possible to enable/disable custom payment providers for the
+        whole site.
 
+        For example::
+
+            payment_providers_enabled: true
             payment_provider_defaults:
                 stripe_connect:
                     client_id: foo
@@ -32,6 +37,9 @@ class PayApp(WebassetsApp):
         read by the payment provider.
 
         """
+
+        self.payment_providers_enabled = cfg.get(
+            'payment_providers_enabled', False)
 
         self.payment_provider_defaults = cfg.get(
             'payment_provider_defaults', {})
