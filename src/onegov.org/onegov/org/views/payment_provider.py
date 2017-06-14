@@ -74,7 +74,7 @@ def new_stripe_connect_provider(self, request):
     # account on the same physical server (which limits the attack-surface)
     salt = 'stripe-connect-oauth'
 
-    payment = StripeConnect(
+    provider = StripeConnect(
         **request.app.payment_provider_defaults['stripe_connect'])
 
     if request.is_admin and 'csrf-token' not in request.params:
@@ -85,7 +85,7 @@ def new_stripe_connect_provider(self, request):
 
         org = request.app.org
 
-        return morepath.redirect(payment.prepare_oauth_request(
+        return morepath.redirect(provider.prepare_oauth_request(
             handler,
             success_url=request.link(self, 'stripe-connect-oauth-success'),
             error_url=request.link(self, 'stripe-connect-oauth-error'),
@@ -100,20 +100,21 @@ def new_stripe_connect_provider(self, request):
 
     # we got a response from stripe!
     request.assert_valid_csrf_token(salt=salt)
-    payment.process_oauth_response(request.params)
+    provider.process_oauth_response(request.params)
 
     # it's possible to add the same payment twice, in which case we update the
     # data of the existing payment
-    for other in self.query().filter_by(type=payment.type):
-        if payment.identity == other.identity:
-            other.data = payment.data
+    for other in self.query().filter_by(type=provider.type):
+        if provider.identity == other.identity:
+            other.meta = provider.meta
+            other.content = provider.content
             return
 
     # if this is the first account, it should be the default
     if not self.query().count():
-        payment.default = True
+        provider.default = True
 
-    request.app.session().add(payment)
+    request.app.session().add(provider)
 
 
 @OrgApp.view(
