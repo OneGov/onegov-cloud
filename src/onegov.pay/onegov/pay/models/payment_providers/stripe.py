@@ -5,11 +5,13 @@ import transaction
 from cached_property import cached_property
 from contextlib import contextmanager
 from datetime import datetime
+from decimal import Decimal
 from html import escape
 from onegov.core.orm.mixins import meta_property
 from onegov.pay import log
 from onegov.pay.models.payment import Payment
 from onegov.pay.models.payment_provider import PaymentProvider
+from onegov.pay.utils import Price
 from sqlalchemy.orm import object_session
 from uuid import UUID, uuid4, uuid5
 
@@ -128,9 +130,9 @@ class StripePayment(Payment):
         """
 
         if self.effective_fee:
-            return self.effective_fee
+            return Decimal(self.effective_fee)
 
-        return self.fee_policy.from_amount(self.amount)
+        return Decimal(self.fee_policy.from_amount(self.amount))
 
     @property
     def remote_url(self):
@@ -206,6 +208,18 @@ class StripeConnect(PaymentProvider):
 
     #: The id of the latest processed balance transaction
     latest_payout = meta_property('latest_payout')
+
+    #: Should the fee be charged to the customer or not?
+    charge_fee_to_customer = meta_property('charge_fee_to_customer')
+
+    def adjust_price(self, price):
+        if self.charge_fee_to_customer:
+            new_price = self.fee_policy.compensate(price.amount)
+            new_fee = self.fee_policy.from_amount(new_price)
+
+            return Price(new_price, price.currency, new_fee)
+
+        return price
 
     @property
     def livemode(self):

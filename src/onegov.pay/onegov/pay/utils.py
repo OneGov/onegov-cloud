@@ -18,11 +18,16 @@ class QueryChain(QueryChainBase):
 
 
 @total_ordering
-class Price(namedtuple('PriceBase', ('amount', 'currency'))):
-    """ A single price. """
+class Price(namedtuple('PriceBase', ('amount', 'currency', 'fee'))):
+    """ A single price.
 
-    def __new__(cls, amount, currency):
-        return super().__new__(cls, Decimal(amount), currency)
+    The amount includes the fee. To get the net amount use the net_amount
+    property.
+
+    """
+
+    def __new__(cls, amount, currency, fee=0):
+        return super().__new__(cls, Decimal(amount), currency, Decimal(fee))
 
     def __bool__(self):
         return self.amount and True or False
@@ -54,5 +59,10 @@ class Price(namedtuple('PriceBase', ('amount', 'currency'))):
     def as_dict(self):
         return {
             'amount': float(self.amount),
-            'currency': self.currency
+            'currency': self.currency,
+            'fee': float(self.fee)
         }
+
+    @property
+    def net_amount(self):
+        return self.amount - self.fee

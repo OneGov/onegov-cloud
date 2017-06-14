@@ -1,7 +1,7 @@
 from collections import defaultdict
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.pay.models import Payment
-from sqlalchemy import desc, or_
+from sqlalchemy import desc
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import undefer
 
@@ -58,11 +58,18 @@ class PaymentCollection(GenericCollection, Pagination):
 
         payment_links = defaultdict(list)
 
-        for cls in Payment.registered_links.values():
-            q = self.session.query(cls)
-            q = q.filter(
-                or_((cls.payment == payment) for payment in self.batch))
-            q = q.options(joinedload(cls.payment))
+        for link in Payment.registered_links.values():
+            targets = self.session.query(
+                getattr(link.table.columns, link.key)
+            ).filter(
+                link.table.columns.payment_id.in_(tuple(
+                    p.id for p in self.batch
+                ))
+            )
+
+            q = self.session.query(link.cls)
+            q = q.filter(link.cls.id.in_(targets.subquery()))
+            q = q.options(joinedload(link.cls.payment))
 
             for link in q:
                 payment_links[link.payment.id].append(link)

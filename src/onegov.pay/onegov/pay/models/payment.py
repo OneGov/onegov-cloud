@@ -1,3 +1,5 @@
+from collections import namedtuple
+from decimal import Decimal
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
@@ -12,6 +14,10 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import object_session
 from uuid import uuid4
+
+
+class RegisteredLink(namedtuple("RegisteredLink", ('cls', 'table', 'key'))):
+    pass
 
 
 class Payment(Base, TimestampMixin, ContentMixin):
@@ -53,6 +59,18 @@ class Payment(Base, TimestampMixin, ContentMixin):
         'polymorphic_on': source
     }
 
+    @property
+    def fee(self):
+        """ The fee associated with this payment. The payment amount includes
+        the fee. To get the net amount use the net_amount property.
+
+        """
+        return Decimal(0)
+
+    @property
+    def net_amount(self):
+        return self.amount - self.fee
+
     @hybrid_property
     def paid(self):
         """ Our states are essentially one paid and n unpaid states (indicating
@@ -65,7 +83,7 @@ class Payment(Base, TimestampMixin, ContentMixin):
         return self.state == 'paid'
 
     @staticmethod
-    def register_link(link_name, linked_class):
+    def register_link(link_name, linked_class, association_table, table_key):
         """ The :class:`~onegov.pay.models.payable.Payable` class registers
         all back-referenes through this method. This is useful for two reasons:
 
@@ -83,17 +101,21 @@ class Payment(Base, TimestampMixin, ContentMixin):
         not through any of its subclasses.
 
         """
-        Payment.registered_links[link_name] = linked_class
+        Payment.registered_links[link_name] = RegisteredLink(
+            cls=linked_class,
+            table=association_table,
+            key=table_key
+        )
 
     @property
     def links(self):
         session = object_session(self)
 
         return QueryChain(tuple(
-            session.query(cls)
+            session.query(link.cls)
             .filter_by(payment=self)
-            .options(joinedload(cls.payment))
-            for cls in self.registered_links.values()
+            .options(joinedload(link.cls.payment))
+            for link in self.registered_links.values()
         ))
 
     @property

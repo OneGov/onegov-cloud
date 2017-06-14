@@ -57,6 +57,16 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin):
 
         return payment
 
+    def adjust_price(self, price):
+        """ Called by client implementations this method allows to adjust the
+        price by adding a fee to it.
+
+        By default no change is made.
+
+        """
+
+        return price
+
     def charge(self, amount, currency, token):
         """ Given a payment token, charges the customer and creates a payment
         which is returned.

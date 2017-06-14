@@ -25,7 +25,7 @@ class Payable(object):
             Column(key, ForeignKey(target), primary_key=True, nullable=False),
             Column('payment_id', ForeignKey(Payment.id), nullable=False))
 
-        Payment.register_link(backref, cls)
+        Payment.register_link(backref, cls, payment_association, key)
 
         return relationship(
             argument=Payment,

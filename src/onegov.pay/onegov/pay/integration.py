@@ -49,6 +49,18 @@ class PayApp(WebassetsApp):
         return self.session().query(PaymentProvider)\
             .filter_by(default=True).first()
 
+    def adjust_price(self, price):
+        """ Takes the given price object and adjusts it depending on the
+        settings of the payment provider (for example, the fee might be
+        charged to the user).
+
+        """
+
+        if self.default_payment_provider:
+            return self.default_payment_provider.adjust_price(price)
+
+        return price
+
 
 @PayApp.webasset_path()
 def get_js_path():
@@ -78,7 +90,8 @@ def process_payment(method, price, provider=None, token=None):
         method = token and 'cc' or 'manual'
 
     if method == 'manual':
-        return ManualPayment(amount=price.amount, currency=price.currency)
+        # manual payments do not carry a fee, so we ignore it
+        return ManualPayment(amount=price.net_amount, currency=price.currency)
 
     if method == 'cc' and token:
         try:

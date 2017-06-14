@@ -11,13 +11,15 @@ def test_price():
     assert Price(10, 'CHF')[0] == Decimal(10)
     assert Price(10, 'CHF')[1] == 'CHF'
 
-    amount, currency = Price(10, 'CHF')
+    amount, currency, fee = Price(10, 'CHF')
     assert amount == Decimal(10)
     assert currency == 'CHF'
+    assert fee == Decimal(0)
 
     assert Price(10, 'CHF').as_dict() == {
         'amount': 10.0,
-        'currency': 'CHF'
+        'currency': 'CHF',
+        'fee': 0
     }
 
     assert str(Price(10, 'CHF')) == '10.00 CHF'

@@ -23,7 +23,7 @@ class PayableCollection(Pagination):
         if self.cls != '*':
             return (self.cls, )
 
-        return Payment.registered_links.values()
+        return tuple(link.cls for link in Payment.registered_links.values())
 
     def query(self):
         return QueryChain((
