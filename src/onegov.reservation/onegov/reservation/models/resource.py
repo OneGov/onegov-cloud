@@ -159,11 +159,8 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
 
         return total
 
-    def process_payment(self, reservation_token=None,
-                        provider=None, payment_token=None, extra=None):
+    def process_payment(self, price, provider=None, payment_token=None):
         """ Processes the payment for the given reservation token. """
-
-        price = self.price_of_reservation(reservation_token, extra)
 
         if price and price.amount > 0:
             return process_payment(
