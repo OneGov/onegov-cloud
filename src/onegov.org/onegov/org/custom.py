@@ -60,7 +60,7 @@ def get_global_tools(request):
             )
         )
 
-        if request.is_admin:
+        if request.is_admin and request.app.payment_providers_enabled:
             links.append(
                 Link(
                     _("Payment Provider"),

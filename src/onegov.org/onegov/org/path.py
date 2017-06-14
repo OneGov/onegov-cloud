@@ -392,7 +392,8 @@ def get_resource_recipient(app, id):
     model=PaymentProviderCollection,
     path='/zahlungsanbieter')
 def get_payment_provider_collection(app):
-    return PaymentProviderCollection(app.session())
+    if app.payment_providers_enabled:
+        return PaymentProviderCollection(app.session())
 
 
 @OrgApp.path(
@@ -400,7 +401,8 @@ def get_payment_provider_collection(app):
     path='/zahlungsanbieter-eintrag/{id}',
     converters=dict(id=UUID))
 def get_payment_provider(app, id):
-    return PaymentProviderCollection(app.session()).by_id(id)
+    if app.payment_providers_enabled:
+        return PaymentProviderCollection(app.session()).by_id(id)
 
 
 @OrgApp.path(

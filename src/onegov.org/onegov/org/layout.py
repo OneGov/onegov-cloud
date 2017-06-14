@@ -1479,23 +1479,24 @@ class PaymentCollectionLayout(DefaultLayout):
     def editbar_links(self):
         links = []
 
-        if self.request.is_admin:
+        if self.app.payment_providers_enabled:
+            if self.request.is_admin:
+                links.append(
+                    Link(
+                        text=_("Payment Provider"),
+                        url=self.request.class_link(PaymentProviderCollection),
+                        attrs={'class': 'payment-provider'}
+                    )
+                )
+
             links.append(
                 Link(
-                    text=_("Payment Provider"),
-                    url=self.request.class_link(PaymentProviderCollection),
-                    attrs={'class': 'payment-provider'}
+                    text=_("Synchronise"),
+                    url=self.request.class_link(
+                        PaymentProviderCollection, name='synchronisieren'
+                    ),
+                    attrs={'class': 'sync'}
                 )
             )
-
-        links.append(
-            Link(
-                text=_("Synchronise"),
-                url=self.request.class_link(
-                    PaymentProviderCollection, name='synchronisieren'
-                ),
-                attrs={'class': 'sync'}
-            )
-        )
 
         return links
