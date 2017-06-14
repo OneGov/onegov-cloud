@@ -1,10 +1,11 @@
 import morepath
 
-from onegov.core.security import Public, Secret
+from onegov.core.security import Public, Private, Secret
 from onegov.org import _
 from onegov.org.app import OrgApp
 from onegov.org.layout import PaymentProviderLayout
 from onegov.org.new_elements import Link, Confirm, Intercooler
+from onegov.pay import PaymentCollection
 from onegov.pay import PaymentProvider
 from onegov.pay import PaymentProviderCollection
 from onegov.pay.models.payment_providers import StripeConnect
@@ -158,3 +159,13 @@ def delete_provider(self, request):
     providers.delete(self)
 
     request.success(_("The payment provider was deleted."))
+
+
+@OrgApp.view(
+    model=PaymentProviderCollection,
+    name='synchronisieren',
+    permission=Private)
+def sync_payments(self, request):
+    self.sync()
+    request.success(_("Successfully synchronised payments"))
+    return request.redirect(request.class_link(PaymentCollection))

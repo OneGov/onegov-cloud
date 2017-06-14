@@ -41,16 +41,6 @@ def view_payments(self, request):
 
 
 @OrgApp.view(
-    model=PaymentProviderCollection,
-    name='synchronisieren',
-    permission=Private)
-def sync_payments(self, request):
-    self.sync()
-    request.success(_("Successfully synchronised payments"))
-    return request.redirect(request.class_link(PaymentCollection))
-
-
-@OrgApp.view(
     model=Payment,
     name='mark-as-paid',
     request_method='POST',

@@ -151,9 +151,6 @@ msgstr "Löschen"
 msgid "New"
 msgstr "Neu"
 
-msgid "Synchronise"
-msgstr "Synchronisieren"
-
 msgid "No"
 msgstr "Nein"
 
@@ -190,6 +187,9 @@ msgstr "Bilder verwalten"
 
 msgid "Choose images"
 msgstr "Bilder auswählen"
+
+msgid "Synchronise"
+msgstr "Synchronisieren"
 
 msgid "Yes"
 msgstr "Ja"
@@ -1949,9 +1949,6 @@ msgstr "Veranstaltungs-Export"
 msgid "Exports all future events."
 msgstr "Exportiert alle zukünftigen Veranstaltungen."
 
-msgid "Successfully synchronised payments"
-msgstr "Synchronisierung erfolgreich"
-
 msgid "Your Stripe account was connected successfully."
 msgstr "Ihr Stripe Konto wurde erfolgreich verbunden."
 
@@ -1963,6 +1960,9 @@ msgstr "Der Standard Zahlungsanbieter wurde verändert."
 
 msgid "The payment provider was deleted."
 msgstr "Der Zahlungsanbieter wurde gelöscht."
+
+msgid "Successfully synchronised payments"
+msgstr "Synchronisierung erfolgreich"
 
 msgid "As default"
 msgstr "Als Standard"
