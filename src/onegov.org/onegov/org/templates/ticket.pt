@@ -36,6 +36,11 @@
                         </div>
 
                         <div class="field-display-block" tal:condition="handler.payment">
+                            <div class="field-display-label" i18n:translate>Payment Amount</div>
+                                <div class="field-display-data ticket-payment">
+                                    ${'{:.2f}'.format(handler.payment.amount)} ${handler.payment.currency}
+                            </div>
+
                             <div class="field-display-label" i18n:translate>Payment State</div>
                             <div class="field-display-data ticket-payment">
                                 <tal:block define="payment handler.payment"
