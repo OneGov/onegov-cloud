@@ -685,6 +685,14 @@ form {
     }
 
     /*
+        Some fields need extra margins
+    */
+    #charge_fee_to_customer,
+    #daily_ticket_statistics {
+        margin-bottom: 1.5rem !important;
+    }
+
+    /*
         Ace code editor, which you don't want to touch. Huge pita to get to
         work right with custom styling (it'll look like it's working, but
         all the cursor measurements are off and the editing is werid).

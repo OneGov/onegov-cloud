@@ -1,6 +1,7 @@
 import morepath
 
 from onegov.core.security import Public, Private, Secret
+from onegov.form import Form
 from onegov.org import _
 from onegov.org.app import OrgApp
 from onegov.org.layout import PaymentProviderLayout
@@ -10,6 +11,8 @@ from onegov.pay import PaymentProvider
 from onegov.pay import PaymentProviderCollection
 from onegov.pay.models.payment_providers import StripeConnect
 from purl import URL
+from sqlalchemy.orm.attributes import flag_modified
+from wtforms.fields import BooleanField
 
 
 @OrgApp.html(
@@ -37,6 +40,12 @@ def view_payment_providers(self, request):
                     )
                 )
             )
+
+        yield Link(
+            _("Settings"),
+            request.link(provider, 'einstellungen'),
+        )
+
         yield Link(
             _("Delete"),
             layout.csrf_protected_url(request.link(provider)),
@@ -169,3 +178,45 @@ def sync_payments(self, request):
     self.sync()
     request.success(_("Successfully synchronised payments"))
     return request.redirect(request.class_link(PaymentCollection))
+
+
+def get_settings_form(model, request):
+    if model.type == 'stripe_connect':
+        class SettingsForm(Form):
+            charge_fee_to_customer = BooleanField(
+                label=_("Charge fees to customer")
+            )
+    else:
+        raise NotImplementedError
+
+    return SettingsForm
+
+
+@OrgApp.form(
+    model=PaymentProvider,
+    permission=Secret,
+    form=get_settings_form,
+    template='form.pt',
+    name='einstellungen'
+)
+def handle_provider_settings(self, request, form):
+
+    if form.submitted(request):
+        form.populate_obj(self)
+        flag_modified(self, 'meta')
+
+        request.success(_("Your changes were saved"))
+        return request.redirect(request.class_link(PaymentProviderCollection))
+
+    elif not request.POST:
+        form.process(obj=self)
+
+    layout = PaymentProviderLayout(self, request)
+    layout.breadcrumbs.append(Link(self.title, '#'))
+
+    return {
+        'layout': layout,
+        'title': self.title,
+        'lead': self.public_identity,
+        'form': form
+    }
