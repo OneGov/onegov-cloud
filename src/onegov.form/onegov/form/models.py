@@ -217,7 +217,7 @@ class FormSubmission(Base, TimestampMixin, Payable):
             if not self.received:
                 self.received = utcnow()
 
-    def process_payment(self, provider=None, token=None):
+    def process_payment(self, price, provider=None, token=None):
         """ Takes a request, optionally with the provider and the token
         by the provider that can be used to charge the credit card and creates
         a payment record if necessary.
@@ -228,11 +228,9 @@ class FormSubmission(Base, TimestampMixin, Payable):
 
         """
 
-        total = self.form_obj.total()
-
-        if total and total.amount > 0:
+        if price and price.amount > 0:
             return process_payment(
-                self.form.payment_method, total, provider, token)
+                self.form.payment_method, price, provider, token)
 
         return True
 
