@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-06 16:43+0200\n"
-"PO-Revision-Date: 2017-06-06 16:43+0200\n"
+"POT-Creation-Date: 2017-06-14 10:42+0200\n"
+"PO-Revision-Date: 2017-06-14 10:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -237,6 +237,9 @@ msgstr "Vorlage / Resultate"
 msgid "Vote number"
 msgstr "Vorlagen-Nummer"
 
+msgid "Identifier"
+msgstr "ID"
+
 msgid "OneGov Cloud"
 msgstr "OneGov Cloud"
 
@@ -248,6 +251,12 @@ msgstr "Vorlage mit Gegenentwurf"
 
 msgid "Default"
 msgstr "Standard"
+
+msgid "Vote"
+msgstr "Abstimmung"
+
+msgid "Election"
+msgstr "Wahl"
 
 msgid "Not a valid phone number."
 msgstr "Ungültige Telefonnummer."
@@ -263,9 +272,6 @@ msgstr "Abstimmung (Italienisch)"
 
 msgid "Vote (Romansh)"
 msgstr "Abstimmung (Rumantsch)"
-
-msgid "Vote"
-msgstr "Abstimmung"
 
 #, python-format
 msgid "New results are available on ${url}"
@@ -324,9 +330,6 @@ msgstr "Kantonale Abstimmungen"
 
 msgid "Communal Votes"
 msgstr "Kommunale Abstimmungen"
-
-msgid "Election"
-msgstr "Wahl"
 
 msgid "Reported"
 msgstr "Gemeldet"
@@ -741,6 +744,9 @@ msgstr "Abstimmung löschen"
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "Das Jahr ${year} wird noch nicht unterstützt"
+
+msgid "Use an election based on proportional representation"
+msgstr "Keine Proporzwahl"
 
 msgid "The data source is not configured properly"
 msgstr "Die Datenquellekonfiguration ist ungültig"

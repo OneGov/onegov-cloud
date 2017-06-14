@@ -6,6 +6,7 @@ from onegov.election_day.models.notification import SmsNotification
 from onegov.election_day.models.notification import WebhookNotification
 from onegov.election_day.models.principal import Principal
 from onegov.election_day.models.subscriber import Subscriber
+from onegov.election_day.models.upload_token import UploadToken
 
 __all__ = [
     'ArchivedResult',
@@ -16,4 +17,5 @@ __all__ = [
     'SmsNotification',
     'Subscriber',
     'WebhookNotification',
+    'UploadToken',
 ]

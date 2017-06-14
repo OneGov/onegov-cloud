@@ -13,11 +13,13 @@ from onegov.election_day.models import Notification
 from onegov.election_day.models import Principal
 from onegov.election_day.models import SmsNotification
 from onegov.election_day.models import Subscriber
+from onegov.election_day.models import UploadToken
 from onegov.election_day.models import WebhookNotification
 from onegov.election_day.models.principal import cantons
 from onegov.election_day.tests import DummyRequest
 from time import sleep
 from unittest.mock import Mock, patch
+from uuid import uuid4
 
 
 SUPPORTED_YEARS = list(range(2002, 2017 + 1))
@@ -777,3 +779,26 @@ def test_data_source(session):
     assert item.name == 'p'
     assert item.district == '3'
     assert item.number == '33'
+
+
+def test_upload_token(session):
+    session.add(UploadToken())
+    session.flush()
+    assert session.query(UploadToken).one().token
+
+    token = uuid4()
+    session.add(UploadToken(token=token))
+    session.flush()
+    assert session.query(UploadToken).count() == 2
+    assert token in [t.token for t in session.query(UploadToken)]
+
+
+def test_upload_token_duplicates(session):
+    token = uuid4()
+    session.add(UploadToken(token=token))
+    session.flush()
+    assert session.query(UploadToken).one().token == token
+
+    session.add(UploadToken(token=token))
+    with pytest.raises(Exception):
+        session.flush()

@@ -125,7 +125,7 @@ def view_upload_majorz_election(self, request, form):
 @ElectionDayApp.form(model=Election, name='upload-proporz',
                      template='upload_election.pt', permission=Private,
                      form=UploadProporzElectionForm)
-def view_upload(self, request, form):
+def view_upload_proporz_election(self, request, form):
 
     assert self.type == 'proporz'
 

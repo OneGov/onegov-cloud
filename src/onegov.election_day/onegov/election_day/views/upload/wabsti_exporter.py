@@ -13,14 +13,10 @@ from onegov.election_day.forms import UploadWabstiProporzElectionForm
 from onegov.election_day.forms import UploadWabstiVoteForm
 from onegov.election_day.models import DataSource
 from onegov.election_day.models import Principal
+from onegov.election_day.views.upload import set_locale
+from onegov.election_day.views.upload import translate_errors
 from onegov.election_day.views.upload import unsupported_year_error
 from webob.exc import HTTPForbidden
-
-
-def set_locale(request):
-    locale = request.headers.get('Accept-Language') or 'en'
-    locale = locale if locale in request.app.locales else 'en'
-    request.locale = locale
 
 
 def authenticated_source(request):
@@ -36,21 +32,10 @@ def authenticated_source(request):
         raise HTTPForbidden()
 
 
-def translate_errors(errors, request):
-    for key, values in errors.items():
-        errors[key] = []
-        for value in values:
-            errors[key].append({
-                'message': request.translate(value.error),
-                'filename': value.filename,
-                'line': value.line
-            })
-
-
 @ElectionDayApp.json(model=Principal, name='upload-wabsti-vote',
                      permission=Public, request_method='POST')
 def view_upload_wabsti_vote(self, request):
-    """ Upload vote results using the WabstiCExportert 2.1.
+    """ Upload vote results using the WabstiCExportert 2.2+.
 
     Example usage:
         curl http://localhost:8080/onegov_election_day/xx/upload-wabsti-vote
@@ -130,7 +115,7 @@ def view_upload_wabsti_vote(self, request):
 @ElectionDayApp.json(model=Principal, name='upload-wabsti-majorz',
                      permission=Public, request_method='POST')
 def view_upload_wabsti_majorz(self, request):
-    """ Upload election results using the WabstiCExportert 2.1.
+    """ Upload election results using the WabstiCExportert 2.2+.
 
     Example usage:
         curl http://localhost:8080/onegov_election_day/xx/upload-wabsti-majorz
@@ -222,7 +207,7 @@ def view_upload_wabsti_majorz(self, request):
 @ElectionDayApp.json(model=Principal, name='upload-wabsti-proporz',
                      permission=Public, request_method='POST')
 def view_upload_wabsti_proporz(self, request):
-    """ Upload election results using the WabstiCExportert 2.1.
+    """ Upload election results using the WabstiCExportert 2.2+.
 
     Example usage:
         curl http://localhost:8080/onegov_election_day/xx/upload-wabsti-proporz

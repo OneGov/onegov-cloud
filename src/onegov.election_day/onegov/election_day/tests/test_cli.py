@@ -7,6 +7,7 @@ from onegov.ballot import Ballot, BallotResult, Vote
 from onegov.election_day.cli import cli
 from onegov.election_day.models import ArchivedResult
 from unittest.mock import patch
+from uuid import uuid4
 
 
 def write_config(path, postgres_dsn, temporary_directory):
@@ -356,3 +357,66 @@ def test_generate_media(postgres_dsn, temporary_directory, session_manager):
     assert run_command(cfg_path, 'govikon', ['generate-media']).exit_code == 0
     assert len(os.listdir(pdf_path)) == 8
     assert os.listdir(svg_path) == []
+
+
+def test_manage_tokens(postgres_dsn, temporary_directory):
+    cfg_path = os.path.join(temporary_directory, 'onegov.yml')
+    write_config(cfg_path, postgres_dsn, temporary_directory)
+    write_principal(temporary_directory, 'Govikon')
+    assert run_command(cfg_path, 'govikon', ['add']).exit_code == 0
+
+    result = run_command(cfg_path, 'govikon', ['list-upload-tokens'])
+    assert result.exit_code == 0
+    assert "No tokens yet" in result.output
+
+    # Create token
+    result = run_command(cfg_path, 'govikon', ['create-upload-token'])
+    assert result.exit_code == 0
+    assert "Token created" in result.output
+    token = [l.strip() for l in result.output.split('\n') if l.strip()][1]
+
+    # Re-create token
+    create_token = ['create-upload-token', '--token', token]
+    result = run_command(cfg_path, 'govikon', create_token)
+    assert result.exit_code == 0
+    assert "Token created" in result.output
+    assert token in result.output
+
+    result = run_command(cfg_path, 'govikon', ['list-upload-tokens'])
+    assert result.exit_code == 0
+    assert token in result.output
+
+    # Create given token
+    new_token = str(uuid4())
+    create_token = ['create-upload-token', '--token', new_token]
+    result = run_command(cfg_path, 'govikon', create_token)
+    assert result.exit_code == 0
+    assert "Token created" in result.output
+    assert new_token in result.output
+
+    result = run_command(cfg_path, 'govikon', ['list-upload-tokens'])
+    assert result.exit_code == 0
+    assert token in result.output
+    assert new_token in result.output
+
+    # Delete token
+    delete_token = ['delete-upload-token', token]
+    result = run_command(cfg_path, 'govikon', delete_token)
+    assert result.exit_code == 0
+    assert "Token deleted" in result.output
+
+    result = run_command(cfg_path, 'govikon', ['list-upload-tokens'])
+    assert result.exit_code == 0
+    assert token not in result.output
+    assert new_token in result.output
+
+    # Clear tokens
+    create_token = ['create-upload-token', '--token', str(uuid4())]
+    result = run_command(cfg_path, 'govikon', create_token)
+    assert result.exit_code == 0
+    assert "Token created" in result.output
+
+    clear_tokens = ['clear-upload-tokens', '--no-confirm']
+    result = run_command(cfg_path, 'govikon', clear_tokens)
+    assert result.exit_code == 0
+    assert "All tokens removed" in result.output

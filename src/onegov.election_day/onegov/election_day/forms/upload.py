@@ -1,11 +1,16 @@
 from onegov.election_day import _
 from onegov.form import Form
 from onegov.form.fields import UploadField
-from onegov.form.validators import WhitelistedMimeType, FileSizeLimit
-from wtforms import BooleanField, IntegerField, RadioField
-from wtforms.validators import (
-    DataRequired, InputRequired, NumberRange, Optional
-)
+from onegov.form.validators import FileSizeLimit
+from onegov.form.validators import WhitelistedMimeType
+from wtforms import BooleanField
+from wtforms import IntegerField
+from wtforms import RadioField
+from wtforms import StringField
+from wtforms.validators import DataRequired
+from wtforms.validators import InputRequired
+from wtforms.validators import NumberRange
+from wtforms.validators import Optional
 
 
 ALLOWED_MIME_TYPES = {
@@ -531,6 +536,39 @@ class UploadWabstiProporzElectionForm(Form):
 
     wpstatic_kandidaten = UploadField(
         label="WPStatic_Kandidaten",
+        validators=[
+            DataRequired(),
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        render_kw=dict(force_simple=True)
+    )
+
+
+class UploadRestForm(Form):
+
+    type = RadioField(
+        _("Type"),
+        choices=[
+            ('vote', _("Vote")),
+            ('election', _("Election")),
+            ('parties', _("Party results")),
+        ],
+        validators=[
+            InputRequired()
+        ],
+        default='vote'
+    )
+
+    id = StringField(
+        label=_("Identifier"),
+        validators=[
+            InputRequired()
+        ]
+    )
+
+    results = UploadField(
+        label=_("Results"),
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),

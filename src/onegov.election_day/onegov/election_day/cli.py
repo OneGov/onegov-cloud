@@ -3,8 +3,9 @@
 import click
 import os
 
-from onegov.core.cli import command_group, pass_group_context
+from onegov.core.cli import command_group, pass_group_context, abort
 from onegov.election_day import log
+from onegov.election_day.collections import UploadTokenCollection
 from onegov.election_day.models import ArchivedResult
 from onegov.election_day.utils import add_local_results
 from onegov.election_day.utils.media_generator import MediaGenerator
@@ -102,6 +103,7 @@ def send_sms(group_context, username, password, originator, sentry):
             'info@seantis.ch' 'top-secret'
 
     """
+
     schemas = list(group_context.matches)
     for appcfg in group_context.appcfgs:
         sms_dir = appcfg.configuration.get('sms_directory')
@@ -130,6 +132,7 @@ def generate_media(sentry):
         onegov-election-day --select '/onegov_election_day/zg' generate-media
 
     """
+
     def generate(request, app):
         if not app.principal or not app.configuration.get('d3_renderer'):
             return
@@ -163,14 +166,14 @@ def generate_media(sentry):
 
 
 @cli.command('list-pdf-signing-reasons')
-@click.option('--sentry')
-def list_pdf_signing_reasons(sentry):
+def list_pdf_signing_reasons():
     """ Lists the reasons usable for PDF signing. Example:
 
         onegov-election-day --select '/onegov_election_day/zg'
             list-pdf-signing-reasons
 
     """
+
     def list_reasons(request, app):
         if not app.principal:
             return
@@ -178,3 +181,78 @@ def list_pdf_signing_reasons(sentry):
         click.echo(MediaGenerator(app).signing_reasons())
 
     return list_reasons
+
+
+@cli.command('list-upload-tokens')
+def list_upload_tokens():
+    """ Lists all tokens usable for uploading using the REST interface.
+
+        onegov-election-day --select '/onegov_election_day/zg'
+            list-upload-tokens
+
+    """
+
+    def create_token(request, app):
+        tokens = UploadTokenCollection(app.session()).list()
+        if tokens:
+            click.echo('Tokens:')
+            for token in tokens:
+                click.secho('  {}'.format(token), fg='green')
+        else:
+            click.echo('No tokens yet.')
+
+    return create_token
+
+
+@cli.command('create-upload-token')
+@click.option('--token')
+def create_upload_token(token):
+    """ Creates a token for uploading using the REST interface.
+
+        onegov-election-day --select '/onegov_election_day/zg'
+            list-pdf-signing-reasons
+
+    """
+    def create_token(request, app):
+        result = UploadTokenCollection(app.session()).create(token)
+        click.echo('Token created:')
+        click.secho('  {}'.format(result), fg='green')
+
+    return create_token
+
+
+@cli.command('delete-upload-token')
+@click.argument('token')
+def delete_upload_token(token):
+    """ Creates a token for uploading using the REST interface.
+
+        onegov-election-day --select '/onegov_election_day/zg'
+            delete-upload-token
+
+    """
+    def create_token(request, app):
+        UploadTokenCollection(app.session()).delete(token)
+        click.echo('Token deleted.')
+
+    return create_token
+
+
+@cli.command('clear-upload-tokens')
+@click.option('--confirm/--no-confirm', default=True,
+              help="Ask for confirmation (disabling this is dangerous!)")
+def clear_tokens(confirm):
+    """ Deletes all tokens usable for uploading using the REST interface.
+
+        onegov-election-day --select '/onegov_election_day/zg'
+            clear-upload-tokens
+
+    """
+    def clear_tokens(request, app):
+        if confirm:
+            if not click.confirm('Do you really want to remove all tokens?'):
+                abort("Canceled")
+
+        click.echo(UploadTokenCollection(app.session()).clear())
+        click.echo('All tokens removed')
+
+    return clear_tokens

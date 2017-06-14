@@ -6,6 +6,7 @@ from onegov.election_day.collections.notifications import \
 from onegov.election_day.collections.archived_results import \
     ArchivedResultCollection
 from onegov.election_day.collections.subscribers import SubscriberCollection
+from onegov.election_day.collections.upload_tokens import UploadTokenCollection
 
 
 __all__ = [
@@ -14,4 +15,5 @@ __all__ = [
     'DataSourceItemCollection',
     'NotificationCollection',
     'SubscriberCollection',
+    'UploadTokenCollection',
 ]

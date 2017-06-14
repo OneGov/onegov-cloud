@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-06 16:43+0200\n"
-"PO-Revision-Date: 2017-06-06 16:43+0200\n"
+"POT-Creation-Date: 2017-06-14 10:42+0200\n"
+"PO-Revision-Date: 2017-06-14 10:45+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -237,6 +237,9 @@ msgstr "Objet de la votation / Résultats"
 msgid "Vote number"
 msgstr "Numéro de votation"
 
+msgid "Identifier"
+msgstr "Identifiant"
+
 msgid "OneGov Cloud"
 msgstr "ONeGov Cloud"
 
@@ -248,6 +251,12 @@ msgstr "Vote avec contre-projet"
 
 msgid "Default"
 msgstr "Défaut"
+
+msgid "Vote"
+msgstr "Votation"
+
+msgid "Election"
+msgstr "Election"
 
 msgid "Not a valid phone number."
 msgstr "N'est pas un numéro de téléphone valide."
@@ -263,9 +272,6 @@ msgstr "Vote (italien)"
 
 msgid "Vote (Romansh)"
 msgstr "Vote (roumain)"
-
-msgid "Vote"
-msgstr "Votation"
 
 #, python-format
 msgid "New results are available on ${url}"
@@ -324,9 +330,6 @@ msgstr "Votations  cantonales"
 
 msgid "Communal Votes"
 msgstr "Votations communales"
-
-msgid "Election"
-msgstr "Election"
 
 msgid "Reported"
 msgstr "Reportés"
@@ -740,6 +743,9 @@ msgstr "Supprimer la votation"
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "L'année ${year} n'est pas encore prise en charge"
+
+msgid "Use an election based on proportional representation"
+msgstr "Aucune election selon le système proportionnel"
 
 msgid "The data source is not configured properly"
 msgstr "La source de données n'est pas configurée correctement"

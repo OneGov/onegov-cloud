@@ -6,6 +6,7 @@ from onegov.election_day.collections import DataSourceCollection
 from onegov.election_day.collections import DataSourceItemCollection
 from onegov.election_day.collections import NotificationCollection
 from onegov.election_day.collections import SubscriberCollection
+from onegov.election_day.collections import UploadTokenCollection
 from onegov.election_day.models import ArchivedResult
 from onegov.election_day.models import DataSource
 from onegov.election_day.models import DataSourceItem
@@ -503,3 +504,29 @@ def test_data_source_item_collection_pagination(session):
         == '99'
 
     assert len(DataSourceItemCollection(session, page=10).batch) == 0
+
+
+def test_upload_token_collection(session):
+
+    collection = UploadTokenCollection(session)
+    assert collection.list() == []
+
+    token = collection.create()
+    assert collection.list() == [token]
+
+    token = collection.create(token=token)
+    assert collection.list() == [token]
+
+    another_token = collection.create(token=uuid4())
+    assert set(collection.list()) == set([token, another_token])
+
+    collection.delete(token)
+    assert collection.list() == [another_token]
+
+    collection.create()
+    collection.create()
+    collection.create()
+    assert len(collection.list()) == 4
+
+    collection.clear()
+    assert collection.list() == []

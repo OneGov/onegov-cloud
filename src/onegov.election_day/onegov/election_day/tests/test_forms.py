@@ -7,6 +7,7 @@ from onegov.election_day.forms import SubscribeForm
 from onegov.election_day.forms import UploadElectionPartyResultsForm
 from onegov.election_day.forms import UploadMajorzElectionForm
 from onegov.election_day.forms import UploadProporzElectionForm
+from onegov.election_day.forms import UploadRestForm
 from onegov.election_day.forms import UploadVoteForm
 from onegov.election_day.forms import VoteForm
 from onegov.election_day.forms.upload import UploadElectionBaseForm
@@ -489,3 +490,16 @@ def test_data_source_item_form_populate(session):
     form.populate(dsp)
     assert not form.callout
     assert form.item.choices == [('p', 'p')]
+
+
+def test_upload_rest_form(session):
+    form = UploadRestForm()
+    assert not form.validate()
+
+    form = UploadRestForm(DummyPostData({'type': 'vote', 'id': 'vote'}))
+    form.results.data = {'mimetype': 'text/plain'}
+    assert form.validate()
+
+    form = UploadRestForm(DummyPostData({'type': 'parties', 'id': 'parties'}))
+    form.results.data = {'mimetype': 'text/plain'}
+    assert form.validate()
