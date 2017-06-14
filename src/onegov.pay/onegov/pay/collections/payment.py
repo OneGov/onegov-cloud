@@ -52,6 +52,10 @@ class PaymentCollection(GenericCollection, Pagination):
         """
 
         batch = batch or self.batch
+
+        if not batch:
+            return None
+
         payment_links = defaultdict(list)
 
         for cls in Payment.registered_links.values():
