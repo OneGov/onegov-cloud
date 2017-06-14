@@ -263,8 +263,8 @@ def confirm_reservation(self, request):
         if failed
     )
 
-    price = self.price_of_reservation(
-        token, submission and submission.form_obj.total())
+    price = request.app.adjust_price(self.price_of_reservation(
+        token, submission and submission.form_obj.total()))
 
     return {
         'title': _("Confirm your reservation"),
@@ -301,10 +301,13 @@ def finalize_reservation(self, request):
     submission = forms.submissions.by_id(token)
 
     try:
-        extra = submission and submission.form_obj.total() or None
         provider = request.app.default_payment_provider
         payment_token = request.params.get('payment_token')
-        payment = self.process_payment(token, provider, payment_token, extra)
+
+        price = request.app.adjust_price(self.price_of_reservation(
+            token, submission and submission.form_obj.total()))
+
+        payment = self.process_payment(price, provider, payment_token)
 
         if not payment:
             request.alert(_("Your payment could not be processed"))

@@ -104,7 +104,7 @@ def handle_pending_submission(self, request):
     else:
         title = self.form.title
 
-    price = form.total()
+    price = request.app.adjust_price(form.total())
 
     return {
         'layout': FormSubmissionLayout(self, request, title),
@@ -154,7 +154,9 @@ def handle_complete_submission(self, request):
         else:
             provider = request.app.default_payment_provider
             token = request.params.get('payment_token')
-            payment = self.process_payment(provider, token)
+
+            payment = self.process_payment(
+                request.app.adjust_price(form.total()), provider, token)
 
             if not payment:
                 request.alert(_("Your payment could not be processed"))

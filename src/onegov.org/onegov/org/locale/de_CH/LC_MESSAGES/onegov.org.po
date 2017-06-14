@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-06-14 13:38+0200\n"
+"POT-Creation-Date: 2017-06-14 15:26+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1316,6 +1316,9 @@ msgstr ""
 msgid "Pay Online Now"
 msgstr "Jetzt online bezahlen"
 
+msgid "Credit Card Fee"
+msgstr "Kreditkarten-Gebühr"
+
 msgid "Pay Offline later"
 msgstr "Später bezahlen"
 
@@ -1596,8 +1599,8 @@ msgstr "Noch keine Zahlungen."
 msgid "Object"
 msgstr "Objekt"
 
-msgid "Amount"
-msgstr "Betrag"
+msgid "Net Amount"
+msgstr "Netto Betrag"
 
 msgid "Fee"
 msgstr "Gebühr"
@@ -2165,3 +2168,6 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "Amount"
+#~ msgstr "Betrag"

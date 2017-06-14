@@ -14,7 +14,7 @@
                         Object
                     </th>
                     <th i18n:translate>
-                        Amount
+                        Net Amount
                     </th>
                     <th i18n:translate>
                         Fee
@@ -65,10 +65,10 @@
                             </tal:b>
                         </tal:b>
                     </td>
-                    <td>${'{0:.2f}'.format(payment.amount)} ${payment.currency}</td>
+                    <td>${'{0:.2f}'.format(payment.net_amount)} ${payment.currency}</td>
                     <td>
                         <tal:b condition="payment.fee|nothing">
-                            ${'{0:.2f}'.format(payment.fee)} ${payment.currency}
+                            + ${'{0:.2f}'.format(payment.fee)} ${payment.currency}
                         </tal:b>
                     </td>
                     <td>

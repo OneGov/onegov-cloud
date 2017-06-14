@@ -397,12 +397,19 @@
             <div class="field-display-block">
                 <div class="field-display-label" i18n:translate>Total Amount</div>
                 <div class="field-display-data">
-                    ${'{:.2f} {}'.format(*price)}
+                    <metal:b use-macro="layout.macros['price']" />
                 </div>
             </div>
         </div>
     </tal:b>
 </metal:display_form>
+
+<metal:price define-macro="price">
+    ${'{:.02f}'.format(price.net_amount)} ${price.currency}
+    <tal:b condition="price.fee and show_fee|nothing">
+        (+ ${'{:.02f}'.format(price.fee)} <tal:b i18n:translate>Credit Card Fee</tal:b>)
+    </tal:b>
+</metal:price>
 
 <metal:person_card define-macro="person_list_card" i18n:domain="onegov.org">
     <div class="person-card person-list-card" tal:define="link request.link(person)">
@@ -914,7 +921,12 @@
                         <div class="field-display-data">
                             <label class="common-text">
                                 <input type="radio" name="payment_method" value="online" checked>
-                                <span i18n:translate>Pay Online Now</span>
+                                <span>
+                                    <tal:b i18n:translate>Pay Online Now</tal:b>
+                                    <tal:b tal:condition="price.fee|nothing">
+                                        (+ ${'{:.02f}'.format(price.fee)} ${price.currency} <tal:b i18n:translate>Credit Card Fee</tal:b>)
+                                    </tal:b>
+                                </span>
                             </label>
                             <label class="common-text">
                                 <input type="radio" name="payment_method" value="manual">
