@@ -30,6 +30,7 @@ def es_org_app(request):
 def create_org_app(request, use_elasticsearch, cls=OrgApp):
     app = create_app(cls, request, use_elasticsearch=use_elasticsearch)
     app.configure_payment_providers(**{
+        'payment_providers_enabled': True,
         'payment_provider_defaults': {
             'stripe_connect': {
                 'client_id': 'foo',

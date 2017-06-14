@@ -3634,6 +3634,7 @@ def test_stripe_form_payment(org_app):
 
     assert "Totalbetrag" in page
     assert "10.00 CHF" in page
+    assert "0.59" in page
     assert "Online zahlen und abschliessen" in page
 
     button = page.pyquery('.checkout-button')
@@ -3674,5 +3675,5 @@ def test_stripe_form_payment(org_app):
     assert "FRM-" in payments
     assert "Stripe Connect" in payments
     assert "info@example.org" in payments
-    assert "10.00 CHF" in payments
+    assert "9.41 CHF" in payments
     assert "0.59" in payments
