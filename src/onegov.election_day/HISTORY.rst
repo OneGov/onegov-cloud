@@ -4,6 +4,9 @@ Changelog
 - Adds a REST interface to upload internal formats.
   [msom]
 
+- Returns parties CSV exports as files, too.
+  [msom]
+
 1.12.2 (2017-06-13)
 ~~~~~~~~~~~~~~~~~~~
 

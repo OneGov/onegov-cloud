@@ -6,6 +6,7 @@ from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.csv import convert_list_of_dicts_to_xlsx
 from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
+from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layout import ElectionsLayout
 from onegov.election_day.utils import add_last_modified_header
@@ -96,4 +97,15 @@ def view_election_parties_data_as_csv(self, request):
         row['votes'] = result.votes
         rows.append(row)
 
-    return convert_list_of_dicts_to_csv(rows)
+    return Response(
+        convert_list_of_dicts_to_csv(rows),
+        content_type='text/csv',
+        content_disposition='inline; filename={}.csv'.format(
+            normalize_for_url(
+                '{}-{}'.format(
+                    self.title,
+                    request.translate(_("Parties")).lower()
+                )
+            )
+        )
+    )
