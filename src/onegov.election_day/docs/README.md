@@ -52,6 +52,60 @@ To set the language, set the a cookie either by browsing to
 
 The views include the https://github.com/davidjbradshaw/iframe-resizer.
 
+REST Interface
+--------------
+
+The web app allows to upload results in the onegov format using a
+multipart-POST-request to `[base_url]/upload` containing the following fields:
+
+- `type`: The type of upload. This is either `vote`, `election` or `parties`.
+- `id`: The ID of the election/vote. The ID is generated from the title and
+  used in the URL as the last part before the view, for example
+  wab.govikon.ch/vote/**energiegesetz-eng** or
+  wab.govikon.ch/election/**nationalratswahlen-2015**/lists.
+- `results`: The results. See the [format_descriptions](format__en.md)
+
+A token must be provided using the passwort part of HTTP basic authentication.
+An invalid authentication returns a `HTTP 401 Unauthorized`. The token can be
+generated using the command line interface (`create-upload-token`).
+
+Valid requests return a `HTTP 200 OK` together with the JSON body:
+
+    {
+    	"status": "success",
+    	"errors": {}
+    }
+
+
+Invalid requests return a `HTTP 400 Bad Request` together with a JSON body
+containing a list of errors (note that `filename` and `line` might be missing):
+
+    {
+        "status": "error",
+        "errors": {
+            "1": [{
+                "line": 2,
+                "filename": null,
+                "message": "1 is unknown"
+            }]
+        }
+    }
+
+It is possible to set the language used for the error messages by setting the
+`Accept-Language` header, possible values are: `de_CH`, `fr_CH`, `it_CH` and
+`rm_CH`.
+
+
+### cURL Example
+
+    curl https://[base_url]/upload \
+      --user :[token] \
+      --header "Accept-Language: de_CH" \
+      --form "type=election" \
+      --form "id=test-election" \
+      --form "results=@import/staenderatswahl-2015.csv"
+
+
 WabstiCExport
 -------------
 
