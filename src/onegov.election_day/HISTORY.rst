@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.13.0 (2017-06-15)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a REST interface to upload internal formats.
   [msom]
