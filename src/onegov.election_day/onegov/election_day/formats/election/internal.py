@@ -1,3 +1,4 @@
+from csv import excel
 from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
 from onegov.ballot import ElectionResult
@@ -218,7 +219,8 @@ def import_election_internal(entities, election, file, mimetype):
     filename = _("Results")
     majorz = election.type == 'majorz'
     csv, error = load_csv(
-        file, mimetype, expected_headers=HEADERS, filename=filename
+        file, mimetype, expected_headers=HEADERS, filename=filename,
+        dialect=excel
     )
     if error:
         return [error]

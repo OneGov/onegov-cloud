@@ -1,3 +1,4 @@
+from csv import excel
 from onegov.ballot import Ballot
 from onegov.ballot import BallotResult
 from onegov.election_day import _
@@ -8,7 +9,6 @@ from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import STATI
 from onegov.election_day.utils import clear_vote
 from onegov.election_day.utils import guessed_group
-
 
 HEADERS = [
     'status',
@@ -31,7 +31,9 @@ def import_vote_internal(entities, vote, file, mimetype):
         A list containing errors.
 
     """
-    csv, error = load_csv(file, mimetype, expected_headers=HEADERS)
+    csv, error = load_csv(
+        file, mimetype, expected_headers=HEADERS, dialect=excel
+    )
     if error:
         return [error]
 

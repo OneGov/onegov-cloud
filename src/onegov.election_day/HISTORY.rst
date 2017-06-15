@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Specify the CSV dialect of our own files to avoid guessing the wrong one.
+  [msom]
+
 1.13.0 (2017-06-15)
 ~~~~~~~~~~~~~~~~~~~
 
