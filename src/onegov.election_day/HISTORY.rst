@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes ambiguous translation.
+  [msom]
+
 1.13.1 (2017-06-15)
 ~~~~~~~~~~~~~~~~~~~
 
