@@ -3,6 +3,7 @@ import pytest
 from decimal import Decimal
 from onegov.form import Form, errors
 from onegov.form.parser import parse_form
+from onegov.pay import Price
 from textwrap import dedent
 from webob.multidict import MultiDict
 from wtforms import FileField
@@ -240,8 +241,8 @@ def test_parse_radio_with_pricing():
 
     form = parse_form(text)()
     assert form.drink.pricing.rules == {
-        'Coffee': (Decimal(2.5), 'CHF'),
-        'Tea': (Decimal(1.5), 'CHF')
+        'Coffee': Price(Decimal(2.5), 'CHF'),
+        'Tea': Price(Decimal(1.5), 'CHF')
     }
 
 
@@ -255,8 +256,8 @@ def test_parse_checkbox_with_pricing():
 
     form = parse_form(text)()
     assert form.extras.pricing.rules == {
-        'Bacon': (Decimal(2.5), 'CHF'),
-        'Cheese': (Decimal(1.5), 'CHF')
+        'Bacon': Price(Decimal(2.5), 'CHF'),
+        'Cheese': Price(Decimal(1.5), 'CHF')
     }
     assert form.extras.pricing.rules['Bacon'].amount == Decimal(2.5)
     assert form.extras.pricing.rules['Bacon'].currency == 'CHF'

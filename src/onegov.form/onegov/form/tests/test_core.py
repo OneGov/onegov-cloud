@@ -1,5 +1,6 @@
 from decimal import Decimal
 from onegov.form import Form, merge_forms, with_options, move_fields
+from onegov.pay import Price
 from wtforms import RadioField, StringField, TextAreaField, validators
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import InputRequired
@@ -442,22 +443,22 @@ def test_pricing():
     assert form.prices() == []
 
     form = TestForm(post({'ticket_insurance': 'yes'}))
-    assert form.total() == (Decimal('10.0'), 'CHF')
+    assert form.total() == Price(Decimal('10.0'), 'CHF')
     assert form.prices() == [
-        ('ticket_insurance', (Decimal(10.0), 'CHF'))
+        ('ticket_insurance', Price(Decimal(10.0), 'CHF'))
     ]
 
     form = TestForm(post({'ticket_insurance': 'yes', 'discount_code': 'test'}))
-    assert form.total() == (Decimal('10.0'), 'CHF')
+    assert form.total() == Price(Decimal('10.0'), 'CHF')
     assert form.prices() == [
-        ('ticket_insurance', (Decimal(10.0), 'CHF'))
+        ('ticket_insurance', Price(Decimal(10.0), 'CHF'))
     ]
 
     form = TestForm(post({'ticket_insurance': 'yes', 'discount_code': 'FOO'}))
-    assert form.total() == (Decimal('5.0'), 'CHF')
+    assert form.total() == Price(Decimal('5.0'), 'CHF')
     assert form.prices() == [
-        ('ticket_insurance', (Decimal(10.0), 'CHF')),
-        ('discount_code', (Decimal(-5.0), 'CHF'))
+        ('ticket_insurance', Price(Decimal(10.0), 'CHF')),
+        ('discount_code', Price(Decimal(-5.0), 'CHF'))
     ]
 
 
@@ -484,15 +485,15 @@ def test_dependent_pricing():
         return DummyRequest(data).POST
 
     form = TestForm(post({'give_donation': 'yes', 'donation': 'small'}))
-    assert form.total() == (Decimal('10.0'), 'CHF')
+    assert form.total() == Price(Decimal('10.0'), 'CHF')
     assert form.prices() == [
-        ('donation', (Decimal(10.0), 'CHF'))
+        ('donation', Price(Decimal(10.0), 'CHF'))
     ]
 
     form = TestForm(post({'give_donation': 'yes', 'donation': 'big'}))
-    assert form.total() == (Decimal('100.0'), 'CHF')
+    assert form.total() == Price(Decimal('100.0'), 'CHF')
     assert form.prices() == [
-        ('donation', (Decimal(100.0), 'CHF'))
+        ('donation', Price(Decimal(100.0), 'CHF'))
     ]
 
     form = TestForm(post({'give_donation': 'no', 'donation': 'small'}))
@@ -547,4 +548,4 @@ def test_nested_dependent_pricing():
         'give_donation': 'yes',
         'really_give': 'yes',
         'donation': 'small'
-    })).total() == (Decimal(10.0), 'CHF')
+    })).total() == Price(Decimal(10.0), 'CHF')
