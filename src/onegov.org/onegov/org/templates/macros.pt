@@ -405,9 +405,9 @@
 </metal:display_form>
 
 <metal:price define-macro="price">
-    ${'{:.02f}'.format(price.net_amount)} ${price.currency}
+    ${layout.format_number(price.net_amount)} ${price.currency}
     <tal:b condition="price.fee and show_fee|nothing">
-        (+ ${'{:.02f}'.format(price.fee)} <tal:b i18n:translate>Credit Card Fee</tal:b>)
+        (+ ${layout.format_number(price.fee)} <tal:b i18n:translate>Credit Card Fee</tal:b>)
     </tal:b>
 </metal:price>
 
@@ -924,7 +924,7 @@
                                 <span>
                                     <tal:b i18n:translate>Pay Online Now</tal:b>
                                     <tal:b tal:condition="price.fee|nothing">
-                                        (+ ${'{:.02f}'.format(price.fee)} ${price.currency} <tal:b i18n:translate>Credit Card Fee</tal:b>)
+                                        (+ ${layout.format_number(price.fee)} ${price.currency} <tal:b i18n:translate>Credit Card Fee</tal:b>)
                                     </tal:b>
                                 </span>
                             </label>

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes number formatting not working in Python < 3.5.
+  [href]
+
 0.9.0 (2017-06-16)
 ~~~~~~~~~~~~~~~~~~~
 
