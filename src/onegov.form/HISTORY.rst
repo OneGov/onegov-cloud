@@ -2,6 +2,10 @@ Changelog
 ---------
 0.17.0 (2017-06-16)
 ~~~~~~~~~~~~~~~~~~~
+
+- Adds the ability to price radio and checkbox fields.
+  [href]
+
 0.16.3 (2017-01-26)
 ~~~~~~~~~~~~~~~~~~~
 
