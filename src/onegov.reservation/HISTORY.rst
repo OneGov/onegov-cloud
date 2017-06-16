@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.5.0 (2017-06-16)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to price resources and use payments for reservations.
   [href]
 
