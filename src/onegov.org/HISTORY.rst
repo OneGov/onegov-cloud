@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.9.1 (2017-06-16)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds support for sentry js.
   [href]
 
