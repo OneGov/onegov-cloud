@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.9.0 (2017-06-16)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds credit card payments for forms and reservations.
   [href]
 
