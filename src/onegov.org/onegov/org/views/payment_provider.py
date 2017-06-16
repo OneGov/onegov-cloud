@@ -197,8 +197,7 @@ def get_settings_form(model, request):
     permission=Secret,
     form=get_settings_form,
     template='form.pt',
-    name='einstellungen'
-)
+    name='einstellungen')
 def handle_provider_settings(self, request, form):
 
     if form.submitted(request):
