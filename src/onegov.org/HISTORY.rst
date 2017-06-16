@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes a minor style issue with checkout forms.
+  [href]
+
 0.9.1 (2017-06-16)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -3701,7 +3701,8 @@ ul.recipients {
     Checkout form
 */
 .checkout {
-    button + a.button {
+    button + a.button,
+    input.button + a.button {
         margin-left: .5rem;
     }
 }
