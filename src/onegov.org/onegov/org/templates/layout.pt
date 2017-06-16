@@ -24,6 +24,11 @@
     <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
 
     <tal:block metal:use-macro="layout.macros.favicon" />
+
+    <tal:b define="sentry_js layout.app.sentry_js" condition="sentry_js">
+      <script src="https://cdn.ravenjs.com/3.6.1/raven.min.js"></script>
+      <script>Raven.config('${layout.sentry_js}').install();</script>
+    </tal:b>
 </head>
 
 <body id="${layout.page_id}" class="${' '.join(cls for cls in layout.body_classes)}" data-default-marker-color="${layout.primary_color}" data-default-lat="${layout.default_map_view.lat|nothing}" data-default-lon="${layout.default_map_view.lon|nothing}" data-default-zoom="${layout.default_map_view.zoom|nothing}">

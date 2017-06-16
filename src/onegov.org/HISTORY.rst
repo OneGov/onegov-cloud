@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for sentry js.
+  [href]
+
 - Fixes number formatting not working in Python < 3.5.
   [href]
 

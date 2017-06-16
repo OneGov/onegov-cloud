@@ -71,6 +71,9 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
                 if s.startswith(schema_prefix)
             )
 
+    def configure_sentry(self, **cfg):
+        self.sentry_js = cfg.get('sentry_js')
+
     @orm_cached(policy='on-table-change:organisations')
     def org(self):
         return self.session().query(Organisation).first()
