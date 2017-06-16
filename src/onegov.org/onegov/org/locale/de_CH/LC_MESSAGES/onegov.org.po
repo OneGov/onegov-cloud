@@ -661,7 +661,7 @@ msgid "Price"
 msgstr "Preis"
 
 msgid "Price per item"
-msgstr "Preis pro Objekt"
+msgstr "Preis pro Eintrag"
 
 msgid "Price per hour"
 msgstr "Preis pro Stunde"
@@ -673,7 +673,7 @@ msgid "Free of charge"
 msgstr "Kostenlos"
 
 msgid "Per item"
-msgstr "Pro Objekt"
+msgstr "Pro Eintrag"
 
 msgid "Per hour"
 msgstr "Pro Stunde"

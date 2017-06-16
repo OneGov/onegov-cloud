@@ -28,9 +28,12 @@
         <div class="row fieldset-display-submit">
             <div class="small-12 columns">
                 <tal:b metal:use-macro="layout.macros['checkout_form']"
-                    tal:define="payment_method layout.model.payment_method"
-                />
-                <a href="${edit_link}" class="button secondary" i18n:translate>Edit</a>
+                    tal:define="payment_method layout.model.payment_method">
+
+                    <tal:b metal:fill-slot="after-submit">
+                        <a href="${edit_link}" class="button secondary" i18n:translate>Edit</a>
+                    </tal:b>
+                </tal:b>
             </div>
         </div>
     </tal:block>

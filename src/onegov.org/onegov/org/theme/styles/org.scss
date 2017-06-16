@@ -3698,6 +3698,15 @@ ul.recipients {
 }
 
 /*
+    Checkout form
+*/
+.checkout {
+    button + a.button {
+        margin-left: .5rem;
+    }
+}
+
+/*
     Apple Pay
 */
 .apple-pay-button {

@@ -902,7 +902,7 @@
 
 
 <metal:checkout_form define-macro="checkout_form" i18n:domain="onegov.org">
-    <form action="${complete_link}" method="POST">
+    <form action="${complete_link}" method="POST" class="checkout">
         <tal:b condition="price" switch="payment_method">
             <tal:b case="'manual'">
                 <label style="display: none;">
@@ -939,14 +939,17 @@
 
             <div data-depends-on="payment_method/online">
                 <tal:b replace="structure checkout_button" />
+                <metal:b define-slot="after-submit" />
             </div>
             <div data-depends-on="payment_method/manual">
                 <input type="submit" value="Complete" class="button" i18n:attributes="value">
+                <metal:b define-slot="after-submit" />
             </div>
         </tal:b>
 
         <tal:b condition="not price">
             <input type="submit" value="Complete" class="button" i18n:attributes="value">
+            <metal:b define-slot="after-submit" />
         </tal:b>
     </form>
 </metal:checkout_form>
