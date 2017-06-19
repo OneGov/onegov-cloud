@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds Pro Juventute's Google Tag Manager script.
+  [href]
+
 - Updates the initial content for future feriennet orgs.
   [href]
 
