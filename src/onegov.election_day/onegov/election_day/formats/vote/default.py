@@ -10,14 +10,14 @@ from onegov.election_day.utils import guessed_group
 
 
 HEADERS = [
-    'Bezirk',
-    'ID',
-    'Name',
-    'Ja Stimmen',
-    'Nein Stimmen',
+    'bezirk',
+    'id',
+    'name',
+    'ja stimmen',
+    'nein stimmen',
     'Stimmberechtigte',
-    'Leere Stimmzettel',
-    'Ungültige Stimmzettel'
+    'leere stimmzettel',
+    'ungültige stimmzettel'
 ]
 
 

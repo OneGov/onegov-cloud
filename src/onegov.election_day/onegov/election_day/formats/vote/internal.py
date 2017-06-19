@@ -61,6 +61,7 @@ def import_vote_internal(entities, vote, file, mimetype):
         ballot_results.setdefault(ballot_type, [])
 
         # the id of the entity
+        entity_id = None
         try:
             entity_id = int(line.entity_id or 0)
         except ValueError:
@@ -93,16 +94,8 @@ def import_vote_internal(entities, vote, file, mimetype):
             }))
         added_groups[ballot_type].add(group)
 
-        # Add the uncounted entity, but use the given group
-        if line.counted.lower() != 'true':
-            ballot_results[ballot_type].append(
-                BallotResult(
-                    group=group,
-                    counted=False,
-                    entity_id=entity_id,
-                )
-            )
-            continue
+        # Counted
+        counted = line.counted.strip().lower() == 'true'
 
         # the yeas
         try:
@@ -156,7 +149,7 @@ def import_vote_internal(entities, vote, file, mimetype):
             ballot_results[ballot_type].append(
                 BallotResult(
                     group=group,
-                    counted=True,
+                    counted=counted,
                     yeas=yeas,
                     nays=nays,
                     elegible_voters=elegible_voters,
