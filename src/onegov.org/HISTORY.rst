@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.9.2 (2017-06-19)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes sentry js not working.
   [href]
 
