@@ -52,7 +52,7 @@ def test_import_wabsti_majorz(session, tar_file):
     elected = "ID,Name,Vorname\n3,Rechsteiner,Paul".encode('utf-8')
 
     errors = import_election_wabsti_majorz(
-        entities, election,
+        election, entities,
         BytesIO(csv), 'text/plain',
     )
 
@@ -76,7 +76,7 @@ def test_import_wabsti_majorz(session, tar_file):
     assert election.allocated_mandates == 0
 
     errors = import_election_wabsti_majorz(
-        entities, election,
+        election, entities,
         BytesIO(csv), 'text/plain',
         BytesIO(elected), 'text/plain',
     )
@@ -118,7 +118,7 @@ def test_import_wabsti_majorz_missing_headers(session):
     entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabsti_majorz(
-        entities, election,
+        election, entities,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -162,7 +162,7 @@ def test_import_wabsti_majorz_invalid_values(session):
     entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabsti_majorz(
-        entities, election,
+        election, entities,
         BytesIO((
             '\n'.join((
                 ','.join((

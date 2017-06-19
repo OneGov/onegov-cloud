@@ -39,7 +39,7 @@ def test_import_internal(session, tar_file):
 
     # Test federal majorz
     errors = import_election_internal(
-        entities, election, BytesIO(csv_majorz), 'text/plain',
+        election, entities, BytesIO(csv_majorz), 'text/plain',
     )
 
     assert not errors
@@ -63,7 +63,7 @@ def test_import_internal(session, tar_file):
     csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
 
     errors = import_election_internal(
-        entities, election, BytesIO(csv), 'text/plain'
+        election, entities, BytesIO(csv), 'text/plain'
     )
 
     assert not errors
@@ -87,7 +87,7 @@ def test_import_internal(session, tar_file):
     election.type = 'proporz'
     election.number_of_mandates = 3
     errors = import_election_internal(
-        entities, election, BytesIO(csv_proporz), 'text/plain',
+        election, entities, BytesIO(csv_proporz), 'text/plain',
     )
 
     assert not errors
@@ -118,7 +118,7 @@ def test_import_internal(session, tar_file):
     csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
 
     errors = import_election_internal(
-        entities, election, BytesIO(csv), 'text/plain'
+        election, entities, BytesIO(csv), 'text/plain'
     )
 
     assert not errors
@@ -199,7 +199,7 @@ def test_import_internal(session, tar_file):
     ).encode('utf-8')
 
     errors = import_election_internal(
-        entities, election, BytesIO(csv), 'text/plain',
+        election, entities, BytesIO(csv), 'text/plain',
     )
 
     assert not errors
@@ -219,7 +219,7 @@ def test_import_internal(session, tar_file):
     csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
 
     errors = import_election_internal(
-        entities, election, BytesIO(csv), 'text/plain'
+        election, entities, BytesIO(csv), 'text/plain'
     )
 
     assert not errors
@@ -242,7 +242,7 @@ def test_import_internal(session, tar_file):
     entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_internal(
-        entities, election, BytesIO(csv_communal), 'text/plain',
+        election, entities, BytesIO(csv_communal), 'text/plain',
     )
 
     assert not errors
@@ -262,7 +262,7 @@ def test_import_internal(session, tar_file):
     csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
 
     errors = import_election_internal(
-        entities, election, BytesIO(csv), 'text/plain'
+        election, entities, BytesIO(csv), 'text/plain'
     )
 
     assert not errors
@@ -295,7 +295,7 @@ def test_import_internal_missing_headers(session):
     entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_internal(
-        entities, election,
+        election, entities,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -347,7 +347,7 @@ def test_import_internal_invalid_values(session):
     entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_internal(
-        entities, election,
+        election, entities,
         BytesIO((
             '\n'.join((
                 ','.join((

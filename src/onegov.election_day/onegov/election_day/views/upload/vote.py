@@ -37,28 +37,28 @@ def view_upload(self, request, form):
             entities = principal.entities.get(self.date.year, [])
             if form.file_format.data == 'internal':
                 errors = import_vote_internal(
-                    entities,
                     self,
+                    entities,
                     form.proposal.raw_data[0].file,
                     form.proposal.data['mimetype']
                 )
             elif form.file_format.data == 'wabsti':
                 errors = import_vote_wabsti(
-                    entities,
                     self,
-                    form.proposal.raw_data[0].file,
-                    form.proposal.data['mimetype'],
+                    entities,
                     form.vote_number.data,
-                    form.data['type'] == 'complex'
+                    form.data['type'] == 'complex',
+                    form.proposal.raw_data[0].file,
+                    form.proposal.data['mimetype']
                 )
             elif form.file_format.data == 'wabsti_c':
                 for source in self.data_sources:
                     errors.extend(
                         import_vote_wabstic(
                             self,
+                            entities,
                             source.district,
                             source.number,
-                            entities,
                             form.sg_geschaefte.raw_data[0].file,
                             form.sg_geschaefte.data['mimetype'],
                             form.sg_gemeinden.raw_data[0].file,
@@ -75,8 +75,8 @@ def view_upload(self, request, form):
                     field = getattr(form, ballot_type.replace('-', '_'))
                     errors.extend(
                         import_vote_default(
-                            entities,
                             self,
+                            entities,
                             ballot_type,
                             field.raw_data[0].file,
                             field.data['mimetype']

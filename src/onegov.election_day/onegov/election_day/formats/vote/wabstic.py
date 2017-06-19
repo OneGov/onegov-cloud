@@ -54,7 +54,7 @@ def line_is_relevant(line, domain, district, number):
     )
 
 
-def import_vote_wabstic(vote, district, number, entities,
+def import_vote_wabstic(vote, entities, district, number,
                         file_sg_geschaefte, mimetype_sg_geschaefte,
                         file_sg_gemeinden, mimetype_sg_gemeinden):
     """ Tries to import the files in the given folder.

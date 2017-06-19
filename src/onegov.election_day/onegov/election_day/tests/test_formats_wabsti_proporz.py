@@ -42,7 +42,7 @@ def test_import_wabsti_proporz(session, tar_file):
     ).encode('utf-8')
 
     errors = import_election_wabsti_proporz(
-        entities, election,
+        election, entities,
         BytesIO(csv), 'text/plain',
     )
 
@@ -70,7 +70,7 @@ def test_import_wabsti_proporz(session, tar_file):
     assert election.allocated_mandates == 0
 
     errors = import_election_wabsti_proporz(
-        entities, election,
+        election, entities,
         BytesIO(csv), 'text/plain',
         BytesIO(connections), 'text/plain',
         BytesIO(elected), 'text/plain',
@@ -127,7 +127,7 @@ def test_import_wabsti_proporz_missing_headers(session):
     entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabsti_proporz(
-        entities, election,
+        election, entities,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -195,7 +195,7 @@ def test_import_wabsti_proporz_invalid_values(session):
     entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabsti_proporz(
-        entities, election,
+        election, entities,
         BytesIO((
             '\n'.join((
                 ','.join((

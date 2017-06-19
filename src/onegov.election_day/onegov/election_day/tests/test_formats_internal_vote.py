@@ -28,7 +28,7 @@ def test_import_internal_vote(session, tar_file):
     principal = Principal(canton='sg')
     entities = principal.entities.get(vote.date.year, {})
 
-    errors = import_vote_internal(entities, vote, BytesIO(csv), 'text/plain')
+    errors = import_vote_internal(vote, entities, BytesIO(csv), 'text/plain')
     assert not errors
     assert vote.completed
     assert vote.ballots.count() == 1
@@ -44,7 +44,7 @@ def test_import_internal_vote(session, tar_file):
     # Test a roundtrip
     csv = convert_list_of_dicts_to_csv(vote.export()).encode('utf-8')
 
-    errors = import_vote_internal(entities, vote, BytesIO(csv), 'text/plain')
+    errors = import_vote_internal(vote, entities, BytesIO(csv), 'text/plain')
     assert not errors
     assert vote.completed
     assert vote.ballots.count() == 1
@@ -68,7 +68,7 @@ def test_import_internal_vote_missing_headers(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_internal(
-        entities, vote,
+        vote, entities,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -101,7 +101,7 @@ def test_import_internal_vote_invalid_values(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_internal(
-        entities, vote,
+        vote, entities,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -196,7 +196,7 @@ def test_import_internal_vote_expats(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_internal(
-        entities, vote,
+        vote, entities,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -244,7 +244,7 @@ def test_import_internal_vote_expats(session):
     ]
 
     errors = import_vote_internal(
-        entities, vote,
+        vote, entities,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -289,7 +289,7 @@ def test_import_internal_vote_temporary_results(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_internal(
-        entities, vote,
+        vote, entities,
         BytesIO((
             '\n'.join((
                 ','.join((

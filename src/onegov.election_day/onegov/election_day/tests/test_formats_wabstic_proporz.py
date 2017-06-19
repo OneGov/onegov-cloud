@@ -42,7 +42,7 @@ def test_import_wabstic_proporz(session, tar_file):
         wp_wahl = f.extractfile(f.next()).read()
 
     errors = import_election_wabstic_proporz(
-        election, '1', '1', entities,
+        election, entities, '1', '1',
         BytesIO(wp_wahl), 'text/plain',
         BytesIO(wpstatic_gemeinden), 'text/plain',
         BytesIO(wp_gemeinden), 'text/plain',
@@ -104,7 +104,7 @@ def test_import_wabstic_proporz_missing_headers(session):
     entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabstic_proporz(
-        election, '0', '0', entities,
+        election, entities, '0', '0',
         BytesIO('Ausmittlungsstand,\n'.encode('utf-8')), 'text/plain',
         BytesIO((
             '\n'.join((
@@ -204,7 +204,7 @@ def test_import_wabstic_proporz_invalid_values(session):
     entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabstic_proporz(
-        election, '0', '0', entities,
+        election, entities, '0', '0',
         BytesIO((
             '\n'.join((
                 ','.join((

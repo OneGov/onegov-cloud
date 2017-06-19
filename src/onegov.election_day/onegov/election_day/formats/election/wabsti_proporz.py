@@ -179,7 +179,7 @@ def parse_connection(line, errors):
 
 
 def import_election_wabsti_proporz(
-    entities, election, file, mimetype,
+    election, entities, file, mimetype,
     connections_file=None, connections_mimetype=None,
     elected_file=None, elected_mimetype=None,
     statistics_file=None, statistics_mimetype=None

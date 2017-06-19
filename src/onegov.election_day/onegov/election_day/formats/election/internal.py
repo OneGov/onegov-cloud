@@ -210,7 +210,7 @@ def parse_connection(line, errors):
         return connection, subconnection
 
 
-def import_election_internal(entities, election, file, mimetype):
+def import_election_internal(election, entities, file, mimetype):
     """ Tries to import the given file (internal format).
 
     :return:

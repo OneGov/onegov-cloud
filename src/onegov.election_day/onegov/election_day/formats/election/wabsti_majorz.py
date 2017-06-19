@@ -125,7 +125,7 @@ def parse_candidates(line, errors):
 
 
 def import_election_wabsti_majorz(
-    entities, election, file, mimetype,
+    election, entities, file, mimetype,
     elected_file=None, elected_mimetype=None
 ):
     errors = []

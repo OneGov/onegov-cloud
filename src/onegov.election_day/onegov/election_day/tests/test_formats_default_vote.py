@@ -17,7 +17,7 @@ def test_import_default_vote(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_default(
-        entities, vote, 'proposal',
+        vote, entities, 'proposal',
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -63,7 +63,7 @@ def test_import_default_vote(session):
     principal = Principal(municipality='1059')
     entities = principal.entities.get(vote.date.year, {})
     errors = import_vote_default(
-        entities, vote, 'proposal',
+        vote, entities, 'proposal',
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -97,7 +97,7 @@ def test_import_default_vote(session):
     principal = Principal(municipality='351')
     entities = principal.entities.get(vote.date.year, {})
     errors = import_vote_default(
-        entities, vote, 'proposal',
+        vote, entities, 'proposal',
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -143,7 +143,7 @@ def test_import_default_vote_missing_headers(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_default(
-        entities, vote, 'proposal',
+        vote, entities, 'proposal',
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -174,7 +174,7 @@ def test_import_default_vote_invalid_values(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_default(
-        entities, vote, 'proposal',
+        vote, entities, 'proposal',
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -259,7 +259,7 @@ def test_import_default_vote_expats(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_default(
-        entities, vote, 'proposal',
+        vote, entities, 'proposal',
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -301,7 +301,7 @@ def test_import_default_vote_expats(session):
     ]
 
     errors = import_vote_default(
-        entities, vote, 'proposal',
+        vote, entities, 'proposal',
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -342,7 +342,7 @@ def test_import_default_vote_temporary_results(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_default(
-        entities, vote, 'proposal',
+        vote, entities, 'proposal',
         BytesIO((
             '\n'.join((
                 ','.join((

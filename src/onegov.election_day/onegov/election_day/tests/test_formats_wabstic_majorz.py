@@ -37,7 +37,7 @@ def test_import_wabstic_majorz(session, tar_file):
         wm_wahl = f.extractfile(f.next()).read()
 
     errors = import_election_wabstic_majorz(
-        election, '9', '9', entities,
+        election, entities, '9', '9',
         BytesIO(wm_wahl), 'text/plain',
         BytesIO(wmstatic_gemeinden), 'text/plain',
         BytesIO(wm_gemeinden), 'text/plain',
@@ -82,7 +82,7 @@ def test_import_wabstic_majorz_missing_headers(session):
     entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabstic_majorz(
-        election, '0', '0', entities,
+        election, entities, '0', '0',
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -161,7 +161,7 @@ def test_import_wabstic_majorz_invalid_values(session):
     entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabstic_majorz(
-        election, '0', '0', entities,
+        election, entities, '0', '0',
         BytesIO((
             '\n'.join((
                 ','.join((

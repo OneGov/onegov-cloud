@@ -24,7 +24,7 @@ HEADERS = [
 ]
 
 
-def import_vote_internal(entities, vote, file, mimetype):
+def import_vote_internal(vote, entities, file, mimetype):
     """ Tries to import the given csv, xls or xlsx file.
 
     :return:

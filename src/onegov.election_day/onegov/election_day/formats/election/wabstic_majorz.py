@@ -68,7 +68,7 @@ def get_entity_id(line, entities):
 
 
 def import_election_wabstic_majorz(
-    election, district, number, entities,
+    election, entities, district, number,
     file_wm_wahl, mimetype_wm_wahl,
     file_wmstatic_gemeinden, mimetype_wmstatic_gemeinden,
     file_wm_gemeinden, mimetype_wm_gemeinden,

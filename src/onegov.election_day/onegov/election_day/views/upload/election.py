@@ -46,14 +46,16 @@ def view_upload_majorz_election(self, request, form):
             entities = principal.entities[self.date.year]
             if form.file_format.data == 'internal':
                 errors = import_election_internal(
-                    entities, self,
+                    self,
+                    entities,
                     form.results.raw_data[0].file,
                     form.results.data['mimetype']
                 )
             elif form.file_format.data == 'wabsti':
                 elected = len(form.elected.data)
                 errors = import_election_wabsti_majorz(
-                    entities, self,
+                    self,
+                    entities,
                     form.results.raw_data[0].file,
                     form.results.data['mimetype'],
                     form.elected.raw_data[0].file if elected else None,
@@ -66,9 +68,9 @@ def view_upload_majorz_election(self, request, form):
                     errors.extend(
                         import_election_wabstic_majorz(
                             self,
+                            entities,
                             source.district,
                             source.number,
-                            entities,
                             form.wm_wahl.raw_data[0].file,
                             form.wm_wahl.data['mimetype'],
                             form.wmstatic_gemeinden.raw_data[0].file,
@@ -134,7 +136,8 @@ def view_upload_proporz_election(self, request, form):
             entities = principal.entities[self.date.year]
             if form.file_format.data == 'internal':
                 errors = import_election_internal(
-                    entities, self,
+                    self,
+                    entities,
                     form.results.raw_data[0].file,
                     form.results.data['mimetype']
                 )
@@ -143,7 +146,8 @@ def view_upload_proporz_election(self, request, form):
                 stats = len(form.statistics.data)
                 elected = len(form.elected.data)
                 errors = import_election_wabsti_proporz(
-                    entities, self,
+                    self,
+                    entities,
                     form.results.raw_data[0].file,
                     form.results.data['mimetype'],
                     form.connections.raw_data[0].file if connections else None,
@@ -159,9 +163,9 @@ def view_upload_proporz_election(self, request, form):
                     errors.extend(
                         import_election_wabstic_proporz(
                             self,
+                            entities,
                             source.district,
                             source.number,
-                            entities,
                             form.wp_wahl.raw_data[0].file,
                             form.wp_wahl.data['mimetype'],
                             form.wpstatic_gemeinden.raw_data[0].file,

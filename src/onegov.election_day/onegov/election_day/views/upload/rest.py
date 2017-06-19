@@ -96,9 +96,9 @@ def view_upload_test(self, request):
 
         err = []
         if form.type.data == 'vote':
-            err = import_vote_internal(entities, item, file, mimetype)
+            err = import_vote_internal(item, entities, file, mimetype)
         if form.type.data == 'election':
-            err = import_election_internal(entities, item, file, mimetype)
+            err = import_election_internal(item, entities, file, mimetype)
         if form.type.data == 'parties':
             err = import_party_results(item, file, mimetype)
         if err:

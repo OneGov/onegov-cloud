@@ -39,7 +39,7 @@ def test_import_wabstic_vote(session, tar_file):
         ('2', 84247, False),
     ):
         errors = import_vote_wabstic(
-            vote, '1', number, entities,
+            vote, entities, '1', number,
             BytesIO(sg_geschaefte), 'text/plain',
             BytesIO(sg_gemeinden), 'text/plain'
         )
@@ -51,7 +51,7 @@ def test_import_wabstic_vote(session, tar_file):
     # Test cantonal results
     vote.domain = 'canton'
     errors = import_vote_wabstic(
-        vote, '1', '3', entities,
+        vote, entities, '1', '3',
         BytesIO(sg_geschaefte), 'text/plain',
         BytesIO(sg_gemeinden), 'text/plain'
     )
@@ -73,7 +73,7 @@ def test_import_wabstic_vote(session, tar_file):
         principal = Principal(name=str(entity_id), municipality=entity_id)
         entities = principal.entities.get(vote.date.year, {})
         errors = import_vote_wabstic(
-            vote, district, number, entities,
+            vote, entities, district, number,
             BytesIO(sg_geschaefte), 'text/plain',
             BytesIO(sg_gemeinden), 'text/plain'
         )
@@ -91,7 +91,7 @@ def test_import_wabstic_vote(session, tar_file):
         principal = Principal(name=str(entity_id), municipality=entity_id)
         entities = principal.entities.get(vote.date.year, {})
         errors = import_vote_wabstic(
-            vote, district, number, entities,
+            vote, entities, district, number,
             BytesIO(sg_geschaefte), 'text/plain',
             BytesIO(sg_gemeinden), 'text/plain'
         )
@@ -104,7 +104,7 @@ def test_import_wabstic_vote(session, tar_file):
     principal = Principal(name=str(3402), municipality=3402)
     entities = principal.entities.get(vote.date.year, {})
     errors = import_vote_wabstic(
-        vote, '83', '1', entities,
+        vote, entities, '83', '1',
         BytesIO(sg_geschaefte), 'text/plain',
         BytesIO(sg_gemeinden), 'text/plain'
     )
@@ -126,7 +126,7 @@ def test_import_wabstic_vote_missing_headers(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabstic(
-        vote, '0', '0', entities,
+        vote, entities, '0', '0',
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -177,7 +177,7 @@ def test_import_wabstic_vote_invalid_values(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabstic(
-        vote, '0', '0', entities,
+        vote, entities, '0', '0',
         BytesIO((
             '\n'.join((
                 ','.join((

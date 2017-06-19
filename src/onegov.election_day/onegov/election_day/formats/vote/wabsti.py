@@ -27,7 +27,7 @@ HEADERS = (
 )
 
 
-def import_vote_wabsti(entities, vote, file, mimetype, vote_number, complex):
+def import_vote_wabsti(vote, entities, complex, vote_number, file, mimetype):
     """ Tries to import the given csv, xls or xlsx file.
 
     :return:

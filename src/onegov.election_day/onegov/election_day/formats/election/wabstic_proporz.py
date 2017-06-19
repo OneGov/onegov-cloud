@@ -99,7 +99,7 @@ def get_list_id(line):
 
 
 def import_election_wabstic_proporz(
-    election, district, number, entities,
+    election, entities, district, number,
     file_wp_wahl, mimetype_wp_wahl,
     file_wpstatic_gemeinden, mimetype_wpstatic_gemeinden,
     file_wp_gemeinden, mimetype_wp_gemeinden,

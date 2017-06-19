@@ -34,7 +34,7 @@ def test_import_wabsti_vote(session, tar_file):
         (4, 109503, 85790, 56.1, 43.9, 62.0),
     ):
         errors = import_vote_wabsti(
-            entities, vote, BytesIO(csv), 'text/plain', number, False
+            vote, entities, number, False, BytesIO(csv), 'text/plain'
         )
         assert not errors
         assert vote.completed
@@ -49,7 +49,7 @@ def test_import_wabsti_vote(session, tar_file):
     vote.date = date(2011, 11, 27)
     entities = principal.entities.get(vote.date.year, {})
     errors = import_vote_wabsti(
-        entities, vote, BytesIO(csv), 'text/plain', 5, True
+        vote, entities, 5, True, BytesIO(csv), 'text/plain'
     )
     assert not errors
     assert vote.completed
@@ -88,7 +88,7 @@ def test_import_wabsti_vote_missing_headers(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabsti(
-        entities, vote,
+        vote, entities, 0, False
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -108,8 +108,7 @@ def test_import_wabsti_vote_missing_headers(session):
                 )),
             ))
         ).encode('utf-8')),
-        'text/plain',
-        0, False
+        'text/plain'
     )
     assert [(e.filename, e.error.interpolate()) for e in errors] == [
         (None, "Missing columns: 'bfs-nr., gegenvnein'")
@@ -126,7 +125,7 @@ def test_import_wabsti_vote_invalid_values(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabsti(
-        entities, vote,
+        vote, entities, 0, False
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -217,7 +216,6 @@ def test_import_wabsti_vote_invalid_values(session):
             ))
         ).encode('utf-8')),
         'text/plain',
-        0, False
     )
     assert sorted(set([
         (e.line, e.error.interpolate()) for e in errors
@@ -244,7 +242,7 @@ def test_import_wabsti_vote_expats(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabsti(
-        entities, vote,
+        vote, entities, 0, False
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -300,15 +298,14 @@ def test_import_wabsti_vote_expats(session):
                 )),
             ))
         ).encode('utf-8')),
-        'text/plain',
-        0, False
+        'text/plain'
     )
     assert [(e.line, e.error.interpolate()) for e in errors] == [
         (3, '0 was found twice'),
     ]
 
     errors = import_vote_wabsti(
-        entities, vote,
+        vote, entities, 0, False
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -347,8 +344,7 @@ def test_import_wabsti_vote_expats(session):
                 )),
             ))
         ).encode('utf-8')),
-        'text/plain',
-        0, False
+        'text/plain'
     )
     assert not errors
     assert vote.proposal.results.filter_by(entity_id=0).one().yeas == 20
@@ -364,7 +360,7 @@ def test_import_wabsti_vote_temporary_results(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabsti(
-        entities, vote,
+        vote, entities, 0, False
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -438,7 +434,6 @@ def test_import_wabsti_vote_temporary_results(session):
             ))
         ).encode('utf-8')),
         'text/plain',
-        0, False
     )
     assert not errors
     assert sorted(

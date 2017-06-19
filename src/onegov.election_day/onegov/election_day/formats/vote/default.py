@@ -21,7 +21,7 @@ HEADERS = [
 ]
 
 
-def import_vote_default(entities, vote, ballot_type, file, mimetype):
+def import_vote_default(vote, entities, ballot_type, file, mimetype):
     """ Tries to import the given csv, xls or xlsx file to the given ballot
     result type.
 
