@@ -1,5 +1,10 @@
 Changelog
 ---------
+
+- Fixes translations of multiple applications affecting each other within the
+  same process.
+  [href]
+
 0.40.5 (2017-06-07)
 ~~~~~~~~~~~~~~~~~~~
 

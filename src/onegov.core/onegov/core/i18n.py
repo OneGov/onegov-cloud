@@ -117,7 +117,7 @@ def pofiles(localedir):
             yield path, pofile
 
 
-@lru_cache(maxsize=16)
+@lru_cache(maxsize=32)
 def compile_translation(pofile_path):
     log.info("Compiling pofile {}".format(pofile_path))
 
@@ -159,7 +159,11 @@ def get_translations(localedirs):
                 de_CH, en_GB, de, fr - note the case!
             """
 
-            translation = compile_translation(pofile_path)
+            # we need to clone each translation because we might later modify
+            # them when we merge translations - when multiple applications
+            # share the same process this can lead to translations from one
+            # application spilling over to the translations of another
+            translation = clone(compile_translation(pofile_path))
 
             if language not in result:
                 result[language] = translation
