@@ -20,7 +20,7 @@ page-default: &lorem-ipsum
     </p>
 
 pages:
-  - title: Organisation
+  - title: Über uns
     type: topic
     meta:
       trait: page
@@ -55,9 +55,21 @@ pages:
     meta:
       trait: news
     content:
-      <<: *lorem-ipsum
       lead: >
-        Die neue Webseite läuft auf der Platform der OneGov Cloud.
+        Die neue Webseite läuft auf Feriennet, der Buchungsplattform für
+        betreute Ferienangebote der Stiftung Pro Juventute.
+      text: |
+        <p>
+          Feriennet ist die umfassende, komplett webbasierte Softwarelösung
+          für die einfache, zeit- und kostensparende Organisation von
+          betreuten Ferienangeboten.
+        </p>
+        <p>
+          Weitere Informationen auf
+          <a href="http://feriennet.projuventute.ch">
+            feriennet.projuventute.ch
+          </a>
+        </p>
 
 filesets:
   - title: Startseiten-Bilder
@@ -82,20 +94,28 @@ organisation:
     primary-color: '#006fba'
   meta:
     contact: |
-      Fabian Reinhard
-      Unter der Egg 5
-      6004 Luzern
-      +41 41 511 22 50
-      fabian.reinhard@seantis.ch
+      Ferienpass Musterlingen
+      Musterstrasse 39
+      8000 Musterlingen
+      044 256 77 77
     contact_html: >
-      Fabian Reinhard<br>
-      Unter der Egg 5<br>
-      6004 Luzern<br>
-      +41 41 511 22 50<br>
-      <a href="mailto:fabian.reinhard@seantis.ch">fabian.reinhard@seantis.ch</a>
-    opening_hours: Montag - Freitag 09:00 - 17:00
-    opening_hours_html: Montag - Freitag 09:00 - 17:00
-    twitter_url: https://twitter.com/seantis
+      Ferienpass Musterlingen<br>
+      Musterstrasse 39<br>
+      8000 Musterlingen<br>
+      044 256 77 77
+    opening_hours: |
+      Wunschphase: 1.-27.5.2017
+      Zuteilung: 28.-30.5.2017
+      Buchungsphase: 1.-15.6.2017
+      Fakturierung: 16.6.2017
+      Ferienpass: 17.7.-20.8.2017
+    opening_hours_html: |
+      Wunschphase: 1.-27.5.2017<br>
+      Zuteilung: 28.-30.5.2017<br>
+      Buchungsphase: 1.-15.6.2017<br>
+      Fakturierung: 16.6.2017<br>
+      Ferienpass: 17.7.-20.8.2017
+    facebook_url: https://de-de.facebook.com/ProJuventute.ch
     homepage_structure: |
       <row>
         <column span="8">

@@ -21,6 +21,12 @@ def create_new_organisation(app, name, create_files=True, path=None):
     forms.add(
         name='kontakt',
         title="Kontakt",
+        meta={
+            'lead': (
+                "Haben Sie Fragen oder eine Anregung? "
+                "Rufen Sie uns einfach an oder benutzen Sie dieses Formular."
+            )
+        },
         definition=textwrap.dedent("""\
             Vorname *= ___
             Nachname *= ___

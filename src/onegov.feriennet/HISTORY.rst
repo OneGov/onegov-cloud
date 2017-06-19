@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Updates the initial content for future feriennet orgs.
+  [href]
+
 1.0.0 (2017-05-29)
 ~~~~~~~~~~~~~~~~~~~
 
