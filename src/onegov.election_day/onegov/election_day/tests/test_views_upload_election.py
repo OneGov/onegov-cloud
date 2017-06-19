@@ -1,9 +1,5 @@
-import pytest
-import tarfile
-
 from datetime import date
 from onegov.ballot import Election
-from onegov.core.utils import module_path
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.tests import login
 from time import sleep
@@ -80,522 +76,6 @@ def test_upload_election_year_unavailable(election_day_app_gr):
     upload = upload.form.submit()
 
     assert "Das Jahr 1990 wird noch nicht unterstützt" in upload
-
-
-@pytest.mark.parametrize("tar_file", [
-    module_path('onegov.election_day', 'tests/fixtures/wabsti_majorz.tar.gz'),
-])
-def test_upload_election_wabsti_majorz(election_day_app_sg, tar_file):
-    archive = ArchivedResultCollection(election_day_app_sg.session())
-    client = Client(election_day_app_sg)
-    client.get('/locale/de_CH').follow()
-
-    login(client)
-
-    new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Election'
-    new.form['date'] = date(2011, 1, 1)
-    new.form['mandates'] = 1
-    new.form['election_type'] = 'majorz'
-    new.form['domain'] = 'federation'
-    new.form.submit()
-    assert archive.query().one().progress == (0, 0)
-
-    with tarfile.open(tar_file, 'r|gz') as f:
-        csv = f.extractfile(f.next()).read()
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'wabsti'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload.form['complete'] = False
-    upload = upload.form.submit()
-
-    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
-
-    results = client.get('/election/election').follow()
-    assert all((expected in results for expected in (
-        "47.79 %", "304'850", "145'694"
-    )))
-    assert "Zwischenergebnisse" in results
-
-    results = client.get('/election/election/statistics')
-    assert all((expected in results for expected in (
-        "144'529", "942", "223", "145'694"
-    )))
-
-    results = client.get('/election/election/candidates')
-    assert all((expected in results for expected in (
-        "53'308", "36'282", "54'616"
-    )))
-
-    assert archive.query().one().progress == (85, 85)
-
-    elected = "ID,Name,Vorname\n3,Rechsteiner,Paul".encode('utf-8')
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'wabsti'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload.form['elected'] = Upload('elected.csv', elected, 'text/plain')
-    upload.form['complete'] = True
-    upload = upload.form.submit()
-
-    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
-
-    results = client.get('/election/election').follow()
-    assert all((expected in results for expected in (
-        "1 von 1", "304'850", "47.79 %", "85 von 85"
-    )))
-    assert "Zwischenergebnisse" not in results
-
-    results = client.get('/election/election/statistics')
-    assert all((expected in results for expected in (
-        "144'529", "942", "223", "145'694"
-    )))
-
-    results = client.get('/election/election/candidates')
-    assert all((expected in results for expected in (
-        "53'308", "36'282", "54'616"
-    )))
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'wabsti'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload.form['elected'] = Upload('elected.csv', elected, 'text/plain')
-    upload.form['complete'] = True
-    upload = upload.form.submit()
-
-    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
-
-    results = client.get('/election/election').follow()
-    assert all((expected in results for expected in (
-        "1 von 1", "304'850", "47.79 %", "85 von 85"
-    )))
-    assert "Zwischenergebnisse" not in results
-
-    results = client.get('/election/election/statistics')
-    assert all((expected in results for expected in (
-        "144'529", "942", "223", "145'694"
-    )))
-
-    results = client.get('/election/election/candidates')
-    assert all((expected in results for expected in (
-        "53'308", "36'282", "54'616"
-    )))
-
-
-def test_upload_election_wabsti_majorz_fail(election_day_app_gr):
-    archive = ArchivedResultCollection(election_day_app_gr.session())
-    client = Client(election_day_app_gr)
-    client.get('/locale/de_CH').follow()
-
-    login(client)
-
-    new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'election'
-    new.form['date'] = date(2015, 1, 1)
-    new.form['mandates'] = 1
-    new.form['election_type'] = 'majorz'
-    new.form['domain'] = 'federation'
-    new.form.submit()
-    assert archive.query().one().progress == (0, 0)
-
-    headers_result = [
-        'AnzMandate',
-        'BFS',
-        'EinheitBez',
-        'StimmBer',
-        'StimmAbgegeben',
-        'StimmLeer',
-        'StimmUngueltig',
-        'StimmGueltig',
-    ]
-
-    headers_candidate = [
-        'kandid_1',
-        'kandname_1',
-        'kandvorname_1',
-        'stimmen_1',
-        'kandid_2',
-        'kandname_2',
-        'kandvorname_2',
-        'stimmen_2',
-        'kandid_3',
-        'kandname_3',
-        'kandvorname_3',
-        'stimmen_3',
-    ]
-
-    headers_elected = [
-        'ID',
-        'Name',
-        'Vorname',
-    ]
-
-    # no data
-    csv_result = '{}\r\n'.format(','.join(headers_result),).encode('utf-8')
-    csv_elected = '{}\r\n'.format(','.join(headers_elected),).encode('utf-8')
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'wabsti'
-    upload.form['results'] = Upload('data.csv', csv_result, 'text/plain')
-    upload.form['elected'] = Upload('elected.csv', csv_elected, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Keine Daten gefunden" in upload
-    assert archive.query().one().progress == (0, 0)
-
-    # Invalid data
-    csv_result = '\r\n'.join((
-        ','.join(headers_result + headers_candidate),
-        ','.join((
-            'one',
-            'onetwothree',
-            'abc',
-            '100',
-            '90',
-            '1',
-            '2',
-            '80',
-            '1',
-            'Name',
-            'Vorname',
-            'zero',
-            '2',
-            'Leere',
-            'Leere',
-            '0',
-            '3',
-            'Ungültige',
-            'Ungültige',
-            '0',
-        )),
-        ','.join((
-            '1',
-            '1234',
-            'abc',
-            '100',
-            '90',
-            '1',
-            '2',
-            '80',
-            '1',
-            'Name',
-            'Vorname',
-            '60',
-            '2',
-            'Leere Zeilen',
-            'Leere Zeilen',
-            '0',
-            '3',
-            'Ungültige Stimmen',
-            'Ungültige Stimmen',
-            '0',
-        )),
-    )).encode('utf-8')
-    csv_elected = '\r\n'.join((
-        ','.join(headers_elected),
-        ','.join((
-            '1',
-            'Name',
-            'Vorname',
-        )),
-        ','.join((
-            '2',
-            'Peterson',
-            'Peter',
-        ))
-    )).encode('utf-8')
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'wabsti'
-    upload.form['results'] = Upload('data.csv', csv_result, 'text/plain')
-    upload.form['elected'] = Upload('elected.csv', csv_elected, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Ungültige Wahldaten" in upload
-    assert "1234 ist unbekannt" in upload
-    assert "Ungültige Daten" in upload
-    assert "Unbekannter Kandidierender" in upload
-    assert archive.query().one().progress == (0, 0)
-
-    # Missing headers
-    headers_result.remove('AnzMandate')
-    headers_elected.remove('ID')
-    csv_result = '{}\r\n'.format(','.join(headers_result),).encode('utf-8')
-    csv_elected = '{}\r\n'.format(','.join(headers_elected),).encode('utf-8')
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'wabsti'
-    upload.form['results'] = Upload('data.csv', csv_result, 'text/plain')
-    upload.form['elected'] = Upload('elected.csv', csv_elected, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Fehlende Spalten: AnzMandate" in upload
-    assert "Fehlende Spalten: ID" in upload
-    assert archive.query().one().progress == (0, 0)
-
-
-@pytest.mark.parametrize("tar_file", [
-    module_path('onegov.election_day', 'tests/fixtures/wabsti_proporz.tar.gz'),
-])
-def test_upload_election_wabsti_proporz(election_day_app, tar_file):
-    archive = ArchivedResultCollection(election_day_app.session())
-    client = Client(election_day_app)
-    client.get('/locale/de_CH').follow()
-
-    login(client)
-
-    new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Election'
-    new.form['date'] = date(2015, 1, 1)
-    new.form['mandates'] = 3
-    new.form['election_type'] = 'proporz'
-    new.form['domain'] = 'federation'
-    new.form.submit()
-    assert archive.query().one().progress == (0, 0)
-
-    with tarfile.open(tar_file, 'r|gz') as f:
-        csv = f.extractfile(f.next()).read()
-        connections = f.extractfile(f.next()).read()
-        stats = f.extractfile(f.next()).read()
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'wabsti'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload.form['complete'] = False
-    upload = upload.form.submit()
-
-    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
-
-    results = client.get('/election/election/candidates')
-    assert all((expected in results for expected in (
-        "3'240", "10'174", "17'034"
-    )))
-    assert "Zwischenergebnisse" in results
-    assert archive.query().one().progress == (11, 11)
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'wabsti'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload.form['connections'] = Upload('cons.csv', connections, 'text/plain')
-    upload.form['statistics'] = Upload('stats.csv', stats, 'text/plain')
-    upload.form['complete'] = True
-    upload = upload.form.submit()
-
-    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
-
-    results = client.get('/election/election').follow()
-    assert all((expected in results for expected in (
-        "11 von 11", "74'803", "40'200", "53.74 %"
-    )))
-    assert "Zwischenergebnisse" not in results
-
-    results = client.get('/election/election/statistics')
-    assert all((expected in results for expected in (
-        "39'067", "118", "1'015", "116'689",
-    )))
-
-    results = client.get('/election/election/connections')
-    assert all((expected in results for expected in (
-        "30'532", "4'178", "807", "25'528", "20'584", "35'543"
-    )))
-
-    results = client.get('/election/election/candidates')
-    assert all((expected in results for expected in (
-        "3'240", "10'174", "17'034"
-    )))
-
-    elected = "ID,Name,Vorname\n401,Pfister,Gerhard\n"
-    elected = elected + "601,Pezzatti,Bruno\n1501,Aeschi,Thomas\n"
-    elected = elected.encode('utf-8')
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'wabsti'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload.form['connections'] = Upload('cons.csv', connections, 'text/plain')
-    upload.form['statistics'] = Upload('stats.csv', stats, 'text/plain')
-    upload.form['elected'] = Upload('elected.csv', elected, 'text/plain')
-    upload.form['complete'] = True
-    upload = upload.form.submit()
-
-    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
-
-    results = client.get('/election/election').follow()
-    assert all((expected in results for expected in (
-        "11 von 11", "3 von 3", "74'803", "40'200", "53.74 %"
-    )))
-    assert "Zwischenergebnisse" not in results
-
-    results = client.get('/election/election/statistics')
-    assert all((expected in results for expected in (
-        "39'067", "118", "1'015", "116'689",
-    )))
-
-    results = client.get('/election/election/connections')
-    assert all((expected in results for expected in (
-        "30'532", "4'178", "807"
-    )))
-
-    results = client.get('/election/election/candidates')
-    assert all((expected in results for expected in (
-        "3'240", "10'174", "17'034"
-    )))
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'wabsti'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload.form['connections'] = Upload('cons.csv', connections, 'text/plain')
-    upload.form['statistics'] = Upload('stats.csv', stats, 'text/plain')
-    upload.form['elected'] = Upload('elected.csv', elected, 'text/plain')
-    upload.form['complete'] = True
-    upload = upload.form.submit()
-
-    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
-
-    results = client.get('/election/election').follow()
-    assert all((expected in results for expected in (
-        "11 von 11", "3 von 3", "74'803", "40'200", "53.74 %"
-    )))
-    assert "Zwischenergebnisse" not in results
-
-    results = client.get('/election/election/statistics')
-    assert all((expected in results for expected in (
-        "39'067", "118", "1'015", "116'689",
-    )))
-
-    results = client.get('/election/election/connections')
-    assert all((expected in results for expected in (
-        "30'532", "4'178", "807"
-    )))
-
-    results = client.get('/election/election/candidates')
-    assert all((expected in results for expected in (
-        "3'240", "10'174", "17'034"
-    )))
-
-
-def test_upload_election_onegov_ballot_fail(election_day_app_gr):
-    archive = ArchivedResultCollection(election_day_app_gr.session())
-    client = Client(election_day_app_gr)
-    client.get('/locale/de_CH').follow()
-
-    login(client)
-
-    new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Election'
-    new.form['date'] = date(2015, 1, 1)
-    new.form['mandates'] = 1
-    new.form['election_type'] = 'proporz'
-    new.form['domain'] = 'federation'
-    new.form.submit()
-    assert archive.query().one().progress == (0, 0)
-
-    headers = [
-        'election_title',
-        'election_date',
-        'election_type',
-        'election_mandates',
-        'election_absolute_majority',
-        'election_status',
-        'election_counted_entities',
-        'election_total_entities',
-        'entity_name',
-        'entity_id',
-        'entity_elegible_voters',
-        'entity_received_ballots',
-        'entity_blank_ballots',
-        'entity_invalid_ballots',
-        'entity_unaccounted_ballots',
-        'entity_accounted_ballots',
-        'entity_blank_votes',
-        'entity_invalid_votes',
-        'entity_accounted_votes',
-        'list_name',
-        'list_id',
-        'list_number_of_mandates',
-        'list_votes',
-        'list_connection',
-        'list_connection_parent',
-        'candidate_family_name',
-        'candidate_first_name',
-        'candidate_id',
-        'candidate_elected',
-        'candidate_party',
-        'candidate_votes',
-    ]
-
-    # no data
-    csv = '{}\r\n'.format(','.join(headers),).encode('utf-8')
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'internal'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Keine Daten gefunden" in upload
-    assert archive.query().one().progress == (0, 0)
-
-    # Invalid data
-    csv = '\r\n'.join((
-        ','.join(headers),
-        ','.join((
-            'Election',
-            '2015-03-02',
-            'proporz',
-            '1',
-            '0',
-            'superfinal',
-            'one',
-            'one',
-            'Town',
-            '1234',
-            '1013',
-            '428',
-            '2',
-            '16',
-            '18',
-            '410',
-            '13',
-            '0',
-            '2037',
-            'Party',
-            'x',
-            'zero',
-            'one',
-            'five',
-            'one',
-            'Muster',
-            'Peter',
-            'y',
-            'False',
-            'Party',
-            'forty',
-        ))
-    )).encode('utf-8')
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'internal'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Ungültige Wahldaten" in upload
-    assert "1234 ist unbekannt" in upload
-    assert "Ungültige Listendaten" in upload
-    assert "Ungültige Listenresultate" in upload
-    assert "Ungültige Kandidierendendaten" in upload
-    assert "Ungültige Kandidierendenresultate" in upload
-    assert "Ungültiger Status" in upload
-    assert archive.query().one().progress == (0, 0)
-
-    # Missing headers
-    headers.remove('entity_id')
-    csv = '{}\r\n'.format(','.join(headers),).encode('utf-8')
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'internal'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Fehlende Spalten: entity_id" in upload
-    assert archive.query().one().progress == (0, 0)
 
 
 def test_upload_election_invalidate_cache(election_day_app_gr):
@@ -939,219 +419,6 @@ def test_upload_election_available_formats_municipality(election_day_app_bern):
     assert [o[0] for o in upload.form['file_format'].options] == ['internal']
 
 
-def test_upload_communal_election(election_day_app_kriens):
-    archive = ArchivedResultCollection(election_day_app_kriens.session())
-    client = Client(election_day_app_kriens)
-    client.get('/locale/de_CH').follow()
-
-    login(client)
-
-    new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Election'
-    new.form['date'] = date(2015, 1, 1)
-    new.form['mandates'] = 1
-    new.form['election_type'] = 'majorz'
-    new.form['domain'] = 'municipality'
-    new.form.submit()
-    assert archive.query().one().progress == (0, 0)
-
-    headers = [
-        'election_absolute_majority',
-        'election_status',
-        'election_counted_entities',
-        'election_total_entities',
-        'entity_id',
-        'entity_name',
-        'entity_elegible_voters',
-        'entity_received_ballots',
-        'entity_blank_ballots',
-        'entity_invalid_ballots',
-        'entity_blank_votes',
-        'entity_invalid_votes',
-        'list_name',
-        'list_id',
-        'list_number_of_mandates',
-        'list_votes',
-        'list_connection',
-        'list_connection_parent',
-        'candidate_family_name',
-        'candidate_first_name',
-        'candidate_id',
-        'candidate_elected',
-        'candidate_party',
-        'candidate_vote'
-    ]
-
-    csv = '{}\r\n'.format(','.join(headers),).encode('utf-8')
-
-    csv = '\r\n'.join((
-        ','.join(headers),
-        (
-            '3294,,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
-            'Koch,Patrick,1,False,,1621'
-        ),
-        (
-            '3294,,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
-            'Konrad,Simon,2,False,,1707'
-        ),
-        (
-            '3294,,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
-            'Faé,Franco,3,False,,3176'
-        ),
-        (
-            '3294,,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
-            'Vereinzelte,,4,False,,82'
-        ),
-    )).encode('utf-8')
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'internal'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    assert "erfolgreich hochgeladen" in upload.form.submit()
-    assert archive.query().one().progress == (1, 1)
-
-    result = client.get('/election/election').follow()
-    assert '36.16' in result
-    assert 'Stadteile' not in result
-    assert 'Gemeinden' not in result
-    assert '<td>Total' not in result
-
-
-def test_upload_communal_election_districts(election_day_app_bern):
-    archive = ArchivedResultCollection(election_day_app_bern.session())
-    client = Client(election_day_app_bern)
-    client.get('/locale/de_CH').follow()
-
-    login(client)
-
-    new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Election'
-    new.form['date'] = date(2015, 1, 1)
-    new.form['mandates'] = 1
-    new.form['election_type'] = 'majorz'
-    new.form['domain'] = 'municipality'
-    new.form.submit()
-    assert archive.query().one().progress == (0, 0)
-
-    headers = [
-        'election_absolute_majority',
-        'election_status',
-        'election_counted_entities',
-        'election_total_entities',
-        'entity_id',
-        'entity_name',
-        'entity_elegible_voters',
-        'entity_received_ballots',
-        'entity_blank_ballots',
-        'entity_invalid_ballots',
-        'entity_blank_votes',
-        'entity_invalid_votes',
-        'list_name',
-        'list_id',
-        'list_number_of_mandates',
-        'list_votes',
-        'list_connection',
-        'list_connection_parent',
-        'candidate_family_name',
-        'candidate_first_name',
-        'candidate_id',
-        'candidate_elected',
-        'candidate_party',
-        'candidate_vote'
-    ]
-
-    csv = '{}\r\n'.format(','.join(headers),).encode('utf-8')
-
-    csv = '\r\n'.join((
-        ','.join(headers),
-        (
-            '12606,,6,6,1,Innere Stadt,15159,5522,265,503,0,0,,,,,,'
-            ',V1,N1,1,True,,3596'
-        ),
-        (
-            '12606,,6,6,2,Länggasse/Felsenau,9399,3342,161,333,0,0,,,,,,'
-            ',V1,N1,1,True,,2139'
-        ),
-        (
-            '12606,,6,6,3,Mattenhof/Weissenbühl,12599,4439,184,441,0,0,,,,,,'
-            ',V1,N1,1,True,,2827'
-        ),
-        (
-            '12606,,6,6,4,Kirchenfeld/Schosshalde,18461,6487,289,624,0,0,,,,,,'
-            ',V1,N1,1,True,,3647'
-        ),
-        (
-            '12606,,6,6,5,Breitenrain/Lorraine,13880,4985,205,466,0,0,,,,,,'
-            ',V1,N1,1,True,,3192'
-        ),
-        (
-            '12606,,6,6,6,Bümpliz/Bethlehem,12999,4506,170,430,0,0,,,,,,'
-            ',V1,N1,1,True,,2227'
-        ),
-        (
-            '12606,,6,6,1,Innere Stadt,15159,5522,265,503,0,0,,,,,,'
-            ',V2,N2,2,False,,608'
-        ),
-        (
-            '12606,,6,6,2,Länggasse/Felsenau,9399,3342,161,333,0,0,,,,,,'
-            ',V2,N2,2,False,,352'
-        ),
-        (
-            '12606,,6,6,3,Mattenhof/Weissenbühl,12599,4439,184,441,0,0,,,,,,'
-            ',V2,N2,2,False,,466'
-        ),
-        (
-            '12606,,6,6,4,Kirchenfeld/Schosshalde,18461,6487,289,624,0,0,,,,,,'
-            ',V2,N2,2,False,,943'
-        ),
-        (
-            '12606,,6,6,5,Breitenrain/Lorraine,13880,4985,205,466,0,0,,,,,,'
-            ',V2,N2,2,False,,489'
-        ),
-        (
-            '12606,,6,6,6,Bümpliz/Bethlehem,12999,4506,170,430,0,0,,,,,,'
-            ',V2,N2,2,False,,489'
-        ),
-        (
-            '12606,,6,6,1,Innere Stadt,15159,5522,265,503,0,0,,,,,,'
-            ',V3,N3,3,False,,550'
-        ),
-        (
-            '12606,,6,6,2,Länggasse/Felsenau,9399,3342,161,333,0,0,,,,,,'
-            ',V3,N3,3,False,,357'
-        ),
-        (
-            '12606,,6,6,3,Mattenhof/Weissenbühl,12599,4439,184,441,0,0,,,,,,'
-            ',V3,N3,3,False,,521'
-        ),
-        (
-            '12606,,6,6,4,Kirchenfeld/Schosshalde,18461,6487,289,624,0,0,,,,,,'
-            ',V3,N3,3,False,,984'
-        ),
-        (
-            '12606,,6,6,5,Breitenrain/Lorraine,13880,4985,205,466,0,0,,,,,,'
-            ',V3,N3,3,False,,633'
-        ),
-        (
-            '12606,,6,6,6,Bümpliz/Bethlehem,12999,4506,170,430,0,0,,,,,,'
-            ',V3,N3,3,False,,1190'
-        ),
-    )).encode('utf-8')
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'internal'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    assert "erfolgreich hochgeladen" in upload.form.submit()
-    assert archive.query().one().progress == (6, 6)
-
-    result = client.get('/election/election').follow()
-    assert '35.49' in result
-
-    result = client.get('/election/election/statistics')
-    assert 'Stadtteil' in result
-    assert '<td>Total' in result
-
-
 def test_upload_election_expats_majorz(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
@@ -1409,3 +676,71 @@ def test_upload_election_notify_hipchat(election_day_app):
 
         assert urlopen.called
         assert 'api.hipchat.com' in urlopen.call_args[0][0].get_full_url()
+
+
+def test_upload_election_submit(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = 'election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'majorz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    # Internal format
+    with patch(
+        'onegov.election_day.views.upload.election.import_election_internal'
+    ) as import_:
+        import_.return_value = []
+
+        csv = 'csv'.encode('utf-8')
+        upload = client.get('/election/election/upload').follow()
+        upload.form['file_format'] = 'internal'
+        upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+        upload = upload.form.submit()
+
+        assert import_.called
+
+    # Wabsti Majorz
+    with patch(
+        'onegov.election_day.views.upload.election.'
+        'import_election_wabsti_majorz'
+    ) as import_:
+        import_.return_value = []
+
+        csv = 'csv'.encode('utf-8')
+        upload = client.get('/election/election/upload').follow()
+        upload.form['file_format'] = 'wabsti'
+        upload.form['majority'] = '5000'
+        upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+        upload = upload.form.submit()
+
+        assert import_.called
+
+        data = client.get('/election/election/json').json
+        assert data['absolute_majority'] == 5000
+        assert data['completed'] == False
+
+    edit = client.get('/election/election/edit')
+    edit.form['election_type'] = 'proporz'
+    edit.form.submit()
+
+    # Wabsti Proporz
+    with patch(
+        'onegov.election_day.views.upload.election.'
+        'import_election_wabsti_proporz'
+    ) as import_:
+        import_.return_value = []
+
+        csv = 'csv'.encode('utf-8')
+        upload = client.get('/election/election/upload').follow()
+        upload.form['file_format'] = 'wabsti'
+        upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+        upload = upload.form.submit()
+
+        assert import_.called

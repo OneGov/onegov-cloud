@@ -169,9 +169,7 @@ def test_import_internal_vote_invalid_values(session):
         'text/plain'
     )
 
-    assert sorted(set([
-        (e.line, e.error.interpolate()) for e in errors
-    ])) == [
+    assert sorted(set([(e.line, e.error.interpolate()) for e in errors])) == [
         (2, 'Could not read nays'),
         (2, 'Could not read the elegible voters'),
         (2, 'Could not read the empty votes'),

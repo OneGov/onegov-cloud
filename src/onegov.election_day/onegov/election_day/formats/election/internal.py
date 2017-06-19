@@ -46,11 +46,12 @@ HEADERS = [
 def parse_election(line, errors):
     counted = 0
     total = 0
-    absolute_majority = None
+    majority = None
     status = None
     try:
         if line.election_absolute_majority:
-            absolute_majority = int(line.election_absolute_majority or 0)
+            majority = int(line.election_absolute_majority or 0)
+            majority = majority if majority else None
         counted = int(line.election_counted_entities or 0)
         total = int(line.election_total_entities or 0)
         status = line.election_status or 'unknown'
@@ -58,7 +59,7 @@ def parse_election(line, errors):
         errors.append(_("Invalid election values"))
     if status not in STATI:
         errors.append(_("Invalid status"))
-    return counted, total, absolute_majority, status
+    return counted, total, majority, status
 
 
 def parse_election_result(line, errors, entities):

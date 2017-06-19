@@ -14,38 +14,35 @@ from uuid import uuid4
 
 
 HEADERS = [
-    # Entity
-    'Einheit_BFS',
-    'Einheit_Name',
-    # Candidate
-    'Liste_KandID',
-    'Kand_Nachname',
-    'Kand_Vorname',
-    # List
-    'Liste_ID',
-    'Liste_Code',
-    'Kand_StimmenTotal',
-    'Liste_ParteistimmenTotal',
+    'einheit_bfs',
+    'einheit_name',
+    'liste_kandid',
+    'kand_nachname',
+    'kand_vorname',
+    'liste_id',
+    'liste_code',
+    'kand_stimmentotal',
+    'liste_parteistimmentotal',
 ]
 
 HEADERS_CONNECTIONS = [
-    'Liste',
-    'LV',
-    'LUV',
+    'liste',
+    'lv',
+    'luv',
 ]
 
 HEADERS_RESULT = [
-    'ID',
+    'id',
 ]
 
 HEADERS_STATS = [
-    'Einheit_BFS',
-    'Einheit_Name',
-    'StimBerTotal',
-    'WZEingegangen',
-    'WZLeer',
-    'WZUngueltig',
-    'StmWZVeraendertLeerAmtlLeer',
+    'einheit_bfs',
+    'einheit_name',
+    'stimbertotal',
+    'wzeingegangen',
+    'wzleer',
+    'wzungueltig',
+    'stmwzveraendertleeramtlleer',
 ]
 
 
@@ -178,6 +175,8 @@ def parse_connection(line, errors):
         ) if subconnection_id else None
         return id, connection, subconnection
 
+    return None, None, None
+
 
 def import_election_wabsti_proporz(
     entities, election, file, mimetype,
@@ -258,9 +257,6 @@ def import_election_wabsti_proporz(
                 id, connection, subconnection = parse_connection(line,
                                                                  line_errors)
 
-                if id not in lists:
-                    continue
-
                 if line_errors:
                     errors.extend(
                         FileImportError(
@@ -268,6 +264,9 @@ def import_election_wabsti_proporz(
                         )
                         for err in line_errors
                     )
+                    continue
+
+                if id not in lists:
                     continue
 
                 if connection:

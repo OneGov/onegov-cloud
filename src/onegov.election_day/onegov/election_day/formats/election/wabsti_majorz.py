@@ -10,20 +10,19 @@ from uuid import uuid4
 
 
 HEADERS = [
-    'AnzMandate',
-    'BFS',
-    'EinheitBez',
-    'StimmBer',
-    'StimmAbgegeben',
-    'StimmLeer',
-    'StimmUngueltig',
-    'StimmGueltig',
+    'anzmandate',
+    'bfs',
+    'einheitbez',
+    'stimmber',
+    'stimmabgegeben',
+    'stimmleer',
+    'stimmungueltig',
 ]
 
 HEADERS_RESULT = [
-    'ID',
-    'Name',
-    'Vorname',
+    'id',
+    'name',
+    'vorname',
 ]
 
 

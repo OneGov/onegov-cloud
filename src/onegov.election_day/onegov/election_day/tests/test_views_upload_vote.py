@@ -93,7 +93,7 @@ def test_upload_vote_year_unavailable(election_day_app):
     assert "Das Jahr 2000 wird noch nicht unterstützt" in results
 
 
-def test_upload_vote_default(election_day_app):
+def test_upload_vote_submit(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
     login(client)
@@ -104,9 +104,12 @@ def test_upload_vote_default(election_day_app):
     new.form['domain'] = 'federation'
     new.form.submit()
 
+    # Default
     with patch(
         'onegov.election_day.views.upload.vote.import_vote_default'
     ) as import_:
+        import_.return_value = []
+
         csv = 'csv'.encode('utf-8')
         upload = client.get('/vote/vote/upload')
         upload.form['file_format'] = 'default'
@@ -120,9 +123,12 @@ def test_upload_vote_default(election_day_app):
     edit.form['vote_type'] = 'complex'
     edit.form.submit()
 
+    # Default (complex)
     with patch(
         'onegov.election_day.views.upload.vote.import_vote_default'
     ) as import_:
+        import_.return_value = []
+
         csv = 'csv'.encode('utf-8')
         upload = client.get('/vote/vote/upload')
         upload.form['file_format'] = 'default'
@@ -137,21 +143,12 @@ def test_upload_vote_default(election_day_app):
             'proposal', 'counter-proposal', 'tie-breaker'
         }
 
-
-def test_upload_vote_internal(election_day_app):
-    client = Client(election_day_app)
-    client.get('/locale/de_CH').follow()
-    login(client)
-
-    new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = 'Vote'
-    new.form['date'] = date(2015, 1, 1)
-    new.form['domain'] = 'federation'
-    new.form.submit()
-
+    # Internal
     with patch(
         'onegov.election_day.views.upload.vote.import_vote_internal'
     ) as import_:
+        import_.return_value = []
+
         csv = 'csv'.encode('utf-8')
         upload = client.get('/vote/vote/upload')
         upload.form['file_format'] = 'internal'
@@ -160,21 +157,12 @@ def test_upload_vote_internal(election_day_app):
 
         assert import_.called
 
-
-def test_upload_vote_wabsti(election_day_app):
-    client = Client(election_day_app)
-    client.get('/locale/de_CH').follow()
-    login(client)
-
-    new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = 'Vote'
-    new.form['date'] = date(2015, 1, 1)
-    new.form['domain'] = 'federation'
-    new.form.submit()
-
+    # Wabsti
     with patch(
         'onegov.election_day.views.upload.vote.import_vote_wabsti'
     ) as import_:
+        import_.return_value = []
+
         csv = 'csv'.encode('utf-8')
         upload = client.get('/vote/vote/upload')
         upload.form['file_format'] = 'wabsti'
@@ -186,6 +174,7 @@ def test_upload_vote_wabsti(election_day_app):
         assert import_.call_args[0][4] == 1
         assert import_.call_args[0][5] == False
 
+    # Wabsti complex
     edit = client.get('/vote/vote/edit')
     edit.form['vote_type'] = 'complex'
     edit.form.submit()
@@ -193,6 +182,8 @@ def test_upload_vote_wabsti(election_day_app):
     with patch(
         'onegov.election_day.views.upload.vote.import_vote_wabsti'
     ) as import_:
+        import_.return_value = []
+
         csv = 'csv'.encode('utf-8')
         upload = client.get('/vote/vote/upload')
         upload.form['file_format'] = 'wabsti'
