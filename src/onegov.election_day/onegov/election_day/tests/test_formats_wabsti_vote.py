@@ -88,7 +88,7 @@ def test_import_wabsti_vote_missing_headers(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabsti(
-        vote, entities, 0, False
+        vote, entities, 0, False,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -125,7 +125,7 @@ def test_import_wabsti_vote_invalid_values(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabsti(
-        vote, entities, 0, False
+        vote, entities, 0, False,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -242,7 +242,7 @@ def test_import_wabsti_vote_expats(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabsti(
-        vote, entities, 0, False
+        vote, entities, 0, False,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -305,7 +305,7 @@ def test_import_wabsti_vote_expats(session):
     ]
 
     errors = import_vote_wabsti(
-        vote, entities, 0, False
+        vote, entities, 0, False,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -360,7 +360,7 @@ def test_import_wabsti_vote_temporary_results(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabsti(
-        vote, entities, 0, False
+        vote, entities, 0, False,
         BytesIO((
             '\n'.join((
                 ','.join((

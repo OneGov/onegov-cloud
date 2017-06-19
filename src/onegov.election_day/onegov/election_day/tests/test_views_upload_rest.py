@@ -167,8 +167,8 @@ def test_view_rest_vote(election_day_app):
         assert result.json['status'] == 'success'
 
         assert import_.called
-        assert 1701 in import_.call_args[0][0]
-        assert isinstance(import_.call_args[0][1], Vote)
+        assert isinstance(import_.call_args[0][0], Vote)
+        assert 1701 in import_.call_args[0][1]
         assert isinstance(import_.call_args[0][2], BytesIO)
         assert import_.call_args[0][3] == 'application/octet-stream'
 
@@ -196,8 +196,8 @@ def test_view_rest_election(election_day_app):
         assert result.json['status'] == 'success'
 
         assert import_.called
-        assert 1701 in import_.call_args[0][0]
-        assert isinstance(import_.call_args[0][1], Election)
+        assert isinstance(import_.call_args[0][0], Election)
+        assert 1701 in import_.call_args[0][1]
         assert isinstance(import_.call_args[0][2], BytesIO)
         assert import_.call_args[0][3] == 'application/octet-stream'
 
