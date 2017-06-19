@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.40.6 (2017-06-19)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes translations of multiple applications affecting each other within the
   same process.
