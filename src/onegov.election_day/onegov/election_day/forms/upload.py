@@ -74,7 +74,6 @@ class UploadElectionBaseForm(Form):
         else:
             self.file_format.choices = [
                 ('internal', "OneGov Cloud"),
-                ('sesam', "SESAM"),
                 ('wabsti', "Wabsti"),
             ]
 
@@ -141,7 +140,7 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
 
     majority = IntegerField(
         label=_("Absolute majority"),
-        depends_on=('file_format', 'wabsti'),  # actually wabsti OR sesam
+        depends_on=('file_format', 'wabsti'),  # actually wabsti
         validators=[
             Optional(),
             NumberRange(min=1)

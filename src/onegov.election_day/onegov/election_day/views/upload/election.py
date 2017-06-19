@@ -7,7 +7,6 @@ from onegov.core.security import Private
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.formats import import_election_internal
-from onegov.election_day.formats import import_election_sesam
 from onegov.election_day.formats import import_election_wabsti_majorz
 from onegov.election_day.formats import import_election_wabsti_proporz
 from onegov.election_day.formats import import_election_wabstic_majorz
@@ -51,13 +50,6 @@ def view_upload_majorz_election(self, request, form):
                     form.results.raw_data[0].file,
                     form.results.data['mimetype']
                 )
-            elif form.file_format.data == 'sesam':
-                errors = import_election_sesam(
-                    entities, self,
-                    form.results.raw_data[0].file,
-                    form.results.data['mimetype']
-                )
-                self.absolute_majority = form.majority.data
             elif form.file_format.data == 'wabsti':
                 elected = len(form.elected.data)
                 errors = import_election_wabsti_majorz(
@@ -142,12 +134,6 @@ def view_upload_proporz_election(self, request, form):
             entities = principal.entities[self.date.year]
             if form.file_format.data == 'internal':
                 errors = import_election_internal(
-                    entities, self,
-                    form.results.raw_data[0].file,
-                    form.results.data['mimetype']
-                )
-            elif form.file_format.data == 'sesam':
-                errors = import_election_sesam(
                     entities, self,
                     form.results.raw_data[0].file,
                     form.results.data['mimetype']

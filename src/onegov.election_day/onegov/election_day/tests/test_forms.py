@@ -319,7 +319,7 @@ def test_upload_election_form():
     assert sorted(f[0] for f in form.file_format.choices) == []
     form.adjust(cantonal_principal, election)
     assert sorted(f[0] for f in form.file_format.choices) == [
-        'internal', 'sesam', 'wabsti'
+        'internal', 'wabsti'
     ]
     form.adjust(communal_principal, election)
     assert sorted(f[0] for f in form.file_format.choices) == [
@@ -336,12 +336,6 @@ def test_upload_election_form():
 
     form = UploadMajorzElectionForm()
     form.adjust(cantonal_principal, election)
-    form.process(DummyPostData({'file_format': 'sesam'}))
-    form.results.data = {'mimetype': 'text/plain'}
-    assert form.validate()
-
-    form = UploadMajorzElectionForm()
-    form.adjust(cantonal_principal, election)
     form.process(DummyPostData({'file_format': 'wabsti'}))
     form.results.data = {'mimetype': 'text/plain'}
     assert form.validate()
@@ -352,12 +346,6 @@ def test_upload_election_form():
     form.process(DummyPostData({
         'file_format': 'internal'
     }))
-    form.results.data = {'mimetype': 'text/plain'}
-    assert form.validate()
-
-    form = UploadProporzElectionForm()
-    form.adjust(cantonal_principal, election)
-    form.process(DummyPostData({'file_format': 'sesam'}))
     form.results.data = {'mimetype': 'text/plain'}
     assert form.validate()
 

@@ -4,6 +4,9 @@ Changelog
 - Fixes ambiguous translation.
   [msom]
 
+- Drops SESAM support.
+  [msom]
+
 1.13.1 (2017-06-15)
 ~~~~~~~~~~~~~~~~~~~
 

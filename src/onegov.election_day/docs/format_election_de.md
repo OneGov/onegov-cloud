@@ -1,20 +1,18 @@
 Format Spezifikation Wahlen
 ============================
 
-Als Dateiformate werden CSV, XLS oder XLSX Dateien akzeptiert, welche von den Wahlprogrammen "Wahlen (SESAM)" und "Wabsti Wahlen und Abstimmungen (VRSG)", oder der Webapplikation selbst generiert werden. Falls eine Tabelle von Hand erstellt werden soll, ist das Format der Webapplikation am einfachsten.
+Als Dateiformate werden CSV, XLS oder XLSX Dateien akzeptiert, welche von "Wabsti Wahlen und Abstimmungen (VRSG)" oder der Webapplikation selbst generiert werden. Falls eine Tabelle von Hand erstellt werden soll, ist das Format der Webapplikation am einfachsten.
 
 Eine "Gemeinde" kann auch ein Bezirk, ein Wahlkreis etc. sein.
 
 ## Inhalt
 
 1. [OneGov](#1-onegov)
-2. [SESAM Majorz](#2-sesam-majorz)
-3. [SESAM Proporz](#3-sesam-proporz)
-4. [Wabsti Majorz](#4-wabsti-majorz)
-5. [Wabsti Proporz](#5-wabsti-proporz)
-6. [WabstiCExport Majorz](#6-wabsticexport-majorz)
-7. [WabstiCExport Proporz](#7-wabsticexport-proporz)
-8. [Parteiresultate](#8-parteiresultate)
+2. [Wabsti Majorz](#2-wabsti-majorz)
+3. [Wabsti Proporz](#3-wabsti-proporz)
+4. [WabstiCExport Majorz](#4-wabsticexport-majorz)
+5. [WabstiCExport Proporz](#5-wabsticexport-proporz)
+6. [Parteiresultate](#6-parteiresultate)
 
 1 OneGov
 ----------
@@ -74,93 +72,7 @@ Falls der Status
 - [election_onegov_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_majorz.csv)
 - [election_onegov_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_proporz.csv)
 
-2 SESAM Majorz
---------------
-
-Das SESAM-Export-Format enthält direkt alle benötigten Daten. Es gibt pro Kandidat und Gemeinde eine Zeile.
-
-### Spalten
-
-Folgende Spalten werden ausgewertet und sollten mindestens vorhanden sein:
-
-Name|Beschreibung
----|---
-`Anzahl Sitze`|Anzahl Sitze.
-`Wahlkreis-Nr`|BFS Nummer der Gemeinde.
-`Wahlkreisbezeichnung`|Der Name der Gemeinde.
-`Anzahl Gemeinden`|Anzahl ausgezählter Gemeinden (z.B. `2 von 50`).
-`Stimmberechtigte`|Anzahl Stimmberechtigte der Gemeinde.
-`Wahlzettel`|Anzahl abgegebene Stimmzettel der Gemeinde.
-`Ungültige Wahlzettel`|Anzahl ungültige Stimmzettel der Gemeinde.
-`Leere Wahlzettel`|Anzahl leere Stimmzettel der Gemeinde.
-`Leere Stimmen`|Anzahl leerer Stimmen der Gemeinde.
-`Ungueltige Stimmen`|Anzahl ungültige Stimmen der Gemeinde.
-`Kandidaten-Nr`|ID des Kandidaten.
-`Gewaehlt`|True, falls der Kandidierenden gewählt wurde.
-`Name`|Nachnahme des Kandidierenden.
-`Vorname`|Vorname des Kandidaten.
-`Stimmen`|Anzahl Kandidierendenstimmen in der Gemeinde.
-
-### Temporäre Resultate
-
-Die Wahl gilt als noch nicht ausgezählt, falls in `Anzahl Gemeinden` die Anzahl ausgezählte Gemeinden nicht mit der Gesamtanzahl an Gemeinden übereinstimmt. Noch nicht ausgezählte Gemeinden sind nicht in den Daten enthalten.
-
-### Vorlage
-
-- [election_sesam_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_sesam_majorz.csv)
-
-3 SESAM Proporz
----------------
-
-Das SESAM-Export-Format enthält direkt alle benötigten Daten. Es gibt pro Kandidat und Gemeinde eine Zeile.
-
-### Spalten
-
-Folgende Spalten werden ausgewertet und sollten mindestens vorhanden sein:
-
-Name|Beschreibung
----|---
-`Anzahl Sitze`|Anzahl Sitze.
-`Wahlkreis-Nr`|BFS Nummer der Gemeinde.
-`Wahlkreisbezeichnung`|Der Name der Gemeinde.
-`Anzahl Gemeinden`|Anzahl ausgezählter Gemeinden (z.B. `2 von 50`).
-`Stimmberechtigte`|Anzahl Stimmberechtigte der Gemeinde.
-`Wahlzettel`|Anzahl abgegebene Stimmzettel der Gemeinde.
-`Ungültige Wahlzettel`|Anzahl ungültige Stimmzettel der Gemeinde.
-`Leere Wahlzettel`|Anzahl leere Stimmzettel der Gemeinde.
-`Leere Stimmen`|Anzahl leerer Stimmen der Gemeinde.
-`Listen-Nr`|ID der Liste des Kandidierenden.
-`Parteibezeichnung`|Name der Liste des Kandidierenden.
-`HLV-Nr`|Hauptlistenverbindungsnummer.
-`ULV-Nr`|Unterlistenverbindungsnummer.
-`Anzahl Sitze Liste`|Gesamte Anzahl der Mandate der Liste.
-`Kandidatenstimmen unveränderte Wahlzettel`|(Teil der Listenstimmen)
-`Zusatzstimmen unveränderte Wahlzettel`|(Teil der Listenstimmen)
-`Kandidatenstimmen veränderte Wahlzettel`|(Teil der Listenstimmen)
-`Zusatzstimmen veränderte Wahlzettel`|(Teil der Listenstimmen)
-`Kandidaten-Nr`|ID des Kandidaten.
-`Gewählt`|True, falls der Kandidierenden gewählt wurde.
-`Name`|Nachnahme des Kandidierenden.
-`Vorname`|Vorname des Kandidaten.
-`Stimmen Total aus Wahlzettel`|Anzahl Kandidierendenstimmen in der Gemeinde.
-
-#### Panaschierdaten
-
-Die Resultaten können Panaschierdaten enthlaten, indem pro Liste eine Spalte hinzugefügt wird:
-
-Name|Beschreibung
----|---
-`{Listennummer} {Listenname}`|Die Anzahl Stimmen von der Liste mit `Listen-Nr`. Die `Listen-Nr` mit dem Wert `00` (`00 OHNE`) steht für die Blankoliste.
-
-### Temporäre Resultate
-
-Die Wahl gilt als noch nicht ausgezählt, falls in `Anzahl Gemeinden` die Anzahl ausgezählte Gemeinden nicht mit der Gesamtanzahl an Gemeinden übereinstimmt. Noch nicht ausgezählte Gemeinden sind nicht in den Daten enthalten.
-
-### Vorlage
-
-- [election_sesam_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_sesam_proporz.csv)
-
-4 Wabsti Majorz
+2 Wabsti Majorz
 ---------------
 
 Das Datenformat benötig zwei einzelne Tabellen: den Datenexport und die Liste der gewählten Kandidaten.
@@ -215,7 +127,7 @@ Das Datenformat enhält auch keine Information dazu, ob eine einzelne Gemeinde f
 - [election_wabsti_majorz_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_majorz_results.csv)
 - [election_wabsti_majorz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_majorz_candidates.csv)
 
-5 Wabsti Proporz
+3 Wabsti Proporz
 ----------------
 
 Das Datenformat benötig vier einzelne Tabellen: den Datenexport der Resultate, der Datenexport der Statistiken, die Listenverbindungen und die Liste der gewählten Kandidaten.
@@ -291,18 +203,18 @@ Das Datenformat enhält auch keine Information dazu, ob eine einzelne Gemeinde f
 - [electionwabsti_proporz_list_connections.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_list_connections)
 - [electionwabsti_proporz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_candidates.csv)
 
-6 WabstiCExport Majorz
+4 WabstiCExport Majorz
 ----------------------
 
 Es wird die Version `2.2` wird unterstützt. Die verschiedenen Spalten der verschiedenen Dateien sind in der Dokumenation des Exporter-Programms definiert.
 
-7 WabstiCExport Proporz
+5 WabstiCExport Proporz
 -----------------------
 
 Es wird die Version `2.2` wird unterstützt. Die verschiedenen Spalten der verschiedenen Dateien sind in der Dokumenation des Exporter-Programms definiert.
 
 
-8 Parteiresultate
+6 Parteiresultate
 -----------------
 
 Jede Proporzwahl kann Parteiresultate enthalten. Diese sind unabhängig von den anderen Resultaten und beinhalten typischerweise die aggregierten Resultate der verschiedenen Listen einer einzelnen Partei.

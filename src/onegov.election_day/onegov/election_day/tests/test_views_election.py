@@ -67,7 +67,7 @@ def test_view_election_statistics(election_day_app_gr):
 
     statistics = client.get('/election/proporz-election/statistics')
     assert all((expected in statistics for expected in (
-        "Grüsch", "56", "32", "31", "154"
+        "Grüsch", "56", "32", "31", "153"
     )))
 
 
@@ -94,7 +94,7 @@ def test_view_election_lists(election_day_app_gr):
     assert '<h3>Listen</h3>' in main
 
     lists = client.get('/election/proporz-election/lists-data')
-    assert all((expected in lists for expected in ("FDP", "8", "CVP", "5")))
+    assert all((expected in lists for expected in ("FDP", "8", "CVP", "6")))
 
     chart = client.get('/election/proporz-election/lists-chart')
     assert chart.status_code == 200
@@ -248,7 +248,7 @@ def test_view_election_connections(election_day_app_gr):
         '{}:{}'.format(link['source'], link['value']) for link in data['links']
     ]
     assert '{}:8'.format(nodes.index('FDP')) in links
-    assert '{}:5'.format(nodes.index('CVP')) in links
+    assert '{}:6'.format(nodes.index('CVP')) in links
 
     chart = client.get('/election/proporz-election/connections-chart')
     assert chart.status_code == 200
@@ -284,7 +284,7 @@ def test_view_election_panachage(election_day_app_gr):
     assert 'CVP' in nodes
 
     links = [link['value'] for link in data['links']]
-    assert all((i in links for i in (1, 2, 3, 7)))
+    assert all((i in links for i in (1, 2, 4, 7)))
 
     chart = client.get('/election/proporz-election/connections-chart')
     assert chart.status_code == 200

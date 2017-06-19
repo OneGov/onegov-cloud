@@ -161,7 +161,7 @@ There are a lot of different possiblities to upload results, here are the typica
 
     - **FI**: Internal format
     - **FW**: Wabsti format
-    - **FM**: SESAM format
+    - **FC**: WabstiC format
 
   - Party results
 

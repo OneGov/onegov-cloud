@@ -97,50 +97,60 @@ def upload_majorz_election(client, create=True, canton='gr'):
         new = client.get('/manage/elections/new-election')
         new.form['election_de'] = 'Majorz Election'
         new.form['date'] = date(2015, 1, 1)
-        new.form['mandates'] = 1
+        new.form['mandates'] = 2
         new.form['election_type'] = 'majorz'
         new.form['domain'] = 'federation'
         new.form.submit()
 
     csv = (
-        "Anzahl Sitze,"
-        "Wahlkreis-Nr,"
-        "Wahlkreisbezeichnung,"
-        "Stimmberechtigte,"
-        "Wahlzettel,"
-        "Ungültige Wahlzettel,"
-        "Leere Wahlzettel,"
-        "Leere Stimmen,"
-        "Ungueltige Stimmen,"
-        "Kandidaten-Nr,"
-        "Gewaehlt,"
-        "Name,"
-        "Vorname,"
-        "Stimmen,"
-        "Anzahl Gemeinden\n"
+        'election_status,'
+        'entity_id,'
+        'entity_name,'
+        'entity_elegible_voters,'
+        'entity_received_ballots,'
+        'entity_invalid_ballots,'
+        'entity_blank_ballots,'
+        'entity_blank_votes,'
+        'entity_invalid_votes,'
+        'candidate_id,'
+        'candidate_elected,'
+        'candidate_family_name,'
+        'candidate_first_name,'
+        'candidate_votes,'
+        'election_counted_entities,'
+        'election_total_entities,'
+        'election_absolute_majority,'
+        'list_name,'
+        'list_id,'
+        'list_number_of_mandates,'
+        'list_votes,'
+        'list_connection,'
+        'list_connection_parent,'
+        'candidate_party,'
+        '\n'
     )
     if canton == 'gr':
         csv += (
-            "2,3503,Mutten,56,25,0,4,1,0,1,Gewaehlt,"
-            "Engler,Stefan,20,1 von 125\n"
+            "unknown,3503,Mutten,56,25,0,4,1,0,1,True,"
+            "Engler,Stefan,20,1,125,,,,,,,,\n"
         )
         csv += (
-            "2,3503,Mutten,56,25,0,4,1,0,2,Gewaehlt,"
-            "Schmid,Martin,18,1 von 125\n"
+            "unknown,3503,Mutten,56,25,0,4,1,0,2,True,"
+            "Schmid,Martin,18,1,125,,,,,,,,\n"
         )
     if canton == 'zg':
         csv += (
-            "2,1711,Zug,56,25,0,4,1,0,1,Gewaehlt,"
-            "Engler,Stefan,20,1 von 125\n"
+            "unknown,1711,Zug,56,25,0,4,1,0,1,True,"
+            "Engler,Stefan,20,1,125,,,,,,,,\n"
         )
         csv += (
-            "2,1710,Walchwil,56,25,0,4,1,0,2,Gewaehlt,"
-            "Schmid,Martin,18,1 von 125\n"
+            "unknown,1710,Walchwil,56,25,0,4,1,0,2,True,"
+            "Schmid,Martin,18,1,125,,,,,,,,\n"
         )
     csv = csv.encode('utf-8')
 
     upload = client.get('/election/majorz-election/upload').follow()
-    upload.form['file_format'] = 'sesam'
+    upload.form['file_format'] = 'internal'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
 
@@ -153,64 +163,62 @@ def upload_proporz_election(client, create=True, canton='gr'):
         new = client.get('/manage/elections/new-election')
         new.form['election_de'] = 'Proporz Election'
         new.form['date'] = date(2015, 1, 1)
-        new.form['mandates'] = 1
+        new.form['mandates'] = 5
         new.form['election_type'] = 'proporz'
         new.form['domain'] = 'federation'
         new.form.submit()
 
     csv = (
-        "Anzahl Sitze,"
-        "Wahlkreis-Nr,"
-        "Wahlkreisbezeichnung,"
-        "Stimmberechtigte,"
-        "Wahlzettel,"
-        "Ungültige Wahlzettel,"
-        "Leere Wahlzettel,"
-        "Leere Stimmen,"
-        "Listen-Nr,"
-        "Parteibezeichnung,"
-        "HLV-Nr,"
-        "ULV-Nr,"
-        "Anzahl Sitze Liste,"
-        "Unveränderte Wahlzettel Liste,"
-        "Veränderte Wahlzettel Liste,"
-        "Kandidatenstimmen unveränderte Wahlzettel,"
-        "Zusatzstimmen unveränderte Wahlzettel,"
-        "Kandidatenstimmen veränderte Wahlzettel,"
-        "Zusatzstimmen veränderte Wahlzettel,"
-        "Kandidaten-Nr,"
-        "Gewählt,"
-        "Name,"
-        "Vorname,"
-        "Stimmen unveränderte Wahlzettel,"
-        "Stimmen veränderte Wahlzettel,"
-        "Stimmen Total aus Wahlzettel,"
-        "01 FDP,"
-        "02 CVP,"
-        "Anzahl Gemeinden\n"
+        'election_status,'
+        'entity_id,'
+        'entity_name,'
+        'entity_elegible_voters,'
+        'entity_received_ballots,'
+        'entity_invalid_ballots,'
+        'entity_blank_ballots,'
+        'entity_blank_votes,'
+        'entity_invalid_votes,'
+        'list_id,'
+        'list_name,'
+        'list_connection_parent,'
+        'list_connection,'
+        'list_number_of_mandates,'
+        'list_votes,'
+        'candidate_id,'
+        'candidate_elected,'
+        'candidate_family_name,'
+        'candidate_first_name,'
+        'candidate_votes,'
+        'election_counted_entities,'
+        'election_total_entities,'
+        'election_absolute_majority,'
+        'candidate_party,'
+        'panachage_votes_from_list_1,'
+        'panachage_votes_from_list_2'
+        '\n'
     )
     if canton == 'gr':
         csv += (
-            "5,3503,Mutten,56,32,1,0,1,1,FDP,1,1,0,0,0,0,0,8,0,101,"
-            "nicht gewählt,Casanova,Angela,0,0,0,0,1,1 von 125\n"
+            "unknown,3503,Mutten,56,32,1,0,1,1,1,FDP,1,1,0,8,"
+            "101,False,Casanova,Angela,0,1,125,,,0,1\n"
         )
         csv += (
-            "5,3503,Mutten,56,32,1,0,1,2,CVP,1,2,0,1,0,5,0,0,0,201,"
-            "nicht gewählt,Caluori,Corina,1,0,1,2,0,1 von 125\n"
+            "unknown,3503,Mutten,56,32,1,0,1,2,2,CVP,1,2,0,6,"
+            "201,False,Caluori,Corina,2,1,125,,,2,0\n"
         )
     elif canton == 'zg':
         csv += (
-            "5,1711,Mutten,56,32,1,0,1,1,FDP,1,1,0,0,0,0,0,8,0,101,"
-            "nicht gewählt,Casanova,Angela,0,0,0,0,1,1 von 125\n"
+            "unknown,1711,Mutten,56,32,1,0,1,1,1,FDP,1,1,0,8,"
+            "101,False,Casanova,Angela,0,1,125,,,0,1\n"
         )
         csv += (
-            "5,1711,Mutten,56,32,1,0,1,2,CVP,1,2,0,1,0,5,0,0,0,201,"
-            "nicht gewählt,Caluori,Corina,1,0,1,2,0,1 von 125\n"
+            "unknown,1711,Mutten,56,32,1,0,1,2,2,CVP,1,2,0,5,"
+            "201,False,Caluori,Corina,2,1,125,,,2,0\n"
         )
     csv = csv.encode('utf-8')
 
     upload = client.get('/election/proporz-election/upload').follow()
-    upload.form['file_format'] = 'sesam'
+    upload.form['file_format'] = 'internal'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
 

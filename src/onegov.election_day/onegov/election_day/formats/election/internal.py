@@ -210,7 +210,7 @@ def parse_connection(line, errors):
 
 
 def import_election_internal(entities, election, file, mimetype):
-    """ Tries to import the given file (sesam format).
+    """ Tries to import the given file (internal format).
 
     :return:
         A list containing errors.

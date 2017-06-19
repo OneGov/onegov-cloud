@@ -1,7 +1,6 @@
 import pytest
 import tarfile
 
-from copy import deepcopy
 from datetime import date
 from onegov.ballot import Election
 from onegov.core.utils import module_path
@@ -47,56 +46,6 @@ HEADER_COLUMNS_INTERNAL = (
     'candidate_votes'
 )
 
-HEADER_COLUMNS_SESAM_MAJORZ = (
-    'Anzahl Sitze,'
-    'Anzahl Gemeinden,'
-    'Wahlkreis-Nr,'
-    'Wahlkreisbezeichnung,'
-    'Stimmberechtigte,'
-    'Wahlzettel,'
-    'Leere Wahlzettel,'
-    'Ungültige Wahlzettel,'
-    'Leere Stimmen,'
-    'Ungueltige Stimmen,'
-    'Kandidaten-Nr,'
-    'Name,'
-    'Vorname,'
-    'Stimmen,'
-    'Gewaehlt'
-)
-
-HEADER_COLUMNS_SESAM_PROPORZ = [
-    'Anzahl Sitze',
-    'Wahlkreis-Nr',
-    'Wahlkreisbezeichnung',
-    'Stimmberechtigte',
-    'Wahlzettel',
-    'Ungültige Wahlzettel',
-    'Leere Wahlzettel',
-    'Leere Stimmen',
-    'Listen-Nr',
-    'Parteibezeichnung',
-    'HLV-Nr',
-    'ULV-Nr',
-    'Anzahl Sitze Liste',
-    'Unveränderte Wahlzettel Liste',
-    'Veränderte Wahlzettel Liste',
-    'Kandidatenstimmen unveränderte Wahlzettel',
-    'Zusatzstimmen unveränderte Wahlzettel',
-    'Kandidatenstimmen veränderte Wahlzettel',
-    'Zusatzstimmen veränderte Wahlzettel',
-    'Kandidaten-Nr',
-    'Gewählt',
-    'Name',
-    'Vorname',
-    'Stimmen unveränderte Wahlzettel',
-    'Stimmen veränderte Wahlzettel',
-    'Stimmen Total aus Wahlzettel',
-    '01 FDP',
-    '02 CVP',
-    'Anzahl Gemeinden',
-]
-
 HEADER_COLUMNS_WABSTI_PROPORZ = (
     'Einheit_BFS,'
     'Einheit_Name,'
@@ -124,335 +73,13 @@ def test_upload_election_year_unavailable(election_day_app_gr):
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    csv = (
-        "Anzahl Sitze,"
-        "Wahlkreis-Nr,"
-        "Wahlkreisbezeichnung,"
-        "Stimmberechtigte,"
-        "Wahlzettel,"
-        "Ungültige Wahlzettel,"
-        "Leere Wahlzettel,"
-        "Leere Stimmen,"
-        "Listen-Nr,"
-        "Parteibezeichnung,"
-        "HLV-Nr,"
-        "ULV-Nr,"
-        "Anzahl Sitze Liste,"
-        "Unveränderte Wahlzettel Liste,"
-        "Veränderte Wahlzettel Liste,"
-        "Kandidatenstimmen unveränderte Wahlzettel,"
-        "Zusatzstimmen unveränderte Wahlzettel,"
-        "Kandidatenstimmen veränderte Wahlzettel,"
-        "Zusatzstimmen veränderte Wahlzettel,"
-        "Kandidaten-Nr,"
-        "Gewählt,"
-        "Name,"
-        "Vorname,"
-        "Stimmen unveränderte Wahlzettel,"
-        "Stimmen veränderte Wahlzettel,"
-        "Stimmen Total aus Wahlzettel,"
-        "01 FDP,"
-        "02 CVP,"
-        " Anzahl Gemeinden\n"
-    )
-    csv = csv.encode('utf-8')
-
+    csv = HEADER_COLUMNS_INTERNAL.encode('utf-8')
     upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'sesam'
+    upload.form['file_format'] = 'internal'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
 
     assert "Das Jahr 1990 wird noch nicht unterstützt" in upload
-
-
-@pytest.mark.parametrize("tar_file", [
-    module_path('onegov.election_day', 'tests/fixtures/sesam_majorz.tar.gz'),
-])
-def test_upload_election_sesam_majorz(election_day_app_gr, tar_file):
-    archive = ArchivedResultCollection(election_day_app_gr.session())
-
-    client = Client(election_day_app_gr)
-    client.get('/locale/de_CH').follow()
-
-    login(client)
-
-    new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Election'
-    new.form['date'] = date(2015, 1, 1)
-    new.form['mandates'] = 1
-    new.form['election_type'] = 'majorz'
-    new.form['domain'] = 'federation'
-    new.form.submit()
-
-    assert archive.query().one().progress == (0, 0)
-
-    with tarfile.open(tar_file, 'r|gz') as f:
-        csv = f.extractfile(f.next()).read()
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'sesam'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
-
-    results = client.get('/election/election').follow()
-    assert all((expected in results for expected in (
-        "125 von 125", "2 von 2", "137'126", "55'291", "40.32 %"
-    )))
-
-    results = client.get('/election/election/statistics')
-    assert all((expected in results for expected in (
-        "48'778", "5'365", "1'148", "84'046"
-    )))
-
-    results = client.get('/election/election/candidates')
-    assert all((expected in results for expected in (
-        "39'608", "35'926"
-    )))
-    assert archive.query().one().progress == (125, 125)
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'sesam'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
-
-    results = client.get('/election/election').follow()
-    assert all((expected in results for expected in (
-        "125 von 125", "2 von 2", "137'126", "55'291", "40.32 %"
-    )))
-
-    results = client.get('/election/election/statistics')
-    assert all((expected in results for expected in (
-        "48'778", "5'365", "1'148", "84'046"
-    )))
-
-    results = client.get('/election/election/candidates')
-    assert all((expected in results for expected in (
-        "39'608", "35'926"
-    )))
-
-
-@pytest.mark.parametrize("tar_file", [
-    module_path('onegov.election_day', 'tests/fixtures/sesam_proporz.tar.gz'),
-])
-def test_upload_election_sesam_proporz(election_day_app_gr, tar_file):
-    archive = ArchivedResultCollection(election_day_app_gr.session())
-    client = Client(election_day_app_gr)
-    client.get('/locale/de_CH').follow()
-
-    login(client)
-
-    new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Election'
-    new.form['date'] = date(2015, 1, 1)
-    new.form['mandates'] = 1
-    new.form['election_type'] = 'proporz'
-    new.form['domain'] = 'federation'
-    new.form.submit()
-    assert archive.query().one().progress == (0, 0)
-
-    with tarfile.open(tar_file, 'r|gz') as f:
-        csv = f.extractfile(f.next()).read()
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'sesam'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
-
-    results = client.get('/election/election').follow()
-    assert all((expected in results for expected in (
-        "125 von 125", "5 von 5", "137'126", "63'053", "45.98 %"
-    )))
-
-    results = client.get('/election/election/statistics')
-    assert all((expected in results for expected in (
-        "145", "2'314", "60'594", "300'743"
-    )))
-
-    results = client.get('/election/election/connections')
-    assert all((expected in results for expected in (
-        "20'610", "33'950", "41'167", "23'673",
-        "39'890", "52'992", "76'665"
-    )))
-
-    results = client.get('/election/election/candidates')
-    assert all((expected in results for expected in (
-        "1'788", "1'038", "520"
-    )))
-    assert archive.query().one().progress == (125, 125)
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'sesam'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
-
-    results = client.get('/election/election').follow()
-    assert all((expected in results for expected in (
-        # totals
-        "125 von 125", "5 von 5", "137'126", "63'053", "45.98 %"
-    )))
-
-    results = client.get('/election/election/statistics')
-    assert all((expected in results for expected in (
-        "145", "2'314", "60'594", "300'743"
-    )))
-
-    results = client.get('/election/election/connections')
-    assert all((expected in results for expected in (
-        "20'610", "33'950", "41'167", "23'673",
-        "39'890", "52'992", "76'665"
-    )))
-
-    results = client.get('/election/election/candidates')
-    assert all((expected in results for expected in (
-        "1'788", "1'038", "520"
-    )))
-
-
-def test_upload_election_sesam_fail(election_day_app_gr):
-    archive = ArchivedResultCollection(election_day_app_gr.session())
-    client = Client(election_day_app_gr)
-    client.get('/locale/de_CH').follow()
-
-    login(client)
-
-    new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Election'
-    new.form['date'] = date(2015, 1, 1)
-    new.form['mandates'] = 1
-    new.form['election_type'] = 'proporz'
-    new.form['domain'] = 'federation'
-    new.form.submit()
-
-    # no data
-    csv = '{}\r\n'.format(
-        ','.join(HEADER_COLUMNS_SESAM_PROPORZ)
-    ).encode('utf-8')
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'sesam'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Keine Daten gefunden" in upload
-    assert archive.query().one().progress == (0, 0)
-
-    # Invalid data
-    csv = '\r\n'.join((
-        ','.join(HEADER_COLUMNS_SESAM_PROPORZ),
-        ','.join((
-            'five',
-            '1234',
-            'Abc',
-            '56',
-            '32',
-            '1',
-            '0',
-            '1',
-            'list one',
-            'FDP',
-            '1',
-            '1',
-            '0',
-            '0',
-            '0',
-            '0',
-            '0',
-            'eight',
-            '0',
-            'zeroone',
-            'nicht gewählt',
-            'Casanova',
-            'Angela',
-            '0',
-            '0',
-            'zero',
-            '0',
-            '0',
-            '1 von 1',
-        ))
-    )).encode('utf-8')
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'sesam'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Ungültige Wahldaten" in upload
-    assert "1234 ist unbekannt" in upload
-    assert "Ungültige Listendaten" in upload
-    assert "Ungültige Listenresultate" in upload
-    assert "Ungültige Kandidierendendaten" in upload
-    assert "Ungültige Kandidierendenresultate" in upload
-    assert archive.query().one().progress == (0, 0)
-
-    csv = '\r\n'.join((
-        ','.join(HEADER_COLUMNS_SESAM_PROPORZ),
-        ','.join((
-            '5',
-            'xyzb',
-            '56',
-            'abcd',
-            '32',
-            '1',
-            '0',
-            '1',
-            '1',
-            'FDP',
-            '1',
-            '1',
-            '0',
-            '0',
-            '0',
-            '0',
-            '0',
-            '8',
-            '0',
-            '101',
-            'nicht gewählt',
-            'Casanova',
-            'Angela',
-            '0',
-            '0',
-            '0',
-            '0',
-            '0',
-            '1/1',
-        ))
-    )).encode('utf-8')
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'sesam'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Ungültige Wahldaten" in upload
-    assert "1234 ist unbekannt" not in upload
-    assert "Ungültige Listendaten" not in upload
-    assert "Ungültige Listenresultate" not in upload
-    assert "Ungültige Kandidierendendaten" not in upload
-    assert "Ungültige Kandidierendenresultate" not in upload
-    assert archive.query().one().progress == (0, 0)
-
-    # Missing headers
-    headers = deepcopy(HEADER_COLUMNS_SESAM_PROPORZ)
-    headers.remove('Wahlkreis-Nr')
-    csv = '{}\r\n'.format(','.join(headers),).encode('utf-8')
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'sesam'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Fehlende Spalten: Wahlkreis-Nr" in upload
-    assert archive.query().one().progress == (0, 0)
 
 
 @pytest.mark.parametrize("tar_file", [
@@ -845,132 +472,6 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
     )))
 
 
-@pytest.mark.parametrize("tar_file", [
-    module_path('onegov.election_day', 'tests/fixtures/sesam_majorz.tar.gz'),
-])
-def test_upload_election_majorz_roundtrip(election_day_app_gr, tar_file):
-    archive = ArchivedResultCollection(election_day_app_gr.session())
-    client = Client(election_day_app_gr)
-    client.get('/locale/de_CH').follow()
-
-    login(client)
-
-    new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Election'
-    new.form['date'] = date(2015, 1, 1)
-    new.form['mandates'] = 1
-    new.form['election_type'] = 'majorz'
-    new.form['domain'] = 'federation'
-    new.form.submit()
-    assert archive.query().one().progress == (0, 0)
-
-    with tarfile.open(tar_file, 'r|gz') as f:
-        csv = f.extractfile(f.next()).read()
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'sesam'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
-    assert archive.query().one().progress == (125, 125)
-
-    export = client.get('/election/election/data-csv').text.encode('utf-8')
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'internal'
-    upload.form['results'] = Upload('data.csv', export, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
-
-    second_export = client.get('/election/election/data-csv').text
-    second_export = second_export.encode('utf-8')
-
-    assert export == second_export
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'sesam'
-    upload.form['majority'] = '500'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
-
-    export = client.get('/election/election/data-csv').text.encode('utf-8')
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'internal'
-    upload.form['results'] = Upload('data.csv', export, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
-
-    second_export = client.get('/election/election/data-csv').text
-    second_export = second_export.encode('utf-8')
-
-    assert export == second_export
-
-
-@pytest.mark.parametrize("tar_file", [
-    module_path('onegov.election_day', 'tests/fixtures/sesam_proporz.tar.gz'),
-])
-def test_upload_election_proporz_roundtrip(election_day_app_gr, tar_file):
-    archive = ArchivedResultCollection(election_day_app_gr.session())
-    client = Client(election_day_app_gr)
-    client.get('/locale/de_CH').follow()
-
-    login(client)
-
-    new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Election'
-    new.form['date'] = date(2015, 1, 1)
-    new.form['mandates'] = 1
-    new.form['election_type'] = 'proporz'
-    new.form['domain'] = 'federation'
-    new.form.submit()
-    assert archive.query().one().progress == (0, 0)
-
-    with tarfile.open(tar_file, 'r|gz') as f:
-        csv = f.extractfile(f.next()).read()
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'sesam'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
-    assert archive.query().one().progress == (125, 125)
-
-    export = client.get('/election/election/data-csv').text.encode('utf-8')
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'internal'
-    upload.form['results'] = Upload('data.csv', export, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
-
-    second_export = client.get('/election/election/data-csv').text
-    second_export = second_export.encode('utf-8')
-
-    assert export == second_export
-
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'internal'
-    upload.form['results'] = Upload('data.csv', second_export, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
-
-    third_export = client.get('/election/election/data-csv').text
-    third_export = third_export.encode('utf-8')
-
-    assert export == second_export
-    assert second_export == third_export
-    assert export == third_export
-
-
 def test_upload_election_onegov_ballot_fail(election_day_app_gr):
     archive = ArchivedResultCollection(election_day_app_gr.session())
     client = Client(election_day_app_gr)
@@ -1176,25 +677,6 @@ def test_upload_election_temporary_results_majorz(election_day_app):
     new.form.submit()
     assert archive.query().one().progress == (0, 0)
 
-    # SESAM: "Anzahl Gemeinden" + missing lines
-    csv = '\n'.join((
-        HEADER_COLUMNS_SESAM_MAJORZ,
-        '7,2 von 11,1701,Baar,13567,40,0,0,18,0,1,Hegglin,Peter,36,FALSE',
-        '7,2 von 11,1701,Baar,13567,40,0,0,18,0,2,Hürlimann,Urs,25,FALSE',
-        '7,2 von 11,1702,Cham,9620,41,0,1,6,0,1,Hegglin,Peter,34,FALSE',
-        '7,2 von 11,1702,Cham,9620,41,0,1,6,0,2,Hürlimann,Urs,28,FALSE',
-    )).encode('utf-8')
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'sesam'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    assert 'erfolgreich hochgeladen' in upload.form.submit()
-    assert archive.query().one().progress == (2, 11)
-
-    result_sesam = client.get('/election/election/data-csv').text
-    assert 'Baar,1701,13567' in result_sesam
-    assert 'Cham,1702,9620' in result_sesam
-    assert 'Zug' not in result_sesam
-
     # Wabsti: form value + (optionally) missing lines
     csv = '\n'.join((
         (
@@ -1259,8 +741,6 @@ def test_upload_election_temporary_results_majorz(election_day_app):
     result_wabsti = client.get('/election/election/data-csv').text
     assert '2,11,Baar,1701' in result_wabsti
 
-    assert result_sesam == result_wabsti.replace('final', 'unknown')
-
     # Onegov internal: misssing and number of municpalities
     csv = '\n'.join((
         HEADER_COLUMNS_INTERNAL,
@@ -1289,7 +769,7 @@ def test_upload_election_temporary_results_majorz(election_day_app):
 
     result_onegov = client.get('/election/election/data-csv').text
 
-    assert result_sesam == result_onegov
+    assert result_wabsti.replace('final', 'unknown') == result_onegov
 
 
 def test_upload_election_temporary_results_proporz(election_day_app):
@@ -1307,61 +787,6 @@ def test_upload_election_temporary_results_proporz(election_day_app):
     new.form['domain'] = 'federation'
     new.form.submit()
     assert archive.query().one().progress == (0, 0)
-
-    # SESAM: "Anzahl Gemeinden" + missing lines
-    csv = '\n'.join((
-        (
-            'Anzahl Sitze,'
-            'Wahlkreis-Nr,'
-            'Wahlkreisbezeichnung,'
-            'Stimmberechtigte,'
-            'Wahlzettel,'
-            'Leere Wahlzettel,'
-            'Ungültige Wahlzettel,'
-            'Leere Stimmen,'
-            'Listen-Nr,'
-            'Parteibezeichnung,'
-            'HLV-Nr,'
-            'ULV-Nr,'
-            'Kandidatenstimmen unveränderte Wahlzettel,'
-            'Kandidatenstimmen veränderte Wahlzettel,'
-            'Zusatzstimmen unveränderte Wahlzettel,'
-            'Zusatzstimmen veränderte Wahlzettel,'
-            'Anzahl Sitze Liste,'
-            'Kandidaten-Nr,'
-            'Gewählt,'
-            'Name,'
-            'Vorname,'
-            'Stimmen Total aus Wahlzettel,'
-            'Anzahl Gemeinden'
-        ),
-        (
-            '2,1701,Baar,14119,7462,77,196,122,1,ALG,,,1435,0,0,0,0,101,'
-            'FALSE,Lustenberger,Andreas,948,2 von 11'
-        ),
-        (
-            '2,1701,Baar,14119,7462,77,196,122,1,ALG,,,1435,0,0,0,0,102,'
-            'FALSE,Schriber-Neiger,Hanni,208,2 von 11'
-        ),
-        (
-            '2,1702,Cham,9926,4863,0,161,50,1,ALG,,,533,0,0,0,0,101,FALSE,'
-            'Lustenberger,Andreas,290,2 von 11'
-        ),
-        (
-            '2,1702,Cham,9926,4863,0,161,50,1,ALG,,,533,0,0,0,0,102,FALSE,'
-            'Schriber-Neiger,Hanni,105,2 von 11'
-        ),
-    )).encode('utf-8')
-    upload = client.get('/election/election/upload').follow()
-    upload.form['file_format'] = 'sesam'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    assert 'erfolgreich hochgeladen' in upload.form.submit()
-    assert archive.query().one().progress == (2, 11)
-
-    result_sesam = client.get('/election/election/data-csv').text
-    assert 'Baar,1701,14119' in result_sesam
-    assert 'Cham,1702,9926' in result_sesam
-    assert 'Zug' not in result_sesam
 
     # Wabsti: form value + (optionally) missing lines
     csv = '\n'.join((
@@ -1406,8 +831,6 @@ def test_upload_election_temporary_results_proporz(election_day_app):
     result_wabsti = client.get('/election/election/data-csv').text
     assert '2,11,Baar,1701' in result_wabsti
 
-    assert result_sesam == result_wabsti.replace('final', 'unknown')
-
     # Onegov internal: misssing and number of municpalities
     csv = '\n'.join((
         HEADER_COLUMNS_INTERNAL,
@@ -1440,7 +863,7 @@ def test_upload_election_temporary_results_proporz(election_day_app):
 
     result_onegov = client.get('/election/election/data-csv').text
 
-    assert result_sesam == result_onegov
+    assert result_onegov == result_wabsti.replace('final', 'unknown')
 
 
 def test_upload_election_available_formats_canton(election_day_app):
@@ -1459,7 +882,7 @@ def test_upload_election_available_formats_canton(election_day_app):
 
     upload = client.get('/election/election/upload').follow()
     assert sorted([o[0] for o in upload.form['file_format'].options]) == [
-        'internal', 'sesam', 'wabsti'
+        'internal', 'wabsti'
     ]
 
     new = client.get('/manage/elections/new-election')
@@ -1472,7 +895,7 @@ def test_upload_election_available_formats_canton(election_day_app):
 
     upload = client.get('/election/election/upload').follow()
     assert sorted([o[0] for o in upload.form['file_format'].options]) == [
-        'internal', 'sesam', 'wabsti'
+        'internal', 'wabsti'
     ]
 
 
@@ -1744,8 +1167,6 @@ def test_upload_election_expats_majorz(election_day_app):
     new.form.submit()
 
     for id_ in (0, 9170):
-        # SESAM: todo
-
         # Wabsti
         csv = '\n'.join((
             (
@@ -1863,24 +1284,6 @@ def test_upload_election_expats_proporz(election_day_app):
     new.form.submit()
 
     for id_ in (0, 9170):
-        # SESAM
-        csv = '\n'.join((
-            ','.join(HEADER_COLUMNS_SESAM_PROPORZ),
-            (
-                '1,{},Auslandschweizer,14119,7462,196,77,273,1,ALG,,,0,80,'
-                '90,100,110,120,130,101,FALSE,Lustenberger,Andreas,0,0,0,0,'
-                '0,1 von 12'
-            ).format(id_),
-        )).encode('utf-8')
-
-        upload = client.get('/election/election/upload').follow()
-        upload.form['file_format'] = 'sesam'
-        upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-        assert 'erfolgreich hochgeladen' in upload.form.submit()
-
-        result_sesam = client.get('/election/election/data-csv').text
-        assert 'Auslandschweizer,0' in result_sesam
-
         # Wabsti
         csv = '\n'.join((
             HEADER_COLUMNS_WABSTI_PROPORZ,
@@ -1942,15 +1345,51 @@ def test_upload_election_notify_hipchat(election_day_app):
     new.form.submit()
 
     csv = '\n'.join((
-        HEADER_COLUMNS_SESAM_MAJORZ,
-        '7,1 von 11,1701,Baar,13567,40,0,0,18,0,1,Hegglin,Peter,36,FALSE',
+        HEADER_COLUMNS_INTERNAL,
+        (
+            ','
+            ','
+            ','
+            ','
+            ','  # abs
+            'unknown,'
+            '1,'
+            '1,'
+            'Baar,'
+            '1701,'
+            '13567,'
+            '40,'
+            '0,'
+            '0,'
+            ','
+            ','
+            '18,'
+            '0,'
+            ','
+            ','
+            ','
+            ','
+            ','
+            ','
+            ','
+            'Hegglin,'
+            'Peter,'
+            '1,'
+            'False,'
+            ','
+            '36'
+        ),
+        (
+            ',,,,,unknown,1,1,Baar,1701,13567,40,0,0,,,18,0,,,,,,,,'
+            'Hegglin,Peter,1,False,,36'
+        )
     )).encode('utf-8')
 
     with patch('urllib.request.urlopen') as urlopen:
 
         # Hipchat not set
         upload = client.get('/election/election/upload').follow()
-        upload.form['file_format'] = 'sesam'
+        upload.form['file_format'] = 'internal'
         upload.form['results'] = Upload('data.csv', csv, 'text/plain')
         assert 'erfolgreich hochgeladen' in upload.form.submit()
 
@@ -1962,7 +1401,7 @@ def test_upload_election_notify_hipchat(election_day_app):
         election_day_app.hipchat_room_id = '1234'
 
         upload = client.get('/election/election/upload').follow()
-        upload.form['file_format'] = 'sesam'
+        upload.form['file_format'] = 'internal'
         upload.form['results'] = Upload('data.csv', csv, 'text/plain')
         assert 'erfolgreich hochgeladen' in upload.form.submit()
 
