@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes sentry js not working.
+  [href]
+
 - Fixes a minor style issue with checkout forms.
   [href]
 

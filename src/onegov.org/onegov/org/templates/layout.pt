@@ -27,7 +27,7 @@
 
     <tal:b define="sentry_js layout.app.sentry_js" condition="sentry_js">
       <script src="https://cdn.ravenjs.com/3.6.1/raven.min.js"></script>
-      <script>Raven.config('${layout.sentry_js}').install();</script>
+      <script>Raven.config('${sentry_js}').install();</script>
     </tal:b>
 </head>
 
