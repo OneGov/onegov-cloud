@@ -10,53 +10,64 @@
                 </div>
 
                 <div class="activity-list-item" tal:repeat="activity activities">
-                    <h3><a href="${request.link(activity)}">${activity.title}</a></h3>
-                    <p class="page-lead">${activity.lead}</p>
+                    <div class="row collapse">
+                        <div class="columns small-2 thumbnail-column">
+                            <div class="thumbnail">
+                                <div tal:condition="activity.thumbnail|nothing"
+                                     style="background-image: url('${activity.thumbnail}');"></div>
+                            </div>
+                        </div>
 
-                    <div class="row" tal:define="
-                        ages get_ages(activity);
-                        min_cost get_min_cost(activity);
-                        available_spots get_available_spots(activity);
-                    ">
-                        <div class="small-12 columns factoids activities-list">
-                            <tal:block condition="ages">
-                                <span class="age" tal:define="
-                                    min_age min(age.lower for age in ages);
-                                    max_age max(age.upper - 1 for age in ages);
-                                ">
-                                    <span i18n:translate class="show-for-sr">Age</span>
-                                    <span i18n:translate>
-                                        <tal:block replace="min_age" i18n:name='min_age' />
-                                        -
-                                        <tal:block replace="max_age" i18n:name='max_age' />
-                                        years
-                                    </span>
-                                </span>
-                            </tal:block>
-                            <tal:block condition="min_cost is not None">
-                                <span class="cost">
-                                    <span i18n:translate class="show-for-sr">Cost</span>
+                        <div class="columns small-10">
+                            <h3><a href="${request.link(activity)}">${activity.title}</a></h3>
+                            <p class="page-lead">${activity.lead}</p>
 
-                                    <span i18n:translate>
-                                        starting at <tal:block i18n:name='price'>${'{:.2f}'.format(min_cost)}</tal:block> CHF
-                                    </span>
-                                </span>
-                            </tal:block>
-                            <tal:block>
-                                <span class="${available_spots and 'available-spots' or 'full'}">
-                                    <span i18n:translate class="show-for-sr">Free Spots</span>
+                            <div class="row collapse" tal:define="
+                                ages get_ages(activity);
+                                min_cost get_min_cost(activity);
+                                available_spots get_available_spots(activity);
+                            ">
+                                <div class="small-12 columns factoids activities-list">
+                                    <tal:block condition="ages">
+                                        <span class="age" tal:define="
+                                            min_age min(age.lower for age in ages);
+                                            max_age max(age.upper - 1 for age in ages);
+                                        ">
+                                            <span i18n:translate class="show-for-sr">Age</span>
+                                            <span i18n:translate>
+                                                <tal:block replace="min_age" i18n:name='min_age' />
+                                                -
+                                                <tal:block replace="max_age" i18n:name='max_age' />
+                                                years
+                                            </span>
+                                        </span>
+                                    </tal:block>
+                                    <tal:block condition="min_cost is not None">
+                                        <span class="cost">
+                                            <span i18n:translate class="show-for-sr">Cost</span>
 
-                                    <span i18n:translate tal:condition="not available_spots">
-                                        No free spots
-                                    </span>
-                                    <span i18n:translate tal:condition="available_spots == 1">
-                                        1 free spot
-                                    </span>
-                                    <span i18n:translate tal:condition="available_spots > 1">
-                                        <tal:block i18n:name="count">${available_spots}</tal:block> free spots
-                                    </span>
-                                </span>
-                            </tal:block>
+                                            <span i18n:translate>
+                                                starting at <tal:block i18n:name='price'>${'{:.2f}'.format(min_cost)}</tal:block> CHF
+                                            </span>
+                                        </span>
+                                    </tal:block>
+                                    <tal:block>
+                                        <span class="${available_spots and 'available-spots' or 'full'}">
+                                            <span i18n:translate class="show-for-sr">Free Spots</span>
+
+                                            <span i18n:translate tal:condition="not available_spots">
+                                                No free spots
+                                            </span>
+                                            <span i18n:translate tal:condition="available_spots == 1">
+                                                1 free spot
+                                            </span>
+                                            <span i18n:translate tal:condition="available_spots > 1">
+                                                <tal:block i18n:name="count">${available_spots}</tal:block> free spots
+                                            </span>
+                                        </span>
+                                    </tal:block>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

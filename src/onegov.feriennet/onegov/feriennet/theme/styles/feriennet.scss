@@ -307,6 +307,32 @@ ul.single-line {
 }
 
 /*
+    Activity thumbnails
+*/
+.thumbnail-column {
+    padding: .5rem .75rem 0 .25rem !important;
+}
+
+.thumbnail {
+    padding-bottom: 90%;
+    position: relative;
+    width: 100%;
+
+    > div {
+        background-position: center top;
+        background-size: cover;
+        border-radius: 1000px;
+        bottom: 0;
+        height: 100%;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 100%;
+    }
+}
+
+/*
     Activity view
 */
 ul.tags {

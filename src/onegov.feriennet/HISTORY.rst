@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Shows a thumbnail for each activity in the overview.
+  [href]
+
 - Adds a sponsor-banner mechanism for the bookings view.
   [href]
 
