@@ -4,7 +4,11 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 import hashlib
 
-from onegov.activity import Booking, Period, Occasion, InvoiceItem
+from onegov.activity import ActivityCollection
+from onegov.activity import Booking
+from onegov.activity import Period
+from onegov.activity import Occasion
+from onegov.activity import InvoiceItem
 from onegov.core.orm.types import UUID, JSON
 from onegov.core.upgrade import upgrade_task
 from sqlalchemy import Boolean
@@ -369,3 +373,9 @@ def add_weekdays_index(context):
         'inverted_weekdays', 'activities', ['weekdays'],
         postgresql_using='gin'
     )
+
+
+@upgrade_task('Extract thumbnails')
+def extract_thumbnails(context):
+    for activity in ActivityCollection(context.session).query():
+        activity.content_observer(None)

@@ -1,10 +1,13 @@
 import hashlib
+import lxml
 import sedate
 import string
+import re
 
 from datetime import timedelta
 from itertools import chain
 from onegov.core.utils import chunks
+from pyquery import PyQuery as pq
 from random import SystemRandom
 
 
@@ -21,6 +24,8 @@ CODE_TO_ESR_MAPPING = {
 ESR_TO_CODE_MAPPING = {
     value: key for key, value in CODE_TO_ESR_MAPPING.items()
 }
+
+INTERNAL_IMAGE_EX = re.compile(r'.*/storage/[0-9a-z]{64}')
 
 
 def random_group_code():
@@ -292,3 +297,25 @@ def dates_overlap(a, b, minutes_between=0, cut_end=True):
                 return True
 
     return False
+
+
+def is_internal_image(url):
+    return url and INTERNAL_IMAGE_EX.match(url) and True or False
+
+
+def extract_thumbnail(text):
+
+    try:
+        first_image = next((img for img in pq(text or '')('img')), None)
+    except lxml.etree.XMLSyntaxError:
+        first_image = None
+
+    if first_image is None:
+        return None
+
+    url = first_image.attrib.get('src')
+
+    if is_internal_image(url) and not url.endswith('/thumbnail'):
+        url += '/thumbnail'
+
+    return url

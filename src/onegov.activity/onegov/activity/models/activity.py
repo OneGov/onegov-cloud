@@ -1,4 +1,5 @@
 from onegov.activity.models.occasion import Occasion
+from onegov.activity.utils import extract_thumbnail
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import (
     content_property,
@@ -52,6 +53,9 @@ class Activity(Base, ContentMixin, TimestampMixin):
 
     #: Describes the activity in detail
     text = content_property('text')
+
+    #: The thumbnail shown in the overview
+    thumbnail = meta_property('thumbnail')
 
     #: Tags/Categories of the activity
     _tags = Column(MutableDict.as_mutable(HSTORE), nullable=True, name='tags')
@@ -127,6 +131,10 @@ class Activity(Base, ContentMixin, TimestampMixin):
     def username_observer(self, username):
         if not self.reporter:
             self.reporter = username
+
+    @observes('content')
+    def content_observer(self, content):
+        self.thumbnail = extract_thumbnail(self.content.get('text'))
 
     @property
     def tags(self):
