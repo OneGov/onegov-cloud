@@ -171,8 +171,8 @@ def test_upload_vote_submit(election_day_app):
         upload = upload.form.submit()
 
         assert import_.called
-        assert import_.call_args[0][4] == 1
-        assert import_.call_args[0][5] == False
+        assert import_.call_args[0][2] == 1
+        assert import_.call_args[0][3] == False
 
     # Wabsti complex
     edit = client.get('/vote/vote/edit')
@@ -192,8 +192,8 @@ def test_upload_vote_submit(election_day_app):
         upload = upload.form.submit()
 
         assert import_.called
-        assert import_.call_args[0][4] == 2
-        assert import_.call_args[0][5] == True
+        assert import_.call_args[0][2] == 2
+        assert import_.call_args[0][3] == True
 
 
 def test_upload_vote_invalidate_cache(election_day_app):
