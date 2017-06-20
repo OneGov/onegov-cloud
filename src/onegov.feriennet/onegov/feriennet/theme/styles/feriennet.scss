@@ -707,6 +707,13 @@ ul.tags {
         position: absolute;
     }
 
+    @media #{$small-only} {
+        .icon-male::before,
+        .icon-female::before {
+            left: 1.5rem;
+        }
+    }
+
     .attendee-bookings {
         .alert-box {
             margin-bottom: 0;
