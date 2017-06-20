@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a sponsor-banner mechanism for the bookings view.
+  [href]
+
 - Adds Pro Juventute's Google Tag Manager script.
   [href]
 

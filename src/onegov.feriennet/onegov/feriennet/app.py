@@ -1,3 +1,5 @@
+import random
+
 from cached_property import cached_property
 from onegov.activity import Period, PeriodCollection
 from onegov.core import utils
@@ -10,6 +12,17 @@ from onegov.org import OrgApp
 from onegov.org.app import get_common_asset as get_org_common_asset
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 from onegov.user import UserCollection
+
+
+BANNER_TEMPLATE = """
+<div class="sponsor-banner">
+    <div class="sponsor-banner-{id}">
+        <a href="{url}">
+            <img src="{src}">
+        </a>
+    </div>
+</div>
+"""
 
 
 class FeriennetApp(OrgApp):
@@ -33,6 +46,25 @@ class FeriennetApp(OrgApp):
     @cached_property
     def sponsors(self):
         return load_sponsors(utils.module_path('onegov.feriennet', 'sponsors'))
+
+    def banner(self, request, id):
+        """ Randomly returns the html to one of the available booking banners.
+
+        """
+        candidates = [
+            sponsor for sponsor in self.sponsors
+            if getattr(sponsor, 'banners', None) and id in sponsor.banners
+        ]
+
+        if not candidates:
+            return None
+
+        winner = random.choice(candidates)
+        return BANNER_TEMPLATE.format(
+            id=id,
+            src=winner.url_for(request, winner.banners[id]['src']),
+            url=winner.banners[id]['url']
+        )
 
 
 @FeriennetApp.template_directory()

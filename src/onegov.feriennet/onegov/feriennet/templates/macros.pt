@@ -105,7 +105,7 @@
                 <div tal:repeat="sponsor chunk" class="columns small-12 medium-3 large-3 ${repeat.sponsor.end and 'end' or ''}">
                     <div tal:condition="sponsor" class="sponsor" style="background-color: ${sponsor.background};">
                         <a href="${sponsor.link}" title="${sponsor.name}">
-                            <img height="${sponsor.height}" width="${sponsor.width}" src="${sponsor.logo_path(request)}" style="top: ${sponsor.top};">
+                            <img height="${sponsor.height}" width="${sponsor.width}" src="${sponsor.url_for(request, sponsor.logo)}" style="top: ${sponsor.top};">
                         </a>
                     </div>
                 </div>

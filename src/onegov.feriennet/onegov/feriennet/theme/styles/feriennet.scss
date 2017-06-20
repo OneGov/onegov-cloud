@@ -1921,3 +1921,28 @@ ul.tags {
         margin-bottom: 1rem;
     }
 }
+
+/*
+    Sponsoring banners
+*/
+.sponsor-banner {
+    margin-bottom: 1.25rem;
+}
+
+.sponsor-banner-bookings {
+    /*
+        aspect ratio 16:5 (100/16*5 =31.25)
+        see https://stackoverflow.com/q/1495407
+    */
+    padding-bottom: 31.25%;
+    position: relative;
+
+    a {
+        bottom: 0;
+        display: block;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+}
