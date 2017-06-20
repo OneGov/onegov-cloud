@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a user view that shows all objects belonging to the user.
+  [href]
+
 0.9.2 (2017-06-19)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-06-14 16:51+0200\n"
+"POT-Creation-Date: 2017-06-20 16:46+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1756,6 +1756,12 @@ msgid ""
 msgstr ""
 "Sie wurden nicht automatisch weitergeleitet damit Sie die Möglichkeit haben "
 "den Verweis zu bearbeiten oder zu löschen."
+
+msgid "No links found."
+msgstr "Keine Verknüpfungen gefunden."
+
+msgid "Select an item to view it"
+msgstr "Wählen Sie einen Eintrag aus um diesen anzuzeigen"
 
 msgid "Inactive"
 msgstr "Inaktiv"

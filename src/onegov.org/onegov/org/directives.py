@@ -38,3 +38,22 @@ class ExportAction(Action):
 
     def perform(self, cls, export_registry):
         export_registry[self.id] = cls(**self.kwargs)
+
+
+class UserlinkAction(Action):
+    """ Registers a user link group. """
+
+    config = {
+        'linkgroup_registry': list
+    }
+
+    counter = iter(range(1, 123456789))
+
+    def __init__(self):
+        self.name = next(self.counter)
+
+    def identifier(self, linkgroup_registry):
+        return self.name
+
+    def perform(self, func, linkgroup_registry):
+        linkgroup_registry.append(func)

@@ -27,7 +27,10 @@
                             <td tal:condition="not:serial" i18n:translate></td>
                         </tal:block>
                         
-                        <td><a href="${request.link(user)}" i18n:translate>Edit</a></td>
+                        <td class="text-links">
+                            <a href="${request.link(user)}" i18n:translate>View</a>
+                            <a href="${request.link(user, 'bearbeiten')}" i18n:translate>Edit</a>
+                        </td>
                     </tr>
                 </tbody>
             </tal:block>

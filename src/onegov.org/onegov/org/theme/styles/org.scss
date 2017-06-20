@@ -3767,3 +3767,10 @@ ul.recipients {
         border: .5px solid $black;
     }
 }
+
+/*
+    Userlinks view
+*/
+.linkgroup select {
+    max-width: 300px;
+}

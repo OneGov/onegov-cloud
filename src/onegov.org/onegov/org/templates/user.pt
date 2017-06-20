@@ -1,0 +1,52 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <div class="field-display">
+            <div class="field-display-block">
+                <div class="field-display-label" i18n:translate>E-Mail</div>
+                <div class="field-display-data ticket-state">
+                    <a href="mailto:${layout.model.username}">${layout.model.username}</a>
+                </div>
+            </div>
+
+            <div class="field-display-block">
+                <div class="field-display-label" i18n:translate>Role</div>
+                <div class="field-display-data ticket-state">
+                    <metal:b use-macro="layout.macros['role_singular']" tal:define="role layout.model.role" />
+                </div>
+            </div>
+
+            <div class="field-display-block">
+                <div class="field-display-label" i18n:translate>Active</div>
+                <div class="field-display-data ticket-state">
+                    ${layout.model.active and '✔︎' or '✘'}
+                </div>
+            </div>
+
+            <div class="linkgroup field-display-block" tal:repeat="group linkgroups">
+                <div class="field-display-label">${group.title}</div>
+                <div class="field-display-data">
+                    <div tal:condition="not:group.links" i18n:translate>
+                        No links found.
+                    </div>
+                    <tal:b condition="len(group.links) > 25">
+                        <select onchange="location = this.value;" tal:condition="group.links">
+                            <option value="" selected disabled i18n:translate>Select an item to view it</option>
+                            <option tal:repeat="link group.links" value="${link.attrs.href}">${link.text}</option>
+                        </select>
+                    </tal:b>
+                    <tal:b condition="len(group.links) <= 25">
+                        <ul>
+                            <li tal:repeat="link group.links">
+                                <tal:b replace="structure link(layout)" />
+                            </li>
+                        </ul>
+                    </tal:b>
+                </div>
+            </div>
+
+        </div>
+    </tal:block>
+</div>

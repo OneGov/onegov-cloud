@@ -6,9 +6,12 @@ from onegov.core.security import Secret
 from onegov.core.templates import render_template
 from onegov.form import merge_forms
 from onegov.org import _, OrgApp
-from onegov.org.elements import Link
 from onegov.org.forms import ManageUserForm, NewUserForm
-from onegov.org.layout import UserManagementLayout, DefaultMailLayout
+from onegov.org.layout import DefaultMailLayout
+from onegov.org.layout import UserLayout
+from onegov.org.layout import UserManagementLayout
+from onegov.org.new_elements import Link, LinkGroup
+from onegov.ticket import TicketCollection, Ticket
 from onegov.user import User, UserCollection
 from onegov.user.errors import ExistingUserError
 from wtforms.validators import Optional
@@ -31,6 +34,47 @@ def view_usermanagement(self, request):
         'title': _("User Management"),
         'users': users
     }
+
+
+@OrgApp.html(model=User, template='user.pt', permission=Secret)
+def view_user(self, request):
+    """ Shows all objects owned by the given user. """
+
+    layout = UserLayout(self, request)
+
+    linkgroups = [
+        fn(request, self) for fn in request.app.config.linkgroup_registry
+    ]
+    linkgroups.sort(key=lambda group: request.translate(group.title))
+
+    return {
+        'layout': layout,
+        'title': self.title,
+        'linkgroups': linkgroups
+    }
+
+
+@OrgApp.userlinks()
+def ticket_links(request, user):
+    tickets = TicketCollection(request.app.session()).query()
+    tickets = tickets.filter_by(user_id=user.id)
+    tickets = tickets.order_by(Ticket.number)
+    tickets = tickets.with_entities(
+        Ticket.id, Ticket.number, Ticket.handler_code)
+
+    return LinkGroup(
+        title=_("Tickets"),
+        links=[
+            Link(
+                ticket.number,
+                request.class_link(Ticket, {
+                    'handler_code': ticket.handler_code,
+                    'id': ticket.id
+                }),
+            )
+            for ticket in tickets
+        ]
+    )
 
 
 def get_manage_user_form(self, request):
@@ -65,7 +109,7 @@ def get_manage_user_form(self, request):
 
 
 @OrgApp.form(model=User, template='form.pt', form=get_manage_user_form,
-             permission=Secret)
+             permission=Secret, name='bearbeiten')
 def handle_manage_user(self, request, form):
 
     # XXX the manage user form doesn't have access to the username

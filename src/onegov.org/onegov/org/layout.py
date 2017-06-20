@@ -1418,6 +1418,28 @@ class UserManagementLayout(DefaultLayout):
             ]
 
 
+class UserLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Usermanagement"), self.request.class_link(UserCollection)),
+            Link(self.model.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_admin:
+            return [
+                Link(
+                    text=_("Edit"),
+                    url=self.request.link(self.model, 'bearbeiten'),
+                    attrs={'class': 'edit-link'}
+                ),
+            ]
+
+
 class ExportCollectionLayout(DefaultLayout):
 
     @cached_property
