@@ -1,20 +1,20 @@
 {
     "1": {
-        "name": "Innere Stadt",
+        "name": "Innere Stadt"
     },
     "2": {
-        "name": "L\u00e4nggasse/Felsenau",
+        "name": "L\u00e4nggasse/Felsenau"
     },
     "3": {
-        "name": "Mattenhof/Weissenb\u00fchl",
+        "name": "Mattenhof/Weissenb\u00fchl"
     },
     "4": {
-        "name": "Kirchenfeld/Schosshalde",
+        "name": "Kirchenfeld/Schosshalde"
     },
     "5": {
-        "name": "Breitenrain/Lorraine",
+        "name": "Breitenrain/Lorraine"
     },
     "6": {
-        "name": "B\u00fcmpliz/Bethlehem",
-    },
+        "name": "B\u00fcmpliz/Bethlehem"
+    }
 }

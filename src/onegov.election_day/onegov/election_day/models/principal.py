@@ -1,5 +1,6 @@
 import onegov.election_day
 import yaml
+import json
 
 from datetime import date
 from cached_property import cached_property
@@ -122,7 +123,7 @@ class Principal(object):
                 year = int(path.name)
 
                 with (path / '{}.json'.format(self.canton)).open('r') as f:
-                    result[year] = {int(k): v for k, v in yaml.load(f).items()}
+                    result[year] = {int(k): v for k, v in json.load(f).items()}
 
         return result
 
@@ -151,7 +152,7 @@ class Principal(object):
                 if path.exists():
                     with (path).open('r') as f:
                         result[year] = {
-                            int(k): v for k, v in yaml.load(f).items()
+                            int(k): v for k, v in json.load(f).items()
                         }
 
             if not result:
