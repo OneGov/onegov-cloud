@@ -356,7 +356,7 @@ def test_import_wabsti_proporz_expats(session):
         assert not errors
 
         candidate = election.candidates.one()
-        assert candidate.results.one().election_result.entity_id == 1
+        assert candidate.results.one().election_result.entity_id == 0
         assert candidate.votes == 50
 
 # todo: test temporary results

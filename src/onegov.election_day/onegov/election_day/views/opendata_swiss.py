@@ -119,7 +119,7 @@ def view_rdf(self, request):
             sub(ds, 'dct:title', {'xml:lang': lang}, title)
 
         # Description
-        # Todo: Add a generic description a more generic description?
+        # Todo: Add a more generic description?
         #  Schlussresultat der kantonalen Abstimmung "XXX" vom 1.1.2000,
         #    Kanton Zug.
         des = _("Results")
