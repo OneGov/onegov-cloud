@@ -14,7 +14,7 @@ from pytest import mark
     module_path('onegov.election_day',
                 'tests/fixtures/internal_election.tar.gz'),
 ])
-def test_import_internal(session, tar_file):
+def test_import_internal_election(session, tar_file):
     session.add(
         Election(
             title='election',
@@ -279,7 +279,7 @@ def test_import_internal(session, tar_file):
     assert sorted(election.elected_candidates) == [('Tschäppät', 'Alexander')]
 
 
-def test_import_internal_missing_headers(session):
+def test_import_internal_election_missing_headers(session):
     session.add(
         Election(
             title='election',
@@ -331,7 +331,7 @@ def test_import_internal_missing_headers(session):
     ]
 
 
-def test_import_internal_invalid_values(session):
+def test_import_internal_election_invalid_values(session):
     session.add(
         Election(
             title='election',
@@ -445,6 +445,83 @@ def test_import_internal_invalid_values(session):
     ]
 
 
-# todo: test expats
+def test_import_internal_election_expats(session):
+    session.add(
+        Election(
+            title='election',
+            domain='canton',
+            type='proporz',
+            date=date(2015, 10, 18),
+            number_of_mandates=6,
+        )
+    )
+    session.flush()
+    election = session.query(Election).one()
+    principal = Principal(canton='zg')
+    entities = principal.entities.get(election.date.year, {})
+
+    for entity_id in (9170, 0):
+        errors = import_election_internal(
+            election, entities,
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'election_absolute_majority',
+                        'election_status',
+                        'election_counted_entities',
+                        'election_total_entities',
+                        'entity_id',
+                        'entity_name',
+                        'entity_elegible_voters',
+                        'entity_received_ballots',
+                        'entity_blank_ballots',
+                        'entity_invalid_ballots',
+                        'entity_blank_votes',
+                        'entity_invalid_votes',
+                        'list_name',
+                        'list_id',
+                        'list_number_of_mandates',
+                        'list_votes',
+                        'list_connection',
+                        'list_connection_parent',
+                        'candidate_family_name',
+                        'candidate_first_name',
+                        'candidate_id',
+                        'candidate_elected',
+                        'candidate_votes',
+                        'candidate_party',
+                    )),
+                    ','.join((
+                        '',  # election_absolute_majority
+                        'unknown',  # election_status
+                        '1',  # election_counted_entities
+                        '11',  # election_total_entities
+                        str(entity_id),  # entity_id
+                        'Expats',  # entity_name
+                        '111',  # entity_elegible_voters
+                        '11',  # entity_received_ballots
+                        '1',  # entity_blank_ballots
+                        '1',  # entity_invalid_ballots
+                        '1',  # entity_blank_votes
+                        '1',  # entity_invalid_votes
+                        '',  # list_name
+                        '',  # list_id
+                        '',  # list_number_of_mandates
+                        '',  # list_votes
+                        '',  # list_connection
+                        '',  # list_connection_parent
+                        'xxx',  # candidate_family_name
+                        'xxx',  # candidate_first_name
+                        '1',  # candidate_id
+                        'false',  # candidate_elected
+                        '1',  # candidate_votes
+                        '',  # candidate_party
+                    ))
+                ))
+            ).encode('utf-8')), 'text/plain',
+        )
+        assert not errors
+        assert election.results.filter_by(entity_id=0).one().invalid_votes == 1
+
 
 # todo: test temporary results

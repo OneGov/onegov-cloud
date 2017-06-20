@@ -221,7 +221,7 @@ def test_import_wabsti_majorz_invalid_values(session):
             ))
         ).encode('utf-8')), 'text/plain',
     )
-    # pp sorted([(e.filename, e.line, e.error.interpolate()) for e in errors])
+
     assert sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
     ]) == [
@@ -232,6 +232,57 @@ def test_import_wabsti_majorz_invalid_values(session):
     ]
 
 
-# todo: test expats
+def test_import_wabsti_majorz_expats(session):
+    session.add(
+        Election(
+            title='election',
+            domain='canton',
+            type='majorz',
+            date=date(2016, 2, 28),
+            number_of_mandates=6,
+        )
+    )
+    session.flush()
+    election = session.query(Election).one()
+    principal = Principal(canton='sg')
+    entities = principal.entities.get(election.date.year, {})
+
+    for entity_id in (9170, 0):
+        errors = import_election_wabsti_majorz(
+            election, entities,
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'AnzMandate',
+                        'BFS',
+                        'EinheitBez',
+                        'StimmBer',
+                        'StimmAbgegeben',
+                        'StimmLeer',
+                        'StimmUngueltig',
+                        'KandName_1',
+                        'Stimmen_1',
+                        'KandName_2',
+                        'Stimmen_2',
+                    )),
+                    ','.join((
+                        '',
+                        str(entity_id),
+                        '',
+                        '100',
+                        '90',
+                        '1',
+                        '1',
+                        'Leere Zeilen',
+                        '0',
+                        'Ungültige Stimmen',
+                        '1'
+                    )),
+                ))
+            ).encode('utf-8')), 'text/plain'
+        )
+
+        assert not errors
+        assert election.results.filter_by(entity_id=0).one().invalid_votes == 1
 
 # todo: test temporary results

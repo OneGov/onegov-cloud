@@ -306,6 +306,57 @@ def test_import_wabsti_proporz_invalid_values(session):
         ('Results', 3, '1234 is unknown')
     ]
 
-# todo: test expats
+
+def test_import_wabsti_proporz_expats(session):
+    session.add(
+        Election(
+            title='election',
+            domain='canton',
+            type='proporz',
+            date=date(2015, 10, 18),
+            number_of_mandates=6,
+        )
+    )
+    session.flush()
+    election = session.query(Election).one()
+    principal = Principal(canton='sg')
+    entities = principal.entities.get(election.date.year, {})
+
+    for entity_id in (9170, 0):
+        errors = import_election_wabsti_proporz(
+            election, entities,
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'Einheit_BFS',
+                        'Einheit_Name',
+                        'Liste_KandID',
+                        'Kand_Nachname',
+                        'Kand_Vorname',
+                        'Liste_ID',
+                        'Liste_Code',
+                        'Kand_StimmenTotal',
+                        'Liste_ParteistimmenTotal',
+                    )),
+                    ','.join((
+                        str(entity_id),
+                        'xxx',
+                        '7',
+                        'xxx',
+                        'xxx',
+                        '8',
+                        '9',
+                        '50',
+                        '60',
+                    )),
+                ))
+            ).encode('utf-8')), 'text/plain',
+        )
+
+        assert not errors
+
+        candidate = election.candidates.one()
+        assert candidate.results.one().election_result.entity_id == 1
+        assert candidate.votes == 50
 
 # todo: test temporary results

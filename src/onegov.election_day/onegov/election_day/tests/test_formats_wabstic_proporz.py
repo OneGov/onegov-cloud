@@ -360,6 +360,168 @@ def test_import_wabstic_proporz_invalid_values(session):
     ]
 
 
-# todo: test expats
+def test_import_wabstic_proporz_expats(session):
+    session.add(
+        Election(
+            title='election',
+            domain='canton',
+            type='proporz',
+            date=date(2015, 10, 18),
+            number_of_mandates=6,
+        )
+    )
+    session.flush()
+    election = session.query(Election).one()
+    principal = Principal(canton='sg')
+    entities = principal.entities.get(election.date.year, {})
+
+    for entity_id, sub_entity_id in (
+        ('9170', ''),
+        ('0', ''),
+        ('', '9170'),
+        ('', '0'),
+    ):
+        errors = import_election_wabstic_proporz(
+            election, entities, '0', '0',
+            BytesIO((  # wp_wahl
+                '\n'.join((
+                    ','.join((
+                        'SortGeschaeft',
+                        'Ausmittlungsstand',
+                    )),
+                    ','.join((
+                        '0',
+                        '0',  # Ausmittlungsstand
+                    )),
+                ))
+            ).encode('utf-8')), 'text/plain',
+            BytesIO((  # wpstatic_gemeinden
+                '\n'.join((
+                    ','.join((
+                        'SortWahlkreis',
+                        'SortGeschaeft',
+                        'SortGemeinde',
+                        'SortGemeindeSub',
+                        'Stimmberechtigte',
+                    )),
+                    ','.join((
+                        '0',
+                        '0',
+                        entity_id,  # SortGemeinde
+                        sub_entity_id,  # SortGemeindeSub
+                        '',  # Stimmberechtigte
+                    )),
+                ))
+            ).encode('utf-8')), 'text/plain',
+            BytesIO((  # wp_gemeinden
+                '\n'.join((
+                    ','.join((
+                        'SortGemeinde',
+                        'SortGemeindeSub',
+                        'Stimmberechtigte',
+                        'Sperrung',
+                        'StmAbgegeben',
+                        'StmLeer',
+                        'StmUngueltig',
+                        'AnzWZAmtLeer',
+                    )),
+                    ','.join((
+                        entity_id,  # SortGemeinde
+                        sub_entity_id,  # SortGemeindeSub
+                        '10000',  # Stimmberechtigte
+                        '',  # Sperrung
+                        '',  # StmAbgegeben
+                        '1',  # StmLeer
+                        '',  # StmUngueltig
+                        '',  # AnzWZAmtLeer
+                    )),
+                ))
+            ).encode('utf-8')), 'text/plain',
+            BytesIO((  # wp_listen
+                '\n'.join((
+                    ','.join((
+                        'SortGeschaeft',
+                        'ListNr',
+                        'ListCode',
+                        'Sitze',
+                        'ListVerb',
+                        'ListUntVerb',
+                    )),
+                    ','.join((
+                        '0',
+                        '1',  # ListNr
+                        '1',  # ListCode
+                        '',  # Sitze
+                        '',  # ListVerb
+                        '',  # ListUntVerb
+                    )),
+                ))
+            ).encode('utf-8')), 'text/plain',
+            BytesIO((  # wp_listengde
+                '\n'.join((
+                    ','.join((
+                        'SortGemeinde',
+                        'SortGemeindeSub',
+                        'ListNr',
+                        'StimmenTotal',
+                    )),
+                    ','.join((
+                        entity_id,  # SortGemeinde
+                        sub_entity_id,  # SortGemeindeSub
+                        '1',  # ListNr
+                        '0',  # StimmenTotal
+                    )),
+                ))
+            ).encode('utf-8')), 'text/plain',
+            BytesIO((  # wpstatic_kandidaten
+                '\n'.join((
+                    ','.join((
+                        'SortGeschaeft',
+                        'KNR',
+                        'Nachname',
+                        'Vorname',
+                    )),
+                    ','.join((
+                        '0',
+                        '101',  # KNR
+                        'xxx',  # Nachname
+                        'xxx',  # Vorname
+                    )),
+                ))
+            ).encode('utf-8')), 'text/plain',
+            BytesIO((  # wp_kandidaten
+                '\n'.join((
+                    ','.join((
+                        'SortGeschaeft',
+                        'KNR',
+                        'Gewahlt',
+                    )),
+                    ','.join((
+                        '0',
+                        '101',  # KNR
+                        '',  # Gewahlt
+                    )),
+                ))
+            ).encode('utf-8')), 'text/plain',
+            BytesIO((  # wp_kandidatengde
+                '\n'.join((
+                    ','.join((
+                        'SortGemeinde',
+                        'SortGemeindeSub',
+                        'KNR',
+                        'Stimmen',
+                    )),
+                    ','.join((
+                        entity_id,  # SortGemeinde
+                        sub_entity_id,  # SortGemeindeSub
+                        '101',  # KNR
+                        '100',  # Stimmen
+                    )),
+                ))
+            ).encode('utf-8')), 'text/plain'
+        )
+
+        assert not errors
+        assert election.results.filter_by(entity_id=0).one().blank_ballots == 1
 
 # todo: test temporary results

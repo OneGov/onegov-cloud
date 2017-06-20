@@ -281,6 +281,7 @@ def test_import_wabstic_majorz_invalid_values(session):
             ))
         ).encode('utf-8')), 'text/plain'
     )
+
     assert sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
     ]) == [
@@ -297,6 +298,128 @@ def test_import_wabstic_majorz_invalid_values(session):
     ]
 
 
-# todo: test expats
+def test_import_wabstic_majorz_expats(session):
+    session.add(
+        Election(
+            title='election',
+            domain='canton',
+            type='majorz',
+            date=date(2016, 2, 28),
+            number_of_mandates=6,
+        )
+    )
+    session.flush()
+    election = session.query(Election).one()
+    principal = Principal(canton='sg')
+    entities = principal.entities.get(election.date.year, {})
+
+    for entity_id, sub_entity_id in (
+        ('9170', ''),
+        ('0', ''),
+        ('', '9170'),
+        ('', '0'),
+    ):
+        errors = import_election_wabstic_majorz(
+            election, entities, '0', '0',
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'SortGeschaeft',
+                        'AbsolutesMehr',
+                        'Ausmittlungsstand',
+                    )),
+                    ','.join((
+                        '0',
+                        '5000',  # AbsolutesMehr
+                        '0',  # Ausmittlungsstand
+                    )),
+                ))
+            ).encode('utf-8')), 'text/plain',
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'SortWahlkreis',
+                        'SortGeschaeft',
+                        'SortGemeinde',
+                        'SortGemeindeSub',
+                        'Stimmberechtigte',
+                    )),
+                    ','.join((
+                        '0',
+                        '0',
+                        entity_id,  # SortGemeinde
+                        sub_entity_id,  # SortGemeindeSub
+                        '10000',  # Stimmberechtigte
+                    )),
+                ))
+            ).encode('utf-8')), 'text/plain',
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'SortGemeinde',
+                        'SortGemeindeSub',
+                        'Stimmberechtigte',
+                        'Sperrung',
+                        'StmAbgegeben',
+                        'StmLeer',
+                        'StmUngueltig',
+                        'StimmenLeer',
+                        'StimmenUngueltig',
+                    )),
+                    ','.join((
+                        entity_id,  # SortGemeinde
+                        sub_entity_id,  # SortGemeindeSub
+                        '10000',  # Stimmberechtigte
+                        '',  # Sperrung
+                        '',  # StmAbgegeben
+                        '',  # StmLeer
+                        '1',  # StmUngueltig
+                        '',  # StimmenLeer
+                        '1',  # StimmenUngueltig
+                    )),
+                ))
+            ).encode('utf-8')), 'text/plain',
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'SortGeschaeft',
+                        'KNR',
+                        'Nachname',
+                        'Vorname',
+                        'Gewahlt',
+                        'Partei',
+                    )),
+                    ','.join((
+                        '0',
+                        '1',  # KNR
+                        'xxx',  # Nachname
+                        'xxx',  # Vorname
+                        '',  # Gewahlt
+                        '',  # Partei
+                    )),
+                ))
+            ).encode('utf-8')), 'text/plain',
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'SortGeschaeft',
+                        'SortGemeinde',
+                        'SortGemeindeSub',
+                        'KNR',
+                        'Stimmen',
+                    )),
+                    ','.join((
+                        '0',
+                        entity_id,  # SortGemeinde
+                        sub_entity_id,  # SortGemeindeSub
+                        '1',  # KNR
+                        '10',  # Stimmen
+                    )),
+                ))
+            ).encode('utf-8')), 'text/plain'
+        )
+
+        assert not errors
+        assert election.results.filter_by(entity_id=0).one().invalid_votes == 1
 
 # todo: test temporary results
