@@ -10,6 +10,9 @@ Changelog
 - Exports all translations of the titles.
   [msom]
 
+- Renders the open data JSON with pretty print and with a meaningful file name.
+  [msom]
+
 - Adds tests.
   [msom]
 

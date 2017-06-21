@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from json import dumps
 from morepath.request import Response
 from onegov.ballot import Election
 from onegov.ballot import PartyResult
@@ -26,7 +27,7 @@ def view_election_data(self, request):
     }
 
 
-@ElectionDayApp.json(model=Election, name='data-json', permission=Public)
+@ElectionDayApp.view(model=Election, name='data-json', permission=Public)
 def view_election_data_as_json(self, request):
     """ View the raw data as JSON. """
 
@@ -34,7 +35,13 @@ def view_election_data_as_json(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_result_change)
 
-    return self.export()
+    return Response(
+        dumps(self.export(), sort_keys=True, indent=2).encode('utf-8'),
+        content_type='application/json',
+        content_disposition='inline; filename={}.json'.format(
+            normalize_for_url(self.title)
+        )
+    )
 
 
 @ElectionDayApp.view(model=Election, name='data-csv', permission=Public)

@@ -1,3 +1,4 @@
+from json import dumps
 from morepath.request import Response
 from onegov.ballot import Vote
 from onegov.core.csv import convert_list_of_dicts_to_csv
@@ -23,7 +24,7 @@ def view_vote_data(self, request):
     }
 
 
-@ElectionDayApp.json(model=Vote, name='data-json', permission=Public)
+@ElectionDayApp.view(model=Vote, name='data-json', permission=Public)
 def view_vote_data_as_json(self, request):
     """ View the raw data as JSON. """
 
@@ -31,7 +32,13 @@ def view_vote_data_as_json(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_result_change)
 
-    return self.export()
+    return Response(
+        dumps(self.export(), sort_keys=True, indent=2).encode('utf-8'),
+        content_type='application/json',
+        content_disposition='inline; filename={}.json'.format(
+            normalize_for_url(self.title)
+        )
+    )
 
 
 @ElectionDayApp.view(model=Vote, name='data-csv', permission=Public)
