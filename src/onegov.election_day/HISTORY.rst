@@ -4,6 +4,9 @@ Changelog
 - Fixes ambiguous translation.
   [msom]
 
+- Fixes smaller bugs in import functions.
+  [msom]
+
 - Drops SESAM support.
   [msom]
 
