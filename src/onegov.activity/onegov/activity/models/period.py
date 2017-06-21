@@ -2,6 +2,7 @@ import sedate
 
 from datetime import date, datetime
 from onegov.activity.models.booking import Booking
+from onegov.activity.models.occasion import Occasion
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID, JSON
@@ -14,6 +15,7 @@ from sqlalchemy import Index
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy import Text
+from sqlalchemy import desc, not_
 from sqlalchemy.orm import object_session, relationship, joinedload, defer
 from uuid import uuid4
 
@@ -41,6 +43,9 @@ class Period(Base, TimestampMixin):
 
     #: A finalized period may not have any change in bookings anymore
     finalized = Column(Boolean, nullable=False, default=False)
+
+    #: An archived period has been entirely completed
+    archived = Column(Boolean, nullable=False, default=False)
 
     #: Start of the wishlist-phase
     prebooking_start = Column(Date, nullable=False)
@@ -160,6 +165,46 @@ class Period(Base, TimestampMixin):
                 booking.state = 'denied'
 
             booking.cost = booking.provisional_booking_cost(period=self)
+
+    def archive(self):
+        """ Moves all accepted activities with an occasion in this period
+        into the archived state, unless there's already another occasion
+        in a period newer than the current period.
+
+        """
+        assert self.confirmed and self.finalized
+
+        self.archived = True
+        self.active = False
+
+        session = object_session(self)
+
+        def future_periods():
+            p = session.query(Period)
+            p = p.order_by(desc(Period.execution_start))
+            p = p.with_entities(Period.id)
+
+            for period in p:
+                if period.id == self.id:
+                    break
+                yield period.id
+
+        # get the activities which have an occasion in a future period
+        f = session.query(Occasion)
+        f = f.with_entities(Occasion.activity_id)
+        f = f.filter(Occasion.period_id.in_(tuple(future_periods())))
+
+        # get the activities which have an occasion in the given period but
+        # no occasion in any future period
+        o = session.query(Occasion)
+        o = o.filter(Occasion.period_id == self.id)
+        o = o.filter(not_(Occasion.activity_id.in_(f.subquery())))
+        o = o.options(joinedload(Occasion.activity))
+
+        # archive those
+        for occasion in o:
+            if occasion.activity.state == 'accepted':
+                occasion.activity.archive()
 
     @property
     def booking_limit(self):

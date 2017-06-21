@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to archive a period.
+  [href]
+
 - Adds a publication request to allow activities to be attached to tickets
   at least once per period.
   [href]

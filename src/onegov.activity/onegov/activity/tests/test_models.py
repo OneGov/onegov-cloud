@@ -2041,3 +2041,73 @@ def test_publication_request(session, owner):
     request = requests.query().first()
     assert request.activity.title == "Sport"
     assert request.period.title == "Autumn 2016"
+
+
+def test_archive_period(session, owner):
+
+    activities = ActivityCollection(session)
+    occasions = OccasionCollection(session)
+    periods = PeriodCollection(session)
+
+    current_period = periods.add(
+        title="Autumn 2017",
+        prebooking=(datetime(2017, 9, 1), datetime(2017, 9, 30)),
+        execution=(datetime(2017, 10, 1), datetime(2017, 10, 31)),
+        active=True
+    )
+
+    future_period = periods.add(
+        title="Winter 2017",
+        prebooking=(datetime(2017, 11, 1), datetime(2017, 11, 30)),
+        execution=(datetime(2017, 12, 1), datetime(2017, 12, 31)),
+        active=False
+    )
+
+    sport = activities.add("Sport", username=owner.username)
+    games = activities.add("Games", username=owner.username)
+
+    sport.propose().accept()
+    games.propose().accept()
+
+    occasions.add(
+        start=datetime(2017, 10, 4, 13),
+        end=datetime(2017, 10, 4, 14),
+        timezone="Europe/Zurich",
+        meeting_point="Lucerne",
+        age=(6, 9),
+        spots=(2, 10),
+        note="Bring game-face",
+        activity=sport,
+        period=current_period
+    )
+    occasions.add(
+        start=datetime(2017, 12, 4, 13),
+        end=datetime(2017, 12, 4, 14),
+        timezone="Europe/Zurich",
+        meeting_point="Lucerne",
+        age=(6, 9),
+        spots=(2, 10),
+        note="Bring game-face",
+        activity=sport,
+        period=future_period
+    )
+    occasions.add(
+        start=datetime(2017, 12, 4, 13),
+        end=datetime(2017, 12, 4, 14),
+        timezone="Europe/Zurich",
+        meeting_point="Lucerne",
+        age=(6, 9),
+        spots=(2, 10),
+        note="Bring game-face",
+        activity=games,
+        period=current_period
+    )
+
+    current_period.confirmed = True
+    current_period.finalized = True
+
+    current_period.archive()
+
+    assert current_period.archived == True
+    assert sport.state == 'accepted'
+    assert games.state == 'archived'
