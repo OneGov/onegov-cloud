@@ -1,3 +1,5 @@
+import transaction
+
 from datetime import date
 from onegov.ballot import Election, Vote
 from onegov.election_day.forms import DataSourceForm
@@ -208,11 +210,11 @@ def test_election_form_model(election_day_app):
     assert model.meta['related_link'] == 'http://ur.l'
 
 
-def test_upload_vote_form():
+def test_upload_vote_form(session):
     cantonal_principal = Principal(name='be', canton='be')
     communal_principal = Principal(name='bern', municipality='351')
 
-    simple_vote = Vote()
+    simple_vote = Vote(title='Vote', date=date(2017, 1, 1), domain='canton')
     simple_vote.meta = {'vote_type': 'simple'}
     complex_vote = Vote()
     complex_vote.meta = {'vote_type': 'complex'}
@@ -228,7 +230,23 @@ def test_upload_vote_form():
     assert sorted(f[0] for f in form.file_format.choices) == [
         'default', 'internal'
     ]
-    # todo: test if wabsti_c is added when data sources are available
+
+    # Test if wabsti_c is added when data sources are available
+    session.add(simple_vote)
+    session.add(DataSource(name='test', type='vote'))
+    session.flush()
+    ds = session.query(DataSource).one()
+    ds.items.append(DataSourceItem(vote_id=ds.query_candidates().one().id))
+    transaction.commit()
+
+    form.adjust(cantonal_principal, session.query(Vote).one())
+    assert sorted(f[0] for f in form.file_format.choices) == [
+        'default', 'internal', 'wabsti', 'wabsti_c'
+    ]
+    form.adjust(communal_principal, session.query(Vote).one())
+    assert sorted(f[0] for f in form.file_format.choices) == [
+        'default', 'internal', 'wabsti_c'
+    ]
 
     # Test preseting of vote type
     form = UploadVoteForm()
@@ -308,11 +326,13 @@ def test_upload_vote_form():
     assert form.validate()
 
 
-def test_upload_election_form():
+def test_upload_election_form(session):
     cantonal_principal = Principal(name='be', canton='be')
     communal_principal = Principal(name='bern', municipality='351')
 
-    election = Election()
+    election = Election(
+        title='Election', date=date(2017, 1, 1), domain='canton', type='majorz'
+    )
 
     # Test limitation of file formats
     form = UploadElectionBaseForm()
@@ -325,7 +345,23 @@ def test_upload_election_form():
     assert sorted(f[0] for f in form.file_format.choices) == [
         'internal'
     ]
-    # todo: test if wabsti_c is added when data sources are available
+
+    # Test if wabsti_c is added when data sources are available
+    session.add(election)
+    session.add(DataSource(name='test', type='majorz'))
+    session.flush()
+    ds = session.query(DataSource).one()
+    ds.items.append(DataSourceItem(election_id=ds.query_candidates().one().id))
+    transaction.commit()
+
+    form.adjust(cantonal_principal, session.query(Election).one())
+    assert sorted(f[0] for f in form.file_format.choices) == [
+        'internal', 'wabsti', 'wabsti_c'
+    ]
+    form.adjust(communal_principal, session.query(Election).one())
+    assert sorted(f[0] for f in form.file_format.choices) == [
+        'internal', 'wabsti_c'
+    ]
 
     # Test required fields (majorz)
     form = UploadMajorzElectionForm()
