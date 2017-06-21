@@ -678,6 +678,7 @@ def test_sms_notification(request, election_day_app, session):
         session.add(Subscriber(phone_number='+41791112233', locale='en'))
         session.add(Subscriber(phone_number='+41791112233', locale='de_CH'))
 
+        # Intermediate election results
         notification = SmsNotification()
         notification.trigger(request, election)
 
@@ -686,12 +687,15 @@ def test_sms_notification(request, election_day_app, session):
         assert notification.last_change == freezed
         assert election_day_app.send_sms.call_count == 2
         assert election_day_app.send_sms.call_args_list[0][0] == (
-            '+41791112233', 'New results are available on https://wab.ch.ch'
+            '+41791112233',
+            'New intermediate results are available on https://wab.ch.ch'
         )
         assert election_day_app.send_sms.call_args_list[1][0] == (
-            '+41791112233', 'Neue Resultate verfügbar auf https://wab.ch.ch'
+            '+41791112233',
+            'Neue Zwischenresultate verfügbar auf https://wab.ch.ch'
         )
 
+        # Intermediate vote results
         notification = SmsNotification()
         notification.trigger(request, vote)
 
@@ -699,6 +703,50 @@ def test_sms_notification(request, election_day_app, session):
         assert notification.vote_id == vote.id
         assert notification.last_change == freezed
         assert election_day_app.send_sms.call_count == 4
+        assert election_day_app.send_sms.call_args_list[2][0] == (
+            '+41791112233',
+            'New intermediate results are available on https://wab.ch.ch'
+        )
+        assert election_day_app.send_sms.call_args_list[3][0] == (
+            '+41791112233',
+            'Neue Zwischenresultate verfügbar auf https://wab.ch.ch'
+        )
+
+        # Final election results
+        election.status = 'final'
+        notification = SmsNotification()
+        notification.trigger(request, election)
+
+        assert notification.action == 'sms'
+        assert notification.election_id == election.id
+        assert notification.last_change == freezed
+        assert election_day_app.send_sms.call_count == 6
+        assert election_day_app.send_sms.call_args_list[4][0] == (
+            '+41791112233',
+            'Final results are available on https://wab.ch.ch'
+        )
+        assert election_day_app.send_sms.call_args_list[5][0] == (
+            '+41791112233',
+            'Schlussresultate verfügbar auf https://wab.ch.ch'
+        )
+
+        # Final vote results
+        vote.status = 'final'
+        notification = SmsNotification()
+        notification.trigger(request, vote)
+
+        assert notification.action == 'sms'
+        assert notification.vote_id == vote.id
+        assert notification.last_change == freezed
+        assert election_day_app.send_sms.call_count == 8
+        assert election_day_app.send_sms.call_args_list[6][0] == (
+            '+41791112233',
+            'Final results are available on https://wab.ch.ch'
+        )
+        assert election_day_app.send_sms.call_args_list[7][0] == (
+            '+41791112233',
+            'Schlussresultate verfügbar auf https://wab.ch.ch'
+        )
 
 
 def test_subscriber(session):

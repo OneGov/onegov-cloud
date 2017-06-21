@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-15 13:46+0200\n"
-"PO-Revision-Date: 2017-06-14 09:30+0200\n"
+"POT-Creation-Date: 2017-06-21 13:33+0200\n"
+"PO-Revision-Date: 2017-06-21 13:43+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -63,6 +63,13 @@ msgstr "Funtaunas da datas"
 
 msgid "Mappings"
 msgstr "Attribuziuns"
+
+msgid ""
+"Successfully subscribed to the SMS services. You will receive an SMS every "
+"time new results are published."
+msgstr ""
+"La communicaziun per SMS è vegnida abunada. A partir d'ussa survegnis Vus in "
+"SMS, uschespert che novs resultats èn vegnids publitgads."
 
 #, python-format
 msgid "Missing columns: '${cols}'"
@@ -274,8 +281,12 @@ msgid "Vote (Romansh)"
 msgstr "Votaziun (rumantsch)"
 
 #, python-format
-msgid "New results are available on ${url}"
-msgstr "Novs resultats disponibels sin ${url}"
+msgid "Final results are available on ${url}"
+msgstr "Resultats finals disponibels sin ${url}"
+
+#, python-format
+msgid "New intermediate results are available on ${url}"
+msgstr "Novs resultats intermediars disponibels sin ${url}"
 
 msgid "Federal"
 msgstr "Sin plaun naziunal"
@@ -725,13 +736,6 @@ msgstr ""
 
 msgid "The page you are looking for could not be found."
 msgstr ""
-
-msgid ""
-"Successfully subscribed to the SMS services. You will receive an SMS every "
-"time new results are published."
-msgstr ""
-"La communicaziun per SMS è vegnida abunada. A partir d'ussa survegnis Vus in "
-"SMS, uschespert che novs resultats èn vegnids publitgads."
 
 msgid ""
 "You will receive an SMS as soon as new results have been published. The SMS "

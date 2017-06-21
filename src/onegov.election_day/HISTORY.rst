@@ -4,6 +4,9 @@ Changelog
 - Sends a confirmation SMS when subscribing.
   [msom]
 
+- Adds status to SMS notifications.
+  [msom]
+
 - Exports all translations of the titles.
   [msom]
 

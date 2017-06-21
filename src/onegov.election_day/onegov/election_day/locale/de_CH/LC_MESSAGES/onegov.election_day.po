@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-15 13:46+0200\n"
-"PO-Revision-Date: 2017-06-14 10:42+0200\n"
+"POT-Creation-Date: 2017-06-21 13:33+0200\n"
+"PO-Revision-Date: 2017-06-21 13:36+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -64,6 +64,13 @@ msgstr "Datenquellen"
 
 msgid "Mappings"
 msgstr "Zuordnungen"
+
+msgid ""
+"Successfully subscribed to the SMS services. You will receive an SMS every "
+"time new results are published."
+msgstr ""
+"Die SMS-Benachrichtigung wurde abonniert. Sie erhalten in Zukunft eine SMS, "
+"sobald neue Resultate publiziert wurden."
 
 #, python-format
 msgid "Missing columns: '${cols}'"
@@ -274,8 +281,12 @@ msgid "Vote (Romansh)"
 msgstr "Abstimmung (Rumantsch)"
 
 #, python-format
-msgid "New results are available on ${url}"
-msgstr "Neue Resultate verfügbar auf ${url}"
+msgid "Final results are available on ${url}"
+msgstr "Schlussresultate verfügbar auf ${url}"
+
+#, python-format
+msgid "New intermediate results are available on ${url}"
+msgstr "Neue Zwischenresultate verfügbar auf ${url}"
 
 msgid "Federal"
 msgstr "National"
@@ -688,13 +699,6 @@ msgstr "Seite nicht gefunden"
 
 msgid "The page you are looking for could not be found."
 msgstr "Die angeforderte Seite konnte nicht gefunden werden."
-
-msgid ""
-"Successfully subscribed to the SMS services. You will receive an SMS every "
-"time new results are published."
-msgstr ""
-"Die SMS-Benachrichtigung wurde abonniert. Sie erhalten in Zukunft eine SMS, "
-"sobald neue Resultate publiziert wurden."
 
 msgid ""
 "You will receive an SMS as soon as new results have been published. The SMS "
