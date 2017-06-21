@@ -437,13 +437,18 @@ def discard_activity(self, request):
     name='beantragen',
     request_method='POST')
 def propose_activity(self, request):
+    assert request.app.active_period, "An active period is required"
 
     session = request.app.session()
 
     with session.no_autoflush:
         self.propose()
+
+        publication_request = self.create_publication_request(
+            request.app.active_period)
+
         ticket = TicketCollection(session).open_ticket(
-            handler_code='FER', handler_id=self.id.hex
+            handler_code='FER', handler_id=publication_request.id.hex
         )
 
     if request.is_organiser_only or request.current_username != self.username:
@@ -501,7 +506,9 @@ def archive_activity(self, request):
 
 def administer_activity(model, request, action, template, subject):
     session = request.app.session()
-    ticket = TicketCollection(session).by_handler_id(model.id.hex)
+    publication_request = model.request_by_period(request.app.active_period)
+    tickets = TicketCollection(session)
+    ticket = tickets.by_handler_id(publication_request.id.hex)
 
     # execute state change
     getattr(model, action)()

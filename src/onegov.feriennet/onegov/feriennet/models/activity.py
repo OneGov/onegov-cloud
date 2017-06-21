@@ -1,6 +1,7 @@
 from cached_property import cached_property
 from onegov.activity import Activity, ActivityCollection
 from onegov.activity.models import DAYS
+from onegov.activity import PublicationRequestCollection
 from onegov.core.templates import render_macro
 from onegov.feriennet import _
 from onegov.org.elements import Link, ConfirmLink
@@ -93,18 +94,19 @@ class VacationActivityHandler(Handler):
 
     @cached_property
     def collection(self):
-        # use the base class here, because the VacationActivityCollection
-        # enforces the query policy for which we need the current request's
-        # identity -> we're too far down the stack to care for this here
-        return ActivityCollection(self.session, type='vacation')
+        return PublicationRequestCollection(self.session)
 
     @cached_property
     def activity(self):
+        return self.publication_request.activity
+
+    @cached_property
+    def publication_request(self):
         return self.collection.by_id(self.id)
 
     @property
     def deleted(self):
-        return self.activity is None
+        return self.publication_request is None
 
     @property
     def email(self):
@@ -116,7 +118,7 @@ class VacationActivityHandler(Handler):
 
     @property
     def subtitle(self):
-        return None
+        return self.publication_request.period.title
 
     @property
     def group(self):

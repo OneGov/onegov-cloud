@@ -119,6 +119,15 @@ def test_activity_permissions(es_feriennet_app):
 
 
 def test_activity_communication(feriennet_app):
+    periods = PeriodCollection(feriennet_app.session())
+    periods.add(
+        title="2016",
+        prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
+        execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
+        active=True
+    )
+    transaction.commit()
+
     admin = Client(feriennet_app)
     admin.login_admin()
 
@@ -148,6 +157,15 @@ def test_activity_communication(feriennet_app):
 
 
 def test_activity_search(es_feriennet_app):
+    periods = PeriodCollection(es_feriennet_app.session())
+    periods.add(
+        title="2016",
+        prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
+        execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
+        active=True
+    )
+    transaction.commit()
+
     anon = Client(es_feriennet_app)
 
     admin = Client(es_feriennet_app)

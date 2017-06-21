@@ -150,8 +150,11 @@ class VacationActivityLayout(DefaultLayout):
 
     @cached_property
     def ticket(self):
-        return TicketCollection(self.request.app.session())\
-            .by_handler_id(self.model.id.hex)
+        request = self.model.latest_request
+
+        if request:
+            tickets = TicketCollection(self.request.app.session())
+            return tickets.by_handler_id(request.id.hex)
 
     @cached_property
     def editbar_links(self):

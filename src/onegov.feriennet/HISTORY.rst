@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for multiple publication requests per activity and period.
+  [href]
+
 1.1.0 (2017-06-21)
 ~~~~~~~~~~~~~~~~~~~
 
