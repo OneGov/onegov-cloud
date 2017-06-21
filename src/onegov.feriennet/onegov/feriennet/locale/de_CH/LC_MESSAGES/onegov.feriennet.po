@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-05-17 14:17+0200\n"
+"POT-Creation-Date: 2017-06-21 09:48+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -14,7 +14,7 @@ msgstr ""
 "X-Generator: Poedit 1.8.12\n"
 
 msgid "No active period"
-msgstr "Keine aktive Periode"
+msgstr "Kein aktiver Zeitraum"
 
 msgid "Activities"
 msgstr "Angebote"
@@ -23,7 +23,7 @@ msgid "Invoices"
 msgstr "Rechnungen"
 
 msgid "Periods"
-msgstr "Perioden"
+msgstr "Zeiträume"
 
 msgid "Attendees"
 msgstr "Teilnehmer"
@@ -67,10 +67,10 @@ msgid "Bookings of ${user}"
 msgstr "Buchungen von ${user}"
 
 msgid "Manage Periods"
-msgstr "Perioden"
+msgstr "Zeiträume"
 
 msgid "New Period"
-msgstr "Neue Periode"
+msgstr "Neuer Zeitraum"
 
 msgid "Matches"
 msgstr "Zuteilungen"
@@ -110,8 +110,8 @@ msgid ""
 "There are no periods defined yet. At least one period needs to be defined "
 "before occasions can be created"
 msgstr ""
-"Es existieren zur Zeit keine Perioden. Mindestens eine Periode muss bestehen "
-"bevor Durchführungen erfasst werden können"
+"Es existieren zur Zeit keine Zeiträume. Mindestens ein Zeitraum muss "
+"bestehen bevor Durchführungen erfasst werden können"
 
 msgid "Show Ticket"
 msgstr "Zum Ticket"
@@ -299,7 +299,7 @@ msgid ""
 "Exports wishlists or bookings, depending on the current state of the given "
 "period."
 msgstr ""
-"Exportiert Wünsche oder Buchungen, je nach Status der gewählten Periode."
+"Exportiert Wünsche oder Buchungen, je nach Status des gewählten Zeitraums."
 
 msgid "Accepted"
 msgstr "Angenommen"
@@ -350,13 +350,13 @@ msgid "Invoice Items"
 msgstr "Rechungspositionen"
 
 msgid "Exports invoice items in the given period."
-msgstr "Exportiert Rechnungspositionen in der gewählten Periode."
+msgstr "Exportiert Rechnungspositionen im gewählten Zeitraum."
 
 msgid "Occasions"
 msgstr "Durchführungen"
 
 msgid "Exports activities with an occasion in the given period."
-msgstr "Exportiert Angebote mit Durchführungen in der gewählten Periode."
+msgstr "Exportiert Angebote mit Durchführungen im gewählten Zeitraum."
 
 msgid "Users"
 msgstr "Benutzer"
@@ -491,7 +491,7 @@ msgid "Ignore Age Restriction"
 msgstr "Altersbeschränkung ignorieren"
 
 msgid "Maximum number of bookings per period"
-msgstr "Maximale Anzahl Buchungen pro Periode"
+msgstr "Maximale Anzahl Buchungen pro Zeitraum"
 
 msgid "You already entered a child with this name"
 msgstr "Sie haben bereits ein Kind mit diesem Namen eingegeben"
@@ -500,10 +500,10 @@ msgid "Add a new attendee"
 msgstr "Neuen Teilnehmer erfassen"
 
 msgid "This occasion is outside the currently active period"
-msgstr "Diese Durchführung liegt ausserhalb der aktiven Periode"
+msgstr "Diese Durchführung liegt ausserhalb des aktiven Zeitraums"
 
 msgid "This period has already been finalized"
-msgstr "Diese Periode wurde bereits abgeschlossen"
+msgstr "Dieser Zeitraum wurde bereits abgeschlossen"
 
 msgid "Cannot create a booking outside the prebooking period"
 msgstr "Anmeldungen können nur während der Wunschphase gemacht werden"
@@ -557,7 +557,7 @@ msgid "This occasion overlaps with another booking"
 msgstr "Diese Durchführung wird von einer bestehenden Buchung überlappt"
 
 msgid "Period"
-msgstr "Periode"
+msgstr "Zeitraum"
 
 msgid "ISO 20022 XML"
 msgstr "ISO 20022 XML"
@@ -600,7 +600,7 @@ msgid "Message"
 msgstr "Mitteilung"
 
 msgid "Send to (applies to active period only)"
-msgstr "Senden an (bezieht sich nur auf die aktive Periode)"
+msgstr "Senden an (bezieht sich nur auf den aktiven Zeitraum)"
 
 msgid "Role"
 msgstr "Rolle"
@@ -699,7 +699,7 @@ msgid "The end date must be after the start date"
 msgstr "Das End-Datum muss nach dem Start-Datum liegen"
 
 msgid "The date is outside the selected period"
-msgstr "Das Datum liegt ausserhalb der gewählten Periode"
+msgstr "Das Datum liegt ausserhalb des gewählten Zeitraums"
 
 msgid "The minium age cannot be higher than the maximum age"
 msgstr "Das Mindestalter kann nicht tiefer als das Maximalalter sein"
@@ -810,8 +810,8 @@ msgid ""
 "It is no longer possible to change the execution settings since the period "
 "has already been confirmed"
 msgstr ""
-"Es ist nicht mehr möglich die Ausführungs-Einstellungen zu verändern da die "
-"Periode bereits bestätigt wurde."
+"Es ist nicht mehr möglich die Ausführungs-Einstellungen zu verändern da der "
+"Zeitraum bereits bestätigt wurde."
 
 msgid "Send a daily status e-mail."
 msgstr "Ein tägliches Status E-Mail senden."
@@ -903,7 +903,7 @@ msgid "Archive Activity"
 msgstr "Angebot archivieren"
 
 msgid "Title of the period."
-msgstr "Titel der Periode."
+msgstr "Titel des Zeitraums."
 
 msgid "Link to the user's invoices."
 msgstr "Link zu den Rechnungen des Benutzers."
@@ -1013,19 +1013,19 @@ msgid "Total"
 msgstr "Total"
 
 msgid "The matching of this period has not been confirmed yet."
-msgstr "Die Zuteilung dieser Periode wurde noch nicht bestätigt."
+msgstr "Die Zuteilung dieses Zeitraums wurde noch nicht bestätigt."
 
 msgid ""
 "This period is not active. Bills may only be created for the active period."
 msgstr ""
-"Diese Periode ist inaktiv. Rechnungen können nur für aktive Perioden "
+"Dieser Zeitraum ist inaktiv. Rechnungen können nur für den aktive Zeitraum "
 "erstellt werden."
 
 msgid ""
 "The billing for this period has been confirmed. You can still change the "
 "invoices manually but you can no longer generate them automatically."
 msgstr ""
-"Die Fakturierung für diese Periode wurde abgeschlossen. Sie können die "
+"Die Fakturierung für diesen Zeitraum wurde abgeschlossen. Sie können die "
 "Rechnungen immer noch manuell ändern aber nicht mehr automatisch generieren."
 
 #. Used in sentence: "No bank account defined. Please define a bank account in
@@ -1339,9 +1339,6 @@ msgstr "Ticket Status anzeigen"
 msgid "Your activity has been archived:"
 msgstr "Ihr Angebot wurde archiviert:"
 
-msgid "Pro Juventute FERIENNET is supported by:"
-msgstr "Pro Juventute FERIENNET wird unterstützt von:"
-
 msgid "The average happiness is ${happiness}."
 msgstr "Die durchschnittliche Zufriedenheit liegt bei ${happiness}."
 
@@ -1373,14 +1370,14 @@ msgstr "Zuteilung zurücksetzen"
 
 msgid "This period is not active. Only the active period may be matched."
 msgstr ""
-"Diese Periode ist inaktiv. Zuteilungen können nur in der aktiven Periode "
+"Dieser Zeitraum ist inaktiv. Zuteilungen können nur im aktiven Zeitraum "
 "gemacht werden."
 
 msgid ""
 "The matching for this period has been confirmed. If you want to change "
 "matching you need to book/cancel bookings manually."
 msgstr ""
-"Die automatische Zuteilung in der aktuellen Periode wurde bereits bestätigt. "
+"Die automatische Zuteilung im aktuellen Zeitraum wurde bereits bestätigt. "
 "Die Zuteilung kann nur noch manuell über Buchungen/Stornierungen gemacht "
 "werden."
 
@@ -1415,7 +1412,7 @@ msgid "Not sent yet"
 msgstr "Noch nie gesendet"
 
 msgid "This period has not been confirmed yet."
-msgstr "In dieser Periode wurde noch keine Zuteilung gemacht."
+msgstr "In diesem Zeitraum wurde noch keine Zuteilung gemacht."
 
 msgid "No occasions defined yet."
 msgstr "Es wurden noch keine Durchführungen definiert."
@@ -1440,7 +1437,7 @@ msgstr ""
 "Durchführungs-Daten stehen:"
 
 msgid "No periods defined."
-msgstr "Keine Perioden definiert."
+msgstr "Keine Zeiträume definiert."
 
 msgid "Prebooking Phase"
 msgstr "Wunschphase"
@@ -1647,7 +1644,7 @@ msgstr ""
 "werden"
 
 msgid "The period is not in the wishlist-phase"
-msgstr "Die Periode befindet sich nicht in der Wunschphase"
+msgstr "Der Zeitraum befindet sich nicht in der Wunschphase"
 
 #, python-format
 msgid "Do you really want to remove \"${title}\"?"
@@ -1678,7 +1675,7 @@ msgid "Run Matching"
 msgstr "Zuteilung ausführen"
 
 msgid "The period was successfully reset"
-msgstr "Die Periode wurde erfolgreich zurückgesetzt"
+msgstr "Der Zeitraum wurde erfolgreich zurückgesetzt"
 
 msgid "The matching was confirmed successfully"
 msgstr "Die Zuteilung wurde erfolgreich abgeschlossen"
@@ -1709,7 +1706,7 @@ msgstr "Unbelegt"
 
 msgid "The period has already been finalized. No new attendees may be added."
 msgstr ""
-"Die Periode wurde bereits abgeschlosse. Es können keine neuen Teilnehmer "
+"Der Zeitraum wurde bereits abgeschlossen. Es können keine neuen Teilnehmer "
 "mehr hinzugefügt werden."
 
 #, python-format
@@ -1762,23 +1759,23 @@ msgid "Attendees for ${period}"
 msgstr "Teilnehmer ${period}"
 
 msgid "The period was activated successfully"
-msgstr "Die Periode wurde erfolgreich aktiviert"
+msgstr "Der Zeitraum wurde erfolgreich aktiviert"
 
 msgid "The period was deactivated successfully"
-msgstr "Die Periode wurde erfolgreich deaktiviert"
+msgstr "Der Zeitraum wurde erfolgreich deaktiviert"
 
 msgid "The period was added successfully"
-msgstr "Die Periode wurde erfolgreich hinzugefügt"
+msgstr "Der Zeitraum wurde erfolgreich hinzugefügt"
 
 msgid "The period was deleted successfully"
-msgstr "Die Periode wurde erfolgreich gelöscht"
+msgstr "Der Zeitraum wurde erfolgreich gelöscht"
 
 msgid "The period could not be deleted as it is still in use"
 msgstr ""
-"Die Periode konnte nicht gelöscht werden, da sie bereits verwendet wird"
+"Der Zeitraum konnte nicht gelöscht werden, da sie bereits verwendet wird"
 
 msgid "Delete Period"
-msgstr "Periode löschen"
+msgstr "Zeitraum löschen"
 
 msgid "Deactivate"
 msgstr "Deaktivieren"
@@ -1791,7 +1788,7 @@ msgid "This will hide all associated occasions"
 msgstr "Damit werden alle damit verbundenen Durchführungen versteckt"
 
 msgid "Deactivate Period"
-msgstr "Periode deaktivieren"
+msgstr "Zeitraum deaktivieren"
 
 msgid "Activate"
 msgstr "Aktivieren"
@@ -1804,8 +1801,19 @@ msgid ""
 "This will deactivate the currently active period. All associated occasions "
 "will be made public"
 msgstr ""
-"Alle anderen Perioden werden deaktiviert. Alle mit der Periode verbundenen "
+"Alle anderen Zeiträume werden deaktiviert. Alle mit dem Zeitraum verbundenen "
 "Durchführungen werden publiziert"
 
 msgid "Activate Period"
-msgstr "Periode aktivieren"
+msgstr "Zeitraum aktivieren"
+
+#, python-format
+msgid "Bookings for ${period}"
+msgstr "Buchungen ${period}"
+
+#, python-format
+msgid "Billing for ${period}"
+msgstr "Fakturierung ${period}"
+
+#~ msgid "Pro Juventute FERIENNET is supported by:"
+#~ msgstr "Pro Juventute FERIENNET wird unterstützt von:"

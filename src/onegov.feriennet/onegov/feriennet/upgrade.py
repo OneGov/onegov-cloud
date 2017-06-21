@@ -5,6 +5,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 import textwrap
 
 from onegov.core.upgrade import upgrade_task
+from onegov.feriennet.models import NotificationTemplate
 from onegov.org.models import Organisation
 from onegov.user import UserCollection
 
@@ -69,3 +70,12 @@ def reinstate_daily_ticket_status_email(context):
     for user in UserCollection(context.session).by_roles('admin'):
         user.data = user.data or {}
         user.data['daily_ticket_statistics'] = True
+
+
+@upgrade_task('Change Periode to Zeitraum')
+def change_period_to_zeitraum(context):
+    templates = context.session.query(NotificationTemplate)
+
+    for template in templates:
+        template.subject = template.subject.replace('[Periode]', '[Zeitraum]')
+        template.text = template.text.replace('[Periode]', '[Zeitraum]')

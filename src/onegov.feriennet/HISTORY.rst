@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Renames "Periode" to "Zeitraum" in the German translation.
+  [href]
+
 - Shows activity/attendee/booking/billing links on the user view.
   [href]
 

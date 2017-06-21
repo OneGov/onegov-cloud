@@ -518,9 +518,9 @@ def test_occasions_form(feriennet_app):
     new.form['lead'] = "Like Minecraft, but in the real world"
     new.form.submit().follow()
 
-    periods = admin.get('/angebote').click("Perioden")
+    periods = admin.get('/angebote').click("Zeiträume")
 
-    period = periods.click("Neue Periode")
+    period = periods.click("Neuer Zeitraum")
     period.form['title'] = "Vacation Program 2016"
     period.form['prebooking_start'] = '2016-09-01'
     period.form['prebooking_end'] = '2016-09-30'
@@ -576,9 +576,9 @@ def test_multiple_dates_occasion(feriennet_app):
     new.form['lead'] = "Like Minecraft, but in the real world"
     new.form.submit().follow()
 
-    periods = admin.get('/angebote').click("Perioden")
+    periods = admin.get('/angebote').click("Zeiträume")
 
-    period = periods.click("Neue Periode")
+    period = periods.click("Neuer Zeitraum")
     period.form['title'] = "Vacation Program 2016"
     period.form['prebooking_start'] = '2016-09-01'
     period.form['prebooking_end'] = '2016-09-30'
@@ -637,9 +637,9 @@ def test_execution_period(feriennet_app):
     new.form['lead'] = "Like Minecraft, but in the real world"
     new.form.submit().follow()
 
-    periods = admin.get('/angebote').click("Perioden")
+    periods = admin.get('/angebote').click("Zeiträume")
 
-    period = periods.click("Neue Periode")
+    period = periods.click("Neuer Zeitraum")
     period.form['title'] = "Vacation Program 2016"
     period.form['prebooking_start'] = '2016-09-01'
     period.form['prebooking_end'] = '2016-09-30'
@@ -785,7 +785,7 @@ def test_enroll_child(feriennet_app):
 
     enroll.form['first_name'] = "Huckleberry"
     enroll.form['last_name'] = "Finn"
-    assert "Diese Durchführung liegt ausserhalb der aktiven Periode"\
+    assert "Diese Durchführung liegt ausserhalb des aktiven Zeitraums"\
         in enroll.form.submit()
 
     # prevent enrollment outside of prebooking
@@ -1180,7 +1180,7 @@ def test_matching_view(feriennet_app):
     matching = matching.form.submit()
 
     assert "wurde bereits bestätigt" in matching
-    assert "Abgeschlossen" in client.get('/angebote').click("Perioden")
+    assert "Abgeschlossen" in client.get('/angebote').click("Zeiträume")
 
 
 def test_confirmed_booking_view(feriennet_app):
@@ -1840,8 +1840,8 @@ def test_send_email(feriennet_app):
     transaction.commit()
 
     page = client.get('/mitteilungen').click('Neue Mitteilungs-Vorlage')
-    page.form['subject'] = '[Periode] subject'
-    page.form['text'] = '[Periode] body'
+    page.form['subject'] = '[Zeitraum] subject'
+    page.form['text'] = '[Zeitraum] body'
     page = page.form.submit().follow()
 
     page = page.click('Versand')
