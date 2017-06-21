@@ -755,7 +755,7 @@ def test_election_results(session):
 
 def test_election_export(session):
     election = Election(
-        title='Election',
+        title='Wahl',
         domain='federation',
         type='majorz',
         date=date(2015, 6, 14),
@@ -764,6 +764,7 @@ def test_election_export(session):
         counted_entities=1,
         total_entities=2
     )
+    election.title_translations['it_CH'] = 'Elezione'
 
     connection = ListConnection(
         connection_id='A'
@@ -866,7 +867,8 @@ def test_election_export(session):
 
     assert election.export() == [
         {
-            'election_title': 'Election',
+            'election_title_de_CH': 'Wahl',
+            'election_title_it_CH': 'Elezione',
             'election_date': '2015-06-14',
             'election_domain': 'federation',
             'election_type': 'majorz',
@@ -902,7 +904,8 @@ def test_election_export(session):
             'panachage_votes_from_list_2': None,
             'panachage_votes_from_list_99': None,
         }, {
-            'election_title': 'Election',
+            'election_title_de_CH': 'Wahl',
+            'election_title_it_CH': 'Elezione',
             'election_date': '2015-06-14',
             'election_domain': 'federation',
             'election_type': 'majorz',

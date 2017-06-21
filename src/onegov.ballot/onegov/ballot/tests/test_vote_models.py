@@ -529,11 +529,12 @@ def test_vote_last_result_change(session):
 
 def test_vote_export(session):
     vote = Vote(
-        title="Is this a test?",
+        title="Abstimmung",
         shortcode="FOO",
         domain='federation',
         date=date(2015, 6, 14)
     )
+    vote.title_translations['it_CH'] = 'Votazione'
 
     session.add(vote)
     session.flush()
@@ -574,7 +575,8 @@ def test_vote_export(session):
 
     assert vote.export() == [
         {
-            'title': "Is this a test?",
+            'title_de_CH': "Abstimmung",
+            'title_it_CH': "Votazione",
             'date': "2015-06-14",
             'shortcode': "FOO",
             'domain': "federation",
@@ -590,7 +592,8 @@ def test_vote_export(session):
             'elegible_voters': 0
         },
         {
-            'title': "Is this a test?",
+            'title_de_CH': "Abstimmung",
+            'title_it_CH': "Votazione",
             'date': "2015-06-14",
             'shortcode': "FOO",
             'domain': "federation",
@@ -606,7 +609,8 @@ def test_vote_export(session):
             'elegible_voters': 150,
         },
         {
-            'title': "Is this a test?",
+            'title_de_CH': "Abstimmung",
+            'title_it_CH': "Votazione",
             'date': "2015-06-14",
             'shortcode': "FOO",
             'domain': "federation",

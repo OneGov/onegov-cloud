@@ -355,7 +355,9 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
                 # have the dict ordered so it works directly with onegov.core's
                 # :func:`onegov.core.csv.convert_list_of_dicts_to_csv`
                 row = OrderedDict()
-                row['title'] = self.title
+
+                for locale, title in (self.title_translations or {}).items():
+                    row['title_{}'.format(locale)] = (title or '').strip()
                 row['date'] = self.date.isoformat()
                 row['shortcode'] = self.shortcode
                 row['domain'] = self.domain

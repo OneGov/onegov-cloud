@@ -408,7 +408,7 @@ class Election(Base, TimestampMixin, DerivedAttributes,
         SubListConnection = aliased(ListConnection)
         results = session.query(
             CandidateResult.votes,
-            Election.title,
+            Election.title_translations,
             Election.date,
             Election.domain,
             Election.type,
@@ -503,8 +503,8 @@ class Election(Base, TimestampMixin, DerivedAttributes,
         rows = []
         for result in results:
             row = OrderedDict()
-
-            row['election_title'] = result[1].strip()
+            for locale, title in (result[1] or {}).items():
+                row['election_title_{}'.format(locale)] = (title or '').strip()
             row['election_date'] = result[2].isoformat()
             row['election_domain'] = result[3]
             row['election_type'] = result[4]
