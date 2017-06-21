@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.1.0 (2017-06-21)
+~~~~~~~~~~~~~~~~~~~
+
 - Automatically extracts a single thumbnail from activity descriptions.
   [href]
 
