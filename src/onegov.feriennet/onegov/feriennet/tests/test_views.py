@@ -559,7 +559,14 @@ def test_occasions_form(feriennet_app):
     activity = occasion.form.submit().follow()
     assert "15 - 20 Jahre" in activity
 
+    occasion = activity.click("Duplizieren")
+    occasion.form['min_age'] = 10
+    activity = occasion.form.submit().follow()
+    assert "15 - 20 Jahre" in activity
+    assert "10 - 20 Jahre" in activity
+
     editor.delete(get_delete_link(activity, index=1))
+    editor.delete(get_delete_link(activity, index=2))
     assert "keine Durchführungen" in editor.get('/angebot/play-with-legos')
 
 

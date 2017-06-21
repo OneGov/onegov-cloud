@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to clone occasions.
+  [href]
+
 - Renames "Periode" to "Zeitraum" in the German translation.
   [href]
 

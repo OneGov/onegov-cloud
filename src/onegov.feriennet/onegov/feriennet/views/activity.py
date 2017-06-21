@@ -233,28 +233,6 @@ def view_activity(self, request):
     session = request.app.session()
     layout = VacationActivityLayout(self, request)
 
-    occasion_links = (
-        lambda o: Link(text=_("Edit"), url=request.link(o, name='bearbeiten')),
-        lambda o: Link(
-            text=_("Delete"), url=layout.csrf_protected_url(request.link(o)),
-            traits=(
-                Confirm(
-                    _('Do you really want to delete "${title}"?', mapping={
-                        'title': layout.format_datetime_range(
-                            o.dates[0].localized_start,
-                            o.dates[0].localized_end
-                        ),
-                    }),
-                    yes=_("Delete Occasion")
-                ),
-                Intercooler(
-                    request_method='DELETE',
-                    redirect_after=request.link(self)
-                ),
-            )
-        )
-    )
-
     occasion_ids = {o.id for o in self.occasions}
     occasion_ids_with_bookings = occasion_ids and {
         b.occasion_id for b in session.query(Booking)
@@ -264,6 +242,7 @@ def view_activity(self, request):
 
     def occasion_links(o):
         yield Link(text=_("Edit"), url=request.link(o, name='bearbeiten'))
+        yield Link(text=_("Clone"), url=request.link(o, name='duplizieren'))
 
         title = layout.format_datetime_range(
             o.dates[0].localized_start,

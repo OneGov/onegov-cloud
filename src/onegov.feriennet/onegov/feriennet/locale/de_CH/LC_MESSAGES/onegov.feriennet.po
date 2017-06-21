@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-06-21 09:48+0200\n"
+"POT-Creation-Date: 2017-06-21 10:04+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1511,8 +1511,8 @@ msgstr "Ihr Angebot wurde archiviert"
 msgid "A ticket has been opened"
 msgstr "Ein Ticket wurde eröffnet"
 
-msgid "Delete"
-msgstr "Löschen"
+msgid "Clone"
+msgstr "Duplizieren"
 
 msgid "Reinstate"
 msgstr "Reaktivieren"
@@ -1532,15 +1532,8 @@ msgstr "14 - 17 Jahre"
 msgid "Own"
 msgstr "Eigene"
 
-#, python-format
-msgid "Do you really want to delete \"${title}\"?"
-msgstr "Möchten Sie \"${title}\" wirklich löschen?"
-
 msgid "Rescind"
 msgstr "Absagen"
-
-msgid "Delete Occasion"
-msgstr "Durchführung löschen"
 
 #, python-format
 msgid "Do you really want to reinstate \"${title}\"?"
@@ -1551,6 +1544,9 @@ msgstr "Vorherige Teilnehmer müssen sich neu anmelden"
 
 msgid "Reinstate Occasion"
 msgstr "Durchführung reaktivieren"
+
+msgid "Delete"
+msgstr "Löschen"
 
 #, python-format
 msgid "Do you really want to rescind \"${title}\"?"
@@ -1563,6 +1559,10 @@ msgstr "${count} bereits angenommene Buchungen werden storniert"
 msgid "Rescind Occasion"
 msgstr "Durchführung absagen"
 
+#, python-format
+msgid "Do you really want to delete \"${title}\"?"
+msgstr "Möchten Sie \"${title}\" wirklich löschen?"
+
 msgid ""
 "There are no accepted bookings associated with this occasion, though there "
 "might be cancelled/blocked bookings which will be deleted."
@@ -1570,6 +1570,9 @@ msgstr ""
 "Es existieren keine angenommenen Buchungen zu dieser Durchführung, aber es "
 "ist möglich dass abgesagte/blockierte Buchungen bestehen. Diese werden "
 "gelöscht."
+
+msgid "Delete Occasion"
+msgstr "Durchführung löschen"
 
 msgid "Edit Attendee"
 msgstr "Teilnehmer bearbeiten"
@@ -1742,6 +1745,9 @@ msgstr "Mitteilungs-Vorlage löschen"
 
 msgid "Enroll Attendee"
 msgstr "Teilnehmer anmelden"
+
+msgid "Clone Occasion"
+msgstr "Durchführung duplizieren"
 
 msgid "Edit Occasion"
 msgstr "Durchführung bearbeiten"

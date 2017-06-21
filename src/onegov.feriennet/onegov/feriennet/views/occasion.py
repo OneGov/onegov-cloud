@@ -54,6 +54,39 @@ def new_occasion(self, request, form):
     template='form.pt',
     form=OccasionForm,
     permission=Private,
+    name='duplizieren')
+def clone_occasion(self, request, form):
+
+    if form.submitted(request):
+        occasions = OccasionCollection(request.app.session())
+        periods = PeriodCollection(request.app.session())
+
+        form.populate_obj(occasions.add(
+            activity=self.activity,
+            start=form.parsed_dates[0].start,
+            end=form.parsed_dates[0].end,
+            timezone=form.timezone,
+            period=periods.by_id(form.period_id.data)
+        ))
+
+        request.success(_("Your changes were saved"))
+        return request.redirect(request.link(self.activity))
+    elif not request.POST:
+        form.process(obj=self)
+
+    return {
+        'layout': OccasionFormLayout(
+            self.activity, request, _("Clone Occasion")),
+        'title': _("Clone Occasion"),
+        'form': form
+    }
+
+
+@FeriennetApp.form(
+    model=Occasion,
+    template='form.pt',
+    form=OccasionForm,
+    permission=Private,
     name='bearbeiten')
 def edit_occasion(self, request, form):
 
