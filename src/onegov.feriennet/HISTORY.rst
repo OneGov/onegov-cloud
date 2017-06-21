@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Shows activity/attendee/booking/billing links on the user view.
+  [href]
+
 - Shows a thumbnail for each activity in the overview.
   [href]
 

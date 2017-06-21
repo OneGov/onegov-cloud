@@ -186,7 +186,7 @@
                 </small>
 
                 <small tal:condition="show_ticket_panel and request.is_admin">
-                    <a href="${request.return_here(request.link(activity.user))}" i18n:translate>Edit contact info</a>
+                    <a href="${request.return_here(request.link(activity.user, 'bearbeiten'))}" i18n:translate>Edit contact info</a>
                 </small>
             </div>
         </div>
