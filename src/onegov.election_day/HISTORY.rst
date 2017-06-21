@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Sends a confirmation SMS when subscribing.
+  [msom]
+
 - Exports all translations of the titles.
   [msom]
 

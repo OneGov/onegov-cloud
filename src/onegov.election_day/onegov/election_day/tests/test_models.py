@@ -679,7 +679,6 @@ def test_sms_notification(request, election_day_app, session):
         session.add(Subscriber(phone_number='+41791112233', locale='de_CH'))
 
         notification = SmsNotification()
-        # request.app.session().query(Subscriber).one()
         notification.trigger(request, election)
 
         assert notification.action == 'sms'

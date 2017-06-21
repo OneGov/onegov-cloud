@@ -1,4 +1,5 @@
 from onegov.core.collection import Pagination
+from onegov.election_day import _
 from onegov.election_day.models import Subscriber
 
 
@@ -37,12 +38,14 @@ class SubscriberCollection(SubscriberCollectionPagination):
 
         return self.query().filter(Subscriber.id == id).first()
 
-    def subscribe(self, phone_number, locale):
+    def subscribe(self, phone_number, request, confirm=True):
         """ Subscribe with the given phone number and locale.
 
         Existing subscriptions with the given number will be updated according
         to the new locale.
         """
+
+        locale = request.locale
 
         subscriber = None
         for existing in self.query().filter_by(phone_number=phone_number):
@@ -59,6 +62,14 @@ class SubscriberCollection(SubscriberCollectionPagination):
                 locale=locale
             )
             self.session.add(subscriber)
+
+            if confirm:
+                content = _(
+                    "Successfully subscribed to the SMS services. You will"
+                    " receive an SMS every time new results are published."
+                )
+                content = request.translate(content)
+                request.app.send_sms(subscriber.phone_number, content)
 
         self.session.flush()
 

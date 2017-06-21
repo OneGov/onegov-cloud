@@ -11,6 +11,7 @@ from onegov.election_day.models import ArchivedResult
 from onegov.election_day.models import DataSource
 from onegov.election_day.models import DataSourceItem
 from onegov.election_day.tests import DummyRequest
+from unittest.mock import patch
 from uuid import uuid4
 
 
@@ -368,25 +369,28 @@ def test_notification_collection(session):
 
 
 def test_subscriber_collection(session):
+    request = DummyRequest(locale='de_CH')
 
     collection = SubscriberCollection(session)
-    collection.subscribe('+41791112233', 'de_CH')
+    collection.subscribe('+41791112233', request, confirm=False)
     subscriber = collection.query().one()
     assert subscriber.phone_number == '+41791112233'
     assert subscriber.locale == 'de_CH'
     assert collection.by_id(subscriber.id) == subscriber
 
-    collection.subscribe('+41791112233', 'de_CH')
+    collection.subscribe('+41791112233', request, confirm=False)
     subscriber = collection.query().one()
     assert subscriber.phone_number == '+41791112233'
     assert subscriber.locale == 'de_CH'
 
-    collection.subscribe('+41791112233', 'en')
+    collection.subscribe(
+        '+41791112233', DummyRequest(locale='en'), confirm=False
+    )
     subscriber = collection.query().one()
     assert subscriber.phone_number == '+41791112233'
     assert subscriber.locale == 'en'
 
-    collection.subscribe('+41792223344', 'de_CH')
+    collection.subscribe('+41792223344', request, confirm=False)
     assert collection.query().count() == 2
 
     collection.unsubscribe('+41791112233')
@@ -399,11 +403,36 @@ def test_subscriber_collection(session):
     assert collection.query().count() == 0
 
 
+def test_subscriber_collection_confirm(session):
+    request = DummyRequest(locale='de_CH')
+
+    with patch.object(request, 'app') as app:
+        collection = SubscriberCollection(session)
+
+        collection.subscribe('+41791112233', request)
+        assert app.send_sms.call_count == 1
+        assert app.send_sms.call_args[0][0] == '+41791112233'
+        assert 'Successfully subscribed to the SMS services' in \
+            app.send_sms.call_args[0][1]
+
+        collection.subscribe('+41791112233', request)
+        assert app.send_sms.call_count == 1
+
+        collection.unsubscribe('+41791112233')
+        collection.subscribe('+41791112233', request)
+        assert app.send_sms.call_count == 2
+
+
 def test_subscriber_collection_pagination(session):
+    request = DummyRequest(locale='de_CH')
 
     collection = SubscriberCollection(session)
     for number in range(100):
-        collection.subscribe('+417911122{:02}'.format(number), 'de_CH')
+        collection.subscribe(
+            '+417911122{:02}'.format(number),
+            request,
+            confirm=False
+        )
     assert collection.query().count() == 100
 
     assert SubscriberCollection(session, page=0).batch[0].phone_number == \
@@ -419,10 +448,15 @@ def test_subscriber_collection_pagination(session):
 
 
 def test_subscriber_collection_term(session):
+    request = DummyRequest(locale='de_CH')
 
     collection = SubscriberCollection(session)
     for number in range(100):
-        collection.subscribe('+417911122{:02}'.format(number), 'de_CH')
+        collection.subscribe(
+            '+417911122{:02}'.format(number),
+            request,
+            confirm=False
+        )
     assert collection.query().count() == 100
 
     collection = SubscriberCollection(session, term='+417911122')
