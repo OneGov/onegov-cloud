@@ -282,6 +282,88 @@ def test_import_wabstic_vote_invalid_values(session):
     ]
 
 
-# todo: test expats
+def test_import_wabstic_vote_expats(session):
+    session.add(
+        Vote(title='vote', domain='federation', date=date(2017, 2, 12))
+    )
+    session.flush()
+    vote = session.query(Vote).one()
+    principal = Principal(canton='sg')
+    entities = principal.entities.get(vote.date.year, {})
+
+    for entity_id, sub_entity_id in (
+        ('9170', ''),
+        ('0', ''),
+        ('', '9170'),
+        ('', '0'),
+    ):
+        errors = import_vote_wabstic(
+            vote, entities, '0', '0',
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'Art',
+                        'SortWahlkreis',
+                        'SortGeschaeft',
+                        'Ausmittlungsstand'
+                    )),
+                    ','.join((
+                        'Eidg',
+                        '0',
+                        '0',
+                        '0'
+                    )),
+                ))
+            ).encode('utf-8')),
+            'text/plain',
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'Art',
+                        'SortWahlkreis',
+                        'SortGeschaeft',
+                        'SortGemeinde',
+                        'SortGemeindeSub',
+                        'Sperrung',
+                        'Stimmberechtigte',
+                        'StmUngueltig',
+                        'StmLeer',
+                        'StmHGJa',
+                        'StmHGNein',
+                        'StmHGOhneAw',
+                        'StmN1Ja',
+                        'StmN1Nein',
+                        'StmN1OhneAw',
+                        'StmN2Ja',
+                        'StmN2Nein',
+                        'StmN2OhneAw',
+                    )),
+                    ','.join((
+                        'Eidg',
+                        '0',
+                        '0',
+                        entity_id,  # 'SortGemeinde',
+                        sub_entity_id,  # 'SortGemeindeSub',
+                        '2000',  # 'Sperrung',
+                        '100',  # 'Stimmberechtigte',
+                        '0',  # 'StmUngueltig',
+                        '1',  # 'StmLeer',
+                        '',  # 'StmHGJa',
+                        '',  # 'StmHGNein',
+                        '',  # 'StmHGOhneAw',
+                        '',  # 'StmN1Ja',
+                        '',  # 'StmN1Nein',
+                        '',  # 'StmN1OhneAw',
+                        '',  # 'StmN2Ja',
+                        '',  # 'StmN2Nein',
+                        '',  # 'StmN2OhneAw',
+                    ))
+                ))
+            ).encode('utf-8')),
+            'text/plain'
+        )
+
+        assert not errors
+        assert vote.proposal.results.filter_by(entity_id=0).one().empty == 1
 
 # todo: test temporary results
