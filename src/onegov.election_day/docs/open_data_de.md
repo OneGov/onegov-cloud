@@ -76,7 +76,7 @@ Die folgenden Felder sind in allen Formaten enthalten:
 
 Name|Beschreibung
 ---|---
-`election_title`|Titel der Wahl
+`election_title_{locale}`|Übersetzter Titel, z.B. `title_de_ch` für den deutschen Titel.
 `election_date`|Das Datum der Wahl (ein ISO 8601 String)
 `election_type`|`proporz` falls Proporzwahl, `majorz` falls Majorzwahl
 `election_mandates`|Die Anzahl der Sitze.
@@ -156,7 +156,7 @@ Die folgenden Felder sind in allen Formaten enthalten:
 
 Name|Beschreibung
 ---|---
-`title`|Titel der Abstimmung.
+`title_{locale}`|Übersetzter Titel, z.B. `title_de_ch` für den deutschen Titel.
 `date`|Das Datum der Abstimmung (ein ISO 8601 String).
 `shortcode`|Internes Kürzel (definiert die Reihenfolge von mehreren Abstimmungen an einem Tag).
 `domain`|`federation` für Nationale Abstimmungen, `canton` für Kantonale Abstimmungen

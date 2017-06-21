@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Exports all translations of the titles.
+  [msom]
+
 - Adds tests.
   [msom]
 

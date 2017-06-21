@@ -78,7 +78,7 @@ Ils suandants champs èn disponibels en tut ils formats:
 
 Num|Descripziun
 ---|---
-`election_title`|Titel da l'elecziun
+`election_title_{locale}`|Translated titles of the vote. For example `title_de_ch` for the German title.
 `election_date`|La data da l'elecziun (sco segns ISO 8601)
 `election_type`|`proporz` en cas d'ina elecziun da proporz, `majorz` en cas d'ina elecziun da maiorz
 `election_mandates`|Il dumber dals sezs.
@@ -159,7 +159,7 @@ Ils suandants champs èn disponibels en tut ils formats:
 
 Num|Descripziun
 ---|---
-`title`|Titel da la votaziun.
+`title_{locale}`|Translated titles of the vote. For example `title_de_ch` for the German title.
 `date`|La data da la votaziun (sco segns ISO 8601).
 `shortcode`|Scursanida interna (definescha la successiun da pliras votaziuns che han lieu il medem di).
 `domain`|`federation` per votaziuns naziunalas, `canton` per votaziuns chantunalas.

@@ -76,7 +76,7 @@ Les champs suivants sont inclus dans tous les formats:
 
 Nom|Description
 ---|---
-`election_title`|Titre de l'élection.
+`election_title_{locale}`|Translated titles, for example `title_de_ch` for the German title.
 `election_date`|La date de l'élection (an ISO 8601 date string).
 `election_type`|`proporz` pour proportionnelle, `majorz` pour le système majoritaire.
 `election_mandates`|Nombre de mandats.
@@ -156,7 +156,7 @@ Les champs suivants sont inclus dans tous les formats:
 
 Nom|Description
 ---|---
-`title`|Nom du vote.
+`title_{locale}`|Translated titles, for example `title_de_ch` for the German title.
 `date`|La date du vote (une chaîne de date ISO 8601).
 `shortcode`|Shortcode interne (définit l'ordre des votes ayant lieu le même jour).
 `domain`|`federation` pour fédéral, `canton` for les votes cantonaux.
