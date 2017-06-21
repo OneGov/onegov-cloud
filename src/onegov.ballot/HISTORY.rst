@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.7.0 (2017-06-21)
+~~~~~~~~~~~~~~~~~~~
 
 - Exports all translations of the titles.
   [msom]
