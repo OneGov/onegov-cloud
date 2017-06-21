@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.1.0 (2017-06-21)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to clone occasions.
   [href]
 
