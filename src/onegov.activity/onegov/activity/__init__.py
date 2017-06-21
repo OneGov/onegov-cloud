@@ -9,7 +9,8 @@ from onegov.activity.models import (
     InvoiceItem,
     Occasion,
     OccasionDate,
-    Period
+    Period,
+    PublicationRequest
 )
 from onegov.activity.collections import (
     ActivityCollection,
@@ -17,7 +18,8 @@ from onegov.activity.collections import (
     BookingCollection,
     InvoiceItemCollection,
     OccasionCollection,
-    PeriodCollection
+    PeriodCollection,
+    PublicationRequestCollection
 )
 
 
@@ -34,5 +36,7 @@ __all__ = [
     'BookingCollection',
     'InvoiceItemCollection',
     'OccasionCollection',
-    'PeriodCollection'
+    'PeriodCollection',
+    'PublicationRequest',
+    'PublicationRequestCollection',
 ]

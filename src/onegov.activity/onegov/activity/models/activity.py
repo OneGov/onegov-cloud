@@ -1,4 +1,5 @@
 from onegov.activity.models.occasion import Occasion
+from onegov.activity.models.period import Period
 from onegov.activity.utils import extract_thumbnail
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import (
@@ -12,7 +13,7 @@ from onegov.core.utils import normalize_for_url
 from onegov.user import User
 from sqlalchemy import Column, Enum, Text, ForeignKey, Integer
 from sqlalchemy import event
-from sqlalchemy import func, distinct, exists, and_
+from sqlalchemy import func, distinct, exists, and_, desc
 from sqlalchemy import Index
 from sqlalchemy.dialects.postgresql import HSTORE, ARRAY
 from sqlalchemy.ext.mutable import MutableDict
@@ -159,6 +160,32 @@ class Activity(Base, ContentMixin, TimestampMixin):
         self.state = 'archived'
 
         return self
+
+    def create_publication_request(self, period, **kwargs):
+        return self.requests.add(activity=self, period=period, **kwargs)
+
+    @property
+    def requests(self):
+        # XXX circular imports
+        from onegov.activity.collections.publication_request import \
+            PublicationRequestCollection
+
+        return PublicationRequestCollection(object_session(self))
+
+    @property
+    def latest_request(self):
+        q = self.requests.query()
+        q = q.filter_by(activity_id=self.id)
+        q = q.join(Period)
+        q = q.order_by(desc(Period.active), desc(Period.execution_start))
+
+        return q.first()
+
+    def request_by_period(self, period):
+        q = self.requests.query()
+        q = q.filter_by(activity_id=self.id, period_id=period.id)
+
+        return q.first()
 
     def has_occasion_in_period(self, period):
         q = object_session(self).query(

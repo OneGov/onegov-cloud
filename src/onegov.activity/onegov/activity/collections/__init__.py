@@ -4,6 +4,8 @@ from onegov.activity.collections.booking import BookingCollection
 from onegov.activity.collections.invoice_item import InvoiceItemCollection
 from onegov.activity.collections.occasion import OccasionCollection
 from onegov.activity.collections.period import PeriodCollection
+from onegov.activity.collections.publication_request import \
+    PublicationRequestCollection
 
 __all__ = [
     'ActivityCollection',
@@ -11,5 +13,6 @@ __all__ = [
     'BookingCollection',
     'InvoiceItemCollection',
     'OccasionCollection',
-    'PeriodCollection'
+    'PeriodCollection',
+    'PublicationRequestCollection'
 ]

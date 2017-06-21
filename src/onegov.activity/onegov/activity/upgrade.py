@@ -6,14 +6,16 @@ import hashlib
 
 from onegov.activity import ActivityCollection
 from onegov.activity import Booking
-from onegov.activity import Period
-from onegov.activity import Occasion
 from onegov.activity import InvoiceItem
+from onegov.activity import Occasion
+from onegov.activity import Period
+from onegov.activity import PeriodCollection
 from onegov.core.orm.types import UUID, JSON
 from onegov.core.upgrade import upgrade_task
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Date
+from sqlalchemy import desc
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
@@ -379,3 +381,22 @@ def add_weekdays_index(context):
 def extract_thumbnails(context):
     for activity in ActivityCollection(context.session).query():
         activity.content_observer(None)
+
+
+@upgrade_task('Retroactively create publication requests')
+def retroactively_create_publication_requests(context):
+    activities = ActivityCollection(context.session).query()
+
+    if not activities.count():
+        return False
+
+    periods = PeriodCollection(context.session)
+
+    p = periods.query()
+    p = p.order_by(desc(Period.active), desc(Period.execution_start))
+    p = p.first()
+
+    assert p, "an active period is required"
+
+    for activity in activities:
+        activity.create_publication_request(p, id=activity.id)

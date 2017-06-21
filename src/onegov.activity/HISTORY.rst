@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Adds a publication request to allow activities to be attached to tickets
+  at least once per period.
+  [href]
+
 1.1.0 (2017-06-21)
 ~~~~~~~~~~~~~~~~~~~
 

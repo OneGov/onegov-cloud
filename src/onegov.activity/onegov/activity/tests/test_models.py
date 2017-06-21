@@ -13,6 +13,7 @@ from onegov.activity import Occasion, OccasionDate
 from onegov.activity import OccasionCollection
 from onegov.activity import Period
 from onegov.activity import PeriodCollection
+from onegov.activity import PublicationRequestCollection
 from onegov.activity.models import DAYS
 from onegov.core.utils import Bunch
 from psycopg2.extras import NumericRange
@@ -2014,3 +2015,29 @@ def test_prebooking_phases():
         period.confirmed = True
         assert not period.is_currently_prebooking
         assert period.is_prebooking_in_past
+
+
+def test_publication_request(session, owner):
+
+    activities = ActivityCollection(session)
+    requests = PublicationRequestCollection(session)
+    periods = PeriodCollection(session)
+
+    period = periods.add(
+        title="Autumn 2016",
+        prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
+        active=True
+    )
+
+    activity = activities.add(
+        title="Sport",
+        username=owner.username,
+    )
+
+    request = requests.add(activity=activity, period=period)
+    session.flush()
+
+    request = requests.query().first()
+    assert request.activity.title == "Sport"
+    assert request.period.title == "Autumn 2016"

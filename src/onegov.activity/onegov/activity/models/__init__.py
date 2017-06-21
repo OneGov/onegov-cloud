@@ -5,7 +5,7 @@ from onegov.activity.models.invoice_item import InvoiceItem
 from onegov.activity.models.occasion import Occasion
 from onegov.activity.models.occasion_date import OccasionDate, DAYS
 from onegov.activity.models.period import Period
-
+from onegov.activity.models.publication_request import PublicationRequest
 
 __all__ = [
     'Activity',
@@ -15,6 +15,7 @@ __all__ = [
     'Occasion',
     'OccasionDate',
     'Period',
+    'PublicationRequest',
     'ACTIVITY_STATES',
     'DAYS'
 ]
