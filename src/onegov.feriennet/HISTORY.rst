@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to offer archived activities again.
+  [href]
+
 - Adds the ability to archive periods.
   [href]
 

@@ -7,6 +7,7 @@ from onegov.activity import Occasion
 from onegov.activity import OccasionCollection
 from onegov.activity import Period
 from onegov.activity.models import ACTIVITY_STATES, DAYS
+from onegov.core.security import Personal
 from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.core.security import Secret
@@ -502,6 +503,20 @@ def archive_activity(self, request):
         template='mail_activity_archived.pt',
         subject=_("Your activity has been archived")
     )
+
+
+@FeriennetApp.view(
+    model=VacationActivity,
+    permission=Personal,
+    name='erneut-anbieten',
+    request_method='POST')
+def offer_activity_again(self, request):
+    assert self.state == 'archived'
+    self.state = 'preview'
+
+    @request.after
+    def redirect_intercooler(response):
+        response.headers.add('X-IC-Redirect', request.link(self, 'bearbeiten'))
 
 
 def administer_activity(model, request, action, template, subject):

@@ -137,7 +137,22 @@ def test_activity_communication(feriennet_app):
     new = editor.get('/angebote').click("Angebot erfassen")
     new.form['title'] = "Learn Python"
     new.form['lead'] = "Using a Raspberry Pi we will learn Python"
-    new.form.submit()
+    activity = new.form.submit().follow()
+
+    occasion = activity.click("Neue Durchführung")
+    occasion.form['dates'] = json.dumps({
+        'values': [{
+            'start': '2016-10-04 10:00:00',
+            'end': '2016-10-04 12:00:00'
+        }]
+    })
+    occasion.form['meeting_point'] = "Franz Karl Weber"
+    occasion.form['note'] = "No griefers"
+    occasion.form['min_age'] = 10
+    occasion.form['max_age'] = 20
+    occasion.form['min_spots'] = 30
+    occasion.form['max_spots'] = 40
+    occasion.form.submit()
 
     editor.post(get_post_url(
         editor.get('/angebot/learn-python'), 'request-publication'))
@@ -177,7 +192,22 @@ def test_activity_search(es_feriennet_app):
     new = editor.get('/angebote').click("Angebot erfassen")
     new.form['title'] = "Learn How to Program"
     new.form['lead'] = "Using a Raspberry Pi we will learn Python"
-    new.form.submit()
+    activity = new.form.submit().follow()
+
+    occasion = activity.click("Neue Durchführung")
+    occasion.form['dates'] = json.dumps({
+        'values': [{
+            'start': '2016-10-04 10:00:00',
+            'end': '2016-10-04 12:00:00'
+        }]
+    })
+    occasion.form['meeting_point'] = "Franz Karl Weber"
+    occasion.form['note'] = "No griefers"
+    occasion.form['min_age'] = 10
+    occasion.form['max_age'] = 20
+    occasion.form['min_spots'] = 30
+    occasion.form['max_spots'] = 40
+    occasion.form.submit()
 
     url = '/angebot/learn-how-to-program'
 
@@ -2074,3 +2104,44 @@ def test_userprofile_login(feriennet_app):
     page = page.form.submit().follow()
 
     assert 'einstellungen' in page.request.url
+
+
+def test_provide_activity_again(feriennet_app):
+    admin = Client(feriennet_app)
+    admin.login_admin()
+
+    new = admin.get('/angebote').click("Angebot erfassen")
+    new.form['title'] = "Learn How to Program"
+    new.form['lead'] = "Using a Raspberry Pi we will learn Python"
+    new.form.submit()
+
+    periods = PeriodCollection(feriennet_app.session())
+    activities = ActivityCollection(feriennet_app.session())
+
+    periods.add(
+        title="2016",
+        prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
+        execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
+        active=True
+    )
+
+    activity = activities.query().first()
+    transaction.commit()
+
+    assert "Erneut anbieten" not in admin.get('/angebote')
+
+    activity = activities.query().first()
+    activity.state = 'archived'
+    transaction.commit()
+
+    assert "Erneut anbieten" in admin.get('/angebote')
+
+    url = get_post_url(admin.get('/angebote'), 'confirm')
+
+    editor = Client(feriennet_app)
+    editor.login_editor()
+    editor.post(url, status=404)
+    assert activities.query().first().state == 'archived'
+
+    admin.post(url)
+    assert activities.query().first().state == 'preview'
