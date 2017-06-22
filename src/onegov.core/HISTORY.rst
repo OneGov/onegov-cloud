@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.41.0 (2017-06-22)
+~~~~~~~~~~~~~~~~~~~
 
 - Allows to configure the used locales.
   [msom]
