@@ -19,7 +19,7 @@ def create_election_day(request, canton="", municipality="", use_maps="false"):
 
     tmp = request.getfixturevalue('temporary_directory')
 
-    app = create_app(ElectionDayApp, request, use_smtp=False)
+    app = create_app(ElectionDayApp, request, use_smtp=True)
     app.configuration['sms_directory'] = os.path.join(tmp, 'sms')
     app.configuration['d3_renderer'] = 'http://localhost:1337'
     app.session_manager.set_locale('de_CH', 'de_CH')

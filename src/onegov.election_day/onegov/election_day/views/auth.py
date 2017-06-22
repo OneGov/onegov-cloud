@@ -1,14 +1,23 @@
 """ The authentication views. """
 
-from onegov.core.security import Public, Private
+from onegov.core.security import Private
+from onegov.core.security import Public
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
+from onegov.election_day import log
 from onegov.election_day.layout import Layout
+from onegov.election_day.layout import MailLayout
+from onegov.election_day.models import Principal
+from onegov.org.mail import send_html_mail
 from onegov.user import Auth
+from onegov.user.collection import UserCollection
 from onegov.user.forms import LoginForm
+from onegov.user.forms import PasswordResetForm
+from onegov.user.forms import RequestPasswordResetForm
+from onegov.user.utils import password_reset_url
 
 
-@ElectionDayApp.form(model=Auth, name='login', template='form.pt',
+@ElectionDayApp.form(model=Auth, name='login', template='login.pt',
                      permission=Public, form=LoginForm)
 def handle_login(self, request, form):
     """ Handles the login requests. """
@@ -22,7 +31,10 @@ def handle_login(self, request, form):
     return response or {
         'layout': Layout(self, request),
         'title': _("Login"),
-        'form': form
+        'form': form,
+        'password_reset_link': request.link(
+            request.app.principal, name='request-password'
+        ),
     }
 
 
@@ -31,3 +43,93 @@ def view_logout(self, request):
     """ Handles the logout requests. """
 
     return self.logout_to(request)
+
+
+@ElectionDayApp.form(
+    model=Principal, name='request-password', template='form.pt',
+    permission=Public, form=RequestPasswordResetForm
+)
+def handle_password_reset_request(self, request, form):
+    """ Handles the password reset requests. """
+
+    show_form = True
+    callout = None
+
+    if form.submitted(request):
+        users = UserCollection(request.app.session())
+        user = users.by_username(form.email.data)
+        if user:
+            url = password_reset_url(
+                user,
+                request,
+                request.link(self, name='reset-password')
+            )
+            send_html_mail(
+                request=request,
+                template='mail_password_reset.pt',
+                subject=_("Password reset"),
+                receivers=(user.username, ),
+                reply_to=request.app.mail_sender,
+                content={
+                    'model': None,
+                    'url': url,
+                    'layout': MailLayout(self, request)
+                }
+            )
+        else:
+            log.info(
+                "Failed password reset attempt by {}".format(
+                    request.client_addr
+                )
+            )
+
+        show_form = False
+        callout = _(
+            (
+                'A password reset link has been sent to ${email}, provided an '
+                'account exists for this email address.'
+            ),
+            mapping={'email': form.email.data}
+        )
+
+    return {
+        'layout': Layout(self, request),
+        'title': _('Reset password'),
+        'form': form,
+        'show_form': show_form,
+        'callout': callout
+    }
+
+
+@ElectionDayApp.form(
+    model=Principal, name='reset-password', template='form.pt',
+    permission=Public, form=PasswordResetForm
+)
+def handle_password_reset(self, request, form):
+
+    callout = None
+    show_form = True
+    if form.submitted(request):
+        if form.update_password(request):
+            show_form = False
+            callout = _("Password changed.")
+        else:
+            form.error_message = _(
+                "Wrong username or password reset link not valid any more."
+            )
+            log.info(
+                "Failed password reset attempt by {}".format(
+                    request.client_addr
+                )
+            )
+
+    if 'token' in request.params:
+        form.token.data = request.params['token']
+
+    return {
+        'layout': Layout(self, request),
+        'title': _('Reset password'),
+        'form': form,
+        'show_form': show_form,
+        'callout': callout
+    }

@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-21 13:33+0200\n"
-"PO-Revision-Date: 2017-06-21 13:38+0200\n"
+"POT-Creation-Date: 2017-06-22 15:27+0200\n"
+"PO-Revision-Date: 2017-06-22 16:02+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -388,6 +388,12 @@ msgstr "Vous êtes connecté:"
 msgid "Logout"
 msgstr "Se déconnecter"
 
+msgid "Forgot your password?"
+msgstr "Mot de passe oublié?"
+
+msgid "Reset password"
+msgstr "Réinitialiser mot de passe"
+
 msgid "Accepted"
 msgstr "Accepté"
 
@@ -505,6 +511,17 @@ msgstr "Vos résultats n'ont pas pu être mis à jour."
 
 msgid "Line"
 msgstr "Ligne"
+
+msgid "Dear Sir or Madam,"
+msgstr "Madame, Monsieur,"
+
+msgid "Click the following link to set a new password:"
+msgstr "Cliquez sur le lien suivant pour définir un nouveau mot de passe :"
+
+msgid "If you don't want to change your password, you can ignore this email."
+msgstr ""
+"Si vous ne souhaitez pas modifier votre mot de passe, vous pouvez ignorer ce "
+"message."
 
 msgid "Upload results"
 msgstr "Mettre à jour les résultats"
@@ -684,6 +701,25 @@ msgstr "Invalide"
 
 msgid "Wrong username or password"
 msgstr "Mauvais nom d'utilisateur ou mot de passe"
+
+#, python-format
+msgid ""
+"A password reset link has been sent to ${email}, provided an account exists "
+"for this email address."
+msgstr ""
+"Un lien de réinitialisation du mot de passe à été envoyé à ${email}, sous "
+"réserve qu'un compte existe à cette adresse."
+
+msgid "Password changed."
+msgstr "Mot de passe changé."
+
+msgid "Wrong username or password reset link not valid any more."
+msgstr ""
+"Identifiant ou mot de passe erroné. Le lien de réinitialisation du mot de "
+"passe a expiré."
+
+msgid "Password reset"
+msgstr "Réinitialisation du mot de passe"
 
 msgid "Access Denied"
 msgstr "Accès refusé"

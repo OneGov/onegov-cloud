@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-21 13:33+0200\n"
+"POT-Creation-Date: 2017-06-22 15:27+0200\n"
 "PO-Revision-Date: 2017-06-21 13:43+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -388,6 +388,12 @@ msgstr "Vus essas annunziada/annunzià:"
 msgid "Logout"
 msgstr "Deconnectar"
 
+msgid "Forgot your password?"
+msgstr ""
+
+msgid "Reset password"
+msgstr ""
+
 msgid "Accepted"
 msgstr "Acceptà"
 
@@ -541,6 +547,15 @@ msgstr "Voss resultats n'han displaschaivlamain betg pudì vegnir chargiads si."
 
 msgid "Line"
 msgstr "Lingia"
+
+msgid "Dear Sir or Madam,"
+msgstr ""
+
+msgid "Click the following link to set a new password:"
+msgstr ""
+
+msgid "If you don't want to change your password, you can ignore this email."
+msgstr ""
 
 msgid "Upload results"
 msgstr "Chargiar si resultats"
@@ -724,6 +739,21 @@ msgid "Wrong username or password"
 msgstr ""
 "Il num da l'utilisadra u da l'utilisader n'è betg enconuschent u il pled-"
 "clav è sbaglià"
+
+#, python-format
+msgid ""
+"A password reset link has been sent to ${email}, provided an account exists "
+"for this email address."
+msgstr ""
+
+msgid "Password changed."
+msgstr ""
+
+msgid "Wrong username or password reset link not valid any more."
+msgstr ""
+
+msgid "Password reset"
+msgstr ""
 
 msgid "Access Denied"
 msgstr ""

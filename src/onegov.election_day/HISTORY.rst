@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds password reset function.
+  [msom]
+
 - Sends a confirmation SMS when subscribing.
   [msom]
 

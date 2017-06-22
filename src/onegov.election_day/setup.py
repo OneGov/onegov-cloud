@@ -41,7 +41,7 @@ setup(
         'onegov.form>=0.12.0',
         'onegov.foundation>=0.0.4',
         'onegov.shared>=0.2.0',
-        'onegov.user',
+        'onegov.user>=0.11.0',
         'pdfdocument',
         'pdfrw',
         'phonenumbers',
