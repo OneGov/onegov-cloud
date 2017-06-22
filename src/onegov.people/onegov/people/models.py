@@ -12,9 +12,9 @@ class Person(Base, TimestampMixin, ORMSearchable):
 
     es_public = True
     es_properties = {
-        'title': {'type': 'string'},
+        'title': {'type': 'text'},
         'function': {'type': 'localized'},
-        'email': {'type': 'string'},
+        'email': {'type': 'text'},
     }
 
     @property
