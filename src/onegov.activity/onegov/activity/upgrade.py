@@ -400,3 +400,16 @@ def retroactively_create_publication_requests(context):
 
     for activity in activities:
         activity.create_publication_request(p, id=activity.id)
+
+
+@upgrade_task('Add archived flag to period')
+def add_archived_flag_to_period(context):
+    context.operations.add_column('periods', Column(
+        'archived', Boolean, nullable=True, default=False
+    ))
+
+    for period in context.session.query(Period):
+        period.archived = False
+
+    context.session.flush()
+    context.operations.alter_column('periods', 'archived', nullable=False)

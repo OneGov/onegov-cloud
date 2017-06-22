@@ -15,7 +15,7 @@ from sqlalchemy import Index
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy import Text
-from sqlalchemy import desc, not_
+from sqlalchemy import desc, not_, distinct
 from sqlalchemy.orm import object_session, relationship, joinedload, defer
 from uuid import uuid4
 
@@ -205,6 +205,20 @@ class Period(Base, TimestampMixin):
         for occasion in o:
             if occasion.activity.state == 'accepted':
                 occasion.activity.archive()
+
+        # also archive all activities without an occasion
+        w = session.query(Occasion)
+        w = w.with_entities(distinct(Occasion.activity_id))
+
+        # XXX circular import
+        from onegov.activity.models.activity import Activity
+
+        a = session.query(Activity)
+        a = a.filter(not_(Activity.id.in_(w.subquery())))
+        a = a.filter(Activity.state == 'accepted')
+
+        for activity in a:
+            activity.archive()
 
     @property
     def booking_limit(self):

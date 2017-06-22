@@ -2065,9 +2065,11 @@ def test_archive_period(session, owner):
 
     sport = activities.add("Sport", username=owner.username)
     games = activities.add("Games", username=owner.username)
+    empty = activities.add("Empty", username=owner.username)
 
     sport.propose().accept()
     games.propose().accept()
+    empty.propose().accept()
 
     occasions.add(
         start=datetime(2017, 10, 4, 13),
@@ -2111,3 +2113,4 @@ def test_archive_period(session, owner):
     assert current_period.archived == True
     assert sport.state == 'accepted'
     assert games.state == 'archived'
+    assert empty.state == 'archived'
