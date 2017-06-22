@@ -32,11 +32,11 @@
                     </td>
                     <td>
                         <span tal:condition="period.all_inclusive and period.booking_cost" i18n:translate>
-                            <tal:block i18n:name="cost" tal:replace="period.booking_cost" /> for 
+                            <tal:block i18n:name="cost" tal:replace="period.booking_cost" /> for
                             <tal:block i18n:name="count" tal:replace="period.max_bookings_per_attendee" /> bookings
                         </span>
                         <span tal:condition="period.all_inclusive and not period.booking_cost" i18n:translate>
-                            Free of charge for 
+                            Free of charge for
                             <tal:block i18n:name="count" tal:replace="period.max_bookings_per_attendee" /> bookings
                         </span>
                         <span tal:condition="not period.all_inclusive and period.booking_cost" i18n:translate>
@@ -48,7 +48,10 @@
                     </td>
                     <td>
                         <span tal:condition="period.active" i18n:translate>Active</span>
-                        <span tal:condition="not:period.active" i18n:translate>Inactive</span>
+                        <span tal:condition="not:period.active">
+                            <tal:b condition="period.archived" i18n:translate>Archived</tal:b>
+                            <tal:b condition="not:period.archived" i18n:translate>Inactive</tal:b>
+                        </span>
                     </td>
                     <td>
                         <ul class="small dense">

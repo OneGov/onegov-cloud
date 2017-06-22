@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to archive periods.
+  [href]
+
 - Adds support for multiple publication requests per activity and period.
   [href]
 

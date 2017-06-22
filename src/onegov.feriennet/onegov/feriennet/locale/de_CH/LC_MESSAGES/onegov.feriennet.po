@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-06-21 10:04+0200\n"
+"POT-Creation-Date: 2017-06-22 09:43+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1770,6 +1770,9 @@ msgstr "Der Zeitraum wurde erfolgreich aktiviert"
 msgid "The period was deactivated successfully"
 msgstr "Der Zeitraum wurde erfolgreich deaktiviert"
 
+msgid "The period was archived successfully"
+msgstr "Der Zeitraum wurde erfolgreich archiviert"
+
 msgid "The period was added successfully"
 msgstr "Der Zeitraum wurde erfolgreich hinzugefügt"
 
@@ -1780,11 +1783,14 @@ msgid "The period could not be deleted as it is still in use"
 msgstr ""
 "Der Zeitraum konnte nicht gelöscht werden, da sie bereits verwendet wird"
 
-msgid "Delete Period"
-msgstr "Zeitraum löschen"
-
 msgid "Deactivate"
 msgstr "Deaktivieren"
+
+msgid "Activate"
+msgstr "Aktivieren"
+
+msgid "Delete Period"
+msgstr "Zeitraum löschen"
 
 #, python-format
 msgid "Do you really want to deactivate \"${title}\"?"
@@ -1796,8 +1802,16 @@ msgstr "Damit werden alle damit verbundenen Durchführungen versteckt"
 msgid "Deactivate Period"
 msgstr "Zeitraum deaktivieren"
 
-msgid "Activate"
-msgstr "Aktivieren"
+#, python-format
+msgid "\"${title}\" cannot be archived yet"
+msgstr "\"${title}\" kann noch nicht archiviert werden"
+
+msgid ""
+"A period can only be archived once the bookings have been made and the bills "
+"have been compiled."
+msgstr ""
+"Ein Zeitraum kann erst archiviert werden wenn die Zuteilung gemacht und die "
+"Rechungen erstellt wurden."
 
 #, python-format
 msgid "Do you really want to activate \"${title}\"?"
@@ -1812,6 +1826,23 @@ msgstr ""
 
 msgid "Activate Period"
 msgstr "Zeitraum aktivieren"
+
+#, python-format
+msgid "Do you really want to archive \"${title}\"?"
+msgstr "Möchten Sie \"${title}\" wirklich archivieren?"
+
+msgid ""
+"This will archive all activities which do not already have an occasion in a "
+"future period. To publish archived activities again a new publication "
+"request needs to be filed."
+msgstr ""
+"Dadurch werden alle Angebote archiviert welche nicht bereits eine "
+"Durchführung in einem zukünftigen Zeitraum haben. Um archivierte Angebote "
+"erneut zu publizieren müssen sie erneut zur Veröffentlichung eingereicht "
+"werden."
+
+msgid "Archive Period"
+msgstr "Zeitraum archivieren"
 
 #, python-format
 msgid "Bookings for ${period}"

@@ -30,6 +30,7 @@ def get_global_tools(request):
 def get_admin_tools(request):
     if request.is_organiser:
         period = request.app.active_period
+        periods = request.app.periods
 
         links = []
 
@@ -42,7 +43,7 @@ def get_admin_tools(request):
                 )
             )
 
-            if period:
+            if periods:
                 links.append(
                     Link(
                         text=_("Matching"),
@@ -59,7 +60,7 @@ def get_admin_tools(request):
                     )
                 )
 
-        if period:
+        if periods:
             links.append(
                 Link(
                     text=_("Attendees"),

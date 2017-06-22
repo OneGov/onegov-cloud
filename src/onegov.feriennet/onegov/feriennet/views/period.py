@@ -4,7 +4,8 @@ from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.forms import PeriodForm
 from onegov.feriennet.layout import PeriodCollectionLayout
 from onegov.feriennet.layout import PeriodFormLayout
-from onegov.org.elements import ConfirmLink, DeleteLink, Link
+from onegov.org.new_elements import Link, Confirm, Intercooler, Block
+from sqlalchemy import desc
 from sqlalchemy.exc import IntegrityError
 
 
@@ -18,45 +19,122 @@ def view_periods(self, request):
 
     def links(period):
         if period.active:
-            yield ConfirmLink(
+            yield Link(
                 text=_("Deactivate"),
-                url=request.link(period, name='deaktivieren'),
-                confirm=_(
-                    'Do you really want to deactivate "${title}"?', mapping={
-                        'title': period.title
-                    }),
-                extra_information=_("This will hide all associated occasions"),
-                classes=('confirm', ),
-                yes_button_text=_("Deactivate Period"))
-        else:
-            yield ConfirmLink(
-                text=_("Activate"),
-                url=request.link(period, name='aktivieren'),
-                confirm=_(
-                    'Do you really want to activate "${title}"?', mapping={
-                        'title': period.title
-                    }),
-                extra_information=_(
-                    "This will deactivate the currently active period. All "
-                    "associated occasions will be made public"
+                url=layout.csrf_protected_url(
+                    request.link(period, name='deaktivieren')
                 ),
-                classes=('confirm', ),
-                yes_button_text=_("Activate Period"))
+                traits=(
+                    Confirm(
+                        _(
+                            'Do you really want to deactivate "${title}"?',
+                            mapping={'title': period.title}
+                        ),
+                        _("This will hide all associated occasions"),
+                        _("Deactivate Period")
+                    ),
+                    Intercooler(
+                        request_method="POST",
+                        redirect_after=request.link(self)
+                    ),
+                )
+            )
+        elif not period.archived:
+            yield Link(
+                text=_("Activate"),
+                url=layout.csrf_protected_url(
+                    request.link(period, name='aktivieren')
+                ),
+                traits=(
+                    Confirm(
+                        _(
+                            'Do you really want to activate "${title}"?',
+                            mapping={'title': period.title}
+                        ),
+                        _(
+                            "This will deactivate the currently active "
+                            "period. All associated occasions will be made "
+                            "public"
+                        ),
+                        _("Activate Period")
+                    ),
+                    Intercooler(
+                        request_method="POST",
+                        redirect_after=request.link(self)
+                    ),
+                )
+            )
 
         yield Link(_("Edit"), request.link(period, 'bearbeiten'))
-        yield DeleteLink(
+
+        if not period.archived:
+            if period.confirmed and period.finalized:
+                yield Link(
+                    text=_("Archive"),
+                    url=layout.csrf_protected_url(
+                        request.link(period, name='archivieren')
+                    ),
+                    traits=(
+                        Confirm(
+                            _(
+                                'Do you really want to archive "${title}"?',
+                                mapping={'title': period.title}
+                            ),
+                            _(
+                                "This will archive all activities which do "
+                                "not already have an occasion in a future "
+                                "period. To publish archived activities again "
+                                "a new publication request needs to be filed."
+                            ),
+                            _("Archive Period")
+                        ),
+                        Intercooler(
+                            request_method="POST",
+                            redirect_after=request.link(self)
+                        ),
+                    )
+                )
+            else:
+                yield Link(
+                    text=_("Archive"),
+                    url='#',
+                    traits=(
+                        Block(
+                            _(
+                                '"${title}" cannot be archived yet',
+                                mapping={'title': period.title}
+                            ),
+                            _(
+                                "A period can only be archived once the "
+                                "bookings have been made and the bills have "
+                                "been compiled."
+                            )
+                        )
+                    )
+                )
+
+        yield Link(
             text=_("Delete"),
             url=layout.csrf_protected_url(request.link(period)),
-            confirm=_('Do you really want to delete "${title}"?', mapping={
-                'title': period.title,
-            }),
-            extra_information=_("This cannot be undone."),
-            classes=('confirm', ),
-            yes_button_text=_("Delete Period"))
+            traits=(
+                Confirm(
+                    _(
+                        'Do you really want to delete "${title}"?',
+                        mapping={'title': period.title}
+                    ),
+                    _("This cannot be undone."),
+                    _("Delete Period")
+                ),
+                Intercooler(
+                    request_method="DELETE",
+                    redirect_after=request.link(self)
+                ),
+            )
+        )
 
     return {
         'layout': layout,
-        'periods': self.query().order_by(Period.execution_start).all(),
+        'periods': self.query().order_by(desc(Period.execution_start)).all(),
         'title': _("Manage Periods"),
         'links': links
     }
@@ -143,6 +221,8 @@ def delete_period(self, request):
     name='aktivieren',
     permission=Secret)
 def activate_period(self, request):
+    request.assert_valid_csrf_token()
+
     self.activate()
     request.success(_("The period was activated successfully"))
 
@@ -158,8 +238,27 @@ def activate_period(self, request):
     name='deaktivieren',
     permission=Secret)
 def deactivate_period(self, request):
+    request.assert_valid_csrf_token()
+
     self.deactivate()
     request.success(_("The period was deactivated successfully"))
+
+    @request.after
+    def redirect_intercooler(response):
+        response.headers.add(
+            'X-IC-Redirect', request.class_link(PeriodCollection))
+
+
+@FeriennetApp.view(
+    model=Period,
+    request_method='POST',
+    name='archivieren',
+    permission=Secret)
+def archive_period(self, request):
+    request.assert_valid_csrf_token()
+
+    self.archive()
+    request.success(_("The period was archived successfully"))
 
     @request.after
     def redirect_intercooler(response):
