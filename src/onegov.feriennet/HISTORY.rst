@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Changes the thumbnail for activities from circle to rounded square.
+  [href]
+
 - Adds the ability to offer archived activities again.
   [href]
 
