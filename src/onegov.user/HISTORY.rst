@@ -4,6 +4,9 @@ Changelog
 - Adds forms and helper functions for password reset.
   [msom]
 
+- Adds French, Italian and Romansh translations.
+  [msom]
+
 0.10.1 (2017-05-02)
 ~~~~~~~~~~~~~~~~~~~
 
