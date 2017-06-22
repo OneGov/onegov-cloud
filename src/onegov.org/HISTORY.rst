@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.11.0 (2017-06-22)
+~~~~~~~~~~~~~~~~~~~
+
 - Upgrades to latest onegov.user release.
   [msom]
 
