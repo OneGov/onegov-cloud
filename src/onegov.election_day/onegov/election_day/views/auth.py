@@ -2,13 +2,13 @@
 
 from onegov.core.security import Private
 from onegov.core.security import Public
+from onegov.core.templates import render_template
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day import log
 from onegov.election_day.layout import Layout
 from onegov.election_day.layout import MailLayout
 from onegov.election_day.models import Principal
-from onegov.org.mail import send_html_mail
 from onegov.user import Auth
 from onegov.user.collection import UserCollection
 from onegov.user.forms import LoginForm
@@ -64,17 +64,21 @@ def handle_password_reset_request(self, request, form):
                 request,
                 request.link(self, name='reset-password')
             )
-            send_html_mail(
-                request=request,
-                template='mail_password_reset.pt',
-                subject=_("Password reset"),
+
+            request.app.send_email(
+                subject=request.translate(_("Password reset")),
                 receivers=(user.username, ),
                 reply_to=request.app.mail_sender,
-                content={
-                    'model': None,
-                    'url': url,
-                    'layout': MailLayout(self, request)
-                }
+                content=render_template(
+                    'mail_password_reset.pt',
+                    request,
+                    {
+                        'title': request.translate(_("Password reset")),
+                        'model': None,
+                        'url': url,
+                        'layout': MailLayout(self, request)
+                    }
+                )
             )
         else:
             log.info(
