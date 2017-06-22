@@ -141,7 +141,9 @@ class VacationActivityHandler(Handler):
                 'layout': layout,
                 'show_ticket_panel': False,
                 'ticket': self.ticket,
-                'is_first': a.count() == 1
+                'is_first': a.count() == 1,
+                'period': self.publication_request.period,
+                'issues': len(self.activity.publication_requests)
             }
         )
 
