@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.2.0 (2017-06-22)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to archive a period.
   [href]
 
