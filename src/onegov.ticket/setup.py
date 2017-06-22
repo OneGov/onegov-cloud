@@ -33,7 +33,7 @@ setup(
     platforms='any',
     install_requires=[
         'onegov.core>=0.16.0',
-        'onegov.search',
+        'onegov.search>=1.1.0',
         'onegov.user',
         'sedate'
     ],

@@ -98,11 +98,11 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     # limit the search to the ticket number -> the rest can be found
     es_public = False
     es_properties = {
-        'number': {'type': 'string'},
-        'title': {'type': 'string'},
-        'subtitle': {'type': 'string'},
-        'group': {'type': 'string'},
-        'ticket_email': {'type': 'string', 'index': 'not_analyzed'},
+        'number': {'type': 'text'},
+        'title': {'type': 'text'},
+        'subtitle': {'type': 'text'},
+        'group': {'type': 'text'},
+        'ticket_email': {'type': 'keyword'},
         'ticket_data': {'type': 'localized_html'}
     }
 

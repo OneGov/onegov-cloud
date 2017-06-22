@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Changes Elasticsearch 2.x mappings from string to text/keyword.
+  [href]
+
 0.6.0 (2017-06-16)
 ~~~~~~~~~~~~~~~~~~~
 
