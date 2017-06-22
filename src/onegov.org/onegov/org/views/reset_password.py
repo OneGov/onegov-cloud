@@ -5,11 +5,12 @@ import morepath
 from onegov.core.security import Public
 from onegov.org import _, log, OrgApp
 from onegov.org.elements import Link
-from onegov.org.forms import RequestPasswordResetForm, PasswordResetForm
 from onegov.org.layout import DefaultLayout
 from onegov.org.mail import send_html_mail
 from onegov.org.models import Organisation
 from onegov.user import UserCollection
+from onegov.user.forms import PasswordResetForm
+from onegov.user.forms import RequestPasswordResetForm
 
 
 @OrgApp.form(model=Organisation, name='request-password', template='form.pt',

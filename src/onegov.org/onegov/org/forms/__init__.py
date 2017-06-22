@@ -10,8 +10,6 @@ from onegov.org.forms.newsletter import NewsletterForm, NewsletterSendForm
 from onegov.org.forms.page import LinkForm, PageForm
 from onegov.org.forms.person import PersonForm
 from onegov.org.forms.reservation import ReservationForm
-from onegov.org.forms.reset_password import PasswordResetForm
-from onegov.org.forms.reset_password import RequestPasswordResetForm
 from onegov.org.forms.resource import ResourceCleanupForm
 from onegov.org.forms.resource import ResourceExportForm
 from onegov.org.forms.resource import ResourceForm
@@ -36,9 +34,7 @@ __all__ = [
     'NewsletterSendForm',
     'NewUserForm',
     'PageForm',
-    'PasswordResetForm',
     'PersonForm',
-    'RequestPasswordResetForm',
     'ReservationForm',
     'ResourceCleanupForm',
     'ResourceExportForm',

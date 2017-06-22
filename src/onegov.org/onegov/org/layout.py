@@ -35,6 +35,7 @@ from onegov.reservation import ResourceCollection
 from onegov.people import PersonCollection
 from onegov.ticket import TicketCollection
 from onegov.user import Auth, UserCollection
+from onegov.user.utils import password_reset_url
 from sedate import to_timezone
 
 
@@ -368,12 +369,10 @@ class Layout(ChameleonLayout):
         if not user:
             return
 
-        return '{url}?token={token}'.format(
-            url=self.request.link(self.app.org, name='reset-password'),
-            token=self.request.new_url_safe_token({
-                'username': user.username,
-                'modified': user.modified.isoformat() if user.modified else ''
-            })
+        return password_reset_url(
+            user,
+            self.request,
+            self.request.link(self.app.org, name='reset-password')
         )
 
 

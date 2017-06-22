@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-06-20 16:46+0200\n"
+"POT-Creation-Date: 2017-06-22 13:53+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -638,12 +638,6 @@ msgstr "Notizen"
 
 msgid "Public extra information about this person"
 msgstr "Öffentliche Extra Informationen zu dieser Person"
-
-msgid "Email Address"
-msgstr "E-Mail Adresse"
-
-msgid "New Password"
-msgstr "Neues Passwort"
 
 msgid "Describes what this reservation resource is about"
 msgstr "Beschreibt um was es bei dieser Reservations-Ressource geht"
@@ -2177,6 +2171,3 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
-
-#~ msgid "Amount"
-#~ msgstr "Betrag"
