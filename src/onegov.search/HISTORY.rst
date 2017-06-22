@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Removes Elasticsearch 2.x string to keyword,text translation.
+  [href]
+
 1.0.1 (2017-05-02)
 ~~~~~~~~~~~~~~~~~~~
 

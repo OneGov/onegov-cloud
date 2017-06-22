@@ -289,8 +289,6 @@ class TypeMappingRegistry(object):
         As a consequence, a change in the mapping requires a reindex.
 
         """
-        mapping = utils.es5_compatible_mapping(mapping)
-
         assert type_name not in self.mappings
         self.mappings[type_name] = TypeMapping(type_name, mapping, model)
 
