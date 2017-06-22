@@ -60,6 +60,12 @@ def get_i18n_localedirs():
     return tuple()
 
 
+@Framework.setting(section='i18n', name='locales')
+def get_i18n_locales():
+    """ Returns the the locales actually used. """
+    return None
+
+
 @Framework.setting(section='i18n', name='default_locale')
 def get_i18n_default_locale():
     """ Returns the fallback language to use if the user gives no indication

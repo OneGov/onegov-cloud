@@ -807,6 +807,12 @@ class Framework(TransactionApp, WebassetsApp, OrmCacheApp, ServerApplication):
     @cached_property
     def locales(self):
         """ Returns all available locales in a set. """
+        try:
+            if self.settings.i18n.locales:
+                return self.settings.i18n.locales
+        except AttributeError:
+            pass
+
         return set(self.translations.keys())
 
     def sign(self, text):
