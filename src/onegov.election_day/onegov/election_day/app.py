@@ -129,6 +129,11 @@ def get_i18n_localedirs():
     ]
 
 
+@ElectionDayApp.setting(section='i18n', name='locales')
+def get_i18n_used_locales():
+    return {'de_CH', 'fr_CH', 'it_CH', 'rm_CH'}
+
+
 @ElectionDayApp.setting(section='i18n', name='default_locale')
 def get_i18n_default_locale():
     return 'de_CH'
