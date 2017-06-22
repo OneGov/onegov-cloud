@@ -33,7 +33,7 @@ setup(
     platforms='any',
     install_requires=[
         'cached_property',
-        'onegov.core>=0.37.0',
+        'onegov.core>=0.41.0',
         'onegov.foundation',
         'onegov.org>=0.3.3',
         'onegov.reservation',

@@ -38,6 +38,11 @@ def get_i18n_localedirs():
     ]
 
 
+@OnboardingApp.setting(section='i18n', name='locales')
+def get_i18n_used_locales():
+    return {'de_CH'}
+
+
 @OnboardingApp.setting(section='i18n', name='default_locale')
 def get_i18n_default_locale():
     return 'de_CH'
