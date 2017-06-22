@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.11.0 (2017-06-22)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds forms and helper functions for password reset.
   [msom]
