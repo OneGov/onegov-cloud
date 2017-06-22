@@ -171,6 +171,11 @@ def get_shared_assets_path():
     return utils.module_path('onegov.shared', 'assets/js')
 
 
+@OrgApp.setting(section='i18n', name='locales')
+def get_i18n_used_locales():
+    return {'de_CH'}
+
+
 @OrgApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs():
     return [

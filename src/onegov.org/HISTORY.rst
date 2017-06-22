@@ -1,11 +1,8 @@
 Changelog
 ---------
 
-0.10.0 (2017-06-21)
-~~~~~~~~~~~~~~~~~~~
-
-- Adds a user view that shows all objects belonging to the user.
-  [href]
+- Upgrade to latest onegov.core release.
+  [msom]
 
 0.9.2 (2017-06-19)
 ~~~~~~~~~~~~~~~~~~~
