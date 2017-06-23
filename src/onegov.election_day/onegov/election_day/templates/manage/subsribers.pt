@@ -57,7 +57,7 @@
                     </tr>
                 </table>
 
-                <div class="pagination-centered">
+                <div tal:condition="subscribers" class="pagination-centered">
                     <div metal:use-macro="layout.macros['pagination']" tal:define="collection layout.model; current_page layout.model;" />
                 </div>
 

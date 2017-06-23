@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes searching an inexisting subscriber throwing an error.
+  [msom]
+
 - Improves error reporting when sending SMS.
   [msom]
 
