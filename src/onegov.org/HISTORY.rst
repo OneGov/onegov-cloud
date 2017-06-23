@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Depends on the latest onegov.form release which fixes a critical parsing bug.
+  [href]
+
 0.11.0 (2017-06-22)
 ~~~~~~~~~~~~~~~~~~~
 
