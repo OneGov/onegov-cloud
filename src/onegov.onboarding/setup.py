@@ -35,7 +35,7 @@ setup(
         'cached_property',
         'onegov.core>=0.41.0',
         'onegov.foundation',
-        'onegov.org>=0.3.3',
+        'onegov.org>=0.11.0',
         'onegov.reservation',
         'onegov.town>=1.12.3'
     ],
