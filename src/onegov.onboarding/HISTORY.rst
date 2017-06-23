@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Depends on latest onegov.core release.
+- Depends on latest onegov.core/org release.
   [msom]
 
 0.3.5 (2017-03-21)
