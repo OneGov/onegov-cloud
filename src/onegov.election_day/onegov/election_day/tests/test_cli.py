@@ -292,7 +292,7 @@ def test_send_sms(postgres_dsn, temporary_directory):
     with open(os.path.join(sms_path, '+417772211.000000'), 'w') as f:
         f.write('Fancy new results!')
 
-    with patch('requests.post') as post:
+    with patch('onegov.election_day.utils.sms_processor.post') as post:
         assert run_command(cfg_path, 'govikon', send_sms).exit_code == 0
         assert post.called
         assert post.call_args[0] == (
