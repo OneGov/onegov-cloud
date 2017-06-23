@@ -227,6 +227,19 @@ def test_prices():
     assert f.pricing.currency == 'USD'
 
 
+def test_non_prices():
+    field = radio()
+
+    f = field.parseString("( ) Foobar (Some Information)")
+    assert f.label == 'Foobar (Some Information)'
+
+    f = field.parseString("( ) Foobar (1up)")
+    assert f.label == 'Foobar (1up)'
+
+    f = field.parseString("( ) Foobar (123.23 USD)")
+    assert f.label == 'Foobar'
+
+
 def test_decimal():
     field = decimal()
 

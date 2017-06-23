@@ -2,6 +2,7 @@ from decimal import Decimal
 from pyparsing import (
     alphanums,
     Combine,
+    FollowedBy,
     Group,
     Literal,
     MatchFirst,
@@ -295,8 +296,14 @@ def marker_box(characters):
     """
 
     check = mark_enclosed_in(characters)('checked')
-    label = with_whitespace_inside(text_without(characters + '()'))('label')
     pricing = enclosed_in(decimal() + currency(), '()')('pricing')
+
+    label_text = with_whitespace_inside(text_without(characters + '()'))
+    label = MatchFirst((
+        label_text + FollowedBy(pricing),
+        Combine(label_text + with_whitespace_inside(text)),
+        label_text
+    ))('label')
 
     return check + label + Optional(pricing)
 
