@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.41.1 (2017-06-23)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes pagination of empty collections throwing ZeroDivisionError errors.
   [msom]
