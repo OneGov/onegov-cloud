@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.14.1 (2017-06-23)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes searching an inexisting subscriber throwing an error.
   [msom]
