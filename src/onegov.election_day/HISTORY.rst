@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.14.0 (2017-06-23)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds password reset function.
   [msom]
