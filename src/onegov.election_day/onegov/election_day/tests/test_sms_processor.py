@@ -1,7 +1,10 @@
 import os
 
 from onegov.election_day.utils.sms_processor import SmsQueueProcessor
+from pytest import raises
+from unittest.mock import MagicMock
 from unittest.mock import Mock
+from unittest.mock import patch
 
 
 def test_sms_queue_processor(election_day_app, temporary_directory):
@@ -60,3 +63,36 @@ def test_sms_queue_processor(election_day_app, temporary_directory):
         '+41797778899',
         '+41797778899',
     ]
+
+
+def test_sms_queue_processor_send():
+    processor = SmsQueueProcessor('path', 'username', 'password')
+
+    with patch(
+        'onegov.election_day.utils.sms_processor.post',
+        return_value=MagicMock(json=lambda: {})
+    ) as post:
+        with raises(Exception):
+            processor._send('1234', 'content')
+        assert post.called
+
+    with patch(
+        'onegov.election_day.utils.sms_processor.post',
+        return_value=MagicMock(json=lambda: {
+            'StatusInfo': 'ERROR',
+            'StatusCode': '0'
+        })
+    ) as post:
+        with raises(Exception):
+            processor._send('1234', 'content')
+        assert post.called
+
+    with patch(
+        'onegov.election_day.utils.sms_processor.post',
+        return_value=MagicMock(json=lambda: {
+            'StatusInfo': 'OK',
+            'StatusCode': '1'
+        })
+    ) as post:
+        processor._send('1234', 'content')
+        assert post.called

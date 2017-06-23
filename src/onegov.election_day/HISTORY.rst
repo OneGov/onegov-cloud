@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves error reporting when sending SMS.
+  [msom]
+
 1.14.0 (2017-06-23)
 ~~~~~~~~~~~~~~~~~~~
 

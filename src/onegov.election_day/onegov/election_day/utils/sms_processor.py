@@ -13,9 +13,9 @@ import logging
 import os
 import stat
 import time
-import requests
 
 from raven import Client
+from requests import post
 
 
 log = logging.getLogger('onegov.election_day')
@@ -92,7 +92,7 @@ class SmsQueueProcessor(object):
         self.originator = originator or "OneGov"
 
     def _send(self, number, content):
-        response = requests.post(
+        response = post(
             'https://json.aspsms.com/SendSimpleTextSMS',
             json={
                 "UserName": self.username,
@@ -105,8 +105,10 @@ class SmsQueueProcessor(object):
 
         response.raise_for_status()
         result = response.json()
-        if result['StatusInfo'] != 'OK' or result['StatusCode'] != '1':
-            raise
+        if result.get('StatusInfo') != 'OK' or result.get('StatusCode') != '1':
+            raise Exception(
+                'Sending SMS failed, got: "{}"'.format(str(result))
+            )
 
     def _parseMessage(self, filename):
         number = None
