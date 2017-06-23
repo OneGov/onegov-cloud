@@ -111,6 +111,8 @@ class Pagination(object):
     @property
     def pages_count(self):
         """ Returns the number of pages. """
+        if not self.batch_size:
+            return 1
         return int(math.ceil(self.subset_count / self.batch_size))
 
     @property
