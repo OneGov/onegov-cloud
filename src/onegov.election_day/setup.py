@@ -58,6 +58,7 @@ setup(
             'mock',
             'onegov.testing',
             'pyquery',
+            'pytest-localserver',
             'pytest>=3.0.0',
             'webtest',
         ],
