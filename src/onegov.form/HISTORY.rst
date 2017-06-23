@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.17.1 (2017-06-23)
+~~~~~~~~~~~~~~~~~~~
 
 - Stops non-pricing text in parentheses from being ignored.
   [href]
