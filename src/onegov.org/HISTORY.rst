@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to filter users in the usermanagement view.
+  [href]
+
 - Changes is-manager/is-not-manager class to role-member, role-editor, etc.
   [href]
 

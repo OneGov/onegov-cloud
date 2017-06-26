@@ -29,10 +29,36 @@ def view_usermanagement(self, request):
     for user in self.query().order_by(User.username).all():
         users[user.role].append(user)
 
+    filters = {}
+
+    filters['role'] = [
+        Link(
+            text=request.translate(title),
+            active=value in self.filters.get('role', tuple()),
+            url=request.link(self.for_filter(role=value))
+        ) for title, value in (
+            (_("Administrator"), 'admin'),
+            (_("Editor"), 'editor'),
+            (_("Member"), 'member'),
+        )
+    ]
+
+    filters['active'] = [
+        Link(
+            text=request.translate(title),
+            active=value in self.filters.get('active', tuple()),
+            url=request.link(self.for_filter(active=value))
+        ) for title, value in (
+            (_("Active"), True),
+            (_("Inactive"), False)
+        )
+    ]
+
     return {
         'layout': layout,
         'title': _("User Management"),
-        'users': users
+        'users': users,
+        'filters': filters
     }
 
 

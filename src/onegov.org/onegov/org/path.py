@@ -77,9 +77,13 @@ def get_user(app, id):
     return UserCollection(app.session()).by_id(id)
 
 
-@OrgApp.path(model=UserCollection, path='/benutzerverwaltung')
-def get_users(app):
-    return UserCollection(app.session())
+@OrgApp.path(
+    model=UserCollection,
+    path='/benutzerverwaltung',
+    converters=dict(active=[bool], role=[str])
+)
+def get_users(app, active=None, role=None):
+    return UserCollection(app.session(), active=active, role=role)
 
 
 @OrgApp.path(model=Topic, path='/themen', absorb=True)

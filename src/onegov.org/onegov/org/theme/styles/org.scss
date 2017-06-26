@@ -3473,6 +3473,12 @@ ul.search-results {
 }
 
 .usermanagement {
+    width: 100%;
+
+    td.text-links {
+        white-space: nowrap;
+    }
+
     .subheader td {
         border-color: $oil;
 
@@ -3773,4 +3779,42 @@ ul.recipients {
 */
 .linkgroup select {
     max-width: 300px;
+}
+
+/*
+    Filter panels
+*/
+.filter-panel {
+    margin-bottom: .5rem;
+
+    .filter-title {
+        border-bottom: 2px solid $primary-color;
+        font-size: $h4-font-size - $h4-font-reduction;
+        margin-bottom: 1rem;
+        margin-top: 0;
+        padding: 0 0 .75rem;
+    }
+
+    ul.tags {
+        list-style: none;
+        margin: 0 0 .75rem;
+        padding: 0;
+
+        li {
+            display: inline-block;
+        }
+
+        a {
+            font-size: .8rem;
+            line-height: .8rem;
+        }
+
+        span {
+            margin-bottom: 0;
+        }
+    }
+
+    .filters ul + ul {
+        margin-top: .5rem;
+    }
 }
