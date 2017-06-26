@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.12.0 (2017-06-26)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to filter users in the usermanagement view.
   [href]
 
