@@ -1,3 +1,4 @@
+from collections import Iterable
 from onegov.core.crypto import random_token
 from onegov.user import log
 from onegov.user.model import User
@@ -14,6 +15,34 @@ from sqlalchemy import sql
 MIN_PASSWORD_LENGTH = 8
 
 
+def as_set(value):
+    if isinstance(value, set):
+        return value
+    if isinstance(value, str):
+        return {value}
+    if isinstance(value, Iterable):
+        return set(value)
+
+    return {value}
+
+
+def as_dictionary_of_sets(d):
+    return {
+        k: (v if v is None else as_set(v))
+        for k, v in d.items()
+    }
+
+
+def toggle(collection, item):
+    if item is None:
+        return collection
+
+    if item in collection:
+        return collection - {item}
+    else:
+        return collection | {item}
+
+
 class UserCollection(object):
     """ Manages a list of users.
 
@@ -24,12 +53,40 @@ class UserCollection(object):
 
     """
 
-    def __init__(self, session):
+    def __init__(self, session, **filters):
         self.session = session
+        self.filters = as_dictionary_of_sets(filters)
+
+    def __getattr__(self, name):
+        if name not in self.filters:
+            raise AttributeError(name)
+
+        return self.filters[name]
+
+    def for_filter(self, **filters):
+        toggled = {
+            key: toggle(self.filters.get(key, set()), value)
+            for key, value in filters.items()
+        }
+
+        for key in self.filters:
+            if key not in toggled:
+                toggled[key] = self.filters[key]
+
+        return self.__class__(self.session, **toggled)
 
     def query(self):
-        """ Returns a query using :class:`onegov.user.model.User`. """
-        return self.session.query(User)
+        """ Returns a query using :class:`onegov.user.model.User`. With
+        the current filters applied.
+
+        """
+        query = self.session.query(User)
+
+        for key, values in self.filters.items():
+            if values:
+                query = query.filter(getattr(User, key).in_(values))
+
+        return query
 
     def add(self, username, password, role,
             data=None, second_factor=None, active=True, realname=None):

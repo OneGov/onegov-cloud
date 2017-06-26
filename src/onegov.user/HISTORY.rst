@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the ability to filter the user collection with custom filters.
+  [href]
+
 0.11.0 (2017-06-22)
 ~~~~~~~~~~~~~~~~~~~
 
