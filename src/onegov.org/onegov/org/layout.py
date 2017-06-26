@@ -109,8 +109,11 @@ class Layout(ChameleonLayout):
     def body_classes(self):
         """ Yields a list of body classes used on the body. """
 
-        yield self.request.is_manager and 'is-manager' or 'is-not-manager'
-        yield self.request.is_logged_in and 'is-logged-in' or 'is-logged-out'
+        if self.request.is_logged_in:
+            yield 'is-logged-in'
+            yield 'role-{}'.format(self.request.current_role)
+        else:
+            yield 'is-logged-out'
 
     @cached_property
     def top_navigation(self):

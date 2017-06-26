@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Changes is-manager/is-not-manager class to role-member, role-editor, etc.
+  [href]
+
 0.11.1 (2017-06-23)
 ~~~~~~~~~~~~~~~~~~~
 
