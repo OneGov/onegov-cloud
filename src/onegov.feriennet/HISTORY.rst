@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.2.0 (2017-06-26)
+~~~~~~~~~~~~~~~~~~~
+
 - Hides certain organiser fields from the member's userprofile.
   [href]
 
