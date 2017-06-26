@@ -9,6 +9,7 @@ from onegov.feriennet.forms import AttendeeSignupForm, OccasionForm
 from onegov.feriennet.layout import OccasionFormLayout
 from onegov.feriennet.models import VacationActivity
 from onegov.user import User, UserCollection
+from sqlalchemy import or_
 
 
 @FeriennetApp.view(
@@ -168,7 +169,7 @@ def book_occasion(self, request, form):
 
         bookings = BookingCollection(request.app.session())
 
-        # if there's a cancelled booking blocking the way, reactivate it
+        # if there's a cancelled/denied booking blocking the way, reactivate it
         booking = None
 
         if not form.is_new:
@@ -181,7 +182,10 @@ def book_occasion(self, request, form):
             q = q.filter(Booking.username == user.username)
             q = q.filter(Booking.attendee == attendee)
             q = q.filter(Booking.occasion_id.in_(o.subquery()))
-            q = q.filter(Booking.state == 'cancelled')
+            q = q.filter(or_(
+                Booking.state == 'cancelled',
+                Booking.state == 'denied'
+            ))
 
             # somewhat unnecessary, but let's be extra sure
             q = q.filter(Booking.period_id == self.period_id)

@@ -1748,6 +1748,13 @@ def test_reactivate_cancelled_booking(feriennet_app):
     page = client.get('/angebot/foobar').click('Anmelden', index=1)
     assert "Wunschliste hinzugefügt" in page.form.submit().follow()
 
+    # including denied bookings
+    bookings.query().first().state = 'denied'
+    transaction.commit()  # can be done by cancelling the whole event in UI
+
+    page = client.get('/angebot/foobar').click('Anmelden', index=1)
+    assert "Wunschliste hinzugefügt" in page.form.submit().follow()
+
     # and even if we confirm the period
     page = client.get('/angebote').click('Zuteilung')
     page.form['confirm'] = 'yes'

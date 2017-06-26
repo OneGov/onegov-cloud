@@ -8,6 +8,7 @@ from onegov.feriennet.utils import encode_name, decode_name
 from onegov.form import Form
 from onegov.user import UserCollection
 from purl import URL
+from sqlalchemy import not_
 from wtforms.fields import BooleanField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
@@ -196,7 +197,9 @@ class AttendeeSignupForm(AttendeeBase):
 
             query = bookings.by_occasion(self.model)
             query = query.filter(Booking.attendee_id == self.attendee.data)
-            query = query.filter(Booking.state != 'cancelled')
+            query = query.filter(not_(
+                Booking.state.in_(('cancelled', 'denied'))
+            ))
 
             booking = query.first()
 

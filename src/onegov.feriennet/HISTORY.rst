@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to book denied bookings if there's an available spot.
+  [href]
+
 - Changes the thumbnail for activities from circle to rounded square.
   [href]
 
