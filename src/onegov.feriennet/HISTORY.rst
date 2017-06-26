@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Hides certain organiser fields from the member's userprofile.
+  [href]
+
 - Adds the ability to book denied bookings if there's an available spot.
   [href]
 

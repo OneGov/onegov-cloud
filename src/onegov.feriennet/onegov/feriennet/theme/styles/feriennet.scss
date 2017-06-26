@@ -663,7 +663,7 @@ ul.tags {
 /*
     Hide certain things from non-managers
 */
-.is-not-manager {
+.role-member {
 
     // file upload manager
     .redactor-toolbar .re-file {
@@ -673,6 +673,15 @@ ul.tags {
     // daily ticket statistics
     .field-daily_ticket_statistics {
         display: none;
+    }
+
+    .userprofile-settings {
+        .field-bank_account,
+        .field-bank_beneficiary,
+        .field-email,  // separate public e-mail address
+        .field-website {
+            display: none;
+        }
     }
 }
 
