@@ -25,16 +25,6 @@
 
 </metal:favicon>
 
-<metal:tags define-macro="tags">
-    <ul class="tags">
-        <li tal:repeat="link tags">
-            <span tal:content="structure link(layout)"
-                class="${link.active and 'active'} blank-label"
-            />
-        </li>
-    </ul>
-</metal:tags>
-
 <metal:footer define-macro="footer">
     <footer>
         <div>
