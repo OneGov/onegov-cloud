@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-06-22 10:38+0200\n"
+"POT-Creation-Date: 2017-06-28 10:44+0200\n"
 "PO-Revision-Date: 2017-06-22 08:50+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -48,3 +48,30 @@ msgstr "Das Feld ist nicht leer"
 
 msgid "New Password"
 msgstr "Neues Passwort"
+
+msgid "Role"
+msgstr "Rolle"
+
+msgid "Expires in"
+msgstr "Verfällt in"
+
+msgid "Number of Signups"
+msgstr "Anzahl Anmeldungen"
+
+msgid "Editor"
+msgstr "Editor"
+
+msgid "Admin"
+msgstr "Administrator"
+
+msgid "1 hour"
+msgstr "1 Stunde"
+
+msgid "24 hours"
+msgstr "24 Stunden"
+
+msgid "7 days"
+msgstr "7 Tage"
+
+msgid "30 days"
+msgstr "30 Tage"

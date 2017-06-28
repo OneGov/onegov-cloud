@@ -1,6 +1,6 @@
 from onegov.form import Form
 from onegov.user import _
-from onegov.user.collection import UserCollection, MIN_PASSWORD_LENGTH
+from onegov.user.collection import MIN_PASSWORD_LENGTH
 from wtforms import StringField, PasswordField, validators
 
 
@@ -41,14 +41,3 @@ class RegistrationForm(Form):
             "The field is not empty"
         ))]
     )
-
-    def register_user(self, request, role='member'):
-        """ Registers the user using the information on the form.
-
-        See :meth:`onegov.user.collections.UserCollection.register_user` for
-        more information.
-
-        """
-
-        return UserCollection(request.app.session()).register(
-            self.username.data, self.password.data, request)

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-06-22 10:38+0200\n"
+"POT-Creation-Date: 2017-06-28 10:44+0200\n"
 "PO-Revision-Date: 2017-06-22 16:08+0200\n"
 "Last-Translator: Marc Sommerhalder <info@seantis.ch>\n"
 "Language-Team: Italian\n"
@@ -47,3 +47,30 @@ msgstr "Il campo non è vuoto"
 
 msgid "New Password"
 msgstr "Nuova Password"
+
+msgid "Role"
+msgstr ""
+
+msgid "Expires in"
+msgstr ""
+
+msgid "Number of Signups"
+msgstr ""
+
+msgid "Editor"
+msgstr ""
+
+msgid "Admin"
+msgstr ""
+
+msgid "1 hour"
+msgstr ""
+
+msgid "24 hours"
+msgstr ""
+
+msgid "7 days"
+msgstr ""
+
+msgid "30 days"
+msgstr ""

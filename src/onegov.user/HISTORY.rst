@@ -1,5 +1,10 @@
 Changelog
 ---------
+
+- Adds the ability to create signup links to allow users to register themselves
+  as editors or admins.
+  [href]
+
 0.12.1 (2017-06-28)
 ~~~~~~~~~~~~~~~~~~~
 

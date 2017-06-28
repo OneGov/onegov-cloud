@@ -174,3 +174,9 @@ def force_lowercase_usernames(context):
 
     # remove the temporary user
     context.session.delete(temp_user)
+
+
+@upgrade_task('Add singup_token column')
+def add_signup_token_column(context):
+    context.operations.add_column(
+        'users', Column('signup_token', Text, nullable=True))

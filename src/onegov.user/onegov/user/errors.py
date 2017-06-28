@@ -20,6 +20,13 @@ class AlreadyActivatedError(OnegovUserError):
     """ Raised when a user was already activated. """
 
 
+class ExpiredSignupLinkError(OnegovUserError):
+    """ Raised when the signup link in use has expired. """
+
+    def __init__(self):
+        pass
+
+
 class InsecurePasswordError(OnegovUserError):
     """ Raised when a user's password is not secure enough. """
 

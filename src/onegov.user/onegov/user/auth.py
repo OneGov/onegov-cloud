@@ -1,7 +1,11 @@
 import morepath
+
+from datetime import datetime
+from itsdangerous import URLSafeSerializer, BadSignature
 from onegov.core.utils import relative_url
 from onegov.user import log
 from onegov.user.collection import UserCollection
+from onegov.user.errors import ExpiredSignupLinkError
 from onegov.user.utils import is_valid_yubikey
 
 
@@ -14,11 +18,15 @@ class Auth(object):
     identity_class = morepath.Identity
 
     def __init__(self, session, application_id, to='/', skip=False,
-                 yubikey_client_id=None, yubikey_secret_key=None):
+                 yubikey_client_id=None, yubikey_secret_key=None,
+                 signup_token=None, signup_token_secret=None):
         assert application_id  # may not be empty!
 
         self.session = session
         self.application_id = application_id
+
+        self.signup_token = signup_token
+        self.signup_token_secret = signup_token_secret
 
         # never redirect to an external page, this might potentially be used
         # to trick the user into thinking he's on our page after entering his
@@ -30,23 +38,51 @@ class Auth(object):
         self.yubikey_secret_key = yubikey_secret_key
 
     @classmethod
-    def from_app(cls, app, to='/', skip=False):
+    def from_app(cls, app, to='/', skip=False, signup_token=None):
         return cls(
             session=app.session(),
             application_id=app.application_id,
             yubikey_client_id=getattr(app, 'yubikey_client_id', None),
             yubikey_secret_key=getattr(app, 'yubikey_secret_key', None),
             to=to,
-            skip=skip
+            skip=skip,
+            signup_token=signup_token,
+            signup_token_secret=getattr(app, 'identity_secret', None)
         )
 
     @classmethod
-    def from_request(cls, request, to='/', skip=False):
-        return cls.from_app(request.app, to, skip)
+    def from_request(cls, request, to='/', skip=False, signup_token=None):
+        return cls.from_app(request.app, to, skip, signup_token)
 
     @classmethod
-    def from_request_path(cls, request, skip=False):
-        return cls.from_request(request, request.transform(request.path), skip)
+    def from_request_path(cls, request, skip=False, signup_token=None):
+        return cls.from_request(
+            request, request.transform(request.path), skip, signup_token)
+
+    @property
+    def signup_token_serializer(self):
+        assert self.signup_token_secret
+        return URLSafeSerializer(self.signup_token_secret, salt='signup')
+
+    def new_signup_token(self, role, max_age=24 * 60 * 60, max_uses=1):
+        """ Returns a signup token which can be used for users to register
+        themselves, directly gaining the given role.
+
+        Signup tokens are recorded on the user to make sure that only the
+        requested amount of uses is allowed.
+
+        """
+        return self.signup_token_serializer.dumps({
+            'role': role,
+            'max_uses': max_uses,
+            'expires': int(datetime.utcnow().timestamp()) + max_age
+        })
+
+    def decode_signup_token(self, token):
+        try:
+            return self.signup_token_serializer.loads(token)
+        except BadSignature:
+            return None
 
     @property
     def users(self):
@@ -156,3 +192,49 @@ class Auth(object):
         request.app.forget_identity(response, request)
 
         return response
+
+    @property
+    def permitted_role_for_registration(self):
+        if not self.signup_token:
+            return 'member'
+
+        assert self.signup_token_secret
+        params = self.decode_signup_token(self.signup_token)
+
+        if not params:
+            return None
+
+        if params['expires'] < int(datetime.utcnow().timestamp()):
+            return None
+
+        signups = UserCollection(self.session)\
+            .by_signup_token(self.signup_token).count()
+
+        if signups >= params['max_uses']:
+            return None
+
+        return params['role']
+
+    def register(self, form, request):
+        """ Registers the user using the information on the registration form.
+
+        Takes the signup token into account to provide the user with the
+        proper role.
+
+        See :meth:`onegov.user.collections.UserCollection.register_user` for
+        more information.
+
+        """
+
+        role = self.permitted_role_for_registration
+
+        if role is None:
+            raise ExpiredSignupLinkError()
+
+        return UserCollection(self.session).register(
+            username=form.username.data,
+            password=form.password.data,
+            request=request,
+            role=role,
+            signup_token=self.signup_token
+        )

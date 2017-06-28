@@ -89,7 +89,8 @@ class UserCollection(object):
         return query
 
     def add(self, username, password, role,
-            data=None, second_factor=None, active=True, realname=None):
+            data=None, second_factor=None, active=True, realname=None,
+            signup_token=None):
         """ Add a user to the collection.
 
             The arguments given to this function are the attributes of the
@@ -107,7 +108,8 @@ class UserCollection(object):
             data=data,
             second_factor=second_factor,
             active=active,
-            realname=realname
+            realname=realname,
+            signup_token=signup_token
         )
 
         self.session.add(user)
@@ -164,12 +166,21 @@ class UserCollection(object):
         roles = [role] + list(roles)
         return self.query().filter(User.role.in_(roles))
 
-    def register(self, username, password, request, role='member'):
+    def by_signup_token(self, signup_token):
+        return self.query().filter_by(signup_token=signup_token)
+
+    def register(self, username, password, request,
+                 role='member', signup_token=None):
         """ Registers a new user.
 
         The so created user needs to activated with a token before it becomes
         active. Use the activation_token in the data dictionary together
         with the :meth:`activate_with_token` function.
+
+        You probably want to use the provided
+        :class:`~onegov.user.forms.registration_form.RegistrationForm` in
+        conjunction with :class:`~onegov.user.auth.Auth` as it includes a lot
+        of extras like signup links and robots protection.
 
         """
 
@@ -194,7 +205,8 @@ class UserCollection(object):
             data={
                 'activation_token': random_token()
             },
-            active=False
+            active=False,
+            signup_token=signup_token
         )
 
     def activate_with_token(self, username, token):

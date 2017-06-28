@@ -85,6 +85,9 @@ class User(Base, TimestampMixin, ORMSearchable):
     #: true if the user is active
     active = Column(Boolean, nullable=False, default=True)
 
+    #: the signup token used by the user
+    signup_token = Column(Text, nullable=True, default=None)
+
     __table_args__ = (
         Index('lowercase_username', func.lower(username), unique=True),
     )

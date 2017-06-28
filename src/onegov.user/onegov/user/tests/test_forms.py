@@ -1,4 +1,5 @@
 from json import dumps, loads
+from onegov.user.auth import Auth
 from onegov.user.collection import UserCollection
 from onegov.user.forms import LoginForm
 from onegov.user.forms import PasswordResetForm
@@ -92,7 +93,9 @@ def test_registration_form(session):
     assert form.validate()
 
     # Test register user
-    form.register_user(DummyRequest(session))
+    auth = Auth(session, 'foobar')
+    auth.register(form, DummyRequest(session))
+
     assert session.query(User).filter_by(username='info@example.com').one()
 
 

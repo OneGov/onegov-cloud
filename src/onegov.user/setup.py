@@ -33,6 +33,7 @@ setup(
     platforms='any',
     install_requires=[
         'click',
+        'itsdangerous',
         'onegov.core>=0.31.0',
         'onegov.form',
         'sqlalchemy',
