@@ -34,7 +34,10 @@ class FileImportError(object):
         self.line = line
 
 
-def load_csv(file, mimetype, expected_headers, filename=None, dialect=None):
+def load_csv(
+    file, mimetype, expected_headers, filename=None, dialect=None,
+    encoding=None
+):
     """ Loads the given file and returns it as CSV file.
 
     :return: A tuple CSVFile, FileImportError.
@@ -86,7 +89,8 @@ def load_csv(file, mimetype, expected_headers, filename=None, dialect=None):
 
     try:
         csv = CSVFile(
-            csvfile, expected_headers=expected_headers, dialect=dialect
+            csvfile, expected_headers=expected_headers, dialect=dialect,
+            encoding=encoding
         )
         list(csv.lines)
     except MissingColumnsError as e:

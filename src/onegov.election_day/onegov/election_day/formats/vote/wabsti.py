@@ -36,7 +36,12 @@ def import_vote_wabsti(vote, entities, vote_number, complex, file, mimetype):
     """
     csv, error = load_csv(file, mimetype, expected_headers=HEADERS)
     if error:
-        return [error]
+        # Wabsti files are sometimes UTF-16
+        csv, utf16_error = load_csv(
+            file, mimetype, expected_headers=HEADERS, encoding='utf-16-le'
+        )
+        if utf16_error:
+            return [error]
 
     used_ballot_types = ['proposal']
     if complex:

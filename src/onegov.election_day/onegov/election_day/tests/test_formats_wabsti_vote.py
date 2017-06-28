@@ -78,6 +78,43 @@ def test_import_wabsti_vote(session, tar_file):
     assert round(vote.tie_breaker.turnout, 1) == 43.3
 
 
+def test_import_wabsti_vote_utf16(session):
+    session.add(
+        Vote(title='vote', domain='federation', date=date(2017, 2, 12))
+    )
+    session.flush()
+    vote = session.query(Vote).one()
+    principal = Principal(canton='sg')
+    entities = principal.entities.get(vote.date.year, {})
+
+    errors = import_vote_wabsti(
+        vote, entities, 0, False,
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'Vorlage-Nr.',
+                    'BfS-Nr.',
+                    'Stimmberechtigte',
+                    'leere SZ',
+                    'ungültige SZ',
+                    'Ja',
+                    'Nein',
+                    'InitOAntw',
+                    'GegenvJa',
+                    'GegenvNein',
+                    'GegenvOAntw',
+                    'StichfrJa',
+                    'StichfrNein',
+                    'StichfrOAntw',
+                    'StimmBet',
+                )),
+            ))
+        ).encode('utf-16-le')),
+        'text/plain'
+    )
+    assert [e.error for e in errors] == ['No data found']
+
+
 def test_import_wabsti_vote_missing_headers(session):
     session.add(
         Vote(title='vote', domain='federation', date=date(2017, 2, 12))
