@@ -4,7 +4,7 @@ name = 'onegov.user'
 description = (
     'A generic user model for OneGov.'
 )
-version = '0.12.1'
+version = '0.13.0'
 
 
 def get_long_description():
