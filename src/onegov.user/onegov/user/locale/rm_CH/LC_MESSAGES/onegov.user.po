@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "POT-Creation-Date: 2017-06-22 10:38+0200\n"
-"PO-Revision-Date: 2017-06-22 10:51+0200\n"
+"PO-Revision-Date: 2017-06-28 12:03+0200\n"
 "Last-Translator: Marc Sommerhalder <info@seantis.ch>\n"
 "Language-Team: Romansh\n"
 "Language: rm\n"
@@ -26,22 +26,22 @@ msgid "YubiKey"
 msgstr "YubiKey"
 
 msgid "Plug your YubiKey into a USB slot and press it."
-msgstr ""
+msgstr "Attatgar la YubiKey e smatgar il buttun."
 
 msgid "Password Confirmation"
-msgstr ""
+msgstr "Confermar il pled-clav"
 
 msgid "Please leave this field empty"
-msgstr ""
+msgstr "Per plaschair laschar vid quest champ"
 
 msgid "The password must be at least eight characters long"
-msgstr ""
+msgstr "Il pled-clav sto avair almain 8 segns"
 
 msgid "Passwords must match"
-msgstr ""
+msgstr "Il pled-clav sto correspunder al pled-clav precedent"
 
 msgid "The field is not empty"
-msgstr ""
+msgstr "Il champ n'è betg vid"
 
 msgid "New Password"
-msgstr ""
+msgstr "Nov pled-clav"
