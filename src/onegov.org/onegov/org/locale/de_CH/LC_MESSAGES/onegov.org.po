@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-06-22 13:53+0200\n"
+"POT-Creation-Date: 2017-06-28 12:04+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -219,6 +219,9 @@ msgid "To remove this event, go to the ticket and reject it."
 msgstr ""
 "Sie können die Veranstaltung jedoch in der Ticketansicht absagen, um sie zu "
 "entfernen."
+
+msgid "Create Signup Link"
+msgstr "Neuer Registrationslink"
 
 msgid "Do you really want to delete this person?"
 msgstr "Möchten Sie die Person wirklich löschen?"
@@ -1688,6 +1691,24 @@ msgstr "Jetzt senden"
 msgid "The newsletter was already sent to the following addresses:"
 msgstr "Der Newsletter wurde bereits an die folgenden Empfänger gesendet:"
 
+msgid ""
+"A signup link allows anyone to sign up with a specific role. Those signups "
+"are limited by time and count but they still present a security risk. Be "
+"sure to only share this link with people you trust."
+msgstr ""
+"Mit einem Registrationslink können sich neue Benutzer für bestimmte Rollen "
+"anmelden, sofern sie den Link kennen. Diese Anmeldungen sind zeitlich "
+"limitiert und auf eine bestimmte Anzahl beschränkt. Trotzdem stellen Sie ein "
+"gewisses Sicherheitsrisiko dar. Bitte teilen Sie diese Links nur mit "
+"Personen denen Sie vertrauen."
+
+msgid ""
+"Your signup link has been created as follows. Please copy it before "
+"continuing, it won't be shown to you again:"
+msgstr ""
+"Ihr Registrationslink wurde wie folgt erstellt. Bitte kopieren Sie diesen "
+"bevor Sie weiterfahren, der Link wird Ihnen nicht wieder angezeigt:"
+
 msgid "Show"
 msgstr "Anzeigen"
 
@@ -1837,6 +1858,9 @@ msgstr "Sie wurden eingeloggt."
 
 msgid "A user with this address already exists"
 msgstr "Ein Benutzer mit dieser E-Mail Adresse existiert bereits"
+
+msgid "This signup link has expired"
+msgstr "Der Registrationslink ist abgelaufen"
 
 msgid "A link was added to the clipboard"
 msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
@@ -2156,6 +2180,9 @@ msgstr "Alle Benutzer"
 
 msgid "User Management"
 msgstr "Benutzerverwaltung"
+
+msgid "New Signup Link"
+msgstr "Neuer Registrationslink"
 
 msgid "New User"
 msgstr "Neuer Benutzer"

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to create signup links.
+  [href]
+
 0.12.0 (2017-06-26)
 ~~~~~~~~~~~~~~~~~~~
 

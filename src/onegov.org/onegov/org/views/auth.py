@@ -13,6 +13,7 @@ from onegov.user.errors import (
     ExistingUserError,
     InvalidActivationTokenError,
     UnknownUserError,
+    ExpiredSignupLinkError,
 )
 from onegov.user.forms import LoginForm, RegistrationForm
 from webob import exc
@@ -92,9 +93,11 @@ def handle_registration(self, request, form):
     if form.submitted(request):
 
         try:
-            user = form.register_user(request)
+            user = self.register(form, request)
         except ExistingUserError:
             request.alert(_("A user with this address already exists"))
+        except ExpiredSignupLinkError:
+            request.alert(_("This signup link has expired"))
         else:
             url = URL(request.link(self, 'activate'))
             url = url.query_param('username', form.username.data)

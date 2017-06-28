@@ -1404,7 +1404,21 @@ class UserManagementLayout(DefaultLayout):
     @cached_property
     def editbar_links(self):
         if self.request.is_manager:
-            return [
+            links = []
+
+            if self.app.settings.org.enable_user_registration:
+                links.append(
+                    Link(
+                        text=_("Create Signup Link"),
+                        url=self.request.class_link(
+                            UserCollection,
+                            name='registrations-link'
+                        ),
+                        attrs={'class': 'new-link'}
+                    )
+                )
+
+            links.append(
                 LinkGroup(
                     title=_("Add"),
                     links=(
@@ -1417,7 +1431,9 @@ class UserManagementLayout(DefaultLayout):
                         ),
                     )
                 )
-            ]
+            )
+
+        return links
 
 
 class UserLayout(DefaultLayout):

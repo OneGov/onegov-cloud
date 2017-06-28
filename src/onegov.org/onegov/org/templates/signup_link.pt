@@ -1,0 +1,34 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <div class="row" tal:condition="not: link">
+            <div class="panel" i18n:translate>
+                A signup link allows anyone to sign up with a specific role. Those signups are limited
+                by time and count but they still present a security risk. Be sure to only share this
+                link with people you trust.
+            </div>
+
+            <div class="small-12 medium-7 large-5 columns">
+                <div metal:use-macro="layout.macros['form']" />
+            </div>
+        </div>
+
+        <div class="row" tal:condition="link">
+            <div class="panel callout">
+                <p i18n:translate>
+                    Your signup link has been created as follows. Please copy
+                    it before continuing, it won't be shown to you again:
+                </p>
+                <a href="${link}" class="signup-link">${link}</a>
+            </div>
+
+            <div>
+                <a href="${request.link(layout.model)}" i18n:translate>
+                    Back to usermanagement
+                </a>
+            </div>
+        </div>
+    </tal:block>
+</div>

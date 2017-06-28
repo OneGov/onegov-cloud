@@ -12,8 +12,9 @@ from onegov.org.layout import UserLayout
 from onegov.org.layout import UserManagementLayout
 from onegov.org.new_elements import Link, LinkGroup
 from onegov.ticket import TicketCollection, Ticket
-from onegov.user import User, UserCollection
+from onegov.user import Auth, User, UserCollection
 from onegov.user.errors import ExistingUserError
+from onegov.user.forms import SignupLinkForm
 from wtforms.validators import Optional
 
 
@@ -59,6 +60,33 @@ def view_usermanagement(self, request):
         'title': _("User Management"),
         'users': users,
         'filters': filters
+    }
+
+
+@OrgApp.form(
+    model=UserCollection,
+    template='signup_link.pt',
+    permission=Secret,
+    form=SignupLinkForm,
+    name='registrations-link')
+def handle_create_signup_link(self, request, form):
+    link = None
+
+    if form.submitted(request):
+        auth = Auth.from_app(request.app)
+        auth.signup_token = form.signup_token(auth)
+
+        link = request.link(auth, 'register')
+
+    layout = UserManagementLayout(self, request)
+    layout.breadcrumbs.append(Link(_("New Signup Link"), '#'))
+    layout.editbar_links = None
+
+    return {
+        'layout': layout,
+        'title': _("New Signup Link"),
+        'link': link,
+        'form': form
     }
 
 
