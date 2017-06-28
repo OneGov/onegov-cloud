@@ -66,10 +66,11 @@ class CSVFile(object):
 
     """
 
-    def __init__(self, csvfile, expected_headers=None, dialect=None):
+    def __init__(self, csvfile, expected_headers=None, dialect=None,
+                 encoding=None):
 
-        # prepare a reader which always returns utf-8
-        encoding = detect_encoding(csvfile)
+        # guess the encoding if not already provided
+        encoding = encoding or detect_encoding(csvfile)
         if encoding is None:
             raise errors.InvalidFormatError()
 

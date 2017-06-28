@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the ability to manually define the csv encoding.
+  [msom]
+
 0.42.0 (2017-06-28)
 ~~~~~~~~~~~~~~~~~~~
 
