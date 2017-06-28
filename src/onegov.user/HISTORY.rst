@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.12.1 (2017-06-28)
+~~~~~~~~~~~~~~~~~~~
 
 - Updates Romansch translations.
   [msom]
