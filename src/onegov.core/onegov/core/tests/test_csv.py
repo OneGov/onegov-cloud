@@ -28,6 +28,10 @@ def test_parse_header():
     assert parse_header("a") == ['a']
     assert parse_header("") == []
     assert parse_header("a,b,c;d") == ['a', 'b', 'c;d']
+    assert parse_header("a,b,c,c") == ['a', 'b', 'c', 'c']
+    assert parse_header(
+        "a,b,c,c,c,c,c,b,b,a", rename_duplicate_column_names=True
+    ) == ['a', 'b', 'c', 'c_1', 'c_2', 'c_3', 'c_4', 'b_1', 'b_2', 'a_1']
 
 
 def test_normalize_header():
@@ -73,6 +77,23 @@ def test_simple_csv_file():
             gefuhlte_temperatur='kalt'
         ),
     ]
+
+
+def test_wacky_csv_file():
+    data = (
+        b'Datum,   Temperatur%, Datum\n'
+        b'01.01.2015, 5, 01.01.2014\n'
+        b'02.01.2015, 0, 02.01.2014'
+    )
+    csv = CSVFile(
+        BytesIO(data),
+        ['datum', 'temperatur'],
+        rename_duplicate_column_names=True
+    )
+
+    assert list(csv.headers.keys()) == ['datum', 'temperatur', 'datum_1']
+    assert list(csv.lines)[0].datum == '01.01.2015'
+    assert list(csv.lines)[1].temperatur == '0'
 
 
 @pytest.mark.parametrize("excel_file", [

@@ -56,6 +56,16 @@ class CSVFile(object):
         The CSV dialect to expect. By default, the dialect will be guessed
         using Python's heuristic.
 
+    :param encoding:
+        The CSV encoding to expect. By default, the encoding will be guessed
+        and will either be UTF-8 or CP1252.
+
+    :param rename_duplicate_column_names:
+        It is possible to rename duplicate column names to deal with super
+        wacky files. If this option is set and a duplicate header is found,
+        a suffix is appended to the column name rather than throwing a
+        DuplicateColumnNamesError.
+
     Once the csv file is open, the records can be acceessed as follows::
 
         with open(path, 'rb') as f:
@@ -67,7 +77,7 @@ class CSVFile(object):
     """
 
     def __init__(self, csvfile, expected_headers=None, dialect=None,
-                 encoding=None):
+                 encoding=None, rename_duplicate_column_names=False):
 
         # guess the encoding if not already provided
         encoding = encoding or detect_encoding(csvfile)
@@ -88,7 +98,11 @@ class CSVFile(object):
         self.csvfile.seek(0)
 
         # if no expected headers expect, we just take what we can get
-        headers = parse_header(self.csvfile.readline(), self.dialect)
+        headers = parse_header(
+            self.csvfile.readline(),
+            self.dialect,
+            rename_duplicate_column_names
+        )
         expected_headers = expected_headers or headers
 
         self.headers = OrderedDict(
@@ -113,7 +127,7 @@ class CSVFile(object):
     @lru_cache(maxsize=128)
     def as_valid_identifier(self, value):
         result = normalize_header(value)
-        for invalid in '- .':
+        for invalid in '- .%':
             result = result.replace(invalid, '_')
         while result and result[0] in '_0123456789':
             result = result[1:]
@@ -408,7 +422,7 @@ def convert_list_of_dicts_to_xlsx(rows, fields=None, key=None, reverse=False):
         return file.read()
 
 
-def parse_header(csv, dialect=None):
+def parse_header(csv, dialect=None, rename_duplicate_column_names=False):
     """ Takes the first line of the given csv string and returns the headers.
 
     Headers are normalized (stripped and normalized) and expected to be
@@ -426,6 +440,14 @@ def parse_header(csv, dialect=None):
 
     headers = next(csv_reader(csv.splitlines(), dialect=dialect))
     headers = [normalize_header(h) for h in headers if h]
+
+    if rename_duplicate_column_names:
+        indexes = {}
+        for i, item in enumerate(headers):
+            indexes.setdefault(item, []).append(i)
+        for key, value in indexes.items():
+            for suffix, index in enumerate(value[1:]):
+                headers[index] += '_{}'.format(suffix + 1)
 
     return headers
 
