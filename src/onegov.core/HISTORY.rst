@@ -1,5 +1,17 @@
 Changelog
 ---------
+
+- Tightens the security of identity_secret and csrf_secret.
+
+  Before, the identity_secret was shared between tennants (application ids).
+  As a result certain signing methods would generate tokens which would work
+  between multiple tennants. Fortunately this wasn't an avenue for serious
+  exploits.
+
+  With this change it is now much harder to use the identity/csrf secret
+  insecurely. By default those tokens are now bound to the tennant.
+  [href]
+
 0.41.1 (2017-06-23)
 ~~~~~~~~~~~~~~~~~~~
 

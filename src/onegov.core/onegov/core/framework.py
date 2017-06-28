@@ -344,19 +344,25 @@ class Framework(TransactionApp, WebassetsApp, OrmCacheApp, ServerApplication):
     def configure_secrets(self, **cfg):
 
         self.identity_secure = cfg.get('identity_secure', True)
-        self.identity_secret = cfg.get('identity_secret', new_uuid().hex)
 
-        self.csrf_secret = cfg.get('csrf_secret', new_uuid().hex)
+        # the identity secret is shared between tennants, so we name it
+        # accordingly - use self.identity_secret to get a secret limited to
+        # the current tennant
+        self.unsafe_identity_secret = cfg.get(
+            'identity_secret', new_uuid().hex)
+
+        # same goes for the csrf_secret
+        self.unsafe_csrf_secret = cfg.get('csrf_secret', new_uuid().hex)
         self.csrf_time_limit = int(cfg.get('csrf_time_limit', 1200))
 
         # you don't want these keys to be the same, see docstring above
-        assert self.identity_secret != self.csrf_secret
+        assert self.unsafe_identity_secret != self.unsafe_csrf_secret
 
         # you don't want to use the keys given in the example file
-        assert self.identity_secret != 'very-secret-key'
+        assert self.unsafe_identity_secret != 'very-secret-key'
 
         # you don't want to use the keys given in the example file
-        assert self.csrf_secret != 'another-very-secret-key'
+        assert self.unsafe_csrf_secret != 'another-very-secret-key'
 
     def configure_yubikey(self, **cfg):
         self.yubikey_client_id = cfg.get('yubikey_client_id', None)
@@ -815,6 +821,24 @@ class Framework(TransactionApp, WebassetsApp, OrmCacheApp, ServerApplication):
 
         return set(self.translations.keys())
 
+    @property
+    def identity_secret(self):
+        """ The identity secret, guaranteed to only be valid for the current
+        application id.
+
+        """
+
+        return self.unsafe_identity_secret + self.application_id_hash
+
+    @property
+    def csrf_secret(self):
+        """ The identity secret, guaranteed to only be valid for the current
+        application id.
+
+        """
+
+        return self.unsafe_csrf_secret + self.application_id_hash
+
     def sign(self, text):
         """ Signs a text with the identity secret.
 
@@ -822,13 +846,13 @@ class Framework(TransactionApp, WebassetsApp, OrmCacheApp, ServerApplication):
         application signs a text another won't be able to unsign it.
 
         """
-        signer = Signer(self.identity_secret, salt=self.application_id)
+        signer = Signer(self.identity_secret, salt='generic-signer')
         return signer.sign(text.encode('utf-8')).decode('utf-8')
 
     def unsign(self, text):
         """ Unsigns a signed text, returning None if unsuccessful. """
         try:
-            signer = Signer(self.identity_secret, salt=self.application_id)
+            signer = Signer(self.identity_secret, salt='generic-signer')
             return signer.unsign(text).decode('utf-8')
         except BadSignature:
             return None

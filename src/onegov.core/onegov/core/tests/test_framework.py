@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from email.header import decode_header
 from email.utils import parseaddr
 from freezegun import freeze_time
+from itsdangerous import BadSignature, Signer
 from onegov.core.framework import Framework
 from onegov.core.upgrade import UpgradeState
 from onegov.core.mail import convert_to_plaintext
@@ -337,7 +338,7 @@ def test_fix_webassets_url():
 
 def test_sign_unsign():
     framework = Framework()
-    framework.identity_secret = 'test'
+    framework.unsafe_identity_secret = 'test'
     framework.application_id = 'one'
 
     assert framework.sign('foo').startswith('foo.')
@@ -350,11 +351,28 @@ def test_sign_unsign():
     assert framework.unsign(signed_by_one) == 'foo'
 
     signed = framework.sign('foo')
-    framework.identity_secret = 'asdf'
+    framework.unsafe_identity_secret = 'asdf'
     assert framework.unsign(signed) is None
 
     signed = framework.sign('foo')
     framework.unsign('bar' + signed) is None
+
+
+def test_custom_signer():
+    framework = Framework()
+    framework.unsafe_identity_secret = 'test'
+    framework.application_id = 'one'
+
+    signed = Signer(framework.identity_secret).sign(b'foobar')
+    assert Signer(framework.identity_secret).unsign(signed) == b'foobar'
+
+    signed = Signer(framework.identity_secret).sign(b'foobar')
+    assert Signer(framework.identity_secret).unsign(signed) == b'foobar'
+
+    framework.application_id = 'two'
+
+    with pytest.raises(BadSignature):
+        Signer(framework.identity_secret).unsign(signed)
 
 
 def test_csrf_secret_key():
