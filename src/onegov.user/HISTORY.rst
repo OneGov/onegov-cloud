@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.13.1 (2017-06-28)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes syntax error in po file.
   [href]
