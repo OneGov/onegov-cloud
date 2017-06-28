@@ -4,6 +4,9 @@ Changelog
 - Allows to upload UTF-16 wabsti files.
   [msom]
 
+- Updates translations.
+  [msom]
+
 1.14.1 (2017-06-23)
 ~~~~~~~~~~~~~~~~~~~
 
