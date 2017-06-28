@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-06-22 15:27+0200\n"
-"PO-Revision-Date: 2017-06-21 13:43+0200\n"
+"PO-Revision-Date: 2017-06-28 12:07+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -389,10 +389,10 @@ msgid "Logout"
 msgstr "Deconnectar"
 
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Emblidà il pled-clav?"
 
 msgid "Reset password"
-msgstr ""
+msgstr "Redefinir il pled-clav"
 
 msgid "Accepted"
 msgstr "Acceptà"
@@ -549,13 +549,15 @@ msgid "Line"
 msgstr "Lingia"
 
 msgid "Dear Sir or Madam,"
-msgstr ""
+msgstr "Stimadas dunnas e stimads signurs,"
 
 msgid "Click the following link to set a new password:"
-msgstr ""
+msgstr "Cliccai sin il suandant link per definir in nov pled-clav:"
 
 msgid "If you don't want to change your password, you can ignore this email."
 msgstr ""
+"Vus pudais ignorar quest e-mail, sche Vus na vulessas betg midar Voss pled-"
+"clav."
 
 msgid "Upload results"
 msgstr "Chargiar si resultats"
@@ -573,7 +575,7 @@ msgid "Please use the following format:"
 msgstr "Duvrai per plaschair il suandant format:"
 
 msgid "No map available for this year."
-msgstr ""
+msgstr "Per quest onn n'è disponibla nagina carta."
 
 msgid "Embed"
 msgstr "Incorporar"
@@ -744,28 +746,30 @@ msgstr ""
 msgid ""
 "A password reset link has been sent to ${email}, provided an account exists "
 "for this email address."
-msgstr ""
+msgstr "In e-mail è vegnì tramess a ${email} (sche l'adressa è valaivla)."
 
 msgid "Password changed."
-msgstr ""
+msgstr "Midà il pled-clav."
 
 msgid "Wrong username or password reset link not valid any more."
-msgstr ""
+msgstr "L'adressa è nunvalaivla u il link è nunvalaivel."
 
 msgid "Password reset"
-msgstr ""
+msgstr "Redefinir il pled-clav"
 
 msgid "Access Denied"
-msgstr ""
+msgstr "Refusà l'access"
 
 msgid "You are trying to open a page for which you are not authorized."
 msgstr ""
+"Vus empruvais d'avrir ina pagina, per la quala Vus n'avais nagina "
+"autorisaziun."
 
 msgid "Page not Found"
-msgstr ""
+msgstr "Betg chattà la pagina"
 
 msgid "The page you are looking for could not be found."
-msgstr ""
+msgstr "La pagina giavischada n'è betg vegnida chattada."
 
 msgid ""
 "You will receive an SMS as soon as new results have been published. The SMS "
@@ -822,7 +826,7 @@ msgid "The year ${year} is not yet supported"
 msgstr "L'onn ${year} na vegn anc betg sustegnì"
 
 msgid "Use an election based on proportional representation"
-msgstr ""
+msgstr "Nagina elecziun da proporz"
 
 msgid "The data source is not configured properly"
-msgstr ""
+msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
