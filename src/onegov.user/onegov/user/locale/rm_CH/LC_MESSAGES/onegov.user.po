@@ -5,13 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-<<<<<<< HEAD
 "POT-Creation-Date: 2017-06-22 10:38+0200\n"
 "PO-Revision-Date: 2017-06-28 12:03+0200\n"
-=======
-"POT-Creation-Date: 2017-06-28 10:44+0200\n"
-"PO-Revision-Date: 2017-06-22 10:51+0200\n"
->>>>>>> Adds the ability to create signup links
 "Last-Translator: Marc Sommerhalder <info@seantis.ch>\n"
 "Language-Team: Romansh\n"
 "Language: rm\n"
@@ -49,10 +44,7 @@ msgid "The field is not empty"
 msgstr "Il champ n'è betg vid"
 
 msgid "New Password"
-<<<<<<< HEAD
 msgstr "Nov pled-clav"
-=======
-msgstr ""
 
 msgid "Role"
 msgstr ""
@@ -80,4 +72,3 @@ msgstr ""
 
 msgid "30 days"
 msgstr ""
->>>>>>> Adds the ability to create signup links
