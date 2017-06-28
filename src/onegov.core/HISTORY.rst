@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.42.0 (2017-06-28)
+~~~~~~~~~~~~~~~~~~~
 
 - Tightens the security of identity_secret and csrf_secret.
 
