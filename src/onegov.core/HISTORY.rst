@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.42.2 (2017-06-28)
+~~~~~~~~~~~~~~~~~~~
 
 - Allows to deal with CSV containing duplicate columns.
   [msom]
