@@ -10,6 +10,8 @@ from onegov.election_day.formats.election.wabstic_majorz \
     import import_election_wabstic_majorz
 from onegov.election_day.formats.election.wabstic_proporz \
     import import_election_wabstic_proporz
+from onegov.election_day.formats.election.wabstim_majorz \
+    import import_election_wabstim_majorz
 
 
 __all__ = [
@@ -18,5 +20,6 @@ __all__ = [
     'import_election_wabsti_proporz',
     'import_election_wabstic_majorz',
     'import_election_wabstic_proporz',
+    'import_election_wabstim_majorz',
     'import_party_results',
 ]

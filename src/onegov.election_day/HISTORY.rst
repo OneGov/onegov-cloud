@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Supports wabsti files for municipalities.
+- Supports wabsti files for municipalities (votes, majorz elections).
   [msom]
 
 - Allows to upload UTF-16 wabsti files.

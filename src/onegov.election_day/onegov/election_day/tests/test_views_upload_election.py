@@ -353,27 +353,49 @@ def test_upload_election_available_formats_canton(election_day_app):
     login(client)
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'election'
+    new.form['election_de'] = 'federal-majorz-election'
     new.form['date'] = date(2015, 1, 1)
     new.form['mandates'] = 1
-    new.form['election_type'] = 'proporz'
+    new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'
     new.form.submit()
-
-    upload = client.get('/election/election/upload').follow()
+    upload = client.get('/election/federal-majorz-election/upload').follow()
     assert sorted([o[0] for o in upload.form['file_format'].options]) == [
         'internal', 'wabsti'
     ]
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'election'
+    new.form['election_de'] = 'federal-proporz-election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+    upload = client.get('/election/federal-proporz-election/upload').follow()
+    assert sorted([o[0] for o in upload.form['file_format'].options]) == [
+        'internal', 'wabsti'
+    ]
+
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = 'cantonal-majorz-election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'majorz'
+    new.form['domain'] = 'canton'
+    new.form.submit()
+    upload = client.get('/election/cantonal-majorz-election/upload').follow()
+    assert sorted([o[0] for o in upload.form['file_format'].options]) == [
+        'internal', 'wabsti'
+    ]
+
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = 'cantonal-proporz-election'
     new.form['date'] = date(2015, 1, 1)
     new.form['mandates'] = 1
     new.form['election_type'] = 'proporz'
     new.form['domain'] = 'canton'
     new.form.submit()
-
-    upload = client.get('/election/election/upload').follow()
+    upload = client.get('/election/cantonal-proporz-election/upload').follow()
     assert sorted([o[0] for o in upload.form['file_format'].options]) == [
         'internal', 'wabsti'
     ]
@@ -386,36 +408,69 @@ def test_upload_election_available_formats_municipality(election_day_app_bern):
     login(client)
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'election'
+    new.form['election_de'] = 'federal-majorz-election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'majorz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+    upload = client.get('/election/federal-majorz-election/upload').follow()
+    assert [o[0] for o in upload.form['file_format'].options] == [
+        'internal', 'wabsti_m'
+    ]
+
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = 'federal-proporz-election'
     new.form['date'] = date(2015, 1, 1)
     new.form['mandates'] = 1
     new.form['election_type'] = 'proporz'
     new.form['domain'] = 'federation'
     new.form.submit()
-
-    upload = client.get('/election/election/upload').follow()
+    upload = client.get('/election/federal-proporz-election/upload').follow()
     assert [o[0] for o in upload.form['file_format'].options] == ['internal']
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'election'
+    new.form['election_de'] = 'cantonal-majorz-election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'majorz'
+    new.form['domain'] = 'canton'
+    new.form.submit()
+    upload = client.get('/election/cantonal-majorz-election/upload').follow()
+    assert [o[0] for o in upload.form['file_format'].options] == [
+        'internal', 'wabsti_m'
+    ]
+
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = 'cantonal-proporz-election'
     new.form['date'] = date(2015, 1, 1)
     new.form['mandates'] = 1
     new.form['election_type'] = 'proporz'
     new.form['domain'] = 'canton'
     new.form.submit()
-
-    upload = client.get('/election/election/upload').follow()
+    upload = client.get('/election/cantonal-proporz-election/upload').follow()
     assert [o[0] for o in upload.form['file_format'].options] == ['internal']
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'election'
+    new.form['election_de'] = 'communal-majorz-election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'majorz'
+    new.form['domain'] = 'municipality'
+    new.form.submit()
+    upload = client.get('/election/communal-majorz-election/upload').follow()
+    assert [o[0] for o in upload.form['file_format'].options] == [
+        'internal', 'wabsti_m'
+    ]
+
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = 'communal-proporz-election'
     new.form['date'] = date(2015, 1, 1)
     new.form['mandates'] = 1
     new.form['election_type'] = 'proporz'
     new.form['domain'] = 'municipality'
     new.form.submit()
-
-    upload = client.get('/election/election/upload').follow()
+    upload = client.get('/election/communal-proporz-election/upload').follow()
     assert [o[0] for o in upload.form['file_format'].options] == ['internal']
 
 
@@ -549,11 +604,10 @@ def test_upload_election_submit(election_day_app):
         assert data['absolute_majority'] == 5000
         assert data['completed'] == False
 
+    # Wabsti Proporz
     edit = client.get('/election/election/edit')
     edit.form['election_type'] = 'proporz'
     edit.form.submit()
-
-    # Wabsti Proporz
     with patch(
         'onegov.election_day.views.upload.election.'
         'import_election_wabsti_proporz'
@@ -563,6 +617,25 @@ def test_upload_election_submit(election_day_app):
         csv = 'csv'.encode('utf-8')
         upload = client.get('/election/election/upload').follow()
         upload.form['file_format'] = 'wabsti'
+        upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+        upload = upload.form.submit()
+
+        assert import_.called
+
+    # Wabsti Municipality Majorz
+    edit = client.get('/election/election/edit')
+    edit.form['election_type'] = 'majorz'
+    edit.form.submit()
+    election_day_app.principal.domain = 'municipality'
+    with patch(
+        'onegov.election_day.views.upload.election.'
+        'import_election_wabstim_majorz'
+    ) as import_:
+        import_.return_value = []
+
+        csv = 'csv'.encode('utf-8')
+        upload = client.get('/election/election/upload').follow()
+        upload.form['file_format'] = 'wabsti_m'
         upload.form['results'] = Upload('data.csv', csv, 'text/plain')
         upload = upload.form.submit()
 

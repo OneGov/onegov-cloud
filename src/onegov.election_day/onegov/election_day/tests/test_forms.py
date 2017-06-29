@@ -12,7 +12,6 @@ from onegov.election_day.forms import UploadProporzElectionForm
 from onegov.election_day.forms import UploadRestForm
 from onegov.election_day.forms import UploadVoteForm
 from onegov.election_day.forms import VoteForm
-from onegov.election_day.forms.upload import UploadElectionBaseForm
 from onegov.election_day.forms.validators import ValidPhoneNumber
 from onegov.election_day.models import DataSource
 from onegov.election_day.models import DataSourceItem
@@ -335,14 +334,25 @@ def test_upload_election_form(session):
     )
 
     # Test limitation of file formats
-    form = UploadElectionBaseForm()
-    assert sorted(f[0] for f in form.file_format.choices) == []
-    form.adjust(cantonal_principal, election)
-    assert sorted(f[0] for f in form.file_format.choices) == [
+    form_majorz = UploadMajorzElectionForm()
+    assert sorted(f[0] for f in form_majorz.file_format.choices) == []
+    form_majorz.adjust(cantonal_principal, election)
+    assert sorted(f[0] for f in form_majorz.file_format.choices) == [
         'internal', 'wabsti'
     ]
-    form.adjust(communal_principal, election)
-    assert sorted(f[0] for f in form.file_format.choices) == [
+    form_majorz.adjust(communal_principal, election)
+    assert sorted(f[0] for f in form_majorz.file_format.choices) == [
+        'internal', 'wabsti_m'
+    ]
+
+    form_proporz = UploadProporzElectionForm()
+    assert sorted(f[0] for f in form_proporz.file_format.choices) == []
+    form_proporz.adjust(cantonal_principal, election)
+    assert sorted(f[0] for f in form_proporz.file_format.choices) == [
+        'internal', 'wabsti'
+    ]
+    form_proporz.adjust(communal_principal, election)
+    assert sorted(f[0] for f in form_proporz.file_format.choices) == [
         'internal'
     ]
 
@@ -354,12 +364,21 @@ def test_upload_election_form(session):
     ds.items.append(DataSourceItem(election_id=ds.query_candidates().one().id))
     transaction.commit()
 
-    form.adjust(cantonal_principal, session.query(Election).one())
-    assert sorted(f[0] for f in form.file_format.choices) == [
+    form_majorz.adjust(cantonal_principal, session.query(Election).one())
+    assert sorted(f[0] for f in form_majorz.file_format.choices) == [
         'internal', 'wabsti', 'wabsti_c'
     ]
-    form.adjust(communal_principal, session.query(Election).one())
-    assert sorted(f[0] for f in form.file_format.choices) == [
+    form_majorz.adjust(communal_principal, session.query(Election).one())
+    assert sorted(f[0] for f in form_majorz.file_format.choices) == [
+        'internal', 'wabsti_c', 'wabsti_m'
+    ]
+
+    form_proporz.adjust(cantonal_principal, session.query(Election).one())
+    assert sorted(f[0] for f in form_proporz.file_format.choices) == [
+        'internal', 'wabsti', 'wabsti_c'
+    ]
+    form_proporz.adjust(communal_principal, session.query(Election).one())
+    assert sorted(f[0] for f in form_proporz.file_format.choices) == [
         'internal', 'wabsti_c'
     ]
 

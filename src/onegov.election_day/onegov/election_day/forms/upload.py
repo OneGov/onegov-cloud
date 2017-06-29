@@ -147,6 +147,14 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
         ]
     )
 
+    def adjust(self, principal, election):
+        """ Adjusts the form to the given principal and election. """
+
+        super(UploadMajorzElectionForm, self).adjust(principal, election)
+
+        if principal.domain == 'municipality':
+            self.file_format.choices.append(('wabsti_m', "Wabsti"))
+
 
 class UploadProporzElectionForm(UploadElectionBaseForm):
 

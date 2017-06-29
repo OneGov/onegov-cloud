@@ -9,24 +9,6 @@ from onegov.election_day.models import Principal
 from pytest import mark
 
 
-HEADERS = [
-    'AnzMandate',
-    'BFS',
-    'EinheitBez',
-    'StimmBer',
-    'StimmAbgegeben',
-    'StimmLeer',
-    'StimmUngueltig',
-    'StimmGueltig',
-]
-
-HEADERS_RESULT = [
-    'ID',
-    'Name',
-    'Vorname',
-]
-
-
 @mark.parametrize("tar_file", [
     module_path('onegov.election_day', 'tests/fixtures/wabsti_majorz.tar.gz'),
 ])
