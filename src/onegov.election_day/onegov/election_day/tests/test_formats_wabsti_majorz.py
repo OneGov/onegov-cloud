@@ -102,6 +102,53 @@ def test_import_wabsti_majorz(session, tar_file):
     assert election.elected_candidates == [('Paul', 'Rechsteiner')]
 
 
+def test_import_wabsti_majorz_utf16(session):
+    session.add(
+        Election(
+            title='election',
+            domain='canton',
+            type='majorz',
+            date=date(2011, 10, 23),
+            number_of_mandates=1,
+        )
+    )
+    session.flush()
+    election = session.query(Election).one()
+    principal = Principal(canton='sg')
+    entities = principal.entities.get(election.date.year, {})
+
+    errors = import_election_wabsti_majorz(
+        election, entities,
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'AnzMandate',
+                    'BFS',
+                    'EinheitBez',
+                    'StimmBer',
+                    'StimmAbgegeben',
+                    'StimmLeer',
+                    'StimmUngueltig',
+                    'KandName_1',
+                    'Stimmen_1',
+                    'KandName_2',
+                    'Stimmen_2',
+                )),
+            ))
+        ).encode('utf-16-le')), 'text/plain',
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'ID',
+                    'Name',
+                    'Vorname',
+                )),
+            ))
+        ).encode('utf-16-le')), 'text/plain',
+    )
+    assert [e.error for e in errors] == ['No data found']
+
+
 def test_import_wabsti_majorz_missing_headers(session):
     session.add(
         Election(

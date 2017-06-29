@@ -111,6 +111,73 @@ def test_import_wabsti_proporz(session, tar_file):
     ]
 
 
+def test_import_wabsti_proporz_utf16(session):
+    session.add(
+        Election(
+            title='election',
+            domain='canton',
+            type='proporz',
+            date=date(2011, 10, 23),
+            number_of_mandates=1,
+        )
+    )
+    session.flush()
+    election = session.query(Election).one()
+    principal = Principal(canton='sg')
+    entities = principal.entities.get(election.date.year, {})
+
+    errors = import_election_wabsti_proporz(
+        election, entities,
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'Einheit_BFS',
+                    'Einheit_Name',
+                    'Liste_KandID',
+                    'Kand_Nachname',
+                    'Kand_Vorname',
+                    'Liste_ID',
+                    'Liste_Code',
+                    'Kand_StimmenTotal',
+                    'Liste_ParteistimmenTotal',
+                )),
+            ))
+        ).encode('utf-16-le')), 'text/plain',
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'Liste',
+                    'LV',
+                    'LUV',
+                )),
+            ))
+        ).encode('utf-16-le')), 'text/plain',
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'ID',
+                    'ignore1',
+                    'ignore2',
+                )),
+            ))
+        ).encode('utf-16-le')), 'text/plain',
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'Einheit_BFS',
+                    'Einheit_Name',
+                    'StimBerTotal',
+                    'WZEingegangen',
+                    'WZLeer',
+                    'WZUngueltig',
+                    'StmWZVeraendertLeerAmtlLeer',
+                )),
+            ))
+        ).encode('utf-16-le')), 'text/plain',
+    )
+    assert [e.error for e in errors] == ['No data found']
+
+
 def test_import_wabsti_proporz_missing_headers(session):
     session.add(
         Election(

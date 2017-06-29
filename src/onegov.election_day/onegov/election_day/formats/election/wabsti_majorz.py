@@ -148,8 +148,15 @@ def import_election_wabsti_majorz(
         file, mimetype, expected_headers=HEADERS, filename=filename
     )
     if error:
-        errors.append(error)
-    else:
+        # Wabsti files are sometimes UTF-16
+        csv, utf16_error = load_csv(
+            file, mimetype, expected_headers=HEADERS, encoding='utf-16-le'
+        )
+        if utf16_error:
+            errors.append(error)
+        else:
+            error = None
+    if not error:
         mandates = 0
         for line in csv.lines:
             line_errors = []
@@ -185,8 +192,16 @@ def import_election_wabsti_majorz(
             filename=filename
         )
         if error:
-            errors.append(error)
-        else:
+            # Wabsti files are sometimes UTF-16
+            csv, utf16_error = load_csv(
+                elected_file, elected_mimetype,
+                expected_headers=HEADERS_RESULT, encoding='utf-16-le'
+            )
+            if utf16_error:
+                errors.append(error)
+            else:
+                error = None
+        if not error:
             for line in csv.lines:
                 line_errors = []
 

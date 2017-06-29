@@ -208,8 +208,16 @@ def import_election_wabsti_proporz(
         file, mimetype, expected_headers=HEADERS, filename=filename
     )
     if error:
-        errors.append(error)
-    else:
+        # Wabsti files are sometimes UTF-16
+        csv, utf16_error = load_csv(
+            file, mimetype, expected_headers=HEADERS, filename=filename,
+            encoding='utf-16-le'
+        )
+        if utf16_error:
+            errors.append(error)
+        else:
+            error = None
+    if not error:
         panachage = {'headers': parse_panachage_headers(csv)}
         for line in csv.lines:
             line_errors = []
@@ -259,8 +267,17 @@ def import_election_wabsti_proporz(
             filename=filename
         )
         if error:
-            errors.append(error)
-        else:
+            # Wabsti files are sometimes UTF-16
+            csv, utf16_error = load_csv(
+                connections_file, connections_mimetype,
+                expected_headers=HEADERS_CONNECTIONS, filename=filename,
+                encoding='utf-16-le'
+            )
+            if utf16_error:
+                errors.append(error)
+            else:
+                error = None
+        if not error:
             indexes = dict([(item.id, key) for key, item in lists.items()])
             for line in csv.lines:
                 line_errors = []
@@ -299,8 +316,17 @@ def import_election_wabsti_proporz(
             filename=filename
         )
         if error:
-            errors.append(error)
-        else:
+            # Wabsti files are sometimes UTF-16
+            csv, utf16_error = load_csv(
+                elected_file, elected_mimetype,
+                expected_headers=HEADERS_RESULT, filename=filename,
+                encoding='utf-16-le'
+            )
+            if utf16_error:
+                errors.append(error)
+            else:
+                error = None
+        if not error:
             indexes = dict([(item.id, key) for key, item in lists.items()])
             for line in csv.lines:
                 try:
@@ -336,8 +362,17 @@ def import_election_wabsti_proporz(
             expected_headers=HEADERS_STATS, filename=filename
         )
         if error:
-            errors.append(error)
-        else:
+            # Wabsti files are sometimes UTF-16
+            csv, utf16_error = load_csv(
+                statistics_file, statistics_mimetype,
+                expected_headers=HEADERS_STATS, filename=filename,
+                encoding='utf-16-le'
+            )
+            if utf16_error:
+                errors.append(error)
+            else:
+                error = None
+        if not error:
             for line in csv.lines:
                 try:
                     group = line.einheit_name.strip()
