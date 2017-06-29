@@ -184,6 +184,16 @@ def import_election_wabsti_proporz(
     elected_file=None, elected_mimetype=None,
     statistics_file=None, statistics_mimetype=None
 ):
+    """ Tries to import the given csv, xls or xlsx file.
+
+    This is the format used by Wabsti for proporz elections. Since there is no
+    format description, importing these files is somewhat experimental.
+
+    :return:
+        A list containing errors.
+
+    """
+
     errors = []
     candidates = {}
     lists = {}

@@ -18,6 +18,8 @@ HEADERS = [
 def import_party_results(election, file, mimetype):
     """ Tries to import the given file.
 
+    This is our own format used for party results.
+
     :return:
         A list containing errors.
 

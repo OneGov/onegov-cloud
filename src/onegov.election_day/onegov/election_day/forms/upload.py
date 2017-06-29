@@ -366,6 +366,7 @@ class UploadVoteForm(Form):
             self.file_format.choices = [
                 ('default', _("Default")),
                 ('internal', "OneGov Cloud"),
+                ('wabsti_m', "Wabsti"),
             ]
         else:
             self.file_format.choices = [

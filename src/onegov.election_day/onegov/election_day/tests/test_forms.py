@@ -228,7 +228,7 @@ def test_upload_vote_form(session):
     ]
     form.adjust(communal_principal, simple_vote)
     assert sorted(f[0] for f in form.file_format.choices) == [
-        'default', 'internal'
+        'default', 'internal', 'wabsti_m'
     ]
 
     # Test if wabsti_c is added when data sources are available
@@ -245,7 +245,7 @@ def test_upload_vote_form(session):
     ]
     form.adjust(communal_principal, session.query(Vote).one())
     assert sorted(f[0] for f in form.file_format.choices) == [
-        'default', 'internal', 'wabsti_c'
+        'default', 'internal', 'wabsti_c', 'wabsti_m'
     ]
 
     # Test preseting of vote type

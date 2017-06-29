@@ -61,6 +61,9 @@ def import_vote_wabstic(vote, entities, district, number,
 
     We assume that the file has been generate using WabstiCExport 2.1.
 
+    :return:
+        A list containing errors.
+
     """
     errors = []
 

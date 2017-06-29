@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Supports wabsti files for municipalities.
+  [msom]
+
 - Allows to upload UTF-16 wabsti files.
   [msom]
 

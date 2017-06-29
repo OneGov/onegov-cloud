@@ -195,6 +195,22 @@ def test_upload_vote_submit(election_day_app):
         assert import_.call_args[0][2] == 2
         assert import_.call_args[0][3] == True
 
+    # Wabsti municipalities
+    election_day_app.principal.domain = 'municipality'
+    with patch(
+        'onegov.election_day.views.upload.vote.import_vote_wabstim'
+    ) as import_:
+        import_.return_value = []
+
+        csv = 'csv'.encode('utf-8')
+        upload = client.get('/vote/vote/upload')
+        upload.form['file_format'] = 'wabsti_m'
+        upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
+        upload = upload.form.submit()
+
+        assert import_.called
+        assert import_.call_args[0][2] == True
+
 
 def test_upload_vote_invalidate_cache(election_day_app):
     client = Client(election_day_app)
@@ -291,7 +307,7 @@ def test_upload_vote_available_formats_municipality(election_day_app_bern):
 
     upload = client.get('/vote/vote/upload')
     assert sorted([o[0] for o in upload.form['file_format'].options]) == [
-        'default', 'internal'
+        'default', 'internal', 'wabsti_m'
     ]
 
     new = client.get('/manage/votes/new-vote')
@@ -302,7 +318,7 @@ def test_upload_vote_available_formats_municipality(election_day_app_bern):
 
     upload = client.get('/vote/vote/upload')
     assert sorted([o[0] for o in upload.form['file_format'].options]) == [
-        'default', 'internal'
+        'default', 'internal', 'wabsti_m'
     ]
 
     new = client.get('/manage/votes/new-vote')
@@ -313,7 +329,7 @@ def test_upload_vote_available_formats_municipality(election_day_app_bern):
 
     upload = client.get('/vote/vote/upload')
     assert sorted([o[0] for o in upload.form['file_format'].options]) == [
-        'default', 'internal'
+        'default', 'internal', 'wabsti_m'
     ]
 
 

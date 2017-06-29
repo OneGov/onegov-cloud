@@ -27,6 +27,8 @@ HEADERS = [
 def import_vote_internal(vote, entities, file, mimetype):
     """ Tries to import the given csv, xls or xlsx file.
 
+    This is the format used by onegov.ballot.Vote.export().
+
     :return:
         A list containing errors.
 

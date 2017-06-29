@@ -9,6 +9,7 @@ from onegov.election_day.formats import import_vote_default
 from onegov.election_day.formats import import_vote_internal
 from onegov.election_day.formats import import_vote_wabsti
 from onegov.election_day.formats import import_vote_wabstic
+from onegov.election_day.formats import import_vote_wabstim
 from onegov.election_day.formats.common import BALLOT_TYPES
 from onegov.election_day.forms import UploadVoteForm
 from onegov.election_day.layout import ManageVotesLayout
@@ -65,6 +66,14 @@ def view_upload(self, request, form):
                             form.sg_gemeinden.data['mimetype']
                         )
                     )
+            elif form.file_format.data == 'wabsti_m':
+                errors = import_vote_wabstim(
+                    self,
+                    entities,
+                    form.data['type'] == 'complex',
+                    form.proposal.raw_data[0].file,
+                    form.proposal.data['mimetype']
+                )
             elif form.file_format.data == 'default':
                 if form.data['type'] == 'simple':
                     ballot_types = ('proposal', )

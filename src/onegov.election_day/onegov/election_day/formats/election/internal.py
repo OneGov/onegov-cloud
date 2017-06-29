@@ -213,6 +213,8 @@ def parse_connection(line, errors):
 def import_election_internal(election, entities, file, mimetype):
     """ Tries to import the given file (internal format).
 
+    This is the format used by onegov.ballot.Election.export().
+
     :return:
         A list containing errors.
 

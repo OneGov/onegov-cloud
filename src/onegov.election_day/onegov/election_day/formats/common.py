@@ -36,7 +36,7 @@ class FileImportError(object):
 
 def load_csv(
     file, mimetype, expected_headers, filename=None, dialect=None,
-    encoding=None
+    encoding=None, rename_duplicate_column_names=False
 ):
     """ Loads the given file and returns it as CSV file.
 
@@ -89,8 +89,11 @@ def load_csv(
 
     try:
         csv = CSVFile(
-            csvfile, expected_headers=expected_headers, dialect=dialect,
-            encoding=encoding
+            csvfile,
+            expected_headers=expected_headers,
+            dialect=dialect,
+            encoding=encoding,
+            rename_duplicate_column_names=rename_duplicate_column_names
         )
         list(csv.lines)
     except MissingColumnsError as e:
