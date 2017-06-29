@@ -281,7 +281,7 @@ class MediaGenerator():
             pdf.h1(item.title_translations.get(locale) or item.title)
 
             # Add dates
-            changed = item.last_change
+            changed = item.last_result_change
             if getattr(changed, 'tzinfo', None) is not None:
                 tz = timezone('Europe/Zurich')
                 changed = tz.normalize(changed.astimezone(tz))

@@ -7,6 +7,9 @@ Changelog
 - Allows to upload UTF-16 wabsti files.
   [msom]
 
+- Fixes showing the wrong last change date.
+  [msom]
+
 - Updates translations.
   [msom]
 
