@@ -43,7 +43,7 @@ Specify the address of the running server in the YAML, e.g.::
 
     d3-renderer: 'http://localhost:1337'
 
-And generate the PDFs or SVGs using the CLI:
+And generate the PDFs or SVGs using the CLI::
 
     onegov-election-day --select /onegov_election_day/* generate-media
 
