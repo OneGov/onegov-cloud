@@ -6,17 +6,18 @@
 # - Width and height must be supplied for quicker rendering.
 # - The top parameter may be used to nudge up and down.
 
-- name: Concordia
-  link: https://www.concordia.ch/
-  logo: sponsors/concordia.png
+- name: CONCORDIA
+  logo_url: 'https://www.concordia.ch/de/microsites/feriennet.html?source=logo'
+  mail_url: 'https://www.concordia.ch/de/microsites/feriennet.html?source=mail'
+  logo: sponsors/concordia.svg
   background: '#fff'
   width: 200px
   height: 48px
   top: -5px
-  # banners:
-  #   bookings:
-  #     # the booking banner has the ratio 16:5 and is up large 670px wide, which
-  #     # leaves a height of 209px. as the viewport grows smaller, the ratio is
-  #     # kept while the banner shrinks
-  #     src: sponsors/concordia-bookings-banner.png
-  #     url: 'https://www.concordia.ch'
+  banners:
+    bookings:
+      # the booking banner has the ratio 16:5 and is up large 670px wide, which
+      # leaves a height of 210px. as the viewport grows smaller, the ratio is
+      # kept while the banner shrinks
+      src: sponsors/concordia-banner.jpg
+      url: 'https://www.concordia.ch/de/microsites/feriennet.html?source=banner'

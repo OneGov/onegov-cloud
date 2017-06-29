@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds CONCORDIA as a platform sponsor.
+  [href]
+
 1.2.0 (2017-06-26)
 ~~~~~~~~~~~~~~~~~~~
 

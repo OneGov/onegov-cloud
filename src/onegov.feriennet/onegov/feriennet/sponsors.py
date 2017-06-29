@@ -14,8 +14,8 @@ def load_sponsors(sponsors_path):
 class Sponsor(object):
 
     __slots__ = (
-        'name', 'logo', 'link', 'background', 'height', 'width', 'top',
-        'banners'
+        'name', 'logo', 'logo_url', 'mail_url', 'background', 'height',
+        'width', 'top', 'banners'
     )
 
     def __init__(self, **kwargs):

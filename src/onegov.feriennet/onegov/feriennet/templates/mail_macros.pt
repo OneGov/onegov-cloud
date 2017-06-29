@@ -7,19 +7,18 @@
 <body>
 
 <metal:reservations define-macro="email_signature" i18n:domain="onegov.feriennet">
-    <!--! <p>
+    <p>
         <hr />
     </p>
     <p style="text-align: center; margin-bottom: 0;">
         <span i18n:translate>Pro Juventute FERIENNET is supported by:</span>
         <span>
             <tal:b repeat="sponsor layout.app.sponsors">
-                <a href="${sponsor.link}">${sponsor.name}</a>
+                <a href="${sponsor.mail_url}">${sponsor.name}</a>
                 <tal:b condition="not repeat.sponsor.end">–</tal:b>
             </tal:b>
         </span>
     </p>
-    -->
 </metal:reservations>
 
 </body>
