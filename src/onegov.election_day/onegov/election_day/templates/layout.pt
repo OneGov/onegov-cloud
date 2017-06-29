@@ -24,7 +24,7 @@ metal:define-macro="layout">
     -->
     <link rel="stylesheet" type="text/css" href="${request.theme_link}">
     <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
-    <script tal:condition="layout.sentry_js" src="https://cdn.ravenjs.com/3.15.0/raven.min.js"></script>
+    <script tal:condition="layout.sentry_js" src="https://cdn.ravenjs.com/3.16.0/raven.min.js"></script>
     <script tal:condition="layout.sentry_js">Raven.config('${layout.sentry_js}').install()</script>
 </head>
 <body>
