@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.15.0 (2017-06-29)
+~~~~~~~~~~~~~~~~~~~
 
 - Supports wabsti files for municipalities (votes, majorz elections).
   [msom]
