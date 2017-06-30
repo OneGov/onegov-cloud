@@ -10,8 +10,8 @@ addons:
 env:
   - TOXENV=py34 DEPLOY=yes ES_VERSION=5.3.2
   - TOXENV=py35 DEPLOY=no ES_VERSION=5.3.2
-  - TOXENV=py34 DEPLOY=yes ES_VERSION=5.4.1
-  - TOXENV=py35 DEPLOY=no ES_VERSION=5.4.1
+  - TOXENV=py34 DEPLOY=yes ES_VERSION=5.4.3
+  - TOXENV=py35 DEPLOY=no ES_VERSION=5.4.3
   - TOXENV=pep8 DEPLOY=no
 
 install: ./.travis-install.sh
