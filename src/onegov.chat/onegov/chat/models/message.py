@@ -48,6 +48,10 @@ class Message(Base):
     #: because here we don't want it to be deferred
     modified = Column(UTCDateTime, onupdate=sedate.utcnow)
 
+    __mapper_args__ = {
+        'order_by': created
+    }
+
     def get(self, request):
         """ Code rendering a message should call this method to get the
         actual text of the message. It might be rendered from meta or it
