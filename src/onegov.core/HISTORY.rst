@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a datetime query argument converter.
+  [href]
+
 0.42.2 (2017-06-28)
 ~~~~~~~~~~~~~~~~~~~
 

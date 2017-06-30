@@ -1,8 +1,9 @@
 """ Contains custom converters used by onegov.town. """
 
+import isodate
 import morepath
 
-from datetime import date
+from datetime import date, datetime
 from onegov.core.framework import Framework
 from onegov.core.utils import is_uuid
 from time import mktime, strptime
@@ -75,3 +76,23 @@ bool_converter = morepath.Converter(
 @Framework.converter(type=bool)
 def get_default_bool_converter():
     return bool_converter
+
+
+def datetime_decode(s):
+    """ Decodes a datetime. """
+    return None if not s else isodate.parse_datetime(s)
+
+
+def datetime_encode(d):
+    """ Encodes a datetime. """
+    return isodate.datetime_isoformat(d) if d else ''
+
+
+datetime_converter = morepath.Converter(
+    decode=datetime_decode, encode=datetime_encode
+)
+
+
+@Framework.converter(type=datetime)
+def get_default_datetime_converter():
+    return datetime_converter
