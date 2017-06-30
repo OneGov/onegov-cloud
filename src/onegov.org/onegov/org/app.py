@@ -298,6 +298,11 @@ def get_editor_asset():
     yield 'editor.js'
 
 
+@OrgApp.webasset('timeline')
+def get_timeline_asset():
+    yield 'timeline.jsx'
+
+
 # do NOT minify the redactor, or the copyright notice goes away, which
 # is something we are not allowed to do per our license
 @OrgApp.webasset('redactor', filters={'js': None})

@@ -38,6 +38,7 @@ setup(
         'elasticsearch',
         'isodate',
         'lxml',
+        'onegov.chat',
         'onegov.core>=0.41.0',
         'onegov.event>=0.5.0',
         'onegov.file>=0.2.1',

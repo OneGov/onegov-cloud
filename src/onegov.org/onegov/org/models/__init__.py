@@ -17,6 +17,7 @@ from onegov.org.models.legacy_file import (
     LegacyFileCollection,
     LegacyImageCollection,
 )
+from onegov.org.models.message import TicketChangeMessage
 from onegov.org.models.organisation import Organisation
 from onegov.org.models.page import AtoZPages, News, Topic
 from onegov.org.models.page_move import PageMove
@@ -79,6 +80,7 @@ __all__ = [
     'ResourceRecipientCollection',
     'Search',
     'SiteCollection',
+    'TicketChangeMessage',
     'Topic',
     'TraitInfo',
     'VisibleOnHomepageExtension',

@@ -1540,3 +1540,16 @@ class PaymentCollectionLayout(DefaultLayout):
             )
 
         return links
+
+
+class MessageCollectionLayout(DefaultLayout):
+    def __init__(self, model, request):
+        super().__init__(model, request)
+        self.request.include('timeline')
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Activity Stream"), '#')
+        ]

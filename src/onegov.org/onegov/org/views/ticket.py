@@ -1,5 +1,6 @@
 import morepath
 
+from onegov.chat import MessageCollection
 from onegov.core.security import Public, Private
 from onegov.org.elements import Link
 from onegov.org.layout import DefaultLayout, TicketLayout, TicketsLayout
@@ -39,6 +40,31 @@ def view_ticket(self, request):
     }
 
 
+def send_email_if_not_self(ticket, request, template, subject):
+    email = ticket.snapshot.get('email') or ticket.handler.email
+
+    if email != request.current_username:
+        send_html_mail(
+            request=request,
+            template=template,
+            subject=subject,
+            receivers=(email, ),
+            content={
+                'model': ticket
+            }
+        )
+
+
+def note_change_in_chat(ticket, request, change):
+    MessageCollection(request.app.session(), type='ticket_change').add(
+        channel_id=ticket.number,
+        owner=request.current_username,
+        meta={
+            'change': change
+        }
+    )
+
+
 @OrgApp.view(model=Ticket, name='accept', permission=Private)
 def accept_ticket(self, request):
     user = UserCollection(request.app.session()).by_username(
@@ -49,6 +75,7 @@ def accept_ticket(self, request):
     except InvalidStateChange:
         request.alert(_("The ticket cannot be accepted because it's not open"))
     else:
+        note_change_in_chat(self, request, 'accepted')
         request.success(_("You have accepted ticket ${number}", mapping={
             'number': self.number
         }))
@@ -66,21 +93,16 @@ def close_ticket(self, request):
             _("The ticket cannot be closed because it's not pending")
         )
     else:
+        note_change_in_chat(self, request, 'closed')
         request.success(_("You have closed ticket ${number}", mapping={
             'number': self.number
         }))
 
-    email = self.snapshot.get('email') or self.handler.email
-
-    if email != request.current_username:
-        send_html_mail(
+        send_email_if_not_self(
+            ticket=self,
             request=request,
             template='mail_ticket_closed.pt',
-            subject=_("Your ticket has been closed"),
-            receivers=(email, ),
-            content={
-                'model': self
-            }
+            subject=_("Your ticket has been closed")
         )
 
     return morepath.redirect(
@@ -99,21 +121,16 @@ def reopen_ticket(self, request):
             _("The ticket cannot be re-opened because it's not closed")
         )
     else:
+        note_change_in_chat(self, request, 'reopened')
         request.success(_("You have reopened ticket ${number}", mapping={
             'number': self.number
         }))
 
-    email = self.snapshot.get('email') or self.handler.email
-
-    if email != request.current_username:
-        send_html_mail(
+        send_email_if_not_self(
+            ticket=self,
             request=request,
             template='mail_ticket_reopened.pt',
-            subject=_("Your ticket has been reopened"),
-            receivers=(email, ),
-            content={
-                'model': self
-            }
+            subject=_("Your ticket has been repoened")
         )
 
     return morepath.redirect(request.link(self))
