@@ -4,7 +4,7 @@ import textwrap
 
 from click.testing import CliRunner
 from onegov.core.cli import cli
-from onegov.core.upgrade import get_tasks, upgrade_task
+from onegov.core.upgrade import get_tasks, upgrade_task, get_module_order_key
 from unittest.mock import patch
 
 
@@ -206,3 +206,16 @@ def test_upgrade_cli(postgres_dsn, session_manager, temporary_directory):
             assert 'Running upgrade for foo/fah' in output[2]
             assert 'no pending upgrade tasks found' in output[3]
             assert result.exit_code == 0
+
+
+def test_get_module_order_key():
+    order_key = get_module_order_key({
+        'click.test': None,
+        'onegov.core:test': None,
+        'sqlalchemy:test': None
+    })
+
+    ids = ['sqlalchemy:test', 'onegov.core:test', 'click:test']
+    ids.sort(key=order_key)
+
+    assert ids == ['click:test', 'sqlalchemy:test', 'onegov.core:test']

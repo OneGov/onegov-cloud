@@ -1,6 +1,15 @@
 Changelog
 ---------
 
+- Orders independent upgrade tasks by their module dependencies.
+
+  This acts as a sane default for module upgrades. For example, if
+  onegov.ticket depends on onegov.user, all user tasks will be executed first.
+  Once the ticket tasks are run, the user tables are therefore up to date.
+
+  This change only affects the order of tasks which do not define no
+  explicit dependencies.
+
 - Adds a datetime query argument converter.
   [href]
 

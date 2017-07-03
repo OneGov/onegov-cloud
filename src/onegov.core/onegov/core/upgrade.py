@@ -1,5 +1,4 @@
 import importlib
-import networkx as nx
 import pkg_resources
 import transaction
 
@@ -11,6 +10,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON
 from sqlalchemy import Column, Text
 from sqlalchemy.engine.reflection import Inspector
+from toposort import toposort, toposort_flatten
 
 
 class UpgradeState(Base, TimestampMixin):
@@ -181,6 +181,42 @@ def get_tasks_by_id(upgrade_modules=None):
     return tasks
 
 
+def get_module_order_key(tasks):
+    """ Returns a sort order key which orders task_ids in order of their
+    module dependencies. That is a task from onegov.core is sorted before
+    a task in onegov.user, because onegov.user depends on onegov.core.
+
+    This is used to order unrelated tasks in a sane way.
+
+    """
+    modules = set()
+
+    for task in tasks:
+        modules.add(task.split(':')[0])
+
+    graph = {}
+    packages = pkg_resources.working_set
+
+    for module in modules:
+        if module not in graph:
+            graph[module] = set()
+
+        if module in packages.by_key:
+            for dependency in packages.by_key[module].requires():
+                if hasattr(dependency, 'name'):
+                    graph[module].add(dependency.name)
+
+    sorted_modules = {
+        task_id: ix for ix, task_id in enumerate(toposort_flatten(graph))
+    }
+
+    def sortkey(task_id):
+        module, name = task_id.split(':', 1)
+        return (sorted_modules[module], task_id)
+
+    return sortkey
+
+
 def get_tasks(upgrade_modules=None):
     """ Takes a list of upgrade modules or classes and returns the
     tasks that should be run in the order they should be run.
@@ -190,26 +226,22 @@ def get_tasks(upgrade_modules=None):
     """
 
     tasks = get_tasks_by_id(upgrade_modules or get_upgrade_modules())
-    ordered_tasks = []
-    roots = set()
-    graph = nx.DiGraph()
+    graph = {}
 
     for task_id, task in tasks.items():
-        if task.requires is None:
-            roots.add(task_id)
-        else:
-            graph.add_edge(task.requires, task_id)
+        if task_id not in graph:
+            graph[task_id] = set()
 
-    for task_id in sorted(roots):
-        ordered_tasks.append((task_id, tasks[task_id]))
+        if task.requires is not None:
+            graph[task_id].add(task.requires)
 
-        try:
-            for _, task_id in nx.dfs_edges(graph, task_id):
-                ordered_tasks.append((task_id, tasks[task_id]))
-        except KeyError:
-            pass
+    sorted_tasks = []
+    order_key = get_module_order_key(tasks)
 
-    return ordered_tasks
+    for task_ids in toposort(graph):
+        sorted_tasks.extend(sorted(task_ids, key=order_key))
+
+    return [(task_id, tasks[task_id]) for task_id in sorted_tasks]
 
 
 def register_modules(session, modules, tasks):
