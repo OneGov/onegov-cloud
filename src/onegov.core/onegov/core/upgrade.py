@@ -203,8 +203,7 @@ def get_module_order_key(tasks):
 
         if module in packages.by_key:
             for dependency in packages.by_key[module].requires():
-                if hasattr(dependency, 'name'):
-                    graph[module].add(dependency.name)
+                graph[module].add(dependency.key)
 
     sorted_modules = {
         task_id: ix for ix, task_id in enumerate(toposort_flatten(graph))
@@ -212,7 +211,7 @@ def get_module_order_key(tasks):
 
     def sortkey(task_id):
         module, name = task_id.split(':', 1)
-        return (sorted_modules[module], task_id)
+        return sorted_modules.get(module, float('inf')), task_id
 
     return sortkey
 

@@ -212,10 +212,23 @@ def test_get_module_order_key():
     order_key = get_module_order_key({
         'click.test': None,
         'onegov.core:test': None,
-        'sqlalchemy:test': None
+        'sqlalchemy:test': None,
+        'missing_module:test': None
     })
 
-    ids = ['sqlalchemy:test', 'onegov.core:test', 'click:test']
+    ids = [
+        'missing_module:test',
+        'sqlalchemy:test',
+        'onegov.core:test',
+        'click:test'
+    ]
     ids.sort(key=order_key)
 
-    assert ids == ['click:test', 'sqlalchemy:test', 'onegov.core:test']
+    assert ids == [
+        # sorted a-z
+        'click:test',
+        'missing_module:test',
+        'sqlalchemy:test',
+        # sorted after its dependencies
+        'onegov.core:test',
+    ]
