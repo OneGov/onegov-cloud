@@ -1,25 +1,47 @@
-from onegov.chat import Message
-from onegov.org import _
+from onegov.chat import Message, MessageCollection
+from onegov.core.templates import render_macro
+from onegov.core.layout import ChameleonLayout
+from onegov.ticket import Ticket
 
 
-class TicketChangeMessage(Message):
+class MacroRenderedMessage(Message):
+
+    def get(self, request):
+        layout = ChameleonLayout(self, request)
+        return render_macro(
+            macro=layout.macros['message_{}'.format(self.type)],
+            request=request,
+            content={
+                'layout': layout,
+                'model': self
+            }
+        )
+
+
+class TicketChangeMessage(MacroRenderedMessage):
 
     __mapper_args__ = {
         'polymorphic_identity': 'ticket_change'
     }
 
-    def get(self, request):
-        if self.meta['change'] == 'accepted':
-            return request.translate(_("${ticket} was accepted", mapping={
-                'ticket': self.channel_id
-            }))
-        elif self.meta['change'] == 'closed':
-            return request.translate(_("${ticket} was closed", mapping={
-                'ticket': self.channel_id
-            }))
-        elif self.meta['change'] == 'reopened':
-            return request.translate(_("${ticket} was reopened", mapping={
-                'ticket': self.channel_id
-            }))
-        else:
-            raise NotImplementedError
+    @classmethod
+    def create(cls, ticket, request, change):
+        messages = MessageCollection(
+            request.app.session(), type='ticket_change')
+
+        return messages.add(
+            channel_id=ticket.number,
+            owner=request.current_username,
+            meta={
+                'id': ticket.id.hex,
+                'handler_code': ticket.handler_code,
+                'change': change,
+                'group': ticket.group
+            }
+        )
+
+    def link(self, request):
+        return request.class_link(Ticket, {
+            'id': self.meta['id'],
+            'handler_code': self.meta['handler_code'],
+        })

@@ -1,6 +1,6 @@
 """ Contains the paths to the different models served by onegov.org. """
 
-from datetime import date, datetime
+from datetime import date
 from onegov.chat import MessageCollection
 from onegov.core.converters import extended_date_converter
 from onegov.event import (
@@ -427,8 +427,7 @@ def get_payments(app, source='*', page=0):
 
 @OrgApp.path(
     model=MessageCollection,
-    path='/timeline',
-    converters=dict(newer_than=datetime, older_than=datetime))
+    path='/timeline')
 def get_messages(app, channel_id='*', type='*',
                  newer_than=None, older_than=None, limit=25):
     return MessageCollection(

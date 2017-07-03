@@ -12,15 +12,19 @@ from sqlalchemy import inspect
 def view_messages_feed(self, request):
     mapper = inspect(Message).polymorphic_map
 
+    def cast(message):
+        message.__class__ = mapper[message.type].class_
+        return message
+
     return {
         'messages': [
             {
-                'id': m.id.hex,
+                'id': m.id,
                 'channel_id': m.channel_id,
                 'owner': m.owner,
                 'type': m.type,
-                'text': mapper[m.type].class_.get(m, request),
-                'created': isodate.datetime_isoformat(m.created)
+                'html': cast(m).get(request),
+                'created': isodate.datetime_isoformat(m.created),
             } for m in self.query()
         ]
     }

@@ -1551,5 +1551,5 @@ class MessageCollectionLayout(DefaultLayout):
     def breadcrumbs(self):
         return [
             Link(_("Homepage"), self.homepage_url),
-            Link(_("Activity Stream"), '#')
+            Link(_("Timeline"), '#')
         ]

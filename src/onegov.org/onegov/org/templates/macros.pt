@@ -963,3 +963,20 @@
         </li>
     </ul>
 </metal:tags>
+
+<metal:block define-macro="message_ticket_change" i18n:domain="onegov.org">
+    <a href="${model.link(request)}">${model.channel_id}</a>
+    <tal:b switch="model.meta.change">
+        <tal:b case="'accepted'" i18n:translate>
+            was accepted.
+        </tal:b>
+        <tal:b case="'closed'" i18n:translate>
+            was closed.
+        </tal:b>
+        <tal:b case="'reopened'" i18n:translate>
+            was reopened.
+        </tal:b>
+    </tal:b>
+
+    <div>${model.meta.group}</div>
+</metal:block>

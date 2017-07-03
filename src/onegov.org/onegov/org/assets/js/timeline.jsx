@@ -14,13 +14,13 @@ var TimelineMessages = React.createClass({
     },
     render: function() {
         var messages = this.state.messages;
-
         return (
             <ul>
                 {messages.map(function(m) {
+                    /* eslint-disable react/no-danger */
                     return (
                         <li key={m.id} className={'message message-' + m.type}>
-                            {m.text}
+                            <div dangerouslySetInnerHTML={{__html: m.html}} />
                         </li>
                     );
                 })}
@@ -33,7 +33,7 @@ var TimelineMessages = React.createClass({
         var messages = this.state.messages;
 
         if (messages.length > 0) {
-            feed.query.newer_than = messages[messages.length - 1].created;
+            feed.query.newer_than = messages[messages.length - 1].id;
         }
 
         $.getJSON(feed.toString(), function(data) {

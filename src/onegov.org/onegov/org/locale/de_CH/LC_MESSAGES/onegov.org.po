@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-06-28 12:04+0200\n"
+"POT-Creation-Date: 2017-07-03 16:53+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -144,6 +144,9 @@ msgstr "Exporte"
 
 msgid "Payment Providers"
 msgstr "Zahlungsanbieter"
+
+msgid "Timeline"
+msgstr "Timeline"
 
 msgid "Delete"
 msgstr "Löschen"
@@ -1319,6 +1322,15 @@ msgstr "Kreditkarten-Gebühr"
 msgid "Pay Offline later"
 msgstr "Später bezahlen"
 
+msgid "was accepted."
+msgstr "wurde akzeptiert."
+
+msgid "was closed."
+msgstr "wurde geschlossen."
+
+msgid "was reopened."
+msgstr "wurde wieder geöffnet."
+
 msgid "Dear Sir or Madam,"
 msgstr "Guten Tag"
 
@@ -2165,6 +2177,9 @@ msgstr ""
 msgid "The ticket cannot be re-opened because it's not closed"
 msgstr ""
 "Das Ticket kann nicht wieder geöffnet werden da es nicht geschlossen ist"
+
+msgid "Your ticket has been repoened"
+msgstr "Das Ticket wurde wieder geöffnet"
 
 msgid "Your request has been processed"
 msgstr "Ihr Anliegen wurde abgeschlossen"

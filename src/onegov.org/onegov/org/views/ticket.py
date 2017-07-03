@@ -1,14 +1,14 @@
 import morepath
 
-from onegov.chat import MessageCollection
 from onegov.core.security import Public, Private
+from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.layout import DefaultLayout, TicketLayout, TicketsLayout
-from onegov.ticket import Ticket, TicketCollection
-from onegov.ticket import handlers as ticket_handlers
-from onegov.ticket.errors import InvalidStateChange
-from onegov.org import _, OrgApp
 from onegov.org.mail import send_html_mail
+from onegov.org.models import TicketChangeMessage
+from onegov.ticket import handlers as ticket_handlers
+from onegov.ticket import Ticket, TicketCollection
+from onegov.ticket.errors import InvalidStateChange
 from onegov.user import User, UserCollection
 
 
@@ -55,16 +55,6 @@ def send_email_if_not_self(ticket, request, template, subject):
         )
 
 
-def note_change_in_chat(ticket, request, change):
-    MessageCollection(request.app.session(), type='ticket_change').add(
-        channel_id=ticket.number,
-        owner=request.current_username,
-        meta={
-            'change': change
-        }
-    )
-
-
 @OrgApp.view(model=Ticket, name='accept', permission=Private)
 def accept_ticket(self, request):
     user = UserCollection(request.app.session()).by_username(
@@ -75,7 +65,7 @@ def accept_ticket(self, request):
     except InvalidStateChange:
         request.alert(_("The ticket cannot be accepted because it's not open"))
     else:
-        note_change_in_chat(self, request, 'accepted')
+        TicketChangeMessage.create(self, request, 'accepted')
         request.success(_("You have accepted ticket ${number}", mapping={
             'number': self.number
         }))
@@ -93,7 +83,7 @@ def close_ticket(self, request):
             _("The ticket cannot be closed because it's not pending")
         )
     else:
-        note_change_in_chat(self, request, 'closed')
+        TicketChangeMessage.create(self, request, 'closed')
         request.success(_("You have closed ticket ${number}", mapping={
             'number': self.number
         }))
@@ -121,7 +111,7 @@ def reopen_ticket(self, request):
             _("The ticket cannot be re-opened because it's not closed")
         )
     else:
-        note_change_in_chat(self, request, 'reopened')
+        TicketChangeMessage.create(self, request, 'reopened')
         request.success(_("You have reopened ticket ${number}", mapping={
             'number': self.number
         }))
