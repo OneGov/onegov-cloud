@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.15.1 (2017-07-03)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes archived results reporting wrong schema.
   [msom]
