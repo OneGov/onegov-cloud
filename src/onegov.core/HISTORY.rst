@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.43.0 (2017-07-03)
+~~~~~~~~~~~~~~~~~~~
 
 - Orders independent upgrade tasks by their module dependencies.
 
