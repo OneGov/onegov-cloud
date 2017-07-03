@@ -1,10 +1,10 @@
 import sedate
 
 from onegov.core.orm import Base
-from onegov.core.orm.types import JSON, UTCDateTime, UUID
+from onegov.core.orm.types import JSON, UTCDateTime
 from sqlalchemy import Column, Text
 from sqlalchemy.ext.hybrid import hybrid_property
-from uuid import uuid4
+from ulid import ulid
 
 
 class Message(Base):
@@ -12,8 +12,8 @@ class Message(Base):
 
     __tablename__ = 'messages'
 
-    #: the public id of the message
-    id = Column(UUID, primary_key=True, default=uuid4)
+    #: the public id of the message - uses ulid for absolute ordering
+    id = Column(Text, primary_key=True, default=ulid)
 
     #: channel to which this message belongs -> this might one day be
     #: linked to an actual channel record - for now it's just a string that
@@ -49,7 +49,7 @@ class Message(Base):
     modified = Column(UTCDateTime, onupdate=sedate.utcnow)
 
     __mapper_args__ = {
-        'order_by': created
+        'order_by': id
     }
 
     def get(self, request):

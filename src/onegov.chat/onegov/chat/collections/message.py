@@ -32,10 +32,10 @@ class MessageCollection(GenericCollection):
             q = q.filter_by(channel_id=self.channel_id)
 
         if self.newer_than is not None:
-            q = q.filter(self.newer_than < self.model_class.created)
+            q = q.filter(self.model_class.id > self.newer_than)
 
         if self.older_than is not None:
-            q = q.filter(self.model_class.created < self.older_than)
+            q = q.filter(self.model_class.id < self.older_than)
 
         if self.limit is not None:
             q = q.limit(self.limit)
