@@ -21,6 +21,7 @@ class DummyApp(object):
         self._session = session
         self.application_id = application_id
         self.principal = DummyPrincipal()
+        self.schema = 'onegov_election_day-{}'.format(self.principal.name)
 
     def session(self):
         return self._session

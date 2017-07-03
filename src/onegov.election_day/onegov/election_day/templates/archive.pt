@@ -40,7 +40,7 @@
                             </thead>
                             <tbody>
                                 <tr tal:repeat="election archive_items[date][domain][type]">
-                                    <td tal:define="prefix election.title_prefix">
+                                    <td tal:define="prefix election.title_prefix(request)">
                                         <a href="${election.url}"><span tal:condition="prefix">${prefix}: </span>${election.title}</a>
                                     </td>
                                     <td class="right-aligned" tal:condition="not: communal_instance">
@@ -66,7 +66,7 @@
                             </thead>
                             <tbody>
                                 <tr tal:repeat="vote archive_items[date][domain][type]">
-                                    <td tal:define="prefix vote.title_prefix">
+                                    <td tal:define="prefix vote.title_prefix(request)">
                                         <a href="${vote.url}"><span tal:condition="prefix">${prefix}: </span>${vote.title}</a>
                                     </td>
                                     <td>

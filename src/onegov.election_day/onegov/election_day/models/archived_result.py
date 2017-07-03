@@ -56,9 +56,8 @@ class ArchivedResult(Base, DomainOfInfluenceMixin, MetaMixin, TimestampMixin):
     title_translations = Column(HSTORE, nullable=False)
     title = translation_hybrid(title_translations)
 
-    @property
-    def title_prefix(self):
-        if self.is_fetched and self.domain == 'municipality':
+    def title_prefix(self, request):
+        if self.is_fetched(request) and self.domain == 'municipality':
             return self.name
 
         return ''
@@ -66,13 +65,12 @@ class ArchivedResult(Base, DomainOfInfluenceMixin, MetaMixin, TimestampMixin):
     #: Shortcode for cantons that use it
     shortcode = Column(Text, nullable=True)
 
-    @property
-    def is_fetched(self):
+    def is_fetched(self, request):
         """ Returns True, if this results has been fetched from another
         instance.
 
         """
-        return self.schema != self.session_manager.current_schema
+        return self.schema != request.app.schema
 
     def is_fetched_by_municipality(self, request):
         """ Returns True, if this results has been fetched from another
@@ -80,7 +78,8 @@ class ArchivedResult(Base, DomainOfInfluenceMixin, MetaMixin, TimestampMixin):
 
         """
         return (
-            self.is_fetched and request.app.principal.domain == 'municipality'
+            self.is_fetched(request) and
+            request.app.principal.domain == 'municipality'
         )
 
     def ensure_meta(self):

@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes archived results reporting wrong schema.
+  [msom]
+
 1.15.0 (2017-06-29)
 ~~~~~~~~~~~~~~~~~~~
 

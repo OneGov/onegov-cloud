@@ -368,10 +368,10 @@ def test_archived_result(session):
     assert result.title_translations == {'en': 'title', 'de_CH': 'title'}
 
     assert result.name == 'name'
-    assert result.title_prefix == ''
+    assert result.title_prefix(request) == ''
 
     result.domain = 'municipality'
-    assert result.title_prefix == result.name
+    assert result.title_prefix(request) == result.name
 
     result.shortcode = 'shortcode'
 
