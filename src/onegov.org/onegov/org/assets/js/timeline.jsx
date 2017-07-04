@@ -23,6 +23,7 @@ var TimelineMessages = React.createClass({
                             <div dangerouslySetInnerHTML={{__html: m.html}} />
                         </li>
                     );
+                    /* eslint-enable react/no-danger */
                 })}
             </ul>
         );
