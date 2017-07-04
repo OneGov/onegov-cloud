@@ -12,9 +12,10 @@ from onegov.form import (
     PendingFormSubmission,
     CompleteFormSubmission
 )
-from onegov.org.layout import FormSubmissionLayout
 from onegov.org import _, OrgApp
+from onegov.org.layout import FormSubmissionLayout
 from onegov.org.mail import send_html_mail
+from onegov.org.models import TicketChangeMessage
 from purl import URL
 
 
@@ -174,6 +175,7 @@ def handle_complete_submission(self, request):
                 ticket = TicketCollection(request.app.session()).open_ticket(
                     handler_code='FRM', handler_id=self.id.hex
                 )
+                TicketChangeMessage.create(ticket, request, 'opened')
 
             if self.email != request.current_username:
                 send_html_mail(

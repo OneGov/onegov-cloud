@@ -9,6 +9,7 @@ from onegov.org.elements import Link
 from onegov.org.forms import EventForm
 from onegov.org.layout import EventLayout
 from onegov.org.mail import send_html_mail
+from onegov.org.models import TicketChangeMessage
 from onegov.ticket import TicketCollection
 from sedate import utcnow
 from uuid import uuid4
@@ -155,6 +156,7 @@ def view_event(self, request):
             ticket = TicketCollection(session).open_ticket(
                 handler_code='EVN', handler_id=self.id.hex
             )
+            TicketChangeMessage.create(ticket, request, 'opened')
 
         if self.meta['submitter_email'] != request.current_username:
             send_html_mail(

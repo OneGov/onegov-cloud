@@ -7,14 +7,15 @@ from datetime import time
 from libres.modules.errors import LibresError
 from onegov.core.security import Public, Private
 from onegov.form import FormCollection, merge_forms
-from onegov.reservation import Allocation, Reservation, Resource
+from onegov.org import _, OrgApp
 from onegov.org import utils
 from onegov.org.elements import Link
 from onegov.org.forms import ReservationForm
 from onegov.org.layout import ReservationLayout
-from onegov.ticket import TicketCollection
-from onegov.org import _, OrgApp
 from onegov.org.mail import send_html_mail
+from onegov.org.models import TicketChangeMessage
+from onegov.reservation import Allocation, Reservation, Resource
+from onegov.ticket import TicketCollection
 from purl import URL
 from sqlalchemy.orm.attributes import flag_modified
 from webob import exc
@@ -336,6 +337,7 @@ def finalize_reservation(self, request):
             ticket = TicketCollection(request.app.session()).open_ticket(
                 handler_code='RSV', handler_id=token
             )
+            TicketChangeMessage.create(ticket, request, 'opened')
 
         if reservations[0].email != request.current_username:
             send_html_mail(

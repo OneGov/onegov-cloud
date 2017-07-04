@@ -44,13 +44,19 @@ def view_messages_feed(self, request):
             for username in usernames
             if username not in owners
         })
+    else:
+        owners = {}
 
     return {
         'messages': [
             {
                 'id': m.id,
                 'type': m.type,
-                'html': m.get(request, owner=owners[m.owner], layout=layout),
+                'html': m.get(
+                    request,
+                    owner=owners.get(m.owner),
+                    layout=layout
+                ),
             } for m in messages
         ]
     }

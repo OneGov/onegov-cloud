@@ -30,7 +30,7 @@ class TicketChangeMessage(MacroRenderedMessage):
 
         return messages.add(
             channel_id=ticket.number,
-            owner=request.current_username,
+            owner=request.current_username or ticket.ticket_email,
             meta={
                 'id': ticket.id.hex,
                 'handler_code': ticket.handler_code,
