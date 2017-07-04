@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.13.2 (2017-07-04)
+~~~~~~~~~~~~~~~~~~~
 
 - Refactor the initials method to be useful from outside.
   [href]
