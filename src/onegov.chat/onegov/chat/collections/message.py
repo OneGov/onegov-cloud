@@ -1,5 +1,6 @@
 from onegov.chat.models import Message
 from onegov.core.collection import GenericCollection
+from sqlalchemy import desc
 
 
 class MessageCollection(GenericCollection):
@@ -41,3 +42,12 @@ class MessageCollection(GenericCollection):
             q = q.limit(self.limit)
 
         return q
+
+    def latest_message(self, offset=0):
+        q = self.session.query(self.model_class)
+        q = q.order_by(desc(self.model_class.id))
+
+        if offset:
+            q = q.offset(min(offset, q.count() - 1))
+
+        return q.first()
