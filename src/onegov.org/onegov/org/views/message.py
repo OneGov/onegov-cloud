@@ -1,31 +1,55 @@
-import isodate
-
+from collections import namedtuple
 from onegov.chat import Message
 from onegov.chat import MessageCollection
 from onegov.core.security import Private
 from onegov.org import OrgApp, _
 from onegov.org.layout import MessageCollectionLayout
+from onegov.user import User
 from sqlalchemy import inspect
+
+
+class Owner(namedtuple('OwnerBase', ('username', 'realname'))):
+
+    @property
+    def initials(self):
+        return User.get_initials(self.username, self.realname)
+
+    @property
+    def name(self):
+        return self.realname or self.username
 
 
 @OrgApp.json(model=MessageCollection, permission=Private, name='feed')
 def view_messages_feed(self, request):
     mapper = inspect(Message).polymorphic_map
+    layout = MessageCollectionLayout(self, request)
 
     def cast(message):
         message.__class__ = mapper[message.type].class_
         return message
 
+    messages = tuple(cast(m) for m in self.query())
+    usernames = {m.owner for m in messages if m.owner}
+
+    if usernames:
+        q = request.app.session().query(User)
+        q = q.with_entities(User.username, User.realname)
+        q = q.filter(User.username.in_(usernames))
+
+        owners = {u.username: Owner(u.username, u.realname) for u in q}
+        owners.update({
+            username: Owner(username, None)
+            for username in usernames
+            if username not in owners
+        })
+
     return {
         'messages': [
             {
                 'id': m.id,
-                'channel_id': m.channel_id,
-                'owner': m.owner,
                 'type': m.type,
-                'html': cast(m).get(request),
-                'created': isodate.datetime_isoformat(m.created),
-            } for m in self.query()
+                'html': m.get(request, owner=owners[m.owner], layout=layout),
+            } for m in messages
         ]
     }
 

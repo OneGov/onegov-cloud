@@ -1,19 +1,18 @@
 from onegov.chat import Message, MessageCollection
 from onegov.core.templates import render_macro
-from onegov.core.layout import ChameleonLayout
 from onegov.ticket import Ticket
 
 
 class MacroRenderedMessage(Message):
 
-    def get(self, request):
-        layout = ChameleonLayout(self, request)
+    def get(self, request, owner, layout):
         return render_macro(
             macro=layout.macros['message_{}'.format(self.type)],
             request=request,
             content={
                 'layout': layout,
-                'model': self
+                'model': self,
+                'owner': owner
             }
         )
 
