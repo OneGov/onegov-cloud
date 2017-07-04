@@ -10,8 +10,16 @@ var CSSTransitionGroup = React.addons.CSSTransitionGroup;
 
 var TimelineMessages = React.createClass({
     getInitialState: function() {
+        var messages = this.props.messages || [];
+
+        // when getting the messages from the feed we add them at the top of
+        // the messages list - to be consistent we make sure to accept messages
+        // in the same order through the props - as they are ordered old -> new
+        // we need to reverse here
+        messages.reverse();
+
         return {
-            'messages': []
+            'messages': this.props.messages || []
         };
     },
     render: function() {
@@ -20,6 +28,8 @@ var TimelineMessages = React.createClass({
             <CSSTransitionGroup
                 component="ul"
                 className="messages"
+                transitionAppear={false}
+                transitionLeave={false}
                 transitionName="messages"
                 transitionEnterTimeout={500}
                 transitionLeaveTimeout={300}
@@ -67,15 +77,15 @@ var TimelineMessages = React.createClass({
 
 var Timeline = function(container) {
     var feed = container.data('feed');
+    var messages = container.data('initial-data').messages || [];
     var poll_interval = parseInt(container.data('poll-interval'), 10);
     var el = $('<div>');
 
     container.empty();
     container.append(el);
     container.timeline = ReactDOM.render(
-        <TimelineMessages feed={feed} />, el.get(0)
+        <TimelineMessages feed={feed} messages={messages} />, el.get(0)
     );
-    container.timeline.update();
 
     setInterval(container.timeline.update, poll_interval * 1000);
 };

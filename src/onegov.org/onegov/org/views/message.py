@@ -1,3 +1,5 @@
+import json
+
 from collections import namedtuple
 from onegov.chat import Message
 from onegov.chat import MessageCollection
@@ -61,9 +63,15 @@ def view_messages_feed(self, request):
 )
 def view_messages(self, request):
 
+    # The initial load contains only the 25 latest message (the feed will
+    # return the 25 oldest messages by default)
+    if not self.newer_than:
+        self.newer_than = self.latest_message(offset=25).id
+
     return {
         'layout': MessageCollectionLayout(self, request),
         'title': _("Timeline"),
         'feed': request.link(self, 'feed'),
+        'initial_data': json.dumps(view_messages_feed(self, request)),
         'poll_interval': 5
     }

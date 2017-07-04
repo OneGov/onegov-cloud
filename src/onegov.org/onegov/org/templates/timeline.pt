@@ -3,6 +3,10 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
-        <div class="timeline" data-feed="${feed}" data-poll-interval="${poll_interval}" />
+        <div class="timeline"
+            data-feed="${feed}"
+            data-initial-data="${initial_data}"
+            data-poll-interval="${poll_interval}"
+        />
     </tal:block>
 </div>
