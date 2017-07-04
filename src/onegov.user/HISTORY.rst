@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Refactor the initials method to be useful from outside.
+  [href]
+
 0.13.1 (2017-06-28)
 ~~~~~~~~~~~~~~~~~~~
 

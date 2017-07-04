@@ -122,8 +122,8 @@ class User(Base, TimestampMixin, ORMSearchable):
         """
         return verify_password(password, self.password_hash)
 
-    @property
-    def initials(self):
+    @classmethod
+    def get_initials(cls, username, realname=None):
         """ Takes the name and returns initials which are at most two
         characters wide.
 
@@ -139,20 +139,24 @@ class User(Base, TimestampMixin, ORMSearchable):
         # for e-mail addresses assume the dot splits the name and use
         # the first two parts of said split (probably won't have a middle
         # name in the e-mail address)
-        if not self.realname:
-            username = self.username.split('@')[0]
+        if not realname:
+            username = username.split('@')[0]
             parts = username.split('.')[:2]
 
         # for real names split by space and assume that with more than one
         # part that the first and last part are the most important to get rid
         # of middlenames
         else:
-            parts = remove_repeated_spaces(self.realname).split(' ')
+            parts = remove_repeated_spaces(realname).split(' ')
 
             if len(parts) > 2:
                 parts = (parts[0], parts[-1])
 
         return ''.join(p[0] for p in parts).upper()
+
+    @property
+    def initials(self):
+        return self.get_initials(self.username, self.realname)
 
     @property
     def has_yubikey(self):
