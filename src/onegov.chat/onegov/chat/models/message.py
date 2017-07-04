@@ -3,6 +3,7 @@ import sedate
 from onegov.core.orm import Base
 from onegov.core.orm.types import JSON, UTCDateTime
 from sqlalchemy import Column, Text
+from sqlalchemy import event
 from sqlalchemy.ext.hybrid import hybrid_property
 from ulid import ulid
 
@@ -66,3 +67,15 @@ class Message(Base):
     def edited(self):
         # use != instead of "is not" as we want this translated into SQL
         return self.modified != None
+
+
+@event.listens_for(Message, 'init')
+def init(target, args, kwargs):
+    """ Ensures that the message id is created upon instantiation. This helps
+    to ensure that each message is ordered according to it's creation.
+
+    Note that messages created within a millisecond of each other are ordered
+    randomly.
+
+    """
+    target.id = ulid()
