@@ -20,6 +20,7 @@ from onegov.feriennet.layout import VacationActivityFormLayout
 from onegov.feriennet.layout import VacationActivityLayout
 from onegov.feriennet.models import VacationActivity
 from onegov.org.mail import send_html_mail
+from onegov.org.models import TicketChangeMessage
 from onegov.org.new_elements import Link, Confirm, Intercooler
 from onegov.ticket import TicketCollection
 from sqlalchemy import desc
@@ -451,6 +452,7 @@ def propose_activity(self, request):
         ticket = TicketCollection(session).open_ticket(
             handler_code='FER', handler_id=publication_request.id.hex
         )
+        TicketChangeMessage.create(ticket, request, 'opened')
 
     if request.is_organiser_only or request.current_username != self.username:
         send_html_mail(
