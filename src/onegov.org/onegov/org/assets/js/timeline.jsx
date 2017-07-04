@@ -33,7 +33,7 @@ var TimelineMessages = React.createClass({
         var messages = this.state.messages;
 
         if (messages.length > 0) {
-            feed.query.newer_than = messages[messages.length - 1].id;
+            feed.query.newer_than = messages[0].id;
         }
 
         $.getJSON(feed.toString(), function(data) {
