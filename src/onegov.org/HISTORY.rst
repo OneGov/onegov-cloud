@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- No longer requires a reply-to address to send e-mails (though one still needs
+  to enter one to save the org settings.)
+  [href]
+
 0.13.0 (2017-06-28)
 ~~~~~~~~~~~~~~~~~~~
 
