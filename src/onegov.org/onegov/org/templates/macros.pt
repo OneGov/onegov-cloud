@@ -964,22 +964,24 @@
     </ul>
 </metal:tags>
 
-<metal:generic_message define-macro="generic_message">
+<metal:generic_message define-macro="generic_message" i18n:domain="onegov.org">
     <div class="title">
         <metal:b define-slot="title" />
     </div>
     <div class="identicon">
-        <tal:b condition="owner">
-            <metal:b use-macro="layout.macros.identicon"
-                     tal:define="
-                        initials owner.initials;
-                        username owner.username;
-                        size 'large';
-                    " />
-        </tal:b>
+        <metal:b use-macro="layout.macros.identicon"
+                 tal:define="
+                    initials owner.initials;
+                    username owner.username;
+                    size 'large';
+                "
+        />
     </div>
     <div class="timestamp">
-        <tal:b><b tal:condition="owner">${owner.name}</b> ${layout.format_date(model.created, 'relative')}</tal:b>
+        <b>${owner.name}</b>
+        <tal:b i18n:translate>
+            at <tal:b i18n:name="time">${layout.format_date(model.created, 'time')}</tal:b>
+        </tal:b>
     </div>
     <div class="text">
         <metal:b define-slot="text" />

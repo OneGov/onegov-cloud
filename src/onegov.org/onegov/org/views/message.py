@@ -52,6 +52,10 @@ def view_messages_feed(self, request):
             {
                 'id': m.id,
                 'type': m.type,
+                'date': ', '.join((
+                    layout.format_date(m.created, 'weekday_long'),
+                    layout.format_date(m.created, 'date_long')
+                )),
                 'html': m.get(
                     request,
                     owner=owners.get(m.owner),

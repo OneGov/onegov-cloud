@@ -3834,6 +3834,46 @@ ul.recipients {
 .messages {
     list-style: none;
     margin: 0;
+
+    li {
+        position: relative;
+
+        + li .title::before {
+            border-right: 1px solid $gainsboro;
+            content: '';
+            display: block;
+            height: 25px;
+            left: 50%;
+            position: absolute;
+            top: -24px;
+        }
+    }
+
+    .first-of-day .title::before {
+        display: none !important;
+    }
+
+    .date {
+        font-size: .875rem;
+        margin-bottom: 1.25rem;
+        text-align: center;
+
+        &::after {
+            border-right: 1px solid $gainsboro;
+            content: '';
+            display: block;
+            height: 20px;
+            left: 50%;
+            position: absolute;
+        }
+
+        span {
+            background-color: $silver;
+            border-radius: 25px;
+            display: inline-block;
+            padding: 0 10px;
+        }
+    }
 }
 
 .message {
@@ -3843,7 +3883,7 @@ ul.recipients {
     display: inline-block;
     font-size: .875rem;
     margin-bottom: 1.5rem;
-    min-width: 400px;
+    width: 100%;    
 
     .identicon {
         float: left;

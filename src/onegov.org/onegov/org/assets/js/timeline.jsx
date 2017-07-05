@@ -24,6 +24,13 @@ var TimelineMessages = React.createClass({
     },
     render: function() {
         var messages = this.state.messages;
+        var showDate = function(ix) {
+            if (ix === 0) {
+                return true;
+            } else {
+                return messages[ix - 1].date !== messages[ix].date;
+            }
+        };
         return (
             <CSSTransitionGroup
                 component="ul"
@@ -34,11 +41,14 @@ var TimelineMessages = React.createClass({
                 transitionEnterTimeout={500}
                 transitionLeaveTimeout={300}
             >
-                {messages.map(function(m) {
+                {messages.map(function(m, ix) {
                     /* eslint-disable react/no-danger */
                     return (
                         <li key={m.id}>
-                            <div className={'message message-' + m.type}
+                            {
+                                showDate(ix) && <div className="date"><span>{m.date}</span></div>
+                            }
+                            <div className={'message message-' + m.type + ' ' + (showDate(ix) && 'first-of-day' || '')}
                                 dangerouslySetInnerHTML={{__html: m.html}}
                             />
                         </li>
