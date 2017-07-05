@@ -68,6 +68,19 @@ class Message(Base):
         # use != instead of "is not" as we want this translated into SQL
         return self.modified != None
 
+    @classmethod
+    def bound_messages(cls, request):
+        """ A message collection bound to the polymorphic identity of this
+        message.
+
+        """
+        from onegov.chat import MessageCollection  # XXX circular import
+
+        return MessageCollection(
+            request.app.session(),
+            type=cls.__mapper_args__['polymorphic_identity']
+        )
+
 
 @event.listens_for(Message, 'init')
 def init(target, args, kwargs):

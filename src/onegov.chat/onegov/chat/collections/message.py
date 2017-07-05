@@ -48,6 +48,6 @@ class MessageCollection(GenericCollection):
         q = q.order_by(desc(self.model_class.id))
 
         if offset:
-            q = q.offset(min(offset, q.count() - 1))
+            q = q.offset(min(offset, q.count()))
 
         return q.first()
