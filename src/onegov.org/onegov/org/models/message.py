@@ -4,7 +4,14 @@ from onegov.event import Event
 from onegov.ticket import Ticket
 
 
-class MacroRenderedMessage(Message):
+class TemplateRenderedMessage(Message):
+
+    @classmethod
+    def bound_messages(cls, request):
+        return MessageCollection(
+            request.app.session(),
+            type=cls.__mapper_args__['polymorphic_identity']
+        )
 
     def get(self, request, owner, layout):
         return render_template(
@@ -19,13 +26,28 @@ class MacroRenderedMessage(Message):
         )
 
 
-class TicketBasedMessage(MacroRenderedMessage):
+class TicketBasedMessage(TemplateRenderedMessage):
 
     def link(self, request):
         return request.class_link(Ticket, {
             'id': self.meta['id'],
             'handler_code': self.meta['handler_code'],
         })
+
+    @classmethod
+    def create(cls, ticket, request, **extra_meta):
+        meta = {
+            'id': ticket.id.hex,
+            'handler_code': ticket.handler_code,
+            'group': ticket.group
+        }
+        meta.update(extra_meta)
+
+        return cls.bound_messages(request).add(
+            channel_id=ticket.number,
+            owner=request.current_username or ticket.ticket_email,
+            meta=meta
+        )
 
 
 class TicketMessage(TicketBasedMessage):
@@ -36,19 +58,7 @@ class TicketMessage(TicketBasedMessage):
 
     @classmethod
     def create(cls, ticket, request, change):
-        messages = MessageCollection(
-            request.app.session(), type='ticket')
-
-        return messages.add(
-            channel_id=ticket.number,
-            owner=request.current_username or ticket.ticket_email,
-            meta={
-                'id': ticket.id.hex,
-                'handler_code': ticket.handler_code,
-                'change': change,
-                'group': ticket.group
-            }
-        )
+        return super().create(ticket, request, change=change)
 
 
 class ReservationMessage(TicketBasedMessage):
@@ -59,20 +69,9 @@ class ReservationMessage(TicketBasedMessage):
 
     @classmethod
     def create(cls, reservations, ticket, request, change):
-        messages = MessageCollection(
-            request.app.session(), type='reservation')
-
-        return messages.add(
-            channel_id=ticket.number,
-            owner=request.current_username or ticket.ticket_email,
-            meta={
-                'id': ticket.id.hex,
-                'handler_code': ticket.handler_code,
-                'change': change,
-                'group': ticket.group,
-                'reservations': [r.id for r in reservations]
-            }
-        )
+        return super().create(ticket, request, change=change, reservations=[
+            r.id for r in reservations
+        ])
 
 
 class EventMessage(TicketBasedMessage):
@@ -83,20 +82,8 @@ class EventMessage(TicketBasedMessage):
 
     @classmethod
     def create(cls, event, ticket, request, change):
-        messages = MessageCollection(
-            request.app.session(), type='event')
-
-        return messages.add(
-            channel_id=ticket.number,
-            owner=request.current_username or ticket.ticket_email,
-            meta={
-                'id': ticket.id.hex,
-                'handler_code': ticket.handler_code,
-                'group': ticket.group,
-                'change': change,
-                'event_name': event.name
-            }
-        )
+        return super().create(
+            ticket, request, change=change, event_name=event.name)
 
     def event_link(self, request):
         return request.class_link(Event, {'name': self.meta['event_name']})
@@ -110,19 +97,10 @@ class PaymentMessage(TicketBasedMessage):
 
     @classmethod
     def create(cls, payment, ticket, request, change):
-        messages = MessageCollection(
-            request.app.session(), type='payment')
-
-        return messages.add(
-            channel_id=ticket.number,
-            owner=request.current_username or ticket.ticket_email,
-            meta={
-                'id': ticket.id.hex,
-                'handler_code': ticket.handler_code,
-                'group': ticket.group,
-                'change': change,
-                'payment_id': payment.id.hex,
-                'amount': float(payment.amount),
-                'currency': payment.currency
-            }
+        return super().create(
+            ticket, request,
+            change=change,
+            payment_id=payment.id.hex,
+            amount=float(payment.amount),
+            currency=payment.currency
         )
