@@ -17,6 +17,7 @@ from onegov.org.models.legacy_file import (
     LegacyFileCollection,
     LegacyImageCollection,
 )
+from onegov.org.models.message import EventPublicationMessage
 from onegov.org.models.message import TicketChangeMessage
 from onegov.org.models.message import ReservationDecisionMessage
 from onegov.org.models.organisation import Organisation
@@ -56,6 +57,7 @@ __all__ = [
     'CustomFormDefinition',
     'DaypassResource',
     'Editor',
+    'EventPublicationMessage',
     'Export',
     'ExportCollection',
     'FormPersonMove',

@@ -1,5 +1,6 @@
 from onegov.chat import Message, MessageCollection
 from onegov.core.templates import render_template
+from onegov.event import Event
 from onegov.ticket import Ticket
 
 
@@ -72,3 +73,30 @@ class ReservationDecisionMessage(TicketBasedMessage):
                 'reservations': [r.id for r in reservations]
             }
         )
+
+
+class EventPublicationMessage(TicketBasedMessage):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'event_publication'
+    }
+
+    @classmethod
+    def create(cls, event, ticket, request, change):
+        messages = MessageCollection(
+            request.app.session(), type='event_publication')
+
+        return messages.add(
+            channel_id=ticket.number,
+            owner=request.current_username or ticket.ticket_email,
+            meta={
+                'id': ticket.id.hex,
+                'handler_code': ticket.handler_code,
+                'group': ticket.group,
+                'change': change,
+                'event_name': event.name
+            }
+        )
+
+    def event_link(self, request):
+        return request.class_link(Event, {'name': self.meta['event_name']})

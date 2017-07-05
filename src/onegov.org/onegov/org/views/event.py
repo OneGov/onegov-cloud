@@ -9,7 +9,7 @@ from onegov.org.elements import Link
 from onegov.org.forms import EventForm
 from onegov.org.layout import EventLayout
 from onegov.org.mail import send_html_mail
-from onegov.org.models import TicketChangeMessage
+from onegov.org.models import TicketChangeMessage, EventPublicationMessage
 from onegov.ticket import TicketCollection
 from sedate import utcnow
 from uuid import uuid4
@@ -58,11 +58,10 @@ def publish_event(self, request):
         'title': self.title
     }))
 
+    session = request.app.session()
+    ticket = TicketCollection(session).by_handler_id(self.id.hex)
+
     if self.meta['submitter_email'] != request.current_username:
-
-        session = request.app.session()
-        ticket = TicketCollection(session).by_handler_id(self.id.hex)
-
         send_html_mail(
             request=request,
             template='mail_event_accepted.pt',
@@ -73,6 +72,8 @@ def publish_event(self, request):
                 'ticket': ticket
             }
         )
+
+    EventPublicationMessage.create(self, ticket, request, 'published')
 
     return request.redirect(request.link(self))
 
@@ -241,6 +242,9 @@ def handle_delete_event(self, request):
                 'ticket': ticket
             }
         )
+
+    if ticket:
+        EventPublicationMessage.create(self, ticket, request, 'deleted')
 
     EventCollection(request.app.session()).delete(self)
 

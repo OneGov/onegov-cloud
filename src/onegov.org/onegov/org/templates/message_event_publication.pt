@@ -1,0 +1,19 @@
+<tal:b i18n:domain="onegov.org">
+    <metal:b use-macro="layout.macros['generic_message']">
+        <metal:b fill-slot="title">
+            <a href="${model.link(request)}">${model.channel_id}</a> - ${model.meta.group}
+        </metal:b>
+        <metal:b fill-slot="text">
+            <i tal:switch="model.meta['change']">
+                <tal:b case="'published'" i18n:translate>
+                    <a href="${model.event_link(request)}" i18n:name="event" i18n:translate>Event</a>
+                    was published.
+                </tal:b>
+                <tal:b case="'deleted'" i18n:translate>
+                    <a href="${model.event_link(request)}" i18n:name="event" i18n:translate>Event</a>
+                    was deleted.
+                </tal:b>
+            </i>
+        </metal:b>
+    </metal:b>
+</tal:b>

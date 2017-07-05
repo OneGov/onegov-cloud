@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-07-05 10:36+0200\n"
+"POT-Creation-Date: 2017-07-05 11:20+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1521,6 +1521,12 @@ msgstr ""
 
 msgid "Your ticket has been reopened"
 msgstr "Ihr Ticket wurde wieder geöffnet"
+
+msgid "${event} was published."
+msgstr "${event} wurde veröffentlicht."
+
+msgid "${event} was deleted."
+msgstr "${event} wurde gelöscht."
 
 msgid "1 reservation accepted."
 msgstr "1 Reservation angenommen."
