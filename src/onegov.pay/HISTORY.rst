@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.1 (2017-07-05)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Fixes Stripe payment syncing failing if there was a payout.
   [href]
 
