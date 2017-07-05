@@ -1,5 +1,10 @@
 Changelog
 ---------
+
+- Renames is_email_template to suppress_global_variables in the render_template
+  function.
+  [href]
+
 0.43.0 (2017-07-03)
 ~~~~~~~~~~~~~~~~~~~
 

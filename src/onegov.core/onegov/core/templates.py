@@ -138,7 +138,8 @@ def get_chameleon_render(loader, name, original_render):
     return render
 
 
-def render_template(template, request, content, is_mail_template='infer'):
+def render_template(template, request, content,
+                    suppress_global_variables='infer'):
     """ Renders the given template. Use this if you need to get the rendered
     value directly. If oyu render a view, this is not needed!
 
@@ -148,14 +149,14 @@ def render_template(template, request, content, is_mail_template='infer'):
 
     """
 
-    if is_mail_template == 'infer':
-        is_mail_template = template.startswith('mail_')
+    if suppress_global_variables == 'infer':
+        suppress_global_variables = template.startswith('mail_')
 
     registry = request.app.config.template_engine_registry
     template = registry._template_loaders['.pt'][template]
 
     variables = get_default_vars(
-        request, content, suppress_global_variables=is_mail_template)
+        request, content, suppress_global_variables=suppress_global_variables)
 
     return template.render(**variables)
 
