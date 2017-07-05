@@ -379,7 +379,7 @@ msgid ""
 "first."
 msgstr ""
 "Um die Einteilung zu löschen, müssen zuerst alle bestehenden Reservationen "
-"abgesagt werden."
+"abgelehnt werden."
 
 msgid "Start"
 msgstr "Von"
@@ -1510,7 +1510,7 @@ msgid "The following reservations have been accepted:"
 msgstr "Die folgenden Reservationen wurden angenommen:"
 
 msgid "The following reservations has unfortunately been rejected:"
-msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
+msgstr "Die folgenden Reservationen mussten leider abgelehnt werden:"
 
 msgid "Your ticket has been closed"
 msgstr "Ihr Ticket wurde geschlossen"
@@ -2097,7 +2097,7 @@ msgid "The reservations were rejected"
 msgstr "Die Reservationen wurden abgelehnt"
 
 msgid "The reservation was rejected"
-msgstr "Die Reservation wurde abgesagt"
+msgstr "Die Reservation wurde abgelehnt"
 
 msgid "The following reservations were rejected"
 msgstr "Die folgenden Reservationen wurden abgelehnt"
