@@ -446,7 +446,8 @@ class StripeConnect(PaymentProvider):
             q = q.filter(self.payment_class.remote_id.in_(paid_charges.keys()))
 
             for p in q:
-                p.payout_date, p.payout_id, p.fee = paid_charges[p.remote_id]
+                p.payout_date, p.payout_id, p.effective_fee\
+                    = paid_charges[p.remote_id]
 
         self.latest_payout = latest_payout and latest_payout.id
 
