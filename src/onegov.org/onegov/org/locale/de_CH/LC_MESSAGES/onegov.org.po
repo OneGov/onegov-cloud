@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-07-05 11:20+0200\n"
+"POT-Creation-Date: 2017-07-05 13:21+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -895,6 +895,9 @@ msgstr "Immer auf der Startseite anzeigen"
 msgid "Form Submissions"
 msgstr "Formulareingaben"
 
+#.
+#. Used in sentence: "${event} published."
+#. Used in sentence: "${event} deleted."
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -1522,11 +1525,25 @@ msgstr ""
 msgid "Your ticket has been reopened"
 msgstr "Ihr Ticket wurde wieder geöffnet"
 
-msgid "${event} was published."
-msgstr "${event} wurde veröffentlicht."
+#. Canonical text for ${event} is: "Event"
+msgid "${event} published."
+msgstr "${event} veröffentlicht."
 
-msgid "${event} was deleted."
-msgstr "${event} wurde gelöscht."
+#. Canonical text for ${event} is: "Event"
+msgid "${event} deleted."
+msgstr "${event} gelöscht."
+
+msgid "${amount} marked as paid."
+msgstr "${amount} als bezahlt markiert."
+
+msgid "${amount} marked as unpaid."
+msgstr "${amount} als unbezahlt markiert."
+
+msgid "${amount} captured."
+msgstr "${amount} eingenommen."
+
+msgid "${amount} refunded."
+msgstr "${amount} rückerstattet."
 
 msgid "1 reservation accepted."
 msgstr "1 Reservation angenommen."
@@ -1540,17 +1557,17 @@ msgstr "1 Reservation abgelehnt."
 msgid "${count} reservations rejected."
 msgstr "${count} Reservationen abgelehnt."
 
-msgid "Ticket was opened."
-msgstr "Ticket wurde eröffnet."
+msgid "Ticket opened."
+msgstr "Ticket eröffnet."
 
-msgid "Ticket was accepted."
-msgstr "Ticket wurde angenommen."
+msgid "Ticket accepted."
+msgstr "Ticket angenommen."
 
-msgid "Ticket was closed."
-msgstr "Ticket wurde geschlossen."
+msgid "Ticket closed."
+msgstr "Ticket geschlossen."
 
-msgid "Ticket was reopened."
-msgstr "Ticket wurde wieder geöffnet."
+msgid "Ticket reopened."
+msgstr "Ticket wieder geöffnet."
 
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr ""

@@ -4,16 +4,16 @@
             <a href="${model.link(request)}">${model.channel_id}</a> - ${model.meta.group}
         </metal:b>
         <metal:b fill-slot="text">
-            <i tal:switch="model.meta['change']">
+            <tal:b switch="model.meta['change']">
                 <tal:b case="'published'" i18n:translate>
                     <a href="${model.event_link(request)}" i18n:name="event" i18n:translate>Event</a>
-                    was published.
+                    published.
                 </tal:b>
                 <tal:b case="'deleted'" i18n:translate>
                     <a href="${model.event_link(request)}" i18n:name="event" i18n:translate>Event</a>
-                    was deleted.
+                    deleted.
                 </tal:b>
-            </i>
+            </tal:b>
         </metal:b>
     </metal:b>
 </tal:b>

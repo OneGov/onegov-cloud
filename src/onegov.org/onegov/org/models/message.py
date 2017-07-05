@@ -100,3 +100,29 @@ class EventPublicationMessage(TicketBasedMessage):
 
     def event_link(self, request):
         return request.class_link(Event, {'name': self.meta['event_name']})
+
+
+class PaymentChangeMessage(TicketBasedMessage):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'payment_change'
+    }
+
+    @classmethod
+    def create(cls, payment, ticket, request, change):
+        messages = MessageCollection(
+            request.app.session(), type='payment_change')
+
+        return messages.add(
+            channel_id=ticket.number,
+            owner=request.current_username or ticket.ticket_email,
+            meta={
+                'id': ticket.id.hex,
+                'handler_code': ticket.handler_code,
+                'group': ticket.group,
+                'change': change,
+                'payment_id': payment.id.hex,
+                'amount': float(payment.amount),
+                'currency': payment.currency
+            }
+        )

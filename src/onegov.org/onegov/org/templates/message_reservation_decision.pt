@@ -4,7 +4,7 @@
             <a href="${model.link(request)}">${model.channel_id}</a> - ${model.meta.group}
         </metal:b>
         <metal:b fill-slot="text">
-            <i tal:switch="model.meta.change" tal:define="count len(model.meta['reservations'])">
+            <tal:b switch="model.meta.change" define="count len(model.meta['reservations'])">
                 <tal:b case="'accepted'">
                     <tal:b condition="count == 1" i18n:translate>
                         1 reservation accepted.
@@ -21,7 +21,7 @@
                         <tal:b i18n:name="count">${count}</tal:b> reservations rejected.
                     </tal:b>
                 </tal:b>
-            </i>
+            </tal:b>
         </metal:b>
     </metal:b>
 </tal:b>

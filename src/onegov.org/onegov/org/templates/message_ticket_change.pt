@@ -4,20 +4,20 @@
             <a href="${model.link(request)}">${model.channel_id}</a> - ${model.meta.group}
         </metal:b>
         <metal:b fill-slot="text">
-            <i tal:switch="model.meta.change">
+            <tal:b switch="model.meta.change">
                 <tal:b case="'opened'" i18n:translate>
-                    Ticket was opened.
+                    Ticket opened.
                 </tal:b>
                 <tal:b case="'accepted'" i18n:translate>
-                    Ticket was accepted.
+                    Ticket accepted.
                 </tal:b>
                 <tal:b case="'closed'" i18n:translate>
-                    Ticket was closed.
+                    Ticket closed.
                 </tal:b>
                 <tal:b case="'reopened'" i18n:translate>
-                    Ticket was reopened.
+                    Ticket reopened.
                 </tal:b>
-            </i>
+            </tal:b>
         </metal:b>
     </metal:b>
 </tal:b>
