@@ -28,16 +28,16 @@ class TicketBasedMessage(MacroRenderedMessage):
         })
 
 
-class TicketChangeMessage(TicketBasedMessage):
+class TicketMessage(TicketBasedMessage):
 
     __mapper_args__ = {
-        'polymorphic_identity': 'ticket_change'
+        'polymorphic_identity': 'ticket'
     }
 
     @classmethod
     def create(cls, ticket, request, change):
         messages = MessageCollection(
-            request.app.session(), type='ticket_change')
+            request.app.session(), type='ticket')
 
         return messages.add(
             channel_id=ticket.number,
@@ -51,16 +51,16 @@ class TicketChangeMessage(TicketBasedMessage):
         )
 
 
-class ReservationDecisionMessage(TicketBasedMessage):
+class ReservationMessage(TicketBasedMessage):
 
     __mapper_args__ = {
-        'polymorphic_identity': 'reservation_decision'
+        'polymorphic_identity': 'reservation'
     }
 
     @classmethod
     def create(cls, reservations, ticket, request, change):
         messages = MessageCollection(
-            request.app.session(), type='reservation_decision')
+            request.app.session(), type='reservation')
 
         return messages.add(
             channel_id=ticket.number,
@@ -75,16 +75,16 @@ class ReservationDecisionMessage(TicketBasedMessage):
         )
 
 
-class EventPublicationMessage(TicketBasedMessage):
+class EventMessage(TicketBasedMessage):
 
     __mapper_args__ = {
-        'polymorphic_identity': 'event_publication'
+        'polymorphic_identity': 'event'
     }
 
     @classmethod
     def create(cls, event, ticket, request, change):
         messages = MessageCollection(
-            request.app.session(), type='event_publication')
+            request.app.session(), type='event')
 
         return messages.add(
             channel_id=ticket.number,
@@ -102,16 +102,16 @@ class EventPublicationMessage(TicketBasedMessage):
         return request.class_link(Event, {'name': self.meta['event_name']})
 
 
-class PaymentChangeMessage(TicketBasedMessage):
+class PaymentMessage(TicketBasedMessage):
 
     __mapper_args__ = {
-        'polymorphic_identity': 'payment_change'
+        'polymorphic_identity': 'payment'
     }
 
     @classmethod
     def create(cls, payment, ticket, request, change):
         messages = MessageCollection(
-            request.app.session(), type='payment_change')
+            request.app.session(), type='payment')
 
         return messages.add(
             channel_id=ticket.number,

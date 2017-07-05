@@ -17,10 +17,10 @@ from onegov.org.models.legacy_file import (
     LegacyFileCollection,
     LegacyImageCollection,
 )
-from onegov.org.models.message import EventPublicationMessage
-from onegov.org.models.message import PaymentChangeMessage
-from onegov.org.models.message import ReservationDecisionMessage
-from onegov.org.models.message import TicketChangeMessage
+from onegov.org.models.message import EventMessage
+from onegov.org.models.message import PaymentMessage
+from onegov.org.models.message import ReservationMessage
+from onegov.org.models.message import TicketMessage
 from onegov.org.models.organisation import Organisation
 from onegov.org.models.page import AtoZPages, News, Topic
 from onegov.org.models.page_move import PageMove
@@ -58,7 +58,7 @@ __all__ = [
     'CustomFormDefinition',
     'DaypassResource',
     'Editor',
-    'EventPublicationMessage',
+    'EventMessage',
     'Export',
     'ExportCollection',
     'FormPersonMove',
@@ -77,16 +77,16 @@ __all__ = [
     'Organisation',
     'PageMove',
     'PagePersonMove',
-    'PaymentChangeMessage',
+    'PaymentMessage',
     'PersonLinkExtension',
     'PersonMove',
-    'ReservationDecisionMessage',
+    'ReservationMessage',
     'ResourcePersonMove',
     'ResourceRecipient',
     'ResourceRecipientCollection',
     'Search',
     'SiteCollection',
-    'TicketChangeMessage',
+    'TicketMessage',
     'Topic',
     'TraitInfo',
     'VisibleOnHomepageExtension',

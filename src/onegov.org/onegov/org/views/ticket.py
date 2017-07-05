@@ -5,7 +5,7 @@ from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.layout import DefaultLayout, TicketLayout, TicketsLayout
 from onegov.org.mail import send_html_mail
-from onegov.org.models import TicketChangeMessage
+from onegov.org.models import TicketMessage
 from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket, TicketCollection
 from onegov.ticket.errors import InvalidStateChange
@@ -65,7 +65,7 @@ def accept_ticket(self, request):
     except InvalidStateChange:
         request.alert(_("The ticket cannot be accepted because it's not open"))
     else:
-        TicketChangeMessage.create(self, request, 'accepted')
+        TicketMessage.create(self, request, 'accepted')
         request.success(_("You have accepted ticket ${number}", mapping={
             'number': self.number
         }))
@@ -83,7 +83,7 @@ def close_ticket(self, request):
             _("The ticket cannot be closed because it's not pending")
         )
     else:
-        TicketChangeMessage.create(self, request, 'closed')
+        TicketMessage.create(self, request, 'closed')
         request.success(_("You have closed ticket ${number}", mapping={
             'number': self.number
         }))
@@ -111,7 +111,7 @@ def reopen_ticket(self, request):
             _("The ticket cannot be re-opened because it's not closed")
         )
     else:
-        TicketChangeMessage.create(self, request, 'reopened')
+        TicketMessage.create(self, request, 'reopened')
         request.success(_("You have reopened ticket ${number}", mapping={
             'number': self.number
         }))

@@ -13,7 +13,7 @@ from onegov.org.elements import Link
 from onegov.org.forms import ReservationForm
 from onegov.org.layout import ReservationLayout
 from onegov.org.mail import send_html_mail
-from onegov.org.models import TicketChangeMessage, ReservationDecisionMessage
+from onegov.org.models import TicketMessage, ReservationMessage
 from onegov.reservation import Allocation, Reservation, Resource
 from onegov.ticket import TicketCollection
 from purl import URL
@@ -337,7 +337,7 @@ def finalize_reservation(self, request):
             ticket = TicketCollection(request.app.session()).open_ticket(
                 handler_code='RSV', handler_id=token
             )
-            TicketChangeMessage.create(ticket, request, 'opened')
+            TicketMessage.create(ticket, request, 'opened')
 
         if reservations[0].email != request.current_username:
             send_html_mail(
@@ -385,7 +385,7 @@ def accept_reservation(self, request):
         tickets = TicketCollection(request.app.session())
         ticket = tickets.by_handler_id(self.token.hex)
 
-        ReservationDecisionMessage.create(
+        ReservationMessage.create(
             reservations, ticket, request, 'accepted')
 
         request.success(_("The reservations were accepted"))
@@ -429,7 +429,7 @@ def reject_reservation(self, request):
     tickets = TicketCollection(request.app.session())
     ticket = tickets.by_handler_id(token)
 
-    ReservationDecisionMessage.create(targeted, ticket, request, 'rejected')
+    ReservationMessage.create(targeted, ticket, request, 'rejected')
 
     # create a snapshot of the ticket to keep the useful information
     if len(excluded) == 0:

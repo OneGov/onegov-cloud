@@ -2,7 +2,7 @@ from functools import partial
 from onegov.core.security import Private
 from onegov.org import OrgApp, _
 from onegov.org.layout import PaymentCollectionLayout
-from onegov.org.models import PaymentChangeMessage
+from onegov.org.models import PaymentMessage
 from onegov.pay import Payment
 from onegov.pay import PaymentCollection
 from onegov.pay import PaymentProviderCollection
@@ -25,7 +25,7 @@ def create_ticket_messages(payment, request, change):
     for link in payment.links:
         ticket = ticket_by_link(tickets, link)
         if ticket:
-            PaymentChangeMessage.create(payment, ticket, request, change)
+            PaymentMessage.create(payment, ticket, request, change)
 
 
 @OrgApp.html(
