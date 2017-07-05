@@ -1,19 +1,20 @@
 from onegov.chat import Message, MessageCollection
-from onegov.core.templates import render_macro
+from onegov.core.templates import render_template
 from onegov.ticket import Ticket
 
 
 class MacroRenderedMessage(Message):
 
     def get(self, request, owner, layout):
-        return render_macro(
-            macro=layout.macros['message_{}'.format(self.type)],
+        return render_template(
+            template='message_{}'.format(self.type),
             request=request,
             content={
                 'layout': layout,
                 'model': self,
                 'owner': owner
-            }
+            },
+            suppress_global_variables=True
         )
 
 

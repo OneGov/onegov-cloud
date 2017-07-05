@@ -963,38 +963,3 @@
         </li>
     </ul>
 </metal:tags>
-
-<metal:block define-macro="message_ticket_change" i18n:domain="onegov.org">
-    <div class="title">
-        <a href="${model.link(request)}">${model.channel_id}</a> - ${model.meta.group}
-    </div>
-    <div class="identicon">
-        <tal:b condition="owner">
-            <metal:b use-macro="layout.macros.identicon"
-                     tal:define="
-                        initials owner.initials;
-                        username owner.username;
-                        size 'large';
-                    " />
-        </tal:b>
-    </div>
-    <div class="timestamp">
-        <tal:b><b tal:condition="owner">${owner.name}</b> ${layout.format_date(model.created, 'relative')}</tal:b>
-    </div>
-    <div class="text">
-        <tal:b switch="model.meta.change">
-            <tal:b case="'opened'" i18n:translate>
-                Ticket was opened.
-            </tal:b>
-            <tal:b case="'accepted'" i18n:translate>
-                Ticket was accepted.
-            </tal:b>
-            <tal:b case="'closed'" i18n:translate>
-                Ticket was closed.
-            </tal:b>
-            <tal:b case="'reopened'" i18n:translate>
-                Ticket was reopened.
-            </tal:b>
-        </tal:b>
-    </div>
-</metal:block>
