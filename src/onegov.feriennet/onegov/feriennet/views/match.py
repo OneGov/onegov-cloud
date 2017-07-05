@@ -7,6 +7,7 @@ from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.forms import MatchForm
 from onegov.feriennet.layout import MatchCollectionLayout
+from onegov.feriennet.models import PeriodMessage
 from onegov.org.new_elements import Block
 from onegov.org.new_elements import Confirm
 from onegov.org.new_elements import Intercooler
@@ -39,6 +40,7 @@ def handle_matches(self, request, form):
 
         if form.confirm_period:
             self.period.confirm()
+            PeriodMessage.create(self.period, request, 'confirmed')
             request.success(_("The matching was confirmed successfully"))
         else:
             request.success(_("The matching run executed successfully"))

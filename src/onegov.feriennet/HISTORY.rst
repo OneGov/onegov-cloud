@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Records changes to the period on the new timeline.
+  [href]
+
 1.2.1 (2017-06-29)
 ~~~~~~~~~~~~~~~~~~~
 

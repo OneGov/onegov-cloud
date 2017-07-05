@@ -11,7 +11,7 @@ from onegov.feriennet.collections import BillingCollection, BillingDetails
 from onegov.feriennet.forms import BillingForm, BankStatementImportForm
 from onegov.feriennet.layout import BillingCollectionImportLayout
 from onegov.feriennet.layout import BillingCollectionLayout
-from onegov.feriennet.models import InvoiceAction
+from onegov.feriennet.models import InvoiceAction, PeriodMessage
 from onegov.org.elements import Link, ConfirmLink
 from onegov.user import UserCollection, User
 from purl import URL
@@ -32,6 +32,7 @@ def view_billing(self, request, form):
         )
 
         if form.finalize_period:
+            PeriodMessage.create(self.period, request, 'finalized')
             self.period.finalized = True
 
     # we can generate many links here, so we need this to be

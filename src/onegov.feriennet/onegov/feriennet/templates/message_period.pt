@@ -1,0 +1,29 @@
+<tal:b i18n:domain="onegov.feriennet">
+    <metal:b use-macro="layout.macros['generic_message']">
+        <metal:b fill-slot="title">
+            <a href="${model.link(request)}">${model.meta['title']}</a>
+        </metal:b>
+        <metal:b fill-slot="text">
+            <tal:b switch="model.meta['action']">
+                <tal:b case="'activated'" i18n:translate>
+                    Period activated.
+                </tal:b>
+                <tal:b case="'deactivated'" i18n:translate>
+                    Period deactivated.
+                </tal:b>
+                <tal:b case="'deleted'" i18n:translate>
+                    Period deleted.
+                </tal:b>
+                <tal:b case="'archived'" i18n:translate>
+                    Period archived.
+                </tal:b>
+                <tal:b case="'confirmed'" i18n:translate>
+                    Matching confirmed.
+                </tal:b>
+                <tal:b case="'finalized'" i18n:translate>
+                    Billing finalized.
+                </tal:b>
+            </tal:b>
+        </metal:b>
+    </metal:b>
+</tal:b>

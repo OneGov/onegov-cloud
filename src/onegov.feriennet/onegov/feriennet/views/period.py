@@ -5,6 +5,7 @@ from onegov.feriennet.forms import PeriodForm
 from onegov.feriennet.layout import PeriodCollectionLayout
 from onegov.feriennet.layout import PeriodFormLayout
 from onegov.org.new_elements import Link, Confirm, Intercooler, Block
+from onegov.feriennet.models import PeriodMessage
 from sqlalchemy import desc
 from sqlalchemy.exc import IntegrityError
 
@@ -206,6 +207,7 @@ def delete_period(self, request):
         request.alert(
             _("The period could not be deleted as it is still in use"))
     else:
+        PeriodMessage.create(self, request, 'deleted')
         request.success(
             _("The period was deleted successfully"))
 
@@ -224,6 +226,7 @@ def activate_period(self, request):
     request.assert_valid_csrf_token()
 
     self.activate()
+    PeriodMessage.create(self, request, 'activated')
     request.success(_("The period was activated successfully"))
 
     @request.after
@@ -241,6 +244,7 @@ def deactivate_period(self, request):
     request.assert_valid_csrf_token()
 
     self.deactivate()
+    PeriodMessage.create(self, request, 'deactivated')
     request.success(_("The period was deactivated successfully"))
 
     @request.after
@@ -258,6 +262,7 @@ def archive_period(self, request):
     request.assert_valid_csrf_token()
 
     self.archive()
+    PeriodMessage.create(self, request, 'archived')
     request.success(_("The period was archived successfully"))
 
     @request.after
