@@ -963,3 +963,25 @@
         </li>
     </ul>
 </metal:tags>
+
+<metal:generic_message define-macro="generic_message">
+    <div class="title">
+        <metal:b define-slot="title" />
+    </div>
+    <div class="identicon">
+        <tal:b condition="owner">
+            <metal:b use-macro="layout.macros.identicon"
+                     tal:define="
+                        initials owner.initials;
+                        username owner.username;
+                        size 'large';
+                    " />
+        </tal:b>
+    </div>
+    <div class="timestamp">
+        <tal:b><b tal:condition="owner">${owner.name}</b> ${layout.format_date(model.created, 'relative')}</tal:b>
+    </div>
+    <div class="text">
+        <metal:b define-slot="text" />
+    </div>
+</metal:generic_message>

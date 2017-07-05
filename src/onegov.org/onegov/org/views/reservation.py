@@ -13,7 +13,7 @@ from onegov.org.elements import Link
 from onegov.org.forms import ReservationForm
 from onegov.org.layout import ReservationLayout
 from onegov.org.mail import send_html_mail
-from onegov.org.models import TicketChangeMessage
+from onegov.org.models import TicketChangeMessage, ReservationDecisionMessage
 from onegov.reservation import Allocation, Reservation, Resource
 from onegov.ticket import TicketCollection
 from purl import URL
@@ -382,6 +382,12 @@ def accept_reservation(self, request):
             # libres does not automatically detect changes yet
             flag_modified(reservation, 'data')
 
+        tickets = TicketCollection(request.app.session())
+        ticket = tickets.by_handler_id(self.token.hex)
+
+        ReservationDecisionMessage.create(
+            reservations, ticket, request, 'accepted')
+
         request.success(_("The reservations were accepted"))
     else:
         request.warning(_("The reservations have already been accepted"))
@@ -420,10 +426,13 @@ def reject_reservation(self, request):
             }
         )
 
+    tickets = TicketCollection(request.app.session())
+    ticket = tickets.by_handler_id(token)
+
+    ReservationDecisionMessage.create(targeted, ticket, request, 'rejected')
+
     # create a snapshot of the ticket to keep the useful information
     if len(excluded) == 0:
-        tickets = TicketCollection(request.app.session())
-        ticket = tickets.by_handler_id(token)
         ticket.create_snapshot(request)
 
     for reservation in targeted:

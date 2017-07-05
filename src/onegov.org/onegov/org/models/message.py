@@ -18,7 +18,16 @@ class MacroRenderedMessage(Message):
         )
 
 
-class TicketChangeMessage(MacroRenderedMessage):
+class TicketBasedMessage(MacroRenderedMessage):
+
+    def link(self, request):
+        return request.class_link(Ticket, {
+            'id': self.meta['id'],
+            'handler_code': self.meta['handler_code'],
+        })
+
+
+class TicketChangeMessage(TicketBasedMessage):
 
     __mapper_args__ = {
         'polymorphic_identity': 'ticket_change'
@@ -40,8 +49,26 @@ class TicketChangeMessage(MacroRenderedMessage):
             }
         )
 
-    def link(self, request):
-        return request.class_link(Ticket, {
-            'id': self.meta['id'],
-            'handler_code': self.meta['handler_code'],
-        })
+
+class ReservationDecisionMessage(TicketBasedMessage):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'reservation_decision'
+    }
+
+    @classmethod
+    def create(cls, reservations, ticket, request, change):
+        messages = MessageCollection(
+            request.app.session(), type='reservation_decision')
+
+        return messages.add(
+            channel_id=ticket.number,
+            owner=request.current_username or ticket.ticket_email,
+            meta={
+                'id': ticket.id.hex,
+                'handler_code': ticket.handler_code,
+                'change': change,
+                'group': ticket.group,
+                'reservations': [r.id for r in reservations]
+            }
+        )

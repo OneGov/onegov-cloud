@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-07-04 17:40+0200\n"
+"POT-Creation-Date: 2017-07-05 10:36+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1322,18 +1322,6 @@ msgstr "Kreditkarten-Gebühr"
 msgid "Pay Offline later"
 msgstr "Später bezahlen"
 
-msgid "Ticket was opened."
-msgstr "Ticket wurde eröffnet."
-
-msgid "Ticket was accepted."
-msgstr "Ticket wurde angenommen."
-
-msgid "Ticket was closed."
-msgstr "Ticket wurde geschlossen."
-
-msgid "Ticket was reopened."
-msgstr "Ticket wurde wieder geöffnet."
-
 msgid "Dear Sir or Madam,"
 msgstr "Guten Tag"
 
@@ -1533,6 +1521,30 @@ msgstr ""
 
 msgid "Your ticket has been reopened"
 msgstr "Ihr Ticket wurde wieder geöffnet"
+
+msgid "1 reservation accepted."
+msgstr "1 Reservation angenommen."
+
+msgid "${count} reservations accepted."
+msgstr "${count} Reservationen angenommen"
+
+msgid "1 reservation rejected."
+msgstr "1 Reservation abgelehnt."
+
+msgid "${count} reservations rejected."
+msgstr "${count} Reservationen abgelehnt."
+
+msgid "Ticket was opened."
+msgstr "Ticket wurde eröffnet."
+
+msgid "Ticket was accepted."
+msgstr "Ticket wurde angenommen."
+
+msgid "Ticket was closed."
+msgstr "Ticket wurde geschlossen."
+
+msgid "Ticket was reopened."
+msgstr "Ticket wurde wieder geöffnet."
 
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr ""

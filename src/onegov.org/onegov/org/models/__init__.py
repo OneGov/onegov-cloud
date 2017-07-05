@@ -18,6 +18,7 @@ from onegov.org.models.legacy_file import (
     LegacyImageCollection,
 )
 from onegov.org.models.message import TicketChangeMessage
+from onegov.org.models.message import ReservationDecisionMessage
 from onegov.org.models.organisation import Organisation
 from onegov.org.models.page import AtoZPages, News, Topic
 from onegov.org.models.page_move import PageMove
@@ -75,6 +76,7 @@ __all__ = [
     'PagePersonMove',
     'PersonLinkExtension',
     'PersonMove',
+    'ReservationDecisionMessage',
     'ResourcePersonMove',
     'ResourceRecipient',
     'ResourceRecipientCollection',
