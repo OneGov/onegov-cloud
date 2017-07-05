@@ -72,7 +72,10 @@ def view_messages(self, request):
     # The initial load contains only the 25 latest message (the feed will
     # return the 25 oldest messages by default)
     if not self.newer_than:
-        self.newer_than = self.latest_message(offset=25).id
+        beyond_horizon = self.latest_message(offset=25)
+
+        if beyond_horizon:
+            self.newer_than = beyond_horizon.id
 
     return {
         'layout': MessageCollectionLayout(self, request),

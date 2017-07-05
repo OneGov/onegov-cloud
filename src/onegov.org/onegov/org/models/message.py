@@ -1,17 +1,10 @@
-from onegov.chat import Message, MessageCollection
+from onegov.chat import Message
 from onegov.core.templates import render_template
 from onegov.event import Event
 from onegov.ticket import Ticket
 
 
 class TemplateRenderedMessage(Message):
-
-    @classmethod
-    def bound_messages(cls, request):
-        return MessageCollection(
-            request.app.session(),
-            type=cls.__mapper_args__['polymorphic_identity']
-        )
 
     def get(self, request, owner, layout):
         return render_template(
