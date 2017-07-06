@@ -97,7 +97,7 @@ def related_types(model):
 
         elif 'polymorphic_identity' in model.__mapper_args__:
             for parentclass in model.__mro__:
-                if not hasattr(model, '__mapper_args__'):
+                if not hasattr(parentclass, '__mapper_args__'):
                     continue
 
                 if 'polymorphic_on' in parentclass.__mapper_args__:
