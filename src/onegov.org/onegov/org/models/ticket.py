@@ -337,28 +337,41 @@ class ReservationHandler(Handler, PaymentLinksMixin):
                 )
             )
 
-        reject = LinkGroup(
-            _("Reject reservations"),
-            [Link(
-                text=_("Reject all"),
-                url=request.return_here(
-                    request.link(self.reservations[0], 'absagen')
-                ),
-                attrs={'class': 'delete-link'},
-                traits=(
-                    Confirm(
-                        _("Do you really want to reject all reservations?"),
-                        _("Rejecting these reservations can't be undone."),
-                        _("Reject reservations")
-                    ),
-                    Intercooler(
-                        request_method='GET',
-                        redirect_after=request.url
-                    )
+        advanced_links = []
+
+        if self.submission:
+            link = URL(request.link(self.submission))
+            link = link.query_param('edit', '')
+            link = link.query_param('title', request.translate(
+                _("Details about the reservation")))
+            link = request.return_here(link.as_string())
+
+            advanced_links.append(
+                Link(
+                    text=_('Edit details'),
+                    url=link,
+                    attrs={'class': ('edit-link', 'border')}
                 )
-            )],
-            right_side=False
-        )
+            )
+
+        advanced_links.append(Link(
+            text=_("Reject all"),
+            url=request.return_here(
+                request.link(self.reservations[0], 'absagen')
+            ),
+            attrs={'class': 'delete-link'},
+            traits=(
+                Confirm(
+                    _("Do you really want to reject all reservations?"),
+                    _("Rejecting these reservations can't be undone."),
+                    _("Reject reservations")
+                ),
+                Intercooler(
+                    request_method='GET',
+                    redirect_after=request.url
+                )
+            )
+        ))
 
         for reservation in self.reservations:
             link = URL(request.link(reservation, 'absagen'))
@@ -366,7 +379,7 @@ class ReservationHandler(Handler, PaymentLinksMixin):
             link = request.return_here(link.as_string())
 
             title = self.get_reservation_title(reservation)
-            reject.links.append(Link(
+            advanced_links.append(Link(
                 text=_("Reject ${title}", mapping={'title': title}),
                 url=link,
                 attrs={'class': 'delete-link'},
@@ -385,24 +398,13 @@ class ReservationHandler(Handler, PaymentLinksMixin):
                 )
             ))
 
-        links.append(reject)
-
-        if self.submission:
-            link = URL(request.link(self.submission))
-            link = link.query_param('edit', '')
-            link = link.query_param('title', request.translate(
-                _("Details about the reservation")))
-            link = request.return_here(link.as_string())
-
-            links.append(
-                Link(
-                    text=_('Edit details'),
-                    url=link,
-                    attrs={'class': 'edit-link'}
-                )
-            )
-
         self.extend_with_payment_links(links, request)
+
+        links.append(LinkGroup(
+            _("Advanced"),
+            links=advanced_links,
+            right_side=False
+        ))
 
         return links
 
@@ -478,27 +480,30 @@ class EventSubmissionHandler(Handler):
                 attrs={'class': 'accept-link'},
             ))
 
-        links.append(Link(
-            text=_("Reject event"),
-            url=layout.csrf_protected_url(request.link(self.event)),
-            attrs={'class': 'delete-link'},
-            traits=(
-                Confirm(
-                    _("Do you really want to reject this event?"),
-                    _("Rejecting this event can't be undone."),
-                    _("Reject event")
+        links.append(LinkGroup(_("Advanced"), links=(
+            Link(
+                text=_('Edit event'),
+                url=request.return_here(
+                    request.link(self.event, 'bearbeiten')
                 ),
-                Intercooler(
-                    request_method='DELETE',
-                    redirect_after=request.link(self.ticket)
+                attrs={'class': ('edit-link', 'border')}
+            ),
+            Link(
+                text=_("Reject event"),
+                url=layout.csrf_protected_url(request.link(self.event)),
+                attrs={'class': ('delete-link')},
+                traits=(
+                    Confirm(
+                        _("Do you really want to reject this event?"),
+                        _("Rejecting this event can't be undone."),
+                        _("Reject event")
+                    ),
+                    Intercooler(
+                        request_method='DELETE',
+                        redirect_after=request.link(self.ticket)
+                    )
                 )
             )
-        ))
-
-        links.append(Link(
-            text=_('Edit event'),
-            url=request.return_here(request.link(self.event, 'bearbeiten')),
-            attrs={'class': 'edit-link'}
-        ))
+        ), right_side=False))
 
         return links

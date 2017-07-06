@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-07-06 10:20+0200\n"
+"POT-Creation-Date: 2017-07-06 14:52+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -819,6 +819,9 @@ msgstr "Mit Referenznummer (ESR)"
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
 
+msgid "Your note about this ticket"
+msgstr "Ihre Notiz zu dem Ticket"
+
 msgid "Admin"
 msgstr "Administrator"
 
@@ -901,20 +904,14 @@ msgstr "Formulareingaben"
 msgid "Event"
 msgstr "Veranstaltung"
 
-msgid "Reject reservations"
-msgstr "Reservationen absagen"
-
 msgid "Edit submission"
 msgstr "Eingabe bearbeiten"
 
 msgid "Details about the reservation"
 msgstr "Details zu Ihrer Reservation"
 
-msgid "Reject event"
-msgstr "Veranstaltung ablehnen"
-
-msgid "Edit event"
-msgstr "Veranstaltung bearbeiten"
+msgid "Reject all"
+msgstr "Alle absagen"
 
 msgid "Mark as paid"
 msgstr "Als bezahlt markieren"
@@ -928,15 +925,12 @@ msgstr "Zahlung Einnehmen"
 msgid "Accept all reservations"
 msgstr "Alle Reservationen annehmen"
 
-msgid "Reject all"
-msgstr "Alle absagen"
+msgid "Edit details"
+msgstr "Details bearbeiten"
 
 #, python-format
 msgid "Reject ${title}"
 msgstr "${title} absagen"
-
-msgid "Edit details"
-msgstr "Details bearbeiten"
 
 msgid "Accept event"
 msgstr "Veranstaltung annehmen"
@@ -944,11 +938,14 @@ msgstr "Veranstaltung annehmen"
 msgid "Refund Payment"
 msgstr "Zahlung Rückerstatten"
 
-msgid "Do you really want to reject this event?"
-msgstr "Möchten Sie diese Veranstaltung wirklich absagen?"
+msgid "Do you really want to reject all reservations?"
+msgstr "Möchten Sie wirklich alle Reservationen absagen?"
 
-msgid "Rejecting this event can't be undone."
-msgstr "Eine Absage kann nicht rückgängig gemacht werden."
+msgid "Rejecting these reservations can't be undone."
+msgstr "Die Absage aller Reservationen kann nicht rückgängig gemacht werden."
+
+msgid "Reject reservations"
+msgstr "Reservationen absagen"
 
 msgid "Do you really want capture the payment?"
 msgstr "Möchten Sie die Zahlung wirklich einnehmen?"
@@ -963,12 +960,6 @@ msgstr ""
 msgid "Capture payment"
 msgstr "Zahlung einnehmen"
 
-msgid "Do you really want to reject all reservations?"
-msgstr "Möchten Sie wirklich alle Reservationen absagen?"
-
-msgid "Rejecting these reservations can't be undone."
-msgstr "Die Absage aller Reservationen kann nicht rückgängig gemacht werden."
-
 msgid "Do you really want to reject this reservation?"
 msgstr "Möchten Sie diese Reservation wirklich absagen?"
 
@@ -979,6 +970,12 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
+msgid "Edit event"
+msgstr "Veranstaltung bearbeiten"
+
+msgid "Reject event"
+msgstr "Veranstaltung ablehnen"
+
 #, python-format
 msgid "Do you really want to refund ${amount}?"
 msgstr "Möchten Sie wirklich ${amount} rückerstatten?"
@@ -986,6 +983,12 @@ msgstr "Möchten Sie wirklich ${amount} rückerstatten?"
 #, python-format
 msgid "Refund ${amount}"
 msgstr "${amount} rückerstatten"
+
+msgid "Do you really want to reject this event?"
+msgstr "Möchten Sie diese Veranstaltung wirklich absagen?"
+
+msgid "Rejecting this event can't be undone."
+msgstr "Eine Absage kann nicht rückgängig gemacht werden."
 
 msgid "Link"
 msgstr "Verknüpfung"
@@ -2189,6 +2192,9 @@ msgstr "${address} wurde erfolgreich abgemeldet"
 #, python-format
 msgid "${address} could not be unsubscribed, wrong token"
 msgstr "${address} konnte nicht abgemeldet werden - falsches Token"
+
+msgid "New Note"
+msgstr "Neue Notiz"
 
 msgid "Your request has been submitted"
 msgstr "Anfrage eingereicht"
