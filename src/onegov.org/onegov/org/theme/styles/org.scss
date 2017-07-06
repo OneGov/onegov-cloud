@@ -1139,6 +1139,7 @@ $new-form-icon: '\f044';
 $new-link-icon: '\f0c1';
 $new-news-icon: '\f1ea';
 $new-newsletter-icon: '\f003';
+$new-note-icon: '\f24a';
 $new-page-icon: '\f0f6';
 $new-payment-icon: '\f09d';
 $new-person-icon: '\f007';
@@ -1237,6 +1238,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .new-link::before { @include icon($new-link-icon); }
     .new-news::before { @include icon($new-news-icon); }
     .new-newsletter::before { @include icon($new-newsletter-icon); }
+    .new-note::before { @include icon($new-note-icon); }
     .new-page::before { @include icon($new-page-icon); }
     .new-payment::before { @include icon($new-payment-icon); }
     .new-person::before { @include icon($new-person-icon); }
@@ -3730,6 +3732,7 @@ h2 + .timeline {
 }
 
 .messages {
+    border-radius: 2px;
     list-style: none;
     margin: 0;
 

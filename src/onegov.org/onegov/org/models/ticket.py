@@ -26,6 +26,16 @@ class EventSubmissionTicket(Ticket):
     es_type_name = 'event_tickets'
 
 
+class NoteLinksMixin(object):
+
+    def extend_with_note_links(self, links, request):
+        links.append(Link(
+            text=_("New Note"),
+            url=request.link(self.ticket, 'notiz'),
+            attrs={'class': 'new-note'}
+        ))
+
+
 class PaymentLinksMixin(object):
 
     def extend_with_payment_links(self, links, request):
@@ -121,7 +131,7 @@ class PaymentLinksMixin(object):
 
 
 @handlers.registered_handler('FRM')
-class FormSubmissionHandler(Handler, PaymentLinksMixin):
+class FormSubmissionHandler(Handler, PaymentLinksMixin, NoteLinksMixin):
 
     handler_title = _("Form Submissions")
 
@@ -179,6 +189,7 @@ class FormSubmissionHandler(Handler, PaymentLinksMixin):
         links = []
 
         self.extend_with_payment_links(links, request)
+        self.extend_with_note_links(links, request)
 
         edit_link = URL(request.link(self.submission))
         edit_link = edit_link.query_param('edit', '').as_string()
@@ -195,7 +206,7 @@ class FormSubmissionHandler(Handler, PaymentLinksMixin):
 
 
 @handlers.registered_handler('RSV')
-class ReservationHandler(Handler, PaymentLinksMixin):
+class ReservationHandler(Handler, PaymentLinksMixin, NoteLinksMixin):
 
     handler_title = _("Reservations")
 
@@ -399,6 +410,7 @@ class ReservationHandler(Handler, PaymentLinksMixin):
             ))
 
         self.extend_with_payment_links(links, request)
+        self.extend_with_note_links(links, request)
 
         links.append(LinkGroup(
             _("Advanced"),
@@ -410,7 +422,7 @@ class ReservationHandler(Handler, PaymentLinksMixin):
 
 
 @handlers.registered_handler('EVN')
-class EventSubmissionHandler(Handler):
+class EventSubmissionHandler(Handler, NoteLinksMixin):
 
     handler_title = _("Events")
 
@@ -467,43 +479,43 @@ class EventSubmissionHandler(Handler):
 
     def get_links(self, request):
 
-        if not self.event:
-            return []
-
         links = []
         layout = EventLayout(self.event, request)
 
-        if self.event.state == 'submitted':
+        if self.event and self.event.state == 'submitted':
             links.append(Link(
                 text=_("Accept event"),
                 url=request.return_here(request.link(self.event, 'publish')),
                 attrs={'class': 'accept-link'},
             ))
 
-        links.append(LinkGroup(_("Advanced"), links=(
-            Link(
-                text=_('Edit event'),
-                url=request.return_here(
-                    request.link(self.event, 'bearbeiten')
-                ),
-                attrs={'class': ('edit-link', 'border')}
-            ),
-            Link(
-                text=_("Reject event"),
-                url=layout.csrf_protected_url(request.link(self.event)),
-                attrs={'class': ('delete-link')},
-                traits=(
-                    Confirm(
-                        _("Do you really want to reject this event?"),
-                        _("Rejecting this event can't be undone."),
-                        _("Reject event")
+        self.extend_with_note_links(links, request)
+
+        if self.event:
+            links.append(LinkGroup(_("Advanced"), links=(
+                Link(
+                    text=_('Edit event'),
+                    url=request.return_here(
+                        request.link(self.event, 'bearbeiten')
                     ),
-                    Intercooler(
-                        request_method='DELETE',
-                        redirect_after=request.link(self.ticket)
+                    attrs={'class': ('edit-link', 'border')}
+                ),
+                Link(
+                    text=_("Reject event"),
+                    url=layout.csrf_protected_url(request.link(self.event)),
+                    attrs={'class': ('delete-link')},
+                    traits=(
+                        Confirm(
+                            _("Do you really want to reject this event?"),
+                            _("Rejecting this event can't be undone."),
+                            _("Reject event")
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=request.link(self.ticket)
+                        )
                     )
                 )
-            )
-        ), right_side=False))
+            ), right_side=False))
 
         return links

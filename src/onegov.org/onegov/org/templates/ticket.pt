@@ -17,7 +17,7 @@
                 </div>
 
                 <div class="ticket-timeline">
-                    <h2 i18n:translate>Activity</h2>
+                    <h2 i18n:translate>Timeline</h2>
                     <div class="timeline" data-feed-data="${feed_data}"></div>
                 </div>
             </div>

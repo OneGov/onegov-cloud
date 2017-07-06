@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-07-06 14:52+0200\n"
+"POT-Creation-Date: 2017-07-06 15:11+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -27,7 +27,7 @@ msgstr "${org} Reservations-Übersicht"
 msgid "Login"
 msgstr "Login"
 
-msgid "Activity"
+msgid "Timeline"
 msgstr "Aktivität"
 
 msgid "Files"
@@ -904,6 +904,9 @@ msgstr "Formulareingaben"
 msgid "Event"
 msgstr "Veranstaltung"
 
+msgid "New Note"
+msgstr "Neue Notiz"
+
 msgid "Edit submission"
 msgstr "Eingabe bearbeiten"
 
@@ -970,12 +973,6 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-msgid "Edit event"
-msgstr "Veranstaltung bearbeiten"
-
-msgid "Reject event"
-msgstr "Veranstaltung ablehnen"
-
 #, python-format
 msgid "Do you really want to refund ${amount}?"
 msgstr "Möchten Sie wirklich ${amount} rückerstatten?"
@@ -983,6 +980,12 @@ msgstr "Möchten Sie wirklich ${amount} rückerstatten?"
 #, python-format
 msgid "Refund ${amount}"
 msgstr "${amount} rückerstatten"
+
+msgid "Edit event"
+msgstr "Veranstaltung bearbeiten"
+
+msgid "Reject event"
+msgstr "Veranstaltung ablehnen"
 
 msgid "Do you really want to reject this event?"
 msgstr "Möchten Sie diese Veranstaltung wirklich absagen?"
@@ -1781,6 +1784,9 @@ msgstr ""
 "Der hinterlegte Datensatz wurde entfernt. Die folgenden Informationen sind "
 "eine Momentaufnahme, erstellt vor der Löschung."
 
+msgid "Activity"
+msgstr "Aktivität"
+
 msgid "Ticket State"
 msgstr "Ticket Status"
 
@@ -1801,9 +1807,6 @@ msgstr "Reaktionszeit"
 
 msgid "Process Time"
 msgstr "Bearbeitungszeit"
-
-msgid "Timeline"
-msgstr "Timeline"
 
 msgid "State:"
 msgstr "Status:"
@@ -2192,9 +2195,6 @@ msgstr "${address} wurde erfolgreich abgemeldet"
 #, python-format
 msgid "${address} could not be unsubscribed, wrong token"
 msgstr "${address} konnte nicht abgemeldet werden - falsches Token"
-
-msgid "New Note"
-msgstr "Neue Notiz"
 
 msgid "Your request has been submitted"
 msgstr "Anfrage eingereicht"
