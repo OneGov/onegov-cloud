@@ -232,6 +232,7 @@ $global-tools-height: 2.5rem;
     .images::before { @include icon('\f03e'); }
     .files::before { @include icon('\f016'); }
     .settings::before { @include icon('\f1de'); }
+    .timeline::before { @include icon('\f017'); }
     .no-tickets::before { @include icon('\f145'); }
 
     .with-count::before {

@@ -1,3 +1,4 @@
+from onegov.chat import MessageCollection
 from onegov.org import _, OrgApp
 from onegov.org.models import GeneralFileCollection, ImageFileCollection
 from onegov.org.new_elements import Link, LinkGroup
@@ -45,6 +46,13 @@ def get_global_tools(request):
     # Management dropdown
     if request.is_manager:
         links = []
+
+        links.append(
+            Link(
+                _("Timeline"), request.class_link(MessageCollection),
+                attrs={'class': 'timeline'}
+            )
+        )
 
         links.append(
             Link(

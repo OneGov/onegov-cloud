@@ -107,5 +107,5 @@ jQuery.fn.timeline = function() {
 };
 
 $(document).ready(function() {
-    $('.timeline').timeline();
+    $('div.timeline').timeline();
 });
