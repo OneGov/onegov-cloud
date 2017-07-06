@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-07-05 15:40+0200\n"
+"POT-Creation-Date: 2017-07-06 10:20+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -26,6 +26,9 @@ msgstr "${org} Reservations-Übersicht"
 
 msgid "Login"
 msgstr "Login"
+
+msgid "Activity"
+msgstr "Aktivität"
 
 msgid "Files"
 msgstr "Dateien"
@@ -144,9 +147,6 @@ msgstr "Exporte"
 
 msgid "Payment Providers"
 msgstr "Zahlungsanbieter"
-
-msgid "Timeline"
-msgstr "Timeline"
 
 msgid "Delete"
 msgstr "Löschen"
@@ -1798,6 +1798,9 @@ msgstr "Reaktionszeit"
 
 msgid "Process Time"
 msgstr "Bearbeitungszeit"
+
+msgid "Timeline"
+msgstr "Timeline"
 
 msgid "State:"
 msgstr "Status:"

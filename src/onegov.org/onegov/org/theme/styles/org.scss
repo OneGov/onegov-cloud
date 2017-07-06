@@ -2033,6 +2033,12 @@ $ticket-number-bg: $yellow-light;
     );
 }
 
+.ticket-timeline .message .title {
+    border: 0;
+    height: 0;
+    padding: 0;
+}
+
 /*
     Tickets list
 */
@@ -3342,130 +3348,6 @@ ul.search-results {
 }
 
 /*
-    Print Styles
-*/
-@media print {
-    #global-tools,
-    .alert-box,
-    .date-range-selector,
-    .date-range-selector-result,
-    .edit-bar,
-    footer,
-    .occurrence-exports,
-    .occurrences-day-date,
-    .occurrences-filter-tags,
-    .page-links,
-    .searchbox,
-    .side-nav,
-    div.push,
-    .top-bar {
-        display: none;
-    }
-
-    .side-panel {
-        border: 1px solid $tuatara;
-        border-radius: 3px;
-        margin-bottom: .5rem;
-
-        .field-display-block {
-            float: left;
-            margin-right: 1.5rem;
-        }
-    }
-
-    html,
-    body {
-        height: 99%; // avoids blank pages at the end
-    }
-
-    body {
-        font-size: 12px !important;
-    }
-
-    .field-display-block * {
-        background-color: transparent;
-        color: $body-font-color;
-        font-size: 12px;
-        margin: 0 !important;
-        padding: 0;
-    }
-
-    .ticket-summary {
-        * {
-            font-size: 12px;
-        }
-
-        ul {
-            margin-bottom: 0;
-        }
-    }
-
-    h1 {
-        font-size: 1.6rem;
-    }
-
-    h2 {
-        @include hairline;
-        font-size: 1.2rem;
-        margin-bottom: .25rem;
-    }
-
-    h3 {
-        font-size: 1.1rem;
-        margin-bottom: .15rem;
-    }
-
-    h4,
-    h5,
-    h6 {
-        font-size: 1rem;
-    }
-
-    .header {
-        max-height: 50px;
-    }
-
-    .logo {
-        max-height: 40px;
-
-        img,
-        svg {
-            max-height: 45px;
-            width: auto;
-        }
-    }
-
-    ul.breadcrumbs {
-        padding: 0 0 .25rem 1rem;
-
-        * {
-            font-size: 9px;
-        }
-    }
-
-    .occupancy-block {
-        h2 {
-            font-weight: bold;
-        }
-
-        .occupancy-entry {
-            .date,
-            .quota {
-                font-weight: normal;
-            }
-        }
-
-        * {
-            font-size: 12px;
-        }
-
-        > .columns {
-            margin-bottom: 0;
-        }
-    }
-}
-
-/*
     Usermanagement
 */
 
@@ -3832,6 +3714,11 @@ ul.recipients {
 /*
     Timeline Messages
 */
+#timeline .timeline,
+h2 + .timeline {
+    margin-top: -.75rem;
+}
+
 .messages {
     list-style: none;
     margin: 0;
@@ -3884,7 +3771,7 @@ ul.recipients {
     display: inline-block;
     font-size: .875rem;
     margin-bottom: 1.5rem;
-    width: 100%;    
+    width: 100%;
 
     .identicon {
         float: left;
@@ -3922,4 +3809,167 @@ ul.recipients {
     transition-duration: 300ms;
     transition-property: transform, opacity;
     transition-timing-function: cubic-bezier(.175, .665, .320, 1), linear;
+}
+
+
+/*
+    Print Styles
+*/
+@media print {
+    #global-tools,
+    .alert-box,
+    .date-range-selector,
+    .date-range-selector-result,
+    .edit-bar,
+    footer,
+    .occurrence-exports,
+    .occurrences-day-date,
+    .occurrences-filter-tags,
+    .page-links,
+    .searchbox,
+    .side-nav,
+    div.push,
+    .top-bar {
+        display: none;
+    }
+
+    .side-panel {
+        border: 1px solid $tuatara;
+        border-radius: 3px;
+        margin-bottom: .5rem;
+
+        .field-display-block {
+            float: left;
+            margin-right: 1.5rem;
+        }
+    }
+
+    html,
+    body {
+        height: 99%; // avoids blank pages at the end
+    }
+
+    body {
+        font-size: 12px !important;
+    }
+
+    .field-display-block .field-display-label,
+    .field-display-block .field-display-data,
+    .field-display-block .field-display-data * {
+        background-color: transparent;
+        color: $body-font-color !important;
+        font-size: 12px !important;
+        margin: 0 !important;
+        padding: 0;
+    }
+
+    .side-panel .ticket-number {
+        display: block !important;
+        line-height: 1.5 !important;
+    }
+
+    .ticket-summary {
+        * {
+            font-size: 12px !important;
+        }
+
+        ul {
+            margin-bottom: 0;
+        }
+    }
+
+    .ticket-timeline * {
+        font-size: 12px !important;
+    }
+
+    .timeline {
+        * {
+            font-size: 12px !important;
+        }
+
+        .identicon {
+            height: 30px;
+            margin-right: -10px;
+            visibility: hidden;
+            width: 10px;
+        }
+
+        .title {
+            margin-bottom: 2px;
+        }
+
+        .text {
+            margin-bottom: 2px;
+        }
+    }
+
+    .payment-state {
+        background: none !important;
+        border: 0 !important;
+        padding: 0 !important;
+    }
+
+    h1 {
+        font-size: 1.6rem;
+    }
+
+    h2 {
+        @include hairline;
+        font-size: 1.2rem;
+        margin-bottom: .25rem;
+    }
+
+    h3 {
+        font-size: 1.1rem;
+        margin-bottom: .15rem;
+    }
+
+    h4,
+    h5,
+    h6 {
+        font-size: 1rem;
+    }
+
+    .header {
+        max-height: 50px;
+    }
+
+    .logo {
+        max-height: 40px;
+
+        img,
+        svg {
+            max-height: 45px;
+            width: auto;
+        }
+    }
+
+    ul.breadcrumbs {
+        padding: 0 0 .25rem 1rem;
+
+        * {
+            font-size: 9px;
+        }
+    }
+
+    .occupancy-block {
+        h2 {
+            font-weight: bold;
+        }
+
+        .occupancy-entry {
+            .date,
+            .quota {
+                font-weight: normal;
+            }
+        }
+
+        * {
+            font-size: 12px;
+        }
+
+        > .columns {
+            margin-bottom: 0;
+        }
+    }
 }

@@ -1,5 +1,7 @@
+import json
 import morepath
 
+from onegov.chat import MessageCollection
 from onegov.core.security import Public, Private
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
@@ -10,6 +12,7 @@ from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket, TicketCollection
 from onegov.ticket.errors import InvalidStateChange
 from onegov.user import User, UserCollection
+from onegov.org.views.message import view_messages_feed
 
 
 @OrgApp.html(model=Ticket, template='ticket.pt', permission=Private)
@@ -30,13 +33,22 @@ def view_ticket(self, request):
     if self.handler.payment:
         self.handler.payment.sync()
 
+    messages = MessageCollection(
+        request.app.session(),
+        channel_id=self.number
+    )
+
     return {
         'title': self.number,
         'layout': TicketLayout(self, request),
         'ticket': self,
         'summary': summary,
         'deleted': handler.deleted,
-        'handler': handler
+        'handler': handler,
+        'feed_data': json.dumps(
+            view_messages_feed(messages, request),
+            separators=(',', ':')
+        ),
     }
 
 

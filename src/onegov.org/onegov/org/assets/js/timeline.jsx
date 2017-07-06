@@ -87,8 +87,8 @@ var TimelineMessages = React.createClass({
 
 var Timeline = function(container) {
     var feed = container.data('feed');
-    var messages = container.data('initial-data').messages || [];
-    var poll_interval = parseInt(container.data('poll-interval'), 10);
+    var messages = container.data('feed-data').messages || [];
+    var interval = parseInt(container.data('feed-interval'), 10);
     var el = $('<div>');
 
     container.empty();
@@ -97,7 +97,9 @@ var Timeline = function(container) {
         <TimelineMessages feed={feed} messages={messages} />, el.get(0)
     );
 
-    setInterval(container.timeline.update, poll_interval * 1000);
+    if (feed && interval) {
+        setInterval(container.timeline.update, interval * 1000);
+    }
 };
 
 jQuery.fn.timeline = function() {

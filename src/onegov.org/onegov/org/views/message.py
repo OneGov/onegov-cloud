@@ -83,8 +83,11 @@ def view_messages(self, request):
 
     return {
         'layout': MessageCollectionLayout(self, request),
-        'title': _("Timeline"),
+        'title': _("Activity"),
         'feed': request.link(self, 'feed'),
-        'initial_data': json.dumps(view_messages_feed(self, request)),
-        'poll_interval': 5
+        'feed_data': json.dumps(
+            view_messages_feed(self, request),
+            separators=(',', ':')
+        ),
+        'feed_interval': 5
     }

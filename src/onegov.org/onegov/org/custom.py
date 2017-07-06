@@ -49,7 +49,7 @@ def get_global_tools(request):
 
         links.append(
             Link(
-                _("Timeline"), request.class_link(MessageCollection),
+                _("Activity"), request.class_link(MessageCollection),
                 attrs={'class': 'timeline'}
             )
         )

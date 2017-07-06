@@ -727,6 +727,10 @@ class TicketsLayout(DefaultLayout):
 
 class TicketLayout(DefaultLayout):
 
+    def __init__(self, model, request):
+        super().__init__(model, request)
+        self.request.include('timeline')
+
     @cached_property
     def collection(self):
         return TicketCollection(self.request.app.session())
@@ -1551,5 +1555,5 @@ class MessageCollectionLayout(DefaultLayout):
     def breadcrumbs(self):
         return [
             Link(_("Homepage"), self.homepage_url),
-            Link(_("Timeline"), '#')
+            Link(_("Activity"), '#')
         ]

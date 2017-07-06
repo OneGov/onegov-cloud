@@ -7,8 +7,8 @@
             <div class="column small-12 medium-8">
                 <div class="timeline"
                     data-feed="${feed}"
-                    data-initial-data="${initial_data}"
-                    data-poll-interval="${poll_interval}"
+                    data-feed-data="${feed_data}"
+                    data-feed-interval="${feed_interval}"
                 />
             </div>
             <div class="column small-12 medium-4">
