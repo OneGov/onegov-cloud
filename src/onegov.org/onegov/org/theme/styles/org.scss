@@ -3765,9 +3765,9 @@ h2 + .timeline {
 }
 
 .message {
-    background-color: $white-smoke;
-    border: 1px solid rgba(150, 150, 150, .25);
-    box-shadow: 2px 2px 2px rgba(150, 150, 150, .5);
+    background-color: $gray-pastel;
+    border: 1px solid rgba(175, 150, 150, .25);
+    box-shadow: 2px 2px 2px rgba(150, 150, 150, .25);
     display: inline-block;
     font-size: .875rem;
     margin-bottom: 1.5rem;
@@ -3779,9 +3779,9 @@ h2 + .timeline {
     }
 
     .title {
-        background-color: $silver;
-        border-bottom: 1px solid rgba(150, 150, 150, .25);
-        margin-bottom: .5rem;
+        background-color: rgba(175, 150, 150, .1);
+        border-bottom: 1px solid rgba(175, 150, 150, .15);
+        margin-bottom: .25rem;
         padding: .25rem .5rem;
     }
 
@@ -3791,6 +3791,24 @@ h2 + .timeline {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+
+    .text {
+        margin-bottom: .5rem;
+    }
+}
+
+/*
+    Ticket notes
+*/
+.message-ticket_note {
+    background: $yellow-pastel;
+
+    .text {
+        overflow: auto;
+        text-overflow: clip;
+        white-space: normal;
+        max-width: $max-line-width;
     }
 }
 

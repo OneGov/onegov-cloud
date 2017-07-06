@@ -16,6 +16,7 @@ from onegov.org.forms.resource import ResourceForm
 from onegov.org.forms.resource_recipient import ResourceRecipientForm
 from onegov.org.forms.settings import SettingsForm
 from onegov.org.forms.signup import SignupForm
+from onegov.org.forms.ticket_note import TicketNoteForm
 from onegov.org.forms.user import ManageUserForm, NewUserForm
 from onegov.org.forms.userprofile import UserProfileForm
 
@@ -44,5 +45,6 @@ __all__ = [
     'RoomAllocationForm',
     'SettingsForm',
     'SignupForm',
+    'TicketNoteForm',
     'UserProfileForm',
 ]

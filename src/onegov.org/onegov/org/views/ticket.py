@@ -5,14 +5,18 @@ from onegov.chat import MessageCollection
 from onegov.core.security import Public, Private
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
-from onegov.org.layout import DefaultLayout, TicketLayout, TicketsLayout
+from onegov.org.forms import TicketNoteForm
+from onegov.org.layout import DefaultLayout
+from onegov.org.layout import TicketLayout
+from onegov.org.layout import TicketNoteLayout
+from onegov.org.layout import TicketsLayout
 from onegov.org.mail import send_html_mail
-from onegov.org.models import TicketMessage
+from onegov.org.models import TicketMessage, TicketNote
+from onegov.org.views.message import view_messages_feed
 from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket, TicketCollection
 from onegov.ticket.errors import InvalidStateChange
 from onegov.user import User, UserCollection
-from onegov.org.views.message import view_messages_feed
 
 
 @OrgApp.html(model=Ticket, template='ticket.pt', permission=Private)
@@ -65,6 +69,23 @@ def send_email_if_not_self(ticket, request, template, subject):
                 'model': ticket
             }
         )
+
+
+@OrgApp.form(
+    model=Ticket, name='notiz', permission=Private,
+    template='form.pt', form=TicketNoteForm
+)
+def handle_new_note(self, request, form):
+
+    if form.submitted(request):
+        TicketNote.create(self, request, form.text.data)
+        return request.redirect(request.link(self))
+
+    return {
+        'title': _("New Note"),
+        'layout': TicketNoteLayout(self, request, _("New Note")),
+        'form': form
+    }
 
 
 @OrgApp.view(model=Ticket, name='accept', permission=Private)

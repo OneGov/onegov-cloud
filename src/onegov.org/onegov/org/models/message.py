@@ -1,6 +1,8 @@
 from onegov.chat import Message
 from onegov.core.templates import render_template
+from onegov.core.utils import linkify
 from onegov.event import Event
+from onegov.search import ORMSearchable
 from onegov.ticket import Ticket
 
 
@@ -41,6 +43,38 @@ class TicketBasedMessage(TemplateRenderedMessage):
             owner=request.current_username or ticket.ticket_email,
             meta=meta
         )
+
+
+class TicketNote(TicketBasedMessage, ORMSearchable):
+    __mapper_args__ = {
+        'polymorphic_identity': 'ticket_note'
+    }
+
+    es_properties = {
+        'text': {'type': 'localized'},
+        'owner': {'type': 'keyword'}
+    }
+
+    es_public = False
+
+    @property
+    def es_language(self):
+        return 'de'  # XXX add to database in the future
+
+    @property
+    def es_suggestion(self):
+        return self.channel_id
+
+    @classmethod
+    def create(cls, ticket, request, text):
+        note = super().create(ticket, request)
+        note.text = text
+
+        return note
+
+    @property
+    def formatted_text(self):
+        return linkify(self.text).replace('\n', '<br>')
 
 
 class TicketMessage(TicketBasedMessage):

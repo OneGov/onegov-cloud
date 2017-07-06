@@ -21,6 +21,7 @@ from onegov.org.models.message import EventMessage
 from onegov.org.models.message import PaymentMessage
 from onegov.org.models.message import ReservationMessage
 from onegov.org.models.message import TicketMessage
+from onegov.org.models.message import TicketNote
 from onegov.org.models.organisation import Organisation
 from onegov.org.models.page import AtoZPages, News, Topic
 from onegov.org.models.page_move import PageMove
@@ -87,6 +88,7 @@ __all__ = [
     'Search',
     'SiteCollection',
     'TicketMessage',
+    'TicketNote',
     'Topic',
     'TraitInfo',
     'VisibleOnHomepageExtension',

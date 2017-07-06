@@ -777,6 +777,25 @@ class TicketLayout(DefaultLayout):
             return links
 
 
+class TicketNoteLayout(DefaultLayout):
+
+    def __init__(self, model, request, title, ticket=None):
+        super().__init__(model, request)
+        self.title = title
+        self.ticket = ticket or model
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Tickets"), self.request.link(
+                TicketCollection(self.request.app.session())
+            )),
+            Link(self.ticket.number, self.request.link(self.ticket)),
+            Link(self.title, '#')
+        ]
+
+
 class ResourcesLayout(DefaultLayout):
 
     @cached_property
