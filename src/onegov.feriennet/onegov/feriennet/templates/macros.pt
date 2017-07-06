@@ -120,7 +120,7 @@
 <metal:activity_ticket_summary define-macro="activity_ticket_summary" i18n:domain="onegov.feriennet">
     <tal:block define="user activity.user.data.organisation or activity.user.title|activity.user.title">
 
-        <div class="panel callout">
+        <div class="panel">
 
             <div i18n:translate>
                 The activity associated with this ticket belongs to <strong i18n:name="user">${user}</strong>.
@@ -148,8 +148,10 @@
 
         <h2>${activity.title}</h2>
 
-        <span class="page-lead" tal:condition="activity.lead" tal:content="activity.lead" />
-        <span>${period.title}</span>
+        <p>
+            <span class="page-lead" tal:condition="activity.lead" tal:content="activity.lead" />
+            <span>${period.title}</span>
+        </p>
 
     </tal:block>
 </metal:activity_ticket_summary>
