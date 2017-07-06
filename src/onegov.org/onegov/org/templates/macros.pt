@@ -986,4 +986,7 @@
     <div class="text">
         <metal:b define-slot="text" />
     </div>
+    <div class="actions">
+        <metal:b define-slot="actions" />
+    </div>
 </metal:generic_message>

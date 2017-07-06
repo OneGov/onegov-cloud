@@ -47,6 +47,7 @@ from onegov.org.models import (
     ResourceRecipientCollection,
     Search,
     SiteCollection,
+    TicketNote,
     Topic,
 )
 from onegov.page import PageCollection
@@ -191,6 +192,13 @@ def get_tickets(app, handler='ALL', state='open', page=0, group=None,
         owner=owner or '*',
         extra_parameters=extra_parameters
     )
+
+
+@OrgApp.path(
+    model=TicketNote,
+    path='/ticket-notes/{id}')
+def get_ticket_note(app, id):
+    return MessageCollection(app.session(), type='ticket_note').by_id(id)
 
 
 @OrgApp.path(model=ResourceCollection, path='/ressourcen')

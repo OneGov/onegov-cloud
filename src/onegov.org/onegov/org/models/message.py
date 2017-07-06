@@ -1,9 +1,13 @@
+from cached_property import cached_property
 from onegov.chat import Message
 from onegov.core.templates import render_template
 from onegov.core.utils import linkify
 from onegov.event import Event
+from onegov.org import _
+from onegov.org.new_elements import Link, Confirm, Intercooler
 from onegov.search import ORMSearchable
-from onegov.ticket import Ticket
+from onegov.ticket import Ticket, TicketCollection
+from sqlalchemy.orm import object_session
 
 
 class TemplateRenderedMessage(Message):
@@ -28,6 +32,13 @@ class TicketBasedMessage(TemplateRenderedMessage):
             'id': self.meta['id'],
             'handler_code': self.meta['handler_code'],
         })
+
+    @cached_property
+    def ticket(self):
+        return TicketCollection(object_session(self)).by_id(
+            self.meta['id'],
+            self.meta['handler_code']
+        )
 
     @classmethod
     def create(cls, ticket, request, **extra_meta):
@@ -75,6 +86,22 @@ class TicketNote(TicketBasedMessage, ORMSearchable):
     @property
     def formatted_text(self):
         return linkify(self.text).replace('\n', '<br>')
+
+    def links(self, layout):
+        yield Link(_("Edit"), layout.request.link(self, 'bearbeiten'))
+        yield Link(
+            _("Delete"), layout.csrf_protected_url(layout.request.link(self)),
+            traits=(
+                Confirm(
+                    _("Do you really want to delete this note?"),
+                    _("This cannot be undone."),
+                    _("Delete Note")
+                ),
+                Intercooler(
+                    request_method="DELETE",
+                    redirect_after=layout.request.link(self.ticket)
+                )
+            ))
 
 
 class TicketMessage(TicketBasedMessage):

@@ -22,6 +22,14 @@ var TimelineMessages = React.createClass({
             'messages': this.props.messages || []
         };
     },
+    componentDidMount: function() {
+        var node = $(ReactDOM.findDOMNode(this));
+        Intercooler.processNodes(node.get(0));
+        var links = node.find('a.confirm');
+
+        links.confirmation();
+        setupRedirectAfter(links);
+    },
     render: function() {
         var messages = this.state.messages;
         var showDate = function(ix) {

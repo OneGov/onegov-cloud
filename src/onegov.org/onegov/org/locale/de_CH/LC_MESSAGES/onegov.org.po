@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-07-06 15:11+0200\n"
+"POT-Creation-Date: 2017-07-06 16:52+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -891,6 +891,12 @@ msgstr "Älter"
 
 msgid "This year"
 msgstr "Dieses Jahr"
+
+msgid "Do you really want to delete this note?"
+msgstr "Möchten Sie diese Notiz wirklich löschen?"
+
+msgid "Delete Note"
+msgstr "Notiz löschen"
 
 msgid "Always visible on homepage"
 msgstr "Immer auf der Startseite anzeigen"
@@ -1784,9 +1790,6 @@ msgstr ""
 "Der hinterlegte Datensatz wurde entfernt. Die folgenden Informationen sind "
 "eine Momentaufnahme, erstellt vor der Löschung."
 
-msgid "Activity"
-msgstr "Aktivität"
-
 msgid "Ticket State"
 msgstr "Ticket Status"
 
@@ -2196,8 +2199,17 @@ msgstr "${address} wurde erfolgreich abgemeldet"
 msgid "${address} could not be unsubscribed, wrong token"
 msgstr "${address} konnte nicht abgemeldet werden - falsches Token"
 
+msgid "The note was deleted"
+msgstr "Die Notiz wurde gelöscht"
+
+msgid "Edit Note"
+msgstr "Notiz bearbeiten"
+
 msgid "Your request has been submitted"
 msgstr "Anfrage eingereicht"
+
+msgid "Your note was added"
+msgstr "Ihre Notiz wurde hinzugefügt"
 
 #, python-format
 msgid "You have accepted ticket ${number}"
@@ -2263,6 +2275,3 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
-
-#~ msgid "${ago} at ${time}"
-#~ msgstr "${ago} um ${time}"

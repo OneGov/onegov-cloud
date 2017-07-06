@@ -6,5 +6,10 @@
         <metal:b fill-slot="text">
             <tal:b tal:content="structure model.formatted_text" />
         </metal:b>
+        <metal:b fill-slot="actions">
+            <div class="text-links">
+                <tal:b repeat="link model.links(layout)" content="structure link(layout)" />
+            </div>
+        </metal:b>
     </metal:b>
 </tal:b>

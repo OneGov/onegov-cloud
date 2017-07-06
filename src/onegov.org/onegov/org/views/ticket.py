@@ -79,11 +79,46 @@ def handle_new_note(self, request, form):
 
     if form.submitted(request):
         TicketNote.create(self, request, form.text.data)
+        request.success(_("Your note was added"))
         return request.redirect(request.link(self))
 
     return {
         'title': _("New Note"),
         'layout': TicketNoteLayout(self, request, _("New Note")),
+        'form': form
+    }
+
+
+@OrgApp.view(model=TicketNote, permission=Private)
+def view_ticket_note(self, request):
+    return request.redirect(request.link(self.ticket))
+
+
+@OrgApp.view(model=TicketNote, permission=Private, request_method='DELETE')
+def delete_ticket_note(self, request):
+    request.assert_valid_csrf_token()
+    request.app.session().delete(self)
+    request.success(_("The note was deleted"))
+
+
+@OrgApp.form(
+    model=TicketNote, name='bearbeiten', permission=Private,
+    template='form.pt', form=TicketNoteForm
+)
+def handle_edit_note(self, request, form):
+    if form.submitted(request):
+        self.text = form.text.data
+        self.owner = request.current_username
+
+        request.success(_("Your changes were saved"))
+        return request.redirect(request.link(self.ticket))
+
+    elif not request.POST:
+        form.process(obj=self)
+
+    return {
+        'title': _("Edit Note"),
+        'layout': TicketNoteLayout(self.ticket, request, _("New Note")),
         'form': form
     }
 
