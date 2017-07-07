@@ -6,7 +6,6 @@ from onegov.core.templates import render_macro
 from onegov.feriennet import _
 from onegov.org.elements import Link, ConfirmLink
 from onegov.org.models.extensions import CoordinatesExtension
-from onegov.org.models.ticket import NoteLinksMixin
 from onegov.org.models.ticket import OrgTicketExtraText
 from onegov.search import ORMSearchable
 from onegov.ticket import handlers, Handler, Ticket
@@ -90,7 +89,7 @@ class ActivityTicket(OrgTicketExtraText, Ticket):
 
 
 @handlers.registered_handler('FER')
-class VacationActivityHandler(Handler, NoteLinksMixin):
+class VacationActivityHandler(Handler):
 
     handler_title = _("Activities")
 
@@ -180,7 +179,5 @@ class VacationActivityHandler(Handler, NoteLinksMixin):
             url=request.return_here(request.link(self.activity)),
             classes=('show-activity', )
         ))
-
-        self.extend_with_note_links(links, request)
 
         return links
