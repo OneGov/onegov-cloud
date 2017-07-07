@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.43.2 (2017-07-07)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds missing permission checking helper.
   [msom]
