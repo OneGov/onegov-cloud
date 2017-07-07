@@ -460,6 +460,13 @@ class CoreRequest(IncludeRequest, ReturnToMixin):
         """
         return self.has_permission(model, self.app.modules.security.Public)
 
+    def is_personal(self, model):
+        """ Returns True if the current user has the Personal permission for
+        the given model.
+
+        """
+        return self.has_permission(model, self.app.modules.security.Personal)
+
     def is_private(self, model):
         """ Returns True if the current user has the Private permission for
         the given model.
