@@ -3738,8 +3738,8 @@ ul.recipients {
 /*
     Timeline Messages
 */
-#timeline .timeline,
-h2 + .timeline {
+#timeline div.timeline,
+h2 + div.timeline {
     margin-top: -.75rem;
 }
 

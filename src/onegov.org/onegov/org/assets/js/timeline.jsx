@@ -16,7 +16,9 @@ var TimelineMessages = React.createClass({
         // the messages list - to be consistent we make sure to accept messages
         // in the same order through the props - as they are ordered old -> new
         // we need to reverse here
-        messages.reverse();
+        if (this.props.order === 'desc') {
+            messages.reverse();
+        }
 
         return {
             'messages': this.props.messages || []
@@ -96,21 +98,27 @@ var TimelineMessages = React.createClass({
         var self = this;
         var messages = this.state.messages;
         var maxlength = 1000;
+        var queuefn = this.props.order === 'desc' && 'unshift' || 'push';
+        var spliceix = this.props.order === 'desc' && -1 || 0;
 
         if (messages.length > 0) {
-            feed.query.newer_than = messages[0].id;
+            if (this.props.order === 'desc') {
+                feed.query.newer_than = messages[0].id;
+            } else {
+                feed.query.newer_than = messages[messages.length - 1].id;
+            }
         }
 
         $.getJSON(feed.toString(), function(data) {
             var state = _.extend({}, self.state);
 
             for (var i = 0; i < data.messages.length; i++) {
-                state.messages.unshift(data.messages[i]);
+                state.messages[queuefn](data.messages[i]);
             }
 
-            // remove messages at the bottom to reclaim memory
+            // remove messages at the end to reclaim memory
             if (messages.length > maxlength) {
-                messages.splice(-1, messages.length - maxlength);
+                messages.splice(spliceix, messages.length - maxlength);
             }
 
             self.setState(state);
@@ -121,13 +129,14 @@ var TimelineMessages = React.createClass({
 var Timeline = function(container) {
     var feed = container.data('feed');
     var messages = container.data('feed-data').messages || [];
+    var order = container.data('feed-order') || 'desc';
     var interval = parseInt(container.data('feed-interval'), 10);
     var el = $('<div>');
 
     container.empty();
     container.append(el);
     container.timeline = ReactDOM.render(
-        <TimelineMessages feed={feed} messages={messages} />, el.get(0)
+        <TimelineMessages feed={feed} messages={messages} order={order} />, el.get(0)
     );
 
     if (feed && interval) {
