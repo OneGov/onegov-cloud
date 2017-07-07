@@ -1,0 +1,31 @@
+language: python
+python: "3.5"
+cache: pip
+
+env:
+    - TOXENV=py34
+    - TOXENV=py35
+    - TOXENV=pep8
+
+addons:
+  postgresql: "9.3"
+
+install:
+    - pip install tox
+    - if [ "$TOXENV" = 'py34' ]; then pip install coveralls; fi
+
+script:
+    - tox -e $TOXENV
+
+after_success:
+    - if [ "$TOXENV" = 'py34' ]; then coveralls; fi
+
+deploy:
+    provider: pypi
+    distributions: "sdist bdist_wheel"
+    user: seantis
+    password:
+      secure: ""
+    on:
+        tags: true
+        condition: $TOXENV = py34
