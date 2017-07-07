@@ -3826,10 +3826,16 @@ h2 + .timeline {
 }
 
 /*
-    Ticket notes
+    Ticket types
 */
+.message-reservation,
+.message-payment,
+.message-event, {
+    background: $green-pastel;
+}
+
 .message-ticket_note {
-    background: $yellow-light;
+    background: $yellow-pastel;
 
     .text {
         max-width: $max-line-width;
