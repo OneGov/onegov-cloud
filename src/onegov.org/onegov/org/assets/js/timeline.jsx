@@ -8,6 +8,17 @@
 */
 var CSSTransitionGroup = React.addons.CSSTransitionGroup;
 
+function isScrolledIntoView(el) {
+    if (_.isUndefined(el)) {
+        return false;
+    }
+
+    var top = el.getBoundingClientRect().top;
+    var bottom = el.getBoundingClientRect().bottom;
+
+    return (top >= 0) && (bottom <= window.innerHeight);
+}
+
 var TimelineMessages = React.createClass({
     getInitialState: function() {
         var messages = this.props.messages || [];
@@ -52,6 +63,23 @@ var TimelineMessages = React.createClass({
         // the same links again and again works
         this.processMessageLinks();
         this.showNoMessagesHint();
+
+        // automatically load more messages when scrolling down
+        if (this.props.feed !== 'static') {
+            var self = this;
+            window.onscroll = _.throttle(function() {
+                if (isScrolledIntoView(self.lastMessageElement())) {
+                    if (self.props.order === 'desc') {
+                        self.loadOlder();
+                    } else {
+                        self.loadNewer();
+                    }
+                }
+            }, 1000);
+        }
+    },
+    lastMessageElement: function() {
+        return $(ReactDOM.findDOMNode(this)).find('li:last').get(0);
     },
     componentDidUpdate: function() {
         this.showNoMessagesHint();
@@ -93,36 +121,57 @@ var TimelineMessages = React.createClass({
             </CSSTransitionGroup>
         );
     },
-    update: function() {
+    load: function(direction) {
         var feed = new Url(this.props.feed);
         var self = this;
         var messages = this.state.messages;
-        var maxlength = 1000;
-        var queuefn = this.props.order === 'desc' && 'unshift' || 'push';
-        var spliceix = this.props.order === 'desc' && -1 || 0;
+        var queuefn = null;
+
+        if (this.props.order === 'desc') {
+            queuefn = direction === 'newer' && 'unshift' || 'push';
+        } else {
+            queuefn = direction === 'newer' && 'push' || 'unshift';
+        }
 
         if (messages.length > 0) {
-            if (this.props.order === 'desc') {
-                feed.query.newer_than = messages[0].id;
+            if (direction === 'newer') {
+                if (this.props.order === 'desc') {
+                    feed.query.newer_than = messages[0].id;
+                } else {
+                    feed.query.newer_than = messages[messages.length - 1].id;
+                }
             } else {
-                feed.query.newer_than = messages[messages.length - 1].id;
+                /* eslint-disable no-lonely-if */
+                if (this.props.order === 'desc') {
+                    delete feed.query.newer_than;
+                    feed.query.older_than = messages[messages.length - 1].id;
+                } else {
+                    delete feed.query.newer_than;
+                    feed.query.older_than = messages[0].id;
+                }
+                /* eslint-enable no-lonely-if */
             }
         }
 
         $.getJSON(feed.toString(), function(data) {
             var state = _.extend({}, self.state);
 
+            if (direction === 'older') {
+                data.messages.reverse();
+            }
+
             for (var i = 0; i < data.messages.length; i++) {
                 state.messages[queuefn](data.messages[i]);
             }
 
-            // remove messages at the end to reclaim memory
-            if (messages.length > maxlength) {
-                messages.splice(spliceix, messages.length - maxlength);
-            }
-
             self.setState(state);
         });
+    },
+    loadOlder: function() {
+        this.load('older');
+    },
+    loadNewer: function() {
+        this.load('newer');
     }
 });
 
@@ -140,7 +189,7 @@ var Timeline = function(container) {
     );
 
     if (feed && interval) {
-        setInterval(container.timeline.update, interval * 1000);
+        setInterval(container.timeline.loadNewer, interval * 1000);
     }
 };
 
