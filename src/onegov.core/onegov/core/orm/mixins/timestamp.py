@@ -19,6 +19,10 @@ class TimestampMixin(object):
     def timestamp():
         return utcnow()
 
+    def force_update(self):
+        """ Forces the model to update by changing the modified parameter. """
+        self.modified = self.timestamp()
+
     @declared_attr
     def created(cls):
         return deferred(Column(UTCDateTime, default=cls.timestamp))

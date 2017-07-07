@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to force an update on all timestamp based models.
+  [href]
+
 - Renames is_email_template to suppress_global_variables in the render_template
   function.
   [href]
