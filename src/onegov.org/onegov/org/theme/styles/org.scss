@@ -2097,6 +2097,13 @@ $all-ticket-icon: '\f055';
     padding-right: .8ex;
 }
 
+.no-tickets {
+    border: 0;
+    height: 400px;
+    padding-top: 150px;
+    text-align: center;
+}
+
 .tickets-table {
     width: 100%;
 
