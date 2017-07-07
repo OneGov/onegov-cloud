@@ -40,16 +40,6 @@ class EventSubmissionTicket(OrgTicketExtraText, Ticket):
     es_type_name = 'event_tickets'
 
 
-class NoteLinksMixin(object):
-
-    def extend_with_note_links(self, links, request):
-        links.append(Link(
-            text=_("New Note"),
-            url=request.link(self.ticket, 'notiz'),
-            attrs={'class': 'new-note'}
-        ))
-
-
 class PaymentLinksMixin(object):
 
     def extend_with_payment_links(self, links, request):
@@ -145,7 +135,7 @@ class PaymentLinksMixin(object):
 
 
 @handlers.registered_handler('FRM')
-class FormSubmissionHandler(Handler, PaymentLinksMixin, NoteLinksMixin):
+class FormSubmissionHandler(Handler, PaymentLinksMixin):
 
     handler_title = _("Form Submissions")
 
@@ -203,7 +193,6 @@ class FormSubmissionHandler(Handler, PaymentLinksMixin, NoteLinksMixin):
         links = []
 
         self.extend_with_payment_links(links, request)
-        self.extend_with_note_links(links, request)
 
         edit_link = URL(request.link(self.submission))
         edit_link = edit_link.query_param('edit', '').as_string()
@@ -220,7 +209,7 @@ class FormSubmissionHandler(Handler, PaymentLinksMixin, NoteLinksMixin):
 
 
 @handlers.registered_handler('RSV')
-class ReservationHandler(Handler, PaymentLinksMixin, NoteLinksMixin):
+class ReservationHandler(Handler, PaymentLinksMixin):
 
     handler_title = _("Reservations")
 
@@ -424,7 +413,6 @@ class ReservationHandler(Handler, PaymentLinksMixin, NoteLinksMixin):
             ))
 
         self.extend_with_payment_links(links, request)
-        self.extend_with_note_links(links, request)
 
         links.append(LinkGroup(
             _("Advanced"),
@@ -436,7 +424,7 @@ class ReservationHandler(Handler, PaymentLinksMixin, NoteLinksMixin):
 
 
 @handlers.registered_handler('EVN')
-class EventSubmissionHandler(Handler, NoteLinksMixin):
+class EventSubmissionHandler(Handler):
 
     handler_title = _("Events")
 
@@ -502,8 +490,6 @@ class EventSubmissionHandler(Handler, NoteLinksMixin):
                 url=request.return_here(request.link(self.event, 'publish')),
                 attrs={'class': 'accept-link'},
             ))
-
-        self.extend_with_note_links(links, request)
 
         if self.event:
             links.append(LinkGroup(_("Advanced"), links=(

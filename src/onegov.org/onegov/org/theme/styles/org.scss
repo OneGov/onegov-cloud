@@ -2190,6 +2190,10 @@ tr.ticket:hover {
     margin: 0;
 }
 
+.new-note {
+    float: right;
+}
+
 .ticket-accept {
     float: right;
 
@@ -2199,8 +2203,7 @@ tr.ticket:hover {
     }
 
     &:hover::before {
-        @include icon($accept-ticket-icon-hover);
-        margin-right: 1ex;
+        content: $accept-ticket-icon-hover;
     }
 }
 
@@ -2213,8 +2216,7 @@ tr.ticket:hover {
     }
 
     &:hover::before {
-        @include icon($close-ticket-icon-hover);
-        margin-right: 1ex;
+        content: $close-ticket-icon-hover;
     }
 }
 
@@ -2227,8 +2229,7 @@ tr.ticket:hover {
     }
 
     &:hover::before {
-        @include icon($reopen-ticket-icon-hover);
-        margin-right: 1ex;
+        content: $reopen-ticket-icon-hover;
     }
 }
 

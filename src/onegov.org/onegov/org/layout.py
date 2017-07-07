@@ -750,6 +750,11 @@ class TicketLayout(DefaultLayout):
             # only show the model related links when the ticket is pending
             if self.model.state == 'pending':
                 links = self.model.handler.get_links(self.request)
+                assert len(links) <= 2, """
+                    Models are limited to two model-specific links. Usually
+                    a primary single link and a link group containing the
+                    other links.
+                """
             else:
                 links = []
 
@@ -773,6 +778,15 @@ class TicketLayout(DefaultLayout):
                     url=self.request.link(self.model, 'reopen'),
                     attrs={'class': ('ticket-button', 'ticket-reopen')}
                 ))
+
+            # ticket notes are always enabled
+            links.append(
+                Link(
+                    text=_("New Note"),
+                    url=self.request.link(self.model, 'notiz'),
+                    attrs={'class': 'new-note'}
+                )
+            )
 
             return links
 
