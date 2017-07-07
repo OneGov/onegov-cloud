@@ -22,13 +22,16 @@ var TimelineMessages = React.createClass({
             'messages': this.props.messages || []
         };
     },
-    componentDidMount: function() {
+    processMessageLinks: function() {
         var node = $(ReactDOM.findDOMNode(this));
         Intercooler.processNodes(node.get(0));
 
         var links = node.find('a.confirm');
         links.confirmation();
         setupRedirectAfter(links);
+    },
+    showNoMessagesHint: function() {
+        var node = $(ReactDOM.findDOMNode(this));
 
         // if there's a .timeline-no-messages block on the same level as the
         // .timeline block, we'll show/hide if there are (no) messages
@@ -37,8 +40,19 @@ var TimelineMessages = React.createClass({
         } else {
             node.parent().parent().siblings('.timeline-no-messages').hide();
         }
+    },
+    componentDidMount: function() {
+        // we only do this on the initial load currently, as we hide all
+        // links in the timeline - however we use the links in the ticket
+        // view where all messages are loaded at once
 
-        window.node = node;
+        // when doing this for all messages we'll have to test if processing
+        // the same links again and again works
+        this.processMessageLinks();
+        this.showNoMessagesHint();
+    },
+    componentDidUpdate: function() {
+        this.showNoMessagesHint();
     },
     render: function() {
         var messages = this.state.messages;
