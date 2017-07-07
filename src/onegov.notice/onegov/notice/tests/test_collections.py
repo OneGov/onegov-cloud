@@ -51,6 +51,12 @@ def test_notice_collection(session):
     assert notices.for_state('submitted').query().count() == 1
     assert notices.for_state('published').query().count() == 1
 
+    assert notices.by_name('important-announcement')
+    assert notices.by_name('important-announcement-1')
+
+    assert notices.by_id(notice_1.id)
+    assert notices.by_id(notice_2.id)
+
     notices.delete(notice_1)
     notices.delete(notice_2)
 
