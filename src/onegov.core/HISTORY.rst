@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.43.1 (2017-07-07)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to force an update on all timestamp based models.
   [href]
