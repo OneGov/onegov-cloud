@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from freezegun import freeze_time
 from onegov.core.framework import Framework
 from onegov.core.request import CoreRequest, ReturnToMixin
-from onegov.core.security import Public, Private, Secret
+from onegov.core.security import Public, Personal, Private, Secret
 from onegov.core.utils import Bunch, scan_morepath_modules
 from webtest import TestApp as Client
 from urllib.parse import quote
@@ -108,12 +108,13 @@ def test_has_permission():
 
     @App.path(path='/')
     class Root(object):
-        allowed_for = (Public, Private, Secret)
+        allowed_for = (Public, Personal, Private, Secret)
 
     @App.view(model=Root, permission=Public)
     def view(self, request):
         permission = {
             'public': Public,
+            'personal': Personal,
             'private': Private,
             'secret': Secret
         }[request.params.get('permission')]
@@ -154,12 +155,14 @@ def test_has_permission():
 
     c = Client(app)
     assert c.get('/?permission=public').text == 'true'
+    assert c.get('/?permission=personal').text == 'false'
     assert c.get('/?permission=private').text == 'false'
     assert c.get('/?permission=secret').text == 'false'
 
     c.get('/login')
 
     assert c.get('/?permission=public').text == 'true'
+    assert c.get('/?permission=personal').text == 'true'
     assert c.get('/?permission=private').text == 'true'
     assert c.get('/?permission=secret').text == 'true'
 
@@ -174,6 +177,10 @@ def test_permission_by_view():
 
     @App.view(model=Root, name='public', permission=Public)
     def public_view(self, request):
+        assert False  # we don't want this view to be called
+
+    @App.view(model=Root, name='personal', permission=Personal)
+    def personal_view(self, request):
         assert False  # we don't want this view to be called
 
     @App.view(model=Root, name='private', permission=Private)
@@ -221,12 +228,14 @@ def test_permission_by_view():
     assert app.permission_by_view(Root) is None
     assert app.permission_by_view(Root, 'login') is Public
     assert app.permission_by_view(Root, 'public') is Public
+    assert app.permission_by_view(Root, 'personal') is Personal
     assert app.permission_by_view(Root, 'private') is Private
     assert app.permission_by_view(Root, 'secret') is Secret
 
     assert app.permission_by_view(Root()) is None
     assert app.permission_by_view(Root(), 'login') is Public
     assert app.permission_by_view(Root(), 'public') is Public
+    assert app.permission_by_view(Root(), 'personal') is Personal
     assert app.permission_by_view(Root(), 'private') is Private
     assert app.permission_by_view(Root(), 'secret') is Secret
 
@@ -241,6 +250,7 @@ def test_permission_by_view():
         assert has_access('{}/'.format(domain))
         assert has_access('{}/login'.format(domain))
         assert has_access('{}/public'.format(domain))
+        assert not has_access('{}/personal'.format(domain))
         assert not has_access('{}/private'.format(domain))
         assert not has_access('{}/secret'.format(domain))
 
@@ -250,5 +260,6 @@ def test_permission_by_view():
         assert has_access('{}/'.format(domain))
         assert has_access('{}/login'.format(domain))
         assert has_access('{}/public'.format(domain))
+        assert has_access('{}/personal'.format(domain))
         assert has_access('{}/private'.format(domain))
         assert has_access('{}/secret'.format(domain))
