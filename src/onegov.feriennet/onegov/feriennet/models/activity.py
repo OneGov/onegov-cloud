@@ -1,12 +1,13 @@
 from cached_property import cached_property
 from onegov.activity import Activity, ActivityCollection
-from onegov.activity.models import DAYS
 from onegov.activity import PublicationRequestCollection
+from onegov.activity.models import DAYS
 from onegov.core.templates import render_macro
 from onegov.feriennet import _
 from onegov.org.elements import Link, ConfirmLink
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.ticket import NoteLinksMixin
+from onegov.org.models.ticket import OrgTicketExtraText
 from onegov.search import ORMSearchable
 from onegov.ticket import handlers, Handler, Ticket
 
@@ -83,7 +84,7 @@ class VacationActivity(Activity, CoordinatesExtension, ORMSearchable):
         return sorted(tags)
 
 
-class ActivityTicket(Ticket):
+class ActivityTicket(OrgTicketExtraText, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'FER'}
     es_type_name = 'activity_tickets'
 
