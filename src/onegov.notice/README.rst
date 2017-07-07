@@ -4,6 +4,7 @@ Onegov Notice
 Official notices for OneGov.
 
 .. image:: https://raw.githubusercontent.com/OneGov/onegov.notice/master/docs/onegov.notice.png
+  :alt: States
 
 Run the Tests
 -------------
