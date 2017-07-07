@@ -25,10 +25,20 @@ var TimelineMessages = React.createClass({
     componentDidMount: function() {
         var node = $(ReactDOM.findDOMNode(this));
         Intercooler.processNodes(node.get(0));
-        var links = node.find('a.confirm');
 
+        var links = node.find('a.confirm');
         links.confirmation();
         setupRedirectAfter(links);
+
+        // if there's a .timeline-no-messages block on the same level as the
+        // .timeline block, we'll show/hide if there are (no) messages
+        if (this.state.messages.length === 0) {
+            node.parent().parent().siblings('.timeline-no-messages').show();
+        } else {
+            node.parent().parent().siblings('.timeline-no-messages').hide();
+        }
+
+        window.node = node;
     },
     render: function() {
         var messages = this.state.messages;
@@ -39,6 +49,7 @@ var TimelineMessages = React.createClass({
                 return messages[ix - 1].date !== messages[ix].date;
             }
         };
+
         return (
             <CSSTransitionGroup
                 component="ul"

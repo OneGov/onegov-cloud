@@ -97,6 +97,10 @@ def view_ticket_note(self, request):
 @OrgApp.view(model=TicketNote, permission=Private, request_method='DELETE')
 def delete_ticket_note(self, request):
     request.assert_valid_csrf_token()
+
+    # force a change of the ticket to make sure that it gets reindexed
+    self.ticket.force_update()
+
     request.app.session().delete(self)
     request.success(_("The note was deleted"))
 
@@ -109,6 +113,9 @@ def handle_edit_note(self, request, form):
     if form.submitted(request):
         self.text = form.text.data
         self.owner = request.current_username
+
+        # force a change of the ticket to make sure that it gets reindexed
+        self.ticket.force_update()
 
         request.success(_("Your changes were saved"))
         return request.redirect(request.link(self.ticket))

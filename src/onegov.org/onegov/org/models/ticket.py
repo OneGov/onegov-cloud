@@ -3,25 +3,39 @@ from onegov.core import utils
 from onegov.core.templates import render_macro
 from onegov.event import EventCollection
 from onegov.form import FormSubmissionCollection
-from onegov.reservation import Allocation, Resource, Reservation
 from onegov.org import _
-from onegov.org.new_elements import Link, LinkGroup, Confirm, Intercooler
 from onegov.org.layout import DefaultLayout, EventLayout
+from onegov.org.models.message import TicketNote
+from onegov.org.new_elements import Link, LinkGroup, Confirm, Intercooler
+from onegov.reservation import Allocation, Resource, Reservation
 from onegov.ticket import Ticket, Handler, handlers
+from sqlalchemy.orm import object_session
 from purl import URL
 
 
-class FormSubmissionTicket(Ticket):
+class OrgTicketExtraText(object):
+
+    @property
+    def extra_localized_text(self):
+        q = object_session(self).query(TicketNote)
+        q = q.filter_by(channel_id=self.number)
+        q = q.filter_by(type='ticket_note')
+        q = q.with_entities(TicketNote.text)
+
+        return ' '.join(n.text for n in q if n.text)
+
+
+class FormSubmissionTicket(OrgTicketExtraText, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'FRM'}
     es_type_name = 'submission_tickets'
 
 
-class ReservationTicket(Ticket):
+class ReservationTicket(OrgTicketExtraText, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'RSV'}
     es_type_name = 'reservation_tickets'
 
 
-class EventSubmissionTicket(Ticket):
+class EventSubmissionTicket(OrgTicketExtraText, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'EVN'}
     es_type_name = 'event_tickets'
 

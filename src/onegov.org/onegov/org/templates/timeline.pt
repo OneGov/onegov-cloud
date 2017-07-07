@@ -8,8 +8,11 @@
                 <div class="timeline"
                     data-feed="${feed}"
                     data-feed-data="${feed_data}"
-                    data-feed-interval="${feed_interval}"
-                />
+                    data-feed-interval="${feed_interval}">
+                </div>
+                <p class="timeline-no-messages" i18n:translate style="display: none;">
+                    No activities yet.
+                </p>
             </div>
             <div class="column small-12 medium-4">
             </div>

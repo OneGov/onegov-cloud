@@ -2051,6 +2051,10 @@ $ticket-number-bg: $yellow-light;
     padding: 0;
 }
 
+.ticket-timeline .timeline-no-messages {
+    margin-top: 1.25rem;
+}
+
 /*
     Tickets list
 */
@@ -3817,7 +3821,7 @@ h2 + .timeline {
     .actions,
     .text,
     .timestamp {
-        margin-left: 4rem; 
+        margin-left: 4rem;
     }
 
     .actions {

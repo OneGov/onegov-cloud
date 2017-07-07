@@ -5,7 +5,6 @@ from onegov.core.utils import linkify
 from onegov.event import Event
 from onegov.org import _
 from onegov.org.new_elements import Link, Confirm, Intercooler
-from onegov.search import ORMSearchable
 from onegov.ticket import Ticket, TicketCollection
 from sqlalchemy.orm import object_session
 
@@ -49,6 +48,9 @@ class TicketBasedMessage(TemplateRenderedMessage):
         }
         meta.update(extra_meta)
 
+        # force a change of the ticket to make sure that it gets reindexed
+        ticket.force_update()
+
         return cls.bound_messages(request).add(
             channel_id=ticket.number,
             owner=request.current_username or ticket.ticket_email,
@@ -56,25 +58,10 @@ class TicketBasedMessage(TemplateRenderedMessage):
         )
 
 
-class TicketNote(TicketBasedMessage, ORMSearchable):
+class TicketNote(TicketBasedMessage):
     __mapper_args__ = {
         'polymorphic_identity': 'ticket_note'
     }
-
-    es_properties = {
-        'text': {'type': 'localized'},
-        'owner': {'type': 'keyword'}
-    }
-
-    es_public = False
-
-    @property
-    def es_language(self):
-        return 'de'  # XXX add to database in the future
-
-    @property
-    def es_suggestion(self):
-        return self.channel_id
 
     @classmethod
     def create(cls, ticket, request, text):
