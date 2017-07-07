@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Gives Ticket classes the ability to define their own searchable extra text.
+  [href]
+
 0.7.0 (2017-06-22)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -103,8 +103,17 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         'subtitle': {'type': 'text'},
         'group': {'type': 'text'},
         'ticket_email': {'type': 'keyword'},
-        'ticket_data': {'type': 'localized_html'}
+        'ticket_data': {'type': 'localized_html'},
+        'extra_localized_text': {'type': 'localized'}
     }
+
+    @property
+    def extra_localized_text(self):
+        """ Maybe used by child-classes to return localized extra data that
+        should be indexed as well.
+
+        """
+        return None
 
     @property
     def es_suggestion(self):
