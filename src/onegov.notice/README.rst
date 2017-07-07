@@ -3,7 +3,7 @@ Onegov Notice
 
 Official notices for OneGov.
 
-.. image:: https://raw.githubusercontent.com/OneGov/onegov.notice/master/docs/onegov.notice.svg
+.. image:: https://raw.githubusercontent.com/OneGov/onegov.notice/master/docs/onegov.notice.png
 
 Run the Tests
 -------------
