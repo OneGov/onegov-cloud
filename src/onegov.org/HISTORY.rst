@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds an activity/audit log and the ability to create notes on tickets.
+  [href]
+
 0.13.1 (2017-07-05)
 ~~~~~~~~~~~~~~~~~~~
 
