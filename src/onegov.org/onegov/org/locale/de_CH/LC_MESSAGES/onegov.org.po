@@ -1822,7 +1822,7 @@ msgstr "Diese Notiz wurde von jemand anderem erstellt. Durch Ihre Änderung werd
 msgid ""
 "Notes are private and only shown to logged-in members. You can use links/e-"
 "mail addresses are turned into clickable links."
-msgstr "Notizen sind Privat und werden nur angemeldeten Benutzern angezeigt. E-Mail Adressen und Links werden klickbar gemacht."
+msgstr "Notizen sind privat und werden nur angemeldeten Benutzern angezeigt. E-Mail Adressen und Links werden klickbar gemacht."
 
 msgid "State:"
 msgstr "Status:"
