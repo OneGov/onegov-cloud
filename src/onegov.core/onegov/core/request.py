@@ -351,7 +351,7 @@ class CoreRequest(IncludeRequest, ReturnToMixin):
 
     def message(self, text, type):
         """ Adds a message with the given type to the messages list. This
-        messages list may then be displayed by an applicaiton building on
+        messages list may then be displayed by an application building on
         onegov.core.
 
         For example:
