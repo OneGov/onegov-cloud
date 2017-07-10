@@ -89,5 +89,5 @@ def view_messages(self, request):
             view_messages_feed(self, request),
             separators=(',', ':')
         ),
-        'feed_interval': 5
+        'feed_interval': 15
     }
