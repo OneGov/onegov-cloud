@@ -34,7 +34,6 @@ setup(
     install_requires=[
         'babel',
         'click',
-        'cssmin',
         'elasticsearch',
         'isodate',
         'lxml',
