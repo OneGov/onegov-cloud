@@ -25,10 +25,6 @@ class Message(Base):
     #: necessarily linked to the user table
     owner = Column(Text, nullable=True)
 
-    #: optional recipient of the message -> may be used to create private
-    #: messages shared between an owner and a recipient
-    recipient = Column(Text, nullable=True)
-
     #: the polymorphic type of the message
     type = Column(Text, nullable=True)
 
