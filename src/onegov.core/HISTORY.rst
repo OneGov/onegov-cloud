@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Skips dill version 0.2.7 as this version leads to recursion errors.
+  [href]
+
 - Enables a css minifier by default.
   [href]
 
