@@ -1,8 +1,8 @@
 import os.path
 
 from collections import OrderedDict
-from csscompressor import compress
 from itertools import chain
+from rcssmin import cssmin
 from scss.compiler import Compiler
 
 
@@ -179,7 +179,7 @@ class BaseTheme(object):
         )
 
         if self.compress:
-            return compress(css)
+            return cssmin(css)
         else:
             return css
 
