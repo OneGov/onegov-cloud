@@ -47,3 +47,23 @@ class DataUriFilter(CSSDataUri):
 
 
 register_filter(DataUriFilter)
+
+
+class RCSSMinFilter(Filter):
+    """ Adds the rcssmin filter (not yet included in webassets) """
+
+    name = 'custom-rcssmin'
+
+    def setup(self):
+        try:
+            import rcssmin
+        except ImportError:
+            raise EnvironmentError('The "rcssmin" package is not installed.')
+        else:
+            self.rcssmin = rcssmin
+
+    def output(self, _in, out, **kw):
+        out.write(self.rcssmin.cssmin(_in.read()))
+
+
+register_filter(RCSSMinFilter)

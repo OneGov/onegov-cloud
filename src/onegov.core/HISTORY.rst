@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Enables a css minifier by default.
+  [href]
+
 0.43.2 (2017-07-07)
 ~~~~~~~~~~~~~~~~~~~
 

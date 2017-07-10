@@ -65,6 +65,7 @@ setup(
         'pyreact',
         'pytz',
         'purl',
+        'rcssmin',
         'sedate',
         'sqlalchemy>=0.9',
         'sqlalchemy-utils',

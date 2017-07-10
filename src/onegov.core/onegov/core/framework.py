@@ -872,7 +872,12 @@ def get_js_filter():
     return 'rjsmin'
 
 
-@Framework.webasset_filter('jsx')
+@Framework.webasset_filter('css')
+def get_css_filter():
+    return 'custom-rcssmin'
+
+
+@Framework.webasset_filter('jsx', produces='js')
 def get_jsx_filter():
     return 'jsx'
 
