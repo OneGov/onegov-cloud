@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.43.3 (2017-07-10)
+~~~~~~~~~~~~~~~~~~~
 
 - Skips dill version 0.2.7 as this version leads to recursion errors.
   [href]
