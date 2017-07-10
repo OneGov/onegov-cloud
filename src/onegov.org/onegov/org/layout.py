@@ -758,6 +758,15 @@ class TicketLayout(DefaultLayout):
             else:
                 links = []
 
+            # if we have a payment, add pamyent links
+            if self.model.state == 'pending':
+                payment = self.model.handler.payment
+
+                if payment and payment.source == 'manual':
+                    links.extend(self.get_manual_payment_links(payment))
+                if payment and payment.source == 'stripe_connect':
+                    links.extend(self.get_stripe_payment_links(payment))
+
             if self.model.state == 'open':
                 links.append(Link(
                     text=_("Accept ticket"),
@@ -789,6 +798,85 @@ class TicketLayout(DefaultLayout):
             )
 
             return links
+
+    def get_manual_payment_links(self, payment):
+        if payment.state == 'open':
+            yield Link(
+                text=_("Mark as paid"),
+                url=self.csrf_protected_url(
+                    self.request.link(payment, 'mark-as-paid'),
+                ),
+                attrs={'class': 'mark-as-paid'},
+                traits=(
+                    Intercooler(
+                        request_method='POST',
+                        redirect_after=self.request.url,
+                    ),
+                )
+            )
+        else:
+            yield Link(
+                text=_("Mark as unpaid"),
+                url=self.csrf_protected_url(
+                    self.request.link(payment, 'mark-as-unpaid'),
+                ),
+                attrs={'class': 'mark-as-unpaid'},
+                traits=(
+                    Intercooler(
+                        request_method='POST',
+                        redirect_after=self.request.url,
+                    ),
+                )
+            )
+
+    def get_stripe_payment_links(self, payment):
+        if payment.state == 'open':
+            yield Link(
+                text=_("Capture Payment"),
+                url=self.csrf_protected_url(
+                    self.request.link(payment, 'capture')
+                ),
+                attrs={'class': 'payment-capture'},
+                traits=(
+                    Confirm(
+                        _("Do you really want capture the payment?"),
+                        _(
+                            "This usually happens automatically, so there is "
+                            "no reason not do capture the payment."
+                        ),
+                        _("Capture payment")
+                    ),
+                    Intercooler(
+                        request_method='POST',
+                        redirect_after=self.request.url
+                    ),
+                )
+            )
+        elif payment.state == 'paid':
+            amount = '{:02f} {}'.format(payment.amount, payment.currency)
+
+            yield Link(
+                text=_("Refund Payment"),
+                url=self.csrf_protected_url(
+                    self.request.link(payment, 'refund')
+                ),
+                attrs={'class': 'payment-refund'},
+                traits=(
+                    Confirm(
+                        _("Do you really want to refund ${amount}?", mapping={
+                            'amount': amount
+                        }),
+                        _("This cannot be undone."),
+                        _("Refund ${amount}", mapping={
+                            'amount': amount
+                        })
+                    ),
+                    Intercooler(
+                        request_method='POST',
+                        redirect_after=self.request.url
+                    )
+                )
+            )
 
 
 class TicketNoteLayout(DefaultLayout):
