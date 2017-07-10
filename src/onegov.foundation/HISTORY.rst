@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.0 (2017-07-10)
+~~~~~~~~~~~~~~~~~~~
+
 - Replace csscompress with rcssmin, which produces slightly bigger results but
   does so in a much faster way.
   [href]
