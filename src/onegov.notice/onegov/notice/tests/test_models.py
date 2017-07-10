@@ -78,18 +78,10 @@ def test_transitions():
         notice.publish()
     with raises(AssertionError):
         notice.reject()
-    with raises(AssertionError):
-        notice.withdraw()
     notice.submit()
     assert notice.state == 'submitted'
 
     # Submitted
-    notice = OfficialNotice(state='submitted')
-    with raises(AssertionError):
-        notice.submit()
-    notice.withdraw()
-    assert notice.state == 'drafted'
-
     notice = OfficialNotice(state='submitted')
     notice.publish()
     assert notice.state == 'published'
@@ -104,17 +96,13 @@ def test_transitions():
         notice.submit()
     with raises(AssertionError):
         notice.publish()
-    with raises(AssertionError):
-        notice.withdraw()
 
     # Rejected
     notice = OfficialNotice(state='rejected')
     with raises(AssertionError):
-        notice.submit()
-    with raises(AssertionError):
         notice.publish()
-    with raises(AssertionError):
-        notice.withdraw()
+    notice.submit()
+    assert notice.state == 'submitted'
 
 
 def test_polymorphism(session):

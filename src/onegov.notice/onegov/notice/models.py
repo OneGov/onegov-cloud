@@ -92,7 +92,7 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     def submit(self):
         """ Submit a drafted notice. """
 
-        assert self.state == 'drafted'
+        assert self.state == 'drafted' or self.state == 'rejected'
         self.state = 'submitted'
 
     def publish(self):
@@ -106,9 +106,3 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
 
         assert self.state == 'submitted'
         self.state = 'rejected'
-
-    def withdraw(self):
-        """ Withdraw a submitted notice. """
-
-        assert self.state == 'submitted'
-        self.state = 'drafted'
