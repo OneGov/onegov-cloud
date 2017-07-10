@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.14.0 (2017-07-10)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a meta column.
   [msom]
