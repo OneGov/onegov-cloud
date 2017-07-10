@@ -180,3 +180,10 @@ def force_lowercase_usernames(context):
 def add_signup_token_column(context):
     context.operations.add_column(
         'users', Column('signup_token', Text, nullable=True))
+
+
+@upgrade_task('Add meta column')
+def add_meta_column(context):
+    context.operations.add_column(
+        'users', Column('meta', JSON, nullable=True)
+    )

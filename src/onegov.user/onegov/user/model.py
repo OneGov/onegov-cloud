@@ -43,6 +43,10 @@ class User(Base, TimestampMixin, ORMSearchable):
     #: the user id is a uuid because that's more secure (no id guessing)
     id = Column(UUID, nullable=False, primary_key=True, default=uuid4)
 
+    #: meta information specific to this user -> we don't use the meta/content
+    #: mixin yet as we might not need the content property
+    meta = Column(JSON, nullable=True, default=dict)
+
     #: the username may be any string, but will usually be an email address
     username = Column(LowercaseText, unique=True, nullable=False)
 
