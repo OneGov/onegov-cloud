@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Uses shared common code from onegov.form for HTML fields.
+- Fixes calucating the contrast of an invalid color throwing an error.
   [msom]
 
 0.14.0 (2017-07-10)

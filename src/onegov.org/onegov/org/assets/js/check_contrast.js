@@ -26,15 +26,16 @@ var check_contrast = function() {
     // see http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
     // the theme lightens the primary color 30% for some elements
     var color = hexToRgb($(this).val());
-    var ratio = (
-        (luminance(255, 255, 255) + 0.05) /
-        (luminance(color.r, color.g, color.b) / 0.7 + 0.05)
-    );
-
-    if ($(this).next('meter').length) {
-        $(this).next('meter').val(ratio);
-    } else {
-        $(this).after('<meter min="1" max="21" low="4.5" value="' + ratio + '"></meter>');
+    if (color) {
+        var ratio = (
+            (luminance(255, 255, 255) + 0.05) /
+            (luminance(color.r, color.g, color.b) / 0.7 + 0.05)
+        );
+        if ($(this).next('meter').length) {
+            $(this).next('meter').val(ratio);
+        } else {
+            $(this).after('<meter min="1" max="21" low="4.5" value="' + ratio + '"></meter>');
+        }
     }
 };
 $('#primary_color').on('input propertychange paste', check_contrast);
