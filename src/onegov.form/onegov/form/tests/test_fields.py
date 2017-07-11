@@ -6,6 +6,7 @@ from cgi import FieldStorage
 from gzip import GzipFile
 from io import BytesIO
 from onegov.form import Form
+from onegov.form.fields import HtmlField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import OrderedMultiCheckboxField
 from onegov.form.fields import UploadField
@@ -67,3 +68,17 @@ def test_ordered_multi_checkbox_field():
         ('b', 'b'),
         ('c', 'c'),
     ]
+
+
+def test_html_field():
+    form = Form()
+    field = HtmlField()
+    field = field.bind(form, 'html')
+
+    field.data = ''
+    assert 'class="editor"' in field()
+    assert field.validate(form)
+
+    field.data = '<script>alert(0)</script>'
+    field.validate(form)
+    assert '<script>' not in field.data

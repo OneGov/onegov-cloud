@@ -3,10 +3,11 @@ import gzip
 import magic
 
 from io import BytesIO
+from onegov.core.html import sanitize_html
 from onegov.form.widgets import MultiCheckboxWidget
 from onegov.form.widgets import OrderedMultiCheckboxWidget
 from onegov.form.widgets import UploadWidget
-from wtforms import FileField, SelectMultipleField, widgets
+from wtforms import FileField, SelectMultipleField, TextAreaField, widgets
 
 
 class MultiCheckboxField(SelectMultipleField):
@@ -77,3 +78,19 @@ class UploadField(FileField):
             'mimetype': mimetype_by_introspection,
             'size': len(file_data)
         }
+
+
+class HtmlField(TextAreaField):
+    """ A textfield with html with integrated sanitation. """
+
+    def __init__(self, *args, **kwargs):
+        self.form = kwargs.get('_form')
+
+        if 'render_kw' not in kwargs or not kwargs['render_kw'].get('class_'):
+            kwargs['render_kw'] = kwargs.get('render_kw', {})
+            kwargs['render_kw']['class_'] = 'editor'
+
+        super().__init__(*args, **kwargs)
+
+    def pre_validate(self, form):
+        self.data = sanitize_html(self.data)
