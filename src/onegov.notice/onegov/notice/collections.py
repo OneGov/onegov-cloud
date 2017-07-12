@@ -2,8 +2,6 @@ from onegov.core.collection import Pagination
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
 from onegov.notice.models import OfficialNotice
-from sedate import as_datetime
-from sedate import replace_timezone
 
 
 class OfficialNoticeCollectionPagination(Pagination):
@@ -18,7 +16,6 @@ class OfficialNoticeCollectionPagination(Pagination):
 
     def subset(self):
         query = self.query()
-        query = query.order_by(OfficialNotice.issue_date)
         return query
 
     @property
@@ -56,7 +53,7 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
 
         return name
 
-    def add(self, title, text, issue_date, timezone, **optional):
+    def add(self, title, text, **optional):
         """ Add a new notice.
 
         A unique, URL-friendly name is created automatically for this notice
@@ -67,8 +64,6 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
         notice = OfficialNotice(
             state='drafted',
             title=title,
-            issue_date=replace_timezone(as_datetime(issue_date), timezone),
-            timezone=timezone,
             name=self._get_unique_name(title),
             **optional
         )

@@ -1,29 +1,15 @@
-from datetime import datetime
 from onegov.notice import OfficialNotice
 from onegov.user import User
 from pytest import raises
-from sedate import replace_timezone
 from transaction import commit
 
 
-def tzdatetime(year, month, day, hour, minute, timezone):
-    return replace_timezone(datetime(year, month, day, hour, minute), timezone)
-
-
 def test_create_notice(session):
-    timezone = 'Europe/Zurich'
-    issue_date = tzdatetime(2008, 2, 7, 10, 15, timezone)
-    title = 'Very Important Official Announcement'
-    text = '<em>Important</em> things happened!'
-
     notice = OfficialNotice()
     notice.state = 'drafted'
-    notice.issue_date = issue_date
-    notice.timezone = timezone
-    notice.title = title
-    notice.text = text
+    notice.title = 'Very Important Official Announcement'
+    notice.text = '<em>Important</em> things happened!'
     notice.name = 'notice'
-    notice.code = 'code'
     notice.category = 'category'
     session.add(notice)
 
@@ -35,16 +21,10 @@ def test_create_notice(session):
     notice = session.query(OfficialNotice).one()
 
     assert notice.state == 'published'
-    assert notice.issue_date == issue_date
-    assert notice.timezone == timezone
-    assert notice.issue_date_localized == issue_date
-    assert str(notice.issue_date.tzinfo) == 'UTC'
-    assert str(notice.issue_date_localized.tzinfo) == timezone
-    assert notice.title == title
-    assert notice.content == {'text': text}
-    assert notice.text == text
+    assert notice.title == 'Very Important Official Announcement'
+    assert notice.content == {'text': '<em>Important</em> things happened!'}
+    assert notice.text == '<em>Important</em> things happened!'
     assert notice.name == 'notice'
-    assert notice.code == 'code'
     assert notice.category == 'category'
 
 
@@ -55,8 +35,6 @@ def test_ownership(session):
     notice = OfficialNotice(
         title='title',
         state='drafted',
-        issue_date=tzdatetime(2008, 2, 7, 10, 15, 'US/Eastern'),
-        timezone='US/Eastern',
         text='Text',
     )
     notice.user = user
@@ -117,8 +95,6 @@ def test_polymorphism(session):
         OfficialNotice(
             title='original',
             state='drafted',
-            issue_date=tzdatetime(2008, 2, 7, 10, 15, 'US/Eastern'),
-            timezone='US/Eastern',
             text='Text',
         )
     )
@@ -127,8 +103,6 @@ def test_polymorphism(session):
         MyOfficialNotice(
             title='my',
             state='drafted',
-            issue_date=tzdatetime(2008, 2, 7, 10, 15, 'US/Eastern'),
-            timezone='US/Eastern',
             text='Text',
         )
     )
@@ -137,8 +111,6 @@ def test_polymorphism(session):
         MyOtherOfficialNotice(
             title='other',
             state='drafted',
-            issue_date=tzdatetime(2008, 2, 7, 10, 15, 'US/Eastern'),
-            timezone='US/Eastern',
             text='Text',
         )
     )

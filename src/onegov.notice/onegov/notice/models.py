@@ -1,14 +1,11 @@
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UTCDateTime
 from onegov.core.orm.types import UUID
 from onegov.user.model import User
-from sedate import to_timezone
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
-from sqlalchemy import String
 from sqlalchemy import Text
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
@@ -37,10 +34,6 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     #: A nice ID usable for the url, readable by humans.
     name = Column(Text)
 
-    #: A general purpose field for identifying the notice within a bunch of
-    #: notices, readable by humans.
-    code = Column(Text, nullable=True)
-
     #: The state of the notice.
     state = Column(
         Enum(
@@ -51,7 +44,7 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
         default='drafted'
     )
 
-    #: The title of the ticket.
+    #: The title of the notice.
     title = Column(Text, nullable=False)
 
     @property
@@ -67,18 +60,6 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
         if self.content is None:
             self.content = {}
         self.content['text'] = value
-
-    #: The issue date of the notice.
-    issue_date = Column(UTCDateTime, nullable=False)
-
-    #: The timezone of the issue date.
-    timezone = Column(String, nullable=False)
-
-    @property
-    def issue_date_localized(self):
-        """ The localized version of the issue date. """
-
-        return to_timezone(self.issue_date, self.timezone)
 
     #: The category if the notice.
     category = Column(Text, nullable=True)
