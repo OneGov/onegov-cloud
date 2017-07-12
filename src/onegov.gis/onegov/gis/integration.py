@@ -43,7 +43,7 @@ def get_css_path():
     return 'assets/css'
 
 
-@MapboxApp.webasset('leaflet', filters={'css': 'datauri'})
+@MapboxApp.webasset('leaflet', filters={'css': ['datauri', 'custom-rcssmin']})
 def get_leaflet_asset():
     yield 'leaflet.css'
     yield 'leaflet-easybutton.css'

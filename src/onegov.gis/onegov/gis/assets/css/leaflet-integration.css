@@ -29,8 +29,9 @@
 }
 
 .vector-marker i {
-    position: relative;
-    top: 7px;
+    position: absolute;
+    top: 8px;
+    left: 0;
     width: 100%;
     color: #333;
     margin: 0;

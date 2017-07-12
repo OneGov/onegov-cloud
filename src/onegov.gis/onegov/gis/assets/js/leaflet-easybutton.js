@@ -111,7 +111,8 @@ L.Control.EasyButton = L.Control.extend({
                                 //   icon: 'fa-circle',    // wrapped with <a>
                                 // }
 
-    leafletClasses:   true      // use leaflet styles for the button
+    leafletClasses:   true,     // use leaflet styles for the button
+    tagName:          'button',
   },
 
 
@@ -166,24 +167,29 @@ L.Control.EasyButton = L.Control.extend({
 
   _buildButton: function(){
 
-    this.button = L.DomUtil.create('button', '');
+    this.button = L.DomUtil.create(this.options.tagName, '');
+
+    if (this.options.tagName === 'button') {
+        this.button.setAttribute('type', 'button');
+    }
 
     if (this.options.id ){
       this.button.id = this.options.id;
     }
 
     if (this.options.leafletClasses){
-      L.DomUtil.addClass(this.button, 'easy-button-button leaflet-bar-part');
+      L.DomUtil.addClass(this.button, 'easy-button-button leaflet-bar-part leaflet-interactive');
     }
 
-    // don't let double clicks get to the map
+    // don't let double clicks and mousedown get to the map
     L.DomEvent.addListener(this.button, 'dblclick', L.DomEvent.stop);
+    L.DomEvent.addListener(this.button, 'mousedown', L.DomEvent.stop);
 
     // take care of normal clicks
     L.DomEvent.addListener(this.button,'click', function(e){
       L.DomEvent.stop(e);
       this._currentState.onClick(this, this._map ? this._map : null );
-      this._map.getContainer().focus();
+      this._map && this._map.getContainer().focus();
     }, this);
 
     // prep the contents of the control
@@ -271,16 +277,12 @@ L.Control.EasyButton = L.Control.extend({
     }
   },
 
-
-
   enable: function(){
     L.DomUtil.addClass(this.button, 'enabled');
     L.DomUtil.removeClass(this.button, 'disabled');
     this.button.setAttribute('aria-hidden', 'false');
     return this;
   },
-
-
 
   disable: function(){
     L.DomUtil.addClass(this.button, 'disabled');
@@ -289,24 +291,21 @@ L.Control.EasyButton = L.Control.extend({
     return this;
   },
 
-
-  removeFrom: function (map) {
-
-    this._container.parentNode.removeChild(this._container);
-    this._map = null;
-
-    return this;
-  },
-
-  onAdd: function(){
-    var containerObj = L.easyBar([this], {
+  onAdd: function(map){
+    var bar = L.easyBar([this], {
       position: this.options.position,
       leafletClasses: this.options.leafletClasses
     });
-    this._container = containerObj.container;
-    return this._container;
-  }
+    this._anonymousBar = bar;
+    this._container = bar.container;
+    return this._anonymousBar.container;
+  },
 
+  removeFrom: function (map) {
+    if (this._map === map)
+      this.remove();
+    return this;
+  },
 
 });
 

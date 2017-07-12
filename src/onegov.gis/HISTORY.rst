@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Upgrade Leaflet and its plugins to the latest release.
+  [href]
+
 0.3.3 (2017-02-15)
 ~~~~~~~~~~~~~~~~~~~
 

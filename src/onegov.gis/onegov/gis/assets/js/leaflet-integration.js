@@ -212,7 +212,10 @@ function addGeocoder(map) {
     L.Control.geocoder({
         position: 'topright',
         placeholder: '',
-        errorMessage: ''
+        errorMessage: '',
+        defaultMarkGeocode: false
+    }).on('markgeocode', function(e) {
+        map.panTo(new L.LatLng(e.geocode.center.lat, e.geocode.center.lng));
     }).addTo(map);
 }
 
