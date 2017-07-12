@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Uses latest jquery.popupoverlay plugin release.
+  [href]
+
 - Fixes calucating the contrast of an invalid color throwing an error.
   [msom]
 

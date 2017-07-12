@@ -1,7 +1,7 @@
 /*!
  * jQuery Popup Overlay
  *
- * @version 1.7.6
+ * @version 1.7.13
  * @requires jQuery v1.7.1+
  * @link http://vast-engineering.github.com/jquery-popup-overlay/
  */
@@ -15,10 +15,11 @@
     var bodymarginright = null;
     var opensuffix = '_open';
     var closesuffix = '_close';
-    var stack = [];
+    var visiblePopupsArray = [];
     var transitionsupport = null;
     var opentimer;
     var iOS = /(iPad|iPhone|iPod)/g.test(navigator.userAgent);
+    var focusableElementsString = "a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, *[tabindex], *[contenteditable]";
 
     var methods = {
 
@@ -83,7 +84,33 @@
 
             $el.addClass('popup_content');
 
-            $body.prepend(el);
+            if ((options.background) && (!$('#' + el.id + '_background').length)) {
+
+                $body.append('<div id="' + el.id + '_background" class="popup_background"></div>');
+
+                var $background = $('#' + el.id + '_background');
+
+                $background.css({
+                    opacity: 0,
+                    visibility: 'hidden',
+                    backgroundColor: options.color,
+                    position: 'fixed',
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 0
+                });
+
+                if (options.setzindex && !options.autozindex) {
+                    $background.css('z-index', '100000');
+                }
+
+                if (options.transition) {
+                    $background.css('transition', options.transition);
+                }
+            }
+
+            $body.append(el);
 
             $el.wrap('<div id="' + el.id + '_wrapper" class="popup_wrapper" />');
 
@@ -126,32 +153,6 @@
             // Hide popup content from screen readers initially
             $el.attr('aria-hidden', true);
 
-            if ((options.background) && (!$('#' + el.id + '_background').length)) {
-
-                $body.prepend('<div id="' + el.id + '_background" class="popup_background"></div>');
-
-                var $background = $('#' + el.id + '_background');
-
-                $background.css({
-                    opacity: 0,
-                    visibility: 'hidden',
-                    backgroundColor: options.color,
-                    position: 'fixed',
-                    top: 0,
-                    right: 0,
-                    bottom: 0,
-                    left: 0
-                });
-
-                if (options.setzindex && !options.autozindex) {
-                    $background.css('z-index', '100000');
-                }
-
-                if (options.transition) {
-                    $background.css('transition', options.transition);
-                }
-            }
-
             if (options.type == 'overlay') {
                 $el.css({
                     textAlign: 'left',
@@ -169,7 +170,7 @@
                 };
 
                 if(options.backgroundactive){
-                    css.position = 'relative';
+                    css.position = 'absolute';
                     css.height = '0';
                     css.overflow = 'visible';
                 }
@@ -270,9 +271,9 @@
             // Remember last clicked place
             lastclicked[el.id] = ordinal;
 
-            // Add popup id to popup stack
+            // Add popup id to visiblePopupsArray
             setTimeout(function() {
-                stack.push(el.id);
+                visiblePopupsArray.push(el.id);
             }, 0);
 
             // Calculating maximum z-index
@@ -416,14 +417,30 @@
             } else {
                 callback(el, ordinal, options.opentransitionend);
             }
+
+            // Handler: Reposition tooltip when window is resized
+            if (options.type == 'tooltip') {
+                $(window).on('resize.' + el.id, function () {
+                    methods.reposition(el, ordinal);
+                });
+            }
         },
 
         /**
          * Hide method
          *
-         * @param {object} el - popup instance DOM node
+         * @param object el - popup instance DOM node
+         * @param boolean outerClick - click on the outer content below popup
          */
-        hide: function (el) {
+        hide: function (el, outerClick) {
+            // Get index of popup ID inside of visiblePopupsArray
+            var popupIdIndex = $.inArray(el.id, visiblePopupsArray);
+
+            // If popup is not opened, ignore the rest of the function
+            if (popupIdIndex === -1) {
+                return;
+            }
+
             if(opentimer) clearTimeout(opentimer);
 
             var $body = $('body');
@@ -434,8 +451,7 @@
 
             $el.data('popup-visible', false);
 
-
-            if (stack.length === 1) {
+            if (visiblePopupsArray.length === 1) {
                 $('html').removeClass('popup_visible').removeClass('popup_visible_' + el.id);
             } else {
                 if($('html').hasClass('popup_visible_' + el.id)) {
@@ -443,15 +459,15 @@
                 }
             }
 
-            // Remove last opened popup from the stack
-            stack.pop();
+            // Remove popup from the visiblePopupsArray
+            visiblePopupsArray.splice(popupIdIndex, 1);
 
             if($wrapper.hasClass('popup_wrapper_visible')) {
                 $wrapper.removeClass('popup_wrapper_visible');
             }
 
-            if (options.keepfocus) {
-                // Focus back on saved element
+            // Focus back on saved element
+            if (options.keepfocus && !outerClick) {
                 setTimeout(function() {
                     if ($($el.data('focusedelementbeforepopup')).is(':visible')) {
                         $el.data('focusedelementbeforepopup').focus();
@@ -529,6 +545,9 @@
                 callback(el, lastclicked[el.id], options.closetransitionend);
             }
 
+            if (options.type == 'tooltip') {
+                $(window).off('resize.' + el.id);
+            }
         },
 
         /**
@@ -637,8 +656,8 @@
                 genericCloseButton = '<button class="popup_close ' + el.id + '_close" title="Close" aria-label="Close"><span aria-hidden="true">×</span></button>';
             }
 
-            if ($el.data('popup-initialized')){
-                $el.append(genericCloseButton);
+            if ($(el).data('popup-initialized')){
+                $(el).append(genericCloseButton);
             }
 
         }
@@ -654,8 +673,11 @@
      */
     var callback = function (el, ordinal, func) {
         var options = $(el).data('popupoptions');
-        var openelement =  (options.openelement) ? options.openelement : ('.' + el.id + opensuffix);
-        var elementclicked = $(openelement + '[data-popup-ordinal="' + ordinal + '"]');
+        var openelement;
+        var elementclicked;
+        if (typeof options === 'undefined') return;
+        openelement =  options.openelement ? options.openelement : ('.' + el.id + opensuffix);
+        elementclicked = $(openelement + '[data-popup-ordinal="' + ordinal + '"]');
         if (typeof func == 'function') {
             func.call($(el), el, elementclicked);
         }
@@ -663,8 +685,8 @@
 
     // Hide popup if ESC key is pressed
     $(document).on('keydown', function (event) {
-        if(stack.length) {
-            var elementId = stack[stack.length - 1];
+        if(visiblePopupsArray.length) {
+            var elementId = visiblePopupsArray[visiblePopupsArray.length - 1];
             var el = document.getElementById(elementId);
 
             if ($(el).data('popupoptions').escape && event.keyCode == 27) {
@@ -675,38 +697,79 @@
 
     // Hide popup on click
     $(document).on('click', function (event) {
-        if(stack.length) {
-            var elementId = stack[stack.length - 1];
+        if(visiblePopupsArray.length) {
+            var elementId = visiblePopupsArray[visiblePopupsArray.length - 1];
             var el = document.getElementById(elementId);
             var closeButton = ($(el).data('popupoptions').closeelement) ? $(el).data('popupoptions').closeelement : ('.' + el.id + closesuffix);
 
-            // Click on Close button
+            // If Close button clicked
             if ($(event.target).closest(closeButton).length) {
                 event.preventDefault();
                 methods.hide(el);
             }
 
-            // Click outside of popup
-            if ($(el).data('popupoptions').blur && !$(event.target).closest('#' + elementId).length && event.which !== 2 && $(event.target).is(':visible')) {
-                methods.hide(el);
+            // If clicked outside of popup
+            if ($(el).data('popupoptions') && $(el).data('popupoptions').blur && !$(event.target).closest('#' + elementId).length && event.which !== 2 && $(event.target).is(':visible')) {
 
-                if ($(el).data('popupoptions').type === 'overlay') {
-                    event.preventDefault(); // iOS will trigger click on the links below the overlay when clicked on the overlay if we don't prevent default action
+                if ($(el).data('popupoptions').background) {
+                    // If clicked on popup cover
+                    methods.hide(el);
+
+                    // Older iOS/Safari will trigger a click on the elements below the cover,
+                    // when tapping on the cover, so the default action needs to be prevented.
+                    event.preventDefault();
+
+                } else {
+                    // If clicked on outer content
+                    methods.hide(el, true);
                 }
             }
         }
     });
 
     // Keep keyboard focus inside of popup
-    $(document).on('focusin', function(event) {
-        if(stack.length) {
-            var elementId = stack[stack.length - 1];
+    $(document).on('keydown', function(event) {
+        if(visiblePopupsArray.length && event.which == 9) {
+
+            // If tab or shift-tab pressed
+            var elementId = visiblePopupsArray[visiblePopupsArray.length - 1];
             var el = document.getElementById(elementId);
 
-            if ($(el).data('popupoptions').keepfocus) {
-                if (!el.contains(event.target)) {
-                    event.stopPropagation();
-                    el.focus();
+            // Get list of all children elements in given object
+            var popupItems = $(el).find('*');
+
+            // Get list of focusable items
+            var focusableItems = popupItems.filter(focusableElementsString).filter(':visible');
+
+            // Get currently focused item
+            var focusedItem = $(':focus');
+
+            // Get the number of focusable items
+            var numberOfFocusableItems = focusableItems.length;
+
+            // Get the index of the currently focused item
+            var focusedItemIndex = focusableItems.index(focusedItem);
+
+            // If popup doesn't contain focusable elements, focus popup itself
+            if (numberOfFocusableItems === 0) {
+                $(el).focus();
+                event.preventDefault();
+            } else {
+                if (event.shiftKey) {
+                    // Back tab
+                    // If focused on first item and user preses back-tab, go to the last focusable item
+                    if (focusedItemIndex === 0) {
+                        focusableItems.get(numberOfFocusableItems - 1).focus();
+                        event.preventDefault();
+                    }
+
+                } else {
+                    // Forward tab
+                    // If focused on the last item and user preses tab, go to the first focusable item
+                    if (focusedItemIndex == numberOfFocusableItems - 1) {
+                        focusableItems.get(0).focus();
+                        event.preventDefault();
+                    }
                 }
             }
         }
@@ -718,10 +781,10 @@
     $.fn.popup = function (customoptions) {
         return this.each(function () {
 
-            $el = $(this);
+            var $el = $(this);
 
             if (typeof customoptions === 'object') {  // e.g. $('#popup').popup({'color':'blue'})
-                var opt = $.extend({}, $.fn.popup.defaults, customoptions);
+                var opt = $.extend({}, $.fn.popup.defaults, $el.data('popupoptions'), customoptions);
                 $el.data('popupoptions', opt);
                 options = $el.data('popupoptions');
 
