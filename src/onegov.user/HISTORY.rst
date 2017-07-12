@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.14.1 (2017-07-12)
+~~~~~~~~~~~~~~~~~~~
 
 - Removes the meta column (there is already a data).
   [msom]
