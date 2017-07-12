@@ -2,6 +2,7 @@ import morepath
 import pytest
 
 from onegov.core import Framework
+from onegov.core import filters  # noqa -> registers webasset filters
 from onegov.core.utils import scan_morepath_modules
 from onegov.gis import MapboxApp
 from webtest import TestApp as Client
