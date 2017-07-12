@@ -7,7 +7,7 @@ from onegov.gis import MapboxApp
 from webtest import TestApp as Client
 
 
-def test_no_secret_keys(es_url, temporary_directory):
+def test_no_secret_keys(temporary_directory):
 
     class App(Framework, MapboxApp):
         pass
@@ -23,7 +23,7 @@ def test_no_secret_keys(es_url, temporary_directory):
         app.configure_application(mapbox_token='sk.asdf')
 
 
-def test_mapbox_token_tween(es_url, temporary_directory):
+def test_mapbox_token_tween(temporary_directory):
 
     class App(Framework, MapboxApp):
         pass
