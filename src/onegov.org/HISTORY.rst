@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.14.1 (2017-07-12)
+~~~~~~~~~~~~~~~~~~~
+
 - Uses latest jquery.popupoverlay plugin release.
   [href]
 
