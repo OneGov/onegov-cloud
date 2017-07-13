@@ -11,11 +11,15 @@ from onegov.activity import OccasionCollection
 from onegov.activity import PeriodCollection
 from onegov.activity.utils import generate_xml
 from onegov.core.utils import Bunch
-from onegov.org.testing import Client, get_message, select_checkbox
+from onegov.testing import Client as BaseClient
 from onegov.testing import utils
 from onegov.user import UserCollection
 from psycopg2.extras import NumericRange
 from webtest import Upload
+
+
+class Client(BaseClient):
+    skip_first_form = True
 
 
 def get_post_url(page, css_class):
@@ -158,14 +162,14 @@ def test_activity_communication(feriennet_app):
         editor.get('/angebot/learn-python'), 'request-publication'))
 
     assert len(feriennet_app.smtp.outbox) == 1
-    assert "Ein neues Ticket" in get_message(feriennet_app, 0)
+    assert "Ein neues Ticket" in admin.get_email(0)
 
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
     assert "Learn Python" in ticket
 
     admin.post(get_post_url(ticket, 'accept-activity'))
     assert len(feriennet_app.smtp.outbox) == 2
-    message = get_message(feriennet_app, 1)
+    message = admin.get_email(1)
     assert "wurde veröffentlicht" in message
     assert "Learn Python" in message
     assert "Using a Raspberry Pi we will learn Python" in message
@@ -261,19 +265,15 @@ def test_activity_filter_tags(feriennet_app):
     new = editor.get('/angebote').click("Angebot erfassen")
     new.form['title'] = "Learn How to Program"
     new.form['lead'] = "Using a Raspberry Pi we will learn Python"
-
-    select_checkbox(new, "tags", "Computer")
-    select_checkbox(new, "tags", "Wissenschaft")
-
+    new.select_checkbox("tags", "Computer")
+    new.select_checkbox("tags", "Wissenschaft")
     new.form.submit()
 
     new = editor.get('/angebote').click("Angebot erfassen")
     new.form['title'] = "Learn How to Cook"
     new.form['lead'] = "Using a Stove we will cook a Python"
-
-    select_checkbox(new, "tags", "Kochen")
-    select_checkbox(new, "tags", "Wissenschaft")
-
+    new.select_checkbox("tags", "Kochen")
+    new.select_checkbox("tags", "Wissenschaft")
     new.form.submit()
 
     for activity in ActivityCollection(feriennet_app.session()).query().all():
@@ -1915,7 +1915,7 @@ def test_send_email(feriennet_app):
     assert "an 2 Empfänger gesendet" in page.form.submit().follow()
     assert len(feriennet_app.smtp.outbox) == 2
 
-    message = get_message(feriennet_app, 0)
+    message = client.get_email(0)
     assert "Ferienpass 2016 subject" in feriennet_app.smtp.outbox[0]['subject']
     assert "Ferienpass 2016 body" in message
 
