@@ -1,0 +1,57 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.gazette">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+
+        <div metal:use-macro="layout.macros['tab_menu']"></div>
+        <div metal:use-macro="layout.macros['breadcrumbs']"></div>
+
+        <div class="row manage-users">
+            <div class="small-12 columns">
+                <div class="row">
+                    <div class="small-12 medium-10 columns">
+                        <h2 i18n:translate>${title}</h2>
+                    </div>
+                    <div class="small-12 medium-2 columns">
+                        <ul class="top-actions text-right">
+                            <li><a class="action-new" href="${new_group}" i18n:translate>New</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <table class="groups stackable">
+                    <thead>
+                        <tr>
+                            <th i18n:translate>Name</th>
+                            <th i18n:translate>Number of Users</th>
+                            <th i18n:translate class="row-actions right-aligned">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr tal:condition="not:groups">
+                            <td i18n:translate>No groups.</td>
+                        </tr>
+                        <tal:block tal:repeat="group groups">
+                            <tr tal:define="number_of_users group.number_of_users">
+                                <td>${group.name}</td>
+                                <td>${number_of_users}</td>
+                                <td class="right-aligned">
+                                    <ul class="actions" data-title="Actions" i18n:attributes="data-title">
+                                        <li>
+                                            <a i18n:translate class="action-edit" href="${request.link(group, 'edit')}">Edit</a>
+                                        </li>
+                                        <li tal:condition="not: number_of_users">
+                                            <a i18n:translate class="action-delete" href="${request.link(group, 'delete')}">Delete</a>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tal:block>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </tal:block>
+</div>

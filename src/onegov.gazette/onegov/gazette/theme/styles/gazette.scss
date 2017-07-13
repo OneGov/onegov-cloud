@@ -1,0 +1,488 @@
+$footer-border-color: #d8d8d8;
+
+/*
+    get rid of the jump that is introduced when switching from a site with
+    scrollbar to a site without (or vice versa)
+
+    (100vw includes the scrollbar, 100% does not)
+*/
+html {
+    margin-left: calc(100vw - 100%);
+}
+
+/*
+    Header
+*/
+.header {
+    img {
+        margin: 1em 0;
+    }
+}
+
+/*
+    Utils
+*/
+.capitalized {
+    text-transform: uppercase;
+}
+
+.h2 {
+    font-size: $h2-font-size;
+}
+
+.h3 {
+    font-size: $h3-font-size;
+}
+
+.h4 {
+    font-size: $h4-font-size;
+}
+
+
+/*
+    Before Content
+*/
+.before-content {
+    background-color: $white-smoke;
+    left: calc(100% - 100vw);
+    margin-bottom: 2rem;
+    padding-left: calc(100vw - 100%);
+    padding-top: 2.5rem;
+    position: relative;
+    width: 100vw;
+
+    .columns {
+        padding: 0 1em;
+    }
+
+    h1 small {
+        display: block;
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin-bottom: 1em;
+        margin-top: 1em;
+    }
+
+    hr {
+        border: 4px solid $primary-color;
+        margin-bottom: 0;
+        margin-top: 2rem;
+        padding: 0;
+    }
+}
+
+/*
+    All tables
+*/
+table {
+    border: 0;
+    width: 100%;
+
+    thead {
+        background: none;
+
+    }
+
+    th {
+        border-bottom: 1px solid $aluminum;
+    }
+
+    tr.even,
+    tr.alt,
+    tr:nth-of-type(even) {
+        background: $white;
+    }
+
+
+    th,
+    td {
+        padding: .5rem;
+
+        &.right-aligned {
+            text-align: right;
+        }
+
+        &.left-aligned {
+            text-align: left;
+        }
+    }
+
+    tr.total {
+        border: 1px solid $iron;
+        border-width: 1px 0;
+        font-weight: bold;
+    }
+
+
+    &.collapsible {
+        .less,
+        .more {
+            td {
+                background-color: $white;
+                color: $primary-color;
+                cursor: pointer;
+            }
+
+            .st-head-row {
+                border: 0;
+                color: $primary-color;
+                cursor: pointer;
+                font-size: .875rem;
+                font-weight: normal;
+            }
+        }
+
+        .less td:first-child,
+        .less .st-head-row {
+            &::before {
+                color: $primary-color;
+                content: '\f056';
+                font-family: 'FontAwesome';
+                margin-right: .75ex;
+            }
+        }
+
+        .more td:first-child,
+        .more .st-head-row {
+            &::before {
+                color: $primary-color;
+                content: '\f055';
+                font-family: 'FontAwesome';
+                margin-right: .75ex;
+            }
+        }
+
+        &.collapsed {
+            tr.sticky-row {
+                background-color: $white;
+            }
+
+            tr.total {
+                background-color: $snow;
+            }
+        }
+    }
+}
+
+/*
+    Responsive tables
+*/
+
+.stacktable.large-only { display: table; }
+.stacktable.small-only { display: none; }
+
+@media #{$small-only} {
+    .stacktable.large-only { display: none; }
+    .stacktable.small-only { display: table; }
+    .stacktable th.st-head-row-main { display: none; }
+    .stackable .answer {
+        text-align: right;
+    }
+
+    .st-head-row {
+        background-color: $white;
+        border-bottom: 3px solid $gainsboro;
+        font-size: 1.2em;
+        padding-top: 2em;
+        text-align: center;
+    }
+
+    .stackable .answer {
+        text-align: right;
+    }
+
+    table tr.total {
+        border: 0;
+        font-weight: bold;
+    }
+}
+
+/*
+    Dashboard
+*/
+.dashboard {
+
+
+    // overview table on the homepage -> specified widths because we have
+    // multiple tables which should align vertically
+    table {
+        margin-bottom: 2rem;
+
+        td:nth-child(2) {
+            width: 20%;
+        }
+
+        td:nth-child(3) {
+            width: 20%;
+        }
+    }
+}
+
+/*
+    Notice
+*/
+.manage-notice {
+    dl {
+        background-color: $smoke;
+        padding: 1em;
+    }
+
+    h3 {
+        margin-top: 1em;
+    }
+}
+
+/*
+    Sortable table
+*/
+.tablesorter-headerUnSorted .tablesorter-header-inner::after {
+    content: '\f0dc';
+    font-family: 'FontAwesome';
+    margin-left: .75ex;
+}
+
+.tablesorter-headerAsc .tablesorter-header-inner::after {
+    content: '\f0de';
+    font-family: 'FontAwesome';
+    margin-left: .75ex;
+}
+
+.tablesorter-headerDesc .tablesorter-header-inner::after {
+    content: '\f0dd';
+    font-family: 'FontAwesome';
+    margin-left: .75ex;
+}
+
+
+/*
+    Footer
+*/
+footer {
+    border-top: 1px solid $footer-border-color;
+    font-size: 85%;
+    left: calc(100% - 100vw);
+    margin-top: 2rem;
+    padding: 1rem 0 1rem calc(100vw - 100%);
+    position: relative;
+    width: 100vw;
+}
+
+
+/*
+    Navigation
+*/
+.tab-navigation {
+    margin-bottom: 2em;
+    margin-top: 1em;
+
+    .title-area {
+        border-bottom: 1px solid $aluminum;
+
+        .name {
+            background: $white-smoke;
+
+            span {
+                padding-left: 1em;
+            }
+        }
+    }
+
+    .top-bar {
+        &:not(.expanded) {
+            border-bottom: 1px solid $aluminum;
+        }
+
+        .title-area .name span {
+            color: $aluminum;
+        }
+
+        .left {
+            li.active {
+                border-left: 2px solid $primary-color;
+            }
+        }
+    }
+}
+
+@media #{$medium-up} {
+    .tab-navigation {
+        .top-bar {
+
+            &:not(.expanded) {
+                border-bottom: 0;
+            }
+
+            .title-area .name span {
+                display: none;
+            }
+
+            .left {
+                border-bottom: 1px solid $aluminum;
+                width: 100%;
+
+                li {
+                    border-bottom: 2px solid $white;
+                    position: relative;
+                    z-index: 10;
+
+                    &.active {
+                        border-bottom: 2px solid $primary-color;
+                        border-left: 0;
+                        top: 1px;
+                        z-index: 20;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+/*
+    Breadcrumbs
+*/
+
+ul.breadcrumbs {
+    background: $white;
+    border: 0;
+    margin-bottom: 2em;
+    padding-left: 0;
+}
+
+/*
+    Backend views
+*/
+
+tr.divider {
+    border-bottom: 1px solid $iron;
+}
+
+/*
+    Manage view actions
+*/
+th.row-actions {
+    width: 200px;
+}
+
+td.row-actions {
+    padding-right: 0;
+}
+
+ul.actions {
+    direction: rtl;
+    list-style-type: circle;
+    margin: .2em 1.1em 1em 0;
+
+    li {
+        font-size: $table-row-font-size;
+    }
+}
+
+.action-button {
+    margin-bottom: 0;
+}
+
+.top-actions {
+    font-size: 1.5rem;
+    list-style-type: none;
+    margin: 1.2rem 0 0;
+}
+
+.action-delete::before {
+    content: '\f1f8';
+    font-family: 'FontAwesome';
+    margin-right: .75ex;
+}
+
+.action-edit::before {
+    content: '\f040';
+    font-family: 'FontAwesome';
+    margin-right: .75ex;
+}
+
+.action-new::before {
+    content: '\f055';
+    font-family: 'FontAwesome';
+    margin-right: .75ex;
+}
+
+.action-publish::before {
+    content: '\f00c';
+    font-family: 'FontAwesome';
+    margin-right: .75ex;
+}
+
+.action-reject::before {
+    content: '\f05e';
+    font-family: 'FontAwesome';
+    margin-right: .75ex;
+}
+
+.action-submit::before {
+    content: '\f061';
+    font-family: 'FontAwesome';
+    margin-right: .75ex;
+}
+
+
+
+
+/*
+    Forms
+*/
+
+form {
+    label > ul {
+        list-style: none;
+
+        margin: 0;
+        margin-bottom: 1rem;
+
+        li input[type="checkbox"],
+        li input[type="radio"] {
+            margin: 0;
+        }
+    }
+}
+
+.cancel-button {
+    margin-right: .5rem;
+}
+
+
+/*
+    Alert boxes
+*/
+
+.alert-box {
+    font-size: 1rem;
+}
+
+
+/*
+    Print
+*/
+
+@media print {
+    p,
+    td,
+    th {
+        font-size: 12px !important;
+    }
+
+    table {
+        max-width: 100%;
+    }
+
+    h2,
+    h3 {
+        page-break-after: avoid;
+    }
+
+    html,
+    body {
+        margin: 0;
+        max-width: 100%;
+        width: 100%;
+    }
+}

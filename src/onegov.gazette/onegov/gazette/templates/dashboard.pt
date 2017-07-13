@@ -1,0 +1,95 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.gazette">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+
+        <div metal:use-macro="layout.macros['tab_menu']"></div>
+        <div metal:use-macro="layout.macros['breadcrumbs']"></div>
+
+        <div class="row dashboard">
+            <div class="small-12 columns">
+                <div class="row">
+                    <div class="small-12 medium-10 columns">
+                        <h2 i18n:translate>${title}</h2>
+                    </div>
+                    <div class="small-12 medium-2 columns">
+                        <ul class="top-actions text-right">
+                            <li><a class="action-new" href="${new_notice}" i18n:translate>New</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div tal:condition="not: rejected or drafted or submitted" i18n:translate>No official notices.</div>
+
+                <tal:block tal:condition="rejected">
+                    <h3 i18n:translate>Rejected</h3>
+                    <table class="rejected stackable">
+                        <thead>
+                            <tr>
+                                <th i18n:translate>Title</th>
+                                <th i18n:translate>Category</th>
+                                <th i18n:translate>Issue(s)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tal:block tal:repeat="notice rejected">
+                                <tr>
+                                    <td><strong><a href="${request.link(notice)}">${notice.title}</a></strong></td>
+                                    <td>${layout.format_category(notice.category)}</td>
+                                    <td><tal:block metal:use-macro="layout.macros['issues']" tal:define="as_list False" /></td>
+                                </tr>
+                            </tal:block>
+                        </tbody>
+                    </table>
+                </tal:block>
+
+                <tal:block tal:condition="drafted">
+                    <h3 i18n:translate>Drafted</h3>
+                    <table class="drafted stackable">
+                        <thead>
+                            <tr>
+                                <th i18n:translate>Title</th>
+                                <th i18n:translate>Category</th>
+                                <th i18n:translate>Issue(s)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tal:block tal:repeat="notice drafted">
+                                <tr>
+                                    <td><strong><a href="${request.link(notice)}">${notice.title}</a></strong></td>
+                                    <td>${layout.format_category(notice.category)}</td>
+                                    <td><tal:block metal:use-macro="layout.macros['issues']" tal:define="as_list False" /></td>
+                                </tr>
+                            </tal:block>
+                        </tbody>
+                    </table>
+                </tal:block>
+
+                <tal:block tal:condition="submitted">
+                    <h3 i18n:translate>Submitted</h3>
+                    <table class="submitted stackable">
+                        <thead>
+                            <tr>
+                                <th i18n:translate>Title</th>
+                                <th i18n:translate>Category</th>
+                                <th i18n:translate>Issue(s)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tal:block tal:repeat="notice submitted">
+                                <tr>
+                                    <td><strong><a href="${request.link(notice)}">${notice.title}</a></strong></td>
+                                    <td>${layout.format_category(notice.category)}</td>
+                                    <td><tal:block metal:use-macro="layout.macros['issues']" tal:define="as_list False" /></td>
+                                </tr>
+                            </tal:block>
+                        </tbody>
+                    </table>
+                </tal:block>
+
+            </div>
+        </div>
+
+    </tal:block>
+</div>

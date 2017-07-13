@@ -1,0 +1,71 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.gazette">
+    <tal:block metal:fill-slot="title">
+        ${notice.title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+
+        <div metal:use-macro="layout.macros['tab_menu']"></div>
+        <div metal:use-macro="layout.macros['breadcrumbs']"></div>
+
+        <div class="row manage-notice">
+
+            <div class="small-12 columns">
+
+                <div>
+                    <tal:block tal:repeat="action actions">
+                        <a i18n:translate class="button small ${action[2]} action-${action[0].lower()}" href="${action[1]}">${action[0]}</a>
+                    </tal:block>
+                </div>
+
+                <div class="row">
+                    <div class="small-12 medium-7 columns">
+                        <h2>${notice.title}</h2>
+                        <div tal:content="structure notice.text"></div>
+                    </div>
+                    <div class="small-12 medium-5 columns">
+                        <dl>
+                            <dt i18n:translate>ID</dt>
+                            <dd>${notice.id}</dd>
+
+                            <dt i18n:translate>Category</dt>
+                            <dd>${layout.format_category(notice.category)}</dd>
+
+                            <dt i18n:translate>User</dt>
+                            <dd>${layout.format_owner(notice.user)}</dd>
+
+                            <dt i18n:translate>Issue(s)</dt>
+                            <dd><tal:block metal:use-macro="layout.macros['issues']" /></dd>
+
+                            <dt i18n:translate>State</dt>
+                            <dd i18n:translate>${notice.state}</dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <h3 i18n:translate>Changes</h3>
+                <table class="changes stackable">
+                    <thead>
+                        <tr>
+                            <th i18n:translate>Date/Time</th>
+                            <th i18n:translate>User</th>
+                            <th i18n:translate>Group</th>
+                            <th i18n:translate>Change</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tal:block tal:repeat="change notice.changes">
+                            <tr>
+                                <td>${layout.format_date(change.created, 'datetime')}</td>
+                                <td>${layout.format_owner(change.user)}</td>
+                                <td>${layout.format_group(change.user)}</td>
+                                <td i18n:translate>${change.text}</td>
+                            </tr>
+                        </tal:block>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+    </tal:block>
+</div>
