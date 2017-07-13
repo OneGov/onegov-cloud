@@ -6,7 +6,7 @@ from onegov.org import OrgApp
 from onegov.org.initial_content import create_new_organisation
 from onegov.org.layout import DefaultLayout
 from onegov.org.new_elements import Element
-from onegov.org.testing import Client
+from onegov.testing import Client
 from onegov.testing.utils import create_app
 from onegov.user import User
 

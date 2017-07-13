@@ -7,28 +7,28 @@ import requests_mock
 import textwrap
 import transaction
 
+from base64 import b64decode, b64encode
 from contextlib import contextmanager
 from datetime import datetime, date, timedelta
 from libres.modules.errors import AffectedReservationError
 from lxml.html import document_fromstring
 from onegov.core.utils import Bunch
 from onegov.form import FormCollection, FormSubmission
-from onegov.reservation import ResourceCollection, Reservation
 from onegov.newsletter import RecipientCollection
-from onegov.org.testing import Client
-from onegov.org.testing import decode_map_value
-from onegov.org.testing import encode_map_value
-from onegov.org.testing import extract_href
-from onegov.org.testing import get_message
-from onegov.org.testing import select_checkbox
+from onegov.testing import Client as BaseClient
 from onegov.page import PageCollection
 from onegov.pay import PaymentProviderCollection
 from onegov.people import Person
+from onegov.reservation import ResourceCollection, Reservation
 from onegov.testing import utils
 from onegov.ticket import TicketCollection
 from onegov.user import UserCollection
 from purl import URL
 from webtest import Upload
+
+
+class Client(BaseClient):
+    skip_first_form = True
 
 
 def bound_reserve(client, allocation):
@@ -60,6 +60,14 @@ def bound_reserve(client, allocation):
         )
 
     return reserve
+
+
+def encode_map_value(dictionary):
+    return b64encode(json.dumps(dictionary).encode('utf-8'))
+
+
+def decode_map_value(value):
+    return json.loads(b64decode(value).decode('utf-8'))
 
 
 @contextmanager
@@ -1190,7 +1198,7 @@ def test_allocations(org_app):
     assert slots.json[0]['title'] == "Ganztägig \nVerfügbar"
 
     # change the daypasses
-    edit = client.get(extract_href(slots.json[0]['actions'][0]))
+    edit = client.get(client.extract_href(slots.json[0]['actions'][0]))
     edit.form['daypasses'] = 2
     edit.form.submit()
 
@@ -1220,11 +1228,11 @@ def test_allocations(org_app):
         '?start=2015-08-04&end=2015-08-05'
     ))
 
-    edit = client.get(extract_href(slots.json[0]['actions'][0]))
+    edit = client.get(client.extract_href(slots.json[0]['actions'][0]))
     edit.form['date'] = '2015-08-06'
     edit.form.submit()
 
-    edit = client.get(extract_href(slots.json[1]['actions'][0]))
+    edit = client.get(client.extract_href(slots.json[1]['actions'][0]))
     edit.form['date'] = '2015-08-07'
     edit.form.submit()
 
@@ -1237,7 +1245,7 @@ def test_allocations(org_app):
     assert len(slots.json) == 2
 
     # delete an allocation
-    client.delete(extract_href(slots.json[0]['actions'][2]))
+    client.delete(client.extract_href(slots.json[0]['actions'][2]))
 
     # get the new slots
     slots = client.get((
@@ -1248,7 +1256,7 @@ def test_allocations(org_app):
     assert len(slots.json) == 1
 
     # delete an allocation
-    client.delete(extract_href(slots.json[0]['actions'][2]))
+    client.delete(client.extract_href(slots.json[0]['actions'][2]))
 
     # get the new slots
     slots = client.get((
@@ -1381,7 +1389,7 @@ def test_reserve_allocation(org_app):
     assert len(slots.json) == 1
 
     with pytest.raises(AffectedReservationError):
-        client.delete(extract_href(slots.json[0]['actions'][2]))
+        client.delete(client.extract_href(slots.json[0]['actions'][2]))
 
     # open the created ticket
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
@@ -2055,7 +2063,7 @@ def test_reserve_and_deny_multiple_dates(org_app):
     client.get(ticket.pyquery('a.delete-link')[-1].attrib['ic-get-from'])
     assert resource.scheduler.managed_reserved_slots().count() == 2
 
-    message = get_message(org_app, 1)
+    message = client.get_email(1)
     assert "abgesagt" in message
     assert "29. April 2016" in message
 
@@ -2063,7 +2071,7 @@ def test_reserve_and_deny_multiple_dates(org_app):
     ticket = ticket.click('Alle Reservationen annehmen').follow()
     assert resource.scheduler.managed_reserved_slots().count() == 2
 
-    message = get_message(org_app, 2)
+    message = client.get_email(2)
     assert "angenommen" in message
     assert "27. April 2016" in message
     assert "28. April 2016" in message
@@ -2072,7 +2080,7 @@ def test_reserve_and_deny_multiple_dates(org_app):
     client.get(ticket.pyquery('a.delete-link')[-1].attrib['ic-get-from'])
     assert resource.scheduler.managed_reserved_slots().count() == 1
 
-    message = get_message(org_app, 3)
+    message = client.get_email(3)
     assert "abgesagt" in message
     assert "27. April 2016" not in message
     assert "28. April 2016" in message
@@ -2081,7 +2089,7 @@ def test_reserve_and_deny_multiple_dates(org_app):
     client.get(ticket.pyquery('a.delete-link')[-1].attrib['ic-get-from'])
     assert resource.scheduler.managed_reserved_slots().count() == 0
 
-    message = get_message(org_app, 4)
+    message = client.get_email(4)
     assert "abgesagt" in message
     assert "27. April 2016" in message
     assert "28. April 2016" not in message
@@ -2652,10 +2660,8 @@ def test_newsletters_crud(org_app):
     new = newsletter.click('Newsletter')
     new.form['title'] = "Our town is AWESOME"
     new.form['lead'] = "Like many of you, I just love our town..."
-
-    select_checkbox(new, "occurrences", "150 Jahre Govikon")
-    select_checkbox(new, "occurrences", "Gemeinsames Turnen")
-
+    new.select_checkbox("occurrences", "150 Jahre Govikon")
+    new.select_checkbox("occurrences", "Gemeinsames Turnen")
     newsletter = new.form.submit().follow()
 
     assert newsletter.pyquery('h1').text() == "Our town is AWESOME"
@@ -2667,7 +2673,7 @@ def test_newsletters_crud(org_app):
 
     edit = newsletter.click("Bearbeiten")
     edit.form['title'] = "I can't even"
-    select_checkbox(edit, "occurrences", "150 Jahre Govikon", checked=False)
+    edit.select_checkbox("occurrences", "150 Jahre Govikon", checked=False)
 
     newsletter = edit.form.submit().follow()
 
@@ -2783,9 +2789,9 @@ def test_newsletter_send(org_app):
     new.form['title'] = "Our town is AWESOME"
     new.form['lead'] = "Like many of you, I just love our town..."
 
-    select_checkbox(new, "news", "Willkommen bei OneGov")
-    select_checkbox(new, "occurrences", "150 Jahre Govikon")
-    select_checkbox(new, "occurrences", "Gemeinsames Turnen")
+    new.select_checkbox("news", "Willkommen bei OneGov")
+    new.select_checkbox("occurrences", "150 Jahre Govikon")
+    new.select_checkbox("occurrences", "Gemeinsames Turnen")
 
     newsletter = new.form.submit().follow()
 
@@ -2808,8 +2814,8 @@ def test_newsletter_send(org_app):
 
     len(send.pyquery('input[name="recipients"]')) == 2
 
-    select_checkbox(send, 'recipients', 'one@example.org', checked=True)
-    select_checkbox(send, 'recipients', 'two@example.org', checked=False)
+    send.select_checkbox('recipients', 'one@example.org', checked=True)
+    send.select_checkbox('recipients', 'two@example.org', checked=False)
 
     newsletter = send.form.submit().follow()
 
@@ -3027,12 +3033,12 @@ def test_registration(org_app):
 
         assert "Vielen Dank" in register.form.submit().follow()
 
-        message = get_message(org_app, 0, 1)
+        message = client.get_email(0, 1)
         assert "Anmeldung bestätigen" in message
 
         expr = r'href="[^"]+">Anmeldung bestätigen</a>'
         url = re.search(expr, message).group()
-        url = extract_href(url)
+        url = client.extract_href(url)
 
         faulty = URL(url).query_param('token', 'asdf').as_string()
 
@@ -3183,7 +3189,7 @@ def test_add_new_user_with_activation_email(org_app):
     assert "Passwort" not in added
     assert "Anmeldungs-Anleitung wurde an den Benutzer gesendet" in added
 
-    email = get_message(org_app, 0)
+    email = client.get_email(0)
     reset = re.search(r'(http://localhost/reset-password[^)]+)', email).group()
 
     page = Client(org_app).get(reset)
@@ -3417,8 +3423,8 @@ def test_manual_form_payment(org_app):
     assert '5.00 CHF' in page
 
     page.form['e_mail'] = 'info@example.org'
-    select_checkbox(page, 'posters', "Executive Committee")
-    select_checkbox(page, 'posters', "Town Square")
+    page.select_checkbox('posters', "Executive Committee")
+    page.select_checkbox('posters', "Town Square")
     page.form['delivery'] = 'Delivery'
 
     page = page.form.submit().follow()

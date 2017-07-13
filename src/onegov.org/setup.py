@@ -72,7 +72,7 @@ setup(
             'onegov.testing',
             'pyquery',
             'pytest-localserver',
-            'requests-mock',
+            'requests-mock'
         ],
     ),
     entry_points={
