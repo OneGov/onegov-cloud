@@ -39,8 +39,11 @@ setup(
         'Pillow',
         'port-for',
         'pytest>=3.0.6',
+        'selenium',
         'sqlalchemy',
-        'testing.postgresql'
+        'testing.postgresql',
+        'webdriver_manager',
+        'webtest-selenium',
     ],
     entry_points={
         'pytest11': [
