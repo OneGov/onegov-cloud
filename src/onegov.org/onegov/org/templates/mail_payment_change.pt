@@ -1,0 +1,19 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="body">
+        <p i18n:translate>Dear Sir or Madam,</p>
+
+        <tal:b tal:switch="change">
+            <p tal:case="'marked-as-paid'" i18n:translate>Your ticket has received a payment.</p>
+            <p tal:case="'marked-as-unpaid'" i18n:translate>Your ticket was marked as unpaid.</p>
+            <p tal:case="'refunded'" i18n:translate>Your ticket's payment has been refunded. Note that it might take a few days until your refunded amount is shown on your credit card bill.</p>
+        </tal:b>
+
+        <p>
+            <span i18n:translate>The ticket number is</span>: <span class="ticket-number">${model.number}</span><br>
+            <span i18n:translate>The payment amount is</span>: <span class="ticket-number">${layout.format_number(payment.amount)} ${payment.currency}</span>
+        </p>
+    </tal:block>
+</div>

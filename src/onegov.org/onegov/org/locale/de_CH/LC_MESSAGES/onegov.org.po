@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-07-10 10:58+0200\n"
+"POT-Creation-Date: 2017-07-13 11:47+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -173,6 +173,15 @@ msgstr "Hinzufügen"
 msgid "New Note"
 msgstr "Neue Notiz"
 
+msgid "Mark as paid"
+msgstr "Als bezahlt markieren"
+
+msgid "Mark as unpaid"
+msgstr "Als unbezahlt markieren"
+
+msgid "Capture Payment"
+msgstr "Zahlung Einnehmen"
+
 msgid "Recipients"
 msgstr "Empfänger"
 
@@ -212,6 +221,9 @@ msgstr "Formular löschen"
 msgid "Accept ticket"
 msgstr "Ticket annehmen"
 
+msgid "Refund Payment"
+msgstr "Zahlung Rückerstatten"
+
 msgid "This resource can't be deleted."
 msgstr "Diese Reservations-Ressource kann nicht gelöscht werden."
 
@@ -237,6 +249,19 @@ msgstr "Person löschen"
 
 msgid "Close ticket"
 msgstr "Ticket abschliessen"
+
+msgid "Do you really want capture the payment?"
+msgstr "Möchten Sie die Zahlung wirklich einnehmen?"
+
+msgid ""
+"This usually happens automatically, so there is no reason not do capture the "
+"payment."
+msgstr ""
+"Dies passiert normalerweise automatisch. Sie können deshalb ohne Bedenken "
+"weiterfahren."
+
+msgid "Capture payment"
+msgstr "Zahlung einnehmen"
 
 msgid "Do you really want to delete this resource?"
 msgstr "Möchten Sie diese Reservations-Ressource wirklich löschen?"
@@ -264,6 +289,14 @@ msgstr "Person"
 
 msgid "Reopen ticket"
 msgstr "Ticket wieder öffnen"
+
+#, python-format
+msgid "Do you really want to refund ${amount}?"
+msgstr "Möchten Sie wirklich ${amount} rückerstatten?"
+
+#, python-format
+msgid "Refund ${amount}"
+msgstr "${amount} rückerstatten"
 
 msgid "Room"
 msgstr "Raum"
@@ -922,15 +955,6 @@ msgstr "Details zu Ihrer Reservation"
 msgid "Reject all"
 msgstr "Alle absagen"
 
-msgid "Mark as paid"
-msgstr "Als bezahlt markieren"
-
-msgid "Mark as unpaid"
-msgstr "Als unbezahlt markieren"
-
-msgid "Capture Payment"
-msgstr "Zahlung Einnehmen"
-
 msgid "Accept all reservations"
 msgstr "Alle Reservationen annehmen"
 
@@ -944,9 +968,6 @@ msgstr "${title} absagen"
 msgid "Accept event"
 msgstr "Veranstaltung annehmen"
 
-msgid "Refund Payment"
-msgstr "Zahlung Rückerstatten"
-
 msgid "Do you really want to reject all reservations?"
 msgstr "Möchten Sie wirklich alle Reservationen absagen?"
 
@@ -955,19 +976,6 @@ msgstr "Die Absage aller Reservationen kann nicht rückgängig gemacht werden."
 
 msgid "Reject reservations"
 msgstr "Reservationen absagen"
-
-msgid "Do you really want capture the payment?"
-msgstr "Möchten Sie die Zahlung wirklich einnehmen?"
-
-msgid ""
-"This usually happens automatically, so there is no reason not do capture the "
-"payment."
-msgstr ""
-"Dies passiert normalerweise automatisch. Sie können deshalb ohne Bedenken "
-"weiterfahren."
-
-msgid "Capture payment"
-msgstr "Zahlung einnehmen"
 
 msgid "Do you really want to reject this reservation?"
 msgstr "Möchten Sie diese Reservation wirklich absagen?"
@@ -978,14 +986,6 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 
 msgid "Reject reservation"
 msgstr "Reservation absagen"
-
-#, python-format
-msgid "Do you really want to refund ${amount}?"
-msgstr "Möchten Sie wirklich ${amount} rückerstatten?"
-
-#, python-format
-msgid "Refund ${amount}"
-msgstr "${amount} rückerstatten"
 
 msgid "Edit event"
 msgstr "Veranstaltung bearbeiten"
@@ -1517,6 +1517,22 @@ msgid "If you don't want to change your password, you can ignore this email."
 msgstr ""
 "Sie können dieses E-Mail ignorieren, falls Sie Ihr Passwort nicht ändern "
 "möchten."
+
+msgid "Your ticket has received a payment."
+msgstr "Ihr Ticket hat eine Zahlung erhalten."
+
+msgid "Your ticket was marked as unpaid."
+msgstr "Ihr Ticket wurde als unbezahlt markiert."
+
+msgid ""
+"Your ticket's payment has been refunded. Note that it might take a few days "
+"until your refunded amount is shown on your credit card bill."
+msgstr ""
+"Ihre Ticket Zahlung wurde rückerstattet. Bitte beachten Sie dass es ein paar "
+"Tage dauern kann bis der Betrag auf Ihrer Kreditkartenabrechnung erscheint."
+
+msgid "The payment amount is"
+msgstr "Ihr Betrag"
 
 msgid "The following reservations have been accepted:"
 msgstr "Die folgenden Reservationen wurden angenommen:"
@@ -2060,6 +2076,15 @@ msgstr "Veranstaltungs-Export"
 
 msgid "Exports all future events."
 msgstr "Exportiert alle zukünftigen Veranstaltungen."
+
+msgid "Your payment has been received"
+msgstr "Ihre Zahlung ist eingegangen"
+
+msgid "Your payment has been withdrawn"
+msgstr "Ihre Zahlung wurde rückgängig gemacht"
+
+msgid "Your payment has been refunded"
+msgstr "Ihre Zahlung wurde rückerstattet"
 
 msgid "Your Stripe account was connected successfully."
 msgstr "Ihr Stripe Konto wurde erfolgreich verbunden."

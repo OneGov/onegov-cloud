@@ -2,11 +2,19 @@ from functools import partial
 from onegov.core.security import Private
 from onegov.org import OrgApp, _
 from onegov.org.layout import PaymentCollectionLayout
+from onegov.org.mail import send_html_mail
 from onegov.org.models import PaymentMessage
 from onegov.pay import Payment
 from onegov.pay import PaymentCollection
 from onegov.pay import PaymentProviderCollection
 from onegov.ticket import TicketCollection
+
+
+EMAIL_SUBJECTS = {
+    'marked-as-paid': _("Your payment has been received"),
+    'marked-as-unpaid': _("Your payment has been withdrawn"),
+    'refunded': _("Your payment has been refunded")
+}
 
 
 def ticket_by_link(tickets, link):
@@ -18,14 +26,36 @@ def ticket_by_link(tickets, link):
         raise NotImplementedError
 
 
-def create_ticket_messages(payment, request, change):
+def send_ticket_notifications(payment, request, change):
     session = request.app.session()
     tickets = TicketCollection(session)
 
     for link in payment.links:
         ticket = ticket_by_link(tickets, link)
-        if ticket:
-            PaymentMessage.create(payment, ticket, request, change)
+
+        if not ticket:
+            continue
+
+        # create a notification in the chat
+        PaymentMessage.create(payment, ticket, request, change)
+
+        if change == 'captured':
+            continue
+
+        # send an e-mail
+        email = ticket.snapshot.get('email') or ticket.handler.email
+        if email != request.current_username:
+            send_html_mail(
+                request=request,
+                template='mail_payment_change.pt',
+                subject=EMAIL_SUBJECTS[change],
+                receivers=(email, ),
+                content={
+                    'model': ticket,
+                    'payment': payment,
+                    'change': change
+                }
+            )
 
 
 @OrgApp.html(
@@ -60,7 +90,7 @@ def view_payments(self, request):
     permission=Private)
 def mark_as_paid(self, request):
     request.assert_valid_csrf_token()
-    create_ticket_messages(self, request, 'marked-as-paid')
+    send_ticket_notifications(self, request, 'marked-as-paid')
 
     assert self.source == 'manual'
     self.state = 'paid'
@@ -73,7 +103,7 @@ def mark_as_paid(self, request):
     permission=Private)
 def mark_as_unpaid(self, request):
     request.assert_valid_csrf_token()
-    create_ticket_messages(self, request, 'marked-as-unpaid')
+    send_ticket_notifications(self, request, 'marked-as-unpaid')
 
     assert self.source == 'manual'
     self.state = 'open'
@@ -86,7 +116,7 @@ def mark_as_unpaid(self, request):
     permission=Private)
 def capture(self, request):
     request.assert_valid_csrf_token()
-    create_ticket_messages(self, request, 'captured')
+    send_ticket_notifications(self, request, 'captured')
 
     assert self.source == 'stripe_connect'
     self.charge.capture()
@@ -99,7 +129,7 @@ def capture(self, request):
     permission=Private)
 def refund(self, request):
     request.assert_valid_csrf_token()
-    create_ticket_messages(self, request, 'refunded')
+    send_ticket_notifications(self, request, 'refunded')
 
     assert self.source == 'stripe_connect'
     self.refund()

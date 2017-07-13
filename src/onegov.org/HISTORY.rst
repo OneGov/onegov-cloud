@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds payment e-mail notifications triggered in tickets.
+  [href]
+
 0.14.1 (2017-07-12)
 ~~~~~~~~~~~~~~~~~~~
 
