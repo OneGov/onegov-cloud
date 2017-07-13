@@ -63,7 +63,7 @@ def test_view_reset_password(gazette_app):
     reset_page.form['email'] = 'someone_else@example.org'
     reset_page.form['password'] = 'new_password'
     reset_page = reset_page.form.submit()
-    assert "Ungültige Addresse oder abgelaufener Link" in reset_page
+    assert "Ungültige Adresse oder abgelaufener Link" in reset_page
     assert token in reset_page.text
 
     reset_page.form['email'] = 'admin@example.org'
@@ -79,7 +79,7 @@ def test_view_reset_password(gazette_app):
     reset_page.form['email'] = 'admin@example.org'
     reset_page.form['password'] = 'new_password'
     reset_page = reset_page.form.submit()
-    assert "Ungültige Addresse oder abgelaufener Link" in reset_page
+    assert "Ungültige Adresse oder abgelaufener Link" in reset_page
 
     login_page = client.get('/auth/login')
     login_page.form['username'] = 'admin@example.org'
