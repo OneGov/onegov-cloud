@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.14.2 (2017-07-13)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes being unable to delete a reservation if it has an associated payment.
   [href]
 
