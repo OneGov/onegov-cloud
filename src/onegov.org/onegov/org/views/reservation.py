@@ -413,6 +413,26 @@ def reject_reservation(self, request):
     forms = FormCollection(request.app.session())
     submission = forms.submissions.by_id(token)
 
+    tickets = TicketCollection(request.app.session())
+    ticket = tickets.by_handler_id(token)
+
+    # if there's a acptured payment we cannot continue
+    payment = ticket.handler.payment
+    if payment and payment.state == 'paid':
+        request.alert(_(
+            "The payment associated with this reservation needs "
+            "to be refunded before the reservation can be rejected"
+        ))
+
+        if not request.headers.get('X-IC-Request'):
+            return request.redirect(request.link(self))
+
+        return None
+
+    # we need to delete the payment at the same time
+    if payment:
+        request.app.session().delete(payment)
+
     if self.email != request.current_username:
         send_html_mail(
             request=request,
@@ -425,9 +445,6 @@ def reject_reservation(self, request):
                 'reservations': targeted
             }
         )
-
-    tickets = TicketCollection(request.app.session())
-    ticket = tickets.by_handler_id(token)
 
     ReservationMessage.create(targeted, ticket, request, 'rejected')
 

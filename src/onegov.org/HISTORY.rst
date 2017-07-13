@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes being unable to delete a reservation if it has an associated payment.
+  [href]
+
 - Adds payment e-mail notifications triggered in tickets.
   [href]
 
