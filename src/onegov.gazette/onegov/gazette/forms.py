@@ -123,32 +123,34 @@ class NoticeForm(Form):
     )
 
     def on_request(self):
+        # populate categories
         principal = self.request.app.principal
 
-        if not self.category.choices:
-            def populate(categories, level=0):
-                for key, name in categories.items():
-                    name = '{} {}'.format('-' * level, name)
-                    self.category.choices.append((key, name))
-                    children = categories.children.get(key)
-                    if children:
-                        populate(children, level + 1)
+        def populate(categories, level=0):
+            for key, name in categories.items():
+                name = '{} {}'.format('-' * level, name)
+                self.category.choices.append((key, name))
+                children = categories.children.get(key)
+                if children:
+                    populate(children, level + 1)
 
-            populate(principal.categories)
+        self.category.choices = []
+        populate(principal.categories)
 
-        if not self.issues.choices:
-            layout = Layout(None, self.request)
-            today = date.today()
-            max_date = today + timedelta(weeks=5)
-            for date_, issue in principal.issues_by_date.items():
-                if date_ < today:
-                    continue
-                if date_ > max_date:
-                    break
+        # populate issues
+        self.issues.choices = []
+        layout = Layout(None, self.request)
+        today = date.today()
+        max_date = today + timedelta(weeks=5)
+        for date_, issue in principal.issues_by_date.items():
+            if date_ < today:
+                continue
+            if date_ > max_date:
+                break
 
-                self.issues.choices.append(
-                    (str(issue), layout.format_issue(issue))
-                )
+            self.issues.choices.append(
+                (str(issue), layout.format_issue(issue))
+            )
 
     def update_model(self, model):
         model.title = self.title.data

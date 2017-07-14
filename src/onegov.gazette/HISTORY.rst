@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a copy option.
+  [msom]
+
 - Adds statistics views.
   [msom]
 

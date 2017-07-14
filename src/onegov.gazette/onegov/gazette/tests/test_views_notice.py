@@ -22,6 +22,7 @@ def test_view_notice_reject_publish(gazette_app):
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1. Oktober 2017"
         manage = manage.form.submit().follow()
+        assert "action-copy" not in manage
         assert "action-delete" in manage
         assert "action-edit" in manage
         assert "action-preview" in manage
@@ -43,6 +44,7 @@ def test_view_notice_reject_publish(gazette_app):
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1.-15. Oktober 2017"
         manage = manage.form.submit().follow()
+        assert "action-copy" not in manage
         assert "action-delete" not in manage
         assert "action-edit" not in manage
         assert "action-preview" in manage
@@ -98,6 +100,7 @@ def test_view_notice_reject_publish(gazette_app):
         manage = manage.form.submit().follow().follow()
         assert "Amtliche Meldung eingereicht." in manage
         manage = editor.get('/notice/erneuerungswahlen')
+        assert "action-copy" not in manage
         assert "action-delete" not in manage
         assert "action-edit" not in manage
         assert "action-preview" in manage
@@ -110,6 +113,7 @@ def test_view_notice_reject_publish(gazette_app):
         assert "Amtliche Meldung eingereicht." in manage
         manage = publisher.get('/notice/schalterschliessung')
         assert "eingereicht" in manage
+        assert "action-copy" not in manage
         assert "action-delete" not in manage
         assert "action-edit" in manage
         assert "action-preview" in manage
@@ -157,6 +161,7 @@ def test_view_notice_reject_publish(gazette_app):
         assert "Amtliche Meldung zurückgewiesen." in manage
         manage = publisher.get('/notice/erneuerungswahlen')
         assert "zurückgewiesen" in manage
+        assert "action-copy" not in manage
         assert "action-delete" not in manage
         assert "action-edit" not in manage
         assert "action-preview" in manage
@@ -166,6 +171,7 @@ def test_view_notice_reject_publish(gazette_app):
 
         manage = editor.get('/notice/erneuerungswahlen')
         assert "zurückgewiesen" in manage
+        assert "action-copy" not in manage
         assert "action-delete" in manage
         assert "action-edit" in manage
         assert "action-preview" in manage
@@ -211,6 +217,7 @@ def test_view_notice_reject_publish(gazette_app):
         assert "Amtliche Meldung veröffentlicht." in manage
         manage = publisher.get('/notice/erneuerungswahlen')
         assert "veröffentlicht" in manage
+        assert "action-copy" not in manage
         assert "action-delete" not in manage
         assert "action-edit" not in manage
         assert "action-preview" in manage
@@ -220,6 +227,7 @@ def test_view_notice_reject_publish(gazette_app):
 
         manage = editor.get('/notice/erneuerungswahlen')
         assert "veröffentlicht" in manage
+        assert "action-copy" in manage
         assert "action-delete" not in manage
         assert "action-edit" not in manage
         assert "action-preview" in manage
@@ -322,3 +330,34 @@ def test_view_notice_edit_others(gazette_app):
         editor.get('/notice/erneuerungswahlen/edit', status=403)
         editor.get('/notice/erneuerungswahlen/submit', status=403)
         editor.get('/notice/erneuerungswahlen/delete', status=403)
+
+
+def test_view_notice_copy(gazette_app):
+    editor = Client(gazette_app)
+    login_editor(editor)
+
+    with freeze_time("2017-10-01 12:00"):
+        manage = editor.get('/notices/drafted/new-notice')
+        manage.form['title'] = "Erneuerungswahlen"
+        manage.form['category'] = '1403'
+        manage.form['issues'] = ['2017-40']
+        manage.form['text'] = "1. Oktober 2017"
+        manage.form.submit()
+
+        editor.get('/notice/erneuerungswahlen/submit').form.submit()
+
+    publisher = Client(gazette_app)
+    login_publisher(publisher)
+    publisher.get('/notice/erneuerungswahlen/publish').form.submit()
+
+    with freeze_time("2018-01-01 12:00"):
+        manage = editor.get('/notice/erneuerungswahlen').click("Kopieren")
+        assert manage.form['title'].value == "Erneuerungswahlen"
+        assert manage.form['category'].value == '1403'
+        assert manage.form['text'].value == "1. Oktober 2017"
+        assert "Das Formular enthält Fehler" in manage.form.submit()
+
+        manage.form['issues'] = ['2018-1']
+        manage = manage.form.submit().follow()
+
+        assert "Erneuerungswahlen" in editor.get('/dashboard')

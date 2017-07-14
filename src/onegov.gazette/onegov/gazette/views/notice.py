@@ -8,13 +8,9 @@ from onegov.gazette.forms import EmptyForm
 from onegov.gazette.forms import NoticeForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import GazetteNotice
-from onegov.user import UserCollection
+from onegov.gazette.views import get_user_id
 from webob.exc import HTTPForbidden
-
-
-def user_id(request):
-    session = request.app.session()
-    return UserCollection(session).by_username(request.identity.userid).id
+from onegov.core.utils import append_query_param
 
 
 @GazetteApp.html(
@@ -43,6 +39,22 @@ def view_notice(self, request):
             )
             actions.append(
                 (_("Delete"), request.link(self, 'delete'), 'alert right')
+            )
+        if self.state == 'published':
+            actions.append(
+                (
+                    _("Copy"),
+                    append_query_param(
+                        request.link(
+                            GazetteNoticeCollection(
+                                request.app.session(), state='published'
+                            ),
+                            name='new-notice'
+                        ),
+                        'source', self.id
+                    ),
+                    'secondary'
+                )
             )
     if request.is_private(self):
         if self.state == 'submitted':
@@ -84,41 +96,6 @@ def view_notice_preview(self, request):
 
 
 @GazetteApp.form(
-    model=GazetteNoticeCollection,
-    name='new-notice',
-    template='form.pt',
-    permission=Personal,
-    form=NoticeForm
-)
-def create_notice(self, request, form):
-    """ Create one or more new notices.
-
-    We allow to create multiple notices with the same attributs for different.
-    This view is mainly used by the editors.
-
-    """
-    layout = Layout(self, request)
-
-    if form.submitted(request):
-        notice = self.add(
-            title=form.title.data,
-            text=form.text.data,
-            category=form.category.data,
-            issues=form.issues.data,
-            user_id=user_id(request)
-        )
-        return redirect(request.link(notice))
-
-    return {
-        'layout': layout,
-        'form': form,
-        'title': _("New Official Notice"),
-        'button_text': _("Save"),
-        'cancel': layout.dashboard_link
-    }
-
-
-@GazetteApp.form(
     model=GazetteNotice,
     name='edit',
     template='form.pt',
@@ -136,7 +113,7 @@ def edit_notice(self, request, form):
 
     layout = Layout(self, request)
 
-    if self.user_id != user_id(request):
+    if self.user_id != get_user_id(request):
         if not request.is_private(self):
             raise HTTPForbidden()
 
@@ -185,7 +162,7 @@ def delete_notice(self, request, form):
     """
     layout = Layout(self, request)
 
-    if self.user_id != user_id(request):
+    if self.user_id != get_user_id(request):
         if not request.is_private(self):
             raise HTTPForbidden()
 
@@ -241,7 +218,7 @@ def submit_notice(self, request, form):
 
     layout = Layout(self, request)
 
-    if self.user_id != user_id(request):
+    if self.user_id != get_user_id(request):
         if not request.is_private(self):
             raise HTTPForbidden()
 

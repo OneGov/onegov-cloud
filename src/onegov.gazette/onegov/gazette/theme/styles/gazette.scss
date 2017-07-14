@@ -388,6 +388,12 @@ ul.actions {
     margin: 1.2rem 0 0;
 }
 
+.action-copy::before {
+    content: '\f24d';
+    font-family: 'FontAwesome';
+    margin-right: .75ex;
+}
+
 .action-delete::before {
     content: '\f1f8';
     font-family: 'FontAwesome';

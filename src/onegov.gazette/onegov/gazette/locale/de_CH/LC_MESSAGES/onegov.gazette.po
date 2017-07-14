@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-14 10:26+0200\n"
-"PO-Revision-Date: 2017-07-14 10:26+0200\n"
+"POT-Creation-Date: 2017-07-14 14:08+0200\n"
+"PO-Revision-Date: 2017-07-14 13:28+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -251,14 +251,11 @@ msgstr "Es können nur Gruppen ohne Benutzer gelöscht werden."
 msgid "Group deleted."
 msgstr "Gruppe gelöscht."
 
-msgid "New Official Notice"
-msgstr "Neue amtliche Publikation"
+msgid "Edit Official Notice"
+msgstr "Amtliche Publikation bearbeiten"
 
 msgid "Save"
 msgstr "Speichern"
-
-msgid "Edit Official Notice"
-msgstr "Amtliche Publikation bearbeiten"
 
 msgid "Delete Official Notice"
 msgstr "Amtliche Publikation löschen"
@@ -324,11 +321,17 @@ msgstr "Amtliche Meldung zurückgewiesen."
 msgid "Submit"
 msgstr "Einreichen"
 
+msgid "Copy"
+msgstr "Kopieren"
+
 msgid "Publish"
 msgstr "Veröffentlichen"
 
 msgid "Reject"
 msgstr "Zurückweisen"
+
+msgid "New Official Notice"
+msgstr "Neue amtliche Publikation"
 
 msgid "Official Notices"
 msgstr "Amtliche Meldungen"
