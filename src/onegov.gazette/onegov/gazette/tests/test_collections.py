@@ -129,7 +129,7 @@ def test_notice_collection_count_by_user(session):
     ):
         for x in range(count):
             collection.add('', '', '', [], users[user])
-    assert collection.count_by_user() == sorted([
+    assert sorted(collection.count_by_user()) == sorted([
         (users['a@example.org'], 2),
         (users['b@example.org'], 4),
         (users['c@example.org'], 1),
