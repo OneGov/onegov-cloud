@@ -37,7 +37,9 @@ class CategoryDict(OrderedDict):
 class Principal(object):
     """ The principal is the political entity running the gazette app. """
 
-    def __init__(self, name, logo, color, categories, issues):
+    def __init__(
+        self, name='', logo='', color='', categories=None, issues=None
+    ):
         categories = categories or []
         issues = issues or {}
 

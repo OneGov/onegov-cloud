@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds statistics views.
+  [msom]
+
 - Adds a preview view.
   [msom]
 
