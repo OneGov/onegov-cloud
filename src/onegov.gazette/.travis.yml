@@ -37,7 +37,7 @@ deploy:
     distributions: "sdist bdist_wheel"
     user: seantis
     password:
-        secure: ""
+        secure: "aVqJCW/anipZ+K/oAM/6LdmuIRSUF8tdmkCyyH0VofLyH+FJtiq/dfr+zxdb0NkTYrbVgt2YdmzWuudyW/gWTBnXeaNd6YAVINMhbf2N01ltYanKmgXoD40f/tc3cJKrZona2+F7Re0DmryMuw9dU8ojZYdY0npYZk13GaLhkwIdVjkncOEVwQGB7x4zQaC4ednk/uXkrfqdvO7oFS9y3mLR9XHzS6FcSY8nOpGISz2mJUSEbJd82bBcBGDffWD1o6Ru4FWrwtTssfaxCWL8IiGFxFMk15IV5ET4xNb5wW0ObUwVdkw4nRF5FtjvKd7evdNwgymTJuJ3+iNHLJp72IoKTMEyWFgpJ1TnyVRpYaH5fm2vBLlKr2T4HhUPFnokUlln2SvcAPT2WxllTsnqcy1UYSC2owhMs8OHA/V6biwzdQPHpRaZ1YikfqXbldgrdhN/dbd6j3K+p0AmeabeOcr1e5YjHo9Z/KCP0yW3d3OS4nVSta5ZGEg7w7avRCi9MFHRDQkVx5kb0ClctsQL02fxPJGd/DKfHrO9mQV2pssJl11tpA/yFyqi/F27l6PUqRYa9LWLWkdUaOudc0zI23R3EP5sSjIxXh2ye9zQ6NKA5onXF6Dkr0dK96H39YNSlpZ54eFhnmvgn8IniKmoKtHoUvbtTG97ijszDWQVERY="
     on:
         tags: true
         condition: $TOXENV = py34
