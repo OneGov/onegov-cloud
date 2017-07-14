@@ -55,11 +55,31 @@ def view_notice(self, request):
             actions.append(
                 (_("Reject"), request.link(self, 'reject'), 'alert right')
             )
+    actions.append(
+        (_("Preview"), request.link(self, 'preview'), 'secondary')
+    )
 
     return {
         'layout': layout,
         'notice': self,
         'actions': actions
+    }
+
+
+@GazetteApp.html(
+    model=GazetteNotice,
+    template='preview.pt',
+    name='preview',
+    permission=Personal
+)
+def view_notice_preview(self, request):
+    """ Preview the notice. """
+
+    layout = Layout(self, request)
+
+    return {
+        'layout': layout,
+        'notice': self
     }
 
 

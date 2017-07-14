@@ -24,6 +24,7 @@ def test_view_notice_reject_publish(gazette_app):
         manage = manage.form.submit().follow()
         assert "action-delete" in manage
         assert "action-edit" in manage
+        assert "action-preview" in manage
         assert "action-publish" not in manage
         assert "action-reject" not in manage
         assert "action-submit" in manage
@@ -44,6 +45,7 @@ def test_view_notice_reject_publish(gazette_app):
         manage = manage.form.submit().follow()
         assert "action-delete" not in manage
         assert "action-edit" not in manage
+        assert "action-preview" in manage
         assert "action-publish" not in manage
         assert "action-reject" not in manage
         assert "action-submit" not in manage
@@ -55,6 +57,14 @@ def test_view_notice_reject_publish(gazette_app):
         assert "Nr. 45, 10.11.2017" in manage
         assert "in Arbeit" in manage
         assert "erstellt" in manage
+
+        # preview the notice(s)
+        preview = editor.get('/notice/erneuerungswahlen/preview')
+        assert "Erneuerungswahlen" in preview
+        assert "1. Oktober 2017" in preview
+        preview = publisher.get('/notice/schalterschliessung/preview')
+        assert "Schalterschliessung" in preview
+        assert "1.-15. Oktober 2017" in preview
 
         # edit notice(s)
         manage = editor.get('/notice/erneuerungswahlen/edit')
@@ -90,6 +100,7 @@ def test_view_notice_reject_publish(gazette_app):
         manage = editor.get('/notice/erneuerungswahlen')
         assert "action-delete" not in manage
         assert "action-edit" not in manage
+        assert "action-preview" in manage
         assert "action-publish" not in manage
         assert "action-reject" not in manage
         assert "action-submit" not in manage
@@ -101,6 +112,7 @@ def test_view_notice_reject_publish(gazette_app):
         assert "eingereicht" in manage
         assert "action-delete" not in manage
         assert "action-edit" in manage
+        assert "action-preview" in manage
         assert "action-publish" in manage
         assert "action-reject" in manage
         assert "action-submit" not in manage
@@ -147,6 +159,7 @@ def test_view_notice_reject_publish(gazette_app):
         assert "zurückgewiesen" in manage
         assert "action-delete" not in manage
         assert "action-edit" not in manage
+        assert "action-preview" in manage
         assert "action-publish" not in manage
         assert "action-reject" not in manage
         assert "action-submit" not in manage
@@ -155,6 +168,7 @@ def test_view_notice_reject_publish(gazette_app):
         assert "zurückgewiesen" in manage
         assert "action-delete" in manage
         assert "action-edit" in manage
+        assert "action-preview" in manage
         assert "action-publish" not in manage
         assert "action-reject" not in manage
         assert "action-submit" in manage
@@ -199,6 +213,7 @@ def test_view_notice_reject_publish(gazette_app):
         assert "veröffentlicht" in manage
         assert "action-delete" not in manage
         assert "action-edit" not in manage
+        assert "action-preview" in manage
         assert "action-publish" not in manage
         assert "action-reject" not in manage
         assert "action-submit" not in manage
@@ -207,6 +222,7 @@ def test_view_notice_reject_publish(gazette_app):
         assert "veröffentlicht" in manage
         assert "action-delete" not in manage
         assert "action-edit" not in manage
+        assert "action-preview" in manage
         assert "action-publish" not in manage
         assert "action-reject" not in manage
         assert "action-submit" not in manage

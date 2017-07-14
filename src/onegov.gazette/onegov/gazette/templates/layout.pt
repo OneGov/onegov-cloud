@@ -65,7 +65,7 @@ metal:define-macro="layout">
         </div>
     </div>
 
-    <footer>
+    <footer metal:define-slot="footer">
         <div class="row">
             <div class="small-12 medium-4 medium-push-4 columns text-center">&nbsp;</div>
             <div class="small-12 medium-4 medium-pull-4 columns small-only-text-center">

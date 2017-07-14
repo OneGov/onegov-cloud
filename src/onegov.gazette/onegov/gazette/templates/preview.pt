@@ -1,0 +1,11 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.gazette">
+    <tal:block metal:fill-slot="title">
+        ${notice.title}
+    </tal:block>
+    <tal:block metal:fill-slot="before-content"></tal:block>
+    <tal:block metal:fill-slot="content">
+        <h2>${notice.title}</h2>
+        <div tal:content="structure notice.text"></div>
+    </tal:block>
+    <tal:block metal:fill-slot="footer"></tal:block>
+</div>
