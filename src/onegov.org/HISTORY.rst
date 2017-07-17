@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds missing German translation.
+  [href]
+
 0.14.2 (2017-07-13)
 ~~~~~~~~~~~~~~~~~~~
 

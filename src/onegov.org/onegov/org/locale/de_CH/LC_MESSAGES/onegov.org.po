@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-07-13 11:47+0200\n"
+"POT-Creation-Date: 2017-07-17 11:41+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2149,6 +2149,13 @@ msgstr "Die Reservationen wurden angenommen"
 
 msgid "The reservations have already been accepted"
 msgstr "Die Reservationen wurden bereits angenommen"
+
+msgid ""
+"The payment associated with this reservation needs to be refunded before the "
+"reservation can be rejected"
+msgstr ""
+"Die mit der Reservation verknüpfte Zahlung muss rückgängig gemacht werden "
+"bevor die Reservation gelöscht werden kann"
 
 msgid "The reservations were rejected"
 msgstr "Die Reservationen wurden abgelehnt"
