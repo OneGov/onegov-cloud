@@ -4,6 +4,9 @@ Changelog
 - Adds an open data licence / terms of use.
   [msom]
 
+- Excludes XLSX from the opendata cataolog.
+  [msom]
+
 1.15.1 (2017-07-03)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -337,14 +337,11 @@ def test_opendata_catalog(election_day_app):
         'Majorz Election',
         'majorz-election.csv',
         'majorz-election.json',
-        'majorz-election.xlsx',
         'Proporz Election',
         'proporz-election.csv',
         'proporz-election.json',
-        'proporz-election.xlsx',
         'vote.csv',
         'vote.json',
-        'vote.xlsx',
         'Vote',
     }
     assert set([
