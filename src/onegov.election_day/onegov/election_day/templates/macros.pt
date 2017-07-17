@@ -327,7 +327,18 @@
             <li><a href="${request.link(model, 'data-xlsx')}">XLSX</a></li>
         </ul>
     </p>
+    <h4 i18n:translate="">Format Description</h4>
     <p><span i18n:translate="">The format of the data is described here:</span> <a href="${layout.opendata_link}"><span i18n:translate="">Format Description</span></a>.</p>
+    <h4 i18n:translate="">Terms of use</h4>
+    <p>
+        <span i18n:translate="">Open use. Must provide the source.</span>
+        <ul>
+            <li i18n:translate="">You may use this dataset for non-commercial purposes.</li>
+            <li i18n:translate="">You may use this dataset for commercial purposes.</li>
+            <li i18n:translate="">You must provide the source (author, title and link to the dataset).</li>
+        </ul>
+        <a href="${layout.terms_link}"><img width="100" height="80" src="${layout.terms_icon}" alt="terms"></a>
+    </p>
 </metal:open_data_download>
 
 <metal:upload_errors define-macro="upload_errors" i18n:domain="onegov.election_day">

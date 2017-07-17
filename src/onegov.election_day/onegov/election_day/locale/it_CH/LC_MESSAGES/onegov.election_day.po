@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-22 15:27+0200\n"
-"PO-Revision-Date: 2017-06-22 16:10+0200\n"
+"POT-Creation-Date: 2017-07-17 09:13+0200\n"
+"PO-Revision-Date: 2017-07-17 09:15+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -499,11 +499,28 @@ msgstr ""
 "I dati grezzi usati per mostrare i risultati sono disponibili nei seguenti "
 "formati:"
 
+msgid "Format Description"
+msgstr "Descrizione del formato"
+
 msgid "The format of the data is described here:"
 msgstr "Il formato dei dati è descritto qui:"
 
-msgid "Format Description"
-msgstr "Descrizione del formato"
+msgid "Terms of use"
+msgstr "Condizioni d’uso"
+
+msgid "Open use. Must provide the source."
+msgstr "Libero utilizzo. Indicazione della fonte obbligatoria."
+
+msgid "You may use this dataset for non-commercial purposes."
+msgstr "Questo set di dati può essere utilizzato a fini non commerciali."
+
+msgid "You may use this dataset for commercial purposes."
+msgstr "Questo set di dati può essere utilizzato a fini commerciali."
+
+msgid "You must provide the source (author, title and link to the dataset)."
+msgstr ""
+"È obbligatoria l’indicazione della fonte (autore, titolo e link al set di "
+"dati)."
 
 msgid "Your results could not be uploaded."
 msgstr "I Suoi risultati non hanno potuto essere caricati."

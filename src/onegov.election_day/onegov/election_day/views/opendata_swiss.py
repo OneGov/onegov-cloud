@@ -215,7 +215,7 @@ def view_rdf(self, request):
             sub(
                 dist, 'dct:rights',
                 {},
-                'NonCommercialAllowed-CommercialAllowed-ReferenceNotRequired'
+                'NonCommercialAllowed-CommercialAllowed-ReferenceRequired'
             )
 
             # Media Type

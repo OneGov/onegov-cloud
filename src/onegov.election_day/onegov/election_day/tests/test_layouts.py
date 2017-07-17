@@ -50,6 +50,12 @@ def test_layout_links():
     assert layout_de.get_topojson_link('ag', 2015)
     assert layout_en.get_topojson_link('ag', 2015)
 
+    assert layout_de.terms_link == 'https://opendata.swiss/de/terms-of-use'
+    assert layout_en.terms_link == 'https://opendata.swiss/en/terms-of-use'
+    assert layout_fr.terms_link == 'https://opendata.swiss/fr/terms-of-use'
+    assert layout_it.terms_link == 'https://opendata.swiss/it/terms-of-use'
+    assert layout_rm.terms_link == 'https://opendata.swiss/rm/terms-of-use'
+
     assert layout_de.opendata_link == (
         'https://github.com/OneGov/onegov.election_day/blob/master/docs/'
         'open_data_de.md'

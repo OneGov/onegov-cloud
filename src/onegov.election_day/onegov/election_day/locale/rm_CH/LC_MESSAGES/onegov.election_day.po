@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-22 15:27+0200\n"
+"POT-Creation-Date: 2017-07-17 09:13+0200\n"
 "PO-Revision-Date: 2017-06-28 12:07+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -536,11 +536,26 @@ msgstr ""
 "Las datas nunelavuradas che vegnan duvradas per mussar ils resultats stattan "
 "a disposiziun en ils suandants formats:"
 
+msgid "Format Description"
+msgstr "Descripziun dal format"
+
 msgid "The format of the data is described here:"
 msgstr "Il format da las datas è descrit qua:"
 
-msgid "Format Description"
-msgstr "Descripziun dal format"
+msgid "Terms of use"
+msgstr ""
+
+msgid "Open use. Must provide the source."
+msgstr ""
+
+msgid "You may use this dataset for non-commercial purposes."
+msgstr ""
+
+msgid "You may use this dataset for commercial purposes."
+msgstr ""
+
+msgid "You must provide the source (author, title and link to the dataset)."
+msgstr ""
 
 msgid "Your results could not be uploaded."
 msgstr "Voss resultats n'han displaschaivlamain betg pudì vegnir chargiads si."

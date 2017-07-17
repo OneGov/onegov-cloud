@@ -52,6 +52,19 @@ class Layout(ChameleonLayout):
         return self.get_opendata_link(lang)
 
     @cached_property
+    def terms_icon(self):
+        static_file = StaticFile.from_application(
+            self.app, 'images/terms_by.svg'
+        )
+
+        return self.request.link(static_file)
+
+    @cached_property
+    def terms_link(self):
+        lang = (self.request.locale or 'en')[:2]
+        return "https://opendata.swiss/{}/terms-of-use".format(lang)
+
+    @cached_property
     def format_description_link(self):
         lang = (self.request.locale or 'en')[:2]
         return (

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-22 15:27+0200\n"
-"PO-Revision-Date: 2017-06-22 15:29+0200\n"
+"POT-Creation-Date: 2017-07-17 09:13+0200\n"
+"PO-Revision-Date: 2017-07-17 09:14+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -499,11 +499,26 @@ msgstr ""
 "Die Rohdaten die zur Anzeige der Resultate verwendet werden, sind in den "
 "folgenden Formaten verfügbar:"
 
+msgid "Format Description"
+msgstr "Formatbeschreibung"
+
 msgid "The format of the data is described here:"
 msgstr "Das Datenformat ist hier beschrieben:"
 
-msgid "Format Description"
-msgstr "Formatbeschreibung"
+msgid "Terms of use"
+msgstr "Nutzungsbedingungen"
+
+msgid "Open use. Must provide the source."
+msgstr "Freie Nutzung. Quellenangabe ist Pflicht."
+
+msgid "You may use this dataset for non-commercial purposes."
+msgstr "Sie dürfen diesen Datensatz für nicht kommerzielle Zwecke nutzen."
+
+msgid "You may use this dataset for commercial purposes."
+msgstr "Sie dürfen diesen Datensatz für kommerzielle Zwecke nutzen."
+
+msgid "You must provide the source (author, title and link to the dataset)."
+msgstr "Eine Quellenangabe ist Pflicht (Autor, Titel und Link zum Datensatz)."
 
 msgid "Your results could not be uploaded."
 msgstr "Ihre Resultate konnten leider nicht hochgeladen werden."

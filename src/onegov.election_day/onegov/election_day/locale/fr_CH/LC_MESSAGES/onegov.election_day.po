@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-22 15:27+0200\n"
-"PO-Revision-Date: 2017-06-22 16:02+0200\n"
+"POT-Creation-Date: 2017-07-17 09:13+0200\n"
+"PO-Revision-Date: 2017-07-17 09:16+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -500,11 +500,28 @@ msgstr ""
 "Les données brutes utilisées pour afficher les résultats sont disponibles "
 "dans les formats suivants:"
 
+msgid "Format Description"
+msgstr "Description du format"
+
 msgid "The format of the data is described here:"
 msgstr "Le format des données est décrit ici:"
 
-msgid "Format Description"
-msgstr "Description du format"
+msgid "Terms of use"
+msgstr "Conditions d’utilisation"
+
+msgid "Open use. Must provide the source."
+msgstr "Utilisation libre. Obligation d’indiquer la source."
+
+msgid "You may use this dataset for non-commercial purposes."
+msgstr "Vous pouvez utiliser ce jeu de données à des fins non commerciales."
+
+msgid "You may use this dataset for commercial purposes."
+msgstr "Vous pouvez utiliser ce jeu de données à des fins commerciales."
+
+msgid "You must provide the source (author, title and link to the dataset)."
+msgstr ""
+"L’indication de la source (auteur, titre et lien vers le jeu de données) est "
+"obligatoire."
 
 msgid "Your results could not be uploaded."
 msgstr "Vos résultats n'ont pas pu être mis à jour."
