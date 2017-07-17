@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Uses shared common code from onegov.form for HTML fields.
+  [msom]
+
 0.14.3 (2017-07-17)
 ~~~~~~~~~~~~~~~~~~~
 
