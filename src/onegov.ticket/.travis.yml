@@ -1,11 +1,22 @@
-language: python
-python: "3.5"
 cache: pip
 
-env:
-    - TOXENV=py34
-    - TOXENV=py35
-    - TOXENV=pep8
+matrix:
+  include:
+    - language: python
+      python: "3.4"
+      env: TOXENV=py34
+
+    - language: python
+      python: "3.5"
+      env: TOXENV=py35
+
+    - language: python
+      python: "3.6"
+      env: TOXENV=py36
+
+    - language: python
+      python: "3.4"
+      env: TOXENV=pep8
 
 addons:
     postgresql: "9.3"
