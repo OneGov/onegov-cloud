@@ -132,7 +132,10 @@ def view_rdf(self, request):
                         "${date}, ${principal}, "
                         "broken down by municipalities.",
                         mapping={
-                            'title': item.title,
+                            'title': (
+                                item.title_translations.get(locale) or
+                                item.title
+                            ),
                             'date': format_date(
                                 item.date, format='long', locale=locale
                             ),
@@ -145,7 +148,10 @@ def view_rdf(self, request):
                         "${date}, ${principal}, "
                         "broken down by municipalities.",
                         mapping={
-                            'title': item.title,
+                            'title': (
+                                item.title_translations.get(locale) or
+                                item.title
+                            ),
                             'date': format_date(
                                 item.date, format='long', locale=locale
                             ),
@@ -159,7 +165,10 @@ def view_rdf(self, request):
                         "${date}, ${principal}, "
                         "broken down by candidates and municipalities.",
                         mapping={
-                            'title': item.title,
+                            'title': (
+                                item.title_translations.get(locale) or
+                                item.title
+                            ),
                             'date': format_date(
                                 item.date, format='long', locale=locale
                             ),
@@ -172,7 +181,10 @@ def view_rdf(self, request):
                         "${date}, ${principal}, "
                         "broken down by candidates and municipalities.",
                         mapping={
-                            'title': item.title,
+                            'title': (
+                                item.title_translations.get(locale) or
+                                item.title
+                            ),
                             'date': format_date(
                                 item.date, format='long', locale=locale
                             ),

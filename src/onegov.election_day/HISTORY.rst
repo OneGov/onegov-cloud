@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes the open data description translations.
+  [msom]
+
 1.15.2 (2017-07-17)
 ~~~~~~~~~~~~~~~~~~~
 
