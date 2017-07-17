@@ -15,10 +15,14 @@ from functools import lru_cache
 from mirakuru import HTTPExecutor as HTTPExecutorBase
 from onegov.core.crypto import hash_password
 from onegov.core.orm import Base, SessionManager
+from onegov.testing.browser import ExtendedBrowser
 from pathlib import Path
+from selenium.webdriver.chrome.options import Options
+from splinter import Browser
 from sqlalchemy import create_engine
 from testing.postgresql import Postgresql
 from uuid import uuid4
+from webdriver_manager.chrome import ChromeDriverManager
 
 
 class HTTPExecutor(HTTPExecutorBase):
@@ -329,3 +333,40 @@ def test_password():
 @pytest.fixture(scope="session")
 def long_lived_filestorage():
     return MemoryFS()
+
+
+@pytest.fixture(scope="session")
+def webdriver():
+    return 'chrome'
+
+
+@pytest.fixture(scope="session")
+def webdriver_options():
+    options = Options()
+    options.add_argument('--headless')
+
+    return options
+
+
+@pytest.fixture(scope="session")
+def webdriver_executable_path():
+    return ChromeDriverManager().install()
+
+
+@pytest.fixture(scope="session")
+def browser_extension():
+    return ExtendedBrowser
+
+
+@pytest.fixture(scope="function")
+def browser(webdriver, webdriver_options, webdriver_executable_path,
+            browser_extension):
+
+    config = {
+        'executable_path': webdriver_executable_path,
+        'options': webdriver_options
+    }
+
+    with Browser(webdriver, **config) as browser:
+        browser_extension.leech(browser)
+        yield browser
