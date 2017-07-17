@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Add github deploy key.
+  [msom]
+
 0.0.2 (2017-07-17)
 ~~~~~~~~~~~~~~~~~~~
 
