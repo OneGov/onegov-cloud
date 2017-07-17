@@ -1,8 +1,7 @@
 import onegov.core
 import onegov.town
 
-from onegov.org.testing import Client
-from onegov.testing import utils
+from onegov.testing import Client, utils
 
 
 def test_view_permissions():
@@ -63,7 +62,7 @@ def test_view_occurrences_on_startpage(town_app):
 
 def test_pages_on_homepage(es_town_app):
     client = Client(es_town_app)
-
+    client.skip_first_form = True
     client.login_editor()
 
     new_page = client.get('/themen/bildung-gesellschaft').click('Thema')
