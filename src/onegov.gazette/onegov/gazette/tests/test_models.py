@@ -44,12 +44,14 @@ def test_principal():
         name: Govikon
         color: '#aabbcc'
         logo: 'logo.svg'
+        publish_to: 'printer@govikon.org'
         categories:
         issues:
     """))
     assert principal.name == 'Govikon'
     assert principal.color == '#aabbcc'
     assert principal.logo == 'logo.svg'
+    assert principal.publish_to == 'printer@govikon.org'
     assert dict(principal.categories) == {}
     assert dict(principal.issues) == {}
     assert dict(principal.issues_by_date) == {}
@@ -58,6 +60,7 @@ def test_principal():
         name: Govikon
         color: '#aabbcc'
         logo: 'logo.svg'
+        publish_to: 'printer@govikon.org'
         categories:
             - 'A': Category A
               children:
@@ -87,6 +90,7 @@ def test_principal():
     assert principal.name == 'Govikon'
     assert principal.color == '#aabbcc'
     assert principal.logo == 'logo.svg'
+    assert principal.publish_to == 'printer@govikon.org'
     assert dict(principal.categories) == {
         'C': 'Category C', 'B': 'Category B', 'A': 'Category A'
     }

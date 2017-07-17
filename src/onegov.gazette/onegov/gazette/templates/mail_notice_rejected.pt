@@ -1,0 +1,25 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.gazette">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="body">
+        <p i18n:translate>Dear Sir or Madam,</p>
+        <p i18n:translate>Your official notice has been rejected:</p>
+        <dl>
+            <dt i18n:translate>Title</dt>
+            <dd>${model.title}</dd>
+
+            <dt i18n:translate>Category</dt>
+            <dd>${layout.format_category(model.category)}</dd>
+
+            <dt i18n:translate>Issue(s)</dt>
+            <dd><tal:block metal:use-macro="layout.macros['issues']" tal:define="notice model; as_list False"/></dd>
+
+            <dt i18n:translate>ID</dt>
+            <dd>${model.id}</dd>
+
+            <dt i18n:translate>Text</dt>
+            <dd tal:content="structure model.text"></dd>
+        </dl>
+    </tal:block>
+</div>

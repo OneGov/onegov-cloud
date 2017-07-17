@@ -181,6 +181,10 @@
         margin-bottom: 10px;
     }
 
+    dt {
+        font-weight: bold;
+    }
+
     /*
         Rulers
     */

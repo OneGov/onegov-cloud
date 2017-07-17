@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Sends emails on publish/reject.
+  [msom]
+
 - Adds a copy option.
   [msom]
 

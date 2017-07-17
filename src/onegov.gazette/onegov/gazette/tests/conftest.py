@@ -19,6 +19,7 @@ def create_gazette(request):
         name: Kanton Zug
         color: '#006FB5'
         logo: 'canton-zg.svg'
+        publish_to: 'printer@onegov.org'
         categories:
             - '14': Kantonale Mitteilungen
               children:

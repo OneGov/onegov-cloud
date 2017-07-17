@@ -179,6 +179,12 @@ def test_view_notice_reject_publish(gazette_app):
         assert "action-reject" not in manage
         assert "action-submit" in manage
 
+        assert len(gazette_app.smtp.outbox) == 1
+        message = gazette_app.smtp.outbox[0]
+        message = message.get_payload(1).get_payload(decode=True)
+        message = message.decode('utf-8')
+        assert "Ihre amtliche Meldung wurde zurückgewiesen:" in message
+
         # try to reject the rejected notice
         editor.get('/notice/erneuerungswahlen/reject', status=403)
         assert (
@@ -234,6 +240,25 @@ def test_view_notice_reject_publish(gazette_app):
         assert "action-publish" not in manage
         assert "action-reject" not in manage
         assert "action-submit" not in manage
+
+        assert len(gazette_app.smtp.outbox) == 3
+        message = gazette_app.smtp.outbox[1]
+        message = message.get_payload(1).get_payload(decode=True)
+        message = message.decode('utf-8')
+        assert "Ihre amtliche Meldung wurde veröffentlicht:" in message
+
+        message = gazette_app.smtp.outbox[2]
+        message = message.get_payload(1).get_payload(decode=True)
+        message = message.decode('utf-8')
+        assert "Bitte veröffentlichen Sie folgende amtliche Meldung:" \
+            in message
+        assert "Nr. 45, 10.11.2017" in message
+        assert "Nr. 47, 24.11.2017" in message
+        assert "Nr. 44, 03.11.2017" in message
+        assert "Nr. 46, 17.11.2017" in message
+        assert "Erneuerungswahlen 10/2017" in message
+        assert "Kantonale Mitteilungen / Wahlen/Abstimmungen" in message
+        assert "1. Oktober 2017" in message
 
         # try to publish a published notice
         editor.get('/notice/erneuerungswahlen/publish', status=403)

@@ -38,7 +38,13 @@ class Principal(object):
     """ The principal is the political entity running the gazette app. """
 
     def __init__(
-        self, name='', logo='', color='', categories=None, issues=None
+        self,
+        name='',
+        logo='',
+        color='',
+        categories=None,
+        issues=None,
+        publish_to=''
     ):
         categories = categories or []
         issues = issues or {}
@@ -46,6 +52,7 @@ class Principal(object):
         self.name = name
         self.logo = logo
         self.color = color
+        self.publish_to = publish_to
 
         # We want the categories nested, accessible by the id and in the order
         # defined in the configuration

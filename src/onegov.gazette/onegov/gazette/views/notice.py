@@ -1,16 +1,18 @@
 from morepath import redirect
 from onegov.core.security import Personal
 from onegov.core.security import Private
+from onegov.core.templates import render_template
+from onegov.core.utils import append_query_param
 from onegov.gazette import _
 from onegov.gazette import GazetteApp
 from onegov.gazette.collections import GazetteNoticeCollection
 from onegov.gazette.forms import EmptyForm
 from onegov.gazette.forms import NoticeForm
 from onegov.gazette.layout import Layout
+from onegov.gazette.layout import MailLayout
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.views import get_user_id
 from webob.exc import HTTPForbidden
-from onegov.core.utils import append_query_param
 
 
 @GazetteApp.html(
@@ -282,6 +284,38 @@ def publish_notice(self, request, form):
     if form.submitted(request):
         self.publish(request)
         request.message(_("Official notice published."), 'success')
+        request.app.send_email(
+            subject=request.translate(_("Official Notice Published")),
+            receivers=(self.user.username, ),
+            reply_to=request.app.mail_sender,
+            content=render_template(
+                'mail_notice_published.pt',
+                request,
+                {
+                    'title': request.translate(_("Official Notice Published")),
+                    'model': self,
+                    'layout': MailLayout(self, request)
+                }
+            )
+        )
+        if request.app.principal.publish_to:
+            request.app.send_email(
+                subject=request.translate(_("Publish Official Notice")),
+                receivers=(request.app.principal.publish_to, ),
+                reply_to=request.app.mail_sender,
+                content=render_template(
+                    'mail_publish.pt',
+                    request,
+                    {
+                        'title': request.translate((
+                            _("Publish Official Notice")
+                        )),
+                        'model': self,
+                        'layout': MailLayout(self, request)
+                    }
+                )
+            )
+            self.add_change(request, _("mail sent"))
         return redirect(layout.homepage_link)
 
     return {
@@ -328,6 +362,20 @@ def reject_notice(self, request, form):
     if form.submitted(request):
         self.reject(request)
         request.message(_("Official notice rejected."), 'success')
+        request.app.send_email(
+            subject=request.translate(_("Official Notice Rejected")),
+            receivers=(self.user.username, ),
+            reply_to=request.app.mail_sender,
+            content=render_template(
+                'mail_notice_rejected.pt',
+                request,
+                {
+                    'title': request.translate(_("Official Notice Rejected")),
+                    'model': self,
+                    'layout': MailLayout(self, request)
+                }
+            )
+        )
         return redirect(layout.homepage_link)
 
     return {
@@ -340,5 +388,6 @@ def reject_notice(self, request, form):
         'title': self.title,
         'subtitle': _("Reject Official Note"),
         'button_text': _("Reject Official Note"),
+        'button_class': 'alert',
         'cancel': request.link(self)
     }
