@@ -7,6 +7,9 @@ Changelog
 - Excludes XLSX from the opendata cataolog.
   [msom]
 
+- Uses the date of the election/vote for the opendata issue date.
+  [msom]
+
 1.15.1 (2017-07-03)
 ~~~~~~~~~~~~~~~~~~~
 

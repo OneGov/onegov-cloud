@@ -3,7 +3,7 @@
 See http://handbook.opendata.swiss/en/library/ch-dcat-ap for more information.
 
 """
-
+from datetime import datetime
 from io import BytesIO
 from onegov.ballot import Election
 from onegov.ballot import Vote
@@ -82,7 +82,9 @@ def view_rdf(self, request):
         sub(
             ds, 'dct:issued',
             {'rdf:datatype': 'http://www.w3.org/2001/XMLSchema#dateTime'},
-            item.created.replace(microsecond=0).isoformat()
+            datetime(
+                item.date.year, item.date.month, item.date.day
+            ).isoformat()
         )
         sub(
             ds, 'dct:modified',
