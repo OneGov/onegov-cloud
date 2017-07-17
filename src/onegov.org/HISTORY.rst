@@ -25,6 +25,30 @@ Changelog
 - Fixes calucating the contrast of an invalid color throwing an error.
   [msom]
 
+0.14.3 (2017-07-17)
+~~~~~~~~~~~~~~~~~~~
+
+- Adds missing German translation.
+  [href]
+
+0.14.2 (2017-07-13)
+~~~~~~~~~~~~~~~~~~~
+
+- Fixes being unable to delete a reservation if it has an associated payment.
+  [href]
+
+- Adds payment e-mail notifications triggered in tickets.
+  [href]
+
+0.14.1 (2017-07-12)
+~~~~~~~~~~~~~~~~~~~
+
+- Uses latest jquery.popupoverlay plugin release.
+  [href]
+
+- Fixes calucating the contrast of an invalid color throwing an error.
+  [msom]
+
 0.14.0 (2017-07-10)
 ~~~~~~~~~~~~~~~~~~~
 
