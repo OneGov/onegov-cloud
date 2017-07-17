@@ -3,6 +3,7 @@
 See http://handbook.opendata.swiss/en/library/ch-dcat-ap for more information.
 
 """
+from babel.dates import format_date
 from datetime import datetime
 from io import BytesIO
 from onegov.ballot import Election
@@ -28,6 +29,7 @@ def sub(parent, tag, attrib=None, text=None):
 @ElectionDayApp.view(model=Principal, permission=Public, name='catalog.rdf')
 def view_rdf(self, request):
 
+    principal_name = request.app.principal.name
     publisher_id = self.open_data.get('id')
     publisher_name = self.open_data.get('name')
     publisher_mail = self.open_data.get('mail')
@@ -121,14 +123,64 @@ def view_rdf(self, request):
             sub(ds, 'dct:title', {'xml:lang': lang}, title)
 
         # Description
-        # Todo: Add a more generic description?
-        #  Schlussresultat der kantonalen Abstimmung "XXX" vom 1.1.2000,
-        #    Kanton Zug.
-        des = _("Results")
-        sub(ds, 'dct:description', {'xml:lang': 'en'}, translate(des, 'de_CH'))
-        sub(ds, 'dct:description', {'xml:lang': 'fr'}, translate(des, 'fr_CH'))
-        sub(ds, 'dct:description', {'xml:lang': 'it'}, translate(des, 'it_CH'))
-        sub(ds, 'dct:description', {'xml:lang': 'en'}, translate(des, 'en'))
+        for lang in ('de', 'fr', 'it', 'en'):
+            locale = '{}_CH'.format(lang)
+            if is_vote:
+                if item.domain == 'canton':
+                    des = _(
+                        "Final results of the cantonal vote \"${title}\", "
+                        "${date}, ${principal}, "
+                        "broken down by municipalities.",
+                        mapping={
+                            'title': item.title,
+                            'date': format_date(
+                                item.date, format='long', locale=locale
+                            ),
+                            'principal': principal_name
+                        }
+                    )
+                else:
+                    des = _(
+                        "Final results of the federal vote \"${title}\", "
+                        "${date}, ${principal}, "
+                        "broken down by municipalities.",
+                        mapping={
+                            'title': item.title,
+                            'date': format_date(
+                                item.date, format='long', locale=locale
+                            ),
+                            'principal': principal_name
+                        }
+                    )
+            else:
+                if item.domain == 'canton':
+                    des = _(
+                        "Final results of the cantonal election \"${title}\", "
+                        "${date}, ${principal}, "
+                        "broken down by candidates and municipalities.",
+                        mapping={
+                            'title': item.title,
+                            'date': format_date(
+                                item.date, format='long', locale=locale
+                            ),
+                            'principal': principal_name
+                        }
+                    )
+                else:
+                    des = _(
+                        "Final results of the federal election \"${title}\", "
+                        "${date}, ${principal}, "
+                        "broken down by candidates and municipalities.",
+                        mapping={
+                            'title': item.title,
+                            'date': format_date(
+                                item.date, format='long', locale=locale
+                            ),
+                            'principal': principal_name
+                        }
+                    )
+            des = translate(des, locale)
+            sub(ds, 'dct:description', {'xml:lang': lang}, des)
 
         # Format description
         for lang in ('de', 'fr', 'it', 'en'):

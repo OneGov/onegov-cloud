@@ -4,10 +4,13 @@ Changelog
 - Adds an open data licence / terms of use.
   [msom]
 
-- Excludes XLSX from the opendata cataolog.
+- Excludes XLSX from the opendata catalog.
   [msom]
 
 - Uses the date of the election/vote for the opendata issue date.
+  [msom]
+
+- Uses a better description of the elections/vote in the opendata catalog.
   [msom]
 
 1.15.1 (2017-07-03)
