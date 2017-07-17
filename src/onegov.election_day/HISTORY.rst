@@ -61,7 +61,7 @@ Changelog
 - Renders the open data JSON with pretty print and with a meaningful file name.
   [msom]
 
-- Switches the headeer logo and base link.
+- Switches the header logo and base link.
   [msom]
 
 - Adds tests.
