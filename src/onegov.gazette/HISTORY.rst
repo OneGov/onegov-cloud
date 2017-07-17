@@ -13,7 +13,7 @@ Changelog
 - Adds a preview view.
   [msom]
 
-0.1.0 (unreleased)
+0.0.1 (unreleased)
 ~~~~~~~~~~~~~~~~~~
 
 - Initial Release.
