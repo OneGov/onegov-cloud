@@ -165,8 +165,6 @@ def view_rdf(self, request):
         # Distributions
         for fmt, media_type in (
             ('csv', 'text/csv'),
-            ('xlsx', ('application/vnd.openxmlformats-officedocument'
-                      '.spreadsheetml.sheet')),
             ('json', 'application/json'),
         ):
             url = request.link(item, 'data-{}'.format(fmt))
