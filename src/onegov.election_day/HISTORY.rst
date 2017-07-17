@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.15.2 (2017-07-17)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds an open data licence / terms of use.
   [msom]
