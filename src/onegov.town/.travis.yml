@@ -4,19 +4,19 @@ matrix:
   include:
     - language: python
       python: "3.4"
-      env: TOXENV=py34 ES_VERSION=5.2.2
+      env: TOXENV=py34 ES_VERSION=5.5.0
 
     - language: python
       python: "3.5"
-      env: TOXENV=py35 ES_VERSION=5.2.2
+      env: TOXENV=py35 ES_VERSION=5.5.0
 
     - language: python
       python: "3.6"
-      env: TOXENV=py36 ES_VERSION=5.2.2
+      env: TOXENV=py36 ES_VERSION=5.5.0
 
     - language: python
       python: "3.4"
-      env: TOXENV=pep8 ES_VERSION=5.2.2
+      env: TOXENV=pep8 ES_VERSION=5.5.0
 
 install: ./.travis-install.sh
 
