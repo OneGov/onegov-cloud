@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.2.2 (2017-07-17)
+~~~~~~~~~~~~~~~~~~~
 
 - Records changes to the period on the new timeline.
   [href]
