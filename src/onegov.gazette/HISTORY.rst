@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.2 (2017-07-17)
+~~~~~~~~~~~~~~~~~~~
 
 - Sends emails on publish/reject.
   [msom]
