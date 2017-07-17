@@ -1,18 +1,27 @@
-language: python
-python: "3.5"
 cache: pip
+
+matrix:
+  include:
+    - language: python
+      python: "3.4"
+      env: TOXENV=py34 ES_VERSION=5.5.0 DEPLOY=yes
+
+    - language: python
+      python: "3.5"
+      env: TOXENV=py35 ES_VERSION=5.5.0 DEPLOY=no
+
+    - language: python
+      python: "3.6"
+      env: TOXENV=py36 ES_VERSION=5.5.0 DEPLOY=no
+
+    - language: python
+      python: "3.4"
+      env: TOXENV=pep8
 
 addons:
   apt:
     packages:
       - oracle-java8-set-default
-
-env:
-  - TOXENV=py34 DEPLOY=yes ES_VERSION=5.4.3
-  - TOXENV=py35 DEPLOY=no ES_VERSION=5.4.3
-  - TOXENV=py34 DEPLOY=yes ES_VERSION=5.5.0
-  - TOXENV=py35 DEPLOY=no ES_VERSION=5.5.0
-  - TOXENV=pep8 DEPLOY=no
 
 install: ./.travis-install.sh
 
