@@ -350,10 +350,7 @@ def webdriver_options():
 
 @pytest.fixture(scope="session")
 def webdriver_executable_path():
-    if not os.environ.get('CHROME_WEBDRIVER'):
-        return ChromeDriverManager().install()
-
-    return os.environ['CHROME_WEBDRIVER']
+    return ChromeDriverManager().install()
 
 
 @pytest.fixture(scope="session")
@@ -364,9 +361,6 @@ def browser_extension():
 @pytest.fixture(scope="function")
 def browser(webdriver, webdriver_options, webdriver_executable_path,
             browser_extension):
-
-    print(os.environ.get('CHROME_WEBDRIVER'))
-    print(webdriver_executable_path)
 
     config = {
         'executable_path': webdriver_executable_path,
