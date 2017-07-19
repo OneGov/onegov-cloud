@@ -367,6 +367,5 @@ def browser(webdriver, webdriver_options, webdriver_executable_path,
         'options': webdriver_options
     }
 
-    with Browser(webdriver, **config) as browser:
-        browser_extension.leech(browser)
+    with browser_extension.spawn(Browser, webdriver, **config) as browser:
         yield browser
