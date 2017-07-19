@@ -365,6 +365,9 @@ def browser_extension():
 def browser(webdriver, webdriver_options, webdriver_executable_path,
             browser_extension):
 
+    print(os.environ.get('CHROME_WEBDRIVER'))
+    print(webdriver_executable_path)
+
     config = {
         'executable_path': webdriver_executable_path,
         'options': webdriver_options
