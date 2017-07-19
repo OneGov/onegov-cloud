@@ -3,6 +3,7 @@ import port_for
 import pytest
 import shlex
 import shutil
+import socket
 import subprocess
 import tempfile
 import transaction
@@ -13,6 +14,7 @@ from elasticsearch import Elasticsearch
 from fs.memoryfs import MemoryFS
 from functools import lru_cache
 from mirakuru import HTTPExecutor as HTTPExecutorBase
+from mirakuru.compat import HTTPConnection, HTTPException
 from onegov.core.crypto import hash_password
 from onegov.core.orm import Base, SessionManager
 from onegov.testing.browser import ExtendedBrowser
@@ -26,6 +28,26 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 
 class HTTPExecutor(HTTPExecutorBase):
+
+    # Ipmlements https://github.com/ClearcodeHQ/mirakuru/issues/181
+    def __init__(self, *args, **kwargs):
+        self.method = kwargs.pop('method', 'HEAD')
+        super().__init__(*args, **kwargs)
+
+    def after_start_check(self):
+        """Check if defined URL returns expected status to a HEAD request."""
+        try:
+            conn = HTTPConnection(self.host, self.port)
+
+            conn.request(self.method, self.url.path)
+            status = str(conn.getresponse().status)
+
+            if status == self.status or self.status_re.match(status):
+                conn.close()
+                return True
+
+        except (HTTPException, socket.timeout, socket.error):
+            return False
 
     def __del__(self):
         try:
@@ -267,8 +289,10 @@ def es_process(es_binary, es_version):
 
     command = command.format(binary=es_binary, pidfile=pid, port=port)
 
-    url = 'http://127.0.0.1:{}'.format(port)
-    executor = HTTPExecutor(command, url)
+    url = 'http://127.0.0.1:{}/_cluster/health?wait_for_status=green'
+    url = url.format(port)
+
+    executor = HTTPExecutor(command, url, method='GET')
     executor.start()
 
     yield executor
@@ -285,6 +309,8 @@ def es_url(es_process):
     """
 
     url = es_process.url.geturl()
+    url = url.split('/_cluster')[0]
+
     yield url
 
     es = Elasticsearch(url)
