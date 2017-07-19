@@ -1,18 +1,21 @@
 cache: pip
 
+# required for google chrome
+dist: trusty
+
 matrix:
   include:
     - language: python
       python: "3.4"
-      env: TOXENV=py34 ES_VERSION=5.5.0
+      env: TOXENV=py34 ES_VERSION=5.5.0 CHROME_WEBDRIVER=/tmp/chromedriver
 
     - language: python
       python: "3.5"
-      env: TOXENV=py35 ES_VERSION=5.5.0
+      env: TOXENV=py35 ES_VERSION=5.5.0 CHROME_WEBDRIVER=/tmp/chromedriver
 
     - language: python
       python: "3.6"
-      env: TOXENV=py36 ES_VERSION=5.5.0
+      env: TOXENV=py36 ES_VERSION=5.5.0 CHROME_WEBDRIVER=/tmp/chromedriver
 
     - language: python
       python: "3.4"
@@ -23,6 +26,7 @@ addons:
     apt:
         packages:
             - oracle-java8-set-default
+            - google-chrome-stable
 
 install: ./.travis-install.sh
 

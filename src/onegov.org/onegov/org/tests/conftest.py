@@ -9,6 +9,7 @@ from onegov.org.new_elements import Element
 from onegov.testing import Client
 from onegov.testing.utils import create_app
 from onegov.user import User
+from pytest_localserver.http import WSGIServer
 
 
 @pytest.yield_fixture(scope='session')
@@ -25,6 +26,14 @@ def org_app(request):
 @pytest.yield_fixture(scope='function')
 def es_org_app(request):
     yield create_org_app(request, use_elasticsearch=True)
+
+
+@pytest.yield_fixture(scope='function')
+def org_app_url(request, org_app):
+    server = WSGIServer(application=org_app)
+    server.start()
+    yield server.url
+    server.stop()
 
 
 def create_org_app(request, use_elasticsearch, cls=OrgApp):
