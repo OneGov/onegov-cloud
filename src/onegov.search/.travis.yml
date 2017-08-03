@@ -4,15 +4,15 @@ matrix:
   include:
     - language: python
       python: "3.4"
-      env: TOXENV=py34 ES_VERSION=5.5.0 DEPLOY=yes
+      env: TOXENV=py34 ES_VERSION=5.5.1 DEPLOY=yes
 
     - language: python
       python: "3.5"
-      env: TOXENV=py35 ES_VERSION=5.5.0 DEPLOY=no
+      env: TOXENV=py35 ES_VERSION=5.5.1 DEPLOY=no
 
     - language: python
       python: "3.6"
-      env: TOXENV=py36 ES_VERSION=5.5.0 DEPLOY=no
+      env: TOXENV=py36 ES_VERSION=5.5.1 DEPLOY=no
 
     - language: python
       python: "3.4"
