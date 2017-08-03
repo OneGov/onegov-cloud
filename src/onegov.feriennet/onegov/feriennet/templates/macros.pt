@@ -63,24 +63,27 @@
                 </div>
                 <div class="columns small-12 medium-9 pro-juventute-ad-text">
                     <div>
-                        <div i18n:translate>
-                            Feriennet is the professional booking platform for
-                            supervised vacation activities
-                        </div>
-                        <a href="http://feriennet.projuventute.ch">feriennet.projuventute.ch</a>
+                        <a href="http://feriennet.projuventute.ch" i18n:translate>
+                            Feriennet is Pro Juventute's booking platform for
+                            supervised vacation activities.
+                        </a>
+                    </div>
+
+                    <div i18n:translate>
+                        This platform was developed by <a i18n:name="seantis" href="https://www.seantis.ch">Seantis GmbH</a> with <a i18n:name="onegovcloud" href="https://www.onegovcloud.ch">OneGov Cloud</a>, supported by <a i18n:name="netcetera" href="https://www.netcetera.com">Netcetera AG</a>.
                     </div>
 
                     <div>
                         <div i18n:translate>
-                            Other Pro Juventute offers
+                            You can find additional Pro Juventute offers
+                            <a href="http://projuventute.ch" i18n:name="here" i18n:translate>here</a>.
                         </div>
-                        <a href="http://projuventute.ch">projuventute.ch</a>
                     </div>
 
                     <div>
                         <div i18n:translate>
                             Pro Juventute Feriennet could only be realised thanks to the
-                            generous support of our partners.
+                            generous support of our <a i18n:name="partners" i18n:translate href="https://www.projuventute.ch/Unsere-Partner.3789.0.html">partners</a>.
                         </div>
                     </div>
                 </div>

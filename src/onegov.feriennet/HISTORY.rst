@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Updates the partner links in the footer.
+  [href]
+
 1.2.2 (2017-07-17)
 ~~~~~~~~~~~~~~~~~~~
 
