@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.2.1 (2017-08-03)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds support for Camt.054.
   [href]
 
