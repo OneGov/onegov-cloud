@@ -1,7 +1,7 @@
 import onegov.gazette
 
 from lxml.html import document_fromstring
-from onegov.testing import utils
+from onegov_testing import utils
 from webtest import TestApp as Client
 
 

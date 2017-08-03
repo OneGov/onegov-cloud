@@ -1,6 +1,6 @@
 from onegov.core.crypto import hash_password
 from onegov.gazette import GazetteApp
-from onegov.testing.utils import create_app
+from onegov_testing.utils import create_app
 from onegov.user import User
 from pytest import fixture
 from textwrap import dedent

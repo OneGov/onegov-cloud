@@ -51,7 +51,7 @@ setup(
             'coverage',
             'freezegun',
             'mock',
-            'onegov.testing',
+            'onegov_testing',
             'pyquery',
             'pytest-localserver',
             'pytest',
