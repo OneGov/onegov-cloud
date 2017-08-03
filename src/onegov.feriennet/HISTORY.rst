@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for Camt.054.
+  [href]
+
 - Updates the partner links in the footer.
   [href]
 

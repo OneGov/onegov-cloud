@@ -20,8 +20,7 @@
                         <li><a rel="noreferrer" href="https://postfinance.ch">Postfinance</a></li>
                     </ul>
                     <p i18n:translate>
-                        Your statement is required to be in "ISO-20022 format (without picture)". Banks may also refer to it as "camt.053". Be sure to ask your bank to switch your account to this format or to select this format in
-                        your online banking profile.
+                        Your statement is required to be in "ISO-20022 format (without picture)". Banks may also refer to it as "camt.054" or "camt.053". Be sure to ask your bank to switch your account to this format or to select this format in your online banking profile.
                     </p>
                 </div>
             </div>

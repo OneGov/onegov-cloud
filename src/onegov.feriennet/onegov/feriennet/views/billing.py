@@ -4,7 +4,7 @@ from base64 import b64decode
 from gzip import GzipFile
 from io import BytesIO
 from onegov.activity import InvoiceItem, InvoiceItemCollection
-from onegov.activity.iso20022 import match_camt_053_to_usernames
+from onegov.activity.iso20022 import match_iso_20022_to_usernames
 from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.collections import BillingCollection, BillingDetails
@@ -173,7 +173,7 @@ def view_execute_import(self, request):
     invoices = InvoiceItemCollection(request.app.session())
 
     transactions = list(
-        match_camt_053_to_usernames(xml, invoices, invoice))
+        match_iso_20022_to_usernames(xml, invoices, invoice))
 
     payments = {
         t.username: t for t in transactions if t.state == 'success'
@@ -234,7 +234,7 @@ def view_billing_import(self, request, form):
         invoices = InvoiceItemCollection(request.app.session())
 
         transactions = list(
-            match_camt_053_to_usernames(xml, invoices, invoice))
+            match_iso_20022_to_usernames(xml, invoices, invoice))
 
         if not transactions:
             del request.browser_session['account-statement']
