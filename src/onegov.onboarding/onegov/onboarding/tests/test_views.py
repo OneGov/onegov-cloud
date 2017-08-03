@@ -2,7 +2,7 @@ import morepath
 import onegov.onboarding
 
 from onegov.core.utils import Bunch, scan_morepath_modules
-from onegov.testing import utils
+from onegov_testing import utils
 from onegov.town import TownApp
 from webtest import TestApp as Client
 
