@@ -7,7 +7,7 @@ from onegov.election_day.tests import login
 from onegov.election_day.tests import upload_majorz_election
 from onegov.election_day.tests import upload_proporz_election
 from onegov.election_day.tests import upload_vote
-from onegov.testing import utils
+from onegov_testing import utils
 from unittest.mock import patch
 from webtest import TestApp as Client
 from xml.etree.ElementTree import fromstring

@@ -6,7 +6,7 @@ import transaction
 from onegov.core.crypto import hash_password
 from onegov.election_day import ElectionDayApp
 from onegov.user import User
-from onegov.testing.utils import create_app
+from onegov_testing.utils import create_app
 
 
 @pytest.fixture(scope='session')
