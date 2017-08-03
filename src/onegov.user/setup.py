@@ -43,7 +43,7 @@ setup(
         test=[
             'coverage',
             'more.itsdangerous',
-            'onegov.testing',
+            'onegov_testing',
             'pyyaml',
             'webtest',
         ],
