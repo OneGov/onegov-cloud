@@ -6,8 +6,8 @@ from onegov.org import OrgApp
 from onegov.org.initial_content import create_new_organisation
 from onegov.org.layout import DefaultLayout
 from onegov.org.new_elements import Element
-from onegov.testing import Client
-from onegov.testing.utils import create_app
+from onegov_testing import Client
+from onegov_testing.utils import create_app
 from onegov.user import User
 from pytest_localserver.http import WSGIServer
 

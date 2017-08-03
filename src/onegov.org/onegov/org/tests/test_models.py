@@ -10,7 +10,7 @@ from onegov.org.models import SiteCollection
 from onegov.org.models.file import GroupFilesByDateMixin
 from onegov.org.models.resource import SharedMethods
 from onegov.page import PageCollection
-from onegov.testing.utils import create_image
+from onegov_testing.utils import create_image
 from pytz import utc
 
 

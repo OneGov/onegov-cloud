@@ -15,12 +15,12 @@ from lxml.html import document_fromstring
 from onegov.core.utils import Bunch
 from onegov.form import FormCollection, FormSubmission
 from onegov.newsletter import RecipientCollection
-from onegov.testing import Client as BaseClient
+from onegov_testing import Client as BaseClient
 from onegov.page import PageCollection
 from onegov.pay import PaymentProviderCollection
 from onegov.people import Person
 from onegov.reservation import ResourceCollection, Reservation
-from onegov.testing import utils
+from onegov_testing import utils
 from onegov.ticket import TicketCollection
 from onegov.user import UserCollection
 from purl import URL

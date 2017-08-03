@@ -4,7 +4,7 @@ from onegov.core.security import Secret
 from onegov.org.app import OrgApp
 from onegov.org.forms import ExportForm
 from onegov.org.models import Export
-from onegov.testing import Client as BaseClient
+from onegov_testing import Client as BaseClient
 
 
 class Client(BaseClient):
