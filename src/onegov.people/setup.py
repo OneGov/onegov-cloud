@@ -38,7 +38,7 @@ setup(
     extras_require=dict(
         test=[
             'coverage',
-            'onegov.testing',
+            'onegov_testing',
             'pytest',
         ],
     ),
