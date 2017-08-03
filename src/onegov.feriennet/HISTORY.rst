@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes newlines in notification templates not rendering as expected.
+  [href]
+
 1.2.4 (2017-08-03)
 ~~~~~~~~~~~~~~~~~~~
 

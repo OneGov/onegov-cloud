@@ -35,13 +35,13 @@ def as_paragraphs(text):
     for line in text.splitlines():
         if line.strip() == '':
             if paragraph:
-                yield '<p>{}</p>'.format(' '.join(paragraph))
+                yield '<p>{}</p>'.format('<br>'.join(paragraph))
                 del paragraph[:]
         else:
             paragraph.append(line)
 
     if paragraph:
-        yield '<p>{}</p>'.format(' '.join(paragraph))
+        yield '<p>{}</p>'.format('<br>'.join(paragraph))
 
 
 class TemplateVariables(object):
