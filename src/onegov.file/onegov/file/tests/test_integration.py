@@ -7,7 +7,7 @@ from onegov.core import Framework
 from onegov.core.utils import scan_morepath_modules
 from onegov.file import DepotApp, FileCollection
 from onegov.file.integration import SUPPORTED_STORAGE_BACKENDS
-from onegov.testing.utils import create_image
+from onegov_testing.utils import create_image
 from webtest import TestApp as Client
 
 

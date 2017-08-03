@@ -4,7 +4,7 @@ import transaction
 from depot.manager import DepotManager
 from io import BytesIO
 from onegov.file import FileCollection, FileSetCollection
-from onegov.testing.utils import create_image
+from onegov_testing.utils import create_image
 
 
 @pytest.fixture(scope='function')

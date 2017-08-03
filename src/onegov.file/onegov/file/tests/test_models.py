@@ -4,7 +4,7 @@ import pytest
 from io import BytesIO
 from onegov.file import File, FileSet
 from onegov.file.models.fileset import file_to_set_associations
-from onegov.testing.utils import create_image
+from onegov_testing.utils import create_image
 from PIL import Image
 
 
