@@ -44,7 +44,7 @@ setup(
         test=[
             'coverage',
             'freezegun',
-            'onegov.testing',
+            'onegov_testing',
             'pytest',
         ],
     ),
