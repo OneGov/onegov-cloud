@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Switches from onegov.testing to onegov_testing.
+  [href]
+
 0.0.3 (2017-07-17)
 ~~~~~~~~~~~~~~~~~~~
 
