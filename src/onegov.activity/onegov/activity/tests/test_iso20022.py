@@ -2,7 +2,7 @@ from datetime import date
 from decimal import Decimal
 from onegov.activity.collections import InvoiceItemCollection
 from onegov.activity.iso20022 import extract_transactions, extract_code
-from onegov.activity.iso20022 import match_camt_053_to_usernames
+from onegov.activity.iso20022 import match_iso_20022_to_usernames
 from onegov.activity.utils import generate_xml, encode_invoice_code
 
 
@@ -133,7 +133,7 @@ def test_invoice_matching(session, owner, member):
         dict(amount='500.00 CHF', note=i3.code)
     ])
 
-    transactions = list(match_camt_053_to_usernames(xml, items, '2017'))
+    transactions = list(match_iso_20022_to_usernames(xml, items, '2017'))
 
     assert len(transactions) == 2
     assert transactions[0].amount == Decimal(500.00)
@@ -151,7 +151,7 @@ def test_invoice_matching(session, owner, member):
         dict(amount='-500.00 CHF', note=i3.code)
     ])
 
-    transactions = list(match_camt_053_to_usernames(xml, items, '2017'))
+    transactions = list(match_iso_20022_to_usernames(xml, items, '2017'))
 
     assert len(transactions) == 0
 
@@ -160,7 +160,7 @@ def test_invoice_matching(session, owner, member):
         dict(amount='500.00 CHF', note='Code: ' + i1.code),
     ])
 
-    transactions = list(match_camt_053_to_usernames(xml, items, '2017'))
+    transactions = list(match_iso_20022_to_usernames(xml, items, '2017'))
 
     assert len(transactions) == 1
     assert transactions[0].username == owner.username
@@ -173,7 +173,7 @@ def test_invoice_matching(session, owner, member):
         dict(amount='250.00 CHF', note=i4.code),
     ])
 
-    transactions = list(match_camt_053_to_usernames(xml, items, '2018'))
+    transactions = list(match_iso_20022_to_usernames(xml, items, '2018'))
 
     assert len(transactions) == 3
     assert transactions[0].amount == Decimal(500.00)
@@ -191,7 +191,7 @@ def test_invoice_matching(session, owner, member):
         dict(amount='250.00 EUR', note=i4.code),
     ])
 
-    transactions = list(match_camt_053_to_usernames(xml, items, '2018'))
+    transactions = list(match_iso_20022_to_usernames(xml, items, '2018'))
 
     assert len(transactions) == 1
     assert transactions[0].username is None
@@ -202,7 +202,7 @@ def test_invoice_matching(session, owner, member):
         dict(amount='250.00 CHF', note='asdf'),
     ])
 
-    transactions = list(match_camt_053_to_usernames(xml, items, '2018'))
+    transactions = list(match_iso_20022_to_usernames(xml, items, '2018'))
     assert len(transactions) == 1
     assert transactions[0].username == member.username
     assert transactions[0].confidence == 0.5
@@ -212,7 +212,7 @@ def test_invoice_matching(session, owner, member):
         dict(amount='123.00 CHF', note='asdf'),
     ])
 
-    transactions = list(match_camt_053_to_usernames(xml, items, '2018'))
+    transactions = list(match_iso_20022_to_usernames(xml, items, '2018'))
     assert len(transactions) == 1
     assert transactions[0].username is None
     assert transactions[0].confidence == 0
@@ -223,7 +223,7 @@ def test_invoice_matching(session, owner, member):
         dict(amount='250.00 CHF', note=i4.code),
     ])
 
-    transactions = list(match_camt_053_to_usernames(xml, items, '2018'))
+    transactions = list(match_iso_20022_to_usernames(xml, items, '2018'))
     assert len(transactions) == 2
     assert transactions[0].username == member.username
     assert transactions[0].confidence == 1.0
@@ -238,7 +238,7 @@ def test_invoice_matching(session, owner, member):
         dict(amount='125.00 CHF', note=i1.code),
     ])
 
-    transactions = list(match_camt_053_to_usernames(xml, items, '2018'))
+    transactions = list(match_iso_20022_to_usernames(xml, items, '2018'))
     assert len(transactions) == 2
     assert transactions[0].username is None
     assert transactions[0].confidence == 0
@@ -252,7 +252,7 @@ def test_invoice_matching(session, owner, member):
         dict(amount='500.00 CHF', reference=encode_invoice_code(i1.code)),
     ])
 
-    transactions = list(match_camt_053_to_usernames(xml, items, '2017'))
+    transactions = list(match_iso_20022_to_usernames(xml, items, '2017'))
 
     assert len(transactions) == 1
     assert transactions[0].username == owner.username
@@ -264,7 +264,7 @@ def test_invoice_matching(session, owner, member):
         dict(amount='250.00 CHF', note=i3.code),
     ])
 
-    transactions = list(match_camt_053_to_usernames(xml, items, '2017'))
+    transactions = list(match_iso_20022_to_usernames(xml, items, '2017'))
 
     assert len(transactions) == 2
     assert transactions[0].username == owner.username
@@ -278,7 +278,7 @@ def test_invoice_matching(session, owner, member):
         dict(amount='250.00 CHF', note=i3.code),
     ])
 
-    transactions = list(match_camt_053_to_usernames(xml, items, '2017'))
+    transactions = list(match_iso_20022_to_usernames(xml, items, '2017'))
 
     assert len(transactions) == 2
     assert transactions[0].username == owner.username
@@ -296,7 +296,7 @@ def test_invoice_matching(session, owner, member):
         ),
     ])
 
-    transactions = list(match_camt_053_to_usernames(xml, items, '2017'))
+    transactions = list(match_iso_20022_to_usernames(xml, items, '2017'))
 
     assert len(transactions) == 1
     assert transactions[0].username == owner.username
@@ -310,7 +310,7 @@ def test_invoice_matching(session, owner, member):
         ),
     ])
 
-    transactions = list(match_camt_053_to_usernames(xml, items, '2017'))
+    transactions = list(match_iso_20022_to_usernames(xml, items, '2017'))
 
     assert len(transactions) == 1
     assert transactions[0].username == owner.username
@@ -324,7 +324,7 @@ def test_invoice_matching(session, owner, member):
         ),
     ])
 
-    transactions = list(match_camt_053_to_usernames(xml, items, '2017'))
+    transactions = list(match_iso_20022_to_usernames(xml, items, '2017'))
 
     assert len(transactions) == 1
     assert transactions[0].username == owner.username
@@ -341,7 +341,7 @@ def test_invoice_matching(session, owner, member):
         dict(amount='250 CHF', note=i1.code, tid=None),
     ])
 
-    transactions = list(match_camt_053_to_usernames(xml, items, '2017'))
+    transactions = list(match_iso_20022_to_usernames(xml, items, '2017'))
     assert len(transactions) == 2
 
     assert transactions[0].tid == 'foobar'

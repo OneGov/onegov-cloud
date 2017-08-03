@@ -188,7 +188,7 @@ def extract_code(text):
         return None
 
 
-def match_camt_053_to_usernames(xml, collection, invoice, currency='CHF'):
+def match_iso_20022_to_usernames(xml, collection, invoice, currency='CHF'):
     """ Takes an ISO20022 camt.053 file and matches it with the invoice
     items in the :class:`~onegov.activity.collections.InvoiceItemCollection`.
 
