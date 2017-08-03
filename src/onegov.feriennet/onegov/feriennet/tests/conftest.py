@@ -3,7 +3,7 @@ import pytest
 
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.initial_content import create_new_organisation
-from onegov.testing.utils import create_app
+from onegov_testing.utils import create_app
 from onegov.user import User
 
 

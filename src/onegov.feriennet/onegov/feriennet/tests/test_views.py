@@ -11,8 +11,8 @@ from onegov.activity import OccasionCollection
 from onegov.activity import PeriodCollection
 from onegov.activity.utils import generate_xml
 from onegov.core.utils import Bunch
-from onegov.testing import Client as BaseClient
-from onegov.testing import utils
+from onegov_testing import Client as BaseClient
+from onegov_testing import utils
 from onegov.user import UserCollection
 from psycopg2.extras import NumericRange
 from webtest import Upload
