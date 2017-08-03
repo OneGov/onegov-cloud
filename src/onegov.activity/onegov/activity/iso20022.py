@@ -100,6 +100,22 @@ class Transaction(object):
         return 'unknown'
 
 
+def transaction_entries(root):
+    """ Yields the transaction entries from the given Camt.053 or Camt.054
+    xml. This works because for our purposes the entries of those two formats
+    are identical.
+
+    """
+
+    # camt.053
+    for entry in root.xpath('/Document/BkToCstmrStmt/Stmt/Ntry'):
+        yield entry
+
+    # camt.054
+    for entry in root.xpath('/Document/BkToCstmrDbtCdtNtfctn/Ntfctn/Ntry'):
+        yield entry
+
+
 def extract_transactions(xml):
     root = etree.fromstring(normalize_xml(xml).encode('utf-8'))
 
@@ -118,7 +134,7 @@ def extract_transactions(xml):
         if text:
             return date(*[int(p) for p in text.split('-')])
 
-    for entry in root.xpath('/Document/BkToCstmrStmt/Stmt/Ntry'):
+    for entry in transaction_entries(root):
         booking_date = as_date(first(entry, 'BookgDt/Dt/text()'))
         valuta_date = as_date(first(entry, 'ValDt/Dt/text()'))
         booking_text = first(entry, 'AddtlNtryInf/text()')
