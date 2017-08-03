@@ -83,7 +83,7 @@ setup(
         test=[
             'coverage',
             'freezegun',
-            'onegov.testing',
+            'onegov_testing',
             'openpyxl',
             'pytest-localserver',
             'requests'
