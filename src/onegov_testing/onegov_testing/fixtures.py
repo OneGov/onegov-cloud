@@ -17,7 +17,7 @@ from mirakuru import HTTPExecutor as HTTPExecutorBase
 from mirakuru.compat import HTTPConnection, HTTPException
 from onegov.core.crypto import hash_password
 from onegov.core.orm import Base, SessionManager
-from onegov.testing.browser import ExtendedBrowser
+from onegov_testing.browser import ExtendedBrowser
 from pathlib import Path
 from selenium.webdriver.chrome.options import Options
 from splinter import Browser
@@ -85,7 +85,7 @@ def cache_password_hashing(monkeysession):
     in onegov.core itself.
 
     So this dangerous code is not only inexistant in the core, it is also not
-    present on the server because onegov.testing is strictly a testing
+    present on the server because onegov_testing is strictly a testing
     dependency and finally it is only run when invoked through pytest.
 
     """

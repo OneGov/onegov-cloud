@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-name = 'onegov.testing'
+name = 'onegov_testing'
 description = (
     'Contains testing code shared by all OneGov Cloud applications.'
 )
@@ -22,7 +22,7 @@ setup(
     version=version,
     description=description,
     long_description=get_long_description(),
-    url='http://github.com/OneGov/onegov.testing',
+    url='http://github.com/OneGov/onegov_testing',
     author='Seantis GmbH',
     author_email='info@seantis.ch',
     license='GPLv2',
@@ -46,7 +46,7 @@ setup(
     ],
     entry_points={
         'pytest11': [
-            'onegov_testing = onegov.testing',
+            'onegov_testing = onegov_testing',
         ]
     },
     classifiers=[

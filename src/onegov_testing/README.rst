@@ -27,23 +27,23 @@ Onegov Testing uses `Semantic Versioning <http://semver.org/>`_
 Build Status
 ------------
 
-.. image:: https://travis-ci.org/OneGov/onegov.testing.png
-  :target: https://travis-ci.org/OneGov/onegov.testing
+.. image:: https://travis-ci.org/OneGov/onegov_testing.png
+  :target: https://travis-ci.org/OneGov/onegov_testing
   :alt: Build Status
 
 Coverage
 --------
 
-.. image:: https://coveralls.io/repos/OneGov/onegov.testing/badge.png?branch=master
-  :target: https://coveralls.io/r/OneGov/onegov.testing?branch=master
+.. image:: https://coveralls.io/repos/OneGov/onegov_testing/badge.png?branch=master
+  :target: https://coveralls.io/r/OneGov/onegov_testing?branch=master
   :alt: Project Coverage
 
 Latests PyPI Release
 --------------------
-.. image:: https://pypip.in/v/onegov.testing/badge.png
-  :target: https://crate.io/packages/onegov.testing
+.. image:: https://pypip.in/v/onegov_testing/badge.png
+  :target: https://crate.io/packages/onegov_testing
   :alt: Latest PyPI Release
 
 License
 -------
-onegov.testing is released under GPLv2
+onegov_testing is released under GPLv2
