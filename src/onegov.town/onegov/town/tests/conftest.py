@@ -4,7 +4,7 @@ import pytest
 import transaction
 
 from onegov.core.utils import module_path
-from onegov.testing.utils import create_app
+from onegov_testing.utils import create_app
 from onegov.town import TownApp
 from onegov.town.initial_content import builtin_form_definitions
 from onegov.town.initial_content import create_new_organisation

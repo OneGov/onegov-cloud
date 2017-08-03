@@ -39,7 +39,7 @@ setup(
             'coverage',
             'morepath',
             'freezegun',
-            'onegov.testing',
+            'onegov_testing',
             'webtest',
             'pyquery',
             'pytest-localserver'

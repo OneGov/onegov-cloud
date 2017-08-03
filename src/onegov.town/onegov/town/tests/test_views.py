@@ -1,7 +1,7 @@
 import onegov.core
 import onegov.town
 
-from onegov.testing import Client, utils
+from onegov_testing import Client, utils
 
 
 def test_view_permissions():
