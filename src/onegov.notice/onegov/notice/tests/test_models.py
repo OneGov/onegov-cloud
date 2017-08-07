@@ -14,6 +14,7 @@ def test_create_notice(session):
     session.add(notice)
 
     notice.submit()
+    notice.accept()
     notice.publish()
 
     commit()
@@ -53,30 +54,55 @@ def test_transitions():
     assert notice.state == 'drafted'
 
     with raises(AssertionError):
-        notice.publish()
-    with raises(AssertionError):
         notice.reject()
+    with raises(AssertionError):
+        notice.accept()
+    with raises(AssertionError):
+        notice.publish()
     notice.submit()
     assert notice.state == 'submitted'
 
     # Submitted
     notice = OfficialNotice(state='submitted')
-    notice.publish()
-    assert notice.state == 'published'
+    with raises(AssertionError):
+        notice.submit()
+    with raises(AssertionError):
+        notice.publish()
+    notice.accept()
+    assert notice.state == 'accepted'
 
     notice = OfficialNotice(state='submitted')
     notice.reject()
     assert notice.state == 'rejected'
+
+    # Accepted
+    notice = OfficialNotice(state='accepted')
+    with raises(AssertionError):
+        notice.submit()
+    with raises(AssertionError):
+        notice.reject()
+    with raises(AssertionError):
+        notice.accept()
+    notice.publish()
+    assert notice.state == 'published'
 
     # Published
     notice = OfficialNotice(state='published')
     with raises(AssertionError):
         notice.submit()
     with raises(AssertionError):
+        notice.reject()
+    with raises(AssertionError):
+        notice.accept()
+    with raises(AssertionError):
         notice.publish()
 
     # Rejected
     notice = OfficialNotice(state='rejected')
+    with raises(AssertionError):
+        notice.reject()
+    with raises(AssertionError):
+        notice.accept()
     with raises(AssertionError):
         notice.publish()
     notice.submit()

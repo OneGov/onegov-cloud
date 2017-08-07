@@ -37,7 +37,7 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     #: The state of the notice.
     state = Column(
         Enum(
-            'drafted', 'submitted', 'published', 'rejected',
+            'drafted', 'submitted', 'published', 'rejected', 'accepted',
             name='official_notice_state'
         ),
         nullable=False,
@@ -76,14 +76,20 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
         assert self.state == 'drafted' or self.state == 'rejected'
         self.state = 'submitted'
 
-    def publish(self):
-        """ Publish a submitted notice. """
-
-        assert self.state == 'submitted'
-        self.state = 'published'
-
     def reject(self):
         """ Reject a submitted notice. """
 
         assert self.state == 'submitted'
         self.state = 'rejected'
+
+    def accept(self):
+        """ Accept a submitted notice. """
+
+        assert self.state == 'submitted'
+        self.state = 'accepted'
+
+    def publish(self):
+        """ Publish an accepted notice. """
+
+        assert self.state == 'accepted'
+        self.state = 'published'
