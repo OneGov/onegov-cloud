@@ -11,6 +11,13 @@
             <div class="small-12 columns">
                 <h2 i18n:translate>${title}</h2>
 
+                <dl class="sub-nav">
+                  <dt i18n:translate>Filter:</dt>
+                  <dd tal:repeat="filter filters" class="${filter['class']}">
+                      <a href="${filter['link']}">${filter['title']}</a>
+                  </dd>
+                </dl>
+
                 <h3 i18n:translate>By Category</h3>
                 <table class="statistics-by-category stackable">
                     <thead>

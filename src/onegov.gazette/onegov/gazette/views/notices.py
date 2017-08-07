@@ -98,9 +98,18 @@ def view_notices_statistics(self, request):
 
     layout = Layout(self, request)
     principal = request.app.principal
+    filters = (
+        {
+            'title': _(state),
+            'link': request.link(self.for_state(state), name='statistics'),
+            'class': 'active' if state == self.state else ''
+        }
+        for state in ('drafted', 'submitted', 'published', 'rejected')
+    )
 
     return {
         'layout': layout,
+        'filters': filters,
         'collection': self,
         'title': _("Statistics"),
         'by_category': self.count_by_category(principal),

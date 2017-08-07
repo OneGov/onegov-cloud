@@ -16,6 +16,9 @@ Changelog
 - Adds statistics to the menu.
   [msom]
 
+- Adds a state filter to the statistics.
+  [msom]
+
 0.0.4 (2017-08-03)
 ~~~~~~~~~~~~~~~~~~~
 
