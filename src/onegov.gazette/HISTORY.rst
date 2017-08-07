@@ -13,6 +13,9 @@ Changelog
 - Sends an email when creating a user.
   [msom]
 
+- Adds statistics to the menu.
+  [msom]
+
 0.0.4 (2017-08-03)
 ~~~~~~~~~~~~~~~~~~~
 

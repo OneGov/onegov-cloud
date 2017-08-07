@@ -86,6 +86,13 @@ class Layout(ChameleonLayout):
         )
 
     @cached_property
+    def manage_statistics_link(self):
+        return self.request.link(
+            GazetteNoticeCollection(self.app.session(), state='published'),
+            name='statistics'
+        )
+
+    @cached_property
     def dashboard_link(self):
         return self.request.link(self.principal, name='dashboard')
 
@@ -126,7 +133,8 @@ class Layout(ChameleonLayout):
         elif self.request.is_private(self.model):
             active = (
                 isinstance(self.model, GazetteNoticeCollection) and
-                getattr(self.model, 'state', None) == 'submitted'
+                getattr(self.model, 'state', None) == 'submitted' and
+                'statistics' not in self.request.url
             )
             result.append((
                 _("Submitted Official Notices"), self.manage_notices_link,
@@ -135,11 +143,22 @@ class Layout(ChameleonLayout):
 
             active = (
                 isinstance(self.model, GazetteNoticeCollection) and
-                getattr(self.model, 'state', None) == 'published'
+                getattr(self.model, 'state', None) == 'published' and
+                'statistics' not in self.request.url
             )
             result.append((
                 _("Published Official Notices"),
                 self.manage_published_notices_link,
+                active
+            ))
+
+            active = (
+                isinstance(self.model, GazetteNoticeCollection) and
+                'statistics' in self.request.url
+            )
+            result.append((
+                _("Statistics"),
+                self.manage_statistics_link,
                 active
             ))
 
