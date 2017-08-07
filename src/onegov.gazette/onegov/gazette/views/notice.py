@@ -284,20 +284,6 @@ def publish_notice(self, request, form):
     if form.submitted(request):
         self.publish(request)
         request.message(_("Official notice published."), 'success')
-        request.app.send_email(
-            subject=request.translate(_("Official Notice Published")),
-            receivers=(self.user.username, ),
-            reply_to=request.app.mail_sender,
-            content=render_template(
-                'mail_notice_published.pt',
-                request,
-                {
-                    'title': request.translate(_("Official Notice Published")),
-                    'model': self,
-                    'layout': MailLayout(self, request)
-                }
-            )
-        )
         if request.app.principal.publish_to:
             request.app.send_email(
                 subject=request.translate(_("Publish Official Notice")),

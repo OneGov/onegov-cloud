@@ -241,13 +241,8 @@ def test_view_notice_reject_publish(gazette_app):
         assert "action-reject" not in manage
         assert "action-submit" not in manage
 
-        assert len(gazette_app.smtp.outbox) == 3
+        assert len(gazette_app.smtp.outbox) == 2
         message = gazette_app.smtp.outbox[1]
-        message = message.get_payload(1).get_payload(decode=True)
-        message = message.decode('utf-8')
-        assert "Ihre amtliche Meldung wurde veröffentlicht:" in message
-
-        message = gazette_app.smtp.outbox[2]
         message = message.get_payload(1).get_payload(decode=True)
         message = message.decode('utf-8')
         assert "Bitte veröffentlichen Sie folgende amtliche Meldung:" \

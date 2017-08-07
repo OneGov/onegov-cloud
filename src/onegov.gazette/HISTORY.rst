@@ -7,6 +7,9 @@ Changelog
 - Reduces font size of the title in the preview.
   [msom]
 
+- Omits the emails on publishing.
+  [msom]
+
 0.0.4 (2017-08-03)
 ~~~~~~~~~~~~~~~~~~~
 
