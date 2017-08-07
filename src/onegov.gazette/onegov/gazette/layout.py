@@ -33,6 +33,16 @@ class Layout(ChameleonLayout):
         return self.request.app.principal
 
     @cached_property
+    def user(self):
+        username = self.request.identity.userid
+        if username:
+            return UserCollection(
+                self.app.session(), username=username
+            ).query().first()
+
+        return None
+
+    @cached_property
     def font_awesome_path(self):
         static_file = StaticFile.from_application(
             self.app, 'font-awesome/css/font-awesome.min.css'

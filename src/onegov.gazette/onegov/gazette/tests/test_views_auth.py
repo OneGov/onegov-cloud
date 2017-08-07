@@ -25,16 +25,16 @@ def test_view_login_logout(gazette_app):
         assert 'Anmelden' in client.get('/').follow()
 
         login.form['password'] = 'hunter2'
-        homepage = login.form.submit().follow().follow()
+        page = login.form.submit().follow().follow()
 
-        assert 'Sie sind angemeldet' in homepage
-        assert 'Abmelden' in homepage
-        assert 'Anmelden' not in homepage
+        assert 'Sie sind angemeldet als: {}@example.org'.format(user) in page
+        assert 'Abmelden' in page
+        assert 'Anmelden' not in page
 
-        homepage = client.get('/').follow().click('Abmelden').follow().follow()
-        assert 'Sie sind angemeldet' not in homepage
-        assert 'Abmelden' not in homepage
-        assert 'Anmelden' in homepage
+        page = client.get('/').follow().click('Abmelden').follow().follow()
+        assert 'Sie sind angemeldet' not in page
+        assert 'Abmelden' not in page
+        assert 'Anmelden' in page
 
 
 def test_view_reset_password(gazette_app):
