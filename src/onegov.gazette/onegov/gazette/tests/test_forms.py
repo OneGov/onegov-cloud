@@ -162,11 +162,11 @@ def test_notice_form(gazette_app):
     with freeze_time("2017-11-01 12:00"):
         form.on_request()
         assert form.issues.choices == [
-            ('2017-44', 'Nr. 44, 03.11.2017'),
-            ('2017-45', 'Nr. 45, 10.11.2017'),
-            ('2017-46', 'Nr. 46, 17.11.2017'),
-            ('2017-47', 'Nr. 47, 24.11.2017'),
-            ('2017-48', 'Nr. 48, 01.12.2017')
+            ('2017-44', 'Nr. 44, Freitag 03.11.2017'),
+            ('2017-45', 'Nr. 45, Freitag 10.11.2017'),
+            ('2017-46', 'Nr. 46, Freitag 17.11.2017'),
+            ('2017-47', 'Nr. 47, Freitag 24.11.2017'),
+            ('2017-48', 'Nr. 48, Freitag 01.12.2017')
         ]
         assert form.category.choices == [
             ('14', ' Kantonale Mitteilungen'),

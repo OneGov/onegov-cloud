@@ -149,7 +149,10 @@ class NoticeForm(Form):
                 break
 
             self.issues.choices.append(
-                (str(issue), layout.format_issue(issue))
+                (
+                    str(issue),
+                    layout.format_issue(issue, date_format='date_with_weekday')
+                )
             )
 
     def update_model(self, model):

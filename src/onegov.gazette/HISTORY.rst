@@ -19,6 +19,9 @@ Changelog
 - Adds a state filter to the statistics.
   [msom]
 
+- Shows the weekday in the add/edit notice form.
+  [msom]
+
 0.0.4 (2017-08-03)
 ~~~~~~~~~~~~~~~~~~~
 

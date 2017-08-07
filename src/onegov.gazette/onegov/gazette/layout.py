@@ -14,6 +14,8 @@ from onegov.user import UserCollection
 
 class Layout(ChameleonLayout):
 
+    date_with_weekday_format = 'EEEE dd.MM.yyyy'
+
     def __init__(self, model, request):
         super().__init__(model, request)
         self.request.include('common')
@@ -188,7 +190,7 @@ class Layout(ChameleonLayout):
     def format_category(self, category):
         return ' / '.join(self.principal.categories_flat.get(category, ['?']))
 
-    def format_issue(self, issue):
+    def format_issue(self, issue, date_format='date'):
         if not isinstance(issue, Issue):
             issue = Issue.from_string(str(issue))
 
@@ -198,7 +200,7 @@ class Layout(ChameleonLayout):
             str(issue.number),
             self.format_date(
                 self.principal.issues[issue.year][issue.number],
-                'date'
+                date_format
             )
         )
 
