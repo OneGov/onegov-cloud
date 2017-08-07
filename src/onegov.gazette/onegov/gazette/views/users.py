@@ -1,11 +1,13 @@
 from morepath import redirect
 from onegov.core.crypto import random_password
 from onegov.core.security import Secret
+from onegov.core.templates import render_template
 from onegov.gazette import _
 from onegov.gazette import GazetteApp
 from onegov.gazette.forms import EmptyForm
 from onegov.gazette.forms import UserForm
 from onegov.gazette.layout import Layout
+from onegov.gazette.layout import MailLayout
 from onegov.gazette.models import GazetteNotice
 from onegov.user import User
 from onegov.user import UserCollection
@@ -62,6 +64,23 @@ def create_user(self, request, form):
                 form.role.data,
                 realname=form.name.data
             )
+            url = request.link(request.app.principal, name='request-password')
+            request.app.send_email(
+                subject=request.translate(_("User account created")),
+                receivers=(user.username, ),
+                reply_to=request.app.mail_sender,
+                content=render_template(
+                    'mail_user_created.pt',
+                    request,
+                    {
+                        'title': request.translate(_("User account created")),
+                        'model': None,
+                        'url': url,
+                        'layout': MailLayout(self, request)
+                    }
+                )
+            )
+
         form.update_model(user)
         request.message(_("User added."), 'success')
         return redirect(layout.manage_users_link)

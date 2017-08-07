@@ -1,0 +1,11 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.gazette">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="body">
+        <p i18n:translate>Dear Sir or Madam,</p>
+        <p i18n:translate>Your user account has been created.</p>
+        <p i18n:translate>Click the following link to set a password:</p>
+        <p><a href="${url}" i18n:translate>Set password</a></p>
+    </tal:block>
+</div>

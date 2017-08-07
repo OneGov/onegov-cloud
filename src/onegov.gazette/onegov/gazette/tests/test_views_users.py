@@ -21,6 +21,12 @@ def test_view_users(gazette_app):
     assert "Benutzer hinzugefügt." in manage
     assert "new_user@example.org" in manage
 
+    assert len(gazette_app.smtp.outbox) == 1
+    message = gazette_app.smtp.outbox[0]
+    message = message.get_payload(1).get_payload(decode=True)
+    message = message.decode('utf-8')
+    assert "Ihr Benutzerkonto wurde erstellt." in message
+
     # make it an editor
     manage = manage.click("Bearbeiten", href="new_user")
     manage.form['role'] = 'member'

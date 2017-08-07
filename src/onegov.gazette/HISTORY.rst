@@ -10,6 +10,9 @@ Changelog
 - Omits the emails on publishing.
   [msom]
 
+- Sends an email when creating a user.
+  [msom]
+
 0.0.4 (2017-08-03)
 ~~~~~~~~~~~~~~~~~~~
 

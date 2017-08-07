@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-07 14:35+0200\n"
-"PO-Revision-Date: 2017-08-07 14:36+0200\n"
+"POT-Creation-Date: 2017-08-07 15:35+0200\n"
+"PO-Revision-Date: 2017-08-07 15:36+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -150,14 +150,11 @@ msgstr "Aktuelle Seite"
 msgid "Dear Sir or Madam,"
 msgstr "Sehr geehrte Damen und Herren,"
 
-msgid "Your official notice has been published:"
-msgstr "Ihre amtliche Meldung wurde veröffentlicht:"
+msgid "Your official notice has been rejected:"
+msgstr "Ihre amtliche Meldung wurde zurückgewiesen:"
 
 msgid "ID"
 msgstr "ID"
-
-msgid "Your official notice has been rejected:"
-msgstr "Ihre amtliche Meldung wurde zurückgewiesen:"
 
 msgid "Click the following link to set a new password:"
 msgstr "Klicken Sie auf den folgenden Link, um ein neues Passwort zu setzen:"
@@ -169,6 +166,15 @@ msgstr ""
 
 msgid "Please publish the following official notice:"
 msgstr "Bitte veröffentlichen Sie folgende amtliche Meldung:"
+
+msgid "Your user account has been created."
+msgstr "Ihr Benutzerkonto wurde erstellt."
+
+msgid "Click the following link to set a password:"
+msgstr "Klicken Sie auf den folgenden Link um ein Passwort festzulegen:"
+
+msgid "Set password"
+msgstr "Passwort festlegen"
 
 msgid "User"
 msgstr "Benutzer"
@@ -342,9 +348,6 @@ msgstr "Veröffentlichen"
 msgid "Reject"
 msgstr "Zurückweisen"
 
-msgid "Official Notice Published"
-msgstr "Amtliche Meldung veröffentlicht"
-
 msgid "Official Notice Rejected"
 msgstr "Amtliche Meldung zurückgewiesen"
 
@@ -389,3 +392,6 @@ msgstr "Es können nur Benutzer ohne amtliche Meldungen gelöscht werden."
 
 msgid "User deleted."
 msgstr "Benutzer gelöscht."
+
+msgid "User account created"
+msgstr "Benutzerkonto erstellt"
