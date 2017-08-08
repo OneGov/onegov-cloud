@@ -8,7 +8,6 @@ from onegov.gazette.forms import EmptyForm
 from onegov.gazette.forms import UserForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.layout import MailLayout
-from onegov.gazette.models import GazetteNotice
 from onegov.user import User
 from onegov.user import UserCollection
 
