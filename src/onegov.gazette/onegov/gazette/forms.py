@@ -11,7 +11,7 @@ from sqlalchemy import String
 from wtforms import RadioField
 from wtforms import SelectField
 from wtforms import StringField
-from wtforms.fields.html5 import EmailField
+from wtforms.validators import Email
 from wtforms.validators import InputRequired
 
 
@@ -46,10 +46,11 @@ class UserForm(Form):
         ]
     )
 
-    email = EmailField(
+    email = StringField(
         label=_("E-Mail"),
         validators=[
-            InputRequired()
+            InputRequired(),
+            Email()
         ]
     )
 
