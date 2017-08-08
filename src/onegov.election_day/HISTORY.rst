@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.15.4 (2017-08-08)
+~~~~~~~~~~~~~~~~~~~
 
 - Updates translations.
   [msom]
