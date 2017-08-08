@@ -33,6 +33,7 @@ setup(
     platforms='any',
     install_requires=[
         'babel',
+        'bleach',
         'cached_property',
         'cssmin',
         'onegov.chat',
