@@ -58,10 +58,10 @@ def test_user_group_form():
 def test_user_form(session):
     # Test apply / update
     form = UserForm()
-    user = User(username='a@a.a', role='editor', realname='User')
+    user = User(username='a@a.ai', role='editor', realname='User')
 
     form.apply_model(user)
-    assert form.email.data == 'a@a.a'
+    assert form.email.data == 'a@a.ai'
     assert form.role.data == 'editor'
     assert form.name.data == 'User'
     assert form.group.data == ''
@@ -70,13 +70,13 @@ def test_user_form(session):
     form.apply_model(user)
     assert form.group.data == 'Group'
 
-    form.email.data = 'b@b.b'
+    form.email.data = 'b@b.bi'
     form.role.data = 'publisher'
     form.name.data = 'Publisher'
     form.group.data = 'Publishers'
 
     form.update_model(user)
-    assert user.username == 'b@b.b'
+    assert user.username == 'b@b.bi'
     assert user.role == 'publisher'
     assert user.realname == 'Publisher'
     assert user.data['group'] == 'Publishers'
@@ -90,7 +90,7 @@ def test_user_form(session):
             DummyPostData({
                 'role': role,
                 'name': 'User',
-                'email': 'x@y.z',
+                'email': 'x@y.za',
                 'group': ''
             })
         )
