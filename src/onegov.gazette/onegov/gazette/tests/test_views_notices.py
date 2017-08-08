@@ -39,7 +39,9 @@ def test_view_notices(gazette_app):
         assert "Keine amtlichen Meldungen" in client.get('/notices/published')
 
         # reject notice
-        client.get('/notice/erneuerungswahlen/reject').form.submit()
+        manage = client.get('/notice/erneuerungswahlen/reject')
+        manage.form['comment'] = 'comment'
+        manage.form.submit()
         assert "Keine amtlichen Meldungen" in client.get('/notices/drafted')
         assert "Keine amtlichen Meldungen" in client.get('/notices/submitted')
         assert "Erneuerungswahlen" in client.get('/notices/rejected')

@@ -32,7 +32,7 @@ class GazetteNotice(OfficialNotice):
         else:
             self.meta['issues'] = {item: None for item in value}
 
-    def add_change(self, request, text):
+    def add_change(self, request, event, text=None):
         """ Adds en entry to the changelog. """
 
         session = object_session(self)
@@ -46,7 +46,8 @@ class GazetteNotice(OfficialNotice):
             GazetteNoticeChange(
                 channel_id=str(self.id),
                 owner=owner,
-                text=text
+                text=text or '',
+                meta={'event': event}
             )
         )
 
@@ -70,7 +71,7 @@ class GazetteNotice(OfficialNotice):
         super(GazetteNotice, self).publish()
         self.add_change(request, _("published"))
 
-    def reject(self, request):
+    def reject(self, request, comment):
         """ Reject a submitted notice.
 
         This automatically adds en entry to the changelog.
@@ -78,7 +79,17 @@ class GazetteNotice(OfficialNotice):
         """
 
         super(GazetteNotice, self).reject()
-        self.add_change(request, _("rejected"))
+        self.add_change(request, _("rejected"), comment)
+
+    @property
+    def rejected_comment(self):
+        """ Returns the comment of the last rejected change log entry. """
+
+        for change in self.changes:
+            if change.event == 'rejected':
+                return change.text
+
+        return ''
 
 
 class GazetteNoticeChange(Message):
@@ -103,6 +114,15 @@ class GazetteNoticeChange(Message):
             '== cast(GazetteNotice.id, TEXT)'
         ),
         backref=backref(
-            'changes', lazy='dynamic', cascade='all,delete-orphan'
+            'changes',
+            lazy='dynamic',
+            cascade='all,delete-orphan',
+            order_by='desc(GazetteNoticeChange.id)'
         )
     )
+
+    @property
+    def event(self):
+        """ Returns the event. """
+
+        return (self.meta or {}).get('event', '')

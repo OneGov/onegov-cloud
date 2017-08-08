@@ -21,5 +21,9 @@
             <dt i18n:translate>Text</dt>
             <dd tal:content="structure model.text"></dd>
         </dl>
+        <dl>
+            <dt i18n:translate>Comment</dt>
+            <dd>${comment}</dd>
+        </dl>
     </tal:block>
 </div>

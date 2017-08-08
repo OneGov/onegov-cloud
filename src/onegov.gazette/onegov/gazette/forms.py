@@ -16,6 +16,7 @@ from wtforms.validators import InputRequired
 
 
 class EmptyForm(Form):
+
     pass
 
 
@@ -166,3 +167,13 @@ class NoticeForm(Form):
         self.category.data = model.category
         self.text.data = model.text
         self.issues.data = list(model.issues.keys())
+
+
+class RejectForm(Form):
+
+    comment = StringField(
+        label=_("Comment"),
+        validators=[
+            InputRequired()
+        ]
+    )

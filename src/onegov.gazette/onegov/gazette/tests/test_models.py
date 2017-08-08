@@ -165,11 +165,13 @@ def test_notice_change(session):
     assert change.channel_id == 'channel'
     assert change.user == None
     assert change.notice == None
+    assert change.event == ''
 
     session.add(User(username='1@2.com', password='test', role='editor'))
     session.flush()
     user = session.query(User).one()
     change.user = user
+    change.meta = {'event': 'event'}
 
     session.add(GazetteNotice(state='drafted', title='title', name='notice'))
     session.flush()
@@ -178,7 +180,9 @@ def test_notice_change(session):
 
     session.flush()
     assert user.changes.one().text == 'text'
+    assert user.changes.one().event == 'event'
     assert notice.changes.one().text == 'text'
+    assert notice.changes.one().event == 'event'
 
 
 def test_gazette_notice_issues():
@@ -225,12 +229,14 @@ def test_gazette_notice_states(session):
     with raises(AssertionError):
         notice.publish(request)
     with raises(AssertionError):
-        notice.reject(request)
+        notice.reject(request, 'XXX')
     notice.submit(request)
 
     with raises(AssertionError):
         notice.submit(request)
-    notice.reject(request)
+    notice.reject(request, 'Some reason')
+    notice.submit(request)
+    notice.reject(request, 'Some other reason')
     notice.submit(request)
     notice.publish(request)
 
@@ -239,20 +245,34 @@ def test_gazette_notice_states(session):
     with raises(AssertionError):
         notice.publish(request)
     with raises(AssertionError):
-        notice.reject(request)
+        notice.reject(request, 'Some reason')
 
     notice.add_change(request, 'printed')
 
     request.identity = DummyIdentity()
     request.identity.userid = user.username
-    notice.add_change(request, 'finished')
+    notice.add_change(request, 'finished', text='all went well')
 
     # the test might be to fast for the implicit ordering by id, we sort it
     # ourselves
-    changes = notice.changes.order_by(GazetteNoticeChange.edited)
-    assert [change.text for change in changes] == [
-        'submitted', 'rejected', 'submitted', 'published', 'printed',
-        'finished'
+    changes = notice.changes.order_by(None)
+    changes = changes.order_by(GazetteNoticeChange.edited.desc())
+    assert [
+        (change.event, change.user, change.text) for change in changes
+    ] == [
+        ('submitted', None, ''),
+        ('rejected', None, 'Some reason'),
+        ('submitted', None, ''),
+        ('rejected', None, 'Some other reason'),
+        ('submitted', None, ''),
+        ('published', None, ''),
+        ('printed', None, ''),
+        ('finished', user, 'all went well')
     ]
-    assert [change.user for change in notice.changes if change.user] == [user]
-    assert [change.text for change in user.changes] == ['finished']
+    assert notice.rejected_comment == 'Some other reason'
+
+    assert [
+        (change.event, change.user, change.text) for change in user.changes
+    ] == [
+        ('finished', user, 'all went well')
+    ]

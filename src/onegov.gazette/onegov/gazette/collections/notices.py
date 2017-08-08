@@ -54,7 +54,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         audit_trail.add(
             channel_id=str(notice.id),
             owner=str(user_id),
-            text=_("created")
+            meta={'event': _("created")}
         )
 
         return notice

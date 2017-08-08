@@ -44,7 +44,9 @@ def test_view_dashboard(gazette_app):
 
         # reject notice
         manage = publisher.get('/').follow().click("Erneuerungswahlen")
-        manage.click("Zurückweisen").form.submit()
+        manage = manage.click("Zurückweisen")
+        manage.form['comment'] = 'comment'
+        manage = manage.form.submit()
 
         manage = editor.get('/').follow()
         assert "Keine amtlichen Meldungen." not in manage

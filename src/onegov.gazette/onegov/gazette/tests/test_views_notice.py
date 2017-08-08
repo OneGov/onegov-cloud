@@ -157,6 +157,7 @@ def test_view_notice_reject_publish(gazette_app):
         editor.get('/notice/erneuerungswahlen/reject', status=403)
 
         manage = publisher.get('/notice/erneuerungswahlen/reject')
+        manage.form['comment'] = "Wichtiger Grund."
         manage = manage.form.submit().follow().follow()
         assert "Amtliche Meldung zurückgewiesen." in manage
         manage = publisher.get('/notice/erneuerungswahlen')
@@ -184,6 +185,7 @@ def test_view_notice_reject_publish(gazette_app):
         message = message.get_payload(1).get_payload(decode=True)
         message = message.decode('utf-8')
         assert "Ihre amtliche Meldung wurde zurückgewiesen:" in message
+        assert "Wichtiger Grund" in message
 
         # try to reject the rejected notice
         editor.get('/notice/erneuerungswahlen/reject', status=403)
@@ -199,6 +201,10 @@ def test_view_notice_reject_publish(gazette_app):
         ) in publisher.get('/notice/erneuerungswahlen/publish')
 
         # edit the rejected notice
+        manage = editor.get('/notice/erneuerungswahlen')
+        assert "Diese amtliche Meldung wurde zurückgewiesen." in manage
+        assert "<strong>Wichtiger Grund.</strong>" in manage
+
         manage = editor.get('/notice/erneuerungswahlen/edit')
         manage.form['title'] = "Erneuerungswahlen 2017"
         manage = manage.form.submit().follow()
@@ -313,6 +319,7 @@ def test_view_notice_delete(gazette_app):
             manage.form['issues'] = ['2017-44', '2017-45']
             manage.form['text'] = "1. Oktober 2017"
             manage.form.submit()
+
             manage = user.get('/notice/erneuerungswahlen/delete')
             manage = manage.form.submit().follow().follow()
             assert "Amtliche Meldung gelöscht." in manage
@@ -325,8 +332,13 @@ def test_view_notice_delete(gazette_app):
             manage.form['issues'] = ['2017-44', '2017-45']
             manage.form['text'] = "1. Oktober 2017"
             manage.form.submit()
+
             editor.get('/notice/erneuerungswahlen/submit').form.submit()
-            publisher.get('/notice/erneuerungswahlen/reject').form.submit()
+
+            manage = publisher.get('/notice/erneuerungswahlen/reject')
+            manage.form['comment'] = 'comment'
+            manage.form.submit()
+
             manage = user.get('/notice/erneuerungswahlen/delete')
             manage = manage.form.submit().follow().follow()
             assert "Amtliche Meldung gelöscht." in manage

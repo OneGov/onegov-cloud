@@ -22,6 +22,9 @@ Changelog
 - Shows the weekday in the add/edit notice form.
   [msom]
 
+- Adds comments for rejecting notices.
+  [msom]
+
 0.0.4 (2017-08-03)
 ~~~~~~~~~~~~~~~~~~~
 

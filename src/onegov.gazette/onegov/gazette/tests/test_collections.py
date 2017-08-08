@@ -39,7 +39,7 @@ def test_notice_collection(session):
     assert notice.category == 'important'
     assert notice.issues == {'2017-1': None, '2017-4': None}
     assert notice.user == user
-    assert notice.changes.one().text == 'created'
+    assert notice.changes.one().event == 'created'
     assert notice.changes.one().user == user
 
     notice = collection.query().filter_by(title='Notice B').one()
@@ -48,7 +48,7 @@ def test_notice_collection(session):
     assert notice.category == 'not so important'
     assert notice.issues == {'2017-2': None, '2017-4': None}
     assert notice.user == user
-    assert notice.changes.one().text == 'created'
+    assert notice.changes.one().event == 'created'
     assert notice.changes.one().user == user
 
 

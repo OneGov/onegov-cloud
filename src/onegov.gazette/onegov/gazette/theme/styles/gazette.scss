@@ -489,6 +489,25 @@ form {
 }
 
 /*
+    Changelog
+*/
+table.changes {
+    tr {
+        vertical-align: top;
+    }
+
+    .event {
+        display: block;
+    }
+
+    .text {
+        display: block;
+        margin-top: .5em;
+        font-style: italic;
+    }
+}
+
+/*
     Print
 */
 

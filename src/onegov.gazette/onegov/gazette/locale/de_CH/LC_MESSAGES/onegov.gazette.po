@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-07 16:45+0200\n"
-"PO-Revision-Date: 2017-08-07 16:45+0200\n"
+"POT-Creation-Date: 2017-08-08 13:33+0200\n"
+"PO-Revision-Date: 2017-08-08 13:14+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -37,6 +37,9 @@ msgstr "Ausgabe(n)"
 
 msgid "Text"
 msgstr "Text"
+
+msgid "Comment"
+msgstr "Bemerkung"
 
 msgid "Publisher"
 msgstr "Herausgeber"
@@ -178,6 +181,9 @@ msgstr "Klicken Sie auf den folgenden Link um ein Passwort festzulegen:"
 
 msgid "Set password"
 msgstr "Passwort festlegen"
+
+msgid "This official notice has been rejected."
+msgstr "Diese amtliche Meldung wurde zurückgewiesen."
 
 msgid "User"
 msgstr "Benutzer"

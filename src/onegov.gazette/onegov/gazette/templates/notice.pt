@@ -17,6 +17,13 @@
                     </tal:block>
                 </div>
 
+                <div class="panel callout" tal:condition="notice.state == 'rejected'">
+                    <p>
+                        <span i18n:translate>This official notice has been rejected.</span>
+                        <span i18n:translate>Comment</span>: <strong>${notice.rejected_comment}</strong>
+                    </p>
+                </div>
+
                 <div class="row">
                     <div class="small-12 medium-7 columns">
                         <h2>${notice.title}</h2>
@@ -58,7 +65,10 @@
                                 <td>${layout.format_date(change.created, 'datetime')}</td>
                                 <td>${layout.format_owner(change.user)}</td>
                                 <td>${layout.format_group(change.user)}</td>
-                                <td i18n:translate>${change.text}</td>
+                                <td>
+                                    <span class="event" i18n:translate>${change.event}</span>
+                                    <span class="text" tal:condition="change.text">${change.text}</span>
+                                </td>
                             </tr>
                         </tal:block>
                     </tbody>

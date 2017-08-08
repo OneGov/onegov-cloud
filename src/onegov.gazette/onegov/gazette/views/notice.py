@@ -8,6 +8,7 @@ from onegov.gazette import GazetteApp
 from onegov.gazette.collections import GazetteNoticeCollection
 from onegov.gazette.forms import EmptyForm
 from onegov.gazette.forms import NoticeForm
+from onegov.gazette.forms import RejectForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.layout import MailLayout
 from onegov.gazette.models import GazetteNotice
@@ -323,7 +324,7 @@ def publish_notice(self, request, form):
     name='reject',
     template='form.pt',
     permission=Private,
-    form=EmptyForm
+    form=RejectForm
 )
 def reject_notice(self, request, form):
     """ Reject a notice.
@@ -346,7 +347,7 @@ def reject_notice(self, request, form):
         }
 
     if form.submitted(request):
-        self.reject(request)
+        self.reject(request, form.comment.data)
         request.message(_("Official notice rejected."), 'success')
         request.app.send_email(
             subject=request.translate(_("Official Notice Rejected")),
@@ -358,6 +359,7 @@ def reject_notice(self, request, form):
                 {
                     'title': request.translate(_("Official Notice Rejected")),
                     'model': self,
+                    'comment': form.comment.data,
                     'layout': MailLayout(self, request)
                 }
             )
