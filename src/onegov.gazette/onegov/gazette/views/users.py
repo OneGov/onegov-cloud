@@ -142,16 +142,9 @@ def delete_user(self, request, form):
 
     layout = Layout(self, request)
 
-    if self.official_notices.filter(GazetteNotice.state != 'drafted').first():
-        return {
-            'layout': layout,
-            'title': self.title,
-            'subtitle': _("Delete Group"),
-            'callout': _(
-                "Only users without official notices may be deleted."
-            ),
-            'show_form': False
-        }
+    callout = None
+    if self.official_notices.first() or self.changes.first():
+        callout = _("There are official notices linked to this user!")
 
     if form.submitted(request):
         collection = UserCollection(request.app.session())
@@ -170,6 +163,7 @@ def delete_user(self, request, form):
         'form': form,
         'title': self.title,
         'subtitle': _("Delete User"),
+        'callout': callout,
         'button_text': _("Delete User"),
         'button_class': 'alert',
         'cancel': layout.manage_users_link
