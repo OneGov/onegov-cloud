@@ -12,6 +12,7 @@ class OfficialNoticeCollectionPagination(Pagination):
         self.page = page
         self.state = state
         self.term = term
+        self.user_ids = []
 
     def __eq__(self, other):
         return (
@@ -55,6 +56,9 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
                     self.model_class.text.ilike(term)
                 )
             )
+        if self.user_ids:
+            query = query.filter(self.model_class.user_id.in_(self.user_ids))
+
         return query
 
     def _get_unique_name(self, name):

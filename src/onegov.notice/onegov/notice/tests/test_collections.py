@@ -1,4 +1,5 @@
 from onegov.notice import OfficialNoticeCollection
+from onegov.user import UserCollection
 from transaction import commit
 
 
@@ -82,6 +83,39 @@ def test_notice_collection_search(session):
 
     notices.term = 'üb'
     assert notices.query().count() == 1
+
+
+def test_notice_collection_users(session):
+    users = UserCollection(session)
+    user_a = users.add('a@example.org', 'password', 'editor').id
+    user_b = users.add('b@example.org', 'password', 'editor').id
+    user_c = users.add('c@example.org', 'password', 'editor').id
+
+    notices = OfficialNoticeCollection(session)
+    notices.add(title='A1', text='text', user_id=user_a)
+    notices.add(title='A2', text='text', user_id=user_a)
+    notices.add(title='A3', text='text', user_id=user_a)
+    notices.add(title='B1', text='text', user_id=user_b)
+    notices.add(title='B2', text='text', user_id=user_b)
+    notices.add(title='C1', text='text', user_id=user_c)
+    notices.add(title='C2', text='text', user_id=user_c)
+
+    assert notices.query().count() == 7
+
+    notices.user_ids = [user_a]
+    assert notices.query().count() == 3
+
+    notices.user_ids = [user_b]
+    assert notices.query().count() == 2
+
+    notices.user_ids = [user_c]
+    assert notices.query().count() == 2
+
+    notices.user_ids = [user_a, user_c]
+    assert notices.query().count() == 5
+    assert sorted([notice.title for notice in notices.query()]) == [
+        'A1', 'A2', 'A3', 'C1', 'C2'
+    ]
 
 
 def test_notice_collection_pagination(session):
