@@ -20,11 +20,9 @@ TRANSLATIONS = {
 class GazetteNoticeCollection(OfficialNoticeCollection):
     """ Manage a list of gazette specific official notices. """
 
-    def query(self):
-        query = self.session.query(GazetteNotice)
-        if self.state:
-            query = query.filter(GazetteNotice.state == self.state)
-        return query
+    @property
+    def model_class(self):
+        return GazetteNotice
 
     def add(self, title, text, category, issues, user_id):
         """ Add a new notice.

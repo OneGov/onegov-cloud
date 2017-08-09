@@ -51,7 +51,6 @@ def test_layout_links():
     assert layout.manage_statistics_link == \
         '/GazetteNoticeCollection/statistics/'
     assert layout.dashboard_link == '/dashboard/'
-    assert layout.archive_link == '/archive/'
 
 
 def test_layout_menu():
@@ -63,7 +62,7 @@ def test_layout_menu():
     request._is_personal = True
     assert layout.menu == [
         ('My Drafted and Submitted Official Notices', '/dashboard/', False),
-        ('My Published Official Notices', '/archive/', False)
+        ('My Published Official Notices', '/GazetteNoticeCollection/', False)
     ]
 
     request._is_private = True

@@ -443,6 +443,26 @@ ul.actions {
 .sub-nav {
     background-color: $white-smoke;
     padding: 10px 10px 10px 0;
+
+    dt,
+    dd,
+    dd a,
+    button {
+        background-color: inherit;
+        color: $steel;
+    }
+
+    input {
+        box-sizing: content-box;
+        height: initial;
+        margin: 0;
+        padding: .2em .5em;
+    }
+
+    button {
+        margin: 0;
+        padding: 0 .2em;
+    }
 }
 
 
@@ -502,8 +522,8 @@ table.changes {
 
     .text {
         display: block;
-        margin-top: .5em;
         font-style: italic;
+        margin-top: .5em;
     }
 }
 

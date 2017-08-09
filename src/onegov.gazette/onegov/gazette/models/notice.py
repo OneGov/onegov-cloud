@@ -1,4 +1,5 @@
 from onegov.chat import Message
+from onegov.core.orm.mixins import meta_property
 from onegov.gazette import _
 from onegov.notice import OfficialNotice
 from onegov.user import User
@@ -121,8 +122,5 @@ class GazetteNoticeChange(Message):
         )
     )
 
-    @property
-    def event(self):
-        """ Returns the event. """
-
-        return (self.meta or {}).get('event', '')
+    #: the event
+    event = meta_property('event')

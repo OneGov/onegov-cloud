@@ -31,6 +31,9 @@ Changelog
 - Allows to delete users with official notices.
   [msom]
 
+- Allows to filter notices by a search term.
+  [msom]
+
 0.0.4 (2017-08-03)
 ~~~~~~~~~~~~~~~~~~~
 

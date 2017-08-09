@@ -5,7 +5,7 @@ from onegov.gazette.collections import GazetteNoticeCollection
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import Principal
-from onegov.gazette.views import get_user
+from onegov.gazette.views import get_user_id
 
 
 @GazetteApp.html(
@@ -17,18 +17,18 @@ from onegov.gazette.views import get_user
 def view_dashboard(self, request):
     layout = Layout(self, request)
     session = request.app.session()
-    user = get_user(request)
+    user_id = get_user_id(request)
 
     rejected = GazetteNoticeCollection(session, state='rejected').query()
-    rejected = rejected.filter(GazetteNotice.user_id == user.id).all()
+    rejected = rejected.filter(GazetteNotice.user_id == user_id).all()
     if rejected:
         request.message(_("You have rejected messages."), 'warning')
 
     drafted = GazetteNoticeCollection(session, state='drafted').query()
-    drafted = drafted.filter(GazetteNotice.user_id == user.id).all()
+    drafted = drafted.filter(GazetteNotice.user_id == user_id).all()
 
     submitted = GazetteNoticeCollection(session, state='submitted').query()
-    submitted = submitted.filter(GazetteNotice.user_id == user.id).all()
+    submitted = submitted.filter(GazetteNotice.user_id == user_id).all()
 
     new_notice = request.link(
         GazetteNoticeCollection(session, state='drafted'),

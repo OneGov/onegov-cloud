@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-08 15:51+0200\n"
-"PO-Revision-Date: 2017-08-08 15:52+0200\n"
+"POT-Creation-Date: 2017-08-09 13:33+0200\n"
+"PO-Revision-Date: 2017-08-09 13:26+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -83,11 +83,11 @@ msgstr "veröffentlicht"
 msgid "created"
 msgstr "erstellt"
 
-msgid "No official notices."
-msgstr "Keine amtlichen Meldungen."
-
 msgid "New"
 msgstr "Neu"
+
+msgid "No official notices."
+msgstr "Keine amtlichen Meldungen."
 
 msgid "Rejected"
 msgstr "Zurückgewiesen"
@@ -199,6 +199,9 @@ msgstr "Datum/Zeit"
 
 msgid "Change"
 msgstr "Änderung"
+
+msgid "Search"
+msgstr "Suche"
 
 msgid "Filter:"
 msgstr "Filter:"
@@ -371,6 +374,12 @@ msgstr "Neue amtliche Publikation"
 
 msgid "Official Notices"
 msgstr "Amtliche Meldungen"
+
+msgid "Drafted Official Notices"
+msgstr "Amtliche Meldungen in Arbeit"
+
+msgid "Rejected Official Notices"
+msgstr "Zurückgewiesene amtliche Meldungen"
 
 msgid "Categories"
 msgstr "Rubriken"

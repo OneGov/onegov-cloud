@@ -57,7 +57,7 @@ def create_notice(self, request, form):
 @GazetteApp.html(
     model=GazetteNoticeCollection,
     template='notices.pt',
-    permission=Private
+    permission=Personal
 )
 def view_notices(self, request):
     """ View the list of notices.
@@ -70,15 +70,24 @@ def view_notices(self, request):
     layout = Layout(self, request)
 
     title = {
+        'drafted': _("Drafted Official Notices"),
+        'rejected': _("Rejected Official Notices"),
         'submitted': _("Submitted Official Notices"),
         'published': _("Published Official Notices")
     }.get(self.state, _("Official Notices"))
+
+    if not request.is_private(self):
+        if self.state == 'published':
+            title = _("My Published Official Notices")
+
+        self.user_ids = [get_user_id(request)]
 
     return {
         'layout': layout,
         'state': self.state,
         'notices': self.batch,
-        'title': title
+        'title': title,
+        'term': self.term
     }
 
 

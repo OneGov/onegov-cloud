@@ -11,6 +11,23 @@
             <div class="small-12 columns">
                 <h2 i18n:translate>${title}</h2>
 
+                <dl class="sub-nav">
+                    <form>
+                        <dt><tal:block i18n:translate>Search</tal:block>:</dt>
+                        <dd>
+                            <input type="text" name="term" value="${term}"/>
+                        </dd>
+                        <dd>
+                            <button type="submit" aria-label="Search" i18n:attributes="aria-label">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </dd>
+                        <dd tal:condition="term">
+                            <a href="${request.path_url}"><i class="fa fa-close" aria-hidden="true"></i></a>
+                        </dd>
+                    </form>
+                </dl>
+
                 <table class="notices stackable">
                     <thead>
                         <tr>

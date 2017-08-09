@@ -165,7 +165,7 @@ def test_notice_change(session):
     assert change.channel_id == 'channel'
     assert change.user == None
     assert change.notice == None
-    assert change.event == ''
+    assert change.event == None
 
     session.add(User(username='1@2.com', password='test', role='editor'))
     session.flush()

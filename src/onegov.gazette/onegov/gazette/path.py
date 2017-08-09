@@ -40,8 +40,10 @@ def get_group(app, id):
 
 
 @GazetteApp.path(model=GazetteNoticeCollection, path='/notices/{state}')
-def get_notices(app, state, page=0):
-    return GazetteNoticeCollection(app.session(), state=state, page=page)
+def get_notices(app, state, page=0, term=None):
+    return GazetteNoticeCollection(
+        app.session(), state=state, page=page, term=term
+    )
 
 
 @GazetteApp.path(model=GazetteNotice, path='/notice/{name}')

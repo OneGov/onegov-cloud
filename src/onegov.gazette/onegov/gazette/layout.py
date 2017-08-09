@@ -99,10 +99,6 @@ class Layout(ChameleonLayout):
         return self.request.link(self.principal, name='dashboard')
 
     @cached_property
-    def archive_link(self):
-        return self.request.link(self.principal, name='archive')
-
-    @cached_property
     def login_link(self):
         if not self.request.is_logged_in:
             return self.request.link(
@@ -165,23 +161,17 @@ class Layout(ChameleonLayout):
             ))
 
         elif self.request.is_personal(self.model):
-            active = (
-                isinstance(self.model, Principal) and
-                'dashboard' in self.request.url
-            )
+            active = isinstance(self.model, Principal)
             result.append((
                 _("My Drafted and Submitted Official Notices"),
                 self.dashboard_link,
                 active
             ))
 
-            active = (
-                isinstance(self.model, Principal) and
-                'archive' in self.request.url
-            )
+            active = isinstance(self.model, GazetteNoticeCollection)
             result.append((
                 _("My Published Official Notices"),
-                self.archive_link,
+                self.manage_published_notices_link,
                 active
             ))
 

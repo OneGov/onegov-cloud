@@ -12,6 +12,9 @@ def test_view_notices(gazette_app):
         client = Client(gazette_app)
         login_publisher(client)
 
+        editor = Client(gazette_app)
+        login_editor(editor)
+
         assert "Keine amtlichen Meldungen" in client.get('/notices/drafted')
         assert "Keine amtlichen Meldungen" in client.get('/notices/submitted')
         assert "Keine amtlichen Meldungen" in client.get('/notices/rejected')
@@ -30,6 +33,8 @@ def test_view_notices(gazette_app):
         assert "Keine amtlichen Meldungen" in client.get('/notices/rejected')
         assert "Keine amtlichen Meldungen" in client.get('/notices/published')
 
+        assert "Keine amtlichen Meldungen" in editor.get('/notices/drafted')
+
         # submit notice
         client.get('/notice/erneuerungswahlen/submit').form.submit()
 
@@ -37,6 +42,8 @@ def test_view_notices(gazette_app):
         assert "Erneuerungswahlen" in client.get('/notices/submitted')
         assert "Keine amtlichen Meldungen" in client.get('/notices/rejected')
         assert "Keine amtlichen Meldungen" in client.get('/notices/published')
+
+        assert "Keine amtlichen Meldungen" in editor.get('/notices/submitted')
 
         # reject notice
         manage = client.get('/notice/erneuerungswahlen/reject')
@@ -47,6 +54,8 @@ def test_view_notices(gazette_app):
         assert "Erneuerungswahlen" in client.get('/notices/rejected')
         assert "Keine amtlichen Meldungen" in client.get('/notices/published')
 
+        assert "Keine amtlichen Meldungen" in editor.get('/notices/rejected')
+
         # submit & publish notice
         client.get('/notice/erneuerungswahlen/submit').form.submit()
         client.get('/notice/erneuerungswahlen/publish').form.submit()
@@ -55,6 +64,48 @@ def test_view_notices(gazette_app):
         assert "Keine amtlichen Meldungen" in client.get('/notices/submitted')
         assert "Keine amtlichen Meldungen" in client.get('/notices/rejected')
         assert "Erneuerungswahlen" in client.get('/notices/published')
+
+        assert "Keine amtlichen Meldungen" in editor.get('/notices/published')
+
+
+def test_view_notices_search(gazette_app):
+    with freeze_time("2017-11-01 12:00"):
+
+        client = Client(gazette_app)
+        login_publisher(client)
+
+        # new notice
+        manage = client.get('/notices/drafted/new-notice')
+        manage.form['title'] = "Erneuerungswahlen"
+        manage.form['category'] = '1403'
+        manage.form['issues'] = ['2017-44', '2017-45']
+        manage.form['text'] = "1. Oktober 2017"
+        manage.form.submit()
+        client.get('/notice/erneuerungswahlen/submit').form.submit()
+        client.get('/notice/erneuerungswahlen/publish').form.submit()
+
+        manage = client.get('/notices/drafted/new-notice')
+        manage.form['title'] = "Kantonsratswahlen"
+        manage.form['category'] = '1403'
+        manage.form['issues'] = ['2017-44', '2017-45']
+        manage.form['text'] = "10. Oktober 2017"
+        manage.form.submit()
+        client.get('/notice/kantonsratswahlen/submit').form.submit()
+        client.get('/notice/kantonsratswahlen/publish').form.submit()
+
+        assert "Erneuerungswahlen" in client.get('/notices/published')
+        assert "Kantonsratswahlen" in client.get('/notices/published')
+
+        url = '/notices/published?term={}'
+
+        assert "Erneuerung" in client.get(url.format('wahlen'))
+        assert "Kantonsrat" in client.get(url.format('wahlen'))
+
+        assert "Erneuerung" not in client.get(url.format('10.+Oktober'))
+        assert "Kantonsrat" in client.get(url.format('10.+Oktober'))
+
+        assert "Erneuerung" in client.get(url.format('neuerun'))
+        assert "Kantonsrat" not in client.get(url.format('neuerun'))
 
 
 def test_view_notices_statistics(gazette_app):
