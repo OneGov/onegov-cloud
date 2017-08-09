@@ -1,4 +1,5 @@
 from freezegun import freeze_time
+from onegov.gazette.tests import login_admin
 from onegov.gazette.tests import login_editor
 from onegov.gazette.tests import login_publisher
 from webtest import TestApp as Client
@@ -311,6 +312,9 @@ def test_view_notice_delete(gazette_app):
         publisher = Client(gazette_app)
         login_publisher(publisher)
 
+        admin = Client(gazette_app)
+        login_admin(admin)
+
         # delete a drafted notice
         for user in (editor, publisher):
             manage = editor.get('/notices/drafted/new-notice')
@@ -323,6 +327,23 @@ def test_view_notice_delete(gazette_app):
             manage = user.get('/notice/erneuerungswahlen/delete')
             manage = manage.form.submit().follow().follow()
             assert "Amtliche Meldung gelöscht." in manage
+
+        # delete a submitted notice
+        for user in (editor, publisher):
+            manage = editor.get('/notices/drafted/new-notice')
+            manage.form['title'] = "Erneuerungswahlen"
+            manage.form['category'] = '1403'
+            manage.form['issues'] = ['2017-44', '2017-45']
+            manage.form['text'] = "1. Oktober 2017"
+            manage.form.submit()
+
+            editor.get('/notice/erneuerungswahlen/submit').form.submit()
+
+            manage = user.get('/notice/erneuerungswahlen/delete')
+            assert manage.forms == {}
+
+            manage = admin.get('/notice/erneuerungswahlen/delete')
+            manage.form.submit().follow().follow()
 
         # delete a rejected notice
         for user in (editor, publisher):
@@ -342,6 +363,24 @@ def test_view_notice_delete(gazette_app):
             manage = user.get('/notice/erneuerungswahlen/delete')
             manage = manage.form.submit().follow().follow()
             assert "Amtliche Meldung gelöscht." in manage
+
+        # delete a published notice
+        for user in (editor, publisher):
+            manage = editor.get('/notices/drafted/new-notice')
+            manage.form['title'] = "Erneuerungswahlen"
+            manage.form['category'] = '1403'
+            manage.form['issues'] = ['2017-44', '2017-45']
+            manage.form['text'] = "1. Oktober 2017"
+            manage.form.submit()
+
+            editor.get('/notice/erneuerungswahlen/submit').form.submit()
+            publisher.get('/notice/erneuerungswahlen/publish').form.submit()
+
+            manage = user.get('/notice/erneuerungswahlen/delete')
+            assert manage.forms == {}
+
+            manage = admin.get('/notice/erneuerungswahlen/delete')
+            manage.form.submit().follow().follow()
 
 
 def test_view_notice_edit_others(gazette_app):

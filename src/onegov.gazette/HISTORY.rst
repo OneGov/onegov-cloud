@@ -4,7 +4,7 @@ Changelog
 - Shows the name of the logged-in user.
   [msom]
 
-- Reduces font size of the title in the preview.
+- Reduces the font size of the title in the preview.
   [msom]
 
 - Omits the emails on publishing.
@@ -32,6 +32,9 @@ Changelog
   [msom]
 
 - Allows to filter notices by a search term.
+  [msom]
+
+- Allows admins to delete submitted and published notices.
   [msom]
 
 0.0.4 (2017-08-03)

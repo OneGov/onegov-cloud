@@ -159,8 +159,12 @@ def edit_notice(self, request, form):
 def delete_notice(self, request, form):
     """ Delete a notice.
 
-    Only drafted notices may be deleted (usually by editors). Editors may only
-    delete their own notices, publishers may delete any notice.
+    Only drafted or rejected notices may be deleted (usually by editors).
+    Editors may only delete their own notices, publishers may delete any
+    notice.
+
+    It is possible for admins to delete published and drafted notices too,
+    although the action is not linked anywhere.
 
     """
     layout = Layout(self, request)
@@ -169,16 +173,22 @@ def delete_notice(self, request, form):
         if not request.is_private(self):
             raise HTTPForbidden()
 
+    callout = None
     if self.state != 'drafted' and self.state != 'rejected':
-        return {
-            'layout': layout,
-            'title': self.title,
-            'subtitle': _("Delete Official Notice"),
-            'callout': _(
-                "Only drafted or rejected official notices may be deleted."
-            ),
-            'show_form': False
-        }
+        if request.is_secret(self):
+            callout = _(
+                "It's probably not a good idea to delete this official notice!"
+            )
+        else:
+            return {
+                'layout': layout,
+                'title': self.title,
+                'subtitle': _("Delete Official Notice"),
+                'callout': _(
+                    "Only drafted or rejected official notices may be deleted."
+                ),
+                'show_form': False
+            }
 
     if form.submitted(request):
         collection = GazetteNoticeCollection(request.app.session())
@@ -195,6 +205,7 @@ def delete_notice(self, request, form):
         'form': form,
         'title': self.title,
         'subtitle': _("Delete Official Notice"),
+        'callout': callout,
         'button_text': _("Delete Official Notice"),
         'button_class': 'alert',
         'cancel': request.link(self)
