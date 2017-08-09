@@ -9,6 +9,9 @@
             <dt i18n:translate>Title</dt>
             <dd>${model.title}</dd>
 
+            <dt i18n:translate>Organization</dt>
+            <dd>${layout.format_organization(model.organization)}</dd>
+
             <dt i18n:translate>Category</dt>
             <dd>${layout.format_category(model.category)}</dd>
 

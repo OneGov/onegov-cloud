@@ -101,6 +101,14 @@ class NoticeForm(Form):
         ]
     )
 
+    organization = SelectField(
+        label=_("Organization"),
+        choices=[],
+        validators=[
+            InputRequired()
+        ]
+    )
+
     category = SelectField(
         label=_("Category"),
         choices=[],
@@ -125,9 +133,12 @@ class NoticeForm(Form):
     )
 
     def on_request(self):
-        # populate categories
         principal = self.request.app.principal
 
+        # populate organization
+        self.organization.choices = list(principal.organizations.items())
+
+        # populate categories
         def populate(categories, level=0):
             for key, name in categories.items():
                 name = '{} {}'.format('-' * level, name)
@@ -159,12 +170,14 @@ class NoticeForm(Form):
 
     def update_model(self, model):
         model.title = self.title.data
+        model.organization = self.organization.data
         model.category = self.category.data
         model.text = self.text.data
         model.issues = self.issues.data
 
     def apply_model(self, model):
         self.title.data = model.title
+        self.organization.data = model.organization
         self.category.data = model.category
         self.text.data = model.text
         self.issues.data = list(model.issues.keys())

@@ -18,12 +18,30 @@
                   </dd>
                 </dl>
 
-                <h3 i18n:translate>By Category</h3>
+                <h3 i18n:translate>By Organizations</h3>
+                <table class="statistics-by-category stackable">
+                    <thead>
+                        <tr>
+                            <th i18n:translate>Organization</th>
+                            <th i18n:translate class="right-aligned">Number of Notices</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tal:block tal:repeat="result by_organizations">
+                            <tr>
+                                <td>${result[0]}</td>
+                                <td class="right-aligned">${result[1]}</td>
+                            </tr>
+                        </tal:block>
+                    </tbody>
+                </table>
+                <p><a href="${request.link(collection, 'statistics-organizations')}"><i class="fa fa-arrow-circle-o-down" aria-hidden="true"></i> <span i18n:translate>Download the results as CSV.</span></a></p>
+
+                <h3 i18n:translate>By Categories</h3>
                 <table class="statistics-by-category stackable">
                     <thead>
                         <tr>
                             <th i18n:translate>Category</th>
-                            <th i18n:translate>Title</th>
                             <th i18n:translate class="right-aligned">Number of Notices</th>
                         </tr>
                     </thead>
@@ -31,8 +49,7 @@
                         <tal:block tal:repeat="result by_category">
                             <tr>
                                 <td>${result[0]}</td>
-                                <td>${result[1]}</td>
-                                <td class="right-aligned">${result[2]}</td>
+                                <td class="right-aligned">${result[1]}</td>
                             </tr>
                         </tal:block>
                     </tbody>

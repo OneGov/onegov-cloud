@@ -20,6 +20,14 @@ def create_gazette(request):
         color: '#006FB5'
         logo: 'canton-zg.svg'
         publish_to: 'printer@onegov.org'
+        organizations:
+          - '100': Staatskanzlei Kanton Zug
+          - '210': Bürgergemeinde Zug
+          - '310': Einwohnergemeinde Zug
+          - '400': Evangelisch-reformierte Kirchgemeinde des Kantons Zug
+          - '501': Katholische Kirchgemeinde Baar
+          - '509': Katholische Kirchgemeinde Zug
+          - '609': Korporation Zug
         categories:
             - '14': Kantonale Mitteilungen
               children:

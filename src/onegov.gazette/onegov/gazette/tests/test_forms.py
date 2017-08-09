@@ -117,23 +117,30 @@ def test_user_form(session):
 def test_notice_form(gazette_app):
     # Test apply / update
     form = NoticeForm()
-    notice = GazetteNotice(title='Title', category='important')
-    notice.text = 'A <b>text</b>.'
+    notice = GazetteNotice(
+        title='Title',
+        text='A <b>text</b>.',
+        organization='onegov',
+        category='important'
+    )
     notice.issues = [str(Issue(2017, 5))]
 
     form.apply_model(notice)
     assert form.title.data == 'Title'
+    assert form.organization.data == 'onegov'
     assert form.category.data == 'important'
     assert form.text.data == 'A <b>text</b>.'
     assert form.issues.data == ['2017-5']
 
     form.title.data = 'Notice'
+    form.organization.data = 'seantis'
     form.category.data = 'medium'
     form.text.data = 'A <b>notice</b>.'
     form.issues.data = ['2017-6']
 
     form.update_model(notice)
     assert notice.title == 'Notice'
+    assert notice.organization == 'seantis'
     assert notice.category == 'medium'
     assert notice.text == 'A <b>notice</b>.'
     assert notice.issues == {'2017-6': None}
@@ -144,10 +151,12 @@ def test_notice_form(gazette_app):
 
     form = NoticeForm()
     form.issues.choices = [('2017-5', '2017-5')]
+    form.organization.choices = [('onegov', 'onegov')]
     form.category.choices = [('important', 'important')]
     form.process(
         DummyPostData({
             'title': 'Title',
+            'organization': 'onegov',
             'category': 'important',
             'issues': ['2017-5'],
             'text': 'Text'
@@ -161,6 +170,15 @@ def test_notice_form(gazette_app):
 
     with freeze_time("2017-11-01 12:00"):
         form.on_request()
+        assert form.organization.choices == [
+            ('100', 'Staatskanzlei Kanton Zug'),
+            ('210', 'Bürgergemeinde Zug'),
+            ('310', 'Einwohnergemeinde Zug'),
+            ('400', 'Evangelisch-reformierte Kirchgemeinde des Kantons Zug'),
+            ('501', 'Katholische Kirchgemeinde Baar'),
+            ('509', 'Katholische Kirchgemeinde Zug'),
+            ('609', 'Korporation Zug')
+        ]
         assert form.issues.choices == [
             ('2017-44', 'Nr. 44, Freitag 03.11.2017'),
             ('2017-45', 'Nr. 45, Freitag 10.11.2017'),

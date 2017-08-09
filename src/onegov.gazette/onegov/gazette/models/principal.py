@@ -42,10 +42,12 @@ class Principal(object):
         name='',
         logo='',
         color='',
+        organizations=None,
         categories=None,
         issues=None,
         publish_to=''
     ):
+        organizations = organizations or {}
         categories = categories or []
         issues = issues or {}
 
@@ -53,6 +55,12 @@ class Principal(object):
         self.logo = logo
         self.color = color
         self.publish_to = publish_to
+
+        # We want the organizations in the order defined in the YAML file and
+        # accessible by key
+        self.organizations = OrderedDict(
+            [next(enumerate(org.items()))[1] for org in organizations]
+        )
 
         # We want the categories nested, accessible by the id and in the order
         # defined in the configuration

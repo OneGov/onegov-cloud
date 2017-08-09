@@ -40,7 +40,7 @@ setup(
         'onegov.core',
         'onegov.form',
         'onegov.foundation',
-        'onegov.notice>=0.0.2',
+        'onegov.notice>=0.0.3',
         'onegov.shared',
         'onegov.user',
         'pyyaml',

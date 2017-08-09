@@ -34,6 +34,9 @@
                             <dt i18n:translate>ID</dt>
                             <dd>${notice.id}</dd>
 
+                            <dt i18n:translate>Organization</dt>
+                            <dd>${layout.format_organization(notice.organization)}</dd>
+
                             <dt i18n:translate>Category</dt>
                             <dd>${layout.format_category(notice.category)}</dd>
 

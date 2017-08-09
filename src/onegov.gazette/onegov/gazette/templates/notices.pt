@@ -32,6 +32,7 @@
                     <thead>
                         <tr>
                             <th i18n:translate>Title</th>
+                            <th i18n:translate>Organization</th>
                             <th i18n:translate>Category</th>
                             <th i18n:translate>Group</th>
                             <th i18n:translate>User</th>
@@ -45,6 +46,7 @@
                         <tal:block tal:repeat="notice notices">
                             <tr>
                                 <td><strong><a href="${request.link(notice)}">${notice.title}</a></strong></td>
+                                <td>${layout.format_organization(notice.organization)}</td>
                                 <td>${layout.format_category(notice.category)}</td>
                                 <td>${layout.format_group(notice.user)}</td>
                                 <td>${layout.format_owner(notice.user)}</td>

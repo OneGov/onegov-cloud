@@ -19,9 +19,11 @@ from onegov.gazette.views import get_user_id
     form=NoticeForm
 )
 def create_notice(self, request, form):
-    """ Create one or more new notices.
+    """ Create a new notice.
 
-    We allow to create multiple notices with the same attributs for different.
+    If a valid UID of a notice is given (via 'source' query parameter), its
+    values are pre-filled in the form.
+
     This view is mainly used by the editors.
 
     """
@@ -31,6 +33,7 @@ def create_notice(self, request, form):
         notice = self.add(
             title=form.title.data,
             text=form.text.data,
+            organization=form.organization.data,
             category=form.category.data,
             issues=form.issues.data,
             user_id=get_user_id(request)
@@ -121,9 +124,35 @@ def view_notices_statistics(self, request):
         'filters': filters,
         'collection': self,
         'title': _("Statistics"),
+        'by_organizations': self.count_by_organization(principal),
         'by_category': self.count_by_category(principal),
         'by_groups': self.count_by_group(),
     }
+
+
+@GazetteApp.view(
+    model=GazetteNoticeCollection,
+    name='statistics-organizations',
+    permission=Private
+)
+def view_notices_statistics_organizations(self, request):
+    """ View the organizations statistics data as CSV. """
+
+    principal = request.app.principal
+
+    response = Response()
+    response.content_type = 'text/csv'
+    response.content_disposition = 'inline; filename={}.csv'.format(
+        request.translate(_("Organizations")).lower()
+    )
+    csvwriter = writer(response)
+    csvwriter.writerow([
+        request.translate(_("Organization")),
+        request.translate(_("Number of Notices"))
+    ])
+    csvwriter.writerows(self.count_by_organization(principal))
+
+    return response
 
 
 @GazetteApp.view(
@@ -144,7 +173,6 @@ def view_notices_statistics_categories(self, request):
     csvwriter = writer(response)
     csvwriter.writerow([
         request.translate(_("Category")),
-        request.translate(_("Title")),
         request.translate(_("Number of Notices"))
     ])
     csvwriter.writerows(self.count_by_category(principal))

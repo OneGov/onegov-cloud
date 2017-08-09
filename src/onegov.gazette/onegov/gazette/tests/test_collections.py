@@ -21,6 +21,7 @@ def test_notice_collection(session):
     collection.add(
         title='Notice A',
         text='An <strong>important</strong> Notice!',
+        organization='onegov',
         category='important',
         issues=['2017-1', '2017-4'],
         user_id=user.id
@@ -28,6 +29,7 @@ def test_notice_collection(session):
     collection.add(
         title='Notice B',
         text='Another Notice',
+        organization='seantis',
         category='not so important',
         issues={'2017-2', '2017-4'},
         user_id=user.id
@@ -36,6 +38,7 @@ def test_notice_collection(session):
     notice = collection.query().filter_by(title='Notice A').one()
     assert notice.title == 'Notice A'
     assert notice.text == 'An <strong>important</strong> Notice!'
+    assert notice.organization == 'onegov'
     assert notice.category == 'important'
     assert notice.issues == {'2017-1': None, '2017-4': None}
     assert notice.user == user
@@ -45,11 +48,51 @@ def test_notice_collection(session):
     notice = collection.query().filter_by(title='Notice B').one()
     assert notice.title == 'Notice B'
     assert notice.text == 'Another Notice'
+    assert notice.organization == 'seantis'
     assert notice.category == 'not so important'
     assert notice.issues == {'2017-2': None, '2017-4': None}
     assert notice.user == user
     assert notice.changes.one().event == 'created'
     assert notice.changes.one().user == user
+
+
+def test_notice_collection_count_by_organization(session):
+    collection = GazetteNoticeCollection(session)
+
+    principal = Principal()
+    assert collection.count_by_organization(principal) == []
+
+    principal = Principal(organizations=[{'1': 'Org 1'}])
+    assert collection.count_by_organization(principal) == [('Org 1', 0)]
+
+    principal = Principal(organizations=[
+        {'1': 'A'},
+        {'2': 'B'},
+        {'3': 'C'},
+    ])
+    assert collection.count_by_organization(principal) == [
+        ('A', 0),
+        ('B', 0),
+        ('C', 0),
+    ]
+
+    for organization, count in (
+        ('1', 2),
+        ('2', 4),
+        ('3', 10),
+        ('4', 10),
+    ):
+        for x in range(count):
+            collection.add('', '', organization, '', [], None)
+    assert collection.count_by_organization(principal) == [
+        ('A', 2),
+        ('B', 4),
+        ('C', 10),
+        # 4 is not defined
+    ]
+
+    assert collection.count_by_organization(principal) == \
+        collection.for_state('drafted').count_by_organization(principal)
 
 
 def test_notice_collection_count_by_category(session):
@@ -59,29 +102,29 @@ def test_notice_collection_count_by_category(session):
     assert collection.count_by_category(principal) == []
 
     principal = Principal(categories=[{'1': 'Cat 1'}])
-    assert collection.count_by_category(principal) == [('1', 'Cat 1', 0)]
+    assert collection.count_by_category(principal) == [('Cat 1', 0)]
 
     principal = Principal(categories=[
         {'1': 'A'},
         {'2': 'B'},
         {
-            '3': 'B',
+            '3': 'C',
             'children': [
-                {'3.1': 'B.1'},
+                {'3.1': 'C.1'},
                 {
-                    '3.2': 'B.2',
-                    'children': [{'3.2.1': 'B.2.I'}]
+                    '3.2': 'C.2',
+                    'children': [{'3.2.1': 'C.2.I'}]
                 }
             ]
         },
     ])
     assert collection.count_by_category(principal) == [
-        ('1', 'A', 0),
-        ('2', 'B', 0),
-        ('3', 'B', 0),
-        ('3.1', 'B / B.1', 0),
-        ('3.2', 'B / B.2', 0),
-        ('3.2.1', 'B / B.2 / B.2.I', 0)
+        ('A', 0),
+        ('B', 0),
+        ('C', 0),
+        ('C / C.1', 0),
+        ('C / C.2', 0),
+        ('C / C.2 / C.2.I', 0)
     ]
 
     for category, count in (
@@ -94,14 +137,14 @@ def test_notice_collection_count_by_category(session):
         ('3.3', 4),
     ):
         for x in range(count):
-            collection.add('', '', category, [], None)
+            collection.add('', '', '', category, [], None)
     assert collection.count_by_category(principal) == [
-        ('1', 'A', 2),
-        ('2', 'B', 4),
-        ('3', 'B', 1),
-        ('3.1', 'B / B.1', 10),
-        ('3.2', 'B / B.2', 0),
-        ('3.2.1', 'B / B.2 / B.2.I', 2)
+        ('A', 2),
+        ('B', 4),
+        ('C', 1),
+        ('C / C.1', 10),
+        ('C / C.2', 0),
+        ('C / C.2 / C.2.I', 2)
         # 3.3 is not defined
     ]
 
@@ -128,7 +171,7 @@ def test_notice_collection_count_by_user(session):
         ('d@example.org', 1),
     ):
         for x in range(count):
-            collection.add('', '', '', [], users[user])
+            collection.add('', '', '', '', [], users[user])
     assert sorted(collection.count_by_user()) == sorted([
         (users['a@example.org'], 2),
         (users['b@example.org'], 4),
@@ -174,7 +217,7 @@ def test_notice_collection_count_by_group(session):
         ('h@example.org', 2),
     ):
         for x in range(count):
-            collection.add('', '', '', [], users[user])
+            collection.add('', '', '', '', [], users[user])
 
     assert collection.count_by_group() == [
         ['', 19], ['A', 6], ['B', 2], ['C', 0]

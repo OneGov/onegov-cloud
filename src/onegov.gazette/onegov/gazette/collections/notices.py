@@ -24,7 +24,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
     def model_class(self):
         return GazetteNotice
 
-    def add(self, title, text, category, issues, user_id):
+    def add(self, title, text, organization, category, issues, user_id):
         """ Add a new notice.
 
         A unique, URL-friendly name is created automatically for this notice
@@ -39,11 +39,12 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
             id=uuid4(),
             state='drafted',
             title=title,
+            text=text,
             name=self._get_unique_name(title),
+            organization=organization,
             category=category,
             user_id=user_id
         )
-        notice.text = text
         notice.issues = issues
         self.session.add(notice)
         self.session.flush()
@@ -57,10 +58,32 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
 
         return notice
 
+    def count_by_organization(self, principal):
+        """ Returns the total number of notices by organizations.
+
+        Returns a tuple ``(organization name, number of notices)``
+        for each category defined in the principal. Filters by the state of
+        the collection.
+
+        """
+
+        result = self.session.query(
+            GazetteNotice.organization,
+            func.count(GazetteNotice.organization)
+        )
+        result = result.group_by(GazetteNotice.organization)
+        if self.state:
+            result = result.filter(GazetteNotice.state == self.state)
+        result = dict(result)
+        return [
+            (value, result.get(key, 0))
+            for key, value in principal.organizations.items()
+        ]
+
     def count_by_category(self, principal):
         """ Returns the total number of notices by categories.
 
-        Returns a tuple ``(category number, category name, number of notices)``
+        Returns a tuple ``(category name, number of notices)``
         for each category defined in the principal. Filters by the state of
         the collection.
 
@@ -75,7 +98,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
             result = result.filter(GazetteNotice.state == self.state)
         result = dict(result)
         return sorted([
-            (key, ' / '.join(value), result.get(key, 0))
+            (' / '.join(value), result.get(key, 0))
             for key, value in principal.categories_flat.items()
         ])
 

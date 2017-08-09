@@ -37,6 +37,9 @@ Changelog
 - Allows admins to delete submitted and published notices.
   [msom]
 
+- Adds organizations to notices.
+  [msom]
+
 0.0.4 (2017-08-03)
 ~~~~~~~~~~~~~~~~~~~
 
