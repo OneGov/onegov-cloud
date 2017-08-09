@@ -50,6 +50,40 @@ def test_notice_collection(session):
     assert notices.for_state('published').query().count() == 0
 
 
+def test_notice_collection_search(session):
+    notices = OfficialNoticeCollection(session)
+    for title, text, state in (
+        ('First', 'Lorem Ipsum', 'drafted'),
+        ('Second', 'A text', 'submitted'),
+        ('Third', 'Anöther text', 'drafted'),
+        ('Fourth', 'A fourth text', 'published'),
+        ('Fifth', 'Lorem Ipsum', 'rejected'),
+        ('Sixt', '<p>Six</p>', 'published'),
+        ('Sübent', 'Sübent', 'drafted'),
+    ):
+        notice = notices.add(title=title, text=text)
+        notice.state = state
+
+    assert notices.query().count() == 7
+
+    notices.term = 'Third'
+    assert notices.query().count() == 1
+
+    notices.term = 'ourth'
+    assert notices.query().count() == 1
+
+    notices.term = 'ipsum'
+    assert notices.query().count() == 2
+    assert notices.for_state('rejected').query().count() == 1
+
+    notices.term = 'six'
+    assert notices.query().count() == 1
+    assert notices.for_state('rejected').query().count() == 0
+
+    notices.term = 'üb'
+    assert notices.query().count() == 1
+
+
 def test_notice_collection_pagination(session):
     notices = OfficialNoticeCollection(session)
 
@@ -61,7 +95,7 @@ def test_notice_collection_pagination(session):
         for month in range(1, 13):
             notice = notices.add(
                 title='Notice {0}-{1}'.format(year, month),
-                text='text'
+                text='A' if month % 3 else 'B'
             )
             if 2009 <= year:
                 notice.submit()
@@ -90,6 +124,6 @@ def test_notice_collection_pagination(session):
     assert published.subset_count == 12
     assert len(published.next.batch) == 12 - published.batch_size
 
-    rejected = notices.for_state('rejected')
-    assert rejected.subset_count == 12
-    assert len(rejected.next.batch) == 12 - rejected.batch_size
+    published.term = 'A'
+    assert published.subset_count == 12
+    assert len(published.next.batch) == 0

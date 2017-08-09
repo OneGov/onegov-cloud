@@ -47,19 +47,8 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     #: The title of the notice.
     title = Column(Text, nullable=False)
 
-    @property
-    def text(self):
-        """ Returns the text of the notice. """
-
-        return (self.content or {}).get('text', '')
-
-    @text.setter
-    def text(self, value):
-        """ Sets the text of the notice. """
-
-        if self.content is None:
-            self.content = {}
-        self.content['text'] = value
+    #: The text of the notice.
+    text = Column(Text, nullable=True)
 
     #: The category if the notice.
     category = Column(Text, nullable=True)

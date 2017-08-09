@@ -23,7 +23,6 @@ def test_create_notice(session):
 
     assert notice.state == 'published'
     assert notice.title == 'Very Important Official Announcement'
-    assert notice.content == {'text': '<em>Important</em> things happened!'}
     assert notice.text == '<em>Important</em> things happened!'
     assert notice.name == 'notice'
     assert notice.category == 'category'
