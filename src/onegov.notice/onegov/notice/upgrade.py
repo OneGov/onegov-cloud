@@ -17,3 +17,12 @@ def add_text_column(context):
         for notice in context.session.query(OfficialNotice):
             notice.text = notice.content.get('text', '')
             notice.content = {}
+
+
+@upgrade_task('Adds a organization column to the official notices')
+def add_organization_column(context):
+    if not context.has_column('official_notices', 'organization'):
+        context.operations.add_column(
+            'official_notices',
+            Column('organization', Text, nullable=True)
+        )

@@ -53,6 +53,9 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     #: The category if the notice.
     category = Column(Text, nullable=True)
 
+    #: The organization this notice belongs to.
+    organization = Column(Text, nullable=True)
+
     #: The user that owns this notice.
     user_id = Column(UUID, ForeignKey(User.id), nullable=True)
     user = relationship(

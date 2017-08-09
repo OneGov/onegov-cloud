@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds an organization column to the notices.
+  [msom]
+
 0.0.2 (2017-08-09)
 ~~~~~~~~~~~~~~~~~~~
 

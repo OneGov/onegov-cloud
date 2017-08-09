@@ -11,6 +11,7 @@ def test_create_notice(session):
     notice.text = '<em>Important</em> things happened!'
     notice.name = 'notice'
     notice.category = 'category'
+    notice.organization = 'organization'
     session.add(notice)
 
     notice.submit()
@@ -26,6 +27,7 @@ def test_create_notice(session):
     assert notice.text == '<em>Important</em> things happened!'
     assert notice.name == 'notice'
     assert notice.category == 'category'
+    assert notice.organization == 'organization'
 
 
 def test_ownership(session):

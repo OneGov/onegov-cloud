@@ -10,7 +10,8 @@ def test_notice_collection(session):
     notice_1 = notices.add(
         title='Important Announcement',
         text='<em>Important</em> things happened!',
-        category='important'
+        category='important',
+        organization='onegov'
     )
     notice_1.submit()
     notice_1.accept()
@@ -22,6 +23,7 @@ def test_notice_collection(session):
     assert notice_1.title == 'Important Announcement'
     assert notice_1.text == '<em>Important</em> things happened!'
     assert notice_1.category == 'important'
+    assert notice_1.organization == 'onegov'
 
     notice_2 = notices.add(
         title='Important Announcement',
