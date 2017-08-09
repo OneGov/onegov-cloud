@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.2 (2017-08-09)
+~~~~~~~~~~~~~~~~~~~
 
 - Allows to filter notices by a search term.
   [msom]
