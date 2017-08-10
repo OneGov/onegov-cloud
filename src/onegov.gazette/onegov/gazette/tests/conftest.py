@@ -21,35 +21,21 @@ def create_gazette(request):
         logo: 'canton-zg.svg'
         publish_to: 'printer@onegov.org'
         organizations:
-          - '100': Staatskanzlei Kanton Zug
-          - '210': Bürgergemeinde Zug
-          - '310': Einwohnergemeinde Zug
-          - '400': Evangelisch-reformierte Kirchgemeinde des Kantons Zug
-          - '501': Katholische Kirchgemeinde Baar
-          - '509': Katholische Kirchgemeinde Zug
-          - '609': Korporation Zug
+            - '100': Staatskanzlei Kanton Zug
+            - '210': Bürgergemeinde Zug
+            - '310': Einwohnergemeinde Zug
+            - '400': Evangelisch-reformierte Kirchgemeinde des Kantons Zug
+            - '501': Katholische Kirchgemeinde Baar
+            - '509': Katholische Kirchgemeinde Zug
+            - '609': Korporation Zug
         categories:
-            - '14': Kantonale Mitteilungen
-              children:
-                - '1402': Einberufung Kantonsrat
-                - '1403': Wahlen/Abstimmungen
-                - '1406': Kant. Gesetzgebung
-                - '1411': Mitteilungen Landschreiber
-                - '1412': Kant. Stellenangebote
-                - '1413': Direktion des Innern
-                - '1414': Direktion für Bildung und Kultur
-                - '1415': Volkswirtschaftsdirektion
-                - '1416': Baudirektion
-                - '1418': Gesundheitsdirektion
-                - '1421': Finanzdirektion
-                - '1426': Gerichtliche Bekanntmachungen
-                - '1427': Konkursamt
+            - '12': Weiterbildung
             - '13': Submissionen
+            - '14': Kantonale Mitteilungen
             - '16': Bürgergemeinden
             - '17': Kath. Kirchgemeinden
             - '18': Ev.-ref. Kirchgemeinde
             - '19': Korporationen
-            - '12': Weiterbildung
             - '20': Handelsregister
         issues:
             2017:

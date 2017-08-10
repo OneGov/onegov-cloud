@@ -4,7 +4,6 @@ from onegov.gazette.models import Issue
 from onegov.gazette.models import Principal
 from onegov.gazette.models import UserGroup
 from onegov.gazette.models.notice import GazetteNoticeChange
-from onegov.gazette.models.principal import CategoryDict
 from onegov.user import User
 from pytest import raises
 from textwrap import dedent
@@ -15,28 +14,6 @@ def test_issue():
     assert issue.year == 2017
     assert issue.number == 1
     assert Issue.from_string(str(issue)) == issue
-
-
-def test_category_dict():
-    categories = CategoryDict()
-    categories['A'] = 'Category A'
-    categories['B'] = 'Category B'
-    categories['C'] = 'Category C'
-
-    assert categories['A'] == 'Category A'
-    assert categories['B'] == 'Category B'
-    assert categories['C'] == 'Category C'
-    assert categories.parent == None
-    assert categories.children == {}
-
-    categories.new_child('A')['A.1'] = 'Category A.1'
-    assert categories['A'] == 'Category A'
-    assert categories['B'] == 'Category B'
-    assert categories['C'] == 'Category C'
-    assert categories.parent == None
-    assert list(categories.children.keys()) == ['A']
-    assert categories.children['A'].parent == categories
-    assert categories.children['A'].children == {}
 
 
 def test_principal():
@@ -68,16 +45,7 @@ def test_principal():
             - '2': Örgänizätiön 2
         categories:
             - 'A': Category A
-              children:
-                - 'A.1': Category A.1
-                - 'A.2': Category A.2
-                  children:
-                    - 'A.2.I': Category A.2.I
-                    - 'A.2.II': Category A.3.II
             - 'B': Category B
-              children:
-                - 'B.1': Category B.1
-                - 'B.2': Category B.2
             - 'C': Category C
         issues:
             2018:
@@ -99,18 +67,11 @@ def test_principal():
     assert dict(principal.organizations) == {
         '1': 'Organization 1', '2': 'Örgänizätiön 2'
     }
+    assert list(principal.organizations.keys()) == ['1', '2']
     assert dict(principal.categories) == {
         'C': 'Category C', 'B': 'Category B', 'A': 'Category A'
     }
-    assert dict(principal.categories.children['A']) == {
-        'A.1': 'Category A.1', 'A.2': 'Category A.2'
-    }
-    assert dict(principal.categories.children['B']) == {
-        'B.1': 'Category B.1', 'B.2': 'Category B.2'
-    }
-    assert dict(principal.categories.children['A'].children['A.2']) == {
-        'A.2.II': 'Category A.3.II', 'A.2.I': 'Category A.2.I'
-    }
+    assert list(principal.categories.keys()) == ['A', 'B', 'C']
     assert list(principal.issues.keys()) == [2016, 2017, 2018]
     assert list(principal.issues[2016]) == [10]
     assert list(principal.issues[2017]) == [40, 41, 45, 46, 50, 52]

@@ -107,34 +107,19 @@ def test_notice_collection_count_by_category(session):
     principal = Principal(categories=[
         {'1': 'A'},
         {'2': 'B'},
-        {
-            '3': 'C',
-            'children': [
-                {'3.1': 'C.1'},
-                {
-                    '3.2': 'C.2',
-                    'children': [{'3.2.1': 'C.2.I'}]
-                }
-            ]
-        },
+        {'3': 'C'},
     ])
     assert collection.count_by_category(principal) == [
         ('A', 0),
         ('B', 0),
         ('C', 0),
-        ('C / C.1', 0),
-        ('C / C.2', 0),
-        ('C / C.2 / C.2.I', 0)
     ]
 
     for category, count in (
         ('1', 2),
         ('2', 4),
         ('3', 1),
-        ('3.1', 10),
-        ('3.2', 0),
-        ('3.2.1', 2),
-        ('3.3', 4),
+        ('4', 10),
     ):
         for x in range(count):
             collection.add('', '', '', category, [], None)
@@ -142,10 +127,7 @@ def test_notice_collection_count_by_category(session):
         ('A', 2),
         ('B', 4),
         ('C', 1),
-        ('C / C.1', 10),
-        ('C / C.2', 0),
-        ('C / C.2 / C.2.I', 2)
-        # 3.3 is not defined
+        # 4 is not defined
     ]
 
     assert collection.count_by_category(principal) == \

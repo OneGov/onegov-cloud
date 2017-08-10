@@ -40,6 +40,9 @@ Changelog
 - Adds organizations to notices.
   [msom]
 
+- Removes hierarchy from categories.
+  [msom]
+
 0.0.4 (2017-08-03)
 ~~~~~~~~~~~~~~~~~~~
 

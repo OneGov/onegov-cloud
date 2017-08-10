@@ -139,16 +139,7 @@ class NoticeForm(Form):
         self.organization.choices = list(principal.organizations.items())
 
         # populate categories
-        def populate(categories, level=0):
-            for key, name in categories.items():
-                name = '{} {}'.format('-' * level, name)
-                self.category.choices.append((key, name))
-                children = categories.children.get(key)
-                if children:
-                    populate(children, level + 1)
-
-        self.category.choices = []
-        populate(principal.categories)
+        self.category.choices = list(principal.categories.items())
 
         # populate issues
         self.issues.choices = []

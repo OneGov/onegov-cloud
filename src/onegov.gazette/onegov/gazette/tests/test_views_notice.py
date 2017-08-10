@@ -20,7 +20,7 @@ def test_view_notice_reject_publish(gazette_app):
         manage = editor.get('/notices/drafted/new-notice')
         manage.form['title'] = "Erneuerungswahlen"
         manage.form['organization'] = '210'
-        manage.form['category'] = '1403'
+        manage.form['category'] = '14'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1. Oktober 2017"
         manage = manage.form.submit().follow()
@@ -33,7 +33,7 @@ def test_view_notice_reject_publish(gazette_app):
         assert "action-submit" in manage
         assert "Erneuerungswahlen" in manage
         assert "1. Oktober 2017" in manage
-        assert "Kantonale Mitteilungen / Wahlen/Abstimmungen" in manage
+        assert "Kantonale Mitteilungen" in manage
         assert "editor@example.org" in manage
         assert "Nr. 44, 03.11.2017" in manage
         assert "Nr. 45, 10.11.2017" in manage
@@ -43,7 +43,7 @@ def test_view_notice_reject_publish(gazette_app):
         manage = publisher.get('/notices/drafted/new-notice')
         manage.form['title'] = "Schalterschliessung"
         manage.form['organization'] = '210'
-        manage.form['category'] = '1411'
+        manage.form['category'] = '14'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1.-15. Oktober 2017"
         manage = manage.form.submit().follow()
@@ -56,7 +56,7 @@ def test_view_notice_reject_publish(gazette_app):
         assert "action-submit" not in manage
         assert "Schalterschliessung" in manage
         assert "1.-15. Oktober 2017" in manage
-        assert "Kantonale Mitteilungen / Mitteilungen Landschreiber" in manage
+        assert "Kantonale Mitteilungen" in manage
         assert "publisher@example.org" in manage
         assert "Nr. 44, 03.11.2017" in manage
         assert "Nr. 45, 10.11.2017" in manage
@@ -261,7 +261,7 @@ def test_view_notice_reject_publish(gazette_app):
         assert "Nr. 44, 03.11.2017" in message
         assert "Nr. 46, 17.11.2017" in message
         assert "Erneuerungswahlen 10/2017" in message
-        assert "Kantonale Mitteilungen / Wahlen/Abstimmungen" in message
+        assert "Kantonale Mitteilungen" in message
         assert "1. Oktober 2017" in message
 
         # try to publish a published notice
@@ -322,7 +322,7 @@ def test_view_notice_delete(gazette_app):
             manage = editor.get('/notices/drafted/new-notice')
             manage.form['title'] = "Erneuerungswahlen"
             manage.form['organization'] = '210'
-            manage.form['category'] = '1403'
+            manage.form['category'] = '14'
             manage.form['issues'] = ['2017-44', '2017-45']
             manage.form['text'] = "1. Oktober 2017"
             manage.form.submit()
@@ -336,7 +336,7 @@ def test_view_notice_delete(gazette_app):
             manage = editor.get('/notices/drafted/new-notice')
             manage.form['title'] = "Erneuerungswahlen"
             manage.form['organization'] = '210'
-            manage.form['category'] = '1403'
+            manage.form['category'] = '14'
             manage.form['issues'] = ['2017-44', '2017-45']
             manage.form['text'] = "1. Oktober 2017"
             manage.form.submit()
@@ -354,7 +354,7 @@ def test_view_notice_delete(gazette_app):
             manage = editor.get('/notices/drafted/new-notice')
             manage.form['title'] = "Erneuerungswahlen"
             manage.form['organization'] = '210'
-            manage.form['category'] = '1403'
+            manage.form['category'] = '14'
             manage.form['issues'] = ['2017-44', '2017-45']
             manage.form['text'] = "1. Oktober 2017"
             manage.form.submit()
@@ -374,7 +374,7 @@ def test_view_notice_delete(gazette_app):
             manage = editor.get('/notices/drafted/new-notice')
             manage.form['title'] = "Erneuerungswahlen"
             manage.form['organization'] = '210'
-            manage.form['category'] = '1403'
+            manage.form['category'] = '14'
             manage.form['issues'] = ['2017-44', '2017-45']
             manage.form['text'] = "1. Oktober 2017"
             manage.form.submit()
@@ -400,7 +400,7 @@ def test_view_notice_edit_others(gazette_app):
         manage = publisher.get('/notices/drafted/new-notice')
         manage.form['title'] = "Erneuerungswahlen"
         manage.form['organization'] = '210'
-        manage.form['category'] = '1403'
+        manage.form['category'] = '14'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1. Oktober 2017"
         manage.form.submit()
@@ -418,7 +418,7 @@ def test_view_notice_copy(gazette_app):
         manage = editor.get('/notices/drafted/new-notice')
         manage.form['title'] = "Erneuerungswahlen"
         manage.form['organization'] = '210'
-        manage.form['category'] = '1403'
+        manage.form['category'] = '14'
         manage.form['issues'] = ['2017-40']
         manage.form['text'] = "1. Oktober 2017"
         manage.form.submit()
@@ -433,7 +433,7 @@ def test_view_notice_copy(gazette_app):
         manage = editor.get('/notice/erneuerungswahlen').click("Kopieren")
         assert manage.form['title'].value == "Erneuerungswahlen"
         assert manage.form['organization'].value == '210'
-        assert manage.form['category'].value == '1403'
+        assert manage.form['category'].value == '14'
         assert manage.form['text'].value == "1. Oktober 2017"
         assert "Das Formular enthält Fehler" in manage.form.submit()
 

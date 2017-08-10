@@ -181,7 +181,7 @@ class Layout(ChameleonLayout):
         return self.principal.organizations.get(organization, '')
 
     def format_category(self, category):
-        return ' / '.join(self.principal.categories_flat.get(category, ['']))
+        return self.principal.categories.get(category, '')
 
     def format_issue(self, issue, date_format='date'):
         if not isinstance(issue, Issue):

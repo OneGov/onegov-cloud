@@ -187,25 +187,12 @@ def test_notice_form(gazette_app):
             ('2017-48', 'Nr. 48, Freitag 01.12.2017')
         ]
         assert form.category.choices == [
-            ('14', ' Kantonale Mitteilungen'),
-            ('1402', '- Einberufung Kantonsrat'),
-            ('1403', '- Wahlen/Abstimmungen'),
-            ('1406', '- Kant. Gesetzgebung'),
-            ('1411', '- Mitteilungen Landschreiber'),
-            ('1412', '- Kant. Stellenangebote'),
-            ('1413', '- Direktion des Innern'),
-            ('1414', '- Direktion für Bildung und Kultur'),
-            ('1415', '- Volkswirtschaftsdirektion'),
-            ('1416', '- Baudirektion'),
-            ('1418', '- Gesundheitsdirektion'),
-            ('1421', '- Finanzdirektion'),
-            ('1426', '- Gerichtliche Bekanntmachungen'),
-            ('1427', '- Konkursamt'),
-            ('13', ' Submissionen'),
-            ('16', ' Bürgergemeinden'),
-            ('17', ' Kath. Kirchgemeinden'),
-            ('18', ' Ev.-ref. Kirchgemeinde'),
-            ('19', ' Korporationen'),
-            ('12', ' Weiterbildung'),
-            ('20', ' Handelsregister')
+            ('12', 'Weiterbildung'),
+            ('13', 'Submissionen'),
+            ('14', 'Kantonale Mitteilungen'),
+            ('16', 'Bürgergemeinden'),
+            ('17', 'Kath. Kirchgemeinden'),
+            ('18', 'Ev.-ref. Kirchgemeinde'),
+            ('19', 'Korporationen'),
+            ('20', 'Handelsregister'),
         ]

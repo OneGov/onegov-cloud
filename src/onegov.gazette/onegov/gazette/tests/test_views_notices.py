@@ -24,7 +24,7 @@ def test_view_notices(gazette_app):
         manage = client.get('/notices/drafted/new-notice')
         manage.form['title'] = "Erneuerungswahlen"
         manage.form['organization'] = '210'
-        manage.form['category'] = '1403'
+        manage.form['category'] = '14'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1. Oktober 2017"
         manage.form.submit()
@@ -79,7 +79,7 @@ def test_view_notices_search(gazette_app):
         manage = client.get('/notices/drafted/new-notice')
         manage.form['title'] = "Erneuerungswahlen"
         manage.form['organization'] = '210'
-        manage.form['category'] = '1403'
+        manage.form['category'] = '14'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1. Oktober 2017"
         manage.form.submit()
@@ -89,7 +89,7 @@ def test_view_notices_search(gazette_app):
         manage = client.get('/notices/drafted/new-notice')
         manage.form['title'] = "Kantonsratswahlen"
         manage.form['organization'] = '210'
-        manage.form['category'] = '1403'
+        manage.form['category'] = '14'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "10. Oktober 2017"
         manage.form.submit()
@@ -143,27 +143,14 @@ def test_view_notices_statistics(gazette_app):
         )
         assert publisher.get(url_categories.format(s)).text == (
             'Rubrik,Anzahl\r\n'
-            'Bürgergemeinden,0\r\n'
-            'Ev.-ref. Kirchgemeinde,0\r\n'
-            'Handelsregister,0\r\n'
-            'Kantonale Mitteilungen,0\r\n'
-            'Kantonale Mitteilungen / Baudirektion,0\r\n'
-            'Kantonale Mitteilungen / Direktion des Innern,0\r\n'
-            'Kantonale Mitteilungen / Direktion für Bildung und Kultur,0\r\n'
-            'Kantonale Mitteilungen / Einberufung Kantonsrat,0\r\n'
-            'Kantonale Mitteilungen / Finanzdirektion,0\r\n'
-            'Kantonale Mitteilungen / Gerichtliche Bekanntmachungen,0\r\n'
-            'Kantonale Mitteilungen / Gesundheitsdirektion,0\r\n'
-            'Kantonale Mitteilungen / Kant. Gesetzgebung,0\r\n'
-            'Kantonale Mitteilungen / Kant. Stellenangebote,0\r\n'
-            'Kantonale Mitteilungen / Konkursamt,0\r\n'
-            'Kantonale Mitteilungen / Mitteilungen Landschreiber,0\r\n'
-            'Kantonale Mitteilungen / Volkswirtschaftsdirektion,0\r\n'
-            'Kantonale Mitteilungen / Wahlen/Abstimmungen,0\r\n'
-            'Kath. Kirchgemeinden,0\r\n'
-            'Korporationen,0\r\n'
-            'Submissionen,0\r\n'
             'Weiterbildung,0\r\n'
+            'Submissionen,0\r\n'
+            'Kantonale Mitteilungen,0\r\n'
+            'Bürgergemeinden,0\r\n'
+            'Kath. Kirchgemeinden,0\r\n'
+            'Ev.-ref. Kirchgemeinde,0\r\n'
+            'Korporationen,0\r\n'
+            'Handelsregister,0\r\n'
         )
         assert publisher.get(url_groups.format(s)).text == (
             'Gruppe,Anzahl\r\n'
@@ -211,8 +198,8 @@ def test_view_notices_statistics(gazette_app):
         for (organization, category, submit, user) in (
             ('100', '13', False, editor),
             ('100', '13', False, user_1),
-            ('100', '1406', False, user_1),
-            ('210', '1406', False, user_1),
+            ('100', '14', False, user_1),
+            ('210', '14', False, user_1),
             ('100', '16', True, user_1),
             ('100', '19', True, user_1),
             ('310', '19', True, user_1),
@@ -250,27 +237,14 @@ def test_view_notices_statistics(gazette_app):
         )
         assert publisher.get(url_categories.format(s)).text == (
             'Rubrik,Anzahl\r\n'
-            'Bürgergemeinden,0\r\n'
-            'Ev.-ref. Kirchgemeinde,0\r\n'
-            'Handelsregister,0\r\n'
-            'Kantonale Mitteilungen,0\r\n'
-            'Kantonale Mitteilungen / Baudirektion,0\r\n'
-            'Kantonale Mitteilungen / Direktion des Innern,0\r\n'
-            'Kantonale Mitteilungen / Direktion für Bildung und Kultur,0\r\n'
-            'Kantonale Mitteilungen / Einberufung Kantonsrat,0\r\n'
-            'Kantonale Mitteilungen / Finanzdirektion,0\r\n'
-            'Kantonale Mitteilungen / Gerichtliche Bekanntmachungen,0\r\n'
-            'Kantonale Mitteilungen / Gesundheitsdirektion,0\r\n'
-            'Kantonale Mitteilungen / Kant. Gesetzgebung,0\r\n'
-            'Kantonale Mitteilungen / Kant. Stellenangebote,0\r\n'
-            'Kantonale Mitteilungen / Konkursamt,0\r\n'
-            'Kantonale Mitteilungen / Mitteilungen Landschreiber,0\r\n'
-            'Kantonale Mitteilungen / Volkswirtschaftsdirektion,0\r\n'
-            'Kantonale Mitteilungen / Wahlen/Abstimmungen,0\r\n'
-            'Kath. Kirchgemeinden,0\r\n'
-            'Korporationen,0\r\n'
-            'Submissionen,0\r\n'
             'Weiterbildung,0\r\n'
+            'Submissionen,0\r\n'
+            'Kantonale Mitteilungen,0\r\n'
+            'Bürgergemeinden,0\r\n'
+            'Kath. Kirchgemeinden,0\r\n'
+            'Ev.-ref. Kirchgemeinde,0\r\n'
+            'Korporationen,0\r\n'
+            'Handelsregister,0\r\n'
         )
         assert publisher.get(url_groups.format(s)).text == (
             'Gruppe,Anzahl\r\n'
@@ -303,58 +277,32 @@ def test_view_notices_statistics(gazette_app):
         'Korporation Zug,0\r\n'
     )
 
-    # categories/drafted: 2 x 13, 2 x 1406, 1 x 14, 2 x 19
+    # categories/drafted: 2 x 13, 3 x 14, 2 x 19
     assert '>2</td>' in publisher.get('/notices/drafted/statistics')
     assert publisher.get(url_categories.format('drafted')).text == (
         'Rubrik,Anzahl\r\n'
-        'Bürgergemeinden,0\r\n'
-        'Ev.-ref. Kirchgemeinde,0\r\n'
-        'Handelsregister,0\r\n'
-        'Kantonale Mitteilungen,1\r\n'
-        'Kantonale Mitteilungen / Baudirektion,0\r\n'
-        'Kantonale Mitteilungen / Direktion des Innern,0\r\n'
-        'Kantonale Mitteilungen / Direktion für Bildung und Kultur,0\r\n'
-        'Kantonale Mitteilungen / Einberufung Kantonsrat,0\r\n'
-        'Kantonale Mitteilungen / Finanzdirektion,0\r\n'
-        'Kantonale Mitteilungen / Gerichtliche Bekanntmachungen,0\r\n'
-        'Kantonale Mitteilungen / Gesundheitsdirektion,0\r\n'
-        'Kantonale Mitteilungen / Kant. Gesetzgebung,2\r\n'
-        'Kantonale Mitteilungen / Kant. Stellenangebote,0\r\n'
-        'Kantonale Mitteilungen / Konkursamt,0\r\n'
-        'Kantonale Mitteilungen / Mitteilungen Landschreiber,0\r\n'
-        'Kantonale Mitteilungen / Volkswirtschaftsdirektion,0\r\n'
-        'Kantonale Mitteilungen / Wahlen/Abstimmungen,0\r\n'
-        'Kath. Kirchgemeinden,0\r\n'
-        'Korporationen,2\r\n'
-        'Submissionen,2\r\n'
         'Weiterbildung,0\r\n'
+        'Submissionen,2\r\n'
+        'Kantonale Mitteilungen,3\r\n'
+        'Bürgergemeinden,0\r\n'
+        'Kath. Kirchgemeinden,0\r\n'
+        'Ev.-ref. Kirchgemeinde,0\r\n'
+        'Korporationen,2\r\n'
+        'Handelsregister,0\r\n'
     )
 
-    # categories/submitted: 3x16, 4x19
+    # categories/submitted: 3 x 16, 4 x 19
     assert '>3</td>' in publisher.get('/notices/submitted/statistics')
     assert publisher.get(url_categories.format('submitted')).text == (
         'Rubrik,Anzahl\r\n'
-        'Bürgergemeinden,3\r\n'
-        'Ev.-ref. Kirchgemeinde,0\r\n'
-        'Handelsregister,0\r\n'
-        'Kantonale Mitteilungen,0\r\n'
-        'Kantonale Mitteilungen / Baudirektion,0\r\n'
-        'Kantonale Mitteilungen / Direktion des Innern,0\r\n'
-        'Kantonale Mitteilungen / Direktion für Bildung und Kultur,0\r\n'
-        'Kantonale Mitteilungen / Einberufung Kantonsrat,0\r\n'
-        'Kantonale Mitteilungen / Finanzdirektion,0\r\n'
-        'Kantonale Mitteilungen / Gerichtliche Bekanntmachungen,0\r\n'
-        'Kantonale Mitteilungen / Gesundheitsdirektion,0\r\n'
-        'Kantonale Mitteilungen / Kant. Gesetzgebung,0\r\n'
-        'Kantonale Mitteilungen / Kant. Stellenangebote,0\r\n'
-        'Kantonale Mitteilungen / Konkursamt,0\r\n'
-        'Kantonale Mitteilungen / Mitteilungen Landschreiber,0\r\n'
-        'Kantonale Mitteilungen / Volkswirtschaftsdirektion,0\r\n'
-        'Kantonale Mitteilungen / Wahlen/Abstimmungen,0\r\n'
-        'Kath. Kirchgemeinden,0\r\n'
-        'Korporationen,4\r\n'
-        'Submissionen,0\r\n'
         'Weiterbildung,0\r\n'
+        'Submissionen,0\r\n'
+        'Kantonale Mitteilungen,0\r\n'
+        'Bürgergemeinden,3\r\n'
+        'Kath. Kirchgemeinden,0\r\n'
+        'Ev.-ref. Kirchgemeinde,0\r\n'
+        'Korporationen,4\r\n'
+        'Handelsregister,0\r\n'
     )
 
     # groups/drafted: 1 x w/o, 5 x B, 1 x C

@@ -97,10 +97,10 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         if self.state:
             result = result.filter(GazetteNotice.state == self.state)
         result = dict(result)
-        return sorted([
-            (' / '.join(value), result.get(key, 0))
-            for key, value in principal.categories_flat.items()
-        ])
+        return [
+            (value, result.get(key, 0))
+            for key, value in principal.categories.items()
+        ]
 
     def count_by_user(self):
         """ Returns the total number of notices by users.
