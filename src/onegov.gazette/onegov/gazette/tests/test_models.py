@@ -45,6 +45,7 @@ def test_principal():
         color: '#aabbcc'
         logo: 'logo.svg'
         publish_to: 'printer@govikon.org'
+        organizations:
         categories:
         issues:
     """))
@@ -52,6 +53,7 @@ def test_principal():
     assert principal.color == '#aabbcc'
     assert principal.logo == 'logo.svg'
     assert principal.publish_to == 'printer@govikon.org'
+    assert dict(principal.organizations) == {}
     assert dict(principal.categories) == {}
     assert dict(principal.issues) == {}
     assert dict(principal.issues_by_date) == {}
@@ -61,6 +63,9 @@ def test_principal():
         color: '#aabbcc'
         logo: 'logo.svg'
         publish_to: 'printer@govikon.org'
+        organizations:
+            - '1': Organization 1
+            - '2': Örgänizätiön 2
         categories:
             - 'A': Category A
               children:
@@ -91,6 +96,9 @@ def test_principal():
     assert principal.color == '#aabbcc'
     assert principal.logo == 'logo.svg'
     assert principal.publish_to == 'printer@govikon.org'
+    assert dict(principal.organizations) == {
+        '1': 'Organization 1', '2': 'Örgänizätiön 2'
+    }
     assert dict(principal.categories) == {
         'C': 'Category C', 'B': 'Category B', 'A': 'Category A'
     }
