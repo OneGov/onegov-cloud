@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.44.0 (2017-08-10)
+~~~~~~~~~~~~~~~~~~~
 
 - No longer limits the number of overflow connections in the queue pool.
 
