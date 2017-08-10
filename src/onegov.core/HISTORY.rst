@@ -1,5 +1,12 @@
 Changelog
 ---------
+
+- No longer limits the number of overflow connections in the queue pool.
+
+  This is mainly useful for cronjob threads which need one connection each and
+  who will now only be limited by the connection limit of the database.
+  [href]
+
 0.43.3 (2017-07-10)
 ~~~~~~~~~~~~~~~~~~~
 

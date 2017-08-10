@@ -187,9 +187,18 @@ class SessionManager(object):
         if pool_config:
             engine_config.update(pool_config)
         else:
+            # the default pool config should work for all onegov applications
+            #
+            # currently most applications use one single connection that is
+            # reused between requests as well as one extra connection for each
+            # instance (cronjob thread with session-based lock)
             engine_config['poolclass'] = QueuePool
+
+            # connections which are kept open when returned to the pool
             engine_config['pool_size'] = 5
-            engine_config['max_overflow'] = 5
+
+            # connections which are closed when returned (unlimited)
+            engine_config['max_overflow'] = -1
 
         self.engine = create_engine(self.dsn, **engine_config)
         self.register_engine(self.engine)
