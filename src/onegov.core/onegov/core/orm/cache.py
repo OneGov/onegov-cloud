@@ -147,13 +147,10 @@ class OrmCacheDescriptor(object):
             obj.is_cached = True
         return obj
 
-    def __get__(self, instance, owner):
-        """ Handles the object/cache access. """
+    def load(self, app):
+        """ Loads the object from the database or cache. """
 
-        if instance is None:
-            return self
-
-        session = instance.session()
+        session = app.session()
 
         # before accessing any cached values we need to make sure that all
         # pending changes are properly flushed -> this leads to some extra cpu
@@ -165,12 +162,12 @@ class OrmCacheDescriptor(object):
         # we use a secondary request cache for even more lookup speed and to
         # make sure that inside a request we always get the exact same instance
         # (otherwise we don't see changes reflected)
-        if self.cache_key in instance.request_cache:
-            return instance.request_cache[self.cache_key]
+        if self.cache_key in app.request_cache:
+            return app.request_cache[self.cache_key]
 
-        obj = instance.cache.get_or_create(
+        obj = app.cache.get_or_create(
             key=self.cache_key,
-            creator=lambda: self.create(instance)
+            creator=lambda: self.create(app)
         )
 
         # named tuples
@@ -190,9 +187,17 @@ class OrmCacheDescriptor(object):
         else:
             obj = self.merge(session, obj)
 
-        instance.request_cache[self.cache_key] = obj
+        app.request_cache[self.cache_key] = obj
 
         return obj
+
+    def __get__(self, instance, owner):
+        """ Handles the object/cache access. """
+
+        if instance is None:
+            return self
+
+        return self.load(instance)
 
 
 def orm_cached(policy):
