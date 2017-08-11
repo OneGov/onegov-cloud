@@ -31,12 +31,12 @@
                 <table class="notices stackable">
                     <thead>
                         <tr>
-                            <th i18n:translate>Title</th>
-                            <th i18n:translate>Organization</th>
-                            <th i18n:translate>Category</th>
+                            <th><tal:block metal:use-macro="layout.macros['order_link']" tal:define="key 'title'"></tal:block></th>
+                            <th><tal:block metal:use-macro="layout.macros['order_link']" tal:define="key 'organization'"></tal:block></th>
+                            <th><tal:block metal:use-macro="layout.macros['order_link']" tal:define="key 'category'"></tal:block></th>
                             <th i18n:translate>Group</th>
                             <th i18n:translate>User</th>
-                            <th i18n:translate>Issue(s)</th>
+                            <th><tal:block metal:use-macro="layout.macros['order_link']" tal:define="key 'issue_date'"></tal:block></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -46,8 +46,8 @@
                         <tal:block tal:repeat="notice notices">
                             <tr>
                                 <td><strong><a href="${request.link(notice)}">${notice.title}</a></strong></td>
-                                <td>${layout.format_organization(notice.organization)}</td>
-                                <td>${layout.format_category(notice.category)}</td>
+                                <td>${notice.organization}</td>
+                                <td>${notice.category}</td>
                                 <td>${layout.format_group(notice.user)}</td>
                                 <td>${layout.format_owner(notice.user)}</td>
                                 <td><tal:block metal:use-macro="layout.macros['issues']" tal:define="as_list False" /></td>

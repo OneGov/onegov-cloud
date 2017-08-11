@@ -24,7 +24,8 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
     def model_class(self):
         return GazetteNotice
 
-    def add(self, title, text, organization, category, issues, user_id):
+    def add(self, title, text, organization_id, category_id, user_id, issues,
+            principal):
         """ Add a new notice.
 
         A unique, URL-friendly name is created automatically for this notice
@@ -41,11 +42,12 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
             title=title,
             text=text,
             name=self._get_unique_name(title),
-            organization=organization,
-            category=category,
             user_id=user_id
         )
+        notice.organization_id = organization_id
+        notice.category_id = category_id
         notice.issues = issues
+        notice.apply_meta(principal)
         self.session.add(notice)
         self.session.flush()
 
@@ -58,12 +60,11 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
 
         return notice
 
-    def count_by_organization(self, principal):
+    def count_by_organization(self):
         """ Returns the total number of notices by organizations.
 
         Returns a tuple ``(organization name, number of notices)``
-        for each category defined in the principal. Filters by the state of
-        the collection.
+        for each organization. Filters by the state of the collection.
 
         """
 
@@ -72,20 +73,17 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
             func.count(GazetteNotice.organization)
         )
         result = result.group_by(GazetteNotice.organization)
+        result = result.filter(GazetteNotice.organization.isnot(None))
         if self.state:
             result = result.filter(GazetteNotice.state == self.state)
-        result = dict(result)
-        return [
-            (value, result.get(key, 0))
-            for key, value in principal.organizations.items()
-        ]
+        result = result.order_by(GazetteNotice.organization)
+        return result.all()
 
-    def count_by_category(self, principal):
+    def count_by_category(self):
         """ Returns the total number of notices by categories.
 
         Returns a tuple ``(category name, number of notices)``
-        for each category defined in the principal. Filters by the state of
-        the collection.
+        for each category. Filters by the state of the collection.
 
         """
 
@@ -94,13 +92,11 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
             func.count(GazetteNotice.category)
         )
         result = result.group_by(GazetteNotice.category)
+        result = result.filter(GazetteNotice.category.isnot(None))
         if self.state:
             result = result.filter(GazetteNotice.state == self.state)
-        result = dict(result)
-        return [
-            (value, result.get(key, 0))
-            for key, value in principal.categories.items()
-        ]
+        result = result.order_by(GazetteNotice.category)
+        return result.all()
 
     def count_by_user(self):
         """ Returns the total number of notices by users.

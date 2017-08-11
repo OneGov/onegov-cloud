@@ -40,12 +40,13 @@ setup(
         'onegov.core',
         'onegov.form',
         'onegov.foundation',
-        'onegov.notice>=0.0.3',
+        'onegov.notice>=0.0.5',
         'onegov.shared',
         'onegov.user',
         'pyyaml',
         'raven',
-        'rjsmin'
+        'rjsmin',
+        'sedate'
     ],
     extras_require=dict(
         test=[

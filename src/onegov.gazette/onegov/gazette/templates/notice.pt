@@ -35,10 +35,10 @@
                             <dd>${notice.id}</dd>
 
                             <dt i18n:translate>Organization</dt>
-                            <dd>${layout.format_organization(notice.organization)}</dd>
+                            <dd>${notice.organization}</dd>
 
                             <dt i18n:translate>Category</dt>
-                            <dd>${layout.format_category(notice.category)}</dd>
+                            <dd>${notice.category}</dd>
 
                             <dt i18n:translate>User</dt>
                             <dd>${layout.format_owner(notice.user)}</dd>

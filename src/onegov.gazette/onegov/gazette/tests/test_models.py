@@ -1,4 +1,5 @@
 from datetime import date
+from datetime import datetime
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import Issue
 from onegov.gazette.models import Principal
@@ -6,6 +7,7 @@ from onegov.gazette.models import UserGroup
 from onegov.gazette.models.notice import GazetteNoticeChange
 from onegov.user import User
 from pytest import raises
+from sedate import standardize_date
 from textwrap import dedent
 
 
@@ -245,3 +247,36 @@ def test_gazette_notice_states(session):
     ] == [
         ('finished', user, 'all went well')
     ]
+
+
+def test_gazette_notice_apply_meta(principal):
+    notice = GazetteNotice()
+
+    notice.apply_meta(principal)
+    assert notice.organization is None
+    assert notice.category is None
+    assert notice.issue_date is None
+
+    notice.organization_id = 'invalid'
+    notice.category_id = 'invalid'
+    notice.issues = [str(Issue(2020, 1))]
+    notice.apply_meta(principal)
+    assert notice.organization is None
+    assert notice.category is None
+    assert notice.issue_date is None
+
+    notice.organization_id = '100'
+    notice.category_id = '12'
+    notice.issues = [str(Issue(2017, 46))]
+    notice.apply_meta(principal)
+    assert notice.organization == 'Staatskanzlei Kanton Zug'
+    assert notice.category == 'Weiterbildung'
+    assert notice.issue_date == standardize_date(
+        datetime(2017, 11, 17), 'Europe/Zurich'
+    )
+
+    notice.issues = [str(Issue(2017, 46)), str(Issue(2017, 40))]
+    notice.apply_meta(principal)
+    assert notice.issue_date == standardize_date(
+        datetime(2017, 10, 6), 'Europe/Zurich'
+    )

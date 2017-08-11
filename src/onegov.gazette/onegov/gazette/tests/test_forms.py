@@ -1,3 +1,4 @@
+from datetime import datetime
 from freezegun import freeze_time
 from onegov.gazette.collections import UserGroupCollection
 from onegov.gazette.forms import NoticeForm
@@ -7,6 +8,7 @@ from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import Issue
 from onegov.gazette.models import UserGroup
 from onegov.user import User
+from sedate import standardize_date
 
 
 class DummyApp(object):
@@ -114,42 +116,49 @@ def test_user_form(session):
     ]
 
 
-def test_notice_form(gazette_app):
+def test_notice_form(session, principal):
     # Test apply / update
     form = NoticeForm()
+    form.request = DummyRequest(session, principal)
+
     notice = GazetteNotice(
         title='Title',
-        text='A <b>text</b>.',
-        organization='onegov',
-        category='important'
+        text='A <b>text</b>.'
     )
-    notice.issues = [str(Issue(2017, 5))]
+    notice.organization_id = '210'
+    notice.category_id = '13'
+    notice.issues = [str(Issue(2017, 43))]
 
     form.apply_model(notice)
     assert form.title.data == 'Title'
-    assert form.organization.data == 'onegov'
-    assert form.category.data == 'important'
+    assert form.organization.data == '210'
+    assert form.category.data == '13'
     assert form.text.data == 'A <b>text</b>.'
-    assert form.issues.data == ['2017-5']
+    assert form.issues.data == ['2017-43']
 
     form.title.data = 'Notice'
-    form.organization.data = 'seantis'
-    form.category.data = 'medium'
+    form.organization.data = '310'
+    form.category.data = '14'
     form.text.data = 'A <b>notice</b>.'
-    form.issues.data = ['2017-6']
+    form.issues.data = ['2017-44']
 
     form.update_model(notice)
     assert notice.title == 'Notice'
-    assert notice.organization == 'seantis'
-    assert notice.category == 'medium'
+    assert notice.organization == 'Einwohnergemeinde Zug'
+    assert notice.category == 'Kantonale Mitteilungen'
     assert notice.text == 'A <b>notice</b>.'
-    assert notice.issues == {'2017-6': None}
+    assert notice.issues == {'2017-44': None}
+    assert notice.issue_date == standardize_date(
+        datetime(2017, 11, 3), 'Europe/Zurich'
+    )
 
     # Test validation
     form = NoticeForm()
+    form.request = DummyRequest(session, principal)
     assert not form.validate()
 
     form = NoticeForm()
+    form.request = DummyRequest(session, principal)
     form.issues.choices = [('2017-5', '2017-5')]
     form.organization.choices = [('onegov', 'onegov')]
     form.category.choices = [('important', 'important')]
@@ -166,7 +175,7 @@ def test_notice_form(gazette_app):
 
     # Test on request
     form = NoticeForm()
-    form.request = DummyRequest(gazette_app.session(), gazette_app.principal)
+    form.request = DummyRequest(session, principal)
 
     with freeze_time("2017-11-01 12:00"):
         form.on_request()

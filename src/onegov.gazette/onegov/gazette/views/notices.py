@@ -33,10 +33,11 @@ def create_notice(self, request, form):
         notice = self.add(
             title=form.title.data,
             text=form.text.data,
-            organization=form.organization.data,
-            category=form.category.data,
+            organization_id=form.organization.data,
+            category_id=form.category.data,
+            user_id=get_user_id(request),
             issues=form.issues.data,
-            user_id=get_user_id(request)
+            principal=request.app.principal
         )
         return redirect(request.link(notice))
 
@@ -79,6 +80,29 @@ def view_notices(self, request):
         'published': _("Published Official Notices")
     }.get(self.state, _("Official Notices"))
 
+    orderings = {
+        'title': {
+            'title': _("Title"),
+            'href': request.link(self.for_order('title')),
+            'sort': self.direction if self.order == 'title' else '',
+        },
+        'organization': {
+            'title': _("Organization"),
+            'href': request.link(self.for_order('organization')),
+            'sort': self.direction if self.order == 'organization' else '',
+        },
+        'category': {
+            'title': _("Category"),
+            'href': request.link(self.for_order('category')),
+            'sort': self.direction if self.order == 'category' else '',
+        },
+        'issue_date': {
+            'title': _("Issue(s)"),
+            'href': request.link(self.for_order('issue_date')),
+            'sort': self.direction if self.order == 'issue_date' else '',
+        }
+    }
+
     if not request.is_private(self):
         if self.state == 'published':
             title = _("My Published Official Notices")
@@ -87,10 +111,10 @@ def view_notices(self, request):
 
     return {
         'layout': layout,
-        'state': self.state,
         'notices': self.batch,
         'title': title,
-        'term': self.term
+        'term': self.term,
+        'orderings': orderings
     }
 
 
@@ -109,7 +133,6 @@ def view_notices_statistics(self, request):
     """
 
     layout = Layout(self, request)
-    principal = request.app.principal
     filters = (
         {
             'title': _(state),
@@ -124,8 +147,8 @@ def view_notices_statistics(self, request):
         'filters': filters,
         'collection': self,
         'title': _("Statistics"),
-        'by_organizations': self.count_by_organization(principal),
-        'by_category': self.count_by_category(principal),
+        'by_organizations': self.count_by_organization(),
+        'by_category': self.count_by_category(),
         'by_groups': self.count_by_group(),
     }
 
@@ -138,8 +161,6 @@ def view_notices_statistics(self, request):
 def view_notices_statistics_organizations(self, request):
     """ View the organizations statistics data as CSV. """
 
-    principal = request.app.principal
-
     response = Response()
     response.content_type = 'text/csv'
     response.content_disposition = 'inline; filename={}.csv'.format(
@@ -150,7 +171,7 @@ def view_notices_statistics_organizations(self, request):
         request.translate(_("Organization")),
         request.translate(_("Number of Notices"))
     ])
-    csvwriter.writerows(self.count_by_organization(principal))
+    csvwriter.writerows(self.count_by_organization())
 
     return response
 
@@ -163,8 +184,6 @@ def view_notices_statistics_organizations(self, request):
 def view_notices_statistics_categories(self, request):
     """ View the categories statistics data as CSV. """
 
-    principal = request.app.principal
-
     response = Response()
     response.content_type = 'text/csv'
     response.content_disposition = 'inline; filename={}.csv'.format(
@@ -175,7 +194,7 @@ def view_notices_statistics_categories(self, request):
         request.translate(_("Category")),
         request.translate(_("Number of Notices"))
     ])
-    csvwriter.writerows(self.count_by_category(principal))
+    csvwriter.writerows(self.count_by_category())
 
     return response
 

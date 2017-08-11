@@ -161,15 +161,16 @@ class NoticeForm(Form):
 
     def update_model(self, model):
         model.title = self.title.data
-        model.organization = self.organization.data
-        model.category = self.category.data
+        model.organization_id = self.organization.data
+        model.category_id = self.category.data
         model.text = self.text.data
         model.issues = self.issues.data
+        model.apply_meta(self.request.app.principal)
 
     def apply_model(self, model):
         self.title.data = model.title
-        self.organization.data = model.organization
-        self.category.data = model.category
+        self.organization.data = model.organization_id
+        self.category.data = model.category_id
         self.text.data = model.text
         self.issues.data = list(model.issues.keys())
 

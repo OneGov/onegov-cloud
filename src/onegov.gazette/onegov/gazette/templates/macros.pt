@@ -129,4 +129,13 @@
     </tal:block>
 </metal:issues>
 
+
+<metal:order_link define-macro="order_link" i18n:domain="onegov.gazette">
+    <a href="${orderings[key]['href']}">
+        <span i18n:translate>${orderings[key]['title']}</span>
+        <i tal:condition="not: orderings[key]['sort']" class="fa fa-sort" aria-hidden="true"></i>
+        <i tal:condition="orderings[key]['sort']" class="fa fa-sort-${orderings[key]['sort']}" aria-hidden="true"></i>
+    </a>
+</metal:order_link>
+
 </body>

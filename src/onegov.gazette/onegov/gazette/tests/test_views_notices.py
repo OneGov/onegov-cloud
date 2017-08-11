@@ -3,6 +3,8 @@ from onegov.gazette.tests import login_admin
 from onegov.gazette.tests import login_editor
 from onegov.gazette.tests import login_publisher
 from unittest.mock import patch
+from urllib.parse import urlparse
+from urllib.parse import parse_qs
 from webtest import TestApp as Client
 
 
@@ -111,6 +113,155 @@ def test_view_notices_search(gazette_app):
         assert "Kantonsrat" not in client.get(url.format('neuerun'))
 
 
+def test_view_notices_order(gazette_app):
+
+    def get_items(page):
+        return [a.text for a in page.pyquery('td strong a')]
+
+    def get_ordering(page):
+        return {
+            r['order'][0]: r['direction'][0]
+            for r in [
+                parse_qs(urlparse(a.attrib['href']).query)
+                for a in page.pyquery('th a')
+            ]
+        }
+
+    with freeze_time("2017-11-01 12:00"):
+
+        client = Client(gazette_app)
+        login_publisher(client)
+
+        # new notice
+        manage = client.get('/notices/drafted/new-notice')
+        manage.form['title'] = "Erneuerungswahlen"
+        manage.form['organization'] = '100'
+        manage.form['category'] = '14'
+        manage.form['issues'] = ['2017-44', '2017-46']
+        manage.form['text'] = "1. Oktober 2017"
+        manage.form.submit()
+        client.get('/notice/erneuerungswahlen/submit').form.submit()
+        client.get('/notice/erneuerungswahlen/publish').form.submit()
+
+        manage = client.get('/notices/drafted/new-notice')
+        manage.form['title'] = "Kantonsratswahlen"
+        manage.form['organization'] = '210'
+        manage.form['category'] = '20'
+        manage.form['issues'] = ['2017-45', '2017-47']
+        manage.form['text'] = "10. Oktober 2017"
+        manage.form.submit()
+        client.get('/notice/kantonsratswahlen/submit').form.submit()
+        client.get('/notice/kantonsratswahlen/publish').form.submit()
+
+        # Default sorting
+        ordered = client.get('/notices/published')
+        assert get_items(ordered) == ["Erneuerungswahlen", "Kantonsratswahlen"]
+        assert get_ordering(client.get('/notices/published')) == {
+            'title': 'desc',
+            'organization': 'asc',
+            'category': 'asc',
+            'issue_date': 'asc'
+        }
+
+        # Invalid sorting
+        ordered = client.get('/notices/published?order=xxx')
+        assert get_items(ordered) == ["Erneuerungswahlen", "Kantonsratswahlen"]
+        assert get_ordering(client.get('/notices/published')) == {
+            'title': 'desc',
+            'organization': 'asc',
+            'category': 'asc',
+            'issue_date': 'asc'
+        }
+
+        # Omit direction
+        ordered = client.get('/notices/published?order=category')
+        assert get_items(ordered) == ["Kantonsratswahlen", "Erneuerungswahlen"]
+        assert get_ordering(ordered) == {
+            'title': 'asc',
+            'organization': 'asc',
+            'category': 'desc',
+            'issue_date': 'asc'
+        }
+
+        # Sort by
+        # ... title
+        url = '/notices/published?order={}&direction={}'
+        ordered = client.get(url.format('title', 'asc'))
+        assert get_items(ordered) == ["Erneuerungswahlen", "Kantonsratswahlen"]
+        assert get_ordering(ordered) == {
+            'title': 'desc',
+            'organization': 'asc',
+            'category': 'asc',
+            'issue_date': 'asc'
+        }
+
+        ordered = client.get(url.format('title', 'desc'))
+        assert get_items(ordered) == ["Kantonsratswahlen", "Erneuerungswahlen"]
+        assert get_ordering(ordered) == {
+            'title': 'asc',
+            'organization': 'asc',
+            'category': 'asc',
+            'issue_date': 'asc'
+        }
+
+        # ... organization
+        ordered = client.get(url.format('organization', 'asc'))
+        assert get_items(ordered) == ["Kantonsratswahlen", "Erneuerungswahlen"]
+        assert get_ordering(ordered) == {
+            'title': 'asc',
+            'organization': 'desc',
+            'category': 'asc',
+            'issue_date': 'asc'
+        }
+
+        ordered = client.get(url.format('organization', 'desc'))
+        assert get_items(ordered) == ["Erneuerungswahlen", "Kantonsratswahlen"]
+        assert get_ordering(ordered) == {
+            'title': 'asc',
+            'organization': 'asc',
+            'category': 'asc',
+            'issue_date': 'asc'
+        }
+
+        # ... category
+        ordered = client.get(url.format('category', 'asc'))
+        assert get_items(ordered) == ["Kantonsratswahlen", "Erneuerungswahlen"]
+        assert get_ordering(ordered) == {
+            'title': 'asc',
+            'organization': 'asc',
+            'category': 'desc',
+            'issue_date': 'asc'
+        }
+
+        ordered = client.get(url.format('category', 'desc'))
+        assert get_items(ordered) == ["Erneuerungswahlen", "Kantonsratswahlen"]
+        assert get_ordering(ordered) == {
+            'title': 'asc',
+            'organization': 'asc',
+            'category': 'asc',
+            'issue_date': 'asc'
+        }
+
+        # ... issues
+        ordered = client.get(url.format('issue_date', 'asc'))
+        assert get_items(ordered) == ["Erneuerungswahlen", "Kantonsratswahlen"]
+        assert get_ordering(ordered) == {
+            'title': 'asc',
+            'organization': 'asc',
+            'category': 'asc',
+            'issue_date': 'desc'
+        }
+
+        ordered = client.get(url.format('issue_date', 'desc'))
+        assert get_items(ordered) == ["Kantonsratswahlen", "Erneuerungswahlen"]
+        assert get_ordering(ordered) == {
+            'title': 'asc',
+            'organization': 'asc',
+            'category': 'asc',
+            'issue_date': 'asc'
+        }
+
+
 def test_view_notices_statistics(gazette_app):
 
     editor = Client(gazette_app)
@@ -133,24 +284,9 @@ def test_view_notices_statistics(gazette_app):
         publisher.get('/notices/{}/statistics'.format(s))
         assert publisher.get(url_organizations.format(s)).text == (
             'Organisation,Anzahl\r\n'
-            'Staatskanzlei Kanton Zug,0\r\n'
-            'Bürgergemeinde Zug,0\r\n'
-            'Einwohnergemeinde Zug,0\r\n'
-            'Evangelisch-reformierte Kirchgemeinde des Kantons Zug,0\r\n'
-            'Katholische Kirchgemeinde Baar,0\r\n'
-            'Katholische Kirchgemeinde Zug,0\r\n'
-            'Korporation Zug,0\r\n'
         )
         assert publisher.get(url_categories.format(s)).text == (
             'Rubrik,Anzahl\r\n'
-            'Weiterbildung,0\r\n'
-            'Submissionen,0\r\n'
-            'Kantonale Mitteilungen,0\r\n'
-            'Bürgergemeinden,0\r\n'
-            'Kath. Kirchgemeinden,0\r\n'
-            'Ev.-ref. Kirchgemeinde,0\r\n'
-            'Korporationen,0\r\n'
-            'Handelsregister,0\r\n'
         )
         assert publisher.get(url_groups.format(s)).text == (
             'Gruppe,Anzahl\r\n'
@@ -224,27 +360,9 @@ def test_view_notices_statistics(gazette_app):
     for s in ('rejected', 'published'):
         assert publisher.get(url_organizations.format(s)).text == (
             'Organisation,Anzahl\r\n'
-            'Staatskanzlei Kanton Zug,0\r\n'
-            'Bürgergemeinde Zug,0\r\n'
-            'Einwohnergemeinde Zug,0\r\n'
-            'Evangelisch-reformierte Kirchgemeinde des Kantons Zug,0\r\n'
-            'Katholische Kirchgemeinde Baar,0\r\n'
-            'Katholische Kirchgemeinde Zug,0\r\n'
-            'Korporation Zug,0\r\n'
-        )
-        assert "Bürgergemeinden" in publisher.get(
-            '/notices/{}/statistics'.format(s)
         )
         assert publisher.get(url_categories.format(s)).text == (
             'Rubrik,Anzahl\r\n'
-            'Weiterbildung,0\r\n'
-            'Submissionen,0\r\n'
-            'Kantonale Mitteilungen,0\r\n'
-            'Bürgergemeinden,0\r\n'
-            'Kath. Kirchgemeinden,0\r\n'
-            'Ev.-ref. Kirchgemeinde,0\r\n'
-            'Korporationen,0\r\n'
-            'Handelsregister,0\r\n'
         )
         assert publisher.get(url_groups.format(s)).text == (
             'Gruppe,Anzahl\r\n'
@@ -256,53 +374,32 @@ def test_view_notices_statistics(gazette_app):
     # organizations/drafted: 5 x 100, 2 x 210
     assert publisher.get(url_organizations.format('drafted')).text == (
         'Organisation,Anzahl\r\n'
-        'Staatskanzlei Kanton Zug,5\r\n'
         'Bürgergemeinde Zug,2\r\n'
-        'Einwohnergemeinde Zug,0\r\n'
-        'Evangelisch-reformierte Kirchgemeinde des Kantons Zug,0\r\n'
-        'Katholische Kirchgemeinde Baar,0\r\n'
-        'Katholische Kirchgemeinde Zug,0\r\n'
-        'Korporation Zug,0\r\n'
+        'Staatskanzlei Kanton Zug,5\r\n'
     )
 
     # organizations/submitted: 6 x 100, 1 x 310
     assert publisher.get(url_organizations.format('submitted')).text == (
         'Organisation,Anzahl\r\n'
-        'Staatskanzlei Kanton Zug,6\r\n'
-        'Bürgergemeinde Zug,0\r\n'
         'Einwohnergemeinde Zug,1\r\n'
-        'Evangelisch-reformierte Kirchgemeinde des Kantons Zug,0\r\n'
-        'Katholische Kirchgemeinde Baar,0\r\n'
-        'Katholische Kirchgemeinde Zug,0\r\n'
-        'Korporation Zug,0\r\n'
+        'Staatskanzlei Kanton Zug,6\r\n'
     )
 
     # categories/drafted: 2 x 13, 3 x 14, 2 x 19
     assert '>2</td>' in publisher.get('/notices/drafted/statistics')
     assert publisher.get(url_categories.format('drafted')).text == (
         'Rubrik,Anzahl\r\n'
-        'Weiterbildung,0\r\n'
-        'Submissionen,2\r\n'
         'Kantonale Mitteilungen,3\r\n'
-        'Bürgergemeinden,0\r\n'
-        'Kath. Kirchgemeinden,0\r\n'
-        'Ev.-ref. Kirchgemeinde,0\r\n'
         'Korporationen,2\r\n'
-        'Handelsregister,0\r\n'
+        'Submissionen,2\r\n'
     )
 
     # categories/submitted: 3 x 16, 4 x 19
     assert '>3</td>' in publisher.get('/notices/submitted/statistics')
     assert publisher.get(url_categories.format('submitted')).text == (
         'Rubrik,Anzahl\r\n'
-        'Weiterbildung,0\r\n'
-        'Submissionen,0\r\n'
-        'Kantonale Mitteilungen,0\r\n'
         'Bürgergemeinden,3\r\n'
-        'Kath. Kirchgemeinden,0\r\n'
-        'Ev.-ref. Kirchgemeinde,0\r\n'
         'Korporationen,4\r\n'
-        'Handelsregister,0\r\n'
     )
 
     # groups/drafted: 1 x w/o, 5 x B, 1 x C
@@ -323,3 +420,6 @@ def test_view_notices_statistics(gazette_app):
         'B,4\r\n'
         'C,3\r\n'
     )
+
+
+# test view ordering

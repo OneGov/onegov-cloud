@@ -79,21 +79,9 @@ def test_layout_menu():
     ]
 
 
-def test_layout_format(gazette_app):
-    request = DummyRequest(gazette_app.session(), gazette_app.principal)
+def test_layout_format(session, principal):
+    request = DummyRequest(session, principal)
     layout = Layout(None, request)
-
-    # Organization
-    assert layout.format_organization(None) == ''
-    assert layout.format_organization('') == ''
-    assert layout.format_organization('1') == ''
-    assert layout.format_organization('100') == 'Staatskanzlei Kanton Zug'
-
-    # Category
-    assert layout.format_category(None) == ''
-    assert layout.format_category('') == ''
-    assert layout.format_category('1') == ''
-    assert layout.format_category('14') == 'Kantonale Mitteilungen'
 
     # Issue
     with raises(ValueError):

@@ -43,6 +43,9 @@ Changelog
 - Removes hierarchy from categories.
   [msom]
 
+- Allows to order notices.
+  [msom]
+
 0.0.4 (2017-08-03)
 ~~~~~~~~~~~~~~~~~~~
 
