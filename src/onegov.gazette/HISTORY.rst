@@ -46,6 +46,9 @@ Changelog
 - Allows to order notices.
   [msom]
 
+- Adds filters for organizations and categories to the edit/create notice views.
+  [msom]
+
 0.0.4 (2017-08-03)
 ~~~~~~~~~~~~~~~~~~~
 

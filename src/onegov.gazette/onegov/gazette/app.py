@@ -137,6 +137,8 @@ def get_common_asset():
     yield 'foundation.js'
     yield 'underscore.js'
     yield 'stacktable.js'
+    yield 'chosen.css'
+    yield 'chosen.jquery.js'
 
     # custom code
     yield 'form_dependencies.js'

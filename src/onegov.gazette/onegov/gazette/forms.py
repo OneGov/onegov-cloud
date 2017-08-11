@@ -4,12 +4,12 @@ from onegov.form import Form
 from onegov.form.fields import OrderedMultiCheckboxField
 from onegov.gazette import _
 from onegov.gazette.fields import HtmlField
+from onegov.gazette.fields import SelectField
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import UserGroup
 from sqlalchemy import cast
 from sqlalchemy import String
 from wtforms import RadioField
-from wtforms import SelectField
 from wtforms import StringField
 from wtforms.validators import Email
 from wtforms.validators import InputRequired

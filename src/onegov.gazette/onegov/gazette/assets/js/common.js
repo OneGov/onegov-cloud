@@ -4,6 +4,9 @@ $(document).foundation();
 // stack tables wishing to be stacked
 $('.stackable').stacktable();
 
+// dropdowns wishing to be chosened
+$(".chosen-select").chosen();
+
 // Add backend dropdown actions
 $('ul.actions').each(function(index, element) {
     $(element).before(
