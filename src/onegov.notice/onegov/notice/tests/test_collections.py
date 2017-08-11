@@ -1,3 +1,5 @@
+from datetime import datetime
+from datetime import timezone
 from onegov.notice import OfficialNoticeCollection
 from onegov.user import UserCollection
 from transaction import commit
@@ -118,6 +120,90 @@ def test_notice_collection_users(session):
     assert sorted([notice.title for notice in notices.query()]) == [
         'A1', 'A2', 'A3', 'C1', 'C2'
     ]
+
+
+def test_notice_collection_order(session):
+    users = UserCollection(session)
+    user_a = users.add('a@example.org', 'password', 'editor').id
+    user_b = users.add('b@example.org', 'password', 'editor').id
+    user_c = users.add('c@example.org', 'password', 'editor').id
+
+    date_1 = datetime(2007, 10, 10, tzinfo=timezone.utc)
+    date_2 = datetime(2007, 11, 11, tzinfo=timezone.utc)
+    date_3 = datetime(2007, 12, 12, tzinfo=timezone.utc)
+
+    notices = OfficialNoticeCollection(session)
+    for title, text, user_id, organization, category, issue_date in (
+        ('A', 'g', user_a, 'p', 'X', date_1),
+        ('B', 'g', user_b, 'q', 'X', date_1),
+        ('B', 'h', user_c, 'p', 'X', date_2),
+        ('C', 'h', user_a, 'q', 'X', date_1),
+        ('D', 'i', user_b, 'p', 'Y', date_1),
+        ('E', 'j', user_c, 'q', 'Y', date_3),
+    ):
+        notices.add(
+            title=title,
+            text=text,
+            user_id=user_id,
+            organization=organization,
+            category=category,
+            issue_date=issue_date,
+        )
+
+    # Default ordering by title
+    result = [n.title for n in notices.query()]
+    assert result == ['A', 'B', 'B', 'C', 'D', 'E']
+
+    # Explicit direction
+    result = [n.title for n in notices.for_order('title', 'asc').query()]
+    assert result == ['A', 'B', 'B', 'C', 'D', 'E']
+
+    result = [n.title for n in notices.for_order('title', 'desc').query()]
+    assert result == ['E', 'D', 'C', 'B', 'B', 'A']
+
+    result = [n.title for n in notices.for_order('title', '').query()]
+    assert result == ['A', 'B', 'B', 'C', 'D', 'E']
+
+    result = [n.title for n in notices.for_order('title', 'xxx').query()]
+    assert result == ['A', 'B', 'B', 'C', 'D', 'E']
+
+    # Implicit direction (flip direction)
+    result = [
+        n.title
+        for n in notices.for_order('title', 'asc').for_order('title').query()
+    ]
+    assert result == ['E', 'D', 'C', 'B', 'B', 'A']
+
+    # Invalid
+    result = [n.title for n in notices.for_order('result').query()]
+    assert result == ['A', 'B', 'B', 'C', 'D', 'E']
+
+    result = [n.title for n in notices.for_order('users').query()]
+    assert result == ['A', 'B', 'B', 'C', 'D', 'E']
+
+    result = [n.title for n in notices.for_order(None).query()]
+    assert result == ['A', 'B', 'B', 'C', 'D', 'E']
+
+    # Valid
+    result = [n.text for n in notices.for_order('text').query()]
+    assert result == ['g', 'g', 'h', 'h', 'i', 'j']
+
+    result = [n.user_id for n in notices.for_order('user_id').query()]
+    assert result == sorted(2 * [user_a] + 2 * [user_b] + 2 * [user_c])
+
+    result = [
+        n.organization for n in notices.for_order('organization').query()
+    ]
+    assert result == ['p', 'p', 'p', 'q', 'q', 'q']
+
+    result = [n.category for n in notices.for_order('category').query()]
+    assert result == ['X', 'X', 'X', 'X', 'Y', 'Y']
+
+    result = [n.issue_date for n in notices.for_order('issue_date').query()]
+    assert result == [date_1, date_1, date_1, date_1, date_2, date_3]
+
+    result = [n.name for n in notices.for_order('name').query()]
+    assert result == ['a', 'b', 'b-1', 'c', 'd', 'e']
 
 
 def test_notice_collection_pagination(session):

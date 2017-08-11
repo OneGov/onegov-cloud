@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Allows to order notices.
+  [msom]
+
 - Adds an issue date column to the notices.
   [msom]
 

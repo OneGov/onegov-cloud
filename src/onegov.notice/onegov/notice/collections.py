@@ -2,23 +2,38 @@ from onegov.core.collection import Pagination
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
 from onegov.notice.models import OfficialNotice
+from sqlalchemy import asc
+from sqlalchemy import desc
+from sqlalchemy import inspect
 from sqlalchemy import or_
 
 
 class OfficialNoticeCollectionPagination(Pagination):
 
-    def __init__(self, session, page=0, state=None, term=None):
+    def __init__(
+        self,
+        session,
+        page=0,
+        state=None,
+        term=None,
+        order=None,
+        direction=None
+    ):
         self.session = session
         self.page = page
         self.state = state
         self.term = term
         self.user_ids = []
+        self.order = order or 'title'
+        self.direction = direction or 'asc'
 
     def __eq__(self, other):
         return (
             self.state == other.state and
             self.page == other.page and
-            self.term == other.term
+            self.term == other.term and
+            self.order == other.order and
+            self.direction == other.direction
         )
 
     def subset(self):
@@ -29,12 +44,45 @@ class OfficialNoticeCollectionPagination(Pagination):
         return self.page
 
     def page_by_index(self, index):
-        return self.__class__(self.session, index, self.state, self.term)
+        return self.__class__(
+            self.session,
+            page=index,
+            state=self.state,
+            term=self.term,
+            order=self.order,
+            direction=self.direction
+        )
 
     def for_state(self, state):
         """ Returns a new instance of the collection with the given state. """
 
-        return self.__class__(self.session, 0, state, self.term)
+        return self.__class__(
+            self.session,
+            state=state,
+            term=self.term,
+            order=self.order,
+            direction=self.direction
+        )
+
+    def for_order(self, order, direction=None):
+        """ Returns a new instance of the collection with the given ordering.
+        Inverts the direction if the new ordering is the same as the old one
+        and an explicit ordering is not defined.
+
+        """
+        if direction is not None:
+            descending = direction == 'desc'
+        else:
+            descending = self.direction == 'desc'
+            descending ^= self.order == order
+
+        return self.__class__(
+            self.session,
+            state=self.state,
+            term=self.term,
+            order=order,
+            direction='desc' if descending else 'asc'
+        )
 
 
 class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
@@ -45,7 +93,13 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
         return OfficialNotice
 
     def query(self):
+        """ Returns a query with the given state and users filter applied and
+        sorted by the given column / direction.
+
+        """
         query = self.session.query(self.model_class)
+
+        # filtering
         if self.state:
             query = query.filter(self.model_class.state == self.state)
         if self.term:
@@ -58,6 +112,13 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
             )
         if self.user_ids:
             query = query.filter(self.model_class.user_id.in_(self.user_ids))
+
+        direction = desc if self.direction == 'desc' else asc
+        if self.order in inspect(self.model_class).columns.keys():
+            attribute = getattr(self.model_class, self.order)
+        else:
+            attribute = self.model_class.title
+        query = query.order_by(None).order_by(direction(attribute))
 
         return query
 
