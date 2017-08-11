@@ -49,6 +49,9 @@ Changelog
 - Adds filters for organizations and categories to the edit/create notice views.
   [msom]
 
+- Allows to show the later issues in the edit/create notice views, too.
+  [msom]
+
 0.0.4 (2017-08-03)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -1,9 +1,8 @@
 from datetime import date
-from datetime import timedelta
 from onegov.form import Form
-from onegov.form.fields import OrderedMultiCheckboxField
 from onegov.gazette import _
 from onegov.gazette.fields import HtmlField
+from onegov.gazette.fields import MultiCheckboxField
 from onegov.gazette.fields import SelectField
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import UserGroup
@@ -117,12 +116,13 @@ class NoticeForm(Form):
         ]
     )
 
-    issues = OrderedMultiCheckboxField(
+    issues = MultiCheckboxField(
         label=_("Issue(s)"),
         choices=[],
         validators=[
             InputRequired()
-        ]
+        ],
+        limit=5
     )
 
     text = HtmlField(
@@ -145,19 +145,17 @@ class NoticeForm(Form):
         self.issues.choices = []
         layout = Layout(None, self.request)
         today = date.today()
-        max_date = today + timedelta(weeks=5)
-        for date_, issue in principal.issues_by_date.items():
-            if date_ < today:
-                continue
-            if date_ > max_date:
-                break
-
-            self.issues.choices.append(
-                (
-                    str(issue),
-                    layout.format_issue(issue, date_format='date_with_weekday')
-                )
+        self.issues.choices = [
+            (
+                str(issue),
+                layout.format_issue(issue, date_format='date_with_weekday')
             )
+            for date_, issue in principal.issues_by_date.items()
+            if date_ >= today
+        ]
+
+        # translate the string of the mutli select field
+        self.issues.translate(self.request)
 
     def update_model(self, model):
         model.title = self.title.data

@@ -28,6 +28,9 @@ class DummyRequest(object):
     def include(self, resource):
         pass
 
+    def translate(self, text):
+        return text
+
 
 class DummyPostData(dict):
     def getlist(self, key):
@@ -193,7 +196,12 @@ def test_notice_form(session, principal):
             ('2017-45', 'Nr. 45, Freitag 10.11.2017'),
             ('2017-46', 'Nr. 46, Freitag 17.11.2017'),
             ('2017-47', 'Nr. 47, Freitag 24.11.2017'),
-            ('2017-48', 'Nr. 48, Freitag 01.12.2017')
+            ('2017-48', 'Nr. 48, Freitag 01.12.2017'),
+            ('2017-49', 'Nr. 49, Freitag 08.12.2017'),
+            ('2017-50', 'Nr. 50, Freitag 15.12.2017'),
+            ('2017-51', 'Nr. 51, Freitag 22.12.2017'),
+            ('2017-52', 'Nr. 52, Freitag 29.12.2017'),
+            ('2018-1', 'Nr. 1, Freitag 05.01.2018')
         ]
         assert form.category.choices == [
             ('12', 'Weiterbildung'),
