@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.4 (2017-08-11)
+~~~~~~~~~~~~~~~~~~~
 
 - Allows to order notices.
   [msom]
