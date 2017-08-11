@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.5 (2017-08-11)
+~~~~~~~~~~~~~~~~~~~
 
 - Fix default direction when ordering notices.
   [msom]
