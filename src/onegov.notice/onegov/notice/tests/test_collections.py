@@ -167,7 +167,15 @@ def test_notice_collection_order(session):
     result = [n.title for n in notices.for_order('title', 'xxx').query()]
     assert result == ['A', 'B', 'B', 'C', 'D', 'E']
 
-    # Implicit direction (flip direction)
+    # Default direction
+    # ... default
+    result = [
+        n.title
+        for n in notices.for_order('text', 'desc').for_order('title').query()
+    ]
+    assert result == ['A', 'B', 'B', 'C', 'D', 'E']
+
+    # ... flip direction
     result = [
         n.title
         for n in notices.for_order('title', 'asc').for_order('title').query()

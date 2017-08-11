@@ -72,9 +72,10 @@ class OfficialNoticeCollectionPagination(Pagination):
         """
         if direction is not None:
             descending = direction == 'desc'
+        elif self.order != order:
+            descending = False
         else:
-            descending = self.direction == 'desc'
-            descending ^= self.order == order
+            descending = self.direction != 'desc'
 
         return self.__class__(
             self.session,
