@@ -225,7 +225,7 @@ def temporary_path(temporary_directory):
 
 @pytest.fixture(scope="session")
 def es_default_version():
-    return '5.5.0'
+    return '5.5.1'
 
 
 @pytest.fixture(scope="session")
