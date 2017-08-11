@@ -1,6 +1,7 @@
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.types import UTCDateTime
 from onegov.core.orm.types import UUID
 from onegov.user.model import User
 from sqlalchemy import Column
@@ -49,6 +50,9 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
 
     #: The text of the notice.
     text = Column(Text, nullable=True)
+
+    #: The issue date of the notice.
+    issue_date = Column(UTCDateTime, nullable=True)
 
     #: The category if the notice.
     category = Column(Text, nullable=True)

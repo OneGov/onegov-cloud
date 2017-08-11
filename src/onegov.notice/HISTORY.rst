@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds an issue date column to the notices.
+  [msom]
+
 0.0.3 (2017-08-09)
 ~~~~~~~~~~~~~~~~~~~
 

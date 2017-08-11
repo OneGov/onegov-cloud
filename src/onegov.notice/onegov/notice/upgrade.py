@@ -1,7 +1,8 @@
+from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task
+from onegov.notice.models import OfficialNotice
 from sqlalchemy import Column
 from sqlalchemy import Text
-from onegov.notice.models import OfficialNotice
 
 
 @upgrade_task('Adds a text column to the official notices')
@@ -25,4 +26,13 @@ def add_organization_column(context):
         context.operations.add_column(
             'official_notices',
             Column('organization', Text, nullable=True)
+        )
+
+
+@upgrade_task('Adds an issue date column to the official notices')
+def add_issue_date_column(context):
+    if not context.has_column('official_notices', 'issue_date'):
+        context.operations.add_column(
+            'official_notices',
+            Column('issue_date', UTCDateTime, nullable=True)
         )

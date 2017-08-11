@@ -1,3 +1,5 @@
+from datetime import datetime
+from datetime import timezone
 from onegov.notice import OfficialNotice
 from onegov.user import User
 from pytest import raises
@@ -12,6 +14,7 @@ def test_create_notice(session):
     notice.name = 'notice'
     notice.category = 'category'
     notice.organization = 'organization'
+    notice.issue_date = datetime(2008, 1, 1, 0, 0, tzinfo=timezone.utc)
     session.add(notice)
 
     notice.submit()
@@ -28,6 +31,7 @@ def test_create_notice(session):
     assert notice.name == 'notice'
     assert notice.category == 'category'
     assert notice.organization == 'organization'
+    assert notice.issue_date == datetime(2008, 1, 1, 0, 0, tzinfo=timezone.utc)
 
 
 def test_ownership(session):
