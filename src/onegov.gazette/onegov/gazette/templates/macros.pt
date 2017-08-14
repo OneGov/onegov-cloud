@@ -138,4 +138,13 @@
     </a>
 </metal:order_link>
 
+<metal:deadline_callout define-macro="deadline_callout" i18n:domain="onegov.gazette">
+    <div class="panel" tal:condition="current_issue|None">
+        <p>
+            <span i18n:translate>Next deadline</span>: <strong>${layout.format_deadline(current_issue)}</strong>
+            <i>(<span i18n:translate>Issue</span> ${layout.format_issue(current_issue)})</i>
+        </p>
+    </div>
+</metal:deadline_callout>
+
 </body>

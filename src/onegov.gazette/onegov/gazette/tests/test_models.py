@@ -1,7 +1,9 @@
 from datetime import date
 from datetime import datetime
+from freezegun import freeze_time
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import Issue
+from onegov.gazette.models import IssueDates
 from onegov.gazette.models import Principal
 from onegov.gazette.models import UserGroup
 from onegov.gazette.models.notice import GazetteNoticeChange
@@ -16,6 +18,13 @@ def test_issue():
     assert issue.year == 2017
     assert issue.number == 1
     assert Issue.from_string(str(issue)) == issue
+
+
+def test_issue_dates():
+    issue_dates = IssueDates(date(2015, 10, 10), datetime(2015, 9, 9, 9, 9))
+    assert issue_dates.issue_date == date(2015, 10, 10)
+    assert issue_dates.deadline == datetime(2015, 9, 9, 9, 9)
+    assert IssueDates.from_string(str(issue_dates)) == issue_dates
 
 
 def test_principal():
@@ -51,16 +60,16 @@ def test_principal():
             - 'C': Category C
         issues:
             2018:
-                1: 2018-01-05
+                1: 2018-01-05 / 2018-01-04T23:59:59
             2016:
-                10: 2016-01-01
+                10: 2016-01-01 / 2015-12-31T23:59:59
             2017:
-                40: 2017-10-06
-                50: 2017-12-15
-                52: 2017-12-29
-                41: 2017-10-13
-                46: 2017-11-17
-                45: 2017-11-10
+                40: 2017-10-06 / 2017-10-05T23:59:59
+                50: 2017-12-15 / 2017-12-14T23:59:59
+                52: 2017-12-29 / 2017-12-28T23:59:59
+                41: 2017-10-13 / 2017-10-12T23:59:59
+                46: 2017-11-17 / 2017-11-16T23:59:59
+                45: 2017-11-10 / 2017-11-09T23:59:59
     """))
     assert principal.name == 'Govikon'
     assert principal.color == '#aabbcc'
@@ -78,7 +87,7 @@ def test_principal():
     assert list(principal.issues[2016]) == [10]
     assert list(principal.issues[2017]) == [40, 41, 45, 46, 50, 52]
     assert list(principal.issues[2018]) == [1]
-    assert list(principal.issues[2017].values()) == [
+    assert [dates.issue_date for dates in principal.issues[2017].values()] == [
         date(2017, 10, 6),
         date(2017, 10, 13),
         date(2017, 11, 10),
@@ -86,7 +95,15 @@ def test_principal():
         date(2017, 12, 15),
         date(2017, 12, 29)
     ]
-    assert list(principal.issues_by_date) == [
+    assert [dates.deadline for dates in principal.issues[2017].values()] == [
+        datetime(2017, 10, 5, 23, 59, 59),
+        datetime(2017, 10, 12, 23, 59, 59),
+        datetime(2017, 11, 9, 23, 59, 59),
+        datetime(2017, 11, 16, 23, 59, 59),
+        datetime(2017, 12, 14, 23, 59, 59),
+        datetime(2017, 12, 28, 23, 59, 59)
+    ]
+    assert list(principal.issues_by_date.keys()) == [
         date(2016, 1, 1),
         date(2017, 10, 6),
         date(2017, 10, 13),
@@ -106,6 +123,47 @@ def test_principal():
         Issue(2017, 52),
         Issue(2018, 1),
     ]
+    assert list(principal.issues_by_deadline.keys()) == [
+        datetime(2015, 12, 31, 23, 59, 59),
+        datetime(2017, 10, 5, 23, 59, 59),
+        datetime(2017, 10, 12, 23, 59, 59),
+        datetime(2017, 11, 9, 23, 59, 59),
+        datetime(2017, 11, 16, 23, 59, 59),
+        datetime(2017, 12, 14, 23, 59, 59),
+        datetime(2017, 12, 28, 23, 59, 59),
+        datetime(2018, 1, 4, 23, 59, 59)
+    ]
+    assert list(principal.issues_by_deadline.values()) == [
+        Issue(2016, 10),
+        Issue(2017, 40),
+        Issue(2017, 41),
+        Issue(2017, 45),
+        Issue(2017, 46),
+        Issue(2017, 50),
+        Issue(2017, 52),
+        Issue(2018, 1),
+    ]
+
+    with raises(ValueError):
+        principal.issue(None)
+    with raises(ValueError):
+        principal.issue('')
+    with raises(ValueError):
+        principal.issue('2015/1')
+    assert principal.issue('2014-1') is None
+    assert principal.issue(Issue(2016, 10)).deadline == \
+        datetime(2015, 12, 31, 23, 59, 59)
+    assert principal.issue('2016-10').deadline == \
+        datetime(2015, 12, 31, 23, 59, 59)
+
+    with freeze_time("2015-01-01 12:00"):
+        assert principal.current_issue == Issue(2016, 10)
+    with freeze_time("2017-12-14 12:00"):
+        assert principal.current_issue == Issue(2017, 50)
+    with freeze_time("2017-12-15 2:00"):
+        assert principal.current_issue == Issue(2017, 52)
+    with freeze_time("2020-01-01 0:00"):
+        assert principal.current_issue == None
 
 
 def test_user_group(session):

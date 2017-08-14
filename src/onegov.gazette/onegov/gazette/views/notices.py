@@ -28,6 +28,7 @@ def create_notice(self, request, form):
 
     """
     layout = Layout(self, request)
+    principal = request.app.principal
 
     if form.submitted(request):
         notice = self.add(
@@ -37,7 +38,7 @@ def create_notice(self, request, form):
             category_id=form.category.data,
             user_id=get_user_id(request),
             issues=form.issues.data,
-            principal=request.app.principal
+            principal=principal
         )
         return redirect(request.link(notice))
 
@@ -54,7 +55,8 @@ def create_notice(self, request, form):
         'form': form,
         'title': _("New Official Notice"),
         'button_text': _("Save"),
-        'cancel': layout.dashboard_link
+        'cancel': layout.dashboard_link,
+        'current_issue': principal.current_issue
     }
 
 

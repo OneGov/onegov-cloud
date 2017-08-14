@@ -1,5 +1,7 @@
 from collections import namedtuple
 from collections import OrderedDict
+from datetime import datetime
+from dateutil.parser import parse
 from yaml import load
 
 
@@ -17,6 +19,27 @@ class Issue(namedtuple('Issue', ['year', 'number'])):
     @classmethod
     def from_string(cls, value):
         return cls(*[int(part) for part in value.split('-')])
+
+
+class IssueDates(namedtuple('IssueDates', ['issue_date', 'deadline'])):
+    """ An issue, which consists of a year and a number.
+
+    The issue might be converte from to a string in the form of 'year-number'
+    for usage in forms and databases.
+
+    """
+
+    def __repr__(self):
+        return '{} / {}'.format(
+            self.issue_date.isoformat(),
+            self.deadline.isoformat()
+        )
+
+    @classmethod
+    def from_string(cls, value):
+        arguments = [parse(part) for part in value.split(' / ')]
+        arguments[0] = arguments[0].date()
+        return cls(*arguments)
 
 
 class Principal(object):
@@ -50,16 +73,42 @@ class Principal(object):
         issues = issues or {}
         self.issues = OrderedDict()
         for year, numbers in sorted(issues.items(), key=lambda year: year[0]):
-            self.issues[year] = OrderedDict(
-                sorted(numbers.items(), key=lambda issue: issue[0])
-            )
+            self.issues[year] = OrderedDict([
+                (key, IssueDates.from_string(numbers[key]))
+                for key in sorted(numbers.keys())
+            ])
 
-        # And we want them also accessible by date
+        # ... and also accessible by date
         self.issues_by_date = OrderedDict()
         for year, numbers in self.issues.items():
-            for number, date in numbers.items():
-                self.issues_by_date[date] = Issue(year, number)
+            for number, dates in numbers.items():
+                self.issues_by_date[dates.issue_date] = Issue(year, number)
+
+        # ... and also accessible by deadline
+        self.issues_by_deadline = OrderedDict()
+        for year, numbers in self.issues.items():
+            for number, dates in numbers.items():
+                self.issues_by_deadline[dates.deadline] = Issue(year, number)
 
     @classmethod
     def from_yaml(cls, yaml_source):
         return cls(**load(yaml_source))
+
+    def issue(self, issue):
+        """ Returns the issue dates of the given issue number. """
+
+        if not isinstance(issue, Issue):
+            issue = Issue.from_string(str(issue))
+
+        return self.issues.get(issue.year, {}).get(issue.number, None)
+
+    @property
+    def current_issue(self):
+        """ Returns the next issue with the nearest deadline. """
+
+        now = datetime.now()
+        issues = [
+            issue for deadline, issue in self.issues_by_deadline.items()
+            if deadline > now
+        ]
+        return issues[0] if issues else None

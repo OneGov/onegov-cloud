@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-11 17:01+0200\n"
-"PO-Revision-Date: 2017-08-11 16:29+0200\n"
+"POT-Creation-Date: 2017-08-14 16:42+0200\n"
+"PO-Revision-Date: 2017-08-14 16:38+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -52,6 +52,10 @@ msgstr "Herausgeber"
 
 msgid "Editor"
 msgstr "Redaktor"
+
+#, python-format
+msgid "No. ${number}, ${issue_date}"
+msgstr "Nr. ${number}, ${issue_date}"
 
 msgid "Users"
 msgstr "Benutzer"
@@ -159,6 +163,12 @@ msgstr "Nächste Seite"
 msgid "You are here"
 msgstr "Aktuelle Seite"
 
+msgid "Next deadline"
+msgstr "Nächster Redaktionsschluss"
+
+msgid "Issue"
+msgstr "Ausgabe"
+
 msgid "Dear Sir or Madam,"
 msgstr "Sehr geehrte Damen und Herren,"
 
@@ -248,9 +258,6 @@ msgstr "Ungültige Adresse oder abgelaufener Link."
 
 msgid "Password reset"
 msgstr "Passwort zurücksetzen"
-
-msgid "You have rejected messages."
-msgstr "Sie haben zurückgewiesene amtliche Meldungen."
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"
@@ -394,10 +401,28 @@ msgid "Rejected Official Notices"
 msgstr "Zurückgewiesene amtliche Meldungen"
 
 msgid "Organizations"
-msgstr ""
+msgstr "Organisationen"
 
 msgid "Categories"
 msgstr "Rubriken"
+
+msgid "You have rejected messages."
+msgstr "Sie haben zurückgewiesene amtliche Meldungen."
+
+#, python-format
+msgid ""
+"You have a drafted message with past issues: <a href='${link}'>${title}</a>"
+msgstr ""
+"Sie haben eine amtliche Meldung in Arbeit mit vergangenen Ausgaben: <a "
+"href='${link}'>${title}</a>"
+
+#, python-format
+msgid ""
+"You have a drafted message with issues close to the deadline: <a "
+"href='${link}'>${title}</a>"
+msgstr ""
+"Sie haben eine amtliche Meldung in Arbeit, für welche der Redaktionsschluss "
+"bald erreicht ist: <a href='${link}'>${title}</a>"
 
 msgid "New User"
 msgstr "Neuer Benutzer"

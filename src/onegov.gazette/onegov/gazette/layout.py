@@ -15,6 +15,7 @@ from onegov.user import UserCollection
 class Layout(ChameleonLayout):
 
     date_with_weekday_format = 'EEEE dd.MM.yyyy'
+    datetime_with_weekday_format = 'EEEE dd.MM.yyyy HH:mm'
 
     def __init__(self, model, request):
         super().__init__(model, request)
@@ -181,15 +182,29 @@ class Layout(ChameleonLayout):
         if not isinstance(issue, Issue):
             issue = Issue.from_string(str(issue))
 
-        date_ = self.principal.issues.get(issue.year, {})
-        date_ = date_.get(issue.number, None)
-        return '?' if not date_ else 'Nr. {}, {}'.format(
-            str(issue.number),
-            self.format_date(
-                self.principal.issues[issue.year][issue.number],
-                date_format
-            )
-        )
+        dates = self.principal.issue(issue)
+        if dates:
+            return self.request.translate(_(
+                "No. ${number}, ${issue_date}",
+                mapping={
+                    'number': issue.number,
+                    'issue_date': self.format_date(
+                        dates.issue_date, date_format
+                    )
+                }
+            ))
+
+        return '?'
+
+    def format_deadline(self, issue, date_format='datetime_with_weekday'):
+        if not isinstance(issue, Issue):
+            issue = Issue.from_string(str(issue))
+
+        dates = self.principal.issue(issue)
+        if dates:
+            return self.format_date(dates.deadline, date_format)
+
+        return '?'
 
     def format_owner(self, owner):
         if owner:

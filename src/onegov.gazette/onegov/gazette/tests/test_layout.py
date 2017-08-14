@@ -39,6 +39,9 @@ class DummyRequest(object):
             target.__class__.__name__ if target else '', name
         ).replace('///', '/',).replace('//', '/',)
 
+    def translate(self, text):
+        return text.interpolate()
+
 
 def test_layout_links():
     layout = Layout(None, DummyRequest(None))
@@ -90,10 +93,27 @@ def test_layout_format(session, principal):
         layout.format_issue('')
     with raises(ValueError):
         layout.format_issue('2015/1')
+
     assert layout.format_issue('2015-1') == '?'
     assert layout.format_issue(Issue(2015, 1)) == '?'
-    assert layout.format_issue(Issue(2017, 41)) == 'Nr. 41, 13.10.2017'
-    assert layout.format_issue('2017-41') == 'Nr. 41, 13.10.2017'
+    assert layout.format_issue(Issue(2017, 41)) == 'No. 41, 13.10.2017'
+    assert layout.format_issue('2017-41') == 'No. 41, 13.10.2017'
+    assert layout.format_issue('2017-41', date_format='date_with_weekday') == \
+        'No. 41, Freitag 13.10.2017'
+
+    # Deadline
+    with raises(ValueError):
+        layout.format_deadline(None)
+    with raises(ValueError):
+        layout.format_deadline('')
+    with raises(ValueError):
+        layout.format_deadline('2015/1')
+    assert layout.format_deadline('2015-1') == '?'
+    assert layout.format_deadline(Issue(2015, 1)) == '?'
+    assert layout.format_deadline(Issue(2017, 41)) == \
+        'Mittwoch 11.10.2017 12:00'
+    assert layout.format_deadline('2017-41') == 'Mittwoch 11.10.2017 12:00'
+    assert layout.format_deadline('2017-41', date_format='time') == '12:00'
 
     # Owner
     assert layout.format_owner(None) == ''

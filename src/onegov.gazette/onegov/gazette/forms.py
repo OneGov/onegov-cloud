@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 from onegov.form import Form
 from onegov.gazette import _
 from onegov.gazette.fields import HtmlField
@@ -144,14 +144,14 @@ class NoticeForm(Form):
         # populate issues
         self.issues.choices = []
         layout = Layout(None, self.request)
-        today = date.today()
+        now = datetime.now()
         self.issues.choices = [
             (
                 str(issue),
                 layout.format_issue(issue, date_format='date_with_weekday')
             )
-            for date_, issue in principal.issues_by_date.items()
-            if date_ >= today
+            for deadline, issue in principal.issues_by_deadline.items()
+            if deadline >= now
         ]
 
         # translate the string of the mutli select field

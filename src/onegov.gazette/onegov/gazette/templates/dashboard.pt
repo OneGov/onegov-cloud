@@ -9,6 +9,9 @@
 
         <div class="row dashboard">
             <div class="small-12 columns">
+
+                <div metal:use-macro="layout.macros['deadline_callout']"></div>
+
                 <div class="row">
                     <div class="small-12 medium-10 columns">
                         <h2 i18n:translate>${title}</h2>

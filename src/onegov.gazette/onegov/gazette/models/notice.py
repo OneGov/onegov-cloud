@@ -112,11 +112,8 @@ class GazetteNotice(OfficialNotice):
         self.category = principal.categories.get(self.category_id)
 
         issues = [Issue.from_string(issue) for issue in self.issues]
-        issues = [
-            principal.issues.get(issue.year, {}).get(issue.number)
-            for issue in issues
-        ]
-        issues = sorted([issue for issue in issues if issue])
+        issues = [principal.issue(issue) for issue in issues]
+        issues = sorted([issue.issue_date for issue in issues if issue])
         if issues:
             self.issue_date = standardize_date(
                 as_datetime(issues[0]), 'Europe/Zurich'

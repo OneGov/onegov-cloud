@@ -43,6 +43,7 @@ setup(
         'onegov.notice>=0.0.5',
         'onegov.shared',
         'onegov.user',
+        'python-dateutil',
         'pyyaml',
         'raven',
         'rjsmin',

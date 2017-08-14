@@ -52,6 +52,9 @@ Changelog
 - Allows to show the later issues in the edit/create notice views, too.
   [msom]
 
+- Adds deadlines to issues.
+  [msom]
+
 0.0.4 (2017-08-03)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -29,7 +29,7 @@ class DummyRequest(object):
         pass
 
     def translate(self, text):
-        return text
+        return text.interpolate()
 
 
 class DummyPostData(dict):
@@ -180,7 +180,7 @@ def test_notice_form(session, principal):
     form = NoticeForm()
     form.request = DummyRequest(session, principal)
 
-    with freeze_time("2017-11-01 12:00"):
+    with freeze_time("2017-11-01 14:00"):
         form.on_request()
         assert form.organization.choices == [
             ('100', 'State Chancellery'),
@@ -191,16 +191,15 @@ def test_notice_form(session, principal):
             ('600', 'Corporation')
         ]
         assert form.issues.choices == [
-            ('2017-44', 'Nr. 44, Freitag 03.11.2017'),
-            ('2017-45', 'Nr. 45, Freitag 10.11.2017'),
-            ('2017-46', 'Nr. 46, Freitag 17.11.2017'),
-            ('2017-47', 'Nr. 47, Freitag 24.11.2017'),
-            ('2017-48', 'Nr. 48, Freitag 01.12.2017'),
-            ('2017-49', 'Nr. 49, Freitag 08.12.2017'),
-            ('2017-50', 'Nr. 50, Freitag 15.12.2017'),
-            ('2017-51', 'Nr. 51, Freitag 22.12.2017'),
-            ('2017-52', 'Nr. 52, Freitag 29.12.2017'),
-            ('2018-1', 'Nr. 1, Freitag 05.01.2018')
+            ('2017-45', 'No. 45, Freitag 10.11.2017'),
+            ('2017-46', 'No. 46, Freitag 17.11.2017'),
+            ('2017-47', 'No. 47, Freitag 24.11.2017'),
+            ('2017-48', 'No. 48, Freitag 01.12.2017'),
+            ('2017-49', 'No. 49, Freitag 08.12.2017'),
+            ('2017-50', 'No. 50, Freitag 15.12.2017'),
+            ('2017-51', 'No. 51, Freitag 22.12.2017'),
+            ('2017-52', 'No. 52, Freitag 29.12.2017'),
+            ('2018-1', 'No. 1, Freitag 05.01.2018'),
         ]
         assert form.category.choices == [
             ('11', 'Education'),

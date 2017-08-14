@@ -145,7 +145,8 @@ def edit_notice(self, request, form):
         'title': self.title,
         'subtitle': _("Edit Official Notice"),
         'button_text': _("Save"),
-        'cancel': request.link(self)
+        'cancel': request.link(self),
+        'current_issue': request.app.principal.current_issue
     }
 
 
