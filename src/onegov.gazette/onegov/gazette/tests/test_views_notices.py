@@ -25,8 +25,8 @@ def test_view_notices(gazette_app):
         # new notice
         manage = client.get('/notices/drafted/new-notice')
         manage.form['title'] = "Erneuerungswahlen"
-        manage.form['organization'] = '210'
-        manage.form['category'] = '14'
+        manage.form['organization'] = '200'
+        manage.form['category'] = '11'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1. Oktober 2017"
         manage.form.submit()
@@ -80,8 +80,8 @@ def test_view_notices_search(gazette_app):
         # new notice
         manage = client.get('/notices/drafted/new-notice')
         manage.form['title'] = "Erneuerungswahlen"
-        manage.form['organization'] = '210'
-        manage.form['category'] = '14'
+        manage.form['organization'] = '200'
+        manage.form['category'] = '11'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1. Oktober 2017"
         manage.form.submit()
@@ -90,8 +90,8 @@ def test_view_notices_search(gazette_app):
 
         manage = client.get('/notices/drafted/new-notice')
         manage.form['title'] = "Kantonsratswahlen"
-        manage.form['organization'] = '210'
-        manage.form['category'] = '14'
+        manage.form['organization'] = '200'
+        manage.form['category'] = '11'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "10. Oktober 2017"
         manage.form.submit()
@@ -136,7 +136,7 @@ def test_view_notices_order(gazette_app):
         manage = client.get('/notices/drafted/new-notice')
         manage.form['title'] = "Erneuerungswahlen"
         manage.form['organization'] = '100'
-        manage.form['category'] = '14'
+        manage.form['category'] = '11'
         manage.form['issues'] = ['2017-44', '2017-46']
         manage.form['text'] = "1. Oktober 2017"
         manage.form.submit()
@@ -145,8 +145,8 @@ def test_view_notices_order(gazette_app):
 
         manage = client.get('/notices/drafted/new-notice')
         manage.form['title'] = "Kantonsratswahlen"
-        manage.form['organization'] = '210'
-        manage.form['category'] = '20'
+        manage.form['organization'] = '200'
+        manage.form['category'] = '13'
         manage.form['issues'] = ['2017-45', '2017-47']
         manage.form['text'] = "10. Oktober 2017"
         manage.form.submit()
@@ -334,18 +334,18 @@ def test_view_notices_statistics(gazette_app):
         for (organization, category, submit, user) in (
             ('100', '13', False, editor),
             ('100', '13', False, user_1),
-            ('100', '14', False, user_1),
-            ('210', '14', False, user_1),
-            ('100', '16', True, user_1),
-            ('100', '19', True, user_1),
-            ('310', '19', True, user_1),
-            ('100', '14', False, user_2),
-            ('100', '16', True, user_2),
-            ('210', '19', False, user_2),
-            ('100', '19', True, user_3),
-            ('100', '16', True, user_3),
-            ('100', '19', False, user_3),
-            ('100', '19', True, user_3),
+            ('100', '11', False, user_1),
+            ('200', '11', False, user_1),
+            ('100', '12', True, user_1),
+            ('100', '14', True, user_1),
+            ('300', '14', True, user_1),
+            ('100', '11', False, user_2),
+            ('100', '12', True, user_2),
+            ('200', '14', False, user_2),
+            ('100', '14', True, user_3),
+            ('100', '12', True, user_3),
+            ('100', '14', False, user_3),
+            ('100', '14', True, user_3),
         ):
             manage = user.get('/notices/drafted/new-notice')
             manage.form['title'] = "Titel"
@@ -371,35 +371,35 @@ def test_view_notices_statistics(gazette_app):
             'C,0\r\n'
         )
 
-    # organizations/drafted: 5 x 100, 2 x 210
+    # organizations/drafted: 5 x 100, 2 x 200
     assert publisher.get(url_organizations.format('drafted')).text == (
         'Organisation,Anzahl\r\n'
-        'Bürgergemeinde Zug,2\r\n'
-        'Staatskanzlei Kanton Zug,5\r\n'
+        'Civic Community,2\r\n'
+        'State Chancellery,5\r\n'
     )
 
-    # organizations/submitted: 6 x 100, 1 x 310
+    # organizations/submitted: 6 x 100, 1 x 300
     assert publisher.get(url_organizations.format('submitted')).text == (
         'Organisation,Anzahl\r\n'
-        'Einwohnergemeinde Zug,1\r\n'
-        'Staatskanzlei Kanton Zug,6\r\n'
+        'Municipality,1\r\n'
+        'State Chancellery,6\r\n'
     )
 
-    # categories/drafted: 2 x 13, 3 x 14, 2 x 19
+    # categories/drafted: 3 x 11, 2 x 13, 2 x 14
     assert '>2</td>' in publisher.get('/notices/drafted/statistics')
     assert publisher.get(url_categories.format('drafted')).text == (
         'Rubrik,Anzahl\r\n'
-        'Kantonale Mitteilungen,3\r\n'
-        'Korporationen,2\r\n'
-        'Submissionen,2\r\n'
+        'Commercial Register,2\r\n'
+        'Education,3\r\n'
+        'Elections,2\r\n'
     )
 
-    # categories/submitted: 3 x 16, 4 x 19
+    # categories/submitted: 3 x 12, 4 x 14
     assert '>3</td>' in publisher.get('/notices/submitted/statistics')
     assert publisher.get(url_categories.format('submitted')).text == (
         'Rubrik,Anzahl\r\n'
-        'Bürgergemeinden,3\r\n'
-        'Korporationen,4\r\n'
+        'Elections,4\r\n'
+        'Submissions,3\r\n'
     )
 
     # groups/drafted: 1 x w/o, 5 x B, 1 x C

@@ -128,27 +128,27 @@ def test_notice_form(session, principal):
         title='Title',
         text='A <b>text</b>.'
     )
-    notice.organization_id = '210'
+    notice.organization_id = '200'
     notice.category_id = '13'
     notice.issues = [str(Issue(2017, 43))]
 
     form.apply_model(notice)
     assert form.title.data == 'Title'
-    assert form.organization.data == '210'
+    assert form.organization.data == '200'
     assert form.category.data == '13'
     assert form.text.data == 'A <b>text</b>.'
     assert form.issues.data == ['2017-43']
 
     form.title.data = 'Notice'
-    form.organization.data = '310'
-    form.category.data = '14'
+    form.organization.data = '300'
+    form.category.data = '11'
     form.text.data = 'A <b>notice</b>.'
     form.issues.data = ['2017-44']
 
     form.update_model(notice)
     assert notice.title == 'Notice'
-    assert notice.organization == 'Einwohnergemeinde Zug'
-    assert notice.category == 'Kantonale Mitteilungen'
+    assert notice.organization == 'Municipality'
+    assert notice.category == 'Education'
     assert notice.text == 'A <b>notice</b>.'
     assert notice.issues == {'2017-44': None}
     assert notice.issue_date == standardize_date(
@@ -183,13 +183,12 @@ def test_notice_form(session, principal):
     with freeze_time("2017-11-01 12:00"):
         form.on_request()
         assert form.organization.choices == [
-            ('100', 'Staatskanzlei Kanton Zug'),
-            ('210', 'Bürgergemeinde Zug'),
-            ('310', 'Einwohnergemeinde Zug'),
-            ('400', 'Evangelisch-reformierte Kirchgemeinde des Kantons Zug'),
-            ('501', 'Katholische Kirchgemeinde Baar'),
-            ('509', 'Katholische Kirchgemeinde Zug'),
-            ('609', 'Korporation Zug')
+            ('100', 'State Chancellery'),
+            ('200', 'Civic Community'),
+            ('300', 'Municipality'),
+            ('400', 'Evangelical Reformed Parish'),
+            ('500', 'Catholic Parish'),
+            ('600', 'Corporation')
         ]
         assert form.issues.choices == [
             ('2017-44', 'Nr. 44, Freitag 03.11.2017'),
@@ -204,12 +203,8 @@ def test_notice_form(session, principal):
             ('2018-1', 'Nr. 1, Freitag 05.01.2018')
         ]
         assert form.category.choices == [
-            ('12', 'Weiterbildung'),
-            ('13', 'Submissionen'),
-            ('14', 'Kantonale Mitteilungen'),
-            ('16', 'Bürgergemeinden'),
-            ('17', 'Kath. Kirchgemeinden'),
-            ('18', 'Ev.-ref. Kirchgemeinde'),
-            ('19', 'Korporationen'),
-            ('20', 'Handelsregister'),
+            ('11', 'Education'),
+            ('12', 'Submissions'),
+            ('13', 'Commercial Register'),
+            ('14', 'Elections'),
         ]

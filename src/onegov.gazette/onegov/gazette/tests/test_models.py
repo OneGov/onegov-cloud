@@ -269,8 +269,8 @@ def test_gazette_notice_apply_meta(principal):
     notice.category_id = '12'
     notice.issues = [str(Issue(2017, 46))]
     notice.apply_meta(principal)
-    assert notice.organization == 'Staatskanzlei Kanton Zug'
-    assert notice.category == 'Weiterbildung'
+    assert notice.organization == 'State Chancellery'
+    assert notice.category == 'Submissions'
     assert notice.issue_date == standardize_date(
         datetime(2017, 11, 17), 'Europe/Zurich'
     )

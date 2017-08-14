@@ -9,27 +9,22 @@ from transaction import commit
 
 
 PRINCIPAL = """
-    name: Kanton Zug
+    name: Govikon
     color: '#006FB5'
-    logo: 'canton-zg.svg'
+    logo: 'govikon.svg'
     publish_to: 'printer@onegov.org'
     organizations:
-        - '100': Staatskanzlei Kanton Zug
-        - '210': Bürgergemeinde Zug
-        - '310': Einwohnergemeinde Zug
-        - '400': Evangelisch-reformierte Kirchgemeinde des Kantons Zug
-        - '501': Katholische Kirchgemeinde Baar
-        - '509': Katholische Kirchgemeinde Zug
-        - '609': Korporation Zug
+        - '100': State Chancellery
+        - '200': Civic Community
+        - '300': Municipality
+        - '400': Evangelical Reformed Parish
+        - '500': Catholic Parish
+        - '600': Corporation
     categories:
-        - '12': Weiterbildung
-        - '13': Submissionen
-        - '14': Kantonale Mitteilungen
-        - '16': Bürgergemeinden
-        - '17': Kath. Kirchgemeinden
-        - '18': Ev.-ref. Kirchgemeinde
-        - '19': Korporationen
-        - '20': Handelsregister
+        - '11': Education
+        - '12': Submissions
+        - '13': Commercial Register
+        - '14': Elections
     issues:
         2017:
             40: 2017-10-06

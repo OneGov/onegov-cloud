@@ -19,8 +19,8 @@ def test_view_notice_reject_publish(gazette_app):
         # state: DRAFTED
         manage = editor.get('/notices/drafted/new-notice')
         manage.form['title'] = "Erneuerungswahlen"
-        manage.form['organization'] = '210'
-        manage.form['category'] = '14'
+        manage.form['organization'] = '200'
+        manage.form['category'] = '11'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1. Oktober 2017"
         manage = manage.form.submit().follow()
@@ -33,7 +33,7 @@ def test_view_notice_reject_publish(gazette_app):
         assert "action-submit" in manage
         assert "Erneuerungswahlen" in manage
         assert "1. Oktober 2017" in manage
-        assert "Kantonale Mitteilungen" in manage
+        assert "Education" in manage
         assert "editor@example.org" in manage
         assert "Nr. 44, 03.11.2017" in manage
         assert "Nr. 45, 10.11.2017" in manage
@@ -42,8 +42,8 @@ def test_view_notice_reject_publish(gazette_app):
 
         manage = publisher.get('/notices/drafted/new-notice')
         manage.form['title'] = "Schalterschliessung"
-        manage.form['organization'] = '210'
-        manage.form['category'] = '14'
+        manage.form['organization'] = '200'
+        manage.form['category'] = '11'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1.-15. Oktober 2017"
         manage = manage.form.submit().follow()
@@ -56,7 +56,7 @@ def test_view_notice_reject_publish(gazette_app):
         assert "action-submit" not in manage
         assert "Schalterschliessung" in manage
         assert "1.-15. Oktober 2017" in manage
-        assert "Kantonale Mitteilungen" in manage
+        assert "Education" in manage
         assert "publisher@example.org" in manage
         assert "Nr. 44, 03.11.2017" in manage
         assert "Nr. 45, 10.11.2017" in manage
@@ -261,7 +261,7 @@ def test_view_notice_reject_publish(gazette_app):
         assert "Nr. 44, 03.11.2017" in message
         assert "Nr. 46, 17.11.2017" in message
         assert "Erneuerungswahlen 10/2017" in message
-        assert "Kantonale Mitteilungen" in message
+        assert "Education" in message
         assert "1. Oktober 2017" in message
 
         # try to publish a published notice
@@ -321,8 +321,8 @@ def test_view_notice_delete(gazette_app):
         for user in (editor, publisher):
             manage = editor.get('/notices/drafted/new-notice')
             manage.form['title'] = "Erneuerungswahlen"
-            manage.form['organization'] = '210'
-            manage.form['category'] = '14'
+            manage.form['organization'] = '200'
+            manage.form['category'] = '11'
             manage.form['issues'] = ['2017-44', '2017-45']
             manage.form['text'] = "1. Oktober 2017"
             manage.form.submit()
@@ -335,8 +335,8 @@ def test_view_notice_delete(gazette_app):
         for user in (editor, publisher):
             manage = editor.get('/notices/drafted/new-notice')
             manage.form['title'] = "Erneuerungswahlen"
-            manage.form['organization'] = '210'
-            manage.form['category'] = '14'
+            manage.form['organization'] = '200'
+            manage.form['category'] = '11'
             manage.form['issues'] = ['2017-44', '2017-45']
             manage.form['text'] = "1. Oktober 2017"
             manage.form.submit()
@@ -353,8 +353,8 @@ def test_view_notice_delete(gazette_app):
         for user in (editor, publisher):
             manage = editor.get('/notices/drafted/new-notice')
             manage.form['title'] = "Erneuerungswahlen"
-            manage.form['organization'] = '210'
-            manage.form['category'] = '14'
+            manage.form['organization'] = '200'
+            manage.form['category'] = '11'
             manage.form['issues'] = ['2017-44', '2017-45']
             manage.form['text'] = "1. Oktober 2017"
             manage.form.submit()
@@ -373,8 +373,8 @@ def test_view_notice_delete(gazette_app):
         for user in (editor, publisher):
             manage = editor.get('/notices/drafted/new-notice')
             manage.form['title'] = "Erneuerungswahlen"
-            manage.form['organization'] = '210'
-            manage.form['category'] = '14'
+            manage.form['organization'] = '200'
+            manage.form['category'] = '11'
             manage.form['issues'] = ['2017-44', '2017-45']
             manage.form['text'] = "1. Oktober 2017"
             manage.form.submit()
@@ -399,8 +399,8 @@ def test_view_notice_edit_others(gazette_app):
 
         manage = publisher.get('/notices/drafted/new-notice')
         manage.form['title'] = "Erneuerungswahlen"
-        manage.form['organization'] = '210'
-        manage.form['category'] = '14'
+        manage.form['organization'] = '200'
+        manage.form['category'] = '11'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1. Oktober 2017"
         manage.form.submit()
@@ -417,8 +417,8 @@ def test_view_notice_copy(gazette_app):
     with freeze_time("2017-10-01 12:00"):
         manage = editor.get('/notices/drafted/new-notice')
         manage.form['title'] = "Erneuerungswahlen"
-        manage.form['organization'] = '210'
-        manage.form['category'] = '14'
+        manage.form['organization'] = '200'
+        manage.form['category'] = '11'
         manage.form['issues'] = ['2017-40']
         manage.form['text'] = "1. Oktober 2017"
         manage.form.submit()
@@ -432,8 +432,8 @@ def test_view_notice_copy(gazette_app):
     with freeze_time("2018-01-01 12:00"):
         manage = editor.get('/notice/erneuerungswahlen').click("Kopieren")
         assert manage.form['title'].value == "Erneuerungswahlen"
-        assert manage.form['organization'].value == '210'
-        assert manage.form['category'].value == '14'
+        assert manage.form['organization'].value == '200'
+        assert manage.form['category'].value == '11'
         assert manage.form['text'].value == "1. Oktober 2017"
         assert "Das Formular enthält Fehler" in manage.form.submit()
 

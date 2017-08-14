@@ -1,8 +1,8 @@
 
 def test_principal_app_cache(gazette_app):
-    assert gazette_app.principal.name == "Kanton Zug"
+    assert gazette_app.principal.name == "Govikon"
     gazette_app.filestorage.remove('principal.yml')
-    assert gazette_app.principal.name == "Kanton Zug"
+    assert gazette_app.principal.name == "Govikon"
 
 
 def test_principal_app_not_existant(gazette_app):

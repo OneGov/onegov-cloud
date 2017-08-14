@@ -24,7 +24,7 @@ def test_notice_collection(session, principal):
         title='Notice A',
         text='An <strong>important</strong> Notice!',
         organization_id='100',
-        category_id='14',
+        category_id='11',
         issues=['2017-46', '2017-47'],
         user_id=user.id,
         principal=principal
@@ -32,8 +32,8 @@ def test_notice_collection(session, principal):
     collection.add(
         title='Notice B',
         text='Another Notice',
-        organization_id='210',
-        category_id='20',
+        organization_id='200',
+        category_id='13',
         issues={'2017-47', '2017-48'},
         user_id=user.id,
         principal=principal
@@ -43,9 +43,9 @@ def test_notice_collection(session, principal):
     assert notice.title == 'Notice A'
     assert notice.text == 'An <strong>important</strong> Notice!'
     assert notice.organization_id == '100'
-    assert notice.organization == 'Staatskanzlei Kanton Zug'
-    assert notice.category_id == '14'
-    assert notice.category == 'Kantonale Mitteilungen'
+    assert notice.organization == 'State Chancellery'
+    assert notice.category_id == '11'
+    assert notice.category == 'Education'
     assert notice.issues == {'2017-46': None, '2017-47': None}
     assert notice.issue_date == standardize_date(
         datetime(2017, 11, 17), 'Europe/Zurich'
@@ -57,10 +57,10 @@ def test_notice_collection(session, principal):
     notice = collection.query().filter_by(title='Notice B').one()
     assert notice.title == 'Notice B'
     assert notice.text == 'Another Notice'
-    assert notice.organization_id == '210'
-    assert notice.organization == 'Bürgergemeinde Zug'
-    assert notice.category_id == '20'
-    assert notice.category == 'Handelsregister'
+    assert notice.organization_id == '200'
+    assert notice.organization == 'Civic Community'
+    assert notice.category_id == '13'
+    assert notice.category == 'Commercial Register'
     assert notice.issues == {'2017-47': None, '2017-48': None}
     assert notice.issue_date == standardize_date(
         datetime(2017, 11, 24), 'Europe/Zurich'

@@ -23,7 +23,7 @@ def test_view_dashboard(gazette_app):
         manage = manage.click("Neu")
         manage.form['title'] = "Erneuerungswahlen"
         manage.form['organization'] = '100'
-        manage.form['category'] = '14'
+        manage.form['category'] = '11'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1. Oktober 2017"
         manage.form.submit()
