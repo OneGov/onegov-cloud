@@ -8,6 +8,8 @@ from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Text
+from sqlalchemy.dialects.postgresql import HSTORE
+from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -51,8 +53,24 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     #: The text of the notice.
     text = Column(Text, nullable=True)
 
-    #: The issue date of the notice.
-    issue_date = Column(UTCDateTime, nullable=True)
+    #: The issues this notice appears in.
+    _issues = Column(
+        MutableDict.as_mutable(HSTORE), name='issues', nullable=True
+    )
+
+    @property
+    def issues(self):
+        return self._issues or {}
+
+    @issues.setter
+    def issues(self, value):
+        if isinstance(value, dict):
+            self._issues = value
+        else:
+            self._issues = {item: None for item in value}
+
+    #: The date of the first issue of the notice.
+    first_issue = Column(UTCDateTime, nullable=True)
 
     #: The category if the notice.
     category = Column(Text, nullable=True)

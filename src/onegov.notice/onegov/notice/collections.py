@@ -17,7 +17,8 @@ class OfficialNoticeCollectionPagination(Pagination):
         state=None,
         term=None,
         order=None,
-        direction=None
+        direction=None,
+        issues=None
     ):
         self.session = session
         self.page = page
@@ -26,6 +27,7 @@ class OfficialNoticeCollectionPagination(Pagination):
         self.user_ids = []
         self.order = order or 'title'
         self.direction = direction or 'asc'
+        self.issues = issues
 
     def __eq__(self, other):
         return (
@@ -33,7 +35,8 @@ class OfficialNoticeCollectionPagination(Pagination):
             self.page == other.page and
             self.term == other.term and
             self.order == other.order and
-            self.direction == other.direction
+            self.direction == other.direction and
+            self.issues == other.issues
         )
 
     def subset(self):
@@ -50,7 +53,8 @@ class OfficialNoticeCollectionPagination(Pagination):
             state=self.state,
             term=self.term,
             order=self.order,
-            direction=self.direction
+            direction=self.direction,
+            issues=self.issues
         )
 
     def for_state(self, state):
@@ -61,7 +65,8 @@ class OfficialNoticeCollectionPagination(Pagination):
             state=state,
             term=self.term,
             order=self.order,
-            direction=self.direction
+            direction=self.direction,
+            issues=self.issues
         )
 
     def for_order(self, order, direction=None):
@@ -82,7 +87,8 @@ class OfficialNoticeCollectionPagination(Pagination):
             state=self.state,
             term=self.term,
             order=order,
-            direction='desc' if descending else 'asc'
+            direction='desc' if descending else 'asc',
+            issues=self.issues
         )
 
 
@@ -113,6 +119,8 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
             )
         if self.user_ids:
             query = query.filter(self.model_class.user_id.in_(self.user_ids))
+        if self.issues:
+            query = query.filter(self.model_class._issues.has_any(self.issues))
 
         direction = desc if self.direction == 'desc' else asc
         if self.order in inspect(self.model_class).columns.keys():
@@ -144,6 +152,7 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
 
         Returns the created notice.
         """
+        issues = optional.pop('issues', None)
         notice = self.model_class(
             state='drafted',
             name=self._get_unique_name(title),
@@ -151,6 +160,8 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
             text=text,
             **optional
         )
+        if issues:
+            notice.issues = issues
 
         self.session.add(notice)
         self.session.flush()

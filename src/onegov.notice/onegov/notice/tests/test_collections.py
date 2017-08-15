@@ -122,6 +122,30 @@ def test_notice_collection_users(session):
     ]
 
 
+def test_notice_collection_issues(session):
+    notices = OfficialNoticeCollection(session)
+    notices.add(title='a', text='text', issues=None)
+    notices.add(title='b', text='text', issues=[])
+    notices.add(title='c', text='text', issues=['1', '2'])
+    notices.add(title='d', text='text', issues=['1'])
+    notices.add(title='e', text='text', issues=['2'])
+    notices.add(title='f', text='text', issues=['2', '3'])
+    notices.add(title='g', text='text', issues=['4'])
+
+    for issues, result in (
+        (None, ['a', 'b', 'c', 'd', 'e', 'f', 'g']),
+        ([], ['a', 'b', 'c', 'd', 'e', 'f', 'g']),
+        (['1'], ['c', 'd']),
+        (['2'], ['c', 'e', 'f']),
+        (['3'], ['f']),
+        (['4'], ['g']),
+        (['1', '4'], ['c', 'd', 'g']),
+        (['2', '3'], ['c', 'e', 'f']),
+    ):
+        notices.issues = issues
+        assert sorted([notice.title for notice in notices.query()]) == result
+
+
 def test_notice_collection_order(session):
     users = UserCollection(session)
     user_a = users.add('a@example.org', 'password', 'editor').id
@@ -133,7 +157,7 @@ def test_notice_collection_order(session):
     date_3 = datetime(2007, 12, 12, tzinfo=timezone.utc)
 
     notices = OfficialNoticeCollection(session)
-    for title, text, user_id, organization, category, issue_date in (
+    for title, text, user_id, organization, category, first_issue in (
         ('A', 'g', user_a, 'p', 'X', date_1),
         ('B', 'g', user_b, 'q', 'X', date_1),
         ('B', 'h', user_c, 'p', 'X', date_2),
@@ -147,7 +171,7 @@ def test_notice_collection_order(session):
             user_id=user_id,
             organization=organization,
             category=category,
-            issue_date=issue_date,
+            first_issue=first_issue,
         )
 
     # Default ordering by title
@@ -207,7 +231,7 @@ def test_notice_collection_order(session):
     result = [n.category for n in notices.for_order('category').query()]
     assert result == ['X', 'X', 'X', 'X', 'Y', 'Y']
 
-    result = [n.issue_date for n in notices.for_order('issue_date').query()]
+    result = [n.first_issue for n in notices.for_order('first_issue').query()]
     assert result == [date_1, date_1, date_1, date_1, date_2, date_3]
 
     result = [n.name for n in notices.for_order('name').query()]

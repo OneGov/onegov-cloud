@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import date
 from datetime import timezone
 from onegov.notice import OfficialNotice
 from onegov.user import User
@@ -14,7 +15,7 @@ def test_create_notice(session):
     notice.name = 'notice'
     notice.category = 'category'
     notice.organization = 'organization'
-    notice.issue_date = datetime(2008, 1, 1, 0, 0, tzinfo=timezone.utc)
+    notice.first_issue = datetime(2008, 1, 1, 0, 0, tzinfo=timezone.utc)
     session.add(notice)
 
     notice.submit()
@@ -31,7 +32,9 @@ def test_create_notice(session):
     assert notice.name == 'notice'
     assert notice.category == 'category'
     assert notice.organization == 'organization'
-    assert notice.issue_date == datetime(2008, 1, 1, 0, 0, tzinfo=timezone.utc)
+    assert notice.first_issue == datetime(
+        2008, 1, 1, 0, 0, tzinfo=timezone.utc
+    )
 
 
 def test_ownership(session):
@@ -151,3 +154,22 @@ def test_polymorphism(session):
     assert session.query(OfficialNotice).count() == 3
     assert session.query(MyOfficialNotice).one().title == 'my'
     assert session.query(MyOtherOfficialNotice).one().title == 'other'
+
+
+def test_issues(session):
+    session.add(OfficialNotice(title='title', state='drafted'))
+    session.flush()
+    notice = session.query(OfficialNotice).one()
+    assert notice.issues == {}
+
+    notice.issues = {
+        '1': datetime(2010, 1, 1, 12, 0).isoformat(),
+        '3': 'xxx-bbb-abd',
+    }
+    assert notice.issues == {
+        '1': '2010-01-01T12:00:00',
+        '3': 'xxx-bbb-abd'
+    }
+
+    notice.issues = ['a', 'b', 'c']
+    assert notice.issues == {'a': None, 'b': None, 'c': None}

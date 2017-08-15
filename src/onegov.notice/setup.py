@@ -33,8 +33,7 @@ setup(
     platforms='any',
     install_requires=[
         'onegov.core',
-        'onegov.user',
-        'sedate'
+        'onegov.user'
     ],
     extras_require=dict(
         test=[
