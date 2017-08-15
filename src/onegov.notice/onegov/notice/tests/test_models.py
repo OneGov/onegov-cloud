@@ -1,5 +1,4 @@
 from datetime import datetime
-from datetime import date
 from datetime import timezone
 from onegov.notice import OfficialNotice
 from onegov.user import User
