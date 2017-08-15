@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.6 (2017-08-15)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds an issues column to the notices.
   [msom]
