@@ -422,4 +422,30 @@ def test_view_notices_statistics(gazette_app):
     )
 
 
-# test view ordering
+def test_view_notices_update(gazette_app):
+    with freeze_time("2017-11-01 12:00"):
+
+        client = Client(gazette_app)
+        login_publisher(client)
+
+        manage = client.get('/notices/drafted/new-notice')
+        manage.form['title'] = "Erneuerungswahlen"
+        manage.form['organization'] = '100'
+        manage.form['category'] = '11'
+        manage.form['issues'] = ['2017-44', '2017-46']
+        manage.form['text'] = "1. Oktober 2017"
+        manage.form.submit()
+        client.get('/notice/erneuerungswahlen/submit').form.submit()
+        client.get('/notice/erneuerungswahlen/publish').form.submit()
+
+        gazette_app.principal.organizations['100'] = "Federal Chancellery"
+
+        manage = client.get('/notices/submitted/update').form.submit().follow()
+        assert "Amtliche Meldungen aktualisiert." in manage
+        assert "State Chancellery" in client.get('/notice/erneuerungswahlen')
+
+        manage = client.get('/notices/published/update').form.submit().follow()
+        assert "Amtliche Meldungen aktualisiert." in manage
+        manage = client.get('/notice/erneuerungswahlen')
+        assert "State Chancellery" not in manage
+        assert "Federal Chancellery" in manage

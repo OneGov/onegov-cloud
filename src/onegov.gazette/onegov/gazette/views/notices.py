@@ -6,6 +6,7 @@ from onegov.core.security import Private
 from onegov.gazette import _
 from onegov.gazette import GazetteApp
 from onegov.gazette.collections import GazetteNoticeCollection
+from onegov.gazette.forms import EmptyForm
 from onegov.gazette.forms import NoticeForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.views import get_user_id
@@ -222,3 +223,37 @@ def view_notices_statistics_groups(self, request):
     csvwriter.writerows(self.count_by_group())
 
     return response
+
+
+@GazetteApp.form(
+    model=GazetteNoticeCollection,
+    name='update',
+    template='form.pt',
+    permission=Private,
+    form=EmptyForm
+)
+def view_notices_update(self, request, form):
+    """ Updates all notices (of this state): Applies the categories, issues and
+    organization from the meta informations. This view is not used normally
+    and only intended when changing category names in the principal definition,
+    for example.
+
+    """
+
+    layout = Layout(self, request)
+    principal = request.app.principal
+
+    if form.submitted(request):
+        for notice in self.query():
+            notice.apply_meta(principal)
+        request.message(_("Notices updated."), "success")
+
+        return redirect(layout.manage_notices_link)
+
+    return {
+        'layout': layout,
+        'form': form,
+        'title': _("Update notices"),
+        'button_text': _("Update"),
+        'cancel': layout.manage_notices_link
+    }
