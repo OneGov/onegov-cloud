@@ -12,7 +12,10 @@ from onegov.gazette.models import Principal
 from onegov.gazette.views import get_user_id
 
 
-@GazetteApp.html(model=Principal, permission=Public)
+@GazetteApp.html(
+    model=Principal,
+    permission=Public
+)
 def view_principal(self, request):
     """ The homepage. Redirects to the default management views according to
     the logged in role.
