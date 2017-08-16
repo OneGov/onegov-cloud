@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes footer urls.
+  [href]
+
 - Fixes newlines in notification templates not rendering as expected.
   [href]
 

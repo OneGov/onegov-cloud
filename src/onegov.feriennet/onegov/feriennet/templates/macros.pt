@@ -52,7 +52,7 @@
 
             <div class="row">
                 <div class="columns small-12 medium-3">
-                    <a href="https://www.projuventute.ch/" class="pro-juventute-logo">
+                    <a href="https://feriennet.projuventute.ch/" class="pro-juventute-logo">
                         <img src="${layout.static_file_path('projuventute.svg')}"
                              alt="Pro Juventute Logo"
                              i18n:attributes="alt"
@@ -63,7 +63,7 @@
                 </div>
                 <div class="columns small-12 medium-9 pro-juventute-ad-text">
                     <div>
-                        <a href="http://feriennet.projuventute.ch" i18n:translate>
+                        <a href="https://feriennet.projuventute.ch" i18n:translate>
                             Feriennet is Pro Juventute's booking platform for
                             supervised vacation activities.
                         </a>
@@ -76,7 +76,7 @@
                     <div>
                         <div i18n:translate>
                             You can find additional Pro Juventute offers
-                            <a href="http://projuventute.ch" i18n:name="here" i18n:translate>here</a>.
+                            <a href="https://www.projuventute.ch" i18n:name="here" i18n:translate>here</a>.
                         </div>
                     </div>
 
