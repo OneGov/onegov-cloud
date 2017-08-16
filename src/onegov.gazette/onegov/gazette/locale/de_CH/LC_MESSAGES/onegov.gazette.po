@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-16 08:51+0200\n"
-"PO-Revision-Date: 2017-08-16 08:51+0200\n"
+"POT-Creation-Date: 2017-08-16 14:41+0200\n"
+"PO-Revision-Date: 2017-08-16 14:38+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -64,19 +64,19 @@ msgid "Groups"
 msgstr "Gruppen"
 
 msgid "Submitted Official Notices"
-msgstr "Eingereichte amtliche Meldungen"
+msgstr "Eingereichte Meldungen"
 
-msgid "Published Official Notices"
-msgstr "Veröffentlichte amtliche Meldungen"
+msgid "Accepted Official Notices"
+msgstr "Angenommene Meldungen"
 
 msgid "Statistics"
 msgstr "Statistiken"
 
 msgid "My Drafted and Submitted Official Notices"
-msgstr "Offene amtliche Meldungen"
+msgstr "Offene Meldungen"
 
-msgid "My Published Official Notices"
-msgstr "Abgeschlossene amtliche Meldungen"
+msgid "My Accepted Official Notices"
+msgstr "Angenommen Meldungen"
 
 msgid "drafted"
 msgstr "in Arbeit"
@@ -86,6 +86,9 @@ msgstr "eingereicht"
 
 msgid "rejected"
 msgstr "zurückgewiesen"
+
+msgid "accepted"
+msgstr "angenommen"
 
 msgid "published"
 msgstr "veröffentlicht"
@@ -97,7 +100,7 @@ msgid "New"
 msgstr "Neu"
 
 msgid "No official notices."
-msgstr "Keine amtlichen Meldungen."
+msgstr "Keine Meldungen."
 
 msgid "Rejected"
 msgstr "Zurückgewiesen"
@@ -173,7 +176,7 @@ msgid "Dear Sir or Madam,"
 msgstr "Sehr geehrte Damen und Herren,"
 
 msgid "Your official notice has been rejected:"
-msgstr "Ihre amtliche Meldung wurde zurückgewiesen:"
+msgstr "Ihre Meldung wurde zurückgewiesen:"
 
 msgid "ID"
 msgstr "ID"
@@ -199,7 +202,7 @@ msgid "Set password"
 msgstr "Passwort festlegen"
 
 msgid "This official notice has been rejected."
-msgstr "Diese amtliche Meldung wurde zurückgewiesen."
+msgstr "Diese Meldung wurde zurückgewiesen."
 
 msgid "User"
 msgstr "Benutzer"
@@ -301,77 +304,77 @@ msgid "Group deleted."
 msgstr "Gruppe gelöscht."
 
 msgid "Edit Official Notice"
-msgstr "Amtliche Publikation bearbeiten"
+msgstr "Meldung bearbeiten"
 
 msgid "Save"
 msgstr "Speichern"
 
 msgid "Delete Official Notice"
-msgstr "Amtliche Publikation löschen"
+msgstr "Meldung löschen"
 
 #, python-format
 msgid "Do you really want to submit \"${item}\"?"
 msgstr "\"${item}\" einreichen?"
 
 msgid "Submit Official Note"
-msgstr "Amtliche Meldung einreichen"
+msgstr "Meldung einreichen"
 
 #, python-format
-msgid "Do you really want to publish \"${item}\"?"
-msgstr "\"${item}\" veröffentlichen?"
+msgid "Do you really want to accept \"${item}\"?"
+msgstr "\"${item}\" annehmen?"
 
-msgid "Publish Official Note"
-msgstr "Amtliche Meldung veröffentlichen"
+msgid "Accept Official Note"
+msgstr "Meldung annehmen"
 
 #, python-format
 msgid "Do you really want to reject \"${item}\"?"
 msgstr "\"${item}\" zurückweisen?"
 
 msgid "Reject Official Note"
-msgstr "Amtliche Meldung zurückweisen"
+msgstr "Meldung zurückweisen"
 
 msgid "Preview"
 msgstr "Vorschau"
 
-msgid "Published official notices may not be edited."
-msgstr "Veröffentlichte amtliche Meldungen können nicht editiert werden."
+msgid "Accepted official notices may not be edited."
+msgstr "Angenommene Meldungen können nicht mehr bearbeitet werden."
 
 msgid "edited"
 msgstr "bearbeitet"
 
 msgid "It's probably not a good idea to delete this official notice!"
-msgstr "Es ist vermutlich keine gute Idee, diese amtliche Meldung zu löschen!"
+msgstr "Es ist vermutlich keine gute Idee, diese Meldung zu löschen!"
 
 msgid "Official notice deleted."
-msgstr "Amtliche Meldung gelöscht."
+msgstr "Meldung gelöscht."
 
-msgid "Only drafted or rejected official notices may be published."
+msgid "Only drafted or rejected official notices may be submitted."
 msgstr ""
-"Es können nur zurückgewiesene amtliche Meldungen oder Meldungen in Arbeit "
-"eingereicht werden."
+"Es können nur zurückgewiesene Meldungen oder Meldungen in Arbeit eingereicht "
+"werden."
 
 msgid "Official notice submitted."
-msgstr "Amtliche Meldung eingereicht."
+msgstr "Meldung eingereicht."
 
-msgid "Only submitted official notices may be published."
-msgstr "Es können nur eingereichte amtliche Meldungen publiziert werden."
+msgid "Only submitted official notices may be accepted."
+msgstr "Es können nur eingereichte Meldungen angenommen werden."
 
-msgid "Official notice published."
-msgstr "Amtliche Meldung veröffentlicht."
+msgid "Official notice accepted."
+msgstr "Meldung angenommen."
 
 msgid "Only submitted official notices may be rejected."
-msgstr "Es können nur eingereichte amtliche Meldungen zurückgewiesen werden."
+msgstr "Es können nur eingereichte Meldungen zurückgewiesen werden."
 
 msgid "Official notice rejected."
-msgstr "Amtliche Meldung zurückgewiesen."
+msgstr "Meldung zurückgewiesen."
 
 msgid "Only drafted or rejected official notices may be deleted."
 msgstr ""
-"Es können nur zurückgewiesene amtliche Meldungen oder Meldungen in Arbeit "
-"gelöscht werden."
+"Es können nur zurückgewiesene Meldungen oder Meldungen in Arbeit gelöscht "
+"werden."
 
 msgid "mail sent"
-msgstr "Email versandt"
+msgstr "E-Mail gesendet"
 
 msgid "Submit"
 msgstr "Einreichen"
@@ -379,38 +382,38 @@ msgstr "Einreichen"
 msgid "Copy"
 msgstr "Kopieren"
 
-msgid "Publish"
-msgstr "Veröffentlichen"
+msgid "Accept"
+msgstr "Annehmen"
 
 msgid "Reject"
 msgstr "Zurückweisen"
 
 msgid "Official Notice Rejected"
-msgstr "Amtliche Meldung zurückgewiesen"
+msgstr "Meldung zurückgewiesen"
 
 msgid "Publish Official Notice"
-msgstr "Amtliche Meldung veröffentlichen"
+msgstr "Meldung veröffentlichen"
 
 msgid "New Official Notice"
-msgstr "Neue amtliche Publikation"
+msgstr "Neue Meldung"
 
 msgid "Official Notices"
-msgstr "Amtliche Meldungen"
+msgstr "Meldungen"
 
 msgid "Update notices"
-msgstr "Amtliche Meldungen aktualisieren"
+msgstr "Meldungen aktualisieren"
 
 msgid "Update"
 msgstr "Aktualisieren"
 
 msgid "Notices updated."
-msgstr "Amtliche Meldungen aktualisiert."
+msgstr "Meldungen aktualisiert."
 
 msgid "Drafted Official Notices"
-msgstr "Amtliche Meldungen in Arbeit"
+msgstr "Meldungen in Arbeit"
 
 msgid "Rejected Official Notices"
-msgstr "Zurückgewiesene amtliche Meldungen"
+msgstr "Zurückgewiesene Meldungen"
 
 msgid "Organizations"
 msgstr "Organisationen"
@@ -419,22 +422,22 @@ msgid "Categories"
 msgstr "Rubriken"
 
 msgid "You have rejected messages."
-msgstr "Sie haben zurückgewiesene amtliche Meldungen."
+msgstr "Sie haben zurückgewiesene Meldungen."
 
 #, python-format
 msgid ""
 "You have a drafted message with past issues: <a href='${link}'>${title}</a>"
 msgstr ""
-"Sie haben eine amtliche Meldung in Arbeit mit vergangenen Ausgaben: <a "
-"href='${link}'>${title}</a>"
+"Sie haben eine Meldung in Arbeit mit vergangenen Ausgaben: <a href='${link}'>"
+"${title}</a>"
 
 #, python-format
 msgid ""
 "You have a drafted message with issues close to the deadline: <a "
 "href='${link}'>${title}</a>"
 msgstr ""
-"Sie haben eine amtliche Meldung in Arbeit, für welche der Redaktionsschluss "
-"bald erreicht ist: <a href='${link}'>${title}</a>"
+"Sie haben eine Meldung in Arbeit, für welche der Redaktionsschluss bald "
+"erreicht ist: <a href='${link}'>${title}</a>"
 
 msgid "New User"
 msgstr "Neuer Benutzer"
@@ -443,7 +446,7 @@ msgid "Edit User"
 msgstr "Benutzer bearbeiten"
 
 msgid "There are official notices linked to this user!"
-msgstr "Es sind amtliche Meldungen mit diesem Benutzer verbunden!"
+msgstr "Dieser Nutzer hat Meldungen!"
 
 msgid "Delete User"
 msgstr "Benutzer löschen"

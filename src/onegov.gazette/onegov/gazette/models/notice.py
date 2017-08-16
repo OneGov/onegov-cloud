@@ -52,16 +52,6 @@ class GazetteNotice(OfficialNotice):
         super(GazetteNotice, self).submit()
         self.add_change(request, _("submitted"))
 
-    def publish(self, request):
-        """ Publish a submitted notice.
-
-        This automatically adds en entry to the changelog.
-
-        """
-
-        super(GazetteNotice, self).publish()
-        self.add_change(request, _("published"))
-
     def reject(self, request, comment):
         """ Reject a submitted notice.
 
@@ -71,6 +61,16 @@ class GazetteNotice(OfficialNotice):
 
         super(GazetteNotice, self).reject()
         self.add_change(request, _("rejected"), comment)
+
+    def accept(self, request):
+        """ Accept a submitted notice.
+
+        This automatically adds en entry to the changelog.
+
+        """
+
+        super(GazetteNotice, self).accept()
+        self.add_change(request, _("accepted"))
 
     @property
     def rejected_comment(self):

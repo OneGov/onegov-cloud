@@ -14,6 +14,7 @@ TRANSLATIONS = {
     'drafted': _("drafted"),
     'submitted': _("submitted"),
     'rejected': _("rejected"),
+    'accepted': _("accepted"),
     'published': _("published"),
 }
 

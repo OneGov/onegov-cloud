@@ -19,7 +19,7 @@ def test_view_dashboard(gazette_app):
         )
 
         manage = editor.get('/').follow()
-        assert "Keine amtlichen Meldungen." in manage
+        assert "Keine Meldungen." in manage
         assert "<h3>Zurückgewiesen</h3>" not in manage
         assert "<h3>in Arbeit</h3>" not in manage
         assert "<h3>Eingereicht</h3>" not in manage
@@ -36,7 +36,7 @@ def test_view_dashboard(gazette_app):
         manage.form.submit()
 
         manage = editor.get('/').follow()
-        assert "Keine amtlichen Meldungen." not in manage
+        assert "Keine Meldungen." not in manage
         assert "<h3>Zurückgewiesen</h3>" not in manage
         assert "<h3>in Arbeit</h3>" in manage
         assert "<h3>Eingereicht</h3>" not in manage
@@ -44,7 +44,7 @@ def test_view_dashboard(gazette_app):
     with freeze_time("2017-11-01 12:00"):
         manage = editor.get('/').follow()
         assert (
-            "Sie haben eine amtliche Meldung in Arbeit, für welche der "
+            "Sie haben eine Meldung in Arbeit, für welche der "
             "Redaktionsschluss bald erreicht ist"
         ) in manage
 
@@ -56,7 +56,7 @@ def test_view_dashboard(gazette_app):
 
         manage = editor.get('/').follow()
         assert (
-            "Sie haben eine amtliche Meldung in Arbeit mit vergangenen "
+            "Sie haben eine Meldung in Arbeit mit vergangenen "
             "Ausgaben"
         ) in manage
 
@@ -71,7 +71,7 @@ def test_view_dashboard(gazette_app):
         manage.click("Erneuerungswahlen").click("Einreichen").form.submit()
 
         manage = editor.get('/').follow()
-        assert "Keine amtlichen Meldungen." not in manage
+        assert "Keine Meldungen." not in manage
         assert "<h3>Zurückgewiesen</h3>" not in manage
         assert "<h3>in Arbeit</h3>" not in manage
         assert "<h3>Eingereicht</h3>" in manage
@@ -83,21 +83,21 @@ def test_view_dashboard(gazette_app):
         manage = manage.form.submit()
 
         manage = editor.get('/').follow()
-        assert "Keine amtlichen Meldungen." not in manage
+        assert "Keine Meldungen." not in manage
         assert "<h3>Zurückgewiesen</h3>" in manage
         assert "<h3>in Arbeit</h3>" not in manage
         assert "<h3>Eingereicht</h3>" not in manage
-        assert "Sie haben zurückgewiesene amtliche Meldungen." in manage
+        assert "Sie haben zurückgewiesene Meldungen." in manage
 
-        # submit & publish notice
+        # submit & accept notice
         manage.click("Erneuerungswahlen").click("Einreichen").form.submit()
 
         manage = publisher.get('/').follow().click("Erneuerungswahlen")
-        manage.click("Veröffentlichen").form.submit()
+        manage.click("Annehmen").form.submit()
 
         manage = editor.get('/').follow()
-        assert "Keine amtlichen Meldungen." in manage
+        assert "Keine Meldungen." in manage
         assert "<h3>Zurückgewiesen</h3>" not in manage
         assert "<h3>in Arbeit</h3>" not in manage
         assert "<h3>Eingereicht</h3>" not in manage
-        assert "Sie haben zurückgewiesene amtliche Meldungen." not in manage
+        assert "Sie haben zurückgewiesene Meldungen." not in manage

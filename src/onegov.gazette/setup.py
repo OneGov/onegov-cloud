@@ -40,7 +40,7 @@ setup(
         'onegov.core',
         'onegov.form',
         'onegov.foundation',
-        'onegov.notice>=0.0.6',
+        'onegov.notice>=0.0.7',
         'onegov.shared',
         'onegov.user',
         'python-dateutil',

@@ -17,10 +17,10 @@ def test_view_notices(gazette_app):
         editor = Client(gazette_app)
         login_editor(editor)
 
-        assert "Keine amtlichen Meldungen" in client.get('/notices/drafted')
-        assert "Keine amtlichen Meldungen" in client.get('/notices/submitted')
-        assert "Keine amtlichen Meldungen" in client.get('/notices/rejected')
-        assert "Keine amtlichen Meldungen" in client.get('/notices/published')
+        assert "Keine Meldungen" in client.get('/notices/drafted')
+        assert "Keine Meldungen" in client.get('/notices/submitted')
+        assert "Keine Meldungen" in client.get('/notices/rejected')
+        assert "Keine Meldungen" in client.get('/notices/accepted')
 
         # new notice
         manage = client.get('/notices/drafted/new-notice')
@@ -32,43 +32,43 @@ def test_view_notices(gazette_app):
         manage.form.submit()
 
         assert "Erneuerungswahlen" in client.get('/notices/drafted')
-        assert "Keine amtlichen Meldungen" in client.get('/notices/submitted')
-        assert "Keine amtlichen Meldungen" in client.get('/notices/rejected')
-        assert "Keine amtlichen Meldungen" in client.get('/notices/published')
+        assert "Keine Meldungen" in client.get('/notices/submitted')
+        assert "Keine Meldungen" in client.get('/notices/rejected')
+        assert "Keine Meldungen" in client.get('/notices/accepted')
 
-        assert "Keine amtlichen Meldungen" in editor.get('/notices/drafted')
+        assert "Keine Meldungen" in editor.get('/notices/drafted')
 
         # submit notice
         client.get('/notice/erneuerungswahlen/submit').form.submit()
 
-        assert "Keine amtlichen Meldungen" in client.get('/notices/drafted')
+        assert "Keine Meldungen" in client.get('/notices/drafted')
         assert "Erneuerungswahlen" in client.get('/notices/submitted')
-        assert "Keine amtlichen Meldungen" in client.get('/notices/rejected')
-        assert "Keine amtlichen Meldungen" in client.get('/notices/published')
+        assert "Keine Meldungen" in client.get('/notices/rejected')
+        assert "Keine Meldungen" in client.get('/notices/accepted')
 
-        assert "Keine amtlichen Meldungen" in editor.get('/notices/submitted')
+        assert "Keine Meldungen" in editor.get('/notices/submitted')
 
         # reject notice
         manage = client.get('/notice/erneuerungswahlen/reject')
         manage.form['comment'] = 'comment'
         manage.form.submit()
-        assert "Keine amtlichen Meldungen" in client.get('/notices/drafted')
-        assert "Keine amtlichen Meldungen" in client.get('/notices/submitted')
+        assert "Keine Meldungen" in client.get('/notices/drafted')
+        assert "Keine Meldungen" in client.get('/notices/submitted')
         assert "Erneuerungswahlen" in client.get('/notices/rejected')
-        assert "Keine amtlichen Meldungen" in client.get('/notices/published')
+        assert "Keine Meldungen" in client.get('/notices/accepted')
 
-        assert "Keine amtlichen Meldungen" in editor.get('/notices/rejected')
+        assert "Keine Meldungen" in editor.get('/notices/rejected')
 
-        # submit & publish notice
+        # submit & accept notice
         client.get('/notice/erneuerungswahlen/submit').form.submit()
-        client.get('/notice/erneuerungswahlen/publish').form.submit()
+        client.get('/notice/erneuerungswahlen/accept').form.submit()
 
-        assert "Keine amtlichen Meldungen" in client.get('/notices/drafted')
-        assert "Keine amtlichen Meldungen" in client.get('/notices/submitted')
-        assert "Keine amtlichen Meldungen" in client.get('/notices/rejected')
-        assert "Erneuerungswahlen" in client.get('/notices/published')
+        assert "Keine Meldungen" in client.get('/notices/drafted')
+        assert "Keine Meldungen" in client.get('/notices/submitted')
+        assert "Keine Meldungen" in client.get('/notices/rejected')
+        assert "Erneuerungswahlen" in client.get('/notices/accepted')
 
-        assert "Keine amtlichen Meldungen" in editor.get('/notices/published')
+        assert "Keine Meldungen" in editor.get('/notices/accepted')
 
 
 def test_view_notices_search(gazette_app):
@@ -86,7 +86,7 @@ def test_view_notices_search(gazette_app):
         manage.form['text'] = "1. Oktober 2017"
         manage.form.submit()
         client.get('/notice/erneuerungswahlen/submit').form.submit()
-        client.get('/notice/erneuerungswahlen/publish').form.submit()
+        client.get('/notice/erneuerungswahlen/accept').form.submit()
 
         manage = client.get('/notices/drafted/new-notice')
         manage.form['title'] = "Kantonsratswahlen"
@@ -96,12 +96,12 @@ def test_view_notices_search(gazette_app):
         manage.form['text'] = "10. Oktober 2017"
         manage.form.submit()
         client.get('/notice/kantonsratswahlen/submit').form.submit()
-        client.get('/notice/kantonsratswahlen/publish').form.submit()
+        client.get('/notice/kantonsratswahlen/accept').form.submit()
 
-        assert "Erneuerungswahlen" in client.get('/notices/published')
-        assert "Kantonsratswahlen" in client.get('/notices/published')
+        assert "Erneuerungswahlen" in client.get('/notices/accepted')
+        assert "Kantonsratswahlen" in client.get('/notices/accepted')
 
-        url = '/notices/published?term={}'
+        url = '/notices/accepted?term={}'
 
         assert "Erneuerung" in client.get(url.format('wahlen'))
         assert "Kantonsrat" in client.get(url.format('wahlen'))
@@ -141,7 +141,7 @@ def test_view_notices_order(gazette_app):
         manage.form['text'] = "1. Oktober 2017"
         manage.form.submit()
         client.get('/notice/erneuerungswahlen/submit').form.submit()
-        client.get('/notice/erneuerungswahlen/publish').form.submit()
+        client.get('/notice/erneuerungswahlen/accept').form.submit()
 
         manage = client.get('/notices/drafted/new-notice')
         manage.form['title'] = "Kantonsratswahlen"
@@ -151,12 +151,12 @@ def test_view_notices_order(gazette_app):
         manage.form['text'] = "10. Oktober 2017"
         manage.form.submit()
         client.get('/notice/kantonsratswahlen/submit').form.submit()
-        client.get('/notice/kantonsratswahlen/publish').form.submit()
+        client.get('/notice/kantonsratswahlen/accept').form.submit()
 
         # Default sorting
-        ordered = client.get('/notices/published')
+        ordered = client.get('/notices/accepted')
         assert get_items(ordered) == ["Erneuerungswahlen", "Kantonsratswahlen"]
-        assert get_ordering(client.get('/notices/published')) == {
+        assert get_ordering(client.get('/notices/accepted')) == {
             'title': 'desc',
             'organization': 'asc',
             'category': 'asc',
@@ -164,9 +164,9 @@ def test_view_notices_order(gazette_app):
         }
 
         # Invalid sorting
-        ordered = client.get('/notices/published?order=xxx')
+        ordered = client.get('/notices/accepted?order=xxx')
         assert get_items(ordered) == ["Erneuerungswahlen", "Kantonsratswahlen"]
-        assert get_ordering(client.get('/notices/published')) == {
+        assert get_ordering(client.get('/notices/accepted')) == {
             'title': 'desc',
             'organization': 'asc',
             'category': 'asc',
@@ -174,7 +174,7 @@ def test_view_notices_order(gazette_app):
         }
 
         # Omit direction
-        ordered = client.get('/notices/published?order=category')
+        ordered = client.get('/notices/accepted?order=category')
         assert get_items(ordered) == ["Kantonsratswahlen", "Erneuerungswahlen"]
         assert get_ordering(ordered) == {
             'title': 'asc',
@@ -185,7 +185,7 @@ def test_view_notices_order(gazette_app):
 
         # Sort by
         # ... title
-        url = '/notices/published?order={}&direction={}'
+        url = '/notices/accepted?order={}&direction={}'
         ordered = client.get(url.format('title', 'asc'))
         assert get_items(ordered) == ["Erneuerungswahlen", "Kantonsratswahlen"]
         assert get_ordering(ordered) == {
@@ -275,7 +275,7 @@ def test_view_notices_statistics(gazette_app):
     url_groups = '/notices/{}/statistics-groups'
 
     # No notices yet
-    states = ('drafted', 'submitted', 'published', 'rejected')
+    states = ('drafted', 'submitted', 'accepted', 'rejected')
     for s in states:
         editor.get('/notices/{}/statistics'.format(s), status=403)
         editor.get('/notices/{}/statistics-groups'.format(s), status=403)
@@ -357,7 +357,7 @@ def test_view_notices_statistics(gazette_app):
             if submit:
                 manage.click("Einreichen").form.submit()
 
-    for s in ('rejected', 'published'):
+    for s in ('rejected', 'accepted'):
         assert publisher.get(url_organizations.format(s)).text == (
             'Organisation,Anzahl\r\n'
         )
@@ -468,16 +468,16 @@ def test_view_notices_update(gazette_app):
         manage.form['text'] = "1. Oktober 2017"
         manage.form.submit()
         client.get('/notice/erneuerungswahlen/submit').form.submit()
-        client.get('/notice/erneuerungswahlen/publish').form.submit()
+        client.get('/notice/erneuerungswahlen/accept').form.submit()
 
         gazette_app.principal.organizations['100'] = "Federal Chancellery"
 
         manage = client.get('/notices/submitted/update').form.submit().follow()
-        assert "Amtliche Meldungen aktualisiert." in manage
+        assert "Meldungen aktualisiert." in manage
         assert "State Chancellery" in client.get('/notice/erneuerungswahlen')
 
-        manage = client.get('/notices/published/update').form.submit().follow()
-        assert "Amtliche Meldungen aktualisiert." in manage
+        manage = client.get('/notices/accepted/update').form.submit().follow()
+        assert "Meldungen aktualisiert." in manage
         manage = client.get('/notice/erneuerungswahlen')
         assert "State Chancellery" not in manage
         assert "Federal Chancellery" in manage

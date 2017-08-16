@@ -256,7 +256,7 @@ def test_gazette_notice_states(session):
 
     request = DummyRequest()
     with raises(AssertionError):
-        notice.publish(request)
+        notice.accept(request)
     with raises(AssertionError):
         notice.reject(request, 'XXX')
     notice.submit(request)
@@ -267,12 +267,12 @@ def test_gazette_notice_states(session):
     notice.submit(request)
     notice.reject(request, 'Some other reason')
     notice.submit(request)
-    notice.publish(request)
+    notice.accept(request)
 
     with raises(AssertionError):
         notice.submit(request)
     with raises(AssertionError):
-        notice.publish(request)
+        notice.accept(request)
     with raises(AssertionError):
         notice.reject(request, 'Some reason')
 
@@ -294,7 +294,7 @@ def test_gazette_notice_states(session):
         ('submitted', None, ''),
         ('rejected', None, 'Some other reason'),
         ('submitted', None, ''),
-        ('published', None, ''),
+        ('accepted', None, ''),
         ('printed', None, ''),
         ('finished', user, 'all went well')
     ]

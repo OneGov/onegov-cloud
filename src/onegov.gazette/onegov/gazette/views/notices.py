@@ -46,10 +46,9 @@ def create_notice(self, request, form):
         return redirect(request.link(notice))
 
     if not form.errors and self.source:
-        try:
-            form.apply_model(self.query().filter_by(id=self.source).first())
-        except KeyError:
-            pass
+        source = self.query().filter_by(id=self.source).first()
+        if source:
+            form.apply_model(source)
 
     return {
         'layout': layout,
@@ -69,7 +68,7 @@ def create_notice(self, request, form):
 def view_notices(self, request):
     """ View the list of notices.
 
-    This view is only visible by a publisher. This (in the state 'published')
+    This view is only visible by a publisher. This (in the state 'accepted')
     is the view used by the publisher.
 
     """
@@ -81,7 +80,7 @@ def view_notices(self, request):
         'drafted': _("Drafted Official Notices"),
         'rejected': _("Rejected Official Notices"),
         'submitted': _("Submitted Official Notices"),
-        'published': _("Published Official Notices")
+        'accepted': _("Accepted Official Notices")
     }.get(self.state, _("Official Notices"))
 
     orderings = {
@@ -108,8 +107,8 @@ def view_notices(self, request):
     }
 
     if not request.is_private(self):
-        if self.state == 'published':
-            title = _("My Published Official Notices")
+        if self.state == 'accepted':
+            title = _("My Accepted Official Notices")
 
         self.user_ids = [get_user_id(request)]
 
@@ -131,7 +130,7 @@ def view_notices(self, request):
 def view_notices_statistics(self, request):
     """ View the list of notices.
 
-    This view is only visible by a publisher. This (in the state 'published')
+    This view is only visible by a publisher. This (in the state 'accepted')
     is the view used by the publisher.
 
     """
@@ -144,7 +143,7 @@ def view_notices_statistics(self, request):
             'link': request.link(self.for_state(state), name='statistics'),
             'class': 'active' if state == self.state else ''
         }
-        for state in ('drafted', 'submitted', 'published', 'rejected')
+        for state in ('drafted', 'submitted', 'accepted', 'rejected')
     )
 
     return {

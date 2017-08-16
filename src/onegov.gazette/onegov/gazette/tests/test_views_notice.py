@@ -5,7 +5,7 @@ from onegov.gazette.tests import login_publisher
 from webtest import TestApp as Client
 
 
-def test_view_notice_reject_publish(gazette_app):
+def test_view_notice_reject_accept(gazette_app):
 
     with freeze_time("2017-11-01 12:00"):
 
@@ -28,7 +28,7 @@ def test_view_notice_reject_publish(gazette_app):
         assert "action-delete" in manage
         assert "action-edit" in manage
         assert "action-preview" in manage
-        assert "action-publish" not in manage
+        assert "action-accept" not in manage
         assert "action-reject" not in manage
         assert "action-submit" in manage
         assert "Erneuerungswahlen" in manage
@@ -51,7 +51,7 @@ def test_view_notice_reject_publish(gazette_app):
         assert "action-delete" not in manage
         assert "action-edit" not in manage
         assert "action-preview" in manage
-        assert "action-publish" not in manage
+        assert "action-accept" not in manage
         assert "action-reject" not in manage
         assert "action-submit" not in manage
         assert "Schalterschliessung" in manage
@@ -84,16 +84,16 @@ def test_view_notice_reject_publish(gazette_app):
         assert "1.-17. Oktober 2017" in manage
         assert "bearbeitet" in manage
 
-        # try to publish the drafted notice(s)
-        editor.get('/notice/erneuerungswahlen/publish', status=403)
+        # try to accept the drafted notice(s)
+        editor.get('/notice/erneuerungswahlen/accept', status=403)
         assert (
-            "Es können nur eingereichte amtliche Meldungen publiziert werden."
-        ) in publisher.get('/notice/erneuerungswahlen/publish')
+            "Es können nur eingereichte Meldungen angenommen werden."
+        ) in publisher.get('/notice/erneuerungswahlen/accept')
 
         # try to reject the drafted notice(s)
         editor.get('/notice/erneuerungswahlen/reject', status=403)
         assert (
-            "Es können nur eingereichte amtliche Meldungen zurückgewiesen "
+            "Es können nur eingereichte Meldungen zurückgewiesen "
             "werden."
         ) in publisher.get('/notice/erneuerungswahlen/reject')
 
@@ -101,46 +101,46 @@ def test_view_notice_reject_publish(gazette_app):
         # state: SUBMITTED
         manage = editor.get('/notice/erneuerungswahlen/submit')
         manage = manage.form.submit().follow().follow()
-        assert "Amtliche Meldung eingereicht." in manage
+        assert "Meldung eingereicht." in manage
         manage = editor.get('/notice/erneuerungswahlen')
         assert "action-copy" not in manage
         assert "action-delete" not in manage
         assert "action-edit" not in manage
         assert "action-preview" in manage
-        assert "action-publish" not in manage
+        assert "action-accept" not in manage
         assert "action-reject" not in manage
         assert "action-submit" not in manage
 
         manage = publisher.get('/notice/schalterschliessung/submit')
         manage = manage.form.submit().follow().follow()
-        assert "Amtliche Meldung eingereicht." in manage
+        assert "Meldung eingereicht." in manage
         manage = publisher.get('/notice/schalterschliessung')
         assert "eingereicht" in manage
         assert "action-copy" not in manage
         assert "action-delete" not in manage
         assert "action-edit" in manage
         assert "action-preview" in manage
-        assert "action-publish" in manage
+        assert "action-accept" in manage
         assert "action-reject" in manage
         assert "action-submit" not in manage
 
         # try to submit submitted notice
         assert (
-            "Es können nur zurückgewiesene amtliche Meldungen oder Meldungen "
+            "Es können nur zurückgewiesene Meldungen oder Meldungen "
             "in Arbeit eingereicht werden."
         ) in editor.get('/notice/erneuerungswahlen/submit')
         assert (
-            "Es können nur zurückgewiesene amtliche Meldungen oder Meldungen "
+            "Es können nur zurückgewiesene Meldungen oder Meldungen "
             "in Arbeit eingereicht werden."
         ) in publisher.get('/notice/schalterschliessung/submit')
 
         # try to delete the submitted notice(s)
         assert (
-            "Es können nur zurückgewiesene amtliche Meldungen oder Meldungen "
+            "Es können nur zurückgewiesene Meldungen oder Meldungen "
             "in Arbeit gelöscht werden."
         ) in editor.get('/notice/erneuerungswahlen/delete')
         assert (
-            "Es können nur zurückgewiesene amtliche Meldungen oder Meldungen "
+            "Es können nur zurückgewiesene Meldungen oder Meldungen "
             "in Arbeit gelöscht werden."
         ) in publisher.get('/notice/schalterschliessung/delete')
 
@@ -162,14 +162,14 @@ def test_view_notice_reject_publish(gazette_app):
         manage = publisher.get('/notice/erneuerungswahlen/reject')
         manage.form['comment'] = "Wichtiger Grund."
         manage = manage.form.submit().follow().follow()
-        assert "Amtliche Meldung zurückgewiesen." in manage
+        assert "Meldung zurückgewiesen." in manage
         manage = publisher.get('/notice/erneuerungswahlen')
         assert "zurückgewiesen" in manage
         assert "action-copy" not in manage
         assert "action-delete" not in manage
         assert "action-edit" not in manage
         assert "action-preview" in manage
-        assert "action-publish" not in manage
+        assert "action-accept" not in manage
         assert "action-reject" not in manage
         assert "action-submit" not in manage
 
@@ -179,7 +179,7 @@ def test_view_notice_reject_publish(gazette_app):
         assert "action-delete" in manage
         assert "action-edit" in manage
         assert "action-preview" in manage
-        assert "action-publish" not in manage
+        assert "action-accept" not in manage
         assert "action-reject" not in manage
         assert "action-submit" in manage
 
@@ -187,25 +187,25 @@ def test_view_notice_reject_publish(gazette_app):
         message = gazette_app.smtp.outbox[0]
         message = message.get_payload(1).get_payload(decode=True)
         message = message.decode('utf-8')
-        assert "Ihre amtliche Meldung wurde zurückgewiesen:" in message
+        assert "Ihre Meldung wurde zurückgewiesen:" in message
         assert "Wichtiger Grund" in message
 
         # try to reject the rejected notice
         editor.get('/notice/erneuerungswahlen/reject', status=403)
         assert (
-            "Es können nur eingereichte amtliche Meldungen zurückgewiesen "
+            "Es können nur eingereichte Meldungen zurückgewiesen "
             "werden."
         ) in publisher.get('/notice/erneuerungswahlen/reject')
 
-        # try to publish the rejected notice
-        editor.get('/notice/erneuerungswahlen/publish', status=403)
+        # try to accept the rejected notice
+        editor.get('/notice/erneuerungswahlen/accept', status=403)
         assert (
-            "Es können nur eingereichte amtliche Meldungen publiziert werden."
-        ) in publisher.get('/notice/erneuerungswahlen/publish')
+            "Es können nur eingereichte Meldungen angenommen werden."
+        ) in publisher.get('/notice/erneuerungswahlen/accept')
 
         # edit the rejected notice
         manage = editor.get('/notice/erneuerungswahlen')
-        assert "Diese amtliche Meldung wurde zurückgewiesen." in manage
+        assert "Diese Meldung wurde zurückgewiesen." in manage
         assert "<strong>Wichtiger Grund.</strong>" in manage
 
         manage = editor.get('/notice/erneuerungswahlen/edit')
@@ -221,32 +221,32 @@ def test_view_notice_reject_publish(gazette_app):
         # submit the rejected notice
         manage = editor.get('/notice/erneuerungswahlen/submit')
         manage = manage.form.submit().follow().follow()
-        assert "Amtliche Meldung eingereicht." in manage
+        assert "Meldung eingereicht." in manage
 
-        # publish the submitted notice
-        # state: PUBLISHED
-        editor.get('/notice/erneuerungswahlen/publish', status=403)
+        # accept the submitted notice
+        # state: ACCEPTED
+        editor.get('/notice/erneuerungswahlen/accept', status=403)
 
-        manage = publisher.get('/notice/erneuerungswahlen/publish')
+        manage = publisher.get('/notice/erneuerungswahlen/accept')
         manage = manage.form.submit().follow().follow()
-        assert "Amtliche Meldung veröffentlicht." in manage
+        assert "Meldung angenommen." in manage
         manage = publisher.get('/notice/erneuerungswahlen')
-        assert "veröffentlicht" in manage
+        assert "angenommen" in manage
         assert "action-copy" not in manage
         assert "action-delete" not in manage
         assert "action-edit" not in manage
         assert "action-preview" in manage
-        assert "action-publish" not in manage
+        assert "action-accept" not in manage
         assert "action-reject" not in manage
         assert "action-submit" not in manage
 
         manage = editor.get('/notice/erneuerungswahlen')
-        assert "veröffentlicht" in manage
+        assert "angenommen" in manage
         assert "action-copy" in manage
         assert "action-delete" not in manage
         assert "action-edit" not in manage
         assert "action-preview" in manage
-        assert "action-publish" not in manage
+        assert "action-accept" not in manage
         assert "action-reject" not in manage
         assert "action-submit" not in manage
 
@@ -264,44 +264,44 @@ def test_view_notice_reject_publish(gazette_app):
         assert "Education" in message
         assert "1. Oktober 2017" in message
 
-        # try to publish a published notice
-        editor.get('/notice/erneuerungswahlen/publish', status=403)
+        # try to acccept an accepted notice
+        editor.get('/notice/erneuerungswahlen/accept', status=403)
         assert (
-            "Es können nur eingereichte amtliche Meldungen publiziert werden."
-        ) in publisher.get('/notice/erneuerungswahlen/publish')
+            "Es können nur eingereichte Meldungen angenommen werden."
+        ) in publisher.get('/notice/erneuerungswahlen/accept')
 
-        # try to submit the published notice
+        # try to submit the accepted notice
         assert (
-            "Es können nur zurückgewiesene amtliche Meldungen oder Meldungen "
+            "Es können nur zurückgewiesene Meldungen oder Meldungen "
             "in Arbeit eingereicht werden."
         ) in editor.get('/notice/erneuerungswahlen/submit')
         assert (
-            "Es können nur zurückgewiesene amtliche Meldungen oder Meldungen "
+            "Es können nur zurückgewiesene Meldungen oder Meldungen "
             "in Arbeit eingereicht werden."
         ) in publisher.get('/notice/erneuerungswahlen/submit')
 
-        # try to reject a published notice
+        # try to reject an accepted notice
         editor.get('/notice/erneuerungswahlen/reject', status=403)
         assert (
-            "Es können nur eingereichte amtliche Meldungen zurückgewiesen "
+            "Es können nur eingereichte Meldungen zurückgewiesen "
             "werden."
         ) in publisher.get('/notice/erneuerungswahlen/reject')
 
-        # try to edit the published notice
+        # try to edit the accepted notice
         assert (
-            "Veröffentlichte amtliche Meldungen können nicht editiert werden."
+            "Angenommene Meldungen können nicht mehr bearbeitet werden."
         ) in editor.get('/notice/erneuerungswahlen/edit')
         assert (
-            "Veröffentlichte amtliche Meldungen können nicht editiert werden."
+            "Angenommene Meldungen können nicht mehr bearbeitet werden."
         ) in publisher.get('/notice/erneuerungswahlen/edit')
 
-        # try to delete the published notice
+        # try to delete the accepted notice
         assert (
-            "Es können nur zurückgewiesene amtliche Meldungen oder Meldungen "
+            "Es können nur zurückgewiesene Meldungen oder Meldungen "
             "in Arbeit gelöscht werden."
         ) in editor.get('/notice/erneuerungswahlen/delete')
         assert (
-            "Es können nur zurückgewiesene amtliche Meldungen oder Meldungen "
+            "Es können nur zurückgewiesene Meldungen oder Meldungen "
             "in Arbeit gelöscht werden."
         ) in publisher.get('/notice/erneuerungswahlen/delete')
 
@@ -329,7 +329,7 @@ def test_view_notice_delete(gazette_app):
 
             manage = user.get('/notice/erneuerungswahlen/delete')
             manage = manage.form.submit().follow().follow()
-            assert "Amtliche Meldung gelöscht." in manage
+            assert "Meldung gelöscht." in manage
 
         # delete a submitted notice
         for user in (editor, publisher):
@@ -367,9 +367,9 @@ def test_view_notice_delete(gazette_app):
 
             manage = user.get('/notice/erneuerungswahlen/delete')
             manage = manage.form.submit().follow().follow()
-            assert "Amtliche Meldung gelöscht." in manage
+            assert "Meldung gelöscht." in manage
 
-        # delete a published notice
+        # delete an accepted notice
         for user in (editor, publisher):
             manage = editor.get('/notices/drafted/new-notice')
             manage.form['title'] = "Erneuerungswahlen"
@@ -380,7 +380,7 @@ def test_view_notice_delete(gazette_app):
             manage.form.submit()
 
             editor.get('/notice/erneuerungswahlen/submit').form.submit()
-            publisher.get('/notice/erneuerungswahlen/publish').form.submit()
+            publisher.get('/notice/erneuerungswahlen/accept').form.submit()
 
             manage = user.get('/notice/erneuerungswahlen/delete')
             assert manage.forms == {}
@@ -427,7 +427,7 @@ def test_view_notice_copy(gazette_app):
 
     publisher = Client(gazette_app)
     login_publisher(publisher)
-    publisher.get('/notice/erneuerungswahlen/publish').form.submit()
+    publisher.get('/notice/erneuerungswahlen/accept').form.submit()
 
     with freeze_time("2018-01-01 12:00"):
         manage = editor.get('/notice/erneuerungswahlen').click("Kopieren")

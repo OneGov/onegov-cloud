@@ -58,6 +58,9 @@ Changelog
 - Adds date filters to statistices.
   [msom]
 
+- Adds an accepted state.
+  [msom]
+
 0.0.4 (2017-08-03)
 ~~~~~~~~~~~~~~~~~~~
 

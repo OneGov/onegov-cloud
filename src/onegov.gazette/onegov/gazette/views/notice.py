@@ -2,7 +2,6 @@ from morepath import redirect
 from onegov.core.security import Personal
 from onegov.core.security import Private
 from onegov.core.templates import render_template
-from onegov.core.utils import append_query_param
 from onegov.gazette import _
 from onegov.gazette import GazetteApp
 from onegov.gazette.collections import GazetteNoticeCollection
@@ -43,18 +42,16 @@ def view_notice(self, request):
             actions.append(
                 (_("Delete"), request.link(self, 'delete'), 'alert right')
             )
-        if self.state == 'published':
+        if self.state == 'accepted':
             actions.append(
                 (
                     _("Copy"),
-                    append_query_param(
-                        request.link(
-                            GazetteNoticeCollection(
-                                request.app.session(), state='published'
-                            ),
-                            name='new-notice'
-                        ),
-                        'source', self.id
+                    request.link(
+                        GazetteNoticeCollection(
+                            request.app.session(),
+                            state=self.state,
+                            source=self.id
+                        ), name='new-notice'
                     ),
                     'secondary'
                 )
@@ -62,7 +59,7 @@ def view_notice(self, request):
     if request.is_private(self):
         if self.state == 'submitted':
             actions.append(
-                (_("Publish"), request.link(self, 'publish'), 'primary')
+                (_("Accept"), request.link(self, 'accept'), 'primary')
             )
             actions.append(
                 (_("Edit"), request.link(self, 'edit'), 'secondary')
@@ -120,13 +117,13 @@ def edit_notice(self, request, form):
         if not request.is_private(self):
             raise HTTPForbidden()
 
-    if self.state == 'published':
+    if self.state == 'accepted' or self.state == 'published':
         return {
             'layout': layout,
             'title': self.title,
             'subtitle': _("Edit Official Notice"),
             'callout': _(
-                'Published official notices may not be edited.'
+                'Accepted official notices may not be edited.'
             ),
             'show_form': False
         }
@@ -164,8 +161,8 @@ def delete_notice(self, request, form):
     Editors may only delete their own notices, publishers may delete any
     notice.
 
-    It is possible for admins to delete published and drafted notices too,
-    although the action is not linked anywhere.
+    It is possible for admins to delete accepted/published and drafted notices
+    too, although the action is not linked anywhere.
 
     """
     layout = Layout(self, request)
@@ -227,7 +224,7 @@ def submit_notice(self, request, form):
     to review.
 
     Only drafted notices may be submitted. Editors may only submit their own
-    notices (publishers may publish any notice).
+    notices (publishers may submit any notice).
 
     """
 
@@ -243,7 +240,7 @@ def submit_notice(self, request, form):
             'title': self.title,
             'subtitle': _("Submit Official Note"),
             'callout': _(
-                "Only drafted or rejected official notices may be published."
+                "Only drafted or rejected official notices may be submitted."
             ),
             'show_form': False
         }
@@ -269,17 +266,17 @@ def submit_notice(self, request, form):
 
 @GazetteApp.form(
     model=GazetteNotice,
-    name='publish',
+    name='accept',
     template='form.pt',
     permission=Private,
     form=EmptyForm
 )
-def publish_notice(self, request, form):
-    """ Publish a notice.
+def accept_notice(self, request, form):
+    """ Accept a notice.
 
-    This view is used by the publishers to publish a submitted notice.
+    This view is used by the publishers to accept a submitted notice.
 
-    Only submitted notices may be published.
+    Only submitted notices may be accepted.
 
     """
 
@@ -289,14 +286,14 @@ def publish_notice(self, request, form):
         return {
             'layout': layout,
             'title': self.title,
-            'subtitle': _("Publish Official Note"),
-            'callout': _("Only submitted official notices may be published."),
+            'subtitle': _("Accept Official Note"),
+            'callout': _("Only submitted official notices may be accepted."),
             'show_form': False
         }
 
     if form.submitted(request):
-        self.publish(request)
-        request.message(_("Official notice published."), 'success')
+        self.accept(request)
+        request.message(_("Official notice accepted."), 'success')
         if request.app.principal.publish_to:
             request.app.send_email(
                 subject=request.translate(_("Publish Official Notice")),
@@ -319,14 +316,14 @@ def publish_notice(self, request, form):
 
     return {
         'message': _(
-            'Do you really want to publish "${item}"?',
+            'Do you really want to accept "${item}"?',
             mapping={'item': self.title}
         ),
         'layout': layout,
         'form': form,
         'title': self.title,
-        'subtitle': _("Publish Official Note"),
-        'button_text': _("Publish Official Note"),
+        'subtitle': _("Accept Official Note"),
+        'button_text': _("Accept Official Note"),
         'cancel': request.link(self)
     }
 
