@@ -1,3 +1,5 @@
+from onegov.core.converters import extended_date_converter
+from onegov.core.converters import uuid_converter
 from onegov.gazette import GazetteApp
 from onegov.gazette.collections import GazetteNoticeCollection
 from onegov.gazette.collections import UserGroupCollection
@@ -39,15 +41,27 @@ def get_group(app, id):
     return UserGroupCollection(app.session()).by_id(id)
 
 
-@GazetteApp.path(model=GazetteNoticeCollection, path='/notices/{state}')
-def get_notices(app, state, page=0, term=None, order=None, direction=None):
+@GazetteApp.path(
+    model=GazetteNoticeCollection,
+    path='/notices/{state}',
+    converters=dict(
+        from_date=extended_date_converter,
+        to_date=extended_date_converter,
+        source=uuid_converter
+    )
+)
+def get_notices(app, state, page=0, term=None, order=None, direction=None,
+                from_date=None, to_date=None, source=None):
     return GazetteNoticeCollection(
         app.session(),
         state=state,
         page=page,
         term=term,
         order=order,
-        direction=direction
+        direction=direction,
+        from_date=from_date,
+        to_date=to_date,
+        source=source
     )
 
 

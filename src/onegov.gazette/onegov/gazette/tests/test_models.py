@@ -313,7 +313,7 @@ def test_gazette_notice_apply_meta(principal):
     notice.apply_meta(principal)
     assert notice.organization is None
     assert notice.category is None
-    assert notice.issue_date is None
+    assert notice.first_issue is None
 
     notice.organization_id = 'invalid'
     notice.category_id = 'invalid'
@@ -321,7 +321,7 @@ def test_gazette_notice_apply_meta(principal):
     notice.apply_meta(principal)
     assert notice.organization is None
     assert notice.category is None
-    assert notice.issue_date is None
+    assert notice.first_issue is None
 
     notice.organization_id = '100'
     notice.category_id = '12'
@@ -329,12 +329,12 @@ def test_gazette_notice_apply_meta(principal):
     notice.apply_meta(principal)
     assert notice.organization == 'State Chancellery'
     assert notice.category == 'Submissions'
-    assert notice.issue_date == standardize_date(
+    assert notice.first_issue == standardize_date(
         datetime(2017, 11, 17), 'Europe/Zurich'
     )
 
     notice.issues = [str(Issue(2017, 46)), str(Issue(2017, 40))]
     notice.apply_meta(principal)
-    assert notice.issue_date == standardize_date(
+    assert notice.first_issue == standardize_date(
         datetime(2017, 10, 6), 'Europe/Zurich'
     )

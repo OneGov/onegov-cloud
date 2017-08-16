@@ -12,7 +12,7 @@
                 <h2 i18n:translate>${title}</h2>
 
                 <dl class="sub-nav">
-                    <form>
+                    <form action="" method="GET">
                         <dt><tal:block i18n:translate>Search</tal:block>:</dt>
                         <dd>
                             <input type="text" name="term" value="${term}"/>

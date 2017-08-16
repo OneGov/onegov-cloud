@@ -55,6 +55,9 @@ Changelog
 - Adds deadlines to issues.
   [msom]
 
+- Adds date filters to statistices.
+  [msom]
+
 0.0.4 (2017-08-03)
 ~~~~~~~~~~~~~~~~~~~
 

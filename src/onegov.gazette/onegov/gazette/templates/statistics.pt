@@ -12,10 +12,26 @@
                 <h2 i18n:translate>${title}</h2>
 
                 <dl class="sub-nav">
-                  <dt i18n:translate>Filter:</dt>
+                  <dt><tal:block i18n:translate>State</tal:block>:</dt>
                   <dd tal:repeat="filter filters" class="${filter['class']}">
                       <a href="${filter['link']}">${filter['title']}</a>
                   </dd>
+                </dl>
+
+                <dl class="sub-nav">
+                    <form action="" method="GET">
+                        <dt><tal:block i18n:translate>Date</tal:block>:</dt>
+                        <dd><input type="date" name="from_date" value="${from_date}" placeholder="${layout.today().isoformat()}"></dd>
+                        <dd><input type="date" name="to_date" value="${to_date}" placeholder="${layout.today().isoformat()}"></dd>
+                        <dd>
+                            <button type="submit" aria-label="Filter by date" i18n:attributes="aria-label">
+                                <i class="fa fa-check"></i>
+                            </button>
+                        </dd>
+                        <dd tal:condition="from_date or to_date">
+                            <a href="${request.path_url}"><i class="fa fa-close" aria-hidden="true"></i></a>
+                        </dd>
+                    </form>
                 </dl>
 
                 <h3 i18n:translate>By Organizations</h3>

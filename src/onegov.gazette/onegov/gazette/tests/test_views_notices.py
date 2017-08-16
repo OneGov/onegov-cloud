@@ -331,28 +331,28 @@ def test_view_notices_statistics(gazette_app):
 
     # Add notices
     with freeze_time("2017-11-01 12:00"):
-        for (organization, category, submit, user) in (
-            ('100', '13', False, editor),
-            ('100', '13', False, user_1),
-            ('100', '11', False, user_1),
-            ('200', '11', False, user_1),
-            ('100', '12', True, user_1),
-            ('100', '14', True, user_1),
-            ('300', '14', True, user_1),
-            ('100', '11', False, user_2),
-            ('100', '12', True, user_2),
-            ('200', '14', False, user_2),
-            ('100', '14', True, user_3),
-            ('100', '12', True, user_3),
-            ('100', '14', False, user_3),
-            ('100', '14', True, user_3),
+        for (organization, category, submit, user, issues) in (
+            ('100', '13', False, editor, ['2017-44']),
+            ('100', '13', False, user_1, ['2017-45']),
+            ('100', '11', False, user_1, ['2017-46']),
+            ('200', '11', False, user_1, ['2017-47']),
+            ('100', '12', True, user_1, ['2017-47', '2017-45']),
+            ('100', '14', True, user_1, ['2017-45', '2017-46']),
+            ('300', '14', True, user_1, ['2017-46']),
+            ('100', '11', False, user_2, ['2017-47']),
+            ('100', '12', True, user_2, ['2017-47']),
+            ('200', '14', False, user_2, ['2017-45', '2017-47']),
+            ('100', '14', True, user_3, ['2017-46']),
+            ('100', '12', True, user_3, ['2017-47']),
+            ('100', '14', False, user_3, ['2017-47']),
+            ('100', '14', True, user_3, ['2017-45', '2017-46', '2017-47']),
         ):
             manage = user.get('/notices/drafted/new-notice')
             manage.form['title'] = "Titel"
             manage.form['organization'] = organization
             manage.form['category'] = category
-            manage.form['issues'] = ['2017-44']
             manage.form['text'] = "Text"
+            manage.form['issues'] = issues
             manage = manage.form.submit().follow()
             if submit:
                 manage.click("Einreichen").form.submit()
@@ -385,6 +385,16 @@ def test_view_notices_statistics(gazette_app):
         'State Chancellery,6\r\n'
     )
 
+    # organizations/submitted/2017-45/46: 4 x 100, 1 x 300
+    url = '{}?from_date=2017-11-10&to_date=2017-11-17'.format(
+        url_organizations.format('submitted')
+    )
+    assert publisher.get(url).text == (
+        'Organisation,Anzahl\r\n'
+        'Municipality,1\r\n'
+        'State Chancellery,4\r\n'
+    )
+
     # categories/drafted: 3 x 11, 2 x 13, 2 x 14
     assert '>2</td>' in publisher.get('/notices/drafted/statistics')
     assert publisher.get(url_categories.format('drafted')).text == (
@@ -400,6 +410,16 @@ def test_view_notices_statistics(gazette_app):
         'Rubrik,Anzahl\r\n'
         'Elections,4\r\n'
         'Submissions,3\r\n'
+    )
+
+    # categories/submitted/2017-45/46: 1 x 12, 4 x 14
+    url = '{}?from_date=2017-11-10&to_date=2017-11-17'.format(
+        url_categories.format('submitted')
+    )
+    assert publisher.get(url).text == (
+        'Rubrik,Anzahl\r\n'
+        'Elections,4\r\n'
+        'Submissions,1\r\n'
     )
 
     # groups/drafted: 1 x w/o, 5 x B, 1 x C
@@ -419,6 +439,17 @@ def test_view_notices_statistics(gazette_app):
         'A,0\r\n'
         'B,4\r\n'
         'C,3\r\n'
+    )
+
+    # groups/submitted/2017-45/46: 3 x B, 2 x C
+    url = '{}?from_date=2017-11-10&to_date=2017-11-17'.format(
+        url_groups.format('submitted')
+    )
+    assert publisher.get(url).text == (
+        'Gruppe,Anzahl\r\n'
+        'A,0\r\n'
+        'B,3\r\n'
+        'C,2\r\n'
     )
 
 

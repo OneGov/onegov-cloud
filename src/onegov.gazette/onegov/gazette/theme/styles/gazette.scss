@@ -451,6 +451,7 @@ ul.actions {
 */
 .sub-nav {
     background-color: $white-smoke;
+    margin-bottom: 0;
     padding: 10px 10px 10px 0;
 
     dt,
@@ -466,6 +467,10 @@ ul.actions {
         height: initial;
         margin: 0;
         padding: .2em .5em;
+
+        &[type="date"] {
+            width: 80%;
+        }
     }
 
     button {

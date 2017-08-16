@@ -1,9 +1,20 @@
+from datetime import date
 from datetime import datetime
 from onegov.gazette.collections import GazetteNoticeCollection
 from onegov.gazette.collections import UserGroupCollection
 from onegov.gazette.models import Principal
 from onegov.user import UserCollection
 from sedate import standardize_date
+
+
+class DummyApp(object):
+    def __init__(self, principal):
+        self.principal = principal
+
+
+class DummyRequest(object):
+    def __init__(self, principal):
+        self.app = DummyApp(principal)
 
 
 def test_user_group_collection(session):
@@ -47,7 +58,7 @@ def test_notice_collection(session, principal):
     assert notice.category_id == '11'
     assert notice.category == 'Education'
     assert notice.issues == {'2017-46': None, '2017-47': None}
-    assert notice.issue_date == standardize_date(
+    assert notice.first_issue == standardize_date(
         datetime(2017, 11, 17), 'Europe/Zurich'
     )
     assert notice.user == user
@@ -62,12 +73,43 @@ def test_notice_collection(session, principal):
     assert notice.category_id == '13'
     assert notice.category == 'Commercial Register'
     assert notice.issues == {'2017-47': None, '2017-48': None}
-    assert notice.issue_date == standardize_date(
+    assert notice.first_issue == standardize_date(
         datetime(2017, 11, 24), 'Europe/Zurich'
     )
     assert notice.user == user
     assert notice.changes.one().event == 'created'
     assert notice.changes.one().user == user
+
+
+def test_notice_collection_on_request(session, principal):
+    collection = GazetteNoticeCollection(session)
+    assert collection.from_date is None
+    assert collection.to_date is None
+    assert collection.issues is None
+
+    collection.on_request(DummyRequest(principal))
+    assert collection.issues is None
+
+    for start, end, length in (
+        (date(2015, 1, 1), date(2020, 1, 1), 14),
+        (None, date(2020, 1, 1), 14),
+        (date(2015, 1, 1), None, 14),
+        (date(2017, 10, 14), date(2017, 11, 18), 5),
+        (None, date(2017, 11, 18), 7),
+        (date(2017, 10, 14), None, 12),
+        (date(2017, 10, 20), date(2017, 10, 20), 1),
+        (date(2017, 10, 21), date(2017, 10, 21), 0),
+        (date(2017, 10, 1), date(2017, 9, 1), 0),
+    ):
+        collection.from_date = start
+        collection.to_date = end
+        collection.on_request(DummyRequest(principal))
+        assert len(collection.issues) == length
+
+    collection.from_date = date(2017, 12, 1)
+    collection.to_date = date(2017, 12, 10)
+    collection.on_request(DummyRequest(principal))
+    assert sorted(collection.issues) == ['2017-48', '2017-49']
 
 
 def test_notice_collection_count_by_organization(session):
@@ -82,7 +124,7 @@ def test_notice_collection_count_by_organization(session):
                 text='',
                 organization_id=organization,
                 category_id='',
-                issues=[],
+                issues=['2017-{}'.format(y) for y in range(x)],
                 user_id=None,
                 principal=principal
             )
@@ -92,6 +134,9 @@ def test_notice_collection_count_by_organization(session):
 
     assert collection.count_by_organization() == \
         collection.for_state('drafted').count_by_organization()
+
+    collection.issues = ['2017-1', '2017-4']
+    assert collection.count_by_organization() == [('B', 2), ('C', 8)]
 
 
 def test_notice_collection_count_by_category(session):
@@ -106,7 +151,7 @@ def test_notice_collection_count_by_category(session):
                 text='',
                 organization_id=None,
                 category_id=category,
-                issues=[],
+                issues=['2017-{}'.format(y) for y in range(x)],
                 user_id=None,
                 principal=principal
             )
@@ -114,6 +159,9 @@ def test_notice_collection_count_by_category(session):
 
     assert collection.count_by_category() == \
         collection.for_state('drafted').count_by_category()
+
+    collection.issues = ['2017-1', '2017-4']
+    assert collection.count_by_category() == [('B', 2)]
 
 
 def test_notice_collection_count_by_user(session, principal):
@@ -140,7 +188,7 @@ def test_notice_collection_count_by_user(session, principal):
                 text='',
                 organization_id='',
                 category_id='',
-                issues=[],
+                issues=['2017-{}'.format(y) for y in range(x)],
                 user_id=users[user],
                 principal=principal
             )
@@ -153,6 +201,11 @@ def test_notice_collection_count_by_user(session, principal):
 
     assert collection.count_by_user() == \
         collection.for_state('drafted').count_by_user()
+
+    collection.issues = ['2017-1', '2017-4']
+    assert sorted(collection.count_by_user()) == sorted([
+        (users['b@example.org'], 2),
+    ])
 
 
 def test_notice_collection_count_by_group(session, principal):
@@ -194,7 +247,7 @@ def test_notice_collection_count_by_group(session, principal):
                 text='',
                 organization_id='',
                 category_id='',
-                issues=[],
+                issues=['2017-{}'.format(y) for y in range(x)],
                 user_id=users[user],
                 principal=principal
             )
@@ -208,3 +261,8 @@ def test_notice_collection_count_by_group(session, principal):
 
     assert collection.count_by_group() == \
         collection.for_state('drafted').count_by_group()
+
+    collection.issues = ['2017-2', '2017-4']
+    assert collection.count_by_group() == [
+        ['', 7], ['A', 1], ['B', 0], ['C', 0]
+    ]

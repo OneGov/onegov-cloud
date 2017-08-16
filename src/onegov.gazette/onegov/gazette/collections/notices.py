@@ -24,6 +24,32 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
     def model_class(self):
         return GazetteNotice
 
+    def __init__(
+        self,
+        session,
+        page=0,
+        state=None,
+        term=None,
+        order=None,
+        direction=None,
+        issues=None,
+        from_date=None,
+        to_date=None,
+        source=None
+    ):
+        super(GazetteNoticeCollection, self).__init__(
+            session=session,
+            page=page,
+            state=state,
+            term=term,
+            order=order,
+            direction=direction,
+            issues=issues
+        )
+        self.from_date = from_date
+        self.to_date = to_date
+        self.source = source
+
     def add(self, title, text, organization_id, category_id, user_id, issues,
             principal):
         """ Add a new notice.
@@ -42,11 +68,11 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
             title=title,
             text=text,
             name=self._get_unique_name(title),
-            user_id=user_id
+            user_id=user_id,
+            issues=issues
         )
         notice.organization_id = organization_id
         notice.category_id = category_id
-        notice.issues = issues
         notice.apply_meta(principal)
         self.session.add(notice)
         self.session.flush()
@@ -60,6 +86,19 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
 
         return notice
 
+    def on_request(self, request):
+        """ Limits the issues to the date filters. """
+        self.issues = None
+        if self.from_date or self.to_date:
+            issues = request.app.principal.issues_by_date
+            self.issues = [
+                str(issue) for date_, issue in issues.items()
+                if (
+                    ((not self.from_date) or (date_ >= self.from_date)) and
+                    ((not self.to_date) or (date_ <= self.to_date))
+                )
+            ]
+
     def count_by_organization(self):
         """ Returns the total number of notices by organizations.
 
@@ -67,7 +106,6 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         for each organization. Filters by the state of the collection.
 
         """
-
         result = self.session.query(
             GazetteNotice.organization,
             func.count(GazetteNotice.organization)
@@ -76,6 +114,8 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         result = result.filter(GazetteNotice.organization.isnot(None))
         if self.state:
             result = result.filter(GazetteNotice.state == self.state)
+        if self.issues:
+            result = result.filter(GazetteNotice._issues.has_any(self.issues))
         result = result.order_by(GazetteNotice.organization)
         return result.all()
 
@@ -86,7 +126,6 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         for each category. Filters by the state of the collection.
 
         """
-
         result = self.session.query(
             GazetteNotice.category,
             func.count(GazetteNotice.category)
@@ -95,6 +134,8 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         result = result.filter(GazetteNotice.category.isnot(None))
         if self.state:
             result = result.filter(GazetteNotice.state == self.state)
+        if self.issues:
+            result = result.filter(GazetteNotice._issues.has_any(self.issues))
         result = result.order_by(GazetteNotice.category)
         return result.all()
 
@@ -105,13 +146,14 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         for each user with a notice. Filters by the state of the collection.
 
         """
-
         result = self.session.query(
             func.cast(GazetteNotice.user_id, String),
             func.count(GazetteNotice.user_id)
         )
         if self.state:
             result = result.filter(GazetteNotice.state == self.state)
+        if self.issues:
+            result = result.filter(GazetteNotice._issues.has_any(self.issues))
         result = result.group_by(GazetteNotice.user_id)
         return result.all()
 

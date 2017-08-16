@@ -15,27 +15,6 @@ from sqlalchemy.orm import relationship
 class GazetteNotice(OfficialNotice):
     __mapper_args__ = {'polymorphic_identity': 'gazette'}
 
-    @property
-    def issues(self):
-        """ Returns the issues this notice appears in. The result is a dict
-        with the issue numbers as keys and an optional code as value.
-
-        """
-
-        return (self.meta or {}).get('issues', {})
-
-    @issues.setter
-    def issues(self, value):
-        """ Sets the issues this notice appears in. """
-
-        if not self.meta:
-            self.meta = {}
-
-        if isinstance(value, dict):
-            self.meta['issues'] = value
-        else:
-            self.meta['issues'] = {item: None for item in value}
-
     #: The ID of the organization. We store this in addition to the
     #: organization name to allow changing organization names.
     organization_id = meta_property('organization_id')
@@ -115,7 +94,7 @@ class GazetteNotice(OfficialNotice):
         issues = [principal.issue(issue) for issue in issues]
         issues = sorted([issue.issue_date for issue in issues if issue])
         if issues:
-            self.issue_date = standardize_date(
+            self.first_issue = standardize_date(
                 as_datetime(issues[0]), 'Europe/Zurich'
             )
 

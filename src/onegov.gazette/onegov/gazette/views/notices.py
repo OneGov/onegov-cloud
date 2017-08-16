@@ -28,6 +28,8 @@ def create_notice(self, request, form):
     This view is mainly used by the editors.
 
     """
+    self.on_request(request)
+
     layout = Layout(self, request)
     principal = request.app.principal
 
@@ -43,11 +45,9 @@ def create_notice(self, request, form):
         )
         return redirect(request.link(notice))
 
-    if not form.errors and 'source' in request.params:
+    if not form.errors and self.source:
         try:
-            form.apply_model(
-                self.query().filter_by(id=request.params['source']).first()
-            )
+            form.apply_model(self.query().filter_by(id=self.source).first())
         except KeyError:
             pass
 
@@ -73,6 +73,7 @@ def view_notices(self, request):
     is the view used by the publisher.
 
     """
+    self.on_request(request)
 
     layout = Layout(self, request)
 
@@ -134,6 +135,7 @@ def view_notices_statistics(self, request):
     is the view used by the publisher.
 
     """
+    self.on_request(request)
 
     layout = Layout(self, request)
     filters = (
@@ -150,6 +152,8 @@ def view_notices_statistics(self, request):
         'filters': filters,
         'collection': self,
         'title': _("Statistics"),
+        'from_date': self.from_date,
+        'to_date': self.to_date,
         'by_organizations': self.count_by_organization(),
         'by_category': self.count_by_category(),
         'by_groups': self.count_by_group(),
@@ -163,6 +167,7 @@ def view_notices_statistics(self, request):
 )
 def view_notices_statistics_organizations(self, request):
     """ View the organizations statistics data as CSV. """
+    self.on_request(request)
 
     response = Response()
     response.content_type = 'text/csv'
@@ -186,6 +191,7 @@ def view_notices_statistics_organizations(self, request):
 )
 def view_notices_statistics_categories(self, request):
     """ View the categories statistics data as CSV. """
+    self.on_request(request)
 
     response = Response()
     response.content_type = 'text/csv'
@@ -209,6 +215,7 @@ def view_notices_statistics_categories(self, request):
 )
 def view_notices_statistics_groups(self, request):
     """ View the groups statistics data as CSV. """
+    self.on_request(request)
 
     response = Response()
     response.content_type = 'text/csv'
@@ -239,6 +246,7 @@ def view_notices_update(self, request, form):
     for example.
 
     """
+    self.on_request(request)
 
     layout = Layout(self, request)
     principal = request.app.principal
