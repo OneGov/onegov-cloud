@@ -210,7 +210,7 @@ def handle_new_user(self, request, form):
         if form.data.get('yubikey'):
             second_factor = {
                 'type': 'yubikey',
-                'data': form.data['yubikey']
+                'data': form.data['yubikey'][:12]
             }
         else:
             second_factor = None
