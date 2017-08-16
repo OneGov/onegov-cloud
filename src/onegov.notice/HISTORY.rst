@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds an 'accepted' state.
+  [msom]
+
 0.0.6 (2017-08-15)
 ~~~~~~~~~~~~~~~~~~~
 

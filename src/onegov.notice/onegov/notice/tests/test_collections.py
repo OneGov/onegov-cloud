@@ -278,6 +278,6 @@ def test_notice_collection_pagination(session):
     assert published.subset_count == 12
     assert len(published.next.batch) == 12 - published.batch_size
 
-    published.term = 'A'
-    assert published.subset_count == 12
-    assert len(published.next.batch) == 0
+    rejected = notices.for_state('rejected')
+    assert rejected.subset_count == 12
+    assert len(rejected.next.batch) == 12 - rejected.batch_size
