@@ -128,15 +128,17 @@ def test_notice_collection_count_by_organization(session):
                 user_id=None,
                 principal=principal
             )
+    # for x in collection.query(): x.organization, x.issues
+
     assert collection.count_by_organization() == [
-        ('A', 2), ('B', 4), ('C', 10),
+        ('A', 1), ('B', 6), ('C', 45),
     ]
 
     assert collection.count_by_organization() == \
         collection.for_state('drafted').count_by_organization()
 
     collection.issues = ['2017-1', '2017-4']
-    assert collection.count_by_organization() == [('B', 2), ('C', 8)]
+    assert collection.count_by_organization() == [('B', 2), ('C', 13)]
 
 
 def test_notice_collection_count_by_category(session):
@@ -155,13 +157,13 @@ def test_notice_collection_count_by_category(session):
                 user_id=None,
                 principal=principal
             )
-    assert collection.count_by_category() == [('A', 2), ('B', 4), ('C', 1)]
+    assert collection.count_by_category() == [('A', 1), ('B', 6)]
 
     assert collection.count_by_category() == \
         collection.for_state('drafted').count_by_category()
 
-    collection.issues = ['2017-1', '2017-4']
-    assert collection.count_by_category() == [('B', 2)]
+    collection.issues = ['2017-0', '2017-2']
+    assert collection.count_by_category() == [('A', 1), ('B', 4)]
 
 
 def test_notice_collection_count_by_user(session, principal):
@@ -193,18 +195,17 @@ def test_notice_collection_count_by_user(session, principal):
                 principal=principal
             )
     assert sorted(collection.count_by_user()) == sorted([
-        (users['a@example.org'], 2),
-        (users['b@example.org'], 4),
-        (users['c@example.org'], 1),
-        (users['d@example.org'], 1),
+        (users['a@example.org'], 1),
+        (users['b@example.org'], 6),
     ])
 
     assert collection.count_by_user() == \
         collection.for_state('drafted').count_by_user()
 
-    collection.issues = ['2017-1', '2017-4']
+    collection.issues = ['2017-0', '2017-2']
     assert sorted(collection.count_by_user()) == sorted([
-        (users['b@example.org'], 2),
+        (users['a@example.org'], 1),
+        (users['b@example.org'], 4),
     ])
 
 
@@ -251,18 +252,14 @@ def test_notice_collection_count_by_group(session, principal):
                 user_id=users[user],
                 principal=principal
             )
-
     assert collection.count_by_group() == [
-        ['', 19], ['A', 6], ['B', 2], ['C', 0]
+        ['', 40], ['A', 7], ['B', 1], ['C', 0]
     ]
-
-    assert sum(x[1] for x in collection.count_by_group()) == \
-        collection.query().count()
 
     assert collection.count_by_group() == \
         collection.for_state('drafted').count_by_group()
 
     collection.issues = ['2017-2', '2017-4']
     assert collection.count_by_group() == [
-        ['', 7], ['A', 1], ['B', 0], ['C', 0]
+        ['', 10], ['A', 1], ['B', 0], ['C', 0]
     ]

@@ -1,4 +1,5 @@
 from onegov.chat import MessageCollection
+from onegov.core.utils import groupbylist
 from onegov.gazette import _
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import UserGroup
@@ -108,16 +109,27 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         """
         result = self.session.query(
             GazetteNotice.organization,
-            func.count(GazetteNotice.organization)
+            GazetteNotice._issues.keys()
         )
-        result = result.group_by(GazetteNotice.organization)
-        result = result.filter(GazetteNotice.organization.isnot(None))
+        result = result.filter(
+            GazetteNotice.organization.isnot(None),
+            func.array_length(GazetteNotice._issues.keys(), 1) != 0
+        )
         if self.state:
             result = result.filter(GazetteNotice.state == self.state)
         if self.issues:
             result = result.filter(GazetteNotice._issues.has_any(self.issues))
         result = result.order_by(GazetteNotice.organization)
-        return result.all()
+
+        issues = set(self.issues or [])
+        operation = issues.intersection if issues else issues.union
+        return [
+            (
+                group[0],
+                sum([len(operation(set(x[1]))) for x in group[1]])
+            )
+            for group in groupbylist(result, lambda a: a[0])
+        ]
 
     def count_by_category(self):
         """ Returns the total number of notices by categories.
@@ -128,16 +140,27 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         """
         result = self.session.query(
             GazetteNotice.category,
-            func.count(GazetteNotice.category)
+            GazetteNotice._issues.keys()
         )
-        result = result.group_by(GazetteNotice.category)
-        result = result.filter(GazetteNotice.category.isnot(None))
+        result = result.filter(
+            GazetteNotice.category.isnot(None),
+            func.array_length(GazetteNotice._issues.keys(), 1) != 0
+        )
         if self.state:
             result = result.filter(GazetteNotice.state == self.state)
         if self.issues:
             result = result.filter(GazetteNotice._issues.has_any(self.issues))
         result = result.order_by(GazetteNotice.category)
-        return result.all()
+
+        issues = set(self.issues or [])
+        operation = issues.intersection if issues else issues.union
+        return [
+            (
+                group[0],
+                sum([len(operation(set(x[1]))) for x in group[1]])
+            )
+            for group in groupbylist(result, lambda a: a[0])
+        ]
 
     def count_by_user(self):
         """ Returns the total number of notices by users.
@@ -148,14 +171,27 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         """
         result = self.session.query(
             func.cast(GazetteNotice.user_id, String),
-            func.count(GazetteNotice.user_id)
+            GazetteNotice._issues.keys()
+        )
+        result = result.filter(
+            GazetteNotice.user_id.isnot(None),
+            func.array_length(GazetteNotice._issues.keys(), 1) != 0
         )
         if self.state:
             result = result.filter(GazetteNotice.state == self.state)
         if self.issues:
             result = result.filter(GazetteNotice._issues.has_any(self.issues))
-        result = result.group_by(GazetteNotice.user_id)
-        return result.all()
+        result = result.order_by(GazetteNotice.user_id)
+
+        issues = set(self.issues or [])
+        operation = issues.intersection if issues else issues.union
+        return [
+            (
+                group[0],
+                sum([len(operation(set(x[1]))) for x in group[1]])
+            )
+            for group in groupbylist(result, lambda a: a[0])
+        ]
 
     def count_by_group(self):
         """ Returns the total number of notices by groups.
