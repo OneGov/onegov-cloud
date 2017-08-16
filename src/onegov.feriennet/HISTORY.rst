@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.2.5 (2017-08-16)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes footer urls.
   [href]
