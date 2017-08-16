@@ -39,6 +39,7 @@ import memcache
 
 from dogpile.cache import make_region, register_backend
 from dogpile.cache.backends.memcached import MemcachedBackend as BaseBackend
+from dogpile.cache.backends.memory import MemoryBackend as BaseMemoryBackend
 from dogpile.cache.api import NO_VALUE
 from dogpile.cache.proxy import ProxyBackend
 from hashlib import sha1
@@ -86,6 +87,40 @@ class DillPickler(object):
 
     def load(self):
         return dill.load(self.file)
+
+
+class MemoryBackend(BaseMemoryBackend):
+    """ A custom memory backend that uses dill to pickle values into a
+    dictionary. This has the added benefit of using the same codepath as the
+    memcached based backend, without actually requiring a memcached server.
+
+    """
+
+    def get(self, key):
+        value = self._cache.get(key, NO_VALUE)
+        return value if value is NO_VALUE else dill.loads(value)
+
+    def get_multi(self, keys):
+        ret = (self._cache.get(key, NO_VALUE) for key in keys)
+        return [
+            value if value is NO_VALUE else dill.loads(value)
+            for value in ret
+        ]
+
+    def set(self, key, value):
+        self._cache[key] = dill.dumps(value)
+
+    def set_multi(self, mapping):
+        for key, value in mapping.items():
+            value = dill.dumps(value)
+            self._cache[key] = value
+
+
+register_backend(
+    'onegov.core.memory',
+    'onegov.core.cache',
+    'MemoryBackend'
+)
 
 
 def prefix_key_mangler(prefix):

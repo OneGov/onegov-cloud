@@ -1,5 +1,13 @@
 Changelog
 ---------
+
+- Forces the memory cache backend to use Dill to force the same codepath for
+  memcached/memcached-less data (now everything is always pickled).
+
+  This lets us catch pickling bugs during testing that we might otherwise
+  miss.
+  [href]
+
 0.44.0 (2017-08-10)
 ~~~~~~~~~~~~~~~~~~~
 

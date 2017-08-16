@@ -1292,6 +1292,9 @@ def test_orm_cache(postgres_dsn):
 
             return q.first()
 
+    # get dill to pickle the following inline class
+    global Document
+
     class Document(Base):
         __tablename__ = 'documents'
 
@@ -1388,6 +1391,9 @@ def test_orm_cache_flush(postgres_dsn):
         def bar(self):
             return self.session().query(Document)\
                 .with_entities(Document.title).one()
+
+    # get dill to pickle the following inline class
+    global Document
 
     class Document(Base):
         __tablename__ = 'documents'

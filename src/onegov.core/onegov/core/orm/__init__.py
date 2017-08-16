@@ -27,10 +27,13 @@ class ModelBase(object):
         models.
 
         """
-        if 'session_manager' in self.__dict__:
-            del self.__dict__['session_manager']
+        state = self.__dict__.copy()
 
-        return self.__dict__.copy()
+        for key in ('session_manager', ):
+            if key in state:
+                del state[key]
+
+        return state
 
     def __setstate__(self, state):
         self.__dict__ = state

@@ -333,7 +333,7 @@ class Framework(TransactionApp, WebassetsApp, OrmCacheApp, ServerApplication):
         self._caches = pylru.lrucache(self.cache_connections, on_cache_ejected)
 
         if cfg.get('disable_memcached', False):
-            self.cache_backend = 'dogpile.cache.memory'
+            self.cache_backend = 'onegov.core.memory'
             self.cache_backend_arguments = {}
         else:
             self.cache_backend = 'onegov.core.memcached'
