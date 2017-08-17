@@ -4,6 +4,9 @@ Changelog
 - Adds user groups.
   [msom]
 
+- Enables polymorphic subclasses on users.
+  [msom]
+
 0.14.1 (2017-07-12)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -41,3 +41,39 @@ def test_user_group(session):
     assert group.users.one() == user
     assert user.group == group
     assert user.group_id == group.id
+
+
+def test_polymorphism_user(session):
+
+    class MyUser(User):
+        __mapper_args__ = {'polymorphic_identity': 'my'}
+
+    class MyOtherUser(User):
+        __mapper_args__ = {'polymorphic_identity': 'other'}
+
+    session.add(User(username='default', password='pwd', role='editor'))
+    session.add(MyUser(username='my', password='pwd', role='editor'))
+    session.add(MyOtherUser(username='other', password='pwd', role='editor'))
+    session.flush()
+
+    assert session.query(User).count() == 3
+    assert session.query(MyUser).one().username == 'my'
+    assert session.query(MyOtherUser).one().username == 'other'
+
+
+def test_polymorphism_group(session):
+
+    class MyGroup(UserGroup):
+        __mapper_args__ = {'polymorphic_identity': 'my'}
+
+    class MyOtherGroup(UserGroup):
+        __mapper_args__ = {'polymorphic_identity': 'other'}
+
+    session.add(UserGroup(name='original'))
+    session.add(MyGroup(name='my'))
+    session.add(MyOtherGroup(name='other'))
+    session.flush()
+
+    assert session.query(UserGroup).count() == 3
+    assert session.query(MyGroup).one().name == 'my'
+    assert session.query(MyOtherGroup).one().name == 'other'

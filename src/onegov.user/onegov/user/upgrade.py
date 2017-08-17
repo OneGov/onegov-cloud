@@ -190,4 +190,11 @@ def add_group_id_column(context):
             Column('group_id', UUID, nullable=True)
         )
 
-# add user.type
+
+@upgrade_task('Add type column')
+def add_type_column(context):
+    if not context.has_column('users', 'type'):
+        context.operations.add_column(
+            'users',
+            Column('type', Text, nullable=True)
+        )
