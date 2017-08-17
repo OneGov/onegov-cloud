@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.15.5 (2017-08-17)
+~~~~~~~~~~~~~~~~~~~
 
 - Uses latest onegov.user.
   [msom]
