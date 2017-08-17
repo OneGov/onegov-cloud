@@ -2,8 +2,7 @@ from collections import OrderedDict
 from datetime import datetime, timedelta
 from itertools import groupby
 from onegov.core.templates import render_template
-from onegov.form import FormSubmission
-from onegov.form.parser.core import parse_form
+from onegov.form import FormSubmission, parse_form
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.models import ResourceRecipient, ResourceRecipientCollection
