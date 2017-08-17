@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds missing constructor argument.
+  [msom]
+
 0.0.8 (2017-08-16)
 ~~~~~~~~~~~~~~~~~~~
 

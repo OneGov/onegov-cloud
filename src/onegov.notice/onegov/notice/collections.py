@@ -18,13 +18,14 @@ class OfficialNoticeCollectionPagination(Pagination):
         term=None,
         order=None,
         direction=None,
-        issues=None
+        issues=None,
+        user_ids=None
     ):
         self.session = session
         self.page = page
         self.state = state
         self.term = term
-        self.user_ids = []
+        self.user_ids = user_ids or []
         self.order = order or 'title'
         self.direction = direction or 'asc'
         self.issues = issues
