@@ -25,10 +25,14 @@ from onegov.form.models import (
     PendingFormSubmission,
     CompleteFormSubmission
 )
-from onegov.form.parser.core import parse_form
+from onegov.form.parser import flatten_fieldsets
+from onegov.form.parser import parse_form
+from onegov.form.parser import parse_formcode
+from onegov.form.parser import WTFormsClassBuilder
 
 __all__ = [
     'CompleteFormSubmission',
+    'flatten_fieldsets',
     'FieldDependency',
     'Form',
     'FormCollection',
@@ -40,7 +44,9 @@ __all__ = [
     'merge_forms',
     'move_fields',
     'parse_form',
+    'parse_formcode',
     'PendingFormSubmission',
     'render_field',
     'with_options',
+    'WTFormsClassBuilder',
 ]

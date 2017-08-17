@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds an intermediate representation of parsed formcode.
+  [href]
+
 0.18.0 (2017-07-11)
 ~~~~~~~~~~~~~~~~~~~
 

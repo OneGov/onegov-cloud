@@ -266,83 +266,56 @@ As in any other form, dependencies are taken into account.
 import pyparsing as pp
 import yaml
 
-from html import escape
 from onegov.core.utils import Bunch
-from onegov.form.core import (
-    FieldDependency,
-    Form,
-    with_options
-)
 from onegov.form import errors
-from onegov.form.fields import MultiCheckboxField, UploadField
-from onegov.form.parser.grammar import (
-    checkbox,
-    date,
-    datetime,
-    email,
-    field_identifier,
-    fieldset_title,
-    fileinput,
-    password,
-    radio,
-    stdnum,
-    textarea,
-    textfield,
-    time,
-)
-from onegov.form.utils import label_to_field_id
-from onegov.form.validators import (
-    Stdnum, ExpectedExtensions, FileSizeLimit, WhitelistedMimeType
-)
-from wtforms import (
-    PasswordField,
-    RadioField,
-    StringField,
-    TextAreaField
-)
-from wtforms.fields.html5 import DateField, DateTimeLocalField, EmailField
-from wtforms.validators import DataRequired, Length, Optional
-from wtforms.widgets import TextArea
-from wtforms_components import Email, If, TimeField
+from onegov.form.parser.grammar import checkbox
+from onegov.form.parser.grammar import date
+from onegov.form.parser.grammar import datetime
+from onegov.form.parser.grammar import email
+from onegov.form.parser.grammar import field_identifier
+from onegov.form.parser.grammar import fieldset_title
+from onegov.form.parser.grammar import fileinput
+from onegov.form.parser.grammar import password
+from onegov.form.parser.grammar import radio
+from onegov.form.parser.grammar import stdnum
+from onegov.form.parser.grammar import textarea
+from onegov.form.parser.grammar import textfield
+from onegov.form.parser.grammar import time
 
 
 # cache the parser elements
-elements = Bunch()
-elements.identifier = field_identifier()
-elements.fieldset_title = fieldset_title()
-elements.textfield = textfield()
-elements.textarea = textarea()
-elements.password = password()
-elements.email = email()
-elements.stdnum = stdnum()
-elements.datetime = datetime()
-elements.date = date()
-elements.time = time()
-elements.fileinput = fileinput()
-elements.radio = radio()
-elements.checkbox = checkbox()
-elements.boxes = elements.checkbox | elements.radio
-elements.single_line_fields = elements.identifier + pp.MatchFirst([
-    elements.textfield,
-    elements.textarea,
-    elements.password,
-    elements.email,
-    elements.stdnum,
-    elements.datetime,
-    elements.date,
-    elements.time,
-    elements.fileinput
-])
+def create_parser_elements():
+    elements = Bunch()
+    elements.identifier = field_identifier()
+    elements.fieldset_title = fieldset_title()
+    elements.textfield = textfield()
+    elements.textarea = textarea()
+    elements.password = password()
+    elements.email = email()
+    elements.stdnum = stdnum()
+    elements.datetime = datetime()
+    elements.date = date()
+    elements.time = time()
+    elements.fileinput = fileinput()
+    elements.radio = radio()
+    elements.checkbox = checkbox()
+    elements.boxes = elements.checkbox | elements.radio
+    elements.single_line_fields = elements.identifier + pp.MatchFirst([
+        elements.textfield,
+        elements.textarea,
+        elements.password,
+        elements.email,
+        elements.stdnum,
+        elements.datetime,
+        elements.date,
+        elements.time,
+        elements.fileinput
+    ])
+
+    return elements
 
 
-# increasing the default filesize is *strongly discouarged*, as we are not
-# storing those files in the database, so they need to fit in memory
-#
-# if this value must be higher, we need to store the files outside the
-# database
-#
-MEGABYTE = 1000 ** 2
-DEFAULT_UPLOAD_LIMIT = 5 * MEGABYTE
+ELEMENTS = create_parser_elements()
 
 
 class CustomLoader(yaml.SafeLoader):
@@ -362,101 +335,250 @@ class constructor(object):
 
 @constructor('!text')
 def construct_textfield(loader, node):
-    return elements.textfield.parseString(node.value)
+    return ELEMENTS.textfield.parseString(node.value)
 
 
 @constructor('!textarea')
 def construct_textarea(loader, node):
-    return elements.textarea.parseString(node.value)
+    return ELEMENTS.textarea.parseString(node.value)
 
 
 @constructor('!email')
 def construct_email(loader, node):
-    return elements.email.parseString(node.value)
+    return ELEMENTS.email.parseString(node.value)
 
 
 @constructor('!stdnum')
 def construct_stdnum(loader, node):
-    return elements.stdnum.parseString(node.value)
+    return ELEMENTS.stdnum.parseString(node.value)
 
 
 @constructor('!date')
 def construct_date(loader, node):
-    return elements.date.parseString(node.value)
+    return ELEMENTS.date.parseString(node.value)
 
 
 @constructor('!datetime')
 def construct_datetime(loader, node):
-    return elements.datetime.parseString(node.value)
+    return ELEMENTS.datetime.parseString(node.value)
 
 
 @constructor('!time')
 def construct_time(loader, node):
-    return elements.time.parseString(node.value)
+    return ELEMENTS.time.parseString(node.value)
 
 
 @constructor('!radio')
 def construct_radio(loader, node):
-    return elements.radio.parseString(node.value)
+    return ELEMENTS.radio.parseString(node.value)
 
 
 @constructor('!checkbox')
 def construct_checkbox(loader, node):
-    return elements.checkbox.parseString(node.value)
+    return ELEMENTS.checkbox.parseString(node.value)
 
 
 @constructor('!fileinput')
 def construct_fileinput(loader, node):
-    return elements.fileinput.parseString(node.value)
+    return ELEMENTS.fileinput.parseString(node.value)
 
 
 @constructor('!password')
 def construct_password(loader, node):
-    return elements.password.parseString(node.value)
+    return ELEMENTS.password.parseString(node.value)
 
 
-def parse_form(text, base_class=Form):
-    """ Takes the given form text, parses it and returns a WTForms form
-    class (not an instance of it).
+def flatten_fieldsets(fieldsets):
+    for fieldset in fieldsets:
+        yield from flatten_fields(fieldset.fields)
+
+
+def flatten_fields(fields):
+    fields = fields or []
+
+    for field in fields:
+        yield field
+
+        if hasattr(field, 'fields'):
+            yield from flatten_fields(field.fields)
+
+        if hasattr(field, 'choices'):
+            for choice in field.choices:
+                yield from flatten_fields(choice.fields)
+
+
+class Fieldset(object):
+    """ Represents a parsed fieldset. """
+
+    def __init__(self, label, fields=None):
+        self.label = label
+        self.fields = fields or []
+
+
+class Choice(object):
+    """ Represents a parsed choice.
+
+    Note: Choices may have child-fields which are meant to be shown to the
+    user if the given choice was selected.
 
     """
+    def __init__(self, key, label, selected=False, fields=None):
+        self.key = key
+        self.label = label
+        self.selected = selected
+        self.fields = fields
 
-    builder = WTFormsClassBuilder(base_class)
-    parsed = yaml.load('\n'.join(translate_to_yaml(text)), CustomLoader)
+
+class Field(object):
+    """ Represents a parsed field. """
+
+    def __init__(self, label, required, **kwargs):
+        self.label = label
+        self.required = required
+
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    @classmethod
+    def create(cls, field, identifier):
+        return cls(
+            label=identifier.label,
+            required=identifier.required
+        )
+
+
+class PasswordField(Field):
+    type = 'password'
+
+
+class EmailField(Field):
+    type = 'email'
+
+
+class DateField(Field):
+    type = 'date'
+
+
+class DatetimeField(Field):
+    type = 'datetime'
+
+
+class TimeField(Field):
+    type = 'time'
+
+
+class TextField(Field):
+    type = 'text'
+
+    @classmethod
+    def create(cls, field, identifier):
+        return cls(
+            label=identifier.label,
+            required=identifier.required,
+            maxlength=field.length or None
+        )
+
+
+class TextAreaField(Field):
+    type = 'textarea'
+
+    @classmethod
+    def create(cls, field, identifier):
+        return cls(
+            label=identifier.label,
+            required=identifier.required,
+            rows=field.rows or None
+        )
+
+
+class StdnumField(Field):
+    type = 'stdnum'
+
+    @classmethod
+    def create(cls, field, identifier):
+        return cls(
+            label=identifier.label,
+            required=identifier.required,
+            format=field.format
+        )
+
+
+class FileinputField(Field):
+    type = 'fileinput'
+
+    @classmethod
+    def create(cls, field, identifier):
+        return cls(
+            label=identifier.label,
+            required=identifier.required,
+            extensions=field.extensions
+        )
+
+
+class OptionsField(object):
+
+    @classmethod
+    def create(cls, field, identifier):
+        choices = [
+            Choice(
+                key=c.label,
+                label=c.label + format_pricing(c.pricing),
+                selected=c.checked
+            )
+            for c in field.choices
+        ]
+
+        pricing = {c.label: c.pricing for c in field.choices if c.pricing}
+
+        return cls(
+            label=identifier.label,
+            required=identifier.required,
+            choices=choices,
+            pricing=pricing or None
+        )
+
+
+class RadioField(OptionsField, Field):
+    type = 'radio'
+
+
+class CheckboxField(OptionsField, Field):
+    type = 'checkbox'
+
+
+def parse_formcode(formcode):
+    """ Takes the given formcode and returns an intermediate representation
+    that can be used to generate forms or do other things.
+
+    """
+    parsed = yaml.load('\n'.join(translate_to_yaml(formcode)), CustomLoader)
+
+    fieldsets = []
+    field_classes = {cls.type: cls for cls in Field.__subclasses__()}
 
     for fieldset in parsed:
 
         # fieldsets occur only at the top level
-        fieldset_name = next(k for k in fieldset.keys())
+        fieldset_label = next(k for k in fieldset.keys())
 
-        if fieldset_name != '...':
-            builder.set_current_fieldset(fieldset_name)
-        else:
-            builder.set_current_fieldset(None)
+        fields = [
+            parse_field_block(block, field_classes)
+            for block in fieldset[fieldset_label]
+        ]
 
-        for block in fieldset[fieldset_name]:
-            handle_block(builder, block)
+        fieldset_label = fieldset_label if fieldset_label != '...' else None
+        fieldsets.append(Fieldset(fieldset_label, fields))
 
-    form_class = builder.form_class
-    form_class._source = text
-
-    return form_class
+    return fieldsets
 
 
-def format_pricing(pricing):
-    if not pricing:
-        return ''
+def parse_field_block(field_block, field_classes):
+    """ Takes the given parsed field block and yields the fields from it """
 
-    return ' ({:.2f} {})'.format(pricing[0], pricing[1])
-
-
-def handle_block(builder, block, dependency=None):
-    """ Takes the given parsed yaml block and adds it to the from builder. """
-
-    key, field = next(i for i in block.items())
+    key, field = next(i for i in field_block.items())
 
     identifier_src = key.rstrip('= ') + '='
-    identifier = elements.identifier.parseString(identifier_src)
+    identifier = ELEMENTS.identifier.parseString(identifier_src)
 
     # add the nested options/dependencies in case of radio/checkbox buttons
     if isinstance(field, list):
@@ -470,139 +592,31 @@ def handle_block(builder, block, dependency=None):
         field = Bunch(choices=choices, type=choices[0].type)
 
         # make sure only one type is found (either radio or checkbox)
-        types = set(f.type for f in field.choices)
+        types = {f.type for f in field.choices}
         assert types <= {'radio', 'checkbox'}
         assert len(types) == 1
 
-    if field.type == 'text':
-        if field.length:
-            validators = [Length(max=field.length)]
-        else:
-            validators = []
-
-        field_id = builder.add_field(
-            field_class=StringField,
-            label=identifier.label,
-            dependency=dependency,
-            required=identifier.required,
-            validators=validators,
-        )
-    elif field.type == 'textarea':
-        field_id = builder.add_field(
-            field_class=TextAreaField,
-            label=identifier.label,
-            dependency=dependency,
-            required=identifier.required,
-            widget=with_options(TextArea, rows=field.rows or None)
-        )
-    elif field.type == 'password':
-        field_id = builder.add_field(
-            field_class=PasswordField,
-            label=identifier.label,
-            dependency=dependency,
-            required=identifier.required
-        )
-    elif field.type == 'email':
-        field_id = builder.add_field(
-            field_class=EmailField,
-            label=identifier.label,
-            dependency=dependency,
-            required=identifier.required,
-            validators=[Email()]
-        )
-    elif field.type == 'stdnum':
-        field_id = builder.add_field(
-            field_class=StringField,
-            label=identifier.label,
-            dependency=dependency,
-            required=identifier.required,
-            validators=[Stdnum(field.format)]
-        )
-    elif field.type == 'date':
-        field_id = builder.add_field(
-            field_class=DateField,
-            label=identifier.label,
-            dependency=dependency,
-            required=identifier.required,
-        )
-    elif field.type == 'datetime':
-        field_id = builder.add_field(
-            field_class=DateTimeLocalField,
-            label=identifier.label,
-            dependency=dependency,
-            required=identifier.required,
-        )
-    elif field.type == 'time':
-        field_id = builder.add_field(
-            field_class=TimeField,
-            label=identifier.label,
-            dependency=dependency,
-            required=identifier.required
-        )
-    elif field.type == 'fileinput':
-        field_id = builder.add_field(
-            field_class=UploadField,
-            label=identifier.label,
-            dependency=dependency,
-            required=identifier.required,
-            validators=[
-                WhitelistedMimeType(),
-                ExpectedExtensions(field.extensions),
-                FileSizeLimit(DEFAULT_UPLOAD_LIMIT)
-            ]
-        )
-    elif field.type == 'radio':
-        choices = [
-            (c.label, c.label + format_pricing(c.pricing))
-            for c in field.choices
-        ]
-        checked = [c.label for c in field.choices if c.checked]
-        default = checked and checked[0] or None
-
-        pricing = {c.label: c.pricing for c in field.choices if c.pricing}
-
-        field_id = builder.add_field(
-            field_class=RadioField,
-            label=identifier.label,
-            dependency=dependency,
-            required=identifier.required,
-            choices=choices,
-            default=default,
-            pricing=pricing or None
-        )
-    elif field.type == 'checkbox':
-        choices = [
-            (c.label, c.label + format_pricing(c.pricing))
-            for c in field.choices
-        ]
-        default = [c.label for c in field.choices if c.checked]
-
-        pricing = {c.label: c.pricing for c in field.choices if c.pricing}
-
-        field_id = builder.add_field(
-            field_class=MultiCheckboxField,
-            label=identifier.label,
-            dependency=dependency,
-            required=identifier.required,
-            choices=choices,
-            default=default,
-            pricing=pricing or None
-        )
-    else:
-        raise NotImplementedError
+    result = field_classes[field.type].create(field, identifier)
 
     # go through nested blocks and recursively add them
     if field.type in {'radio', 'checkbox'}:
-        for choice in field.choices:
+        for ix, choice in enumerate(field.choices):
             if not choice.dependencies:
                 continue
 
-            dependency = FieldDependency(field_id, choice.label)
+            result.choices[ix].fields = [
+                parse_field_block(child, field_classes)
+                for child in choice.dependencies
+            ]
 
-            for child in choice.dependencies:
-                handle_block(builder, child, dependency)
+    return result
 
-    return field_id
+
+def format_pricing(pricing):
+    if not pricing:
+        return ''
+
+    return ' ({:.2f} {})'.format(pricing[0], pricing[1])
 
 
 def match(expr, text):
@@ -651,7 +665,7 @@ def ensure_a_fieldset(lines):
             yield ix, line
             continue
 
-        if match(elements.fieldset_title, line):
+        if match(ELEMENTS.fieldset_title, line):
             found_fieldset = True
             yield ix, line
         else:
@@ -675,13 +689,13 @@ def translate_to_yaml(text):
         indent = ' ' * (4 + (len(line) - len(line.lstrip())))
 
         # the top level are the fieldsets
-        if match(elements.fieldset_title, line):
+        if match(ELEMENTS.fieldset_title, line):
             yield '- "{}":'.format(line.lstrip('# ').rstrip())
             expect_nested = False
             continue
 
         # fields are nested lists of dictionaries
-        parse_result = try_parse(elements.single_line_fields, line)
+        parse_result = try_parse(ELEMENTS.single_line_fields, line)
         if parse_result is not None:
             yield '{indent}- "{identifier}": !{type} "{definition}"'.format(
                 indent=indent,
@@ -694,7 +708,7 @@ def translate_to_yaml(text):
             continue
 
         # checkboxes/radios come without identifier
-        parse_result = try_parse(elements.boxes, line)
+        parse_result = try_parse(ELEMENTS.boxes, line)
         if parse_result is not None:
 
             if not expect_nested:
@@ -708,7 +722,7 @@ def translate_to_yaml(text):
             continue
 
         # identifiers which are alone contain nested checkboxes/radios
-        if match(elements.identifier, line):
+        if match(ELEMENTS.identifier, line):
 
             # this should have been matched by the single line field above
             if not line.endswith('='):
@@ -727,105 +741,3 @@ def translate_to_yaml(text):
 
     if not actual_fields:
         raise errors.InvalidFormSyntax(line=ix + 1)
-
-
-class WTFormsClassBuilder(object):
-    """ Helps dynamically build a wtforms class from parsed blocks.
-
-    For example::
-
-        builder = WTFormsClassBuilder(BaseClass)
-        builder.add_field(StringField, label='Name', required=True)
-
-        MyForm = builder.form_class
-    """
-
-    def __init__(self, base_class):
-
-        class DynamicForm(base_class):
-            pass
-
-        self.form_class = DynamicForm
-        self.current_fieldset = None
-
-    def set_current_fieldset(self, label):
-        self.current_fieldset = label
-
-    def validators_extend(self, validators, required, dependency):
-        if required:
-            if dependency is None:
-                self.validators_add_required(validators)
-            else:
-                self.validators_add_dependency(validators, dependency)
-        else:
-            self.validators_add_optional(validators)
-
-    def validators_add_required(self, validators):
-        # we use the DataRequired check instead of InputRequired, since
-        # InputRequired only works if the data comes over the wire. We
-        # also want to load forms with data from the database, where
-        # InputRequired will fail, but DataRequired will not.
-        #
-        # As a consequence, falsey values can't be submitted for now.
-        validators.insert(0, DataRequired())
-
-    def validators_add_dependency(self, validators, dependency):
-        # set the requried flag, even if it's not always required
-        # as it's better to show it too often, than not often enough
-        validator = If(dependency.fulfilled, DataRequired())
-        validator.field_flags = ('required', )
-        validators.insert(0, validator)
-
-    def validators_add_optional(self, validators):
-        validators.insert(0, Optional())
-
-    def mark_as_dependent(self, field_id, dependency):
-        field = getattr(self.form_class, field_id)
-        widget = field.kwargs.get('widget', field.field_class.widget)
-
-        field.kwargs['widget'] = with_options(
-            widget, **dependency.html_data
-        )
-
-    def get_unique_field_id(self, label, dependency):
-        # try to find a smart field_id that contains the dependency or the
-        # current fieldset name - if all fails, an error will be thrown,
-        # as field_ids *need* to be unique
-        if dependency:
-            field_id = dependency.field_id + '_' + label_to_field_id(label)
-        elif self.current_fieldset:
-            field_id = label_to_field_id(self.current_fieldset + ' ' + label)
-        else:
-            field_id = label_to_field_id(label)
-
-        if hasattr(self.form_class, field_id):
-            raise errors.DuplicateLabelError(label=label)
-
-        return field_id
-
-    def add_field(self, field_class, label, required,
-                  dependency=None, field_id=None, pricing=None, **kwargs):
-        validators = kwargs.pop('validators', [])
-
-        # labels in wtforms are not escaped correctly - for safety we make sure
-        # that the label is properly html escaped. See also:
-        # https://github.com/wtforms/wtforms/issues/315
-        # -> quotes are allowed because the label is rendered between tags,
-        # not as part of the attributes
-        label = escape(label, quote=False)
-        field_id = field_id or self.get_unique_field_id(label, dependency)
-
-        self.validators_extend(validators, required, dependency)
-
-        setattr(self.form_class, field_id, field_class(
-            label=label,
-            validators=validators,
-            fieldset=self.current_fieldset,
-            pricing=pricing,
-            **kwargs
-        ))
-
-        if dependency:
-            self.mark_as_dependent(field_id, dependency)
-
-        return field_id

@@ -2,7 +2,7 @@ import pytest
 
 from decimal import Decimal
 from onegov.form import Form, errors
-from onegov.form.parser import parse_form
+from onegov.form import parse_formcode, parse_form, flatten_fieldsets
 from onegov.pay import Price
 from textwrap import dedent
 from webob.multidict import MultiDict
@@ -443,3 +443,73 @@ def test_invalid_syntax():
             "(x) 9. Klasse",
         )))
     assert e.value.line == 2
+
+
+def test_parse_formcode():
+    fieldsets = parse_formcode("""
+        # General
+        First Name *= ___
+        Last Name = ___[10]
+
+        # Order
+        Products =
+            [ ] Pizza
+                Type =
+                    (x) Default
+                    ( ) Gluten-Free
+            [x] Burger
+    """)
+
+    assert len(fieldsets) == 2
+    assert fieldsets[0].label == 'General'
+
+    assert fieldsets[0].fields[0].type == 'text'
+    assert fieldsets[0].fields[0].required
+    assert fieldsets[0].fields[0].maxlength is None
+
+    assert fieldsets[0].fields[1].type == 'text'
+    assert not fieldsets[0].fields[1].required
+    assert fieldsets[0].fields[1].maxlength == 10
+
+    assert fieldsets[1].label == 'Order'
+    assert fieldsets[1].fields[0].type == 'checkbox'
+
+    assert fieldsets[1].fields[0].choices[0].key == 'Pizza'
+    assert fieldsets[1].fields[0].choices[0].label == 'Pizza'
+    assert not fieldsets[1].fields[0].choices[0].selected
+
+    assert fieldsets[1].fields[0].choices[1].key == 'Burger'
+    assert fieldsets[1].fields[0].choices[1].label == 'Burger'
+    assert fieldsets[1].fields[0].choices[1].selected
+
+    assert fieldsets[1].fields[0].choices[0].fields[0].label == 'Type'
+    assert fieldsets[1].fields[0].choices[0].fields[0].choices[0].selected
+    assert not fieldsets[1].fields[0].choices[0].fields[0].choices[1].selected
+    assert fieldsets[1].fields[0].choices[0].fields[0].choices[0].label \
+        == 'Default'
+    assert fieldsets[1].fields[0].choices[0].fields[0].choices[1].label \
+        == 'Gluten-Free'
+
+
+def test_flatten_fieldsets():
+    fieldsets = parse_formcode("""
+        # General
+        First Name *= ___
+        Last Name *= ___[10]
+
+        # Order
+        Products =
+            [ ] Pizza
+                Type =
+                    (x) Default
+                    ( ) Gluten-Free
+            [x] Burger
+    """)
+
+    fields = list(flatten_fieldsets(fieldsets))
+
+    assert len(fields) == 4
+    assert fields[0].label == 'First Name'
+    assert fields[1].label == 'Last Name'
+    assert fields[2].label == 'Products'
+    assert fields[3].label == 'Type'

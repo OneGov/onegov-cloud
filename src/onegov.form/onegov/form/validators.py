@@ -121,7 +121,7 @@ class ValidFormDefinition(object):
     def __call__(self, form, field):
         if field.data:
             # XXX circular import
-            from onegov.form.parser.core import parse_form
+            from onegov.form import parse_form
 
             try:
                 form = parse_form(field.data)()
