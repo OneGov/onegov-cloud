@@ -1,3 +1,4 @@
+from onegov.user.forms.group import UserGroupForm
 from onegov.user.forms.login import LoginForm
 from onegov.user.forms.registration import RegistrationForm
 from onegov.user.forms.reset_password import PasswordResetForm
@@ -9,5 +10,6 @@ __all__ = [
     'PasswordResetForm',
     'RegistrationForm',
     'RequestPasswordResetForm',
-    'SignupLinkForm'
+    'SignupLinkForm',
+    'UserGroupForm'
 ]

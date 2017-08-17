@@ -5,7 +5,9 @@ from onegov.user.forms import LoginForm
 from onegov.user.forms import PasswordResetForm
 from onegov.user.forms import RegistrationForm
 from onegov.user.forms import RequestPasswordResetForm
+from onegov.user.forms import UserGroupForm
 from onegov.user.models import User
+from onegov.user.models import UserGroup
 
 
 class DummyApp():
@@ -208,3 +210,23 @@ def test_password_reset_form(session):
     }))
     assert form.validate()
     assert not form.update_password(request)
+
+
+def test_user_group_form():
+    # Test apply / update
+    form = UserGroupForm()
+    group = UserGroup(name='Group X')
+
+    form.apply_model(group)
+    assert form.name.data == 'Group X'
+
+    form.name.data = 'Group Y'
+    form.update_model(group)
+    assert group.name == 'Group Y'
+
+    # Test validation
+    form = UserGroupForm()
+    assert not form.validate()
+
+    form = UserGroupForm(DummyPostData({'name': 'Group'}))
+    assert form.validate()
