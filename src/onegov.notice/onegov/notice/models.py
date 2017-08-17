@@ -3,7 +3,7 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.orm.types import UUID
-from onegov.user.model import User
+from onegov.user import User
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
