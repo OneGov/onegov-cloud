@@ -1,6 +1,6 @@
 from json import dumps
 from onegov.user.utils import password_reset_url
-from onegov.user.collection import UserCollection
+from onegov.user.collections import UserCollection
 
 
 class DummyRequest():

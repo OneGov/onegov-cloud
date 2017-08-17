@@ -4,11 +4,12 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID, LowercaseText
 from onegov.core.utils import remove_repeated_spaces
 from onegov.search import ORMSearchable
+from onegov.user.models.group import UserGroup
 from onegov.user.utils import is_valid_yubikey_format
 from onegov.user.utils import yubikey_otp_to_serial
-from sqlalchemy import Boolean, Column, Index, Text, func
+from sqlalchemy import Boolean, Column, Index, Text, func, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import deferred
+from sqlalchemy.orm import backref, deferred, relationship
 from uuid import uuid4
 
 
@@ -51,6 +52,12 @@ class User(Base, TimestampMixin, ORMSearchable):
 
     #: the role is relevant for security in onegov.core
     role = Column(Text, nullable=False)
+
+    #: the group this user belongs to
+    group_id = Column(UUID, ForeignKey(UserGroup.id), nullable=True)
+    group = relationship(
+        UserGroup, backref=backref('users', lazy='dynamic')
+    )
 
     #: the real name of the user for display (use the :attr:`name` property
     #: to automatically get the name or the username)

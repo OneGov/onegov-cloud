@@ -1,11 +1,11 @@
 from json import dumps, loads
 from onegov.user.auth import Auth
-from onegov.user.collection import UserCollection
+from onegov.user.collections import UserCollection
 from onegov.user.forms import LoginForm
 from onegov.user.forms import PasswordResetForm
 from onegov.user.forms import RegistrationForm
 from onegov.user.forms import RequestPasswordResetForm
-from onegov.user.model import User
+from onegov.user.models import User
 
 
 class DummyApp():

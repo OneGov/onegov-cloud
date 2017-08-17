@@ -1,7 +1,8 @@
 import pytest
 
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
-from onegov.user import UserCollection
+from onegov.user.collections import UserCollection
+from onegov.user.collections import UserGroupCollection
 from onegov.user.errors import (
     AlreadyActivatedError,
     ExistingUserError,
@@ -174,3 +175,13 @@ def test_user_lowercase(session):
         users.add('admin@foo.Bar', 'p@ssw0rd', role='admin')
 
     assert e.value.message == 'admin@foo.Bar'
+
+
+def test_user_group(session):
+    groups = UserGroupCollection(session)
+
+    groups.add(name='group y')
+    groups.add(name='group x')
+    assert [group.name for group in groups.query().all()] == [
+        'group x', 'group y'
+    ]

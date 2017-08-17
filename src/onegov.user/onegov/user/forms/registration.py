@@ -1,6 +1,6 @@
 from onegov.form import Form
 from onegov.user import _
-from onegov.user.collection import MIN_PASSWORD_LENGTH
+from onegov.user.collections import MIN_PASSWORD_LENGTH
 from wtforms import StringField, PasswordField, validators
 
 

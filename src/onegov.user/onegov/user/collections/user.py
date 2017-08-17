@@ -1,7 +1,7 @@
 from collections import Iterable
 from onegov.core.crypto import random_token
 from onegov.user import log
-from onegov.user.model import User
+from onegov.user.models import User
 from onegov.user.errors import (
     AlreadyActivatedError,
     ExistingUserError,
@@ -76,7 +76,7 @@ class UserCollection(object):
         return self.__class__(self.session, **toggled)
 
     def query(self):
-        """ Returns a query using :class:`onegov.user.model.User`. With
+        """ Returns a query using :class:`onegov.user.models.User`. With
         the current filters applied.
 
         """

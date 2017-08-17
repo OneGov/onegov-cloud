@@ -4,7 +4,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from collections import defaultdict
 from onegov.core.upgrade import upgrade_task
-from onegov.core.orm.types import JSON
+from onegov.core.orm.types import JSON, UUID
 from onegov.user import User, UserCollection
 from sqlalchemy import Boolean, Column, Text
 from sqlalchemy.sql import text
@@ -180,3 +180,14 @@ def force_lowercase_usernames(context):
 def add_signup_token_column(context):
     context.operations.add_column(
         'users', Column('signup_token', Text, nullable=True))
+
+
+@upgrade_task('Add group_id column')
+def add_group_id_column(context):
+    if not context.has_column('users', 'group_id'):
+        context.operations.add_column(
+            'users',
+            Column('group_id', UUID, nullable=True)
+        )
+
+# add user.type
