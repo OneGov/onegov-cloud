@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Uses lates onegov.user.
+  [msom]
+
 0.8.0 (2017-07-07)
 ~~~~~~~~~~~~~~~~~~~
 

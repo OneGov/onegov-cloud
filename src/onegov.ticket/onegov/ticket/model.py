@@ -5,7 +5,7 @@ from onegov.core.orm.types import UTCDateTime
 from onegov.search import ORMSearchable
 from onegov.ticket import handlers
 from onegov.ticket.errors import InvalidStateChange
-from onegov.user.model import User
+from onegov.user import User
 from sedate import utcnow
 from sqlalchemy import Column, Enum, ForeignKey, Integer, Text
 from sqlalchemy.ext.declarative import declared_attr

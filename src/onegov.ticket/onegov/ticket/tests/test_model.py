@@ -4,7 +4,7 @@ from datetime import timedelta
 from freezegun import freeze_time
 from onegov.ticket import Ticket
 from onegov.ticket.errors import InvalidStateChange
-from onegov.user.model import User
+from onegov.user import User
 from sedate import utcnow
 
 
