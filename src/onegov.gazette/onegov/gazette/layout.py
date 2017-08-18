@@ -8,7 +8,6 @@ from onegov.gazette.models import Issue
 from onegov.gazette.models import Principal
 from onegov.user import Auth
 from onegov.user import UserCollection
-from onegov.user import UserGroup
 from onegov.user import UserGroupCollection
 
 

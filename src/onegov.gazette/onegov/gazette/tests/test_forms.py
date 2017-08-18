@@ -4,9 +4,7 @@ from onegov.gazette.forms import NoticeForm
 from onegov.gazette.forms import UserForm
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import Issue
-from onegov.user import User
 from onegov.user import UserCollection
-from onegov.user import UserGroup
 from onegov.user import UserGroupCollection
 from sedate import standardize_date
 

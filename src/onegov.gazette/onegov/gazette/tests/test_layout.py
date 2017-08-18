@@ -1,7 +1,5 @@
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import Issue
-from onegov.user import User
-from onegov.user import UserGroupCollection
 from pytest import raises
 
 
