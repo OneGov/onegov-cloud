@@ -2,13 +2,13 @@ from onegov.core.converters import extended_date_converter
 from onegov.core.converters import uuid_converter
 from onegov.gazette import GazetteApp
 from onegov.gazette.collections import GazetteNoticeCollection
-from onegov.gazette.collections import UserGroupCollection
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import Principal
-from onegov.gazette.models import UserGroup
 from onegov.user import Auth
 from onegov.user import User
 from onegov.user import UserCollection
+from onegov.user import UserGroup
+from onegov.user import UserGroupCollection
 
 
 @GazetteApp.path(model=Auth, path='/auth')

@@ -2,11 +2,11 @@ from morepath import redirect
 from onegov.core.security import Secret
 from onegov.gazette import _
 from onegov.gazette import GazetteApp
-from onegov.gazette.collections import UserGroupCollection
 from onegov.gazette.forms import EmptyForm
-from onegov.gazette.forms import UserGroupForm
 from onegov.gazette.layout import Layout
-from onegov.gazette.models import UserGroup
+from onegov.user import UserGroup
+from onegov.user import UserGroupCollection
+from onegov.user.forms import UserGroupForm
 
 
 @GazetteApp.html(
@@ -108,7 +108,7 @@ def delete_group(self, request, form):
 
     layout = Layout(self, request)
 
-    if self.number_of_users:
+    if self.users.count():
         return {
             'layout': layout,
             'title': self.name,

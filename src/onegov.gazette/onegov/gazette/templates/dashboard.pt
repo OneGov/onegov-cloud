@@ -33,6 +33,7 @@
                                 <th i18n:translate>Title</th>
                                 <th i18n:translate>Organization</th>
                                 <th i18n:translate>Category</th>
+                                <th i18n:translate>User</th>
                                 <th i18n:translate>Issue(s)</th>
                             </tr>
                         </thead>
@@ -42,6 +43,7 @@
                                     <td><strong><a href="${request.link(notice)}">${notice.title}</a></strong></td>
                                     <td>${notice.organization}</td>
                                     <td>${notice.category}</td>
+                                    <td>${notice.user.realname|None}</td>
                                     <td><tal:block metal:use-macro="layout.macros['issues']" tal:define="as_list False" /></td>
                                 </tr>
                             </tal:block>
@@ -57,6 +59,7 @@
                                 <th i18n:translate>Title</th>
                                 <th i18n:translate>Organization</th>
                                 <th i18n:translate>Category</th>
+                                <th i18n:translate>User</th>
                                 <th i18n:translate>Issue(s)</th>
                             </tr>
                         </thead>
@@ -66,6 +69,7 @@
                                     <td><strong><a href="${request.link(notice)}">${notice.title}</a></strong></td>
                                     <td>${notice.organization}</td>
                                     <td>${notice.category}</td>
+                                    <td>${notice.user.realname|None}</td>
                                     <td><tal:block metal:use-macro="layout.macros['issues']" tal:define="as_list False" /></td>
                                 </tr>
                             </tal:block>
@@ -81,6 +85,7 @@
                                 <th i18n:translate>Title</th>
                                 <th i18n:translate>Organization</th>
                                 <th i18n:translate>Category</th>
+                                <th i18n:translate>User</th>
                                 <th i18n:translate>Issue(s)</th>
                             </tr>
                         </thead>
@@ -90,6 +95,7 @@
                                     <td><strong><a href="${request.link(notice)}">${notice.title}</a></strong></td>
                                     <td>${notice.organization}</td>
                                     <td>${notice.category}</td>
+                                    <td>${notice.user.realname|None}</td>
                                     <td><tal:block metal:use-macro="layout.macros['issues']" tal:define="as_list False" /></td>
                                 </tr>
                             </tal:block>

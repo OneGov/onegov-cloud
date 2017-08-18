@@ -33,7 +33,7 @@
                             <td i18n:translate>No groups.</td>
                         </tr>
                         <tal:block tal:repeat="group groups">
-                            <tr tal:define="number_of_users group.number_of_users">
+                            <tr tal:define="number_of_users group.users.count()">
                                 <td>${group.name}</td>
                                 <td>${number_of_users}</td>
                                 <td class="right-aligned">

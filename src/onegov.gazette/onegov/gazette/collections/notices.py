@@ -2,9 +2,9 @@ from onegov.chat import MessageCollection
 from onegov.core.utils import groupbylist
 from onegov.gazette import _
 from onegov.gazette.models import GazetteNotice
-from onegov.gazette.models import UserGroup
 from onegov.notice import OfficialNoticeCollection
 from onegov.user import User
+from onegov.user import UserGroup
 from sqlalchemy import func
 from sqlalchemy import String
 from uuid import uuid4
@@ -35,6 +35,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         order=None,
         direction=None,
         issues=None,
+        user_ids=None,
         from_date=None,
         to_date=None,
         source=None
@@ -46,7 +47,8 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
             term=term,
             order=order,
             direction=direction,
-            issues=issues
+            issues=issues,
+            user_ids=user_ids
         )
         self.from_date = from_date
         self.to_date = to_date
@@ -201,8 +203,10 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         group defined. Filters by the state of the collection.
 
         """
-        users = self.session.query(func.cast(User.id, String), User.data)
-        users = {user[0]: (user[1] or {}).get('group', None) for user in users}
+        users = dict(self.session.query(
+            func.cast(User.id, String),
+            func.cast(User.group_id, String)
+        ))
 
         result = {
             group[0]: [group[1], 0]

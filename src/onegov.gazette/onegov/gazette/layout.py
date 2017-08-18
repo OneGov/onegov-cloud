@@ -4,12 +4,12 @@ from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.gazette import _
 from onegov.gazette.collections import GazetteNoticeCollection
-from onegov.gazette.collections import UserGroupCollection
 from onegov.gazette.models import Issue
 from onegov.gazette.models import Principal
-from onegov.gazette.models import UserGroup
 from onegov.user import Auth
 from onegov.user import UserCollection
+from onegov.user import UserGroup
+from onegov.user import UserGroupCollection
 
 
 class Layout(ChameleonLayout):
@@ -205,24 +205,6 @@ class Layout(ChameleonLayout):
             return self.format_date(dates.deadline, date_format)
 
         return '?'
-
-    def format_owner(self, owner):
-        if owner:
-            return owner.realname or owner.username
-
-        return ''
-
-    def format_group(self, user):
-        if user:
-            group_id = (user.data or {}).get('group')
-            if group_id:
-                query = self.app.session().query(UserGroup)
-                query = query.filter(UserGroup.id == group_id)
-                group = query.first()
-                if group:
-                    return group.name
-
-        return ''
 
 
 class MailLayout(Layout):

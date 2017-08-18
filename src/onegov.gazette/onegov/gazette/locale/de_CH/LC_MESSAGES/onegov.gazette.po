@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-16 14:41+0200\n"
-"PO-Revision-Date: 2017-08-16 14:38+0200\n"
+"POT-Creation-Date: 2017-08-18 08:56+0200\n"
+"PO-Revision-Date: 2017-08-17 12:28+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -52,6 +52,9 @@ msgstr "Herausgeber"
 
 msgid "Editor"
 msgstr "Redaktor"
+
+msgid "- none -"
+msgstr "- keine -"
 
 #, python-format
 msgid "No. ${number}, ${issue_date}"
@@ -104,6 +107,9 @@ msgstr "Keine Meldungen."
 
 msgid "Rejected"
 msgstr "Zurückgewiesen"
+
+msgid "User"
+msgstr "Benutzer"
 
 msgid "Drafted"
 msgstr "in Arbeit"
@@ -203,9 +209,6 @@ msgstr "Passwort festlegen"
 
 msgid "This official notice has been rejected."
 msgstr "Diese Meldung wurde zurückgewiesen."
-
-msgid "User"
-msgstr "Benutzer"
 
 msgid "State"
 msgstr "Status"

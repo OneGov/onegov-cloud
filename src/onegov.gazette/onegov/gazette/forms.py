@@ -5,7 +5,7 @@ from onegov.gazette.fields import HtmlField
 from onegov.gazette.fields import MultiCheckboxField
 from onegov.gazette.fields import SelectField
 from onegov.gazette.layout import Layout
-from onegov.gazette.models import UserGroup
+from onegov.user import UserGroup
 from sqlalchemy import cast
 from sqlalchemy import String
 from wtforms import RadioField
@@ -58,37 +58,21 @@ class UserForm(Form):
         self.group.choices = session.query(
             cast(UserGroup.id, String), UserGroup.name
         ).all()
-        self.group.choices.insert(0, ('', ''))
+        self.group.choices.insert(
+            0, ('', self.request.translate(_("- none -")))
+        )
 
     def update_model(self, model):
         model.username = self.email.data
         model.role = self.role.data
         model.realname = self.name.data
-        if not model.data:
-            model.data = {}
-        model.data['group'] = self.group.data
+        model.group_id = self.group.data or None
 
     def apply_model(self, model):
         self.email.data = model.username
         self.role.data = model.role
         self.name.data = model.realname
-        self.group.data = (model.data or {}).get('group', '')
-
-
-class UserGroupForm(Form):
-
-    name = StringField(
-        label=_("Name"),
-        validators=[
-            InputRequired()
-        ]
-    )
-
-    def update_model(self, model):
-        model.name = self.name.data
-
-    def apply_model(self, model):
-        self.name.data = model.name
+        self.group.data = str(model.group_id or '')
 
 
 class NoticeForm(Form):

@@ -10,7 +10,7 @@ from onegov.gazette.layout import Layout
 from onegov.gazette.layout import MailLayout
 from onegov.gazette.models import Principal
 from onegov.user import Auth
-from onegov.user.collection import UserCollection
+from onegov.user import UserCollection
 from onegov.user.forms import LoginForm
 from onegov.user.forms import PasswordResetForm
 from onegov.user.forms import RequestPasswordResetForm

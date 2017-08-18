@@ -5,7 +5,6 @@ from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import Issue
 from onegov.gazette.models import IssueDates
 from onegov.gazette.models import Principal
-from onegov.gazette.models import UserGroup
 from onegov.gazette.models.notice import GazetteNoticeChange
 from onegov.user import User
 from pytest import raises
@@ -166,25 +165,6 @@ def test_principal():
         assert principal.current_issue == None
 
 
-def test_user_group(session):
-    session.add(UserGroup(name='Group'))
-    session.flush()
-
-    group = session.query(UserGroup).one()
-    assert group.number_of_users == 0
-
-    session.add(User(username='1@2.com', password='test', role='editor'))
-    session.flush()
-    assert group.number_of_users == 0
-
-    user = session.query(User).one()
-    user.data = {}
-    assert group.number_of_users == 0
-
-    user.data['group'] = str(group.id)
-    assert group.number_of_users == 1
-
-
 def test_notice_change(session):
     session.add(GazetteNoticeChange(text='text', channel_id='channel'))
     session.flush()
@@ -200,7 +180,7 @@ def test_notice_change(session):
     session.flush()
     user = session.query(User).one()
     change.user = user
-    change.meta = {'event': 'event'}
+    change.event = 'event'
 
     session.add(GazetteNotice(state='drafted', title='title', name='notice'))
     session.flush()

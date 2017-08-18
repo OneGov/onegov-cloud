@@ -1,13 +1,13 @@
 from datetime import datetime
 from freezegun import freeze_time
-from onegov.gazette.collections import UserGroupCollection
 from onegov.gazette.forms import NoticeForm
 from onegov.gazette.forms import UserForm
-from onegov.gazette.forms import UserGroupForm
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import Issue
-from onegov.gazette.models import UserGroup
 from onegov.user import User
+from onegov.user import UserCollection
+from onegov.user import UserGroup
+from onegov.user import UserGroupCollection
 from sedate import standardize_date
 
 
@@ -40,30 +40,17 @@ class DummyPostData(dict):
         return v
 
 
-def test_user_group_form():
-    # Test apply / update
-    form = UserGroupForm()
-    group = UserGroup(name='Group X')
-
-    form.apply_model(group)
-    assert form.name.data == 'Group X'
-
-    form.name.data = 'Group Y'
-    form.update_model(group)
-    assert group.name == 'Group Y'
-
-    # Test validation
-    form = UserGroupForm()
-    assert not form.validate()
-
-    form = UserGroupForm(DummyPostData({'name': 'Group'}))
-    assert form.validate()
-
-
 def test_user_form(session):
     # Test apply / update
+    users = UserCollection(session)
+    user = users.add(
+        username='a@a.ai', realname='User', role='editor', password='pwd'
+    )
+
+    groups = UserGroupCollection(session)
+    group = groups.add(name='Group A')
+
     form = UserForm()
-    user = User(username='a@a.ai', role='editor', realname='User')
 
     form.apply_model(user)
     assert form.email.data == 'a@a.ai'
@@ -71,20 +58,26 @@ def test_user_form(session):
     assert form.name.data == 'User'
     assert form.group.data == ''
 
-    user.data = {'group': 'Group'}
+    user.group = group
+    session.flush()
+
     form.apply_model(user)
-    assert form.group.data == 'Group'
+    assert form.group.data == str(group.id)
 
     form.email.data = 'b@b.bi'
     form.role.data = 'publisher'
     form.name.data = 'Publisher'
-    form.group.data = 'Publishers'
+    form.group.data = ''
 
     form.update_model(user)
     assert user.username == 'b@b.bi'
     assert user.role == 'publisher'
     assert user.realname == 'Publisher'
-    assert user.data['group'] == 'Publishers'
+    assert user.group_id is None
+
+    session.flush()
+    session.refresh(user)
+    assert user.group is None
 
     # Test validation
     form = UserForm()
@@ -101,12 +94,13 @@ def test_user_form(session):
         )
         assert form.validate() == result
 
-    # Test on request
+
+def test_user_form_on_request(session):
     form = UserForm()
     form.request = DummyRequest(session)
 
     form.on_request()
-    assert form.group.choices == [('', '')]
+    assert form.group.choices == [('', '- none -')]
 
     groups = UserGroupCollection(session)
     groups.add(name='Group A')
@@ -115,7 +109,7 @@ def test_user_form(session):
 
     form.on_request()
     assert sorted([choice[1] for choice in form.group.choices]) == [
-        '', 'Group A', 'Group B', 'Group C'
+        '- none -', 'Group A', 'Group B', 'Group C'
     ]
 
 

@@ -39,7 +39,7 @@
                                 <tr>
                                     <td>${user.realname}</td>
                                     <td>${user.username}</td>
-                                    <td>${layout.format_group(user)}</td>
+                                    <td>${user.group.name|None}</td>
                                     <td class="right-aligned">
                                         <ul class="actions" data-title="Actions" i18n:attributes="data-title">
                                             <li>

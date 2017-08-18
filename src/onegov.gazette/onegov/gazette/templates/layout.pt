@@ -75,7 +75,7 @@ metal:define-macro="layout">
             <div class="small-12 medium-4 columns small-only-text-center medium-text-right manage-links">
                 <a tal:condition="layout.login_link" href="${layout.login_link}" i18n:translate>Login</a>
                 <tal:block condition="layout.logout_link" >
-                    <span><tal:block i18n:translate>You are logged in as:</tal:block> ${layout.format_owner(layout.user)}.</span><br>
+                    <span><tal:block i18n:translate>You are logged in as:</tal:block> ${layout.user.realname or layout.user.username|None}.</span><br>
                     <a href="${layout.logout_link}" i18n:translate>Logout</a><br>
                 </tal:block>
             </div>

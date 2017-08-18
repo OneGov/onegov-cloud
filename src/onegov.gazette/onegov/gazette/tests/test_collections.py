@@ -1,9 +1,9 @@
 from datetime import date
 from datetime import datetime
 from onegov.gazette.collections import GazetteNoticeCollection
-from onegov.gazette.collections import UserGroupCollection
 from onegov.gazette.models import Principal
 from onegov.user import UserCollection
+from onegov.user import UserGroupCollection
 from sedate import standardize_date
 
 
@@ -15,14 +15,6 @@ class DummyApp(object):
 class DummyRequest(object):
     def __init__(self, principal):
         self.app = DummyApp(principal)
-
-
-def test_user_group_collection(session):
-    collection = UserGroupCollection(session)
-    collection.add(name='A')
-    collection.add(name='C')
-    collection.add(name='B')
-    assert [group.name for group in collection.query()] == ['A', 'B', 'C']
 
 
 def test_notice_collection(session, principal):
@@ -214,21 +206,20 @@ def test_notice_collection_count_by_group(session, principal):
     assert collection.count_by_group() == []
 
     groups = UserGroupCollection(session)
-    groups.add(name='A')
+    group_a = groups.add(name='A')
+    group_b = groups.add(name='B')
     groups.add(name='C')
-    groups.add(name='B')
-    groups = {group.name: str(group.id) for group in groups.query().all()}
     assert collection.count_by_group() == [['A', 0], ['B', 0], ['C', 0]]
 
     users = UserCollection(session)
-    users.add('a@example.org', 'pw', 'editor', data={'group': groups['A']})
-    users.add('b@example.org', 'pw', 'editor', data={'group': groups['A']})
+    users.add('a@example.org', 'pw', 'editor').group = group_a
+    users.add('b@example.org', 'pw', 'editor').group = group_a
     users.add('c@example.org', 'pw', 'admin')
     users.add('d@example.org', 'pw', 'publisher')
-    users.add('e@example.org', 'pw', 'publisher', data={'group': groups['B']})
-    users.add('f@example.org', 'pw', 'publisher', data={})
-    users.add('g@example.org', 'pw', 'publisher', data={'group': 'X'})
-    users.add('h@example.org', 'pw', 'publisher', data={'group': None})
+    users.add('e@example.org', 'pw', 'publisher').group = group_b
+    users.add('f@example.org', 'pw', 'publisher')
+    users.add('g@example.org', 'pw', 'publisher')
+    users.add('h@example.org', 'pw', 'publisher')
     users = {user.username: str(user.id) for user in users.query().all()}
     assert collection.count_by_group() == [['A', 0], ['B', 0], ['C', 0]]
 

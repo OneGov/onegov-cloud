@@ -1,7 +1,7 @@
-from onegov.gazette.collections import UserGroupCollection
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import Issue
 from onegov.user import User
+from onegov.user import UserGroupCollection
 from pytest import raises
 
 
@@ -114,14 +114,3 @@ def test_layout_format(session, principal):
         'Mittwoch 11.10.2017 12:00'
     assert layout.format_deadline('2017-41') == 'Mittwoch 11.10.2017 12:00'
     assert layout.format_deadline('2017-41', date_format='time') == '12:00'
-
-    # Owner
-    assert layout.format_owner(None) == ''
-    assert layout.format_owner(User(realname='User')) == 'User'
-
-    # Group
-    assert layout.format_group(None) == ''
-    assert layout.format_group(User()) == ''
-
-    uid = str(UserGroupCollection(request.app.session()).add(name='Group').id)
-    assert layout.format_group(User(data={'group': uid})) == 'Group'
