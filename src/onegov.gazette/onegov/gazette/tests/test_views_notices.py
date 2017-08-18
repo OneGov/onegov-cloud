@@ -366,9 +366,6 @@ def test_view_notices_statistics(gazette_app):
         )
         assert publisher.get(url_groups.format(s)).text == (
             'Gruppe,Anzahl\r\n'
-            'A,0\r\n'
-            'B,0\r\n'
-            'C,0\r\n'
         )
 
     assert publisher.get('/notices/drafted/statistics')
@@ -427,8 +424,6 @@ def test_view_notices_statistics(gazette_app):
     assert '>5</td>' in publisher.get('/notices/drafted/statistics')
     assert publisher.get(url_groups.format('drafted')).text == (
         'Gruppe,Anzahl\r\n'
-        ',1\r\n'
-        'A,0\r\n'
         'B,6\r\n'
         'C,1\r\n'
     )
@@ -437,7 +432,6 @@ def test_view_notices_statistics(gazette_app):
     assert '>4</td>' in publisher.get('/notices/submitted/statistics')
     assert publisher.get(url_groups.format('submitted')).text == (
         'Gruppe,Anzahl\r\n'
-        'A,0\r\n'
         'B,6\r\n'
         'C,5\r\n'
     )
@@ -448,7 +442,6 @@ def test_view_notices_statistics(gazette_app):
     )
     assert publisher.get(url).text == (
         'Gruppe,Anzahl\r\n'
-        'A,0\r\n'
         'B,4\r\n'
         'C,3\r\n'
     )

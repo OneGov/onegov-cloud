@@ -158,48 +158,6 @@ def test_notice_collection_count_by_category(session):
     assert collection.count_by_category() == [('A', 1), ('B', 4)]
 
 
-def test_notice_collection_count_by_user(session, principal):
-    collection = GazetteNoticeCollection(session)
-    assert collection.count_by_user() == []
-
-    users = UserCollection(session)
-    user_a = users.add('a@example.org', 'pw', 'editor')
-    user_b = users.add('b@example.org', 'pw', 'editor')
-    user_c = users.add('c@example.org', 'pw', 'admin')
-    user_d = users.add('d@example.org', 'pw', 'publisher')
-    assert collection.count_by_user() == []
-
-    for user, count in (
-        (user_a, 2),
-        (user_b, 4),
-        (user_c, 1),
-        (user_d, 1),
-    ):
-        for x in range(count):
-            collection.add(
-                title='',
-                text='',
-                organization_id='',
-                category_id='',
-                issues=['2017-{}'.format(y) for y in range(x)],
-                user=user,
-                principal=principal
-            )
-    assert sorted(collection.count_by_user()) == sorted([
-        (str(user_a.id), 1),
-        (str(user_b.id), 6),
-    ])
-
-    assert collection.count_by_user() == \
-        collection.for_state('drafted').count_by_user()
-
-    collection.issues = ['2017-0', '2017-2']
-    assert sorted(collection.count_by_user()) == sorted([
-        (str(user_a.id), 1),
-        (str(user_b.id), 4),
-    ])
-
-
 def test_notice_collection_count_by_group(session, principal):
     collection = GazetteNoticeCollection(session)
     assert collection.count_by_group() == []
@@ -208,7 +166,6 @@ def test_notice_collection_count_by_group(session, principal):
     group_a = groups.add(name='A')
     group_b = groups.add(name='B')
     groups.add(name='C')
-    assert collection.count_by_group() == [['A', 0], ['B', 0], ['C', 0]]
 
     users = UserCollection(session)
     user_a = users.add('a@example.org', 'pw', 'editor', group=group_a)
@@ -219,7 +176,6 @@ def test_notice_collection_count_by_group(session, principal):
     user_f = users.add('f@example.org', 'pw', 'publisher')
     user_g = users.add('g@example.org', 'pw', 'publisher')
     user_h = users.add('h@example.org', 'pw', 'publisher')
-    assert collection.count_by_group() == [['A', 0], ['B', 0], ['C', 0]]
 
     for user, count in (
         (user_a, 2),
@@ -242,7 +198,7 @@ def test_notice_collection_count_by_group(session, principal):
                 principal=principal
             )
     assert collection.count_by_group() == [
-        ['', 40], ['A', 7], ['B', 1], ['C', 0]
+        ('A', 7), ('B', 1)
     ]
 
     assert collection.count_by_group() == \
@@ -250,5 +206,5 @@ def test_notice_collection_count_by_group(session, principal):
 
     collection.issues = ['2017-2', '2017-4']
     assert collection.count_by_group() == [
-        ['', 10], ['A', 1], ['B', 0], ['C', 0]
+        ('A', 1)
     ]

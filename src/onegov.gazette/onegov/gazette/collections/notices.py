@@ -166,26 +166,26 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
             for group in groupbylist(result, lambda a: a[0])
         ]
 
-    def count_by_user(self):
-        """ Returns the total number of notices by users.
+    def count_by_group(self):
+        """ Returns the total number of notices by groups.
 
-        Returns a tuple ``(user ID, number of notices)``
-        for each user with a notice. Filters by the state of the collection.
+        Returns a tuple ``(group name, number of notices)``
+        for each group. Filters by the state of the collection.
 
         """
         result = self.session.query(
-            func.cast(GazetteNotice.user_id, String),
+            UserGroup.name,
             GazetteNotice._issues.keys()
         )
         result = result.filter(
-            GazetteNotice.user_id.isnot(None),
+            GazetteNotice.group_id == UserGroup.id,
             func.array_length(GazetteNotice._issues.keys(), 1) != 0
         )
         if self.state:
             result = result.filter(GazetteNotice.state == self.state)
         if self.issues:
             result = result.filter(GazetteNotice._issues.has_any(self.issues))
-        result = result.order_by(GazetteNotice.user_id)
+        result = result.order_by(UserGroup.name)
 
         issues = set(self.issues or [])
         operation = issues.intersection if issues else issues.union
@@ -196,33 +196,3 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
             )
             for group in groupbylist(result, lambda a: a[0])
         ]
-
-    def count_by_group(self):
-        """ Returns the total number of notices by groups.
-
-        Returns a tuple ``(Group name, name, number of notices)`` for each
-        group defined. Filters by the state of the collection.
-
-        """
-        users = dict(self.session.query(
-            func.cast(User.id, String),
-            func.cast(User.group_id, String)
-        ))
-
-        result = {
-            group[0]: [group[1], 0]
-            for group in self.session.query(
-                func.cast(UserGroup.id, String),
-                UserGroup.name
-            )
-        }
-        result[''] = ['', 0]
-        for user, value in self.count_by_user():
-            key = users.get(user, '') or ''
-            if key not in result:
-                key = ''
-            result[key][1] += value
-        if not result[''][1]:
-            del result['']
-
-        return sorted(result.values())
