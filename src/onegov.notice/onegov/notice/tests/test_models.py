@@ -1,9 +1,9 @@
 from datetime import datetime
 from datetime import timezone
 from onegov.notice import OfficialNotice
-from onegov.user import User
+from onegov.user import UserCollection
+from onegov.user import UserGroupCollection
 from pytest import raises
-from transaction import commit
 
 
 def test_create_notice(session):
@@ -21,8 +21,6 @@ def test_create_notice(session):
     notice.accept()
     notice.publish()
 
-    commit()
-
     notice = session.query(OfficialNotice).one()
 
     assert notice.state == 'published'
@@ -37,8 +35,10 @@ def test_create_notice(session):
 
 
 def test_ownership(session):
-    user = User(username='hans@dampf.ch', password='1234', role='admin')
-    session.add(user)
+    users = UserCollection(session)
+    groups = UserGroupCollection(session)
+    user = users.add('1@2.3', '1234', 'admin', realname='user')
+    group = groups.add(name='group')
 
     notice = OfficialNotice(
         title='title',
@@ -46,12 +46,15 @@ def test_ownership(session):
         text='Text',
     )
     notice.user = user
+    notice.group = group
     session.add(notice)
-
     session.flush()
-    commit()
 
-    assert session.query(OfficialNotice).one().user.username == 'hans@dampf.ch'
+    notice = session.query(OfficialNotice).one()
+    notice.user == user
+    notice.user.realname == 'user'
+    notice.group == group
+    notice.group.name == 'group'
 
 
 def test_transitions():

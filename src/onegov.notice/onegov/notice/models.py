@@ -4,6 +4,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.orm.types import UUID
 from onegov.user import User
+from onegov.user import UserGroup
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
@@ -81,7 +82,13 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     #: The user that owns this notice.
     user_id = Column(UUID, ForeignKey(User.id), nullable=True)
     user = relationship(
-        User, backref=backref('official_notices', lazy='dynamic')
+        User, backref=backref('official_notices', lazy='select')
+    )
+
+    #: The group that owns this notice.
+    group_id = Column(UUID, ForeignKey(UserGroup.id), nullable=True)
+    group = relationship(
+        UserGroup, backref=backref('official_notices', lazy='select')
     )
 
     def submit(self):

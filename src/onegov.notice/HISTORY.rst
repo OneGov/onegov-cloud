@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds groups to notices.
+  [msom]
+
 0.0.10 (2017-08-17)
 ~~~~~~~~~~~~~~~~~~~
 
