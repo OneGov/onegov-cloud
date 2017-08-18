@@ -41,10 +41,10 @@
                             <dd>${notice.category}</dd>
 
                             <dt i18n:translate>User</dt>
-                            <dd>${notice.user.realname|None}</dd>
+                            <dd>${notice.user_name}</dd>
 
                             <dt i18n:translate>Group</dt>
-                            <dd>${notice.user.group.name|None}</dd>
+                            <dd>${notice.group_name}</dd>
 
                             <dt i18n:translate>Issue(s)</dt>
                             <dd><tal:block metal:use-macro="layout.macros['issues']" /></dd>
@@ -69,7 +69,7 @@
                         <tal:block tal:repeat="change notice.changes">
                             <tr>
                                 <td>${layout.format_date(change.created, 'datetime')}</td>
-                                <td>${change.user.realname|None}</td>
+                                <td>${change.user_name}</td>
                                 <td>${change.user.group.name|None}</td>
                                 <td>
                                     <span class="event" i18n:translate>${change.event}</span>

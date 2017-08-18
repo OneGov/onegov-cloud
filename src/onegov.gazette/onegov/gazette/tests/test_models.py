@@ -6,7 +6,8 @@ from onegov.gazette.models import Issue
 from onegov.gazette.models import IssueDates
 from onegov.gazette.models import Principal
 from onegov.gazette.models.notice import GazetteNoticeChange
-from onegov.user import User
+from onegov.user import UserCollection
+from onegov.user import UserGroupCollection
 from pytest import raises
 from sedate import standardize_date
 from textwrap import dedent
@@ -165,7 +166,74 @@ def test_principal():
         assert principal.current_issue == None
 
 
+def test_notice_user_and_group(session):
+    users = UserCollection(session)
+    groups = UserGroupCollection(session)
+
+    session.add(GazetteNotice(title='notice'))
+    session.flush()
+    notice = session.query(GazetteNotice).one()
+
+    assert notice.user is None
+    assert notice.user_id is None
+    assert notice.user_name is None
+    assert notice._user_name is None
+    assert notice.group is None
+    assert notice.group_id is None
+    assert notice.group_name is None
+    assert notice._group_name is None
+
+    # add user and group
+    user = users.add('1@2.3', 'p', 'editor', realname='user')
+    group = groups.add(name='group')
+    notice.user = user
+    notice.group = group
+    session.flush()
+    session.refresh(notice)
+
+    assert notice.user == user
+    assert notice.user_id == user.id
+    assert notice.user_name == 'user'
+    assert notice._user_name == 'user'
+    assert notice.group == group
+    assert notice.group_id == group.id
+    assert notice.group_name == 'group'
+    assert notice._group_name == 'group'
+
+    # rename user and group
+    user.realname = 'xxx'
+    group.name = 'yyy'
+    session.flush()
+    session.refresh(notice)
+
+    assert notice.user == user
+    assert notice.user_id == user.id
+    assert notice.user_name == 'xxx'
+    assert notice._user_name == 'xxx'
+    assert notice.group == group
+    assert notice.group_id == group.id
+    assert notice.group_name == 'yyy'
+    assert notice._group_name == 'yyy'
+
+    # delete user and group
+    users.delete(user.username)
+    groups.delete(group)
+    session.flush()
+    session.refresh(notice)
+
+    assert notice.user is None
+    assert notice.user_id is None
+    assert notice.user_name == '(xxx)'
+    assert notice._user_name == 'xxx'
+    assert notice.group is None
+    assert notice.group_id is None
+    assert notice.group_name == '(yyy)'
+    assert notice._group_name == 'yyy'
+
+
 def test_notice_change(session):
+    users = UserCollection(session)
+
     session.add(GazetteNoticeChange(text='text', channel_id='channel'))
     session.flush()
 
@@ -173,25 +241,53 @@ def test_notice_change(session):
     assert change.text == 'text'
     assert change.channel_id == 'channel'
     assert change.user == None
+    assert change.user_name == None
+    assert change._user_name == None
     assert change.notice == None
     assert change.event == None
 
-    session.add(User(username='1@2.com', password='test', role='editor'))
-    session.flush()
-    user = session.query(User).one()
-    change.user = user
+    # Add user
     change.event = 'event'
+    user = users.add('1@2.com', 'test', 'editor')
+    change.user = user
+    session.flush()
+    session.refresh(change)
 
+    assert change.text == 'text'
+    assert change.channel_id == 'channel'
+    assert change.user == user
+    assert change.user_name == '1@2.com'
+    assert change._user_name == '1@2.com'
+    assert change.notice == None
+    assert change.event == 'event'
+    assert user.changes == [change]
+
+    # Add to notice
     session.add(GazetteNotice(state='drafted', title='title', name='notice'))
     session.flush()
     notice = session.query(GazetteNotice).one()
     change.notice = notice
 
+    assert notice.changes.one() == change
+
+    # Rename user
+    user.realname = 'Peter'
     session.flush()
-    assert user.changes.one().text == 'text'
-    assert user.changes.one().event == 'event'
-    assert notice.changes.one().text == 'text'
-    assert notice.changes.one().event == 'event'
+    session.refresh(change)
+
+    assert change.user == user
+    assert change.user_name == 'Peter'
+    assert change._user_name == 'Peter'
+    assert user.changes == [change]
+
+    # Delete user
+    users.delete(user.username)
+    session.flush()
+    session.refresh(change)
+
+    assert change.user == None
+    assert change.user_name == '(Peter)'
+    assert change._user_name == 'Peter'
 
 
 def test_gazette_notice_issues():
@@ -228,11 +324,11 @@ def test_gazette_notice_states(session):
     class DummyRequest():
         identity = None
 
+    user = UserCollection(session).add('1@2.com', 'test', 'publisher')
+
     session.add(GazetteNotice(state='drafted', title='title', name='notice'))
-    session.add(User(username='1@2.com', password='p', role='publisher'))
     session.flush()
     notice = session.query(GazetteNotice).one()
-    user = session.query(User).one()
 
     request = DummyRequest()
     with raises(AssertionError):
@@ -261,11 +357,14 @@ def test_gazette_notice_states(session):
     request.identity = DummyIdentity()
     request.identity.userid = user.username
     notice.add_change(request, 'finished', text='all went well')
+    session.flush()
+    session.refresh(user)
 
     # the test might be to fast for the implicit ordering by id, we sort it
     # ourselves
     changes = notice.changes.order_by(None)
     changes = changes.order_by(GazetteNoticeChange.edited.desc())
+    [(change.event, change.user, change.text) for change in changes]
     assert [
         (change.event, change.user, change.text) for change in changes
     ] == [

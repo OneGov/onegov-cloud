@@ -54,7 +54,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         self.to_date = to_date
         self.source = source
 
-    def add(self, title, text, organization_id, category_id, user_id, issues,
+    def add(self, title, text, organization_id, category_id, user, issues,
             principal):
         """ Add a new notice.
 
@@ -72,9 +72,10 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
             title=title,
             text=text,
             name=self._get_unique_name(title),
-            user_id=user_id,
             issues=issues
         )
+        notice.user = user
+        notice.group = user.group if user else None
         notice.organization_id = organization_id
         notice.category_id = category_id
         notice.apply_meta(principal)
@@ -84,7 +85,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         audit_trail = MessageCollection(self.session, type='gazette_notice')
         audit_trail.add(
             channel_id=str(notice.id),
-            owner=str(user_id),
+            owner=str(user.id) if user else '',
             meta={'event': _("created")}
         )
 

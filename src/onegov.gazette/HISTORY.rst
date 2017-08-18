@@ -61,6 +61,12 @@ Changelog
 - Adds an accepted state.
   [msom]
 
+- Caches the user and group name on notices in case they get deleted.
+  [msom]
+
+- Caches the user name on notice changes in case they get deleted.
+  [msom]
+
 0.0.4 (2017-08-03)
 ~~~~~~~~~~~~~~~~~~~
 

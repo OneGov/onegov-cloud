@@ -142,7 +142,7 @@ def delete_user(self, request, form):
     layout = Layout(self, request)
 
     callout = None
-    if self.official_notices.first() or self.changes.first():
+    if self.official_notices or self.changes:
         callout = _("There are official notices linked to this user!")
 
     if form.submitted(request):

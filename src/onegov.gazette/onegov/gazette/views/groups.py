@@ -108,6 +108,10 @@ def delete_group(self, request, form):
 
     layout = Layout(self, request)
 
+    callout = None
+    if self.official_notices:
+        callout = _("There are official notices linked to this group!")
+
     if self.users.count():
         return {
             'layout': layout,
@@ -131,6 +135,7 @@ def delete_group(self, request, form):
         'form': form,
         'title': self.name,
         'subtitle': _("Delete Group"),
+        'callout': callout,
         'button_text': _("Delete Group"),
         'button_class': 'alert',
         'cancel': layout.manage_user_groups_link

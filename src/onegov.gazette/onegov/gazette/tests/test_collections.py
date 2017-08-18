@@ -29,7 +29,7 @@ def test_notice_collection(session, principal):
         organization_id='100',
         category_id='11',
         issues=['2017-46', '2017-47'],
-        user_id=user.id,
+        user=user,
         principal=principal
     )
     collection.add(
@@ -38,7 +38,7 @@ def test_notice_collection(session, principal):
         organization_id='200',
         category_id='13',
         issues={'2017-47', '2017-48'},
-        user_id=user.id,
+        user=user,
         principal=principal
     )
 
@@ -117,7 +117,7 @@ def test_notice_collection_count_by_organization(session):
                 organization_id=organization,
                 category_id='',
                 issues=['2017-{}'.format(y) for y in range(x)],
-                user_id=None,
+                user=None,
                 principal=principal
             )
     # for x in collection.query(): x.organization, x.issues
@@ -146,7 +146,7 @@ def test_notice_collection_count_by_category(session):
                 organization_id=None,
                 category_id=category,
                 issues=['2017-{}'.format(y) for y in range(x)],
-                user_id=None,
+                user=None,
                 principal=principal
             )
     assert collection.count_by_category() == [('A', 1), ('B', 6)]
@@ -163,18 +163,17 @@ def test_notice_collection_count_by_user(session, principal):
     assert collection.count_by_user() == []
 
     users = UserCollection(session)
-    users.add('a@example.org', 'pw', 'editor')
-    users.add('b@example.org', 'pw', 'editor')
-    users.add('c@example.org', 'pw', 'admin')
-    users.add('d@example.org', 'pw', 'publisher')
-    users = {user.username: str(user.id) for user in users.query().all()}
+    user_a = users.add('a@example.org', 'pw', 'editor')
+    user_b = users.add('b@example.org', 'pw', 'editor')
+    user_c = users.add('c@example.org', 'pw', 'admin')
+    user_d = users.add('d@example.org', 'pw', 'publisher')
     assert collection.count_by_user() == []
 
     for user, count in (
-        ('a@example.org', 2),
-        ('b@example.org', 4),
-        ('c@example.org', 1),
-        ('d@example.org', 1),
+        (user_a, 2),
+        (user_b, 4),
+        (user_c, 1),
+        (user_d, 1),
     ):
         for x in range(count):
             collection.add(
@@ -183,12 +182,12 @@ def test_notice_collection_count_by_user(session, principal):
                 organization_id='',
                 category_id='',
                 issues=['2017-{}'.format(y) for y in range(x)],
-                user_id=users[user],
+                user=user,
                 principal=principal
             )
     assert sorted(collection.count_by_user()) == sorted([
-        (users['a@example.org'], 1),
-        (users['b@example.org'], 6),
+        (str(user_a.id), 1),
+        (str(user_b.id), 6),
     ])
 
     assert collection.count_by_user() == \
@@ -196,8 +195,8 @@ def test_notice_collection_count_by_user(session, principal):
 
     collection.issues = ['2017-0', '2017-2']
     assert sorted(collection.count_by_user()) == sorted([
-        (users['a@example.org'], 1),
-        (users['b@example.org'], 4),
+        (str(user_a.id), 1),
+        (str(user_b.id), 4),
     ])
 
 
@@ -212,26 +211,25 @@ def test_notice_collection_count_by_group(session, principal):
     assert collection.count_by_group() == [['A', 0], ['B', 0], ['C', 0]]
 
     users = UserCollection(session)
-    users.add('a@example.org', 'pw', 'editor').group = group_a
-    users.add('b@example.org', 'pw', 'editor').group = group_a
-    users.add('c@example.org', 'pw', 'admin')
-    users.add('d@example.org', 'pw', 'publisher')
-    users.add('e@example.org', 'pw', 'publisher').group = group_b
-    users.add('f@example.org', 'pw', 'publisher')
-    users.add('g@example.org', 'pw', 'publisher')
-    users.add('h@example.org', 'pw', 'publisher')
-    users = {user.username: str(user.id) for user in users.query().all()}
+    user_a = users.add('a@example.org', 'pw', 'editor', group=group_a)
+    user_b = users.add('b@example.org', 'pw', 'editor', group=group_a)
+    user_c = users.add('c@example.org', 'pw', 'admin')
+    user_d = users.add('d@example.org', 'pw', 'publisher')
+    user_e = users.add('e@example.org', 'pw', 'publisher', group=group_b)
+    user_f = users.add('f@example.org', 'pw', 'publisher')
+    user_g = users.add('g@example.org', 'pw', 'publisher')
+    user_h = users.add('h@example.org', 'pw', 'publisher')
     assert collection.count_by_group() == [['A', 0], ['B', 0], ['C', 0]]
 
     for user, count in (
-        ('a@example.org', 2),
-        ('b@example.org', 4),
-        ('c@example.org', 1),
-        ('d@example.org', 7),
-        ('e@example.org', 2),
-        ('f@example.org', 3),
-        ('g@example.org', 6),
-        ('h@example.org', 2),
+        (user_a, 2),
+        (user_b, 4),
+        (user_c, 1),
+        (user_d, 7),
+        (user_e, 2),
+        (user_f, 3),
+        (user_g, 6),
+        (user_h, 2),
     ):
         for x in range(count):
             collection.add(
@@ -240,7 +238,7 @@ def test_notice_collection_count_by_group(session, principal):
                 organization_id='',
                 category_id='',
                 issues=['2017-{}'.format(y) for y in range(x)],
-                user_id=users[user],
+                user=user,
                 principal=principal
             )
     assert collection.count_by_group() == [

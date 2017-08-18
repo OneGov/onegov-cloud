@@ -9,6 +9,7 @@ from onegov.gazette.collections import GazetteNoticeCollection
 from onegov.gazette.forms import EmptyForm
 from onegov.gazette.forms import NoticeForm
 from onegov.gazette.layout import Layout
+from onegov.gazette.views import get_user
 from onegov.gazette.views import get_user_id
 
 
@@ -39,7 +40,7 @@ def create_notice(self, request, form):
             text=form.text.data,
             organization_id=form.organization.data,
             category_id=form.category.data,
-            user_id=get_user_id(request),
+            user=get_user(request),
             issues=form.issues.data,
             principal=principal
         )
