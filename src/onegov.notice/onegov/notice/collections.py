@@ -19,13 +19,15 @@ class OfficialNoticeCollectionPagination(Pagination):
         order=None,
         direction=None,
         issues=None,
-        user_ids=None
+        user_ids=None,
+        group_ids=None
     ):
         self.session = session
         self.page = page
         self.state = state
         self.term = term
         self.user_ids = user_ids or []
+        self.group_ids = group_ids or []
         self.order = order or 'title'
         self.direction = direction or 'asc'
         self.issues = issues
@@ -37,7 +39,9 @@ class OfficialNoticeCollectionPagination(Pagination):
             self.term == other.term and
             self.order == other.order and
             self.direction == other.direction and
-            self.issues == other.issues
+            self.issues == other.issues and
+            self.user_ids == other.user_ids and
+            self.group_ids == other.group_ids
         )
 
     def subset(self):
@@ -55,7 +59,9 @@ class OfficialNoticeCollectionPagination(Pagination):
             term=self.term,
             order=self.order,
             direction=self.direction,
-            issues=self.issues
+            issues=self.issues,
+            user_ids=self.user_ids,
+            group_ids=self.group_ids
         )
 
     def for_state(self, state):
@@ -67,7 +73,9 @@ class OfficialNoticeCollectionPagination(Pagination):
             term=self.term,
             order=self.order,
             direction=self.direction,
-            issues=self.issues
+            issues=self.issues,
+            user_ids=self.user_ids,
+            group_ids=self.group_ids
         )
 
     def for_order(self, order, direction=None):
@@ -89,7 +97,9 @@ class OfficialNoticeCollectionPagination(Pagination):
             term=self.term,
             order=order,
             direction='desc' if descending else 'asc',
-            issues=self.issues
+            issues=self.issues,
+            user_ids=self.user_ids,
+            group_ids=self.group_ids
         )
 
 
@@ -120,6 +130,8 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
             )
         if self.user_ids:
             query = query.filter(self.model_class.user_id.in_(self.user_ids))
+        if self.group_ids:
+            query = query.filter(self.model_class.group_id.in_(self.group_ids))
         if self.issues:
             query = query.filter(self.model_class._issues.has_any(self.issues))
 

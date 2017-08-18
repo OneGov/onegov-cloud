@@ -2,6 +2,7 @@ from datetime import datetime
 from datetime import timezone
 from onegov.notice import OfficialNoticeCollection
 from onegov.user import UserCollection
+from onegov.user import UserGroupCollection
 from transaction import commit
 
 
@@ -89,36 +90,86 @@ def test_notice_collection_search(session):
     assert notices.query().count() == 1
 
 
-def test_notice_collection_users(session):
+def test_notice_collection_users_and_groups(session):
+    groups = UserGroupCollection(session)
+    group_ab = groups.add(name='AB')
+    group_c = groups.add(name='C')
+    group_d = groups.add(name='D')
+
     users = UserCollection(session)
-    user_a = users.add('a@example.org', 'password', 'editor').id
-    user_b = users.add('b@example.org', 'password', 'editor').id
-    user_c = users.add('c@example.org', 'password', 'editor').id
+    user_a = users.add('a@example.org', 'password', 'editor', group=group_ab)
+    user_b = users.add('b@example.org', 'password', 'editor', group=group_ab)
+    user_c = users.add('c@example.org', 'password', 'editor', group=group_c)
+    user_d = users.add('d@example.org', 'password', 'editor', group=group_d)
+    user_e = users.add('e@example.org', 'password', 'editor')
 
     notices = OfficialNoticeCollection(session)
-    notices.add(title='A1', text='text', user_id=user_a)
-    notices.add(title='A2', text='text', user_id=user_a)
-    notices.add(title='A3', text='text', user_id=user_a)
-    notices.add(title='B1', text='text', user_id=user_b)
-    notices.add(title='B2', text='text', user_id=user_b)
-    notices.add(title='C1', text='text', user_id=user_c)
-    notices.add(title='C2', text='text', user_id=user_c)
+    for title, user in (
+        ('A1', user_a),
+        ('A2', user_a),
+        ('A3', user_a),
+        ('B1', user_b),
+        ('B2', user_b),
+        ('C1', user_c),
+        ('C2', user_c),
+        ('D1', user_d),
+        ('D2', user_d),
+        ('D3', user_d),
+    ):
+        notices.add(
+            title=title,
+            text='text',
+            user_id=user.id,
+            group_id=user.group.id if user.group else None
+        )
 
-    assert notices.query().count() == 7
+    assert notices.query().count() == 10
 
-    notices.user_ids = [user_a]
-    assert notices.query().count() == 3
+    # test users
+    notices.user_ids = [user_a.id]
+    assert sorted([n.title for n in notices.query()]) == ['A1', 'A2', 'A3']
 
-    notices.user_ids = [user_b]
-    assert notices.query().count() == 2
+    notices.user_ids = [user_b.id]
+    assert sorted([n.title for n in notices.query()]) == ['B1', 'B2']
 
-    notices.user_ids = [user_c]
-    assert notices.query().count() == 2
+    notices.user_ids = [user_c.id]
+    assert sorted([n.title for n in notices.query()]) == ['C1', 'C2']
 
-    notices.user_ids = [user_a, user_c]
-    assert notices.query().count() == 5
-    assert sorted([notice.title for notice in notices.query()]) == [
-        'A1', 'A2', 'A3', 'C1', 'C2'
+    notices.user_ids = [user_d.id]
+    assert sorted([n.title for n in notices.query()]) == ['D1', 'D2', 'D3']
+
+    notices.user_ids = [user_e.id]
+    assert sorted([n.title for n in notices.query()]) == []
+
+    notices.user_ids = [user_b.id, user_c.id]
+    assert sorted([n.title for n in notices.query()]) == [
+        'B1', 'B2', 'C1', 'C2'
+    ]
+
+    # test groups
+    notices.user_ids = []
+
+    notices.group_ids = [group_ab.id]
+    assert sorted([n.title for n in notices.query()]) == [
+        'A1', 'A2', 'A3', 'B1', 'B2'
+    ]
+
+    notices.group_ids = [group_c.id]
+    assert sorted([n.title for n in notices.query()]) == ['C1', 'C2']
+
+    notices.group_ids = [group_d.id]
+    assert sorted([n.title for n in notices.query()]) == ['D1', 'D2', 'D3']
+
+    notices.group_ids = [group_ab.id, group_d.id]
+    assert sorted([n.title for n in notices.query()]) == [
+        'A1', 'A2', 'A3', 'B1', 'B2', 'D1', 'D2', 'D3'
+    ]
+
+    # test users and groups
+    notices.group_ids = [group_ab.id, group_d.id]
+    notices.user_ids = [user_b.id, user_d.id]
+    assert sorted([n.title for n in notices.query()]) == [
+        'B1', 'B2', 'D1', 'D2', 'D3'
     ]
 
 

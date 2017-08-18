@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Allows to filter notices by a user group IDs.
+  [msom]
+
 0.0.12 (2017-08-18)
 ~~~~~~~~~~~~~~~~~~~
 
