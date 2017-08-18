@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Allows to pass the group when creating users.
+  [msom]
+
 0.15.0 (2017-08-17)
 ~~~~~~~~~~~~~~~~~~~
 

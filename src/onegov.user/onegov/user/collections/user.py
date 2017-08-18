@@ -90,7 +90,7 @@ class UserCollection(object):
 
     def add(self, username, password, role,
             data=None, second_factor=None, active=True, realname=None,
-            signup_token=None):
+            signup_token=None, group=None):
         """ Add a user to the collection.
 
             The arguments given to this function are the attributes of the
@@ -109,7 +109,8 @@ class UserCollection(object):
             second_factor=second_factor,
             active=active,
             realname=realname,
-            signup_token=signup_token
+            signup_token=signup_token,
+            group_id=group.id if group else None
         )
 
         self.session.add(user)
