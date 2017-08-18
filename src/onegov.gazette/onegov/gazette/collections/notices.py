@@ -3,10 +3,8 @@ from onegov.core.utils import groupbylist
 from onegov.gazette import _
 from onegov.gazette.models import GazetteNotice
 from onegov.notice import OfficialNoticeCollection
-from onegov.user import User
 from onegov.user import UserGroup
 from sqlalchemy import func
-from sqlalchemy import String
 from uuid import uuid4
 
 
