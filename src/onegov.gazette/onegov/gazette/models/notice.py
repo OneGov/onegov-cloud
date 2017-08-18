@@ -22,7 +22,8 @@ class CachedUserNameMixin(object):
 
     @observes('user', 'user.realname', 'user.username')
     def user_observer(self, user, realname, username):
-        super(SubClass, self).user_observer(user, realname, username)
+        if hasattr(self, '_user_observer'):
+            self._user_observer(user, realname, username)
 
     """
 
@@ -40,7 +41,7 @@ class CachedUserNameMixin(object):
             return self.user.realname or self.user.username
         return '({})'.format(self._user_name) if self._user_name else None
 
-    def user_observer(self, user, realname, username):
+    def _user_observer(self, user, realname, username):
         """ Upates the last known name of the owner.
 
         This never deletes the stored name, set ``self._user_name`` yourself
@@ -61,7 +62,8 @@ class CachedGroupNameMixin(object):
 
     @observes('group', 'group.name')
     def group_observer(self, group, name):
-        super(SubClass, self).group_observer(group, name)
+        if hasattr(self, '_group_observerr'):
+            self._group_observerr(user, realname, username)
 
     """
 
@@ -80,7 +82,7 @@ class CachedGroupNameMixin(object):
             return self.group.name
         return '({})'.format(self._group_name) if self._group_name else None
 
-    def group_observer(self, group, name):
+    def _group_observer(self, group, name):
         """ Upates the last known name of the group.
 
         This never deletes the stored name, set ``self._group_name`` yourself
@@ -123,11 +125,13 @@ class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
 
     @observes('user', 'user.realname', 'user.username')
     def user_observer(self, user, realname, username):
-        super(GazetteNotice, self).user_observer(user, realname, username)
+        if hasattr(self, '_user_observer'):
+            self._user_observer(user, realname, username)
 
     @observes('group', 'group.name')
     def group_observer(self, group, name):
-        super(GazetteNotice, self).group_observer(group, name)
+        if hasattr(self, '_group_observer'):
+            self._group_observer(group, name)
 
     def add_change(self, request, event, text=None):
         """ Adds en entry to the changelog. """
@@ -221,9 +225,8 @@ class GazetteNoticeChange(Message, CachedUserNameMixin):
 
     @observes('user', 'user.realname', 'user.username')
     def user_observer(self, user, realname, username):
-        super(GazetteNoticeChange, self).user_observer(
-            user, realname, username
-        )
+        if hasattr(self, '_user_observer'):
+            self._user_observer(user, realname, username)
 
     #: the notice which this change belongs to
     notice = relationship(
