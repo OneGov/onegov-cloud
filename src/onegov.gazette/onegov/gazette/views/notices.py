@@ -100,10 +100,10 @@ def view_notices(self, request):
             'href': request.link(self.for_order('category')),
             'sort': self.direction if self.order == 'category' else '',
         },
-        'issue_date': {
+        'first_issue': {
             'title': _("Issue(s)"),
-            'href': request.link(self.for_order('issue_date')),
-            'sort': self.direction if self.order == 'issue_date' else '',
+            'href': request.link(self.for_order('first_issue')),
+            'sort': self.direction if self.order == 'first_issue' else '',
         }
     }
 

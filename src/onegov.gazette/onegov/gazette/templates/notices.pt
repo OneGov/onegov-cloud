@@ -36,7 +36,7 @@
                             <th><tal:block metal:use-macro="layout.macros['order_link']" tal:define="key 'category'"></tal:block></th>
                             <th i18n:translate>Group</th>
                             <th i18n:translate>User</th>
-                            <th><tal:block metal:use-macro="layout.macros['order_link']" tal:define="key 'issue_date'"></tal:block></th>
+                            <th><tal:block metal:use-macro="layout.macros['order_link']" tal:define="key 'first_issue'"></tal:block></th>
                         </tr>
                     </thead>
                     <tbody>

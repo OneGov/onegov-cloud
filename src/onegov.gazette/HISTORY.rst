@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes ordering by first issue.
+  [msom]
+
 0.1.0 (2017-08-21)
 ~~~~~~~~~~~~~~~~~~~
 
