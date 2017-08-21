@@ -1,5 +1,7 @@
 from onegov.gazette.tests import login_admin
-from onegov.gazette.tests import login_editor
+from onegov.gazette.tests import login_editor_1
+from onegov.gazette.tests import login_editor_2
+from onegov.gazette.tests import login_editor_3
 from onegov.gazette.tests import login_publisher
 from webtest import TestApp as Client
 
@@ -10,7 +12,9 @@ def test_view_users(gazette_app):
 
     manage = client.get('/users')
     assert 'publisher@example.org' in manage
-    assert 'editor@example.org' in manage
+    assert 'editor1@example.org' in manage
+    assert 'editor2@example.org' in manage
+    assert 'editor3@example.org' in manage
 
     # add a publisher
     manage = manage.click("Neu")
@@ -44,15 +48,25 @@ def test_view_users_permissions(gazette_app):
 
     login_admin(client)
     manage = client.get('/users')
-    edit_link = manage.click("Bearbeiten", href='editor').request.url
-    delete_link = manage.click("Löschen", href='edit').request.url
+    edit_link = manage.click("Bearbeiten", href='editor1').request.url
+    delete_link = manage.click("Löschen", href='editor1').request.url
 
     login_publisher(client)
     client.get('/users', status=403)
     client.get(edit_link, status=403)
     client.get(delete_link, status=403)
 
-    login_editor(client)
+    login_editor_1(client)
+    client.get('/users', status=403)
+    client.get(edit_link, status=403)
+    client.get(delete_link, status=403)
+
+    login_editor_2(client)
+    client.get('/users', status=403)
+    client.get(edit_link, status=403)
+    client.get(delete_link, status=403)
+
+    login_editor_3(client)
     client.get('/users', status=403)
     client.get(edit_link, status=403)
     client.get(delete_link, status=403)

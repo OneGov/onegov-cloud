@@ -3,9 +3,11 @@ from onegov.core.crypto import hash_password
 from onegov.gazette import GazetteApp
 from onegov.gazette.models.principal import Principal
 from onegov.user import User
+from onegov.user import UserGroup
 from pytest import fixture
 from textwrap import dedent
 from transaction import commit
+from uuid import uuid4
 
 
 PRINCIPAL = """
@@ -55,6 +57,9 @@ def create_gazette(request):
     app.session_manager.set_locale('de_CH', 'de_CH')
     app.filestorage.settext('principal.yml', dedent(PRINCIPAL))
 
+    group_id = uuid4()
+    app.session().add(UserGroup(name='TestGroup', id=group_id))
+
     app.session().add(User(
         username='admin@example.org',
         password_hash=request.getfixturevalue('gazette_password'),
@@ -66,7 +71,19 @@ def create_gazette(request):
         role='editor'
     ))
     app.session().add(User(
-        username='editor@example.org',
+        username='editor1@example.org',
+        password_hash=request.getfixturevalue('gazette_password'),
+        role='member',
+        group_id=group_id
+    ))
+    app.session().add(User(
+        username='editor2@example.org',
+        password_hash=request.getfixturevalue('gazette_password'),
+        role='member',
+        group_id=group_id
+    ))
+    app.session().add(User(
+        username='editor3@example.org',
         password_hash=request.getfixturevalue('gazette_password'),
         role='member'
     ))

@@ -34,6 +34,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         direction=None,
         issues=None,
         user_ids=None,
+        group_ids=None,
         from_date=None,
         to_date=None,
         source=None
@@ -46,7 +47,8 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
             order=order,
             direction=direction,
             issues=issues,
-            user_ids=user_ids
+            user_ids=user_ids,
+            group_ids=group_ids
         )
         self.from_date = from_date
         self.to_date = to_date

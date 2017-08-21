@@ -1,315 +1,380 @@
 from freezegun import freeze_time
 from onegov.gazette.tests import login_admin
-from onegov.gazette.tests import login_editor
+from onegov.gazette.tests import login_editor_1
+from onegov.gazette.tests import login_editor_2
+from onegov.gazette.tests import login_editor_3
 from onegov.gazette.tests import login_publisher
 from webtest import TestApp as Client
 
 
-def test_view_notice_reject_accept(gazette_app):
+def login_users(gazette_app):
+    editor_1 = Client(gazette_app)
+    login_editor_1(editor_1)
+
+    editor_2 = Client(gazette_app)
+    login_editor_2(editor_2)
+
+    editor_3 = Client(gazette_app)
+    login_editor_3(editor_3)
+
+    publisher = Client(gazette_app)
+    login_publisher(publisher)
+
+    return editor_1, editor_2, editor_3, publisher
+
+
+def submit_notice(user, slug, unable=False, forbidden=False):
+    url = '/notice/{}/submit'.format(slug)
+    if unable:
+        assert not user.get(url).forms
+    elif forbidden:
+        assert user.get(url, status=403)
+    else:
+        manage = user.get(url)
+        manage = manage.form.submit()
+        assert "Meldung eingereicht" in manage.follow().follow()
+
+
+def accept_notice(user, slug, unable=False, forbidden=False):
+    url = '/notice/{}/accept'.format(slug)
+    if unable:
+        assert not user.get(url).forms
+    elif forbidden:
+        assert user.get(url, status=403)
+    else:
+        manage = user.get(url)
+        manage = manage.form.submit()
+        assert "Meldung angenommen" in manage.follow().follow()
+
+
+def reject_notice(user, slug, unable=False, forbidden=False):
+    url = '/notice/{}/reject'.format(slug)
+    if unable:
+        assert not user.get(url).forms
+    elif forbidden:
+        assert user.get(url, status=403)
+    else:
+        manage = user.get(url)
+        manage.form['comment'] = 'XYZ'
+        manage = manage.form.submit()
+        assert "Meldung zurückgewiesen" in manage.follow().follow()
+
+
+def edit_notice(user, slug, unable=False, forbidden=False, **kwargs):
+    url = '/notice/{}/edit'.format(slug)
+    if unable:
+        assert not user.get(url).forms
+    elif forbidden:
+        assert user.get(url, status=403)
+    else:
+        manage = user.get(url)
+        for key, value in kwargs.items():
+            manage.form[key] = value
+        manage = manage.form.submit().follow()
+
+
+def test_view_notice(gazette_app):
+    # Check if the details of the notice is displayed correctly in the
+    # display view (that is: organization, owner, group etc).
+
+    editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
 
     with freeze_time("2017-11-01 12:00"):
+        # create a notice for each editor
+        for count, user in enumerate((editor_1, editor_2, editor_3)):
+            manage = user.get('/notices/drafted/new-notice')
+            manage.form['title'] = 'Titel {}'.format(count + 1)
+            manage.form['organization'] = '200'
+            manage.form['category'] = '11'
+            manage.form['issues'] = ['2017-44', '2017-45']
+            manage.form['text'] = "1. Oktober 2017"
+            manage.form.submit()
 
-        editor = Client(gazette_app)
-        login_editor(editor)
+        # check if the notices are displayed correctly
+        for slug, title, owner, group in (
+            ('titel-1', 'Titel 1', 'editor1@example.org', True),
+            ('titel-2', 'Titel 2', 'editor2@example.org', True),
+            ('titel-3', 'Titel 3', 'editor3@example.org', False),
+        ):
+            for user in (editor_1, editor_2, editor_3, publisher):
+                view = user.get('/notice/{}'.format(slug))
+                assert title in view
+                assert "1. Oktober 2017" in view
+                assert "Civic Community" in view
+                assert "Education" in view
+                assert owner in view
+                if group:
+                    assert "TestGroup" in view
+                else:
+                    assert "TestGroup" not in view
+                assert "Nr. 44, 03.11.2017" in view
+                assert "Nr. 45, 10.11.2017" in view
+                assert "in Arbeit" in view
+                assert "erstellt" in view
 
-        publisher = Client(gazette_app)
-        login_publisher(publisher)
 
-        # new notice(s)
-        # state: DRAFTED
+def test_view_notice_actions(gazette_app):
+    # Check if the actions are displayed correctly in the detail view
+
+    editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
+
+    with freeze_time("2017-11-01 12:00"):
+        # create a notice for each editor
+        for count, user in enumerate((editor_1, editor_2, editor_3)):
+            manage = user.get('/notices/drafted/new-notice')
+            manage.form['title'] = 'Titel {}'.format(count + 1)
+            manage.form['organization'] = '200'
+            manage.form['category'] = '11'
+            manage.form['issues'] = ['2017-44', '2017-45']
+            manage.form['text'] = "1. Oktober 2017"
+            manage.form.submit()
+
+        # check the actions
+        actions = {
+            'p': 'action-preview',
+            'c': 'action-copy',
+            'e': 'action-edit',
+            'd': 'action-delete',
+            's': 'action-submit',
+            'a': 'action-accept',
+            'r': 'action-reject',
+        }
+
+        def check(values):
+            for user, slug, can in values:
+                view = user.get('/notice/{}'.format(slug))
+                cannot = [x for x in actions.keys() if x not in can]
+                assert all((actions[action] in view for action in can))
+                assert all((actions[action] not in view for action in cannot))
+
+        # ... when drafted
+        check((
+            (publisher, 'titel-1', 'p'),
+            (publisher, 'titel-2', 'p'),
+            (publisher, 'titel-3', 'p'),
+            (editor_1, 'titel-1', 'peds'),
+            (editor_1, 'titel-2', 'peds'),
+            (editor_1, 'titel-3', 'p'),
+            (editor_2, 'titel-1', 'peds'),
+            (editor_2, 'titel-2', 'peds'),
+            (editor_2, 'titel-3', 'p'),
+            (editor_3, 'titel-1', 'p'),
+            (editor_3, 'titel-2', 'p'),
+            (editor_3, 'titel-3', 'peds'),
+        ))
+
+        # ... when submitted
+        submit_notice(editor_1, 'titel-1')
+        submit_notice(editor_2, 'titel-2')
+        submit_notice(editor_3, 'titel-3')
+
+        check((
+            (publisher, 'titel-1', 'pear'),
+            (publisher, 'titel-2', 'pear'),
+            (publisher, 'titel-3', 'pear'),
+            (editor_1, 'titel-1', 'p'),
+            (editor_1, 'titel-2', 'p'),
+            (editor_1, 'titel-3', 'p'),
+            (editor_2, 'titel-1', 'p'),
+            (editor_2, 'titel-2', 'p'),
+            (editor_2, 'titel-3', 'p'),
+            (editor_3, 'titel-1', 'p'),
+            (editor_3, 'titel-2', 'p'),
+            (editor_3, 'titel-3', 'p'),
+        ))
+
+        # ... when rejected
+        reject_notice(publisher, 'titel-1')
+        reject_notice(publisher, 'titel-2')
+        reject_notice(publisher, 'titel-3')
+
+        check((
+            (publisher, 'titel-1', 'p'),
+            (publisher, 'titel-2', 'p'),
+            (publisher, 'titel-3', 'p'),
+            (editor_1, 'titel-1', 'peds'),
+            (editor_1, 'titel-2', 'peds'),
+            (editor_1, 'titel-3', 'p'),
+            (editor_2, 'titel-1', 'peds'),
+            (editor_2, 'titel-2', 'peds'),
+            (editor_2, 'titel-3', 'p'),
+            (editor_3, 'titel-1', 'p'),
+            (editor_3, 'titel-2', 'p'),
+            (editor_3, 'titel-3', 'peds'),
+        ))
+
+        # ... when accepted
+        submit_notice(editor_1, 'titel-1')
+        submit_notice(editor_2, 'titel-2')
+        submit_notice(editor_3, 'titel-3')
+        accept_notice(publisher, 'titel-1')
+        accept_notice(publisher, 'titel-2')
+        accept_notice(publisher, 'titel-3')
+
+        check((
+            (publisher, 'titel-1', 'p'),
+            (publisher, 'titel-2', 'p'),
+            (publisher, 'titel-3', 'p'),
+            (editor_1, 'titel-1', 'pc'),
+            (editor_1, 'titel-2', 'pc'),
+            (editor_1, 'titel-3', 'pc'),
+            (editor_2, 'titel-1', 'pc'),
+            (editor_2, 'titel-2', 'pc'),
+            (editor_2, 'titel-3', 'pc'),
+            (editor_3, 'titel-1', 'pc'),
+            (editor_3, 'titel-2', 'pc'),
+            (editor_3, 'titel-3', 'pc'),
+        ))
+
+
+def test_view_notice_preview(gazette_app):
+    editor = Client(gazette_app)
+    login_editor_1(editor)
+
+    with freeze_time("2017-11-01 12:00"):
         manage = editor.get('/notices/drafted/new-notice')
-        manage.form['title'] = "Erneuerungswahlen"
+        manage.form['title'] = 'Titel'
         manage.form['organization'] = '200'
         manage.form['category'] = '11'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1. Oktober 2017"
-        manage = manage.form.submit().follow()
-        assert "action-copy" not in manage
-        assert "action-delete" in manage
-        assert "action-edit" in manage
-        assert "action-preview" in manage
-        assert "action-accept" not in manage
-        assert "action-reject" not in manage
-        assert "action-submit" in manage
-        assert "Erneuerungswahlen" in manage
-        assert "1. Oktober 2017" in manage
-        assert "Education" in manage
-        assert "editor@example.org" in manage
-        assert "Nr. 44, 03.11.2017" in manage
-        assert "Nr. 45, 10.11.2017" in manage
-        assert "in Arbeit" in manage
-        assert "erstellt" in manage
+        manage.form.submit()
 
-        manage = publisher.get('/notices/drafted/new-notice')
-        manage.form['title'] = "Schalterschliessung"
-        manage.form['organization'] = '200'
-        manage.form['category'] = '11'
-        manage.form['issues'] = ['2017-44', '2017-45']
-        manage.form['text'] = "1.-15. Oktober 2017"
-        manage = manage.form.submit().follow()
-        assert "action-copy" not in manage
-        assert "action-delete" not in manage
-        assert "action-edit" not in manage
-        assert "action-preview" in manage
-        assert "action-accept" not in manage
-        assert "action-reject" not in manage
-        assert "action-submit" not in manage
-        assert "Schalterschliessung" in manage
-        assert "1.-15. Oktober 2017" in manage
-        assert "Education" in manage
-        assert "publisher@example.org" in manage
-        assert "Nr. 44, 03.11.2017" in manage
-        assert "Nr. 45, 10.11.2017" in manage
-        assert "in Arbeit" in manage
-        assert "erstellt" in manage
+    view = editor.get('/notice/titel/preview')
+    assert "Titel" in view
+    assert "1. Oktober 2017" in view
+    assert "Civic Community" not in view
+    assert "Education" not in view
+    assert "TestGroup" not in view
+    assert "Nr. 44, 03.11.2017" not in view
+    assert "Nr. 45, 10.11.2017" not in view
+    assert "in Arbeit" not in view
+    assert "erstellt" not in view
 
-        # preview the notice(s)
-        preview = editor.get('/notice/erneuerungswahlen/preview')
-        assert "Erneuerungswahlen" in preview
-        assert "1. Oktober 2017" in preview
-        preview = publisher.get('/notice/schalterschliessung/preview')
-        assert "Schalterschliessung" in preview
-        assert "1.-15. Oktober 2017" in preview
 
-        # edit notice(s)
-        manage = editor.get('/notice/erneuerungswahlen/edit')
-        manage.form['issues'] = ['2017-44', '2017-45', '2017-46']
-        manage = manage.form.submit().follow()
-        assert "Nr. 46, 17.11.2017" in manage
-        assert "bearbeitet" in manage
+def test_view_notice_submit(gazette_app):
+    editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
 
-        manage = publisher.get('/notice/schalterschliessung/edit')
-        manage.form['text'] = "1.-17. Oktober 2017"
-        manage = manage.form.submit().follow()
-        assert "1.-17. Oktober 2017" in manage
-        assert "bearbeitet" in manage
+    with freeze_time("2017-11-01 12:00"):
+        # create a notice for each editor
+        for count, user in enumerate((editor_1, editor_2, editor_3)):
+            manage = user.get('/notices/drafted/new-notice')
+            manage.form['title'] = 'Titel {}'.format(count + 1)
+            manage.form['organization'] = '200'
+            manage.form['category'] = '11'
+            manage.form['issues'] = ['2017-44', '2017-45']
+            manage.form['text'] = "1. Oktober 2017"
+            manage.form.submit()
 
-        # try to accept the drafted notice(s)
-        editor.get('/notice/erneuerungswahlen/accept', status=403)
-        assert (
-            "Es können nur eingereichte Meldungen angenommen werden."
-        ) in publisher.get('/notice/erneuerungswahlen/accept')
+    # check invalid actions
+    for action in ('reject', 'accept'):
+        assert not publisher.get('/notice/titel-1/{}'.format(action)).forms
+        assert not publisher.get('/notice/titel-2/{}'.format(action)).forms
+        assert not publisher.get('/notice/titel-3/{}'.format(action)).forms
+        for user in (editor_1, editor_2, editor_3):
+            user.get('/notice/titel-1/{}'.format(action), status=403)
+            user.get('/notice/titel-2/{}'.format(action), status=403)
+            user.get('/notice/titel-3/{}'.format(action), status=403)
 
-        # try to reject the drafted notice(s)
-        editor.get('/notice/erneuerungswahlen/reject', status=403)
-        assert (
-            "Es können nur eingereichte Meldungen zurückgewiesen "
-            "werden."
-        ) in publisher.get('/notice/erneuerungswahlen/reject')
+    # check if the notices can be submitted
+    for user, slug, forbidden in (
+        (editor_1, 'titel-3', True),
+        (editor_3, 'titel-1', True),
+        (editor_1, 'titel-1', False),
+        (editor_1, 'titel-2', False),
+        (editor_3, 'titel-3', False),
+    ):
+        submit_notice(user, slug, forbidden=forbidden)
 
-        # submit the notice(s)
-        # state: SUBMITTED
-        manage = editor.get('/notice/erneuerungswahlen/submit')
-        manage = manage.form.submit().follow().follow()
-        assert "Meldung eingereicht." in manage
-        manage = editor.get('/notice/erneuerungswahlen')
-        assert "action-copy" not in manage
-        assert "action-delete" not in manage
-        assert "action-edit" not in manage
-        assert "action-preview" in manage
-        assert "action-accept" not in manage
-        assert "action-reject" not in manage
-        assert "action-submit" not in manage
 
-        manage = publisher.get('/notice/schalterschliessung/submit')
-        manage = manage.form.submit().follow().follow()
-        assert "Meldung eingereicht." in manage
-        manage = publisher.get('/notice/schalterschliessung')
-        assert "eingereicht" in manage
-        assert "action-copy" not in manage
-        assert "action-delete" not in manage
-        assert "action-edit" in manage
-        assert "action-preview" in manage
-        assert "action-accept" in manage
-        assert "action-reject" in manage
-        assert "action-submit" not in manage
+def test_view_notice_reject(gazette_app):
+    editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
 
-        # try to submit submitted notice
-        assert (
-            "Es können nur zurückgewiesene Meldungen oder Meldungen "
-            "in Arbeit eingereicht werden."
-        ) in editor.get('/notice/erneuerungswahlen/submit')
-        assert (
-            "Es können nur zurückgewiesene Meldungen oder Meldungen "
-            "in Arbeit eingereicht werden."
-        ) in publisher.get('/notice/schalterschliessung/submit')
+    with freeze_time("2017-11-01 12:00"):
+        # create a notice for each editor
+        for count, user in enumerate((editor_1, editor_2, editor_3)):
+            manage = user.get('/notices/drafted/new-notice')
+            manage.form['title'] = 'Titel {}'.format(count + 1)
+            manage.form['organization'] = '200'
+            manage.form['category'] = '11'
+            manage.form['issues'] = ['2017-44', '2017-45']
+            manage.form['text'] = "1. Oktober 2017"
+            manage.form.submit()
+            submit_notice(user, 'titel-{}'.format(count + 1))
 
-        # try to delete the submitted notice(s)
-        assert (
-            "Es können nur zurückgewiesene Meldungen oder Meldungen "
-            "in Arbeit gelöscht werden."
-        ) in editor.get('/notice/erneuerungswahlen/delete')
-        assert (
-            "Es können nur zurückgewiesene Meldungen oder Meldungen "
-            "in Arbeit gelöscht werden."
-        ) in publisher.get('/notice/schalterschliessung/delete')
+    # check wrong actions
+    submit_notice(publisher, 'titel-1', unable=True)
+    submit_notice(publisher, 'titel-2', unable=True)
+    submit_notice(publisher, 'titel-3', unable=True)
+    submit_notice(editor_1, 'titel-1', unable=True)
+    submit_notice(editor_1, 'titel-2', unable=True)
+    submit_notice(editor_1, 'titel-3', forbidden=True)
+    submit_notice(editor_2, 'titel-1', unable=True)
+    submit_notice(editor_2, 'titel-2', unable=True)
+    submit_notice(editor_2, 'titel-3', forbidden=True)
+    submit_notice(editor_3, 'titel-1', forbidden=True)
+    submit_notice(editor_3, 'titel-2', forbidden=True)
+    submit_notice(editor_3, 'titel-3', unable=True)
 
-        # edit the submitted notice(s)
-        manage = editor.get('/notice/erneuerungswahlen/edit')
-        manage.form['issues'] = ['2017-44', '2017-45', '2017-46', '2017-47']
-        manage = manage.form.submit().follow()
-        assert "Nr. 47, 24.11.2017" in manage
+    # check if the notices can be rejected
+    for user, slug, forbidden in (
+        (editor_1, 'titel-1', True),
+        (editor_1, 'titel-2', True),
+        (editor_1, 'titel-3', True),
+        (editor_3, 'titel-3', True),
+        (publisher, 'titel-1', False),
+        (publisher, 'titel-2', False),
+        (publisher, 'titel-3', False),
+    ):
+        reject_notice(user, slug, forbidden=forbidden)
 
-        manage = publisher.get('/notice/schalterschliessung/edit')
-        manage.form['text'] = "1.-18. Oktober 2017"
-        manage = manage.form.submit().follow()
-        assert "1.-18. Oktober 2017" in manage
 
-        # reject one notice
-        # state: REJECTED
-        editor.get('/notice/erneuerungswahlen/reject', status=403)
+def test_view_notice_accept(gazette_app):
+    editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
 
-        manage = publisher.get('/notice/erneuerungswahlen/reject')
-        manage.form['comment'] = "Wichtiger Grund."
-        manage = manage.form.submit().follow().follow()
-        assert "Meldung zurückgewiesen." in manage
-        manage = publisher.get('/notice/erneuerungswahlen')
-        assert "zurückgewiesen" in manage
-        assert "action-copy" not in manage
-        assert "action-delete" not in manage
-        assert "action-edit" not in manage
-        assert "action-preview" in manage
-        assert "action-accept" not in manage
-        assert "action-reject" not in manage
-        assert "action-submit" not in manage
+    with freeze_time("2017-11-01 12:00"):
+        # create a notice for each editor
+        for count, user in enumerate((editor_1, editor_2, editor_3)):
+            manage = user.get('/notices/drafted/new-notice')
+            manage.form['title'] = 'Titel {}'.format(count + 1)
+            manage.form['organization'] = '200'
+            manage.form['category'] = '11'
+            manage.form['issues'] = ['2017-44', '2017-45']
+            manage.form['text'] = "1. Oktober 2017"
+            manage.form.submit()
+            submit_notice(user, 'titel-{}'.format(count + 1))
 
-        manage = editor.get('/notice/erneuerungswahlen')
-        assert "zurückgewiesen" in manage
-        assert "action-copy" not in manage
-        assert "action-delete" in manage
-        assert "action-edit" in manage
-        assert "action-preview" in manage
-        assert "action-accept" not in manage
-        assert "action-reject" not in manage
-        assert "action-submit" in manage
+    # check wrong actions
+    submit_notice(publisher, 'titel-1', unable=True)
+    submit_notice(publisher, 'titel-2', unable=True)
+    submit_notice(publisher, 'titel-3', unable=True)
+    submit_notice(editor_1, 'titel-1', unable=True)
+    submit_notice(editor_1, 'titel-2', unable=True)
+    submit_notice(editor_1, 'titel-3', forbidden=True)
+    submit_notice(editor_2, 'titel-1', unable=True)
+    submit_notice(editor_2, 'titel-2', unable=True)
+    submit_notice(editor_2, 'titel-3', forbidden=True)
+    submit_notice(editor_3, 'titel-1', forbidden=True)
+    submit_notice(editor_3, 'titel-2', forbidden=True)
+    submit_notice(editor_3, 'titel-3', unable=True)
 
-        assert len(gazette_app.smtp.outbox) == 1
-        message = gazette_app.smtp.outbox[0]
-        message = message.get_payload(1).get_payload(decode=True)
-        message = message.decode('utf-8')
-        assert "Ihre Meldung wurde zurückgewiesen:" in message
-        assert "Wichtiger Grund" in message
-
-        # try to reject the rejected notice
-        editor.get('/notice/erneuerungswahlen/reject', status=403)
-        assert (
-            "Es können nur eingereichte Meldungen zurückgewiesen "
-            "werden."
-        ) in publisher.get('/notice/erneuerungswahlen/reject')
-
-        # try to accept the rejected notice
-        editor.get('/notice/erneuerungswahlen/accept', status=403)
-        assert (
-            "Es können nur eingereichte Meldungen angenommen werden."
-        ) in publisher.get('/notice/erneuerungswahlen/accept')
-
-        # edit the rejected notice
-        manage = editor.get('/notice/erneuerungswahlen')
-        assert "Diese Meldung wurde zurückgewiesen." in manage
-        assert "<strong>Wichtiger Grund.</strong>" in manage
-
-        manage = editor.get('/notice/erneuerungswahlen/edit')
-        manage.form['title'] = "Erneuerungswahlen 2017"
-        manage = manage.form.submit().follow()
-        assert "Erneuerungswahlen 2017" in manage
-
-        manage = publisher.get('/notice/erneuerungswahlen/edit')
-        manage.form['title'] = "Erneuerungswahlen 10/2017"
-        manage = manage.form.submit().follow()
-        assert "Erneuerungswahlen 10/2017" in manage
-
-        # submit the rejected notice
-        manage = editor.get('/notice/erneuerungswahlen/submit')
-        manage = manage.form.submit().follow().follow()
-        assert "Meldung eingereicht." in manage
-
-        # accept the submitted notice
-        # state: ACCEPTED
-        editor.get('/notice/erneuerungswahlen/accept', status=403)
-
-        manage = publisher.get('/notice/erneuerungswahlen/accept')
-        manage = manage.form.submit().follow().follow()
-        assert "Meldung angenommen." in manage
-        manage = publisher.get('/notice/erneuerungswahlen')
-        assert "angenommen" in manage
-        assert "action-copy" not in manage
-        assert "action-delete" not in manage
-        assert "action-edit" not in manage
-        assert "action-preview" in manage
-        assert "action-accept" not in manage
-        assert "action-reject" not in manage
-        assert "action-submit" not in manage
-
-        manage = editor.get('/notice/erneuerungswahlen')
-        assert "angenommen" in manage
-        assert "action-copy" in manage
-        assert "action-delete" not in manage
-        assert "action-edit" not in manage
-        assert "action-preview" in manage
-        assert "action-accept" not in manage
-        assert "action-reject" not in manage
-        assert "action-submit" not in manage
-
-        assert len(gazette_app.smtp.outbox) == 2
-        message = gazette_app.smtp.outbox[1]
-        message = message.get_payload(1).get_payload(decode=True)
-        message = message.decode('utf-8')
-        assert "Bitte veröffentlichen Sie folgende amtliche Meldung:" \
-            in message
-        assert "Nr. 45, 10.11.2017" in message
-        assert "Nr. 47, 24.11.2017" in message
-        assert "Nr. 44, 03.11.2017" in message
-        assert "Nr. 46, 17.11.2017" in message
-        assert "Erneuerungswahlen 10/2017" in message
-        assert "Education" in message
-        assert "1. Oktober 2017" in message
-
-        # try to acccept an accepted notice
-        editor.get('/notice/erneuerungswahlen/accept', status=403)
-        assert (
-            "Es können nur eingereichte Meldungen angenommen werden."
-        ) in publisher.get('/notice/erneuerungswahlen/accept')
-
-        # try to submit the accepted notice
-        assert (
-            "Es können nur zurückgewiesene Meldungen oder Meldungen "
-            "in Arbeit eingereicht werden."
-        ) in editor.get('/notice/erneuerungswahlen/submit')
-        assert (
-            "Es können nur zurückgewiesene Meldungen oder Meldungen "
-            "in Arbeit eingereicht werden."
-        ) in publisher.get('/notice/erneuerungswahlen/submit')
-
-        # try to reject an accepted notice
-        editor.get('/notice/erneuerungswahlen/reject', status=403)
-        assert (
-            "Es können nur eingereichte Meldungen zurückgewiesen "
-            "werden."
-        ) in publisher.get('/notice/erneuerungswahlen/reject')
-
-        # try to edit the accepted notice
-        assert (
-            "Angenommene Meldungen können nicht mehr bearbeitet werden."
-        ) in editor.get('/notice/erneuerungswahlen/edit')
-        assert (
-            "Angenommene Meldungen können nicht mehr bearbeitet werden."
-        ) in publisher.get('/notice/erneuerungswahlen/edit')
-
-        # try to delete the accepted notice
-        assert (
-            "Es können nur zurückgewiesene Meldungen oder Meldungen "
-            "in Arbeit gelöscht werden."
-        ) in editor.get('/notice/erneuerungswahlen/delete')
-        assert (
-            "Es können nur zurückgewiesene Meldungen oder Meldungen "
-            "in Arbeit gelöscht werden."
-        ) in publisher.get('/notice/erneuerungswahlen/delete')
+    # check if the notices can be rejected
+    for user, slug, forbidden in (
+        (editor_1, 'titel-1', True),
+        (editor_1, 'titel-2', True),
+        (editor_1, 'titel-3', True),
+        (editor_3, 'titel-3', True),
+        (publisher, 'titel-1', False),
+        (publisher, 'titel-2', False),
+        (publisher, 'titel-3', False),
+    ):
+        accept_notice(user, slug, forbidden=forbidden)
 
 
 def test_view_notice_delete(gazette_app):
     with freeze_time("2017-11-01 12:00"):
         editor = Client(gazette_app)
-        login_editor(editor)
+        login_editor_1(editor)
 
         publisher = Client(gazette_app)
         login_publisher(publisher)
@@ -341,7 +406,7 @@ def test_view_notice_delete(gazette_app):
             manage.form['text'] = "1. Oktober 2017"
             manage.form.submit()
 
-            editor.get('/notice/erneuerungswahlen/submit').form.submit()
+            submit_notice(user, 'erneuerungswahlen')
 
             manage = user.get('/notice/erneuerungswahlen/delete')
             assert manage.forms == {}
@@ -359,11 +424,8 @@ def test_view_notice_delete(gazette_app):
             manage.form['text'] = "1. Oktober 2017"
             manage.form.submit()
 
-            editor.get('/notice/erneuerungswahlen/submit').form.submit()
-
-            manage = publisher.get('/notice/erneuerungswahlen/reject')
-            manage.form['comment'] = 'comment'
-            manage.form.submit()
+            submit_notice(user, 'erneuerungswahlen')
+            reject_notice(publisher, 'erneuerungswahlen')
 
             manage = user.get('/notice/erneuerungswahlen/delete')
             manage = manage.form.submit().follow().follow()
@@ -379,8 +441,8 @@ def test_view_notice_delete(gazette_app):
             manage.form['text'] = "1. Oktober 2017"
             manage.form.submit()
 
-            editor.get('/notice/erneuerungswahlen/submit').form.submit()
-            publisher.get('/notice/erneuerungswahlen/accept').form.submit()
+            submit_notice(editor, 'erneuerungswahlen')
+            accept_notice(publisher, 'erneuerungswahlen')
 
             manage = user.get('/notice/erneuerungswahlen/delete')
             assert manage.forms == {}
@@ -389,15 +451,18 @@ def test_view_notice_delete(gazette_app):
             manage.form.submit().follow().follow()
 
 
-def test_view_notice_edit_others(gazette_app):
-    with freeze_time("2017-11-01 12:00"):
-        editor = Client(gazette_app)
-        login_editor(editor)
+def test_view_notice_changelog(gazette_app):
+    editor_1 = Client(gazette_app)
+    login_editor_1(editor_1)
 
-        publisher = Client(gazette_app)
-        login_publisher(publisher)
+    editor_2 = Client(gazette_app)
+    login_editor_1(editor_2)
 
-        manage = publisher.get('/notices/drafted/new-notice')
+    publisher = Client(gazette_app)
+    login_publisher(publisher)
+
+    with freeze_time("2017-11-01 12:00 CET"):
+        manage = editor_1.get('/notices/drafted/new-notice')
         manage.form['title'] = "Erneuerungswahlen"
         manage.form['organization'] = '200'
         manage.form['category'] = '11'
@@ -405,17 +470,136 @@ def test_view_notice_edit_others(gazette_app):
         manage.form['text'] = "1. Oktober 2017"
         manage.form.submit()
 
-        editor.get('/notice/erneuerungswahlen/edit', status=403)
-        editor.get('/notice/erneuerungswahlen/submit', status=403)
-        editor.get('/notice/erneuerungswahlen/delete', status=403)
+    with freeze_time("2017-11-01 12:02 CET"):
+        submit_notice(editor_1, 'erneuerungswahlen')
+
+    with freeze_time("2017-11-01 12:30 CET"):
+        reject_notice(publisher, 'erneuerungswahlen')
+
+    with freeze_time("2017-11-01 14:00 CET"):
+        edit_notice(editor_2, 'erneuerungswahlen', organization='300')
+
+    with freeze_time("2017-11-01 14:02 CET"):
+        submit_notice(editor_2, 'erneuerungswahlen')
+
+    with freeze_time("2017-11-01 15:00 CET"):
+        accept_notice(publisher, 'erneuerungswahlen')
+
+    view = editor_1.get('/notice/erneuerungswahlen')
+
+    changes = [
+        ''.join(i.strip() for i in td.itertext())
+        for td in view.pyquery('table.changes td')
+    ]
+    changes = sorted([
+        (
+            changes[4 * i + 0],
+            changes[4 * i + 1],
+            changes[4 * i + 2],
+            changes[4 * i + 3]
+        )
+        for i in range(len(changes) // 4)
+    ])
+
+    assert changes == [
+        ('01.11.2017 12:00', 'editor1@example.org', 'TestGroup', 'erstellt'),
+        ('01.11.2017 12:02', 'editor1@example.org', 'TestGroup',
+         'eingereicht'),
+        ('01.11.2017 12:30', 'publisher@example.org', '', 'zurückgewiesenXYZ'),
+        ('01.11.2017 14:00', 'editor1@example.org', 'TestGroup', 'bearbeitet'),
+        ('01.11.2017 14:02', 'editor1@example.org', 'TestGroup',
+         'eingereicht'),
+        ('01.11.2017 15:00', 'publisher@example.org', '', 'E-Mail gesendet'),
+        ('01.11.2017 15:00', 'publisher@example.org', '', 'angenommen'),
+    ]
+
+
+def test_view_notice_edit(gazette_app):
+    editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
+
+    with freeze_time("2017-11-01 12:00"):
+        manage = editor_1.get('/notices/drafted/new-notice')
+        manage.form['title'] = "Notice"
+        manage.form['organization'] = '200'
+        manage.form['category'] = '11'
+        manage.form['issues'] = ['2017-44', '2017-45']
+        manage.form['text'] = "1. Oktober 2017"
+        manage.form.submit()
+
+        edit_notice(
+            editor_1, 'notice',
+            title="Kantonsratswahl",
+            organization='300',
+            category='12',
+            issues=['2017-46'],
+            text="1. Dezember 2017",
+        )
+        view = editor_1.get('/notice/notice')
+        assert "Kantonsratswahl" in view
+        assert "Municipality" in view
+        assert "Submissions" in view
+        assert "Nr. 46, 17.11.2017" in view
+        assert "1. Dezember 2017" in view
+
+    # drafed
+    for user, title, forbidden in (
+        (editor_1, 'XXX1', False),
+        (editor_2, 'XXX2', False),
+        (editor_3, 'XXX3', True),
+        (publisher, 'XXX4', False),
+    ):
+        edit_notice(user, 'notice', title=title, forbidden=forbidden)
+        if not forbidden:
+            assert title in editor_1.get('/notice/notice')
+
+    # submitted
+    submit_notice(editor_1, 'notice')
+    for user, title, forbidden in (
+        (editor_1, 'YYY1', False),
+        (editor_2, 'YYY2', False),
+        (editor_3, 'YYY3', True),
+        (publisher, 'YYY4', False),
+    ):
+        edit_notice(user, 'notice', title=title, forbidden=forbidden)
+        if not forbidden:
+            assert title in editor_1.get('/notice/notice')
+
+    # rejected
+    reject_notice(publisher, 'notice')
+    for user, title, forbidden in (
+        (editor_1, 'YYY1', False),
+        (editor_2, 'YYY2', False),
+        (editor_3, 'YYY3', True),
+        (publisher, 'YYY4', False),
+    ):
+        edit_notice(user, 'notice', title=title, forbidden=forbidden)
+        if not forbidden:
+            assert title in editor_1.get('/notice/notice')
+
+    # accepted
+    submit_notice(editor_1, 'notice')
+    accept_notice(publisher, 'notice')
+    edit_notice(editor_1, 'notice', unable=True)
+    edit_notice(editor_2, 'notice', unable=True)
+    edit_notice(editor_3, 'notice', forbidden=True)
+    edit_notice(publisher, 'notice', unable=True)
 
 
 def test_view_notice_copy(gazette_app):
-    editor = Client(gazette_app)
-    login_editor(editor)
+    editor_1 = Client(gazette_app)
+    login_editor_1(editor_1)
+
+    editor_2 = Client(gazette_app)
+    login_editor_1(editor_2)
+
+    editor_3 = Client(gazette_app)
+    login_editor_1(editor_3)
+
+    publisher = Client(gazette_app)
+    login_publisher(publisher)
 
     with freeze_time("2017-10-01 12:00"):
-        manage = editor.get('/notices/drafted/new-notice')
+        manage = editor_1.get('/notices/drafted/new-notice')
         manage.form['title'] = "Erneuerungswahlen"
         manage.form['organization'] = '200'
         manage.form['category'] = '11'
@@ -423,21 +607,21 @@ def test_view_notice_copy(gazette_app):
         manage.form['text'] = "1. Oktober 2017"
         manage.form.submit()
 
-        editor.get('/notice/erneuerungswahlen/submit').form.submit()
-
-    publisher = Client(gazette_app)
-    login_publisher(publisher)
-    publisher.get('/notice/erneuerungswahlen/accept').form.submit()
+        submit_notice(editor_1, 'erneuerungswahlen')
+        accept_notice(publisher, 'erneuerungswahlen')
 
     with freeze_time("2018-01-01 12:00"):
-        manage = editor.get('/notice/erneuerungswahlen').click("Kopieren")
-        assert manage.form['title'].value == "Erneuerungswahlen"
-        assert manage.form['organization'].value == '200'
-        assert manage.form['category'].value == '11'
-        assert manage.form['text'].value == "1. Oktober 2017"
-        assert "Das Formular enthält Fehler" in manage.form.submit()
+        for user in (editor_1, editor_2, editor_3):
+            manage = user.get('/notice/erneuerungswahlen').click("Kopieren")
+            assert manage.form['title'].value == "Erneuerungswahlen"
+            assert manage.form['organization'].value == '200'
+            assert manage.form['category'].value == '11'
+            assert manage.form['text'].value == "1. Oktober 2017"
+            assert manage.form['issues'].value is None
 
-        manage.form['issues'] = ['2018-1']
-        manage = manage.form.submit().follow()
+            manage.form['issues'] = ['2018-1']
+            manage = manage.form.submit().follow()
 
-        assert "Erneuerungswahlen" in editor.get('/dashboard')
+            assert "Erneuerungswahlen" in user.get('/dashboard')
+
+        assert "Kopieren" not in publisher.get('/notice/erneuerungswahlen')

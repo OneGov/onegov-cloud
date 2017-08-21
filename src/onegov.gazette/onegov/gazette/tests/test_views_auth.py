@@ -15,7 +15,7 @@ def test_view_permissions():
 def test_view_login_logout(gazette_app):
     client = Client(gazette_app)
 
-    for user in ('admin', 'editor', 'publisher'):
+    for user in ('admin', 'editor1', 'editor2', 'editor3', 'publisher'):
         login = client.get('/').follow()
         login.form['username'] = '{}@example.org'.format(user)
         login.form['password'] = 'hunter1'

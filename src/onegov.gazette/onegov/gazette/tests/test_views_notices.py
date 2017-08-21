@@ -1,6 +1,8 @@
 from freezegun import freeze_time
 from onegov.gazette.tests import login_admin
-from onegov.gazette.tests import login_editor
+from onegov.gazette.tests import login_editor_1
+from onegov.gazette.tests import login_editor_2
+from onegov.gazette.tests import login_editor_3
 from onegov.gazette.tests import login_publisher
 from unittest.mock import patch
 from urllib.parse import urlparse
@@ -11,19 +13,24 @@ from webtest import TestApp as Client
 def test_view_notices(gazette_app):
     with freeze_time("2017-11-01 12:00"):
 
-        client = Client(gazette_app)
-        login_publisher(client)
+        publisher = Client(gazette_app)
+        login_publisher(publisher)
 
-        editor = Client(gazette_app)
-        login_editor(editor)
+        editor_1 = Client(gazette_app)
+        login_editor_1(editor_1)
 
-        assert "Keine Meldungen" in client.get('/notices/drafted')
-        assert "Keine Meldungen" in client.get('/notices/submitted')
-        assert "Keine Meldungen" in client.get('/notices/rejected')
-        assert "Keine Meldungen" in client.get('/notices/accepted')
+        editor_2 = Client(gazette_app)
+        login_editor_2(editor_2)
 
-        # new notice
-        manage = client.get('/notices/drafted/new-notice')
+        editor_3 = Client(gazette_app)
+        login_editor_3(editor_3)
+
+        for user in (publisher, editor_1, editor_2, editor_3):
+            for state in ('drafted', 'submitted', 'rejected', 'accepted'):
+                assert "Keine Meldungen" in user.get('/notices/' + state)
+
+        # new notices
+        manage = editor_1.get('/notices/drafted/new-notice')
         manage.form['title'] = "Erneuerungswahlen"
         manage.form['organization'] = '200'
         manage.form['category'] = '11'
@@ -31,44 +38,84 @@ def test_view_notices(gazette_app):
         manage.form['text'] = "1. Oktober 2017"
         manage.form.submit()
 
-        assert "Erneuerungswahlen" in client.get('/notices/drafted')
-        assert "Keine Meldungen" in client.get('/notices/submitted')
-        assert "Keine Meldungen" in client.get('/notices/rejected')
-        assert "Keine Meldungen" in client.get('/notices/accepted')
+        manage = editor_3.get('/notices/drafted/new-notice')
+        manage.form['title'] = "Kantonsratswahlen"
+        manage.form['organization'] = '200'
+        manage.form['category'] = '11'
+        manage.form['issues'] = ['2017-44', '2017-45']
+        manage.form['text'] = "1. Oktober 2017"
+        manage.form.submit()
 
-        assert "Keine Meldungen" in editor.get('/notices/drafted')
+        for user in (publisher, editor_1, editor_2, editor_3):
+            for state in ('submitted', 'rejected', 'accepted'):
+                assert "Keine Meldungen" in user.get('/notices/' + state)
 
-        # submit notice
-        client.get('/notice/erneuerungswahlen/submit').form.submit()
+        assert "Erneuerungswahlen" in publisher.get('/notices/drafted')
+        assert "Erneuerungswahlen" in editor_1.get('/notices/drafted')
+        assert "Erneuerungswahlen" in editor_2.get('/notices/drafted')
+        assert "Erneuerungswahlen" not in editor_3.get('/notices/drafted')
+        assert "Kantonsratswahlen" in publisher.get('/notices/drafted')
+        assert "Kantonsratswahlen" not in editor_1.get('/notices/drafted')
+        assert "Kantonsratswahlen" not in editor_1.get('/notices/drafted')
+        assert "Kantonsratswahlen" in editor_3.get('/notices/drafted')
 
-        assert "Keine Meldungen" in client.get('/notices/drafted')
-        assert "Erneuerungswahlen" in client.get('/notices/submitted')
-        assert "Keine Meldungen" in client.get('/notices/rejected')
-        assert "Keine Meldungen" in client.get('/notices/accepted')
+        # submit notices
+        editor_1.get('/notice/erneuerungswahlen/submit').form.submit()
+        editor_3.get('/notice/kantonsratswahlen/submit').form.submit()
 
-        assert "Keine Meldungen" in editor.get('/notices/submitted')
+        for user in (publisher, editor_1, editor_2, editor_3):
+            for state in ('drafted', 'rejected', 'accepted'):
+                assert "Keine Meldungen" in user.get('/notices/' + state)
 
-        # reject notice
-        manage = client.get('/notice/erneuerungswahlen/reject')
+        assert "Erneuerungswahlen" in publisher.get('/notices/submitted')
+        assert "Erneuerungswahlen" in editor_1.get('/notices/submitted')
+        assert "Erneuerungswahlen" in editor_2.get('/notices/submitted')
+        assert "Erneuerungswahlen" not in editor_3.get('/notices/submitted')
+        assert "Kantonsratswahlen" in publisher.get('/notices/submitted')
+        assert "Kantonsratswahlen" not in editor_1.get('/notices/submitted')
+        assert "Kantonsratswahlen" not in editor_2.get('/notices/submitted')
+        assert "Kantonsratswahlen" in editor_3.get('/notices/submitted')
+
+        # reject notices
+        manage = publisher.get('/notice/erneuerungswahlen/reject')
         manage.form['comment'] = 'comment'
         manage.form.submit()
-        assert "Keine Meldungen" in client.get('/notices/drafted')
-        assert "Keine Meldungen" in client.get('/notices/submitted')
-        assert "Erneuerungswahlen" in client.get('/notices/rejected')
-        assert "Keine Meldungen" in client.get('/notices/accepted')
 
-        assert "Keine Meldungen" in editor.get('/notices/rejected')
+        manage = publisher.get('/notice/kantonsratswahlen/reject')
+        manage.form['comment'] = 'comment'
+        manage.form.submit()
 
-        # submit & accept notice
-        client.get('/notice/erneuerungswahlen/submit').form.submit()
-        client.get('/notice/erneuerungswahlen/accept').form.submit()
+        for user in (publisher, editor_1, editor_2, editor_3):
+            for state in ('drafted', 'submitted', 'accepted'):
+                assert "Keine Meldungen" in user.get('/notices/' + state)
 
-        assert "Keine Meldungen" in client.get('/notices/drafted')
-        assert "Keine Meldungen" in client.get('/notices/submitted')
-        assert "Keine Meldungen" in client.get('/notices/rejected')
-        assert "Erneuerungswahlen" in client.get('/notices/accepted')
+        assert "Erneuerungswahlen" in publisher.get('/notices/rejected')
+        assert "Erneuerungswahlen" in editor_1.get('/notices/rejected')
+        assert "Erneuerungswahlen" in editor_2.get('/notices/rejected')
+        assert "Erneuerungswahlen" not in editor_3.get('/notices/rejected')
+        assert "Kantonsratswahlen" in publisher.get('/notices/rejected')
+        assert "Kantonsratswahlen" not in editor_1.get('/notices/rejected')
+        assert "Kantonsratswahlen" not in editor_2.get('/notices/rejected')
+        assert "Kantonsratswahlen" in editor_3.get('/notices/rejected')
 
-        assert "Keine Meldungen" in editor.get('/notices/accepted')
+        # submit & accept notices
+        editor_1.get('/notice/erneuerungswahlen/submit').form.submit()
+        publisher.get('/notice/erneuerungswahlen/accept').form.submit()
+        editor_3.get('/notice/kantonsratswahlen/submit').form.submit()
+        publisher.get('/notice/kantonsratswahlen/accept').form.submit()
+
+        for user in (publisher, editor_1, editor_2, editor_3):
+            for state in ('drafted', 'submitted', 'rejected'):
+                assert "Keine Meldungen" in user.get('/notices/' + state)
+
+        assert "Erneuerungswahlen" in publisher.get('/notices/accepted')
+        assert "Erneuerungswahlen" in editor_1.get('/notices/accepted')
+        assert "Erneuerungswahlen" in editor_2.get('/notices/accepted')
+        assert "Erneuerungswahlen" not in editor_3.get('/notices/accepted')
+        assert "Kantonsratswahlen" in publisher.get('/notices/accepted')
+        assert "Kantonsratswahlen" not in editor_1.get('/notices/accepted')
+        assert "Kantonsratswahlen" not in editor_2.get('/notices/accepted')
+        assert "Kantonsratswahlen" in editor_3.get('/notices/accepted')
 
 
 def test_view_notices_search(gazette_app):
@@ -265,7 +312,7 @@ def test_view_notices_order(gazette_app):
 def test_view_notices_statistics(gazette_app):
 
     editor = Client(gazette_app)
-    login_editor(editor)
+    login_editor_3(editor)  # this has no group
 
     publisher = Client(gazette_app)
     login_publisher(publisher)

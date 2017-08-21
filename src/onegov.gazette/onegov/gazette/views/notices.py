@@ -10,7 +10,7 @@ from onegov.gazette.forms import EmptyForm
 from onegov.gazette.forms import NoticeForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.views import get_user
-from onegov.gazette.views import get_user_id
+from onegov.gazette.views import get_user_and_group
 
 
 @GazetteApp.form(
@@ -108,10 +108,9 @@ def view_notices(self, request):
     }
 
     if not request.is_private(self):
+        self.user_ids, self.group_ids = get_user_and_group(request)
         if self.state == 'accepted':
             title = _("My Accepted Official Notices")
-
-        self.user_ids = [get_user_id(request)]
 
     return {
         'layout': layout,

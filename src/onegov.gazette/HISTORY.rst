@@ -67,6 +67,9 @@ Changelog
 - Caches the user name on notice changes in case they get deleted.
   [msom]
 
+- Shows notices for the same group.
+  [msom]
+
 0.0.4 (2017-08-03)
 ~~~~~~~~~~~~~~~~~~~
 

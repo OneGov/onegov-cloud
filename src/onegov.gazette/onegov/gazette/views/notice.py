@@ -11,7 +11,7 @@ from onegov.gazette.forms import RejectForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.layout import MailLayout
 from onegov.gazette.models import GazetteNotice
-from onegov.gazette.views import get_user_id
+from onegov.gazette.views import get_user_and_group
 from webob.exc import HTTPForbidden
 
 
@@ -21,7 +21,7 @@ from webob.exc import HTTPForbidden
     permission=Personal
 )
 def view_notice(self, request):
-    """ View a notice notice.
+    """ View a notice.
 
     View the notice and its meta data. This is the main view for the notices
     to do the state changes.
@@ -31,17 +31,21 @@ def view_notice(self, request):
     layout = Layout(self, request)
 
     actions = []
+
     if request.is_personal(self) and not request.is_private(self):
-        if self.state == 'drafted' or self.state == 'rejected':
-            actions.append(
-                (_("Submit"), request.link(self, 'submit'), 'primary')
-            )
-            actions.append(
-                (_("Edit"), request.link(self, 'edit'), 'secondary')
-            )
-            actions.append(
-                (_("Delete"), request.link(self, 'delete'), 'alert right')
-            )
+        user_ids, group_ids = get_user_and_group(request)
+        if (self.group_id in group_ids) or (self.user_id in user_ids):
+            if self.state == 'drafted' or self.state == 'rejected':
+
+                actions.append(
+                    (_("Submit"), request.link(self, 'submit'), 'primary')
+                )
+                actions.append(
+                    (_("Edit"), request.link(self, 'edit'), 'secondary')
+                )
+                actions.append(
+                    (_("Delete"), request.link(self, 'delete'), 'alert right')
+                )
         if self.state == 'accepted':
             actions.append(
                 (
@@ -113,8 +117,9 @@ def edit_notice(self, request, form):
 
     layout = Layout(self, request)
 
-    if self.user_id != get_user_id(request):
-        if not request.is_private(self):
+    if not request.is_private(self):
+        user_ids, group_ids = get_user_and_group(request)
+        if not ((self.group_id in group_ids) or (self.user_id in user_ids)):
             raise HTTPForbidden()
 
     if self.state == 'accepted' or self.state == 'published':
@@ -167,8 +172,9 @@ def delete_notice(self, request, form):
     """
     layout = Layout(self, request)
 
-    if self.user_id != get_user_id(request):
-        if not request.is_private(self):
+    if not request.is_private(self):
+        user_ids, group_ids = get_user_and_group(request)
+        if not ((self.group_id in group_ids) or (self.user_id in user_ids)):
             raise HTTPForbidden()
 
     callout = None
@@ -230,8 +236,9 @@ def submit_notice(self, request, form):
 
     layout = Layout(self, request)
 
-    if self.user_id != get_user_id(request):
-        if not request.is_private(self):
+    if not request.is_private(self):
+        user_ids, group_ids = get_user_and_group(request)
+        if not ((self.group_id in group_ids) or (self.user_id in user_ids)):
             raise HTTPForbidden()
 
     if self.state != 'drafted' and self.state != 'rejected':

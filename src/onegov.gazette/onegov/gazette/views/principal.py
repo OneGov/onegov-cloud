@@ -7,9 +7,8 @@ from onegov.gazette import _
 from onegov.gazette import GazetteApp
 from onegov.gazette.collections import GazetteNoticeCollection
 from onegov.gazette.layout import Layout
-from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import Principal
-from onegov.gazette.views import get_user_id
+from onegov.gazette.views import get_user_and_group
 
 
 @GazetteApp.html(
@@ -50,17 +49,21 @@ def view_dashboard(self, request):
 
     """
     layout = Layout(self, request)
-    session = request.app.session()
-    user_id = get_user_id(request)
 
-    rejected = GazetteNoticeCollection(session, state='rejected').query()
-    rejected = rejected.filter(GazetteNotice.user_id == user_id).all()
+    user_ids, group_ids = get_user_and_group(request)
+    collection = GazetteNoticeCollection(
+        request.app.session(),
+        user_ids=user_ids,
+        group_ids=group_ids
+    )
+
+    # rejected
+    rejected = collection.for_state('rejected').query().all()
     if rejected:
         request.message(_("You have rejected messages."), 'warning')
 
-    drafted = GazetteNoticeCollection(session, state='drafted').query()
-    drafted = drafted.filter(GazetteNotice.user_id == user_id).all()
-
+    # drafted
+    drafted = collection.for_state('drafted').query().all()
     now = datetime.now()
     limit = now + timedelta(days=2)
     for notice in drafted:
@@ -99,11 +102,11 @@ def view_dashboard(self, request):
                 'info'
             )
 
-    submitted = GazetteNoticeCollection(session, state='submitted').query()
-    submitted = submitted.filter(GazetteNotice.user_id == user_id).all()
+    # submitted
+    submitted = collection.for_state('submitted').query().all()
 
     new_notice = request.link(
-        GazetteNoticeCollection(session, state='drafted'),
+        collection.for_state('drafted'),
         name='new-notice'
     )
 
