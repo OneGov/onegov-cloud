@@ -207,7 +207,7 @@ def test_view_notices_order(gazette_app):
             'title': 'desc',
             'organization': 'asc',
             'category': 'asc',
-            'issue_date': 'asc'
+            'first_issue': 'asc'
         }
 
         # Invalid sorting
@@ -217,7 +217,7 @@ def test_view_notices_order(gazette_app):
             'title': 'desc',
             'organization': 'asc',
             'category': 'asc',
-            'issue_date': 'asc'
+            'first_issue': 'asc'
         }
 
         # Omit direction
@@ -227,7 +227,7 @@ def test_view_notices_order(gazette_app):
             'title': 'asc',
             'organization': 'asc',
             'category': 'desc',
-            'issue_date': 'asc'
+            'first_issue': 'asc'
         }
 
         # Sort by
@@ -239,7 +239,7 @@ def test_view_notices_order(gazette_app):
             'title': 'desc',
             'organization': 'asc',
             'category': 'asc',
-            'issue_date': 'asc'
+            'first_issue': 'asc'
         }
 
         ordered = client.get(url.format('title', 'desc'))
@@ -248,7 +248,7 @@ def test_view_notices_order(gazette_app):
             'title': 'asc',
             'organization': 'asc',
             'category': 'asc',
-            'issue_date': 'asc'
+            'first_issue': 'asc'
         }
 
         # ... organization
@@ -258,7 +258,7 @@ def test_view_notices_order(gazette_app):
             'title': 'asc',
             'organization': 'desc',
             'category': 'asc',
-            'issue_date': 'asc'
+            'first_issue': 'asc'
         }
 
         ordered = client.get(url.format('organization', 'desc'))
@@ -267,7 +267,7 @@ def test_view_notices_order(gazette_app):
             'title': 'asc',
             'organization': 'asc',
             'category': 'asc',
-            'issue_date': 'asc'
+            'first_issue': 'asc'
         }
 
         # ... category
@@ -277,7 +277,7 @@ def test_view_notices_order(gazette_app):
             'title': 'asc',
             'organization': 'asc',
             'category': 'desc',
-            'issue_date': 'asc'
+            'first_issue': 'asc'
         }
 
         ordered = client.get(url.format('category', 'desc'))
@@ -286,26 +286,26 @@ def test_view_notices_order(gazette_app):
             'title': 'asc',
             'organization': 'asc',
             'category': 'asc',
-            'issue_date': 'asc'
+            'first_issue': 'asc'
         }
 
         # ... issues
-        ordered = client.get(url.format('issue_date', 'asc'))
+        ordered = client.get(url.format('first_issue', 'asc'))
         assert get_items(ordered) == ["Erneuerungswahlen", "Kantonsratswahlen"]
         assert get_ordering(ordered) == {
             'title': 'asc',
             'organization': 'asc',
             'category': 'asc',
-            'issue_date': 'desc'
+            'first_issue': 'desc'
         }
 
-        ordered = client.get(url.format('issue_date', 'desc'))
+        ordered = client.get(url.format('first_issue', 'desc'))
         assert get_items(ordered) == ["Kantonsratswahlen", "Erneuerungswahlen"]
         assert get_ordering(ordered) == {
             'title': 'asc',
             'organization': 'asc',
             'category': 'asc',
-            'issue_date': 'asc'
+            'first_issue': 'asc'
         }
 
 
