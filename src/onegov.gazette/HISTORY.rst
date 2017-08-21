@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.1.0 (2017-08-21)
+~~~~~~~~~~~~~~~~~~~
 
 - Shows the name of the logged-in user.
   [msom]
