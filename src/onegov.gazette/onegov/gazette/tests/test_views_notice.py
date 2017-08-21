@@ -461,7 +461,7 @@ def test_view_notice_changelog(gazette_app):
     publisher = Client(gazette_app)
     login_publisher(publisher)
 
-    with freeze_time("2017-11-01 12:00 CET"):
+    with freeze_time("2017-11-01 12:00"):
         manage = editor_1.get('/notices/drafted/new-notice')
         manage.form['title'] = "Erneuerungswahlen"
         manage.form['organization'] = '200'
@@ -470,19 +470,19 @@ def test_view_notice_changelog(gazette_app):
         manage.form['text'] = "1. Oktober 2017"
         manage.form.submit()
 
-    with freeze_time("2017-11-01 12:02 CET"):
+    with freeze_time("2017-11-01 12:02"):
         submit_notice(editor_1, 'erneuerungswahlen')
 
-    with freeze_time("2017-11-01 12:30 CET"):
+    with freeze_time("2017-11-01 12:30"):
         reject_notice(publisher, 'erneuerungswahlen')
 
-    with freeze_time("2017-11-01 14:00 CET"):
+    with freeze_time("2017-11-01 14:00"):
         edit_notice(editor_2, 'erneuerungswahlen', organization='300')
 
-    with freeze_time("2017-11-01 14:02 CET"):
+    with freeze_time("2017-11-01 14:02"):
         submit_notice(editor_2, 'erneuerungswahlen')
 
-    with freeze_time("2017-11-01 15:00 CET"):
+    with freeze_time("2017-11-01 15:00"):
         accept_notice(publisher, 'erneuerungswahlen')
 
     view = editor_1.get('/notice/erneuerungswahlen')
@@ -502,15 +502,15 @@ def test_view_notice_changelog(gazette_app):
     ])
 
     assert changes == [
-        ('01.11.2017 12:00', 'editor1@example.org', 'TestGroup', 'erstellt'),
-        ('01.11.2017 12:02', 'editor1@example.org', 'TestGroup',
+        ('01.11.2017 13:00', 'editor1@example.org', 'TestGroup', 'erstellt'),
+        ('01.11.2017 13:02', 'editor1@example.org', 'TestGroup',
          'eingereicht'),
-        ('01.11.2017 12:30', 'publisher@example.org', '', 'zurückgewiesenXYZ'),
-        ('01.11.2017 14:00', 'editor1@example.org', 'TestGroup', 'bearbeitet'),
-        ('01.11.2017 14:02', 'editor1@example.org', 'TestGroup',
+        ('01.11.2017 13:30', 'publisher@example.org', '', 'zurückgewiesenXYZ'),
+        ('01.11.2017 15:00', 'editor1@example.org', 'TestGroup', 'bearbeitet'),
+        ('01.11.2017 15:02', 'editor1@example.org', 'TestGroup',
          'eingereicht'),
-        ('01.11.2017 15:00', 'publisher@example.org', '', 'E-Mail gesendet'),
-        ('01.11.2017 15:00', 'publisher@example.org', '', 'angenommen'),
+        ('01.11.2017 16:00', 'publisher@example.org', '', 'E-Mail gesendet'),
+        ('01.11.2017 16:00', 'publisher@example.org', '', 'angenommen'),
     ]
 
 
