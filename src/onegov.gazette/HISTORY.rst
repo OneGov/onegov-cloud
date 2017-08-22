@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.1.2 (2017-08-22)
+~~~~~~~~~~~~~~~~~~~
 
 - Shows the publisher menu entries for the admin as well.
   [msom]
