@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Shows the publisher menu entries for the admin as well.
+  [msom]
+
 - Fixes delete icon on user managemenet view.
   [msom]
 

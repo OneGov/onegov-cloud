@@ -128,7 +128,7 @@ class Layout(ChameleonLayout):
                 _("Groups"), self.manage_user_groups_link, active
             ))
 
-        elif self.request.is_private(self.model):
+        if self.request.is_private(self.model):
             active = (
                 isinstance(self.model, GazetteNoticeCollection) and
                 getattr(self.model, 'state', None) == 'submitted' and
