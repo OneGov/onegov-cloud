@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes delete icon on user managemenet view.
+  [msom]
+
 0.1.1 (2017-08-21)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -46,7 +46,7 @@
                                                 <a i18n:translate class="action-edit" href="${request.link(user, 'edit')}">Edit</a>
                                             </li>
                                             <li>
-                                                <a i18n:translate class="action-edit" href="${request.link(user, 'delete')}">Delete</a>
+                                                <a i18n:translate class="action-delete" href="${request.link(user, 'delete')}">Delete</a>
                                             </li>
                                         </ul>
                                     </td>
