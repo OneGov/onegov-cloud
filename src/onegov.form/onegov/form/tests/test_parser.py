@@ -466,13 +466,18 @@ def test_parse_formcode():
     assert fieldsets[0].fields[0].type == 'text'
     assert fieldsets[0].fields[0].required
     assert fieldsets[0].fields[0].maxlength is None
+    assert fieldsets[0].fields[0].id == 'general_first_name'
 
     assert fieldsets[0].fields[1].type == 'text'
     assert not fieldsets[0].fields[1].required
     assert fieldsets[0].fields[1].maxlength == 10
+    assert fieldsets[0].fields[1].id == 'general_last_name'
 
     assert fieldsets[1].label == 'Order'
     assert fieldsets[1].fields[0].type == 'checkbox'
+
+    assert fieldsets[1].fields[0].label == 'Products'
+    assert fieldsets[1].fields[0].id == 'order_products'
 
     assert fieldsets[1].fields[0].choices[0].key == 'Pizza'
     assert fieldsets[1].fields[0].choices[0].label == 'Pizza'
@@ -483,12 +488,48 @@ def test_parse_formcode():
     assert fieldsets[1].fields[0].choices[1].selected
 
     assert fieldsets[1].fields[0].choices[0].fields[0].label == 'Type'
+    assert fieldsets[1].fields[0].choices[0].fields[0].id \
+        == 'order_products_type'
     assert fieldsets[1].fields[0].choices[0].fields[0].choices[0].selected
     assert not fieldsets[1].fields[0].choices[0].fields[0].choices[1].selected
     assert fieldsets[1].fields[0].choices[0].fields[0].choices[0].label \
         == 'Default'
     assert fieldsets[1].fields[0].choices[0].fields[0].choices[1].label \
         == 'Gluten-Free'
+
+
+def test_parse_formcode_duplicate_fieldname():
+    with pytest.raises(errors.DuplicateLabelError):
+        parse_formcode("""
+            # General
+            Foo *= ___
+            Foo = ___[10]
+        """)
+
+    with pytest.raises(errors.DuplicateLabelError):
+        parse_formcode("""
+            Foo *= ___
+            Foo = ___[10]
+        """)
+
+    with pytest.raises(errors.DuplicateLabelError):
+        parse_formcode("""
+            # General
+            Sure *=
+                ( ) Yes
+                ( ) No
+                    Foo = ___
+                    Foo = ___
+        """)
+
+    with pytest.raises(errors.DuplicateLabelError):
+        parse_formcode("""
+            Sure *=
+                ( ) Yes
+                ( ) No
+                    Foo = ___
+                    Foo = ___
+        """)
 
 
 def test_flatten_fieldsets():

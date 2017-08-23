@@ -281,6 +281,7 @@ from onegov.form.parser.grammar import stdnum
 from onegov.form.parser.grammar import textarea
 from onegov.form.parser.grammar import textfield
 from onegov.form.parser.grammar import time
+from onegov.form.utils import label_to_field_id
 
 
 # cache the parser elements
@@ -555,6 +556,7 @@ def parse_formcode(formcode):
 
     fieldsets = []
     field_classes = {cls.type: cls for cls in Field.__subclasses__()}
+    used_ids = set()
 
     for fieldset in parsed:
 
@@ -562,7 +564,7 @@ def parse_formcode(formcode):
         fieldset_label = next(k for k in fieldset.keys())
 
         fields = [
-            parse_field_block(block, field_classes)
+            parse_field_block(block, field_classes, used_ids, fieldset_label)
             for block in fieldset[fieldset_label]
         ]
 
@@ -572,7 +574,8 @@ def parse_formcode(formcode):
     return fieldsets
 
 
-def parse_field_block(field_block, field_classes):
+def parse_field_block(field_block, field_classes,
+                      used_ids, fieldset_label, parent=None):
     """ Takes the given parsed field block and yields the fields from it """
 
     key, field = next(i for i in field_block.items())
@@ -597,6 +600,24 @@ def parse_field_block(field_block, field_classes):
         assert len(types) == 1
 
     result = field_classes[field.type].create(field, identifier)
+    result.parent = parent
+
+    # give each field a proper unique id
+    if result.parent:
+        result.id = '_'.join((
+            result.parent.id, label_to_field_id(result.label)
+        ))
+    elif fieldset_label:
+        result.id = label_to_field_id(' '.join((
+            fieldset_label, result.label
+        )))
+    else:
+        result.id = label_to_field_id(result.label)
+
+    if result.id in used_ids:
+        raise errors.DuplicateLabelError(label=result.label)
+
+    used_ids.add(result.id)
 
     # go through nested blocks and recursively add them
     if field.type in {'radio', 'checkbox'}:
@@ -605,7 +626,13 @@ def parse_field_block(field_block, field_classes):
                 continue
 
             result.choices[ix].fields = [
-                parse_field_block(child, field_classes)
+                parse_field_block(
+                    field_block=child,
+                    field_classes=field_classes,
+                    used_ids=used_ids,
+                    fieldset_label=fieldset_label,
+                    parent=result
+                )
                 for child in choice.dependencies
             ]
 

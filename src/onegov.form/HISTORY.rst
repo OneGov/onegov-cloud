@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the field id to the intermediate representation.
+  [href]
+
 0.19.0 (2017-08-23)
 ~~~~~~~~~~~~~~~~~~~
 
