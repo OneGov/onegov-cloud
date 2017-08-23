@@ -1,5 +1,6 @@
 from onegov.core.collection import GenericCollection
 from onegov.directory.models import Directory
+from onegov.directory.types import DirectoryConfiguration
 
 
 class DirectoryCollection(GenericCollection):
@@ -15,4 +16,6 @@ class DirectoryCollection(GenericCollection):
     def add(self, **kwargs):
         if self.type != '*':
             kwargs.setdefault('type', self.type)
+        if 'configuration' not in kwargs:
+            kwargs['configuration'] = DirectoryConfiguration()
         return super().add(**kwargs)

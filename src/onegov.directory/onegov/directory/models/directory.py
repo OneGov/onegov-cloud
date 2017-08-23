@@ -4,6 +4,7 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
+from onegov.directory.types import DirectoryConfigurationStorage
 from onegov.form import flatten_fieldsets, parse_formcode, parse_form
 from sqlalchemy import Column
 from sqlalchemy import Text
@@ -45,7 +46,7 @@ class Directory(Base, ContentMixin, TimestampMixin):
     structure = Column(Text, nullable=False)
 
     #: The configuration of the contained entries
-    configuration = Column(Text, nullable=False)
+    configuration = Column(DirectoryConfigurationStorage, nullable=False)
 
     __mapper_args__ = {
         'order_by': order,
