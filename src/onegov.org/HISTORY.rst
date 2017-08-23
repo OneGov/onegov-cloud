@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.14.5 (2017-08-23)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes newly created users with Yubikeys failing to login.
   [href]
 
