@@ -4,6 +4,7 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
+from onegov.form import flatten_fieldsets, parse_formcode, parse_form
 from sqlalchemy import Column
 from sqlalchemy import Text
 from sqlalchemy.orm import relationship
@@ -69,3 +70,15 @@ class Directory(Base, ContentMixin, TimestampMixin):
     def title_observer(self, title):
         self.order = normalize_for_url(title)
         self.name = self.name or self.order
+
+    @property
+    def fields(self):
+        return tuple(flatten_fieldsets(parse_formcode(self.structure)))
+
+    @property
+    def form(self):
+
+        class DirectoryEntryForm(parse_form(self.structure)):
+            pass
+
+        return DirectoryEntryForm

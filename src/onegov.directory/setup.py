@@ -32,7 +32,8 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'onegov.core>=0.4.0'
+        'onegov.core>=0.4.0',
+        'onegov.form',
     ],
     extras_require=dict(
         test=[
