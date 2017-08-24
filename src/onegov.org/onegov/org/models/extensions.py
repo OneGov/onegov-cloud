@@ -356,19 +356,21 @@ class PersonLinkExtension(ContentExtension):
         builder.set_current_fieldset(fieldset_label)
 
         for person in self.get_selectable_people(request):
-            field_id = builder.add_field(
+            field_id = fieldset_id + '_' + person.id.hex
+
+            builder.add_field(
                 field_class=BooleanField,
+                field_id=field_id,
                 label=person.title,
                 required=False,
                 id=person.id,
-                field_id=fieldset_id + '_' + person.id.hex
             )
             builder.add_field(
                 field_class=StringField,
+                field_id=field_id + '_function',
                 label=request.translate(_("Function")),
                 required=False,
                 dependency=FieldDependency(field_id, 'y'),
-                field_id=field_id + '_function'
             )
 
         return builder.form_class
