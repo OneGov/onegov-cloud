@@ -60,8 +60,9 @@ def handle_field(builder, field, dependency=None):
         else:
             validators = []
 
-        field_id = builder.add_field(
+        builder.add_field(
             field_class=StringField,
+            field_id=field.id,
             label=field.label,
             dependency=dependency,
             required=field.required,
@@ -69,8 +70,9 @@ def handle_field(builder, field, dependency=None):
         )
 
     elif field.type == 'textarea':
-        field_id = builder.add_field(
+        builder.add_field(
             field_class=TextAreaField,
+            field_id=field.id,
             label=field.label,
             dependency=dependency,
             required=field.required,
@@ -78,16 +80,18 @@ def handle_field(builder, field, dependency=None):
         )
 
     elif field.type == 'password':
-        field_id = builder.add_field(
+        builder.add_field(
             field_class=PasswordField,
+            field_id=field.id,
             label=field.label,
             dependency=dependency,
             required=field.required
         )
 
     elif field.type == 'email':
-        field_id = builder.add_field(
+        builder.add_field(
             field_class=EmailField,
+            field_id=field.id,
             label=field.label,
             dependency=dependency,
             required=field.required,
@@ -95,8 +99,9 @@ def handle_field(builder, field, dependency=None):
         )
 
     elif field.type == 'stdnum':
-        field_id = builder.add_field(
+        builder.add_field(
             field_class=StringField,
+            field_id=field.id,
             label=field.label,
             dependency=dependency,
             required=field.required,
@@ -104,32 +109,36 @@ def handle_field(builder, field, dependency=None):
         )
 
     elif field.type == 'date':
-        field_id = builder.add_field(
+        builder.add_field(
             field_class=DateField,
+            field_id=field.id,
             label=field.label,
             dependency=dependency,
             required=field.required,
         )
 
     elif field.type == 'datetime':
-        field_id = builder.add_field(
+        builder.add_field(
             field_class=DateTimeLocalField,
+            field_id=field.id,
             label=field.label,
             dependency=dependency,
             required=field.required,
         )
 
     elif field.type == 'time':
-        field_id = builder.add_field(
+        builder.add_field(
             field_class=TimeField,
+            field_id=field.id,
             label=field.label,
             dependency=dependency,
             required=field.required
         )
 
     elif field.type == 'fileinput':
-        field_id = builder.add_field(
+        builder.add_field(
             field_class=UploadField,
+            field_id=field.id,
             label=field.label,
             dependency=dependency,
             required=field.required,
@@ -141,8 +150,9 @@ def handle_field(builder, field, dependency=None):
         )
 
     elif field.type == 'radio':
-        field_id = builder.add_field(
+        builder.add_field(
             field_class=RadioField,
+            field_id=field.id,
             label=field.label,
             dependency=dependency,
             required=field.required,
@@ -152,8 +162,9 @@ def handle_field(builder, field, dependency=None):
         )
 
     elif field.type == 'checkbox':
-        field_id = builder.add_field(
+        builder.add_field(
             field_class=MultiCheckboxField,
+            field_id=field.id,
             label=field.label,
             dependency=dependency,
             required=field.required,
@@ -170,12 +181,10 @@ def handle_field(builder, field, dependency=None):
             if not choice.fields:
                 continue
 
-            dependency = FieldDependency(field_id, choice.label)
+            dependency = FieldDependency(field.id, choice.label)
 
-            for field in choice.fields:
-                handle_field(builder, field, dependency)
-
-    return field_id
+            for choice_field in choice.fields:
+                handle_field(builder, choice_field, dependency)
 
 
 class WTFormsClassBuilder(object):
@@ -252,9 +261,12 @@ class WTFormsClassBuilder(object):
 
         return field_id
 
-    def add_field(self, field_class, label, required,
-                  dependency=None, field_id=None, pricing=None, **kwargs):
+    def add_field(self, field_class, field_id, label, required,
+                  dependency=None, pricing=None, **kwargs):
         validators = kwargs.pop('validators', [])
+
+        if hasattr(self.form_class, field_id):
+            raise errors.DuplicateLabelError(label=label)
 
         # labels in wtforms are not escaped correctly - for safety we make sure
         # that the label is properly html escaped. See also:
@@ -262,7 +274,6 @@ class WTFormsClassBuilder(object):
         # -> quotes are allowed because the label is rendered between tags,
         # not as part of the attributes
         label = escape(label, quote=False)
-        field_id = field_id or self.get_unique_field_id(label, dependency)
 
         self.validators_extend(validators, required, dependency)
 
@@ -277,4 +288,4 @@ class WTFormsClassBuilder(object):
         if dependency:
             self.mark_as_dependent(field_id, dependency)
 
-        return field_id
+        return getattr(self.form_class, field_id)

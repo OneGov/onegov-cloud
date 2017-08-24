@@ -607,7 +607,7 @@ def parse_field_block(field_block, field_classes,
         result.id = '_'.join((
             result.parent.id, label_to_field_id(result.label)
         ))
-    elif fieldset_label:
+    elif fieldset_label not in (None, '...'):
         result.id = label_to_field_id(' '.join((
             fieldset_label, result.label
         )))
