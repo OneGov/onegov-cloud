@@ -77,9 +77,22 @@ class Directory(Base, ContentMixin, TimestampMixin):
         return tuple(flatten_fieldsets(parse_formcode(self.structure)))
 
     @property
-    def form(self):
+    def form_class(self):
+        directory = self
 
         class DirectoryEntryForm(parse_form(self.structure)):
-            pass
+
+            def populate_obj(self, obj):
+                obj.title = directory.configuration.extract_title(self.data)
+                obj.order = directory.configuration.extract_order(self.data)
+
+                obj.content['fields'] = {
+                    field.id: self.data[field.id] for field in directory.fields
+                }
+
+            def process_obj(self, obj):
+                for field in directory.fields:
+                    form_field = getattr(self, field.id)
+                    form_field.data = obj.content['fields'][field.id]
 
         return DirectoryEntryForm

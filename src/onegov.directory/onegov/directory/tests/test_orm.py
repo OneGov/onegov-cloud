@@ -1,5 +1,6 @@
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryConfiguration
+from onegov.directory import DirectoryEntry
 
 
 def test_directory_title_and_order(session):
@@ -42,28 +43,67 @@ def test_directory_configuration(session):
     people = DirectoryCollection(session).add(
         title='People',
         structure="""
+            # General
             First Name *= ___
             Last Name *= ___
         """,
         configuration=DirectoryConfiguration(
-            title=('First Name', 'Last Name'),
-            order=('Last Name', 'First Name'),
+            title=('general_first_name', 'general_last_name'),
+            order=('general_last_name', 'general_first_name'),
         )
     )
 
-    assert people.configuration.title == ('First Name', 'Last Name')
-    assert people.configuration.order == ('Last Name', 'First Name')
+    assert people.configuration.title == (
+        'general_first_name',
+        'general_last_name'
+    )
+    assert people.configuration.order == (
+        'general_last_name',
+        'general_first_name'
+    )
 
     person = {
-        'First Name': 'Tom',
-        'Last Name': 'Riddle'
+        'general_first_name': 'Tom',
+        'general_last_name': 'Riddle'
     }
 
     assert people.configuration.extract_title(person) == 'Tom Riddle'
     assert people.configuration.extract_order(person) == 'riddle-tom'
 
-    people.configuration.title = ('Last Name', 'First Name')
+    people.configuration.title = ('general_last_name', 'general_first_name')
     session.flush()
 
     people = DirectoryCollection(session).query().first()
     assert people.configuration.extract_title(person) == 'Riddle Tom'
+
+
+def test_directory_form(session):
+    people = DirectoryCollection(session).add(
+        title='People',
+        structure="""
+            First Name *= ___
+            Last Name *= ___
+        """,
+        configuration=DirectoryConfiguration(
+            title=('first_name', 'last_name'),
+            order=('last_name', 'first_name'),
+        )
+    )
+
+    form = people.form_class()
+    form.first_name.data = 'Rick'
+    form.last_name.data = 'Sanchez'
+
+    rick = DirectoryEntry(content={})
+    form.populate_obj(rick)
+
+    assert rick.title == 'Rick Sanchez'
+    assert rick.order == 'sanchez-rick'
+    assert rick.content['fields']['first_name'] == 'Rick'
+    assert rick.content['fields']['last_name'] == 'Sanchez'
+
+    form = people.form_class()
+    form.process(obj=rick)
+
+    assert form.first_name.data == 'Rick'
+    assert form.last_name.data == 'Sanchez'
