@@ -747,7 +747,11 @@ def test_application_retries(postgres_dsn, number_of_retries):
         session.add(Record())
         session.query(Record).delete('fetch')
 
-        time.sleep(0.2)
+        # we sleep in small increments, as this might increase the chance of
+        # these threads actually running concurrently (depending on postgres
+        # latencies we might otherwise be scheduled serially)
+        for _ in range(0, 10):
+            time.sleep(0.01)
 
     @App.view(model=OperationalError)
     def operational_error_handler(self, request):
