@@ -554,3 +554,89 @@ def test_flatten_fieldsets():
     assert fields[1].label == 'Last Name'
     assert fields[2].label == 'Products'
     assert fields[3].label == 'Type'
+
+
+def test_integer_range():
+
+    form_class = parse_form("Age = 21..150")
+    form = form_class(MultiDict([
+        ('age', '')
+    ]))
+
+    form.validate()
+    assert not form.errors
+
+    form_class = parse_form("Age *= 21..150")
+    form = form_class(MultiDict([
+        ('age', '')
+    ]))
+
+    form.validate()
+    assert form.errors
+
+    form_class = parse_form("Age *= 21..150")
+    form = form_class(MultiDict([
+        ('age', '20')
+    ]))
+
+    form.validate()
+    assert form.errors
+
+    form_class = parse_form("Age *= 21..150")
+    form = form_class(MultiDict([
+        ('age', '151')
+    ]))
+
+    form.validate()
+    assert form.errors
+
+    form_class = parse_form("Age *= 21..150")
+    form = form_class(MultiDict([
+        ('age', '21')
+    ]))
+
+    form.validate()
+    assert not form.errors
+
+
+def test_decimal_range():
+
+    form_class = parse_form("Percentage = 0.00..100.00")
+    form = form_class(MultiDict([
+        ('percentage', '')
+    ]))
+
+    form.validate()
+    assert not form.errors
+
+    form_class = parse_form("Percentage *= 0.00..100.00")
+    form = form_class(MultiDict([
+        ('percentage', '')
+    ]))
+
+    form.validate()
+    assert form.errors
+
+    form_class = parse_form("Percentage = 0.00..100.00")
+    form = form_class(MultiDict([
+        ('percentage', '-1')
+    ]))
+
+    form.validate()
+    assert form.errors
+
+    form_class = parse_form("Percentage = 0.00..100.00")
+    form = form_class(MultiDict([
+        ('percentage', '101')
+    ]))
+
+    form.validate()
+    assert form.errors
+
+    form_class = parse_form("Percentage = 0.00..100.00")
+    form = form_class(MultiDict([
+        ('percentage', '33.33')
+    ]))
+
+    form.validate()
+    assert not form.errors

@@ -29,9 +29,11 @@ from onegov.form.parser import flatten_fieldsets
 from onegov.form.parser import parse_form
 from onegov.form.parser import parse_formcode
 from onegov.form.parser import WTFormsClassBuilder
+from onegov.form.utils import decimal_range
 
 __all__ = [
     'CompleteFormSubmission',
+    'decimal_range',
     'flatten_fieldsets',
     'FieldDependency',
     'Form',

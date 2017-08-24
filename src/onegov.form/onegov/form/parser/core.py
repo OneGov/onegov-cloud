@@ -138,6 +138,17 @@ A Time is defined by this exact string: ``HH:MM``::
 
 One more time, this doesn't mean that the datetime format can be influenced.
 
+Numbers
+~~~~~~~
+
+There are two types of number fields. An integer and a float field:
+
+    I'm an integer field = 0..99
+    I'm an integer field of a different range = -100..100
+
+    I'm a float field = 0.00..99.00
+    I'm an float field of a different range = -100.00..100.00
+
 Files
 ~~~~~
 
@@ -271,10 +282,12 @@ from onegov.form import errors
 from onegov.form.parser.grammar import checkbox
 from onegov.form.parser.grammar import date
 from onegov.form.parser.grammar import datetime
+from onegov.form.parser.grammar import decimal_range_field
 from onegov.form.parser.grammar import email
 from onegov.form.parser.grammar import field_identifier
 from onegov.form.parser.grammar import fieldset_title
 from onegov.form.parser.grammar import fileinput
+from onegov.form.parser.grammar import integer_range_field
 from onegov.form.parser.grammar import password
 from onegov.form.parser.grammar import radio
 from onegov.form.parser.grammar import stdnum
@@ -300,6 +313,8 @@ def create_parser_elements():
     elements.fileinput = fileinput()
     elements.radio = radio()
     elements.checkbox = checkbox()
+    elements.integer_range = integer_range_field()
+    elements.decimal_range = decimal_range_field()
     elements.boxes = elements.checkbox | elements.radio
     elements.single_line_fields = elements.identifier + pp.MatchFirst([
         elements.textfield,
@@ -310,7 +325,9 @@ def create_parser_elements():
         elements.datetime,
         elements.date,
         elements.time,
-        elements.fileinput
+        elements.fileinput,
+        elements.integer_range,
+        elements.decimal_range,
     ])
 
     return elements
@@ -387,6 +404,16 @@ def construct_fileinput(loader, node):
 @constructor('!password')
 def construct_password(loader, node):
     return ELEMENTS.password.parseString(node.value)
+
+
+@constructor('!decimal_range')
+def construct_decimal_range(loader, node):
+    return ELEMENTS.decimal_range.parseString(node.value)
+
+
+@constructor('!integer_range')
+def construct_integer_range(loader, node):
+    return ELEMENTS.integer_range.parseString(node.value)
 
 
 def flatten_fieldsets(fieldsets):
@@ -502,6 +529,25 @@ class StdnumField(Field):
             required=identifier.required,
             format=field.format
         )
+
+
+class RangeField(object):
+
+    @classmethod
+    def create(cls, field, identifier):
+        return cls(
+            label=identifier.label,
+            required=identifier.required,
+            range=field[0]
+        )
+
+
+class IntegerRangeField(RangeField, Field):
+    type = 'integer_range'
+
+
+class DecimalRangeField(RangeField, Field):
+    type = 'decimal_range'
 
 
 class FileinputField(Field):

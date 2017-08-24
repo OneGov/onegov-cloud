@@ -1,4 +1,5 @@
 from decimal import Decimal
+from onegov.form.utils import decimal_range
 from pyparsing import (
     alphanums,
     Combine,
@@ -60,6 +61,18 @@ def as_decimal(tokens):
 def as_uppercase(tokens):
     """ Converts the token to uppercase if possible. """
     return ''.join(tokens).upper() if tokens else None
+
+
+def as_integer_range(tokens):
+    """ Converts the token to an integer range if possible. """
+    if tokens:
+        return range(int(tokens[0]), int(tokens[1]))
+
+
+def as_decimal_range(tokens):
+    """ Converts the token to a decimal range if possible. """
+    if tokens:
+        return decimal_range(tokens[0], tokens[1])
 
 
 def rstrip(tokens):
@@ -269,6 +282,30 @@ def decimal():
 
     return (Optional('-') + numeric + Optional(Suppress('.') + numeric))\
         .setParseAction(as_decimal)('amount')
+
+
+def range_field(value_expression, parse_action, type):
+    """ Generic range field parser. """
+
+    r = (value_expression + Suppress('..') + value_expression)
+    r = r.setParseAction(parse_action)
+    r = r.addParseAction(tag(type=type))
+
+    return r
+
+
+def integer_range_field():
+    """ Returns an integer range parser. """
+
+    number = Combine(Optional('-') + numeric)
+    return range_field(number, as_integer_range, 'integer_range')
+
+
+def decimal_range_field():
+    """ Returns a decimal range parser. """
+
+    number = Combine(Optional('-') + numeric + Literal('.') + numeric)
+    return range_field(number, as_decimal_range, 'decimal_range')
 
 
 def currency():

@@ -15,8 +15,12 @@ from wtforms import PasswordField
 from wtforms import RadioField
 from wtforms import StringField
 from wtforms import TextAreaField
-from wtforms.fields.html5 import DateField, DateTimeLocalField, EmailField
-from wtforms.validators import DataRequired, Length, Optional
+from wtforms.fields.html5 import DateField
+from wtforms.fields.html5 import DateTimeLocalField
+from wtforms.fields.html5 import EmailField
+from wtforms.fields.html5 import IntegerField
+from wtforms.fields.html5 import DecimalField
+from wtforms.validators import DataRequired, Length, Optional, NumberRange
 from wtforms.widgets import TextArea
 from wtforms_components import Email, If, TimeField
 
@@ -171,6 +175,36 @@ def handle_field(builder, field, dependency=None):
             choices=[(c.key, c.label) for c in field.choices],
             default=[c.key for c in field.choices if c.selected],
             pricing=field.pricing
+        )
+
+    elif field.type == 'integer_range':
+        builder.add_field(
+            field_class=IntegerField,
+            field_id=field.id,
+            label=field.label,
+            dependency=dependency,
+            required=field.required,
+            validators=[
+                NumberRange(
+                    field.range.start,
+                    field.range.stop
+                )
+            ]
+        )
+
+    elif field.type == 'decimal_range':
+        builder.add_field(
+            field_class=DecimalField,
+            field_id=field.id,
+            label=field.label,
+            dependency=dependency,
+            required=field.required,
+            validators=[
+                NumberRange(
+                    field.range.start,
+                    field.range.stop
+                )
+            ]
         )
 
     else:

@@ -1,13 +1,16 @@
 from decimal import Decimal
+from onegov.form.utils import decimal_range
 from onegov.form.parser.grammar import (
     checkbox,
+    currency,
     date,
     datetime,
     decimal,
-    currency,
+    decimal_range_field,
     email,
     field_identifier,
     fileinput,
+    integer_range_field,
     password,
     radio,
     stdnum,
@@ -15,7 +18,7 @@ from onegov.form.parser.grammar import (
     textarea,
     textfield,
     time,
-    with_whitespace_inside
+    with_whitespace_inside,
 )
 
 
@@ -255,3 +258,25 @@ def test_currency():
     assert field.parseString('CHF')[0] == 'CHF'
     assert field.parseString('usd')[0] == 'USD'
     assert field.parseString('Cny')[0] == 'CNY'
+
+
+def test_integer_range():
+    field = integer_range_field()
+
+    assert field.parseString('0..10')[0] == range(0, 10)
+    assert field.parseString('-10..100')[0] == range(-10, 100)
+    assert field.parseString('0..-20')[0] == range(0, -20)
+    assert field.parseString('-10..-20')[0] == range(-10, -20)
+
+
+def test_decimal_range():
+    field = decimal_range_field()
+
+    assert field.parseString('0.00..10.00')[0] \
+        == decimal_range('0.0', '10.0')
+    assert field.parseString('-10.00..100.00')[0] \
+        == decimal_range('-10.0', '100.0')
+    assert field.parseString('0.00..-20.00')[0] \
+        == decimal_range('0.0', '-20.0')
+    assert field.parseString('-10.00..-20.00')[0] \
+        == decimal_range('-10.0', '-20.0')

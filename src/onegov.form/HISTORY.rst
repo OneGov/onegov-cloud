@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds integer and decimal ranges (age = 1..99, percentile = 0.00..100.00)
+  [href]
+
 0.19.1 (2017-08-24)
 ~~~~~~~~~~~~~~~~~~~
 
