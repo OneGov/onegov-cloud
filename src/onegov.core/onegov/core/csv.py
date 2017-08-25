@@ -476,9 +476,9 @@ def match_headers(headers, expected):
         ['first_name', 'last_name']
 
     If no match is possible, an
-    :exception:`~onegov.core.errors.MissingColumnsError`, or
-    :exception:`~onegov.core.errors.AmbiguousColumnsError` or
-    :exception:`~onegov.core.errors.DuplicateColumnNamesError` error is raised.
+    :class:`~onegov.core.errors.MissingColumnsError`, or
+    :class:`~onegov.core.errors.AmbiguousColumnsError` or
+    :class:`~onegov.core.errors.DuplicateColumnNamesError` error is raised.
 
     :return: The matched headers in the order of appearance.
 

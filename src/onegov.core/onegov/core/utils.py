@@ -157,7 +157,7 @@ def module_path_root(module):
 def module_path(module, subpath):
     """ Returns a subdirectory in the given python module.
 
-    :module:
+    :mod:
         A python module (actual module or string)
 
     :subpath:
@@ -451,7 +451,7 @@ class PostThread(Thread):
 
     """ POSTs the given data with the headers to the URL.
 
-    Example:
+    Example::
 
         data = {'a': 1, 'b': 2}
         data = json.dumps(data).encode('utf-8')

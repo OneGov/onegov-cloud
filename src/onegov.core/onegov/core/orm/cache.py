@@ -203,7 +203,7 @@ class OrmCacheDescriptor(object):
 def orm_cached(policy):
     """ The decorator use to setup the cache descriptor.
 
-    See the :module:`onegov.core.orm.cache` docs for usage.
+    See the :mod:`onegov.core.orm.cache` docs for usage.
 
     """
 

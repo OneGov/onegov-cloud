@@ -1,6 +1,6 @@
 """ Provides a way to specify cronjobs which should be called at an exact time.
 
-Example:
+Example::
 
     @App.cronjob(hour=8, minute=0, timezone='Europe/Zurich')
     def cleanup_stuff(request):
