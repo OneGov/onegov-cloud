@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for decimal values to JSON.
+  [href]
+
 - Forces the memory cache backend to use Dill to force the same codepath for
   memcached/memcached-less data (now everything is always pickled).
 

@@ -14,6 +14,7 @@ import isodate
 import json
 import types
 
+from decimal import Decimal
 from onegov.core import utils
 
 
@@ -23,6 +24,8 @@ class CustomJSONEncoder(json.JSONEncoder):
             return '__datetime__@' + isodate.datetime_isoformat(o)
         elif isinstance(o, datetime.date):
             return '__date__@' + isodate.date_isoformat(o)
+        elif isinstance(o, Decimal):
+            return '__decimal__@' + str(o)
         elif isinstance(o, datetime.time):
             return '__time__@' + isodate.time_isoformat(o)
         elif isinstance(o, types.GeneratorType):
@@ -31,9 +34,11 @@ class CustomJSONEncoder(json.JSONEncoder):
             if isinstance(o, str):
                 # make sure the reserved words can't be added as a string by
                 # some smartass that wants to screw with us
-                o = utils.lchop(o, '__datetime__@')
                 o = utils.lchop(o, '__date__@')
+                o = utils.lchop(o, '__datetime__@')
+                o = utils.lchop(o, '__decimal__@')
                 o = utils.lchop(o, '__time__@')
+
             return super().default(o)
 
 
@@ -46,6 +51,9 @@ def custom_json_decoder(value):
 
     if value.startswith('__datetime__@'):
         return isodate.parse_datetime(value[13:])
+
+    if value.startswith('__decimal__@'):
+        return Decimal(value[12:])
 
     if value.startswith('__time__@'):
         return isodate.parse_time(value[9:])
