@@ -86,6 +86,7 @@ setup(
             'onegov_testing',
             'openpyxl',
             'pytest-localserver',
+            'pytest-rerunfailures',
             'requests'
         ],
     ),
