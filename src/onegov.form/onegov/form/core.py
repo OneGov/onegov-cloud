@@ -17,8 +17,7 @@ class Form(BaseForm):
     """ Extends wtforms.Form with useful methods and integrations needed in
     OneGov applications.
 
-    Fieldsets
-    ---------
+    **Fieldsets**
 
     This form supports fieldsets (which WTForms doesn't recognize). To put
     fields into a fieldset, add a fieldset attribute to the field during
@@ -51,8 +50,7 @@ class Form(BaseForm):
     This ensures that all fields are in either a visible or an invisible
     fieldset (see :meth:`Fieldset.is_visible`).
 
-    Dependencies
-    ------------
+    **Dependencies**
 
     This form also supports dependencies. So field b may depend on field a, if
     field a has a certain value, field b is shown on the form (with some
@@ -80,8 +78,7 @@ class Form(BaseForm):
                 depends_on=('option', 'no')
             )
 
-    Pricing
-    -------
+    **Pricing**
 
     Pricing is a way to attach prices to certain form fields. A total price
     is calcualted depending on the selections the user makes::
@@ -443,7 +440,7 @@ class Form(BaseForm):
         been populated. Therefore it is a good place to validate against
         multiple fields.
 
-        All methods which start with 'ensure_' are ensurances. If and only if
+        All methods which start with ``ensure_`` are ensurances. If and only if
         an ensurance returns False it is considered to have failed. In this
         case the validate method returns False as well. If None or '' or
         any other falsy value is returned, no error is assumed! This avoids

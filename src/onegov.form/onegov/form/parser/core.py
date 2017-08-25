@@ -170,7 +170,7 @@ One more time, this doesn't mean that the datetime format can be influenced.
 Numbers
 ~~~~~~~
 
-There are two types of number fields. An integer and a float field:
+There are two types of number fields. An integer and a float field::
 
     I'm an integer field = 0..99
     I'm an integer field of a different range = -100..100
@@ -287,7 +287,7 @@ Pricing Information
 ~~~~~~~~~~~~~~~~~~~
 
 Radio buttons and checkboxes may be priced. For example, the following order
-form can be modeled:
+form can be modeled::
 
     Node Size =
         ( ) Small (20 USD)
