@@ -24,7 +24,7 @@ class Editor(object):
             Only necessary if it's a new page. The trait controls the content
             of the page and leads to different forms.
 
-            See :module:`onegov.org.models.page`.
+            See :mod:`onegov.org.models.page`.
 
         """
 
