@@ -1,3 +1,6 @@
+import pytest
+import re
+
 from decimal import Decimal
 from onegov.form.utils import decimal_range
 from onegov.form.parser.grammar import (
@@ -66,12 +69,35 @@ def test_textfield():
     f = field.parseString('___')
     assert f.type == 'text'
     assert not f.length
-    f.asDict() == {'length': None, 'type': 'text'}
+    assert f.asDict() == {'type': 'text'}
 
     f = field.parseString('___[25]')
     assert f.type == 'text'
     assert f.length == 25
-    f.asDict() == {'length': 25, 'type': 'text'}
+    assert f.asDict() == {'length': 25, 'type': 'text'}
+
+    # valid regex
+    f = field.parseString('___/[0-9]{4}')
+    assert f.type == 'text'
+    assert not f.length
+    assert f.asDict() == {
+        'type': 'text',
+        'regex': re.compile('[0-9]{4}')
+    }
+
+    # invalid regex
+    with pytest.raises(re.error):
+        f = field.parseString('___/[0-9')
+
+    # combined with a length validator
+    f = field.parseString('___[10]/[a-zA-Z]+')
+    assert f.type == 'text'
+    assert f.length == 10
+    assert f.asDict() == {
+        'length': 10,
+        'type': 'text',
+        'regex': re.compile('[a-zA-Z]+')
+    }
 
 
 def test_textarea():

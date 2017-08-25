@@ -1,3 +1,5 @@
+import re
+
 from decimal import Decimal
 from onegov.form.utils import decimal_range
 from pyparsing import (
@@ -75,6 +77,12 @@ def as_decimal_range(tokens):
         return decimal_range(tokens[0], tokens[1])
 
 
+def as_regex(tokens):
+    """ Converts the token to a working regex if possible. """
+    if tokens:
+        return re.compile(tokens[0])
+
+
 def rstrip(tokens):
     """ Strips whitetext on the right of the token. """
     return tokens[0].rstrip()
@@ -139,10 +147,17 @@ def textfield():
 
     The number defines the maximum length.
 
+    Additionally, a regex may be specified to validate the field::
+
+        ___/[0-9]{4}
+
     """
     length = number_enclosed_in('[]')('length')
 
-    textfield = Suppress('___') + Optional(length)
+    regex = Word(unicode_characters).setParseAction(as_regex)('regex')
+    regex = Suppress('/') + regex
+
+    textfield = Suppress('___') + Optional(length) + Optional(regex)
     textfield.setParseAction(tag(type='text'))
 
     return textfield

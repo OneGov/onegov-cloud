@@ -22,13 +22,15 @@ def test_parse_text():
         Last name = ___
         Country = ___[50]
         Comment = ...[8]
+        Zipcode = ___[4]/[0-9]*
+        Currency = ___/[A-Z]{3}
     """)
 
     form_class = parse_form(text)
     form = form_class()
 
     fields = form._fields.values()
-    assert len(fields) == 4
+    assert len(fields) == 6
 
     assert form.first_name.label.text == 'First name'
     assert len(form.first_name.validators) == 1
@@ -46,6 +48,51 @@ def test_parse_text():
     assert form.comment.label.text == 'Comment'
     assert form.comment.widget(form.comment) == (
         '<textarea id="comment" name="comment" rows="8"></textarea>')
+
+    assert form.zipcode.label.text == 'Zipcode'
+    assert len(form.zipcode.validators) == 3
+    assert isinstance(form.zipcode.validators[0], validators.Optional)
+    assert isinstance(form.zipcode.validators[1], validators.Length)
+    assert isinstance(form.zipcode.validators[2], validators.Regexp)
+
+    assert form.currency.label.text == 'Currency'
+    assert len(form.currency.validators) == 2
+    assert isinstance(form.currency.validators[0], validators.Optional)
+    assert isinstance(form.currency.validators[1], validators.Regexp)
+
+
+def test_regex_validation():
+    form_class = parse_form("Zipcode = ___[4]/[0-9]+")
+
+    form = form_class(MultiDict([('zipcode', 'abcd')]))
+    form.validate()
+    assert form.errors
+
+    form = form_class(MultiDict([('zipcode', '12345')]))
+    form.validate()
+    assert form.errors
+
+    form = form_class(MultiDict([('zipcode', '1234')]))
+    form.validate()
+    assert not form.errors
+
+    form_class = parse_form("Zipcode = ___/^(yes|no)$")
+
+    form = form_class(MultiDict([('zipcode', 'yess')]))
+    form.validate()
+    assert form.errors
+
+    form = form_class(MultiDict([('zipcode', 'noes')]))
+    form.validate()
+    assert form.errors
+
+    form = form_class(MultiDict([('zipcode', 'yes')]))
+    form.validate()
+    assert not form.errors
+
+    form = form_class(MultiDict([('zipcode', 'no')]))
+    form.validate()
+    assert not form.errors
 
 
 def test_parse_different_base_class():

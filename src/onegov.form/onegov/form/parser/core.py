@@ -85,6 +85,24 @@ If the textfield is limited in length, the length can be given::
 
 The length of such textfields is validated.
 
+Additionally, textfields may use regexes to validate their contents::
+
+    I'm a numbers-only textfield = ___/^[0-9]+$
+
+You *can* combine the length with a regex, though you probably don't want to::
+
+    I'm a length-limited numbers-only textfield = ___[4]/^[0-9]+$
+
+This could be simplified as follows:
+
+    I'm a length-limited numbers-only textfield = ___/^[0-9]{0,4}$
+
+Note that you don't *need* to specify the beginning (^) and the end ($) of the
+string, but not doing so might result in unexpected results. For example,
+while '123abc' is invalid for ``___/^[0-9]+$``, it is perfectly valid for
+``___/[0-9]+``. The latter only demands that the text starts with a number,
+not that it only consists of numbers!
+
 Textarea
 ~~~~~~~~
 
@@ -275,6 +293,7 @@ As in any other form, dependencies are taken into account.
 """
 
 import pyparsing as pp
+import re
 import yaml
 
 from onegov.core.utils import Bunch
@@ -500,10 +519,13 @@ class TextField(Field):
 
     @classmethod
     def create(cls, field, identifier):
+        regex = field.regex and re.compile(field.regex) or None
+
         return cls(
             label=identifier.label,
             required=identifier.required,
-            maxlength=field.length or None
+            maxlength=field.length or None,
+            regex=regex
         )
 
 
@@ -768,9 +790,13 @@ def translate_to_yaml(text):
             continue
 
         # fields are nested lists of dictionaries
-        parse_result = try_parse(ELEMENTS.single_line_fields, line)
+        try:
+            parse_result = try_parse(ELEMENTS.single_line_fields, line)
+        except re.error:
+            raise errors.InvalidFormSyntax(line=ix + 1)
+
         if parse_result is not None:
-            yield '{indent}- "{identifier}": !{type} "{definition}"'.format(
+            yield '{indent}- "{identifier}": !{type} \'{definition}\''.format(
                 indent=indent,
                 type=parse_result.type,
                 identifier=line.split('=')[0].strip(),
@@ -787,7 +813,7 @@ def translate_to_yaml(text):
             if not expect_nested:
                 raise errors.InvalidFormSyntax(line=ix + 1)
 
-            yield '{indent}- !{type} "{definition}":'.format(
+            yield '{indent}- !{type} \'{definition}\':'.format(
                 indent=indent,
                 type=parse_result.type,
                 definition=line.strip()

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to define a validation regex for text fields.
+  [href]
+
 - Adds integer and decimal ranges (age = 1..99, percentile = 0.00..100.00).
   [href]
 
