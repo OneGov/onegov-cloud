@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.45.0 (2017-08-25)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds support for decimal values to JSON.
   [href]
