@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds an url field.
+  [href]
+
 - Adds the ability to define a validation regex for text fields.
   [href]
 

@@ -11,7 +11,8 @@ from wtforms import validators
 from wtforms.fields.html5 import (
     DateField,
     DateTimeLocalField,
-    EmailField
+    EmailField,
+    URLField,
 )
 from wtforms_components import TimeField
 
@@ -210,6 +211,13 @@ def test_parse_email():
 
     assert form.e_mail.label.text == 'E-Mail'
     assert isinstance(form.e_mail, EmailField)
+
+
+def test_parse_url():
+    form = parse_form("Url = http://")()
+
+    assert form.url.label.text == 'Url'
+    assert isinstance(form.url, URLField)
 
 
 def test_parse_date():

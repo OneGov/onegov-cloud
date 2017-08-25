@@ -22,6 +22,7 @@ from onegov.form.parser.grammar import (
     textfield,
     time,
     with_whitespace_inside,
+    url
 )
 
 
@@ -131,6 +132,19 @@ def test_email():
     f = field.parseString("@@@")
     assert f.type == 'email'
     assert f.asDict() == {'type': 'email'}
+
+
+def test_url():
+
+    field = url()
+
+    f = field.parseString("http://")
+    assert f.type == 'url'
+    assert f.asDict() == {'type': 'url'}
+
+    f = field.parseString("https://")
+    assert f.type == 'url'
+    assert f.asDict() == {'type': 'url'}
 
 
 def test_dates():

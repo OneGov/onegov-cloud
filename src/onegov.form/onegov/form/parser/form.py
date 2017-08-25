@@ -20,11 +20,13 @@ from wtforms.fields.html5 import DateTimeLocalField
 from wtforms.fields.html5 import DecimalField
 from wtforms.fields.html5 import EmailField
 from wtforms.fields.html5 import IntegerField
+from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired
 from wtforms.validators import Length
 from wtforms.validators import NumberRange
 from wtforms.validators import Optional
 from wtforms.validators import Regexp
+from wtforms.validators import URL
 from wtforms.widgets import TextArea
 from wtforms_components import Email, If, TimeField
 
@@ -108,6 +110,16 @@ def handle_field(builder, field, dependency=None):
             dependency=dependency,
             required=field.required,
             validators=[Email()]
+        )
+
+    elif field.type == 'url':
+        builder.add_field(
+            field_class=URLField,
+            field_id=field.id,
+            label=field.label,
+            dependency=dependency,
+            required=field.required,
+            validators=[URL()]
         )
 
     elif field.type == 'stdnum':

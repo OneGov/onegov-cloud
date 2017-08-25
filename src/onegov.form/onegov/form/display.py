@@ -60,7 +60,8 @@ class BaseRenderer(object):
     'StringField',
     'TextField',
     'TextAreaField',
-    'EmailField'
+    'EmailField',
+    'URLField'
 )
 class StringFieldRenderer(BaseRenderer):
     def __call__(self, field):

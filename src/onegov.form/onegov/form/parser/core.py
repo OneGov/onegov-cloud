@@ -129,6 +129,17 @@ An e-mail field consists of exactly three ``@``::
 
     I'm an e-mail field = @@@
 
+
+URL
+~~~
+
+An url field consists of the http/https prefix::
+
+    I'm an url field = http://
+    I'm the exact same = https://
+
+Whether or not you enter http or https has no bearing on the validation.
+
 Date
 ~~~~
 
@@ -313,6 +324,7 @@ from onegov.form.parser.grammar import stdnum
 from onegov.form.parser.grammar import textarea
 from onegov.form.parser.grammar import textfield
 from onegov.form.parser.grammar import time
+from onegov.form.parser.grammar import url
 from onegov.form.utils import label_to_field_id
 
 
@@ -325,6 +337,7 @@ def create_parser_elements():
     elements.textarea = textarea()
     elements.password = password()
     elements.email = email()
+    elements.url = url()
     elements.stdnum = stdnum()
     elements.datetime = datetime()
     elements.date = date()
@@ -340,6 +353,7 @@ def create_parser_elements():
         elements.textarea,
         elements.password,
         elements.email,
+        elements.url,
         elements.stdnum,
         elements.datetime,
         elements.date,
@@ -383,6 +397,11 @@ def construct_textarea(loader, node):
 @constructor('!email')
 def construct_email(loader, node):
     return ELEMENTS.email.parseString(node.value)
+
+
+@constructor('!url')
+def construct_url(loader, node):
+    return ELEMENTS.url.parseString(node.value)
 
 
 @constructor('!stdnum')
@@ -500,6 +519,10 @@ class PasswordField(Field):
 
 class EmailField(Field):
     type = 'email'
+
+
+class UrlField(Field):
+    type = 'url'
 
 
 class DateField(Field):

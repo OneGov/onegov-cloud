@@ -205,6 +205,18 @@ def email():
     return Suppress('@@@').setParseAction(tag(type='email'))
 
 
+def url():
+    """ Returns an url field parser.
+
+    Example::
+
+        http://
+        https://
+
+    """
+    return Suppress(Regex(r'https?://')).setParseAction(tag(type='url'))
+
+
 def date():
     """ Returns a date parser.
 
