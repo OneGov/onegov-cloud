@@ -126,3 +126,15 @@ class MultiCheckboxFieldRenderer(BaseRenderer):
 class NullRenderer(BaseRenderer):
     def __call__(self, field):
         return ''
+
+
+@registry.register_for('DecimalField')
+class DecimalRenderer(BaseRenderer):
+    def __call__(self, field):
+        return '{:.2f}'.format(field.data)
+
+
+@registry.register_for('IntegerField')
+class IntegerRenderer(BaseRenderer):
+    def __call__(self, field):
+        return '{}'.format(int(field.data))
