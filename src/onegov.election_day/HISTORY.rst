@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Sorts the elections/votes by issue date in the open data view.
+  [msom]
+
 1.15.5 (2017-08-17)
 ~~~~~~~~~~~~~~~~~~~
 

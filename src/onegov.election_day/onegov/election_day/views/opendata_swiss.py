@@ -69,7 +69,7 @@ def view_rdf(self, request):
             return text.interpolate(translator.gettext(text))
         return text.interpolate(text)
 
-    for item in items:
+    for item in sorted(items, key=lambda i: i.date, reverse=True):
         is_vote = isinstance(item, Vote)
 
         # IDs
