@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds an intialization function for searches to the collection.
+  [msom]
+
 0.1.0 (2017-08-21)
 ~~~~~~~~~~~~~~~~~~~
 

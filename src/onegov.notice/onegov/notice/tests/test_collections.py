@@ -72,22 +72,17 @@ def test_notice_collection_search(session):
 
     assert notices.query().count() == 7
 
-    notices.term = 'Third'
-    assert notices.query().count() == 1
+    assert notices.for_term('Third').query().count() == 1
 
-    notices.term = 'ourth'
-    assert notices.query().count() == 1
+    assert notices.for_term('ourth').query().count() == 1
 
-    notices.term = 'ipsum'
-    assert notices.query().count() == 2
-    assert notices.for_state('rejected').query().count() == 1
+    assert notices.for_term('ipsum').query().count() == 2
+    assert notices.for_term('ipsum').for_state('rejected').query().count() == 1
 
-    notices.term = 'six'
-    assert notices.query().count() == 1
-    assert notices.for_state('rejected').query().count() == 0
+    assert notices.for_term('six').query().count() == 1
+    assert notices.for_term('six').for_state('rejected').query().count() == 0
 
-    notices.term = 'üb'
-    assert notices.query().count() == 1
+    assert notices.for_term('üb').query().count() == 1
 
 
 def test_notice_collection_users_and_groups(session):

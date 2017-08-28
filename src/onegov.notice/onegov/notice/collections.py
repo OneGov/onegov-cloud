@@ -78,6 +78,20 @@ class OfficialNoticeCollectionPagination(Pagination):
             group_ids=self.group_ids
         )
 
+    def for_term(self, term):
+        """ Returns a new instance of the collection with the given term. """
+
+        return self.__class__(
+            self.session,
+            state=self.state,
+            term=term,
+            order=self.order,
+            direction=self.direction,
+            issues=self.issues,
+            user_ids=self.user_ids,
+            group_ids=self.group_ids
+        )
+
     def for_order(self, order, direction=None):
         """ Returns a new instance of the collection with the given ordering.
         Inverts the direction if the new ordering is the same as the old one
