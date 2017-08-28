@@ -13,7 +13,10 @@
 
                 <div>
                     <tal:block tal:repeat="action actions">
-                        <a i18n:translate class="button small ${action[2]} action-${action[0].lower()}" href="${action[1]}">${action[0]}</a>
+                        <a i18n:translate
+                           class="button small ${action[2]} action-${action[0].lower()}"
+                           href="${action[1]}"
+                           target="${action[3]}">${action[0]}</a>
                     </tal:block>
                 </div>
 

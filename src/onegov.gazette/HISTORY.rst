@@ -4,6 +4,9 @@ Changelog
 - Fixes clear search/dates view.
   [msom]
 
+- Shows the preview in a separate window.
+  [msom]
+
 0.1.2 (2017-08-22)
 ~~~~~~~~~~~~~~~~~~~
 

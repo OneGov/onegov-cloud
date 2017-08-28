@@ -37,43 +37,63 @@ def view_notice(self, request):
         if (self.group_id in group_ids) or (self.user_id in user_ids):
             if self.state == 'drafted' or self.state == 'rejected':
 
-                actions.append(
-                    (_("Submit"), request.link(self, 'submit'), 'primary')
-                )
-                actions.append(
-                    (_("Edit"), request.link(self, 'edit'), 'secondary')
-                )
-                actions.append(
-                    (_("Delete"), request.link(self, 'delete'), 'alert right')
-                )
+                actions.append((
+                    _("Submit"),
+                    request.link(self, 'submit'),
+                    'primary',
+                    '_self'
+                ))
+                actions.append((
+                    _("Edit"),
+                    request.link(self, 'edit'),
+                    'secondary',
+                    '_self'
+                ))
+                actions.append((
+                    _("Delete"),
+                    request.link(self, 'delete'),
+                    'alert right',
+                    '_self'
+                ))
         if self.state == 'accepted':
-            actions.append(
-                (
-                    _("Copy"),
-                    request.link(
-                        GazetteNoticeCollection(
-                            request.app.session(),
-                            state=self.state,
-                            source=self.id
-                        ), name='new-notice'
-                    ),
-                    'secondary'
-                )
-            )
+            actions.append((
+                _("Copy"),
+                request.link(
+                    GazetteNoticeCollection(
+                        request.app.session(),
+                        state=self.state,
+                        source=self.id
+                    ), name='new-notice'
+                ),
+                'secondary',
+                '_self'
+            ))
     if request.is_private(self):
         if self.state == 'submitted':
-            actions.append(
-                (_("Accept"), request.link(self, 'accept'), 'primary')
-            )
-            actions.append(
-                (_("Edit"), request.link(self, 'edit'), 'secondary')
-            )
-            actions.append(
-                (_("Reject"), request.link(self, 'reject'), 'alert right')
-            )
-    actions.append(
-        (_("Preview"), request.link(self, 'preview'), 'secondary')
-    )
+            actions.append((
+                _("Accept"),
+                request.link(self, 'accept'),
+                'primary',
+                '_self'
+            ))
+            actions.append((
+                _("Edit"),
+                request.link(self, 'edit'),
+                'secondary',
+                '_self'
+            ))
+            actions.append((
+                _("Reject"),
+                request.link(self, 'reject'),
+                'alert right',
+                '_self'
+            ))
+    actions.append((
+        _("Preview"),
+        request.link(self, 'preview'),
+        'secondary',
+        '_blank'
+    ))
 
     return {
         'layout': layout,
