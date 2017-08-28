@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes clear search/dates view.
+  [msom]
+
 0.1.2 (2017-08-22)
 ~~~~~~~~~~~~~~~~~~~
 

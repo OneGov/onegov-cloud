@@ -117,7 +117,8 @@ def view_notices(self, request):
         'notices': self.batch,
         'title': title,
         'term': self.term,
-        'orderings': orderings
+        'orderings': orderings,
+        'clear': request.link(self.for_term(''))
     }
 
 
@@ -156,6 +157,7 @@ def view_notices_statistics(self, request):
         'by_organizations': self.count_by_organization(),
         'by_category': self.count_by_category(),
         'by_groups': self.count_by_group(),
+        'clear': request.link(self.for_dates(None, None), name='statistics')
     }
 
 

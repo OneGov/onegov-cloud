@@ -23,7 +23,7 @@
                             </button>
                         </dd>
                         <dd tal:condition="term">
-                            <a href="${request.path_url}"><i class="fa fa-close" aria-hidden="true"></i></a>
+                            <a href="${clear}"><i class="fa fa-close" aria-hidden="true"></i></a>
                         </dd>
                     </form>
                 </dl>

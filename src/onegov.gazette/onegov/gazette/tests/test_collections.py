@@ -93,13 +93,11 @@ def test_notice_collection_on_request(session, principal):
         (date(2017, 10, 21), date(2017, 10, 21), 0),
         (date(2017, 10, 1), date(2017, 9, 1), 0),
     ):
-        collection.from_date = start
-        collection.to_date = end
+        collection = collection.for_dates(start, end)
         collection.on_request(DummyRequest(principal))
         assert len(collection.issues) == length
 
-    collection.from_date = date(2017, 12, 1)
-    collection.to_date = date(2017, 12, 10)
+    collection = collection.for_dates(date(2017, 12, 1), date(2017, 12, 10))
     collection.on_request(DummyRequest(principal))
     assert sorted(collection.issues) == ['2017-48', '2017-49']
 

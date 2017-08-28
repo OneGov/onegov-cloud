@@ -54,6 +54,23 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         self.to_date = to_date
         self.source = source
 
+    def for_dates(self, from_date, to_date):
+        """ Returns a new instance of the collection with the given dates. """
+
+        return self.__class__(
+            self.session,
+            state=self.state,
+            term=self.term,
+            order=self.order,
+            direction=self.direction,
+            issues=self.issues,
+            user_ids=self.user_ids,
+            group_ids=self.group_ids,
+            from_date=from_date,
+            to_date=to_date,
+            source=self.source
+        )
+
     def add(self, title, text, organization_id, category_id, user, issues,
             principal):
         """ Add a new notice.
