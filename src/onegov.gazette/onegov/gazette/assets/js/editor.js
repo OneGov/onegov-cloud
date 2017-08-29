@@ -4,7 +4,7 @@ $(function() {
         var form = textarea.closest('form');
 
         textarea.redactor({
-            buttons: ['bold', 'italic'],
+            buttons: ['bold', 'italic', 'unorderedlist', 'orderedlist'],
             formatting: ['p', 'blockquote'],
             lang: 'de',
         });

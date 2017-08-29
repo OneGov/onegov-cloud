@@ -25,6 +25,9 @@ Changelog
 - Reorders meta data column in notice detail view.
   [msom]
 
+- Allows ordered and unordered lists in the editor.
+  [msom]
+
 0.1.2 (2017-08-22)
 ~~~~~~~~~~~~~~~~~~~
 

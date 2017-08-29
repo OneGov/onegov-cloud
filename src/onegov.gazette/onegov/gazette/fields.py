@@ -6,7 +6,7 @@ from onegov.gazette import _
 
 
 cleaner = Cleaner(
-    tags=['br', 'em', 'p', 'strong'],
+    tags=['br', 'em', 'p', 'strong', 'ol', 'ul', 'li'],
     attributes={},
     strip=True
 )

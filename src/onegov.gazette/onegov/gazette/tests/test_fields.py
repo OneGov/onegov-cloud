@@ -21,10 +21,16 @@ def test_html_field():
         '</span>'
         '<span class="md-line md-end-block"><script>XXXX</script></span>'
         '</p>'
+        '<ul><li>1</li><li>2</li><li>3</li></ul>'
+        '<ol><li>1</li><li>2</li><li>3</li></ol>'
     )
 
     field.validate(form)
-    assert field.data == 'Lorem Ipsum<p><em>Lorem</em>, ipsum.XXXX</p>'
+    assert field.data == (
+        'Lorem Ipsum<p><em>Lorem</em>, ipsum.XXXX</p>'
+        '<ul><li>1</li><li>2</li><li>3</li></ul>'
+        '<ol><li>1</li><li>2</li><li>3</li></ol>'
+    )
 
 
 def test_select_field():
