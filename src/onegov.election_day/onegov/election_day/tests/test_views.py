@@ -70,11 +70,13 @@ def test_i18n(election_day_app):
 
 
 def test_pages_cache(election_day_app):
-    election_day_app.principal.open_data = {
+    principal = election_day_app.principal
+    principal.open_data = {
         'id': 'kanton-govikon',
         'mail': 'info@govikon',
         'name': 'Staatskanzlei Kanton Govikon'
     }
+    election_day_app.cache.set('principal', principal)
 
     client = Client(election_day_app)
     client.get('/locale/de_CH')
@@ -305,11 +307,13 @@ def test_opendata_catalog(election_day_app):
     response = client.get('/catalog.rdf', expect_errors=True)
     assert response.status_code == 501
 
-    election_day_app.principal.open_data = {
+    principal = election_day_app.principal
+    principal.open_data = {
         'id': 'kanton-govikon',
         'mail': 'info@govikon',
         'name': 'Staatskanzlei Kanton Govikon'
     }
+    election_day_app.cache.set('principal', principal)
 
     # Empty
     root = fromstring(client.get('/catalog.rdf').text)

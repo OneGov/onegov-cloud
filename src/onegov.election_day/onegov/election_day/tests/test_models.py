@@ -637,7 +637,10 @@ def test_webhook_notification(session):
 def test_sms_notification(request, election_day_app, session):
     with freeze_time("2008-01-01 00:00"):
         election_day_app.send_sms = Mock()
-        election_day_app.principal.sms_notification = 'https://wab.ch.ch'
+
+        principal = election_day_app.principal
+        principal.sms_notification = 'https://wab.ch.ch'
+        election_day_app.cache.set('principal', principal)
 
         session.add(
             Election(

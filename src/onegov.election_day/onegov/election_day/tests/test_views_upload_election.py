@@ -623,10 +623,15 @@ def test_upload_election_submit(election_day_app):
         assert import_.called
 
     # Wabsti Municipality Majorz
+    principal = election_day_app.principal
+    principal.domain = 'municipality'
+    principal.municipality = '351'
+    election_day_app.cache.set('principal', principal)
+
     edit = client.get('/election/election/edit')
     edit.form['election_type'] = 'majorz'
     edit.form.submit()
-    election_day_app.principal.domain = 'municipality'
+
     with patch(
         'onegov.election_day.views.upload.election.'
         'import_election_wabstim_majorz'

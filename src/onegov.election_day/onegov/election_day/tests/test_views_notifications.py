@@ -20,8 +20,9 @@ def test_view_notifications_votes(election_day_app):
     assert "Benachrichtigungen auslösen" not in client.get('/manage/votes')
     assert "Benachrichtigungen auszulösen" not in upload_vote(client, False)
 
-    election_day_app.principal.webhooks = {'http://example.com/1': None}
-    del election_day_app.principal.notifications
+    principal = election_day_app.principal
+    principal.webhooks = {'http://example.com/1': None}
+    election_day_app.cache.set('principal', principal)
 
     assert "Benachrichtigungen auslösen" in client.get('/manage/votes')
     assert "Benachrichtigungen auszulösen" in upload_vote(client, False)
@@ -53,8 +54,9 @@ def test_view_notifications_elections(election_day_app_gr):
         client, False
     )
 
-    election_day_app_gr.principal.webhooks = {'http://example.com/1': None}
-    del election_day_app_gr.principal.notifications
+    principal = election_day_app_gr.principal
+    principal.webhooks = {'http://example.com/1': None}
+    election_day_app_gr.cache.set('principal', principal)
 
     assert "Benachrichtigungen auslösen" in client.get('/manage/elections')
     assert "Benachrichtigungen auszulösen" in upload_majorz_election(

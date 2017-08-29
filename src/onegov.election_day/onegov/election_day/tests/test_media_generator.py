@@ -488,12 +488,14 @@ def test_get_pdf_signing_reasons(session, election_day_app):
         assert not get.called
 
     # signing
-    election_day_app.principal.pdf_signing = {
+    principal = election_day_app.principal
+    principal.pdf_signing = {
         'host': 'http://abcd.ef',
         'login': 'abcd',
         'password': '1234',
         'reason': 'why'
     }
+    election_day_app.cache.set('principal', principal)
     generator = MediaGenerator(election_day_app)
 
     args = {

@@ -196,7 +196,11 @@ def test_upload_vote_submit(election_day_app):
         assert import_.call_args[0][3] == True
 
     # Wabsti municipalities
-    election_day_app.principal.domain = 'municipality'
+    principal = election_day_app.principal
+    principal.domain = 'municipality'
+    principal.municipality = '351'
+    election_day_app.cache.set('principal', principal)
+
     with patch(
         'onegov.election_day.views.upload.vote.import_vote_wabstim'
     ) as import_:
