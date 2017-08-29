@@ -22,6 +22,9 @@ Changelog
 - Allows to set a reply to address when publishing.
   [msom]
 
+- Reorders meta data column in notice detail view.
+  [msom]
+
 0.1.2 (2017-08-22)
 ~~~~~~~~~~~~~~~~~~~
 

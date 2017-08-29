@@ -34,8 +34,11 @@
                     </div>
                     <div class="small-12 medium-5 columns">
                         <dl>
-                            <dt i18n:translate>ID</dt>
-                            <dd>${notice.id}</dd>
+                            <dt i18n:translate>State</dt>
+                            <dd i18n:translate>${notice.state}</dd>
+
+                            <dt i18n:translate>Issue(s)</dt>
+                            <dd><tal:block metal:use-macro="layout.macros['issues']" /></dd>
 
                             <dt i18n:translate>Organization</dt>
                             <dd>${notice.organization}</dd>
@@ -49,11 +52,8 @@
                             <dt i18n:translate>Group</dt>
                             <dd>${notice.group_name}</dd>
 
-                            <dt i18n:translate>Issue(s)</dt>
-                            <dd><tal:block metal:use-macro="layout.macros['issues']" /></dd>
-
-                            <dt i18n:translate>State</dt>
-                            <dd i18n:translate>${notice.state}</dd>
+                            <dt i18n:translate>ID</dt>
+                            <dd>${notice.id}</dd>
                         </dl>
                     </div>
                 </div>
