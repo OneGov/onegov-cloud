@@ -28,6 +28,9 @@ Changelog
 - Allows ordered and unordered lists in the editor.
   [msom]
 
+- Allows to fold issues after unfolding again.
+  [msom]
+
 0.1.2 (2017-08-22)
 ~~~~~~~~~~~~~~~~~~~
 

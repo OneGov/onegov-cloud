@@ -25,8 +25,9 @@ Foundation.libs.dropdown.small = function() { return false; };
 
 // Hide the first x options in a limited multi select form field
 $('ul[data-limit]').each(function() {
-    $(this).children('li:not(.expand)').slice($(this).data('limit')).hide();
-    $(this).append(
+    var ul = $(this);
+    ul.children('li:not(.expand)').slice(ul.data('limit')).hide();
+    ul.append(
         $('<li></li>')
             .attr('class', 'expand')
             .html(
@@ -34,11 +35,28 @@ $('ul[data-limit]').each(function() {
                 .attr('href', '#')
                 .attr('class', 'action-expand')
                 .on('click', function() {
-                    $(this).closest('ul').children('li:not(.expand)').show();
-                    $(this).hide();
+                    ul.children('li:not(.expand)').show();
+                    ul.children('li.expand').hide();
                     return false;
                 })
-                .html($(this).data('expand-title') || 'Show all')
+                .html(ul.data('expand-title') || 'Show all')
             )
+    );
+    ul.append(
+        $('<li></li>')
+            .attr('class', 'fold')
+            .html(
+                $('<a></a>')
+                .attr('href', '#')
+                .attr('class', 'action-fold')
+                .on('click', function() {
+                    ul.children('li:not(.expand)').slice(ul.data('limit')).hide();
+                    ul.children('li.expand').show();
+                    ul.children('li.fold').hide();
+                    return false;
+                })
+                .html(ul.data('fold-title') || 'Show less')
+            )
+            .hide()
     );
 });

@@ -425,6 +425,12 @@ ul.actions {
     margin-right: .75ex;
 }
 
+.action-fold::before {
+    content: '\f056';
+    font-family: 'FontAwesome';
+    margin-right: .75ex;
+}
+
 .action-preview::before {
     content: '\f06e';
     font-family: 'FontAwesome';

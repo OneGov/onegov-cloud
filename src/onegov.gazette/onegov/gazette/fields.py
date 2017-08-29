@@ -43,10 +43,14 @@ class MultiCheckboxField(MultiCheckboxFieldBase):
             kwargs['render_kw'] = kwargs.get('render_kw', {})
             kwargs['render_kw']['data-limit'] = str(kwargs.pop('limit', 10))
             kwargs['render_kw']['data-expand-title'] = _("Show all")
+            kwargs['render_kw']['data-fold-title'] = _("Show less")
 
         super().__init__(*args, **kwargs)
 
     def translate(self, request):
         self.render_kw['data-expand-title'] = request.translate(
             self.render_kw['data-expand-title']
+        )
+        self.render_kw['data-fold-title'] = request.translate(
+            self.render_kw['data-fold-title']
         )
