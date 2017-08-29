@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.15.7 (2017-08-29)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes test failing due to changes in the memory backend.
   [msom]
