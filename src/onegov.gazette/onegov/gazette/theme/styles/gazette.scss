@@ -478,7 +478,8 @@ ul.actions {
         margin: 0;
         padding: .2em .5em;
 
-        &[type="date"] {
+        &[type="date"],
+        &[type="text"] {
             width: 80%;
         }
     }

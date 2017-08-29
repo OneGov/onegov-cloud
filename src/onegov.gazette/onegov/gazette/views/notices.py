@@ -117,8 +117,11 @@ def view_notices(self, request):
         'notices': self.batch,
         'title': title,
         'term': self.term,
+        'from_date': self.from_date,
+        'to_date': self.to_date,
         'orderings': orderings,
-        'clear': request.link(self.for_term(''))
+        'clear_term': request.link(self.for_term('')),
+        'clear_dates': request.link(self.for_dates(None, None))
     }
 
 

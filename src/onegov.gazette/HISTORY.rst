@@ -34,6 +34,9 @@ Changelog
 - Removes the principal name below the logo.
   [msom]
 
+- Allows to filter notices by date.
+  [msom]
+
 0.1.2 (2017-08-22)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -54,6 +54,39 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         self.to_date = to_date
         self.source = source
 
+    def for_state(self, state):
+        """ Returns a new instance of the collection with the given state. """
+
+        result = super(GazetteNoticeCollection, self).for_state(state)
+        result.from_date = self.from_date
+        result.to_date = self.to_date
+        result.source = self.source
+        return result
+
+    def for_term(self, term):
+        """ Returns a new instance of the collection with the given term. """
+
+        result = super(GazetteNoticeCollection, self).for_term(term)
+        result.from_date = self.from_date
+        result.to_date = self.to_date
+        result.source = self.source
+        return result
+
+    def for_order(self, order, direction=None):
+        """ Returns a new instance of the collection with the given ordering.
+        Inverts the direction if the new ordering is the same as the old one
+        and an explicit ordering is not defined.
+
+        """
+
+        result = super(GazetteNoticeCollection, self).for_order(
+            order, direction
+        )
+        result.from_date = self.from_date
+        result.to_date = self.to_date
+        result.source = self.source
+        return result
+
     def for_dates(self, from_date, to_date):
         """ Returns a new instance of the collection with the given dates. """
 
