@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from onegov.chat import Message
 from onegov.core.orm.mixins import meta_property
 from onegov.gazette import _
@@ -191,6 +192,22 @@ class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
                 return change.text
 
         return ''
+
+    @property
+    def issues(self):
+        """ Returns the issues sorted (by year/number). """
+
+        issues = self._issues or {}
+        keys = (Issue.from_string(issue) for issue in (self._issues or {}))
+        keys = sorted(keys, key=lambda x: (x.year, x.number))
+        return OrderedDict((str(key), issues[str(key)]) for key in keys)
+
+    @issues.setter
+    def issues(self, value):
+        if isinstance(value, dict):
+            self._issues = value
+        else:
+            self._issues = {item: None for item in value}
 
     def apply_meta(self, principal):
         """ Updates the category, organization and issue date from the meta

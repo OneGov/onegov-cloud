@@ -16,6 +16,9 @@ Changelog
 - Adjust dashboard warnings.
   [msom]
 
+- Order issues by issue year/number.
+  [msom]
+
 0.1.2 (2017-08-22)
 ~~~~~~~~~~~~~~~~~~~
 

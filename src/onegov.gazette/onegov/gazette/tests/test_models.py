@@ -294,25 +294,19 @@ def test_gazette_notice_issues():
     notice = GazetteNotice()
     assert notice.issues == {}
 
-    notice.issues = [1, 2, 3]
-    assert notice.issues == {1: None, 2: None, 3: None}
-    notice.issues = ['a', 'b', 'c']
-    assert notice.issues == {'a': None, 'b': None, 'c': None}
+    notice.issues = ['2010-1', '2011-4', '2008-7']
+    assert list(notice.issues.keys()) == ['2008-7', '2010-1', '2011-4']
+    assert notice.issues == {'2008-7': None, '2010-1': None, '2011-4': None}
 
-    notice.issues = {1, 2, 3}
-    assert notice.issues == {1: None, 2: None, 3: None}
-    notice.issues = {'a', 'b', 'c'}
-    assert notice.issues == {'a': None, 'b': None, 'c': None}
+    notice.issues = {'2010-1', '2010-2', '2010-11'}
+    assert list(notice.issues.keys()) == ['2010-1', '2010-2', '2010-11']
+    assert notice.issues == {'2010-1': None, '2010-2': None, '2010-11': None}
 
-    notice.issues = {1: 'a', 2: 'b', 3: 'c'}
-    assert notice.issues == {1: 'a', 2: 'b', 3: 'c'}
-    notice.issues = {'a': 1, 'b': 2, 'c': 3}
-    assert notice.issues == {'a': 1, 'b': 2, 'c': 3}
+    notice.issues = {'2010-1': 'a', '2009-2': 'b', '2010-11': 'c'}
+    assert list(notice.issues.keys()) == ['2009-2', '2010-1', '2010-11']
+    assert notice.issues == {'2009-2': 'b', '2010-1': 'a', '2010-11': 'c'}
 
-    notice.issues = {
-        str(Issue(2017, 10)): 1004,
-        str(Issue(2017, 11)): 1022,
-    }
+    notice.issues = {str(Issue(2017, 10)): 1004, str(Issue(2017, 11)): 1022}
     assert notice.issues == {'2017-10': 1004, '2017-11': 1022}
 
 
