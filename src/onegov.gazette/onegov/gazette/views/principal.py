@@ -66,41 +66,23 @@ def view_dashboard(self, request):
     drafted = collection.for_state('drafted').query().all()
     now = datetime.now()
     limit = now + timedelta(days=2)
+    past_issues_selected = False
+    deadline_reached_soon = False
     for notice in drafted:
-        past_issues_selected = False
-        deadline_reached_soon = False
         for issue in notice.issues:
             deadline = self.issue(issue).deadline
             past_issues_selected = past_issues_selected or deadline < now
             deadline_reached_soon = deadline_reached_soon or deadline < limit
-        if past_issues_selected:
-            request.message(
-                _(
-                    (
-                        "You have a drafted message with past issues: "
-                        "<a href='${link}'>${title}</a>"
-                    ),
-                    mapping={
-                        'link': request.link(notice),
-                        'title': notice.title
-                    }
-                ),
-                'info'
-            )
-        elif deadline_reached_soon:
-            request.message(
-                _(
-                    (
-                        "You have a drafted message with issues close to "
-                        "the deadline: <a href='${link}'>${title}</a>"
-                    ),
-                    mapping={
-                        'link': request.link(notice),
-                        'title': notice.title
-                    }
-                ),
-                'info'
-            )
+    if past_issues_selected:
+        request.message(
+            _("You have drafted messages with past issues."),
+            'warning'
+        )
+    if deadline_reached_soon:
+        request.message(
+            _("You have drafted messages with issues close to the deadline."),
+            'warning'
+        )
 
     # submitted
     submitted = collection.for_state('submitted').query().all()

@@ -13,6 +13,9 @@ Changelog
 - Adjusts email texts.
   [msom]
 
+- Adjust dashboard warnings.
+  [msom]
+
 0.1.2 (2017-08-22)
 ~~~~~~~~~~~~~~~~~~~
 
