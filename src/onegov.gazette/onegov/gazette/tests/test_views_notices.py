@@ -510,7 +510,9 @@ def test_view_notices_update(gazette_app):
         client.get('/notice/erneuerungswahlen/submit').form.submit()
         client.get('/notice/erneuerungswahlen/accept').form.submit()
 
-        gazette_app.principal.organizations['100'] = "Federal Chancellery"
+        principal = gazette_app.principal
+        principal.organizations['100'] = "Federal Chancellery"
+        gazette_app.cache.set('principal', principal)
 
         manage = client.get('/notices/submitted/update').form.submit().follow()
         assert "Meldungen aktualisiert." in manage

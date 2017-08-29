@@ -7,6 +7,9 @@ Changelog
 - Shows the preview in a separate window.
   [msom]
 
+- Fixes test failing due to changes in the memory backend.
+  [msom]
+
 0.1.2 (2017-08-22)
 ~~~~~~~~~~~~~~~~~~~
 
