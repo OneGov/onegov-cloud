@@ -31,6 +31,9 @@ Changelog
 - Allows to fold issues after unfolding again.
   [msom]
 
+- Removes the principal name below the logo.
+  [msom]
+
 0.1.2 (2017-08-22)
 ~~~~~~~~~~~~~~~~~~~
 

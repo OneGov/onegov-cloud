@@ -43,7 +43,7 @@ metal:define-macro="layout">
         <div class="row">
             <div class="columns small-12">
                 <div metal:define-slot="before-content">
-                    <h1><small>${layout.app.principal.name}</small><tal:block i18n:translate>Gazette</tal:block></h1>
+                    <h1><tal:block i18n:translate>Gazette</tal:block></h1>
                     <hr>
                 </div>
             </div>
