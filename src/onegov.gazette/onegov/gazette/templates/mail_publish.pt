@@ -3,11 +3,11 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="body">
-        <p i18n:translate>Dear Sir or Madam,</p>
+        <p i18n:translate>Dear Publisher,</p>
         <p i18n:translate>Please publish the following official notice:</p>
         <dl>
-            <dt i18n:translate>Title</dt>
-            <dd>${model.title}</dd>
+            <dt i18n:translate>Issue(s)</dt>
+            <dd><tal:block metal:use-macro="layout.macros['issues']" tal:define="notice model; as_list False"/></dd>
 
             <dt i18n:translate>Organization</dt>
             <dd>${model.organization}</dd>
@@ -15,14 +15,11 @@
             <dt i18n:translate>Category</dt>
             <dd>${model.category}</dd>
 
-            <dt i18n:translate>Issue(s)</dt>
-            <dd><tal:block metal:use-macro="layout.macros['issues']" tal:define="notice model; as_list False"/></dd>
-
-            <dt i18n:translate>ID</dt>
-            <dd>${model.id}</dd>
+            <dt i18n:translate>Title</dt>
+            <dd>${model.title}</dd>
 
             <dt i18n:translate>Text</dt>
-            <dd tal:content="structure model.text"></dd>
+            <dd class="callout" tal:content="structure model.text"></dd>
         </dl>
     </tal:block>
 </div>

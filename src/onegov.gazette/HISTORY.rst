@@ -10,6 +10,9 @@ Changelog
 - Fixes test failing due to changes in the memory backend.
   [msom]
 
+- Adjusts email texts.
+  [msom]
+
 0.1.2 (2017-08-22)
 ~~~~~~~~~~~~~~~~~~~
 

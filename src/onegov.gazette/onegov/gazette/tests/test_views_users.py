@@ -29,7 +29,7 @@ def test_view_users(gazette_app):
     message = gazette_app.smtp.outbox[0]
     message = message.get_payload(1).get_payload(decode=True)
     message = message.decode('utf-8')
-    assert "Ihr Benutzerkonto wurde erstellt." in message
+    assert "Benutzerkonto Amtsblattredaktion erstellt" in message
 
     # make it an editor
     manage = manage.click("Bearbeiten", href="new_user")

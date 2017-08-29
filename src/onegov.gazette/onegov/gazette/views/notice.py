@@ -323,15 +323,19 @@ def accept_notice(self, request, form):
         request.message(_("Official notice accepted."), 'success')
         if request.app.principal.publish_to:
             request.app.send_email(
-                subject=request.translate(_("Publish Official Notice")),
+                subject=request.translate(_(
+                    "Publish Official Notice ${id}",
+                    mapping={'id': self.id}
+                )),
                 receivers=(request.app.principal.publish_to, ),
                 reply_to=request.app.mail_sender,
                 content=render_template(
                     'mail_publish.pt',
                     request,
                     {
-                        'title': request.translate((
-                            _("Publish Official Notice")
+                        'title': request.translate(_(
+                            "Publish Official Notice ${id}",
+                            mapping={'id': self.id}
                         )),
                         'model': self,
                         'layout': MailLayout(self, request)
@@ -386,14 +390,19 @@ def reject_notice(self, request, form):
         self.reject(request, form.comment.data)
         request.message(_("Official notice rejected."), 'success')
         request.app.send_email(
-            subject=request.translate(_("Official Notice Rejected")),
+            subject=request.translate(
+                _("Official Notice Rejected ${id}", mapping={'id': self.id})
+            ),
             receivers=(self.user.username, ),
             reply_to=request.app.mail_sender,
             content=render_template(
                 'mail_notice_rejected.pt',
                 request,
                 {
-                    'title': request.translate(_("Official Notice Rejected")),
+                    'title': request.translate(_(
+                        "Official Notice Rejected ${id}",
+                        mapping={'id': self.id}
+                    )),
                     'model': self,
                     'comment': form.comment.data,
                     'layout': MailLayout(self, request)

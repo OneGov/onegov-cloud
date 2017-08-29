@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-18 12:22+0200\n"
-"PO-Revision-Date: 2017-08-29 13:07+0200\n"
+"POT-Creation-Date: 2017-08-29 13:31+0200\n"
+"PO-Revision-Date: 2017-08-29 13:32+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -178,28 +178,37 @@ msgstr "Nächster Redaktionsschluss"
 msgid "Issue"
 msgstr "Ausgabe"
 
-msgid "Dear Sir or Madam,"
+msgid "Dear Sirs and Madams,"
 msgstr "Sehr geehrte Damen und Herren,"
 
 msgid "Your official notice has been rejected:"
-msgstr "Ihre Meldung wurde zurückgewiesen:"
+msgstr "Ihr Inserat für den amtlichen Teil des Amtsblatts wurde zurückgewiesen"
 
 msgid "ID"
 msgstr "ID"
 
+msgid "Dear Sir or Madam,"
+msgstr "Sehr geehrte Dame, sehr geehrter Herr"
+
 msgid "Click the following link to set a new password:"
-msgstr "Klicken Sie auf den folgenden Link, um ein neues Passwort zu setzen:"
+msgstr ""
+"Klicken Sie auf den folgenden Link, um ein Passwort für die Einreichung von "
+"Amtsblattinseraten zu setzen:"
 
 msgid "If you don't want to change your password, you can ignore this email."
 msgstr ""
 "Sie können dieses E-Mail ignorieren, falls Sie Ihr Passwort nicht ändern "
 "möchten."
 
+msgid "Dear Publisher,"
+msgstr "Sehr geehrte Amtsblattredaktion"
+
 msgid "Please publish the following official notice:"
-msgstr "Bitte veröffentlichen Sie folgende amtliche Meldung:"
+msgstr "Bitte publizieren Sie folgendes Inserat für den amtlichen Teil"
 
 msgid "Your user account has been created."
-msgstr "Ihr Benutzerkonto wurde erstellt."
+msgstr ""
+"Ihr Benutzerkonto für die Einreichung von Amtsblattinseraten wurde erstellt."
 
 msgid "Click the following link to set a password:"
 msgstr "Klicken Sie auf den folgenden Link um ein Passwort festzulegen:"
@@ -266,7 +275,7 @@ msgid "Wrong username or password reset link not valid any more."
 msgstr "Ungültige Adresse oder abgelaufener Link."
 
 msgid "Password reset"
-msgstr "Passwort zurücksetzen"
+msgstr "Persönliches Passwort Amtsblattredaktion zurücksetzen"
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"
@@ -382,9 +391,6 @@ msgstr ""
 msgid "mail sent"
 msgstr "E-Mail gesendet"
 
-msgid "Submit"
-msgstr "Einreichen"
-
 msgid "Copy"
 msgstr "Kopieren"
 
@@ -394,11 +400,16 @@ msgstr "Annehmen"
 msgid "Reject"
 msgstr "Zurückweisen"
 
-msgid "Official Notice Rejected"
-msgstr "Meldung zurückgewiesen"
+#, python-format
+msgid "Official Notice Rejected ${id}"
+msgstr "Inserat für den amtlichen Teil zurückgewiesen ${id}"
 
-msgid "Publish Official Notice"
-msgstr "Meldung veröffentlichen"
+msgid "Submit"
+msgstr "Einreichen"
+
+#, python-format
+msgid "Publish Official Notice ${id}"
+msgstr "Publikation für den amtlichen Teil ${id}"
 
 msgid "New Official Notice"
 msgstr "Neue Meldung"
@@ -473,4 +484,4 @@ msgid "User deleted."
 msgstr "Benutzer gelöscht."
 
 msgid "User account created"
-msgstr "Benutzerkonto erstellt"
+msgstr "Benutzerkonto Amtsblattredaktion erstellt"
