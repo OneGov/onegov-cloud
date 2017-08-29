@@ -443,12 +443,14 @@ def test_sign_pdf(session, election_day_app):
         assert not post.called
 
     # signing
-    election_day_app.principal.pdf_signing = {
+    principal = election_day_app.principal
+    principal.pdf_signing = {
         'host': 'http://abcd.ef',
         'login': 'abcd',
         'password': '1234',
         'reason': 'why'
     }
+    election_day_app.cache.set('principal', principal)
     generator = MediaGenerator(election_day_app)
 
     with election_day_app.filestorage.open('vote.pdf', 'w') as f:
