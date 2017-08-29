@@ -41,6 +41,7 @@ def test_principal():
     assert principal.color == '#aabbcc'
     assert principal.logo == 'logo.svg'
     assert principal.publish_to == 'printer@govikon.org'
+    assert principal.publish_from == ''
     assert dict(principal.organizations) == {}
     assert dict(principal.categories) == {}
     assert dict(principal.issues) == {}
@@ -51,6 +52,7 @@ def test_principal():
         color: '#aabbcc'
         logo: 'logo.svg'
         publish_to: 'printer@govikon.org'
+        publish_from: 'publisher@govikon.org'
         organizations:
             - '1': Organization 1
             - '2': Örgänizätiön 2
@@ -75,6 +77,7 @@ def test_principal():
     assert principal.color == '#aabbcc'
     assert principal.logo == 'logo.svg'
     assert principal.publish_to == 'printer@govikon.org'
+    assert principal.publish_from == 'publisher@govikon.org'
     assert dict(principal.organizations) == {
         '1': 'Organization 1', '2': 'Örgänizätiön 2'
     }

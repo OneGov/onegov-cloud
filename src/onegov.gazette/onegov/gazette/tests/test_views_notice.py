@@ -358,7 +358,7 @@ def test_view_notice_accept(gazette_app):
     submit_notice(editor_3, 'titel-2', forbidden=True)
     submit_notice(editor_3, 'titel-3', unable=True)
 
-    # check if the notices can be rejected
+    # check if the notices can be accepted
     for user, slug, forbidden in (
         (editor_1, 'titel-1', True),
         (editor_1, 'titel-2', True),
@@ -366,9 +366,29 @@ def test_view_notice_accept(gazette_app):
         (editor_3, 'titel-3', True),
         (publisher, 'titel-1', False),
         (publisher, 'titel-2', False),
-        (publisher, 'titel-3', False),
+        # (publisher, 'titel-3', False),
     ):
         accept_notice(user, slug, forbidden=forbidden)
+
+    assert len(gazette_app.smtp.outbox) == 2
+    for message in gazette_app.smtp.outbox:
+        assert message['Reply-To'] == 'mails@govikon.ch'
+        payload = message.get_payload(1).get_payload(decode=True)
+        payload = payload.decode('utf-8')
+        assert "Publikation für den amtlichen Teil" in payload
+
+    principal = gazette_app.principal
+    principal.publish_from = 'publisher@govikon.ch'
+    gazette_app.cache.set('principal', principal)
+
+    accept_notice(publisher, 'titel-3')
+
+    assert len(gazette_app.smtp.outbox) == 3
+    message = gazette_app.smtp.outbox[2]
+    assert message['Reply-To'] == 'publisher@govikon.ch'
+    payload = message.get_payload(1).get_payload(decode=True)
+    payload = payload.decode('utf-8')
+    assert "Publikation für den amtlichen Teil" in payload
 
 
 def test_view_notice_delete(gazette_app):

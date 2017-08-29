@@ -13,10 +13,13 @@ Changelog
 - Adjusts email texts.
   [msom]
 
-- Adjust dashboard warnings.
+- Adjusts dashboard warnings.
   [msom]
 
-- Order issues by issue year/number.
+- Orders issues by issue year/number.
+  [msom]
+
+- Allows to set a reply to address when publishing.
   [msom]
 
 0.1.2 (2017-08-22)

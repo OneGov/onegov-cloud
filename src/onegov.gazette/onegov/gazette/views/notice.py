@@ -322,13 +322,16 @@ def accept_notice(self, request, form):
         self.accept(request)
         request.message(_("Official notice accepted."), 'success')
         if request.app.principal.publish_to:
+            reply_to = (
+                request.app.principal.publish_from or request.app.mail_sender
+            )
             request.app.send_email(
                 subject=request.translate(_(
                     "Publish Official Notice ${id}",
                     mapping={'id': self.id}
                 )),
                 receivers=(request.app.principal.publish_to, ),
-                reply_to=request.app.mail_sender,
+                reply_to=reply_to,
                 content=render_template(
                     'mail_publish.pt',
                     request,

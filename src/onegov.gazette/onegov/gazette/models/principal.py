@@ -53,12 +53,14 @@ class Principal(object):
         organizations=None,
         categories=None,
         issues=None,
-        publish_to=''
+        publish_to='',
+        publish_from=''
     ):
         self.name = name
         self.logo = logo
         self.color = color
         self.publish_to = publish_to
+        self.publish_from = publish_from
 
         # We want the organizations and categories in the order defined in the
         # YAML file and accessible by key
