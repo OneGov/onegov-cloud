@@ -31,9 +31,11 @@ metal:define-macro="layout">
     <div class="row header">
         <div class="small-12 medium-4 medium-push-8 columns text-right"></div>
         <div class="small-12 medium-8 medium-pull-4 small-only-text-center columns">
-            <a href="${layout.homepage_link}" title="homepage" i18n:attributes="title">
-                <img aria-hidden="true" alt="Gazette" i18n:attributes="alt" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
-            </a>
+            <div metal:define-slot="logo">
+                <a href="${layout.homepage_link}" title="homepage" i18n:attributes="title">
+                    <img aria-hidden="true" alt="Gazette" i18n:attributes="alt" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
+                </a>
+            </div>
         </div>
     </div>
 
