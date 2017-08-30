@@ -37,6 +37,9 @@ Changelog
 - Allows to filter notices by date.
   [msom]
 
+- Shows state filters on notices view.
+  [msom]
+
 0.1.2 (2017-08-22)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -77,12 +77,14 @@ def view_notices(self, request):
 
     layout = Layout(self, request)
 
-    title = {
-        'drafted': _("Drafted Official Notices"),
-        'rejected': _("Rejected Official Notices"),
-        'submitted': _("Submitted Official Notices"),
-        'accepted': _("Accepted Official Notices")
-    }.get(self.state, _("Official Notices"))
+    filters = (
+        {
+            'title': _(state),
+            'link': request.link(self.for_state(state)),
+            'class': 'active' if state == self.state else ''
+        }
+        for state in ('drafted', 'submitted', 'accepted', 'rejected')
+    )
 
     orderings = {
         'title': {
@@ -107,15 +109,17 @@ def view_notices(self, request):
         }
     }
 
+    title = _("Official Notices")
     if not request.is_private(self):
         self.user_ids, self.group_ids = get_user_and_group(request)
-        if self.state == 'accepted':
-            title = _("My Accepted Official Notices")
+        filters = None
+        title = _("My Accepted Official Notices")
 
     return {
         'layout': layout,
         'notices': self.batch,
         'title': title,
+        'filters': filters,
         'term': self.term,
         'from_date': self.from_date,
         'to_date': self.to_date,

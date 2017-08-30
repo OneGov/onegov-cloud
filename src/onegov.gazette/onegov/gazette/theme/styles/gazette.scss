@@ -488,6 +488,10 @@ ul.actions {
         margin: 0;
         padding: 0 .2em;
     }
+
+    &:last-child {
+        margin-bottom: 1em;
+    }
 }
 
 

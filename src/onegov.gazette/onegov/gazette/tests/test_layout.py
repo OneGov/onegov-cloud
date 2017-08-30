@@ -48,7 +48,6 @@ def test_layout_links():
     assert layout.manage_users_link == '/UserCollection/'
     assert layout.manage_user_groups_link == '/UserGroupCollection/'
     assert layout.manage_notices_link == '/GazetteNoticeCollection/'
-    assert layout.manage_accepted_notices_link == '/GazetteNoticeCollection/'
     assert layout.manage_statistics_link == \
         '/GazetteNoticeCollection/statistics/'
     assert layout.dashboard_link == '/dashboard/'
@@ -68,8 +67,7 @@ def test_layout_menu():
 
     request._is_private = True
     assert layout.menu == [
-        ('Submitted Official Notices', '/GazetteNoticeCollection/', False),
-        ('Accepted Official Notices', '/GazetteNoticeCollection/', False),
+        ('Official Notices', '/GazetteNoticeCollection/', False),
         ('Statistics', '/GazetteNoticeCollection/statistics/', False)
     ]
 
@@ -77,8 +75,7 @@ def test_layout_menu():
     assert layout.menu == [
         ('Users', '/UserCollection/', False),
         ('Groups', '/UserGroupCollection/', False),
-        ('Submitted Official Notices', '/GazetteNoticeCollection/', False),
-        ('Accepted Official Notices', '/GazetteNoticeCollection/', False),
+        ('Official Notices', '/GazetteNoticeCollection/', False),
         ('Statistics', '/GazetteNoticeCollection/statistics/', False)
     ]
 
