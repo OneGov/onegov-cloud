@@ -32,7 +32,6 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'more_itertools',
         'onegov.core>=0.4.0',
         'onegov.form',
     ],
