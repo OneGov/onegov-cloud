@@ -49,6 +49,9 @@ Changelog
 - Adds an option to indicate if one needs to pay to publish a specific notice.
   [msom]
 
+- Adds a print button to the preview.
+  [msom]
+
 0.1.2 (2017-08-22)
 ~~~~~~~~~~~~~~~~~~~
 

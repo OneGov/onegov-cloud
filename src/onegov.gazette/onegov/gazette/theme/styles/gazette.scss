@@ -442,6 +442,12 @@ ul.actions {
     margin-right: .75ex;
 }
 
+.action-print::before {
+    content: '\f02f';
+    font-family: 'FontAwesome';
+    margin-right: .75ex;
+}
+
 .action-accept::before {
     content: '\f00c';
     font-family: 'FontAwesome';
