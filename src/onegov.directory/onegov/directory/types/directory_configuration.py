@@ -1,3 +1,4 @@
+from more_itertools import collapse
 from onegov.core import custom_json as json
 from onegov.core.utils import normalize_for_url
 from sqlalchemy.ext.mutable import Mutable
@@ -40,9 +41,10 @@ class DirectoryConfiguration(Mutable, JSONConfiguration):
 
     fields = ('title', 'order')
 
-    def __init__(self, title=None, order=None):
+    def __init__(self, title=None, order=None, keywords=None):
         self.title = title
         self.order = order
+        self.keywords = keywords
 
     def __setattr__(self, name, value):
         self.changed()
@@ -60,6 +62,20 @@ class DirectoryConfiguration(Mutable, JSONConfiguration):
     def extract_order(self, data):
         assert self.order
         return normalize_for_url(self.join(data, 'order'))
+
+    def extract_keywords(self, data):
+        if self.keywords:
+            keywords = set()
+
+            for key in self.keywords:
+                for value in collapse(data[key]):
+                    if isinstance(value, str):
+                        value = value.strip()
+
+                    if value:
+                        keywords.add(value)
+
+            return keywords
 
 
 DirectoryConfiguration.associate_with(DirectoryConfigurationStorage)

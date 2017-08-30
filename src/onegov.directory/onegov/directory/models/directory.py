@@ -8,6 +8,7 @@ from onegov.directory.types import DirectoryConfigurationStorage
 from onegov.form import flatten_fieldsets, parse_formcode, parse_form
 from sqlalchemy import Column
 from sqlalchemy import Text
+from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import observes
 from uuid import uuid4
@@ -67,6 +68,25 @@ class Directory(Base, ContentMixin, TimestampMixin):
     def entry_cls(self):
         return self.__class__._decl_class_registry[self.entry_cls_name]
 
+    def add(self, **values):
+        return self.update(self.entry_cls(), **values)
+
+    def update(self, entry, **values):
+        entry.content = entry.content or {}
+        entry.content['values'] = {
+            f.id: values[f.id] for f in self.fields
+        }
+
+        cfg = self.configuration
+
+        entry.title = cfg.extract_title(values)
+        entry.order = cfg.extract_order(values)
+        entry.keywords = cfg.extract_keywords(values)
+
+        object_session(self).flush()
+
+        return entry
+
     @observes('title')
     def title_observer(self, title):
         self.order = normalize_for_url(title)
@@ -83,16 +103,11 @@ class Directory(Base, ContentMixin, TimestampMixin):
         class DirectoryEntryForm(parse_form(self.structure)):
 
             def populate_obj(self, obj):
-                obj.title = directory.configuration.extract_title(self.data)
-                obj.order = directory.configuration.extract_order(self.data)
-
-                obj.content['fields'] = {
-                    field.id: self.data[field.id] for field in directory.fields
-                }
+                directory.update(obj, **self.data)
 
             def process_obj(self, obj):
                 for field in directory.fields:
                     form_field = getattr(self, field.id)
-                    form_field.data = obj.content['fields'][field.id]
+                    form_field.data = obj.content['values'][field.id]
 
         return DirectoryEntryForm
