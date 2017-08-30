@@ -41,10 +41,11 @@ class DirectoryConfiguration(Mutable, JSONConfiguration):
 
     fields = ('title', 'order')
 
-    def __init__(self, title=None, order=None, keywords=None):
+    def __init__(self, title=None, order=None, keywords=None, searchable=None):
         self.title = title
         self.order = order
         self.keywords = keywords
+        self.searchable = searchable
 
     def __setattr__(self, name, value):
         self.changed()
@@ -76,6 +77,10 @@ class DirectoryConfiguration(Mutable, JSONConfiguration):
                         keywords.add(value)
 
             return keywords
+
+    def extract_searchable_text(self, data):
+        if self.searchable:
+            return self.join(data, 'searchable')
 
 
 DirectoryConfiguration.associate_with(DirectoryConfigurationStorage)

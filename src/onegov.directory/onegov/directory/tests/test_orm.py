@@ -99,37 +99,11 @@ def test_directory_form(session):
 
     assert rick.title == 'Rick Sanchez'
     assert rick.order == 'sanchez-rick'
-    assert rick.content['values']['first_name'] == 'Rick'
-    assert rick.content['values']['last_name'] == 'Sanchez'
+    assert rick.content['fields']['first_name'] == 'Rick'
+    assert rick.content['fields']['last_name'] == 'Sanchez'
 
     form = people.form_class()
     form.process(obj=rick)
 
     assert form.first_name.data == 'Rick'
     assert form.last_name.data == 'Sanchez'
-
-
-def test_directory_entry(session):
-    inventory = DirectoryCollection(session).add(
-        title="Inventory",
-        structure="""
-            Name *= ___
-            Type =
-                [ ] Tool
-                [ ] Valuable
-                [ ] Vehicle
-        """,
-        configuration=DirectoryConfiguration(
-            title=('name', ),
-            order=('name', ),
-            keywords=('type', )
-        )
-    )
-
-    vespa = inventory.add(name="Vespa", type=('Vehicle', ))
-    screwdriver = inventory.add(name="Screwdriver", type=('Tool', ))
-    scalpel = inventory.add(name="Scalpel", type=('Tool', 'Valuable'))
-
-    assert vespa.keywords == {'Vehicle'}
-    assert screwdriver.keywords == {'Tool'}
-    assert scalpel.keywords == {'Tool', 'Valuable'}

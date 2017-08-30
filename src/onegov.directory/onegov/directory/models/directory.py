@@ -6,6 +6,7 @@ from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
 from onegov.directory.types import DirectoryConfigurationStorage
 from onegov.form import flatten_fieldsets, parse_formcode, parse_form
+from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Text
 from sqlalchemy.orm import object_session
@@ -14,13 +15,27 @@ from sqlalchemy_utils import observes
 from uuid import uuid4
 
 
-class Directory(Base, ContentMixin, TimestampMixin):
+class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
     """ A directory of entries that share a common data structure. For example,
     a directory of people, of emergency services or playgrounds.
 
     """
 
     __tablename__ = 'directories'
+
+    es_properties = {
+        'title': {'type': 'localized'},
+        'lead': {'type': 'localized'},
+        'text': {'type': 'localized_html'}
+    }
+
+    @property
+    def es_language(self):
+        return 'de'  # XXX add to database in the future
+
+    @property
+    def es_public(self):
+        return False  # to be overridden downstream
 
     #: An interal id for references (not public)
     id = Column(UUID, primary_key=True, default=uuid4)
@@ -72,16 +87,12 @@ class Directory(Base, ContentMixin, TimestampMixin):
         return self.update(self.entry_cls(), **values)
 
     def update(self, entry, **values):
-        entry.content = entry.content or {}
-        entry.content['values'] = {
-            f.id: values[f.id] for f in self.fields
-        }
-
         cfg = self.configuration
 
         entry.title = cfg.extract_title(values)
         entry.order = cfg.extract_order(values)
         entry.keywords = cfg.extract_keywords(values)
+        entry.values = {f.id: values[f.id] for f in self.fields}
 
         object_session(self).flush()
 
@@ -108,6 +119,6 @@ class Directory(Base, ContentMixin, TimestampMixin):
             def process_obj(self, obj):
                 for field in directory.fields:
                     form_field = getattr(self, field.id)
-                    form_field.data = obj.content['values'][field.id]
+                    form_field.data = obj.values[field.id]
 
         return DirectoryEntryForm

@@ -2,6 +2,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Index
@@ -11,10 +12,31 @@ from sqlalchemy.ext.mutable import MutableDict
 from uuid import uuid4
 
 
-class DirectoryEntry(Base, ContentMixin, TimestampMixin):
+class DirectoryEntry(Base, ContentMixin, TimestampMixin, ORMSearchable):
     """ A single entry of a directory. """
 
     __tablename__ = 'directory_entries'
+
+    @property
+    def es_properties(self):
+        return {
+            'keywords': {'type': 'keyword'},
+            'title': {'type': 'localized'},
+            'lead': {'type': 'localized'},
+
+            # since the searchable text might include html, we remove it
+            # even if there's no html -> possibly decreasing the search
+            # quality a bit
+            'text': {'type': 'localized_html'}
+        }
+
+    @property
+    def es_language(self):
+        return 'de'  # XXX add to database in the future
+
+    @property
+    def es_public(self):
+        return False  # to be overridden downstream
 
     #: An interal id for references (not public)
     id = Column(UUID, primary_key=True, default=uuid4)
@@ -55,3 +77,16 @@ class DirectoryEntry(Base, ContentMixin, TimestampMixin):
     @keywords.setter
     def keywords(self, value):
         self._keywords = {k: '' for k in value} if value else None
+
+    @property
+    def text(self):
+        self.directory.configuration.extract_keywords(self.values)
+
+    @property
+    def values(self):
+        return self.content and self.content.get('values', {})
+
+    @values.setter
+    def values(self, values):
+        self.content = self.content or {}
+        self.content['values'] = values
