@@ -80,7 +80,7 @@ class DirectoryEntry(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     @property
     def text(self):
-        self.directory.configuration.extract_keywords(self.values)
+        self.directory.configuration.extract_searchable(self.values)
 
     @property
     def values(self):

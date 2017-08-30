@@ -64,6 +64,10 @@ class DirectoryConfiguration(Mutable, JSONConfiguration):
         assert self.order
         return normalize_for_url(self.join(data, 'order'))
 
+    def extract_searchable(self, data):
+        if self.searchable:
+            return self.join(data, 'searchable')
+
     def extract_keywords(self, data):
         if self.keywords:
             keywords = set()
@@ -77,10 +81,6 @@ class DirectoryConfiguration(Mutable, JSONConfiguration):
                         keywords.add(value)
 
             return keywords
-
-    def extract_searchable_text(self, data):
-        if self.searchable:
-            return self.join(data, 'searchable')
 
 
 DirectoryConfiguration.associate_with(DirectoryConfigurationStorage)
