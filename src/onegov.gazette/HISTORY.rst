@@ -43,6 +43,9 @@ Changelog
 - Translates chosen strings.
   [msom]
 
+- Moves the login/logout links to the top right.
+  [msom]
+
 0.1.2 (2017-08-22)
 ~~~~~~~~~~~~~~~~~~~
 

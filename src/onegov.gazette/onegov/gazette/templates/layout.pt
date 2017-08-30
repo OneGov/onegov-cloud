@@ -29,13 +29,19 @@ metal:define-macro="layout">
 </head>
 <body>
     <div class="row header">
-        <div class="small-12 medium-4 medium-push-8 columns text-right"></div>
-        <div class="small-12 medium-8 medium-pull-4 small-only-text-center columns">
+        <div class="small-12 medium-6 columns small-only-text-center">
             <div metal:define-slot="logo">
                 <a href="${layout.homepage_link}" title="homepage" i18n:attributes="title">
                     <img aria-hidden="true" alt="Gazette" i18n:attributes="alt" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
                 </a>
             </div>
+        </div>
+        <div class="small-12 medium-6 columns text-right loginout">
+            <a tal:condition="layout.login_link" href="${layout.login_link}" i18n:translate>Login</a>
+            <tal:block condition="layout.logout_link" >
+                <span><tal:block i18n:translate>Logged in as</tal:block> ${layout.user.realname or layout.user.username|None}.</span><br>
+                <a href="${layout.logout_link}" i18n:translate>Logout</a><br>
+            </tal:block>
         </div>
     </div>
 
@@ -69,17 +75,9 @@ metal:define-macro="layout">
 
     <footer metal:define-slot="footer">
         <div class="row">
-            <div class="small-12 medium-4 medium-push-4 columns text-center">&nbsp;</div>
-            <div class="small-12 medium-4 medium-pull-4 columns small-only-text-center">
+            <div class="small-12 columns small-only-text-center">
                 <span >&copy; ${layout.copyright_year} ${layout.principal.name}</span><br>
                 <a class="onegov-link" href="https://onegovcloud.ch">OneGov Cloud</a> | <a href="https://github.com/OneGov/onegov.gazette/blob/master/HISTORY.rst#changelog">v${layout.app_version}</a><br>
-            </div>
-            <div class="small-12 medium-4 columns small-only-text-center medium-text-right manage-links">
-                <a tal:condition="layout.login_link" href="${layout.login_link}" i18n:translate>Login</a>
-                <tal:block condition="layout.logout_link" >
-                    <span><tal:block i18n:translate>You are logged in as:</tal:block> ${layout.user.realname or layout.user.username|None}.</span><br>
-                    <a href="${layout.logout_link}" i18n:translate>Logout</a><br>
-                </tal:block>
             </div>
         </div>
     </footer>

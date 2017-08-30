@@ -27,7 +27,7 @@ def test_view_login_logout(gazette_app):
         login.form['password'] = 'hunter2'
         page = login.form.submit().follow().follow()
 
-        assert 'Sie sind angemeldet als: {}@example.org'.format(user) in page
+        assert 'Angemeldet als {}@example.org'.format(user) in page
         assert 'Abmelden' in page
         assert 'Anmelden' not in page
 
@@ -90,4 +90,4 @@ def test_view_reset_password(gazette_app):
     login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = 'new_password'
     login_page = login_page.form.submit().follow()
-    assert "Sie sind angemeldet" in login_page.follow()
+    assert "Angemeldet als admin@example.org" in login_page.follow()
