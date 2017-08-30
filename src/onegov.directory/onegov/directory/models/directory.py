@@ -90,6 +90,7 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
         cfg = self.configuration
 
         entry.title = cfg.extract_title(values)
+        entry.lead = cfg.extract_lead(values)
         entry.order = cfg.extract_order(values)
         entry.keywords = cfg.extract_keywords(values)
         entry.values = {f.id: values[f.id] for f in self.fields}

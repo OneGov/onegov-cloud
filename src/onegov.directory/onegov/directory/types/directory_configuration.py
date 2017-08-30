@@ -41,8 +41,10 @@ class DirectoryConfiguration(Mutable, JSONConfiguration):
 
     fields = ('title', 'order')
 
-    def __init__(self, title=None, order=None, keywords=None, searchable=None):
+    def __init__(self, title=None, lead=None, order=None, keywords=None,
+                 searchable=None):
         self.title = title
+        self.lead = lead
         self.order = order
         self.keywords = keywords
         self.searchable = searchable
@@ -59,6 +61,9 @@ class DirectoryConfiguration(Mutable, JSONConfiguration):
     def extract_title(self, data):
         assert self.title
         return self.join(data, 'title')
+
+    def extract_lead(self, data):
+        return self.join(data, 'lead')
 
     def extract_order(self, data):
         assert self.order
