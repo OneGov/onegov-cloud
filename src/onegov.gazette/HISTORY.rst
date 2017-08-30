@@ -40,6 +40,9 @@ Changelog
 - Shows state filters on notices view.
   [msom]
 
+- Translates chosen strings.
+  [msom]
+
 0.1.2 (2017-08-22)
 ~~~~~~~~~~~~~~~~~~~
 
