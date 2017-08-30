@@ -99,8 +99,8 @@ def test_directory_form(session):
 
     assert rick.title == 'Rick Sanchez'
     assert rick.order == 'sanchez-rick'
-    assert rick.content['fields']['first_name'] == 'Rick'
-    assert rick.content['fields']['last_name'] == 'Sanchez'
+    assert rick.values['first_name'] == 'Rick'
+    assert rick.values['last_name'] == 'Sanchez'
 
     form = people.form_class()
     form.process(obj=rick)

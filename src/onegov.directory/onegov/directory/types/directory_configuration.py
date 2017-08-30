@@ -63,7 +63,8 @@ class DirectoryConfiguration(Mutable, JSONConfiguration):
         return self.join(data, 'title')
 
     def extract_lead(self, data):
-        return self.join(data, 'lead')
+        if self.lead:
+            return self.join(data, 'lead')
 
     def extract_order(self, data):
         assert self.order
