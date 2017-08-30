@@ -8,6 +8,7 @@ from onegov.gazette.layout import Layout
 from onegov.user import UserGroup
 from sqlalchemy import cast
 from sqlalchemy import String
+from wtforms import BooleanField
 from wtforms import RadioField
 from wtforms import StringField
 from wtforms.validators import Email
@@ -100,6 +101,10 @@ class NoticeForm(Form):
         ]
     )
 
+    at_cost = BooleanField(
+        label=_("Liable to pay costs")
+    )
+
     issues = MultiCheckboxField(
         label=_("Issue(s)"),
         choices=[],
@@ -146,6 +151,7 @@ class NoticeForm(Form):
         model.organization_id = self.organization.data
         model.category_id = self.category.data
         model.text = self.text.data
+        model.at_cost = self.at_cost.data
         model.issues = self.issues.data
         model.apply_meta(self.request.app.principal)
 
@@ -154,6 +160,7 @@ class NoticeForm(Form):
         self.organization.data = model.organization_id
         self.category.data = model.category_id
         self.text.data = model.text
+        self.at_cost.data = model.at_cost
         self.issues.data = list(model.issues.keys())
 
 

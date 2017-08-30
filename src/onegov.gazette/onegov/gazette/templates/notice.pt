@@ -46,6 +46,10 @@
                             <dt i18n:translate>Category</dt>
                             <dd>${notice.category}</dd>
 
+                            <dt i18n:translate>Liable to pay costs</dt>
+                            <dd i18n:translate tal:condition="notice.at_cost">Yes</dd>
+                            <dd i18n:translate tal:condition="not: notice.at_cost">No</dd>
+
                             <dt i18n:translate>User</dt>
                             <dd>${notice.user_name}</dd>
 

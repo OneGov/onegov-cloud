@@ -46,6 +46,9 @@ Changelog
 - Moves the login/logout links to the top right.
   [msom]
 
+- Adds an option to indicate if one needs to pay to publish a specific notice.
+  [msom]
+
 0.1.2 (2017-08-22)
 ~~~~~~~~~~~~~~~~~~~
 

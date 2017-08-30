@@ -15,6 +15,10 @@
             <dt i18n:translate>Category</dt>
             <dd>${model.category}</dd>
 
+            <dt i18n:translate>Liable to pay costs</dt>
+            <dd i18n:translate tal:condition="model.at_cost">Yes</dd>
+            <dd i18n:translate tal:condition="not: model.at_cost">No</dd>
+
             <dt i18n:translate>Title</dt>
             <dd>${model.title}</dd>
 

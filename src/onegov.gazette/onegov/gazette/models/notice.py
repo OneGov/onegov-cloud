@@ -116,6 +116,9 @@ class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
 
     __mapper_args__ = {'polymorphic_identity': 'gazette'}
 
+    #: True, if the official notice needs to be paid for
+    at_cost = meta_property('at_cost')
+
     #: The ID of the organization. We store this in addition to the
     #: organization name to allow changing organization names.
     organization_id = meta_property('organization_id')
