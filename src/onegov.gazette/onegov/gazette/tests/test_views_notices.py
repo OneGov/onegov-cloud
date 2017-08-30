@@ -204,20 +204,20 @@ def test_view_notices_order(gazette_app):
         ordered = client.get('/notices/accepted')
         assert get_items(ordered) == ["Erneuerungswahlen", "Kantonsratswahlen"]
         assert get_ordering(client.get('/notices/accepted')) == {
-            'title': 'desc',
+            'title': 'asc',
             'organization': 'asc',
             'category': 'asc',
-            'first_issue': 'asc'
+            'first_issue': 'desc'
         }
 
         # Invalid sorting
         ordered = client.get('/notices/accepted?order=xxx')
         assert get_items(ordered) == ["Erneuerungswahlen", "Kantonsratswahlen"]
         assert get_ordering(client.get('/notices/accepted')) == {
-            'title': 'desc',
+            'title': 'asc',
             'organization': 'asc',
             'category': 'asc',
-            'first_issue': 'asc'
+            'first_issue': 'desc'
         }
 
         # Omit direction
