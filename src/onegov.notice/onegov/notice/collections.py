@@ -28,7 +28,7 @@ class OfficialNoticeCollectionPagination(Pagination):
         self.term = term
         self.user_ids = user_ids or []
         self.group_ids = group_ids or []
-        self.order = order or 'title'
+        self.order = order or 'first_issue'
         self.direction = direction or 'asc'
         self.issues = issues
 
@@ -153,7 +153,7 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
         if self.order in inspect(self.model_class).columns.keys():
             attribute = getattr(self.model_class, self.order)
         else:
-            attribute = self.model_class.title
+            attribute = self.model_class.first_issue
         query = query.order_by(None).order_by(direction(attribute))
 
         return query

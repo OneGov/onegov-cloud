@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Sorts by first issue date by default.
+  [msom]
+
 0.1.1 (2017-08-28)
 ~~~~~~~~~~~~~~~~~~~
 

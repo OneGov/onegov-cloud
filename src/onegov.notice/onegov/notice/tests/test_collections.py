@@ -220,9 +220,9 @@ def test_notice_collection_order(session):
             first_issue=first_issue,
         )
 
-    # Default ordering by title
-    result = [n.title for n in notices.query()]
-    assert result == ['A', 'B', 'B', 'C', 'D', 'E']
+    # Default ordering by issue date
+    result = [n.first_issue for n in notices.query()]
+    assert result == [date_1, date_1, date_1, date_1, date_2, date_3]
 
     # Explicit direction
     result = [n.title for n in notices.for_order('title', 'asc').query()]
@@ -253,14 +253,14 @@ def test_notice_collection_order(session):
     assert result == ['E', 'D', 'C', 'B', 'B', 'A']
 
     # Invalid
-    result = [n.title for n in notices.for_order('result').query()]
-    assert result == ['A', 'B', 'B', 'C', 'D', 'E']
+    result = [n.first_issue for n in notices.for_order('result').query()]
+    assert result == [date_1, date_1, date_1, date_1, date_2, date_3]
 
-    result = [n.title for n in notices.for_order('users').query()]
-    assert result == ['A', 'B', 'B', 'C', 'D', 'E']
+    result = [n.first_issue for n in notices.for_order('users').query()]
+    assert result == [date_1, date_1, date_1, date_1, date_2, date_3]
 
-    result = [n.title for n in notices.for_order(None).query()]
-    assert result == ['A', 'B', 'B', 'C', 'D', 'E']
+    result = [n.first_issue for n in notices.for_order(None).query()]
+    assert result == [date_1, date_1, date_1, date_1, date_2, date_3]
 
     # Valid
     result = [n.text for n in notices.for_order('text').query()]
@@ -276,9 +276,6 @@ def test_notice_collection_order(session):
 
     result = [n.category for n in notices.for_order('category').query()]
     assert result == ['X', 'X', 'X', 'X', 'Y', 'Y']
-
-    result = [n.first_issue for n in notices.for_order('first_issue').query()]
-    assert result == [date_1, date_1, date_1, date_1, date_2, date_3]
 
     result = [n.name for n in notices.for_order('name').query()]
     assert result == ['a', 'b', 'b-1', 'c', 'd', 'e']
