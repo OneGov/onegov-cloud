@@ -1,5 +1,6 @@
 from collections import Iterable
 from onegov.core.crypto import random_token
+from onegov.core.utils import toggle
 from onegov.user import log
 from onegov.user.models import User
 from onegov.user.errors import (
@@ -31,16 +32,6 @@ def as_dictionary_of_sets(d):
         k: (v if v is None else as_set(v))
         for k, v in d.items()
     }
-
-
-def toggle(collection, item):
-    if item is None:
-        return collection
-
-    if item in collection:
-        return collection - {item}
-    else:
-        return collection | {item}
 
 
 class UserCollection(object):
