@@ -33,7 +33,6 @@ setup(
     platforms='any',
     install_requires=[
         'babel',
-        'bleach',
         'cached_property',
         'cssmin',
         'onegov.chat',
@@ -41,6 +40,7 @@ setup(
         'onegov.form',
         'onegov.foundation',
         'onegov.notice>=0.1.2',
+        'onegov.quill',
         'onegov.shared',
         'onegov.user>=0.15.1',
         'python-dateutil',

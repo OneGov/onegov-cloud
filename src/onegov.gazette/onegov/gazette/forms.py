@@ -1,10 +1,10 @@
 from datetime import datetime
 from onegov.form import Form
 from onegov.gazette import _
-from onegov.gazette.fields import HtmlField
 from onegov.gazette.fields import MultiCheckboxField
 from onegov.gazette.fields import SelectField
 from onegov.gazette.layout import Layout
+from onegov.quill import QuillField
 from onegov.user import UserGroup
 from sqlalchemy import cast
 from sqlalchemy import String
@@ -114,7 +114,7 @@ class NoticeForm(Form):
         limit=5
     )
 
-    text = HtmlField(
+    text = QuillField(
         label=_("Text"),
         validators=[
             InputRequired()

@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Uses quill editor instead of redactor.
+  [msom]
+
 1.1.0 (2017-08-31)
 ~~~~~~~~~~~~~~~~~~~
 

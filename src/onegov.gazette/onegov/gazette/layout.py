@@ -18,9 +18,9 @@ class Layout(ChameleonLayout):
 
     def __init__(self, model, request):
         super().__init__(model, request)
+        self.request.include('frameworks')
+        self.request.include('quill')
         self.request.include('common')
-        self.request.include('redactor')
-        self.request.include('editor')
         self.breadcrumbs = []
 
     def title(self):

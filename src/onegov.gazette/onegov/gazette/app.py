@@ -2,9 +2,10 @@ from onegov.core import Framework, utils
 from onegov.core.filestorage import FilestorageFile
 from onegov.gazette.models import Principal
 from onegov.gazette.theme import GazetteTheme
+from onegov.quill import QuillApp
 
 
-class GazetteApp(Framework):
+class GazetteApp(Framework, QuillApp):
     """ The gazette application. Include this in your onegov.yml to serve
     it with onegov-server.
 
@@ -122,8 +123,11 @@ def get_webasset_output():
     return 'assets/bundles'
 
 
-@GazetteApp.webasset('common', filters={'css': ['datauri', 'custom-rcssmin']})
-def get_common_asset():
+@GazetteApp.webasset(
+    'frameworks',
+    filters={'css': ['datauri', 'custom-rcssmin']}
+)
+def get_frameworks_asset():
     # Common assets unlikely to change
     yield 'modernizr.js'
 
@@ -140,19 +144,10 @@ def get_common_asset():
     yield 'chosen.css'
     yield 'chosen.jquery.js'
 
+
+@GazetteApp.webasset('common')
+def get_common_asset():
     # custom code
     yield 'form_dependencies.js'
     yield 'datetimepicker.js'
     yield 'common.js'
-
-
-@GazetteApp.webasset('redactor', filters={'js': None})
-def get_redactor_asset():
-    yield 'redactor.min.js'
-    yield 'redactor.css'
-
-
-@GazetteApp.webasset('editor')
-def get_editor_asset():
-    yield 'redactor.de.js'
-    yield 'editor.js'
