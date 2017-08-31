@@ -120,7 +120,9 @@ def test_view_notice_actions(gazette_app):
 
     with freeze_time("2017-11-01 12:00"):
         # create a notice for each editor
-        for count, user in enumerate((editor_1, editor_2, editor_3)):
+        for count, user in enumerate(
+            (editor_1, editor_2, editor_3, publisher)
+        ):
             manage = user.get('/notices/drafted/new-notice')
             manage.form['title'] = 'Titel {}'.format(count + 1)
             manage.form['organization'] = '200'
@@ -152,78 +154,98 @@ def test_view_notice_actions(gazette_app):
             (publisher, 'titel-1', 'p'),
             (publisher, 'titel-2', 'p'),
             (publisher, 'titel-3', 'p'),
+            (publisher, 'titel-4', 'peds'),
             (editor_1, 'titel-1', 'peds'),
             (editor_1, 'titel-2', 'peds'),
             (editor_1, 'titel-3', 'p'),
+            (editor_1, 'titel-4', 'p'),
             (editor_2, 'titel-1', 'peds'),
             (editor_2, 'titel-2', 'peds'),
             (editor_2, 'titel-3', 'p'),
+            (editor_2, 'titel-4', 'p'),
             (editor_3, 'titel-1', 'p'),
             (editor_3, 'titel-2', 'p'),
             (editor_3, 'titel-3', 'peds'),
+            (editor_3, 'titel-4', 'p'),
         ))
 
         # ... when submitted
         submit_notice(editor_1, 'titel-1')
         submit_notice(editor_2, 'titel-2')
         submit_notice(editor_3, 'titel-3')
+        submit_notice(publisher, 'titel-4')
 
         check((
             (publisher, 'titel-1', 'pear'),
             (publisher, 'titel-2', 'pear'),
             (publisher, 'titel-3', 'pear'),
+            (publisher, 'titel-4', 'pear'),
             (editor_1, 'titel-1', 'p'),
             (editor_1, 'titel-2', 'p'),
             (editor_1, 'titel-3', 'p'),
+            (editor_1, 'titel-4', 'p'),
             (editor_2, 'titel-1', 'p'),
             (editor_2, 'titel-2', 'p'),
             (editor_2, 'titel-3', 'p'),
+            (editor_2, 'titel-4', 'p'),
             (editor_3, 'titel-1', 'p'),
             (editor_3, 'titel-2', 'p'),
             (editor_3, 'titel-3', 'p'),
+            (editor_3, 'titel-4', 'p'),
         ))
 
         # ... when rejected
         reject_notice(publisher, 'titel-1')
         reject_notice(publisher, 'titel-2')
         reject_notice(publisher, 'titel-3')
+        reject_notice(publisher, 'titel-4')
 
         check((
             (publisher, 'titel-1', 'p'),
             (publisher, 'titel-2', 'p'),
             (publisher, 'titel-3', 'p'),
+            (publisher, 'titel-4', 'peds'),
             (editor_1, 'titel-1', 'peds'),
             (editor_1, 'titel-2', 'peds'),
             (editor_1, 'titel-3', 'p'),
+            (editor_1, 'titel-4', 'p'),
             (editor_2, 'titel-1', 'peds'),
             (editor_2, 'titel-2', 'peds'),
             (editor_2, 'titel-3', 'p'),
+            (editor_2, 'titel-4', 'p'),
             (editor_3, 'titel-1', 'p'),
             (editor_3, 'titel-2', 'p'),
             (editor_3, 'titel-3', 'peds'),
+            (editor_3, 'titel-4', 'p'),
         ))
 
         # ... when accepted
         submit_notice(editor_1, 'titel-1')
         submit_notice(editor_2, 'titel-2')
         submit_notice(editor_3, 'titel-3')
+        submit_notice(publisher, 'titel-4')
         accept_notice(publisher, 'titel-1')
         accept_notice(publisher, 'titel-2')
         accept_notice(publisher, 'titel-3')
+        accept_notice(publisher, 'titel-4')
 
         check((
-            (publisher, 'titel-1', 'p'),
-            (publisher, 'titel-2', 'p'),
-            (publisher, 'titel-3', 'p'),
+            (publisher, 'titel-1', 'pc'),
+            (publisher, 'titel-2', 'pc'),
+            (publisher, 'titel-3', 'pc'),
+            (publisher, 'titel-4', 'pc'),
             (editor_1, 'titel-1', 'pc'),
             (editor_1, 'titel-2', 'pc'),
             (editor_1, 'titel-3', 'pc'),
+            (editor_1, 'titel-4', 'pc'),
             (editor_2, 'titel-1', 'pc'),
             (editor_2, 'titel-2', 'pc'),
             (editor_2, 'titel-3', 'pc'),
+            (editor_2, 'titel-4', 'pc'),
             (editor_3, 'titel-1', 'pc'),
             (editor_3, 'titel-2', 'pc'),
             (editor_3, 'titel-3', 'pc'),
+            (editor_3, 'titel-4', 'pc'),
         ))
 
 
@@ -631,7 +653,7 @@ def test_view_notice_copy(gazette_app):
         accept_notice(publisher, 'erneuerungswahlen')
 
     with freeze_time("2018-01-01 12:00"):
-        for user in (editor_1, editor_2, editor_3):
+        for user in (editor_1, editor_2, editor_3, publisher):
             manage = user.get('/notice/erneuerungswahlen').click("Kopieren")
             assert manage.form['title'].value == "Erneuerungswahlen"
             assert manage.form['organization'].value == '200'
@@ -643,5 +665,4 @@ def test_view_notice_copy(gazette_app):
             manage = manage.form.submit().follow()
 
             assert "Erneuerungswahlen" in user.get('/dashboard')
-
-        assert "Kopieren" not in publisher.get('/notice/erneuerungswahlen')
+            assert "Erneuerungswahlen" in user.get('/notices/drafted')

@@ -9,7 +9,17 @@
 
         <div class="row manage-notices">
             <div class="small-12 columns">
-                <h2 i18n:translate>${title}</h2>
+                <div class="row">
+                    <div class="small-12 medium-10 columns">
+                        <h2 i18n:translate>${title}</h2>
+                    </div>
+                    <div class="small-12 medium-2 columns">
+                        <ul class="top-actions text-right">
+                            <li><a class="action-new" href="${new_notice}" i18n:translate>New</a></li>
+                        </ul>
+                    </div>
+                </div>
+
 
                 <div>
                     <dl class="sub-nav" tal:condition="filters">

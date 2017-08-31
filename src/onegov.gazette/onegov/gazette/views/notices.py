@@ -125,7 +125,8 @@ def view_notices(self, request):
         'to_date': self.to_date,
         'orderings': orderings,
         'clear_term': request.link(self.for_term('')),
-        'clear_dates': request.link(self.for_dates(None, None))
+        'clear_dates': request.link(self.for_dates(None, None)),
+        'new_notice': request.link(self, name='new-notice')
     }
 
 

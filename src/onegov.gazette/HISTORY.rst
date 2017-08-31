@@ -7,6 +7,9 @@ Changelog
 - Adds a close button to the preview.
   [msom]
 
+- Allows publishers to add notices.
+  [msom]
+
 1.0.0 (2017-08-31)
 ~~~~~~~~~~~~~~~~~~~
 
