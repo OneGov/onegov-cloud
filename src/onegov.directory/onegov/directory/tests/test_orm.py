@@ -111,4 +111,52 @@ def test_directory_form(session):
 
 
 def test_directory_entry_collection(session):
-    pass
+    directory = DirectoryCollection(session).add(
+        title='Albums',
+        structure="""
+            Artist *= ___
+            Title *= ___
+            Year *= 1900..2100
+            Genre =
+                [ ] Hip Hop
+                [ ] Pop
+                [ ] Rock
+        """,
+        configuration=DirectoryConfiguration(
+            title=('title', ),
+            order=('artist', 'title'),
+            keywords=('genre', )
+        )
+    )
+
+    directory.add(
+        artist="Rise Against",
+        title="Siren Song of the Counter-Culture",
+        year=2004,
+        genre=['Rock']
+    )
+
+    directory.add(
+        artist="Kettcar",
+        title="Du und wieviel von deinen Freunden",
+        year=2002,
+        genre=['Rock', 'Pop']
+    )
+
+    directory.add(
+        artist="Hilltop Hoods",
+        title="Drinking from the Sun, Walking Under Stars Restrung",
+        year=2016,
+        genre=['Hip Hop']
+    )
+
+    albums = DirectoryEntryCollection(directory)
+    assert albums.query().count() == 3
+
+    assert albums.for_filter(genre='Hip Hop').query().count() == 1
+    assert albums.for_filter(genre='Hip Hop')\
+        .for_filter(genre='Hip Hop').query().count() == 3
+
+    assert albums.for_filter(genre='Rock').query().count() == 2
+    assert albums.for_filter(genre='Rock')\
+        .for_filter(genre='Pop').query().count() == 1

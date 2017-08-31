@@ -84,7 +84,7 @@ class DirectoryConfiguration(Mutable, JSONConfiguration):
                         value = value.strip()
 
                     if value:
-                        keywords.add(value)
+                        keywords.add(':'.join((key, value)))
 
             return keywords
 

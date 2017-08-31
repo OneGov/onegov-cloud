@@ -84,7 +84,12 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
         return self.__class__._decl_class_registry[self.entry_cls_name]
 
     def add(self, **values):
-        return self.update(self.entry_cls(), **values)
+        entry = self.entry_cls()
+        entry.directory_id = self.id
+
+        object_session(self).add(entry)
+
+        return self.update(entry, **values)
 
     def update(self, entry, **values):
         cfg = self.configuration

@@ -1,15 +1,39 @@
 from onegov.core.collection import GenericCollection
-from onegov.directory.models import DirectoryEntry
 from onegov.core.utils import toggle
+from onegov.directory.models import DirectoryEntry
+from sqlalchemy.orm import object_session
+from sqlalchemy.dialects.postgresql import array
 
 
 class DirectoryEntryCollection(GenericCollection):
 
-    def __init__(self, session, directory, type='*', extra_parameters=None):
-        super().__init__(session)
+    def __init__(self, directory, type='*', extra_parameters=None):
+        super().__init__(object_session(directory))
         self.type = type
         self.directory = directory
         self.extra_parameters = extra_parameters or {}
+
+    def query(self):
+        query = super().query().filter_by(directory_id=self.directory.id)
+        keywords = self.valid_keywords(self.extra_parameters)
+
+        values = {
+            ':'.join((keyword, value))
+            for keyword in keywords
+            for value in keywords[keyword]
+        }
+
+        if values:
+            query = query.filter(
+                self.model_class._keywords.has_all(array(values)))
+
+        return query
+
+    def valid_keywords(self, parameters):
+        return {
+            k: v for k, v in parameters.items()
+            if k in set(self.directory.configuration.keywords)
+        }
 
     @property
     def directory_name(self):
@@ -23,11 +47,9 @@ class DirectoryEntryCollection(GenericCollection):
         if not self.directory.configuration.keywords:
             return self
 
-        available = set(self.directory.configuration.keywords)
-        keywords = {k: v for k, v in keywords.items() if k in available}
         parameters = self.extra_parameters.copy()
 
-        for keyword, value in keywords.items():
+        for keyword, value in self.valid_keywords(keywords).items():
             collection = set(parameters.get(keyword, []))
             collection = toggle(collection, value)
 
@@ -36,5 +58,4 @@ class DirectoryEntryCollection(GenericCollection):
             elif keyword in parameters:
                 del parameters[keyword]
 
-        return self.__class__(
-            self.session, self.directory, self.type, parameters)
+        return self.__class__(self.directory, self.type, parameters)
