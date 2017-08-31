@@ -122,7 +122,7 @@ def get_webasset_output():
     return 'assets/bundles'
 
 
-@GazetteApp.webasset('common')
+@GazetteApp.webasset('common', filters={'css': ['datauri', 'custom-rcssmin']})
 def get_common_asset():
     # Common assets unlikely to change
     yield 'modernizr.js'
