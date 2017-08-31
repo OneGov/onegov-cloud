@@ -160,3 +160,11 @@ def test_directory_entry_collection(session):
     assert albums.for_filter(genre='Rock').query().count() == 2
     assert albums.for_filter(genre='Rock')\
         .for_filter(genre='Pop').query().count() == 1
+
+    kettcar = albums.for_filter(genre='Pop').query().one()
+    assert kettcar.values == {
+        'artist': 'Kettcar',
+        'title': 'Du und wieviel von deinen Freunden',
+        'year': 2002,
+        'genre': ['Rock', 'Pop']
+    }
