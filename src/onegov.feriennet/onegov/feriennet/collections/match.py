@@ -1,8 +1,9 @@
 from collections import OrderedDict
 from itertools import groupby
 from onegov.activity import Activity, Booking, Attendee, Occasion, OccasionDate
-from statistics import mean
+from onegov.core.utils import toggle
 from sqlalchemy import func, literal_column, not_, distinct
+from statistics import mean
 
 
 class MatchCollection(object):
@@ -20,16 +21,6 @@ class MatchCollection(object):
         return self.__class__(self.session, period)
 
     def for_filter(self, state=None):
-
-        def toggle(collection, item):
-            if item is None:
-                return collection
-
-            if item in collection:
-                return collection - {item}
-            else:
-                return collection | {item}
-
         toggled = (
             toggle(collection, item) for collection, item in (
                 (self.states, state),
