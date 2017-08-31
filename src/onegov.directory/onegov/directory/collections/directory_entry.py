@@ -36,7 +36,7 @@ class DirectoryEntryCollection(GenericCollection):
         }
 
     @property
-    def directory_name(self):
+    def name(self):
         return self.directory.name
 
     @property

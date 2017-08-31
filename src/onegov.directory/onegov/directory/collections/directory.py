@@ -19,3 +19,6 @@ class DirectoryCollection(GenericCollection):
         if 'configuration' not in kwargs:
             kwargs['configuration'] = DirectoryConfiguration()
         return super().add(**kwargs)
+
+    def by_name(self, name):
+        return self.query().filter_by(name=name).first()

@@ -37,6 +37,7 @@ setup(
         'onegov.form',
         'onegov.gis',
         'onegov.search',
+        'pyyaml',
     ],
     extras_require=dict(
         test=[

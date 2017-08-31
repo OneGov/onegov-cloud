@@ -1,43 +1,57 @@
+import yaml
+
 from more_itertools import collapse
 from onegov.core import custom_json as json
 from onegov.core.utils import normalize_for_url
 from sqlalchemy.ext.mutable import Mutable
 from sqlalchemy.types import TypeDecorator, TEXT
+from sqlalchemy_utils.types.scalar_coercible import ScalarCoercible
 
 
-class DirectoryConfigurationStorage(TypeDecorator):
+class DirectoryConfigurationStorage(TypeDecorator, ScalarCoercible):
 
     impl = TEXT
 
+    @property
+    def python_type(self):
+        return DirectoryConfiguration
+
     def process_bind_param(self, value, dialect):
         if value is not None:
-            value = value.to_json()
-
-        return value
+            return value.to_json()
 
     def process_result_value(self, value, dialect):
         if value is not None:
-            value = DirectoryConfiguration.from_json(value)
-
-        return value
+            return DirectoryConfiguration.from_json(value)
 
 
-class JSONConfiguration(object):
+class StoredConfiguration(object):
 
     fields = None
 
-    def to_json(self):
-        return json.dumps({
+    def to_dict(self):
+        return {
             name: getattr(self, name)
             for name in self.fields
-        })
+        }
+
+    def to_json(self):
+        return json.dumps(self.to_dict())
+
+    def to_yaml(self):
+        text = yaml.dump(self.to_dict(), default_flow_style=False)
+        return text.replace('\n- ', '\n  - ')
 
     @classmethod
     def from_json(cls, text):
         return cls(**json.loads(text))
 
+    @classmethod
+    def from_yaml(cls, text):
+        return cls(**yaml.load(text))
 
-class DirectoryConfiguration(Mutable, JSONConfiguration):
+
+class DirectoryConfiguration(Mutable, StoredConfiguration):
 
     fields = ('title', 'lead', 'order', 'keywords', 'searchable')
 
@@ -52,6 +66,13 @@ class DirectoryConfiguration(Mutable, JSONConfiguration):
     def __setattr__(self, name, value):
         self.changed()
         return super().__setattr__(name, value)
+
+    @classmethod
+    def coerce(cls, key, value):
+        if not isinstance(value, Mutable):
+            raise TypeError()
+        else:
+            return value
 
     def join(self, data, attribute, separator=' '):
         return separator.join(s.strip() for s in (

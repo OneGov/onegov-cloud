@@ -19,18 +19,16 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
 
     __tablename__ = 'directory_entries'
 
-    @property
-    def es_properties(self):
-        return {
-            'keywords': {'type': 'keyword'},
-            'title': {'type': 'localized'},
-            'lead': {'type': 'localized'},
+    es_properties = {
+        'keywords': {'type': 'keyword'},
+        'title': {'type': 'localized'},
+        'lead': {'type': 'localized'},
 
-            # since the searchable text might include html, we remove it
-            # even if there's no html -> possibly decreasing the search
-            # quality a bit
-            'text': {'type': 'localized_html'}
-        }
+        # since the searchable text might include html, we remove it
+        # even if there's no html -> possibly decreasing the search
+        # quality a bit
+        'text': {'type': 'localized_html'}
+    }
 
     @property
     def es_language(self):
