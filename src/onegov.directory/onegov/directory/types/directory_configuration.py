@@ -39,7 +39,7 @@ class JSONConfiguration(object):
 
 class DirectoryConfiguration(Mutable, JSONConfiguration):
 
-    fields = ('title', 'order')
+    fields = ('title', 'lead', 'order', 'keywords', 'searchable')
 
     def __init__(self, title=None, lead=None, order=None, keywords=None,
                  searchable=None):

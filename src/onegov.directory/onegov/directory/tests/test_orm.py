@@ -1,6 +1,7 @@
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryEntry
+from onegov.directory import DirectoryEntryCollection
 
 
 def test_directory_title_and_order(session):
@@ -107,3 +108,7 @@ def test_directory_form(session):
 
     assert form.first_name.data == 'Rick'
     assert form.last_name.data == 'Sanchez'
+
+
+def test_directory_entry_collection(session):
+    pass
