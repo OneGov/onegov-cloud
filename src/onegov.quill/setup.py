@@ -41,6 +41,7 @@ setup(
         test=[
             'coverage',
             'onegov_testing',
+            'onegov.form',
             'pytest',
         ],
     ),
