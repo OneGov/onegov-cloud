@@ -39,6 +39,7 @@ setup(
         'lxml',
         'onegov.chat',
         'onegov.core>=0.41.0',
+        'onegov.directory',
         'onegov.event>=0.5.0',
         'onegov.file>=0.2.1',
         'onegov.form>=0.18.0',

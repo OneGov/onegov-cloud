@@ -3,6 +3,7 @@
 from datetime import date
 from onegov.chat import MessageCollection
 from onegov.core.converters import extended_date_converter
+from onegov.directory import DirectoryCollection, DirectoryEntryCollection
 from onegov.event import (
     Event,
     EventCollection,
@@ -446,3 +447,21 @@ def get_messages(app, channel_id='*', type='*',
         older_than=older_than,
         limit=min(25, limit)  # bind the limit to a max of 25
     )
+
+
+@OrgApp.path(
+    model=DirectoryCollection,
+    path='/verzeichnisse')
+def get_directories(app):
+    return DirectoryCollection(app.session(), type='extended')
+
+
+@OrgApp.path(
+    model=DirectoryEntryCollection,
+    path='/verzeichnis/{name}')
+def get_directory_entries(app, name, extra_parameters):
+    directory = DirectoryCollection(app.session()).by_name(name)
+
+    if directory:
+        return DirectoryEntryCollection(
+            directory, type='extended', extra_parameters=extra_parameters)

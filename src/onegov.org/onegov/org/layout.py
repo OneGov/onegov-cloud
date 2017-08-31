@@ -1673,3 +1673,37 @@ class MessageCollectionLayout(DefaultLayout):
             Link(_("Homepage"), self.homepage_url),
             Link(_("Timeline"), '#')
         ]
+
+
+class DirectoryCollectionLayout(DefaultLayout):
+
+    def __init__(self, model, request):
+        super().__init__(model, request)
+        self.include_editor()
+        self.include_code_editor()
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Directories"), '#')
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_admin:
+            return [
+                LinkGroup(
+                    title=_("Add"),
+                    links=[
+                        Link(
+                            text=_("Directory"),
+                            url=self.request.link(
+                                self.model,
+                                name='neu'
+                            ),
+                            attrs={'class': 'new-directory'}
+                        )
+                    ]
+                ),
+            ]

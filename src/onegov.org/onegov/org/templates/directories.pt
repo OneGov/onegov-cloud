@@ -1,0 +1,15 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <p tal:condition="not:directories" i18n:translate="">No directories defined yet.</p>
+
+        <ul tal:condition="directories" class="with-lead">
+            <li tal:repeat="directory directories">
+                <a class="list-title" tal:attributes="href link(directory)">${directory.title}</a><metal:hint use-macro="layout.macros['hidden-from-public-hint']" tal:define="item directory" />
+                <div class="list-lead">${directory.lead}</div>
+            </li>
+        </ul>
+    </tal:block>
+</div>
