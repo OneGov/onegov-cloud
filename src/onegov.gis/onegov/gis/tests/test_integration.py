@@ -45,11 +45,8 @@ def test_mapbox_token_tween(temporary_directory):
     morepath.commit(App)
 
     app = App()
-    app.configure_application()
+    app.configure_application(mapbox_token='pk.asdf')
     app.namespace = 'foo'
     app.set_application_id('foo/bar')
 
-    assert '<body>' in Client(app).get('/')
-
-    app.configure_application(mapbox_token='pk.asdf')
-    assert '<body data-mapbox-token="pk.asdf"></body>'
+    assert '<body data-mapbox-token="pk.asdf"></body>' in Client(app).get('/')
