@@ -35,6 +35,7 @@ setup(
         'more_itertools',
         'onegov.core>=0.4.0',
         'onegov.form',
+        'onegov.gis',
         'onegov.search',
     ],
     extras_require=dict(
