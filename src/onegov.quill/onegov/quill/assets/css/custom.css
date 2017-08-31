@@ -1,0 +1,23 @@
+.quill-container {
+    margin-bottom: 1em;
+}
+
+.ql-toolbar button {
+    margin-bottom: 0;
+}
+.ql-toolbar button.ql-active {
+    background: #ddd;
+}
+
+
+.ql-editor p,
+.ql-editor ul,
+.ql-editor ol,
+.ql-editor table,
+.ql-editor dl,
+.ql-editor blockquote,
+.ql-editor pre {
+    font-size: 14px;
+    line-height: 1.6em;
+    margin-bottom: 1em;
+}
