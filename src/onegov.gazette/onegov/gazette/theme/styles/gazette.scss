@@ -399,10 +399,26 @@ ul.actions {
     margin-bottom: 0;
 }
 
+/*
+    Top actions
+*/
 .top-actions {
     font-size: 1.5rem;
     list-style-type: none;
     margin: 1.2rem 0 0;
+}
+
+/*
+    Action buttons
+*/
+a.button.right {
+    margin-left: .3em;
+}
+
+.action-close::before {
+    content: '\f00d';
+    font-family: 'FontAwesome';
+    margin-right: .75ex;
 }
 
 .action-copy::before {
@@ -526,10 +542,6 @@ form {
             font-size: .875rem;
         }
     }
-}
-
-.cancel-button {
-    margin-right: .5rem;
 }
 
 

@@ -4,6 +4,9 @@ Changelog
 - Fixes chosen sprites.
   [msom]
 
+- Adds a close button to the preview.
+  [msom]
+
 1.0.0 (2017-08-31)
 ~~~~~~~~~~~~~~~~~~~
 
