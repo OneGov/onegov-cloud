@@ -488,3 +488,15 @@ class PostThread(Thread):
                     self.url, str(e)
                 )
             )
+
+
+def toggle(collection, item):
+    """ Toggles an item in a set. """
+
+    if item is None:
+        return collection
+
+    if item in collection:
+        return collection - {item}
+    else:
+        return collection | {item}

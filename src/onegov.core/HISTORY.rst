@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a toggle function for sets to utils.
+  [href]
+
 0.45.0 (2017-08-25)
 ~~~~~~~~~~~~~~~~~~~
 
