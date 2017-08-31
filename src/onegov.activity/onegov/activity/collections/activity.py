@@ -5,6 +5,7 @@ from onegov.activity.utils import merge_ranges, overlaps
 from onegov.core.collection import Pagination
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
+from onegov.core.utils import toggle
 from sqlalchemy import or_, func, text, bindparam, Integer, select, column
 from sqlalchemy.dialects.postgresql import array
 
@@ -163,15 +164,6 @@ class ActivityCollection(Pagination):
         """
 
         duration = int(duration) if duration is not None else None
-
-        def toggle(collection, item):
-            if item is None:
-                return collection
-
-            if item in collection:
-                return collection - {item}
-            else:
-                return collection | {item}
 
         toggled = (
             toggle(collection, item) for collection, item in (
