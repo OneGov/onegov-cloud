@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.2 (2017-09-01)
+~~~~~~~~~~~~~~~~~~~
+
 - Accepts more values on the coordinates ORM field.
   [href]
 
