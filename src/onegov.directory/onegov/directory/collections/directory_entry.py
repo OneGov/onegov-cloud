@@ -1,17 +1,36 @@
-from onegov.core.collection import GenericCollection
+from onegov.core.collection import GenericCollection, Pagination
 from onegov.core.utils import toggle
 from onegov.directory.models import DirectoryEntry
 from sqlalchemy.orm import object_session
 from sqlalchemy.dialects.postgresql import array
 
 
-class DirectoryEntryCollection(GenericCollection):
+class DirectoryEntryCollection(GenericCollection, Pagination):
 
-    def __init__(self, directory, type='*', extra_parameters=None):
+    def __init__(self, directory, type='*', extra_parameters=None, page=0):
         super().__init__(object_session(directory))
         self.type = type
         self.directory = directory
         self.extra_parameters = extra_parameters or {}
+        self.page = page
+
+    def __eq__(self, other):
+        return self.type == other.type and self.page == other.page
+
+    def subset(self):
+        return self.query()
+
+    @property
+    def page_index(self):
+        return self.page
+
+    def page_by_index(self, index):
+        return self.__class__(
+            self.directory,
+            self.type,
+            self.extra_parameters,
+            page=index
+        )
 
     def query(self):
         query = super().query().filter_by(directory_id=self.directory.id)
