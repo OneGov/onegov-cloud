@@ -71,6 +71,7 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
 
     __table_args__ = (
         Index('inverted_keywords', 'keywords', postgresql_using='gin'),
+        Index('unique_entry_name', 'directory_id', 'name', unique=True),
     )
 
     @property
