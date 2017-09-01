@@ -549,7 +549,7 @@
 </metal:ticket_callout>
 
 <metal:pagination define-macro="pagination" i18n:domain="onegov.org">
-    <ul class="pagination" role="menubar" aria-label="Pagination">
+    <ul class="pagination" role="menubar" aria-label="Pagination" tal:condition="collection.pages_count > 1">
         <tal:block repeat="page collection.pages">
             <tal:block define="
                 previous current_page.previous;

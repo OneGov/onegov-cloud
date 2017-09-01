@@ -4,6 +4,9 @@ Changelog
 - Fixes dialog not showing for undeletable objects.
   [href]
 
+- Hides the pagination if there's only one page.
+  [href]
+
 0.14.6 (2017-08-25)
 ~~~~~~~~~~~~~~~~~~~
 
