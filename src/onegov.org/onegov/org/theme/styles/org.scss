@@ -1135,6 +1135,7 @@ $mark-as-paid: '\f058';
 $mark-as-unpaid: '\f057';
 $new-daypass-icon: '\f145';
 $new-directory-icon: '\f0e8';
+$new-directory-entry-icon: '\f192';
 $new-recipient: '\f1fa';
 $new-form-icon: '\f044';
 $new-link-icon: '\f0c1';
@@ -1236,6 +1237,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .mark-as-unpaid::before { @include icon($mark-as-unpaid); }
     .new-daypass::before { @include icon($new-daypass-icon); }
     .new-directory::before { @include icon($new-directory-icon); }
+    .new-directory-entry::before { @include icon($new-directory-entry-icon); }
     .new-form::before { @include icon($new-form-icon); }
     .new-link::before { @include icon($new-link-icon); }
     .new-news::before { @include icon($new-news-icon); }

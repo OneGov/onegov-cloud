@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-07-17 11:41+0200\n"
+"POT-Creation-Date: 2017-09-01 14:30+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -148,6 +148,9 @@ msgstr "Exporte"
 msgid "Payment Providers"
 msgstr "Zahlungsanbieter"
 
+msgid "Directories"
+msgstr "Verzeichnisse"
+
 msgid "Delete"
 msgstr "Löschen"
 
@@ -281,6 +284,15 @@ msgstr "Newsletter löschen"
 msgid "Delete photo album"
 msgstr "Fotoalbum löschen"
 
+msgid "Do you really want to delete this directory?"
+msgstr "Möchten Sie das Verzeichnis wirklich löschen?"
+
+msgid "All entries will be deleted as well."
+msgstr "Alle Einträge werden ebenfalls gelöscht."
+
+msgid "Delete directory"
+msgstr "Verzeichnis löschen"
+
 msgid "Form"
 msgstr "Formular"
 
@@ -321,6 +333,12 @@ msgstr "Benutzer"
 
 msgid "Stripe Connect"
 msgstr ""
+
+msgid "Directory"
+msgstr "Verzeichnis"
+
+msgid "Entry"
+msgstr "Eintrag"
 
 msgid "Not a valid color."
 msgstr "Ungültige Farbe."
@@ -456,6 +474,21 @@ msgstr "Von"
 msgid "Until"
 msgstr "Bis zum"
 
+msgid "Title"
+msgstr "Titel"
+
+msgid "Lead"
+msgstr "Einleitung"
+
+msgid "Describes what this form is about"
+msgstr "Beschreibt kurz um was es bei diesem Formular geht"
+
+msgid "Definition"
+msgstr "Definition"
+
+msgid "Configuration"
+msgstr "Konfiguration"
+
 msgid "Exhibition"
 msgstr "Ausstellung"
 
@@ -513,9 +546,6 @@ msgstr "Vortrag"
 msgid "E-Mail"
 msgstr "E-Mail"
 
-msgid "Title"
-msgstr "Titel"
-
 msgid "Concerto in the castle garden"
 msgstr "Konzert im Schlossgarten"
 
@@ -567,17 +597,8 @@ msgstr "Das Enddatum muss nach dem Startdatum liegen."
 msgid "The weekday of the start date must be selected."
 msgstr "Der Wochentag der Veranstaltung muss ausgewählt sein."
 
-msgid "Lead"
-msgstr "Einleitung"
-
-msgid "Describes what this form is about"
-msgstr "Beschreibt kurz um was es bei diesem Formular geht"
-
 msgid "Text"
 msgstr "Text"
-
-msgid "Definition"
-msgstr "Definition"
 
 msgid "Format"
 msgstr "Format"
@@ -1087,6 +1108,12 @@ msgstr ""
 "Diese Seite hat Unterseiten. Nur Administratoren können Seiten mit "
 "Unterseiten löschen. Um diese Seite zu löschen müssen Sie erst alle "
 "Unterseiten löschen, oder Sie wenden sich an einen Administrator."
+
+msgid "No directories defined yet."
+msgstr "Noch keine Verzchnisse definiert."
+
+msgid "This directory is empty."
+msgstr "Dieses Verzeichnis ist leer."
 
 msgid ""
 "Please review your data and press \"Complete\" to finalize the process. If "
@@ -1965,6 +1992,18 @@ msgstr "Der Registrationslink ist abgelaufen"
 
 msgid "A link was added to the clipboard"
 msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
+
+msgid "New Directory"
+msgstr "Neues Verzeichnis"
+
+msgid "New Directory Entry"
+msgstr "Neuer Verzeichniseintrag"
+
+msgid "Added a new directory"
+msgstr "Ein neues Verzeichnis wurde hinzugefügt"
+
+msgid "Added a new directory entry"
+msgstr "Ein neuer Verzeichniseintrag wurde hinzugefügt"
 
 msgid "Submit an event"
 msgstr "Veranstaltung melden"

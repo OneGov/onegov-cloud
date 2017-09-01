@@ -137,6 +137,7 @@ def handle_new_directory_entry(self, request, form):
 
     layout = DirectoryEntryCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.editbar_links = []
 
     return {
         'layout': layout,
