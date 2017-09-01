@@ -33,7 +33,7 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
         )
 
     def by_name(self, name):
-        return self.query().filter_by(name=name)
+        return self.query().filter_by(name=name).first()
 
     def query(self):
         query = super().query().filter_by(directory_id=self.directory.id)
