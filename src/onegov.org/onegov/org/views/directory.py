@@ -151,6 +151,32 @@ def handle_new_directory_entry(self, request, form):
     }
 
 
+@OrgApp.form(
+    model=DirectoryEntry,
+    permission=Private,
+    template='form.pt',
+    form=get_directory_entry_form_class,
+    name='bearbeiten')
+def handle_edit_directory_entry(self, request, form):
+    if form.submitted(request):
+        form.populate_obj(self)
+
+        request.success(_("Your changes were saved"))
+        return request.redirect(request.link(self))
+    elif not request.POST:
+        form.process(obj=self)
+
+    layout = DirectoryEntryLayout(self, request)
+    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.editbar_links = []
+
+    return {
+        'layout': layout,
+        'title': self.title,
+        'form': form,
+    }
+
+
 @OrgApp.html(
     model=DirectoryEntry,
     permission=Public,
@@ -162,3 +188,16 @@ def view_directory_entry(self, request):
         'title': self.title,
         'entry': self
     }
+
+
+@OrgApp.view(
+    model=DirectoryEntry,
+    permission=Private,
+    request_method='DELETE')
+def delete_directory_entry(self, request):
+    request.assert_valid_csrf_token()
+
+    session = request.app.session()
+    session.delete(self)
+
+    request.success(_("The entry was deleted"))

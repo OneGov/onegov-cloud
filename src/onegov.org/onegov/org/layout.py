@@ -1744,7 +1744,12 @@ class DirectoryEntryCollectionLayout(DefaultLayout):
                     attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
-                            _("Do you really want to delete this directory?"),
+                            _(
+                                'Do you really want to delete "${title}"?',
+                                mapping={
+                                    'title': self.model.directory.title
+                                }
+                            ),
                             _("All entries will be deleted as well."),
                             _("Delete directory")
                         ),
@@ -1786,5 +1791,41 @@ class DirectoryEntryLayout(DefaultLayout):
                     'directory_name': self.model.directory.name
                 }
             )),
-            Link(_(self.model.title), '#')
+            Link(_(self.model.title), self.request.link(self.model))
         ]
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_manager:
+            return [
+                Link(
+                    text=_("Edit"),
+                    url=self.request.link(self.model, '+bearbeiten'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_("Delete"),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _(
+                                'Do you really want to delete "${title}"?',
+                                mapping={
+                                    'title': self.model.title
+                                }
+                            ),
+                            _("This cannot be undone."),
+                            _("Delete entry")
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(
+                                DirectoryEntryCollection(self.model.directory)
+                            )
+                        )
+                    )
+                )
+            ]

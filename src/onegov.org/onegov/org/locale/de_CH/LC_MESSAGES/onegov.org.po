@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-09-01 15:25+0200\n"
+"POT-Creation-Date: 2017-09-01 15:51+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -284,14 +284,18 @@ msgstr "Newsletter löschen"
 msgid "Delete photo album"
 msgstr "Fotoalbum löschen"
 
-msgid "Do you really want to delete this directory?"
-msgstr "Möchten Sie das Verzeichnis wirklich löschen?"
+#, python-format
+msgid "Do you really want to delete \"${title}\"?"
+msgstr "Möchten Sie \"${title}\" wirklich löschen?"
 
 msgid "All entries will be deleted as well."
 msgstr "Alle Einträge werden ebenfalls gelöscht."
 
 msgid "Delete directory"
 msgstr "Verzeichnis löschen"
+
+msgid "Delete entry"
+msgstr "Eintrag löschen"
 
 msgid "Form"
 msgstr "Formular"
@@ -2001,6 +2005,9 @@ msgstr "Das Verzeichnis wurde gelöscht"
 
 msgid "New Directory Entry"
 msgstr "Neuer Verzeichniseintrag"
+
+msgid "The entry was deleted"
+msgstr "Der Eintrag wurde gelöscht"
 
 msgid "Added a new directory"
 msgstr "Ein neues Verzeichnis wurde hinzugefügt"
