@@ -1,5 +1,4 @@
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -25,8 +24,7 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     es_properties = {
         'title': {'type': 'localized'},
-        'lead': {'type': 'localized'},
-        'text': {'type': 'localized_html'}
+        'lead': {'type': 'localized'}
     }
 
     @property
@@ -48,9 +46,6 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     #: Describes the directory briefly
     lead = Column(Text, nullable=True)
-
-    #: Describes the activity in detail
-    text = content_property('text')
 
     #: The normalized title for sorting
     order = Column(Text, nullable=False, index=True)
