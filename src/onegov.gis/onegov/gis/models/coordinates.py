@@ -35,4 +35,7 @@ class CoordinatesMixin(object):
 
     @coordinates.setter
     def coordinates(self, value):
-        self.content['coordinates'] = value.as_dict()
+        if not isinstance(value, dict):
+            value = value.as_dict()
+
+        self.content['coordinates'] = value
