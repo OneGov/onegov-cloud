@@ -1996,6 +1996,9 @@ msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
 msgid "New Directory"
 msgstr "Neues Verzeichnis"
 
+msgid "The directory was deleted"
+msgstr "Das Verzeichnis wurde gelöscht"
+
 msgid "New Directory Entry"
 msgstr "Neuer Verzeichniseintrag"
 

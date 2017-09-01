@@ -104,8 +104,13 @@ def handle_edit_directory(self, request, form):
 def delete_directory(self, request):
     request.assert_valid_csrf_token()
 
-    DirectoryCollection(request.app.session()).delete(self.directory)
-    request.success("The directory was deleted")
+    session = request.app.session()
+
+    for entry in self.directory.entries:
+        session.delete(entry)
+
+    DirectoryCollection(session).delete(self.directory)
+    request.success(_("The directory was deleted"))
 
 
 @OrgApp.html(
