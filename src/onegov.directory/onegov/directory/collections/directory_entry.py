@@ -6,9 +6,17 @@ from sqlalchemy.dialects.postgresql import array
 
 
 class DirectoryEntryCollection(GenericCollection, Pagination):
+    """ Provides a view on a directory's entries.
+
+    The directory itself might be a natural place for lots of these methods
+    to reside, but ultimately we want to avoid mixing the concerns of the
+    directory model and this view-supporting collection.
+
+    """
 
     def __init__(self, directory, type='*', extra_parameters=None, page=0):
         super().__init__(object_session(directory))
+
         self.type = type
         self.directory = directory
         self.extra_parameters = extra_parameters or {}
