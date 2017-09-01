@@ -132,6 +132,6 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
                 for field in directory.fields:
                     form_field = getattr(self, field.id)
-                    form_field.data = obj.values[field.id]
+                    form_field.data = obj.values.get(field.id)
 
         return DirectoryEntryForm
