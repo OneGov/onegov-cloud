@@ -129,7 +129,7 @@ def view_directory(self, request):
     name='neu')
 def handle_new_directory_entry(self, request, form):
     if form.submitted(request):
-        entry = self.directory.add(**form.data)
+        entry = self.directory.add(values=form.data, type='extended')
         form.populate_obj(entry)
 
         request.success(_("Added a new directory entry"))
