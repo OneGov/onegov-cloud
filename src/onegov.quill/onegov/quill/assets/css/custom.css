@@ -2,13 +2,16 @@
     margin-bottom: 1em;
 }
 
-.ql-toolbar button {
+.ql-snow.ql-toolbar button,
+.ql-snow .ql-toolbar button {
     margin-bottom: 0;
+    height: 22px;
+    width: 22px;
 }
+
 .ql-toolbar button.ql-active {
     background: #ddd;
 }
-
 
 .ql-editor p,
 .ql-editor ul,
