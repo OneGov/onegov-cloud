@@ -8,6 +8,7 @@ from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.core.utils import linkify
+from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.form import FormCollection, FormSubmissionFile, render_field
 from onegov.newsletter import NewsletterCollection, RecipientCollection
@@ -1703,6 +1704,63 @@ class DirectoryCollectionLayout(DefaultLayout):
                                 name='neu'
                             ),
                             attrs={'class': 'new-directory'}
+                        )
+                    ]
+                ),
+            ]
+
+
+class DirectoryEntryCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Directories"), self.request.class_link(
+                DirectoryCollection
+            )),
+            Link(_(self.model.directory.title), self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_admin:
+            return [
+                Link(
+                    text=_("Edit"),
+                    url=self.request.link(self.model, 'bearbeiten'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_("Delete"),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _("Do you really want to delete this directory?"),
+                            _("All entries will be deleted as well."),
+                            _("Delete directory")
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.class_link(
+                                DirectoryCollection
+                            )
+                        )
+                    )
+                ),
+                LinkGroup(
+                    title=_("Add"),
+                    links=[
+                        Link(
+                            text=_("Entry"),
+                            url=self.request.link(
+                                self.model,
+                                name='neu'
+                            ),
+                            attrs={'class': 'new-directory-entry'}
                         )
                     ]
                 ),

@@ -3,7 +3,9 @@
 from datetime import date
 from onegov.chat import MessageCollection
 from onegov.core.converters import extended_date_converter
-from onegov.directory import DirectoryCollection, DirectoryEntryCollection
+from onegov.directory import DirectoryCollection
+from onegov.directory import DirectoryEntryCollection
+from onegov.directory import DirectoryEntry
 from onegov.event import (
     Event,
     EventCollection,
@@ -459,9 +461,24 @@ def get_directories(app):
 @OrgApp.path(
     model=DirectoryEntryCollection,
     path='/verzeichnis/{name}')
-def get_directory_entries(app, name, extra_parameters):
+def get_directory_entries(app, name, extra_parameters, page=0):
     directory = DirectoryCollection(app.session()).by_name(name)
 
     if directory:
-        return DirectoryEntryCollection(
-            directory, type='extended', extra_parameters=extra_parameters)
+        collection = DirectoryEntryCollection(
+            directory=directory,
+            type='extended',
+            extra_parameters=extra_parameters,
+            page=page
+        )
+
+        collection.is_hidden_from_public = directory.is_hidden_from_public
+
+        return collection
+
+
+@OrgApp.path(
+    model=DirectoryEntry,
+    path='/verzeichnis-eintrag/{name}')
+def get_directory_entry(app, name, extra_parameters):
+    return DirectoryEntryCollection(app.session()).by_name(name)

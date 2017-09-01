@@ -1,5 +1,7 @@
 from onegov.org.models.atoz import AtoZ
 from onegov.org.models.clipboard import Clipboard
+from onegov.org.models.directory import ExtendedDirectory
+from onegov.org.models.directory import ExtendedDirectoryEntry
 from onegov.org.models.editor import Editor
 from onegov.org.models.export import Export, ExportCollection
 from onegov.org.models.file import (
@@ -62,6 +64,8 @@ __all__ = [
     'EventMessage',
     'Export',
     'ExportCollection',
+    'ExtendedDirectory',
+    'ExtendedDirectoryEntry',
     'FormPersonMove',
     'GeneralFile',
     'GeneralFileCollection',

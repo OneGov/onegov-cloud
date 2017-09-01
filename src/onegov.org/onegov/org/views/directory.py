@@ -5,6 +5,8 @@ from onegov.directory import DirectoryEntryCollection
 from onegov.org import OrgApp, _
 from onegov.org.forms import DirectoryForm
 from onegov.org.layout import DirectoryCollectionLayout
+from onegov.org.layout import DirectoryEntryCollectionLayout
+from onegov.org.models import ExtendedDirectory
 from onegov.org.new_elements import Link
 
 
@@ -23,8 +25,12 @@ def view_directories(self, request):
     }
 
 
+def get_directory_form_class(model, request):
+    return ExtendedDirectory().with_content_extensions(DirectoryForm, request)
+
+
 @OrgApp.form(model=DirectoryCollection, name='neu', template='form.pt',
-             permission=Secret, form=DirectoryForm)
+             permission=Secret, form=get_directory_form_class)
 def handle_new_directory(self, request, form):
     if form.submitted(request):
         directory = self.add(
@@ -56,7 +62,8 @@ def handle_new_directory(self, request, form):
 
 
 @OrgApp.form(model=DirectoryEntryCollection, template='form.pt',
-             permission=Secret, form=DirectoryForm, name='bearbeiten')
+             permission=Secret, form=get_directory_form_class,
+             name='bearbeiten')
 def handle_edit_directory(self, request, form):
 
     if form.submitted(request):
@@ -80,4 +87,27 @@ def handle_edit_directory(self, request, form):
         'title': self.directory.title,
         'form': form,
         'form_width': 'large',
+    }
+
+
+@OrgApp.view(
+    model=DirectoryEntryCollection,
+    permission=Secret,
+    request_method='DELETE')
+def delete_directory(self, request):
+    request.assert_valid_csrf_token()
+
+    DirectoryCollection(request.app.session()).delete(self.directory)
+    request.success("The directory was deleted")
+
+
+@OrgApp.html(
+    model=DirectoryEntryCollection,
+    permission=Public,
+    template='directory.pt')
+def view_directory(self, request):
+    return {
+        'layout': DirectoryEntryCollectionLayout(self, request),
+        'title': self.directory.title,
+        'entries': self.batch,
     }
