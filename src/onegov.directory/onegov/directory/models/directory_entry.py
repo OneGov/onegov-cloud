@@ -74,6 +74,10 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     )
 
     @property
+    def directory_name(self):
+        return self.directory.name
+
+    @property
     def keywords(self):
         return set(self._keywords.keys()) if self._keywords else set()
 

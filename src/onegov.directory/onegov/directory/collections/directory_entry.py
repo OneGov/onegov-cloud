@@ -58,7 +58,7 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
         }
 
     @property
-    def name(self):
+    def directory_name(self):
         return self.directory.name
 
     @property
