@@ -44,7 +44,10 @@ class CoordinatesField(StringField):
         return text
 
     def process_data(self, value):
-        self.data = value and Coordinates(**value) or Coordinates()
+        if isinstance(value, Coordinates):
+            self.data = value
+        else:
+            self.data = value and Coordinates(**value) or Coordinates()
 
     def populate_obj(self, obj, name):
         setattr(obj, name, self.data and self.data.as_dict() or None)
