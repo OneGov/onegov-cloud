@@ -14,6 +14,9 @@ from sqlalchemy_utils import observes
 from uuid import uuid4
 
 
+INHERIT = object()
+
+
 class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
     """ A directory of entries that share a common data structure. For example,
     a directory of people, of emergency services or playgrounds.
@@ -50,7 +53,7 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
     #: The normalized title for sorting
     order = Column(Text, nullable=False, index=True)
 
-    #: the polymorphic type of the directory
+    #: The polymorphic type of the directory
     type = Column(Text, nullable=True)
 
     #: The data structure of the contained entries
@@ -78,9 +81,11 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
     def entry_cls(self):
         return self.__class__._decl_class_registry[self.entry_cls_name]
 
-    def add(self, **values):
-        entry = self.entry_cls()
-        entry.directory = self
+    def add(self, values, type=INHERIT):
+        entry = self.entry_cls(
+            directory=self,
+            type=self.type if type is INHERIT else type
+        )
 
         object_session(self).add(entry)
 
@@ -88,9 +93,6 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     def update(self, entry, set_name=False, **values):
         cfg = self.configuration
-
-        # XXX we assume the type of the entry and the directory are the same
-        entry.type = self.type
 
         entry.title = cfg.extract_title(values)
         entry.lead = cfg.extract_lead(values)

@@ -129,26 +129,26 @@ def test_directory_entry_collection(session):
         )
     )
 
-    directory.add(
+    directory.add(values=dict(
         artist="Rise Against",
         title="Siren Song of the Counter-Culture",
         year=2004,
         genre=['Rock']
-    )
+    ))
 
-    directory.add(
+    directory.add(values=dict(
         artist="Kettcar",
         title="Du und wieviel von deinen Freunden",
         year=2002,
         genre=['Rock', 'Pop']
-    )
+    ))
 
-    directory.add(
+    directory.add(values=dict(
         artist="Hilltop Hoods",
         title="Drinking from the Sun, Walking Under Stars Restrung",
         year=2016,
         genre=['Hip Hop']
-    )
+    ))
 
     albums = DirectoryEntryCollection(directory)
     assert albums.query().count() == 3
