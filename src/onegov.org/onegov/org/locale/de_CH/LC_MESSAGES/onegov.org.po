@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-09-01 14:30+0200\n"
+"POT-Creation-Date: 2017-09-01 15:25+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1110,7 +1110,7 @@ msgstr ""
 "Unterseiten löschen, oder Sie wenden sich an einen Administrator."
 
 msgid "No directories defined yet."
-msgstr "Noch keine Verzchnisse definiert."
+msgstr "Noch keine Verzeichnisse definiert."
 
 msgid "This directory is empty."
 msgstr "Dieses Verzeichnis ist leer."
