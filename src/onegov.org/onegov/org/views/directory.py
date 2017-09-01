@@ -117,6 +117,7 @@ def view_directory(self, request):
         'layout': DirectoryEntryCollectionLayout(self, request),
         'title': self.directory.title,
         'entries': self.batch,
+        'directory': self.directory
     }
 
 
