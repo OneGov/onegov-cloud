@@ -85,7 +85,7 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     def add(self, **values):
         entry = self.entry_cls()
-        entry.directory_id = self.id
+        entry.directory = self
 
         object_session(self).add(entry)
 
@@ -93,6 +93,9 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     def update(self, entry, set_name=False, **values):
         cfg = self.configuration
+
+        # XXX we assume the type of the entry and the directory are the same
+        entry.type = self.type
 
         entry.title = cfg.extract_title(values)
         entry.lead = cfg.extract_lead(values)
@@ -123,6 +126,7 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
         class DirectoryEntryForm(parse_form(self.structure)):
 
             def populate_obj(self, obj):
+                super().populate_obj(obj)
                 directory.update(obj, **self.data)
 
             def process_obj(self, obj):
