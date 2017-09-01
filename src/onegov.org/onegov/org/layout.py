@@ -9,6 +9,7 @@ from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.core.utils import linkify
 from onegov.directory import DirectoryCollection
+from onegov.directory import DirectoryEntryCollection
 from onegov.event import OccurrenceCollection
 from onegov.form import FormCollection, FormSubmissionFile, render_field
 from onegov.newsletter import NewsletterCollection, RecipientCollection
@@ -1701,7 +1702,7 @@ class DirectoryCollectionLayout(DefaultLayout):
                             text=_("Directory"),
                             url=self.request.link(
                                 self.model,
-                                name='neu'
+                                name='+neu'
                             ),
                             attrs={'class': 'new-directory'}
                         )
@@ -1719,7 +1720,11 @@ class DirectoryEntryCollectionLayout(DefaultLayout):
             Link(_("Directories"), self.request.class_link(
                 DirectoryCollection
             )),
-            Link(_(self.model.directory.title), self.request.link(self.model))
+            Link(_(self.model.directory.title), self.request.class_link(
+                DirectoryEntryCollection, {
+                    'directory_name': self.model.directory_name
+                }
+            ))
         ]
 
     @cached_property
@@ -1728,7 +1733,7 @@ class DirectoryEntryCollectionLayout(DefaultLayout):
             return [
                 Link(
                     text=_("Edit"),
-                    url=self.request.link(self.model, 'bearbeiten'),
+                    url=self.request.link(self.model, '+bearbeiten'),
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
@@ -1758,10 +1763,28 @@ class DirectoryEntryCollectionLayout(DefaultLayout):
                             text=_("Entry"),
                             url=self.request.link(
                                 self.model,
-                                name='neu'
+                                name='+neu'
                             ),
                             attrs={'class': 'new-directory-entry'}
                         )
                     ]
                 ),
             ]
+
+
+class DirectoryEntryLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Directories"), self.request.class_link(
+                DirectoryCollection
+            )),
+            Link(_(self.model.directory.title), self.request.class_link(
+                DirectoryEntryCollection, {
+                    'directory_name': self.model.directory.name
+                }
+            )),
+            Link(_(self.model.title), '#')
+        ]

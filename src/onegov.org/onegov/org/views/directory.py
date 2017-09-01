@@ -1,13 +1,24 @@
-from onegov.core.security import Public, Secret
+from onegov.core.security import Public, Private, Secret
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryConfiguration
+from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryEntryCollection
 from onegov.org import OrgApp, _
 from onegov.org.forms import DirectoryForm
 from onegov.org.layout import DirectoryCollectionLayout
 from onegov.org.layout import DirectoryEntryCollectionLayout
-from onegov.org.models import ExtendedDirectory
+from onegov.org.layout import DirectoryEntryLayout
+from onegov.org.models import ExtendedDirectory, ExtendedDirectoryEntry
 from onegov.org.new_elements import Link
+
+
+def get_directory_form_class(model, request):
+    return ExtendedDirectory().with_content_extensions(DirectoryForm, request)
+
+
+def get_directory_entry_form_class(model, request):
+    return ExtendedDirectoryEntry().with_content_extensions(
+        model.directory.form_class, request)
 
 
 @OrgApp.html(
@@ -23,10 +34,6 @@ def view_directories(self, request):
             DirectoryEntryCollection(directory)
         )
     }
-
-
-def get_directory_form_class(model, request):
-    return ExtendedDirectory().with_content_extensions(DirectoryForm, request)
 
 
 @OrgApp.form(model=DirectoryCollection, name='neu', template='form.pt',
@@ -110,4 +117,41 @@ def view_directory(self, request):
         'layout': DirectoryEntryCollectionLayout(self, request),
         'title': self.directory.title,
         'entries': self.batch,
+    }
+
+
+@OrgApp.form(
+    model=DirectoryEntryCollection,
+    permission=Private,
+    template='form.pt',
+    form=get_directory_entry_form_class,
+    name='neu')
+def handle_new_directory_entry(self, request, form):
+    if form.submitted(request):
+        entry = self.directory.add(**form.data)
+        form.populate_obj(entry)
+
+        request.success(_("Added a new directory entry"))
+        return request.redirect(request.link(entry))
+
+    layout = DirectoryEntryCollectionLayout(self, request)
+    layout.breadcrumbs.append(Link(_("New"), '#'))
+
+    return {
+        'layout': layout,
+        'title': _("New Directory Entry"),
+        'form': form,
+    }
+
+
+@OrgApp.html(
+    model=DirectoryEntry,
+    permission=Public,
+    template='directory_entry.pt')
+def view_directory_entry(self, request):
+
+    return {
+        'layout': DirectoryEntryLayout(self, request),
+        'title': self.title,
+        'entry': self
     }

@@ -460,9 +460,9 @@ def get_directories(app):
 
 @OrgApp.path(
     model=DirectoryEntryCollection,
-    path='/verzeichnis/{name}')
-def get_directory_entries(app, name, extra_parameters, page=0):
-    directory = DirectoryCollection(app.session()).by_name(name)
+    path='/verzeichnisse/{directory_name}')
+def get_directory_entries(app, directory_name, extra_parameters, page=0):
+    directory = DirectoryCollection(app.session()).by_name(directory_name)
 
     if directory:
         collection = DirectoryEntryCollection(
@@ -479,6 +479,12 @@ def get_directory_entries(app, name, extra_parameters, page=0):
 
 @OrgApp.path(
     model=DirectoryEntry,
-    path='/verzeichnis-eintrag/{name}')
-def get_directory_entry(app, name, extra_parameters):
-    return DirectoryEntryCollection(app.session()).by_name(name)
+    path='/verzeichnisse/{directory_name}/{name}')
+def get_directory_entry(app, directory_name, name):
+    directory = DirectoryCollection(app.session()).by_name(directory_name)
+
+    if directory:
+        return DirectoryEntryCollection(
+            directory=directory,
+            type='extended'
+        ).by_name(name)
