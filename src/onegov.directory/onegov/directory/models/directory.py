@@ -89,9 +89,9 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
         object_session(self).add(entry)
 
-        return self.update(entry, **values)
+        return self.update(entry, set_name=True, **values)
 
-    def update(self, entry, **values):
+    def update(self, entry, set_name=False, **values):
         cfg = self.configuration
 
         entry.title = cfg.extract_title(values)
@@ -99,6 +99,9 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
         entry.order = cfg.extract_order(values)
         entry.keywords = cfg.extract_keywords(values)
         entry.values = {f.id: values[f.id] for f in self.fields}
+
+        if set_name:
+            entry.name = normalize_for_url(entry.title)
 
         object_session(self).flush()
 

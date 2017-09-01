@@ -41,6 +41,9 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     #: An interal id for references (not public)
     id = Column(UUID, primary_key=True, default=uuid4)
 
+    #: The public id of the directory entry
+    name = Column(Text, nullable=False)
+
     #: The directory this entry belongs to
     directory_id = Column(ForeignKey('directories.id'), nullable=False)
 

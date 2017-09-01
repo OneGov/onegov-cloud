@@ -32,6 +32,9 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
             page=index
         )
 
+    def by_name(self, name):
+        return self.query().filter_by(name=name)
+
     def query(self):
         query = super().query().filter_by(directory_id=self.directory.id)
         keywords = self.valid_keywords(self.extra_parameters)
