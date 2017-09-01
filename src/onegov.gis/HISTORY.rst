@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.1 (2017-09-01)
+~~~~~~~~~~~~~~~~~~~
+
 - Accepts more values on the coordinates setter.
   [href]
 
