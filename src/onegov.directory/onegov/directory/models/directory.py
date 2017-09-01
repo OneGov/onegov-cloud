@@ -124,9 +124,12 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
             def populate_obj(self, obj):
                 super().populate_obj(obj)
+
                 directory.update(obj, **self.data)
 
             def process_obj(self, obj):
+                super().process_obj(obj)
+
                 for field in directory.fields:
                     form_field = getattr(self, field.id)
                     form_field.data = obj.values[field.id]
