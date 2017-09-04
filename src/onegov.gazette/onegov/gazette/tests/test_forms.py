@@ -52,6 +52,7 @@ def test_user_form(session):
 
     form.apply_model(user)
     assert form.email.data == 'a@a.ai'
+    assert form.email_old.data == 'a@a.ai'
     assert form.role.data == 'editor'
     assert form.name.data == 'User'
     assert form.group.data == ''
@@ -79,6 +80,7 @@ def test_user_form(session):
 
     # Test validation
     form = UserForm()
+    form.request = DummyRequest(session)
     assert not form.validate()
 
     for role, result in (('admin', False), ('editor', True), ('member', True)):
@@ -90,7 +92,31 @@ def test_user_form(session):
                 'group': ''
             })
         )
+        form.request = DummyRequest(session)
         assert form.validate() == result
+
+    form = UserForm(
+        DummyPostData({
+            'role': 'editor',
+            'name': 'User',
+            'email': 'b@b.bi',
+            'group': ''
+        })
+    )
+    form.request = DummyRequest(session)
+    assert not form.validate()
+
+    form = UserForm(
+        DummyPostData({
+            'role': 'editor',
+            'name': 'User',
+            'email': 'b@b.bi',
+            'email_old': 'b@b.bi',
+            'group': ''
+        })
+    )
+    form.request = DummyRequest(session)
+    assert form.validate()
 
 
 def test_user_form_on_request(session):

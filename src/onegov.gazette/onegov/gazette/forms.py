@@ -4,11 +4,13 @@ from onegov.gazette import _
 from onegov.gazette.fields import MultiCheckboxField
 from onegov.gazette.fields import SelectField
 from onegov.gazette.layout import Layout
+from onegov.gazette.validators import UniqueUsername
 from onegov.quill import QuillField
 from onegov.user import UserGroup
 from sqlalchemy import cast
 from sqlalchemy import String
 from wtforms import BooleanField
+from wtforms import HiddenField
 from wtforms import RadioField
 from wtforms import StringField
 from wtforms.validators import Email
@@ -50,9 +52,12 @@ class UserForm(Form):
         label=_("E-Mail"),
         validators=[
             InputRequired(),
-            Email()
+            Email(),
+            UniqueUsername(default_field='email_old')
         ]
     )
+
+    email_old = HiddenField()
 
     def on_request(self):
         session = self.request.app.session()
@@ -71,6 +76,7 @@ class UserForm(Form):
 
     def apply_model(self, model):
         self.email.data = model.username
+        self.email_old.data = model.username
         self.role.data = model.role
         self.name.data = model.realname
         self.group.data = str(model.group_id or '')

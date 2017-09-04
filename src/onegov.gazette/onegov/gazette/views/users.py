@@ -54,33 +54,30 @@ def create_user(self, request, form):
     layout = Layout(self, request)
 
     if form.submitted(request):
-        if self.exists(form.email.data):
-            user = self.by_username(form.email.data)
-        else:
-            user = self.add(
-                form.email.data,
-                random_password(16),
-                form.role.data,
-                realname=form.name.data
-            )
-            url = request.link(request.app.principal, name='request-password')
-            request.app.send_email(
-                subject=request.translate(_("User account created")),
-                receivers=(user.username, ),
-                reply_to=request.app.mail_sender,
-                content=render_template(
-                    'mail_user_created.pt',
-                    request,
-                    {
-                        'title': request.translate(_("User account created")),
-                        'model': None,
-                        'url': url,
-                        'layout': MailLayout(self, request)
-                    }
-                )
-            )
-
+        user = self.add(
+            form.email.data,
+            random_password(16),
+            form.role.data,
+            realname=form.name.data
+        )
         form.update_model(user)
+        url = request.link(request.app.principal, name='request-password')
+        request.app.send_email(
+            subject=request.translate(_("User account created")),
+            receivers=(user.username, ),
+            reply_to=request.app.mail_sender,
+            content=render_template(
+                'mail_user_created.pt',
+                request,
+                {
+                    'title': request.translate(_("User account created")),
+                    'model': None,
+                    'url': url,
+                    'layout': MailLayout(self, request)
+                }
+            )
+        )
+
         request.message(_("User added."), 'success')
         return redirect(layout.manage_users_link)
 
@@ -107,6 +104,7 @@ def edit_user(self, request, form):
     """
 
     layout = Layout(self, request)
+    # import pdb; pdb.set_trace()
 
     if form.submitted(request):
         form.update_model(self)
