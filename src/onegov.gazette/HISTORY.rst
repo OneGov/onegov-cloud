@@ -4,6 +4,9 @@ Changelog
 - Adds a user name validator.
   [msom]
 
+- Updates translation.
+  [msom]
+
 1.2.1 (2017-09-04)
 ~~~~~~~~~~~~~~~~~~~
 
