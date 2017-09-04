@@ -23,7 +23,7 @@ def test_view_dashboard(gazette_app):
 
     with freeze_time("2017-10-20 12:00"):
         deadline = (
-            "<span>Nächster Redaktionsschluss</span>: "
+            "<span>Nächster Eingabeschluss</span>: "
             "<strong>Mittwoch 25.10.2017 12:00</strong>"
         )
 
@@ -66,12 +66,12 @@ def test_view_dashboard(gazette_app):
         manage = editor_1.get('/').follow()
         assert (
             "Sie haben Meldungenen in Arbeit, für welche der "
-            "Redaktionsschluss bald erreicht ist."
+            "Eingabeschluss bald erreicht ist."
         ) in manage
 
     with freeze_time("2017-11-02 12:00"):
         deadline = (
-            "<span>Nächster Redaktionsschluss</span>: "
+            "<span>Nächster Eingabeschluss</span>: "
             "<strong>Mittwoch 08.11.2017 12:00</strong>"
         )
 
