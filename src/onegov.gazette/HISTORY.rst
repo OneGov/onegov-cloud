@@ -7,6 +7,9 @@ Changelog
 - Updates translation.
   [msom]
 
+- Requires to select an organization when adding a notice.
+  [msom]
+
 1.2.1 (2017-09-04)
 ~~~~~~~~~~~~~~~~~~~
 

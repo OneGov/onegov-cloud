@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-04 12:33+0200\n"
-"PO-Revision-Date: 2017-09-04 14:28+0200\n"
+"POT-Creation-Date: 2017-09-04 14:44+0200\n"
+"PO-Revision-Date: 2017-09-04 14:43+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -61,6 +61,9 @@ msgstr "Redaktor"
 
 msgid "- none -"
 msgstr "- keine -"
+
+msgid "Select one"
+msgstr "Bitte auswählen"
 
 #, python-format
 msgid "No. ${number}, ${issue_date}"

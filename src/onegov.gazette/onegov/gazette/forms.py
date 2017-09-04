@@ -132,6 +132,9 @@ class NoticeForm(Form):
 
         # populate organization
         self.organization.choices = list(principal.organizations.items())
+        self.organization.choices.insert(
+            0, ('', self.request.translate(_("Select one")))
+        )
 
         # populate categories
         self.category.choices = list(principal.categories.items())

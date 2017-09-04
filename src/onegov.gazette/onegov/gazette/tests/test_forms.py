@@ -201,6 +201,7 @@ def test_notice_form(session, principal):
     with freeze_time("2017-11-01 14:00"):
         form.on_request()
         assert form.organization.choices == [
+            ('', 'Select one'),
             ('100', 'State Chancellery'),
             ('200', 'Civic Community'),
             ('300', 'Municipality'),
