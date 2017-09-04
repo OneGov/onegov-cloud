@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Uses latest onegov.quill release.
+  [msom]
+
 1.2.0 (2017-09-01)
 ~~~~~~~~~~~~~~~~~~~
 
