@@ -122,6 +122,7 @@ class NoticeForm(Form):
 
     text = QuillField(
         label=_("Text"),
+        tags=('strong', 'ol', 'ul'),
         validators=[
             InputRequired()
         ]
