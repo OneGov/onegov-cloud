@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.0 (2017-09-05)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a user name validator.
   [msom]
