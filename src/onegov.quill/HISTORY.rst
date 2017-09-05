@@ -1,5 +1,12 @@
 Changelog
 ---------
+
+- Allows to configure the used formats.
+  [msom]
+
+- Removes jQuery dependency.
+  [msom]
+
 0.1.2 (2017-09-04)
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -8,6 +15,9 @@ Changelog
 
 0.1.1 (2017-09-01)
 ~~~~~~~~~~~~~~~~~~~~~
+- Nothing.
+  [msom]
+
 0.1.0 (2017-09-01)
 ~~~~~~~~~~~~~~~~~~~~~
 

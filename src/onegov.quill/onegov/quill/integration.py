@@ -24,4 +24,3 @@ def get_leaflet_asset():
     yield 'quill.snow.css'
     yield 'custom.css'
     yield 'quill.js'
-    yield 'editor.js'

@@ -33,4 +33,4 @@ def test_integration(temporary_directory):
     app.namespace = 'foo'
     app.set_application_id('foo/bar')
 
-    assert 'quill.bundle.js' in Client(app).get('/')
+    assert 'quill.js.bundle.js' in Client(app).get('/')
