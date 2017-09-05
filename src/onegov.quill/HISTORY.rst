@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.2.0 (2017-09-05)
+~~~~~~~~~~~~~~~~~~~~~
 
 - Allows to configure the used formats.
   [msom]
