@@ -4,6 +4,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
 from onegov.directory.types import DirectoryConfigurationStorage
+from onegov.directory.migration import DirectoryMigration
 from onegov.form import flatten_fieldsets, parse_formcode, parse_form
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
@@ -103,7 +104,10 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
         if set_name:
             entry.name = normalize_for_url(entry.title)
 
-        object_session(self).flush()
+        session = object_session(self)
+
+        if not session._flushing:
+            object_session(self).flush()
 
         return entry
 
@@ -111,6 +115,15 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
     def title_observer(self, title):
         self.order = normalize_for_url(title)
         self.name = self.name or self.order
+
+    @observes('structure', 'configuration')
+    def structure_configuration_observer(self, structure, configuration):
+        migration = DirectoryMigration(
+            directory=self,
+            new_structure=structure,
+            new_configuration=configuration
+        )
+        migration.execute()
 
     @property
     def fields(self):
