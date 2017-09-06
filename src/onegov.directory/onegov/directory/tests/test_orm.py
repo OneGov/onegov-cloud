@@ -7,7 +7,9 @@ from onegov.directory import DirectoryEntryCollection
 def test_directory_title_and_order(session):
     doctors = DirectoryCollection(session).add(
         title='Doctors',
-        structure='',
+        structure="""
+            Name = ___
+        """,
         configuration=DirectoryConfiguration()
     )
 
