@@ -67,6 +67,15 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         self.changed()
         return super().__setattr__(name, value)
 
+    def rename_field(self, old_name, new_name):
+        for field in self.fields:
+            lst = getattr(self, field)
+
+            for ix, name in enumerate(lst):
+                lst[ix] = new_name if name == old_name else name
+
+            setattr(self, field, lst)
+
     @classmethod
     def coerce(cls, key, value):
         if not isinstance(value, Mutable):

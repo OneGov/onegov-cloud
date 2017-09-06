@@ -1,6 +1,8 @@
 from collections import defaultdict
-from onegov.form import flatten_fieldsets, parse_formcode
 from onegov.core.utils import normalize_for_url
+from onegov.form import flatten_fieldsets, parse_formcode
+from sqlalchemy.orm.attributes import flag_modified
+from sqlalchemy.orm.attributes import get_history
 
 
 class DirectoryMigration(object):
@@ -12,13 +14,23 @@ class DirectoryMigration(object):
     """
 
     def __init__(self, directory, new_structure, new_configuration):
+
         self.directory = directory
         self.new_structure = new_structure
         self.new_configuration = new_configuration
         self.changes = StructuralChanges(
-            self.directory.structure,
+            self.old_structure,
             self.new_structure
         )
+
+    @property
+    def old_structure(self):
+        history = get_history(self.directory, 'structure')
+
+        if history.deleted:
+            return history.deleted[0]
+        else:
+            return self.directory.structure
 
     @property
     def possible(self):
@@ -28,16 +40,40 @@ class DirectoryMigration(object):
         if not self.changes:
             return True
 
+        if not self.changes.changed_fields:
+            return True
+
         return False
 
     def execute(self):
         assert self.possible
 
-        for entry in self.directory.entries:
-            self.directory.update(entry, **entry.values)
-
         self.directory.structure = self.new_structure
         self.directory.configuration = self.new_configuration
+
+        for entry in self.directory.entries:
+            # XXX this is currently rather destructive and automatic, we would
+            # want to change this into something that is save for the user
+            # by maybe keeping the old values around somehow
+            for added in self.changes.added_fields:
+                entry.values[added] = None
+
+            for removed in self.changes.removed_fields:
+                del entry.values[removed]
+
+            for old, new in self.changes.renamed_fields.items():
+                entry.values[new] = entry.values[old]
+                del entry.values[old]
+
+                self.directory.configuration.rename_field(old, new)
+
+            self.directory.update(entry, **entry.values)
+
+            # force an elasticsearch reindex
+            flag_modified(entry, 'title')
+
+            # XXX add validation
+            pass
 
 
 class StructuralChanges(object):
@@ -62,10 +98,12 @@ class StructuralChanges(object):
         self.detect_changed_fields()
 
     def __bool__(self):
-        return self.added_fields\
-            or self.removed_fields\
-            or self.renamed_fields\
-            or self.changed_fields
+        return bool(
+            self.added_fields or
+            self.removed_fields or
+            self.renamed_fields or
+            self.changed_fields
+        )
 
     def detect_added_fields(self):
         self.added_fields = [
