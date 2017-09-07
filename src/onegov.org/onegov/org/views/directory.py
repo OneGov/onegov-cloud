@@ -1,3 +1,4 @@
+from collections import namedtuple
 from onegov.core.security import Public, Private, Secret
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryConfiguration
@@ -118,11 +119,26 @@ def delete_directory(self, request):
     permission=Public,
     template='directory.pt')
 def view_directory(self, request):
+
+    Filter = namedtuple('Filter', ('title', 'tags'))
+    filters = []
+    empty = tuple()
+
+    for keyword, title, values in self.available_filters:
+        filters.append(Filter(title=title, tags=tuple(
+            Link(
+                text=value,
+                active=value in self.keywords.get(keyword, empty),
+                url=request.link(self.for_filter(**{keyword: value}))
+            ) for value in values
+        )))
+
     return {
         'layout': DirectoryEntryCollectionLayout(self, request),
         'title': self.directory.title,
         'entries': self.batch,
-        'directory': self.directory
+        'directory': self.directory,
+        'filters': filters
     }
 
 
