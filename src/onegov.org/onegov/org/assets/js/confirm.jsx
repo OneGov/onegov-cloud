@@ -38,7 +38,6 @@ var Confirmation = React.createClass({
     }
 });
 
-
 /*
     The confirmation, if no 'yes' button is supplied (to inform the user
     why some action can't be taken).
@@ -66,7 +65,6 @@ var DenyConfirmation = React.createClass({
     is invoked.
 */
 var show_confirmation = function(question, yes, no, extra, handle_yes) {
-    var id = _.random(0, 65536);
     var el = $("<div class='confirm row'>");
 
     $('body').append(el);
@@ -81,7 +79,8 @@ var show_confirmation = function(question, yes, no, extra, handle_yes) {
     } else {
         confirm = ReactDOM.render(
             <Confirmation
-                question={question} yes={yes} no={no} extra={extra} />,
+                question={question} yes={yes} no={no} extra={extra}
+            />,
             el.get(0)
         );
     }
@@ -141,14 +140,14 @@ $(document).on('opened.fndtn.reveal', '[data-reveal]', function() {
 });
 
 // remove the div when the dialog closes
-$(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
+$(document).on('closed.fndtn.reveal', '[data-reveal]', function() {
     if ($(this).parent().hasClass('confirm')) {
         $(this).parent().remove();
     }
 });
 
 // handles the click on the link (or other elements)
-var handle_confirmation = function(e, on_confirm) {
+var handle_confirmation = function(_e, on_confirm) {
     var question = $(this).data('confirm');
     var yes = $(this).data('confirm-yes');
     var no = $(this).data('confirm-no');
@@ -159,23 +158,26 @@ var handle_confirmation = function(e, on_confirm) {
 
 // adds an enter key handler to jQuery
 jQuery.fn.enter = function(callback) {
-   if(!callback) {
-      return;
-   }
+    if (!callback) {
+        return;
+    }
 
-   $(this).keydown(function(e) {
-       var ev = e || event;
-       if(ev.keyCode == 13) {
-          callback();
-          return false;
-       }
-   });
+    $(this).keydown(function(e) {
+        var ev = e || event;
+
+        if (ev.keyCode === 13) {
+            callback();
+            return false;
+        }
+
+        return true;
+    });
 };
 
 // sets up a confirmation link with the dialog
 jQuery.fn.confirmation = function() {
     return this.each(function() {
-         intercept(this, 'click', handle_confirmation);
+        intercept(this, 'click', handle_confirmation);
     });
 };
 
