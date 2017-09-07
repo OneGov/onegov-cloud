@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Slightly improves the look of confirmation dialogs.
+  [href]
+
 - Fixes dialog not showing for undeletable objects.
   [href]
 

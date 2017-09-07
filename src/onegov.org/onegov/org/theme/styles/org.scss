@@ -1524,9 +1524,21 @@ div#redactor-droparea {
 /*
     confirm dialog styling
 */
-.confirm-modal .button {
-    margin-right: 1rem;
-    margin-top: 1rem;
+.confirm-modal {
+
+    h2 {
+        font-size: $h3-font-size - $h3-font-reduction;
+        font-weight: bold;
+    }
+
+    p {
+        max-widht: $max-line-width;
+    }
+
+    .button {
+        margin: 1rem 1rem 0 0;
+    }
+
 }
 
 /*
