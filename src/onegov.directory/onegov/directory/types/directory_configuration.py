@@ -84,7 +84,7 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
             return value
 
     def join(self, data, attribute, separator=' '):
-        return separator.join(s.strip() for s in (
+        return separator.join((s and str(s).strip() or '') for s in (
             data[key] for key in getattr(self, attribute)
         ))
 
