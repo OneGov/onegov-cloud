@@ -312,7 +312,8 @@ $global-tools-height: 2.5rem;
 .blank-label {
     @include label($bg: $white);
     border: 1px solid $gray;
-    margin: 0 4px 6px 0;
+    font-size: .8rem;
+    margin: 0 4px 7px 0;
 
     &.active {
         @include primary-color-background;
