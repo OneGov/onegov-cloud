@@ -575,7 +575,6 @@ class FormSubmissionLayout(DefaultLayout):
         if self.form.has_submissions(with_state='complete'):
             delete_link = Link(
                 text=_("Delete"),
-                url=self.request.link(self.form),
                 attrs={'class': 'delete-link'},
                 traits=(
                     Block(
@@ -1045,7 +1044,6 @@ class ResourceLayout(DefaultLayout):
             else:
                 delete_link = Link(
                     text=_("Delete"),
-                    url=self.request.link(self.model),
                     attrs={'class': 'delete-link'},
                     traits=(
                         Block(
@@ -1129,7 +1127,6 @@ class AllocationEditFormLayout(DefaultLayout):
             else:
                 yield Link(
                     text=_("Delete"),
-                    url=self.request.link(self.model),
                     attrs={'class': 'delete-link'},
                     traits=(
                         Block(
@@ -1244,7 +1241,6 @@ class OccurrenceLayout(EventBaseLayout):
             else:
                 delete_link = Link(
                     text=_("Delete"),
-                    url=self.request.link(self.model.event),
                     attrs={'class': 'delete-link'},
                     traits=(
                         Block(
@@ -1300,7 +1296,6 @@ class EventLayout(EventBaseLayout):
             else:
                 delete_link = Link(
                     text=_("Delete"),
-                    url=self.request.link(self.model),
                     attrs={'class': 'delete-link'},
                     traits=(
                         Block(

@@ -147,13 +147,15 @@ $(document).on('closed.fndtn.reveal', '[data-reveal]', function() {
 });
 
 // handles the click on the link (or other elements)
-var handle_confirmation = function(_e, on_confirm) {
+var handle_confirmation = function(e, on_confirm) {
     var question = $(this).data('confirm');
     var yes = $(this).data('confirm-yes');
     var no = $(this).data('confirm-no');
     var extra = $(this).data('confirm-extra');
 
     show_confirmation(question, yes, no, extra, on_confirm);
+
+    e.preventDefault();
 };
 
 // adds an enter key handler to jQuery

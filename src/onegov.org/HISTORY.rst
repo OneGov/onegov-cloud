@@ -1,8 +1,14 @@
 Changelog
 ---------
 
+- Fixes dialog not showing for undeletable objects.
+  [href]
+
 0.14.6 (2017-08-25)
 ~~~~~~~~~~~~~~~~~~~
+
+- Adds compatibility with the latest onegov.form release.
+  [href]
 
 0.14.5 (2017-08-23)
 ~~~~~~~~~~~~~~~~~~~
