@@ -14,12 +14,12 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
 
     """
 
-    def __init__(self, directory, type='*', extra_parameters=None, page=0):
+    def __init__(self, directory, type='*', keywords=None, page=0):
         super().__init__(object_session(directory))
 
         self.type = type
         self.directory = directory
-        self.extra_parameters = extra_parameters or {}
+        self.keywords = keywords or {}
         self.page = page
 
     def __eq__(self, other):
@@ -36,7 +36,7 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
         return self.__class__(
             self.directory,
             self.type,
-            self.extra_parameters,
+            self.keywords,
             page=index
         )
 
@@ -45,7 +45,7 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
 
     def query(self):
         query = super().query().filter_by(directory_id=self.directory.id)
-        keywords = self.valid_keywords(self.extra_parameters)
+        keywords = self.valid_keywords(self.keywords)
 
         values = {
             ':'.join((keyword, value))
@@ -73,18 +73,28 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
     def model_class(self):
         return DirectoryEntry.get_polymorphic_class(self.type, DirectoryEntry)
 
+    @property
+    def available_filters(self):
+        keywords = self.directory.configuration.keywords
+        fields = {f.id: f for f in self.directory.fields if f.id in keywords}
+
+        return (
+            (k, fields[k].label, sorted([c.label for c in fields[k].choices]))
+            for k in keywords
+        )
+
     def for_filter(self, **keywords):
         if not self.directory.configuration.keywords:
             return self
 
-        parameters = self.extra_parameters.copy()
+        parameters = self.keywords.copy()
 
         for keyword, value in self.valid_keywords(keywords).items():
             collection = set(parameters.get(keyword, []))
             collection = toggle(collection, value)
 
             if collection:
-                parameters[keyword] = tuple(collection)
+                parameters[keyword] = list(collection)
             elif keyword in parameters:
                 del parameters[keyword]
 
