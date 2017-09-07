@@ -1,7 +1,10 @@
+import pytest
+
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryEntryCollection
+from onegov.directory.errors import ValidationError
 
 
 def test_directory_title_and_order(session):
@@ -170,3 +173,17 @@ def test_directory_entry_collection(session):
         'year': 2002,
         'genre': ['Rock', 'Pop']
     }
+
+
+def test_validation_error(session):
+    places = DirectoryCollection(session).add(
+        title='Place',
+        structure="Name *= ___",
+        configuration=DirectoryConfiguration(
+            title=('name', ),
+            order=('name', ),
+        )
+    )
+
+    with pytest.raises(ValidationError):
+        places.add(values={'name': ''})

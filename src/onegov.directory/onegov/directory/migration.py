@@ -1,6 +1,6 @@
 from collections import defaultdict
 from onegov.core.utils import normalize_for_url
-from onegov.form import flatten_fieldsets, parse_formcode
+from onegov.form import flatten_fieldsets, parse_formcode, parse_form
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.orm.attributes import get_history
 
@@ -18,6 +18,9 @@ class DirectoryMigration(object):
         self.directory = directory
         self.new_structure = new_structure
         self.new_configuration = new_configuration
+        self.new_form_class = parse_form(new_structure)
+        self.fieldtype_migrations = FieldTypeMigrations()
+
         self.changes = StructuralChanges(
             self.old_structure,
             self.new_structure
@@ -41,6 +44,25 @@ class DirectoryMigration(object):
             return True
 
         if not self.changes.changed_fields:
+            return True
+
+        for changed in self.changes.changed_fields:
+            old = self.changes.old[changed]
+            new = self.changes.new[changed]
+
+            # we can change a required field to a non-required
+            if old.required and not new.required and old.type == new.type:
+                continue
+
+            # we cannot introduce a required field after the fact
+            if new.required and not old.required:
+                break
+
+            # we can only convert certain types
+            if old.required == new.required and old.type != new.type:
+                if not self.fieldtype_migrations.possible(old.type, new.type):
+                    break
+        else:
             return True
 
         return False
@@ -67,13 +89,57 @@ class DirectoryMigration(object):
 
                 self.directory.configuration.rename_field(old, new)
 
-            self.directory.update(entry, **entry.values)
+            for changed in self.changes.changed_fields:
+                convert = self.fieldtype_migrations.get_converter(
+                    self.changes.old[changed].type,
+                    self.changes.new[changed].type
+                )
+
+                entry.values[changed] = convert(entry.values[changed])
+
+            self.directory.update(entry, entry.values)
 
             # force an elasticsearch reindex
             flag_modified(entry, 'title')
 
-            # XXX add validation
-            pass
+
+class FieldTypeMigrations(object):
+    """ Contains methods to migrate fields from one type to another. """
+
+    def possible(self, old_type, new_type):
+        return self.get_converter(old_type, new_type) is not None
+
+    def get_converter(self, old_type, new_type):
+
+        if old_type == 'password':
+            return  # disabled to avoid accidental leaks
+
+        explicit = '{}_to_{}'.format(old_type, new_type)
+        generic = 'any_to_{}'.format(new_type)
+
+        if hasattr(self, explicit):
+            return getattr(self, explicit)
+
+        if hasattr(self, generic):
+            return getattr(self, generic)
+
+    def any_to_text(self, value):
+        return str(value if value is not None else '').strip()
+
+    def any_to_textarea(self, value):
+        return self.any_to_text(value)
+
+    def textarea_to_text(self, value):
+        return value.replace('\n', ' ').strip()
+
+    def date_to_text(self, value):
+        return '{:%d.%m.%Y}'.format(value)
+
+    def datetime_to_text(self, value):
+        return '{:%d.%m.%Y %H:%M}'.format(value)
+
+    def time_to_text(self, value):
+        return '{:%H:%M}'.format(value)
 
 
 class StructuralChanges(object):

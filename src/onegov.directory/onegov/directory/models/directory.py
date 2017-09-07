@@ -1,10 +1,12 @@
+from functools import lru_cache
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
-from onegov.directory.types import DirectoryConfigurationStorage
+from onegov.directory.errors import ValidationError
 from onegov.directory.migration import DirectoryMigration
+from onegov.directory.types import DirectoryConfigurationStorage
 from onegov.form import flatten_fieldsets, parse_formcode, parse_form
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
@@ -90,9 +92,9 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
         object_session(self).add(entry)
 
-        return self.update(entry, set_name=True, **values)
+        return self.update(entry, values, set_name=True)
 
-    def update(self, entry, set_name=False, **values):
+    def update(self, entry, values, set_name=False):
         cfg = self.configuration
 
         entry.title = cfg.extract_title(values)
@@ -108,6 +110,12 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
         if not session._flushing:
             object_session(self).flush()
+
+        form = self.form_class(data=entry.values)
+        form.validate()
+
+        if form.errors:
+            raise ValidationError(form.errors)
 
         return entry
 
@@ -131,6 +139,10 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     @property
     def form_class(self):
+        return self.form_class_from_structure(self.structure)
+
+    @lru_cache(maxsize=1)
+    def form_class_from_structure(self, structure):
         directory = self
 
         class DirectoryEntryForm(parse_form(self.structure)):
@@ -138,7 +150,7 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
             def populate_obj(self, obj):
                 super().populate_obj(obj)
 
-                directory.update(obj, **self.data)
+                directory.update(obj, self.data)
 
             def process_obj(self, obj):
                 super().process_obj(obj)
