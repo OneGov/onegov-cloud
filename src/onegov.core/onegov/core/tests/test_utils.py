@@ -205,3 +205,18 @@ def test_post_thread(session):
         assert urlopen.call_args[0][0].get_full_url() == url
         assert urlopen.call_args[0][1] == data
         assert urlopen.call_args[0][0].headers == dict(headers)
+
+
+def test_binary_dictionary():
+
+    d = utils.binary_to_dictionary(b'foobar')
+    assert d['filename'] is None
+    assert d['mimetype'] == 'text/plain'
+    assert d['size'] == 6
+
+    d = utils.binary_to_dictionary(b'foobar', 'readme.txt')
+    assert d['filename'] == 'readme.txt'
+    assert d['mimetype'] == 'text/plain'
+    assert d['size'] == 6
+
+    assert utils.dictionary_to_binary(d) == b'foobar'

@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a helper method to express binary data in a dictionary.
+  [href]
+
 0.46.0 (2017-08-31)
 ~~~~~~~~~~~~~~~~~~~
 

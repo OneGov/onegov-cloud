@@ -1,4 +1,6 @@
+import base64
 import bleach
+import gzip
 import hashlib
 import importlib
 import inspect
@@ -11,6 +13,7 @@ import re
 import sqlalchemy
 import urllib.request
 
+from io import BytesIO
 from collections import Iterable
 from contextlib import contextmanager
 from cProfile import Profile
@@ -500,3 +503,39 @@ def toggle(collection, item):
         return collection - {item}
     else:
         return collection | {item}
+
+
+def binary_to_dictionary(binary, filename=None):
+    """ Takes raw binary filedata and stores it in a dictionary together
+    with metadata information.
+
+    The data is compressed before it is stored int he dictionary. Use
+    :func:`dictionary_to_binary` to get the original binary data back.
+
+    """
+
+    assert isinstance(binary, bytes)
+
+    mimetype = magic.from_buffer(binary, mime=True)
+    gzipdata = BytesIO()
+
+    with gzip.GzipFile(fileobj=gzipdata, mode='wb') as f:
+        f.write(binary)
+
+    return {
+        'data': base64.b64encode(gzipdata.getvalue()).decode('ascii'),
+        'filename': filename,
+        'mimetype': mimetype,
+        'size': len(binary)
+    }
+
+
+def dictionary_to_binary(dictionary):
+    """ Takes a dictionary created by :func:`binary_to_dictionary` and returns
+    the original binary data.
+
+    """
+    data = base64.b64decode(dictionary['data'])
+
+    with gzip.GzipFile(fileobj=BytesIO(data), mode='r') as f:
+        return f.read()
