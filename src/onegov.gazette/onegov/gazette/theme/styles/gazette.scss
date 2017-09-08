@@ -488,20 +488,20 @@ a.button.right {
 */
 .sub-nav {
     background-color: $white-smoke;
-    margin-bottom: 0;
+    margin: 0;
     padding: 10px 10px 10px 0;
 
     dt,
     dd,
     dd a,
     button {
-        background-color: inherit;
+        background-color: transparent;
         color: $steel;
     }
 
     input {
         box-sizing: content-box;
-        height: initial;
+        height: 1.7em;
         margin: 0;
         padding: .2em .5em;
 
