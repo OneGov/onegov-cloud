@@ -1,12 +1,8 @@
-import base64
-import gzip
-import magic
-
-from io import BytesIO
 from onegov.core.html import sanitize_html
 from onegov.form.widgets import MultiCheckboxWidget
 from onegov.form.widgets import OrderedMultiCheckboxWidget
 from onegov.form.widgets import UploadWidget
+from onegov.core.utils import binary_to_dictionary
 from wtforms import FileField, SelectMultipleField, TextAreaField, widgets
 
 
@@ -60,24 +56,10 @@ class UploadField(FileField):
 
         if fp is None:
             return {}
-        else:
-            fp.seek(0)
 
-        file_data = fp.read()
+        fp.seek(0)
 
-        mimetype_by_introspection = magic.from_buffer(file_data, mime=True)
-
-        compressed_data = BytesIO()
-        with gzip.GzipFile(fileobj=compressed_data, mode="wb") as f:
-            f.write(file_data)
-
-        return {
-            'data': base64.b64encode(
-                compressed_data.getvalue()).decode('ascii'),
-            'filename': fs.filename,
-            'mimetype': mimetype_by_introspection,
-            'size': len(file_data)
-        }
+        return binary_to_dictionary(fp.read(), fs.filename)
 
 
 class HtmlField(TextAreaField):

@@ -1,10 +1,10 @@
-import base64
 import re
 import tempfile
 
 from cgi import FieldStorage
 from gzip import GzipFile
 from io import BytesIO
+from onegov.core.utils import dictionary_to_binary
 from onegov.form import Form
 from onegov.form.fields import HtmlField
 from onegov.form.fields import MultiCheckboxField
@@ -38,7 +38,7 @@ def test_upload_file():
         with GzipFile(filename='', mode='r', fileobj=BytesIO(data)) as f:
             return f.read()
 
-    assert decompress(base64.b64decode(data['data'])) == b'foobar'
+    assert dictionary_to_binary(data) == b'foobar'
 
 
 def test_ordered_multi_checkbox_field():

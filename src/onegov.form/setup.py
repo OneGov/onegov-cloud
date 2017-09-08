@@ -40,7 +40,6 @@ setup(
         'onegov.search',
         'pyparsing!=2.1.2',  # 2.1.2 has a problem with Python 3
         'pyyaml',
-        'python-magic>=0.4.12',
         'python-stdnum',
         'sedate',
         'sqlalchemy_utils',

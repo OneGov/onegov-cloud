@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Moves the binary as dictionary encoding to onegov.core.
+  [href]
+
 0.20.0 (2017-08-31)
 ~~~~~~~~~~~~~~~~~~~
 
