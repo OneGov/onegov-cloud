@@ -2,6 +2,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.file import FileSet
 from onegov.gis import CoordinatesMixin
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
@@ -10,6 +11,7 @@ from sqlalchemy import Index
 from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
@@ -59,6 +61,15 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     #: Describes the entry briefly
     lead = Column(Text, nullable=True)
 
+    #: The id of the linked fileset
+    fileset_id = Column(ForeignKey(FileSet.id), nullable=True)
+    fileset = relationship(
+        'FileSet',
+        uselist=False,
+        single_parent=True,
+        cascade="all, delete-orphan"
+    )
+
     #: All keywords defined for this entry (indexed)
     _keywords = Column(
         MutableDict.as_mutable(HSTORE), nullable=True, name='keywords'
@@ -98,3 +109,7 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     def values(self, values):
         self.content = self.content or {}
         self.content['values'] = values
+
+    @property
+    def files(self):
+        return self.fileset and self.fileset.files or tuple()

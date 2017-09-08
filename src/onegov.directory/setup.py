@@ -34,6 +34,7 @@ setup(
     install_requires=[
         'more_itertools',
         'onegov.core>=0.4.0',
+        'onegov.file',
         'onegov.form',
         'onegov.gis',
         'onegov.search',

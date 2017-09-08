@@ -1,12 +1,14 @@
 from functools import lru_cache
+from onegov.core.crypto import random_token
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from onegov.core.utils import normalize_for_url
+from onegov.core.utils import normalize_for_url, dictionary_to_binary
 from onegov.directory.errors import ValidationError
 from onegov.directory.migration import DirectoryMigration
 from onegov.directory.types import DirectoryConfigurationStorage
+from onegov.file import File, FileSet
 from onegov.form import flatten_fieldsets, parse_formcode, parse_form
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
@@ -95,27 +97,52 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
         return self.update(entry, values, set_name=True)
 
     def update(self, entry, values, set_name=False):
+        session = object_session(self)
+
         cfg = self.configuration
 
         entry.title = cfg.extract_title(values)
         entry.lead = cfg.extract_lead(values)
         entry.order = cfg.extract_order(values)
         entry.keywords = cfg.extract_keywords(values)
-        entry.values = {f.id: values[f.id] for f in self.fields}
 
         if set_name:
             entry.name = normalize_for_url(entry.title)
 
-        session = object_session(self)
+        basic_fields = tuple(f for f in self.fields if f.type != 'fileinput')
+        entry.values = {f.id: values[f.id] for f in basic_fields}
+
+        file_fields = tuple(
+            f for f in self.fields if f.type == 'fileinput'
+            if values[f.id] is not None
+        )
+        if file_fields:
+            # XXX add the ability to keep a file
+            if entry.fileset:
+                for f in entry.fileset.files:
+                    session.delete(f)
+            else:
+                entry.fileset = FileSet(title=self.title)
+
+            for field in file_fields:
+                new_file = File(
+                    id=random_token(),
+                    name=values[field.id]['filename'],
+                    reference=dictionary_to_binary(values[field.id])
+                )
+
+                entry.fileset.files.append(new_file)
+                entry.values[field.id] = values[field.id]
+                entry.values[field.id]['id'] = new_file.id
+                entry.values[field.id]['data'] = None
+
+        form = self.form_class(data=entry.values)
+
+        if not form.validate():
+            raise ValidationError(form.errors)
 
         if not session._flushing:
             object_session(self).flush()
-
-        form = self.form_class(data=entry.values)
-        form.validate()
-
-        if form.errors:
-            raise ValidationError(form.errors)
 
         return entry
 

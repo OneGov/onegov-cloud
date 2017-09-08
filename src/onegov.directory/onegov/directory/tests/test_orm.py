@@ -1,10 +1,12 @@
 import pytest
 
+from onegov.core.utils import binary_to_dictionary
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryEntryCollection
 from onegov.directory.errors import ValidationError
+from onegov.file import File, FileSet
 
 
 def test_directory_title_and_order(session):
@@ -187,3 +189,35 @@ def test_validation_error(session):
 
     with pytest.raises(ValidationError):
         places.add(values={'name': ''})
+
+
+def test_fileset(session):
+    press_releases = DirectoryCollection(session).add(
+        title="Press Releases",
+        structure="""
+            Title *= ___
+            File = *.txt
+        """,
+        configuration=DirectoryConfiguration(
+            title=('title', ),
+            order=('title', ),
+        )
+    )
+
+    iphone_found = press_releases.add(values=dict(
+        title="iPhone Found in Ancient Ruins in the Andes",
+        file=binary_to_dictionary(b'just kidding', 'press-release.txt')
+    ))
+
+    assert len(iphone_found.fileset.files) == 1
+    assert len(iphone_found.files) == 1
+    assert iphone_found.values['file']['id'] == iphone_found.files[0].id
+
+    assert session.query(FileSet).count() == 1
+    assert session.query(File).count() == 1
+
+    session.delete(iphone_found)
+    session.flush()
+
+    assert session.query(FileSet).count() == 0
+    assert session.query(File).count() == 0
