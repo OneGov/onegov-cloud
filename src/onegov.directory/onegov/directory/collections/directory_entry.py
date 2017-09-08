@@ -75,7 +75,7 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
 
     @property
     def available_filters(self):
-        keywords = self.directory.configuration.keywords
+        keywords = self.directory.configuration.keywords or tuple()
         fields = {f.id: f for f in self.directory.fields if f.id in keywords}
 
         return (
