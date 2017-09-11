@@ -1,5 +1,6 @@
 """ The authentication views. """
 
+from morepath import redirect
 from onegov.core.security import Personal
 from onegov.core.security import Public
 from onegov.core.templates import render_template
@@ -115,12 +116,14 @@ def handle_password_reset_request(self, request, form):
 )
 def handle_password_reset(self, request, form):
 
+    layout = Layout(self, request)
     callout = None
     show_form = True
     if form.submitted(request):
         if form.update_password(request):
             show_form = False
-            callout = _("Password changed.")
+            request.message(_("Password changed."), 'success')
+            return redirect(layout.homepage_link)
         else:
             form.error_message = _(
                 "Wrong username or password reset link not valid any more."
@@ -135,7 +138,7 @@ def handle_password_reset(self, request, form):
         form.token.data = request.params['token']
 
     return {
-        'layout': Layout(self, request),
+        'layout': layout,
         'title': _('Reset password'),
         'form': form,
         'show_form': show_form,

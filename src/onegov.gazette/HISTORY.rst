@@ -10,6 +10,9 @@ Changelog
 - Redirects to the manage notices view when working with notices.
   [msom]
 
+- Redirects to the login screen after setting the password.
+  [msom]
+
 1.3.0 (2017-09-05)
 ~~~~~~~~~~~~~~~~~~~
 

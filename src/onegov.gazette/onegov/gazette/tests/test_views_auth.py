@@ -74,7 +74,7 @@ def test_view_reset_password(gazette_app):
 
     reset_page.form['email'] = 'admin@example.org'
     reset_page.form['password'] = 'new_password'
-    assert "Passwort geändert" in reset_page.form.submit()
+    assert "Passwort geändert" in reset_page.form.submit().follow().follow()
 
     reset_page.form['email'] = 'admin@example.org'
     reset_page.form['password'] = 'new_password'
