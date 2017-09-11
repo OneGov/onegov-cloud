@@ -15,7 +15,7 @@ def test_view_groups(gazette_app):
     # add a group
     manage = manage.click("Neu")
     manage.form['name'] = "Gruppe XY"
-    manage = manage.form.submit().follow()
+    manage = manage.form.submit().maybe_follow()
     assert "Gruppe hinzugefügt." in manage
     assert "Gruppe XY" in manage
     assert "Bearbeiten" in manage
@@ -25,7 +25,7 @@ def test_view_groups(gazette_app):
     # edit group
     manage = manage.click("Bearbeiten", index=0)
     manage.form['name'] = "Gruppe YZ"
-    manage = manage.form.submit().follow()
+    manage = manage.form.submit().maybe_follow()
     assert "Gruppe geändert." in manage
     assert "Gruppe XY" not in manage
     assert "Gruppe YZ" in manage
@@ -39,7 +39,7 @@ def test_view_groups(gazette_app):
     }['Gruppe YZ']
     manage.form['name'] = 'User A'
     manage.form['email'] = 'user_a@example.com'
-    manage = manage.form.submit().follow()
+    manage = manage.form.submit().maybe_follow()
     assert "Benutzer hinzugefügt." in manage
 
     # delete group
@@ -55,11 +55,11 @@ def test_view_groups(gazette_app):
     # delete user and group
     manage = client.get('/user/user_a%40example.com/edit')
     manage.form['group'] = ''
-    manage = manage.form.submit().follow()
+    manage = manage.form.submit().maybe_follow()
 
     manage = client.get('/groups')
     assert "Löschen" in manage
-    manage = manage.click("Löschen").form.submit().follow()
+    manage = manage.click("Löschen").form.submit().maybe_follow()
     assert "Gruppe gelöscht." in manage
     assert "TestGroup" in manage
     assert "Gruppe YZ" not in manage
@@ -71,7 +71,7 @@ def test_view_groups_permissions(gazette_app):
     login_admin(client)
     manage = client.get('/groups').click("Neu")
     manage.form['name'] = 'XY'
-    manage = manage.form.submit().follow()
+    manage = manage.form.submit().maybe_follow()
     edit_link = manage.click('Bearbeiten', index=0).request.url
     delete_link = manage.click('Löschen', index=0).request.url
 

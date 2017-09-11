@@ -16,22 +16,22 @@ def test_view_login_logout(gazette_app):
     client = Client(gazette_app)
 
     for user in ('admin', 'editor1', 'editor2', 'editor3', 'publisher'):
-        login = client.get('/').follow()
+        login = client.get('/').maybe_follow()
         login.form['username'] = '{}@example.org'.format(user)
         login.form['password'] = 'hunter1'
 
         assert "Unbekannter Benutzername oder falsches Passwort" \
             in login.form.submit()
-        assert 'Anmelden' in client.get('/').follow()
+        assert 'Anmelden' in client.get('/').maybe_follow()
 
         login.form['password'] = 'hunter2'
-        page = login.form.submit().follow().follow()
+        page = login.form.submit().maybe_follow()
 
         assert 'Angemeldet als {}@example.org'.format(user) in page
         assert 'Abmelden' in page
         assert 'Anmelden' not in page
 
-        page = client.get('/').follow().click('Abmelden').follow().follow()
+        page = client.get('/').maybe_follow().click('Abmelden').maybe_follow()
         assert 'Sie sind angemeldet' not in page
         assert 'Abmelden' not in page
         assert 'Anmelden' in page
@@ -74,7 +74,7 @@ def test_view_reset_password(gazette_app):
 
     reset_page.form['email'] = 'admin@example.org'
     reset_page.form['password'] = 'new_password'
-    assert "Passwort geändert" in reset_page.form.submit().follow().follow()
+    assert "Passwort geändert" in reset_page.form.submit().maybe_follow()
 
     reset_page.form['email'] = 'admin@example.org'
     reset_page.form['password'] = 'new_password'
@@ -89,5 +89,5 @@ def test_view_reset_password(gazette_app):
 
     login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = 'new_password'
-    login_page = login_page.form.submit().follow()
-    assert "Angemeldet als admin@example.org" in login_page.follow()
+    login_page = login_page.form.submit().maybe_follow()
+    assert "Angemeldet als admin@example.org" in login_page.maybe_follow()

@@ -361,7 +361,7 @@ def test_view_notices_statistics(gazette_app):
         )[group]
         with patch('onegov.gazette.views.users.random_password') as password:
             password.return_value = 'hunter2'
-            manage.form.submit().follow()
+            manage.form.submit().maybe_follow()
 
     user_1 = Client(gazette_app)
     user_2 = Client(gazette_app)
@@ -400,7 +400,7 @@ def test_view_notices_statistics(gazette_app):
             manage.form['category'] = category
             manage.form['text'] = "Text"
             manage.form['issues'] = issues
-            manage = manage.form.submit().follow()
+            manage = manage.form.submit().maybe_follow()
             if submit:
                 manage.click("Einreichen").form.submit()
 
@@ -514,11 +514,13 @@ def test_view_notices_update(gazette_app):
         principal.organizations['100'] = "Federal Chancellery"
         gazette_app.cache.set('principal', principal)
 
-        manage = client.get('/notices/submitted/update').form.submit().follow()
+        manage = client.get('/notices/submitted/update')
+        manage = manage.form.submit().maybe_follow()
         assert "Meldungen aktualisiert." in manage
         assert "State Chancellery" in client.get('/notice/erneuerungswahlen')
 
-        manage = client.get('/notices/accepted/update').form.submit().follow()
+        manage = client.get('/notices/accepted/update')
+        manage = manage.form.submit().maybe_follow()
         assert "Meldungen aktualisiert." in manage
         manage = client.get('/notice/erneuerungswahlen')
         assert "State Chancellery" not in manage

@@ -30,7 +30,7 @@ def test_view_users(gazette_app):
     manage.form['role'] = 'editor'
     manage.form['name'] = "New user"
     manage.form['email'] = "new_user@example.org"
-    manage = manage.form.submit().follow()
+    manage = manage.form.submit().maybe_follow()
     assert "Benutzer hinzugefügt." in manage
     assert "new_user@example.org" in manage
 
@@ -43,7 +43,7 @@ def test_view_users(gazette_app):
     # make it an editor
     manage = manage.click("Bearbeiten", href="new_user")
     manage.form['role'] = 'member'
-    manage = manage.form.submit().follow()
+    manage = manage.form.submit().maybe_follow()
     assert "Benutzer geändert." in manage
 
     # try to change the email adress to an already taken one
@@ -53,8 +53,8 @@ def test_view_users(gazette_app):
     assert "Ein Benutzer mit dieser E-Mail-Adresse existiert bereits" in manage
 
     # delete user
-    manage = client.get('/users')
-    manage = manage.click("Löschen", href="new_user").form.submit().follow()
+    manage = client.get('/users').click("Löschen", href="new_user")
+    manage = manage.form.submit().maybe_follow()
     assert "Benutzer gelöscht." in manage
     assert "new_user@example.org" not in manage
 

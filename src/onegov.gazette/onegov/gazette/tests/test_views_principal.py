@@ -7,13 +7,13 @@ from webtest import TestApp as Client
 def test_view_principal(gazette_app):
     client = Client(gazette_app)
 
-    assert 'auth/login' in client.get('/').follow().request.url
+    assert 'auth/login' in client.get('/').maybe_follow().request.url
 
     login_admin(client)
-    assert '/users' in client.get('/').follow().request.url
+    assert '/users' in client.get('/').maybe_follow().request.url
 
     login_publisher(client)
-    assert '/notices' in client.get('/').follow().request.url
+    assert '/notices' in client.get('/').maybe_follow().request.url
 
     login_editor_1(client)
-    assert '/dashboard' in client.get('/').follow().request.url
+    assert '/dashboard' in client.get('/').maybe_follow().request.url
