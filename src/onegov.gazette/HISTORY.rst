@@ -7,6 +7,9 @@ Changelog
 - Adds a link to the rejected notice in the rejected email.
   [msom]
 
+- Redirects to the manage notices view when working with notices.
+  [msom]
+
 1.3.0 (2017-09-05)
 ~~~~~~~~~~~~~~~~~~~
 

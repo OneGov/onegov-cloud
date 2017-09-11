@@ -32,7 +32,7 @@ def submit_notice(user, slug, unable=False, forbidden=False):
     else:
         manage = user.get(url)
         manage = manage.form.submit()
-        assert "Meldung eingereicht" in manage.follow().follow()
+        assert "Meldung eingereicht" in manage.follow()
 
 
 def accept_notice(user, slug, unable=False, forbidden=False):
@@ -44,7 +44,7 @@ def accept_notice(user, slug, unable=False, forbidden=False):
     else:
         manage = user.get(url)
         manage = manage.form.submit()
-        assert "Meldung angenommen" in manage.follow().follow()
+        assert "Meldung angenommen" in manage.follow()
 
 
 def reject_notice(user, slug, unable=False, forbidden=False):
@@ -57,7 +57,7 @@ def reject_notice(user, slug, unable=False, forbidden=False):
         manage = user.get(url)
         manage.form['comment'] = 'XYZ'
         manage = manage.form.submit()
-        assert "Meldung zurückgewiesen" in manage.follow().follow()
+        assert "Meldung zurückgewiesen" in manage.follow()
 
 
 def edit_notice(user, slug, unable=False, forbidden=False, **kwargs):
@@ -435,7 +435,7 @@ def test_view_notice_delete(gazette_app):
             manage.form.submit()
 
             manage = user.get('/notice/erneuerungswahlen/delete')
-            manage = manage.form.submit().follow().follow()
+            manage = manage.form.submit().follow()
             assert "Meldung gelöscht." in manage
 
         # delete a submitted notice
@@ -454,7 +454,7 @@ def test_view_notice_delete(gazette_app):
             assert manage.forms == {}
 
             manage = admin.get('/notice/erneuerungswahlen/delete')
-            manage.form.submit().follow().follow()
+            manage.form.submit().follow()
 
         # delete a rejected notice
         for user in (editor, publisher):
@@ -470,7 +470,7 @@ def test_view_notice_delete(gazette_app):
             reject_notice(publisher, 'erneuerungswahlen')
 
             manage = user.get('/notice/erneuerungswahlen/delete')
-            manage = manage.form.submit().follow().follow()
+            manage = manage.form.submit().follow()
             assert "Meldung gelöscht." in manage
 
         # delete an accepted notice
@@ -490,7 +490,7 @@ def test_view_notice_delete(gazette_app):
             assert manage.forms == {}
 
             manage = admin.get('/notice/erneuerungswahlen/delete')
-            manage.form.submit().follow().follow()
+            manage.form.submit().follow()
 
 
 def test_view_notice_changelog(gazette_app):
