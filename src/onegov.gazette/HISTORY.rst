@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.1 (2017-09-11)
+~~~~~~~~~~~~~~~~~~~
 
 - Improves styles for IE.
   [msom]
