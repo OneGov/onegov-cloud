@@ -4,6 +4,9 @@ Changelog
 - Improves styles for IE.
   [msom]
 
+- Adds a link to the rejected notice in the rejected email.
+  [msom]
+
 1.3.0 (2017-09-05)
 ~~~~~~~~~~~~~~~~~~~
 

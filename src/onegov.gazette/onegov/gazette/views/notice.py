@@ -408,7 +408,8 @@ def reject_notice(self, request, form):
                     )),
                     'model': self,
                     'comment': form.comment.data,
-                    'layout': MailLayout(self, request)
+                    'layout': MailLayout(self, request),
+                    'url': request.link(self)
                 }
             )
         )

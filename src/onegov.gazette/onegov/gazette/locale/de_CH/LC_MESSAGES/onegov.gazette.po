@@ -191,7 +191,7 @@ msgid "Dear Sirs and Madams,"
 msgstr "Sehr geehrte Damen und Herren,"
 
 msgid "Your official notice has been rejected:"
-msgstr "Ihr Inserat für den amtlichen Teil des Amtsblatts wurde zurückgewiesen"
+msgstr "Ihr Inserat für den amtlichen Teil des Amtsblatts wurde zurückgewiesen:"
 
 msgid "Yes"
 msgstr "Ja"
