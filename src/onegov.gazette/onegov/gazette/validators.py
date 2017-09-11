@@ -14,7 +14,6 @@ class UniqueUsername(object):
         self.default_field = default_field
 
     def __call__(self, form, field):
-        # import pdb; pdb.set_trace()
         query = form.request.app.session().query(User.username)
         query = query.filter(User.username == field.data)
         if self.default_field and hasattr(form, self.default_field):

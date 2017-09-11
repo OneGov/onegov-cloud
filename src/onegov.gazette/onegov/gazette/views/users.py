@@ -10,6 +10,7 @@ from onegov.gazette.layout import Layout
 from onegov.gazette.layout import MailLayout
 from onegov.user import User
 from onegov.user import UserCollection
+from onegov.user.utils import password_reset_url
 
 
 @GazetteApp.html(
@@ -61,7 +62,11 @@ def create_user(self, request, form):
             realname=form.name.data
         )
         form.update_model(user)
-        url = request.link(request.app.principal, name='request-password')
+        url = password_reset_url(
+            user,
+            request,
+            request.link(request.app.principal, name='reset-password')
+        )
         request.app.send_email(
             subject=request.translate(_("User account created")),
             receivers=(user.username, ),
@@ -104,7 +109,6 @@ def edit_user(self, request, form):
     """
 
     layout = Layout(self, request)
-    # import pdb; pdb.set_trace()
 
     if form.submitted(request):
         form.update_model(self)

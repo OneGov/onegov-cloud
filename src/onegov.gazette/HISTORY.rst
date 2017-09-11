@@ -13,6 +13,9 @@ Changelog
 - Redirects to the login screen after setting the password.
   [msom]
 
+- Sends directly the password reset link when creating a user.
+  [msom]
+
 1.3.0 (2017-09-05)
 ~~~~~~~~~~~~~~~~~~~
 
