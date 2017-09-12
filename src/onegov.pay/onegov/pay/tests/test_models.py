@@ -62,6 +62,8 @@ def test_payment_with_different_bases(postgres_dsn):
     assert kebab.payment.amount == 100
     assert times.payment.amount == 200
 
+    mgr.dispose()
+
 
 def test_payment_referential_integrity(postgres_dsn):
 
@@ -196,3 +198,5 @@ def test_manual_payment(postgres_dsn):
 
     payments = session.query(Payment).all()
     assert [t.title for p in payments for t in p.linked_products] == ["Car"]
+
+    mgr.dispose()

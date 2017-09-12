@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Switch to onegov.core's generic association implementation.
+  [href]
+
 0.1.1 (2017-07-05)
 ~~~~~~~~~~~~~~~~~~~~~
 

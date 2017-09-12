@@ -16,7 +16,6 @@ def reset_payment():
         cls = classes.pop()
 
         for key in Payment.registered_links:
-            delattr(cls, key)
             del cls.__mapper__._props[key]
 
         classes.extend(cls.__subclasses__())

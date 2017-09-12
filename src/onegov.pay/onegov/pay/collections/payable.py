@@ -1,6 +1,6 @@
 from onegov.core.collection import Pagination
+from onegov.core.orm.utils import QueryChain
 from onegov.pay import Payment
-from onegov.pay.utils import QueryChain
 from sqlalchemy.orm import joinedload
 
 
