@@ -1,9 +1,10 @@
 from depot.fields.sqlalchemy import UploadedFileField as UploadedFileFieldBase
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
+from onegov.core.orm.abstract import Associable
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.file.filters import OnlyIfImage, WithThumbnailFilter
 from onegov.file.attachments import ProcessedUploadedFile
+from onegov.file.filters import OnlyIfImage, WithThumbnailFilter
 from sqlalchemy import Column, Text
 from sqlalchemy_utils import observes
 
@@ -22,7 +23,7 @@ class UploadedFileField(UploadedFileFieldBase):
         return dialect.type_descriptor(Text())
 
 
-class File(Base, TimestampMixin):
+class File(Base, Associable, TimestampMixin):
     """ A general file (image, document, pdf, etc), referenced in the database.
 
     Thanks to the use of `Depot <http://depot.readthedocs.io>`_ files

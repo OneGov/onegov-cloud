@@ -2,14 +2,25 @@ import transaction
 import pytest
 
 from io import BytesIO
-from onegov.file import File, FileSet
+from onegov.core.orm import Base
+from onegov.file import File, FileSet, AssociatedFiles
 from onegov.file.models.fileset import file_to_set_associations
 from onegov_testing.utils import create_image
 from PIL import Image
+from sqlalchemy import Column
+from sqlalchemy import Integer
+from sqlalchemy import Text
 
 
 class PolymorphicFile(File):
     __mapper_args__ = {'polymorphic_identity': 'polymorphic'}
+
+
+class Blogpost(Base, AssociatedFiles):
+    __tablename__ = 'blogposts'
+
+    id = Column(Integer, primary_key=True)
+    text = Column(Text, nullable=False)
 
 
 @pytest.mark.parametrize('cls', [File, PolymorphicFile])
@@ -184,3 +195,25 @@ def test_determine_unknown_svg_size(session, temporary_path):
     # use the default max size as the size if we can't determine one
     logo = session.query(File).order_by(File.name).one()
     assert logo.reference.size == ['1024px', '1024px']
+
+
+def test_associated_files(session):
+    post = Blogpost(
+        text="My interview at <company>",
+        files=[File(name='frowney.png', reference=create_image(1024, 1024))]
+    )
+
+    session.add(post)
+    session.flush()
+
+    assert len(post.files) == 1
+    assert post.files[0].name == 'frowney.png'
+    assert post.files[0].reference.size == ('1024px', '1024px')
+
+    assert session.query(File).one().linked_blogposts == [post]
+    assert session.query(File).one().links.all() == (post, )
+
+    session.delete(post)
+    session.flush()
+
+    assert session.query(File).count() == 0

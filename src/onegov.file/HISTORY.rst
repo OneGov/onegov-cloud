@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to link a bunch of files to any ORM model.
+  [href]
+
 0.3.2 (2017-01-26)
 ~~~~~~~~~~~~~~~~~~~
 
