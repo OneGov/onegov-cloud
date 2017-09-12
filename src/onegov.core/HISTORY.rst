@@ -1,5 +1,12 @@
 Changelog
 ---------
+
+- Adds generic associations to the ORM library.
+  
+  See ``associable.py`` for more information. This feature should be
+  considered experimental.
+  [href] 
+
 0.47.0 (2017-09-08)
 ~~~~~~~~~~~~~~~~~~~
 

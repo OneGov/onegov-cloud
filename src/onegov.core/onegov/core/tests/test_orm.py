@@ -13,6 +13,7 @@ from onegov.core.orm import (
     ModelBase, SessionManager, translation_hybrid, find_models
 )
 from onegov.core.orm.abstract import AdjacencyList
+from onegov.core.orm.abstract import Associable, associated
 from onegov.core.orm.mixins import (
     meta_property, content_property, ContentMixin, TimestampMixin
 )
@@ -1433,3 +1434,187 @@ def test_orm_cache_flush(postgres_dsn):
     assert app.session().dirty
     assert app.bar.title == 'Sup'
     assert app.foo.title == 'Sup'
+
+
+def test_associable_one_to_one(postgres_dsn):
+    Base = declarative_base(cls=ModelBase)
+
+    class Address(Base, Associable):
+        __tablename__ = 'adresses'
+
+        id = Column(Integer, primary_key=True)
+        town = Column(Text, nullable=False)
+
+    class Addressable(object):
+        address = associated(Address, 'address', 'one-to-one')
+
+    class Company(Base, Addressable):
+        __tablename__ = 'companies'
+
+        id = Column(Integer, primary_key=True)
+        name = Column(Text, nullable=False)
+
+    class Person(Base, Addressable):
+        __tablename__ = 'people'
+
+        id = Column(Integer, primary_key=True)
+        name = Column(Text, nullable=False)
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('testing')
+
+    session = mgr.session()
+
+    session.add(Company(
+        name='Seantis GmbH',
+        address=Address(town='6004 Luzern')
+    ))
+
+    session.add(Person(
+        name='Denis Krienbühl',
+        address=Address(town='6343 Rotkreuz')
+    ))
+
+    seantis = session.query(Company).first()
+    assert seantis.address.town == "6004 Luzern"
+
+    denis = session.query(Person).first()
+    assert denis.address.town == "6343 Rotkreuz"
+
+    addresses = session.query(Address).all()
+    assert addresses[0].links.count() == 1
+    assert addresses[0].links.first().name == "Seantis GmbH"
+    assert len(addresses[0].linked_companies) == 1
+    assert len(addresses[0].linked_people) == 0
+
+    assert addresses[1].links.count() == 1
+    assert addresses[1].links.first().name == "Denis Krienbühl"
+    assert len(addresses[1].linked_companies) == 0
+    assert len(addresses[1].linked_people) == 1
+
+    session.delete(denis)
+    session.flush()
+
+    assert session.query(Address).count() == 1
+
+    session.delete(addresses[0])
+    session.flush()
+
+    assert session.query(Company).first()
+
+
+def test_associable_one_to_many(postgres_dsn):
+    Base = declarative_base(cls=ModelBase)
+
+    class Address(Base, Associable):
+        __tablename__ = 'adresses'
+
+        id = Column(Integer, primary_key=True)
+        town = Column(Text, nullable=False)
+
+    class Addressable(object):
+        addresses = associated(Address, 'addresses', 'one-to-many')
+
+    class Company(Base, Addressable):
+        __tablename__ = 'companies'
+
+        id = Column(Integer, primary_key=True)
+        name = Column(Text, nullable=False)
+
+    class Person(Base, Addressable):
+        __tablename__ = 'people'
+
+        id = Column(Integer, primary_key=True)
+        name = Column(Text, nullable=False)
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('testing')
+
+    session = mgr.session()
+
+    session.add(Company(
+        name='Seantis GmbH',
+        addresses=[Address(town='6004 Luzern')]
+    ))
+
+    session.add(Person(
+        name='Denis Krienbühl',
+        addresses=[Address(town='6343 Rotkreuz')]
+    ))
+
+    seantis = session.query(Company).first()
+    assert seantis.addresses[0].town == "6004 Luzern"
+
+    denis = session.query(Person).first()
+    assert denis.addresses[0].town == "6343 Rotkreuz"
+
+    addresses = session.query(Address).all()
+
+    assert addresses[0].links.count() == 1
+    assert addresses[0].links.first().name == "Seantis GmbH"
+    assert len(addresses[0].linked_companies) == 1
+    assert len(addresses[0].linked_people) == 0
+
+    assert addresses[1].links.count() == 1
+    assert addresses[1].links.first().name == "Denis Krienbühl"
+    assert len(addresses[1].linked_companies) == 0
+    assert len(addresses[1].linked_people) == 1
+
+    session.delete(denis)
+    session.flush()
+
+    assert session.query(Address).count() == 1
+
+
+def test_associable_many_to_many(postgres_dsn):
+    Base = declarative_base(cls=ModelBase)
+
+    class Address(Base, Associable):
+        __tablename__ = 'adresses'
+
+        id = Column(Integer, primary_key=True)
+        town = Column(Text, nullable=False)
+
+    class Addressable(object):
+        addresses = associated(Address, 'addresses', 'many-to-many')
+
+    class Company(Base, Addressable):
+        __tablename__ = 'companies'
+
+        id = Column(Integer, primary_key=True)
+        name = Column(Text, nullable=False)
+
+    class Person(Base, Addressable):
+        __tablename__ = 'people'
+
+        id = Column(Integer, primary_key=True)
+        name = Column(Text, nullable=False)
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('testing')
+
+    session = mgr.session()
+
+    session.add(Company(
+        name='Seantis GmbH',
+        addresses=[Address(town='6004 Luzern')]
+    ))
+
+    session.add(Person(
+        name='Denis Krienbühl',
+        addresses=session.query(Company).first().addresses
+    ))
+
+    seantis = session.query(Company).first()
+    assert seantis.addresses[0].town == "6004 Luzern"
+
+    denis = session.query(Person).first()
+    assert denis.addresses[0].town == "6004 Luzern"
+
+    addresses = session.query(Address).all()
+    assert addresses[0].links.count() == 2
+
+    session.delete(denis)
+    session.flush()
+
+    assert session.query(Address).count() == 1
