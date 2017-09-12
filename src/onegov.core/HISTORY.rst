@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.48.0 (2017-09-12)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds generic associations to the ORM library.
   
