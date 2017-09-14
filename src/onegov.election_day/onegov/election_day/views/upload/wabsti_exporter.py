@@ -87,7 +87,7 @@ def view_upload_wabsti_vote(self, request):
 
         entities = self.entities.get(vote.date.year, {})
         errors[vote.id] = import_vote_wabstic(
-            vote, item.district, item.number, entities,
+            vote, entities, item.district, item.number,
             form.sg_geschaefte.raw_data[0].file,
             form.sg_geschaefte.data['mimetype'],
             form.sg_gemeinden.raw_data[0].file,

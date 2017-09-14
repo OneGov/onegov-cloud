@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes upload of wabsti files.
+  [msom]
+
 1.15.7 (2017-08-29)
 ~~~~~~~~~~~~~~~~~~~
 
