@@ -555,34 +555,8 @@ form {
 
 
 /*
-    Preview
-*/
-.preview {
-    h2 {
-        font-size: 1.25em;
-        font-weight: 500;
-    }
-}
-
-/*
-    Changelog
-*/
-table.changes {
-    .event {
-        display: block;
-    }
-
-    .text {
-        display: block;
-        font-style: italic;
-        margin-top: .5em;
-    }
-}
-
-/*
     Print
 */
-
 @media print {
     p,
     td,
@@ -605,20 +579,39 @@ table.changes {
         max-width: 100%;
         width: 100%;
     }
+}
 
-    .preview {
-        * {
-            font-family: Arial, Helvetica, sans-serif !important;
-            font-size: 1em !important;
-        }
+/*
+    Preview
+*/
+.preview {
+    * {
+        font-family: Arial, Helvetica, sans-serif !important;
+        font-size: 10pt !important;
+    }
 
-        h2 {
-            font-size: 1.25em !important;
-        }
+    h2 {
+        font-size: 14pt !important;
+        font-weight: 500;
+    }
 
-        ul {
-            list-style: square outside url('data:image/gif;base64,R0lGODlhBQAKAIABAAAAAP///yH5BAEAAAEALAAAAAAFAAoAAAIIjI+ZwKwPUQEAOw==');
-        }
+    ul {
+        list-style: square outside url('data:image/gif;base64,R0lGODlhBQAKAIABAAAAAP///yH5BAEAAAEALAAAAAAFAAoAAAIIjI+ZwKwPUQEAOw==');
+    }
+}
+
+/*
+    Changelog
+*/
+table.changes {
+    .event {
+        display: block;
+    }
+
+    .text {
+        display: block;
+        font-style: italic;
+        margin-top: .5em;
     }
 }
 
