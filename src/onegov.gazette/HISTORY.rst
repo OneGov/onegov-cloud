@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves print styles.
+  [msom]
+
 1.3.1 (2017-09-11)
 ~~~~~~~~~~~~~~~~~~~
 

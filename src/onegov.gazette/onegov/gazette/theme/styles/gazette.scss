@@ -605,6 +605,21 @@ table.changes {
         max-width: 100%;
         width: 100%;
     }
+
+    .preview {
+        * {
+            font-family: Arial, Helvetica, sans-serif !important;
+            font-size: 1em !important;
+        }
+
+        h2 {
+            font-size: 1.25em !important;
+        }
+
+        ul {
+            list-style: square outside url('data:image/gif;base64,R0lGODlhBQAKAIABAAAAAP///yH5BAEAAAEALAAAAAAFAAoAAAIIjI+ZwKwPUQEAOw==');
+        }
+    }
 }
 
 
