@@ -969,7 +969,7 @@ def http_conflict_tween_factory(app, handler):
     return http_conflict_tween
 
 
-@Framework.tween_factory(over=http_conflict_tween_factory)
+@Framework.tween_factory(under=http_conflict_tween_factory)
 def current_language_tween_factory(app, handler):
     def current_language_tween(request):
         """ Set the current language on the session manager for each request,

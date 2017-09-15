@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Sets the language in the ORM after the transaction has begun, not before.
+  [href]
+
 0.48.0 (2017-09-12)
 ~~~~~~~~~~~~~~~~~~~
 
