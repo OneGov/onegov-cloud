@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds french translation.
+  [href]
+
 - Moves the binary as dictionary encoding to onegov.core.
   [href]
 
