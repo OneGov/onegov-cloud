@@ -52,6 +52,7 @@ class Organisation(Base, TimestampMixin):
     bank_payment_order_type = meta_property('bank_payment_order_type')
     bank_esr_participant_number = meta_property('bank_esr_participant_number')
     square_logo_url = meta_property('square_logo_url')
+    locales = meta_property('locales')
 
     @contact.setter
     def contact(self, value):

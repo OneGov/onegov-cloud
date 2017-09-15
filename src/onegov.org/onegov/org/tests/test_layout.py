@@ -159,6 +159,7 @@ def test_template_layout(postgres_dsn):
         org = Mock()
         org.name = 'Govikon'
         org.theme_options = theme_options
+        org.locales = ['de_CH']
 
         # disable LibresIntegration for this test
         def configure_libres(self, **cfg):

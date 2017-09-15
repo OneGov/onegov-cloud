@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-09-01 15:51+0200\n"
+"POT-Creation-Date: 2017-09-15 13:48+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -769,6 +769,9 @@ msgstr "Antworten an automatisch generierte E-Mails gehen an diese Adresse."
 msgid "Primary Color"
 msgstr "Primärfarbe"
 
+msgid "Languages"
+msgstr "Sprachen"
+
 msgid "Bank Account (IBAN)"
 msgstr "Bankkonto (IBAN)"
 
@@ -870,6 +873,12 @@ msgstr "Erweitert"
 
 msgid "A beneficiary is required if a bank account is given."
 msgstr "Ein Begünstigter ist nötig wenn ein Bank Konto angegeben wird."
+
+msgid "German"
+msgstr "Deutsch"
+
+msgid "French"
+msgstr "Französisch"
 
 msgid "Basic"
 msgstr "Einfach"

@@ -4,6 +4,7 @@ from lxml import etree
 from onegov.form import Form
 from onegov.form.core import with_options
 from onegov.form.validators import Stdnum
+from onegov.form.fields import MultiCheckboxField
 from onegov.gis import CoordinatesField
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
@@ -50,6 +51,15 @@ class SettingsForm(Form):
     primary_color = ColorField(
         label=_("Primary Color"),
         fieldset=_("General")
+    )
+    locales = MultiCheckboxField(
+        label=_("Languages"),
+        fieldset=_("General"),
+        choices=(
+            ('de_CH', _("German")),
+            ('fr_CH', _("French"))
+        ),
+        validators=[validators.InputRequired()]
     )
     bank_account = StringField(
         label=_("Bank Account (IBAN)"),

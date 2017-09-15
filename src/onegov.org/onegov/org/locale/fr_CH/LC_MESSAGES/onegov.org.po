@@ -1,0 +1,2215 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE 1.0\n"
+"POT-Creation-Date: 2017-09-15 13:48+0200\n"
+"PO-Revision-Date: 2017-03-02 09:52+0100\n"
+"Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
+"Language-Team: French\n"
+"Language: fr_CH\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Lingua 3.12\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.8.12\n"
+
+#, python-format
+msgid "${org} OneGov Cloud Status"
+msgstr ""
+
+msgid "General"
+msgstr ""
+
+#, python-format
+msgid "${org} Reservation Overview"
+msgstr ""
+
+msgid "Login"
+msgstr ""
+
+msgid "Timeline"
+msgstr ""
+
+msgid "Files"
+msgstr ""
+
+msgid "Images"
+msgstr ""
+
+msgid "Payments"
+msgstr ""
+
+msgid "Management"
+msgstr ""
+
+msgid "Open Tickets"
+msgstr ""
+
+msgid "Pending Tickets"
+msgstr ""
+
+msgid "Closed Tickets"
+msgstr ""
+
+msgid "Register"
+msgstr ""
+
+msgid "Payment Provider"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Users"
+msgstr ""
+
+msgid "Tickets"
+msgstr ""
+
+msgid "Ticket"
+msgstr ""
+
+msgid "User Profile"
+msgstr ""
+
+msgid "Logout"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "This site is hidden from the general public"
+msgstr ""
+
+msgid "Mo"
+msgstr ""
+
+msgid "Tu"
+msgstr ""
+
+msgid "We"
+msgstr ""
+
+msgid "Th"
+msgstr ""
+
+msgid "Fr"
+msgstr ""
+
+msgid "Sa"
+msgstr ""
+
+msgid "Su"
+msgstr ""
+
+msgid "Homepage"
+msgstr ""
+
+msgid "Forms"
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
+msgid "People"
+msgstr ""
+
+msgid "Reservations"
+msgstr ""
+
+msgid "Notifications"
+msgstr ""
+
+msgid "Edit allocation"
+msgstr ""
+
+#, python-format
+msgid "Every ${days} until ${end}"
+msgstr ""
+
+msgid "Events"
+msgstr ""
+
+msgid "Newsletter"
+msgstr ""
+
+msgid "Subscribers"
+msgstr ""
+
+msgid "Photo Albums"
+msgstr ""
+
+msgid "Usermanagement"
+msgstr ""
+
+msgid "Exports"
+msgstr ""
+
+msgid "Payment Providers"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "New"
+msgstr ""
+
+msgid "No"
+msgstr ""
+
+msgid "This form can't be deleted."
+msgstr ""
+
+msgid ""
+"There are submissions associated with the form. Those need to be removed "
+"first."
+msgstr ""
+
+msgid "Add"
+msgstr ""
+
+msgid "New Note"
+msgstr ""
+
+msgid "Mark as paid"
+msgstr ""
+
+msgid "Mark as unpaid"
+msgstr ""
+
+msgid "Capture Payment"
+msgstr ""
+
+msgid "Recipients"
+msgstr ""
+
+msgid "Clean up"
+msgstr ""
+
+msgid "Occupancy"
+msgstr ""
+
+msgid "Export"
+msgstr ""
+
+msgid "Send"
+msgstr ""
+
+msgid "Manage images"
+msgstr ""
+
+msgid "Choose images"
+msgstr ""
+
+msgid "Synchronise"
+msgstr ""
+
+msgid "Yes"
+msgstr ""
+
+msgid "Do you really want to delete this form?"
+msgstr ""
+
+msgid "This cannot be undone."
+msgstr ""
+
+msgid "Delete form"
+msgstr ""
+
+msgid "Accept ticket"
+msgstr ""
+
+msgid "Refund Payment"
+msgstr ""
+
+msgid "This resource can't be deleted."
+msgstr ""
+
+msgid "There are existing reservations associated with this resource"
+msgstr ""
+
+msgid "This event can't be deleted."
+msgstr ""
+
+msgid "To remove this event, go to the ticket and reject it."
+msgstr ""
+
+msgid "Create Signup Link"
+msgstr ""
+
+msgid "Do you really want to delete this person?"
+msgstr ""
+
+msgid "Delete person"
+msgstr ""
+
+msgid "Close ticket"
+msgstr ""
+
+msgid "Do you really want capture the payment?"
+msgstr ""
+
+msgid ""
+"This usually happens automatically, so there is no reason not do capture the "
+"payment."
+msgstr ""
+
+msgid "Capture payment"
+msgstr ""
+
+msgid "Do you really want to delete this resource?"
+msgstr ""
+
+msgid "Delete resource"
+msgstr ""
+
+msgid "Do you really want to delete this event?"
+msgstr ""
+
+msgid "Delete event"
+msgstr ""
+
+msgid "Delete newsletter"
+msgstr ""
+
+msgid "Delete photo album"
+msgstr ""
+
+msgid "Form"
+msgstr ""
+
+msgid "Person"
+msgstr ""
+
+msgid "Reopen ticket"
+msgstr ""
+
+#, python-format
+msgid "Do you really want to refund ${amount}?"
+msgstr ""
+
+#, python-format
+msgid "Refund ${amount}"
+msgstr ""
+
+msgid "Room"
+msgstr ""
+
+msgid "Daypass"
+msgstr ""
+
+msgid "E-Mail Recipient"
+msgstr ""
+
+msgid "Do you really want to delete this allocation?"
+msgstr ""
+
+msgid "Delete allocation"
+msgstr ""
+
+msgid "Photo Album"
+msgstr ""
+
+msgid "User"
+msgstr ""
+
+msgid "Stripe Connect"
+msgstr ""
+
+msgid "Not a valid color."
+msgstr ""
+
+msgid "Admins"
+msgstr ""
+
+msgid "Editors"
+msgstr ""
+
+msgid "Members"
+msgstr ""
+
+msgid "A conflicting allocation exists for the requested time period."
+msgstr ""
+
+msgid "A conflicting reservation exists for the requested time period."
+msgstr ""
+
+msgid "An existing reservation would be affected by the requested change."
+msgstr ""
+
+msgid "A pending reservation would be affected by the requested change."
+msgstr ""
+
+msgid "The requested period is no longer available."
+msgstr ""
+
+msgid "No reservable slot found."
+msgstr ""
+
+msgid "Reservations can't be made for more than 24 hours at a time."
+msgstr ""
+
+msgid "The given reservation paramters are invalid."
+msgstr ""
+
+msgid "The given reservation token is invalid."
+msgstr ""
+
+msgid "The requested number of reservations is higher than allowed."
+msgstr ""
+
+msgid "The requested quota is invalid (must be at least one)."
+msgstr ""
+
+msgid "The allocation does not have enough free spots."
+msgstr ""
+
+msgid "The resulting allocation would be invalid."
+msgstr ""
+
+msgid "No reservations to confirm."
+msgstr ""
+
+msgid "The given timerange is longer than the existing allocation."
+msgstr ""
+
+msgid "Reservation too short. A reservation must last at least 5 minutes."
+msgstr ""
+
+msgid "Whole day"
+msgstr ""
+
+#, python-format
+msgid "${percent}% Available"
+msgstr ""
+
+#, python-format
+msgid "${num}/${max} Available"
+msgstr ""
+
+msgid "Available"
+msgstr ""
+
+msgid "Unavailable"
+msgstr ""
+
+msgid ""
+"This allocation can't be deleted because there are existing reservations "
+"associated with it."
+msgstr ""
+
+msgid ""
+"To delete this allocation, all existing reservations need to be cancelled "
+"first."
+msgstr ""
+
+msgid "Start"
+msgstr ""
+
+msgid "Date"
+msgstr ""
+
+msgid "End"
+msgstr ""
+
+msgid "Except for"
+msgstr ""
+
+msgid "Daypasses"
+msgstr ""
+
+msgid "Daypasses Limit"
+msgstr ""
+
+msgid "Each starting at"
+msgstr ""
+
+msgid "HH:MM"
+msgstr ""
+
+msgid "Each ending at"
+msgstr ""
+
+msgid "May be partially reserved"
+msgstr ""
+
+msgid "Options"
+msgstr ""
+
+msgid "From"
+msgstr ""
+
+msgid "Until"
+msgstr ""
+
+msgid "Exhibition"
+msgstr ""
+
+msgid "Gastronomy"
+msgstr ""
+
+msgid "Health"
+msgstr ""
+
+msgid "Cinema"
+msgstr ""
+
+msgid "Congress"
+msgstr ""
+
+msgid "Concert"
+msgstr ""
+
+msgid "Art"
+msgstr ""
+
+msgid "Literature"
+msgstr ""
+
+msgid "Market"
+msgstr ""
+
+msgid "Music"
+msgstr ""
+
+msgid "Party"
+msgstr ""
+
+msgid "Politics"
+msgstr ""
+
+msgid "Religion"
+msgstr ""
+
+msgid "Sports"
+msgstr ""
+
+msgid "Dancing"
+msgstr ""
+
+msgid "Theater"
+msgstr ""
+
+msgid "Meetup"
+msgstr ""
+
+msgid "Talk"
+msgstr ""
+
+msgid "E-Mail"
+msgstr ""
+
+msgid "Title"
+msgstr ""
+
+msgid "Concerto in the castle garden"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Enjoy a concerto in the castle garden."
+msgstr ""
+
+msgid "Location"
+msgstr ""
+
+msgid "Castle garden"
+msgstr ""
+
+msgid "Organizer"
+msgstr ""
+
+msgid "Music society"
+msgstr ""
+
+msgid "Coordinates"
+msgstr ""
+
+msgid "The marker can be moved by dragging it with the mouse"
+msgstr ""
+
+msgid "Tags"
+msgstr ""
+
+msgid "To"
+msgstr ""
+
+msgid "Repeats itself every"
+msgstr ""
+
+msgid "Until date"
+msgstr ""
+
+msgid "Please set and end date if the event is recurring."
+msgstr ""
+
+msgid "Please select a weekday if the event is recurring."
+msgstr ""
+
+msgid "The end date must be later than the start date."
+msgstr ""
+
+msgid "The weekday of the start date must be selected."
+msgstr ""
+
+msgid "Lead"
+msgstr ""
+
+msgid "Describes what this form is about"
+msgstr ""
+
+msgid "Text"
+msgstr ""
+
+msgid "Definition"
+msgstr ""
+
+msgid "Format"
+msgstr ""
+
+msgid "Payment Method"
+msgstr ""
+
+msgid "The end date must be later than the start date"
+msgstr ""
+
+msgid ""
+"You need to setup a default payment provider to enable credit card payments"
+msgstr ""
+
+msgid "CSV File"
+msgstr ""
+
+msgid "Excel File"
+msgstr ""
+
+msgid "JSON File"
+msgstr ""
+
+msgid "No credit card payments"
+msgstr ""
+
+msgid "Credit card payments optional"
+msgstr ""
+
+msgid "Credit card payments required"
+msgstr ""
+
+msgid "Describes what this photo album is about"
+msgstr ""
+
+msgid "View"
+msgstr ""
+
+msgid "Show images on homepage"
+msgstr ""
+
+msgid "Full size images"
+msgstr ""
+
+msgid "Grid layout"
+msgstr ""
+
+msgid "Used in the overview and the e-mail subject"
+msgstr ""
+
+msgid "Editorial"
+msgstr ""
+
+msgid "A few words about this edition of the newsletter"
+msgstr ""
+
+msgid "Latest news"
+msgstr ""
+
+msgid "Selected News / Events"
+msgstr ""
+
+msgid "Please select at least one recipient"
+msgstr ""
+
+msgid "URL"
+msgstr ""
+
+msgid "Describes what this page is about"
+msgstr ""
+
+msgid "First name"
+msgstr ""
+
+msgid "Last name"
+msgstr ""
+
+msgid "Function"
+msgstr ""
+
+msgid "Phone"
+msgstr ""
+
+msgid "Website"
+msgstr ""
+
+msgid "Picture"
+msgstr ""
+
+msgid "URL pointing to the picture"
+msgstr ""
+
+msgid "Address"
+msgstr ""
+
+msgid "Notes"
+msgstr ""
+
+msgid "Public extra information about this person"
+msgstr ""
+
+msgid "Describes what this reservation resource is about"
+msgstr ""
+
+msgid "Group"
+msgstr ""
+
+msgid "Used to group the resource in the overview"
+msgstr ""
+
+msgid "Extra Fields Definition"
+msgstr ""
+
+msgid "Price"
+msgstr ""
+
+msgid "Price per item"
+msgstr ""
+
+msgid "Price per hour"
+msgstr ""
+
+msgid "Currency"
+msgstr ""
+
+msgid "Free of charge"
+msgstr ""
+
+msgid "Per item"
+msgstr ""
+
+msgid "Per hour"
+msgstr ""
+
+msgid "The price must be larger than zero"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "Send on"
+msgstr ""
+
+msgid "Resources"
+msgstr ""
+
+msgid "E-Mail Reply Address"
+msgstr ""
+
+msgid "Logo"
+msgstr ""
+
+msgid "URL pointing to the logo"
+msgstr ""
+
+msgid "Logo (Square)"
+msgstr ""
+
+msgid "Replies to automated e-mails go to this address."
+msgstr ""
+
+msgid "Primary Color"
+msgstr ""
+
+msgid "Languages"
+msgstr ""
+
+msgid "Bank Account (IBAN)"
+msgstr ""
+
+msgid "Payment"
+msgstr ""
+
+msgid "Beneficiary"
+msgstr ""
+
+msgid "Payment Order"
+msgstr ""
+
+msgid "ESR participant number"
+msgstr ""
+
+msgid "Contact"
+msgstr ""
+
+msgid "The address and phone number of the municipality"
+msgstr ""
+
+msgid "Information"
+msgstr ""
+
+msgid "Contact Link"
+msgstr ""
+
+msgid "URL pointing to a contact page"
+msgstr ""
+
+msgid "Opening Hours"
+msgstr ""
+
+msgid "The opening hours of the municipality"
+msgstr ""
+
+msgid "Opening Hours Link"
+msgstr ""
+
+msgid "URL pointing to an opening hours page"
+msgstr ""
+
+msgid "Facebook"
+msgstr ""
+
+msgid "URL pointing to the facebook site"
+msgstr ""
+
+msgid "Social Media"
+msgstr ""
+
+msgid "Twitter"
+msgstr ""
+
+msgid "URL pointing to the twitter site"
+msgstr ""
+
+msgid "Homepage Image #1"
+msgstr ""
+
+msgid "Homepage Image #2"
+msgstr ""
+
+msgid "Homepage Image #3"
+msgstr ""
+
+msgid "Homepage Image #4"
+msgstr ""
+
+msgid "Homepage Image #5"
+msgstr ""
+
+msgid "Homepage Image #6"
+msgstr ""
+
+msgid "Homepage Cover"
+msgstr ""
+
+msgid "Homepage Structure (for advanced users only)"
+msgstr ""
+
+msgid "The structure of the homepage"
+msgstr ""
+
+msgid "The default map view. This should show the whole town"
+msgstr ""
+
+msgid "Maps"
+msgstr ""
+
+msgid "Analytics Code"
+msgstr ""
+
+msgid "JavaScript for web statistics support"
+msgstr ""
+
+msgid "Advanced"
+msgstr ""
+
+msgid "A beneficiary is required if a bank account is given."
+msgstr ""
+
+msgid "German"
+msgstr ""
+
+msgid "French"
+msgstr ""
+
+msgid "Basic"
+msgstr ""
+
+msgid "With reference number (ESR)"
+msgstr ""
+
+msgid "E-Mail Address"
+msgstr ""
+
+msgid "Your note about this ticket"
+msgstr ""
+
+msgid "Admin"
+msgstr ""
+
+msgid "Editor"
+msgstr ""
+
+msgid "Member"
+msgstr ""
+
+msgid "Active"
+msgstr ""
+
+msgid "Role"
+msgstr ""
+
+msgid "Yubikey"
+msgstr ""
+
+msgid "Plug your YubiKey into a USB slot and press it."
+msgstr ""
+
+msgid "The users e-mail address (a.k.a. username)"
+msgstr ""
+
+msgid "Send Activation E-Mail with Instructions"
+msgstr ""
+
+msgid "Invalid Yubikey"
+msgstr ""
+
+#, python-format
+msgid "This Yubikey is already used by ${username}"
+msgstr ""
+
+msgid "A user with this e-mail address exists already"
+msgstr ""
+
+msgid "Administrators and editors must use a Yubikey"
+msgstr ""
+
+msgid "Send a daily status e-mail."
+msgstr ""
+
+msgid "All events"
+msgstr ""
+
+msgid "Hide from the public"
+msgstr ""
+
+msgid "Map"
+msgstr ""
+
+msgid "Visible on homepage"
+msgstr ""
+
+msgid "This month"
+msgstr ""
+
+msgid "Last month"
+msgstr ""
+
+msgid "Last year"
+msgstr ""
+
+msgid "Older"
+msgstr ""
+
+msgid "This year"
+msgstr ""
+
+msgid "Do you really want to delete this note?"
+msgstr ""
+
+msgid "Delete Note"
+msgstr ""
+
+msgid "Always visible on homepage"
+msgstr ""
+
+msgid "Form Submissions"
+msgstr ""
+
+#.
+#. Used in sentence: "${event} published."
+#. Used in sentence: "${event} deleted."
+msgid "Event"
+msgstr ""
+
+msgid "Edit submission"
+msgstr ""
+
+msgid "Details about the reservation"
+msgstr ""
+
+msgid "Reject all"
+msgstr ""
+
+msgid "Accept all reservations"
+msgstr ""
+
+msgid "Edit details"
+msgstr ""
+
+#, python-format
+msgid "Reject ${title}"
+msgstr ""
+
+msgid "Accept event"
+msgstr ""
+
+msgid "Do you really want to reject all reservations?"
+msgstr ""
+
+msgid "Rejecting these reservations can't be undone."
+msgstr ""
+
+msgid "Reject reservations"
+msgstr ""
+
+msgid "Do you really want to reject this reservation?"
+msgstr ""
+
+#, python-format
+msgid "Rejecting ${title} can't be undone."
+msgstr ""
+
+msgid "Reject reservation"
+msgstr ""
+
+msgid "Edit event"
+msgstr ""
+
+msgid "Reject event"
+msgstr ""
+
+msgid "Do you really want to reject this event?"
+msgstr ""
+
+msgid "Rejecting this event can't be undone."
+msgstr ""
+
+msgid "Link"
+msgstr ""
+
+msgid "New Link"
+msgstr ""
+
+msgid "Added a new link"
+msgstr ""
+
+msgid "Edit Link"
+msgstr ""
+
+msgid "The link was deleted"
+msgstr ""
+
+msgid "Delete link"
+msgstr ""
+
+#, python-format
+msgid "Do you really want to delete the link \"${title}\"?"
+msgstr ""
+
+msgid "Topic"
+msgstr ""
+
+msgid "New Topic"
+msgstr ""
+
+msgid "Added a new topic"
+msgstr ""
+
+msgid "Edit Topic"
+msgstr ""
+
+msgid "The topic was deleted"
+msgstr ""
+
+msgid "Delete topic"
+msgstr ""
+
+#, python-format
+msgid "Do you really want to delete the topic \"${title}\"?"
+msgstr ""
+
+msgid "News"
+msgstr ""
+
+msgid "Add News"
+msgstr ""
+
+msgid "Added news"
+msgstr ""
+
+msgid "Edit News"
+msgstr ""
+
+msgid "The news was deleted"
+msgstr ""
+
+msgid "Delete news"
+msgstr ""
+
+#, python-format
+msgid "Do you really want to delete the news \"${title}\"?"
+msgstr ""
+
+msgid "Copy"
+msgstr ""
+
+msgid "Paste"
+msgstr ""
+
+msgid "Please note that this page has subpages which will also be deleted!"
+msgstr ""
+
+msgid "This page can't be deleted."
+msgstr ""
+
+msgid ""
+"This page has subpages. Only administrators can delete pages with subpages. "
+"To delete this page, delete all subpages first or ask an administrator to do "
+"it for you."
+msgstr ""
+
+msgid ""
+"Please review your data and press \"Complete\" to finalize the process. If "
+"there's anything you'd like to change, click on \"Edit\" to return to the "
+"filled-out form."
+msgstr ""
+
+msgid "Complete"
+msgstr ""
+
+msgid "No exports available."
+msgstr ""
+
+msgid "Upload"
+msgstr ""
+
+msgid "All Files"
+msgstr ""
+
+msgid "Do you really want to delete the file?"
+msgstr ""
+
+msgid "Delete File"
+msgstr ""
+
+msgid "No files uploaded yet"
+msgstr ""
+
+msgid "You are trying to open a page for which you are not authorized."
+msgstr ""
+
+msgid "Please follow this link to login with a different user."
+msgstr ""
+
+msgid "Please follow this link to login."
+msgstr ""
+
+msgid "No forms defined yet."
+msgstr ""
+
+msgid "All Images"
+msgstr ""
+
+msgid ""
+"To edit the image descriptions, click on one, enter your descrption and "
+"press return. To abort press escape."
+msgstr ""
+
+msgid "Click to add a description"
+msgstr ""
+
+msgid "Do you really want to delete the image?"
+msgstr ""
+
+msgid "Delete Image"
+msgstr ""
+
+msgid "No images uploaded yet"
+msgstr ""
+
+msgid "This album does not contain any images yet."
+msgstr ""
+
+msgid "No photo albums defined yet."
+msgstr ""
+
+msgid "Skip navigation"
+msgstr ""
+
+msgid "Back to the homepage"
+msgstr ""
+
+msgid "Search"
+msgstr ""
+
+msgid "The form contains errors. Please check the fields marked in red."
+msgstr ""
+
+msgid "Don't have an account yet?"
+msgstr ""
+
+msgid "Register now"
+msgstr ""
+
+msgid "Forgot your password?"
+msgstr ""
+
+msgid "Reset password"
+msgstr ""
+
+msgid "You are here"
+msgstr ""
+
+msgid "more…"
+msgstr ""
+
+msgid "Submit"
+msgstr ""
+
+msgid "Selected Topics"
+msgstr ""
+
+msgid "Drop files to upload"
+msgstr ""
+
+msgid "All news"
+msgstr ""
+
+msgid ""
+"This site is hidden from the general public. To show it to everyone, edit "
+"this page and disable \"Hide from public\"."
+msgstr ""
+
+msgid ""
+"This site contains no lead. Leads are used for lists and search results."
+msgstr ""
+
+msgid "Total Amount"
+msgstr ""
+
+msgid "Open"
+msgstr ""
+
+msgid "Pending"
+msgstr ""
+
+msgid "Closed"
+msgstr ""
+
+msgid "Paid"
+msgstr ""
+
+msgid "Failed"
+msgstr ""
+
+msgid "Refunded"
+msgstr ""
+
+msgid "Manual"
+msgstr ""
+
+msgid "Ticket Number"
+msgstr ""
+
+msgid "Previous Page"
+msgstr ""
+
+msgid "Next Page"
+msgstr ""
+
+msgid "Quota"
+msgstr ""
+
+msgid "State"
+msgstr ""
+
+msgid "Initiated"
+msgstr ""
+
+msgid "Submitted"
+msgstr ""
+
+msgid "Published"
+msgstr ""
+
+msgid "Withdrawn"
+msgstr ""
+
+msgid "Submitter"
+msgstr ""
+
+msgid "Date and time"
+msgstr ""
+
+msgid "Recurrence"
+msgstr ""
+
+msgid "All dates"
+msgstr ""
+
+msgid "No events found."
+msgstr ""
+
+msgid "Filter by date"
+msgstr ""
+
+msgid "Administrator"
+msgstr ""
+
+msgid "Administrators"
+msgstr ""
+
+msgid "Close (Esc)"
+msgstr ""
+
+msgid "Share"
+msgstr ""
+
+msgid "Toggle fullscreen"
+msgstr ""
+
+msgid "Zoom in/out"
+msgstr ""
+
+msgid ""
+"This space holds images from your photo-albums. To show photos add a few "
+"photos to an album and mark it as available for the homepage."
+msgstr ""
+
+msgid ""
+"Your request will be processed shortly. To see the state of your process "
+"your may return to this page at any time. All information on this page has "
+"been sent to your e-mail address."
+msgstr ""
+
+msgid ""
+"Your request has been completed. If you asked for documents to be sent to "
+"your address, they should arrive shortly. If you asked to pick up documents "
+"at the municipality, the are now ready to be picked up."
+msgstr ""
+
+msgid "Pay Online Now"
+msgstr ""
+
+msgid "Credit Card Fee"
+msgstr ""
+
+msgid "Pay Offline later"
+msgstr ""
+
+msgid "at ${time}"
+msgstr ""
+
+msgid "Dear Sir or Madam,"
+msgstr ""
+
+msgid "Your e-mail address was just used to create an account on ${homepage}."
+msgstr ""
+
+msgid "To activate your account, click confirm below:"
+msgstr ""
+
+msgid "Confirm my account"
+msgstr ""
+
+msgid ""
+"If you believe this is an error, ignore this message and we'll never bother "
+"you again."
+msgstr ""
+
+msgid "Hello"
+msgstr ""
+
+msgid ""
+"You are recieving this mail because you subscribed to the following "
+"newsletter:"
+msgstr ""
+
+msgid "Plese click the following link to confirm your subscription:"
+msgstr ""
+
+msgid "Confirm subscription"
+msgstr ""
+
+msgid ""
+"If you did not subscribe to this newsletter you can simply ignore this e-"
+"mail. We will not bother you again."
+msgstr ""
+
+msgid "Best regards,"
+msgstr ""
+
+msgid "The OneGov Cloud Team"
+msgstr ""
+
+msgid "Good morning,"
+msgstr ""
+
+msgid "The following reservations are scheduled for today."
+msgstr ""
+
+msgid "No reservations today."
+msgstr ""
+
+msgid "Have a great day!"
+msgstr ""
+
+msgid ""
+"This is the daily reservation overview for ${organisation}. If you no longer "
+"want to receive this e-mail please contact an administrator so they can "
+"remove you from the recipients list."
+msgstr ""
+
+msgid "This is what happend on the ${org} website yesterday:"
+msgstr ""
+
+msgid "This is what happend on the ${org} website over the weekend:"
+msgstr ""
+
+msgid "tickets were opened."
+msgstr ""
+
+msgid "ticket was opened."
+msgstr ""
+
+msgid "tickets were accepted."
+msgstr ""
+
+msgid "ticket was accepted."
+msgstr ""
+
+msgid "tickets were closed."
+msgstr ""
+
+msgid "ticket was closed."
+msgstr ""
+
+msgid "There are currently ${currently_open} tickets open and"
+msgstr ""
+
+msgid "There is currently ${currently_open} ticket open and"
+msgstr ""
+
+msgid "tickets are pending."
+msgstr ""
+
+msgid "ticket is pending."
+msgstr ""
+
+msgid "Have a great week!"
+msgstr ""
+
+msgid ""
+"This is the daily OneGov Cloud status e-mail. If you don't want to receive "
+"this e-mail you may deactivate it by clicking on"
+msgstr ""
+
+msgid "unsubscribe"
+msgstr ""
+
+msgid "Or by changing the settings in your user profile."
+msgstr ""
+
+msgid "Your event has been accepted:"
+msgstr ""
+
+msgid "The ticket number is"
+msgstr ""
+
+msgid "Check ticket status"
+msgstr ""
+
+msgid "Your event has unfortunately been rejected:"
+msgstr ""
+
+msgid "An administrator just created a new account on ${org} for you."
+msgstr ""
+
+msgid "Your username is ${email}."
+msgstr ""
+
+msgid "Click on the following link to set your account password:"
+msgstr ""
+
+msgid "Set Account Password"
+msgstr ""
+
+msgid "To use your account you need the Yubikey with the serial ${number}"
+msgstr ""
+
+msgid ""
+"You are receiving this e-mail because you signed up for the ${org} "
+"newsletter."
+msgstr ""
+
+msgid "Click here to view web version."
+msgstr ""
+
+msgid "Click here to unsubscribe."
+msgstr ""
+
+msgid "Click the following link to set a new password:"
+msgstr ""
+
+msgid "If you don't want to change your password, you can ignore this email."
+msgstr ""
+
+msgid "Your ticket has received a payment."
+msgstr ""
+
+msgid "Your ticket was marked as unpaid."
+msgstr ""
+
+msgid ""
+"Your ticket's payment has been refunded. Note that it might take a few days "
+"until your refunded amount is shown on your credit card bill."
+msgstr ""
+
+msgid "The payment amount is"
+msgstr ""
+
+msgid "The following reservations have been accepted:"
+msgstr ""
+
+msgid "The following reservations have unfortunately been cancelled:"
+msgstr ""
+
+msgid "Your ticket has been closed"
+msgstr ""
+
+msgid "A new ticket has been opened"
+msgstr ""
+
+msgid ""
+"We will send another e-mail once your ticket has been completed. In the "
+"meantime you can check the status of your ticket at any time:"
+msgstr ""
+
+msgid "Your ticket has been reopened"
+msgstr ""
+
+#. Canonical text for ${event} is: "Event"
+msgid "${event} published."
+msgstr ""
+
+#. Canonical text for ${event} is: "Event"
+msgid "${event} deleted."
+msgstr ""
+
+msgid "${amount} marked as paid."
+msgstr ""
+
+msgid "${amount} marked as unpaid."
+msgstr ""
+
+msgid "${amount} captured."
+msgstr ""
+
+msgid "${amount} refunded."
+msgstr ""
+
+msgid "1 reservation accepted."
+msgstr ""
+
+msgid "${count} reservations accepted."
+msgstr ""
+
+msgid "1 reservation rejected."
+msgstr ""
+
+msgid "${count} reservations rejected."
+msgstr ""
+
+msgid "Ticket opened."
+msgstr ""
+
+msgid "Ticket accepted."
+msgstr ""
+
+msgid "Ticket closed."
+msgstr ""
+
+msgid "Ticket reopened."
+msgstr ""
+
+msgid "Sign up to our newsletter to always stay up to date:"
+msgstr ""
+
+msgid "Signup"
+msgstr ""
+
+msgid "There are currently ${count} recipients registered."
+msgstr ""
+
+msgid "Archive"
+msgstr ""
+
+msgid "No newsletters yet."
+msgstr ""
+
+msgid "Not yet sent."
+msgstr ""
+
+msgid ""
+"The user ${username} was created successfully. Please write down the user's "
+"password, as it won't be shown to you again:"
+msgstr ""
+
+msgid "Password:"
+msgstr ""
+
+msgid ""
+"The user ${username} was created successfully. An e-mail has been sent to "
+"the user with login instructions."
+msgstr ""
+
+msgid "Back to usermanagement"
+msgstr ""
+
+msgid ""
+"Sorry, the page you are looking for could not be found. Try checking the URL "
+"for errors or use the search box on the top."
+msgstr ""
+
+msgid "Export this event"
+msgstr ""
+
+msgid "Export all occurrences of this event"
+msgstr ""
+
+msgid "All occurrences of this event"
+msgstr ""
+
+msgid "Submit your event"
+msgstr ""
+
+msgid "Submit your own event"
+msgstr ""
+
+msgid "No payment providers defined."
+msgstr ""
+
+msgid "Connected:"
+msgstr ""
+
+msgid "Fee:"
+msgstr ""
+
+msgid "No payments yet."
+msgstr ""
+
+msgid "Object"
+msgstr ""
+
+msgid "Net Amount"
+msgstr ""
+
+msgid "Fee"
+msgstr ""
+
+msgid "Created"
+msgstr ""
+
+msgid "Disbursed"
+msgstr ""
+
+msgid "No people added yet."
+msgstr ""
+
+msgid ""
+"Subscribers may always unsubscribe themselves through a link shown at the "
+"bottom of the newsletter. If you unsubscribe them here, they will not be "
+"notified."
+msgstr ""
+
+msgid "Unsubscribe"
+msgstr ""
+
+msgid "No dates found, please select dates in the calendar first"
+msgstr ""
+
+msgid "Go to calendar"
+msgstr ""
+
+msgid "Select a free time span in the calendar below to create an allocation."
+msgstr ""
+
+msgid "Further Information"
+msgstr ""
+
+msgid "Removes all unreserved allocations between the start and end date."
+msgstr ""
+
+msgid "Utilised"
+msgstr ""
+
+msgid ""
+"The following recipients receive a daily e-mail sent at 06:00 containing the "
+"reservation data for all reservations of the day."
+msgstr ""
+
+msgid "No recipients defined yet."
+msgstr ""
+
+msgid "No reservation resources defined yet."
+msgstr ""
+
+msgid ""
+"Searching is currently unavailable due to technical difficulties. Please "
+"excuse the inconvenience and try again later."
+msgstr ""
+
+msgid "Your search returned no results."
+msgstr ""
+
+msgid "Select the images that should be shown inside this album."
+msgstr ""
+
+msgid "Confirm selection"
+msgstr ""
+
+msgid "This newsletter has not been sent yet."
+msgstr ""
+
+msgid "First sent ${time_ago}."
+msgstr ""
+
+msgid "This newsletter was sent to ${n} subscribers."
+msgstr ""
+
+msgid "All subscribers have already received this newsletter."
+msgstr ""
+
+msgid "Send Now"
+msgstr ""
+
+msgid "The newsletter was already sent to the following addresses:"
+msgstr ""
+
+msgid ""
+"A signup link allows anyone to sign up with a specific role. Those signups "
+"are limited by time and count but they still present a security risk. Be "
+"sure to only share this link with people you trust."
+msgstr ""
+
+msgid ""
+"Your signup link has been created as follows. Please copy it before "
+"continuing, it won't be shown to you again:"
+msgstr ""
+
+msgid "Show"
+msgstr ""
+
+msgid "Do you really want to delete the submission?"
+msgstr ""
+
+msgid "Delete Submission"
+msgstr ""
+
+msgid ""
+"The record behind this ticket was removed. The following information is a "
+"snapshot kept for future reference."
+msgstr ""
+
+msgid "No activities yet."
+msgstr ""
+
+msgid "Ticket State"
+msgstr ""
+
+msgid "Payment Amount"
+msgstr ""
+
+msgid "Payment State"
+msgstr ""
+
+msgid "Payment Source"
+msgstr ""
+
+msgid "Owner"
+msgstr ""
+
+msgid "Reaction Time"
+msgstr ""
+
+msgid "Process Time"
+msgstr ""
+
+msgid ""
+"You are editing a note created by someone else. By saving your changes you "
+"will become the author of the whole note."
+msgstr ""
+
+msgid ""
+"Notes are private and only shown to logged-in members. You can use links/e-"
+"mail addresses are turned into clickable links."
+msgstr ""
+
+msgid "State:"
+msgstr ""
+
+msgid "Owner:"
+msgstr ""
+
+msgid "Kind:"
+msgstr ""
+
+msgid "<dynamic element>"
+msgstr ""
+
+msgid "Accept"
+msgstr ""
+
+msgid ""
+"You've reached this site because you are logged in. Visitors are "
+"automatically redirected to the following link:"
+msgstr ""
+
+msgid ""
+"You are not automatically redirected so you have a chance to edit or delete "
+"this link."
+msgstr ""
+
+msgid "No links found."
+msgstr ""
+
+msgid "Select an item to view it"
+msgstr ""
+
+msgid "Inactive"
+msgstr ""
+
+msgid "Username"
+msgstr ""
+
+msgid "Identicon"
+msgstr ""
+
+msgid "Password"
+msgstr ""
+
+msgid "Confirm?"
+msgstr ""
+
+msgid "Extra..."
+msgstr ""
+
+msgid "New allocation"
+msgstr ""
+
+#, python-format
+msgid "Successfully added ${n} allocations"
+msgstr ""
+
+msgid "Your changes were saved"
+msgstr ""
+
+msgid "Topics A-Z"
+msgstr ""
+
+#, python-format
+msgid "Login to ${org}"
+msgstr ""
+
+msgid "Account Registration"
+msgstr ""
+
+msgid "You have been logged out."
+msgstr ""
+
+msgid "Wrong e-mail address, password or yubikey."
+msgstr ""
+
+msgid ""
+"Your account has been activated. You may now log in with your credentials"
+msgstr ""
+
+#, python-format
+msgid "Your ${org} Registration"
+msgstr ""
+
+msgid ""
+"Thank you for registering. Please follow the instructions on the activiation "
+"e-mail sent to you."
+msgstr ""
+
+msgid "Unknown user"
+msgstr ""
+
+msgid "Invalid activation token"
+msgstr ""
+
+msgid "Your account has already been activated."
+msgstr ""
+
+msgid "Your userprofile is incomplete. Please update it before you continue."
+msgstr ""
+
+msgid "You have been logged in."
+msgstr ""
+
+msgid "A user with this address already exists"
+msgstr ""
+
+msgid "This signup link has expired"
+msgstr ""
+
+msgid "A link was added to the clipboard"
+msgstr ""
+
+msgid "Submit an event"
+msgstr ""
+
+msgid ""
+"Only events taking place inside the town or events related to town societies "
+"are published. Events which are purely commercial are not published. There's "
+"no right to be published and already published events may be removed from "
+"the page without notification or reason."
+msgstr ""
+
+#, python-format
+msgid "You have accepted the event ${title}"
+msgstr ""
+
+msgid "Thank you for your submission!"
+msgstr ""
+
+msgid "Your event was accepted"
+msgstr ""
+
+msgid "Your event was rejected"
+msgstr ""
+
+msgid "A ticket has been opened"
+msgstr ""
+
+msgid "Access Denied"
+msgstr ""
+
+msgid "Not Found"
+msgstr ""
+
+msgid "Manage Photo Albums"
+msgstr ""
+
+msgid "This file type is not supported"
+msgstr ""
+
+msgid "The file name is too long"
+msgstr ""
+
+msgid "New Form"
+msgstr ""
+
+msgid "A form with this name already exists"
+msgstr ""
+
+msgid "Added a new form"
+msgstr ""
+
+msgid "Your payment could not be processed"
+msgstr ""
+
+msgid "Pay Online and Complete"
+msgstr ""
+
+msgid "Select images"
+msgstr ""
+
+msgid "New Photo Album"
+msgstr ""
+
+msgid "Select"
+msgstr ""
+
+msgid "Added a new photo album"
+msgstr ""
+
+#, python-format
+msgid "Do you really want to unsubscribe \"{}\"?"
+msgstr ""
+
+msgid "New Newsletter"
+msgstr ""
+
+msgid "Edit Newsletter"
+msgstr ""
+
+#, python-format
+msgid ""
+"Success! We have sent a confirmation link to ${address}, if we didn't send "
+"you one already."
+msgstr ""
+
+#, python-format
+msgid "Sent \"${title}\" to ${n} recipients"
+msgstr ""
+
+#, python-format
+msgid "Welcome to the ${org} Newsletter"
+msgstr ""
+
+msgid "Added a new newsletter"
+msgstr ""
+
+msgid "A newsletter with this name already exists"
+msgstr ""
+
+msgid "Event Export"
+msgstr ""
+
+msgid "Exports all future events."
+msgstr ""
+
+msgid "Your payment has been received"
+msgstr ""
+
+msgid "Your payment has been withdrawn"
+msgstr ""
+
+msgid "Your payment has been refunded"
+msgstr ""
+
+msgid "Your Stripe account was connected successfully."
+msgstr ""
+
+msgid "Your Stripe account could not be connected."
+msgstr ""
+
+msgid "Changed the default payment provider."
+msgstr ""
+
+msgid "The payment provider was deleted."
+msgstr ""
+
+msgid "Successfully synchronised payments"
+msgstr ""
+
+msgid "As default"
+msgstr ""
+
+msgid "Charge fees to customer"
+msgstr ""
+
+msgid "Do you really want to delete this provider?"
+msgstr ""
+
+msgid "Should this provider really be the new default?"
+msgstr ""
+
+msgid "All future payments will be redirected."
+msgstr ""
+
+msgid "Make Default"
+msgstr ""
+
+msgid "New person"
+msgstr ""
+
+msgid "Added a new person"
+msgstr ""
+
+#, python-format
+msgid "New dates for ${title}"
+msgstr ""
+
+msgid "Continue"
+msgstr ""
+
+msgid "Confirm your reservation"
+msgstr ""
+
+msgid "Reserve"
+msgstr ""
+
+msgid "Confirm"
+msgstr ""
+
+msgid "Thank you for your reservation!"
+msgstr ""
+
+msgid "The reservations were accepted"
+msgstr ""
+
+msgid "The reservations have already been accepted"
+msgstr ""
+
+msgid ""
+"The payment associated with this reservation needs to be refunded before the "
+"reservation can be rejected"
+msgstr ""
+
+msgid "The reservations were rejected"
+msgstr ""
+
+msgid "The reservation was rejected"
+msgstr ""
+
+msgid "The following reservations were rejected"
+msgstr ""
+
+msgid "Your reservations were accepted"
+msgstr ""
+
+#, python-format
+msgid ""
+"A password reset link has been sent to ${email}, provided an account exists "
+"for this email address."
+msgstr ""
+
+msgid "Password changed."
+msgstr ""
+
+msgid "Wrong username or password reset link not valid any more."
+msgstr ""
+
+msgid "Password reset"
+msgstr ""
+
+msgid "Added a new daypass"
+msgstr ""
+
+msgid "New daypass"
+msgstr ""
+
+msgid "Added a new room"
+msgstr ""
+
+msgid "New room"
+msgstr ""
+
+msgid "Exports the reservations of the given date range."
+msgstr ""
+
+#, python-format
+msgid "Successfully removed ${count} unused allocations"
+msgstr ""
+
+msgid "New Recipient"
+msgstr ""
+
+msgid "Edit Recipient"
+msgstr ""
+
+msgid "Added a new recipient"
+msgstr ""
+
+#, python-format
+msgid "Do you really want to delete \"${name}\"?"
+msgstr ""
+
+msgid "Delete Recipient"
+msgstr ""
+
+#, python-format
+msgid "Search through ${count} indexed documents"
+msgstr ""
+
+#, python-format
+msgid "${count} Results"
+msgstr ""
+
+msgid "Search Unavailable"
+msgstr ""
+
+msgid "Topics"
+msgstr ""
+
+#, python-format
+msgid "the subscription for ${address} was successfully confirmed"
+msgstr ""
+
+#, python-format
+msgid "the subscription for ${address} could not be confirmed, wrong token"
+msgstr ""
+
+#, python-format
+msgid "${address} successfully unsubscribed"
+msgstr ""
+
+#, python-format
+msgid "${address} could not be unsubscribed, wrong token"
+msgstr ""
+
+msgid "The note was deleted"
+msgstr ""
+
+msgid "Edit Note"
+msgstr ""
+
+msgid "Your request has been submitted"
+msgstr ""
+
+msgid "Your note was added"
+msgstr ""
+
+#, python-format
+msgid "You have accepted ticket ${number}"
+msgstr ""
+
+#, python-format
+msgid "You have closed ticket ${number}"
+msgstr ""
+
+#, python-format
+msgid "You have reopened ticket ${number}"
+msgstr ""
+
+msgid "Your request is currently pending"
+msgstr ""
+
+msgid "Ticket Status"
+msgstr ""
+
+msgid "The ticket cannot be accepted because it's not open"
+msgstr ""
+
+msgid "The ticket cannot be closed because it's not pending"
+msgstr ""
+
+msgid "The ticket cannot be re-opened because it's not closed"
+msgstr ""
+
+msgid "Your ticket has been repoened"
+msgstr ""
+
+msgid "Your request has been processed"
+msgstr ""
+
+msgid "All"
+msgstr ""
+
+msgid "All Tickets"
+msgstr ""
+
+msgid "All Users"
+msgstr ""
+
+msgid "User Management"
+msgstr ""
+
+msgid "New Signup Link"
+msgstr ""
+
+msgid "New User"
+msgstr ""
+
+msgid "The user was created successfully"
+msgstr ""
+
+msgid "A user with this e-mail address already exists"
+msgstr ""
+
+msgid "An account was created for you"
+msgstr ""
+
+msgid "You have been successfully unsubscribed from all regular emails."
+msgstr ""

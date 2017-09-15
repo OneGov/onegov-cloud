@@ -3,9 +3,7 @@
 from datetime import date
 from onegov.chat import MessageCollection
 from onegov.core.converters import extended_date_converter
-from onegov.directory import DirectoryCollection
-from onegov.directory import DirectoryEntryCollection
-from onegov.directory import DirectoryEntry
+from onegov.core.i18n import SiteLocale
 from onegov.event import (
     Event,
     EventCollection,
@@ -444,40 +442,7 @@ def get_messages(app, channel_id='*', type='*',
     )
 
 
-@OrgApp.path(
-    model=DirectoryCollection,
-    path='/verzeichnisse')
-def get_directories(app):
-    return DirectoryCollection(app.session(), type='extended')
-
-
-@OrgApp.path(
-    model=DirectoryEntryCollection,
-    path='/verzeichnisse/{directory_name}')
-def get_directory_entries(app, directory_name, extra_parameters, page=0):
-    directory = DirectoryCollection(app.session()).by_name(directory_name)
-
-    if directory:
-        collection = DirectoryEntryCollection(
-            directory=directory,
-            type='extended',
-            extra_parameters=extra_parameters,
-            page=page
-        )
-
-        collection.is_hidden_from_public = directory.is_hidden_from_public
-
-        return collection
-
-
-@OrgApp.path(
-    model=DirectoryEntry,
-    path='/verzeichnisse/{directory_name}/{name}')
-def get_directory_entry(app, directory_name, name):
-    directory = DirectoryCollection(app.session()).by_name(directory_name)
-
-    if directory:
-        return DirectoryEntryCollection(
-            directory=directory,
-            type='extended'
-        ).by_name(name)
+@OrgApp.path(model=SiteLocale, path='/locale/{locale}')
+def get_locale(request, app, locale, to=None):
+    to = to or request.link(app.org)
+    return SiteLocale.for_path(app, locale, to)

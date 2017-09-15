@@ -112,6 +112,7 @@
 
             <div class="small-12 medium-4 columns">
                 <metal:b use-macro="layout.macros['footer_social_media']" />
+                <metal:b use-macro="layout.macros['footer_locales']" />
             </div>
         </div>
     </tal:block>
@@ -155,6 +156,18 @@
         </li>
     </ul>
 </metal:footer_social_media>
+
+<metal:footer_locales define-macro="footer_locales">
+    <div class="footer-locales" tal:condition="layout.org.locales and len(layout.org.locales) > 1">
+        <h2>Languages</h2>
+        <div class="text-links">
+            <tal:b repeat="(name, url) layout.locales">
+                <a tal:condition="request.locale not in url" href="${url}">${name}</a>
+                <a tal:condition="request.locale in url" style="cursor: default"><strong>${name}</strong></a>
+            </tal:b>
+        </div>
+    </div>
+</metal:footer_locales>
 
 <metal:panel define-macro="events-panel">
     <h2 i18n:translate>Events</h2>

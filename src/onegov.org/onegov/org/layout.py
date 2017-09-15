@@ -1,10 +1,12 @@
 import babel.dates
 
+from babel import Locale
 from cached_property import cached_property
 from datetime import date, datetime, timedelta
 from dateutil import rrule
 from decimal import Decimal
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
+from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.core.utils import linkify
@@ -150,6 +152,21 @@ class Layout(ChameleonLayout):
         dropdown title.
         """
         return None
+
+    @cached_property
+    def locales(self):
+        to = self.request.url
+
+        def get_name(locale):
+            return Locale.parse(locale).get_language_name().capitalize()
+
+        def get_link(locale):
+            return self.request.link(SiteLocale(locale, to))
+
+        return [
+            (get_name(locale), get_link(locale))
+            for locale in sorted(self.app.locales)
+        ]
 
     @cached_property
     def file_upload_url(self):
