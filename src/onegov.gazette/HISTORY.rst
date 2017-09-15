@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes reset password link not working when creating users with groups.
+  [msom]
+
 1.3.2 (2017-09-14)
 ~~~~~~~~~~~~~~~~~~~
 

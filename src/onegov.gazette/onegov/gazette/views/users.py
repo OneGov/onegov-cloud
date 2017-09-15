@@ -62,6 +62,7 @@ def create_user(self, request, form):
             realname=form.name.data
         )
         form.update_model(user)
+        user.modified = user.timestamp()
         url = password_reset_url(
             user,
             request,
