@@ -39,10 +39,7 @@ setup(
         'Pillow',
         'port-for',
         'pytest>=3.0.6',
-        # pinned to avoid errors with pyfilesystem2 - once said package no
-        # longer requires a six in the 1.10.* range, remove this
-        # see https://github.com/PyFilesystem/pyfilesystem2/issues/79
-        'six==1.10.0',
+        'fs==2.0.10a1',
         'sqlalchemy',
         'splinter',
         'webdriver-manager',
