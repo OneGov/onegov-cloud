@@ -47,6 +47,21 @@ PRINCIPAL = """
 """
 
 
+@fixture(scope="session")
+def import_scan():
+    """ Scans all the onegov.* sources to make sure that the tables are
+    created.
+
+    Include this fixtures as first argument if needed (that is if you run a
+    single test and get sqlalchemy relation errors).
+
+    """
+
+    import importscan
+    import onegov
+    importscan.scan(onegov, ignore=['.test', '.tests'])
+
+
 @fixture(scope='session')
 def gazette_password():
     return hash_password('hunter2')
@@ -95,7 +110,6 @@ def create_gazette(request):
 
 @fixture(scope="function")
 def gazette_app(request):
-
     app = create_gazette(request)
     yield app
     app.session_manager.dispose()
