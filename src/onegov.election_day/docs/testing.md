@@ -47,6 +47,7 @@ It's important to test the code manually, to see visual flaws etc. One can use t
   - [ ] Can you subsribe/unsubscribe to SMS notifications?
 - [ ] Does the backend look OK?
   - [ ] Does the login and logout work?
+  - [ ] Does the passwort reset work?
   - [ ] Does the pagination work?
   - [ ] Can you create/edit/delete elections and votes?
   - [ ] Can you create/edit/delete data sources and mappings?
