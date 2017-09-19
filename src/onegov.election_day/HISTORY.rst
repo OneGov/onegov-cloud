@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Always Show First and Last Item of Pagination.
+  [msom]
+
 1.15.8 (2017-09-14)
 ~~~~~~~~~~~~~~~~~~~
 

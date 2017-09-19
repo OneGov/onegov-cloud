@@ -692,6 +692,15 @@ form {
     }
 }
 
+/*
+    Pagination
+*/
+ul.pagination li.first,
+ul.pagination li.last {
+    background-color: $smoke;
+    border-radius: 3px;
+}
+
 
 /*
     Shortcode

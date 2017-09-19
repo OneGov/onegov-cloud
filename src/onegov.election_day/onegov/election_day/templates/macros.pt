@@ -104,7 +104,7 @@
                 previous current_page.previous;
                 next current_page.next;
                 is_current current_page == page;
-                is_visible abs(current_page.page-page.page) < 6;
+                is_visible (abs(current_page.page-page.page) < 6) or repeat.page.start or repeat.page.end;
             ">
                 <tal:block condition="repeat.page.start and previous">
                     <li class="arrow">
@@ -112,7 +112,7 @@
                     </li>
                 </tal:block>
 
-                <li tal:condition="is_visible" class="${is_current and 'current' or ''}">
+                <li tal:condition="is_visible" class="${is_current and 'current' or ''} ${repeat.page.start and 'first' or ''} ${repeat.page.end and 'last' or ''}">
                     <a href="${request.link(page)}">${page.page + 1}</a>
                 </li>
 
