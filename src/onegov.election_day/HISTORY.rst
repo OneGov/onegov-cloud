@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.15.9 (2017-09-20)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes placing of terms of use.
   [msom]
