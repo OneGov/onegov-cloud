@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-17 10:17+0200\n"
+"POT-Creation-Date: 2017-09-20 08:02+0200\n"
 "PO-Revision-Date: 2017-07-17 11:14+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -499,11 +499,11 @@ msgstr ""
 "I dati grezzi usati per mostrare i risultati sono disponibili nei seguenti "
 "formati:"
 
-msgid "Format Description"
-msgstr "Descrizione del formato"
-
 msgid "The format of the data is described here:"
 msgstr "Il formato dei dati è descritto qui:"
+
+msgid "Format Description"
+msgstr "Descrizione del formato"
 
 msgid "Terms of use"
 msgstr "Condizioni d’uso"

@@ -26,6 +26,8 @@
                 </p>
             </tal:block>
 
+            <div metal:use-macro="layout.macros['terms_of_use']" tal:define="model election"/>
+
         </tal:block>
 
         <div metal:use-macro="layout.macros['related_link']" tal:define="meta election.meta" />

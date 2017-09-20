@@ -327,8 +327,10 @@
             <li><a href="${request.link(model, 'data-xlsx')}">XLSX</a></li>
         </ul>
     </p>
-    <h4 i18n:translate="">Format Description</h4>
     <p><span i18n:translate="">The format of the data is described here:</span> <a href="${layout.opendata_link}"><span i18n:translate="">Format Description</span></a>.</p>
+</metal:open_data_download>
+
+<metal:terms_of_use define-macro="terms_of_use" i18n:domain="onegov.election_day">
     <h4 i18n:translate="">Terms of use</h4>
     <p>
         <span i18n:translate="">Open use. Must provide the source.</span>
@@ -339,7 +341,7 @@
         </ul>
         <a href="${layout.terms_link}"><img width="100" height="80" src="${layout.terms_icon}" alt="terms"></a>
     </p>
-</metal:open_data_download>
+</metal:terms_of_use>
 
 <metal:upload_errors define-macro="upload_errors" i18n:domain="onegov.election_day">
     <div class="after-upload" tal:condition="errors">

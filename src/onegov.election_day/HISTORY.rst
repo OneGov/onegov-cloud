@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Always Show First and Last Item of Pagination.
+- Fixes placing of terms of use.
   [msom]
 
 1.15.8 (2017-09-14)

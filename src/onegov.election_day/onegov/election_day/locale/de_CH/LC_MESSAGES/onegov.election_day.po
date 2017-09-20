@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-17 10:17+0200\n"
+"POT-Creation-Date: 2017-09-20 08:02+0200\n"
 "PO-Revision-Date: 2017-07-17 10:19+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -499,11 +499,11 @@ msgstr ""
 "Die Rohdaten die zur Anzeige der Resultate verwendet werden, sind in den "
 "folgenden Formaten verfügbar:"
 
-msgid "Format Description"
-msgstr "Formatbeschreibung"
-
 msgid "The format of the data is described here:"
 msgstr "Das Datenformat ist hier beschrieben:"
+
+msgid "Format Description"
+msgstr "Formatbeschreibung"
 
 msgid "Terms of use"
 msgstr "Nutzungsbedingungen"
