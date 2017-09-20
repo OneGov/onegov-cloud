@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Patch the chosen library to fix searching for non-ascii characters.
+  [msom]
+
 1.3.3 (2017-09-15)
 ~~~~~~~~~~~~~~~~~~~
 
