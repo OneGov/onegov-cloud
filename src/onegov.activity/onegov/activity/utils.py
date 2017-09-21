@@ -307,7 +307,7 @@ def extract_thumbnail(text):
 
     try:
         first_image = next((img for img in pq(text or '')('img')), None)
-    except lxml.etree.XMLSyntaxError:
+    except (lxml.etree.XMLSyntaxError, lxml.etree.ParserError):
         first_image = None
 
     if first_image is None:
