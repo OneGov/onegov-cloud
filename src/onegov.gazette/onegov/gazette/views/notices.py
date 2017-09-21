@@ -1,4 +1,5 @@
 from datetime import datetime
+from io import BytesIO
 from morepath import redirect
 from morepath.request import Response
 from onegov.core.security import Personal
@@ -181,17 +182,8 @@ def view_notices_statistics_xlsx(self, request):
     """ View the statistics as XLSX. """
     self.on_request(request)
 
-    response = Response()
-    response.content_type = (
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    )
-    response.content_disposition = 'inline; filename={}-{}-{}.xlsx'.format(
-        request.translate(_("Statistics")).lower(),
-        normalize_for_url(request.translate(TRANSLATIONS.get(self.state, ''))),
-        datetime.now().strftime('%Y%m%d%H%M')
-    )
-
-    workbook = Workbook(response.body_file)
+    output = BytesIO()
+    workbook = Workbook(output)
     for title, row, content in (
         (_("Organizations"), _("Organization"), self.count_by_organization),
         (_("Categories"), _("Category"), self.count_by_category),
@@ -206,6 +198,18 @@ def view_notices_statistics_xlsx(self, request):
         for index, row in enumerate(content()):
             worksheet.write_row(index + 1, 0, row)
     workbook.close()
+    output.seek(0)
+
+    response = Response()
+    response.content_type = (
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response.content_disposition = 'inline; filename={}-{}-{}.xlsx'.format(
+        request.translate(_("Statistics")).lower(),
+        normalize_for_url(request.translate(TRANSLATIONS.get(self.state, ''))),
+        datetime.now().strftime('%Y%m%d%H%M')
+    )
+    response.body = output.read()
 
     return response
 
