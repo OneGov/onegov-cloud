@@ -8,7 +8,8 @@ $('.stackable').stacktable();
 $('.chosen-select').chosen({
     no_results_text: "Keine Ergebnisse gefunden:",
     placeholder_text_multiple: "Mehrere Optionen auswählen",
-    placeholder_text_single: "Eine Option auswählen"
+    placeholder_text_single: "Eine Option auswählen",
+    search_contains: true
 });
 
 // Add backend dropdown actions
