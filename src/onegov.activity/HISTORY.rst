@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.2.2 (2017-09-21)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds support for LXML 4.0.
   [msom]
