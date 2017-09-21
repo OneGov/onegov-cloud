@@ -5,9 +5,10 @@ from onegov.gazette.tests import login_editor_2
 from onegov.gazette.tests import login_editor_3
 from onegov.gazette.tests import login_publisher
 from unittest.mock import patch
-from urllib.parse import urlparse
 from urllib.parse import parse_qs
+from urllib.parse import urlparse
 from webtest import TestApp as Client
+from xlrd import open_workbook
 
 
 def test_view_notices(gazette_app):
@@ -317,27 +318,29 @@ def test_view_notices_statistics(gazette_app):
     publisher = Client(gazette_app)
     login_publisher(publisher)
 
-    url_organizations = '/notices/{}/statistics-organizations'
-    url_categories = '/notices/{}/statistics-categories'
-    url_groups = '/notices/{}/statistics-groups'
+    def statistic(state, sheet_name, qs=None):
+        result = publisher.get(
+            '/notices/{}/statistics-xlsx?{}'.format(state, qs or '')
+        )
+        book = open_workbook(file_contents=result.body)
+        for sheet in book.sheets():
+            if sheet.name == sheet_name:
+                return [
+                    [sheet.cell(row, col).value for col in range(sheet.ncols)]
+                    for row in range(sheet.nrows)
+                ]
 
     # No notices yet
     states = ('drafted', 'submitted', 'accepted', 'rejected')
     for s in states:
         editor.get('/notices/{}/statistics'.format(s), status=403)
-        editor.get('/notices/{}/statistics-groups'.format(s), status=403)
-        editor.get('/notices/{}/statistics-categories'.format(s), status=403)
+        editor.get('/notices/{}/statistics-xlsx'.format(s), status=403)
 
         publisher.get('/notices/{}/statistics'.format(s))
-        assert publisher.get(url_organizations.format(s)).text == (
-            'Organisation,Anzahl\r\n'
-        )
-        assert publisher.get(url_categories.format(s)).text == (
-            'Rubrik,Anzahl\r\n'
-        )
-        assert publisher.get(url_groups.format(s)).text == (
-            'Gruppe,Anzahl\r\n'
-        )
+
+        assert statistic(s, 'Organisationen') == [['Organisation', 'Anzahl']]
+        assert statistic(s, 'Rubriken') == [['Rubrik', 'Anzahl']]
+        assert statistic(s, 'Gruppen') == [['Gruppe', 'Anzahl']]
 
     # Add users and groups
     admin = Client(gazette_app)
@@ -405,93 +408,87 @@ def test_view_notices_statistics(gazette_app):
                 manage.click("Einreichen").form.submit()
 
     for s in ('rejected', 'accepted'):
-        assert publisher.get(url_organizations.format(s)).text == (
-            'Organisation,Anzahl\r\n'
-        )
-        assert publisher.get(url_categories.format(s)).text == (
-            'Rubrik,Anzahl\r\n'
-        )
-        assert publisher.get(url_groups.format(s)).text == (
-            'Gruppe,Anzahl\r\n'
-        )
+        assert statistic(s, 'Organisationen') == [['Organisation', 'Anzahl']]
+        assert statistic(s, 'Rubriken') == [['Rubrik', 'Anzahl']]
+        assert statistic(s, 'Gruppen') == [['Gruppe', 'Anzahl']]
 
     assert publisher.get('/notices/drafted/statistics')
     assert publisher.get('/notices/submitted/statistics')
 
     # organizations/drafted: 5 x 100, 3 x 200
-    assert publisher.get(url_organizations.format('drafted')).text == (
-        'Organisation,Anzahl\r\n'
-        'Civic Community,3\r\n'
-        'State Chancellery,5\r\n'
-    )
+    assert statistic('drafted', 'Organisationen') == [
+        ['Organisation', 'Anzahl'],
+        ['Civic Community', 3],
+        ['State Chancellery', 5]
+    ]
 
     # organizations/submitted: 10 x 100, 1 x 300
-    assert publisher.get(url_organizations.format('submitted')).text == (
-        'Organisation,Anzahl\r\n'
-        'Municipality,1\r\n'
-        'State Chancellery,10\r\n'
-    )
+    assert statistic('submitted', 'Organisationen') == [
+        ['Organisation', 'Anzahl'],
+        ['Municipality', 1],
+        ['State Chancellery', 10],
+    ]
 
     # organizations/submitted/2017-45/46: 6 x 100, 1 x 300
-    url = '{}?from_date=2017-11-10&to_date=2017-11-17'.format(
-        url_organizations.format('submitted')
-    )
-    assert publisher.get(url).text == (
-        'Organisation,Anzahl\r\n'
-        'Municipality,1\r\n'
-        'State Chancellery,6\r\n'
-    )
+    assert statistic(
+        'submitted', 'Organisationen',
+        'from_date=2017-11-10&to_date=2017-11-17'
+    ) == [
+        ['Organisation', 'Anzahl'],
+        ['Municipality', 1],
+        ['State Chancellery', 6],
+    ]
 
     # categories/drafted: 3 x 11, 2 x 13, 3 x 14
-    assert publisher.get(url_categories.format('drafted')).text == (
-        'Rubrik,Anzahl\r\n'
-        'Commercial Register,2\r\n'
-        'Education,3\r\n'
-        'Elections,3\r\n'
-    )
+    assert statistic('drafted', 'Rubriken') == [
+        ['Rubrik', 'Anzahl'],
+        ['Commercial Register', 2],
+        ['Education', 3],
+        ['Elections', 3],
+    ]
 
     # categories/submitted: 4 x 12, 7 x 14
-    assert publisher.get(url_categories.format('submitted')).text == (
-        'Rubrik,Anzahl\r\n'
-        'Elections,7\r\n'
-        'Submissions,4\r\n'
-    )
+    assert statistic('submitted', 'Rubriken') == [
+        ['Rubrik', 'Anzahl'],
+        ['Elections', 7],
+        ['Submissions', 4],
+    ]
 
     # categories/submitted/2017-45/46: 1 x 12, 6 x 14
-    url = '{}?from_date=2017-11-10&to_date=2017-11-17'.format(
-        url_categories.format('submitted')
-    )
-    assert publisher.get(url).text == (
-        'Rubrik,Anzahl\r\n'
-        'Elections,6\r\n'
-        'Submissions,1\r\n'
-    )
+    assert statistic(
+        'submitted', 'Rubriken',
+        'from_date=2017-11-10&to_date=2017-11-17'
+    ) == [
+        ['Rubrik', 'Anzahl'],
+        ['Elections', 6],
+        ['Submissions', 1],
+    ]
 
     # groups/drafted: 1 x w/o, 6 x B, 1 x C
     assert '>5</td>' in publisher.get('/notices/drafted/statistics')
-    assert publisher.get(url_groups.format('drafted')).text == (
-        'Gruppe,Anzahl\r\n'
-        'B,6\r\n'
-        'C,1\r\n'
-    )
+    assert statistic('drafted', 'Gruppen') == [
+        ['Gruppe', 'Anzahl'],
+        ['B', 6],
+        ['C', 1],
+    ]
 
     # groups/submitted: 6 x B, 5 x C
     assert '>4</td>' in publisher.get('/notices/submitted/statistics')
-    assert publisher.get(url_groups.format('submitted')).text == (
-        'Gruppe,Anzahl\r\n'
-        'B,6\r\n'
-        'C,5\r\n'
-    )
+    assert statistic('submitted', 'Gruppen') == [
+        ['Gruppe', 'Anzahl'],
+        ['B', 6],
+        ['C', 5],
+    ]
 
     # groups/submitted/2017-45/46: 4 x B, 3 x C
-    url = '{}?from_date=2017-11-10&to_date=2017-11-17'.format(
-        url_groups.format('submitted')
-    )
-    assert publisher.get(url).text == (
-        'Gruppe,Anzahl\r\n'
-        'B,4\r\n'
-        'C,3\r\n'
-    )
+    assert statistic(
+        'submitted', 'Gruppen',
+        'from_date=2017-11-10&to_date=2017-11-17'
+    ) == [
+        ['Gruppe', 'Anzahl'],
+        ['B', 4],
+        ['C', 3],
+    ]
 
 
 def test_view_notices_update(gazette_app):

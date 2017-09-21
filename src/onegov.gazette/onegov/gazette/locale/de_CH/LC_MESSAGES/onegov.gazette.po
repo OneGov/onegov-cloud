@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-04 14:44+0200\n"
-"PO-Revision-Date: 2017-09-04 14:43+0200\n"
+"POT-Creation-Date: 2017-09-21 14:57+0200\n"
+"PO-Revision-Date: 2017-09-21 14:57+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -191,7 +191,8 @@ msgid "Dear Sirs and Madams,"
 msgstr "Sehr geehrte Damen und Herren,"
 
 msgid "Your official notice has been rejected:"
-msgstr "Ihr Inserat für den amtlichen Teil des Amtsblatts wurde zurückgewiesen:"
+msgstr ""
+"Ihr Inserat für den amtlichen Teil des Amtsblatts wurde zurückgewiesen:"
 
 msgid "Yes"
 msgstr "Ja"
@@ -267,14 +268,17 @@ msgstr "Organisationen"
 msgid "Number of Notices"
 msgstr "Anzahl"
 
-msgid "Download the results as CSV."
-msgstr "Als CSV herunterladen."
-
 msgid "By Categories"
-msgstr "Kategorien"
+msgstr "Rubriken"
 
 msgid "By Groups"
 msgstr "Gruppen"
+
+msgid "Download"
+msgstr "Herunterladen"
+
+msgid "Download the results as XLSX."
+msgstr "Als XLSX herunterladen."
 
 msgid "No users."
 msgstr "Keine Benutzer."
@@ -289,11 +293,11 @@ msgid ""
 msgstr ""
 "Eine E-Mail wurde an ${email} gesendet (sofern die Adresse gültig ist)."
 
-msgid "Password changed."
-msgstr "Passwort geändert."
-
 msgid "Wrong username or password reset link not valid any more."
 msgstr "Ungültige Adresse oder abgelaufener Link."
+
+msgid "Password changed."
+msgstr "Passwort geändert."
 
 msgid "Password reset"
 msgstr "Persönliches Passwort Amtsblattredaktion zurücksetzen"
@@ -435,6 +439,12 @@ msgstr "Publikation für den amtlichen Teil ${id}"
 msgid "New Official Notice"
 msgstr "Neue Meldung"
 
+msgid "Organizations"
+msgstr "Organisationen"
+
+msgid "Categories"
+msgstr "Rubriken"
+
 msgid "Update notices"
 msgstr "Meldungen aktualisieren"
 
@@ -443,12 +453,6 @@ msgstr "Aktualisieren"
 
 msgid "Notices updated."
 msgstr "Meldungen aktualisiert."
-
-msgid "Organizations"
-msgstr "Organisationen"
-
-msgid "Categories"
-msgstr "Rubriken"
 
 msgid "You have rejected messages."
 msgstr "Sie haben zurückgewiesene Meldungen."

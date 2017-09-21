@@ -1,16 +1,19 @@
-from csv import writer
+from datetime import datetime
 from morepath import redirect
 from morepath.request import Response
 from onegov.core.security import Personal
 from onegov.core.security import Private
+from onegov.core.utils import normalize_for_url
 from onegov.gazette import _
 from onegov.gazette import GazetteApp
 from onegov.gazette.collections import GazetteNoticeCollection
+from onegov.gazette.collections.notices import TRANSLATIONS
 from onegov.gazette.forms import EmptyForm
 from onegov.gazette.forms import NoticeForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.views import get_user
 from onegov.gazette.views import get_user_and_group
+from xlsxwriter import Workbook
 
 
 @GazetteApp.form(
@@ -171,72 +174,38 @@ def view_notices_statistics(self, request):
 
 @GazetteApp.view(
     model=GazetteNoticeCollection,
-    name='statistics-organizations',
+    name='statistics-xlsx',
     permission=Private
 )
-def view_notices_statistics_organizations(self, request):
-    """ View the organizations statistics data as CSV. """
+def view_notices_statistics_xlsx(self, request):
+    """ View the statistics as XLSX. """
     self.on_request(request)
 
     response = Response()
-    response.content_type = 'text/csv'
-    response.content_disposition = 'inline; filename={}.csv'.format(
-        request.translate(_("Organizations")).lower()
+    response.content_type = (
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
-    csvwriter = writer(response)
-    csvwriter.writerow([
-        request.translate(_("Organization")),
-        request.translate(_("Number of Notices"))
-    ])
-    csvwriter.writerows(self.count_by_organization())
-
-    return response
-
-
-@GazetteApp.view(
-    model=GazetteNoticeCollection,
-    name='statistics-categories',
-    permission=Private
-)
-def view_notices_statistics_categories(self, request):
-    """ View the categories statistics data as CSV. """
-    self.on_request(request)
-
-    response = Response()
-    response.content_type = 'text/csv'
-    response.content_disposition = 'inline; filename={}.csv'.format(
-        request.translate(_("Categories")).lower()
+    response.content_disposition = 'inline; filename={}-{}-{}.xlsx'.format(
+        request.translate(_("Statistics")).lower(),
+        normalize_for_url(request.translate(TRANSLATIONS.get(self.state, ''))),
+        datetime.now().strftime('%Y%m%d%H%M')
     )
-    csvwriter = writer(response)
-    csvwriter.writerow([
-        request.translate(_("Category")),
-        request.translate(_("Number of Notices"))
-    ])
-    csvwriter.writerows(self.count_by_category())
 
-    return response
-
-
-@GazetteApp.view(
-    model=GazetteNoticeCollection,
-    name='statistics-groups',
-    permission=Private
-)
-def view_notices_statistics_groups(self, request):
-    """ View the groups statistics data as CSV. """
-    self.on_request(request)
-
-    response = Response()
-    response.content_type = 'text/csv'
-    response.content_disposition = 'inline; filename={}.csv'.format(
-        request.translate(_("Groups")).lower()
-    )
-    csvwriter = writer(response)
-    csvwriter.writerow([
-        request.translate(_("Group")),
-        request.translate(_("Number of Notices"))
-    ])
-    csvwriter.writerows(self.count_by_group())
+    workbook = Workbook(response.body_file)
+    for title, row, content in (
+        (_("Organizations"), _("Organization"), self.count_by_organization),
+        (_("Categories"), _("Category"), self.count_by_category),
+        (_("Groups"), _("Group"), self.count_by_group),
+    ):
+        worksheet = workbook.add_worksheet()
+        worksheet.name = request.translate(title)
+        worksheet.write_row(0, 0, (
+            request.translate(row),
+            request.translate(_("Number of Notices"))
+        ))
+        for index, row in enumerate(content()):
+            worksheet.write_row(index + 1, 0, row)
+    workbook.close()
 
     return response
 

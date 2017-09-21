@@ -47,7 +47,9 @@ setup(
         'pyyaml',
         'raven',
         'rjsmin',
-        'sedate'
+        'sedate',
+        'xlrd',
+        'xlsxwriter'
     ],
     extras_require=dict(
         test=[

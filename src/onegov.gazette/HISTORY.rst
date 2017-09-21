@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Export statistics as XLSX instead of CSV.
+  [msom]
+
 1.3.5 (2017-09-21)
 ~~~~~~~~~~~~~~~~~~~
 
