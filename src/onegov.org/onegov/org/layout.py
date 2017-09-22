@@ -11,7 +11,8 @@ from onegov.core.utils import linkify
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryEntryCollection
 from onegov.event import OccurrenceCollection
-from onegov.form import FormCollection, FormSubmissionFile, render_field
+from onegov.file import File
+from onegov.form import FormCollection, render_field
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
@@ -319,8 +320,9 @@ class Layout(ChameleonLayout):
             return None
 
         if field.data.get('data', '').startswith('@'):
-            return self.request.link(
-                FormSubmissionFile(id=field.data['data'].lstrip('@')))
+            return self.request.class_link(File, {
+                'id': field.data['data'].lstrip('@')
+            })
 
     @cached_property
     def move_person_url_template(self):

@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Slightly improves the look of confirmation dialogs.
+- Switches to onegov.file for form submission files.
   [href]
 
 - Fixes dialog not showing for undeletable objects.
