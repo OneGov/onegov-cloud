@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Suppress the IE/Edge popup when closing the preview.
+  [msom]
+
 1.4.0 (2017-09-21)
 ~~~~~~~~~~~~~~~~~~~
 
