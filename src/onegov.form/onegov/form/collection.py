@@ -3,7 +3,6 @@ import warnings
 from datetime import datetime, timedelta
 from onegov.core.crypto import random_token
 from onegov.core.utils import normalize_for_url
-from onegov.file import File
 from onegov.file.utils import as_fileintent
 from onegov.form.errors import UnableToComplete
 from onegov.form.fields import UploadField
@@ -266,7 +265,7 @@ class FormSubmissionCollection(object):
 
             f = FormFile(
                 id=random_token(),
-                name=field['filename'],
+                name=field.filename,
                 note=field_id,
                 reference=as_fileintent(
                     content=field.file,
