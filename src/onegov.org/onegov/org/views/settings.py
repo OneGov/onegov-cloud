@@ -31,8 +31,8 @@ def handle_settings(self, request, form):
         def clear_locale(response):
             response.delete_cookie('locale')
 
-        if 'return-to' in request.params:
-            return request.redirect(request.link(self, name='einstellungen'))
+        # always redirect to make sure locale changes are applied
+        return request.redirect(request.link(self, name='einstellungen'))
 
     elif request.method == 'GET':
         form.process(obj=self)

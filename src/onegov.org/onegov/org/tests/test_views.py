@@ -2886,7 +2886,7 @@ def test_map_default_view(org_app):
     settings.form['default_map_view'] = encode_map_value({
         'lat': 47, 'lon': 8, 'zoom': 12
     })
-    settings = settings.form.submit()
+    settings = settings.form.submit().follow()
 
     assert decode_map_value(settings.form['default_map_view'].value) == {
         'lat': 47, 'lon': 8, 'zoom': 12
@@ -2981,25 +2981,25 @@ def test_settings(org_app):
 
     settings_page.form['primary_color'] = '#ccddee'
     settings_page.form['reply_to'] = 'info@govikon.ch'
-    settings_page = settings_page.form.submit()
+    settings_page = settings_page.form.submit().follow()
 
     assert "Ungültige Farbe." not in settings_page.text
 
     settings_page.form['logo_url'] = 'https://seantis.ch/logo.img'
     settings_page.form['reply_to'] = 'info@govikon.ch'
-    settings_page = settings_page.form.submit()
+    settings_page = settings_page.form.submit().follow()
 
     assert '<img src="https://seantis.ch/logo.img"' in settings_page.text
 
     settings_page.form['homepage_image_1'] = "http://images/one"
     settings_page.form['homepage_image_2'] = "http://images/two"
-    settings_page = settings_page.form.submit()
+    settings_page = settings_page.form.submit().follow()
 
     assert 'http://images/one' in settings_page
     assert 'http://images/two' in settings_page
 
     settings_page.form['analytics_code'] = '<script>alert("Hi!");</script>'
-    settings_page = settings_page.form.submit()
+    settings_page = settings_page.form.submit().follow()
     assert '<script>alert("Hi!");</script>' in settings_page.text
 
 
@@ -3774,13 +3774,7 @@ def test_switch_languages(org_app):
     assert 'Allemand' not in page
 
     page.form['locales'] = 'fr_CH'
-    page = page.form.submit()
-
-    assert 'Allemand' not in page
-    assert 'Deutsch' in page
-
-    # the language updates after a refresh
-    page = client.get('/einstellungen')
+    page = page.form.submit().follow()
 
     assert 'Allemand' in page
     assert 'Deutsch' not in page
