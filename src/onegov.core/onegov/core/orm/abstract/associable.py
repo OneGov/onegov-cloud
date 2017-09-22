@@ -117,9 +117,11 @@ def associated(associated_cls, attribute_name, cardinality='one-to-many',
     if cardinality in ('one-to-one', 'one-to-many'):
         cascade = 'all, delete-orphan'
         single_parent = True
+        passive_deletes = False
     else:
         cascade = False
         single_parent = False
+        passive_deletes = True
 
     if uselist == 'auto':
         uselist = not cardinality.endswith('to-one')
@@ -151,7 +153,7 @@ def associated(associated_cls, attribute_name, cardinality='one-to-many',
             single_parent=single_parent,
             cascade=cascade,
             uselist=uselist,
-            passive_deletes=True
+            passive_deletes=passive_deletes
         )
 
     return declared_attr(descriptor)
