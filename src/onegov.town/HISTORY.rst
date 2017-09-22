@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds french translation.
+  [href]
+
 1.13.3 (2017-08-03)
 ~~~~~~~~~~~~~~~~~~~~~
 
