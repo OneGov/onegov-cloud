@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.48.2 (2017-09-22)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes associable not disabling cascades completely.
   [href]
