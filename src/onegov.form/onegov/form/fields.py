@@ -50,16 +50,18 @@ class UploadField(FileField):
             self.data = {}
 
     def process_fieldstorage(self, fs):
+        self.file = getattr(fs, 'file', getattr(fs, 'stream', None))
+        self.filename = getattr(fs, 'filename', None)
 
-        # support webob and werkzeug multidicts
-        fp = getattr(fs, 'file', getattr(fs, 'stream', None))
-
-        if fp is None:
+        if not self.file:
             return {}
 
-        fp.seek(0)
+        self.file.seek(0)
 
-        return binary_to_dictionary(fp.read(), fs.filename)
+        try:
+            return binary_to_dictionary(self.file.read(), self.filename)
+        finally:
+            self.file.seek(0)
 
 
 class HtmlField(TextAreaField):

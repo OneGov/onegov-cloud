@@ -2,14 +2,13 @@ import pytest
 
 from datetime import datetime, timedelta
 from io import BytesIO
-from onegov.form import (
-    CompleteFormSubmission,
-    FormCollection,
-    PendingFormSubmission,
-    parse_form,
-)
-from onegov.form.models import FormSubmissionFile, hash_definition
+from onegov.file import File
+from onegov.form import CompleteFormSubmission
+from onegov.form import FormCollection
+from onegov.form import parse_form
+from onegov.form import PendingFormSubmission
 from onegov.form.errors import UnableToComplete
+from onegov.form.models import hash_definition
 from sedate import utcnow
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError
@@ -273,7 +272,7 @@ def test_delete_fail_with_submissions(session):
         collection.definitions.delete('newsletter', with_submissions=False)
 
 
-def test_file_submissions(session):
+def test_file_submissions_update(session):
     collection = FormCollection(session)
 
     # upload a new file
@@ -286,10 +285,10 @@ def test_file_submissions(session):
         'file', definition.form_class(data), state='pending')
 
     assert len(submission.files) == 1
-    assert len(submission.files[0].filedata) > 0
+    assert submission.files[0].checksum == '3858f62230ac3c915f300c664312c63f'
 
     # replace the existing file
-    previous_content = submission.files[0].filedata
+    previous_file = submission.files[0]
     session.refresh(submission)
 
     data = FileMultiDict()
@@ -297,12 +296,15 @@ def test_file_submissions(session):
     data.add_file('file', BytesIO(b'barfoo'), filename='foobar.txt')
 
     collection.submissions.update(submission, definition.form_class(data))
+    session.flush()
+    session.refresh(submission)
 
     assert len(submission.files) == 1
-    assert previous_content != submission.files[0].filedata
+    assert previous_file.id != submission.files[0].id
+    assert previous_file.checksum != submission.files[0].checksum
 
     # keep the file
-    previous_content = submission.files[0].filedata
+    previous_file = submission.files[0]
     session.refresh(submission)
 
     data = FileMultiDict()
@@ -310,9 +312,12 @@ def test_file_submissions(session):
     data.add_file('file', BytesIO(b''), filename='foobar.txt')
 
     collection.submissions.update(submission, definition.form_class(data))
+    session.flush()
+    session.refresh(submission)
 
     assert len(submission.files) == 1
-    assert previous_content == submission.files[0].filedata
+    assert previous_file.id == submission.files[0].id
+    assert previous_file.checksum == submission.files[0].checksum
 
     # delete the file
     session.refresh(submission)
@@ -338,12 +343,14 @@ def test_file_submissions_cascade(session):
     collection.submissions.add(
         'file', definition.form_class(data), state='pending')
 
-    assert session.query(FormSubmissionFile).count() == 1
+    assert session.query(File).count() == 1
 
     collection.submissions.remove_old_pending_submissions(older_than=(
         datetime.utcnow() + timedelta(seconds=60)))
 
-    assert session.query(FormSubmissionFile).count() == 0
+    session.flush()
+
+    assert session.query(File).count() == 0
 
 
 def test_get_current(session):

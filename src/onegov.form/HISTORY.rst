@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Moves from the custom form submission file model to a onegov.file based one.
+
+  This improves the performance of serving files and makes sure that a
+  unified approach is used across multiple onegov modules.
+  [href]
+
 - Adds french translation.
   [href]
 

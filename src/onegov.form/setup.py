@@ -36,6 +36,7 @@ setup(
         'humanize',
         'jsonpickle',
         'onegov.core>=0.16.0',
+        'onegov.file',
         'onegov.pay',
         'onegov.search',
         'pyparsing!=2.1.2',  # 2.1.2 has a problem with Python 3

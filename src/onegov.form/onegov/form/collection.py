@@ -1,16 +1,19 @@
 import warnings
 
 from datetime import datetime, timedelta
+from onegov.core.crypto import random_token
 from onegov.core.utils import normalize_for_url
+from onegov.file import File
+from onegov.file.utils import as_fileintent
 from onegov.form.errors import UnableToComplete
 from onegov.form.fields import UploadField
 from onegov.form.models import (
     FormDefinition,
     FormSubmission,
-    FormSubmissionFile
+    FormFile
 )
 from sedate import replace_timezone, utcnow
-from sqlalchemy import func, not_, exc
+from sqlalchemy import func, exc, inspect
 from uuid import uuid4
 
 
@@ -218,16 +221,14 @@ class FormSubmissionCollection(object):
         """
         assert submission.id and submission.state
 
-        exclude = exclude or set()
+        # ignore certain fields
+        exclude = exclude and set(exclude) or set()
+        exclude.add(form.meta.csrf_field_name)  # never include the csrf token
 
         submission.definition = form._source
         submission.data = {
             k: v for k, v in form.data.items() if k not in exclude
         }
-
-        # never include the csrf token
-        if form.meta.csrf and form.meta.csrf_field_name in submission.data:
-            del submission.data[form.meta.csrf_field_name]
 
         # move uploaded files to a separate table
         files = set(
@@ -250,27 +251,33 @@ class FormSubmissionCollection(object):
 
         # delete all files which are not part of the updated form
         # if no files are given, delete all files belonging to the submission
-        query = self.session.query(FormSubmissionFile)
-        query = query.filter(FormSubmissionFile.submission_id == submission.id)
+        trash = [f for f in submission.files if f.note not in files_to_keep]
 
-        if files_to_keep:
-            query = query.filter(not_(
-                FormSubmissionFile.field_id.in_(files_to_keep)))
+        for f in trash:
+            self.session.delete(f)
 
-        query.delete('fetch')
+        if trash and inspect(submission).persistent:
+            self.session.refresh(submission)
 
         # store the new fields in the separate table
+
         for field_id in files_to_add:
-            f = FormSubmissionFile(
-                id=uuid4(),
-                field_id=field_id,
-                submission_id=submission.id,
-                filedata=submission.data[field_id]['data'],
+            field = getattr(form, field_id)
+
+            f = FormFile(
+                id=random_token(),
+                name=field['filename'],
+                note=field_id,
+                reference=as_fileintent(
+                    content=field.file,
+                    filename=field.filename
+                )
             )
-            self.session.add(f)
+
+            submission.files.append(f)
 
             # replace the data in the submission with a reference
-            submission.data[field_id]['data'] = '@{}'.format(f.id.hex)
+            submission.data[field_id]['data'] = '@{}'.format(f.id)
 
             # we need to mark these changes as only top-level json changes
             # are automatically propagated
@@ -296,13 +303,8 @@ class FormSubmissionCollection(object):
         if not include_external:
             submissions = submissions.filter(FormSubmission.name != None)
 
-        files = self.session.query(FormSubmissionFile)
-        files = files.filter(FormSubmissionFile.submission_id.in_(
-            submissions.with_entities(FormSubmission.id).subquery())
-        )
-
-        files.delete('fetch')
-        submissions.delete('fetch')
+        for submission in submissions:
+            self.session.delete(submission)
 
     def by_state(self, state):
         return self.query().filter(FormSubmission.state == state)
@@ -328,13 +330,6 @@ class FormSubmissionCollection(object):
         if current_only:
             an_hour_ago = utcnow() - timedelta(hours=1)
             query = query.filter(FormSubmission.last_change >= an_hour_ago)
-
-        return query.first()
-
-    def file_by_id(self, id):
-        """ Returns the submission file with the given id or None. """
-        query = self.session.query(FormSubmissionFile)
-        query = query.filter(FormSubmissionFile.id == id)
 
         return query.first()
 

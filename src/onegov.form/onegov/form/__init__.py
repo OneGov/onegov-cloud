@@ -20,8 +20,8 @@ from onegov.form.core import (
 from onegov.form.display import render_field
 from onegov.form.models import (
     FormDefinition,
+    FormFile,
     FormSubmission,
-    FormSubmissionFile,
     PendingFormSubmission,
     CompleteFormSubmission
 )
@@ -40,9 +40,9 @@ __all__ = [
     'FormCollection',
     'FormDefinition',
     'FormDefinitionCollection',
+    'FormFile',
     'FormSubmission',
     'FormSubmissionCollection',
-    'FormSubmissionFile',
     'merge_forms',
     'move_fields',
     'parse_form',

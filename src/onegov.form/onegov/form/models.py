@@ -6,6 +6,7 @@ from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.orm.types import JSON, UUID
 from onegov.core.orm.types import UTCDateTime
+from onegov.file import AssociatedFiles, File
 from onegov.form.display import render_field
 from onegov.form.parser import parse_form
 from onegov.pay import Payable
@@ -13,11 +14,7 @@ from onegov.pay import process_payment
 from onegov.search import ORMSearchable
 from sedate import utcnow
 from sqlalchemy import Column, Enum, ForeignKey, Text
-from sqlalchemy.orm import (
-    deferred,
-    object_session,
-    relationship,
-)
+from sqlalchemy.orm import object_session, relationship
 from sqlalchemy_utils import observes
 from uuid import uuid4
 from wtforms import StringField, TextAreaField
@@ -109,7 +106,7 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, SearchableDefinition):
         return query.first() and True or False
 
 
-class FormSubmission(Base, TimestampMixin, Payable):
+class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles):
     """ Defines a submitted form in the database. """
 
     __tablename__ = 'submissions'
@@ -147,13 +144,6 @@ class FormSubmission(Base, TimestampMixin, Payable):
     state = Column(
         Enum('pending', 'complete', name='submission_state'),
         nullable=False
-    )
-
-    #: the files belonging to this submission
-    files = relationship(
-        "FormSubmissionFile",
-        backref='submission',
-        cascade="all, delete-orphan"
     )
 
     __mapper_args__ = {
@@ -243,43 +233,5 @@ class CompleteFormSubmission(FormSubmission):
     __mapper_args__ = {'polymorphic_identity': 'complete'}
 
 
-class FormSubmissionFile(Base, TimestampMixin):
-    """ Holds files uploaded in form submissions.
-
-    This ensures that forms can be loaded without having to load the files
-    into memory. But it's still not super efficient. The thinking is that
-    most forms won't have file uploads and if they do it won't be large.
-
-    Don't store big files here, or files which need to be served often.
-    For that you *have* to use some kind of filesystem storage.
-
-    The basic use case for this table is the odd table which contains some
-    kind of file which is then viewed by backend personell only.
-
-    In this case there won't many file downloads and it's important
-    that the file stays with the form and is not accidentally lost.
-
-    So it fits for that case.
-    """
-
-    __tablename__ = 'submission_files'
-
-    #: id of the file
-    id = Column(UUID, primary_key=True, default=uuid4)
-
-    #: the id of the submission
-    submission_id = Column(UUID, ForeignKey(FormSubmission.id), nullable=False)
-
-    #: the id of the field in the submission
-    field_id = Column(Text, nullable=False)
-
-    #: the actual file data
-    filedata = deferred(Column(Text, nullable=False))
-
-    @property
-    def submission_data(self):
-        """ Returns the data stored on the submission, associated with this
-        submisison file.
-
-        """
-        return self.submission.data.get(self.field_id)
+class FormFile(File):
+    __mapper_args__ = {'polymorphic_identity': 'formfile'}
