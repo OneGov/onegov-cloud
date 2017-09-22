@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes the associated table names for associable models.
+  [href]
+
 - Sets the language in the ORM after the transaction has begun, not before.
   [href]
 

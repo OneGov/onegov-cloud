@@ -125,7 +125,7 @@ def associated(associated_cls, attribute_name, cardinality='one-to-many',
         uselist = not cardinality.endswith('to-one')
 
     def descriptor(cls):
-        name = 'payments_for_{}'.format(cls.__tablename__)
+        name = '_for_'.join((associated_cls.__tablename__, cls.__tablename__))
         key = '{}_id'.format(cls.__tablename__)
         target = '{}.id'.format(cls.__tablename__)
         backref = 'linked_{}'.format(cls.__tablename__)
