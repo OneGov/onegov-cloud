@@ -27,6 +27,10 @@ def handle_settings(self, request, form):
 
         request.success(_("Your changes were saved"))
 
+        @request.after
+        def clear_locale(response):
+            response.delete_cookie('locale')
+
         if 'return-to' in request.params:
             return request.redirect(request.link(self, name='einstellungen'))
 

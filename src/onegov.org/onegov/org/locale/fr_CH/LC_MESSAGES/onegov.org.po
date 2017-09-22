@@ -1,3 +1,4 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
@@ -9,1584 +10,1670 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Lingua 3.12\n"
+"gengo-order-id: 3154854\n"
 "X-Generator: Poedit 1.8.12\n"
 
 #, python-format
 msgid "${org} OneGov Cloud Status"
-msgstr ""
+msgstr "Statut du OneGov Cloud de ${org}"
 
 msgid "General"
-msgstr ""
+msgstr "Général"
 
 #, python-format
 msgid "${org} Reservation Overview"
-msgstr ""
+msgstr "Aperçu de la ${org} réservation"
 
 msgid "Login"
-msgstr ""
+msgstr "Connexion"
 
 msgid "Timeline"
-msgstr ""
+msgstr "Chronologie"
 
 msgid "Files"
-msgstr ""
+msgstr "Fichiers"
 
 msgid "Images"
-msgstr ""
+msgstr "Images"
 
 msgid "Payments"
-msgstr ""
+msgstr "Paiements"
 
 msgid "Management"
-msgstr ""
+msgstr "Gestion"
 
 msgid "Open Tickets"
-msgstr ""
+msgstr "Ouvrir les tickets"
 
 msgid "Pending Tickets"
-msgstr ""
+msgstr "Tickets en attente"
 
 msgid "Closed Tickets"
-msgstr ""
+msgstr "Tickets clôturés"
 
 msgid "Register"
-msgstr ""
+msgstr "S'inscrire"
 
 msgid "Payment Provider"
-msgstr ""
+msgstr "Opérateur de paiement"
 
 msgid "Settings"
-msgstr ""
+msgstr "Paramètres"
 
 msgid "Users"
-msgstr ""
+msgstr "Utilisateurs"
 
 msgid "Tickets"
-msgstr ""
+msgstr "Tickets"
 
 msgid "Ticket"
-msgstr ""
+msgstr "Ticket"
 
 msgid "User Profile"
-msgstr ""
+msgstr "Profil d'utilisateur"
 
 msgid "Logout"
-msgstr ""
+msgstr "Se déconnecter"
 
 msgid "Cancel"
-msgstr ""
+msgstr "Annuler"
 
 msgid "This site is hidden from the general public"
-msgstr ""
+msgstr "Ce site est caché pour le grand public"
 
 msgid "Mo"
-msgstr ""
+msgstr "Lu"
 
 msgid "Tu"
-msgstr ""
+msgstr "Ma"
 
 msgid "We"
-msgstr ""
+msgstr "Me"
 
 msgid "Th"
-msgstr ""
+msgstr "Je"
 
 msgid "Fr"
-msgstr ""
+msgstr "Ve"
 
 msgid "Sa"
-msgstr ""
+msgstr "Sa"
 
 msgid "Su"
-msgstr ""
+msgstr "Di"
 
 msgid "Homepage"
-msgstr ""
+msgstr "Page d'accueil"
 
 msgid "Forms"
-msgstr ""
+msgstr "Formulaires"
 
 msgid "Edit"
-msgstr ""
+msgstr "Modifier"
 
 msgid "People"
-msgstr ""
+msgstr "Personnes"
 
 msgid "Reservations"
-msgstr ""
+msgstr "Réservations"
 
 msgid "Notifications"
-msgstr ""
+msgstr "Notifications"
 
 msgid "Edit allocation"
-msgstr ""
+msgstr "Modifier l'allocation"
 
 #, python-format
 msgid "Every ${days} until ${end}"
-msgstr ""
+msgstr "Tous les ${days} jusqu'à ${end}"
 
 msgid "Events"
-msgstr ""
+msgstr "Événements"
 
 msgid "Newsletter"
-msgstr ""
+msgstr "Newsletter"
 
 msgid "Subscribers"
-msgstr ""
+msgstr "Abonnés"
 
 msgid "Photo Albums"
-msgstr ""
+msgstr "Albums photo"
 
 msgid "Usermanagement"
-msgstr ""
+msgstr "Gestion de l'utilisateur"
 
 msgid "Exports"
-msgstr ""
+msgstr "Exports"
 
 msgid "Payment Providers"
-msgstr ""
+msgstr "Opérateurs de paiement"
 
 msgid "Delete"
-msgstr ""
+msgstr "Supprimer"
 
 msgid "New"
-msgstr ""
+msgstr "Nouveau"
 
 msgid "No"
-msgstr ""
+msgstr "Non"
 
 msgid "This form can't be deleted."
-msgstr ""
+msgstr "Ce formulaire ne peut être supprimé."
 
 msgid ""
 "There are submissions associated with the form. Those need to be removed "
 "first."
 msgstr ""
+"Il existe des requêtes associées à ce formulaire. Il faut d'abord les "
+"supprimer."
 
 msgid "Add"
-msgstr ""
+msgstr "Ajouter"
 
 msgid "New Note"
-msgstr ""
+msgstr "Nouveau commentaire"
 
 msgid "Mark as paid"
-msgstr ""
+msgstr "Marquer comme payé"
 
 msgid "Mark as unpaid"
-msgstr ""
+msgstr "Marquer comme non payé"
 
 msgid "Capture Payment"
-msgstr ""
+msgstr "Capturer le paiement"
 
 msgid "Recipients"
-msgstr ""
+msgstr "Destinataires"
 
 msgid "Clean up"
-msgstr ""
+msgstr "Nettoyer"
 
 msgid "Occupancy"
-msgstr ""
+msgstr "Occupation"
 
 msgid "Export"
-msgstr ""
+msgstr "Exporter"
 
 msgid "Send"
-msgstr ""
+msgstr "Envoyer"
 
 msgid "Manage images"
-msgstr ""
+msgstr "Gérer les images"
 
 msgid "Choose images"
-msgstr ""
+msgstr "Choisir des images"
 
 msgid "Synchronise"
-msgstr ""
+msgstr "Synchroniser"
 
 msgid "Yes"
-msgstr ""
+msgstr "Oui"
 
 msgid "Do you really want to delete this form?"
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer ce formulaire ?"
 
 msgid "This cannot be undone."
-msgstr ""
+msgstr "Cela ne peut être effectué."
 
 msgid "Delete form"
-msgstr ""
+msgstr "Supprimer le formulaire"
 
 msgid "Accept ticket"
-msgstr ""
+msgstr "Accepter le ticket"
 
 msgid "Refund Payment"
-msgstr ""
+msgstr "Rembourser le paiement"
 
 msgid "This resource can't be deleted."
-msgstr ""
+msgstr "Cette ressource ne peut être supprimée."
 
 msgid "There are existing reservations associated with this resource"
-msgstr ""
+msgstr "Des réservations existantes sont associées à cette ressource"
 
 msgid "This event can't be deleted."
-msgstr ""
+msgstr "Cet événement ne peut être supprimé."
 
 msgid "To remove this event, go to the ticket and reject it."
-msgstr ""
+msgstr "Pour supprimer cet événement, allez sur le ticket et refusez-le."
 
 msgid "Create Signup Link"
-msgstr ""
+msgstr "Créez un lien d'inscription"
 
 msgid "Do you really want to delete this person?"
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer cette personne ?"
 
 msgid "Delete person"
-msgstr ""
+msgstr "Supprimer la personne"
 
 msgid "Close ticket"
-msgstr ""
+msgstr "Fermer le ticket"
 
 msgid "Do you really want capture the payment?"
-msgstr ""
+msgstr "Voulez-vous vraiment capturer le paiement ?"
 
 msgid ""
-"This usually happens automatically, so there is no reason not do capture the "
-"payment."
+"This usually happens automatically, so there is no reason not do capture the"
+" payment."
 msgstr ""
+"Cela arrive généralement automatiquement, il n'y a donc aucune raison de ne "
+"pas capturer le paiement."
 
 msgid "Capture payment"
-msgstr ""
+msgstr "Capturer le paiement"
 
 msgid "Do you really want to delete this resource?"
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer cette ressource ?"
 
 msgid "Delete resource"
-msgstr ""
+msgstr "Supprimer la ressource"
 
 msgid "Do you really want to delete this event?"
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer cet événement ?"
 
 msgid "Delete event"
-msgstr ""
+msgstr "Supprimer l'événement"
 
 msgid "Delete newsletter"
-msgstr ""
+msgstr "Supprimer la newsletter"
 
 msgid "Delete photo album"
-msgstr ""
+msgstr "Supprimer l'album photo"
 
 msgid "Form"
-msgstr ""
+msgstr "Formulaire"
 
 msgid "Person"
-msgstr ""
+msgstr "Personne"
 
 msgid "Reopen ticket"
-msgstr ""
+msgstr "Ré-ouvrir le ticket"
 
 #, python-format
 msgid "Do you really want to refund ${amount}?"
-msgstr ""
+msgstr "Voulez-vous vraiment rembourser ${amount} ?"
 
 #, python-format
 msgid "Refund ${amount}"
-msgstr ""
+msgstr "Rembourser ${amount}"
 
 msgid "Room"
-msgstr ""
+msgstr "Espace"
 
 msgid "Daypass"
-msgstr ""
+msgstr "Pass journée"
 
 msgid "E-Mail Recipient"
-msgstr ""
+msgstr "Destinataire de l'e-mail"
 
 msgid "Do you really want to delete this allocation?"
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer cette attribution ?"
 
 msgid "Delete allocation"
-msgstr ""
+msgstr "Supprimer l'attribution"
 
 msgid "Photo Album"
-msgstr ""
+msgstr "Album photo"
 
 msgid "User"
-msgstr ""
+msgstr "Utilisateur"
 
 msgid "Stripe Connect"
-msgstr ""
+msgstr "Stripe Connect"
 
 msgid "Not a valid color."
-msgstr ""
+msgstr "Couleur non valide."
 
 msgid "Admins"
-msgstr ""
+msgstr "Admins"
 
 msgid "Editors"
-msgstr ""
+msgstr "Éditeurs"
 
 msgid "Members"
-msgstr ""
+msgstr "Membres"
 
 msgid "A conflicting allocation exists for the requested time period."
-msgstr ""
+msgstr "Une attribution contradictoire existe pour la période demandée."
 
 msgid "A conflicting reservation exists for the requested time period."
-msgstr ""
+msgstr "Une réservation contradictoire existe pour la période demandée."
 
 msgid "An existing reservation would be affected by the requested change."
 msgstr ""
+"Une réservation existante serait affectée par la modification demandée."
 
 msgid "A pending reservation would be affected by the requested change."
 msgstr ""
+"Une réservation en attente serait affectée par la modification demandée."
 
 msgid "The requested period is no longer available."
-msgstr ""
+msgstr "La période demandée n'est plus disponible."
 
 msgid "No reservable slot found."
-msgstr ""
+msgstr "Aucun créneau réservable disponible."
 
 msgid "Reservations can't be made for more than 24 hours at a time."
-msgstr ""
+msgstr "Les réservations ne peuvent être effectuées plus de 24 h à l'avance."
 
 msgid "The given reservation paramters are invalid."
-msgstr ""
+msgstr "Les paramètres de réservation donnés ne sont pas valides."
 
 msgid "The given reservation token is invalid."
-msgstr ""
+msgstr "Le jeton de réservation donné n'est pas valide."
 
 msgid "The requested number of reservations is higher than allowed."
-msgstr ""
+msgstr "Le nombre de réservations requis est supérieur à celui autorisé."
 
 msgid "The requested quota is invalid (must be at least one)."
-msgstr ""
+msgstr "Le quota requis est invalide (doit être au minimum un)."
 
 msgid "The allocation does not have enough free spots."
-msgstr ""
+msgstr "L'allocation ne dispose pas de suffisamment de places disponibles."
 
 msgid "The resulting allocation would be invalid."
-msgstr ""
+msgstr "L'attribution résultante ne serait pas valide."
 
 msgid "No reservations to confirm."
-msgstr ""
+msgstr "Aucune réservation pour confirmer."
 
 msgid "The given timerange is longer than the existing allocation."
 msgstr ""
+"L'intervalle de temps donné est plus long que l'attribution existante."
 
 msgid "Reservation too short. A reservation must last at least 5 minutes."
 msgstr ""
+"Réservation trop courte. Une réservation doit durer au moins cinq minutes."
 
 msgid "Whole day"
-msgstr ""
+msgstr "Toute la journée"
 
 #, python-format
 msgid "${percent}% Available"
-msgstr ""
+msgstr "${percent}% disponible"
 
 #, python-format
 msgid "${num}/${max} Available"
-msgstr ""
+msgstr "${num}/${max} disponible"
 
 msgid "Available"
-msgstr ""
+msgstr "Disponible"
 
 msgid "Unavailable"
-msgstr ""
+msgstr "Indisponible"
 
 msgid ""
 "This allocation can't be deleted because there are existing reservations "
 "associated with it."
 msgstr ""
+"Cette attribution ne peut pas être supprimée car il existe des réservations "
+"existantes qui y sont associées."
 
 msgid ""
 "To delete this allocation, all existing reservations need to be cancelled "
 "first."
 msgstr ""
+"Pour supprimer cette attribution, toutes les réservations existantes doivent"
+" être annulées en premier."
 
 msgid "Start"
-msgstr ""
+msgstr "Début"
 
 msgid "Date"
-msgstr ""
+msgstr "Date"
 
 msgid "End"
-msgstr ""
+msgstr "Fin"
 
 msgid "Except for"
-msgstr ""
+msgstr "À l'exception de"
 
 msgid "Daypasses"
-msgstr ""
+msgstr "Cartes journalières"
 
 msgid "Daypasses Limit"
-msgstr ""
+msgstr "Limite des cartes journalières"
 
 msgid "Each starting at"
-msgstr ""
+msgstr "Chacun commençant à"
 
 msgid "HH:MM"
-msgstr ""
+msgstr "HH:MM"
 
 msgid "Each ending at"
-msgstr ""
+msgstr "Chacun finissant à"
 
 msgid "May be partially reserved"
-msgstr ""
+msgstr "Peut être partiellement réservé"
 
 msgid "Options"
-msgstr ""
+msgstr "Options"
 
 msgid "From"
-msgstr ""
+msgstr "De"
 
 msgid "Until"
-msgstr ""
+msgstr "Jusqu'à"
 
 msgid "Exhibition"
-msgstr ""
+msgstr "Exposition"
 
 msgid "Gastronomy"
-msgstr ""
+msgstr "Gastronomie"
 
 msgid "Health"
-msgstr ""
+msgstr "Santé"
 
 msgid "Cinema"
-msgstr ""
+msgstr "Cinéma"
 
 msgid "Congress"
-msgstr ""
+msgstr "Congrès"
 
 msgid "Concert"
-msgstr ""
+msgstr "Concert"
 
 msgid "Art"
-msgstr ""
+msgstr "Art"
 
 msgid "Literature"
-msgstr ""
+msgstr "Littérature"
 
 msgid "Market"
-msgstr ""
+msgstr "Marché"
 
 msgid "Music"
-msgstr ""
+msgstr "Musique"
 
 msgid "Party"
-msgstr ""
+msgstr "Fête"
 
 msgid "Politics"
-msgstr ""
+msgstr "Politique"
 
 msgid "Religion"
-msgstr ""
+msgstr "Religion"
 
 msgid "Sports"
-msgstr ""
+msgstr "Sports"
 
 msgid "Dancing"
-msgstr ""
+msgstr "Dansant"
 
 msgid "Theater"
-msgstr ""
+msgstr "Théâtre"
 
 msgid "Meetup"
-msgstr ""
+msgstr "Rencontre"
 
 msgid "Talk"
-msgstr ""
+msgstr "Conférence"
 
 msgid "E-Mail"
-msgstr ""
+msgstr "E-mail"
 
 msgid "Title"
-msgstr ""
+msgstr "Titre"
 
 msgid "Concerto in the castle garden"
-msgstr ""
+msgstr "Concerto dans le jardin du château"
 
 msgid "Description"
-msgstr ""
+msgstr "Description"
 
 msgid "Enjoy a concerto in the castle garden."
-msgstr ""
+msgstr "Profitez d'un concerto dans le jardin du château."
 
 msgid "Location"
-msgstr ""
+msgstr "Localisation"
 
 msgid "Castle garden"
-msgstr ""
+msgstr "Jardin du château"
 
 msgid "Organizer"
-msgstr ""
+msgstr "Organisateur"
 
 msgid "Music society"
-msgstr ""
+msgstr "Société musicale"
 
 msgid "Coordinates"
-msgstr ""
+msgstr "Coordonnées"
 
 msgid "The marker can be moved by dragging it with the mouse"
-msgstr ""
+msgstr "Le curseur peut être déplacé avec la souris"
 
 msgid "Tags"
-msgstr ""
+msgstr "Étiquettes"
 
 msgid "To"
-msgstr ""
+msgstr "Vers"
 
 msgid "Repeats itself every"
-msgstr ""
+msgstr "Se répète tous les"
 
 msgid "Until date"
-msgstr ""
+msgstr "Jusqu'à"
 
 msgid "Please set and end date if the event is recurring."
-msgstr ""
+msgstr "Veuillez préciser une date de fin si l'événement est récurrent."
 
 msgid "Please select a weekday if the event is recurring."
-msgstr ""
+msgstr "Veuillez choisir un jour de la semaine si l'événement est récurrent."
 
 msgid "The end date must be later than the start date."
-msgstr ""
+msgstr "La date de fin doit être postérieure à la date de début."
 
 msgid "The weekday of the start date must be selected."
 msgstr ""
+"Le jour de la semaine correspondant à la date de début doit être "
+"sélectionné."
 
 msgid "Lead"
-msgstr ""
+msgstr "Accroche"
 
 msgid "Describes what this form is about"
-msgstr ""
+msgstr "Décrit le contenu de ce formulaire"
 
 msgid "Text"
-msgstr ""
+msgstr "Texte"
 
 msgid "Definition"
-msgstr ""
+msgstr "Définition"
 
 msgid "Format"
-msgstr ""
+msgstr "Format"
 
 msgid "Payment Method"
-msgstr ""
+msgstr "Méthode de paiement"
 
 msgid "The end date must be later than the start date"
-msgstr ""
+msgstr "La date de fin doit être postérieure à la date de début"
 
 msgid ""
 "You need to setup a default payment provider to enable credit card payments"
 msgstr ""
+"Vous devez choisir un fournisseur de paiement par défaut pour activer les "
+"paiements par carte de crédit"
 
 msgid "CSV File"
-msgstr ""
+msgstr "Fichier CSV"
 
 msgid "Excel File"
-msgstr ""
+msgstr "Fichier Excel"
 
 msgid "JSON File"
-msgstr ""
+msgstr "Fichier JSON"
 
 msgid "No credit card payments"
-msgstr ""
+msgstr "Pas de paiements par carte de crédit"
 
 msgid "Credit card payments optional"
-msgstr ""
+msgstr "Paiements par carte de crédit en option"
 
 msgid "Credit card payments required"
-msgstr ""
+msgstr "Paiements par carte de crédit requis"
 
 msgid "Describes what this photo album is about"
-msgstr ""
+msgstr "Décrit l'album photo"
 
 msgid "View"
-msgstr ""
+msgstr "Visualiser"
 
 msgid "Show images on homepage"
-msgstr ""
+msgstr "Montrer les images sur la page d'accueil"
 
 msgid "Full size images"
-msgstr ""
+msgstr "Images de taille normale"
 
 msgid "Grid layout"
-msgstr ""
+msgstr "Mise en page en grille"
 
 msgid "Used in the overview and the e-mail subject"
-msgstr ""
+msgstr "Utilisé dans l'aperçu et le sujet de l'e-mail"
 
 msgid "Editorial"
-msgstr ""
+msgstr "Éditorial"
 
 msgid "A few words about this edition of the newsletter"
-msgstr ""
+msgstr "Quelques mots concernant l'édition de cette lettre d'informations"
 
 msgid "Latest news"
-msgstr ""
+msgstr "Dernières nouvelles"
 
 msgid "Selected News / Events"
-msgstr ""
+msgstr "Nouvelles/événements sélectionnés"
 
 msgid "Please select at least one recipient"
-msgstr ""
+msgstr "Veuillez choisir au moins un destinataire"
 
 msgid "URL"
-msgstr ""
+msgstr "Lien"
 
 msgid "Describes what this page is about"
-msgstr ""
+msgstr "Décrit de quoi parle cette page"
 
 msgid "First name"
-msgstr ""
+msgstr "Prénom"
 
 msgid "Last name"
-msgstr ""
+msgstr "Nom de famille"
 
 msgid "Function"
-msgstr ""
+msgstr "Fonction"
 
 msgid "Phone"
-msgstr ""
+msgstr "Téléphone"
 
 msgid "Website"
-msgstr ""
+msgstr "Site Web"
 
 msgid "Picture"
-msgstr ""
+msgstr "Photo"
 
 msgid "URL pointing to the picture"
-msgstr ""
+msgstr "URL pointant vers la photo"
 
 msgid "Address"
-msgstr ""
+msgstr "Adresse"
 
 msgid "Notes"
-msgstr ""
+msgstr "Notes"
 
 msgid "Public extra information about this person"
-msgstr ""
+msgstr "Informations publiques supplémentaires à propos de cette semaine"
 
 msgid "Describes what this reservation resource is about"
-msgstr ""
+msgstr "Décrit en quoi consiste cette ressource de réservation"
 
 msgid "Group"
-msgstr ""
+msgstr "Groupe"
 
 msgid "Used to group the resource in the overview"
-msgstr ""
+msgstr "Utilisé pour grouper la ressource dans la vue d'ensemble"
 
 msgid "Extra Fields Definition"
-msgstr ""
+msgstr "Définition de champs supplémentaires"
 
 msgid "Price"
-msgstr ""
+msgstr "Prix"
 
 msgid "Price per item"
-msgstr ""
+msgstr "Prix par article"
 
 msgid "Price per hour"
-msgstr ""
+msgstr "Prix par heure"
 
 msgid "Currency"
-msgstr ""
+msgstr "Devise"
 
 msgid "Free of charge"
-msgstr ""
+msgstr "Gratuit"
 
 msgid "Per item"
-msgstr ""
+msgstr "Par article"
 
 msgid "Per hour"
-msgstr ""
+msgstr "Par heure"
 
 msgid "The price must be larger than zero"
-msgstr ""
+msgstr "Le prix doit être supérieur à zéro"
 
 msgid "Name"
-msgstr ""
+msgstr "Nom"
 
 msgid "Send on"
-msgstr ""
+msgstr "Envoyer sur"
 
 msgid "Resources"
-msgstr ""
+msgstr "Ressources"
 
 msgid "E-Mail Reply Address"
-msgstr ""
+msgstr "Adresse e-mail de réponse"
 
 msgid "Logo"
-msgstr ""
+msgstr "Logo"
 
 msgid "URL pointing to the logo"
-msgstr ""
+msgstr "URL pointant vers le logo"
 
 msgid "Logo (Square)"
-msgstr ""
+msgstr "Logo (carré)"
 
 msgid "Replies to automated e-mails go to this address."
-msgstr ""
+msgstr "Les réponses aux e-mails automatisés sont envoyées à cette adresse."
 
 msgid "Primary Color"
-msgstr ""
+msgstr "Couleur primaire"
 
 msgid "Languages"
-msgstr ""
+msgstr "Langues"
 
 msgid "Bank Account (IBAN)"
-msgstr ""
+msgstr "Compte bancaire (IBAN)"
 
 msgid "Payment"
-msgstr ""
+msgstr "Paiement"
 
 msgid "Beneficiary"
-msgstr ""
+msgstr "Bénéficiaire"
 
 msgid "Payment Order"
-msgstr ""
+msgstr "Demande de paiement"
 
 msgid "ESR participant number"
-msgstr ""
+msgstr "Numéro de compte postal du participant"
 
 msgid "Contact"
-msgstr ""
+msgstr "Contact"
 
 msgid "The address and phone number of the municipality"
-msgstr ""
+msgstr "L'adresse et le numéro de téléphone de la municipalité"
 
 msgid "Information"
-msgstr ""
+msgstr "Information"
 
 msgid "Contact Link"
-msgstr ""
+msgstr "Rubrique Contact"
 
 msgid "URL pointing to a contact page"
-msgstr ""
+msgstr "URL pointant vers une page de contact"
 
 msgid "Opening Hours"
-msgstr ""
+msgstr "Horaires d'ouverture"
 
 msgid "The opening hours of the municipality"
-msgstr ""
+msgstr "Les horaires d'ouverture de la municipalité"
 
 msgid "Opening Hours Link"
-msgstr ""
+msgstr "Lien vers les horaires d'ouvertures"
 
 msgid "URL pointing to an opening hours page"
-msgstr ""
+msgstr "URL pointant vers une page d'horaires d'ouverture"
 
 msgid "Facebook"
-msgstr ""
+msgstr "Facebook"
 
 msgid "URL pointing to the facebook site"
-msgstr ""
+msgstr "URL pointant vers la page Facebook"
 
 msgid "Social Media"
-msgstr ""
+msgstr "Réseaux sociaux"
 
 msgid "Twitter"
-msgstr ""
+msgstr "Twitter"
 
 msgid "URL pointing to the twitter site"
-msgstr ""
+msgstr "URL pointant vers la page Twitter"
 
 msgid "Homepage Image #1"
-msgstr ""
+msgstr "Image n°1 de page d'accueil"
 
 msgid "Homepage Image #2"
-msgstr ""
+msgstr "Image n°2 de page d'accueil"
 
 msgid "Homepage Image #3"
-msgstr ""
+msgstr "Image n°3 de page d'accueil"
 
 msgid "Homepage Image #4"
-msgstr ""
+msgstr "Image n°4 de page d'accueil"
 
 msgid "Homepage Image #5"
-msgstr ""
+msgstr "Image n°5 de page d'accueil"
 
 msgid "Homepage Image #6"
-msgstr ""
+msgstr "Image n°6 de page d'accueil"
 
 msgid "Homepage Cover"
-msgstr ""
+msgstr "Couverture de la page d'accueil"
 
 msgid "Homepage Structure (for advanced users only)"
 msgstr ""
+"Structure de la page d'accueil (seulement pour les utilisateurs avancés)"
 
 msgid "The structure of the homepage"
-msgstr ""
+msgstr "La structure de la page d'accueil"
 
 msgid "The default map view. This should show the whole town"
-msgstr ""
+msgstr "La vue par défaut de la carte. Cela devrait montrer la ville entière"
 
 msgid "Maps"
-msgstr ""
+msgstr "Cartes"
 
 msgid "Analytics Code"
-msgstr ""
+msgstr "Code Analytics"
 
 msgid "JavaScript for web statistics support"
-msgstr ""
+msgstr "JavaScript pour l'assistance en matière de statistiques web"
 
 msgid "Advanced"
-msgstr ""
+msgstr "Avancé"
 
 msgid "A beneficiary is required if a bank account is given."
-msgstr ""
+msgstr "Un bénéficiaire est nécessaire si un compte bancaire est donné."
 
 msgid "German"
-msgstr ""
+msgstr "Allemand"
 
 msgid "French"
-msgstr ""
+msgstr "Français"
 
 msgid "Basic"
-msgstr ""
+msgstr "Base"
 
 msgid "With reference number (ESR)"
-msgstr ""
+msgstr "Avec un numéro de référence (ESR)"
 
 msgid "E-Mail Address"
-msgstr ""
+msgstr "Adresse e-mail"
 
 msgid "Your note about this ticket"
-msgstr ""
+msgstr "Votre note à propos de ce ticket"
 
 msgid "Admin"
-msgstr ""
+msgstr "Admin"
 
 msgid "Editor"
-msgstr ""
+msgstr "Rédacteur"
 
 msgid "Member"
-msgstr ""
+msgstr "Membres"
 
 msgid "Active"
-msgstr ""
+msgstr "Actif"
 
 msgid "Role"
-msgstr ""
+msgstr "Rôle"
 
 msgid "Yubikey"
-msgstr ""
+msgstr "Yubikey"
 
 msgid "Plug your YubiKey into a USB slot and press it."
-msgstr ""
+msgstr "Branchez votre YubiKey sur un port USB et appuyez dessus."
 
 msgid "The users e-mail address (a.k.a. username)"
-msgstr ""
+msgstr "L'adresse e-mail de l'utilisateur (alias le nom d'utilisateur)"
 
 msgid "Send Activation E-Mail with Instructions"
-msgstr ""
+msgstr "Envoyer un e-mail d'activation avec des directives"
 
 msgid "Invalid Yubikey"
-msgstr ""
+msgstr "YubiKey non valide"
 
 #, python-format
 msgid "This Yubikey is already used by ${username}"
-msgstr ""
+msgstr "Cette YubiKey est déjà utilisée par ${username}"
 
 msgid "A user with this e-mail address exists already"
-msgstr ""
+msgstr "Un utilisateur avec cette adresse e-mail existe déjà"
 
 msgid "Administrators and editors must use a Yubikey"
 msgstr ""
+"Les administrateurs et les programmateurs doivent utiliser une YubiKey"
 
 msgid "Send a daily status e-mail."
-msgstr ""
+msgstr "Envoyez un e-mail de suivi quotidien."
 
 msgid "All events"
-msgstr ""
+msgstr "Tous les événements"
 
 msgid "Hide from the public"
-msgstr ""
+msgstr "Cacher au public"
 
 msgid "Map"
-msgstr ""
+msgstr "Carte"
 
 msgid "Visible on homepage"
-msgstr ""
+msgstr "Visible sur la page d'accueil"
 
 msgid "This month"
-msgstr ""
+msgstr "Ce mois-ci"
 
 msgid "Last month"
-msgstr ""
+msgstr "Le mois dernier"
 
 msgid "Last year"
-msgstr ""
+msgstr "L'an dernier"
 
 msgid "Older"
-msgstr ""
+msgstr "Plus âgés"
 
 msgid "This year"
-msgstr ""
+msgstr "Cette année"
 
 msgid "Do you really want to delete this note?"
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer cette note ?"
 
 msgid "Delete Note"
-msgstr ""
+msgstr "Supprimer la note"
 
 msgid "Always visible on homepage"
-msgstr ""
+msgstr "Toujours visible sur la page d'accueil"
 
 msgid "Form Submissions"
-msgstr ""
+msgstr "Envois de formulaire"
 
-#.
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
 msgid "Event"
-msgstr ""
+msgstr "Événement"
 
 msgid "Edit submission"
-msgstr ""
+msgstr "Modifier votre envoi"
 
 msgid "Details about the reservation"
-msgstr ""
+msgstr "Détails à propos de la réservation"
 
 msgid "Reject all"
-msgstr ""
+msgstr "Tout refuser"
 
 msgid "Accept all reservations"
-msgstr ""
+msgstr "Accepter toutes les réservations"
 
 msgid "Edit details"
-msgstr ""
+msgstr "Modifier les détails"
 
 #, python-format
 msgid "Reject ${title}"
-msgstr ""
+msgstr "Refuser ${title}"
 
 msgid "Accept event"
-msgstr ""
+msgstr "Accepter l'événement"
 
 msgid "Do you really want to reject all reservations?"
-msgstr ""
+msgstr "Voulez-vous vraiment refuser toutes les réservations ?"
 
 msgid "Rejecting these reservations can't be undone."
-msgstr ""
+msgstr "Le refus de ces réservations est irréversible."
 
 msgid "Reject reservations"
-msgstr ""
+msgstr "Refuser les réservations"
 
 msgid "Do you really want to reject this reservation?"
-msgstr ""
+msgstr "Voulez-vous vraiment refuser cette réservation ?"
 
 #, python-format
 msgid "Rejecting ${title} can't be undone."
-msgstr ""
+msgstr "Refuser ${title} est irréversible."
 
 msgid "Reject reservation"
-msgstr ""
+msgstr "Refuser la réservation"
 
 msgid "Edit event"
-msgstr ""
+msgstr "Modifier l'événement"
 
 msgid "Reject event"
-msgstr ""
+msgstr "Refuser l'événement"
 
 msgid "Do you really want to reject this event?"
-msgstr ""
+msgstr "Voulez-vous vraiment refuser cet événement ?"
 
 msgid "Rejecting this event can't be undone."
-msgstr ""
+msgstr "Rejeter cet événement est irréversible."
 
 msgid "Link"
-msgstr ""
+msgstr "Lien"
 
 msgid "New Link"
-msgstr ""
+msgstr "Nouveau lien"
 
 msgid "Added a new link"
-msgstr ""
+msgstr "A ajouté un nouveau lien"
 
 msgid "Edit Link"
-msgstr ""
+msgstr "Modifier le lien"
 
 msgid "The link was deleted"
-msgstr ""
+msgstr "Le lien a été supprimé"
 
 msgid "Delete link"
-msgstr ""
+msgstr "Supprimer le lien"
 
 #, python-format
 msgid "Do you really want to delete the link \"${title}\"?"
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer le lien « ${title} » ?"
 
 msgid "Topic"
-msgstr ""
+msgstr "Rubrique"
 
 msgid "New Topic"
-msgstr ""
+msgstr "Nouveau sujet"
 
 msgid "Added a new topic"
-msgstr ""
+msgstr "A ajouté un nouveau sujet"
 
 msgid "Edit Topic"
-msgstr ""
+msgstr "Modifier le sujet"
 
 msgid "The topic was deleted"
-msgstr ""
+msgstr "Le sujet a été supprimé"
 
 msgid "Delete topic"
-msgstr ""
+msgstr "Supprimer le sujet"
 
 #, python-format
 msgid "Do you really want to delete the topic \"${title}\"?"
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer le sujet « ${title} » ?"
 
 msgid "News"
-msgstr ""
+msgstr "Nouvelles"
 
 msgid "Add News"
-msgstr ""
+msgstr "Ajouter des nouvelles"
 
 msgid "Added news"
-msgstr ""
+msgstr "Nouvelles ajoutées"
 
 msgid "Edit News"
-msgstr ""
+msgstr "Modifier les nouvelles"
 
 msgid "The news was deleted"
-msgstr ""
+msgstr "Les nouvelles ont été supprimées"
 
 msgid "Delete news"
-msgstr ""
+msgstr "Supprimez les nouvelles"
 
 #, python-format
 msgid "Do you really want to delete the news \"${title}\"?"
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer les nouvelles « ${title} » ?"
 
 msgid "Copy"
-msgstr ""
+msgstr "Copie"
 
 msgid "Paste"
-msgstr ""
+msgstr "Coller"
 
 msgid "Please note that this page has subpages which will also be deleted!"
 msgstr ""
+"Veuillez noter que cette page contient des sous-pages qui seront également "
+"supprimées !"
 
 msgid "This page can't be deleted."
-msgstr ""
+msgstr "Cette page ne peut pas être supprimée."
 
 msgid ""
 "This page has subpages. Only administrators can delete pages with subpages. "
-"To delete this page, delete all subpages first or ask an administrator to do "
-"it for you."
+"To delete this page, delete all subpages first or ask an administrator to do"
+" it for you."
 msgstr ""
+"Cette page contient des sous-pages. Seuls les administrateurs peuvent "
+"supprimer des pages avec des sous-pages. Pour supprimer cette page, "
+"supprimez d'abord toutes les sous-pages, ou demandez à un administrateur de "
+"le faire pour vous."
 
 msgid ""
 "Please review your data and press \"Complete\" to finalize the process. If "
 "there's anything you'd like to change, click on \"Edit\" to return to the "
 "filled-out form."
 msgstr ""
+"Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le"
+" processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
+"« Modifier » pour retourner sur le formulaire complété."
 
 msgid "Complete"
-msgstr ""
+msgstr "Complet"
 
 msgid "No exports available."
-msgstr ""
+msgstr "Aucune exportation disponible."
 
 msgid "Upload"
-msgstr ""
+msgstr "Télécharger"
 
 msgid "All Files"
-msgstr ""
+msgstr "Tous les fichiers"
 
 msgid "Do you really want to delete the file?"
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer le fichier ?"
 
 msgid "Delete File"
-msgstr ""
+msgstr "Supprimez le fichier"
 
 msgid "No files uploaded yet"
-msgstr ""
+msgstr "Aucun fichier téléchargé pour le moment"
 
 msgid "You are trying to open a page for which you are not authorized."
 msgstr ""
+"Vous essayez d'ouvrir une page pour laquelle vous n'êtes pas autorisé."
 
 msgid "Please follow this link to login with a different user."
 msgstr ""
+"Veuillez suivre ce lien pour vous connecter en tant qu'utilisateur "
+"différent."
 
 msgid "Please follow this link to login."
-msgstr ""
+msgstr "Veuillez suivre ce lien pour vous connecter."
 
 msgid "No forms defined yet."
-msgstr ""
+msgstr "Aucun formulaire défini pour le moment."
 
 msgid "All Images"
-msgstr ""
+msgstr "Toutes les images"
 
 msgid ""
 "To edit the image descriptions, click on one, enter your descrption and "
 "press return. To abort press escape."
 msgstr ""
+"Pour modifier les descriptions d'image, cliquez sur une image, saisissez "
+"votre description et appuyez sur retour. Pour interrompre, appuyez sur "
+"sortir."
 
 msgid "Click to add a description"
-msgstr ""
+msgstr "Cliquez pour ajouter une description"
 
 msgid "Do you really want to delete the image?"
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer l'image ?"
 
 msgid "Delete Image"
-msgstr ""
+msgstr "Supprimez l'image"
 
 msgid "No images uploaded yet"
-msgstr ""
+msgstr "Aucune image téléchargée pour le moment"
 
 msgid "This album does not contain any images yet."
-msgstr ""
+msgstr "Cet album ne contient pas encore d'images."
 
 msgid "No photo albums defined yet."
-msgstr ""
+msgstr "Aucun album photo défini pour le moment."
 
 msgid "Skip navigation"
-msgstr ""
+msgstr "Ignorez la navigation"
 
 msgid "Back to the homepage"
-msgstr ""
+msgstr "Retour à la page d'accueil"
 
 msgid "Search"
-msgstr ""
+msgstr "Chercher"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
+"Le formulaire contient des erreurs. Veuillez vérifier les champs marqués en "
+"rouge."
 
 msgid "Don't have an account yet?"
-msgstr ""
+msgstr "Vous n'avez pas encore de compte ?"
 
 msgid "Register now"
-msgstr ""
+msgstr "Inscrivez-vous maintenant"
 
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Avez-vous oublié votre mot de passe ?"
 
 msgid "Reset password"
-msgstr ""
+msgstr "Réinitialisez le mot de passe"
 
 msgid "You are here"
-msgstr ""
+msgstr "Vous êtes ici"
 
 msgid "more…"
-msgstr ""
+msgstr "plus…"
 
 msgid "Submit"
-msgstr ""
+msgstr "Envoyer"
 
 msgid "Selected Topics"
-msgstr ""
+msgstr "Sujets sélectionnés"
 
 msgid "Drop files to upload"
-msgstr ""
+msgstr "Déposez des fichiers pour télécharger"
 
 msgid "All news"
-msgstr ""
+msgstr "Toutes les nouvelles"
 
 msgid ""
 "This site is hidden from the general public. To show it to everyone, edit "
 "this page and disable \"Hide from public\"."
 msgstr ""
+"Ce site est caché du grand public. Pour le montrer à tout le monde, modifiez"
+" cette page et désactivez « Cacher du public »."
 
 msgid ""
 "This site contains no lead. Leads are used for lists and search results."
 msgstr ""
+"Ce site ne contient aucun fil. Les fils sont utilisés pour les listes et les"
+" résultats de recherche."
 
 msgid "Total Amount"
-msgstr ""
+msgstr "Montant total"
 
 msgid "Open"
-msgstr ""
+msgstr "Ouvert"
 
 msgid "Pending"
-msgstr ""
+msgstr "En attente"
 
 msgid "Closed"
-msgstr ""
+msgstr "Fermé"
 
 msgid "Paid"
-msgstr ""
+msgstr "Payé"
 
 msgid "Failed"
-msgstr ""
+msgstr "Échoué"
 
 msgid "Refunded"
-msgstr ""
+msgstr "Remboursé"
 
 msgid "Manual"
-msgstr ""
+msgstr "Manuelle"
 
 msgid "Ticket Number"
-msgstr ""
+msgstr "Numéro du ticket"
 
 msgid "Previous Page"
-msgstr ""
+msgstr "Page précédente"
 
 msgid "Next Page"
-msgstr ""
+msgstr "Page suivante"
 
 msgid "Quota"
-msgstr ""
+msgstr "Quota"
 
 msgid "State"
-msgstr ""
+msgstr "État"
 
 msgid "Initiated"
-msgstr ""
+msgstr "Initié"
 
 msgid "Submitted"
-msgstr ""
+msgstr "Soumis"
 
 msgid "Published"
-msgstr ""
+msgstr "Publié"
 
 msgid "Withdrawn"
-msgstr ""
+msgstr "Retiré"
 
 msgid "Submitter"
-msgstr ""
+msgstr "Auteur"
 
 msgid "Date and time"
-msgstr ""
+msgstr "Date et heure"
 
 msgid "Recurrence"
-msgstr ""
+msgstr "Récurrence"
 
 msgid "All dates"
-msgstr ""
+msgstr "Toutes les dates"
 
 msgid "No events found."
-msgstr ""
+msgstr "Aucun événement trouvé."
 
 msgid "Filter by date"
-msgstr ""
+msgstr "Filtrer par date"
 
 msgid "Administrator"
-msgstr ""
+msgstr "Administrateur"
 
 msgid "Administrators"
-msgstr ""
+msgstr "Administrateurs"
 
 msgid "Close (Esc)"
-msgstr ""
+msgstr "Fermer (Echap)\n"
 
 msgid "Share"
-msgstr ""
+msgstr "Partager"
 
 msgid "Toggle fullscreen"
-msgstr ""
+msgstr "Basculer en mode plein écran"
 
 msgid "Zoom in/out"
-msgstr ""
+msgstr "Zoom avant/arrière"
 
 msgid ""
 "This space holds images from your photo-albums. To show photos add a few "
 "photos to an album and mark it as available for the homepage."
 msgstr ""
+"Cet emplacement contient des images de vos albums de photos. Pour afficher "
+"des photos, ajoutez quelques photos à un album et marquez-les comme "
+"disponibles pour la page d'accueil."
 
 msgid ""
 "Your request will be processed shortly. To see the state of your process "
 "your may return to this page at any time. All information on this page has "
 "been sent to your e-mail address."
 msgstr ""
+"Votre demande va être traitée sous peu. Pour suivre l'état d'avancement, "
+"vous pouvez revenir sur cette page à tout moment. Toutes les informations "
+"présentes sur cette page ont été envoyées à votre adresse e-mail."
 
 msgid ""
 "Your request has been completed. If you asked for documents to be sent to "
 "your address, they should arrive shortly. If you asked to pick up documents "
 "at the municipality, the are now ready to be picked up."
 msgstr ""
+"Votre demande a été traitée. Si vous avez demandé l'envoi des documents à "
+"votre adresse, ils devraient arriver sous peu. Si vous avez demandé à "
+"prendre les documents à la mairie, vous pouvez le faire maintenant, ils sont"
+" prêts."
 
 msgid "Pay Online Now"
-msgstr ""
+msgstr "Payer en ligne maintenant"
 
 msgid "Credit Card Fee"
-msgstr ""
+msgstr "Frais de carte de crédit"
 
 msgid "Pay Offline later"
-msgstr ""
+msgstr "Payer hors ligne plus tard"
 
 msgid "at ${time}"
-msgstr ""
+msgstr "à ${time}"
 
 msgid "Dear Sir or Madam,"
-msgstr ""
+msgstr "Cher Monsieur, chère Madame,"
 
 msgid "Your e-mail address was just used to create an account on ${homepage}."
 msgstr ""
+"Votre adresse e-mail vient d'être utilisée pour créer un compte sur "
+"${homepage}."
 
 msgid "To activate your account, click confirm below:"
-msgstr ""
+msgstr "Pour activer votre compte, cliquer sur confirmer ci-dessous :"
 
 msgid "Confirm my account"
-msgstr ""
+msgstr "Confirmer mon compte"
 
 msgid ""
 "If you believe this is an error, ignore this message and we'll never bother "
 "you again."
 msgstr ""
+"Si vous pensez que c'est une erreur, ignorez ce message et nous ne vous "
+"importunerons plus jamais."
 
 msgid "Hello"
-msgstr ""
+msgstr "Bonjour"
 
 msgid ""
 "You are recieving this mail because you subscribed to the following "
 "newsletter:"
 msgstr ""
+"Vous recevez ce courriel parce que vous vous êtes abonné à la lettre "
+"d'informations suivante :"
 
 msgid "Plese click the following link to confirm your subscription:"
 msgstr ""
+"Veuillez cliquer sur le lien suivant pour confirmer votre abonnement :"
 
 msgid "Confirm subscription"
-msgstr ""
+msgstr "Confirmer l'abonnement"
 
 msgid ""
-"If you did not subscribe to this newsletter you can simply ignore this e-"
-"mail. We will not bother you again."
+"If you did not subscribe to this newsletter you can simply ignore this "
+"e-mail. We will not bother you again."
 msgstr ""
+"Si vous ne vous êtes pas abonné à cette lettre d'informations, vous pouvez "
+"tout simplement ignorer cet e-mail. Nous ne vous importunerons plus."
 
 msgid "Best regards,"
-msgstr ""
+msgstr "Cordialement,"
 
 msgid "The OneGov Cloud Team"
-msgstr ""
+msgstr "L'équipe de OneGov Cloud"
 
 msgid "Good morning,"
-msgstr ""
+msgstr "Bonjour,"
 
 msgid "The following reservations are scheduled for today."
-msgstr ""
+msgstr "Les réservations suivantes sont programmées pour aujourd'hui."
 
 msgid "No reservations today."
-msgstr ""
+msgstr "Aucune réservation aujourd'hui."
 
 msgid "Have a great day!"
-msgstr ""
+msgstr "Passez une bonne journée !"
 
 msgid ""
-"This is the daily reservation overview for ${organisation}. If you no longer "
-"want to receive this e-mail please contact an administrator so they can "
+"This is the daily reservation overview for ${organisation}. If you no longer"
+" want to receive this e-mail please contact an administrator so they can "
 "remove you from the recipients list."
 msgstr ""
+"Voici l'aperçu quotidien sur les réservations pour ${organisation}. Si vous "
+"ne souhaitez plus recevoir ce courriel, veuillez contacter un administrateur"
+" pour qu'il vous enlève de la liste des destinataires."
 
 msgid "This is what happend on the ${org} website yesterday:"
-msgstr ""
+msgstr "Voici ce qui s'est passé aujourd'hui sur le site web de ${org} :"
 
 msgid "This is what happend on the ${org} website over the weekend:"
-msgstr ""
+msgstr "Voici ce qui s'est passé ce week-end sur le site web de ${org} :"
 
 msgid "tickets were opened."
-msgstr ""
+msgstr "tickets ouverts."
 
 msgid "ticket was opened."
-msgstr ""
+msgstr "ticket ouvert."
 
 msgid "tickets were accepted."
-msgstr ""
+msgstr "tickets acceptés."
 
 msgid "ticket was accepted."
-msgstr ""
+msgstr "ticket accepté."
 
 msgid "tickets were closed."
-msgstr ""
+msgstr "tickets fermés."
 
 msgid "ticket was closed."
-msgstr ""
+msgstr "ticket fermé."
 
 msgid "There are currently ${currently_open} tickets open and"
-msgstr ""
+msgstr "Il y a actuellement ${currently_open} tickets ouverts et"
 
 msgid "There is currently ${currently_open} ticket open and"
-msgstr ""
+msgstr "Il y a actuellement ${currently_open} ticket ouvert et"
 
 msgid "tickets are pending."
-msgstr ""
+msgstr "tickets en attente."
 
 msgid "ticket is pending."
-msgstr ""
+msgstr "ticket en attente."
 
 msgid "Have a great week!"
-msgstr ""
+msgstr "Bonne semaine !"
 
 msgid ""
 "This is the daily OneGov Cloud status e-mail. If you don't want to receive "
 "this e-mail you may deactivate it by clicking on"
 msgstr ""
+"Ceci est le courriel quotidien de situation de OneGov Cloud. Si vous ne "
+"souhaitez pas recevoir ce courriel, vous pouvez le désactiver en cliquant "
+"sur"
 
 msgid "unsubscribe"
-msgstr ""
+msgstr "se désabonner"
 
 msgid "Or by changing the settings in your user profile."
-msgstr ""
+msgstr "Ou en changeant les réglages dans votre profil d'utilisateur."
 
 msgid "Your event has been accepted:"
-msgstr ""
+msgstr "Votre événement a été accepté :"
 
 msgid "The ticket number is"
-msgstr ""
+msgstr "Le numéro du ticket est"
 
 msgid "Check ticket status"
-msgstr ""
+msgstr "Vérifier l'état du ticket"
 
 msgid "Your event has unfortunately been rejected:"
-msgstr ""
+msgstr "Votre événement a malheureusement été rejeté :"
 
 msgid "An administrator just created a new account on ${org} for you."
 msgstr ""
+"Un administrateur vient de créer un nouveau compte sur ${org} pour vous."
 
 msgid "Your username is ${email}."
-msgstr ""
+msgstr "Votre nom d'utilisateur est ${email}."
 
 msgid "Click on the following link to set your account password:"
 msgstr ""
+"Cliquer sur le lien suivant pour définir le mot de passe de votre compte :"
 
 msgid "Set Account Password"
-msgstr ""
+msgstr "Définir le mot de passe du compte"
 
 msgid "To use your account you need the Yubikey with the serial ${number}"
 msgstr ""
+"Pour utiliser votre compte, vous aurez besoin de la Yubikey avec le numéro "
+"de série ${number}"
 
 msgid ""
 "You are receiving this e-mail because you signed up for the ${org} "
 "newsletter."
 msgstr ""
+"Vous recevez ce courriel parce que vous vous êtes abonné à la lettre "
+"d'informations de ${org}."
 
 msgid "Click here to view web version."
-msgstr ""
+msgstr "Cliquer ici pour voir la version internet."
 
 msgid "Click here to unsubscribe."
-msgstr ""
+msgstr "Cliquer ici pour vous désabonner."
 
 msgid "Click the following link to set a new password:"
-msgstr ""
+msgstr "Cliquer sur le lien suivant pour définir un nouveau mot de passe :"
 
 msgid "If you don't want to change your password, you can ignore this email."
 msgstr ""
+"Si vous ne souhaitez pas changer de mot de passe, vous pouvez ignorer cet "
+"e-mail."
 
 msgid "Your ticket has received a payment."
-msgstr ""
+msgstr "Votre ticket a reçu un paiement."
 
 msgid "Your ticket was marked as unpaid."
-msgstr ""
+msgstr "Votre ticket a été marqué non payé."
 
 msgid ""
 "Your ticket's payment has been refunded. Note that it might take a few days "
 "until your refunded amount is shown on your credit card bill."
 msgstr ""
+"Votre ticket vous a été remboursé. Notez qu'il peut se passer quelques jours"
+" avant que le montant du remboursement ne figure sur votre relevé de carte "
+"de crédit."
 
 msgid "The payment amount is"
-msgstr ""
+msgstr "Le montant du paiement est"
 
 msgid "The following reservations have been accepted:"
-msgstr ""
+msgstr "Les réservations suivantes ont été acceptées :"
 
 msgid "The following reservations have unfortunately been cancelled:"
-msgstr ""
+msgstr "Les réservations suivantes ont malheureusement été annulées :"
 
 msgid "Your ticket has been closed"
-msgstr ""
+msgstr "Votre ticket a été fermé"
 
 msgid "A new ticket has been opened"
-msgstr ""
+msgstr "Un nouveau ticket a été ouvert"
 
 msgid ""
 "We will send another e-mail once your ticket has been completed. In the "
 "meantime you can check the status of your ticket at any time:"
 msgstr ""
+"Nous vous enverrons un autre e-mail dès que votre ticket aura été traité. "
+"Entre-temps, vous pouvez aller voir l'état de votre ticket à tout moment :"
 
 msgid "Your ticket has been reopened"
-msgstr ""
+msgstr "Votre ticket a été ré-ouvert"
 
 #. Canonical text for ${event} is: "Event"
 msgid "${event} published."
-msgstr ""
+msgstr "${event} publié."
 
 #. Canonical text for ${event} is: "Event"
 msgid "${event} deleted."
-msgstr ""
+msgstr "${event} effacé."
 
 msgid "${amount} marked as paid."
-msgstr ""
+msgstr "${amount} marqué comme payé."
 
 msgid "${amount} marked as unpaid."
-msgstr ""
+msgstr "${amount} marqué comme non payé."
 
 msgid "${amount} captured."
-msgstr ""
+msgstr "${amount} capturé."
 
 msgid "${amount} refunded."
-msgstr ""
+msgstr "${amount} remboursé."
 
 msgid "1 reservation accepted."
-msgstr ""
+msgstr "1 réservation acceptée."
 
 msgid "${count} reservations accepted."
-msgstr ""
+msgstr "${count} réservations acceptées."
 
 msgid "1 reservation rejected."
-msgstr ""
+msgstr "1 réservation rejetée."
 
 msgid "${count} reservations rejected."
-msgstr ""
+msgstr "${count} réservations rejetées."
 
 msgid "Ticket opened."
-msgstr ""
+msgstr "Ticket ouvert."
 
 msgid "Ticket accepted."
-msgstr ""
+msgstr "Ticket accepté."
 
 msgid "Ticket closed."
-msgstr ""
+msgstr "Ticket fermé."
 
 msgid "Ticket reopened."
-msgstr ""
+msgstr "Ticket ré-ouvert."
 
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr ""
+"Abonnez-vous à notre lettre d'informations pour rester au courant en "
+"permanence :"
 
 msgid "Signup"
-msgstr ""
+msgstr "S'abonner"
 
 msgid "There are currently ${count} recipients registered."
-msgstr ""
+msgstr "Il y a actuellement ${count} destinataires enregistrés."
 
 msgid "Archive"
-msgstr ""
+msgstr "Archiver"
 
 msgid "No newsletters yet."
-msgstr ""
+msgstr "Pas encore de lettre d'informations."
 
 msgid "Not yet sent."
-msgstr ""
+msgstr "Pas encore envoyé."
 
 msgid ""
 "The user ${username} was created successfully. Please write down the user's "
 "password, as it won't be shown to you again:"
 msgstr ""
+"Création de l'utilisateur ${username} réussie. Veuillez conserver ce mot de "
+"passe d'utilisateur, car il ne vous sera plus montré à nouveau : "
 
 msgid "Password:"
-msgstr ""
+msgstr "Mot de passe :"
 
 msgid ""
 "The user ${username} was created successfully. An e-mail has been sent to "
 "the user with login instructions."
 msgstr ""
+"Création de l'utilisateur ${username} réussie. Un e-mail a été envoyé à "
+"l'utilisateur avec les instructions de connexion."
 
 msgid "Back to usermanagement"
-msgstr ""
+msgstr "Retour à la gestion des utilisateurs"
 
 msgid ""
-"Sorry, the page you are looking for could not be found. Try checking the URL "
-"for errors or use the search box on the top."
+"Sorry, the page you are looking for could not be found. Try checking the URL"
+" for errors or use the search box on the top."
 msgstr ""
+"Désolé, la page que vous cherchez n'a pu être trouvée. Essayez de vérifier "
+"qu'il n'y a pas d'erreurs dans l'URL ou utilisez la fenêtre de recherche "
+"située en haut."
 
 msgid "Export this event"
-msgstr ""
+msgstr "Exporter cet événement"
 
 msgid "Export all occurrences of this event"
-msgstr ""
+msgstr "Exporter toutes les occurrences de cet événement"
 
 msgid "All occurrences of this event"
-msgstr ""
+msgstr "Toutes les occurrences de cet événement"
 
 msgid "Submit your event"
 msgstr ""
@@ -1652,8 +1739,8 @@ msgid "Utilised"
 msgstr ""
 
 msgid ""
-"The following recipients receive a daily e-mail sent at 06:00 containing the "
-"reservation data for all reservations of the day."
+"The following recipients receive a daily e-mail sent at 06:00 containing the"
+" reservation data for all reservations of the day."
 msgstr ""
 
 msgid "No recipients defined yet."
@@ -1749,8 +1836,8 @@ msgid ""
 msgstr ""
 
 msgid ""
-"Notes are private and only shown to logged-in members. You can use links/e-"
-"mail addresses are turned into clickable links."
+"Notes are private and only shown to logged-in members. You can use "
+"links/e-mail addresses are turned into clickable links."
 msgstr ""
 
 msgid "State:"
@@ -1837,8 +1924,8 @@ msgid "Your ${org} Registration"
 msgstr ""
 
 msgid ""
-"Thank you for registering. Please follow the instructions on the activiation "
-"e-mail sent to you."
+"Thank you for registering. Please follow the instructions on the activiation"
+" e-mail sent to you."
 msgstr ""
 
 msgid "Unknown user"
@@ -1869,10 +1956,10 @@ msgid "Submit an event"
 msgstr ""
 
 msgid ""
-"Only events taking place inside the town or events related to town societies "
-"are published. Events which are purely commercial are not published. There's "
-"no right to be published and already published events may be removed from "
-"the page without notification or reason."
+"Only events taking place inside the town or events related to town societies"
+" are published. Events which are purely commercial are not published. "
+"There's no right to be published and already published events may be removed"
+" from the page without notification or reason."
 msgstr ""
 
 #, python-format
@@ -2043,8 +2130,8 @@ msgid "The reservations have already been accepted"
 msgstr ""
 
 msgid ""
-"The payment associated with this reservation needs to be refunded before the "
-"reservation can be rejected"
+"The payment associated with this reservation needs to be refunded before the"
+" reservation can be rejected"
 msgstr ""
 
 msgid "The reservations were rejected"

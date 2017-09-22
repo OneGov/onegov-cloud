@@ -4,7 +4,6 @@ from lxml import etree
 from onegov.form import Form
 from onegov.form.core import with_options
 from onegov.form.validators import Stdnum
-from onegov.form.fields import MultiCheckboxField
 from onegov.gis import CoordinatesField
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
@@ -52,7 +51,7 @@ class SettingsForm(Form):
         label=_("Primary Color"),
         fieldset=_("General")
     )
-    locales = MultiCheckboxField(
+    locales = RadioField(
         label=_("Languages"),
         fieldset=_("General"),
         choices=(

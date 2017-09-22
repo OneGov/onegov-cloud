@@ -3762,3 +3762,25 @@ def test_stripe_charge_fee_to_customer(org_app):
     assert "info@example.org" in payments
     assert "10.00" in payments
     assert "0.61" in payments
+
+
+def test_switch_languages(org_app):
+
+    client = Client(org_app)
+    client.login_admin()
+
+    page = client.get('/einstellungen')
+    assert 'Deutsch' in page
+    assert 'Allemand' not in page
+
+    page.form['locales'] = 'fr_CH'
+    page = page.form.submit()
+
+    assert 'Allemand' not in page
+    assert 'Deutsch' in page
+
+    # the language updates after a refresh
+    page = client.get('/einstellungen')
+
+    assert 'Allemand' in page
+    assert 'Deutsch' not in page

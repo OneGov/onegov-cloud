@@ -194,7 +194,11 @@ def get_i18n_default_locale():
 def get_locale_negotiator():
     def locale_negotiator(locales, request):
         if request.app.org:
-            locales = request.app.org.locales or (get_i18n_default_locale(), )
+            locales = request.app.org.locales or get_i18n_default_locale()
+
+            if isinstance(locales, str):
+                locales = (locales, )
+
             return default_locale_negotiator(locales, request) or locales[0]
         else:
             return default_locale_negotiator(locales, request)

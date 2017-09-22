@@ -112,7 +112,6 @@
 
             <div class="small-12 medium-4 columns">
                 <metal:b use-macro="layout.macros['footer_social_media']" />
-                <metal:b use-macro="layout.macros['footer_locales']" />
             </div>
         </div>
     </tal:block>
