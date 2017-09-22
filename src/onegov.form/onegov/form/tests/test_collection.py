@@ -330,6 +330,30 @@ def test_file_submissions_update(session):
     assert len(submission.files) == 0
 
 
+def test_file_submissions_cascade(session):
+
+    collection = FormCollection(session)
+
+    # upload a new file
+    definition = collection.definitions.add('File', definition="File = *.txt")
+
+    data = FileMultiDict()
+    data.add_file('file', BytesIO(b'foobar'), filename='foobar.txt')
+
+    collection.submissions.add(
+        'file', definition.form_class(data), state='pending')
+
+    assert session.query(File).count() == 1
+    session.flush()
+
+    collection.submissions.remove_old_pending_submissions(older_than=(
+        datetime.utcnow() + timedelta(seconds=60)))
+
+    session.flush()
+
+    assert session.query(File).count() == 0
+
+
 def test_get_current(session):
     collection = FormCollection(session)
 
@@ -370,28 +394,3 @@ def test_add_externally_defined_submission(session):
     collection.submissions.remove_old_pending_submissions(
         older_than=date, include_external=True)
     assert collection.submissions.query().count() == 0
-
-
-def test_file_submissions_cascade(session):
-    # XXX for some reason this fails if it runs right after the
-    # test_filesubmissions_update function..
-
-    collection = FormCollection(session)
-
-    # upload a new file
-    definition = collection.definitions.add('File', definition="File = *.txt")
-
-    data = FileMultiDict()
-    data.add_file('file', BytesIO(b'foobar'), filename='foobar.txt')
-
-    collection.submissions.add(
-        'file', definition.form_class(data), state='pending')
-
-    assert session.query(File).count() == 1
-
-    collection.submissions.remove_old_pending_submissions(older_than=(
-        datetime.utcnow() + timedelta(seconds=60)))
-
-    session.flush()
-
-    assert session.query(File).count() == 0
