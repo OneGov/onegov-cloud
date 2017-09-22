@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.48.1 (2017-09-22)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes the associated table names for associable models.
   [href]
