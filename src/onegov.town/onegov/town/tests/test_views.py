@@ -54,8 +54,8 @@ def test_view_occurrences_on_startpage(town_app):
     events = (
         '150 Jahre Govikon',
         'Alle Veranstaltungen',
-        'Gemeindeversammlung',
-        'MuKi Turnen',
+        'Gemeinsames Turnen',
+        'Generalversammlung'
     )
     assert set(events) <= set(links)
 

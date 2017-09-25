@@ -1,0 +1,242 @@
+page-default: &lorem-ipsum
+  text: |
+    <p>
+      Loin, très loin, au delà des monts Mots, à mille lieues des pays
+      Voyellie et Consonnia, demeurent les Bolos Bolos. Ils vivent en
+      retrait, à Bourg-en-Lettres, sur les côtes de la Sémantique,
+      un vaste océan de langues.
+    </p>
+
+    <p>
+      Un petit ruisseau, du nom de Larousse, coule en leur lieu et les
+      approvisionne en règlalades nécessaires en tout genre; un pays
+      paradisiagmatique, dans lequel des pans entiers de phrases
+      prémâchées vous volent litéralement tout cuit dans la bouche.
+    </p>
+
+    <p>
+      Pas même la toute puissante Ponctuation ne régit les Bolos Bolos -
+      une vie on ne peut moins orthodoxographique. Un jour pourtant,
+      une petite ligne de Bolo Bolo du nom de Lorem Ipsum décida de
+      s'aventurer dans la vaste Grammaire.
+    </p>
+
+pages:
+  - title: Vivre et résider
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Cette partie du site internet contient les points et services de
+        l'administration, liés à la vie quotidienne et à la résidence dans
+        la municipalité.
+
+  - title: Éducation et société
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Nos citoyens sont le capital de notre municipalité.
+        La municipalité de Govikon propose des offres éducatives actuelles
+        et un réseau polyvalent de services sociaux.
+
+  - title: Politique et gouvernement
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Cette partie du site internet présente le conseil local et l'administration.
+
+  - title: Loisirs et tourisme
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Cette partie du site internet concerne les sports, les associations,
+        les centres sportifs, et les attractions culturelles et touristiques.
+
+  - title: Portrait et économie
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Cette partie du site internet contient des informations à propos de
+        l'histoire de la municipalité, ses traditions, sa géographie, et son économie.
+
+  - title: Nouvelles
+    type: news
+    name: aktuelles
+    meta:
+      trait: news
+
+  - title: Bienvenue sur OneGov Cloud
+    parent: aktuelles
+    type: news
+    meta:
+      trait: news
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Les services en ligne de votre municipalité sont désormais prêts à être
+        utilisés. Cliquez sur le titre de cette annonce pour les premières
+        étapes, plus d'informations, et un rapide aperçu.
+      text: >
+        <h2>Premières étapes</h2>
+        <p>
+              Les suggestions suivantes sont destinées à vous aider à vous
+              familiariser avec le OneGov Cloud. Nous vous invitons à ignorer
+              ces étapes si vous préférez découvrir les choses par vous-même.
+        </p>
+
+        <h3>Inscrivez-vous</h3>
+
+        <p>
+          Vous pouvez vous inscrire avec votre adresse e-mail dès maintenant.
+          Vous avez oublié votre mot de passe ? Pas de problème,
+          <a href="/request-password">vous pouvez le réinitialiser</a>.
+        </p>
+
+        <h3>Ajustez l'apparence et le style</h3>
+
+        <p>
+          Le OneGov Cloud peut être ajusté à vos besoins.
+          <a href="/einstellungen">Dans les réglages</a>, vous pouvez modifier
+          le logo, les images de la page d'accueil, et plus.
+        </p>
+
+        <h3>Présentez votre municipalité</h3>
+
+        <p>
+          Cliquez sur <strong>Vivre et résider</strong> dans la navigation,
+          et puis sur <strong>Ajouter > Point</strong> en dessous de la navigation
+          principale. Vous ne voyez pas de bouton <strong>Ajouter</strong> ?
+          Alors, vous devez d'abord vous connecter.
+        </p>
+
+        <h3>Remplissez un formulaire</h3>
+
+        <p>
+          Il y a de nombreux formulaires disponibles dans
+          <a href="/formulare">Services</a>, à remplir par vos citoyens.
+          Remplissez un formulaire et un nouveau ticket sera créé.
+        </p>
+
+        <p>
+          Vous pouvez modifier des tickets dans l'affichage
+          <a href="/tickets/ALL/open">Tickets</a>. Par ailleurs : vous pouvez
+          toujours ajouter vos propres formulaires et modifier les existants.
+        </p>
+
+        <h3>À propos de votre exemple de OneGov Cloud</h3>
+
+        <p>
+          Il y a beaucoup d'autres choses à découvrir – nous ne voulons pas tout
+          dévoiler pour le moment.
+        </p>        
+
+        <p>
+          Votre exemple de OneGov Cloud fonctionne sur un environnement de test
+          qui expirera dans deux semaines. Donc, prenez votre temps afin de
+          tester OneGov Cloud.
+        </p>
+
+        <p>
+          L'exemple de test est accessible à tout le monde, mais nous nous
+          assurons qu'il ne soit pas indexé par aucun moteur de recherche.
+        </p>
+
+        <p>
+          Si vous avez des questions, n'hésitez pas à nous contacter :
+        </p>
+
+        <p>
+          <strong>Fabian Reinhard</strong><br>
+          Unter der Egg 5 <br>
+          6004 Lucerne <br>
+          +41 41 511 22 50 <br>
+          <a href="mailto:fabian.reinhard@seantis.ch">fabian.reinhard@seantis.ch</a>
+        </p>
+
+        <h3>Comment continuer ?</h3>
+
+        <p>
+          Si nous vous avons convaincu, faites-le nous savoir et nous pouvons
+          faire évoluer votre environnement de test à celui de production.
+          Nous serions enchantés de vous compter parmi nous !
+        </p>
+
+filesets:
+  - title: Page d'accueil – images
+    type: image
+    meta:
+      show_images_on_homepage: true
+      lead: Ces images sont affichées sur la page d'accueil.
+      view: grid
+    files:
+      - path: images/38hrjv7gg2w-eric-jan-van-dorp.jpg
+        note: "{organisation} en hiver"
+      - path: images/himwr1n0dzq-martin-sattler.jpg
+        note: "Au sommet du lac de {organisation}"
+      - path: images/bhnxfaencti-eddy-klaus.jpg
+        note: "Au marché de l'art de {organisation}"
+      - path: images/p0sruan6cfi-samuel-zeller.jpg
+        note: "Le transport naval possède une longue tradition à {organisation}"
+
+organisation:
+  theme_options:
+    footer-height: 235px
+    primary-color: '#006fba'
+  meta:
+    contact: |
+      Fabian Reinhard
+      Unter der Egg 5
+      6004 Lucerne
+      +41 41 511 22 50
+      fabian.reinhard@seantis.ch
+    contact_html: >
+      Fabian Reinhard<br>
+      Unter der Egg 5<br>
+      6004 Lucerne<br>
+      +41 41 511 22 50<br>
+      <a href="mailto:fabian.reinhard@seantis.ch">fabian.reinhard@seantis.ch</a>
+    opening_hours: Du lundi au vendredi, de 09 h 00 à 17 h 00
+    opening_hours_html: Du lundi au vendredi, de 09 h 00 à 17 h 00
+    twitter_url: https://twitter.com/seantis
+    homepage_structure: |
+      <row>
+        <column span="12">
+          <slider />
+        </column>
+      </row>
+      <row>
+        <column span="8">
+            <row>
+                <column span="6">
+                    <news />
+                </column>
+                <column span="6">
+                    <events />
+                </column>
+            </row>
+            <line />
+            <homepage-tiles />
+        </column>
+        <column span="4">
+          <panel>
+            <services />
+          </panel>
+          <panel>
+            <directories />
+          </panel>
+        </column>
+      </row>
