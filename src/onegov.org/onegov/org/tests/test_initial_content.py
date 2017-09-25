@@ -23,7 +23,7 @@ def test_initial_content(org_app):
     forms = FormCollection(org_app.session()).definitions.query().all()
     forms = set(form.name for form in forms)
 
-    builtin_forms_path = module_path('onegov.org', 'forms/builtin')
+    builtin_forms_path = module_path('onegov.org', 'forms/builtin/de')
 
     paths = (p for p in os.listdir(builtin_forms_path))
     paths = (p for p in paths if p.endswith('.form'))

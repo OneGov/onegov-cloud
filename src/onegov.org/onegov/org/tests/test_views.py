@@ -2231,7 +2231,7 @@ def test_view_occurrences(org_app):
     query = 'tags=Sports'
     assert tags(query) == ["Sport"]
     assert total_events(query) == 10
-    assert set(events(query)) == set(["Gemeinsames Turnen", "Grümpelturnier"])
+    assert set(events(query)) == set(["Gemeinsames Turnen", "Fussballturnier"])
 
     query = 'tags=Politics&tags=Party'
     assert sorted(tags(query)) == ["Party", "Politik"]

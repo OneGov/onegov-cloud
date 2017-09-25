@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-09-22 13:58+0200\n"
+"POT-Creation-Date: 2017-09-25 14:47+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -81,6 +81,52 @@ msgstr "Annuler"
 
 msgid "This site is hidden from the general public"
 msgstr "Ce site est caché pour le grand public"
+
+msgid "Daypass"
+msgstr "Carte journalière"
+
+msgid "Conference room"
+msgstr "Salle de conférence"
+
+msgid "Sports facility"
+msgstr "Installations sportives"
+
+msgid "General Assembly"
+msgstr "Assemblée générale"
+
+msgid "Communal hall"
+msgstr "Salle communale"
+
+msgid "Community Gymnastics"
+msgstr "Gymnastique communautaire"
+
+msgid "Gymnasium"
+msgstr "Gymnase"
+
+msgid "Football Tournament"
+msgstr "Tournoi de football"
+
+msgid "We celebrate our 150th anniversary."
+msgstr "Nous célébrons notre 150e anniversaire."
+
+msgid "As every year."
+msgstr "Comme chaque année."
+
+msgid "Get fit together."
+msgstr "Retrouvons la forme ensemble."
+
+msgid "Women's Club"
+msgstr "Club des femmes"
+
+msgid "Amateurs welcome!"
+msgstr "Les amateurs sont les bienvenus !"
+
+msgid "Sports Association"
+msgstr "Association sportive"
+
+#, python-format
+msgid "150 years {organisation}"
+msgstr "{organisation} de 150 ans"
 
 msgid "Mo"
 msgstr "Lu"
@@ -299,9 +345,6 @@ msgstr "Rembourser ${amount}"
 
 msgid "Room"
 msgstr "Espace"
-
-msgid "Daypass"
-msgstr "Carte journalière"
 
 msgid "E-Mail Recipient"
 msgstr "Destinataire de l'e-mail"

@@ -1,0 +1,141 @@
+page-default: &lorem-ipsum
+  text: |
+
+    <p>
+      Loin, très loin, au delà des monts Mots, à mille lieues des pays
+      Voyellie et Consonnia, demeurent les Bolos Bolos. Ils vivent en
+      retrait, à Bourg-en-Lettres, sur les côtes de la Sémantique,
+      un vaste océan de langues.
+    </p>
+
+    <p>
+      Un petit ruisseau, du nom de Larousse, coule en leur lieu et les
+      approvisionne en règlalades nécessaires en tout genre; un pays
+      paradisiagmatique, dans lequel des pans entiers de phrases
+      prémâchées vous volent litéralement tout cuit dans la bouche.
+    </p>
+
+    <p>
+      Pas même la toute puissante Ponctuation ne régit les Bolos Bolos -
+      une vie on ne peut moins orthodoxographique. Un jour pourtant,
+      une petite ligne de Bolo Bolo du nom de Lorem Ipsum décida de
+      s'aventurer dans la vaste Grammaire.
+    </p>
+
+pages:
+  - title: Organisation
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Cette partie du site internet décrit l'organisation.
+  - title: Sujets
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Cette partie du site internet décrit les points essentiels de l'organisation.
+  - title: Contact
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Cette partie du site internet décrit comment joindre l'organisation.
+  - title: Nouvelles
+    type: news
+    name: aktuelles
+    meta:
+      trait: news
+  - title: Nous avons un nouveau site internet !
+    parent: aktuelles
+    type: news
+    meta:
+      trait: news
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Le nouveau site internet fonctionne sur la plate-forme OneGov Cloud.
+
+filesets:
+  - title: Page d'accueil – images
+    type: image
+    meta:
+      show_images_on_homepage: true
+      lead: Ces images sont affichées sur la page d'accueil.
+      view: grid
+    files:
+      - path: images/3bearyu-muo-daiga-ellaby.jpg
+        note: "Barbecue de {organisation}"
+      - path: images/hzgs56ze49s-anthony-delanoix.jpg
+        note: "Concert de charité de {organisation}"
+      - path: images/jwimshwif14-jeff-sheldon.jpg
+        note: "Apprentissage à vie avec {organisation}"
+
+organisation:
+  theme_options:
+    footer-height: 235px
+    primary-color: '#006fba'
+  meta:
+    contact: |
+      Fabian Reinhard
+      Unter der Egg 5
+      6004 Luzern
+      +41 41 511 22 50
+      fabian.reinhard@seantis.ch
+    contact_html: >
+      Fabian Reinhard<br>
+      Unter der Egg 5<br>
+      6004 Luzern<br>
+      +41 41 511 22 50<br>
+      <a href="mailto:fabian.reinhard@seantis.ch">fabian.reinhard@seantis.ch</a>
+    opening_hours: Du lundi au vendredi, de 09 h 00 à 17 h 00.
+    opening_hours_html: Du lundi au vendredi, de 09 h 00 à 17 h 00.
+    twitter_url: https://twitter.com/seantis
+    homepage_structure: |
+      <row>
+        <column span="8">
+          <slider />
+          <news />
+        </column>
+        <column span="4">
+          <panel>
+            <links title="Services">
+              <link url="./formulare"
+                    description="Demandes et réponses">
+                    Formulaires
+              </link>
+              <link url="./ressourcen"
+                    description="Pièces et cartes journalières">
+                    Réservations
+              </link>
+            </links>
+          </panel>
+
+          <panel>
+            <events />
+          </panel>
+
+          <panel>
+            <links title="Répertoires">
+              <link url="./personen"
+                    description="Tous les contacts">
+                Personnes
+              </link>
+              <link url="./fotoalben"
+                    description="Impressions">
+                Albums photo
+              </link>
+              <link url="./a-z"
+                    description="Catalogue de A à Z">
+                Sujets
+              </link>
+            </links>
+          </panel>
+        </column>
+      </row>

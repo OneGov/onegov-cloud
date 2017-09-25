@@ -240,7 +240,7 @@ def test_sitecollection(org_app):
         'wir-haben-eine-neue-webseite'
     }
 
-    builtin_forms_path = module_path('onegov.org', 'forms/builtin')
+    builtin_forms_path = module_path('onegov.org', 'forms/builtin/de')
 
     paths = (p for p in os.listdir(builtin_forms_path))
     paths = (p for p in paths if p.endswith('.form'))

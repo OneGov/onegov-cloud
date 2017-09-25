@@ -26,8 +26,10 @@ cli = command_group()
 
 @cli.command(context_settings={'creates_path': True})
 @click.argument('name')
+@click.option('--locale',
+              default='de_CH', type=click.Choice(['de_CH', 'fr_CH']))
 @pass_group_context
-def add(group_context, name):
+def add(group_context, name, locale):
     """ Adds an org with the given name to the database. For example:
 
         onegov-org --select '/onegov_org/evilcorp' add "Evilcorp"
@@ -40,7 +42,7 @@ def add(group_context, name):
             abort("{} already contains an organisation".format(
                 group_context.selector))
 
-        app.settings.org.create_new_organisation(app, name)
+        app.settings.org.create_new_organisation(app, name, locale=locale)
 
         click.echo("{} was created successfully".format(name))
 
