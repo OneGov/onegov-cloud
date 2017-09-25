@@ -3,18 +3,20 @@
 from datetime import date
 from onegov.chat import MessageCollection
 from onegov.core.converters import extended_date_converter
-from onegov.core.i18n import SiteLocale
 from onegov.event import (
     Event,
     EventCollection,
     Occurrence,
     OccurrenceCollection
 )
+from onegov.file import File
+from onegov.file.integration import get_file
 from onegov.form import (
     FormDefinition,
     FormCollection,
     CompleteFormSubmission,
-    PendingFormSubmission
+    PendingFormSubmission,
+    FormFile
 )
 from onegov.newsletter import (
     Newsletter,
@@ -141,6 +143,32 @@ def get_pending_form_submission(app, id):
 def get_complete_form_submission(app, id):
     return FormCollection(app.session()).submissions.by_id(
         id, state='complete', current_only=False)
+
+
+@OrgApp.path(model=File, path='/storage/{id}')
+def get_file_for_org(request, app, id):
+    """ Form files are kept private and out of any caches.
+
+    This approach is not all that morepath-y, as we could override the views
+    instead to change the required permissions, but this approach has the
+    advantage that we don't need to overwrite multiple views and we do not
+    have to care for additional views added in the future.
+
+    """
+    obj = get_file(app, id)
+
+    if obj and isinstance(obj, FormFile):
+        if not request.has_role('editor', 'admin'):
+            obj = None
+        else:
+            @request.after
+            def disable_cache(response):
+                response.cache_control.no_cache = True
+                response.cache_control.max_age = None
+                response.cache_control.public = False
+                response.cache_control.private = True
+
+    return obj
 
 
 @OrgApp.path(model=Editor, path='/editor/{action}/{trait}/{page_id}')
@@ -361,7 +389,7 @@ def get_subscription(app, recipient_id, token):
 
 
 @OrgApp.path(model=LegacyFile, path='/datei/{filename}')
-def get_file(app, filename):
+def get_legacy_file(app, filename):
     return LegacyFileCollection(app).get_file_by_filename(filename)
 
 
@@ -440,9 +468,3 @@ def get_messages(app, channel_id='*', type='*',
         older_than=older_than,
         limit=min(25, limit)  # bind the limit to a max of 25
     )
-
-
-@OrgApp.path(model=SiteLocale, path='/locale/{locale}')
-def get_locale(request, app, locale, to=None):
-    to = to or request.link(app.org)
-    return SiteLocale.for_path(app, locale, to)

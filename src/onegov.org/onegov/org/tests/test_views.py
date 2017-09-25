@@ -718,6 +718,12 @@ def test_show_uploaded_file(org_app):
     assert file_response.content_type == 'text/plain'
     assert file_response.text == 'foobar'
 
+    assert file_response.cache_control.private
+    assert file_response.cache_control.no_cache
+    assert not file_response.cache_control.public
+
+    assert Client(org_app).get(file_response.request.url, status=404)
+
 
 def test_hide_page(org_app):
     client = Client(org_app)
