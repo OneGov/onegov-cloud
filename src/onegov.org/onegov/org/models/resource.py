@@ -132,10 +132,6 @@ class SearchableResource(ORMSearchable):
     }
 
     @property
-    def es_language(self):
-        return 'de'  # XXX add to database in the future
-
-    @property
     def es_public(self):
         return not self.is_hidden_from_public
 

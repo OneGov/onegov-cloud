@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Switches to onegov.search's automatic language detection.
+  [href]
+
 - Switches to onegov.file for form submission files.
   [href]
 

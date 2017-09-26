@@ -134,10 +134,6 @@ class ImageSet(FileSet, HiddenFromPublicExtension, ORMSearchable):
         return not self.is_hidden_from_public
 
     @property
-    def es_language(self):
-        return 'de'  # xxx for now there's no other language
-
-    @property
     def es_suggestions(self):
         return {
             "input": [self.title.lower()]

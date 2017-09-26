@@ -33,10 +33,6 @@ class SearchablePage(ORMSearchable):
         return not self.is_hidden_from_public
 
     @property
-    def es_language(self):
-        return 'de'  # xxx for now there's no other language
-
-    @property
     def es_skip(self):
         return self.meta.get('trait') == 'link'  # do not index links
 
