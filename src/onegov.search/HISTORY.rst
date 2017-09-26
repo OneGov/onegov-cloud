@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.2.0 (2017-09-26)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds automatic language detection for localisable content.
   [href]
 
