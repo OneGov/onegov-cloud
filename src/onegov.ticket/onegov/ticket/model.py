@@ -123,10 +123,6 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         ]
 
     @property
-    def es_language(self):
-        return 'de'  # XXX add to database in the future
-
-    @property
     def ticket_email(self):
         if self.handler.deleted:
             return self.snapshot.get('email')
