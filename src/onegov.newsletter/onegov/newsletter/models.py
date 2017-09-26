@@ -38,7 +38,6 @@ class Newsletter(Base, ContentMixin, TimestampMixin, ORMSearchable):
     __tablename__ = 'newsletters'
 
     es_id = 'name'
-    es_language = 'de'  # XXX add to database in the future
     es_properties = {
         'title': {'type': 'localized'},
         'lead': {'type': 'localized'},
