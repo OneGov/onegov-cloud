@@ -33,10 +33,6 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     }
 
     @property
-    def es_language(self):
-        return 'de'  # XXX add to database in the future
-
-    @property
     def es_public(self):
         return False  # to be overridden downstream
 
