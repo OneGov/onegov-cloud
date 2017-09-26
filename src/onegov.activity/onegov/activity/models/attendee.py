@@ -29,7 +29,6 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'attendees'
 
-    es_language = 'de'  # XXX add to database in the future
     es_properties = {
         'username': {'type': 'text'},
         'name': {'type': 'text'},
