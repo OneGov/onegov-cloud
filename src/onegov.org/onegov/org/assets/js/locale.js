@@ -13,7 +13,33 @@ var locales = {
         "Whole day": "Ganztägig",
         "Yes": "Ja",
         "Add Suggestion": "Vorschlag Hinzufügen",
-        "Goto date": "Zu Datum springen"
+        "Goto date": "Zu Datum springen",
+        "Image": "Bild",
+        "File": "Datei",
+        "Internal Link": "Interner Link",
+        "Upload": "Hochladen",
+        "Select": "Auswählen"
+    },
+    fr: {
+        "Allocation": "Allocation",
+        "Add": "Ajouter",
+        "Count": "Nombre",
+        "Dates": "Dates",
+        "From": "De",
+        "No": "Non",
+        "Remove": "Enlever",
+        "Reserve": "Réserver",
+        "Select allocations in the calendar to reserve them": "Sélectionnez les affectations dans le calendrier pour les réserver",
+        "Until": "Jusqu'à",
+        "Whole day": "Toute la journée",
+        "Yes": "Oui",
+        "Add Suggestion": "Ajouter une suggestion",
+        "Goto date": " Aller à la date",
+        "Image": "Image",
+        "File": "Fichier",
+        "Internal Link": "Lien interne",
+        "Upload": "Télécharger",
+        "Select": "Sélectionner"
     }
 };
 

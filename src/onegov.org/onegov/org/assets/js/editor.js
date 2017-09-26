@@ -2,6 +2,8 @@ $(function() {
     _.each($('textarea.editor'), function(el) {
         var textarea = $(el);
         var form = textarea.closest('form');
+        var language = window.locale.language;
+        var translation = $.Redactor.opts.langs[language];
 
         textarea.redactor({
             buttons: [
@@ -16,16 +18,16 @@ $(function() {
             imageManagerJson: form.data('image-list-url'),
             definedLinks: form.data('sitecollection-url'),
             plugins: ['bufferbuttons', 'filemanager', 'imagemanager', 'definedlinks'],
-            lang: 'de',
+            lang: language,
             convertVideoLinks: false,
             formattingAdd: [
                 {
                     tag: 'h2',
-                    title: "Titel"
+                    title: translation.title
                 },
                 {
                     tag: 'h3',
-                    title: "Untertitel"
+                    title: translation.subtitle
                 }
             ],
             /* defined in input_with_button.js */

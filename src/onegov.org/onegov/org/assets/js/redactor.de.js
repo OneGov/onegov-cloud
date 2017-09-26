@@ -2,7 +2,7 @@
 $.Redactor.opts.langs['de'] = {
 	html: 'HTML',
 	video: 'Video',
-	image: 'Bilder',
+	image: 'Bild',
 	table: 'Tabelle',
 	link: 'Link',
 	link_insert: 'Link einfügen ...',
@@ -45,6 +45,7 @@ $.Redactor.opts.langs['de'] = {
 	add_head: 'Titel einfügen',
 	delete_head: 'Titel entfernen',
 	title: 'Title',
+    subtitle: 'Untertitel',
 	image_view: 'Bilder',
 	image_position: 'Textumbruch',
 	none: 'Keine',
@@ -75,6 +76,8 @@ $.Redactor.opts.langs['de'] = {
 	filename: 'Name (optional)',
 	edit: 'Bearbeiten',
 	center: 'Center',
-	upload_label: 'Datei hier ablegen oder '
+	upload_label: 'Datei hier ablegen oder ',
+	redo: 'Wiederherstellen',
+	undo: 'Rückgängig'
 };
 })( jQuery );

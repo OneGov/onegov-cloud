@@ -58,17 +58,16 @@ var setup_internal_link_select = function(input) {
         row.find('.button').click(function(e) {
             var popup_content = $('<div class="popup" />');
 
-            // XXX put translatable strings in a separate file
             if (types.indexOf('image-url') != -1) {
-                popup_content.append($('<a class="image-url">Bild</a>'));
+                popup_content.append($('<a class="image-url">' + window.locale("Image") + '</a>'));
             }
 
             if (types.indexOf('file-url') != -1) {
-                popup_content.append($('<a class="file-url">Datei</a>'));
+                popup_content.append($('<a class="file-url">' + window.locale("File") + '</a>'));
             }
 
             if (types.indexOf('internal-url') != -1) {
-                popup_content.append($('<a class="internal-url">Interner Link</a>'));
+                popup_content.append($('<a class="internal-url">' + window.locale("Internal Link") + '</a>'));
             }
 
             popup_content.popup({
@@ -143,7 +142,7 @@ var on_internal_link_button_click = function(input, type) {
         imageUpload: form.data('image-upload-url'),
         imageManagerJson: form.data('image-list-url'),
         definedLinks: form.data('sitecollection-url'),
-        lang: 'de',
+        lang: window.locale.language,
         fileUploadErrorCallback: handleUploadError,
         imageUploadErrorCallback: handleUploadError
     });

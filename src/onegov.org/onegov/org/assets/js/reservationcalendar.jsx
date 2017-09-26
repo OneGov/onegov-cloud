@@ -118,7 +118,8 @@ rc.getFullcalendarOptions = function(options) {
         viewRenderers: [],
         eventRenderers: [],
         reservations: rcOptions.reservations,
-        reservationform: rcOptions.reservationform
+        reservationform: rcOptions.reservationform,
+        locale: window.locale.language
     };
 
     // the reservation calendar type definition

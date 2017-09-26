@@ -279,6 +279,7 @@ def get_fullcalendar_asset():
     yield 'fullcalendar.css'
     yield 'fullcalendar.js'
     yield 'fullcalendar.de.js'
+    yield 'fullcalendar.fr.js'
     yield 'reservationcalendar.jsx'
     yield 'reservationcalendar_custom.js'
 
@@ -310,6 +311,7 @@ def get_editor_asset():
     yield 'filemanager.js'
     yield 'imagemanager.js'
     yield 'redactor.de.js'
+    yield 'redactor.fr.js'
     yield 'input_with_button.js'
     yield 'editor.js'
 
@@ -372,7 +374,8 @@ def get_common_asset():
     yield 'leaflet'
     yield 'pay'
     yield 'moment.js'
-    yield 'moment.de.js'
+    yield 'moment.de-ch.js'
+    yield 'moment.fr-ch.js'
     yield 'jquery.datetimepicker.js'
     yield 'jquery.mousewheel.js'
     yield 'jquery.popupoverlay.js'

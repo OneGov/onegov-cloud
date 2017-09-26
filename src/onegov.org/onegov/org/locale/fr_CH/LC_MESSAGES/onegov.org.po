@@ -350,10 +350,10 @@ msgid "E-Mail Recipient"
 msgstr "Destinataire de l'e-mail"
 
 msgid "Do you really want to delete this allocation?"
-msgstr "Voulez-vous vraiment supprimer cette attribution ?"
+msgstr "Voulez-vous vraiment supprimer cette allocation ?"
 
 msgid "Delete allocation"
-msgstr "Supprimer l'attribution"
+msgstr "Supprimer l'allocation"
 
 msgid "Photo Album"
 msgstr "Album photo"
@@ -377,7 +377,7 @@ msgid "Members"
 msgstr "Membres"
 
 msgid "A conflicting allocation exists for the requested time period."
-msgstr "Une attribution contradictoire existe pour la période demandée."
+msgstr "Une allocation contradictoire existe pour la période demandée."
 
 msgid "A conflicting reservation exists for the requested time period."
 msgstr "Une réservation contradictoire existe pour la période demandée."
@@ -415,13 +415,13 @@ msgid "The allocation does not have enough free spots."
 msgstr "L'allocation ne dispose pas de suffisamment de places disponibles."
 
 msgid "The resulting allocation would be invalid."
-msgstr "L'attribution résultante ne serait pas valide."
+msgstr "L'allocation résultante ne serait pas valide."
 
 msgid "No reservations to confirm."
 msgstr "Aucune réservation pour confirmer."
 
 msgid "The given timerange is longer than the existing allocation."
-msgstr "L'intervalle de temps donné est plus long que l'attribution existante."
+msgstr "L'intervalle de temps donné est plus long que l'allocation existante."
 
 msgid "Reservation too short. A reservation must last at least 5 minutes."
 msgstr ""
@@ -448,14 +448,14 @@ msgid ""
 "This allocation can't be deleted because there are existing reservations "
 "associated with it."
 msgstr ""
-"Cette attribution ne peut pas être supprimée car il existe des réservations "
+"Cette allocation ne peut pas être supprimée car il existe des réservations "
 "existantes qui y sont associées."
 
 msgid ""
 "To delete this allocation, all existing reservations need to be cancelled "
 "first."
 msgstr ""
-"Pour supprimer cette attribution, toutes les réservations existantes doivent "
+"Pour supprimer cette allocation, toutes les réservations existantes doivent "
 "être annulées en premier."
 
 msgid "Start"
@@ -1768,14 +1768,14 @@ msgstr "Aller au calendrier"
 msgid "Select a free time span in the calendar below to create an allocation."
 msgstr ""
 "Sélectionnez un intervalle de temps libre dans le calendrier ci-dessous pour "
-"créer une attribution."
+"créer une allocation."
 
 msgid "Further Information"
 msgstr "Plus d'informations"
 
 msgid "Removes all unreserved allocations between the start and end date."
 msgstr ""
-"Supprime toutes les attribution non réservées entre la date de début et de "
+"Supprime toutes les allocation non réservées entre la date de début et de "
 "fin."
 
 msgid "Utilised"
@@ -1951,7 +1951,7 @@ msgid "Extra..."
 msgstr "Supplémentaire..."
 
 msgid "New allocation"
-msgstr "Nouvelle attribution"
+msgstr "Nouvelle allocation"
 
 #, python-format
 msgid "Successfully added ${n} allocations"
