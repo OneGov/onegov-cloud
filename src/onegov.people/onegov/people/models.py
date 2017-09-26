@@ -18,10 +18,6 @@ class Person(Base, TimestampMixin, ORMSearchable):
     }
 
     @property
-    def es_language(self):
-        return 'de'  # XXX add to database in the future
-
-    @property
     def title(self):
         return self.last_name + " " + self.first_name
 
