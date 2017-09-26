@@ -174,10 +174,6 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
     def es_public(self):
         return self.state == 'published'
 
-    @property
-    def es_language(self):
-        return 'de'  # XXX add to database in the future
-
     def __setattr__(self, name, value):
         """ Automatically update the occurrences if shared attributes change.
         """
