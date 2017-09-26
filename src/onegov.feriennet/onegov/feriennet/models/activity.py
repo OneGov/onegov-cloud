@@ -33,10 +33,6 @@ class VacationActivity(Activity, CoordinatesExtension, ORMSearchable):
         return self.state == 'preview'
 
     @property
-    def es_language(self):
-        return 'de'
-
-    @property
     def es_sugggestions(self):
         return {
             'input': (self.title.lower(), )
