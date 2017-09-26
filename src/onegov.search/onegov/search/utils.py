@@ -1,7 +1,10 @@
 import hashlib
 import json
+import os
 import re
 
+from langdetect import DetectorFactory, PROFILES_DIRECTORY
+from langdetect.utils.lang_profile import LangProfile
 from onegov.core.orm import find_models
 
 
@@ -104,3 +107,36 @@ def related_types(model):
                     return related_types(parentclass)
 
     return result
+
+
+class LanguageDetector(object):
+    """ Detects languages with the help of langdetect.
+
+    Unlike langdetect this detector may be limited to a subset of all
+    supported languages, which may improve accuracy if the subset is known and
+    saves some memory.
+
+    """
+
+    def __init__(self, supported_languages):
+        self.supported_languages = supported_languages
+        self.factory = DetectorFactory()
+
+        for ix, language in enumerate(supported_languages):
+            path = os.path.join(PROFILES_DIRECTORY, language)
+
+            with open(path, 'r', encoding='utf-8') as f:
+                profile = LangProfile(**json.load(f))
+                self.factory.add_profile(profile, ix, len(supported_languages))
+
+    def spawn_detector(self, text):
+        detector = self.factory.create()
+        detector.append(text)
+
+        return detector
+
+    def detect(self, text):
+        return self.spawn_detector(text).detect()
+
+    def probabilities(self, text):
+        return self.spawn_detector(text).get_probabilities()

@@ -520,3 +520,58 @@ def test_suggestions(es_url, postgres_dsn):
     assert set(app.es_suggestions(query='w', languages=['en'])) == {
         'Winger Jeff'
     }
+
+
+def test_language_detection(es_url, postgres_dsn):
+
+    class App(Framework, ElasticsearchApp):
+        pass
+
+    Base = declarative_base()
+
+    class Document(Base, ORMSearchable):
+        __tablename__ = 'documents'
+
+        id = Column(Integer, primary_key=True)
+        title = Column(Text, nullable=False)
+
+        es_properties = {
+            'title': {'type': 'localized'}
+        }
+
+        es_public = True
+
+    scan_morepath_modules(App)
+    morepath.commit()
+
+    app = App()
+    app.configure_application(
+        dsn=postgres_dsn,
+        base=Base,
+        elasticsearch_hosts=[es_url]
+    )
+
+    app.namespace = 'documents'
+    app.set_application_id('documents/home')
+
+    session = app.session()
+    session.add(Document(title="Mein Dokument"))
+    session.add(Document(title="My document"))
+    session.add(Document(title="Mon document"))
+    transaction.commit()
+    app.es_indexer.process()
+    app.es_client.indices.refresh(index='_all')
+
+    german = app.es_search(languages=['de']).execute().load()
+    english = app.es_search(languages=['en']).execute().load()
+    french = app.es_search(languages=['fr']).execute().load()
+
+    # this illustrates that language detection is not exact (esp. if the
+    # text is rather short)
+    assert len(german) == 1
+    assert len(english) == 0
+    assert len(french) == 2
+
+    assert german[0].title == "Mein Dokument"
+    assert french[0].title == "My document"
+    assert french[1].title == "Mon document"

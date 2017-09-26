@@ -47,15 +47,11 @@ class Searchable(object):
         a ``to_dict`` method.
 
         Internally, onegov.search stores differing languages in different
-        indices. For this reason you should mark all fields which are
-        specific to :attr:`es_language` like this::
+        indices. It does this automatically through langauge detection, or
+        by manually specifying a language.
 
-            @property
-            def es_properties(self):
-
-                return {
-                    'title': { 'type': 'localized' }
-                }
+        Note that objects with multiple languages are not supported
+        (each object is supposed to have exactly one language).
 
         Onegov.search will automatically insert the right analyzer for
         types like these.
@@ -84,16 +80,18 @@ class Searchable(object):
 
     @property
     def es_language(self):
-        """ Returns the ISO 639-1 language code of the content. Note that
-        the object's id may not be the same over differing languages.
+        """ Defines the language of the object. By default 'auto' is used,
+        which triggers automatic language detection. Automatic language
+        detection is reasonably accurate if provided with enough text. Short
+        texts are not detected easily.
 
-        That is to say, this is not valid::
+        When 'auto' is used, expect some content to be misclassified. You
+        should then search over all languages, not just the epxected one.
 
-            Object(id=1, language='de')
-            Object(id=2, language='en')
+        This property can be used to manually set the language.
 
         """
-        raise NotImplementedError
+        return 'auto'
 
     @property
     def es_public(self):

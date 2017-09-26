@@ -1,16 +1,21 @@
 import platform
+import re
 
 from copy import deepcopy
 from elasticsearch.exceptions import NotFoundError, TransportError
+from langdetect.lang_detect_exception import LangDetectException
 from onegov.core.utils import is_non_string_iterable
 from onegov.search import log, Searchable, utils
 from queue import Queue, Empty, Full
 
+
 ES_ANALYZER_MAP = {
     'en': 'english',
     'de': 'german',
+    'fr': 'french',
     'en_html': 'english_html',
-    'de_html': 'german_html'
+    'de_html': 'german_html',
+    'fr_html': 'french_html',
 }
 
 ANALYSIS_CONFIG = {
@@ -34,6 +39,27 @@ ANALYSIS_CONFIG = {
         "german_stemmer": {
             "type": "stemmer",
             "language": "light_german"
+        },
+        "french_elision": {
+            "type": "elision",
+            "articles_case": True,
+            "articles": [
+                "l", "m", "t", "qu", "n", "s",
+                "j", "d", "c", "jusqu", "quoiqu",
+                "lorsqu", "puisqu"
+            ]
+        },
+        "french_stop": {
+            "type": "stop",
+            "stopwords": "_french_"
+        },
+        "french_keywords": {
+            "type": "keyword_marker",
+            "keywords": ["Exemple"]
+        },
+        "french_stemmer": {
+            "type": "stemmer",
+            "language": "light_french"
         }
     },
     "analyzer": {
@@ -59,6 +85,19 @@ ANALYSIS_CONFIG = {
                 "german_stop",
                 "german_normalization",
                 "german_stemmer"
+            ]
+        },
+        "french_html": {
+            "tokenizer": "standard",
+            "char_filter": [
+                "html_strip"
+            ],
+            "filter": [
+                "french_elision",
+                "lowercase",
+                "french_stop",
+                "french_keywords",
+                "french_stemmer"
             ]
         },
         "autocomplete": {
@@ -496,6 +535,50 @@ class IndexManager(object):
         ))
 
 
+class ORMLanguageDetector(utils.LanguageDetector):
+
+    html_strip_expression = re.compile(r'<[^<]+?>')
+
+    def localized_properties(self, obj):
+        for key, definition in obj.es_properties.items():
+            if definition.get('type', '').startswith('localized'):
+                yield key
+
+    def localized_texts(self, obj, max_chars=None):
+        chars = 0
+
+        for p in self.localized_properties(obj):
+            text = getattr(obj, p, '')
+
+            if not isinstance(text, str):
+                continue
+
+            yield text.strip()
+
+            chars += len(text)
+
+            if max_chars is not None and max_chars <= chars:
+                break
+
+    def detect_object_language(self, obj):
+        properties = self.localized_properties(obj)
+
+        if not properties:
+            # here, the mapping will be the same for all languages
+            return self.supported_languages[0]
+
+        text = ' '.join(self.localized_texts(obj, max_chars=1024))
+        text = self.html_strip_expression.sub('', text).strip()
+
+        if not text:
+            return self.supported_languages[0]
+
+        try:
+            return self.detect(text)
+        except LangDetectException:
+            return self.supported_languages[0]
+
+
 class ORMEventTranslator(object):
     """ Handles the onegov.core orm events, translates them into indexing
     actions and puts the result into a queue for the indexer to consume.
@@ -509,9 +592,12 @@ class ORMEventTranslator(object):
         'date': lambda dt: dt.isoformat(),
     }
 
-    def __init__(self, mappings, max_queue_size=0):
+    def __init__(self, mappings, max_queue_size=0, languages=(
+        'de', 'fr', 'en'
+    )):
         self.mappings = mappings
         self.queue = Queue(maxsize=max_queue_size)
+        self.detector = ORMLanguageDetector(languages)
 
     def on_insert(self, schema, obj):
         if isinstance(obj, Searchable):
@@ -535,16 +621,21 @@ class ORMEventTranslator(object):
         if obj.es_skip:
             return
 
+        if obj.es_language == 'auto':
+            language = self.detector.detect_object_language(obj)
+        else:
+            language = obj.es_language
+
         translation = {
             'action': 'index',
             'id': getattr(obj, obj.es_id),
             'schema': schema,
             'type_name': obj.es_type_name,
-            'language': obj.es_language,
+            'language': language,
             'properties': {}
         }
 
-        mapping = self.mappings[obj.es_type_name].for_language(obj.es_language)
+        mapping = self.mappings[obj.es_type_name].for_language(language)
 
         for prop, mapping in mapping.items():
 

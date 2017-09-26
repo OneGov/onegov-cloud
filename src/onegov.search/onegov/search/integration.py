@@ -61,6 +61,11 @@ class ElasticsearchApp(morepath.App):
             the ssl connection. Defaults to true. Do not disable, unless you
             are in testing!
 
+        :elasticsearch_languages:
+            The languages supported by onegov.search. Defaults to:
+                - en
+                - de
+                - fr
         """
 
         if not cfg.get('enable_elasticsearch', True):
@@ -140,15 +145,21 @@ class ElasticsearchApp(morepath.App):
             types=types
         )
 
-    def es_search_by_request(self, request, types='*', explain=False):
+    def es_search_by_request(self, request, types='*', explain=False,
+                             limit_to_request_language=False):
         """ Takes the current :class:`~onegov.core.request.CoreRequest` and
         returns an elastic search scoped to the current application, the
         requests language and it's access rights.
 
         """
 
+        if limit_to_request_language:
+            languages = [request.locale.split('_')[0]]
+        else:
+            languages = '*'
+
         return self.es_search(
-            languages=[request.locale.split('_')[0]],
+            languages=languages,
             types=types,
             include_private=self.es_may_use_private_search(request),
             explain=explain
@@ -193,14 +204,20 @@ class ElasticsearchApp(morepath.App):
 
         return suggestions
 
-    def es_suggestions_by_request(self, request, query, types='*'):
+    def es_suggestions_by_request(self, request, query, types='*',
+                                  limit_to_request_language=False):
         """ Returns suggestions for the given query, scoped to the language
         and the login status of the given requst.
 
         """
+        if limit_to_request_language:
+            languages = [request.locale.split('_')[0]]
+        else:
+            languages = '*'
+
         return self.es_suggestions(
             query,
-            languages=[request.locale.split('_')[0]],
+            languages=languages,
             types=types,
             include_private=self.es_may_use_private_search(request)
         )

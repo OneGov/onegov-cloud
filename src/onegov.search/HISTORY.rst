@@ -1,8 +1,14 @@
 Changelog
 ---------
 
+- Adds automatic language detection for localisable content.
+  [href]
+
 1.1.1 (2017-07-06)
 ~~~~~~~~~~~~~~~~~~~
+
+- Switch onegov.testing to onegov_testing.
+  [href]
 
 1.1.0 (2017-06-22)
 ~~~~~~~~~~~~~~~~~~~
