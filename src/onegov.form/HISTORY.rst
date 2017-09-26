@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Switches to onegov.search's automatic language detection.
+  [href]
+
 0.21.0 (2017-09-22)
 ~~~~~~~~~~~~~~~~~~~
 

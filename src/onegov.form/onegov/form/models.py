@@ -41,10 +41,6 @@ class SearchableDefinition(ORMSearchable):
         'text': {'type': 'localized_html'}
     }
 
-    @property
-    def es_language(self):
-        return 'de'  # XXX add to database in the future
-
 
 class FormDefinition(Base, ContentMixin, TimestampMixin, SearchableDefinition):
     """ Defines a form stored in the database. """
