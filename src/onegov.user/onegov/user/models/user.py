@@ -28,7 +28,6 @@ class User(Base, TimestampMixin, ORMSearchable):
         'polymorphic_on': type
     }
 
-    es_language = 'de'  # XXX add to database in the future
     es_properties = {
         'username': {'type': 'text'},
         'realname': {'type': 'text'},
