@@ -10,6 +10,7 @@ from email.header import decode_header
 from email.utils import parseaddr
 from freezegun import freeze_time
 from itsdangerous import BadSignature, Signer
+from onegov.core.redirect import Redirect
 from onegov.core.framework import Framework
 from onegov.core.upgrade import UpgradeState
 from onegov.core.mail import convert_to_plaintext
@@ -941,3 +942,35 @@ def test_send_hipchat(session):
             'message': 'This is a test message',
             'notify': False,
         }
+
+
+def test_generic_redirect():
+
+    class App(Framework):
+        pass
+
+    @App.path(path='/foo')
+    class FooRedirect(Redirect):
+        to = '/bar'
+
+    @App.path(path='/bar', absorb=True)
+    class BarRedirect(Redirect):
+        to = '/foo'
+
+    App.commit()
+
+    app = App()
+    app.application_id = 'test'
+    app.configure_application(identity_secure=False)
+    app.cache_backend = 'dogpile.cache.memory'
+    app.cache_backend_arguments = {}
+
+    client = Client(app)
+
+    assert client.get('/foo', status=302).location.endswith('/bar')
+    assert client.get('/fooo', status=404)
+    assert client.get('/foo/bar', status=404)
+
+    assert client.get('/bar', status=302).location.endswith('/foo')
+    assert client.get('/barr', status=404)
+    assert client.get('/bar/foo', status=302).location.endswith('/foo/foo')

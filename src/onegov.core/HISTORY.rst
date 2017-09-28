@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a generic redirect model for internal redirects.
+  [href]
+
 0.48.2 (2017-09-22)
 ~~~~~~~~~~~~~~~~~~~
 
