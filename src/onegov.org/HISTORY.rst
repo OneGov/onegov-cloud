@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.15.0 (2017-09-28)
+~~~~~~~~~~~~~~~~~~~
+
 - Consistently uses English in the urls, instead of a German/English mix.
   [href]
 
