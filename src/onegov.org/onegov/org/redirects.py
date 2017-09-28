@@ -94,7 +94,7 @@ class AbonnentenRedirect(Redirect):
 
 @OrgApp.path(path='/datei', absorb=True)
 class DateiRedirect(Redirect):
-    to = '/datei'
+    to = '/file'
 
 
 @OrgApp.path(path='/bild', absorb=True)
@@ -114,12 +114,12 @@ class FotoalbumRedirect(Redirect):
 
 @OrgApp.path(path='/ressourcen-empfang')
 class RessourcenEmpfangRedirect(Redirect):
-    to = '/ressource-recipients'
+    to = '/resource-recipients'
 
 
 @OrgApp.path(path='/ressourcen-empfaenger', absorb=True)
 class RessourcenEmpfaengerRedirect(Redirect):
-    to = '/ressource-recipient'
+    to = '/resource-recipient'
 
 
 @OrgApp.path(path='/zahlungsanbieter')

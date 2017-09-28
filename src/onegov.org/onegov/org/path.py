@@ -415,14 +415,14 @@ def get_image_set(app, id):
 
 @OrgApp.path(
     model=ResourceRecipientCollection,
-    path='/ressource-recipients')
+    path='/resource-recipients')
 def get_resource_recipient_collection(app):
     return ResourceRecipientCollection(app.session())
 
 
 @OrgApp.path(
     model=ResourceRecipient,
-    path='/ressource-recipient/{id}',
+    path='/resource-recipient/{id}',
     converters=dict(id=UUID))
 def get_resource_recipient(app, id):
     return ResourceRecipientCollection(app.session()).by_id(id)
