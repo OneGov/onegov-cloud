@@ -414,3 +414,35 @@ def test_gazette_notice_apply_meta(principal):
     assert notice.first_issue == standardize_date(
         datetime(2017, 10, 6), 'Europe/Zurich'
     )
+
+
+def test_gazette_notice_overdue_issues(principal):
+    notice = GazetteNotice()
+    assert not notice.overdue_issues(principal)
+
+    notice.issues = ['2017-40']
+    with freeze_time("2017-01-01 12:00"):
+        assert not notice.overdue_issues(principal)
+    with freeze_time("2017-10-04 10:00"):
+        assert not notice.overdue_issues(principal)
+
+    with freeze_time("2017-10-04 12:01"):
+        assert notice.overdue_issues(principal)
+    with freeze_time("2018-01-01 12:00"):
+        assert notice.overdue_issues(principal)
+
+
+def test_gazette_notice_expired_issues(principal):
+    notice = GazetteNotice()
+    notice.expired_issues(principal)
+
+    notice.issues = ['2017-40']
+    with freeze_time("2017-01-01 12:00"):
+        assert not notice.expired_issues(principal)
+    with freeze_time("2017-10-05 23:59"):
+        assert not notice.expired_issues(principal)
+
+    with freeze_time("2017-10-06 00:01"):
+        assert notice.expired_issues(principal)
+    with freeze_time("2018-01-01 12:00"):
+        assert notice.expired_issues(principal)

@@ -1,3 +1,4 @@
+from datetime import date
 from datetime import datetime
 from onegov.form import Form
 from onegov.gazette import _
@@ -143,15 +144,23 @@ class NoticeForm(Form):
         # populate issues
         self.issues.choices = []
         layout = Layout(None, self.request)
+        today = date.today()
         now = datetime.now()
-        self.issues.choices = [
-            (
-                str(issue),
-                layout.format_issue(issue, date_format='date_with_weekday')
-            )
-            for deadline, issue in principal.issues_by_deadline.items()
-            if deadline >= now
-        ]
+        publisher = self.request.is_private(self.model)
+        for issue_date, issue in principal.issues_by_date.items():
+            deadline = principal.issues[issue.year][issue.number].deadline
+            if (
+                (publisher and today < issue_date) or
+                (not publisher and now < deadline)
+            ):
+                self.issues.choices.append((
+                    str(issue),
+                    layout.format_issue(
+                        issue, date_format='date_with_weekday'
+                    )
+                ))
+                if now >= deadline:
+                    self.issues.render_kw['data-hot-issue'] = str(issue)
 
         # translate the string of the mutli select field
         self.issues.translate(self.request)

@@ -542,6 +542,10 @@ form {
             font-size: .875rem;
         }
     }
+
+    label.warning {
+        background-color: $warning-color;
+    }
 }
 
 

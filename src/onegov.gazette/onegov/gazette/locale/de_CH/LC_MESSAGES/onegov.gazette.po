@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-28 10:03+0200\n"
-"PO-Revision-Date: 2017-09-25 15:37+0200\n"
+"POT-Creation-Date: 2017-09-28 12:31+0200\n"
+"PO-Revision-Date: 2017-09-28 11:32+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -379,6 +379,9 @@ msgstr "Vorschau"
 msgid "Accepted official notices may not be edited."
 msgstr "Angenommene Meldungen können nicht mehr bearbeitet werden."
 
+msgid "The official notice has past issue. Please re-select issues."
+msgstr "Bitte Ausgaben neu wählen."
+
 msgid "edited"
 msgstr "bearbeitet"
 
@@ -405,6 +408,14 @@ msgstr "Es können nur eingereichte Meldungen zurückgewiesen werden."
 msgid "Official notice rejected."
 msgstr "Meldung zurückgewiesen."
 
+msgid "Copy"
+msgstr "Kopieren"
+
+msgid ""
+"The official notice has issues for which the deadlines are reached. Please "
+"re-select valid issues."
+msgstr "Bitte Ausgaben neu wählen."
+
 msgid "It's probably not a good idea to delete this official notice!"
 msgstr "Es ist vermutlich keine gute Idee, diese Meldung zu löschen!"
 
@@ -416,8 +427,8 @@ msgstr ""
 msgid "mail sent"
 msgstr "E-Mail gesendet"
 
-msgid "Copy"
-msgstr "Kopieren"
+msgid "Submit"
+msgstr "Einreichen"
 
 msgid "Accept"
 msgstr "Annehmen"
@@ -428,9 +439,6 @@ msgstr "Zurückweisen"
 #, python-format
 msgid "Official Notice Rejected ${id}"
 msgstr "Inserat für den amtlichen Teil zurückgewiesen ${id}"
-
-msgid "Submit"
-msgstr "Einreichen"
 
 #, python-format
 msgid "Publish Official Notice ${id}"

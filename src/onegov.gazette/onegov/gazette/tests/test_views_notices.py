@@ -12,7 +12,7 @@ from xlrd import open_workbook
 
 
 def test_view_notices(gazette_app):
-    with freeze_time("2017-11-01 12:00"):
+    with freeze_time("2017-11-01 11:00"):
 
         publisher = Client(gazette_app)
         login_publisher(publisher)
@@ -120,7 +120,7 @@ def test_view_notices(gazette_app):
 
 
 def test_view_notices_search(gazette_app):
-    with freeze_time("2017-11-01 12:00"):
+    with freeze_time("2017-11-01 11:00"):
 
         client = Client(gazette_app)
         login_publisher(client)
@@ -175,7 +175,7 @@ def test_view_notices_order(gazette_app):
             ]
         }
 
-    with freeze_time("2017-11-01 12:00"):
+    with freeze_time("2017-11-01 11:00"):
 
         client = Client(gazette_app)
         login_publisher(client)
@@ -380,7 +380,7 @@ def test_view_notices_statistics(gazette_app):
         login.form.submit()
 
     # Add notices
-    with freeze_time("2017-11-01 12:00"):
+    with freeze_time("2017-11-01 11:00"):
         for (organization, category, submit, user, issues) in (
             ('100', '13', False, editor, ['2017-44']),
             ('100', '13', False, user_1, ['2017-45']),
@@ -492,7 +492,7 @@ def test_view_notices_statistics(gazette_app):
 
 
 def test_view_notices_update(gazette_app):
-    with freeze_time("2017-11-01 12:00"):
+    with freeze_time("2017-11-01 11:00"):
 
         client = Client(gazette_app)
         login_publisher(client)

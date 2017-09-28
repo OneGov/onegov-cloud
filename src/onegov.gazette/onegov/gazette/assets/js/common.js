@@ -65,3 +65,10 @@ $('ul[data-limit]').each(function() {
             .hide()
     );
 });
+
+// Highlight the hot issue
+$('ul[data-hot-issue]').each(function() {
+    var issue = $(this).data('hot-issue');
+    var input = $("input[value='" + issue + "']").attr('id');
+    $("label[for='" + input + "']").addClass('warning');
+});

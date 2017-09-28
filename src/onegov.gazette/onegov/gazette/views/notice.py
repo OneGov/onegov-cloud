@@ -159,6 +159,25 @@ def edit_notice(self, request, form):
             'show_form': False
         }
 
+    if self.expired_issues(request.app.principal):
+        request.message(
+            _(
+                "The official notice has past issue. Please re-select issues."
+            ),
+            'warning'
+        )
+    elif (
+        self.overdue_issues(request.app.principal) and
+        not request.is_private(self)
+    ):
+        request.message(
+            _(
+                "The official notice has issues for which the deadlines are "
+                "reached. Please re-select valid issues."
+            ),
+            'warning'
+        )
+
     if form.submitted(request):
         form.update_model(self)
         self.add_change(request, _("edited"))
@@ -263,6 +282,9 @@ def submit_notice(self, request, form):
     Only drafted notices may be submitted. Editors may only submit their own
     notices (publishers may submit any notice).
 
+    If a notice has invalid/past issues, the user is redirected to the edit
+    view to select new issues.
+
     """
 
     layout = Layout(self, request)
@@ -282,6 +304,15 @@ def submit_notice(self, request, form):
             ),
             'show_form': False
         }
+
+    if (
+        self.expired_issues(request.app.principal) or
+        (
+            self.overdue_issues(request.app.principal) and
+            not request.is_private(self)
+        )
+    ):
+        return redirect(request.link(self, name='edit'))
 
     if form.submitted(request):
         self.submit(request)
@@ -328,6 +359,9 @@ def accept_notice(self, request, form):
             'callout': _("Only submitted official notices may be accepted."),
             'show_form': False
         }
+
+    if self.expired_issues(request.app.principal):
+        return redirect(request.link(self, name='edit'))
 
     if form.submitted(request):
         self.accept(request)

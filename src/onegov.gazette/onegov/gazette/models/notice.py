@@ -1,4 +1,6 @@
 from collections import OrderedDict
+from datetime import date
+from datetime import datetime
 from onegov.chat import Message
 from onegov.core.orm.mixins import meta_property
 from onegov.gazette import _
@@ -211,6 +213,26 @@ class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
             self._issues = value
         else:
             self._issues = {item: None for item in value}
+
+    def overdue_issues(self, principal):
+        """ Returns True, if any of the issue's deadline is reached. """
+        now = datetime.now()
+        for issue in self.issues:
+            issue = principal.issue(issue)
+            if issue and (issue.deadline < now):
+                return True
+
+        return False
+
+    def expired_issues(self, principal):
+        """ Returns True, if any of the issue's issue date is reached. """
+        today = date.today()
+        for issue in self.issues:
+            issue = principal.issue(issue)
+            if issue and (issue.issue_date <= today):
+                return True
+
+        return False
 
     def apply_meta(self, principal):
         """ Updates the category, organization and issue date from the meta

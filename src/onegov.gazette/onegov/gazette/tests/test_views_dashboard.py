@@ -62,7 +62,7 @@ def test_view_dashboard(gazette_app):
         assert "<h3>in Arbeit</h3>" not in manage
         assert "<h3>Eingereicht</h3>" not in manage
 
-    with freeze_time("2017-11-01 12:00"):
+    with freeze_time("2017-11-01 11:00"):
         manage = editor_1.get('/').maybe_follow()
         assert (
             "Sie haben Meldungenen in Arbeit, für welche der "

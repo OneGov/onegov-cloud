@@ -1,14 +1,24 @@
 Changelog
 ---------
 
-- Uses warnings instead of callouts in forms.
+- Allows publishers to edit, submit and delete any notice.
   [msom]
 
-- Allows the publisher to edit, submit and delete any notice.
+- Allows publishers to manage issues past the deadline
+  [msom]
+
+- Checks the deadlines/issue dates before submitting and accepting notices.
+  [msom]
+
+- Shows a warning in the edit notice view in case of past or overdue issues.
+  [msom]
+
+- Uses warnings instead of callouts in forms.
   [msom]
 
 - Fixes dashboard warnings.
   [msom]
+
 
 1.4.1 (2017-09-22)
 ~~~~~~~~~~~~~~~~~~~

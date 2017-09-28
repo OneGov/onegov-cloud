@@ -23,24 +23,28 @@ def login_users(gazette_app):
     return editor_1, editor_2, editor_3, publisher
 
 
-def submit_notice(user, slug, unable=False, forbidden=False):
+def submit_notice(user, slug, unable=False, forbidden=False, redirected=False):
     url = '/notice/{}/submit'.format(slug)
     if unable:
         assert not user.get(url).forms
     elif forbidden:
         assert user.get(url, status=403)
+    elif redirected:
+        assert '/edit' in user.get(url, status=302).location
     else:
         manage = user.get(url)
         manage = manage.form.submit()
         assert "Meldung eingereicht" in manage.maybe_follow()
 
 
-def accept_notice(user, slug, unable=False, forbidden=False):
+def accept_notice(user, slug, unable=False, forbidden=False, redirected=False):
     url = '/notice/{}/accept'.format(slug)
     if unable:
         assert not user.get(url).forms
     elif forbidden:
         assert user.get(url, status=403)
+    elif redirected:
+        assert '/edit' in user.get(url, status=302).location
     else:
         manage = user.get(url)
         manage = manage.form.submit()
@@ -79,7 +83,7 @@ def test_view_notice(gazette_app):
 
     editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
 
-    with freeze_time("2017-11-01 12:00"):
+    with freeze_time("2017-11-01 11:00"):
         # create a notice for each editor
         for count, user in enumerate((editor_1, editor_2, editor_3)):
             manage = user.get('/notices/drafted/new-notice')
@@ -118,7 +122,7 @@ def test_view_notice_actions(gazette_app):
 
     editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
 
-    with freeze_time("2017-11-01 12:00"):
+    with freeze_time("2017-11-01 11:00"):
         # create a notice for each editor
         for count, user in enumerate(
             (editor_1, editor_2, editor_3, publisher)
@@ -253,7 +257,7 @@ def test_view_notice_preview(gazette_app):
     editor = Client(gazette_app)
     login_editor_1(editor)
 
-    with freeze_time("2017-11-01 12:00"):
+    with freeze_time("2017-11-01 11:00"):
         manage = editor.get('/notices/drafted/new-notice')
         manage.form['title'] = 'Titel'
         manage.form['organization'] = '200'
@@ -277,7 +281,7 @@ def test_view_notice_preview(gazette_app):
 def test_view_notice_submit(gazette_app):
     editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
 
-    with freeze_time("2017-11-01 12:00"):
+    with freeze_time("2017-11-01 11:00"):
         # create a notice for each editor
         for count, user in enumerate((editor_1, editor_2, editor_3)):
             manage = user.get('/notices/drafted/new-notice')
@@ -298,21 +302,28 @@ def test_view_notice_submit(gazette_app):
             user.get('/notice/titel-2/{}'.format(action), status=403)
             user.get('/notice/titel-3/{}'.format(action), status=403)
 
-    # check if the notices can be submitted
-    for user, slug, forbidden in (
-        (editor_1, 'titel-3', True),
-        (editor_3, 'titel-1', True),
-        (editor_1, 'titel-1', False),
-        (editor_1, 'titel-2', False),
-        (editor_3, 'titel-3', False),
-    ):
-        submit_notice(user, slug, forbidden=forbidden)
+    # check if invalid permissions
+    submit_notice(editor_1, 'titel-3', forbidden=True)
+    submit_notice(editor_2, 'titel-3', forbidden=True)
+    submit_notice(editor_3, 'titel-1', forbidden=True)
+    submit_notice(editor_3, 'titel-2', forbidden=True)
+
+    # check deadlines
+    with freeze_time("2017-11-08 13:00"):
+        submit_notice(editor_1, 'titel-2', redirected=True)
+        submit_notice(publisher, 'titel-2', redirected=True)
+    with freeze_time("2017-11-01 13:00"):
+        submit_notice(editor_1, 'titel-2', redirected=True)
+        submit_notice(publisher, 'titel-2')
+    with freeze_time("2017-11-01 11:00"):
+        submit_notice(editor_1, 'titel-1')
+        submit_notice(editor_3, 'titel-3')
 
 
 def test_view_notice_reject(gazette_app):
     editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
 
-    with freeze_time("2017-11-01 12:00"):
+    with freeze_time("2017-11-01 11:00"):
         # create a notice for each editor
         for count, user in enumerate((editor_1, editor_2, editor_3)):
             manage = user.get('/notices/drafted/new-notice')
@@ -354,7 +365,7 @@ def test_view_notice_reject(gazette_app):
 def test_view_notice_accept(gazette_app):
     editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
 
-    with freeze_time("2017-11-01 12:00"):
+    with freeze_time("2017-11-01 11:00"):
         # create a notice for each editor
         for count, user in enumerate((editor_1, editor_2, editor_3)):
             manage = user.get('/notices/drafted/new-notice')
@@ -380,41 +391,46 @@ def test_view_notice_accept(gazette_app):
     submit_notice(editor_3, 'titel-2', forbidden=True)
     submit_notice(editor_3, 'titel-3', unable=True)
 
-    # check if the notices can be accepted
-    for user, slug, forbidden in (
-        (editor_1, 'titel-1', True),
-        (editor_1, 'titel-2', True),
-        (editor_1, 'titel-3', True),
-        (editor_3, 'titel-3', True),
-        (publisher, 'titel-1', False),
-        (publisher, 'titel-2', False),
-        # (publisher, 'titel-3', False),
-    ):
-        accept_notice(user, slug, forbidden=forbidden)
+    # check redirect for past issues
+    with freeze_time("2017-11-04 11:00"):
+        accept_notice(publisher, 'titel-1', redirected=True)
 
-    assert len(gazette_app.smtp.outbox) == 2
-    for message in gazette_app.smtp.outbox:
-        assert message['Reply-To'] == 'mails@govikon.ch'
+    with freeze_time("2017-11-01 15:00"):
+        # check if the notices can be accepted
+        for user, slug, forbidden in (
+            (editor_1, 'titel-1', True),
+            (editor_1, 'titel-2', True),
+            (editor_1, 'titel-3', True),
+            (editor_3, 'titel-3', True),
+            (publisher, 'titel-1', False),
+            (publisher, 'titel-2', False),
+            # (publisher, 'titel-3', False),
+        ):
+            accept_notice(user, slug, forbidden=forbidden)
+
+        assert len(gazette_app.smtp.outbox) == 2
+        for message in gazette_app.smtp.outbox:
+            assert message['Reply-To'] == 'mails@govikon.ch'
+            payload = message.get_payload(1).get_payload(decode=True)
+            payload = payload.decode('utf-8')
+            assert "Publikation für den amtlichen Teil" in payload
+
+        principal = gazette_app.principal
+        principal.publish_from = 'publisher@govikon.ch'
+        gazette_app.cache.set('principal', principal)
+
+        accept_notice(publisher, 'titel-3')
+
+        assert len(gazette_app.smtp.outbox) == 3
+        message = gazette_app.smtp.outbox[2]
+        assert message['Reply-To'] == 'publisher@govikon.ch'
         payload = message.get_payload(1).get_payload(decode=True)
         payload = payload.decode('utf-8')
         assert "Publikation für den amtlichen Teil" in payload
 
-    principal = gazette_app.principal
-    principal.publish_from = 'publisher@govikon.ch'
-    gazette_app.cache.set('principal', principal)
-
-    accept_notice(publisher, 'titel-3')
-
-    assert len(gazette_app.smtp.outbox) == 3
-    message = gazette_app.smtp.outbox[2]
-    assert message['Reply-To'] == 'publisher@govikon.ch'
-    payload = message.get_payload(1).get_payload(decode=True)
-    payload = payload.decode('utf-8')
-    assert "Publikation für den amtlichen Teil" in payload
-
 
 def test_view_notice_delete(gazette_app):
-    with freeze_time("2017-11-01 12:00"):
+    with freeze_time("2017-11-01 11:00"):
         editor = Client(gazette_app)
         login_editor_1(editor)
 
@@ -503,7 +519,7 @@ def test_view_notice_changelog(gazette_app):
     publisher = Client(gazette_app)
     login_publisher(publisher)
 
-    with freeze_time("2017-11-01 12:00"):
+    with freeze_time("2017-11-01 10:00"):
         manage = editor_1.get('/notices/drafted/new-notice')
         manage.form['title'] = "Erneuerungswahlen"
         manage.form['organization'] = '200'
@@ -512,16 +528,16 @@ def test_view_notice_changelog(gazette_app):
         manage.form['text'] = "1. Oktober 2017"
         manage.form.submit()
 
-    with freeze_time("2017-11-01 12:02"):
+    with freeze_time("2017-11-01 11:02"):
         submit_notice(editor_1, 'erneuerungswahlen')
 
-    with freeze_time("2017-11-01 12:30"):
+    with freeze_time("2017-11-01 11:30"):
         reject_notice(publisher, 'erneuerungswahlen')
 
-    with freeze_time("2017-11-01 14:00"):
+    with freeze_time("2017-11-01 11:45"):
         edit_notice(editor_2, 'erneuerungswahlen', organization='300')
 
-    with freeze_time("2017-11-01 14:02"):
+    with freeze_time("2017-11-01 11:48"):
         submit_notice(editor_2, 'erneuerungswahlen')
 
     with freeze_time("2017-11-01 15:00"):
@@ -544,12 +560,12 @@ def test_view_notice_changelog(gazette_app):
     ])
 
     assert changes == [
-        ('01.11.2017 13:00', 'editor1@example.org', 'TestGroup', 'erstellt'),
-        ('01.11.2017 13:02', 'editor1@example.org', 'TestGroup',
+        ('01.11.2017 11:00', 'editor1@example.org', 'TestGroup', 'erstellt'),
+        ('01.11.2017 12:02', 'editor1@example.org', 'TestGroup',
          'eingereicht'),
-        ('01.11.2017 13:30', 'publisher@example.org', '', 'zurückgewiesenXYZ'),
-        ('01.11.2017 15:00', 'editor1@example.org', 'TestGroup', 'bearbeitet'),
-        ('01.11.2017 15:02', 'editor1@example.org', 'TestGroup',
+        ('01.11.2017 12:30', 'publisher@example.org', '', 'zurückgewiesenXYZ'),
+        ('01.11.2017 12:45', 'editor1@example.org', 'TestGroup', 'bearbeitet'),
+        ('01.11.2017 12:48', 'editor1@example.org', 'TestGroup',
          'eingereicht'),
         ('01.11.2017 16:00', 'publisher@example.org', '', 'E-Mail gesendet'),
         ('01.11.2017 16:00', 'publisher@example.org', '', 'angenommen'),
@@ -559,7 +575,7 @@ def test_view_notice_changelog(gazette_app):
 def test_view_notice_edit(gazette_app):
     editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
 
-    with freeze_time("2017-11-01 12:00"):
+    with freeze_time("2017-11-01 11:00"):
         manage = editor_1.get('/notices/drafted/new-notice')
         manage.form['title'] = "Notice"
         manage.form['organization'] = '200'
@@ -583,7 +599,7 @@ def test_view_notice_edit(gazette_app):
         assert "Nr. 46, 17.11.2017" in view
         assert "1. Dezember 2017" in view
 
-    # drafed
+    # drafted
     for user, title, forbidden in (
         (editor_1, 'XXX1', False),
         (editor_2, 'XXX2', False),
@@ -625,6 +641,32 @@ def test_view_notice_edit(gazette_app):
     edit_notice(editor_2, 'notice', unable=True)
     edit_notice(editor_3, 'notice', forbidden=True)
     edit_notice(publisher, 'notice', unable=True)
+
+
+def test_view_notice_edit_deadlines(gazette_app):
+    editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
+
+    with freeze_time("2017-11-01 11:00"):
+        manage = editor_1.get('/notices/drafted/new-notice')
+        manage.form['title'] = "Notice"
+        manage.form['organization'] = '200'
+        manage.form['category'] = '11'
+        manage.form['issues'] = ['2017-44', '2017-45']
+        manage.form['text'] = "1. Oktober 2017"
+        manage.form.submit()
+
+    marker = "Bitte Ausgaben neu wählen."
+    with freeze_time("2017-11-01 11:00"):
+        assert marker not in editor_1.get('/notice/notice/edit')
+        assert marker not in publisher.get('/notice/notice/edit')
+
+    with freeze_time("2017-11-01 13:00"):
+        assert marker in editor_1.get('/notice/notice/edit')
+        assert marker not in publisher.get('/notice/notice/edit')
+
+    with freeze_time("2017-11-10 13:00"):
+        assert marker in editor_1.get('/notice/notice/edit')
+        assert marker in publisher.get('/notice/notice/edit')
 
 
 def test_view_notice_copy(gazette_app):
