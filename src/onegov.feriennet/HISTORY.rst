@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.2.6 (2017-09-28)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds compatibility with latest onegov.org release.
   [href]
