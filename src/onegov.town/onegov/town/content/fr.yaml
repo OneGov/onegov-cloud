@@ -75,12 +75,12 @@ pages:
 
   - title: Nouvelles
     type: news
-    name: aktuelles
+    name: news
     meta:
       trait: news
 
   - title: Bienvenue sur OneGov Cloud
-    parent: aktuelles
+    parent: news
     type: news
     meta:
       trait: news
@@ -110,7 +110,7 @@ pages:
 
         <p>
           Le OneGov Cloud peut être ajusté à vos besoins.
-          <a href="/einstellungen">Dans les réglages</a>, vous pouvez modifier
+          <a href="/settings">Dans les réglages</a>, vous pouvez modifier
           le logo, les images de la page d'accueil, et plus.
         </p>
 
@@ -127,7 +127,7 @@ pages:
 
         <p>
           Il y a de nombreux formulaires disponibles dans
-          <a href="/formulare">Services</a>, à remplir par vos citoyens.
+          <a href="/forms">Services</a>, à remplir par vos citoyens.
           Remplissez un formulaire et un nouveau ticket sera créé.
         </p>
 

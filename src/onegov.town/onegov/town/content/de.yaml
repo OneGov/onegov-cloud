@@ -74,11 +74,12 @@ pages:
 
   - title: Aktuelles
     type: news
+    name: news
     meta:
       trait: news
 
   - title: Willkommen bei der OneGov Cloud
-    parent: aktuelles
+    parent: news
     type: news
     meta:
       trait: news
@@ -109,7 +110,7 @@ pages:
         <p>
           Die OneGov Cloud lässt sich nach Ihrem Gusto einrichten. Sie können das
           Logo, die Bilder auf der Startseite und mehr in den
-          <a href="/einstellungen">Einstellungen</a> ändern.
+          <a href="/settings">Einstellungen</a> ändern.
         </p>
 
         <h3>Stellen Sie Ihre Gemeinde vor</h3>
@@ -124,7 +125,7 @@ pages:
         <h3>Füllen Sie ein Formular aus</h3>
 
         <p>
-          Im <a href="/formulare">Online-Schalter</a> gibt es eine ganze Reihe von
+          Im <a href="/forms">Online-Schalter</a> gibt es eine ganze Reihe von
           Formularen die Bürger ausfüllen können. Füllen Sie ein Formular aus
           und ein Ticket wird geöffnet.
         </p>
