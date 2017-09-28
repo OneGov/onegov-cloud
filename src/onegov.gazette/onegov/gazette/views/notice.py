@@ -211,7 +211,7 @@ def delete_notice(self, request, form):
                 _(
                     "Only drafted or rejected official notices may be deleted."
                 ),
-                'error'
+                'alert'
             )
             return {
                 'layout': layout,
