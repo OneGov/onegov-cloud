@@ -197,20 +197,26 @@ def delete_notice(self, request, form):
         if not ((self.group_id in group_ids) or (self.user_id in user_ids)):
             raise HTTPForbidden()
 
-    callout = None
     if self.state != 'drafted' and self.state != 'rejected':
         if request.is_secret(self):
-            callout = _(
-                "It's probably not a good idea to delete this official notice!"
+            request.message(
+                _(
+                    "It's probably not a good idea to delete this official "
+                    "notice!"
+                ),
+                'warning'
             )
         else:
+            request.message(
+                _(
+                    "Only drafted or rejected official notices may be deleted."
+                ),
+                'error'
+            )
             return {
                 'layout': layout,
                 'title': self.title,
                 'subtitle': _("Delete Official Notice"),
-                'callout': _(
-                    "Only drafted or rejected official notices may be deleted."
-                ),
                 'show_form': False
             }
 
@@ -229,7 +235,6 @@ def delete_notice(self, request, form):
         'form': form,
         'title': self.title,
         'subtitle': _("Delete Official Notice"),
-        'callout': callout,
         'button_text': _("Delete Official Notice"),
         'button_class': 'alert',
         'cancel': request.link(self)

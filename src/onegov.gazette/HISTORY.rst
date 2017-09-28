@@ -1,30 +1,34 @@
 Changelog
 ---------
+
+- Uses warnings instead of callouts in forms.
+  [msom]
+
 1.4.1 (2017-09-22)
 ~~~~~~~~~~~~~~~~~~~
 
-- Suppress the IE/Edge popup when closing the preview.
+- Suppresses the IE/Edge popup when closing the preview.
   [msom]
 
 1.4.0 (2017-09-21)
 ~~~~~~~~~~~~~~~~~~~
 
-- Export statistics as XLSX instead of CSV.
+- Exports statistics as XLSX instead of CSV.
   [msom]
 
 1.3.5 (2017-09-21)
 ~~~~~~~~~~~~~~~~~~~
 
-- Update chosen to 1.8.2.
+- Updates chosen to 1.8.2.
   [msom]
 
-- Configure chosen to search within words, too.
+- Configures chosen to search within words, too.
   [msom]
 
 1.3.4 (2017-09-20)
 ~~~~~~~~~~~~~~~~~~~
 
-- Patch the chosen library to fix searching for non-ascii characters.
+- Patches the chosen library to fix searching for non-ascii characters.
   [msom]
 
 1.3.3 (2017-09-15)

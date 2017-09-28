@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-21 14:57+0200\n"
-"PO-Revision-Date: 2017-09-21 14:57+0200\n"
+"POT-Creation-Date: 2017-09-28 10:03+0200\n"
+"PO-Revision-Date: 2017-09-25 15:37+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.0.3\n"
+"X-Generator: Poedit 2.0.4\n"
 
 msgid "Show all"
 msgstr "Alle anzeigen"
@@ -321,9 +321,6 @@ msgstr "Neue Gruppe"
 msgid "Edit Group"
 msgstr "Gruppe bearbeiten"
 
-msgid "There are official notices linked to this group!"
-msgstr "Diese Gruppe hat Meldungen!"
-
 #, python-format
 msgid "Do you really want to delete \"${item}\"?"
 msgstr "Möchten Sie \"${item}\" wirklich löschen?"
@@ -336,6 +333,9 @@ msgstr "Gruppe hinzugefügt."
 
 msgid "Group modified."
 msgstr "Gruppe geändert."
+
+msgid "There are official notices linked to this group!"
+msgstr "Diese Gruppe hat Meldungen!"
 
 msgid "Only groups without users may be deleted."
 msgstr "Es können nur Gruppen ohne Benutzer gelöscht werden."
@@ -382,9 +382,6 @@ msgstr "Angenommene Meldungen können nicht mehr bearbeitet werden."
 msgid "edited"
 msgstr "bearbeitet"
 
-msgid "It's probably not a good idea to delete this official notice!"
-msgstr "Es ist vermutlich keine gute Idee, diese Meldung zu löschen!"
-
 msgid "Official notice deleted."
 msgstr "Meldung gelöscht."
 
@@ -407,6 +404,9 @@ msgstr "Es können nur eingereichte Meldungen zurückgewiesen werden."
 
 msgid "Official notice rejected."
 msgstr "Meldung zurückgewiesen."
+
+msgid "It's probably not a good idea to delete this official notice!"
+msgstr "Es ist vermutlich keine gute Idee, diese Meldung zu löschen!"
 
 msgid "Only drafted or rejected official notices may be deleted."
 msgstr ""
@@ -439,17 +439,17 @@ msgstr "Publikation für den amtlichen Teil ${id}"
 msgid "New Official Notice"
 msgstr "Neue Meldung"
 
-msgid "Organizations"
-msgstr "Organisationen"
-
-msgid "Categories"
-msgstr "Rubriken"
-
 msgid "Update notices"
 msgstr "Meldungen aktualisieren"
 
 msgid "Update"
 msgstr "Aktualisieren"
+
+msgid "Organizations"
+msgstr "Organisationen"
+
+msgid "Categories"
+msgstr "Rubriken"
 
 msgid "Notices updated."
 msgstr "Meldungen aktualisiert."
@@ -471,9 +471,6 @@ msgstr "Neuer Benutzer"
 msgid "Edit User"
 msgstr "Benutzer bearbeiten"
 
-msgid "There are official notices linked to this user!"
-msgstr "Dieser Nutzer hat Meldungen!"
-
 msgid "Delete User"
 msgstr "Benutzer löschen"
 
@@ -488,6 +485,9 @@ msgstr "Benutzer hinzugefügt."
 
 msgid "User modified."
 msgstr "Benutzer geändert."
+
+msgid "There are official notices linked to this user!"
+msgstr "Dieser Nutzer hat Meldungen!"
 
 msgid "User deleted."
 msgstr "Benutzer gelöscht."
