@@ -108,13 +108,13 @@ def view_resources_json(self, request):
     )
 
 
-@OrgApp.form(model=ResourceCollection, name='neuer-raum',
+@OrgApp.form(model=ResourceCollection, name='new-room',
              template='form.pt', permission=Private, form=get_room_form)
 def handle_new_room(self, request, form):
     return handle_new_resource(self, request, form, 'room')
 
 
-@OrgApp.form(model=ResourceCollection, name='neue-tageskarte',
+@OrgApp.form(model=ResourceCollection, name='new-daypass',
              template='form.pt', permission=Private, form=get_daypass_form)
 def handle_new_daypass(self, request, form):
     return handle_new_resource(self, request, form, 'daypass')
@@ -144,7 +144,7 @@ def handle_new_resource(self, request, form, type):
     }
 
 
-@OrgApp.form(model=Resource, name='bearbeiten', template='form.pt',
+@OrgApp.form(model=Resource, name='edit', template='form.pt',
              permission=Private, form=get_resource_form)
 def handle_edit_resource(self, request, form):
     if form.submitted(request):
@@ -296,7 +296,7 @@ def get_date_range(resource, params):
     return sedate.align_range_to_day(start, end, resource.timezone)
 
 
-@OrgApp.html(model=Resource, permission=Private, name='belegung',
+@OrgApp.html(model=Resource, permission=Private, name='occupancy',
              template='resource_occupancy.pt')
 def view_occupancy(self, request):
 

@@ -40,7 +40,7 @@ def view_imagesets(self, request):
     }
 
 
-@OrgApp.html(model=ImageSet, name='auswahl', template='select_images.pt',
+@OrgApp.html(model=ImageSet, name='select', template='select_images.pt',
              permission=Private, request_method='GET')
 def select_images(self, request):
 
@@ -64,7 +64,7 @@ def select_images(self, request):
     layout = ImageSetLayout(self, request)
     layout.breadcrumbs.append(Link(_("Select"), '#'))
 
-    action = URL(request.link(self, 'auswahl')).query_param(
+    action = URL(request.link(self, 'select')).query_param(
         'csrf-token', request.new_csrf_token())
 
     return {
@@ -75,7 +75,7 @@ def select_images(self, request):
     }
 
 
-@OrgApp.html(model=ImageSet, name='auswahl', template='select_images.pt',
+@OrgApp.html(model=ImageSet, name='select', template='select_images.pt',
              permission=Private, request_method='POST')
 def handle_select_images(self, request):
 
@@ -93,7 +93,7 @@ def handle_select_images(self, request):
     return morepath.redirect(request.link(self))
 
 
-@OrgApp.form(model=ImageSetCollection, name='neu', template='form.pt',
+@OrgApp.form(model=ImageSetCollection, name='new', template='form.pt',
              permission=Private, form=get_form_class)
 def handle_new_imageset(self, request, form):
 
@@ -115,7 +115,7 @@ def handle_new_imageset(self, request, form):
     }
 
 
-@OrgApp.form(model=ImageSet, name='bearbeiten', template='form.pt',
+@OrgApp.form(model=ImageSet, name='edit', template='form.pt',
              permission=Private, form=get_form_class)
 def handle_edit_imageset(self, request, form):
     if form.submitted(request):

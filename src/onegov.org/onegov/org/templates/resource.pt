@@ -20,7 +20,7 @@
             data-reservationform="${request.link(resource, name='formular')}"
             data-type="${resource.type}"
             data-editable="${request.is_manager and 'true' or 'false'}"
-            data-select-url="${request.link(resource, name='neue-einteilung')}"
+            data-select-url="${request.link(resource, name='new-allocation')}"
             data-view="${resource.view}"
             data-date="${resource.date and resource.date.isoformat() or ''}"
             data-highlights-min="${resource.highlights_min or ''}"

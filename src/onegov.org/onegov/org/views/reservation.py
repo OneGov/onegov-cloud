@@ -162,7 +162,7 @@ def get_reservation_form_class(resource, request):
         return ReservationForm
 
 
-@OrgApp.form(model=Resource, name='formular', template='reservation_form.pt',
+@OrgApp.form(model=Resource, name='form', template='reservation_form.pt',
              permission=Public, form=get_reservation_form_class)
 def handle_reservation_form(self, request, form):
     """ Asks the user for the form data required to complete one or many
@@ -207,7 +207,7 @@ def handle_reservation_form(self, request, form):
 
     # go to the next step if the submitted data is valid
     if form.submitted(request):
-        return morepath.redirect(request.link(self, 'bestaetigung'))
+        return morepath.redirect(request.link(self, 'confirmation'))
     else:
         data = {}
 
@@ -239,7 +239,7 @@ def handle_reservation_form(self, request, form):
     }
 
 
-@OrgApp.html(model=Resource, name='bestaetigung', permission=Public,
+@OrgApp.html(model=Resource, name='confirmation', permission=Public,
              template='reservation_confirmation.pt')
 def confirm_reservation(self, request):
     reservations = self.bound_reservations(request).all()
@@ -276,8 +276,8 @@ def confirm_reservation(self, request):
             utils.ReservationInfo(self, r, request) for r in reservations
         ],
         'failed_reservations': failed_reservations,
-        'complete_link': request.link(self, 'abschluss'),
-        'edit_link': request.link(self, 'formular'),
+        'complete_link': request.link(self, 'finish'),
+        'edit_link': request.link(self, 'form'),
         'price': price,
         'checkout_button': price and request.app.checkout_button(
             button_label=request.translate(_("Pay Online and Complete")),
@@ -289,7 +289,7 @@ def confirm_reservation(self, request):
     }
 
 
-@OrgApp.html(model=Resource, name='abschluss', permission=Public,
+@OrgApp.html(model=Resource, name='finish', permission=Public,
              template='layout.pt', request_method='POST')
 def finalize_reservation(self, request):
     reservations = self.bound_reservations(request).all()
@@ -325,7 +325,7 @@ def finalize_reservation(self, request):
         transaction.abort()
         utils.show_libres_error(e, request)
 
-        url = URL(request.link(self, name='bestaetigung'))
+        url = URL(request.link(self, name='confirmation'))
         url = url.query_param('failed_reservations', e.reservation.id)
 
         return morepath.redirect(url.as_string())
@@ -355,7 +355,7 @@ def finalize_reservation(self, request):
         return morepath.redirect(request.link(ticket, 'status'))
 
 
-@OrgApp.view(model=Reservation, name='annehmen', permission=Private)
+@OrgApp.view(model=Reservation, name='accept', permission=Private)
 def accept_reservation(self, request):
     if not self.data or not self.data.get('accepted'):
         resource = request.app.libres_resources.by_reservation(self)
@@ -395,7 +395,7 @@ def accept_reservation(self, request):
     return request.redirect(request.link(self))
 
 
-@OrgApp.view(model=Reservation, name='absagen', permission=Private)
+@OrgApp.view(model=Reservation, name='reject', permission=Private)
 def reject_reservation(self, request):
     resource = request.app.libres_resources.by_reservation(self)
     token = self.token.hex

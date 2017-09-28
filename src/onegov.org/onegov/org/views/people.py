@@ -39,7 +39,7 @@ def view_person(self, request):
     }
 
 
-@OrgApp.form(model=PersonCollection, name='neu', template='form.pt',
+@OrgApp.form(model=PersonCollection, name='new', template='form.pt',
              permission=Private, form=PersonForm)
 def handle_new_person(self, request, form):
 
@@ -60,7 +60,7 @@ def handle_new_person(self, request, form):
     }
 
 
-@OrgApp.form(model=Person, name='bearbeiten', template='form.pt',
+@OrgApp.form(model=Person, name='edit', template='form.pt',
              permission=Private, form=PersonForm)
 def handle_edit_person(self, request, form):
 

@@ -188,7 +188,7 @@ def view_subscribers(self, request):
     }
 
 
-@OrgApp.form(model=NewsletterCollection, name='neu', template='form.pt',
+@OrgApp.form(model=NewsletterCollection, name='new', template='form.pt',
              permission=Public, form=get_newsletter_form)
 def handle_new_newsletter(self, request, form):
 
@@ -211,7 +211,7 @@ def handle_new_newsletter(self, request, form):
     }
 
 
-@OrgApp.form(model=Newsletter, template='form.pt', name='bearbeiten',
+@OrgApp.form(model=Newsletter, template='form.pt', name='edit',
              permission=Private, form=get_newsletter_form)
 def edit_newsletter(self, request, form):
 
@@ -240,7 +240,7 @@ def delete_page(self, request):
     request.success("The newsletter was deleted")
 
 
-@OrgApp.form(model=Newsletter, template='send_newsletter.pt', name='senden',
+@OrgApp.form(model=Newsletter, template='send_newsletter.pt', name='send',
              permission=Private, form=get_newsletter_send_form)
 def handle_send_newsletter(self, request, form):
 

@@ -14,7 +14,7 @@ from webob.exc import HTTPForbidden
 
 
 @OrgApp.form(
-    model=Organisation, name='benutzerprofil', template='userprofile.pt',
+    model=Organisation, name='userprofile', template='userprofile.pt',
     permission=Personal, form=UserProfileForm)
 def handle_user_profile(self, request, form):
     """ Handles the GET and POST login requests. """
@@ -29,7 +29,7 @@ def handle_user_profile(self, request, form):
         request.success(_("Your changes were saved"))
 
         if 'return-to' in request.GET:
-            return request.redirect(request.link(self, 'benutzerprofil'))
+            return request.redirect(request.link(self, 'userprofile'))
 
     elif not request.POST:
         form.process(obj=user)

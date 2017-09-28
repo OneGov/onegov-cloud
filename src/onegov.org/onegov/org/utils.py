@@ -362,7 +362,7 @@ class AllocationEventInfo(object):
         if self.request.is_manager:
             yield Link(
                 _("Edit"),
-                self.request.link(self.allocation, name='bearbeiten'),
+                self.request.link(self.allocation, name='edit'),
             )
 
             yield Link(
@@ -415,7 +415,7 @@ class AllocationEventInfo(object):
                 link(self.request).decode('utf-8')
                 for link in self.event_actions
             ],
-            'editurl': self.request.link(self.allocation, name='bearbeiten'),
+            'editurl': self.request.link(self.allocation, name='edit'),
             'reserveurl': self.request.link(self.allocation, name='reserve')
         }
 

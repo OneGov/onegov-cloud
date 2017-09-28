@@ -78,7 +78,7 @@ def publish_event(self, request):
     return request.redirect(request.link(self))
 
 
-@OrgApp.form(model=OccurrenceCollection, name='neu', template='form.pt',
+@OrgApp.form(model=OccurrenceCollection, name='new', template='form.pt',
              form=EventForm, permission=Public)
 def handle_new_event(self, request, form):
     """ Add a new event.
@@ -179,7 +179,7 @@ def view_event(self, request):
 
     return {
         'completable': self.state == 'initiated',
-        'edit_url': request.link(self, 'bearbeiten'),
+        'edit_url': request.link(self, 'edit'),
         'event': self,
         'layout': EventLayout(self, request),
         'ticket': ticket,
@@ -187,7 +187,7 @@ def view_event(self, request):
     }
 
 
-@OrgApp.form(model=Event, name='bearbeiten', template='form.pt',
+@OrgApp.form(model=Event, name='edit', template='form.pt',
              permission=Public, form=EventForm)
 def handle_edit_event(self, request, form):
     """ Edit an event.

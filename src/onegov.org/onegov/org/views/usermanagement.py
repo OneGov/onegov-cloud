@@ -132,7 +132,7 @@ def ticket_links(request, user):
 
 
 def get_manage_user_form(self, request):
-    userprofile_form = query_form_class(request, self, name='benutzerprofil')
+    userprofile_form = query_form_class(request, self, name='userprofile')
     assert userprofile_form
 
     class OptionalUserprofile(userprofile_form):
@@ -163,7 +163,7 @@ def get_manage_user_form(self, request):
 
 
 @OrgApp.form(model=User, template='form.pt', form=get_manage_user_form,
-             permission=Secret, name='bearbeiten')
+             permission=Secret, name='edit')
 def handle_manage_user(self, request, form):
 
     # XXX the manage user form doesn't have access to the username
@@ -194,7 +194,7 @@ def handle_manage_user(self, request, form):
 
 
 @OrgApp.form(model=UserCollection, template='newuser.pt', form=NewUserForm,
-             name='neu', permission=Secret)
+             name='new', permission=Secret)
 def handle_new_user(self, request, form):
 
     if not request.app.settings.org.enable_yubikey:

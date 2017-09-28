@@ -24,7 +24,7 @@ def get_form_class(model, request):
     return model.with_content_extensions(form_classes[model.type], request)
 
 
-@OrgApp.form(model=FormCollection, name='neu', template='form.pt',
+@OrgApp.form(model=FormCollection, name='new', template='form.pt',
              permission=Private, form=get_form_class)
 def handle_new_definition(self, request, form):
 
@@ -47,7 +47,7 @@ def handle_new_definition(self, request, form):
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
         Link(_("Forms"), request.link(self)),
-        Link(_("New Form"), request.link(self, name='neu'))
+        Link(_("New Form"), request.link(self, name='new'))
     ]
 
     return {
@@ -59,7 +59,7 @@ def handle_new_definition(self, request, form):
 
 
 @OrgApp.form(model=FormDefinition, template='form.pt', permission=Private,
-             form=get_form_class, name='bearbeiten')
+             form=get_form_class, name='edit')
 def handle_edit_definition(self, request, form):
 
     if form.submitted(request):
@@ -80,7 +80,7 @@ def handle_edit_definition(self, request, form):
         Link(_("Homepage"), layout.homepage_url),
         Link(_("Forms"), request.link(collection)),
         Link(self.title, request.link(self)),
-        Link(_("Edit"), request.link(self, name='bearbeiten'))
+        Link(_("Edit"), request.link(self, name='edit'))
     ]
 
     return {

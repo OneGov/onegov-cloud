@@ -29,7 +29,7 @@
                                 </tal:block>
                                 
                                 <td class="text-links">
-                                    <a href="${request.link(user)}" i18n:translate>View</a>&nbsp;<a href="${request.link(user, 'bearbeiten')}" i18n:translate>Edit</a>
+                                    <a href="${request.link(user)}" i18n:translate>View</a>&nbsp;<a href="${request.link(user, 'edit')}" i18n:translate>Edit</a>
                                 </td>
                             </tr>
                         </tbody>

@@ -21,7 +21,7 @@ def get_global_tools(request):
         yield LinkGroup(request.current_username, classes=('user', ), links=(
             Link(
                 _("User Profile"), request.link(
-                    request.app.org, name='benutzerprofil'
+                    request.app.org, name='userprofile'
                 ), attrs={'class': 'profile'}
             ),
             Link(
@@ -89,7 +89,7 @@ def get_global_tools(request):
             links.append(
                 Link(
                     _("Settings"), request.link(
-                        request.app.org, 'einstellungen'
+                        request.app.org, 'settings'
                     ), attrs={'class': 'settings'}
                 )
             )

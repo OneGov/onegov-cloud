@@ -84,7 +84,7 @@ def get_edit_allocation_form_class(allocation, request):
     raise NotImplementedError
 
 
-@OrgApp.form(model=Resource, template='form.pt', name='neue-einteilung',
+@OrgApp.form(model=Resource, template='form.pt', name='new-allocation',
              permission=Private, form=get_new_allocation_form_class)
 def handle_new_allocation(self, request, form):
     """ Handles new allocations for differing form classes. """
@@ -141,7 +141,7 @@ def handle_new_allocation(self, request, form):
     }
 
 
-@OrgApp.form(model=Allocation, template='form.pt', name='bearbeiten',
+@OrgApp.form(model=Allocation, template='form.pt', name='edit',
              permission=Private, form=get_edit_allocation_form_class)
 def handle_edit_allocation(self, request, form):
     """ Handles edit allocation for differing form classes. """

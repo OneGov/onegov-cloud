@@ -37,7 +37,7 @@ def view_occurrences(self, request):
 
     return {
         'active_tags': self.tags,
-        'add_link': request.link(self, name='neu'),
+        'add_link': request.link(self, name='new'),
         'date_placeholder': date.today().isoformat(),
         'end': self.end.isoformat() if self.end else '',
         'layout': layout,

@@ -72,7 +72,7 @@ def send_email_if_not_self(ticket, request, template, subject):
 
 
 @OrgApp.form(
-    model=Ticket, name='notiz', permission=Private,
+    model=Ticket, name='note', permission=Private,
     template='ticket_note_form.pt', form=TicketNoteForm
 )
 def handle_new_note(self, request, form):
@@ -107,7 +107,7 @@ def delete_ticket_note(self, request):
 
 
 @OrgApp.form(
-    model=TicketNote, name='bearbeiten', permission=Private,
+    model=TicketNote, name='edit', permission=Private,
     template='ticket_note_form.pt', form=TicketNoteForm
 )
 def handle_edit_note(self, request, form):

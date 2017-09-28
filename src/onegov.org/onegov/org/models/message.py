@@ -75,7 +75,7 @@ class TicketNote(TicketBasedMessage):
         return linkify(self.text).replace('\n', '<br>')
 
     def links(self, layout):
-        yield Link(_("Edit"), layout.request.link(self, 'bearbeiten'))
+        yield Link(_("Edit"), layout.request.link(self, 'edit'))
         yield Link(
             _("Delete"), layout.csrf_protected_url(layout.request.link(self)),
             traits=(

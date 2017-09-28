@@ -19,7 +19,7 @@ def view_resource_recipients(self, request):
     def recipient_links(recipient):
         yield Link(
             text=_("Edit"),
-            url=request.link(recipient, 'bearbeiten')
+            url=request.link(recipient, 'edit')
         )
 
         yield DeleteLink(
@@ -42,7 +42,7 @@ def view_resource_recipients(self, request):
 
 @OrgApp.form(
     model=ResourceRecipientCollection,
-    name='neuer-empfaenger',
+    name='new-recipient',
     template='form.pt',
     permission=Private,
     form=ResourceRecipientForm)
@@ -71,7 +71,7 @@ def handle_new_resource_recipient(self, request, form):
 
 @OrgApp.form(
     model=ResourceRecipient,
-    name='bearbeiten',
+    name='edit',
     template='form.pt',
     permission=Private,
     form=ResourceRecipientForm)

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Consistently uses English in the urls, instead of a German/English mix.
+  [href]
+
 - Switches to onegov.search's automatic language detection.
   [href]
 

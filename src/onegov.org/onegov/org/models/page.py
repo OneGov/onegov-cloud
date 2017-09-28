@@ -1,4 +1,3 @@
-from onegov.core import utils
 from onegov.core.orm.mixins import content_property
 from onegov.org import _
 from onegov.org.forms import LinkForm, PageForm
@@ -104,7 +103,7 @@ class News(Page, TraitInfo, SearchablePage, HiddenFromPublicExtension,
 
     @property
     def absorb(self):
-        return utils.lchop(self.path, 'aktuelles').lstrip('/')
+        return ''.join(self.path.split('/', 1)[1:])
 
     @property
     def deletable(self):

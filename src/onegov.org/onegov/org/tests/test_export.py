@@ -35,7 +35,7 @@ def test_export(request):
     admin = Client(app)
     admin.login_admin()
 
-    page = admin.get('/exporte')
+    page = admin.get('/exports')
     assert "My Export" in page
     assert "Foo bar." in page
 
@@ -54,7 +54,7 @@ def test_export(request):
     editor = Client(app)
     editor.login_editor()
 
-    page = editor.get('/exporte')
+    page = editor.get('/exports')
     assert "My Export" not in page
     assert "Foo bar." not in page
 

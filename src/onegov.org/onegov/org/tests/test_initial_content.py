@@ -16,7 +16,7 @@ def test_initial_content(org_app):
         'organisation': 'Organisation',
         'themen': 'Themen',
         'kontakt': 'Kontakt',
-        'aktuelles': 'Aktuelles',
+        'news': 'Aktuelles',
         'wir-haben-eine-neue-webseite': 'Wir haben eine neue Webseite!'
     }
 

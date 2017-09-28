@@ -46,7 +46,7 @@ def bound_reserve(client, allocation):
         whole_day=default_whole_day
     ):
 
-        baseurl = '/einteilung/{}/{}/reserve'.format(
+        baseurl = '/allocation/{}/{}/reserve'.format(
             resource,
             allocation_id
         )
@@ -132,11 +132,11 @@ def test_view_files(org_app):
 
     client = Client(org_app)
 
-    assert client.get('/dateien', expect_errors=True).status_code == 403
+    assert client.get('/files', expect_errors=True).status_code == 403
 
     client.login_admin()
 
-    files_page = client.get('/dateien')
+    files_page = client.get('/files')
 
     assert "Noch keine Dateien hochgeladen" in files_page
 
@@ -151,11 +151,11 @@ def test_view_images(org_app):
 
     client = Client(org_app)
 
-    assert client.get('/bilder', expect_errors=True).status_code == 403
+    assert client.get('/images', expect_errors=True).status_code == 403
 
     client.login_admin()
 
-    images_page = client.get('/bilder')
+    images_page = client.get('/images')
 
     assert "Noch keine Bilder hochgeladen" in images_page
 
@@ -268,7 +268,7 @@ def test_reset_password(org_app):
 def test_unauthorized(org_app):
     client = Client(org_app)
 
-    unauth_page = client.get('/einstellungen', expect_errors=True)
+    unauth_page = client.get('/settings', expect_errors=True)
     assert "Zugriff verweigert" in unauth_page.text
     assert "folgen Sie diesem Link um sich anzumelden" in unauth_page.text
 
@@ -357,7 +357,7 @@ def test_news(org_app):
     client = Client(org_app)
     client.login_admin().follow()
 
-    page = client.get('/aktuelles')
+    page = client.get('/news')
     assert str(datetime.utcnow().year) not in page.text
 
     page = page.click('Nachricht')
@@ -373,7 +373,7 @@ def test_news(org_app):
     assert "It is lots of fun" in page.text
     assert str(datetime.utcnow().year) not in page.text
 
-    page = client.get('/aktuelles')
+    page = client.get('/news')
 
     assert "We have a new homepage" in page.text
     assert "It is very good" in page.text
@@ -382,10 +382,10 @@ def test_news(org_app):
     # do not show the year in the news list if there's only one
     assert str(datetime.utcnow().year) not in page.text
 
-    page = client.get('/aktuelles/we-have-a-new-homepage')
+    page = client.get('/news/we-have-a-new-homepage')
 
     client.delete(page.pyquery('a[ic-delete-from]').attr('ic-delete-from'))
-    page = client.get('/aktuelles')
+    page = client.get('/news')
 
     assert "We have a new homepage" not in page.text
     assert "It is very good" not in page.text
@@ -398,7 +398,7 @@ def test_news_on_homepage(org_app):
 
     anon = Client(org_app)
 
-    news_list = client.get('/aktuelles')
+    news_list = client.get('/news')
 
     page = news_list.click('Nachricht')
     page.form['title'] = "Foo"
@@ -422,7 +422,7 @@ def test_news_on_homepage(org_app):
     assert "Foo" not in homepage
 
     # sticky news don't count toward that limit
-    foo = PageCollection(org_app.session()).by_path('aktuelles/foo')
+    foo = PageCollection(org_app.session()).by_path('news/foo')
     foo.is_visible_on_homepage = True
 
     transaction.commit()
@@ -433,7 +433,7 @@ def test_news_on_homepage(org_app):
     assert "Foo" in homepage
 
     # hidden news don't count for anonymous users
-    baz = PageCollection(org_app.session()).by_path('aktuelles/baz')
+    baz = PageCollection(org_app.session()).by_path('news/baz')
     baz.is_hidden_from_public = True
 
     transaction.commit()
@@ -449,7 +449,7 @@ def test_news_on_homepage(org_app):
     assert "Foo" in homepage
 
     # even if they are stickied
-    baz = PageCollection(org_app.session()).by_path('aktuelles/baz')
+    baz = PageCollection(org_app.session()).by_path('news/baz')
     baz.is_hidden_from_public = True
     baz.is_visible_on_homepage = True
 
@@ -529,17 +529,17 @@ def test_submit_form(org_app):
     transaction.commit()
 
     client = Client(org_app)
-    form_page = client.get('/formulare').click('Profile')
+    form_page = client.get('/forms').click('Profile')
     assert 'Your Details' in form_page
     assert 'First name' in form_page
     assert 'Last name' in form_page
     assert 'E-Mail' in form_page
 
-    assert 'formular/' in form_page.request.url
+    assert 'form/' in form_page.request.url
     form_page = form_page.form.submit().follow()
 
-    assert 'formular/' not in form_page.request.url
-    assert 'formular-eingabe' in form_page.request.url
+    assert 'form/' not in form_page.request.url
+    assert 'form-preview' in form_page.request.url
     assert len(form_page.pyquery('small.error')) == 3
 
     form_page.form['your_details_first_name'] = 'Kung'
@@ -574,11 +574,11 @@ def test_pending_submission_error_file_upload(org_app):
     transaction.commit()
 
     client = Client(org_app)
-    form_page = client.get('/formulare').click('Statistics')
+    form_page = client.get('/forms').click('Statistics')
     form_page.form['datei'] = Upload('test.jpg', utils.create_image().read())
 
     form_page = form_page.form.submit().follow()
-    assert 'formular-eingabe' in form_page.request.url
+    assert 'form-preview' in form_page.request.url
     assert len(form_page.pyquery('small.error')) == 2
 
 
@@ -591,7 +591,7 @@ def test_pending_submission_successful_file_upload(org_app):
     transaction.commit()
 
     client = Client(org_app)
-    form_page = client.get('/formulare').click('Statistics')
+    form_page = client.get('/forms').click('Statistics')
     form_page.form['datei'] = Upload('README.txt', b'1;2;3')
     form_page = form_page.form.submit().follow()
 
@@ -609,7 +609,7 @@ def test_add_custom_form(org_app):
     client.login_editor()
 
     # this error is not strictly line based, so there's a general error
-    form_page = client.get('/formulare/neu')
+    form_page = client.get('/forms/new')
     form_page.form['title'] = "My Form"
     form_page.form['lead'] = "This is a form"
     form_page.form['text'] = "There are many like it, but this one's mine"
@@ -619,7 +619,7 @@ def test_add_custom_form(org_app):
     assert "Das Formular ist nicht gültig." in form_page
 
     # this error is line based
-    form_page = client.get('/formulare/neu')
+    form_page = client.get('/forms/new')
     form_page.form['title'] = "My Form"
     form_page.form['lead'] = "This is a form"
     form_page.form['text'] = "There are many like it, but this one's mine"
@@ -636,7 +636,7 @@ def test_add_custom_form(org_app):
     form_page.form['e_mail'] = 'my@name.com'
     form_page = form_page.form.submit().follow()
 
-    form_page = client.get('/formular/my-form/bearbeiten')
+    form_page = client.get('/form/my-form/edit')
     form_page.form['definition'] = "Nom * = ___\nMail * = @@@"
     form_page = form_page.form.submit().follow()
 
@@ -649,7 +649,7 @@ def test_add_duplicate_form(org_app):
     client = Client(org_app)
     client.login_editor()
 
-    form_page = client.get('/formulare/neu')
+    form_page = client.get('/forms/new')
     form_page.form['title'] = "My Form"
     form_page.form['lead'] = "This is a form"
     form_page.form['text'] = "There are many like it, but this one's mine"
@@ -658,7 +658,7 @@ def test_add_duplicate_form(org_app):
 
     assert "Ein neues Formular wurd hinzugefügt" in form_page
 
-    form_page = client.get('/formulare/neu')
+    form_page = client.get('/forms/new')
     form_page.form['title'] = "My Form"
     form_page.form['lead'] = "This is a form"
     form_page.form['text'] = "There are many like it, but this one's mine"
@@ -670,7 +670,7 @@ def test_add_duplicate_form(org_app):
 
 def test_delete_builtin_form(org_app):
     client = Client(org_app)
-    builtin_form = '/formular/anmeldung'
+    builtin_form = '/form/anmeldung'
 
     response = client.delete(builtin_form, expect_errors=True)
     assert response.status_code == 403
@@ -685,7 +685,7 @@ def test_delete_custom_form(org_app):
     client = Client(org_app)
     client.login_editor()
 
-    form_page = client.get('/formulare/neu')
+    form_page = client.get('/forms/new')
     form_page.form['title'] = "My Form"
     form_page.form['definition'] = "e-mail * = @@@"
     form_page = form_page.form.submit().follow()
@@ -703,7 +703,7 @@ def test_show_uploaded_file(org_app):
     client = Client(org_app)
     client.login_editor()
 
-    form_page = client.get('/formular/text')
+    form_page = client.get('/form/text')
     form_page.form['e_mail'] = 'info@example.org'
     form_page.form['file'] = Upload('test.txt', b'foobar')
     form_page = form_page.form.submit().follow()  # preview
@@ -729,7 +729,7 @@ def test_hide_page(org_app):
     client = Client(org_app)
     client.login_editor()
 
-    new_page = client.get('/themen/organisation').click('Thema')
+    new_page = client.get('/topics/organisation').click('Thema')
 
     new_page.form['title'] = "Test"
     new_page.form['is_hidden_from_public'] = True
@@ -751,7 +751,7 @@ def test_hide_news(org_app):
     client = Client(org_app)
     client.login_editor()
 
-    new_page = client.get('/aktuelles').click('Nachricht')
+    new_page = client.get('/news').click('Nachricht')
 
     new_page.form['title'] = "Test"
     new_page.form['is_hidden_from_public'] = True
@@ -773,13 +773,13 @@ def test_hide_form(org_app):
     client = Client(org_app)
     client.login_editor()
 
-    form_page = client.get('/formular/anmeldung/bearbeiten')
+    form_page = client.get('/form/anmeldung/edit')
     form_page.form['is_hidden_from_public'] = True
     page = form_page.form.submit().follow()
 
     anonymous = Client(org_app)
     response = anonymous.get(
-        '/formular/anmeldung', expect_errors=True)
+        '/form/anmeldung', expect_errors=True)
     assert response.status_code == 403
 
     edit_page = page.click("Bearbeiten")
@@ -794,7 +794,7 @@ def test_people_view(org_app):
     client = Client(org_app)
     client.login_editor()
 
-    people = client.get('/personen')
+    people = client.get('/people')
     assert 'noch keine Personen' in people
 
     new_person = people.click('Person')
@@ -804,7 +804,7 @@ def test_people_view(org_app):
 
     assert 'Gordon Flash' in person
 
-    people = client.get('/personen')
+    people = client.get('/people')
 
     assert 'Gordon Flash' in people
 
@@ -818,7 +818,7 @@ def test_people_view(org_app):
     delete_link = person.pyquery('a.delete-link').attr('ic-delete-from')
     client.delete(delete_link)
 
-    people = client.get('/personen')
+    people = client.get('/people')
     assert 'noch keine Personen' in people
 
 
@@ -826,7 +826,7 @@ def test_with_people(org_app):
     client = Client(org_app)
     client.login_editor()
 
-    people = client.get('/personen')
+    people = client.get('/people')
 
     new_person = people.click('Person')
     new_person.form['first_name'] = 'Flash'
@@ -838,7 +838,7 @@ def test_with_people(org_app):
     new_person.form['last_name'] = 'Ming'
     new_person.form.submit()
 
-    new_page = client.get('/themen/organisation').click('Thema')
+    new_page = client.get('/topics/organisation').click('Thema')
 
     assert 'Gordon Flash' in new_page
     assert 'Ming Merciless' in new_page
@@ -868,7 +868,7 @@ def test_delete_linked_person_issue_149(org_app):
     client = Client(org_app)
     client.login_editor()
 
-    people = client.get('/personen')
+    people = client.get('/people')
 
     new_person = people.click('Person')
     new_person.form['first_name'] = 'Flash'
@@ -879,13 +879,13 @@ def test_delete_linked_person_issue_149(org_app):
         .filter(Person.last_name == 'Gordon')\
         .one()
 
-    new_page = client.get('/themen/organisation').click('Thema')
+    new_page = client.get('/topics/organisation').click('Thema')
     new_page.form['title'] = 'About Flash'
     new_page.form['people_' + gordon.id.hex] = True
     new_page.form['people_' + gordon.id.hex + '_function'] = 'Astronaut'
     edit_page = new_page.form.submit().follow().click('Bearbeiten')
 
-    person = client.get('/personen').click('Gordon Flash')
+    person = client.get('/people').click('Gordon Flash')
     delete_link = person.pyquery('a.delete-link').attr('ic-delete-from')
     client.delete(delete_link)
 
@@ -914,14 +914,14 @@ def test_tickets(org_app):
     assert page.pyquery('.pending-tickets').attr('data-count') == '0'
     assert page.pyquery('.closed-tickets').attr('data-count') == '0'
 
-    form_page = client.get('/formulare/neu')
+    form_page = client.get('/forms/new')
     form_page.form['title'] = "Newsletter"
     form_page.form['definition'] = "E-Mail *= @@@"
     form_page = form_page.form.submit()
 
     client.logout()
 
-    form_page = client.get('/formular/newsletter')
+    form_page = client.get('/form/newsletter')
     form_page.form['e_mail'] = 'info@seantis.ch'
 
     assert len(org_app.smtp.outbox) == 0
@@ -1040,10 +1040,10 @@ def test_resource_slots(org_app):
 
     client = Client(org_app)
 
-    url = '/ressource/foo/slots'
+    url = '/resource/foo/slots'
     assert client.get(url).json == []
 
-    url = '/ressource/foo/slots?start=2015-08-04&end=2015-08-05'
+    url = '/resource/foo/slots?start=2015-08-04&end=2015-08-05'
     result = client.get(url).json
 
     assert len(result) == 2
@@ -1058,7 +1058,7 @@ def test_resource_slots(org_app):
     assert result[1]['className'] == 'event-available'
     assert result[1]['title'] == "Ganztägig \nVerfügbar"
 
-    url = '/ressource/foo/slots?start=2015-08-06&end=2015-08-06'
+    url = '/resource/foo/slots?start=2015-08-06&end=2015-08-06'
     result = client.get(url).json
 
     assert len(result) == 1
@@ -1070,7 +1070,7 @@ def test_resources(org_app):
     client = Client(org_app)
     client.login_admin()
 
-    resources = client.get('/ressourcen')
+    resources = client.get('/resources')
 
     new = resources.click('Raum')
     new.form['title'] = 'Meeting Room'
@@ -1083,9 +1083,9 @@ def test_resources(org_app):
     edit.form['title'] = 'Besprechungsraum'
     edit.form.submit()
 
-    assert 'Besprechungsraum' in client.get('/ressourcen')
+    assert 'Besprechungsraum' in client.get('/resources')
 
-    resource = client.get('/ressource/meeting-room')
+    resource = client.get('/resource/meeting-room')
     delete_link = resource.pyquery('a.delete-link').attr('ic-delete-from')
 
     assert client.delete(delete_link, status=200)
@@ -1095,7 +1095,7 @@ def test_reserved_resources_fields(org_app):
     client = Client(org_app)
     client.login_admin()
 
-    room = client.get('/ressourcen').click('Raum')
+    room = client.get('/resources').click('Raum')
     room.form['title'] = 'Meeting Room'
     room.form['definition'] = "Email *= @@@"
     room = room.form.submit()
@@ -1114,7 +1114,7 @@ def test_clipboard(org_app):
     client = Client(org_app)
     client.login_admin()
 
-    page = client.get('/themen/organisation')
+    page = client.get('/topics/organisation')
     assert 'paste-link' not in page
 
     page = page.click(
@@ -1132,23 +1132,23 @@ def test_clipboard_separation(org_app):
     client = Client(org_app)
     client.login_admin()
 
-    page = client.get('/themen/organisation')
+    page = client.get('/topics/organisation')
     page = page.click('Kopieren')
 
-    assert 'paste-link' in client.get('/themen/organisation')
+    assert 'paste-link' in client.get('/topics/organisation')
 
     # new client (browser) -> new clipboard
     client = Client(org_app)
     client.login_admin()
 
-    assert 'paste-link' not in client.get('/themen/organisation')
+    assert 'paste-link' not in client.get('/topics/organisation')
 
 
 def test_copy_pages_to_news(org_app):
     client = Client(org_app)
     client.login_admin()
 
-    page = client.get('/themen/organisation')
+    page = client.get('/topics/organisation')
     edit = page.click('Bearbeiten')
 
     edit.form['lead'] = '0xdeadbeef'
@@ -1156,12 +1156,12 @@ def test_copy_pages_to_news(org_app):
 
     page.click('Kopieren')
 
-    edit = client.get('/aktuelles').click('Einf')
+    edit = client.get('/news').click('Einf')
 
     assert '0xdeadbeef' in edit
     page = edit.form.submit().follow()
 
-    assert '/aktuelles/organisation' in page.request.url
+    assert '/news/organisation' in page.request.url
 
 
 def test_sitecollection(org_app):
@@ -1175,7 +1175,7 @@ def test_sitecollection(org_app):
 
     assert collection[0] == {
         'name': 'Kontakt',
-        'url': 'http://localhost/themen/kontakt',
+        'url': 'http://localhost/topics/kontakt',
         'group': 'Themen'
     }
 
@@ -1186,7 +1186,7 @@ def test_allocations(org_app):
 
     # create a new daypass allocation
     new = client.get((
-        '/ressource/tageskarte/neue-einteilung'
+        '/resource/tageskarte/new-allocation'
         '?start=2015-08-04&end=2015-08-05'
     ))
 
@@ -1196,7 +1196,7 @@ def test_allocations(org_app):
 
     # view the daypasses
     slots = client.get((
-        '/ressource/tageskarte/slots'
+        '/resource/tageskarte/slots'
         '?start=2015-08-04&end=2015-08-05'
     ))
 
@@ -1209,7 +1209,7 @@ def test_allocations(org_app):
     edit.form.submit()
 
     slots = client.get((
-        '/ressource/tageskarte/slots'
+        '/resource/tageskarte/slots'
         '?start=2015-08-04&end=2015-08-04'
     ))
 
@@ -1218,7 +1218,7 @@ def test_allocations(org_app):
 
     # try to create a new allocation over an existing one
     new = client.get((
-        '/ressource/tageskarte/neue-einteilung'
+        '/resource/tageskarte/new-allocation'
         '?start=2015-08-04&end=2015-08-04'
     ))
 
@@ -1230,7 +1230,7 @@ def test_allocations(org_app):
 
     # move the existing allocations
     slots = client.get((
-        '/ressource/tageskarte/slots'
+        '/resource/tageskarte/slots'
         '?start=2015-08-04&end=2015-08-05'
     ))
 
@@ -1244,7 +1244,7 @@ def test_allocations(org_app):
 
     # get the new slots
     slots = client.get((
-        '/ressource/tageskarte/slots'
+        '/resource/tageskarte/slots'
         '?start=2015-08-06&end=2015-08-07'
     ))
 
@@ -1255,7 +1255,7 @@ def test_allocations(org_app):
 
     # get the new slots
     slots = client.get((
-        '/ressource/tageskarte/slots'
+        '/resource/tageskarte/slots'
         '?start=2015-08-06&end=2015-08-07'
     ))
 
@@ -1266,7 +1266,7 @@ def test_allocations(org_app):
 
     # get the new slots
     slots = client.get((
-        '/ressource/tageskarte/slots'
+        '/resource/tageskarte/slots'
         '?start=2015-08-06&end=2015-08-07'
     ))
 
@@ -1277,12 +1277,12 @@ def test_allocation_times(org_app):
     client = Client(org_app)
     client.login_admin()
 
-    new = client.get('/ressourcen').click('Raum')
+    new = client.get('/resources').click('Raum')
     new.form['title'] = 'Meeting Room'
     new.form.submit()
 
     # 12:00 - 00:00
-    new = client.get('/ressource/meeting-room/neue-einteilung')
+    new = client.get('/resource/meeting-room/new-allocation')
     new.form['start'] = '2015-08-20'
     new.form['end'] = '2015-08-20'
     new.form['start_time'] = '12:00'
@@ -1291,7 +1291,7 @@ def test_allocation_times(org_app):
     new.form.submit()
 
     slots = client.get(
-        '/ressource/meeting-room/slots?start=2015-08-20&end=2015-08-20'
+        '/resource/meeting-room/slots?start=2015-08-20&end=2015-08-20'
     )
 
     assert len(slots.json) == 1
@@ -1299,7 +1299,7 @@ def test_allocation_times(org_app):
     assert slots.json[0]['end'] == '2015-08-21T00:00:00+02:00'
 
     # 00:00 - 02:00
-    new = client.get('/ressource/meeting-room/neue-einteilung')
+    new = client.get('/resource/meeting-room/new-allocation')
     new.form['start'] = '2015-08-22'
     new.form['end'] = '2015-08-22'
     new.form['start_time'] = '00:00'
@@ -1308,7 +1308,7 @@ def test_allocation_times(org_app):
     new.form.submit()
 
     slots = client.get(
-        '/ressource/meeting-room/slots?start=2015-08-22&end=2015-08-22'
+        '/resource/meeting-room/slots?start=2015-08-22&end=2015-08-22'
     )
 
     assert len(slots.json) == 1
@@ -1316,7 +1316,7 @@ def test_allocation_times(org_app):
     assert slots.json[0]['end'] == '2015-08-22T02:00:00+02:00'
 
     # 12:00 - 00:00 over two days
-    new = client.get('/ressource/meeting-room/neue-einteilung')
+    new = client.get('/resource/meeting-room/new-allocation')
     new.form['start'] = '2015-08-24'
     new.form['end'] = '2015-08-25'
     new.form['start_time'] = '12:00'
@@ -1325,7 +1325,7 @@ def test_allocation_times(org_app):
     new.form.submit()
 
     slots = client.get(
-        '/ressource/meeting-room/slots?start=2015-08-24&end=2015-08-25'
+        '/resource/meeting-room/slots?start=2015-08-24&end=2015-08-25'
     )
 
     assert len(slots.json) == 2
@@ -1361,7 +1361,7 @@ def test_reserve_allocation(org_app):
     assert result.headers['X-IC-Trigger'] == 'rc-reservations-changed'
 
     # and fill out the form
-    formular = client.get('/ressource/tageskarte/formular')
+    formular = client.get('/resource/tageskarte/form')
     formular.form['email'] = 'info@example.org'
     formular.form['note'] = 'Foobar'
 
@@ -1388,7 +1388,7 @@ def test_reserve_allocation(org_app):
     client.login_admin()
 
     slots = client.get((
-        '/ressource/tageskarte/slots'
+        '/resource/tageskarte/slots'
         '?start=2015-08-28&end=2015-08-28'
     ))
 
@@ -1479,7 +1479,7 @@ def test_reserve_allocation_partially(org_app):
     assert reserve('10:00', '12:00').json == {'success': True}
 
     # fill out the form
-    formular = client.get('/ressource/tageskarte/formular')
+    formular = client.get('/resource/tageskarte/form')
     formular.form['email'] = 'info@example.org'
 
     ticket = formular.form.submit().follow().form.submit().follow()
@@ -1509,7 +1509,7 @@ def test_reserve_allocation_partially(org_app):
     assert "12:00" in message
 
     # see if the slots are partitioned correctly
-    url = '/ressource/tageskarte/slots?start=2015-08-01&end=2015-08-30'
+    url = '/resource/tageskarte/slots?start=2015-08-01&end=2015-08-30'
     slots = client.get(url).json
     assert slots[0]['partitions'] == [[50.0, True], [50.0, False]]
 
@@ -1538,7 +1538,7 @@ def test_reserve_no_definition(org_app):
     assert result.json == {'success': True}
 
     # fill out the reservation form
-    formular = client.get('/ressource/tageskarte/formular')
+    formular = client.get('/resource/tageskarte/form')
     formular.form['email'] = 'info@example.org'
 
     ticket = formular.form.submit().follow().form.submit().follow()
@@ -1568,7 +1568,7 @@ def test_reserve_confirmation_no_definition(org_app):
     # create a reservation
     assert reserve(quota=4).json == {'success': True}
 
-    formular = client.get('/ressource/tageskarte/formular')
+    formular = client.get('/resource/tageskarte/form')
     formular.form['email'] = "info@example.org"
 
     confirmation = formular.form.submit().follow()
@@ -1612,7 +1612,7 @@ def test_reserve_confirmation_with_definition(org_app):
     # create a reservation
     assert reserve("10:30", "12:00").json == {'success': True}
 
-    formular = client.get('/ressource/tageskarte/formular')
+    formular = client.get('/resource/tageskarte/form')
     formular.form['email'] = "info@example.org"
     formular.form['vorname'] = "Thomas"
     formular.form['nachname'] = "Anderson"
@@ -1657,7 +1657,7 @@ def test_reserve_session_bound(org_app):
     # create a reservation
     assert reserve(quota=4).json == {'success': True}
 
-    formular = client.get('/ressource/tageskarte/formular')
+    formular = client.get('/resource/tageskarte/form')
     formular.form['email'] = 'info@example.org'
 
     confirm = formular.form.submit().follow()
@@ -1692,7 +1692,7 @@ def test_delete_reservation_anonymous(org_app):
     assert reserve(quota=4).json == {'success': True}
 
     # get the delete url
-    reservations_url = '/ressource/tageskarte/reservations'
+    reservations_url = '/resource/tageskarte/reservations'
 
     reservations = client.get(reservations_url).json['reservations']
     url = reservations[0]['delete']
@@ -1730,13 +1730,13 @@ def test_reserve_in_parallel(org_app):
 
     # create a reservation
     assert c1_reserve().json == {'success': True}
-    formular = c1.get('/ressource/tageskarte/formular')
+    formular = c1.get('/resource/tageskarte/form')
     formular.form['email'] = 'info@example.org'
     f1 = formular.form.submit().follow()
 
     # create a parallel reservation
     assert c2_reserve().json == {'success': True}
-    formular = c2.get('/ressource/tageskarte/formular')
+    formular = c2.get('/resource/tageskarte/form')
     formular.form['email'] = 'info@example.org'
     f2 = formular.form.submit().follow()
 
@@ -1766,19 +1766,19 @@ def test_occupancy_view(org_app):
 
     # create a reservation
     assert reserve().json == {'success': True}
-    formular = client.get('/ressource/tageskarte/formular')
+    formular = client.get('/resource/tageskarte/form')
     formular.form['email'] = 'info@example.org'
     formular.form.submit().follow().form.submit()
 
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
 
     # at this point, the reservation won't show up in the occupancy view
-    occupancy = client.get('/ressource/tageskarte/belegung?date=20150828')
+    occupancy = client.get('/resource/tageskarte/occupancy?date=20150828')
     assert len(occupancy.pyquery('.occupancy-block')) == 0
 
     # ..until we accept it
     ticket.click('Alle Reservationen annehmen')
-    occupancy = client.get('/ressource/tageskarte/belegung?date=20150828')
+    occupancy = client.get('/resource/tageskarte/occupancy?date=20150828')
     assert len(occupancy.pyquery('.occupancy-block')) == 1
 
 
@@ -1804,7 +1804,7 @@ def test_reservation_export_view(org_app):
 
     # create a reservation
     assert reserve().json == {'success': True}
-    formular = client.get('/ressource/tageskarte/formular')
+    formular = client.get('/resource/tageskarte/form')
     formular.form['email'] = 'info@example.org'
     formular.form['vorname'] = 'Charlie'
     formular.form['nachname'] = 'Carson'
@@ -1813,7 +1813,7 @@ def test_reservation_export_view(org_app):
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
 
     # at this point, the reservation won't show up in the export
-    export = client.get('/ressource/tageskarte/export')
+    export = client.get('/resource/tageskarte/export')
     export.form['start'] = date(2015, 8, 28)
     export.form['end'] = date(2015, 8, 28)
     export.form['file_format'] = 'json'
@@ -1843,7 +1843,7 @@ def test_reserve_session_separation(org_app):
 
     # check both for separation by resource and by client
     for room in ('meeting-room', 'gym'):
-        new = c1.get('/ressourcen').click('Raum')
+        new = c1.get('/resources').click('Raum')
         new.form['title'] = room
         new.form.submit()
 
@@ -1865,13 +1865,13 @@ def test_reserve_session_separation(org_app):
     assert c2_reserve_gym().json == {'success': True}
 
     for room in ('meeting-room', 'gym'):
-        result = c1.get('/ressource/{}/reservations'.format(room)).json
+        result = c1.get('/resource/{}/reservations'.format(room)).json
         assert len(result['reservations']) == 1
 
-        result = c2.get('/ressource/{}/reservations'.format(room)).json
+        result = c2.get('/resource/{}/reservations'.format(room)).json
         assert len(result['reservations']) == 1
 
-    formular = c1.get('/ressource/meeting-room/formular')
+    formular = c1.get('/resource/meeting-room/form')
     formular.form['email'] = 'info@example.org'
     formular.form.submit()
 
@@ -1881,16 +1881,16 @@ def test_reserve_session_separation(org_app):
     resource = org_app.libres_resources.by_name('meeting-room')
     assert resource.scheduler.managed_reserved_slots().count() == 1
 
-    result = c1.get('/ressource/meeting-room/reservations'.format(room)).json
+    result = c1.get('/resource/meeting-room/reservations'.format(room)).json
     assert len(result['reservations']) == 0
 
-    result = c1.get('/ressource/gym/reservations'.format(room)).json
+    result = c1.get('/resource/gym/reservations'.format(room)).json
     assert len(result['reservations']) == 1
 
-    result = c2.get('/ressource/meeting-room/reservations'.format(room)).json
+    result = c2.get('/resource/meeting-room/reservations'.format(room)).json
     assert len(result['reservations']) == 1
 
-    result = c2.get('/ressource/gym/reservations'.format(room)).json
+    result = c2.get('/resource/gym/reservations'.format(room)).json
     assert len(result['reservations']) == 1
 
 
@@ -1898,7 +1898,7 @@ def test_reserve_reservation_prediction(org_app):
     client = Client(org_app)
     client.login_admin()
 
-    new = client.get('/ressourcen').click('Raum')
+    new = client.get('/resources').click('Raum')
     new.form['title'] = 'Gym'
     new.form.submit()
 
@@ -1921,7 +1921,7 @@ def test_reserve_reservation_prediction(org_app):
     reserve_a1()
     reserve_a2()
 
-    reservations_url = '/ressource/gym/reservations'
+    reservations_url = '/resource/gym/reservations'
     assert not client.get(reservations_url).json['prediction']
 
     resource = org_app.libres_resources.by_name('gym')
@@ -1971,7 +1971,7 @@ def test_reserve_multiple_allocations(org_app):
     assert reserve_thursday().json == {'success': True}
     assert reserve_friday().json == {'success': True}
 
-    formular = client.get('/ressource/tageskarte/formular')
+    formular = client.get('/resource/tageskarte/form')
     assert "28. April 2016" in formular
     assert "29. April 2016" in formular
     formular.form['email'] = "info@example.org"
@@ -2054,7 +2054,7 @@ def test_reserve_and_deny_multiple_dates(org_app):
     assert reserve_thursday().json == {'success': True}
     assert reserve_friday().json == {'success': True}
 
-    formular = client.get('/ressource/tageskarte/formular')
+    formular = client.get('/resource/tageskarte/form')
     formular.form['email'] = "info@example.org"
 
     confirmation = formular.form.submit().follow()
@@ -2137,7 +2137,7 @@ def test_reserve_failing_multiple(org_app):
     assert c2_reserve_friday().json == {'success': True}
 
     # accept the first reservation session
-    formular = c1.get('/ressource/tageskarte/formular')
+    formular = c1.get('/resource/tageskarte/form')
     formular.form['email'] = "info@example.org"
     formular.form.submit().follow().form.submit().follow()
 
@@ -2145,7 +2145,7 @@ def test_reserve_failing_multiple(org_app):
     ticket.click('Alle Reservationen annehmen')
 
     # then try to accept the second one
-    formular = c2.get('/ressource/tageskarte/formular')
+    formular = c2.get('/resource/tageskarte/form')
     formular.form['email'] = "info@example.org"
     confirmation = formular.form.submit().follow()
     confirmation = confirmation.form.submit().follow()
@@ -2177,7 +2177,7 @@ def test_cleanup_allocations(org_app):
     client = Client(org_app)
     client.login_admin()
 
-    cleanup = client.get('/ressource/tageskarte').click("Aufräumen")
+    cleanup = client.get('/resource/tageskarte').click("Aufräumen")
     cleanup.form['start'] = date(2015, 8, 31)
     cleanup.form['end'] = date(2015, 8, 1)
     cleanup = cleanup.form.submit()
@@ -2195,20 +2195,20 @@ def test_view_occurrences(org_app):
     client = Client(org_app)
 
     def events(query=''):
-        page = client.get('/veranstaltungen/?{}'.format(query))
+        page = client.get('/events/?{}'.format(query))
         return [event.text for event in page.pyquery('h3 a')]
 
     def total_events(query=''):
-        page = client.get('/veranstaltungen/?{}'.format(query))
+        page = client.get('/events/?{}'.format(query))
         return int(page.pyquery('.date-range-selector-result span')[0].text)
 
     def dates(query=''):
-        page = client.get('/veranstaltungen/?{}'.format(query))
+        page = client.get('/events/?{}'.format(query))
         return [datetime.strptime(div.text, '%d.%m.%Y').date() for div
                 in page.pyquery('.occurrence-date')]
 
     def tags(query=''):
-        page = client.get('/veranstaltungen/?{}'.format(query))
+        page = client.get('/events/?{}'.format(query))
         tags = [tag.text.strip() for tag in page.pyquery('.blank-label')]
         return list(set([tag for tag in tags if tag]))
 
@@ -2267,7 +2267,7 @@ def test_view_occurrences(org_app):
 
 def test_view_occurrence(org_app):
     client = Client(org_app)
-    events = client.get('/veranstaltungen')
+    events = client.get('/events')
 
     event = events.click("Generalversammlung")
     assert event.pyquery('h1.main-title').text() == "Generalversammlung"
@@ -2294,7 +2294,7 @@ def test_view_occurrence(org_app):
 
 def test_submit_event(org_app):
     client = Client(org_app)
-    form_page = client.get('/veranstaltungen').click("Veranstaltung melden")
+    form_page = client.get('/events').click("Veranstaltung melden")
 
     assert "Das Formular enthält Fehler" in form_page.form.submit()
 
@@ -2352,7 +2352,7 @@ def test_submit_event(org_app):
     ticket_nr = confirmation_page.pyquery('.ticket-number').text()
     assert "EVN-" in ticket_nr
 
-    assert "My Event" not in client.get('/veranstaltungen')
+    assert "My Event" not in client.get('/events')
 
     assert len(org_app.smtp.outbox) == 1
     message = org_app.smtp.outbox[0]
@@ -2393,7 +2393,7 @@ def test_submit_event(org_app):
     # Publish event
     ticket_page = ticket_page.click("Veranstaltung annehmen").follow()
 
-    assert "My Event" in client.get('/veranstaltungen')
+    assert "My Event" in client.get('/events')
 
     assert len(org_app.smtp.outbox) == 2
     message = org_app.smtp.outbox[1]
@@ -2428,7 +2428,7 @@ def test_edit_event(org_app):
     client = Client(org_app)
 
     # Submit and publish an event
-    form_page = client.get('/veranstaltungen').click("Veranstaltung melden")
+    form_page = client.get('/events').click("Veranstaltung melden")
     event_date = date.today() + timedelta(days=1)
     form_page.form['email'] = "test@example.org"
     form_page.form['title'] = "My Ewent"
@@ -2444,41 +2444,41 @@ def test_edit_event(org_app):
     ticket_page = client.get('/tickets/ALL/open').click("Annehmen").follow()
     ticket_page = ticket_page.click("Veranstaltung annehmen").follow()
 
-    assert "My Ewent" in client.get('/veranstaltungen')
-    assert "Lokation" in client.get('/veranstaltungen')
+    assert "My Ewent" in client.get('/events')
+    assert "Lokation" in client.get('/events')
 
     # Edit a submitted event
-    event_page = client.get('/veranstaltungen').click("My Ewent")
+    event_page = client.get('/events').click("My Ewent")
     event_page = event_page.click("Bearbeiten")
     event_page.form['title'] = "My Event"
     event_page.form.submit().follow()
 
-    assert "My Ewent" not in client.get('/veranstaltungen')
-    assert "My Event" in client.get('/veranstaltungen')
+    assert "My Ewent" not in client.get('/events')
+    assert "My Event" in client.get('/events')
 
     # Edit a submitted event via the ticket
     event_page = ticket_page.click("Veranstaltung bearbeiten")
     event_page.form['location'] = "Location"
     event_page.form.submit().follow()
 
-    assert "Lokation" not in client.get('/veranstaltungen')
-    assert "Location" in client.get('/veranstaltungen')
+    assert "Lokation" not in client.get('/events')
+    assert "Location" in client.get('/events')
 
     # Edit a non-submitted event
-    event_page = client.get('/veranstaltungen').click("150 Jahre Govikon")
+    event_page = client.get('/events').click("150 Jahre Govikon")
     event_page = event_page.click("Bearbeiten")
     event_page.form['title'] = "Stadtfest"
     event_page.form.submit().follow()
 
-    assert "150 Jahre Govikon" not in client.get('/veranstaltungen')
-    assert "Stadtfest" in client.get('/veranstaltungen')
+    assert "150 Jahre Govikon" not in client.get('/events')
+    assert "Stadtfest" in client.get('/events')
 
 
 def test_delete_event(org_app):
     client = Client(org_app)
 
     # Submit and publish an event
-    form_page = client.get('/veranstaltungen').click("Veranstaltung melden")
+    form_page = client.get('/events').click("Veranstaltung melden")
     event_date = date.today() + timedelta(days=1)
     form_page.form['email'] = "test@example.org"
     form_page.form['title'] = "My Event"
@@ -2495,10 +2495,10 @@ def test_delete_event(org_app):
     ticket_page = ticket_page.click("Veranstaltung annehmen").follow()
     ticket_nr = ticket_page.pyquery('.ticket-number').text()
 
-    assert "My Event" in client.get('/veranstaltungen')
+    assert "My Event" in client.get('/events')
 
     # Try to delete a submitted event directly
-    event_page = client.get('/veranstaltungen').click("My Event")
+    event_page = client.get('/events').click("My Event")
 
     assert "Diese Veranstaltung kann nicht gelöscht werden." in \
         event_page.pyquery('a.delete-link')[0].values()
@@ -2516,24 +2516,24 @@ def test_delete_event(org_app):
     assert "Ihre Veranstaltung musste leider abgelehnt werden" in message
     assert ticket_nr in message
 
-    assert "My Event" not in client.get('/veranstaltungen')
+    assert "My Event" not in client.get('/events')
 
     # Delete a non-submitted event
-    event_page = client.get('/veranstaltungen').click("Generalversammlung")
+    event_page = client.get('/events').click("Generalversammlung")
     assert "Möchten Sie die Veranstaltung wirklich löschen?" in \
         event_page.pyquery('a.delete-link')[0].values()
 
     delete_link = event_page.pyquery('a.delete-link').attr('ic-delete-from')
     client.delete(delete_link)
 
-    assert "Generalversammlung" not in client.get('/veranstaltungen')
+    assert "Generalversammlung" not in client.get('/events')
 
 
 def test_basic_search(es_org_app):
     client = Client(es_org_app)
     client.login_admin()
 
-    add_news = client.get('/aktuelles').click('Nachricht')
+    add_news = client.get('/news').click('Nachricht')
     add_news.form['title'] = "Now supporting fulltext search"
     add_news.form['lead'] = "It is pretty awesome"
     add_news.form['text'] = "Much <em>wow</em>"
@@ -2556,15 +2556,15 @@ def test_basic_search(es_org_app):
     assert "It is pretty awesome" in search_page
 
     # make sure anonymous doesn't see hidden things in the search results
-    assert "fulltext" in Client(es_org_app).get('/suche?q=fulltext')
+    assert "fulltext" in Client(es_org_app).get('/search?q=fulltext')
     edit_news = news.click("Bearbeiten")
     edit_news.form['is_hidden_from_public'] = True
     edit_news.form.submit()
 
     es_org_app.es_client.indices.refresh(index='_all')
 
-    assert "Now supporting" not in Client(es_org_app).get('/suche?q=fulltext')
-    assert "Now supporting" in client.get('/suche?q=fulltext')
+    assert "Now supporting" not in Client(es_org_app).get('/search?q=fulltext')
+    assert "Now supporting" in client.get('/search?q=fulltext')
 
 
 def test_view_search_is_limiting(es_org_app):
@@ -2574,12 +2574,12 @@ def test_view_search_is_limiting(es_org_app):
     client = Client(es_org_app)
     client.login_admin()
 
-    add_news = client.get('/aktuelles').click('Nachricht')
+    add_news = client.get('/news').click('Nachricht')
     add_news.form['title'] = "Foobar"
     add_news.form['lead'] = "Foobar"
     add_news.form.submit()
 
-    add_news = client.get('/aktuelles').click('Nachricht')
+    add_news = client.get('/news').click('Nachricht')
     add_news.form['title'] = "Deadbeef"
     add_news.form['lead'] = "Deadbeef"
     add_news.form.submit()
@@ -2606,7 +2606,7 @@ def test_basic_autocomplete(es_org_app):
 
     client.login_editor()
 
-    people = client.get('/personen')
+    people = client.get('/people')
 
     new_person = people.click('Person')
     new_person.form['first_name'] = 'Flash'
@@ -2614,8 +2614,8 @@ def test_basic_autocomplete(es_org_app):
     new_person.form.submit()
 
     es_org_app.es_client.indices.refresh(index='_all')
-    assert client.get('/suche/suggest?q=Go').json == ["Gordon Flash"]
-    assert client.get('/suche/suggest?q=Fl').json == []
+    assert client.get('/search/suggest?q=Go').json == ["Gordon Flash"]
+    assert client.get('/search/suggest?q=Fl').json == []
 
 
 def test_unsubscribe_link(org_app):
@@ -2776,7 +2776,7 @@ def test_newsletter_subscribers_management(org_app):
 
     client.login_editor()
 
-    subscribers = client.get('/abonnenten')
+    subscribers = client.get('/subscribers')
     assert "info@example.org" in subscribers
 
     unsubscribe = subscribers.pyquery('a[ic-get-from]').attr('ic-get-from')
@@ -2883,7 +2883,7 @@ def test_map_default_view(org_app):
     client = Client(org_app)
     client.login_admin()
 
-    settings = client.get('/einstellungen')
+    settings = client.get('/settings')
 
     assert decode_map_value(settings.form['default_map_view'].value) == {
         'lat': None, 'lon': None, 'zoom': None
@@ -2932,14 +2932,14 @@ def test_manage_album(org_app):
     client = Client(org_app)
     client.login_editor()
 
-    albums = client.get('/fotoalben')
+    albums = client.get('/photoalbums')
     assert "Noch keine Fotoalben" in albums
 
     new = albums.click('Fotoalbum')
     new.form['title'] = "Comicon 2016"
     new.form.submit()
 
-    albums = client.get('/fotoalben')
+    albums = client.get('/photoalbums')
     assert "Comicon 2016" in albums
 
     album = albums.click("Comicon 2016")
@@ -2969,11 +2969,11 @@ def test_manage_album(org_app):
 def test_settings(org_app):
     client = Client(org_app)
 
-    assert client.get('/einstellungen', expect_errors=True).status_code == 403
+    assert client.get('/settings', expect_errors=True).status_code == 403
 
     client.login_admin()
 
-    settings_page = client.get('/einstellungen')
+    settings_page = client.get('/settings')
     document = settings_page.pyquery
 
     assert document.find('input[name=name]').val() == 'Govikon'
@@ -3071,18 +3071,18 @@ def test_disabled_yubikey(org_app):
 
     org_app.settings.org.enable_yubikey = False
     assert 'YubiKey' not in client.get('/auth/login')
-    assert 'YubiKey' not in client.get('/benutzerverwaltung')
+    assert 'YubiKey' not in client.get('/usermanagement')
 
     org_app.settings.org.enable_yubikey = True
     assert 'YubiKey' in client.get('/auth/login')
-    assert 'YubiKey' in client.get('/benutzerverwaltung')
+    assert 'YubiKey' in client.get('/usermanagement')
 
 
 def test_disable_users(org_app):
     client = Client(org_app)
     client.login_admin()
 
-    users = client.get('/benutzerverwaltung')
+    users = client.get('/usermanagement')
     assert 'admin@example.org' in users
     assert 'editor@example.org' in users
 
@@ -3108,7 +3108,7 @@ def test_change_role(org_app):
 
     org_app.settings.org.enable_yubikey = True
 
-    editor = client.get('/benutzerverwaltung').click('Bearbeiten', index=1)
+    editor = client.get('/usermanagement').click('Bearbeiten', index=1)
     assert "müssen zwingend einen YubiKey" in editor.form.submit()
 
     editor.form['role'] = 'member'
@@ -3136,7 +3136,7 @@ def test_unique_yubikey(org_app):
 
     org_app.settings.org.enable_yubikey = True
 
-    users = client.get('/benutzerverwaltung')
+    users = client.get('/usermanagement')
     admin = users.click('Bearbeiten', index=0)
     editor = users.click('Bearbeiten', index=1)
 
@@ -3157,7 +3157,7 @@ def test_add_new_user_without_activation_email(org_app):
 
     org_app.settings.org.enable_yubikey = True
 
-    new = client.get('/benutzerverwaltung').click('Benutzer', index=2)
+    new = client.get('/usermanagement').click('Benutzer', index=2)
     new.form['username'] = 'admin@example.org'
 
     assert "existiert bereits" in new.form.submit()
@@ -3186,7 +3186,7 @@ def test_add_new_user_with_activation_email(org_app):
 
     org_app.settings.org.enable_yubikey = False
 
-    new = client.get('/benutzerverwaltung').click('Benutzer', index=2)
+    new = client.get('/usermanagement').click('Benutzer', index=2)
     new.form['username'] = 'member@example.org'
     new.form['role'] = 'member'
     new.form['send_activation_email'] = True
@@ -3215,7 +3215,7 @@ def test_edit_user_settings(org_app):
 
     org_app.settings.org.enable_yubikey = False
 
-    new = client.get('/benutzerverwaltung').click('Benutzer', index=2)
+    new = client.get('/usermanagement').click('Benutzer', index=2)
     new.form['username'] = 'new@example.org'
     new.form['role'] = 'member'
     new.form.submit()
@@ -3223,7 +3223,7 @@ def test_edit_user_settings(org_app):
     users = UserCollection(org_app.session())
     assert not users.by_username('new@example.org').data
 
-    edit = client.get('/benutzerverwaltung').click('Bearbeiten', index=2)
+    edit = client.get('/usermanagement').click('Bearbeiten', index=2)
     assert "new@example.org" in edit
 
     edit.form.get('daily_ticket_statistics').checked = False
@@ -3272,7 +3272,7 @@ def test_send_ticket_email(org_app):
     def submit_event(client, email):
         start = date.today() + timedelta(days=1)
 
-        page = client.get('/veranstaltungen').click("Veranstaltung melden")
+        page = client.get('/events').click("Veranstaltung melden")
         page.form['email'] = email
         page.form['title'] = "My Event"
         page.form['description'] = "My event is an event."
@@ -3306,7 +3306,7 @@ def test_send_ticket_email(org_app):
     transaction.commit()
 
     def submit_form(client, email):
-        page = client.get('/formulare').click('Profile')
+        page = client.get('/forms').click('Profile')
         page.form['name'] = 'foobar'
         page.form['e_mail'] = email
         page.form.submit().follow().form.submit()
@@ -3339,7 +3339,7 @@ def test_send_ticket_email(org_app):
         assert reserve('10:00', '12:00').json == {'success': True}
 
         # fill out the form
-        formular = client.get('/ressource/tageskarte/formular')
+        formular = client.get('/resource/tageskarte/form')
         formular.form['email'] = email
 
         formular.form.submit().follow().form.submit().follow()
@@ -3361,7 +3361,7 @@ def test_login_with_required_userprofile(org_app):
 
     client = Client(org_app)
 
-    page = client.get('/auth/login?to=/einstellungen')
+    page = client.get('/auth/login?to=/settings')
     page.form['username'] = 'admin@example.org'
     page.form['password'] = 'wrong-password'
     page = page.form.submit()
@@ -3371,11 +3371,11 @@ def test_login_with_required_userprofile(org_app):
     page.form['password'] = 'hunter2'
     page = page.form.submit().follow()
 
-    assert 'benutzerprofil' in page.request.url
+    assert 'userprofile' in page.request.url
     assert "Ihr Benutzerprofil ist unvollständig" in page
     page = page.form.submit().follow()
 
-    assert 'einstellungen' in page.request.url
+    assert 'settings' in page.request.url
 
     # userprofile is complete
     org_app.settings.org.require_complete_userprofile = True
@@ -3383,12 +3383,12 @@ def test_login_with_required_userprofile(org_app):
 
     client = Client(org_app)
 
-    page = client.get('/auth/login?to=/einstellungen')
+    page = client.get('/auth/login?to=/settings')
     page.form['username'] = 'admin@example.org'
     page.form['password'] = 'hunter2'
     page = page.form.submit()
 
-    assert 'einstellungen' in page.request.url
+    assert 'settings' in page.request.url
 
     # completeness not required
     org_app.settings.org.require_complete_userprofile = False
@@ -3396,12 +3396,12 @@ def test_login_with_required_userprofile(org_app):
 
     client = Client(org_app)
 
-    page = client.get('/auth/login?to=/einstellungen')
+    page = client.get('/auth/login?to=/settings')
     page.form['username'] = 'admin@example.org'
     page.form['password'] = 'hunter2'
     page = page.form.submit()
 
-    assert 'einstellungen' in page.request.url
+    assert 'settings' in page.request.url
 
 
 def test_manual_form_payment(org_app):
@@ -3423,7 +3423,7 @@ def test_manual_form_payment(org_app):
 
     client = Client(org_app)
 
-    page = client.get('/formular/govikon-poster')
+    page = client.get('/form/govikon-poster')
     assert '10.00 CHF' in page
     assert '20.00 CHF' in page
     assert '5.00 CHF' in page
@@ -3455,7 +3455,7 @@ def test_manual_form_payment(org_app):
 
     assert page.pyquery('.payment-state').text() == "Offen"
 
-    payments = client.get('/zahlungen')
+    payments = client.get('/payments')
     assert "FRM-" in payments
     assert "Manuell" in payments
     assert "info@example.org" in payments
@@ -3494,7 +3494,7 @@ def test_manual_reservation_payment_with_extra(org_app):
     # create a reservation
     reserve(quota=2, whole_day=True)
 
-    page = client.get('/ressource/tageskarte/formular')
+    page = client.get('/resource/tageskarte/form')
     page.form['email'] = 'info@example.org'
 
     page.form['donation'] = 'No'
@@ -3522,7 +3522,7 @@ def test_manual_reservation_payment_with_extra(org_app):
 
     assert page.pyquery('.payment-state').text() == "Offen"
 
-    payments = client.get('/zahlungen')
+    payments = client.get('/payments')
     assert "RSV-" in payments
     assert "Manuell" in payments
     assert "info@example.org" in payments
@@ -3554,7 +3554,7 @@ def test_manual_reservation_payment_without_extra(org_app):
     # create a reservation
     reserve()
 
-    page = client.get('/ressource/tageskarte/formular')
+    page = client.get('/resource/tageskarte/form')
     page.form['email'] = 'info@example.org'
     assert '20.00' in page.form.submit().follow()
 
@@ -3577,7 +3577,7 @@ def test_manual_reservation_payment_without_extra(org_app):
 
     assert page.pyquery('.payment-state').text() == "Offen"
 
-    payments = client.get('/zahlungen')
+    payments = client.get('/payments')
     assert "RSV-" in payments
     assert "Manuell" in payments
     assert "info@example.org" in payments
@@ -3596,7 +3596,7 @@ def test_setup_stripe(org_app):
             'token': '0xdeadbeef'
         })
 
-        client.get('/zahlungsanbieter').click("Stripe Connect")
+        client.get('/payment-provider').click("Stripe Connect")
 
         url = URL(m.request_history[0].json()['url'])
         url = url.query_param('oauth_redirect_secret', 'bar')
@@ -3640,7 +3640,7 @@ def test_stripe_form_payment(org_app):
 
     client = Client(org_app)
 
-    page = client.get('/formular/donate')
+    page = client.get('/form/donate')
     page.form['e_mail'] = 'info@example.org'
     page = page.form.submit().follow()
 
@@ -3683,7 +3683,7 @@ def test_stripe_form_payment(org_app):
         ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
         assert "Bezahlt" in ticket
 
-    payments = client.get('/zahlungen')
+    payments = client.get('/payments')
     assert "FRM-" in payments
     assert "Stripe Connect" in payments
     assert "info@example.org" in payments
@@ -3719,13 +3719,13 @@ def test_stripe_charge_fee_to_customer(org_app):
             'email': 'info@example.org'
         })
 
-        page = client.get('/zahlungsanbieter').click("Einstellungen", index=1)
+        page = client.get('/payment-provider').click("Einstellungen", index=1)
 
     assert 'Govikon / info@example.org' in page
     page.form['charge_fee_to_customer'] = True
     page.form.submit()
 
-    page = client.get('/formular/donate')
+    page = client.get('/form/donate')
     page.form['e_mail'] = 'info@example.org'
     page = page.form.submit().follow()
 
@@ -3762,7 +3762,7 @@ def test_stripe_charge_fee_to_customer(org_app):
         ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
         assert "Bezahlt" in ticket
 
-    payments = client.get('/zahlungen')
+    payments = client.get('/payments')
     assert "FRM-" in payments
     assert "Stripe Connect" in payments
     assert "info@example.org" in payments
@@ -3775,7 +3775,7 @@ def test_switch_languages(org_app):
     client = Client(org_app)
     client.login_admin()
 
-    page = client.get('/einstellungen')
+    page = client.get('/settings')
     assert 'Deutsch' in page
     assert 'Allemand' not in page
 

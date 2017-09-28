@@ -43,7 +43,7 @@ def view_payment_providers(self, request):
 
         yield Link(
             _("Settings"),
-            request.link(provider, 'einstellungen'),
+            request.link(provider, 'settings'),
         )
 
         yield Link(
@@ -172,7 +172,7 @@ def delete_provider(self, request):
 
 @OrgApp.view(
     model=PaymentProviderCollection,
-    name='synchronisieren',
+    name='sync',
     permission=Private)
 def sync_payments(self, request):
     self.sync()
@@ -197,7 +197,7 @@ def get_settings_form(model, request):
     permission=Secret,
     form=get_settings_form,
     template='form.pt',
-    name='einstellungen')
+    name='settings')
 def handle_provider_settings(self, request, form):
 
     if form.submitted(request):

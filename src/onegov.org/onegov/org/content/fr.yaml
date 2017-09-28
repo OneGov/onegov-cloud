@@ -49,11 +49,11 @@ pages:
         Cette partie du site internet décrit comment joindre l'organisation.
   - title: Nouvelles
     type: news
-    name: aktuelles
+    name: news
     meta:
       trait: news
   - title: Nous avons un nouveau site internet !
-    parent: aktuelles
+    parent: news
     type: news
     meta:
       trait: news
@@ -106,11 +106,11 @@ organisation:
         <column span="4">
           <panel>
             <links title="Services">
-              <link url="./formulare"
+              <link url="./forms"
                     description="Demandes et réponses">
                     Formulaires
               </link>
-              <link url="./ressourcen"
+              <link url="./resources"
                     description="Pièces et cartes journalières">
                     Réservations
               </link>
@@ -123,11 +123,11 @@ organisation:
 
           <panel>
             <links title="Répertoires">
-              <link url="./personen"
+              <link url="./people"
                     description="Tous les contacts">
                 Personnes
               </link>
-              <link url="./fotoalben"
+              <link url="./photoalbums"
                     description="Impressions">
                 Albums photo
               </link>

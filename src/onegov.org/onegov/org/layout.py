@@ -589,7 +589,7 @@ class FormSubmissionLayout(DefaultLayout):
 
         edit_link = Link(
             text=_("Edit"),
-            url=self.request.link(self.form, name='bearbeiten'),
+            url=self.request.link(self.form, name='edit'),
             attrs={'class': 'edit-link'}
         )
 
@@ -653,7 +653,7 @@ class FormCollectionLayout(DefaultLayout):
                             text=_("Form"),
                             url=self.request.link(
                                 self.model,
-                                name='neu'
+                                name='new'
                             ),
                             attrs={'class': 'new-form'}
                         )
@@ -682,7 +682,7 @@ class PersonCollectionLayout(DefaultLayout):
                             text=_("Person"),
                             url=self.request.link(
                                 self.model,
-                                name='neu'
+                                name='new'
                             ),
                             attrs={'class': 'new-person'}
                         )
@@ -711,7 +711,7 @@ class PersonLayout(DefaultLayout):
             return [
                 Link(
                     text=_("Edit"),
-                    url=self.request.link(self.model, 'bearbeiten'),
+                    url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
@@ -812,7 +812,7 @@ class TicketLayout(DefaultLayout):
             links.append(
                 Link(
                     text=_("New Note"),
-                    url=self.request.link(self.model, 'notiz'),
+                    url=self.request.link(self.model, 'note'),
                     attrs={'class': 'new-note'}
                 )
             )
@@ -943,7 +943,7 @@ class ResourcesLayout(DefaultLayout):
                             text=_("Room"),
                             url=self.request.link(
                                 self.model,
-                                name='neuer-raum'
+                                name='new-room'
                             ),
                             attrs={'class': 'new-room'}
                         ),
@@ -951,7 +951,7 @@ class ResourcesLayout(DefaultLayout):
                             text=_("Daypass"),
                             url=self.request.link(
                                 self.model,
-                                name='neue-tageskarte'
+                                name='new-daypass'
                             ),
                             attrs={'class': 'new-daypass'}
                         )
@@ -987,7 +987,7 @@ class ResourceRecipientsLayout(DefaultLayout):
                             text=_("E-Mail Recipient"),
                             url=self.request.link(
                                 self.model,
-                                name='neuer-empfaenger'
+                                name='new-recipient'
                             ),
                             attrs={'class': 'new-recipient'}
                         ),
@@ -1079,7 +1079,7 @@ class ResourceLayout(DefaultLayout):
             return [
                 Link(
                     text=_("Edit"),
-                    url=self.request.link(self.model, 'bearbeiten'),
+                    url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-link'}
                 ),
                 delete_link,
@@ -1090,7 +1090,7 @@ class ResourceLayout(DefaultLayout):
                 ),
                 Link(
                     text=_("Occupancy"),
-                    url=self.request.link(self.model, 'belegung'),
+                    url=self.request.link(self.model, 'occupancy'),
                     attrs={'class': ('occupancy-link', 'calendar-dependent')}
                 ),
                 Link(
@@ -1234,7 +1234,7 @@ class OccurrenceLayout(EventBaseLayout):
             edit_link = Link(
                 text=_("Edit"),
                 url=self.request.return_to(
-                    self.request.link(self.model.event, 'bearbeiten'),
+                    self.request.link(self.model.event, 'edit'),
                     self.request.link(self.model.event)
                 ),
                 attrs={'class': 'edit-link'}
@@ -1292,7 +1292,7 @@ class EventLayout(EventBaseLayout):
         if self.request.is_manager:
             edit_link = Link(
                 text=_("Edit"),
-                url=self.request.link(self.model, 'bearbeiten'),
+                url=self.request.link(self.model, 'edit'),
                 attrs={'class': 'edit-link'}
             )
             if self.event_deletable(self.model):
@@ -1349,7 +1349,7 @@ class NewsletterLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self):
 
-        if self.is_collection and self.view_name == 'neu':
+        if self.is_collection and self.view_name == 'new':
             return [
                 Link(_("Homepage"), self.homepage_url),
                 Link(_("Newsletter"), self.request.link(self.collection)),
@@ -1386,7 +1386,7 @@ class NewsletterLayout(DefaultLayout):
                             text=_("Newsletter"),
                             url=self.request.link(
                                 NewsletterCollection(self.app.session()),
-                                name='neu'
+                                name='new'
                             ),
                             attrs={'class': 'new-newsletter'}
                         ),
@@ -1397,12 +1397,12 @@ class NewsletterLayout(DefaultLayout):
             return [
                 Link(
                     text=_("Send"),
-                    url=self.request.link(self.model, 'senden'),
+                    url=self.request.link(self.model, 'send'),
                     attrs={'class': 'send-link'}
                 ),
                 Link(
                     text=_("Edit"),
-                    url=self.request.link(self.model, 'bearbeiten'),
+                    url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
@@ -1466,7 +1466,7 @@ class ImageSetCollectionLayout(DefaultLayout):
                             text=_("Photo Album"),
                             url=self.request.link(
                                 self.model,
-                                name='neu'
+                                name='new'
                             ),
                             attrs={'class': 'new-photo-album'}
                         )
@@ -1499,14 +1499,14 @@ class ImageSetLayout(DefaultLayout):
             return [
                 Link(
                     text=_("Choose images"),
-                    url=self.request.link(self.model, 'auswahl'),
+                    url=self.request.link(self.model, 'select'),
                     attrs={'class': 'select'}
                 ),
                 Link(
                     text=_("Edit"),
                     url=self.request.link(
                         self.model,
-                        name='bearbeiten'
+                        name='edit'
                     ),
                     attrs={'class': 'edit-link'}
                 ),
@@ -1566,7 +1566,7 @@ class UserManagementLayout(DefaultLayout):
                         Link(
                             text=_("User"),
                             url=self.request.class_link(
-                                UserCollection, name='neu'
+                                UserCollection, name='new'
                             ),
                             attrs={'class': 'new-user'}
                         ),
@@ -1593,7 +1593,7 @@ class UserLayout(DefaultLayout):
             return [
                 Link(
                     text=_("Edit"),
-                    url=self.request.link(self.model, 'bearbeiten'),
+                    url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-link'}
                 ),
             ]

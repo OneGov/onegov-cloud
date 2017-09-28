@@ -44,7 +44,7 @@ def handle_login(self, request, form):
                 redirected_to_userprofile = True
 
                 self.to = request.return_to(
-                    '/benutzerprofil',
+                    '/userprofile',
                     self.to
                 )
 

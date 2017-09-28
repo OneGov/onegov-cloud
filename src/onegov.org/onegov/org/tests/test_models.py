@@ -236,7 +236,7 @@ def test_sitecollection(org_app):
     }
 
     assert {o.name for o in objects['news']} == {
-        'aktuelles',
+        'news',
         'wir-haben-eine-neue-webseite'
     }
 

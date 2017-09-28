@@ -48,10 +48,11 @@ pages:
         erreichen ist.
   - title: Aktuelles
     type: news
+    name: news
     meta:
       trait: news
   - title: Wir haben eine neue Webseite!
-    parent: aktuelles
+    parent: news
     type: news
     meta:
       trait: news
@@ -104,11 +105,11 @@ organisation:
         <column span="4">
           <panel>
             <links title="Dienstleistungen">
-              <link url="./formulare"
+              <link url="./forms"
                     description="Anfragen &amp; Rückmeldungen">
                     Formulare
               </link>
-              <link url="./ressourcen"
+              <link url="./resources"
                     description="Räume &amp; Tageskarten">
                     Reservationen
               </link>
@@ -121,11 +122,11 @@ organisation:
 
           <panel>
             <links title="Verzeichnisse">
-              <link url="./personen"
+              <link url="./people"
                     description="Alle Kontakte">
                 Personen
               </link>
-              <link url="./fotoalben"
+              <link url="./photoalbums"
                     description="Impressionen">
                 Fotoalben
               </link>

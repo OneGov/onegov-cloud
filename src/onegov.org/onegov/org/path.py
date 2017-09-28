@@ -83,35 +83,40 @@ def get_user(app, id):
 
 @OrgApp.path(
     model=UserCollection,
-    path='/benutzerverwaltung',
+    path='/usermanagement',
     converters=dict(active=[bool], role=[str])
 )
 def get_users(app, active=None, role=None):
     return UserCollection(app.session(), active=active, role=role)
 
 
-@OrgApp.path(model=Topic, path='/themen', absorb=True)
+@OrgApp.path(model=Topic, path='/topics', absorb=True)
 def get_topic(app, absorb):
     return PageCollection(app.session()).by_path(absorb, ensure_type='topic')
 
 
-@OrgApp.path(model=News, path='/aktuelles', absorb=True)
+@OrgApp.path(model=News, path='/news', absorb=True)
 def get_news(app, absorb):
-    absorb = '/{}/{}'.format('aktuelles', absorb)
-    return PageCollection(app.session()).by_path(absorb, ensure_type='news')
+    pages = PageCollection(app.session())
+
+    old_path = '/{}/{}'.format('aktuelles', absorb)
+    new_path = '/{}/{}'.format('news', absorb)
+
+    return pages.by_path(new_path, ensure_type='news')\
+        or pages.by_path(old_path, ensure_type='news')
 
 
-@OrgApp.path(model=GeneralFileCollection, path='/dateien')
+@OrgApp.path(model=GeneralFileCollection, path='/files')
 def get_files(app):
     return GeneralFileCollection(app.session())
 
 
-@OrgApp.path(model=ImageFileCollection, path='/bilder')
+@OrgApp.path(model=ImageFileCollection, path='/images')
 def get_images(app):
     return ImageFileCollection(app.session())
 
 
-@OrgApp.path(model=ExportCollection, path='/exporte')
+@OrgApp.path(model=ExportCollection, path='/exports')
 def get_exports(request, app):
     return ExportCollection(app)
 
@@ -121,24 +126,24 @@ def get_export(request, app, id):
     return ExportCollection(app).by_id(id)
 
 
-@OrgApp.path(model=FormCollection, path='/formulare')
+@OrgApp.path(model=FormCollection, path='/forms')
 def get_forms(app):
     return FormCollection(app.session())
 
 
-@OrgApp.path(model=FormDefinition, path='/formular/{name}')
+@OrgApp.path(model=FormDefinition, path='/form/{name}')
 def get_form(app, name):
     return FormCollection(app.session()).definitions.by_name(name)
 
 
-@OrgApp.path(model=PendingFormSubmission, path='/formular-eingabe/{id}',
+@OrgApp.path(model=PendingFormSubmission, path='/form-preview/{id}',
              converters=dict(id=UUID))
 def get_pending_form_submission(app, id):
     return FormCollection(app.session()).submissions.by_id(
         id, state='pending', current_only=True)
 
 
-@OrgApp.path(model=CompleteFormSubmission, path='/formular-eingang/{id}',
+@OrgApp.path(model=CompleteFormSubmission, path='/form-submission/{id}',
              converters=dict(id=UUID))
 def get_complete_form_submission(app, id):
     return FormCollection(app.session()).submissions.by_id(
@@ -185,7 +190,7 @@ def get_editor(app, action, trait, page_id):
         return Editor(action=action, page=page, trait=trait)
 
 
-@OrgApp.path(model=PersonCollection, path='/personen')
+@OrgApp.path(model=PersonCollection, path='/people')
 def get_people(app):
     return PersonCollection(app.session())
 
@@ -223,12 +228,12 @@ def get_ticket_note(app, id):
     return MessageCollection(app.session(), type='ticket_note').by_id(id)
 
 
-@OrgApp.path(model=ResourceCollection, path='/ressourcen')
+@OrgApp.path(model=ResourceCollection, path='/resources')
 def get_resources(app):
     return app.libres_resources
 
 
-@OrgApp.path(model=Resource, path='/ressource/{name}', converters=dict(
+@OrgApp.path(model=Resource, path='/resource/{name}', converters=dict(
              date=date, highlights_min=int, highlights_max=int))
 def get_resource(app, name, date=None, view='agendaWeek',
                  highlights_min=None, highlights_max=None):
@@ -244,7 +249,7 @@ def get_resource(app, name, date=None, view='agendaWeek',
     return resource
 
 
-@OrgApp.path(model=Allocation, path='/einteilung/{resource}/{id}',
+@OrgApp.path(model=Allocation, path='/allocation/{resource}/{id}',
              converters=dict(resource=UUID))
 def get_allocation(app, resource, id):
     resource = app.libres_resources.by_id(resource)
@@ -334,29 +339,29 @@ def get_resource_move(app, key, subject, direction, target):
             session, resource, subject, target, direction)
 
 
-@OrgApp.path(model=OccurrenceCollection, path='/veranstaltungen',
+@OrgApp.path(model=OccurrenceCollection, path='/events',
              converters=dict(start=extended_date_converter,
                              end=extended_date_converter, tags=[]))
 def get_occurrences(app, page=0, start=None, end=None, tags=None):
     return OccurrenceCollection(app.session(), page, start, end, tags)
 
 
-@OrgApp.path(model=Occurrence, path='/veranstaltung/{name}')
+@OrgApp.path(model=Occurrence, path='/event/{name}')
 def get_occurrence(app, name):
     return OccurrenceCollection(app.session()).by_name(name)
 
 
-@OrgApp.path(model=EventCollection, path='/events')
+@OrgApp.path(model=EventCollection, path='/event-manager')
 def get_events(app, page=0, state='published'):
     return EventCollection(app.session(), page, state)
 
 
-@OrgApp.path(model=Event, path='/event/{name}')
+@OrgApp.path(model=Event, path='/event-management/{name}')
 def get_event(app, name):
     return EventCollection(app.session()).by_name(name)
 
 
-@OrgApp.path(model=Search, path='/suche')
+@OrgApp.path(model=Search, path='/search')
 def get_search(request, q='', page=0):
     return Search(request, q, page)
 
@@ -376,7 +381,7 @@ def get_newsletter(app, name):
     return get_newsletters(app).by_name(name)
 
 
-@OrgApp.path(model=RecipientCollection, path='/abonnenten')
+@OrgApp.path(model=RecipientCollection, path='/subscribers')
 def get_newsletter_recipients(app):
     return RecipientCollection(app.session())
 
@@ -388,36 +393,36 @@ def get_subscription(app, recipient_id, token):
     return recipient and Subscription(recipient, token)
 
 
-@OrgApp.path(model=LegacyFile, path='/datei/{filename}')
+@OrgApp.path(model=LegacyFile, path='/file/{filename}')
 def get_legacy_file(app, filename):
     return LegacyFileCollection(app).get_file_by_filename(filename)
 
 
-@OrgApp.path(model=LegacyImage, path='/bild/{filename}')
+@OrgApp.path(model=LegacyImage, path='/image/{filename}')
 def get_image(app, filename):
     return LegacyImageCollection(app).get_file_by_filename(filename)
 
 
-@OrgApp.path(model=ImageSetCollection, path='/fotoalben')
+@OrgApp.path(model=ImageSetCollection, path='/photoalbums')
 def get_image_sets(app):
     return ImageSetCollection(app.session())
 
 
-@OrgApp.path(model=ImageSet, path='/fotoalbum/{id}')
+@OrgApp.path(model=ImageSet, path='/photoalbum/{id}')
 def get_image_set(app, id):
     return ImageSetCollection(app.session()).by_id(id)
 
 
 @OrgApp.path(
     model=ResourceRecipientCollection,
-    path='/ressourcen-empfang')
+    path='/ressource-recipients')
 def get_resource_recipient_collection(app):
     return ResourceRecipientCollection(app.session())
 
 
 @OrgApp.path(
     model=ResourceRecipient,
-    path='/ressourcen-empfaenger/{id}',
+    path='/ressource-recipient/{id}',
     converters=dict(id=UUID))
 def get_resource_recipient(app, id):
     return ResourceRecipientCollection(app.session()).by_id(id)
@@ -425,7 +430,7 @@ def get_resource_recipient(app, id):
 
 @OrgApp.path(
     model=PaymentProviderCollection,
-    path='/zahlungsanbieter')
+    path='/payment-provider')
 def get_payment_provider_collection(app):
     if app.payment_providers_enabled:
         return PaymentProviderCollection(app.session())
@@ -433,7 +438,7 @@ def get_payment_provider_collection(app):
 
 @OrgApp.path(
     model=PaymentProvider,
-    path='/zahlungsanbieter-eintrag/{id}',
+    path='/payment-provider-entry/{id}',
     converters=dict(id=UUID))
 def get_payment_provider(app, id):
     if app.payment_providers_enabled:
@@ -442,7 +447,7 @@ def get_payment_provider(app, id):
 
 @OrgApp.path(
     model=Payment,
-    path='/zahlung/{id}',
+    path='/payment/{id}',
     converters=dict(id=UUID))
 def get_payment(app, id):
     return PaymentCollection(app.session()).by_id(id)
@@ -450,7 +455,7 @@ def get_payment(app, id):
 
 @OrgApp.path(
     model=PaymentCollection,
-    path='/zahlungen')
+    path='/payments')
 def get_payments(app, source='*', page=0):
     return PaymentCollection(app.session(), source, page)
 

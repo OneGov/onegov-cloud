@@ -12,6 +12,18 @@ from onegov.user import User
 from pytest_localserver.http import WSGIServer
 
 
+@pytest.fixture(scope="session", autouse=True)
+def import_scan():
+    """ Scans all the onegov.* sources to make sure that the tables are
+    created.
+
+    """
+
+    import importscan
+    import onegov
+    importscan.scan(onegov, ignore=['.test', '.tests'])
+
+
 @pytest.yield_fixture(scope='session')
 def handlers():
     yield onegov.ticket.handlers

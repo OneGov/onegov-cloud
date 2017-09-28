@@ -249,7 +249,7 @@ class ReservationHandler(Handler):
                 Link(
                     text=_("Accept all reservations"),
                     url=request.return_here(
-                        request.link(self.reservations[0], 'annehmen')
+                        request.link(self.reservations[0], 'accept')
                     ),
                     attrs={'class': 'accept-link'}
                 )
@@ -275,7 +275,7 @@ class ReservationHandler(Handler):
         advanced_links.append(Link(
             text=_("Reject all"),
             url=request.return_here(
-                request.link(self.reservations[0], 'absagen')
+                request.link(self.reservations[0], 'reject')
             ),
             attrs={'class': 'delete-link'},
             traits=(
@@ -292,7 +292,7 @@ class ReservationHandler(Handler):
         ))
 
         for reservation in self.reservations:
-            link = URL(request.link(reservation, 'absagen'))
+            link = URL(request.link(reservation, 'reject'))
             link = link.query_param('reservation-id', reservation.id)
             link = request.return_here(link.as_string())
 
@@ -398,7 +398,7 @@ class EventSubmissionHandler(Handler):
                 Link(
                     text=_('Edit event'),
                     url=request.return_here(
-                        request.link(self.event, 'bearbeiten')
+                        request.link(self.event, 'edit')
                     ),
                     attrs={'class': ('edit-link', 'border')}
                 ),
