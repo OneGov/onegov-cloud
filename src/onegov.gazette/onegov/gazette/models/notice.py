@@ -216,7 +216,7 @@ class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
 
     def overdue_issues(self, principal):
         """ Returns True, if any of the issue's deadline is reached. """
-        now = datetime.now()
+        now = datetime.utcnow()
         for issue in self.issues:
             issue = principal.issue(issue)
             if issue and (issue.deadline < now):
@@ -246,9 +246,7 @@ class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
         issues = [principal.issue(issue) for issue in issues]
         issues = sorted([issue.issue_date for issue in issues if issue])
         if issues:
-            self.first_issue = standardize_date(
-                as_datetime(issues[0]), 'Europe/Zurich'
-            )
+            self.first_issue = standardize_date(as_datetime(issues[0]), 'UTC')
 
 
 class GazetteNoticeChange(Message, CachedUserNameMixin):

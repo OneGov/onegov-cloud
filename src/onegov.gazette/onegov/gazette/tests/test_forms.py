@@ -173,9 +173,7 @@ def test_notice_form(session, principal):
     assert notice.category == 'Education'
     assert notice.text == 'A <b>notice</b>.'
     assert notice.issues == {'2017-44': None}
-    assert notice.first_issue == standardize_date(
-        datetime(2017, 11, 3), 'Europe/Zurich'
-    )
+    assert notice.first_issue == standardize_date(datetime(2017, 11, 3), 'UTC')
 
     # Test validation
     form = NoticeForm()

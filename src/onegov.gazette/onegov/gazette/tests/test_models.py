@@ -406,13 +406,13 @@ def test_gazette_notice_apply_meta(principal):
     assert notice.organization == 'State Chancellery'
     assert notice.category == 'Submissions'
     assert notice.first_issue == standardize_date(
-        datetime(2017, 11, 17), 'Europe/Zurich'
+        datetime(2017, 11, 17), 'UTC'
     )
 
     notice.issues = [str(Issue(2017, 46)), str(Issue(2017, 40))]
     notice.apply_meta(principal)
     assert notice.first_issue == standardize_date(
-        datetime(2017, 10, 6), 'Europe/Zurich'
+        datetime(2017, 10, 6), 'UTC'
     )
 
 

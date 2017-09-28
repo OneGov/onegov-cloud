@@ -207,7 +207,7 @@ def view_notices_statistics_xlsx(self, request):
     response.content_disposition = 'inline; filename={}-{}-{}.xlsx'.format(
         request.translate(_("Statistics")).lower(),
         normalize_for_url(request.translate(TRANSLATIONS.get(self.state, ''))),
-        datetime.now().strftime('%Y%m%d%H%M')
+        datetime.utcnow().strftime('%Y%m%d%H%M')
     )
     response.body = output.read()
 

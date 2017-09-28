@@ -19,6 +19,8 @@ Changelog
 - Fixes dashboard warnings.
   [msom]
 
+- Assume issue dates and times to be UTC.
+  [msom]
 
 1.4.1 (2017-09-22)
 ~~~~~~~~~~~~~~~~~~~

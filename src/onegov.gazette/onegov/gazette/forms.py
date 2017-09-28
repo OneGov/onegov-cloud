@@ -145,7 +145,7 @@ class NoticeForm(Form):
         self.issues.choices = []
         layout = Layout(None, self.request)
         today = date.today()
-        now = datetime.now()
+        now = datetime.utcnow()
         publisher = self.request.is_private(self.model)
         for issue_date, issue in principal.issues_by_date.items():
             deadline = principal.issues[issue.year][issue.number].deadline

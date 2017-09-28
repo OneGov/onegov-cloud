@@ -64,7 +64,7 @@ def view_dashboard(self, request):
 
     # drafted
     drafted = collection.for_state('drafted').query().all()
-    now = datetime.now()
+    now = datetime.utcnow()
     limit = now + timedelta(days=2)
     past_issues_selected = False
     deadline_reached_soon = False

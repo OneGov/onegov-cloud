@@ -54,13 +54,15 @@ class Principal(object):
         categories=None,
         issues=None,
         publish_to='',
-        publish_from=''
+        publish_from='',
+        time_zone='Europe/Zurich'
     ):
         self.name = name
         self.logo = logo
         self.color = color
         self.publish_to = publish_to
         self.publish_from = publish_from
+        self.time_zone = time_zone
 
         # We want the organizations and categories in the order defined in the
         # YAML file and accessible by key
@@ -108,7 +110,7 @@ class Principal(object):
     def current_issue(self):
         """ Returns the next issue with the nearest deadline. """
 
-        now = datetime.now()
+        now = datetime.utcnow()
         issues = [
             issue for deadline, issue in self.issues_by_deadline.items()
             if deadline > now

@@ -9,6 +9,8 @@ from onegov.gazette.models import Principal
 from onegov.user import Auth
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
+from sedate import standardize_date
+from sedate import to_timezone
 
 
 class Layout(ChameleonLayout):
@@ -189,7 +191,13 @@ class Layout(ChameleonLayout):
 
         dates = self.principal.issue(issue)
         if dates:
-            return self.format_date(dates.deadline, date_format)
+            return self.format_date(
+                to_timezone(
+                    standardize_date(dates.deadline, 'UTC'),
+                    self.principal.time_zone
+                ),
+                date_format
+            )
 
         return '?'
 

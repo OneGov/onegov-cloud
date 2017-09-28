@@ -109,6 +109,6 @@ def test_layout_format(session, principal):
     assert layout.format_deadline('2015-1') == '?'
     assert layout.format_deadline(Issue(2015, 1)) == '?'
     assert layout.format_deadline(Issue(2017, 41)) == \
-        'Mittwoch 11.10.2017 12:00'
-    assert layout.format_deadline('2017-41') == 'Mittwoch 11.10.2017 12:00'
-    assert layout.format_deadline('2017-41', date_format='time') == '12:00'
+        'Mittwoch 11.10.2017 14:00'  # MESZ
+    assert layout.format_deadline('2017-41') == 'Mittwoch 11.10.2017 14:00'
+    assert layout.format_deadline('2017-41', date_format='time') == '14:00'

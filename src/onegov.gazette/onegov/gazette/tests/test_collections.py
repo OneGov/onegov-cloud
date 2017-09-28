@@ -51,7 +51,7 @@ def test_notice_collection(session, principal):
     assert notice.category == 'Education'
     assert notice.issues == {'2017-46': None, '2017-47': None}
     assert notice.first_issue == standardize_date(
-        datetime(2017, 11, 17), 'Europe/Zurich'
+        datetime(2017, 11, 17), 'UTC'
     )
     assert notice.user == user
     assert notice.changes.one().event == 'created'
@@ -66,7 +66,7 @@ def test_notice_collection(session, principal):
     assert notice.category == 'Commercial Register'
     assert notice.issues == {'2017-47': None, '2017-48': None}
     assert notice.first_issue == standardize_date(
-        datetime(2017, 11, 24), 'Europe/Zurich'
+        datetime(2017, 11, 24), 'UTC'
     )
     assert notice.user == user
     assert notice.changes.one().event == 'created'
