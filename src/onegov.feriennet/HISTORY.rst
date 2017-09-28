@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds compatibility with latest onegov.org release.
+  [href]
+
 - Switches to onegov.search's automatic language detection.
   [href]
 

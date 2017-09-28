@@ -31,7 +31,7 @@ def get_delete_link(page, index=0):
 
 
 def fill_out_profile(client, first_name="Scrooge", last_name="McDuck"):
-    profile = client.get('/benutzerprofil')
+    profile = client.get('/userprofile')
     profile.form['salutation'] = 'mr'
     profile.form['first_name'] = first_name
     profile.form['last_name'] = last_name
@@ -217,35 +217,35 @@ def test_activity_search(es_feriennet_app):
 
     # in preview, activities can't be found
     es_feriennet_app.es_client.indices.refresh(index='_all')
-    assert 'search-result-vacation' not in admin.get('/suche?q=Learn')
-    assert 'search-result-vacation' not in editor.get('/suche?q=Learn')
-    assert 'search-result-vacation' not in anon.get('/suche?q=Learn')
+    assert 'search-result-vacation' not in admin.get('/search?q=Learn')
+    assert 'search-result-vacation' not in editor.get('/search?q=Learn')
+    assert 'search-result-vacation' not in anon.get('/search?q=Learn')
 
     editor.post(get_post_url(editor.get(url), 'request-publication'))
 
     # once proposed, activities can be found by the admin only
     es_feriennet_app.es_client.indices.refresh(index='_all')
-    assert 'search-result-vacation' in admin.get('/suche?q=Learn')
-    assert 'search-result-vacation' not in editor.get('/suche?q=Learn')
-    assert 'search-result-vacation' not in anon.get('/suche?q=Learn')
+    assert 'search-result-vacation' in admin.get('/search?q=Learn')
+    assert 'search-result-vacation' not in editor.get('/search?q=Learn')
+    assert 'search-result-vacation' not in anon.get('/search?q=Learn')
 
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
     admin.post(get_post_url(ticket, 'accept-activity'))
 
     # once accepted, activities can be found by anyone
     es_feriennet_app.es_client.indices.refresh(index='_all')
-    assert 'search-result-vacation' in admin.get('/suche?q=Learn')
-    assert 'search-result-vacation' in editor.get('/suche?q=Learn')
-    assert 'search-result-vacation' in anon.get('/suche?q=Learn')
+    assert 'search-result-vacation' in admin.get('/search?q=Learn')
+    assert 'search-result-vacation' in editor.get('/search?q=Learn')
+    assert 'search-result-vacation' in anon.get('/search?q=Learn')
 
     ticket = admin.get(ticket.request.url)
     admin.post(get_post_url(ticket, 'archive-activity'))
 
     # archived the search will fail again, except for admins
     es_feriennet_app.es_client.indices.refresh(index='_all')
-    assert 'search-result-vacation' in admin.get('/suche?q=Learn')
-    assert 'search-result-vacation' not in editor.get('/suche?q=Learn')
-    assert 'search-result-vacation' not in anon.get('/suche?q=Learn')
+    assert 'search-result-vacation' in admin.get('/search?q=Learn')
+    assert 'search-result-vacation' not in editor.get('/search?q=Learn')
+    assert 'search-result-vacation' not in anon.get('/search?q=Learn')
 
 
 def test_activity_filter_tags(feriennet_app):
@@ -1864,7 +1864,7 @@ def test_occasion_attendance_collection(feriennet_app):
     assert "Mike" in page
 
     # if the emergency info is given, it is shown
-    page = admin.get('/benutzerprofil')
+    page = admin.get('/userprofile')
     page.form['salutation'] = 'mr'
     page.form['first_name'] = 'foo'
     page.form['last_name'] = 'bar'

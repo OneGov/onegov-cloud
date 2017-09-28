@@ -9,7 +9,7 @@
                     You haven't added an emergency contact to your profile yet.
                     Please add this information in your userprofile so we can reach you in an emergency!
                 </div>
-                <a i18n:translate href="${request.return_here(request.link(request.app.org, 'benutzerprofil'))}">Add in Userprofile</a>
+                <a i18n:translate href="${request.return_here(request.link(request.app.org, 'userprofile'))}">Add in Userprofile</a>
             </div>
             <div class="emergency-contact" tal:condition="has_emergency_contact">
                 <div i18n:translate>
@@ -18,7 +18,7 @@
                 <div>
                     <strong>${user.data.emergency}</strong>
                 </div>
-                <a i18n:translate href="${request.return_here(request.link(request.app.org, 'benutzerprofil'))}">Change in Userprofile</a>
+                <a i18n:translate href="${request.return_here(request.link(request.app.org, 'userprofile'))}">Change in Userprofile</a>
             </div>
         </tal:block>
 

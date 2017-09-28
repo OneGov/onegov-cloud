@@ -14,7 +14,7 @@ class RegistrationWidget(object):
                 </a>
             </div>
             <div tal:condition="request.is_logged_in" class="register">
-                <a href="./benutzerprofil" class="button secondary">
+                <a href="./userprofile" class="button secondary">
                     ${profile_text}
                 </a>
             </div>

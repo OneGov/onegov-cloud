@@ -6,7 +6,7 @@ from onegov.org.views.userprofile import handle_user_profile
 
 
 @FeriennetApp.form(
-    model=Organisation, name='benutzerprofil', template='userprofile.pt',
+    model=Organisation, name='userprofile', template='userprofile.pt',
     permission=Personal, form=UserProfileForm)
 def handle_custom_user_profile(self, request, form):
     return handle_user_profile(self, request, form)
