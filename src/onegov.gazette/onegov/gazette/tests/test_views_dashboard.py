@@ -79,6 +79,10 @@ def test_view_dashboard(gazette_app):
         assert (
             "Sie haben Meldungen in Arbeit mit vergangenen Ausgaben."
         ) in manage
+        assert (
+            "Sie haben Meldungenen in Arbeit, für welche der "
+            "Eingabeschluss bald erreicht ist."
+        ) not in manage
 
         # edit notice
         manage = editor_1.get('/notice/erneuerungswahlen').click("Bearbeiten")

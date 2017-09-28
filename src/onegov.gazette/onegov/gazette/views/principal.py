@@ -71,8 +71,10 @@ def view_dashboard(self, request):
     for notice in drafted:
         for issue in notice.issues:
             deadline = self.issue(issue).deadline
-            past_issues_selected = past_issues_selected or deadline < now
-            deadline_reached_soon = deadline_reached_soon or deadline < limit
+            if deadline < now:
+                past_issues_selected = True
+            elif deadline < limit:
+                deadline_reached_soon = True
     if past_issues_selected:
         request.message(
             _("You have drafted messages with past issues."),
