@@ -27,8 +27,13 @@ def create_new_organisation(app, name, reply_to=None, forms=None,
     org.meta['locales'] = locale
     session.add(org)
 
+    form_locales = {
+        'de_CH': 'forms/builtin/de',
+        'fr_CH': 'forms/builtin/fr',
+    }
+
     forms = forms or builtin_form_definitions(
-        module_path('onegov.town', 'forms/builtin'))
+        module_path('onegov.town', form_locales[locale]))
 
     translator = app.translations.get(locale)
 
