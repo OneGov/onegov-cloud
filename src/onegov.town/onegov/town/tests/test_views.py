@@ -14,36 +14,36 @@ def test_startpage(town_app):
     links = client.get('/').pyquery('.top-bar-section a')
 
     assert links[0].text.strip('\n ') == 'Leben & Wohnen'
-    assert links[0].attrib.get('href').endswith('/themen/leben-wohnen')
+    assert links[0].attrib.get('href').endswith('/topics/leben-wohnen')
 
     assert links[1].text.strip('\n ') == 'Bildung & Gesellschaft'
-    assert links[1].attrib.get('href').endswith('/themen/bildung-gesellschaft')
+    assert links[1].attrib.get('href').endswith('/topics/bildung-gesellschaft')
 
     assert links[2].text.strip('\n ') == 'Politik & Verwaltung'
-    assert links[2].attrib.get('href').endswith('/themen/politik-verwaltung')
+    assert links[2].attrib.get('href').endswith('/topics/politik-verwaltung')
 
     assert links[3].text.strip('\n ') == 'Freizeit & Tourismus'
-    assert links[3].attrib.get('href').endswith('/themen/freizeit-tourismus')
+    assert links[3].attrib.get('href').endswith('/topics/freizeit-tourismus')
 
     assert links[4].text.strip('\n ') == 'Porträt & Wirtschaft'
-    assert links[4].attrib.get('href').endswith('/themen/portraet-wirtschaft')
+    assert links[4].attrib.get('href').endswith('/topics/portraet-wirtschaft')
 
     links = client.get('/').pyquery('.homepage-tiles a')
 
     assert links[0].find('h3').text.strip('\n ') == 'Leben & Wohnen'
-    assert links[0].attrib.get('href').endswith('/themen/leben-wohnen')
+    assert links[0].attrib.get('href').endswith('/topics/leben-wohnen')
 
     assert links[1].find('h3').text.strip('\n ') == 'Bildung & Gesellschaft'
-    assert links[1].attrib.get('href').endswith('/themen/bildung-gesellschaft')
+    assert links[1].attrib.get('href').endswith('/topics/bildung-gesellschaft')
 
     assert links[2].find('h3').text.strip('\n ') == 'Politik & Verwaltung'
-    assert links[2].attrib.get('href').endswith('/themen/politik-verwaltung')
+    assert links[2].attrib.get('href').endswith('/topics/politik-verwaltung')
 
     assert links[3].find('h3').text.strip('\n ') == 'Freizeit & Tourismus'
-    assert links[3].attrib.get('href').endswith('/themen/freizeit-tourismus')
+    assert links[3].attrib.get('href').endswith('/topics/freizeit-tourismus')
 
     assert links[4].find('h3').text.strip('\n ') == 'Porträt & Wirtschaft'
-    assert links[4].attrib.get('href').endswith('/themen/portraet-wirtschaft')
+    assert links[4].attrib.get('href').endswith('/topics/portraet-wirtschaft')
 
 
 def test_view_occurrences_on_startpage(town_app):
@@ -65,7 +65,7 @@ def test_pages_on_homepage(es_town_app):
     client.skip_first_form = True
     client.login_editor()
 
-    new_page = client.get('/themen/bildung-gesellschaft').click('Thema')
+    new_page = client.get('/topics/bildung-gesellschaft').click('Thema')
     new_page.form['title'] = "0xdeadbeef"
     new_page = new_page.form.submit().follow()
 
