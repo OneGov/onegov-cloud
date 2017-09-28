@@ -151,9 +151,9 @@ def test_view_notice_actions(gazette_app):
 
         # ... when drafted
         check((
-            (publisher, 'titel-1', 'p'),
-            (publisher, 'titel-2', 'p'),
-            (publisher, 'titel-3', 'p'),
+            (publisher, 'titel-1', 'peds'),
+            (publisher, 'titel-2', 'peds'),
+            (publisher, 'titel-3', 'peds'),
             (publisher, 'titel-4', 'peds'),
             (editor_1, 'titel-1', 'peds'),
             (editor_1, 'titel-2', 'peds'),
@@ -201,9 +201,9 @@ def test_view_notice_actions(gazette_app):
         reject_notice(publisher, 'titel-4')
 
         check((
-            (publisher, 'titel-1', 'p'),
-            (publisher, 'titel-2', 'p'),
-            (publisher, 'titel-3', 'p'),
+            (publisher, 'titel-1', 'peds'),
+            (publisher, 'titel-2', 'peds'),
+            (publisher, 'titel-3', 'peds'),
             (publisher, 'titel-4', 'peds'),
             (editor_1, 'titel-1', 'peds'),
             (editor_1, 'titel-2', 'peds'),

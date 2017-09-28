@@ -32,44 +32,35 @@ def view_notice(self, request):
 
     actions = []
 
-    if request.is_personal(self):
-        user_ids, group_ids = get_user_and_group(request)
-        if (self.group_id in group_ids) or (self.user_id in user_ids):
-            if self.state == 'drafted' or self.state == 'rejected':
+    user_ids, group_ids = get_user_and_group(request)
+    editor = request.is_personal(self)
+    publisher = request.is_private(self)
+    owner = self.user_id in user_ids
+    same_group = self.group_id in group_ids
 
-                actions.append((
-                    _("Submit"),
-                    request.link(self, 'submit'),
-                    'primary',
-                    '_self'
-                ))
-                actions.append((
-                    _("Edit"),
-                    request.link(self, 'edit'),
-                    'secondary',
-                    '_self'
-                ))
-                actions.append((
-                    _("Delete"),
-                    request.link(self, 'delete'),
-                    'alert right',
-                    '_self'
-                ))
-        if self.state == 'accepted':
+    if self.state == 'drafted' or self.state == 'rejected':
+        if publisher or (editor and (same_group or owner)):
             actions.append((
-                _("Copy"),
-                request.link(
-                    GazetteNoticeCollection(
-                        request.app.session(),
-                        state=self.state,
-                        source=self.id
-                    ), name='new-notice'
-                ),
+                _("Submit"),
+                request.link(self, 'submit'),
+                'primary',
+                '_self'
+            ))
+            actions.append((
+                _("Edit"),
+                request.link(self, 'edit'),
                 'secondary',
                 '_self'
             ))
-    if request.is_private(self):
-        if self.state == 'submitted':
+            actions.append((
+                _("Delete"),
+                request.link(self, 'delete'),
+                'alert right',
+                '_self'
+            ))
+
+    if self.state == 'submitted':
+        if publisher:
             actions.append((
                 _("Accept"),
                 request.link(self, 'accept'),
@@ -88,6 +79,21 @@ def view_notice(self, request):
                 'alert right',
                 '_self'
             ))
+
+    if self.state == 'accepted':
+        actions.append((
+            _("Copy"),
+            request.link(
+                GazetteNoticeCollection(
+                    request.app.session(),
+                    state=self.state,
+                    source=self.id
+                ), name='new-notice'
+            ),
+            'secondary',
+            '_self'
+        ))
+
     actions.append((
         _("Preview"),
         request.link(self, 'preview'),

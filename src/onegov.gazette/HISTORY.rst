@@ -4,6 +4,9 @@ Changelog
 - Uses warnings instead of callouts in forms.
   [msom]
 
+- Allows the publisher to edit, submit and delete any notice.
+  [msom]
+
 1.4.1 (2017-09-22)
 ~~~~~~~~~~~~~~~~~~~
 
