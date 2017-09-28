@@ -111,13 +111,13 @@ def delete_group(self, request, form):
     if self.official_notices:
         request.message(
             _("There are official notices linked to this group!"),
-            "warning"
+            'warning'
         )
 
     if self.users.count():
         request.message(
             _('Only groups without users may be deleted.'),
-            "error"
+            'alert'
         )
         return {
             'layout': layout,

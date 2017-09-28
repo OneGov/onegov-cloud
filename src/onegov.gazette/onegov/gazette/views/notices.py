@@ -236,7 +236,7 @@ def view_notices_update(self, request, form):
     if form.submitted(request):
         for notice in self.query():
             notice.apply_meta(principal)
-        request.message(_("Notices updated."), "success")
+        request.message(_("Notices updated."), 'success')
 
         return redirect(layout.manage_notices_link)
 
