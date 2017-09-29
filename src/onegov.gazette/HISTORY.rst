@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.5.0 (2017-09-29)
+~~~~~~~~~~~~~~~~~~~
 
 - Allows publishers to edit, submit and delete any notice.
   [msom]
