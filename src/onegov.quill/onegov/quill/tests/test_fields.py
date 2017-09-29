@@ -5,6 +5,11 @@ from onegov.quill.fields import QuillField
 def test_field_clean():
     form = Form()
 
+    field = QuillField(tags=[])
+    field = field.bind(form, 'html')
+    field.data = None
+    assert field.validate(form)
+
     test_data = """
         <h2>
             <span class="">A<strong>B</strong><b>C</b></span>

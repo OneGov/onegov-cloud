@@ -25,4 +25,4 @@ class QuillField(TextAreaField):
         self.cleaner = Cleaner(tags=tags, attributes={}, strip=True)
 
     def pre_validate(self, form):
-        self.data = self.cleaner.clean(self.data)
+        self.data = self.cleaner.clean(self.data or '')
