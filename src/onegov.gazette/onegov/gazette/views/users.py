@@ -26,10 +26,9 @@ def view_users(self, request):
     """
 
     layout = Layout(self, request)
-    roles = [
-        (_("Publishers"), self.for_filter(role='editor').query().all()),
-        (_("Editors"), self.for_filter(role='member').query().all())
-    ]
+    pub = self.for_filter(role='editor').query().order_by(User.username).all()
+    ed = self.for_filter(role='member').query().order_by(User.username).all()
+    roles = [(_("Publishers"), pub), (_("Editors"), ed)]
     return {
         'layout': layout,
         'roles': roles,

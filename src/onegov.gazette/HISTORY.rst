@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Orders the list of users by email.
+  [msom]
+
 1.5.0 (2017-09-29)
 ~~~~~~~~~~~~~~~~~~~
 
