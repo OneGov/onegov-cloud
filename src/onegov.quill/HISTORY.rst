@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.2.1 (2017-09-29)
+~~~~~~~~~~~~~~~~~~~~~
 
 - Adds compatibility with bleach 2.1.
   [msom]
