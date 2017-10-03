@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Updates Concordia's URLs.
+  [href]
+
 - Adds the ability to pay invoice items using Stripe.
   [href]
 

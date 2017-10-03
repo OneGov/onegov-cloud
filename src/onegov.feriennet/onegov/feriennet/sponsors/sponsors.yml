@@ -7,8 +7,8 @@
 # - The top parameter may be used to nudge up and down.
 
 - name: CONCORDIA
-  logo_url: 'https://www.concordia.ch/de/microsites/feriennet.html?source=logo'
-  mail_url: 'https://www.concordia.ch/de/microsites/feriennet.html?source=mail'
+  logo_url: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=logo\\|feriennet\\|0\\|0\\|fnet\\|de'
+  mail_url: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=mail\\|feriennet\\|0\\|0\\|fnet\\|de'
   logo: sponsors/concordia.svg
   background: '#fff'
   width: 200px
@@ -20,4 +20,4 @@
       # leaves a height of 210px. as the viewport grows smaller, the ratio is
       # kept while the banner shrinks
       src: sponsors/concordia-banner.jpg
-      url: 'https://www.concordia.ch/de/microsites/feriennet.html?source=banner'
+      url: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner\\|feriennet\\|0\\|0\\|fnet\\|de'
