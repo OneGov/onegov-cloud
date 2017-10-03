@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes booking confirmation dialogs showing the wrong times.
+  [href]
+
 - Updates Concordia's URLs.
   [href]
 

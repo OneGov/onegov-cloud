@@ -87,8 +87,8 @@ def get_booking_title(layout, booking):
     return "{} - {}".format(
         booking.occasion.activity.title,
         layout.format_datetime_range(
-            booking.occasion.dates[0].start,
-            booking.occasion.dates[0].end))
+            booking.occasion.dates[0].localized_start,
+            booking.occasion.dates[0].localized_end))
 
 
 def actions_by_booking(layout, period, booking):
