@@ -1,4 +1,5 @@
 from morepath import Identity
+from onegov.core.browser_session import BrowserSession
 from onegov.core.framework import Framework
 
 
@@ -40,3 +41,28 @@ def verify_identity(identity):
     # checking if the user is really in the database here - or if it was
     # removed in the meantime)
     return True
+
+
+def forget(app, session_id):
+    """ Clears the tokens associated with the identity from given browser
+    session.
+
+    """
+
+    session = BrowserSession(app.application_id, session_id, app.session_cache)
+    for key in IdentityPolicy.required_keys:
+        if session.has(key):
+            del session[key]
+
+
+def remembered(app, session_id):
+    """ Checks if tokens associated with the identity are stored for the given
+    browser session.
+
+    """
+    session = BrowserSession(app.application_id, session_id, app.session_cache)
+    for key in IdentityPolicy.required_keys:
+        if session.has(key):
+            return True
+
+    return False

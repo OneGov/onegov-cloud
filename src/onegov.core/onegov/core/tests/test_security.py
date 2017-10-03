@@ -3,6 +3,7 @@ import onegov.core.security
 
 from onegov.core.framework import Framework
 from onegov.core.security import Public, Personal, Private, Secret
+from onegov.core.security import forget, remembered
 from webtest import TestApp as Client
 
 
@@ -153,3 +154,28 @@ def test_secure_cookie():
 
     cookie = client.cookiejar._cookies['localhost.local']['/']['session_id']
     assert cookie.secure
+
+
+def test_forget():
+    app = spawn_basic_permissions_app()
+    client = Client(app)
+    response = client.post('/login', {'userid': 'user', 'role': 'admin'})
+
+    session_id = app.unsign(response.request.cookies['session_id'])
+    assert remembered(app, session_id)
+
+    assert client.get('/public').text == 'public'
+    assert client.get('/personal').text == 'personal'
+    assert client.get('/private').text == 'private'
+    assert client.get('/secret').text == 'secret'
+    assert client.get('/hidden').text == 'hidden'
+
+    forget(app, session_id)
+    assert not remembered(app, session_id)
+
+    assert client.get('/public').text == 'public'
+    assert client.get('/personal', expect_errors=True).status_code == 403
+    assert client.get('/private', expect_errors=True).status_code == 403
+    assert client.get('/secret', expect_errors=True).status_code == 403
+    assert client.get('/logout', expect_errors=True).status_code == 403
+    assert client.get('/hidden', expect_errors=True).status_code == 403

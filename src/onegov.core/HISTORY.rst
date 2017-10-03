@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds helper functions for identity management.
+  [msom]
+
 0.49.0 (2017-09-28)
 ~~~~~~~~~~~~~~~~~~~
 
@@ -25,10 +29,10 @@ Changelog
 ~~~~~~~~~~~~~~~~~~~
 
 - Adds generic associations to the ORM library.
-  
+
   See ``associable.py`` for more information. This feature should be
   considered experimental.
-  [href] 
+  [href]
 
 0.47.0 (2017-09-08)
 ~~~~~~~~~~~~~~~~~~~
