@@ -62,6 +62,9 @@
                                         </div>
                                     </tal:b>
                                 </tal:b>
+                                <tal:b case="default">
+                                    <metal:b use-macro="layout.macros['payment_link_fallback']" />
+                                </tal:b>
                             </tal:b>
                         </tal:b>
                     </td>

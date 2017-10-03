@@ -1002,3 +1002,8 @@
         <metal:b define-slot="actions" />
     </div>
 </metal:generic_message>
+
+
+<metal:payment_link_fallback define-macro="payment_link_fallback" i18n:domain="onegov.org">
+    <!--! pass -->
+</metal:payment_link_fallback>
