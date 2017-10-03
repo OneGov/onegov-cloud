@@ -1,5 +1,5 @@
 from onegov.activity import Booking, BookingCollection
-from onegov.activity import InvoiceItemCollection
+from onegov.activity import InvoiceItemCollection, InvoiceItem
 from onegov.activity import Occasion, OccasionCollection
 from onegov.activity import Period, PeriodCollection
 from onegov.activity import Attendee, AttendeeCollection
@@ -190,6 +190,13 @@ def get_my_invoies(request, app, username=None):
         username = request.current_username
 
     return InvoiceItemCollection(app.session(), username)
+
+
+@FeriennetApp.path(
+    model=InvoiceItem,
+    path='/invoice-item/{id}')
+def get_my_invoice_item(request, app, id):
+    return InvoiceItemCollection(app.session()).by_id(id)
 
 
 @FeriennetApp.path(

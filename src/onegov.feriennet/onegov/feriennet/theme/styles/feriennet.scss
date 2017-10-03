@@ -1292,7 +1292,7 @@ ul.tags {
         margin: .5rem .25rem .5rem .75rem;
     }
 
-    button {
+    > button {
         float: right;
         height: 40px;
         margin: 0;
@@ -1525,7 +1525,7 @@ ul.tags {
         font-family: $font-family-monospace;
     }
 
-    li.paid .item-amount:after {
+    li.paid .item-amount::after {
         @include icon('\f05d');
         color: $green-dark;
         font-weight: normal;
@@ -1533,12 +1533,17 @@ ul.tags {
         right: 33px;
     }
 
-    li.unpaid .item-amount:after {
+    li.unpaid .item-amount::after {
         @include icon('\f06a');
         color: $red-dark;
         font-weight: normal;
         position: absolute;
         right: 33px;
+    }
+
+    li.paid.stripe_connect .item-amount::after {
+        content: '\f09d';
+        font-size: .875rem;
     }
 }
 
@@ -1966,4 +1971,30 @@ ul.tags {
 */
 .message-period {
     background: $blue-pastel;
+}
+
+
+/*
+    Payment button
+*/
+.payment-button {
+    button.checkout-button {
+        background: $white;
+        border: 1px solid $oil;
+        border-radius: 2px;
+        color: $body-font-color;
+        margin: .5rem 0 -.5rem;
+        outline: none;
+
+        &:hover {
+            background: $white;
+            box-shadow: 1px 1px 2px $base;
+            outline: none;
+        }
+
+        &::before {
+            @include icon('\f09d');
+            margin-right: 1ex;
+        }
+    }
 }

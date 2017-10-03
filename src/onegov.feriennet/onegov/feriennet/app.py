@@ -43,6 +43,18 @@ class FeriennetApp(OrgApp):
 
         return p
 
+    @orm_cached(policy='on-table-change:periods')
+    def periods_by_id(self):
+        return {
+            p.id.hex: p for p in PeriodCollection(self.session()).query()
+        }
+
+    @orm_cached(policy='on-table-change:users')
+    def users_by_username(self):
+        return {
+            u.username: u for u in UserCollection(self.session()).query()
+        }
+
     @cached_property
     def sponsors(self):
         return load_sponsors(utils.module_path('onegov.feriennet', 'sponsors'))

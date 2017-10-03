@@ -6,6 +6,7 @@ from itertools import groupby
 from onegov.activity import Activity, Attendee, Booking, Occasion, InvoiceItem
 from onegov.activity import BookingCollection, InvoiceItemCollection
 from onegov.core.utils import normalize_for_url
+from onegov.pay import Price
 from onegov.user import User
 from sortedcontainers import SortedDict
 
@@ -50,6 +51,10 @@ class BillingDetails(object):
         }
 
         self.id = self.item_id(self.first)
+
+    @property
+    def price(self):
+        return Price(self.outstanding, 'CHF')
 
     @staticmethod
     def item_id(item):

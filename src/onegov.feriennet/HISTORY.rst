@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the ability to pay invoice items using Stripe.
+  [href]
+
 1.2.6 (2017-09-28)
 ~~~~~~~~~~~~~~~~~~~
 

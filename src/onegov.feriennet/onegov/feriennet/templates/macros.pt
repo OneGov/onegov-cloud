@@ -20,8 +20,8 @@
         new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
         j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-        })(window,document,'script','dataLayer','GTM-KM9K588');
-    /* eslint-enable */</script>
+        })(window,document,'script','dataLayer','GTM-KM9K588');/* eslint-enable */
+    </script>
 
 </metal:favicon>
 
@@ -512,3 +512,19 @@
         Your request has been completed.
     </p>
 </metal:ticket_status_page_message>
+
+
+<metal:payment_link_fallback define-macro="payment_link_fallback" i18n:domain="onegov.feriennet">
+    <tal:b switch="link.__tablename__">
+        <tal:b case="'invoice_items'">
+            <div tal:condition="repeat.link.start">
+                <a href="${request.link(link)}">
+                    <strong>${request.app.users_by_username[link.username].title}</strong>
+                </a>
+                <div>
+                    ${request.app.periods_by_id[link.invoice].title}
+                </div>
+            </div>
+        </tal:b>
+    </tal:b>
+</metal:payment_link_fallback>

@@ -6,7 +6,7 @@
     <div class="row">
         <div class="columns small-12 medium-8">
             <tal:block condition="not: bills" i18n:translate>No bills created yet.</tal:block>
-            
+
             <div class="bills" tal:condition="bills">
                 <div class="bill ${details.paid and 'paid' or 'unpaid'}" id="${details.id}" tal:repeat="(title, details) bills.items()">
                     <h3>${details.title}</h3>
@@ -29,7 +29,7 @@
                                 <li class="item-group">
                                     <strong>${group}</strong>
                                 </li>
-                                <li tal:repeat="item groupitems" class="${item.paid and 'paid' or 'unpaid'}">
+                                <li tal:repeat="item groupitems" class="${item.paid and 'paid' or 'unpaid'} ${item.source and item.source or ''}">
                                     <span class="item-text">${item.text}</span>
                                     <span class="item-amount" tal:content="'{:.2f}'.format(item.amount)"></span>
                                 </li>
@@ -39,6 +39,28 @@
                                 <strong class="item-amount" tal:content="'{:.2f}'.format(details.total)"></strong>
                             </li>
                         </ul>
+                    </div>
+
+                    <div class="invoice-items-payment" tal:condition="payment_provider and not details.paid">
+                        <div class="row">
+                            <div class="columns small-12">
+                                <h4 i18n:translate>Online Payment</h4>
+
+                                <div class="payment-button">
+                                    <tal:b metal:use-macro="layout.macros['checkout_form']"
+                                        tal:define="
+                                            payment_method 'cc';
+                                            checkout_button payment_button(details.title, details.price);
+                                            complete_link request.url;
+                                            price details.price;
+                                    ">
+                                        <tal:b metal:fill-slot="after-submit">
+                                            <input type="hidden" name="period" value="${details.first.invoice}">
+                                        </tal:b>
+                                    </tal:b>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="invoice-items-payment" tal:condition="account and not details.paid">
