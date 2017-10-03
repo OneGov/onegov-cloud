@@ -35,6 +35,7 @@ setup(
         'lxml',
         'onegov.core>=0.4.0',
         'onegov.search',
+        'onegov.pay',
         'onegov.user',
         'pyquery',
         'sedate',
