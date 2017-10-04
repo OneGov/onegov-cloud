@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.50.0 (2017-10-04)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds helper functions for identity management.
   [msom]
