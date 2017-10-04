@@ -5,7 +5,7 @@ import transaction
 from datetime import datetime, timedelta
 from onegov.core import Framework
 from onegov.core.utils import Bunch
-from more.itsdangerous import IdentityPolicy
+from onegov.core.security.identity_policy import IdentityPolicy
 from onegov.user import (
     Auth, is_valid_yubikey, is_valid_yubikey_format,
     UserCollection, yubikey_otp_to_serial
@@ -209,16 +209,22 @@ def test_auth_integration(session):
 
     response = client.get('/auth?username=AzureDiamond&password=hunter1')
     assert response.text == 'Error'
+    assert not UserCollection(session).by_username('AzureDiamond').sessions
 
     response = client.get('/auth?username=AzureDiamond&password=hunter2')
     assert response.status_code == 302
     assert response.location == 'http://localhost/go'
-    assert response.headers['Set-Cookie'].startswith('userid=azurediamond')
+    assert response.headers['Set-Cookie'].startswith('session_id')
+    session_id = app.unsign(response.request.cookies['session_id'])
+    user = UserCollection(session).by_username('AzureDiamond')
+    assert session_id in user.sessions
 
     response = client.get('/auth/logout')
     assert response.status_code == 302
     assert response.location == 'http://localhost/go'
-    assert response.headers['Set-Cookie'].startswith('userid=;')
+    assert response.headers['Set-Cookie'].startswith('session_id')
+    user = UserCollection(session).by_username('AzureDiamond')
+    assert not user.sessions
 
 
 def test_signup_token_data(session):

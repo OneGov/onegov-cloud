@@ -1,5 +1,21 @@
+from freezegun import freeze_time
 from onegov.user import User
 from onegov.user import UserGroup
+from unittest.mock import call
+from unittest.mock import patch
+
+
+class DummyBrowserSession():
+    def __init__(self, token):
+        self._token = token
+
+
+class DummyRequest():
+    def __init__(self, token):
+        self.client_addr = '127.0.0.1'
+        self.user_agent = 'Mozilla/5.0'
+        self.browser_session = DummyBrowserSession(token)
+        self.app = None
 
 
 def test_user_initials():
@@ -77,3 +93,114 @@ def test_polymorphism_group(session):
     assert session.query(UserGroup).count() == 3
     assert session.query(MyGroup).one().name == 'my'
     assert session.query(MyOtherGroup).one().name == 'other'
+
+
+def test_user_save_session():
+    user = User()
+    assert not user.sessions
+
+    with patch('onegov.user.models.user.remembered') as remembered:
+        remembered.return_value = True
+
+        with freeze_time('2016-09-01 12:00'):
+            user.save_current_session(DummyRequest('xxx'))
+
+        with freeze_time('2016-10-01 12:00'):
+            user.save_current_session(DummyRequest('yyy'))
+
+        assert user.sessions == {
+            'xxx': {
+                'address': '127.0.0.1',
+                'timestamp': '2016-09-01T12:00:00',
+                'agent': 'Mozilla/5.0'
+            },
+            'yyy': {
+                'address': '127.0.0.1',
+                'timestamp': '2016-10-01T12:00:00',
+                'agent': 'Mozilla/5.0'
+            }
+        }
+
+
+def test_user_remove_session():
+    user = User()
+    assert not user.sessions
+
+    with patch('onegov.user.models.user.remembered') as remembered:
+        remembered.return_value = True
+
+        user.save_current_session(DummyRequest('xxx'))
+        user.save_current_session(DummyRequest('yyy'))
+        assert 'xxx' in user.sessions
+        assert 'yyy' in user.sessions
+
+        user.remove_current_session(DummyRequest('xxx'))
+        assert 'xxx' not in user.sessions
+        assert 'yyy' in user.sessions
+
+
+def test_user_logout_all_sessions():
+    user = User()
+    assert not user.sessions
+
+    with patch('onegov.user.models.user.remembered') as remembered:
+        with patch('onegov.user.models.user.forget') as forget:
+            remembered.return_value = True
+
+            user.save_current_session(DummyRequest('xxx'))
+            user.save_current_session(DummyRequest('yyy'))
+            assert 'xxx' in user.sessions
+            assert 'yyy' in user.sessions
+
+            user.logout_all_sessions(DummyRequest('zzz'))
+            assert forget.mock_calls == [call(None, 'xxx'), call(None, 'yyy')]
+
+
+def test_user_cleanup_sessions():
+    user = User()
+    assert not user.sessions
+
+    with patch('onegov.user.models.user.remembered') as remembered:
+        with patch('onegov.user.models.user.forget'):
+            # ... implicit
+            remembered.return_value = True
+            user.save_current_session(DummyRequest('xxx'))
+            assert 'xxx' in user.sessions
+
+            remembered.return_value = False
+            user.cleanup_sessions(DummyRequest('zzz'))
+            assert 'xxx' not in user.sessions
+
+            # ... while adding
+            remembered.return_value = True
+            user.save_current_session(DummyRequest('xxx'))
+            assert 'xxx' in user.sessions
+
+            remembered.return_value = False
+            user.save_current_session(DummyRequest('yyy'))
+            assert 'xxx' not in user.sessions
+            assert 'yyy' not in user.sessions
+
+            # ... while removing
+            remembered.return_value = True
+            user.save_current_session(DummyRequest('xxx'))
+            user.save_current_session(DummyRequest('yyy'))
+            assert 'xxx' in user.sessions
+            assert 'yyy' in user.sessions
+
+            remembered.return_value = False
+            user.remove_current_session(DummyRequest('xxx'))
+            assert 'xxx' not in user.sessions
+            assert 'yyy' not in user.sessions
+
+            # ... while logging out
+            remembered.return_value = True
+            user.save_current_session(DummyRequest('xxx'))
+            user.save_current_session(DummyRequest('yyy'))
+            assert 'xxx' in user.sessions
+            assert 'yyy' in user.sessions
+
+            remembered.return_value = False
+            user.logout_all_sessions(DummyRequest('zzz'))
+            assert 'xxx' not in user.sessions
+            assert 'yyy' not in user.sessions

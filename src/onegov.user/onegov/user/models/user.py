@@ -1,7 +1,9 @@
+from datetime import datetime
 from onegov.core.crypto import hash_password, verify_password
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.mixins import data_property, TimestampMixin
 from onegov.core.orm.types import JSON, UUID, LowercaseText
+from onegov.core.security import forget, remembered
 from onegov.core.utils import remove_repeated_spaces
 from onegov.search import ORMSearchable
 from onegov.user.models.group import UserGroup
@@ -210,3 +212,44 @@ class User(Base, TimestampMixin, ORMSearchable):
         yubikey = self.yubikey
 
         return yubikey and yubikey_otp_to_serial(yubikey) or None
+
+    #: sessions of this user
+    sessions = data_property('sessions')
+
+    def cleanup_sessions(self, request):
+        """ Removes stored sessions not valid anymore. """
+
+        self.sessions = self.sessions or {}
+        for session_id in list(self.sessions.keys()):
+            if not remembered(request.app, session_id):
+                del self.sessions[session_id]
+
+    def save_current_session(self, request):
+        """ Stores the current browser session. """
+
+        self.sessions = self.sessions or {}
+        self.sessions[request.browser_session._token] = {
+            'address': request.client_addr,
+            'timestamp': datetime.utcnow().isoformat(),
+            'agent': request.user_agent
+        }
+
+        self.cleanup_sessions(request)
+
+    def remove_current_session(self, request):
+        """ Removes the current browser session. """
+
+        token = request.browser_session._token
+        if self.sessions and token and token in self.sessions:
+            del self.sessions[token]
+
+        self.cleanup_sessions(request)
+
+    def logout_all_sessions(self, request):
+        """ Terminates all open browser sessions. """
+
+        self.sessions = self.sessions or {}
+        for session_id in self.sessions:
+            forget(request.app, session_id)
+
+        self.cleanup_sessions(request)

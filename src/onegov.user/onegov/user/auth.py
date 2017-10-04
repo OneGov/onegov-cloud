@@ -178,6 +178,10 @@ class Auth(object):
         response = self.redirect(request)
         request.app.remember_identity(response, request, identity)
 
+        user = self.users.by_username(username)
+        if user:
+            user.save_current_session(request)
+
         return response
 
     def logout_to(self, request):
@@ -187,6 +191,10 @@ class Auth(object):
         forgotten.
 
         """
+
+        user = self.users.by_username(request.identity.userid)
+        if user:
+            user.remove_current_session(request)
 
         response = self.redirect(request)
         request.app.forget_identity(response, request)

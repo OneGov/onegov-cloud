@@ -51,6 +51,14 @@ def test_cli(postgres_dsn, session_manager, temporary_directory):
     result = runner.invoke(cli, [
         '--config', cfg_path,
         '--select', '/foo/bar',
+        'list-sessions'
+    ])
+    assert result.exit_code == 0
+    assert 'admin@example.org' not in result.output
+
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
         'add', 'admin', 'admin@example.org',
         '--password', 'hunter2',
         '--no-prompt',
@@ -91,6 +99,14 @@ def test_cli(postgres_dsn, session_manager, temporary_directory):
         '--config', cfg_path,
         '--select', '/foo/bar',
         'list'
+    ])
+    assert result.exit_code == 0
+    assert 'admin@example.org' not in result.output
+
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'list-sessions'
     ])
     assert result.exit_code == 0
     assert 'admin@example.org' not in result.output

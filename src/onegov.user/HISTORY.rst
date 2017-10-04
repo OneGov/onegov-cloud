@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Remember the open sessions and allow to force-close them (logout).
+  [msom]
+
 0.16.0 (2017-09-26)
 ~~~~~~~~~~~~~~~~~~~
 

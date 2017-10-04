@@ -34,7 +34,7 @@ setup(
     install_requires=[
         'click',
         'itsdangerous',
-        'onegov.core>=0.31.0',
+        'onegov.core>=0.50.0',
         'onegov.form',
         'sqlalchemy',
         'yubico-client'
@@ -42,6 +42,7 @@ setup(
     extras_require=dict(
         test=[
             'coverage',
+            'freezegun',
             'more.itsdangerous',
             'onegov_testing',
             'pyyaml',

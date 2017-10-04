@@ -240,3 +240,22 @@ def change_yubikey(username, yubikey):
         click.secho("{}'s yubikey was changed".format(username), fg='green')
 
     return change
+
+
+@cli.command(name='list-sessions', context_settings={'singular': True})
+def list_sessions():
+    """ Lists all sessions of all users. """
+
+    def list_sessions(request, app):
+        for user in UserCollection(app.session()).query():
+            if user.sessions:
+                click.secho('{}'.format(user.username), fg='yellow')
+                for session in user.sessions.values():
+                    session = session or {}
+                    print('{} [{}] "{}"'.format(
+                        session.get('address', '?'),
+                        session.get('timestamp', '?'),
+                        session.get('agent', '?'),
+                    ))
+
+    return list_sessions
