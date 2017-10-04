@@ -112,6 +112,7 @@ def edit_user(self, request, form):
 
     if form.submitted(request):
         form.update_model(self)
+        self.logout_all_sessions(request)
         request.message(_("User modified."), 'success')
         return redirect(layout.manage_users_link)
 
@@ -153,6 +154,7 @@ def delete_user(self, request, form):
         collection = UserCollection(request.app.session())
         user = collection.by_username(self.username)
         if user.role != 'admin':
+            self.logout_all_sessions(request)
             collection.delete(self.username)
             request.message(_("User deleted."), 'success')
         return redirect(layout.manage_users_link)
@@ -169,4 +171,59 @@ def delete_user(self, request, form):
         'button_text': _("Delete User"),
         'button_class': 'alert',
         'cancel': layout.manage_users_link
+    }
+
+
+@GazetteApp.html(
+    model=UserCollection,
+    name='sessions',
+    template='sessions.pt',
+    permission=Secret
+)
+def view_user_sessions(self, request):
+    """ View all open browser sessions.
+
+    This view is only visible by an admin.
+
+    """
+
+    layout = Layout(self, request)
+    return {
+        'layout': layout,
+        'users': self.query().all()
+    }
+
+
+@GazetteApp.form(
+    model=User,
+    name='clear-sessions',
+    template='form.pt',
+    permission=Secret,
+    form=EmptyForm
+)
+def clear_user_sessions(self, request, form):
+    """ Closes all open browser sessions.
+
+    This view is only visible by an admin.
+
+    """
+
+    layout = Layout(self, request)
+    cancel = request.link(
+        UserCollection(request.app.session()), name='sessions'
+    )
+
+    if form.submitted(request):
+        self.logout_all_sessions(request)
+        return redirect(cancel)
+
+    return {
+        'message': _("Do you really clear all active sessions?"),
+        'layout': layout,
+        'form': form,
+        'title': self.title,
+        'subtitle': _("Clear Sessions"),
+        'button_text': _("Clear Sessions"),
+        'button_class': 'alert',
+        'cancel': cancel
     }

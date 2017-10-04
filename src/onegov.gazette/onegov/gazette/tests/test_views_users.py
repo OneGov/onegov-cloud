@@ -1,3 +1,4 @@
+from freezegun import freeze_time
 from onegov.gazette.tests import login_admin
 from onegov.gazette.tests import login_editor_1
 from onegov.gazette.tests import login_editor_2
@@ -86,3 +87,81 @@ def test_view_users_permissions(gazette_app):
     client.get('/users', status=403)
     client.get(edit_link, status=403)
     client.get(delete_link, status=403)
+
+
+def test_view_user_sessions(gazette_app):
+    admin = Client(gazette_app)
+    with freeze_time("2016-06-06 06:06"):
+        login_admin(admin)
+
+    client_1 = Client(gazette_app)
+    with freeze_time("2017-07-07 07:07"):
+        login_editor_1(client_1)
+
+    client_2 = Client(gazette_app)
+    with freeze_time("2018-08-08 08:08"):
+        login_editor_1(client_2)
+
+    client_1.get('/dashboard')
+    client_2.get('/dashboard')
+
+    manage = admin.get('/users/sessions')
+    assert '(admin@example.org)' in manage
+    assert '(editor1@example.org)' in manage
+    assert '2016-06-06T06:06:00' in manage
+    assert '2017-07-07T07:07:00' in manage
+    assert '2018-08-08T08:08:00' in manage
+
+    manage.click('Sitzungen beenden', href='editor1', index=0).form.submit()
+
+    manage = admin.get('/users/sessions')
+    assert '(admin@example.org)' in manage
+    assert '(editor1@example.org)' not in manage
+    assert '2016-06-06T06:06:00' in manage
+    assert '2017-07-07T07:07:00' not in manage
+    assert '2018-08-08T08:08:00' not in manage
+
+    client_1.get('/dashboard', status=403)
+    client_2.get('/dashboard', status=403)
+
+
+def test_view_user_sessions_delete(gazette_app):
+    admin = Client(gazette_app)
+    login_admin(admin)
+
+    client_1 = Client(gazette_app)
+    login_editor_1(client_1)
+    client_1.get('/dashboard')
+
+    client_2 = Client(gazette_app)
+    login_editor_1(client_2)
+    client_2.get('/dashboard')
+
+    manage = admin.get('/users').click("Löschen", href='editor1')
+    manage = manage.form.submit().maybe_follow()
+    assert "Benutzer gelöscht." in manage
+
+    client_1.get('/dashboard', status=403)
+    client_2.get('/dashboard', status=403)
+
+
+def test_view_user_sessions_modify(gazette_app):
+    admin = Client(gazette_app)
+    login_admin(admin)
+
+    client_1 = Client(gazette_app)
+    login_editor_1(client_1)
+    client_1.get('/dashboard')
+
+    client_2 = Client(gazette_app)
+    login_editor_1(client_2)
+    client_2.get('/dashboard')
+
+    manage = admin.get('/users').click("Bearbeiten", href='editor1')
+    manage.form['role'] = 'member'
+    manage.form['name'] = "Hans"
+    manage = manage.form.submit().maybe_follow()
+    assert "Benutzer geändert." in manage
+
+    client_1.get('/dashboard', status=403)
+    client_2.get('/dashboard', status=403)

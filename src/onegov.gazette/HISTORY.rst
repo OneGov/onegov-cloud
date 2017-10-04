@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds session managment for users.
+  [msom]
+
 - Orders the list of users by email.
   [msom]
 

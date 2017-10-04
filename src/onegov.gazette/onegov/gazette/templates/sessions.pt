@@ -1,0 +1,49 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.gazette">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+
+        <div metal:use-macro="layout.macros['tab_menu']"></div>
+        <div metal:use-macro="layout.macros['breadcrumbs']"></div>
+
+        <div class="row manage-user-sessions">
+            <div class="small-12 columns">
+                <h1 i18n:translate>Sessions</h1>
+                <table class="users stackable">
+                    <thead>
+                        <tr>
+                            <th i18n:translate>User</th>
+                            <th i18n:translate>Login Timestamp</th>
+                            <th i18n:translate>IP Address</th>
+                            <th i18n:translate>User Agent</th>
+                            <th i18n:translate class="row-actions right-aligned">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tal:block tal:repeat="user users">
+                            <tal:block tal:condition="user.sessions">
+                                <tal:block tal:repeat="session_id user.sessions">
+                                    <tr>
+                                        <td>${user.realname} (${user.username})</td>
+                                        <td i18n:translate>${user.sessions[session_id]['timestamp']|'?'}</td>
+                                        <td i18n:translate>${user.sessions[session_id]['address']|'?'}</td>
+                                        <td i18n:translate>${user.sessions[session_id]['agent']|'?'}</td>
+                                        <td class="right-aligned">
+                                            <ul class="actions" data-title="Actions" i18n:attributes="data-title">
+                                                <li>
+                                                    <a i18n:translate class="action-edit" href="${request.link(user, 'clear-sessions')}?">Clear Sessions</a>
+                                                </li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                </tal:block>
+                            </tal:block>
+                        </tal:block>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </tal:block>
+</div>

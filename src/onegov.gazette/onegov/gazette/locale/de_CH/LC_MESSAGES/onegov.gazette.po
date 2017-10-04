@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-28 12:31+0200\n"
-"PO-Revision-Date: 2017-09-28 11:32+0200\n"
+"POT-Creation-Date: 2017-10-04 10:54+0200\n"
+"PO-Revision-Date: 2017-10-04 10:32+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -262,6 +262,21 @@ msgstr "Schliessen"
 msgid "Print"
 msgstr "Drucken"
 
+msgid "Sessions"
+msgstr "Sitzungen"
+
+msgid "Login Timestamp"
+msgstr "Anmeldung"
+
+msgid "IP Address"
+msgstr "Adresse"
+
+msgid "User Agent"
+msgstr "Browser"
+
+msgid "Clear Sessions"
+msgstr "Sitzungen beenden"
+
 msgid "By Organizations"
 msgstr "Organisationen"
 
@@ -481,6 +496,9 @@ msgstr "Benutzer bearbeiten"
 
 msgid "Delete User"
 msgstr "Benutzer löschen"
+
+msgid "Do you really clear all active sessions?"
+msgstr "Wollen Sie wirklich alle Sitzungen beenden?"
 
 msgid "Publishers"
 msgstr "Herausgeber"

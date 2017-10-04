@@ -42,7 +42,7 @@ setup(
         'onegov.notice>=0.1.2',
         'onegov.quill>=0.2.0',
         'onegov.shared',
-        'onegov.user>=0.15.1',
+        'onegov.user>=0.17.0',
         'python-dateutil',
         'pyyaml',
         'raven',
