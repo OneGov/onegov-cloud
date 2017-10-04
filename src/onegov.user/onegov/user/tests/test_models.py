@@ -153,7 +153,8 @@ def test_user_logout_all_sessions():
             assert 'yyy' in user.sessions
 
             user.logout_all_sessions(DummyRequest('zzz'))
-            assert forget.mock_calls == [call(None, 'xxx'), call(None, 'yyy')]
+            assert call(None, 'xxx') in forget.mock_calls
+            assert call(None, 'yyy') in forget.mock_calls
 
 
 def test_user_cleanup_sessions():
