@@ -437,27 +437,31 @@ def reject_notice(self, request, form):
     if form.submitted(request):
         self.reject(request, form.comment.data)
         request.message(_("Official notice rejected."), 'success')
-        request.app.send_email(
-            subject=request.translate(
-                _("Official Notice Rejected ${id}", mapping={'id': self.id})
-            ),
-            receivers=(self.user.username, ),
-            reply_to=request.app.mail_sender,
-            content=render_template(
-                'mail_notice_rejected.pt',
-                request,
-                {
-                    'title': request.translate(_(
+        if self.user:
+            request.app.send_email(
+                subject=request.translate(
+                    _(
                         "Official Notice Rejected ${id}",
                         mapping={'id': self.id}
-                    )),
-                    'model': self,
-                    'comment': form.comment.data,
-                    'layout': MailLayout(self, request),
-                    'url': request.link(self)
-                }
+                    )
+                ),
+                receivers=(self.user.username, ),
+                reply_to=request.app.mail_sender,
+                content=render_template(
+                    'mail_notice_rejected.pt',
+                    request,
+                    {
+                        'title': request.translate(_(
+                            "Official Notice Rejected ${id}",
+                            mapping={'id': self.id}
+                        )),
+                        'model': self,
+                        'comment': form.comment.data,
+                        'layout': MailLayout(self, request),
+                        'url': request.link(self)
+                    }
+                )
             )
-        )
         return redirect(layout.manage_notices_link)
 
     return {

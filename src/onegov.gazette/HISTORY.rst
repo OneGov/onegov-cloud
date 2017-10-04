@@ -10,6 +10,9 @@ Changelog
 - Updates RavenJs to 3.18.1.
   [msom]
 
+- Fixes rejecting a notice of a deleted user throwing an error.
+  [msom]
+
 1.5.0 (2017-09-29)
 ~~~~~~~~~~~~~~~~~~~
 
