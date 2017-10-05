@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.6.0 (2017-10-05)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds session managment for users.
   [msom]
