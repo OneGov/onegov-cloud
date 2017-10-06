@@ -328,314 +328,323 @@ msgid "Proposed"
 msgstr "Proposé"
 
 msgid "Published"
-msgstr ""
+msgstr "Publié"
 
 msgid "Mr."
-msgstr ""
+msgstr "M."
 
 msgid "Ms."
-msgstr ""
+msgstr "Mme."
 
 msgid "Open"
-msgstr ""
+msgstr "Ouvert"
 
 msgid "Cancelled"
-msgstr ""
+msgstr "Annulé"
 
 msgid "Denied"
-msgstr ""
+msgstr "Refusé"
 
 msgid "Blocked"
-msgstr ""
+msgstr "Bloqué"
 
 msgid "Boy"
-msgstr ""
+msgstr "Garçon"
 
 msgid "Girl"
-msgstr ""
+msgstr "Fille"
 
 msgid "Administrator"
-msgstr ""
+msgstr "Administrateur"
 
 msgid "Member"
-msgstr ""
+msgstr "Membre"
 
 msgid "Invoice Items"
-msgstr ""
+msgstr "Éléments de la facture"
 
 msgid "Exports invoice items in the given period."
-msgstr ""
+msgstr "Exporte les éléments de la facture sur une période donnée."
 
 msgid "Occasions"
-msgstr ""
+msgstr "Occasions"
 
 msgid "Exports activities with an occasion in the given period."
-msgstr ""
+msgstr "Exporte les activités avec une occasion sur une période donnée."
 
 msgid "Users"
-msgstr ""
+msgstr "Utilisateurs"
 
 msgid "Exports user accounts."
-msgstr ""
+msgstr "Exporte les comptes d'utilisateur."
 
 msgid "Title"
-msgstr ""
+msgstr "Titre"
 
 msgid "The title of the activity"
-msgstr ""
+msgstr "Le titre de l'activité"
 
 msgid "Lead"
-msgstr ""
+msgstr "Diriger"
 
 msgid "Describes briefly what this activity is about"
-msgstr ""
+msgstr "Décrit brièvement le thème de l'activité"
 
 msgid "Text"
-msgstr ""
+msgstr "Texte"
 
 msgid "Tags"
-msgstr ""
+msgstr "Étiquettes"
 
 msgid "Organiser"
-msgstr ""
+msgstr "Organisateur"
 
 msgid "Administration"
-msgstr ""
+msgstr "Administration"
 
 msgid "Location"
-msgstr ""
+msgstr "Localisation"
 
 msgid "Map"
-msgstr ""
+msgstr "Carte"
 
 msgid "Adventure"
-msgstr ""
+msgstr "Aventure"
 
 msgid "Animals"
-msgstr ""
+msgstr "Animaux"
 
 msgid "Baking"
-msgstr ""
+msgstr "Pâtisserie"
 
 msgid "Cinema"
-msgstr ""
+msgstr "Cinéma"
 
 msgid "Computer"
-msgstr ""
+msgstr "Ordinateur"
 
 msgid "Cooking"
-msgstr ""
+msgstr "Cuisine"
 
 msgid "Dance"
-msgstr ""
+msgstr "Danse"
 
 msgid "Design"
-msgstr ""
+msgstr "Design"
 
 msgid "Excursion"
-msgstr ""
+msgstr "Excursion"
 
 msgid "Farm"
-msgstr ""
+msgstr "Ferme"
 
 msgid "Game"
-msgstr ""
+msgstr "Jeu"
 
 msgid "Handicraft"
-msgstr ""
+msgstr "Artisanat"
 
 msgid "Health"
-msgstr ""
+msgstr "Santé"
 
 msgid "Media"
-msgstr ""
+msgstr "Média"
 
 msgid "Museums"
-msgstr ""
+msgstr "Musées"
 
 msgid "Music"
-msgstr ""
+msgstr "Musique"
 
 msgid "Nature"
-msgstr ""
+msgstr "Nature"
 
 msgid "Science"
-msgstr ""
+msgstr "Science"
 
 msgid "Security"
-msgstr ""
+msgstr "Sécurité"
 
 msgid "Sightseeing"
-msgstr ""
+msgstr "Visite"
 
 msgid "Sport"
-msgstr ""
+msgstr "Sport"
 
 msgid "Styling"
-msgstr ""
+msgstr "Stylisme"
 
 msgid "Theater"
-msgstr ""
+msgstr "Théâtre"
 
 msgid "Trade"
-msgstr ""
+msgstr "Commerce"
 
 msgid "First Name"
-msgstr ""
+msgstr "Prénom"
 
 msgid "Last Name"
-msgstr ""
+msgstr "Nom"
 
 msgid "Birthdate"
-msgstr ""
+msgstr "Date de naissance"
 
 msgid "Gender"
-msgstr ""
+msgstr "Sexe"
 
 msgid "Note"
-msgstr ""
+msgstr "Note"
 
 msgid "Allergies, Disabilities, Particulars"
-msgstr ""
+msgstr "Allergies, Handicaps, Particularités"
 
 msgid "Attendee"
-msgstr ""
+msgstr "Participant"
 
 msgid "Ignore Age Restriction"
-msgstr ""
+msgstr "Ignorer la restriction d'âge"
 
 msgid "Maximum number of bookings per period"
-msgstr ""
+msgstr "Nombre maximum de réservations par période"
 
 msgid "You already entered a child with this name"
-msgstr ""
+msgstr "Vous avec déjà entré un enfant avec ce nom"
 
 msgid "Add a new attendee"
-msgstr ""
+msgstr "Ajouter un nouveau participant"
 
 msgid "This occasion is outside the currently active period"
-msgstr ""
+msgstr "Cet occasion est en dehors de la période active présente"
 
 msgid "This period has already been finalized"
-msgstr ""
+msgstr "Cette période a déjà été finalisée"
 
 msgid "Cannot create a booking outside the prebooking period"
 msgstr ""
+"Impossible de créer une réservation en dehors de la période de pré-"
+"réservation"
 
 msgid "This occasion is already fully booked"
-msgstr ""
+msgstr "Cette occasion est complète"
 
 msgid "This is an unapproved activity"
-msgstr ""
+msgstr "Cette activité n'est pas approuvée"
 
 msgid "The attendee already has a booking for this activity"
-msgstr ""
+msgstr "Ce participant a déjà une réservation pour cette activité"
 
 msgid "The attendee is too old"
-msgstr ""
+msgstr "Le participant est trop âgé"
 
 msgid "The attendee is too young"
-msgstr ""
+msgstr "Le participant est trop jeune"
 
 msgid "The deadline has passed"
-msgstr ""
+msgstr "La date limite est dépassée"
 
 msgid ""
 "Your userprofile is not complete. It needs to be complete before signing up "
 "any attendees."
 msgstr ""
+"Votre profil d'utilisateur est incomplet. Il doit être complété avant de "
+"pouvoir inscrire des participants."
 
 msgid ""
 "The user's userprofile is not complete. It needs to be complete before "
 "signing up any attendees."
 msgstr ""
+"Le profil de cet utilisateur est incomplet. Il doit être complété avant de "
+"pouvoir inscrire des participants."
 
 #, python-format
 msgid "This occasion has already been booked by ${name}"
-msgstr ""
+msgstr "Cette occasion a déjà été entièrement réservée par ${name}"
 
 #, python-format
 msgid ""
 "The attendee already has already reached the maximum number of ${count} "
 "bookings"
 msgstr ""
+"Le participant a déjà atteint le nombre maximal de ${count} réservations"
 
 msgid "This occasion overlaps with another booking"
-msgstr ""
+msgstr "Cette occasion est sur le même créneau qu'une autre réservation"
 
 msgid "Period"
-msgstr ""
+msgstr "Période"
 
 msgid "ISO 20022 XML"
-msgstr ""
+msgstr "ISO 20022 XML"
 
 msgid "Confirm billing:"
-msgstr ""
+msgstr "Confirmation de la facturation :"
 
 msgid "I know that this stops all changes including cancellations."
 msgstr ""
+"Je comprends que cela bloque toutes les modifications, notamment les "
+"annulations."
 
 msgid "No, preview only"
-msgstr ""
+msgstr "Non, prévisualiser seulement"
 
 msgid "Yes, confirm billing"
-msgstr ""
+msgstr "Oui, confirmer la facturation"
 
 msgid "Children of organisers"
-msgstr ""
+msgstr "Enfants des organisateurs"
 
 msgid "Prefer the following children:"
-msgstr ""
+msgstr "Préférer les enfants suivants :"
 
 msgid "Children of administrators"
-msgstr ""
+msgstr "Enfants des administrateurs"
 
 msgid "Confirm matching:"
-msgstr ""
+msgstr "Confirmer la correspondance :"
 
 msgid "I know the wishlist-phase ends as a result."
-msgstr ""
+msgstr "Je comprends que cela terminera la phase de liste de souhaits."
 
 msgid "Yes, confirm matching"
-msgstr ""
+msgstr "Oui, confirmer la correspondance"
 
 msgid "Subject"
-msgstr ""
+msgstr "Sujet"
 
 msgid "Message"
-msgstr ""
+msgstr "Message"
 
 msgid "Send to (applies to active period only)"
-msgstr ""
+msgstr "Envoyer à (s'applique uniquement pour une période active)"
 
 msgid "Role"
-msgstr ""
+msgstr "Rôle"
 
 msgid "Occasion"
-msgstr ""
+msgstr "Occasion"
 
 msgid "Useraccounts"
-msgstr ""
+msgstr "Comptes d'utilisateur"
 
 #, python-format
 msgid "${title} (cancelled) <small>${dates}, ${count} Attendees</small>"
-msgstr ""
+msgstr "${title} (annulé) <small>${dates}, ${count} Participants</small>"
 
 #, python-format
 msgid "${title} <small>${dates}, ${count} Attendees</small>"
-msgstr ""
+msgstr "${title} <small>${dates}, ${count} Participants</small>"
 
 msgid "Myself"
-msgstr ""
+msgstr "Moi-même"
 
 msgid "Organisers with an occasion"
-msgstr ""
+msgstr "Organisateurs avec une occasion"
 
 msgid "Users of a given role"
-msgstr ""
+msgstr "Utilisateurs avec un rôle donné"
 
 msgid "Users with wishes"
-msgstr ""
+msgstr "Utilisateurs avec des souhaits"
 
 msgid "Users with bookings"
 msgstr ""
@@ -839,7 +848,7 @@ msgid "Emergency Contact"
 msgstr ""
 
 msgid "012 345 67 89 (Peter Muster)"
-msgstr ""
+msgstr "012 345 67 89 (Jean Dupont)"
 
 msgid "Website"
 msgstr ""
@@ -1330,7 +1339,7 @@ msgid "Years"
 msgstr ""
 
 msgid "Name"
-msgstr ""
+msgstr "Nom"
 
 msgid "State"
 msgstr ""
