@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds Credit Suisse sponsoring.
+  [href]
+
 - Translates urls to English.
   [href]
 
