@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.15.1 (2017-10-06)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes reservations not working after url change.
   [href]
 
