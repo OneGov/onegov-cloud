@@ -71,7 +71,7 @@
                                         </td>
                                         <td class="payment-status" tal:condition="item.paid">
                                             <span i18n:translate class="show-for-sr">Paid</span>
-                                            <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                            <i class="fa ${item.source == 'stripe_connect' and 'fa-credit-card' or 'fa-check-circle'}" aria-hidden="true"></i>
                                         </td>
                                         <td class="actions">
                                             <tal:block tal:define="actions tuple(item_actions(item))" tal:condition="actions">

@@ -2,6 +2,7 @@ from cached_property import cached_property
 from onegov.activity import Activity, PeriodCollection, Occasion
 from onegov.feriennet import _
 from onegov.feriennet import security
+from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.const import OWNER_EDITABLE_STATES
@@ -395,6 +396,28 @@ class BillingCollectionLayout(DefaultLayout):
                 self.request.link(self.model, 'import'),
                 attrs={'class': 'import'}
             ),
+        )
+
+
+class OnlinePaymentsLayout(DefaultLayout):
+
+    def __init__(self, *args, **kwargs):
+        self.title = kwargs.pop('title')
+        super().__init__(*args, **kwargs)
+
+    @cached_property
+    def breadcrumbs(self):
+        return (
+            Link(_("Homepage"), self.homepage_url),
+            Link(
+                _("Activities"),
+                self.request.class_link(VacationActivityCollection)
+            ),
+            Link(
+                _("Billing"),
+                self.request.class_link(BillingCollection)
+            ),
+            Link(self.title, '#')
         )
 
 

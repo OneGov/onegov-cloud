@@ -11,10 +11,15 @@ from onegov.feriennet.collections import BillingCollection, BillingDetails
 from onegov.feriennet.forms import BillingForm, BankStatementImportForm
 from onegov.feriennet.layout import BillingCollectionImportLayout
 from onegov.feriennet.layout import BillingCollectionLayout
+from onegov.feriennet.layout import OnlinePaymentsLayout
 from onegov.feriennet.models import InvoiceAction, PeriodMessage
-from onegov.org.elements import Link, ConfirmLink
+from onegov.org.new_elements import Link, Confirm, Intercooler, Block
+from onegov.pay import Payment
+from onegov.pay import PaymentProviderCollection
+from onegov.pay import payments_association_table_for
 from onegov.user import UserCollection, User
 from purl import URL
+from sqlalchemy import desc
 
 
 @FeriennetApp.form(
@@ -78,48 +83,66 @@ def view_billing(self, request, form):
 
         link_arguments = dict(
             text=text,
-            classes=(action, ),
-            request_method='POST',
             url=insert_csrf(request.link(InvoiceAction(
                 session=session,
                 id=item.id,
                 action=action,
                 extend_to=extend_to
-            )))
+            ))),
+            attrs={
+                'class': [action],
+            }
         )
 
         if not discourage_changes and not disable_changes:
-            yield Link(**link_arguments)
+            yield Link(traits=(
+                Intercooler(request_method='POST'),
+            ), **link_arguments)
         elif disable_changes:
-            link_arguments['classes'] += ('confirm', )
-            yield ConfirmLink(
-                confirm=extend_to and
-                _(
-                    "This bill or parts of it have been paid online. "
-                    "To change the state of the bill the payment needs to "
-                    "charged back."
-                ) or
-                _(
-                    "This position has been paid online. To change the "
-                    "the state of the position the payment needs to be "
-                    "charged back."
+            yield Link(
+                traits=(
+                    Block(
+                        extend_to and
+                        _(
+                            "This bill or parts of it have been paid online. "
+                            "To change the state of the bill the payment "
+                            "needs to be charged back."
+                        ) or
+                        _(
+                            "This position has been paid online. To change "
+                            "the state of the position the payment needs to "
+                            "be charged back."
+                        )
+                    )
                 ),
                 **link_arguments
             )
+
+            if extend_to == 'invoice':
+                yield Link(
+                    _("Show online payments"),
+                    attrs={'class': 'show-online-payments'},
+                    url=request.link(item, 'online-payments')
+                )
         elif discourage_changes:
-            link_arguments['classes'] += ('confirm', )
-            yield ConfirmLink(
-                confirm=extend_to and
-                _(
-                    "This bill or parts of it have been confirmed by the "
-                    "bank, do you really want to change the payment "
-                    "status?"
-                ) or
-                _(
-                    "This position has been confirmed by the bank, do you "
-                    "really want to change the payment status?"
+            yield Link(
+                traits=(
+                    Confirm(
+                        extend_to and
+                        _(
+                            "This bill or parts of it have been confirmed by "
+                            "the bank, do you really want to change the "
+                            "payment status?"
+                        ) or
+                        _(
+                            "This position has been confirmed by the bank, do "
+                            "you really want to change the payment status?"
+                        ),
+                        None,
+                        text
+                    ),
+                    Intercooler(request_method='POST')
                 ),
-                yes_button_text=text,
                 **link_arguments
             )
 
@@ -137,6 +160,74 @@ def view_billing(self, request, form):
         'button_text': _("Create Bills"),
         'invoice_actions': invoice_actions,
         'item_actions': item_actions
+    }
+
+
+@FeriennetApp.html(
+    model=BillingCollection,
+    permission=Secret,
+    name='online-payments',
+    template='online-payments.pt')
+def view_online_payments(self, request):
+    table = payments_association_table_for(InvoiceItem)
+    session = request.app.session()
+
+    invoice_item_ids = self.invoice_items.query()
+    invoice_item_ids = invoice_item_ids.with_entities(InvoiceItem.id)
+
+    payment_ids = session.query(table.c.payment_id)
+    payment_ids = payment_ids.filter(
+        table.c.invoice_items_id.in_(invoice_item_ids.subquery()))
+
+    payments = session.query(Payment).filter(
+        Payment.id.in_(payment_ids.subquery()))
+
+    payments = payments.order_by(desc(Payment.created))
+
+    providers = {
+        provider.id: provider
+        for provider in PaymentProviderCollection(session).query()
+    }
+
+    title = _("Online Payments by ${name}", mapping={
+        'name': self.invoice_items.query().first().user.title
+    })
+
+    layout = OnlinePaymentsLayout(self, request, title=title)
+
+    def payment_actions(payment):
+        if payment.state == 'paid':
+            amount = '{:02f} {}'.format(payment.amount, payment.currency)
+
+            yield Link(
+                text=_("Refund Payment"),
+                url=layout.csrf_protected_url(
+                    request.link(payment, 'refund')
+                ),
+                attrs={'class': 'payment-refund'},
+                traits=(
+                    Confirm(
+                        _("Do you really want to refund ${amount}?", mapping={
+                            'amount': amount
+                        }),
+                        _("This cannot be undone."),
+                        _("Refund ${amount}", mapping={
+                            'amount': amount
+                        })
+                    ),
+                    Intercooler(
+                        request_method='POST',
+                        redirect_after=request.url
+                    )
+                )
+            )
+
+    return {
+        'title': title,
+        'payments': payments,
+        'payment_actions': payment_actions,
+        'providers': providers,
+        'layout': layout
     }
 
 

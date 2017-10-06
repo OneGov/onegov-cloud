@@ -1,0 +1,8 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.feriennet">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <metal:b use-macro="layout.macros['payments']" />
+    </tal:block>
+</div>

@@ -1,13 +1,15 @@
 from itertools import groupby
 from onegov.activity import InvoiceItem, InvoiceItemCollection
-from onegov.core.security import Personal
+from onegov.core.security import Personal, Secret
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.collections import BillingDetails
+from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.layout import InvoiceLayout
 from onegov.feriennet.views.shared import all_users
 from onegov.pay import process_payment
 from sortedcontainers import SortedDict
 from stdnum import iban
+from uuid import UUID
 
 
 @FeriennetApp.view(
@@ -19,6 +21,21 @@ def redirect_to_invoice_view(self, request):
         InvoiceItemCollection(
             request.app.session(), username=self.username, invoice=self.invoice
         )
+    ))
+
+
+@FeriennetApp.view(
+    model=InvoiceItem,
+    permission=Secret,
+    name='online-payments'
+)
+def view_creditcard_payments(self, request):
+    return request.redirect(request.class_link(
+        BillingCollection,
+        {
+            'username': self.username,
+            'period_id': UUID(self.invoice)
+        }, name='online-payments'
     ))
 
 
