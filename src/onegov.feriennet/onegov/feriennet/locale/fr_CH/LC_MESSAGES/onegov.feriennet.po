@@ -647,325 +647,347 @@ msgid "Users with wishes"
 msgstr "Utilisateurs avec des souhaits"
 
 msgid "Users with bookings"
-msgstr ""
+msgstr "Utilisateurs avec des réservations"
 
 msgid "Users with unpaid bills"
-msgstr ""
+msgstr "Utilisateurs avec des factures impayées."
 
 msgid "Users with attendees of a given occasion"
-msgstr ""
+msgstr "Utilisateurs avec des participations à un événement donné"
 
 msgid "Administrators"
-msgstr ""
+msgstr "Administrateurs"
 
 msgid "Organisers"
-msgstr ""
+msgstr "Organisateurs"
 
 msgid "Members"
-msgstr ""
+msgstr "Membres"
 
 msgid "Active users"
-msgstr ""
+msgstr "Utilisateurs actifs"
 
 msgid "Inactive users"
-msgstr ""
+msgstr "Utilisateurs inactifs"
 
 msgid "Dates"
-msgstr ""
+msgstr "Dates"
 
 msgid "Meeting Point"
-msgstr ""
+msgstr "Point de rassemblement"
 
 msgid "Cost"
-msgstr ""
+msgstr "Coût"
 
 msgid "The amount paid to the organiser"
-msgstr ""
+msgstr "Le montant payé à l'organisateur"
 
 msgid "Minimum Number of Participants"
-msgstr ""
+msgstr "Nombre minimum de participants"
 
 msgid "Participants"
-msgstr ""
+msgstr "Participants"
 
 msgid "Maximum Number of Participants"
-msgstr ""
+msgstr "Nombre maximum de participants"
 
 msgid "Minimum Age"
-msgstr ""
+msgstr "Âge minimum"
 
 msgid "Maximum Age"
-msgstr ""
+msgstr "Âge maximum"
 
 msgid "Bookings to this occasion may overlap with other bookings"
 msgstr ""
+"Il est possible que les réservations pour cet événement chevauchent d'autres"
+" réservations"
 
 msgid "Advanced"
-msgstr ""
+msgstr "Avancé"
 
 msgid "Must specify at least one date"
-msgstr ""
+msgstr "Vous devez spécifier au moins une date"
 
 msgid "Date validation failed"
-msgstr ""
+msgstr "Échec de la validation de la date"
 
 msgid "The end date must be after the start date"
-msgstr ""
+msgstr "La date de fin doit être après la date de début"
 
 msgid "The date is outside the selected period"
-msgstr ""
+msgstr "La date est hors de la période choisie"
 
 msgid "The minium age cannot be higher than the maximum age"
-msgstr ""
+msgstr "L'âge minimum ne peut être plus élevé que l'âge maximum"
 
 msgid ""
 "The minium number of participants cannot be higher than the maximum number "
 "of participants"
 msgstr ""
+"Le nombre minimum de participants ne peut être supérieur au nombre maximum "
+"de participants"
 
 msgid ""
 "The maximum number of spots is lower than the number of already accepted "
 "bookings."
 msgstr ""
+"Le nombre maximum de places est inférieur au nombre de réservations déjà "
+"acceptées."
 
 msgid "Start"
-msgstr ""
+msgstr "Début"
 
 msgid "End"
-msgstr ""
+msgstr "Fin"
 
 msgid "Add"
-msgstr ""
+msgstr "Ajouter"
 
 msgid "Remove"
-msgstr ""
+msgstr "Supprimer"
 
 msgid "The date overlaps with another in this occasion"
-msgstr ""
+msgstr "La date chevauche une autre date de cet événement"
 
 #, python-format
 msgid "Ferienpass Summer ${year}"
-msgstr ""
+msgstr "Passeport-vacances été ${year}"
 
 msgid "Prebooking Start"
-msgstr ""
+msgstr "Début de la pré-réservation"
 
 msgid "Prebooking End"
-msgstr ""
+msgstr "Fin de la pré-réservation"
 
 msgid "Execution Start"
-msgstr ""
+msgstr "Début de l'exécution"
 
 msgid "Execution End"
-msgstr ""
+msgstr "Fin de l'exécution"
 
 msgid "How are the activities conducted?"
-msgstr ""
+msgstr "Comment les activités sont-elles menées ?"
 
 msgid "Execution"
-msgstr ""
+msgstr "Exécution"
 
 msgid "Maximum Number of Activities per Attendee"
-msgstr ""
+msgstr "Nombre maximum d'activités par participants"
 
 msgid "Cost of the Pass"
-msgstr ""
+msgstr "Prix du passeport"
 
 msgid "The administrative cost of each booking"
-msgstr ""
+msgstr "Le coût administratif de chaque réservation"
 
 msgid "Required minutes between bookings"
-msgstr ""
+msgstr "Temps en minutes nécessaire entre les réservations"
 
 msgid "Stop accepting bookings"
-msgstr ""
+msgstr "Ne plus accepter de réservation"
 
 msgid "Deadline"
-msgstr ""
+msgstr "Date limite"
 
 msgid "Fixed day"
-msgstr ""
+msgstr "Jour fixé"
 
 msgid "X Days Before"
-msgstr ""
+msgstr "X jours avant"
 
 msgid "The execution phase conflicts with existing occasions"
-msgstr ""
+msgstr "La phase d'exécution est en conflit avec des événements existants"
 
 msgid ""
 "Each attendee may book as many activites as he likes. Each activity is "
 "billed separately."
 msgstr ""
+"Chaque participant peut réserver autant d'activités qu'il le souhaite. "
+"Chaque activité est facturée séparément."
 
 msgid ""
 "Each attendee may attend a limited number of activites for a fixed price."
 msgstr ""
+"Chaque participant peut participer à un nombre limité d'activités pour un "
+"prix forfaitaire."
 
 msgid "On a fixed day"
-msgstr ""
+msgstr "À une date fixée"
 
 msgid "X days before each occasion"
-msgstr ""
+msgstr "X jours avant chaque événement"
 
 msgid ""
 "The prebooking period must start before the exeuction period and each period"
 " must start before it ends."
 msgstr ""
+"La période de pré-réservation doit débuter avant la période d'exécution et "
+"chaque période doit débuter avant sa fin."
 
 msgid ""
 "It is no longer possible to change the execution settings since the period "
 "has already been confirmed"
 msgstr ""
+"Il n'est plus possible de modifier les paramètres de l'exécution, la période"
+" ayant déjà été confirmée"
 
 msgid "Send a daily status e-mail."
-msgstr ""
+msgstr "Envoyez un e-mail de suivi quotidien."
 
 msgid "Salutation"
-msgstr ""
+msgstr "Civilité"
 
 msgid "Organisation"
-msgstr ""
+msgstr "Organisation"
 
 msgid "Address"
-msgstr ""
+msgstr "Adresse"
 
 msgid "Zip Code"
-msgstr ""
+msgstr "Code postal"
 
 msgid "Place"
-msgstr ""
+msgstr "Lieu"
 
 msgid "Public E-Mail Address"
-msgstr ""
+msgstr "Adresse e-mail publique"
 
 msgid "If different than username"
-msgstr ""
+msgstr "Si différent du nom d'utilisateur"
 
 msgid "Phone"
-msgstr ""
+msgstr "Numéro de téléphone"
 
 msgid "Emergency Contact"
-msgstr ""
+msgstr "Contact en cas d'urgence"
 
 msgid "012 345 67 89 (Peter Muster)"
 msgstr "012 345 67 89 (Jean Dupont)"
 
 msgid "Website"
-msgstr ""
+msgstr "Site internet"
 
 msgid "Website address including http:// or https://"
-msgstr ""
+msgstr "Adresse du site internet, http:// ou https:// inclus"
 
 msgid "Bank Account (IBAN)"
-msgstr ""
+msgstr "Compte bancaire (IBAN)"
 
 msgid "Beneficiary"
-msgstr ""
+msgstr "Bénéficiaire"
 
 msgid "A beneficiary is required if a bank account is given."
-msgstr ""
+msgstr "Un bénéficiaire est nécessaire si un compte bancaire est donné."
 
 msgid "Please enter both a phone number and a name"
-msgstr ""
+msgstr "Veuillez entrer un numéro de téléphone et un nom"
 
 msgid "Activity"
-msgstr ""
+msgstr "Activité"
 
 msgid "Half day"
-msgstr ""
+msgstr "Demi-journée"
 
 msgid "Full day"
-msgstr ""
+msgstr "Jour entier"
 
 msgid "Multiple days"
-msgstr ""
+msgstr "Plusieurs jours"
 
 msgid "Show activity"
-msgstr ""
+msgstr "Afficher l'activité"
 
 msgid "Publish"
-msgstr ""
+msgstr "Publier"
 
 msgid "Do you really want to publish this activity?"
-msgstr ""
+msgstr "Voulez-vous vraiment publier cette activité ?"
 
 msgid "Publish Activity"
-msgstr ""
+msgstr "Publier l'activité"
 
 msgid "Archive"
-msgstr ""
+msgstr "Archiver"
 
 msgid "Do you really want to archive this activity?"
-msgstr ""
+msgstr "Voulez-vous vraiment archiver cette activité ?"
 
 msgid "This cannot be undone. The activity will be made private as a result."
 msgstr ""
+"Cette action ne peut être annulée. L'activité sera par conséquent rendue "
+"privée."
 
 msgid "Archive Activity"
-msgstr ""
+msgstr "Archiver l'activité"
 
 msgid "Title of the period."
-msgstr ""
+msgstr "Titre de la période."
 
 msgid "Link to the user's invoices."
-msgstr ""
+msgstr "Lien vers les factures de l'utilisateur."
 
 msgid "Link to the user's bookings."
-msgstr ""
+msgstr "Lien vers les réservations de l'utilisateur."
 
 msgid "Link to the activities."
-msgstr ""
+msgstr "Lien vers les activités."
 
 msgid "Link to the homepage."
-msgstr ""
+msgstr "Lien vers la page d'accueil."
 
 msgid "No activites found."
-msgstr ""
+msgstr "Aucune activité trouvée"
 
 msgid "Age"
-msgstr ""
+msgstr "Âge"
 
 msgid "${min_age} - ${max_age} years"
-msgstr ""
+msgstr "${min_age} - ${max_age} ans"
 
 msgid "starting at ${price} CHF"
-msgstr ""
+msgstr "à partir de ${price} CHF"
 
 msgid "Free Spots"
-msgstr ""
+msgstr "Places libres"
 
 msgid "No free spots"
-msgstr ""
+msgstr "Pas de place libre"
 
 msgid "1 free spot"
-msgstr ""
+msgstr "1 place libre"
 
 msgid "${count} free spots"
-msgstr ""
+msgstr "${count} places libres"
 
 msgid "States"
-msgstr ""
+msgstr "États"
 
 msgid "Duration"
-msgstr ""
+msgstr "Durée"
 
 msgid "Weeks"
-msgstr ""
+msgstr "Semaines"
 
 msgid "Weekdays"
-msgstr ""
+msgstr "Jours de la semaine"
 
 msgid ""
 "This is a preview. Please edit it until you are satisifed with the result "
 "and then press \"Request Publication\". An administrator will then review "
 "your proposal."
 msgstr ""
+"Ceci est un aperçu. Veuillez l'éditer jusqu'à être satisfait du résultat, "
+"puis appuyer sur « Demander la publication ». Un administrateur examinera "
+"ensuite votre proposition."
 
 msgid ""
 "This is a preview. Please edit it until you are satisifed with the result "
 "and then press \"Request Publication\" to mark the activity ready for "
 "review."
 msgstr ""
+"Ceci est un aperçu. Veuillez l'éditer jusqu'à être satisfait du résultat, "
+"puis appuyer sur « Demander la publication » pour marquer l'activité comme "
+"étant prête à être examinée."
 
 msgid "This activity is currently being reviewd by an administrator."
 msgstr ""
