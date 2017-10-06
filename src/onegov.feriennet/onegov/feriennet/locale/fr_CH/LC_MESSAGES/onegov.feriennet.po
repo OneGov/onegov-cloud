@@ -1,3 +1,4 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
@@ -9,317 +10,322 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Lingua 3.12\n"
 "X-Generator: Poedit 1.8.12\n"
 
 msgid "No active period"
-msgstr ""
+msgstr "Pas de période active"
 
 msgid "Activities"
-msgstr ""
+msgstr "Activités"
 
 msgid "Invoices"
-msgstr ""
+msgstr "Factures"
 
 msgid "Periods"
-msgstr ""
+msgstr "Périodes"
 
 msgid "Attendees"
-msgstr ""
+msgstr "Participants"
 
 msgid "Wishlist"
-msgstr ""
+msgstr "Liste d'envies"
 
 msgid "Matching"
-msgstr ""
+msgstr "Correspondance"
 
 msgid "Billing"
-msgstr ""
+msgstr "Facturation"
 
 msgid "Notifications"
-msgstr ""
+msgstr "Notifications"
 
 msgid "Exports"
-msgstr ""
+msgstr "Exports"
 
 msgid "Bookings"
-msgstr ""
+msgstr "Réservations"
 
 msgid "Register a new account"
-msgstr ""
+msgstr "Enregistrer un nouveau compte"
 
 msgid "Go to Login"
-msgstr ""
+msgstr "Aller à la connexion"
 
 msgid "Go to Profile"
-msgstr ""
+msgstr "Aller sur le profil"
 
 msgid "Homepage"
-msgstr ""
+msgstr "Page d'accueil"
 
 msgid "Provide activity again"
-msgstr ""
+msgstr "Fournir l'activité à nouveau "
 
 #, python-format
 msgid "Wishlist of ${user}"
-msgstr ""
+msgstr "Liste d'envies de ${user}"
 
 #, python-format
 msgid "Bookings of ${user}"
-msgstr ""
+msgstr "Réservations de ${user}"
 
 msgid "Manage Periods"
-msgstr ""
+msgstr "Gérer les périodes"
 
 msgid "New Period"
-msgstr ""
+msgstr "Nouvelle période"
 
 msgid "Matches"
-msgstr ""
+msgstr "Correspondances"
 
 msgid "Import Bank Statement"
-msgstr ""
+msgstr "Importer un relevé bancaire"
 
 msgid "Notification Templates"
-msgstr ""
+msgstr "Modèles de notification"
 
 msgid "Submit Activity"
-msgstr ""
+msgstr "Soumettre l'activité"
 
 msgid "New Notification Template"
-msgstr ""
+msgstr "Nouveau modèle de notification"
 
 msgid "Edit Activity"
-msgstr ""
+msgstr "Modifier l'activité"
 
 #, python-format
 msgid "Do you really want to provide \"${title}\" again?"
-msgstr ""
+msgstr "Voulez-vous vraiment fournir \"${title}\" à nouveau ?"
 
 msgid "You will have to request publication again"
-msgstr ""
+msgstr "Vous devrez demander la publication à nouveau"
 
 msgid "Provide Again"
-msgstr ""
+msgstr "Fournir à nouveau"
 
 msgid "Discard Activity"
-msgstr ""
+msgstr "Annuler l'activité"
 
 msgid "New Occasion"
-msgstr ""
+msgstr "Nouvelle occasion"
 
 msgid "Show Ticket"
-msgstr ""
+msgstr "Montrer le billet"
 
 msgid "Request Publication"
-msgstr ""
+msgstr "Demander la publication"
 
 msgid "Occasions cannot be created yet"
-msgstr ""
+msgstr "Les occasions ne peuvent pas encore être créées"
 
 msgid ""
 "There are no periods defined yet. At least one period needs to be defined "
 "before occasions can be created"
 msgstr ""
+"Il n'y a encore aucune période de définie. Il doit y avoir au moins une "
+"période définie avant que les occasions ne puissent être créées."
 
 #, python-format
 msgid "Do you really want to discard \"${title}\"?"
-msgstr ""
+msgstr "Voulez-vous vraiment annuler \"${title}\" ?"
 
 msgid "This cannot be undone."
-msgstr ""
+msgstr "Cela ne peut être effectué."
 
 msgid "Do you really want to request publication?"
-msgstr ""
+msgstr "Voulez-vous vraiment demander la publication ?"
 
 msgid "Please add at least one occasion before requesting publication."
 msgstr ""
+"Veuillez ajouter au moins une occasion avant de demande la publication."
 
 msgid "Editor"
-msgstr ""
+msgstr "Éditeur"
 
 msgid "Editors"
-msgstr ""
+msgstr "Éditeurs"
 
 msgid "Opening Hours"
-msgstr ""
+msgstr "Horaires d'ouverture"
 
 msgid "Opening Hours Link"
-msgstr ""
+msgstr "Lien vers les horaires d'ouvertures"
 
 msgid "The opening hours of the municipality"
-msgstr ""
+msgstr "Les horaires d'ouverture de la municipalité"
 
 msgid "URL pointing to an opening hours page"
-msgstr ""
+msgstr "URL pointant vers une page d'horaires d'ouverture"
 
 msgid "Activity Title"
-msgstr ""
+msgstr "Titre d'activité"
 
 msgid "Activity Lead"
-msgstr ""
+msgstr "Introduction de l'activité"
 
 msgid "Activity Text"
-msgstr ""
+msgstr "Texte d'activité"
 
 msgid "Activity Status"
-msgstr ""
+msgstr "État de l'activité"
 
 msgid "Activity Location"
-msgstr ""
+msgstr "Lieu de l'activité"
 
 msgid "Booking State"
-msgstr ""
+msgstr "État de la réservation"
 
 msgid "Booking Priority"
-msgstr ""
+msgstr "Priorité de la réservation"
 
 msgid "Booking Cost"
-msgstr ""
+msgstr "Coût de la réservation"
 
 msgid "Attendee First Name"
-msgstr ""
+msgstr "Prénom du participant"
 
 msgid "Attendee Last Name"
-msgstr ""
+msgstr "Nom de famille du participant"
 
 msgid "Attendee Birth Date"
-msgstr ""
+msgstr "Date de naissance du participant"
 
 msgid "Attendee Gender"
-msgstr ""
+msgstr "Sexe du participant"
 
 msgid "Attendee Notes"
-msgstr ""
+msgstr "Commentaires du participant"
 
 msgid "Attendee Booking-Limit"
-msgstr ""
+msgstr "Limite de réservation du participant"
 
 msgid "Occasion Rescinded"
-msgstr ""
+msgstr "Occasion annulée"
 
 msgid "Occasion Dates"
-msgstr ""
+msgstr "Dates de l'occasion"
 
 msgid "Occasion Note"
-msgstr ""
+msgstr "Commentaire de l'occasion"
 
 msgid "Occasion Age"
-msgstr ""
+msgstr "Âge de l'occasion"
 
 msgid "Occasion Spots"
-msgstr ""
+msgstr "Lieux de l'occasion"
 
 msgid "Occasion Cost"
-msgstr ""
+msgstr "Coût de l'occasion"
 
 msgid "Occasion Meeting Point"
-msgstr ""
+msgstr "Point de renvez-vous de l'occasion"
 
 msgid "Occasion May Overlap"
-msgstr ""
+msgstr "L'occasion peut coïncider"
 
 msgid "User Login"
-msgstr ""
+msgstr "Identifiant de l'utilisateur"
 
 msgid "User Role"
-msgstr ""
+msgstr "Rôle de l'utilisateur"
 
 msgid "User Active"
-msgstr ""
+msgstr "Utilisateur actif"
 
 msgid "User Salutation"
-msgstr ""
+msgstr "Salutations de l'utilisateur"
 
 msgid "User First Name"
-msgstr ""
+msgstr "Prénom de l'utilisateur"
 
 msgid "User Last Name"
-msgstr ""
+msgstr "Nom de famille de l'utilisateur"
 
 msgid "User Organisation"
-msgstr ""
+msgstr "Organisation de l'utilisateur"
 
 msgid "User Address"
-msgstr ""
+msgstr "Adresse de l'utilisateur"
 
 msgid "User Zipcode"
-msgstr ""
+msgstr "Code postal de l'utilisateur"
 
 msgid "User Location"
-msgstr ""
+msgstr "Ville de l'utilisateur"
 
 msgid "User E-Mail"
-msgstr ""
+msgstr "E-mail de l'utilisateur"
 
 msgid "User Phone"
-msgstr ""
+msgstr "Téléphone de l'utilisateur"
 
 msgid "User Emergency"
-msgstr ""
+msgstr "Urgence de l'utilisateur"
 
 msgid "User Website"
-msgstr ""
+msgstr "Site Web de l'utilisateur"
 
 msgid "User Bank Account"
-msgstr ""
+msgstr "Compte bancaire de l'utilisateur"
 
 msgid "User Beneficiary"
-msgstr ""
+msgstr "Utilisateur bénéficiaire"
 
 msgid "User Status E-Mail"
-msgstr ""
+msgstr "E-mail de statut de l'utilisateur"
 
 msgid "Invoice Item Group"
-msgstr ""
+msgstr "Groupe d'articles de la facture "
 
 msgid "Invoice Item Text"
-msgstr ""
+msgstr "Texte de l'article de la facture"
 
 msgid "Invoice Item Code"
-msgstr ""
+msgstr "Code de l'article de la facture "
 
 msgid "Invoice Item ESR"
-msgstr ""
+msgstr "Article ESR de la facture"
 
 msgid "Invoice Item Paid"
-msgstr ""
+msgstr "Article de facture payé"
 
 msgid "Invoice Item Transaction ID"
-msgstr ""
+msgstr "Référence de transaction de l'article de la facture"
 
 msgid "Invoice Item Source"
-msgstr ""
+msgstr "Source de l'article de la facture "
 
 msgid "Invoice Item Unit"
-msgstr ""
+msgstr "Unité de l'article de la facture "
 
 msgid "Invoice Item Quantity"
-msgstr ""
+msgstr "Quantité d'articles de la facture "
 
 msgid "Invoice Item Amount"
-msgstr ""
+msgstr "Montant de l'article de la facture"
 
 msgid "Wishlist / Bookings"
-msgstr ""
+msgstr "Liste d'envies / Réservations"
 
 msgid ""
 "Exports wishlists or bookings, depending on the current state of the given "
 "period."
 msgstr ""
+"Exporte les listes d'envies ou les réservations, en fonction de l'état "
+"actuel de la période donnée."
 
 msgid "Accepted"
-msgstr ""
+msgstr "Accepté"
 
 msgid "Archived"
-msgstr ""
+msgstr "Archivé"
 
 msgid "Preview"
-msgstr ""
+msgstr "Aperçu"
 
 msgid "Proposed"
-msgstr ""
+msgstr "Proposé"
 
 msgid "Published"
 msgstr ""
@@ -793,8 +799,8 @@ msgid "X days before each occasion"
 msgstr ""
 
 msgid ""
-"The prebooking period must start before the exeuction period and each period "
-"must start before it ends."
+"The prebooking period must start before the exeuction period and each period"
+" must start before it ends."
 msgstr ""
 
 msgid ""
@@ -948,7 +954,8 @@ msgstr ""
 
 msgid ""
 "This is a preview. Please edit it until you are satisifed with the result "
-"and then press \"Request Publication\" to mark the activity ready for review."
+"and then press \"Request Publication\" to mark the activity ready for "
+"review."
 msgstr ""
 
 msgid "This activity is currently being reviewd by an administrator."
@@ -1194,8 +1201,8 @@ msgid "Please review the activity carefully before publishing it."
 msgstr ""
 
 msgid ""
-"To remove this activity from the public part of the website, you can archive "
-"it."
+"To remove this activity from the public part of the website, you can archive"
+" it."
 msgstr ""
 
 msgid "Edit contact info"
@@ -1278,8 +1285,8 @@ msgid ""
 msgstr ""
 
 msgid ""
-"Between each booking we enforce ${minutes} minutes of block-time in which no "
-"other booking is permitted."
+"Between each booking we enforce ${minutes} minutes of block-time in which no"
+" other booking is permitted."
 msgstr ""
 
 msgid ""
@@ -1315,7 +1322,8 @@ msgstr ""
 msgid "${operability} of all occasions have enough attendees."
 msgstr ""
 
-msgid "Marking bookings increases their priority during the next matching run."
+msgid ""
+"Marking bookings increases their priority during the next matching run."
 msgstr ""
 
 msgid "Years"
@@ -1366,8 +1374,8 @@ msgid "Variables"
 msgstr ""
 
 msgid ""
-"Clicking \"Send\" will send the e-mail below to all selected recipients. You "
-"will receive a copy of the e-mail if you are not already on the recipients "
+"Clicking \"Send\" will send the e-mail below to all selected recipients. You"
+" will receive a copy of the e-mail if you are not already on the recipients "
 "list."
 msgstr ""
 
@@ -1599,8 +1607,8 @@ msgid ""
 msgstr ""
 
 msgid ""
-"This bill or parts of it have been confirmed by the bank, do you really want "
-"to change the payment status?"
+"This bill or parts of it have been confirmed by the bank, do you really want"
+" to change the payment status?"
 msgstr ""
 
 msgid "The booking was cancelled successfully"
@@ -1776,8 +1784,8 @@ msgid "\"${title}\" cannot be archived yet"
 msgstr ""
 
 msgid ""
-"A period can only be archived once the bookings have been made and the bills "
-"have been compiled."
+"A period can only be archived once the bookings have been made and the bills"
+" have been compiled."
 msgstr ""
 
 #, python-format
