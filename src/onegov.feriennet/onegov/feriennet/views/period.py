@@ -23,7 +23,7 @@ def view_periods(self, request):
             yield Link(
                 text=_("Deactivate"),
                 url=layout.csrf_protected_url(
-                    request.link(period, name='deaktivieren')
+                    request.link(period, name='deactivate')
                 ),
                 traits=(
                     Confirm(
@@ -44,7 +44,7 @@ def view_periods(self, request):
             yield Link(
                 text=_("Activate"),
                 url=layout.csrf_protected_url(
-                    request.link(period, name='aktivieren')
+                    request.link(period, name='activate')
                 ),
                 traits=(
                     Confirm(
@@ -66,14 +66,14 @@ def view_periods(self, request):
                 )
             )
 
-        yield Link(_("Edit"), request.link(period, 'bearbeiten'))
+        yield Link(_("Edit"), request.link(period, 'edit'))
 
         if not period.archived:
             if period.confirmed and period.finalized:
                 yield Link(
                     text=_("Archive"),
                     url=layout.csrf_protected_url(
-                        request.link(period, name='archivieren')
+                        request.link(period, name='archive')
                     ),
                     traits=(
                         Confirm(
@@ -143,7 +143,7 @@ def view_periods(self, request):
 
 @FeriennetApp.form(
     model=PeriodCollection,
-    name='neu',
+    name='new',
     form=PeriodForm,
     template='period_form.pt',
     permission=Secret)
@@ -171,7 +171,7 @@ def new_period(self, request, form):
 
 @FeriennetApp.form(
     model=Period,
-    name='bearbeiten',
+    name='edit',
     form=PeriodForm,
     template='period_form.pt',
     permission=Secret)
@@ -220,7 +220,7 @@ def delete_period(self, request):
 @FeriennetApp.view(
     model=Period,
     request_method='POST',
-    name='aktivieren',
+    name='activate',
     permission=Secret)
 def activate_period(self, request):
     request.assert_valid_csrf_token()
@@ -238,7 +238,7 @@ def activate_period(self, request):
 @FeriennetApp.view(
     model=Period,
     request_method='POST',
-    name='deaktivieren',
+    name='deactivate',
     permission=Secret)
 def deactivate_period(self, request):
     request.assert_valid_csrf_token()
@@ -256,7 +256,7 @@ def deactivate_period(self, request):
 @FeriennetApp.view(
     model=Period,
     request_method='POST',
-    name='archivieren',
+    name='archive',
     permission=Secret)
 def archive_period(self, request):
     request.assert_valid_csrf_token()

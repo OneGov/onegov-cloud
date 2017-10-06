@@ -49,7 +49,7 @@ class VacationActivityCollectionLayout(DefaultLayout):
     def organiser_links(self):
         yield Link(
             text=_("Submit Activity"),
-            url=self.request.link(self.model, name='neu'),
+            url=self.request.link(self.model, name='new'),
             attrs={'class': 'new-activity'}
         )
 
@@ -74,7 +74,7 @@ class VacationActivityCollectionLayout(DefaultLayout):
                 url=self.request.class_link(
                     VacationActivity,
                     {'name': activity.name},
-                    name="erneut-anbieten"
+                    name="offer-again"
                 ),
                 traits=(
                     Confirm(
@@ -217,7 +217,7 @@ class VacationActivityLayout(DefaultLayout):
                 if period and self.model.has_occasion_in_period(period):
                     links.append(Link(
                         text=_("Request Publication"),
-                        url=self.request.link(self.model, name='beantragen'),
+                        url=self.request.link(self.model, name='propose'),
                         attrs={'class': 'request-publication'},
                         traits=(
                             Confirm(
@@ -273,7 +273,7 @@ class VacationActivityLayout(DefaultLayout):
 
             links.append(Link(
                 text=_("Edit Activity"),
-                url=self.request.link(self.model, name='bearbeiten'),
+                url=self.request.link(self.model, name='edit'),
                 attrs={'class': 'edit-link'}
             ))
 
@@ -296,7 +296,7 @@ class VacationActivityLayout(DefaultLayout):
             else:
                 links.append(Link(
                     text=_("New Occasion"),
-                    url=self.request.link(self.model, 'neue-durchfuehrung'),
+                    url=self.request.link(self.model, 'new-occasion'),
                     attrs={'class': 'new-occasion'}
                 ))
 
@@ -328,7 +328,7 @@ class PeriodCollectionLayout(DefaultLayout):
         return (
             Link(
                 _("New Period"),
-                self.request.link(self.model, 'neu'),
+                self.request.link(self.model, 'new'),
                 attrs={'class': 'new-period'}
             ),
         )
@@ -472,7 +472,7 @@ class NotificationTemplateCollectionLayout(DefaultLayout):
             return (
                 Link(
                     _("New Notification Template"),
-                    self.request.link(self.model, 'neu'),
+                    self.request.link(self.model, 'new'),
                     attrs={'class': 'new-notification'}
                 ),
             )

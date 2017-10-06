@@ -36,12 +36,12 @@ def view_notification_templates(self, request):
     def get_links(notification):
         yield Link(
             text=_("Mailing"),
-            url=request.link(notification, 'versand')
+            url=request.link(notification, 'send')
         )
 
         yield Link(
             text=_("Edit"),
-            url=request.link(notification, 'bearbeiten')
+            url=request.link(notification, 'edit')
         )
 
         yield DeleteLink(
@@ -66,7 +66,7 @@ def view_notification_templates(self, request):
     model=NotificationTemplateCollection,
     permission=Secret,
     template='notification_template_form.pt',
-    name='neu',
+    name='new',
     form=NotificationTemplateForm)
 def view_notification_template_form(self, request, form):
 
@@ -93,7 +93,7 @@ def view_notification_template_form(self, request, form):
     model=NotificationTemplate,
     permission=Secret,
     template='notification_template_form.pt',
-    name='bearbeiten',
+    name='edit',
     form=NotificationTemplateForm)
 def edit_notification(self, request, form):
 
@@ -134,7 +134,7 @@ def delete_notification(self, request):
     model=NotificationTemplate,
     permission=Secret,
     template='notification_template_send_form.pt',
-    name='versand',
+    name='send',
     form=NotificationTemplateSendForm)
 def handle_send_notification(self, request, form):
 
@@ -185,6 +185,6 @@ def handle_send_notification(self, request, form):
         'form': form,
         'preview_subject': variables.render(self.subject),
         'preview_body': variables.render(self.text),
-        'edit_link': request.return_here(request.link(self, 'bearbeiten')),
+        'edit_link': request.return_here(request.link(self, 'edit')),
         'button_text': _("Send E-Mail Now")
     }

@@ -149,7 +149,7 @@ def handle_matches(self, request, form):
                 text=_("Cancel Booking"),
                 url=layout.csrf_protected_url(
                     request.class_link(
-                        Booking, {'id': record.booking_id}, 'absagen'
+                        Booking, {'id': record.booking_id}, 'cancel'
                     )
                 ),
                 traits=(
@@ -206,7 +206,7 @@ def handle_matches(self, request, form):
 
 @FeriennetApp.view(
     model=MatchCollection,
-    name='zuruecksetzen',
+    name='reset',
     permission=Secret,
     request_method="POST")
 def reset_matching(self, request):

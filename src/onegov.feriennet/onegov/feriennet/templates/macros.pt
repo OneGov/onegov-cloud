@@ -363,8 +363,8 @@
             </span>
 
             <tal:block switch="request.is_logged_in">
-                <a tal:case="True" class="button" href="${request.link(occasion, 'anmelden')}" i18n:translate>Enroll</a>
-                <a tal:case="False" class="button" href="${layout.login_to_url(request.link(occasion, 'anmelden'), skip=True)}" i18n:translate>Enroll</a>
+                <a tal:case="True" class="button" href="${request.link(occasion, 'book')}" i18n:translate>Enroll</a>
+                <a tal:case="False" class="button" href="${layout.login_to_url(request.link(occasion, 'book'), skip=True)}" i18n:translate>Enroll</a>
             </tal:block>
         </div>
     </tal:block>

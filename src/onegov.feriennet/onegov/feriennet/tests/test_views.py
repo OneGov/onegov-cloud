@@ -56,7 +56,7 @@ def test_activity_permissions(es_feriennet_app):
     editor = Client(es_feriennet_app)
     editor.login_editor()
 
-    new = editor.get('/angebote').click("Angebot erfassen")
+    new = editor.get('/activities').click("Angebot erfassen")
     new.form['title'] = "Learn How to Program"
     new.form['lead'] = "Using a Raspberry Pi we will learn Python"
     new.form.submit()
@@ -83,20 +83,20 @@ def test_activity_permissions(es_feriennet_app):
 
     transaction.commit()
 
-    url = '/angebot/learn-how-to-program'
+    url = '/activity/learn-how-to-program'
 
-    assert "Learn How to Program" in editor.get('/angebote')
-    assert "Learn How to Program" not in anon.get('/angebote')
-    assert "Learn How to Program" in admin.get('/angebote')
+    assert "Learn How to Program" in editor.get('/activities')
+    assert "Learn How to Program" not in anon.get('/activities')
+    assert "Learn How to Program" in admin.get('/activities')
     assert editor.get(url, status=200)
     assert anon.get(url, status=404)
     assert admin.get(url, status=200)
 
     editor.post(get_post_url(editor.get(url), 'request-publication'))
 
-    assert "Learn How to Program" in editor.get('/angebote')
-    assert "Learn How to Program" not in anon.get('/angebote')
-    assert "Learn How to Program" in admin.get('/angebote')
+    assert "Learn How to Program" in editor.get('/activities')
+    assert "Learn How to Program" not in anon.get('/activities')
+    assert "Learn How to Program" in admin.get('/activities')
     assert editor.get(url, status=200)
     assert anon.get(url, status=404)
     assert admin.get(url, status=200)
@@ -104,9 +104,9 @@ def test_activity_permissions(es_feriennet_app):
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
     admin.post(get_post_url(ticket, 'accept-activity'))
 
-    assert "Learn How to Program" in editor.get('/angebote')
-    assert "Learn How to Program" in anon.get('/angebote')
-    assert "Learn How to Program" in admin.get('/angebote')
+    assert "Learn How to Program" in editor.get('/activities')
+    assert "Learn How to Program" in anon.get('/activities')
+    assert "Learn How to Program" in admin.get('/activities')
     assert editor.get(url, status=200)
     assert anon.get(url, status=200)
     assert admin.get(url, status=200)
@@ -114,9 +114,9 @@ def test_activity_permissions(es_feriennet_app):
     ticket = admin.get(ticket.request.url)
     admin.post(get_post_url(ticket, 'archive-activity'))
 
-    assert "Learn How to Program" in editor.get('/angebote')
-    assert "Learn How to Program" not in anon.get('/angebote')
-    assert "Learn How to Program" in admin.get('/angebote')
+    assert "Learn How to Program" in editor.get('/activities')
+    assert "Learn How to Program" not in anon.get('/activities')
+    assert "Learn How to Program" in admin.get('/activities')
     assert editor.get(url, status=200)
     assert anon.get(url, status=404)
     assert admin.get(url, status=200)
@@ -138,7 +138,7 @@ def test_activity_communication(feriennet_app):
     editor = Client(feriennet_app)
     editor.login_editor()
 
-    new = editor.get('/angebote').click("Angebot erfassen")
+    new = editor.get('/activities').click("Angebot erfassen")
     new.form['title'] = "Learn Python"
     new.form['lead'] = "Using a Raspberry Pi we will learn Python"
     activity = new.form.submit().follow()
@@ -159,7 +159,7 @@ def test_activity_communication(feriennet_app):
     occasion.form.submit()
 
     editor.post(get_post_url(
-        editor.get('/angebot/learn-python'), 'request-publication'))
+        editor.get('/activity/learn-python'), 'request-publication'))
 
     assert len(feriennet_app.smtp.outbox) == 1
     assert "Ein neues Ticket" in admin.get_email(0)
@@ -193,7 +193,7 @@ def test_activity_search(es_feriennet_app):
     editor = Client(es_feriennet_app)
     editor.login_editor()
 
-    new = editor.get('/angebote').click("Angebot erfassen")
+    new = editor.get('/activities').click("Angebot erfassen")
     new.form['title'] = "Learn How to Program"
     new.form['lead'] = "Using a Raspberry Pi we will learn Python"
     activity = new.form.submit().follow()
@@ -213,7 +213,7 @@ def test_activity_search(es_feriennet_app):
     occasion.form['max_spots'] = 40
     occasion.form.submit()
 
-    url = '/angebot/learn-how-to-program'
+    url = '/activity/learn-how-to-program'
 
     # in preview, activities can't be found
     es_feriennet_app.es_client.indices.refresh(index='_all')
@@ -262,14 +262,14 @@ def test_activity_filter_tags(feriennet_app):
     admin = Client(feriennet_app)
     admin.login_admin()
 
-    new = editor.get('/angebote').click("Angebot erfassen")
+    new = editor.get('/activities').click("Angebot erfassen")
     new.form['title'] = "Learn How to Program"
     new.form['lead'] = "Using a Raspberry Pi we will learn Python"
     new.select_checkbox("tags", "Computer")
     new.select_checkbox("tags", "Wissenschaft")
     new.form.submit()
 
-    new = editor.get('/angebote').click("Angebot erfassen")
+    new = editor.get('/activities').click("Angebot erfassen")
     new.form['title'] = "Learn How to Cook"
     new.form['lead'] = "Using a Stove we will cook a Python"
     new.select_checkbox("tags", "Kochen")
@@ -281,7 +281,7 @@ def test_activity_filter_tags(feriennet_app):
 
     transaction.commit()
 
-    page = anon.get('/angebote')
+    page = anon.get('/activities')
     assert "Keine Angebote" in page
 
     # only show activites to anonymous if there's an active period..
@@ -293,7 +293,7 @@ def test_activity_filter_tags(feriennet_app):
     )
     transaction.commit()
 
-    page = anon.get('/angebote')
+    page = anon.get('/activities')
     assert "Keine Angebote" in page
 
     # ..and if there are any occasions for those activities
@@ -309,7 +309,7 @@ def test_activity_filter_tags(feriennet_app):
 
     transaction.commit()
 
-    page = anon.get('/angebote')
+    page = anon.get('/activities')
     assert "Learn How to Cook" in page
     assert "Learn How to Program" in page
 
@@ -336,27 +336,27 @@ def test_activity_filter_tags(feriennet_app):
     assert "Learn How to Program" in page
 
     # the state filter works for editors
-    new = editor.get('/angebote').click("Angebot erfassen")
+    new = editor.get('/activities').click("Angebot erfassen")
     new.form['title'] = "Learn How to Dance"
     new.form['lead'] = "We will dance with a Python"
     new.form.submit()
 
     # editors see the state as a filter
-    assert "Vorschau" in editor.get('/angebote')
+    assert "Vorschau" in editor.get('/activities')
 
     # anonymous does not
-    assert "Vorschau" not in anon.get('/angebote')
+    assert "Vorschau" not in anon.get('/activities')
 
-    page = editor.get('/angebote').click('Vorschau')
+    page = editor.get('/activities').click('Vorschau')
     assert "Learn How to Cook" not in page
     assert "Learn How to Program" not in page
     assert "Learn How to Dance" in page
 
     # anyone can filter by week
-    page = editor.get('/angebote').click('04.01.2016 - 10.01.2016', index=0)
+    page = editor.get('/activities').click('04.01.2016 - 10.01.2016', index=0)
     assert "Keine Angebote" in page
 
-    page = editor.get('/angebote').click('01.01.2016 - 03.01.2016', index=0)
+    page = editor.get('/activities').click('01.01.2016 - 03.01.2016', index=0)
     assert "Learn How to Cook" in page
 
 
@@ -400,8 +400,8 @@ def test_activity_filter_duration(feriennet_app):
 
     client = Client(feriennet_app)
 
-    half_day = client.get('/angebote').click('Halbtägig')
-    many_day = client.get('/angebote').click('Mehrtägig')
+    half_day = client.get('/activities').click('Halbtägig')
+    many_day = client.get('/activities').click('Mehrtägig')
 
     assert "Meeting" in half_day
     assert "Retreat" not in half_day
@@ -414,8 +414,8 @@ def test_activity_filter_duration(feriennet_app):
 
     transaction.commit()
 
-    full_day = client.get('/angebote').click('Ganztägig')
-    many_day = client.get('/angebote').click('Mehrtägig')
+    full_day = client.get('/activities').click('Ganztägig')
+    many_day = client.get('/activities').click('Mehrtägig')
 
     assert "Retreat" in full_day
     assert "Retreat" not in many_day
@@ -463,8 +463,8 @@ def test_activity_filter_age_ranges(feriennet_app):
 
     client = Client(feriennet_app)
 
-    preschool = client.get('/angebote').click('3 - 6 Jahre')
-    highschool = client.get('/angebote').click('14 - 17 Jahre')
+    preschool = client.get('/activities').click('3 - 6 Jahre')
+    highschool = client.get('/activities').click('14 - 17 Jahre')
 
     assert "Retreat" in preschool
     assert "Meeting" in preschool
@@ -476,7 +476,7 @@ def test_activity_filter_age_ranges(feriennet_app):
     occasions.by_id(meeting_occasion_id).age = NumericRange(15, 20)
     transaction.commit()
 
-    preschool = client.get('/angebote').click('3 - 6 Jahre')
+    preschool = client.get('/activities').click('3 - 6 Jahre')
 
     assert "Retreat" in preschool
     assert "Meeting" not in preschool
@@ -490,12 +490,12 @@ def test_organiser_info(feriennet_app):
     editor = Client(feriennet_app)
     editor.login_editor()
 
-    new = editor.get('/angebote').click("Angebot erfassen")
+    new = editor.get('/activities').click("Angebot erfassen")
     new.form['title'] = "Play with Legos"
     new.form['lead'] = "Like Minecraft, but in the real world"
     new.form.submit()
 
-    new = admin.get('/angebote').click("Angebot erfassen")
+    new = admin.get('/activities').click("Angebot erfassen")
     new.form['title'] = "Play with Playmobil"
     new.form['lead'] = "Like Second Life, but in the real world"
     new.form.submit()
@@ -506,19 +506,19 @@ def test_organiser_info(feriennet_app):
     transaction.commit()
 
     # by default the email address of the owner is shown
-    assert 'editor@example.org' in admin.get('/angebot/play-with-legos')
-    assert 'admin@example.org' in editor.get('/angebot/play-with-playmobil')
+    assert 'editor@example.org' in admin.get('/activity/play-with-legos')
+    assert 'admin@example.org' in editor.get('/activity/play-with-playmobil')
 
     # only the owner gets the change contact link
-    assert "Kontakt ändern" in editor.get('/angebot/play-with-legos')
-    assert "Kontakt ändern" not in editor.get('/angebot/play-with-playmobil')
+    assert "Kontakt ändern" in editor.get('/activity/play-with-legos')
+    assert "Kontakt ändern" not in editor.get('/activity/play-with-playmobil')
 
     # admins get the change contact link as well
-    assert "Kontakt ändern" in admin.get('/angebot/play-with-legos')
-    assert "Kontakt ändern" in admin.get('/angebot/play-with-playmobil')
+    assert "Kontakt ändern" in admin.get('/activity/play-with-legos')
+    assert "Kontakt ändern" in admin.get('/activity/play-with-playmobil')
 
     # owner changes are reflected on the activity
-    contact = editor.get('/angebot/play-with-legos').click('Kontakt ändern')
+    contact = editor.get('/activity/play-with-legos').click('Kontakt ändern')
     contact.form['salutation'] = 'mr'
     contact.form['first_name'] = 'Ed'
     contact.form['last_name'] = 'Itor'
@@ -532,7 +532,7 @@ def test_organiser_info(feriennet_app):
     contact.form['emergency'] = '+01 234 56 78 (Peter)'
     contact.form.submit()
 
-    activity = editor.get('/angebot/play-with-legos')
+    activity = editor.get('/activity/play-with-legos')
 
     assert "Editors Association" in activity
     assert "Ed\u00A0Itor" in activity
@@ -544,11 +544,11 @@ def test_organiser_info(feriennet_app):
     assert "https://www.example.org" in activity
 
     # admin changes are reflected on the activity
-    contact = admin.get('/angebot/play-with-legos').click('Kontakt ändern')
+    contact = admin.get('/activity/play-with-legos').click('Kontakt ändern')
     contact.form['organisation'] = 'Admins Association'
     contact.form.submit()
 
-    activity = editor.get('/angebot/play-with-legos')
+    activity = editor.get('/activity/play-with-legos')
 
     assert "Admins Association" in activity
 
@@ -561,12 +561,12 @@ def test_occasions_form(feriennet_app):
     admin = Client(feriennet_app)
     admin.login_admin()
 
-    new = editor.get('/angebote').click("Angebot erfassen")
+    new = editor.get('/activities').click("Angebot erfassen")
     new.form['title'] = "Play with Legos"
     new.form['lead'] = "Like Minecraft, but in the real world"
     new.form.submit().follow()
 
-    periods = admin.get('/angebote').click("Zeiträume")
+    periods = admin.get('/activities').click("Zeiträume")
 
     period = periods.click("Neuer Zeitraum")
     period.form['title'] = "Vacation Program 2016"
@@ -577,7 +577,7 @@ def test_occasions_form(feriennet_app):
     period.form['deadline_date'] = '2016-10-01'
     period.form.submit()
 
-    activity = editor.get('/angebote').click("Play with Legos")
+    activity = editor.get('/activities').click("Play with Legos")
     assert "keine Durchführungen" in activity
 
     occasion = activity.click("Neue Durchführung")
@@ -615,7 +615,7 @@ def test_occasions_form(feriennet_app):
 
     editor.delete(get_delete_link(activity, index=1))
     editor.delete(get_delete_link(activity, index=2))
-    assert "keine Durchführungen" in editor.get('/angebot/play-with-legos')
+    assert "keine Durchführungen" in editor.get('/activity/play-with-legos')
 
 
 def test_multiple_dates_occasion(feriennet_app):
@@ -626,12 +626,12 @@ def test_multiple_dates_occasion(feriennet_app):
     admin = Client(feriennet_app)
     admin.login_admin()
 
-    new = editor.get('/angebote').click("Angebot erfassen")
+    new = editor.get('/activities').click("Angebot erfassen")
     new.form['title'] = "Play with Legos"
     new.form['lead'] = "Like Minecraft, but in the real world"
     new.form.submit().follow()
 
-    periods = admin.get('/angebote').click("Zeiträume")
+    periods = admin.get('/activities').click("Zeiträume")
 
     period = periods.click("Neuer Zeitraum")
     period.form['title'] = "Vacation Program 2016"
@@ -642,7 +642,7 @@ def test_multiple_dates_occasion(feriennet_app):
     period.form['deadline_date'] = '2016-09-01'
     period.form.submit()
 
-    activity = editor.get('/angebote').click("Play with Legos")
+    activity = editor.get('/activities').click("Play with Legos")
     assert "keine Durchführungen" in activity
 
     occasion = activity.click("Neue Durchführung")
@@ -687,12 +687,12 @@ def test_execution_period(feriennet_app):
     admin = Client(feriennet_app)
     admin.login_admin()
 
-    new = admin.get('/angebote').click("Angebot erfassen")
+    new = admin.get('/activities').click("Angebot erfassen")
     new.form['title'] = "Play with Legos"
     new.form['lead'] = "Like Minecraft, but in the real world"
     new.form.submit().follow()
 
-    periods = admin.get('/angebote').click("Zeiträume")
+    periods = admin.get('/activities').click("Zeiträume")
 
     period = periods.click("Neuer Zeitraum")
     period.form['title'] = "Vacation Program 2016"
@@ -703,7 +703,9 @@ def test_execution_period(feriennet_app):
     period.form['deadline_date'] = '2016-09-01'
     period.form.submit()
 
-    occasion = admin.get('/angebot/play-with-legos').click("Neue Durchführung")
+    occasion = admin.get('/activity/play-with-legos')\
+        .click("Neue Durchführung")
+
     occasion.form['min_age'] = 10
     occasion.form['max_age'] = 20
     occasion.form['min_spots'] = 30
@@ -733,7 +735,7 @@ def test_execution_period(feriennet_app):
     })
     assert "Änderungen wurden gespeichert" in occasion.form.submit().follow()
 
-    period = admin.get('/perioden').click("Bearbeiten")
+    period = admin.get('/periods').click("Bearbeiten")
     period.form['execution_start'] = '2016-10-02'
     period.form['execution_end'] = '2016-10-02'
     period = period.form.submit()
@@ -788,7 +790,7 @@ def test_enroll_child(feriennet_app):
 
     client = Client(feriennet_app)
 
-    activity = client.get('/angebot/retreat')
+    activity = client.get('/activity/retreat')
 
     login = activity.click("Anmelden")
     assert "Login" in login
@@ -803,7 +805,7 @@ def test_enroll_child(feriennet_app):
     assert "Teilnehmer anmelden" in enroll
 
     # the link changes, but the result stays the same
-    enroll = client.get('/angebot/retreat').click("Anmelden")
+    enroll = client.get('/activity/retreat').click("Anmelden")
     assert "Teilnehmer anmelden" in enroll
 
     enroll.form['first_name'] = "Tom"
@@ -885,7 +887,7 @@ def test_enroll_child(feriennet_app):
 
     transaction.commit()
 
-    enroll = client.get('/angebot/another-retreat').click("Anmelden")
+    enroll = client.get('/activity/another-retreat').click("Anmelden")
     enroll.form.submit()
 
     assert "maximale Anzahl von 1 Buchungen" in enroll.form.submit()
@@ -907,10 +909,10 @@ def test_enroll_child(feriennet_app):
 
     transaction.commit()
 
-    enroll = client.get('/angebot/another-retreat').click("Anmelden", index=0)
+    enroll = client.get('/activity/another-retreat').click("Anmelden", index=0)
     enroll = enroll.form.submit()
 
-    enroll = client.get('/angebot/another-retreat').click("Anmelden", index=1)
+    enroll = client.get('/activity/another-retreat').click("Anmelden", index=1)
     enroll = enroll.form.submit()
 
     assert "bereits eine andere Durchführung dieses Angebots gebucht" in enroll
@@ -958,7 +960,7 @@ def test_enroll_age_mismatch(feriennet_app):
 
     fill_out_profile(admin)
 
-    page = admin.get('/angebot/retreat').click("Anmelden")
+    page = admin.get('/activity/retreat').click("Anmelden")
     page.form['first_name'] = "Tom"
     page.form['last_name'] = "Sawyer"
     page.form['gender'] = 'male'
@@ -1015,7 +1017,7 @@ def test_enroll_after_wishlist_phase(feriennet_app):
 
     fill_out_profile(admin)
 
-    page = admin.get('/angebot/retreat').click("Anmelden")
+    page = admin.get('/activity/retreat').click("Anmelden")
     page.form['first_name'] = "Tom"
     page.form['last_name'] = "Sawyer"
     page.form['gender'] = 'male'
@@ -1205,7 +1207,7 @@ def test_matching_view(feriennet_app):
     client = Client(feriennet_app)
     client.login_admin()
 
-    matching = client.get('/angebote').click("Zuteilung")
+    matching = client.get('/activities').click("Zuteilung")
 
     # check the initial state
     assert "Ferienpass 2016" in matching
@@ -1224,7 +1226,7 @@ def test_matching_view(feriennet_app):
 
     # reset it again
     client.post(get_post_url(matching, 'reset-matching'))
-    matching = client.get('/angebote').click("Zuteilung")
+    matching = client.get('/activities').click("Zuteilung")
 
     assert "Zufriedenheit liegt bei <strong>0%</strong>" in matching
     assert "<strong>0%</strong> aller Durchführungen haben genug" in matching
@@ -1235,7 +1237,7 @@ def test_matching_view(feriennet_app):
     matching = matching.form.submit()
 
     assert "wurde bereits bestätigt" in matching
-    assert "Abgeschlossen" in client.get('/angebote').click("Zeiträume")
+    assert "Abgeschlossen" in client.get('/activities').click("Zeiträume")
 
 
 def test_confirmed_booking_view(feriennet_app):
@@ -1289,7 +1291,7 @@ def test_confirmed_booking_view(feriennet_app):
 
     transaction.commit()
 
-    page = client.get('/meine-buchungen')
+    page = client.get('/my-bookings')
     assert "Offen" in page
     assert "Stornieren" not in page
     assert "Entfernen" in page
@@ -1301,7 +1303,7 @@ def test_confirmed_booking_view(feriennet_app):
 
     transaction.commit()
 
-    page = client.get('/meine-buchungen')
+    page = client.get('/my-bookings')
     assert "Angenommen" in page
     assert "Stornieren" in page
     assert "Entfernen" not in page
@@ -1318,7 +1320,7 @@ def test_confirmed_booking_view(feriennet_app):
         bookings.query().one().state = state
         transaction.commit()
 
-        assert text in client.get('/meine-buchungen')
+        assert text in client.get('/my-bookings')
 
     # If there are not enough attendees, show a warning
     periods.query().one().confirmed = True
@@ -1327,7 +1329,7 @@ def test_confirmed_booking_view(feriennet_app):
 
     transaction.commit()
 
-    page = client.get('/meine-buchungen')
+    page = client.get('/my-bookings')
     assert "nicht genügend Teilnehmer" in page
 
 
@@ -1389,10 +1391,10 @@ def test_direct_booking_and_storno(feriennet_app):
     fill_out_profile(member, "Zak", "McKracken")
 
     # in a confirmed period parents can book directly
-    page = client.get('/angebot/foobar')
+    page = client.get('/activity/foobar')
     assert "1 Plätze frei" in page
 
-    other = member.get('/angebot/foobar').click('Anmelden')
+    other = member.get('/activity/foobar').click('Anmelden')
 
     page = page.click('Anmelden')
     booked = page.form.submit().follow()
@@ -1406,10 +1408,10 @@ def test_direct_booking_and_storno(feriennet_app):
     assert "bereits für diese Durchführung angemeldet" in page
 
     # cancel the booking
-    page = client.get('/meine-buchungen')
+    page = client.get('/my-bookings')
     client.post(get_post_url(page, 'confirm'))
 
-    page = client.get('/angebot/foobar')
+    page = client.get('/activity/foobar')
     assert "1 Plätze frei" in page
 
     # admins may do this for other members
@@ -1423,7 +1425,7 @@ def test_direct_booking_and_storno(feriennet_app):
     assert "Für <strong>Zak McKracken</strong>" in page
 
     # members may not (simply ignores the other user)
-    page = member.get('/angebot/foobar').click('Anmelden')
+    page = member.get('/activity/foobar').click('Anmelden')
     assert "admin@example.org" not in page
 
     page = member.get(other_url.replace('member@', 'admin@'))
@@ -1482,37 +1484,37 @@ def test_cancel_occasion(feriennet_app):
     client.login_admin()
     fill_out_profile(client)
 
-    page = client.get('/angebot/foobar')
+    page = client.get('/activity/foobar')
     assert "Löschen" in page
     assert "Absagen" not in page
     assert "Reaktivieren" not in page
 
     page.click('Anmelden').form.submit()
-    assert "Angenommen" in client.get('/meine-buchungen')
+    assert "Angenommen" in client.get('/my-bookings')
 
-    page = client.get('/angebot/foobar')
+    page = client.get('/activity/foobar')
     assert "Löschen" not in page
     assert "Absagen" in page
     assert "Reaktivieren" not in page
 
     client.post(get_post_url(page, 'confirm'))
-    assert "Storniert" in client.get('/meine-buchungen')
+    assert "Storniert" in client.get('/my-bookings')
 
-    page = client.get('/angebot/foobar')
+    page = client.get('/activity/foobar')
     assert "Löschen" not in page
     assert "Absagen" not in page
     assert "Reaktivieren" in page
 
     client.post(get_post_url(page, 'confirm'))
-    assert "Storniert" in client.get('/meine-buchungen')
+    assert "Storniert" in client.get('/my-bookings')
 
-    page = client.get('/angebot/foobar')
+    page = client.get('/activity/foobar')
     assert "Löschen" not in page
     assert "Absagen" in page
     assert "Reaktivieren" not in page
 
-    client.delete(get_delete_link(client.get('/meine-buchungen')))
-    page = client.get('/angebot/foobar')
+    client.delete(get_delete_link(client.get('/my-bookings')))
+    page = client.get('/activity/foobar')
     assert "Löschen" in page
     assert "Absagen" not in page
     assert "Reaktivieren" not in page
@@ -1602,7 +1604,7 @@ def test_billing(feriennet_app):
     member = Client(feriennet_app)
     member.login('member@example.org', 'hunter2')
 
-    page = admin.get('/angebote').click('Fakturierung')
+    page = admin.get('/activities').click('Fakturierung')
     assert "noch keine Rechnungen" in page
 
     page = page.form.submit()
@@ -1610,10 +1612,10 @@ def test_billing(feriennet_app):
     assert "admin@example.org" in page
 
     # as long as the period is not finalized, there's no way to pay
-    page = admin.get('/rechnungen?username=admin@example.org')
+    page = admin.get('/billing?username=admin@example.org')
     assert page.pyquery('.outstanding').text() == '100.00 Ausstehend'
 
-    page = admin.get('/rechnungen?username=member@example.org')
+    page = admin.get('/billing?username=member@example.org')
     assert page.pyquery('.outstanding').text() == '1100.00 Ausstehend'
 
     assert 'mark-paid' not in page
@@ -1621,29 +1623,29 @@ def test_billing(feriennet_app):
     # as long as the period is not finalized, there are no invoices
     assert member.get('/').pyquery('.invoices-count').attr['data-count'] == '0'
     assert admin.get('/').pyquery('.invoices-count').attr['data-count'] == '0'
-    assert "noch keine Rechnungen" in member.get('/meine-rechnungen')
-    assert "noch keine Rechnungen" in admin.get('/meine-rechnungen')
+    assert "noch keine Rechnungen" in member.get('/my-bills')
+    assert "noch keine Rechnungen" in admin.get('/my-bills')
 
     # once the period is finalized, the invoices become public and they
     # may be marked as paid
-    page = admin.get('/angebote').click('Fakturierung')
+    page = admin.get('/activities').click('Fakturierung')
     page.form['confirm'] = 'yes'
     page.form['sure'] = 'yes'
     page = page.form.submit()
 
     assert member.get('/').pyquery('.invoices-count').attr['data-count'] == '1'
     assert admin.get('/').pyquery('.invoices-count').attr['data-count'] == '1'
-    assert "noch keine Rechnungen" not in member.get('/meine-rechnungen')
-    assert "noch keine Rechnungen" not in admin.get('/meine-rechnungen')
-    assert "Ferienpass 2016" in member.get('/meine-rechnungen')
-    assert "Ferienpass 2016" in admin.get('/meine-rechnungen')
+    assert "noch keine Rechnungen" not in member.get('/my-bills')
+    assert "noch keine Rechnungen" not in admin.get('/my-bills')
+    assert "Ferienpass 2016" in member.get('/my-bills')
+    assert "Ferienpass 2016" in admin.get('/my-bills')
 
-    page = admin.get('/rechnungen?username=member@example.org')
+    page = admin.get('/billing?username=member@example.org')
     assert '1100.00 Ausstehend' in page.pyquery('.outstanding').text()
 
     admin.post(get_post_url(page, 'mark-paid:last'))
 
-    page = admin.get('/rechnungen?username=member@example.org')
+    page = admin.get('/billing?username=member@example.org')
 
     # occsaions with the same title (here the same activity) is not defined
     assert '1000.00 Ausstehend' in page.pyquery('.outstanding').text() or\
@@ -1651,12 +1653,12 @@ def test_billing(feriennet_app):
 
     admin.post(get_post_url(page, 'mark-unpaid'))
 
-    page = admin.get('/rechnungen?username=member@example.org')
+    page = admin.get('/billing?username=member@example.org')
     assert '1100.00 Ausstehend' in page.pyquery('.outstanding').text()
 
     admin.post(get_post_url(page, 'mark-paid:first'))
 
-    page = admin.get('/rechnungen?username=member@example.org')
+    page = admin.get('/billing?username=member@example.org')
     assert 'Bezahlt' in page.pyquery('.outstanding').text()
 
     assert member.get('/').pyquery('.invoices-count').attr['data-count'] == '0'
@@ -1723,54 +1725,54 @@ def test_reactivate_cancelled_booking(feriennet_app):
     fill_out_profile(client)
 
     # by default we block conflicting bookings
-    page = client.get('/angebot/foobar').click('Anmelden', index=0)
+    page = client.get('/activity/foobar').click('Anmelden', index=0)
     page = page.form.submit().follow()
 
     assert "Wunschliste hinzugefügt" in page
 
-    page = client.get('/angebot/foobar').click('Anmelden', index=0)
+    page = client.get('/activity/foobar').click('Anmelden', index=0)
     assert "bereits für diese Durchführung angemeldet" in page.form.submit()
 
-    page = client.get('/angebot/foobar').click('Anmelden', index=1)
+    page = client.get('/activity/foobar').click('Anmelden', index=1)
     assert "eine andere Durchführung" in page.form.submit()
 
     # unless they are cancelled
     bookings.query().first().state = 'cancelled'
     transaction.commit()  # can be done by cancelling the whole event in UI
 
-    page = client.get('/angebot/foobar').click('Anmelden', index=0)
+    page = client.get('/activity/foobar').click('Anmelden', index=0)
     assert "Wunschliste hinzugefügt" in page.form.submit().follow()
 
     # this also works between multiple occasions of the same activity
     bookings.query().first().state = 'cancelled'
     transaction.commit()  # can be done by cancelling the whole event in UI
 
-    page = client.get('/angebot/foobar').click('Anmelden', index=1)
+    page = client.get('/activity/foobar').click('Anmelden', index=1)
     assert "Wunschliste hinzugefügt" in page.form.submit().follow()
 
     # including denied bookings
     bookings.query().first().state = 'denied'
     transaction.commit()  # can be done by cancelling the whole event in UI
 
-    page = client.get('/angebot/foobar').click('Anmelden', index=1)
+    page = client.get('/activity/foobar').click('Anmelden', index=1)
     assert "Wunschliste hinzugefügt" in page.form.submit().follow()
 
     # and even if we confirm the period
-    page = client.get('/angebote').click('Zuteilung')
+    page = client.get('/activities').click('Zuteilung')
     page.form['confirm'] = 'yes'
     page.form['sure'] = 'yes'
     page.form.submit()
 
-    page = client.get('/meine-buchungen')
+    page = client.get('/my-bookings')
     client.post(get_post_url(page, 'confirm'))  # cancel the booking
 
-    page = client.get('/angebot/foobar').click('Anmelden', index=0)
+    page = client.get('/activity/foobar').click('Anmelden', index=0)
     assert "war erfolgreic" in page.form.submit().follow()
 
-    page = client.get('/meine-buchungen')
+    page = client.get('/my-bookings')
     client.post(get_post_url(page, 'confirm'))  # cancel the booking
 
-    page = client.get('/angebot/foobar').click('Anmelden', index=1)
+    page = client.get('/activity/foobar').click('Anmelden', index=1)
     assert "war erfolgreich" in page.form.submit().follow()
 
 
@@ -1837,13 +1839,13 @@ def test_occasion_attendance_collection(feriennet_app):
 
     # anonymous has no access
     anon = Client(feriennet_app)
-    assert anon.get('/teilnehmer', status=403)
+    assert anon.get('/attendees', status=403)
 
     # if the period is unconfirmed the attendees are not shown
     admin = Client(feriennet_app)
     admin.login_admin()
 
-    page = admin.get('/teilnehmer')
+    page = admin.get('/attendees')
     assert "noch keine Zuteilung" in page
     assert "Dustin" not in page
 
@@ -1854,12 +1856,12 @@ def test_occasion_attendance_collection(feriennet_app):
     editor = Client(feriennet_app)
     editor.login_editor()
 
-    page = editor.get('/teilnehmer')
+    page = editor.get('/attendees')
     assert "Dustin" not in page
     assert "Mike" in page
 
     # admins seel all the occasions
-    page = admin.get('/teilnehmer')
+    page = admin.get('/attendees')
     assert "Dustin" in page
     assert "Mike" in page
 
@@ -1873,7 +1875,7 @@ def test_occasion_attendance_collection(feriennet_app):
     page.form['emergency'] = '123456789 Admin'
     page.form.submit()
 
-    assert "123456789 Admin" in admin.get('/teilnehmer')
+    assert "123456789 Admin" in admin.get('/attendees')
 
 
 def test_send_email(feriennet_app):
@@ -1901,7 +1903,7 @@ def test_send_email(feriennet_app):
 
     transaction.commit()
 
-    page = client.get('/mitteilungen').click('Neue Mitteilungs-Vorlage')
+    page = client.get('/notifications').click('Neue Mitteilungs-Vorlage')
     page.form['subject'] = '[Zeitraum] subject'
     page.form['text'] = '[Zeitraum] body'
     page = page.form.submit().follow()
@@ -2005,7 +2007,7 @@ def test_import_account_statement(feriennet_app):
     assert "1 Zahlungen importieren" in page
     admin.post(get_post_url(page, 'button'))
 
-    page = admin.get('/meine-rechnungen')
+    page = admin.get('/my-bills')
     assert "1 Zahlungen wurden importiert" in page
     assert "unpaid" not in page
 
@@ -2065,15 +2067,15 @@ def test_deadline(feriennet_app):
     transaction.commit()
 
     anonymous = Client(feriennet_app)
-    assert "Anmelden" not in anonymous.get('/angebot/foo')
+    assert "Anmelden" not in anonymous.get('/activity/foo')
 
     # do show it for admins though and allow signups
     admin = Client(feriennet_app)
     admin.login_admin()
 
-    assert "Anmelden" in admin.get('/angebot/foo')
+    assert "Anmelden" in admin.get('/activity/foo')
 
-    page = admin.get('/angebot/foo').click("Anmelden")
+    page = admin.get('/activity/foo').click("Anmelden")
     assert "Der Anmeldeschluss wurde erreicht" not in page.form.submit()
 
     # stop others, even if they get to the form
@@ -2087,7 +2089,7 @@ def test_deadline(feriennet_app):
 def test_userprofile_login(feriennet_app):
     client = Client(feriennet_app)
 
-    page = client.get('/auth/login?to=/einstellungen')
+    page = client.get('/auth/login?to=/settings')
     page.form['username'] = 'admin@example.org'
     page.form['password'] = 'hunter2'
     page = page.form.submit().follow()
@@ -2101,23 +2103,23 @@ def test_userprofile_login(feriennet_app):
     page.form['emergency'] = '0123 456 789 (Scrooge McDuck)'
     page = page.form.submit().follow()
 
-    assert 'einstellungen' in page.request.url
+    assert 'settings' in page.request.url
 
     client = Client(feriennet_app)
 
-    page = client.get('/auth/login?to=/einstellungen')
+    page = client.get('/auth/login?to=/settings')
     page.form['username'] = 'admin@example.org'
     page.form['password'] = 'hunter2'
     page = page.form.submit().follow()
 
-    assert 'einstellungen' in page.request.url
+    assert 'settings' in page.request.url
 
 
 def test_provide_activity_again(feriennet_app):
     admin = Client(feriennet_app)
     admin.login_admin()
 
-    new = admin.get('/angebote').click("Angebot erfassen")
+    new = admin.get('/activities').click("Angebot erfassen")
     new.form['title'] = "Learn How to Program"
     new.form['lead'] = "Using a Raspberry Pi we will learn Python"
     new.form.submit()
@@ -2135,15 +2137,15 @@ def test_provide_activity_again(feriennet_app):
     activity = activities.query().first()
     transaction.commit()
 
-    assert "Erneut anbieten" not in admin.get('/angebote')
+    assert "Erneut anbieten" not in admin.get('/activities')
 
     activity = activities.query().first()
     activity.state = 'archived'
     transaction.commit()
 
-    assert "Erneut anbieten" in admin.get('/angebote')
+    assert "Erneut anbieten" in admin.get('/activities')
 
-    url = get_post_url(admin.get('/angebote'), 'confirm')
+    url = get_post_url(admin.get('/activities'), 'confirm')
 
     editor = Client(feriennet_app)
     editor.login_editor()

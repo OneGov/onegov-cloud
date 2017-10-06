@@ -18,7 +18,7 @@ from uuid import UUID
 
 @FeriennetApp.path(
     model=VacationActivityCollection,
-    path='/angebote',
+    path='/activities',
     converters=dict(
         tags=[str],
         states=[str],
@@ -60,7 +60,7 @@ def get_vacation_activities(request, app, page=0,
 
 @FeriennetApp.path(
     model=VacationActivity,
-    path='/angebot/{name}')
+    path='/activity/{name}')
 def get_vacation_activity(request, app, name):
     return VacationActivityCollection(
         app.session(), identity=request.identity).by_name(name)
@@ -68,7 +68,7 @@ def get_vacation_activity(request, app, name):
 
 @FeriennetApp.path(
     model=Occasion,
-    path='/durchfuehrungen/{id}',
+    path='/occurrences/{id}',
     converters=dict(id=UUID))
 def get_occasion(request, app, id):
     return OccasionCollection(app.session()).by_id(id)
@@ -76,14 +76,14 @@ def get_occasion(request, app, id):
 
 @FeriennetApp.path(
     model=PeriodCollection,
-    path='/perioden')
+    path='/periods')
 def get_periods(request, app):
     return PeriodCollection(app.session())
 
 
 @FeriennetApp.path(
     model=Period,
-    path='/periode/{id}',
+    path='/period/{id}',
     converters=dict(id=UUID))
 def get_period(request, app, id):
     return PeriodCollection(app.session()).by_id(id)
@@ -91,7 +91,7 @@ def get_period(request, app, id):
 
 @FeriennetApp.path(
     model=BookingCollection,
-    path='/meine-buchungen',
+    path='/my-bookings',
     converters=dict(period_id=UUID))
 def get_my_bookings(request, app, period_id=None, username=None):
     # only admins can actually specify the username
@@ -114,7 +114,7 @@ def get_my_bookings(request, app, period_id=None, username=None):
 
 @FeriennetApp.path(
     model=Booking,
-    path='/buchung/{id}',
+    path='/booking/{id}',
     converters=dict(id=UUID))
 def get_booking(request, app, id):
     return BookingCollection(app.session()).by_id(id)
@@ -122,7 +122,7 @@ def get_booking(request, app, id):
 
 @FeriennetApp.path(
     model=Attendee,
-    path='/teilnehmer/{id}',
+    path='/attendee/{id}',
     converters=dict(id=UUID))
 def get_attendee(request, app, id):
     return AttendeeCollection(app.session()).by_id(id)
@@ -130,7 +130,7 @@ def get_attendee(request, app, id):
 
 @FeriennetApp.path(
     model=MatchCollection,
-    path='/zuteilungen',
+    path='/matching',
     converters=dict(period_id=UUID, states=[str]))
 def get_matches(request, app, period_id, states=None):
     # the default period is the active period or the first we can find
@@ -147,7 +147,7 @@ def get_matches(request, app, period_id, states=None):
 
 @FeriennetApp.path(
     model=BillingCollection,
-    path='/rechnungen',
+    path='/billing',
     converters=dict(period_id=UUID))
 def get_billing(request, app, period_id, username=None, expand=False):
     # the default period is the active period or the first we can find
@@ -164,7 +164,7 @@ def get_billing(request, app, period_id, username=None, expand=False):
 
 @FeriennetApp.path(
     model=InvoiceAction,
-    path='/rechnungsaktion/{id}/{action}',
+    path='/invoice-action/{id}/{action}',
     converters=dict(id=UUID))
 def get_invoice_action(request, app, id, action, extend_to=None):
     action = InvoiceAction(
@@ -178,7 +178,7 @@ def get_invoice_action(request, app, id, action, extend_to=None):
 
 @FeriennetApp.path(
     model=InvoiceItemCollection,
-    path='/meine-rechnungen')
+    path='/my-bills')
 def get_my_invoies(request, app, username=None):
 
     # only admins can actually specify the username
@@ -201,7 +201,7 @@ def get_my_invoice_item(request, app, id):
 
 @FeriennetApp.path(
     model=OccasionAttendeeCollection,
-    path='/teilnehmer',
+    path='/attendees',
     converters=dict(period_id=UUID))
 def get_occasion_attendee_collection(request, app, period_id=None):
     # the default period is the active period or the first we can find
@@ -224,14 +224,14 @@ def get_occasion_attendee_collection(request, app, period_id=None):
 
 @FeriennetApp.path(
     model=NotificationTemplateCollection,
-    path='/mitteilungen')
+    path='/notifications')
 def get_notification_template_collection(request, app):
     return NotificationTemplateCollection(app.session())
 
 
 @FeriennetApp.path(
     model=NotificationTemplate,
-    path='/mitteilung/{id}',
+    path='/notification/{id}',
     converters=dict(id=UUID))
 def get_notification_template(request, app, id):
     return NotificationTemplateCollection(app.session()).by_id(id)

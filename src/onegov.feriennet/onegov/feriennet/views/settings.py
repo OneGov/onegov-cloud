@@ -5,7 +5,7 @@ from onegov.org.views.settings import handle_settings
 from onegov.feriennet.app import FeriennetApp
 
 
-@FeriennetApp.form(model=Organisation, name='einstellungen',
+@FeriennetApp.form(model=Organisation, name='settings',
                    template='form.pt', permission=Secret, form=SettingsForm)
 def custom_handle_settings(self, request, form):
 

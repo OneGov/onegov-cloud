@@ -25,7 +25,7 @@ def view_occasion(self, request):
     template='form.pt',
     form=OccasionForm,
     permission=Private,
-    name='neue-durchfuehrung')
+    name='new-occasion')
 def new_occasion(self, request, form):
 
     if form.submitted(request):
@@ -55,7 +55,7 @@ def new_occasion(self, request, form):
     template='form.pt',
     form=OccasionForm,
     permission=Private,
-    name='duplizieren')
+    name='clone')
 def clone_occasion(self, request, form):
 
     if form.submitted(request):
@@ -88,7 +88,7 @@ def clone_occasion(self, request, form):
     template='form.pt',
     form=OccasionForm,
     permission=Private,
-    name='bearbeiten')
+    name='edit')
 def edit_occasion(self, request, form):
 
     if form.submitted(request):
@@ -143,7 +143,7 @@ def reinstate_occasion(self, request):
     model=Occasion,
     form=AttendeeSignupForm,
     permission=Personal,
-    name='anmelden',
+    name='book',
     template='enroll_form.pt')
 def book_occasion(self, request, form):
 

@@ -243,8 +243,8 @@ def view_activity(self, request):
     } or set()
 
     def occasion_links(o):
-        yield Link(text=_("Edit"), url=request.link(o, name='bearbeiten'))
-        yield Link(text=_("Clone"), url=request.link(o, name='duplizieren'))
+        yield Link(text=_("Edit"), url=request.link(o, name='edit'))
+        yield Link(text=_("Clone"), url=request.link(o, name='clone'))
 
         title = layout.format_datetime_range(
             o.dates[0].localized_start,
@@ -366,7 +366,7 @@ def view_activity(self, request):
     template='form.pt',
     form=get_activity_form_class,
     permission=Private,
-    name='neu')
+    name='new')
 def new_activity(self, request, form):
 
     if form.submitted(request):
@@ -390,7 +390,7 @@ def new_activity(self, request, form):
     template='form.pt',
     form=get_activity_form_class,
     permission=Private,
-    name='bearbeiten')
+    name='edit')
 def edit_activity(self, request, form):
 
     if form.submitted(request):
@@ -436,7 +436,7 @@ def discard_activity(self, request):
 @FeriennetApp.view(
     model=VacationActivity,
     permission=Private,
-    name='beantragen',
+    name='propose',
     request_method='POST')
 def propose_activity(self, request):
     assert request.app.active_period, "An active period is required"
@@ -478,7 +478,7 @@ def propose_activity(self, request):
 @FeriennetApp.view(
     model=VacationActivity,
     permission=Secret,
-    name='annehmen',
+    name='accept',
     request_method='POST')
 def accept_activity(self, request):
 
@@ -494,7 +494,7 @@ def accept_activity(self, request):
 @FeriennetApp.view(
     model=VacationActivity,
     permission=Secret,
-    name='archivieren',
+    name='archive',
     request_method='POST')
 def archive_activity(self, request):
 
@@ -510,7 +510,7 @@ def archive_activity(self, request):
 @FeriennetApp.view(
     model=VacationActivity,
     permission=Personal,
-    name='erneut-anbieten',
+    name='offer-again',
     request_method='POST')
 def offer_activity_again(self, request):
     assert self.state == 'archived'
@@ -518,7 +518,7 @@ def offer_activity_again(self, request):
 
     @request.after
     def redirect_intercooler(response):
-        response.headers.add('X-IC-Redirect', request.link(self, 'bearbeiten'))
+        response.headers.add('X-IC-Redirect', request.link(self, 'edit'))
 
 
 def administer_activity(model, request, action, template, subject):

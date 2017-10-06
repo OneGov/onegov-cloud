@@ -150,7 +150,7 @@ class VacationActivityHandler(Handler):
         if self.activity.state in ('proposed', 'archived'):
             links.append(ConfirmLink(
                 text=_("Publish"),
-                url=request.link(self.activity, name='annehmen'),
+                url=request.link(self.activity, name='accept'),
                 confirm=_("Do you really want to publish this activity?"),
                 extra_information=_("This cannot be undone."),
                 classes=('confirm', 'accept-activity'),
@@ -160,7 +160,7 @@ class VacationActivityHandler(Handler):
         if self.activity.state == 'accepted':
             links.append(ConfirmLink(
                 text=_("Archive"),
-                url=request.link(self.activity, name='archivieren'),
+                url=request.link(self.activity, name='archive'),
                 confirm=_("Do you really want to archive this activity?"),
                 extra_information=_(
                     "This cannot be undone. "

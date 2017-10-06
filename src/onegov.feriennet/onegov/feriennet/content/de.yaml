@@ -127,19 +127,19 @@ organisation:
 
           <panel>
             <links>
-                <link url="./personen"
+                <link url="./people"
                     description="Personen">
                     Team
                 </link>
-                <link url="./formular/kontakt"
+                <link url="./forms/kontakt"
                     description="Anfragen">
                     Kontakt
                 </link>
-                <link url="./aktuelles"
+                <link url="./news"
                     description="Neuigkeiten">
                     Aktuelles
                 </link>
-                <link url="./fotoalben"
+                <link url="./photoalbums"
                     description="Impressionen">
                     Fotoalben
                 </link>

@@ -159,7 +159,7 @@ def execute_invoice_action(self, request):
 @FeriennetApp.view(
     model=BillingCollection,
     request_method='POST',
-    name='import-ausfuehren',
+    name='execute-import',
     permission=Secret)
 def view_execute_import(self, request):
     request.assert_valid_csrf_token()
@@ -270,6 +270,6 @@ def view_billing_import(self, request, form):
         ),
         'model': self,
         'post_url': layout.csrf_protected_url(
-            request.link(self, 'import-ausfuehren')
+            request.link(self, 'execute-import')
         )
     }

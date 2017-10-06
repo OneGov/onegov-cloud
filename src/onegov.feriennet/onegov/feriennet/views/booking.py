@@ -115,7 +115,7 @@ def actions_by_booking(layout, period, booking):
         actions.append(ConfirmLink(
             text=_("Cancel Booking"),
             url=layout.csrf_protected_url(
-                layout.request.link(booking, 'absagen')
+                layout.request.link(booking, 'cancel')
             ),
             confirm=_('Do you really want to cancel "${title}"?', mapping={
                 'title': get_booking_title(layout, booking)
@@ -216,7 +216,7 @@ def delete_booking(self, request):
 
 @FeriennetApp.view(
     model=Booking,
-    name='absagen',
+    name='cancel',
     permission=Personal,
     request_method='POST')
 def cancel_booking(self, request):

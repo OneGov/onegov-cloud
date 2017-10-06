@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Translates urls to English.
+  [href]
+
 - Fixes booking confirmation dialogs showing the wrong times.
   [href]
 
