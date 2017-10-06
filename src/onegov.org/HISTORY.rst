@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes reservations not working after url change.
+  [href]
+
 - Adds the ability to use the payments table in other views.
   [href]
 
