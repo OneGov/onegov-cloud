@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.2.0 (2017-10-06)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Adds a helper method to get the association table for a given Payable.
   [href]
 
