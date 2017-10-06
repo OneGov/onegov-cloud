@@ -1,6 +1,7 @@
 from collections import namedtuple
 from decimal import Decimal
 from functools import total_ordering
+from onegov.core.orm import Base
 
 
 @total_ordering
@@ -52,3 +53,7 @@ class Price(namedtuple('PriceBase', ('amount', 'currency', 'fee'))):
     @property
     def net_amount(self):
         return self.amount - self.fee
+
+
+def payments_association_table_for(cls):
+    return Base.metadata.tables['payments_for_{}'.format(cls.__tablename__)]

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a helper method to get the association table for a given Payable.
+  [href]
+
 - Switch to onegov.core's generic association implementation.
   [href]
 
