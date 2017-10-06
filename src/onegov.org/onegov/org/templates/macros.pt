@@ -1003,7 +1003,104 @@
     </div>
 </metal:generic_message>
 
-
 <metal:payment_link_fallback define-macro="payment_link_fallback" i18n:domain="onegov.org">
     <!--! pass -->
 </metal:payment_link_fallback>
+
+<metal:payments define-macro="payments" i18n:domain="onegov.org">
+    <table class="payments-table" tal:condition="payments">
+        <thead>
+            <tr>
+                <th i18n:translate tal:condition="payment_links|nothing">
+                    Object
+                </th>
+                <th i18n:translate>
+                    Net Amount
+                </th>
+                <th i18n:translate>
+                    Fee
+                </th>
+                <th i18n:translate>
+                    Payment Provider
+                </th>
+                <th i18n:translate>
+                    State
+                </th>
+                <th i18n:translate>
+                    Created
+                </th>
+                <th i18n:translate>
+                    Disbursed
+                </th>
+                <th tal:condition="payment_actions|nothing"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr tal:repeat="payment payments">
+                <td tal:condition="payment_links|nothing">
+                    <tal:b repeat="link payment_links[payment.id]">
+                        <tal:b switch="link.__tablename__">
+                            <tal:b case="'submissions'">
+                                <tal:b define="ticket get_ticket(link)">
+                                    <div>
+                                        <a href="${request.link(ticket)}">
+                                            <strong>${ticket.number}</strong>
+                                        </a>
+                                        <div>
+                                            ${link.title}
+                                        </div>
+                                    </div>
+                                </tal:b>
+                            </tal:b>
+                            <tal:b case="'reservations'" condition="repeat.link.start">
+                                <tal:b define="ticket get_ticket(link)">
+                                    <div>
+                                        <a href="${request.link(ticket)}">
+                                            <strong>${ticket.number}</strong>
+                                        </a>
+                                        <div>
+                                            ${link.title}
+                                        </div>
+                                    </div>
+                                </tal:b>
+                            </tal:b>
+                            <tal:b case="default">
+                                <metal:b use-macro="layout.macros['payment_link_fallback']" />
+                            </tal:b>
+                        </tal:b>
+                    </tal:b>
+                </td>
+                <td>${'{0:.2f}'.format(payment.net_amount)} ${payment.currency}</td>
+                <td>
+                    <tal:b condition="payment.fee|nothing">
+                        + ${'{0:.2f}'.format(payment.fee)} ${payment.currency}
+                    </tal:b>
+                </td>
+                <td>
+                    <span tal:condition="payment.provider_id">
+                        ${providers[payment.provider_id].title}
+                    </span>
+                    <span tal:condition="not:payment.provider" i18n:translate>
+                        Manual
+                    </span>
+                </td>
+                <td>
+                    <metal:b use-macro="layout.macros['payment_status']" />
+                </td>
+                <td>
+                    ${layout.format_date(payment.created, 'datetime')}
+                </td>
+                <td>
+                    <tal:b condition="payment.payout_date|nothing">
+                        ${layout.format_date(payment.payout_date, 'date')}
+                    </tal:b>
+                </td>
+                <td tal:condition="payment_actions|nothing" class="text-links">
+                    <tal:b repeat="link payment_actions(payment)">
+                        <tal:b replace="structure link(layout)" />
+                    </tal:b>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</metal:payments>

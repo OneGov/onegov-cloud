@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to use the payments table in other views.
+  [href]
+
 0.15.0 (2017-09-28)
 ~~~~~~~~~~~~~~~~~~~
 
