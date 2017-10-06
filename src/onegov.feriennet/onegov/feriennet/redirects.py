@@ -23,7 +23,7 @@ class PeriodenRedirect(Redirect):
 
 
 @FeriennetApp.path(path='/periode', absorb=True)
-class PeriodenRedirect(Redirect):
+class PeriodeRedirect(Redirect):
     to = '/period'
 
 
