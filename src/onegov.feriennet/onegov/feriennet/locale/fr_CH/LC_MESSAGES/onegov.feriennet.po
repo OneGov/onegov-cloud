@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-10-03 16:34+0200\n"
+"POT-Creation-Date: 2017-10-06 14:53+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -991,72 +991,82 @@ msgstr ""
 
 msgid "This activity is currently being reviewd by an administrator."
 msgstr ""
+"Cette activité est actuellement en cours d'évaluation par un administrateur."
 
 msgid "This activity has been archived."
-msgstr ""
+msgstr "Cette activité a été archivée."
 
 msgid "There are currently no occasions planned."
-msgstr ""
+msgstr "Il n'y a actuellement aucun événement programmé."
 
 msgid "The total amount is ${amount} CHF."
-msgstr ""
+msgstr "Le montant total est de ${amount} CHF."
 
 msgid "The outstanding amount is ${amount} CHF."
-msgstr ""
+msgstr "Le montant impayé est de ${amount} CHF."
 
 msgid "No bills created yet."
-msgstr ""
+msgstr "Aucune facture n'a été créée pour le moment."
 
 msgid "Paid"
-msgstr ""
+msgstr "Payé"
 
 msgid "${amount} unpaid"
-msgstr ""
+msgstr "${amount} non payés"
 
 msgid "Show Details"
-msgstr ""
+msgstr "Afficher les détails"
 
 msgid "Booking Text"
-msgstr ""
+msgstr "Message de réservation"
 
 msgid "Amount"
-msgstr ""
+msgstr "Montant"
 
 msgid "Actions"
-msgstr ""
+msgstr "Actions"
 
 msgid "Unpaid"
-msgstr ""
+msgstr "Non payé(s)"
 
 msgid "Total"
-msgstr ""
+msgstr "Total"
 
 msgid "The matching of this period has not been confirmed yet."
-msgstr ""
+msgstr "La rencontre de cette période n'a pas encore été confirmée."
 
 msgid ""
 "This period is not active. Bills may only be created for the active period."
 msgstr ""
+"Cette période n'est pas active. Les factures peuvent seulement être créées "
+"pour la période active."
 
 msgid ""
 "The billing for this period has been confirmed. You can still change the "
 "invoices manually but you can no longer generate them automatically."
 msgstr ""
+"La facturation pour cette période a été confirmée. Vous pouvez toujours "
+"modifier les factures manuellement mais vous ne pouvez plus les générer "
+"automatiquement."
 
 #. Used in sentence: "No bank account defined. Please define a bank account in
 #. the ${link} first."
 msgid "settings"
-msgstr ""
+msgstr "paramètres"
 
 #. Canonical text for ${link} is: "settings"
 msgid ""
 "No bank account defined. Please define a bank account in the ${link} first."
 msgstr ""
+"Aucun compte bancaire défini. Veuillez d'abord définir un compte bancaire "
+"sur ${link}."
 
 msgid ""
 "To import a bank statement you need an account with one of the following "
 "banks:"
 msgstr ""
+"Pour importer un relevé bancaire, vous aurez besoin d'un compte chez l'une "
+"des banques suivantes :"
 
 msgid ""
 "Your statement is required to be in \"ISO-20022 format (without picture)\". "
@@ -1064,98 +1074,112 @@ msgid ""
 "your bank to switch your account to this format or to select this format in "
 "your online banking profile."
 msgstr ""
+"Votre relevé doit être au « format ISO-20022 (sans photo) ». Il se peut "
+"également que les banques y fassent référence en tant que « camt.054 » ou "
+"« camt.053 ». Assurez-vous de demander à votre banque de mettre votre compte"
+" sous ce format ou de sélectionner ce format dans votre profil de banque en "
+"ligne."
 
 msgid "Username"
-msgstr ""
+msgstr "Nom d'utilisateur"
 
 msgid "Unknown"
-msgstr ""
+msgstr "Inconnu"
 
 msgid "Valuta Date"
-msgstr ""
+msgstr "Taux de change à la date du"
 
 msgid "Account"
-msgstr ""
+msgstr "Compte"
 
 msgid "Account Owner"
-msgstr ""
+msgstr "Titulaire du compte"
 
 msgid "Reference Number"
-msgstr ""
+msgstr "Numéro de référence"
 
 msgid "Investigate"
-msgstr ""
+msgstr "Enquêter"
 
 msgid "Show ${user}'s bills."
-msgstr ""
+msgstr "Afficher les factures de ${user}."
 
 msgid "Import ${count} payments"
-msgstr ""
+msgstr "Importer ${count} paiements"
 
 msgid "Legend"
-msgstr ""
+msgstr "Légende"
 
 msgid "Payment detected."
-msgstr ""
+msgstr "Paiement détecté."
 
 msgid "The amount, note or reference is wrong."
-msgstr ""
+msgstr "Le montant, la note ou la référence est incorrect. "
 
 msgid "The payment was found twice."
-msgstr ""
+msgstr "Le paiement a été trouvé deux fois."
 
 msgid "The payment has already been imported."
-msgstr ""
+msgstr "Le paiement a déjà été importé."
 
 msgid "Could not match the payment to a bill."
-msgstr ""
+msgstr "N'a pas pu trouver de facture correspondant au paiement."
 
 msgid ""
 "You haven't added an emergency contact to your profile yet. Please add this "
 "information in your userprofile so we can reach you in an emergency!"
 msgstr ""
+"Vous n'avez pas encore ajouté d'informations de contact en cas d'urgence à "
+"votre profil. Veuillez ajouter ces informations dans votre profil "
+"d'utilisateur afin que nous puissions vous contacter en cas d'urgence !"
 
 msgid "Add in Userprofile"
-msgstr ""
+msgstr "Ajouter sur le profil d'utilisateur"
 
 msgid ""
 "This is your emergency contact. Please change it in the user profile if it "
 "is not up to date anymore:"
 msgstr ""
+"Ce sont des informations de contact en cas d'urgence. Veuillez les modifier "
+"sur le profil d'utilisateur si elles ne sont plus à jour :"
 
 msgid "Change in Userprofile"
-msgstr ""
+msgstr "Modifier dans le profil d'utilisateur"
 
 msgid "No bookings yet."
-msgstr ""
+msgstr "Pas encore de réservation."
 
 msgid "Print All"
-msgstr ""
+msgstr "Tout imprimer"
 
 msgid "Mark up to three occasions per child as favorites."
-msgstr ""
+msgstr "Marquez jusqu'à trois événements par enfant en tant que favoris."
 
 msgid ""
 "Once the pre-booking is over, we will divide all children into activities."
 msgstr ""
+"Une fois la pré-réservation terminée, nous répartirons les enfants dans les "
+"activités."
 
 msgid "We cannot guarantee that everyone gets into their favorite activity."
 msgstr ""
+"Nous ne pouvons garantir que tout le monde pourra participer à son activité "
+"préféré."
 
 msgid "Print"
-msgstr ""
+msgstr "Imprimer"
 
 msgid "Limited to ${number} bookings"
-msgstr ""
+msgstr "Limité à ${number} réservations"
 
 msgid "Unlimited bookings"
-msgstr ""
+msgstr "Réservations illimitées"
 
 msgid "Free of charge"
-msgstr ""
+msgstr "Gratuit"
 
 msgid "This occasion does not have enough attendees yet."
-msgstr ""
+msgstr "Cet événement n'a pas encore assez de participants. "
 
 msgid "Passport"
 msgstr ""
@@ -1594,6 +1618,10 @@ msgid "Booking Limit of ${name}"
 msgstr ""
 
 #, python-format
+msgid "Online Payments by ${name}"
+msgstr ""
+
+#, python-format
 msgid "Billing for ${title}"
 msgstr ""
 
@@ -1622,14 +1650,28 @@ msgstr ""
 msgid "Mark whole bill as paid"
 msgstr ""
 
+msgid "Refund Payment"
+msgstr ""
+
+msgid "Show online payments"
+msgstr ""
+
+#, python-format
+msgid "Do you really want to refund ${amount}?"
+msgstr ""
+
+#, python-format
+msgid "Refund ${amount}"
+msgstr ""
+
 msgid ""
-"This position has been paid online. To change the the state of the position "
-"the payment needs to be charged back."
+"This position has been paid online. To change the state of the position the "
+"payment needs to be charged back."
 msgstr ""
 
 msgid ""
 "This bill or parts of it have been paid online. To change the state of the "
-"bill the payment needs to charged back."
+"bill the payment needs to be charged back."
 msgstr ""
 
 msgid ""
