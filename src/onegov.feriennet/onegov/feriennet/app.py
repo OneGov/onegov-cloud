@@ -20,6 +20,12 @@ BANNER_TEMPLATE = """
         <a href="{url}">
             <img src="{src}">
         </a>
+        <img src="{tracker}"
+                 border="0"
+                 height="1"
+                 width="1"
+                 onerror="this.style.display='none'"
+                 alt="Advertisement">
     </div>
 </div>
 """
@@ -75,7 +81,8 @@ class FeriennetApp(OrgApp):
         return BANNER_TEMPLATE.format(
             id=id,
             src=winner.url_for(request, winner.banners[id]['src']),
-            url=winner.banners[id]['url']
+            url=winner.banners[id]['url'],
+            tracker=winner.banners[id].get('tracker')
         )
 
 

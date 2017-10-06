@@ -21,3 +21,17 @@
       # kept while the banner shrinks
       src: sponsors/concordia-banner.jpg
       url: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner\\|feriennet\\|0\\|0\\|fnet\\|de'
+
+- name: CREDIT SUISSE
+  logo_url: 'https://www.credit-suisse.com/corporate/de/responsibility/economy-society/commitments-in-switzerland.html'
+  mail_url: 'https://www.credit-suisse.com/corporate/de/responsibility/economy-society/commitments-in-switzerland.html'
+  logo: sponsors/credit-suisse.svg
+  background: '#fff'
+  width: 200px
+  height: 46px
+  top: -7px
+  banners:
+    bookings:
+      src: sponsors/credit-suisse-banner.png
+      url: 'https://ad.doubleclick.net/ddm/trackclk/N8394.3080457PROJUVENTUTE/B20111643.205375159;dc_trk_aid=405205282;dc_trk_cid=91028232;dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
+      tracker: 'https://ad.doubleclick.net/ddm/trackimp/N8394.3080457PROJUVENTUTE/B20111643.205375159;dc_trk_aid=405205282;dc_trk_cid=91028232;ord=[timestamp];dc_lat=;dc_rdid=;tag_for_child_directed_treatment=?|https://ad.doubleclick.net/ddm/trackimp/N8394.3080457PROJUVENTUTE/B20111643.205375159;dc_trk_aid=405205282;dc_trk_cid=91028232;ord=%5btimestamp%5d;dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
