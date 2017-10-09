@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Removes leftover onegov.notices table.
+  [href]
+
 0.15.1 (2017-10-06)
 ~~~~~~~~~~~~~~~~~~~
 
