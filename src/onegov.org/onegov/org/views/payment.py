@@ -22,8 +22,6 @@ def ticket_by_link(tickets, link):
         return tickets.by_handler_id(link.token.hex)
     elif link.__tablename__ == 'submissions':
         return tickets.by_handler_id(link.id.hex)
-    else:
-        raise NotImplementedError
 
 
 def send_ticket_notifications(payment, request, change):
