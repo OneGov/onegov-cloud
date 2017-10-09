@@ -75,7 +75,10 @@ class RegisteredLink(namedtuple("RegisteredLink", (
     'attribute',
     'cardinality',
 ))):
-    pass
+
+    @property
+    def class_attribute(self):
+        return getattr(self.cls, self.attribute)
 
 
 def associated(associated_cls, attribute_name, cardinality='one-to-many',
