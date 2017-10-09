@@ -1,5 +1,5 @@
 /*!
- * Quill Editor v1.3.2
+ * Quill Editor v1.3.3
  * https://quilljs.com/
  * Copyright (c) 2014, Jason Chen
  * Copyright (c) 2013, salesforce.com
@@ -140,7 +140,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var ParchmentError = (function (_super) {
+var ParchmentError = /** @class */ (function (_super) {
     __extends(ParchmentError, _super);
     function ParchmentError(message) {
         var _this = this;
@@ -1291,7 +1291,7 @@ var Quill = function () {
   }, {
     key: 'getFormat',
     value: function getFormat() {
-      var index = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.getSelection();
+      var index = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.getSelection(true);
       var length = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
 
       if (typeof index === 'number') {
@@ -1531,7 +1531,7 @@ Quill.DEFAULTS = {
 Quill.events = _emitter4.default.events;
 Quill.sources = _emitter4.default.sources;
 // eslint-disable-next-line no-undef
-Quill.version =  false ? 'dev' : "1.3.2";
+Quill.version =  false ? 'dev' : "1.3.3";
 
 Quill.imports = {
   'delta': _quillDelta2.default,
@@ -2107,7 +2107,7 @@ function objEquiv(a, b, opts) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var Registry = __webpack_require__(1);
-var Attributor = (function () {
+var Attributor = /** @class */ (function () {
     function Attributor(attrName, keyName, options) {
         if (options === void 0) { options = {}; }
         this.attrName = attrName;
@@ -2792,7 +2792,6 @@ var Selection = function () {
     this.lastRange = this.savedRange = new Range(0, 0);
     this.handleComposition();
     this.handleDragging();
-    this.handleEmbedSelection();
     this.emitter.listenDOM('selectionchange', document, function () {
       if (!_this.mouseDown) {
         setTimeout(_this.update.bind(_this, _emitter4.default.sources.USER), 1);
@@ -2859,26 +2858,6 @@ var Selection = function () {
       this.emitter.listenDOM('mouseup', document.body, function () {
         _this3.mouseDown = false;
         _this3.update(_emitter4.default.sources.USER);
-      });
-    }
-  }, {
-    key: 'handleEmbedSelection',
-    value: function handleEmbedSelection() {
-      var _this4 = this;
-
-      this.emitter.on(_emitter4.default.events.SELECTION_CHANGE, function () {
-        var selectedNode = document.querySelector('.ql-embed-selected');
-        if (selectedNode) {
-          selectedNode.classList.remove('ql-embed-selected');
-        }
-      });
-      this.root.addEventListener('click', function (e) {
-        var blot = _parchment2.default.find(e.target, true);
-        if (blot instanceof _parchment2.default.Embed) {
-          var range = new Range(blot.offset(scroll), blot.length());
-          _this4.setRange(range, _emitter4.default.sources.USER);
-          blot.domNode.classList.add('ql-embed-selected');
-        }
       });
     }
   }, {
@@ -3010,7 +2989,7 @@ var Selection = function () {
   }, {
     key: 'normalizedToRange',
     value: function normalizedToRange(range) {
-      var _this5 = this;
+      var _this4 = this;
 
       var positions = [[range.start.node, range.start.offset]];
       if (!range.native.collapsed) {
@@ -3022,7 +3001,7 @@ var Selection = function () {
             offset = _position[1];
 
         var blot = _parchment2.default.find(node, true);
-        var index = blot.offset(_this5.scroll);
+        var index = blot.offset(_this4.scroll);
         if (offset === 0) {
           return index;
         } else if (blot instanceof _parchment2.default.Container) {
@@ -3067,7 +3046,7 @@ var Selection = function () {
   }, {
     key: 'rangeToNative',
     value: function rangeToNative(range) {
-      var _this6 = this;
+      var _this5 = this;
 
       var indexes = range.collapsed ? [range.index] : [range.index, range.index + range.length];
       var args = [];
@@ -3075,7 +3054,7 @@ var Selection = function () {
       indexes.forEach(function (index, i) {
         index = Math.min(scrollLength - 1, index);
         var node = void 0,
-            _scroll$leaf5 = _this6.scroll.leaf(index),
+            _scroll$leaf5 = _this5.scroll.leaf(index),
             _scroll$leaf6 = _slicedToArray(_scroll$leaf5, 2),
             leaf = _scroll$leaf6[0],
             offset = _scroll$leaf6[1];
@@ -3323,7 +3302,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var linked_list_1 = __webpack_require__(44);
 var shadow_1 = __webpack_require__(30);
 var Registry = __webpack_require__(1);
-var ContainerBlot = (function (_super) {
+var ContainerBlot = /** @class */ (function (_super) {
     __extends(ContainerBlot, _super);
     function ContainerBlot() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -3569,7 +3548,7 @@ var attributor_1 = __webpack_require__(12);
 var store_1 = __webpack_require__(31);
 var container_1 = __webpack_require__(17);
 var Registry = __webpack_require__(1);
-var FormatBlot = (function (_super) {
+var FormatBlot = /** @class */ (function (_super) {
     __extends(FormatBlot, _super);
     function FormatBlot() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -3651,7 +3630,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var shadow_1 = __webpack_require__(30);
 var Registry = __webpack_require__(1);
-var LeafBlot = (function (_super) {
+var LeafBlot = /** @class */ (function (_super) {
     __extends(LeafBlot, _super);
     function LeafBlot() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -4604,15 +4583,15 @@ var Embed = function (_Parchment$Embed) {
 
     var _this = _possibleConstructorReturn(this, (Embed.__proto__ || Object.getPrototypeOf(Embed)).call(this, node));
 
-    var wrapper = document.createElement('span');
-    wrapper.setAttribute('contenteditable', false);
+    _this.contentNode = document.createElement('span');
+    _this.contentNode.setAttribute('contenteditable', false);
     [].slice.call(_this.domNode.childNodes).forEach(function (childNode) {
-      wrapper.appendChild(childNode);
+      _this.contentNode.appendChild(childNode);
     });
     _this.leftGuard = document.createTextNode(GUARD_TEXT);
     _this.rightGuard = document.createTextNode(GUARD_TEXT);
     _this.domNode.appendChild(_this.leftGuard);
-    _this.domNode.appendChild(wrapper);
+    _this.domNode.appendChild(_this.contentNode);
     _this.domNode.appendChild(_this.rightGuard);
     return _this;
   }
@@ -5075,7 +5054,7 @@ module.exports = _quill2.default;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var Registry = __webpack_require__(1);
-var ShadowBlot = (function () {
+var ShadowBlot = /** @class */ (function () {
     function ShadowBlot(domNode) {
         this.domNode = domNode;
         this.attach();
@@ -5232,7 +5211,7 @@ var attributor_1 = __webpack_require__(12);
 var class_1 = __webpack_require__(32);
 var style_1 = __webpack_require__(33);
 var Registry = __webpack_require__(1);
-var AttributorStore = (function () {
+var AttributorStore = /** @class */ (function () {
     function AttributorStore(domNode) {
         this.attributes = {};
         this.domNode = domNode;
@@ -5318,7 +5297,7 @@ function match(node, prefix) {
         return name.indexOf(prefix + "-") === 0;
     });
 }
-var ClassAttributor = (function (_super) {
+var ClassAttributor = /** @class */ (function (_super) {
     __extends(ClassAttributor, _super);
     function ClassAttributor() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -5379,7 +5358,7 @@ function camelize(name) {
     }).join('');
     return parts[0] + rest;
 }
-var StyleAttributor = (function (_super) {
+var StyleAttributor = /** @class */ (function (_super) {
     __extends(StyleAttributor, _super);
     function StyleAttributor() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -5807,6 +5786,13 @@ Keyboard.DEFAULTS = {
       prefix: /^\s*?(1\.|-|\[ ?\]|\[x\])$/,
       handler: function handler(range, context) {
         var length = context.prefix.length;
+
+        var _quill$getLine7 = this.quill.getLine(range.index),
+            _quill$getLine8 = _slicedToArray(_quill$getLine7, 2),
+            line = _quill$getLine8[0],
+            offset = _quill$getLine8[1];
+
+        if (offset > length) return true;
         var value = void 0;
         switch (context.prefix.trim()) {
           case '[]':case '[ ]':
@@ -5823,13 +5809,7 @@ Keyboard.DEFAULTS = {
         }
         this.quill.insertText(range.index, ' ', _quill2.default.sources.USER);
         this.quill.history.cutoff();
-
-        var _quill$getLine7 = this.quill.getLine(range.index + 1),
-            _quill$getLine8 = _slicedToArray(_quill$getLine7, 2),
-            line = _quill$getLine8[0],
-            offset = _quill$getLine8[1];
-
-        var delta = new _quillDelta2.default().retain(range.index + 1 - offset).delete(length + 1).retain(line.length() - 1 - offset).retain(1, { list: value });
+        var delta = new _quillDelta2.default().retain(range.index - offset).delete(length + 1).retain(line.length() - 2 - offset).retain(1, { list: value });
         this.quill.updateContents(delta, _quill2.default.sources.USER);
         this.quill.history.cutoff();
         this.quill.setSelection(range.index - length, _quill2.default.sources.SILENT);
@@ -6830,7 +6810,7 @@ exports.default = BaseTheme;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var LinkedList = (function () {
+var LinkedList = /** @class */ (function () {
     function LinkedList() {
         this.head = this.tail = undefined;
         this.length = 0;
@@ -6988,7 +6968,7 @@ var OBSERVER_CONFIG = {
     subtree: true
 };
 var MAX_OPTIMIZE_ITERATIONS = 100;
-var ScrollBlot = (function (_super) {
+var ScrollBlot = /** @class */ (function (_super) {
     __extends(ScrollBlot, _super);
     function ScrollBlot(node) {
         var _this = _super.call(this, node) || this;
@@ -7155,7 +7135,7 @@ function isEqual(obj1, obj2) {
     }
     return true;
 }
-var InlineBlot = (function (_super) {
+var InlineBlot = /** @class */ (function (_super) {
     __extends(InlineBlot, _super);
     function InlineBlot() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -7228,7 +7208,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var format_1 = __webpack_require__(18);
 var Registry = __webpack_require__(1);
-var BlockBlot = (function (_super) {
+var BlockBlot = /** @class */ (function (_super) {
     __extends(BlockBlot, _super);
     function BlockBlot() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -7303,7 +7283,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var leaf_1 = __webpack_require__(19);
-var EmbedBlot = (function (_super) {
+var EmbedBlot = /** @class */ (function (_super) {
     __extends(EmbedBlot, _super);
     function EmbedBlot() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -7352,7 +7332,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var leaf_1 = __webpack_require__(19);
 var Registry = __webpack_require__(1);
-var TextBlot = (function (_super) {
+var TextBlot = /** @class */ (function (_super) {
     __extends(TextBlot, _super);
     function TextBlot(node) {
         var _this = _super.call(this, node) || this;
@@ -10235,7 +10215,7 @@ var List = function (_Container) {
 
     var _this2 = _possibleConstructorReturn(this, (List.__proto__ || Object.getPrototypeOf(List)).call(this, domNode));
 
-    domNode.addEventListener('click', function (e) {
+    var listEventHandler = function listEventHandler(e) {
       if (e.target.parentNode !== domNode) return;
       var format = _this2.statics.formats(domNode);
       var blot = _parchment2.default.find(e.target);
@@ -10244,7 +10224,10 @@ var List = function (_Container) {
       } else if (format === 'unchecked') {
         blot.format('list', 'checked');
       }
-    });
+    };
+
+    domNode.addEventListener('touchstart', listEventHandler);
+    domNode.addEventListener('mousedown', listEventHandler);
     return _this2;
   }
 
@@ -10731,7 +10714,10 @@ var FormulaBlot = function (_Embed) {
     value: function create(value) {
       var node = _get(FormulaBlot.__proto__ || Object.getPrototypeOf(FormulaBlot), 'create', this).call(this, value);
       if (typeof value === 'string') {
-        window.katex.render(value, node);
+        window.katex.render(value, node, {
+          throwOnError: false,
+          errorColor: '#f00'
+        });
         node.setAttribute('data-value', value);
       }
       return node;
@@ -11024,13 +11010,13 @@ module.exports = "<svg viewbox=\"0 0 18 18\"> <path class=ql-fill d=M11.759,2.48
 /* 92 */
 /***/ (function(module, exports) {
 
-module.exports = "<svg viewbox=\"0 0 18 18\"> <line class=ql-stroke x1=3 x2=3 y1=4 y2=14></line> <line class=ql-stroke x1=11 x2=11 y1=4 y2=14></line> <line class=ql-stroke x1=11 x2=3 y1=9 y2=9></line> <line class=\"ql-stroke ql-thin\" x1=13.5 x2=15.5 y1=14.5 y2=14.5></line> <path class=ql-fill d=M14.5,15a0.5,0.5,0,0,1-.5-0.5V12.085l-0.276.138A0.5,0.5,0,0,1,13.053,12c-0.124-.247-0.023-0.324.224-0.447l1-.5A0.5,0.5,0,0,1,15,11.5v3A0.5,0.5,0,0,1,14.5,15Z></path> </svg>";
+module.exports = "<svg viewBox=\"0 0 18 18\"> <path class=ql-fill d=M10,4V14a1,1,0,0,1-2,0V10H3v4a1,1,0,0,1-2,0V4A1,1,0,0,1,3,4V8H8V4a1,1,0,0,1,2,0Zm6.06787,9.209H14.98975V7.59863a.54085.54085,0,0,0-.605-.60547h-.62744a1.01119,1.01119,0,0,0-.748.29688L11.645,8.56641a.5435.5435,0,0,0-.022.8584l.28613.30762a.53861.53861,0,0,0,.84717.0332l.09912-.08789a1.2137,1.2137,0,0,0,.2417-.35254h.02246s-.01123.30859-.01123.60547V13.209H12.041a.54085.54085,0,0,0-.605.60547v.43945a.54085.54085,0,0,0,.605.60547h4.02686a.54085.54085,0,0,0,.605-.60547v-.43945A.54085.54085,0,0,0,16.06787,13.209Z /> </svg>";
 
 /***/ }),
 /* 93 */
 /***/ (function(module, exports) {
 
-module.exports = "<svg viewbox=\"0 0 18 18\"> <line class=ql-stroke x1=3 x2=3 y1=4 y2=14></line> <line class=ql-stroke x1=11 x2=11 y1=4 y2=14></line> <line class=ql-stroke x1=11 x2=3 y1=9 y2=9></line> <path class=\"ql-stroke ql-thin\" d=M15.5,14.5h-2c0-.234,1.85-1.076,1.85-2.234a0.959,0.959,0,0,0-1.85-.109></path> </svg>";
+module.exports = "<svg viewBox=\"0 0 18 18\"> <path class=ql-fill d=M16.73975,13.81445v.43945a.54085.54085,0,0,1-.605.60547H11.855a.58392.58392,0,0,1-.64893-.60547V14.0127c0-2.90527,3.39941-3.42187,3.39941-4.55469a.77675.77675,0,0,0-.84717-.78125,1.17684,1.17684,0,0,0-.83594.38477c-.2749.26367-.561.374-.85791.13184l-.4292-.34082c-.30811-.24219-.38525-.51758-.1543-.81445a2.97155,2.97155,0,0,1,2.45361-1.17676,2.45393,2.45393,0,0,1,2.68408,2.40918c0,2.45312-3.1792,2.92676-3.27832,3.93848h2.79443A.54085.54085,0,0,1,16.73975,13.81445ZM9,3A.99974.99974,0,0,0,8,4V8H3V4A1,1,0,0,0,1,4V14a1,1,0,0,0,2,0V10H8v4a1,1,0,0,0,2,0V4A.99974.99974,0,0,0,9,3Z /> </svg>";
 
 /***/ }),
 /* 94 */
