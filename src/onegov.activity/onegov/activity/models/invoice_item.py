@@ -2,7 +2,7 @@ from onegov.activity import utils
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from onegov.pay import Payable
+from onegov.pay import PayableManyTimes
 from onegov.user import User
 from sqlalchemy import Boolean
 from sqlalchemy import Column
@@ -15,7 +15,7 @@ from sqlalchemy_utils import observes
 from uuid import uuid4
 
 
-class InvoiceItem(Base, TimestampMixin, Payable):
+class InvoiceItem(Base, TimestampMixin, PayableManyTimes):
     """ An item in an invoice. """
 
     __tablename__ = 'invoice_items'

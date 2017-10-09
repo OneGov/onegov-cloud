@@ -60,17 +60,19 @@ class InvoiceItemCollection(GenericCollection):
         items = self.query().filter(and_(
             InvoiceItem.source != None,
             InvoiceItem.source != 'xml'
-        )).join(InvoiceItem.payment)
+        )).join(InvoiceItem.payments)
 
         for item in items:
-            if item.payment:
-                # though it should be fairly rare, it's possible for charges
-                # not to be captured yet
-                if item.payment.state == 'open':
-                    item.payment.charge.capture()
-                    item.payment.sync()
+            if item.payments:
+                for payment in item.payments:
+                    # though it should be fairly rare, it's possible for
+                    # charges not to be captured yet
+                    if payment.state == 'open':
+                        payment.charge.capture()
+                        payment.sync()
 
-                item.paid = item.payment.state == 'paid'
+                # the last payment is the relevant one
+                item.paid = item.payments[-1].state == 'paid'
 
     def add(self, user, invoice, group, text, unit, quantity):
         if isinstance(user, str):
