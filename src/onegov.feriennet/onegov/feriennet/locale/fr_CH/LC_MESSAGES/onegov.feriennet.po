@@ -83,7 +83,7 @@ msgid "Import Bank Statement"
 msgstr "Importer un relevé bancaire"
 
 msgid "Synchronise Online Payments"
-msgstr ""
+msgstr "Paiements en ligne synchronisés"
 
 msgid "Notification Templates"
 msgstr "Modèles de notification"
@@ -1898,49 +1898,56 @@ msgid "Do you really want to deactivate \"${title}\"?"
 msgstr "Voulez-vous vraiment désactiver « ${title} » ?"
 
 msgid "This will hide all associated occasions"
-msgstr ""
+msgstr "Ceci masquera toutes les occasions associées"
 
 msgid "Deactivate Period"
-msgstr ""
+msgstr "Désactiver la période"
 
 #, python-format
 msgid "\"${title}\" cannot be archived yet"
-msgstr ""
+msgstr "\"${title}\" ne peut pas encore être archivé"
 
 msgid ""
 "A period can only be archived once the bookings have been made and the bills"
 " have been compiled."
 msgstr ""
+"Une période peut uniquement être achevée lorsque les réservations ont été "
+"faites et que les factures ont été compilées."
 
 #, python-format
 msgid "Do you really want to activate \"${title}\"?"
-msgstr ""
+msgstr "Êtes-vous certain de vouloir activer \"${title}\" ?"
 
 msgid ""
 "This will deactivate the currently active period. All associated occasions "
 "will be made public"
 msgstr ""
+"Cela désactivera la période active. Toutes les occasions associées seront "
+"rendues publiques"
 
 msgid "Activate Period"
-msgstr ""
+msgstr "Activer la période"
 
 #, python-format
 msgid "Do you really want to archive \"${title}\"?"
-msgstr ""
+msgstr "Souhaitez-vous vraiment archiver \"${title}\" ?"
 
 msgid ""
 "This will archive all activities which do not already have an occasion in a "
 "future period. To publish archived activities again a new publication "
 "request needs to be filed."
 msgstr ""
+"Cela archivera toutes les activités qui n'ont pas encore d'occasion pour la "
+"période à venir. Pour republier les activités archivées, une nouvelle "
+"demande de publication doit être effectuée."
 
 msgid "Archive Period"
-msgstr ""
+msgstr "Archiver la période"
 
 #, python-format
 msgid "Bookings for ${period}"
-msgstr ""
+msgstr "Réservations pour ${period}"
 
 #, python-format
 msgid "Billing for ${period}"
-msgstr ""
+msgstr "Facturation pour ${period}"
