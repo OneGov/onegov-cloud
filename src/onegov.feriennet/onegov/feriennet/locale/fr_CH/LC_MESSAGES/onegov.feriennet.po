@@ -1182,337 +1182,369 @@ msgid "This occasion does not have enough attendees yet."
 msgstr "Cet événement n'a pas encore assez de participants. "
 
 msgid "Passport"
-msgstr ""
+msgstr "Passeport"
 
 msgid "For ${user}"
-msgstr ""
+msgstr "Pour ${user}"
 
 msgid "User"
-msgstr ""
+msgstr "Utilisateur"
 
 msgid "Online Payment"
-msgstr ""
+msgstr "Paiement en ligne"
 
 msgid "Bank Transfer"
-msgstr ""
+msgstr "Virement bancaire"
 
 msgid "Notice"
-msgstr ""
+msgstr "Notification"
 
 msgid "Pro Juventute Feriennet"
-msgstr ""
+msgstr "Feriennet de Pro Juventute "
 
 msgid "Pro Juventute Logo"
-msgstr ""
+msgstr "Logo Pro Juventute "
 
 msgid ""
 "Feriennet is Pro Juventute's booking platform for supervised vacation "
 "activities."
 msgstr ""
+"Feriennet est la plate-forme de réservations de Pro Juventute pour les "
+"activités de loisirs encadrées."
 
 msgid ""
 "This platform was developed by ${seantis} with ${onegovcloud}, supported by "
 "${netcetera}."
 msgstr ""
+"La plate-forme est développé par ${seantis} avec ${onegovcloud}, pris en "
+"charge par ${netcetera}."
 
 #. Used in sentence: "You can find additional Pro Juventute offers ${here}."
 msgid "here"
-msgstr ""
+msgstr "ici"
 
 #. Canonical text for ${here} is: "here"
 msgid "You can find additional Pro Juventute offers ${here}."
-msgstr ""
+msgstr "Vous trouverez d'autres offres Pro Juventute ${here}."
 
 #. Used in sentence: "Pro Juventute Feriennet could only be realised thanks to
 #. the generous support of our ${partners}."
 msgid "partners"
-msgstr ""
+msgstr "Partenaires"
 
 #. Canonical text for ${partners} is: "partners"
 msgid ""
 "Pro Juventute Feriennet could only be realised thanks to the generous "
 "support of our ${partners}."
 msgstr ""
+"Feriennet de Pro Juventute n'a pu être réalisée que grâce à la générosité de"
+" nos ${partners}."
 
 msgid "Feriennet Partner"
-msgstr ""
+msgstr "Partenaire Feriennet"
 
 msgid "Platform"
-msgstr ""
+msgstr "Plate-forme"
 
 msgid "The activity associated with this ticket belongs to ${user}."
-msgstr ""
+msgstr "L'activité associée à ce ticket appartient à ${user}."
 
 msgid "This is the user's first activity."
-msgstr ""
+msgstr "C'est la première activité de l'utilisateur."
 
 msgid "The user has submitted activities before."
-msgstr ""
+msgstr "L'utilisateur a soumis des activités auparavant."
 
 msgid "Activity State"
-msgstr ""
+msgstr "État de l'activité"
 
 msgid "Please review the activity carefully before publishing it."
-msgstr ""
+msgstr "Veuillez vérifier attentivement l'activité avant de la publier."
 
 msgid ""
 "To remove this activity from the public part of the website, you can archive"
 " it."
 msgstr ""
+"Pour supprimer cette activité de la partie publique du site, vous devez "
+"l'archiver."
 
 msgid "Edit contact info"
-msgstr ""
+msgstr "Modifier les coordonnées"
 
 msgid "Ticket State"
-msgstr ""
+msgstr "Statut du ticket"
 
 msgid "Fully booked"
-msgstr ""
+msgstr "Complet"
 
 msgid "Rescinded"
-msgstr ""
+msgstr "Annulé"
 
 msgid "${count} spots available"
-msgstr ""
+msgstr "${count} places disponibles"
 
 msgid "${min_spots} - ${max_spots} participants"
-msgstr ""
+msgstr "${min_spots} – ${max_spots} participants"
 
 msgid "up to ${max_spots} participants"
-msgstr ""
+msgstr "Jusqu'à ${max_spots} participants"
 
 msgid "${count} attendees"
-msgstr ""
+msgstr "${count} participants"
 
 msgid "${cost} CHF"
-msgstr ""
+msgstr "${cost} CHF"
 
 msgid "No additional costs"
-msgstr ""
+msgstr "Aucun frais supplémentaires "
 
 msgid "Independent of other occasions"
-msgstr ""
+msgstr "Indépendant d'autres événements"
 
 msgid "Enroll your child now."
-msgstr ""
+msgstr "Inscrivez votre enfant dès maintenant."
 
 msgid "Enroll"
-msgstr ""
+msgstr "Inscrire"
 
 msgid "Mark activity as favorite"
-msgstr ""
+msgstr "Mettre cette activité dans mes favoris"
 
 msgid "Unmark activity as favorite"
-msgstr ""
+msgstr "Retirer cette activité de mes favoris"
 
 msgid "Increase the bookings priority"
-msgstr ""
+msgstr "Augmenter la priorité des réservations"
 
 msgid "Decrease the bookings priority"
-msgstr ""
+msgstr "Diminuer la priorité des réservations"
 
 msgid "Prebooking begins on ${date}."
-msgstr ""
+msgstr "La pré-réservation commence le ${date}."
 
 msgid "Prebooking is now active until ${date}."
-msgstr ""
+msgstr "La pré-réservation est désormais active jusqu'au ${date}."
 
 msgid "Prebooking has ended."
-msgstr ""
+msgstr "Les pré-réservations sont terminées."
 
 msgid "There cannot be any more bookings."
-msgstr ""
+msgstr "Les réservations ne sont plus possibles."
 
 msgid "The deadline for last-minute bookings is the ${date}."
 msgstr ""
+"La date limite pour les réservations de dernière minute est le ${date}."
 
 msgid "Last-minute bookings are possible up to ${days} before each occasion."
 msgstr ""
+"Les réservations de dernière minute sont possibles jusqu'à ${days} avant "
+"chaque événement."
 
 msgid ""
 "Each child is assigned up to ${count} activities. To ensure a good matching "
 "you can signup for more activities than those."
 msgstr ""
+"Chaque enfant est inscrit jusqu'à ${count} activités. Pour être qu'elles lui"
+" correspondent, vous pouvez l'inscrire à plus d'activités."
 
 msgid ""
 "The passport costs ${amount} CHF per child. Individual activities may incur "
 "additional charges."
 msgstr ""
+"Le passeport coûte ${amount} CHF par enfant. Les activités individuelles "
+"peuvent faire l'objet d'un supplément."
 
 msgid ""
 "Between each booking we enforce ${minutes} minutes of block-time in which no"
 " other booking is permitted."
 msgstr ""
+"Entre chaque réservation, nous imposons ${minutes} minutes de latence "
+"pendant lesquelles aucune autre réservation n'est possible."
 
 msgid ""
 "Your request will be processed shortly. To see the state of your process "
 "your may return to this page at any time. All information on this page has "
 "been sent to your e-mail address."
 msgstr ""
+"Votre demande va être traitée sous peu. Pour suivre l'état d'avancement, "
+"vous pouvez revenir sur cette page à tout moment. Toutes les informations "
+"présentes sur cette page ont été envoyées à votre adresse e-mail."
 
 msgid "Your request has been completed."
-msgstr ""
+msgstr "Votre demande a été traitée."
 
 msgid "Dear Sir or Madam,"
-msgstr ""
+msgstr "Cher Monsieur, chère Madame,"
 
 msgid "Your activity has been published:"
-msgstr ""
+msgstr "Votre activité a été publiée :"
 
 msgid "The ticket number is"
-msgstr ""
+msgstr "Le numéro du ticket est"
 
 msgid "Check ticket status"
-msgstr ""
+msgstr "Vérifier l'état du ticket"
 
 msgid "Your activity has been archived:"
-msgstr ""
+msgstr "Votre activité a été archivée : "
 
 msgid "Pro Juventute FERIENNET is supported by:"
-msgstr ""
+msgstr "FERIENNET de Pro Juventute est pris en charge par :"
 
 msgid "The average happiness is ${happiness}."
-msgstr ""
+msgstr "Le taux de satisfaction est de ${happiness}."
 
 msgid "${operability} of all occasions have enough attendees."
-msgstr ""
+msgstr "${operability} des événements ont assez de participants."
 
 msgid ""
 "Marking bookings increases their priority during the next matching run."
 msgstr ""
+"Marquer des réservations augmente leur priorité lors de la prochaine "
+"recherche."
 
 msgid "Years"
-msgstr ""
+msgstr "Années"
 
 msgid "Name"
 msgstr "Nom"
 
 msgid "State"
-msgstr ""
+msgstr "État"
 
 msgid "No bookings."
-msgstr ""
+msgstr "Pas de réservations."
 
 msgid "Automatic Matching"
-msgstr ""
+msgstr "Recherche automatique"
 
 msgid "Reset Matching"
-msgstr ""
+msgstr "Réinitialiser la recherche"
 
 msgid "This period is not active. Only the active period may be matched."
 msgstr ""
+"Cette période n'est pas active. Seule une période active peut être choisie."
 
 msgid ""
 "The matching for this period has been confirmed. If you want to change "
 "matching you need to book/cancel bookings manually."
 msgstr ""
+"La disponibilité pour cette période est confirmée. Si vous souhaitez "
+"modifier votre choix, vous devez effectuer/annuler les réservations "
+"manuellement."
 
 msgid "Period activated."
-msgstr ""
+msgstr "Période activée."
 
 msgid "Period deactivated."
-msgstr ""
+msgstr "Période désactivée."
 
 msgid "Period deleted."
-msgstr ""
+msgstr "Période supprimée."
 
 msgid "Period archived."
-msgstr ""
+msgstr "Période archivée."
 
 msgid "Matching confirmed."
-msgstr ""
+msgstr "Disponibilité confirmée."
 
 msgid "Billing finalized."
-msgstr ""
+msgstr "Facturation effectuée."
 
 msgid "Variables"
-msgstr ""
+msgstr "Variables"
 
 msgid ""
 "Clicking \"Send\" will send the e-mail below to all selected recipients. You"
 " will receive a copy of the e-mail if you are not already on the recipients "
 "list."
 msgstr ""
+"En cliquant sur «Envoyer», vous enverrez l'e-mail ci-dessous à tous les "
+"destinataires sélectionnés. Vous recevrez une copie si vous n'êtes pas dans "
+"la liste des destinataires."
 
 msgid "Edit"
-msgstr ""
+msgstr "Modifier"
 
 msgid "Target Group"
-msgstr ""
+msgstr "Groupe cible"
 
 msgid "There are no available recipients for your user account."
 msgstr ""
+"Il n'y a pas de destinataires disponibles pour votre compte utilisateur."
 
 msgid "No notification templates yet."
-msgstr ""
+msgstr "Il n'y a pas encore de gabarits de notification."
 
 msgid "sent ${time_ago}"
-msgstr ""
+msgstr "envoyé ${time_ago}"
 
 msgid "Not sent yet"
-msgstr ""
+msgstr "Pas encore envoyé"
 
 msgid "This period has not been confirmed yet."
-msgstr ""
+msgstr "Cette période n'a pas encore été confirmée."
 
 msgid "No occasions defined yet."
-msgstr ""
+msgstr "Aucun événement n'est encore défini."
 
 msgid "Emergency Contact:"
-msgstr ""
+msgstr "Personne à contacter en cas d'urgence :"
 
 msgid "Missing!"
-msgstr ""
+msgstr "Manquant !"
 
 msgid "(User: ${user})"
-msgstr ""
+msgstr "(Utilisateur : ${user})"
 
 msgid "Notes:"
-msgstr ""
+msgstr "Notes :"
 
 msgid ""
 "The following activites contain occasions which are in conflict with the "
 "given execution phase:"
 msgstr ""
+"Les activités suivantes contiennent des événements qui sont en conflit avec "
+"la phase d'exécution donnée:"
 
 msgid "No periods defined."
-msgstr ""
+msgstr "Aucune période n'est définie."
 
 msgid "Prebooking Phase"
-msgstr ""
+msgstr "Phase de pré-réservation"
 
 msgid "Exeuction Phase"
-msgstr ""
+msgstr "Phase d'exécution"
 
 msgid "Administrative Costs"
-msgstr ""
+msgstr "Coûts administratifs"
 
 msgid "Status"
-msgstr ""
+msgstr "Statut"
 
 msgid "Completed"
-msgstr ""
+msgstr "Terminé"
 
 msgid "${cost} for ${count} bookings"
-msgstr ""
+msgstr "${cost} pour ${count} réservations"
 
 msgid "Free of charge for ${count} bookings"
-msgstr ""
+msgstr "Gratuit pour ${count} réservations"
 
 msgid "${cost} per booking"
-msgstr ""
+msgstr "${cost} par réservation"
 
 msgid "Active"
-msgstr ""
+msgstr "Actif"
 
 msgid "Inactive"
-msgstr ""
+msgstr "Inactif"
 
 msgid "Mo"
-msgstr ""
+msgstr "Lu"
 
 msgid "Tu"
-msgstr ""
+msgstr "Ma"
 
 msgid "We"
 msgstr ""
