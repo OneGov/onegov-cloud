@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.51.0 (2017-10-09)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds proper many-to-many support for associable tables by removing the PK.
   [href]
