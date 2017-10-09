@@ -414,6 +414,18 @@ class OnlinePaymentsLayout(DefaultLayout):
         super().__init__(*args, **kwargs)
 
     @cached_property
+    def editbar_links(self):
+        return (
+            Link(
+                _("Synchronise Online Payments"),
+                self.request.return_here(
+                    self.request.class_link(
+                        PaymentProviderCollection, name='sync')),
+                attrs={'class': 'sync'},
+            ),
+        )
+
+    @cached_property
     def breadcrumbs(self):
         return (
             Link(_("Homepage"), self.homepage_url),

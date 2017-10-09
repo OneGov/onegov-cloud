@@ -1,8 +1,9 @@
-from onegov.activity import InvoiceItemCollection
+from onegov.activity import InvoiceItemCollection, InvoiceItem
 from onegov.core.security import Private
-from onegov.feriennet import FeriennetApp, _
-from onegov.pay import PaymentCollection, PaymentProviderCollection
+from onegov.feriennet import FeriennetApp
+from onegov.pay import Payment, PaymentProviderCollection
 from onegov.org.views.payment_provider import sync_payments
+from onegov.org.views.payment import refund
 
 
 @FeriennetApp.view(
@@ -22,5 +23,20 @@ def sync_payments_and_reconcile(self, request):
     # performance one - we don't want to load the payments when rendering
     # the potentially large list of invoice items
     InvoiceItemCollection(self.session).sync()
+
+    return result
+
+
+@FeriennetApp.view(
+    model=Payment,
+    name='refund',
+    request_method='POST',
+    permission=Private)
+def refund_and_reconcile(self, request):
+    result = refund(self, request)
+
+    for link in self.links:
+        if isinstance(link, InvoiceItem):
+            link.paid = self.state == 'paid'
 
     return result
