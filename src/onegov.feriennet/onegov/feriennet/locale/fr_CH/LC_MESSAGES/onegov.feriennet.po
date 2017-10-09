@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-10-06 14:53+0200\n"
+"POT-Creation-Date: 2017-10-09 11:40+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -81,6 +81,9 @@ msgstr "Correspondances"
 
 msgid "Import Bank Statement"
 msgstr "Importer un relevé bancaire"
+
+msgid "Synchronise Online Payments"
+msgstr ""
 
 msgid "Notification Templates"
 msgstr "Modèles de notification"
@@ -1547,336 +1550,352 @@ msgid "Tu"
 msgstr "Ma"
 
 msgid "We"
-msgstr ""
+msgstr "Me"
 
 msgid "Th"
-msgstr ""
+msgstr "Je"
 
 msgid "Fr"
-msgstr ""
+msgstr "Ve"
 
 msgid "Sa"
-msgstr ""
+msgstr "Sa"
 
 msgid "Su"
-msgstr ""
+msgstr "Di"
 
 msgid "New Activity"
-msgstr ""
+msgstr "Nouvelle activité"
 
 msgid "The activity was discarded"
-msgstr ""
+msgstr "L'activité a été abandonnée"
 
 msgid "Thank you for your proposal!"
-msgstr ""
+msgstr "Merci de votre proposition !"
 
 msgid "Your changes were saved"
-msgstr ""
+msgstr "Vos modifications ont été enregistrées"
 
 msgid "Your activity has been published"
-msgstr ""
+msgstr "Votre activité a été publiée"
 
 msgid "Your activity has been archived"
-msgstr ""
+msgstr "Votre activité a été archivée"
 
 msgid "A ticket has been opened"
-msgstr ""
+msgstr "Un ticket a été ouvert"
 
 msgid "Clone"
-msgstr ""
+msgstr "Cloner"
 
 msgid "Reinstate"
-msgstr ""
+msgstr "Rétablir"
 
 msgid " 3 - 6 years"
-msgstr ""
+msgstr "De 3 à 6 ans"
 
 msgid " 7 - 10 years"
-msgstr ""
+msgstr "De 7 à 10 ans"
 
 msgid "11 - 13 years"
-msgstr ""
+msgstr "De 11 à 13 ans"
 
 msgid "14 - 17 years"
-msgstr ""
+msgstr "De 14 à 17 ans"
 
 msgid "Own"
-msgstr ""
+msgstr "Propre"
 
 msgid "Rescind"
-msgstr ""
+msgstr "Annuler"
 
 #, python-format
 msgid "Do you really want to reinstate \"${title}\"?"
-msgstr ""
+msgstr "Voulez-vous vraiment rétablir « ${title} » ?"
 
 msgid "Previous attendees need to re-apply"
-msgstr ""
+msgstr "Les participants précédents doivent postuler à nouveau"
 
 msgid "Reinstate Occasion"
-msgstr ""
+msgstr "Rétablir l'événement"
 
 msgid "Delete"
-msgstr ""
+msgstr "Supprimer"
 
 #, python-format
 msgid "Do you really want to rescind \"${title}\"?"
-msgstr ""
+msgstr "Voulez-vous vraiment annuler « ${title} » ?"
 
 #, python-format
 msgid "${count} already accepted bookings will be cancelled"
-msgstr ""
+msgstr "${count} réservations déjà acceptées vont être annulées"
 
 msgid "Rescind Occasion"
-msgstr ""
+msgstr "Rétablir l'événement"
 
 #, python-format
 msgid "Do you really want to delete \"${title}\"?"
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer « ${title} » ?"
 
 msgid ""
 "There are no accepted bookings associated with this occasion, though there "
 "might be cancelled/blocked bookings which will be deleted."
 msgstr ""
+"Il n'y a aucune réservation acceptée associée à cet événement, mais il y a "
+"peut-être des réservations annulées/bloquées qui seront supprimées."
 
 msgid "Delete Occasion"
-msgstr ""
+msgstr "Supprimer l'événement"
 
 msgid "Edit Attendee"
-msgstr ""
+msgstr "Changer le participant"
 
 #, python-format
 msgid "Booking Limit of ${name}"
-msgstr ""
+msgstr "Limite de réservation de ${name}"
 
 #, python-format
 msgid "Online Payments by ${name}"
-msgstr ""
+msgstr "Paiements en ligne par ${name}"
 
 #, python-format
 msgid "Billing for ${title}"
-msgstr ""
+msgstr "Facture pour ${title}"
 
 msgid "Create Bills"
-msgstr ""
+msgstr "Créer des factures"
 
 #, python-format
 msgid "Imported ${count} payments"
-msgstr ""
+msgstr "${count} paiements importés"
 
 msgid "No payments could be imported"
-msgstr ""
+msgstr "Aucun paiement n'a pu être importé"
 
 msgid "Mark as unpaid"
-msgstr ""
+msgstr "Marquer comme non payé"
 
 msgid "Mark as paid"
-msgstr ""
+msgstr "Marquer comme payé"
 
 msgid "No transactions were found in the given file"
-msgstr ""
+msgstr "Aucune transaction n'a été trouvée dans le fichier donné"
 
 msgid "Mark whole bill as unpaid"
-msgstr ""
+msgstr "Marquer la facture entière comme impayée"
 
 msgid "Mark whole bill as paid"
-msgstr ""
+msgstr "Marquer la facture entière comme payée"
 
 msgid "Refund Payment"
-msgstr ""
+msgstr "Rembourser le paiement"
 
 msgid "Show online payments"
-msgstr ""
+msgstr "Montrer les paiements en ligne"
 
 #, python-format
 msgid "Do you really want to refund ${amount}?"
-msgstr ""
+msgstr "Voulez-vous vraiment rembourser ${montant} ?"
 
 #, python-format
 msgid "Refund ${amount}"
-msgstr ""
+msgstr "Rembourser ${montant}"
 
 msgid ""
 "This position has been paid online. To change the state of the position the "
 "payment needs to be charged back."
 msgstr ""
+"Cette position a été payée en ligne. Pour changer le statut de la position, "
+"le paiement doit être facturé à nouveau. "
 
 msgid ""
 "This bill or parts of it have been paid online. To change the state of the "
 "bill the payment needs to be charged back."
 msgstr ""
+"Cette facture ou certains de ses éléments ont été payés en ligne. Pour "
+"changer le statut de la facture, le paiement doit être facturé à nouveau."
 
 msgid ""
 "This position has been confirmed by the bank, do you really want to change "
 "the payment status?"
 msgstr ""
+"Cette position a été confirmée par la banque, voulez-vous vraiment modifier "
+"le statut du paiement ?"
 
 msgid ""
 "This bill or parts of it have been confirmed by the bank, do you really want"
 " to change the payment status?"
 msgstr ""
+"Cette facture ou certains de ses éléments ont été confirmés par la banque, "
+"voulez-vous vraiment modifier le statut du paiement ?"
 
 msgid "The booking was cancelled successfully"
-msgstr ""
+msgstr "La réservation a été annulée avec succès"
 
 msgid "Only open, cancelled, denied or blocked bookings may be deleted"
 msgstr ""
+"Seules les réservations ouvertes, annulées, refusées ou bloquées peuvent "
+"être supprimées"
 
 msgid "The period is not in the wishlist-phase"
-msgstr ""
+msgstr "La période n'est pas dans le phase de liste de souhaits"
 
 #, python-format
 msgid "Do you really want to remove \"${title}\"?"
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer « ${title} » ?"
 
 msgid "Remove Booking"
-msgstr ""
+msgstr "Supprimer la réservation"
 
 msgid "Cannot select more than three favorites per child"
-msgstr ""
+msgstr "Impossible de choisir plus de trois favoris par enfant"
 
 msgid "Cancel Booking"
-msgstr ""
+msgstr "Annuler la réservation"
 
 #, python-format
 msgid "Do you really want to cancel \"${title}\"?"
-msgstr ""
+msgstr "Voulez-vous vraiment annuler « ${title} » ?"
 
 #, python-format
 msgid "Invoices of ${user}"
-msgstr ""
+msgstr "Factures de ${user}"
 
 msgid "Your payment could not be processed"
-msgstr ""
+msgstr "Votre paiement n'a pas pu être traité"
 
 msgid "Your payment has been received. Thank you!"
-msgstr ""
+msgstr "Votre paiement a été reçu. Merci !"
 
 msgid "Pay Online Now"
-msgstr ""
+msgstr "Payer en ligne maintenant"
 
 #, python-format
 msgid "Matches for ${title}"
-msgstr ""
+msgstr "Correspondances pour ${title}"
 
 msgid "Run Matching"
-msgstr ""
+msgstr "Recherche des correspondances"
 
 msgid "The period was successfully reset"
-msgstr ""
+msgstr "La période a été réinitialisée avec succès"
 
 msgid "The matching was confirmed successfully"
-msgstr ""
+msgstr "L'appariement a été confirmé avec succès"
 
 msgid "The matching run executed successfully"
-msgstr ""
+msgstr "Recherche des correspondances exécutée avec succès"
 
 msgid "Signup Attendee"
-msgstr ""
+msgstr "Participant inscrit"
 
 msgid "Remove Wish"
-msgstr ""
+msgstr "Supprimer le souhait"
 
 msgid "Too many attendees"
-msgstr ""
+msgstr "Trop de participants"
 
 msgid "Fully occupied"
-msgstr ""
+msgstr "Entièrement occupé"
 
 msgid "Enough attendees"
-msgstr ""
+msgstr "Assez de participants"
 
 msgid "Not enough attendees"
-msgstr ""
+msgstr "Pas assez de participants"
 
 msgid "No attendees"
-msgstr ""
+msgstr "Pas de participants"
 
 msgid "The period has already been finalized. No new attendees may be added."
 msgstr ""
+"La période a déjà été finalisée. Aucun nouveau participant ne peut être "
+"ajouté."
 
 #, python-format
 msgid "Do you really want to remove ${attendee}'s wish?"
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer le souhait de ${attendee} ?"
 
 #, python-format
 msgid "Do you really want to delete ${attendee}'s booking?"
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer la réservation de ${attendee} ?"
 
 #, python-format
 msgid "Do you really want to cancel ${attendee}'s booking?"
-msgstr ""
+msgstr "Voulez-vous vraiment annuler la réservation de ${attendee} ?"
 
 msgid "Mailing"
-msgstr ""
+msgstr "Publipostage"
 
 msgid "Send E-Mail Now"
-msgstr ""
+msgstr "Envoyer un e-mail maintenant"
 
 msgid "Successfully added a new notification template"
-msgstr ""
+msgstr "Ajout réussi d'un nouveau modèle de notification"
 
 msgid "There are no recipients matching the selection"
-msgstr ""
+msgstr "Il n'y a aucun destinataire correspondant à la sélection"
 
 #, python-format
 msgid "Successfully sent the e-mail to ${count} recipients"
-msgstr ""
+msgstr "Envoi réussi de l'e-mail à ${count} destinataires"
 
 msgid "Delete Notification Template"
-msgstr ""
+msgstr "Supprimer le modèle de notification"
 
 msgid "Enroll Attendee"
-msgstr ""
+msgstr "Inscrire des participants"
 
 msgid "Clone Occasion"
-msgstr ""
+msgstr "Cloner l'événement"
 
 msgid "Edit Occasion"
-msgstr ""
+msgstr "Modifier l'événement"
 
 #, python-format
 msgid "The booking for ${name} was succesfull"
-msgstr ""
+msgstr "La réservation pour ${name} a réussi"
 
 #, python-format
 msgid "The occasion was added to ${name}'s wishlist"
-msgstr ""
+msgstr "L'événement a été ajouté à la liste d'envies de ${name}"
 
 #, python-format
 msgid "Attendees for ${period}"
-msgstr ""
+msgstr "Participants pour ${period}"
 
 msgid "The period was activated successfully"
-msgstr ""
+msgstr "La période a été activée avec succès"
 
 msgid "The period was deactivated successfully"
-msgstr ""
+msgstr "La période a été désactivée avec succès"
 
 msgid "The period was archived successfully"
-msgstr ""
+msgstr "La période a été archivée avec succès"
 
 msgid "The period was added successfully"
-msgstr ""
+msgstr "La période a été ajoutée avec succès"
 
 msgid "The period was deleted successfully"
-msgstr ""
+msgstr "La période a été supprimée avec succès"
 
 msgid "The period could not be deleted as it is still in use"
 msgstr ""
+"La période n'a pas pu être supprimée car elle est toujours en cours "
+"d'utilisation"
 
 msgid "Deactivate"
-msgstr ""
+msgstr "Désactiver"
 
 msgid "Activate"
-msgstr ""
+msgstr "Activer"
 
 msgid "Delete Period"
-msgstr ""
+msgstr "Supprimer la période"
 
 #, python-format
 msgid "Do you really want to deactivate \"${title}\"?"
-msgstr ""
+msgstr "Voulez-vous vraiment désactiver « ${title} » ?"
 
 msgid "This will hide all associated occasions"
 msgstr ""
