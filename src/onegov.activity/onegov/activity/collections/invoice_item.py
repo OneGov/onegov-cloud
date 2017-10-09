@@ -1,6 +1,6 @@
 from onegov.activity.models import InvoiceItem
 from onegov.core.collection import GenericCollection
-from sqlalchemy import func, not_
+from sqlalchemy import func, not_, and_
 
 
 class InvoiceItemCollection(GenericCollection):
@@ -55,6 +55,22 @@ class InvoiceItemCollection(GenericCollection):
             q = q.filter(not_(InvoiceItem.invoice.in_(exclude_invoices)))
 
         return q.scalar()
+
+    def sync(self):
+        items = self.query().filter(and_(
+            InvoiceItem.source != None,
+            InvoiceItem.source != 'xml'
+        )).join(InvoiceItem.payment)
+
+        for item in items:
+            if item.payment:
+                # though it should be fairly rare, it's possible for charges
+                # not to be captured yet
+                if item.payment.state == 'open':
+                    item.payment.charge.capture()
+                    item.payment.sync()
+
+                item.paid = item.payment.state == 'paid'
 
     def add(self, user, invoice, group, text, unit, quantity):
         if isinstance(user, str):
