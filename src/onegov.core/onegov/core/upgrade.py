@@ -72,6 +72,8 @@ def get_upgrade_modules():
         }
 
     """
+    yield 'onegov.core', importlib.import_module('onegov.core.upgrades')
+
     for distribution, entry_map in get_distributions_with_entry_map('onegov'):
         if 'upgrade' in entry_map:
             yield (

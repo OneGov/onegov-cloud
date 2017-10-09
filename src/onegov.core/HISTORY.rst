@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds proper many-to-many support for associable tables by removing the PK.
+  [href]
+
 - Moves identity management functions.
   [msom]
 

@@ -140,7 +140,7 @@ def associated(associated_cls, attribute_name, cardinality='one-to-many',
 
         association = Table(
             name, cls.metadata,
-            Column(key, ForeignKey(target), primary_key=True, nullable=False),
+            Column(key, ForeignKey(target), nullable=False),
             Column(association_key, ForeignKey(association_id), nullable=False)
         )
 
