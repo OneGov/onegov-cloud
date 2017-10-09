@@ -69,9 +69,15 @@ class PaymentCollection(GenericCollection, Pagination):
 
             q = self.session.query(link.cls)
             q = q.filter(link.cls.id.in_(targets.subquery()))
-            q = q.options(joinedload(link.cls.payment))
+            q = q.options(joinedload(link.class_attribute))
 
-            for link in q:
-                payment_links[link.payment.id].append(link)
+            for record in q:
+                payments = getattr(record, link.attribute)
+
+                try:
+                    for payment in payments:
+                        payment_links[payment.id].append(record)
+                except TypeError:
+                    payment_links[payments.id].append(record)
 
         return payment_links

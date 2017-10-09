@@ -9,3 +9,12 @@ class Payable(object):
     """
 
     payment = associated(Payment, 'payment', 'many-to-many', uselist=False)
+
+
+class PayableManyTimes(object):
+    """ Same as :class:`Payable`, but using a list of payments instead of
+    a single one (proper many-to-many payments).
+
+    """
+
+    payments = associated(Payment, 'payments', 'many-to-many', uselist=True)

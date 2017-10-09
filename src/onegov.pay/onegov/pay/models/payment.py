@@ -1,4 +1,3 @@
-from collections import namedtuple
 from decimal import Decimal
 from onegov.core.orm import Base
 from onegov.core.orm.abstract.associable import Associable
@@ -12,10 +11,6 @@ from sqlalchemy import Numeric
 from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
 from uuid import uuid4
-
-
-class RegisteredLink(namedtuple("RegisteredLink", ('cls', 'table', 'key'))):
-    pass
 
 
 class Payment(Base, TimestampMixin, ContentMixin, Associable):
