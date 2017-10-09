@@ -64,9 +64,7 @@ def handle_edit_definition(self, request, form):
 
     if form.submitted(request):
         form.populate_obj(self, exclude={'definition'})
-
-        if self.type == 'custom':
-            self.definition = form.definition.data
+        self.definition = form.definition.data
 
         request.success(_("Your changes were saved"))
         return morepath.redirect(request.link(self))
