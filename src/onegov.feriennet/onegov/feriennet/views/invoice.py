@@ -127,7 +127,7 @@ def handle_payment(self, request):
     else:
 
         for item in items:
-            item.payment = payment
+            item.payments.append(payment)
             item.paid = True
             item.source = provider.type
 
