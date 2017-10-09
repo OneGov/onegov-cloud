@@ -10,6 +10,7 @@ from onegov.feriennet.models import VacationActivity
 from onegov.org.new_elements import Link, Confirm, Intercooler, Block
 from onegov.org.new_elements import LinkGroup
 from onegov.org.layout import DefaultLayout as BaseLayout
+from onegov.pay import PaymentProviderCollection
 from onegov.ticket import TicketCollection
 
 
@@ -396,6 +397,13 @@ class BillingCollectionLayout(DefaultLayout):
                 self.request.link(self.model, 'import'),
                 attrs={'class': 'import'}
             ),
+            Link(
+                _("Synchronise Online Payments"),
+                self.request.return_here(
+                    self.request.class_link(
+                        PaymentProviderCollection, name='sync')),
+                attrs={'class': 'sync'},
+            )
         )
 
 

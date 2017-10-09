@@ -121,7 +121,6 @@ def handle_payment(self, request):
     items = tuple(q)
     bill = BillingDetails(period, items)
     payment = process_payment('cc', bill.price, provider, token)
-    payment.sync()
 
     if not payment:
         request.alert(_("Your payment could not be processed"))
