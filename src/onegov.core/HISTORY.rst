@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Moves identity management functions.
+  [msom]
+
 0.50.0 (2017-10-04)
 ~~~~~~~~~~~~~~~~~~~
 

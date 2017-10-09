@@ -9,6 +9,16 @@ CALL_COUNT = 0
 
 def test_cache_connections():
 
+    class IdentityPolicy(object):
+        def identify(self, request):
+            return None
+
+        def remember(self, response, request, identity):
+            pass
+
+        def forget(self, response, request):
+            pass
+
     class App(Framework):
         pass
 
@@ -25,6 +35,10 @@ def test_cache_connections():
             return str(CALL_COUNT)
 
         return call_count()
+
+    @App.identity_policy()
+    def identity_policy():
+        return IdentityPolicy()
 
     app = App()
     app.namespace = 'towns'
