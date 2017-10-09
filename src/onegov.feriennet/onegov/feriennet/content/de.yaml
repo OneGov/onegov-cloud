@@ -47,10 +47,11 @@ pages:
         mögliche neue Sponsoren informiert.
   - title: Aktuelles
     type: news
+    name: news
     meta:
       trait: news
   - title: Wir haben eine neue Webseite!
-    parent: aktuelles
+    parent: news
     type: news
     meta:
       trait: news

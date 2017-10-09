@@ -1,0 +1,150 @@
+page-default: &lorem-ipsum
+  text: |
+    <p>
+      Loin, très loin, au delà des monts Mots, à mille lieues des pays
+      Voyellie et Consonnia, demeurent les Bolos Bolos. Ils vivent en
+      retrait, à Bourg-en-Lettres, sur les côtes de la Sémantique,
+      un vaste océan de langues.
+    </p>
+
+    <p>
+      Un petit ruisseau, du nom de Larousse, coule en leur lieu et les
+      approvisionne en règlalades nécessaires en tout genre; un pays
+      paradisiagmatique, dans lequel des pans entiers de phrases
+      prémâchées vous volent litéralement tout cuit dans la bouche.
+    </p>
+
+    <p>
+      Pas même la toute puissante Ponctuation ne régit les Bolos Bolos -
+      une vie on ne peut moins orthodoxographique. Un jour pourtant,
+      une petite ligne de Bolo Bolo du nom de Lorem Ipsum décida de
+      s'aventurer dans la vaste Grammaire.
+    </p>
+
+pages:
+  - title: À propos de nous
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Cette partie du site internet décrit l'organisation.
+  - title: Conditions de participation
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Cette partie du site internet décrit les conditions de participation.
+  - title: Sponsoren
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Cette partie du site internet nomme les sponsors et informe les sponsors à venir.
+  - title: Nouvelles
+    type: news
+    meta:
+      trait: news
+  - title: Nous avons un nouveau site internet !
+    parent: news
+    type: news
+    meta:
+      trait: news
+    content:
+      lead: >
+        Ce nouveau site internet tourne sur Feriennet, la nouvelle plate-forme de réservations pour activités de vacances
+        encadrées par la fondation Pro Juventute.
+      text: |
+        <p>
+          Feriennet est une solution logicielle complète et entièrement basée
+          sur la toile pour l'organisation rapide, efficace et bon marché
+          d'activités de vacances encadrées.
+        </p>
+        <p>
+          Plus d'informations sur
+          <a href="http://feriennet.projuventute.ch">
+            feriennet.projuventute.ch
+          </a>
+        </p>
+
+filesets:
+  - title: Page d'accueil – images
+    type: image
+    meta:
+      show_images_on_homepage: true
+      lead: Ces images sont affichées sur la page d'accueil.
+      view: grid
+    files:
+      - path: images/1zr3wnstnvy-aaron-burden.jpg
+        note: "Un participant en train de peindre"
+      - path: images/hn5ytnkwuxw-markus-spiske.jpg
+        note: "Le cours de photographie toujours aussi populaire"
+      - path: images/rx2vjcjqtxi-elissa-algora.jpg
+        note: "Du ski au camp d'hiver de {organisation}"
+      - path: images/sahbl2upxco-ashton-bingham.jpg
+        note: "Eau de la fascination"
+
+organisation:
+  theme_options:
+    footer-height: 235px
+    primary-color: '#006fba'
+  meta:
+    contact: |
+      Ferienpass Musterlingen
+      Musterstrasse 39
+      8000 Musterlingen
+      044 256 77 77
+    contact_html: >
+      Ferienpass Musterlingen<br>
+      Musterstrasse 39<br>
+      8000 Musterlingen<br>
+      044 256 77 77
+    opening_hours: |
+      Phase de la liste d'envies: 1.-27.5.2017
+      Correspondance: 28.-30.5.2017
+      Phase de réservation: 1.-15.6.2017
+      Facturation: 16.6.2017
+      Passeport-vacances: 17.7.-20.8.2017
+    opening_hours_html: |
+      Phase de la liste d'envies: 1.-27.5.2017<br>
+      Correspondance: 28.-30.5.2017<br>
+      Phase de réservation: 1.-15.6.2017<br>
+      Facturation: 16.6.2017<br>
+      Passeport-vacances: 17.7.-20.8.2017
+    facebook_url: https://de-de.facebook.com/ProJuventute.ch
+    homepage_structure: |
+      <row>
+        <column span="8">
+          <slider />
+          <news />
+        </column>
+        <column span="4">
+          <registration />
+
+          <panel>
+            <links>
+                <link url="./people"
+                    description="Personnes">
+                    Équipe
+                </link>
+                <link url="./forms/kontakt"
+                    description="Anfragen">
+                    Contact
+                </link>
+                <link url="./news"
+                    description="Qui mérite de faire l'actualité">
+                    Nouvelle(s)
+                </link>
+                <link url="./photoalbums"
+                    description="Impressions">
+                    Albums photos
+                </link>
+            </links>
+          </panel>
+        </column>
+      </row>
