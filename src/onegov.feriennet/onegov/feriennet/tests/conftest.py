@@ -34,6 +34,18 @@ def create_feriennet_app(request, use_elasticsearch):
         app_class=FeriennetApp,
         request=request,
         use_elasticsearch=use_elasticsearch)
+    app.configure_payment_providers(**{
+        'payment_providers_enabled': True,
+        'payment_provider_defaults': {
+            'stripe_connect': {
+                'client_id': 'foo',
+                'client_secret': 'foo',
+                'oauth_gateway': 'https://oauth.example.org',
+                'oauth_gateway_auth': 'foo',
+                'oauth_gateway_secret': 'bar'
+            }
+        }
+    })
 
     session = app.session()
 

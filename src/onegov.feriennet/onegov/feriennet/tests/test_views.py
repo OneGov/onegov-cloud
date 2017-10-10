@@ -1,5 +1,6 @@
 import json
 import onegov.feriennet
+import requests_mock
 import transaction
 
 from datetime import datetime, timedelta, date
@@ -11,6 +12,7 @@ from onegov.activity import OccasionCollection
 from onegov.activity import PeriodCollection
 from onegov.activity.utils import generate_xml
 from onegov.core.utils import Bunch
+from onegov.pay import Payment, PaymentProviderCollection
 from onegov_testing import Client as BaseClient
 from onegov_testing import utils
 from onegov.user import UserCollection
@@ -2154,3 +2156,171 @@ def test_provide_activity_again(feriennet_app):
 
     admin.post(url)
     assert activities.query().first().state == 'preview'
+
+
+def test_online_payment(feriennet_app):
+    activities = ActivityCollection(feriennet_app.session(), type='vacation')
+    attendees = AttendeeCollection(feriennet_app.session())
+    periods = PeriodCollection(feriennet_app.session())
+    occasions = OccasionCollection(feriennet_app.session())
+    bookings = BookingCollection(feriennet_app.session())
+
+    owner = Bunch(username='admin@example.org')
+
+    prebooking = tuple(d.date() for d in (
+        datetime.now() - timedelta(days=1),
+        datetime.now() + timedelta(days=1)
+    ))
+
+    execution = tuple(d.date() for d in (
+        datetime.now() + timedelta(days=10),
+        datetime.now() + timedelta(days=12)
+    ))
+
+    period = periods.add(
+        title="Ferienpass 2017",
+        prebooking=prebooking,
+        execution=execution,
+        active=True
+    )
+    period.confirmed = True
+
+    foobar = activities.add("Foobar", username='admin@example.org')
+    foobar.propose().accept()
+
+    o = occasions.add(
+        start=datetime(2016, 11, 25, 8),
+        end=datetime(2016, 11, 25, 16),
+        age=(0, 10),
+        spots=(0, 2),
+        timezone="Europe/Zurich",
+        activity=foobar,
+        period=period,
+        cost=100,
+    )
+
+    a = attendees.add(owner, 'Dustin', date(2000, 1, 1), 'female')
+    b = bookings.add(owner, a, o)
+    b.state = 'accepted'
+    b.cost = 100
+
+    session = feriennet_app.session()
+    providers = PaymentProviderCollection(session)
+    providers.add(type='stripe_connect', default=True, meta={
+        'publishable_key': '0xdeadbeef',
+        'access_token': 'foobar'
+    })
+
+    transaction.commit()
+
+    client = Client(feriennet_app)
+    client.login_admin()
+
+    assert 'checkout-button' not in client.get('/my-bills')
+
+    page = client.get('/').click('Fakturierung')
+    page.form['confirm'] = 'yes'
+    page.form['sure'] = 'yes'
+    page = page.form.submit()
+
+    page = client.get('/my-bills')
+    assert 'checkout-button' in page
+    assert "Jetzt online bezahlen" in page
+
+    # pay online
+    with requests_mock.Mocker() as m:
+        charge = {
+            'id': '123456'
+        }
+
+        m.post('https://api.stripe.com/v1/charges', json=charge)
+        m.get('https://api.stripe.com/v1/charges/123456', json=charge)
+        m.post('https://api.stripe.com/v1/charges/123456/capture', json=charge)
+
+        page.form['payment_token'] = 'foobar'
+        page.form.submit().follow()
+
+    # sync the charges
+    with requests_mock.Mocker() as m:
+        page = client.get('/payments')
+        assert ">Offen<" in page
+
+        m.get('https://api.stripe.com/v1/charges?limit=50', json={
+            "object": "list",
+            "url": "/v1/charges",
+            "has_more": False,
+            "data": [
+                {
+                    'id': '123456',
+                    'captured': True,
+                    'refunded': False,
+                    'paid': True,
+                    'status': 'foobar',
+                    'metadata': {
+                        'payment_id': session.query(Payment).one().id.hex
+                    }
+                }
+            ]
+        })
+
+        m.get('https://api.stripe.com/v1/payouts?limit=50&status=paid', json={
+            "object": "list",
+            "url": "/v1/payouts",
+            "has_more": False,
+        })
+
+        page = client.get('/billing')
+        page = page.click('Online Zahlungen synchronisieren').follow()
+
+        assert "Synchronisierung erfolgreich" in page
+        assert ">Bezahlt<" in page
+
+        page = client.get('/payments')
+        assert ">Offen<" not in page
+        assert ">Bezahlt<" in page
+
+    page = client.get('/payments')
+    assert "Ferienpass 2017" in page
+    assert "Stripe Connect" in page
+    assert "96.80" in page
+    assert "3.20" in page
+
+    page = client.get('/billing')
+    page = page.click('Online Zahlungen anzeigen').follow()
+    assert "96.80" in page
+    assert "3.20" in page
+
+    # refund the charge
+    with requests_mock.Mocker() as m:
+        charge = {
+            'id': '123456'
+        }
+        m.post('https://api.stripe.com/v1/refunds', json=charge)
+        client.post(get_post_url(page, 'payment-refund'))
+
+    page = client.get('/billing')
+    assert ">Unbezahlt<" in page
+
+    page = client.get('/payments')
+    assert ">Rückerstattet<" in page
+
+    page = client.get('/my-bills')
+    assert 'checkout-button' in page
+    assert "Jetzt online bezahlen" in page
+
+    # pay again (leading to a refunded and an open charge)
+    with requests_mock.Mocker() as m:
+        charge = {
+            'id': '654321'
+        }
+
+        m.post('https://api.stripe.com/v1/charges', json=charge)
+        m.get('https://api.stripe.com/v1/charges/654321', json=charge)
+        m.post('https://api.stripe.com/v1/charges/654321/capture', json=charge)
+
+        page.form['payment_token'] = 'barfoo'
+        page.form.submit().follow()
+
+    page = client.get('/payments')
+    assert ">Offen<" in page
+    assert ">Rückerstattet<" in page

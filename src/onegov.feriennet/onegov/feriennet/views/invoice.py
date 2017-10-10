@@ -1,9 +1,10 @@
 from itertools import groupby
 from onegov.activity import InvoiceItem, InvoiceItemCollection
 from onegov.core.security import Personal, Secret
+from onegov.core.templates import render_macro
 from onegov.feriennet import FeriennetApp, _
-from onegov.feriennet.collections import BillingDetails
 from onegov.feriennet.collections import BillingCollection
+from onegov.feriennet.collections import BillingDetails
 from onegov.feriennet.layout import InvoiceLayout
 from onegov.feriennet.views.shared import all_users
 from onegov.pay import process_payment
@@ -78,21 +79,32 @@ def view_my_invoices(self, request):
         account = account and iban.format(account)
 
     beneficiary = request.app.org.bank_beneficiary
-
     payment_provider = request.app.default_payment_provider
+    layout = InvoiceLayout(self, request, title)
 
     def payment_button(title, price):
+        price = payment_provider.adjust_price(price)
+
+        label = ': '.join((
+            request.translate(_("Pay Online Now")),
+            render_macro(layout.macros['price'], layout.request, {
+                'layout': layout,
+                'price': price,
+                'show_fee': True
+            })
+        ))
+
         return request.app.checkout_button(
-            button_label=request.translate(_("Pay Online Now")),
+            button_label=label,
             title=title,
-            price=payment_provider.adjust_price(price),
+            price=price,
             email=self.username,
             locale=request.locale
         )
 
     return {
         'title': title,
-        'layout': InvoiceLayout(self, request, title),
+        'layout': layout,
         'users': users,
         'user': user,
         'bills': bills,
@@ -120,7 +132,8 @@ def handle_payment(self, request):
 
     items = tuple(q)
     bill = BillingDetails(period, items)
-    payment = process_payment('cc', bill.price, provider, token)
+    price = request.app.default_payment_provider.adjust_price(bill.price)
+    payment = process_payment('cc', price, provider, token)
 
     if not payment:
         request.alert(_("Your payment could not be processed"))
