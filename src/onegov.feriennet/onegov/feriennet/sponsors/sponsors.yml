@@ -5,10 +5,22 @@
 # - The background color is set around the logo.
 # - Width and height must be supplied for quicker rendering.
 # - The top parameter may be used to nudge up and down.
+# - the booking banner has the ratio 16:5 and is up large 670px wide, which
+#   leaves a height of 210px. as the viewport grows smaller, the ratio is
+#   kept while the banner shrinks
+# - Any value may be translated by using a de/fr/it dictionary instead of the
+#   actual values. See examples below.
+#
 
 - name: CONCORDIA
-  logo_url: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=logo\\|feriennet\\|0\\|0\\|fnet\\|de'
-  mail_url: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=mail\\|feriennet\\|0\\|0\\|fnet\\|de'
+  logo_url:
+    de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=logo\\|feriennet\\|0\\|0\\|fnet\\|de'
+    fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=logo\\|feriennet\\|0\\|0\\|fnet\\|fr'
+    it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=logo\\|feriennet\\|0\\|0\\|fnet\\|it'
+  mail_url:
+    de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=mail\\|feriennet\\|0\\|0\\|fnet\\|de'
+    fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=mail\\|feriennet\\|0\\|0\\|fnet\\|fr'
+    it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=mail\\|feriennet\\|0\\|0\\|fnet\\|it'
   logo: sponsors/concordia.svg
   background: '#fff'
   width: 200px
@@ -16,15 +28,21 @@
   top: -5px
   banners:
     bookings:
-      # the booking banner has the ratio 16:5 and is up large 670px wide, which
-      # leaves a height of 210px. as the viewport grows smaller, the ratio is
-      # kept while the banner shrinks
       src: sponsors/concordia-banner.jpg
-      url: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner\\|feriennet\\|0\\|0\\|fnet\\|de'
+      url:
+        de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner\\|feriennet\\|0\\|0\\|fnet\\|de'
+        fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner\\|feriennet\\|0\\|0\\|fnet\\|fr'
+        it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=banner\\|feriennet\\|0\\|0\\|fnet\\|it'
 
 - name: CREDIT SUISSE
-  logo_url: 'https://www.credit-suisse.com/corporate/de/responsibility/economy-society/commitments-in-switzerland.html'
-  mail_url: 'https://www.credit-suisse.com/corporate/de/responsibility/economy-society/commitments-in-switzerland.html'
+  logo_url:
+    de: 'https://www.credit-suisse.com/corporate/de/responsibility/economy-society/commitments-in-switzerland.html'
+    fr: 'https://www.credit-suisse.com/corporate/fr/responsibility/economy-society/commitments-in-switzerland.html'
+    it: 'https://www.credit-suisse.com/corporate/it/responsibility/economy-society/commitments-in-switzerland.html'
+  mail_url:
+    de: 'https://www.credit-suisse.com/corporate/de/responsibility/economy-society/commitments-in-switzerland.html'
+    fr: 'https://www.credit-suisse.com/corporate/fr/responsibility/economy-society/commitments-in-switzerland.html'
+    it: 'https://www.credit-suisse.com/corporate/it/responsibility/economy-society/commitments-in-switzerland.html'
   logo: sponsors/credit-suisse.svg
   background: '#fff'
   width: 200px
@@ -33,5 +51,11 @@
   banners:
     bookings:
       src: sponsors/credit-suisse-banner.png
-      url: 'https://ad.doubleclick.net/ddm/trackclk/N8394.3080457PROJUVENTUTE/B20111643.205375159;dc_trk_aid=405205282;dc_trk_cid=91028232;dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
-      tracker: 'https://ad.doubleclick.net/ddm/trackimp/N8394.3080457PROJUVENTUTE/B20111643.205375159;dc_trk_aid=405205282;dc_trk_cid=91028232;ord=[timestamp];dc_lat=;dc_rdid=;tag_for_child_directed_treatment=?|https://ad.doubleclick.net/ddm/trackimp/N8394.3080457PROJUVENTUTE/B20111643.205375159;dc_trk_aid=405205282;dc_trk_cid=91028232;ord=%5btimestamp%5d;dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
+      url:
+        de: 'https://ad.doubleclick.net/ddm/trackclk/N8394.3080457PROJUVENTUTE/B20111643.205375159;dc_trk_aid=405205282;dc_trk_cid=91028232;dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
+        fr: 'https://ad.doubleclick.net/ddm/trackclk/N8394.3080457PROJUVENTUTE/B20111643.205375156;dc_trk_aid=405218298;dc_trk_cid=91028232;dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
+        it: 'https://ad.doubleclick.net/ddm/trackclk/N8394.3080457PROJUVENTUTE/B20111643.205375153;dc_trk_aid=405204988;dc_trk_cid=91028232;dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
+      tracker:
+        de: 'https://ad.doubleclick.net/ddm/trackimp/N8394.3080457PROJUVENTUTE/B20111643.205375159;dc_trk_aid=405205282;dc_trk_cid=91028232;dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
+        fr: 'https://ad.doubleclick.net/ddm/trackimp/N8394.3080457PROJUVENTUTE/B20111643.205375156;dc_trk_aid=405218298;dc_trk_cid=91028232;dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
+        it: 'https://ad.doubleclick.net/ddm/trackimp/N8394.3080457PROJUVENTUTE/B20111643.205375153;dc_trk_aid=405204988;dc_trk_cid=91028232;dc_lat=;dc_rdid=;tag_for_child_directed_treatment='

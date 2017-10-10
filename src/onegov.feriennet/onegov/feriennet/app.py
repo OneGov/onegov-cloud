@@ -78,6 +78,8 @@ class FeriennetApp(OrgApp):
             return None
 
         winner = random.choice(candidates)
+        winner = winner.localized(request)
+
         return BANNER_TEMPLATE.format(
             id=id,
             src=winner.url_for(request, winner.banners[id]['src']),
