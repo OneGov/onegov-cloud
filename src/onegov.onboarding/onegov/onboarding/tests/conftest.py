@@ -9,7 +9,7 @@ from uuid import uuid4
 
 
 @pytest.yield_fixture(scope="function")
-def onboarding_app(postgres_dsn, temporary_directory, smtp):
+def onboarding_app(postgres_dsn, temporary_directory, smtp, es_url):
 
     scan_morepath_modules(onegov.onboarding.OnboardingApp)
     morepath.commit(onegov.onboarding.OnboardingApp)
@@ -35,6 +35,7 @@ def onboarding_app(postgres_dsn, temporary_directory, smtp):
                 }
             }
         },
+        elasticsearch_hosts=[es_url]
     )
     app.set_application_id(app.namespace + '/' + 'test')
 
