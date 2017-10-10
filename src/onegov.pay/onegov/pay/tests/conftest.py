@@ -15,9 +15,10 @@ def reset_payment():
     while classes:
         cls = classes.pop()
 
-        for key in Payment.registered_links:
+        for key in (Payment.registered_links or tuple()):
             del cls.__mapper__._props[key]
 
         classes.extend(cls.__subclasses__())
 
-    Payment.registered_links.clear()
+    if Payment.registered_links:
+        Payment.registered_links.clear()
