@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.0 (2017-10-10)
+~~~~~~~~~~~~~~~~~~~
 
 - Make invoice items payable.
   [href]
