@@ -4,11 +4,10 @@ import morepath
 from elasticsearch import Elasticsearch
 from more.transaction.main import transaction_tween_factory
 from onegov.search import Search
-from onegov.search.indexer import (
-    Indexer,
-    ORMEventTranslator,
-    TypeMappingRegistry
-)
+from onegov.search.indexer import Indexer
+from onegov.search.indexer import ORMEventTranslator
+from onegov.search.indexer import TypeMappingRegistry
+from onegov.search.utils import searchable_sqlalchemy_models
 
 
 class ElasticsearchApp(morepath.App):
@@ -230,6 +229,28 @@ class ElasticsearchApp(morepath.App):
 
         """
         return request.is_logged_in
+
+    def es_perform_reindex(self):
+        """ Reindexes all content.
+
+        This is a heavy operation and should be run with consideration.
+
+        """
+
+        self.es_indexer.ixmgr.created_indices = set()
+
+        # delete all existing indices for this town
+        ixs = self.es_indexer.ixmgr.get_managed_indices_wildcard(self.schema)
+        self.es_client.indices.delete(ixs)
+
+        # load all database objects and index them
+        session = self.session()
+
+        for base in self.session_manager.bases:
+            for model in searchable_sqlalchemy_models(base):
+                for obj in session.query(model).all():
+                    self.es_orm_events.index(self.schema, obj)
+                    self.es_indexer.process()
 
 
 @ElasticsearchApp.tween_factory(over=transaction_tween_factory)

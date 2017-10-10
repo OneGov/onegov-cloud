@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to reindex from code.
+  [href]
+
 1.2.0 (2017-09-26)
 ~~~~~~~~~~~~~~~~~~~
 
