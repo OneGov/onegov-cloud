@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.0 (2017-10-10)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Adds proper support for many-to-many payments.
   [href]
 
