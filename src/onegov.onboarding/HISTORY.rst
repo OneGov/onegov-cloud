@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.4.0 (2017-10-10)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes search not working after town instance creation.
   [href]
