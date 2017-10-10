@@ -37,6 +37,7 @@ setup(
         'onegov.foundation',
         'onegov.org>=0.11.0',
         'onegov.reservation',
+        'onegov.search',
         'onegov.town>=1.12.3'
     ],
     extras_require=dict(

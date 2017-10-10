@@ -162,6 +162,7 @@ class TownAssistant(Assistant):
                 'org': name
             })
 
+            self.app.es_perform_reindex()
             self.app.send_email(
                 subject=title,
                 receivers=(user, ),

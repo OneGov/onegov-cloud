@@ -1,7 +1,15 @@
 Changelog
 ---------
+
+- Fixes search not working after town instance creation.
+  [href]
+
 0.3.7 (2017-08-03)
 ~~~~~~~~~~~~~~~~~~~
+
+- Switch onegov.testing to onegov_testing
+  [href]
+
 0.3.6 (2017-06-23)
 ~~~~~~~~~~~~~~~~~~~
 

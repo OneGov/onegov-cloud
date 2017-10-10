@@ -2,9 +2,10 @@ from onegov.core import Framework, utils
 from onegov.file import DepotApp
 from onegov.onboarding.theme import OnboardingTheme
 from onegov.reservation import LibresIntegration
+from onegov.search import ElasticsearchApp
 
 
-class OnboardingApp(Framework, LibresIntegration, DepotApp):
+class OnboardingApp(Framework, LibresIntegration, DepotApp, ElasticsearchApp):
 
     serve_static_files = True
 
