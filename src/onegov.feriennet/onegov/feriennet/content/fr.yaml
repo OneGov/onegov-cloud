@@ -38,7 +38,7 @@ pages:
       <<: *lorem-ipsum
       lead: >
         Cette partie du site internet décrit les conditions de participation.
-  - title: Sponsoren
+  - title: Sponsors
     type: topic
     meta:
       trait: page
@@ -48,6 +48,7 @@ pages:
         Cette partie du site internet nomme les sponsors et informe les sponsors à venir.
   - title: Nouvelles
     type: news
+    name: news
     meta:
       trait: news
   - title: Nous avons un nouveau site internet !
