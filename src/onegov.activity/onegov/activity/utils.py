@@ -27,6 +27,12 @@ ESR_TO_CODE_MAPPING = {
 
 INTERNAL_IMAGE_EX = re.compile(r'.*/storage/[0-9a-z]{64}')
 
+MUNICIPALITY_EX = re.compile(r"""
+    (?P<zipcode>[1-9]{1}[0-9]{3})
+    \s+
+    (?P<municipality>[\w\s\(\)\.\-]+)
+""", re.VERBOSE)
+
 
 def random_group_code():
     random = SystemRandom()
@@ -319,3 +325,12 @@ def extract_thumbnail(text):
         url += '/thumbnail'
 
     return url
+
+
+def extract_municipality(text):
+    for line in text.splitlines():
+        for fragment in line.split(','):
+            match = MUNICIPALITY_EX.match(fragment.strip())
+
+            if match:
+                return int(match.group('zipcode')), match.group('municipality')

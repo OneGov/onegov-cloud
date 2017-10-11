@@ -413,3 +413,13 @@ def add_archived_flag_to_period(context):
 
     context.session.flush()
     context.operations.alter_column('periods', 'archived', nullable=False)
+
+
+@upgrade_task('Extract municipality from activities')
+def add_municipality_column_to_activites(context):
+    context.operations.add_column('activities', Column(
+        'municipality', Text, nullable=True
+    ))
+
+    for activity in ActivityCollection(context.session).query():
+        activity.location_observer(None)

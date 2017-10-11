@@ -1,6 +1,6 @@
 from onegov.activity.models.occasion import Occasion
 from onegov.activity.models.period import Period
-from onegov.activity.utils import extract_thumbnail
+from onegov.activity.utils import extract_thumbnail, extract_municipality
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import (
     content_property,
@@ -71,6 +71,9 @@ class Activity(Base, ContentMixin, TimestampMixin):
     #: Describes the location of the activity
     location = Column(Text, nullable=True)
 
+    #: The municipality in which the activity is held, from the location
+    municipality = Column(Text, nullable=True)
+
     #: Access the user linked to this activity
     user = relationship('User')
 
@@ -136,6 +139,15 @@ class Activity(Base, ContentMixin, TimestampMixin):
     @observes('content')
     def content_observer(self, content):
         self.thumbnail = extract_thumbnail(self.content.get('text'))
+
+    @observes('location')
+    def location_observer(self, content):
+        municipality = extract_municipality(self.location)
+
+        if municipality:
+            self.municipality = municipality[1]
+        else:
+            self.municipality = None
 
     @property
     def tags(self):

@@ -9,6 +9,7 @@ from onegov.activity.utils import format_invoice_code
 from onegov.activity.utils import generate_checksum
 from onegov.activity.utils import is_valid_checksum
 from onegov.activity.utils import merge_ranges
+from onegov.activity.utils import extract_municipality
 
 
 def test_merge_ranges():
@@ -92,3 +93,22 @@ def test_format_esr_reference():
 
     assert format_esr_reference('127131108141601011502061')\
         == '1271 31108 14160 10115 02061'
+
+
+def test_extract_municipality():
+    assert extract_municipality("6004 Luzern") == (6004, 'Luzern')
+    assert extract_municipality("9000 St. Gallen") == (9000, 'St. Gallen')
+    assert extract_municipality("""
+        Bahnhofstrasse 123
+        1234 Test
+    """) == (1234, "Test")
+    assert extract_municipality("Bahnhofstrasse 123, 1234 Test")\
+        == (1234, "Test")
+
+    assert extract_municipality("""
+        1234 Foo
+        3456 Bar
+    """) == (1234, "Foo")
+
+    assert extract_municipality("0123 invalid plz") is None
+    assert extract_municipality("4653 Obergösgen") == (4653, "Obergösgen")

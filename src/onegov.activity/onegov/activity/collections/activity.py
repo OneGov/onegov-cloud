@@ -6,7 +6,14 @@ from onegov.core.collection import Pagination
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
 from onegov.core.utils import toggle
-from sqlalchemy import or_, func, text, bindparam, Integer, select, column
+from sqlalchemy import bindparam
+from sqlalchemy import column
+from sqlalchemy import distinct
+from sqlalchemy import func
+from sqlalchemy import Integer
+from sqlalchemy import or_
+from sqlalchemy import select
+from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import array
 
 
@@ -20,7 +27,8 @@ class ActivityCollection(Pagination):
                  owners=None,
                  period_ids=None,
                  dateranges=None,
-                 weekdays=None):
+                 weekdays=None,
+                 municipalities=None):
         self.session = session
         self.type = type
         self.page = page
@@ -33,6 +41,7 @@ class ActivityCollection(Pagination):
         self.period_ids = set(period_ids) if period_ids else set()
         self.dateranges = set(dateranges) if dateranges else set()
         self.weekdays = set(weekdays) if weekdays else set()
+        self.municipalities = set(municipalities) if municipalities else set()
 
     def __eq__(self, other):
         return self.type == other.type and self.page == other.page
@@ -56,7 +65,8 @@ class ActivityCollection(Pagination):
             owners=self.owners,
             period_ids=self.period_ids,
             dateranges=self.dateranges,
-            weekdays=self.weekdays
+            weekdays=self.weekdays,
+            municipalities=self.municipalities
         )
 
     def contains_age_range(self, age_range):
@@ -141,6 +151,10 @@ class ActivityCollection(Pagination):
             query = query.filter(
                 model_class.weekdays.op('&&')(array(self.weekdays)))
 
+        if self.municipalities:
+            query = query.filter(
+                model_class.municipality.in_(self.municipalities))
+
         return query
 
     def for_filter(self,
@@ -151,7 +165,8 @@ class ActivityCollection(Pagination):
                    owner=None,
                    period_id=None,
                    daterange=None,
-                   weekday=None):
+                   weekday=None,
+                   municipality=None):
         """ Returns a new collection instance.
 
         The given tag is excluded if already in the list, included if not
@@ -174,7 +189,8 @@ class ActivityCollection(Pagination):
                 (self.owners, owner),
                 (self.period_ids, period_id),
                 (self.dateranges, daterange),
-                (self.weekdays, weekday)
+                (self.weekdays, weekday),
+                (self.municipalities, municipality)
             )
         )
 
@@ -208,6 +224,17 @@ class ActivityCollection(Pagination):
         tags = self.session.execute(query).scalar()
 
         return set(tags) if tags else set()
+
+    @property
+    def used_municipalities(self):
+        """ Returns a list of all the municipalities on *all* activites of
+        the current type
+
+        """
+        q = self.query_base().with_entities(distinct(Activity.municipality))
+        q = q.filter(Activity.municipality != None)
+
+        return set(r[0] for r in q)
 
     def get_unique_name(self, name):
         """ Given a desired name, finds a variant of that name that's not

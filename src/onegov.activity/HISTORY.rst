@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a municipality field to activities.
+  [href]
+
 1.3.0 (2017-10-10)
 ~~~~~~~~~~~~~~~~~~~
 
