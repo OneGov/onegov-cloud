@@ -27,7 +27,8 @@ from uuid import UUID
         owners=[str],
         period_ids=[UUID],
         dateranges=[date_range_converter],
-        weekdays=[int]
+        weekdays=[int],
+        municipalities=[str]
     ))
 def get_vacation_activities(request, app, page=0,
                             tags=None,
@@ -37,7 +38,8 @@ def get_vacation_activities(request, app, page=0,
                             owners=None,
                             period_ids=None,
                             dateranges=None,
-                            weekdays=None):
+                            weekdays=None,
+                            municipalities=None):
 
     if not request.is_organiser:
         period = app.active_period
@@ -54,7 +56,8 @@ def get_vacation_activities(request, app, page=0,
         owners=owners,
         period_ids=period_ids,
         dateranges=dateranges,
-        weekdays=weekdays
+        weekdays=weekdays,
+        municipalities=municipalities,
     )
 
 

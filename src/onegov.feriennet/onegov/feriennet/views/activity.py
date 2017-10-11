@@ -11,6 +11,7 @@ from onegov.core.security import Personal
 from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.core.security import Secret
+from onegov.core.utils import normalize_for_url
 from onegov.feriennet import _
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections import VacationActivityCollection
@@ -146,6 +147,15 @@ def view_activities(self, request):
                 url=request.link(self.for_filter(weekday=weekday))
             ) for weekday in range(0, 7)
         )
+
+        filters['municipalities'] = [
+            Link(
+                text=municipality,
+                active=municipality in self.municipalities,
+                url=request.link(self.for_filter(municipality=municipality))
+            ) for municipality in self.used_municipalities
+        ]
+        filters['municipalities'].sort(key=lambda l: normalize_for_url(l.text))
 
         if request.is_organiser:
             if request.app.periods:
