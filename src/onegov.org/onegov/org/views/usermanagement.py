@@ -68,7 +68,7 @@ def view_usermanagement(self, request):
     template='signup_link.pt',
     permission=Secret,
     form=SignupLinkForm,
-    name='registrations-link')
+    name='signup-link')
 def handle_create_signup_link(self, request, form):
     link = None
 

@@ -1553,7 +1553,7 @@ class UserManagementLayout(DefaultLayout):
                         text=_("Create Signup Link"),
                         url=self.request.class_link(
                             UserCollection,
-                            name='registrations-link'
+                            name='signup-link'
                         ),
                         attrs={'class': 'new-link'}
                     )
