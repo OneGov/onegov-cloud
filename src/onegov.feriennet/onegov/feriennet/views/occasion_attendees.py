@@ -18,5 +18,6 @@ def view_occasion_attendees(self, request):
         'occasions': self.occasions(),
         'periods': request.app.periods,
         'period': self.period,
-        'model': self
+        'model': self,
+        'organisation': request.app.org,
     }

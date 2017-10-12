@@ -32,7 +32,8 @@ class OccasionForm(Form):
     )
 
     meeting_point = StringField(
-        label=_("Meeting Point")
+        label=_("Meeting Point"),
+        validators=[InputRequired()]
     )
 
     note = TextAreaField(

@@ -712,6 +712,7 @@ def test_execution_period(feriennet_app):
     occasion.form['max_age'] = 20
     occasion.form['min_spots'] = 30
     occasion.form['max_spots'] = 40
+    occasion.form['meeting_point'] = 'At the venue'
 
     occasion.form['dates'] = json.dumps({
         'values': [{

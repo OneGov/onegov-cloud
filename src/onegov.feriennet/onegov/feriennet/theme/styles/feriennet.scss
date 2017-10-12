@@ -146,6 +146,10 @@ ul.single-line {
     @include generic-icon('\f133');
 }
 
+.location-icon {
+    @include generic-icon('\f041');
+}
+
 .child-icon {
     @include generic-icon('\f1ae');
 }
@@ -1604,7 +1608,7 @@ ul.tags {
 .occasion-dates ul {
     font-size: 1em;
     list-style: none;
-    margin-bottom: .75em;
+    margin-bottom: 0;
     margin-left: 0;
 }
 
@@ -1617,6 +1621,14 @@ ul.tags {
         page-break-after: avoid;
         page-break-inside: avoid;
 
+        .organisation {
+            border-radius: 2px;
+            border: 1px solid $monsoon;
+            padding: 1rem 1rem 0;
+            position: absolute;
+            right: 0;
+        }
+
         h2 {
             font-size: $h3-font-size - $h3-font-reduction;
         }
@@ -1628,6 +1640,7 @@ ul.tags {
 
     .attendees {
         font-size: .9em;  // em for correct scaling in print
+        max-width: 70%;
 
         li {
             margin-bottom: .5rem;
