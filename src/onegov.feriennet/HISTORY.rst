@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds more information to the attendee print-out.
+  [href]
+
 - Adds the ability to toggle the political municipality in the userprofile.
   [href]
 
