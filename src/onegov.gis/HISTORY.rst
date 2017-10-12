@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves style of map buttons and provides more space for gecode results.
+  [href]
+
 0.4.2 (2017-09-01)
 ~~~~~~~~~~~~~~~~~~~
 

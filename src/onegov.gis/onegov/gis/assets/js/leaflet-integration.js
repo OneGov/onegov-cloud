@@ -186,7 +186,7 @@ function addExternalLinkButton(map) {
         position: 'topright',
         states: [{
             stateName: 'closed',
-            icon: 'fa-external-link-square',
+            icon: 'fa-external-link',
             onClick: function(btn) {
                 var menu = $('<ul class="map-context-menu">');
                 var point = map.getCenter();
@@ -199,7 +199,7 @@ function addExternalLinkButton(map) {
             }
         }, {
             stateName: 'open',
-            icon: 'fa-external-link-square',
+            icon: 'fa-external-link',
             onClick: function(btn) {
                 $(btn.button).parent().find('.map-context-menu').remove();
                 btn.state('closed');
@@ -210,7 +210,7 @@ function addExternalLinkButton(map) {
 
 function addGeocoder(map) {
     L.Control.geocoder({
-        position: 'topright',
+        position: 'topleft',
         placeholder: '',
         errorMessage: '',
         defaultMarkGeocode: false

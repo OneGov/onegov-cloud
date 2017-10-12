@@ -2,7 +2,7 @@
     Workaround for https://github.com/Leaflet/Leaflet/issues/3575
 */
 .leaflet-tile-container img {
-    box-shadow: 0 0 1px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 0 1px rgba(0, 0, 0, .05);
 }
 
 /*
@@ -11,6 +11,71 @@
 .leaflet-bar button {
     margin: 0;
     padding: 0;
+}
+
+/*
+    External links button
+*/
+.open-active .fa, .closed-active .fa {
+    font-size: .875rem;
+}
+
+.open-active:hover {
+    background: white;
+}
+
+/*
+    Remove touch border
+*/
+.leaflet-touch .leaflet-bar {
+    border: 0;
+}
+
+/*
+    Customise button looks
+*/
+.add-point-active, .remove-point-active {
+    background: red;
+    color: white;
+}
+
+.leaflet-control-zoom > a,
+.leaflet-disabled {
+    background-color: black !important;
+    border: 1px solid black !important;
+    color: white !important;
+}
+
+.leaflet-control-geocoder-icon {
+    background: black !important;
+    border: 1px solid black;
+    color: white;
+}
+
+.closed-active {
+    background: black;
+    color: white;
+}
+
+.leaflet-control-geocoder-icon::before {
+    color: white;
+}
+
+.leaflet-control-geocoder-icon:hover,
+.leaflet-control-zoom > a:hover,
+.add-point-active:hover,
+.remove-point-active:hover,
+.closed-active:hover {
+    box-shadow: 0 0 1px 1px white;
+    background: black;
+    color: white;
+    position: relative;
+    z-index: 10;
+}
+
+.add-point-active:hover,
+.remove-point-active:hover {
+    background: red;
 }
 
 /*
@@ -46,6 +111,10 @@
     Make sure the attribution is always rendered as one line
 */
 
+.leaflet-control-attribution {
+    border-radius: 3px 0 0 0;
+}
+
 .leaflet-control-attribution ul {
     list-style: none;
     margin: 0;
@@ -53,9 +122,9 @@
 
 .leaflet-control-attribution ul li {
     float: left;
-    font-size: 10px !important;
+    font-size: 9px !important;
     font-weight: normal;
-    margin-bottom: 3px;
+    margin-bottom: 2px;
     padding: 0;
     position: relative;
     top: 1px;
@@ -97,7 +166,7 @@ button.open-active {
 
 .leaflet-container .leaflet-control-container .map-context-menu li a,
 .leaflet-container .leaflet-control-container .map-context-menu li a:hover {
-    font-size: 16px !important;
+    font-size: .875rem !important;
     font-weight: normal !important;
     padding: 0 5px;
     text-align: left;
@@ -119,7 +188,7 @@ button.open-active {
     cursor: auto;
 }
 
-/* 
+/*
     Leaflet geocoder fixes
 */
 
@@ -130,15 +199,16 @@ button.open-active {
 .leaflet-control-geocoder-icon {
     float: right;
     height: 24px;
-    background: none;
     margin: 0;
     padding: 0;
 }
 
 .leaflet-control-geocoder-icon::before {
-    font-family: "FontAwesome";
     content: "\f002";
+    font-family: "FontAwesome";
     margin-left: 4px;
+    position: relative;
+    top: -1px;
 }
 
 .leaflet-control-geocoder .leaflet-control-geocoder-form {
@@ -148,7 +218,7 @@ button.open-active {
 .leaflet-control-geocoder .leaflet-control-geocoder-form input {
     box-shadow: none;
     font-size: 12px;
-    height: 26px;
+    height: 25px;
     margin: 0;
     width: 100%;
 }
@@ -176,16 +246,17 @@ button.open-active {
 }
 
 .leaflet-control-geocoder-form-no-error {
-    height: 1px;
-    background-color: #ccc;
-    width: 100%;
-    content: " ";
-    display: block;
+    display: none;
 }
 
 .leaflet-control-geocoder-error {
     background-color: red;
+    display: block;
+    height: 4px;
     margin: 0;
     padding: 0;
-    height: 5px;
+    position: relative;
+    top: -1px;
+    z-index: 100;
+    box-shadow: 0 2px 0 0 red;
 }

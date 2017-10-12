@@ -102,6 +102,8 @@ module.exports = {
 			if (!suggest && results.length === 1) {
 				this._geocodeResultSelected(results[0]);
 			} else if (results.length > 0) {
+        		results = results.slice(0, 3); // limit to three results
+
 				this._alts.innerHTML = '';
 				this._results = results;
 				L.DomUtil.removeClass(this._alts, 'leaflet-control-geocoder-alternatives-minimized');
