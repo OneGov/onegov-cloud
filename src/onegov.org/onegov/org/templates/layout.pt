@@ -20,6 +20,8 @@
 
          Have a look at the source code: https://onegov.readthedocs.org
      -->
+    <!--! Sliders do not render nicely until all css/js has been loaded, so we hide them until that happens (see also: common.js) -->
+    <style>.slider{opacity:0;}</style>
     <link rel="stylesheet" type="text/css" href="${request.theme_link}">
     <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
 

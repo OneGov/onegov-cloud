@@ -78,3 +78,8 @@ $(document).on('show-alert', function(_, data) {
 });
 
 $('button[data-toggle]').toggleButton();
+
+// show the slider once everything has loaded
+$(document).ready(function() {
+    $('.slider').css('opacity', 1);
+});

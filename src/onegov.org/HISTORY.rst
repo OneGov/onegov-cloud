@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+- Only show sliders once they can be correctly rendered.
+
+  This improves the look of the homepage on the initial load.
+  [href]
+
 0.15.2 (2017-10-10)
 ~~~~~~~~~~~~~~~~~~~
 
