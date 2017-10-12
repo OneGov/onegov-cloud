@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.15.3 (2017-10-12)
+~~~~~~~~~~~~~~~~~~~
+
 - Only show sliders once they can be correctly rendered.
 
   This improves the look of the homepage on the initial load.
