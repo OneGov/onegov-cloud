@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.14.1 (2017-10-12)
+~~~~~~~~~~~~~~~~~~~~~
 
 - Fixes settings view not being customised anymore.
   [href]
