@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-10-11 15:51+0200\n"
+"POT-Creation-Date: 2017-10-12 14:09+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -256,6 +256,9 @@ msgstr "Benutzer PLZ"
 
 msgid "User Location"
 msgstr "Benutzer Ort"
+
+msgid "User Political Municipality"
+msgstr "Benutzer Politische Gemeinde"
 
 msgid "User E-Mail"
 msgstr "Benutzer E-Mail"
@@ -846,6 +849,9 @@ msgstr "PLZ"
 
 msgid "Place"
 msgstr "Ort"
+
+msgid "Political Municipality"
+msgstr "Politische Gemeinde"
 
 msgid "Public E-Mail Address"
 msgstr "Öffentliche E-Mail Adresse"
@@ -1931,6 +1937,12 @@ msgstr ""
 
 msgid "Archive Period"
 msgstr "Zeitraum archivieren"
+
+msgid "Require the political municipality in the userprofile"
+msgstr "Verlange die politische Gemeinde im Benutzerprofile"
+
+msgid "Extra Features"
+msgstr "Extra Funktionalitäten"
 
 #, python-format
 msgid "Bookings for ${period}"

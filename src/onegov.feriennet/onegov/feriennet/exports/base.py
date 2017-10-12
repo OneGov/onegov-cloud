@@ -74,6 +74,8 @@ class FeriennetExport(Export):
         yield _("User Address"), user_data.get('address', '')
         yield _("User Zipcode"), user_data.get('zip_code', '')
         yield _("User Location"), user_data.get('place', '')
+        yield _("User Political Municipality"), \
+            user_data.get('political_municipality', '')
         yield _("User E-Mail"), user_data.get('e-mail', '')
         yield _("User Phone"), user_data.get('phone', '')
         yield _("User Emergency"), user_data.get('emergency', '')

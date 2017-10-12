@@ -1,14 +1,39 @@
+from onegov.feriennet import _
 from onegov.core.security import Secret
+from onegov.feriennet.app import FeriennetApp
+from onegov.form import Form, merge_forms
 from onegov.org.forms import SettingsForm
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_settings
-from onegov.feriennet.app import FeriennetApp
+from wtforms.fields import BooleanField
+
+
+def settings_form(model, request):
+
+    class CustomFieldsForm(Form):
+        show_political_municipality = BooleanField(
+            label=_("Require the political municipality in the userprofile"),
+            fieldset=_("Extra Features")
+        )
+
+        def process_obj(self, obj):
+            super().process_obj(obj)
+
+            self.show_political_municipality.data = obj.meta.get(
+                'show_political_municipality', False)
+
+        def populate_obj(self, obj, *args, **kwargs):
+            super().populate_obj(obj, *args, **kwargs)
+
+            obj.meta['show_political_municipality']\
+                = self.show_political_municipality.data
+
+    return merge_forms(SettingsForm, CustomFieldsForm)
 
 
 @FeriennetApp.form(model=Organisation, name='settings',
-                   template='form.pt', permission=Secret, form=SettingsForm)
+                   template='form.pt', permission=Secret, form=settings_form)
 def custom_handle_settings(self, request, form):
-
     form.delete_field('homepage_cover')
     form.delete_field('homepage_structure')
 

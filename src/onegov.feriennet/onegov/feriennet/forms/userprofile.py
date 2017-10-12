@@ -24,7 +24,8 @@ class UserProfileForm(Form):
         'emergency',
         'daily_ticket_statistics',
         'bank_account',
-        'bank_beneficiary'
+        'bank_beneficiary',
+        'political_municipality'
     )
 
     salutation = RadioField(
@@ -62,6 +63,11 @@ class UserProfileForm(Form):
 
     place = StringField(
         label=_("Place"),
+        validators=[InputRequired()]
+    )
+
+    political_municipality = StringField(
+        label=_("Political Municipality"),
         validators=[InputRequired()]
     )
 
@@ -107,6 +113,17 @@ class UserProfileForm(Form):
     def name(self, value):
         self.first_name.data, self.last_name.data = decode_name(value)
 
+    def on_request(self):
+        self.toggle_political_municipality()
+
+    @property
+    def show_political_municipality(self):
+        return self.request.app.org.meta.get('show_political_municipality')
+
+    def toggle_political_municipality(self):
+        if not self.show_political_municipality:
+            self.delete_field('political_municipality')
+
     def validate_emergency(self, field):
         if field.data:
             characters = tuple(c for c in field.data if c.strip())
@@ -133,6 +150,10 @@ class UserProfileForm(Form):
             model.realname = self.name
 
             for key in self.extra_fields:
+                if key == 'political_municipality':
+                    if not self.show_political_municipality:
+                        continue
+
                 model.data[key] = self.data.get(key)
 
     def process_obj(self, model):
@@ -143,4 +164,8 @@ class UserProfileForm(Form):
             self.name = model.realname
 
             for key in self.extra_fields:
+                if key == 'political_municipality':
+                    if not self.show_political_municipality:
+                        continue
+
                 getattr(self, key).data = modeldata.get(key)

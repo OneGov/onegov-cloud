@@ -129,6 +129,8 @@ def get_is_complete_userprofile_handler():
         form = UserProfileForm()
         form.request = request
         form.model = user
+        form.on_request()
+
         form.process(obj=user)
 
         for field_id, field in form._fields.items():

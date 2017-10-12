@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to toggle the political municipality in the userprofile.
+  [href]
+
 - Adds the ability to filter activites by municipality.
   [href]
 
