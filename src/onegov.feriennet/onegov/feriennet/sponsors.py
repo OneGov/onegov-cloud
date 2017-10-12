@@ -1,3 +1,4 @@
+import time
 import yaml
 
 from pathlib import Path
@@ -26,16 +27,16 @@ class Sponsor(object):
         assert path.startswith('sponsors/')
         return request.link(StaticFile(path))
 
-    def localized(self, request, data=None):
-        """ Returns an instance of the sponsor with all localisation structures
-        localized according to the current language.
+    def compiled(self, request, data=None):
+        """ Returns an instance of the sponsor with all data localized and
+        all variables replaced with the related values.
 
         This turns the following sponsor::
 
             url:
-                de: Ja
-                fr: Oui
-                it: Si
+                de: Ja {timestamp}
+                fr: Oui {timestamp}
+                it: Si {timestamp}
 
         Into this::
 
@@ -52,8 +53,12 @@ class Sponsor(object):
         def translate(value):
             if isinstance(value, dict):
                 if set(value.keys()) <= {'de', 'fr', 'it'}:
-                    return value[language]
-                return self.localized(request, value)
+                    value = value[language]
+                else:
+                    return self.compiled(request, value)
+
+            if isinstance(value, str):
+                return value.format(timestamp=int(time.time() * 1000))
 
             return value
 

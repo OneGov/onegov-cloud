@@ -14,7 +14,7 @@
         <span i18n:translate>Pro Juventute FERIENNET is supported by:</span>
         <span>
             <tal:b repeat="sponsor layout.app.sponsors">
-                <tal:b define="sponsor sponsor.localized(request)">
+                <tal:b define="sponsor sponsor.compiled(request)">
                   <a href="${sponsor.mail_url}">${sponsor.name}</a>
                   <tal:b condition="not repeat.sponsor.end">–</tal:b>
                 </tal:b>

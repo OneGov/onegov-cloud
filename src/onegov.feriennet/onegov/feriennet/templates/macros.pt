@@ -96,7 +96,7 @@
 
             <div tal:repeat="chunk layout.chunks(layout.app.sponsors, 4)" class="row sponsors-row">
                 <div tal:repeat="sponsor chunk" class="columns small-12 medium-3 large-3 ${repeat.sponsor.end and 'end' or ''}">
-                    <div tal:define="sponsor sponsor and sponsor.localized(request)" tal:condition="sponsor" class="sponsor" style="background-color: ${sponsor.background};">
+                    <div tal:define="sponsor sponsor and sponsor.compiled(request)" tal:condition="sponsor" class="sponsor" style="background-color: ${sponsor.background};">
                         <a href="${sponsor.logo_url}" title="${sponsor.name}">
                             <img height="${sponsor.height}" width="${sponsor.width}" src="${sponsor.url_for(request, sponsor.logo)}" style="top: ${sponsor.top};">
                         </a>
