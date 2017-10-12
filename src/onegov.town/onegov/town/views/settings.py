@@ -40,7 +40,7 @@ def get_custom_settings_form(model, request):
     )
 
 
-@TownApp.form(model=Organisation, name='einstellungen', template='form.pt',
+@TownApp.form(model=Organisation, name='settings', template='form.pt',
               permission=Secret, form=get_custom_settings_form)
 def custom_handle_settings(self, request, form):
 
