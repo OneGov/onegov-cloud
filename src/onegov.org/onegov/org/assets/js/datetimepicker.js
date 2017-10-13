@@ -95,10 +95,11 @@ var attach_button = function(input) {
     });
 };
 
-var setup_datetimepicker = function(type, selector, onChange) {
+var setup_datetimepicker = function(type, selector, onChange, extraOptions) {
     var locale = get_locale();
     var i18n_options = datetimepicker_i18n[locale];
 
+    extraOptions = extraOptions || {};
     onChange = onChange || function() {};
     selector = selector || 'input[type=' + type + ']';
 
@@ -188,7 +189,8 @@ var setup_datetimepicker = function(type, selector, onChange) {
 
         input.datetimepicker($.extend(
             general,
-            type_specific
+            type_specific,
+            extraOptions
         ));
 
         // convert the initial value to the localized format

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to pass extra parameters to the jquery datetime picker.
+  [href]
+
 0.15.3 (2017-10-12)
 ~~~~~~~~~~~~~~~~~~~
 
