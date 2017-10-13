@@ -188,6 +188,13 @@ def extract_code(text):
         return None
 
 
+def encode(code):
+    try:
+        return encode_invoice_code(code)
+    except (RuntimeError, ValueError):
+        return None
+
+
 def match_iso_20022_to_usernames(xml, collection, invoice, currency='CHF'):
     """ Takes an ISO20022 camt.053 file and matches it with the invoice
     items in the :class:`~onegov.activity.collections.InvoiceItemCollection`.
@@ -212,6 +219,20 @@ def match_iso_20022_to_usernames(xml, collection, invoice, currency='CHF'):
 
     paid_transaction_ids = {i.tid: i.username for i in q}
 
+    # Get a list of known ref/code username matches to be used as a last resort
+    q = collection.for_invoice(None).query()
+    q = q.with_entities(InvoiceItem.code, InvoiceItem.username)
+    q = q.group_by(InvoiceItem.code, InvoiceItem.username)
+    q = q.filter(
+        InvoiceItem.paid == True,
+        InvoiceItem.source == None
+    )
+
+    known_codes, known_refs = {}, {}
+    for i in q:
+        known_codes[i.code] = i.username
+        known_refs[encode(i.code)] = i.username
+
     # Get the items matching the given invoice
     q = collection.for_invoice(invoice).query()
     q = q.with_entities(
@@ -229,12 +250,6 @@ def match_iso_20022_to_usernames(xml, collection, invoice, currency='CHF'):
     # Sum up the items to virtual invoices
     invoices = []
     Invoice = namedtuple('Invoice', ('username', 'code', 'ref', 'amount'))
-
-    def encode(code):
-        try:
-            return encode_invoice_code(code)
-        except (RuntimeError, ValueError):
-            return None
 
     for username, items in groupby(q, key=lambda i: i.username):
         amount = Decimal('0.00')
@@ -319,5 +334,13 @@ def match_iso_20022_to_usernames(xml, collection, invoice, currency='CHF'):
             elif len(amnt_usernames) == 1:
                 transaction.username = next(u for u in amnt_usernames)
                 transaction.confidence = 0.5
+
+            if not transaction.confidence:
+                if ref in known_refs:
+                    transaction.username = known_refs[ref]
+                    transaction.confidence = 0.5
+                elif code in known_codes:
+                    transaction.username = known_codes[code]
+                    transaction.confidence = 0.5
 
         yield transaction

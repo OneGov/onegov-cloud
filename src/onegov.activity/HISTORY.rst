@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds some matching of manual payments to iso20022 matcher.
+  [href]
+
 - Adds the ability to filter activities by availability.
   [href]
 
