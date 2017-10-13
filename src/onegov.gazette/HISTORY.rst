@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.7.0 (2017-10-13)
+~~~~~~~~~~~~~~~~~~~
 
 - Allows to sort notices by group and user names.
   [msom]
