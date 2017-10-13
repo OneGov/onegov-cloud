@@ -237,7 +237,12 @@ class OccasionForm(Form):
                     'end': as_json_date(d.end),
                     'error': self.date_errors.get(ix, "")
                 } for ix, d in enumerate(dates)
-            ]
+            ],
+            'extra': {
+                'defaultDate':
+                    self.request.app.active_period.execution_start.isoformat(),
+                'defaultTime': '08:00'
+            }
         })
 
     def populate_obj(self, model):

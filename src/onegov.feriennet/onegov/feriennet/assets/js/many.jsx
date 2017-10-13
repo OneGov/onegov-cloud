@@ -84,6 +84,7 @@ var ManyDateTimes = React.createClass({
                                         label={data.labels.start}
                                         defaultValue={value.start}
                                         onChange={onStartChange}
+                                        extra={data.extra}
                                     />
                                 </div>
                                 <div className="small-5 columns">
@@ -91,20 +92,21 @@ var ManyDateTimes = React.createClass({
                                         label={data.labels.end}
                                         defaultValue={value.end}
                                         onChange={onEndChange}
+                                        extra={data.extra}
                                     />
                                 </div>
                                 <div className="small-2 columns">
                                     {
                                         index === (values.length - 1) &&
                                             <a href="#" className="button round field-button" onClick={onAdd}>
-                                                <i className="fa fa-plus" aria-hidden="true"></i>
+                                                <i className="fa fa-plus" aria-hidden="true" />
                                                 <span className="show-for-sr">{data.labels.add}</span>
                                             </a>
                                     }
                                     {
                                         index > 0 && index === (values.length - 1) &&
                                             <a href="#" className="button round secondary field-button" onClick={onRemove}>
-                                                <i className="fa fa-minus" aria-hidden="true"></i>
+                                                <i className="fa fa-minus" aria-hidden="true" />
                                                 <span className="show-for-sr">{data.labels.remove}</span>
                                             </a>
                                     }
@@ -139,9 +141,14 @@ var DateTimeField = React.createClass({
     renderDateTimeButton: function() {
         var onChange = this.props.onChange;
         if (!Modernizr.inputtypes.datetime) {
+            if (this.props.extra && this.props.extra.defaultDate) {
+                this.props.extra.defaultDate = new Date(
+                    this.props.extra.defaultDate);
+            }
+
             setup_datetimepicker('datetime', '#' + this.id, function(e) {
                 onChange(e);
-            });
+            }, this.props.extra);
         }
     },
     render: function() {

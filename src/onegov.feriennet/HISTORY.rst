@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Defaults to the beginning of the active period when creting an occasion.
+  [href]
+
 - Adds the ability to include timestamps in sponsoring urls.
   [href]
 
