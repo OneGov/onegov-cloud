@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.2.0 (2017-10-13)
+~~~~~~~~~~~~~~~~~~~
 
 - Allows to sort by group and user names.
   [msom]
