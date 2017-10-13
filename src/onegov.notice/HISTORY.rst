@@ -4,6 +4,9 @@ Changelog
 - Allows to sort by group and user names.
   [msom]
 
+- Allows to sarch categories, organizations, group names and user names.
+  [msom]
+
 0.1.2 (2017-08-30)
 ~~~~~~~~~~~~~~~~~~~
 

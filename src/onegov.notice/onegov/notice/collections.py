@@ -133,6 +133,8 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
 
         """
         query = self.session.query(self.model_class)
+        query = query.join(self.model_class.group, isouter=True)
+        query = query.join(self.model_class.user, isouter=True)
 
         # filtering
         if self.state:
@@ -142,7 +144,12 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
             query = query.filter(
                 or_(
                     self.model_class.title.ilike(term),
-                    self.model_class.text.ilike(term)
+                    self.model_class.text.ilike(term),
+                    self.model_class.category.ilike(term),
+                    self.model_class.organization.ilike(term),
+                    UserGroup.name.ilike(term),
+                    User.realname.ilike(term),
+                    User.username.ilike(term)
                 )
             )
         if self.user_ids:
@@ -156,16 +163,12 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
         if self.order in inspect(self.model_class).columns.keys():
             attribute = getattr(self.model_class, self.order)
         elif self.order == 'group.name':
-            query = query.join(self.model_class.group, isouter=True)
             attribute = func.coalesce(UserGroup.name, '')
         elif self.order == 'user.realname':
-            query = query.join(self.model_class.user, isouter=True)
             attribute = func.coalesce(User.realname, '')
         elif self.order == 'user.username':
-            query = query.join(self.model_class.user, isouter=True)
             attribute = func.coalesce(User.username, '')
         elif self.order == 'user.name':
-            query = query.join(self.model_class.user, isouter=True)
             attribute = func.coalesce(User.realname, User.username, '')
         else:
             attribute = self.model_class.first_issue

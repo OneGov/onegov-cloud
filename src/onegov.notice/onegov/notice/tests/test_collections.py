@@ -57,17 +57,32 @@ def test_notice_collection(session):
 
 
 def test_notice_collection_search(session):
+    groups = UserGroupCollection(session)
+    group_a = groups.add(name='GroupA')
+    group_b = groups.add(name='GroupB1')
+
+    users = UserCollection(session)
+    user_a = users.add('a@example.org', 'password', 'editor', realname='Hans')
+    user_b = users.add('b@example.org', 'password', 'editor')
+
     notices = OfficialNoticeCollection(session)
-    for title, text, state in (
-        ('First', 'Lorem Ipsum', 'drafted'),
-        ('Second', 'A text', 'submitted'),
-        ('Third', 'Anöther text', 'drafted'),
-        ('Fourth', 'A fourth text', 'published'),
-        ('Fifth', 'Lorem Ipsum', 'rejected'),
-        ('Sixt', '<p>Six</p>', 'published'),
-        ('Sübent', 'Sübent', 'drafted'),
+    for state, title, text, category, organization, user, group in (
+        ('drafted', 'First', 'Lorem Ipsum', 'Cat1', None, None, group_a),
+        ('submitted', 'Second', 'A text', 'Cat1', 'Org1', user_a, group_b),
+        ('drafted', 'Third', 'Anöther text', 'Cat2', None, None, None),
+        ('published', 'Fourth', 'A fourth text', None, 'Org2', None, None),
+        ('rejected', 'Fifth', 'Lorem Ipsum', None, None, user_a, None),
+        ('published', 'Sixt', '<p>Six</p>', None, None, user_b, group_a),
+        ('drafted', 'Sübent', 'Sübent', None, None, None, None),
     ):
-        notice = notices.add(title=title, text=text)
+        notice = notices.add(
+            title=title,
+            text=text,
+            category=category,
+            organization=organization,
+            user=user,
+            group=group
+        )
         notice.state = state
 
     assert notices.query().count() == 7
@@ -83,6 +98,22 @@ def test_notice_collection_search(session):
     assert notices.for_term('six').for_state('rejected').query().count() == 0
 
     assert notices.for_term('üb').query().count() == 1
+
+    assert notices.for_term('Cat1').query().count() == 2
+    assert notices.for_term('Cat2').query().count() == 1
+    assert notices.for_term('Cat').query().count() == 3
+
+    assert notices.for_term('Org1').query().count() == 1
+    assert notices.for_term('Org').query().count() == 4
+
+    assert notices.for_term('1').query().count() == 2
+    assert notices.for_term('2').query().count() == 2
+
+    assert notices.for_term('@example.org').query().count() == 3
+    assert notices.for_term('ans').query().count() == 2
+
+    assert notices.for_term('group').query().count() == 3
+    assert notices.for_term('groupb').query().count() == 1
 
 
 def test_notice_collection_users_and_groups(session):
