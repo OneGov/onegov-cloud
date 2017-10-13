@@ -148,6 +148,17 @@ def view_activities(self, request):
             ) for weekday in range(0, 7)
         )
 
+        filters['available'] = tuple(
+            Link(
+                text=request.translate(text),
+                active=available in self.available,
+                url=request.link(self.for_filter(available=available))
+            ) for text, available in (
+                (_("Yes"), True),
+                (_("No"), False),
+            )
+        )
+
         filters['municipalities'] = [
             Link(
                 text=municipality,

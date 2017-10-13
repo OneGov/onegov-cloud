@@ -99,6 +99,11 @@
                     <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['tags']" />
                 </div>
 
+                <div tal:condition="filters['available']|nothing" class="filter-available">
+                    <h2 class="filter-title" i18n:translate>Free Spots</h2>
+                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['available']" />
+                </div>
+
                 <div tal:condition="filters['municipalities']|nothing" class="filter-municipalities">
                     <h2 class="filter-title" i18n:translate>Municipalities</h2>
                     <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['municipalities']" />

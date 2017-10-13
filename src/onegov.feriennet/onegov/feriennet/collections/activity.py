@@ -14,7 +14,8 @@ class VacationActivityCollection(ActivityCollection):
                  period_ids=None,
                  dateranges=None,
                  weekdays=None,
-                 municipalities=None):
+                 municipalities=None,
+                 available=None):
         super().__init__(
             session=session,
             type='vacation',
@@ -27,7 +28,8 @@ class VacationActivityCollection(ActivityCollection):
             period_ids=period_ids,
             dateranges=dateranges,
             weekdays=weekdays,
-            municipalities=municipalities
+            municipalities=municipalities,
+            available=available
         )
         self.identity = identity
 
@@ -54,5 +56,6 @@ class VacationActivityCollection(ActivityCollection):
             period_ids=self.period_ids,
             dateranges=self.dateranges,
             weekdays=self.weekdays,
-            municipalities=self.municipalities
+            municipalities=self.municipalities,
+            available=self.available
         )
