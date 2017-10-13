@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Counts available spots as 0 if the occasion has been cancelled.
+  [href]
+
 1.4.0 (2017-10-11)
 ~~~~~~~~~~~~~~~~~~~
 

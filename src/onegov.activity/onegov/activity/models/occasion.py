@@ -6,6 +6,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from psycopg2.extras import NumericRange
 from sqlalchemy import Boolean
+from sqlalchemy import case
 from sqlalchemy import column
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
@@ -164,7 +165,18 @@ class Occasion(Base, TimestampMixin):
 
     @hybrid_property
     def available_spots(self):
+        if self.cancelled:
+            return 0
         return self.spots.upper - 1 - self.attendee_count
+
+    @available_spots.expression
+    def available_spots(cls):
+        return case((
+            (
+                cls.cancelled == False,
+                func.upper(cls.spots) - 1 - cls.attendee_count
+            ),
+        ), else_=0)
 
     @property
     def max_spots(self):

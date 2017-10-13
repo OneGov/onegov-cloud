@@ -1189,44 +1189,68 @@ def test_attendees_count(session, owner):
 
     transaction.commit()
 
-    assert occasions.query().one().attendee_count == 0
-    assert not occasions.query().one().operable
+    q = occasions.query()
+
+    assert q.one().attendee_count == 0
+    assert q.one().available_spots == 2
+    assert q.with_entities(Occasion.available_spots).one()[0] == 2
+
+    assert not q.one().operable
 
     bookings.add(owner, a1, o)
     transaction.commit()
 
-    assert occasions.query().one().attendee_count == 0
-    assert not occasions.query().one().operable
+    assert q.one().attendee_count == 0
+    assert q.one().available_spots == 2
+    assert q.with_entities(Occasion.available_spots).one()[0] == 2
+    assert not q.one().operable
 
     bookings.query().one().state = 'accepted'
     transaction.commit()
 
-    assert occasions.query().one().attendee_count == 1
-    assert occasions.query().one().operable
+    assert q.one().attendee_count == 1
+    assert q.one().available_spots == 1
+    assert q.with_entities(Occasion.available_spots).one()[0] == 1
+    assert q.one().operable
 
     bookings.add(owner, a2, o)
     transaction.commit()
 
-    assert occasions.query().one().attendee_count == 1
-    assert occasions.query().one().operable
+    assert q.one().attendee_count == 1
+    assert q.one().available_spots == 1
+    assert q.with_entities(Occasion.available_spots).one()[0] == 1
+    assert q.one().operable
 
     bookings.query().all()[0].state = 'accepted'
     bookings.query().all()[1].state = 'accepted'
     transaction.commit()
 
-    assert occasions.query().one().attendee_count == 2
-    assert occasions.query().one().operable
+    assert q.one().attendee_count == 2
+    assert q.one().available_spots == 0
+    assert q.with_entities(Occasion.available_spots).one()[0] == 0
+    assert q.one().operable
 
     session.delete(bookings.query().first())
     transaction.commit()
 
-    assert occasions.query().one().attendee_count == 1
-    assert occasions.query().one().operable
+    assert q.one().attendee_count == 1
+    assert q.one().available_spots == 1
+    assert q.with_entities(Occasion.available_spots).one()[0] == 1
+    assert q.one().operable
 
     bookings.query().one().state = 'open'
 
-    assert occasions.query().one().attendee_count == 0
-    assert not occasions.query().one().operable
+    assert q.one().attendee_count == 0
+    assert q.one().available_spots == 2
+    assert q.with_entities(Occasion.available_spots).one()[0] == 2
+    assert not q.one().operable
+
+    q.one().cancelled = True
+    transaction.commit()
+
+    assert q.one().attendee_count == 0
+    assert q.one().available_spots == 0
+    assert q.with_entities(Occasion.available_spots).one()[0] == 0
 
 
 def test_accept_booking(session, owner):
