@@ -193,9 +193,13 @@ def test_notice_collection_issues(session):
 
 
 def test_notice_collection_order(session):
+    groups = UserGroupCollection(session)
+    group_c = groups.add(name='C').id
+    group_d = groups.add(name='D').id
+
     users = UserCollection(session)
-    user_a = users.add('a@example.org', 'password', 'editor').id
-    user_b = users.add('b@example.org', 'password', 'editor').id
+    user_a = users.add('a@example.org', 'password', 'editor', realname='o').id
+    user_b = users.add('b@example.org', 'password', 'editor', realname='p').id
     user_c = users.add('c@example.org', 'password', 'editor').id
 
     date_1 = datetime(2007, 10, 10, tzinfo=timezone.utc)
@@ -203,18 +207,19 @@ def test_notice_collection_order(session):
     date_3 = datetime(2007, 12, 12, tzinfo=timezone.utc)
 
     notices = OfficialNoticeCollection(session)
-    for title, text, user_id, organization, category, first_issue in (
-        ('A', 'g', user_a, 'p', 'X', date_1),
-        ('B', 'g', user_b, 'q', 'X', date_1),
-        ('B', 'h', user_c, 'p', 'X', date_2),
-        ('C', 'h', user_a, 'q', 'X', date_1),
-        ('D', 'i', user_b, 'p', 'Y', date_1),
-        ('E', 'j', user_c, 'q', 'Y', date_3),
+    for title, text, user, group, organization, category, first_issue in (
+        ('A', 'g', user_a, group_c, 'p', 'X', date_1),
+        ('B', 'g', user_b, group_d, 'q', 'X', date_1),
+        ('B', 'h', None, None, 'p', 'X', date_2),
+        ('C', 'h', user_a, None, 'q', 'X', date_1),
+        ('D', 'i', user_b, group_d, 'p', 'Y', date_1),
+        ('E', 'j', user_c, group_c, 'q', 'Y', date_3),
     ):
         notices.add(
             title=title,
             text=text,
-            user_id=user_id,
+            user_id=user,
+            group_id=group,
             organization=organization,
             category=category,
             first_issue=first_issue,
@@ -266,19 +271,52 @@ def test_notice_collection_order(session):
     result = [n.text for n in notices.for_order('text').query()]
     assert result == ['g', 'g', 'h', 'h', 'i', 'j']
 
+    # ... user_id
     result = [n.user_id for n in notices.for_order('user_id').query()]
-    assert result == sorted(2 * [user_a] + 2 * [user_b] + 2 * [user_c])
+    assert result == sorted(2 * [user_a] + 2 * [user_b] + [user_c]) + [None]
 
+    # ... organization
     result = [
         n.organization for n in notices.for_order('organization').query()
     ]
     assert result == ['p', 'p', 'p', 'q', 'q', 'q']
 
+    # ... category
     result = [n.category for n in notices.for_order('category').query()]
     assert result == ['X', 'X', 'X', 'X', 'Y', 'Y']
 
+    # ... name
     result = [n.name for n in notices.for_order('name').query()]
     assert result == ['a', 'b', 'b-1', 'c', 'd', 'e']
+
+    # ... group.name
+    result = [
+        n.group.name if n.group else None
+        for n in notices.for_order('group.name').query()
+    ]
+    assert result == [None, None, 'C', 'C', 'D', 'D']
+
+    # ... user.name(s)
+    result = [
+        n.user.realname if n.user else None
+        for n in notices.for_order('user.realname').query()
+    ]
+    assert result == [None, None, 'o', 'o', 'p', 'p']
+
+    result = [
+        n.user.username if n.user else None
+        for n in notices.for_order('user.username').query()
+    ]
+    assert result == [
+        None, 'a@example.org', 'a@example.org',
+        'b@example.org', 'b@example.org', 'c@example.org'
+    ]
+
+    result = [
+        n.user.realname or n.user.username if n.user else None
+        for n in notices.for_order('user.name').query()
+    ]
+    assert result == [None, 'c@example.org', 'o', 'o', 'p', 'p']
 
 
 def test_notice_collection_pagination(session):

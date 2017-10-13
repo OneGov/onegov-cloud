@@ -2,10 +2,13 @@ from onegov.core.collection import Pagination
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
 from onegov.notice.models import OfficialNotice
+from onegov.user import User
+from onegov.user import UserGroup
 from sqlalchemy import asc
 from sqlalchemy import desc
 from sqlalchemy import inspect
 from sqlalchemy import or_
+from sqlalchemy import func
 
 
 class OfficialNoticeCollectionPagination(Pagination):
@@ -152,6 +155,18 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
         direction = desc if self.direction == 'desc' else asc
         if self.order in inspect(self.model_class).columns.keys():
             attribute = getattr(self.model_class, self.order)
+        elif self.order == 'group.name':
+            query = query.join(UserGroup, isouter=True)
+            attribute = func.coalesce(UserGroup.name, '')
+        elif self.order == 'user.realname':
+            query = query.join(User, isouter=True)
+            attribute = func.coalesce(User.realname, '')
+        elif self.order == 'user.username':
+            query = query.join(User, isouter=True)
+            attribute = func.coalesce(User.username, '')
+        elif self.order == 'user.name':
+            query = query.join(User, isouter=True)
+            attribute = func.coalesce(User.realname, User.username, '')
         else:
             attribute = self.model_class.first_issue
         query = query.order_by(None).order_by(direction(attribute))
