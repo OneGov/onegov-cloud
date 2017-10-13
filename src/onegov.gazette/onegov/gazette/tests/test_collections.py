@@ -42,7 +42,7 @@ def test_notice_collection(session, principal):
         principal=principal
     )
 
-    notice = collection.query().filter_by(title='Notice A').one()
+    notice = collection.for_term('Notice A').query().one()
     assert notice.title == 'Notice A'
     assert notice.text == 'An <strong>important</strong> Notice!'
     assert notice.organization_id == '100'
@@ -57,7 +57,7 @@ def test_notice_collection(session, principal):
     assert notice.changes.one().event == 'created'
     assert notice.changes.one().user == user
 
-    notice = collection.query().filter_by(title='Notice B').one()
+    notice = collection.for_term('Notice B').query().one()
     assert notice.title == 'Notice B'
     assert notice.text == 'Another Notice'
     assert notice.organization_id == '200'

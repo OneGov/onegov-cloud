@@ -208,6 +208,8 @@ def test_view_notices_order(gazette_app):
             'title': 'asc',
             'organization': 'asc',
             'category': 'asc',
+            'group.name': 'asc',
+            'user.name': 'asc',
             'first_issue': 'desc'
         }
 
@@ -218,6 +220,8 @@ def test_view_notices_order(gazette_app):
             'title': 'asc',
             'organization': 'asc',
             'category': 'asc',
+            'group.name': 'asc',
+            'user.name': 'asc',
             'first_issue': 'desc'
         }
 
@@ -228,6 +232,8 @@ def test_view_notices_order(gazette_app):
             'title': 'asc',
             'organization': 'asc',
             'category': 'desc',
+            'group.name': 'asc',
+            'user.name': 'asc',
             'first_issue': 'asc'
         }
 
@@ -240,6 +246,8 @@ def test_view_notices_order(gazette_app):
             'title': 'desc',
             'organization': 'asc',
             'category': 'asc',
+            'group.name': 'asc',
+            'user.name': 'asc',
             'first_issue': 'asc'
         }
 
@@ -249,6 +257,8 @@ def test_view_notices_order(gazette_app):
             'title': 'asc',
             'organization': 'asc',
             'category': 'asc',
+            'group.name': 'asc',
+            'user.name': 'asc',
             'first_issue': 'asc'
         }
 
@@ -259,6 +269,8 @@ def test_view_notices_order(gazette_app):
             'title': 'asc',
             'organization': 'desc',
             'category': 'asc',
+            'group.name': 'asc',
+            'user.name': 'asc',
             'first_issue': 'asc'
         }
 
@@ -268,6 +280,8 @@ def test_view_notices_order(gazette_app):
             'title': 'asc',
             'organization': 'asc',
             'category': 'asc',
+            'group.name': 'asc',
+            'user.name': 'asc',
             'first_issue': 'asc'
         }
 
@@ -278,6 +292,8 @@ def test_view_notices_order(gazette_app):
             'title': 'asc',
             'organization': 'asc',
             'category': 'desc',
+            'group.name': 'asc',
+            'user.name': 'asc',
             'first_issue': 'asc'
         }
 
@@ -287,6 +303,51 @@ def test_view_notices_order(gazette_app):
             'title': 'asc',
             'organization': 'asc',
             'category': 'asc',
+            'group.name': 'asc',
+            'user.name': 'asc',
+            'first_issue': 'asc'
+        }
+
+        # ... group
+        ordered = client.get(url.format('group.name', 'asc'))
+        assert get_ordering(ordered) == {
+            'title': 'asc',
+            'organization': 'asc',
+            'category': 'asc',
+            'group.name': 'desc',
+            'user.name': 'asc',
+            'first_issue': 'asc'
+        }
+
+        ordered = client.get(url.format('category', 'desc'))
+        assert get_ordering(ordered) == {
+            'title': 'asc',
+            'organization': 'asc',
+            'category': 'asc',
+            'group.name': 'asc',
+            'user.name': 'asc',
+            'first_issue': 'asc'
+        }
+
+        # ... user
+        ordered = client.get(url.format('user.name', 'asc'))
+        assert get_ordering(ordered) == {
+            'title': 'asc',
+            'organization': 'asc',
+            'category': 'asc',
+            'group.name': 'asc',
+            'user.name': 'desc',
+            'first_issue': 'asc'
+        }
+
+        ordered = client.get(url.format('category', 'desc'))
+        assert get_items(ordered) == ["Erneuerungswahlen", "Kantonsratswahlen"]
+        assert get_ordering(ordered) == {
+            'title': 'asc',
+            'organization': 'asc',
+            'category': 'asc',
+            'group.name': 'asc',
+            'user.name': 'asc',
             'first_issue': 'asc'
         }
 
@@ -297,6 +358,8 @@ def test_view_notices_order(gazette_app):
             'title': 'asc',
             'organization': 'asc',
             'category': 'asc',
+            'group.name': 'asc',
+            'user.name': 'asc',
             'first_issue': 'desc'
         }
 
@@ -306,6 +369,8 @@ def test_view_notices_order(gazette_app):
             'title': 'asc',
             'organization': 'asc',
             'category': 'asc',
+            'group.name': 'asc',
+            'user.name': 'asc',
             'first_issue': 'asc'
         }
 

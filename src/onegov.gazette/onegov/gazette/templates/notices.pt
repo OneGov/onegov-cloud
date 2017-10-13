@@ -72,8 +72,8 @@
                             <th><tal:block metal:use-macro="layout.macros['order_link']" tal:define="key 'title'"></tal:block></th>
                             <th><tal:block metal:use-macro="layout.macros['order_link']" tal:define="key 'organization'"></tal:block></th>
                             <th><tal:block metal:use-macro="layout.macros['order_link']" tal:define="key 'category'"></tal:block></th>
-                            <th i18n:translate>Group</th>
-                            <th i18n:translate>User</th>
+                            <th><tal:block metal:use-macro="layout.macros['order_link']" tal:define="key 'group'"></tal:block></th>
+                            <th><tal:block metal:use-macro="layout.macros['order_link']" tal:define="key 'user'"></tal:block></th>
                             <th><tal:block metal:use-macro="layout.macros['order_link']" tal:define="key 'first_issue'"></tal:block></th>
                         </tr>
                     </thead>

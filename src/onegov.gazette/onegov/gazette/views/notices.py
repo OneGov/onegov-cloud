@@ -12,6 +12,7 @@ from onegov.gazette.collections.notices import TRANSLATIONS
 from onegov.gazette.forms import EmptyForm
 from onegov.gazette.forms import NoticeForm
 from onegov.gazette.layout import Layout
+from onegov.gazette.models import GazetteNotice
 from onegov.gazette.views import get_user
 from onegov.gazette.views import get_user_and_group
 from xlsxwriter import Workbook
@@ -51,7 +52,7 @@ def create_notice(self, request, form):
         return redirect(request.link(notice))
 
     if not form.errors and self.source:
-        source = self.query().filter_by(id=self.source).first()
+        source = self.query().filter(GazetteNotice.id == self.source).first()
         if source:
             form.apply_model(source)
 
@@ -105,6 +106,16 @@ def view_notices(self, request):
             'title': _("Category"),
             'href': request.link(self.for_order('category')),
             'sort': self.direction if self.order == 'category' else '',
+        },
+        'group': {
+            'title': _("Group"),
+            'href': request.link(self.for_order('group.name')),
+            'sort': self.direction if self.order == 'group.name' else '',
+        },
+        'user': {
+            'title': _("User"),
+            'href': request.link(self.for_order('user.name')),
+            'sort': self.direction if self.order == 'user.name' else '',
         },
         'first_issue': {
             'title': _("Issue(s)"),

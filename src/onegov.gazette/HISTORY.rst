@@ -1,5 +1,13 @@
 Changelog
 ---------
+
+- Allows to sort notices by group and user names.
+  [msom]
+
+- Allows to filter notices by categories, organizations, group names and
+  user names.
+  [msom]
+
 1.6.0 (2017-10-05)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -39,7 +39,7 @@ setup(
         'onegov.core',
         'onegov.form',
         'onegov.foundation',
-        'onegov.notice>=0.1.2',
+        'onegov.notice>=0.2.0',
         'onegov.quill>=0.2.0',
         'onegov.shared',
         'onegov.user>=0.17.0',
