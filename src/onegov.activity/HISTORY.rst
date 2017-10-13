@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to filter activities by availability.
+  [href]
+
 - Counts available spots as 0 if the occasion has been cancelled.
   [href]
 

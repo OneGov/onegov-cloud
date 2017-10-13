@@ -1,6 +1,6 @@
 import sedate
 
-from onegov.activity.models import Activity
+from onegov.activity.models import Activity, Occasion
 from onegov.activity.utils import merge_ranges, overlaps
 from onegov.core.collection import Pagination
 from onegov.core.utils import increment_name
@@ -28,7 +28,8 @@ class ActivityCollection(Pagination):
                  period_ids=None,
                  dateranges=None,
                  weekdays=None,
-                 municipalities=None):
+                 municipalities=None,
+                 available=None):
         self.session = session
         self.type = type
         self.page = page
@@ -42,6 +43,7 @@ class ActivityCollection(Pagination):
         self.dateranges = set(dateranges) if dateranges else set()
         self.weekdays = set(weekdays) if weekdays else set()
         self.municipalities = set(municipalities) if municipalities else set()
+        self.available = set(available) if available else set()
 
     def __eq__(self, other):
         return self.type == other.type and self.page == other.page
@@ -66,7 +68,8 @@ class ActivityCollection(Pagination):
             period_ids=self.period_ids,
             dateranges=self.dateranges,
             weekdays=self.weekdays,
-            municipalities=self.municipalities
+            municipalities=self.municipalities,
+            available=self.available
         )
 
     def contains_age_range(self, age_range):
@@ -155,6 +158,26 @@ class ActivityCollection(Pagination):
             query = query.filter(
                 model_class.municipality.in_(self.municipalities))
 
+        if True in self.available:
+            query = query.filter(
+                model_class.id.in_(
+                    self.session.query(Occasion)
+                        .with_entities(distinct(Occasion.activity_id))
+                        .filter(Occasion.available_spots > 0)
+                        .subquery()
+                )
+            )
+
+        if False in self.available:
+            query = query.filter(
+                model_class.id.in_(
+                    self.session.query(Occasion)
+                        .with_entities(Occasion.activity_id)
+                        .group_by(Occasion.activity_id)
+                        .having(func.sum(Occasion.available_spots) == 0)
+                )
+            )
+
         return query
 
     def for_filter(self,
@@ -166,7 +189,8 @@ class ActivityCollection(Pagination):
                    period_id=None,
                    daterange=None,
                    weekday=None,
-                   municipality=None):
+                   municipality=None,
+                   available=None):
         """ Returns a new collection instance.
 
         The given tag is excluded if already in the list, included if not
@@ -190,7 +214,8 @@ class ActivityCollection(Pagination):
                 (self.period_ids, period_id),
                 (self.dateranges, daterange),
                 (self.weekdays, weekday),
-                (self.municipalities, municipality)
+                (self.municipalities, municipality),
+                (self.available, available)
             )
         )
 
