@@ -4,11 +4,12 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from onegov.core.utils import normalize_for_url, dictionary_to_binary
+from onegov.core.utils import normalize_for_url
 from onegov.directory.errors import ValidationError
 from onegov.directory.migration import DirectoryMigration
 from onegov.directory.types import DirectoryConfigurationStorage
 from onegov.file import File
+from onegov.file.utils import as_fileintent
 from onegov.form import flatten_fieldsets, parse_formcode, parse_form
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
@@ -20,6 +21,10 @@ from uuid import uuid4
 
 
 INHERIT = object()
+
+
+class DirectoryFile(File):
+    __mapper_args__ = {'polymorphic_identity': 'directory'}
 
 
 class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
@@ -105,33 +110,59 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
         if set_name:
             entry.name = normalize_for_url(entry.title)
 
-        basic_fields = tuple(f for f in self.fields if f.type != 'fileinput')
-        entry.values = {f.id: values[f.id] for f in basic_fields}
+        updated = {f.id: values[f.id] for f in self.basic_fields}
 
-        file_fields = tuple(
-            f for f in self.fields if f.type == 'fileinput'
-            if values[f.id] is not None
-        )
+        if self.file_fields:
 
-        if file_fields:
-            # XXX add the ability to keep a file
+            # files which are not given or whose value is {} are removed
+            # (this is in line with onegov.form's file upload field+widget)
             for f in entry.files:
-                session.delete(f)
+                delete = (
+                    f.note not in values or
+                    values[f.note] == {} or
+                    values[f.note] is not None
+                )
 
-            for field in file_fields:
+                if delete:
+                    session.delete(f)
+
+            for field in self.file_fields:
+
+                # keep files if selected in the dialog
+                if values[field.id] is None:
+                    updated[field.id] = entry.values[field.id]
+
+                # migrate files during an entry migration
+                if isinstance(values[field.id], dict):
+                    updated[field.id] = values[field.id]
+                    continue
+
+                # delte files if selected in the dialog
                 if not values[field.id]:
                     continue
 
                 new_file = File(
                     id=random_token(),
-                    name=values[field.id]['filename'],
-                    reference=dictionary_to_binary(values[field.id])
+                    name=values[field.id].filename,
+                    note=field.id,
+                    type='directory',
+                    reference=as_fileintent(
+                        content=values[field.id].file,
+                        filename=values[field.id].filename
+                    )
                 )
 
+                updated[field.id] = {
+                    'data': '@' + new_file.id,
+                    'filename': values[field.id].filename,
+                    'mimetype': new_file.reference.file.content_type,
+                    'size': new_file.reference.file.content_length
+                }
+
                 entry.files.append(new_file)
-                entry.values[field.id] = values[field.id]
-                entry.values[field.id]['id'] = new_file.id
-                entry.values[field.id]['data'] = None
+
+        entry.values = updated
+        entry.content.changed()
 
         form = self.form_class(data=entry.values)
 
@@ -162,6 +193,14 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
         return tuple(flatten_fieldsets(parse_formcode(self.structure)))
 
     @property
+    def basic_fields(self):
+        return tuple(f for f in self.fields if f.type != 'fileinput')
+
+    @property
+    def file_fields(self):
+        return tuple(f for f in self.fields if f.type == 'fileinput')
+
+    @property
     def form_class(self):
         return self.form_class_from_structure(self.structure)
 
@@ -174,7 +213,16 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
             def populate_obj(self, obj):
                 super().populate_obj(obj)
 
-                directory.update(obj, self.data)
+                data = {
+                    k: v for k, v in self.data.items() if k not in {
+                        f.id for f in directory.file_fields
+                    }
+                }
+
+                for field in directory.file_fields:
+                    data[field.id] = self[field.id]
+
+                directory.update(obj, data)
 
             def process_obj(self, obj):
                 super().process_obj(obj)

@@ -95,3 +95,4 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     def values(self, values):
         self.content = self.content or {}
         self.content['values'] = values
+        self.content.changed()

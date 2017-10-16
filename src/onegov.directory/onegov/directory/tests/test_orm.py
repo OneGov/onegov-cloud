@@ -1,6 +1,7 @@
 import pytest
 
-from onegov.core.utils import binary_to_dictionary
+from io import BytesIO
+from onegov.core.utils import Bunch
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryEntry
@@ -191,7 +192,7 @@ def test_validation_error(session):
         places.add(values={'name': ''})
 
 
-def test_fileset(session):
+def test_files(session):
     press_releases = DirectoryCollection(session).add(
         title="Press Releases",
         structure="""
@@ -206,11 +207,17 @@ def test_fileset(session):
 
     iphone_found = press_releases.add(values=dict(
         title="iPhone Found in Ancient Ruins in the Andes",
-        file=binary_to_dictionary(b'just kidding', 'press-release.txt')
+        file=Bunch(
+            file=BytesIO(b'just kidding'),
+            filename='press-release.txt'
+        )
+
     ))
 
     assert len(iphone_found.files) == 1
-    assert iphone_found.values['file']['id'] == iphone_found.files[0].id
+    assert iphone_found.values['file']['size'] == 12
+    assert iphone_found.values['file']['mimetype'] == 'text/plain'
+    assert iphone_found.values['file']['filename'] == 'press-release.txt'
     assert session.query(File).count() == 1
 
     session.delete(iphone_found)
