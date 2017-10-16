@@ -480,7 +480,7 @@ def get_messages(app, channel_id='*', type='*',
 
 @OrgApp.path(
     model=DirectoryCollection,
-    path='/verzeichnisse')
+    path='/directories')
 def get_directories(app):
     return DirectoryCollection(app.session(), type='extended')
 
@@ -514,7 +514,7 @@ keywords_converter = morepath.Converter(
 
 @OrgApp.path(
     model=DirectoryEntryCollection,
-    path='/verzeichnisse/{directory_name}',
+    path='/directories/{directory_name}',
     converters={'keywords': keywords_converter})
 def get_directory_entries(app, directory_name, keywords, page=0):
     directory = DirectoryCollection(app.session()).by_name(directory_name)
@@ -534,7 +534,7 @@ def get_directory_entries(app, directory_name, keywords, page=0):
 
 @OrgApp.path(
     model=DirectoryEntry,
-    path='/verzeichnisse/{directory_name}/{name}')
+    path='/directories/{directory_name}/{name}')
 def get_directory_entry(app, directory_name, name):
     directory = DirectoryCollection(app.session()).by_name(directory_name)
 

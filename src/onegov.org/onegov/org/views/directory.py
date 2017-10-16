@@ -37,7 +37,7 @@ def view_directories(self, request):
     }
 
 
-@OrgApp.form(model=DirectoryCollection, name='neu', template='form.pt',
+@OrgApp.form(model=DirectoryCollection, name='new', template='form.pt',
              permission=Secret, form=get_directory_form_class)
 def handle_new_directory(self, request, form):
     if form.submitted(request):
@@ -58,7 +58,7 @@ def handle_new_directory(self, request, form):
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
         Link(_("Directories"), request.link(self)),
-        Link(_("New"), request.link(self, name='neu'))
+        Link(_("New"), request.link(self, name='new'))
     ]
 
     return {
@@ -71,7 +71,7 @@ def handle_new_directory(self, request, form):
 
 @OrgApp.form(model=DirectoryEntryCollection, template='form.pt',
              permission=Secret, form=get_directory_form_class,
-             name='bearbeiten')
+             name='edit')
 def handle_edit_directory(self, request, form):
 
     if form.submitted(request):
@@ -147,7 +147,7 @@ def view_directory(self, request):
     permission=Private,
     template='form.pt',
     form=get_directory_entry_form_class,
-    name='neu')
+    name='new')
 def handle_new_directory_entry(self, request, form):
     if form.submitted(request):
         entry = self.directory.add(values=form.data, type='extended')
@@ -172,7 +172,7 @@ def handle_new_directory_entry(self, request, form):
     permission=Private,
     template='form.pt',
     form=get_directory_entry_form_class,
-    name='bearbeiten')
+    name='edit')
 def handle_edit_directory_entry(self, request, form):
     if form.submitted(request):
         form.populate_obj(self)

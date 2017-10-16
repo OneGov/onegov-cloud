@@ -1721,7 +1721,7 @@ class DirectoryCollectionLayout(DefaultLayout):
                             text=_("Directory"),
                             url=self.request.link(
                                 self.model,
-                                name='+neu'
+                                name='+new'
                             ),
                             attrs={'class': 'new-directory'}
                         )
@@ -1752,7 +1752,7 @@ class DirectoryEntryCollectionLayout(DefaultLayout):
             return [
                 Link(
                     text=_("Edit"),
-                    url=self.request.link(self.model, '+bearbeiten'),
+                    url=self.request.link(self.model, '+edit'),
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
@@ -1787,7 +1787,7 @@ class DirectoryEntryCollectionLayout(DefaultLayout):
                             text=_("Entry"),
                             url=self.request.link(
                                 self.model,
-                                name='+neu'
+                                name='+new'
                             ),
                             attrs={'class': 'new-directory-entry'}
                         )
@@ -1819,7 +1819,7 @@ class DirectoryEntryLayout(DefaultLayout):
             return [
                 Link(
                     text=_("Edit"),
-                    url=self.request.link(self.model, '+bearbeiten'),
+                    url=self.request.link(self.model, '+edit'),
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
