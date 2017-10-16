@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.1 (2017-10-16)
+~~~~~~~~~~~~~~~~~~~
 
 - Defaults to the beginning of the active period when creting an occasion.
   [href]
