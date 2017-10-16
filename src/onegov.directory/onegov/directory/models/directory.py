@@ -121,6 +121,9 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
                 entry.fileset = FileSet(title=self.title)
 
             for field in file_fields:
+                if not values[field.id]:
+                    continue
+
                 new_file = File(
                     id=random_token(),
                     name=values[field.id]['filename'],
