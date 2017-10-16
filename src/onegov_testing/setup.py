@@ -39,6 +39,9 @@ setup(
         'Pillow',
         'port-for',
         'pytest>=3.0.6',
+        # pinned to avoid errors with pyexecjs, once this package releases
+        # a version > 1.4.1, remove this:
+        'six==1.10.0',
         'sqlalchemy',
         'splinter',
         'webdriver-manager',
