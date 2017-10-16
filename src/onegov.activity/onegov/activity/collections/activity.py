@@ -17,6 +17,9 @@ from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import array
 
 
+AVAILABILITY_VALUES = {'none', 'few', 'many'}
+
+
 class ActivityCollection(Pagination):
 
     def __init__(self, session, type='*', page=0,
@@ -44,6 +47,8 @@ class ActivityCollection(Pagination):
         self.weekdays = set(weekdays) if weekdays else set()
         self.municipalities = set(municipalities) if municipalities else set()
         self.available = set(available) if available else set()
+
+        assert self.available <= AVAILABILITY_VALUES
 
     def __eq__(self, other):
         return self.type == other.type and self.page == other.page
@@ -158,25 +163,56 @@ class ActivityCollection(Pagination):
             query = query.filter(
                 model_class.municipality.in_(self.municipalities))
 
-        if True in self.available:
-            query = query.filter(
-                model_class.id.in_(
-                    self.session.query(Occasion)
-                        .with_entities(distinct(Occasion.activity_id))
-                        .filter(Occasion.available_spots > 0)
-                        .subquery()
-                )
-            )
+        if self.available:
+            spots = set()
 
-        if False in self.available:
-            query = query.filter(
-                model_class.id.in_(
-                    self.session.query(Occasion)
-                        .with_entities(Occasion.activity_id)
-                        .group_by(Occasion.activity_id)
-                        .having(func.sum(Occasion.available_spots) == 0)
-                )
-            )
+        if 'none' in self.available:
+            spots.add(0)
+
+        if 'few' in self.available:
+            spots.update((1, 2))
+
+        if 'many' in self.available:
+            spots.update(range(3, 1000))
+
+        if self.available and self.available < AVAILABILITY_VALUES:
+            queries = []
+
+            stub = self.session.query(Occasion)
+            stub = stub.with_entities(Occasion.activity_id)
+            stub = stub.group_by(Occasion.activity_id)
+
+            for amount in self.available:
+                if amount == 'none':
+                    queries.append(
+                        model_class.id.in_(
+                            stub.having(
+                                func.sum(Occasion.available_spots) == 0
+                            )
+                        )
+                    )
+                elif amount == 'few':
+                    queries.append(
+                        model_class.id.in_(
+                            stub.having(
+                                func.sum(Occasion.available_spots).in_(
+                                    (1, 2, 3)
+                                )
+                            )
+                        )
+                    )
+                elif amount == 'many':
+                    queries.append(
+                        model_class.id.in_(
+                            stub.having(
+                                func.sum(Occasion.available_spots) >= 4
+                            )
+                        )
+                    )
+                else:
+                    raise NotImplementedError
+
+            query = query.filter(or_(*queries))
 
         return query
 
