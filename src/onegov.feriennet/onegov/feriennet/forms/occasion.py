@@ -239,8 +239,10 @@ class OccasionForm(Form):
                 } for ix, d in enumerate(dates)
             ],
             'extra': {
-                'defaultDate':
+                'defaultDate': (
+                    self.request.app.active_period and
                     self.request.app.active_period.execution_start.isoformat(),
+                ),
                 'defaultTime': '08:00'
             }
         })

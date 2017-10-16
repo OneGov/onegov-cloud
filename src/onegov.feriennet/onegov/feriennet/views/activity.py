@@ -154,8 +154,9 @@ def view_activities(self, request):
                 active=available in self.available,
                 url=request.link(self.for_filter(available=available))
             ) for text, available in (
-                (_("Yes"), True),
-                (_("No"), False),
+                (_("None"), 'none'),
+                (_("Few"), 'few'),
+                (_("Many"), 'many'),
             )
         )
 

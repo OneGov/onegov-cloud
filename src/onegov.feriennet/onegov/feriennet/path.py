@@ -29,7 +29,7 @@ from uuid import UUID
         dateranges=[date_range_converter],
         weekdays=[int],
         municipalities=[str],
-        available=[bool]
+        available=[str]
     ))
 def get_vacation_activities(request, app, page=0,
                             tags=None,
