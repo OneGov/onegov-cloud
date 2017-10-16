@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Changes the activity filter to have more useful options.
+  [href]
+
 1.5.0 (2017-10-16)
 ~~~~~~~~~~~~~~~~~~~
 
