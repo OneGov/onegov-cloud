@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.5.0 (2017-10-16)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds some matching of manual payments to iso20022 matcher.
   [href]
