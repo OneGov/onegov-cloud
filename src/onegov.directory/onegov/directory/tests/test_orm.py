@@ -6,7 +6,7 @@ from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryEntryCollection
 from onegov.directory.errors import ValidationError
-from onegov.file import File, FileSet
+from onegov.file import File
 
 
 def test_directory_title_and_order(session):
@@ -209,15 +209,11 @@ def test_fileset(session):
         file=binary_to_dictionary(b'just kidding', 'press-release.txt')
     ))
 
-    assert len(iphone_found.fileset.files) == 1
     assert len(iphone_found.files) == 1
     assert iphone_found.values['file']['id'] == iphone_found.files[0].id
-
-    assert session.query(FileSet).count() == 1
     assert session.query(File).count() == 1
 
     session.delete(iphone_found)
     session.flush()
 
-    assert session.query(FileSet).count() == 0
     assert session.query(File).count() == 0

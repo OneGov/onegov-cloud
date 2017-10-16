@@ -8,7 +8,7 @@ from onegov.core.utils import normalize_for_url, dictionary_to_binary
 from onegov.directory.errors import ValidationError
 from onegov.directory.migration import DirectoryMigration
 from onegov.directory.types import DirectoryConfigurationStorage
-from onegov.file import File, FileSet
+from onegov.file import File
 from onegov.form import flatten_fieldsets, parse_formcode, parse_form
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
@@ -112,13 +112,11 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
             f for f in self.fields if f.type == 'fileinput'
             if values[f.id] is not None
         )
+
         if file_fields:
             # XXX add the ability to keep a file
-            if entry.fileset:
-                for f in entry.fileset.files:
-                    session.delete(f)
-            else:
-                entry.fileset = FileSet(title=self.title)
+            for f in entry.files:
+                session.delete(f)
 
             for field in file_fields:
                 if not values[field.id]:
@@ -130,7 +128,7 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
                     reference=dictionary_to_binary(values[field.id])
                 )
 
-                entry.fileset.files.append(new_file)
+                entry.files.append(new_file)
                 entry.values[field.id] = values[field.id]
                 entry.values[field.id]['id'] = new_file.id
                 entry.values[field.id]['data'] = None
