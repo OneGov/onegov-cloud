@@ -45,6 +45,47 @@ Changelog
 - Switches to onegov.file for form submission files.
   [href]
 
+0.15.4 (2017-10-13)
+~~~~~~~~~~~~~~~~~~~
+
+- Adds the ability to pass extra parameters to the jquery datetime picker.
+  [href]
+
+0.15.3 (2017-10-12)
+~~~~~~~~~~~~~~~~~~~
+
+- Only show sliders once they can be correctly rendered.
+
+  This improves the look of the homepage on the initial load.
+  [href]
+
+0.15.2 (2017-10-10)
+~~~~~~~~~~~~~~~~~~~
+
+- Removes leftover onegov.notices table.
+  [href]
+
+0.15.1 (2017-10-06)
+~~~~~~~~~~~~~~~~~~~
+
+- Fixes reservations not working after url change.
+  [href]
+
+- Adds the ability to use the payments table in other views.
+  [href]
+
+0.15.0 (2017-09-28)
+~~~~~~~~~~~~~~~~~~~
+
+- Consistently uses English in the urls, instead of a German/English mix.
+  [href]
+
+- Switches to onegov.search's automatic language detection.
+  [href]
+
+- Switches to onegov.file for form submission files.
+  [href]
+
 - Fixes dialog not showing for undeletable objects.
   [href]
 
