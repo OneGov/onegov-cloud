@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.4 (2017-10-17)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes empty coordinates resulting in an error.
   [href]
 
