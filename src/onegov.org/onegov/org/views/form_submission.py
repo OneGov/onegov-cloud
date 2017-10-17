@@ -79,7 +79,7 @@ def handle_pending_submission(self, request):
 
     if not request.POST:
         form.ignore_csrf_error()
-    else:
+    elif not form.errors:
         collection.submissions.update(self, form)
 
     # these parameters keep between form requests (the rest throw away)
