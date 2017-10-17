@@ -402,16 +402,19 @@
 </metal:display_form>
 
 <metal:display_field define-macro="display_fields" i18n:domain="onegov.org">
-    <div class="field-display" tal:repeat="field fields">
+    <div class="field-display" tal:repeat="field fields" tal:define="allow_downloads allow_downloads|request.is_manager; allow_views allow_views|False">
         <div class="field-display-block" tal:define="rendered layout.render_field(field)" tal:condition="rendered">
             <div class="field-display-label">${field.label.text}</div>
-            <div class="field-display-data" tal:define="downloadable request.is_manager and field.type == 'UploadField'">
-                <tal:block condition="downloadable">
-                    <a href="${layout.field_download_link(field)}">
-                        <tal:block replace="structure rendered" />
-                    </a>
-                </tal:block>
-                <tal:block condition="not:downloadable">
+            <div class="field-display-data">
+                <tal:b condition="(allow_downloads or allow_views) and field.type == 'UploadField'">
+                    <tal:b define="url layout.field_download_link(field)">
+                        <a href="${url}" tal:condition="not allow_views or not field.is_image">
+                            <tal:block replace="structure rendered" />
+                        </a>
+                        <img src="${url}" tal:condition="allow_views and field.is_image" />
+                    </tal:b>
+                </tal:b>
+                <tal:block condition="not (allow_downloads or allow_views) or field.type != 'UploadField'">
                     <tal:block replace="structure rendered" />
                 </tal:block>
             </div>

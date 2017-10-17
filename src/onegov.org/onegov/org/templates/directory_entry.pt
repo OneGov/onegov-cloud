@@ -9,7 +9,11 @@
             <div metal:fill-slot="after-lead">
                 <metal:b
                     use-macro="layout.macros['display_fields']"
-                    tal:define="fields entry.content_fields"
+                    tal:define="
+                        fields entry.content_fields;
+                        allow_downloads True;
+                        allow_views True;
+                    "
                 />
             </div>
 
