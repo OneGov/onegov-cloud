@@ -1,11 +1,8 @@
-from onegov.core.crypto import random_token
 from onegov.core.html import sanitize_html
-from onegov.core.utils import binary_to_dictionary
-from onegov.file import File
-from onegov.file.utils import as_fileintent
 from onegov.form.widgets import MultiCheckboxWidget
 from onegov.form.widgets import OrderedMultiCheckboxWidget
 from onegov.form.widgets import UploadWidget
+from onegov.core.utils import binary_to_dictionary
 from wtforms import FileField, SelectMultipleField, TextAreaField, widgets
 
 
@@ -23,84 +20,48 @@ class OrderedMultiCheckboxField(MultiCheckboxField):
     widget = OrderedMultiCheckboxWidget()
 
 
-class RawUploadField(FileField):
-    """ A custom file field that that supports keeping/deleting and replacing
-    files through the use of a custom widget.
+class UploadField(FileField):
+    """ A custom file field that turns the uploaded file into a compressed
+    base64 string together with the filename, size and mimetype.
 
     """
 
     widget = UploadWidget()
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fieldstorage = None
 
     def process_formdata(self, valuelist):
         # the upload widget optionally includes an action with the request,
         # indicating if the existing file should be replaced, kept or deleted
         if valuelist:
             if len(valuelist) == 2:
-                action, self.fieldstorage = valuelist
+                action, fieldstorage = valuelist
             else:
-                action = 'new'
-                self.fieldstorage = valuelist[0]
+                action = 'replace'
+                fieldstorage = valuelist[0]
 
-            self.data = getattr(self, '{}_file'.format(action))()
+            if action == 'replace':
+                self.data = self.process_fieldstorage(fieldstorage)
+            elif action == 'delete':
+                self.data = {}
+            elif action == 'keep':
+                pass
+            else:
+                raise NotImplementedError()
         else:
-            self.data = None
+            self.data = {}
 
-    @property
-    def file(self):
-        return getattr(self.fieldstorage, 'file', None) or\
-            getattr(self.fieldstorage, 'stream', None)
+    def process_fieldstorage(self, fs):
+        self.file = getattr(fs, 'file', getattr(fs, 'stream', None))
+        self.filename = getattr(fs, 'filename', None)
 
-    @property
-    def filename(self):
-        return getattr(self.fieldstorage, 'filename', None)
-
-    @property
-    def filesize(self):
-        if self.fieldstorage:
-            import pdb; pdb.set_trace()
-
-        return 0
-
-    def new_file(self):
-        raise NotImplementedError
-
-    def delete_file(self):
-        raise NotImplementedError
-
-    def keep_file(self):
-        raise NotImplementedError
-
-
-class UploadField(RawUploadField):
-    """ Turns the uploaded file into a json structure containing the
-    data as a compressed base64 string.
-
-    """
-
-    @property
-    def filename(self):
-        return super().filename or self.data and self.data.get('filename')
-
-    @property
-    def filesize(self):
-        return super().filesize or self.data and self.data.get('size')
-
-    def new_file(self):
         if not self.file:
             return {}
 
         self.file.seek(0)
-        return binary_to_dictionary(self.file.read(), self.filename)
 
-    def delete_file(self):
-        return {}
-
-    def keep_file(self):
-        return None
+        try:
+            return binary_to_dictionary(self.file.read(), self.filename)
+        finally:
+            self.file.seek(0)
 
 
 class HtmlField(TextAreaField):
