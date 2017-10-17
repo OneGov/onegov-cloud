@@ -1,8 +1,9 @@
 from onegov.core.html import sanitize_html
+from onegov.core.utils import binary_to_dictionary
+from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form.widgets import MultiCheckboxWidget
 from onegov.form.widgets import OrderedMultiCheckboxWidget
 from onegov.form.widgets import UploadWidget
-from onegov.core.utils import binary_to_dictionary
 from wtforms import FileField, SelectMultipleField, TextAreaField, widgets
 
 
@@ -27,6 +28,11 @@ class UploadField(FileField):
     """
 
     widget = UploadWidget()
+
+    @property
+    def is_image(self):
+        return self.data and\
+            self.data.get('mimetype') in IMAGE_MIME_TYPES_AND_SVG
 
     def process_formdata(self, valuelist):
         # the upload widget optionally includes an action with the request,

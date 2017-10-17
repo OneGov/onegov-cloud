@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds an 'is_image' property to upload fields.
+  [href]
+
 0.22.0 (2017-09-26)
 ~~~~~~~~~~~~~~~~~~~
 
