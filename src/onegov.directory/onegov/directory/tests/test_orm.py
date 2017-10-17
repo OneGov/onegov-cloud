@@ -1,7 +1,9 @@
 import pytest
+import transaction
 
 from io import BytesIO
 from onegov.core.utils import Bunch
+from onegov.directory import Directory
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryEntry
@@ -205,14 +207,23 @@ def test_files(session):
         )
     )
 
+    txt = Bunch(
+        data=object(),
+        file=BytesIO(b'just kidding'),
+        filename='press-release.txt'
+    )
+
     iphone_found = press_releases.add(values=dict(
         title="iPhone Found in Ancient Ruins in the Andes",
-        file=Bunch(
-            file=BytesIO(b'just kidding'),
-            filename='press-release.txt'
-        )
-
+        file=txt
     ))
+
+    def commit():
+        nonlocal iphone_found, press_releases
+
+        transaction.commit()
+        iphone_found = session.query(DirectoryEntry).one()
+        press_releases = session.query(Directory).one()
 
     assert len(iphone_found.files) == 1
     assert iphone_found.values['file']['size'] == 12
@@ -220,6 +231,43 @@ def test_files(session):
     assert iphone_found.values['file']['filename'] == 'press-release.txt'
     assert session.query(File).count() == 1
 
+    file_id = session.query(File).one().id
+    press_releases.update(iphone_found, dict(
+        title="iPhone Found in Ancient Ruins in the Andes",
+        file=Bunch(data=None)  # keep the file (from onegov.form)
+    ))
+    commit()
+
+    assert session.query(File).one().id == file_id
+
+    press_releases.update(iphone_found, dict(
+        title="iPhone Found in Ancient Ruins in the Andes",
+        file=Bunch(data={})  # delete the file (from onegov.form)
+    ))
+    commit()
+
+    assert session.query(File).count() == 0
+
+    iphone_found = press_releases.update(iphone_found, values=dict(
+        title="iPhone Found in Ancient Ruins in the Andes",
+        file=txt
+    ))
+    commit()
+
+    assert session.query(File).count() == 1
+    assert session.query(File).one().id != file_id
+
+    # replacing the file leads to a new id
+    file_id = session.query(File).one().id
+    iphone_found = press_releases.update(iphone_found, values=dict(
+        title="iPhone Found in Ancient Ruins in the Andes",
+        file=txt
+    ))
+    commit()
+
+    assert session.query(File).one().id != file_id
+
+    # deleting the model cascades to the session
     session.delete(iphone_found)
     session.flush()
 

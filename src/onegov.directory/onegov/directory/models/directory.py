@@ -1,3 +1,5 @@
+import inspect
+
 from functools import lru_cache
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
@@ -16,6 +18,7 @@ from sqlalchemy import Column
 from sqlalchemy import Text
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy_utils import observes
 from uuid import uuid4
 
@@ -87,7 +90,7 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
     def entry_cls(self):
         return self.__class__._decl_class_registry[self.entry_cls_name]
 
-    def add(self, values, type=INHERIT):
+    def add(self, values, type=INHERIT, form=None):
         entry = self.entry_cls(
             directory=self,
             type=self.type if type is INHERIT else type
@@ -97,30 +100,36 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
         return self.update(entry, values, set_name=True)
 
+    def add_by_form(self, form, type=INHERIT):
+        entry = self.add(form.mixed_data, type)
+
+        # certain features, like mixin-forms require the form population
+        # code to run - it ain't pretty but it avoids a lot of headaches
+        form.populate_obj(entry, directory_update=False)
+
+        return entry
+
     def update(self, entry, values, set_name=False):
         session = object_session(self)
 
-        cfg = self.configuration
-
-        entry.title = cfg.extract_title(values)
-        entry.lead = cfg.extract_lead(values)
-        entry.order = cfg.extract_order(values)
-        entry.keywords = cfg.extract_keywords(values)
-
-        if set_name:
-            entry.name = normalize_for_url(entry.title)
-
+        # replace all existing basic fields
         updated = {f.id: values[f.id] for f in self.basic_fields}
 
+        # treat file fields differently
         if self.file_fields:
 
             # files which are not given or whose value is {} are removed
             # (this is in line with onegov.form's file upload field+widget)
             for f in entry.files:
+
+                # migration
+                if isinstance(values[f.note], dict):
+                    continue
+
                 delete = (
                     f.note not in values or
-                    values[f.note] == {} or
-                    values[f.note] is not None
+                    values[f.note].data == {} or
+                    values[f.note].data is not None
                 )
 
                 if delete:
@@ -128,30 +137,36 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
             for field in self.file_fields:
 
-                # keep files if selected in the dialog
-                if values[field.id] is None:
-                    updated[field.id] = entry.values[field.id]
-
                 # migrate files during an entry migration
                 if isinstance(values[field.id], dict):
                     updated[field.id] = values[field.id]
                     continue
 
-                # delte files if selected in the dialog
-                if not values[field.id]:
+                # keep files if selected in the dialog
+                if values[field.id].data is None:
+                    updated[field.id] = entry.values[field.id]
                     continue
 
-                new_file = File(
+                # delete files if selected in the dialog
+                if not values[field.id].data:
+                    updated[field.id] = {}
+                    continue
+
+                # create a new file
+                new_file = DirectoryFile(
                     id=random_token(),
                     name=values[field.id].filename,
                     note=field.id,
-                    type='directory',
                     reference=as_fileintent(
                         content=values[field.id].file,
                         filename=values[field.id].filename
                     )
                 )
+                session.add(new_file)
 
+                entry.files.append(new_file)
+
+                # keep a reference to the file in the values
                 updated[field.id] = {
                     'data': '@' + new_file.id,
                     'filename': values[field.id].filename,
@@ -159,18 +174,31 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
                     'size': new_file.reference.file.content_length
                 }
 
-                entry.files.append(new_file)
-
+        # update the values
         entry.values = updated
-        entry.content.changed()
 
+        # update the metadata
+        entry.title = self.configuration.extract_title(values)
+        entry.lead = self.configuration.extract_lead(values)
+        entry.order = self.configuration.extract_order(values)
+        entry.keywords = self.configuration.extract_keywords(values)
+
+        # update the title
+        if set_name:
+            entry.name = normalize_for_url(entry.title)
+
+        # validate the values
         form = self.form_class(data=entry.values)
 
         if not form.validate():
             raise ValidationError(form.errors)
 
+        # mark the values as dirty (required because values is only part
+        # of the actual content dictionary)
+        entry.content.changed()
+
         if not session._flushing:
-            object_session(self).flush()
+            session.flush()
 
         return entry
 
@@ -210,19 +238,31 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
         class DirectoryEntryForm(parse_form(self.structure)):
 
-            def populate_obj(self, obj):
-                super().populate_obj(obj)
-
+            @property
+            def mixed_data(self):
+                # use the field data for non-file fields
                 data = {
                     k: v for k, v in self.data.items() if k not in {
                         f.id for f in directory.file_fields
                     }
                 }
 
+                # use the field objects for file-fields
                 for field in directory.file_fields:
                     data[field.id] = self[field.id]
 
-                directory.update(obj, data)
+                return data
+
+            def populate_obj(self, obj, directory_update=True):
+                exclude = {k for k, v in inspect.getmembers(
+                    obj.__class__,
+                    lambda v: isinstance(v, InstrumentedAttribute)
+                )}
+
+                super().populate_obj(obj, exclude=exclude)
+
+                if directory_update:
+                    directory.update(obj, self.mixed_data)
 
             def process_obj(self, obj):
                 super().process_obj(obj)

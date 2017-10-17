@@ -55,6 +55,7 @@ class DirectoryMigration(object):
                 continue
 
             # we cannot introduce a required field after the fact
+            # XXX -> we can make this work by validating the results first
             if new.required and not old.required:
                 break
 
