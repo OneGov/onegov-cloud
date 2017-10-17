@@ -281,8 +281,10 @@ def test_file_submissions_update(session):
     data = FileMultiDict()
     data.add_file('file', BytesIO(b'foobar'), filename='foobar.txt')
 
-    submission = collection.submissions.add(
-        'file', definition.form_class(data), state='pending')
+    form = definition.form_class(data)
+
+    assert form.file.filesize == 6
+    submission = collection.submissions.add('file', form, state='pending')
 
     assert len(submission.files) == 1
     assert submission.files[0].checksum == '3858f62230ac3c915f300c664312c63f'
