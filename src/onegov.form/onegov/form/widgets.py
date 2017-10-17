@@ -119,9 +119,9 @@ class UploadWidget(FileInput):
                 # be careful, we do our own html generation here without any
                 # safety harness - we need to carefully escape values the user
                 # might supply
-                filesize=humanize.naturalsize(field.data['size']),
-                filename=escape(field.data['filename'], quote=True),
                 name=field.id,
+                filesize=humanize.naturalsize(field.filesize),
+                filename=field.filename and escape(field.filename, quote=True),
                 input_html=input_html,
                 existing_file_label=field.gettext(_('Uploaded file')),
                 keep_label=field.gettext(_('Keep file')),

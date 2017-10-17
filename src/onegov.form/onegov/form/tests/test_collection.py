@@ -292,7 +292,7 @@ def test_file_submissions_update(session):
     session.refresh(submission)
 
     data = FileMultiDict()
-    data.add('file', 'replace')
+    data.add('file', 'new')
     data.add_file('file', BytesIO(b'barfoo'), filename='foobar.txt')
 
     collection.submissions.update(submission, definition.form_class(data))

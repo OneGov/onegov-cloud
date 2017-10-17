@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Slightly refactors the UploadField class to support other implementations.
+  [href]
+
 0.22.0 (2017-09-26)
 ~~~~~~~~~~~~~~~~~~~
 

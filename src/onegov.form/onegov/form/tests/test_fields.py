@@ -25,10 +25,9 @@ def create_file(mimetype, filename, content):
 def test_upload_file():
     field = UploadField()
     field = field.bind(Form(), 'upload')
+    field.fieldstorage = create_file('text/plain', 'test.txt', b'foobar')
 
-    textfile = create_file('text/plain', 'test.txt', b'foobar')
-    data = field.process_fieldstorage(textfile)
-
+    data = field.new_file()
     assert data['filename'] == 'test.txt'
     assert data['mimetype'] == 'text/plain'
     assert data['size']
