@@ -1,7 +1,8 @@
-import os
-
+from onegov.core.crypto import random_token
 from onegov.core.html import sanitize_html
 from onegov.core.utils import binary_to_dictionary
+from onegov.file import File
+from onegov.file.utils import as_fileintent
 from onegov.form.widgets import MultiCheckboxWidget
 from onegov.form.widgets import OrderedMultiCheckboxWidget
 from onegov.form.widgets import UploadWidget
@@ -59,11 +60,10 @@ class RawUploadField(FileField):
 
     @property
     def filesize(self):
-        if not self.file:
-            return 0
+        if self.fieldstorage:
+            import pdb; pdb.set_trace()
 
-        self.file.seek(0, os.SEEK_END)
-        return self.file.tell()
+        return 0
 
     def new_file(self):
         raise NotImplementedError
