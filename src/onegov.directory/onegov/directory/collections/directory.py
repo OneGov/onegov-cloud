@@ -16,8 +16,15 @@ class DirectoryCollection(GenericCollection):
     def add(self, **kwargs):
         if self.type != '*':
             kwargs.setdefault('type', self.type)
+
         if 'configuration' not in kwargs:
             kwargs['configuration'] = DirectoryConfiguration()
+
+        elif isinstance(kwargs['configuration'], str):
+            kwargs['configuration'] = DirectoryConfiguration.from_yaml(
+                kwargs['configuration']
+            )
+
         return super().add(**kwargs)
 
     def by_name(self, name):
