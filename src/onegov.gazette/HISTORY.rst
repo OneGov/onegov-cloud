@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.8.0 (2017-10-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a script to import members.
   [msom]
