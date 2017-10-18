@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the ability to print exceptions during development.
+  [href]
+
 0.51.0 (2017-10-09)
 ~~~~~~~~~~~~~~~~~~~
 

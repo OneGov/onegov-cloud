@@ -22,6 +22,8 @@ import inspect
 import json
 import morepath
 import pylru
+import traceback
+import sys
 
 from cached_property import cached_property
 from datetime import datetime
@@ -78,6 +80,7 @@ class Framework(TransactionApp, WebassetsApp, OrmCacheApp, ServerApplication):
         """ Intercept all wsgi calls so we can attach debug tools. """
 
         fn = super().__call__
+        fn = self.with_print_exceptions(fn)
         fn = self.with_request_cache(fn)
 
         if getattr(self, 'sql_query_report', False):
@@ -113,6 +116,19 @@ class Framework(TransactionApp, WebassetsApp, OrmCacheApp, ServerApplication):
             return fn(*args, **kwargs)
 
         return with_request_cache_wrapper
+
+    def with_print_exceptions(self, fn):
+
+        def with_print_exceptions_wrapper(*args, **kwargs):
+            try:
+                return fn(*args, **kwargs)
+            except:
+                if getattr(self, 'print_exceptions', False):
+                    print("=" * 80, file=sys.stderr)
+                    traceback.print_exc()
+                raise
+
+        return with_print_exceptions_wrapper
 
     def clear_request_cache(self):
         self.request_cache = {}
@@ -299,6 +315,11 @@ class Framework(TransactionApp, WebassetsApp, OrmCacheApp, ServerApplication):
 
             Do not use in production!
 
+        :print_exceptions:
+            If true, exceptions are printed to stderr. Note that you should
+            usually configure logging through onegov.server. This is mainly
+            used for certain unit tests where we use WSGI more directly.
+
         """
 
         super().configure_application(**cfg)
@@ -396,6 +417,7 @@ class Framework(TransactionApp, WebassetsApp, OrmCacheApp, ServerApplication):
         self.allow_shift_f5_compile = cfg.get('allow_shift_f5_compile', False)
         self.sql_query_report = cfg.get('sql_query_report', False)
         self.profile = cfg.get('profile', False)
+        self.print_exceptions = cfg.get('print_exceptions', False)
 
     def configure_mail(self, **cfg):
         self.mail_host = cfg.get('mail_host', None)
