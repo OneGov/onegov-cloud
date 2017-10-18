@@ -11,7 +11,7 @@ import urllib3
 
 from _pytest.monkeypatch import MonkeyPatch
 from elasticsearch import Elasticsearch
-from fs.memoryfs import MemoryFS
+from fs.tempfs import TempFS
 from functools import lru_cache
 from mirakuru import HTTPExecutor as HTTPExecutorBase
 from mirakuru.compat import HTTPConnection, HTTPException
@@ -355,7 +355,7 @@ def test_password():
 
 @pytest.fixture(scope="session")
 def long_lived_filestorage():
-    return MemoryFS()
+    return TempFS()
 
 
 @pytest.fixture(scope="session")

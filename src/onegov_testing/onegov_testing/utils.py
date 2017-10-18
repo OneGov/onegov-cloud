@@ -67,7 +67,7 @@ def create_app(app_class, request, use_elasticsearch=False,
     app.namespace = random_namespace()
     app.configure_application(
         dsn=request.getfixturevalue('postgres_dsn'),
-        filestorage='fs.memoryfs.MemoryFS',
+        filestorage='fs.osfs.OSFS',
         filestorage_object=filestorage_object,
         depot_backend='depot.io.memory.MemoryFileStorage',
         identity_secure=False,
