@@ -24,24 +24,31 @@ def import_scan():
     importscan.scan(onegov, ignore=['.test', '.tests'])
 
 
-@pytest.yield_fixture(scope='session')
+@pytest.fixture(scope='session')
 def handlers():
     yield onegov.ticket.handlers
     onegov.ticket.handlers.registry = {}
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.fixture(scope='function')
 def org_app(request):
     yield create_org_app(request, use_elasticsearch=False)
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.fixture(scope='function')
 def es_org_app(request):
     yield create_org_app(request, use_elasticsearch=True)
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.fixture(scope='function')
+def browser(browser, org_app_url):
+    browser.baseurl = org_app_url
+    yield browser
+
+
+@pytest.fixture(scope='function')
 def org_app_url(request, org_app):
+    org_app.print_exceptions = True
     server = WSGIServer(application=org_app)
     server.start()
     yield server.url
@@ -90,7 +97,7 @@ def create_org_app(request, use_elasticsearch, cls=OrgApp):
     return app
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.fixture(scope='function')
 def render_element(request):
     class App(OrgApp):
         pass
