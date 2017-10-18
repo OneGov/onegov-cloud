@@ -1,24 +1,27 @@
 import dectate
 import morepath
 
-from onegov.core.utils import Bunch, scan_morepath_modules
 from io import BytesIO
+from onegov.core.utils import Bunch, scan_morepath_modules
 from PIL import Image
 from random import randint
 from uuid import uuid4
 
 
-def create_image(width=50, height=50):
+def create_image(width=50, height=50, output=None):
     """ Generates a test image and returns it's file handle. """
 
-    im = BytesIO()
+    im = output or BytesIO()
     image = Image.new('RGBA', size=(width, height), color=(
         randint(0, 255),
         randint(0, 255),
         randint(0, 255)
     ))
     image.save(im, 'png')
-    im.name = 'test.png'
+
+    if not getattr(im, 'name', None):
+        im.name = 'test.png'
+
     im.seek(0)
     return im
 
