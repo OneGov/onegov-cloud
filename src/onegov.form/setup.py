@@ -35,6 +35,7 @@ setup(
         'colour>=0.0.4',
         'humanize',
         'jsonpickle',
+        'more.webassets',
         'onegov.core>=0.16.0',
         'onegov.file',
         'onegov.pay',

@@ -18,6 +18,7 @@ from onegov.form.core import (
     with_options,
 )
 from onegov.form.display import render_field
+from onegov.form.integration import FormApp
 from onegov.form.models import (
     FormDefinition,
     FormFile,
@@ -37,6 +38,7 @@ __all__ = [
     'flatten_fieldsets',
     'FieldDependency',
     'Form',
+    'FormApp',
     'FormCollection',
     'FormDefinition',
     'FormDefinitionCollection',
