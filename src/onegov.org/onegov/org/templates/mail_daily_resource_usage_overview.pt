@@ -17,7 +17,7 @@
                         <b>${title}</b><br>
 
                         <b tal:define="start reservation.display_start(); end reservation.display_end()">
-                            <!-- simple whole day check: -->
+                            <!--! simple whole day check: -->
                             <tal:block condition="start.time() != end.time()">
                                 ${layout.format_time_range(start, end)}
                             </tal:block>

@@ -254,7 +254,7 @@
 </metal:homepage-tiles>
 
 <metal:single_field define-macro="field">
-     <!-- render the label after the field if it's a boolean field -->
+     <!--! render the label after the field if it's a boolean field -->
     <tal:block condition="field.type == 'BooleanField'">
         ${field(placeholder=request.translate(field.description))}
         <span class="label-text">${field.label.text}</span>
