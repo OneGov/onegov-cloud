@@ -366,7 +366,9 @@ def webdriver():
 @pytest.fixture(scope="session")
 def webdriver_options():
     options = Options()
-    options.add_argument('--headless')
+
+    if os.environ.get('SHOW_BROWSER') != '1':
+        options.add_argument('--headless')
 
     return options
 
