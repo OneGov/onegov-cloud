@@ -98,8 +98,12 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
             return self.join(data, 'lead')
 
     def extract_order(self, data):
-        assert self.order
-        return normalize_for_url(self.join(data, 'order'))
+        # by default we use the title as order
+        attribute = (
+            (self.order and 'order') or
+            (self.title and 'title')
+        )
+        return normalize_for_url(self.join(data, attribute))
 
     def extract_searchable(self, data):
         if self.searchable:
