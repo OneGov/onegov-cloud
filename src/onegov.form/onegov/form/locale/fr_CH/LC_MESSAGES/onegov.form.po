@@ -16,13 +16,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.11\n"
-"gengo-order-id: 3150455\n"
 
 msgid "Required"
-msgstr ""
+msgstr "Requis"
 
 msgid "Optional"
-msgstr ""
+msgstr "Optionnel"
 
 #, python-format
 msgid "The file is too large, please provide a file smaller than {}."
@@ -63,70 +62,70 @@ msgid "Replace file"
 msgstr "Remplacer le fichier"
 
 msgid "General"
-msgstr ""
+msgstr "Général"
 
 msgid "Title"
-msgstr ""
+msgstr "Titre"
 
 msgid "Text"
-msgstr ""
+msgstr "Texte"
 
 msgid "Multiline"
-msgstr ""
+msgstr "Multi-lignes"
 
 msgid "E-Mail"
-msgstr ""
+msgstr "E-mail"
 
 msgid "Website"
-msgstr ""
+msgstr "Site internet"
 
 msgid "Date and time"
-msgstr ""
+msgstr "Date et heure"
 
 msgid "Date"
-msgstr ""
+msgstr "Date"
 
 msgid "Time"
-msgstr ""
+msgstr "Heure"
 
 msgid "Choices"
-msgstr ""
+msgstr "Choix"
 
 msgid "Choice"
-msgstr ""
+msgstr "Choix"
 
 msgid "Multiple Choice"
-msgstr ""
+msgstr "Choix multiples"
 
 msgid "Files"
-msgstr ""
+msgstr "Fichiers"
 
 msgid "Image"
-msgstr ""
+msgstr "Image"
 
 msgid "Document"
-msgstr ""
+msgstr "Document"
 
 msgid "Numbers"
-msgstr ""
+msgstr "Numéros"
 
 msgid "Age"
-msgstr ""
+msgstr "Âge"
 
 msgid "Percentage"
-msgstr ""
+msgstr "Pourcentage"
 
 msgid "Extended"
-msgstr ""
+msgstr "Étendu"
 
 msgid "IBAN"
-msgstr ""
+msgstr "IBAN"
 
 msgid "Swiss social security number"
-msgstr ""
+msgstr "Numéro de sécurité sociale suisse"
 
 msgid "Swiss business identifier"
-msgstr ""
+msgstr "Identificateur suisse d'entreprise"
 
 msgid "Swiss vat number"
-msgstr ""
+msgstr "Numéro de TVA suisse"
