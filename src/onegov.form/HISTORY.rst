@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.23.0 (2017-10-19)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a formcode snippet insertion script written in React.
   [href]
