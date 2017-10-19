@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes event dates being capitalized instead of titled.
+  [href]
+
 0.16.0 (2017-10-19)
 ~~~~~~~~~~~~~~~~~~~
 
