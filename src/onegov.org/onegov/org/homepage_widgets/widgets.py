@@ -142,8 +142,6 @@ class EventsWidget(object):
             ) for o in occurrences
         ]
 
-        import pdb; pdb.set_trace()
-
         event_links.append(
             Link(
                 text=_("All events"),

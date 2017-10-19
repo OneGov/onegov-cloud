@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Removes left-over pdb call.
+  [href]
+
 0.16.1 (2017-10-19)
 ~~~~~~~~~~~~~~~~~~~
 
