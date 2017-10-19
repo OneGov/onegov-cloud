@@ -6,7 +6,6 @@ from dectate import directive
 from onegov.core import Framework, utils
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.orm import orm_cached
-from onegov.core.i18n import default_locale_negotiator
 from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.gis import MapboxApp

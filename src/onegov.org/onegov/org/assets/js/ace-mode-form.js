@@ -18,10 +18,6 @@ var FormHighlightRules = function() {
                 regex: /(___|\*\*\*|\.\.\.|@@@|YYYY.MM.DD|YYYY.MM.DD HH:MM|HH:MM|[0-9]+[0-9\.]+[0-9]+)/
             },
             {
-                token: 'support.type',
-                regex: /\/.*/
-            },
-            {
                 token: 'keyword',
                 regex: /[\[\(]{1}[x ]?[\]\)]{1}/
             },
