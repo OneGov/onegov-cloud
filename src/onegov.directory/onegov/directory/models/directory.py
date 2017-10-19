@@ -1,6 +1,6 @@
 import inspect
 
-from functools import lru_cache
+from onegov.core.cache import lru_cache
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
