@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.4.1 (2017-10-19)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes events not being created in the correct language.
   [href]
