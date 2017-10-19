@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a formcode snippet insertion script written in React.
+  [href]
+
 - Adds an 'is_image' property to upload fields.
   [href]
 

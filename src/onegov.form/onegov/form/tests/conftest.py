@@ -24,6 +24,10 @@ def form_app(request):
     # we do not support react 16 yet, as it basically requires ES6
     react = 'https://unpkg.com/react@15.6.2/dist/react-with-addons.js'
     react_dom = 'https://unpkg.com/react-dom@15.6.2/dist/react-dom.js'
+    fontawesome = (
+        'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0'
+        '/css/font-awesome.min.css'
+    )
 
     class TestApp(Framework, FormApp):
         pass
@@ -39,6 +43,14 @@ def form_app(request):
                 <head>
                     <script type="text/javascript" src="{}"></script>
                     <script type="text/javascript" src="{}"></script>
+                    <link rel="stylesheet" href="{}">
+                    <style>
+
+                        .formcode-toolbar-element {{
+                            height: 10px;
+                            width: 10px;
+                        }}
+                    </style>
                 </head>
                 <body>
                     <div class="formcode-snippets"
@@ -49,7 +61,7 @@ def form_app(request):
                     <textarea></textarea>
                 </body>
             </html>
-        """.format(react, react_dom)
+        """.format(react, react_dom, fontawesome)
 
     @TestApp.html(model=Content)
     def view_content(self, request):

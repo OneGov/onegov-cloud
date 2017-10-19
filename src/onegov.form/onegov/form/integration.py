@@ -17,7 +17,6 @@ def get_formcode_snippets():
 def view_formcode_snippets(self, request):
     return {
         'labels': {
-            'insert': request.translate(_("Insert")),
             'required': request.translate(_("Required")),
             'optional': request.translate(_("Optional")),
         },

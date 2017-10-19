@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-09-15 09:50+0200\n"
+"POT-Creation-Date: 2017-10-19 14:34+0200\n"
 "PO-Revision-Date: 2015-10-15 09:43+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -17,6 +17,12 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.11\n"
 "gengo-order-id: 3150455\n"
+
+msgid "Required"
+msgstr ""
+
+msgid "Optional"
+msgstr ""
 
 #, python-format
 msgid "The file is too large, please provide a file smaller than {}."
@@ -55,3 +61,72 @@ msgstr "Supprimer le fichier"
 
 msgid "Replace file"
 msgstr "Remplacer le fichier"
+
+msgid "General"
+msgstr ""
+
+msgid "Title"
+msgstr ""
+
+msgid "Text"
+msgstr ""
+
+msgid "Multiline"
+msgstr ""
+
+msgid "E-Mail"
+msgstr ""
+
+msgid "Website"
+msgstr ""
+
+msgid "Date and time"
+msgstr ""
+
+msgid "Date"
+msgstr ""
+
+msgid "Time"
+msgstr ""
+
+msgid "Choices"
+msgstr ""
+
+msgid "Choice"
+msgstr ""
+
+msgid "Multiple Choice"
+msgstr ""
+
+msgid "Files"
+msgstr ""
+
+msgid "Image"
+msgstr ""
+
+msgid "Document"
+msgstr ""
+
+msgid "Numbers"
+msgstr ""
+
+msgid "Age"
+msgstr ""
+
+msgid "Percentage"
+msgstr ""
+
+msgid "Extended"
+msgstr ""
+
+msgid "IBAN"
+msgstr ""
+
+msgid "Swiss social security number"
+msgstr ""
+
+msgid "Swiss business identifier"
+msgstr ""
+
+msgid "Swiss vat number"
+msgstr ""

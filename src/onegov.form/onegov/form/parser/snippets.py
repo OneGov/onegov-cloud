@@ -4,30 +4,41 @@ from onegov.form import _
 class Snippets(object):
 
     fragments = (
-        (_("Single line"), '___'),
-        (_("Multi line"), '...'),
+        (_("General"), None),
+        (_("Title"), '#'),
+        (_("Text"), '___'),
+        (_("Multiline"), '...'),
         (_("E-Mail"), '@@@'),
         (_("Website"), 'http://'),
-        (_("E-Mail"), '@@@'),
+
+        (_("Date and time"), None),
         (_("Date"), 'YYYY.MM.DD'),
         (_("Time"), 'HH:MM'),
         (_("Date and time"), 'YYYY.MM.DD HH:MM'),
-        (_("Multiple Choice"), (
-            'Multiple Choice =\n',
-            '    [ ] Choice 1\n',
-            '    [ ] Choice 2\n',
-            '    [ ] Choice 3\n',
-        )),
+
+        (_("Choices"), None),
         (_("Choice"), (
-            'Choice =\n',
-            '    (x) Option 1\n',
-            '    ( ) Option 2\n',
-            '    ( ) Option 3\n',
+            '\n'
+            '    (x) A\n'
+            '    ( ) B\n'
+            '    ( ) C'
         )),
+        (_("Multiple Choice"), (
+            '\n'
+            '    [ ] A\n'
+            '    [ ] B\n'
+            '    [ ] C'
+        )),
+
+        (_("Files"), None),
         (_("Image"), '*.jpg|*.png|*.gif'),
         (_("Document"), '*.pdf'),
+
+        (_("Numbers"), None),
         (_("Age"), '0..150'),
         (_("Percentage"), '0.00..100.00'),
+
+        (_("Extended"), None),
         (_("IBAN"), '# iban'),
         (_("Swiss social security number"), '# ch.ssn'),
         (_("Swiss business identifier"), '# ch.uid'),
