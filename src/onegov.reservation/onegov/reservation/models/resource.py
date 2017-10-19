@@ -1,4 +1,4 @@
-from functools import lru_cache
+from onegov.core.cache import lru_cache
 from libres import new_scheduler
 from libres.db.models import Allocation
 from libres.db.models.base import ORMBase
