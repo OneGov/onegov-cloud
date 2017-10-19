@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.51.1 (2017-10-19)
+~~~~~~~~~~~~~~~~~~~
 
 - Replaces the builtin lru_cache with fastchache's faster version.
   [href]
