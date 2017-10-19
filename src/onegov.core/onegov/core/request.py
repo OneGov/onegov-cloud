@@ -3,7 +3,7 @@ import morepath
 
 from cached_property import cached_property
 from datetime import timedelta
-from functools import lru_cache
+from onegov.core.cache import lru_cache
 from itsdangerous import (
     BadSignature,
     SignatureExpired,

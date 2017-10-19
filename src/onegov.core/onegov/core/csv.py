@@ -12,7 +12,7 @@ from csv import Error as CsvError
 from csv import reader as csv_reader
 from csv import writer as csv_writer
 from editdistance import eval as distance
-from functools import lru_cache
+from onegov.core.cache import lru_cache
 from io import BytesIO, StringIO
 from itertools import permutations
 from onegov.core import errors

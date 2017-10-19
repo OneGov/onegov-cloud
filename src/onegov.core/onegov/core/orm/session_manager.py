@@ -1,10 +1,10 @@
-import functools
 import threading
 import re
 import weakref
 import zope.sqlalchemy
 
 from blinker import Signal
+from onegov.core.cache import lru_cache
 from sqlalchemy import create_engine, event, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.pool import QueuePool
@@ -272,7 +272,7 @@ class SessionManager(object):
         # happen by accident (it'll lead to hard to debug errors)
         cache_size = min(len(aggregates_manager.generator_registry), 32)
 
-        @functools.lru_cache(cache_size)
+        @lru_cache(cache_size)
         def prevent_bulk_changes_on_aggregate_modules(module_class):
             for registered in aggregates_manager.generator_registry:
                 assert not issubclass(module_class, registered), """

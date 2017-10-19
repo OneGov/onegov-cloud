@@ -37,6 +37,7 @@ eventually be discarded by memcache if the cache is full).
 import dill
 import memcache
 
+from fastcache import clru_cache as lru_cache  # noqa
 from dogpile.cache import make_region, register_backend
 from dogpile.cache.backends.memcached import MemcachedBackend as BaseBackend
 from dogpile.cache.backends.memory import MemoryBackend as BaseMemoryBackend

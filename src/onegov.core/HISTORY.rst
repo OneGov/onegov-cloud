@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Replaces the builtin lru_cache with fastchache's faster version.
+  [href]
+
 - Adds the ability to print exceptions during development.
   [href]
 

@@ -44,6 +44,7 @@ setup(
         'dill!=0.2.7',
         'dogpile.cache',
         'editdistance',
+        'fastcache',
         'fs>=2.0.0',
         'html2text',
         'itsdangerous',

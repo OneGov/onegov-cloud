@@ -40,7 +40,7 @@ import os.path
 import polib
 import re
 
-from functools import lru_cache
+from onegov.core.cache import lru_cache
 from io import BytesIO
 from onegov.core.framework import Framework, log
 from onegov.core.utils import pairwise
