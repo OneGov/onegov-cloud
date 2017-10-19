@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a formcode snippet toolbar for formcode fields.
+  [href]
+
 0.15.4 (2017-10-13)
 ~~~~~~~~~~~~~~~~~~~
 

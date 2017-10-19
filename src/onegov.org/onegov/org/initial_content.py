@@ -3,7 +3,7 @@ import os
 import yaml
 
 from datetime import datetime, timedelta
-from functools import lru_cache
+from onegov.core.cache import lru_cache
 from onegov.core.utils import module_path
 from onegov.event import EventCollection
 from onegov.file import FileSetCollection, FileCollection

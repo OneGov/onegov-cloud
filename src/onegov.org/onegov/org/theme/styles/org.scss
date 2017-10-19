@@ -738,6 +738,14 @@ form {
         line-height: 12px;
     }
 
+    .ace_scroller {
+        box-shadow: $input-box-shadow;
+    }
+
+    .focused .ace_scroller {
+        background: $input-focus-bg-color;
+    }
+
     .ace-syntax-error {
         background: $yellow-light;
         position: absolute;
@@ -3891,6 +3899,109 @@ h2 + div.timeline {
     transition-timing-function: cubic-bezier(.175, .665, .320, 1), linear;
 }
 
+/*
+    Formcode Toolbar
+*/
+
+.formcode-toolbar {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+    text-align: right;
+}
+
+.formcode-toolbar-element {
+    color: $body-font-color;
+    position: relative;
+
+    > span {
+        display: inline-block;
+        padding: 4px 8px;
+
+        &:hover {
+            background-color: $blue;
+            color: $white;
+        }
+    }
+}
+
+.formcode-snippets {
+    background: $white;
+    border: 1px solid $gainsboro;
+    box-shadow: 0 1px 7px rgba(0, 0, 0, .25);
+    color: $body-font-color;
+    display: table;
+    font-size: .875rem;
+    padding: 4px;
+    position: absolute;
+    right: 0;
+    top: 29px;
+    z-index: 100000;
+}
+
+.formcode-snippet {
+    display: table-row;
+
+    &:hover {
+        background: $silver;
+    }
+
+    > * {
+        display: table-cell;
+    }
+}
+
+.formcode-snippet-title + .formcode-snippet .formcode-snippet-name,
+.formcode-snippet-title + .formcode-snippet .formcode-snippet-action {
+    border-top: 1px solid $gainsboro;
+}
+
+.formcode-snippet-title {
+    color: $monsoon;
+    display: cell;
+    font-weight: 400;
+    margin-top: .5rem;
+    padding-left: 6px;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+.formcode-snippet-title:first-child {
+    margin-top: 0;
+}
+
+.formcode-snippet-name {
+    padding: 2px 6px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.formcode-snippet-actions > *:first-child {
+    margin-right: 1ex;
+}
+
+.formcode-snippet-required,
+.formcode-snippet-optional {
+    padding: 4px 5px 5px;
+    visibility: hidden;
+}
+
+.formcode-snippet-required:hover {
+    background-color: $red-light;
+    color: $red-dark;
+    outline: 1px solid $red-dark;
+}
+
+.formcode-snippet-optional:hover {
+    background-color: $green-light;
+    color: $green-dark;
+    outline: 1px solid $green-dark;
+}
+
+.formcode-snippet:hover {
+    .formcode-snippet-optional,
+    .formcode-snippet-required {
+        visibility: visible;
+    }
+}
 
 /*
     Print Styles

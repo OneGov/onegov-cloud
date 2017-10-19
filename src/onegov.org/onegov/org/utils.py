@@ -4,7 +4,7 @@ import sedate
 
 from collections import defaultdict, Counter
 from datetime import datetime, time
-from functools import lru_cache
+from onegov.core.cache import lru_cache
 from isodate import parse_date, parse_datetime
 from itertools import groupby
 from libres.modules import errors as libres_errors

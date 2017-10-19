@@ -4,9 +4,10 @@ from chameleon import PageTemplate
 from collections import defaultdict
 from dectate import directive
 from onegov.core import Framework, utils
-from onegov.core.orm import orm_cached
 from onegov.core.i18n import default_locale_negotiator
+from onegov.core.orm import orm_cached
 from onegov.file import DepotApp
+from onegov.form import FormApp
 from onegov.gis import MapboxApp
 from onegov.org import directives
 from onegov.org.homepage_widgets import transform_homepage_structure
@@ -23,7 +24,7 @@ from sqlalchemy import desc
 
 
 class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
-             DepotApp, PayApp):
+             DepotApp, PayApp, FormApp):
 
     serve_static_files = True
     request_class = OrgRequest
@@ -301,6 +302,7 @@ def get_code_editor_asset():
     yield 'ace-mode-form.js'
     yield 'ace-mode-xml.js'
     yield 'ace-theme-tomorrow.js'
+    yield 'formcode'
     yield 'code_editor.js'
 
 
