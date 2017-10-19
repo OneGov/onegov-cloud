@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes events not being created in the correct language.
+  [href]
+
 0.4.0 (2017-10-10)
 ~~~~~~~~~~~~~~~~~~~
 
