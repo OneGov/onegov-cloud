@@ -1,11 +1,8 @@
 Changelog
 ---------
 
-- Fixes invalid form resulting in deletion of form submission files.
-  [href]
-
-- Slightly improves the look of confirmation dialogs.
-  [href]
+0.16.0 (2017-10-19)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a formcode snippet toolbar for formcode fields.
   [href]
