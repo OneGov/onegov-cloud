@@ -13,7 +13,7 @@ import re
 import sqlalchemy
 import urllib.request
 
-from io import BytesIO
+from io import BytesIO, StringIO
 from collections import Iterable
 from contextlib import contextmanager
 from cProfile import Profile
@@ -539,3 +539,77 @@ def dictionary_to_binary(dictionary):
 
     with gzip.GzipFile(fileobj=BytesIO(data), mode='r') as f:
         return f.read()
+
+
+def safe_format(format, dictionary, types={int, str, float}):
+    """ Takes a user-supplied string with format blocks and returns a string
+    where those blocks are replaced by values in a dictionary.
+
+    For example::
+
+        >>> safe_format('[user] has logged in', {'user': 'admin'})
+        'admin has logged in'
+
+    :param format:
+        The format to use. Square brackets denote dictionary keys. To
+        literally print square bracktes, mask them by doubling ('[[' -> '[')
+
+    :param dictionary:
+        The dictionary holding the variables to use. If the key is not found
+        in the dictionary, the bracket is replaced with an empty string.
+
+    :param types:
+        A set of types supported by the dictionary. Limiting this to safe
+        types like builtins (str, int, float) ensure that no values are
+        accidentally leaked through faulty __str__ representations.
+
+        Note that inheritance is ignored. Supported types need to be
+        whitelisted explicitly.
+
+    This is strictly meant for formats provided by users. Python's string
+    formatting options are clearly superior to this, however it is less
+    secure!
+
+    """
+
+    output = StringIO()
+    buffer = StringIO()
+    opened = 0
+
+    for ix, char in enumerate(format):
+        if char == '[':
+            opened += 1
+
+        if char == ']':
+            opened -= 1
+
+        if opened == 1 and char != '[' and char != ']':
+            print(char, file=buffer, end='')
+            continue
+
+        if opened == 2 or opened == -2:
+            if buffer.tell():
+                raise RuntimeError("Unexpected bracket inside bracket found")
+
+            print(char, file=output, end='')
+            opened = 0
+            continue
+
+        if buffer.tell():
+            k = buffer.getvalue()
+            v = dictionary.get(k, '')
+            t = type(v)
+
+            if t not in types:
+                raise RuntimeError("Invalid type for '{}': {}".format(k, t))
+
+            print(v, file=output, end='')
+            buffer = StringIO()
+
+        if char != '[' and char != ']':
+            print(char, file=output, end='')
+
+    if opened != 0:
+        raise RuntimeError("Uneven number of brackets in '{}'".format(format))
+
+    return output.getvalue()

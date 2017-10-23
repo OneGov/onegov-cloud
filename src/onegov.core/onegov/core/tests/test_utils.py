@@ -220,3 +220,28 @@ def test_binary_dictionary():
     assert d['size'] == 6
 
     assert utils.dictionary_to_binary(d) == b'foobar'
+
+
+def test_safe_format():
+    fmt = utils.safe_format
+
+    assert fmt('hello [user]', {'user': 'admin'}) == 'hello admin'
+    assert fmt('[ix]: [ix]', {'ix': 1}) == '1: 1'
+    assert fmt('[[user]]', {'user': 'admin'}) == '[user]'
+    assert fmt('[[[user]]]', {'user': 'admin'}) == '[admin]'
+    assert fmt('[asdf]', {}) == ''
+
+    with pytest.raises(RuntimeError) as e:
+        fmt('[foo[bar]]', {'foo[bar]': 'baz'})
+
+    assert 'bracket inside bracket' in str(e)
+
+    with pytest.raises(RuntimeError) as e:
+        fmt('[secret]', {'secret': object()})
+
+    assert 'type' in str(e)
+
+    with pytest.raises(RuntimeError) as e:
+        fmt('[asdf', {})
+
+    assert 'Uneven' in str(e)
