@@ -3,41 +3,6 @@
     The menu is unstyled by default and is styled on a per-app basis.
 */
 
-// Takes its children and wraps them in a toolbar element, which is a button
-// that pops up a menu when clicked.
-var ToolbarElement = React.createClass({
-    getInitialState: function() {
-        return {
-            visible: false
-        };
-    },
-    componentWillMount: function() {
-        document.addEventListener('click', this.handleGlobalClick);
-    },
-    componentWillUnmount: function() {
-        document.removeEventListener('click', this.handleGlobalClick);
-    },
-    handleGlobalClick: function(e) {
-        if (this.state.visible) {
-            if (!ReactDOM.findDOMNode(this).contains(e.target)) {
-                this.setState({visible: false});
-            }
-        }
-    },
-    handleClick: function(e) {
-        this.setState({visible: !this.state.visible});
-        e.preventDefault();
-    },
-    render: function() {
-        return (
-            <div className="formcode-toolbar-element" onClick={this.handleClick}>
-                <span><i className={'fa ' + this.props.icon} aria-hidden="true" /></span>
-                {this.state.visible && this.props.children}
-            </div>
-        );
-    }
-});
-
 // Renders the formsnippets given by FormApp
 var FormSnippets = React.createClass({
     render: function() {
@@ -45,7 +10,7 @@ var FormSnippets = React.createClass({
 
         return (
             <div className="formcode-toolbar">
-                <ToolbarElement icon="fa-plus-circle">
+                <ToggleButton icon="fa-plus-circle">
                     <div className="formcode-snippets">
                         {this.props.snippets.map(function(snippet, ix) {
                             return snippet[1] !== null && (
@@ -63,7 +28,7 @@ var FormSnippets = React.createClass({
                             );
                         })}
                     </div>
-                </ToolbarElement>
+                </ToggleButton>
             </div>
         );
     }

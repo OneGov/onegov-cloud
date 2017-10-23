@@ -31,4 +31,5 @@ def get_js_path():
 
 @FormApp.webasset('formcode')
 def get_formcode_asset():
+    yield 'togglebutton.jsx'
     yield 'snippets.jsx'
