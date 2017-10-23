@@ -230,6 +230,7 @@ def test_safe_format():
     assert fmt('[[user]]', {'user': 'admin'}) == '[user]'
     assert fmt('[[[user]]]', {'user': 'admin'}) == '[admin]'
     assert fmt('[asdf]', {}) == ''
+    assert fmt('[foo]', {'FOO': 'bar'}, adapt=str.upper) == 'bar'
 
     with pytest.raises(RuntimeError) as e:
         fmt('[foo[bar]]', {'foo[bar]': 'baz'})
@@ -245,3 +246,8 @@ def test_safe_format():
         fmt('[asdf', {})
 
     assert 'Uneven' in str(e)
+
+    with pytest.raises(RuntimeError) as e:
+        fmt('[foo]', {}, raise_on_missing=True)
+
+    assert 'is unknown' in str(e)

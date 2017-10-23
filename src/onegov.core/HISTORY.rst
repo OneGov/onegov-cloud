@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves the safe_format utility and adds a way to extract its keys.
+  [href]
+
 0.52.0 (2017-10-23)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -541,7 +541,8 @@ def dictionary_to_binary(dictionary):
         return f.read()
 
 
-def safe_format(format, dictionary, types={int, str, float}):
+def safe_format(format, dictionary, types={int, str, float}, adapt=None,
+                raise_on_missing=False):
     """ Takes a user-supplied string with format blocks and returns a string
     where those blocks are replaced by values in a dictionary.
 
@@ -565,6 +566,14 @@ def safe_format(format, dictionary, types={int, str, float}):
 
         Note that inheritance is ignored. Supported types need to be
         whitelisted explicitly.
+
+    :param adapt:
+        An optional callable that receives the key before it is used. Returns
+        the same key or an altered version.
+
+    :param raise_on_missing:
+        True if missing keys should result in a runtime error (defaults to
+        False).
 
     This is strictly meant for formats provided by users. Python's string
     formatting options are clearly superior to this, however it is less
@@ -596,7 +605,11 @@ def safe_format(format, dictionary, types={int, str, float}):
             continue
 
         if buffer.tell():
-            k = buffer.getvalue()
+            k = adapt(buffer.getvalue()) if adapt else buffer.getvalue()
+
+            if raise_on_missing and k not in dictionary:
+                raise RuntimeError("Key '{}' is unknown".format(k))
+
             v = dictionary.get(k, '')
             t = type(v)
 
@@ -613,3 +626,19 @@ def safe_format(format, dictionary, types={int, str, float}):
         raise RuntimeError("Uneven number of brackets in '{}'".format(format))
 
     return output.getvalue()
+
+
+def safe_format_keys(format, adapt=None):
+    """ Takes a :func:`safe_format` string and returns the found keys. """
+
+    keys = []
+
+    def adapt_and_record(key):
+        key = adapt(key) if adapt else key
+        keys.append(key)
+
+        return key
+
+    safe_format(format, {}, adapt=adapt_and_record)
+
+    return keys
