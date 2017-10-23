@@ -1,6 +1,7 @@
 from onegov.directory import DirectoryConfiguration
 from onegov.form import Form
 from onegov.form.validators import ValidFormDefinition
+from onegov.form.utils import label_to_field_id
 from onegov.org import _
 from onegov.core.utils import safe_format_keys
 from wtforms import StringField, TextAreaField, validators
@@ -29,8 +30,7 @@ class DirectoryForm(Form):
         validators=[validators.InputRequired()])
 
     lead_format = StringField(
-        label=_("Lead Format"),
-        validators=[validators.InputRequired()])
+        label=_("Lead Format"))
 
     content_fields = TextAreaField(
         label=_("Content Fields"),
@@ -58,7 +58,10 @@ class DirectoryForm(Form):
         return DirectoryConfiguration(
             title=self.title_format.data,
             lead=self.lead_format.data,
-            order=safe_format_keys(self.title_format.data),
+            order=safe_format_keys(
+                self.title_format.data,
+                adapt=label_to_field_id
+            ),
             keywords=keyword_fields,
             searchable=content_fields + address_fields,
             display={

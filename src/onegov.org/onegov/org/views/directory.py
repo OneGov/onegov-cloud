@@ -1,7 +1,6 @@
 from collections import namedtuple
 from onegov.core.security import Public, Private, Secret
 from onegov.directory import DirectoryCollection
-from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryEntryCollection
 from onegov.org import OrgApp, _
@@ -45,9 +44,7 @@ def handle_new_directory(self, request, form):
             title=form.title.data,
             lead=form.lead.data,
             structure=form.structure.data,
-            configuration=DirectoryConfiguration.from_yaml(
-                form.configuration.data
-            )
+            configuration=form.configuration
         )
 
         request.success(_("Added a new directory"))
