@@ -59,15 +59,14 @@ def test_directory_configuration(session):
             Last Name *= ___
         """,
         configuration=DirectoryConfiguration(
-            title=('general_first_name', 'general_last_name'),
+            title="[general_first_name] [general_last_name]",
             order=('general_last_name', 'general_first_name'),
         )
     )
 
-    assert people.configuration.title == (
-        'general_first_name',
-        'general_last_name'
-    )
+    assert people.configuration.title\
+        == "[general_first_name] [general_last_name]"
+
     assert people.configuration.order == (
         'general_last_name',
         'general_first_name'
@@ -81,7 +80,7 @@ def test_directory_configuration(session):
     assert people.configuration.extract_title(person) == 'Tom Riddle'
     assert people.configuration.extract_order(person) == 'riddle-tom'
 
-    people.configuration.title = ('general_last_name', 'general_first_name')
+    people.configuration.title = "[general_last_name] [general_first_name]"
     session.flush()
 
     people = DirectoryCollection(session).query().first()
@@ -96,7 +95,7 @@ def test_directory_form(session):
             Last Name *= ___
         """,
         configuration=DirectoryConfiguration(
-            title=('first_name', 'last_name'),
+            title="[first_name] [last_name]",
             order=('last_name', 'first_name'),
         )
     )
@@ -133,7 +132,7 @@ def test_directory_entry_collection(session):
                 [ ] Rock
         """,
         configuration=DirectoryConfiguration(
-            title=('title', ),
+            title="[title]",
             order=('artist', 'title'),
             keywords=('genre', )
         )

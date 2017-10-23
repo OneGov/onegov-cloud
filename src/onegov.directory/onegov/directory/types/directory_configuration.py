@@ -2,7 +2,7 @@ import yaml
 
 from more_itertools import collapse
 from onegov.core import custom_json as json
-from onegov.core.utils import normalize_for_url
+from onegov.core.utils import normalize_for_url, safe_format
 from sqlalchemy.ext.mutable import Mutable
 from sqlalchemy.types import TypeDecorator, TEXT
 from sqlalchemy_utils.types.scalar_coercible import ScalarCoercible
@@ -90,12 +90,10 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         ))
 
     def extract_title(self, data):
-        assert self.title
-        return self.join(data, 'title')
+        return safe_format(self.title, data)
 
     def extract_lead(self, data):
-        if self.lead:
-            return self.join(data, 'lead')
+        return self.lead and safe_format(self.lead, data) or ''
 
     def extract_order(self, data):
         # by default we use the title as order
