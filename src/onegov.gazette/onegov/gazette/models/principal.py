@@ -55,7 +55,8 @@ class Principal(object):
         issues=None,
         publish_to='',
         publish_from='',
-        time_zone='Europe/Zurich'
+        time_zone='Europe/Zurich',
+        help_link=''
     ):
         self.name = name
         self.logo = logo
@@ -63,6 +64,7 @@ class Principal(object):
         self.publish_to = publish_to
         self.publish_from = publish_from
         self.time_zone = time_zone
+        self.help_link = help_link
 
         # We want the organizations and categories in the order defined in the
         # YAML file and accessible by key

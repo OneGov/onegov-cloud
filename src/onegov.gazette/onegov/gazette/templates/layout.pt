@@ -77,9 +77,12 @@ metal:define-macro="layout">
 
     <footer metal:define-slot="footer">
         <div class="row">
-            <div class="small-12 columns small-only-text-center">
+            <div class="small-12 medium-6 columns small-only-text-center">
                 <span >&copy; ${layout.copyright_year} ${layout.principal.name}</span><br>
                 <a class="onegov-link" href="https://onegovcloud.ch">OneGov Cloud</a> | <a href="https://github.com/OneGov/onegov.gazette/blob/master/HISTORY.rst#changelog">v${layout.app_version}</a><br>
+            </div>
+            <div class="small-12 medium-6 columns text-right">
+                <a tal:condition="layout.principal.help_link" href="${layout.principal.help_link}" target="_blank" i18n:translate>Help</a>
             </div>
         </div>
     </footer>

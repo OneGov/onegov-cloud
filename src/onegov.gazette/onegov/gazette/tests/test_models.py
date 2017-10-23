@@ -53,6 +53,7 @@ def test_principal():
         logo: 'logo.svg'
         publish_to: 'printer@govikon.org'
         publish_from: 'publisher@govikon.org'
+        help_link: 'https://help.me'
         organizations:
             - '1': Organization 1
             - '2': Örgänizätiön 2
@@ -78,6 +79,7 @@ def test_principal():
     assert principal.logo == 'logo.svg'
     assert principal.publish_to == 'printer@govikon.org'
     assert principal.publish_from == 'publisher@govikon.org'
+    assert principal.help_link == 'https://help.me'
     assert dict(principal.organizations) == {
         '1': 'Organization 1', '2': 'Örgänizätiön 2'
     }

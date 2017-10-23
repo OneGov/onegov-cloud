@@ -17,3 +17,18 @@ def test_view_principal(gazette_app):
 
     login_editor_1(client)
     assert '/dashboard' in client.get('/').maybe_follow().request.url
+
+
+def test_view_help_link(gazette_app):
+    client = Client(gazette_app)
+
+    result = client.get('/').maybe_follow()
+    assert 'Hilfe' not in result
+
+    principal = gazette_app.principal
+    principal.help_link = 'https://help.me'
+    gazette_app.cache.set('principal', principal)
+
+    result = client.get('/').maybe_follow()
+    assert 'Hilfe' in result
+    assert 'https://help.me' in result
