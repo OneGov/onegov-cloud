@@ -122,7 +122,7 @@ class Framework(TransactionApp, WebassetsApp, OrmCacheApp, ServerApplication):
         def with_print_exceptions_wrapper(*args, **kwargs):
             try:
                 return fn(*args, **kwargs)
-            except:
+            except Exception:
                 if getattr(self, 'print_exceptions', False):
                     print("=" * 80, file=sys.stderr)
                     traceback.print_exc()

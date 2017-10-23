@@ -424,7 +424,7 @@ class UpgradeRunner(object):
                     executed += 1
                     self.on_task_success(task)
 
-            except:
+            except Exception:
                 upgrade.abort()
                 self.on_task_fail(task)
 

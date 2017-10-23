@@ -180,7 +180,7 @@ def touch(file_path):
     """ Touches the file on the given path. """
     try:
         os.utime(file_path, None)
-    except:
+    except Exception:
         open(file_path, 'a').close()
 
 
