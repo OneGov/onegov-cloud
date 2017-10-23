@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds basic formcode parsing through a REST interface.
+  [href]
+
 - Introduces an additional human-readable field id for parsed fields.
   [href]
 
