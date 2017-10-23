@@ -96,9 +96,9 @@ def test_view_notice(gazette_app):
 
         # check if the notices are displayed correctly
         for slug, title, owner, group in (
-            ('titel-1', 'Titel 1', 'editor1@example.org', True),
-            ('titel-2', 'Titel 2', 'editor2@example.org', True),
-            ('titel-3', 'Titel 3', 'editor3@example.org', False),
+            ('titel-1', 'Titel 1', 'First Editor', True),
+            ('titel-2', 'Titel 2', 'Second Editor', True),
+            ('titel-3', 'Titel 3', 'Third Editor', False),
         ):
             for user in (editor_1, editor_2, editor_3, publisher):
                 view = user.get('/notice/{}'.format(slug))
@@ -560,15 +560,15 @@ def test_view_notice_changelog(gazette_app):
     ])
 
     assert changes == [
-        ('01.11.2017 11:00', 'editor1@example.org', 'TestGroup', 'erstellt'),
-        ('01.11.2017 12:02', 'editor1@example.org', 'TestGroup',
+        ('01.11.2017 11:00', 'First Editor', 'TestGroup', 'erstellt'),
+        ('01.11.2017 12:02', 'First Editor', 'TestGroup',
          'eingereicht'),
-        ('01.11.2017 12:30', 'publisher@example.org', '', 'zurückgewiesenXYZ'),
-        ('01.11.2017 12:45', 'editor1@example.org', 'TestGroup', 'bearbeitet'),
-        ('01.11.2017 12:48', 'editor1@example.org', 'TestGroup',
+        ('01.11.2017 12:30', 'Publisher', '', 'zurückgewiesenXYZ'),
+        ('01.11.2017 12:45', 'First Editor', 'TestGroup', 'bearbeitet'),
+        ('01.11.2017 12:48', 'First Editor', 'TestGroup',
          'eingereicht'),
-        ('01.11.2017 16:00', 'publisher@example.org', '', 'E-Mail gesendet'),
-        ('01.11.2017 16:00', 'publisher@example.org', '', 'angenommen'),
+        ('01.11.2017 16:00', 'Publisher', '', 'E-Mail gesendet'),
+        ('01.11.2017 16:00', 'Publisher', '', 'angenommen'),
     ]
 
 

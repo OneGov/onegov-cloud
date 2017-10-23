@@ -5,6 +5,7 @@ from onegov.gazette.tests import login_editor_2
 from onegov.gazette.tests import login_editor_3
 from onegov.gazette.tests import login_publisher
 from webtest import TestApp as Client
+from xlrd import open_workbook
 
 
 def test_view_users(gazette_app):
@@ -165,3 +166,44 @@ def test_view_user_sessions_modify(gazette_app):
 
     client_1.get('/dashboard', status=403)
     client_2.get('/dashboard', status=403)
+
+
+def test_view_users_export(gazette_app):
+    admin = Client(gazette_app)
+    login_admin(admin)
+
+    result = admin.get('/users').click("Als XLSX herunterladen")
+    book = open_workbook(file_contents=result.body)
+    assert book.nsheets == 2
+
+    sheet = book.sheet_by_name('Redaktoren')
+    assert sheet.ncols == 3
+    assert sheet.nrows == 4
+
+    assert sheet.cell(0, 0).value == 'Gruppe'
+    assert sheet.cell(0, 1).value == 'Name'
+    assert sheet.cell(0, 2).value == 'E-Mail'
+
+    assert sheet.cell(1, 0).value == 'TestGroup'
+    assert sheet.cell(1, 1).value == 'First Editor'
+    assert sheet.cell(1, 2).value == 'editor1@example.org'
+
+    assert sheet.cell(2, 0).value == 'TestGroup'
+    assert sheet.cell(2, 1).value == 'Second Editor'
+    assert sheet.cell(2, 2).value == 'editor2@example.org'
+
+    assert sheet.cell(3, 0).value == ''
+    assert sheet.cell(3, 1).value == 'Third Editor'
+    assert sheet.cell(3, 2).value == 'editor3@example.org'
+
+    sheet = book.sheet_by_name('Herausgeber')
+    assert sheet.ncols == 3
+    assert sheet.nrows == 2
+
+    assert sheet.cell(0, 0).value == 'Gruppe'
+    assert sheet.cell(0, 1).value == 'Name'
+    assert sheet.cell(0, 2).value == 'E-Mail'
+
+    assert sheet.cell(1, 0).value == ''
+    assert sheet.cell(1, 1).value == 'Publisher'
+    assert sheet.cell(1, 2).value == 'publisher@example.org'

@@ -1,4 +1,7 @@
+from datetime import datetime
+from io import BytesIO
 from morepath import redirect
+from morepath.request import Response
 from onegov.core.crypto import random_password
 from onegov.core.security import Secret
 from onegov.core.templates import render_template
@@ -10,7 +13,9 @@ from onegov.gazette.layout import Layout
 from onegov.gazette.layout import MailLayout
 from onegov.user import User
 from onegov.user import UserCollection
+from onegov.user import UserGroup
 from onegov.user.utils import password_reset_url
+from xlsxwriter import Workbook
 
 
 @GazetteApp.html(
@@ -33,6 +38,7 @@ def view_users(self, request):
         'layout': layout,
         'roles': roles,
         'title': _('Users'),
+        'export': request.link(self, name='export'),
         'new_user': request.link(self, name='new-user')
     }
 
@@ -227,3 +233,58 @@ def clear_user_sessions(self, request, form):
         'button_class': 'alert',
         'cancel': cancel
     }
+
+
+@GazetteApp.view(
+    model=UserCollection,
+    name='export',
+    permission=Secret
+)
+def export_users(self, request):
+    """ Export all users as XLSX. The exported file can be re-imported
+    using the import-editors command line command.
+
+    """
+    output = BytesIO()
+    workbook = Workbook(output)
+
+    for role, name in (
+        ('member', request.translate(_("Editors"))),
+        ('editor', request.translate(_("Publishers")))
+    ):
+        worksheet = workbook.add_worksheet()
+        worksheet.name = name
+        worksheet.write_row(0, 0, (
+            request.translate(_("Group")),
+            request.translate(_("Name")),
+            request.translate(_("E-Mail"))
+        ))
+
+        editors = self.query().filter(User.role == role)
+        editors = editors.join(User.group, isouter=True)
+        editors = editors.order_by(
+            UserGroup.name,
+            User.realname,
+            User.username
+        )
+        for index, editor in enumerate(editors.all()):
+            worksheet.write_row(index + 1, 0, (
+                editor.group.name if editor.group else '',
+                editor.realname or '',
+                editor.username or ''
+            ))
+
+    workbook.close()
+    output.seek(0)
+
+    response = Response()
+    response.content_type = (
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response.content_disposition = 'inline; filename={}-{}.xlsx'.format(
+        request.translate(_("Users")).lower(),
+        datetime.utcnow().strftime('%Y%m%d%H%M')
+    )
+    response.body = output.read()
+
+    return response

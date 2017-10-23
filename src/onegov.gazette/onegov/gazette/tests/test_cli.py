@@ -85,66 +85,61 @@ def test_add_instance_missing_config(postgres_dsn, temporary_directory):
     assert "Instance was created successfully" in result.output
 
 
-def test_import_members(postgres_dsn, temporary_directory):
+def test_import_editors(postgres_dsn, temporary_directory):
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
     write_config(cfg_path, postgres_dsn, temporary_directory)
     write_principal(temporary_directory, 'Govikon')
     assert run_command(cfg_path, 'govikon', ['add']).exit_code == 0
 
-    path = os.path.join(temporary_directory, 'members.xlsx')
+    path = os.path.join(temporary_directory, 'benutzer.xlsx')
     workbook = Workbook(path)
-    worksheet = workbook.add_worksheet()
+    worksheet = workbook.add_worksheet('Redaktoren')
+
     worksheet.write('A1', 'Gruppe')
     worksheet.write('B1', 'Name')
-    worksheet.write('C1', 'Vorname')
-    worksheet.write('D1', 'Email')
+    worksheet.write('C1', 'E-Mail')
 
     worksheet.write('A2', 'abc')
-    worksheet.write('B2', 'Friedmann')
-    worksheet.write('C2', 'Lisa')
-    worksheet.write('D2', 'lisa@friedmann.com')
+    worksheet.write('B2', 'Lisa Friedmann')
+    worksheet.write('C2', 'lisa@friedmann.com')
 
     worksheet.write('A3', 'abc')
-    worksheet.write('B3', 'Wolf')
-    worksheet.write('C3', 'Martina')
-    worksheet.write('D3', 'martina@wolf.com')
+    worksheet.write('B3', 'Martina Wolf')
+    worksheet.write('C3', 'martina@wolf.com')
 
     worksheet.write('A4', 'abc')
-    worksheet.write('B4', 'Krueger')
-    worksheet.write('C4', 'Eric')
-    worksheet.write('D4', 'eric@krueger.com')
+    worksheet.write('B4', 'Eric Krueger')
+    worksheet.write('C4', 'eric@krueger.com')
 
     worksheet.write('A5', 'xyz')
-    worksheet.write('B5', 'Gärtner')
-    worksheet.write('C5', 'Dominik')
-    worksheet.write('D5', 'dominik@gertner.com')
+    worksheet.write('B5', 'Dominik Gärtner')
+    worksheet.write('C5', 'dominik@gertner.com')
 
     worksheet.write('A6', '')
-    worksheet.write('B6', 'Trommler')
-    worksheet.write('C6', 'Vanessa')
-    worksheet.write('D6', 'vanessa@trommler.com')
+    worksheet.write('B6', 'Vanessa Trommler')
+    worksheet.write('C6', 'vanessa@trommler.com')
     workbook.close()
 
     result = run_command(
-        cfg_path, 'govikon', ['import-members', path, '--dry-run']
+        cfg_path, 'govikon', ['import-editors', path, '--dry-run']
     )
     assert result.exit_code == 0
     assert '3 group(s) imported' in result.output
-    assert '5 member(s) imported'in result.output
+    assert '5 editor(s) imported'in result.output
 
-    result = run_command(cfg_path, 'govikon', ['import-members', path])
+    result = run_command(cfg_path, 'govikon', ['import-editors', path])
     assert result.exit_code == 0
     assert '3 group(s) imported' in result.output
-    assert '5 member(s) imported'in result.output
+    assert '5 editor(s) imported'in result.output
 
-    result = run_command(cfg_path, 'govikon', ['import-members', path])
+    result = run_command(cfg_path, 'govikon', ['import-editors', path])
     assert result.exit_code != 0
 
     result = run_command(
-        cfg_path, 'govikon', ['import-members', path, '--clear']
+        cfg_path, 'govikon', ['import-editors', path, '--clear']
     )
     assert result.exit_code == 0
-    assert 'Deleting all members' in result.output
+    assert 'Deleting all editors' in result.output
     assert 'Deleting all groups' in result.output
     assert '3 group(s) imported' in result.output
-    assert '5 member(s) imported'in result.output
+    assert '5 editor(s) imported'in result.output

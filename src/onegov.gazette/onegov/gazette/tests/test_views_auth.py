@@ -15,9 +15,15 @@ def test_view_permissions():
 def test_view_login_logout(gazette_app):
     client = Client(gazette_app)
 
-    for user in ('admin', 'editor1', 'editor2', 'editor3', 'publisher'):
+    for username, realname in (
+        ('admin@example.org', ''),
+        ('editor1@example.org', 'First Editor'),
+        ('editor2@example.org', 'Second Editor'),
+        ('editor3@example.org', 'Third Editor'),
+        ('publisher@example.org', 'Publisher'),
+    ):
         login = client.get('/').maybe_follow()
-        login.form['username'] = '{}@example.org'.format(user)
+        login.form['username'] = username
         login.form['password'] = 'hunter1'
 
         assert "Unbekannter Benutzername oder falsches Passwort" \
@@ -27,7 +33,7 @@ def test_view_login_logout(gazette_app):
         login.form['password'] = 'hunter2'
         page = login.form.submit().maybe_follow()
 
-        assert 'Angemeldet als {}@example.org'.format(user) in page
+        assert 'Angemeldet als {}'.format(realname or username) in page
         assert 'Abmelden' in page
         assert 'Anmelden' not in page
 

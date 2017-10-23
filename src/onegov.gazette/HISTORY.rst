@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds an XLSX export of all publishers and editors.
+  [msom]
+
 - Updates RavenJs to 3.19.1.
   [msom]
 
