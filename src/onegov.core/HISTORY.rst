@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.52.0 (2017-10-23)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a safe_format utility function for user-provided format strings.
   [href]
