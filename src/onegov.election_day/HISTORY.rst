@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Updates RavenJs to 3.18.1.
+- Updates RavenJs to 3.19.1.
   [msom]
 
 1.15.9 (2017-09-20)
