@@ -3,7 +3,6 @@ import yaml
 from more_itertools import collapse
 from onegov.core import custom_json as json
 from onegov.core.utils import normalize_for_url, safe_format
-from onegov.form.utils import label_to_field_id
 from sqlalchemy.ext.mutable import Mutable
 from sqlalchemy.types import TypeDecorator, TEXT
 from sqlalchemy_utils.types.scalar_coercible import ScalarCoercible
@@ -87,15 +86,14 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
 
     def join(self, data, attribute, separator=' '):
         return separator.join((s and str(s).strip() or '') for s in (
-            data[label_to_field_id(key)] for key in getattr(self, attribute)
+            data[key] for key in getattr(self, attribute)
         ))
 
     def extract_title(self, data):
-        return safe_format(self.title, data, adapt=label_to_field_id)
+        return safe_format(self.title, data)
 
     def extract_lead(self, data):
-        if self.lead:
-            return safe_format(self.lead, data, adapt=label_to_field_id)
+        return self.lead and safe_format(self.lead, data) or ''
 
     def extract_order(self, data):
         # by default we use the title as order
@@ -114,8 +112,6 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
             keywords = set()
 
             for key in self.keywords:
-                key = label_to_field_id(key)
-
                 for value in collapse(data[key]):
                     if isinstance(value, str):
                         value = value.strip()

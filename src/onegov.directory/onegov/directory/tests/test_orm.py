@@ -95,7 +95,7 @@ def test_directory_form(session):
             Last Name *= ___
         """,
         configuration=DirectoryConfiguration(
-            title="[First Name] [Last Name]",
+            title="[first_name] [last_name]",
             order=('last_name', 'first_name'),
         )
     )

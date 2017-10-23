@@ -1,7 +1,6 @@
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.core.utils import toggle
 from onegov.directory.models import DirectoryEntry
-from onegov.form.utils import label_to_field_id
 from sqlalchemy.orm import object_session
 from sqlalchemy.dialects.postgresql import array
 
@@ -49,7 +48,7 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
         keywords = self.valid_keywords(self.keywords)
 
         values = {
-            ':'.join((label_to_field_id(keyword), value))
+            ':'.join((keyword, value))
             for keyword in keywords
             for value in keywords[keyword]
         }
@@ -76,10 +75,7 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
 
     @property
     def available_filters(self):
-        keywords = {
-            label_to_field_id(k) for k in
-            self.directory.configuration.keywords or tuple()
-        }
+        keywords = self.directory.configuration.keywords or tuple()
         fields = {f.id: f for f in self.directory.fields if f.id in keywords}
 
         return (
