@@ -45,7 +45,6 @@ def form_app(request):
                     <script type="text/javascript" src="{}"></script>
                     <link rel="stylesheet" href="{}">
                     <style>
-
                         .formcode-toolbar-element {{
                             height: 10px;
                             width: 10px;
@@ -62,6 +61,16 @@ def form_app(request):
                 </body>
             </html>
         """.format(react, react_dom, fontawesome)
+
+    @TestApp.path(path='/registry')
+    class Registry(Content):
+        html = """
+            <!doctype html>
+            <html>
+                <head></head>
+                <body></body>
+            </html>
+        """
 
     @TestApp.html(model=Content)
     def view_content(self, request):

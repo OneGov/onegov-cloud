@@ -1,6 +1,6 @@
 from more.webassets import WebassetsApp
 from onegov.core.security import Public
-from onegov.form import _, log
+from onegov.form import _
 from onegov.form.parser.core import flatten_fieldsets, parse_formcode
 from onegov.form.parser.snippets import Snippets
 from onegov.form.errors import FormError
@@ -55,7 +55,7 @@ def view_parse_formcode(self, request):
             for field in flatten_fieldsets(parse_formcode(formcode))
         ]
     except FormError as e:
-        log.exception(e)
+        pass
 
     return {}
 
@@ -67,5 +67,6 @@ def get_js_path():
 
 @FormApp.webasset('formcode')
 def get_formcode_asset():
+    yield 'formcodewatch.js'
     yield 'togglebutton.jsx'
     yield 'snippets.jsx'
