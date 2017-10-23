@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Introduces an additional human-readable field id for parsed fields.
+  [href]
+
 0.23.0 (2017-10-19)
 ~~~~~~~~~~~~~~~~~~~
 

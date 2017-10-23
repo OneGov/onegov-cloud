@@ -475,6 +475,8 @@ def flatten_fields(fields):
 
 
 def find_field(fieldsets, id):
+    id = label_to_field_id(id or '')
+
     for fieldset in fieldsets:
         if fieldset.id == id:
             return fieldset
@@ -492,9 +494,13 @@ class Fieldset(object):
         self.label = label if label != '...' else None
         self.fields = fields or []
 
-    @cached_property
+    @property
     def id(self):
-        return self.label and label_to_field_id(self.label)
+        return label_to_field_id(self.human_id)
+
+    @property
+    def human_id(self):
+        return self.label or ''
 
     def find_field(self, *args, **kwargs):
         return find_field((self, ), *args, **kwargs)
@@ -526,20 +532,25 @@ class Field(object):
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-    @cached_property
+    @property
     def id(self):
+        return label_to_field_id(self.human_id)
+
+    @cached_property
+    def human_id(self):
         if self.parent:
-            return '_'.join((
-                self.parent.id,
-                label_to_field_id(self.label)
+            return '/'.join((
+                self.parent.human_id,
+                self.label
             ))
 
-        if self.fieldset.label:
-            return label_to_field_id('_'.join((
-                self.fieldset.id, self.label
-            )))
+        if self.fieldset.human_id:
+            return '/'.join((
+                self.fieldset.human_id,
+                self.label
+            ))
 
-        return label_to_field_id(self.label)
+        return self.label
 
     @classmethod
     def create(cls, field, identifier, parent=None, fieldset=None):

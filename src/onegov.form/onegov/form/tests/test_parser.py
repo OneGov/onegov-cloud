@@ -712,17 +712,30 @@ def test_field_ids():
     """)
 
     assert fs[0].fields[0].id == 'first_name'
+    assert fs[0].fields[0].human_id == 'First Name'
     assert fs[0].fields[1].id == 'last_name'
+    assert fs[0].fields[1].human_id == 'Last Name'
     assert fs[1].fields[0].id == 'my_order_products'
+    assert fs[1].fields[0].human_id == 'My Order/Products'
     assert fs[1].fields[0].choices[0].fields[0].id == 'my_order_products_type'
+    assert fs[1].fields[0].choices[0].fields[0].human_id\
+        == 'My Order/Products/Type'
 
     assert find_field(fs, None) is fs[0]
     assert find_field(fs, 'my_order') is fs[1]
+    assert find_field(fs, 'My Order') is fs[1]
     assert find_field(fs, 'first_name').id == 'first_name'
+    assert find_field(fs, 'First Name').id == 'first_name'
     assert find_field(fs, 'last_name').id == 'last_name'
+    assert find_field(fs, 'Last Name').id == 'last_name'
     assert find_field(fs, 'my_order_products').id == 'my_order_products'
+    assert find_field(fs, 'My Order/Products').id == 'my_order_products'
     assert find_field(fs, 'my_order_products_type').id\
+        == 'my_order_products_type'
+    assert find_field(fs, 'My Order/Products/Type').id\
         == 'my_order_products_type'
 
     assert fs[0].find_field('first_name').id == 'first_name'
+    assert fs[0].find_field('First Name').id == 'first_name'
     assert fs[1].find_field('first_name') is None
+    assert fs[1].find_field('First Name') is None
