@@ -26,6 +26,7 @@ from onegov.form.models import (
     PendingFormSubmission,
     CompleteFormSubmission
 )
+from onegov.form.parser import find_field
 from onegov.form.parser import flatten_fieldsets
 from onegov.form.parser import parse_form
 from onegov.form.parser import parse_formcode
@@ -35,6 +36,7 @@ from onegov.form.utils import decimal_range
 __all__ = [
     'CompleteFormSubmission',
     'decimal_range',
+    'find_field',
     'flatten_fieldsets',
     'FieldDependency',
     'Form',

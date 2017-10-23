@@ -307,6 +307,7 @@ import pyparsing as pp
 import re
 import yaml
 
+from cached_property import cached_property
 from onegov.core.utils import Bunch
 from onegov.form import errors
 from onegov.form.parser.grammar import checkbox
@@ -473,12 +474,30 @@ def flatten_fields(fields):
                 yield from flatten_fields(choice.fields)
 
 
+def find_field(fieldsets, id):
+    for fieldset in fieldsets:
+        if fieldset.id == id:
+            return fieldset
+
+        if not fieldset.id or id.startswith(fieldset.id):
+            for field in flatten_fields(fieldset.fields):
+                if field.id == id:
+                    return field
+
+
 class Fieldset(object):
     """ Represents a parsed fieldset. """
 
     def __init__(self, label, fields=None):
-        self.label = label
+        self.label = label if label != '...' else None
         self.fields = fields or []
+
+    @cached_property
+    def id(self):
+        return self.label and label_to_field_id(self.label)
+
+    def find_field(self, *args, **kwargs):
+        return find_field((self, ), *args, **kwargs)
 
 
 class Choice(object):
@@ -498,18 +517,37 @@ class Choice(object):
 class Field(object):
     """ Represents a parsed field. """
 
-    def __init__(self, label, required, **kwargs):
+    def __init__(self, label, required, parent=None, fieldset=None, **kwargs):
         self.label = label
         self.required = required
+        self.parent = parent
+        self.fieldset = fieldset
 
         for key, value in kwargs.items():
             setattr(self, key, value)
 
+    @cached_property
+    def id(self):
+        if self.parent:
+            return '_'.join((
+                self.parent.id,
+                label_to_field_id(self.label)
+            ))
+
+        if self.fieldset.label:
+            return label_to_field_id('_'.join((
+                self.fieldset.id, self.label
+            )))
+
+        return label_to_field_id(self.label)
+
     @classmethod
-    def create(cls, field, identifier):
+    def create(cls, field, identifier, parent=None, fieldset=None):
         return cls(
             label=identifier.label,
-            required=identifier.required
+            required=identifier.required,
+            parent=parent,
+            fieldset=fieldset
         )
 
 
@@ -541,12 +579,14 @@ class TextField(Field):
     type = 'text'
 
     @classmethod
-    def create(cls, field, identifier):
+    def create(cls, field, identifier, parent=None, fieldset=None):
         regex = field.regex and re.compile(field.regex) or None
 
         return cls(
             label=identifier.label,
             required=identifier.required,
+            parent=parent,
+            fieldset=fieldset,
             maxlength=field.length or None,
             regex=regex
         )
@@ -556,10 +596,12 @@ class TextAreaField(Field):
     type = 'textarea'
 
     @classmethod
-    def create(cls, field, identifier):
+    def create(cls, field, identifier, parent=None, fieldset=None):
         return cls(
             label=identifier.label,
             required=identifier.required,
+            parent=parent,
+            fieldset=fieldset,
             rows=field.rows or None
         )
 
@@ -568,10 +610,12 @@ class StdnumField(Field):
     type = 'stdnum'
 
     @classmethod
-    def create(cls, field, identifier):
+    def create(cls, field, identifier, parent=None, fieldset=None):
         return cls(
             label=identifier.label,
             required=identifier.required,
+            parent=parent,
+            fieldset=fieldset,
             format=field.format
         )
 
@@ -579,10 +623,12 @@ class StdnumField(Field):
 class RangeField(object):
 
     @classmethod
-    def create(cls, field, identifier):
+    def create(cls, field, identifier, parent=None, fieldset=None):
         return cls(
             label=identifier.label,
             required=identifier.required,
+            parent=parent,
+            fieldset=fieldset,
             range=field[0]
         )
 
@@ -599,10 +645,12 @@ class FileinputField(Field):
     type = 'fileinput'
 
     @classmethod
-    def create(cls, field, identifier):
+    def create(cls, field, identifier, parent=None, fieldset=None):
         return cls(
             label=identifier.label,
             required=identifier.required,
+            parent=parent,
+            fieldset=fieldset,
             extensions=field.extensions
         )
 
@@ -610,7 +658,7 @@ class FileinputField(Field):
 class OptionsField(object):
 
     @classmethod
-    def create(cls, field, identifier):
+    def create(cls, field, identifier, parent=None, fieldset=None):
         choices = [
             Choice(
                 key=c.label,
@@ -625,6 +673,8 @@ class OptionsField(object):
         return cls(
             label=identifier.label,
             required=identifier.required,
+            parent=parent,
+            fieldset=fieldset,
             choices=choices,
             pricing=pricing or None
         )
@@ -652,21 +702,21 @@ def parse_formcode(formcode):
     for fieldset in parsed:
 
         # fieldsets occur only at the top level
-        fieldset_label = next(k for k in fieldset.keys())
+        label = next(k for k in fieldset.keys())
+        fs = Fieldset(label)
 
-        fields = [
-            parse_field_block(block, field_classes, used_ids, fieldset_label)
-            for block in fieldset[fieldset_label]
+        fs.fields = [
+            parse_field_block(block, field_classes, used_ids, fs)
+            for block in fieldset[label]
         ]
 
-        fieldset_label = fieldset_label if fieldset_label != '...' else None
-        fieldsets.append(Fieldset(fieldset_label, fields))
+        fieldsets.append(fs)
 
     return fieldsets
 
 
 def parse_field_block(field_block, field_classes,
-                      used_ids, fieldset_label, parent=None):
+                      used_ids, fieldset, parent=None):
     """ Takes the given parsed field block and yields the fields from it """
 
     key, field = next(i for i in field_block.items())
@@ -690,20 +740,8 @@ def parse_field_block(field_block, field_classes,
         assert types <= {'radio', 'checkbox'}
         assert len(types) == 1
 
-    result = field_classes[field.type].create(field, identifier)
-    result.parent = parent
-
-    # give each field a proper unique id
-    if result.parent:
-        result.id = '_'.join((
-            result.parent.id, label_to_field_id(result.label)
-        ))
-    elif fieldset_label not in (None, '...'):
-        result.id = label_to_field_id(' '.join((
-            fieldset_label, result.label
-        )))
-    else:
-        result.id = label_to_field_id(result.label)
+    result = field_classes[field.type].create(
+        field, identifier, parent, fieldset)
 
     if result.id in used_ids:
         raise errors.DuplicateLabelError(label=result.label)
@@ -721,7 +759,7 @@ def parse_field_block(field_block, field_classes,
                     field_block=child,
                     field_classes=field_classes,
                     used_ids=used_ids,
-                    fieldset_label=fieldset_label,
+                    fieldset=fieldset,
                     parent=result
                 )
                 for child in choice.dependencies

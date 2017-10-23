@@ -1,7 +1,7 @@
 import pytest
 
 from decimal import Decimal
-from onegov.form import Form, errors
+from onegov.form import Form, errors, find_field
 from onegov.form import parse_formcode, parse_form, flatten_fieldsets
 from onegov.pay import Price
 from textwrap import dedent
@@ -695,3 +695,34 @@ def test_decimal_range():
 
     form.validate()
     assert not form.errors
+
+
+def test_field_ids():
+    fs = parse_formcode("""
+        First Name *= ___
+        Last Name = ___[10]
+
+        # My Order
+        Products =
+            [ ] Pizza
+                Type =
+                    (x) Default
+                    ( ) Gluten-Free
+            [x] Burger
+    """)
+
+    assert fs[0].fields[0].id == 'first_name'
+    assert fs[0].fields[1].id == 'last_name'
+    assert fs[1].fields[0].id == 'my_order_products'
+    assert fs[1].fields[0].choices[0].fields[0].id == 'my_order_products_type'
+
+    assert find_field(fs, None) is fs[0]
+    assert find_field(fs, 'my_order') is fs[1]
+    assert find_field(fs, 'first_name').id == 'first_name'
+    assert find_field(fs, 'last_name').id == 'last_name'
+    assert find_field(fs, 'my_order_products').id == 'my_order_products'
+    assert find_field(fs, 'my_order_products_type').id\
+        == 'my_order_products_type'
+
+    assert fs[0].find_field('first_name').id == 'first_name'
+    assert fs[1].find_field('first_name') is None

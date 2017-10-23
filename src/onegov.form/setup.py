@@ -32,6 +32,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
+        'cached_property',
         'colour>=0.0.4',
         'humanize',
         'jsonpickle',
