@@ -2,7 +2,6 @@ from onegov.form import Form
 from onegov.gazette import _
 from onegov.gazette.fields import SelectField
 from onegov.gazette.validators import UniqueUsername
-from onegov.user import User
 from onegov.user import UserGroup
 from sqlalchemy import cast
 from sqlalchemy import String
