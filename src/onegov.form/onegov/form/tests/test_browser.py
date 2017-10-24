@@ -1,6 +1,3 @@
-import time
-
-
 def test_snippets(browser):
     browser.visit('/snippets')
 
@@ -28,9 +25,7 @@ def test_snippets(browser):
 
 def test_registry(browser):
     browser.visit('/registry')
-
-    time.sleep(0.5)
-
+    browser.wait_for_js_variable('formcodeWatcherRegistry')
     browser.execute_script("""
         var watcher = formcodeWatcherRegistry.new("test");
         watcher.subscribe(function(value) {
