@@ -94,7 +94,7 @@ class ExtendedBrowser(InjectedBrowserExtension):
         time_budget = timeout
         interval = 0.1
 
-        is_undefined = 'typeof {} == "undefined"'.format(variable)
+        is_undefined = '{} == undefined'.format(variable)
 
         while time_budget > 0 and self.evaluate_script(is_undefined):
             time.sleep(interval)
