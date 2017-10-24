@@ -5,82 +5,11 @@ from onegov.gazette import _
 from onegov.gazette.fields import MultiCheckboxField
 from onegov.gazette.fields import SelectField
 from onegov.gazette.layout import Layout
-from onegov.gazette.validators import UniqueUsername
+from onegov.gazette.models import Category
 from onegov.quill import QuillField
-from onegov.user import UserGroup
-from sqlalchemy import cast
-from sqlalchemy import String
 from wtforms import BooleanField
-from wtforms import HiddenField
-from wtforms import RadioField
 from wtforms import StringField
-from wtforms.validators import Email
 from wtforms.validators import InputRequired
-
-
-class EmptyForm(Form):
-
-    pass
-
-
-class UserForm(Form):
-
-    role = RadioField(
-        label=_("Role"),
-        choices=[
-            ('editor', _("Publisher")),
-            ('member', _("Editor"))
-        ],
-        default='member',
-        validators=[
-            InputRequired()
-        ]
-    )
-
-    group = SelectField(
-        label=_("Group"),
-        choices=[('', '')]
-    )
-
-    name = StringField(
-        label=_("Name"),
-        validators=[
-            InputRequired()
-        ]
-    )
-
-    email = StringField(
-        label=_("E-Mail"),
-        validators=[
-            InputRequired(),
-            Email(),
-            UniqueUsername(default_field='email_old')
-        ]
-    )
-
-    email_old = HiddenField()
-
-    def on_request(self):
-        session = self.request.app.session()
-        self.group.choices = session.query(
-            cast(UserGroup.id, String), UserGroup.name
-        ).all()
-        self.group.choices.insert(
-            0, ('', self.request.translate(_("- none -")))
-        )
-
-    def update_model(self, model):
-        model.username = self.email.data
-        model.role = self.role.data
-        model.realname = self.name.data
-        model.group_id = self.group.data or None
-
-    def apply_model(self, model):
-        self.email.data = model.username
-        self.email_old.data = model.username
-        self.role.data = model.role
-        self.name.data = model.realname
-        self.group.data = str(model.group_id or '')
 
 
 class NoticeForm(Form):
@@ -131,6 +60,7 @@ class NoticeForm(Form):
 
     def on_request(self):
         principal = self.request.app.principal
+        session = self.request.app.session()
 
         # populate organization
         self.organization.choices = list(principal.organizations.items())
@@ -139,7 +69,10 @@ class NoticeForm(Form):
         )
 
         # populate categories
-        self.category.choices = list(principal.categories.items())
+        query = session.query(Category.name, Category.title)
+        query = query.filter(Category.active == True)
+        query = query.order_by(Category.order)
+        self.category.choices = query.all()
 
         # populate issues
         self.issues.choices = []
@@ -172,7 +105,10 @@ class NoticeForm(Form):
         model.text = self.text.data
         model.at_cost = self.at_cost.data
         model.issues = self.issues.data
-        model.apply_meta(self.request.app.principal)
+
+        principal = self.request.app.principal
+        session = self.request.app.session()
+        model.apply_meta(principal, session)
 
     def apply_model(self, model):
         self.title.data = model.title
@@ -181,13 +117,3 @@ class NoticeForm(Form):
         self.text.data = model.text
         self.at_cost.data = model.at_cost
         self.issues.data = list(model.issues.keys())
-
-
-class RejectForm(Form):
-
-    comment = StringField(
-        label=_("Comment"),
-        validators=[
-            InputRequired()
-        ]
-    )

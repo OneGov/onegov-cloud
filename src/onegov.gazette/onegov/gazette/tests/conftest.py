@@ -1,7 +1,8 @@
 from onegov_testing.utils import create_app
 from onegov.core.crypto import hash_password
 from onegov.gazette import GazetteApp
-from onegov.gazette.models.principal import Principal
+from onegov.gazette.collections import CategoryCollection
+from onegov.gazette.models import Principal
 from onegov.user import User
 from onegov.user import UserGroup
 from pytest import fixture
@@ -47,6 +48,62 @@ PRINCIPAL = """
 """
 
 
+def create_categories(session):
+    categories = CategoryCollection(session)
+    categories.add_root(name='10', title='Complaints', active=False)
+    categories.add_root(name='11', title='Education', active=True)
+    categories.add_root(name='12', title='Submissions', active=True)
+    categories.add_root(name='13', title='Commercial Register', active=True)
+    categories.add_root(name='14', title='Elections', active=True)
+    return categories.query().all()
+
+
+def create_gazette(request):
+    app = create_app(GazetteApp, request, use_smtp=True)
+    app.session_manager.set_locale('de_CH', 'de_CH')
+    app.filestorage.settext('principal.yml', dedent(PRINCIPAL))
+
+    group_id = uuid4()
+    session = app.session()
+    session.add(UserGroup(name='TestGroup', id=group_id))
+
+    session.add(User(
+        username='admin@example.org',
+        password_hash=request.getfixturevalue('gazette_password'),
+        role='admin'
+    ))
+    session.add(User(
+        realname='Publisher',
+        username='publisher@example.org',
+        password_hash=request.getfixturevalue('gazette_password'),
+        role='editor'
+    ))
+    session.add(User(
+        realname='First Editor',
+        username='editor1@example.org',
+        password_hash=request.getfixturevalue('gazette_password'),
+        role='member',
+        group_id=group_id
+    ))
+    session.add(User(
+        realname='Second Editor',
+        username='editor2@example.org',
+        password_hash=request.getfixturevalue('gazette_password'),
+        role='member',
+        group_id=group_id
+    ))
+    session.add(User(
+        realname='Third Editor',
+        username='editor3@example.org',
+        password_hash=request.getfixturevalue('gazette_password'),
+        role='member'
+    ))
+
+    create_categories(session)
+    commit()
+    return app
+
+
 @fixture(scope="session")
 def import_scan():
     """ Scans all the onegov.* sources to make sure that the tables are
@@ -67,49 +124,15 @@ def gazette_password():
     return hash_password('hunter2')
 
 
-def create_gazette(request):
-    app = create_app(GazetteApp, request, use_smtp=True)
-    app.session_manager.set_locale('de_CH', 'de_CH')
-    app.filestorage.settext('principal.yml', dedent(PRINCIPAL))
+@fixture(scope="function")
+def categories(session):
+    """ Adds some default categories to the database. """
+    yield create_categories(session)
 
-    group_id = uuid4()
-    app.session().add(UserGroup(name='TestGroup', id=group_id))
 
-    app.session().add(User(
-        username='admin@example.org',
-        password_hash=request.getfixturevalue('gazette_password'),
-        role='admin'
-    ))
-    app.session().add(User(
-        realname='Publisher',
-        username='publisher@example.org',
-        password_hash=request.getfixturevalue('gazette_password'),
-        role='editor'
-    ))
-    app.session().add(User(
-        realname='First Editor',
-        username='editor1@example.org',
-        password_hash=request.getfixturevalue('gazette_password'),
-        role='member',
-        group_id=group_id
-    ))
-    app.session().add(User(
-        realname='Second Editor',
-        username='editor2@example.org',
-        password_hash=request.getfixturevalue('gazette_password'),
-        role='member',
-        group_id=group_id
-    ))
-    app.session().add(User(
-        realname='Third Editor',
-        username='editor3@example.org',
-        password_hash=request.getfixturevalue('gazette_password'),
-        role='member'
-    ))
-
-    commit()
-
-    return app
+@fixture(scope="function")
+def principal(categories):
+    yield Principal.from_yaml(dedent(PRINCIPAL))
 
 
 @fixture(scope="function")
@@ -117,8 +140,3 @@ def gazette_app(request):
     app = create_gazette(request)
     yield app
     app.session_manager.dispose()
-
-
-@fixture(scope="function")
-def principal(request):
-    yield Principal.from_yaml(dedent(PRINCIPAL))

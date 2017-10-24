@@ -1,6 +1,7 @@
 from datetime import date
 from datetime import datetime
 from onegov.gazette.collections import GazetteNoticeCollection
+from onegov.gazette.collections import CategoryCollection
 from onegov.gazette.models import Principal
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
@@ -15,6 +16,28 @@ class DummyApp(object):
 class DummyRequest(object):
     def __init__(self, principal):
         self.app = DummyApp(principal)
+
+
+def test_category_collection(session):
+    collection = CategoryCollection(session)
+
+    collection.add_root(title='First', active=True)
+    collection.add_root(title='Second', active=False)
+    collection.add_root(title='Third')
+    collection.add_root(title='Fourth', active=True)
+
+    categories = collection.query().all()
+    assert categories[0].title == 'First'
+    assert categories[0].name == '1'
+
+    assert categories[1].title == 'Fourth'
+    assert categories[1].name == '4'
+
+    assert categories[2].title == 'Second'
+    assert categories[2].name == '2'
+
+    assert categories[3].title == 'Third'
+    assert categories[3].name == '3'
 
 
 def test_notice_collection(session, principal):
@@ -135,7 +158,11 @@ def test_notice_collection_count_by_category(session):
     collection = GazetteNoticeCollection(session)
     assert collection.count_by_category() == []
 
-    principal = Principal(categories=[{'1': 'A'}, {'2': 'B'}, {'3': 'C'}])
+    categories = CategoryCollection(session)
+    categories.add_root(name='1', title='A')
+    categories.add_root(name='2', title='B')
+    categories.add_root(name='3', title='C')
+    principal = Principal()
     for category, count in (('1', 2), ('2', 4), ('3', 1)):
         for x in range(count):
             collection.add(

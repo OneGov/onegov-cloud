@@ -4,6 +4,7 @@ from datetime import datetime
 from onegov.chat import Message
 from onegov.core.orm.mixins import meta_property
 from onegov.gazette import _
+from onegov.gazette.models.category import Category
 from onegov.gazette.models.principal import Issue
 from onegov.notice import OfficialNotice
 from onegov.user import User
@@ -234,13 +235,16 @@ class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
 
         return False
 
-    def apply_meta(self, principal):
+    def apply_meta(self, principal, session):
         """ Updates the category, organization and issue date from the meta
         values.
 
         """
         self.organization = principal.organizations.get(self.organization_id)
-        self.category = principal.categories.get(self.category_id)
+
+        query = session.query(Category.title)
+        query = query.filter(Category.name == self.category_id).first()
+        self.category = query[0] if query else None
 
         issues = [Issue.from_string(issue) for issue in self.issues]
         issues = [principal.issue(issue) for issue in issues]

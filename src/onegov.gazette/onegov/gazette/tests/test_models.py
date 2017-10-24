@@ -1,6 +1,7 @@
 from datetime import date
 from datetime import datetime
 from freezegun import freeze_time
+from onegov.gazette.models import Category
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import Issue
 from onegov.gazette.models import IssueDates
@@ -11,6 +12,24 @@ from onegov.user import UserGroupCollection
 from pytest import raises
 from sedate import standardize_date
 from textwrap import dedent
+
+
+def test_category(session):
+    session.add(
+        Category(
+            name='100',
+            title='Abstimmungen',
+            active=True,
+            external='ABC'
+        )
+    )
+    session.flush()
+
+    category = session.query(Category).one()
+    assert category.name == '100'
+    assert category.title == 'Abstimmungen'
+    assert category.active
+    assert category.external == 'ABC'
 
 
 def test_issue():
@@ -43,7 +62,7 @@ def test_principal():
     assert principal.publish_to == 'printer@govikon.org'
     assert principal.publish_from == ''
     assert dict(principal.organizations) == {}
-    assert dict(principal.categories) == {}
+    assert dict(principal._categories) == {}
     assert dict(principal.issues) == {}
     assert dict(principal.issues_by_date) == {}
 
@@ -84,10 +103,10 @@ def test_principal():
         '1': 'Organization 1', '2': 'Örgänizätiön 2'
     }
     assert list(principal.organizations.keys()) == ['1', '2']
-    assert dict(principal.categories) == {
+    assert dict(principal._categories) == {
         'C': 'Category C', 'B': 'Category B', 'A': 'Category A'
     }
-    assert list(principal.categories.keys()) == ['A', 'B', 'C']
+    assert list(principal._categories.keys()) == ['A', 'B', 'C']
     assert list(principal.issues.keys()) == [2016, 2017, 2018]
     assert list(principal.issues[2016]) == [10]
     assert list(principal.issues[2017]) == [40, 41, 45, 46, 50, 52]
@@ -385,10 +404,10 @@ def test_gazette_notice_states(session):
     ]
 
 
-def test_gazette_notice_apply_meta(principal):
+def test_gazette_notice_apply_meta(principal, session, categories):
     notice = GazetteNotice()
 
-    notice.apply_meta(principal)
+    notice.apply_meta(principal, session)
     assert notice.organization is None
     assert notice.category is None
     assert notice.first_issue is None
@@ -396,7 +415,7 @@ def test_gazette_notice_apply_meta(principal):
     notice.organization_id = 'invalid'
     notice.category_id = 'invalid'
     notice.issues = [str(Issue(2020, 1))]
-    notice.apply_meta(principal)
+    notice.apply_meta(principal, session)
     assert notice.organization is None
     assert notice.category is None
     assert notice.first_issue is None
@@ -404,7 +423,7 @@ def test_gazette_notice_apply_meta(principal):
     notice.organization_id = '100'
     notice.category_id = '12'
     notice.issues = [str(Issue(2017, 46))]
-    notice.apply_meta(principal)
+    notice.apply_meta(principal, session)
     assert notice.organization == 'State Chancellery'
     assert notice.category == 'Submissions'
     assert notice.first_issue == standardize_date(
@@ -412,7 +431,7 @@ def test_gazette_notice_apply_meta(principal):
     )
 
     notice.issues = [str(Issue(2017, 46)), str(Issue(2017, 40))]
-    notice.apply_meta(principal)
+    notice.apply_meta(principal, session)
     assert notice.first_issue == standardize_date(
         datetime(2017, 10, 6), 'UTC'
     )

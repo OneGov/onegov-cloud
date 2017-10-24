@@ -3,6 +3,7 @@ from datetime import datetime
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.gazette import _
+from onegov.gazette.collections import CategoryCollection
 from onegov.gazette.collections import GazetteNoticeCollection
 from onegov.gazette.models import Issue
 from onegov.gazette.models import Principal
@@ -78,6 +79,10 @@ class Layout(ChameleonLayout):
         return self.request.link(UserGroupCollection(self.app.session()))
 
     @cached_property
+    def manage_categories_link(self):
+        return self.request.link(CategoryCollection(self.app.session()))
+
+    @cached_property
     def manage_notices_link(self):
         return self.request.link(
             GazetteNoticeCollection(self.app.session(), state='submitted')
@@ -128,6 +133,11 @@ class Layout(ChameleonLayout):
             active = isinstance(self.model, UserGroupCollection)
             result.append((
                 _("Groups"), self.manage_user_groups_link, active
+            ))
+
+            active = isinstance(self.model, CategoryCollection)
+            result.append((
+                _("Categories"), self.manage_categories_link, active
             ))
 
         if self.request.is_private(self.model):

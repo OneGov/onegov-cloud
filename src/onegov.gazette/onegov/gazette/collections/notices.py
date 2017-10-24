@@ -128,7 +128,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         notice.group = user.group if user else None
         notice.organization_id = organization_id
         notice.category_id = category_id
-        notice.apply_meta(principal)
+        notice.apply_meta(principal, self.session)
         self.session.add(notice)
         self.session.flush()
 

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-23 12:35+0200\n"
-"PO-Revision-Date: 2017-10-23 12:35+0200\n"
+"POT-Creation-Date: 2017-10-24 14:32+0200\n"
+"PO-Revision-Date: 2017-10-24 14:32+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -32,42 +32,6 @@ msgstr "Alle anzeigen"
 msgid "Show less"
 msgstr "Weniger anzeigen"
 
-msgid "Role"
-msgstr "Rolle"
-
-msgid "Title"
-msgstr "Titel"
-
-msgid "Organization"
-msgstr "Organisation"
-
-msgid "Category"
-msgstr "Rubrik"
-
-msgid "Liable to pay costs"
-msgstr "Kostenpflichtig 85% vom Normalpreis"
-
-msgid "Issue(s)"
-msgstr "Ausgabe(n)"
-
-msgid "Text"
-msgstr "Text"
-
-msgid "Comment"
-msgstr "Bemerkung"
-
-msgid "Publisher"
-msgstr "Herausgeber"
-
-msgid "Editor"
-msgstr "Redaktor"
-
-msgid "- none -"
-msgstr "- keine -"
-
-msgid "Select one"
-msgstr "Bitte auswählen"
-
 #, python-format
 msgid "No. ${number}, ${issue_date}"
 msgstr "Nr. ${number}, ${issue_date}"
@@ -77,6 +41,9 @@ msgstr "Benutzer"
 
 msgid "Groups"
 msgstr "Gruppen"
+
+msgid "Categories"
+msgstr "Rubriken"
 
 msgid "Official Notices"
 msgstr "Meldungen"
@@ -111,8 +78,71 @@ msgstr "veröffentlicht"
 msgid "created"
 msgstr "erstellt"
 
+msgid "Title"
+msgstr "Titel"
+
+msgid "External"
+msgstr "Externe Bezeichnung"
+
+msgid "Active"
+msgstr "Aktiv"
+
+msgid "Comment"
+msgstr "Bemerkung"
+
+msgid "Organization"
+msgstr "Organisation"
+
+msgid "Category"
+msgstr "Rubrik"
+
+msgid "Liable to pay costs"
+msgstr "Kostenpflichtig 85% vom Normalpreis"
+
+msgid "Issue(s)"
+msgstr "Ausgabe(n)"
+
+msgid "Text"
+msgstr "Text"
+
+msgid "Select one"
+msgstr "Bitte auswählen"
+
+msgid "Role"
+msgstr "Rolle"
+
+msgid "Publisher"
+msgstr "Herausgeber"
+
+msgid "Editor"
+msgstr "Redaktor"
+
+msgid "- none -"
+msgstr "- keine -"
+
 msgid "New"
 msgstr "Neu"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "Actions"
+msgstr "Aktionen"
+
+msgid "No categories."
+msgstr "Keine Rubriken."
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "Edit"
+msgstr "Bearbeiten"
+
+msgid "Delete"
+msgstr "Löschen"
 
 msgid "No official notices."
 msgstr "Keine Meldungen."
@@ -136,17 +166,8 @@ msgstr ""
 msgid "Number of Users"
 msgstr "Anzahl Benutzer"
 
-msgid "Actions"
-msgstr "Aktionen"
-
 msgid "No groups."
 msgstr "Keine Gruppen."
-
-msgid "Edit"
-msgstr "Bearbeiten"
-
-msgid "Delete"
-msgstr "Löschen"
 
 msgid "Gazette"
 msgstr "Amtsblatt"
@@ -199,15 +220,6 @@ msgstr "Sehr geehrte Damen und Herren,"
 msgid "Your official notice has been rejected:"
 msgstr ""
 "Ihr Inserat für den amtlichen Teil des Amtsblatts wurde zurückgewiesen:"
-
-msgid "Yes"
-msgstr "Ja"
-
-msgid "No"
-msgstr "Nein"
-
-msgid "ID"
-msgstr "ID"
 
 msgid "Dear Sir or Madam,"
 msgstr "Sehr geehrte Dame, sehr geehrter Herr"
@@ -326,6 +338,34 @@ msgstr "Passwort geändert."
 msgid "Password reset"
 msgstr "Persönliches Passwort Amtsblattredaktion zurücksetzen"
 
+msgid "New Category"
+msgstr "Neue Rubrik"
+
+msgid "Save"
+msgstr "Speichern"
+
+msgid "Edit Category"
+msgstr "Rubrik bearbeiten"
+
+#, python-format
+msgid "Do you really want to delete \"${item}\"?"
+msgstr "Möchten Sie \"${item}\" wirklich löschen?"
+
+msgid "Delete Category"
+msgstr "Rubrik löschen"
+
+msgid "Category added."
+msgstr "Rubrik hinzugefügt."
+
+msgid "Category modified."
+msgstr "Rubrik geändert."
+
+msgid "Only unused categorys may be deleted."
+msgstr "Es können nur unbenutzte Rubriken gelöscht werden."
+
+msgid "Category deleted."
+msgstr "Rubrik gelöscht."
+
 msgid "Access Denied"
 msgstr "Zugriff verweigert"
 
@@ -344,10 +384,6 @@ msgstr "Neue Gruppe"
 
 msgid "Edit Group"
 msgstr "Gruppe bearbeiten"
-
-#, python-format
-msgid "Do you really want to delete \"${item}\"?"
-msgstr "Möchten Sie \"${item}\" wirklich löschen?"
 
 msgid "Delete Group"
 msgstr "Gruppe löschen"
@@ -369,9 +405,6 @@ msgstr "Gruppe gelöscht."
 
 msgid "Edit Official Notice"
 msgstr "Meldung bearbeiten"
-
-msgid "Save"
-msgstr "Speichern"
 
 msgid "Delete Official Notice"
 msgstr "Meldung löschen"
@@ -479,9 +512,6 @@ msgstr "Aktualisieren"
 
 msgid "Organizations"
 msgstr "Organisationen"
-
-msgid "Categories"
-msgstr "Rubriken"
 
 msgid "Notices updated."
 msgstr "Meldungen aktualisiert."

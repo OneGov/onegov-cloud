@@ -1,7 +1,9 @@
 from onegov.core.converters import extended_date_converter
 from onegov.core.converters import uuid_converter
 from onegov.gazette import GazetteApp
+from onegov.gazette.collections import CategoryCollection
 from onegov.gazette.collections import GazetteNoticeCollection
+from onegov.gazette.models import Category
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import Principal
 from onegov.user import Auth
@@ -39,6 +41,16 @@ def get_groups(app):
 @GazetteApp.path(model=UserGroup, path='/group/{id}')
 def get_group(app, id):
     return UserGroupCollection(app.session()).by_id(id)
+
+
+@GazetteApp.path(model=CategoryCollection, path='/categories')
+def get_categories(app):
+    return CategoryCollection(app.session())
+
+
+@GazetteApp.path(model=Category, path='/category/{id}')
+def get_category(app, id):
+    return CategoryCollection(app.session()).by_id(id)
 
 
 @GazetteApp.path(

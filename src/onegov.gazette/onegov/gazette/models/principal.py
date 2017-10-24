@@ -71,7 +71,8 @@ class Principal(object):
         self.organizations = OrderedDict(
             [next(enumerate(org.items()))[1] for org in (organizations or {})]
         )
-        self.categories = OrderedDict(
+        # todo: remove this in a future version, once it is migrated
+        self._categories = OrderedDict(
             [next(enumerate(org.items()))[1] for org in (categories or {})]
         )
 

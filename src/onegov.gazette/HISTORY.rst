@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Allows to manage categories.
+  [msom]
+
 - Adds an XLSX export of all publishers and editors.
   [msom]
 

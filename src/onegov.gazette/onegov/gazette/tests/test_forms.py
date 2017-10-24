@@ -1,7 +1,10 @@
 from datetime import datetime
 from freezegun import freeze_time
+from onegov.gazette.collections import CategoryCollection
+from onegov.gazette.forms import CategoryForm
 from onegov.gazette.forms import NoticeForm
 from onegov.gazette.forms import UserForm
+from onegov.gazette.models import Category
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import Issue
 from onegov.user import UserCollection
@@ -40,6 +43,42 @@ class DummyPostData(dict):
         if not isinstance(v, (list, tuple)):
             v = [v]
         return v
+
+
+def test_category_form(session):
+    # Test apply / update
+    categories = CategoryCollection(session)
+    category = categories.add_root(name='1', title='ABC', active=True)
+    category.external = 'XYZ'
+
+    form = CategoryForm()
+
+    form.apply_model(category)
+    assert form.title.data == 'ABC'
+    assert form.external.data == 'XYZ'
+    assert form.active.data == True
+
+    form.title.data = 'DEF'
+    form.external.data = 'UVW'
+    form.active.data = False
+
+    form.update_model(category)
+    assert category.title == 'DEF'
+    assert category.external == 'UVW'
+    assert category.active == False
+
+    # Test validation
+    form = CategoryForm()
+    form.request = DummyRequest(session)
+    assert not form.validate()
+
+    form = CategoryForm(
+        DummyPostData({
+            'title': 'title',
+        })
+    )
+    form.request = DummyRequest(session)
+    assert form.validate()
 
 
 def test_user_form(session):
@@ -223,10 +262,10 @@ def test_notice_form(session, principal):
             ('2018-1', 'No. 1, Freitag 05.01.2018'),
         ]
         assert form.category.choices == [
-            ('11', 'Education'),
-            ('12', 'Submissions'),
             ('13', 'Commercial Register'),
+            ('11', 'Education'),
             ('14', 'Elections'),
+            ('12', 'Submissions'),
         ]
 
         form = NoticeForm()
@@ -255,9 +294,9 @@ def test_notice_form(session, principal):
             ('2018-1', 'No. 1, Freitag 05.01.2018'),
         ]
         assert form.category.choices == [
-            ('11', 'Education'),
-            ('12', 'Submissions'),
             ('13', 'Commercial Register'),
+            ('11', 'Education'),
             ('14', 'Elections'),
+            ('12', 'Submissions'),
         ]
         assert form.issues.render_kw['data-hot-issue'] == '2017-44'
