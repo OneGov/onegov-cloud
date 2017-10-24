@@ -37,19 +37,7 @@ var FormSnippets = React.createClass({
 // Renders a single formsnippet and handles the insertion logic
 var FormSnippet = React.createClass({
     insertSnippet: function(snippet) {
-        // if the target is an element, add to its value
-        var element = document.querySelector(this.props.target);
-        if (element) {
-            element.value += '\n' + snippet;
-            return;
-        }
-
-        // otherwise assume it is a function stored on the window
-        var fn = window[this.props.target];
-        if (fn) {
-            fn(snippet, this.props.snippet[0]);
-            return;
-        }
+        formcodeUtils.updateTarget(this.props.target, snippet, this.props.snippet[0]);
     },
     getSnippet: function(required) {
         // the title is the only thing that renders differently
@@ -98,27 +86,18 @@ var FormSnippet = React.createClass({
 
 // loads the formcode snippets from the server and renders them
 var initFormSnippets = function(container) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', container.getAttribute('data-source'));
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            var data = JSON.parse(xhr.responseText);
-            var el = container.appendChild(document.createElement('div'));
+    formcodeUtils.request('get', container.getAttribute('data-source'), function(data) {
+        var el = container.appendChild(document.createElement('div'));
 
-            ReactDOM.render(
-                <FormSnippets
-                    labels={data.labels}
-                    snippets={data.snippets}
-                    target={container.getAttribute('data-target')}
-                />,
-                el
-            );
-
-        } else {
-            console.log("XHR request failed with status " + xhr.status); // eslint-disable-line no-console
-        }
-    };
-    xhr.send();
+        ReactDOM.render(
+            <FormSnippets
+                labels={data.labels}
+                snippets={data.snippets}
+                target={container.getAttribute('data-target')}
+            />,
+            el
+        );
+    });
 };
 
 // automatically hooks up all formcode snippet elements

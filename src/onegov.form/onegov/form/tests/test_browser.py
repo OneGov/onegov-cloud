@@ -36,3 +36,24 @@ def test_registry(browser):
 
     code = browser.evaluate_script("window.code")
     assert code == [{'human_id': 'Label', 'type': 'textarea', 'id': 'label'}]
+
+
+def test_formcode_format(browser):
+    browser.visit('/formcode-format')
+    browser.wait_for_js_variable('formcodeWatcherRegistry')
+    browser.execute_script("""
+        var watcher = formcodeWatcherRegistry.new("test");
+        var el = document.querySelector('#container');
+
+        el.setAttribute('data-watcher', 'test');
+        el.setAttribute('data-target', 'textarea');
+
+        initFormcodeFormat(el);
+
+        watcher.update('Textfield = ___');
+    """)
+
+    browser.find_by_css('.formcode-toolbar-element').click()
+    browser.find_by_css('.formcode-format-field').click()
+
+    assert browser.find_by_css('textarea').value == '[Textfield]'

@@ -50,7 +50,7 @@ def view_parse_formcode(self, request):
             {
                 'id': field.id,
                 'human_id': field.human_id,
-                'type': field.type
+                'type': field.type,
             }
             for field in flatten_fieldsets(parse_formcode(formcode))
         ]
@@ -67,6 +67,8 @@ def get_js_path():
 
 @FormApp.webasset('formcode')
 def get_formcode_asset():
+    yield 'utils.js'
     yield 'formcodewatch.js'
     yield 'togglebutton.jsx'
     yield 'snippets.jsx'
+    yield 'formcodeformat.jsx'

@@ -3,29 +3,9 @@ var FormcodeWatcher = function() {
     var subscriptions = {};
 
     self.subscribers = function() {
-        var result = [];
-
-        for (var key in subscriptions) {
-            if (subscriptions.hasOwnProperty(key)) {
-                result.push(subscriptions[key]);
-            }
-        }
-
-        return result;
-    };
-
-    self.fetch = function(formcode, success) {
-        var xhr = new XMLHttpRequest();
-
-        xhr.open('POST', '/formcode-fields');
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                success(JSON.parse(xhr.responseText));
-            } else {
-                console.log("XHR request failed with status " + xhr.status); // eslint-disable-line no-console
-            }
-        };
-        xhr.send(formcode);
+        return Object.getOwnPropertyNames(subscriptions).map(function(key) {
+            return subscriptions[key];
+        });
     };
 
     self.update = function(formcode) {
@@ -35,11 +15,13 @@ var FormcodeWatcher = function() {
             return;
         }
 
-        self.fetch(formcode, function(fields) {
+        var success = function(fields) {
             subscribers.forEach(function(subscriber) {
                 subscriber(fields);
             });
-        });
+        };
+
+        formcodeUtils.request('post', '/formcode-fields', success, formcode);
     };
 
     self.subscribe = function(subscriber) {
@@ -47,7 +29,7 @@ var FormcodeWatcher = function() {
     };
 
     self.unsubscribe = function(subscriber) {
-        if (subscriptions[subscriber] === undefined) {
+        if (subscriptions[subscriber] !== undefined) {
             delete subscriptions[subscriber];
         }
     };
@@ -57,15 +39,15 @@ var FormcodeWatcher = function() {
 
 var FormcodeWatcherRegistry = function() {
     var self = this;
-    self.watchers = {};
+    var watchers = {};
 
     self.new = function(name) {
-        self.watchers[name] = FormcodeWatcher();
-        return self.watchers[name];
+        watchers[name] = FormcodeWatcher();
+        return watchers[name];
     };
 
     self.get = function(name) {
-        return self.watchers[name];
+        return watchers[name];
     };
 
     return self;

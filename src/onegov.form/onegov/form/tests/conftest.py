@@ -72,6 +72,23 @@ def form_app(request):
             </html>
         """
 
+    @TestApp.path(path='/formcode-format')
+    class FormcodeFormat(Content):
+        html = """
+            <!doctype html>
+            <html>
+                <head>
+                    <script type="text/javascript" src="{}"></script>
+                    <script type="text/javascript" src="{}"></script>
+                    <link rel="stylesheet" href="{}">
+                </head>
+                <body>
+                    <div id="container"></div>
+                    <textarea></textarea>
+                </body>
+            </html>
+        """.format(react, react_dom, fontawesome)
+
     @TestApp.html(model=Content)
     def view_content(self, request):
         request.include('formcode')
