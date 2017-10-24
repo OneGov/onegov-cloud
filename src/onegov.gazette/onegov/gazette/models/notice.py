@@ -147,7 +147,7 @@ class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
         try:
             username = request.identity.userid
             owner = str(UserCollection(session).by_username(username).id)
-        except:
+        except Exception:
             owner = None
 
         self.changes.append(
