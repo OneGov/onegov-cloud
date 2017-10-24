@@ -19,8 +19,7 @@ def test_category(session):
         Category(
             name='100',
             title='Abstimmungen',
-            active=True,
-            external='ABC'
+            active=True
         )
     )
     session.flush()
@@ -28,8 +27,7 @@ def test_category(session):
     category = session.query(Category).one()
     assert category.name == '100'
     assert category.title == 'Abstimmungen'
-    assert category.active
-    assert category.external == 'ABC'
+    assert category.active == True
 
 
 def test_issue():

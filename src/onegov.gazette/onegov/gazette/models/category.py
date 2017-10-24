@@ -1,6 +1,4 @@
 from onegov.core.orm.abstract import AdjacencyList
-from onegov.core.orm.mixins import ContentMixin
-from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
 from sqlalchemy import Boolean
 from sqlalchemy import Column
@@ -8,7 +6,7 @@ from sqlalchemy_utils import observes
 from sqlalchemy.orm import object_session
 
 
-class Category(AdjacencyList, ContentMixin, TimestampMixin):
+class Category(AdjacencyList, TimestampMixin):
 
     """ Defines a category for official notices.
 
@@ -20,9 +18,6 @@ class Category(AdjacencyList, ContentMixin, TimestampMixin):
 
     #: True, if this category is still in use.
     active = Column(Boolean, nullable=True)
-
-    #: The external category (the publisher's category)
-    external = meta_property('external')
 
     @property
     def in_use(self):

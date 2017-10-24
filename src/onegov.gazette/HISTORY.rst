@@ -1,10 +1,11 @@
 Changelog
 ---------
-1.9.0 (2017-10-24)
-~~~~~~~~~~~~~~~~~~~
 
 - Allows to manage categories.
   [msom]
+
+1.9.0 (2017-10-24)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds an XLSX export of all publishers and editors.
   [msom]

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-24 14:32+0200\n"
+"POT-Creation-Date: 2017-10-24 16:58+0200\n"
 "PO-Revision-Date: 2017-10-24 14:32+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -80,9 +80,6 @@ msgstr "erstellt"
 
 msgid "Title"
 msgstr "Titel"
-
-msgid "External"
-msgstr "Externe Bezeichnung"
 
 msgid "Active"
 msgstr "Aktiv"
@@ -492,10 +489,6 @@ msgstr "Annehmen"
 
 msgid "Reject"
 msgstr "Zurückweisen"
-
-#, python-format
-msgid "Publish Official Notice ${id}"
-msgstr "Publikation für den amtlichen Teil ${id}"
 
 #, python-format
 msgid "Official Notice Rejected ${id}"

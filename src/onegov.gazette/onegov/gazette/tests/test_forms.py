@@ -48,22 +48,18 @@ def test_category_form(session):
     # Test apply / update
     categories = CategoryCollection(session)
     category = categories.add_root(name='1', title='ABC', active=True)
-    category.external = 'XYZ'
 
     form = CategoryForm()
 
     form.apply_model(category)
     assert form.title.data == 'ABC'
-    assert form.external.data == 'XYZ'
     assert form.active.data == True
 
     form.title.data = 'DEF'
-    form.external.data = 'UVW'
     form.active.data = False
 
     form.update_model(category)
     assert category.title == 'DEF'
-    assert category.external == 'UVW'
     assert category.active == False
 
     # Test validation
