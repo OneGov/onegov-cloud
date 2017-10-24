@@ -103,11 +103,9 @@ var initFormSnippets = function(container) {
     xhr.onload = function() {
         if (xhr.status === 200) {
             var data = JSON.parse(xhr.responseText);
-            container.data = data;
+            var el = container.appendChild(document.createElement('div'));
 
-            var el = document.createElement('div');
-            container.appendChild(el);
-            container.formsnippets = ReactDOM.render(
+            ReactDOM.render(
                 <FormSnippets
                     labels={data.labels}
                     snippets={data.snippets}
