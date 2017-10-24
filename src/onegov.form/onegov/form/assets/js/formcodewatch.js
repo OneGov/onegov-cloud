@@ -1,23 +1,26 @@
 var FormcodeWatcher = function() {
     var self = this;
+    var subscriptions = {};
 
-    self.subscribers = [];
+    self.subscribers = function() {
+        var result = [];
 
-    self.update = function(formcode) {
-
-        if (self.subscribers.length === 0) {
-            return;
+        for (var key in subscriptions) {
+            if (subscriptions.hasOwnProperty(key)) {
+                result.push(subscriptions[key]);
+            }
         }
 
+        return result;
+    };
+
+    self.fetch = function(formcode, success) {
         var xhr = new XMLHttpRequest();
+
         xhr.open('POST', '/formcode-fields');
         xhr.onload = function() {
             if (xhr.status === 200) {
-                self.fields = JSON.parse(xhr.responseText);
-
-                self.subscribers.forEach(function(subscriber) {
-                    subscriber(self.fields);
-                });
+                success(JSON.parse(xhr.responseText));
             } else {
                 console.log("XHR request failed with status " + xhr.status); // eslint-disable-line no-console
             }
@@ -25,8 +28,28 @@ var FormcodeWatcher = function() {
         xhr.send(formcode);
     };
 
+    self.update = function(formcode) {
+        var subscribers = self.subscribers();
+
+        if (subscribers.length === 0) {
+            return;
+        }
+
+        self.fetch(formcode, function(fields) {
+            subscribers.forEach(function(subscriber) {
+                subscriber(fields);
+            });
+        });
+    };
+
     self.subscribe = function(subscriber) {
-        self.subscribers.push(subscriber);
+        subscriptions[subscriber] = subscriber;
+    };
+
+    self.unsubscribe = function(subscriber) {
+        if (subscriptions[subscriber] === undefined) {
+            delete subscriptions[subscriber];
+        }
     };
 
     return self;
