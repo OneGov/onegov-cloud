@@ -1,3 +1,6 @@
+import time
+
+
 class InjectedBrowserExtension(object):
     """ Offers methods to inject an extended browser into the Splinter browser
     class hierarchy. All methods not related to spawning/cloning a new browser
@@ -84,3 +87,18 @@ class ExtendedBrowser(InjectedBrowserExtension):
 
     def logout(self):
         self.get('/auth/logout')
+
+    def wait_for_js_variable(self, variable, timeout=10.0):
+        """ Wait until the given javascript variable is no longer undefined """
+
+        time_budget = timeout
+        interval = 0.1
+
+        is_undefined = 'typeof {} == "undefined"'.format(variable)
+
+        while time_budget > 0 and self.evaluate_script(is_undefined):
+            time.sleep(interval)
+            time_budget -= interval
+
+        if time_budget <= 0:
+            raise RuntimeError("Timeout reached")
