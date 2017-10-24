@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds categories and organizations to notices.
+  [msom]
+
 0.2.0 (2017-10-13)
 ~~~~~~~~~~~~~~~~~~~
 

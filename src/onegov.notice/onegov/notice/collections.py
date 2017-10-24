@@ -22,6 +22,8 @@ class OfficialNoticeCollectionPagination(Pagination):
         order=None,
         direction=None,
         issues=None,
+        categories=None,
+        organizations=None,
         user_ids=None,
         group_ids=None
     ):
@@ -29,20 +31,24 @@ class OfficialNoticeCollectionPagination(Pagination):
         self.page = page
         self.state = state
         self.term = term
-        self.user_ids = user_ids or []
-        self.group_ids = group_ids or []
         self.order = order or 'first_issue'
         self.direction = direction or 'asc'
         self.issues = issues
+        self.categories = categories
+        self.organizations = organizations
+        self.user_ids = user_ids or []
+        self.group_ids = group_ids or []
 
     def __eq__(self, other):
         return (
-            self.state == other.state and
             self.page == other.page and
+            self.state == other.state and
             self.term == other.term and
             self.order == other.order and
             self.direction == other.direction and
             self.issues == other.issues and
+            self.categories == other.categories and
+            self.organizations == other.organizations and
             self.user_ids == other.user_ids and
             self.group_ids == other.group_ids
         )
@@ -63,6 +69,8 @@ class OfficialNoticeCollectionPagination(Pagination):
             order=self.order,
             direction=self.direction,
             issues=self.issues,
+            categories=self.categories,
+            organizations=self.organizations,
             user_ids=self.user_ids,
             group_ids=self.group_ids
         )
@@ -77,6 +85,8 @@ class OfficialNoticeCollectionPagination(Pagination):
             order=self.order,
             direction=self.direction,
             issues=self.issues,
+            categories=self.categories,
+            organizations=self.organizations,
             user_ids=self.user_ids,
             group_ids=self.group_ids
         )
@@ -91,6 +101,8 @@ class OfficialNoticeCollectionPagination(Pagination):
             order=self.order,
             direction=self.direction,
             issues=self.issues,
+            categories=self.categories,
+            organizations=self.organizations,
             user_ids=self.user_ids,
             group_ids=self.group_ids
         )
@@ -115,6 +127,8 @@ class OfficialNoticeCollectionPagination(Pagination):
             order=order,
             direction='desc' if descending else 'asc',
             issues=self.issues,
+            categories=self.categories,
+            organizations=self.organizations,
             user_ids=self.user_ids,
             group_ids=self.group_ids
         )
@@ -128,10 +142,24 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
         return OfficialNotice
 
     def query(self):
-        """ Returns a query with the given state and users filter applied and
-        sorted by the given column / direction.
+        """ Returns a filtered and sorted query.
+
+        Filters by:
+        - notice.state matches state
+        - notice.user_id is in user_ids
+        - notice.group_id is in group_ids
+        - notice.issues has any of the issues
+        - term is in title, text, category, organization, groupname, usernames
+
+        Orders by:
+        - any notice columns
+        - group name (group.name)
+        - users real name (user.realname)
+        - username (user.username)
+        - username or users real name (user.name)
 
         """
+
         query = self.session.query(self.model_class)
         query = query.join(self.model_class.group, isouter=True)
         query = query.join(self.model_class.user, isouter=True)
@@ -158,6 +186,14 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
             query = query.filter(self.model_class.group_id.in_(self.group_ids))
         if self.issues:
             query = query.filter(self.model_class._issues.has_any(self.issues))
+        if self.categories:
+            query = query.filter(
+                self.model_class._categories.has_any(self.categories)
+            )
+        if self.organizations:
+            query = query.filter(
+                self.model_class._organizations.has_any(self.organizations)
+            )
 
         direction = desc if self.direction == 'desc' else asc
         if self.order in inspect(self.model_class).columns.keys():
@@ -198,6 +234,8 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
         Returns the created notice.
         """
         issues = optional.pop('issues', None)
+        categories = optional.pop('categories', None)
+        organizations = optional.pop('organizations', None)
         notice = self.model_class(
             state='drafted',
             name=self._get_unique_name(title),
@@ -207,6 +245,10 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
         )
         if issues:
             notice.issues = issues
+        if categories:
+            notice.categories = categories
+        if organizations:
+            notice.organizations = organizations
 
         self.session.add(notice)
         self.session.flush()

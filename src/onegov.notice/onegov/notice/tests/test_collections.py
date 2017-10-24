@@ -223,6 +223,54 @@ def test_notice_collection_issues(session):
         assert sorted([notice.title for notice in notices.query()]) == result
 
 
+def test_notice_collection_categories(session):
+    notices = OfficialNoticeCollection(session)
+    notices.add(title='a', text='text', categories=None)
+    notices.add(title='b', text='text', categories=[])
+    notices.add(title='c', text='text', categories=['1', '2'])
+    notices.add(title='d', text='text', categories=['1'])
+    notices.add(title='e', text='text', categories=['2'])
+    notices.add(title='f', text='text', categories=['2', '3'])
+    notices.add(title='g', text='text', categories=['4'])
+
+    for categories, result in (
+        (None, ['a', 'b', 'c', 'd', 'e', 'f', 'g']),
+        ([], ['a', 'b', 'c', 'd', 'e', 'f', 'g']),
+        (['1'], ['c', 'd']),
+        (['2'], ['c', 'e', 'f']),
+        (['3'], ['f']),
+        (['4'], ['g']),
+        (['1', '4'], ['c', 'd', 'g']),
+        (['2', '3'], ['c', 'e', 'f']),
+    ):
+        notices.categories = categories
+        assert sorted([notice.title for notice in notices.query()]) == result
+
+
+def test_notice_collection_organizations(session):
+    notices = OfficialNoticeCollection(session)
+    notices.add(title='a', text='text', organizations=None)
+    notices.add(title='b', text='text', organizations=[])
+    notices.add(title='c', text='text', organizations=['1', '2'])
+    notices.add(title='d', text='text', organizations=['1'])
+    notices.add(title='e', text='text', organizations=['2'])
+    notices.add(title='f', text='text', organizations=['2', '3'])
+    notices.add(title='g', text='text', organizations=['4'])
+
+    for organizations, result in (
+        (None, ['a', 'b', 'c', 'd', 'e', 'f', 'g']),
+        ([], ['a', 'b', 'c', 'd', 'e', 'f', 'g']),
+        (['1'], ['c', 'd']),
+        (['2'], ['c', 'e', 'f']),
+        (['3'], ['f']),
+        (['4'], ['g']),
+        (['1', '4'], ['c', 'd', 'g']),
+        (['2', '3'], ['c', 'e', 'f']),
+    ):
+        notices.organizations = organizations
+        assert sorted([notice.title for notice in notices.query()]) == result
+
+
 def test_notice_collection_order(session):
     groups = UserGroupCollection(session)
     group_c = groups.add(name='C').id

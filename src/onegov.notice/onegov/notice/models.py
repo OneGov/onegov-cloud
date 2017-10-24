@@ -18,7 +18,24 @@ from uuid import uuid4
 
 class OfficialNotice(Base, ContentMixin, TimestampMixin):
 
-    """ Defines an official notice. """
+    """ Defines an official notice.
+
+    The notice follows a typcical state transition: drafted by an editor ->
+    submitted by and editor to a publisher -> accepted by a publisher ->
+    published by the publisher. It may be alternatively rejected by a publisher
+    when submitted.
+
+    The notice typically has a title and a text, belongs to a user and a user
+    group, appears in one ore more issues and belongs to one or more categories
+    and organizations.
+
+    You can set the date of the first issue besides setting the issues (to
+    allow filtering by date for example).
+
+    You can set the category and organization directly instead of using the
+    HSTOREs (or use both).
+
+    """
 
     __tablename__ = 'official_notices'
 
@@ -73,11 +90,43 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     #: The date of the first issue of the notice.
     first_issue = Column(UTCDateTime, nullable=True)
 
-    #: The category if the notice.
+    #: The categories of this notice.
+    _categories = Column(
+        MutableDict.as_mutable(HSTORE), name='categories', nullable=True
+    )
+
+    @property
+    def categories(self):
+        return self._categories or {}
+
+    @categories.setter
+    def categories(self, value):
+        if isinstance(value, dict):
+            self._categories = value
+        else:
+            self._categories = {item: None for item in value}
+
+    #: The category of the notice.
     category = Column(Text, nullable=True)
 
     #: The organization this notice belongs to.
     organization = Column(Text, nullable=True)
+
+    #: The categories of this notice.
+    _organizations = Column(
+        MutableDict.as_mutable(HSTORE), name='organizations', nullable=True
+    )
+
+    @property
+    def organizations(self):
+        return self._organizations or {}
+
+    @organizations.setter
+    def organizations(self, value):
+        if isinstance(value, dict):
+            self._organizations = value
+        else:
+            self._organizations = {item: None for item in value}
 
     #: The user that owns this notice.
     user_id = Column(UUID, ForeignKey(User.id), nullable=True)

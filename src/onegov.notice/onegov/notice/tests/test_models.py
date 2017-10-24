@@ -12,9 +12,9 @@ def test_create_notice(session):
     notice.title = 'Very Important Official Announcement'
     notice.text = '<em>Important</em> things happened!'
     notice.name = 'notice'
+    notice.first_issue = datetime(2008, 1, 1, 0, 0, tzinfo=timezone.utc)
     notice.category = 'category'
     notice.organization = 'organization'
-    notice.first_issue = datetime(2008, 1, 1, 0, 0, tzinfo=timezone.utc)
     session.add(notice)
 
     notice.submit()
@@ -32,6 +32,9 @@ def test_create_notice(session):
     assert notice.first_issue == datetime(
         2008, 1, 1, 0, 0, tzinfo=timezone.utc
     )
+    assert notice.categories == {}
+    assert notice.organizations == {}
+    assert notice.issues == {}
 
 
 def test_ownership(session):
@@ -175,3 +178,41 @@ def test_issues(session):
 
     notice.issues = ['a', 'b', 'c']
     assert notice.issues == {'a': None, 'b': None, 'c': None}
+
+
+def test_categories(session):
+    session.add(OfficialNotice(title='title', state='drafted'))
+    session.flush()
+    notice = session.query(OfficialNotice).one()
+    assert notice.categories == {}
+
+    notice.categories = {
+        'A': 'Category A',
+        'B': 'Category B',
+    }
+    assert notice.categories == {
+        'A': 'Category A',
+        'B': 'Category B',
+    }
+
+    notice.categories = ['a', 'b', 'c']
+    assert notice.categories == {'a': None, 'b': None, 'c': None}
+
+
+def test_organizations(session):
+    session.add(OfficialNotice(title='title', state='drafted'))
+    session.flush()
+    notice = session.query(OfficialNotice).one()
+    assert notice.organizations == {}
+
+    notice.organizations = {
+        'A': 'Organization A',
+        'B': 'Organization B',
+    }
+    assert notice.organizations == {
+        'A': 'Organization A',
+        'B': 'Organization B',
+    }
+
+    notice.organizations = ['a', 'b', 'c']
+    assert notice.organizations == {'a': None, 'b': None, 'c': None}
