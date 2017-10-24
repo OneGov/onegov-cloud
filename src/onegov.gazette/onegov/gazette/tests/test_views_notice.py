@@ -408,12 +408,23 @@ def test_view_notice_accept(gazette_app):
         ):
             accept_notice(user, slug, forbidden=forbidden)
 
-        assert len(gazette_app.smtp.outbox) == 2
-        for message in gazette_app.smtp.outbox:
-            assert message['Reply-To'] == 'mails@govikon.ch'
-            payload = message.get_payload(1).get_payload(decode=True)
-            payload = payload.decode('utf-8')
-            assert "Publikation für den amtlichen Teil" in payload
+        message = gazette_app.smtp.outbox.pop()
+        assert message['From'] == 'mails@govikon.ch'
+        assert message['To'] == 'printer@onegov.org'
+        assert message['Reply-To'] == 'mails@govikon.ch'
+        assert '44 Titel 2' in message['Subject']
+        payload = message.get_payload(1).get_payload(decode=True)
+        payload = payload.decode('utf-8')
+        assert '44 Titel 2' in payload
+
+        message = gazette_app.smtp.outbox.pop()
+        assert message['From'] == 'mails@govikon.ch'
+        assert message['To'] == 'printer@onegov.org'
+        assert message['Reply-To'] == 'mails@govikon.ch'
+        assert '44 Titel 1' in message['Subject']
+        payload = message.get_payload(1).get_payload(decode=True)
+        payload = payload.decode('utf-8')
+        assert '44 Titel 1' in payload
 
         principal = gazette_app.principal
         principal.publish_from = 'publisher@govikon.ch'
@@ -421,12 +432,14 @@ def test_view_notice_accept(gazette_app):
 
         accept_notice(publisher, 'titel-3')
 
-        assert len(gazette_app.smtp.outbox) == 3
-        message = gazette_app.smtp.outbox[2]
+        message = gazette_app.smtp.outbox.pop()
+        assert message['From'] == 'mails@govikon.ch'
+        assert message['To'] == 'printer@onegov.org'
         assert message['Reply-To'] == 'publisher@govikon.ch'
+        assert '44 Titel 3' in message['Subject']
         payload = message.get_payload(1).get_payload(decode=True)
         payload = payload.decode('utf-8')
-        assert "Publikation für den amtlichen Teil" in payload
+        assert '44 Titel 3' in payload
 
 
 def test_view_notice_delete(gazette_app):

@@ -11,6 +11,7 @@ from onegov.gazette.forms import RejectForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.layout import MailLayout
 from onegov.gazette.models import GazetteNotice
+from onegov.gazette.models import Issue
 from onegov.gazette.views import get_user_and_group
 from webob.exc import HTTPForbidden
 
@@ -370,21 +371,18 @@ def accept_notice(self, request, form):
             reply_to = (
                 request.app.principal.publish_from or request.app.mail_sender
             )
+            issues = list(self.issues.keys())
+            number = Issue.from_string(issues[0]).number if issues else ''
+            subject = "{} {} {}".format(number, self.title, self.id)
             request.app.send_email(
-                subject=request.translate(_(
-                    "Publish Official Notice ${id}",
-                    mapping={'id': self.id}
-                )),
+                subject=subject,
                 receivers=(request.app.principal.publish_to, ),
                 reply_to=reply_to,
                 content=render_template(
                     'mail_publish.pt',
                     request,
                     {
-                        'title': request.translate(_(
-                            "Publish Official Notice ${id}",
-                            mapping={'id': self.id}
-                        )),
+                        'title': subject,
                         'model': self,
                         'layout': MailLayout(self, request)
                     }

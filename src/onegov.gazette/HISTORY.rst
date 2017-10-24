@@ -10,6 +10,9 @@ Changelog
 - Adds a configurable help link.
   [msom]
 
+- Updates the subject of the publish mail.
+  [msom]
+
 - Updates RavenJs to 3.19.1.
   [msom]
 
