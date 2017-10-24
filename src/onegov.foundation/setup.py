@@ -32,9 +32,8 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'onegov.core>=0.4.0',
-        'pyscss>=1.3.5',
-        'rcssmin',
+        'onegov.core',
+        'libsass',
     ],
     entry_points={
         'onegov': [

@@ -1,9 +1,9 @@
 import os.path
+import sass
 
 from collections import OrderedDict
 from itertools import chain
-from rcssmin import cssmin
-from scss.compiler import Compiler
+from io import StringIO
 
 
 class BaseTheme(object):
@@ -162,26 +162,24 @@ class BaseTheme(object):
         _options = self.default_options.copy()
         _options.update(options)
 
-        if _options:
-            prefix = "@import 'foundation/functions';"
-            prefix = prefix + '\n'.join(
-                "${}: {};".format(k, v) for k, v in _options.items()
-            )
-        else:
-            prefix = ""
+        theme = StringIO()
+
+        print("@import 'foundation/functions';", file=theme)
+
+        for key, value in _options.items():
+            print("${}: {};".format(key, value), file=theme)
+
+        for i in self.imports:
+            print("@import '{}';".format(i), file=theme)
 
         paths = self.extra_search_paths
         paths.append(self.foundation_path)
 
-        compiler = Compiler(search_path=paths)
-        css = compiler.compile_string(
-            prefix + '\n'.join("@import '{}';".format(i) for i in self.imports)
+        return sass.compile(
+            string=theme.getvalue(),
+            include_paths=paths,
+            output_style='compressed' if self.compress else 'nested'
         )
-
-        if self.compress:
-            return cssmin(css)
-        else:
-            return css
 
 
 class Theme(BaseTheme):

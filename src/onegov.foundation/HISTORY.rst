@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Replaces rcssmin/pyscss with the dramatically faster libsass.
+  [href]
+
 0.3.0 (2017-07-10)
 ~~~~~~~~~~~~~~~~~~~
 
