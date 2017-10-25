@@ -42,7 +42,7 @@ def test_registry(browser):
 
 def test_formcode_format(browser):
     browser.visit('/formcode-format')
-    browser.wait_for_js_variable('formcodeWatcherRegistry')
+    browser.wait_for_js_variable('initFormcodeFormat')
     browser.execute_script("""
         var watcher = formcodeWatcherRegistry.new("test");
         var el = document.querySelector('#container');
@@ -56,6 +56,6 @@ def test_formcode_format(browser):
     """)
 
     browser.find_by_css('.formcode-toolbar-element').click()
-    browser.find_by_css('.formcode-format-field').click()
+    browser.find_by_css('.formcode-snippet').click()
 
     assert browser.find_by_css('textarea').value == '[Textfield]'
