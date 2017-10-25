@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes footer-height not working with new foundation theme release.
+  [href]
+
 0.4.1 (2017-10-19)
 ~~~~~~~~~~~~~~~~~~~
 
