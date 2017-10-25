@@ -19,7 +19,3 @@ class CategoryCollection(AdjacencyListCollection):
         ])
         next = (names[-1] + 1) if names else 1
         return str(next)
-
-    # todo: add helper to check if this category is used
-
-    # todo: add a helper to update a specific category?
