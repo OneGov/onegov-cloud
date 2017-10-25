@@ -1,6 +1,8 @@
-var FormcodeWatcher = function() {
+var FormcodeWatcher = function(name) {
     var self = this;
     var subscriptions = {};
+
+    self.name = name;
 
     self.subscribers = function() {
         return Object.getOwnPropertyNames(subscriptions).map(function(key) {
@@ -25,13 +27,12 @@ var FormcodeWatcher = function() {
     };
 
     self.subscribe = function(subscriber) {
-        subscriptions[subscriber] = subscriber;
-    };
+        var subscriberName = formcodeUtils.randomId('subscriber-');
+        subscriptions[subscriberName] = subscriber;
 
-    self.unsubscribe = function(subscriber) {
-        if (subscriptions[subscriber] !== undefined) {
-            delete subscriptions[subscriber];
-        }
+        return function() {
+            delete subscriptions[subscriberName];
+        };
     };
 
     return self;
@@ -42,7 +43,8 @@ var FormcodeWatcherRegistry = function() {
     var watchers = {};
 
     self.new = function(name) {
-        watchers[name] = FormcodeWatcher();
+        name = name || formcodeUtils.randomId('watcher-');
+        watchers[name] = FormcodeWatcher(name);
         return watchers[name];
     };
 

@@ -3,13 +3,14 @@ var FormcodeUtils = function() {
 
     self.updateTarget = function(target, value, extra, separator) {
         // if the target is an element, add to its value
-        var element = document.querySelector(target);
+        var element = target instanceof Element && target || document.querySelector(target);
         if (element) {
             if (element.value === '') {
                 element.value = value;
             } else {
                 element.value += (separator || '\n') + value;
             }
+            element.focus();
             return;
         }
 
@@ -19,6 +20,7 @@ var FormcodeUtils = function() {
             fn(value, extra);
             return;
         }
+
     };
 
     self.request = function(method, url, success, body) {
@@ -32,6 +34,11 @@ var FormcodeUtils = function() {
             }
         };
         xhr.send(body);
+    };
+
+    self.randomId = function(prefix) {
+        var id = Math.floor(Math.random() * 1000001);
+        return prefix && prefix + id || id;
     };
 
     return self;

@@ -28,10 +28,12 @@ def test_registry(browser):
     browser.wait_for_js_variable('formcodeWatcherRegistry')
     browser.execute_script("""
         var watcher = formcodeWatcherRegistry.new("test");
-        watcher.subscribe(function(value) {
+        var unsubscribe = watcher.subscribe(function(value) {
             window.code = value;
         });
         watcher.update("Label = ...");
+        unsubscribe();
+        watcher.update("Label = ___");
     """)
 
     code = browser.evaluate_script("window.code")

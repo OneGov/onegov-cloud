@@ -54,7 +54,7 @@ def view_parse_formcode(self, request):
             }
             for field in flatten_fieldsets(parse_formcode(formcode))
         ]
-    except FormError as e:
+    except (FormError, AttributeError):
         pass
 
     return {}

@@ -3,32 +3,36 @@ var FormCodeFormat = React.createClass({
         return {fields: []};
     },
     componentDidMount: function() {
-        this.props.watcher.subscribe(this.update);
+        this.unsubscribe = this.props.watcher.subscribe(this.update);
     },
     componentWillUnmount: function() {
-        this.props.watcher.unsubsribe(this.update);
+        this.unsubscribe();
     },
     update: function(fields) {
         var filtered = [];
 
-        fields.forEach(function(field) {
-            if (!(/(fileinput|radio|checkbox)/).test(field.type)) {
-                filtered.push(field);
-            }
-        });
+        if (fields.forEach !== undefined) {
+            fields.forEach(function(field) {
+                if (!(/(fileinput|radio|checkbox)/).test(field.type)) {
+                    filtered.push(field);
+                }
+            });
+        }
 
         this.setState({fields: filtered});
     },
     render: function() {
         return (
-            <div className="formcode-toolbar">
-                <ToggleButton icon="fa-plus-circle">
-                    <FormCodeFormatFields
-                        fields={this.state.fields}
-                        target={this.props.target}
-                    />
-                </ToggleButton>
-            </div>
+            this.state.fields.length > 0 && (
+                <div className="formcode-toolbar">
+                    <ToggleButton icon="fa-plus-circle">
+                        <FormCodeFormatFields
+                            fields={this.state.fields}
+                            target={this.props.target}
+                        />
+                    </ToggleButton>
+                </div>
+            )
         );
     }
 });
@@ -37,7 +41,7 @@ var FormCodeFormatFields = React.createClass({
     render: function() {
         var self = this;
         return (
-            <div className="format-fields">
+            <div className="formcode-snippets">
                 {
                     self.props.fields.map(function(field, ix) {
                         return (
@@ -61,8 +65,10 @@ var FormCodeFormatField = React.createClass({
     },
     render: function() {
         return (
-            <div className="formcode-format-field" onClick={this.handleClick}>
-                {this.props.field.human_id}
+            <div className="formcode-snippet" onClick={this.handleClick}>
+                <div className="formcode-snippet-name">
+                    {this.props.field.human_id}
+                </div>
             </div>
         );
     }
@@ -70,15 +76,14 @@ var FormCodeFormatField = React.createClass({
 
 // attaches itself to the given formcode format watcher and keeps a list
 // of available fields in a list to be inserted as safe formats
-var initFormcodeFormat = function(container) {
-    var watcherId = container.getAttribute('data-watcher');
-    var watcher = formcodeWatcherRegistry.get(watcherId);
+var initFormcodeFormat = function(container, watcher, target) {
+    watcher = watcher || formcodeWatcherRegistry.get(container.getAttribute('data-watcher'));
+    target = target || container.getAttribute('data-target');
 
-    if (watcher === undefined) {
+    if (watcher === undefined || target === undefined) {
         return;
     }
 
-    var target = container.getAttribute('data-target');
     var el = container.appendChild(document.createElement('div'));
     ReactDOM.render(
         <FormCodeFormat watcher={watcher} target={target} />,
