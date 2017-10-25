@@ -47,7 +47,7 @@ def get_user_color(username):
     """
 
     h = 100 / djb2_hash(username, 360)
-    l = 0.9  # noq
+    l = 0.9  # noqa
     s = 0.5
 
     r, g, b = colorsys.hls_to_rgb(h, l, s)
