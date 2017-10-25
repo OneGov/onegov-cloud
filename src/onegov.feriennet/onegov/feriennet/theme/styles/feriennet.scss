@@ -1622,8 +1622,8 @@ ul.tags {
         page-break-inside: avoid;
 
         .organisation {
-            border-radius: 2px;
             border: 1px solid $monsoon;
+            border-radius: 2px;
             padding: 1rem 1rem 0;
             position: absolute;
             right: 0;
@@ -1749,7 +1749,7 @@ ul.tags {
 .notification-preview {
     background: $white-smoke;
     margin-bottom: 1rem;
-    max-width: $max-line-width + 7rem;
+    max-width: $max-line-width + 13ex;
     padding: .75rem 1rem;
     position: relative;
 
