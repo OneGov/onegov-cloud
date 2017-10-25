@@ -68,7 +68,7 @@ def get_js_path():
 @FormApp.webasset('formcode')
 def get_formcode_asset():
     yield 'utils.js'
-    yield 'formcodewatch.js'
+    yield 'watcher.jsx'
     yield 'togglebutton.jsx'
     yield 'snippets.jsx'
-    yield 'formcodeformat.jsx'
+    yield 'format.jsx'

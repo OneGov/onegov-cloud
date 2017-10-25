@@ -2,37 +2,28 @@ var FormCodeFormat = React.createClass({
     getInitialState: function() {
         return {fields: []};
     },
-    componentDidMount: function() {
-        this.unsubscribe = this.props.watcher.subscribe(this.update);
-    },
-    componentWillUnmount: function() {
-        this.unsubscribe();
-    },
-    update: function(fields) {
-        var filtered = [];
-
-        if (fields.forEach !== undefined) {
-            fields.forEach(function(field) {
-                if (!(/(fileinput|radio|checkbox)/).test(field.type)) {
-                    filtered.push(field);
-                }
-            });
-        }
-
-        this.setState({fields: filtered});
+    onUpdateFields: function(fields) {
+        this.setState({fields: fields});
     },
     render: function() {
         return (
-            this.state.fields.length > 0 && (
+            <WatchedFields
+                exclude={['fileinput', 'radio', 'checkbox']}
+                update={this.onUpdateFields}
+                watcher={this.props.watcher}
+            >
                 <div className="formcode-toolbar">
-                    <ToggleButton icon="fa-plus-circle">
-                        <FormCodeFormatFields
-                            fields={this.state.fields}
-                            target={this.props.target}
-                        />
-                    </ToggleButton>
+                    {
+                        this.state.fields.length > 0 &&
+                        <ToggleButton icon="fa-plus-circle">
+                            <FormCodeFormatFields
+                                fields={this.state.fields}
+                                target={this.props.target}
+                            />
+                        </ToggleButton>
+                    }
                 </div>
-            )
+            </WatchedFields>
         );
     }
 });

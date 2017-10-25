@@ -56,3 +56,49 @@ var FormcodeWatcherRegistry = function() {
 };
 
 window.formcodeWatcherRegistry = FormcodeWatcherRegistry();
+
+var WatchedFields = React.createClass({
+    getInitialState: function() {
+        return {fields: []};
+    },
+    includeField: function(field) {
+        if (this.props.include !== undefined) {
+            var inc = new RegExp('(' + this.props.include.join('|') + ')');
+            if (!inc.test(field.type)) {
+                return false;
+            }
+        }
+
+        if (this.props.exclude !== undefined) {
+            var exc = new RegExp('(' + this.props.exclude.join('|') + ')');
+            if (exc.test(field.type)) {
+                return false;
+            }
+        }
+
+        return true;
+    },
+    componentDidMount: function() {
+        this.unsubscribe = this.props.watcher.subscribe(this.update);
+    },
+    componentWillUnmount: function() {
+        this.unsubscribe();
+    },
+    update: function(fields) {
+        var filtered = [];
+        var self = this;
+
+        if (fields.forEach !== undefined) {
+            fields.forEach(function(field) {
+                if (self.includeField(field)) {
+                    filtered.push(field);
+                }
+            });
+        }
+
+        this.props.update(filtered);
+    },
+    render: function() {
+        return (this.props.children);
+    }
+});
