@@ -33,6 +33,8 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         order=None,
         direction=None,
         issues=None,
+        categories=None,
+        organizations=None,
         user_ids=None,
         group_ids=None,
         from_date=None,
@@ -47,6 +49,8 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
             order=order,
             direction=direction,
             issues=issues,
+            categories=categories,
+            organizations=organizations,
             user_ids=user_ids,
             group_ids=group_ids
         )
@@ -97,6 +101,8 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
             order=self.order,
             direction=self.direction,
             issues=self.issues,
+            categories=self.categories,
+            organizations=self.organizations,
             user_ids=self.user_ids,
             group_ids=self.group_ids,
             from_date=from_date,

@@ -102,9 +102,10 @@ class CachedGroupNameMixin(object):
 class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
     """ An official notice with extras.
 
-    Instead of using categories and organizations directly, the IDs defined
-    in the principal are used: The IDs are stored in the meta and the values
-    are copied to the columns when calling ``apply_meta``.
+    We use a combination of the categories/organizations HSTORE and the
+    individual category/organization columns. The ID of the category/
+    organization is stored in the HSTORE column and the actual name ist copied
+    when calling ``apply_meta``.
 
     It's possible to add a changelog entry by calling ``add_change``. Changelog
     entries are created for state changes by default.
@@ -121,14 +122,6 @@ class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
 
     #: True, if the official notice needs to be paid for
     at_cost = meta_property('at_cost')
-
-    #: The ID of the organization. We store this in addition to the
-    #: organization name to allow changing organization names.
-    organization_id = meta_property('organization_id')
-
-    #: The ID of the category. We store this in addition to the
-    #: category name to allow changing category names.
-    category_id = meta_property('category_id')
 
     @observes('user', 'user.realname', 'user.username')
     def user_observer(self, user, realname, username):
@@ -214,6 +207,34 @@ class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
             self._issues = value
         else:
             self._issues = {item: None for item in value}
+
+    @property
+    def category_id(self):
+        """ The ID of the category. We store this the ID in the HSTORE (we use
+        only one!) and additionaly store the title of the category in the
+        category column.
+
+        """
+        keys = list(self.categories.keys())
+        return keys[0] if keys else None
+
+    @category_id.setter
+    def category_id(self, value):
+        self.categories = [value]
+
+    @property
+    def organization_id(self):
+        """ The ID of the organization. We store this the ID in the HSTORE (we
+        use only one!) and additionaly store the title of the organization in
+        the organization column.
+
+        """
+        keys = list(self.organizations.keys())
+        return keys[0] if keys else None
+
+    @organization_id.setter
+    def organization_id(self, value):
+        self.organizations = [value]
 
     def overdue_issues(self, principal):
         """ Returns True, if any of the issue's deadline is reached. """

@@ -19,28 +19,27 @@ class Category(AdjacencyList, TimestampMixin):
     #: True, if this category is still in use.
     active = Column(Boolean, nullable=True)
 
-    @property
-    def in_use(self):
+    def in_use(self, session):
         """ True, if the category is used by any notice. """
-        from onegov.gazette.models.notice import GazetteNotice
+        from onegov.gazette.models.notice import GazetteNotice  # circular
 
-        session = object_session(self)
-        assert session
-
-        for notice in session.query(GazetteNotice):
-            if self.name == notice.category_id:
-                return True
+        query = session.query(GazetteNotice._categories)
+        query = query.filter(
+            GazetteNotice._categories.has_key(self.name)  # noqa
+        )
+        if query.first():
+            return True
 
         return False
 
     @observes('title')
     def title_observer(self, title):
-        from onegov.gazette.models.notice import GazetteNotice
+        from onegov.gazette.models.notice import GazetteNotice  # circular
 
-        session = object_session(self)
-        assert session
-
-        for notice in session.query(GazetteNotice):
-            if self.name == notice.category_id:
-                if title != notice.category:
-                    notice.category = title
+        query = object_session(self).query(GazetteNotice)
+        query = query.filter(
+            GazetteNotice._categories.has_key(self.name),  # noqa
+            GazetteNotice.category != title
+        )
+        for notice in query:
+            notice.category = title

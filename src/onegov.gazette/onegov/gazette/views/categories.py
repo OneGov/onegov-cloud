@@ -108,8 +108,9 @@ def delete_category(self, request, form):
 
     """
     layout = Layout(self, request)
+    session = request.app.session()
 
-    if self.in_use:
+    if self.in_use(session):
         request.message(
             _("Only unused categorys may be deleted."),
             'alert'
@@ -122,7 +123,7 @@ def delete_category(self, request, form):
         }
 
     if form.submitted(request):
-        collection = CategoryCollection(request.app.session())
+        collection = CategoryCollection(session)
         collection.delete(self)
         request.message(_("Category deleted."), 'success')
         return redirect(layout.manage_categories_link)
