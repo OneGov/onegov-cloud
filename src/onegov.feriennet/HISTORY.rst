@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.2 (2017-10-25)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds compatibility with the latest onegov.foundation release.
   [href]
