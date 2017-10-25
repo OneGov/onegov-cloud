@@ -275,7 +275,7 @@ $global-tools-height: 2.5rem;
 }
 
 #inner-body {
-    margin: 0 auto -$footer-height;
+    margin: 0 auto (-$footer-height);
 
     @media not print {
       min-height: 100%;
