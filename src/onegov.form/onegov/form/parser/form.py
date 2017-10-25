@@ -6,7 +6,7 @@ from onegov.form.core import with_options
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import UploadField
 from onegov.form.parser.core import parse_formcode
-from onegov.form.utils import label_to_field_id
+from onegov.form.utils import as_internal_id
 from onegov.form.validators import ExpectedExtensions
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import Stdnum
@@ -304,11 +304,11 @@ class WTFormsClassBuilder(object):
         # current fieldset name - if all fails, an error will be thrown,
         # as field_ids *need* to be unique
         if dependency:
-            field_id = dependency.field_id + '_' + label_to_field_id(label)
+            field_id = dependency.field_id + '_' + as_internal_id(label)
         elif self.current_fieldset:
-            field_id = label_to_field_id(self.current_fieldset + ' ' + label)
+            field_id = as_internal_id(self.current_fieldset + ' ' + label)
         else:
-            field_id = label_to_field_id(label)
+            field_id = as_internal_id(label)
 
         if hasattr(self.form_class, field_id):
             raise errors.DuplicateLabelError(label=label)

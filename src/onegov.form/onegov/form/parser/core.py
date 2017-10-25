@@ -326,7 +326,7 @@ from onegov.form.parser.grammar import textarea
 from onegov.form.parser.grammar import textfield
 from onegov.form.parser.grammar import time
 from onegov.form.parser.grammar import url
-from onegov.form.utils import label_to_field_id
+from onegov.form.utils import as_internal_id
 
 
 # cache the parser elements
@@ -475,7 +475,7 @@ def flatten_fields(fields):
 
 
 def find_field(fieldsets, id):
-    id = label_to_field_id(id or '')
+    id = as_internal_id(id or '')
 
     for fieldset in fieldsets:
         if fieldset.id == id:
@@ -496,7 +496,7 @@ class Fieldset(object):
 
     @property
     def id(self):
-        return label_to_field_id(self.human_id)
+        return as_internal_id(self.human_id)
 
     @property
     def human_id(self):
@@ -534,7 +534,7 @@ class Field(object):
 
     @property
     def id(self):
-        return label_to_field_id(self.human_id)
+        return as_internal_id(self.human_id)
 
     @cached_property
     def human_id(self):

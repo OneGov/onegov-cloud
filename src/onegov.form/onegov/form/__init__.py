@@ -31,9 +31,10 @@ from onegov.form.parser import flatten_fieldsets
 from onegov.form.parser import parse_form
 from onegov.form.parser import parse_formcode
 from onegov.form.parser import WTFormsClassBuilder
-from onegov.form.utils import decimal_range
+from onegov.form.utils import decimal_range, as_internal_id
 
 __all__ = [
+    'as_internal_id',
     'CompleteFormSubmission',
     'decimal_range',
     'find_field',
