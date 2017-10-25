@@ -3935,6 +3935,7 @@ h2 + div.timeline {
     color: $body-font-color;
     display: table;
     font-size: .875rem;
+    min-width: 150px;
     padding: 4px;
     position: absolute;
     right: 0;

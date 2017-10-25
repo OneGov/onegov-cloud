@@ -1,5 +1,6 @@
 from onegov.core.utils import linkify
 from onegov.directory import Directory, DirectoryEntry
+from onegov.form.utils import as_internal_id
 from onegov.org.models.extensions import HiddenFromPublicExtension
 from onegov.org.models.extensions import CoordinatesExtension
 
@@ -36,7 +37,9 @@ class ExtendedDirectoryEntry(DirectoryEntry, CoordinatesExtension,
 
     @property
     def content_fields(self):
-        content_config = self.display_config.get('content')
+        content_config = {
+            as_internal_id(k) for k in self.display_config.get('content')
+        }
 
         if content_config:
             form = self.directory.form_class(data=self.values)

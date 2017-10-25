@@ -24,6 +24,21 @@ $(function() {
         editor.renderer.setPadding(10);
         editor.renderer.setShowGutter(false);
         editor.renderer.setScrollMargin(10, 10, 10, 10);
+
+        if (mode === 'form') {
+            var watcher = formcodeWatcherRegistry.new();
+
+            editor.on("change", _.debounce(function() {
+                watcher.update(editor.getValue());
+            }, 500));
+
+            var form = textarea.closest('form');
+            form.find('.formcode-format-for-ace').each(function() {
+                var container = $("<div>").insertBefore(this);
+                initFormcodeFormat(container.get(0), watcher, this);
+            });
+        }
+
         editor.getSession().setValue(textarea.val());
         editor.getSession().setMode("ace/mode/" + mode);
         editor.setTheme("ace/theme/tomorrow");
