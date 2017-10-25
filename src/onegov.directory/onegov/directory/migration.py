@@ -1,4 +1,7 @@
-from onegov.form import flatten_fieldsets, parse_formcode, parse_form
+from onegov.form import as_internal_id
+from onegov.form import flatten_fieldsets
+from onegov.form import parse_form
+from onegov.form import parse_formcode
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.orm.attributes import get_history
 
@@ -77,18 +80,23 @@ class DirectoryMigration(object):
             # want to change this into something that is save for the user
             # by maybe keeping the old values around somehow
             for added in self.changes.added_fields:
+                added = as_internal_id(added)
                 entry.values[added] = None
 
             for removed in self.changes.removed_fields:
+                removed = as_internal_id(removed)
                 del entry.values[removed]
 
             for old, new in self.changes.renamed_fields.items():
+                old_human, new_human = old, new
+                old, new = as_internal_id(old), as_internal_id(new)
                 entry.values[new] = entry.values[old]
                 del entry.values[old]
 
-                self.directory.configuration.rename_field(old, new)
+                self.directory.configuration.rename_field(old_human, new_human)
 
             for changed in self.changes.changed_fields:
+                changed = as_internal_id(changed)
                 convert = self.fieldtype_migrations.get_converter(
                     self.changes.old[changed].type,
                     self.changes.new[changed].type

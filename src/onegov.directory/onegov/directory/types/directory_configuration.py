@@ -5,8 +5,7 @@ from datetime import date, datetime, time
 from more_itertools import collapse
 from onegov.core import custom_json as json
 from onegov.core.utils import normalize_for_url, safe_format, safe_format_keys
-from onegov.form import parse_formcode, flatten_fieldsets
-from onegov.form.utils import label_to_field_id
+from onegov.form import parse_formcode, flatten_fieldsets, as_internal_id
 from sqlalchemy.ext.mutable import Mutable
 from sqlalchemy.types import TypeDecorator, TEXT
 from sqlalchemy_utils.types.scalar_coercible import ScalarCoercible
@@ -116,13 +115,29 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         for field in self.fields:
             value = getattr(self, field)
 
-            if field in ('title', 'lead'):
-                value.replace('[' + old_name + ']', '[' + new_name + ']')
-            else:
-                for ix, name in enumerate(value):
-                    value[ix] = new_name if name == old_name else name
+            setattr(self, field, self.rename_field_value(
+                value, old_name, new_name))
 
-            setattr(self, field, value)
+    def rename_field_value(self, value, old_name, new_name):
+        if not value:
+            return value
+
+        if isinstance(value, str):
+            return value.replace('[' + old_name + ']', '[' + new_name + ']')
+
+        if isinstance(value, list):
+            for ix, name in enumerate(value):
+                value[ix] = new_name if name == old_name else name
+
+            return value
+
+        if isinstance(value, dict):
+            return {
+                k: self.rename_field_value(v, old_name, new_name)
+                for k, v in value.items()
+            }
+
+        raise NotImplementedError
 
     @classmethod
     def coerce(cls, key, value):
@@ -133,7 +148,7 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
 
     def join(self, data, attribute, separator=' '):
         return separator.join((s and str(s).strip() or '') for s in (
-            data[label_to_field_id(key)] for key in getattr(self, attribute)
+            data[as_internal_id(key)] for key in getattr(self, attribute)
         ))
 
     def for_safe_format(self, data):
@@ -148,12 +163,12 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
 
     def extract_title(self, data):
         return safe_format(
-            self.title, self.for_safe_format(data), adapt=label_to_field_id)
+            self.title, self.for_safe_format(data), adapt=as_internal_id)
 
     def extract_lead(self, data):
         if self.lead:
             return safe_format(
-                self.lead, self.for_safe_format(data), adapt=label_to_field_id)
+                self.lead, self.for_safe_format(data), adapt=as_internal_id)
 
     def extract_order(self, data):
         # by default we use the title as order
@@ -172,7 +187,7 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
             keywords = set()
 
             for key in self.keywords:
-                key = label_to_field_id(key)
+                key = as_internal_id(key)
 
                 for value in collapse(data[key]):
                     if isinstance(value, str):
