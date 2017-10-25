@@ -12,7 +12,7 @@ def test_detect_added_fields():
         """
     )
 
-    assert changes.added_fields == ['last_name']
+    assert changes.added_fields == ['Last Name']
 
 
 def test_detect_removed_fields():
@@ -26,7 +26,7 @@ def test_detect_removed_fields():
         """
     )
 
-    assert changes.removed_fields == ['last_name']
+    assert changes.removed_fields == ['Last Name']
 
 
 def test_detect_renamed_fields():
@@ -39,7 +39,7 @@ def test_detect_renamed_fields():
         """
     )
 
-    assert changes.renamed_fields == {'first_name': 'name'}
+    assert changes.renamed_fields == {'First Name': 'Name'}
 
     changes = StructuralChanges(
         """
@@ -52,7 +52,7 @@ def test_detect_renamed_fields():
         """
     )
 
-    assert changes.renamed_fields == {'general_first_name': 'personal_name'}
+    assert changes.renamed_fields == {'General/First Name': 'Personal/Name'}
 
     changes = StructuralChanges(
         """
@@ -65,7 +65,7 @@ def test_detect_renamed_fields():
         """
     )
 
-    assert changes.renamed_fields == {'general_first_name': 'personal_name'}
+    assert changes.renamed_fields == {'General/First Name': 'Personal/Name'}
 
     changes = StructuralChanges(
         """
@@ -76,8 +76,8 @@ def test_detect_renamed_fields():
         """
     )
 
-    assert changes.removed_fields == ['name']
-    assert changes.added_fields == ['comment']
+    assert changes.removed_fields == ['Name']
+    assert changes.added_fields == ['Comment']
 
 
 def test_detect_changed_fields():
@@ -90,7 +90,7 @@ def test_detect_changed_fields():
         """
     )
 
-    assert changes.changed_fields == ['name']
+    assert changes.changed_fields == ['Name']
 
     changes = StructuralChanges(
         """
@@ -101,8 +101,8 @@ def test_detect_changed_fields():
         """
     )
 
-    assert changes.renamed_fields == {'first_name': 'name'}
-    assert changes.changed_fields == ['name']
+    assert changes.renamed_fields == {'First Name': 'Name'}
+    assert changes.changed_fields == ['Name']
 
     changes = StructuralChanges(
         """
@@ -113,4 +113,4 @@ def test_detect_changed_fields():
         """
     )
 
-    assert changes.changed_fields == ['name']
+    assert changes.changed_fields == ['Name']

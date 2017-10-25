@@ -1,5 +1,3 @@
-from collections import defaultdict
-from onegov.core.utils import normalize_for_url
 from onegov.form import flatten_fieldsets, parse_formcode, parse_form
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.orm.attributes import get_history
@@ -153,10 +151,12 @@ class StructuralChanges(object):
 
     def __init__(self, old_structure, new_structure):
         self.old = {
-            f.id: f for f in flatten_fieldsets(parse_formcode(old_structure))
+            f.human_id: f for f in flatten_fieldsets(
+                parse_formcode(old_structure))
         }
         self.new = {
-            f.id: f for f in flatten_fieldsets(parse_formcode(new_structure))
+            f.human_id: f for f in flatten_fieldsets(
+                parse_formcode(new_structure))
         }
 
         self.detect_added_fields()
@@ -174,14 +174,14 @@ class StructuralChanges(object):
 
     def detect_added_fields(self):
         self.added_fields = [
-            f.id for f in self.new.values()
-            if f.id not in {f.id for f in self.old.values()}
+            f.human_id for f in self.new.values()
+            if f.human_id not in {f.human_id for f in self.old.values()}
         ]
 
     def detect_removed_fields(self):
         self.removed_fields = [
-            f.id for f in self.old.values()
-            if f.id not in {f.id for f in self.new.values()}
+            f.human_id for f in self.old.values()
+            if f.human_id not in {f.human_id for f in self.new.values()}
         ]
 
     def detect_renamed_fields(self):
@@ -216,20 +216,3 @@ class StructuralChanges(object):
 
             elif self.old[old].type != self.new[new].type:
                 self.changed_fields.append(new)
-
-
-def fieldset_signatures(fields):
-    fieldsets = defaultdict(list)
-
-    for field in fields:
-        normalized_fieldset = normalize_for_url(field.fieldset)
-        bare_id = field.id[len(normalized_fieldset) + 1:]
-
-        fieldsets[field.fieldset].append(bare_id)
-
-    signatures = defaultdict(list)
-
-    for fieldset, fields in fieldsets.items():
-        signatures['-'.join(fields)].append(fieldset)
-
-    return signatures

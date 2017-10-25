@@ -114,12 +114,15 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
 
     def rename_field(self, old_name, new_name):
         for field in self.fields:
-            lst = getattr(self, field)
+            value = getattr(self, field)
 
-            for ix, name in enumerate(lst):
-                lst[ix] = new_name if name == old_name else name
+            if field in ('title', 'lead'):
+                value.replace('[' + old_name + ']', '[' + new_name + ']')
+            else:
+                for ix, name in enumerate(value):
+                    value[ix] = new_name if name == old_name else name
 
-            setattr(self, field, lst)
+            setattr(self, field, value)
 
     @classmethod
     def coerce(cls, key, value):
