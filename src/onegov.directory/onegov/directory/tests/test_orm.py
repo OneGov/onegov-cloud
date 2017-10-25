@@ -59,17 +59,17 @@ def test_directory_configuration(session):
             Last Name *= ___
         """,
         configuration=DirectoryConfiguration(
-            title="[general_first_name] [general_last_name]",
-            order=('general_last_name', 'general_first_name'),
+            title="[General/First Name] [General/Last Name]",
+            order=('General/Last Name', 'General/First Name'),
         )
     )
 
     assert people.configuration.title\
-        == "[general_first_name] [general_last_name]"
+        == "[General/First Name] [General/Last Name]"
 
     assert people.configuration.order == (
-        'general_last_name',
-        'general_first_name'
+        'General/Last Name',
+        'General/First Name'
     )
 
     person = {
@@ -80,11 +80,38 @@ def test_directory_configuration(session):
     assert people.configuration.extract_title(person) == 'Tom Riddle'
     assert people.configuration.extract_order(person) == 'riddle-tom'
 
-    people.configuration.title = "[general_last_name] [general_first_name]"
+    people.configuration.title = "[General/Last Name] [General/First Name]"
     session.flush()
 
     people = DirectoryCollection(session).query().first()
     assert people.configuration.extract_title(person) == 'Riddle Tom'
+
+
+def test_directory_configuration_missing_fields():
+    cfg = DirectoryConfiguration(
+        title="[First Name] [Last Name]",
+        keywords=['Category']
+    )
+
+    assert not cfg.missing_fields("""
+        First Name *= ___
+        Last Name *= ___
+        Category *=
+            [ ] Consultant
+            [ ] Employee
+    """)
+
+    assert cfg.missing_fields("""
+        First Name *= ___
+        Last Name *= ___
+    """) == {'keywords': ['Category']}
+
+    assert cfg.missing_fields("""
+        First Name *= ___
+        Category *=
+            [ ] Consultant
+            [ ] Employee
+    """) == {'title': ['Last Name']}
 
 
 def test_directory_form(session):
@@ -95,8 +122,8 @@ def test_directory_form(session):
             Last Name *= ___
         """,
         configuration=DirectoryConfiguration(
-            title="[first_name] [last_name]",
-            order=('last_name', 'first_name'),
+            title="[First Name] [Last Name]",
+            order=('Last Name', 'First Name'),
         )
     )
 
@@ -132,9 +159,9 @@ def test_directory_entry_collection(session):
                 [ ] Rock
         """,
         configuration=DirectoryConfiguration(
-            title="[title]",
-            order=('artist', 'title'),
-            keywords=('genre', )
+            title="[Title]",
+            order=('Artist', 'Title'),
+            keywords=('Genre', )
         )
     )
 
@@ -184,8 +211,8 @@ def test_validation_error(session):
         title='Place',
         structure="Name *= ___",
         configuration=DirectoryConfiguration(
-            title=('name', ),
-            order=('name', ),
+            title=('Name', ),
+            order=('Name', ),
         )
     )
 
@@ -201,8 +228,8 @@ def test_files(session):
             File = *.txt
         """,
         configuration=DirectoryConfiguration(
-            title=('title', ),
-            order=('title', ),
+            title=('Title', ),
+            order=('Title', ),
         )
     )
 

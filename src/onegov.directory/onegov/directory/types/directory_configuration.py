@@ -1,12 +1,22 @@
 import yaml
 
+from collections import defaultdict
+from datetime import date, datetime, time
 from more_itertools import collapse
 from onegov.core import custom_json as json
-from onegov.core.utils import normalize_for_url, safe_format
+from onegov.core.utils import normalize_for_url, safe_format, safe_format_keys
+from onegov.form import parse_formcode, flatten_fieldsets
 from onegov.form.utils import label_to_field_id
 from sqlalchemy.ext.mutable import Mutable
 from sqlalchemy.types import TypeDecorator, TEXT
 from sqlalchemy_utils.types.scalar_coercible import ScalarCoercible
+
+# XXX i18n
+SAFE_FORMAT_TRANSLATORS = {
+    date: lambda d: d.strftime('%d.%m.%Y'),
+    datetime: lambda d: d.strftime('%d.%m.%Y %H:%M'),
+    time: lambda t: t.strftime('%H:%M')
+}
 
 
 class DirectoryConfigurationStorage(TypeDecorator, ScalarCoercible):
@@ -69,6 +79,39 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         self.changed()
         return super().__setattr__(name, value)
 
+    def missing_fields(self, formcode):
+        """ Takes the given formcode and returns a dictionary with missing
+        fields per configuration field. If the return-value is falsy, the
+        configuration is valid.
+
+        For example::
+
+            >>> cfg = DirectoryConfiguration(title='[Name]')
+            >>> cfg.missing_fields('Title = ___')
+
+            {'title': ['Name']}
+
+        """
+        formfields = tuple(flatten_fieldsets(parse_formcode(formcode)))
+        known = {field.human_id for field in formfields}
+
+        errors = defaultdict(list)
+
+        for name in self.fields:
+            if not getattr(self, name):
+                continue
+
+            if name in ('title', 'lead'):
+                found = safe_format_keys(getattr(self, name))
+            else:
+                found = getattr(self, name)
+
+            for id in found:
+                if id not in known:
+                    errors[name].append(id)
+
+        return errors
+
     def rename_field(self, old_name, new_name):
         for field in self.fields:
             lst = getattr(self, field)
@@ -87,15 +130,27 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
 
     def join(self, data, attribute, separator=' '):
         return separator.join((s and str(s).strip() or '') for s in (
-            data[key] for key in getattr(self, attribute)
+            data[label_to_field_id(key)] for key in getattr(self, attribute)
         ))
 
+    def for_safe_format(self, data):
+        return {
+            k: SAFE_FORMAT_TRANSLATORS.get(type(v), str)(v)
+            for k, v in data.items()
+            if (
+                type(v) in (str, int, float) or
+                type(v) in SAFE_FORMAT_TRANSLATORS
+            )
+        }
+
     def extract_title(self, data):
-        return safe_format(self.title, data, adapt=label_to_field_id)
+        return safe_format(
+            self.title, self.for_safe_format(data), adapt=label_to_field_id)
 
     def extract_lead(self, data):
         if self.lead:
-            return safe_format(self.lead, data, adapt=label_to_field_id)
+            return safe_format(
+                self.lead, self.for_safe_format(data), adapt=label_to_field_id)
 
     def extract_order(self, data):
         # by default we use the title as order
@@ -114,6 +169,8 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
             keywords = set()
 
             for key in self.keywords:
+                key = label_to_field_id(key)
+
                 for value in collapse(data[key]):
                     if isinstance(value, str):
                         value = value.strip()
