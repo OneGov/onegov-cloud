@@ -65,7 +65,7 @@ def test_view_dashboard(gazette_app):
     with freeze_time("2017-11-01 11:00"):
         manage = editor_1.get('/').maybe_follow()
         assert (
-            "Sie haben Meldungenen in Arbeit, für welche der "
+            "Sie haben Meldungen in Arbeit, für welche der "
             "Eingabeschluss bald erreicht ist."
         ) in manage
 
