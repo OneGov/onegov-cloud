@@ -54,10 +54,10 @@ def view_parse_formcode(self, request):
             }
             for field in flatten_fieldsets(parse_formcode(formcode))
         ]
-    except (FormError, AttributeError):
-        pass
+    except (FormError, AttributeError, TypeError):
+        return {'error': True}
 
-    return {}
+    return []
 
 
 @FormApp.webasset_path()

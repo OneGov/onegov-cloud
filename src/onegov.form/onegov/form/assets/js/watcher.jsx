@@ -62,14 +62,14 @@ var WatchedFields = React.createClass({
         return {fields: []};
     },
     includeField: function(field) {
-        if (this.props.include !== undefined) {
+        if (this.props.include && this.props.include.join("")) {
             var inc = new RegExp('(' + this.props.include.join('|') + ')');
             if (!inc.test(field.type)) {
                 return false;
             }
         }
 
-        if (this.props.exclude !== undefined) {
+        if (this.props.exclude && this.props.exclude.join("")) {
             var exc = new RegExp('(' + this.props.exclude.join('|') + ')');
             if (exc.test(field.type)) {
                 return false;
@@ -85,6 +85,10 @@ var WatchedFields = React.createClass({
         this.unsubscribe();
     },
     update: function(fields) {
+        if (fields.error === true) {
+            return;
+        }
+
         var filtered = [];
         var self = this;
 

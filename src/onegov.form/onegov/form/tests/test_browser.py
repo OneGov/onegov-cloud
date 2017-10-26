@@ -108,3 +108,51 @@ def test_formcode_select_prefilled(browser):
     """, 'A = ___\nB = ...\nC = *.png')
 
     assert len(browser.find_by_css('.formcode-select input:checked')) == 1
+
+
+def test_formcode_keep_selection(browser):
+    browser.visit('/formcode-select')
+    browser.wait_for_js_variable('initFormcodeSelect')
+    browser.driver.execute_script("""
+        var watcher = document.watcher = formcodeWatcherRegistry.new();
+        var el = document.querySelector('#container');
+        document.querySelector('textarea').value='A'
+
+        initFormcodeSelect(el, watcher, 'textarea', ['text', 'textarea']);
+        watcher.update('B = ___');
+    """)
+
+    assert len(browser.find_by_css('.formcode-select input:checked')) == 0
+    browser.driver.execute_script("document.watcher.update('A = ___');")
+
+    assert len(browser.find_by_css('.formcode-select input:checked')) == 1
+    browser.driver.execute_script("document.watcher.update('C = ___');")
+
+    assert len(browser.find_by_css('.formcode-select input:checked')) == 0
+
+
+def test_field_errors_should_not_yield_updates(browser):
+    browser.visit('/formcode-format')
+    browser.wait_for_js_variable('initFormcodeFormat')
+    browser.execute_script("""
+        document.watcher = formcodeWatcherRegistry.new();
+        var el = document.querySelector('#container')
+
+        initFormcodeFormat(el, document.watcher, 'textarea');
+        document.watcher.update('Textfield = ___');
+    """)
+
+    browser.find_by_css('.formcode-toolbar-element').click()
+
+    assert len(browser.find_by_css('.formcode-snippet')) == 1
+    assert browser.find_by_css('.formcode-snippet').text == "Textfield"
+
+    browser.execute_script("document.watcher.update('Test =-= !invalid');")
+
+    assert len(browser.find_by_css('.formcode-snippet')) == 1
+    assert browser.find_by_css('.formcode-snippet').text == "Textfield"
+
+    browser.execute_script("document.watcher.update('Fixed = ___');")
+
+    assert len(browser.find_by_css('.formcode-snippet')) == 1
+    assert browser.find_by_css('.formcode-snippet').text == "Fixed"

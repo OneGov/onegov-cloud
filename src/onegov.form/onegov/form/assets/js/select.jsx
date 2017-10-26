@@ -18,7 +18,8 @@ var FormcodeSelect = React.createClass({
         return Object.getOwnPropertyNames(selected || this.state.selected).join('\n');
     },
     getTarget: function() {
-        return document.querySelector(this.props.target);
+        var target = this.props.target;
+        return target instanceof Element && target || document.querySelector(target);
     },
     cloneState: function() {
         return JSON.parse(JSON.stringify(this.state));
@@ -74,7 +75,7 @@ var FormcodeSelectField = React.createClass({
     getInitialState: function() {
         return {selected: this.props.selected};
     },
-    handleClick: function() {
+    handleChange: function() {
         var selected = !this.state.selected;
         this.setState({selected: selected});
         this.props.handler(this.props.id, selected);
@@ -84,9 +85,8 @@ var FormcodeSelectField = React.createClass({
             <label>
                 <input
                     type="checkbox"
-                    name={"formcode-select-" + this.props.id}
                     checked={this.state.selected}
-                    onClick={this.handleClick}
+                    onChange={this.handleChange}
                 />
                 {this.props.label}
             </label>
@@ -94,10 +94,15 @@ var FormcodeSelectField = React.createClass({
     }
 });
 
-var initFormcodeSelect = function(container, watcher, target, include) {
+var initFormcodeSelect = function(container, watcher, target, include, exclude) {
     var el = container.appendChild(document.createElement('div'));
     ReactDOM.render(
-        <FormcodeSelect watcher={watcher} target={target} include={include} />,
+        <FormcodeSelect
+            watcher={watcher}
+            target={target}
+            include={include}
+            exclude={exclude}
+        />,
         el
     );
 };
