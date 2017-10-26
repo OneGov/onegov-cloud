@@ -1751,7 +1751,7 @@ class DirectoryEntryCollectionLayout(DefaultLayout):
         if self.request.is_admin:
             return [
                 Link(
-                    text=_("Edit"),
+                    text=_("Configure"),
                     url=self.request.link(self.model, '+edit'),
                     attrs={'class': 'edit-link'}
                 ),
@@ -1769,7 +1769,7 @@ class DirectoryEntryCollectionLayout(DefaultLayout):
                                     'title': self.model.directory.title
                                 }
                             ),
-                            _("All entries will be deleted as well."),
+                            _("All entries will be deleted as well!"),
                             _("Delete directory")
                         ),
                         Intercooler(

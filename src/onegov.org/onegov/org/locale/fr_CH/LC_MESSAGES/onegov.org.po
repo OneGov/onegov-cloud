@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-10-26 16:30+0200\n"
+"POT-Creation-Date: 2017-10-26 16:39+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -256,6 +256,9 @@ msgstr "Choisir des images"
 msgid "Synchronise"
 msgstr "Synchroniser"
 
+msgid "Configure"
+msgstr ""
+
 msgid "Yes"
 msgstr "Oui"
 
@@ -333,7 +336,7 @@ msgstr "Supprimer l'album photo"
 msgid "Do you really want to delete \"${title}\"?"
 msgstr ""
 
-msgid "All entries will be deleted as well."
+msgid "All entries will be deleted as well!"
 msgstr ""
 
 msgid "Delete directory"

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-10-26 16:30+0200\n"
+"POT-Creation-Date: 2017-10-26 16:39+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -255,6 +255,9 @@ msgstr "Bilder auswählen"
 msgid "Synchronise"
 msgstr "Synchronisieren"
 
+msgid "Configure"
+msgstr "Konfigurieren"
+
 msgid "Yes"
 msgstr "Ja"
 
@@ -334,8 +337,8 @@ msgstr "Fotoalbum löschen"
 msgid "Do you really want to delete \"${title}\"?"
 msgstr "Möchten Sie \"${title}\" wirklich löschen?"
 
-msgid "All entries will be deleted as well."
-msgstr "Alle Einträge werden ebenfalls gelöscht."
+msgid "All entries will be deleted as well!"
+msgstr "Alle Einträge werden ebenfalls gelöscht!"
 
 msgid "Delete directory"
 msgstr "Verzeichnis löschen"
@@ -2466,6 +2469,3 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
-
-#~ msgid "Display in Sidebar"
-#~ msgstr "In der Seitenleiste anzeigen"
