@@ -136,23 +136,6 @@ def test_organization_form(session):
     assert form.validate()
 
 
-def test_user_form_on_request(session):
-    form = UserForm()
-    form.request = DummyRequest(session)
-
-    form.on_request()
-    assert form.group.choices == [('', '- none -')]
-
-    groups = UserGroupCollection(session)
-    groups.add(name='Group A')
-    groups.add(name='Group B')
-    groups.add(name='Group C')
-
-    form.on_request()
-    assert sorted([choice[1] for choice in form.group.choices]) == [
-        '- none -', 'Group A', 'Group B', 'Group C'
-    ]
-
 def test_user_form(session):
     # Test apply / update
     users = UserCollection(session)
