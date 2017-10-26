@@ -128,6 +128,7 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
                 delete = (
                     f.note not in values or
+                    values[f.note] is None or
                     values[f.note].data == {} or
                     values[f.note].data is not None
                 )
@@ -136,9 +137,10 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
                     session.delete(f)
 
             for field in self.file_fields:
-
                 # migrate files during an entry migration
-                if isinstance(values[field.id], dict):
+                if values[field.id] is None or\
+                        isinstance(values[field.id], dict):
+
                     updated[field.id] = values[field.id]
                     continue
 
@@ -209,12 +211,15 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     @observes('structure', 'configuration')
     def structure_configuration_observer(self, structure, configuration):
-        migration = DirectoryMigration(
-            directory=self,
-            new_structure=structure,
-            new_configuration=configuration
-        )
+        migration = self.migration(structure, configuration)
         migration.execute()
+
+    def migration(self, new_structure, new_configuration):
+        return DirectoryMigration(
+            directory=self,
+            new_structure=new_structure,
+            new_configuration=new_configuration
+        )
 
     @property
     def fields(self):

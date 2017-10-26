@@ -204,9 +204,13 @@ class StructuralChanges(object):
                     self.renamed_fields[r] = a
 
         self.added_fields = [
-            f for f in self.added_fields if f not in self.renamed_fields]
+            f for f in self.added_fields
+            if f not in set(self.renamed_fields.values())
+        ]
         self.removed_fields = [
-            f for f in self.removed_fields if f not in self.renamed_fields]
+            f for f in self.removed_fields
+            if f not in self.renamed_fields
+        ]
 
     def detect_changed_fields(self):
         self.changed_fields = []
