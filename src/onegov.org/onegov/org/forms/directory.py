@@ -1,8 +1,9 @@
+from cached_property import cached_property
+from onegov.core.utils import safe_format_keys
 from onegov.directory import DirectoryConfiguration
-from onegov.form import Form
+from onegov.form import Form, flatten_fieldsets, parse_formcode, as_internal_id
 from onegov.form.validators import ValidFormDefinition
 from onegov.org import _
-from onegov.core.utils import safe_format_keys
 from wtforms import StringField, TextAreaField, validators
 
 
@@ -13,7 +14,7 @@ class DirectoryForm(Form):
 
     lead = TextAreaField(
         label=_("Lead"),
-        description=_("Describes what this form is about"),
+        description=_("Describes what this directory is about"),
         render_kw={'rows': 4})
 
     structure = TextAreaField(
@@ -27,33 +28,48 @@ class DirectoryForm(Form):
     title_format = StringField(
         label=_("Title Format"),
         validators=[validators.InputRequired()],
-        render_kw={'class_': 'formcode-format-for-ace'})
+        render_kw={'class_': 'formcode-format'})
 
     lead_format = StringField(
         label=_("Lead Format"),
-        render_kw={'class_': 'formcode-format-for-ace'})
+        render_kw={'class_': 'formcode-format'})
 
     content_fields = TextAreaField(
         label=_("Content Fields"),
-        render_kw={'rows': 8})
+        render_kw={'class_': 'formcode-select'})
 
-    address_fields = TextAreaField(
-        label=_("Address Fields"),
-        render_kw={'rows': 8})
+    contact_fields = TextAreaField(
+        label=_("Contact Fields"),
+        render_kw={
+            'class_': 'formcode-select',
+            'data-fields-exclude': 'fileinput,radio,checkbox'
+        })
 
     keyword_fields = TextAreaField(
         label=_("Keyword Fields"),
-        render_kw={'rows': 8})
+        render_kw={
+            'class_': 'formcode-select',
+            'data-fields-include': 'radio,checkbox'
+        })
+
+    @cached_property
+    def known_field_ids(self):
+        return {
+            field.id for field in
+            flatten_fieldsets(parse_formcode(self.structure.data))
+        }
 
     def extract_field_ids(self, field):
         for line in field.data.splitlines():
             line = line.strip()
-            yield line
+
+            if as_internal_id(line) in self.known_field_ids:
+                yield line
 
     @property
     def configuration(self):
         content_fields = list(self.extract_field_ids(self.content_fields))
-        address_fields = list(self.extract_field_ids(self.address_fields))
+        contact_fields = list(self.extract_field_ids(self.contact_fields))
         keyword_fields = list(self.extract_field_ids(self.keyword_fields))
 
         return DirectoryConfiguration(
@@ -61,10 +77,10 @@ class DirectoryForm(Form):
             lead=self.lead_format.data,
             order=safe_format_keys(self.title_format.data),
             keywords=keyword_fields,
-            searchable=content_fields + address_fields,
+            searchable=content_fields + contact_fields,
             display={
                 'content': content_fields,
-                'address': address_fields
+                'contact': contact_fields
             }
         )
 
@@ -73,7 +89,7 @@ class DirectoryForm(Form):
         self.title_format.data = cfg.title
         self.lead_format.data = cfg.lead or ''
         self.content_fields.data = '\n'.join(cfg.display.get('content', ''))
-        self.address_fields.data = '\n'.join(cfg.display.get('address', ''))
+        self.contact_fields.data = '\n'.join(cfg.display.get('contact', ''))
         self.keyword_fields.data = '\n'.join(cfg.keywords)
 
     def populate_obj(self, obj):

@@ -33,9 +33,19 @@ $(function() {
             }, 500));
 
             var form = textarea.closest('form');
-            form.find('.formcode-format-for-ace').each(function() {
+            form.find('.formcode-format').each(function() {
                 var container = $("<div>").insertBefore(this);
                 initFormcodeFormat(container.get(0), watcher, this);
+            });
+
+            $('.formcode-select').each(function() {
+                var exclude = (this.getAttribute('data-fields-exclude') || '');
+                var include = (this.getAttribute('data-fields-include') || '');
+                var container = $("<div>").insertBefore(this);
+
+                $(this).hide();
+
+                initFormcodeSelect(container.get(0), watcher, this, include.split(','), exclude.split(','));
             });
         }
 

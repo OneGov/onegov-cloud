@@ -589,6 +589,12 @@ form {
         min-height: 250px;
     }
 
+    .formcode-select {
+        @include form-element;
+        height: 100%;
+        min-height: 2.3125rem;
+    }
+
     small.error {
         padding: .5rem;
         padding-left: .5rem;

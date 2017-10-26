@@ -1,6 +1,6 @@
 from onegov.core.utils import linkify
 from onegov.directory import Directory, DirectoryEntry
-from onegov.form.utils import as_internal_id
+from onegov.form import as_internal_id
 from onegov.org.models.extensions import HiddenFromPublicExtension
 from onegov.org.models.extensions import CoordinatesExtension
 
@@ -23,7 +23,10 @@ class ExtendedDirectoryEntry(DirectoryEntry, CoordinatesExtension,
 
     @property
     def contact(self):
-        contact_config = self.display_config.get('contact')
+        contact_config = tuple(
+            as_internal_id(name) for name in
+            self.display_config.get('contact')
+        )
 
         if contact_config:
             values = (self.values.get(name) for name in contact_config)
