@@ -44,13 +44,11 @@ class DummyRequest(object):
 def test_layout_links():
     layout = Layout(None, DummyRequest(None))
     assert layout.homepage_link == '/'
-    assert layout.manage_link == '/'
     assert layout.manage_users_link == '/UserCollection/'
-    assert layout.manage_user_groups_link == '/UserGroupCollection/'
+    assert layout.manage_groups_link == '/UserGroupCollection/'
     assert layout.manage_notices_link == '/GazetteNoticeCollection/'
-    assert layout.manage_statistics_link == \
-        '/GazetteNoticeCollection/statistics/'
     assert layout.dashboard_link == '/dashboard/'
+    assert layout.dashboard_or_notices_link == '/dashboard/'
 
 
 def test_layout_menu():

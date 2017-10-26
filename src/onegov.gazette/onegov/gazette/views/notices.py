@@ -61,7 +61,7 @@ def create_notice(self, request, form):
         'form': form,
         'title': _("New Official Notice"),
         'button_text': _("Save"),
-        'cancel': layout.dashboard_link,
+        'cancel': layout.dashboard_or_notices_link,
         'current_issue': principal.current_issue
     }
 
@@ -250,12 +250,12 @@ def view_notices_update(self, request, form):
             notice.apply_meta(principal, session)
         request.message(_("Notices updated."), 'success')
 
-        return redirect(layout.manage_notices_link)
+        return redirect(layout.dashboard_or_notices_link)
 
     return {
         'layout': layout,
         'form': form,
         'title': _("Update notices"),
         'button_text': _("Update"),
-        'cancel': layout.manage_notices_link
+        'cancel': layout.dashboard_or_notices_link
     }

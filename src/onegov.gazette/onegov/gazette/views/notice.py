@@ -250,7 +250,7 @@ def delete_notice(self, request, form):
         collection = GazetteNoticeCollection(request.app.session())
         collection.delete(self)
         request.message(_("Official notice deleted."), 'success')
-        return redirect(layout.manage_notices_link)
+        return redirect(layout.dashboard_or_notices_link)
 
     return {
         'message': _(
@@ -318,7 +318,7 @@ def submit_notice(self, request, form):
     if form.submitted(request):
         self.submit(request)
         request.message(_("Official notice submitted."), 'success')
-        return redirect(layout.manage_notices_link)
+        return redirect(layout.dashboard_or_notices_link)
 
     return {
         'message': _(
@@ -389,7 +389,7 @@ def accept_notice(self, request, form):
                 )
             )
             self.add_change(request, _("mail sent"))
-        return redirect(layout.manage_notices_link)
+        return redirect(layout.dashboard_or_notices_link)
 
     return {
         'message': _(
@@ -460,7 +460,7 @@ def reject_notice(self, request, form):
                     }
                 )
             )
-        return redirect(layout.manage_notices_link)
+        return redirect(layout.dashboard_or_notices_link)
 
     return {
         'message': _(

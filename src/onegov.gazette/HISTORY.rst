@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes redirects for various views.
+  [msom]
+
 - Fixes typo.
   [msom]
 

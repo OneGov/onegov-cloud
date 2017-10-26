@@ -49,13 +49,13 @@ def create_group(self, request, form):
     if form.submitted(request):
         self.add(name=form.name.data)
         request.message(_("Group added."), 'success')
-        return redirect(layout.manage_user_groups_link)
+        return redirect(layout.manage_groups_link)
 
     return {
         'layout': layout,
         'form': form,
         'title': _("New Group"),
-        'cancel': layout.manage_user_groups_link
+        'cancel': layout.manage_groups_link
     }
 
 
@@ -78,7 +78,7 @@ def edit_group(self, request, form):
     if form.submitted(request):
         form.update_model(self)
         request.message(_("Group modified."), 'success')
-        return redirect(layout.manage_user_groups_link)
+        return redirect(layout.manage_groups_link)
 
     if not form.errors:
         form.apply_model(self)
@@ -88,7 +88,7 @@ def edit_group(self, request, form):
         'form': form,
         'title': self.name,
         'subtitle': _("Edit Group"),
-        'cancel': layout.manage_user_groups_link
+        'cancel': layout.manage_groups_link
     }
 
 
@@ -129,7 +129,7 @@ def delete_group(self, request, form):
     if form.submitted(request):
         UserGroupCollection(request.app.session()).delete(self)
         request.message(_("Group deleted."), 'success')
-        return redirect(layout.manage_user_groups_link)
+        return redirect(layout.manage_groups_link)
 
     return {
         'message': _(
@@ -142,5 +142,5 @@ def delete_group(self, request, form):
         'subtitle': _("Delete Group"),
         'button_text': _("Delete Group"),
         'button_class': 'alert',
-        'cancel': layout.manage_user_groups_link
+        'cancel': layout.manage_groups_link
     }
