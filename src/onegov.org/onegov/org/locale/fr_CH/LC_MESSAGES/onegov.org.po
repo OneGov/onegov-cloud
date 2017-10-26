@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-09-25 14:47+0200\n"
+"POT-Creation-Date: 2017-10-26 15:51+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -195,6 +195,9 @@ msgstr "Exports"
 msgid "Payment Providers"
 msgstr "Opérateurs de paiement"
 
+msgid "Directories"
+msgstr ""
+
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -326,6 +329,19 @@ msgstr "Supprimer la newsletter"
 msgid "Delete photo album"
 msgstr "Supprimer l'album photo"
 
+#, python-format
+msgid "Do you really want to delete \"${title}\"?"
+msgstr ""
+
+msgid "All entries will be deleted as well."
+msgstr ""
+
+msgid "Delete directory"
+msgstr ""
+
+msgid "Delete entry"
+msgstr ""
+
 msgid "Form"
 msgstr "Formulaire"
 
@@ -363,6 +379,12 @@ msgstr "Utilisateur"
 
 msgid "Stripe Connect"
 msgstr "Stripe Connect"
+
+msgid "Directory"
+msgstr ""
+
+msgid "Entry"
+msgstr ""
 
 msgid "Not a valid color."
 msgstr "Couleur non valide."
@@ -497,6 +519,33 @@ msgstr "De"
 msgid "Until"
 msgstr "Jusqu'à"
 
+msgid "Title"
+msgstr "Titre"
+
+msgid "Lead"
+msgstr "Accroche"
+
+msgid "Describes what this directory is about"
+msgstr ""
+
+msgid "Definition"
+msgstr "Définition"
+
+msgid "Title Format"
+msgstr ""
+
+msgid "Lead Format"
+msgstr ""
+
+msgid "Display in the main view"
+msgstr ""
+
+msgid "Display in Sidebar"
+msgstr ""
+
+msgid "Use for filtering"
+msgstr ""
+
 msgid "Exhibition"
 msgstr "Exposition"
 
@@ -554,9 +603,6 @@ msgstr "Conférence"
 msgid "E-Mail"
 msgstr "E-mail"
 
-msgid "Title"
-msgstr "Titre"
-
 msgid "Concerto in the castle garden"
 msgstr "Concerto dans le jardin du château"
 
@@ -609,17 +655,11 @@ msgid "The weekday of the start date must be selected."
 msgstr ""
 "Le jour de la semaine correspondant à la date de début doit être sélectionné."
 
-msgid "Lead"
-msgstr "Accroche"
-
 msgid "Describes what this form is about"
 msgstr "Décrit le contenu de ce formulaire"
 
 msgid "Text"
 msgstr "Texte"
-
-msgid "Definition"
-msgstr "Définition"
 
 msgid "Format"
 msgstr "Format"
@@ -1141,6 +1181,32 @@ msgstr ""
 "supprimez d'abord toutes les sous-pages, ou demandez à un administrateur de "
 "le faire pour vous."
 
+msgid "No directories defined yet."
+msgstr ""
+
+msgid "This directory is empty."
+msgstr ""
+
+msgid ""
+"Your edit requires a migration of existing entries. Please confirm the "
+"following changes:"
+msgstr ""
+
+msgid "Added:"
+msgstr ""
+
+msgid "Removed:"
+msgstr ""
+
+msgid "Renamed:"
+msgstr ""
+
+msgid "Changed:"
+msgstr ""
+
+msgid "Confirm"
+msgstr "Confirmer"
+
 msgid ""
 "Please review your data and press \"Complete\" to finalize the process. If "
 "there's anything you'd like to change, click on \"Edit\" to return to the "
@@ -1395,6 +1461,21 @@ msgstr "Payer hors ligne plus tard"
 
 msgid "at ${time}"
 msgstr "à ${time}"
+
+msgid "Object"
+msgstr "Objet"
+
+msgid "Net Amount"
+msgstr "Montant net"
+
+msgid "Fee"
+msgstr "Tarif"
+
+msgid "Created"
+msgstr "Créé"
+
+msgid "Disbursed"
+msgstr "Décaissé"
 
 msgid "Dear Sir or Madam,"
 msgstr "Cher Monsieur, chère Madame,"
@@ -1729,21 +1810,6 @@ msgstr "Tarif :"
 msgid "No payments yet."
 msgstr "Pas de paiements pour le moment."
 
-msgid "Object"
-msgstr "Objet"
-
-msgid "Net Amount"
-msgstr "Montant net"
-
-msgid "Fee"
-msgstr "Tarif"
-
-msgid "Created"
-msgstr "Créé"
-
-msgid "Disbursed"
-msgstr "Décaissé"
-
 msgid "No people added yet."
 msgstr "Aucune personne n'a encore été ajoutée."
 
@@ -2019,6 +2085,29 @@ msgstr "Ce lien d'inscription a expiré"
 msgid "A link was added to the clipboard"
 msgstr "Un lien a été ajouté au presse-papiers"
 
+msgid "New Directory"
+msgstr ""
+
+msgid "The directory was deleted"
+msgstr ""
+
+msgid "New Directory Entry"
+msgstr ""
+
+msgid "The entry was deleted"
+msgstr ""
+
+msgid "Added a new directory"
+msgstr ""
+
+msgid "Added a new directory entry"
+msgstr ""
+
+msgid ""
+"The requested change cannot be performed, as it is incompatible with "
+"existing entries"
+msgstr ""
+
 msgid "Submit an event"
 msgstr "Soumettre un événement"
 
@@ -2190,9 +2279,6 @@ msgstr "Confirmer votre réservation"
 
 msgid "Reserve"
 msgstr "Réserver"
-
-msgid "Confirm"
-msgstr "Confirmer"
 
 msgid "Thank you for your reservation!"
 msgstr "Merci pour votre réservation !"

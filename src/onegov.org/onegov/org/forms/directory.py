@@ -35,18 +35,18 @@ class DirectoryForm(Form):
         render_kw={'class_': 'formcode-format'})
 
     content_fields = TextAreaField(
-        label=_("Content Fields"),
+        label=_("Display in the main view"),
         render_kw={'class_': 'formcode-select'})
 
     contact_fields = TextAreaField(
-        label=_("Contact Fields"),
+        label=_("Display in Sidebar"),
         render_kw={
             'class_': 'formcode-select',
             'data-fields-exclude': 'fileinput,radio,checkbox'
         })
 
     keyword_fields = TextAreaField(
-        label=_("Keyword Fields"),
+        label=_("Use for filtering"),
         render_kw={
             'class_': 'formcode-select',
             'data-fields-include': 'radio,checkbox'

@@ -66,16 +66,38 @@ def handle_new_directory(self, request, form):
     }
 
 
-@OrgApp.form(model=DirectoryEntryCollection, template='form.pt',
-             permission=Secret, form=get_directory_form_class,
-             name='edit')
+@OrgApp.form(model=DirectoryEntryCollection, name='edit',
+             template='directory_entry_form.pt', permission=Secret,
+             form=get_directory_form_class)
 def handle_edit_directory(self, request, form):
+    migration = None
 
     if form.submitted(request):
-        form.populate_obj(self.directory)
+        save_changes = True
 
-        request.success(_("Your changes were saved"))
-        return request.redirect(request.link(self))
+        if self.directory.entries:
+            migration = self.directory.migration(
+                form.structure.data,
+                form.configuration
+            )
+
+            if migration.changes:
+                if not migration.possible:
+                    save_changes = False
+                    request.alert(_(
+                        "The requested change cannot be performed, "
+                        "as it is incompatible with existing entries"
+                    ))
+                else:
+                    if not request.params.get('confirm'):
+                        form.action += '&confirm=1'
+                        save_changes = False
+
+        if save_changes:
+            form.populate_obj(self.directory)
+            request.success(_("Your changes were saved"))
+            return request.redirect(request.link(self))
+
     elif not request.POST:
         form.process(obj=self.directory)
 
@@ -92,6 +114,7 @@ def handle_edit_directory(self, request, form):
         'title': self.directory.title,
         'form': form,
         'form_width': 'large',
+        'migration': migration,
     }
 
 

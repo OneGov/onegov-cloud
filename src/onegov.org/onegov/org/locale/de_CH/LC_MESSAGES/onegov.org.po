@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-09-25 14:47+0200\n"
+"POT-Creation-Date: 2017-10-26 15:51+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -527,14 +527,26 @@ msgstr "Titel"
 msgid "Lead"
 msgstr "Einleitung"
 
-msgid "Describes what this form is about"
-msgstr "Beschreibt kurz um was es bei diesem Formular geht"
+msgid "Describes what this directory is about"
+msgstr "Beschreibt worum es bei diesem Verzeichnis geht"
 
 msgid "Definition"
 msgstr "Definition"
 
-msgid "Configuration"
-msgstr "Konfiguration"
+msgid "Title Format"
+msgstr "Titel Format"
+
+msgid "Lead Format"
+msgstr "Lead Format"
+
+msgid "Display in the main view"
+msgstr "In der Hauptansicht anzeigen"
+
+msgid "Display in Sidebar"
+msgstr "In der Seitenleiste anzeigen"
+
+msgid "Use for filtering"
+msgstr "Als Filter nutzen"
 
 msgid "Exhibition"
 msgstr "Ausstellung"
@@ -643,6 +655,9 @@ msgstr "Das Enddatum muss nach dem Startdatum liegen."
 
 msgid "The weekday of the start date must be selected."
 msgstr "Der Wochentag der Veranstaltung muss ausgewählt sein."
+
+msgid "Describes what this form is about"
+msgstr "Beschreibt kurz um was es bei diesem Formular geht"
 
 msgid "Text"
 msgstr "Text"
@@ -1172,6 +1187,28 @@ msgid "This directory is empty."
 msgstr "Dieses Verzeichnis ist leer."
 
 msgid ""
+"Your edit requires a migration of existing entries. Please confirm the "
+"following changes:"
+msgstr ""
+"Ihre Änderung bedingt eine Migration der bestehenden Einträge. Bitte "
+"bestätigen Sie die folgenden Änderungen:"
+
+msgid "Added:"
+msgstr "Hinzugefügt:"
+
+msgid "Removed:"
+msgstr "Entfernt:"
+
+msgid "Renamed:"
+msgstr "Umbenannt:"
+
+msgid "Changed:"
+msgstr "Verändert:"
+
+msgid "Confirm"
+msgstr "Bestätigen"
+
+msgid ""
 "Please review your data and press \"Complete\" to finalize the process. If "
 "there's anything you'd like to change, click on \"Edit\" to return to the "
 "filled-out form."
@@ -1422,6 +1459,21 @@ msgstr "Später bezahlen"
 
 msgid "at ${time}"
 msgstr "um ${time}"
+
+msgid "Object"
+msgstr "Objekt"
+
+msgid "Net Amount"
+msgstr "Netto Betrag"
+
+msgid "Fee"
+msgstr "Gebühr"
+
+msgid "Created"
+msgstr "Erstellt"
+
+msgid "Disbursed"
+msgstr "Ausbezahlt"
 
 msgid "Dear Sir or Madam,"
 msgstr "Guten Tag"
@@ -1757,21 +1809,6 @@ msgstr "Gebühr:"
 msgid "No payments yet."
 msgstr "Noch keine Zahlungen."
 
-msgid "Object"
-msgstr "Objekt"
-
-msgid "Net Amount"
-msgstr "Netto Betrag"
-
-msgid "Fee"
-msgstr "Gebühr"
-
-msgid "Created"
-msgstr "Erstellt"
-
-msgid "Disbursed"
-msgstr "Ausbezahlt"
-
 msgid "No people added yet."
 msgstr "Es wurden noch keine Personen hinzugefügt."
 
@@ -2064,6 +2101,13 @@ msgstr "Ein neues Verzeichnis wurde hinzugefügt"
 msgid "Added a new directory entry"
 msgstr "Ein neuer Verzeichniseintrag wurde hinzugefügt"
 
+msgid ""
+"The requested change cannot be performed, as it is incompatible with "
+"existing entries"
+msgstr ""
+"Die verlangte Änderung kann nicht durchgeführt werden, da sie mit den "
+"bereist existierenden Einträgen inkompatibel ist."
+
 msgid "Submit an event"
 msgstr "Veranstaltung melden"
 
@@ -2235,9 +2279,6 @@ msgstr "Bestätigen Sie Ihre Reservation"
 
 msgid "Reserve"
 msgstr "Reservieren"
-
-msgid "Confirm"
-msgstr "Bestätigen"
 
 msgid "Thank you for your reservation!"
 msgstr "Vielen Dank für Ihre Reservation!"
