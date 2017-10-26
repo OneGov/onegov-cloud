@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes order not being preserved in the select component.
+  [href]
+
 0.24.0 (2017-10-26)
 ~~~~~~~~~~~~~~~~~~~
 

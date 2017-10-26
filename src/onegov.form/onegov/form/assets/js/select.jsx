@@ -15,7 +15,17 @@ var FormcodeSelect = React.createClass({
         };
     },
     getSelectionAsText: function(selected) {
-        return Object.getOwnPropertyNames(selected || this.state.selected).join('\n');
+        var fields = Object.getOwnPropertyNames(selected || this.state.selected);
+
+        var order = this.state.fields.map(function(field) {
+            return field.human_id;
+        });
+
+        fields.sort(function(a, b) {
+            return order.indexOf(a) - order.indexOf(b);
+        });
+
+        return fields.join('\n');
     },
     getTarget: function() {
         var target = this.props.target;
