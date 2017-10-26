@@ -30,12 +30,10 @@ class ExtendedDirectoryEntry(DirectoryEntry, CoordinatesExtension,
 
         if contact_config:
             values = (self.values.get(name) for name in contact_config)
+            value = '\n'.join(linkify(v) for v in values if v)
 
-            return '<ul>{}</ul>'.format(
-                ''.join(
-                    '<li>{}</li>'.format(linkify(value))
-                    for value in values if value
-                )
+            return '<ul><li>{}</li></ul>'.format(
+                '</li><li>'.join(linkify(value).splitlines())
             )
 
     @property

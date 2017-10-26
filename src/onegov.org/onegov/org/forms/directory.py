@@ -39,7 +39,7 @@ class DirectoryForm(Form):
         render_kw={'class_': 'formcode-select'})
 
     contact_fields = TextAreaField(
-        label=_("Display in Sidebar"),
+        label=_("Display as address"),
         render_kw={
             'class_': 'formcode-select',
             'data-fields-exclude': 'fileinput,radio,checkbox'

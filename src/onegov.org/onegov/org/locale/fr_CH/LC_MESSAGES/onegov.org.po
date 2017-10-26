@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-10-26 15:51+0200\n"
+"POT-Creation-Date: 2017-10-26 16:30+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -540,7 +540,7 @@ msgstr ""
 msgid "Display in the main view"
 msgstr ""
 
-msgid "Display in Sidebar"
+msgid "Display as address"
 msgstr ""
 
 msgid "Use for filtering"
