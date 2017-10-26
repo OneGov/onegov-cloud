@@ -72,3 +72,4 @@ def get_formcode_asset():
     yield 'togglebutton.jsx'
     yield 'snippets.jsx'
     yield 'format.jsx'
+    yield 'select.jsx'

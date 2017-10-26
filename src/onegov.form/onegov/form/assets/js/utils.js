@@ -20,7 +20,6 @@ var FormcodeUtils = function() {
             fn(value, extra);
             return;
         }
-
     };
 
     self.request = function(method, url, success, body) {

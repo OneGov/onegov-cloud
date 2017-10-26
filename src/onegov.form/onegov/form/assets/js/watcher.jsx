@@ -96,7 +96,7 @@ var WatchedFields = React.createClass({
             });
         }
 
-        this.props.update(filtered);
+        this.props.handler(filtered);
     },
     render: function() {
         return (this.props.children);

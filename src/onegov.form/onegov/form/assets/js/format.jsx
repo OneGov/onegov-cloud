@@ -1,4 +1,4 @@
-var FormCodeFormat = React.createClass({
+var FormcodeFormat = React.createClass({
     getInitialState: function() {
         return {fields: []};
     },
@@ -9,14 +9,14 @@ var FormCodeFormat = React.createClass({
         return (
             <WatchedFields
                 exclude={['fileinput', 'radio', 'checkbox']}
-                update={this.onUpdateFields}
                 watcher={this.props.watcher}
+                handler={this.onUpdateFields}
             >
                 <div className="formcode-toolbar">
                     {
                         this.state.fields.length > 0 &&
                         <ToggleButton icon="fa-plus-circle">
-                            <FormCodeFormatFields
+                            <FormcodeFormatFields
                                 fields={this.state.fields}
                                 target={this.props.target}
                             />
@@ -28,7 +28,7 @@ var FormCodeFormat = React.createClass({
     }
 });
 
-var FormCodeFormatFields = React.createClass({
+var FormcodeFormatFields = React.createClass({
     render: function() {
         var self = this;
         return (
@@ -36,7 +36,7 @@ var FormCodeFormatFields = React.createClass({
                 {
                     self.props.fields.map(function(field, ix) {
                         return (
-                            <FormCodeFormatField
+                            <FormcodeFormatField
                                 key={ix}
                                 field={field}
                                 target={self.props.target}
@@ -49,7 +49,7 @@ var FormCodeFormatFields = React.createClass({
     }
 });
 
-var FormCodeFormatField = React.createClass({
+var FormcodeFormatField = React.createClass({
     handleClick: function() {
         var format = '[' + this.props.field.human_id + ']';
         formcodeUtils.updateTarget(this.props.target, format, null, ' ');
@@ -77,12 +77,7 @@ var initFormcodeFormat = function(container, watcher, target) {
 
     var el = container.appendChild(document.createElement('div'));
     ReactDOM.render(
-        <FormCodeFormat watcher={watcher} target={target} />,
+        <FormcodeFormat watcher={watcher} target={target} />,
         el
     );
 };
-
-// automatically hooks up all formcode snippet elements
-document.addEventListener("DOMContentLoaded", function() {
-    document.querySelectorAll('.formcode-format').forEach(initFormcodeFormat);
-});

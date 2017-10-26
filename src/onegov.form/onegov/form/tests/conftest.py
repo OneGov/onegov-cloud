@@ -89,6 +89,22 @@ def form_app(request):
             </html>
         """.format(react, react_dom, fontawesome)
 
+    @TestApp.path(path='/formcode-select')
+    class FormcodeSelect(Content):
+        html = """
+            <!doctype html>
+            <html>
+                <head>
+                    <script type="text/javascript" src="{}"></script>
+                    <script type="text/javascript" src="{}"></script>
+                </head>
+                <body>
+                    <div id="container"></div>
+                    <textarea></textarea>
+                </body>
+            </html>
+        """.format(react, react_dom)
+
     @TestApp.html(model=Content)
     def view_content(self, request):
         request.include('formcode')

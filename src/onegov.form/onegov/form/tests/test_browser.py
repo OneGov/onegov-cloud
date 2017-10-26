@@ -1,5 +1,9 @@
 def test_snippets(browser):
     browser.visit('/snippets')
+    browser.wait_for_js_variable('initFormSnippets')
+    browser.execute_script("""
+        initFormSnippets(document.querySelector('.formcode-snippets'));
+    """)
 
     assert browser.is_element_present_by_css('.formcode-snippets')
     assert len(browser.find_by_css('.formcode-toolbar')) == 1
@@ -59,3 +63,48 @@ def test_formcode_format(browser):
     browser.find_by_css('.formcode-snippet').click()
 
     assert browser.find_by_css('textarea').value == '[Textfield]'
+
+
+def test_formcode_select_empty(browser):
+    browser.visit('/formcode-select')
+    browser.wait_for_js_variable('initFormcodeSelect')
+    browser.driver.execute_script("""
+        var watcher = formcodeWatcherRegistry.new();
+        var el = document.querySelector('#container');
+
+        initFormcodeSelect(el, watcher, 'textarea', ['text', 'textarea']);
+        watcher.update(arguments[0]);
+    """, 'A = ___\nB = ...\nC = *.png')
+
+    assert len(browser.find_by_css('.formcode-select input')) == 2
+    browser.find_by_css('.formcode-select input')[0].click()
+    browser.find_by_css('.formcode-select input')[1].click()
+
+    assert browser.find_by_css('textarea').value == "A\nB"
+
+    browser.find_by_css('.formcode-select input')[1].click()
+    assert browser.find_by_css('textarea').value == "A"
+
+    browser.find_by_css('.formcode-select input')[1].click()
+    assert browser.find_by_css('textarea').value == "A\nB"
+
+    browser.find_by_css('.formcode-select input')[0].click()
+    assert browser.find_by_css('textarea').value == "B"
+
+    browser.find_by_css('.formcode-select input')[1].click()
+    assert browser.find_by_css('textarea').value == ""
+
+
+def test_formcode_select_prefilled(browser):
+    browser.visit('/formcode-select')
+    browser.wait_for_js_variable('initFormcodeSelect')
+    browser.driver.execute_script("""
+        var watcher = formcodeWatcherRegistry.new();
+        var el = document.querySelector('#container');
+        document.querySelector('textarea').value='A'
+
+        initFormcodeSelect(el, watcher, 'textarea', ['text', 'textarea']);
+        watcher.update(arguments[0]);
+    """, 'A = ___\nB = ...\nC = *.png')
+
+    assert len(browser.find_by_css('.formcode-select input:checked')) == 1

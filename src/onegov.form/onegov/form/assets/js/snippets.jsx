@@ -99,8 +99,3 @@ var initFormSnippets = function(container) {
         );
     });
 };
-
-// automatically hooks up all formcode snippet elements
-document.addEventListener("DOMContentLoaded", function() {
-    document.querySelectorAll('.formcode-snippets').forEach(initFormSnippets);
-});
