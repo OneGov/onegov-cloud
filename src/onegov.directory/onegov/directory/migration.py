@@ -96,12 +96,12 @@ class DirectoryMigration(object):
                 self.directory.configuration.rename_field(old_human, new_human)
 
             for changed in self.changes.changed_fields:
-                changed = as_internal_id(changed)
                 convert = self.fieldtype_migrations.get_converter(
                     self.changes.old[changed].type,
                     self.changes.new[changed].type
                 )
 
+                changed = as_internal_id(changed)
                 entry.values[changed] = convert(entry.values[changed])
 
             self.directory.update(entry, entry.values)
