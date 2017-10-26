@@ -25,7 +25,7 @@ class ExtendedDirectoryEntry(DirectoryEntry, CoordinatesExtension,
     def contact(self):
         contact_config = tuple(
             as_internal_id(name) for name in
-            self.display_config.get('contact')
+            self.display_config.get('contact', tuple())
         )
 
         if contact_config:
@@ -41,7 +41,8 @@ class ExtendedDirectoryEntry(DirectoryEntry, CoordinatesExtension,
     @property
     def content_fields(self):
         content_config = {
-            as_internal_id(k) for k in self.display_config.get('content')
+            as_internal_id(k)
+            for k in self.display_config.get('content', tuple())
         }
 
         if content_config:
