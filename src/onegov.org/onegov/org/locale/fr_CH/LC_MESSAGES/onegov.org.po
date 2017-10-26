@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-10-26 16:39+0200\n"
+"POT-Creation-Date: 2017-10-26 16:44+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1192,7 +1192,13 @@ msgstr ""
 
 msgid ""
 "Your edit requires a migration of existing entries. Please confirm the "
-"following changes:"
+"following changes."
+msgstr ""
+
+msgid ""
+"Changes are detected using a heuristic. Therefore it is possible that your "
+"changes were misdetected. If in doubt, press cancel and try to change the "
+"directory in small increments."
 msgstr ""
 
 msgid "Added:"

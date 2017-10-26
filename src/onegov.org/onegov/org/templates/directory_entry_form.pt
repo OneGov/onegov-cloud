@@ -5,9 +5,15 @@
     <tal:b metal:fill-slot="content" define="confirm_migration migration and migration.possible">
         <tal:b condition="confirm_migration">
             <div class="panel callout">
-                <p i18n:translate i18n:translate>
-                Your edit requires a migration of existing entries. Please
-                confirm the following changes:
+                <p i18n:translate>
+                    Your edit requires a migration of existing entries. Please
+                    confirm the following changes.
+                </p>
+
+                <p i18n:translate>
+                    Changes are detected using a heuristic. Therefore it is possible
+                    that your changes were misdetected. If in doubt, press cancel and
+                    try to change the directory in small increments.
                 </p>
             </div>
 
