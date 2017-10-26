@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Allows to manage categories.
+- Allows to manage categories and organizations.
   [msom]
 
 1.9.0 (2017-10-24)

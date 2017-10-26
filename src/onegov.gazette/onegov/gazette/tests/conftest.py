@@ -2,6 +2,7 @@ from onegov_testing.utils import create_app
 from onegov.core.crypto import hash_password
 from onegov.gazette import GazetteApp
 from onegov.gazette.collections import CategoryCollection
+from onegov.gazette.collections import OrganizationCollection
 from onegov.gazette.models import Principal
 from onegov.user import User
 from onegov.user import UserGroup
@@ -46,6 +47,32 @@ PRINCIPAL = """
         2018:
             1: 2018-01-05 / 2018-01-03T12:00:00
 """
+
+
+def create_organizations(session):
+    organizations = OrganizationCollection(session)
+    organizations.add_root(
+        name='100', order=1, title='State Chancellery', active=True
+    )
+    organizations.add_root(
+        name='200', order=2, title='Civic Community', active=True
+    )
+    organizations.add_root(
+        name='300', order=3, title='Municipality', active=True
+    )
+    organizations.add_root(
+        name='400', order=4, title='Evangelical Reformed Parish', active=True
+    )
+    organizations.add_root(
+        name='510', order=5, title='Sikh Community', active=False
+    )
+    organizations.add_root(
+        name='500', order=6, title='Catholic Parish', active=True
+    )
+    organizations.add_root(
+        name='600', order=7, title='Corporation', active=True
+    )
+    return organizations.query().all()
 
 
 def create_categories(session):
@@ -99,6 +126,7 @@ def create_gazette(request):
         role='member'
     ))
 
+    create_organizations(session)
     create_categories(session)
     commit()
     return app
@@ -125,13 +153,19 @@ def gazette_password():
 
 
 @fixture(scope="function")
+def organizations(session):
+    """ Adds some default organizations to the database. """
+    yield create_organizations(session)
+
+
+@fixture(scope="function")
 def categories(session):
     """ Adds some default categories to the database. """
     yield create_categories(session)
 
 
 @fixture(scope="function")
-def principal(categories):
+def principal(organizations, categories):
     yield Principal.from_yaml(dedent(PRINCIPAL))
 
 

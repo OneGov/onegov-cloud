@@ -75,6 +75,7 @@ def test_layout_menu():
     assert layout.menu == [
         ('Users', '/UserCollection/', False),
         ('Groups', '/UserGroupCollection/', False),
+        ('Organizations', '/OrganizationCollection/', False),
         ('Categories', '/CategoryCollection/', False),
         ('Official Notices', '/GazetteNoticeCollection/', False),
         ('Statistics', '/GazetteNoticeCollection/statistics/', False)

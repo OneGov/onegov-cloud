@@ -2,6 +2,7 @@ from datetime import date
 from datetime import datetime
 from onegov.gazette.collections import GazetteNoticeCollection
 from onegov.gazette.collections import CategoryCollection
+from onegov.gazette.collections import OrganizationCollection
 from onegov.gazette.models import Principal
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
@@ -20,6 +21,28 @@ class DummyRequest(object):
 
 def test_category_collection(session):
     collection = CategoryCollection(session)
+
+    collection.add_root(title='First', active=True)
+    collection.add_root(title='Second', active=False)
+    collection.add_root(title='Third')
+    collection.add_root(title='Fourth', active=True)
+
+    categories = collection.query().all()
+    assert categories[0].title == 'First'
+    assert categories[0].name == '1'
+
+    assert categories[1].title == 'Fourth'
+    assert categories[1].name == '4'
+
+    assert categories[2].title == 'Second'
+    assert categories[2].name == '2'
+
+    assert categories[3].title == 'Third'
+    assert categories[3].name == '3'
+
+
+def test_organization_collection(session):
+    collection = OrganizationCollection(session)
 
     collection.add_root(title='First', active=True)
     collection.add_root(title='Second', active=False)
@@ -129,7 +152,11 @@ def test_notice_collection_count_by_organization(session):
     collection = GazetteNoticeCollection(session)
     assert collection.count_by_organization() == []
 
-    principal = Principal(organizations=[{'1': 'A'}, {'2': 'B'}, {'3': 'C'}])
+    organizations = OrganizationCollection(session)
+    organizations.add_root(name='1', title='A')
+    organizations.add_root(name='2', title='B')
+    organizations.add_root(name='3', title='C')
+    principal = Principal()
     for organization, count in (('1', 2), ('2', 4), ('3', 10)):
         for x in range(count):
             collection.add(
@@ -141,8 +168,6 @@ def test_notice_collection_count_by_organization(session):
                 user=None,
                 principal=principal
             )
-    # for x in collection.query(): x.organization, x.issues
-
     assert collection.count_by_organization() == [
         ('A', 1), ('B', 6), ('C', 45),
     ]

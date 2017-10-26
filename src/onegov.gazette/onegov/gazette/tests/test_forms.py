@@ -1,8 +1,10 @@
 from datetime import datetime
 from freezegun import freeze_time
 from onegov.gazette.collections import CategoryCollection
+from onegov.gazette.collections import OrganizationCollection
 from onegov.gazette.forms import CategoryForm
 from onegov.gazette.forms import NoticeForm
+from onegov.gazette.forms import OrganizationForm
 from onegov.gazette.forms import UserForm
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import Issue
@@ -75,6 +77,81 @@ def test_category_form(session):
     form.request = DummyRequest(session)
     assert form.validate()
 
+
+def test_organization_form(session):
+    # Test apply / update
+    organizations = OrganizationCollection(session)
+    parent = organizations.add_root(title='parent', active=True)
+    child = organizations.add(parent=parent, title='child', active=True)
+    other = organizations.add_root(title='other', active=True)
+
+    form = OrganizationForm()
+    form.request = DummyRequest(session)
+    form.on_request()
+    assert form.parent.choices == [
+        ('', '- none -'),
+        ('1', 'parent'),
+        ('3', 'other')
+    ]
+
+    form.apply_model(parent)
+    assert form.title.data == 'parent'
+    assert form.active.data == True
+    assert form.parent.data == ''
+
+    form.apply_model(child)
+    assert form.title.data == 'child'
+    assert form.active.data == True
+    assert form.parent.data == '1'
+
+    form.apply_model(other)
+    assert form.title.data == 'other'
+    assert form.active.data == True
+    assert form.parent.data == ''
+
+    form.title.data = 'DEF'
+    form.active.data = False
+    form.parent.data = '1'
+
+    form.update_model(other)
+    session.flush()
+    session.expire(other)
+    assert other.title == 'DEF'
+    assert other.active == False
+    assert other.parent == parent
+    assert other.siblings.filter_by(id='3')
+
+    # Test validation
+    form = OrganizationForm()
+    form.request = DummyRequest(session)
+    assert not form.validate()
+
+    form = OrganizationForm(
+        DummyPostData({
+            'title': 'title',
+            'parent': ''
+        })
+    )
+    form.request = DummyRequest(session)
+    assert form.validate()
+
+
+def test_user_form_on_request(session):
+    form = UserForm()
+    form.request = DummyRequest(session)
+
+    form.on_request()
+    assert form.group.choices == [('', '- none -')]
+
+    groups = UserGroupCollection(session)
+    groups.add(name='Group A')
+    groups.add(name='Group B')
+    groups.add(name='Group C')
+
+    form.on_request()
+    assert sorted([choice[1] for choice in form.group.choices]) == [
+        '- none -', 'Group A', 'Group B', 'Group C'
+    ]
 
 def test_user_form(session):
     # Test apply / update

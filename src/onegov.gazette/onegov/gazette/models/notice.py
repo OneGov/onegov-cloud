@@ -5,6 +5,7 @@ from onegov.chat import Message
 from onegov.core.orm.mixins import meta_property
 from onegov.gazette import _
 from onegov.gazette.models.category import Category
+from onegov.gazette.models.organization import Organization
 from onegov.gazette.models.principal import Issue
 from onegov.notice import OfficialNotice
 from onegov.user import User
@@ -261,7 +262,9 @@ class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
         values.
 
         """
-        self.organization = principal.organizations.get(self.organization_id)
+        query = session.query(Organization.title)
+        query = query.filter(Organization.name == self.organization_id).first()
+        self.organization = query[0] if query else None
 
         query = session.query(Category.title)
         query = query.filter(Category.name == self.category_id).first()

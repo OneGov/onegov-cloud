@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-24 16:58+0200\n"
-"PO-Revision-Date: 2017-10-24 14:32+0200\n"
+"POT-Creation-Date: 2017-10-26 12:21+0200\n"
+"PO-Revision-Date: 2017-10-26 12:24+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -41,6 +41,9 @@ msgstr "Benutzer"
 
 msgid "Groups"
 msgstr "Gruppen"
+
+msgid "Organizations"
+msgstr "Organisationen"
 
 msgid "Categories"
 msgstr "Rubriken"
@@ -105,6 +108,12 @@ msgstr "Text"
 msgid "Select one"
 msgstr "Bitte auswählen"
 
+msgid "Parent Organization"
+msgstr "Übergeordnete Organisation"
+
+msgid "- none -"
+msgstr "- keine -"
+
 msgid "Role"
 msgstr "Rolle"
 
@@ -113,9 +122,6 @@ msgstr "Herausgeber"
 
 msgid "Editor"
 msgstr "Redaktor"
-
-msgid "- none -"
-msgstr "- keine -"
 
 msgid "New"
 msgstr "Neu"
@@ -270,6 +276,9 @@ msgstr "Datum"
 
 msgid "Filter by date"
 msgstr "Nach Datum filtern"
+
+msgid "No organizations."
+msgstr "Keine Organisationen."
 
 msgid "Close"
 msgstr "Schliessen"
@@ -503,11 +512,31 @@ msgstr "Meldungen aktualisieren"
 msgid "Update"
 msgstr "Aktualisieren"
 
-msgid "Organizations"
-msgstr "Organisationen"
-
 msgid "Notices updated."
 msgstr "Meldungen aktualisiert."
+
+msgid "New Organization"
+msgstr "Neue Organisation"
+
+msgid "Edit Organization"
+msgstr "Organisation bearbeiten"
+
+msgid "Delete Organization"
+msgstr "Organisation löschen"
+
+msgid "Organization added."
+msgstr "Organisation hinzugefügt."
+
+msgid "Organization modified."
+msgstr "Organisation geändert."
+
+msgid "Only unused organizations with no sub-organisations may be deleted."
+msgstr ""
+"Nur unbenutzte Organisationen ohne Unterorganisationen können gelöscht "
+"werden."
+
+msgid "Organization deleted."
+msgstr "Organisation gelöscht."
 
 msgid "You have rejected messages."
 msgstr "Sie haben zurückgewiesene Meldungen."

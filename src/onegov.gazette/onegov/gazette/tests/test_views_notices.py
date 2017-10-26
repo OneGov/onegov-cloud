@@ -1,9 +1,11 @@
 from freezegun import freeze_time
+from onegov.gazette.models import GazetteNotice
 from onegov.gazette.tests import login_admin
 from onegov.gazette.tests import login_editor_1
 from onegov.gazette.tests import login_editor_2
 from onegov.gazette.tests import login_editor_3
 from onegov.gazette.tests import login_publisher
+from transaction import commit
 from unittest.mock import patch
 from urllib.parse import parse_qs
 from urllib.parse import urlparse
@@ -562,6 +564,7 @@ def test_view_notices_update(gazette_app):
         client = Client(gazette_app)
         login_publisher(client)
 
+        # Add a notice
         manage = client.get('/notices/drafted/new-notice')
         manage.form['title'] = "Erneuerungswahlen"
         manage.form['organization'] = '100'
@@ -572,18 +575,41 @@ def test_view_notices_update(gazette_app):
         client.get('/notice/erneuerungswahlen/submit').form.submit()
         client.get('/notice/erneuerungswahlen/accept').form.submit()
 
-        principal = gazette_app.principal
-        principal.organizations['100'] = "Federal Chancellery"
-        gazette_app.cache.set('principal', principal)
+        manage = client.get('/notice/erneuerungswahlen')
+        assert 'State Chancellery' in manage
+        assert 'Education' in manage
 
+        # Change the category and organization of the notice
+        # (don't change the category or organization because of the observers!)
+        session = gazette_app.session()
+        notice = session.query(GazetteNotice).one()
+        notice.category = 'Edurcatio'
+        notice.organization = 'Sate Chancelery'
+        commit()
+
+        manage = client.get('/notice/erneuerungswahlen')
+        assert 'Education' not in manage
+        assert 'Edurcatio' in manage
+        assert 'State Chancellery' not in manage
+        assert 'Sate Chancelery' in manage
+
+        # Update all notices
         manage = client.get('/notices/submitted/update')
         manage = manage.form.submit().maybe_follow()
         assert "Meldungen aktualisiert." in manage
-        assert "State Chancellery" in client.get('/notice/erneuerungswahlen')
+
+        manage = client.get('/notice/erneuerungswahlen')
+        assert 'Education' not in manage
+        assert 'Edurcatio' in manage
+        assert 'State Chancellery' not in manage
+        assert 'Sate Chancelery' in manage
 
         manage = client.get('/notices/accepted/update')
         manage = manage.form.submit().maybe_follow()
         assert "Meldungen aktualisiert." in manage
+
         manage = client.get('/notice/erneuerungswahlen')
-        assert "State Chancellery" not in manage
-        assert "Federal Chancellery" in manage
+        assert 'Education' in manage
+        assert 'Edurcatio' not in manage
+        assert 'State Chancellery' in manage
+        assert 'Sate Chancelery' not in manage

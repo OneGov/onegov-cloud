@@ -2,6 +2,7 @@ from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.mixins import TimestampMixin
 from sqlalchemy import Boolean
 from sqlalchemy import Column
+from sqlalchemy import or_
 from sqlalchemy_utils import observes
 from sqlalchemy.orm import object_session
 
@@ -10,7 +11,8 @@ class Category(AdjacencyList, TimestampMixin):
 
     """ Defines a category for official notices.
 
-    The name is used as key, the title as value.
+    Although the categories are defined as an adjacency list, we currently
+    use it only as a simple alphabetically ordered key-value list (name-title).
 
     """
 
@@ -21,6 +23,7 @@ class Category(AdjacencyList, TimestampMixin):
 
     def in_use(self, session):
         """ True, if the category is used by any notice. """
+
         from onegov.gazette.models.notice import GazetteNotice  # circular
 
         query = session.query(GazetteNotice._categories)
@@ -34,12 +37,20 @@ class Category(AdjacencyList, TimestampMixin):
 
     @observes('title')
     def title_observer(self, title):
+        """ Changes the category title of the notices when updating the title
+        of the category.
+
+        """
+
         from onegov.gazette.models.notice import GazetteNotice  # circular
 
         query = object_session(self).query(GazetteNotice)
         query = query.filter(
             GazetteNotice._categories.has_key(self.name),  # noqa
-            GazetteNotice.category != title
+            or_(
+                GazetteNotice.category.is_(None),
+                GazetteNotice.category != title
+            )
         )
         for notice in query:
             notice.category = title

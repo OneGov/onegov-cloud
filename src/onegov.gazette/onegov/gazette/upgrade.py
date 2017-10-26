@@ -4,6 +4,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from onegov.core.upgrade import upgrade_task
 from onegov.gazette.collections.categories import CategoryCollection
+from onegov.gazette.collections.organizations import OrganizationCollection
 from onegov.gazette.models.notice import GazetteNotice
 
 
@@ -28,6 +29,35 @@ def migrate_categories(context):
     collection = CategoryCollection(session)
     for name, title in categories.items():
         collection.add_root(name=name, title=title, active=True)
+
+
+@upgrade_task('Migrate gazette organizations', always_run=True)
+def migrate_organizations(context):
+    principal = getattr(context.app, 'principal', None)
+    if not principal:
+        return False
+
+    organizations = getattr(principal, '_organizations', None)
+    if not organizations:
+        return False
+
+    if not context.has_table('gazette_organizations'):
+        return False
+
+    session = context.app.session_manager.session()
+    session.execute("delete from gazette_organizations")  # todo: remove me!!!!
+    count = session.execute("select count(*) from gazette_organizations")
+    if count.scalar() != 0:
+        return False
+
+    collection = OrganizationCollection(session)
+    for index, name in enumerate(organizations):
+        collection.add_root(
+            name=name,
+            title=organizations[name],
+            active=True,
+            order=index
+        )
 
 
 @upgrade_task(

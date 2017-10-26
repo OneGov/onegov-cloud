@@ -5,6 +5,7 @@ from onegov.gazette.models import Category
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import Issue
 from onegov.gazette.models import IssueDates
+from onegov.gazette.models import Organization
 from onegov.gazette.models import Principal
 from onegov.gazette.models.notice import GazetteNoticeChange
 from onegov.user import UserCollection
@@ -18,16 +19,75 @@ def test_category(session):
     session.add(
         Category(
             name='100',
-            title='Abstimmungen',
+            title='Election',
             active=True
         )
     )
     session.flush()
-
     category = session.query(Category).one()
+
     assert category.name == '100'
-    assert category.title == 'Abstimmungen'
+    assert category.title == 'Election'
     assert category.active == True
+    assert category.in_use(session) == False
+
+    # Test in use
+    session.add(GazetteNotice(title='notice', category_id=category.name))
+    session.flush()
+
+    assert category.in_use(session) == True
+
+    # Test title observer
+    category.title = 'Vote'
+    session.flush()
+
+    assert session.query(GazetteNotice).one().category == 'Vote'
+
+
+def test_organization(session):
+    session.add(
+        Organization(
+            name='100',
+            title='State Chancellery',
+            active=True
+        )
+    )
+    session.flush()
+    parent = session.query(Organization).one()
+
+    assert parent.name == '100'
+    assert parent.title == 'State Chancellery'
+    assert parent.active == True
+    assert parent.in_use(session) == False
+
+    # Test in use
+    session.add(
+        Organization(
+            parent=parent,
+            name='101',
+            title='Administration',
+            active=True
+        )
+    )
+    session.flush()
+    child = session.query(Organization).filter_by(name='101').one()
+
+    assert parent.in_use(session) == True
+    assert child.in_use(session) == False
+
+    session.add(
+        GazetteNotice(title='notice', organization_id='101')
+    )
+    session.flush()
+
+    assert parent.in_use(session) == True
+    assert child.in_use(session) == True
+
+    # Test title observer
+    child.title = 'Administrations'
+    session.flush()
+
+    assert session.query(GazetteNotice).one().organization == 'Administrations'
 
 
 def test_issue():
@@ -59,7 +119,7 @@ def test_principal():
     assert principal.logo == 'logo.svg'
     assert principal.publish_to == 'printer@govikon.org'
     assert principal.publish_from == ''
-    assert dict(principal.organizations) == {}
+    assert dict(principal._organizations) == {}
     assert dict(principal._categories) == {}
     assert dict(principal.issues) == {}
     assert dict(principal.issues_by_date) == {}
@@ -97,10 +157,10 @@ def test_principal():
     assert principal.publish_to == 'printer@govikon.org'
     assert principal.publish_from == 'publisher@govikon.org'
     assert principal.help_link == 'https://help.me'
-    assert dict(principal.organizations) == {
+    assert dict(principal._organizations) == {
         '1': 'Organization 1', '2': 'Örgänizätiön 2'
     }
-    assert list(principal.organizations.keys()) == ['1', '2']
+    assert list(principal._organizations.keys()) == ['1', '2']
     assert dict(principal._categories) == {
         'C': 'Category C', 'B': 'Category B', 'A': 'Category A'
     }

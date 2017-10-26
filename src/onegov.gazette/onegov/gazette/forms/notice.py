@@ -6,6 +6,7 @@ from onegov.gazette.fields import MultiCheckboxField
 from onegov.gazette.fields import SelectField
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import Category
+from onegov.gazette.models import Organization
 from onegov.quill import QuillField
 from wtforms import BooleanField
 from wtforms import StringField
@@ -63,7 +64,10 @@ class NoticeForm(Form):
         session = self.request.app.session()
 
         # populate organization
-        self.organization.choices = list(principal.organizations.items())
+        query = session.query(Organization.name, Organization.title)
+        query = query.filter(Organization.active == True)
+        query = query.order_by(Organization.order)
+        self.organization.choices = list(query.all())
         self.organization.choices.insert(
             0, ('', self.request.translate(_("Select one")))
         )

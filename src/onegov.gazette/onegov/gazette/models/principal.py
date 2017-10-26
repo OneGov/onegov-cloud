@@ -66,12 +66,10 @@ class Principal(object):
         self.time_zone = time_zone
         self.help_link = help_link
 
-        # We want the organizations and categories in the order defined in the
-        # YAML file and accessible by key
-        self.organizations = OrderedDict(
+        # todo: remove these in a future version, once it is migrated
+        self._organizations = OrderedDict(
             [next(enumerate(org.items()))[1] for org in (organizations or {})]
         )
-        # todo: remove this in a future version, once it is migrated
         self._categories = OrderedDict(
             [next(enumerate(org.items()))[1] for org in (categories or {})]
         )
