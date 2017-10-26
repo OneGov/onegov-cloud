@@ -1,5 +1,10 @@
 Changelog
 ---------
+
+- Uses the HSTORES for category and organization ID from the latest
+  onegov.notice.
+  [msom]
+
 1.9.1 (2017-10-26)
 ~~~~~~~~~~~~~~~~~~~
 
