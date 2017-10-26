@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.9.1 (2017-10-26)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes redirects for various views.
   [msom]
