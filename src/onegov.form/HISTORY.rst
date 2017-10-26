@@ -1,5 +1,10 @@
 Changelog
 ---------
+0.24.0 (2017-10-26)
+~~~~~~~~~~~~~~~~~~~
+
+- Adds various javascript tools to work with formcode.
+  [href]
 
 - Adds basic formcode parsing through a REST interface.
   [href]
