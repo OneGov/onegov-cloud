@@ -6,7 +6,7 @@
 
         <div class="row">
             <div class="columns medium-8">
-                <p tal:condition="not:entries" i18n:translate="">This directory is empty.</p>
+                <p tal:condition="not:entries" i18n:translate="">No entries found.</p>
 
                 <ul class="with-lead" tal:condition="entries">
                     <li tal:repeat="entry entries">

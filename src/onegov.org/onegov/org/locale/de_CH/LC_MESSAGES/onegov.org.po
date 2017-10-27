@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-10-26 16:44+0200\n"
+"POT-Creation-Date: 2017-10-26 16:55+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1186,8 +1186,8 @@ msgstr ""
 msgid "No directories defined yet."
 msgstr "Noch keine Verzeichnisse definiert."
 
-msgid "This directory is empty."
-msgstr "Dieses Verzeichnis ist leer."
+msgid "No entries found."
+msgstr "Keine Einträge gefunden."
 
 msgid ""
 "Your edit requires a migration of existing entries. Please confirm the "
@@ -2478,3 +2478,6 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "This directory is empty."
+#~ msgstr "Dieses Verzeichnis ist leer."
