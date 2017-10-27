@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a gejson map type.
+  [href]
+
 0.4.4 (2017-10-17)
 ~~~~~~~~~~~~~~~~~~~
 
