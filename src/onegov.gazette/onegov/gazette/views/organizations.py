@@ -46,10 +46,11 @@ def create_organization(self, request, form):
     layout = Layout(self, request)
 
     if form.submitted(request):
-        self.add_root(
+        organization = self.add_root(
             title=form.title.data,
-            active=form.active.data
+            active=form.active.data,
         )
+        organization.parent_id = form.parent.data or None
         request.message(_("Organization added."), 'success')
         return redirect(layout.manage_organizations_link)
 
