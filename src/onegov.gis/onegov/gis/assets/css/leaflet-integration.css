@@ -260,3 +260,20 @@ button.open-active {
     z-index: 100;
     box-shadow: 0 2px 0 0 red;
 }
+
+/*
+    Leaflet popups
+*/
+
+.leaflet-popup > div {
+    border-radius: 5px;
+}
+
+.leaflet-popup-content {
+    font-size: .8rem;
+    margin: 7px 14px !important;
+}
+
+.leaflet-popup-content .popup-title {
+    font-weight: bold;
+}

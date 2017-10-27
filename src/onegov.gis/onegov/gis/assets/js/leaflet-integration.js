@@ -352,6 +352,48 @@ var MapboxMarkerMap = function(target) {
     }
 };
 
+var MapboxGeojsonMap = function(target) {
+    // a map that displays a large number of map markers
+
+    var lat = target.data('lat');
+    var lon = target.data('lon');
+    var zoom = target.data('zoom');
+    var includeZoomControls = true;
+    var map = spawnDefaultMap(target, lat, lon, zoom, includeZoomControls);
+
+    var pointToLayer = function(_feature, latlng) {
+        var icon = L.VectorMarkers.icon({
+            prefix: 'fa',
+            icon: 'fa-circle',
+            markerColor: $('body').data('default-marker-color') || '#006fba'
+        });
+
+        return L.marker({'lat': latlng.lat, 'lng': latlng.lng}, {
+            icon: icon
+        });
+    };
+
+    var onEachFeature = function(feature, layer) {
+        if (feature.properties) {
+            layer.bindPopup(
+                '<a class="popup-title" href="' + feature.properties.link + '">' +
+                feature.properties.title +
+                '</a>' +
+                '<div class="popup-lead">' + feature.properties.lead + '</div>'
+            );
+        }
+    };
+
+    $.getJSON(target.data('geojson'), function(features) {
+        var layer = L.geoJSON(features, {
+            pointToLayer: pointToLayer,
+            onEachFeature: onEachFeature
+        }).addTo(map);
+
+        map.fitBounds(layer.getBounds().pad(0.5), {maxZoom: zoom});
+    });
+};
+
 jQuery.fn.mapboxInput = function() {
     return this.each(function() {
         MapboxInput($(this));
@@ -364,7 +406,14 @@ jQuery.fn.mapboxMarkerMap = function() {
     });
 };
 
+jQuery.fn.mapboxGeojsonMap = function() {
+    return this.each(function() {
+        MapboxGeojsonMap($(this));
+    });
+};
+
 $(document).ready(function() {
     $('input.coordinates').mapboxInput();
     $('.marker-map').mapboxMarkerMap();
+    $('.geojson-map').mapboxGeojsonMap();
 });
