@@ -5,6 +5,19 @@
     <tal:block metal:fill-slot="content">
 
         <div class="row">
+            <div class="columns medium-12">
+                <div class="geojson-map"
+                    data-geojson="${geojson}"
+                    data-lat="${layout.default_map_view.lat}"
+                    data-lon="${layout.default_map_view.lon}"
+                    data-zoom="${layout.default_map_view.zoom}"
+                    data-map-height="350px"
+                    style="margin-bottom: 1rem; height: 350px;"
+                ></div>
+            </div>
+        </div>
+
+        <div class="row">
             <div class="columns medium-8">
                 <p tal:condition="not:entries" i18n:translate="">No entries found.</p>
 

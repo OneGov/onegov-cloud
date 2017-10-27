@@ -2653,6 +2653,17 @@ button {
 }
 
 /*
+    Leaflet customisation
+*/
+.leaflet-popup-content a {
+    color: $anchor-font-color !important;
+
+    &:hover {
+        color: $anchor-font-color-hover !important;
+    }
+}
+
+/*
     Events
 */
 

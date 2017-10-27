@@ -10,6 +10,8 @@ from onegov.org.layout import DirectoryEntryCollectionLayout
 from onegov.org.layout import DirectoryEntryLayout
 from onegov.org.models import ExtendedDirectory, ExtendedDirectoryEntry
 from onegov.org.new_elements import Link
+from sqlalchemy import cast
+from sqlalchemy import JSON
 
 
 def get_directory_form_class(model, request):
@@ -158,8 +160,43 @@ def view_directory(self, request):
         'title': self.directory.title,
         'entries': self.batch,
         'directory': self.directory,
-        'filters': filters
+        'filters': filters,
+        'geojson': request.link(self, name='+geojson')
     }
+
+
+@OrgApp.json(
+    model=DirectoryEntryCollection,
+    permission=Public,
+    name='geojson')
+def view_geojson(self, request):
+    q = self.query()
+    q = q.with_entities(
+        DirectoryEntry.id,
+        DirectoryEntry.name,
+        DirectoryEntry.title,
+        DirectoryEntry.lead,
+        cast(DirectoryEntry.content, JSON)["coordinates"].label('coordinates')
+    )
+
+    url_prefix = request.class_link(DirectoryEntry, {
+        'directory_name': self.directory.name,
+        'name': ''
+    })
+
+    return tuple({
+        'type': "Feature",
+        'properties': {
+            'name': e.name,
+            'title': e.title,
+            'lead': e.lead,
+            'link': url_prefix + e.name
+        },
+        'geometry': {
+            'coordinates': [e.coordinates['lon'], e.coordinates['lat']],
+            'type': "Point"
+        }
+    } for e in q if e.coordinates)
 
 
 @OrgApp.form(
