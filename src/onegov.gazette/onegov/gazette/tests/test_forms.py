@@ -50,32 +50,41 @@ def test_category_form(session):
     # Test apply / update
     categories = CategoryCollection(session)
     category = categories.add_root(name='1', title='ABC', active=True)
+    categories.add_root(name='2', title='XYZ', active=True)
 
     form = CategoryForm()
-
     form.apply_model(category)
     assert form.title.data == 'ABC'
     assert form.active.data == True
+    assert form.name.data == '1'
+    assert form.name_old.data == '1'
 
     form.title.data = 'DEF'
     form.active.data = False
-
     form.update_model(category)
     assert category.title == 'DEF'
     assert category.active == False
+    assert category.name == '1'
+
+    form.name.data = '3'
+    form.update_model(category)
+    assert form.name.data == '3'
 
     # Test validation
     form = CategoryForm()
     form.request = DummyRequest(session)
     assert not form.validate()
 
-    form = CategoryForm(
-        DummyPostData({
-            'title': 'title',
-        })
-    )
-    form.request = DummyRequest(session)
-    assert form.validate()
+    for name, result in (('3', False), ('1', True), ('', True), ('8', True)):
+        form = CategoryForm(
+            DummyPostData({
+                'title': 'title',
+                'name_old': '1',
+                'name': name
+            })
+        )
+        form.request = DummyRequest(session)
+        assert form.validate() == result
 
 
 def test_organization_form(session):
@@ -98,21 +107,26 @@ def test_organization_form(session):
     assert form.title.data == 'parent'
     assert form.active.data == True
     assert form.parent.data == ''
+    assert form.name.data == '1'
+    assert form.name_old.data == '1'
 
     form.apply_model(child)
     assert form.title.data == 'child'
     assert form.active.data == True
     assert form.parent.data == '1'
+    assert form.name.data == '2'
+    assert form.name_old.data == '2'
 
     form.apply_model(other)
     assert form.title.data == 'other'
     assert form.active.data == True
     assert form.parent.data == ''
+    assert form.name.data == '3'
+    assert form.name_old.data == '3'
 
     form.title.data = 'DEF'
     form.active.data = False
     form.parent.data = '1'
-
     form.update_model(other)
     session.flush()
     session.expire(other)
@@ -120,20 +134,28 @@ def test_organization_form(session):
     assert other.active == False
     assert other.parent == parent
     assert other.siblings.filter_by(id='3')
+    assert other.name == '3'
+
+    form.name.data = '4'
+    form.update_model(other)
+    assert other.name == '4'
 
     # Test validation
     form = OrganizationForm()
     form.request = DummyRequest(session)
     assert not form.validate()
 
-    form = OrganizationForm(
-        DummyPostData({
-            'title': 'title',
-            'parent': ''
-        })
-    )
-    form.request = DummyRequest(session)
-    assert form.validate()
+    for name, result in (('2', False), ('1', True), ('', True), ('8', True)):
+        form = OrganizationForm(
+            DummyPostData({
+                'title': 'title',
+                'parent': '',
+                'name_old': '1',
+                'name': name
+            })
+        )
+        form.request = DummyRequest(session)
+        assert form.validate() == result
 
 
 def test_user_form(session):

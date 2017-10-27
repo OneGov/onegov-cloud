@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-27 09:31+0200\n"
-"PO-Revision-Date: 2017-10-27 09:33+0200\n"
+"POT-Creation-Date: 2017-10-27 11:55+0200\n"
+"PO-Revision-Date: 2017-10-27 11:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -60,8 +60,8 @@ msgstr "Offene Meldungen"
 msgid "My Accepted Official Notices"
 msgstr "Angenommene Meldungen"
 
-msgid "A user with this e-mail address already exists."
-msgstr "Ein Benutzer mit dieser E-Mail-Adresse existiert bereits."
+msgid "This value already exists."
+msgstr "Dieser Wert ist bereits vorhanden."
 
 msgid "drafted"
 msgstr "in Arbeit"
@@ -86,6 +86,12 @@ msgstr "Titel"
 
 msgid "Active"
 msgstr "Aktiv"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "Leave blank to set the value automatically."
+msgstr "Leer lassen, um den Wert automatisch zu setzen."
 
 msgid "Comment"
 msgstr "Bemerkung"
@@ -123,11 +129,11 @@ msgstr "Herausgeber"
 msgid "Editor"
 msgstr "Redaktor"
 
+msgid "A user with this e-mail address already exists."
+msgstr "Ein Benutzer mit dieser E-Mail-Adresse existiert bereits."
+
 msgid "New"
 msgstr "Neu"
-
-msgid "ID"
-msgstr "ID"
 
 msgid "Actions"
 msgstr "Aktionen"

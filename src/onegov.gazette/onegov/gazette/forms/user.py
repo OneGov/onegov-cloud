@@ -1,7 +1,8 @@
 from onegov.form import Form
 from onegov.gazette import _
 from onegov.gazette.fields import SelectField
-from onegov.gazette.validators import UniqueUsername
+from onegov.gazette.validators import UniqueColumnValue
+from onegov.user import User
 from onegov.user import UserGroup
 from sqlalchemy import cast
 from sqlalchemy import String
@@ -43,7 +44,11 @@ class UserForm(Form):
         validators=[
             InputRequired(),
             Email(),
-            UniqueUsername(default_field='email_old')
+            UniqueColumnValue(
+                column=User.username,
+                message=_("A user with this e-mail address already exists."),
+                old_field='email_old'
+            )
         ]
     )
 

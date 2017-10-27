@@ -1,7 +1,8 @@
 from onegov.user import UserCollection
-from onegov.gazette.validators import UniqueUsername
+from onegov.gazette.validators import UniqueColumnValue
 from pytest import raises
 from wtforms.validators import ValidationError
+from onegov.user import User
 
 
 class DummyApp(object):
@@ -27,16 +28,22 @@ class DummyField(object):
         self.data = data
 
 
-def test_unique_username_validator(session):
+def test_unique_column_value_validator(session):
     form = DummyForm(session)
     field = DummyField('a@example.org')
-    validator = UniqueUsername()
+    validator = UniqueColumnValue(User.username)
 
     validator(form, field)
 
     UserCollection(session).add('a@example.org', 'pwd', 'editor')
-    with raises(ValidationError):
+    with raises(ValidationError) as excinfo:
         validator(form, field)
+    assert str(excinfo.value) == 'This value already exists.'
 
-    form.default_field = DummyField('a@example.org')
-    validator = UniqueUsername(default_field='default_field')
+    validator = UniqueColumnValue(User.username, message='message')
+    with raises(ValidationError) as excinfo:
+        validator(form, field)
+    assert str(excinfo.value) == 'message'
+
+    form.old_field = DummyField('a@example.org')
+    validator = UniqueColumnValue(User.username, old_field='old_field')

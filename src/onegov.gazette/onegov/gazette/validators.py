@@ -1,26 +1,25 @@
 from wtforms.validators import ValidationError
-from onegov.user import User
 from onegov.gazette import _
 
 
-class UniqueUsername(object):
-    """ Test if the email is not already used as a username.
+class UniqueColumnValue(object):
+    """ Test if the column value is not already used.
 
-    A form field name can be provided to allow a default value.
+    A form field name can be specified which provided the old value.
 
     """
 
-    def __init__(self, default_field=None):
-        self.default_field = default_field
+    def __init__(self, column, message=None, old_field=None):
+        self.column = column
+        self.message = message or _("This value already exists.")
+        self.old_field = old_field
 
     def __call__(self, form, field):
-        query = form.request.app.session().query(User.username)
-        query = query.filter(User.username == field.data)
-        if self.default_field and hasattr(form, self.default_field):
+        query = form.request.app.session().query(self.column)
+        query = query.filter(self.column == field.data)
+        if self.old_field and hasattr(form, self.old_field):
             query = query.filter(
-                User.username != getattr(form, self.default_field).data
+                self.column != getattr(form, self.old_field).data
             )
         if query.first():
-            raise ValidationError(_(
-                "A user with this e-mail address already exists."
-            ))
+            raise ValidationError(self.message)
