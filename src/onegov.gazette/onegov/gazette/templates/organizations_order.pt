@@ -1,0 +1,33 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.gazette">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+
+        <div metal:use-macro="layout.macros['tab_menu']"></div>
+        <div metal:use-macro="layout.macros['breadcrumbs']"></div>
+
+        <div class="row manage-organizations">
+            <div class="small-12 columns">
+                <div class="row">
+                    <div class="small-12 medium-10 columns">
+                        <h2 i18n:translate>Order Organizations</h2>
+                    </div>
+                </div>
+
+                <ul data-sortable data-sortable-url="${layout.sortable_url_template}">
+                    <tal:block tal:repeat="root roots">
+                        <li data-sortable-id="${root.id}">
+                            ${root.title}
+                            <ul tal:condition="root.children" data-sortable data-sortable-url="${layout.sortable_url_template}">
+                                <li tal:repeat="child root.children" data-sortable-id="${root.id}">${child.title}</li>
+                            </ul>
+                        </li>
+                    </tal:block>
+                </ul>
+
+            </div>
+        </div>
+
+    </tal:block>
+</div>

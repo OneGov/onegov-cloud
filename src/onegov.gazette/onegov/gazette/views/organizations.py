@@ -7,6 +7,7 @@ from onegov.gazette.forms import OrganizationForm
 from onegov.gazette.forms import EmptyForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import Organization
+from onegov.gazette.models import OrganizationMove
 
 
 @GazetteApp.html(
@@ -26,8 +27,40 @@ def view_organizations(self, request):
     return {
         'layout': layout,
         'roots': roots,
-        'new_organization': request.link(self, name='new-organization')
+        'new_organization': request.link(self, name='new-organization'),
+        'order': request.link(self, name='order')
     }
+
+
+@GazetteApp.html(
+    model=OrganizationCollection,
+    name='order',
+    template='organizations_order.pt',
+    permission=Secret
+)
+def view_organizations_order(self, request):
+    """ Reorder the list of organizations.
+
+    This view is only visible by an admin.
+
+    """
+    layout = Layout(self, request)
+    roots = self.query().filter(Organization.parent_id.is_(None))
+
+    return {
+        'layout': layout,
+        'roots': roots
+    }
+
+
+@GazetteApp.view(
+    model=OrganizationMove,
+    permission=Secret,
+    request_method='PUT'
+)
+def move_organization(self, request):
+    request.assert_valid_csrf_token()
+    self.execute()
 
 
 @GazetteApp.form(

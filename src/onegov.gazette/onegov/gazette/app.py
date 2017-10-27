@@ -143,6 +143,8 @@ def get_frameworks_asset():
     yield 'stacktable.js'
     yield 'chosen.css'
     yield 'chosen.jquery.js'
+    yield 'sortable.js'
+    yield 'sortable_custom.js'
 
 
 @GazetteApp.webasset('common')

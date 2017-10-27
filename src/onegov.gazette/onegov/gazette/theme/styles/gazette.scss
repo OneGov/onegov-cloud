@@ -270,6 +270,35 @@ table {
     margin-left: .75ex;
 }
 
+/*
+    Sortable lists
+*/
+ul[data-sortable] {
+    cursor: move;
+    list-style: none;
+
+    li {
+        border: 1px dashed $aluminum;
+        cursor: move;
+        margin-bottom: .3rem;
+        padding: .3rem .5rem;
+
+        &.sortable-chosen {
+            background-color: $white-smoke;
+            border: 1px solid $aluminum;
+        }
+
+    }
+}
+
+.dragging {
+    opacity: 1;
+
+    &.sortable-ghost {
+        opacity: .3;
+    }
+}
+
 
 /*
     Footer
@@ -415,6 +444,12 @@ a.button.right {
     margin-left: .3em;
 }
 
+.action-accept::before {
+    content: '\f00c';
+    font-family: 'FontAwesome';
+    margin-right: .75ex;
+}
+
 .action-close::before {
     content: '\f00d';
     font-family: 'FontAwesome';
@@ -452,6 +487,12 @@ a.button.right {
     margin-right: .75ex;
 }
 
+.action-order::before {
+    content: '\f047';
+    font-family: 'FontAwesome';
+    margin-right: .75ex;
+}
+
 .action-preview::before {
     content: '\f06e';
     font-family: 'FontAwesome';
@@ -460,12 +501,6 @@ a.button.right {
 
 .action-print::before {
     content: '\f02f';
-    font-family: 'FontAwesome';
-    margin-right: .75ex;
-}
-
-.action-accept::before {
-    content: '\f00c';
     font-family: 'FontAwesome';
     margin-right: .75ex;
 }

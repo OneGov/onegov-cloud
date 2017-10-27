@@ -7,6 +7,7 @@ from onegov.gazette.collections import CategoryCollection
 from onegov.gazette.collections import GazetteNoticeCollection
 from onegov.gazette.collections import OrganizationCollection
 from onegov.gazette.models import Issue
+from onegov.gazette.models import OrganizationMove
 from onegov.gazette.models import Principal
 from onegov.user import Auth
 from onegov.user import UserCollection
@@ -114,6 +115,12 @@ class Layout(ChameleonLayout):
                 Auth.from_request(self.request, to=self.homepage_link),
                 name='logout'
             )
+
+    @cached_property
+    def sortable_url_template(self):
+        return self.csrf_protected_url(
+            self.request.link(OrganizationMove.for_url_template())
+        )
 
     @property
     def menu(self):

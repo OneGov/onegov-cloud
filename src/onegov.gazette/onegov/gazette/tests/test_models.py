@@ -1,11 +1,13 @@
 from datetime import date
 from datetime import datetime
 from freezegun import freeze_time
+from onegov.gazette.collections import OrganizationCollection
 from onegov.gazette.models import Category
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import Issue
 from onegov.gazette.models import IssueDates
 from onegov.gazette.models import Organization
+from onegov.gazette.models import OrganizationMove
 from onegov.gazette.models import Principal
 from onegov.gazette.models.notice import GazetteNoticeChange
 from onegov.user import UserCollection
@@ -88,6 +90,49 @@ def test_organization(session):
     session.flush()
 
     assert session.query(GazetteNotice).one().organization == 'Administrations'
+
+
+def test_organization_move(session):
+    # test URL template
+    move = OrganizationMove(None, None, None, None).for_url_template()
+    assert move.direction == '{direction}'
+    assert move.subject_id == '{subject_id}'
+    assert move.target_id == '{target_id}'
+
+    # test execute
+    collection = OrganizationCollection(session)
+    collection.add_root(title='2', id=2, order=2)
+    collection.add_root(title='1', id=1, oder=1)
+    parent = collection.add_root(title='3', id=3, order=3)
+    collection.add(parent=parent, title='5', id=5, order=2)
+    collection.add(parent=parent, title='4', id=4, order=1)
+
+    def tree():
+        return [
+            [o.title, [c.title for c in o.children]]
+            for o in collection.query().filter_by(parent_id=None)
+        ]
+
+    assert tree() == [['1', []], ['2', []], ['3', ['4', '5']]]
+
+    OrganizationMove(session, 1, 2, 'below').execute()
+    assert tree() == [['2', []], ['1', []], ['3', ['4', '5']]]
+
+    OrganizationMove(session, 3, 1, 'above').execute()
+    assert tree() == [['2', []], ['3', ['4', '5']], ['1', []]]
+
+    OrganizationMove(session, 5, 4, 'above').execute()
+    session.flush()
+    session.expire_all()
+    assert tree() == [['2', []], ['3', ['5', '4']], ['1', []]]
+
+    # invalid
+    OrganizationMove(session, 8, 9, 'above').execute()
+    assert tree() == [['2', []], ['3', ['5', '4']], ['1', []]]
+
+    OrganizationMove(session, 5, 2, 'above').execute()
+    session.expire_all()
+    assert tree() == [['2', []], ['3', ['5', '4']], ['1', []]]
 
 
 def test_issue():

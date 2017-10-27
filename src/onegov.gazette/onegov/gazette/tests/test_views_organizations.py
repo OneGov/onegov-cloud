@@ -1,3 +1,4 @@
+from onegov.gazette.models import Organization
 from onegov.gazette.tests import login_admin
 from onegov.gazette.tests import login_editor_1
 from onegov.gazette.tests import login_publisher
@@ -148,3 +149,62 @@ def test_view_organizations_permissions(gazette_app):
     client.get('/organizations', status=403)
     client.get(edit_link, status=403)
     client.get(delete_link, status=403)
+
+
+def test_view_organizations_order(gazette_app):
+    client = Client(gazette_app)
+    login_admin(client)
+
+    manage = client.get('/organizations')
+    manage = manage.click('Ordnen')
+    organizations = [
+        t.text.strip() for t in manage.pyquery('ul[data-sortable] li')
+    ]
+    assert organizations == [
+        'State Chancellery',
+        'Civic Community',
+        'Municipality',
+        'Evangelical Reformed Parish',
+        'Sikh Community',
+        'Catholic Parish',
+        'Corporation',
+    ]
+    url = manage.pyquery('ul[data-sortable]')[0].attrib['data-sortable-url']
+    expected = (
+        '/move/organization/%7Bsubject_id%7D/%7Bdirection%7D/%7Btarget_id%7D'
+        '?csrf-token='
+    )
+    assert expected in url
+
+    # Move items
+    session = gazette_app.session()
+    query = session.query(Organization)
+
+    subject = query.filter_by(title='State Chancellery').one().id
+    target = query.filter_by(title='Sikh Community').one().id
+    move = url.replace('%7Bsubject_id%7D', str(subject))
+    move = move.replace('%7Btarget_id%7D', str(target))
+    move = move.replace('%7Bdirection%7D', 'below')
+    client.put(move)
+
+    subject = query.filter_by(title='Catholic Parish').one().id
+    target = query.filter_by(title='Municipality').one().id
+    move = url.replace('%7Bsubject_id%7D', str(subject))
+    move = move.replace('%7Btarget_id%7D', str(target))
+    move = move.replace('%7Bdirection%7D', 'above')
+    client.put(move)
+
+    manage = client.get('/organizations')
+    manage = manage.click('Ordnen')
+    organizations = [
+        t.text.strip() for t in manage.pyquery('ul[data-sortable] li')
+    ]
+    assert organizations == [
+        'Civic Community',
+        'Catholic Parish',
+        'Municipality',
+        'Evangelical Reformed Parish',
+        'Sikh Community',
+        'State Chancellery',
+        'Corporation',
+    ]

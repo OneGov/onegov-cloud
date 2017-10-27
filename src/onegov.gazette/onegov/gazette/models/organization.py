@@ -1,4 +1,5 @@
 from onegov.core.orm.abstract import AdjacencyList
+from onegov.core.orm.abstract import MoveDirection
 from onegov.core.orm.mixins import TimestampMixin
 from sqlalchemy import Boolean
 from sqlalchemy import Column
@@ -56,3 +57,37 @@ class Organization(AdjacencyList, TimestampMixin):
         )
         for notice in query:
             notice.organization = title
+
+
+class OrganizationMove(object):
+    """ Represents a single move of an adjacency list item. """
+
+    def __init__(self, session, subject_id, target_id, direction):
+        self.session = session
+        self.subject_id = subject_id
+        self.target_id = target_id
+        self.direction = direction
+
+    @classmethod
+    def for_url_template(cls):
+        return cls(
+            session=None,
+            subject_id='{subject_id}',
+            target_id='{target_id}',
+            direction='{direction}'
+        )
+
+    def execute(self):
+        from onegov.gazette.collections import OrganizationCollection
+        organizations = OrganizationCollection(self.session)
+
+        organizations = OrganizationCollection(self.session)
+        subject = organizations.by_id(self.subject_id)
+        target = organizations.by_id(self.target_id)
+        if subject and target and subject != target:
+            if subject.parent_id == target.parent_id:
+                OrganizationCollection(self.session).move(
+                    subject=subject,
+                    target=target,
+                    direction=getattr(MoveDirection, self.direction)
+                )

@@ -16,6 +16,7 @@
                     <div class="small-12 medium-2 columns">
                         <ul class="top-actions text-right">
                             <li><a class="action-new" href="${new_organization}" i18n:translate>New</a></li>
+                            <li><a class="action-order" href="${order}" i18n:translate>Order</a></li>
                         </ul>
                     </div>
                 </div>

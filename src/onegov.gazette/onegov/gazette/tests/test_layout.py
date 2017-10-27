@@ -40,6 +40,9 @@ class DummyRequest(object):
     def translate(self, text):
         return text.interpolate()
 
+    def new_csrf_token(self):
+        return 'XXX'
+
 
 def test_layout_links():
     layout = Layout(None, DummyRequest(None))
@@ -49,6 +52,11 @@ def test_layout_links():
     assert layout.manage_notices_link == '/GazetteNoticeCollection/'
     assert layout.dashboard_link == '/dashboard/'
     assert layout.dashboard_or_notices_link == '/dashboard/'
+
+
+def test_sortable_url_template():
+    layout = Layout(None, DummyRequest(None))
+    assert layout.sortable_url_template == '/OrganizationMove/?csrf-token=XXX'
 
 
 def test_layout_menu():
