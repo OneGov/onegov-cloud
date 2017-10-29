@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Speeds up the first load slightly.
+  [href]
+
 - Adds the ability to pass '--pdb' to the onegov-server cli to enable
   post-mortem debugging.
   [href]

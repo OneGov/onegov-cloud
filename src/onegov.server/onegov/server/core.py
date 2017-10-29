@@ -93,11 +93,8 @@ class Server(object):
     def configure_morepath(self):
         """ Configures morepath automatically, if any application uses it. """
 
-        morepath_applications = set(
-            self.applications.morepath_applications())
-
-        # morepath is only loaded if required by an application
-        if morepath_applications:
+        # morepath is only loaded if there's at lest one app depending on it
+        if next(self.applications.morepath_applications(), None):
             import morepath
             morepath.autoscan()
 
