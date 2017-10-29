@@ -66,7 +66,6 @@ def get_common_asset():
     yield 'modernizr.js'
     yield 'jquery.js'
     yield 'placeholder.js'
-    yield 'fastclick.js'
     yield 'foundation.js'
     yield 'underscore.js'
     yield 'colorpicker.js'
