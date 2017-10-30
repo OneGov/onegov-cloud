@@ -2,6 +2,7 @@ from onegov.gazette.models import Organization
 from onegov.gazette.tests import login_admin
 from onegov.gazette.tests import login_editor_1
 from onegov.gazette.tests import login_publisher
+from pyquery import PyQuery as pq
 from webtest import TestApp as Client
 
 
@@ -26,40 +27,20 @@ def test_view_organizations(gazette_app):
     assert 'Organisation hinzugefügt.' in manage
     assert 'Organisation XY' in manage
     organizations = [
-        t.text for t in manage.pyquery('table.organizations tbody tr td')
+        [td.text.strip() for td in pq(tr)('td')]
+        for tr in manage.pyquery('table.organizations tbody tr')
     ]
-
-    assert organizations[0] == 'State Chancellery'
-    assert organizations[1] == 'Ja'
-    assert organizations[2] == '100'
-
-    assert organizations[4] == 'Civic Community'
-    assert organizations[5] == 'Ja'
-    assert organizations[6] == '200'
-
-    assert organizations[8] == 'Municipality'
-    assert organizations[9] == 'Ja'
-    assert organizations[10] == '300'
-
-    assert organizations[12] == 'Evangelical Reformed Parish'
-    assert organizations[13] == 'Ja'
-    assert organizations[14] == '400'
-
-    assert organizations[16] == 'Sikh Community'
-    assert organizations[17] == 'Nein'
-    assert organizations[18] == '510'
-
-    assert organizations[20] == 'Catholic Parish'
-    assert organizations[21] == 'Ja'
-    assert organizations[22] == '500'
-
-    assert organizations[24] == 'Corporation'
-    assert organizations[25] == 'Ja'
-    assert organizations[26] == '600'
-
-    assert organizations[28] == 'Organisation XY'
-    assert organizations[29] == 'Ja'
-    assert organizations[30] == '601'
+    assert organizations == [
+        ['State Chancellery', 'Ja', '100', ''],
+        ['Civic Community', 'Ja', '200', ''],
+        ['Municipality', 'Ja', '300', ''],
+        ['Churches', 'Ja', '400', ''],
+        ['— Evangelical Reformed Parish', 'Ja', '410', ''],
+        ['— Sikh Community', 'Nein', '420', ''],
+        ['— Catholic Parish', 'Ja', '430', ''],
+        ['Corporation', 'Ja', '500', ''],
+        ['Organisation XY', 'Ja', '501', '']
+    ]
 
     # use the first organization in a notice
     manage = client.get('/notices/drafted/new-notice')
@@ -83,32 +64,57 @@ def test_view_organizations(gazette_app):
     assert 'Organisation Z' in manage
 
     organizations = [
+        [td.text.strip() for td in pq(tr)('td')]
+        for tr in manage.pyquery('table.organizations tbody tr')
+    ]
+    assert organizations == [
+        ['Organisation Z', 'Nein', '100', ''],
+        ['Civic Community', 'Ja', '200', ''],
+        ['Municipality', 'Ja', '300', ''],
+        ['Churches', 'Ja', '400', ''],
+        ['— Evangelical Reformed Parish', 'Ja', '410', ''],
+        ['— Sikh Community', 'Nein', '420', ''],
+        ['— Catholic Parish', 'Ja', '430', ''],
+        ['Corporation', 'Ja', '500', ''],
+        ['Organisation XY', 'Ja', '501', '']
+    ]
+    organizations = [
         t.text for t in manage.pyquery('table.organizations tbody tr td')
     ]
-    assert organizations[0] == 'Organisation Z'
-    assert organizations[4] == 'Civic Community'
-    assert organizations[8] == 'Municipality'
-    assert organizations[12] == 'Evangelical Reformed Parish'
-    assert organizations[16] == 'Sikh Community'
-    assert organizations[20] == 'Catholic Parish'
-    assert organizations[24] == 'Corporation'
-    assert organizations[28] == 'Organisation XY'
-    assert organizations[1] == 'Nein'
 
     # check if the notice has been updated
     manage = client.get('/notice/titel')
     assert 'State Chancellery' not in manage
     assert 'Organisation Z' in manage
 
+    # try to delete the organization with suborganizations
+    manage = client.get('/organizations')
+    manage = manage.click('Löschen', index=3)
+    assert (
+        'Nur unbenutzte Organisationen ohne Unterorganisationen können '
+        'gelöscht werden.'
+    ) in manage
+    assert not manage.forms
+
+    # try to delete the used organization
+    manage = client.get('/organizations')
+    manage = manage.click('Löschen', index=3)
+    assert (
+        'Nur unbenutzte Organisationen ohne Unterorganisationen können '
+        'gelöscht werden.'
+    ) in manage
+    assert not manage.forms
+
     # delete all but one (unused) organizations
     manage = client.get('/organizations')
-    manage.click('Löschen', index=1).form.submit()
-    manage.click('Löschen', index=2).form.submit()
-    manage.click('Löschen', index=3).form.submit()
-    manage.click('Löschen', index=4).form.submit()
-    manage.click('Löschen', index=5).form.submit()
-    manage.click('Löschen', index=6).form.submit()
+    manage.click('Löschen', index=8).form.submit()
     manage.click('Löschen', index=7).form.submit()
+    manage.click('Löschen', index=6).form.submit()
+    manage.click('Löschen', index=5).form.submit()
+    manage.click('Löschen', index=4).form.submit()
+    manage.click('Löschen', index=3).form.submit()
+    manage.click('Löschen', index=2).form.submit()
+    manage.click('Löschen', index=1).form.submit()
 
     manage = client.get('/organizations')
     assert 'Organisation Z' in manage
@@ -119,15 +125,6 @@ def test_view_organizations(gazette_app):
     assert 'Catholic Parish' not in manage
     assert 'Corporation' not in manage
     assert 'Organisation XY' not in manage
-
-    # Try to delete the used organization
-    manage = client.get('/organizations')
-    manage = manage.click('Löschen')
-    assert (
-        'Nur unbenutzte Organisationen ohne Unterorganisationen können '
-        'gelöscht werden.'
-    ) in manage
-    assert not manage.forms
 
 
 def test_view_organizations_permissions(gazette_app):
@@ -164,6 +161,7 @@ def test_view_organizations_order(gazette_app):
         'State Chancellery',
         'Civic Community',
         'Municipality',
+        'Churches',
         'Evangelical Reformed Parish',
         'Sikh Community',
         'Catholic Parish',
@@ -181,14 +179,14 @@ def test_view_organizations_order(gazette_app):
     query = session.query(Organization)
 
     subject = query.filter_by(title='State Chancellery').one().id
-    target = query.filter_by(title='Sikh Community').one().id
+    target = query.filter_by(title='Municipality').one().id
     move = url.replace('%7Bsubject_id%7D', str(subject))
     move = move.replace('%7Btarget_id%7D', str(target))
     move = move.replace('%7Bdirection%7D', 'below')
     client.put(move)
 
     subject = query.filter_by(title='Catholic Parish').one().id
-    target = query.filter_by(title='Municipality').one().id
+    target = query.filter_by(title='Sikh Community').one().id
     move = url.replace('%7Bsubject_id%7D', str(subject))
     move = move.replace('%7Btarget_id%7D', str(target))
     move = move.replace('%7Bdirection%7D', 'above')
@@ -201,10 +199,11 @@ def test_view_organizations_order(gazette_app):
     ]
     assert organizations == [
         'Civic Community',
-        'Catholic Parish',
         'Municipality',
-        'Evangelical Reformed Parish',
-        'Sikh Community',
         'State Chancellery',
+        'Churches',
+        'Evangelical Reformed Parish',
+        'Catholic Parish',
+        'Sikh Community',
         'Corporation',
     ]

@@ -323,9 +323,9 @@ def test_notice_form(session, principal):
             ('100', 'State Chancellery'),
             ('200', 'Civic Community'),
             ('300', 'Municipality'),
-            ('400', 'Evangelical Reformed Parish'),
-            ('500', 'Catholic Parish'),
-            ('600', 'Corporation')
+            ('410', 'Evangelical Reformed Parish'),
+            ('430', 'Catholic Parish'),
+            ('500', 'Corporation')
         ]
         assert form.issues.choices == [
             ('2017-45', 'No. 45, Freitag 10.11.2017'),
@@ -354,9 +354,9 @@ def test_notice_form(session, principal):
             ('100', 'State Chancellery'),
             ('200', 'Civic Community'),
             ('300', 'Municipality'),
-            ('400', 'Evangelical Reformed Parish'),
-            ('500', 'Catholic Parish'),
-            ('600', 'Corporation')
+            ('410', 'Evangelical Reformed Parish'),
+            ('430', 'Catholic Parish'),
+            ('500', 'Corporation')
         ]
         assert form.issues.choices == [
             ('2017-44', 'No. 44, Freitag 03.11.2017'),

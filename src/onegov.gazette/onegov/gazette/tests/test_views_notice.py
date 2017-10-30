@@ -370,7 +370,7 @@ def test_view_notice_accept(gazette_app):
         for count, user in enumerate((editor_1, editor_2, editor_3)):
             manage = user.get('/notices/drafted/new-notice')
             manage.form['title'] = 'Titel {}'.format(count + 1)
-            manage.form['organization'] = '200'
+            manage.form['organization'] = '410'
             manage.form['category'] = '11'
             manage.form['issues'] = ['2017-44', '2017-45']
             manage.form['text'] = "1. Oktober 2017"
@@ -412,19 +412,19 @@ def test_view_notice_accept(gazette_app):
         assert message['From'] == 'mails@govikon.ch'
         assert message['To'] == 'printer@onegov.org'
         assert message['Reply-To'] == 'mails@govikon.ch'
-        assert '44 Titel 2' in message['Subject']
+        assert '44 400 Titel 2' in message['Subject']
         payload = message.get_payload(1).get_payload(decode=True)
         payload = payload.decode('utf-8')
-        assert '44 Titel 2' in payload
+        assert '44 400 Titel 2' in payload
 
         message = gazette_app.smtp.outbox.pop()
         assert message['From'] == 'mails@govikon.ch'
         assert message['To'] == 'printer@onegov.org'
         assert message['Reply-To'] == 'mails@govikon.ch'
-        assert '44 Titel 1' in message['Subject']
+        assert '44 400 Titel 1' in message['Subject']
         payload = message.get_payload(1).get_payload(decode=True)
         payload = payload.decode('utf-8')
-        assert '44 Titel 1' in payload
+        assert '44 400 Titel 1' in payload
 
         principal = gazette_app.principal
         principal.publish_from = 'publisher@govikon.ch'
@@ -436,10 +436,10 @@ def test_view_notice_accept(gazette_app):
         assert message['From'] == 'mails@govikon.ch'
         assert message['To'] == 'printer@onegov.org'
         assert message['Reply-To'] == 'publisher@govikon.ch'
-        assert '44 Titel 3' in message['Subject']
+        assert '44 400 Titel 3' in message['Subject']
         payload = message.get_payload(1).get_payload(decode=True)
         payload = payload.decode('utf-8')
-        assert '44 Titel 3' in payload
+        assert '44 400 Titel 3' in payload
 
 
 def test_view_notice_delete(gazette_app):

@@ -63,14 +63,25 @@ class NoticeForm(Form):
         principal = self.request.app.principal
         session = self.request.app.session()
 
-        # populate organization
-        query = session.query(Organization.name, Organization.title)
-        query = query.filter(Organization.active == True)
-        query = query.order_by(Organization.order)
-        self.organization.choices = list(query.all())
-        self.organization.choices.insert(
-            0, ('', self.request.translate(_("Select one")))
+        # populate organization (active root elements with no children or
+        # active children (but not their parents))
+        self.organization.choices = []
+        self.organization.choices.append(
+            ('', self.request.translate(_("Select one")))
         )
+        query = session.query(Organization)
+        query = query.filter(Organization.active == True)
+        query = query.filter(Organization.parent_id.is_(None))
+        query = query.order_by(Organization.order)
+        for root in query:
+            if root.children:
+                for child in root.children:
+                    if child.active:
+                        self.organization.choices.append(
+                            (child.name, child.title)
+                        )
+            else:
+                self.organization.choices.append((root.name, root.title))
 
         # populate categories
         query = session.query(Category.name, Category.title)

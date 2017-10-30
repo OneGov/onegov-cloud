@@ -60,17 +60,23 @@ def create_organizations(session):
     organizations.add_root(
         name='300', order=3, title='Municipality', active=True
     )
-    organizations.add_root(
-        name='400', order=4, title='Evangelical Reformed Parish', active=True
+    churches = organizations.add_root(
+        name='400', order=4, title='Churches', active=True
+    )
+    organizations.add(
+        parent=churches,
+        name='410', order=1, title='Evangelical Reformed Parish', active=True
+    )
+    organizations.add(
+        parent=churches,
+        name='420', order=2, title='Sikh Community', active=False
+    )
+    organizations.add(
+        parent=churches,
+        name='430', order=3, title='Catholic Parish', active=True
     )
     organizations.add_root(
-        name='510', order=5, title='Sikh Community', active=False
-    )
-    organizations.add_root(
-        name='500', order=6, title='Catholic Parish', active=True
-    )
-    organizations.add_root(
-        name='600', order=7, title='Corporation', active=True
+        name='500', order=5, title='Corporation', active=True
     )
     return organizations.query().all()
 
