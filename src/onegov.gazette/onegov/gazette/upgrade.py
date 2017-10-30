@@ -69,7 +69,6 @@ def migrate_organizations(context):
         return False
 
     session = context.app.session_manager.session()
-    session.execute("delete from gazette_organizations")  # todo: remove me!!!!
     count = session.execute("select count(*) from gazette_organizations")
     if count.scalar() != 0:
         return False
