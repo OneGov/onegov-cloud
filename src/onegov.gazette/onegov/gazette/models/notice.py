@@ -224,6 +224,13 @@ class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
         self.categories = [value]
 
     @property
+    def category_object(self):
+        if self.category_id:
+            query = object_session(self).query(Category)
+            query = query.filter(Category.name == self.category_id)
+            return query.first()
+
+    @property
     def organization_id(self):
         """ The ID of the organization. We store this the ID in the HSTORE (we
         use only one!) and additionaly store the title of the organization in
@@ -236,6 +243,13 @@ class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
     @organization_id.setter
     def organization_id(self, value):
         self.organizations = [value]
+
+    @property
+    def organization_object(self):
+        if self.organization_id:
+            query = object_session(self).query(Organization)
+            query = query.filter(Organization.name == self.organization_id)
+            return query.first()
 
     def overdue_issues(self, principal):
         """ Returns True, if any of the issue's deadline is reached. """

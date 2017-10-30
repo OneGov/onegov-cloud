@@ -293,6 +293,40 @@ def test_principal():
         assert principal.current_issue == None
 
 
+def test_notice_organization(session):
+    session.add(GazetteNotice(title='notice', organization_id='xxx'))
+    session.flush()
+
+    notice = session.query(GazetteNotice).one()
+    assert notice.organization_id == 'xxx'
+    assert notice.organization_object is None
+    assert notice.organization is None
+
+    session.add(Organization(name='xxx', title='Organization', active=True))
+    organization = session.query(Organization).one()
+    session.flush()
+    assert notice.organization_id == 'xxx'
+    assert notice.organization_object == organization
+    assert notice.organization is 'Organization'  # through title observer
+
+
+def test_notice_category(session):
+    session.add(GazetteNotice(title='notice', category_id='xxx'))
+    session.flush()
+
+    notice = session.query(GazetteNotice).one()
+    assert notice.category_id == 'xxx'
+    assert notice.category_object is None
+    assert notice.category is None
+
+    session.add(Category(name='xxx', title='Category', active=True))
+    category = session.query(Category).one()
+    session.flush()
+    assert notice.category_id == 'xxx'
+    assert notice.category_object == category
+    assert notice.category is 'Category'  # through title observer
+
+
 def test_notice_user_and_group(session):
     users = UserCollection(session)
     groups = UserGroupCollection(session)
