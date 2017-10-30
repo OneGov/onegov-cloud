@@ -31,7 +31,7 @@ def view_directories(self, request):
     return {
         'title': _("Directories"),
         'layout': DirectoryCollectionLayout(self, request),
-        'directories': tuple(self.query()),
+        'directories': request.exclude_invisible(self.query()),
         'link': lambda directory: request.link(
             DirectoryEntryCollection(directory)
         )
@@ -158,7 +158,7 @@ def view_directory(self, request):
     return {
         'layout': DirectoryEntryCollectionLayout(self, request),
         'title': self.directory.title,
-        'entries': self.batch,
+        'entries': request.exclude_invisible(self.query()),
         'directory': self.directory,
         'filters': filters,
         'geojson': request.link(self, name='+geojson')

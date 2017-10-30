@@ -3784,3 +3784,50 @@ def test_switch_languages(org_app):
 
     assert 'Allemand' in page
     assert 'Deutsch' not in page
+
+
+def test_directory_visibility(org_app):
+
+    client = Client(org_app)
+    client.login_admin()
+
+    page = client.get('/directories')
+    assert 'Noch keine Verzeichnisse' in page
+
+    page = page.click('Verzeichnis')
+    page.form['title'] = "Clubs"
+    page.form['structure'] = """
+        Name *= ___
+    """
+    page.form['title_format'] = '[Name]'
+    page.form.submit()
+
+    page = client.get('/directories/clubs')
+    page = page.click('Eintrag')
+    page.form['name'] = 'Soccer Club'
+    page.form.submit()
+
+    anon = Client(org_app)
+    assert "Clubs" in anon.get('/directories')
+    assert "Soccer" in anon.get('/directories/clubs')
+    assert "Soccer" in anon.get('/directories/clubs/soccer-club')
+
+    page = client.get('/directories/clubs/soccer-club').click("Bearbeiten")
+    page.form['is_hidden_from_public'] = True
+    page.form.submit()
+
+    assert "Clubs" in anon.get('/directories')
+    assert "Soccer" not in anon.get('/directories/clubs')
+    assert anon.get('/directories/clubs/soccer-club', status=403)
+
+    page = client.get('/directories/clubs/soccer-club').click("Bearbeiten")
+    page.form['is_hidden_from_public'] = False
+    page.form.submit()
+
+    page = client.get('/directories/clubs').click("Konfigurieren")
+    page.form['is_hidden_from_public'] = True
+    page.form.submit()
+
+    assert "Clubs" not in anon.get('/directories')
+    assert anon.get('/directories/clubs', status=403)
+    assert anon.get('/directories/clubs/soccer-club')
