@@ -252,7 +252,7 @@ class WsgiProcess(multiprocessing.Process):
             server = make_server(
                 self.host, self.port, self.app_factory(),
                 handler_class=CustomWSGIRequestHandler)
-        except:
+        except Exception:
             # if there's an error, print it
             print(traceback.format_exc())
 

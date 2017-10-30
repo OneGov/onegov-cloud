@@ -149,7 +149,7 @@ class Server(object):
 
         try:
             return application(environ, start_response)
-        except:
+        except Exception:
             if self.post_mortem:
                 import pdb; pdb.post_mortem()  # noqa
             raise
