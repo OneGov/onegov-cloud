@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.16.4 (2017-10-30)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes newsletter subject not rendering correctly.
   [href]
 
