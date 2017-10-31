@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-10-31 10:49+0100\n"
+"POT-Creation-Date: 2017-10-31 14:59+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1000,8 +1000,18 @@ msgstr "Les administrateurs et les programmateurs doivent utiliser une YubiKey"
 msgid "Send a daily status e-mail."
 msgstr "Envoyez un e-mail de suivi quotidien."
 
+msgid "All directories"
+msgstr ""
+
 msgid "All events"
 msgstr "Tous les événements"
+
+#, python-format
+msgid "${count} entries"
+msgstr ""
+
+msgid "1 entry"
+msgstr ""
 
 msgid "Hide from the public"
 msgstr "Cacher au public"

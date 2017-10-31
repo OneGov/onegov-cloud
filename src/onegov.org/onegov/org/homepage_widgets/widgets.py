@@ -1,4 +1,5 @@
 from collections import namedtuple
+from onegov.directory import DirectoryCollection, DirectoryEntryCollection
 from onegov.event import OccurrenceCollection
 from onegov.newsletter import NewsletterCollection
 from onegov.org import _, OrgApp
@@ -33,9 +34,21 @@ class ColumnWidget(object):
 
 @OrgApp.homepage_widget(tag='panel')
 class PanelWidget(object):
+    # panels with less than one link (not counting the more-link) are
+    # hidden unless the user is logged-in
     template = """
         <xsl:template match="panel">
-            <div class="side-panel">
+            <div class="side-panel requires-children">
+                <xsl:attribute name="data-required-children">
+                    <xsl:value-of select="'a:not(.more-link)'"/>
+                </xsl:attribute>
+                <xsl:attribute name="data-required-count">
+                    <xsl:value-of select="'1'"/>
+                </xsl:attribute>
+                <xsl:attribute name="data-required-unless">
+                    <xsl:value-of select="'.is-logged-in'"/>
+                </xsl:attribute>
+
                 <xsl:apply-templates select="node()"/>
             </div>
         </xsl:template>
@@ -72,6 +85,48 @@ class LinksWidget(object):
             </ul>
         </xsl:template>
     """
+
+
+@OrgApp.homepage_widget(tag='directories')
+class DirectoriesWidget(object):
+    template = """
+        <xsl:template match="directories">
+            <metal:block use-macro="layout.macros['directories-panel']" />
+        </xsl:template>
+    """
+
+    def get_variables(self, layout):
+        directories = DirectoryCollection(
+            layout.app.session(), type="extended")
+
+        links = [
+            Link(
+                text=d.title,
+                url=layout.request.class_link(
+                    DirectoryEntryCollection, {'directory_name': d.name}
+                ),
+                subtitle=(
+                    d.count == 1 and
+                    _("1 entry") or
+                    _("${count} entries", mapping={'count': d.count})
+                )
+            ) for d in layout.request.exclude_invisible(directories.query())
+        ]
+
+        links.append(
+            Link(
+                text=_("All directories"),
+                url=layout.request.class_link(DirectoryCollection),
+                classes=('more-link', )
+            )
+        )
+
+        return {
+            'directory_panel': LinkGroup(
+                title=_("Directories"),
+                links=links,
+            )
+        }
 
 
 @OrgApp.homepage_widget(tag='news')
@@ -156,7 +211,7 @@ class EventsWidget(object):
         )
 
         return {
-            'events_panel': latest_events
+            'event_panel': latest_events
         }
 
 

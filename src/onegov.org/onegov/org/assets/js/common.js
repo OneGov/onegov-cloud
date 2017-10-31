@@ -83,3 +83,19 @@ $('button[data-toggle]').toggleButton();
 $(document).ready(function() {
     $('.slider').css('opacity', 1);
 });
+
+// support some extraordinary styling
+$(document).ready(function() {
+    $('.requires-children').each(function() {
+        var el = $(this);
+
+        if ($(el.data('required-unless')).length === 0) {
+            var children = el.find(el.data('required-children'));
+            var required = parseInt(el.data('required-count'), 10);
+
+            if (children.length < required) {
+                el.hide();
+            }
+        }
+    });
+});

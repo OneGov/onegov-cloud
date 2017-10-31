@@ -170,7 +170,14 @@
 
 <metal:panel define-macro="events-panel">
     <h2 i18n:translate>Events</h2>
-    <metal:block use-macro="layout.macros['panel-links']" tal:define="panel events_panel"/>
+    <metal:block use-macro="layout.macros['panel-links']" tal:define="panel event_panel"/>
+</metal:panel>
+
+<metal:panel define-macro="directories-panel">
+    <tal:b condition="directory_panel.links">
+        <h2 i18n:translate>Directories</h2>
+        <metal:block use-macro="layout.macros['panel-links']" tal:define="panel directory_panel" />
+    </tal:b>
 </metal:panel>
 
 <metal:form define-macro="form">

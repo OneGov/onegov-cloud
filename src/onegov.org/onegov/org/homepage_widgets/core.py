@@ -121,6 +121,8 @@ def inject_widget_variables(layout, structure, variables=None):
     for tag, widget in layout.app.config.homepage_widget_registry.items():
         if '<{}'.format(tag) in structure:
             if hasattr(widget, 'get_variables'):
-                variables.update(widget.get_variables(layout))
+                for key, value in widget.get_variables(layout).items():
+                    assert key not in variables, "use unique variable names"
+                    variables[key] = value
 
     return variables
