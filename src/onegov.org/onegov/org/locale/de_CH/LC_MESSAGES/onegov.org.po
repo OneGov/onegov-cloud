@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-10-31 10:14+0100\n"
+"POT-Creation-Date: 2017-10-31 10:49+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -550,6 +550,9 @@ msgstr "Adresse"
 
 msgid "Filters"
 msgstr "Filter"
+
+msgid "Directory entries may have coordinates"
+msgstr "Zu Verzeichnis-Einträgen können Koordinaten erfasst werden"
 
 #, python-format
 msgid "The following fields are unknown: ${fields}"

@@ -1,14 +1,17 @@
+from onegov.core.orm.mixins import meta_property
 from onegov.core.utils import linkify
 from onegov.directory import Directory, DirectoryEntry
 from onegov.form import as_internal_id
-from onegov.org.models.extensions import HiddenFromPublicExtension
 from onegov.org.models.extensions import CoordinatesExtension
+from onegov.org.models.extensions import HiddenFromPublicExtension
 
 
 class ExtendedDirectory(Directory, HiddenFromPublicExtension):
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
     es_type_name = 'extended_directories'
+
+    enable_map = meta_property('enable_map')
 
 
 class ExtendedDirectoryEntry(DirectoryEntry, CoordinatesExtension,

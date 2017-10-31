@@ -19,8 +19,15 @@ def get_directory_form_class(model, request):
 
 
 def get_directory_entry_form_class(model, request):
-    return ExtendedDirectoryEntry().with_content_extensions(
+    form_class = ExtendedDirectoryEntry().with_content_extensions(
         model.directory.form_class, request)
+
+    class OptionalMapForm(form_class):
+        def on_request(self):
+            if not model.directory.enable_map:
+                self.delete_field('coordinates')
+
+    return OptionalMapForm
 
 
 @OrgApp.html(

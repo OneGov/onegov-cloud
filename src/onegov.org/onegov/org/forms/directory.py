@@ -4,7 +4,11 @@ from onegov.directory import DirectoryConfiguration
 from onegov.form import Form, flatten_fieldsets, parse_formcode, as_internal_id
 from onegov.form.validators import ValidFormDefinition
 from onegov.org import _
-from wtforms import StringField, TextAreaField, validators, ValidationError
+from wtforms import StringField
+from wtforms import TextAreaField
+from wtforms import validators
+from wtforms import ValidationError
+from wtforms import BooleanField
 
 
 class DirectoryForm(Form):
@@ -51,6 +55,11 @@ class DirectoryForm(Form):
             'class_': 'formcode-select',
             'data-fields-include': 'radio,checkbox'
         })
+
+    enable_map = BooleanField(
+        label=_("Directory entries may have coordinates"),
+        default=True
+    )
 
     @cached_property
     def known_field_ids(self):
