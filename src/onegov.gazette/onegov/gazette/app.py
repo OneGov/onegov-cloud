@@ -128,13 +128,13 @@ def get_webasset_output():
     filters={'css': ['datauri', 'custom-rcssmin']}
 )
 def get_frameworks_asset():
-    # Common assets unlikely to change
+    # common assets unlikely to change
     yield 'modernizr.js'
 
     # jQuery
     yield 'jquery.js'
     yield 'jquery.datetimepicker.css'
-    yield 'jquery.datetimepicker.js'
+    yield 'jquery.datetimepicker.full.js'
 
     # other frameworks
     yield 'fastclick.js'
