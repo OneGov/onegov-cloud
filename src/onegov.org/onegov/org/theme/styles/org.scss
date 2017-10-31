@@ -63,6 +63,11 @@
 $max-line-width: 67ex;
 
 /*
+    The height of full-width banners
+*/
+$full-width-banner-height: 333px;
+
+/*
     Zurb foundation uses this without !import, which causes IE11 to not
     apply the placeholder color.
 */
@@ -3540,7 +3545,7 @@ ul.recipients {
 }
 
 .slider {
-    height: 333px;
+    height: $full-width-banner-height;
 
     li {
         @include smooth-edges;
@@ -3548,7 +3553,7 @@ ul.recipients {
         background-position: center center !important;
         background-size: cover !important;
 
-        height: 333px;
+        height: $full-width-banner-height;
     }
 
     &.no-images {
@@ -3919,6 +3924,15 @@ h2 + div.timeline {
     transition-duration: 300ms;
     transition-property: transform, opacity;
     transition-timing-function: cubic-bezier(.175, .665, .320, 1), linear;
+}
+
+/*
+    Directories
+*/
+
+.directories-map {
+    height: $full-width-banner-height;
+    margin-bottom: 1rem;
 }
 
 /*

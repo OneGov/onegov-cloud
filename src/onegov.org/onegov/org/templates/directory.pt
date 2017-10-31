@@ -6,13 +6,12 @@
 
         <div class="row">
             <div class="columns medium-12">
-                <div class="geojson-map"
+                <div class="geojson-map directories-map"
                     data-geojson="${geojson}"
                     data-lat="${layout.default_map_view.lat}"
                     data-lon="${layout.default_map_view.lon}"
                     data-zoom="${layout.default_map_view.zoom}"
-                    data-map-height="350px"
-                    style="margin-bottom: 1rem; height: 350px;"
+                    data-map-height="333px"
                 ></div>
             </div>
         </div>
