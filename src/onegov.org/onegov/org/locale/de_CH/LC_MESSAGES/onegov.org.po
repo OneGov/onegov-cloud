@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-10-26 16:55+0200\n"
+"POT-Creation-Date: 2017-10-31 10:14+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -536,20 +536,24 @@ msgstr "Beschreibt worum es bei diesem Verzeichnis geht"
 msgid "Definition"
 msgstr "Definition"
 
-msgid "Title Format"
-msgstr "Titel Format"
+msgid "Title-Format"
+msgstr "Titel-Format"
 
-msgid "Lead Format"
-msgstr "Lead Format"
+msgid "Lead-Format"
+msgstr "Lead-Format"
 
-msgid "Display in the main view"
-msgstr "In der Hauptansicht anzeigen"
+msgid "Main view"
+msgstr "Hauptansicht"
 
-msgid "Display as address"
-msgstr "Als Adresse anzeigen"
+msgid "Address"
+msgstr "Adresse"
 
-msgid "Use for filtering"
-msgstr "Als Filter nutzen"
+msgid "Filters"
+msgstr "Filter"
+
+#, python-format
+msgid "The following fields are unknown: ${fields}"
+msgstr "Die folgenden Felder sind unbekannt: ${fields}"
 
 msgid "Exhibition"
 msgstr "Ausstellung"
@@ -757,9 +761,6 @@ msgstr "Bild"
 
 msgid "URL pointing to the picture"
 msgstr "Link zum Bild"
-
-msgid "Address"
-msgstr "Adresse"
 
 msgid "Notes"
 msgstr "Notizen"
@@ -2478,6 +2479,3 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
-
-#~ msgid "This directory is empty."
-#~ msgstr "Dieses Verzeichnis ist leer."

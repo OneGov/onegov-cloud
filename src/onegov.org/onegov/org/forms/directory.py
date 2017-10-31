@@ -26,27 +26,27 @@ class DirectoryForm(Form):
         render_kw={'rows': 32, 'data-editor': 'form'})
 
     title_format = StringField(
-        label=_("Title Format"),
+        label=_("Title-Format"),
         validators=[validators.InputRequired()],
         render_kw={'class_': 'formcode-format'})
 
     lead_format = StringField(
-        label=_("Lead Format"),
+        label=_("Lead-Format"),
         render_kw={'class_': 'formcode-format'})
 
     content_fields = TextAreaField(
-        label=_("Display in the main view"),
+        label=_("Main view"),
         render_kw={'class_': 'formcode-select'})
 
     contact_fields = TextAreaField(
-        label=_("Display as address"),
+        label=_("Address"),
         render_kw={
             'class_': 'formcode-select',
             'data-fields-exclude': 'fileinput,radio,checkbox'
         })
 
     keyword_fields = TextAreaField(
-        label=_("Use for filtering"),
+        label=_("Filters"),
         render_kw={
             'class_': 'formcode-select',
             'data-fields-include': 'radio,checkbox'
