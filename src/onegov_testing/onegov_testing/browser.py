@@ -102,3 +102,9 @@ class ExtendedBrowser(InjectedBrowserExtension):
 
         if time_budget <= 0:
             raise RuntimeError("Timeout reached")
+
+    def scroll_to_css(self, css):
+        """ Scrolls to the first element matching the given css expression. """
+
+        self.execute_script(
+            'document.querySelector("{}").scrollIntoView()'.format(css))
