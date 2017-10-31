@@ -139,5 +139,5 @@ def delete_category(self, request, form):
         'subtitle': _("Delete Category"),
         'button_text': _("Delete Category"),
         'button_class': 'alert',
-        'cancel': request.link(self)
+        'cancel': layout.manage_categories_link
     }

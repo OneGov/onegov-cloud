@@ -177,5 +177,5 @@ def delete_organization(self, request, form):
         'subtitle': _("Delete Organization"),
         'button_text': _("Delete Organization"),
         'button_class': 'alert',
-        'cancel': request.link(self)
+        'cancel': layout.manage_organizations_link
     }
