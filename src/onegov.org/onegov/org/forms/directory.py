@@ -4,7 +4,7 @@ from onegov.directory import DirectoryConfiguration
 from onegov.form import Form, flatten_fieldsets, parse_formcode, as_internal_id
 from onegov.form.validators import ValidFormDefinition
 from onegov.org import _
-from wtforms import StringField, TextAreaField, validators
+from wtforms import StringField, TextAreaField, validators, ValidationError
 
 
 class DirectoryForm(Form):
@@ -59,12 +59,30 @@ class DirectoryForm(Form):
             flatten_fieldsets(parse_formcode(self.structure.data))
         }
 
+    @cached_property
+    def missing_fields(self):
+        return self.configuration.missing_fields(self.structure.data)
+
     def extract_field_ids(self, field):
         for line in field.data.splitlines():
             line = line.strip()
 
             if as_internal_id(line) in self.known_field_ids:
                 yield line
+
+    def validate_title_format(self, field):
+        if 'title' in self.missing_fields:
+            raise ValidationError(
+                _("The following fields are unknown: ${fields}", mapping={
+                    'fields': ', '.join(self.missing_fields['title'])
+                }))
+
+    def validate_lead_format(self, field):
+        if 'lead' in self.missing_fields:
+            raise ValidationError(
+                _("The following fields are unknown: ${fields}", mapping={
+                    'fields': ', '.join(self.missing_fields['lead'])
+                }))
 
     @property
     def configuration(self):
