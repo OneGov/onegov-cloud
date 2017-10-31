@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Updates French translation.
+  [href]
+
 1.3.2 (2017-10-25)
 ~~~~~~~~~~~~~~~~~~~
 
