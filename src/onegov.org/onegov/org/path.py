@@ -6,6 +6,10 @@ from collections import defaultdict
 from datetime import date
 from onegov.chat import MessageCollection
 from onegov.core.converters import extended_date_converter
+from onegov.directory import Directory
+from onegov.directory import DirectoryCollection
+from onegov.directory import DirectoryEntryCollection
+from onegov.directory import DirectoryEntry
 from onegov.event import (
     Event,
     EventCollection,
@@ -510,6 +514,13 @@ def keywords_encode(d):
 keywords_converter = morepath.Converter(
     decode=keywords_decode, encode=keywords_encode
 )
+
+
+@OrgApp.path(
+    model=Directory,
+    path='/directory/{name}')
+def get_directory(app, name):
+    return DirectoryCollection(app.session()).by_name(name)
 
 
 @OrgApp.path(

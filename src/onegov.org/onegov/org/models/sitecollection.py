@@ -1,5 +1,6 @@
 from onegov.form.models import FormDefinition
 from onegov.reservation import Resource
+from onegov.directory import Directory
 from onegov.org.models.file import ImageSet
 from onegov.org.models.page import News, Topic
 from sqlalchemy.orm import defer
@@ -36,6 +37,15 @@ class SiteCollection(object):
         resources = resources.options(defer(Resource.timezone))
         resources = resources.order_by(Resource.title)
 
+        # get the directories
+        directories = self.session.query(Directory)
+        directories = directories.options(defer(Directory.meta))
+        directories = directories.options(defer(Directory.content))
+        directories = directories.options(defer(Directory.lead))
+        directories = directories.options(defer(Directory.structure))
+        directories = directories.options(defer(Directory.configuration))
+        directories = directories.order_by(Directory.order)
+
         # get the foto albums
         imagesets = self.session.query(ImageSet)
         imagesets = imagesets.options(defer(ImageSet.meta))
@@ -43,9 +53,10 @@ class SiteCollection(object):
         imagesets = imagesets.order_by(ImageSet.title)
 
         return {
-            'topics': topics.all(),
-            'news': news.all(),
-            'forms': forms.all(),
-            'resources': resources.all(),
-            'imagesets': imagesets.all(),
+            'topics': tuple(topics),
+            'news': tuple(news),
+            'forms': tuple(forms),
+            'resources': tuple(resources),
+            'directories': tuple(directories),
+            'imagesets': tuple(imagesets),
         }

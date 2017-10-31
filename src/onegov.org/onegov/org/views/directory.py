@@ -1,5 +1,6 @@
 from collections import namedtuple
 from onegov.core.security import Public, Private, Secret
+from onegov.directory import Directory
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryEntryCollection
@@ -43,6 +44,15 @@ def view_directories(self, request):
             DirectoryEntryCollection(directory)
         )
     }
+
+
+@OrgApp.view(
+    model=Directory,
+    permission=Public)
+def view_directory_redirect(self, request):
+    return request.redirect(request.class_link(
+        DirectoryEntryCollection, {'directory_name': self.name}
+    ))
 
 
 @OrgApp.form(model=DirectoryCollection, name='new', template='form.pt',
