@@ -84,3 +84,115 @@ def test_browse_directory_uploads(browser, org_app):
     browser.find_by_value("Absenden").click()
 
     assert not browser.is_element_present_by_css('.field-display img')
+
+
+def test_browse_directory_editor(browser, org_app):
+    browser.login_admin()
+    browser.visit('/directories/+new')
+
+    assert browser.is_element_present_by_css('.formcode-toolbar', wait_time=5)
+
+    browser.fill('title', "Restaurants")
+
+    # add a title through the dropdown menu
+    browser.find_by_css('.formcode-toolbar-element').click()
+    browser.find_by_css('.formcode-snippet-name')[0].click()
+
+    # add a text through the dropdown menu
+    browser.find_by_css('.formcode-toolbar-element').click()
+    browser.find_by_css('.formcode-snippet-name')[1].mouse_over()
+    browser.find_by_css('.formcode-snippet-required')[0].click()
+
+    assert browser.find_by_css('#structure').value == (
+        "# Titel\n"
+        "Text *= ___\n"
+    )
+
+    # Add the title to the title format
+    browser.scroll_to_css('#title_format')
+    assert browser.is_element_present_by_xpath(
+        '(//div[@class="formcode-toolbar-element"])[2]', wait_time=5)
+
+    browser.find_by_css('.formcode-toolbar-element')[1].click()
+    browser.find_by_css('.formcode-snippet-name')[0].click()
+
+    assert browser.find_by_css('#title_format').value == '[Titel/Text]'
+
+    # Add it to the lead format as well
+    browser.scroll_to_css('#lead_format')
+    assert browser.is_element_present_by_xpath(
+        '(//div[@class="formcode-toolbar-element"])[3]', wait_time=5)
+
+    browser.find_by_css('.formcode-toolbar-element')[2].click()
+    browser.find_by_css('.formcode-snippet-name')[0].click()
+
+    assert browser.find_by_css('#lead_format').value == '[Titel/Text]'
+
+    # Elect to show the fields in the main view
+    browser.find_by_css('.formcode-select label').click()
+
+    assert browser.find_by_css('#content_fields').value == "Titel/Text"
+
+    # Save the form and ensure that after the load we get the same selections
+    browser.find_by_value("Absenden").click()
+    browser.find_by_css('.edit-link').click()
+
+    assert browser.find_by_css('.formcode-select input')[0].checked
+    assert not browser.find_by_css('.formcode-select input')[1].checked
+
+
+def test_browse_directory_coordinates(browser, org_app):
+    DirectoryCollection(org_app.session(), type='extended').add(
+        title="Restaurants",
+        structure="""
+            Name *= ___
+            Tables = 0..1000
+        """,
+        configuration="""
+            title: '[name]'
+            lead: 'Offers [tables] tables'
+            order:
+                - name
+            display:
+                content:
+                    - name
+        """,
+        type='extended'
+    )
+
+    transaction.commit()
+
+    # create two restaurants with two different coordinates
+    browser.login_admin()
+    browser.visit('/directories/restaurants/+new')
+    browser.fill('name', "City Wok")
+    browser.fill('tables', "10")
+    assert browser.is_element_present_by_css('.add-point-active', wait_time=5)
+    browser.execute_script('document.leafletmaps[0].panBy([-100, 100]);')
+    browser.find_by_css('.add-point-active').click()
+    browser.find_by_value("Absenden").click()
+
+    browser.visit('/directories/restaurants/+new')
+    browser.fill('name', "City Sushi")
+    browser.fill('tables', "20")
+    assert browser.is_element_present_by_css('.add-point-active', wait_time=5)
+    browser.execute_script('document.leafletmaps[0].panBy([100, -100]);')
+    browser.find_by_css('.add-point-active').click()
+    browser.find_by_value("Absenden").click()
+
+    # make sure the restaurants are visible in the overview
+    browser.visit('/directories/restaurants')
+    assert "Offers 20 tables" in browser.html
+    assert "Offers 10 tables" in browser.html
+
+    # as well as their points, which we can toggle
+    assert not browser.is_element_present_by_css('.popup-title')
+    assert not browser.is_element_present_by_css('.popup-lead')
+
+    browser.find_by_css('.vector-marker')[1].click()
+    assert browser.is_element_present_by_css('.popup-title')
+    assert browser.is_element_present_by_css('.popup-lead')
+
+    # the popup leads us to the restaurant
+    browser.find_by_css('.popup-title').click()
+    assert browser.is_element_present_by_id('directories-restaurants-city-wok')
