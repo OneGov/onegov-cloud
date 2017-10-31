@@ -15,11 +15,13 @@ from onegov.file.utils import as_fileintent
 from onegov.form import flatten_fieldsets, parse_formcode, parse_form
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
+from sqlalchemy import Integer
 from sqlalchemy import Text
+from sqlalchemy import func
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.attributes import InstrumentedAttribute
-from sqlalchemy_utils import observes
+from sqlalchemy_utils import aggregated, observes
 from uuid import uuid4
 
 
@@ -70,6 +72,11 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     #: The configuration of the contained entries
     configuration = Column(DirectoryConfigurationStorage, nullable=False)
+
+    #: The number of entries in the directory
+    @aggregated('entries', Column(Integer, nullable=False, default=0))
+    def count(self):
+        return func.count('1')
 
     __mapper_args__ = {
         'order_by': order,
