@@ -111,34 +111,6 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
 
         return errors
 
-    def rename_field(self, old_name, new_name):
-        for field in self.fields:
-            value = getattr(self, field)
-
-            setattr(self, field, self.rename_field_value(
-                value, old_name, new_name))
-
-    def rename_field_value(self, value, old_name, new_name):
-        if not value:
-            return value
-
-        if isinstance(value, str):
-            return value.replace('[' + old_name + ']', '[' + new_name + ']')
-
-        if isinstance(value, list):
-            for ix, name in enumerate(value):
-                value[ix] = new_name if name == old_name else name
-
-            return value
-
-        if isinstance(value, dict):
-            return {
-                k: self.rename_field_value(v, old_name, new_name)
-                for k, v in value.items()
-            }
-
-        raise NotImplementedError
-
     @classmethod
     def coerce(cls, key, value):
         if not isinstance(value, Mutable):

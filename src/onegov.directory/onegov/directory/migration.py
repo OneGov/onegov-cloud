@@ -88,12 +88,9 @@ class DirectoryMigration(object):
                 del entry.values[removed]
 
             for old, new in self.changes.renamed_fields.items():
-                old_human, new_human = old, new
                 old, new = as_internal_id(old), as_internal_id(new)
                 entry.values[new] = entry.values[old]
                 del entry.values[old]
-
-                self.directory.configuration.rename_field(old_human, new_human)
 
             for changed in self.changes.changed_fields:
                 convert = self.fieldtype_migrations.get_converter(
