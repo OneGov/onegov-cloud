@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a reference to each created map to the document.
+  [href]
+
 - Adds a gejson map type.
   [href]
 

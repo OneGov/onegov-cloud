@@ -267,6 +267,9 @@ function spawnDefaultMap(element, lat, lon, zoom, includeZoomControls) {
         });
     });
 
+    document.leafletmaps = document.leafletmaps || [];
+    document.leafletmaps.push(map);
+
     return map;
 }
 
