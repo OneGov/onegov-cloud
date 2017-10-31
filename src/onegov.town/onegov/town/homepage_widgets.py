@@ -1,7 +1,7 @@
 from onegov.form import FormCollection
 from onegov.reservation import ResourceCollection
 from onegov.org.elements import Link, LinkGroup
-from onegov.org.models import AtoZPages, ImageSetCollection
+from onegov.org.models import ImageSetCollection
 from onegov.people import PersonCollection
 from onegov.town import TownApp, _
 
@@ -61,15 +61,15 @@ class ServicesWidget(object):
         }
 
 
-@TownApp.homepage_widget(tag='directories')
-class DirectoriesWidget(object):
+@TownApp.homepage_widget(tag='contacts_and_albums')
+class ContactsAndAlbumsWidget(object):
 
     template = """
-        <xsl:template match="directories">
-            <h2 tal:content="directories_panel.title"></h2>
+        <xsl:template match="contacts_and_albums">
+            <h2 tal:content="contacts_and_albums_panel.title"></h2>
 
             <metal:block use-macro="layout.macros['panel-links']"
-                tal:define="panel directories_panel"
+                tal:define="panel contacts_and_albums_panel"
             />
         </xsl:template>
     """
@@ -78,8 +78,8 @@ class DirectoriesWidget(object):
         request = layout.request
 
         return {
-            'directories_panel': LinkGroup(
-                title=_("Directories"),
+            'contacts_and_albums_panel': LinkGroup(
+                title=_("Contacts and Photos"),
                 links=[
                     Link(
                         text=_("People"),
@@ -91,11 +91,6 @@ class DirectoriesWidget(object):
                         url=request.class_link(ImageSetCollection),
                         subtitle=_("Impressions")
                     ),
-                    Link(
-                        text=_("Topics"),
-                        url=request.class_link(AtoZPages),
-                        subtitle=_("Catalog A-Z")
-                    )
                 ]
             )
         }

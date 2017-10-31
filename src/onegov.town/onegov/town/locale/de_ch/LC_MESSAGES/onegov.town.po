@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-09-22 10:35+0200\n"
+"POT-Creation-Date: 2017-10-31 14:44+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -21,8 +21,8 @@ msgstr "Online-Schalter"
 msgid "Reservations"
 msgstr "Reservationen"
 
-msgid "Directories"
-msgstr "Verzeichnisse"
+msgid "Contacts and Photos"
+msgstr "Kontakte und Fotos"
 
 msgid "Forms and applications"
 msgstr "Formulare und Gesuche"
@@ -47,12 +47,6 @@ msgstr "Fotoalben"
 
 msgid "Impressions"
 msgstr "Impressionen"
-
-msgid "Topics"
-msgstr "Themen"
-
-msgid "Catalog A-Z"
-msgstr "Katalog A-Z"
 
 msgid "Online Counter Label"
 msgstr "Onlineschalter Label"
