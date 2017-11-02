@@ -73,7 +73,7 @@ def test_organization(session):
     session.flush()
     child = session.query(Organization).filter_by(name='101').one()
 
-    assert parent.in_use(session) == True
+    assert parent.in_use(session) == False
     assert child.in_use(session) == False
 
     session.add(
@@ -81,7 +81,7 @@ def test_organization(session):
     )
     session.flush()
 
-    assert parent.in_use(session) == True
+    assert parent.in_use(session) == False
     assert child.in_use(session) == True
 
     # Test title observer

@@ -61,7 +61,7 @@ def create_user(self, request, form):
 
     if form.submitted(request):
         user = self.add(
-            form.email.data,
+            form.username.data,
             random_password(16),
             form.role.data,
             realname=form.name.data

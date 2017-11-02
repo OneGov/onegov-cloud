@@ -1,9 +1,10 @@
 from onegov.form import Form
 from onegov.gazette import _
 from onegov.gazette.models import Category
+from onegov.gazette.models import GazetteNotice
 from onegov.gazette.validators import UniqueColumnValue
+from onegov.gazette.validators import UnusedColumnKeyValue
 from wtforms import BooleanField
-from wtforms import HiddenField
 from wtforms import StringField
 from wtforms.validators import InputRequired
 
@@ -26,14 +27,10 @@ class CategoryForm(Form):
         label=_("ID"),
         description=_("Leave blank to set the value automatically."),
         validators=[
-            UniqueColumnValue(
-                column=Category.name,
-                old_field='name_old'
-            )
+            UniqueColumnValue(Category),
+            UnusedColumnKeyValue(GazetteNotice._categories)
         ]
     )
-
-    name_old = HiddenField()
 
     def update_model(self, model):
         model.title = self.title.data
@@ -45,4 +42,6 @@ class CategoryForm(Form):
         self.title.data = model.title
         self.active.data = model.active
         self.name.data = model.name
-        self.name_old.data = model.name
+        self.name.default = model.name
+        if model.in_use(self.request.app.session()):
+            self.name.render_kw = {'readonly': True}

@@ -4,6 +4,7 @@ from freezegun import freeze_time
 from onegov.gazette.collections import CategoryCollection
 from onegov.gazette.collections import IssueCollection
 from onegov.gazette.collections import OrganizationCollection
+from onegov.gazette.collections import GazetteNoticeCollection
 from onegov.gazette.forms import CategoryForm
 from onegov.gazette.forms import IssueForm
 from onegov.gazette.forms import NoticeForm
@@ -55,55 +56,76 @@ class DummyPostData(dict):
 
 
 def test_category_form(session):
+    request = DummyRequest(session)
+
     # Test apply / update
+    # ... unused
     categories = CategoryCollection(session)
     category = categories.add_root(name='1', title='ABC', active=True)
-    categories.add_root(name='2', title='XYZ', active=True)
 
     form = CategoryForm()
+    form.request = request
     form.apply_model(category)
     assert form.title.data == 'ABC'
     assert form.active.data == True
     assert form.name.data == '1'
-    assert form.name_old.data == '1'
 
     form.title.data = 'DEF'
     form.active.data = False
+    form.name.data = '3'
     form.update_model(category)
     assert category.title == 'DEF'
     assert category.active == False
-    assert category.name == '1'
+    assert category.name == '3'
 
-    form.name.data = '3'
-    form.update_model(category)
-    assert form.name.data == '3'
+    # ... used
+    category = categories.add_root(name='2', title='XYZ', active=True)
+    GazetteNoticeCollection(session).add('title', 'text', '', '2', None, [])
+
+    form.apply_model(category)
+    assert form.name.render_kw == {'readonly': True}
 
     # Test validation
+    # ... empty values
     form = CategoryForm()
-    form.request = DummyRequest(session)
+    form.request = request
     assert not form.validate()
 
-    for name, result in (('3', False), ('1', True), ('', True), ('8', True)):
-        form = CategoryForm(
-            DummyPostData({
-                'title': 'title',
-                'name_old': '1',
-                'name': name
-            })
-        )
-        form.request = DummyRequest(session)
-        assert form.validate() == result
+    # ... new model
+    form = CategoryForm(DummyPostData({'title': 'title', 'name': '2'}))
+    form.request = request
+    assert not form.validate()
+    assert 'This value already exists.' in form.errors['name']
+
+    form = CategoryForm(DummyPostData({'title': 'title', 'name': '5'}))
+    form.request = request
+    assert form.validate()
+
+    # ... existing model
+    form = CategoryForm(DummyPostData({'title': 'title', 'name': '3'}))
+    form.model = categories.query().filter_by(name='2').one()
+    form.request = request
+    assert not form.validate()
+    assert 'This value already exists.' in form.errors['name']
+    assert 'This value is in use.' in form.errors['name']
+
+    form = CategoryForm(DummyPostData({'title': 'title', 'name': '5'}))
+    form.model = categories.query().filter_by(name='3').one()
+    form.request = request
+    assert form.validate()
 
 
 def test_organization_form(session):
-    # Test apply / update
+    request = DummyRequest(session)
+
+    # Test on request
     organizations = OrganizationCollection(session)
     parent = organizations.add_root(title='parent', active=True)
     child = organizations.add(parent=parent, title='child', active=True)
     other = organizations.add_root(title='other', active=True)
 
     form = OrganizationForm()
-    form.request = DummyRequest(session)
+    form.request = request
     form.on_request()
     assert form.parent.choices == [
         ('', '- none -'),
@@ -111,26 +133,25 @@ def test_organization_form(session):
         ('3', 'other')
     ]
 
+    # Test apply / update
+    # ... unused
     form.apply_model(parent)
     assert form.title.data == 'parent'
     assert form.active.data == True
     assert form.parent.data == ''
     assert form.name.data == '1'
-    assert form.name_old.data == '1'
 
     form.apply_model(child)
     assert form.title.data == 'child'
     assert form.active.data == True
     assert form.parent.data == '1'
     assert form.name.data == '2'
-    assert form.name_old.data == '2'
 
     form.apply_model(other)
     assert form.title.data == 'other'
     assert form.active.data == True
     assert form.parent.data == ''
     assert form.name.data == '3'
-    assert form.name_old.data == '3'
 
     form.title.data = 'DEF'
     form.active.data = False
@@ -148,26 +169,55 @@ def test_organization_form(session):
     form.update_model(other)
     assert other.name == '4'
 
+    # ... used
+    GazetteNoticeCollection(session).add('title', 'text', '4', '', None, [])
+
+    form.apply_model(other)
+    assert form.name.render_kw == {'readonly': True}
+
     # Test validation
+    # ... empty values
     form = OrganizationForm()
-    form.request = DummyRequest(session)
+    form.request = request
     assert not form.validate()
 
-    for name, result in (('2', False), ('1', True), ('', True), ('8', True)):
-        form = OrganizationForm(
-            DummyPostData({
-                'title': 'title',
-                'parent': '',
-                'name_old': '1',
-                'name': name
-            })
-        )
-        form.request = DummyRequest(session)
-        assert form.validate() == result
+    # ... new model
+    form = OrganizationForm(
+        DummyPostData({'title': 'title', 'parent': '', 'name': '2'})
+    )
+    form.request = request
+    assert not form.validate()
+    assert 'This value already exists.' in form.errors['name']
+
+    form = OrganizationForm(
+        DummyPostData({'title': 'title', 'parent': '', 'name': '5'})
+    )
+    form.request = request
+    assert form.validate()
+
+    # ... existing model
+    form = OrganizationForm(
+        DummyPostData({'title': 'title', 'parent': '', 'name': '2'})
+    )
+    form.model = organizations.query().filter_by(name='4').one()
+    form.request = request
+    assert not form.validate()
+    assert 'This value already exists.' in form.errors['name']
+    assert 'This value is in use.' in form.errors['name']
+
+    form = OrganizationForm(
+        DummyPostData({'title': 'title', 'parent': '', 'name': '5'})
+    )
+    form.model = organizations.query().filter_by(name='1').one()
+    form.request = request
+    assert form.validate()
 
 
 def test_issue_form(session):
+    request = DummyRequest(session, DummyPrincipal())
+
     # Test apply / update
+    # ... unused
     issues = IssueCollection(session)
     issue = issues.add(
         name='2018-1', number=1, date=date(2018, 1, 5),
@@ -175,13 +225,12 @@ def test_issue_form(session):
     )
 
     form = IssueForm()
-    form.request = DummyRequest(session, DummyPrincipal())
+    form.request = request
     form.on_request()
 
     form.apply_model(issue)
     assert form.number.data == 1
     assert form.name.data == '2018-1'
-    assert form.name_old.data == '2018-1'
     assert form.date_.data == date(2018, 1, 5)
     assert form.deadline.data == datetime(2018, 1, 4, 13, 0)
 
@@ -196,29 +245,84 @@ def test_issue_form(session):
         datetime(2019, 1, 4, 12, 0), 'UTC'
     )
 
+    # used
+    issue = issues.add(
+        name='2019-3', number=3, date=date(2019, 2, 5),
+        deadline=standardize_date(datetime(2019, 2, 4, 12, 0), 'UTC')
+    )
+    notices = GazetteNoticeCollection(session)
+    notices.add('title', 'text', '', '', None, ['2019-3'])
+
+    form.apply_model(issue)
+    assert form.number.render_kw == {'readonly': True}
+
     # Test validation
+    # ... empty values
     form = IssueForm()
-    form.request = DummyRequest(session, DummyPrincipal())
-    form.on_request()
+    form.request = request
     assert not form.validate()
 
-    for number, old, deadline, result in (
-        (2, None, '2019-01-02T12:00', False),  # issue name is taken
-        (2, '2019-2', '2019-01-02T12:00', True),  # edit
-        (1, None, '2019-01-02T12:00', True),  # W3C
-        (1, None, '2019-01-02 12:00', True)  # Datetimepicker
-    ):
-        form = IssueForm(
-            DummyPostData({
-                'number': number,
-                'date_': '2019-01-02',
-                'deadline': '2019-01-02T12:00',
-                'name_old': old
-            })
-        )
-        form.request = DummyRequest(session, DummyPrincipal())
-        form.on_request()
-        assert form.validate() == result
+    # ... new model
+    form = IssueForm(
+        DummyPostData({
+            'number': '3', 'date_': '2019-03-05',
+            'deadline': '2019-03-04T12:00'
+        })
+    )
+    form.request = request
+    assert not form.validate()
+    assert 'This value already exists.' in form.errors['name']
+
+    form = IssueForm(
+        DummyPostData({
+            'number': '5', 'date_': '2019-03-05',
+            'deadline': '2019-03-04T12:00'
+        })
+    )
+    form.request = request
+    assert form.validate()
+
+    form = IssueForm(
+        DummyPostData({
+            'number': '3', 'date_': '2018-03-05',
+            'deadline': '2019-03-04T12:00'
+        })
+    )
+    form.request = request
+    assert form.validate()
+
+    # ... existing model
+    form = IssueForm(
+        DummyPostData({
+            'number': '2', 'date_': '2019-03-05',
+            'deadline': '2019-03-04T12:00'
+        })
+    )
+    form.model = issues.query().filter_by(number='3').one()
+    form.request = request
+    assert not form.validate()
+    assert 'This value already exists.' in form.errors['name']
+    assert 'This value is in use.' in form.errors['name']
+
+    form = IssueForm(
+        DummyPostData({
+            'number': '5', 'date_': '2019-03-05',
+            'deadline': '2019-03-04T12:00'
+        })
+    )
+    form.model = issues.query().filter_by(number='2').one()
+    form.request = request
+    assert form.validate()
+
+    # Datetimepicker forma
+    form = IssueForm(
+        DummyPostData({
+            'number': '1', 'date_': '2020-01-01',
+            'deadline': '2011-01-01 12:00'
+        })
+    )
+    form.request = request
+    assert form.validate()
 
 
 def test_user_form(session):
@@ -234,8 +338,7 @@ def test_user_form(session):
     form = UserForm()
 
     form.apply_model(user)
-    assert form.email.data == 'a@a.ai'
-    assert form.email_old.data == 'a@a.ai'
+    assert form.username.data == 'a@a.ai'
     assert form.role.data == 'editor'
     assert form.name.data == 'User'
     assert form.group.data == ''
@@ -246,7 +349,7 @@ def test_user_form(session):
     form.apply_model(user)
     assert form.group.data == str(group.id)
 
-    form.email.data = 'b@b.bi'
+    form.username.data = 'b@b.bi'
     form.role.data = 'publisher'
     form.name.data = 'Publisher'
     form.group.data = ''
@@ -266,40 +369,34 @@ def test_user_form(session):
     form.request = DummyRequest(session)
     assert not form.validate()
 
+    # ... admins can not be created
     for role, result in (('admin', False), ('editor', True), ('member', True)):
         form = UserForm(
             DummyPostData({
                 'role': role,
                 'name': 'User',
-                'email': 'x@y.za',
+                'username': 'x@y.za',
                 'group': ''
             })
         )
         form.request = DummyRequest(session)
         assert form.validate() == result
 
+    # ... existing email
     form = UserForm(
         DummyPostData({
             'role': 'editor',
             'name': 'User',
-            'email': 'b@b.bi',
+            'username': 'b@b.bi',
             'group': ''
         })
     )
     form.request = DummyRequest(session)
     assert not form.validate()
+    assert 'This value already exists.' in form.errors['username']
 
-    form = UserForm(
-        DummyPostData({
-            'role': 'editor',
-            'name': 'User',
-            'email': 'b@b.bi',
-            'email_old': 'b@b.bi',
-            'group': ''
-        })
-    )
-    form.request = DummyRequest(session)
-    assert form.validate()
+    form.model = user
+    form.validate()
 
 
 def test_user_form_on_request(session):

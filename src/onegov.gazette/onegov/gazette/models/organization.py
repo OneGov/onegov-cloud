@@ -24,15 +24,9 @@ class Organization(AdjacencyList, TimestampMixin):
     active = Column(Boolean, nullable=True)
 
     def in_use(self, session):
-        """ True, if the organization is used by any notice or has any child
-        organizations.
-
-        """
+        """ True, if the organization is used by any notice. """
 
         from onegov.gazette.models.notice import GazetteNotice  # circular
-
-        if self.children:
-            return True
 
         query = session.query(GazetteNotice._organizations)
         query = query.filter(

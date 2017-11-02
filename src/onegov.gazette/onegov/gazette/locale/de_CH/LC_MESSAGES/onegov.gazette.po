@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-02 10:00+0100\n"
-"PO-Revision-Date: 2017-11-02 10:00+0100\n"
+"POT-Creation-Date: 2017-11-02 15:31+0100\n"
+"PO-Revision-Date: 2017-11-02 13:42+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -66,6 +66,9 @@ msgstr "Angenommene Meldungen"
 msgid "This value already exists."
 msgstr "Dieser Wert ist bereits vorhanden."
 
+msgid "This value is in use."
+msgstr "Dieser Wert wird verwendet."
+
 msgid "drafted"
 msgstr "in Arbeit"
 
@@ -108,9 +111,6 @@ msgstr "Datum"
 msgid "Deadline"
 msgstr "Eingabeschluss"
 
-msgid "This issue already exists."
-msgstr "Diese Ausgabe ist bereits vorhanden."
-
 msgid "Organization"
 msgstr "Organisation"
 
@@ -143,9 +143,6 @@ msgstr "Herausgeber"
 
 msgid "Editor"
 msgstr "Redaktor"
-
-msgid "A user with this e-mail address already exists."
-msgstr "Ein Benutzer mit dieser E-Mail-Adresse existiert bereits."
 
 msgid "New"
 msgstr "Neu"

@@ -22,16 +22,16 @@ def test_view_users(gazette_app):
     manage = manage.click("Neu")
     manage.form['role'] = 'editor'
     manage.form['name'] = "New editor"
-    manage.form['email'] = "editor1@example.org"
+    manage.form['username'] = "editor1@example.org"
     manage = manage.form.submit()
-    assert "Ein Benutzer mit dieser E-Mail-Adresse existiert bereits" in manage
+    assert "Dieser Wert ist bereits vorhanden." in manage
 
     # add a publisher
     manage = client.get('/users')
     manage = manage.click("Neu")
     manage.form['role'] = 'editor'
     manage.form['name'] = "New user"
-    manage.form['email'] = "new_user@example.org"
+    manage.form['username'] = "new_user@example.org"
     manage = manage.form.submit().maybe_follow()
     assert "Benutzer hinzugefügt." in manage
     assert "new_user@example.org" in manage
@@ -50,9 +50,9 @@ def test_view_users(gazette_app):
 
     # try to change the email adress to an already taken one
     manage = manage.click("Bearbeiten", href="new_user")
-    manage.form['email'] = 'publisher@example.org'
+    manage.form['username'] = 'publisher@example.org'
     manage = manage.form.submit()
-    assert "Ein Benutzer mit dieser E-Mail-Adresse existiert bereits" in manage
+    assert "Dieser Wert ist bereits vorhanden." in manage
 
     # delete user
     manage = client.get('/users').click("Löschen", href="new_user")

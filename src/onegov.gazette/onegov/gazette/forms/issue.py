@@ -1,9 +1,11 @@
 from onegov.form import Form
 from onegov.gazette import _
 from onegov.gazette.fields import DateTimeLocalField
+from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import Issue
 from onegov.gazette.models import IssueName
 from onegov.gazette.validators import UniqueColumnValue
+from onegov.gazette.validators import UnusedColumnKeyValue
 from sedate import standardize_date
 from sedate import to_timezone
 from wtforms import HiddenField
@@ -41,15 +43,10 @@ class IssueForm(Form):
 
     name = HiddenField(
         validators=[
-            UniqueColumnValue(
-                column=Issue.name,
-                old_field='name_old',
-                message=_("This issue already exists.")
-            )
+            UniqueColumnValue(Issue),
+            UnusedColumnKeyValue(GazetteNotice._issues)
         ]
     )
-
-    name_old = HiddenField()
 
     def validate(self):
         if self.date_.data and self.number.data:
@@ -75,7 +72,6 @@ class IssueForm(Form):
     def apply_model(self, model):
         self.number.data = model.number
         self.name.data = model.name
-        self.name_old.data = model.name
         self.date_.data = model.date
         self.deadline.data = model.deadline
         # Convert the deadline from UTC to the local timezone
@@ -83,3 +79,5 @@ class IssueForm(Form):
             self.deadline.data = to_timezone(
                 self.deadline.data, self.timezone.data
             ).replace(tzinfo=None)
+        if model.in_use(self.request.app.session()):
+            self.number.render_kw = {'readonly': True}

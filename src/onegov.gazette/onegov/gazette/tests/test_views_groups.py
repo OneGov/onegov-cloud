@@ -38,7 +38,7 @@ def test_view_groups(gazette_app):
         option[2]: option[0] for option in manage.form['group'].options
     }['Gruppe YZ']
     manage.form['name'] = 'User A'
-    manage.form['email'] = 'user_a@example.com'
+    manage.form['username'] = 'user_a@example.com'
     manage = manage.form.submit().maybe_follow()
     assert "Benutzer hinzugefügt." in manage
 

@@ -145,7 +145,7 @@ def delete_organization(self, request, form):
     layout = Layout(self, request)
     session = request.app.session()
 
-    if self.in_use(session):
+    if self.children or self.in_use(session):
         request.message(
             _(
                 "Only unused organizations with no sub-organisations may be "

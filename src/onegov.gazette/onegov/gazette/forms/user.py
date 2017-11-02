@@ -6,7 +6,6 @@ from onegov.user import User
 from onegov.user import UserGroup
 from sqlalchemy import cast
 from sqlalchemy import String
-from wtforms import HiddenField
 from wtforms import RadioField
 from wtforms import StringField
 from wtforms.validators import Email
@@ -39,20 +38,14 @@ class UserForm(Form):
         ]
     )
 
-    email = StringField(
+    username = StringField(
         label=_("E-Mail"),
         validators=[
             InputRequired(),
             Email(),
-            UniqueColumnValue(
-                column=User.username,
-                message=_("A user with this e-mail address already exists."),
-                old_field='email_old'
-            )
+            UniqueColumnValue(User)
         ]
     )
-
-    email_old = HiddenField()
 
     def on_request(self):
         session = self.request.app.session()
@@ -64,14 +57,13 @@ class UserForm(Form):
         )
 
     def update_model(self, model):
-        model.username = self.email.data
+        model.username = self.username.data
         model.role = self.role.data
         model.realname = self.name.data
         model.group_id = self.group.data or None
 
     def apply_model(self, model):
-        self.email.data = model.username
-        self.email_old.data = model.username
+        self.username.data = model.username
         self.role.data = model.role
         self.name.data = model.realname
         self.group.data = str(model.group_id or '')

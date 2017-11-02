@@ -425,7 +425,7 @@ def test_view_notices_statistics(gazette_app):
     ):
         manage.form['role'] = 'member'
         manage.form['name'] = user
-        manage.form['email'] = user
+        manage.form['username'] = user
         manage.form['group'] = dict(
             (x[2], x[0]) for x in manage.form['group'].options
         )[group]

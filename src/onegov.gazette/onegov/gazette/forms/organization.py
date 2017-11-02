@@ -1,11 +1,12 @@
 from onegov.form import Form
 from onegov.gazette import _
+from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import Organization
 from onegov.gazette.validators import UniqueColumnValue
+from onegov.gazette.validators import UnusedColumnKeyValue
 from sqlalchemy import cast
 from sqlalchemy import String
 from wtforms import BooleanField
-from wtforms import HiddenField
 from wtforms import SelectField
 from wtforms import StringField
 from wtforms.validators import InputRequired
@@ -34,14 +35,10 @@ class OrganizationForm(Form):
         label=_("ID"),
         description=_("Leave blank to set the value automatically."),
         validators=[
-            UniqueColumnValue(
-                column=Organization.name,
-                old_field='name_old'
-            )
+            UniqueColumnValue(Organization),
+            UnusedColumnKeyValue(GazetteNotice._organizations)
         ]
     )
-
-    name_old = HiddenField()
 
     def on_request(self):
         session = self.request.app.session()
@@ -66,5 +63,6 @@ class OrganizationForm(Form):
         self.title.data = model.title
         self.active.data = model.active
         self.name.data = model.name
-        self.name_old.data = model.name
         self.parent.data = str(model.parent_id or '')
+        if model.in_use(self.request.app.session()):
+            self.name.render_kw = {'readonly': True}
