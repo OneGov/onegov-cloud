@@ -2,6 +2,7 @@ from onegov.chat import MessageCollection
 from onegov.core.utils import groupbylist
 from onegov.gazette import _
 from onegov.gazette.models import GazetteNotice
+from onegov.gazette.models import Issue
 from onegov.notice import OfficialNoticeCollection
 from onegov.user import UserGroup
 from sqlalchemy import func
@@ -41,6 +42,16 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         to_date=None,
         source=None
     ):
+        # get the issues from the date filters
+        issues = None
+        if from_date or to_date:
+            query = session.query(Issue.name)
+            if from_date:
+                query = query.filter(Issue.date >= from_date)
+            if to_date:
+                query = query.filter(Issue.date <= to_date)
+            issues = [issue[0] for issue in query]
+
         super(GazetteNoticeCollection, self).__init__(
             session=session,
             page=page,
@@ -110,8 +121,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
             source=self.source
         )
 
-    def add(self, title, text, organization_id, category_id, user, issues,
-            principal):
+    def add(self, title, text, organization_id, category_id, user, issues):
         """ Add a new notice.
 
         A unique, URL-friendly name is created automatically for this notice
@@ -134,7 +144,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         notice.group = user.group if user else None
         notice.organization_id = organization_id
         notice.category_id = category_id
-        notice.apply_meta(principal, self.session)
+        notice.apply_meta(self.session)
         self.session.add(notice)
         self.session.flush()
 
@@ -147,18 +157,18 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
 
         return notice
 
-    def on_request(self, request):
-        """ Limits the issues to the date filters. """
-        self.issues = None
-        if self.from_date or self.to_date:
-            issues = request.app.principal.issues_by_date
-            self.issues = [
-                str(issue) for date_, issue in issues.items()
-                if (
-                    ((not self.from_date) or (date_ >= self.from_date)) and
-                    ((not self.to_date) or (date_ <= self.to_date))
-                )
-            ]
+    # def on_request(self, request):
+    #     """ Limits the issues to the date filters. """
+    #     self.issues = None
+    #     if self.from_date or self.to_date:
+    #         issues = request.app.principal.issues_by_date
+    #         self.issues = [
+    #             str(issue) for date_, issue in issues.items()
+    #             if (
+    #                 ((not self.from_date) or (date_ >= self.from_date)) and
+    #                 ((not self.to_date) or (date_ <= self.to_date))
+    #             )
+    #         ]
 
     def count_by_organization(self):
         """ Returns the total number of notices by organizations.

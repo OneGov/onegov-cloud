@@ -13,7 +13,7 @@ Changelog
 - Fixes redirects for various views.
   [msom]
 
-- Allows to manage categories and organizations.
+- Allows to manage categories, organizations and issues.
   [msom]
 
 1.9.2 (2017-10-26)

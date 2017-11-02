@@ -1,16 +1,23 @@
+from datetime import date
 from datetime import datetime
 from freezegun import freeze_time
 from onegov.gazette.collections import CategoryCollection
+from onegov.gazette.collections import IssueCollection
 from onegov.gazette.collections import OrganizationCollection
 from onegov.gazette.forms import CategoryForm
+from onegov.gazette.forms import IssueForm
 from onegov.gazette.forms import NoticeForm
 from onegov.gazette.forms import OrganizationForm
 from onegov.gazette.forms import UserForm
 from onegov.gazette.models import GazetteNotice
-from onegov.gazette.models import Issue
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
 from sedate import standardize_date
+
+
+class DummyPrincipal(object):
+    def __init__(self, time_zone='Europe/Zurich'):
+        self.time_zone = time_zone
 
 
 class DummyApp(object):
@@ -27,6 +34,7 @@ class DummyRequest(object):
         self.app = DummyApp(session, principal)
         self.private = private
         self.locale = 'de_CH'
+        self.time_zone = 'Europe/Zurich'
 
     def is_private(self, model):
         return self.private
@@ -158,6 +166,61 @@ def test_organization_form(session):
         assert form.validate() == result
 
 
+def test_issue_form(session):
+    # Test apply / update
+    issues = IssueCollection(session)
+    issue = issues.add(
+        name='2018-1', number=1, date=date(2018, 1, 5),
+        deadline=standardize_date(datetime(2018, 1, 4, 12, 0), 'UTC')
+    )
+
+    form = IssueForm()
+    form.request = DummyRequest(session, DummyPrincipal())
+    form.on_request()
+
+    form.apply_model(issue)
+    assert form.number.data == 1
+    assert form.name.data == '2018-1'
+    assert form.name_old.data == '2018-1'
+    assert form.date_.data == date(2018, 1, 5)
+    assert form.deadline.data == datetime(2018, 1, 4, 13, 0)
+
+    form.number.data = 2
+    form.date_.data = date(2019, 1, 5)
+    form.deadline.data = datetime(2019, 1, 4, 13, 0)
+    form.update_model(issue)
+    assert issue.number == 2
+    assert issue.name == '2019-2'
+    assert issue.date == date(2019, 1, 5)
+    assert issue.deadline == standardize_date(
+        datetime(2019, 1, 4, 12, 0), 'UTC'
+    )
+
+    # Test validation
+    form = IssueForm()
+    form.request = DummyRequest(session, DummyPrincipal())
+    form.on_request()
+    assert not form.validate()
+
+    for number, old, deadline, result in (
+        (2, None, '2019-01-02T12:00', False),  # issue name is taken
+        (2, '2019-2', '2019-01-02T12:00', True),  # edit
+        (1, None, '2019-01-02T12:00', True),  # W3C
+        (1, None, '2019-01-02 12:00', True)  # Datetimepicker
+    ):
+        form = IssueForm(
+            DummyPostData({
+                'number': number,
+                'date_': '2019-01-02',
+                'deadline': '2019-01-02T12:00',
+                'name_old': old
+            })
+        )
+        form.request = DummyRequest(session, DummyPrincipal())
+        form.on_request()
+        assert form.validate() == result
+
+
 def test_user_form(session):
     # Test apply / update
     users = UserCollection(session)
@@ -257,10 +320,10 @@ def test_user_form_on_request(session):
     ]
 
 
-def test_notice_form(session, principal):
+def test_notice_form(session, categories, organizations, issues):
     # Test apply / update
     form = NoticeForm()
-    form.request = DummyRequest(session, principal)
+    form.request = DummyRequest(session)
 
     notice = GazetteNotice(
         title='Title',
@@ -268,7 +331,7 @@ def test_notice_form(session, principal):
     )
     notice.organization_id = '200'
     notice.category_id = '13'
-    notice.issues = [str(Issue(2017, 43))]
+    notice.issues = ['2017-43']
 
     form.apply_model(notice)
     assert form.title.data == 'Title'
@@ -293,11 +356,11 @@ def test_notice_form(session, principal):
 
     # Test validation
     form = NoticeForm()
-    form.request = DummyRequest(session, principal)
+    form.request = DummyRequest(session)
     assert not form.validate()
 
     form = NoticeForm()
-    form.request = DummyRequest(session, principal)
+    form.request = DummyRequest(session)
     form.issues.choices = [('2017-5', '2017-5')]
     form.organization.choices = [('onegov', 'onegov')]
     form.category.choices = [('important', 'important')]
@@ -316,7 +379,7 @@ def test_notice_form(session, principal):
     with freeze_time("2017-11-01 14:00"):
         form = NoticeForm()
         form.model = None
-        form.request = DummyRequest(session, principal)
+        form.request = DummyRequest(session)
         form.on_request()
         assert form.organization.choices == [
             ('', 'Select one'),
@@ -347,7 +410,7 @@ def test_notice_form(session, principal):
 
         form = NoticeForm()
         form.model = None
-        form.request = DummyRequest(session, principal, private=True)
+        form.request = DummyRequest(session, private=True)
         form.on_request()
         assert form.organization.choices == [
             ('', 'Select one'),

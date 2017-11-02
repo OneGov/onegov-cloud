@@ -1,17 +1,18 @@
 from collections import OrderedDict
 from datetime import date
-from datetime import datetime
 from onegov.chat import Message
 from onegov.core.orm.mixins import meta_property
 from onegov.gazette import _
 from onegov.gazette.models.category import Category
+from onegov.gazette.models.issue import Issue
+from onegov.gazette.models.issue import IssueName
 from onegov.gazette.models.organization import Organization
-from onegov.gazette.models.principal import Issue
 from onegov.notice import OfficialNotice
 from onegov.user import User
 from onegov.user import UserCollection
 from sedate import as_datetime
 from sedate import standardize_date
+from sedate import utcnow
 from sqlalchemy_utils import observes
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
@@ -108,6 +109,8 @@ class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
     organization is stored in the HSTORE column and the actual name ist copied
     when calling ``apply_meta``.
 
+    We store only the issue names (year-number) in the HSTORE.
+
     It's possible to add a changelog entry by calling ``add_change``. Changelog
     entries are created for state changes by default.
 
@@ -198,7 +201,7 @@ class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
         """ Returns the issues sorted (by year/number). """
 
         issues = self._issues or {}
-        keys = (Issue.from_string(issue) for issue in (self._issues or {}))
+        keys = [IssueName.from_string(issue) for issue in (self._issues or {})]
         keys = sorted(keys, key=lambda x: (x.year, x.number))
         return OrderedDict((str(key), issues[str(key)]) for key in keys)
 
@@ -208,6 +211,15 @@ class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
             self._issues = value
         else:
             self._issues = {item: None for item in value}
+
+    @property
+    def issue_objects(self):
+        if self._issues:
+            query = object_session(self).query(Issue)
+            query = query.filter(Issue.name.in_(self._issues.keys()))
+            query = query.order_by(Issue.date)
+            return query.all()
+        return []
 
     @property
     def category_id(self):
@@ -251,44 +263,57 @@ class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
             query = query.filter(Organization.name == self.organization_id)
             return query.first()
 
-    def overdue_issues(self, principal):
+    @property
+    def overdue_issues(self):
         """ Returns True, if any of the issue's deadline is reached. """
-        now = datetime.utcnow()
-        for issue in self.issues:
-            issue = principal.issue(issue)
-            if issue and (issue.deadline < now):
+
+        if self._issues:
+            query = object_session(self).query(Issue)
+            query = query.filter(Issue.name.in_(self._issues.keys()))
+            query = query.filter(Issue.deadline < utcnow())
+            if query.first():
                 return True
 
         return False
 
-    def expired_issues(self, principal):
+    @property
+    def expired_issues(self):
         """ Returns True, if any of the issue's issue date is reached. """
-        today = date.today()
-        for issue in self.issues:
-            issue = principal.issue(issue)
-            if issue and (issue.issue_date <= today):
+        if self._issues:
+            query = object_session(self).query(Issue)
+            query = query.filter(Issue.name.in_(self._issues.keys()))
+            query = query.filter(Issue.date <= date.today())
+            if query.first():
                 return True
 
         return False
 
-    def apply_meta(self, principal, session):
+    def apply_meta(self, session):
         """ Updates the category, organization and issue date from the meta
         values.
 
         """
+        self.organization = None
         query = session.query(Organization.title)
         query = query.filter(Organization.name == self.organization_id).first()
-        self.organization = query[0] if query else None
+        if query:
+            self.organization = query[0]
 
+        self.category = None
         query = session.query(Category.title)
         query = query.filter(Category.name == self.category_id).first()
-        self.category = query[0] if query else None
+        if query:
+            self.category = query[0]
 
-        issues = [Issue.from_string(issue) for issue in self.issues]
-        issues = [principal.issue(issue) for issue in issues]
-        issues = sorted([issue.issue_date for issue in issues if issue])
-        if issues:
-            self.first_issue = standardize_date(as_datetime(issues[0]), 'UTC')
+        self.first_issue = None
+        if self._issues:
+            query = session.query(Issue.date)
+            query = query.filter(Issue.name.in_(self._issues.keys()))
+            query = query.order_by(Issue.date).first()
+            if query:
+                self.first_issue = standardize_date(
+                    as_datetime(query[0]), 'UTC'
+                )
 
 
 class GazetteNoticeChange(Message, CachedUserNameMixin):

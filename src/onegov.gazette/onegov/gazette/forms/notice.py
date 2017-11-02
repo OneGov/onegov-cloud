@@ -1,16 +1,17 @@
 from datetime import date
-from datetime import datetime
 from onegov.form import Form
 from onegov.gazette import _
 from onegov.gazette.fields import MultiCheckboxField
 from onegov.gazette.fields import SelectField
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import Category
+from onegov.gazette.models import Issue
 from onegov.gazette.models import Organization
 from onegov.quill import QuillField
 from wtforms import BooleanField
 from wtforms import StringField
 from wtforms.validators import InputRequired
+from sedate import utcnow
 
 
 class NoticeForm(Form):
@@ -60,7 +61,6 @@ class NoticeForm(Form):
     )
 
     def on_request(self):
-        principal = self.request.app.principal
         session = self.request.app.session()
 
         # populate organization (active root elements with no children or
@@ -90,25 +90,23 @@ class NoticeForm(Form):
         self.category.choices = query.all()
 
         # populate issues
-        self.issues.choices = []
+        now = utcnow()
         layout = Layout(None, self.request)
-        today = date.today()
-        now = datetime.utcnow()
-        publisher = self.request.is_private(self.model)
-        for issue_date, issue in principal.issues_by_date.items():
-            deadline = principal.issues[issue.year][issue.number].deadline
-            if (
-                (publisher and today < issue_date) or
-                (not publisher and now < deadline)
-            ):
-                self.issues.choices.append((
-                    str(issue),
-                    layout.format_issue(
-                        issue, date_format='date_with_weekday'
-                    )
-                ))
-                if now >= deadline:
-                    self.issues.render_kw['data-hot-issue'] = str(issue)
+
+        self.issues.choices = []
+        query = session.query(Issue)
+        query = query.order_by(Issue.date)
+        if self.request.is_private(self.model):
+            query = query.filter(date.today() < Issue.date)  # publisher
+        else:
+            query = query.filter(now < Issue.deadline)  # editor
+        for issue in query:
+            self.issues.choices.append((
+                issue.name,
+                layout.format_issue(issue, date_format='date_with_weekday')
+            ))
+            if now >= issue.deadline:
+                self.issues.render_kw['data-hot-issue'] = issue.name
 
         # translate the string of the mutli select field
         self.issues.translate(self.request)
@@ -121,9 +119,7 @@ class NoticeForm(Form):
         model.at_cost = self.at_cost.data
         model.issues = self.issues.data
 
-        principal = self.request.app.principal
-        session = self.request.app.session()
-        model.apply_meta(principal, session)
+        model.apply_meta(self.request.app.session())
 
     def apply_model(self, model):
         self.title.data = model.title

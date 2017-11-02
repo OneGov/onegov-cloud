@@ -3,7 +3,11 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 from onegov.core.upgrade import upgrade_task
+from onegov.gazette.collections.categories import CategoryCollection
+from onegov.gazette.collections.organizations import OrganizationCollection
+from onegov.gazette.collections.issues import IssueCollection
 from onegov.gazette.models.notice import GazetteNotice
+from sedate import standardize_date
 
 
 @upgrade_task(
@@ -81,3 +85,33 @@ def migrate_organizations(context):
             active=True,
             order=index
         )
+
+
+@upgrade_task('Migrate gazette issues', always_run=True)
+def migrate_issues(context):
+    principal = getattr(context.app, 'principal', None)
+    if not principal:
+        return False
+
+    issues = getattr(principal, '_issues', None)
+    if not issues:
+        return False
+
+    if not context.has_table('gazette_issues'):
+        return False
+
+    session = context.app.session_manager.session()
+    count = session.execute("select count(*) from gazette_issues")
+    if count.scalar() != 0:
+        return False
+
+    collection = IssueCollection(session)
+    for year, values in issues.items():
+        for number, dates in values.items():
+            assert dates.issue_date.year == year
+            collection.add(
+                name='{}-{}'.format(year, number),
+                number=number,
+                date=dates.issue_date,
+                deadline=standardize_date(dates.deadline, 'UTC')
+            )

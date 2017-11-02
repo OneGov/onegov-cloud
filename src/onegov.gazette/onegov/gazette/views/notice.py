@@ -11,15 +11,14 @@ from onegov.gazette.forms import RejectForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.layout import MailLayout
 from onegov.gazette.models import GazetteNotice
-from onegov.gazette.models import Issue
 from onegov.gazette.views import get_user_and_group
 from webob.exc import HTTPForbidden
 
 
 def construct_subject(notice):
     """ Construct the subject of the publish email. """
-    issues = list(notice.issues.keys())
-    number = Issue.from_string(issues[0]).number if issues else ''
+    issues = notice.issue_objects
+    number = issues[0].number if issues else ''
 
     organization = notice.organization_object
     parent = organization.parent if organization else None
@@ -155,8 +154,9 @@ def edit_notice(self, request, form):
     """
 
     layout = Layout(self, request)
+    is_private = request.is_private(self)
 
-    if not request.is_private(self):
+    if not is_private:
         user_ids, group_ids = get_user_and_group(request)
         if not ((self.group_id in group_ids) or (self.user_id in user_ids)):
             raise HTTPForbidden()
@@ -172,17 +172,14 @@ def edit_notice(self, request, form):
             'show_form': False
         }
 
-    if self.expired_issues(request.app.principal):
+    if self.expired_issues:
         request.message(
             _(
                 "The official notice has past issue. Please re-select issues."
             ),
             'warning'
         )
-    elif (
-        self.overdue_issues(request.app.principal) and
-        not request.is_private(self)
-    ):
+    elif self.overdue_issues and not is_private:
         request.message(
             _(
                 "The official notice has issues for which the deadlines are "
@@ -206,7 +203,7 @@ def edit_notice(self, request, form):
         'subtitle': _("Edit Official Notice"),
         'button_text': _("Save"),
         'cancel': request.link(self),
-        'current_issue': request.app.principal.current_issue
+        'current_issue': layout.current_issue
     }
 
 
@@ -301,8 +298,9 @@ def submit_notice(self, request, form):
     """
 
     layout = Layout(self, request)
+    is_private = request.is_private(self)
 
-    if not request.is_private(self):
+    if not is_private:
         user_ids, group_ids = get_user_and_group(request)
         if not ((self.group_id in group_ids) or (self.user_id in user_ids)):
             raise HTTPForbidden()
@@ -318,13 +316,7 @@ def submit_notice(self, request, form):
             'show_form': False
         }
 
-    if (
-        self.expired_issues(request.app.principal) or
-        (
-            self.overdue_issues(request.app.principal) and
-            not request.is_private(self)
-        )
-    ):
+    if self.expired_issues or (self.overdue_issues and not is_private):
         return redirect(request.link(self, name='edit'))
 
     if form.submitted(request):
@@ -373,7 +365,7 @@ def accept_notice(self, request, form):
             'show_form': False
         }
 
-    if self.expired_issues(request.app.principal):
+    if self.expired_issues:
         return redirect(request.link(self, name='edit'))
 
     if form.submitted(request):

@@ -1,3 +1,4 @@
+from freezegun import freeze_time
 from onegov.gazette.models import Organization
 from onegov.gazette.tests import login_admin
 from onegov.gazette.tests import login_editor_1
@@ -7,124 +8,125 @@ from webtest import TestApp as Client
 
 
 def test_view_organizations(gazette_app):
-    client = Client(gazette_app)
-    login_admin(client)
+    with freeze_time("2017-10-20 12:00"):
+        client = Client(gazette_app)
+        login_admin(client)
 
-    # Test data:
-    # 100 / State Chancellery / active
-    # 200 / Civic Community / active
-    # 300 / Municipality / active
-    # 400 / Evangelical Reformed Parish / active
-    # 510 / Sikh Community / inactive
-    # 500 / Catholic Parish / active
-    # 600 / Corporation / active
+        # Test data:
+        # 100 / State Chancellery / active
+        # 200 / Civic Community / active
+        # 300 / Municipality / active
+        # 400 / Evangelical Reformed Parish / active
+        # 510 / Sikh Community / inactive
+        # 500 / Catholic Parish / active
+        # 600 / Corporation / active
 
-    # add a organization
-    manage = client.get('/organizations')
-    manage = manage.click('Neu')
-    manage.form['title'] = 'Organisation XY'
-    manage = manage.form.submit().maybe_follow()
-    assert 'Organisation hinzugefügt.' in manage
-    assert 'Organisation XY' in manage
-    organizations = [
-        [td.text.strip() for td in pq(tr)('td')]
-        for tr in manage.pyquery('table.organizations tbody tr')
-    ]
-    assert organizations == [
-        ['State Chancellery', 'Ja', '100', ''],
-        ['Civic Community', 'Ja', '200', ''],
-        ['Municipality', 'Ja', '300', ''],
-        ['Churches', 'Ja', '400', ''],
-        ['— Evangelical Reformed Parish', 'Ja', '410', ''],
-        ['— Sikh Community', 'Nein', '420', ''],
-        ['— Catholic Parish', 'Ja', '430', ''],
-        ['Corporation', 'Ja', '500', ''],
-        ['Organisation XY', 'Ja', '501', '']
-    ]
+        # add a organization
+        manage = client.get('/organizations')
+        manage = manage.click('Neu')
+        manage.form['title'] = 'Organisation XY'
+        manage = manage.form.submit().maybe_follow()
+        assert 'Organisation hinzugefügt.' in manage
+        assert 'Organisation XY' in manage
+        organizations = [
+            [td.text.strip() for td in pq(tr)('td')]
+            for tr in manage.pyquery('table.organizations tbody tr')
+        ]
+        assert organizations == [
+            ['State Chancellery', 'Ja', '100', ''],
+            ['Civic Community', 'Ja', '200', ''],
+            ['Municipality', 'Ja', '300', ''],
+            ['Churches', 'Ja', '400', ''],
+            ['— Evangelical Reformed Parish', 'Ja', '410', ''],
+            ['— Sikh Community', 'Nein', '420', ''],
+            ['— Catholic Parish', 'Ja', '430', ''],
+            ['Corporation', 'Ja', '500', ''],
+            ['Organisation XY', 'Ja', '501', '']
+        ]
 
-    # use the first organization in a notice
-    manage = client.get('/notices/drafted/new-notice')
-    manage.form['title'] = 'Titel'
-    manage.form['organization'] = '100'
-    manage.form['category'] = '13'
-    manage.form['issues'] = ['2017-44']
-    manage.form['text'] = 'Text'
-    manage = manage.form.submit().maybe_follow()
-    assert '<h2>Titel</h2>' in manage
-    assert 'State Chancellery' in manage
+        # use the first organization in a notice
+        manage = client.get('/notices/drafted/new-notice')
+        manage.form['title'] = 'Titel'
+        manage.form['organization'] = '100'
+        manage.form['category'] = '13'
+        manage.form['issues'] = ['2017-44']
+        manage.form['text'] = 'Text'
+        manage = manage.form.submit().maybe_follow()
+        assert '<h2>Titel</h2>' in manage
+        assert 'State Chancellery' in manage
 
-    # edit the first organization
-    manage = client.get('/organizations')
-    manage = manage.click('Bearbeiten', index=0)
-    manage.form['title'] = 'Organisation Z'
-    manage.form['active'] = False
-    manage = manage.form.submit().maybe_follow()
-    assert 'Organisation geändert.' in manage
-    assert 'State Chancellery' not in manage
-    assert 'Organisation Z' in manage
+        # edit the first organization
+        manage = client.get('/organizations')
+        manage = manage.click('Bearbeiten', index=0)
+        manage.form['title'] = 'Organisation Z'
+        manage.form['active'] = False
+        manage = manage.form.submit().maybe_follow()
+        assert 'Organisation geändert.' in manage
+        assert 'State Chancellery' not in manage
+        assert 'Organisation Z' in manage
 
-    organizations = [
-        [td.text.strip() for td in pq(tr)('td')]
-        for tr in manage.pyquery('table.organizations tbody tr')
-    ]
-    assert organizations == [
-        ['Organisation Z', 'Nein', '100', ''],
-        ['Civic Community', 'Ja', '200', ''],
-        ['Municipality', 'Ja', '300', ''],
-        ['Churches', 'Ja', '400', ''],
-        ['— Evangelical Reformed Parish', 'Ja', '410', ''],
-        ['— Sikh Community', 'Nein', '420', ''],
-        ['— Catholic Parish', 'Ja', '430', ''],
-        ['Corporation', 'Ja', '500', ''],
-        ['Organisation XY', 'Ja', '501', '']
-    ]
-    organizations = [
-        t.text for t in manage.pyquery('table.organizations tbody tr td')
-    ]
+        organizations = [
+            [td.text.strip() for td in pq(tr)('td')]
+            for tr in manage.pyquery('table.organizations tbody tr')
+        ]
+        assert organizations == [
+            ['Organisation Z', 'Nein', '100', ''],
+            ['Civic Community', 'Ja', '200', ''],
+            ['Municipality', 'Ja', '300', ''],
+            ['Churches', 'Ja', '400', ''],
+            ['— Evangelical Reformed Parish', 'Ja', '410', ''],
+            ['— Sikh Community', 'Nein', '420', ''],
+            ['— Catholic Parish', 'Ja', '430', ''],
+            ['Corporation', 'Ja', '500', ''],
+            ['Organisation XY', 'Ja', '501', '']
+        ]
+        organizations = [
+            t.text for t in manage.pyquery('table.organizations tbody tr td')
+        ]
 
-    # check if the notice has been updated
-    manage = client.get('/notice/titel')
-    assert 'State Chancellery' not in manage
-    assert 'Organisation Z' in manage
+        # check if the notice has been updated
+        manage = client.get('/notice/titel')
+        assert 'State Chancellery' not in manage
+        assert 'Organisation Z' in manage
 
-    # try to delete the organization with suborganizations
-    manage = client.get('/organizations')
-    manage = manage.click('Löschen', index=3)
-    assert (
-        'Nur unbenutzte Organisationen ohne Unterorganisationen können '
-        'gelöscht werden.'
-    ) in manage
-    assert not manage.forms
+        # try to delete the organization with suborganizations
+        manage = client.get('/organizations')
+        manage = manage.click('Löschen', index=3)
+        assert (
+            'Nur unbenutzte Organisationen ohne Unterorganisationen können '
+            'gelöscht werden.'
+        ) in manage
+        assert not manage.forms
 
-    # try to delete the used organization
-    manage = client.get('/organizations')
-    manage = manage.click('Löschen', index=3)
-    assert (
-        'Nur unbenutzte Organisationen ohne Unterorganisationen können '
-        'gelöscht werden.'
-    ) in manage
-    assert not manage.forms
+        # try to delete the used organization
+        manage = client.get('/organizations')
+        manage = manage.click('Löschen', index=3)
+        assert (
+            'Nur unbenutzte Organisationen ohne Unterorganisationen können '
+            'gelöscht werden.'
+        ) in manage
+        assert not manage.forms
 
-    # delete all but one (unused) organizations
-    manage = client.get('/organizations')
-    manage.click('Löschen', index=8).form.submit()
-    manage.click('Löschen', index=7).form.submit()
-    manage.click('Löschen', index=6).form.submit()
-    manage.click('Löschen', index=5).form.submit()
-    manage.click('Löschen', index=4).form.submit()
-    manage.click('Löschen', index=3).form.submit()
-    manage.click('Löschen', index=2).form.submit()
-    manage.click('Löschen', index=1).form.submit()
+        # delete all but one (unused) organizations
+        manage = client.get('/organizations')
+        manage.click('Löschen', index=8).form.submit()
+        manage.click('Löschen', index=7).form.submit()
+        manage.click('Löschen', index=6).form.submit()
+        manage.click('Löschen', index=5).form.submit()
+        manage.click('Löschen', index=4).form.submit()
+        manage.click('Löschen', index=3).form.submit()
+        manage.click('Löschen', index=2).form.submit()
+        manage.click('Löschen', index=1).form.submit()
 
-    manage = client.get('/organizations')
-    assert 'Organisation Z' in manage
-    assert 'Civic Community' not in manage
-    assert 'Municipality' not in manage
-    assert 'Evangelical Reformed Parish' not in manage
-    assert 'Sikh Community' not in manage
-    assert 'Catholic Parish' not in manage
-    assert 'Corporation' not in manage
-    assert 'Organisation XY' not in manage
+        manage = client.get('/organizations')
+        assert 'Organisation Z' in manage
+        assert 'Civic Community' not in manage
+        assert 'Municipality' not in manage
+        assert 'Evangelical Reformed Parish' not in manage
+        assert 'Sikh Community' not in manage
+        assert 'Catholic Parish' not in manage
+        assert 'Corporation' not in manage
+        assert 'Organisation XY' not in manage
 
 
 def test_view_organizations_permissions(gazette_app):

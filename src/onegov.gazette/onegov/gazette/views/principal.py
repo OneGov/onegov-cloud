@@ -9,6 +9,7 @@ from onegov.gazette.collections import GazetteNoticeCollection
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import Principal
 from onegov.gazette.views import get_user_and_group
+from sedate import utcnow
 
 
 @GazetteApp.html(
@@ -64,16 +65,15 @@ def view_dashboard(self, request):
 
     # drafted
     drafted = collection.for_state('drafted').query().all()
-    now = datetime.utcnow()
+    now = utcnow()
     limit = now + timedelta(days=2)
     past_issues_selected = False
     deadline_reached_soon = False
     for notice in drafted:
-        for issue in notice.issues:
-            deadline = self.issue(issue).deadline
-            if deadline < now:
+        for issue in notice.issue_objects:
+            if issue.deadline < now:
                 past_issues_selected = True
-            elif deadline < limit:
+            elif issue.deadline < limit:
                 deadline_reached_soon = True
     if past_issues_selected:
         request.message(
@@ -101,5 +101,5 @@ def view_dashboard(self, request):
         'drafted': drafted,
         'submitted': submitted,
         'new_notice': new_notice,
-        'current_issue': self.current_issue,
+        'current_issue': layout.current_issue
     }

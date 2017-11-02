@@ -34,10 +34,8 @@ def create_notice(self, request, form):
     This view is mainly used by the editors.
 
     """
-    self.on_request(request)
 
     layout = Layout(self, request)
-    principal = request.app.principal
 
     if form.submitted(request):
         notice = self.add(
@@ -46,8 +44,7 @@ def create_notice(self, request, form):
             organization_id=form.organization.data,
             category_id=form.category.data,
             user=get_user(request),
-            issues=form.issues.data,
-            principal=principal
+            issues=form.issues.data
         )
         return redirect(request.link(notice))
 
@@ -62,7 +59,7 @@ def create_notice(self, request, form):
         'title': _("New Official Notice"),
         'button_text': _("Save"),
         'cancel': layout.dashboard_or_notices_link,
-        'current_issue': principal.current_issue
+        'current_issue': layout.current_issue
     }
 
 
@@ -78,7 +75,6 @@ def view_notices(self, request):
     is the view used by the publisher.
 
     """
-    self.on_request(request)
 
     layout = Layout(self, request)
 
@@ -158,7 +154,6 @@ def view_notices_statistics(self, request):
     is the view used by the publisher.
 
     """
-    self.on_request(request)
 
     layout = Layout(self, request)
     filters = (
@@ -191,7 +186,6 @@ def view_notices_statistics(self, request):
 )
 def view_notices_statistics_xlsx(self, request):
     """ View the statistics as XLSX. """
-    self.on_request(request)
 
     output = BytesIO()
     workbook = Workbook(output)
@@ -239,15 +233,13 @@ def view_notices_update(self, request, form):
     for example.
 
     """
-    self.on_request(request)
 
     layout = Layout(self, request)
-    principal = request.app.principal
     session = request.app.session()
 
     if form.submitted(request):
         for notice in self.query():
-            notice.apply_meta(principal, session)
+            notice.apply_meta(session)
         request.message(_("Notices updated."), 'success')
 
         return redirect(layout.dashboard_or_notices_link)

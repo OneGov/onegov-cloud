@@ -5,6 +5,7 @@ from onegov.core.static import StaticFile
 from onegov.gazette import _
 from onegov.gazette.collections import CategoryCollection
 from onegov.gazette.collections import GazetteNoticeCollection
+from onegov.gazette.collections import IssueCollection
 from onegov.gazette.collections import OrganizationCollection
 from onegov.gazette.models import Issue
 from onegov.gazette.models import OrganizationMove
@@ -12,7 +13,6 @@ from onegov.gazette.models import Principal
 from onegov.user import Auth
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
-from sedate import standardize_date
 from sedate import to_timezone
 
 
@@ -27,6 +27,7 @@ class Layout(ChameleonLayout):
         self.request.include('quill')
         self.request.include('common')
         self.breadcrumbs = []
+        self.session = request.app.session()
 
     def title(self):
         return ''
@@ -44,7 +45,7 @@ class Layout(ChameleonLayout):
         username = self.request.identity.userid
         if username:
             return UserCollection(
-                self.app.session(), username=username
+                self.session, username=username
             ).query().first()
 
         return None
@@ -70,24 +71,28 @@ class Layout(ChameleonLayout):
 
     @cached_property
     def manage_users_link(self):
-        return self.request.link(UserCollection(self.app.session()))
+        return self.request.link(UserCollection(self.session))
 
     @cached_property
     def manage_groups_link(self):
-        return self.request.link(UserGroupCollection(self.app.session()))
+        return self.request.link(UserGroupCollection(self.session))
 
     @cached_property
     def manage_organizations_link(self):
-        return self.request.link(OrganizationCollection(self.app.session()))
+        return self.request.link(OrganizationCollection(self.session))
 
     @cached_property
     def manage_categories_link(self):
-        return self.request.link(CategoryCollection(self.app.session()))
+        return self.request.link(CategoryCollection(self.session))
+
+    @cached_property
+    def manage_issues_link(self):
+        return self.request.link(IssueCollection(self.session))
 
     @cached_property
     def manage_notices_link(self):
         return self.request.link(
-            GazetteNoticeCollection(self.app.session(), state='submitted')
+            GazetteNoticeCollection(self.session, state='submitted')
         )
 
     @cached_property
@@ -150,6 +155,11 @@ class Layout(ChameleonLayout):
                 _("Categories"), self.manage_categories_link, active
             ))
 
+            active = isinstance(self.model, IssueCollection)
+            result.append((
+                _("Issues"), self.manage_issues_link, active
+            ))
+
         if self.request.is_private(self.model):
             active = (
                 isinstance(self.model, GazetteNoticeCollection) and
@@ -166,7 +176,7 @@ class Layout(ChameleonLayout):
                 'statistics' in self.request.url
             )
             link = self.request.link(
-                GazetteNoticeCollection(self.app.session(), state='accepted'),
+                GazetteNoticeCollection(self.session, state='accepted'),
                 name='statistics'
             )
             result.append((
@@ -185,7 +195,7 @@ class Layout(ChameleonLayout):
 
             active = isinstance(self.model, GazetteNoticeCollection)
             link = self.request.link(
-                GazetteNoticeCollection(self.app.session(), state='accepted')
+                GazetteNoticeCollection(self.session, state='accepted')
             )
             result.append((
                 _("My Accepted Official Notices"),
@@ -195,39 +205,30 @@ class Layout(ChameleonLayout):
 
         return result
 
+    @property
+    def current_issue(self):
+        return IssueCollection(self.session).current_issue
+
+    def format_date(self, dt, format):
+        """ Returns a readable version of the given date while automatically
+        converting to the principals timezone if the date is timezone aware.
+
+        """
+        if getattr(dt, 'tzinfo', None) is not None:
+            dt = to_timezone(dt, self.principal.time_zone)
+        return super(Layout, self).format_date(dt, format)
+
     def format_issue(self, issue, date_format='date'):
-        if not isinstance(issue, Issue):
-            issue = Issue.from_string(str(issue))
+        """ Returns the issues number and date. """
+        assert isinstance(issue, Issue)
 
-        dates = self.principal.issue(issue)
-        if dates:
-            return self.request.translate(_(
-                "No. ${number}, ${issue_date}",
-                mapping={
-                    'number': issue.number,
-                    'issue_date': self.format_date(
-                        dates.issue_date, date_format
-                    )
-                }
-            ))
-
-        return '?'
-
-    def format_deadline(self, issue, date_format='datetime_with_weekday'):
-        if not isinstance(issue, Issue):
-            issue = Issue.from_string(str(issue))
-
-        dates = self.principal.issue(issue)
-        if dates:
-            return self.format_date(
-                to_timezone(
-                    standardize_date(dates.deadline, 'UTC'),
-                    self.principal.time_zone
-                ),
-                date_format
-            )
-
-        return '?'
+        return self.request.translate(_(
+            "No. ${number}, ${issue_date}",
+            mapping={
+                'number': issue.number or '',
+                'issue_date': self.format_date(issue.date, date_format)
+            }
+        ))
 
 
 class MailLayout(Layout):

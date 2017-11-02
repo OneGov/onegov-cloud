@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-27 11:55+0200\n"
-"PO-Revision-Date: 2017-10-27 11:55+0200\n"
+"POT-Creation-Date: 2017-11-02 10:00+0100\n"
+"PO-Revision-Date: 2017-11-02 10:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -47,6 +47,9 @@ msgstr "Organisationen"
 
 msgid "Categories"
 msgstr "Rubriken"
+
+msgid "Issues"
+msgstr "Ausgaben"
 
 msgid "Official Notices"
 msgstr "Meldungen"
@@ -95,6 +98,18 @@ msgstr "Leer lassen, um den Wert automatisch zu setzen."
 
 msgid "Comment"
 msgstr "Bemerkung"
+
+msgid "Number"
+msgstr "Nummer"
+
+msgid "Date"
+msgstr "Datum"
+
+msgid "Deadline"
+msgstr "Eingabeschluss"
+
+msgid "This issue already exists."
+msgstr "Diese Ausgabe ist bereits vorhanden."
 
 msgid "Organization"
 msgstr "Organisation"
@@ -178,6 +193,12 @@ msgstr "Anzahl Benutzer"
 msgid "No groups."
 msgstr "Keine Gruppen."
 
+msgid "Issue"
+msgstr "Ausgabe"
+
+msgid "No issues."
+msgstr "Keine Ausgaben."
+
 msgid "Gazette"
 msgstr "Amtsblatt"
 
@@ -219,9 +240,6 @@ msgstr "Aktuelle Seite"
 
 msgid "Next deadline"
 msgstr "Nächster Eingabeschluss"
-
-msgid "Issue"
-msgstr "Ausgabe"
 
 msgid "Dear Sirs and Madams,"
 msgstr "Sehr geehrte Damen und Herren,"
@@ -276,9 +294,6 @@ msgstr "Änderung"
 
 msgid "Search"
 msgstr "Suche"
-
-msgid "Date"
-msgstr "Datum"
 
 msgid "Filter by date"
 msgstr "Nach Datum filtern"
@@ -420,6 +435,27 @@ msgstr "Es können nur Gruppen ohne Benutzer gelöscht werden."
 
 msgid "Group deleted."
 msgstr "Gruppe gelöscht."
+
+msgid "New Issue"
+msgstr "Neue Ausgabe"
+
+msgid "Edit Issue"
+msgstr "Ausgabe bearbeiten"
+
+msgid "Delete Issue"
+msgstr "Ausgabe löschen"
+
+msgid "Issue added."
+msgstr "Ausgabe hinzugefügt."
+
+msgid "Issue modified."
+msgstr "Ausgabe geändert."
+
+msgid "Only unused issues may be deleted."
+msgstr "Es können nur unbenutzte Ausgaben gelöscht werden."
+
+msgid "Issue deleted."
+msgstr "Ausgabe gelöscht."
 
 msgid "Edit Official Notice"
 msgstr "Meldung bearbeiten"

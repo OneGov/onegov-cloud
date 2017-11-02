@@ -1,0 +1,60 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.gazette">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+
+        <div metal:use-macro="layout.macros['tab_menu']"></div>
+        <div metal:use-macro="layout.macros['breadcrumbs']"></div>
+
+        <div class="row manage-issues">
+            <div class="small-12 columns">
+                <div class="row">
+                    <div class="small-12 medium-10 columns">
+                        <h2 i18n:translate>Issues</h2>
+                    </div>
+                    <div class="small-12 medium-2 columns">
+                        <ul class="top-actions text-right">
+                            <li><a class="action-new" href="${new_issue}" i18n:translate>New</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <table class="issues stackable">
+                    <thead>
+                        <tr>
+                            <th i18n:translate>Issue</th>
+                            <th i18n:translate>Date</th>
+                            <th i18n:translate>Deadline</th>
+                            <th i18n:translate class="row-actions right-aligned">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr tal:condition="not:issues">
+                            <td i18n:translate>No issues.</td>
+                        </tr>
+                        <tal:block tal:repeat="issue issues">
+                            <tr>
+                                <td>${issue.name}</td>
+                                <td>${layout.format_date(issue.date, 'date')}</td>
+                                <td>${layout.format_date(issue.deadline, 'datetime_with_weekday')}</td>
+                                <td class="right-aligned">
+                                    <ul class="actions" data-title="Actions" i18n:attributes="data-title">
+                                        <li>
+                                            <a i18n:translate class="action-edit" href="${request.link(issue, 'edit')}">Edit</a>
+                                        </li>
+                                        <li>
+                                            <a i18n:translate class="action-delete" href="${request.link(issue, 'delete')}">Delete</a>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tal:block>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+    </tal:block>
+</div>

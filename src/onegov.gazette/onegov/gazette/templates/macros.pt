@@ -122,10 +122,10 @@
 
 <metal:issues define-macro="issues" i18n:domain="onegov.gazette">
     <ul tal:condition="as_list|True">
-        <li tal:repeat="issue notice.issues">${layout.format_issue(issue)}</li>
+        <li tal:repeat="issue notice.issue_objects">${layout.format_issue(issue)}</li>
     </ul>
     <tal:block tal:condition="not: as_list|True">
-        <span style="display:block" tal:repeat="issue notice.issues">${layout.format_issue(issue)}</span>
+        <span style="display:block" tal:repeat="issue notice.issue_objects">${layout.format_issue(issue)}</span>
     </tal:block>
 </metal:issues>
 
@@ -141,7 +141,7 @@
 <metal:deadline_callout define-macro="deadline_callout" i18n:domain="onegov.gazette">
     <div class="panel" tal:condition="current_issue|None">
         <p>
-            <span i18n:translate>Next deadline</span>: <strong>${layout.format_deadline(current_issue)}</strong>
+            <span i18n:translate>Next deadline</span>: <strong>${layout.format_date(current_issue.deadline, format='datetime_with_weekday')}</strong>
             <i>(<span i18n:translate>Issue</span> ${layout.format_issue(current_issue)})</i>
         </p>
     </div>

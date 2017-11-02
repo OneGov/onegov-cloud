@@ -3,9 +3,11 @@ from onegov.core.converters import uuid_converter
 from onegov.gazette import GazetteApp
 from onegov.gazette.collections import CategoryCollection
 from onegov.gazette.collections import GazetteNoticeCollection
+from onegov.gazette.collections import IssueCollection
 from onegov.gazette.collections import OrganizationCollection
 from onegov.gazette.models import Category
 from onegov.gazette.models import GazetteNotice
+from onegov.gazette.models import Issue
 from onegov.gazette.models import Organization
 from onegov.gazette.models import OrganizationMove
 from onegov.gazette.models import Principal
@@ -64,6 +66,16 @@ def get_organizations(app):
 @GazetteApp.path(model=Organization, path='/organization/{id}')
 def get_organization(app, id):
     return OrganizationCollection(app.session()).by_id(id)
+
+
+@GazetteApp.path(model=IssueCollection, path='/issues')
+def get_issues(app):
+    return IssueCollection(app.session())
+
+
+@GazetteApp.path(model=Issue, path='/issue/{id}')
+def get_issue(app, id):
+    return IssueCollection(app.session()).by_id(id)
 
 
 @GazetteApp.path(

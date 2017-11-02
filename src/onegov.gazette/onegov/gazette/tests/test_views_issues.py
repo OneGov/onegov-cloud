@@ -1,0 +1,163 @@
+from freezegun import freeze_time
+from onegov.gazette.tests import login_admin
+from onegov.gazette.tests import login_editor_1
+from onegov.gazette.tests import login_publisher
+from pyquery import PyQuery as pq
+from webtest import TestApp as Client
+
+
+def test_view_issues(gazette_app):
+    with freeze_time("2017-10-01 12:00"):
+        client = Client(gazette_app)
+        login_admin(client)
+
+        # Test data:
+        # 2017:
+        #     40: 2017-10-06 / 2017-10-04T12:00:00
+        #     41: 2017-10-13 / 2017-10-11T12:00:00
+        #     42: 2017-10-20 / 2017-10-18T12:00:00
+        #     43: 2017-10-27 / 2017-10-25T12:00:00
+        #     44: 2017-11-03 / 2017-11-01T12:00:00
+        #     45: 2017-11-10 / 2017-11-08T12:00:00
+        #     46: 2017-11-17 / 2017-11-15T12:00:00
+        #     47: 2017-11-24 / 2017-11-22T12:00:00
+        #     48: 2017-12-01 / 2017-11-29T12:00:00
+        #     49: 2017-12-08 / 2017-12-06T12:00:00
+        #     50: 2017-12-15 / 2017-12-13T12:00:00
+        #     51: 2017-12-22 / 2017-12-20T12:00:00
+        #     52: 2017-12-29 / 2017-12-27T12:00:00
+        # 2018:
+        #     1: 2018-01-05 / 2018-01-03T12:00:00
+
+        # add a issue
+        manage = client.get('/issues')
+        manage = manage.click('Neu')
+        manage.form['number'] = '1'
+        manage.form['date_'] = '2019-01-02'
+        manage.form['deadline'] = '2019-01-01T12:00'
+        manage = manage.form.submit().maybe_follow()
+        assert 'Ausgabe hinzugefügt.' in manage
+        assert '2019-1' in manage
+        issues = [
+            [td.text.strip() for td in pq(tr)('td')]
+            for tr in manage.pyquery('table.issues tbody tr')
+        ]
+        assert issues == [
+            ['2017-40', '06.10.2017', 'Mittwoch 04.10.2017 14:00', ''],
+            ['2017-41', '13.10.2017', 'Mittwoch 11.10.2017 14:00', ''],
+            ['2017-42', '20.10.2017', 'Mittwoch 18.10.2017 14:00', ''],
+            ['2017-43', '27.10.2017', 'Mittwoch 25.10.2017 14:00', ''],
+            ['2017-44', '03.11.2017', 'Mittwoch 01.11.2017 13:00', ''],
+            ['2017-45', '10.11.2017', 'Mittwoch 08.11.2017 13:00', ''],
+            ['2017-46', '17.11.2017', 'Mittwoch 15.11.2017 13:00', ''],
+            ['2017-47', '24.11.2017', 'Mittwoch 22.11.2017 13:00', ''],
+            ['2017-48', '01.12.2017', 'Mittwoch 29.11.2017 13:00', ''],
+            ['2017-49', '08.12.2017', 'Mittwoch 06.12.2017 13:00', ''],
+            ['2017-50', '15.12.2017', 'Mittwoch 13.12.2017 13:00', ''],
+            ['2017-51', '22.12.2017', 'Mittwoch 20.12.2017 13:00', ''],
+            ['2017-52', '29.12.2017', 'Mittwoch 27.12.2017 13:00', ''],
+            ['2018-1', '05.01.2018', 'Mittwoch 03.01.2018 13:00', ''],
+            ['2019-1', '02.01.2019', 'Dienstag 01.01.2019 12:00', '']
+        ]
+
+        # use the first issue in a notice
+        manage = client.get('/notices/drafted/new-notice')
+        manage.form['title'] = 'Titel'
+        manage.form['organization'] = '200'
+        manage.form['category'] = '13'
+        manage.form['issues'] = ['2017-40']
+        manage.form['text'] = 'Text'
+        manage = manage.form.submit().maybe_follow()
+        assert '<h2>Titel</h2>' in manage
+        assert 'Nr. 40, 06.10.2017' in manage
+
+        # edit the first issue
+        manage = client.get('/issues')
+        manage = manage.click('Bearbeiten', index=0)
+        manage.form['date_'] = '2017-10-05'
+        manage.form['deadline'] = '2017-10-03T14:00'
+        manage = manage.form.submit().maybe_follow()
+        assert 'Ausgabe geändert.' in manage
+
+        issues = [
+            [td.text.strip() for td in pq(tr)('td')]
+            for tr in manage.pyquery('table.issues tbody tr')
+        ]
+        assert issues == [
+            ['2017-40', '05.10.2017', 'Dienstag 03.10.2017 14:00', ''],
+            ['2017-41', '13.10.2017', 'Mittwoch 11.10.2017 14:00', ''],
+            ['2017-42', '20.10.2017', 'Mittwoch 18.10.2017 14:00', ''],
+            ['2017-43', '27.10.2017', 'Mittwoch 25.10.2017 14:00', ''],
+            ['2017-44', '03.11.2017', 'Mittwoch 01.11.2017 13:00', ''],
+            ['2017-45', '10.11.2017', 'Mittwoch 08.11.2017 13:00', ''],
+            ['2017-46', '17.11.2017', 'Mittwoch 15.11.2017 13:00', ''],
+            ['2017-47', '24.11.2017', 'Mittwoch 22.11.2017 13:00', ''],
+            ['2017-48', '01.12.2017', 'Mittwoch 29.11.2017 13:00', ''],
+            ['2017-49', '08.12.2017', 'Mittwoch 06.12.2017 13:00', ''],
+            ['2017-50', '15.12.2017', 'Mittwoch 13.12.2017 13:00', ''],
+            ['2017-51', '22.12.2017', 'Mittwoch 20.12.2017 13:00', ''],
+            ['2017-52', '29.12.2017', 'Mittwoch 27.12.2017 13:00', ''],
+            ['2018-1', '05.01.2018', 'Mittwoch 03.01.2018 13:00', ''],
+            ['2019-1', '02.01.2019', 'Dienstag 01.01.2019 12:00', '']
+        ]
+
+        # check if the notice has been updated
+        manage = client.get('/notice/titel')
+        assert 'Nr. 40, 06.10.2017' not in manage
+        assert 'Nr. 40, 05.10.2017' in manage
+
+        # delete all but one (unused) issues
+        manage = client.get('/issues')
+        manage.click('Löschen', index=1).form.submit()
+        manage.click('Löschen', index=2).form.submit()
+        manage.click('Löschen', index=3).form.submit()
+        manage.click('Löschen', index=4).form.submit()
+        manage.click('Löschen', index=5).form.submit()
+        manage.click('Löschen', index=6).form.submit()
+        manage.click('Löschen', index=7).form.submit()
+        manage.click('Löschen', index=8).form.submit()
+        manage.click('Löschen', index=9).form.submit()
+        manage.click('Löschen', index=10).form.submit()
+        manage.click('Löschen', index=11).form.submit()
+        manage.click('Löschen', index=12).form.submit()
+        manage.click('Löschen', index=13).form.submit()
+        manage.click('Löschen', index=14).form.submit()
+
+        manage = client.get('/issues')
+        issues = [
+            [td.text.strip() for td in pq(tr)('td')]
+            for tr in manage.pyquery('table.issues tbody tr')
+        ]
+        assert issues == [
+            ['2017-40', '05.10.2017', 'Dienstag 03.10.2017 14:00', '']
+        ]
+
+        # Try to delete the used issue
+        manage = client.get('/issues')
+        manage = manage.click('Löschen')
+        assert 'Es können nur unbenutzte Ausgaben gelöscht werden.' in manage
+        assert not manage.forms
+
+
+def test_view_issues_permissions(gazette_app):
+    with freeze_time("2017-10-20 12:00"):
+        client = Client(gazette_app)
+
+        login_admin(client)
+        manage = client.get('/issues').click('Neu')
+        manage.form['number'] = '1'
+        manage.form['date_'] = '2017-01-02'
+        manage.form['deadline'] = '2017-01-01T12:00'
+        manage = manage.form.submit().maybe_follow()
+        edit_link = manage.click('Bearbeiten', index=0).request.url
+        delete_link = manage.click('Löschen', index=0).request.url
+
+        login_publisher(client)
+        client.get('/issues', status=403)
+        client.get(edit_link, status=403)
+        client.get(delete_link, status=403)
+
+        login_editor_1(client)
+        client.get('/issues', status=403)
+        client.get(edit_link, status=403)
+        client.get(delete_link, status=403)
