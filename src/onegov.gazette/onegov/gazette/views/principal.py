@@ -1,4 +1,3 @@
-from datetime import datetime
 from datetime import timedelta
 from morepath import redirect
 from onegov.core.security import Personal
