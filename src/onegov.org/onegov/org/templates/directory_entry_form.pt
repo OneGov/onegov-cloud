@@ -15,6 +15,11 @@
                     that your changes were misdetected. If in doubt, press cancel and
                     try to change the directory in small increments.
                 </p>
+
+                <p>
+                    <div i18n:translate>For additional safety you can also download a backup before continuing:</div>
+                    <div><i class="fa fa-download" aria-hidden="true"></i> <a i18n:translate href="${request.link(model, '+zip')}">Download backup</a></div>
+                </p>
             </div>
 
             <ul>

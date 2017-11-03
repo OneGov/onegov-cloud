@@ -139,6 +139,7 @@ def handle_edit_directory(self, request, form):
         'form': form,
         'form_width': 'large',
         'migration': migration,
+        'model': self
     }
 
 

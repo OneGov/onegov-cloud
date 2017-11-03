@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-11-03 11:01+0100\n"
+"POT-Creation-Date: 2017-11-03 11:28+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1218,6 +1218,12 @@ msgstr ""
 "Änderungen werden durch eine Heuristik erkannt. Deshalb kann es vorkommen "
 "dass Änderungen falsch erkannt werden. Im Zweifelsfall brechen Sie die "
 "Änderung ab und versuchen es mit kleineren Änderungsschritten."
+
+msgid "For additional safety you can also download a backup before continuing:"
+msgstr "Zu Ihrer zusätzlichen Sicherheit können Sie ausserdem vorher ein Backup herunterladen:"
+
+msgid "Download backup"
+msgstr "Backup herunterladen"
 
 msgid "Added:"
 msgstr "Hinzugefügt:"
