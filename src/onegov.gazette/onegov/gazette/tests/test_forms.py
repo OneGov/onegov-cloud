@@ -2,13 +2,14 @@ from datetime import date
 from datetime import datetime
 from freezegun import freeze_time
 from onegov.gazette.collections import CategoryCollection
+from onegov.gazette.collections import GazetteNoticeCollection
 from onegov.gazette.collections import IssueCollection
 from onegov.gazette.collections import OrganizationCollection
-from onegov.gazette.collections import GazetteNoticeCollection
 from onegov.gazette.forms import CategoryForm
 from onegov.gazette.forms import IssueForm
 from onegov.gazette.forms import NoticeForm
 from onegov.gazette.forms import OrganizationForm
+from onegov.gazette.forms import UnrestrictedNoticeForm
 from onegov.gazette.forms import UserForm
 from onegov.gazette.models import GazetteNotice
 from onegov.user import UserCollection
@@ -537,3 +538,45 @@ def test_notice_form(session, categories, organizations, issues):
             ('12', 'Submissions'),
         ]
         assert form.issues.render_kw['data-hot-issue'] == '2017-44'
+
+
+def test_unrestricted_notice_form(session, categories, organizations, issues):
+    # Test on request
+    with freeze_time("2019-11-01 14:00"):
+        form = UnrestrictedNoticeForm()
+        form.model = None
+        form.request = DummyRequest(session)
+        form.on_request()
+        assert form.organization.choices == [
+            ('', 'Select one'),
+            ('100', 'State Chancellery'),
+            ('200', 'Civic Community'),
+            ('300', 'Municipality'),
+            ('410', 'Evangelical Reformed Parish'),
+            ('420', '(Sikh Community)'),
+            ('430', 'Catholic Parish'),
+            ('500', 'Corporation')
+        ]
+        assert form.issues.choices == [
+            ('2017-40', 'No. 40, Freitag 06.10.2017'),
+            ('2017-41', 'No. 41, Freitag 13.10.2017'),
+            ('2017-42', 'No. 42, Freitag 20.10.2017'),
+            ('2017-43', 'No. 43, Freitag 27.10.2017'),
+            ('2017-44', 'No. 44, Freitag 03.11.2017'),
+            ('2017-45', 'No. 45, Freitag 10.11.2017'),
+            ('2017-46', 'No. 46, Freitag 17.11.2017'),
+            ('2017-47', 'No. 47, Freitag 24.11.2017'),
+            ('2017-48', 'No. 48, Freitag 01.12.2017'),
+            ('2017-49', 'No. 49, Freitag 08.12.2017'),
+            ('2017-50', 'No. 50, Freitag 15.12.2017'),
+            ('2017-51', 'No. 51, Freitag 22.12.2017'),
+            ('2017-52', 'No. 52, Freitag 29.12.2017'),
+            ('2018-1', 'No. 1, Freitag 05.01.2018')
+        ]
+        assert form.category.choices == [
+            ('13', 'Commercial Register'),
+            ('10', '(Complaints)'),
+            ('11', 'Education'),
+            ('14', 'Elections'),
+            ('12', 'Submissions'),
+        ]

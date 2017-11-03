@@ -15,6 +15,13 @@ from sedate import utcnow
 
 
 class NoticeForm(Form):
+    """ Edit an official notice.
+
+    The issues are limited according to the deadline (or the issue date in the
+    for publishers) and the categories and organizations are limited to the
+    active one.
+
+    """
 
     title = StringField(
         label=_("Title"),
@@ -128,3 +135,56 @@ class NoticeForm(Form):
         self.text.data = model.text
         self.at_cost.data = model.at_cost
         self.issues.data = list(model.issues.keys())
+
+
+class UnrestrictedNoticeForm(NoticeForm):
+    """ Edit an official notice without limitations on the issues, categories
+    and organiaztions.
+
+    """
+
+    def on_request(self):
+        session = self.request.app.session()
+        layout = Layout(None, self.request)
+
+        def title(item):
+            return item.title if item.active else '({})'.format(item.title)
+
+        # populate organization (root elements with no children or children
+        # (but not their parents))
+        self.organization.choices = []
+        self.organization.choices.append(
+            ('', self.request.translate(_("Select one")))
+        )
+        query = session.query(Organization)
+        query = query.filter(Organization.parent_id.is_(None))
+        query = query.order_by(Organization.order)
+        for root in query:
+            if root.children:
+                for child in root.children:
+                    self.organization.choices.append(
+                        (child.name, title(child))
+                    )
+            else:
+                self.organization.choices.append((root.name, title(root)))
+
+        # populate categories
+        self.category.choices = []
+        query = session.query(Category)
+        query = query.order_by(Category.order)
+        for category in query:
+            self.category.choices.append((category.name, title(category)))
+
+        # populate issues
+        del self.issues.render_kw['data-limit']
+        self.issues.choices = []
+        query = session.query(Issue)
+        query = query.order_by(Issue.date)
+        for issue in query:
+            self.issues.choices.append((
+                issue.name,
+                layout.format_issue(issue, date_format='date_with_weekday')
+            ))
+
+        # translate the string of the mutli select field
+        self.issues.translate(self.request)

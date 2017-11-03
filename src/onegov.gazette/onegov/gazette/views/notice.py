@@ -1,6 +1,7 @@
 from morepath import redirect
 from onegov.core.security import Personal
 from onegov.core.security import Private
+from onegov.core.security import Secret
 from onegov.core.templates import render_template
 from onegov.gazette import _
 from onegov.gazette import GazetteApp
@@ -8,6 +9,7 @@ from onegov.gazette.collections import GazetteNoticeCollection
 from onegov.gazette.forms import EmptyForm
 from onegov.gazette.forms import NoticeForm
 from onegov.gazette.forms import RejectForm
+from onegov.gazette.forms import UnrestrictedNoticeForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.layout import MailLayout
 from onegov.gazette.models import GazetteNotice
@@ -47,6 +49,7 @@ def view_notice(self, request):
     user_ids, group_ids = get_user_and_group(request)
     editor = request.is_personal(self)
     publisher = request.is_private(self)
+    admin = request.is_secret(self)
     owner = self.user_id in user_ids
     same_group = self.group_id in group_ids
 
@@ -105,6 +108,13 @@ def view_notice(self, request):
             'secondary',
             '_self'
         ))
+        if admin:
+            actions.append((
+                _("Edit"),
+                request.link(self, 'edit_unrestricted'),
+                'alert right',
+                '_self'
+            ))
 
     actions.append((
         _("Preview"),
@@ -147,9 +157,10 @@ def view_notice_preview(self, request):
 def edit_notice(self, request, form):
     """ Edit a notice.
 
-    The issue can not be changed. This view is used by the editors and
-    publishers. Editors may only edit their own notices, publishers may edit
-    any notice.
+    This view is used by the editors and publishers. Editors may only edit
+    their own notices, publishers may edit any notice. It's not possible to
+    change already accepted or published notices (although you can use the
+    unrestricted view for this).
 
     """
 
@@ -204,6 +215,49 @@ def edit_notice(self, request, form):
         'button_text': _("Save"),
         'cancel': request.link(self),
         'current_issue': layout.current_issue
+    }
+
+
+@GazetteApp.form(
+    model=GazetteNotice,
+    name='edit_unrestricted',
+    template='form.pt',
+    permission=Secret,
+    form=UnrestrictedNoticeForm
+)
+def edit_notice_unrestricted(self, request, form):
+    """ Edit a notice without restrictions.
+
+    This view is only usable by publishers.
+
+    """
+
+    layout = Layout(self, request)
+
+    if self.state == 'accepted':
+        request.message(
+            _("This official notice has already been accepted!"), 'warning'
+        )
+    elif self.state == 'published':
+        request.message(
+            _("This official notice has already been published!"), 'warning'
+        )
+
+    if form.submitted(request):
+        form.update_model(self)
+        self.add_change(request, _("edited"))
+        return redirect(request.link(self))
+
+    if not form.errors:
+        form.apply_model(self)
+
+    return {
+        'layout': layout,
+        'form': form,
+        'title': self.title,
+        'subtitle': _("Edit Official Notice"),
+        'button_text': _("Save"),
+        'cancel': request.link(self)
     }
 
 
