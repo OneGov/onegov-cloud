@@ -1,3 +1,4 @@
+import json
 import pytest
 import transaction
 
@@ -8,8 +9,11 @@ from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryEntryCollection
+from onegov.directory import DirectoryArchive
 from onegov.directory.errors import ValidationError
 from onegov.file import File
+from onegov_testing.utils import create_image
+from tempfile import NamedTemporaryFile
 
 
 def test_directory_title_and_order(session):
@@ -298,3 +302,58 @@ def test_files(session):
     session.flush()
 
     assert session.query(File).count() == 0
+
+
+def test_archive(session, temporary_path):
+    directories = DirectoryCollection(session)
+    businesses = directories.add(
+        title="Businesses",
+        lead="The town's businesses",
+        structure="""
+            Name *= ___
+            Employees = 0..1000
+            Logo = *.png
+        """,
+        configuration=DirectoryConfiguration(
+            title="[name]",
+            order=['name']
+        )
+    )
+
+    output = NamedTemporaryFile(suffix='.png')
+    businesses.add(values=dict(
+        name="Initech",
+        employees=250,
+        logo=Bunch(
+            data=object(),
+            file=create_image(output=output).file,
+            filename='logo.png'
+        )
+    ))
+
+    businesses.add(values=dict(
+        name="Evilcorp",
+        employees=1000,
+        logo=None
+    ))
+
+    transaction.commit()
+
+    archive = DirectoryArchive(temporary_path, 'json')
+    archive.write(directories.by_name('businesses'))
+
+    metadata = json.loads((temporary_path / 'metadata.json').open().read())
+    data = json.loads((temporary_path / 'data.json').open().read())
+
+    assert metadata['title'] == businesses.title
+    assert metadata['lead'] == businesses.lead
+    assert metadata['type'] == businesses.type
+    assert metadata['structure'] == businesses.structure
+    assert metadata['configuration'] == businesses.configuration.to_dict()
+    assert data == [
+        {'Name': 'Evilcorp', 'Employees': 1000, 'Logo': None},
+        {'Name': 'Initech', 'Employees': 250, 'Logo': 'logo/initech.png'}
+    ]
+
+    assert (temporary_path / 'logo/initech.png').is_file()
+    assert not (temporary_path / 'logo/evilcorp.png').is_file()
