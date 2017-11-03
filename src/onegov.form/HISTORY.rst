@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.25.0 (2017-11-03)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds basic field value parsing as a helper for import methods.
   [href]
