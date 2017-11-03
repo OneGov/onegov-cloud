@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-10-31 14:59+0100\n"
+"POT-Creation-Date: 2017-11-03 11:01+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2118,6 +2118,12 @@ msgid "New Directory Entry"
 msgstr ""
 
 msgid "The entry was deleted"
+msgstr ""
+
+msgid ""
+"Exports all entries of this directory. The resulting zipfile contains the "
+"selected format as well as metadata and images/files if the directory "
+"contains any."
 msgstr ""
 
 msgid "Added a new directory"

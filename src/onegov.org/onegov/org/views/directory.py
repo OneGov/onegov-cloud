@@ -1,18 +1,23 @@
 from collections import namedtuple
 from onegov.core.security import Public, Private, Secret
+from onegov.core.utils import render_file
 from onegov.directory import Directory
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryEntryCollection
+from onegov.directory import DirectoryZipArchive
 from onegov.org import OrgApp, _
 from onegov.org.forms import DirectoryForm
+from onegov.org.forms.generic import ExportForm
 from onegov.org.layout import DirectoryCollectionLayout
 from onegov.org.layout import DirectoryEntryCollectionLayout
 from onegov.org.layout import DirectoryEntryLayout
 from onegov.org.models import ExtendedDirectory, ExtendedDirectoryEntry
 from onegov.org.new_elements import Link
+from purl import URL
 from sqlalchemy import cast
 from sqlalchemy import JSON
+from tempfile import NamedTemporaryFile
 
 
 def get_directory_form_class(model, request):
@@ -290,3 +295,51 @@ def delete_directory_entry(self, request):
     session.delete(self)
 
     request.success(_("The entry was deleted"))
+
+
+@OrgApp.form(model=DirectoryEntryCollection, permission=Private, name='export',
+             template='export.pt', form=ExportForm)
+def view_export(self, request, form):
+
+    layout = DirectoryEntryCollectionLayout(self, request)
+    layout.breadcrumbs.append(Link(_("Export"), '#'))
+    layout.editbar_links = None
+
+    if form.submitted(request):
+        url = URL(request.link(self, '+zip'))
+        url = url.query_param('format', form.format)
+
+        return request.redirect(url.as_string())
+
+    return {
+        'layout': layout,
+        'title': _("Export"),
+        'form': form,
+        'explanation': _(
+            "Exports all entries of this directory. The resulting zipfile "
+            "contains the selected format as well as metadata and "
+            "images/files if the directory contains any."
+        )
+    }
+
+
+@OrgApp.view(model=DirectoryEntryCollection, permission=Private, name='zip')
+def view_zip_file(self, request):
+    layout = DirectoryEntryCollectionLayout(self, request)
+
+    format = request.params.get('format', 'json')
+    formatter = layout.export_formatter(format)
+
+    def transform(key, value):
+        return formatter(key), formatter(value)
+
+    with NamedTemporaryFile() as f:
+        archive = DirectoryZipArchive(f.name + '.zip', format, transform)
+        archive.write(self.directory)
+
+        response = render_file(str(archive.path), request)
+
+    response.headers['Content-Disposition']\
+        = 'attachment; filename="{}.zip"'.format(self.directory.name)
+
+    return response

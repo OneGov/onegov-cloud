@@ -1756,6 +1756,15 @@ class DirectoryEntryCollectionLayout(DefaultLayout):
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
+                    text=_("Export"),
+                    url=self.request.class_link(
+                        DirectoryEntryCollection, {
+                            'directory_name': self.model.directory_name
+                        }, name='+export'
+                    ),
+                    attrs={'class': 'export-link'}
+                ),
+                Link(
                     text=_("Delete"),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)
