@@ -157,6 +157,9 @@ def test_browse_directory_coordinates(browser, org_app):
                 content:
                     - name
         """,
+        meta={
+            'enable_map': True
+        },
         type='extended'
     )
 
