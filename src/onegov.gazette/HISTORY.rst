@@ -16,6 +16,9 @@ Changelog
 - Allows to manage categories, organizations and issues.
   [msom]
 
+- Adds an unrestricted edit view for admins.
+  [msom]
+
 1.9.2 (2017-10-26)
 ~~~~~~~~~~~~~~~~~~~
 
