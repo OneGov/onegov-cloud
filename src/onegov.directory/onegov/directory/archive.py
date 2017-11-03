@@ -5,8 +5,11 @@ import os
 
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.csv import convert_list_of_dicts_to_xlsx
-from onegov.core.utils import rchop
+from onegov.core.utils import Bunch, rchop, is_subpath
+from onegov.directory.models import Directory
+from onegov.directory.types import DirectoryConfiguration
 from onegov.file import File
+from onegov.form import as_internal_id
 from pathlib import Path
 from sqlalchemy.orm import object_session
 from tempfile import TemporaryDirectory, NamedTemporaryFile
@@ -15,7 +18,60 @@ from tempfile import TemporaryDirectory, NamedTemporaryFile
 class DirectoryArchiveReader(object):
 
     def read(self):
+        metadata = self.read_metadata()
+        entries = self.read_data()
+
+        directory = Directory(
+            title=metadata['title'],
+            lead=metadata['lead'],
+            name=metadata['name'],
+            type=metadata['type'],
+            structure=metadata['structure'],
+            configuration=DirectoryConfiguration(**metadata['configuration'])
+        )
+
+        fields = {f.human_id: f for f in directory.fields}
+
+        def parse(key, value):
+            field = fields[key]
+
+            if field.type == 'fileinput' and value:
+
+                # be extra paranoid about these path values -> they could
+                # potentially be used to access files on the local system
+                assert '..' not in value
+                assert value.count('/') == 1
+                assert value.startswith(field.id + '/')
+
+                path = self.path / value
+                assert is_subpath(str(self.path), str(path))
+
+                value = Bunch(
+                    data=object(),
+                    file=path.open('rb'),
+                    filename=value.split('/')[-1]
+                )
+
+            return as_internal_id(key), fields[key].parse(value)
+
+        for entry in entries:
+            directory.add(dict(parse(k, v) for k, v in entry.items()))
+
+        return directory
+
+    def read_metadata(self):
+        with (self.path / 'metadata.json').open('r') as f:
+            return json.loads(f.read())
+
+    def read_data(self):
+        if (self.path / 'data.json').exists():
+            return self.read_data_from_json()
+
         raise NotImplementedError
+
+    def read_data_from_json(self):
+        with (self.path / 'data.json').open('r') as f:
+            return json.loads(f.read())
 
 
 class DirectoryArchiveWriter(object):

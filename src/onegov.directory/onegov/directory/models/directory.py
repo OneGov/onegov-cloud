@@ -103,8 +103,6 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
             type=self.type if type is INHERIT else type
         )
 
-        object_session(self).add(entry)
-
         return self.update(entry, values, set_name=True)
 
     def add_by_form(self, form, type=INHERIT):
@@ -171,8 +169,6 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
                         filename=values[field.id].filename
                     )
                 )
-                session.add(new_file)
-
                 entry.files.append(new_file)
 
                 # keep a reference to the file in the values
@@ -206,7 +202,7 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
         # of the actual content dictionary)
         entry.content.changed()
 
-        if not session._flushing:
+        if session and not session._flushing:
             session.flush()
 
         return entry
