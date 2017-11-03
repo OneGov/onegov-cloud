@@ -27,7 +27,7 @@ class DirectoryArchiveWriter(object):
     def write_directory_metadata(self, directory):
         metadata = {
             'configuration': directory.configuration.to_dict(),
-            'structure': directory.structure,
+            'structure': directory.structure.replace('\r\n', '\n'),
             'title': directory.title,
             'lead': directory.lead,
             'name': directory.name,
