@@ -308,6 +308,8 @@ import re
 import yaml
 
 from cached_property import cached_property
+from dateutil import parser as dateutil_parser
+from decimal import Decimal
 from onegov.core.utils import Bunch
 from onegov.form import errors
 from onegov.form.parser.grammar import checkbox
@@ -561,6 +563,9 @@ class Field(object):
             fieldset=fieldset
         )
 
+    def parse(self, value):
+        return value
+
 
 class PasswordField(Field):
     type = 'password'
@@ -577,13 +582,26 @@ class UrlField(Field):
 class DateField(Field):
     type = 'date'
 
+    def parse(self, value):
+        # the first int in an ambiguous date is assumed to be a day
+        # (since our software runs in europe first and foremost)
+        return dateutil_parser.parse(value, dayfirst=True).date()
+
 
 class DatetimeField(Field):
     type = 'datetime'
 
+    def parse(self, value):
+        # the first int in an ambiguous date is assumed to be a day
+        # (since our software runs in europe first and foremost)
+        return dateutil_parser.parse(value, dayfirst=True)
+
 
 class TimeField(Field):
     type = 'time'
+
+    def parse(self, value):
+        return time(*map(int, value.split(':')))
 
 
 class TextField(Field):
@@ -647,9 +665,15 @@ class RangeField(object):
 class IntegerRangeField(RangeField, Field):
     type = 'integer_range'
 
+    def parse(self, value):
+        return int(value)
+
 
 class DecimalRangeField(RangeField, Field):
     type = 'decimal_range'
+
+    def parse(self, value):
+        return Decimal(value)
 
 
 class FileinputField(Field):
@@ -689,6 +713,12 @@ class OptionsField(object):
             choices=choices,
             pricing=pricing or None
         )
+
+    def parse(self, value):
+        if isinstance(value, str):
+            return [v.strip() for v in value.split(',')]
+
+        return value
 
 
 class RadioField(OptionsField, Field):

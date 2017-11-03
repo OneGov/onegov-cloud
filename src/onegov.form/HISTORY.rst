@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds basic field value parsing as a helper for import methods.
+  [href]
+
 - Fixes order not being preserved in the select component.
   [href]
 
