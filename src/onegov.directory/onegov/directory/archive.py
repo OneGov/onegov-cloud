@@ -19,7 +19,7 @@ from tempfile import TemporaryDirectory, NamedTemporaryFile
 
 class DirectoryArchiveReader(object):
 
-    def read(self, target=None, skip_existing=True):
+    def read(self, target=None, skip_existing=True, limit=0):
         metadata = self.read_metadata()
         records = self.read_data()
 
@@ -79,7 +79,11 @@ class DirectoryArchiveReader(object):
 
             return as_internal_id(key), value
 
-        for record in records:
+        for count, record in enumerate(records, start=1):
+
+            if limit and count > limit:
+                continue
+
             values = dict(
                 p for p in (parse(k, v) for k, v in record.items())
                 if p is not unknown
