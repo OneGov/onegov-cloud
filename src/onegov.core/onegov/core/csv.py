@@ -182,17 +182,24 @@ def detect_encoding(csvfile):
 
 
 def sniff_dialect(csv):
-    """ Takes the given csv string and returns the dialect or None. Works just
-    like Python's built in sniffer, just that it is a bit more conservative and
-    doesn't just accept any kind of character as csv delimiter.
+    """ Takes the given csv string and returns the dialect or raises an error.
+    Works just like Python's built in sniffer, just that it is a bit more
+    conservative and doesn't just accept any kind of character as csv
+    delimiter.
 
     """
     if not csv:
         raise errors.EmptyFileError()
 
-    dialect = Sniffer().sniff(csv)
+    try:
+        dialect = Sniffer().sniff(csv, VALID_CSV_DELIMITERS)
+    except CsvError:
 
-    if dialect.delimiter not in VALID_CSV_DELIMITERS:
+        # sometimes we can get away with an extra pass just over the first line
+        # (the header tends to contain fewer special cases)
+        if '\n' in csv:
+            return sniff_dialect(csv[:csv.find('\n')])
+
         raise errors.InvalidFormatError()
 
     return dialect

@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves detection of CSV dialects.
+  [href]
+
 0.52.1 (2017-10-23)
 ~~~~~~~~~~~~~~~~~~~
 
