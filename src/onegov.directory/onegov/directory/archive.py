@@ -3,6 +3,7 @@ import json
 import shutil
 import os
 
+from collections import OrderedDict
 from onegov.core.csv import CSVFile
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.csv import convert_list_of_dicts_to_xlsx
@@ -151,7 +152,7 @@ class DirectoryArchiveWriter(object):
                 yield self.transform(field.human_id, value)
 
         def as_dict(entry):
-            data = {k: v for k, v in as_tuples(entry)}
+            data = OrderedDict(as_tuples(entry))
 
             coordinates = entry.content.get('coordinates', {})
             data['_lat'] = coordinates.get('lat')
