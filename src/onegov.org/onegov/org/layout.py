@@ -278,7 +278,7 @@ class Layout(ChameleonLayout):
 
             return value
 
-        if format == 'xlsx':
+        if format in ('xlsx', 'csv'):
             def formatter(value):
                 if is_daterange_list(value, (date, datetime)):
                     return '\n'.join(formatter(v) for v in value)
