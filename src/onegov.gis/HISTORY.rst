@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Upgrades to leaflet 1.2.0.
+  [href]
+
 - Adds a reference to each created map to the document.
   [href]
 
