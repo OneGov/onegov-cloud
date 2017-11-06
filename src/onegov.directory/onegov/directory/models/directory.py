@@ -97,7 +97,7 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
     def entry_cls(self):
         return self.__class__._decl_class_registry[self.entry_cls_name]
 
-    def add(self, values, type=INHERIT, form=None):
+    def add(self, values, type=INHERIT):
         entry = self.entry_cls(
             directory=self,
             type=self.type if type is INHERIT else type,
@@ -105,30 +105,6 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
         )
 
         return self.update(entry, values, set_name=True)
-
-    def add_by_import(self, imported):
-        entry = self.entry_cls(
-            directory=self,
-            type=imported.type,
-            meta=imported.meta,
-            content=imported.content,
-            name=imported.name,
-            title=imported.title,
-            lead=imported.lead,
-            order=imported.order,
-        )
-
-        for file in imported.files:
-            entry.files.append(DirectoryFile(
-                id=file.id,
-                name=file.name,
-                note=file.note,
-                type=file.type,
-                reference=file.reference,
-                checksum=file.checksum
-            ))
-
-        return entry
 
     def add_by_form(self, form, type=INHERIT):
         entry = self.add(form.mixed_data, type)

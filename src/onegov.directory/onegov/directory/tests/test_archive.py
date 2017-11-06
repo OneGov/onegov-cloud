@@ -66,15 +66,15 @@ def test_archive_create(session, temporary_path):
             'Name': 'Evilcorp',
             'Employees': 1000,
             'Logo': None,
-            '_lat': None,
-            '_lon': None,
+            'Latitude': None,
+            'Longitude': None,
         },
         {
             'Name': 'Initech',
             'Employees': 250,
             'Logo': 'logo/initech.png',
-            '_lat': None,
-            '_lon': None,
+            'Latitude': None,
+            'Longitude': None,
         }
     ]
 

@@ -7,8 +7,8 @@ from collections import OrderedDict
 from onegov.core.csv import CSVFile
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.csv import convert_list_of_dicts_to_xlsx
-from onegov.core.utils import Bunch, rchop, is_subpath
-from onegov.directory.models import Directory
+from onegov.core.utils import Bunch, rchop, is_subpath, normalize_for_url
+from onegov.directory.models import Directory, DirectoryEntry
 from onegov.directory.types import DirectoryConfiguration
 from onegov.file import File
 from onegov.form import as_internal_id
@@ -19,21 +19,30 @@ from tempfile import TemporaryDirectory, NamedTemporaryFile
 
 class DirectoryArchiveReader(object):
 
-    def read(self):
+    def read(self, target=None, skip_existing=True):
         metadata = self.read_metadata()
         records = self.read_data()
 
-        directory = Directory(
-            title=metadata['title'],
-            lead=metadata['lead'],
-            name=metadata['name'],
-            type=metadata['type'],
-            structure=metadata['structure'],
-            configuration=DirectoryConfiguration(**metadata['configuration'])
-        )
+        directory = target or Directory()
+        directory.title = metadata['title']
+        directory.lead = metadata['lead']
+        directory.name = metadata['name']
+        directory.type = metadata['type']
+        directory.structure = metadata['structure']
+        directory.configuration = DirectoryConfiguration(
+            **metadata['configuration'])
 
         by_human_id = {f.human_id: f for f in directory.fields}
         by_id = {f.id: f for f in directory.fields}
+
+        if skip_existing and target:
+            existing = {
+                e.name for e in object_session(target).query(DirectoryEntry)
+                .filter_by(directory_id=target.id)
+                .with_entities(DirectoryEntry.name)
+            }
+        else:
+            existing = set()
 
         unknown = object()
 
@@ -71,16 +80,29 @@ class DirectoryArchiveReader(object):
             return as_internal_id(key), value
 
         for record in records:
-            entry = directory.add(dict(
+            values = dict(
                 p for p in (parse(k, v) for k, v in record.items())
                 if p is not unknown
-            ))
+            )
 
-            if record.get('_lat') and record.get('_lon'):
-                entry.content['coordinates'] = {
-                    'lon': record['_lon'],
-                    'lat': record['_lat']
-                }
+            if skip_existing:
+                title = directory.configuration.extract_title(values)
+
+                if normalize_for_url(title) in existing:
+                    continue
+
+            entry = directory.add(values)
+
+            names = (
+                ('latitude', 'longitude'),
+                ('Latitude', 'Longitude')
+            )
+            for lat, lon in names:
+                if record.get(lat) and record.get(lon):
+                    entry.content['coordinates'] = {
+                        'lon': record[lon],
+                        'lat': record[lat]
+                    }
 
         return directory
 
@@ -155,8 +177,8 @@ class DirectoryArchiveWriter(object):
             data = OrderedDict(as_tuples(entry))
 
             coordinates = entry.content.get('coordinates', {})
-            data['_lat'] = coordinates.get('lat')
-            data['_lon'] = coordinates.get('lon')
+            data['Latitude'] = coordinates.get('lat')
+            data['Longitude'] = coordinates.get('lon')
 
             return data
 
@@ -246,13 +268,13 @@ class DirectoryZipArchive(object):
 
         return obj
 
-    def write(self, directory):
-        self.archive.write(directory)
+    def write(self, directory, *args, **kwargs):
+        self.archive.write(directory, *args, **kwargs)
         self.compress()
 
-    def read(self):
+    def read(self, *args, **kwargs):
         self.extract()
-        return self.archive.read()
+        return self.archive.read(*args, **kwargs)
 
     def compress(self):
         # make_archive expects a path without extension
