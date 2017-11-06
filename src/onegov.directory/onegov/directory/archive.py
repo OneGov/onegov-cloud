@@ -20,7 +20,7 @@ class DirectoryArchiveReader(object):
 
     def read(self):
         metadata = self.read_metadata()
-        entries = self.read_data()
+        records = self.read_data()
 
         directory = Directory(
             title=metadata['title'],
@@ -62,13 +62,25 @@ class DirectoryArchiveReader(object):
                 else:
                     value = None
 
-            return as_internal_id(key), field.parse(value)
+            try:
+                value = field.parse(value)
+            except ValueError:
+                value = None
 
-        for entry in entries:
-            directory.add(dict(
-                result for result in (parse(k, v) for k, v in entry.items())
-                if result is not unknown
+            return as_internal_id(key), value
+
+        for record in records:
+            entry = directory.add(dict(
+                p for p in (parse(k, v) for k, v in record.items())
+                if p is not unknown
             ))
+
+            if record.get('_lat') and record.get('_lon'):
+                entry.meta = entry.meta or {}
+                entry.meta['coordinates'] = {
+                    'lon': record['_lon'],
+                    'lat': record['_lat']
+                }
 
         return directory
 
@@ -140,7 +152,13 @@ class DirectoryArchiveWriter(object):
                 yield self.transform(field.human_id, value)
 
         def as_dict(entry):
-            return {k: v for k, v in as_tuples(entry)}
+            data = {k: v for k, v in as_tuples(entry)}
+
+            coordinates = entry.meta.get('coordinates', {})
+            data['_lat'] = coordinates.get('lat')
+            data['_lon'] = coordinates.get('lon')
+
+            return data
 
         data = tuple(as_dict(e) for e in directory.entries)
 

@@ -62,8 +62,20 @@ def test_archive_create(session, temporary_path):
     assert metadata['structure'] == businesses.structure
     assert metadata['configuration'] == businesses.configuration.to_dict()
     assert data == [
-        {'Name': 'Evilcorp', 'Employees': 1000, 'Logo': None},
-        {'Name': 'Initech', 'Employees': 250, 'Logo': 'logo/initech.png'}
+        {
+            'Name': 'Evilcorp',
+            'Employees': 1000,
+            'Logo': None,
+            '_lat': None,
+            '_lon': None,
+        },
+        {
+            'Name': 'Initech',
+            'Employees': 250,
+            'Logo': 'logo/initech.png',
+            '_lat': None,
+            '_lon': None,
+        }
     ]
 
     assert (temporary_path / 'logo/initech.png').is_file()
@@ -182,3 +194,31 @@ def test_zip_archive_from_buffer(session, temporary_path):
     assert directory.lead == "The town's businesses"
     assert directory.structure == "Name *= ___"
     assert len(directory.entries) == 1
+
+
+def test_corodinates(session, temporary_path):
+    directories = DirectoryCollection(session)
+    points = directories.add(
+        title="Points of interest",
+        lead="You gotta see this!",
+        structure="Name *= ___",
+        configuration=DirectoryConfiguration(
+            title="[name]",
+            order=['name']
+        )
+    )
+
+    sign = points.add(values=dict(name="Govikon Sign"))
+    sign.meta['coordinates'] = {'lat': 34.1341151, 'lon': -118.3215482}
+
+    transaction.commit()
+
+    archive = DirectoryArchive(temporary_path, 'json')
+    archive.write(directories.by_name('points-of-interest'))
+
+    directory = archive.read()
+    assert directory.title == "Points of interest"
+    assert directory.entries[0].meta['coordinates'] == {
+        'lat': 34.1341151,
+        'lon': -118.3215482
+    }
