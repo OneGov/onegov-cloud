@@ -3,6 +3,7 @@ import json
 import shutil
 import os
 
+from onegov.core.csv import CSVFile
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.csv import convert_list_of_dicts_to_xlsx
 from onegov.core.utils import Bunch, rchop, is_subpath
@@ -30,32 +31,44 @@ class DirectoryArchiveReader(object):
             configuration=DirectoryConfiguration(**metadata['configuration'])
         )
 
-        fields = {f.human_id: f for f in directory.fields}
+        by_human_id = {f.human_id: f for f in directory.fields}
+        by_id = {f.id: f for f in directory.fields}
+
+        unknown = object()
 
         def parse(key, value):
-            field = fields[key]
+            field = by_human_id.get(key) or by_id.get(key)
 
-            if field.type == 'fileinput' and value:
+            if not field:
+                return unknown
 
-                # be extra paranoid about these path values -> they could
-                # potentially be used to access files on the local system
-                assert '..' not in value
-                assert value.count('/') == 1
-                assert value.startswith(field.id + '/')
+            if field.type == 'fileinput':
 
-                path = self.path / value
-                assert is_subpath(str(self.path), str(path))
+                if value:
+                    # be extra paranoid about these path values -> they could
+                    # potentially be used to access files on the local system
+                    assert '..' not in value
+                    assert value.count('/') == 1
+                    assert value.startswith(field.id + '/')
 
-                value = Bunch(
-                    data=object(),
-                    file=path.open('rb'),
-                    filename=value.split('/')[-1]
-                )
+                    path = self.path / value
+                    assert is_subpath(str(self.path), str(path))
 
-            return as_internal_id(key), fields[key].parse(value)
+                    value = Bunch(
+                        data=object(),
+                        file=path.open('rb'),
+                        filename=value.split('/')[-1]
+                    )
+                else:
+                    value = None
+
+            return as_internal_id(key), field.parse(value)
 
         for entry in entries:
-            directory.add(dict(parse(k, v) for k, v in entry.items()))
+            directory.add(dict(
+                result for result in (parse(k, v) for k, v in entry.items())
+                if result is not unknown
+            ))
 
         return directory
 
@@ -67,16 +80,28 @@ class DirectoryArchiveReader(object):
         if (self.path / 'data.json').exists():
             return self.read_data_from_json()
 
+        if (self.path / 'data.csv').exists():
+            return self.read_data_from_csv()
+
         raise NotImplementedError
 
     def read_data_from_json(self):
         with (self.path / 'data.json').open('r') as f:
             return json.loads(f.read())
 
+    def read_data_from_csv(self):
+        with (self.path / 'data.csv').open('rb') as f:
+            csv = CSVFile(f)
+            csv.rowtype = dict
+
+            return list(csv.lines)
+
 
 class DirectoryArchiveWriter(object):
 
     def write(self, directory):
+        assert self.format in ('xlsx', 'csv', 'json')
+
         self.write_directory_metadata(directory)
         self.write_directory_entries(directory)
 
@@ -169,9 +194,7 @@ class DirectoryArchiveWriter(object):
 
 class DirectoryArchive(DirectoryArchiveReader, DirectoryArchiveWriter):
 
-    def __init__(self, path, format, transform=None):
-        assert format in ('xlsx', 'csv', 'json')
-
+    def __init__(self, path, format=None, transform=None):
         self.path = Path(path)
         self.format = format
         self.transform = transform or (lambda key, value: (key, value))
@@ -185,6 +208,20 @@ class DirectoryZipArchive(object):
         self.path = path
         self.temp = TemporaryDirectory()
         self.archive = DirectoryArchive(self.temp.name, *args, **kwargs)
+
+    @classmethod
+    def from_buffer(cls, buffer):
+        f = NamedTemporaryFile()
+
+        buffer.seek(0)
+
+        while f.write(buffer.read(1024 * 1024)):
+            pass
+
+        obj = cls(f.name)
+        obj.file = f
+
+        return obj
 
     def write(self, directory):
         self.archive.write(directory)
@@ -201,6 +238,6 @@ class DirectoryZipArchive(object):
 
     def extract(self):
         shutil.unpack_archive(
-            filename=self.archive.path,
-            extract_dir=self.path,
+            filename=str(self.path),
+            extract_dir=str(self.archive.path),
             format=self.format)

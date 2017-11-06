@@ -69,7 +69,7 @@ def test_archive_create(session, temporary_path):
     assert not (temporary_path / 'logo/evilcorp.png').is_file()
 
 
-@pytest.mark.parametrize('archive_format', ['json'])
+@pytest.mark.parametrize('archive_format', ['json', 'csv'])
 def test_archive_import(session, temporary_path, archive_format):
     directories = DirectoryCollection(session)
     businesses = directories.add(
