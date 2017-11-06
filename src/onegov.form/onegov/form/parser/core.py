@@ -666,7 +666,7 @@ class IntegerRangeField(RangeField, Field):
     type = 'integer_range'
 
     def parse(self, value):
-        return int(value)
+        return int(float(value))  # automatically truncates dots
 
 
 class DecimalRangeField(RangeField, Field):

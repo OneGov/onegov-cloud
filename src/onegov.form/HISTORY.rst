@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Automatically ignores the part after the dot when parsing integers.
+  [href]
+
 0.25.0 (2017-11-03)
 ~~~~~~~~~~~~~~~~~~~
 
