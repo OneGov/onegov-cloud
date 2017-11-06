@@ -243,7 +243,8 @@ function spawnDefaultMap(element, lat, lon, zoom, includeZoomControls) {
         sleepNote: false,
         sleepTime: 500,
         wakeTime: 500,
-        sleepOpacity: 1.0
+        sleepOpacity: 1.0,
+        preferCanvas: true
     };
 
     var map = L.map(element[0], options)
@@ -325,7 +326,7 @@ var MapboxInput = function(input) {
 var MapboxMarkerMap = function(target) {
     var lat = target.data('lat');
     var lon = target.data('lon');
-    var zoom = target.data('zoom');
+    var zoom = target.data('zoom') || $('body').data('default-zoom') || 10;
     var includeZoomControls = target.data('map-type') !== 'thumbnail';
 
     var map = spawnDefaultMap(target, lat, lon, zoom, includeZoomControls);
@@ -364,13 +365,13 @@ var MapboxGeojsonMap = function(target) {
     var includeZoomControls = true;
     var map = spawnDefaultMap(target, lat, lon, zoom, includeZoomControls);
 
-    var pointToLayer = function(_feature, latlng) {
-        var icon = L.VectorMarkers.icon({
-            prefix: 'fa',
-            icon: 'fa-circle',
-            markerColor: $('body').data('default-marker-color') || '#006fba'
-        });
+    var icon = L.VectorMarkers.icon({
+        prefix: 'fa',
+        icon: 'fa-circle',
+        markerColor: $('body').data('default-marker-color') || '#006fba'
+    });
 
+    var pointToLayer = function(_feature, latlng) {
         return L.marker({'lat': latlng.lat, 'lng': latlng.lng}, {
             icon: icon
         });
@@ -393,7 +394,7 @@ var MapboxGeojsonMap = function(target) {
             onEachFeature: onEachFeature
         }).addTo(map);
 
-        map.fitBounds(layer.getBounds().pad(0.5), {maxZoom: zoom});
+        map.fitBounds(layer.getBounds().pad(0.185), {maxZoom: zoom});
     });
 };
 
