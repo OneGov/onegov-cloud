@@ -26,11 +26,6 @@
                         <div class="list-lead">${entry.lead}</div>
                     </li>
                 </ul>
-
-                <div class="pagination-centered" tal:condition="entries">
-                    <div metal:use-macro="layout.macros['pagination']" tal:define="
-                    collection layout.model; current_page layout.model;" />
-                </div>
             </div>
 
             <div class="columns medium-4 filter-panel">
