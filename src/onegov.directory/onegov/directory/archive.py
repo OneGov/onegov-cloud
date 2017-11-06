@@ -61,11 +61,11 @@ class DirectoryArchiveReader(object):
                     )
                 else:
                     value = None
-
-            try:
-                value = field.parse(value)
-            except ValueError:
-                value = None
+            else:
+                try:
+                    value = field.parse(value)
+                except ValueError:
+                    value = None
 
             return as_internal_id(key), value
 
@@ -76,8 +76,7 @@ class DirectoryArchiveReader(object):
             ))
 
             if record.get('_lat') and record.get('_lon'):
-                entry.meta = entry.meta or {}
-                entry.meta['coordinates'] = {
+                entry.content['coordinates'] = {
                     'lon': record['_lon'],
                     'lat': record['_lat']
                 }
@@ -154,7 +153,7 @@ class DirectoryArchiveWriter(object):
         def as_dict(entry):
             data = {k: v for k, v in as_tuples(entry)}
 
-            coordinates = entry.meta.get('coordinates', {})
+            coordinates = entry.content.get('coordinates', {})
             data['_lat'] = coordinates.get('lat')
             data['_lon'] = coordinates.get('lon')
 

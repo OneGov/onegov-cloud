@@ -209,7 +209,7 @@ def test_corodinates(session, temporary_path):
     )
 
     sign = points.add(values=dict(name="Govikon Sign"))
-    sign.meta['coordinates'] = {'lat': 34.1341151, 'lon': -118.3215482}
+    sign.content['coordinates'] = {'lat': 34.1341151, 'lon': -118.3215482}
 
     transaction.commit()
 
@@ -218,7 +218,7 @@ def test_corodinates(session, temporary_path):
 
     directory = archive.read()
     assert directory.title == "Points of interest"
-    assert directory.entries[0].meta['coordinates'] == {
+    assert directory.entries[0].content['coordinates'] == {
         'lat': 34.1341151,
         'lon': -118.3215482
     }
