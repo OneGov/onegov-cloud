@@ -94,6 +94,13 @@ def view_notice(self, request):
                 'alert right',
                 '_self'
             ))
+            if admin:
+                actions.append((
+                    _("Delete"),
+                    request.link(self, 'delete'),
+                    'alert right',
+                    '_self'
+                ))
 
     if self.state == 'accepted':
         actions.append((
@@ -112,6 +119,12 @@ def view_notice(self, request):
             actions.append((
                 _("Edit"),
                 request.link(self, 'edit_unrestricted'),
+                'secondary',
+                '_self'
+            ))
+            actions.append((
+                _("Delete"),
+                request.link(self, 'delete'),
                 'alert right',
                 '_self'
             ))
@@ -275,39 +288,38 @@ def delete_notice(self, request, form):
     Editors may only delete their own notices, publishers may delete any
     notice.
 
-    It is possible for admins to delete accepted/published and drafted notices
-    too, although the action is not linked anywhere.
+    It is possible for admins to delete submitted and accepted notices too.
 
     """
     layout = Layout(self, request)
+    is_admin = request.is_secret(self)
 
     if not request.is_private(self):
         user_ids, group_ids = get_user_and_group(request)
         if not ((self.group_id in group_ids) or (self.user_id in user_ids)):
             raise HTTPForbidden()
 
-    if self.state != 'drafted' and self.state != 'rejected':
-        if request.is_secret(self):
-            request.message(
-                _(
-                    "It's probably not a good idea to delete this official "
-                    "notice!"
-                ),
-                'warning'
-            )
-        else:
-            request.message(
-                _(
-                    "Only drafted or rejected official notices may be deleted."
-                ),
-                'alert'
-            )
-            return {
-                'layout': layout,
-                'title': self.title,
-                'subtitle': _("Delete Official Notice"),
-                'show_form': False
-            }
+    if (
+        self.state == 'published' or
+        (self.state in ('submitted', 'accepted') and not is_admin)
+    ):
+        request.message(
+            _(
+                "Only drafted or rejected official notices may be deleted."
+            ),
+            'alert'
+        )
+        return {
+            'layout': layout,
+            'title': self.title,
+            'subtitle': _("Delete Official Notice"),
+            'show_form': False
+        }
+
+    if self.state == 'accepted':
+        request.message(
+            _("This official notice has already been accepted!"), 'warning'
+        )
 
     if form.submitted(request):
         collection = GazetteNoticeCollection(request.app.session())

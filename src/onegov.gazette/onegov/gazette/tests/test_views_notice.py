@@ -200,10 +200,10 @@ def test_view_notice_actions(gazette_app):
         submit_notice(publisher, 'titel-4')
 
         check((
-            (admin, 'titel-1', 'pear'),
-            (admin, 'titel-2', 'pear'),
-            (admin, 'titel-3', 'pear'),
-            (admin, 'titel-4', 'pear'),
+            (admin, 'titel-1', 'pedar'),
+            (admin, 'titel-2', 'pedar'),
+            (admin, 'titel-3', 'pedar'),
+            (admin, 'titel-4', 'pedar'),
             (publisher, 'titel-1', 'pear'),
             (publisher, 'titel-2', 'pear'),
             (publisher, 'titel-3', 'pear'),
@@ -262,10 +262,10 @@ def test_view_notice_actions(gazette_app):
         accept_notice(publisher, 'titel-4')
 
         check((
-            (admin, 'titel-1', 'pec'),
-            (admin, 'titel-2', 'pec'),
-            (admin, 'titel-3', 'pec'),
-            (admin, 'titel-4', 'pec'),
+            (admin, 'titel-1', 'pedc'),
+            (admin, 'titel-2', 'pedc'),
+            (admin, 'titel-3', 'pedc'),
+            (admin, 'titel-4', 'pedc'),
             (publisher, 'titel-1', 'pc'),
             (publisher, 'titel-2', 'pc'),
             (publisher, 'titel-3', 'pc'),
@@ -551,6 +551,7 @@ def test_view_notice_delete(gazette_app):
             assert manage.forms == {}
 
             manage = admin.get('/notice/erneuerungswahlen/delete')
+            assert "Diese Meldung wurde bereits angenommen!" in manage
             manage.form.submit().maybe_follow()
 
 
