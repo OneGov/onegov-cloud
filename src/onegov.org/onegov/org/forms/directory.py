@@ -169,4 +169,4 @@ class DirectoryImportForm(Form):
             session.flush()
 
         archive = DirectoryZipArchive.from_buffer(self.zip_file.file)
-        archive.read(target=target, skip_existing=True)
+        archive.read(target=target, skip_existing=True, limit=100)

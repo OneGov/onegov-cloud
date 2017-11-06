@@ -347,7 +347,7 @@ def view_zip_file(self, request):
 
 
 @OrgApp.form(model=DirectoryEntryCollection, permission=Private, name='import',
-             template='form.pt', form=DirectoryImportForm)
+             template='import.pt', form=DirectoryImportForm)
 def view_import(self, request, form):
 
     layout = DirectoryEntryCollectionLayout(self, request)
@@ -363,4 +363,10 @@ def view_import(self, request, form):
         'layout': layout,
         'title': _("Import"),
         'form': form,
+        'explanation': _(
+            "Updates the directory configuration and imports all entries "
+            "given in the ZIP file. The format is the same as produced by "
+            "the export function. Note that only 100 items are imported at a "
+            "time. To import more items repeat the import accordingly."
+        )
     }
