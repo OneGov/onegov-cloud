@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for slashes in csv headers.
+  [href]
+
 - Improves detection of CSV dialects.
   [href]
 
