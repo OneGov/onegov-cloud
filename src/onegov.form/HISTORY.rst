@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for radio input parsing.
+  [href]
+
 - Automatically ignores the part after the dot when parsing integers.
   [href]
 

@@ -724,6 +724,10 @@ class OptionsField(object):
 class RadioField(OptionsField, Field):
     type = 'radio'
 
+    def parse(self, value):
+        v = super().parse(value)
+        return v and v[0] or None
+
 
 class CheckboxField(OptionsField, Field):
     type = 'checkbox'
