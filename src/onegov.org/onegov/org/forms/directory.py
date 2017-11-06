@@ -2,7 +2,10 @@ from cached_property import cached_property
 from onegov.core.utils import safe_format_keys
 from onegov.directory import DirectoryConfiguration
 from onegov.form import Form, flatten_fieldsets, parse_formcode, as_internal_id
+from onegov.form.fields import UploadField
 from onegov.form.validators import ValidFormDefinition
+from onegov.form.validators import WhitelistedMimeType
+from onegov.form.validators import FileSizeLimit
 from onegov.org import _
 from wtforms import StringField
 from wtforms import TextAreaField
@@ -125,3 +128,19 @@ class DirectoryForm(Form):
 
     def process_obj(self, obj):
         self.configuration = obj.configuration
+
+
+class DirectoryImportForm(Form):
+
+    zip_file = UploadField(
+        label=_("Import"),
+        validators=[
+            validators.DataRequired(),
+            WhitelistedMimeType({
+                'application/zip',
+                'application/octet-stream'
+            }),
+            FileSizeLimit(25 * 1024 * 1024)
+        ],
+        render_kw=dict(force_simple=True)
+    )

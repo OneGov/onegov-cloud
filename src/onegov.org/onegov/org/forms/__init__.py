@@ -3,6 +3,7 @@ from onegov.org.forms.allocation import DaypassAllocationForm
 from onegov.org.forms.allocation import RoomAllocationEditForm
 from onegov.org.forms.allocation import RoomAllocationForm
 from onegov.org.forms.directory import DirectoryForm
+from onegov.org.forms.directory import DirectoryImportForm
 from onegov.org.forms.event import EventForm
 from onegov.org.forms.form_definition import FormDefinitionForm
 from onegov.org.forms.generic import ExportForm, DateRangeForm
@@ -27,6 +28,7 @@ __all__ = [
     'DaypassAllocationEditForm',
     'DaypassAllocationForm',
     'DirectoryForm',
+    'DirectoryImportForm',
     'EventForm',
     'ExportForm',
     'FormDefinitionForm',

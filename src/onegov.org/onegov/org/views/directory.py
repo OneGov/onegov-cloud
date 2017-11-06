@@ -7,7 +7,7 @@ from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryEntryCollection
 from onegov.directory import DirectoryZipArchive
 from onegov.org import OrgApp, _
-from onegov.org.forms import DirectoryForm
+from onegov.org.forms import DirectoryForm, DirectoryImportForm
 from onegov.org.forms.generic import ExportForm
 from onegov.org.layout import DirectoryCollectionLayout
 from onegov.org.layout import DirectoryEntryCollectionLayout
@@ -344,3 +344,36 @@ def view_zip_file(self, request):
         = 'attachment; filename="{}.zip"'.format(self.directory.name)
 
     return response
+
+
+@OrgApp.form(model=DirectoryEntryCollection, permission=Private, name='import',
+             template='form.pt', form=DirectoryImportForm)
+def view_import(self, request, form):
+
+    layout = DirectoryEntryCollectionLayout(self, request)
+    layout.breadcrumbs.append(Link(_("Import"), '#'))
+    layout.editbar_links = None
+
+    if form.submitted(request):
+        d = DirectoryZipArchive.from_buffer(form.zip_file.file).read()
+
+        self.directory.title = d.title
+        self.directory.lead = d.lead
+        self.directory.structure = d.structure
+        self.directory.configuration = d.configuration
+
+        # XXX add append-only option
+        self.directory.entries = []
+
+        for entry in d.entries:
+            self.directory.add(entry.values)
+
+        request.app.session
+
+        return request.redirect(request.link(self))
+
+    return {
+        'layout': layout,
+        'title': _("Export"),
+        'form': form,
+    }
