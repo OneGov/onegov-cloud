@@ -355,25 +355,12 @@ def view_import(self, request, form):
     layout.editbar_links = None
 
     if form.submitted(request):
-        d = DirectoryZipArchive.from_buffer(form.zip_file.file).read()
-
-        self.directory.title = d.title
-        self.directory.lead = d.lead
-        self.directory.structure = d.structure
-        self.directory.configuration = d.configuration
-
-        # XXX add append-only option
-        self.directory.entries = []
-
-        for entry in d.entries:
-            self.directory.add(entry.values)
-
-        request.app.session
+        form.run_import(target=self.directory)
 
         return request.redirect(request.link(self))
 
     return {
         'layout': layout,
-        'title': _("Export"),
+        'title': _("Import"),
         'form': form,
     }

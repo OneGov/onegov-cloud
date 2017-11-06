@@ -1,17 +1,21 @@
 from cached_property import cached_property
 from onegov.core.utils import safe_format_keys
 from onegov.directory import DirectoryConfiguration
+from onegov.directory import DirectoryEntry
+from onegov.directory import DirectoryZipArchive
 from onegov.form import Form, flatten_fieldsets, parse_formcode, as_internal_id
 from onegov.form.fields import UploadField
+from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import ValidFormDefinition
 from onegov.form.validators import WhitelistedMimeType
-from onegov.form.validators import FileSizeLimit
 from onegov.org import _
+from sqlalchemy.orm import object_session
+from wtforms import BooleanField
+from wtforms import RadioField
 from wtforms import StringField
 from wtforms import TextAreaField
-from wtforms import validators
 from wtforms import ValidationError
-from wtforms import BooleanField
+from wtforms import validators
 
 
 class DirectoryForm(Form):
@@ -132,6 +136,18 @@ class DirectoryForm(Form):
 
 class DirectoryImportForm(Form):
 
+    mode = RadioField(
+        label=_("Mode"),
+        choices=(
+            ('new+update', _("Add new entries and update existing ones")),
+            ('new', _("Add new entries only")),
+            ('update', _("Update existing entries only")),
+            ('new+update+replace', _("Replace existing entries"))
+        ),
+        default='new+update',
+        validators=[validators.InputRequired()]
+    )
+
     zip_file = UploadField(
         label=_("Import"),
         validators=[
@@ -144,3 +160,39 @@ class DirectoryImportForm(Form):
         ],
         render_kw=dict(force_simple=True)
     )
+
+    def run_import(self, target):
+        session = object_session(target)
+
+        d = DirectoryZipArchive.from_buffer(self.zip_file.file).read()
+
+        target.title = d.title
+        target.lead = d.lead
+        target.structure = d.structure
+        target.configuration = d.configuration
+
+        if 'replace' in self.mode.data:
+            for existing in target.entries:
+                session.delete(existing)
+
+            session.flush()
+
+        existing = {
+            entry.name: entry
+            for entry in session.query(DirectoryEntry).filter_by(
+                directory_id=target.id
+            )
+        }
+
+        for imported in d.entries:
+            known = imported.name in existing
+
+            if not known and 'new' in self.mode.data:
+
+                # ok, as long as the directory is imported at the same
+                # time -> if we import the entry only, we need to update it
+                # maybe (depending on how we get it...)
+                target.add_by_import(imported)
+
+            if known and 'update' in self.mode.data:
+                existing[imported.name].content.update(imported.content)

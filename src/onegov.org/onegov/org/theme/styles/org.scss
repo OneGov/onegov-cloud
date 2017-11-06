@@ -1154,6 +1154,7 @@ $edit-link-icon: '\f040';
 $export-link-icon: '\f019';
 $file-link-icon: '\f0c6';
 $image-link-icon: '\f03e';
+$import-link-icon: '\f093';
 $internal-link-icon: '\f0c1';
 $manage-recipients: '\f003';
 $manage-subscribers: '\f0c0';
@@ -1256,6 +1257,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .export-link::before { @include icon($export-link-icon); }
     .file-url::before { @include icon($file-link-icon); }
     .image-url::before { @include icon($image-link-icon); }
+    .import-link::before { @include icon($import-link-icon); }
     .internal-url::before { @include icon($internal-link-icon); }
     .manage-recipients::before { @include icon($manage-recipients); }
     .manage-subscribers::before { @include icon($manage-subscribers); }
