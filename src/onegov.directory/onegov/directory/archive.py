@@ -147,34 +147,35 @@ class DirectoryArchiveWriter(object):
         write = getattr(self, 'write_{}'.format(self.format))
         write(self.path / 'data.{}'.format(self.format), data)
 
-        files = object_session(directory).query(File)
-        files = files.filter(File.id.in_(paths))
-
         tempfiles = []
 
-        for f in files:
-            folder, name = paths[f.id].split('/', 1)
-            folder = self.path / folder
+        if paths:
+            files = object_session(directory).query(File)
+            files = files.filter(File.id.in_(paths))
 
-            if not folder.exists():
-                folder.mkdir()
+            for f in files:
+                folder, name = paths[f.id].split('/', 1)
+                folder = self.path / folder
 
-            # support both local files and others (memory/remote)
-            if hasattr(f.reference.file, '_file_path'):
-                src = os.path.abspath(f.reference.file._file_path)
-            else:
-                tmp = NamedTemporaryFile()
-                tmp.write(f.reference.file.read())
-                tempfiles.append(tmp)
+                if not folder.exists():
+                    folder.mkdir()
 
-                src = tmp.name
+                # support both local files and others (memory/remote)
+                if hasattr(f.reference.file, '_file_path'):
+                    src = os.path.abspath(f.reference.file._file_path)
+                else:
+                    tmp = NamedTemporaryFile()
+                    tmp.write(f.reference.file.read())
+                    tempfiles.append(tmp)
 
-            dst = str(folder / name)
+                    src = tmp.name
 
-            try:
-                os.link(src, dst)  # prefer links if possible
-            except OSError:
-                shutil.copyfile(src, dst)
+                dst = str(folder / name)
+
+                try:
+                    os.link(src, dst)  # prefer links if possible
+                except OSError:
+                    shutil.copyfile(src, dst)
 
         for tempfile in tempfiles:
             tempfile.close()
@@ -218,7 +219,11 @@ class DirectoryZipArchive(object):
         while f.write(buffer.read(1024 * 1024)):
             pass
 
+        f.flush()
+
         obj = cls(f.name)
+
+        # keep the tempfile around undtil the zip archive itself is GC'd
         obj.file = f
 
         return obj
