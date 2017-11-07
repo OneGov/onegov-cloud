@@ -156,7 +156,10 @@ class Layout(object):
         return self.request.unconsumed and self.request.unconsumed[-1] or None
 
     def today(self):
-        return sedate.to_timezone(sedate.utcnow(), self.timezone).date()
+        return self.now().date()
+
+    def now(self):
+        return sedate.to_timezone(sedate.utcnow(), self.timezone)
 
 
 class ChameleonLayout(Layout):

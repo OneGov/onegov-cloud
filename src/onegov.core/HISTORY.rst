@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to get the local time from the layout.
+  [href]
+
 - Adds the ability to specify a custom rowtype for CSVFile objects.
   [href]
 
