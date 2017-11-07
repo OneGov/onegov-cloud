@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.53.0 (2017-11-07)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to get the local time from the layout.
   [href]
