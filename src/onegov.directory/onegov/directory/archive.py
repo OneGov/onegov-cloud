@@ -4,11 +4,12 @@ import shutil
 import os
 
 from collections import OrderedDict
-from onegov.core.csv import CSVFile
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.csv import convert_list_of_dicts_to_xlsx
 from onegov.core.csv import convert_xls_to_csv
+from onegov.core.csv import CSVFile
 from onegov.core.utils import Bunch, rchop, is_subpath
+from onegov.directory.errors import MissingColumnError
 from onegov.directory.models import Directory, DirectoryEntry
 from onegov.directory.types import DirectoryConfiguration
 from onegov.file import File
@@ -79,7 +80,8 @@ class FieldParser(object):
 class DirectoryArchiveReader(object):
     """ Reading part of :class:`DirectoryArchive`. """
 
-    def read(self, target=None, skip_existing=True, limit=0):
+    def read(self, target=None, skip_existing=True, limit=0,
+             apply_metadata=True):
         """ Reads the archive resulting in a dictionary and entries.
 
         :param target:
@@ -94,10 +96,16 @@ class DirectoryArchiveReader(object):
             Limits the number of records which are imported. If the limit
             is reached, the read process silently ignores all extra items.
 
+        :param apply_metadata:
+            True if the metadata found in the archive should be applied
+            to the directory.
+
         """
 
         directory = target or Directory()
-        self.apply_metadata(directory, self.read_metadata())
+
+        if apply_metadata:
+            self.apply_metadata(directory, self.read_metadata())
 
         if skip_existing and target:
             existing = {
@@ -121,7 +129,10 @@ class DirectoryArchiveReader(object):
             if limit and amount > limit:
                 continue
 
-            entry = directory.add(values)
+            try:
+                entry = directory.add(values)
+            except KeyError as e:
+                raise MissingColumnError(column=e.args[0])
 
             names = (
                 ('latitude', 'longitude'),

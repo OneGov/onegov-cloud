@@ -157,11 +157,14 @@ def test_directory_entry_collection(session):
                 [ ] Hip Hop
                 [ ] Pop
                 [ ] Rock
+            German =
+                ( ) Yes
+                ( ) No
         """,
         configuration=DirectoryConfiguration(
             title="[Title]",
             order=('Artist', 'Title'),
-            keywords=('Genre', )
+            keywords=('Genre', 'German')
         )
     )
 
@@ -169,21 +172,24 @@ def test_directory_entry_collection(session):
         artist="Rise Against",
         title="Siren Song of the Counter-Culture",
         year=2004,
-        genre=['Rock']
+        genre=['Rock'],
+        german='No'
     ))
 
     directory.add(values=dict(
         artist="Kettcar",
         title="Du und wieviel von deinen Freunden",
         year=2002,
-        genre=['Rock', 'Pop']
+        genre=['Rock', 'Pop'],
+        german='Yes'
     ))
 
     directory.add(values=dict(
         artist="Hilltop Hoods",
         title="Drinking from the Sun, Walking Under Stars Restrung",
         year=2016,
-        genre=['Hip Hop']
+        genre=['Hip Hop'],
+        german='No'
     ))
 
     albums = DirectoryEntryCollection(directory)
@@ -202,8 +208,22 @@ def test_directory_entry_collection(session):
         'artist': 'Kettcar',
         'title': 'Du und wieviel von deinen Freunden',
         'year': 2002,
-        'genre': ['Rock', 'Pop']
+        'genre': ['Rock', 'Pop'],
+        'german': 'Yes'
     }
+
+    assert albums.for_filter(german='Yes').query().count() == 1
+    assert albums.for_filter(
+        german='Yes', singular=True
+    ).for_filter(
+        german='No', singular=True
+    ).query().count() == 2
+
+    assert albums.for_filter(
+        german='Yes', singular=False
+    ).for_filter(
+        german='No', singular=False
+    ).query().count() == 0
 
 
 def test_validation_error(session):

@@ -90,7 +90,7 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
             for k in keywords
         )
 
-    def for_filter(self, **keywords):
+    def for_filter(self, singular=False, **keywords):
         if not self.directory.configuration.keywords:
             return self
 
@@ -98,7 +98,11 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
 
         for keyword, value in self.valid_keywords(keywords).items():
             collection = set(parameters.get(keyword, []))
-            collection = toggle(collection, value)
+
+            if singular:
+                collection = set() if value in collection else {value}
+            else:
+                collection = toggle(collection, value)
 
             if collection:
                 parameters[keyword] = list(collection)
