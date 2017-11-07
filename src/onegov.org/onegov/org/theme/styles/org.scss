@@ -334,6 +334,13 @@ $global-tools-height: 2.5rem;
     }
 }
 
+/*
+    Click through
+*/
+.click-through {
+    cursor: pointer;
+}
+
 // we need to use exact pixel measurements for the footer or we end up with
 // incosistent results across browsers, which might mean the difference between
 // showing a scrollbar and not showing one
@@ -3767,6 +3774,11 @@ ul.recipients {
             display: inline-block;
             font-size: .875rem;
             margin-bottom: 8px;
+
+            &:hover .blank-label {
+                @include primary-color-background;
+                border: 1px solid $primary-color;
+            }
         }
 
         a {

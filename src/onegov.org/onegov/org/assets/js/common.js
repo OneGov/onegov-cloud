@@ -99,3 +99,10 @@ $(document).ready(function() {
         }
     });
 });
+
+// send clicks from certain blocks down to the first link
+$(document).ready(function() {
+    $('.click-through').click(function() {
+        window.location = $(this).find('a:first').attr('href');
+    });
+});
