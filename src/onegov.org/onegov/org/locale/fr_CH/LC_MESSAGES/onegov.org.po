@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-11-03 11:28+0100\n"
+"POT-Creation-Date: 2017-11-07 13:56+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -259,6 +259,9 @@ msgstr "Synchroniser"
 msgid "Configure"
 msgstr ""
 
+msgid "Import"
+msgstr ""
+
 msgid "Yes"
 msgstr "Oui"
 
@@ -391,6 +394,9 @@ msgstr ""
 
 msgid "Not a valid color."
 msgstr "Couleur non valide."
+
+msgid "Not a valid choice"
+msgstr ""
 
 msgid "Admins"
 msgstr "Admins"
@@ -552,8 +558,17 @@ msgstr ""
 msgid "Directory entries may have coordinates"
 msgstr ""
 
+msgid "Mode"
+msgstr ""
+
 #, python-format
 msgid "The following fields are unknown: ${fields}"
+msgstr ""
+
+msgid "Only import new entries"
+msgstr ""
+
+msgid "Replace all entries"
 msgstr ""
 
 msgid "Exhibition"
@@ -1219,6 +1234,11 @@ msgid "For additional safety you can also download a backup before continuing:"
 msgstr ""
 
 msgid "Download backup"
+msgstr ""
+
+msgid ""
+"There was an error while migrating your directory! You can fix the displayed "
+"entries in a separate window and then continue here."
 msgstr ""
 
 msgid "Added:"
@@ -2130,6 +2150,13 @@ msgid ""
 "Exports all entries of this directory. The resulting zipfile contains the "
 "selected format as well as metadata and images/files if the directory "
 "contains any."
+msgstr ""
+
+msgid ""
+"Updates the directory configuration and imports all entries given in the ZIP "
+"file. The format is the same as produced by the export function. Note that "
+"only 100 items are imported at a time. To import more items repeat the "
+"import accordingly."
 msgstr ""
 
 msgid "Added a new directory"

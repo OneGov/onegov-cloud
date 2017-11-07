@@ -4,7 +4,7 @@
     </tal:b>
     <tal:b metal:fill-slot="content" define="confirm_migration migration and migration.possible">
         <tal:b condition="confirm_migration">
-            <div class="panel callout">
+            <div class="panel callout" tal:condition="not error">
                 <p i18n:translate>
                     Your edit requires a migration of existing entries. Please
                     confirm the following changes.
@@ -19,6 +19,25 @@
                 <p>
                     <div i18n:translate>For additional safety you can also download a backup before continuing:</div>
                     <div><i class="fa fa-download" aria-hidden="true"></i> <a i18n:translate href="${request.link(model, '+zip')}">Download backup</a></div>
+                </p>
+            </div>
+
+            <div class="panel callout" tal:condition="error">
+                <p i18n:translate>
+                    There was an error while migrating your directory! You can fix the displayed entries in a separate window and then continue here.
+                </p>
+
+                <p>
+                    <ul class="dense">
+                        <li tal:repeat="(field_id, messages) error.errors.items()">
+                            <div>
+                                <strong><a href="${error.link}">${error.entry.title}</a></strong>
+                            </div>
+                            <div>
+                                ${directory.field_by_id(field_id).human_id}: ${error_translate(' '.join(messages))}
+                            </div>
+                        </li>
+                    </ul>
                 </p>
             </div>
 
@@ -45,6 +64,7 @@
                 Cancel
             </div>
         </tal:b>
+
         <div class="row" style="display: ${confirm_migration and 'none' or 'block'}">
             <div class="small-12 medium-8 large-6 columns" id="confirm-migration">
                 <div metal:use-macro="layout.macros['form']" />

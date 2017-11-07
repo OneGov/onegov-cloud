@@ -1,4 +1,5 @@
 import re
+import transaction
 
 from collections import namedtuple
 from onegov.core.security import Public, Private, Secret
@@ -8,6 +9,7 @@ from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryEntryCollection
 from onegov.directory import DirectoryZipArchive
+from onegov.directory.errors import ValidationError
 from onegov.org import OrgApp, _
 from onegov.org.forms import DirectoryForm, DirectoryImportForm
 from onegov.org.forms.generic import ExportForm
@@ -93,10 +95,11 @@ def handle_new_directory(self, request, form):
 
 
 @OrgApp.form(model=DirectoryEntryCollection, name='edit',
-             template='directory_entry_form.pt', permission=Secret,
+             template='directory_form.pt', permission=Secret,
              form=get_directory_form_class)
 def handle_edit_directory(self, request, form):
     migration = None
+    error = None
 
     if form.submitted(request):
         save_changes = True
@@ -121,8 +124,16 @@ def handle_edit_directory(self, request, form):
 
         if save_changes:
             form.populate_obj(self.directory)
-            request.success(_("Your changes were saved"))
-            return request.redirect(request.link(self))
+
+            try:
+                self.session.flush()
+            except ValidationError as e:
+                error = e
+                error.link = request.link(e.entry)
+                transaction.abort()
+            else:
+                request.success(_("Your changes were saved"))
+                return request.redirect(request.link(self))
 
     elif not request.POST:
         form.process(obj=self.directory)
@@ -141,7 +152,10 @@ def handle_edit_directory(self, request, form):
         'form': form,
         'form_width': 'large',
         'migration': migration,
-        'model': self
+        'model': self,
+        'error': error,
+        'error_translate': lambda text: request.translate(_(text)),
+        'directory': self.directory,
     }
 
 

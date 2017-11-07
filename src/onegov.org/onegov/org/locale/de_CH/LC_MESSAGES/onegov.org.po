@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-11-03 11:28+0100\n"
+"POT-Creation-Date: 2017-11-07 13:56+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -258,6 +258,9 @@ msgstr "Synchronisieren"
 msgid "Configure"
 msgstr "Konfigurieren"
 
+msgid "Import"
+msgstr "Import"
+
 msgid "Yes"
 msgstr "Ja"
 
@@ -392,6 +395,9 @@ msgstr "Eintrag"
 
 msgid "Not a valid color."
 msgstr "Ungültige Farbe."
+
+msgid "Not a valid choice"
+msgstr "Ungültige Auswahl"
 
 msgid "Admins"
 msgstr "Administratoren"
@@ -554,9 +560,18 @@ msgstr "Filter"
 msgid "Directory entries may have coordinates"
 msgstr "Zu Verzeichnis-Einträgen können Koordinaten erfasst werden"
 
+msgid "Mode"
+msgstr "Modus"
+
 #, python-format
 msgid "The following fields are unknown: ${fields}"
 msgstr "Die folgenden Felder sind unbekannt: ${fields}"
+
+msgid "Only import new entries"
+msgstr "Nur neue Einträge importieren"
+
+msgid "Replace all entries"
+msgstr "Alle Einträge ersetzen"
 
 msgid "Exhibition"
 msgstr "Ausstellung"
@@ -1220,10 +1235,20 @@ msgstr ""
 "Änderung ab und versuchen es mit kleineren Änderungsschritten."
 
 msgid "For additional safety you can also download a backup before continuing:"
-msgstr "Zu Ihrer zusätzlichen Sicherheit können Sie ausserdem vorher ein Backup herunterladen:"
+msgstr ""
+"Zu Ihrer zusätzlichen Sicherheit können Sie ausserdem vorher ein Backup "
+"herunterladen:"
 
 msgid "Download backup"
 msgstr "Backup herunterladen"
+
+msgid ""
+"There was an error while migrating your directory! You can fix the displayed "
+"entries in a separate window and then continue here."
+msgstr ""
+"Bei der Verzeichnismigration ist ein Fehler aufgetreten! Sie können den "
+"angezeigten Fehler im Eintrag in einem separaten Fenster beheben und danach "
+"hier weiterfahren."
 
 msgid "Added:"
 msgstr "Hinzugefügt:"
@@ -2135,6 +2160,18 @@ msgstr ""
 "Exportiert alle Einträge dieses Verzeichnisses. Die resultierende Zip-Datei "
 "enthält das gewählte Format sowie alle Metadaten und allfällige Bilder/"
 "Dateien."
+
+msgid ""
+"Updates the directory configuration and imports all entries given in the ZIP "
+"file. The format is the same as produced by the export function. Note that "
+"only 100 items are imported at a time. To import more items repeat the "
+"import accordingly."
+msgstr ""
+"Aktualisiert die Konfiguration des Verzeichnis und importiert alle Einträge "
+"gemäss der angegebenen Zip Datei. Das Format entspricht dem Format des "
+"Exports. Bitte beachten Sie das nur bis zu 100 Einträge pro Import "
+"berücksichtigt werden. Um mehr Einträge zu importieren muss der Import "
+"wiederholt werden."
 
 msgid "Added a new directory"
 msgstr "Ein neues Verzeichnis wurde hinzugefügt"
