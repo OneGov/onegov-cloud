@@ -1,3 +1,5 @@
+import re
+
 from collections import namedtuple
 from onegov.core.security import Public, Private, Secret
 from onegov.core.utils import render_file
@@ -340,8 +342,12 @@ def view_zip_file(self, request):
 
         response = render_file(str(archive.path), request)
 
+    filename = ' '.join((
+        self.directory.name, layout.format_date(layout.now(), 'datetime')))
+    filename = re.sub(r'[\.:]+', '-', filename)
+
     response.headers['Content-Disposition']\
-        = 'attachment; filename="{}.zip"'.format(self.directory.name)
+        = 'attachment; filename="{}"'.format(filename)
 
     return response
 
