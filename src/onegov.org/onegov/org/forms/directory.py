@@ -135,6 +135,16 @@ class DirectoryForm(Form):
 
 class DirectoryImportForm(Form):
 
+    import_config = RadioField(
+        label=_("Apply directory configuration"),
+        choices=(
+            ('yes', _("Yes, import configuration and entries")),
+            ('no', _("No, only import entries"))
+        ),
+        default='no',
+        validators=[validators.InputRequired()]
+    )
+
     mode = RadioField(
         label=_("Mode"),
         choices=(
@@ -169,4 +179,9 @@ class DirectoryImportForm(Form):
             session.flush()
 
         archive = DirectoryZipArchive.from_buffer(self.zip_file.file)
-        archive.read(target=target, skip_existing=True, limit=100)
+        archive.read(
+            target=target,
+            skip_existing=True,
+            limit=100,
+            apply_metadata=self.import_config.data == 'yes'
+        )

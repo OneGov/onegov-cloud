@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-11-07 13:56+0100\n"
+"POT-Creation-Date: 2017-11-07 14:19+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -560,12 +560,21 @@ msgstr "Filter"
 msgid "Directory entries may have coordinates"
 msgstr "Zu Verzeichnis-Einträgen können Koordinaten erfasst werden"
 
+msgid "Apply directory configuration"
+msgstr "Verzeichniskonfiguration anwenden"
+
 msgid "Mode"
 msgstr "Modus"
 
 #, python-format
 msgid "The following fields are unknown: ${fields}"
 msgstr "Die folgenden Felder sind unbekannt: ${fields}"
+
+msgid "Yes, import configuration and entries"
+msgstr "Ja, Konfiguration und Einträge importieren"
+
+msgid "No, only import entries"
+msgstr "Nein, nur Einträge importieren"
 
 msgid "Only import new entries"
 msgstr "Nur neue Einträge importieren"
@@ -1264,6 +1273,9 @@ msgstr "Verändert:"
 
 msgid "Confirm"
 msgstr "Bestätigen"
+
+msgid "There was an error while importing your directory!"
+msgstr "Beim Verzeichnisimport ist ein Fehler aufgetreten!"
 
 msgid ""
 "Please review your data and press \"Complete\" to finalize the process. If "
@@ -2178,6 +2190,10 @@ msgstr "Ein neues Verzeichnis wurde hinzugefügt"
 
 msgid "Added a new directory entry"
 msgstr "Ein neuer Verzeichniseintrag wurde hinzugefügt"
+
+#, python-format
+msgid "The column ${name} is missing"
+msgstr "Die Spalte ${name} fehlt"
 
 msgid ""
 "The requested change cannot be performed, as it is incompatible with "

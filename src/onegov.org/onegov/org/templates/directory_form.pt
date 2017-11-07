@@ -28,16 +28,7 @@
                 </p>
 
                 <p>
-                    <ul class="dense">
-                        <li tal:repeat="(field_id, messages) error.errors.items()">
-                            <div>
-                                <strong><a href="${error.link}">${error.entry.title}</a></strong>
-                            </div>
-                            <div>
-                                ${directory.field_by_id(field_id).human_id}: ${error_translate(' '.join(messages))}
-                            </div>
-                        </li>
-                    </ul>
+                    <metal:b use-macro="layout.macros['directory_error']" />
                 </p>
             </div>
 

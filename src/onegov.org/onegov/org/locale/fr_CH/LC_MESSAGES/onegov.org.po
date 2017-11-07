@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-11-07 13:56+0100\n"
+"POT-Creation-Date: 2017-11-07 14:19+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -558,11 +558,20 @@ msgstr ""
 msgid "Directory entries may have coordinates"
 msgstr ""
 
+msgid "Apply directory configuration"
+msgstr ""
+
 msgid "Mode"
 msgstr ""
 
 #, python-format
 msgid "The following fields are unknown: ${fields}"
+msgstr ""
+
+msgid "Yes, import configuration and entries"
+msgstr ""
+
+msgid "No, only import entries"
 msgstr ""
 
 msgid "Only import new entries"
@@ -1255,6 +1264,9 @@ msgstr ""
 
 msgid "Confirm"
 msgstr "Confirmer"
+
+msgid "There was an error while importing your directory!"
+msgstr ""
 
 msgid ""
 "Please review your data and press \"Complete\" to finalize the process. If "
@@ -2163,6 +2175,10 @@ msgid "Added a new directory"
 msgstr ""
 
 msgid "Added a new directory entry"
+msgstr ""
+
+#, python-format
+msgid "The column ${name} is missing"
 msgstr ""
 
 msgid ""

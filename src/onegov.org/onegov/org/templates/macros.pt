@@ -984,7 +984,7 @@
     <ul class="tags">
         <li tal:repeat="link tags">
             <span tal:content="structure link(layout)"
-                class="${link.active and 'active'} blank-label"
+                class="${link.active and 'active'} blank-label ${link.rounded and 'rounded'}"
             />
         </li>
     </ul>
@@ -1118,3 +1118,19 @@
         </tbody>
     </table>
 </metal:payments>
+
+<metal:directory_error define-macro="directory_error" i18n:domain="onegov.org">
+    <ul class="dense">
+        <li tal:repeat="(field_id, messages) error.errors.items()">
+            <div tal:condition="error.link|nothing">
+                <strong><a href="${error.link}">${error.entry.title}</a></strong>
+            </div>
+            <div tal:condition="not:error.link|nothing">
+                <strong>${error.entry.title}</strong>
+            </div>
+            <div>
+                ${directory.field_by_id(field_id).human_id}: ${error_translate(' '.join(messages))}
+            </div>
+        </li>
+    </ul>
+</metal:directory_error>

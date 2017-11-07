@@ -9,7 +9,7 @@ from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryEntryCollection
 from onegov.directory import DirectoryZipArchive
-from onegov.directory.errors import ValidationError
+from onegov.directory.errors import ValidationError, MissingColumnError
 from onegov.org import OrgApp, _
 from onegov.org.forms import DirectoryForm, DirectoryImportForm
 from onegov.org.forms.generic import ExportForm
@@ -185,12 +185,20 @@ def view_directory(self, request):
     filters = []
     empty = tuple()
 
+    radio_fields = set(
+        f.id for f in self.directory.fields if f.type == 'radio'
+    )
+
     for keyword, title, values in self.available_filters:
         filters.append(Filter(title=title, tags=tuple(
             Link(
                 text=value,
                 active=value in self.keywords.get(keyword, empty),
-                url=request.link(self.for_filter(**{keyword: value}))
+                url=request.link(self.for_filter(
+                    singular=keyword in radio_fields,
+                    **{keyword: value}
+                )),
+                rounded=keyword in radio_fields
             ) for value in values
         )))
 
@@ -367,17 +375,27 @@ def view_zip_file(self, request):
 
 
 @OrgApp.form(model=DirectoryEntryCollection, permission=Private, name='import',
-             template='import.pt', form=DirectoryImportForm)
+             template='directory_import.pt', form=DirectoryImportForm)
 def view_import(self, request, form):
+    error = None
 
     layout = DirectoryEntryCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("Import"), '#'))
     layout.editbar_links = None
 
     if form.submitted(request):
-        form.run_import(target=self.directory)
-
-        return request.redirect(request.link(self))
+        try:
+            form.run_import(target=self.directory)
+        except MissingColumnError as e:
+            request.alert(_("The column ${name} is missing", mapping={
+                'name': self.directory.field_by_id(e.column).human_id
+            }))
+            transaction.abort()
+        except ValidationError as e:
+            error = e
+            transaction.abort()
+        else:
+            return request.redirect(request.link(self))
 
     return {
         'layout': layout,
@@ -388,5 +406,8 @@ def view_import(self, request, form):
             "given in the ZIP file. The format is the same as produced by "
             "the export function. Note that only 100 items are imported at a "
             "time. To import more items repeat the import accordingly."
-        )
+        ),
+        'directory': self.directory,
+        'error': error,
+        'error_translate': lambda text: request.translate(_(text)),
     }
