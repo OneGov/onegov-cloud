@@ -298,3 +298,159 @@ def test_files(session):
     session.flush()
 
     assert session.query(File).count() == 0
+
+
+def test_migrate_text_field(session):
+    rooms = DirectoryCollection(session).add(
+        title="Rooms",
+        structure="""
+            Name *= ___
+            Note  = ...
+        """,
+        configuration=DirectoryConfiguration(
+            title=('Name', ),
+            order=('Name', ),
+        )
+    )
+
+    conference = rooms.add(values=dict(
+        name="Conference Room",
+        note="Has a beamer\nand snacks"
+    ))
+
+    rooms.structure = """
+        Name *= ___
+        Note  = ___
+    """
+
+    session.flush()
+    assert conference.values['note'] == 'Has a beamer and snacks'
+
+
+def test_migrate_rename_field(session):
+    rooms = DirectoryCollection(session).add(
+        title="Rooms",
+        structure="""
+            Name *= ___
+            Note  = ___
+        """,
+        configuration=DirectoryConfiguration(
+            title=('Name', ),
+            order=('Name', ),
+        )
+    )
+
+    conference = rooms.add(values=dict(
+        name="Conference Room",
+        note="Has a beamer and snacks"
+    ))
+
+    rooms.structure = """
+        Name *= ___
+        Notiz  = ___
+    """
+
+    session.flush()
+    assert conference.values['notiz'] == 'Has a beamer and snacks'
+
+
+def test_migrate_introduce_radio_field(session):
+    rooms = DirectoryCollection(session).add(
+        title="Rooms",
+        structure="""
+            Name *= ___
+        """,
+        configuration=DirectoryConfiguration(
+            title=('Name', ),
+            order=('Name', ),
+        )
+    )
+
+    conference = rooms.add(values=dict(
+        name="Conference Room",
+        note="Has a beamer and snacks"
+    ))
+
+    rooms.structure = """
+        Name *= ___
+        Beamer =
+            ( ) Yes
+            ( ) No
+    """
+
+    session.flush()
+    assert not conference.values['beamer']
+
+    rooms.structure = """
+        Name *= ___
+        Beamer =
+            (x) Yes
+            ( ) No
+    """
+
+    session.flush()
+    assert not conference.values['beamer'] == 'Yes'
+
+
+def test_introduce_required_field_fail(session):
+    rooms = DirectoryCollection(session).add(
+        title="Rooms",
+        structure="""
+            Name *= ___
+        """,
+        configuration=DirectoryConfiguration(
+            title=('Name', ),
+            order=('Name', ),
+        )
+    )
+
+    rooms.add(values=dict(
+        name="Conference Room",
+    ))
+
+    rooms.structure = """
+        Name *= ___
+        Seats *= 0..99
+    """
+
+    with pytest.raises(ValidationError):
+        session.flush()
+
+
+def test_introduce_required_field(session):
+    rooms = DirectoryCollection(session).add(
+        title="Rooms",
+        structure="""
+            Name *= ___
+        """,
+        configuration=DirectoryConfiguration(
+            title=('Name', ),
+            order=('Name', ),
+        )
+    )
+
+    conference = rooms.add(values=dict(
+        name="Conference Room",
+    ))
+
+    # to introduce a new default field add it as optional
+    rooms.structure = """
+        Name *= ___
+        Seats = 0..99
+    """
+
+    session.flush()
+
+    # then fill out the values
+    conference.values['seats'] = 3
+    conference.content.changed()
+
+    session.flush()
+
+    # then mark it as required
+    rooms.structure = """
+        Name *= ___
+        Seats *= 0..99
+    """
+
+    session.flush()

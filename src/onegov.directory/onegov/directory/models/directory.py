@@ -215,8 +215,7 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     @observes('structure', 'configuration')
     def structure_configuration_observer(self, structure, configuration):
-        migration = self.migration(structure, configuration)
-        migration.execute()
+        self.migration(structure, configuration).execute()
 
     def migration(self, new_structure, new_configuration):
         return DirectoryMigration(

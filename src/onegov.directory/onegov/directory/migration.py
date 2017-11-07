@@ -14,11 +14,11 @@ class DirectoryMigration(object):
 
     """
 
-    def __init__(self, directory, new_structure, new_configuration):
+    def __init__(self, directory, new_structure=None, new_configuration=None):
 
         self.directory = directory
-        self.new_structure = new_structure
-        self.new_configuration = new_configuration
+        self.new_structure = new_structure or directory.structure
+        self.new_configuration = new_configuration or directory.configuration
         self.new_form_class = parse_form(new_structure)
         self.fieldtype_migrations = FieldTypeMigrations()
 
@@ -51,14 +51,10 @@ class DirectoryMigration(object):
             old = self.changes.old[changed]
             new = self.changes.new[changed]
 
-            # we can change a required field to a non-required
-            if old.required and not new.required and old.type == new.type:
+            # we can turn required into optional fields and vice versa
+            # (the form validation takes care of validating the requirements)
+            if old.required != new.required and old.type == new.type:
                 continue
-
-            # we cannot introduce a required field after the fact
-            # XXX -> we can make this work by validating the results first
-            if new.required and not old.required:
-                break
 
             # we can only convert certain types
             if old.required == new.required and old.type != new.type:
@@ -117,6 +113,9 @@ class FieldTypeMigrations(object):
 
         if old_type == 'password':
             return  # disabled to avoid accidental leaks
+
+        if old_type == new_type:
+            return lambda v: v
 
         explicit = '{}_to_{}'.format(old_type, new_type)
         generic = 'any_to_{}'.format(new_type)
