@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.26.0 (2017-11-07)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds support for radio input parsing.
   [href]
