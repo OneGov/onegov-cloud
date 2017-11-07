@@ -191,7 +191,7 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
         # update the title
         if set_name:
-            entry.name = normalize_for_url(entry.title)
+            entry.name = self.configuration.extract_name(values)
 
         # validate the values
         form = self.form_class(data=entry.values)
@@ -227,7 +227,11 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     @property
     def fields(self):
-        return tuple(flatten_fieldsets(parse_formcode(self.structure)))
+        return self.fields_from_structure(self.structure)
+
+    @lru_cache(maxsize=1)
+    def fields_from_structure(self, structure):
+        return tuple(flatten_fieldsets(parse_formcode(structure)))
 
     @property
     def basic_fields(self):

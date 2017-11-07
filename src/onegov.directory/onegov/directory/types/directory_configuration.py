@@ -133,6 +133,9 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
             )
         }
 
+    def extract_name(self, data):
+        return normalize_for_url(self.extract_title(data))
+
     def extract_title(self, data):
         return safe_format(
             self.title, self.for_safe_format(data), adapt=as_internal_id)
