@@ -197,7 +197,7 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
         form = self.form_class(data=entry.values)
 
         if not form.validate():
-            raise ValidationError(form.errors)
+            raise ValidationError(entry, form.errors)
 
         # mark the values as dirty (required because values is only part
         # of the actual content dictionary)
@@ -239,6 +239,10 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
     @property
     def file_fields(self):
         return tuple(f for f in self.fields if f.type == 'fileinput')
+
+    def field_by_id(self, id):
+        query = (f for f in self.fields if f.human_id == id or f.id == id)
+        return next(query, None)
 
     @property
     def form_class(self):
