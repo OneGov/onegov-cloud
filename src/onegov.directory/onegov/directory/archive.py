@@ -7,6 +7,7 @@ from collections import OrderedDict
 from onegov.core.csv import CSVFile
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.csv import convert_list_of_dicts_to_xlsx
+from onegov.core.csv import convert_xls_to_csv
 from onegov.core.utils import Bunch, rchop, is_subpath
 from onegov.directory.models import Directory, DirectoryEntry
 from onegov.directory.types import DirectoryConfiguration
@@ -166,6 +167,9 @@ class DirectoryArchiveReader(object):
         if (self.path / 'data.csv').exists():
             return self.read_data_from_csv()
 
+        if (self.path / 'data.xlsx').exists():
+            return self.read_data_from_xlsx()
+
         raise NotImplementedError
 
     def read_data_from_json(self):
@@ -174,10 +178,11 @@ class DirectoryArchiveReader(object):
 
     def read_data_from_csv(self):
         with (self.path / 'data.csv').open('rb') as f:
-            csv = CSVFile(f)
-            csv.rowtype = dict
+            return tuple(CSVFile(f, rowtype=dict).lines)
 
-            return list(csv.lines)
+    def read_data_from_xlsx(self):
+        with (self.path / 'data.xlsx').open('rb') as f:
+            return tuple(CSVFile(convert_xls_to_csv(f), rowtype=dict).lines)
 
 
 class DirectoryArchiveWriter(object):
