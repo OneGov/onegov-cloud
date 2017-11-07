@@ -66,6 +66,14 @@ class CSVFile(object):
         a suffix is appended to the column name rather than throwing a
         DuplicateColumnNamesError.
 
+    :param rowtype:
+        An alternative rowtype for the resulting rows. This should be a
+        callable that receives a `rownumber` key/value and all the other
+        keys/values found in the csv. The keys are normalized and are valid
+        Python identifiers usable as attribute names.
+
+        Defaults to a namedtuple created using the found headers.
+
     Once the csv file is open, the records can be acceessed as follows::
 
         with open(path, 'rb') as f:
@@ -77,7 +85,8 @@ class CSVFile(object):
     """
 
     def __init__(self, csvfile, expected_headers=None, dialect=None,
-                 encoding=None, rename_duplicate_column_names=False):
+                 encoding=None, rename_duplicate_column_names=False,
+                 rowtype=None):
 
         # guess the encoding if not already provided
         encoding = encoding or detect_encoding(csvfile)
@@ -117,7 +126,7 @@ class CSVFile(object):
             rownumber can't be used as a header
         """
 
-        self.rowtype = namedtuple(
+        self.rowtype = rowtype or namedtuple(
             "CSVFileRow", ['rownumber'] + list(
                 self.as_valid_identifier(k)
                 for k in self.headers.keys()

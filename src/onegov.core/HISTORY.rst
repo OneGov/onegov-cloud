@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to specify a custom rowtype for CSVFile objects.
+  [href]
+
 - Adds support for slashes in csv headers.
   [href]
 
