@@ -4,6 +4,7 @@ from decimal import Decimal
 from unidecode import unidecode
 
 _unwanted_characters = re.compile(r'[^a-zA-Z0-9]+')
+_html_tags = re.compile(r'<.*?>')
 
 
 def as_internal_id(label):
@@ -26,6 +27,10 @@ def get_fields_from_class(cls):
     fields.sort(key=lambda x: (x[1].creation_counter, x[0]))
 
     return fields
+
+
+def extract_text_from_html(html):
+    return _html_tags.sub('', html)
 
 
 class decimal_range(object):

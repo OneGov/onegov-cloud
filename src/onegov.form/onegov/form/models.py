@@ -9,6 +9,7 @@ from onegov.core.orm.types import UTCDateTime
 from onegov.file import AssociatedFiles, File
 from onegov.form.display import render_field
 from onegov.form.parser import parse_form
+from onegov.form.utils import extract_text_from_html
 from onegov.pay import Payable
 from onegov.pay import process_payment
 from onegov.search import ORMSearchable
@@ -192,10 +193,10 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles):
             )
 
             if title_fields:
-                self.title = ', '.join(
+                self.title = extract_text_from_html(', '.join(
                     html.unescape(render_field(form._fields[id]))
                     for id in title_fields
-                )
+                ))
 
             self.email = self.get_email_field_data(form=form)
 
