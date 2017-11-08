@@ -5,7 +5,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.core.upgrade import upgrade_task
 from onegov.ticket import Ticket
-from sqlalchemy import Column, Integer, Text
+from sqlalchemy import Boolean, Column, Integer, Text
 
 
 @upgrade_task('Add handler_id to ticket', always_run=True)
@@ -71,3 +71,18 @@ def add_process_time_to_ticket(context):
     if not context.has_column('tickets', 'process_time'):
         context.operations.add_column(
             'tickets', Column('process_time', Integer, nullable=True))
+
+
+@upgrade_task('Add muted state to ticket')
+def add_muted_state_to_ticket(context):
+    if context.has_column('tickets', 'muted'):
+        return False
+
+    context.operations.add_column(
+        'tickets', Column('muted', Boolean, nullable=True))
+
+    for ticket in context.session.query(Ticket):
+        ticket.muted = False
+
+    context.session.flush()
+    context.operations.alter_column('tickets', 'muted', nullable=False)

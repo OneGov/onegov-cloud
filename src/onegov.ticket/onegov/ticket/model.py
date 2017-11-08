@@ -7,7 +7,7 @@ from onegov.ticket import handlers
 from onegov.ticket.errors import InvalidStateChange
 from onegov.user import User
 from sedate import utcnow
-from sqlalchemy import Column, Enum, ForeignKey, Integer, Text
+from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, Text
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import deferred, relationship
 from uuid import uuid4
@@ -68,6 +68,9 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     #: ``process_time`` itself is only accurate if the ticket is closed, so in
     #: reports make sure to account for the ticket state.
     process_time = Column(Integer, nullable=True)
+
+    #: true if the notifications for this ticket should be muted
+    muted = Column(Boolean, nullable=False, default=False)
 
     # override the created attribute from the timestamp mixin - we don't want
     # it to be deferred by default because we usually need it
