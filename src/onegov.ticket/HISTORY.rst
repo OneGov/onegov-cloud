@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.10.0 (2017-11-08)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a muted state to the ticket.
   [href]
 
