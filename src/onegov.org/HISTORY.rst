@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.17.0 (2017-11-08)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds directories, a generic way keep and present structured information.
   [href]
 
