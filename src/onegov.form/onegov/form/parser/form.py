@@ -10,7 +10,6 @@ from onegov.form.utils import as_internal_id
 from onegov.form.validators import ExpectedExtensions
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import Stdnum
-from onegov.form.validators import WhitelistedMimeType
 from wtforms import PasswordField
 from wtforms import RadioField
 from wtforms import StringField
@@ -167,7 +166,6 @@ def handle_field(builder, field, dependency=None):
             dependency=dependency,
             required=field.required,
             validators=[
-                WhitelistedMimeType(),
                 ExpectedExtensions(field.extensions),
                 FileSizeLimit(DEFAULT_UPLOAD_LIMIT)
             ]

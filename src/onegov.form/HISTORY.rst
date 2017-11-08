@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- No longer limit the set of availble file upload extensions.
+  [href]
+
 0.26.1 (2017-11-08)
 ~~~~~~~~~~~~~~~~~~~
 
