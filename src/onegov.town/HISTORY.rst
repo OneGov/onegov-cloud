@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.15.0 (2017-11-08)
+~~~~~~~~~~~~~~~~~~~~~
 
 - Adds directories widget to homepage.
   [href]
