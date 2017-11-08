@@ -60,8 +60,6 @@ class BaseRenderer(object):
     'StringField',
     'TextField',
     'TextAreaField',
-    'EmailField',
-    'URLField'
 )
 class StringFieldRenderer(BaseRenderer):
     def __call__(self, field):
@@ -72,6 +70,20 @@ class StringFieldRenderer(BaseRenderer):
 class PasswordFieldRenderer(BaseRenderer):
     def __call__(self, field):
         return '*' * len(field.data)
+
+
+@registry.register_for('EmailField')
+class EmailFieldRenderer(BaseRenderer):
+    def __call__(self, field):
+        return '<a href="mailto:{mail}">{mail}</a>'.format(
+            mail=self.escape(field.data))
+
+
+@registry.register_for('URLField')
+class URLFieldRenderer(BaseRenderer):
+    def __call__(self, field):
+        return '<a href="{url}">{url}</a>'.format(
+            url=self.escape(field.data))
 
 
 @registry.register_for('DateField')
