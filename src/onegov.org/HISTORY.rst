@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Limit the yubi key length on the form field as well.
+  [href]
+
 0.17.0 (2017-11-08)
 ~~~~~~~~~~~~~~~~~~~
 

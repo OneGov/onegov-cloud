@@ -26,6 +26,7 @@ class ManageUserForm(Form):
     yubikey = TextField(
         label=_("Yubikey"),
         description=_("Plug your YubiKey into a USB slot and press it."),
+        filters=[lambda v: v and v[:12] or ''],
         render_kw={'autocomplete': 'off'}
     )
 
