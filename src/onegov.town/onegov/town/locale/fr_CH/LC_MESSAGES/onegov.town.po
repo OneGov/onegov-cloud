@@ -23,7 +23,7 @@ msgid "Reservations"
 msgstr "Réservations"
 
 msgid "Contacts and Photos"
-msgstr ""
+msgstr "Contacts et photos"
 
 msgid "Forms and applications"
 msgstr "Formulaires et candidatures"
