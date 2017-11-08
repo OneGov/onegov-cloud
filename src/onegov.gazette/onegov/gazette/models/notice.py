@@ -137,6 +137,17 @@ class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
         if hasattr(self, '_group_observer'):
             self._group_observer(group, name)
 
+    def next_publication_number(self, issue):
+        """ Returns the next publication number for the given issue. """
+
+        query = object_session(self).query(GazetteNotice)
+        query = query.filter(GazetteNotice._issues.has_key(issue))  # noqa
+        query = query.filter(GazetteNotice.state == 'published')
+        numbers = [item.issues[issue] for item in query]
+        numbers = [int(number) for number in numbers if number]
+        number = (max(numbers) + 1) if numbers else 1
+        return number
+
     def add_change(self, request, event, text=None):
         """ Adds en entry to the changelog. """
 
@@ -185,6 +196,22 @@ class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
 
         super(GazetteNotice, self).accept()
         self.add_change(request, _("accepted"))
+
+    def publish(self, request):
+        """ Publish an accepted notice.
+
+        This automatically adds en entry to the changelog and assigns the
+        publication numbers.
+
+        """
+
+        issues = dict(self.issues)
+        for issue in issues:
+            issues[issue] = str(self.next_publication_number(issue))
+        self._issues = issues
+
+        super(GazetteNotice, self).publish()
+        self.add_change(request, _("published"))
 
     @property
     def rejected_comment(self):

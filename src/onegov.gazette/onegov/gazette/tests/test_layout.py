@@ -3,6 +3,7 @@ from datetime import datetime
 from freezegun import freeze_time
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import Issue
+from onegov.gazette.models import GazetteNotice
 from pytest import raises
 from sedate import standardize_date
 
@@ -75,7 +76,7 @@ def test_layout_menu():
     request._is_personal = True
     assert layout.menu == [
         ('My Drafted and Submitted Official Notices', '/dashboard/', False),
-        ('My Accepted Official Notices', '/GazetteNoticeCollection/', False)
+        ('My Published Official Notices', '/GazetteNoticeCollection/', False)
     ]
 
     request._is_private = True
@@ -126,8 +127,23 @@ def test_layout_format(session, principal):
         layout.format_issue('')
 
     assert layout.format_issue(Issue()) == 'No. , '
-    assert layout.format_issue(Issue(number=1, date=date(2017, 1, 2))) \
-        == 'No. 1, 02.01.2017'
+
     assert layout.format_issue(
-        Issue(number=1, date=date(2017, 1, 2)), date_format='date_with_weekday'
+        Issue(number=1, date=date(2017, 1, 2))
+    ) == 'No. 1, 02.01.2017'
+    assert layout.format_issue(
+        Issue(number=1, date=date(2017, 1, 2)),
+        date_format='date_with_weekday'
     ) == 'No. 1, Montag 02.01.2017'
+    assert layout.format_issue(
+        Issue(name='2017-1', number=1, date=date(2017, 1, 2)),
+        notice=GazetteNotice()
+    ) == 'No. 1, 02.01.2017'
+    assert layout.format_issue(
+        Issue(name='2017-1', number=1, date=date(2017, 1, 2)),
+        notice=GazetteNotice(issues=['2017-1'])
+    ) == 'No. 1, 02.01.2017'
+    assert layout.format_issue(
+        Issue(name='2017-1', number=1, date=date(2017, 1, 2)),
+        notice=GazetteNotice(_issues={'2017-1': 10})
+    ) == 'No. 1, 02.01.2017 / 10'

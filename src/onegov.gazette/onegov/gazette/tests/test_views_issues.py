@@ -7,7 +7,7 @@ from webtest import TestApp as Client
 
 
 def test_view_issues(gazette_app):
-    with freeze_time("2017-10-01 12:00"):
+    with freeze_time("2017-11-01 12:00"):
         client = Client(gazette_app)
         login_admin(client)
 
@@ -17,6 +17,7 @@ def test_view_issues(gazette_app):
         #     41: 2017-10-13 / 2017-10-11T12:00:00
         #     42: 2017-10-20 / 2017-10-18T12:00:00
         #     43: 2017-10-27 / 2017-10-25T12:00:00
+        # >>>>>
         #     44: 2017-11-03 / 2017-11-01T12:00:00
         #     45: 2017-11-10 / 2017-11-08T12:00:00
         #     46: 2017-11-17 / 2017-11-15T12:00:00
@@ -38,15 +39,15 @@ def test_view_issues(gazette_app):
         manage = manage.form.submit().maybe_follow()
         assert 'Ausgabe hinzugefügt.' in manage
         assert '2019-1' in manage
-        issues = [
+        upcoming_issues = [
             [td.text.strip() for td in pq(tr)('td')]
-            for tr in manage.pyquery('table.issues tbody tr')
+            for tr in manage.pyquery('table.issues.upcoming tbody tr')
         ]
-        assert issues == [
-            ['2017-40', '06.10.2017', 'Mittwoch 04.10.2017 14:00', ''],
-            ['2017-41', '13.10.2017', 'Mittwoch 11.10.2017 14:00', ''],
-            ['2017-42', '20.10.2017', 'Mittwoch 18.10.2017 14:00', ''],
-            ['2017-43', '27.10.2017', 'Mittwoch 25.10.2017 14:00', ''],
+        past_issues = [
+            [td.text.strip() for td in pq(tr)('td')]
+            for tr in manage.pyquery('table.issues.past tbody tr')
+        ]
+        assert upcoming_issues == [
             ['2017-44', '03.11.2017', 'Mittwoch 01.11.2017 13:00', ''],
             ['2017-45', '10.11.2017', 'Mittwoch 08.11.2017 13:00', ''],
             ['2017-46', '17.11.2017', 'Mittwoch 15.11.2017 13:00', ''],
@@ -59,36 +60,42 @@ def test_view_issues(gazette_app):
             ['2018-1', '05.01.2018', 'Mittwoch 03.01.2018 13:00', ''],
             ['2019-1', '02.01.2019', 'Dienstag 01.01.2019 12:00', '']
         ]
+        assert past_issues == [
+            ['2017-43', '27.10.2017', 'Mittwoch 25.10.2017 14:00', ''],
+            ['2017-42', '20.10.2017', 'Mittwoch 18.10.2017 14:00', ''],
+            ['2017-41', '13.10.2017', 'Mittwoch 11.10.2017 14:00', ''],
+            ['2017-40', '06.10.2017', 'Mittwoch 04.10.2017 14:00', ''],
+        ]
 
-        # use the first issue in a notice
+        # use the first available issue in a notice
         manage = client.get('/notices/drafted/new-notice')
         manage.form['title'] = 'Titel'
         manage.form['organization'] = '200'
         manage.form['category'] = '13'
-        manage.form['issues'] = ['2017-40']
+        manage.form['issues'] = ['2017-44']
         manage.form['text'] = 'Text'
         manage = manage.form.submit().maybe_follow()
         assert '<h2>Titel</h2>' in manage
-        assert 'Nr. 40, 06.10.2017' in manage
+        assert 'Nr. 44, 03.11.2017' in manage
 
-        # edit the first issue
+        # edit the issue
         manage = client.get('/issues')
         manage = manage.click('Bearbeiten', index=0)
-        manage.form['date_'] = '2017-10-05'
-        manage.form['deadline'] = '2017-10-03T14:00'
+        manage.form['date_'] = '2017-11-02'
+        manage.form['deadline'] = '2017-11-01T12:00'
         manage = manage.form.submit().maybe_follow()
         assert 'Ausgabe geändert.' in manage
 
-        issues = [
+        upcoming_issues = [
             [td.text.strip() for td in pq(tr)('td')]
-            for tr in manage.pyquery('table.issues tbody tr')
+            for tr in manage.pyquery('table.issues.upcoming tbody tr')
         ]
-        assert issues == [
-            ['2017-40', '05.10.2017', 'Dienstag 03.10.2017 14:00', ''],
-            ['2017-41', '13.10.2017', 'Mittwoch 11.10.2017 14:00', ''],
-            ['2017-42', '20.10.2017', 'Mittwoch 18.10.2017 14:00', ''],
-            ['2017-43', '27.10.2017', 'Mittwoch 25.10.2017 14:00', ''],
-            ['2017-44', '03.11.2017', 'Mittwoch 01.11.2017 13:00', ''],
+        past_issues = [
+            [td.text.strip() for td in pq(tr)('td')]
+            for tr in manage.pyquery('table.issues.past tbody tr')
+        ]
+        assert upcoming_issues == [
+            ['2017-44', '02.11.2017', 'Mittwoch 01.11.2017 12:00', ''],
             ['2017-45', '10.11.2017', 'Mittwoch 08.11.2017 13:00', ''],
             ['2017-46', '17.11.2017', 'Mittwoch 15.11.2017 13:00', ''],
             ['2017-47', '24.11.2017', 'Mittwoch 22.11.2017 13:00', ''],
@@ -100,11 +107,17 @@ def test_view_issues(gazette_app):
             ['2018-1', '05.01.2018', 'Mittwoch 03.01.2018 13:00', ''],
             ['2019-1', '02.01.2019', 'Dienstag 01.01.2019 12:00', '']
         ]
+        assert past_issues == [
+            ['2017-43', '27.10.2017', 'Mittwoch 25.10.2017 14:00', ''],
+            ['2017-42', '20.10.2017', 'Mittwoch 18.10.2017 14:00', ''],
+            ['2017-41', '13.10.2017', 'Mittwoch 11.10.2017 14:00', ''],
+            ['2017-40', '06.10.2017', 'Mittwoch 04.10.2017 14:00', ''],
+        ]
 
         # check if the notice has been updated
         manage = client.get('/notice/titel')
-        assert 'Nr. 40, 06.10.2017' not in manage
-        assert 'Nr. 40, 05.10.2017' in manage
+        assert 'Nr. 44, 03.11.2017' not in manage
+        assert 'Nr. 44, 02.11.2017' in manage
 
         # delete all but one (unused) issues
         manage = client.get('/issues')
@@ -129,7 +142,7 @@ def test_view_issues(gazette_app):
             for tr in manage.pyquery('table.issues tbody tr')
         ]
         assert issues == [
-            ['2017-40', '05.10.2017', 'Dienstag 03.10.2017 14:00', '']
+            ['2017-44', '02.11.2017', 'Mittwoch 01.11.2017 12:00', '']
         ]
 
         # Try to delete the used issue
@@ -161,3 +174,52 @@ def test_view_issues_permissions(gazette_app):
         client.get('/issues', status=403)
         client.get(edit_link, status=403)
         client.get(delete_link, status=403)
+
+
+def test_view_issues_publish(gazette_app):
+    with freeze_time("2017-11-01 12:00"):
+        client = Client(gazette_app)
+        login_admin(client)
+
+        for number, issues in enumerate(((44, 45), (45, 46), (45,))):
+            slug = 'notice-{}'.format(number)
+            manage = client.get('/notices/drafted/new-notice')
+            manage.form['title'] = slug
+            manage.form['organization'] = '200'
+            manage.form['category'] = '13'
+            manage.form['issues'] = ['2017-{}'.format(i) for i in issues]
+            manage.form['text'] = 'Text'
+            manage = manage.form.submit()
+
+            client.get('/notice/{}/submit'.format(slug)).form.submit()
+            if len(issues) > 1:
+                client.get('/notice/{}/accept'.format(slug)).form.submit()
+
+        # publish 44
+        manage = client.get('/issues').click('Veröffentlichen', index=0)
+        assert "Publikationsnummern für 1 Meldung(en) vergeben." in manage
+        manage.form.submit()
+
+        notice_0 = client.get('/notice/notice-0')
+        notice_1 = client.get('/notice/notice-1')
+        notice_2 = client.get('/notice/notice-2')
+        assert '<li>Nr. 44, 03.11.2017 / 1</li>' in notice_0
+        assert '<li>Nr. 45, 10.11.2017 / 1</li>' in notice_0
+        assert '<li>Nr. 45, 10.11.2017</li>' in notice_1
+        assert '<li>Nr. 46, 17.11.2017</li>' in notice_1
+        assert '<li>Nr. 45, 10.11.2017</li>' in notice_2
+
+        # publish 45
+        manage = client.get('/issues').click('Veröffentlichen', index=1)
+        assert "Diese Ausgabe hat eingereichte Meldungen!" in manage
+        assert "Publikationsnummern für 1 Meldung(en) vergeben." in manage
+        manage.form.submit()
+
+        notice_0 = client.get('/notice/notice-0')
+        notice_1 = client.get('/notice/notice-1')
+        notice_2 = client.get('/notice/notice-2')
+        assert '<li>Nr. 44, 03.11.2017 / 1</li>' in notice_0
+        assert '<li>Nr. 45, 10.11.2017 / 1</li>' in notice_0
+        assert '<li>Nr. 45, 10.11.2017 / 2</li>' in notice_1
+        assert '<li>Nr. 46, 17.11.2017 / 1</li>' in notice_1
+        assert '<li>Nr. 45, 10.11.2017</li>' in notice_2

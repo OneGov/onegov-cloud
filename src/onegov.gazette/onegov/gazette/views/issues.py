@@ -1,3 +1,4 @@
+from datetime import date
 from morepath import redirect
 from onegov.core.security import Secret
 from onegov.gazette import _
@@ -22,9 +23,15 @@ def view_issues(self, request):
     """
     layout = Layout(self, request)
 
+    today = date.today()
+    past_issues = self.query().filter(Issue.date < today)
+    past_issues = past_issues.order_by(None).order_by(Issue.date.desc())
+    next_issues = self.query().filter(Issue.date >= today)
+
     return {
         'layout': layout,
-        'issues': self.query().all(),
+        'past_issues': past_issues,
+        'next_issues': next_issues,
         'new_issue': request.link(self, name='new-issue')
     }
 
@@ -139,4 +146,114 @@ def delete_issue(self, request, form):
         'button_text': _("Delete Issue"),
         'button_class': 'alert',
         'cancel': layout.manage_issues_link
+    }
+
+
+@GazetteApp.form(
+    model=Issue,
+    name='publish',
+    template='form.pt',
+    permission=Secret,
+    form=EmptyForm
+)
+def publish_issue(self, request, form):
+    """ Publish an issue.
+
+    If the issue has not already been published before, we redirect to the
+    PDF generation view afterwards.
+
+    This view is only visible by an admin.
+
+    """
+
+    if self.submitted_notices:
+        request.message(
+            _("There are submitted notices for this issue!"), 'warning'
+        )
+
+    layout = Layout(self, request)
+    if form.submitted(request):
+        self.publish(request)
+        request.message(_("All notices published."), 'success')
+        return redirect(request.link(self, name='generate'))
+
+    return {
+        'layout': layout,
+        'form': form,
+        'title': self.name,
+        'subtitle': _("Publish all notices"),
+        'button_text': _("Publish"),
+        'cancel': layout.manage_issues_link,
+        'message': _(
+            (
+                'Do you really want to publish all notices of "${item}"? This '
+                'will assign the publication numbers for ${number} notice(s).'
+            ),
+            mapping={
+                'item': self.name,
+                'number': len(self.accepted_notices)
+            }
+        ),
+    }
+
+
+@GazetteApp.form(
+    model=Issue,
+    name='generate',
+    template='form.pt',
+    permission=Secret,
+    form=EmptyForm
+)
+def generate_issue(self, request, form):
+    """ Generates the PDF of the issue.
+
+    Redirect to the sign view after generating the PDF.
+
+    This view is only visible by an admin.
+
+    """
+
+    layout = Layout(self, request)
+    if form.submitted(request):
+        self.generate_pdf()
+        request.message(_("PDF generated."), 'success')
+        return redirect(request.link(self, name='sign'))
+
+    return {
+        'layout': layout,
+        'form': form,
+        'title': self.name,
+        'subtitle': _("Generate PDF"),
+        'button_text': _("Generate"),
+        'cancel': layout.manage_issues_link,
+    }
+
+
+@GazetteApp.form(
+    model=Issue,
+    name='sign',
+    template='form.pt',
+    permission=Secret,
+    form=EmptyForm
+)
+def sign_issue(self, request, form):
+    """ Signs the PDF of the issue.
+
+    This view is only visible by an admin.
+
+    """
+
+    layout = Layout(self, request)
+    if form.submitted(request):
+        self.sign_pdf()
+        request.message(_("PDF signed."), 'success')
+        return redirect(layout.manage_issues_link)
+
+    return {
+        'layout': layout,
+        'form': form,
+        'title': self.name,
+        'subtitle': _("Sign PDF"),
+        'button_text': _("Sign"),
+        'cancel': layout.manage_issues_link,
     }

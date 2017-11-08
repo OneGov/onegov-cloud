@@ -49,14 +49,32 @@ class Issue(Base, TimestampMixin):
     # The deadline of this issue.
     deadline = Column(UTCDateTime, nullable=True)
 
-    def in_use(self, session):
-        """ True, if the issued is used by any notice. """
+    def query(self):
+        """ Returns a query the get all notices related to this issue. """
 
         from onegov.gazette.models.notice import GazetteNotice  # circular
 
-        query = session.query(GazetteNotice._issues)
+        query = object_session(self).query(GazetteNotice)
         query = query.filter(GazetteNotice._issues.has_key(self.name))  # noqa
-        if query.first():
+
+        return query
+
+    @property
+    def accepted_notices(self):
+        from onegov.gazette.models.notice import GazetteNotice  # circular
+
+        return self.query().filter(GazetteNotice.state == 'accepted').all()
+
+    @property
+    def submitted_notices(self):
+        from onegov.gazette.models.notice import GazetteNotice  # circular
+
+        return self.query().filter(GazetteNotice.state == 'submitted').all()
+
+    def in_use(self, session):
+        """ True, if the issued is used by any notice. """
+
+        if self.query().first():
             return True
 
         return False
@@ -71,9 +89,7 @@ class Issue(Base, TimestampMixin):
         from onegov.gazette.models.notice import GazetteNotice  # circular
 
         date_time = standardize_date(as_datetime(date_), 'UTC')
-        query = object_session(self).query(GazetteNotice)
-        query = query.filter(
-            GazetteNotice._issues.has_key(self.name),  # noqa
+        query = self.query().filter(
             or_(
                 GazetteNotice.first_issue.is_(None),
                 GazetteNotice.first_issue != date_time
@@ -81,3 +97,20 @@ class Issue(Base, TimestampMixin):
         )
         for notice in query:
             notice.first_issue = date_time
+
+    def publish(self, request):
+        """ Ensures that every accepted notice of this issue has been
+        published.
+
+        """
+
+        for notice in self.accepted_notices:
+            notice.publish(request)
+
+    def generate_pdf(self):
+        """ Generates the PDF. """
+        raise NotImplementedError()
+
+    def sign_pdf(self):
+        """ Signs the PDF. """
+        raise NotImplementedError()

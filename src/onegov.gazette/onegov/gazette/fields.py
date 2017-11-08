@@ -8,23 +8,26 @@ class SelectField(SelectFieldBase):
     """ A select field with chosen support. """
 
     def __init__(self, *args, **kwargs):
-        if 'render_kw' not in kwargs or not kwargs['render_kw'].get('class_'):
-            kwargs['render_kw'] = kwargs.get('render_kw', {})
-            kwargs['render_kw']['class_'] = 'chosen-select'
+        render_kw = kwargs.pop('render_kw', {})
+        render_kw['class_'] = 'chosen-select'
+        kwargs['render_kw'] = render_kw
 
         super().__init__(*args, **kwargs)
 
 
 class MultiCheckboxField(MultiCheckboxFieldBase):
     """ A multi checkbox field where only the first elements are display and
-    the the rest can be shown when needed. """
+    the the rest can be shown when needed.
+
+    Also, disables all the options if the whole field is disabled.
+    """
 
     def __init__(self, *args, **kwargs):
-        if 'render_kw' not in kwargs or not kwargs['render_kw'].get('class_'):
-            kwargs['render_kw'] = kwargs.get('render_kw', {})
-            kwargs['render_kw']['data-limit'] = str(kwargs.pop('limit', 10))
-            kwargs['render_kw']['data-expand-title'] = _("Show all")
-            kwargs['render_kw']['data-fold-title'] = _("Show less")
+        render_kw = kwargs.pop('render_kw', {})
+        render_kw['data-limit'] = str(kwargs.pop('limit', 10))
+        render_kw['data-expand-title'] = _("Show all")
+        render_kw['data-fold-title'] = _("Show less")
+        kwargs['render_kw'] = render_kw
 
         super().__init__(*args, **kwargs)
 
@@ -35,6 +38,13 @@ class MultiCheckboxField(MultiCheckboxFieldBase):
         self.render_kw['data-fold-title'] = request.translate(
             self.render_kw['data-fold-title']
         )
+
+    def __iter__(self):
+        for opt in super(MultiCheckboxField, self).__iter__():
+            if 'disabled' in self.render_kw:
+                opt.render_kw = opt.render_kw or {}
+                opt.render_kw['disabled'] = self.render_kw['disabled']
+            yield opt
 
 
 class DateTimeLocalField(DateTimeLocalFieldBase):

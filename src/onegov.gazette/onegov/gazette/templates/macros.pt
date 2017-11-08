@@ -122,10 +122,10 @@
 
 <metal:issues define-macro="issues" i18n:domain="onegov.gazette">
     <ul tal:condition="as_list|True">
-        <li tal:repeat="issue notice.issue_objects">${layout.format_issue(issue)}</li>
+        <li tal:repeat="issue notice.issue_objects">${layout.format_issue(issue, notice=notice)}</li>
     </ul>
     <tal:block tal:condition="not: as_list|True">
-        <span style="display:block" tal:repeat="issue notice.issue_objects">${layout.format_issue(issue)}</span>
+        <span style="display:block" tal:repeat="issue notice.issue_objects">${layout.format_issue(issue, notice=notice)}</span>
     </tal:block>
 </metal:issues>
 

@@ -29,7 +29,9 @@ def test_view_notices(gazette_app):
         login_editor_3(editor_3)
 
         for user in (publisher, editor_1, editor_2, editor_3):
-            for state in ('drafted', 'submitted', 'rejected', 'accepted'):
+            for state in (
+                'drafted', 'submitted', 'rejected', 'accepted', 'published'
+            ):
                 assert "Keine Meldungen" in user.get('/notices/' + state)
 
         # new notices
@@ -50,7 +52,7 @@ def test_view_notices(gazette_app):
         manage.form.submit()
 
         for user in (publisher, editor_1, editor_2, editor_3):
-            for state in ('submitted', 'rejected', 'accepted'):
+            for state in ('submitted', 'rejected', 'accepted', 'published'):
                 assert "Keine Meldungen" in user.get('/notices/' + state)
 
         assert "Erneuerungswahlen" in publisher.get('/notices/drafted')
@@ -67,7 +69,7 @@ def test_view_notices(gazette_app):
         editor_3.get('/notice/kantonsratswahlen/submit').form.submit()
 
         for user in (publisher, editor_1, editor_2, editor_3):
-            for state in ('drafted', 'rejected', 'accepted'):
+            for state in ('drafted', 'rejected', 'accepted', 'published'):
                 assert "Keine Meldungen" in user.get('/notices/' + state)
 
         assert "Erneuerungswahlen" in publisher.get('/notices/submitted')
@@ -89,7 +91,7 @@ def test_view_notices(gazette_app):
         manage.form.submit()
 
         for user in (publisher, editor_1, editor_2, editor_3):
-            for state in ('drafted', 'submitted', 'accepted'):
+            for state in ('drafted', 'submitted', 'accepted', 'published'):
                 assert "Keine Meldungen" in user.get('/notices/' + state)
 
         assert "Erneuerungswahlen" in publisher.get('/notices/rejected')
@@ -108,9 +110,19 @@ def test_view_notices(gazette_app):
         publisher.get('/notice/kantonsratswahlen/accept').form.submit()
 
         for user in (publisher, editor_1, editor_2, editor_3):
-            for state in ('drafted', 'submitted', 'rejected'):
+            for state in ('drafted', 'submitted', 'rejected', 'published'):
                 assert "Keine Meldungen" in user.get('/notices/' + state)
 
+        assert "Erneuerungswahlen" in publisher.get('/notices/accepted')
+        assert "Erneuerungswahlen" in editor_1.get('/notices/accepted')
+        assert "Erneuerungswahlen" in editor_2.get('/notices/accepted')
+        assert "Erneuerungswahlen" not in editor_3.get('/notices/accepted')
+        assert "Kantonsratswahlen" in publisher.get('/notices/accepted')
+        assert "Kantonsratswahlen" not in editor_1.get('/notices/accepted')
+        assert "Kantonsratswahlen" not in editor_2.get('/notices/accepted')
+        assert "Kantonsratswahlen" in editor_3.get('/notices/accepted')
+
+        # publish notices
         assert "Erneuerungswahlen" in publisher.get('/notices/accepted')
         assert "Erneuerungswahlen" in editor_1.get('/notices/accepted')
         assert "Erneuerungswahlen" in editor_2.get('/notices/accepted')
@@ -481,6 +493,7 @@ def test_view_notices_statistics(gazette_app):
 
     assert publisher.get('/notices/drafted/statistics')
     assert publisher.get('/notices/submitted/statistics')
+    assert publisher.get('/notices/published/statistics')
 
     # organizations/drafted: 5 x 100, 3 x 200
     assert statistic('drafted', 'Organisationen') == [

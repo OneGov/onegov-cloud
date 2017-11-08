@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-06 08:25+0100\n"
-"PO-Revision-Date: 2017-11-03 08:42+0100\n"
+"POT-Creation-Date: 2017-11-08 11:10+0100\n"
+"PO-Revision-Date: 2017-11-07 16:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -33,8 +33,12 @@ msgid "Show less"
 msgstr "Weniger anzeigen"
 
 #, python-format
-msgid "No. ${number}, ${issue_date}"
-msgstr "Nr. ${number}, ${issue_date}"
+msgid "No. ${issue_number}, ${issue_date} / ${notice_number}"
+msgstr "Nr. ${issue_number}, ${issue_date} / ${notice_number}"
+
+#, python-format
+msgid "No. ${issue_number}, ${issue_date}"
+msgstr "Nr. ${issue_number}, ${issue_date}"
 
 msgid "Users"
 msgstr "Benutzer"
@@ -60,8 +64,8 @@ msgstr "Statistiken"
 msgid "My Drafted and Submitted Official Notices"
 msgstr "Offene Meldungen"
 
-msgid "My Accepted Official Notices"
-msgstr "Angenommene Meldungen"
+msgid "My Published Official Notices"
+msgstr "Veröffentlichte Meldungen"
 
 msgid "This value already exists."
 msgstr "Dieser Wert ist bereits vorhanden."
@@ -190,11 +194,29 @@ msgstr "Anzahl Benutzer"
 msgid "No groups."
 msgstr "Keine Gruppen."
 
+msgid "Upcoming Issues"
+msgstr "Kommende Ausgaben"
+
 msgid "Issue"
 msgstr "Ausgabe"
 
-msgid "No issues."
-msgstr "Keine Ausgaben."
+msgid "No upcoming issues."
+msgstr "Keine kommenden Ausgaben."
+
+msgid "Publish"
+msgstr "Veröffentlichen"
+
+msgid "Generate"
+msgstr "Erzeugen"
+
+msgid "Sign"
+msgstr "Signieren"
+
+msgid "Past Issues"
+msgstr "Vergangene Ausgaben"
+
+msgid "No past issues."
+msgstr "Keine vergangenen Ausgaben."
 
 msgid "Gazette"
 msgstr "Amtsblatt"
@@ -442,6 +464,23 @@ msgstr "Ausgabe bearbeiten"
 msgid "Delete Issue"
 msgstr "Ausgabe löschen"
 
+msgid "Publish all notices"
+msgstr "Alle Meldungen veröffentlichen"
+
+#, python-format
+msgid ""
+"Do you really want to publish all notices of \"${item}\"? This will assign "
+"the publication numbers for ${number} notice(s)."
+msgstr ""
+"Alle Meldungen von \"${item}\" veröffentlichen? Es werden "
+"Publikationsnummern für ${number} Meldung(en) vergeben."
+
+msgid "Generate PDF"
+msgstr "PDF erstellen"
+
+msgid "Sign PDF"
+msgstr "PDF signieren"
+
 msgid "Issue added."
 msgstr "Ausgabe hinzugefügt."
 
@@ -453,6 +492,18 @@ msgstr "Es können nur unbenutzte Ausgaben gelöscht werden."
 
 msgid "Issue deleted."
 msgstr "Ausgabe gelöscht."
+
+msgid "There are submitted notices for this issue!"
+msgstr "Diese Ausgabe hat eingereichte Meldungen!"
+
+msgid "All notices published."
+msgstr "Alle "
+
+msgid "PDF generated."
+msgstr "PDF erstellt."
+
+msgid "PDF signed."
+msgstr "PDF signiert."
 
 msgid "Edit Official Notice"
 msgstr "Meldung bearbeiten"
@@ -481,6 +532,17 @@ msgstr "\"${item}\" zurückweisen?"
 msgid "Reject Official Note"
 msgstr "Meldung zurückweisen"
 
+#, python-format
+msgid ""
+"Do you really want to publish \"${item}\"? This will assign the publication "
+"numbers for the following issues: ${issues}."
+msgstr ""
+"\"${item}\" veröffentlichen? Es werden Publikationsnummern für die folgenden "
+"Ausgaben vergeben: ${issues}."
+
+msgid "Publish Official Note"
+msgstr "Meldung veröffentlichen"
+
 msgid "Preview"
 msgstr "Vorschau"
 
@@ -495,6 +557,11 @@ msgstr "bearbeitet"
 
 msgid "This official notice has already been accepted!"
 msgstr "Diese Meldung wurde bereits angenommen!"
+
+msgid "Only drafted or rejected official notices may be deleted."
+msgstr ""
+"Es können nur zurückgewiesene Meldungen oder Meldungen in Arbeit gelöscht "
+"werden."
 
 msgid "Official notice deleted."
 msgstr "Meldung gelöscht."
@@ -519,6 +586,12 @@ msgstr "Es können nur eingereichte Meldungen zurückgewiesen werden."
 msgid "Official notice rejected."
 msgstr "Meldung zurückgewiesen."
 
+msgid "Only accepted official notices may be published."
+msgstr "Es können nur angenommene Meldungen veröffentlicht werden."
+
+msgid "Official notice published."
+msgstr "Meldung veröffentlicht."
+
 msgid "Copy"
 msgstr "Kopieren"
 
@@ -529,11 +602,6 @@ msgstr "Bitte Ausgaben neu wählen."
 
 msgid "This official notice has already been published!"
 msgstr "Diese Meldung wurde bereits veröffentlicht!"
-
-msgid "Only drafted or rejected official notices may be deleted."
-msgstr ""
-"Es können nur zurückgewiesene Meldungen oder Meldungen in Arbeit gelöscht "
-"werden."
 
 msgid "mail sent"
 msgstr "E-Mail gesendet"

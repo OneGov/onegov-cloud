@@ -103,6 +103,41 @@ def view_notice(self, request):
                 ))
 
     if self.state == 'accepted':
+        if publisher:
+            actions.append((
+                _("Publish"),
+                request.link(self, 'publish'),
+                'primary',
+                '_self'
+            ))
+        if admin:
+            actions.append((
+                _("Edit"),
+                request.link(self, 'edit_unrestricted'),
+                'secondary',
+                '_self'
+            ))
+        actions.append((
+            _("Copy"),
+            request.link(
+                GazetteNoticeCollection(
+                    request.app.session(),
+                    state=self.state,
+                    source=self.id
+                ), name='new-notice'
+            ),
+            'secondary',
+            '_self'
+        ))
+        if admin:
+            actions.append((
+                _("Delete"),
+                request.link(self, 'delete'),
+                'alert right',
+                '_self'
+            ))
+
+    if self.state == 'published':
         actions.append((
             _("Copy"),
             request.link(
@@ -120,12 +155,6 @@ def view_notice(self, request):
                 _("Edit"),
                 request.link(self, 'edit_unrestricted'),
                 'secondary',
-                '_self'
-            ))
-            actions.append((
-                _("Delete"),
-                request.link(self, 'delete'),
-                'alert right',
                 '_self'
             ))
 
@@ -247,6 +276,14 @@ def edit_notice_unrestricted(self, request, form):
 
     layout = Layout(self, request)
 
+    if self.state == 'published':
+        form.disable_issues()
+
+    if form.submitted(request):
+        form.update_model(self)
+        self.add_change(request, _("edited"))
+        return redirect(request.link(self))
+
     if self.state == 'accepted':
         request.message(
             _("This official notice has already been accepted!"), 'warning'
@@ -255,11 +292,6 @@ def edit_notice_unrestricted(self, request, form):
         request.message(
             _("This official notice has already been published!"), 'warning'
         )
-
-    if form.submitted(request):
-        form.update_model(self)
-        self.add_change(request, _("edited"))
-        return redirect(request.link(self))
 
     if not form.errors:
         form.apply_model(self)
@@ -542,5 +574,57 @@ def reject_notice(self, request, form):
         'subtitle': _("Reject Official Note"),
         'button_text': _("Reject Official Note"),
         'button_class': 'alert',
+        'cancel': request.link(self)
+    }
+
+
+@GazetteApp.form(
+    model=GazetteNotice,
+    name='publish',
+    template='form.pt',
+    permission=Private,
+    form=EmptyForm
+)
+def publish_notice(self, request, form):
+    """ Publish a notice.
+
+    This view is used by the publishers to publish an accepted notice.
+
+    Only accepted notices may be published.
+
+    """
+
+    layout = Layout(self, request)
+
+    if self.state != 'accepted':
+        return {
+            'layout': layout,
+            'title': self.title,
+            'subtitle': _("Publish Official Note"),
+            'callout': _("Only accepted official notices may be published."),
+            'show_form': False
+        }
+
+    if form.submitted(request):
+        self.publish(request)
+        request.message(_("Official notice published."), 'success')
+        return redirect(layout.dashboard_or_notices_link)
+
+    return {
+        'message': _(
+            (
+                'Do you really want to publish "${item}"? This will assign '
+                'the publication numbers for the following issues: ${issues}.'
+            ),
+            mapping={
+                'item': self.title,
+                'issues': ', '.join(self.issues.keys())
+            }
+        ),
+        'layout': layout,
+        'form': form,
+        'title': self.title,
+        'subtitle': _("Publish Official Note"),
+        'button_text': _("Publish Official Note"),
         'cancel': request.link(self)
     }

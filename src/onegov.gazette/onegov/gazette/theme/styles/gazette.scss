@@ -487,6 +487,12 @@ a.button.right {
     margin-right: .75ex;
 }
 
+.action-generate::before {
+    content: '\f1c1';
+    font-family: 'FontAwesome';
+    margin-right: .75ex;
+}
+
 .action-order::before {
     content: '\f047';
     font-family: 'FontAwesome';
@@ -505,8 +511,20 @@ a.button.right {
     margin-right: .75ex;
 }
 
+.action-publish::before {
+    content: '\f00c';
+    font-family: 'FontAwesome';
+    margin-right: .75ex;
+}
+
 .action-reject::before {
     content: '\f05e';
+    font-family: 'FontAwesome';
+    margin-right: .75ex;
+}
+
+.action-sign::before {
+    content: '\f023';
     font-family: 'FontAwesome';
     margin-right: .75ex;
 }

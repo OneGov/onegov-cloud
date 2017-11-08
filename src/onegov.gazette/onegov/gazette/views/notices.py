@@ -84,7 +84,9 @@ def view_notices(self, request):
             'link': request.link(self.for_state(state)),
             'class': 'active' if state == self.state else ''
         }
-        for state in ('drafted', 'submitted', 'accepted', 'rejected')
+        for state in (
+            'drafted', 'submitted', 'accepted', 'rejected', 'published'
+        )
     )
 
     orderings = {
@@ -124,7 +126,7 @@ def view_notices(self, request):
     if not request.is_private(self):
         self.user_ids, self.group_ids = get_user_and_group(request)
         filters = None
-        title = _("My Accepted Official Notices")
+        title = _("My Published Official Notices")
 
     return {
         'layout': layout,
@@ -162,7 +164,9 @@ def view_notices_statistics(self, request):
             'link': request.link(self.for_state(state), name='statistics'),
             'class': 'active' if state == self.state else ''
         }
-        for state in ('drafted', 'submitted', 'accepted', 'rejected')
+        for state in (
+            'drafted', 'submitted', 'accepted', 'rejected', 'published'
+        )
     )
 
     return {

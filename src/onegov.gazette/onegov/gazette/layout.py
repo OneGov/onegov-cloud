@@ -195,10 +195,10 @@ class Layout(ChameleonLayout):
 
             active = isinstance(self.model, GazetteNoticeCollection)
             link = self.request.link(
-                GazetteNoticeCollection(self.session, state='accepted')
+                GazetteNoticeCollection(self.session, state='published')
             )
             result.append((
-                _("My Accepted Official Notices"),
+                _("My Published Official Notices"),
                 link,
                 active
             ))
@@ -218,17 +218,33 @@ class Layout(ChameleonLayout):
             dt = to_timezone(dt, self.principal.time_zone)
         return super(Layout, self).format_date(dt, format)
 
-    def format_issue(self, issue, date_format='date'):
-        """ Returns the issues number and date. """
+    def format_issue(self, issue, date_format='date', notice=None):
+        """ Returns the issues number and date and optionally the publication
+        number of the given notice. """
+
         assert isinstance(issue, Issue)
 
-        return self.request.translate(_(
-            "No. ${number}, ${issue_date}",
-            mapping={
-                'number': issue.number or '',
-                'issue_date': self.format_date(issue.date, date_format)
-            }
-        ))
+        issue_number = issue.number or ''
+        issue_date = self.format_date(issue.date, date_format)
+        notice_number = notice.issues.get(issue.name, None) if notice else None
+
+        if notice_number:
+            return self.request.translate(_(
+                "No. ${issue_number}, ${issue_date} / ${notice_number}",
+                mapping={
+                    'issue_number': issue_number,
+                    'issue_date': issue_date,
+                    'notice_number': notice_number
+                }
+            ))
+        else:
+            return self.request.translate(_(
+                "No. ${issue_number}, ${issue_date}",
+                mapping={
+                    'issue_number': issue_number,
+                    'issue_date': issue_date
+                }
+            ))
 
 
 class MailLayout(Layout):

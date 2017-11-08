@@ -141,6 +141,8 @@ class UnrestrictedNoticeForm(NoticeForm):
     """ Edit an official notice without limitations on the issues, categories
     and organiaztions.
 
+    Optionally disables the issues (e.g. if the notice is already published).
+
     """
 
     def on_request(self):
@@ -188,3 +190,18 @@ class UnrestrictedNoticeForm(NoticeForm):
 
         # translate the string of the mutli select field
         self.issues.translate(self.request)
+
+    def disable_issues(self):
+        self.issues.validators = []
+        self.issues.render_kw['disabled'] = True
+
+    def update_model(self, model):
+        model.title = self.title.data
+        model.organization_id = self.organization.data
+        model.category_id = self.category.data
+        model.text = self.text.data
+        model.at_cost = self.at_cost.data
+        if model.state != 'published':
+            model.issues = self.issues.data
+
+        model.apply_meta(self.request.app.session())

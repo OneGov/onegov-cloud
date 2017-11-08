@@ -144,7 +144,7 @@ def test_issue(session):
     session.add(
         Issue(
             id=0,
-            name='2018-07',
+            name='2018-7',
             number=7,
             date=date(2017, 7, 1),
             deadline=standardize_date(datetime(2017, 6, 25, 12, 0), 'UTC')
@@ -154,23 +154,43 @@ def test_issue(session):
     issue = session.query(Issue).one()
 
     assert issue.id == 0
-    assert issue.name == '2018-07'
+    assert issue.name == '2018-7'
     assert issue.number == 7
     assert issue.date == date(2017, 7, 1)
     assert issue.deadline == standardize_date(
         datetime(2017, 6, 25, 12, 0), 'UTC'
     )
 
-    # Test in use
+    # Test query etc
     assert issue.in_use(session) == False
-    session.add(GazetteNotice(title='notice', issues=[issue.name]))
+    assert issue.query().all() == []
+    assert issue.accepted_notices == []
+    assert issue.submitted_notices == []
+
+    issues = [issue.name]
+    session.add(GazetteNotice(title='d', issues=issues))
+    session.add(GazetteNotice(title='a', state='accepted', issues=issues))
+    session.add(GazetteNotice(title='s', state='submitted', issues=issues))
+    session.add(GazetteNotice(title='s', issues=['2018-1']))
+    session.add(GazetteNotice(title='s', issues=['2018-1', issue.name]))
     session.flush()
+
     assert issue.in_use(session) == True
+    assert len(issue.query().all()) == 4
+    assert issue.accepted_notices[0].title == 'a'
+    assert issue.submitted_notices[0].title == 's'
 
     # Test date observer
     issue.date = date(2017, 7, 2)
     session.flush()
-    assert session.query(GazetteNotice).one().first_issue.date() == issue.date
+    dates = [i.first_issue for i in session.query(GazetteNotice)]
+    dates = [d.date() for d in dates if d]
+    assert set(dates) == set([issue.date])
+
+    # Test publish
+    issue.publish(object())
+    assert len(issue.query().all()) == 4
+    assert issue.accepted_notices == []
 
 
 def test_principal():
@@ -474,10 +494,14 @@ def test_notice_states(session):
         notice.accept(request)
     with raises(AssertionError):
         notice.reject(request, 'XXX')
+    with raises(AssertionError):
+        notice.publish(request)
     notice.submit(request)
 
     with raises(AssertionError):
         notice.submit(request)
+    with raises(AssertionError):
+        notice.publish(request)
     notice.reject(request, 'Some reason')
     notice.submit(request)
     notice.reject(request, 'Some other reason')
@@ -491,6 +515,17 @@ def test_notice_states(session):
     with raises(AssertionError):
         notice.reject(request, 'Some reason')
 
+    notice.publish(request)
+
+    with raises(AssertionError):
+        notice.submit(request)
+    with raises(AssertionError):
+        notice.accept(request)
+    with raises(AssertionError):
+        notice.reject(request, 'Some reason')
+    with raises(AssertionError):
+        notice.publish(request)
+
     notice.add_change(request, 'printed')
 
     request.identity = DummyIdentity()
@@ -503,7 +538,6 @@ def test_notice_states(session):
     # ourselves
     changes = notice.changes.order_by(None)
     changes = changes.order_by(GazetteNoticeChange.edited.desc())
-    [(change.event, change.user, change.text) for change in changes]
     assert [
         (change.event, change.user, change.text) for change in changes
     ] == [
@@ -513,6 +547,7 @@ def test_notice_states(session):
         ('rejected', None, 'Some other reason'),
         ('submitted', None, ''),
         ('accepted', None, ''),
+        ('published', None, ''),
         ('printed', None, ''),
         ('finished', user, 'all went well')
     ]
@@ -523,6 +558,84 @@ def test_notice_states(session):
     ] == [
         ('finished', user, 'all went well')
     ]
+
+
+def test_notice_next_publication_number(session):
+    session.add(
+        GazetteNotice(
+            state='drafted', title='t', name='n',
+            _issues={'2017-1': None, '2017-2': None}
+        )
+    )
+    session.add(
+        GazetteNotice(
+            state='submitted', title='t', name='n',
+            _issues={'2017-1': None, '2017-3': None}
+        )
+    )
+    session.add(
+        GazetteNotice(
+            state='accepted', title='t', name='n',
+            _issues={'2017-1': None, '2017-4': '5'}
+        )
+    )
+    session.add(
+        GazetteNotice(
+            state='published', title='t', name='n',
+            _issues={'2017-1': '1', '2017-2': '5', '2017-5': '2'}
+        )
+    )
+    session.add(
+        GazetteNotice(
+            state='published', title='t', name='n',
+            _issues={'2017-1': '2', '2017-5': '1', '2017-6': '20'}
+        )
+    )
+    session.flush()
+
+    notice = session.query(GazetteNotice).first()
+    assert notice.next_publication_number(None) == 1
+    assert notice.next_publication_number('') == 1
+    assert notice.next_publication_number('2017-1') == 3
+    assert notice.next_publication_number('2017-2') == 6
+    assert notice.next_publication_number('2017-3') == 1
+    assert notice.next_publication_number('2017-4') == 1
+    assert notice.next_publication_number('2017-5') == 3
+    assert notice.next_publication_number('2017-6') == 21
+
+
+def test_notice_publish(session):
+    request = object()
+
+    session.add(
+        GazetteNotice(state='accepted', title='title', name='notice')
+    )
+    session.flush()
+    notice = session.query(GazetteNotice).filter_by(state='accepted').one()
+    notice.publish(request)
+    assert notice.issues == {}
+
+    session.add(
+        GazetteNotice(
+            state='accepted', title='title', name='notice',
+            issues=['2017-1', '2017-2']
+        )
+    )
+    session.flush()
+    notice = session.query(GazetteNotice).filter_by(state='accepted').one()
+    notice.publish(request)
+    assert notice.issues == {'2017-1': '1', '2017-2': '1'}
+
+    session.add(
+        GazetteNotice(
+            state='accepted', title='title', name='notice',
+            issues=['2017-2', '2017-3']
+        )
+    )
+    session.flush()
+    notice = session.query(GazetteNotice).filter_by(state='accepted').one()
+    notice.publish(request)
+    assert notice.issues == {'2017-2': '2', '2017-3': '1'}
 
 
 def test_notice_apply_meta(session, categories, organizations, issues):
