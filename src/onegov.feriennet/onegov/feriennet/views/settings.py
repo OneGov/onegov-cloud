@@ -12,8 +12,7 @@ def settings_form(model, request):
 
     class CustomFieldsForm(Form):
         show_political_municipality = BooleanField(
-            label=_("Require the political municipality in the userprofile"),
-            fieldset=_("Extra Features")
+            label=_("Require the political municipality in the userprofile")
         )
 
         def process_obj(self, obj):

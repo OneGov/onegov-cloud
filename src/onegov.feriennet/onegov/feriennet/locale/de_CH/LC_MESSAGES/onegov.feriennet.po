@@ -1948,7 +1948,7 @@ msgid "Archive Period"
 msgstr "Zeitraum archivieren"
 
 msgid "Require the political municipality in the userprofile"
-msgstr "Verlange die politische Gemeinde im Benutzerprofile"
+msgstr "Verlange die politische Gemeinde im Benutzerprofil"
 
 msgid "Extra Features"
 msgstr "Extra Funktionalitäten"

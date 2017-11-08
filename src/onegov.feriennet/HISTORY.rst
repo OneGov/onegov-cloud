@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves look of advanced settings.
+  [href]
+
 - Stops editors from seeing pages hidden from public.
   [href]
 

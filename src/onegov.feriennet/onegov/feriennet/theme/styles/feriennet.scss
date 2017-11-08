@@ -118,6 +118,17 @@ ul.single-line {
 }
 
 /*
+    Improve the look of the custom homepage settings
+*/
+#settings #fieldset-advanced {
+    margin-bottom: 0;
+}
+
+.field-show_political_municipality {
+    padding-bottom: 1rem;
+}
+
+/*
     Generic icons (experimental, might replace other approaches in the future)
 */
 @mixin generic-icon($icon) {
