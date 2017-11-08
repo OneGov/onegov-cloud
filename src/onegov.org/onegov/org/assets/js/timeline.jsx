@@ -135,13 +135,17 @@ var TimelineMessages = React.createClass({
 
         if (messages.length > 0) {
             if (direction === 'newer') {
+                feed.query.load = 'older-first';
+
                 if (this.props.order === 'desc') {
                     feed.query.newer_than = messages[0].id;
                 } else {
                     feed.query.newer_than = messages[messages.length - 1].id;
                 }
-            } else {
-                /* eslint-disable no-lonely-if */
+            }
+            if (direction === 'older') {
+                feed.query.load = 'newer-first';
+
                 if (this.props.order === 'desc') {
                     delete feed.query.newer_than;
                     feed.query.older_than = messages[messages.length - 1].id;
@@ -149,16 +153,11 @@ var TimelineMessages = React.createClass({
                     delete feed.query.newer_than;
                     feed.query.older_than = messages[0].id;
                 }
-                /* eslint-enable no-lonely-if */
             }
         }
 
         $.getJSON(feed.toString(), function(data) {
             var state = _.extend({}, self.state);
-
-            if (direction === 'older') {
-                data.messages.reverse();
-            }
 
             for (var i = 0; i < data.messages.length; i++) {
                 state.messages[queuefn](data.messages[i]);

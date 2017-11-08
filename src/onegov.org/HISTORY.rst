@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes timeline not loading all messages.
+  [href]
+
 - Limit the yubi key length on the form field as well.
   [href]
 

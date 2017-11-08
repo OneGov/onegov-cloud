@@ -471,14 +471,16 @@ def get_payments(app, source='*', page=0):
     model=MessageCollection,
     path='/timeline')
 def get_messages(app, channel_id='*', type='*',
-                 newer_than=None, older_than=None, limit=25):
+                 newer_than=None, older_than=None, limit=25,
+                 load='older-first'):
     return MessageCollection(
         session=app.session(),
         type=type,
         channel_id=channel_id,
         newer_than=newer_than,
         older_than=older_than,
-        limit=min(25, limit)  # bind the limit to a max of 25
+        limit=min(25, limit),  # bind the limit to a max of 25
+        load='newer-first' if load == 'newer-first' else 'older-first'
     )
 
 
