@@ -3297,6 +3297,21 @@ def test_send_ticket_email(org_app):
     assert len(org_app.smtp.outbox) == 2
     assert 'admin@example.org' == org_app.smtp.outbox[1]['To']
 
+    # ticket notifications can be manually disabled
+    page = admin.get('/tickets/ALL/open').click('Annehmen', index=1).follow()
+    page = page.click('E-Mails deaktivieren').follow()
+
+    assert 'deaktiviert' in page
+    ticket_url = page.request.url
+    page = page.click('Ticket abschliessen').follow()
+
+    assert len(org_app.smtp.outbox) == 2
+    page = admin.get(ticket_url)
+    page = page.click('E-Mails aktivieren').follow()
+
+    page = page.click('Ticket wieder öffnen').follow()
+    assert len(org_app.smtp.outbox) == 3
+
     # make sure the same holds true for forms
     collection = FormCollection(org_app.session())
     collection.definitions.add('Profile', definition=textwrap.dedent("""

@@ -8,6 +8,9 @@
             <!--! note that the following snippet is DUPLICATED below, because when
                   printing this site we want the content panel to be shown first -->
             <div class="columns small-12 medium-8 hide-for-print">
+                <div tal:condition="ticket.muted" class="panel callout" i18n:translate>
+                    No e-mails will be sent for this ticket.
+                </div>
                 <div tal:condition="deleted" class="panel callout" i18n:translate>
                     The record behind this ticket was removed. The following information
                     is a snapshot kept for future reference.

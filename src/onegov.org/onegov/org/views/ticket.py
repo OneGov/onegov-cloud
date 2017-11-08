@@ -56,19 +56,26 @@ def view_ticket(self, request):
     }
 
 
-def send_email_if_not_self(ticket, request, template, subject):
+def send_email_if_enabled(ticket, request, template, subject):
     email = ticket.snapshot.get('email') or ticket.handler.email
 
-    if email != request.current_username:
-        send_html_mail(
-            request=request,
-            template=template,
-            subject=subject,
-            receivers=(email, ),
-            content={
-                'model': ticket
-            }
-        )
+    # do not send an e-mail if the recipient is the current logged in user
+    if email == request.current_username:
+        return
+
+    # do not send an e-mail if the ticket is muted
+    if ticket.muted:
+        return
+
+    send_html_mail(
+        request=request,
+        template=template,
+        subject=subject,
+        receivers=(email, ),
+        content={
+            'model': ticket
+        }
+    )
 
 
 @OrgApp.form(
@@ -165,7 +172,7 @@ def close_ticket(self, request):
             'number': self.number
         }))
 
-        send_email_if_not_self(
+        send_email_if_enabled(
             ticket=self,
             request=request,
             template='mail_ticket_closed.pt',
@@ -193,12 +200,38 @@ def reopen_ticket(self, request):
             'number': self.number
         }))
 
-        send_email_if_not_self(
+        send_email_if_enabled(
             ticket=self,
             request=request,
             template='mail_ticket_reopened.pt',
             subject=_("Your ticket has been repoened")
         )
+
+    return morepath.redirect(request.link(self))
+
+
+@OrgApp.view(model=Ticket, name='mute', permission=Private)
+def mute_ticket(self, request):
+    self.muted = True
+
+    TicketMessage.create(self, request, 'muted')
+    request.success(
+        _("You have disabled e-mails for ticket ${number}", mapping={
+            'number': self.number
+        }))
+
+    return morepath.redirect(request.link(self))
+
+
+@OrgApp.view(model=Ticket, name='unmute', permission=Private)
+def unmute_ticket(self, request):
+    self.muted = False
+
+    TicketMessage.create(self, request, 'unmuted')
+    request.success(
+        _("You have enabled e-mails for ticket ${number}", mapping={
+            'number': self.number
+        }))
 
     return morepath.redirect(request.link(self))
 

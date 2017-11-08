@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-11-07 14:19+0100\n"
+"POT-Creation-Date: 2017-11-08 16:16+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -275,6 +275,12 @@ msgstr "Formular löschen"
 
 msgid "Accept ticket"
 msgstr "Ticket annehmen"
+
+msgid "Enable E-Mails"
+msgstr "E-Mails aktivieren"
+
+msgid "Disable E-Mails"
+msgstr "E-Mails deaktivieren"
 
 msgid "Refund Payment"
 msgstr "Zahlung Rückerstatten"
@@ -1804,6 +1810,12 @@ msgstr "Ticket geschlossen."
 msgid "Ticket reopened."
 msgstr "Ticket wieder geöffnet."
 
+msgid "Ticket e-mails disabled."
+msgstr "Ticket E-Mails deaktiviert."
+
+msgid "Ticket e-mails enabled."
+msgstr "Ticket E-Mails aktiviert."
+
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr ""
 "Abonnieren Sie unseren Newsletter um immer auf dem Laufenden zu bleiben:"
@@ -1987,6 +1999,9 @@ msgstr "Möchten Sie die Eingabe wirklich löschen?"
 
 msgid "Delete Submission"
 msgstr "Eingabe Löschen"
+
+msgid "No e-mails will be sent for this ticket."
+msgstr "Zu diesem Ticket werden keine E-Mails versendet."
 
 msgid ""
 "The record behind this ticket was removed. The following information is a "
@@ -2489,6 +2504,14 @@ msgstr "Die Notiz wurde gelöscht"
 
 msgid "Edit Note"
 msgstr "Notiz bearbeiten"
+
+#, python-format
+msgid "You have disabled e-mails for ticket ${number}"
+msgstr "Sie haben E-Mails für das Ticket ${number} deaktiviert"
+
+#, python-format
+msgid "You have enabled e-mails for ticket ${number}"
+msgstr "Sie haben E-Mails für das Ticket ${number} aktiviert"
 
 msgid "Your request has been submitted"
 msgstr "Anfrage eingereicht"

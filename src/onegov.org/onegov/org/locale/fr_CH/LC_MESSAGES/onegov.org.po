@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-11-07 14:19+0100\n"
+"POT-Creation-Date: 2017-11-08 16:16+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -12,6 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
+"gengo-order-id: 3231599\n"
 "X-Generator: Poedit 1.8.12\n"
 
 #, python-format
@@ -276,6 +277,12 @@ msgstr "Supprimer le formulaire"
 
 msgid "Accept ticket"
 msgstr "Accepter le ticket"
+
+msgid "Enable E-Mails"
+msgstr ""
+
+msgid "Disable E-Mails"
+msgstr ""
 
 msgid "Refund Payment"
 msgstr "Rembourser le paiement"
@@ -1813,6 +1820,12 @@ msgstr "Ticket fermé."
 msgid "Ticket reopened."
 msgstr "Ticket ré-ouvert."
 
+msgid "Ticket e-mails disabled."
+msgstr ""
+
+msgid "Ticket e-mails enabled."
+msgstr ""
+
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr ""
 "Abonnez-vous à notre lettre d'informations pour rester au courant en "
@@ -1998,6 +2011,9 @@ msgstr "Voulez-vous vraiment supprimer la soumission ?"
 
 msgid "Delete Submission"
 msgstr "Supprimer la soumission"
+
+msgid "No e-mails will be sent for this ticket."
+msgstr ""
 
 msgid ""
 "The record behind this ticket was removed. The following information is a "
@@ -2505,6 +2521,14 @@ msgstr "La note a été supprimée"
 
 msgid "Edit Note"
 msgstr "Éditer la note"
+
+#, python-format
+msgid "You have disabled e-mails for ticket ${number}"
+msgstr ""
+
+#, python-format
+msgid "You have enabled e-mails for ticket ${number}"
+msgstr ""
 
 msgid "Your request has been submitted"
 msgstr "Votre demande a été envoyée"

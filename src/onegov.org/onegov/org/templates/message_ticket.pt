@@ -17,6 +17,12 @@
                 <tal:b case="'reopened'" i18n:translate>
                     Ticket reopened.
                 </tal:b>
+                <tal:b case="'muted'" i18n:translate>
+                    Ticket e-mails disabled.
+                </tal:b>
+                <tal:b case="'unmuted'" i18n:translate>
+                    Ticket e-mails enabled.
+                </tal:b>
             </tal:b>
         </metal:b>
     </metal:b>

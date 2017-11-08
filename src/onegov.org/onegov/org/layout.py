@@ -808,6 +808,24 @@ class TicketLayout(DefaultLayout):
                     attrs={'class': ('ticket-button', 'ticket-reopen')}
                 ))
 
+            # muting/unmuting is always enabled
+            if self.model.muted:
+                links.append(
+                    Link(
+                        text=_("Enable E-Mails"),
+                        url=self.request.link(self.model, 'unmute'),
+                        attrs={'class': 'unmute'}
+                    )
+                )
+            else:
+                links.append(
+                    Link(
+                        text=_("Disable E-Mails"),
+                        url=self.request.link(self.model, 'mute'),
+                        attrs={'class': 'mute'}
+                    )
+                )
+
             # ticket notes are always enabled
             links.append(
                 Link(
