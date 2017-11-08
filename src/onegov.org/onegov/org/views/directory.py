@@ -72,7 +72,8 @@ def handle_new_directory(self, request, form):
             title=form.title.data,
             lead=form.lead.data,
             structure=form.structure.data,
-            configuration=form.configuration
+            configuration=form.configuration,
+            enable_map=form.enable_map.data
         )
 
         request.success(_("Added a new directory"))

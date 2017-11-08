@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes new directories ignoring the enable_map setting.
+  [href]
+
 - Fixes timeline not loading all messages.
   [href]
 
