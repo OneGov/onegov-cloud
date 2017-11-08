@@ -40,6 +40,7 @@ def test_registry(browser):
         watcher.update("Label = ___");
     """)
 
+    browser.wait_for_js_variable('window.code')
     code = browser.evaluate_script("window.code")
     assert code == [{'human_id': 'Label', 'type': 'textarea', 'id': 'label'}]
 
