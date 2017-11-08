@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.17.1 (2017-11-08)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes new directories ignoring the enable_map setting.
   [href]
 
