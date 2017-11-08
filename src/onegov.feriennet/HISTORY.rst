@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.3 (2017-11-08)
+~~~~~~~~~~~~~~~~~~~
 
 - Improves look of advanced settings.
   [href]
