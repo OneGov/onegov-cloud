@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.1 (2017-11-08)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to specify the oder in which messages are loaded.
   [href]
 
