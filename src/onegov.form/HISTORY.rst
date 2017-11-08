@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.26.1 (2017-11-08)
+~~~~~~~~~~~~~~~~~~~
 
 - Renders e-mail addresses and websites as clickable links.
   [href]
