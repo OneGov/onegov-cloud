@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.26.3 (2017-11-08)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes submission title containing html.
   [href]
