@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Stops editors from seeing pages hidden from public.
+  [href]
+
 - Updates French translation.
   [href]
 

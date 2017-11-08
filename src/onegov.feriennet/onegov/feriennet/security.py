@@ -21,6 +21,17 @@ def is_owner(username, activity):
     return username == activity.username
 
 
+@FeriennetApp.permission_rule(model=object, permission=object)
+def local_has_permission_logged_in(app, identity, model, permission):
+
+    # is_hidden_from_public is stricter in feriennet, only admins see it
+    if identity.role != 'admin':
+        if getattr(model, 'is_hidden_from_public', False):
+            return False
+
+    return has_permission_logged_in(app, identity, model, permission)
+
+
 @FeriennetApp.permission_rule(model=object, permission=Private)
 def has_private_permission_logged_in(app, identity, model, permission):
     """ Take away private permission for editors. For exceptions see
@@ -29,7 +40,7 @@ def has_private_permission_logged_in(app, identity, model, permission):
     """
 
     if identity.role != 'editor':
-        return has_permission_logged_in(app, identity, model, permission)
+        return local_has_permission_logged_in(app, identity, model, permission)
 
     return False
 
@@ -39,7 +50,7 @@ def has_private_permission_site_collection(app, identity, model, permission):
     """ Give editors the ability to access the site collection. """
 
     if identity.role != 'editor':
-        return has_permission_logged_in(app, identity, model, permission)
+        return local_has_permission_logged_in(app, identity, model, permission)
 
     return True
 
@@ -52,7 +63,7 @@ def has_private_permission_image_collection(app, identity, model, permission):
     """
 
     if identity.role != 'editor':
-        return has_permission_logged_in(app, identity, model, permission)
+        return local_has_permission_logged_in(app, identity, model, permission)
 
     return True
 
@@ -67,7 +78,7 @@ def has_private_permission_activity_collections(
 
     # only overries the editor role
     if identity.role != 'editor':
-        return has_permission_logged_in(app, identity, model, permission)
+        return local_has_permission_logged_in(app, identity, model, permission)
 
     return True
 
@@ -78,7 +89,7 @@ def has_private_permission_activities(app, identity, model, permission):
 
     # only overries the editor role
     if identity.role != 'editor':
-        return has_permission_logged_in(app, identity, model, permission)
+        return local_has_permission_logged_in(app, identity, model, permission)
 
     return is_owner(identity.userid, model) \
         and model.state in OWNER_EDITABLE_STATES
@@ -90,7 +101,7 @@ def has_private_permission_occasions(app, identity, model, permission):
 
     # only overries the editor role
     if identity.role != 'editor':
-        return has_permission_logged_in(app, identity, model, permission)
+        return local_has_permission_logged_in(app, identity, model, permission)
 
     return is_owner(identity.userid, model.activity) \
         and model.activity.state in OWNER_EDITABLE_STATES
@@ -104,7 +115,7 @@ def has_private_permission_notifications(app, identity, model, permission):
 
     # only overries the editor role
     if identity.role != 'editor':
-        return has_permission_logged_in(app, identity, model, permission)
+        return local_has_permission_logged_in(app, identity, model, permission)
 
     return True
 
@@ -115,7 +126,7 @@ def has_private_permission_notification(app, identity, model, permission):
 
     # only overries the editor role
     if identity.role != 'editor':
-        return has_permission_logged_in(app, identity, model, permission)
+        return local_has_permission_logged_in(app, identity, model, permission)
 
     return True
 
@@ -161,4 +172,4 @@ def has_private_permission_occasion_attendee_collection(
     if identity.role in ('admin', 'editor'):
         return True
 
-    return has_permission_logged_in(app, identity, model, permission)
+    return local_has_permission_logged_in(app, identity, model, permission)
