@@ -89,7 +89,8 @@ def edit_notice_unrestricted(user, slug, unable=False, forbidden=False,
         manage = user.get(url)
         for key, value in kwargs.items():
             manage.form[key] = value
-        manage = manage.form.submit().maybe_follow()
+        manage = manage.form.submit()
+        assert "Meldung geändert" in manage.maybe_follow()
 
 
 def publish_notice(user, slug, unable=False, forbidden=False):
