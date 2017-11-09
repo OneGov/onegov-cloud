@@ -7,7 +7,6 @@ from sedate import standardize_date
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Integer
-from sqlalchemy import or_
 from sqlalchemy import Text
 from sqlalchemy_utils import observes
 from sqlalchemy.orm import object_session
@@ -87,33 +86,20 @@ class Issue(Base, TimestampMixin):
         """ Changes the issue date of the notices when updating the date
         of the issue.
 
-        """
-
-        from onegov.gazette.models.notice import GazetteNotice  # circular
-
-        date_time = standardize_date(as_datetime(date_), 'UTC')
-        notices = self.notices().filter(
-            or_(
-                GazetteNotice.first_issue.is_(None),
-                GazetteNotice.first_issue != date_time
-            )
-        )
-        for notice in notices:
-            notice.first_issue = date_time
-
-    def publish(self, request):
-        """ Ensures that every accepted notice of this issue has been
-        published.
+        At this moment, the transaction is not yet commited: Querying the
+        current issue returns the old date.
 
         """
 
-        for notice in self.accepted_notices:
-            notice.publish(request)
+        issues = object_session(self).query(Issue.name, Issue.date)
+        issues = dict(issues.order_by(Issue.date))
+        issues[self.name] = date_
+        issues = {
+            key: standardize_date(as_datetime(value), 'UTC')
+            for key, value in issues.items()
+        }
 
-    def generate_pdf(self):
-        """ Generates the PDF. """
-        raise NotImplementedError()
-
-    def sign_pdf(self):
-        """ Signs the PDF. """
-        raise NotImplementedError()
+        for notice in self.notices():
+            dates = [issues.get(issue, None) for issue in notice._issues]
+            dates = [date for date in dates if date]
+            notice.first_issue = min(dates)
