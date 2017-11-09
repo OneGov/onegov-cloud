@@ -35,6 +35,7 @@ Changelog
   [msom]
 
 - Adds an unrestricted edit view for admins.
+  [msom]
 
 1.9.3 (2017-11-09)
 ~~~~~~~~~~~~~~~~~~~
