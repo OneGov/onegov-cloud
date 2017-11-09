@@ -173,7 +173,7 @@ def test_view_issues_permissions(gazette_app):
 def test_view_issues_publish(gazette_app):
     with freeze_time("2017-11-01 12:00"):
         client = Client(gazette_app)
-        login_admin(client)
+        login_publisher(client)
 
         for number, issues in enumerate(((44, 45), (45, 46), (45,))):
             slug = 'notice-{}'.format(number)

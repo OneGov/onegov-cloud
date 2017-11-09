@@ -155,7 +155,7 @@ def delete_issue(self, request, form):
     model=Issue,
     name='publish',
     template='form.pt',
-    permission=Secret,
+    permission=Private,
     form=EmptyForm
 )
 def publish_issue(self, request, form):
@@ -164,7 +164,7 @@ def publish_issue(self, request, form):
     If the issue has not already been published before, we redirect to the
     PDF generation view afterwards.
 
-    This view is only visible by an admin.
+    This view is only visible by a publisher.
 
     """
 
@@ -203,7 +203,7 @@ def publish_issue(self, request, form):
     model=Issue,
     name='generate',
     template='form.pt',
-    permission=Secret,
+    permission=Private,
     form=EmptyForm
 )
 def generate_issue(self, request, form):
@@ -211,7 +211,7 @@ def generate_issue(self, request, form):
 
     Redirect to the sign view after generating the PDF.
 
-    This view is only visible by an admin.
+    This view is only visible by a publisher.
 
     """
 
@@ -235,13 +235,13 @@ def generate_issue(self, request, form):
     model=Issue,
     name='sign',
     template='form.pt',
-    permission=Secret,
+    permission=Private,
     form=EmptyForm
 )
 def sign_issue(self, request, form):
     """ Signs the PDF of the issue.
 
-    This view is only visible by an admin.
+    This view is only visible by a publisher.
 
     """
 

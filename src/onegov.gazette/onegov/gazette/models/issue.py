@@ -103,3 +103,22 @@ class Issue(Base, TimestampMixin):
             dates = [issues.get(issue, None) for issue in notice._issues]
             dates = [date for date in dates if date]
             notice.first_issue = min(dates)
+
+    def publish(self, request):
+        """ Ensures that every accepted notice of this issue has been
+        published.
+
+        """
+
+        issues = object_session(self).query(Issue.name, Issue.date)
+        issues = dict(issues.order_by(Issue.date))
+        issues[self.name] = date_
+        issues = {
+            key: standardize_date(as_datetime(value), 'UTC')
+            for key, value in issues.items()
+        }
+
+        for notice in self.notices():
+            dates = [issues.get(issue, None) for issue in notice._issues]
+            dates = [date for date in dates if date]
+            notice.first_issue = min(dates)
