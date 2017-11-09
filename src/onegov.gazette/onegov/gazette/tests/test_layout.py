@@ -89,8 +89,11 @@ def test_layout_menu():
     assert layout.menu == [
         ('Official Notices', '/GazetteNoticeCollection/', False),
         ('Statistics', '/GazetteNoticeCollection/statistics/', False),
+        ('Issues', '/IssueCollection/', False),
+        ('Organizations', '/OrganizationCollection/', False),
+        ('Categories', '/CategoryCollection/', False),
         ('Users', '/UserCollection/', False),
-        ('Groups', '/UserGroupCollection/', False)
+        ('Groups', '/UserGroupCollection/', False),
     ]
 
 

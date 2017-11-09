@@ -130,6 +130,7 @@ class Layout(ChameleonLayout):
     @property
     def menu(self):
         result = []
+
         if self.request.is_private(self.model):
             # Publisher
             active = (
@@ -176,6 +177,21 @@ class Layout(ChameleonLayout):
 
         if self.request.is_secret(self.model):
             # Admin
+            active = isinstance(self.model, IssueCollection)
+            result.append((
+                _("Issues"), self.manage_issues_link, active
+            ))
+
+            active = isinstance(self.model, OrganizationCollection)
+            result.append((
+                _("Organizations"), self.manage_organizations_link, active
+            ))
+
+            active = isinstance(self.model, CategoryCollection)
+            result.append((
+                _("Categories"), self.manage_categories_link, active
+            ))
+
             active = isinstance(self.model, UserCollection)
             result.append((
                 _("Users"),

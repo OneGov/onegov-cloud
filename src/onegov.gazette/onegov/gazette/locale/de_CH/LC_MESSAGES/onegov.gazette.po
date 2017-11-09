@@ -558,6 +558,9 @@ msgstr "bearbeitet"
 msgid "Official notice modified."
 msgstr "Meldung geändert."
 
+msgid "Official notice modified."
+msgstr "Meldung geändert."
+
 msgid "Official notice deleted."
 msgstr "Meldung gelöscht."
 

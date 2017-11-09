@@ -35,6 +35,23 @@ Changelog
   [msom]
 
 - Adds an unrestricted edit view for admins.
+
+1.9.3 (2017-11-09)
+~~~~~~~~~~~~~~~~~~~
+
+- Fixes initialization of fields.
+  [msom]
+
+- Uses latest onegov.quill release.
+  [msom]
+
+- Adds a notice modified message.
+  [msom]
+
+- Changes the order of the items in the admin menu.
+  [msom]
+
+- Always shows the first and last pagination element.
   [msom]
 
 1.9.2 (2017-10-26)
