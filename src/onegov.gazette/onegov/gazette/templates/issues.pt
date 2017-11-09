@@ -45,6 +45,40 @@
                                             <a i18n:translate class="action-edit" href="${request.link(issue, 'edit')}">Edit</a>
                                         </li>
                                         <li>
+                                            <a i18n:translate class="action-delete" href="${request.link(issue, 'delete')}">Delete</a>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tal:block>
+                    </tbody>
+                </table>
+
+                <h3 i18n:translate>Past Issues</h3>
+                <table class="issues past stackable">
+                    <thead>
+                        <tr>
+                            <th i18n:translate>Issue</th>
+                            <th i18n:translate>Date</th>
+                            <th i18n:translate>Deadline</th>
+                            <th i18n:translate class="row-actions right-aligned">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr tal:condition="not:past_issues">
+                            <td i18n:translate>No past issues.</td>
+                        </tr>
+                        <tal:block tal:repeat="issue past_issues">
+                            <tr>
+                                <td>${issue.name}</td>
+                                <td>${layout.format_date(issue.date, 'date')}</td>
+                                <td>${layout.format_date(issue.deadline, 'datetime_with_weekday')}</td>
+                                <td class="right-aligned">
+                                    <ul class="actions" data-title="Actions" i18n:attributes="data-title">
+                                        <li>
+                                            <a i18n:translate class="action-edit" href="${request.link(issue, 'edit')}">Edit</a>
+                                        </li>
+                                        <li>
                                             <a i18n:translate class="action-publish" href="${request.link(issue, 'publish')}">Publish</a>
                                         </li>
                                         <li>

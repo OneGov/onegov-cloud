@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-09 09:59+0100\n"
-"PO-Revision-Date: 2017-11-07 16:07+0100\n"
+"POT-Creation-Date: 2017-11-09 10:05+0100\n"
+"PO-Revision-Date: 2017-11-03 08:42+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -35,10 +35,6 @@ msgstr "Weniger anzeigen"
 #, python-format
 msgid "No. ${issue_number}, ${issue_date} / ${notice_number}"
 msgstr "Nr. ${issue_number}, ${issue_date} / ${notice_number}"
-
-#, python-format
-msgid "No. ${issue_number}, ${issue_date}"
-msgstr "Nr. ${issue_number}, ${issue_date}"
 
 msgid "Official Notices"
 msgstr "Meldungen"
@@ -202,15 +198,6 @@ msgstr "Ausgabe"
 
 msgid "No upcoming issues."
 msgstr "Keine kommenden Ausgaben."
-
-msgid "Publish"
-msgstr "Veröffentlichen"
-
-msgid "Generate"
-msgstr "Erzeugen"
-
-msgid "Sign"
-msgstr "Signieren"
 
 msgid "Past Issues"
 msgstr "Vergangene Ausgaben"
@@ -561,8 +548,10 @@ msgstr "Meldung geändert."
 msgid "This official notice has already been accepted!"
 msgstr "Diese Meldung wurde bereits angenommen!"
 
-msgid "Official notice modified."
-msgstr "Meldung geändert."
+msgid "Only drafted or rejected official notices may be deleted."
+msgstr ""
+"Es können nur zurückgewiesene Meldungen oder Meldungen in Arbeit gelöscht "
+"werden."
 
 msgid "Official notice deleted."
 msgstr "Meldung gelöscht."
