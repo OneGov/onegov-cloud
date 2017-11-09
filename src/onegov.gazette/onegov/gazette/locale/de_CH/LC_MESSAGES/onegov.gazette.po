@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-09 08:58+0100\n"
-"PO-Revision-Date: 2017-11-09 08:54+0100\n"
+"POT-Creation-Date: 2017-11-09 09:59+0100\n"
+"PO-Revision-Date: 2017-11-07 16:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -40,11 +40,14 @@ msgstr "Nr. ${issue_number}, ${issue_date} / ${notice_number}"
 msgid "No. ${issue_number}, ${issue_date}"
 msgstr "Nr. ${issue_number}, ${issue_date}"
 
-msgid "Users"
-msgstr "Benutzer"
+msgid "Official Notices"
+msgstr "Meldungen"
 
-msgid "Groups"
-msgstr "Gruppen"
+msgid "Statistics"
+msgstr "Statistiken"
+
+msgid "Issues"
+msgstr "Ausgaben"
 
 msgid "Organizations"
 msgstr "Organisationen"
@@ -52,14 +55,11 @@ msgstr "Organisationen"
 msgid "Categories"
 msgstr "Rubriken"
 
-msgid "Issues"
-msgstr "Ausgaben"
+msgid "Users"
+msgstr "Benutzer"
 
-msgid "Official Notices"
-msgstr "Meldungen"
-
-msgid "Statistics"
-msgstr "Statistiken"
+msgid "Groups"
+msgstr "Gruppen"
 
 msgid "My Drafted and Submitted Official Notices"
 msgstr "Offene Meldungen"
@@ -557,6 +557,9 @@ msgstr "bearbeitet"
 
 msgid "Official notice modified."
 msgstr "Meldung geändert."
+
+msgid "This official notice has already been accepted!"
+msgstr "Diese Meldung wurde bereits angenommen!"
 
 msgid "Official notice modified."
 msgstr "Meldung geändert."
