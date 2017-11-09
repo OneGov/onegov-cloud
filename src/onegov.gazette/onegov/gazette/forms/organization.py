@@ -64,5 +64,5 @@ class OrganizationForm(Form):
         self.active.data = model.active
         self.name.data = model.name
         self.parent.data = str(model.parent_id or '')
-        if model.in_use(self.request.app.session()):
+        if model.in_use:
             self.name.render_kw = {'readonly': True}

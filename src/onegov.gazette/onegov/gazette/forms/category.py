@@ -43,5 +43,5 @@ class CategoryForm(Form):
         self.active.data = model.active
         self.name.data = model.name
         self.name.default = model.name
-        if model.in_use(self.request.app.session()):
+        if model.in_use:
             self.name.render_kw = {'readonly': True}

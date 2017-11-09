@@ -23,16 +23,23 @@ class Organization(AdjacencyList, TimestampMixin):
     #: True, if this organization is still in use.
     active = Column(Boolean, nullable=True)
 
-    def in_use(self, session):
-        """ True, if the organization is used by any notice. """
+    def notices(self):
+        """ Returns a query to get all notices related to this category. """
 
         from onegov.gazette.models.notice import GazetteNotice  # circular
 
-        query = session.query(GazetteNotice._organizations)
-        query = query.filter(
+        notices = object_session(self).query(GazetteNotice)
+        notices = notices.filter(
             GazetteNotice._organizations.has_key(self.name)  # noqa
         )
-        if query.first():
+
+        return notices
+
+    @property
+    def in_use(self):
+        """ True, if the organization is used by any notice. """
+
+        if self.notices().first():
             return True
 
         return False
@@ -41,15 +48,14 @@ class Organization(AdjacencyList, TimestampMixin):
     def title_observer(self, title):
         from onegov.gazette.models.notice import GazetteNotice  # circular
 
-        query = object_session(self).query(GazetteNotice)
-        query = query.filter(
-            GazetteNotice._organizations.has_key(self.name),  # noqa
+        notices = self.notices()
+        notices = notices.filter(
             or_(
                 GazetteNotice.organization.is_(None),
                 GazetteNotice.organization != title
             )
         )
-        for notice in query:
+        for notice in notices:
             notice.organization = title
 
 

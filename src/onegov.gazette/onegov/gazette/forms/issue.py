@@ -79,5 +79,5 @@ class IssueForm(Form):
             self.deadline.data = to_timezone(
                 self.deadline.data, self.timezone.data
             ).replace(tzinfo=None)
-        if model.in_use(self.request.app.session()):
+        if model.in_use:
             self.number.render_kw = {'readonly': True}

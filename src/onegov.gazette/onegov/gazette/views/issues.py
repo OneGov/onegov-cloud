@@ -116,7 +116,7 @@ def delete_issue(self, request, form):
     layout = Layout(self, request)
     session = request.app.session()
 
-    if self.in_use(session):
+    if self.in_use:
         request.message(
             _("Only unused issues may be deleted."),
             'alert'

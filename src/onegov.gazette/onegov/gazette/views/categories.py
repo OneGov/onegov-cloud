@@ -110,7 +110,7 @@ def delete_category(self, request, form):
     layout = Layout(self, request)
     session = request.app.session()
 
-    if self.in_use(session):
+    if self.in_use:
         request.message(
             _("Only unused categorys may be deleted."),
             'alert'
