@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.9.3 (2017-11-09)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes initialization of fields.
   [msom]
