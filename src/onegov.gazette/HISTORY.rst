@@ -4,6 +4,9 @@ Changelog
 - Fixes initialization of fields.
   [msom]
 
+- Uses latest onegov.quill release.
+  [msom]
+
 1.9.2 (2017-10-26)
 ~~~~~~~~~~~~~~~~~~~
 
