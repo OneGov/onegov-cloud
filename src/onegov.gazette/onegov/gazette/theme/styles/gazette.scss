@@ -308,6 +308,20 @@ ul[data-sortable] {
     }
 }
 
+/*
+    Categories & Organizations
+*/
+td.inactive {
+    text-decoration: line-through double;
+}
+
+td.child::before {
+    content: '\f0da';
+    font-family: 'FontAwesome';
+    margin-left: 2em;
+    margin-right: .75ex;
+}
+
 
 /*
     Footer

@@ -25,8 +25,6 @@
                     <thead>
                         <tr>
                             <th i18n:translate>Title</th>
-                            <th i18n:translate>Active</th>
-                            <th i18n:translate>ID</th>
                             <th i18n:translate class="row-actions right-aligned">Actions</th>
                         </tr>
                     </thead>
@@ -36,10 +34,7 @@
                         </tr>
                         <tal:block tal:repeat="root roots">
                             <tr>
-                                <td>${root.title}</td>
-                                <td tal:condition="root.active" i18n:translate>Yes</td>
-                                <td tal:condition="not: root.active" i18n:translate>No</td>
-                                <td>${root.name}</td>
+                                <td class="${'inactive' if not root.active else ''}">${root.title} <i>(${root.name})</i></td>
                                 <td class="right-aligned">
                                     <ul class="actions" data-title="Actions" i18n:attributes="data-title">
                                         <li>
@@ -52,10 +47,7 @@
                                 </td>
                             </tr>
                             <tr tal:repeat="child root.children">
-                                <td>&mdash; ${child.title}</td>
-                                <td tal:condition="child.active" i18n:translate>Yes</td>
-                                <td tal:condition="not: child.active" i18n:translate>No</td>
-                                <td>${child.name}</td>
+                                <td class="child ${'inactive' if not child.active else ''}">${child.title} <i>(${child.name})</i></td>
                                 <td class="right-aligned">
                                     <ul class="actions" data-title="Actions" i18n:attributes="data-title">
                                         <li>

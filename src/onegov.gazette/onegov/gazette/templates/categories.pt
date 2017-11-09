@@ -24,8 +24,6 @@
                     <thead>
                         <tr>
                             <th i18n:translate>Title</th>
-                            <th i18n:translate>Active</th>
-                            <th i18n:translate>ID</th>
                             <th i18n:translate class="row-actions right-aligned">Actions</th>
                         </tr>
                     </thead>
@@ -35,10 +33,7 @@
                         </tr>
                         <tal:block tal:repeat="category categories">
                             <tr>
-                                <td>${category.title}</td>
-                                <td tal:condition="category.active" i18n:translate>Yes</td>
-                                <td tal:condition="not: category.active" i18n:translate>No</td>
-                                <td>${category.name}</td>
+                                <td class="${'inactive' if not category.active else ''}">${category.title} <i>(${category.name})</i></td>
                                 <td class="right-aligned">
                                     <ul class="actions" data-title="Actions" i18n:attributes="data-title">
                                         <li>

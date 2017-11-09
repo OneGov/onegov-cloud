@@ -26,16 +26,19 @@ def test_view_categories(gazette_app):
         assert 'Rubrik hinzugefügt.' in manage
         assert 'Rubrik XY' in manage
         categories = [
-            [td.text.strip() for td in pq(tr)('td')]
+            [
+                ''.join((td.text_content(), td.attrib['class']))
+                for td in pq(tr)('td')[:1]
+            ][0]
             for tr in manage.pyquery('table.categories tbody tr')
         ]
         assert categories == [
-            ['Commercial Register', 'Ja', '13', ''],
-            ['Complaints', 'Nein', '10', ''],
-            ['Education', 'Ja', '11', ''],
-            ['Elections', 'Ja', '14', ''],
-            ['Rubrik XY', 'Ja', '15', ''],
-            ['Submissions', 'Ja', '12', '']
+            'Commercial Register (13)',
+            'Complaints (10)inactive',
+            'Education (11)',
+            'Elections (14)',
+            'Rubrik XY (15)',
+            'Submissions (12)'
         ]
 
         # use the first category in a notice
@@ -59,16 +62,19 @@ def test_view_categories(gazette_app):
         assert 'Commercial Register' not in manage
 
         categories = [
-            [td.text.strip() for td in pq(tr)('td')]
+            [
+                ''.join((td.text_content(), td.attrib['class']))
+                for td in pq(tr)('td')[:1]
+            ][0]
             for tr in manage.pyquery('table.categories tbody tr')
         ]
         assert categories == [
-            ['Complaints', 'Nein', '10', ''],
-            ['Education', 'Ja', '11', ''],
-            ['Elections', 'Ja', '14', ''],
-            ['Rubrik XY', 'Ja', '15', ''],
-            ['Rubrik Z', 'Nein', '13', ''],
-            ['Submissions', 'Ja', '12', '']
+            'Complaints (10)inactive',
+            'Education (11)',
+            'Elections (14)',
+            'Rubrik XY (15)',
+            'Rubrik Z (13)inactive',
+            'Submissions (12)'
         ]
 
         # check if the notice has been updated

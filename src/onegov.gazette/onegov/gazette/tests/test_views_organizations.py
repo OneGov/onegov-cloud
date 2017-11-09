@@ -29,19 +29,22 @@ def test_view_organizations(gazette_app):
         assert 'Organisation hinzugefügt.' in manage
         assert 'Organisation XY' in manage
         organizations = [
-            [td.text.strip() for td in pq(tr)('td')]
+            [
+                ''.join((td.text_content(), td.attrib['class']))
+                for td in pq(tr)('td')[:1]
+            ][0]
             for tr in manage.pyquery('table.organizations tbody tr')
         ]
         assert organizations == [
-            ['State Chancellery', 'Ja', '100', ''],
-            ['Civic Community', 'Ja', '200', ''],
-            ['Municipality', 'Ja', '300', ''],
-            ['Churches', 'Ja', '400', ''],
-            ['— Evangelical Reformed Parish', 'Ja', '410', ''],
-            ['— Sikh Community', 'Nein', '420', ''],
-            ['— Catholic Parish', 'Ja', '430', ''],
-            ['Corporation', 'Ja', '500', ''],
-            ['Organisation XY', 'Ja', '501', '']
+            'State Chancellery (100)',
+            'Civic Community (200)',
+            'Municipality (300)',
+            'Churches (400)',
+            'Evangelical Reformed Parish (410)child ',
+            'Sikh Community (420)child inactive',
+            'Catholic Parish (430)child ',
+            'Corporation (500)',
+            'Organisation XY (501)'
         ]
 
         # use the first organization in a notice
@@ -66,22 +69,22 @@ def test_view_organizations(gazette_app):
         assert 'Organisation Z' in manage
 
         organizations = [
-            [td.text.strip() for td in pq(tr)('td')]
+            [
+                ''.join((td.text_content(), td.attrib['class']))
+                for td in pq(tr)('td')[:1]
+            ][0]
             for tr in manage.pyquery('table.organizations tbody tr')
         ]
         assert organizations == [
-            ['Organisation Z', 'Nein', '100', ''],
-            ['Civic Community', 'Ja', '200', ''],
-            ['Municipality', 'Ja', '300', ''],
-            ['Churches', 'Ja', '400', ''],
-            ['— Evangelical Reformed Parish', 'Ja', '410', ''],
-            ['— Sikh Community', 'Nein', '420', ''],
-            ['— Catholic Parish', 'Ja', '430', ''],
-            ['Corporation', 'Ja', '500', ''],
-            ['Organisation XY', 'Ja', '501', '']
-        ]
-        organizations = [
-            t.text for t in manage.pyquery('table.organizations tbody tr td')
+            'Organisation Z (100)inactive',
+            'Civic Community (200)',
+            'Municipality (300)',
+            'Churches (400)',
+            'Evangelical Reformed Parish (410)child ',
+            'Sikh Community (420)child inactive',
+            'Catholic Parish (430)child ',
+            'Corporation (500)',
+            'Organisation XY (501)'
         ]
 
         # check if the notice has been updated
