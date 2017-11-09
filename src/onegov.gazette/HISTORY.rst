@@ -13,6 +13,9 @@ Changelog
 - Changes the order of the items in the admin menu.
   [msom]
 
+- Always shows the first and last pagination element.
+  [msom]
+
 1.9.2 (2017-10-26)
 ~~~~~~~~~~~~~~~~~~~
 
