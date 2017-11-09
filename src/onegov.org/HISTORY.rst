@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.17.2 (2017-11-09)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to manually mute ticket e-mails.
   [href]
 
