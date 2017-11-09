@@ -10,7 +10,7 @@ def test_view_principal(gazette_app):
     assert 'auth/login' in client.get('/').maybe_follow().request.url
 
     login_admin(client)
-    assert '/users' in client.get('/').maybe_follow().request.url
+    assert '/notices' in client.get('/').maybe_follow().request.url
 
     login_publisher(client)
     assert '/notices' in client.get('/').maybe_follow().request.url

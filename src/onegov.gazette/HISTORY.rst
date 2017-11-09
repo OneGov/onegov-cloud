@@ -10,6 +10,9 @@ Changelog
 - Adds a notice modified message.
   [msom]
 
+- Changes the order of the items in the admin menu.
+  [msom]
+
 1.9.2 (2017-10-26)
 ~~~~~~~~~~~~~~~~~~~
 

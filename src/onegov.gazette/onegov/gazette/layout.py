@@ -130,37 +130,8 @@ class Layout(ChameleonLayout):
     @property
     def menu(self):
         result = []
-        if self.request.is_secret(self.model):
-            active = isinstance(self.model, UserCollection)
-            result.append((
-                _("Users"),
-                self.manage_users_link,
-                active
-            ))
-
-            active = isinstance(self.model, UserGroupCollection)
-            result.append((
-                _("Groups"),
-                self.manage_groups_link,
-                active
-            ))
-
-            active = isinstance(self.model, OrganizationCollection)
-            result.append((
-                _("Organizations"), self.manage_organizations_link, active
-            ))
-
-            active = isinstance(self.model, CategoryCollection)
-            result.append((
-                _("Categories"), self.manage_categories_link, active
-            ))
-
-            active = isinstance(self.model, IssueCollection)
-            result.append((
-                _("Issues"), self.manage_issues_link, active
-            ))
-
         if self.request.is_private(self.model):
+            # Publisher
             active = (
                 isinstance(self.model, GazetteNoticeCollection) and
                 'statistics' not in self.request.url
@@ -184,8 +155,8 @@ class Layout(ChameleonLayout):
                 link,
                 active
             ))
-
         elif self.request.is_personal(self.model):
+            # Editor
             active = isinstance(self.model, Principal)
             result.append((
                 _("My Drafted and Submitted Official Notices"),
@@ -200,6 +171,22 @@ class Layout(ChameleonLayout):
             result.append((
                 _("My Published Official Notices"),
                 link,
+                active
+            ))
+
+        if self.request.is_secret(self.model):
+            # Admin
+            active = isinstance(self.model, UserCollection)
+            result.append((
+                _("Users"),
+                self.manage_users_link,
+                active
+            ))
+
+            active = isinstance(self.model, UserGroupCollection)
+            result.append((
+                _("Groups"),
+                self.manage_groups_link,
                 active
             ))
 

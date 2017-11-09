@@ -23,9 +23,6 @@ def view_principal(self, request):
 
     layout = Layout(self, request)
 
-    if request.is_secret(self):
-        return redirect(layout.manage_users_link)
-
     if request.is_private(self):
         return redirect(layout.manage_notices_link)
 
