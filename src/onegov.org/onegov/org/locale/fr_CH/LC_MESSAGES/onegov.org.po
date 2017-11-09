@@ -12,7 +12,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
-"gengo-order-id: 3231599\n"
 "X-Generator: Poedit 1.8.12\n"
 
 #, python-format
@@ -279,10 +278,10 @@ msgid "Accept ticket"
 msgstr "Accepter le ticket"
 
 msgid "Enable E-Mails"
-msgstr ""
+msgstr "Activer les e-mails"
 
 msgid "Disable E-Mails"
-msgstr ""
+msgstr "Désactiver les e-mails"
 
 msgid "Refund Payment"
 msgstr "Rembourser le paiement"
@@ -1821,10 +1820,10 @@ msgid "Ticket reopened."
 msgstr "Ticket ré-ouvert."
 
 msgid "Ticket e-mails disabled."
-msgstr ""
+msgstr "E-mails de tickets désactivés."
 
 msgid "Ticket e-mails enabled."
-msgstr ""
+msgstr "E-mails de tickets activés."
 
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr ""
@@ -2013,7 +2012,7 @@ msgid "Delete Submission"
 msgstr "Supprimer la soumission"
 
 msgid "No e-mails will be sent for this ticket."
-msgstr ""
+msgstr "Aucun e-mail ne sera envoyé pour ce ticket."
 
 msgid ""
 "The record behind this ticket was removed. The following information is a "
@@ -2524,11 +2523,11 @@ msgstr "Éditer la note"
 
 #, python-format
 msgid "You have disabled e-mails for ticket ${number}"
-msgstr ""
+msgstr "Vous avez désactivé les e-mails pour le ticket ${number}"
 
 #, python-format
 msgid "You have enabled e-mails for ticket ${number}"
-msgstr ""
+msgstr "Vous avez activé les e-mails pour le ticket ${number}"
 
 msgid "Your request has been submitted"
 msgstr "Votre demande a été envoyée"
