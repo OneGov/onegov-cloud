@@ -1,11 +1,11 @@
 from datetime import date
 from morepath import redirect
-from onegov.core.security import Secret
+from onegov.core.security import Private
 from onegov.gazette import _
 from onegov.gazette import GazetteApp
 from onegov.gazette.collections import IssueCollection
-from onegov.gazette.forms import IssueForm
 from onegov.gazette.forms import EmptyForm
+from onegov.gazette.forms import IssueForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import Issue
 
@@ -13,12 +13,12 @@ from onegov.gazette.models import Issue
 @GazetteApp.html(
     model=IssueCollection,
     template='issues.pt',
-    permission=Secret
+    permission=Private
 )
 def view_issues(self, request):
     """ View the list of issues.
 
-    This view is only visible by an admin.
+    This view is only visible by a publisher.
 
     """
     layout = Layout(self, request)
@@ -40,13 +40,13 @@ def view_issues(self, request):
     model=IssueCollection,
     name='new-issue',
     template='form.pt',
-    permission=Secret,
+    permission=Private,
     form=IssueForm
 )
 def create_issue(self, request, form):
     """ Create a new issue.
 
-    This view is only visible by an admin.
+    This view is only visible by a publisher.
 
     """
     layout = Layout(self, request)
@@ -71,13 +71,13 @@ def create_issue(self, request, form):
     model=Issue,
     name='edit',
     template='form.pt',
-    permission=Secret,
+    permission=Private,
     form=IssueForm
 )
 def edit_issue(self, request, form):
     """ Edit a issue.
 
-    This view is only visible by an admin.
+    This view is only visible by a publisher.
 
     """
 
@@ -104,13 +104,15 @@ def edit_issue(self, request, form):
     model=Issue,
     name='delete',
     template='form.pt',
-    permission=Secret,
+    permission=Private,
     form=EmptyForm
 )
 def delete_issue(self, request, form):
     """ Delete a issue.
 
     Only unused issues may be deleted.
+
+    This view is only visible by a publisher.
 
     """
     layout = Layout(self, request)

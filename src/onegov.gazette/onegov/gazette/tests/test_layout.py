@@ -82,7 +82,8 @@ def test_layout_menu():
     request._is_private = True
     assert layout.menu == [
         ('Official Notices', '/GazetteNoticeCollection/', False),
-        ('Statistics', '/GazetteNoticeCollection/statistics/', False)
+        ('Statistics', '/GazetteNoticeCollection/statistics/', False),
+        ('Issues', '/IssueCollection/', False)
     ]
 
     request._is_secret = True
