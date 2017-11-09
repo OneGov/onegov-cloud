@@ -1650,6 +1650,16 @@ div#redactor-droparea {
         max-width: $max-line-width;
     }
 
+    pre {
+        @include smooth-edges;
+
+        background: $white-smoke;
+        display: inline-block;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        padding: .75rem 1rem;
+    }
+
     .has-img,
     .has-video {
         max-width: none;

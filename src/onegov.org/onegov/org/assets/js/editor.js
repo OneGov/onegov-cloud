@@ -11,7 +11,7 @@ $(function() {
                 'unorderedlist', 'orderedlist', 'image', 'file', 'link',
                 'horizontalrule', 'html'
             ],
-            formatting: ['p', 'blockquote'],
+            formatting: ['p', 'blockquote', 'pre'],
             fileUpload: form.data('file-upload-url'),
             fileManagerJson: form.data('file-list-url'),
             imageUpload: form.data('image-upload-url'),

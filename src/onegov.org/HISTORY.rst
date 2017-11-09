@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Enables <pre> tags in page text.
+  [href]
+
 0.17.2 (2017-11-09)
 ~~~~~~~~~~~~~~~~~~~
 
