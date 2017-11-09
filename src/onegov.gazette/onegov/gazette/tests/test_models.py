@@ -169,6 +169,8 @@ def test_issue(session):
 
     # Test query etc
     assert len(issue.notices().all()) == 0
+    assert issue.accepted_notices == []
+    assert issue.submitted_notices == []
     assert issue.in_use == False
 
     issues = [issue.name]
@@ -180,6 +182,8 @@ def test_issue(session):
     session.flush()
 
     assert len(issue.notices().all()) == 4
+    assert issue.accepted_notices[0].title == 'a'
+    assert issue.submitted_notices[0].title == 's'
     assert issue.in_use == True
 
     # Test date observer
@@ -188,6 +192,11 @@ def test_issue(session):
     dates = [i.first_issue for i in session.query(GazetteNotice)]
     dates = [d.date() for d in dates if d]
     assert set(dates) == set([issue.date])
+
+    # Test publish
+    issue.publish(object())
+    assert len(issue.notices().all()) == 4
+    assert issue.accepted_notices == []
 
 
 def test_principal():

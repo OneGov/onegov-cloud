@@ -62,6 +62,18 @@ class Issue(Base, TimestampMixin):
         return notices
 
     @property
+    def accepted_notices(self):
+        from onegov.gazette.models.notice import GazetteNotice  # circular
+
+        return self.notices().filter(GazetteNotice.state == 'accepted').all()
+
+    @property
+    def submitted_notices(self):
+        from onegov.gazette.models.notice import GazetteNotice  # circular
+
+        return self.notices().filter(GazetteNotice.state == 'submitted').all()
+
+    @property
     def in_use(self):
         """ True, if the issued is used by any notice. """
 
