@@ -1,35 +1,7 @@
 Changelog
 ---------
-1.9.3 (2017-11-09)
+1.10.0 (2017-11-09)
 ~~~~~~~~~~~~~~~~~~~
-
-- Fixes initialization of fields.
-  [msom]
-
-- Uses latest onegov.quill release.
-  [msom]
-
-- Adds a notice modified message.
-  [msom]
-
-- Changes the order of the items in the admin menu.
-  [msom]
-
-- Always shows the first and last pagination element.
-  [msom]
-
-1.9.2 (2017-10-26)
-~~~~~~~~~~~~~~~~~~~
-
-- Uses the HSTORES for category and organization ID from the latest
-  onegov.notice.
-  [msom]
-
-1.9.1 (2017-10-26)
-~~~~~~~~~~~~~~~~~~~
-
-- Fixes redirects for various views.
-  [msom]
 
 - Allows to manage categories, organizations and issues.
   [msom]
