@@ -244,6 +244,7 @@ def edit_notice(self, request, form):
     if form.submitted(request):
         form.update_model(self)
         self.add_change(request, _("edited"))
+        request.message(_("Official notice modified."), 'success')
         return redirect(request.link(self))
 
     if not form.errors:

@@ -7,6 +7,9 @@ Changelog
 - Uses latest onegov.quill release.
   [msom]
 
+- Adds a notice modified message.
+  [msom]
+
 1.9.2 (2017-10-26)
 ~~~~~~~~~~~~~~~~~~~
 
