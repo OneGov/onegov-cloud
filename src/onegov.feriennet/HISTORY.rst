@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.4 (2017-11-09)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds french logo of Pro Juventute.
   [href]
