@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Enables <pre> and <span> tags in sanitized html.
+  [href]
+
 0.53.0 (2017-11-07)
 ~~~~~~~~~~~~~~~~~~~
 
