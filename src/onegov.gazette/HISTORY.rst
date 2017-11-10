@@ -7,6 +7,9 @@ Changelog
 - Fixes setting the initial external ID of an organization.
   [msom]
 
+- Fixes sorting of sub-organizations.
+  [msom]
+
 1.10.1 (2017-11-10)
 ~~~~~~~~~~~~~~~~~~~
 

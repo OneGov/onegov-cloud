@@ -83,7 +83,6 @@ class OrganizationMove(object):
 
     def execute(self):
         from onegov.gazette.collections import OrganizationCollection
-        organizations = OrganizationCollection(self.session)
 
         organizations = OrganizationCollection(self.session)
         subject = organizations.by_id(self.subject_id)

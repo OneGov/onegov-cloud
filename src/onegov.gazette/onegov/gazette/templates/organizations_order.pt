@@ -20,7 +20,7 @@
                         <li data-sortable-id="${root.id}">
                             ${root.title}
                             <ul tal:condition="root.children" data-sortable data-sortable-url="${layout.sortable_url_template}">
-                                <li tal:repeat="child root.children" data-sortable-id="${root.id}">${child.title}</li>
+                                <li tal:repeat="child root.children" data-sortable-id="${child.id}">${child.title}</li>
                             </ul>
                         </li>
                     </tal:block>
