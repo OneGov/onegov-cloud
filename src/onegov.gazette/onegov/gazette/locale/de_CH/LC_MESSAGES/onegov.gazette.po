@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-09 10:05+0100\n"
-"PO-Revision-Date: 2017-11-03 08:42+0100\n"
+"POT-Creation-Date: 2017-11-10 09:12+0100\n"
+"PO-Revision-Date: 2017-11-10 09:12+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -153,12 +153,6 @@ msgstr "Aktionen"
 msgid "No categories."
 msgstr "Keine Rubriken."
 
-msgid "Yes"
-msgstr "Ja"
-
-msgid "No"
-msgstr "Nein"
-
 msgid "Edit"
 msgstr "Bearbeiten"
 
@@ -253,6 +247,12 @@ msgstr "Sehr geehrte Damen und Herren,"
 msgid "Your official notice has been rejected:"
 msgstr ""
 "Ihr Inserat für den amtlichen Teil des Amtsblatts wurde zurückgewiesen:"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
 
 msgid "Dear Sir or Madam,"
 msgstr "Sehr geehrte Dame, sehr geehrter Herr"
@@ -538,6 +538,15 @@ msgstr "Angenommene Meldungen können nicht mehr bearbeitet werden."
 
 msgid "The official notice has past issue. Please re-select issues."
 msgstr "Bitte Ausgaben neu wählen."
+
+msgid ""
+"The official notice has an invalid category. Please re-select the category."
+msgstr "Bitte Rubrik neu wählen."
+
+msgid ""
+"The official notice has an invalid organization. Please re-select the "
+"organization."
+msgstr "Bitte Organisation neu wählen."
 
 msgid "edited"
 msgstr "bearbeitet"

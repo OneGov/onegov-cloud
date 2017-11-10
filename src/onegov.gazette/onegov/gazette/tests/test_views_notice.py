@@ -1,4 +1,6 @@
 from freezegun import freeze_time
+from onegov.gazette.models import Category
+from onegov.gazette.models import Organization
 from onegov.gazette.tests import login_admin
 from onegov.gazette.tests import login_editor_1
 from onegov.gazette.tests import login_editor_2
@@ -93,16 +95,28 @@ def edit_notice_unrestricted(user, slug, unable=False, forbidden=False,
         assert "Meldung geändert" in manage.maybe_follow()
 
 
-def publish_notice(user, slug, unable=False, forbidden=False):
-    url = '/notice/{}/publish'.format(slug)
-    if unable:
-        assert not user.get(url).forms
-    elif forbidden:
-        assert user.get(url, status=403)
-    else:
-        manage = user.get(url)
-        manage = manage.form.submit()
-        assert "Meldung veröffentlicht" in manage.maybe_follow()
+def change_category(gazette_app, name, **kwargs):
+    admin = Client(gazette_app)
+    login_admin(admin)
+
+    session = gazette_app.session()
+    category = session.query(Category.id).filter_by(name=name).one()[0]
+    manage = admin.get('/category/{}/edit'.format(category))
+    for key, value in kwargs.items():
+        manage.form[key] = value
+    manage.form.submit()
+
+
+def change_organization(gazette_app, name, **kwargs):
+    admin = Client(gazette_app)
+    login_admin(admin)
+
+    session = gazette_app.session()
+    org = session.query(Organization.id).filter_by(name=name).one()[0]
+    manage = admin.get('/organization/{}/edit'.format(org))
+    for key, value in kwargs.items():
+        manage.form[key] = value
+    manage.form.submit()
 
 
 def test_view_notice(gazette_app):
@@ -400,15 +414,30 @@ def test_view_notice_submit(gazette_app):
     submit_notice(editor_3, 'titel-1', forbidden=True)
     submit_notice(editor_3, 'titel-2', forbidden=True)
 
-    # check deadlines
+    # check deadlines (2 gets submitted)
     with freeze_time("2017-11-08 13:00"):
         submit_notice(editor_1, 'titel-2', redirected=True)
         submit_notice(publisher, 'titel-2', redirected=True)
     with freeze_time("2017-11-01 13:00"):
         submit_notice(editor_1, 'titel-2', redirected=True)
         submit_notice(publisher, 'titel-2')
+
+    # check invalid category (1 gets submitted)
     with freeze_time("2017-11-01 11:00"):
+        change_category(gazette_app, '11', active=False)
+        submit_notice(editor_1, 'titel-1', redirected=True)
+        submit_notice(publisher, 'titel-1', redirected=True)
+
+        change_category(gazette_app, '11', active=True)
         submit_notice(editor_1, 'titel-1')
+
+    # check invalid organization (3 gets submitted)
+    with freeze_time("2017-11-01 11:00"):
+        change_organization(gazette_app, '200', active=False)
+        submit_notice(editor_3, 'titel-3', redirected=True)
+        submit_notice(publisher, 'titel-3', redirected=True)
+
+        change_organization(gazette_app, '200', active=True)
         submit_notice(editor_3, 'titel-3')
 
 
@@ -486,6 +515,18 @@ def test_view_notice_accept(gazette_app):
     # check redirect for past issues
     with freeze_time("2017-11-04 11:00"):
         accept_notice(publisher, 'titel-1', redirected=True)
+
+    # check redirect for invalid category
+    with freeze_time("2017-11-04 11:00"):
+        change_category(gazette_app, '11', active=False)
+        accept_notice(publisher, 'titel-1', redirected=True)
+        change_category(gazette_app, '11', active=True)
+
+    # check redirect for invalid organization
+    with freeze_time("2017-11-01 11:00"):
+        change_organization(gazette_app, '410', active=False)
+        accept_notice(publisher, 'titel-1', redirected=True)
+        change_organization(gazette_app, '410', active=True)
 
     with freeze_time("2017-11-01 15:00"):
         # check if the notices can be accepted
@@ -830,6 +871,46 @@ def test_view_notice_edit_deadlines(gazette_app):
     with freeze_time("2017-11-10 13:00"):
         assert marker in editor_1.get('/notice/notice/edit')
         assert marker in publisher.get('/notice/notice/edit')
+
+
+def test_view_notice_edit_invalid_category(gazette_app):
+    editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
+
+    with freeze_time("2017-11-01 11:00"):
+        manage = editor_1.get('/notices/drafted/new-notice')
+        manage.form['title'] = "Notice"
+        manage.form['organization'] = '200'
+        manage.form['category'] = '11'
+        manage.form['issues'] = ['2017-44', '2017-45']
+        manage.form['text'] = "1. Oktober 2017"
+        manage.form.submit()
+
+        marker = "Bitte Rubrik neu wählen."
+
+        assert marker not in editor_1.get('/notice/notice/edit')
+
+        change_category(gazette_app, '11', active=False)
+        assert marker in editor_1.get('/notice/notice/edit')
+
+
+def test_view_notice_edit_invalid_organization(gazette_app):
+    editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
+
+    with freeze_time("2017-11-01 11:00"):
+        manage = editor_1.get('/notices/drafted/new-notice')
+        manage.form['title'] = "Notice"
+        manage.form['organization'] = '200'
+        manage.form['category'] = '11'
+        manage.form['issues'] = ['2017-44', '2017-45']
+        manage.form['text'] = "1. Oktober 2017"
+        manage.form.submit()
+
+        marker = "Bitte Organisation neu wählen."
+
+        assert marker not in editor_1.get('/notice/notice/edit')
+
+        change_organization(gazette_app, '200', active=False)
+        assert marker in editor_1.get('/notice/notice/edit')
 
 
 def test_view_notice_edit_unrestricted(gazette_app):

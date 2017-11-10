@@ -315,6 +315,20 @@ class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
 
         return False
 
+    @property
+    def invalid_category(self):
+        """ Returns True, if the category of the is invalid or inactive. """
+        query = object_session(self).query(Category.active)
+        query = query.filter(Category.name == self.category_id).first()
+        return (not query[0]) if query else True
+
+    @property
+    def invalid_organization(self):
+        """ Returns True, if the category of the is invalid or inactive. """
+        query = object_session(self).query(Organization.active)
+        query = query.filter(Organization.name == self.organization_id).first()
+        return (not query[0]) if query else True
+
     def apply_meta(self, session):
         """ Updates the category, organization and issue date from the meta
         values.

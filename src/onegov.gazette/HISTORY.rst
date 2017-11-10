@@ -7,6 +7,13 @@ Changelog
 - Fixes setting the initial ID of a category or organization.
   [msom]
 
+- Checks the category and organization before submitting and accepting notices.
+  [msom]
+
+- Displays a warning when editing a notice with an invalid category or
+  organization.
+  [msom]
+
 1.10.0 (2017-11-09)
 ~~~~~~~~~~~~~~~~~~~
 

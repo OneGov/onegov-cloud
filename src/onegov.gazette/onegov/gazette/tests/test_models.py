@@ -711,3 +711,35 @@ def test_gazette_notice_expired_issues(session, issues):
         assert notice.expired_issues
     with freeze_time("2018-01-01 12:00"):
         assert notice.expired_issues
+
+
+def test_gazette_notice_invalid_category(session, categories):
+    session.add(GazetteNotice(title='notice'))
+    session.flush()
+    notice = session.query(GazetteNotice).one()
+    assert notice.invalid_category
+
+    notice.category_id = '0'
+    assert notice.invalid_category
+
+    notice.category_id = '10'
+    assert notice.invalid_category
+
+    notice.category_id = '13'
+    assert not notice.invalid_category
+
+
+def test_gazette_notice_invalid_organization(session, organizations):
+    session.add(GazetteNotice(title='notice'))
+    session.flush()
+    notice = session.query(GazetteNotice).one()
+    assert notice.invalid_organization
+
+    notice.organization_id = '0'
+    assert notice.invalid_organization
+
+    notice.organization_id = '420'
+    assert notice.invalid_organization
+
+    notice.organization_id = '410'
+    assert not notice.invalid_organization

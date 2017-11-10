@@ -240,6 +240,22 @@ def edit_notice(self, request, form):
             ),
             'warning'
         )
+    if self.invalid_category:
+        request.message(
+            _(
+                "The official notice has an invalid category. "
+                "Please re-select the category."
+            ),
+            'warning'
+        )
+    if self.invalid_organization:
+        request.message(
+            _(
+                "The official notice has an invalid organization. "
+                "Please re-select the organization."
+            ),
+            'warning'
+        )
 
     if form.submitted(request):
         form.update_model(self)
@@ -398,8 +414,8 @@ def submit_notice(self, request, form):
     Only drafted notices may be submitted. Editors may only submit their own
     notices (publishers may submit any notice).
 
-    If a notice has invalid/past issues, the user is redirected to the edit
-    view to select new issues.
+    If a notice has invalid/past issues or an invalid/inactive
+    category/organization, the user is redirected to the edit view.
 
     """
 
@@ -422,7 +438,12 @@ def submit_notice(self, request, form):
             'show_form': False
         }
 
-    if self.expired_issues or (self.overdue_issues and not is_private):
+    if (
+        self.expired_issues or
+        (self.overdue_issues and not is_private) or
+        self.invalid_category or
+        self.invalid_organization
+    ):
         return redirect(request.link(self, name='edit'))
 
     if form.submitted(request):
@@ -471,7 +492,11 @@ def accept_notice(self, request, form):
             'show_form': False
         }
 
-    if self.expired_issues:
+    if (
+        self.expired_issues or
+        self.invalid_category or
+        self.invalid_organization
+    ):
         return redirect(request.link(self, name='edit'))
 
     if form.submitted(request):
