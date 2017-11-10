@@ -121,9 +121,9 @@ def test_organization_form(session):
 
     # Test on request
     organizations = OrganizationCollection(session)
-    parent = organizations.add_root(title='parent', active=True)
+    parent = organizations.add_root(title='parent', active=True, order=1)
     child = organizations.add(parent=parent, title='child', active=True)
-    other = organizations.add_root(title='other', active=True)
+    other = organizations.add_root(title='other', active=True, order=2)
     other.external_name = 'xxx'
 
     form = OrganizationForm()

@@ -51,6 +51,7 @@ class OrganizationForm(Form):
             Organization.title
         )
         query = query.filter(Organization.parent_id.is_(None))
+        query = query.order_by(Organization.order)
         self.parent.choices = query.all()
         self.parent.choices.insert(
             0, ('', self.request.translate(_("- none -")))
