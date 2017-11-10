@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.10.1 (2017-11-10)
+~~~~~~~~~~~~~~~~~~~
 
 - Uses a chosen select for parent organizations.
   [msom]
