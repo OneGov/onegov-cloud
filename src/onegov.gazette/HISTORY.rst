@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.10.2 (2017-11-10)
+~~~~~~~~~~~~~~~~~~~
 
 - Order parents in organization form by their order.
   [msom]
