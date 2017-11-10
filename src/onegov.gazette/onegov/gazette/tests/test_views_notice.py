@@ -545,23 +545,25 @@ def test_view_notice_accept(gazette_app):
         assert message['From'] == 'mails@govikon.ch'
         assert message['To'] == 'printer@onegov.org'
         assert message['Reply-To'] == 'mails@govikon.ch'
-        assert '44 400 Titel 2' in message['Subject']
+        assert '44  Titel 2' in message['Subject']
         payload = message.get_payload(1).get_payload(decode=True)
         payload = payload.decode('utf-8')
-        assert '44 400 Titel 2' in payload
+        assert '44  Titel 2' in payload
 
         message = gazette_app.smtp.outbox.pop()
         assert message['From'] == 'mails@govikon.ch'
         assert message['To'] == 'printer@onegov.org'
         assert message['Reply-To'] == 'mails@govikon.ch'
-        assert '44 400 Titel 1' in message['Subject']
+        assert '44  Titel 1' in message['Subject']
         payload = message.get_payload(1).get_payload(decode=True)
         payload = payload.decode('utf-8')
-        assert '44 400 Titel 1' in payload
+        assert '44  Titel 1' in payload
 
         principal = gazette_app.principal
         principal.publish_from = 'publisher@govikon.ch'
         gazette_app.cache.set('principal', principal)
+
+        change_organization(gazette_app, '400', external_name='xxx')
 
         accept_notice(publisher, 'titel-3')
 
@@ -569,10 +571,10 @@ def test_view_notice_accept(gazette_app):
         assert message['From'] == 'mails@govikon.ch'
         assert message['To'] == 'printer@onegov.org'
         assert message['Reply-To'] == 'publisher@govikon.ch'
-        assert '44 400 Titel 3' in message['Subject']
+        assert '44 xxx Titel 3' in message['Subject']
         payload = message.get_payload(1).get_payload(decode=True)
         payload = payload.decode('utf-8')
-        assert '44 400 Titel 3' in payload
+        assert '44 xxx Titel 3' in payload
 
 
 def test_view_notice_publish(gazette_app):

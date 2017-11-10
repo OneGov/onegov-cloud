@@ -1,4 +1,5 @@
 from onegov.core.orm.abstract import AdjacencyList
+from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from sqlalchemy import Boolean
 from sqlalchemy import Column
@@ -7,7 +8,7 @@ from sqlalchemy_utils import observes
 from sqlalchemy.orm import object_session
 
 
-class Category(AdjacencyList, TimestampMixin):
+class Category(AdjacencyList, ContentMixin, TimestampMixin):
 
     """ Defines a category for official notices.
 

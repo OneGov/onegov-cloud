@@ -14,6 +14,9 @@ Changelog
   organization.
   [msom]
 
+- Uses an external organization name for accepted mails instead of the name.
+  [msom]
+
 1.10.0 (2017-11-09)
 ~~~~~~~~~~~~~~~~~~~
 

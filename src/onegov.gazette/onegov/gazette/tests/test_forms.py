@@ -124,6 +124,7 @@ def test_organization_form(session):
     parent = organizations.add_root(title='parent', active=True)
     child = organizations.add(parent=parent, title='child', active=True)
     other = organizations.add_root(title='other', active=True)
+    other.external_name = 'xxx'
 
     form = OrganizationForm()
     form.request = request
@@ -141,22 +142,26 @@ def test_organization_form(session):
     assert form.active.data == True
     assert form.parent.data == ''
     assert form.name.data == '1'
+    assert form.external_name.data == None
 
     form.apply_model(child)
     assert form.title.data == 'child'
     assert form.active.data == True
     assert form.parent.data == '1'
     assert form.name.data == '2'
+    assert form.external_name.data == None
 
     form.apply_model(other)
     assert form.title.data == 'other'
     assert form.active.data == True
     assert form.parent.data == ''
     assert form.name.data == '3'
+    assert form.external_name.data == 'xxx'
 
     form.title.data = 'DEF'
     form.active.data = False
     form.parent.data = '1'
+    form.external_name.data = 'yyy'
     form.update_model(other)
     session.flush()
     session.expire(other)
@@ -165,6 +170,7 @@ def test_organization_form(session):
     assert other.parent == parent
     assert other.siblings.filter_by(id='3')
     assert other.name == '3'
+    assert form.external_name.data == 'yyy'
 
     form.name.data = '4'
     form.update_model(other)

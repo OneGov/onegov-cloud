@@ -1,5 +1,7 @@
 from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.abstract import MoveDirection
+from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
 from sqlalchemy import Boolean
 from sqlalchemy import Column
@@ -8,7 +10,7 @@ from sqlalchemy_utils import observes
 from sqlalchemy.orm import object_session
 
 
-class Organization(AdjacencyList, TimestampMixin):
+class Organization(AdjacencyList, ContentMixin, TimestampMixin):
 
     """ Defines an organization for official notices.
 
@@ -22,6 +24,8 @@ class Organization(AdjacencyList, TimestampMixin):
 
     #: True, if this organization is still in use.
     active = Column(Boolean, nullable=True)
+
+    external_name = meta_property('external_name')
 
     def notices(self):
         """ Returns a query to get all notices related to this category. """

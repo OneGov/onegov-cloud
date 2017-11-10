@@ -62,6 +62,7 @@ def test_organization(session):
     assert parent.name == '100'
     assert parent.title == 'State Chancellery'
     assert parent.active == True
+    assert parent.external_name == None
 
     # Test in use
     session.add(

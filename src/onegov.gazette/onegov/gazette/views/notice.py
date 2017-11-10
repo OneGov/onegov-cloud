@@ -24,7 +24,7 @@ def construct_subject(notice):
 
     organization = notice.organization_object
     parent = organization.parent if organization else None
-    parent_id = parent.name if parent else ''
+    parent_id = (parent.external_name or '') if parent else ''
 
     return "{} {} {} {}".format(number, parent_id, notice.title, notice.id)
 

@@ -2,12 +2,14 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
 from onegov.gazette.collections.categories import CategoryCollection
-from onegov.gazette.collections.organizations import OrganizationCollection
 from onegov.gazette.collections.issues import IssueCollection
+from onegov.gazette.collections.organizations import OrganizationCollection
 from onegov.gazette.models.notice import GazetteNotice
 from sedate import standardize_date
+from sqlalchemy.schema import Column
 
 
 @upgrade_task(
@@ -115,3 +117,28 @@ def migrate_issues(context):
                 date=dates.issue_date,
                 deadline=standardize_date(dates.deadline, 'UTC')
             )
+
+
+@upgrade_task('Add content and meta data')
+def add_content_and_meta_data_columns(context):
+    if not context.has_column('gazette_categories', 'meta'):
+        context.operations.add_column(
+            'gazette_categories',
+            Column('meta', JSON)
+        )
+    if not context.has_column('gazette_categories', 'content'):
+        context.operations.add_column(
+            'gazette_categories',
+            Column('content', JSON)
+        )
+
+    if not context.has_column('gazette_organizations', 'meta'):
+        context.operations.add_column(
+            'gazette_organizations',
+            Column('meta', JSON)
+        )
+    if not context.has_column('gazette_organizations', 'content'):
+        context.operations.add_column(
+            'gazette_organizations',
+            Column('content', JSON)
+        )
