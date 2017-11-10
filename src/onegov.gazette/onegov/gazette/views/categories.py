@@ -47,7 +47,8 @@ def create_category(self, request, form):
     if form.submitted(request):
         self.add_root(
             title=form.title.data,
-            active=form.active.data
+            active=form.active.data,
+            name=form.name.data
         )
         request.message(_("Category added."), 'success')
         return redirect(layout.manage_categories_link)

@@ -4,6 +4,9 @@ Changelog
 - Uses a chosen select for parent organizations.
   [msom]
 
+- Fixes setting the initial ID of a category or organization.
+  [msom]
+
 1.10.0 (2017-11-09)
 ~~~~~~~~~~~~~~~~~~~
 

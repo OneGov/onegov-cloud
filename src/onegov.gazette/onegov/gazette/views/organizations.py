@@ -82,6 +82,7 @@ def create_organization(self, request, form):
         organization = self.add_root(
             title=form.title.data,
             active=form.active.data,
+            name=form.name.data
         )
         organization.parent_id = form.parent.data or None
         request.message(_("Organization added."), 'success')
