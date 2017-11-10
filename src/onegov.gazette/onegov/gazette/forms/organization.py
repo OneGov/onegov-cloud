@@ -1,5 +1,6 @@
 from onegov.form import Form
 from onegov.gazette import _
+from onegov.gazette.fields import SelectField
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import Organization
 from onegov.gazette.validators import UniqueColumnValue
@@ -7,7 +8,6 @@ from onegov.gazette.validators import UnusedColumnKeyValue
 from sqlalchemy import cast
 from sqlalchemy import String
 from wtforms import BooleanField
-from wtforms import SelectField
 from wtforms import StringField
 from wtforms.validators import InputRequired
 
