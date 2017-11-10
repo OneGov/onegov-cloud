@@ -4,6 +4,9 @@ Changelog
 - Order parents in organization form by their order.
   [msom]
 
+- Fixes setting the initial external ID of an organization.
+  [msom]
+
 1.10.1 (2017-11-10)
 ~~~~~~~~~~~~~~~~~~~
 
