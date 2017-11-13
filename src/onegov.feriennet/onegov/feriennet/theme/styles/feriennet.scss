@@ -40,6 +40,13 @@ a > h6 {
 }
 
 /*
+    enable bank account settings for feriennet
+*/
+#settings #fieldset-payment {
+    display: block;
+}
+
+/*
     background color of default logo
 */
 svg {
