@@ -487,7 +487,7 @@ msgid "There are submitted notices for this issue!"
 msgstr "Diese Ausgabe hat eingereichte Meldungen!"
 
 msgid "All notices published."
-msgstr "Alle "
+msgstr "Alle Meldungen veröffentlicht."
 
 msgid "PDF generated."
 msgstr "PDF erstellt."
