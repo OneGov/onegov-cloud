@@ -1,7 +1,6 @@
 from babel.dates import format_date
 from babel.dates import format_time
 from base64 import b64decode
-from base64 import b64encode
 from copy import deepcopy
 from datetime import date
 from io import BytesIO
@@ -16,7 +15,6 @@ from onegov.election_day import _
 from onegov.election_day import log
 from onegov.election_day.utils import pdf_filename
 from onegov.election_day.utils import svg_filename
-from onegov.election_day.utils.pdf import Pdf
 from onegov.election_day.views.election import get_candidates_results
 from onegov.election_day.views.election import get_connection_results
 from onegov.election_day.views.election.candidates import \
@@ -30,11 +28,12 @@ from onegov.election_day.views.election.parties import get_party_deltas
 from onegov.election_day.views.election.parties import get_party_results
 from onegov.election_day.views.election.parties import \
     view_election_parties_data
+from onegov.pdf import LexworkSigner
+from onegov.pdf import Pdf
 from os.path import basename
 from pdfdocument.document import MarkupParagraph
 from pytz import timezone
 from reportlab.lib.units import cm
-from requests import get
 from requests import post
 from rjsmin import jsmin
 from shutil import copyfileobj
@@ -151,55 +150,25 @@ class MediaGenerator():
 
         return self.get_chart('map', fmt, data, width, params)
 
-    def signing_reasons(self):
-        if not self.pdf_signing:
-            return []
-
-        response = get(
-            '{}/{}'.format(
-                self.pdf_signing['host'].rstrip('/'),
-                'admin_interface/pdf_signature_reasons.json'
-            ),
-            headers={
-                'X-LEXWORK-LOGIN': self.pdf_signing['login'],
-                'X-LEXWORK-PASSWORD': self.pdf_signing['password']
-            }
-        )
-        response.raise_for_status()
-        return response.json().get('result')
-
     def sign_pdf(self, path):
         if self.pdf_signing:
-            filename = basename(path)
-            with self.app.filestorage.open(path, 'rb') as f:
-                data = b64encode(f.read()).decode('utf-8')
-
-            try:
-                response = post(
-                    '{}/{}'.format(
-                        self.pdf_signing['host'].rstrip('/'),
-                        'admin_interface/pdf_signature_jobs.json'
-                    ),
-                    headers={
-                        'X-LEXWORK-LOGIN': self.pdf_signing['login'],
-                        'X-LEXWORK-PASSWORD': self.pdf_signing['password']
-                    },
-                    json={
-                        'pdf_signature_job': {
-                            'file_name': filename,
-                            'data': data,
-                            'reason_for_signature': self.pdf_signing['reason']
-                        }
-                    }
-                )
-                data = response.json()['result']['signed_data']
-            except Exception as e:
-                log.error("Could not sign PDF {}: {}".format(filename, e))
-                return
+            signer = LexworkSigner(
+                self.pdf_signing['host'],
+                self.pdf_signing['login'],
+                self.pdf_signing['password']
+            )
+            with self.app.filestorage.open(path, 'rb') as file:
+                filename = basename(path)
+                reason = self.pdf_signing['reason']
+                try:
+                    data = signer.sign(file, filename, reason)
+                except Exception as e:
+                    log.error("Could not sign PDF {}: {}".format(filename, e))
+                    return
 
             self.app.filestorage.remove(path)
             with self.app.filestorage.open(path, 'wb') as f:
-                f.write(b64decode(data))
+                f.write(data)
 
     def generate_pdf(self, item, path, locale):
         """ Generates the PDF for an election or a vote. """

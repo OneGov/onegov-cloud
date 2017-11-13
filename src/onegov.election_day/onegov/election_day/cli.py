@@ -165,24 +165,6 @@ def generate_media(sentry):
     return generate
 
 
-@cli.command('list-pdf-signing-reasons')
-def list_pdf_signing_reasons():
-    """ Lists the reasons usable for PDF signing. Example:
-
-        onegov-election-day --select '/onegov_election_day/zg'
-            list-pdf-signing-reasons
-
-    """
-
-    def list_reasons(request, app):
-        if not app.principal:
-            return
-
-        click.echo(MediaGenerator(app).signing_reasons())
-
-    return list_reasons
-
-
 @cli.command('list-upload-tokens')
 def list_upload_tokens():
     """ Lists all tokens usable for uploading using the REST interface.
