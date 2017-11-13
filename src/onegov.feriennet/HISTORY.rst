@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.5 (2017-11-13)
+~~~~~~~~~~~~~~~~~~~
 
 - Shows accidentally hidden payment fields in settings.
   [href]
