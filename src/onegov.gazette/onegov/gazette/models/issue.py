@@ -48,7 +48,7 @@ class Issue(Base, TimestampMixin):
     # The deadline of this issue.
     deadline = Column(UTCDateTime, nullable=True)
 
-    def notices(self):
+    def notices(self, state=None):
         """ Returns a query to get all notices related to this issue. """
 
         from onegov.gazette.models.notice import GazetteNotice  # circular
@@ -57,20 +57,10 @@ class Issue(Base, TimestampMixin):
         notices = notices.filter(
             GazetteNotice._issues.has_key(self.name)  # noqa
         )
+        if state:
+            notices = notices.filter(GazetteNotice.state == state)
 
         return notices
-
-    @property
-    def accepted_notices(self):
-        from onegov.gazette.models.notice import GazetteNotice  # circular
-
-        return self.notices().filter(GazetteNotice.state == 'accepted').all()
-
-    @property
-    def submitted_notices(self):
-        from onegov.gazette.models.notice import GazetteNotice  # circular
-
-        return self.notices().filter(GazetteNotice.state == 'submitted').all()
 
     @property
     def in_use(self):
@@ -110,13 +100,12 @@ class Issue(Base, TimestampMixin):
 
         """
 
-        issues = object_session(self).query(Issue.name, Issue.date)
-        issues = dict(issues.order_by(Issue.date))
-        issues[self.name] = date_
-        issues = {
-            key: standardize_date(as_datetime(value), 'UTC')
-            for key, value in issues.items()
-        }
+        for notice in self.notices('accepted'):
+            notice.publish(request)
+
+    def generate_pdf(self):
+        """ Generates the PDF. """
+        raise NotImplementedError()
 
         for notice in self.notices():
             dates = [issues.get(issue, None) for issue in notice._issues]
