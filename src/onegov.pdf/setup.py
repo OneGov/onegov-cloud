@@ -32,16 +32,16 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'onegov.core>=0.4.0'
+        'onegov.core>=0.4.0',
+        'pdfdocument',
+        'pdfrw',
+        'reportlab'
     ],
     extras_require=dict(
         test=[
             'coverage',
             'onegov_testing',
-            'pytest',
-            'pdfdocument',
-            'pdfrw',
-            'reportlab',
+            'pytest'
         ],
     ),
     entry_points={
