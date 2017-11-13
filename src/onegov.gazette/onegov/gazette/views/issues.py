@@ -8,6 +8,7 @@ from onegov.gazette.forms import EmptyForm
 from onegov.gazette.forms import IssueForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import Issue
+from onegov.gazette.pdf import Pdf
 
 
 @GazetteApp.html(
@@ -168,7 +169,7 @@ def publish_issue(self, request, form):
 
     """
 
-    if self.submitted_notices:
+    if self.notices('submitted').first():
         request.message(
             _("There are submitted notices for this issue!"), 'warning'
         )
@@ -193,7 +194,7 @@ def publish_issue(self, request, form):
             ),
             mapping={
                 'item': self.name,
-                'number': len(self.accepted_notices)
+                'number': len(self.notices('accepted').all())
             }
         ),
     }
@@ -217,7 +218,20 @@ def generate_issue(self, request, form):
 
     layout = Layout(self, request)
     if form.submitted(request):
-        self.generate_pdf()
+        # output = self.generate_pdf()
+
+        # todo: don't return the PDF
+        from morepath.request import Response
+        output = Pdf.from_issue(self)
+        output.seek(0)
+        response = Response()
+        response.content_type = 'application/pdf'
+        response.content_disposition = 'inline; filename={}.pdf'.format(
+            self.name
+        )
+        response.body = output.read()
+        return response
+
         request.message(_("PDF generated."), 'success')
         return redirect(request.link(self, name='sign'))
 
