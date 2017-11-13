@@ -1,11 +1,11 @@
-Onegov Pdf
+Onegov PDF
 ==========
 
 PDF for OneGov.
 
 Run the Tests
 -------------
-    
+
 Install tox and run it::
 
     pip install tox
@@ -18,11 +18,11 @@ Limit the tests to a specific python version::
 Conventions
 -----------
 
-Onegov Pdf follows PEP8 as close as possible. To test for it run::
+Onegov PDF follows PEP8 as close as possible. To test for it run::
 
     tox -e pep8
 
-Onegov Pdf uses `Semantic Versioning <http://semver.org/>`_
+Onegov PDF uses `Semantic Versioning <http://semver.org/>`_
 
 Build Status
 ------------
