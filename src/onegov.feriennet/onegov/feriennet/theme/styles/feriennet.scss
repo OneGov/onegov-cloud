@@ -40,13 +40,6 @@ a > h6 {
 }
 
 /*
-    enable bank account settings for feriennet
-*/
-#settings #fieldset-payment {
-    display: block;
-}
-
-/*
     background color of default logo
 */
 svg {
@@ -120,7 +113,7 @@ ul.single-line {
     for onegov.feriennet and should probably replaced by something feriennet
     specific.
 */
-#einstellungen #fieldset-payment {
+#settings #fieldset-payment {
     display: block;
 }
 
