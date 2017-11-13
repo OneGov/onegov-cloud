@@ -1,39 +1,14 @@
 from copy import deepcopy
+from onegov.pdf.flowables import InlinePDF
 from pdfdocument.document import MarkupParagraph, PDFDocument
-from pdfrw import PdfReader
-from pdfrw.buildxobj import pagexobj
-from pdfrw.toreportlab import makerl
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
-from reportlab.platypus import Flowable
-from reportlab.platypus import Paragraph
-from reportlab.platypus import Table
-from reportlab.platypus import PageTemplate
+from reportlab.lib.units import cm
 from reportlab.platypus import Frame
 from reportlab.platypus import NextPageTemplate
-from reportlab.lib.units import cm
-
-
-class InlinePDF(Flowable):
-    """ A flowable containing a PDF. """
-
-    def __init__(self, pdf_file, width):
-        Flowable.__init__(self)
-        pdf_file.seek(0)
-        page = PdfReader(pdf_file, decompress=False).pages[0]
-        self.page = pagexobj(page)
-        self.scale = width / self.page.BBox[2]
-        self.width = width
-        self.height = self.page.BBox[3] * self.scale
-        self.hAlign = 'CENTER'
-
-    def wrap(self, *args):
-        return (self.width, self.height)
-
-    def draw(self):
-        rl_obj = makerl(self.canv, self.page)
-        self.canv.scale(self.scale, self.scale)
-        self.canv.doForm(rl_obj)
+from reportlab.platypus import PageTemplate
+from reportlab.platypus import Paragraph
+from reportlab.platypus import Table
 
 
 def empty_page_fn(cavnas, doc):
