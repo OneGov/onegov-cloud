@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Specifically excludes the broken elasticsearch 5.5.1 release.
+  [href]
+
 1.2.1 (2017-10-10)
 ~~~~~~~~~~~~~~~~~~~
 
