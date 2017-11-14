@@ -513,6 +513,15 @@ def command_group():
             def get_cronjobs_enabled():
                 return False
 
+            @CliApplication.setting_section(section='roles')
+            def get_roles_setting():
+                # override the security settings -> we need the public
+                # role to work for anonymous users, even if the base
+                # application disables that
+                return {
+                    'anonymous': {Public},
+                }
+
             scan_morepath_modules(CliApplication)
             CliApplication.commit()
 
