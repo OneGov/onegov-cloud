@@ -28,7 +28,7 @@ def authenticated_source(request):
         query = request.app.session().query(DataSource)
         query = query.filter(DataSource.token == token)
         return query.one()
-    except:
+    except Exception:
         raise HTTPForbidden()
 
 

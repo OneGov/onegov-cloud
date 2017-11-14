@@ -54,7 +54,7 @@ def parse_election_result(line, errors, entities):
                 votes = int(getattr(line, 'stimmen_{}'.format(count)) or 0)
             except AttributeError:
                 break
-            except:
+            except Exception:
                 raise
             else:
                 if name == 'Leere Zeilen':

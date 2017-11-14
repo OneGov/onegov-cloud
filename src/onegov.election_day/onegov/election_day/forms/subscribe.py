@@ -25,5 +25,5 @@ class SubscribeForm(Form):
                 phonenumbers.parse(self.phone_number.data, 'CH'),
                 phonenumbers.PhoneNumberFormat.E164
             )
-        except:
+        except Exception:
             return None

@@ -19,7 +19,7 @@ class ValidPhoneNumber(object):
         if field.data:
             try:
                 number = phonenumbers.parse(field.data, 'CH')
-            except:
+            except Exception:
                 raise ValidationError(self.message)
 
             valid = (

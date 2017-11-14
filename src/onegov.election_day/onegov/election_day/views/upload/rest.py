@@ -26,7 +26,7 @@ def authenticate(request):
         ).decode('utf-8').split(':')[1]
 
         request.app.session().query(UploadToken).filter_by(token=token).one()
-    except:
+    except Exception:
         raise HTTPUnauthorized()
 
 

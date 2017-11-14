@@ -257,7 +257,7 @@ class SmsQueueProcessor(object):
             log.info("SMS to {} sent.".format(number))
 
         # Catch errors and log them here
-        except:
+        except Exception:
             if self.sentry_client:
                 self.sentry_client.captureException()
             else:
