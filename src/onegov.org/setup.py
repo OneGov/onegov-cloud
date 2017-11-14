@@ -34,7 +34,6 @@ setup(
     install_requires=[
         'babel',
         'click',
-        'elasticsearch',
         'isodate',
         'lxml',
         'onegov.chat',
