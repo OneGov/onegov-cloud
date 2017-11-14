@@ -16,7 +16,6 @@ if (!Modernizr.inputtypes['datetime-local']) {
         dayOfWeekStart: 1, // Monday
         format: 'Y-m-d H:i',   // HTML5
         // The correct format would be 'Y-m-d\\TH:i', but the code is too buggy
-        defaultTime: '12:00',
         lazyInit: true,
         timepicker: true
     });
