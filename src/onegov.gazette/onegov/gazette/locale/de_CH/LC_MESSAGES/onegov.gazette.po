@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-10 10:28+0100\n"
+"POT-Creation-Date: 2017-11-14 15:23+0100\n"
 "PO-Revision-Date: 2017-11-10 10:28+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -62,6 +62,9 @@ msgstr "Offene Meldungen"
 
 msgid "My Published Official Notices"
 msgstr "Veröffentlichte Meldungen"
+
+msgid "Gazette"
+msgstr "Amtsblatt"
 
 msgid "This value already exists."
 msgstr "Dieser Wert ist bereits vorhanden."
@@ -193,17 +196,23 @@ msgstr "Kommende Ausgaben"
 msgid "Issue"
 msgstr "Ausgabe"
 
+msgid "PDF"
+msgstr "PDF"
+
 msgid "No upcoming issues."
 msgstr "Keine kommenden Ausgaben."
+
+msgid "Publish"
+msgstr "Veröffentlichen"
+
+msgid "Generate"
+msgstr "Erzeugen"
 
 msgid "Past Issues"
 msgstr "Vergangene Ausgaben"
 
 msgid "No past issues."
 msgstr "Keine vergangenen Ausgaben."
-
-msgid "Gazette"
-msgstr "Amtsblatt"
 
 msgid "homepage"
 msgstr "Startseite"
@@ -468,9 +477,6 @@ msgstr ""
 msgid "Generate PDF"
 msgstr "PDF erstellen"
 
-msgid "Sign PDF"
-msgstr "PDF signieren"
-
 msgid "Issue added."
 msgstr "Ausgabe hinzugefügt."
 
@@ -491,9 +497,6 @@ msgstr "Alle Meldungen veröffentlicht."
 
 msgid "PDF generated."
 msgstr "PDF erstellt."
-
-msgid "PDF signed."
-msgstr "PDF signiert."
 
 msgid "Edit Official Notice"
 msgstr "Meldung bearbeiten"

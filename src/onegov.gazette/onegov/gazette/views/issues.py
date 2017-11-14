@@ -220,7 +220,7 @@ def generate_issue(self, request, form):
     if form.submitted(request):
         self.pdf = Pdf.from_issue(self, request)
         request.message(_("PDF generated."), 'success')
-        return redirect(request.link(self, name='sign'))
+        return redirect(layout.manage_issues_link)
 
     return {
         'layout': layout,
@@ -228,35 +228,5 @@ def generate_issue(self, request, form):
         'title': self.name,
         'subtitle': _("Generate PDF"),
         'button_text': _("Generate"),
-        'cancel': layout.manage_issues_link,
-    }
-
-
-@GazetteApp.form(
-    model=Issue,
-    name='sign',
-    template='form.pt',
-    permission=Private,
-    form=EmptyForm
-)
-def sign_issue(self, request, form):
-    """ Signs the PDF of the issue.
-
-    This view is only visible by a publisher.
-
-    """
-
-    layout = Layout(self, request)
-    if form.submitted(request):
-        self.sign_pdf()
-        request.message(_("PDF signed."), 'success')
-        return redirect(layout.manage_issues_link)
-
-    return {
-        'layout': layout,
-        'form': form,
-        'title': self.name,
-        'subtitle': _("Sign PDF"),
-        'button_text': _("Sign"),
         'cancel': layout.manage_issues_link,
     }

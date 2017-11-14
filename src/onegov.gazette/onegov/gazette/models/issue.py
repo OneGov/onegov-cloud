@@ -125,12 +125,3 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
 
         for notice in self.notices('accepted'):
             notice.publish(request)
-
-    def generate_pdf(self):
-        """ Generates the PDF. """
-        raise NotImplementedError()
-
-        for notice in self.notices():
-            dates = [issues.get(issue, None) for issue in notice._issues]
-            dates = [date for date in dates if date]
-            notice.first_issue = min(dates)
