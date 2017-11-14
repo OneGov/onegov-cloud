@@ -218,20 +218,7 @@ def generate_issue(self, request, form):
 
     layout = Layout(self, request)
     if form.submitted(request):
-        # output = self.generate_pdf()
-
-        # todo: don't return the PDF
-        from morepath.request import Response
-        output = Pdf.from_issue(self, request)
-        output.seek(0)
-        response = Response()
-        response.content_type = 'application/pdf'
-        response.content_disposition = 'inline; filename={}.pdf'.format(
-            self.name
-        )
-        response.body = output.read()
-        return response
-
+        self.pdf = Pdf.from_issue(self, request)
         request.message(_("PDF generated."), 'success')
         return redirect(request.link(self, name='sign'))
 

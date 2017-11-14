@@ -27,6 +27,7 @@
                             <th i18n:translate>Issue</th>
                             <th i18n:translate>Date</th>
                             <th i18n:translate>Deadline</th>
+                            <th i18n:translate>PDF</th>
                             <th i18n:translate class="row-actions right-aligned">Actions</th>
                         </tr>
                     </thead>
@@ -39,6 +40,9 @@
                                 <td>${issue.name}</td>
                                 <td>${layout.format_date(issue.date, 'date')}</td>
                                 <td>${layout.format_date(issue.deadline, 'datetime_with_weekday')}</td>
+                                <td>
+                                    <a tal:condition="issue.pdf" href="${request.link(issue.pdf)}">${issue.pdf.name}</a>
+                                </td>
                                 <td class="right-aligned">
                                     <ul class="actions" data-title="Actions" i18n:attributes="data-title">
                                         <li>
@@ -104,6 +108,7 @@
                             <th i18n:translate>Issue</th>
                             <th i18n:translate>Date</th>
                             <th i18n:translate>Deadline</th>
+                            <th i18n:translate>PDF</th>
                             <th i18n:translate class="row-actions right-aligned">Actions</th>
                         </tr>
                     </thead>
@@ -116,6 +121,9 @@
                                 <td>${issue.name}</td>
                                 <td>${layout.format_date(issue.date, 'date')}</td>
                                 <td>${layout.format_date(issue.deadline, 'datetime_with_weekday')}</td>
+                                <td>
+                                    <a tal:condition="issue.pdf" href="${request.link(issue.pdf)}">${issue.pdf.name}</a>
+                                </td>
                                 <td class="right-aligned">
                                     <ul class="actions" data-title="Actions" i18n:attributes="data-title">
                                         <li>

@@ -1,7 +1,11 @@
 from collections import namedtuple
+from onegov.core.crypto import random_token
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UTCDateTime
+from onegov.file import AssociatedFiles
+from onegov.file import File
+from onegov.file.utils import as_fileintent
 from sedate import as_datetime
 from sedate import standardize_date
 from sqlalchemy import Column
@@ -28,7 +32,11 @@ class IssueName(namedtuple('IssueName', ['year', 'number'])):
         return cls(*[int(part) for part in value.split('-')])
 
 
-class Issue(Base, TimestampMixin):
+class IssuePdfFile(File):
+    __mapper_args__ = {'polymorphic_identity': 'gazette_issue'}
+
+
+class Issue(Base, TimestampMixin, AssociatedFiles):
     """ Defines an issue. """
 
     __tablename__ = 'gazette_issues'
@@ -47,6 +55,21 @@ class Issue(Base, TimestampMixin):
 
     # The deadline of this issue.
     deadline = Column(UTCDateTime, nullable=True)
+
+    @property
+    def pdf(self):
+        return self.files[0] if self.files else None
+
+    @pdf.setter
+    def pdf(self, value):
+        self.files.clear()
+        self.files.append(
+            IssuePdfFile(
+                id=random_token(),
+                name=self.name,
+                reference=as_fileintent(value, self.name)
+            )
+        )
 
     def notices(self, state=None):
         """ Returns a query to get all notices related to this issue. """

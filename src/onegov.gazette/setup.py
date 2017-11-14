@@ -37,6 +37,7 @@ setup(
         'cssmin',
         'onegov.chat',
         'onegov.core',
+        'onegov.file',
         'onegov.form',
         'onegov.foundation',
         'onegov.notice>=0.3.0',
