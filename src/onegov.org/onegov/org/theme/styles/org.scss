@@ -1655,7 +1655,7 @@ div#redactor-droparea {
 
         background: $white-smoke;
         display: inline-block;
-        font-size: 0.9rem;
+        font-size: .9rem;
         margin-bottom: 1rem;
         padding: .75rem 1rem;
     }
@@ -2654,6 +2654,14 @@ button {
         display: inline-block;
         width: 40%;
     }
+}
+
+/*
+    Members are excluded from daily e-mails by default, so no need
+    to show the checkbox.
+*/
+.role-member .field-daily_ticket_statistics {
+    display: none;
 }
 
 /*

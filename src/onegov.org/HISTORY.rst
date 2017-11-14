@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Hides daily ticket statistic fields from members.
+  [href]
+
 0.17.4 (2017-11-14)
 ~~~~~~~~~~~~~~~~~~~
 
