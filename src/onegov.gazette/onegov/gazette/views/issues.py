@@ -222,7 +222,7 @@ def generate_issue(self, request, form):
 
         # todo: don't return the PDF
         from morepath.request import Response
-        output = Pdf.from_issue(self)
+        output = Pdf.from_issue(self, request)
         output.seek(0)
         response = Response()
         response.content_type = 'application/pdf'
