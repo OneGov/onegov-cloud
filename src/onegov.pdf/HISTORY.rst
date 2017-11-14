@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a generic header and footer.
+  [msom]
+
 0.1.1 (2017-11-13)
 ~~~~~~~~~~~~~~~~~~~~~
 
