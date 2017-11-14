@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.15.1 (2017-11-14)
+~~~~~~~~~~~~~~~~~~~~~
 
 - Fixes new towns not containing the people/fotos widget.
   [href]
