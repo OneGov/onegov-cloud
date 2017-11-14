@@ -2,7 +2,6 @@ from babel.dates import format_date
 from babel.dates import format_time
 from base64 import b64decode
 from copy import deepcopy
-from datetime import date
 from io import BytesIO
 from io import StringIO
 from json import loads
@@ -29,6 +28,8 @@ from onegov.election_day.views.election.parties import get_party_results
 from onegov.election_day.views.election.parties import \
     view_election_parties_data
 from onegov.pdf import LexworkSigner
+from onegov.pdf import page_fn_footer
+from onegov.pdf import page_fn_header_and_footer
 from onegov.pdf import Pdf
 from os.path import basename
 from pdfdocument.document import MarkupParagraph
@@ -37,7 +38,6 @@ from reportlab.lib.units import cm
 from requests import post
 from rjsmin import jsmin
 from shutil import copyfileobj
-from textwrap import shorten, wrap
 
 
 class MediaGenerator():
@@ -182,46 +182,14 @@ class MediaGenerator():
             def format_group(item):
                 return item.group if item.entity_id else translate(_("Expats"))
 
-            def draw_footer(canvas, doc):
-                canvas.saveState()
-                canvas.setFont('Helvetica', 9)
-                canvas.drawString(
-                    doc.leftMargin,
-                    doc.bottomMargin / 2,
-                    '© {} {}'.format(
-                        date.today().year,
-                        principal.name
-                    )
-                )
-                canvas.drawRightString(
-                    doc.pagesize[0] - doc.rightMargin,
-                    doc.bottomMargin / 2,
-                    '{}'.format(canvas._pageNumber)
-                )
-                canvas.restoreState()
-
-            def draw_header_and_footer(canvas, doc):
-                draw_footer(canvas, doc)
-
-                canvas.saveState()
-                title = item.title_translations.get(locale) or item.title
-                lines = wrap(title, 110)[:2]
-                if len(lines) > 1:
-                    lines[1] = shorten(lines[1], 100)
-                text = canvas.beginText()
-                text.setFont('Helvetica', 9)
-                text.setTextOrigin(
-                    doc.leftMargin,
-                    doc.pagesize[1] - doc.topMargin * 2 / 3
-                )
-                text.textLines(lines)
-                canvas.drawText(text)
-                canvas.restoreState()
-
-            pdf = Pdf(f)
+            pdf = Pdf(
+                f,
+                title=item.title_translations.get(locale) or item.title,
+                author=principal.name
+            )
             pdf.init_a4_portrait(
-                page_fn=draw_footer,
-                page_fn_later=draw_header_and_footer
+                page_fn=page_fn_footer,
+                page_fn_later=page_fn_header_and_footer
             )
 
             def table_style_results(columns):

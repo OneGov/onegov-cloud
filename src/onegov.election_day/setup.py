@@ -40,7 +40,7 @@ setup(
         'onegov.ballot>=1.7.0',
         'onegov.form>=0.12.0',
         'onegov.foundation>=0.0.4',
-        'onegov.pdf',
+        'onegov.pdf>=0.2.0',
         'onegov.shared>=0.2.0',
         'onegov.user>=0.15.0',
         'phonenumbers',
