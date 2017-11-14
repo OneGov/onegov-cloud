@@ -1,3 +1,4 @@
+import json
 import morepath
 import os.path
 
@@ -147,7 +148,12 @@ def render_depot_file(file, request):
 def respond_with_alt_text(reference, request):
     @request.after
     def include_alt_text(response):
-        response.headers.add('X-File-Note', reference.note or '')
+        # HTTP headers are limited to ASCII, so we encode our result in
+        # JSON before showing it
+        response.headers.add('X-File-Note', json.dumps(
+            {'note': reference.note or ''},
+            separators=(',', ':')
+        ))
 
 
 @DepotApp.path(model=File, path='/storage/{id}')

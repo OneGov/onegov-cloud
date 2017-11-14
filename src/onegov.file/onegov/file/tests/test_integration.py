@@ -131,13 +131,13 @@ def test_file_note_header(app):
     client = Client(app)
 
     response = client.get('/storage/{}'.format(fid))
-    assert response.headers['X-File-Note'] == 'Avatar'
+    assert response.headers['X-File-Note'] == '{"note":"Avatar"}'
 
     response = client.get('/storage/{}/thumbnail'.format(fid))
-    assert response.headers['X-File-Note'] == 'Avatar'
+    assert response.headers['X-File-Note'] == '{"note":"Avatar"}'
 
     response = client.head('/storage/{}'.format(fid))
-    assert response.headers['X-File-Note'] == 'Avatar'
+    assert response.headers['X-File-Note'] == '{"note":"Avatar"}'
 
     response = client.head('/storage/{}/thumbnail'.format(fid))
-    assert response.headers['X-File-Note'] == 'Avatar'
+    assert response.headers['X-File-Note'] == '{"note":"Avatar"}'

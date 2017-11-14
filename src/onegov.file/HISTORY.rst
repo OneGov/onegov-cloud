@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Encodes X-File-Note results in json to avoid non-ASCII characters.
+  [href]
+
 0.4.0 (2017-09-22)
 ~~~~~~~~~~~~~~~~~~~
 
