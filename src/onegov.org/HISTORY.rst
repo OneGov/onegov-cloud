@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.17.4 (2017-11-14)
+~~~~~~~~~~~~~~~~~~~
+
 - Supports X-File-Notes encoded as JSON.
   [href]
 
