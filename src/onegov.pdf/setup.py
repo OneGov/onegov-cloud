@@ -48,6 +48,9 @@ setup(
     entry_points={
         'onegov': [
             'upgrade = onegov.pdf.upgrade'
+        ],
+        'console_scripts': [
+            'onegov-pdf=onegov.pdf.cli:cli'
         ]
     },
     classifiers=[
