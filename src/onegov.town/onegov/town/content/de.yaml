@@ -236,6 +236,9 @@ organisation:
             <services />
           </panel>
           <panel>
+            <contacts_and_albums />
+          </panel>
+          <panel>
             <directories />
           </panel>
         </column>
