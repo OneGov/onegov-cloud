@@ -51,7 +51,7 @@ class Pdf(PdfBase):
             GazetteNotice._categories.has_key(category)
         )
         notices = notices.order_by(
-            GazetteNotice._issues.vals()
+            GazetteNotice._issues[issue]
         )
         return notices.all()
 
@@ -120,5 +120,7 @@ class Pdf(PdfBase):
         pdf.h1(title)
         pdf.unfold_data(data)
         pdf.generate()
+
+        file.seek(0)
 
         return file

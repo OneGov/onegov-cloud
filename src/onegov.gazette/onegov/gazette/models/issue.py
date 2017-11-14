@@ -62,12 +62,13 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
 
     @pdf.setter
     def pdf(self, value):
+        filename = '{}.pdf'.format(self.name)
         self.files.clear()
         self.files.append(
             IssuePdfFile(
                 id=random_token(),
-                name=self.name,
-                reference=as_fileintent(value, self.name)
+                name=filename,
+                reference=as_fileintent(value, filename)
             )
         )
 

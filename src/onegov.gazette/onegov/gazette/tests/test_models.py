@@ -1,6 +1,7 @@
 from datetime import date
 from datetime import datetime
 from freezegun import freeze_time
+from onegov.file.utils import as_fileintent
 from onegov.gazette.collections import OrganizationCollection
 from onegov.gazette.models import Category
 from onegov.gazette.models import GazetteNotice
@@ -9,6 +10,7 @@ from onegov.gazette.models import IssueName
 from onegov.gazette.models import Organization
 from onegov.gazette.models import OrganizationMove
 from onegov.gazette.models import Principal
+from onegov.gazette.models.issue import IssuePdfFile
 from onegov.gazette.models.notice import GazetteNoticeChange
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
@@ -147,14 +149,33 @@ def test_issue_name():
     assert IssueName.from_string(str(issue_name)) == issue_name
 
 
-def test_issue(session):
+def test_issue_file(gazette_app, session):
+    session.add(
+        IssuePdfFile(
+            id='abcd',
+            name='test.txt',
+            reference=as_fileintent('Test text.'.encode('utf-8'), 'test.txt')
+        )
+    )
+    session.flush()
+
+    file = session.query(IssuePdfFile).one()
+
+    assert file.id == 'abcd'
+    assert file.name == 'test.txt'
+    assert file.type == 'gazette_issue'
+    assert file.reference.file.read().decode('utf-8') == 'Test text.'
+
+
+def test_issue(gazette_app, session):
     session.add(
         Issue(
             id=0,
             name='2018-7',
             number=7,
             date=date(2017, 7, 1),
-            deadline=standardize_date(datetime(2017, 6, 25, 12, 0), 'UTC')
+            deadline=standardize_date(datetime(2017, 6, 25, 12, 0), 'UTC'),
+            pdf='PDF'.encode('utf-8')
         )
     )
     session.flush()
@@ -167,6 +188,10 @@ def test_issue(session):
     assert issue.deadline == standardize_date(
         datetime(2017, 6, 25, 12, 0), 'UTC'
     )
+    assert issue.pdf.id
+    assert issue.pdf.name == '2018-7.pdf'
+    assert issue.pdf.type == 'gazette_issue'
+    assert issue.pdf.reference.file.read().decode('utf-8') == 'PDF'
 
     # Test query etc
     assert len(issue.notices().all()) == 0

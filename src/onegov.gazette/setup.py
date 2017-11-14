@@ -62,6 +62,7 @@ setup(
             'pyquery',
             'pytest-localserver',
             'pytest',
+            'PyPDF2',
             'webtest',
         ],
     ),
