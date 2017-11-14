@@ -33,7 +33,6 @@ setup(
     platforms='any',
     install_requires=[
         'coverage',
-        'elasticsearch',
         'mirakuru',
         'onegov.core',
         'Pillow',

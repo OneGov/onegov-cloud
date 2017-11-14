@@ -10,7 +10,6 @@ import transaction
 import urllib3
 
 from _pytest.monkeypatch import MonkeyPatch
-from elasticsearch import Elasticsearch
 from fs.tempfs import TempFS
 from functools import lru_cache
 from mirakuru import HTTPExecutor as HTTPExecutorBase
@@ -25,6 +24,12 @@ from sqlalchemy import create_engine
 from testing.postgresql import Postgresql
 from uuid import uuid4
 from webdriver_manager.chrome import ChromeDriverManager
+
+try:
+    from elasticsearch import Elasticsearch
+except ImportError:
+    def Elasticsearch(*args, **kwargs):
+        assert False, "Elasticsearch is not installed"
 
 
 class HTTPExecutor(HTTPExecutorBase):
@@ -52,7 +57,7 @@ class HTTPExecutor(HTTPExecutorBase):
     def __del__(self):
         try:
             super().__del__()
-        except:
+        except Exception:
             pass
 
 
