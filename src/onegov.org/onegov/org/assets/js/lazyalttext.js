@@ -33,11 +33,11 @@ var onLazyLoadAltText = function(element) {
     var src = target.attr('src') || target.data('src');
 
     if (target.parents('.redactor-editor').length !== 0) {
-        return;  // skip inside the redactor editor
+        return; // skip inside the redactor editor
     }
 
     if (target.parents('#redactor-image-manager-box').length !== 0) {
-        return;  // skip inside the image manger selection box
+        return; // skip inside the image manger selection box
     }
 
     if (target.siblings('.alt-text').length !== 0) {
@@ -46,19 +46,26 @@ var onLazyLoadAltText = function(element) {
         // we need to adjust the caption width because it relies on the image
         adjustCaption(target);
 
-        return;  // we already have an alt text
+        return; // we already have an alt text
     }
 
     if (target.hasClass('.static-alt')) {
-        return;  // this alt text is not dynamic
+        return; // this alt text is not dynamic
     }
 
     $.ajax({method: 'HEAD', url: src,
         success: function(_data, _textStatus, request) {
             var alt = request.getResponseHeader('X-File-Note');
+            var note = null;
 
-            if (alt && alt.trim() !== "") {
-                appendAltText(target, alt);
+            try {
+                note = JSON.parse(alt).note;
+            } catch (e) {
+                note = alt;
+            }
+
+            if (note && note.trim()) {
+                appendAltText(target, note);
             }
         }
     });
