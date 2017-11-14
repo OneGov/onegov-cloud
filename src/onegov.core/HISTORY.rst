@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.53.2 (2017-11-14)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds support for applications that limit the Public permission.
   [href]
