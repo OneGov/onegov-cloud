@@ -1,0 +1,37 @@
+cache: pip
+
+matrix:
+  include:
+    - language: python
+      python: "3.4"
+      env: TOXENV=py34
+
+    - language: python
+      python: "3.5"
+      env: TOXENV=py35
+
+    - language: python
+      python: "3.6"
+      env: TOXENV=py36
+
+    - language: python
+      python: "3.4"
+      env: TOXENV=pep8
+
+install:
+  - pip install tox
+  - if [ "$TOXENV" = 'py34' ]; then pip install coveralls; fi
+script:
+  - tox -e $TOXENV
+after_success:
+  - if [ "$TOXENV" = 'py34' ]; then coveralls; fi
+
+deploy:
+  provider: pypi
+  distributions: "sdist bdist_wheel"
+  user: seantis
+  password:
+    secure: "CF497GNQmnYyMzMXvDGCf0UkGzoJpETrtxndiXFof8OZXl+mkr4NYPrropcYPMi/YMhiib/QQuhcY0xeUxeSgJE8henNPddIJBc3/l9OAVcoTrUTb13CG4/42IhBAGBj2H7uSMTcRdAvH5M8R/SkKYakj3IBMVEnb+kIR2X2xsw23kWYs8XKgjYUViRcmoP85YWqOSDIqLNohguMbM076xcTRpx64AxeFsM7x0WU9vjqLvZ7wmenLsgBbDbNlDtkDkQ9qaSNQZcqFHdhHgI9JDrbOwgDgA0+w9cjTHxZJRvhMNFo8KU3Dh1jQsrn4tzXHIQElzHmDBSVEOm2/WN9PVfsmEaCIuUMWOrfhfdbkRYiCH8YNr7DYy10skH/p2RyuMo4uUu/vsNCI6gTJ0+khd97ASNEJvstvbPLfF3vS0usHZ+TFvtmlHOKYvogu+bnkGrNPjK4Gqwt1rFV0ZPMbCA76r75VrtYuFOfgtjqMapHCyvFGQxBXFi6OEABJmIMtAlL9sweSxJvd7Sv7e8G7kj+MMvBiGsDYBoeNdXrcPFPEd/Yzcz+UgMdCtoh29npv8N6uTlIyduFEIpVXuHo73+pkXwmaklnQkXgyO+copVXePrQ44pfVIxaTuaselV7BaqPgYZAi6KxLwmcTgn6HjXaPw6zAZr+By57P9R6kQQ="
+  on:
+    tags: true
+    condition: $TOXENV = py34
