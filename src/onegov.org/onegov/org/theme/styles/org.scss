@@ -2657,14 +2657,6 @@ button {
 }
 
 /*
-    Members are excluded from daily e-mails by default, so no need
-    to show the checkbox.
-*/
-.role-member .field-daily_ticket_statistics {
-    display: none;
-}
-
-/*
     Calendar day display
 */
 .calendar-day {
