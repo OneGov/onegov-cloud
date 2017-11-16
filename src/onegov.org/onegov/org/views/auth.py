@@ -3,21 +3,23 @@
 import morepath
 
 from onegov.core.security import Public, Personal
-from onegov.core.templates import render_template
 from onegov.org import _, OrgApp
+from onegov.org import log
 from onegov.org.elements import Link
-from onegov.org.layout import DefaultLayout, DefaultMailLayout
+from onegov.org.layout import DefaultLayout
+from onegov.org.mail import send_html_mail
 from onegov.user import Auth, UserCollection
-from onegov.user.errors import (
-    AlreadyActivatedError,
-    ExistingUserError,
-    InvalidActivationTokenError,
-    UnknownUserError,
-    ExpiredSignupLinkError,
-)
-from onegov.user.forms import LoginForm, RegistrationForm
-from webob import exc
+from onegov.user.errors import AlreadyActivatedError
+from onegov.user.errors import ExistingUserError
+from onegov.user.errors import ExpiredSignupLinkError
+from onegov.user.errors import InvalidActivationTokenError
+from onegov.user.errors import UnknownUserError
+from onegov.user.forms import LoginForm
+from onegov.user.forms import PasswordResetForm
+from onegov.user.forms import RegistrationForm
+from onegov.user.forms import RequestPasswordResetForm
 from purl import URL
+from webob import exc
 
 
 @OrgApp.form(model=Auth, name='login', template='login.pt', permission=Public,
@@ -71,8 +73,7 @@ def handle_login(self, request, form):
 
     return {
         'layout': layout,
-        'password_reset_link': request.link(
-            request.app.org, name='request-password'),
+        'password_reset_link': request.link(self, name='request-password'),
         'register_link': request.link(self, name='register'),
         'may_register': org_settings.enable_user_registration,
         'title': _('Login to ${org}', mapping={
@@ -103,24 +104,22 @@ def handle_registration(self, request, form):
             url = url.query_param('username', form.username.data)
             url = url.query_param('token', user.data['activation_token'])
 
-            title = subject = request.translate(
+            subject = request.translate(
                 _("Your ${org} Registration", mapping={
                     'org': request.app.org.title
                 })
             )
 
-            request.app.send_email(
+            send_html_mail(
+                request=request,
+                template='mail_activation.pt',
                 subject=subject,
                 receivers=(form.username.data, ),
-                content=render_template(
-                    'mail_activation.pt', request, {
-                        'layout': DefaultMailLayout(self, request),
-                        'activation_link': url.as_string(),
-                        'title': title
-                    }
-                )
+                content={
+                    'activation_link': url.as_string(),
+                    'model': self
+                }
             )
-
             request.success(_(
                 "Thank you for registering. Please follow the instructions "
                 "on the activiation e-mail sent to you."
@@ -175,3 +174,92 @@ def view_logout(self, request):
 
     request.info(_("You have been logged out."))
     return self.logout_to(request)
+
+
+@OrgApp.form(model=Auth, name='request-password', template='form.pt',
+             permission=Public, form=RequestPasswordResetForm)
+def handle_password_reset_request(self, request, form):
+    """ Handles the GET and POST password reset requests. """
+
+    layout = DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_("Homepage"), layout.homepage_url),
+        Link(_("Reset password"), request.link(self, name='request-password'))
+    ]
+
+    if form.submitted(request):
+
+        user = UserCollection(request.app.session())\
+            .by_username(form.email.data)
+
+        url = layout.password_reset_url(user)
+
+        if url:
+            send_html_mail(
+                request=request,
+                template='mail_password_reset.pt',
+                subject=_("Password reset"),
+                receivers=(user.username, ),
+                content={'model': None, 'url': url}
+            )
+        else:
+            log.info(
+                "Failed password reset attempt by {}".format(
+                    request.client_addr
+                )
+            )
+
+        response = morepath.redirect(request.link(self, name='login'))
+        request.success(
+            _(('A password reset link has been sent to ${email}, provided an '
+               'account exists for this email address.'),
+              mapping={'email': form.email.data})
+        )
+        return response
+
+    return {
+        'layout': layout,
+        'title': _('Reset password'),
+        'form': form,
+        'form_width': 'small'
+    }
+
+
+@OrgApp.form(model=Auth, name='reset-password', template='form.pt',
+             permission=Public, form=PasswordResetForm)
+def handle_password_reset(self, request, form):
+    request.include('check_password')
+
+    if form.submitted(request):
+        # do NOT log the user in at this point - only onegov.user.auth does
+        # logins - we only ever want one path to be able to login, which makes
+        # it easier to do it correctly.
+
+        if form.update_password(request):
+            request.success(_("Password changed."))
+            return morepath.redirect(request.link(self, name='login'))
+        else:
+            request.alert(
+                _("Wrong username or password reset link not valid any more.")
+            )
+            log.info(
+                "Failed password reset attempt by {}".format(
+                    request.client_addr
+                )
+            )
+
+    if 'token' in request.params:
+        form.token.data = request.params['token']
+
+    layout = DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_("Homepage"), layout.homepage_url),
+        Link(_("Reset password"), request.link(self, name='request-password'))
+    ]
+
+    return {
+        'layout': layout,
+        'title': _('Reset password'),
+        'form': form,
+        'form_width': 'small'
+    }

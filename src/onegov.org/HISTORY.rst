@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Moves password reset views to the auth model.
+  [href]
+
 0.17.5 (2017-11-16)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -396,7 +396,7 @@ class Layout(ChameleonLayout):
         return password_reset_url(
             user,
             self.request,
-            self.request.link(self.app.org, name='reset-password')
+            self.request.class_link(Auth, name='reset-password')
         )
 
 

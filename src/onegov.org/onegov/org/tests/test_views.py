@@ -3196,7 +3196,8 @@ def test_add_new_user_with_activation_email(org_app):
     assert "Anmeldungs-Anleitung wurde an den Benutzer gesendet" in added
 
     email = client.get_email(0)
-    reset = re.search(r'(http://localhost/reset-password[^)]+)', email).group()
+    reset = re.search(
+        r'(http://localhost/auth/reset-password[^)]+)', email).group()
 
     page = Client(org_app).get(reset)
     page.form['email'] = 'member@example.org'

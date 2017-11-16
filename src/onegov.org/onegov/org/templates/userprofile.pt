@@ -24,7 +24,7 @@
         <div class="field-display">
             <div class="field-display-label" i18n:translate>Password</div>
             <div class="field-display-data">
-                <a href="./request-password" i18n:translate>Reset password</a>
+                <a href="./auth/request-password" i18n:translate>Reset password</a>
             </div>
         </div>
         <div class="field-display userprofile-settings">
