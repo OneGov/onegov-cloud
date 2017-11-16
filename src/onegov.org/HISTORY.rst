@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.17.5 (2017-11-16)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds directories to initial org layout.
   [href]
 
