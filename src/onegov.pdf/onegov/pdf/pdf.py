@@ -161,11 +161,11 @@ class Pdf(PDFDocument):
         self.style.heading3.textColor = self.style.normal.textColor
 
         self.style.heading4 = deepcopy(self.style.normal)
-        self.style.heading3.fontSize = 1 * self.style.fontSize
-        self.style.heading3.spaceBefore = 1.33 * self.style.heading3.fontSize
-        self.style.heading3.spaceAfter = 1.33 * self.style.heading3.fontSize
-        self.style.heading3.fontName = self.style.fontName
-        self.style.heading3.textColor = self.style.normal.textColor
+        self.style.heading4.fontSize = 1 * self.style.fontSize
+        self.style.heading4.spaceBefore = 1.33 * self.style.heading4.fontSize
+        self.style.heading4.spaceAfter = 1.33 * self.style.heading4.fontSize
+        self.style.heading4.fontName = self.style.fontName
+        self.style.heading4.textColor = self.style.normal.textColor
 
         self.style.paragraph.spaceAfter = 2 * self.style.paragraph.fontSize
 
