@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds directories to initial org layout.
+  [href]
+
 - Hides daily ticket statistic fields from members.
   [href]
 

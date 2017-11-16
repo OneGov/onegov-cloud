@@ -122,7 +122,7 @@ organisation:
           </panel>
 
           <panel>
-            <links title="Répertoires">
+            <links title="Contacts et photos">
               <link url="./people"
                     description="Tous les contacts">
                 Personnes
@@ -136,6 +136,10 @@ organisation:
                 Sujets
               </link>
             </links>
+          </panel>
+
+          <panel>
+            <directories />
           </panel>
         </column>
       </row>

@@ -121,7 +121,7 @@ organisation:
           </panel>
 
           <panel>
-            <links title="Verzeichnisse">
+            <links title="Kontakte und Fotos">
               <link url="./people"
                     description="Alle Kontakte">
                 Personen
@@ -130,11 +130,11 @@ organisation:
                     description="Impressionen">
                 Fotoalben
               </link>
-              <link url="./a-z"
-                    description="Katalog A-Z">
-                Themen
-              </link>
             </links>
+          </panel>
+
+          <panel>
+            <directories />
           </panel>
         </column>
       </row>
