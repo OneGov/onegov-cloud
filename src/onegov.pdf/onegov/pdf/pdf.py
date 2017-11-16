@@ -147,18 +147,21 @@ class Pdf(PDFDocument):
         self.style.heading1.spaceAfter = 0.67 * self.style.heading1.fontSize
         self.style.heading1.fontName = self.style.fontName
         self.style.heading1.textColor = self.style.normal.textColor
+        self.style.heading1.leading = 1.2 * self.style.heading1.fontSize
 
         self.style.heading2.fontSize = 1.5 * self.style.fontSize
         self.style.heading2.spaceBefore = 0.83 * self.style.heading2.fontSize
         self.style.heading2.spaceAfter = 0.83 * self.style.heading2.fontSize
         self.style.heading2.fontName = self.style.fontName
         self.style.heading2.textColor = self.style.normal.textColor
+        self.style.heading2.leading = 1.2 * self.style.heading2.fontSize
 
         self.style.heading3.fontSize = 1.17 * self.style.fontSize
         self.style.heading3.spaceBefore = 1 * self.style.heading3.fontSize
         self.style.heading3.spaceAfter = 1 * self.style.heading3.fontSize
         self.style.heading3.fontName = self.style.fontName
         self.style.heading3.textColor = self.style.normal.textColor
+        self.style.heading3.leading = 1.2 * self.style.heading3.fontSize
 
         self.style.heading4 = deepcopy(self.style.normal)
         self.style.heading4.fontSize = 1 * self.style.fontSize
@@ -166,6 +169,7 @@ class Pdf(PDFDocument):
         self.style.heading4.spaceAfter = 1.33 * self.style.heading4.fontSize
         self.style.heading4.fontName = self.style.fontName
         self.style.heading4.textColor = self.style.normal.textColor
+        self.style.heading4.leading = 1.2 * self.style.heading4.fontSize
 
         self.style.paragraph.spaceAfter = 2 * self.style.paragraph.fontSize
 
