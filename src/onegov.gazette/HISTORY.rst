@@ -1,6 +1,10 @@
 Changelog
 ---------
-1.9.4 (2017-11-16)
+
+- Fixes failing test.
+  [msom]
+
+1.9.4 (2017-11-15)
 ~~~~~~~~~~~~~~~~~~~
 
 - Skips failing test.
