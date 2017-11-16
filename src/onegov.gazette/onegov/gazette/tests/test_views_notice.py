@@ -854,6 +854,12 @@ def test_view_notice_edit(gazette_app):
         edit_notice(editor_3, 'notice', forbidden=True)
         edit_notice(publisher, 'notice', unable=True)
 
+    publish_notice(publisher, 'notice')
+    edit_notice(editor_1, 'notice', unable=True)
+    edit_notice(editor_2, 'notice', unable=True)
+    edit_notice(editor_3, 'notice', forbidden=True)
+    edit_notice(publisher, 'notice', unable=True)
+
 
 def test_view_notice_edit_deadlines(gazette_app):
     editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
