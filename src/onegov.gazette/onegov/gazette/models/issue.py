@@ -63,14 +63,13 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
     @pdf.setter
     def pdf(self, value):
         filename = '{}.pdf'.format(self.name)
-        self.files.clear()
-        self.files.append(
-            IssuePdfFile(
-                id=random_token(),
-                name=filename,
-                reference=as_fileintent(value, filename)
-            )
-        )
+
+        pdf = self.pdf or IssuePdfFile(id=random_token())
+        pdf.name = filename
+        pdf.reference = as_fileintent(value, filename)
+
+        if not self.pdf:
+            self.files.append(pdf)
 
     def notices(self, state=None):
         """ Returns a query to get all notices related to this issue. """
