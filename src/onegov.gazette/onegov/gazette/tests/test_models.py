@@ -168,16 +168,15 @@ def test_issue_file(gazette_app, session):
 
 
 def test_issue(gazette_app, session):
-    session.add(
-        Issue(
-            id=0,
-            name='2018-7',
-            number=7,
-            date=date(2017, 7, 1),
-            deadline=standardize_date(datetime(2017, 6, 25, 12, 0), 'UTC'),
-            pdf='PDF'.encode('utf-8')
-        )
+    issue = Issue(
+        id=0,
+        name='2018-7',
+        number=7,
+        date=date(2017, 7, 1),
+        deadline=standardize_date(datetime(2017, 6, 25, 12, 0), 'UTC'),
     )
+    issue.pdf = 'PDF'.encode('utf-8')
+    session.add(issue)
     session.flush()
     issue = session.query(Issue).one()
 
