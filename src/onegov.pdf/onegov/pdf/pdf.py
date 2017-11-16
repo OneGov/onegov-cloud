@@ -160,6 +160,13 @@ class Pdf(PDFDocument):
         self.style.heading3.fontName = self.style.fontName
         self.style.heading3.textColor = self.style.normal.textColor
 
+        self.style.heading4 = deepcopy(self.style.normal)
+        self.style.heading3.fontSize = 1 * self.style.fontSize
+        self.style.heading3.spaceBefore = 1.33 * self.style.heading3.fontSize
+        self.style.heading3.spaceAfter = 1.33 * self.style.heading3.fontSize
+        self.style.heading3.fontName = self.style.fontName
+        self.style.heading3.textColor = self.style.normal.textColor
+
         self.style.paragraph.spaceAfter = 2 * self.style.paragraph.fontSize
 
         self.style.figcaption = deepcopy(self.style.paragraph)
@@ -191,6 +198,21 @@ class Pdf(PDFDocument):
             ('VALIGN', (1, 1), (-1, -1), 'TOP'),
             ('LINEBELOW', (0, 0), (-1, 0), 0.2, colors.black),
         )
+
+    def h4(self, text, style=None):
+        self.story.append(Paragraph(text, style or self.style.heading4))
+
+    def paragaphs(self, text, style=None):
+        """ Adds the given html as markup paragraphs.
+
+        Example:
+            pdf.paragraphs('<p>First</p><p>Second</p>')
+
+        """
+
+        tree = etree.parse(StringIO(text), etree.HTMLParser())
+        for p in tree.find('body'):
+            self.p_markup(etree.tostring(p, encoding='unicode'), style)
 
     def fit_size(self, width, height, factor=1.0):
         """ Returns the given width and height so that it fits on the page. """
@@ -276,15 +298,3 @@ class Pdf(PDFDocument):
         """ Adds a figure caption. """
 
         self.p(text, style=style or self.style.figcaption)
-
-    def paragaphs(self, text, style=None):
-        """ Adds the given html as markup paragraphs.
-
-        Example:
-            pdf.paragraphs('<p>First</p><p>Second</p>')
-
-        """
-
-        tree = etree.parse(StringIO(text), etree.HTMLParser())
-        for p in tree.find('body'):
-            self.p_markup(etree.tostring(p, encoding='unicode'), style)

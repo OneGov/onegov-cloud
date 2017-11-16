@@ -4,6 +4,9 @@ Changelog
 - Allows to append a block of HTML paragraphs.
   [msom]
 
+- Adds h4.
+  [msom]
+
 0.2.0 (2017-11-14)
 ~~~~~~~~~~~~~~~~~~~~~
 
