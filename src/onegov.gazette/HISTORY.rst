@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.10.3 (2017-11-16)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes failing test.
   [msom]
