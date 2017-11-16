@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.9.4 (2017-11-16)
+~~~~~~~~~~~~~~~~~~~
 
 - Skips failing test.
   [href]
