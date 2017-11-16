@@ -1,44 +1,8 @@
 Changelog
 ---------
-1.10.2 (2017-11-10)
-~~~~~~~~~~~~~~~~~~~
 
-- Order parents in organization form by their order.
-  [msom]
-
-- Fixes setting the initial external ID of an organization.
-  [msom]
-
-- Fixes sorting of sub-organizations.
-  [msom]
-
-1.10.1 (2017-11-10)
-~~~~~~~~~~~~~~~~~~~
-
-- Uses a chosen select for parent organizations.
-  [msom]
-
-- Fixes setting the initial ID of a category or organization.
-  [msom]
-
-- Checks the category and organization before submitting and accepting notices.
-  [msom]
-
-- Displays a warning when editing a notice with an invalid category or
-  organization.
-  [msom]
-
-- Uses an external organization name for accepted mails instead of the name.
-  [msom]
-
-1.10.0 (2017-11-09)
-~~~~~~~~~~~~~~~~~~~
-
-- Allows to manage categories, organizations and issues.
-  [msom]
-
-- Adds an unrestricted edit view for admins.
-  [msom]
+- Skips failing test.
+  [href]
 
 1.9.3 (2017-11-09)
 ~~~~~~~~~~~~~~~~~~~
