@@ -14,7 +14,7 @@ from reportlab.lib.units import cm
 from reportlab.platypus import Paragraph
 
 
-def test_pdf_document_fit_size():
+def test_pdf_fit_size():
 
     def floor(*args):
         return tuple(int(arg) for arg in args)
@@ -45,7 +45,7 @@ def test_pdf_document_fit_size():
     assert floor(*pdf.fit_size(100 * cm, 200 * cm, 0.9)) == floor(m_h / 2, m_h)
 
 
-def test_pdf_document():
+def test_pdf():
 
     f = BytesIO()
     pdf = Pdf(f)
@@ -100,7 +100,38 @@ def test_pdf_document():
     assert len(PdfReader(f, decompress=False).pages) == 7
 
 
-def test_header():
+def test_pdf_paragraphs():
+    file = BytesIO()
+    pdf = Pdf(file)
+    pdf.init_a4_portrait()
+    pdf.paragaphs('first')
+    pdf.paragaphs('<p>second</p>')
+    pdf.paragaphs('<p>third</p>')
+    pdf.paragaphs('<p>fourth</p><p>fifth</p>')
+    pdf.paragaphs('<p>sixt')
+    pdf.paragaphs('<p><strong>seventh</strong></p>')
+
+    story = [p.text for p in pdf.story if isinstance(p, Paragraph)]
+    assert story == [
+        '<p>first</p>',
+        '<p>second</p>',
+        '<p>third</p>',
+        '<p>fourth</p>',
+        '<p>fifth</p>',
+        '<p>sixt</p>',
+        '<p><strong>seventh</strong></p>'
+    ]
+    pdf.generate()
+
+    file.seek(0)
+    reader = PdfFileReader(file)
+    assert reader.getNumPages() == 1
+    assert reader.getPage(0).extractText() == (
+        'first\nsecond\nthird\nfourth\nfifth\nsixt\nseventh\n'
+    )
+
+
+def test_page_fn_header():
     # no title
     file = BytesIO()
     pdf = Pdf(file)
@@ -150,7 +181,7 @@ def test_header():
     )
 
 
-def test_footer():
+def test_page_fn_footer():
     # no author
     file = BytesIO()
     pdf = Pdf(file)
@@ -188,7 +219,7 @@ def test_footer():
     assert reader.getPage(0).extractText() == '© 2017 author\n1\n'
 
 
-def test_header_and_footer():
+def test_page_fn_header_and_footer():
     file = BytesIO()
     pdf = Pdf(file, title='title', author='author')
     pdf.init_a4_portrait(page_fn_header_and_footer)

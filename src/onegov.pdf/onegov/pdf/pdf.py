@@ -1,5 +1,7 @@
 from copy import deepcopy
 from datetime import date
+from io import StringIO
+from lxml import etree
 from onegov.pdf.flowables import InlinePDF
 from pdfdocument.document import MarkupParagraph, PDFDocument
 from reportlab.lib import colors
@@ -274,3 +276,15 @@ class Pdf(PDFDocument):
         """ Adds a figure caption. """
 
         self.p(text, style=style or self.style.figcaption)
+
+    def paragaphs(self, text, style=None):
+        """ Adds the given html as markup paragraphs.
+
+        Example:
+            pdf.paragraphs('<p>First</p><p>Second</p>')
+
+        """
+
+        tree = etree.parse(StringIO(text), etree.HTMLParser())
+        for p in tree.find('body'):
+            self.p_markup(etree.tostring(p, encoding='unicode'), style)

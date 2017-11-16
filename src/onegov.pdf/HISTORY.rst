@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Allows to append a block of HTML paragraphs.
+  [msom]
+
 0.2.0 (2017-11-14)
 ~~~~~~~~~~~~~~~~~~~~~
 

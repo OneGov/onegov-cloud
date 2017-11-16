@@ -42,7 +42,8 @@ setup(
             'coverage',
             'onegov_testing',
             'pytest',
-            'PyPDF2'
+            'PyPDF2',
+            'lxml'
         ],
     ),
     entry_points={
