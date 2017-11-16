@@ -1,6 +1,5 @@
 from freezegun import freeze_time
 from onegov.gazette.models import Organization
-from onegov.gazette.tests import login_admin
 from onegov.gazette.tests import login_editor_1
 from onegov.gazette.tests import login_publisher
 from pyquery import PyQuery as pq
@@ -10,7 +9,7 @@ from webtest import TestApp as Client
 def test_view_organizations(gazette_app):
     with freeze_time("2017-10-20 12:00"):
         client = Client(gazette_app)
-        login_admin(client)
+        login_publisher(client)
 
         # Test data:
         # 100 / State Chancellery / active
@@ -135,17 +134,12 @@ def test_view_organizations(gazette_app):
 def test_view_organizations_permissions(gazette_app):
     client = Client(gazette_app)
 
-    login_admin(client)
+    login_publisher(client)
     manage = client.get('/organizations').click('Neu')
     manage.form['title'] = 'XY'
     manage = manage.form.submit().maybe_follow()
     edit_link = manage.click('Bearbeiten', index=0).request.url
     delete_link = manage.click('Löschen', index=0).request.url
-
-    login_publisher(client)
-    client.get('/organizations', status=403)
-    client.get(edit_link, status=403)
-    client.get(delete_link, status=403)
 
     login_editor_1(client)
     client.get('/organizations', status=403)
@@ -155,7 +149,7 @@ def test_view_organizations_permissions(gazette_app):
 
 def test_view_organizations_order(gazette_app):
     client = Client(gazette_app)
-    login_admin(client)
+    login_publisher(client)
 
     manage = client.get('/organizations')
     manage = manage.click('Ordnen')

@@ -162,6 +162,16 @@ class Layout(ChameleonLayout):
                 _("Issues"), self.manage_issues_link, active
             ))
 
+            active = isinstance(self.model, OrganizationCollection)
+            result.append((
+                _("Organizations"), self.manage_organizations_link, active
+            ))
+
+            active = isinstance(self.model, CategoryCollection)
+            result.append((
+                _("Categories"), self.manage_categories_link, active
+            ))
+
         elif self.request.is_personal(self.model):
             # Editor
             active = isinstance(self.model, Principal)
@@ -183,16 +193,6 @@ class Layout(ChameleonLayout):
 
         if self.request.is_secret(self.model):
             # Admin
-            active = isinstance(self.model, OrganizationCollection)
-            result.append((
-                _("Organizations"), self.manage_organizations_link, active
-            ))
-
-            active = isinstance(self.model, CategoryCollection)
-            result.append((
-                _("Categories"), self.manage_categories_link, active
-            ))
-
             active = isinstance(self.model, UserCollection)
             result.append((
                 _("Users"),

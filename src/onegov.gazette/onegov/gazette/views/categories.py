@@ -1,5 +1,5 @@
 from morepath import redirect
-from onegov.core.security import Secret
+from onegov.core.security import Private
 from onegov.gazette import _
 from onegov.gazette import GazetteApp
 from onegov.gazette.collections import CategoryCollection
@@ -12,7 +12,7 @@ from onegov.gazette.models import Category
 @GazetteApp.html(
     model=CategoryCollection,
     template='categories.pt',
-    permission=Secret
+    permission=Private
 )
 def view_categories(self, request):
     """ View the list of categories.
@@ -33,7 +33,7 @@ def view_categories(self, request):
     model=CategoryCollection,
     name='new-category',
     template='form.pt',
-    permission=Secret,
+    permission=Private,
     form=CategoryForm
 )
 def create_category(self, request, form):
@@ -66,7 +66,7 @@ def create_category(self, request, form):
     model=Category,
     name='edit',
     template='form.pt',
-    permission=Secret,
+    permission=Private,
     form=CategoryForm
 )
 def edit_category(self, request, form):
@@ -99,7 +99,7 @@ def edit_category(self, request, form):
     model=Category,
     name='delete',
     template='form.pt',
-    permission=Secret,
+    permission=Private,
     form=EmptyForm
 )
 def delete_category(self, request, form):

@@ -1,5 +1,5 @@
 from morepath import redirect
-from onegov.core.security import Secret
+from onegov.core.security import Private
 from onegov.gazette import _
 from onegov.gazette import GazetteApp
 from onegov.gazette.collections import OrganizationCollection
@@ -13,12 +13,12 @@ from onegov.gazette.models import OrganizationMove
 @GazetteApp.html(
     model=OrganizationCollection,
     template='organizations.pt',
-    permission=Secret
+    permission=Private
 )
 def view_organizations(self, request):
     """ View the list of organizations.
 
-    This view is only visible by an admin.
+    This view is only visible by a publisher.
 
     """
     layout = Layout(self, request)
@@ -36,12 +36,12 @@ def view_organizations(self, request):
     model=OrganizationCollection,
     name='order',
     template='organizations_order.pt',
-    permission=Secret
+    permission=Private
 )
 def view_organizations_order(self, request):
     """ Reorder the list of organizations.
 
-    This view is only visible by an admin.
+    This view is only visible by a publisher.
 
     """
     layout = Layout(self, request)
@@ -55,7 +55,7 @@ def view_organizations_order(self, request):
 
 @GazetteApp.view(
     model=OrganizationMove,
-    permission=Secret,
+    permission=Private,
     request_method='PUT'
 )
 def move_organization(self, request):
@@ -67,13 +67,13 @@ def move_organization(self, request):
     model=OrganizationCollection,
     name='new-organization',
     template='form.pt',
-    permission=Secret,
+    permission=Private,
     form=OrganizationForm
 )
 def create_organization(self, request, form):
     """ Create a new organization.
 
-    This view is only visible by an admin.
+    This view is only visible by a publisher.
 
     """
     layout = Layout(self, request)
@@ -102,13 +102,13 @@ def create_organization(self, request, form):
     model=Organization,
     name='edit',
     template='form.pt',
-    permission=Secret,
+    permission=Private,
     form=OrganizationForm
 )
 def edit_organization(self, request, form):
     """ Edit a organization.
 
-    This view is only visible by an admin.
+    This view is only visible by a publisher.
 
     """
 
@@ -135,7 +135,7 @@ def edit_organization(self, request, form):
     model=Organization,
     name='delete',
     template='form.pt',
-    permission=Secret,
+    permission=Private,
     form=EmptyForm
 )
 def delete_organization(self, request, form):
