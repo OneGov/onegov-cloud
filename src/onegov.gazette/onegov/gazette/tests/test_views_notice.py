@@ -410,21 +410,21 @@ def test_view_notice_submit(gazette_app):
             manage.form['text'] = "1. Oktober 2017"
             manage.form.submit()
 
-    # check invalid actions
-    for action in ('reject', 'accept'):
-        assert not publisher.get('/notice/titel-1/{}'.format(action)).forms
-        assert not publisher.get('/notice/titel-2/{}'.format(action)).forms
-        assert not publisher.get('/notice/titel-3/{}'.format(action)).forms
-        for user in (editor_1, editor_2, editor_3):
-            user.get('/notice/titel-1/{}'.format(action), status=403)
-            user.get('/notice/titel-2/{}'.format(action), status=403)
-            user.get('/notice/titel-3/{}'.format(action), status=403)
+        # check invalid actions
+        for action in ('reject', 'accept'):
+            assert not publisher.get('/notice/titel-1/{}'.format(action)).forms
+            assert not publisher.get('/notice/titel-2/{}'.format(action)).forms
+            assert not publisher.get('/notice/titel-3/{}'.format(action)).forms
+            for user in (editor_1, editor_2, editor_3):
+                user.get('/notice/titel-1/{}'.format(action), status=403)
+                user.get('/notice/titel-2/{}'.format(action), status=403)
+                user.get('/notice/titel-3/{}'.format(action), status=403)
 
-    # check if invalid permissions
-    submit_notice(editor_1, 'titel-3', forbidden=True)
-    submit_notice(editor_2, 'titel-3', forbidden=True)
-    submit_notice(editor_3, 'titel-1', forbidden=True)
-    submit_notice(editor_3, 'titel-2', forbidden=True)
+        # check if invalid permissions
+        submit_notice(editor_1, 'titel-3', forbidden=True)
+        submit_notice(editor_2, 'titel-3', forbidden=True)
+        submit_notice(editor_3, 'titel-1', forbidden=True)
+        submit_notice(editor_3, 'titel-2', forbidden=True)
 
     # check deadlines (2 gets submitted)
     with freeze_time("2017-11-08 13:00"):
@@ -468,31 +468,31 @@ def test_view_notice_reject(gazette_app):
             manage.form.submit()
             submit_notice(user, 'titel-{}'.format(count + 1))
 
-    # check wrong actions
-    submit_notice(publisher, 'titel-1', unable=True)
-    submit_notice(publisher, 'titel-2', unable=True)
-    submit_notice(publisher, 'titel-3', unable=True)
-    submit_notice(editor_1, 'titel-1', unable=True)
-    submit_notice(editor_1, 'titel-2', unable=True)
-    submit_notice(editor_1, 'titel-3', forbidden=True)
-    submit_notice(editor_2, 'titel-1', unable=True)
-    submit_notice(editor_2, 'titel-2', unable=True)
-    submit_notice(editor_2, 'titel-3', forbidden=True)
-    submit_notice(editor_3, 'titel-1', forbidden=True)
-    submit_notice(editor_3, 'titel-2', forbidden=True)
-    submit_notice(editor_3, 'titel-3', unable=True)
+        # check wrong actions
+        submit_notice(publisher, 'titel-1', unable=True)
+        submit_notice(publisher, 'titel-2', unable=True)
+        submit_notice(publisher, 'titel-3', unable=True)
+        submit_notice(editor_1, 'titel-1', unable=True)
+        submit_notice(editor_1, 'titel-2', unable=True)
+        submit_notice(editor_1, 'titel-3', forbidden=True)
+        submit_notice(editor_2, 'titel-1', unable=True)
+        submit_notice(editor_2, 'titel-2', unable=True)
+        submit_notice(editor_2, 'titel-3', forbidden=True)
+        submit_notice(editor_3, 'titel-1', forbidden=True)
+        submit_notice(editor_3, 'titel-2', forbidden=True)
+        submit_notice(editor_3, 'titel-3', unable=True)
 
-    # check if the notices can be rejected
-    for user, slug, forbidden in (
-        (editor_1, 'titel-1', True),
-        (editor_1, 'titel-2', True),
-        (editor_1, 'titel-3', True),
-        (editor_3, 'titel-3', True),
-        (publisher, 'titel-1', False),
-        (publisher, 'titel-2', False),
-        (publisher, 'titel-3', False),
-    ):
-        reject_notice(user, slug, forbidden=forbidden)
+        # check if the notices can be rejected
+        for user, slug, forbidden in (
+            (editor_1, 'titel-1', True),
+            (editor_1, 'titel-2', True),
+            (editor_1, 'titel-3', True),
+            (editor_3, 'titel-3', True),
+            (publisher, 'titel-1', False),
+            (publisher, 'titel-2', False),
+            (publisher, 'titel-3', False),
+        ):
+            reject_notice(user, slug, forbidden=forbidden)
 
 
 def test_view_notice_accept(gazette_app):
@@ -510,19 +510,19 @@ def test_view_notice_accept(gazette_app):
             manage.form.submit()
             submit_notice(user, 'titel-{}'.format(count + 1))
 
-    # check wrong actions
-    submit_notice(publisher, 'titel-1', unable=True)
-    submit_notice(publisher, 'titel-2', unable=True)
-    submit_notice(publisher, 'titel-3', unable=True)
-    submit_notice(editor_1, 'titel-1', unable=True)
-    submit_notice(editor_1, 'titel-2', unable=True)
-    submit_notice(editor_1, 'titel-3', forbidden=True)
-    submit_notice(editor_2, 'titel-1', unable=True)
-    submit_notice(editor_2, 'titel-2', unable=True)
-    submit_notice(editor_2, 'titel-3', forbidden=True)
-    submit_notice(editor_3, 'titel-1', forbidden=True)
-    submit_notice(editor_3, 'titel-2', forbidden=True)
-    submit_notice(editor_3, 'titel-3', unable=True)
+        # check wrong actions
+        submit_notice(publisher, 'titel-1', unable=True)
+        submit_notice(publisher, 'titel-2', unable=True)
+        submit_notice(publisher, 'titel-3', unable=True)
+        submit_notice(editor_1, 'titel-1', unable=True)
+        submit_notice(editor_1, 'titel-2', unable=True)
+        submit_notice(editor_1, 'titel-3', forbidden=True)
+        submit_notice(editor_2, 'titel-1', unable=True)
+        submit_notice(editor_2, 'titel-2', unable=True)
+        submit_notice(editor_2, 'titel-3', forbidden=True)
+        submit_notice(editor_3, 'titel-1', forbidden=True)
+        submit_notice(editor_3, 'titel-2', forbidden=True)
+        submit_notice(editor_3, 'titel-3', unable=True)
 
     # check redirect for past issues
     with freeze_time("2017-11-04 11:00"):
@@ -811,48 +811,48 @@ def test_view_notice_edit(gazette_app):
         assert "Nr. 46, 17.11.2017" in view
         assert "1. Dezember 2017" in view
 
-    # drafted
-    for user, title, forbidden in (
-        (editor_1, 'XXX1', False),
-        (editor_2, 'XXX2', False),
-        (editor_3, 'XXX3', True),
-        (publisher, 'XXX4', False),
-    ):
-        edit_notice(user, 'notice', title=title, forbidden=forbidden)
-        if not forbidden:
-            assert title in editor_1.get('/notice/notice')
+        # drafted
+        for user, title, forbidden in (
+            (editor_1, 'XXX1', False),
+            (editor_2, 'XXX2', False),
+            (editor_3, 'XXX3', True),
+            (publisher, 'XXX4', False),
+        ):
+            edit_notice(user, 'notice', title=title, forbidden=forbidden)
+            if not forbidden:
+                assert title in editor_1.get('/notice/notice')
 
-    # submitted
-    submit_notice(editor_1, 'notice')
-    for user, title, forbidden in (
-        (editor_1, 'YYY1', False),
-        (editor_2, 'YYY2', False),
-        (editor_3, 'YYY3', True),
-        (publisher, 'YYY4', False),
-    ):
-        edit_notice(user, 'notice', title=title, forbidden=forbidden)
-        if not forbidden:
-            assert title in editor_1.get('/notice/notice')
+        # submitted
+        submit_notice(editor_1, 'notice')
+        for user, title, forbidden in (
+            (editor_1, 'YYY1', False),
+            (editor_2, 'YYY2', False),
+            (editor_3, 'YYY3', True),
+            (publisher, 'YYY4', False),
+        ):
+            edit_notice(user, 'notice', title=title, forbidden=forbidden)
+            if not forbidden:
+                assert title in editor_1.get('/notice/notice')
 
-    # rejected
-    reject_notice(publisher, 'notice')
-    for user, title, forbidden in (
-        (editor_1, 'YYY1', False),
-        (editor_2, 'YYY2', False),
-        (editor_3, 'YYY3', True),
-        (publisher, 'YYY4', False),
-    ):
-        edit_notice(user, 'notice', title=title, forbidden=forbidden)
-        if not forbidden:
-            assert title in editor_1.get('/notice/notice')
+        # rejected
+        reject_notice(publisher, 'notice')
+        for user, title, forbidden in (
+            (editor_1, 'YYY1', False),
+            (editor_2, 'YYY2', False),
+            (editor_3, 'YYY3', True),
+            (publisher, 'YYY4', False),
+        ):
+            edit_notice(user, 'notice', title=title, forbidden=forbidden)
+            if not forbidden:
+                assert title in editor_1.get('/notice/notice')
 
-    # accepted
-    submit_notice(editor_1, 'notice')
-    accept_notice(publisher, 'notice')
-    edit_notice(editor_1, 'notice', unable=True)
-    edit_notice(editor_2, 'notice', unable=True)
-    edit_notice(editor_3, 'notice', forbidden=True)
-    edit_notice(publisher, 'notice', unable=True)
+        # accepted
+        submit_notice(editor_1, 'notice')
+        accept_notice(publisher, 'notice')
+        edit_notice(editor_1, 'notice', unable=True)
+        edit_notice(editor_2, 'notice', unable=True)
+        edit_notice(editor_3, 'notice', forbidden=True)
+        edit_notice(publisher, 'notice', unable=True)
 
     publish_notice(publisher, 'notice')
     edit_notice(editor_1, 'notice', unable=True)
