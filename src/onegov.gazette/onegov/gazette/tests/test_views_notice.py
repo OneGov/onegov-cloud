@@ -131,7 +131,7 @@ def change_organization(gazette_app, name, **kwargs):
     manage.form.submit()
 
 
-def test_view_notice(gazette_app):
+def test_view_notice1(gazette_app):
     # Check if the details of the notice is displayed correctly in the
     # display view (that is: organization, owner, group etc).
 
@@ -181,11 +181,11 @@ def test_view_notice(gazette_app):
         publish_notice(publisher, 'titel-2')
         publish_notice(publisher, 'titel-3')
 
-        for number in range(1, 4):
+        for number in range(3):
             for user in (editor_1, editor_2, editor_3, publisher):
-                view = user.get('/notice/titel-{}'.format(number))
-                assert "Nr. 44, 03.11.2017 / {}".format(number) in view
-                assert "Nr. 45, 10.11.2017 / {}".format(number) in view
+                view = user.get('/notice/titel-{}'.format(number + 1))
+                assert "Nr. 44, 03.11.2017 / {}".format(2 * number + 1) in view
+                assert "Nr. 45, 10.11.2017 / {}".format(2 * number + 2) in view
 
 
 def test_view_notice_actions(gazette_app):

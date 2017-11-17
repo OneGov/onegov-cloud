@@ -198,7 +198,7 @@ def test_view_issues_publish(gazette_app):
         notice_1 = client.get('/notice/notice-1')
         notice_2 = client.get('/notice/notice-2')
         assert '<li>Nr. 44, 03.11.2017 / 1</li>' in notice_0
-        assert '<li>Nr. 45, 10.11.2017 / 1</li>' in notice_0
+        assert '<li>Nr. 45, 10.11.2017 / 2</li>' in notice_0
         assert '<li>Nr. 45, 10.11.2017</li>' in notice_1
         assert '<li>Nr. 46, 17.11.2017</li>' in notice_1
         assert '<li>Nr. 45, 10.11.2017</li>' in notice_2
@@ -213,9 +213,9 @@ def test_view_issues_publish(gazette_app):
         notice_1 = client.get('/notice/notice-1')
         notice_2 = client.get('/notice/notice-2')
         assert '<li>Nr. 44, 03.11.2017 / 1</li>' in notice_0
-        assert '<li>Nr. 45, 10.11.2017 / 1</li>' in notice_0
-        assert '<li>Nr. 45, 10.11.2017 / 2</li>' in notice_1
-        assert '<li>Nr. 46, 17.11.2017 / 1</li>' in notice_1
+        assert '<li>Nr. 45, 10.11.2017 / 2</li>' in notice_0
+        assert '<li>Nr. 45, 10.11.2017 / 3</li>' in notice_1
+        assert '<li>Nr. 46, 17.11.2017 / 4</li>' in notice_1
         assert '<li>Nr. 45, 10.11.2017</li>' in notice_2
 
 

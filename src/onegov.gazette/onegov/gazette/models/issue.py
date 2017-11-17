@@ -10,6 +10,7 @@ from sedate import as_datetime
 from sedate import standardize_date
 from sqlalchemy import Column
 from sqlalchemy import Date
+from sqlalchemy import extract
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy_utils import observes
@@ -85,6 +86,32 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
 
         return notices
 
+    @staticmethod
+    def publication_numbers(session):
+        """ Returns the current publication numbers by year. """
+
+        from onegov.gazette.models.notice import GazetteNotice  # circular
+
+        result = {}
+
+        years = session.query(extract('year', Issue.date).distinct())
+        years = [int(year[0]) for year in years]
+        for year in years:
+            numbers = []
+
+            issues = session.query(Issue.name)
+            issues = issues.filter(extract('year', Issue.date) == year)
+            for issue in issues:
+                numbers.extend([
+                    x[0] for x in session.query(GazetteNotice._issues[issue])
+                    if x[0]
+                ])
+            numbers = [int(number) for number in numbers]
+
+            result[year] = max(numbers) if numbers else 0
+
+        return result
+
     @property
     def in_use(self):
         """ True, if the issued is used by any notice. """
@@ -123,5 +150,6 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
 
         """
 
+        publication_numbers = None
         for notice in self.notices('accepted'):
-            notice.publish(request)
+            publication_numbers = notice.publish(request, publication_numbers)

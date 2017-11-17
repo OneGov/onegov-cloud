@@ -137,17 +137,6 @@ class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
         if hasattr(self, '_group_observer'):
             self._group_observer(group, name)
 
-    def next_publication_number(self, issue):
-        """ Returns the next publication number for the given issue. """
-
-        query = object_session(self).query(GazetteNotice)
-        query = query.filter(GazetteNotice._issues.has_key(issue))  # noqa
-        query = query.filter(GazetteNotice.state == 'published')
-        numbers = [item.issues[issue] for item in query]
-        numbers = [int(number) for number in numbers if number]
-        number = (max(numbers) + 1) if numbers else 1
-        return number
-
     def add_change(self, request, event, text=None):
         """ Adds en entry to the changelog. """
 
@@ -197,21 +186,30 @@ class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
         super(GazetteNotice, self).accept()
         self.add_change(request, _("accepted"))
 
-    def publish(self, request):
+    def publish(self, request, publication_numbers=None):
         """ Publish an accepted notice.
 
         This automatically adds en entry to the changelog and assigns the
         publication numbers.
 
+        Returns the updated publications numbers to allow batch-publishing.
+
         """
 
+        if not publication_numbers:
+            session = request.app.session()
+            publication_numbers = Issue.publication_numbers(session)
+
         issues = dict(self.issues)
-        for issue in issues:
-            issues[issue] = str(self.next_publication_number(issue))
+        for issue in self.issue_objects:
+            publication_numbers[issue.date.year] += 1
+            issues[issue.name] = str(publication_numbers[issue.date.year])
         self._issues = issues
 
         super(GazetteNotice, self).publish()
         self.add_change(request, _("published"))
+
+        return publication_numbers
 
     @property
     def rejected_comment(self):
