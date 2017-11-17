@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.3.0 (2017-11-17)
+~~~~~~~~~~~~~~~~~~~~~
 
 - Rewrites the mini_html function to use list flowables and a HTML sanitizer/
   cleaner.
