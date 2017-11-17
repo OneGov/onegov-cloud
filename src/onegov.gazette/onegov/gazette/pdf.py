@@ -1,3 +1,4 @@
+from copy import deepcopy
 from io import BytesIO
 from onegov.gazette import _
 from onegov.gazette.layout import Layout
@@ -11,23 +12,58 @@ from onegov.pdf import Pdf as PdfBase
 
 class Pdf(PdfBase):
 
-    def h(self, title, level=1):
-        """ Add a title h1-h3 according to the given level. """
+    def adjust_style(self, font_size=10):
+        """ Adds styles for notices. """
 
-        getattr(self, 'h{}'.format(min(level, 3)))(title)
+        super(Pdf, self).adjust_style(font_size)
 
-    def unfold_data(self, data, level=2):
+        self.style.title = deepcopy(self.style.normal)
+        self.style.title.fontSize = 2.25 * self.style.fontSize
+        self.style.title.leading = 1.2 * self.style.title.fontSize
+        self.style.title.spaceBefore = 0
+        self.style.title.spaceAfter = 0.67 * self.style.title.fontSize
+
+        self.style.h_notice = deepcopy(self.style.normal)
+        self.style.h_notice.fontSize = 1.125 * self.style.fontSize
+        self.style.h_notice.spaceBefore = 1.275 * self.style.h_notice.fontSize
+        self.style.h_notice.spaceAfter = 0.275 * self.style.h_notice.fontSize
+
+        self.style.paragraph.spaceAfter = 0.675 * self.style.paragraph.fontSize
+        self.style.paragraph.leading = 1.275 * self.style.paragraph.fontSize
+
+        self.style.ul_bullet = '-'
+        self.style.li.spaceAfter = 0.275 * self.style.li.fontSize
+        self.style.li.leading = 1.275 * self.style.li.fontSize
+
+    def h(self, title, level=0):
+        """ Adds a title according to the given level. """
+
+        if not level:
+            self.p_markup(title, self.style.title)
+        else:
+            getattr(self, 'h{}'.format(min(level, 4)))(title)
+
+    def unfold_data(self, data, level=1):
         """ Take a nested list of dicts and add it. """
 
         for item in data:
             title = item.get('title', None)
             if title:
                 self.h(title, level)
+                self.story[-1].keepWithNext = True
 
             notices = item.get('notices', [])
             for notice in notices:
-                self.h3(notice[0])  # todo: ?
-                self.p_markup(notice[1])
+                self.p_markup(
+                    '<b>{}</b> <i><font size="{}">{}</font></i>'.format(
+                        notice[0],
+                        0.875 * self.style.h_notice.fontSize,
+                        notice[2]
+                    ),
+                    self.style.h_notice
+                )
+                self.story[-1].keepWithNext = True
+                self.mini_html(notice[1])
 
             children = item.get('children', [])
             if children:
@@ -42,7 +78,8 @@ class Pdf(PdfBase):
 
         notices = session.query(
             GazetteNotice.title,
-            GazetteNotice.text
+            GazetteNotice.text,
+            GazetteNotice._issues[issue]
         )
         notices = notices.filter(
             GazetteNotice._issues.has_key(issue),  # noqa
@@ -127,7 +164,7 @@ class Pdf(PdfBase):
         layout = Layout(None, request)
         title = '{} {}'.format(
             request.translate(_("Gazette")),
-            layout.format_issue(issue, date_format='date_with_weekday')
+            layout.format_issue(issue, date_format='date')
         )
 
         file = file or BytesIO()
@@ -140,7 +177,7 @@ class Pdf(PdfBase):
             page_fn=page_fn_footer,
             page_fn_later=page_fn_header_and_footer
         )
-        pdf.h1(title)
+        pdf.h(title)
         pdf.unfold_data(data)
         pdf.generate()
 
