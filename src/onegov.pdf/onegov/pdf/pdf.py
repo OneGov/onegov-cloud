@@ -1,13 +1,19 @@
+from bleach.sanitizer import Cleaner
 from copy import deepcopy
 from datetime import date
+from html5lib.filters.whitespace import Filter as whitespace_filter
 from io import StringIO
 from lxml import etree
 from onegov.pdf.flowables import InlinePDF
-from pdfdocument.document import MarkupParagraph, PDFDocument
+from pdfdocument.document import MarkupParagraph
+from pdfdocument.document import PDFDocument
 from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.enums import TA_LEFT
+from reportlab.lib.enums import TA_RIGHT
 from reportlab.lib.units import cm
 from reportlab.platypus import Frame
+from reportlab.platypus import ListFlowable
 from reportlab.platypus import NextPageTemplate
 from reportlab.platypus import PageTemplate
 from reportlab.platypus import Paragraph
@@ -172,6 +178,12 @@ class Pdf(PDFDocument):
         self.style.heading4.leading = 1.2 * self.style.heading4.fontSize
 
         self.style.paragraph.spaceAfter = 2 * self.style.paragraph.fontSize
+        self.style.paragraph.leading = 1.2 * self.style.paragraph.fontSize
+
+        self.style.ol_bullet = '1'
+        self.style.ul_bullet = 'bulletchar'
+        self.style.li = deepcopy(self.style.normal)
+        self.style.li.leading = 1.2 * self.style.li.fontSize
 
         self.style.figcaption = deepcopy(self.style.paragraph)
         self.style.figcaption.fontSize = 0.85 * self.style.figcaption.fontSize
@@ -205,18 +217,6 @@ class Pdf(PDFDocument):
 
     def h4(self, text, style=None):
         self.story.append(Paragraph(text, style or self.style.heading4))
-
-    def paragaphs(self, text, style=None):
-        """ Adds the given html as markup paragraphs.
-
-        Example:
-            pdf.paragraphs('<p>First</p><p>Second</p>')
-
-        """
-
-        tree = etree.parse(StringIO(text), etree.HTMLParser())
-        for p in tree.find('body'):
-            self.p_markup(etree.tostring(p, encoding='unicode'), style)
 
     def fit_size(self, width, height, factor=1.0):
         """ Returns the given width and height so that it fits on the page. """
@@ -302,3 +302,63 @@ class Pdf(PDFDocument):
         """ Adds a figure caption. """
 
         self.p(text, style=style or self.style.figcaption)
+
+    def mini_html(self, html):
+        """ Convert a small subset of HTML into ReportLab paragraphs.
+
+        This is very limited and currently supports only paragraphs and
+        non-nested ordered/unordered lists.
+
+        """
+
+        # Remove unwanted markup
+        cleaner = Cleaner(
+            tags=('p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li'),
+            attributes={},
+            strip=True,
+            filters=[whitespace_filter]
+        )
+        html = cleaner.clean(html or '')
+
+        def inner_html(element):
+            return '{}{}{}'.format(
+                (element.text or '').strip(),
+                ''.join((
+                    etree.tostring(child, encoding='unicode').strip()
+                    for child in element
+                )),
+                (element.tail or '').strip()
+            )
+
+        # Walk the tree
+        tree = etree.parse(StringIO(html), etree.HTMLParser())
+        for element in tree.find('body'):
+            if element.tag == 'p':
+                self.p_markup(inner_html(element), self.style.paragraph)
+            elif element.tag in 'ol':
+                items = [
+                    MarkupParagraph(inner_html(item), self.style.li)
+                    for item in element
+                ]
+                self.story.append(
+                    ListFlowable(
+                        items,
+                        bulletType=self.style.ol_bullet,
+                        bulletFontName=self.style.li.fontName,
+                        bulletFontSize=self.style.li.fontSize,
+                    )
+                )
+            elif element.tag == 'ul':
+                items = [
+                    MarkupParagraph(inner_html(item), self.style.li)
+                    for item in element
+                ]
+                self.story.append(
+                    ListFlowable(
+                        items,
+                        bulletType='bullet',
+                        bulletFontName=self.style.li.fontName,
+                        bulletFontSize=self.style.li.fontSize,
+                        start=self.style.ul_bullet
+                    )
+                )

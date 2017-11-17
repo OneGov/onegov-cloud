@@ -32,6 +32,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
+        'bleach',
         'onegov.core>=0.4.0',
         'pdfdocument',
         'pdfrw',

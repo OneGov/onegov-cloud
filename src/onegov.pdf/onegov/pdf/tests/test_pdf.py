@@ -12,6 +12,7 @@ from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.enums import TA_RIGHT
 from reportlab.lib.units import cm
 from reportlab.platypus import Paragraph
+from reportlab.platypus import ListFlowable
 
 
 def test_pdf_fit_size():
@@ -100,34 +101,88 @@ def test_pdf():
     assert len(PdfReader(f, decompress=False).pages) == 7
 
 
-def test_pdf_paragraphs():
+def test_pdf_mini_html():
     file = BytesIO()
     pdf = Pdf(file)
     pdf.init_a4_portrait()
-    pdf.paragaphs('first')
-    pdf.paragaphs('<p>second</p>')
-    pdf.paragaphs('<p>third</p>')
-    pdf.paragaphs('<p>fourth</p><p>fifth</p>')
-    pdf.paragaphs('<p>sixt')
-    pdf.paragaphs('<p><strong>seventh</strong></p>')
 
-    story = [p.text for p in pdf.story if isinstance(p, Paragraph)]
-    assert story == [
-        '<p>first</p>',
-        '<p>second</p>',
-        '<p>third</p>',
-        '<p>fourth</p>',
-        '<p>fifth</p>',
-        '<p>sixt</p>',
-        '<p><strong>seventh</strong></p>'
+    html = """<h1>Ipsum</h1>
+    <p><strong>Pellentesque habitant morbi tristique</strong> senectus et
+    <span style="font-size: 20">netus</span> et malesuada fames ac turpis.</p>
+    <p>Donec eu libero sit amet quam egestas semper. <em>Aenean ultricies mi
+    vitae est</em>. Mauris <code>commodo vitae</code>.</p>
+    <p><a href="#" target="_blank">Donec non enim</a> in turpis pulvinar
+    facilisis. Ut felis.</p>
+    <h2>Aliquam</h2>
+    <ol>
+       <li>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</li>
+       <li class="last">Aliquam tincidunt mauris eu risus.</li>
+    </ol>
+    <blockquote>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+    </blockquote>
+    <h3>Aenean</h3>
+    <ul>
+       <li>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</li>
+       <li>Aliquam tincidunt mauris eu risus.</li>
+    </ul>
+    <pre><code>
+    #header h1 a {
+      display: block;
+      width: 300px;
+      height: 80px;
+    }
+    </code></pre>
+    """
+    pdf.mini_html(html)
+
+    paragraphs = [p.text for p in pdf.story if isinstance(p, Paragraph)]
+    assert paragraphs == [
+        'Ipsum',
+        (
+            '<strong>Pellentesque habitant morbi tristique</strong> senectus '
+            'et netus et malesuada fames ac turpis.'
+        ),
+        (
+            'Donec eu libero sit amet quam egestas semper.<em>Aenean '
+            'ultricies mi vitae est</em>. Mauris commodo vitae.'
+        ),
+        'Donec non enim in turpis pulvinar facilisis. Ut felis.Aliquam',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.Aenean'
     ]
+
+    lists = [
+        [li.text for li in l._flowables]
+        for l in pdf.story if isinstance(l, ListFlowable)
+    ]
+    assert lists == [
+        [
+            'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.',
+            'Aliquam tincidunt mauris eu risus.'
+        ],
+        [
+            'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.',
+            'Aliquam tincidunt mauris eu risus.'
+        ]
+    ]
+
     pdf.generate()
 
     file.seek(0)
     reader = PdfFileReader(file)
     assert reader.getNumPages() == 1
     assert reader.getPage(0).extractText() == (
-        'first\nsecond\nthird\nfourth\nfifth\nsixt\nseventh\n'
+        'Ipsum\n'
+        'Pellentesque habitant morbi tristique senectus et netus et '
+        'malesuada fames ac turpis.\n'
+        'Donec eu libero sit amet quam egestas semper.Aenean ultricies mi '
+        'vitae est. Mauris commodo vitae.\n'
+        'Donec non enim in turpis pulvinar facilisis. Ut felis.Aliquam\n'
+        '1\nLorem ipsum dolor sit amet, consectetuer adipiscing elit.\n'
+        '2\nAliquam tincidunt mauris eu risus.\n'
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.Aenean\n'
+        '\nLorem ipsum dolor sit amet, consectetuer adipiscing elit.\n'
+        '\nAliquam tincidunt mauris eu risus.\n'
     )
 
 

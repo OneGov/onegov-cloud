@@ -1,7 +1,8 @@
 Changelog
 ---------
 
-- Allows to append a block of HTML paragraphs.
+- Rewrites the mini_html function to use list flowables and a HTML sanitizer/
+  cleaner.
   [msom]
 
 - Adds h4.
