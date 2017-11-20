@@ -15,7 +15,11 @@ from onegov.town.initial_content import create_new_organisation
 
 
 class TownApp(OrgApp):
-    pass
+
+    def configure_organisation(self, **cfg):
+        cfg.setdefault('enable_user_registration', False)
+        cfg.setdefault('enable_yubikey', True)
+        super().configure_organisation(**cfg)
 
 
 @TownApp.static_directory()
@@ -31,16 +35,6 @@ def get_template_directory():
 @TownApp.setting(section='core', name='theme')
 def get_theme():
     return TownTheme()
-
-
-@TownApp.setting(section='org', name='enable_user_registration')
-def get_enable_user_registration():
-    return False
-
-
-@TownApp.setting(section='org', name='enable_yubikey')
-def get_enable_yubikey():
-    return True
 
 
 @TownApp.setting(section='i18n', name='localedirs')
