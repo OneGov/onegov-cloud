@@ -34,6 +34,9 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     export = directive(directives.ExportAction)
     userlinks = directive(directives.UserlinkAction)
 
+    #: the version of this application (do not change manually!)
+    version = '0.18.0'
+
     def is_allowed_application_id(self, application_id):
         """ Stops onegov.server from ever passing the request to the org
         application, if the schema does not exist. This way we can host
