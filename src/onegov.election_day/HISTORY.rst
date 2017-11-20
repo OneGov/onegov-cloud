@@ -4,6 +4,9 @@ Changelog
 - Uses onegov.pdf.
   [msom]
 
+- Updates RavenJs.
+  [msom]
+
 1.15.10 (2017-10-23)
 ~~~~~~~~~~~~~~~~~~~
 
