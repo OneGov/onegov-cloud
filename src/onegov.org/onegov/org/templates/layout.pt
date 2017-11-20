@@ -28,7 +28,7 @@
     <tal:block metal:use-macro="layout.macros.favicon" />
 
     <tal:b define="sentry_js layout.app.sentry_js" condition="sentry_js">
-      <script src="https://cdn.ravenjs.com/3.6.1/raven.min.js"></script>
+      <script src="https://cdn.ravenjs.com/3.20.1/raven.min.js" crossorigin="anonymous"></script>
       <script>Raven.config('${sentry_js}').install();</script>
     </tal:b>
 </head>
