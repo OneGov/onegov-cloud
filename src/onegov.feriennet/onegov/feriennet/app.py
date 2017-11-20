@@ -33,6 +33,9 @@ BANNER_TEMPLATE = """
 
 class FeriennetApp(OrgApp):
 
+    #: the version of this application (do not change manually!)
+    version = '1.3.6'
+
     request_class = FeriennetRequest
 
     def es_may_use_private_search(self, request):
