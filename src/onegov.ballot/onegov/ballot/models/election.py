@@ -278,6 +278,26 @@ class Election(Base, TimestampMixin, DerivedAttributes,
 
         return results.first() is not None
 
+    def clear_results(self):
+        """ Clears all the results. """
+
+        self.counted_entities = 0
+        self.total_entities = 0
+        self.absolute_majority = None
+        self.status = None
+
+        session = object_session(self)
+        for connection in self.list_connections:
+            session.delete(connection)
+        for list_ in self.lists:
+            session.delete(list_)
+        for candidate in self.candidates:
+            session.delete(candidate)
+        for result in self.results:
+            session.delete(result)
+        for result in self.party_results:
+            session.delete(result)
+
     def export(self):
         """ Returns all data connected to this election as list with dicts.
 

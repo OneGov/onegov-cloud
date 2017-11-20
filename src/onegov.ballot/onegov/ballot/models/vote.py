@@ -290,6 +290,15 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
 
         return max(last_changes)
 
+    def clear_results(self):
+        """ Clear all the results. """
+
+        self.status = None
+
+        session = object_session(self)
+        for ballot in self.ballots:
+            session.delete(ballot)
+
     def export(self):
         """ Returns all data connected to this vote as list with dicts.
 
@@ -513,6 +522,13 @@ class Ballot(Base, TimestampMixin, DerivedAttributes, DerivedBallotsCount):
             result[id] = r
 
         return result
+
+    def clear_results(self):
+        """ Clear all the results. """
+
+        session = object_session(self)
+        for result in self.results:
+            session.delete(result)
 
 
 class BallotResult(Base, TimestampMixin, DerivedAttributes,

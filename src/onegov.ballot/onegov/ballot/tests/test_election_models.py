@@ -1023,3 +1023,89 @@ def test_election_status(session):
             election.counted_entities = counted
             election.total_entities = total
             assert election.completed == completed
+
+
+def test_clear_election(session):
+    eid = uuid4()
+    pid = uuid4()
+    cid = uuid4()
+    sid = uuid4()
+    lid = uuid4()
+    election = Election(
+        title='Election',
+        type='majorz',
+        domain='canton',
+        date=date(2017, 1, 1),
+        status='interim',
+        counted_entities=1,
+        total_entities=2,
+        absolute_majority=10000
+    )
+    election.list_connections.append(
+        ListConnection(id=pid, connection_id='1')
+    )
+    election.list_connections.append(
+        ListConnection(id=sid, connection_id='2', parent_id=pid)
+    )
+    election.lists.append(
+        List(
+            id=lid,
+            number_of_mandates=0,
+            list_id='A',
+            name='List',
+            connection_id=sid
+        )
+    )
+    election.candidates.append(
+        Candidate(
+            id=cid,
+            candidate_id='0',
+            family_name='X',
+            first_name='Y',
+            elected=False,
+            list_id=lid,
+        )
+    )
+    election.results.append(
+        ElectionResult(
+            id=eid,
+            group='group',
+            entity_id=1,
+            elegible_voters=100,
+            received_ballots=2,
+            blank_ballots=3,
+            invalid_ballots=4,
+            blank_votes=5,
+            invalid_votes=6
+        )
+    )
+    election.party_results.append(
+        PartyResult(
+            year=2017,
+            number_of_mandates=0,
+            votes=0,
+            total_votes=100,
+            name='A',
+        )
+    )
+
+    session.add(ListResult(election_result_id=eid, list_id=lid, votes=10))
+    session.add(PanachageResult(target_list_id=lid, source_list_id=1, votes=0))
+    session.add(
+        CandidateResult(election_result_id=eid, candidate_id=cid, votes=0)
+    )
+
+    session.add(election)
+    session.flush()
+
+    election.clear_results()
+
+    assert election.counted_entities == 0
+    assert election.total_entities == 0
+    assert election.absolute_majority is None
+    assert election.status is None
+    assert election.list_connections.all() == []
+    assert election.lists.all() == []
+    assert election.candidates.all() == []
+    assert election.results.all() == []
+    assert election.party_results.all() == []

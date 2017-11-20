@@ -787,3 +787,58 @@ def test_vote_status(session):
     ):
         vote.status = status
         assert vote.completed == completed
+
+
+def test_clear_ballot(session):
+    vote = Vote(
+        title='Vote',
+        domain='canton',
+        date=date(2017, 1, 1),
+        status='interim'
+    )
+    vote.ballots.append(Ballot(type='proposal'))
+    vote.proposal.results.append(
+        BallotResult(
+            entity_id=1,
+            group='group',
+            counted=True,
+            yeas=1,
+            nays=2,
+            empty=3,
+            invalid=4,
+        )
+    )
+    session.add(vote)
+    session.flush()
+
+    vote.proposal.clear_results()
+
+    assert vote.proposal.results.first() == None
+
+
+def test_clear_vote(session):
+    vote = Vote(
+        title='Vote',
+        domain='canton',
+        date=date(2017, 1, 1),
+        status='interim'
+    )
+    vote.ballots.append(Ballot(type='proposal'))
+    vote.proposal.results.append(
+        BallotResult(
+            entity_id=1,
+            group='group',
+            counted=True,
+            yeas=1,
+            nays=2,
+            empty=3,
+            invalid=4,
+        )
+    )
+    session.add(vote)
+    session.flush()
+
+    vote.clear_results()
+
+    assert vote.status is None
+    assert [ballot for ballot in vote.ballots] == []
