@@ -2,9 +2,8 @@ from onegov.org import OrgApp
 
 
 class IntranetApp(OrgApp):
-    pass
 
-
-@IntranetApp.setting(section='org', name='enable_yubikey')
-def get_enable_yubikey():
-    return True
+    def configure_organisation(self, **cfg):
+        cfg.setdefault('enable_user_registration', False)
+        cfg.setdefault('enable_yubikey', True)
+        super().configure_organisation(**cfg)
