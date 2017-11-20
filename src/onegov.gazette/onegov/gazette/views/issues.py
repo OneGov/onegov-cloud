@@ -210,8 +210,6 @@ def publish_issue(self, request, form):
 def generate_issue(self, request, form):
     """ Generates the PDF of the issue.
 
-    Redirect to the sign view after generating the PDF.
-
     This view is only visible by a publisher.
 
     """

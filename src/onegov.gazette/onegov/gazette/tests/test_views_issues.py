@@ -1,6 +1,8 @@
 from freezegun import freeze_time
+from io import BytesIO
 from onegov.gazette.tests import login_editor_1
 from onegov.gazette.tests import login_publisher
+from PyPDF2 import PdfFileReader
 from pyquery import PyQuery as pq
 from webtest import TestApp as Client
 
@@ -219,4 +221,76 @@ def test_view_issues_publish(gazette_app):
         assert '<li>Nr. 45, 10.11.2017</li>' in notice_2
 
 
-# todo: test generate
+def test_view_issues_generate(gazette_app):
+    with freeze_time("2017-11-01 12:00"):
+        client = Client(gazette_app)
+        login_publisher(client)
+
+        # add a notice
+        manage = client.get('/notices/drafted/new-notice')
+        manage.form['title'] = 'First notice'
+        manage.form['organization'] = '200'
+        manage.form['category'] = '13'
+        manage.form['issues'] = ['2017-44']
+        manage.form['text'] = 'This is the first notice'
+        manage = manage.form.submit()
+
+        client.get('/notice/first-notice/submit').form.submit()
+        client.get('/notice/first-notice/accept').form.submit()
+        client.get('/notice/first-notice/publish').form.submit()
+
+        # generate 44
+        manage = client.get('/issues').click('Erzeugen', index=0)
+        manage = manage.form.submit().maybe_follow()
+        assert "PDF erstellt." in manage
+        assert "2017-44.pdf" in manage
+
+        manage = manage.click('2017-44.pdf')
+        assert manage.content_type == 'application/pdf'
+
+        reader = PdfFileReader(BytesIO(manage.body))
+        text = ''.join([page.extractText() for page in reader.pages])
+        assert text == (
+            '© 2017 Govikon\n'
+            '1\nAmtsblatt Nr. 44, 03.11.2017\n'
+            'Civic Community\n'
+            'Commercial Register\n'
+            'First notice 1\n'
+            'This is the first notice\n'
+        )
+
+        # add another notice
+        manage = client.get('/notices/drafted/new-notice')
+        manage.form['title'] = 'Second notice'
+        manage.form['organization'] = '100'
+        manage.form['category'] = '11'
+        manage.form['issues'] = ['2017-44']
+        manage.form['text'] = 'This is the second notice'
+        manage = manage.form.submit()
+
+        client.get('/notice/second-notice/submit').form.submit()
+        client.get('/notice/second-notice/accept').form.submit()
+        client.get('/notice/second-notice/publish').form.submit()
+
+        # generate again
+        manage = client.get('/issues').click('Erzeugen', index=0)
+        manage = manage.form.submit().maybe_follow()
+        assert "PDF erstellt." in manage
+
+        manage = manage.click('2017-44.pdf')
+        assert manage.content_type == 'application/pdf'
+
+        reader = PdfFileReader(BytesIO(manage.body))
+        text = ''.join([page.extractText() for page in reader.pages])
+        assert text == (
+            '© 2017 Govikon\n'
+            '1\nAmtsblatt Nr. 44, 03.11.2017\n'
+            'State Chancellery\n'
+            'Education\n'
+            'Second notice 2\n'
+            'This is the second notice\n'
+            'Civic Community\n'
+            'Commercial Register\n'
+            'First notice 1\n'
+            'This is the first notice\n'
+        )
