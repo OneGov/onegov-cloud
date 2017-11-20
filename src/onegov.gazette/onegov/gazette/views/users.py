@@ -196,6 +196,7 @@ def view_user_sessions(self, request):
     layout = Layout(self, request)
     return {
         'layout': layout,
+        'title': _('Sessions'),
         'users': self.query().all()
     }
 

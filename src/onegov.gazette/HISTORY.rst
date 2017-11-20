@@ -1,52 +1,8 @@
 Changelog
 ---------
-1.10.4 (2017-11-16)
-~~~~~~~~~~~~~~~~~~~
 
-- Allows publishers to manage organizations and categories.
+- Adds missing title slot.
   [msom]
-
-1.10.3 (2017-11-16)
-~~~~~~~~~~~~~~~~~~~
-
-- Allows publishers to manage organizations and categories.
-  [msom]
-
-1.10.3 (2017-11-16)
-~~~~~~~~~~~~~~~~~~~
-
-- Fixes failing test.
-  [msom]
-
-1.10.2 (2017-11-10)
-~~~~~~~~~~~~~~~~~~~
-
-- Fixes failing test.
-  [msom]
-
-1.10.2 (2017-11-10)
-~~~~~~~~~~~~~~~~~~~
-
-- Fixes failing test.
-  [msom]
-
-1.9.4 (2017-11-15)
-~~~~~~~~~~~~~~~~~~~
-
-- Skips failing test.
-  [href]
-
-1.9.5 (2017-11-16)
-~~~~~~~~~~~~~~~~~~~
-
-- Fixes failing test.
-  [msom]
-
-1.9.4 (2017-11-15)
-~~~~~~~~~~~~~~~~~~~
-
-- Skips failing test.
-  [href]
 
 1.9.5 (2017-11-16)
 ~~~~~~~~~~~~~~~~~~~
