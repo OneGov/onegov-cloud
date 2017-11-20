@@ -87,20 +87,15 @@ class FeriennetApp(OrgApp):
             tracker=winner.banners[id].get('tracker')
         )
 
+    def configure_organisation(self, **cfg):
+        cfg.setdefault('enable_user_registration', True)
+        cfg.setdefault('enable_yubikey', False)
+        super().configure_organisation(**cfg)
+
 
 @FeriennetApp.template_directory()
 def get_template_directory():
     return 'templates'
-
-
-@FeriennetApp.setting(section='org', name='enable_user_registration')
-def get_enable_user_registration():
-    return True
-
-
-@FeriennetApp.setting(section='org', name='enable_yubikey')
-def get_enable_yubikey():
-    return False
 
 
 @FeriennetApp.setting(section='org', name='create_new_organisation')
