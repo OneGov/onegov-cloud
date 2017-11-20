@@ -104,7 +104,7 @@
                 previous current_page.previous;
                 next current_page.next;
                 is_current current_page == page;
-                is_visible (abs(current_page.page-page.page) < 6) or repeat.page.start or repeat.page.end;
+                is_visible (abs(current_page.page-page.page) < 4) or repeat.page.start or repeat.page.end;
             ">
                 <tal:block condition="repeat.page.start and previous">
                     <li class="arrow">

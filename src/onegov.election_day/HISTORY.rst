@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Always Show First and Last Item of Pagination.
+  [msom]
+
 - Adds missing title slot.
   [msom]
 
