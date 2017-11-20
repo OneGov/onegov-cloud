@@ -10,7 +10,6 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import NotificationCollection
 from onegov.election_day.forms import EmptyForm
-from onegov.election_day.forms import EmptyForm
 from onegov.election_day.forms import VoteForm
 from onegov.election_day.layout import ManageVotesLayout
 
