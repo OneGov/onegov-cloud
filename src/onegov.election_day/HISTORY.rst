@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds missing title slot.
+  [msom]
+
 - Uses onegov.pdf.
   [msom]
 

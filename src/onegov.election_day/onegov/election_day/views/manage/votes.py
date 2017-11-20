@@ -21,7 +21,7 @@ def view_votes(self, request):
 
     return {
         'layout': ManageVotesLayout(self, request),
-        'title': _("Manage"),
+        'title': _("Votes"),
         'groups': groupbylist(self.batch, key=lambda vote: vote.date),
         'new_vote': request.link(self, 'new-vote')
     }
@@ -72,7 +72,7 @@ def edit_vote(self, request, form):
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Edit"),
+        'subtitle': _("Edit vote"),
         'cancel': layout.manage_model_link
     }
 

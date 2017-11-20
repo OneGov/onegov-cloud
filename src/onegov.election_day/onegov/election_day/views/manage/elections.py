@@ -20,7 +20,7 @@ def view_elections(self, request):
 
     return {
         'layout': ManageElectionsLayout(self, request),
-        'title': _("Manage"),
+        'title': _("Elections"),
         'elections': self.batch,
         'new_election': request.link(self, 'new-election')
     }
@@ -71,7 +71,7 @@ def edit_election(self, request, form):
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Edit"),
+        'subtitle': _("Edit election"),
         'cancel': layout.manage_model_link
     }
 

@@ -26,7 +26,7 @@ def view_data_sources(self, request):
 
     return {
         'layout': ManageDataSourcesLayout(self, request),
-        'title': _("Manage"),
+        'title': _("Data sources"),
         'data_sources': self.batch,
         'new_source': request.link(self, 'new-source'),
         'labels': dict(UPLOAD_TYPE_LABELS)
@@ -125,7 +125,7 @@ def view_data_source_items(self, request):
 
     return {
         'layout': ManageDataSourceItemsLayout(self, request),
-        'title': _("Manage"),
+        'title': _("Mappings"),
         'items': self.batch,
         'item_name': self.source.label,
         'source': self.source,
@@ -180,7 +180,8 @@ def edit_data_source_item(self, request, form):
     return {
         'layout': layout,
         'form': form,
-        'title': _("Edit"),
+        'title': self.name,
+        'subtitle': _("Edit mapping"),
         'cancel': layout.manage_model_link
     }
 
