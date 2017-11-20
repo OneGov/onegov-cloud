@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.8.0 (2017-11-20)
+~~~~~~~~~~~~~~~~~~~
 
 - Allows to clear the results.
   [msom]
