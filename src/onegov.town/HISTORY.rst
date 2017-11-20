@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Includes the version, current user and role in javascript error reports.
+  [href]
+
 1.15.2 (2017-11-20)
 ~~~~~~~~~~~~~~~~~~~~~
 
