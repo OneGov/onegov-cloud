@@ -4,7 +4,7 @@ name = 'onegov.intranet'
 description = (
     'Adapts onegov.org for use as an intranet application.'
 )
-version = '0.0.1'
+version = '0.0.2'
 
 
 def get_long_description():
