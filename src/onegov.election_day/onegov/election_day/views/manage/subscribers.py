@@ -6,7 +6,7 @@ from onegov.core.security import Private
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import SubscriberCollection
-from onegov.election_day.forms import DeleteForm
+from onegov.election_day.forms import EmptyForm
 from onegov.election_day.layout import ManageSubscribersLayout
 from onegov.election_day.models import Subscriber
 
@@ -26,7 +26,7 @@ def view_subscribers(self, request):
 
 
 @ElectionDayApp.form(model=Subscriber, name='delete', template='form.pt',
-                     permission=Private, form=DeleteForm)
+                     permission=Private, form=EmptyForm)
 def delete_subscriber(self, request, form):
 
     layout = ManageSubscribersLayout(self, request)

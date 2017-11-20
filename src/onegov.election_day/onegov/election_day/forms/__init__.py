@@ -14,7 +14,7 @@ from onegov.election_day.forms.vote import VoteForm
 from onegov.form import Form
 
 
-class DeleteForm(Form):
+class EmptyForm(Form):
     pass
 
 
@@ -25,7 +25,7 @@ class TriggerNotificationForm(Form):
 __all__ = [
     'DataSourceForm',
     'DataSourceItemForm',
-    'DeleteForm',
+    'EmptyForm',
     'ElectionForm',
     'SubscribeForm',
     'TriggerNotificationForm',

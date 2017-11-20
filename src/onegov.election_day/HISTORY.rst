@@ -13,6 +13,9 @@ Changelog
 - Updates RavenJs.
   [msom]
 
+- Uses a confirmation form for updating results.
+  [msom]
+
 1.15.10 (2017-10-23)
 ~~~~~~~~~~~~~~~~~~~
 

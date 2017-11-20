@@ -83,3 +83,18 @@ def election_day_app_kriens(request):
     app = create_election_day(request, "", "'1059'", "false")
     yield app
     app.session_manager.dispose()
+
+
+@pytest.fixture(scope="session")
+def import_scan():
+    """ Scans all the onegov.* sources to make sure that the tables are
+    created.
+
+    Include this fixtures as first argument if needed (that is if you run a
+    single test and get sqlalchemy relation errors).
+
+    """
+
+    import importscan
+    import onegov
+    importscan.scan(onegov, ignore=['.test', '.tests'])

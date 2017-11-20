@@ -9,7 +9,7 @@ from onegov.election_day.collections import DataSourceCollection
 from onegov.election_day.collections import DataSourceItemCollection
 from onegov.election_day.forms import DataSourceForm
 from onegov.election_day.forms import DataSourceItemForm
-from onegov.election_day.forms import DeleteForm
+from onegov.election_day.forms import EmptyForm
 from onegov.election_day.layout import ManageDataSourceItemsLayout
 from onegov.election_day.layout import ManageDataSourcesLayout
 from onegov.election_day.models import DataSource
@@ -66,7 +66,7 @@ def manage_data_source(self, request):
 
 
 @ElectionDayApp.form(model=DataSource, name='generate-token',
-                     template='form.pt', permission=Private, form=DeleteForm)
+                     template='form.pt', permission=Private, form=EmptyForm)
 def generate_data_source_token(self, request, form):
     """ Regenerate a new token for the data source. """
 
@@ -89,7 +89,7 @@ def generate_data_source_token(self, request, form):
 
 
 @ElectionDayApp.form(model=DataSource, name='delete',
-                     template='form.pt', permission=Private, form=DeleteForm)
+                     template='form.pt', permission=Private, form=EmptyForm)
 def delete_data_source(self, request, form):
     """ Delete the data source item. """
 
@@ -187,7 +187,7 @@ def edit_data_source_item(self, request, form):
 
 
 @ElectionDayApp.form(model=DataSourceItem, name='delete',
-                     template='form.pt', permission=Private, form=DeleteForm)
+                     template='form.pt', permission=Private, form=EmptyForm)
 def delete_data_source_item(self, request, form):
     """ Delete the data source item. """
 

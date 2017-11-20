@@ -165,7 +165,7 @@ def test_view_update_results(election_day_app):
     results = archive.query().count() == 0
     assert len(client.get('/json').json['results']) == 0
 
-    client.get('/update-results')
+    client.get('/update-results').form.submit()
 
     results = archive.query().count() == 2
     assert len(client.get('/json').json['results']) == 2

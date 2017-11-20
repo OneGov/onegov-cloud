@@ -9,7 +9,7 @@ from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import NotificationCollection
-from onegov.election_day.forms import DeleteForm
+from onegov.election_day.forms import EmptyForm
 from onegov.election_day.forms import TriggerNotificationForm
 from onegov.election_day.forms import VoteForm
 from onegov.election_day.layout import ManageVotesLayout
@@ -78,7 +78,7 @@ def edit_vote(self, request, form):
 
 
 @ElectionDayApp.form(model=Vote, name='delete', template='form.pt',
-                     permission=Private, form=DeleteForm)
+                     permission=Private, form=EmptyForm)
 def delete_vote(self, request, form):
 
     layout = ManageVotesLayout(self, request)
