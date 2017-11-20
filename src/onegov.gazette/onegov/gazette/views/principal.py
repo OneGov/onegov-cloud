@@ -5,6 +5,7 @@ from onegov.core.security import Public
 from onegov.gazette import _
 from onegov.gazette import GazetteApp
 from onegov.gazette.collections import GazetteNoticeCollection
+from onegov.gazette.collections import IssueCollection
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import Principal
 from onegov.gazette.views import get_user_and_group
@@ -13,11 +14,15 @@ from sedate import utcnow
 
 @GazetteApp.html(
     model=Principal,
-    permission=Public
+    permission=Public,
+    template='archive.pt',
 )
 def view_principal(self, request):
-    """ The homepage. Redirects to the default management views according to
-    the logged in role.
+    """ The homepage.
+
+    Redirects to the default management views according to the logged in role.
+
+    Shows the weekly PDFs if not logged-in.
 
     """
 
@@ -29,7 +34,13 @@ def view_principal(self, request):
     if request.is_personal(self):
         return redirect(layout.dashboard_link)
 
-    return redirect(layout.login_link)
+    issues = IssueCollection(request.app.session()).by_years(desc=True)
+
+    return {
+        'layout': layout,
+        'title': "{} {}".format(_("Gazette"), request.app.principal.name),
+        'issues': issues
+    }
 
 
 @GazetteApp.html(

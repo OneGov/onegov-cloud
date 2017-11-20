@@ -22,7 +22,7 @@ def test_view_login_logout(gazette_app):
         ('editor3@example.org', 'Third Editor'),
         ('publisher@example.org', 'Publisher'),
     ):
-        login = client.get('/').maybe_follow()
+        login = client.get('/').maybe_follow().click('Anmelden')
         login.form['username'] = username
         login.form['password'] = 'hunter1'
 

@@ -1,0 +1,18 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.gazette">
+    <tal:block metal:fill-slot="content">
+
+        <tal:block tal:repeat="year issues">
+            <tal:block tal:condition="issues[year]">
+                <tal:block tal:condition="python: any((issue.pdf for issue in issues[year]))">
+                    <h2>${year}</h2>
+                    <ul tal:repeat="issue issues[year]">
+                        <li tal:condition="issue.pdf">
+                            <a  href="${request.link(issue.pdf)}">${layout.format_issue(issue)}</a>
+                        </li>
+                    </ul>
+                </tal:block>
+            </tal:block>
+        </tal:block>
+
+    </tal:block>
+</div>

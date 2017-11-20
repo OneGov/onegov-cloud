@@ -91,12 +91,11 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
         """ Returns the current publication numbers by year. """
 
         from onegov.gazette.models.notice import GazetteNotice  # circular
+        from onegov.gazette.collections.issues import IssueCollection  # circ.
 
         result = {}
 
-        years = session.query(extract('year', Issue.date).distinct())
-        years = [int(year[0]) for year in years]
-        for year in years:
+        for year in IssueCollection(session).years:
             numbers = []
 
             issues = session.query(Issue.name)
