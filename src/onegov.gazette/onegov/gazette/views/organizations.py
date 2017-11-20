@@ -25,6 +25,7 @@ def view_organizations(self, request):
     roots = self.query().filter(Organization.parent_id.is_(None))
 
     return {
+        'title': _("Organizations"),
         'layout': layout,
         'roots': roots,
         'new_organization': request.link(self, name='new-organization'),
@@ -48,6 +49,7 @@ def view_organizations_order(self, request):
     roots = self.query().filter(Organization.parent_id.is_(None))
 
     return {
+        'title': _("Organizations"),
         'layout': layout,
         'roots': roots
     }

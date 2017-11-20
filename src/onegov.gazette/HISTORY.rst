@@ -1,16 +1,59 @@
 Changelog
 ---------
-1.9.6 (2017-11-20)
-~~~~~~~~~~~~~~~~~~~
 
 - Adds missing title slot.
   [msom]
 
-1.9.5 (2017-11-16)
+1.10.4 (2017-11-16)
+~~~~~~~~~~~~~~~~~~~
+
+- Allows publishers to manage organizations and categories.
+  [msom]
+
+1.10.3 (2017-11-16)
 ~~~~~~~~~~~~~~~~~~~
 
 - Fixes failing test.
   [msom]
+
+1.10.2 (2017-11-10)
+~~~~~~~~~~~~~~~~~~~
+
+- Order parents in organization form by their order.
+  [msom]
+
+- Fixes setting the initial external ID of an organization.
+  [msom]
+
+- Fixes sorting of sub-organizations.
+  [msom]
+
+1.10.1 (2017-11-10)
+~~~~~~~~~~~~~~~~~~~
+
+- Uses a chosen select for parent organizations.
+  [msom]
+
+- Fixes setting the initial ID of a category or organization.
+  [msom]
+
+- Checks the category and organization before submitting and accepting notices.
+  [msom]
+
+- Displays a warning when editing a notice with an invalid category or
+  organization.
+  [msom]
+
+- Uses an external organization name for accepted mails instead of the name.
+  [msom]
+
+1.10.0 (2017-11-09)
+~~~~~~~~~~~~~~~~~~~
+
+- Allows to manage categories, organizations and issues.
+  [msom]
+
+- Adds an unrestricted edit view for admins.
 
 1.9.4 (2017-11-15)
 ~~~~~~~~~~~~~~~~~~~

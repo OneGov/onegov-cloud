@@ -23,6 +23,7 @@ def view_categories(self, request):
     layout = Layout(self, request)
 
     return {
+        'title': _("Categories"),
         'layout': layout,
         'categories': self.query().all(),
         'new_category': request.link(self, name='new-category')

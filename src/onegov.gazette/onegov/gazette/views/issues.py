@@ -30,6 +30,7 @@ def view_issues(self, request):
     next_issues = self.query().filter(Issue.date >= today)
 
     return {
+        'title': _("Issues"),
         'layout': layout,
         'past_issues': past_issues,
         'next_issues': next_issues,
