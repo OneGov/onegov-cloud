@@ -5,7 +5,6 @@ from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layout import DefaultLayout, ElectionsLayout
 from onegov.election_day.utils import add_last_modified_header
-from onegov.election_day.utils import handle_headerless_params
 from sqlalchemy.orm import object_session
 
 
@@ -148,14 +147,14 @@ def view_election_parties_chart(self, request):
 def view_election_parties(self, request):
     """" The main view. """
 
-    handle_headerless_params(request)
+    layout = ElectionsLayout(self, request, 'parties')
 
     years, parties = get_party_results(self)
     deltas, results = get_party_deltas(self, years, parties)
 
     return {
         'election': self,
-        'layout': ElectionsLayout(self, request, 'parties'),
+        'layout': layout,
         'results': results,
         'years': years,
         'deltas': deltas

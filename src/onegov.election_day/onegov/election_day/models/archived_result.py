@@ -1,10 +1,17 @@
 from copy import deepcopy
-from onegov.ballot.models.common import DomainOfInfluenceMixin, MetaMixin
-from onegov.core.orm import Base, translation_hybrid
+from onegov.ballot.models.common import DomainOfInfluenceMixin
+from onegov.ballot.models.common import MetaMixin
+from onegov.core.orm import Base
+from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import HSTORE, UUID
+from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import UTCDateTime
-from sqlalchemy import Column, Date, Enum, Integer, Text
+from onegov.core.orm.types import UUID
+from sqlalchemy import Column
+from sqlalchemy import Date
+from sqlalchemy import Enum
+from sqlalchemy import Integer
+from sqlalchemy import Text
 from uuid import uuid4
 
 

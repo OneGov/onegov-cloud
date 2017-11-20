@@ -2,7 +2,8 @@ from morepath.request import Response
 from onegov.ballot import Ballot
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layout import DefaultLayout, VotesLayout
+from onegov.election_day.layout import DefaultLayout
+from onegov.election_day.layout import VotesLayout
 from onegov.election_day.utils import add_last_modified_header
 
 

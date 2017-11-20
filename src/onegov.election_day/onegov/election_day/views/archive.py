@@ -1,5 +1,6 @@
 from morepath import redirect
-from onegov.core.security import Public, Private
+from onegov.core.security import Private
+from onegov.core.security import Public
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
@@ -9,28 +10,40 @@ from onegov.election_day.models import Principal
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_archive_links
 from onegov.election_day.utils import get_summaries
-from onegov.election_day.utils import handle_headerless_params
 
 
-@ElectionDayApp.html(model=ArchivedResultCollection, template='archive.pt',
-                     permission=Public)
+@ElectionDayApp.html(
+    model=ArchivedResultCollection,
+    template='archive.pt',
+    permission=Public
+)
 def view_archive(self, request):
+    """ Shows all the results from the elections and votes for a given year
+    or date.
 
-    handle_headerless_params(request)
+    """
 
+    layout = DefaultLayout(self, request)
     results, last_modified = self.by_date()
     results = self.group_items(results, request)
 
     return {
-        'layout': DefaultLayout(self, request),
+        'layout': layout,
         'date': self.date,
         'archive_items': results
     }
 
 
-@ElectionDayApp.json(model=ArchivedResultCollection, permission=Public,
-                     name='json')
+@ElectionDayApp.json(
+    model=ArchivedResultCollection,
+    name='json',
+    permission=Public
+)
 def view_archive_json(self, request):
+    """ Shows all the results from the elections and votes for a given year
+    or date as JSON.
+
+    """
 
     results, last_modified = self.by_date()
     results = get_summaries(results, request)
@@ -47,24 +60,39 @@ def view_archive_json(self, request):
     }
 
 
-@ElectionDayApp.html(model=Principal, template='archive.pt', permission=Public)
+@ElectionDayApp.html(
+    model=Principal,
+    template='archive.pt',
+    permission=Public
+)
 def view_principal(self, request):
+    """ Shows all the results from the elections and votes of the last election
+    day.
 
-    handle_headerless_params(request)
+    """
 
+    layout = DefaultLayout(self, request)
     archive = ArchivedResultCollection(request.app.session())
     latest, last_modified = archive.latest()
     latest = archive.group_items(latest, request)
 
     return {
-        'layout': DefaultLayout(self, request),
+        'layout': layout,
         'archive_items': latest,
         'date': None
     }
 
 
-@ElectionDayApp.json(model=Principal, permission=Public, name='json')
+@ElectionDayApp.json(
+    model=Principal,
+    name='json',
+    permission=Public
+)
 def view_principal_json(self, request):
+    """ Shows all the results from the elections and votes of the last election
+    day as JSON.
+
+    """
 
     archive = ArchivedResultCollection(request.app.session())
     latest, last_modified = archive.latest()
@@ -82,9 +110,20 @@ def view_principal_json(self, request):
     }
 
 
-@ElectionDayApp.form(model=Principal, permission=Private,
-                     name='update-results', form=EmptyForm, template='form.pt')
+@ElectionDayApp.form(
+    model=Principal,
+    name='update-results',
+    template='form.pt',
+    form=EmptyForm,
+    permission=Private
+)
 def view_update_results(self, request, form):
+    """ Updates all results.
+
+    This view is not linked anywhere since there is normally no need to call
+    it.
+
+    """
 
     layout = DefaultLayout(self, request)
     archive = ArchivedResultCollection(request.app.session())

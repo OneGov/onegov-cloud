@@ -6,18 +6,17 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.layout import VotesLayout
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_vote_summary
-from onegov.election_day.utils import handle_headerless_params
 
 
 @ElectionDayApp.html(model=Vote, template='vote/ballot.pt', permission=Public)
 def view_vote_proposal(self, request):
     """" The main view. """
 
-    handle_headerless_params(request)
+    layout = VotesLayout(self, request)
 
     return {
         'vote': self,
-        'layout': VotesLayout(self, request),
+        'layout': layout,
         'show_map': request.app.principal.is_year_available(self.date.year)
     }
 
@@ -27,11 +26,11 @@ def view_vote_proposal(self, request):
 def view_vote_counter_proposal(self, request):
     """" The main view. """
 
-    handle_headerless_params(request)
+    layout = VotesLayout(self, request, 'counter-proposal')
 
     return {
         'vote': self,
-        'layout': VotesLayout(self, request, 'counter-proposal'),
+        'layout': layout,
         'show_map': request.app.principal.is_year_available(self.date.year)
     }
 
@@ -41,11 +40,11 @@ def view_vote_counter_proposal(self, request):
 def view_vote_tie_breaker(self, request):
     """" The main view. """
 
-    handle_headerless_params(request)
+    layout = VotesLayout(self, request, 'tie-breaker')
 
     return {
         'vote': self,
-        'layout': VotesLayout(self, request, 'tie-breaker'),
+        'layout': layout,
         'show_map': request.app.principal.is_year_available(self.date.year)
     }
 

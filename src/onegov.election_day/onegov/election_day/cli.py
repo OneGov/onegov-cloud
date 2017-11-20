@@ -3,7 +3,9 @@
 import click
 import os
 
-from onegov.core.cli import command_group, pass_group_context, abort
+from onegov.core.cli import abort
+from onegov.core.cli import command_group
+from onegov.core.cli import pass_group_context
 from onegov.election_day import log
 from onegov.election_day.collections import UploadTokenCollection
 from onegov.election_day.models import ArchivedResult

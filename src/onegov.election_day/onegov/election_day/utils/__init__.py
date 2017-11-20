@@ -1,15 +1,9 @@
 from hashlib import sha256
-from onegov.ballot import Election, Vote, Ballot
+from onegov.ballot import Ballot
+from onegov.ballot import Election
+from onegov.ballot import Vote
 from onegov.election_day.models import ArchivedResult
 from sqlalchemy.orm import object_session
-
-
-def handle_headerless_params(request):
-    if 'headerless' in request.params:
-        request.browser_session['headerless'] = True
-    if 'headerful' in request.params:
-        if request.browser_session.has('headerless'):
-            del request.browser_session['headerless']
 
 
 def add_last_modified_header(response, last_modified):

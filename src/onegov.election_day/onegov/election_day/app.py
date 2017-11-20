@@ -2,7 +2,8 @@ import os
 import re
 
 from datetime import datetime
-from onegov.core import Framework, utils
+from onegov.core import Framework
+from onegov.core import utils
 from onegov.core.datamanager import FileDataManager
 from onegov.core.filestorage import FilestorageFile
 from onegov.core.framework import transaction_tween_factory

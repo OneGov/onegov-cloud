@@ -11,7 +11,6 @@ from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layout import ElectionsLayout
 from onegov.election_day.utils import add_last_modified_header
-from onegov.election_day.utils import handle_headerless_params
 
 
 @ElectionDayApp.html(model=Election, template='election/data.pt',
@@ -19,11 +18,11 @@ from onegov.election_day.utils import handle_headerless_params
 def view_election_data(self, request):
     """" The main view. """
 
-    handle_headerless_params(request)
+    layout = ElectionsLayout(self, request, 'data')
 
     return {
         'election': self,
-        'layout': ElectionsLayout(self, request, 'data')
+        'layout': layout
     }
 
 

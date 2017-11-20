@@ -1,10 +1,8 @@
-from onegov.ballot import (
-    Candidate,
-    CandidateResult,
-    ElectionResult,
-    List,
-    ListConnection
-)
+from onegov.ballot import Candidate
+from onegov.ballot import CandidateResult
+from onegov.ballot import ElectionResult
+from onegov.ballot import List
+from onegov.ballot import ListConnection
 from onegov.core.utils import groupbylist
 from sqlalchemy import desc
 

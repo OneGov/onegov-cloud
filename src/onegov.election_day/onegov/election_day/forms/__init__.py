@@ -1,3 +1,4 @@
+from onegov.election_day.forms.common import EmptyForm
 from onegov.election_day.forms.data_source import DataSourceForm
 from onegov.election_day.forms.data_source import DataSourceItemForm
 from onegov.election_day.forms.election import ElectionForm
@@ -11,15 +12,6 @@ from onegov.election_day.forms.upload import UploadWabstiMajorzElectionForm
 from onegov.election_day.forms.upload import UploadWabstiProporzElectionForm
 from onegov.election_day.forms.upload import UploadWabstiVoteForm
 from onegov.election_day.forms.vote import VoteForm
-from onegov.form import Form
-
-
-class EmptyForm(Form):
-    pass
-
-
-class TriggerNotificationForm(Form):
-    pass
 
 
 __all__ = [
@@ -28,7 +20,7 @@ __all__ = [
     'EmptyForm',
     'ElectionForm',
     'SubscribeForm',
-    'TriggerNotificationForm',
+    'EmptyForm',
     'UploadElectionPartyResultsForm',
     'UploadMajorzElectionForm',
     'UploadProporzElectionForm',

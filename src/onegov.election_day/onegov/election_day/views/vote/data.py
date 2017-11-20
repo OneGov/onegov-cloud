@@ -8,7 +8,6 @@ from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layout import VotesLayout
 from onegov.election_day.utils import add_last_modified_header
-from onegov.election_day.utils import handle_headerless_params
 
 
 @ElectionDayApp.html(model=Vote, template='vote/data.pt',
@@ -16,11 +15,11 @@ from onegov.election_day.utils import handle_headerless_params
 def view_vote_data(self, request):
     """" The main view. """
 
-    handle_headerless_params(request)
+    layout = VotesLayout(self, request, 'data')
 
     return {
         'vote': self,
-        'layout': VotesLayout(self, request, 'data')
+        'layout': layout
     }
 
 

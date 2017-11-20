@@ -2,7 +2,8 @@ from onegov.core.security import Public
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layout import Layout
-from webob.exc import HTTPForbidden, HTTPNotFound
+from webob.exc import HTTPForbidden
+from webob.exc import HTTPNotFound
 
 
 @ElectionDayApp.html(

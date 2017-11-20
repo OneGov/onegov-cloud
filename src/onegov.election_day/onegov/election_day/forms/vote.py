@@ -1,8 +1,10 @@
 from datetime import date
 from onegov.election_day import _
 from onegov.form import Form
-from wtforms import RadioField, StringField
-from wtforms.fields.html5 import DateField, URLField
+from wtforms import RadioField
+from wtforms import StringField
+from wtforms.fields.html5 import DateField
+from wtforms.fields.html5 import URLField
 from wtforms.validators import InputRequired
 
 

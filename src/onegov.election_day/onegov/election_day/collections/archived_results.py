@@ -1,10 +1,19 @@
 from collections import OrderedDict
 from datetime import date
 from itertools import groupby
+from onegov.ballot import Election
+from onegov.ballot import ElectionCollection
+from onegov.ballot import Vote
+from onegov.ballot import VoteCollection
 from onegov.election_day.models import ArchivedResult
-from sqlalchemy import cast, desc, distinct, extract, func, Integer
-from time import mktime, strptime
-from onegov.ballot import Election, ElectionCollection, Vote, VoteCollection
+from sqlalchemy import cast
+from sqlalchemy import desc
+from sqlalchemy import distinct
+from sqlalchemy import extract
+from sqlalchemy import func
+from sqlalchemy import Integer
+from time import mktime
+from time import strptime
 
 
 def groupbydict(items, keyfunc, sortfunc=None):

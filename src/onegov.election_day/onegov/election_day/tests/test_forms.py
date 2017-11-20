@@ -12,10 +12,10 @@ from onegov.election_day.forms import UploadProporzElectionForm
 from onegov.election_day.forms import UploadRestForm
 from onegov.election_day.forms import UploadVoteForm
 from onegov.election_day.forms import VoteForm
-from onegov.election_day.forms.validators import ValidPhoneNumber
 from onegov.election_day.models import DataSource
 from onegov.election_day.models import DataSourceItem
 from onegov.election_day.models import Principal
+from onegov.election_day.validators import ValidPhoneNumber
 from pytest import raises
 from wtforms.validators import ValidationError
 

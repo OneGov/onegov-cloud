@@ -2,7 +2,8 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
-from onegov.ballot import Election, Vote
+from onegov.ballot import Election
+from onegov.ballot import Vote
 from onegov.core.upgrade import upgrade_task
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.models import ArchivedResult

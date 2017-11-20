@@ -10,7 +10,6 @@ from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import NotificationCollection
 from onegov.election_day.forms import EmptyForm
 from onegov.election_day.forms import ElectionForm
-from onegov.election_day.forms import TriggerNotificationForm
 from onegov.election_day.layout import ManageElectionsLayout
 
 
@@ -107,7 +106,7 @@ def delete_election(self, request, form):
 
 @ElectionDayApp.form(model=Election, name='trigger',
                      template='form.pt', permission=Private,
-                     form=TriggerNotificationForm)
+                     form=EmptyForm)
 def trigger_notifications(self, request, form):
 
     session = request.app.session()

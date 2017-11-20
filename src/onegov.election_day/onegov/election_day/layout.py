@@ -12,7 +12,8 @@ from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import DataSourceCollection
 from onegov.election_day.collections import DataSourceItemCollection
 from onegov.election_day.collections import SubscriberCollection
-from onegov.election_day.utils import pdf_filename, svg_filename
+from onegov.election_day.utils import pdf_filename
+from onegov.election_day.utils import svg_filename
 from onegov.user import Auth
 
 
@@ -22,8 +23,15 @@ class Layout(ChameleonLayout):
 
     def __init__(self, model, request):
         super().__init__(model, request)
+
         self.request.include('common')
         self.request.include('custom')
+
+        if 'headerless' in request.params:
+            request.browser_session['headerless'] = True
+        if 'headerful' in request.params:
+            if request.browser_session.has('headerless'):
+                del request.browser_session['headerless']
 
     def title(self):
         return ''

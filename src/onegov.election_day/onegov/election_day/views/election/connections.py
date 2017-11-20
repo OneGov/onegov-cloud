@@ -3,9 +3,9 @@ from morepath.request import Response
 from onegov.ballot import Election
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layout import DefaultLayout, ElectionsLayout
+from onegov.election_day.layout import DefaultLayout
+from onegov.election_day.layout import ElectionsLayout
 from onegov.election_day.utils import add_last_modified_header
-from onegov.election_day.utils import handle_headerless_params
 from onegov.election_day.views.election import get_connection_results
 from sqlalchemy.orm import object_session
 
@@ -100,11 +100,11 @@ def view_election_connections_chart(self, request):
 def view_election_connections(self, request):
     """" The main view. """
 
-    handle_headerless_params(request)
+    layout = ElectionsLayout(self, request, 'connections')
 
     return {
         'election': self,
-        'layout': ElectionsLayout(self, request, 'connections'),
+        'layout': layout,
         'connections': get_connection_results(self, object_session(self)),
     }
 

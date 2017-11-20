@@ -38,6 +38,7 @@ class DummyRequest(object):
         self.is_logged_in = is_logged_in
         if app and session:
             self.app.session = Mock(return_value=session)
+        self.params = {}
 
     def link(self, model, name=''):
         return '{}/{}'.format(
