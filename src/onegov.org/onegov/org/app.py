@@ -74,6 +74,17 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
                 if s.startswith(schema_prefix)
             )
 
+    def configure_organisation(self, **cfg):
+        self.enable_user_registration = cfg.get(
+            'enable_user_registration',
+            False
+        )
+
+        self.enable_yubikey = cfg.get(
+            'enable_yubikey',
+            False
+        )
+
     def configure_sentry(self, **cfg):
         self.sentry_js = cfg.get('sentry_js')
 
@@ -219,16 +230,6 @@ def get_template_directory():
 @OrgApp.setting(section='core', name='theme')
 def get_theme():
     return OrgTheme()
-
-
-@OrgApp.setting(section='org', name='enable_user_registration')
-def get_enable_user_registration():
-    return False
-
-
-@OrgApp.setting(section='org', name='enable_yubikey')
-def get_enable_yubikey():
-    return False
 
 
 @OrgApp.setting(section='org', name='create_new_organisation')

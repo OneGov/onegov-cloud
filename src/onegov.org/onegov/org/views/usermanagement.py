@@ -171,7 +171,7 @@ def handle_manage_user(self, request, form):
     # for validation purposes (check for a unique yubikey)
     form.current_username = self.username
 
-    if not request.app.settings.org.enable_yubikey:
+    if not request.app.enable_yubikey:
         form.delete_field('yubikey')
 
     if form.submitted(request):
@@ -197,7 +197,7 @@ def handle_manage_user(self, request, form):
              name='new', permission=Secret)
 def handle_new_user(self, request, form):
 
-    if not request.app.settings.org.enable_yubikey:
+    if not request.app.enable_yubikey:
         form.delete_field('yubikey')
 
     layout = UserManagementLayout(self, request)

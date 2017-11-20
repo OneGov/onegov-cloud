@@ -8,7 +8,6 @@ import textwrap
 import transaction
 
 from base64 import b64decode, b64encode
-from contextlib import contextmanager
 from datetime import datetime, date, timedelta
 from libres.modules.errors import AffectedReservationError
 from lxml.html import document_fromstring
@@ -68,18 +67,6 @@ def encode_map_value(dictionary):
 
 def decode_map_value(value):
     return json.loads(b64decode(value).decode('utf-8'))
-
-
-@contextmanager
-def temporary_setting(app, section, setting, value):
-    section = getattr(app.settings, section)
-    oldvalue = getattr(section, setting)
-
-    setattr(section, setting, value)
-
-    yield
-
-    setattr(section, setting, oldvalue)
 
 
 def test_view_permissions():
@@ -3010,70 +2997,66 @@ def test_settings(org_app):
 
 
 def test_registration_honeypot(org_app):
+    org_app.enable_user_registration = True
 
-    with temporary_setting(org_app, 'org', 'enable_user_registration', True):
-        org_app.settings.org.enable_user_registration = True
+    client = Client(org_app)
 
-        client = Client(org_app)
+    register = client.get('/auth/register')
+    register.form['username'] = 'spam@example.org'
+    register.form['password'] = 'p@ssw0rd'
+    register.form['confirm'] = 'p@ssw0rd'
+    register.form['roboter_falle'] = 'buy pills now'
 
-        register = client.get('/auth/register')
-        register.form['username'] = 'spam@example.org'
-        register.form['password'] = 'p@ssw0rd'
-        register.form['confirm'] = 'p@ssw0rd'
-        register.form['roboter_falle'] = 'buy pills now'
-
-        assert "Das Feld ist nicht leer" in register.form.submit()
+    assert "Das Feld ist nicht leer" in register.form.submit()
 
 
 def test_registration(org_app):
 
-    with temporary_setting(org_app, 'org', 'enable_user_registration', True):
-        org_app.settings.org.enable_user_registration = True
+    org_app.enable_user_registration = True
 
-        client = Client(org_app)
+    client = Client(org_app)
 
-        register = client.get('/auth/register')
-        register.form['username'] = 'user@example.org'
-        register.form['password'] = 'p@ssw0rd'
-        register.form['confirm'] = 'p@ssw0rd'
+    register = client.get('/auth/register')
+    register.form['username'] = 'user@example.org'
+    register.form['password'] = 'p@ssw0rd'
+    register.form['confirm'] = 'p@ssw0rd'
 
-        assert "Vielen Dank" in register.form.submit().follow()
+    assert "Vielen Dank" in register.form.submit().follow()
 
-        message = client.get_email(0, 1)
-        assert "Anmeldung bestätigen" in message
+    message = client.get_email(0, 1)
+    assert "Anmeldung bestätigen" in message
 
-        expr = r'href="[^"]+">Anmeldung bestätigen</a>'
-        url = re.search(expr, message).group()
-        url = client.extract_href(url)
+    expr = r'href="[^"]+">Anmeldung bestätigen</a>'
+    url = re.search(expr, message).group()
+    url = client.extract_href(url)
 
-        faulty = URL(url).query_param('token', 'asdf').as_string()
+    faulty = URL(url).query_param('token', 'asdf').as_string()
 
-        assert "Ungültiger Aktivierungscode" in client.get(faulty).follow()
-        assert "Konto wurde aktiviert" in client.get(url).follow()
-        assert "Konto wurde bereits aktiviert" in client.get(url).follow()
+    assert "Ungültiger Aktivierungscode" in client.get(faulty).follow()
+    assert "Konto wurde aktiviert" in client.get(url).follow()
+    assert "Konto wurde bereits aktiviert" in client.get(url).follow()
 
-        logged_in = client.login('user@example.org', 'p@ssw0rd').follow()
-        assert "eingeloggt" in logged_in
+    logged_in = client.login('user@example.org', 'p@ssw0rd').follow()
+    assert "eingeloggt" in logged_in
 
 
 def test_registration_disabled(org_app):
 
-    with temporary_setting(org_app, 'org', 'enable_user_registration', False):
-        client = Client(org_app)
-        org_app.settings.org.enable_user_registration = False
+    client = Client(org_app)
+    org_app.enable_user_registration = False
 
-        assert client.get('/auth/register', status=404)
+    assert client.get('/auth/register', status=404)
 
 
 def test_disabled_yubikey(org_app):
     client = Client(org_app)
     client.login_admin()
 
-    org_app.settings.org.enable_yubikey = False
+    org_app.enable_yubikey = False
     assert 'YubiKey' not in client.get('/auth/login')
     assert 'YubiKey' not in client.get('/usermanagement')
 
-    org_app.settings.org.enable_yubikey = True
+    org_app.enable_yubikey = True
     assert 'YubiKey' in client.get('/auth/login')
     assert 'YubiKey' in client.get('/usermanagement')
 
@@ -3106,7 +3089,7 @@ def test_change_role(org_app):
     client = Client(org_app)
     client.login_admin()
 
-    org_app.settings.org.enable_yubikey = True
+    org_app.enable_yubikey = True
 
     editor = client.get('/usermanagement').click('Bearbeiten', index=1)
     assert "müssen zwingend einen YubiKey" in editor.form.submit()
@@ -3123,7 +3106,7 @@ def test_change_role(org_app):
     editor.form['yubikey'] = 'cccccccdefgh'
     assert editor.form.submit().status_code == 302
 
-    org_app.settings.org.enable_yubikey = False
+    org_app.enable_yubikey = False
     editor.form['role'] = 'admin'
     editor.form['active'] = True
     editor.form['yubikey'] = ''
@@ -3134,7 +3117,7 @@ def test_unique_yubikey(org_app):
     client = Client(org_app)
     client.login_admin()
 
-    org_app.settings.org.enable_yubikey = True
+    org_app.enable_yubikey = True
 
     users = client.get('/usermanagement')
     admin = users.click('Bearbeiten', index=0)
@@ -3155,7 +3138,7 @@ def test_add_new_user_without_activation_email(org_app):
     client = Client(org_app)
     client.login_admin()
 
-    org_app.settings.org.enable_yubikey = True
+    org_app.enable_yubikey = True
 
     new = client.get('/usermanagement').click('Benutzer', index=2)
     new.form['username'] = 'admin@example.org'
@@ -3184,7 +3167,7 @@ def test_add_new_user_with_activation_email(org_app):
     client = Client(org_app)
     client.login_admin()
 
-    org_app.settings.org.enable_yubikey = False
+    org_app.enable_yubikey = False
 
     new = client.get('/usermanagement').click('Benutzer', index=2)
     new.form['username'] = 'member@example.org'
@@ -3214,7 +3197,7 @@ def test_edit_user_settings(org_app):
     client = Client(org_app)
     client.login_admin()
 
-    org_app.settings.org.enable_yubikey = False
+    org_app.enable_yubikey = False
 
     new = client.get('/usermanagement').click('Benutzer', index=2)
     new.form['username'] = 'new@example.org'

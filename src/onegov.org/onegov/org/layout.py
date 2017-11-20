@@ -1565,7 +1565,7 @@ class UserManagementLayout(DefaultLayout):
         if self.request.is_manager:
             links = []
 
-            if self.app.settings.org.enable_user_registration:
+            if self.app.enable_user_registration:
                 links.append(
                     Link(
                         text=_("Create Signup Link"),

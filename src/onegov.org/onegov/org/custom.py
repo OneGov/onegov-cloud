@@ -37,7 +37,7 @@ def get_global_tools(request):
             ), attrs={'class': 'login'}
         )
 
-        if request.app.settings.org.enable_user_registration:
+        if request.app.enable_user_registration:
             yield Link(
                 _("Register"), request.link(
                     Auth.from_request_path(request), name='register'

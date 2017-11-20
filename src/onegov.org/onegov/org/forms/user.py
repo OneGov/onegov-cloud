@@ -35,7 +35,7 @@ class ManageUserForm(Form):
             return
 
         if not field.data:
-            if not self.request.app.settings.org.enable_yubikey:
+            if not self.request.app.enable_yubikey:
                 return
 
             if self.role.data in ('admin', 'editor'):

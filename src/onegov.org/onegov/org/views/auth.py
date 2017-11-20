@@ -27,9 +27,7 @@ from webob import exc
 def handle_login(self, request, form):
     """ Handles the login requests. """
 
-    org_settings = request.app.settings.org
-
-    if not org_settings.enable_yubikey:
+    if not request.app.enable_yubikey:
         form.delete_field('yubikey')
 
     if self.skippable(request):
@@ -39,6 +37,7 @@ def handle_login(self, request, form):
 
         redirected_to_userprofile = False
 
+        org_settings = request.app.settings.org
         if org_settings.require_complete_userprofile:
             username = form.username.data
 
@@ -75,7 +74,7 @@ def handle_login(self, request, form):
         'layout': layout,
         'password_reset_link': request.link(self, name='request-password'),
         'register_link': request.link(self, name='register'),
-        'may_register': org_settings.enable_user_registration,
+        'may_register': request.app.enable_user_registration,
         'title': _('Login to ${org}', mapping={
             'org': request.app.org.title
         }),
@@ -88,7 +87,7 @@ def handle_login(self, request, form):
 def handle_registration(self, request, form):
     """ Handles the user registration. """
 
-    if not request.app.settings.org.enable_user_registration:
+    if not request.app.enable_user_registration:
         raise exc.HTTPNotFound()
 
     if form.submitted(request):
@@ -143,7 +142,7 @@ def handle_registration(self, request, form):
 @OrgApp.view(model=Auth, name='activate', permission=Public)
 def handle_activation(self, request):
 
-    if not request.app.settings.org.enable_user_registration:
+    if not request.app.enable_user_registration:
         raise exc.HTTPNotFound()
 
     users = UserCollection(request.app.session())
