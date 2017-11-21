@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Allows to clear the results of elections and votes.
+  [msom]
+
 - Always Show First and Last Item of Pagination.
   [msom]
 

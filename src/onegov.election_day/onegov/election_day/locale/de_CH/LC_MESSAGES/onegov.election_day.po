@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-20 14:10+0100\n"
-"PO-Revision-Date: 2017-11-20 14:12+0100\n"
+"POT-Creation-Date: 2017-11-21 12:47+0100\n"
+"PO-Revision-Date: 2017-11-21 12:49+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -64,6 +64,9 @@ msgstr "Datenquellen"
 
 msgid "Mappings"
 msgstr "Zuordnungen"
+
+msgid "Not a valid phone number."
+msgstr "Ungültige Telefonnummer."
 
 msgid ""
 "Successfully subscribed to the SMS services. You will receive an SMS every "
@@ -264,9 +267,6 @@ msgstr "Abstimmung"
 
 msgid "Election"
 msgstr "Wahl"
-
-msgid "Not a valid phone number."
-msgstr "Ungültige Telefonnummer."
 
 msgid "Vote (German)"
 msgstr "Abstimmung (Deutsch)"
@@ -695,6 +695,9 @@ msgstr "Neue Wahl"
 msgid "View"
 msgstr "Anzeigen"
 
+msgid "Clear results"
+msgstr "Resultate löschen"
+
 msgid "Upload party results"
 msgstr "Parteiresultate hochladen"
 
@@ -715,6 +718,9 @@ msgstr "Leer"
 
 msgid "Invalid"
 msgstr "Ungültig"
+
+msgid "Update results"
+msgstr "Resultate aktualisieren"
 
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"
@@ -815,6 +821,10 @@ msgstr "Zuordnung löschen"
 
 msgid "Edit election"
 msgstr "Wahl bearbeiten"
+
+#, python-format
+msgid "Do you really want to clear all results of \"${item}\"?"
+msgstr "Möchten Sie wirklich alle Resultate von \"${item}\" löschen?"
 
 msgid "Delete election"
 msgstr "Wahl löschen"

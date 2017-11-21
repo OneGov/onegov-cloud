@@ -92,8 +92,3 @@ def test_load_csv_errors(election_day_app):
         BytesIO('A,B\n1,2\n'.encode('utf-8')), 'application/excel', ['A']
     )
     assert error.error == 'Not a valid xls/xlsx file.'
-
-
-# test_clear_vote
-# test_clear_ballot
-# test_clear_election

@@ -5,7 +5,6 @@ from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import BALLOT_TYPES
-from onegov.election_day.utils import clear_ballot
 from onegov.election_day.utils import guessed_group
 
 
@@ -208,7 +207,7 @@ def import_vote_default(vote, entities, ballot_type, file, mimetype):
 
     if ballot_results:
         vote.status = None
-        clear_ballot(ballot)
+        ballot.clear_results()
 
         for result in ballot_results:
             ballot.results.append(result)

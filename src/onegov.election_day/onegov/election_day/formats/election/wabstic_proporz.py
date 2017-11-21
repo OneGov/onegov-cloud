@@ -8,7 +8,6 @@ from onegov.election_day import _
 from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
-from onegov.election_day.utils import clear_election
 from uuid import uuid4
 
 
@@ -534,7 +533,7 @@ def import_election_wabstic_proporz(
         return errors
 
     if added_results:
-        clear_election(election)
+        election.clear_results()
 
         election.counted_entities = sum([
             1 for value in added_entities.values() if value['counted']

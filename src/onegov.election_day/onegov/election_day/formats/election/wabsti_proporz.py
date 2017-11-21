@@ -9,7 +9,6 @@ from onegov.election_day import _
 from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
-from onegov.election_day.utils import clear_election
 from uuid import uuid4
 
 
@@ -409,7 +408,7 @@ def import_election_wabsti_proporz(
         return errors
 
     if results:
-        clear_election(election)
+        election.clear_results()
 
         election.counted_entities = len(results)
         election.total_entities = max(len(entities), len(results))

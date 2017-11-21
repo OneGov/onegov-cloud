@@ -3,7 +3,6 @@ from onegov.ballot import Ballot
 from onegov.ballot import Election
 from onegov.ballot import Vote
 from onegov.election_day.models import ArchivedResult
-from sqlalchemy.orm import object_session
 
 
 def add_last_modified_header(response, last_modified):
@@ -221,44 +220,6 @@ def svg_filename(item, type_, locale=None):
         ts = int(item.last_result_change.timestamp())
 
     return '{}-{}.{}.{}.{}.svg'.format(name, hash, ts, type_, locale or 'any')
-
-
-def clear_election(election):
-    """ Clear the election of all of its results. """
-
-    election.counted_entities = 0
-    election.total_entities = 0
-    election.absolute_majority = None
-    election.status = None
-
-    session = object_session(election)
-    for connection in election.list_connections:
-        session.delete(connection)
-    for list_ in election.lists:
-        session.delete(list_)
-    for candidate in election.candidates:
-        session.delete(candidate)
-    for result in election.results:
-        session.delete(result)
-    for result in election.party_results:
-        session.delete(result)
-
-
-def clear_vote(vote):
-    """ Clear the vote of all of its ballots. """
-
-    session = object_session(vote)
-    vote.status = None
-    for ballot in vote.ballots:
-        session.delete(ballot)
-
-
-def clear_ballot(ballot):
-    """ Clear the ballot of all of its results. """
-
-    session = object_session(ballot)
-    for result in ballot.results:
-        session.delete(result)
 
 
 def guessed_group(entity, other):

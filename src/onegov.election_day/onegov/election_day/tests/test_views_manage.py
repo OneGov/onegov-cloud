@@ -2,6 +2,9 @@ from datetime import date
 from lxml.html import document_fromstring
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.tests import login
+from onegov.election_day.tests import upload_majorz_election
+from onegov.election_day.tests import upload_proporz_election
+from onegov.election_day.tests import upload_vote
 from webtest import TestApp as Client
 
 
@@ -114,6 +117,36 @@ def test_view_manage(election_day_app):
     assert "Noch keine Abstimmungen erfasst" in manage
 
     assert archive.query().count() == 0
+
+
+def test_view_clear_results(import_scan, election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+    upload_majorz_election(client, canton='zg')
+    upload_proporz_election(client, canton='zg')
+    upload_vote(client)
+
+    marker = "Noch keine Resultate"
+    urls = (
+        '/election/majorz-election/candidates',
+        '/election/majorz-election/statistics',
+        '/election/proporz-election/lists',
+        '/election/proporz-election/candidates',
+        '/election/proporz-election/connections',
+        '/election/proporz-election/parties',
+        '/election/proporz-election/panachage',
+        '/election/proporz-election/statistics',
+        '/vote/vote'
+    )
+    assert all((marker not in client.get(url) for url in urls))
+
+    client.get('/election/majorz-election/clear').form.submit()
+    client.get('/election/proporz-election/clear').form.submit()
+    client.get('/vote/vote/clear').form.submit()
+
+    assert all((marker in client.get(url) for url in urls))
 
 
 def test_view_manage_data_sources(election_day_app):

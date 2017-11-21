@@ -4,7 +4,6 @@ from onegov.election_day import _
 from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
-from onegov.election_day.utils import clear_vote
 from onegov.election_day.utils import guessed_group
 
 
@@ -179,7 +178,7 @@ def import_vote_wabsti(vote, entities, vote_number, complex, file, mimetype):
     ):
         return [FileImportError(_("No data found"))]
 
-    clear_vote(vote)
+    vote.clear_results()
 
     for ballot_type in used_ballot_types:
         remaining = (

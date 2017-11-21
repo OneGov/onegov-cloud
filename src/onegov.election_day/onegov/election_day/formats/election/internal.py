@@ -11,7 +11,6 @@ from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import STATI
-from onegov.election_day.utils import clear_election
 from uuid import uuid4
 
 
@@ -307,7 +306,7 @@ def import_election_internal(election, entities, file, mimetype):
         return errors
 
     if results:
-        clear_election(election)
+        election.clear_results()
 
         if absolute_majority is not None:
             election.absolute_majority = absolute_majority

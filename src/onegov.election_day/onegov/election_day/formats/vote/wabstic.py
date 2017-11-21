@@ -4,7 +4,6 @@ from onegov.election_day import _
 from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
-from onegov.election_day.utils import clear_vote
 
 
 HEADERS_SG_GESCHAEFTE = (
@@ -231,7 +230,7 @@ def import_vote_wabstic(vote, entities, district, number,
     if errors:
         return errors
 
-    clear_vote(vote)
+    vote.clear_results()
 
     vote.status = 'unknown'
     if complete == 1:

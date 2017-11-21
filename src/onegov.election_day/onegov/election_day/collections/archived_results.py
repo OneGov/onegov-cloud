@@ -136,14 +136,15 @@ class ArchivedResultCollection(object):
 
             return query.all(), (last_modified.first() or [None])[0]
 
-    def update(self, item, request):
+    def update(self, item, request, force=False):
         """ Updates a result. """
-
         url = request.link(item)
 
         result = self.query().filter_by(url=url).first()
-        if result and result.last_result_change == item.last_result_change:
-            return result
+        if result:
+            unchanged = result.last_result_change == item.last_result_change
+            if unchanged and not force:
+                return result
 
         add_result = False
         if not result:
@@ -205,6 +206,16 @@ class ArchivedResultCollection(object):
         self.session.flush()
 
         self.update(item, request)
+        self.session.flush()
+
+    def clear(self, item, request):
+        """ Clears an election or vote and the associated result entry.  """
+
+        assert isinstance(item, Election) or isinstance(item, Vote)
+
+        item.clear_results()
+        self.update(item, request, force=True)
+
         self.session.flush()
 
     def delete(self, item, request):

@@ -7,7 +7,6 @@ from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import STATI
-from onegov.election_day.utils import clear_vote
 from onegov.election_day.utils import guessed_group
 
 HEADERS = [
@@ -167,7 +166,7 @@ def import_vote_internal(vote, entities, file, mimetype):
     if not any((len(results) for results in ballot_results.values())):
         return [FileImportError(_("No data found"))]
 
-    clear_vote(vote)
+    vote.clear_results()
 
     vote.status = status
 

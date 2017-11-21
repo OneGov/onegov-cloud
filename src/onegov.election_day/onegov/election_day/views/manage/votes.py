@@ -14,9 +14,14 @@ from onegov.election_day.forms import VoteForm
 from onegov.election_day.layout import ManageVotesLayout
 
 
-@ElectionDayApp.html(model=VoteCollection, template='manage/votes.pt',
-                     permission=Private)
+@ElectionDayApp.html(
+    model=VoteCollection,
+    template='manage/votes.pt',
+    permission=Private
+)
 def view_votes(self, request):
+
+    """ View a list of all votes. """
 
     return {
         'layout': ManageVotesLayout(self, request),
@@ -29,6 +34,8 @@ def view_votes(self, request):
 @ElectionDayApp.form(model=VoteCollection, name='new-vote', template='form.pt',
                      permission=Private, form=VoteForm)
 def create_vote(self, request, form):
+
+    """ Create a new vote. """
 
     layout = ManageVotesLayout(self, request)
     archive = ArchivedResultCollection(request.app.session())
@@ -49,9 +56,16 @@ def create_vote(self, request, form):
     }
 
 
-@ElectionDayApp.form(model=Vote, name='edit', template='form.pt',
-                     permission=Private, form=VoteForm)
+@ElectionDayApp.form(
+    model=Vote,
+    name='edit',
+    template='form.pt',
+    form=VoteForm,
+    permission=Private
+)
 def edit_vote(self, request, form):
+
+    """ Edit an existing vote. """
 
     layout = ManageVotesLayout(self, request)
     archive = ArchivedResultCollection(request.app.session())
@@ -76,9 +90,52 @@ def edit_vote(self, request, form):
     }
 
 
-@ElectionDayApp.form(model=Vote, name='delete', template='form.pt',
-                     permission=Private, form=EmptyForm)
+@ElectionDayApp.form(
+    model=Vote,
+    name='clear',
+    template='form.pt',
+    form=EmptyForm,
+    permission=Private
+)
+def clear_vote(self, request, form):
+
+    """ Clear the results of a vote. """
+
+    layout = ManageVotesLayout(self, request)
+    archive = ArchivedResultCollection(request.app.session())
+
+    if form.submitted(request):
+        archive.clear(self, request)
+        return morepath.redirect(layout.manage_model_link)
+
+    return {
+        'message': _(
+            'Do you really want to clear all results of "${item}"?',
+            mapping={
+                'item': self.title
+            }
+        ),
+        'layout': layout,
+        'form': form,
+        'title': self.title,
+        'shortcode': self.shortcode,
+        'subtitle': _("Clear results"),
+        'button_text': _("Clear results"),
+        'button_class': 'alert',
+        'cancel': layout.manage_model_link
+    }
+
+
+@ElectionDayApp.form(
+    model=Vote,
+    name='delete',
+    template='form.pt',
+    form=EmptyForm,
+    permission=Private
+)
 def delete_vote(self, request, form):
+
+    """ Delete an existing vote. """
 
     layout = ManageVotesLayout(self, request)
     archive = ArchivedResultCollection(request.app.session())
@@ -105,9 +162,16 @@ def delete_vote(self, request, form):
     }
 
 
-@ElectionDayApp.form(model=Vote, name='trigger', template='form.pt',
-                     permission=Private, form=EmptyForm)
-def trigger_notifications(self, request, form):
+@ElectionDayApp.form(
+    model=Vote,
+    name='trigger',
+    template='form.pt',
+    form=EmptyForm,
+    permission=Private
+)
+def trigger_vote(self, request, form):
+
+    """ Trigger the notifications related to a vote. """
 
     session = request.app.session()
     notifications = NotificationCollection(session)

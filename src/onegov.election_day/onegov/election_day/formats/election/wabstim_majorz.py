@@ -4,7 +4,6 @@ from onegov.ballot import ElectionResult
 from onegov.election_day import _
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
-from onegov.election_day.utils import clear_election
 from uuid import uuid4
 
 
@@ -195,7 +194,7 @@ def import_election_wabstim_majorz(
         return errors
 
     if results:
-        clear_election(election)
+        election.clear_results()
 
         election.number_of_mandates = mandates
         election.absolute_majority = majority

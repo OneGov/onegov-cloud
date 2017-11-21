@@ -13,9 +13,14 @@ from onegov.election_day.forms import ElectionForm
 from onegov.election_day.layout import ManageElectionsLayout
 
 
-@ElectionDayApp.html(model=ElectionCollection, template='manage/elections.pt',
-                     permission=Private)
+@ElectionDayApp.html(
+    model=ElectionCollection,
+    template='manage/elections.pt',
+    permission=Private
+)
 def view_elections(self, request):
+
+    """ View a list of all elections. """
 
     return {
         'layout': ManageElectionsLayout(self, request),
@@ -25,9 +30,16 @@ def view_elections(self, request):
     }
 
 
-@ElectionDayApp.form(model=ElectionCollection, name='new-election',
-                     template='form.pt', permission=Private, form=ElectionForm)
+@ElectionDayApp.form(
+    model=ElectionCollection,
+    name='new-election',
+    template='form.pt',
+    form=ElectionForm,
+    permission=Private
+)
 def create_election(self, request, form):
+
+    """ Create a new election. """
 
     layout = ManageElectionsLayout(self, request)
     archive = ArchivedResultCollection(request.app.session())
@@ -48,9 +60,16 @@ def create_election(self, request, form):
     }
 
 
-@ElectionDayApp.form(model=Election, name='edit', template='form.pt',
-                     permission=Private, form=ElectionForm)
+@ElectionDayApp.form(
+    model=Election,
+    name='edit',
+    template='form.pt',
+    form=ElectionForm,
+    permission=Private
+)
 def edit_election(self, request, form):
+
+    """ Edit an existing election. """
 
     layout = ManageElectionsLayout(self, request)
     archive = ArchivedResultCollection(request.app.session())
@@ -75,9 +94,52 @@ def edit_election(self, request, form):
     }
 
 
-@ElectionDayApp.form(model=Election, name='delete', template='form.pt',
-                     permission=Private, form=EmptyForm)
+@ElectionDayApp.form(
+    model=Election,
+    name='clear',
+    template='form.pt',
+    form=EmptyForm,
+    permission=Private
+)
+def clear_election(self, request, form):
+
+    """ Clear the results of an election. """
+
+    layout = ManageElectionsLayout(self, request)
+    archive = ArchivedResultCollection(request.app.session())
+
+    if form.submitted(request):
+        archive.clear(self, request)
+        return morepath.redirect(layout.manage_model_link)
+
+    return {
+        'message': _(
+            'Do you really want to clear all results of "${item}"?',
+            mapping={
+                'item': self.title
+            }
+        ),
+        'layout': layout,
+        'form': form,
+        'title': self.title,
+        'shortcode': self.shortcode,
+        'subtitle': _("Clear results"),
+        'button_text': _("Clear results"),
+        'button_class': 'alert',
+        'cancel': layout.manage_model_link
+    }
+
+
+@ElectionDayApp.form(
+    model=Election,
+    name='delete',
+    template='form.pt',
+    form=EmptyForm,
+    permission=Private
+)
 def delete_election(self, request, form):
+
+    """ Delete an existing election. """
 
     layout = ManageElectionsLayout(self, request)
     archive = ArchivedResultCollection(request.app.session())
@@ -104,10 +166,16 @@ def delete_election(self, request, form):
     }
 
 
-@ElectionDayApp.form(model=Election, name='trigger',
-                     template='form.pt', permission=Private,
-                     form=EmptyForm)
-def trigger_notifications(self, request, form):
+@ElectionDayApp.form(
+    model=Election,
+    name='trigger',
+    template='form.pt',
+    form=EmptyForm,
+    permission=Private
+)
+def trigger_election(self, request, form):
+
+    """ Trigger the notifications related to an election. """
 
     session = request.app.session()
     notifications = NotificationCollection(session)

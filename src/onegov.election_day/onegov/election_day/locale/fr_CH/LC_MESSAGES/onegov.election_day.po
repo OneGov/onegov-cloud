@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-20 14:10+0100\n"
+"POT-Creation-Date: 2017-11-21 12:47+0100\n"
 "PO-Revision-Date: 2017-11-20 14:11+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -64,6 +64,9 @@ msgstr "Sources de données"
 
 msgid "Mappings"
 msgstr "Cartographie"
+
+msgid "Not a valid phone number."
+msgstr "N'est pas un numéro de téléphone valide."
 
 msgid ""
 "Successfully subscribed to the SMS services. You will receive an SMS every "
@@ -264,9 +267,6 @@ msgstr "Votation"
 
 msgid "Election"
 msgstr "Election"
-
-msgid "Not a valid phone number."
-msgstr "N'est pas un numéro de téléphone valide."
 
 msgid "Vote (German)"
 msgstr "Vote (allemand)"
@@ -695,6 +695,9 @@ msgstr "Nouveau election"
 msgid "View"
 msgstr "Voir"
 
+msgid "Clear results"
+msgstr ""
+
 msgid "Upload party results"
 msgstr "Uploader les résultats par parti"
 
@@ -715,6 +718,9 @@ msgstr "Vide"
 
 msgid "Invalid"
 msgstr "Invalide"
+
+msgid "Update results"
+msgstr ""
 
 msgid "Wrong username or password"
 msgstr "Mauvais nom d'utilisateur ou mot de passe"
@@ -817,6 +823,10 @@ msgstr "Supprimer la cartographie"
 
 msgid "Edit election"
 msgstr "Modifier l’élection"
+
+#, python-format
+msgid "Do you really want to clear all results of \"${item}\"?"
+msgstr ""
 
 msgid "Delete election"
 msgstr "Supprimer l'élection"
