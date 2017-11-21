@@ -45,6 +45,7 @@ def create_election(self, request, form):
         election = Election()
         form.update_model(election)
         archive.add(election, request)
+        request.message(_("Election added."), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {
@@ -72,6 +73,7 @@ def edit_election(self, request, form):
     if form.submitted(request):
         form.update_model(self)
         archive.update(self, request)
+        request.message(_("Election modified."), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     if not form.errors:
@@ -100,6 +102,7 @@ def clear_election(self, request, form):
 
     if form.submitted(request):
         archive.clear(self, request)
+        request.message(_("Results deleted."), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {
@@ -133,6 +136,7 @@ def delete_election(self, request, form):
 
     if form.submitted(request):
         archive.delete(self, request)
+        request.message(_("Election deleted."), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {
@@ -167,6 +171,7 @@ def trigger_election(self, request, form):
 
     if form.submitted(request):
         notifications.trigger(request, self)
+        request.message(_("Notifications triggered."), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     callout = None

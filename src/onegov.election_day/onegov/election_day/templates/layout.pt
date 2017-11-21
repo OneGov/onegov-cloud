@@ -51,6 +51,15 @@ metal:define-macro="layout">
 
     <div class="content">
         <div class="row">
+          <div class="small-12 columns" id="alert-boxes">
+            <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">
+              <tal:block tal:content="structure message.text" />
+              <a href="#" class="close">&times;</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
             <div class="columns small-12">
                 <div metal:define-slot="content"></div>
             </div>

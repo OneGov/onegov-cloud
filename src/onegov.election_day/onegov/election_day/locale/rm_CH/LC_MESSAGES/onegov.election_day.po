@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-21 12:47+0100\n"
+"POT-Creation-Date: 2017-11-21 14:32+0100\n"
 "PO-Revision-Date: 2017-11-20 14:10+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -862,6 +862,24 @@ msgstr "Modifitgar l'attribuziun"
 msgid "Delete mapping"
 msgstr "Stizzar l'attribuziun"
 
+msgid "Data source added."
+msgstr ""
+
+msgid "Token regenerated."
+msgstr ""
+
+msgid "Data source deleted."
+msgstr ""
+
+msgid "Mapping added."
+msgstr ""
+
+msgid "Mapping modified."
+msgstr ""
+
+msgid "Mapping deleted."
+msgstr ""
+
 msgid "Edit election"
 msgstr "Modifitgar l'elecziun"
 
@@ -882,14 +900,41 @@ msgstr ""
 msgid "Do you really want to retrigger the notfications?"
 msgstr "Propi trametter danovamain communicaziuns als abunents?"
 
+msgid "Election added."
+msgstr ""
+
+msgid "Election modified."
+msgstr ""
+
+msgid "Results deleted."
+msgstr ""
+
+msgid "Election deleted."
+msgstr ""
+
+msgid "Notifications triggered."
+msgstr ""
+
 msgid "Delete subscriber"
 msgstr "Stizzar l'abunent(a)"
+
+msgid "Subscriber deleted."
+msgstr ""
 
 msgid "Edit vote"
 msgstr "Modifitgar la votaziun"
 
 msgid "Delete vote"
 msgstr "Stizzar la votaziun"
+
+msgid "Vote added."
+msgstr ""
+
+msgid "Vote modified."
+msgstr ""
+
+msgid "Vote deleted."
+msgstr ""
 
 #, python-format
 msgid "The year ${year} is not yet supported"

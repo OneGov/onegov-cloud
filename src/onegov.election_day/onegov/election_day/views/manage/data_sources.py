@@ -49,6 +49,7 @@ def create_data_source(self, request, form):
         form.update_model(data_source)
         self.add(data_source)
         layout = ManageDataSourceItemsLayout(data_source, request)
+        request.message(_("Data source added."), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {
@@ -87,6 +88,7 @@ def generate_data_source_token(self, request, form):
 
     if form.submitted(request):
         self.token = uuid4()
+        request.message(_("Token regenerated."), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {
@@ -114,6 +116,7 @@ def delete_data_source(self, request, form):
     if form.submitted(request):
         data_sources = DataSourceCollection(request.app.session())
         data_sources.delete(self)
+        request.message(_("Data source deleted."), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {
@@ -168,13 +171,14 @@ def create_data_source_item(self, request, form):
         data_source_item = DataSourceItem()
         form.update_model(data_source_item)
         self.add(data_source_item)
+        request.message(_("Mapping added."), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {
         'layout': layout,
         'form': form,
         'callout': form.callout,
-        'title': _("New data source"),
+        'title': _("New mapping"),
         'cancel': layout.manage_model_link
     }
 
@@ -194,6 +198,7 @@ def edit_data_source_item(self, request, form):
 
     if form.submitted(request):
         form.update_model(self)
+        request.message(_("Mapping modified."), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     if not form.errors:
@@ -221,6 +226,7 @@ def delete_data_source_item(self, request, form):
     if form.submitted(request):
         data_source_items = DataSourceItemCollection(request.app.session())
         data_source_items.delete(self)
+        request.message(_("Mapping deleted."), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {

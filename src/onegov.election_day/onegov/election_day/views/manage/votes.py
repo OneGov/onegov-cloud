@@ -46,6 +46,7 @@ def create_vote(self, request, form):
         vote = Vote()
         form.update_model(vote)
         archive.add(vote, request)
+        request.message(_("Vote added."), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {
@@ -73,6 +74,7 @@ def edit_vote(self, request, form):
     if form.submitted(request):
         form.update_model(self)
         archive.update(self, request)
+        request.message(_("Vote modified."), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     if not form.errors:
@@ -101,6 +103,7 @@ def clear_vote(self, request, form):
 
     if form.submitted(request):
         archive.clear(self, request)
+        request.message(_("Results deleted."), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {
@@ -134,6 +137,7 @@ def delete_vote(self, request, form):
 
     if form.submitted(request):
         archive.delete(self, request)
+        request.message(_("Vote deleted."), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {
@@ -168,6 +172,7 @@ def trigger_vote(self, request, form):
 
     if form.submitted(request):
         notifications.trigger(request, self)
+        request.message(_("Notifications triggered."), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     callout = None

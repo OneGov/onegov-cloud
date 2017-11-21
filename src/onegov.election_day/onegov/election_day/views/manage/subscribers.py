@@ -15,7 +15,7 @@ from onegov.election_day.models import Subscriber
 )
 def view_subscribers(self, request):
 
-    """ View a list with all subsribers. """
+    """ View a list with all subscribers. """
 
     return {
         'layout': ManageSubscribersLayout(self, request),
@@ -39,6 +39,7 @@ def delete_subscriber(self, request, form):
     if form.submitted(request):
         subscribers = SubscriberCollection(request.app.session())
         subscribers.unsubscribe(self.phone_number)
+        request.message(_("Subscriber deleted."), 'success')
         return morepath.redirect(layout.manage_model_link)
 
     return {

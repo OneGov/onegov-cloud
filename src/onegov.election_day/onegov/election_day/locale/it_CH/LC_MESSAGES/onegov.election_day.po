@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-21 12:47+0100\n"
+"POT-Creation-Date: 2017-11-21 14:32+0100\n"
 "PO-Revision-Date: 2017-11-20 14:11+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -818,6 +818,24 @@ msgstr "Modifica mapping"
 msgid "Delete mapping"
 msgstr "Elimina mapping"
 
+msgid "Data source added."
+msgstr ""
+
+msgid "Token regenerated."
+msgstr ""
+
+msgid "Data source deleted."
+msgstr ""
+
+msgid "Mapping added."
+msgstr ""
+
+msgid "Mapping modified."
+msgstr ""
+
+msgid "Mapping deleted."
+msgstr ""
+
 msgid "Edit election"
 msgstr "Modifica elezione"
 
@@ -838,14 +856,41 @@ msgstr ""
 msgid "Do you really want to retrigger the notfications?"
 msgstr "Vuoi davvero riattivare le notifiche?"
 
+msgid "Election added."
+msgstr ""
+
+msgid "Election modified."
+msgstr ""
+
+msgid "Results deleted."
+msgstr ""
+
+msgid "Election deleted."
+msgstr ""
+
+msgid "Notifications triggered."
+msgstr ""
+
 msgid "Delete subscriber"
 msgstr "Elimina iscritto/a"
+
+msgid "Subscriber deleted."
+msgstr ""
 
 msgid "Edit vote"
 msgstr "Modifica votazione"
 
 msgid "Delete vote"
 msgstr "Elimina votazione"
+
+msgid "Vote added."
+msgstr ""
+
+msgid "Vote modified."
+msgstr ""
+
+msgid "Vote deleted."
+msgstr ""
 
 #, python-format
 msgid "The year ${year} is not yet supported"

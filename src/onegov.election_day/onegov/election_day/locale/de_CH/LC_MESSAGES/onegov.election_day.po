@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-21 12:47+0100\n"
-"PO-Revision-Date: 2017-11-21 12:49+0100\n"
+"POT-Creation-Date: 2017-11-21 14:32+0100\n"
+"PO-Revision-Date: 2017-11-21 14:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -819,6 +819,24 @@ msgstr "Zuordnung bearbeiten"
 msgid "Delete mapping"
 msgstr "Zuordnung löschen"
 
+msgid "Data source added."
+msgstr "Datenquelle hinzugefügt."
+
+msgid "Token regenerated."
+msgstr "Token neu erzeugt."
+
+msgid "Data source deleted."
+msgstr "Datenquelle gelöscht."
+
+msgid "Mapping added."
+msgstr "Zuordnung hinzugefügt."
+
+msgid "Mapping modified."
+msgstr "Zuordnung geändert."
+
+msgid "Mapping deleted."
+msgstr "Zuordnung gelöscht."
+
 msgid "Edit election"
 msgstr "Wahl bearbeiten"
 
@@ -837,14 +855,41 @@ msgstr "Keine Änderungen seit dem letzten Auslösen der Benachrichtigungen!"
 msgid "Do you really want to retrigger the notfications?"
 msgstr "Benachrichtigungen wirklich erneut auslösen?"
 
+msgid "Election added."
+msgstr "Wahl hinzugefügt."
+
+msgid "Election modified."
+msgstr "Wahl geändert."
+
+msgid "Results deleted."
+msgstr "Ergebnisse gelöscht."
+
+msgid "Election deleted."
+msgstr "Wahl gelöscht."
+
+msgid "Notifications triggered."
+msgstr "Benachrichtigungen ausgelöst."
+
 msgid "Delete subscriber"
 msgstr "Abonnent(in) löschen"
+
+msgid "Subscriber deleted."
+msgstr "Abonnent(in) gelöscht."
 
 msgid "Edit vote"
 msgstr "Abstimmung bearbeiten"
 
 msgid "Delete vote"
 msgstr "Abstimmung löschen"
+
+msgid "Vote added."
+msgstr "Abstimmung hinzugefügt."
+
+msgid "Vote modified."
+msgstr "Abstimmung geändert."
+
+msgid "Vote deleted."
+msgstr "Abstimmung gelöscht."
 
 #, python-format
 msgid "The year ${year} is not yet supported"
