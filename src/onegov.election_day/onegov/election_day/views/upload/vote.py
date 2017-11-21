@@ -2,7 +2,6 @@
 import transaction
 
 from onegov.ballot import Vote
-from onegov.core.security import Private
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.formats import import_vote_default
@@ -16,9 +15,15 @@ from onegov.election_day.layout import ManageVotesLayout
 from onegov.election_day.views.upload import unsupported_year_error
 
 
-@ElectionDayApp.form(model=Vote, name='upload', template='upload_vote.pt',
-                     permission=Private, form=UploadVoteForm)
+@ElectionDayApp.manage_form(
+    model=Vote,
+    name='upload',
+    template='upload_vote.pt',
+    form=UploadVoteForm
+)
 def view_upload(self, request, form):
+
+    """ Uploads votes results. """
 
     errors = []
 

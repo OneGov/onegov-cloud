@@ -30,9 +30,14 @@ def authenticate(request):
         raise HTTPUnauthorized()
 
 
-@ElectionDayApp.json(model=Principal, name='upload',
-                     permission=Public, request_method='POST')
+@ElectionDayApp.json(
+    model=Principal,
+    name='upload',
+    permission=Public,
+    request_method='POST'
+)
 def view_upload_test(self, request):
+
     """ Upload election or vote results via REST using the internal format.
 
     Example usage:

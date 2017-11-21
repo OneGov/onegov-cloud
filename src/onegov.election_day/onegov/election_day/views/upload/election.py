@@ -3,7 +3,6 @@ import morepath
 import transaction
 
 from onegov.ballot import Election
-from onegov.core.security import Private
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.formats import import_election_internal
@@ -18,17 +17,31 @@ from onegov.election_day.layout import ManageElectionsLayout
 from onegov.election_day.views.upload import unsupported_year_error
 
 
-@ElectionDayApp.html(model=Election, name='upload', permission=Private)
+@ElectionDayApp.manage_html(
+    model=Election,
+    name='upload'
+)
 def view_upload_election(self, request):
+    """ Upload results of an election.
+
+    Redirects to the majorz or proporz upload view.
+
+    """
+
     if self.type == 'majorz':
         return morepath.redirect(request.link(self, 'upload-majorz'))
     return morepath.redirect(request.link(self, 'upload-proporz'))
 
 
-@ElectionDayApp.form(model=Election, name='upload-majorz',
-                     template='upload_election.pt', permission=Private,
-                     form=UploadMajorzElectionForm)
+@ElectionDayApp.manage_form(
+    model=Election,
+    name='upload-majorz',
+    template='upload_election.pt',
+    form=UploadMajorzElectionForm,
+)
 def view_upload_majorz_election(self, request, form):
+
+    """ Upload results of a majorz election. """
 
     assert self.type == 'majorz'
 
@@ -122,10 +135,15 @@ def view_upload_majorz_election(self, request, form):
     }
 
 
-@ElectionDayApp.form(model=Election, name='upload-proporz',
-                     template='upload_election.pt', permission=Private,
-                     form=UploadProporzElectionForm)
+@ElectionDayApp.manage_form(
+    model=Election,
+    name='upload-proporz',
+    template='upload_election.pt',
+    form=UploadProporzElectionForm
+)
 def view_upload_proporz_election(self, request, form):
+
+    """ Upload results of a proproz election. """
 
     assert self.type == 'proporz'
 

@@ -13,9 +13,14 @@ from onegov.election_day.layout import ElectionsLayout
 from onegov.election_day.utils import add_last_modified_header
 
 
-@ElectionDayApp.html(model=Election, template='election/data.pt',
-                     name='data', permission=Public)
+@ElectionDayApp.html(
+    model=Election,
+    name='data',
+    template='election/data.pt',
+    permission=Public
+)
 def view_election_data(self, request):
+
     """" The main view. """
 
     layout = ElectionsLayout(self, request, 'data')
@@ -26,8 +31,13 @@ def view_election_data(self, request):
     }
 
 
-@ElectionDayApp.view(model=Election, name='data-json', permission=Public)
+@ElectionDayApp.view(
+    model=Election,
+    name='data-json',
+    permission=Public
+)
 def view_election_data_as_json(self, request):
+
     """ View the raw data as JSON. """
 
     @request.after
@@ -43,8 +53,13 @@ def view_election_data_as_json(self, request):
     )
 
 
-@ElectionDayApp.view(model=Election, name='data-csv', permission=Public)
+@ElectionDayApp.view(
+    model=Election,
+    name='data-csv',
+    permission=Public
+)
 def view_election_data_as_csv(self, request):
+
     """ View the raw data as CSV. """
 
     @request.after
@@ -60,8 +75,13 @@ def view_election_data_as_csv(self, request):
     )
 
 
-@ElectionDayApp.view(model=Election, name='data-xlsx', permission=Public)
+@ElectionDayApp.view(
+    model=Election,
+    name='data-xlsx',
+    permission=Public
+)
 def view_election_data_as_xlsx(self, request):
+
     """ View the raw data as XLSX. """
 
     @request.after
@@ -79,8 +99,13 @@ def view_election_data_as_xlsx(self, request):
     )
 
 
-@ElectionDayApp.view(model=Election, name='data-parties', permission=Public)
+@ElectionDayApp.view(
+    model=Election,
+    name='data-parties',
+    permission=Public
+)
 def view_election_parties_data_as_csv(self, request):
+
     """ View the raw parties data as CSV. """
 
     @request.after

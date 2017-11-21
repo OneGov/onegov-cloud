@@ -3,20 +3,17 @@
 import morepath
 
 from onegov.ballot import Election, ElectionCollection
-from onegov.core.security import Private
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import NotificationCollection
-from onegov.election_day.forms import EmptyForm
 from onegov.election_day.forms import ElectionForm
 from onegov.election_day.layout import ManageElectionsLayout
 
 
-@ElectionDayApp.html(
+@ElectionDayApp.manage_html(
     model=ElectionCollection,
-    template='manage/elections.pt',
-    permission=Private
+    template='manage/elections.pt'
 )
 def view_elections(self, request):
 
@@ -30,12 +27,10 @@ def view_elections(self, request):
     }
 
 
-@ElectionDayApp.form(
+@ElectionDayApp.manage_form(
     model=ElectionCollection,
     name='new-election',
-    template='form.pt',
-    form=ElectionForm,
-    permission=Private
+    form=ElectionForm
 )
 def create_election(self, request, form):
 
@@ -60,12 +55,10 @@ def create_election(self, request, form):
     }
 
 
-@ElectionDayApp.form(
+@ElectionDayApp.manage_form(
     model=Election,
     name='edit',
-    template='form.pt',
-    form=ElectionForm,
-    permission=Private
+    form=ElectionForm
 )
 def edit_election(self, request, form):
 
@@ -94,12 +87,9 @@ def edit_election(self, request, form):
     }
 
 
-@ElectionDayApp.form(
+@ElectionDayApp.manage_form(
     model=Election,
-    name='clear',
-    template='form.pt',
-    form=EmptyForm,
-    permission=Private
+    name='clear'
 )
 def clear_election(self, request, form):
 
@@ -130,12 +120,9 @@ def clear_election(self, request, form):
     }
 
 
-@ElectionDayApp.form(
+@ElectionDayApp.manage_form(
     model=Election,
-    name='delete',
-    template='form.pt',
-    form=EmptyForm,
-    permission=Private
+    name='delete'
 )
 def delete_election(self, request, form):
 
@@ -166,12 +153,9 @@ def delete_election(self, request, form):
     }
 
 
-@ElectionDayApp.form(
+@ElectionDayApp.manage_form(
     model=Election,
-    name='trigger',
-    template='form.pt',
-    form=EmptyForm,
-    permission=Private
+    name='trigger'
 )
 def trigger_election(self, request, form):
 

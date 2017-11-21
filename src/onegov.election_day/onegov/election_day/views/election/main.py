@@ -13,14 +13,22 @@ from onegov.election_day.views.election.lists import get_list_results
 from sqlalchemy.orm import object_session
 
 
-@ElectionDayApp.html(model=Election, permission=Public)
+@ElectionDayApp.html(
+    model=Election,
+    permission=Public
+)
 def view_election(self, request):
+
     """" The main view. """
 
     return redirect(ElectionsLayout(self, request).main_view)
 
 
-@ElectionDayApp.json(model=Election, permission=Public, name='json')
+@ElectionDayApp.json(
+    model=Election,
+    name='json',
+    permission=Public
+)
 def view_election_json(self, request):
     """" The main view as JSON. """
 
@@ -156,8 +164,13 @@ def view_election_json(self, request):
     return data
 
 
-@ElectionDayApp.json(model=Election, permission=Public, name='summary')
+@ElectionDayApp.json(
+    model=Election,
+    name='summary',
+    permission=Public
+)
 def view_election_summary(self, request):
+
     """ View the summary of the election as JSON. """
 
     @request.after
@@ -167,8 +180,13 @@ def view_election_summary(self, request):
     return get_election_summary(self, request)
 
 
-@ElectionDayApp.view(model=Election, name='pdf', permission=Public)
+@ElectionDayApp.view(
+    model=Election,
+    name='pdf',
+    permission=Public
+)
 def view_election_pdf(self, request):
+
     """ View the generated PDF. """
 
     layout = ElectionsLayout(self, request)

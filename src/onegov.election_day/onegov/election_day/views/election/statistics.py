@@ -6,9 +6,14 @@ from onegov.election_day.views.election import get_missing_entities
 from sqlalchemy.orm import object_session
 
 
-@ElectionDayApp.html(model=Election, template='election/statistics.pt',
-                     name='statistics', permission=Public)
+@ElectionDayApp.html(
+    model=Election,
+    name='statistics',
+    template='election/statistics.pt',
+    permission=Public
+)
 def view_election_statistics(self, request):
+
     """" The main view. """
 
     layout = ElectionsLayout(self, request, 'statistics')

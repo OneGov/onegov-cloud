@@ -8,9 +8,14 @@ from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_vote_summary
 
 
-@ElectionDayApp.html(model=Vote, template='vote/ballot.pt', permission=Public)
+@ElectionDayApp.html(
+    model=Vote,
+    template='vote/ballot.pt',
+    permission=Public
+)
 def view_vote_proposal(self, request):
-    """" The main view. """
+
+    """" The main view (proposal). """
 
     layout = VotesLayout(self, request)
 
@@ -21,10 +26,15 @@ def view_vote_proposal(self, request):
     }
 
 
-@ElectionDayApp.html(model=Vote, template='vote/ballot.pt', permission=Public,
-                     name='counter-proposal')
+@ElectionDayApp.html(
+    model=Vote,
+    name='counter-proposal',
+    template='vote/ballot.pt',
+    permission=Public
+)
 def view_vote_counter_proposal(self, request):
-    """" The main view. """
+
+    """" The main view (counter-proposal). """
 
     layout = VotesLayout(self, request, 'counter-proposal')
 
@@ -35,10 +45,15 @@ def view_vote_counter_proposal(self, request):
     }
 
 
-@ElectionDayApp.html(model=Vote, template='vote/ballot.pt', permission=Public,
-                     name='tie-breaker')
+@ElectionDayApp.html(
+    model=Vote,
+    name='tie-breaker',
+    template='vote/ballot.pt',
+    permission=Public
+)
 def view_vote_tie_breaker(self, request):
-    """" The main view. """
+
+    """" The main view (tie-breaker). """
 
     layout = VotesLayout(self, request, 'tie-breaker')
 
@@ -49,8 +64,13 @@ def view_vote_tie_breaker(self, request):
     }
 
 
-@ElectionDayApp.json(model=Vote, permission=Public, name='json')
+@ElectionDayApp.json(
+    model=Vote,
+    name='json',
+    permission=Public
+)
 def view_vote_json(self, request):
+
     """" The main view as JSON. """
 
     @request.after
@@ -146,8 +166,13 @@ def view_vote_json(self, request):
     }
 
 
-@ElectionDayApp.json(model=Vote, permission=Public, name='summary')
+@ElectionDayApp.json(
+    model=Vote,
+    name='summary',
+    permission=Public
+)
 def view_vote_summary(self, request):
+
     """ View the summary of the vote as JSON. """
 
     @request.after
@@ -157,8 +182,13 @@ def view_vote_summary(self, request):
     return get_vote_summary(self, request)
 
 
-@ElectionDayApp.view(model=Vote, name='pdf', permission=Public)
+@ElectionDayApp.view(
+    model=Vote,
+    name='pdf',
+    permission=Public
+)
 def view_vote_pdf(self, request):
+
     """ View the generated PDF. """
 
     layout = VotesLayout(self, request)

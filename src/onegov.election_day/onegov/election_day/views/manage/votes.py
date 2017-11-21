@@ -3,21 +3,18 @@
 import morepath
 
 from onegov.ballot import Vote, VoteCollection
-from onegov.core.security import Private
 from onegov.core.utils import groupbylist
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import NotificationCollection
-from onegov.election_day.forms import EmptyForm
 from onegov.election_day.forms import VoteForm
 from onegov.election_day.layout import ManageVotesLayout
 
 
-@ElectionDayApp.html(
+@ElectionDayApp.manage_html(
     model=VoteCollection,
     template='manage/votes.pt',
-    permission=Private
 )
 def view_votes(self, request):
 
@@ -31,8 +28,11 @@ def view_votes(self, request):
     }
 
 
-@ElectionDayApp.form(model=VoteCollection, name='new-vote', template='form.pt',
-                     permission=Private, form=VoteForm)
+@ElectionDayApp.manage_form(
+    model=VoteCollection,
+    name='new-vote',
+    form=VoteForm
+)
 def create_vote(self, request, form):
 
     """ Create a new vote. """
@@ -56,12 +56,10 @@ def create_vote(self, request, form):
     }
 
 
-@ElectionDayApp.form(
+@ElectionDayApp.manage_form(
     model=Vote,
     name='edit',
-    template='form.pt',
-    form=VoteForm,
-    permission=Private
+    form=VoteForm
 )
 def edit_vote(self, request, form):
 
@@ -90,12 +88,9 @@ def edit_vote(self, request, form):
     }
 
 
-@ElectionDayApp.form(
+@ElectionDayApp.manage_form(
     model=Vote,
-    name='clear',
-    template='form.pt',
-    form=EmptyForm,
-    permission=Private
+    name='clear'
 )
 def clear_vote(self, request, form):
 
@@ -126,12 +121,9 @@ def clear_vote(self, request, form):
     }
 
 
-@ElectionDayApp.form(
+@ElectionDayApp.manage_form(
     model=Vote,
-    name='delete',
-    template='form.pt',
-    form=EmptyForm,
-    permission=Private
+    name='delete'
 )
 def delete_vote(self, request, form):
 
@@ -162,12 +154,9 @@ def delete_vote(self, request, form):
     }
 
 
-@ElectionDayApp.form(
+@ElectionDayApp.manage_form(
     model=Vote,
-    name='trigger',
-    template='form.pt',
-    form=EmptyForm,
-    permission=Private
+    name='trigger'
 )
 def trigger_vote(self, request, form):
 

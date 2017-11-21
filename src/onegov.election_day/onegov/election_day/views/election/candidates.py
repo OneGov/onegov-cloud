@@ -10,9 +10,18 @@ from sqlalchemy import desc
 from sqlalchemy.orm import object_session
 
 
-@ElectionDayApp.json(model=Election, permission=Public, name='candidates-data')
+@ElectionDayApp.json(
+    model=Election,
+    name='candidates-data',
+    permission=Public
+)
 def view_election_candidates_data(self, request):
-    """" View the candidates as JSON. Used to for the candidates bar chart. """
+
+    """" View the candidates as JSON.
+
+    Used to for the candidates bar chart.
+
+    """
 
     session = object_session(self)
 
@@ -48,9 +57,14 @@ def view_election_candidates_data(self, request):
     }
 
 
-@ElectionDayApp.html(model=Election, permission=Public,
-                     name='candidates-chart', template='embed.pt')
+@ElectionDayApp.html(
+    model=Election,
+    name='candidates-chart',
+    template='embed.pt',
+    permission=Public
+)
 def view_election_candidates_chart(self, request):
+
     """" View the candidates as bar chart. """
 
     @request.after
@@ -66,9 +80,14 @@ def view_election_candidates_chart(self, request):
     }
 
 
-@ElectionDayApp.html(model=Election, template='election/candidates.pt',
-                     name='candidates', permission=Public)
+@ElectionDayApp.html(
+    model=Election,
+    name='candidates',
+    template='election/candidates.pt',
+    permission=Public
+)
 def view_election_candidates(self, request):
+
     """" The main view. """
 
     layout = ElectionsLayout(self, request, 'candidates')
@@ -80,8 +99,13 @@ def view_election_candidates(self, request):
     }
 
 
-@ElectionDayApp.json(model=Election, permission=Public, name='candidates-svg')
+@ElectionDayApp.json(
+    model=Election,
+    name='candidates-svg',
+    permission=Public
+)
 def view_election_candidates_svg(self, request):
+
     """ View the candidates as SVG. """
 
     layout = ElectionsLayout(self, request, 'candidates')

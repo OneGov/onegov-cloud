@@ -7,14 +7,26 @@ from onegov.election_day.layout import VotesLayout
 from onegov.election_day.utils import add_last_modified_header
 
 
-@ElectionDayApp.json(model=Ballot, permission=Public, name='by-entity')
+@ElectionDayApp.json(
+    model=Ballot,
+    name='by-entity',
+    permission=Public
+)
 def view_ballot_by_entity(self, request):
+
+    """ Returns the data for the ballot map. """
+
     return self.percentage_by_entity()
 
 
-@ElectionDayApp.html(model=Ballot, template='embed.pt', permission=Public,
-                     name='map')
+@ElectionDayApp.html(
+    model=Ballot,
+    name='map',
+    template='embed.pt',
+    permission=Public
+)
 def view_ballot_as_map(self, request):
+
     """" View the ballot as map. """
 
     @request.after
@@ -31,8 +43,13 @@ def view_ballot_as_map(self, request):
     }
 
 
-@ElectionDayApp.json(model=Ballot, permission=Public, name='svg')
+@ElectionDayApp.json(
+    model=Ballot,
+    name='svg',
+    permission=Public
+)
 def view_ballot_svg(self, request):
+
     """ View the ballot as SVG. """
 
     layout = VotesLayout(self.vote, request, tab=self.type)

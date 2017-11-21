@@ -2,11 +2,14 @@ import os
 import re
 
 from datetime import datetime
+from dectate import directive
 from onegov.core import Framework
 from onegov.core import utils
 from onegov.core.datamanager import FileDataManager
 from onegov.core.filestorage import FilestorageFile
 from onegov.core.framework import transaction_tween_factory
+from onegov.election_day.directives import ManageFormAction
+from onegov.election_day.directives import ManageHtmlAction
 from onegov.election_day.models import Principal
 from onegov.election_day.theme import ElectionDayTheme
 
@@ -18,6 +21,8 @@ class ElectionDayApp(Framework):
     """
 
     serve_static_files = True
+    manage_html = directive(ManageHtmlAction)
+    manage_form = directive(ManageFormAction)
 
     @property
     def principal(self):

@@ -2,14 +2,12 @@
 
 import morepath
 
-from onegov.core.security import Private
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import DataSourceCollection
 from onegov.election_day.collections import DataSourceItemCollection
 from onegov.election_day.forms import DataSourceForm
 from onegov.election_day.forms import DataSourceItemForm
-from onegov.election_day.forms import EmptyForm
 from onegov.election_day.layout import ManageDataSourceItemsLayout
 from onegov.election_day.layout import ManageDataSourcesLayout
 from onegov.election_day.models import DataSource
@@ -18,10 +16,12 @@ from onegov.election_day.models.data_source import UPLOAD_TYPE_LABELS
 from uuid import uuid4
 
 
-@ElectionDayApp.html(model=DataSourceCollection,
-                     template='manage/data_sources.pt',
-                     permission=Private)
+@ElectionDayApp.manage_html(
+    model=DataSourceCollection,
+    template='manage/data_sources.pt'
+)
 def view_data_sources(self, request):
+
     """ View all data sources as a list. """
 
     return {
@@ -33,12 +33,13 @@ def view_data_sources(self, request):
     }
 
 
-@ElectionDayApp.form(model=DataSourceCollection,
-                     name='new-source',
-                     template='form.pt',
-                     permission=Private,
-                     form=DataSourceForm)
+@ElectionDayApp.manage_form(
+    model=DataSourceCollection,
+    name='new-source',
+    form=DataSourceForm
+)
 def create_data_source(self, request, form):
+
     """ Create a new data source. """
 
     layout = ManageDataSourcesLayout(self, request)
@@ -58,16 +59,28 @@ def create_data_source(self, request, form):
     }
 
 
-@ElectionDayApp.view(model=DataSource, permission=Private, name='manage')
+@ElectionDayApp.manage_html(
+    model=DataSource,
+    name='manage'
+)
 def manage_data_source(self, request):
-    """ Manage the data source. Redirect to the list of data source items."""
+
+    """ Manage the data source.
+
+    Redirect to the list of data source items.
+
+    """
+
     layout = ManageDataSourceItemsLayout(self, request)
     return morepath.redirect(layout.manage_model_link)
 
 
-@ElectionDayApp.form(model=DataSource, name='generate-token',
-                     template='form.pt', permission=Private, form=EmptyForm)
+@ElectionDayApp.manage_form(
+    model=DataSource,
+    name='generate-token'
+)
 def generate_data_source_token(self, request, form):
+
     """ Regenerate a new token for the data source. """
 
     layout = ManageDataSourcesLayout(self, request)
@@ -88,9 +101,12 @@ def generate_data_source_token(self, request, form):
     }
 
 
-@ElectionDayApp.form(model=DataSource, name='delete',
-                     template='form.pt', permission=Private, form=EmptyForm)
+@ElectionDayApp.manage_form(
+    model=DataSource,
+    name='delete'
+)
 def delete_data_source(self, request, form):
+
     """ Delete the data source item. """
 
     layout = ManageDataSourcesLayout(self, request)
@@ -117,10 +133,12 @@ def delete_data_source(self, request, form):
     }
 
 
-@ElectionDayApp.html(model=DataSourceItemCollection,
-                     template='manage/data_source_items.pt',
-                     permission=Private)
+@ElectionDayApp.manage_html(
+    model=DataSourceItemCollection,
+    template='manage/data_source_items.pt'
+)
 def view_data_source_items(self, request):
+
     """ View all data source items as a list. """
 
     return {
@@ -133,12 +151,13 @@ def view_data_source_items(self, request):
     }
 
 
-@ElectionDayApp.form(model=DataSourceItemCollection,
-                     name='new-item',
-                     template='form.pt',
-                     permission=Private,
-                     form=DataSourceItemForm)
+@ElectionDayApp.manage_form(
+    model=DataSourceItemCollection,
+    name='new-item',
+    form=DataSourceItemForm
+)
 def create_data_source_item(self, request, form):
+
     """ Create a new data source item. """
 
     layout = ManageDataSourceItemsLayout(self, request)
@@ -160,12 +179,15 @@ def create_data_source_item(self, request, form):
     }
 
 
-@ElectionDayApp.form(model=DataSourceItem,
-                     name='edit',
-                     template='form.pt',
-                     permission=Private,
-                     form=DataSourceItemForm)
+@ElectionDayApp.manage_form(
+    model=DataSourceItem,
+    name='edit',
+    form=DataSourceItemForm
+)
 def edit_data_source_item(self, request, form):
+
+    """ Edit a data source item. """
+
     layout = ManageDataSourceItemsLayout(self.source, request)
 
     form.populate(self.source)
@@ -186,9 +208,12 @@ def edit_data_source_item(self, request, form):
     }
 
 
-@ElectionDayApp.form(model=DataSourceItem, name='delete',
-                     template='form.pt', permission=Private, form=EmptyForm)
+@ElectionDayApp.manage_form(
+    model=DataSourceItem,
+    name='delete'
+)
 def delete_data_source_item(self, request, form):
+
     """ Delete the data source item. """
 
     layout = ManageDataSourceItemsLayout(self.source, request)

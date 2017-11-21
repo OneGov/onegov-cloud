@@ -9,6 +9,7 @@ from sqlalchemy.orm import object_session
 
 
 def get_party_results(election):
+
     """ Returns the aggregated party results as list. """
 
     if election.type != 'proporz' or not election.party_results.first():
@@ -39,6 +40,7 @@ def get_party_results(election):
 
 
 def get_party_deltas(election, years, parties):
+
     """ Returns the aggregated party results with the differences to the
     last elections.
 
@@ -77,9 +79,17 @@ def get_party_deltas(election, years, parties):
     return deltas, results
 
 
-@ElectionDayApp.json(model=Election, permission=Public,
-                     name='parties-data')
+@ElectionDayApp.json(
+    model=Election,
+    name='parties-data',
+    permission=Public
+)
 def view_election_parties_data(self, request):
+
+    """ Retuns the data used for the grouped bar diagram showing the party
+    results.
+
+    """
 
     if self.type == 'majorz':
         return {
@@ -124,9 +134,14 @@ def view_election_parties_data(self, request):
     }
 
 
-@ElectionDayApp.html(model=Election, permission=Public,
-                     name='parties-chart', template='embed.pt')
+@ElectionDayApp.html(
+    model=Election,
+    name='parties-chart',
+    template='embed.pt',
+    permission=Public
+)
 def view_election_parties_chart(self, request):
+
     """" View the parties as grouped bar chart. """
 
     @request.after
@@ -142,9 +157,14 @@ def view_election_parties_chart(self, request):
     }
 
 
-@ElectionDayApp.html(model=Election, template='election/parties.pt',
-                     name='parties', permission=Public)
+@ElectionDayApp.html(
+    model=Election,
+    name='parties',
+    template='election/parties.pt',
+    permission=Public
+)
 def view_election_parties(self, request):
+
     """" The main view. """
 
     layout = ElectionsLayout(self, request, 'parties')
@@ -161,8 +181,13 @@ def view_election_parties(self, request):
     }
 
 
-@ElectionDayApp.json(model=Election, permission=Public, name='parties-svg')
+@ElectionDayApp.json(
+    model=Election,
+    name='parties-svg',
+    permission=Public
+)
 def view_election_parties_svg(self, request):
+
     """ View the parties as SVG. """
 
     layout = ElectionsLayout(self, request, 'parties')

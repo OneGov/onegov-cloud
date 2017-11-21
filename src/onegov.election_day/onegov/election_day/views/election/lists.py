@@ -10,6 +10,7 @@ from sqlalchemy.orm import object_session
 
 
 def get_list_results(election, session):
+
     """ Returns the aggregated list results as list. """
 
     result = session.query(
@@ -21,8 +22,13 @@ def get_list_results(election, session):
     return result
 
 
-@ElectionDayApp.json(model=Election, permission=Public, name='lists-data')
+@ElectionDayApp.json(
+    model=Election,
+    name='lists-data',
+    permission=Public
+)
 def view_election_lists_data(self, request):
+
     """" View the lists as JSON. Used to for the lists bar chart. """
 
     if self.type == 'majorz':
@@ -44,9 +50,14 @@ def view_election_lists_data(self, request):
     }
 
 
-@ElectionDayApp.html(model=Election, permission=Public,
-                     name='lists-chart', template='embed.pt')
+@ElectionDayApp.html(
+    model=Election,
+    name='lists-chart',
+    template='embed.pt',
+    permission=Public
+)
 def view_election_lists_chart(self, request):
+
     """" View the lists as bar chart. """
 
     @request.after
@@ -62,9 +73,14 @@ def view_election_lists_chart(self, request):
     }
 
 
-@ElectionDayApp.html(model=Election, template='election/lists.pt',
-                     name='lists', permission=Public)
+@ElectionDayApp.html(
+    model=Election,
+    name='lists',
+    template='election/lists.pt',
+    permission=Public
+)
 def view_election_lists(self, request):
+
     """" The main view. """
 
     layout = ElectionsLayout(self, request, 'lists')
@@ -76,8 +92,13 @@ def view_election_lists(self, request):
     }
 
 
-@ElectionDayApp.json(model=Election, permission=Public, name='lists-svg')
+@ElectionDayApp.json(
+    model=Election,
+    name='lists-svg',
+    permission=Public
+)
 def view_election_lists_svg(self, request):
+
     """ View the lists as SVG. """
 
     layout = ElectionsLayout(self, request, 'lists')

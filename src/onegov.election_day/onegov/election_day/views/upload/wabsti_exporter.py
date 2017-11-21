@@ -32,9 +32,14 @@ def authenticated_source(request):
         raise HTTPForbidden()
 
 
-@ElectionDayApp.json(model=Principal, name='upload-wabsti-vote',
-                     permission=Public, request_method='POST')
+@ElectionDayApp.json(
+    model=Principal,
+    name='upload-wabsti-vote',
+    request_method='POST',
+    permission=Public
+)
 def view_upload_wabsti_vote(self, request):
+
     """ Upload vote results using the WabstiCExportert 2.2+.
 
     Example usage:
@@ -45,6 +50,7 @@ def view_upload_wabsti_vote(self, request):
             --form "sg_geschafte=@SG_Geschaefte.csv"
 
     """
+
     set_locale(request)
 
     data_source = authenticated_source(request)
@@ -112,8 +118,12 @@ def view_upload_wabsti_vote(self, request):
         return {'status': 'success', 'errors': {}}
 
 
-@ElectionDayApp.json(model=Principal, name='upload-wabsti-majorz',
-                     permission=Public, request_method='POST')
+@ElectionDayApp.json(
+    model=Principal,
+    name='upload-wabsti-majorz',
+    request_method='POST',
+    permission=Public
+)
 def view_upload_wabsti_majorz(self, request):
     """ Upload election results using the WabstiCExportert 2.2+.
 
@@ -204,8 +214,12 @@ def view_upload_wabsti_majorz(self, request):
         return {'status': 'success', 'errors': {}}
 
 
-@ElectionDayApp.json(model=Principal, name='upload-wabsti-proporz',
-                     permission=Public, request_method='POST')
+@ElectionDayApp.json(
+    model=Principal,
+    name='upload-wabsti-proporz',
+    request_method='POST',
+    permission=Public
+)
 def view_upload_wabsti_proporz(self, request):
     """ Upload election results using the WabstiCExportert 2.2+.
 

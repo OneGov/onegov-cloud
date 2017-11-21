@@ -18,6 +18,7 @@ from onegov.election_day.utils import get_summaries
     permission=Public
 )
 def view_archive(self, request):
+
     """ Shows all the results from the elections and votes for a given year
     or date.
 
@@ -40,6 +41,7 @@ def view_archive(self, request):
     permission=Public
 )
 def view_archive_json(self, request):
+
     """ Shows all the results from the elections and votes for a given year
     or date as JSON.
 
@@ -66,6 +68,7 @@ def view_archive_json(self, request):
     permission=Public
 )
 def view_principal(self, request):
+
     """ Shows all the results from the elections and votes of the last election
     day.
 
@@ -89,6 +92,7 @@ def view_principal(self, request):
     permission=Public
 )
 def view_principal_json(self, request):
+
     """ Shows all the results from the elections and votes of the last election
     day as JSON.
 
@@ -118,6 +122,7 @@ def view_principal_json(self, request):
     permission=Private
 )
 def view_update_results(self, request, form):
+
     """ Updates all results.
 
     This view is not linked anywhere since there is normally no need to call

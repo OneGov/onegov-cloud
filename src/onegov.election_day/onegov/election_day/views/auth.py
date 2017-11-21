@@ -17,9 +17,15 @@ from onegov.user.forms import RequestPasswordResetForm
 from onegov.user.utils import password_reset_url
 
 
-@ElectionDayApp.form(model=Auth, name='login', template='login.pt',
-                     permission=Public, form=LoginForm)
+@ElectionDayApp.form(
+    model=Auth,
+    name='login',
+    template='login.pt',
+    form=LoginForm,
+    permission=Public
+)
 def handle_login(self, request, form):
+
     """ Handles the login requests. """
 
     if form.submitted(request):
@@ -38,18 +44,27 @@ def handle_login(self, request, form):
     }
 
 
-@ElectionDayApp.html(model=Auth, name='logout', permission=Private)
+@ElectionDayApp.html(
+    model=Auth,
+    name='logout',
+    permission=Private
+)
 def view_logout(self, request):
+
     """ Handles the logout requests. """
 
     return self.logout_to(request)
 
 
 @ElectionDayApp.form(
-    model=Principal, name='request-password', template='form.pt',
-    permission=Public, form=RequestPasswordResetForm
+    model=Principal,
+    name='request-password',
+    template='form.pt',
+    form=RequestPasswordResetForm,
+    permission=Public
 )
 def handle_password_reset_request(self, request, form):
+
     """ Handles the password reset requests. """
 
     show_form = True
@@ -106,10 +121,15 @@ def handle_password_reset_request(self, request, form):
 
 
 @ElectionDayApp.form(
-    model=Principal, name='reset-password', template='form.pt',
-    permission=Public, form=PasswordResetForm
+    model=Principal,
+    name='reset-password',
+    template='form.pt',
+    form=PasswordResetForm,
+    permission=Public
 )
 def handle_password_reset(self, request, form):
+
+    """ Handles password reset requests. """
 
     callout = None
     show_form = True

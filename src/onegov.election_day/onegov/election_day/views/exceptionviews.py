@@ -7,9 +7,13 @@ from webob.exc import HTTPNotFound
 
 
 @ElectionDayApp.html(
-    model=HTTPForbidden, permission=Public, template='exception.pt'
+    model=HTTPForbidden,
+    template='exception.pt',
+    permission=Public
 )
 def handle_forbidden(self, request):
+
+    """ Displays a nice HTTP 403 error. """
 
     @request.after
     def set_status_code(response):
@@ -25,9 +29,13 @@ def handle_forbidden(self, request):
 
 
 @ElectionDayApp.html(
-    model=HTTPNotFound, permission=Public, template='exception.pt'
+    model=HTTPNotFound,
+    template='exception.pt',
+    permission=Public
 )
 def handle_notfound(self, request):
+
+    """ Displays a nice HTTP 404 error. """
 
     @request.after
     def set_status_code(response):

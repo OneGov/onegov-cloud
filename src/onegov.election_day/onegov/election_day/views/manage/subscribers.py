@@ -2,19 +2,20 @@
 
 import morepath
 
-from onegov.core.security import Private
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import SubscriberCollection
-from onegov.election_day.forms import EmptyForm
 from onegov.election_day.layout import ManageSubscribersLayout
 from onegov.election_day.models import Subscriber
 
 
-@ElectionDayApp.html(model=SubscriberCollection,
-                     template='manage/subsribers.pt',
-                     permission=Private)
+@ElectionDayApp.manage_html(
+    model=SubscriberCollection,
+    template='manage/subsribers.pt'
+)
 def view_subscribers(self, request):
+
+    """ View a list with all subsribers. """
 
     return {
         'layout': ManageSubscribersLayout(self, request),
@@ -25,9 +26,13 @@ def view_subscribers(self, request):
     }
 
 
-@ElectionDayApp.form(model=Subscriber, name='delete', template='form.pt',
-                     permission=Private, form=EmptyForm)
+@ElectionDayApp.manage_form(
+    model=Subscriber,
+    name='delete'
+)
 def delete_subscriber(self, request, form):
+
+    """ Delete a single subsriber. """
 
     layout = ManageSubscribersLayout(self, request)
 

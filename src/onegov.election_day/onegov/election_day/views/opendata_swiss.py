@@ -1,8 +1,3 @@
-""" Returns an XML / RDF / DCAT-AP for Switzerland format for opendata.swiss
-
-See http://handbook.opendata.swiss/en/library/ch-dcat-ap for more information.
-
-"""
 from babel.dates import format_date
 from datetime import datetime
 from io import BytesIO
@@ -26,8 +21,20 @@ def sub(parent, tag, attrib=None, text=None):
     return element
 
 
-@ElectionDayApp.view(model=Principal, permission=Public, name='catalog.rdf')
+@ElectionDayApp.view(
+    model=Principal,
+    name='catalog.rdf',
+    permission=Public
+)
 def view_rdf(self, request):
+
+    """ Returns an XML / RDF / DCAT-AP for Switzerland format for
+    opendata.swiss.
+
+    See http://handbook.opendata.swiss/en/library/ch-dcat-ap for more
+    information.
+
+    """
 
     principal_name = request.app.principal.name
     publisher_id = self.open_data.get('id')

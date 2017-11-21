@@ -9,8 +9,13 @@ from onegov.election_day.layout import ElectionsLayout
 from onegov.election_day.utils import add_last_modified_header
 
 
-@ElectionDayApp.json(model=Election, permission=Public, name='panachage-data')
+@ElectionDayApp.json(
+    model=Election,
+    name='panachage-data',
+    permission=Public
+)
 def view_election_panachage_data(self, request):
+
     """" View the panachage data as JSON. Used to for the panachage sankey
     chart.
 
@@ -64,9 +69,14 @@ def view_election_panachage_data(self, request):
     }
 
 
-@ElectionDayApp.html(model=Election, permission=Public,
-                     name='panachage-chart', template='embed.pt')
+@ElectionDayApp.html(
+    model=Election,
+    name='panachage-chart',
+    template='embed.pt',
+    permission=Public
+)
 def view_election_panachage_chart(self, request):
+
     """" View the panachage data as sankey chart. """
 
     @request.after
@@ -82,9 +92,14 @@ def view_election_panachage_chart(self, request):
     }
 
 
-@ElectionDayApp.html(model=Election, template='election/panachage.pt',
-                     name='panachage', permission=Public)
+@ElectionDayApp.html(
+    model=Election,
+    name='panachage',
+    template='election/panachage.pt',
+    permission=Public
+)
 def view_election_panachage(self, request):
+
     """" The main view. """
 
     layout = ElectionsLayout(self, request, 'panachage')
@@ -95,8 +110,13 @@ def view_election_panachage(self, request):
     }
 
 
-@ElectionDayApp.json(model=Election, permission=Public, name='panachage-svg')
+@ElectionDayApp.json(
+    model=Election,
+    name='panachage-svg',
+    permission=Public
+)
 def view_election_panachage_svg(self, request):
+
     """ View the panachage as SVG. """
 
     layout = ElectionsLayout(self, request, 'panachage')

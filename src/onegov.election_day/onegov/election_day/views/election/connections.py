@@ -10,11 +10,18 @@ from onegov.election_day.views.election import get_connection_results
 from sqlalchemy.orm import object_session
 
 
-@ElectionDayApp.json(model=Election, permission=Public,
-                     name='connections-data')
+@ElectionDayApp.json(
+    model=Election,
+    name='connections-data',
+    permission=Public
+)
 def view_election_connections_data(self, request):
-    """" View the list connections as JSON. Used to for the connection sankey
-    chart. """
+
+    """" View the list connections as JSON.
+
+    Used to for the connection sankey chart.
+
+    """
 
     if self.type == 'majorz':
         return {}
@@ -76,9 +83,14 @@ def view_election_connections_data(self, request):
     }
 
 
-@ElectionDayApp.html(model=Election, permission=Public,
-                     name='connections-chart', template='embed.pt')
+@ElectionDayApp.html(
+    model=Election,
+    name='connections-chart',
+    template='embed.pt',
+    permission=Public
+)
 def view_election_connections_chart(self, request):
+
     """" View the connections as sankey chart. """
 
     @request.after
@@ -95,9 +107,14 @@ def view_election_connections_chart(self, request):
     }
 
 
-@ElectionDayApp.html(model=Election, template='election/connections.pt',
-                     name='connections', permission=Public)
+@ElectionDayApp.html(
+    model=Election,
+    name='connections',
+    template='election/connections.pt',
+    permission=Public
+)
 def view_election_connections(self, request):
+
     """" The main view. """
 
     layout = ElectionsLayout(self, request, 'connections')
@@ -109,8 +126,13 @@ def view_election_connections(self, request):
     }
 
 
-@ElectionDayApp.json(model=Election, permission=Public, name='connections-svg')
+@ElectionDayApp.json(
+    model=Election,
+    name='connections-svg',
+    permission=Public
+)
 def view_election_connections_svg(self, request):
+
     """ View the connections as SVG. """
 
     layout = ElectionsLayout(self, request, 'connections')

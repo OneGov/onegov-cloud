@@ -7,9 +7,17 @@ from onegov.election_day.models import Principal
 from onegov.election_day.collections import SubscriberCollection
 
 
-@ElectionDayApp.form(model=Principal, name='subscribe',
-                     template='form.pt', permission=Public, form=SubscribeForm)
+@ElectionDayApp.form(
+    model=Principal,
+    name='subscribe',
+    template='form.pt',
+    form=SubscribeForm,
+    permission=Public
+)
 def subscribe(self, request, form):
+
+    """ Adds the given phone number to the SMS subscribers."""
+
     layout = DefaultLayout(self, request)
 
     callout = None
@@ -36,9 +44,17 @@ def subscribe(self, request, form):
     }
 
 
-@ElectionDayApp.form(model=Principal, name='unsubscribe',
-                     template='form.pt', permission=Public, form=SubscribeForm)
+@ElectionDayApp.form(
+    model=Principal,
+    name='unsubscribe',
+    template='form.pt',
+    form=SubscribeForm,
+    permission=Public
+)
 def unsubscribe(self, request, form):
+
+    """ Removes the given phone number from the SMS subscribers."""
+
     layout = DefaultLayout(self, request)
 
     callout = None
