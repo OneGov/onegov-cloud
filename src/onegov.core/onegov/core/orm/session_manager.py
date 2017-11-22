@@ -494,7 +494,11 @@ class SessionManager(object):
 
         """
         conn = self.engine.execution_options(schema=None)
-        query = text("SELECT schema_name FROM information_schema.schemata")
+        query = text("""
+            SELECT schema_name
+            FROM information_schema.schemata
+            ORDER BY schema_name
+        """)
 
         if limit_to_namespace is not None:
             return [
