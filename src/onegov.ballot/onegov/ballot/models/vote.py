@@ -1,9 +1,10 @@
 from collections import OrderedDict
-from onegov.ballot.models.common import DomainOfInfluenceMixin
-from onegov.ballot.models.common import MetaMixin
-from onegov.ballot.models.common import StatusMixin
+from onegov.ballot.models.mixins import DomainOfInfluenceMixin
+from onegov.ballot.models.mixins import StatusMixin
+from onegov.ballot.models.mixins import summarized_property
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
+from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import UUID
@@ -83,17 +84,13 @@ class DerivedBallotsCount(object):
 
 
 class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
-           MetaMixin, StatusMixin):
+           ContentMixin, StatusMixin):
     """ A vote describes the issue being voted on. For example,
     "Vote for Net Neutrality" or "Vote for Basic Income".
 
     """
 
     __tablename__ = 'votes'
-
-    summarized_properties = [
-        'yeas', 'nays', 'empty', 'invalid', 'elegible_voters',
-    ]
 
     #: identifies the vote, may be used in the url, generated from the title
     id = Column(Text, primary_key=True)
@@ -246,6 +243,21 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
             int(len(results) / divider)
         )
 
+    #: the total yeas
+    yeas = summarized_property('yeas')
+
+    #: the total nays
+    nays = summarized_property('nays')
+
+    #: the total empty votes
+    empty = summarized_property('empty')
+
+    #: the total invalid votes
+    invalid = summarized_property('invalid')
+
+    #: the total elegible voters
+    elegible_voters = summarized_property('elegible_voters')
+
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
 
@@ -312,54 +324,6 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
         the nesting of values. Each record in the resulting list is a single
         ballot result.
 
-        Each entry in the list (row) has the following format:
-
-        * ``title``:
-            Title of the vote.
-
-        * ``date``:
-            The date of the vote (an ISO 8601 date string).
-
-        * ``shortcode``:
-            Internal shortcode (defines the ordering of votes on the same day).
-
-        * ``domain``:
-            ``federation`` for federal, ``canton`` for cantonal,
-            ``municipality`` for communal votes.
-
-        * ``status``:
-            The status of the vote: ``unknown``, ``interim`` or ``final``.
-
-        * ``type``:
-            ``proposal`` (Vorschlag), ``counter-proposal`` (Gegenvorschlag) or
-            ``tie-breaker`` (Stichfrage).
-
-        * ``group``: The designation of the result. May be the district and
-            the town's name divided by a slash, the city's name and the
-            city's district divided by a slash or simply the town's name. This
-            depends entirely on the canton.
-
-        * ``entity_id``: The id of the political entity. The
-            "BFS Nummer" for example.
-
-        * ``counted``: True if the result was counted, False if the result is
-            not known yet (the voting counts are not final yet).
-
-        * ``yeas``:
-            The number of yes votes.
-
-        * ``nays``:
-            The number of no votes.
-
-        * ``invalid``:
-            The number of invalid votes.
-
-        * ``empty``:
-            The number of empty votes.
-
-        * ``elegible_voters``:
-            The number of people elegible to vote.
-
         """
 
         rows = []
@@ -408,10 +372,6 @@ class Ballot(Base, TimestampMixin, DerivedAttributes, DerivedBallotsCount):
     """
 
     __tablename__ = 'ballots'
-
-    summarized_properties = [
-        'yeas', 'nays', 'empty', 'invalid', 'elegible_voters'
-    ]
 
     #: identifies the ballot, maybe used in the url
     id = Column(UUID, primary_key=True, default=uuid4)
@@ -477,6 +437,21 @@ class Ballot(Base, TimestampMixin, DerivedAttributes, DerivedBallotsCount):
         results = query.all()
 
         return sum(1 for r in results if r[0]), len(results)
+
+    #: the total yeas
+    yeas = summarized_property('yeas')
+
+    #: the total nays
+    nays = summarized_property('nays')
+
+    #: the total empty votes
+    empty = summarized_property('empty')
+
+    #: the total invalid votes
+    invalid = summarized_property('invalid')
+
+    #: the total elegible voters
+    elegible_voters = summarized_property('elegible_voters')
 
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """

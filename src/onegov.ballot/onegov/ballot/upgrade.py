@@ -3,9 +3,13 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 from onegov.ballot import Vote
-from onegov.core.orm.types import HSTORE, JSON
+from onegov.core.orm.types import HSTORE
+from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
-from sqlalchemy import Column, Enum, Integer, Text
+from sqlalchemy import Column
+from sqlalchemy import Enum
+from sqlalchemy import Integer
+from sqlalchemy import Text
 from sqlalchemy.engine.reflection import Inspector
 
 
@@ -215,3 +219,12 @@ def add_ballot_title(context):
     context.operations.add_column('ballots', Column(
         'title_translations', HSTORE, nullable=True
     ))
+
+
+@upgrade_task('Add content columns')
+def add_content_columns(context):
+    if not context.has_column('elections', 'content'):
+        context.operations.add_column('elections', Column('content', JSON))
+
+    if not context.has_column('votes', 'content'):
+        context.operations.add_column('votes', Column('content', JSON))

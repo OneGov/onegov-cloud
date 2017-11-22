@@ -1,10 +1,11 @@
 from collections import OrderedDict
 from itertools import groupby
-from onegov.ballot.models.common import DomainOfInfluenceMixin
-from onegov.ballot.models.common import MetaMixin
-from onegov.ballot.models.common import StatusMixin
+from onegov.ballot.models.mixins import DomainOfInfluenceMixin
+from onegov.ballot.models.mixins import StatusMixin
+from onegov.ballot.models.mixins import summarized_property
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
+from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import UUID
@@ -57,18 +58,9 @@ class DerivedAttributes(object):
 
 
 class Election(Base, TimestampMixin, DerivedAttributes,
-               DomainOfInfluenceMixin, MetaMixin, StatusMixin):
+               DomainOfInfluenceMixin, ContentMixin, StatusMixin):
 
     __tablename__ = 'elections'
-
-    summarized_properties = [
-        'elegible_voters',
-        'received_ballots',
-        'accounted_ballots',
-        'blank_ballots',
-        'invalid_ballots',
-        'accounted_votes'
-    ]
 
     #: Identifies the result, may be used in the url
     id = Column(Text, primary_key=True)
@@ -189,6 +181,24 @@ class Election(Base, TimestampMixin, DerivedAttributes,
         lazy='dynamic',
     )
 
+    #: The total elegible voters
+    elegible_voters = summarized_property('elegible_voters')
+
+    #: The total recceived ballots
+    received_ballots = summarized_property('received_ballots')
+
+    #: The total accounted ballots
+    accounted_ballots = summarized_property('accounted_ballots')
+
+    #: The total blank ballots
+    blank_ballots = summarized_property('blank_ballots')
+
+    #: The total invalid ballots
+    invalid_ballots = summarized_property('invalid_ballots')
+
+    #: The total accounted votes
+    accounted_votes = summarized_property('accounted_votes')
+
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
 
@@ -307,116 +317,6 @@ class Election(Base, TimestampMixin, DerivedAttributes,
         candidate result for each political entity. Party results are not
         included in the export (since they are not really connected with the
         lists).
-
-        Each entry in the list (row) has the following format:
-
-        * ``election_title``:
-            Title of the election.
-
-        * ``election_date``:
-            The date of the election (an ISO 8601 date string).
-
-        * ``election_domain``:
-            ``federation`` for federal, ``canton`` for cantonal,
-            ``municipality`` for communal votes.
-
-        * ``election_type``:
-            ``proporz`` for proportional, ``majorz`` for majority system.
-
-        * ``election_mandates``:
-            The number of mandates.
-
-        * ``election_absolute_majority``:
-            The absolute majority.  Only relevant for elections based on
-            majority system.
-
-        * ``election_status``:
-            The status of the election: ``unknown``, ``interim`` or ``final``.
-
-        * ``election_counted_entities``:
-            The number of already counted entities.
-
-        * ``election_total_entities``:
-            The total number of entities.
-
-        * ``entity_name``:
-            The name of the entity.
-
-        * ``entity_bfs_number``:
-            The id of the entity (e.g. the BFS number).
-
-        * ``entity_elegible_voters``:
-            The number of people eligible to vote in this entity.
-
-        * ``entity_received_ballots``:
-            The number of received ballots in this entity.
-
-        * ``entity_blank_ballots``:
-            The number of blank ballots in this entity.
-
-        * ``entity_invalid_ballots``:
-            The number of invalid ballots in this entity.
-
-        * ``entity_unaccounted_ballots``:
-            The number of unaccounted ballots in this entity.
-
-        * ``entity_accounted_ballots``:
-            The number of accounted ballots in this entity.
-
-        * ``entity_blank_votes``:
-            The number of blank votes in this entity.
-
-        * ``entity_invalid_votes``:
-            The number of invalid votes in this entity. Is zero for
-            elections based on proportional representation.
-
-        * ``entity_accounted_votes``:
-            The number of accounted votes in this entity.
-
-        * ``list_name``:
-            The name of the list this candidate appears on. Only relevant for
-            elections based on proportional representation.
-
-        * ``list_id``:
-            The id of the list this candidate appears on. Only relevant for
-            elections based on proportional representation.
-
-        * ``list_number_of_mandates``:
-            The number of mandates this list has got. Only relevant for
-            elections based on proportional representation.
-
-        * ``list_votes``:
-            The number of votes this list has got in this entity.
-            Only relevant for elections based on proportional representation.
-
-        * ``list_connection``:
-            The ID of the list connection this list is connected to. Only
-            relevant for elections based on proportional representation.
-
-        * ``list_connection_parent``:
-            The ID of the parent list conneciton this list is connected to.
-            Only relevant for elections based on proportional representation.
-
-        * ``candidate_family_name``:
-            The family name of the candidate.
-
-        * ``candidate_first_name``:
-            The first name of the candidate.
-
-        * ``candidate_id``:
-            The ID of the candidate.
-
-        * ``candidate_elected``:
-            True if the candidate has been elected.
-
-        * ``candidate_party``:
-            The name of the party of this candidate.
-
-        * ``candidate_votes``:
-            The number of votes this candidate got.
-
-        * ``panachage_votes_from_list_XX``:
-            The number of votes the list got from the given list.
 
         """
 
@@ -578,8 +478,6 @@ class ListConnection(Base, TimestampMixin):
 
     __tablename__ = 'list_connections'
 
-    summarized_properties = ['votes', 'number_of_mandates']
-
     #: internal id of the list
     id = Column(UUID, primary_key=True, default=uuid4)
 
@@ -624,6 +522,12 @@ class ListConnection(Base, TimestampMixin):
             child.total_number_of_mandates for child in self.children
         )
 
+    #: the total votes
+    votes = summarized_property('votes')
+
+    #: the total number of mandates
+    number_of_mandates = summarized_property('number_of_mandates')
+
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
 
@@ -646,8 +550,6 @@ class List(Base, TimestampMixin):
     """ A list. """
 
     __tablename__ = 'lists'
-
-    summarized_properties = ['votes']
 
     #: internal id of the list
     id = Column(UUID, primary_key=True, default=uuid4)
@@ -691,6 +593,9 @@ class List(Base, TimestampMixin):
         lazy='dynamic'
     )
 
+    #: the total votes
+    votes = summarized_property('votes')
+
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
 
@@ -713,8 +618,6 @@ class Candidate(Base, TimestampMixin):
     """ A candidate. """
 
     __tablename__ = 'candidates'
-
-    summarized_properties = ['votes']
 
     #: the internal id of the candidate
     id = Column(UUID, primary_key=True, default=uuid4)
@@ -747,6 +650,9 @@ class Candidate(Base, TimestampMixin):
         backref=backref('candidate'),
         lazy='dynamic',
     )
+
+    #: the total votes
+    votes = summarized_property('votes')
 
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
