@@ -198,4 +198,5 @@ def test_browse_directory_coordinates(browser, org_app):
 
     # the popup leads us to the restaurant
     browser.find_by_css('.popup-title').click()
-    assert browser.is_element_present_by_id('directories-restaurants-city-wok')
+    assert browser.is_element_present_by_id(
+        'page-directories-restaurants-city-wok')

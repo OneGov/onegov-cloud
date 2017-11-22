@@ -108,7 +108,7 @@ class Layout(ChameleonLayout):
         page_id = page_id.replace('/', '-')
         page_id = page_id.rstrip('-')
 
-        return page_id or 'root'
+        return 'page-' + (page_id or 'root')
 
     @cached_property
     def body_classes(self):

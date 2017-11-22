@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Prefixes the page ids to avoid javascript errors.
+  [href]
+
 - Shows an error messages when an AJAX call fails, instead of showing nothing.
   [href]
 

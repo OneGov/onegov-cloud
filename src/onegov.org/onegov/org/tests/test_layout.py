@@ -45,11 +45,11 @@ def test_layout():
 
     layout = DefaultLayout(MockModel(), MockRequest())
     layout.request.path_info = '/'
-    assert layout.page_id == 'root'
+    assert layout.page_id == 'page-root'
 
     layout = DefaultLayout(MockModel(), MockRequest())
     layout.request.path_info = '/foo/bar/'
-    assert layout.page_id == 'foo-bar'
+    assert layout.page_id == 'page-foo-bar'
 
 
 def test_page_layout_sidebar(session):

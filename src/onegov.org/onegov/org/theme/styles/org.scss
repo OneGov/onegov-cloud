@@ -150,7 +150,7 @@ body {
     for onegov.feriennet and should probably replaced by something feriennet
     specific.
 */
-#settings #fieldset-payment {
+#page-settings #fieldset-payment {
     display: none;
 }
 
@@ -3835,12 +3835,12 @@ ul.recipients {
 /*
     Timeline Messages
 */
-#timeline div.timeline,
+#page-timeline div.timeline,
 h2 + div.timeline {
     margin-top: -.75rem;
 }
 
-#timeline .actions {
+#page-timeline .actions {
     display: none;
 }
 
