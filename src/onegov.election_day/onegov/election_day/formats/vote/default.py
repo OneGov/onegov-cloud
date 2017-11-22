@@ -33,11 +33,11 @@ def import_vote_default(vote, entities, ballot_type, file, mimetype):
     """
     assert ballot_type in BALLOT_TYPES
 
-    filename = _("Proposal")
-    if ballot_type == 'counter-proposal':
-        filename = _("Counter Proposal")
-    if ballot_type == 'tie-breaker':
-        filename = _("Tie-Breaker")
+    filename = {
+        'proposal': _("Proposal"),
+        'counter-proposal': _("Counter Proposal"),
+        'tie-breaker': _("Tie-Breaker")
+    }.get(ballot_type)
 
     csv, error = load_csv(
         file, mimetype, expected_headers=HEADERS, filename=filename
@@ -45,11 +45,7 @@ def import_vote_default(vote, entities, ballot_type, file, mimetype):
     if error:
         return [error]
 
-    ballot = next((b for b in vote.ballots if b.type == ballot_type), None)
-
-    if not ballot:
-        ballot = Ballot(type=ballot_type)
-        vote.ballots.append(ballot)
+    ballot = vote.ballot(ballot_type, create=True)
 
     ballot_results = []
     errors = []

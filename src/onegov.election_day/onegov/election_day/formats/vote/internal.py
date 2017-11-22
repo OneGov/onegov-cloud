@@ -185,13 +185,7 @@ def import_vote_internal(vote, entities, file, mimetype):
             )
 
         if ballot_results[ballot_type]:
-            ballot = next(
-                (b for b in vote.ballots if b.type == ballot_type), None
-            )
-            if not ballot:
-                ballot = Ballot(type=ballot_type)
-                vote.ballots.append(ballot)
-
+            ballot = vote.ballot(ballot_type, create=True)
             for result in ballot_results[ballot_type]:
                 ballot.results.append(result)
 

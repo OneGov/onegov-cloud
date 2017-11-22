@@ -7,6 +7,9 @@ from onegov.ballot import Vote
 from onegov.core.upgrade import upgrade_task
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.models import ArchivedResult
+from onegov.core.orm.types import JSON
+from sqlalchemy import Column
+
 
 
 @upgrade_task('Create archived results')
@@ -102,3 +105,11 @@ def add_elected_candidates(context):
         election = session.query(Election).filter_by(id=election_id).first()
         if election:
             result.elected_candidates = election.elected_candidates
+
+
+@upgrade_task('Add content columns to archived results')
+def add_content_columns_to_archived_results(context):
+    if not context.has_column('archived_results', 'content'):
+        context.operations.add_column(
+            'archived_results', Column('content', JSON)
+        )

@@ -1,8 +1,8 @@
 from copy import deepcopy
-from onegov.ballot.models.common import DomainOfInfluenceMixin
-from onegov.ballot.models.common import MetaMixin
+from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
+from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import UTCDateTime
@@ -15,7 +15,8 @@ from sqlalchemy import Text
 from uuid import uuid4
 
 
-class ArchivedResult(Base, DomainOfInfluenceMixin, MetaMixin, TimestampMixin):
+class ArchivedResult(Base, DomainOfInfluenceMixin, ContentMixin,
+                     TimestampMixin):
 
     """ Stores the result of an election or vote. """
 

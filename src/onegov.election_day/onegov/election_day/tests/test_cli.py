@@ -184,6 +184,8 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager):
         if vote_type:
             vote = Vote(id=id, title=title, domain=domain, date=then)
             vote.ballots.append(Ballot(type='proposal'))
+            get_session(entity).add(vote)
+            get_session(entity).flush()
 
             if with_result:
                 vote.proposal.results.append(
@@ -211,8 +213,6 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager):
                         )
                     )
 
-            get_session(entity).add(vote)
-            get_session(entity).flush()
             transaction.commit()
 
         get_session(entity).add(
@@ -318,16 +318,17 @@ def test_generate_media(postgres_dsn, temporary_directory, session_manager):
             domain='canton',
             date=date(2015, 6, number)
         )
+        session_manager.set_current_schema('onegov_election_day-govikon')
+        session = session_manager.session()
+        session.add(vote)
+        session.flush()
+
         vote.ballots.append(Ballot(type='proposal'))
         vote.proposal.results.append(
             BallotResult(
                 group='x', entity_id=1, counted=True, yeas=30, nays=10
             )
         )
-        session_manager.set_current_schema('onegov_election_day-govikon')
-        session = session_manager.session()
-        session.add(vote)
-        session.flush()
         transaction.commit()
 
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
