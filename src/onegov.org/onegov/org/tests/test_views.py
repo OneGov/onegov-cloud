@@ -1028,7 +1028,7 @@ def test_ticket_states_idempotent(org_app):
 
     page = client.get(
         client.get('/tickets/ALL/closed')
-            .pyquery('.ticket-number-plain a').attr('href'))
+        .pyquery('.ticket-number-plain a').attr('href'))
 
     page.click('Ticket wieder öffnen')
     page.click('Ticket wieder öffnen')
