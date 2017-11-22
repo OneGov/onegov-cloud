@@ -208,3 +208,10 @@ def rename_candidates_tables(context):
             if context.has_table(new_name):
                 context.operations.drop_table(new_name)
             context.operations.rename_table(old_name, new_name)
+
+
+@upgrade_task('Adds ballot title')
+def add_ballot_title(context):
+    context.operations.add_column('ballots', Column(
+        'title_translations', HSTORE, nullable=True
+    ))

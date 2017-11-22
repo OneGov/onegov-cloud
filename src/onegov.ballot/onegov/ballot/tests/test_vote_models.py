@@ -36,6 +36,29 @@ def test_vote_create_all_models(session):
     session.flush()
 
 
+def test_vote_ballots(session):
+    vote = Vote(
+        title="Universal Healthcare",
+        domain='federation',
+        date=date(2015, 6, 14),
+    )
+
+    session.add(vote)
+    session.flush()
+
+    assert vote.ballot('proposal') is None
+    assert vote.ballot('counter-proposal') is None
+    assert vote.ballot('tie-breaker') is None
+
+    assert vote.ballot('proposal', create=True) is not None
+    assert vote.ballot('counter-proposal', create=True) is not None
+    assert vote.ballot('tie-breaker', create=True) is not None
+
+    assert vote.ballot('proposal') is not None
+    assert vote.ballot('counter-proposal') is not None
+    assert vote.ballot('tie-breaker') is not None
+
+
 def test_vote_id_generation(session):
     vote = Vote(
         title="Universal Healthcare",
@@ -542,8 +565,25 @@ def test_vote_export(session):
     assert vote.export() == []
 
     vote.ballots.append(Ballot(type='proposal'))
-    vote.ballots.append(Ballot(type='counter-proposal'))
-    vote.ballots.append(Ballot(type='tie-breaker'))
+    vote.ballots.append(
+        Ballot(
+            type='counter-proposal',
+            title_translations={
+                'de_CH': 'Gegenvorschlag',
+                'it_CH': 'Controprogetto'
+            }
+        )
+    )
+    vote.ballots.append(
+        Ballot(
+            type='tie-breaker',
+            title_translations={
+                'de_CH': 'Stichfrage',
+                'it_CH': 'Spareggio'
+            }
+        )
+    )
+
     vote.proposal.results.append(
         BallotResult(
             group='Foo Town',
@@ -609,8 +649,8 @@ def test_vote_export(session):
             'elegible_voters': 150,
         },
         {
-            'title_de_CH': "Abstimmung",
-            'title_it_CH': "Votazione",
+            'title_de_CH': "Gegenvorschlag",
+            'title_it_CH': "Controprogetto",
             'date': "2015-06-14",
             'shortcode': "FOO",
             'domain': "federation",
@@ -796,6 +836,9 @@ def test_clear_ballot(session):
         date=date(2017, 1, 1),
         status='interim'
     )
+    session.add(vote)
+    session.flush()
+
     vote.ballots.append(Ballot(type='proposal'))
     vote.proposal.results.append(
         BallotResult(
@@ -808,8 +851,6 @@ def test_clear_ballot(session):
             invalid=4,
         )
     )
-    session.add(vote)
-    session.flush()
 
     vote.proposal.clear_results()
 
@@ -823,6 +864,9 @@ def test_clear_vote(session):
         date=date(2017, 1, 1),
         status='interim'
     )
+    session.add(vote)
+    session.flush()
+
     vote.ballots.append(Ballot(type='proposal'))
     vote.proposal.results.append(
         BallotResult(
@@ -835,10 +879,8 @@ def test_clear_vote(session):
             invalid=4,
         )
     )
-    session.add(vote)
-    session.flush()
 
     vote.clear_results()
 
     assert vote.status is None
-    assert [ballot for ballot in vote.ballots] == []
+    assert vote.proposal.results.first() == None

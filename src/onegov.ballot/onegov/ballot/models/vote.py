@@ -117,25 +117,31 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
         lazy='dynamic'
     )
 
-    #: a vote contains either one ballot (a proposal), or three ballots (a
-    #: proposal, a counter proposal and a tie breaker)
+    def ballot(self, ballot_type, create=False):
+        """ Returns the given ballot if it exists. Optionally creates the
+        ballot.
+
+        """
+
+        result = self.ballots.filter(Ballot.type == ballot_type).first()
+
+        if not result and create:
+            result = Ballot(type=ballot_type)
+            self.ballots.append(result)
+
+        return result
+
     @property
     def proposal(self):
-        if self.ballots.count() >= 1:
-            return self.ballots[0]
-        return None
+        return self.ballot('proposal')
 
     @property
     def counter_proposal(self):
-        if self.ballots.count() == 3:
-            return self.ballots[1]
-        return None
+        return self.ballot('counter-proposal')
 
     @property
     def tie_breaker(self):
-        if self.ballots.count() == 3:
-            return self.ballots[2]
-        return None
+        return self.ballot('tie-breaker')
 
     @observes('title_translations')
     def title_observer(self, translations):
@@ -295,9 +301,8 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
 
         self.status = None
 
-        session = object_session(self)
         for ballot in self.ballots:
-            session.delete(ballot)
+            ballot.clear_results()
 
     def export(self):
         """ Returns all data connected to this vote as list with dicts.
@@ -361,11 +366,12 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
 
         for ballot in self.ballots:
             for result in ballot.results:
-                # have the dict ordered so it works directly with onegov.core's
-                # :func:`onegov.core.csv.convert_list_of_dicts_to_csv`
                 row = OrderedDict()
 
-                for locale, title in (self.title_translations or {}).items():
+                titles = (
+                    ballot.title_translations or self.title_translations or {}
+                )
+                for locale, title in titles.items():
                     row['title_{}'.format(locale)] = (title or '').strip()
                 row['date'] = self.date.isoformat()
                 row['shortcode'] = self.shortcode
@@ -426,6 +432,10 @@ class Ballot(Base, TimestampMixin, DerivedAttributes, DerivedBallotsCount):
 
     #: identifies the vote this ballot result belongs to
     vote_id = Column(Text, ForeignKey(Vote.id), nullable=False)
+
+    #: title of the ballot
+    title_translations = Column(HSTORE, nullable=True)
+    title = translation_hybrid(title_translations)
 
     #: a ballot contains n results
     results = relationship(
