@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.18.2 (2017-11-22)
+~~~~~~~~~~~~~~~~~~~
+
 - Prefixes the page ids to avoid javascript errors.
   [href]
 

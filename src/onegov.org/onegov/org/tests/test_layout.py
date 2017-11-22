@@ -200,7 +200,7 @@ def test_template_layout(postgres_dsn):
     response = client.get('/model')
 
     assert '<!DOCTYPE html>' in response.text
-    assert '<body id="model"' in response.text
+    assert '<body id="page-model"' in response.text
 
 
 def test_events_layout_format_date():
