@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.53.3 (2017-11-22)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes schema order being undeterministic.
   [href]
