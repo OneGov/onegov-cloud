@@ -64,20 +64,47 @@ $('.image-select input[type="checkbox"]').on('click', function(e) {
 });
 
 // A generic error messages handler
-$(document).on('show-alert', function(_, data) {
+function showAlertMessage(message, type, target) {
+    type = type || 'alert';
+    target = target || '#alert-boxes';
+
     var alert = $('<div />')
         .attr('data-alert', '')
-        .attr('class', 'alert-box ' + data.type)
-        .text(data.message)
+        .attr('class', 'alert-box ' + (type || 'alert'))
+        .text(message)
         .append($('<a href="#" class="close">&times;</a>'));
 
-    var target = $(data.target || '#alert-boxes');
-    target.append(alert);
-
+    $(target || '#alert-boxes').append(alert);
     $(document).foundation();
+}
+
+$(document).on('show-alert', function(_, data) {
+    showAlertMessage(data.message, data.type, data.target);
 });
 
 $('button[data-toggle]').toggleButton();
+
+// handle intercooler errors generically
+$(document).ajaxError(function(_e, xhr, _settings, error) {
+    if (xhr.status === 502) {
+        showAlertMessage(locale(
+            "The server could not be reached. Please try again."
+        ));
+    } else if (xhr.status === 503) {
+        showAlertMessage(locale(
+            "This site is currently undergoing scheduled maintenance, " +
+            "please try again later."
+        ));
+    } else if (xhr.status === 500) {
+        showAlertMessage(locale(
+            "The server responded with an error. We have been informed " +
+            "and will investigate the problem."
+        ));
+    } else {
+        // a generic error messages is better than nothing
+        showAlertMessage(error || xhr.statusTexst);
+    }
+});
 
 // show the slider once everything has loaded
 $(document).ready(function() {

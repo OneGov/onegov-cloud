@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Shows an error messages when an AJAX call fails, instead of showing nothing.
+  [href]
+
 - Ensures idempotence of all ticket state changes.
   [href]
 

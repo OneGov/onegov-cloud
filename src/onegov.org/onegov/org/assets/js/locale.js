@@ -18,7 +18,10 @@ var locales = {
         "File": "Datei",
         "Internal Link": "Interner Link",
         "Upload": "Hochladen",
-        "Select": "Auswählen"
+        "Select": "Auswählen",
+        "This site is currently undergoing scheduled maintenance, please try again later.": "Die Webseite wird gerade planmässig gewartet. Bitte versuchen Sie es später noch einmal.",
+        "The server responded with an error. We have been informed and will investigate the problem.": "Auf dem Server ist ein Fehler aufgetreten. Wir wurden informiert und werden das Problem analysieren.",
+        "The server could not be reached. Please try again.": "Der Server konnte nicht erreicht werden. Bitte probieren Sie es noch einmal."
     },
     fr: {
         "Allocation": "Allocation",
@@ -39,7 +42,10 @@ var locales = {
         "File": "Fichier",
         "Internal Link": "Lien interne",
         "Upload": "Télécharger",
-        "Select": "Sélectionner"
+        "Select": "Sélectionner",
+        "This site is currently undergoing scheduled maintenance, please try again later.": "Le site est actuellement l'objet d'une maintenance programmée, veuillez réessayer plus tard.",
+        "The server responded with an error. We have been informed and will investigate the problem.": "Le serveur a répondu par une erreur. Nous en avons été informés et nous étudierons le problème.",
+        "The server could not be reached. Please try again.": "Le serveur n'a pas pu être joint. Veuillez réessayer."
     }
 };
 
