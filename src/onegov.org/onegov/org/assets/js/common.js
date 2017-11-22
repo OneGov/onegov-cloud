@@ -100,9 +100,9 @@ $(document).ajaxError(function(_e, xhr, _settings, error) {
             "The server responded with an error. We have been informed " +
             "and will investigate the problem."
         ));
-    } else {
+    } else if (500 <= xhr.status && xhr.status <= 599) {
         // a generic error messages is better than nothing
-        showAlertMessage(error || xhr.statusTexst);
+        showAlertMessage(error || xhr.statusText);
     }
 });
 
