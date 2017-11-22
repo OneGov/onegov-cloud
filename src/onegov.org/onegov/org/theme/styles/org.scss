@@ -57,6 +57,13 @@
 }
 
 /*
+    Fixes a foundation js error
+*/
+.foundation-data-attribute-namespace {
+    font-family: false;
+}
+
+/*
     The maximum width of a line relative to the font. This limits textblocks
     to a readable length.
 */
