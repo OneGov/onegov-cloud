@@ -144,21 +144,26 @@ def accept_ticket(self, request):
     user = UserCollection(request.app.session()).by_username(
         request.identity.userid)
 
+    was_pending = self.state == 'open'
+
     try:
         self.accept_ticket(user)
     except InvalidStateChange:
         request.alert(_("The ticket cannot be accepted because it's not open"))
     else:
-        TicketMessage.create(self, request, 'accepted')
-        request.success(_("You have accepted ticket ${number}", mapping={
-            'number': self.number
-        }))
+        if was_pending:
+            TicketMessage.create(self, request, 'accepted')
+            request.success(_("You have accepted ticket ${number}", mapping={
+                'number': self.number
+            }))
 
     return morepath.redirect(request.link(self))
 
 
 @OrgApp.view(model=Ticket, name='close', permission=Private)
 def close_ticket(self, request):
+
+    was_pending = self.state == 'pending'
 
     try:
         self.close_ticket()
@@ -167,17 +172,18 @@ def close_ticket(self, request):
             _("The ticket cannot be closed because it's not pending")
         )
     else:
-        TicketMessage.create(self, request, 'closed')
-        request.success(_("You have closed ticket ${number}", mapping={
-            'number': self.number
-        }))
+        if was_pending:
+            TicketMessage.create(self, request, 'closed')
+            request.success(_("You have closed ticket ${number}", mapping={
+                'number': self.number
+            }))
 
-        send_email_if_enabled(
-            ticket=self,
-            request=request,
-            template='mail_ticket_closed.pt',
-            subject=_("Your ticket has been closed")
-        )
+            send_email_if_enabled(
+                ticket=self,
+                request=request,
+                template='mail_ticket_closed.pt',
+                subject=_("Your ticket has been closed")
+            )
 
     return morepath.redirect(
         request.link(TicketCollection(request.app.session())))
@@ -188,6 +194,8 @@ def reopen_ticket(self, request):
     user = UserCollection(request.app.session()).by_username(
         request.identity.userid)
 
+    was_closed = self.state == 'closed'
+
     try:
         self.reopen_ticket(user)
     except InvalidStateChange:
@@ -195,17 +203,18 @@ def reopen_ticket(self, request):
             _("The ticket cannot be re-opened because it's not closed")
         )
     else:
-        TicketMessage.create(self, request, 'reopened')
-        request.success(_("You have reopened ticket ${number}", mapping={
-            'number': self.number
-        }))
+        if was_closed:
+            TicketMessage.create(self, request, 'reopened')
+            request.success(_("You have reopened ticket ${number}", mapping={
+                'number': self.number
+            }))
 
-        send_email_if_enabled(
-            ticket=self,
-            request=request,
-            template='mail_ticket_reopened.pt',
-            subject=_("Your ticket has been repoened")
-        )
+            send_email_if_enabled(
+                ticket=self,
+                request=request,
+                template='mail_ticket_reopened.pt',
+                subject=_("Your ticket has been repoened")
+            )
 
     return morepath.redirect(request.link(self))
 

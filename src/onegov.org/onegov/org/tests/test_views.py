@@ -997,6 +997,46 @@ def test_tickets(org_app):
     assert '/status' in message
 
 
+def test_ticket_states_idempotent(org_app):
+    client = Client(org_app)
+    client.login_editor()
+
+    page = client.get('/forms/new')
+    page.form['title'] = "Newsletter"
+    page.form['definition'] = "E-Mail *= @@@"
+    page = page.form.submit()
+
+    page = client.get('/form/newsletter')
+    page.form['e_mail'] = 'info@seantis.ch'
+
+    page.form.submit().follow().form.submit().follow()
+    assert len(org_app.smtp.outbox) == 1
+    assert len(client.get('/timeline/feed').json['messages']) == 1
+
+    page = client.get('/tickets/ALL/open')
+    page.click('Annehmen')
+    page.click('Annehmen')
+    page = page.click('Annehmen').follow()
+    assert len(org_app.smtp.outbox) == 1
+    assert len(client.get('/timeline/feed').json['messages']) == 2
+
+    page.click('Ticket abschliessen')
+    page.click('Ticket abschliessen')
+    page = page.click('Ticket abschliessen').follow()
+    assert len(org_app.smtp.outbox) == 2
+    assert len(client.get('/timeline/feed').json['messages']) == 3
+
+    page = client.get(
+        client.get('/tickets/ALL/closed')
+            .pyquery('.ticket-number-plain a').attr('href'))
+
+    page.click('Ticket wieder öffnen')
+    page.click('Ticket wieder öffnen')
+    page = page.click('Ticket wieder öffnen').follow()
+    assert len(org_app.smtp.outbox) == 3
+    assert len(client.get('/timeline/feed').json['messages']) == 4
+
+
 def test_resource_slots(org_app):
 
     resources = ResourceCollection(org_app.libres_context)

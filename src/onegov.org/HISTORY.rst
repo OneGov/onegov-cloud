@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Ensures idempotence of all ticket state changes.
+  [href]
+
 0.18.1 (2017-11-20)
 ~~~~~~~~~~~~~~~~~~~
 
