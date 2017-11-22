@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Changes the style to work with the latest onegov.org release.
+  [href]
+
 1.3.7 (2017-11-20)
 ~~~~~~~~~~~~~~~~~~~
 
