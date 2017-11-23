@@ -82,7 +82,7 @@ class ArchivedResult(Base, DomainOfInfluenceMixin, ContentMixin,
     external_id = meta_property('id')
 
     #: The names of the elected candidates.
-    elected_candidates = meta_property('elected_candidates', default=[])
+    elected_candidates = meta_property('elected_candidates', default=list)
 
     #: The answer of a vote (accepted, rejected, counter-proposal).
     answer = meta_property('answer', default='')
