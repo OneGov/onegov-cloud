@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.53.6 (2017-11-23)
+~~~~~~~~~~~~~~~~~~~
 
 - Cuts down on cli debug output when the postgres server is down.
   [href]
