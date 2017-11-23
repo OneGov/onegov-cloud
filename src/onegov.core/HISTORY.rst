@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.53.4 (2017-11-23)
+~~~~~~~~~~~~~~~~~~~
 
 - Allows to set a default to dictionary based properties.
   [msom]
