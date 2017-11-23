@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.18.4 (2017-11-23)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes intercooler requests being sent using POST instead of DELETE.
   [href]
 
