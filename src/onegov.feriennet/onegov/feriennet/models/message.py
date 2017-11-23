@@ -1,5 +1,6 @@
 from onegov.activity import Period
 from onegov.org.models.message import TemplateRenderedMessage
+from onegov.org.models.message import TicketBasedMessage
 
 
 class PeriodMessage(TemplateRenderedMessage):
@@ -23,3 +24,14 @@ class PeriodMessage(TemplateRenderedMessage):
                 'action': action
             }
         )
+
+
+class ActivityMessage(TicketBasedMessage):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'activity'
+    }
+
+    @classmethod
+    def create(cls, ticket, request, action):
+        return super().create(ticket, request, action=action)

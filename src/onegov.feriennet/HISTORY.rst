@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds activity messages to publiation/archival of activities.
+  [href]
+
 1.3.8 (2017-11-22)
 ~~~~~~~~~~~~~~~~~~~
 

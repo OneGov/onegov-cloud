@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-10-16 10:53+0200\n"
+"POT-Creation-Date: 2017-11-23 15:12+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1445,6 +1445,12 @@ msgstr ""
 "Les réservations pour cette période sont confirmées. Si vous souhaitez "
 "modifier ou annuler les réservations, vous devez le faire manuellement."
 
+msgid "Activity published."
+msgstr "Activité publiée."
+
+msgid "Activity archived."
+msgstr "Activité archivée."
+
 msgid "Period activated."
 msgstr "Période activée."
 
@@ -1966,9 +1972,6 @@ msgstr "Archiver la période"
 msgid "Require the political municipality in the userprofile"
 msgstr "Commune politique requise dans le profil de l'utilisateur"
 
-msgid "Extra Features"
-msgstr "Paramètres supplémentaires"
-
 #, python-format
 msgid "Bookings for ${period}"
 msgstr "Réservations pour ${period}"
@@ -1976,3 +1979,6 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
+
+#~ msgid "Extra Features"
+#~ msgstr "Paramètres supplémentaires"

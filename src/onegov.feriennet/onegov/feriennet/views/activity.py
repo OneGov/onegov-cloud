@@ -19,6 +19,7 @@ from onegov.feriennet.forms import VacationActivityForm
 from onegov.feriennet.layout import VacationActivityCollectionLayout
 from onegov.feriennet.layout import VacationActivityFormLayout
 from onegov.feriennet.layout import VacationActivityLayout
+from onegov.feriennet.models import ActivityMessage
 from onegov.feriennet.models import VacationActivity
 from onegov.org.mail import send_html_mail
 from onegov.org.models import TicketMessage
@@ -563,6 +564,8 @@ def administer_activity(model, request, action, template, subject):
                 'ticket': ticket
             }
         )
+
+    ActivityMessage.create(ticket, request, action)
 
     @request.after
     def redirect_intercooler(response):
