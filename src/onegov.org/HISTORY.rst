@@ -1,10 +1,10 @@
 Changelog
 ---------
 
-0.18.3 (2017-11-22)
-~~~~~~~~~~~~~~~~~~~
+- Fixes intercooler requests being sent using POST instead of DELETE.
+  [href]
 
-0.18.2 (2017-11-22)
+0.18.3 (2017-11-22)
 ~~~~~~~~~~~~~~~~~~~
 
 - Prefixes the page ids to avoid javascript errors.
