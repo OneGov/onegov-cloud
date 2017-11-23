@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.53.5 (2017-11-23)
+~~~~~~~~~~~~~~~~~~~
 
 - Checks the default values of dictionary based properties.
   [msom]
