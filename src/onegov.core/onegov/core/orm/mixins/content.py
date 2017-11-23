@@ -24,7 +24,7 @@ class ContentMixin(object):
 
 def dictionary_based_property_factory(attribute):
 
-    def dictionary_based_property(name):
+    def dictionary_based_property(name, default=None):
         """ Enables access of dictionaries through properties.
 
         Usage::
@@ -60,7 +60,9 @@ def dictionary_based_property_factory(attribute):
 
         def getter(self):
             dictionary = getattr(self, attribute, None)
-            return dictionary.get(name) if dictionary is not None else None
+            if dictionary is not None:
+                return dictionary.get(name, default)
+            return default
 
         def setter(self, value):
             if getattr(self, attribute) is None:

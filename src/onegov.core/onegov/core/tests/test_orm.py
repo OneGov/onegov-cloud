@@ -1138,6 +1138,7 @@ def test_content_properties():
 
         type = meta_property('type')
         name = content_property('name')
+        value = meta_property('value', default=1)
 
         @name.setter
         def name(self, value):
@@ -1152,6 +1153,7 @@ def test_content_properties():
     content = Content()
     assert content.type is None
     assert content.name is None
+    assert content.value == 1
 
     content.type = 'page'
     assert content.type == 'page'
@@ -1169,8 +1171,15 @@ def test_content_properties():
     assert content.name is None
     assert content.content == {}
 
+    content.value = 2
+    assert content.value == 2
+    assert content.meta['value'] == 2
+    del content.value
+    assert content.value == 1
+
     content.meta = None
     assert content.type is None
+    assert content.value == 1
     content.type = 'Foobar'
     assert content.type == 'Foobar'
 
