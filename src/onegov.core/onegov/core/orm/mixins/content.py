@@ -58,10 +58,20 @@ def dictionary_based_property_factory(attribute):
 
         """
 
+        assert (
+            default is None or
+            callable(default) or
+            isinstance(
+                default, (int, float, complex, str, tuple, frozenset, bytes)
+            )
+        )
+
         def getter(self):
             dictionary = getattr(self, attribute, None)
             if dictionary is not None:
-                return dictionary.get(name, default)
+                return dictionary.get(
+                    name, default() if callable(default) else default
+                )
             return default
 
         def setter(self, value):

@@ -1183,6 +1183,11 @@ def test_content_properties():
     content.type = 'Foobar'
     assert content.type == 'Foobar'
 
+    with pytest.raises(AssertionError):
+        content.invalid = meta_property('invalid', default=[])
+    with pytest.raises(AssertionError):
+        content.invalid = meta_property('invalid', default={})
+
 
 def test_find_models():
 
