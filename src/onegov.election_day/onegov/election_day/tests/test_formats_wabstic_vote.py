@@ -100,7 +100,7 @@ def test_import_wabstic_vote(session, tar_file):
         assert not vote.ballots.one().results.one().counted
 
     # Test complex vote
-    vote.meta = {'vote_type': 'complex'}
+    vote.vote_type = 'complex'
     principal = Principal(name=str(3402), municipality=3402)
     entities = principal.entities.get(vote.date.year, {})
     errors = import_vote_wabstic(

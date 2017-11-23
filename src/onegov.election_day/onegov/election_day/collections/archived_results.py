@@ -160,23 +160,22 @@ class ArchivedResultCollection(object):
         result.title = item.title
         result.title_translations = item.title_translations
         result.last_result_change = item.last_result_change
-        result.meta = {}
-        result.meta['id'] = item.id
-        result.meta['counted'] = item.counted
-        result.meta['completed'] = item.completed
+        result.external_id = item.id
+        result.counted = item.counted
+        result.completed = item.completed
 
         if isinstance(item, Election):
             result.type = 'election'
             result.counted_entities = item.counted_entities
             result.total_entities = item.total_entities
-            result.meta['elected_candidates'] = item.elected_candidates
+            result.elected_candidates = item.elected_candidates
 
         if isinstance(item, Vote):
             result.type = 'vote'
             result.counted_entities, result.total_entities = item.progress
-            result.meta['answer'] = item.answer
-            result.meta['nays_percentage'] = item.nays_percentage
-            result.meta['yeas_percentage'] = item.yeas_percentage
+            result.answer = item.answer
+            result.nays_percentage = item.nays_percentage
+            result.yeas_percentage = item.yeas_percentage
 
         if add_result:
             self.session.add(result)

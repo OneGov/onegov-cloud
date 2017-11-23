@@ -3,7 +3,9 @@ from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.mixins.content import dictionary_based_property_factory
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.orm.types import UUID
@@ -13,6 +15,9 @@ from sqlalchemy import Enum
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from uuid import uuid4
+
+
+meta_local_property = dictionary_based_property_factory('local')
 
 
 class ArchivedResult(Base, DomainOfInfluenceMixin, ContentMixin,
@@ -73,6 +78,42 @@ class ArchivedResult(Base, DomainOfInfluenceMixin, ContentMixin,
     #: Shortcode for cantons that use it
     shortcode = Column(Text, nullable=True)
 
+    #: The id of the election/vote.
+    external_id = meta_property('id')
+
+    #: The names of the elected candidates.
+    elected_candidates = meta_property('elected_candidates', default=[])
+
+    #: The answer of a vote (accepted, rejected, counter-proposal).
+    answer = meta_property('answer', default='')
+
+    #: The nays rate of a vote.
+    nays_percentage = meta_property('nays_percentage', default=100.0)
+
+    #: The yeas rate of a vote.
+    yeas_percentage = meta_property('yeas_percentage', default=0.0)
+
+    #: True, if the vote or election has been counted.
+    counted = meta_property('counted', default=False)
+
+    #: True, if the vote or election has been completed.
+    completed = meta_property('completed', default=False)
+
+    #: The local results (municipal results if fetched from cantonal instance)
+    local = meta_property('local')
+
+    #: The answer if this a fetched cantonal/federal result on a communal
+    #: instance.
+    local_answer = meta_local_property('answer', '')
+
+    #: The nays rate if this a fetched cantonal/federal result on a communal
+    #: instance.
+    local_nays_percentage = meta_local_property('nays_percentage', 100.0)
+
+    #: The yeas rate if this a fetched cantonal/federal result on a communal
+    #: instance.
+    local_yeas_percentage = meta_local_property('yeas_percentage', 0.0)
+
     def is_fetched(self, request):
         """ Returns True, if this results has been fetched from another
         instance.
@@ -90,86 +131,12 @@ class ArchivedResult(Base, DomainOfInfluenceMixin, ContentMixin,
             request.app.principal.domain == 'municipality'
         )
 
-    def ensure_meta(self):
-        """ Ensure that the meta dict is set. """
-
-        if self.meta is None:
-            self.meta = {}
-
-    def ensure_meta_local(self):
-        """ Ensure that the meta dict is set and contains the 'local' key. """
-
-        self.ensure_meta()
-        if 'local' not in self.meta:
-            self.meta['local'] = {}
-
-    @property
-    def elected_candidates(self):
-        """ The names of the elected candidates. """
-
-        return (self.meta or {}).get('elected_candidates', [])
-
-    @elected_candidates.setter
-    def elected_candidates(self, value):
-        self.ensure_meta()
-        self.meta['elected_candidates'] = value
-
-    @property
-    def answer(self):
-        """ The answer of a vote (accepted, rejected, counter-proposal). """
-
-        return (self.meta or {}).get('answer', '')
-
-    @answer.setter
-    def answer(self, value):
-        self.ensure_meta()
-        self.meta['answer'] = value
-
-    @property
-    def local_answer(self):
-        """ The answer if this a fetched cantonal/federal result on a communal
-        instance.
-
-        """
-
-        return (self.meta or {}).get('local', {}).get('answer', '')
-
-    @local_answer.setter
-    def local_answer(self, value):
-        self.ensure_meta_local()
-        self.meta['local']['answer'] = value
-
     def display_answer(self, request):
         """ Returns the answer (depending on the current instance). """
 
         if self.is_fetched_by_municipality(request):
             return self.local_answer
         return self.answer
-
-    @property
-    def nays_percentage(self):
-        """ The nays rate of a vote. """
-
-        return (self.meta or {}).get('nays_percentage', 100.0)
-
-    @nays_percentage.setter
-    def nays_percentage(self, value):
-        self.ensure_meta()
-        self.meta['nays_percentage'] = value
-
-    @property
-    def local_nays_percentage(self):
-        """ The nays rate if this a fetched cantonal/federal result on a
-        communal instance.
-
-        """
-
-        return (self.meta or {}).get('local', {}).get('nays_percentage', 100.0)
-
-    @local_nays_percentage.setter
-    def local_nays_percentage(self, value):
-        self.ensure_meta_local()
-        self.meta['local']['nays_percentage'] = value
 
     def display_nays_percentage(self, request):
         """ Returns the nays rate (depending on the current instance). """
@@ -178,61 +145,12 @@ class ArchivedResult(Base, DomainOfInfluenceMixin, ContentMixin,
             return self.local_nays_percentage
         return self.nays_percentage
 
-    @property
-    def yeas_percentage(self):
-        """ The yeas rate of a vote. """
-
-        return (self.meta or {}).get('yeas_percentage', 0.0)
-
-    @yeas_percentage.setter
-    def yeas_percentage(self, value):
-        self.ensure_meta()
-        self.meta['yeas_percentage'] = value
-
-    @property
-    def local_yeas_percentage(self):
-        """ The yeas rate if this a fetched cantonal/federal result on a
-        communal instance.
-
-        """
-
-        return (self.meta or {}).get('local', {}).get('yeas_percentage', 0.0)
-
-    @local_yeas_percentage.setter
-    def local_yeas_percentage(self, value):
-        self.ensure_meta_local()
-        self.meta['local']['yeas_percentage'] = value
-
     def display_yeas_percentage(self, request):
         """ Returns the yeas rate (depending on the current instance). """
 
         if self.is_fetched_by_municipality(request):
             return self.local_yeas_percentage
         return self.yeas_percentage
-
-    @property
-    def counted(self):
-        """ True, if the vote or election has been counted. """
-
-        return (self.meta or {}).get('counted', False)
-
-    @counted.setter
-    def counted(self, value):
-        if self.meta is None:
-            self.meta = {}
-        self.meta['counted'] = value
-
-    @property
-    def completed(self):
-        """ True, if the vote or election has been completed. """
-
-        return (self.meta or {}).get('completed', False)
-
-    @completed.setter
-    def completed(self, value):
-        if self.meta is None:
-            self.meta = {}
-        self.meta['completed'] = value
 
     def copy_from(self, source):
         self.date = source.date

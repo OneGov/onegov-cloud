@@ -190,7 +190,7 @@ def test_archived_results(session):
     assert archive.get_years() == [2001]
     assert archive.query().count() == 2
 
-    ids_i = sorted([r.meta['id'] for r in archive.query()])
+    ids_i = sorted([r.external_id for r in archive.query()])
     ids_a = [r.id for r in elections.values()] + [r.id for r in votes.values()]
     assert ids_i == ['election-2001', 'vote-2001']
     assert set(ids_i).issubset(set(ids_a))
@@ -200,7 +200,7 @@ def test_archived_results(session):
     assert archive.get_years() == [2002, 2001]
     assert archive.query().count() == 4
 
-    ids_i = sorted([r.meta['id'] for r in archive.query()])
+    ids_i = sorted([r.external_id for r in archive.query()])
     ids_a = [r.id for r in elections.values()] + [r.id for r in votes.values()]
     assert ids_i == [
         'election-2001', 'election-2002', 'vote-2001', 'vote-2002'
@@ -213,7 +213,7 @@ def test_archived_results(session):
     assert archive.get_years() == [2003, 2002, 2001]
     assert archive.query().count() == 6
 
-    ids_i = sorted([r.meta['id'] for r in archive.query()])
+    ids_i = sorted([r.external_id for r in archive.query()])
     ids_a = [r.id for r in elections.values()] + [r.id for r in votes.values()]
     assert set(ids_i) == set(ids_a)
 
@@ -236,8 +236,8 @@ def test_archived_results(session):
     assert result.counted_entities == None
     assert result.total_entities == None
     assert result.progress == (0, 0)
-    assert result.meta['id'] == 'election-2001'
-    assert result.meta['elected_candidates'] == []
+    assert result.external_id == 'election-2001'
+    assert result.elected_candidates == []
 
     last_result_change = result.last_result_change
 
@@ -270,7 +270,7 @@ def test_archived_results(session):
     assert result.title == 'Vote'
     assert result.shortcode == 'shortcode'
     assert result.title_translations == {'de_CH': 'Vote'}
-    assert result.meta['id'] == 'vote-2001'
+    assert result.external_id == 'vote-2001'
 
 
 def test_notification_collection(session):

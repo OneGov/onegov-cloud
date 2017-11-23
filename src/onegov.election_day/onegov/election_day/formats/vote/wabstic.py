@@ -1,4 +1,3 @@
-from onegov.ballot import Ballot
 from onegov.ballot import BallotResult
 from onegov.election_day import _
 from onegov.election_day.formats.common import EXPATS
@@ -88,7 +87,7 @@ def import_vote_wabstic(vote, entities, district, number,
 
     # Get the vote type
     used_ballot_types = ['proposal']
-    if (vote.meta or {}).get('vote_type', 'simple') == 'complex':
+    if vote.vote_type == 'complex':
         used_ballot_types.extend(['counter-proposal', 'tie-breaker'])
 
     # Parse the vote

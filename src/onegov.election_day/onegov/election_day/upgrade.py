@@ -11,7 +11,6 @@ from onegov.core.orm.types import JSON
 from sqlalchemy import Column
 
 
-
 @upgrade_task('Create archived results')
 def create_archived_results(context):
 
@@ -48,8 +47,7 @@ def add_id_to_archived_results(context):
                 Vote.title_translations == result.title_translations
             ).first()
             if vote and vote.id in result.url:
-                result.meta = result.meta or {}
-                result.meta['id'] = vote.id
+                result.external_id = vote.id
 
         if result.type == 'election':
             election = session.query(Election).filter(
@@ -61,8 +59,7 @@ def add_id_to_archived_results(context):
                 Election.total_entities == result.total_entities,
             ).first()
             if election and election.id in result.url:
-                result.meta = result.meta or {}
-                result.meta['id'] = election.id
+                result.external_id = election.id
 
 
 @upgrade_task('Update vote progress')
@@ -80,8 +77,8 @@ def update_vote_progress(context):
     )
 
     for result in results:
-        vote_id = result.meta.get('id')
-        vote = session.query(Vote).filter_by(id=vote_id).first()
+        vote = session.query(Vote).filter_by(id=result.external_id)
+        vote = vote.first()
         if vote:
             result.counted_entities, result.total_entities = vote.progress
 
@@ -101,8 +98,8 @@ def add_elected_candidates(context):
     )
 
     for result in results:
-        election_id = result.meta.get('id')
-        election = session.query(Election).filter_by(id=election_id).first()
+        election = session.query(Election).filter_by(id=result.external_id)
+        election = election.first()
         if election:
             result.elected_candidates = election.elected_candidates
 

@@ -68,23 +68,17 @@ class VoteForm(Form):
         model.date = self.date.data
         model.domain = self.domain.data
         model.shortcode = self.shortcode.data
+        model.related_link = self.related_link.data
+        model.vote_type = self.vote_type.data
 
         model.title_translations = {}
         model.title_translations['de_CH'] = self.vote_de.data
-
         if self.vote_fr.data:
             model.title_translations['fr_CH'] = self.vote_fr.data
-
         if self.vote_it.data:
             model.title_translations['it_CH'] = self.vote_it.data
-
         if self.vote_rm.data:
             model.title_translations['rm_CH'] = self.vote_rm.data
-
-        if not model.meta:
-            model.meta = {}
-        model.meta['related_link'] = self.related_link.data
-        model.meta['vote_type'] = self.vote_type.data
 
     def apply_model(self, model):
         self.vote_de.data = model.title_translations['de_CH']
@@ -95,7 +89,5 @@ class VoteForm(Form):
         self.date.data = model.date
         self.domain.data = model.domain
         self.shortcode.data = model.shortcode
-
-        meta_data = model.meta or {}
-        self.related_link.data = meta_data.get('related_link', '')
-        self.vote_type.data = meta_data.get('vote_type', 'simple')
+        self.related_link.data = model.related_link
+        self.vote_type.data = model.vote_type or 'simple'

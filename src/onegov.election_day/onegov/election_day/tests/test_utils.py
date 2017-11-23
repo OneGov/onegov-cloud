@@ -234,44 +234,44 @@ def test_get_archive_links(session):
 
 
 def test_add_local_results(session):
-    target = ArchivedResult(meta={})
+    target = ArchivedResult()
 
     be = Principal(name='BE', canton='be')
     bern = Principal(name='Bern', municipality='351')
 
     # wrong principal domain
     add_local_results(ArchivedResult(), target, be, session)
-    assert 'local' not in target.meta
+    assert not target.local
 
     # wrong type
     add_local_results(ArchivedResult(type='election'), target, bern, session)
-    assert 'local' not in target.meta
+    assert not target.local
 
     # missing ID
     add_local_results(ArchivedResult(type='vote'), target, bern, session)
-    assert 'local' not in target.meta
+    assert not target.local
 
     # no vote
-    source = ArchivedResult(type='vote', meta={'id': 'id'})
+    source = ArchivedResult(type='vote', external_id='id')
     add_local_results(source, target, bern, session)
-    assert 'local' not in target.meta
+    assert not target.local
 
     # no proposal
     session.add(Vote(title="Vote", domain='federation', date=date(2011, 1, 1)))
     session.flush()
     vote = session.query(Vote).one()
 
-    source = ArchivedResult(type='vote', meta={'id': vote.id})
+    source = ArchivedResult(type='vote', external_id=vote.id)
     add_local_results(source, target, bern, session)
-    assert 'local' not in target.meta
+    assert not target.local
 
     # no results
     vote.ballots.append(Ballot(type="proposal"))
     session.flush()
 
-    source = ArchivedResult(type='vote', meta={'id': vote.id})
+    source = ArchivedResult(type='vote', external_id=vote.id)
     add_local_results(source, target, bern, session)
-    assert 'local' not in target.meta
+    assert not target.local
 
     # not yet counted
     vote.proposal.results.append(
@@ -283,16 +283,16 @@ def test_add_local_results(session):
     session.flush()
     proposal = session.query(BallotResult).one()
 
-    source = ArchivedResult(type='vote', meta={'id': vote.id})
+    source = ArchivedResult(type='vote', external_id=vote.id)
     add_local_results(source, target, bern, session)
-    assert 'local' not in target.meta
+    assert not target.local
 
     # simple vote
     proposal.counted = True
 
-    source = ArchivedResult(type='vote', meta={'id': vote.id})
+    source = ArchivedResult(type='vote', external_id=vote.id)
     add_local_results(source, target, bern, session)
-    assert 'local' in target.meta
+    assert target.local
     assert target.local_answer == 'rejected'
     assert target.local_yeas_percentage == 25.0
     assert target.local_nays_percentage == 75.0
@@ -300,21 +300,21 @@ def test_add_local_results(session):
     proposal.yeas = 7000
 
     add_local_results(source, target, bern, session)
-    assert 'local' in target.meta
+    assert target.local
     assert target.local_answer == 'accepted'
     assert target.local_yeas_percentage == 70.0
     assert target.local_nays_percentage == 30.0
 
     # complex vote
     # no results
-    target = ArchivedResult(meta={})
+    target = ArchivedResult()
     vote.ballots.append(Ballot(type="counter-proposal"))
     vote.ballots.append(Ballot(type="tie-breaker"))
     session.flush()
 
-    source = ArchivedResult(type='vote', meta={'id': vote.id})
+    source = ArchivedResult(type='vote', external_id=vote.id)
     add_local_results(source, target, bern, session)
-    assert 'local' not in target.meta
+    assert not target.local
 
     # not yet counted
     vote.counter_proposal.results.append(
@@ -333,9 +333,9 @@ def test_add_local_results(session):
     counter = vote.counter_proposal.results.one()
     tie = vote.tie_breaker.results.one()
 
-    source = ArchivedResult(type='vote', meta={'id': vote.id})
+    source = ArchivedResult(type='vote', external_id=vote.id)
     add_local_results(source, target, bern, session)
-    assert 'local' not in target.meta
+    assert not target.local
 
     # complex vote
     counter.counted = True
@@ -343,7 +343,7 @@ def test_add_local_results(session):
 
     # p: y, c: n, t:p
     add_local_results(source, target, bern, session)
-    assert 'local' in target.meta
+    assert target.local
     assert target.local_answer == 'proposal'
     assert target.local_yeas_percentage == 70.0
     assert target.local_nays_percentage == 30.0

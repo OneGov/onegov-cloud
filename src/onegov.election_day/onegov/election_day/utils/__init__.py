@@ -134,11 +134,13 @@ def add_local_results(source, target, principal, session):
         principal.domain == 'municipality' and
         principal.municipality and
         source.type == 'vote' and
-        'id' in (source.meta or {})
+        source.external_id
     )
     if adjust:
         entity_id = principal.municipality
-        vote = session.query(Vote).filter(Vote.id == source.meta['id']).first()
+        vote = session.query(Vote).filter(
+            Vote.id == source.external_id
+        ).first()
         if vote and vote.proposal:
             yeas = None
             nays = None

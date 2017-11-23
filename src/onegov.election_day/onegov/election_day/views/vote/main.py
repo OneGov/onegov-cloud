@@ -99,7 +99,7 @@ def view_vote_json(self, request):
             'counted': counted,
             'total': self.progress[1]
         },
-        'related_link': (self.meta or {}).get('related_link', ''),
+        'related_link': self.related_link,
         'title': self.title_translations,
         'type': 'election',
         'results': {

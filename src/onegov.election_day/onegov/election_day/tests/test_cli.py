@@ -248,7 +248,7 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager):
     assert get_session('thun').query(ArchivedResult).count() == 4
 
     meta = {
-        r.meta['id']: r.meta
+        r.external_id: r.meta
         for r in get_session('bern').query(ArchivedResult)
         if r.meta and 'id' in r.meta
     }

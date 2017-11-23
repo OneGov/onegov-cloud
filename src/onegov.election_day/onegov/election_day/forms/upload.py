@@ -386,7 +386,7 @@ class UploadVoteForm(Form):
         if vote.data_sources:
             self.file_format.choices.append(('wabsti_c', "WabstiCExport"))
 
-        if (vote.meta or {}).get('vote_type', 'simple') == 'complex':
+        if vote.vote_type == 'complex':
             self.type.choices = [('complex', _("Vote with Counter-Proposal"))]
             self.type.data = 'complex'
         else:

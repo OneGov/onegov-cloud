@@ -118,11 +118,9 @@ def view_upload(self, request, form):
             ):
                 # It might be that the vote type setting stored in the meta
                 # is overridden by the import (internal, wabsti c)
-                if not self.meta:
-                    self.meta = {}
-                self.meta['vote_type'] = 'simple'
+                self.vote_type = 'simple'
                 if self.counter_proposal:
-                    self.meta['vote_type'] = 'complex'
+                    self.vote_type = 'complex'
 
             status = 'success'
             request.app.pages_cache.invalidate()

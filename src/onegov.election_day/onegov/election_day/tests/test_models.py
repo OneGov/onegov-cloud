@@ -346,6 +346,7 @@ def test_archived_result(session):
     assert result.display_nays_percentage(request) == 100.0
     assert result.display_yeas_percentage(request) == 0.0
 
+    assert result.counted == False
     result.counted = True
     assert result.counted == True
 
@@ -435,7 +436,7 @@ def test_archived_result_local_results(session):
     assert result.meta == {
         'answer': 'accepted',
         'nays_percentage': 20.5,
-        'yeas_percentage': 79.5,
+        'yeas_percentage': 79.5
     }
 
     assert result.answer == 'accepted'

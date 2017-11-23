@@ -1,4 +1,3 @@
-from onegov.ballot import Ballot
 from onegov.ballot import BallotResult
 from onegov.election_day import _
 from onegov.election_day.formats.common import EXPATS

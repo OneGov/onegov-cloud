@@ -690,7 +690,7 @@ class MediaGenerator():
                         pdf.spacer()
 
             # Add related link
-            link = (item.meta or {}).get('related_link', '')
+            link = item.related_link
             if link:
                 pdf.h2(translate(_('Related link')))
                 pdf.p_markup('<a href="{link}">{link}</a>'.format(link=link))

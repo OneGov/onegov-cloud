@@ -95,10 +95,8 @@ def test_vote_form_model(election_day_app):
     model.date = date.today()
     model.domain = 'federation'
     model.shortcode = 'xy'
-    model.meta = {
-        'related_link': 'http://u.rl',
-        'vote_type': 'simple'
-    }
+    model.related_link = 'http://u.rl'
+    model.vote_type = 'simple'
 
     form = VoteForm()
     form.apply_model(model)
@@ -133,8 +131,8 @@ def test_vote_form_model(election_day_app):
     assert model.date == date(2016, 1, 1)
     assert model.domain == 'canton'
     assert model.shortcode == 'yz'
-    assert model.meta['related_link'] == 'http://ur.l'
-    assert model.meta['vote_type'] == 'complex'
+    assert model.related_link == 'http://ur.l'
+    assert model.vote_type == 'complex'
 
 
 def test_election_form_domains():
@@ -165,7 +163,7 @@ def test_election_form_model(election_day_app):
     model.shortcode = 'xy'
     model.type = 'proporz'
     model.number_of_mandates = 5
-    model.meta = {'related_link': 'http://u.rl'}
+    model.related_link = 'http://u.rl'
 
     form = ElectionForm()
     form.apply_model(model)
@@ -206,7 +204,7 @@ def test_election_form_model(election_day_app):
     assert model.type == 'majorz'
     assert model.number_of_mandates == 2
     assert model.absolute_majority == 10000
-    assert model.meta['related_link'] == 'http://ur.l'
+    assert model.related_link == 'http://ur.l'
 
 
 def test_upload_vote_form(session):
@@ -214,9 +212,9 @@ def test_upload_vote_form(session):
     communal_principal = Principal(name='bern', municipality='351')
 
     simple_vote = Vote(title='Vote', date=date(2017, 1, 1), domain='canton')
-    simple_vote.meta = {'vote_type': 'simple'}
+    simple_vote.vote_type = 'simple'
     complex_vote = Vote()
-    complex_vote.meta = {'vote_type': 'complex'}
+    complex_vote.vote_type = 'complex'
 
     # Test limitation of file formats
     form = UploadVoteForm()
