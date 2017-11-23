@@ -7,6 +7,7 @@ from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import UUID
 from onegov.core.utils import increment_name
@@ -287,6 +288,9 @@ class Election(Base, TimestampMixin, DerivedAttributes,
         results = results.filter(PanachageResult.target_list_id.in_(ids))
 
         return results.first() is not None
+
+    #: may be used to store a link related to this election
+    related_link = meta_property('related_link')
 
     def clear_results(self):
         """ Clears all the results. """

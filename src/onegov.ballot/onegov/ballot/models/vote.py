@@ -5,6 +5,7 @@ from onegov.ballot.models.mixins import summarized_property
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import UUID
@@ -139,6 +140,9 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
     @property
     def tie_breaker(self):
         return self.ballot('tie-breaker')
+
+    #: may be used to identify the vote type, e.g. simple or complex.
+    vote_type = meta_property('vote_type')
 
     @observes('title_translations')
     def title_observer(self, translations):
@@ -307,6 +311,9 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
             return None
 
         return max(last_changes)
+
+    #: may be used to store a link related to this vote
+    related_link = meta_property('related_link')
 
     def clear_results(self):
         """ Clear all the results. """

@@ -4,6 +4,9 @@ Changelog
 - Adds title with translations to ballots.
   [msom]
 
+- Adds vote type and related links.
+  [msom]
+
 1.8.0 (2017-11-20)
 ~~~~~~~~~~~~~~~~~~~
 
