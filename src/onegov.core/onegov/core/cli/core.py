@@ -164,6 +164,7 @@ is not executed.
 
 import click
 import inspect
+import sqlalchemy
 import sys
 
 from fnmatch import fnmatch
@@ -463,10 +464,17 @@ def command_group():
         '--config', default='onegov.yml',
         help="The onegov config file")
     def command_group(select, config):
-        context = click.get_current_context()
-        context_settings = get_context_specific_settings(context)
-        context.obj = GroupContext(select, config, **context_settings)
-        context.obj.validate_guard_conditions(context)
+        try:
+            context = click.get_current_context()
+            context_settings = get_context_specific_settings(context)
+            context.obj = GroupContext(select, config, **context_settings)
+            context.obj.validate_guard_conditions(context)
+        except sqlalchemy.exc.OperationalError as e:
+            if "Connection refused" in ' '.join(e.args):
+                print(e)
+                sys.exit(1)
+            else:
+                raise
 
     @command_group.resultcallback()
     def process_results(processor, select, config):
