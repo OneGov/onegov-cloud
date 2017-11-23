@@ -146,7 +146,7 @@ def test_transaction_integration(postgres_dsn):
     c = Client(app)
     try:
         c.get('/', expect_errors=True)
-    except:
+    except Exception:
         pass
 
     collection = ResourceCollection(app.libres_context)
