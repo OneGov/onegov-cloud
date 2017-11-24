@@ -13,42 +13,6 @@ from wtforms.validators import Optional
 
 class ElectionForm(Form):
 
-    election_de = StringField(
-        label=_("Election (German)"),
-        validators=[
-            InputRequired()
-        ]
-    )
-    election_fr = StringField(
-        label=_("Election (French)")
-    )
-    election_it = StringField(
-        label=_("Election (Italian)")
-    )
-    election_rm = StringField(
-        label=_("Election (Romansh)")
-    )
-
-    shortcode = StringField(
-        label=_("Shortcode")
-    )
-
-    date = DateField(
-        label=_("Date"),
-        validators=[
-            InputRequired()
-        ],
-        default=date.today
-    )
-
-    mandates = IntegerField(
-        label=_("Mandates"),
-        validators=[
-            InputRequired(),
-            NumberRange(min=1)
-        ]
-    )
-
     election_type = RadioField(
         label=_("System"),
         choices=[
@@ -67,6 +31,47 @@ class ElectionForm(Form):
         ]
     )
 
+    date = DateField(
+        label=_("Date"),
+        validators=[
+            InputRequired()
+        ],
+        default=date.today
+    )
+
+    mandates = IntegerField(
+        label=_("Mandates"),
+        validators=[
+            InputRequired(),
+            NumberRange(min=1)
+        ]
+    )
+
+    shortcode = StringField(
+        label=_("Shortcode")
+    )
+
+    election_de = StringField(
+        label=_("German"),
+        fieldset=_("Title of the election"),
+        render_kw={'lang': 'de'}
+    )
+    election_fr = StringField(
+        label=_("French"),
+        fieldset=_("Title of the election"),
+        render_kw={'lang': 'fr'}
+    )
+    election_it = StringField(
+        label=_("Italian"),
+        fieldset=_("Title of the election"),
+        render_kw={'lang': 'it'}
+    )
+    election_rm = StringField(
+        label=_("Romansh"),
+        fieldset=_("Title of the election"),
+        render_kw={'lang': 'rm'}
+    )
+
     related_link = URLField(
         label=_("Related link")
     )
@@ -79,6 +84,23 @@ class ElectionForm(Form):
         ],
         depends_on=('election_type', 'majorz'),
     )
+
+    def validate(self):
+        result = super(ElectionForm, self).validate()
+        if not any((
+            self.election_de.data,
+            self.election_fr.data,
+            self.election_it.data,
+            self.election_rm.data
+        )):
+            message = _("Provide at least one title.")
+            self.election_de.errors.append(message)
+            self.election_fr.errors.append(message)
+            self.election_it.errors.append(message)
+            self.election_rm.errors.append(message)
+            result = False
+
+        return result
 
     def set_domain(self, principal):
         self.domain.choices = [
@@ -95,20 +117,23 @@ class ElectionForm(Form):
         model.absolute_majority = self.absolute_majority.data
         model.related_link = self.related_link.data
 
-        model.title_translations = {}
-        model.title_translations['de_CH'] = self.election_de.data
+        titles = {}
+        if self.election_de.data:
+            titles['de_CH'] = self.election_de.data
         if self.election_fr.data:
-            model.title_translations['fr_CH'] = self.election_fr.data
+            titles['fr_CH'] = self.election_fr.data
         if self.election_it.data:
-            model.title_translations['it_CH'] = self.election_it.data
+            titles['it_CH'] = self.election_it.data
         if self.election_rm.data:
-            model.title_translations['rm_CH'] = self.election_rm.data
+            titles['rm_CH'] = self.election_rm.data
+        model.title_translations = titles
 
     def apply_model(self, model):
-        self.election_de.data = model.title_translations['de_CH']
-        self.election_fr.data = model.title_translations.get('fr_CH')
-        self.election_it.data = model.title_translations.get('it_CH')
-        self.election_rm.data = model.title_translations.get('rm_CH')
+        titles = model.title_translations or {}
+        self.election_de.data = titles.get('de_CH')
+        self.election_fr.data = titles.get('fr_CH')
+        self.election_it.data = titles.get('it_CH')
+        self.election_rm.data = titles.get('rm_CH')
 
         self.date.data = model.date
         self.domain.data = model.domain

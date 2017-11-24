@@ -15,7 +15,9 @@
 
             <div metal:use-macro="layout.macros['tab_menu']"/>
 
-            <h3 tal:content="layout.title()" tal:condition="layout.title()" />
+            <h3 tal:condition="layout.title()">
+                ${layout.title()}<span tal:condition="ballot.title">: ${ballot.title}</span>
+            </h3>
 
             <div class="row" tal:condition="show_map">
                 <div class="small-12 small-centered medium-8 large-6 columns map-container">

@@ -93,7 +93,7 @@ def test_upload_vote_year_unavailable(election_day_app):
     assert "Das Jahr 2000 wird noch nicht unterstützt" in results
 
 
-def test_upload_vote_submit(import_scan, election_day_app):
+def test_upload_vote_submit(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
     login(client)

@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-21 14:32+0100\n"
-"PO-Revision-Date: 2017-11-20 14:11+0100\n"
+"POT-Creation-Date: 2017-11-24 14:23+0100\n"
+"PO-Revision-Date: 2017-11-24 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -193,20 +193,8 @@ msgstr "Pas de votations actuellement."
 msgid "No elections yet."
 msgstr "Pas de elections actuellement."
 
-msgid "Election (German)"
-msgstr "Election (allemand)"
-
-msgid "Election (French)"
-msgstr "Election (français)"
-
-msgid "Election (Italian)"
-msgstr "Election (italien)"
-
-msgid "Election (Romansh)"
-msgstr "Election (roumain)"
-
-msgid "Shortcode"
-msgstr "Shortcode"
+msgid "System"
+msgstr "Système"
 
 msgid "Date"
 msgstr "Date"
@@ -214,14 +202,32 @@ msgstr "Date"
 msgid "Mandates"
 msgstr "Mandats"
 
-msgid "System"
-msgstr "Système"
+msgid "Shortcode"
+msgstr "Shortcode"
+
+msgid "German"
+msgstr "Allemand"
+
+msgid "Title of the election"
+msgstr "Titre de l'élection"
+
+msgid "French"
+msgstr "Français"
+
+msgid "Italian"
+msgstr "Italian"
+
+msgid "Romansh"
+msgstr "Roumain"
 
 msgid "Related link"
 msgstr "Informations complémentaires"
 
 msgid "Absolute majority"
 msgstr "Majorité absolue"
+
+msgid "Provide at least one title."
+msgstr ""
 
 msgid "Election based on proportional representation"
 msgstr "Election selon le système proportionnel"
@@ -232,26 +238,14 @@ msgstr "Election selon le système majoritaire"
 msgid "Phone number"
 msgstr "Téléphone"
 
-msgid "File format"
-msgstr "Format de fichier"
+msgid "Title of the the vote/proposal"
+msgstr ""
 
-msgid "Complete"
-msgstr "Terminé"
+msgid "Title of the counter proposal"
+msgstr ""
 
-msgid "Party results"
-msgstr "Résultats des partis"
-
-msgid "Proposal / Results"
-msgstr "Objet de la votation / Résultats"
-
-msgid "Vote number"
-msgstr "Numéro de votation"
-
-msgid "Identifier"
-msgstr "Identifiant"
-
-msgid "OneGov Cloud"
-msgstr "ONeGov Cloud"
+msgid "Title of the tie breaker"
+msgstr ""
 
 msgid "Simple Vote"
 msgstr "Vote simple"
@@ -259,8 +253,20 @@ msgstr "Vote simple"
 msgid "Vote with Counter-Proposal"
 msgstr "Vote avec contre-projet"
 
-msgid "Default"
-msgstr "Défaut"
+msgid "File format"
+msgstr "Format de fichier"
+
+msgid "Complete"
+msgstr "Terminé"
+
+msgid "OneGov Cloud"
+msgstr "OneGov Cloud"
+
+msgid "Party results"
+msgstr "Résultats des partis"
+
+msgid "Identifier"
+msgstr "Identifiant"
 
 msgid "Vote"
 msgstr "Votation"
@@ -268,17 +274,14 @@ msgstr "Votation"
 msgid "Election"
 msgstr "Election"
 
-msgid "Vote (German)"
-msgstr "Vote (allemand)"
+msgid "Proposal / Results"
+msgstr "Objet de la votation / Résultats"
 
-msgid "Vote (French)"
-msgstr "Vote (français)"
+msgid "Vote number"
+msgstr "Numéro de votation"
 
-msgid "Vote (Italian)"
-msgstr "Vote (italien)"
-
-msgid "Vote (Romansh)"
-msgstr "Vote (roumain)"
+msgid "Default"
+msgstr "Défaut"
 
 #, python-format
 msgid "Final results are available on ${url}"

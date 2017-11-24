@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds titles for counter-proposal and tie-breakers.
+  [msom]
+
 - Allows to clear the results of elections and votes.
   [msom]
 
