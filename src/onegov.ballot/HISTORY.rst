@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Split models to separate files.
+- Split models and collections to separate files.
   [msom]
 
 1.9.0 (2017-11-23)

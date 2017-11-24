@@ -1,5 +1,6 @@
-from onegov.ballot.collection import BallotCollection, VoteCollection
-from onegov.ballot.collection import ElectionCollection
+from onegov.ballot.collections import BallotCollection
+from onegov.ballot.collections import ElectionCollection
+from onegov.ballot.collections import VoteCollection
 from onegov.ballot.models import Ballot
 from onegov.ballot.models import BallotResult
 from onegov.ballot.models import Candidate

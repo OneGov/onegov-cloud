@@ -1,16 +1,14 @@
 from datetime import date
 from freezegun import freeze_time
-from onegov.ballot import (
-    Candidate,
-    CandidateResult,
-    Election,
-    ElectionResult,
-    List,
-    ListConnection,
-    ListResult,
-    PanachageResult,
-    PartyResult
-)
+from onegov.ballot import Candidate
+from onegov.ballot import CandidateResult
+from onegov.ballot import Election
+from onegov.ballot import ElectionResult
+from onegov.ballot import List
+from onegov.ballot import ListConnection
+from onegov.ballot import ListResult
+from onegov.ballot import PanachageResult
+from onegov.ballot import PartyResult
 from uuid import uuid4
 
 

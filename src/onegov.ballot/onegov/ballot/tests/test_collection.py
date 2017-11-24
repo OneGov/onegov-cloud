@@ -1,8 +1,10 @@
 from datetime import date
-from onegov.ballot import (
-    Ballot, BallotCollection, Election, ElectionCollection, Vote,
-    VoteCollection
-)
+from onegov.ballot import Ballot
+from onegov.ballot import BallotCollection
+from onegov.ballot import Election
+from onegov.ballot import ElectionCollection
+from onegov.ballot import Vote
+from onegov.ballot import VoteCollection
 
 
 def test_elections_by_date(session):

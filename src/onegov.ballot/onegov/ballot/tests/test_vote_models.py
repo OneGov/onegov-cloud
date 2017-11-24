@@ -1,6 +1,8 @@
 from datetime import date
 from freezegun import freeze_time
-from onegov.ballot import Ballot, BallotResult, Vote
+from onegov.ballot import Ballot
+from onegov.ballot import BallotResult
+from onegov.ballot import Vote
 
 
 def test_vote_create_all_models(session):
