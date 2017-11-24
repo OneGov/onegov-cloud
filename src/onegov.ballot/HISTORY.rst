@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Makes votes polymorphic.
+  [msom]
+
 - Split models and collections to separate files.
   [msom]
 

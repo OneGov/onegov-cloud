@@ -2,63 +2,95 @@ from datetime import date
 from freezegun import freeze_time
 from onegov.ballot import Ballot
 from onegov.ballot import BallotResult
+from onegov.ballot import ComplexVote
 from onegov.ballot import Vote
 
 
-def test_vote_create_all_models(session):
+def test_vote(session):
     vote = Vote(
         title="Universal Healthcare",
         domain='federation',
         date=date(2015, 6, 14),
     )
-
     session.add(vote)
     session.flush()
 
+    vote = session.query(Vote).one()
+
+    assert vote.type == 'simple'
+    assert vote.title == "Universal Healthcare"
+    assert vote.domain == 'federation'
+    assert vote.date == date(2015, 6, 14)
+    assert vote.proposal
+    assert vote.ballot('proposal')
+    assert not vote.ballot('counter-proposal')
+    assert not vote.ballot('tie-breaker')
+
+
+def test_complex_vote(session):
+    vote = ComplexVote(
+        title="Universal Healthcare",
+        domain='federation',
+        date=date(2015, 6, 14),
+    )
+    session.add(vote)
+    session.flush()
+
+    vote = session.query(Vote).one()
+
+    assert vote.type == 'complex'
+    assert vote.title == "Universal Healthcare"
+    assert vote.domain == 'federation'
+    assert vote.date == date(2015, 6, 14)
+    assert vote.proposal
+    assert vote.counter_proposal
+    assert vote.tie_breaker
+    assert vote.ballot('proposal')
+    assert vote.ballot('counter-proposal')
+    assert vote.ballot('tie-breaker')
+
+
+def test_ballot(session):
+    vote = Vote(
+        id='vote',
+        title="Universal Healthcare",
+        domain='federation',
+        date=date(2015, 6, 14),
+    )
     ballot = Ballot(
         type='proposal',
-        vote_id=vote.id
+        title='Proposal',
+        vote_id='vote'
     )
-
+    ballot.results.append(
+        BallotResult(
+            group='ZG/Rotkreuz',
+            counted=True,
+            yeas=4982,
+            nays=4452,
+            empty=500,
+            invalid=66,
+            entity_id=1
+        )
+    )
+    session.add(vote)
     session.add(ballot)
     session.flush()
 
-    ballot_result = BallotResult(
-        group='ZG/Rotkreuz',
-        counted=True,
-        yeas=4982,
-        nays=4452,
-        empty=500,
-        invalid=66,
-        entity_id=1,
-        ballot_id=ballot.id
-    )
+    ballot = session.query(Ballot).one()
 
-    session.add(ballot_result)
-    session.flush()
+    assert ballot.type == 'proposal'
+    assert ballot.title == "Proposal"
+    assert ballot.vote.title == "Universal Healthcare"
 
-
-def test_vote_ballots(session):
-    vote = Vote(
-        title="Universal Healthcare",
-        domain='federation',
-        date=date(2015, 6, 14),
-    )
-
-    session.add(vote)
-    session.flush()
-
-    assert vote.ballot('proposal') is None
-    assert vote.ballot('counter-proposal') is None
-    assert vote.ballot('tie-breaker') is None
-
-    assert vote.ballot('proposal', create=True) is not None
-    assert vote.ballot('counter-proposal', create=True) is not None
-    assert vote.ballot('tie-breaker', create=True) is not None
-
-    assert vote.ballot('proposal') is not None
-    assert vote.ballot('counter-proposal') is not None
-    assert vote.ballot('tie-breaker') is not None
+    result = ballot.results.one()
+    assert result.group == 'ZG/Rotkreuz'
+    assert result.counted == True
+    assert result.yeas == 4982
+    assert result.nays == 4452
+    assert result.empty == 500
+    assert result.invalid == 66
+    assert result.entity_id == 1
 
 
 def test_vote_id_generation(session):
@@ -181,7 +213,7 @@ def test_ballot_nobody_voted_right(session):
 
 
 def test_ballot_answer_proposal_wins(session):
-    vote = Vote(
+    vote = ComplexVote(
         title="Abstimmung mit Gegenentwurf",
         domain='federation',
         date=date(2015, 6, 18)
@@ -211,7 +243,7 @@ def test_ballot_answer_proposal_wins(session):
 
 
 def test_ballot_answer_counter_proposal_wins(session):
-    vote = Vote(
+    vote = ComplexVote(
         title="Abstimmung mit Gegenentwurf",
         domain='federation',
         date=date(2015, 6, 18)
@@ -241,7 +273,7 @@ def test_ballot_answer_counter_proposal_wins(session):
 
 
 def test_ballot_answer_counter_tie_breaker_decides(session):
-    vote = Vote(
+    vote = ComplexVote(
         title="Abstimmung mit Gegenentwurf",
         domain='federation',
         date=date(2015, 6, 18)
@@ -278,7 +310,7 @@ def test_ballot_answer_counter_tie_breaker_decides(session):
 
 
 def test_ballot_answer_nobody_wins(session):
-    vote = Vote(
+    vote = ComplexVote(
         title="Abstimmung mit Gegenentwurf",
         domain='federation',
         date=date(2015, 6, 18)
@@ -553,7 +585,7 @@ def test_vote_last_result_change(session):
 
 
 def test_vote_export(session):
-    vote = Vote(
+    vote = ComplexVote(
         title="Abstimmung",
         shortcode="FOO",
         domain='federation',
@@ -773,6 +805,9 @@ def test_vote_status(session):
     # ... complex vote with some results
     vote.ballots.append(Ballot(type='counter-proposal'))
     vote.ballots.append(Ballot(type='tie-breaker'))
+    vote.type = 'complex'
+    vote.__class__ = ComplexVote
+
     for status, completed in (
         (None, False), ('unknown', False), ('interim', False), ('final', True)
     ):

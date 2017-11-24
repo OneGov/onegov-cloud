@@ -13,6 +13,7 @@ from onegov.ballot.models import ListResult
 from onegov.ballot.models import PanachageResult
 from onegov.ballot.models import PartyResult
 from onegov.ballot.models import Vote
+from onegov.ballot.models import ComplexVote
 
 __all__ = [
     'Ballot',
@@ -20,6 +21,7 @@ __all__ = [
     'BallotResult',
     'Candidate',
     'CandidateResult',
+    'ComplexVote',
     'Election',
     'ElectionCollection',
     'ElectionResult',
@@ -29,5 +31,5 @@ __all__ = [
     'PanachageResult',
     'PartyResult',
     'Vote',
-    'VoteCollection'
+    'VoteCollection',
 ]

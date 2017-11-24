@@ -34,6 +34,17 @@ class Vote(Base, TimestampMixin, DerivedBallotsCountMixin,
 
     __tablename__ = 'votes'
 
+    #: the type of the item, this can be used to create custom polymorphic
+    #: subclasses of this class. See
+    #: `<http://docs.sqlalchemy.org/en/improve_toc/\
+    #: orm/extensions/declarative/inheritance.html>`_.
+    type = Column(Text, nullable=True)
+
+    __mapper_args__ = {
+        'polymorphic_on': type,
+        'polymorphic_identity': 'simple'
+    }
+
     #: identifies the vote, may be used in the url, generated from the title
     id = Column(Text, primary_key=True)
 
@@ -62,7 +73,8 @@ class Vote(Base, TimestampMixin, DerivedBallotsCountMixin,
 
         """
 
-        result = self.ballots.filter(Ballot.type == ballot_type).first()
+        result = [b for b in self.ballots if b.type == ballot_type]
+        result = result[0] if result else None
 
         if not result and create:
             result = Ballot(type=ballot_type)
@@ -72,18 +84,7 @@ class Vote(Base, TimestampMixin, DerivedBallotsCountMixin,
 
     @property
     def proposal(self):
-        return self.ballot('proposal')
-
-    @property
-    def counter_proposal(self):
-        return self.ballot('counter-proposal')
-
-    @property
-    def tie_breaker(self):
-        return self.ballot('tie-breaker')
-
-    #: may be used to identify the vote type, e.g. simple or complex.
-    vote_type = meta_property('vote_type')
+        return self.ballot('proposal', create=True)
 
     @observes('title_translations')
     def title_observer(self, translations):
@@ -110,49 +111,13 @@ class Vote(Base, TimestampMixin, DerivedBallotsCountMixin,
         if not self.counted or not self.proposal:
             return None
 
-        # standard ballot, no counter proposal
-        if not self.counter_proposal:
-            return 'accepted' if self.proposal.accepted else 'rejected'
-
-        # variant ballot, with proposal, coutner proposal and tie breaker
-        elif all((self.proposal, self.counter_proposal, self.tie_breaker)):
-
-            if self.proposal.accepted and self.counter_proposal.accepted:
-                if self.tie_breaker.accepted:
-                    return 'proposal'
-                else:
-                    return 'counter-proposal'
-
-            elif self.proposal.accepted:
-                return 'proposal'
-
-            elif self.counter_proposal.accepted:
-                return 'counter-proposal'
-
-            else:
-                return 'rejected'
-
-        # not implemeneted here, not implemented in Swiss law either (at least
-        # on a federal level)
-        else:
-            raise NotImplementedError
+        return 'accepted' if self.proposal.accepted else 'rejected'
 
     @property
     def yeas_percentage(self):
         """ The percentage of yeas (discounts empty/invalid ballots). """
 
-        # if we have no counter proposal, the yeas are a simple sum
-        if not self.counter_proposal:
-            subject = self
-        else:
-            if self.answer in ('proposal', 'rejected'):
-                # if the proposal won or both proposal and counter-proposal
-                # were rejected, we show the yeas/nays of the proposal
-                subject = self.proposal
-            else:
-                subject = self.counter_proposal
-
-        return subject.yeas / ((subject.yeas + subject.nays) or 1) * 100
+        return self.yeas / ((self.yeas + self.nays) or 1) * 100
 
     @property
     def nays_percentage(self):
@@ -164,10 +129,6 @@ class Vote(Base, TimestampMixin, DerivedBallotsCountMixin,
     def progress(self):
         """ Returns a tuple with the first value being the number of counted
         entities and the second value being the number of total entities.
-
-        If this is complex vote with proposal, counter-proposal and tie-breaker
-        it's assumed all three ballots are present/not present for one entity
-        (otherwise there might be a rounding error).
 
         """
 
@@ -302,3 +263,63 @@ class Vote(Base, TimestampMixin, DerivedBallotsCountMixin,
                 rows.append(row)
 
         return rows
+
+
+class ComplexVote(Vote):
+    """ A complex vote with proposal, counter-proposal and tie-breaker. """
+
+    __mapper_args__ = {'polymorphic_identity': 'complex'}
+
+    @property
+    def proposal(self):
+        return self.ballot('proposal', create=True)
+
+    @property
+    def counter_proposal(self):
+        return self.ballot('counter-proposal', create=True)
+
+    @property
+    def tie_breaker(self):
+        return self.ballot('tie-breaker', create=True)
+
+    @staticmethod
+    def get_answer(counted, proposal, counter_proposal, tie_breaker):
+        if not (counted and proposal and counter_proposal and tie_breaker):
+            return None
+
+        if proposal.accepted and counter_proposal.accepted:
+            if tie_breaker.accepted:
+                return 'proposal'
+            else:
+                return 'counter-proposal'
+
+        elif proposal.accepted:
+            return 'proposal'
+
+        elif counter_proposal.accepted:
+            return 'counter-proposal'
+
+        else:
+            return 'rejected'
+
+    @property
+    def answer(self):
+        return self.get_answer(
+            self.counted,
+            self.proposal,
+            self.counter_proposal,
+            self.tie_breaker
+        )
+
+    @property
+    def yeas_percentage(self):
+        """ The percentage of yeas (discounts empty/invalid ballots). """
+
+        if self.answer in ('proposal', 'rejected'):
+            # if the proposal won or both proposal and counter-proposal
+            # were rejected, we show the yeas/nays of the proposal
+            subject = self.proposal
+        else:
+            subject = self.counter_proposal
+
+        return subject.yeas / ((subject.yeas + subject.nays) or 1) * 100

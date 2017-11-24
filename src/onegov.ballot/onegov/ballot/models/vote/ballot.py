@@ -75,13 +75,17 @@ class Ballot(Base, TimestampMixin, DerivedAttributesMixin,
     def counted(self):
         """ True if all results have been counted. """
 
-        return (
-            sum(1 for r in self.results if r.counted) == self.results.count()
-        )
+        count = self.results.count()
+        if not count:
+            return False
+
+        return (sum(1 for r in self.results if r.counted) == count)
 
     @counted.expression
     def counted(cls):
-        expr = select([func.bool_and(BallotResult.counted)])
+        expr = select([
+            func.coalesce(func.bool_and(BallotResult.counted), False)
+        ])
         expr = expr.where(BallotResult.ballot_id == cls.id)
         expr = expr.label('counted')
 
