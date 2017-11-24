@@ -1,5 +1,6 @@
 from hashlib import sha256
 from onegov.ballot import Ballot
+from onegov.ballot import ComplexVote
 from onegov.ballot import Election
 from onegov.ballot import Vote
 from onegov.election_day.models import ArchivedResult
@@ -127,9 +128,6 @@ def add_local_results(source, target, principal, session):
 
     """
 
-    def accepted(ballot):
-        return ballot.yeas > ballot.nays
-
     adjust = (
         principal.domain == 'municipality' and
         principal.municipality and
@@ -138,9 +136,8 @@ def add_local_results(source, target, principal, session):
     )
     if adjust:
         entity_id = principal.municipality
-        vote = session.query(Vote).filter(
-            Vote.id == source.external_id
-        ).first()
+        vote = session.query(Vote).filter(Vote.id == source.external_id)
+        vote = vote.first()
         if vote and vote.proposal:
             yeas = None
             nays = None
@@ -151,7 +148,7 @@ def add_local_results(source, target, principal, session):
             proposal = proposal.first()
 
             if proposal and proposal.counted:
-                if vote.counter_proposal and vote.tie_breaker:
+                if vote.type == 'complex':
                     counter = vote.counter_proposal.results
                     counter = counter.filter_by(entity_id=entity_id)
                     counter = counter.first()
@@ -160,19 +157,13 @@ def add_local_results(source, target, principal, session):
                     tie = tie.filter_by(entity_id=entity_id)
                     tie = tie.first()
 
-                    if counter and counter.counted and tie and tie.counted:
-                        if accepted(proposal) and accepted(counter):
-                            if accepted(tie):
-                                answer = 'proposal'
-                            else:
-                                answer = 'counter-proposal'
-                        elif accepted(proposal):
-                            answer = 'proposal'
-                        elif accepted(counter):
-                            answer = 'counter-proposal'
-                        else:
-                            answer = 'rejected'
-
+                    answer = ComplexVote.get_answer(
+                        counter.counted,
+                        proposal,
+                        counter,
+                        tie
+                    )
+                    if answer:
                         if answer == 'counter-proposal':
                             yeas = counter.yeas
                             nays = counter.nays
@@ -182,7 +173,7 @@ def add_local_results(source, target, principal, session):
                 else:
                     yeas = proposal.yeas
                     nays = proposal.nays
-                    answer = 'accepted' if accepted(proposal) else 'rejected'
+                    answer = 'accepted' if proposal.accepted else 'rejected'
 
             if yeas and nays and answer:
                 yeas = yeas / ((yeas + nays) or 1) * 100

@@ -2,8 +2,12 @@ import os
 import yaml
 
 from click.testing import CliRunner
-from datetime import date, datetime, timezone
-from onegov.ballot import Ballot, BallotResult, Vote
+from datetime import date
+from datetime import datetime
+from datetime import timezone
+from onegov.ballot import Ballot
+from onegov.ballot import BallotResult
+from onegov.ballot import Vote
 from onegov.election_day.cli import cli
 from onegov.election_day.models import ArchivedResult
 from unittest.mock import patch
@@ -166,15 +170,15 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager):
         transaction.commit()
 
     results = (
-        ('be', 'canton', 'vote-3', 0, False, False),
-        ('be', 'canton', 'vote-4', 0, False, False),
-        ('be', 'canton', 'vote-5', 0, True, False),
-        ('be', 'canton', 'vote-6', 1, False, False),
-        ('be', 'canton', 'vote-7', 1, True, False),
-        ('be', 'canton', 'vote-8', 1, True, True),
-        ('be', 'canton', 'vote-9', 2, False, False),
-        ('be', 'canton', 'vote-10', 2, True, False),
-        ('be', 'canton', 'vote-11', 2, True, True),
+        ('be', 'canton', 'vote-3', None, False, False),
+        ('be', 'canton', 'vote-4', None, False, False),
+        ('be', 'canton', 'vote-5', None, True, False),
+        ('be', 'canton', 'vote-6', 'simple', False, False),
+        ('be', 'canton', 'vote-7', 'simple', True, False),
+        ('be', 'canton', 'vote-8', 'simple', True, True),
+        ('be', 'canton', 'vote-9', 'complex', False, False),
+        ('be', 'canton', 'vote-10', 'complex', True, False),
+        ('be', 'canton', 'vote-11', 'complex', True, True),
     )
     for entity, domain, title, vote_type, with_id, with_result in results:
         id = '{}-{}-{}'.format(entity, domain, title)
@@ -182,7 +186,9 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager):
 
         vote = None
         if vote_type:
-            vote = Vote(id=id, title=title, domain=domain, date=then)
+            vote = Vote.get_polymorphic_class(vote_type, Vote)(
+                id=id, title=title, domain=domain, date=then
+            )
             vote.ballots.append(Ballot(type='proposal'))
             get_session(entity).add(vote)
             get_session(entity).flush()
@@ -195,7 +201,7 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager):
                     )
                 )
 
-            if vote_type > 1:
+            if vote_type == 'complex':
                 vote.ballots.append(Ballot(type='counter-proposal'))
                 vote.ballots.append(Ballot(type='tie-breaker'))
 

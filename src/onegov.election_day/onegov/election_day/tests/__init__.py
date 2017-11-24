@@ -66,6 +66,7 @@ def upload_vote(client, create=True):
         new.form['vote_de'] = 'Vote'
         new.form['date'] = date(2015, 1, 1)
         new.form['domain'] = 'federation'
+        new.form['vote_type'] = 'simple'
         new.form.submit()
 
     csv = (

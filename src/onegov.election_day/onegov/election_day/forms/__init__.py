@@ -17,10 +17,10 @@ from onegov.election_day.forms.vote import VoteForm
 __all__ = [
     'DataSourceForm',
     'DataSourceItemForm',
-    'EmptyForm',
     'ElectionForm',
-    'SubscribeForm',
     'EmptyForm',
+    'EmptyForm',
+    'SubscribeForm',
     'UploadElectionPartyResultsForm',
     'UploadMajorzElectionForm',
     'UploadProporzElectionForm',

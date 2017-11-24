@@ -53,7 +53,6 @@ def view_upload(self, request, form):
                     self,
                     entities,
                     form.vote_number.data,
-                    form.data['type'] == 'complex',
                     form.proposal.raw_data[0].file,
                     form.proposal.data['mimetype']
                 )
@@ -75,14 +74,12 @@ def view_upload(self, request, form):
                 errors = import_vote_wabstim(
                     self,
                     entities,
-                    form.data['type'] == 'complex',
                     form.proposal.raw_data[0].file,
                     form.proposal.data['mimetype']
                 )
             elif form.file_format.data == 'default':
-                if form.data['type'] == 'simple':
-                    ballot_types = ('proposal', )
-                else:
+                ballot_types = ('proposal', )
+                if self.type == 'complex':
                     ballot_types = BALLOT_TYPES
 
                 for ballot_type in ballot_types:
@@ -105,23 +102,6 @@ def view_upload(self, request, form):
             status = 'error'
             transaction.abort()
         else:
-            if form.file_format.data == 'default':
-                if form.data['type'] == 'simple':
-                    # Clear the unused ballots
-                    if self.counter_proposal:
-                        session.delete(self.counter_proposal)
-                    if self.tie_breaker:
-                        session.delete(self.counter_proposal)
-            elif (
-                form.file_format.data == 'internal' or
-                form.file_format.data == 'wabsti_c'
-            ):
-                # It might be that the vote type setting stored in the meta
-                # is overridden by the import (internal, wabsti c)
-                self.vote_type = 'simple'
-                if self.counter_proposal:
-                    self.vote_type = 'complex'
-
             status = 'success'
             request.app.pages_cache.invalidate()
             request.app.send_hipchat(

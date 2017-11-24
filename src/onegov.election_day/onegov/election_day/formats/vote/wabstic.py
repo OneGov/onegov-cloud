@@ -87,7 +87,7 @@ def import_vote_wabstic(vote, entities, district, number,
 
     # Get the vote type
     used_ballot_types = ['proposal']
-    if vote.vote_type == 'complex':
+    if vote.type == 'complex':
         used_ballot_types.extend(['counter-proposal', 'tie-breaker'])
 
     # Parse the vote

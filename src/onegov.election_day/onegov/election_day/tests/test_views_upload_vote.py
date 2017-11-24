@@ -93,13 +93,21 @@ def test_upload_vote_year_unavailable(election_day_app):
     assert "Das Jahr 2000 wird noch nicht unterstützt" in results
 
 
-def test_upload_vote_submit(election_day_app):
+def test_upload_vote_submit(import_scan, election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
     login(client)
 
     new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = 'Vote'
+    new.form['vote_type'] = 'simple'
+    new.form['vote_de'] = 'vote'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    new = client.get('/manage/votes/new-vote')
+    new.form['vote_type'] = 'complex'
+    new.form['vote_de'] = 'complex'
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
     new.form.submit()
@@ -119,10 +127,6 @@ def test_upload_vote_submit(election_day_app):
         assert import_.called
         assert import_.call_args[0][2] == 'proposal'
 
-    edit = client.get('/vote/vote/edit')
-    edit.form['vote_type'] = 'complex'
-    edit.form.submit()
-
     # Default (complex)
     with patch(
         'onegov.election_day.views.upload.vote.import_vote_default'
@@ -130,7 +134,7 @@ def test_upload_vote_submit(election_day_app):
         import_.return_value = []
 
         csv = 'csv'.encode('utf-8')
-        upload = client.get('/vote/vote/upload')
+        upload = client.get('/vote/complex/upload')
         upload.form['file_format'] = 'default'
         upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
         upload.form['counter_proposal'] = Upload('data.csv', csv, 'text/plain')
@@ -172,28 +176,6 @@ def test_upload_vote_submit(election_day_app):
 
         assert import_.called
         assert import_.call_args[0][2] == 1
-        assert import_.call_args[0][3] == False
-
-    # Wabsti complex
-    edit = client.get('/vote/vote/edit')
-    edit.form['vote_type'] = 'complex'
-    edit.form.submit()
-
-    with patch(
-        'onegov.election_day.views.upload.vote.import_vote_wabsti'
-    ) as import_:
-        import_.return_value = []
-
-        csv = 'csv'.encode('utf-8')
-        upload = client.get('/vote/vote/upload')
-        upload.form['file_format'] = 'wabsti'
-        upload.form['vote_number'] = '2'
-        upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
-        upload = upload.form.submit()
-
-        assert import_.called
-        assert import_.call_args[0][2] == 2
-        assert import_.call_args[0][3] == True
 
     # Wabsti municipalities
     principal = election_day_app.principal
@@ -213,7 +195,6 @@ def test_upload_vote_submit(election_day_app):
         upload = upload.form.submit()
 
         assert import_.called
-        assert import_.call_args[0][2] == True
 
 
 def test_upload_vote_invalidate_cache(election_day_app):
@@ -430,4 +411,4 @@ def test_upload_vote_all_or_nothing(election_day_app):
     assert archive.query().one().progress == (0, 0)
 
     vote = VoteCollection(election_day_app.session()).by_id('bacon-yea-or-nay')
-    assert not vote.ballots.count()
+    assert [ballot.results.count() for ballot in vote.ballots] == [0, 0, 0]

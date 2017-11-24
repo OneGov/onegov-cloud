@@ -5,6 +5,7 @@ from onegov.ballot import Ballot
 from onegov.ballot import BallotResult
 from onegov.ballot import Election
 from onegov.ballot import Vote
+from onegov.ballot import ComplexVote
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.models import ArchivedResult
 from onegov.election_day.models import Principal
@@ -233,7 +234,7 @@ def test_get_archive_links(session):
         set(['2016', '2015', '2014', '2011', '2009', '2007'])
 
 
-def test_add_local_results(session):
+def test_add_local_results_simple(session):
     target = ArchivedResult()
 
     be = Principal(name='BE', canton='be')
@@ -305,7 +306,37 @@ def test_add_local_results(session):
     assert target.local_yeas_percentage == 70.0
     assert target.local_nays_percentage == 30.0
 
-    # complex vote
+
+def test_add_local_results_complex(session):
+    target = ArchivedResult()
+
+    be = Principal(name='BE', canton='be')
+    bern = Principal(name='Bern', municipality='351')
+
+    # wrong principal domain
+    add_local_results(ArchivedResult(), target, be, session)
+    assert not target.local
+
+    # wrong type
+    add_local_results(ArchivedResult(type='election'), target, bern, session)
+    assert not target.local
+
+    # missing ID
+    add_local_results(ArchivedResult(type='vote'), target, bern, session)
+    assert not target.local
+
+    # no vote
+    source = ArchivedResult(type='vote', external_id='id')
+    add_local_results(source, target, bern, session)
+    assert not target.local
+
+    # no proposal
+    session.add(
+        ComplexVote(title="Vote", domain='federation', date=date(2011, 1, 1))
+    )
+    session.flush()
+    vote = session.query(ComplexVote).one()
+
     # no results
     target = ArchivedResult()
     vote.ballots.append(Ballot(type="counter-proposal"))
@@ -317,6 +348,12 @@ def test_add_local_results(session):
     assert not target.local
 
     # not yet counted
+    vote.proposal.results.append(
+        BallotResult(
+            group='Bern', entity_id=351,
+            counted=True, yeas=7000, nays=3000, empty=0, invalid=0
+        )
+    )
     vote.counter_proposal.results.append(
         BallotResult(
             group='Bern', entity_id=351,
@@ -330,6 +367,7 @@ def test_add_local_results(session):
         )
     )
     session.flush()
+    proposal = vote.proposal.results.one()
     counter = vote.counter_proposal.results.one()
     tie = vote.tie_breaker.results.one()
 

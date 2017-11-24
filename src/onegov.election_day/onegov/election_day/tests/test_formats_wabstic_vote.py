@@ -3,6 +3,7 @@ import tarfile
 from datetime import date
 from io import BytesIO
 from onegov.ballot import Vote
+from onegov.ballot import ComplexVote
 from onegov.core.utils import module_path
 from onegov.election_day.formats import import_vote_wabstic
 from onegov.election_day.models import Principal
@@ -100,7 +101,13 @@ def test_import_wabstic_vote(session, tar_file):
         assert not vote.ballots.one().results.one().counted
 
     # Test complex vote
-    vote.vote_type = 'complex'
+    session.add(
+        ComplexVote(
+            title='vote', domain='municipality', date=date(2017, 2, 12)
+        )
+    )
+    session.flush()
+    vote = session.query(ComplexVote).one()
     principal = Principal(name=str(3402), municipality=3402)
     entities = principal.entities.get(vote.date.year, {})
     errors = import_vote_wabstic(

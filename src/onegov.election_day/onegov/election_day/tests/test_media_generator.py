@@ -199,7 +199,10 @@ def add_proporz_election(session, year=2015):
 
 
 def add_vote(session, type_):
-    vote = Vote(title='Vote', domain='federation', date=date(2015, 6, 18))
+    vote = Vote.get_polymorphic_class(type_, Vote)(
+        title='Vote', domain='federation', date=date(2015, 6, 18)
+    )
+
     vote.ballots.append(Ballot(type='proposal'))
     if type_ == 'complex':
         vote.ballots.append(Ballot(type='counter-proposal'))

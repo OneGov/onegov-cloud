@@ -9,6 +9,19 @@ from wtforms.validators import InputRequired
 
 
 class VoteForm(Form):
+
+    vote_type = RadioField(
+        _("Type"),
+        choices=[
+            ('simple', _("Simple Vote")),
+            ('complex', _("Vote with Counter-Proposal")),
+        ],
+        validators=[
+            InputRequired()
+        ],
+        default='simple'
+    )
+
     vote_de = StringField(
         label=_("Vote (German)"),
         validators=[
@@ -42,18 +55,6 @@ class VoteForm(Form):
         ]
     )
 
-    vote_type = RadioField(
-        _("Type"),
-        choices=[
-            ('simple', _("Simple Vote")),
-            ('complex', _("Vote with Counter-Proposal")),
-        ],
-        validators=[
-            InputRequired()
-        ],
-        default='simple'
-    )
-
     related_link = URLField(
         label=_("Related link")
     )
@@ -69,7 +70,6 @@ class VoteForm(Form):
         model.domain = self.domain.data
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
-        model.vote_type = self.vote_type.data
 
         model.title_translations = {}
         model.title_translations['de_CH'] = self.vote_de.data
@@ -90,4 +90,11 @@ class VoteForm(Form):
         self.domain.data = model.domain
         self.shortcode.data = model.shortcode
         self.related_link.data = model.related_link
-        self.vote_type.data = model.vote_type or 'simple'
+        if model.type == 'complex':
+            self.vote_type.choices = [
+                ('complex', _("Vote with Counter-Proposal"))
+            ]
+            self.vote_type.data = 'complex'
+        else:
+            self.vote_type.choices = [('simple', _("Simple Vote"))]
+            self.vote_type.data = 'simple'

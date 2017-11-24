@@ -309,6 +309,10 @@ class VotesLayout(Layout):
         return ''
 
     @cached_property
+    def type(self):
+        return self.model.type
+
+    @cached_property
     def ballot(self):
         if self.tab == 'counter-proposal':
             return self.model.counter_proposal
@@ -349,7 +353,7 @@ class VotesLayout(Layout):
         if not self.has_results:
             return []
 
-        if not self.counter_proposal:
+        if self.type == 'simple':
             return (
                 (
                     self.title('proposal'),

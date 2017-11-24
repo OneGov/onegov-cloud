@@ -119,7 +119,7 @@ def test_view_manage(election_day_app):
     assert archive.query().count() == 0
 
 
-def test_view_clear_results(import_scan, election_day_app):
+def test_view_clear_results(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 

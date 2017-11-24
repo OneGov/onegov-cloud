@@ -26,7 +26,7 @@ def test_import_wabstim_vote(session, tar_file):
     principal = Principal(municipality='3298', name='Walenstadt')
     entities = principal.entities.get(vote.date.year, {})
     errors = import_vote_wabstim(
-        vote, entities, False, BytesIO(xlsx), 'application/excel'
+        vote, entities, BytesIO(xlsx), 'application/excel'
     )
     assert not errors
     assert vote.completed
@@ -50,7 +50,7 @@ def test_import_wabstim_vote_utf16(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabstim(
-        vote, entities, False,
+        vote, entities,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -86,7 +86,7 @@ def test_import_wabstim_vote_missing_headers(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabstim(
-        vote, entities, False,
+        vote, entities,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -123,7 +123,7 @@ def test_import_wabstim_vote_invalid_values(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabstim(
-        vote, entities, False,
+        vote, entities,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -234,7 +234,7 @@ def test_import_wabstim_vote_expats(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabstim(
-        vote, entities, False,
+        vote, entities,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -286,7 +286,7 @@ def test_import_wabstim_vote_temporary_results(session):
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabstim(
-        vote, entities, False,
+        vote, entities,
         BytesIO((
             '\n'.join((
                 ','.join((

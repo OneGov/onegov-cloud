@@ -3,6 +3,7 @@ from freezegun import freeze_time
 from onegov.ballot import Ballot
 from onegov.ballot import Election
 from onegov.ballot import Vote
+from onegov.ballot import ComplexVote
 from onegov.ballot import ElectionCollection
 from onegov.ballot import VoteCollection
 from onegov.election_day.layout import ElectionsLayout
@@ -213,7 +214,7 @@ def test_votes_layout(session):
     assert list(layout.menu) == []
 
     with freeze_time("2014-01-01 12:00"):
-        vote = Vote(
+        vote = ComplexVote(
             title="Vote",
             domain='federation',
             date=date(2011, 1, 1),

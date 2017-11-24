@@ -1,7 +1,9 @@
 import transaction
 
 from datetime import date
-from onegov.ballot import Election, Vote
+from onegov.ballot import ComplexVote
+from onegov.ballot import Election
+from onegov.ballot import Vote
 from onegov.election_day.forms import DataSourceForm
 from onegov.election_day.forms import DataSourceItemForm
 from onegov.election_day.forms import ElectionForm
@@ -96,7 +98,6 @@ def test_vote_form_model(election_day_app):
     model.domain = 'federation'
     model.shortcode = 'xy'
     model.related_link = 'http://u.rl'
-    model.vote_type = 'simple'
 
     form = VoteForm()
     form.apply_model(model)
@@ -132,7 +133,13 @@ def test_vote_form_model(election_day_app):
     assert model.domain == 'canton'
     assert model.shortcode == 'yz'
     assert model.related_link == 'http://ur.l'
-    assert model.vote_type == 'complex'
+    assert model.type == 'simple'
+
+    model = ComplexVote(title='Vote')
+
+    form.apply_model(model)
+
+    assert form.vote_type.data == 'complex'
 
 
 def test_election_form_domains():
@@ -212,9 +219,7 @@ def test_upload_vote_form(session):
     communal_principal = Principal(name='bern', municipality='351')
 
     simple_vote = Vote(title='Vote', date=date(2017, 1, 1), domain='canton')
-    simple_vote.vote_type = 'simple'
-    complex_vote = Vote()
-    complex_vote.vote_type = 'complex'
+    complex_vote = ComplexVote()
 
     # Test limitation of file formats
     form = UploadVoteForm()

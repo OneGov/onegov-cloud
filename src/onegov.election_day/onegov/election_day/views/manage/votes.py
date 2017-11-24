@@ -43,7 +43,7 @@ def create_vote(self, request, form):
     form.set_domain(request.app.principal)
 
     if form.submitted(request):
-        vote = Vote()
+        vote = Vote.get_polymorphic_class(form.vote_type.data, Vote)()
         form.update_model(vote)
         archive.add(vote, request)
         request.message(_("Vote added."), 'success')

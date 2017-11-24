@@ -23,7 +23,7 @@ HEADERS = (
 )
 
 
-def import_vote_wabstim(vote, entities, complex, file, mimetype):
+def import_vote_wabstim(vote, entities, file, mimetype):
     """ Tries to import the given csv, xls or xlsx file.
 
     This is the format used by Wabsti for municipalities. Since there is no
@@ -47,7 +47,7 @@ def import_vote_wabstim(vote, entities, complex, file, mimetype):
             return [error]
 
     used_ballot_types = ['proposal']
-    if complex:
+    if vote.type == 'complex':
         used_ballot_types.extend(['counter-proposal', 'tie-breaker'])
 
     ballot_results = {key: [] for key in used_ballot_types}

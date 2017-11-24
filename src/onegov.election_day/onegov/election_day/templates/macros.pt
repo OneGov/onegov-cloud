@@ -203,8 +203,8 @@
     <h1>
         ${vote.title}
         <small tal:condition="vote.answer">
-            <div tal:condition="not: vote.counter_proposal" metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer"/>
-            <div tal:condition="vote.counter_proposal">
+            <div tal:condition="vote.type == 'simple'" metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer"/>
+            <div tal:condition="vote.type == 'complex'">
                 <tal:block tal:define="proposal vote.proposal.accepted;
                                        counter_proposal vote.counter_proposal.accepted;
                                        tie_breaker vote.tie_breaker.accepted">

@@ -124,6 +124,7 @@ def test_view_last_modified(election_day_app):
         login(client)
 
         new = client.get('/manage/votes/new-vote')
+        new.form['vote_type'] = "complex"
         new.form['vote_de'] = "Vote"
         new.form['date'] = date(2013, 1, 1)
         new.form['domain'] = 'federation'
@@ -170,7 +171,7 @@ def test_view_last_modified(election_day_app):
             assert 'Last-Modified' not in client.get(path).headers
 
 
-def test_view_headerless(import_scan, election_day_app):
+def test_view_headerless(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 

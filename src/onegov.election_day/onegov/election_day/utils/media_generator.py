@@ -544,7 +544,7 @@ class MediaGenerator():
                 answer = _('Rejected')
                 if item.answer == 'accepted':
                     answer = _('Accepted')
-                if item.counter_proposal:
+                if item.type == 'complex':
                     proposal = item.proposal.accepted
                     counter_proposal = item.counter_proposal.accepted
                     if not proposal and not counter_proposal:
@@ -564,7 +564,7 @@ class MediaGenerator():
                 pdf.spacer()
 
                 ballots = ((None, item.proposal),)
-                if item.counter_proposal:
+                if item.type == 'complex':
                     ballots = (
                         (_('Proposal'), item.proposal),
                         (_('Counter Proposal'), item.counter_proposal),
