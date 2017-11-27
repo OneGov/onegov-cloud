@@ -778,7 +778,7 @@ def test_view_notice_changelog(gazette_app):
         ('01.11.2017 12:45', 'First Editor', 'TestGroup', 'bearbeitet'),
         ('01.11.2017 12:48', 'First Editor', 'TestGroup',
          'eingereicht'),
-        ('01.11.2017 16:00', 'Publisher', '', 'E-Mail gesendet'),
+        ('01.11.2017 16:00', 'Publisher', '', 'Druck beauftragt'),
         ('01.11.2017 16:00', 'Publisher', '', 'angenommen'),
         ('01.11.2017 17:00', 'Publisher', '', 'veröffentlicht')
     ]

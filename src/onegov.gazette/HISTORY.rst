@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Updates translation.
+  [msom]
+
+1.9.6 (2017-11-20)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds missing title slot.
   [msom]
 

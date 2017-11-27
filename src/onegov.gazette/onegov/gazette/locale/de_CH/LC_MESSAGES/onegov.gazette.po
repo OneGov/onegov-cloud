@@ -609,7 +609,7 @@ msgid "This official notice has already been published!"
 msgstr "Diese Meldung wurde bereits veröffentlicht!"
 
 msgid "mail sent"
-msgstr "E-Mail gesendet"
+msgstr "Druck beauftragt"
 
 msgid "Submit"
 msgstr "Einreichen"
