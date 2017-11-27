@@ -34,7 +34,7 @@ Onegov Election Day follows PEP8 as close as possible. To test for it run::
 Onegov Election Day uses `Semantic Versioning <http://semver.org/>`_
 
 Media Generation
---------------
+----------------
 
 A `Renderer <https://github.com/seantis/d3-renderer>`_ (which renders the D3
 scripts) is needed to generate the PDFs and SVGs.
