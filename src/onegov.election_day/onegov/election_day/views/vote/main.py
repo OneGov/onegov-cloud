@@ -110,6 +110,7 @@ def view_vote_json(self, request):
         'ballots': [
             {
                 'type': ballot.type,
+                'title': ballot.title_translations,
                 'progress': {
                     'counted': ballot.progress[0],
                     'total': ballot.progress[1],
