@@ -240,3 +240,17 @@ def add_vote_type_column(context):
             vote.type = meta.get('vote_type', 'simple')
             if 'vote_type' in meta:
                 del vote.meta['vote_type']
+
+
+# todo:
+#  drop type_of_election
+#  change election.type to Text
+    #: Type of the election
+    # type = Column(
+    #     Enum(
+    #         'proporz',
+    #         'majorz',
+    #         name='type_of_election'
+    #     ),
+    #     nullable=False
+    # )
