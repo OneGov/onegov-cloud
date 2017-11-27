@@ -48,7 +48,6 @@ class ProporzElection(Election):
 
     @property
     def last_result_change(self):
-        raise
         """ Gets the latest created/modified date of the election or amongst
         the results of this election.
 

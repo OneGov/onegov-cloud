@@ -242,15 +242,10 @@ def add_vote_type_column(context):
                 del vote.meta['vote_type']
 
 
-# todo:
-#  drop type_of_election
-#  change election.type to Text
-    #: Type of the election
-    # type = Column(
-    #     Enum(
-    #         'proporz',
-    #         'majorz',
-    #         name='type_of_election'
-    #     ),
-    #     nullable=False
-    # )
+@upgrade_task('Change election type column')
+def change_election_type_column(context):
+    type_ = Enum('proporz', 'majorz', name='type_of_election')
+    context.operations.execute(
+        'ALTER TABLE elections ALTER COLUMN type TYPE Text'
+    )
+    type_.drop(context.operations.get_bind(), checkfirst=False)
