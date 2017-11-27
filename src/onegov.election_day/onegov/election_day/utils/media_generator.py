@@ -570,10 +570,14 @@ class MediaGenerator():
                         (_('Counter Proposal'), item.counter_proposal),
                         (_('Tie-Breaker'), item.tie_breaker),
                     )
-
                 for title, ballot in ballots:
                     if title:
-                        pdf.h2(translate(title))
+                        pdf.h2(
+                            '{}{}'.format(
+                                translate(title),
+                                ': ' + ballot.title if ballot.title else ''
+                            )
+                        )
 
                     # Factoids
                     pdf.table(
