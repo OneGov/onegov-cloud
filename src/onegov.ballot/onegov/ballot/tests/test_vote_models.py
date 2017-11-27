@@ -583,6 +583,12 @@ def test_vote_last_result_change(session):
 
     assert vote.last_result_change.isoformat() == '2015-01-01T14:00:00+00:00'
 
+    with freeze_time("2016-01-01 14:00"):
+        vote.proposal.title_translations = {'en': 'Proposal', 'de': 'Vorlage'}
+        session.flush()
+
+    assert vote.last_result_change.isoformat() == '2016-01-01T14:00:00+00:00'
+
 
 def test_vote_export(session):
     vote = ComplexVote(

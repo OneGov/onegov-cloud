@@ -9,6 +9,9 @@ Changelog
 - Split models and collections to separate files.
   [msom]
 
+- Improves last result change for votes.
+  [msom]
+
 1.9.0 (2017-11-23)
 ~~~~~~~~~~~~~~~~~~~
 

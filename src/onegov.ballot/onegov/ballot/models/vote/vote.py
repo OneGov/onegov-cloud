@@ -195,19 +195,22 @@ class Vote(Base, TimestampMixin, DerivedBallotsCountMixin,
 
         session = object_session(self)
 
-        ballot_ids = session.query(Ballot)
-        ballot_ids = ballot_ids.with_entities(Ballot.id)
-        ballot_ids = ballot_ids.filter(Ballot.vote_id == self.id)
-        ballot_ids = ballot_ids.subquery()
+        ballots = session.query(Ballot)
+        ballots = ballots.filter(Ballot.vote_id == self.id)
+        ballots = ballots.all()
+        for ballot in ballots:
+            last_changes.append(ballot.last_change)
 
-        results = session.query(BallotResult)
-        results = results.with_entities(BallotResult.last_change)
-        results = results.order_by(desc(BallotResult.last_change))
-        results = results.filter(BallotResult.ballot_id.in_(ballot_ids))
+        ballot_ids = [ballot.id for ballot in ballots]
+        if ballot_ids:
+            results = session.query(BallotResult)
+            results = results.with_entities(BallotResult.last_change)
+            results = results.order_by(desc(BallotResult.last_change))
+            results = results.filter(BallotResult.ballot_id.in_(ballot_ids))
 
-        last_change = results.first()
-        if last_change:
-            last_changes.append(last_change[0])
+            last_change = results.first()
+            if last_change:
+                last_changes.append(last_change[0])
 
         if not len(last_changes):
             return None
