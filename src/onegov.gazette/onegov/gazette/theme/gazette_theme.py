@@ -7,7 +7,7 @@ class GazetteTheme(BaseTheme):
 
     # don't touch this number, it's incremented using bumpversion, so every
     # release will automatically trigger a rebuild of the theme
-    version = '1.9.7'
+    version = '1.10.5'
 
     @property
     def post_imports(self):
