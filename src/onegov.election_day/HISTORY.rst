@@ -16,9 +16,6 @@ Changelog
 - Uses onegov.pdf.
   [msom]
 
-- Updates RavenJs.
-  [msom]
-
 - Uses a confirmation form for updating results.
   [msom]
 
