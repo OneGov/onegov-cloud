@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.9.7 (2017-11-27)
+~~~~~~~~~~~~~~~~~~~
 
 - Updates translation.
   [msom]
