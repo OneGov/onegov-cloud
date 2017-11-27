@@ -5,7 +5,6 @@ from onegov.ballot.models.election.election_result import ElectionResult
 from onegov.ballot.models.election.list import List
 from onegov.ballot.models.election.list_connection import ListConnection
 from onegov.ballot.models.election.list_result import ListResult
-from onegov.ballot.models.election.majorz_election import MajorzElection
 from onegov.ballot.models.election.panachage_result import PanachageResult
 from onegov.ballot.models.election.party_result import PartyResult
 from onegov.ballot.models.election.proporz_election import ProporzElection
@@ -19,7 +18,6 @@ __all__ = [
     'List',
     'ListConnection',
     'ListResult',
-    'MajorzElection',
     'PanachageResult',
     'PartyResult',
     'ProporzElection',

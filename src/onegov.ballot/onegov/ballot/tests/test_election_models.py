@@ -7,7 +7,6 @@ from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
-from onegov.ballot import MajorzElection
 from onegov.ballot import PanachageResult
 from onegov.ballot import PartyResult
 from onegov.ballot import ProporzElection
@@ -170,7 +169,7 @@ def test_election_create_all_models(session):
 
 
 def test_election_id_generation(session):
-    election = MajorzElection(
+    election = Election(
         title='Legislative Election',
         domain='federation',
         date=date(2015, 6, 14),
@@ -181,7 +180,7 @@ def test_election_id_generation(session):
 
     assert election.id == 'legislative-election'
 
-    election = MajorzElection(
+    election = Election(
         title='Legislative Election',
         domain='federation',
         date=date(2015, 6, 14),
@@ -194,7 +193,7 @@ def test_election_id_generation(session):
 
 
 def test_election_summarized_properties(session):
-    election = MajorzElection(
+    election = Election(
         title="Election",
         domain='federation',
         date=date(2015, 6, 14),
@@ -226,7 +225,7 @@ def test_election_summarized_properties(session):
 
 
 def test_derived_properties(session):
-    election = MajorzElection(
+    election = Election(
         title='Legislative Election',
         domain='federation',
         date=date(2015, 6, 14),
@@ -274,7 +273,7 @@ def test_derived_properties(session):
 
 
 def test_election_counted(session):
-    election = MajorzElection(
+    election = Election(
         title='Legislative Election',
         domain='federation',
         date=date(2015, 6, 14),
@@ -309,7 +308,7 @@ def test_election_counted(session):
 
 def test_election_last_result_change(session):
     with freeze_time("2014-01-01 12:00"):
-        election = MajorzElection(
+        election = Election(
             title='Legislative Election',
             domain='federation',
             date=date(2015, 6, 14),
@@ -745,7 +744,7 @@ def test_election_results(session):
 
 
 def test_election_export(session):
-    election = MajorzElection(
+    election = Election(
         title='Wahl',
         domain='federation',
         date=date(2015, 6, 14),
@@ -1059,7 +1058,7 @@ def test_election_export_proporz(session):
 
 
 def test_election_meta_data(session):
-    election = MajorzElection(
+    election = Election(
         title='Election',
         domain='federation',
         date=date(2015, 6, 14),
@@ -1082,7 +1081,7 @@ def test_election_meta_data(session):
 
 
 def test_election_status(session):
-    election = MajorzElection(
+    election = Election(
         title='Election',
         domain='federation',
         date=date(2015, 6, 14),
