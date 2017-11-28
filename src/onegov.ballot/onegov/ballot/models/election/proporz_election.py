@@ -100,6 +100,19 @@ class ProporzElection(Election):
 
         return results.first() is not None
 
+    def clear_results(self):
+        """ Clears all the results. """
+
+        super(ProporzElection, self).clear_results()
+
+        session = object_session(self)
+        for connection in self.list_connections:
+            session.delete(connection)
+        for list_ in self.lists:
+            session.delete(list_)
+        for result in self.party_results:
+            session.delete(result)
+
     def export(self):
         """ Returns all data connected to this election as list with dicts.
 
