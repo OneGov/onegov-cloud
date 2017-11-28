@@ -16,6 +16,11 @@ def pytest_addoption(parser):
     Set this option if you run into  sqlalchemy erorrs like:
         "relation XXX does not exist"
 
+    Run it like this:
+        py.test src/onegov.election-day/onegov/election_day/tests/
+            -k test_view_clear_results
+            --import-scan
+
     """
     parser.addoption('--import-scan', action="store_true")
 
