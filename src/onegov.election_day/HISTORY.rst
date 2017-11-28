@@ -1,6 +1,6 @@
 Changelog
 ---------
-1.16.0 (2017-11-27)
+1.17.0 (2017-11-28)
 ~~~~~~~~~~~~~~~~~~~
 
 - Adds titles for counter-proposal and tie-breakers.
