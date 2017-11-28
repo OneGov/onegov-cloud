@@ -315,9 +315,13 @@ class VotesLayout(Layout):
     @cached_property
     def ballot(self):
         if self.tab == 'counter-proposal':
-            return self.model.counter_proposal
+            if self.model.type == 'complex':
+                return self.model.counter_proposal
+            return None
         if self.tab == 'tie-breaker':
-            return self.model.tie_breaker
+            if self.model.type == 'complex':
+                return self.model.tie_breaker
+            return None
         return self.model.proposal
 
     def visible(self, tab=None):
@@ -329,7 +333,7 @@ class VotesLayout(Layout):
         if tab == 'proposal':
             return True
         if self.tab == 'counter-proposal' or self.tab == 'tie-breaker':
-            return self.counter_proposal
+            return self.model.type == 'complex'
 
         return True
 
@@ -339,10 +343,6 @@ class VotesLayout(Layout):
         if not proposal:
             return False
         return any((r.counted for r in proposal.results))
-
-    @cached_property
-    def counter_proposal(self):
-        return self.model.counter_proposal
 
     @cached_property
     def summarize(self):
