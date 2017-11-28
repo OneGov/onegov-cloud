@@ -402,6 +402,9 @@ class VotesLayout(Layout):
         """ Returns the path to the SVG file or None, if it is not available.
         """
 
+        if not self.ballot:
+            return None
+
         path = 'svg/{}'.format(
             svg_filename(self.ballot, 'map', self.request.locale)
         )
