@@ -9,6 +9,25 @@ from onegov.user import User
 from onegov_testing.utils import create_app
 
 
+def pytest_addoption(parser):
+    """ Adds a command line argument to scans all the onegov.* sources to
+    make sure that the database tables are created.
+
+    Set this option if you run into  sqlalchemy erorrs like:
+        "relation XXX does not exist"
+
+    """
+    parser.addoption('--import-scan', action="store_true")
+
+
+def pytest_cmdline_main(config):
+    option = config.getoption('--import-scan')
+    if option:
+        import importscan
+        import onegov
+        importscan.scan(onegov, ignore=['.test', '.tests'])
+
+
 @pytest.fixture(scope='session')
 def election_day_password():
     # only hash the password for the test users once per test session
@@ -83,18 +102,3 @@ def election_day_app_kriens(request):
     app = create_election_day(request, "", "'1059'", "false")
     yield app
     app.session_manager.dispose()
-
-
-@pytest.fixture(scope="session")
-def import_scan():
-    """ Scans all the onegov.* sources to make sure that the tables are
-    created.
-
-    Include this fixtures as first argument if needed (that is if you run a
-    single test and get sqlalchemy relation errors).
-
-    """
-
-    import importscan
-    import onegov
-    importscan.scan(onegov, ignore=['.test', '.tests'])
