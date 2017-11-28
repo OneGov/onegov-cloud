@@ -19,8 +19,6 @@ from onegov.org.layout import DirectoryEntryLayout
 from onegov.org.models import ExtendedDirectory, ExtendedDirectoryEntry
 from onegov.org.new_elements import Link
 from purl import URL
-from sqlalchemy import cast
-from sqlalchemy import JSON
 from tempfile import NamedTemporaryFile
 
 
@@ -224,7 +222,7 @@ def view_geojson(self, request):
         DirectoryEntry.name,
         DirectoryEntry.title,
         DirectoryEntry.lead,
-        cast(DirectoryEntry.content, JSON)["coordinates"].label('coordinates')
+        DirectoryEntry.content["coordinates"].label('coordinates')
     )
 
     url_prefix = request.class_link(DirectoryEntry, {

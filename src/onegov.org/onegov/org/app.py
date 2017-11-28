@@ -120,12 +120,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     def homepage_pages(self):
         pages = PageCollection(self.session()).query()
         pages = pages.filter(Topic.type == 'topic')
-
-        # XXX use JSON/JSONB for this (the attribute is not there if it's
-        # false, so this is not too bad speed-wise but it's still awful)
-        pages = pages.filter(Topic.meta.contains(
-            'is_visible_on_homepage'
-        ))
+        pages = pages.filter(Topic.meta['is_visible_on_homepage'] == True)
 
         result = defaultdict(list)
 

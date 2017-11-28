@@ -2650,7 +2650,7 @@ def test_unsubscribe_link(org_app):
     client = Client(org_app)
 
     user = UserCollection(org_app.session()).by_username('editor@example.org')
-    assert user.data is None
+    assert not user.data
 
     request = Bunch(identity_secret=org_app.identity_secret, app=org_app)
 
