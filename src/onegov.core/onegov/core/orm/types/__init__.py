@@ -4,4 +4,10 @@ from onegov.core.orm.types.utcdatetime_type import UTCDateTime
 from onegov.core.orm.types.uuid_type import UUID
 from onegov.core.orm.types.lowercase_text_type import LowercaseText
 
-__all__ = ['HSTORE', 'JSON', 'UTCDateTime', 'UUID', 'LowercaseText']
+__all__ = [
+    'HSTORE',
+    'JSON',
+    'UTCDateTime',
+    'UUID',
+    'LowercaseText'
+]

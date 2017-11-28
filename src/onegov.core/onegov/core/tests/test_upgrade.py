@@ -35,6 +35,24 @@ def test_upgrade_task_registration():
     assert tasks[1][1].requires is None
 
 
+def test_raw_task_requirement():
+
+    class MyUpgradeModule(object):
+
+        @upgrade_task(name='Add new field', raw=True, always_run=True)
+        def add_new_field(session_manager, schemas):
+            pass
+
+        @upgrade_task(name='Add another field', requires='one:Add new field')
+        def add_another_field(request):
+            pass
+
+    with pytest.raises(AssertionError) as e:
+        get_tasks([('one', MyUpgradeModule)])
+
+    assert "Raw tasks cannot be required" in str(e)
+
+
 def test_upgrade_task_requirements():
 
     class Two(object):
@@ -205,6 +223,87 @@ def test_upgrade_cli(postgres_dsn, session_manager, temporary_directory):
             assert 'no pending upgrade tasks found' in output[1]
             assert 'Running upgrade for foo/fah' in output[2]
             assert 'no pending upgrade tasks found' in output[3]
+            assert result.exit_code == 0
+
+
+def test_raw_upgrade_cli(postgres_dsn, session_manager, temporary_directory):
+
+    config = os.path.join(temporary_directory, 'test.yml')
+    with open(config, 'w') as cfg:
+        cfg.write(textwrap.dedent("""\
+            applications:
+                - path: /foo/*
+                  application: onegov.core.framework.Framework
+                  namespace: foo
+                  configuration:
+                    dsn: {}
+                    identity_secure: False
+                    identity_secret: asdf
+                    csrf_secret: asdfasdf
+                    filestorage: fs.osfs.OSFS
+                    filestorage_options:
+                      root_path: '{}/file-storage'
+                      create: true
+        """.format(postgres_dsn, temporary_directory)))
+
+    session_manager.ensure_schema_exists("foo-bar")
+    session_manager.ensure_schema_exists("foo-fah")
+
+    with patch('onegov.core.upgrade.get_upgrade_modules') as get_1:
+        with patch('onegov.core.cli.commands.get_upgrade_modules') as get_2:
+
+            class Upgrades:
+                @staticmethod
+                @upgrade_task(name='Foobar', raw=True, always_run=True)
+                def run_upgrade(session_manager, schemas):
+                    assert schemas == ['foo-bar', 'foo-fah']
+                    return False
+
+            get_1.return_value = get_2.return_value = [
+                ('onegov.test', Upgrades)
+            ]
+
+            # tasks which return False, are not shown
+            runner = CliRunner()
+            result = runner.invoke(cli, [
+                '--config', config,
+                'upgrade'
+            ], catch_exceptions=False)
+
+            output = result.output.split('\n')
+            assert 'Running raw upgrade for foo/*' in output[0]
+            assert 'no pending upgrade tasks found' in output[1]
+            assert 'Running upgrade for foo/bar' in output[2]
+            assert 'no pending upgrade tasks found' in output[3]
+            assert 'Running upgrade for foo/fah' in output[4]
+            assert 'no pending upgrade tasks found' in output[5]
+            assert result.exit_code == 0
+
+            class NewUpgrades:
+                @staticmethod
+                @upgrade_task(name='Barfoo', raw=True, always_run=True)
+                def run_upgrade(session_manager, schemas):
+                    return True
+
+            get_1.return_value = get_2.return_value = [
+                ('onegov.test', NewUpgrades)
+            ]
+
+            # tasks wich return True are shown
+            runner = CliRunner()
+            result = runner.invoke(cli, [
+                '--config', config,
+                'upgrade',
+            ], catch_exceptions=False)
+
+            output = result.output.split('\n')
+            assert 'Running raw upgrade for foo/*' in output[0]
+            assert 'Barfoo' in output[1]
+            assert 'executed 1 upgrade tasks' in output[2]
+            assert 'Running upgrade for foo/bar' in output[3]
+            assert 'no pending upgrade tasks found' in output[4]
+            assert 'Running upgrade for foo/fah' in output[5]
+            assert 'no pending upgrade tasks found' in output[6]
             assert result.exit_code == 0
 
 

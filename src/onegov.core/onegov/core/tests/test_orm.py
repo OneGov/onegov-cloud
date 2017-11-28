@@ -374,7 +374,9 @@ def test_json_type(postgres_dsn):
     session.add(test)
     transaction.commit()
 
-    assert session.query(Test).filter(Test.id == 1).one().data is None
+    # our json type automatically coreces None to an empty dict
+    assert session.query(Test).filter(Test.id == 1).one().data == {}
+    assert session.execute('SELECT data::text from test').scalar() == '{}'
 
     test = Test(id=2, data={'foo': 'bar'})
     session.add(test)
@@ -391,6 +393,12 @@ def test_json_type(postgres_dsn):
     assert session.query(Test).filter(Test.id == 2).one().data == {
         'foo': 'rab'
     }
+
+    test = Test(id=3, data={})
+    session.add(test)
+    transaction.commit()
+
+    assert session.query(Test).filter(Test.id == 3).one().data == {}
 
     mgr.dispose()
 

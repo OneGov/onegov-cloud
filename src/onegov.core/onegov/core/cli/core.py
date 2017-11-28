@@ -144,6 +144,28 @@ This is independent of the app/request context. If we return a function, the
 function is going to be called with the request and the app. If we do not, the
 command ends as expected.
 
+Returning multiple functions
+----------------------------
+
+When a cli command returns multiple functions, they are run in succession.
+
+The signature is taken into account. If there's a 'request' parameter in the
+function, the usual request context is set up.
+
+If there is no 'request' parameter in the function, it is called once per
+appcfg, together with the group context::
+
+    @cli.command()
+    def my_special_command():
+
+        def handle_command(request, app):
+            pass
+
+        def handle_raw(group_context, appcfg):
+            pass
+
+        return (handle_command, handle_raw)
+
 Limiting Selectors to a Single Instance
 ---------------------------------------
 
@@ -318,21 +340,33 @@ class GroupContext(GroupContextGuard):
         mgr = self.unbound_session_manager(appcfg.configuration['dsn'])
         return mgr.list_schemas(limit_to_namespace=appcfg.namespace)
 
+    def split_match(self, match):
+        match = match.lstrip('/')
+
+        if '/' in match:
+            return match.split('/', 1)
+        else:
+            return match, ''
+
     def match_to_path(self, match):
         """ Takes the given match and returns the application path used in
         http requests.
 
         """
-        match = match.lstrip('/')
-
-        if '/' in match:
-            namespace, id = match.split('/')[:2]
-        else:
-            namespace, id = match, ''
+        namespace, id = self.split_match(match)
 
         for appcfg in self.config.applications:
             if appcfg.namespace == namespace:
                 return appcfg.path.replace('*', id).rstrip('/')
+
+    def match_to_appcfg(self, match):
+        """ Takes the given match and returns the maching appcfg object. """
+
+        namespace, id = self.split_match(match)
+
+        for appcfg in self.config.applications:
+            if appcfg.namespace == namespace:
+                return appcfg
 
     @property
     def appcfgs(self):
@@ -488,6 +522,11 @@ def command_group():
         if not processor:
             return
 
+        if callable(processor):
+            processors = (processor, )
+        else:
+            processors = processor
+
         group_context = click.get_current_context().obj
 
         # load all applications into the server
@@ -548,14 +587,21 @@ def command_group():
             configure_morepath=False
         )
 
+        def expects_request(processor):
+            return 'request' in processor.__code__.co_varnames
+
         # call the matching applications
         client = Client(server)
-
         matches = list(group_context.matches)
 
         for match in matches:
-            path = group_context.match_to_path(match)
-            client.get(path + '/' + view_path)
+            for processor in processors:
+                if expects_request(processor):
+                    path = group_context.match_to_path(match)
+                    client.get(path + '/' + view_path)
+                else:
+                    appcfg = group_context.match_to_appcfg(match)
+                    processor(group_context, appcfg)
 
     return command_group
 

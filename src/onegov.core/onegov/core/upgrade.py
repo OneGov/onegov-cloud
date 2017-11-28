@@ -9,7 +9,9 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON
 from sqlalchemy import Column, Text
+from sqlalchemy import create_engine
 from sqlalchemy.engine.reflection import Inspector
+from sqlalchemy.pool import StaticPool
 from toposort import toposort, toposort_flatten
 
 
@@ -127,20 +129,43 @@ class upgrade_task(object):
 
         If the reference cannot be found, the upgrade fails.
 
+    :raw:
+        A raw task is run without setting up a request. Instead a database
+        connection and a list of targeted schemas is passed. It's up to the
+        upgrade function to make sure the right schemas are targeted through
+        that connection!
+
+        This is useful for upgrades which need to execute some raw SQL that
+        cannot be executed in a request context. For example, this is a way
+        to migrate the upgrade states table of the upgrade itself.
+
+        Raw tasks are always run and there state is not recorded. So the
+        raw task needs to be idempotent and return False if there was no
+        change.
+
+        Only use this if you have no other way. This is a very blunt instrument
+        only used under special circumstances.
+
     Always run tasks may return ``False`` if they wish to be considered
     as not run (and therefore not shown in the upgrade runner).
 
     """
 
-    def __init__(self, name, always_run=False, requires=None):
+    def __init__(self, name, always_run=False, requires=None, raw=False):
+        if raw:
+            assert always_run, "raw tasks must always run"
+            assert not requires, "raw tasks may not require other tasks"
+
         self.name = name
         self.always_run = always_run
         self.requires = requires
+        self.raw = raw
 
     def __call__(self, fn):
         fn.task_name = self.name
         fn.always_run = self.always_run
         fn.requires = self.requires
+        fn.raw = self.raw
         return fn
 
 
@@ -227,6 +252,11 @@ def get_tasks(upgrade_modules=None):
     """
 
     tasks = get_tasks_by_id(upgrade_modules or get_upgrade_modules())
+
+    for task_id, task in tasks.items():
+        if task.requires:
+            assert not tasks[task.requires].raw, "Raw tasks cannot be required"
+
     graph = {}
 
     for task_id, task in tasks.items():
@@ -354,8 +384,52 @@ class UpgradeContext(object):
         return table in inspector.get_table_names(schema=self.schema)
 
 
+class RawUpgradeRunner(object):
+    """ Runs the given raw tasks. """
+
+    def __init__(self, tasks, commit=True,
+                 on_task_success=None, on_task_fail=None):
+        self.tasks = tasks
+        self.commit = commit
+
+        self._on_task_success = on_task_success
+        self._on_task_fail = on_task_fail
+
+    def run_upgrade(self, dsn, schemas):
+
+        # it's possible for applications to exist without schemas, if the
+        # application doesn't use multi-tennants and has not been run yet
+        if not schemas:
+            return 0
+
+        engine = create_engine(dsn, poolclass=StaticPool)
+        connection = engine.connect()
+        executions = 0
+
+        for id, task in self.tasks:
+            t = connection.begin()
+
+            try:
+                if task(connection, schemas):
+                    executions += 1
+                    self._on_task_success(task)
+
+            except Exception:
+                t.rollback()
+                self._on_task_fail(task)
+
+                raise
+            else:
+                if self.commit:
+                    t.commit()
+                else:
+                    t.rollback()
+
+        return executions
+
+
 class UpgradeRunner(object):
-    """ Runs all tasks of a :class:`UpgradeTasksRegistry`. """
+    """ Runs the given basic tasks. """
 
     def __init__(self, modules, tasks, commit=True,
                  on_task_success=None, on_task_fail=None):

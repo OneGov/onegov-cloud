@@ -83,7 +83,7 @@ def dumps(obj):
     if obj is not None:
         return json.dumps(obj, cls=CustomJSONEncoder)
     else:
-        return ''
+        return None
 
 
 def loads(value):

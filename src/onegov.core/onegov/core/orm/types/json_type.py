@@ -7,34 +7,29 @@
 from onegov.core import custom_json as json
 
 from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy.types import TypeDecorator, TEXT
+from sqlalchemy.types import TypeDecorator
+from sqlalchemy.dialects.postgresql import JSONB
 
 
 class JSON(TypeDecorator):
-    """ A JSON type for postgres that's backwards compatible with Postgres 9.1.
+    """ A JSONB based type that coerces None's to empty dictionaries.
 
-    In the future this will be replaced by JSON (or JSONB) though that requires
-    that we require a later Postgres release. It would also mean that all
-    json types have to be migrated.
-
-    This type is associated with Sqlalchemy's MutableDict, so changes made to
-    the dict are reflected in the database.
-
-    See http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/mutable.html
+    That is, this JSONB column does not have NULL values, it only has
+    falsy values (an empty dict).
 
     """
 
-    impl = TEXT
+    impl = JSONB
 
     def process_bind_param(self, value, dialect):
-        if value is not None:
-            value = json.dumps(value)
+        if value is None:
+            return {}
 
         return value
 
     def process_result_value(self, value, dialect):
-        if value is not None:
-            value = json.loads(value)
+        if value is None:
+            return {}
 
         return value
 

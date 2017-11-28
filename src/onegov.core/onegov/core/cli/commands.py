@@ -6,10 +6,13 @@ import platform
 import subprocess
 import sys
 
-from onegov.core.cli.core import command_group, pass_group_context
 from mailthon.middleware import TLS, Auth
+from onegov.core.cli.core import command_group, pass_group_context
 from onegov.core.mail import Postman
-from onegov.core.upgrade import UpgradeRunner, get_tasks, get_upgrade_modules
+from onegov.core.upgrade import get_tasks
+from onegov.core.upgrade import get_upgrade_modules
+from onegov.core.upgrade import RawUpgradeRunner
+from onegov.core.upgrade import UpgradeRunner
 from onegov.server.config import Config
 from smtplib import SMTPRecipientsRefused
 from uuid import uuid4
@@ -286,11 +289,46 @@ def upgrade(group_context, dry_run):
     modules = list(get_upgrade_modules())
     tasks = get_tasks()
 
+    executed_raw_upgrades = set()
+
+    basic_tasks = tuple((id, task) for id, task in tasks if not task.raw)
+    raw_tasks = tuple((id, task) for id, task in tasks if task.raw)
+
     def on_success(task):
         print(click.style("* " + str(task.task_name), fg='green'))
 
     def on_fail(task):
         print(click.style("* " + str(task.task_name), fg='red'))
+
+    def run_upgrade_runner(runner, *args):
+        executed_tasks = runner.run_upgrade(*args)
+
+        if executed_tasks:
+            print("executed {} upgrade tasks".format(executed_tasks))
+        else:
+            print("no pending upgrade tasks found")
+
+    def run_raw_upgrade(group_context, appcfg):
+        if appcfg in executed_raw_upgrades:
+            return
+
+        executed_raw_upgrades.add(appcfg)
+
+        title = "Running raw upgrade for {}".format(appcfg.path.lstrip('/'))
+        print(click.style(title, underline=True))
+
+        upgrade_runner = RawUpgradeRunner(
+            tasks=raw_tasks,
+            commit=not dry_run,
+            on_task_success=on_success,
+            on_task_fail=on_fail
+        )
+
+        run_upgrade_runner(
+            upgrade_runner,
+            appcfg.configuration['dsn'],
+            group_context.available_schemas(appcfg),
+        )
 
     def run_upgrade(request, app):
         title = "Running upgrade for {}".format(request.app.application_id)
@@ -298,17 +336,17 @@ def upgrade(group_context, dry_run):
 
         upgrade_runner = UpgradeRunner(
             modules=modules,
-            tasks=tasks,
+            tasks=basic_tasks,
             commit=not dry_run,
             on_task_success=on_success,
             on_task_fail=on_fail
         )
+        run_upgrade_runner(upgrade_runner, request)
 
-        executed_tasks = upgrade_runner.run_upgrade(request)
+    def upgrade_steps():
+        if next((t for n, t in tasks if t.raw), False):
+            yield run_raw_upgrade
 
-        if executed_tasks:
-            print("executed {} upgrade tasks".format(executed_tasks))
-        else:
-            print("no pending upgrade tasks found")
+        yield run_upgrade
 
-    return run_upgrade
+    return tuple(upgrade_steps())
