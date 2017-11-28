@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-24 14:23+0100\n"
+"POT-Creation-Date: 2017-11-28 14:04+0100\n"
 "PO-Revision-Date: 2017-11-24 14:27+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -120,23 +120,23 @@ msgstr "Valeurs non valides"
 msgid "${name} is unknown"
 msgstr "${name} inconnue"
 
-msgid "Invalid list values"
-msgstr "Valeurs de la liste non valides"
-
-msgid "Invalid list results"
-msgstr "Résultats de la liste non valides"
-
 msgid "Invalid candidate values"
 msgstr "Valeurs des candidats non valides"
 
 msgid "Invalid candidate results"
 msgstr "Résultats des candidats non valides"
 
-msgid "Invalid list connection values"
-msgstr "Valeurs de connexion de liste non valides"
-
 msgid "No data found"
 msgstr "Pas de données trouvées"
+
+msgid "Invalid list values"
+msgstr "Valeurs de la liste non valides"
+
+msgid "Invalid list results"
+msgstr "Résultats de la liste non valides"
+
+msgid "Invalid list connection values"
+msgstr "Valeurs de connexion de liste non valides"
 
 msgid "Invalid values"
 msgstr "Valeurs non valides"
@@ -229,11 +229,11 @@ msgstr "Majorité absolue"
 msgid "Provide at least one title."
 msgstr ""
 
-msgid "Election based on proportional representation"
-msgstr "Election selon le système proportionnel"
-
 msgid "Election based on the simple majority system"
 msgstr "Election selon le système majoritaire"
+
+msgid "Election based on proportional representation"
+msgstr "Election selon le système proportionnel"
 
 msgid "Phone number"
 msgstr "Téléphone"
@@ -722,9 +722,6 @@ msgstr "Vide"
 msgid "Invalid"
 msgstr "Invalide"
 
-msgid "Update results"
-msgstr ""
-
 msgid "Wrong username or password"
 msgstr "Mauvais nom d'utilisateur ou mot de passe"
 
@@ -807,6 +804,12 @@ msgstr ""
 
 msgid "Blank list"
 msgstr "Liste vierge"
+
+msgid "Update results"
+msgstr ""
+
+msgid "Results updated."
+msgstr ""
 
 msgid "Do you really want to regenerate the token?"
 msgstr "Voulez-vous vraiment renouveler le token ?"

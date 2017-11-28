@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-24 14:21+0100\n"
-"PO-Revision-Date: 2017-11-24 14:30+0100\n"
+"POT-Creation-Date: 2017-11-28 14:04+0100\n"
+"PO-Revision-Date: 2017-11-28 14:04+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -120,23 +120,23 @@ msgstr "Ungültige Daten"
 msgid "${name} is unknown"
 msgstr "${name} ist unbekannt"
 
-msgid "Invalid list values"
-msgstr "Ungültige Listendaten"
-
-msgid "Invalid list results"
-msgstr "Ungültige Listenresultate"
-
 msgid "Invalid candidate values"
 msgstr "Ungültige Kandidierendendaten"
 
 msgid "Invalid candidate results"
 msgstr "Ungültige Kandidierendenresultate"
 
-msgid "Invalid list connection values"
-msgstr "Ungültige Listenverbindungsdaten"
-
 msgid "No data found"
 msgstr "Keine Daten gefunden"
+
+msgid "Invalid list values"
+msgstr "Ungültige Listendaten"
+
+msgid "Invalid list results"
+msgstr "Ungültige Listenresultate"
+
+msgid "Invalid list connection values"
+msgstr "Ungültige Listenverbindungsdaten"
 
 msgid "Invalid values"
 msgstr "Ungültige Werte"
@@ -226,14 +226,14 @@ msgstr "Weiterführende Informationen"
 msgid "Absolute majority"
 msgstr "Absolutes Mehr"
 
-msgid "Select at least one title."
+msgid "Provide at least one title."
 msgstr "Geben Sie mindestens einen Titel ein."
-
-msgid "Election based on proportional representation"
-msgstr "Proporzwahl"
 
 msgid "Election based on the simple majority system"
 msgstr "Majorzwahl"
+
+msgid "Election based on proportional representation"
+msgstr "Proporzwahl"
 
 msgid "Phone number"
 msgstr "Telefonnummer"
@@ -722,9 +722,6 @@ msgstr "Leer"
 msgid "Invalid"
 msgstr "Ungültig"
 
-msgid "Update results"
-msgstr "Resultate aktualisieren"
-
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"
 
@@ -805,6 +802,12 @@ msgstr ""
 
 msgid "Blank list"
 msgstr "Blankoliste"
+
+msgid "Update results"
+msgstr "Resultate aktualisieren"
+
+msgid "Results updated."
+msgstr "Resultate aktualisiert."
 
 msgid "Do you really want to regenerate the token?"
 msgstr "Möchten Sie das Token wirklich neu erzeugen?"
@@ -903,3 +906,6 @@ msgstr "Keine Proporzwahl"
 
 msgid "The data source is not configured properly"
 msgstr "Die Datenquellekonfiguration ist ungültig"
+
+#~ msgid "Select at least one title."
+#~ msgstr "Geben Sie mindestens einen Titel ein."

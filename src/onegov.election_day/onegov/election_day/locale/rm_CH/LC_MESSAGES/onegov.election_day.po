@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-24 14:23+0100\n"
+"POT-Creation-Date: 2017-11-28 14:04+0100\n"
 "PO-Revision-Date: 2017-11-24 14:29+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -120,23 +120,23 @@ msgstr "Datas nunvalaivlas"
 msgid "${name} is unknown"
 msgstr "${name} n'è betg enconuschent"
 
-msgid "Invalid list values"
-msgstr "Datas da glista nunvalaivlas"
-
-msgid "Invalid list results"
-msgstr "Resultats da glistas nunvalaivels"
-
 msgid "Invalid candidate values"
 msgstr "Datas da candidat nunvalaivlas"
 
 msgid "Invalid candidate results"
 msgstr "Resultats da candidat nunvalaivels"
 
-msgid "Invalid list connection values"
-msgstr "Datas nunvalaivlas da colliaziuns da glistas"
-
 msgid "No data found"
 msgstr "Chattà naginas datas"
+
+msgid "Invalid list values"
+msgstr "Datas da glista nunvalaivlas"
+
+msgid "Invalid list results"
+msgstr "Resultats da glistas nunvalaivels"
+
+msgid "Invalid list connection values"
+msgstr "Datas nunvalaivlas da colliaziuns da glistas"
 
 msgid "Invalid values"
 msgstr "Valurs nunvalaivlas"
@@ -229,11 +229,11 @@ msgstr "Maioritad absoluta"
 msgid "Provide at least one title."
 msgstr ""
 
-msgid "Election based on proportional representation"
-msgstr "Elecziun da proporz"
-
 msgid "Election based on the simple majority system"
 msgstr "Elecziun da maiorz"
+
+msgid "Election based on proportional representation"
+msgstr "Elecziun da proporz"
 
 msgid "Phone number"
 msgstr "Numer da telefon"
@@ -761,9 +761,6 @@ msgstr "Vid"
 msgid "Invalid"
 msgstr "Nunvalaivel"
 
-msgid "Update results"
-msgstr ""
-
 msgid "Wrong username or password"
 msgstr ""
 "Il num da l'utilisadra u da l'utilisader n'è betg enconuschent u il pled-"
@@ -848,6 +845,12 @@ msgstr ""
 
 msgid "Blank list"
 msgstr "Glista en blanco"
+
+msgid "Update results"
+msgstr ""
+
+msgid "Results updated."
+msgstr ""
 
 msgid "Do you really want to regenerate the token?"
 msgstr "Vulais Vus propi generar da nov il token?"

@@ -1,10 +1,6 @@
-from morepath import redirect
-from onegov.core.security import Private
 from onegov.core.security import Public
-from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
-from onegov.election_day.forms import EmptyForm
 from onegov.election_day.layout import DefaultLayout
 from onegov.election_day.models import Principal
 from onegov.election_day.utils import add_last_modified_header
@@ -111,36 +107,4 @@ def view_principal_json(self, request):
         'name': self.name,
         'results': latest,
         'archive': get_archive_links(archive, request)
-    }
-
-
-@ElectionDayApp.form(
-    model=Principal,
-    name='update-results',
-    template='form.pt',
-    form=EmptyForm,
-    permission=Private
-)
-def view_update_results(self, request, form):
-
-    """ Updates all results.
-
-    This view is not linked anywhere since there is normally no need to call
-    it.
-
-    """
-
-    layout = DefaultLayout(self, request)
-    archive = ArchivedResultCollection(request.app.session())
-
-    if form.submitted(request):
-        archive = ArchivedResultCollection(request.app.session())
-        archive.update_all(request)
-        return redirect(layout.manage_link)
-
-    return {
-        'layout': layout,
-        'form': form,
-        'title': _("Update results"),
-        'cancel': layout.manage_link
     }

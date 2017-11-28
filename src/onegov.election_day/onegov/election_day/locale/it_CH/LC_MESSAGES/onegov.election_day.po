@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-24 14:23+0100\n"
+"POT-Creation-Date: 2017-11-28 14:04+0100\n"
 "PO-Revision-Date: 2017-11-24 14:28+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -120,23 +120,23 @@ msgstr "Valori non validi"
 msgid "${name} is unknown"
 msgstr "${name} è sconosciuto"
 
-msgid "Invalid list values"
-msgstr "Valori della lista non validi"
-
-msgid "Invalid list results"
-msgstr "Risultati della lista non validi"
-
 msgid "Invalid candidate values"
 msgstr "Valori del candidato non validi"
 
 msgid "Invalid candidate results"
 msgstr "Risultati del candidato non validi"
 
-msgid "Invalid list connection values"
-msgstr "Valori della lista delle connessioni non validi"
-
 msgid "No data found"
 msgstr "Nessun dato trovato"
+
+msgid "Invalid list values"
+msgstr "Valori della lista non validi"
+
+msgid "Invalid list results"
+msgstr "Risultati della lista non validi"
+
+msgid "Invalid list connection values"
+msgstr "Valori della lista delle connessioni non validi"
 
 msgid "Invalid values"
 msgstr "Valori non validi"
@@ -229,11 +229,11 @@ msgstr "Maggioranza assoluta"
 msgid "Provide at least one title."
 msgstr ""
 
-msgid "Election based on proportional representation"
-msgstr "Elezione secondo il sistema proporzionale"
-
 msgid "Election based on the simple majority system"
 msgstr "Elezione secondo il sistema maggioritario"
+
+msgid "Election based on proportional representation"
+msgstr "Elezione secondo il sistema proporzionale"
 
 msgid "Phone number"
 msgstr "Numero di telefono"
@@ -719,9 +719,6 @@ msgstr "Bianche"
 msgid "Invalid"
 msgstr "Nulle"
 
-msgid "Update results"
-msgstr ""
-
 msgid "Wrong username or password"
 msgstr "Nome utente sconosciuto o password errata"
 
@@ -804,6 +801,12 @@ msgstr ""
 
 msgid "Blank list"
 msgstr "Lista bianca"
+
+msgid "Update results"
+msgstr ""
+
+msgid "Results updated."
+msgstr ""
 
 msgid "Do you really want to regenerate the token?"
 msgstr "Rigenerare il token?"
