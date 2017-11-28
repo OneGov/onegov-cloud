@@ -3,6 +3,7 @@ import tarfile
 from datetime import date
 from io import BytesIO
 from onegov.ballot import Election
+from onegov.ballot import ProporzElection
 from onegov.core.utils import module_path
 from onegov.election_day.formats import import_election_wabsti_proporz
 from onegov.election_day.models import Principal
@@ -14,10 +15,9 @@ from pytest import mark
 ])
 def test_import_wabsti_proporz(session, tar_file):
     session.add(
-        Election(
+        ProporzElection(
             title='election',
             domain='canton',
-            type='proporz',
             date=date(2015, 10, 18),
             number_of_mandates=3,
         )
@@ -113,10 +113,9 @@ def test_import_wabsti_proporz(session, tar_file):
 
 def test_import_wabsti_proporz_utf16(session):
     session.add(
-        Election(
+        ProporzElection(
             title='election',
             domain='canton',
-            type='proporz',
             date=date(2011, 10, 23),
             number_of_mandates=1,
         )
@@ -180,10 +179,9 @@ def test_import_wabsti_proporz_utf16(session):
 
 def test_import_wabsti_proporz_missing_headers(session):
     session.add(
-        Election(
+        ProporzElection(
             title='election',
             domain='canton',
-            type='proporz',
             date=date(2015, 10, 18),
             number_of_mandates=6,
         )
@@ -248,10 +246,9 @@ def test_import_wabsti_proporz_missing_headers(session):
 
 def test_import_wabsti_proporz_invalid_values(session):
     session.add(
-        Election(
+        ProporzElection(
             title='election',
             domain='canton',
-            type='proporz',
             date=date(2015, 10, 18),
             number_of_mandates=6,
         )
@@ -376,10 +373,9 @@ def test_import_wabsti_proporz_invalid_values(session):
 
 def test_import_wabsti_proporz_expats(session):
     session.add(
-        Election(
+        ProporzElection(
             title='election',
             domain='canton',
-            type='proporz',
             date=date(2015, 10, 18),
             number_of_mandates=6,
         )

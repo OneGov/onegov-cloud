@@ -35,7 +35,6 @@ def test_archive(session):
             Election(
                 title="Election {}".format(year),
                 domain='federation',
-                type='majorz',
                 date=date(year, 1, 1),
             )
         )
@@ -96,7 +95,6 @@ def test_archive_grouping(session):
             Election(
                 title="{} election 1".format(domain),
                 domain=domain,
-                type='majorz',
                 date=date(2017, 2, 12)
             )
         )
@@ -112,7 +110,6 @@ def test_archive_grouping(session):
             Election(
                 title="{} election 2".format(domain),
                 domain=domain,
-                type='majorz',
                 date=date(2017, 5, 21)
             )
         )
@@ -163,7 +160,6 @@ def test_archived_results(session):
         year: Election(
             title="Election {}".format(year),
             domain='federation',
-            type='majorz',
             date=date(year, 1, 1),
         ) for year in (2001, 2002, 2003)
     }
@@ -283,7 +279,6 @@ def test_notification_collection(session):
             Election(
                 title="Election",
                 domain='federation',
-                type='majorz',
                 date=date(2011, 1, 1)
             )
         )

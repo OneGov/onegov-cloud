@@ -7,7 +7,8 @@ from onegov.core.security import Public
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
-from onegov.election_day.formats import import_election_internal
+from onegov.election_day.formats import import_election_internal_majorz
+from onegov.election_day.formats import import_election_internal_proporz
 from onegov.election_day.formats import import_party_results
 from onegov.election_day.formats import import_vote_internal
 from onegov.election_day.forms import UploadRestForm
@@ -103,7 +104,14 @@ def view_upload_test(self, request):
         if form.type.data == 'vote':
             err = import_vote_internal(item, entities, file, mimetype)
         if form.type.data == 'election':
-            err = import_election_internal(item, entities, file, mimetype)
+            if item.type == 'proporz':
+                err = import_election_internal_proporz(
+                    item, entities, file, mimetype
+                )
+            else:
+                err = import_election_internal_majorz(
+                    item, entities, file, mimetype
+                )
         if form.type.data == 'parties':
             err = import_party_results(item, file, mimetype)
         if err:

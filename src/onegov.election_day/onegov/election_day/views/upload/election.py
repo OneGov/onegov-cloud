@@ -5,7 +5,8 @@ import transaction
 from onegov.ballot import Election
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
-from onegov.election_day.formats import import_election_internal
+from onegov.election_day.formats import import_election_internal_majorz
+from onegov.election_day.formats import import_election_internal_proporz
 from onegov.election_day.formats import import_election_wabsti_majorz
 from onegov.election_day.formats import import_election_wabsti_proporz
 from onegov.election_day.formats import import_election_wabstic_majorz
@@ -57,7 +58,7 @@ def view_upload_majorz_election(self, request, form):
         else:
             entities = principal.entities[self.date.year]
             if form.file_format.data == 'internal':
-                errors = import_election_internal(
+                errors = import_election_internal_majorz(
                     self,
                     entities,
                     form.results.raw_data[0].file,
@@ -159,7 +160,7 @@ def view_upload_proporz_election(self, request, form):
         else:
             entities = principal.entities[self.date.year]
             if form.file_format.data == 'internal':
-                errors = import_election_internal(
+                errors = import_election_internal_proporz(
                     self,
                     entities,
                     form.results.raw_data[0].file,

@@ -17,7 +17,6 @@ def test_import_wabstic_majorz(session, tar_file):
         Election(
             title='election',
             domain='canton',
-            type='majorz',
             date=date(2016, 2, 28),
             number_of_mandates=6,
         )
@@ -71,7 +70,6 @@ def test_import_wabstic_majorz_missing_headers(session):
         Election(
             title='election',
             domain='canton',
-            type='majorz',
             date=date(2016, 2, 28),
             number_of_mandates=6,
         )
@@ -150,7 +148,6 @@ def test_import_wabstic_majorz_invalid_values(session):
         Election(
             title='election',
             domain='canton',
-            type='majorz',
             date=date(2016, 2, 28),
             number_of_mandates=6,
         )
@@ -303,7 +300,6 @@ def test_import_wabstic_majorz_expats(session):
         Election(
             title='election',
             domain='canton',
-            type='majorz',
             date=date(2016, 2, 28),
             number_of_mandates=6,
         )

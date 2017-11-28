@@ -1,4 +1,7 @@
-from onegov.election_day.formats.election import import_election_internal
+from onegov.election_day.formats.election import \
+    import_election_internal_majorz
+from onegov.election_day.formats.election import \
+    import_election_internal_proporz
 from onegov.election_day.formats.election import import_election_wabsti_majorz
 from onegov.election_day.formats.election import import_election_wabsti_proporz
 from onegov.election_day.formats.election import import_election_wabstic_majorz
@@ -14,7 +17,8 @@ from onegov.election_day.formats.vote.wabstim import import_vote_wabstim
 
 
 __all__ = [
-    'import_election_internal',
+    'import_election_internal_majorz',
+    'import_election_internal_proporz',
     'import_election_wabsti_majorz',
     'import_election_wabsti_proporz',
     'import_election_wabstic_majorz',

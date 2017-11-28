@@ -563,21 +563,45 @@ def test_upload_election_submit(election_day_app):
     login(client)
 
     new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'election'
+    new.form['election_de'] = 'majorz'
     new.form['date'] = date(2015, 1, 1)
     new.form['mandates'] = 1
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    # Internal format
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = 'proporz'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    # Internal Majorz
     with patch(
-        'onegov.election_day.views.upload.election.import_election_internal'
+        'onegov.election_day.views.upload.election.'
+        'import_election_internal_majorz'
     ) as import_:
         import_.return_value = []
 
         csv = 'csv'.encode('utf-8')
-        upload = client.get('/election/election/upload').follow()
+        upload = client.get('/election/majorz/upload').follow()
+        upload.form['file_format'] = 'internal'
+        upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+        upload = upload.form.submit()
+
+        assert import_.called
+
+    # Internal Proporz
+    with patch(
+        'onegov.election_day.views.upload.election.'
+        'import_election_internal_proporz'
+    ) as import_:
+        import_.return_value = []
+
+        csv = 'csv'.encode('utf-8')
+        upload = client.get('/election/proporz/upload').follow()
         upload.form['file_format'] = 'internal'
         upload.form['results'] = Upload('data.csv', csv, 'text/plain')
         upload = upload.form.submit()
@@ -592,7 +616,7 @@ def test_upload_election_submit(election_day_app):
         import_.return_value = []
 
         csv = 'csv'.encode('utf-8')
-        upload = client.get('/election/election/upload').follow()
+        upload = client.get('/election/majorz/upload').follow()
         upload.form['file_format'] = 'wabsti'
         upload.form['majority'] = '5000'
         upload.form['results'] = Upload('data.csv', csv, 'text/plain')
@@ -600,14 +624,11 @@ def test_upload_election_submit(election_day_app):
 
         assert import_.called
 
-        data = client.get('/election/election/json').json
+        data = client.get('/election/majorz/json').json
         assert data['absolute_majority'] == 5000
         assert data['completed'] == False
 
     # Wabsti Proporz
-    edit = client.get('/election/election/edit')
-    edit.form['election_type'] = 'proporz'
-    edit.form.submit()
     with patch(
         'onegov.election_day.views.upload.election.'
         'import_election_wabsti_proporz'
@@ -615,7 +636,7 @@ def test_upload_election_submit(election_day_app):
         import_.return_value = []
 
         csv = 'csv'.encode('utf-8')
-        upload = client.get('/election/election/upload').follow()
+        upload = client.get('/election/proporz/upload').follow()
         upload.form['file_format'] = 'wabsti'
         upload.form['results'] = Upload('data.csv', csv, 'text/plain')
         upload = upload.form.submit()
@@ -628,10 +649,6 @@ def test_upload_election_submit(election_day_app):
     principal.municipality = '351'
     election_day_app.cache.set('principal', principal)
 
-    edit = client.get('/election/election/edit')
-    edit.form['election_type'] = 'majorz'
-    edit.form.submit()
-
     with patch(
         'onegov.election_day.views.upload.election.'
         'import_election_wabstim_majorz'
@@ -639,7 +656,7 @@ def test_upload_election_submit(election_day_app):
         import_.return_value = []
 
         csv = 'csv'.encode('utf-8')
-        upload = client.get('/election/election/upload').follow()
+        upload = client.get('/election/majorz/upload').follow()
         upload.form['file_format'] = 'wabsti_m'
         upload.form['results'] = Upload('data.csv', csv, 'text/plain')
         upload = upload.form.submit()

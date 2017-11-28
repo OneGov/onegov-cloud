@@ -173,7 +173,39 @@ def test_view_rest_vote(election_day_app):
         assert import_.call_args[0][3] == 'application/octet-stream'
 
 
-def test_view_rest_election(election_day_app):
+def test_view_rest_majorz(election_day_app):
+    token = UploadTokenCollection(election_day_app.session()).create()
+    transaction.commit()
+
+    client = Client(election_day_app)
+    client.authorization = ('Basic', ('', token))
+
+    create_election(election_day_app, 'majorz')
+
+    params = (
+        ('id', 'election'),
+        ('type', 'election'),
+        ('results', Upload('results.csv', 'a'.encode('utf-8'))),
+    )
+
+    with patch(
+        (
+            'onegov.election_day.views.upload.rest.'
+            'import_election_internal_majorz'
+        ),
+        return_value=[]
+    ) as import_:
+        result = client.post('/upload', params=params)
+        assert result.json['status'] == 'success'
+
+        assert import_.called
+        assert isinstance(import_.call_args[0][0], Election)
+        assert 1701 in import_.call_args[0][1]
+        assert isinstance(import_.call_args[0][2], BytesIO)
+        assert import_.call_args[0][3] == 'application/octet-stream'
+
+
+def test_view_rest_proporz(election_day_app):
     token = UploadTokenCollection(election_day_app.session()).create()
     transaction.commit()
 
@@ -189,7 +221,10 @@ def test_view_rest_election(election_day_app):
     )
 
     with patch(
-        'onegov.election_day.views.upload.rest.import_election_internal',
+        (
+            'onegov.election_day.views.upload.rest.'
+            'import_election_internal_proporz'
+        ),
         return_value=[]
     ) as import_:
         result = client.post('/upload', params=params)

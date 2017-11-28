@@ -16,12 +16,13 @@ class ElectionForm(Form):
     election_type = RadioField(
         label=_("System"),
         choices=[
-            ('proporz', _("Election based on proportional representation")),
             ('majorz', _("Election based on the simple majority system")),
+            ('proporz', _("Election based on proportional representation")),
         ],
         validators=[
             InputRequired()
-        ]
+        ],
+        default='majorz'
     )
 
     domain = RadioField(
@@ -142,3 +143,15 @@ class ElectionForm(Form):
         self.mandates.data = model.number_of_mandates
         self.absolute_majority.data = model.absolute_majority
         self.related_link.data = model.related_link
+
+        if model.type == 'majorz':
+            self.election_type.choices = [
+                ('majorz', _("Election based on the simple majority system"))
+            ]
+            self.election_type.data = 'majorz'
+
+        else:
+            self.election_type.choices = [
+                ('proporz', _("Election based on proportional representation"))
+            ]
+            self.election_type.data = 'proporz'

@@ -37,7 +37,6 @@ def test_get_election_summary(session):
         election = Election(
             title="Election",
             domain='federation',
-            type='majorz',
             date=date(2011, 1, 1),
         )
         session.add(election)
@@ -112,7 +111,6 @@ def test_get_summary(session):
         election = Election(
             title="Election",
             domain='federation',
-            type='majorz',
             date=date(2011, 1, 1),
         )
         vote = Vote(
@@ -161,7 +159,6 @@ def test_get_summaries(session):
         election = Election(
             title="Election",
             domain='federation',
-            type='majorz',
             date=date(2011, 1, 1),
         )
         vote = Vote(
@@ -213,7 +210,6 @@ def test_get_archive_links(session):
             Election(
                 title="Election {}".format(year),
                 domain='federation',
-                type='majorz',
                 date=date(year, 1, 1),
             ),
             request
@@ -428,7 +424,6 @@ def test_pdf_filename(session):
         election = Election(
             title="Election",
             domain='federation',
-            type='majorz',
             date=date(2011, 1, 1),
         )
         vote = Vote(
@@ -462,7 +457,6 @@ def test_svg_filename(session):
         election = Election(
             title="Election",
             domain='federation',
-            type='majorz',
             date=date(2011, 1, 1),
         )
         vote = Vote(

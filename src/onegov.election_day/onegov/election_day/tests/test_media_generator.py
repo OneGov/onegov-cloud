@@ -13,6 +13,7 @@ from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
 from onegov.ballot import PanachageResult
 from onegov.ballot import PartyResult
+from onegov.ballot import ProporzElection
 from onegov.ballot import Vote
 from onegov.election_day import _
 from onegov.election_day.utils.media_generator import MediaGenerator
@@ -35,7 +36,6 @@ def add_majorz_election(session):
     election = Election(
         title='Majorz Election',
         domain='federation',
-        type='majorz',
         date=date(2015, 6, 14),
         number_of_mandates=1,
         absolute_majority=200,
@@ -86,10 +86,9 @@ def add_majorz_election(session):
 
 
 def add_proporz_election(session, year=2015):
-    election = Election(
+    election = ProporzElection(
         title='Proporz Election',
         domain='federation',
-        type='proporz',
         date=date(year, 6, 14),
         number_of_mandates=1,
         counted_entities=1,

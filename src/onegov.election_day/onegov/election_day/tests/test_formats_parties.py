@@ -1,15 +1,15 @@
 from datetime import date
 from io import BytesIO
 from onegov.ballot import Election
+from onegov.ballot import ProporzElection
 from onegov.election_day.formats import import_party_results
 
 
 def test_import_party_results(session):
     session.add(
-        Election(
+        ProporzElection(
             title='election',
             domain='canton',
-            type='proporz',
             date=date(2015, 10, 18),
             number_of_mandates=6,
         )
@@ -53,10 +53,9 @@ def test_import_party_results(session):
 
 def test_import_party_results_missing_headers(session):
     session.add(
-        Election(
+        ProporzElection(
             title='election',
             domain='canton',
-            type='proporz',
             date=date(2015, 10, 18),
             number_of_mandates=6,
         )
@@ -85,10 +84,9 @@ def test_import_party_results_missing_headers(session):
 
 def test_import_party_results_invalid_values(session):
     session.add(
-        Election(
+        ProporzElection(
             title='election',
             domain='canton',
-            type='proporz',
             date=date(2015, 10, 18),
             number_of_mandates=6,
         )

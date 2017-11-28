@@ -512,7 +512,6 @@ def test_notification(session):
             Election(
                 title="Election",
                 domain='federation',
-                type='majorz',
                 date=date(2011, 1, 1)
             )
         )
@@ -556,7 +555,6 @@ def test_webhook_notification(session):
             Election(
                 title="Election",
                 domain='federation',
-                type='majorz',
                 date=date(2011, 1, 1)
             )
         )
@@ -647,7 +645,6 @@ def test_sms_notification(request, election_day_app, session):
             Election(
                 title="Election",
                 domain='federation',
-                type='majorz',
                 date=date(2011, 1, 1)
             )
         )

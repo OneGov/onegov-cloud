@@ -17,7 +17,6 @@ def test_import_wabstim_majorz(session, tar_file):
         Election(
             title='election',
             domain='municipality',
-            type='majorz',
             date=date(2016, 9, 25),
             number_of_mandates=6,
         )
@@ -69,7 +68,6 @@ def test_import_wabstim_majorz_utf16(session):
         Election(
             title='election',
             domain='municipality',
-            type='majorz',
             date=date(2011, 10, 23),
             number_of_mandates=1,
         )
@@ -103,7 +101,6 @@ def test_import_wabstim_majorz_missing_headers(session):
         Election(
             title='election',
             domain='municipality',
-            type='majorz',
             date=date(2016, 2, 28),
             number_of_mandates=6,
         )
@@ -138,7 +135,6 @@ def test_import_wabstim_majorz_invalid_values(session):
         Election(
             title='election',
             domain='municipality',
-            type='majorz',
             date=date(2016, 2, 28),
             number_of_mandates=6,
         )
@@ -274,7 +270,6 @@ def test_import_wabstim_majorz_expats(session):
         Election(
             title='election',
             domain='municipality',
-            type='majorz',
             date=date(2016, 2, 28),
             number_of_mandates=6,
         )

@@ -3,6 +3,7 @@ import tarfile
 from datetime import date
 from io import BytesIO
 from onegov.ballot import Election
+from onegov.ballot import ProporzElection
 from onegov.ballot import List
 from onegov.core.utils import module_path
 from onegov.election_day.formats import import_election_wabstic_proporz
@@ -16,10 +17,9 @@ from pytest import mark
 ])
 def test_import_wabstic_proporz(session, tar_file):
     session.add(
-        Election(
+        ProporzElection(
             title='election',
             domain='canton',
-            type='proporz',
             date=date(2015, 10, 18),
             number_of_mandates=12,
         )
@@ -90,10 +90,9 @@ def test_import_wabstic_proporz(session, tar_file):
 
 def test_import_wabstic_proporz_missing_headers(session):
     session.add(
-        Election(
+        ProporzElection(
             title='election',
             domain='canton',
-            type='proporz',
             date=date(2015, 10, 18),
             number_of_mandates=6,
         )
@@ -190,10 +189,9 @@ def test_import_wabstic_proporz_missing_headers(session):
 
 def test_import_wabstic_proporz_invalid_values(session):
     session.add(
-        Election(
+        ProporzElection(
             title='election',
             domain='canton',
-            type='proporz',
             date=date(2015, 10, 18),
             number_of_mandates=6,
         )
@@ -362,10 +360,9 @@ def test_import_wabstic_proporz_invalid_values(session):
 
 def test_import_wabstic_proporz_expats(session):
     session.add(
-        Election(
+        ProporzElection(
             title='election',
             domain='canton',
-            type='proporz',
             date=date(2015, 10, 18),
             number_of_mandates=6,
         )
