@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.5.1 (2017-11-29)
+~~~~~~~~~~~~~~~~~~~
+
 - Improves drawing performance of map markers.
   [href]
 
