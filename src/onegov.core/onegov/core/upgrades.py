@@ -67,8 +67,6 @@ def migrate_to_jsonb(connection, schemas):
         """), schemas=tuple(schemas), names=tuple(c.name for c in columns))
     )
 
-    changed = False
-
     for schema in schemas:
         for column in columns:
             identity = ':'.join((schema, column.table.name, column.name))
@@ -87,6 +85,6 @@ def migrate_to_jsonb(connection, schemas):
                 column=column.name
             ))
 
-            changed = True
-
-    return changed
+            # commits/rolls back the current transaction (to keep the number
+            # of required locks to a minimum)
+            yield True

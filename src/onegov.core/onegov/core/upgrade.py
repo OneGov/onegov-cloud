@@ -1,3 +1,4 @@
+import inspect
 import importlib
 import pkg_resources
 import transaction
@@ -145,6 +146,10 @@ class upgrade_task(object):
 
         Only use this if you have no other way. This is a very blunt instrument
         only used under special circumstances.
+
+        Note, raw tasks may be normal function OR generators. If they are
+        generators, then with each yield the transaction is either commited
+        or rolled-back depending on the dry-run cli argument.
 
     Always run tasks may return ``False`` if they wish to be considered
     as not run (and therefore not shown in the upgrade runner).
@@ -410,7 +415,22 @@ class RawUpgradeRunner(object):
             t = connection.begin()
 
             try:
-                if task(connection, schemas):
+                success = False
+
+                if inspect.isgeneratorfunction(task):
+                    for changed in task(connection, schemas):
+                        success = success or changed
+
+                        if self.commit:
+                            t.commit()
+                        else:
+                            t.rollback()
+
+                        t = connection.begin()
+                else:
+                    success = task(connection, schemas)
+
+                if success:
                     executions += 1
                     self._on_task_success(task)
 
