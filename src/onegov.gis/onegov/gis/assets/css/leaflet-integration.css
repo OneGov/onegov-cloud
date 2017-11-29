@@ -95,8 +95,8 @@
 
 .vector-marker i {
     position: absolute;
-    top: 8px;
     left: 0;
+    transform: translateY(8px);
     width: 100%;
     color: #333;
     margin: 0;
