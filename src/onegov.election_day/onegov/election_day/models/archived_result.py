@@ -30,11 +30,14 @@ class ArchivedResult(Base, DomainOfInfluenceMixin, ContentMixin,
     #: Identifies the result
     id = Column(UUID, primary_key=True, default=uuid4)
 
-    #: Identifies the date of the vote
+    #: The date of the election/vote
     date = Column(Date, nullable=False)
 
-    #: Identifies the date of the vote
-    last_result_change = Column(UTCDateTime, nullable=False)
+    #: The last change of the results election/vote
+    last_modified = Column(UTCDateTime, nullable=True)
+
+    #: The last change of election/vote
+    last_result_change = Column(UTCDateTime, nullable=True)
 
     #: Type of the result
     type = Column(
@@ -154,6 +157,7 @@ class ArchivedResult(Base, DomainOfInfluenceMixin, ContentMixin,
 
     def copy_from(self, source):
         self.date = source.date
+        self.last_modified = source.last_modified
         self.last_result_change = source.last_result_change
         self.type = source.type
         self.schema = source.schema

@@ -29,7 +29,7 @@ class Notification(Base, TimestampMixin):
     action = Column(Text, nullable=False)
 
     #: The last update of the corresponding election/vote
-    last_change = Column(UTCDateTime, nullable=False)
+    last_modified = Column(UTCDateTime, nullable=True)
 
     #: The corresponding election id
     election_id = Column(Text, ForeignKey(Election.id), nullable=True)
@@ -45,7 +45,8 @@ class Notification(Base, TimestampMixin):
 
     def update_from_model(self, model):
         """ Copy """
-        self.last_change = model.last_result_change
+
+        self.last_modified = model.last_modified
         if isinstance(model, Election):
             self.election_id = model.id
         if isinstance(model, Vote):

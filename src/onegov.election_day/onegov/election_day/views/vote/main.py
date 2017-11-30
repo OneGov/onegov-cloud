@@ -75,7 +75,7 @@ def view_vote_json(self, request):
 
     @request.after
     def add_last_modified(response):
-        add_last_modified_header(response, self.last_result_change)
+        add_last_modified_header(response, self.last_modified)
 
     show_map = request.app.principal.is_year_available(self.date.year)
     media = {}
@@ -94,7 +94,7 @@ def view_vote_json(self, request):
         'completed': self.completed,
         'date': self.date.isoformat(),
         'domain': self.domain,
-        'last_modified': self.last_result_change.isoformat(),
+        'last_modified': self.last_modified.isoformat(),
         'progress': {
             'counted': counted,
             'total': self.progress[1]
@@ -178,7 +178,7 @@ def view_vote_summary(self, request):
 
     @request.after
     def add_last_modified(response):
-        add_last_modified_header(response, self.last_result_change)
+        add_last_modified_header(response, self.last_modified)
 
     return get_vote_summary(self, request)
 

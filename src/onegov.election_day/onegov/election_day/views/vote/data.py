@@ -39,7 +39,7 @@ def view_vote_data_as_json(self, request):
 
     @request.after
     def add_last_modified(response):
-        add_last_modified_header(response, self.last_result_change)
+        add_last_modified_header(response, self.last_modified)
 
     return Response(
         dumps(self.export(), sort_keys=True, indent=2).encode('utf-8'),
@@ -61,7 +61,7 @@ def view_vote_data_as_csv(self, request):
 
     @request.after
     def add_last_modified(response):
-        add_last_modified_header(response, self.last_result_change)
+        add_last_modified_header(response, self.last_modified)
 
     return Response(
         convert_list_of_dicts_to_csv(self.export()),
@@ -83,7 +83,7 @@ def view_vote_data_as_xlsx(self, request):
 
     @request.after
     def add_last_modified(response):
-        add_last_modified_header(response, self.last_result_change)
+        add_last_modified_header(response, self.last_modified)
 
     return Response(
         convert_list_of_dicts_to_xlsx(self.export()),

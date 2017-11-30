@@ -20,7 +20,7 @@ def get_election_summary(election, request, url=None):
     """ Returns some basic informations about the given election as a JSON
     seriazable dict. """
 
-    last_modified = election.last_result_change
+    last_modified = election.last_modified
     if last_modified:
         last_modified = last_modified.isoformat()
 
@@ -49,7 +49,7 @@ def get_vote_summary(vote, request, url=None):
     except AttributeError:
         divider = 1
 
-    last_modified = vote.last_result_change
+    last_modified = vote.last_modified
     if last_modified:
         last_modified = last_modified.isoformat()
 
@@ -191,7 +191,7 @@ def pdf_filename(item, locale):
     return '{}-{}.{}.{}.pdf'.format(
         'election' if isinstance(item, Election) else 'vote',
         sha256(item.id.encode('utf-8')).hexdigest(),
-        int(item.last_result_change.timestamp()),
+        int(item.last_modified.timestamp()),
         locale
     )
 
@@ -206,11 +206,11 @@ def svg_filename(item, type_, locale=None):
     if isinstance(item, Ballot):
         name = 'ballot'
         hash = str(item.id)
-        ts = int(item.vote.last_result_change.timestamp())
+        ts = int(item.vote.last_modified.timestamp())
     else:
         name = 'election' if isinstance(item, Election) else 'vote'
         hash = sha256(item.id.encode('utf-8')).hexdigest()
-        ts = int(item.last_result_change.timestamp())
+        ts = int(item.last_modified.timestamp())
 
     return '{}-{}.{}.{}.{}.svg'.format(name, hash, ts, type_, locale or 'any')
 

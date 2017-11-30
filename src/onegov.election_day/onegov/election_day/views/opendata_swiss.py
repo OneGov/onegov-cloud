@@ -98,7 +98,7 @@ def view_rdf(self, request):
         sub(
             ds, 'dct:modified',
             {'rdf:datatype': 'http://www.w3.org/2001/XMLSchema#dateTime'},
-            item.last_result_change.replace(microsecond=0).isoformat()
+            item.last_modified.replace(microsecond=0).isoformat()
         )
         sub(
             ds, 'dct:accrualPeriodicity',
@@ -267,7 +267,7 @@ def view_rdf(self, request):
             sub(
                 dist, 'dct:modified',
                 {'rdf:datatype': 'http://www.w3.org/2001/XMLSchema#dateTime'},
-                item.last_result_change.replace(microsecond=0).isoformat()
+                item.last_modified.replace(microsecond=0).isoformat()
             )
 
             # URLs

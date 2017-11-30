@@ -31,7 +31,7 @@ def view_ballot_as_map(self, request):
 
     @request.after
     def add_last_modified(response):
-        add_last_modified_header(response, self.vote.last_result_change)
+        add_last_modified_header(response, self.vote.last_modified)
 
     show_map = request.app.principal.is_year_available(self.vote.date.year)
     return {

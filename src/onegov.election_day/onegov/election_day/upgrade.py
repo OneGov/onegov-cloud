@@ -4,10 +4,11 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from onegov.ballot import Election
 from onegov.ballot import Vote
+from onegov.core.orm.types import JSON
+from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.models import ArchivedResult
-from onegov.core.orm.types import JSON
 from sqlalchemy import Column
 
 
@@ -109,4 +110,36 @@ def add_content_columns_to_archived_results(context):
     if not context.has_column('archived_results', 'content'):
         context.operations.add_column(
             'archived_results', Column('content', JSON)
+        )
+
+
+@upgrade_task('Change last change columns')
+def change_last_change_columns(context):
+    if not context.has_column('archived_results', 'last_modified'):
+        context.operations.add_column(
+            'archived_results',
+            Column('last_modified', UTCDateTime, nullable=True)
+        )
+    if context.has_column('archived_results', 'last_result_change'):
+        context.operations.execute(
+            'ALTER TABLE {} ALTER COLUMN {} DROP NOT NULL;'.format(
+                'archived_results', 'last_result_change'
+            )
+        )
+
+    if (
+        context.has_column('notifications', 'last_change') and
+        not context.has_column('notifications', 'last_modified')
+    ):
+        context.operations.execute(
+            'ALTER TABLE {} RENAME COLUMN {} TO {};'.format(
+                'notifications', 'last_change', 'last_modified'
+            )
+        )
+
+    if context.has_column('notifications', 'last_modified'):
+        context.operations.execute(
+            'ALTER TABLE {} ALTER COLUMN {} DROP NOT NULL;'.format(
+                'notifications', 'last_modified'
+            )
         )

@@ -34,7 +34,7 @@ def view_election_json(self, request):
 
     @request.after
     def add_last_modified(response):
-        add_last_modified_header(response, self.last_result_change)
+        add_last_modified_header(response, self.last_modified)
 
     media = {'charts': {}}
     if ElectionsLayout(self, request).pdf_path:
@@ -52,7 +52,7 @@ def view_election_json(self, request):
         'completed': self.completed,
         'date': self.date.isoformat(),
         'domain': self.domain,
-        'last_modified': self.last_result_change.isoformat(),
+        'last_modified': self.last_modified.isoformat(),
         'mandates': {
             'allocated': self.allocated_mandates or 0,
             'total': self.number_of_mandates or 0,
@@ -175,7 +175,7 @@ def view_election_summary(self, request):
 
     @request.after
     def add_last_modified(response):
-        add_last_modified_header(response, self.last_result_change)
+        add_last_modified_header(response, self.last_modified)
 
     return get_election_summary(self, request)
 

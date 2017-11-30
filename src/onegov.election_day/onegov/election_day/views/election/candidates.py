@@ -69,7 +69,7 @@ def view_election_candidates_chart(self, request):
 
     @request.after
     def add_last_modified(response):
-        add_last_modified_header(response, self.last_result_change)
+        add_last_modified_header(response, self.last_modified)
 
     return {
         'model': self,

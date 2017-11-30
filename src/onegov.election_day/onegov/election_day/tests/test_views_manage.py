@@ -65,8 +65,6 @@ def test_view_manage(election_day_app):
     new.form['mandates'] = 1
     manage = new.form.submit().follow()
 
-    last_result_change = archive.query().one().last_result_change
-
     assert "Elect a new president" in manage
     edit = manage.click('Bearbeiten')
     edit.form['election_de'] = 'Elect a new federal councillor'
@@ -75,7 +73,6 @@ def test_view_manage(election_day_app):
 
     assert "Elect a new federal councillor" in manage
     assert "Elect a new federal councillor" == archive.query().one().title
-    assert last_result_change != archive.query().one().last_result_change
 
     delete = manage.click("Löschen")
     assert "Wahl löschen" in delete
@@ -97,8 +94,6 @@ def test_view_manage(election_day_app):
     new.form['domain'] = 'federation'
     manage = new.form.submit().follow()
 
-    last_result_change = archive.query().one().last_result_change
-
     assert "Vote for a better yesterday" in manage
     edit = manage.click('Bearbeiten')
     edit.form['vote_de'] = 'Vote for a better tomorrow'
@@ -106,7 +101,6 @@ def test_view_manage(election_day_app):
 
     assert "Vote for a better tomorrow" in manage
     assert "Vote for a better tomorrow" == archive.query().one().title
-    assert last_result_change != archive.query().one().last_result_change
 
     delete = manage.click("Löschen")
     assert "Abstimmung löschen" in delete

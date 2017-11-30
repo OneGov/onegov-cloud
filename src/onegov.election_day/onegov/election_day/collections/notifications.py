@@ -19,7 +19,7 @@ class NotificationCollection(object):
 
         return self.query().filter(
             Notification.election_id == election.id,
-            Notification.last_change == election.last_result_change
+            Notification.last_modified == election.last_modified
         ).all()
 
     def by_vote(self, vote):
@@ -30,7 +30,7 @@ class NotificationCollection(object):
 
         return self.query().filter(
             Notification.vote_id == vote.id,
-            Notification.last_change == vote.last_result_change
+            Notification.last_modified == vote.last_modified
         ).all()
 
     def trigger(self, request, model):

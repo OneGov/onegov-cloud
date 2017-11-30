@@ -100,7 +100,7 @@ class ArchivedResultCollection(object):
         )
 
         last_modified = self.session.query(
-            func.max(query.subquery().c.last_result_change)
+            func.max(query.subquery().c.last_modified)
         )
 
         return query.all(), (last_modified.first() or [None])[0]
@@ -131,20 +131,16 @@ class ArchivedResultCollection(object):
             )
 
             last_modified = self.session.query(
-                func.max(query.subquery().c.last_result_change)
+                func.max(query.subquery().c.last_modified)
             )
 
             return query.all(), (last_modified.first() or [None])[0]
 
-    def update(self, item, request, force=False):
+    def update(self, item, request):
         """ Updates a result. """
         url = request.link(item)
 
         result = self.query().filter_by(url=url).first()
-        if result:
-            unchanged = result.last_result_change == item.last_result_change
-            if unchanged and not force:
-                return result
 
         add_result = False
         if not result:
@@ -159,6 +155,7 @@ class ArchivedResultCollection(object):
         result.shortcode = item.shortcode
         result.title = item.title
         result.title_translations = item.title_translations
+        result.last_modified = item.last_modified
         result.last_result_change = item.last_result_change
         result.external_id = item.id
         result.counted = item.counted
@@ -213,7 +210,7 @@ class ArchivedResultCollection(object):
         assert isinstance(item, Election) or isinstance(item, Vote)
 
         item.clear_results()
-        self.update(item, request, force=True)
+        self.update(item, request)
 
         self.session.flush()
 

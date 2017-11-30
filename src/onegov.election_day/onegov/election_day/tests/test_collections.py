@@ -1,6 +1,10 @@
-from datetime import date, datetime, timezone
+from datetime import date
 from freezegun import freeze_time
-from onegov.ballot.models import Election, Vote
+from onegov.ballot.models import Ballot
+from onegov.ballot.models import BallotResult
+from onegov.ballot.models import Election
+from onegov.ballot.models import ElectionResult
+from onegov.ballot.models import Vote
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import DataSourceCollection
 from onegov.election_day.collections import DataSourceItemCollection
@@ -156,6 +160,7 @@ def test_archived_results(session):
     archive = ArchivedResultCollection(session)
     request = DummyRequest()
 
+    # Add elections and votes
     elections = {
         year: Election(
             title="Election {}".format(year),
@@ -178,6 +183,7 @@ def test_archived_results(session):
 
     session.flush()
 
+    # Test get_years / query
     assert archive.get_years() == []
 
     archive.update(elections[2001], request)
@@ -219,6 +225,7 @@ def test_archived_results(session):
     assert archive.get_years() == [2003, 2001]
     assert archive.query().count() == 4
 
+    # Test update election
     result = archive.update(elections[2001], request)
     assert result.url == 'Election/election-2001'
     assert result.schema
@@ -227,7 +234,8 @@ def test_archived_results(session):
     assert result.shortcode == None
     assert result.title == 'Election 2001'
     assert result.title_translations == {'de_CH': 'Election 2001'}
-    assert result.last_result_change
+    assert result.last_modified is not None
+    assert result.last_result_change is None
     assert result.type == 'election'
     assert result.counted_entities == None
     assert result.total_entities == None
@@ -235,38 +243,62 @@ def test_archived_results(session):
     assert result.external_id == 'election-2001'
     assert result.elected_candidates == []
 
-    last_result_change = result.last_result_change
-
     elections[2001].title = 'Election'
     elections[2001].shortcode = 'shortcode'
     result = archive.update(elections[2001], request)
 
-    assert result.last_result_change != last_result_change
+    assert result.last_modified is not None
+    assert result.last_result_change is None
     assert result.title == 'Election'
     assert result.shortcode == 'shortcode'
     assert result.title_translations == {'de_CH': 'Election'}
 
-    result = archive.update(votes[2001], request)
-    result.url = 'Vote/vote-2001'
-    result.schema
-    result.domain = 'federation'
-    result.date = date(2001, 1, 1)
-    result.shortcode = None
-    result.title = 'Vote 2001'
-    result.title_translations = {'de_CH': 'Vote 2001'}
-    result.last_result_change
+    elections[2001].results.append(
+        ElectionResult(
+            group='group',
+            entity_id=1,
+            elegible_voters=100,
+            received_ballots=50,
+            blank_ballots=2,
+            invalid_ballots=5,
+            blank_votes=4,
+            invalid_votes=3
+        )
+    )
+    result = archive.update(elections[2001], request)
+    assert result.last_result_change is not None
 
-    last_result_change = result.last_result_change
+    # Test update vote
+    result = archive.update(votes[2001], request)
+    assert result.url == 'Vote/vote-2001'
+    assert result.schema
+    assert result.domain == 'federation'
+    assert result.date == date(2001, 1, 1)
+    assert result.shortcode == None
+    assert result.title == 'Vote 2001'
+    assert result.title_translations == {'de_CH': 'Vote 2001'}
+    assert result.last_modified is not None
+    assert result.last_result_change is None
 
     votes[2001].title = 'Vote'
     votes[2001].shortcode = 'shortcode'
     result = archive.update(votes[2001], request)
 
-    assert result.last_result_change != last_result_change
+    assert result.last_modified is not None
+    assert result.last_result_change is None
     assert result.title == 'Vote'
     assert result.shortcode == 'shortcode'
     assert result.title_translations == {'de_CH': 'Vote'}
     assert result.external_id == 'vote-2001'
+
+    votes[2001].ballots.append(Ballot(type='proposal'))
+    votes[2001].proposal.results.append(
+        BallotResult(
+            group='x', yeas=100, nays=0, counted=True, entity_id=1
+        )
+    )
+    result = archive.update(votes[2001], request)
+    assert result.last_result_change is not None
 
 
 def test_notification_collection(session):
@@ -274,7 +306,8 @@ def test_notification_collection(session):
 
     election = None
     vote = None
-    with freeze_time("2008-01-01 00:00"):
+    with freeze_time("2008-01-01"):
+        # Add an election and a vote
         session.add(
             Election(
                 title="Election",
@@ -296,6 +329,7 @@ def test_notification_collection(session):
         assert collection.by_election(election) == []
         assert collection.by_vote(vote) == []
 
+        # No notifications configured
         request = DummyRequest()
         collection.trigger(request, election)
         collection.trigger(request, vote)
@@ -303,6 +337,7 @@ def test_notification_collection(session):
         assert collection.by_election(election) == []
         assert collection.by_vote(vote) == []
 
+        # Add a webhook
         request.app.principal.webhooks = {'http://abc.com/1': None}
         collection.trigger(request, election)
         collection.trigger(request, vote)
@@ -311,26 +346,23 @@ def test_notification_collection(session):
         assert len(notifications) == 1
         assert notifications[0].action == 'webhooks'
         assert notifications[0].election_id == election.id
-        assert notifications[0].last_change == datetime(2008, 1, 1, 0, 0,
-                                                        tzinfo=timezone.utc)
+        assert notifications[0].last_modified.isoformat().startswith('2008-01')
 
         notifications = collection.by_vote(vote)
         assert len(notifications) == 1
         assert notifications[0].action == 'webhooks'
         assert notifications[0].vote_id == vote.id
-        assert notifications[0].last_change == datetime(2008, 1, 1, 0, 0,
-                                                        tzinfo=timezone.utc)
+        assert notifications[0].last_modified.isoformat().startswith('2008-01')
 
-    with freeze_time("2009-01-01 00:00"):
+    with freeze_time("2009-01-01"):
         vote.title = "A vote"
         election.title = "An election"
         session.flush()
 
-        freezed = datetime(2009, 1, 1, 0, 0, tzinfo=timezone.utc)
-
         assert collection.by_election(election) == []
         assert collection.by_vote(vote) == []
 
+        # Add a webhook and SMS notification
         request = DummyRequest(session=session)
         request.app.principal.webhooks = {'http://abc.com/1': None}
         request.app.principal.sms_notification = 'http://example.com'
@@ -344,8 +376,8 @@ def test_notification_collection(session):
         assert notifications[0].action != notifications[1].action
         assert notifications[0].election_id == election.id
         assert notifications[1].election_id == election.id
-        assert notifications[0].last_change == freezed
-        assert notifications[1].last_change == freezed
+        assert notifications[0].last_modified.isoformat().startswith('2009-01')
+        assert notifications[1].last_modified.isoformat().startswith('2009-01')
 
         notifications = collection.by_vote(vote)
         assert len(notifications) == 2
@@ -354,8 +386,8 @@ def test_notification_collection(session):
         assert notifications[0].action != notifications[1].action
         assert notifications[0].vote_id == vote.id
         assert notifications[1].vote_id == vote.id
-        assert notifications[0].last_change == freezed
-        assert notifications[1].last_change == freezed
+        assert notifications[0].last_modified.isoformat().startswith('2009-01')
+        assert notifications[1].last_modified.isoformat().startswith('2009-01')
 
         collection.trigger(request, election)
         collection.trigger(request, vote)
