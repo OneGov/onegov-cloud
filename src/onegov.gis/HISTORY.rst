@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Renders icon in marker as svg, not html.
+  [href]
+
 0.5.1 (2017-11-29)
 ~~~~~~~~~~~~~~~~~~~
 

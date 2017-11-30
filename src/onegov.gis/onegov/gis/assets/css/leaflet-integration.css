@@ -82,8 +82,8 @@
     Leaflet marker styles
 */
 .vector-marker {
-    width: 30px;
-    height: 39px;
+    width: 28px;
+    height: 37px;
     position: absolute;
     left: 0;
     top: 0;
@@ -91,20 +91,6 @@
     text-align: center;
     -webkit-filter: drop-shadow(1px 0px 2px #999);
     filter: drop-shadow(1px 0px 2px #999);
-}
-
-.vector-marker i {
-    position: absolute;
-    left: 0;
-    transform: translateY(8px);
-    width: 100%;
-    color: #333;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-    display: inline-block;
-    font-size: 14px;
-    z-index: 1000;
 }
 
 /*

@@ -1,4 +1,18 @@
 /*
+    Leaflet Vector Marker Template
+*/
+var vectorMarkerSVGTemplate = '<svg width="28" height="37" viewBox="0 0 28 37" xmlns="http://www.w3.org/2000/svg" version="1.1"><path transform="translate(2 2)" text-anchor="middle" fill="{{marker-color}}" fill-rule="nonzero" stroke="{{border-color}}" stroke-width="3" d="M12,0 C5.37136723,0 0,5.37130729 0,11.9998721 C0,14.6408328 0.85563905,17.0808246 2.30116496,19.0628596 L12,31.5826752 L21.698835,19.0628596 C23.1443609,17.0808246 24,14.6408328 24,11.9998721 C24,5.37130729 18.6286328,0 12,0 L12,0 Z"></path><text x="50%" y="50%" fill="{{icon-color}}" font-family="FontAwesome" font-size="14" text-anchor="middle" alignment-baseline="center">{{icon}}</text></svg>';
+
+function VectorMarkerSVG(markerColor, borderColor, iconColor, icon) {
+    icon = '&#x' + (icon || 'f111').replace('\\', '');
+    return vectorMarkerSVGTemplate
+        .replace('{{marker-color}}', markerColor)
+        .replace('{{border-color}}', borderColor)
+        .replace('{{icon-color}}', iconColor)
+        .replace('{{icon}}', icon);
+}
+
+/*
     Leaflet Vector Marker (ish)
 
     This is not actually leaflet-vector marker anymore, it's the same idea and
@@ -10,48 +24,36 @@ L.VectorMarkers.Icon = L.Icon.extend({
     options: {
         className: "vector-marker",
         extraClasses: [],
-        prefix: "fa",
-        icon: "fa-circle",
+        icon: "f111",
         markerColor: "blue",
-        strokeColor: "white",
+        borderColor: "white",
         iconColor: "white",
-        popupAnchor: [1, -27],
-        size: [30, 39],
-        svg: '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg width="30px" height="39px" viewBox="0 0 30 39" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><path d="M15,3 C8.37136723,3 3,8.37130729 3,14.9998721 C3,17.6408328 3.85563905,20.0808246 5.30116496,22.0628596 L15,34.5826752 L24.698835,22.0628596 C26.1443609,20.0808246 27,17.6408328 27,14.9998721 C27,8.37130729 21.6286328,3 15,3 L15,3 Z" id="marker" stroke="{{stroke-color}}" stroke-width="3" fill="{{color}}"></path></g></svg>'
+        popupAnchor: [1, -31],
+        size: [28, 37]
     },
     initialize: function(options) {
         return L.Util.setOptions(this, options);
     },
     createIcon: function(oldIcon) {
         var div = (oldIcon && oldIcon.tagName === "DIV" ? oldIcon : document.createElement("div"));
-        div.innerHTML = this.options.svg
-            .replace('{{color}}', this.options.markerColor)
-            .replace('{{stroke-color}}', this.options.strokeColor);
-        div.classList.add(this.options.className);
 
+        div.innerHTML = VectorMarkerSVG(
+            this.options.markerColor,
+            this.options.borderColor,
+            this.options.iconColor,
+            this.options.icon
+        );
+
+        div.classList.add(this.options.className);
         for (var i = 0; i < this.options.extraClasses.length; i++) {
             div.classList.add(this.options.extraClasses[i]);
         }
 
-        if (this.options.icon) {
-            div.appendChild(this.createInnerIcon());
-        }
-
         var size = L.point(this.options.size);
-
         div.style.marginLeft = (-size.x / 2) + 'px';
         div.style.marginTop = (-size.y) + 'px';
 
         return div;
-    },
-    createInnerIcon: function() {
-        var i = document.createElement('i');
-
-        i.classList.add(this.options.prefix);
-        i.classList.add(this.options.icon);
-        i.style.color = this.options.iconColor;
-
-        return i;
     }
 });
 
@@ -101,8 +103,6 @@ function asMarkerMap(map, input) {
     var marker;
     var coordinates = getCoordinates(input);
     var icon = L.VectorMarkers.icon({
-        prefix: 'fa',
-        icon: 'fa-circle',
         markerColor: input.data('marker-color') || $('body').data('default-marker-color') || '#006fba'
     });
 
@@ -335,8 +335,6 @@ var MapboxMarkerMap = function(target) {
     /* for now we do not support clicking the marker, so we use marker-noclick
     as a way to disable the pointer cursor */
     var icon = L.VectorMarkers.icon({
-        prefix: 'fa',
-        icon: 'fa-circle',
         extraClasses: ['marker-' + target.data('map-type')],
         markerColor: target.data('marker-color') || $('body').data('default-marker-color') || '#006fba'
     });
@@ -366,8 +364,6 @@ var MapboxGeojsonMap = function(target) {
     var map = spawnDefaultMap(target, lat, lon, zoom, includeZoomControls);
 
     var icon = L.VectorMarkers.icon({
-        prefix: 'fa',
-        icon: 'fa-circle',
         markerColor: $('body').data('default-marker-color') || '#006fba'
     });
 
