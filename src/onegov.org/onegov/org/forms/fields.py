@@ -1,4 +1,4 @@
-from onegov.org.utils import annotate_html
+from onegov.org.utils import annotate_html, remove_empty_paragraphs
 from onegov.form.fields import HtmlField as HtmlFieldBase
 
 
@@ -11,4 +11,8 @@ class HtmlField(HtmlFieldBase):
 
     def pre_validate(self, form):
         super(HtmlField, self).pre_validate(form)
-        self.data = annotate_html(self.data, form.request)
+        self.data = remove_empty_paragraphs(
+            annotate_html(
+                self.data, form.request
+            )
+        )

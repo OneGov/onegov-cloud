@@ -17,6 +17,11 @@ from operator import attrgetter
 from purl import URL
 
 
+# for our empty paragraphs approach we don't need a full-blown xml parser
+# since we only remove a very limited set of paragraphs
+EMPTY_PARAGRAPHS = re.compile(r'<p>\s*<br>\s*</p>')
+
+
 def djb2_hash(text, size):
     """ Implementation of the djb2 hash, a simple hash function with a
     configurable table size.
@@ -138,6 +143,13 @@ def annotate_html(html, request=None):
         set_image_sizes(images, request)
 
     return ''.join(tostring(e).decode('utf-8') for e in fragments)
+
+
+def remove_empty_paragraphs(html):
+    if not html:
+        return html
+
+    return EMPTY_PARAGRAPHS.sub('', html)
 
 
 def set_image_sizes(images, request):

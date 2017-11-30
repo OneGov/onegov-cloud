@@ -41,6 +41,25 @@ def test_annotate_html():
     assert 'class="has-video"></a>' in utils.annotate_html(html)
 
 
+def test_remove_empty_paragraphs():
+    html = "<p><br></p>"
+    assert utils.remove_empty_paragraphs(html) == ""
+
+    # multiple br elements added by shift+enter are left alone (this is
+    # a way to manually override the empty paragraphs removal)
+    html = "<p><br><br></p>"
+    assert utils.remove_empty_paragraphs(html) == "<p><br><br></p>"
+
+    html = "<p> <br></p>"
+    assert utils.remove_empty_paragraphs(html) == ""
+
+    html = "<p>hey</p>"
+    assert utils.remove_empty_paragraphs(html) == "<p>hey</p>"
+
+    html = "<p><img></p>"
+    assert utils.remove_empty_paragraphs(html) == "<p><img></p>"
+
+
 def test_predict_next_value():
     assert utils.predict_next_value((1, )) is None
     assert utils.predict_next_value((1, 1)) is None
