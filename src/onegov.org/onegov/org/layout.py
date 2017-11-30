@@ -64,8 +64,8 @@ class Layout(ChameleonLayout):
 
     """
 
-    date_long_without_year_format = 'd. MMMM'
-    datetime_long_without_year_format = 'd. MMMM HH:mm'
+    date_long_without_year_format = 'E d. MMMM'
+    datetime_long_without_year_format = 'E d. MMMM HH:mm'
 
     @property
     def org(self):

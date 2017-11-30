@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Changes the long date format to include the weekday.
+  [href]
+
 - Highlights the parent link in each breadcrumb.
   [href]
 
