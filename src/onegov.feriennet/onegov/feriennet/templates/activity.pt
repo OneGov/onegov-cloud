@@ -39,8 +39,10 @@
                     <div tal:define="period occasions[0].period" class="${period.active and 'active-occasions' or 'inactive-occasions'}">
                         <h3>${title}</h3>
 
-                        <div class="hints">
-                            <tal:block metal:use-macro="layout.macros.period_hints" />
+                        <div class="panel">
+                            <div class="hints">
+                                <tal:block metal:use-macro="layout.macros.period_hints" />
+                            </div>
                         </div>
 
                         <ul class="occasions">

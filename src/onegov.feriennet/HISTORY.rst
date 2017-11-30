@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves the look of the occasions in the activity view.
+  [href]
+
 - Stops muted tickets from sending activity publication e-mails.
   [href]
 
