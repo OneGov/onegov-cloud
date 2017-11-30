@@ -1,3 +1,4 @@
+import pytest
 import transaction
 
 from onegov.directory import DirectoryCollection
@@ -19,14 +20,18 @@ def test_browse_activities(browser):
     assert not other.is_text_present("Noch keine Aktivität")
 
 
-def test_browse_directory_uploads(browser, org_app):
+@pytest.mark.parametrize("field", (
+    'Photo = *.png|*.jpg',
+    'Photo *= *.png|*.jpg',
+))
+def test_browse_directory_uploads(browser, org_app, field):
     DirectoryCollection(org_app.session(), type='extended').add(
         title="Crime Scenes",
         structure="""
             Name *= ___
             Description *= ...
-            Photo = *.png|*.jpg
-        """,
+            {field}
+        """.format(field=field),
         configuration="""
             title:
                 - name
@@ -83,7 +88,10 @@ def test_browse_directory_uploads(browser, org_app):
     browser.choose('photo', 'delete')
     browser.find_by_value("Absenden").click()
 
-    assert not browser.is_element_present_by_css('.field-display img')
+    if field.startswith('Photo ='):
+        assert not browser.is_element_present_by_css('.field-display img')
+    else:
+        assert browser.is_text_present("Dieses Feld wird benötigt")
 
 
 def test_browse_directory_editor(browser, org_app):
