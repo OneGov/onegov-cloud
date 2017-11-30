@@ -151,12 +151,12 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
                     continue
 
                 # keep files if selected in the dialog
-                if values[field.id].data is None:
+                if getattr(values[field.id], 'action', None) == 'keep':
                     updated[field.id] = entry.values[field.id]
                     continue
 
                 # delete files if selected in the dialog
-                if not values[field.id].data:
+                if getattr(values[field.id], 'action', None) == 'delete':
                     updated[field.id] = {}
                     continue
 

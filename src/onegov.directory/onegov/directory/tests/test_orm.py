@@ -280,7 +280,7 @@ def test_files(session):
     file_id = session.query(File).one().id
     press_releases.update(iphone_found, dict(
         title="iPhone Found in Ancient Ruins in the Andes",
-        file=Bunch(data=None)  # keep the file (from onegov.form)
+        file=Bunch(data=None, action='keep')  # keep the file -> onegov.form
     ))
     commit()
 
@@ -288,7 +288,7 @@ def test_files(session):
 
     press_releases.update(iphone_found, dict(
         title="iPhone Found in Ancient Ruins in the Andes",
-        file=Bunch(data={})  # delete the file (from onegov.form)
+        file=Bunch(data={}, action='delete')  # delete the file -> onegov.form
     ))
     commit()
 
