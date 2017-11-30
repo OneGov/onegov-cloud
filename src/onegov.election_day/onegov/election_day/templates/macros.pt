@@ -321,11 +321,11 @@
     <h3 i18n:translate="">Open Data</h3>
     <p i18n:translate="">The raw data used to display the results is available in the following formats:</p>
     <p>
-        <ul>
+        <ol>
             <li><a href="${request.link(model, 'data-json')}">JSON</a></li>
             <li><a href="${request.link(model, 'data-csv')}">CSV</a></li>
             <li><a href="${request.link(model, 'data-xlsx')}">XLSX</a></li>
-        </ul>
+        </ol>
     </p>
     <p><span i18n:translate="">The format of the data is described here:</span> <a href="${layout.opendata_link}"><span i18n:translate="">Format Description</span></a>.</p>
 </metal:open_data_download>
@@ -337,7 +337,15 @@
         <ul>
             <li i18n:translate="">You may use this dataset for non-commercial purposes.</li>
             <li i18n:translate="">You may use this dataset for commercial purposes.</li>
-            <li i18n:translate="">You must provide the source (author, title and link to the dataset).</li>
+            <li>
+                <tal:block i18n:translate="">You must provide the source (author, title and link to the dataset).</tal:block>
+                <ol class="citations">
+                    <li>${layout.principal.name} (${layout.format_date(model.last_result_change, 'datetime_long')}). <cite>${model.title} (JSON)</cite>. ${request.link(model, 'data-json')}.</li>
+                    <li>${layout.principal.name} (${layout.format_date(model.last_result_change, 'datetime_long')}). <cite>${model.title} (CSV)</cite>. ${request.link(model, 'data-csv')}.</li>
+                    <li>${layout.principal.name} (${layout.format_date(model.last_result_change, 'datetime_long')}). <cite>${model.title} (XLSX)</cite>. ${request.link(model, 'data-xlsx')}.</li>
+                <ol>
+
+            </li>
         </ul>
         <a href="${layout.terms_link}"><img width="100" height="80" src="${layout.terms_icon}" alt="terms"></a>
     </p>

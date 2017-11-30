@@ -4,6 +4,9 @@ Changelog
 - Improves calculation of last changes.
   [msom]
 
+- Provides open data citation examples.
+  [msom]
+
 1.17.1 (2017-11-28)
 ~~~~~~~~~~~~~~~~~~~
 
