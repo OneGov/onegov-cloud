@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Highlights the parent link in each breadcrumb.
+  [href]
+
 0.18.5 (2017-11-30)
 ~~~~~~~~~~~~~~~~~~~
 
