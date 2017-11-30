@@ -35,7 +35,8 @@ def write_config(path, postgres_dsn, temporary_directory):
                         temporary_directory
                     ),
                     'lockfile_path': temporary_directory,
-                    'd3_renderer': 'http://localhost:1337'
+                    'd3_renderer': 'http://localhost:1337',
+                    'disable_memcached': True
                 },
             }
         ]
