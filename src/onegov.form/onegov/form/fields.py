@@ -1,3 +1,5 @@
+import inspect
+
 from onegov.core.html import sanitize_html
 from onegov.core.utils import binary_to_dictionary
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
@@ -5,6 +7,7 @@ from onegov.form.widgets import MultiCheckboxWidget
 from onegov.form.widgets import OrderedMultiCheckboxWidget
 from onegov.form.widgets import UploadWidget
 from wtforms import FileField, SelectMultipleField, TextAreaField, widgets
+from wtforms.validators import DataRequired, InputRequired
 
 
 class MultiCheckboxField(SelectMultipleField):
@@ -30,6 +33,26 @@ class UploadField(FileField):
     widget = UploadWidget()
 
     @property
+    def data(self):
+        caller = inspect.currentframe().f_back.f_locals.get('self')
+
+        # give the required validators the idea that the data is there
+        # when the action was to keep the current file - an evil approach
+        if isinstance(caller, (DataRequired, InputRequired)):
+            truthy = (
+                getattr(self, '_data', None) or
+                getattr(self, 'action', None) == 'keep'
+            )
+
+            return truthy
+
+        return getattr(self, '_data', None)
+
+    @data.setter
+    def data(self, value):
+        self._data = value
+
+    @property
     def is_image(self):
         return self.data and\
             self.data.get('mimetype') in IMAGE_MIME_TYPES_AND_SVG
@@ -39,16 +62,16 @@ class UploadField(FileField):
         # indicating if the existing file should be replaced, kept or deleted
         if valuelist:
             if len(valuelist) == 2:
-                action, fieldstorage = valuelist
+                self.action, fieldstorage = valuelist
             else:
-                action = 'replace'
+                self.action = 'replace'
                 fieldstorage = valuelist[0]
 
-            if action == 'replace':
+            if self.action == 'replace':
                 self.data = self.process_fieldstorage(fieldstorage)
-            elif action == 'delete':
+            elif self.action == 'delete':
                 self.data = {}
-            elif action == 'keep':
+            elif self.action == 'keep':
                 pass
             else:
                 raise NotImplementedError()

@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes complex file input field not working as required field.
+  [href]
+
 0.26.3 (2017-11-08)
 ~~~~~~~~~~~~~~~~~~~
 
