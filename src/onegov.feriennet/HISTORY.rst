@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Stops muted tickets from sending activity publication e-mails.
+  [href]
+
 - Adds activity messages to publiation/archival of activities.
   [href]
 

@@ -553,7 +553,7 @@ def administer_activity(model, request, action, template, subject):
     # execute state change
     getattr(model, action)()
 
-    if request.current_username != model.username:
+    if request.current_username != model.username and not ticket.muted:
         send_html_mail(
             request=request,
             template=template,
