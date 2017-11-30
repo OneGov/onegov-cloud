@@ -1,10 +1,10 @@
-from onegov.ballot.models.vote.ballot_result import BallotResult
-from onegov.ballot.models.vote.ballot import Ballot
-from onegov.ballot.models.vote.mixins import DerivedBallotsCountMixin
 from collections import OrderedDict
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.ballot.models.mixins import StatusMixin
 from onegov.ballot.models.mixins import summarized_property
+from onegov.ballot.models.vote.ballot import Ballot
+from onegov.ballot.models.vote.ballot_result import BallotResult
+from onegov.ballot.models.vote.mixins import DerivedBallotsCountMixin
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
@@ -183,39 +183,34 @@ class Vote(Base, TimestampMixin, DerivedBallotsCountMixin,
         return expr
 
     @property
-    def last_result_change(self):
-        """ Gets the latest created/modified date of the vote or amongst the
-        results of this vote.
+    def last_modified(self):
+        """ Returns last change of the vote, its ballots and any of its
+        results.
 
         """
+        ballots = object_session(self).query(Ballot.last_change)
+        ballots = ballots.order_by(desc(Ballot.last_change))
+        ballots = ballots.filter(Ballot.vote_id == self.id)
+        ballots = ballots.first()[0] if ballots.first() else None
 
-        last_changes = []
-        if self.last_change:
-            last_changes.append(self.last_change)
+        changes = [ballots, self.last_change, self.last_result_change]
+        changes = [change for change in changes if change]
+        return max(changes) if changes else None
+
+    @property
+    def last_result_change(self):
+        """ Returns the last change of the results of the vote. """
 
         session = object_session(self)
-
-        ballots = session.query(Ballot)
-        ballots = ballots.filter(Ballot.vote_id == self.id)
-        ballots = ballots.all()
-        for ballot in ballots:
-            last_changes.append(ballot.last_change)
-
-        ballot_ids = [ballot.id for ballot in ballots]
-        if ballot_ids:
-            results = session.query(BallotResult)
-            results = results.with_entities(BallotResult.last_change)
-            results = results.order_by(desc(BallotResult.last_change))
-            results = results.filter(BallotResult.ballot_id.in_(ballot_ids))
-
-            last_change = results.first()
-            if last_change:
-                last_changes.append(last_change[0])
-
-        if not len(last_changes):
+        ballot_ids = session.query(Ballot.id)
+        ballot_ids = ballot_ids.filter(Ballot.vote_id == self.id).all()
+        if not ballot_ids:
             return None
 
-        return max(last_changes)
+        results = session.query(BallotResult.last_change)
+        results = results.order_by(desc(BallotResult.last_change))
+        results = results.filter(BallotResult.ballot_id.in_(ballot_ids))
+        return results.first()[0] if results.first() else None
 
     #: may be used to store a link related to this vote
     related_link = meta_property('related_link')

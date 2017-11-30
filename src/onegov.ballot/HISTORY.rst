@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves calculation of last changes.
+  [msom]
+
 1.10.0 (2017-11-28)
 ~~~~~~~~~~~~~~~~~~~
 

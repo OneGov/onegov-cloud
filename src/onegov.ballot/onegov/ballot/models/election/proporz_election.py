@@ -47,44 +47,62 @@ class ProporzElection(Election):
     )
 
     @property
-    def last_result_change(self):
-        """ Gets the latest created/modified date of the election or amongst
-        the results of this election.
-
-        This does include changes made to the election itself (title, ...),
-        the candidate results and the party results.
-
-        This does not include changes made to candidates, lists, list
-        connections and children of election results such as candidate
-        results, list results, ...
+    def last_modified(self):
+        """ Returns last change of the election, its candidates, lists, list
+        connections and any of its results.
 
         """
+        session = object_session(self)
 
-        last_changes = []
+        changed = super(ProporzElection, self).last_modified
 
-        if self.last_change:
-            last_changes.append(self.last_change)
+        connections = session.query(ListConnection.last_change)
+        connections = connections.order_by(desc(ListConnection.last_change))
+        connections = connections.filter(ListConnection.election_id == self.id)
+        connections = connections.first()[0] if connections.first() else None
 
-        results = object_session(self).query(ElectionResult)
-        results = results.with_entities(ElectionResult.last_change)
-        results = results.order_by(desc(ElectionResult.last_change))
-        results = results.filter(ElectionResult.election_id == self.id)
-        last_change = results.first()
-        if last_change:
-            last_changes.append(last_change[0])
+        lists = session.query(List.last_change)
+        lists = lists.order_by(desc(List.last_change))
+        lists = lists.filter(List.election_id == self.id)
+        lists = lists.first()[0] if lists.first() else None
 
-        results = object_session(self).query(PartyResult)
-        results = results.with_entities(PartyResult.last_change)
-        results = results.order_by(desc(PartyResult.last_change))
-        results = results.filter(PartyResult.election_id == self.id)
-        last_change = results.first()
-        if last_change:
-            last_changes.append(last_change[0])
+        changes = [changed, connections, lists]
+        changes = [change for change in changes if change]
+        return max(changes) if changes else None
 
-        if not len(last_changes):
-            return None
+    @property
+    def last_result_change(self):
+        """ Returns the last change of the results of the election and the
+        candidates.
 
-        return max(last_changes)
+        """
+        session = object_session(self)
+
+        changed = super(ProporzElection, self).last_result_change
+
+        lists = None
+        pan = None
+        ids = session.query(List.id)
+        ids = ids.filter(List.election_id == self.id).all()
+        if ids:
+            lists = session.query(ListResult.last_change)
+            lists = lists.order_by(desc(ListResult.last_change))
+            lists = lists.filter(ListResult.list_id.in_(ids))
+            lists = lists.first()[0] if lists.first() else None
+
+            pan = session.query(PanachageResult.last_change)
+            pan = pan.order_by(desc(PanachageResult.last_change))
+            pan = pan.filter(PanachageResult.target_list_id.in_(ids))
+            pan = pan.first()[0] if pan.first() else None
+
+        parties = session.query(PartyResult.last_change)
+        parties = parties.order_by(desc(PartyResult.last_change))
+        parties = parties.filter(PartyResult.election_id == self.id)
+        parties = parties.first()[0] if parties.first() else None
+
+        changes = [changed, lists, pan, parties]
+        changes = [change for change in changes if change]
+        return max(changes) if changes else None
 
     @property
     def has_panachage_data(self):

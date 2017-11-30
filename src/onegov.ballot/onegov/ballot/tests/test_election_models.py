@@ -306,21 +306,22 @@ def test_election_counted(session):
     assert election.progress == (2, 0)
 
 
-def test_election_last_result_change(session):
-    with freeze_time("2014-01-01 12:00"):
+def test_election_last_change(session):
+    # Add the election
+    with freeze_time("2014-01-01"):
         election = Election(
             title='Legislative Election',
             domain='federation',
             date=date(2015, 6, 14),
         )
-
         session.add(election)
         session.flush()
 
-    assert election.last_result_change.isoformat() == \
-        '2014-01-01T12:00:00+00:00'
+    assert election.last_modified.isoformat().startswith('2014-01-01')
+    assert election.last_result_change == None
 
-    with freeze_time("2015-01-01 12:00"):
+    # Add a result
+    with freeze_time("2014-01-02"):
         election.results.append(ElectionResult(
             group='group',
             entity_id=1,
@@ -331,13 +332,13 @@ def test_election_last_result_change(session):
             blank_votes=4,
             invalid_votes=3
         ))
-
         session.flush()
 
-    assert election.last_result_change.isoformat() == \
-        '2015-01-01T12:00:00+00:00'
+    assert election.last_modified.isoformat().startswith('2014-01-02')
+    assert election.last_result_change.isoformat().startswith('2014-01-02')
 
-    with freeze_time("2015-01-01 13:00"):
+    # Add another result
+    with freeze_time("2014-01-03"):
         election.results.append(ElectionResult(
             group='group',
             entity_id=2,
@@ -348,11 +349,256 @@ def test_election_last_result_change(session):
             blank_votes=12,
             invalid_votes=9
         ))
-
         session.flush()
 
-    assert election.last_result_change.isoformat() == \
-        '2015-01-01T13:00:00+00:00'
+    # Add a candidate
+    with freeze_time("2014-01-04"):
+        candidate = Candidate(
+            elected=True,
+            candidate_id='1',
+            family_name='Quimby',
+            first_name='Joe'
+        )
+        election.candidates.append(candidate)
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-04')
+    assert election.last_result_change.isoformat().startswith('2014-01-03')
+
+    # Add candidate results
+    with freeze_time("2014-01-05"):
+        election.results.first().candidate_results.append(
+            CandidateResult(candidate_id=candidate.id, votes=520)
+        )
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-05')
+    assert election.last_result_change.isoformat().startswith('2014-01-05')
+
+    # Change a result
+    with freeze_time("2014-01-06"):
+        election.results.first().blank_ballots = 7
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-06')
+    assert election.last_result_change.isoformat().startswith('2014-01-06')
+
+    # Change the candidate result
+    with freeze_time("2014-01-07"):
+        election.candidates.first().results.first().votes = 510
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-07')
+    assert election.last_result_change.isoformat().startswith('2014-01-07')
+
+    # Change the candidate
+    with freeze_time("2014-01-08"):
+        election.candidates.first().elected = False
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-08')
+    assert election.last_result_change.isoformat().startswith('2014-01-07')
+
+    # Change the election
+    with freeze_time("2014-01-09"):
+        election.domain = 'canton'
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-09')
+    assert election.last_result_change.isoformat().startswith('2014-01-07')
+
+
+def test_election_last_change_proporz(session):
+    # Add the election
+    with freeze_time("2014-01-01"):
+        election = ProporzElection(
+            title='Legislative Election',
+            domain='federation',
+            date=date(2015, 6, 14),
+        )
+        session.add(election)
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-01')
+    assert election.last_result_change == None
+
+    # Add a result
+    with freeze_time("2014-01-02"):
+        election.results.append(ElectionResult(
+            group='group',
+            entity_id=1,
+            elegible_voters=100,
+            received_ballots=50,
+            blank_ballots=2,
+            invalid_ballots=5,
+            blank_votes=4,
+            invalid_votes=3
+        ))
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-02')
+    assert election.last_result_change.isoformat().startswith('2014-01-02')
+
+    # Add another result
+    with freeze_time("2014-01-03"):
+        election.results.append(ElectionResult(
+            group='group',
+            entity_id=2,
+            elegible_voters=200,
+            received_ballots=150,
+            blank_ballots=6,
+            invalid_ballots=15,
+            blank_votes=12,
+            invalid_votes=9
+        ))
+        session.flush()
+
+    # Add a candidate
+    with freeze_time("2014-01-04"):
+        candidate = Candidate(
+            elected=True,
+            candidate_id='1',
+            family_name='Quimby',
+            first_name='Joe'
+        )
+        election.candidates.append(candidate)
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-04')
+    assert election.last_result_change.isoformat().startswith('2014-01-03')
+
+    # Add candidate results
+    with freeze_time("2014-01-05"):
+        election.results.first().candidate_results.append(
+            CandidateResult(candidate_id=candidate.id, votes=520)
+        )
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-05')
+    assert election.last_result_change.isoformat().startswith('2014-01-05')
+
+    # Add a list
+    with freeze_time("2014-01-06"):
+        list_ = List(
+            list_id='1', number_of_mandates=1, name='Quimby Again!',
+        )
+        election.lists.append(list_)
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-06')
+    assert election.last_result_change.isoformat().startswith('2014-01-05')
+
+    # Add a list result
+    with freeze_time("2014-01-07"):
+        election.results.first().list_results.append(
+            ListResult(list_id=list_.id, votes=520)
+        )
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-07')
+    assert election.last_result_change.isoformat().startswith('2014-01-07')
+
+    # Add a list connection
+    with freeze_time("2014-01-08"):
+        election.list_connections.append(ListConnection(connection_id='A'))
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-08')
+    assert election.last_result_change.isoformat().startswith('2014-01-07')
+
+    # Add a panachage result
+    with freeze_time("2014-01-09"):
+        election.lists.first().panachage_results.append(
+            PanachageResult(source_list_id=2, votes=1)
+        )
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-09')
+    assert election.last_result_change.isoformat().startswith('2014-01-09')
+
+    # Add a party result
+    with freeze_time("2014-01-10"):
+        election.party_results.append(
+            PartyResult(
+                name='Republican Party', votes=10, total_votes=100
+            )
+        )
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-10')
+    assert election.last_result_change.isoformat().startswith('2014-01-10')
+
+    # Change a result
+    with freeze_time("2014-01-11"):
+        election.results.first().blank_ballots = 7
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-11')
+    assert election.last_result_change.isoformat().startswith('2014-01-11')
+
+    # Change the candidate result
+    with freeze_time("2014-01-12"):
+        election.candidates.first().results.first().votes = 510
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-12')
+    assert election.last_result_change.isoformat().startswith('2014-01-12')
+
+    # Change the list result
+    with freeze_time("2014-01-13"):
+        election.lists.first().results.first().votes = 530
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-13')
+    assert election.last_result_change.isoformat().startswith('2014-01-13')
+
+    # Change the panachage result
+    with freeze_time("2014-01-14"):
+        election.lists.first().panachage_results.first().votes = 2
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-14')
+    assert election.last_result_change.isoformat().startswith('2014-01-14')
+
+    # Change the party result
+    with freeze_time("2014-01-15"):
+        election.party_results.first().votes = 20
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-15')
+    assert election.last_result_change.isoformat().startswith('2014-01-15')
+
+    # Change the candidate
+    with freeze_time("2014-01-16"):
+        election.candidates.first().elected = False
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-16')
+    assert election.last_result_change.isoformat().startswith('2014-01-15')
+
+    # Change the list
+    with freeze_time("2014-01-17"):
+        election.lists.first().name = 'Quimby Forever!'
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-17')
+    assert election.last_result_change.isoformat().startswith('2014-01-15')
+
+    # Change the list connection
+    with freeze_time("2014-01-18"):
+        election.list_connections.first().connection_id = 'B'
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-18')
+    assert election.last_result_change.isoformat().startswith('2014-01-15')
+
+    # Change the election
+    with freeze_time("2014-01-19"):
+        election.domain = 'canton'
+        session.flush()
+
+    assert election.last_modified.isoformat().startswith('2014-01-19')
+    assert election.last_result_change.isoformat().startswith('2014-01-15')
 
 
 def test_election_has_panachage_data(session):

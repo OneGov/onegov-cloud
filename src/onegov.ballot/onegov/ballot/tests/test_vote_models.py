@@ -545,49 +545,73 @@ def test_ballot_results_aggregation(session):
     round(session.query(Ballot.nays_percentage).first()[0], 2) == 10.62
 
 
-def test_vote_last_result_change(session):
-    with freeze_time("2014-01-01 12:00"):
+def test_vote_last_change(session):
+    # Add vote
+    with freeze_time("2014-01-01"):
         vote = Vote(
             title="Abstimmung",
             domain='federation',
             date=date(2015, 6, 18)
         )
-
         vote.ballots.append(Ballot(type='proposal'))
-
         session.add(vote)
         session.flush()
 
-    # if only the proposal is accepted, the proposal wins
-    with freeze_time("2015-01-01 12:00"):
-        vote.proposal.results.append(BallotResult(
-            group='x', yeas=100, nays=0, counted=True, entity_id=1))
-        vote.proposal.results.append(BallotResult(
-            group='y', yeas=0, nays=100, counted=True, entity_id=1))
+    assert vote.last_modified.isoformat().startswith('2014-01-01')
+    assert vote.last_result_change == None
 
+    # Add results
+    with freeze_time("2014-01-02"):
+        vote.proposal.results.append(
+            BallotResult(
+                group='x', yeas=100, nays=0, counted=True, entity_id=1
+            )
+        )
+        vote.proposal.results.append(
+            BallotResult(
+                group='y', yeas=0, nays=100, counted=True, entity_id=1
+            )
+        )
         session.flush()
 
-    assert vote.last_result_change.isoformat() == '2015-01-01T12:00:00+00:00'
+    assert vote.last_modified.isoformat().startswith('2014-01-02')
+    assert vote.last_result_change.isoformat().startswith('2014-01-02')
 
-    with freeze_time("2015-01-01 13:00"):
-        vote.proposal.results.append(BallotResult(
-            group='z', yeas=100, nays=0, counted=True, entity_id=1))
-
+    # Add another result
+    with freeze_time("2014-01-03"):
+        vote.proposal.results.append(
+            BallotResult(
+                group='z', yeas=100, nays=0, counted=True, entity_id=1
+            )
+        )
         session.flush()
 
-    assert vote.last_result_change.isoformat() == '2015-01-01T13:00:00+00:00'
+    assert vote.last_modified.isoformat().startswith('2014-01-03')
+    assert vote.last_result_change.isoformat().startswith('2014-01-03')
 
-    with freeze_time("2015-01-01 14:00"):
+    # Change a result
+    with freeze_time("2014-01-04"):
         vote.proposal.results[0].group = 'q'
         session.flush()
 
-    assert vote.last_result_change.isoformat() == '2015-01-01T14:00:00+00:00'
+    assert vote.last_modified.isoformat().startswith('2014-01-04')
+    assert vote.last_result_change.isoformat().startswith('2014-01-04')
 
-    with freeze_time("2016-01-01 14:00"):
+    # Change a ballot
+    with freeze_time("2014-01-05"):
         vote.proposal.title_translations = {'en': 'Proposal', 'de': 'Vorlage'}
         session.flush()
 
-    assert vote.last_result_change.isoformat() == '2016-01-01T14:00:00+00:00'
+    assert vote.last_modified.isoformat().startswith('2014-01-05')
+    assert vote.last_result_change.isoformat().startswith('2014-01-04')
+
+    # Change the vote
+    with freeze_time("2014-01-06"):
+        vote.domain = 'canton'
+        session.flush()
+
+    assert vote.last_modified.isoformat().startswith('2014-01-06')
+    assert vote.last_result_change.isoformat().startswith('2014-01-04')
 
 
 def test_vote_export(session):
