@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes required fileinput fields not working.
+  [href]
+
 0.18.4 (2017-11-23)
 ~~~~~~~~~~~~~~~~~~~
 
