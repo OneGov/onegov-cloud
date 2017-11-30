@@ -1,7 +1,17 @@
 Elecziuns & votaziuns: Open Data
 ================================
 
-## Introducziun
+Cundiziun d'utilisaziun
+-----------------------
+
+Libra utilisaziun. La funtauna sto vegnir inditgada.
+
+- Vus dastgais duvrar questa unitad da datas per intents betg commerzials.
+- Vus dastgais duvrar questa unitad da datas per intents commerzials.
+- La funtauna sto vegnir inditgada (autura u autur, titel e link a l'unitad da datas).
+
+Introducziun
+------------
 
 Per mintga pagina impurtanta datti in'alternativa JSON correspundenta.
 

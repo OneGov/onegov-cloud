@@ -1,7 +1,17 @@
 Elections et votes : Données ouvertes
 =====================================
 
-## Introduction
+Conditions d’utilisation
+------------------------
+
+Utilisation libre. Obligation d’indiquer la source.
+
+- Vous pouvez utiliser ce jeu de données à des fins non commerciales.
+- Vous pouvez utiliser ce jeu de données à des fins commerciales.
+- L’indication de la source (auteur, titre et lien vers le jeu de données) est obligatoire.
+
+Introduction
+------------
 
 Il y a des alternatives JSON pour toutes les vues importantes. Toutes les réponses contiennent l’en-tête HTTP `Last-Modified` (Modifié pour la dernière fois) avec la dernière fois que les données ont changé (c’est-à-dire la dernière fois que les résultats d'une élection ou d’une votation ont été téléchargés).
 

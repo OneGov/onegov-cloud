@@ -1,7 +1,17 @@
 Elezioni & votazioni: Dati aperti
 =================================
 
-## Introduzione
+Condizioni d’uso
+----------------
+
+Libero utilizzo. Indicazione della fonte obbligatoria.
+
+- Questo set di dati può essere utilizzato a fini non commerciali.
+- Questo set di dati può essere utilizzato a fini commerciali.
+- È obbligatoria l’indicazione della fonte (autore, titolo e link al set di dati).
+
+Introduzione
+------------
 
 Ci sono alternative al formato JSON per tutte le visualizzazioni più importanti. Tutte le risposte contengono l'intestazione HTTP `Last-Modified` (Ultima modifica) con l'ultima volta in cui si è verificata una modifica dei dati (ad es. l'ultima volta in cui i risultati di un'elezione o i voti sono stati caricati).
 

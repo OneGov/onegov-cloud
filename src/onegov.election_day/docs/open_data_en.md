@@ -1,12 +1,21 @@
 Elections & Votes: Open Data
 ============================
 
-## Introduction
+Terms of use
+------------
+
+Open use. Must provide the source.
+
+- You may use this dataset for non-commercial purposes.
+- You may use this dataset for commercial purposes.
+- You must provide the source (author, title and link to the dataset).
+
+Introduction
+------------
 
 There are JSON alternatives for all important views. All responses contain the `Last-Modified` HTTP Header with the last time, the data has change (i.e. the last time, results of an election or vote have been uploaded).
 
 "Municipality" might refer to a district, ward, etc.
-
 
 Contents
 --------

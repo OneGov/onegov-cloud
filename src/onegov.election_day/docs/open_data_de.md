@@ -1,7 +1,17 @@
 Wahlen & Abstimmungen: Open Data
 ================================
 
-## Einleitung
+Nutzungsbedingungen
+-------------------
+
+Freie Nutzung. Quellenangabe ist Pflicht.
+
+- Sie dürfen diesen Datensatz für nicht kommerzielle Zwecke nutzen.
+- Sie dürfen diesen Datensatz für kommerzielle Zwecke nutzen.
+- Eine Quellenangabe ist Pflicht (Autor, Titel und Link zum Datensatz).
+
+Einleitung
+----------
 
 Für jede wichtige Seite gibt es eine enstprechende JSON-Alternative. Alle Responses enthalten den `Last-Modified` HTTP Header, welcher Auskunft über den Zeitpunkt der letzten Änderung gibt (z.B., wann zum letzten Mal Ergebnisse einer Wahl oder Abstimmung hochgeladen wurden).
 
