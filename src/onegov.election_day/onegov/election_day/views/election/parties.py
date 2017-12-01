@@ -3,7 +3,7 @@ from onegov.ballot import Election
 from onegov.ballot import PartyResult
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layout import DefaultLayout, ElectionsLayout
+from onegov.election_day.layouts import DefaultLayout, ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
 from sqlalchemy.orm import object_session
 
@@ -167,7 +167,7 @@ def view_election_parties(self, request):
 
     """" The main view. """
 
-    layout = ElectionsLayout(self, request, 'parties')
+    layout = ElectionLayout(self, request, 'parties')
 
     years, parties = get_party_results(self)
     deltas, results = get_party_deltas(self, years, parties)
@@ -190,7 +190,7 @@ def view_election_parties_svg(self, request):
 
     """ View the parties as SVG. """
 
-    layout = ElectionsLayout(self, request, 'parties')
+    layout = ElectionLayout(self, request, 'parties')
     if not layout.svg_path:
         return Response(status='503 Service Unavailable')
 

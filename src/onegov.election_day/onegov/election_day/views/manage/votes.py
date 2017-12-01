@@ -9,7 +9,7 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import NotificationCollection
 from onegov.election_day.forms import VoteForm
-from onegov.election_day.layout import ManageVotesLayout
+from onegov.election_day.layouts import ManageVotessLayout
 
 
 @ElectionDayApp.manage_html(
@@ -21,7 +21,7 @@ def view_votes(self, request):
     """ View a list of all votes. """
 
     return {
-        'layout': ManageVotesLayout(self, request),
+        'layout': ManageVotessLayout(self, request),
         'title': _("Votes"),
         'groups': groupbylist(self.batch, key=lambda vote: vote.date),
         'new_vote': request.link(self, 'new-vote')
@@ -37,7 +37,7 @@ def create_vote(self, request, form):
 
     """ Create a new vote. """
 
-    layout = ManageVotesLayout(self, request)
+    layout = ManageVotessLayout(self, request)
     archive = ArchivedResultCollection(request.app.session())
 
     form.set_domain(request.app.principal)
@@ -66,7 +66,7 @@ def edit_vote(self, request, form):
 
     """ Edit an existing vote. """
 
-    layout = ManageVotesLayout(self, request)
+    layout = ManageVotessLayout(self, request)
     archive = ArchivedResultCollection(request.app.session())
 
     form.set_domain(request.app.principal)
@@ -98,7 +98,7 @@ def clear_vote(self, request, form):
 
     """ Clear the results of a vote. """
 
-    layout = ManageVotesLayout(self, request)
+    layout = ManageVotessLayout(self, request)
     archive = ArchivedResultCollection(request.app.session())
 
     if form.submitted(request):
@@ -132,7 +132,7 @@ def delete_vote(self, request, form):
 
     """ Delete an existing vote. """
 
-    layout = ManageVotesLayout(self, request)
+    layout = ManageVotessLayout(self, request)
     archive = ArchivedResultCollection(request.app.session())
 
     if form.submitted(request):
@@ -168,7 +168,7 @@ def trigger_vote(self, request, form):
 
     session = request.app.session()
     notifications = NotificationCollection(session)
-    layout = ManageVotesLayout(self, request)
+    layout = ManageVotessLayout(self, request)
 
     if form.submitted(request):
         notifications.trigger(request, self)

@@ -8,7 +8,7 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import NotificationCollection
 from onegov.election_day.forms import ElectionForm
-from onegov.election_day.layout import ManageElectionsLayout
+from onegov.election_day.layouts import ManageElectionsLayout
 
 
 @ElectionDayApp.manage_html(

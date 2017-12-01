@@ -6,8 +6,8 @@ from onegov.core.templates import render_template
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day import log
-from onegov.election_day.layout import Layout
-from onegov.election_day.layout import MailLayout
+from onegov.election_day.layouts import DefaultLayout
+from onegov.election_day.layouts import MailLayout
 from onegov.election_day.models import Principal
 from onegov.user import Auth
 from onegov.user import UserCollection
@@ -35,7 +35,7 @@ def handle_login(self, request, form):
         response = None
 
     return response or {
-        'layout': Layout(self, request),
+        'layout': DefaultLayout(self, request),
         'title': _("Login"),
         'form': form,
         'password_reset_link': request.link(
@@ -112,7 +112,7 @@ def handle_password_reset_request(self, request, form):
         )
 
     return {
-        'layout': Layout(self, request),
+        'layout': DefaultLayout(self, request),
         'title': _('Reset password'),
         'form': form,
         'show_form': show_form,
@@ -151,7 +151,7 @@ def handle_password_reset(self, request, form):
         form.token.data = request.params['token']
 
     return {
-        'layout': Layout(self, request),
+        'layout': DefaultLayout(self, request),
         'title': _('Reset password'),
         'form': form,
         'show_form': show_form,

@@ -219,19 +219,41 @@ def test_view_pdf(election_day_app):
         f.write(pdf)
 
     filenames = []
-    with patch('onegov.election_day.layout.pdf_filename',
+    with patch('onegov.election_day.layouts.vote.pdf_filename',
                return_value='test.pdf'):
-        for path in paths:
-            result = client.get(path)
-            assert result.body == pdf
-            assert result.headers['Content-Type'] == 'application/pdf'
-            assert result.headers['Content-Length'] == '8'
-            assert result.headers['Content-Disposition'].startswith(
-                'inline; filename='
-            )
-            filenames.append(
-                result.headers['Content-Disposition'].split('filename=')[1]
-            )
+        result = client.get('/vote/vote/pdf')
+        assert result.body == pdf
+        assert result.headers['Content-Type'] == 'application/pdf'
+        assert result.headers['Content-Length'] == '8'
+        assert result.headers['Content-Disposition'].startswith(
+            'inline; filename='
+        )
+        filenames.append(
+            result.headers['Content-Disposition'].split('filename=')[1]
+        )
+    with patch('onegov.election_day.layouts.election.pdf_filename',
+               return_value='test.pdf'):
+        result = client.get('/election/majorz-election/pdf')
+        assert result.body == pdf
+        assert result.headers['Content-Type'] == 'application/pdf'
+        assert result.headers['Content-Length'] == '8'
+        assert result.headers['Content-Disposition'].startswith(
+            'inline; filename='
+        )
+        filenames.append(
+            result.headers['Content-Disposition'].split('filename=')[1]
+        )
+
+        result = client.get('/election/proporz-election/pdf')
+        assert result.body == pdf
+        assert result.headers['Content-Type'] == 'application/pdf'
+        assert result.headers['Content-Length'] == '8'
+        assert result.headers['Content-Disposition'].startswith(
+            'inline; filename='
+        )
+        filenames.append(
+            result.headers['Content-Disposition'].split('filename=')[1]
+        )
 
     assert sorted(filenames) == [
         'majorz-election.pdf',
@@ -273,9 +295,23 @@ def test_view_svg(election_day_app):
         f.write(svg)
 
     filenames = []
-    with patch('onegov.election_day.layout.svg_filename',
+    with patch('onegov.election_day.layouts.vote.svg_filename',
                return_value='test.svg'):
-        for path in paths:
+        result = client.get(paths[0])
+        assert result.body == svg
+        assert result.headers['Content-Type'] == (
+            'application/svg; charset=utf-8'
+        )
+        assert result.headers['Content-Length'] == '99'
+        assert result.headers['Content-Disposition'].startswith(
+            'inline; filename='
+        )
+        filenames.append(
+            result.headers['Content-Disposition'].split('filename=')[1]
+        )
+    with patch('onegov.election_day.layouts.election.svg_filename',
+               return_value='test.svg'):
+        for path in paths[1:]:
             result = client.get(path)
             assert result.body == svg
             assert result.headers['Content-Type'] == (

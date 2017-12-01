@@ -6,14 +6,14 @@ from onegov.ballot import Vote
 from onegov.ballot import ComplexVote
 from onegov.ballot import ElectionCollection
 from onegov.ballot import VoteCollection
-from onegov.election_day.layout import ElectionsLayout
-from onegov.election_day.layout import Layout
-from onegov.election_day.layout import ManageDataSourceItemsLayout
-from onegov.election_day.layout import ManageDataSourcesLayout
-from onegov.election_day.layout import ManageElectionsLayout
-from onegov.election_day.layout import ManageSubscribersLayout
-from onegov.election_day.layout import ManageVotesLayout
-from onegov.election_day.layout import VotesLayout
+from onegov.election_day.layouts import ElectionLayout
+from onegov.election_day.layouts import DefaultLayout
+from onegov.election_day.layouts import ManageDataSourceItemsLayout
+from onegov.election_day.layouts import ManageDataSourcesLayout
+from onegov.election_day.layouts import ManageElectionsLayout
+from onegov.election_day.layouts import ManageSubscribersLayout
+from onegov.election_day.layouts import ManageVotessLayout
+from onegov.election_day.layouts import VoteLayout
 from onegov.election_day.collections import DataSourceCollection
 from onegov.election_day.collections import DataSourceItemCollection
 from onegov.election_day.collections import SubscriberCollection
@@ -24,17 +24,17 @@ from unittest.mock import Mock
 def test_layout_principal():
     request = DummyRequest()
     model = Vote()
-    layout = Layout(model, request)
+    layout = DefaultLayout(model, request)
 
     assert layout.principal == request.app.principal
 
 
 def test_layout_links():
-    layout_de = Layout(None, DummyRequest(locale='de'))
-    layout_en = Layout(None, DummyRequest(locale='en'))
-    layout_fr = Layout(None, DummyRequest(locale='fr'))
-    layout_it = Layout(None, DummyRequest(locale='it'))
-    layout_rm = Layout(None, DummyRequest(locale='rm'))
+    layout_de = DefaultLayout(None, DummyRequest(locale='de'))
+    layout_en = DefaultLayout(None, DummyRequest(locale='en'))
+    layout_fr = DefaultLayout(None, DummyRequest(locale='fr'))
+    layout_it = DefaultLayout(None, DummyRequest(locale='it'))
+    layout_rm = DefaultLayout(None, DummyRequest(locale='rm'))
 
     assert layout_de.homepage_link == 'DummyPrincipal/archive'
     assert layout_en.homepage_link == 'DummyPrincipal/archive'
@@ -102,14 +102,16 @@ def test_layout_links():
     assert layout_de.login_link == 'Auth/login'
     assert layout_de.logout_link is None
 
-    layout_de = Layout(None, DummyRequest(locale='de', is_logged_in=True))
+    layout_de = DefaultLayout(
+        None, DummyRequest(locale='de', is_logged_in=True)
+    )
 
     assert layout_de.login_link is None
     assert layout_de.logout_link == 'Auth/logout'
 
 
 def test_elections_layout(session):
-    layout = ElectionsLayout(None, DummyRequest())
+    layout = ElectionLayout(None, DummyRequest())
 
     assert layout.all_tabs == (
         'lists', 'candidates', 'connections', 'parties', 'statistics',
@@ -126,7 +128,7 @@ def test_elections_layout(session):
     assert layout.title('data') == 'Downloads'
     assert layout.title('panachage') == 'Panachage'
 
-    layout = ElectionsLayout(Election(type='majorz'), DummyRequest())
+    layout = ElectionLayout(Election(type='majorz'), DummyRequest())
     assert layout.majorz
     assert not layout.proporz
     assert layout.main_view == 'Election/candidates'
@@ -134,7 +136,7 @@ def test_elections_layout(session):
     assert list(layout.menu) == []
     assert not layout.tacit
 
-    layout = ElectionsLayout(Election(type='proporz'), DummyRequest())
+    layout = ElectionLayout(Election(type='proporz'), DummyRequest())
     assert not layout.majorz
     assert layout.proporz
     assert layout.main_view == 'Election/lists'
@@ -142,7 +144,7 @@ def test_elections_layout(session):
     assert list(layout.menu) == []
     assert not layout.tacit
 
-    layout = ElectionsLayout(
+    layout = ElectionLayout(
         Election(type='majorz', tacit=True), DummyRequest()
     )
     assert layout.tacit
@@ -164,19 +166,19 @@ def test_elections_layout(session):
         request = DummyRequest()
         request.app.filestorage = Mock()
 
-        layout = ElectionsLayout(election, request)
+        layout = ElectionLayout(election, request)
         assert layout.pdf_path == 'pdf/election-{}.de.pdf'.format(ts)
         assert layout.svg_path == 'svg/election-{}.None.any.svg'.format(ts)
         assert layout.svg_link == 'Election/None-svg'
         assert layout.svg_name == 'election.svg'
 
-        layout = ElectionsLayout(election, request, 'lists')
+        layout = ElectionLayout(election, request, 'lists')
         assert layout.pdf_path == 'pdf/election-{}.de.pdf'.format(ts)
         assert layout.svg_path == 'svg/election-{}.lists.any.svg'.format(ts)
         assert layout.svg_link == 'Election/lists-svg'
         assert layout.svg_name == 'election-lists.svg'
 
-        layout = ElectionsLayout(election, request, 'candidates')
+        layout = ElectionLayout(election, request, 'candidates')
         assert layout.pdf_path == 'pdf/election-{}.de.pdf'.format(ts)
         assert layout.svg_path == 'svg/election-{}.candidates.any.svg'.format(
             ts
@@ -184,7 +186,7 @@ def test_elections_layout(session):
         assert layout.svg_link == 'Election/candidates-svg'
         assert layout.svg_name == 'election-candidates.svg'
 
-        layout = ElectionsLayout(election, request, 'connections')
+        layout = ElectionLayout(election, request, 'connections')
         assert layout.pdf_path == 'pdf/election-{}.de.pdf'.format(ts)
         assert layout.svg_path == 'svg/election-{}.connections.any.svg'.format(
             ts
@@ -192,7 +194,7 @@ def test_elections_layout(session):
         assert layout.svg_link == 'Election/connections-svg'
         assert layout.svg_name == 'election-list-connections.svg'
 
-        layout = ElectionsLayout(election, request, 'panachage')
+        layout = ElectionLayout(election, request, 'panachage')
         assert layout.pdf_path == 'pdf/election-{}.de.pdf'.format(ts)
         assert layout.svg_path == 'svg/election-{}.panachage.any.svg'.format(
             ts
@@ -200,7 +202,7 @@ def test_elections_layout(session):
         assert layout.svg_link == 'Election/panachage-svg'
         assert layout.svg_name == 'election-panachage.svg'
 
-        layout = ElectionsLayout(election, request, 'parties')
+        layout = ElectionLayout(election, request, 'parties')
         assert layout.pdf_path == 'pdf/election-{}.de.pdf'.format(ts)
         assert layout.svg_path == 'svg/election-{}.parties.any.svg'.format(ts)
         assert layout.svg_link == 'Election/parties-svg'
@@ -208,7 +210,7 @@ def test_elections_layout(session):
 
 
 def test_votes_layout(session):
-    layout = VotesLayout(Vote(), DummyRequest())
+    layout = VoteLayout(Vote(), DummyRequest())
 
     assert layout.title() == 'Proposal'
     assert layout.title('undefined') == ''
@@ -241,7 +243,7 @@ def test_votes_layout(session):
         request = DummyRequest()
         request.app.filestorage = Mock()
 
-        layout = VotesLayout(vote, request)
+        layout = VoteLayout(vote, request)
         assert layout.pdf_path == 'pdf/vote-{}.{}.de.pdf'.format(vh, ts)
         assert layout.svg_path == 'svg/ballot-{}.{}.map.de.svg'.format(
             proposal.id, ts
@@ -249,7 +251,7 @@ def test_votes_layout(session):
         assert layout.svg_link == 'Ballot/svg'
         assert layout.svg_name == 'vote-proposal.svg'
 
-        layout = VotesLayout(vote, request, 'counter-proposal')
+        layout = VoteLayout(vote, request, 'counter-proposal')
         assert layout.pdf_path == 'pdf/vote-{}.{}.de.pdf'.format(vh, ts)
         assert layout.svg_path == 'svg/ballot-{}.{}.map.de.svg'.format(
             counter.id, ts
@@ -257,7 +259,7 @@ def test_votes_layout(session):
         assert layout.svg_link == 'Ballot/svg'
         assert layout.svg_name == 'vote-counter-proposal.svg'
 
-        layout = VotesLayout(vote, request, 'tie-breaker')
+        layout = VoteLayout(vote, request, 'tie-breaker')
         assert layout.pdf_path == 'pdf/vote-{}.{}.de.pdf'.format(vh, ts)
         assert layout.svg_path == 'svg/ballot-{}.{}.map.de.svg'.format(
             tie.id, ts
@@ -268,7 +270,7 @@ def test_votes_layout(session):
 
 def test_manage_layout(session):
     # Votes
-    layout = ManageVotesLayout(
+    layout = ManageVotessLayout(
         VoteCollection(session),
         DummyRequest()
     )
@@ -283,7 +285,7 @@ def test_manage_layout(session):
     ]
 
     # ... with full menu
-    layout = ManageVotesLayout(
+    layout = ManageVotessLayout(
         VoteCollection(session),
         DummyRequest()
     )

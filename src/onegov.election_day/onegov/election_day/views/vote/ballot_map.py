@@ -2,8 +2,8 @@ from morepath.request import Response
 from onegov.ballot import Ballot
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layout import DefaultLayout
-from onegov.election_day.layout import VotesLayout
+from onegov.election_day.layouts import DefaultLayout
+from onegov.election_day.layouts import VoteLayout
 from onegov.election_day.utils import add_last_modified_header
 
 
@@ -52,7 +52,7 @@ def view_ballot_svg(self, request):
 
     """ View the ballot as SVG. """
 
-    layout = VotesLayout(self.vote, request, tab=self.type)
+    layout = VoteLayout(self.vote, request, tab=self.type)
     if not layout.svg_path:
         return Response(status='503 Service Unavailable')
 

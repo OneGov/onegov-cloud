@@ -1,5 +1,5 @@
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layout import ManageLayout
+from onegov.election_day.layouts import ManageLayout
 from onegov.election_day.models import Principal
 
 

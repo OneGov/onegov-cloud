@@ -5,7 +5,7 @@ from onegov.ballot import Election
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.formats import import_party_results
 from onegov.election_day.forms import UploadElectionPartyResultsForm
-from onegov.election_day.layout import ManageElectionsLayout
+from onegov.election_day.layouts import ManageElectionsLayout
 
 
 @ElectionDayApp.manage_form(

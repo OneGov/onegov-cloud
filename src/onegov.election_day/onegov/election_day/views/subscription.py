@@ -2,7 +2,7 @@ from onegov.core.security import Public
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.forms import SubscribeForm
-from onegov.election_day.layout import DefaultLayout
+from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.models import Principal
 from onegov.election_day.collections import SubscriberCollection
 

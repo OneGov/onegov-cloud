@@ -4,7 +4,7 @@ from onegov.ballot import Election
 from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layout import ElectionsLayout
+from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_election_summary
 from onegov.election_day.views.election import get_candidates_results
@@ -21,7 +21,7 @@ def view_election(self, request):
 
     """" The main view. """
 
-    return redirect(ElectionsLayout(self, request).main_view)
+    return redirect(ElectionLayout(self, request).main_view)
 
 
 @ElectionDayApp.json(
@@ -37,15 +37,15 @@ def view_election_json(self, request):
         add_last_modified_header(response, self.last_modified)
 
     media = {'charts': {}}
-    if ElectionsLayout(self, request).pdf_path:
+    if ElectionLayout(self, request).pdf_path:
         media['pdf'] = request.link(self, 'pdf')
     for tab in ('candidates', 'lists', 'connections', 'panachage', 'parties'):
-        if ElectionsLayout(self, request, tab=tab).svg_path:
+        if ElectionLayout(self, request, tab=tab).svg_path:
             media['charts'][tab] = request.link(self, '{}-svg'.format(tab))
 
     embed = {'candidates': request.link(self, 'candidates-chart')}
     for item in ('lists', 'connections', 'panachage', 'parties'):
-        if ElectionsLayout(self, request).visible(item):
+        if ElectionLayout(self, request).visible(item):
             embed[item] = request.link(self, '{}-chart'.format(item))
 
     data = {
@@ -189,7 +189,7 @@ def view_election_pdf(self, request):
 
     """ View the generated PDF. """
 
-    layout = ElectionsLayout(self, request)
+    layout = ElectionLayout(self, request)
 
     if not layout.pdf_path:
         return Response(status='503 Service Unavailable')

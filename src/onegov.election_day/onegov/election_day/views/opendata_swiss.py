@@ -7,7 +7,7 @@ from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layout import Layout
+from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.models import Principal
 from webob.exc import HTTPNotImplemented
 from xml.etree.ElementTree import Element
@@ -47,7 +47,7 @@ def view_rdf(self, request):
     def set_headers(response):
         response.headers['Content-Type'] = 'application/rdf+xml; charset=UTF-8'
 
-    layout = Layout(self, request)
+    layout = DefaultLayout(self, request)
     domains = dict(self.available_domains)
 
     rdf = Element('rdf:RDF', attrib={

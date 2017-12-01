@@ -9,7 +9,7 @@ from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layout import ElectionsLayout
+from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
 
 
@@ -23,7 +23,7 @@ def view_election_data(self, request):
 
     """" The main view. """
 
-    layout = ElectionsLayout(self, request, 'data')
+    layout = ElectionLayout(self, request, 'data')
 
     return {
         'election': self,

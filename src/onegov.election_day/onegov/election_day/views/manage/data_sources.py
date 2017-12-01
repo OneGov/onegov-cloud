@@ -8,8 +8,8 @@ from onegov.election_day.collections import DataSourceCollection
 from onegov.election_day.collections import DataSourceItemCollection
 from onegov.election_day.forms import DataSourceForm
 from onegov.election_day.forms import DataSourceItemForm
-from onegov.election_day.layout import ManageDataSourceItemsLayout
-from onegov.election_day.layout import ManageDataSourcesLayout
+from onegov.election_day.layouts import ManageDataSourceItemsLayout
+from onegov.election_day.layouts import ManageDataSourcesLayout
 from onegov.election_day.models import DataSource
 from onegov.election_day.models import DataSourceItem
 from onegov.election_day.models.data_source import UPLOAD_TYPE_LABELS

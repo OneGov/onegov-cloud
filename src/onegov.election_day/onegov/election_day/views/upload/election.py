@@ -14,7 +14,7 @@ from onegov.election_day.formats import import_election_wabstic_proporz
 from onegov.election_day.formats import import_election_wabstim_majorz
 from onegov.election_day.forms import UploadMajorzElectionForm
 from onegov.election_day.forms import UploadProporzElectionForm
-from onegov.election_day.layout import ManageElectionsLayout
+from onegov.election_day.layouts import ManageElectionsLayout
 from onegov.election_day.views.upload import unsupported_year_error
 
 

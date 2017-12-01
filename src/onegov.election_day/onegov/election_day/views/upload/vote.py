@@ -11,7 +11,7 @@ from onegov.election_day.formats import import_vote_wabstic
 from onegov.election_day.formats import import_vote_wabstim
 from onegov.election_day.formats.common import BALLOT_TYPES
 from onegov.election_day.forms import UploadVoteForm
-from onegov.election_day.layout import ManageVotesLayout
+from onegov.election_day.layouts import ManageVotessLayout
 from onegov.election_day.views.upload import unsupported_year_error
 
 
@@ -111,7 +111,7 @@ def view_upload(self, request, form):
                 )
             )
 
-    layout = ManageVotesLayout(self, request)
+    layout = ManageVotessLayout(self, request)
 
     return {
         'layout': layout,

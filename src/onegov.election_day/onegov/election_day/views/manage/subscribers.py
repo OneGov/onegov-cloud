@@ -5,7 +5,7 @@ import morepath
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import SubscriberCollection
-from onegov.election_day.layout import ManageSubscribersLayout
+from onegov.election_day.layouts import ManageSubscribersLayout
 from onegov.election_day.models import Subscriber
 
 

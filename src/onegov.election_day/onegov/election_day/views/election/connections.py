@@ -3,8 +3,8 @@ from morepath.request import Response
 from onegov.ballot import Election
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layout import DefaultLayout
-from onegov.election_day.layout import ElectionsLayout
+from onegov.election_day.layouts import DefaultLayout
+from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.views.election import get_connection_results
 from sqlalchemy.orm import object_session
@@ -117,7 +117,7 @@ def view_election_connections(self, request):
 
     """" The main view. """
 
-    layout = ElectionsLayout(self, request, 'connections')
+    layout = ElectionLayout(self, request, 'connections')
 
     return {
         'election': self,
@@ -135,7 +135,7 @@ def view_election_connections_svg(self, request):
 
     """ View the connections as SVG. """
 
-    layout = ElectionsLayout(self, request, 'connections')
+    layout = ElectionLayout(self, request, 'connections')
     if not layout.svg_path:
         return Response(status='503 Service Unavailable')
 

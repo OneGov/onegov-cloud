@@ -3,7 +3,7 @@ from onegov.ballot import Vote
 from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layout import VotesLayout
+from onegov.election_day.layouts import VoteLayout
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_vote_summary
 
@@ -17,7 +17,7 @@ def view_vote_proposal(self, request):
 
     """" The main view (proposal). """
 
-    layout = VotesLayout(self, request)
+    layout = VoteLayout(self, request)
 
     return {
         'vote': self,
@@ -36,7 +36,7 @@ def view_vote_counter_proposal(self, request):
 
     """" The main view (counter-proposal). """
 
-    layout = VotesLayout(self, request, 'counter-proposal')
+    layout = VoteLayout(self, request, 'counter-proposal')
 
     return {
         'vote': self,
@@ -55,7 +55,7 @@ def view_vote_tie_breaker(self, request):
 
     """" The main view (tie-breaker). """
 
-    layout = VotesLayout(self, request, 'tie-breaker')
+    layout = VoteLayout(self, request, 'tie-breaker')
 
     return {
         'vote': self,
@@ -79,12 +79,12 @@ def view_vote_json(self, request):
 
     show_map = request.app.principal.is_year_available(self.date.year)
     media = {}
-    if VotesLayout(self, request).pdf_path:
+    if VoteLayout(self, request).pdf_path:
         media['pdf'] = request.link(self, 'pdf')
     if show_map:
         media['maps'] = {}
         for ballot in self.ballots:
-            if VotesLayout(self, request, tab=ballot.type).svg_path:
+            if VoteLayout(self, request, tab=ballot.type).svg_path:
                 media['maps'][ballot.type] = request.link(ballot, 'svg')
 
     counted = self.progress[0]
@@ -192,7 +192,7 @@ def view_vote_pdf(self, request):
 
     """ View the generated PDF. """
 
-    layout = VotesLayout(self, request)
+    layout = VoteLayout(self, request)
 
     if not layout.pdf_path:
         return Response(status='503 Service Unavailable')

@@ -4,8 +4,8 @@ from onegov.ballot import Election
 from onegov.core.security import Public
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layout import DefaultLayout
-from onegov.election_day.layout import ElectionsLayout
+from onegov.election_day.layouts import DefaultLayout
+from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
 
 
@@ -102,7 +102,7 @@ def view_election_panachage(self, request):
 
     """" The main view. """
 
-    layout = ElectionsLayout(self, request, 'panachage')
+    layout = ElectionLayout(self, request, 'panachage')
 
     return {
         'election': self,
@@ -119,7 +119,7 @@ def view_election_panachage_svg(self, request):
 
     """ View the panachage as SVG. """
 
-    layout = ElectionsLayout(self, request, 'panachage')
+    layout = ElectionLayout(self, request, 'panachage')
     if not layout.svg_path:
         return Response(status='503 Service Unavailable')
 
