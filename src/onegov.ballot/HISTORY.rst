@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds tacit elections.
+  [msom]
+
 - Improves calculation of last changes.
   [msom]
 

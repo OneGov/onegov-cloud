@@ -225,6 +225,9 @@ class Election(Base, TimestampMixin, DerivedAttributesMixin,
     #: may be used to store a link related to this election
     related_link = meta_property('related_link')
 
+    #: may be used to mark an election as a tacit election
+    tacit = meta_property('tacit', default=False)
+
     def clear_results(self):
         """ Clears all the results. """
 
