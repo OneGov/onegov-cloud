@@ -239,7 +239,47 @@ class MediaGenerator():
             pdf.spacer()
 
             # Election
-            if isinstance(item, Election):
+            if isinstance(item, Election) and item.tacit:
+                # Candidates
+                data = view_election_candidates_data(item, None)
+                if data and data.get('results'):
+                    pdf.h2(translate(_('Candidates')))
+                    pdf.spacer()
+                    if item.type == 'majorz':
+                        pdf.table(
+                            [[
+                                translate(_('Candidate')),
+                                translate(_('Party')),
+                                translate(_('Elected')),
+                            ]] + [[
+                                '{} {}'.format(r[0], r[1]),
+                                r[3],
+                                translate(_('Yes')) if r[2] else '',
+                            ] for r in get_candidates_results(
+                                item, self.session
+                            )],
+                            [None, None, 2 * cm],
+                            style=table_style_results(3)
+                        )
+                    else:
+                        pdf.table(
+                            [[
+                                translate(_('Candidate')),
+                                translate(_('List')),
+                                translate(_('Elected')),
+                            ]] + [[
+                                '{} {}'.format(r[0], r[1]),
+                                r[5],
+                                translate(_('Yes')) if r[2] else '',
+                            ] for r in get_candidates_results(
+                                item, self.session
+                            )],
+                            [None, None, 2 * cm],
+                            style=table_style_results(3)
+                        )
+                    pdf.pagebreak()
+
+            elif isinstance(item, Election):
                 majorz = item.type == 'majorz'
 
                 # Factoids
@@ -537,7 +577,7 @@ class MediaGenerator():
                     )
                 pdf.pagebreak()
 
-            if isinstance(item, Vote):
+            elif isinstance(item, Vote):
                 summarize = item.proposal.results.count() != 1
 
                 # Answer

@@ -274,6 +274,7 @@ def test_election_form_model(election_day_app):
     model.type = 'proporz'
     model.number_of_mandates = 5
     model.related_link = 'http://u.rl'
+    model.tacit = False
 
     form = ElectionForm()
     form.apply_model(model)
@@ -288,6 +289,7 @@ def test_election_form_model(election_day_app):
     assert form.election_type.data == 'proporz'
     assert form.mandates.data == 5
     assert form.related_link.data == 'http://u.rl'
+    assert form.tacit.data == False
 
     form.election_de.data = 'An Election (DE)'
     form.election_fr.data = 'An Election (FR)'
@@ -300,6 +302,7 @@ def test_election_form_model(election_day_app):
     form.mandates.data = 2
     form.absolute_majority.data = 10000
     form.related_link.data = 'http://ur.l'
+    form.tacit.data = True
 
     form.update_model(model)
 
@@ -315,6 +318,7 @@ def test_election_form_model(election_day_app):
     assert model.number_of_mandates == 2
     assert model.absolute_majority == 10000
     assert model.related_link == 'http://ur.l'
+    assert model.tacit == True
 
 
 def test_upload_vote_form(session):

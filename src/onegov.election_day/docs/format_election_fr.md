@@ -11,6 +11,7 @@ En ce qui concerne les formats de fichiers, les fichiers XLS et XLSX sont accept
 4. [WabstiCExport Majorz](#4-wabsticexport-majorz)
 5. [WabstiCExport Proporz](#5-wabsticexport-proporz)
 6. [Party results](#6-party-results)
+7. [Élection tacite](#7-election-tacite)
 
 
 1 Onegov
@@ -234,3 +235,9 @@ Nom|Description
 ### Template
 
 - [election_party_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_party_results.csv)
+
+
+7 Élection tacite
+-----------------
+
+Tacit elections can be uploaded by using the internal format with every vote set to `0`.

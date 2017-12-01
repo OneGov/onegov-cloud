@@ -198,13 +198,30 @@ class ElectionsLayout(Layout):
         tab = self.tab if tab is None else tab
 
         if tab == 'lists':
-            return self.proporz
-        if tab == 'parties':
-            return self.proporz and self.model.party_results.first()
+            return (
+                self.proporz and
+                not self.tacit
+            )
         if tab == 'connections':
-            return self.proporz and self.model.list_connections.first()
+            return (
+                self.proporz and
+                not self.tacit and
+                self.model.list_connections.first()
+            )
+        if tab == 'parties':
+            return (
+                self.proporz and
+                not self.tacit and
+                self.model.party_results.first()
+            )
+        if tab == 'statistics':
+            return not self.tacit
         if tab == 'panachage':
-            return self.proporz and self.model.has_panachage_data
+            return (
+                self.proporz and
+                not self.tacit and
+                self.model.has_panachage_data
+            )
 
         return True
 
@@ -227,14 +244,20 @@ class ElectionsLayout(Layout):
         return False
 
     @cached_property
+    def tacit(self):
+        if self.model.tacit:
+            return True
+        return False
+
+    @cached_property
     def summarize(self):
         return self.model.total_entities != 1
 
     @cached_property
     def main_view(self):
-        if self.proporz:
-            return self.request.link(self.model, 'lists')
-        return self.request.link(self.model, 'candidates')
+        if self.majorz or self.tacit:
+            return self.request.link(self.model, 'candidates')
+        return self.request.link(self.model, 'lists')
 
     @cached_property
     def menu(self):

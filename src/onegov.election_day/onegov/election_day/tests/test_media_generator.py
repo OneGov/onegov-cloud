@@ -322,22 +322,22 @@ def test_generate_pdf_election(session, election_day_app):
     generator = MediaGenerator(election_day_app)
 
     # Majorz election
-    election = add_majorz_election(session)
+    majorz = add_majorz_election(session)
     with patch.object(generator, 'get_chart', return_value=pdf_chart()) as gc:
         for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
             gc.reset_mock()
-            generator.generate_pdf(election, 'election.pdf', locale)
+            generator.generate_pdf(majorz, 'election.pdf', locale)
 
             assert gc.call_count == 1
             with election_day_app.filestorage.open('election.pdf', 'rb') as f:
                 assert len(PdfReader(f, decompress=False).pages) == 3
 
     # Proporz election
-    election = add_proporz_election(session)
+    proporz = add_proporz_election(session)
     with patch.object(generator, 'get_chart', return_value=pdf_chart()) as gc:
         for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
             gc.reset_mock()
-            generator.generate_pdf(election, 'election.pdf', locale)
+            generator.generate_pdf(proporz, 'election.pdf', locale)
 
             assert gc.call_count == 5
             with election_day_app.filestorage.open('election.pdf', 'rb') as f:
@@ -348,23 +348,30 @@ def test_generate_pdf_election(session, election_day_app):
     with patch.object(generator, 'get_chart', return_value=pdf_chart()) as gc:
         for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
             gc.reset_mock()
-            generator.generate_pdf(election, 'election.pdf', locale)
+            generator.generate_pdf(proporz, 'election.pdf', locale)
 
             assert gc.call_count == 5
             with election_day_app.filestorage.open('election.pdf', 'rb') as f:
                 assert len(PdfReader(f, decompress=False).pages) == 7
 
     # Proporz election with more than one entitiy
-    election.counted_entities = 5
-    election.total_entities = 5
+    proporz.counted_entities = 5
+    proporz.total_entities = 5
     with patch.object(generator, 'get_chart', return_value=pdf_chart()) as gc:
         for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
             gc.reset_mock()
-            generator.generate_pdf(election, 'election.pdf', locale)
+            generator.generate_pdf(proporz, 'election.pdf', locale)
 
             assert gc.call_count == 5
             with election_day_app.filestorage.open('election.pdf', 'rb') as f:
                 assert len(PdfReader(f, decompress=False).pages) == 7
+
+    # Tacit election
+    majorz.tacit = True
+    for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
+        generator.generate_pdf(majorz, 'election.pdf', locale)
+        with election_day_app.filestorage.open('election.pdf', 'rb') as f:
+            assert len(PdfReader(f, decompress=False).pages) == 1
 
 
 def test_generate_pdf_vote(session, election_day_app):

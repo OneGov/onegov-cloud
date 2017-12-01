@@ -1,6 +1,7 @@
 from datetime import date
 from onegov.election_day import _
 from onegov.form import Form
+from wtforms import BooleanField
 from wtforms import IntegerField
 from wtforms import RadioField
 from wtforms import StringField
@@ -30,6 +31,11 @@ class ElectionForm(Form):
         validators=[
             InputRequired()
         ]
+    )
+
+    tacit = BooleanField(
+        label=_("Tacit election"),
+        render_kw=dict(force_simple=True)
     )
 
     date = DateField(
@@ -117,6 +123,7 @@ class ElectionForm(Form):
         model.number_of_mandates = self.mandates.data
         model.absolute_majority = self.absolute_majority.data
         model.related_link = self.related_link.data
+        model.tacit = self.tacit.data
 
         titles = {}
         if self.election_de.data:
@@ -143,6 +150,7 @@ class ElectionForm(Form):
         self.mandates.data = model.number_of_mandates
         self.absolute_majority.data = model.absolute_majority
         self.related_link.data = model.related_link
+        self.tacit.data = model.tacit
 
         if model.type == 'majorz':
             self.election_type.choices = [

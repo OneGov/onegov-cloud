@@ -13,6 +13,7 @@ Eine "Gemeinde" kann auch ein Bezirk, ein Wahlkreis etc. sein.
 4. [WabstiCExport Majorz](#4-wabsticexport-majorz)
 5. [WabstiCExport Proporz](#5-wabsticexport-proporz)
 6. [Parteiresultate](#6-parteiresultate)
+7. [Stille Wahl](#7-stille-wahl)
 
 1 OneGov
 ----------
@@ -206,12 +207,12 @@ Das Datenformat enhält auch keine Information dazu, ob eine einzelne Gemeinde f
 4 WabstiCExport Majorz
 ----------------------
 
-Es wird die Version `2.2` wird unterstützt. Die verschiedenen Spalten der verschiedenen Dateien sind in der Dokumenation des Exporter-Programms definiert.
+Es wird die Version `2.2` wird unterstützt. Die verschiedenen Spalten der verschiedenen Dateien sind in der Dokumentation des Exporter-Programms definiert.
 
 5 WabstiCExport Proporz
 -----------------------
 
-Es wird die Version `2.2` wird unterstützt. Die verschiedenen Spalten der verschiedenen Dateien sind in der Dokumenation des Exporter-Programms definiert.
+Es wird die Version `2.2` wird unterstützt. Die verschiedenen Spalten der verschiedenen Dateien sind in der Dokumentation des Exporter-Programms definiert.
 
 
 6 Parteiresultate
@@ -234,3 +235,9 @@ Name|Beschreibung
 ### Template
 
 - [election_party_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_party_results.csv)
+
+
+7 Stille Wahl
+-------------
+
+Für stille Wahlen kann das interne Format verwendet werden. Alle Stimmen werden dabei auf `0` gesetzt.

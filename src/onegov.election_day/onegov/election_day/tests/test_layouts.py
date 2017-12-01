@@ -132,6 +132,7 @@ def test_elections_layout(session):
     assert layout.main_view == 'Election/candidates'
     assert not layout.has_results
     assert list(layout.menu) == []
+    assert not layout.tacit
 
     layout = ElectionsLayout(Election(type='proporz'), DummyRequest())
     assert not layout.majorz
@@ -139,6 +140,12 @@ def test_elections_layout(session):
     assert layout.main_view == 'Election/lists'
     assert not layout.has_results
     assert list(layout.menu) == []
+    assert not layout.tacit
+
+    layout = ElectionsLayout(
+        Election(type='majorz', tacit=True), DummyRequest()
+    )
+    assert layout.tacit
 
     with freeze_time("2014-01-01 12:00"):
         election = Election(

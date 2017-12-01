@@ -259,34 +259,36 @@
 </metal:vote_header>
 
 <metal:election_factoids define-macro="election_factoids" i18n:domain="onegov.election_day">
-    <ul class="small-block-grid-1 medium-block-grid-4 factoids">
-        <li>
-            <span i18n:translate="">Turnout</span>
-            <strong>${'{0:.2f}'.format(election.turnout)} %</strong>
-        </li>
-        <li>
-            <span i18n:translate="">Elegible Voters</span>
-            <strong>${layout.format_number(election.elegible_voters)}</strong>
-        </li>
-        <li>
-            <span i18n:translate="">Received Ballots</span>
-            <strong>${layout.format_number(election.received_ballots)}</strong>
-        </li>
-        <li>
-            <span i18n:translate="">Counted</span>
-            <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" /></strong>
-        </li>
-    </ul>
-    <ul class="small-block-grid-1 medium-block-grid-4 factoids">
-        <li>
-            <span i18n:translate="">Mandates</span>
-            <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress (election.allocated_mandates, election.number_of_mandates)" /></strong>
-        </li>
-        <li tal:condition="layout.majorz">
-            <span i18n:translate="">Absolute majority</span>
-            <strong tal:condition="election.absolute_majority">${layout.format_number(election.absolute_majority or 0)}</strong>
-        </li>
-    </ul>
+    <tal:block tal:condition="not election.tacit">
+        <ul class="small-block-grid-1 medium-block-grid-4 factoids">
+            <li>
+                <span i18n:translate="">Turnout</span>
+                <strong>${'{0:.2f}'.format(election.turnout)} %</strong>
+            </li>
+            <li>
+                <span i18n:translate="">Elegible Voters</span>
+                <strong>${layout.format_number(election.elegible_voters)}</strong>
+            </li>
+            <li>
+                <span i18n:translate="">Received Ballots</span>
+                <strong>${layout.format_number(election.received_ballots)}</strong>
+            </li>
+            <li>
+                <span i18n:translate="">Counted</span>
+                <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" /></strong>
+            </li>
+        </ul>
+        <ul class="small-block-grid-1 medium-block-grid-4 factoids">
+            <li>
+                <span i18n:translate="">Mandates</span>
+                <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress (election.allocated_mandates, election.number_of_mandates)" /></strong>
+            </li>
+            <li tal:condition="layout.majorz">
+                <span i18n:translate="">Absolute majority</span>
+                <strong tal:condition="election.absolute_majority">${layout.format_number(election.absolute_majority or 0)}</strong>
+            </li>
+        </ul>
+    </tal:block>
 </metal:election_factoids>
 
 <metal:vote_factoids define-macro="vote_factoids" i18n:domain="onegov.election_day">

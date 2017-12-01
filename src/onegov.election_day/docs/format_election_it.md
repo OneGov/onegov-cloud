@@ -11,6 +11,7 @@ Sono accettati come formati di file CSV, XLS o XLSX generati dai "Wabsti elezion
 4. [WabstiCExport Sistema Maggioritario](#4-wabsticexport-sistema-maggioritario)
 5. [WabstiCExport Sistema Proporzionale](#5-wabsticexport-sistema-proporzionale)
 6. [Party results](#6-party-results)
+7. [Elezione tacita](#7-elezione-tacita)
 
 
 1 Onegov
@@ -233,3 +234,9 @@ Nome|Descrizione
 ### Template
 
 - [election_party_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_party_results.csv)
+
+
+7 Elezione tacita
+-----------------
+
+Tacit elections can be uploaded by using the internal format with every vote set to `0`.

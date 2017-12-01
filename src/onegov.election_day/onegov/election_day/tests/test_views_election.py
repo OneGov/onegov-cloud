@@ -1,3 +1,4 @@
+from datetime import date
 from freezegun import freeze_time
 from onegov.election_day.tests import login
 from onegov.election_day.tests import upload_majorz_election
@@ -369,3 +370,59 @@ def test_view_election_data(election_day_app_gr):
 
     export = client.get('/election/proporz-election/data-xlsx')
     assert export.status == '200 OK'
+
+
+def test_view_election_tacit(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = 'Tacit Election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 2
+    new.form['election_type'] = 'majorz'
+    new.form['domain'] = 'federation'
+    new.form['tacit'] = True
+    new.form.submit()
+
+    csv = (
+        'election_status,'
+        'entity_id,'
+        'entity_name,'
+        'entity_elegible_voters,'
+        'entity_received_ballots,'
+        'entity_invalid_ballots,'
+        'entity_blank_ballots,'
+        'entity_blank_votes,'
+        'entity_invalid_votes,'
+        'candidate_id,'
+        'candidate_elected,'
+        'candidate_family_name,'
+        'candidate_first_name,'
+        'candidate_votes,'
+        'election_counted_entities,'
+        'election_total_entities,'
+        'election_absolute_majority,'
+        'candidate_party,'
+        '\n'
+    )
+    csv += (
+        "final,3503,Mutten,56,0,0,0,0,0,1,True,Engler,Stefan,0,1,125,,\n"
+    )
+    csv += (
+        "final,3503,Mutten,56,0,0,0,0,0,2,True,Schmid,Martin,0,1,125,,\n"
+    )
+    csv = csv.encode('utf-8')
+
+    upload = client.get('/election/tacit-election/upload').follow()
+    upload.form['file_format'] = 'internal'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload = upload.form.submit()
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+    candidates = client.get('/election/tacit-election/candidates')
+    assert "Engler Stefan" in candidates
+    assert "Schmid Martin" in candidates
+    assert "Wahlbeteiligung" not in candidates
