@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.18.0 (2017-12-01)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds tacit elections.
   [msom]
