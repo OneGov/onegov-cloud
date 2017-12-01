@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.19.0 (2017-12-01)
+~~~~~~~~~~~~~~~~~~~
+
 - Changes the long date format to include the weekday.
   [href]
 
