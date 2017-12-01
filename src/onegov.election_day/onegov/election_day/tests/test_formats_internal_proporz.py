@@ -119,7 +119,6 @@ def test_import_internal_proporz_missing_headers(session):
         BytesIO((
             '\n'.join((
                 ','.join((
-                    'election_absolute_majority',
                     'election_status',
                     'election_counted_entities',
                     'election_total_entities',
@@ -170,7 +169,6 @@ def test_import_internal_proporz_invalid_values(session):
         BytesIO((
             '\n'.join((
                 ','.join((
-                    'election_absolute_majority',
                     'election_status',
                     'election_counted_entities',
                     'election_total_entities',
@@ -196,7 +194,6 @@ def test_import_internal_proporz_invalid_values(session):
                     'candidate_party',
                 )),
                 ','.join((
-                    'xxx',  # election_absolute_majority
                     'xxx',  # election_status
                     'xxx',  # election_counted_entities
                     'xxx',  # election_total_entities
@@ -222,7 +219,6 @@ def test_import_internal_proporz_invalid_values(session):
                     'xxx',  # candidate_party
                 )),
                 ','.join((
-                    '',  # election_absolute_majority
                     'unknown',  # election_status
                     '1',  # election_counted_entities
                     '78',  # election_total_entities
@@ -284,7 +280,6 @@ def test_import_internal_proporz_expats(session):
             BytesIO((
                 '\n'.join((
                     ','.join((
-                        'election_absolute_majority',
                         'election_status',
                         'election_counted_entities',
                         'election_total_entities',
@@ -310,7 +305,6 @@ def test_import_internal_proporz_expats(session):
                         'candidate_party',
                     )),
                     ','.join((
-                        '',  # election_absolute_majority
                         'unknown',  # election_status
                         '1',  # election_counted_entities
                         '11',  # election_total_entities
