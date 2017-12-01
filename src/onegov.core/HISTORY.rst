@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.54.0 (2017-12-01)
+~~~~~~~~~~~~~~~~~~~
 
 - Switches the data type of all JSON columns from TEXT to JSONB.
   [href]
