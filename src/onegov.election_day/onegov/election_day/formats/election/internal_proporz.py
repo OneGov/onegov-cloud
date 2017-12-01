@@ -15,7 +15,6 @@ from uuid import uuid4
 
 
 HEADERS = [
-    'election_absolute_majority',
     'election_status',
     'election_counted_entities',
     'election_total_entities',
