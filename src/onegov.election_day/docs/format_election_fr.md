@@ -181,7 +181,7 @@ Nom|Description
 
 ### Résultats de candidats des colonnes
 
-Da das Datenformat keine Informationen über die gewählten Kandidaten liefert, müssen diese in einer zweiten Tabelle mitgeliefert werden. Jede Zeile enthält dabei eine gewählten Kandidaten mit den folgenden Spalten:
+Because the file format does not supply any information on the elected candidate, those must be included in a second column. Each row consists of one elected candidate with the following columns:
 
 Nom|Description
 ---|---
@@ -232,7 +232,7 @@ Nom|Description
 `votes`|The number of votes.
 
 
-### Template
+### Modèles
 
 - [election_party_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_party_results.csv)
 

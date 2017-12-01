@@ -231,7 +231,7 @@ Nome|Descrizione
 `mandates`|The number of mandates.
 `votes`|The number of votes.
 
-### Template
+### Modelli
 
 - [election_party_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_party_results.csv)
 
