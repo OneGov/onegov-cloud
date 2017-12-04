@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Ensures absence of whitespace in user realnames.
+  [href]
+
 - Allows the publication/archival of activities from inactive periods.
   [href]
 

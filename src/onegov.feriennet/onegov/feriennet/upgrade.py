@@ -6,8 +6,9 @@ import textwrap
 
 from onegov.core.upgrade import upgrade_task
 from onegov.feriennet.models import NotificationTemplate
+from onegov.feriennet.utils import NAME_SEPARATOR
 from onegov.org.models import Organisation
-from onegov.user import UserCollection
+from onegov.user import UserCollection, User
 
 
 @upgrade_task('Install the default feriennet page structure 2')
@@ -79,3 +80,23 @@ def change_period_to_zeitraum(context):
     for template in templates:
         template.subject = template.subject.replace('[Periode]', '[Zeitraum]')
         template.text = template.text.replace('[Periode]', '[Zeitraum]')
+
+
+@upgrade_task('Remove extra space from user')
+def remove_extra_space_from_user(context):
+    org = context.session.query(Organisation).first()
+
+    if org is None:
+        return
+
+    # not a feriennet
+    if '<registration />' not in org.meta['homepage_structure']:
+        return
+
+    users = UserCollection(context.session).query()
+    users = users.filter(User.realname.like('%{}%'.format(NAME_SEPARATOR)))
+
+    for user in users:
+        user.realname = NAME_SEPARATOR.join(
+            p.strip() for p in user.realname.split(NAME_SEPARATOR)
+        )

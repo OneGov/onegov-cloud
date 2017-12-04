@@ -107,7 +107,10 @@ class UserProfileForm(Form):
 
     @property
     def name(self):
-        return encode_name(self.first_name.data, self.last_name.data).strip()
+        return encode_name(
+            self.first_name.data.strip(),
+            self.last_name.data.strip()
+        )
 
     @name.setter
     def name(self, value):
@@ -155,6 +158,10 @@ class UserProfileForm(Form):
                         continue
 
                 model.data[key] = self.data.get(key)
+
+                # strip whitespace from all fields
+                if isinstance(model.data[key], str):
+                    model.data[key] = model.data[key].strip()
 
     def process_obj(self, model):
         super().process_obj(model)
