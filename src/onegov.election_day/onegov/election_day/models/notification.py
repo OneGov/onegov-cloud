@@ -22,11 +22,19 @@ class Notification(Base, TimestampMixin):
 
     __tablename__ = 'notifications'
 
+    #: the type of the item, this can be used to create custom polymorphic
+    #: subclasses of this class. See
+    #: `<http://docs.sqlalchemy.org/en/improve_toc/\
+    #: orm/extensions/declarative/inheritance.html>`_.
+    type = Column(Text, nullable=True)
+
+    __mapper_args__ = {
+        'polymorphic_on': type,
+        'polymorphic_identity': None
+    }
+
     #: Identifies the notification
     id = Column(UUID, primary_key=True, default=uuid4)
-
-    #: The action made (e.g. the URL called)
-    action = Column(Text, nullable=False)
 
     #: The last update of the corresponding election/vote
     last_modified = Column(UTCDateTime, nullable=True)
@@ -60,6 +68,8 @@ class Notification(Base, TimestampMixin):
 
 class WebhookNotification(Notification):
 
+    __mapper_args__ = {'polymorphic_identity': 'webhooks'}
+
     def trigger(self, request, model):
         """ Posts the summary of the given vote or election to the webhook
         URL defined for this principal.
@@ -72,7 +82,6 @@ class WebhookNotification(Notification):
 
         """
         self.update_from_model(model)
-        self.action = 'webhooks'
 
         webhooks = request.app.principal.webhooks
         if webhooks:
@@ -91,6 +100,8 @@ class WebhookNotification(Notification):
 
 class SmsNotification(Notification):
 
+    __mapper_args__ = {'polymorphic_identity': 'sms'}
+
     def trigger(self, request, model):
         """ Posts a link to the vote or election to all subscribers.
 
@@ -100,7 +111,6 @@ class SmsNotification(Notification):
 
         """
         self.update_from_model(model)
-        self.action = 'sms'
 
         if model.completed:
             content = _(

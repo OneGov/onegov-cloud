@@ -170,3 +170,21 @@ def make_subscriber_polymorphic(context):
         susbscribers = susbscribers.filter(Subscriber.type.is_(None))
         for subscriber in susbscribers:
             subscriber.type = 'sms'
+
+
+@upgrade_task('Make notifications polymorphic')
+def make_notifications_polymorphic(context):
+    if (
+        context.has_column('notifications', 'action') and
+        not context.has_column('notifications', 'type')
+    ):
+        context.operations.execute(
+            'ALTER TABLE {} RENAME COLUMN {} TO {};'.format(
+                'notifications', 'action', 'type'
+            )
+        )
+        context.operations.execute(
+            'ALTER TABLE {} ALTER COLUMN {} DROP NOT NULL;'.format(
+                'notifications', 'type'
+            )
+        )

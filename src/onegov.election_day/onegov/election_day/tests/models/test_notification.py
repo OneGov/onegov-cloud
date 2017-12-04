@@ -19,17 +19,15 @@ from unittest.mock import patch
 
 def test_notification(session):
     notification = Notification()
-    notification.action = 'action'
     notification.last_modified = datetime(
         2007, 1, 1, 0, 0, tzinfo=timezone.utc
     )
-
     session.add(notification)
     session.flush()
 
     notification = session.query(Notification).one()
     assert notification.id
-    assert notification.action == 'action'
+    assert notification.type == None
     assert notification.last_modified == datetime(
         2007, 1, 1, 0, 0, tzinfo=timezone.utc
     )
@@ -94,7 +92,7 @@ def test_webhook_notification(session):
         notification = WebhookNotification()
         notification.trigger(DummyRequest(), election)
 
-        assert notification.action == 'webhooks'
+        assert notification.type == 'webhooks'
         assert notification.election_id == election.id
         assert notification.last_modified == datetime(
             2008, 1, 1, 0, 0, tzinfo=timezone.utc
@@ -111,7 +109,7 @@ def test_webhook_notification(session):
 
         notification.trigger(DummyRequest(), vote)
 
-        assert notification.action == 'webhooks'
+        assert notification.type == 'webhooks'
         assert notification.vote_id == vote.id
         assert notification.last_modified == datetime(
             2008, 1, 1, 0, 0, tzinfo=timezone.utc
@@ -197,14 +195,14 @@ def test_sms_notification(request, election_day_app, session):
 
         notification = SmsNotification()
         notification.trigger(request, election)
-        assert notification.action == 'sms'
+        assert notification.type == 'sms'
         assert notification.election_id == election.id
         assert notification.last_modified == freezed
         assert election_day_app.send_sms.call_count == 0
 
         notification = SmsNotification()
         notification.trigger(request, vote)
-        assert notification.action == 'sms'
+        assert notification.type == 'sms'
         assert notification.vote_id == vote.id
         assert notification.last_modified == freezed
         assert election_day_app.send_sms.call_count == 0
@@ -217,7 +215,7 @@ def test_sms_notification(request, election_day_app, session):
         notification = SmsNotification()
         notification.trigger(request, election)
 
-        assert notification.action == 'sms'
+        assert notification.type == 'sms'
         assert notification.election_id == election.id
         assert notification.last_modified == freezed
         assert election_day_app.send_sms.call_count == 2
@@ -234,7 +232,7 @@ def test_sms_notification(request, election_day_app, session):
         notification = SmsNotification()
         notification.trigger(request, vote)
 
-        assert notification.action == 'sms'
+        assert notification.type == 'sms'
         assert notification.vote_id == vote.id
         assert notification.last_modified == freezed
         assert election_day_app.send_sms.call_count == 4
@@ -252,7 +250,7 @@ def test_sms_notification(request, election_day_app, session):
         notification = SmsNotification()
         notification.trigger(request, election)
 
-        assert notification.action == 'sms'
+        assert notification.type == 'sms'
         assert notification.election_id == election.id
         assert notification.last_modified == freezed
         assert election_day_app.send_sms.call_count == 6
@@ -270,7 +268,7 @@ def test_sms_notification(request, election_day_app, session):
         notification = SmsNotification()
         notification.trigger(request, vote)
 
-        assert notification.action == 'sms'
+        assert notification.type == 'sms'
         assert notification.vote_id == vote.id
         assert notification.last_modified == freezed
         assert election_day_app.send_sms.call_count == 8

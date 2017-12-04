@@ -49,13 +49,13 @@ def test_notification_collection(session):
 
         notifications = collection.by_election(election)
         assert len(notifications) == 1
-        assert notifications[0].action == 'webhooks'
+        assert notifications[0].type == 'webhooks'
         assert notifications[0].election_id == election.id
         assert notifications[0].last_modified.isoformat().startswith('2008-01')
 
         notifications = collection.by_vote(vote)
         assert len(notifications) == 1
-        assert notifications[0].action == 'webhooks'
+        assert notifications[0].type == 'webhooks'
         assert notifications[0].vote_id == vote.id
         assert notifications[0].last_modified.isoformat().startswith('2008-01')
 
@@ -76,9 +76,9 @@ def test_notification_collection(session):
 
         notifications = collection.by_election(election)
         assert len(notifications) == 2
-        assert notifications[0].action in ('webhooks', 'sms')
-        assert notifications[1].action in ('webhooks', 'sms')
-        assert notifications[0].action != notifications[1].action
+        assert notifications[0].type in ('webhooks', 'sms')
+        assert notifications[1].type in ('webhooks', 'sms')
+        assert notifications[0].type != notifications[1].type
         assert notifications[0].election_id == election.id
         assert notifications[1].election_id == election.id
         assert notifications[0].last_modified.isoformat().startswith('2009-01')
@@ -86,9 +86,9 @@ def test_notification_collection(session):
 
         notifications = collection.by_vote(vote)
         assert len(notifications) == 2
-        assert notifications[0].action in ('webhooks', 'sms')
-        assert notifications[1].action in ('webhooks', 'sms')
-        assert notifications[0].action != notifications[1].action
+        assert notifications[0].type in ('webhooks', 'sms')
+        assert notifications[1].type in ('webhooks', 'sms')
+        assert notifications[0].type != notifications[1].type
         assert notifications[0].vote_id == vote.id
         assert notifications[1].vote_id == vote.id
         assert notifications[0].last_modified.isoformat().startswith('2009-01')
