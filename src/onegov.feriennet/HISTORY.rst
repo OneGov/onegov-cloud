@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Hides users without realname from the booking/payment selectors.
+  [href]
+
 - Ensures absence of whitespace in user realnames.
   [href]
 

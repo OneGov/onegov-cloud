@@ -478,9 +478,13 @@
     <div class="filter-panel" tal:condition="request.is_admin and users">
         <h2 class="filter-title" i18n:translate>User</h2>
         <select onchange="location = this.value;">
-            <option tal:repeat="u users" value="${request.link(model.for_username(u.username))}" tal:attributes="selected u.id == user.id">
-                ${u.title}
-            </option>
+            <tal:b repeat="u users">
+                <option tal:condition="u.username == request.current_username or u.realname"
+                        tal:attributes="selected u.id == user.id"
+                        value="${request.link(model.for_username(u.username))}">
+                    ${u.title}
+                </option>
+            </tal:b>
         </select>
     </div>
 </metal:users>
