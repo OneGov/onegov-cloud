@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-11-30 17:05+0100\n"
-"PO-Revision-Date: 2017-11-30 16:45+0100\n"
+"PO-Revision-Date: 2017-12-04 07:23+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -230,7 +230,7 @@ msgid "Absolute majority"
 msgstr "Majorité absolue"
 
 msgid "Provide at least one title."
-msgstr ""
+msgstr "Indiquez au moins un titre."
 
 msgid "Election based on the simple majority system"
 msgstr "Election selon le système majoritaire"
@@ -242,13 +242,13 @@ msgid "Phone number"
 msgstr "Téléphone"
 
 msgid "Title of the the vote/proposal"
-msgstr ""
+msgstr "Titre du vote / de l'initiative"
 
 msgid "Title of the counter proposal"
-msgstr ""
+msgstr "Titre de le contre-projet"
 
 msgid "Title of the tie breaker"
-msgstr ""
+msgstr "Titre de le jeu décisif"
 
 msgid "Simple Vote"
 msgstr "Vote simple"
@@ -702,7 +702,7 @@ msgid "View"
 msgstr "Voir"
 
 msgid "Clear results"
-msgstr ""
+msgstr "Effacer les résultats"
 
 msgid "Upload party results"
 msgstr "Uploader les résultats par parti"
@@ -809,10 +809,10 @@ msgid "Blank list"
 msgstr "Liste vierge"
 
 msgid "Update results"
-msgstr ""
+msgstr "Mettre à jour les résultats"
 
 msgid "Results updated."
-msgstr ""
+msgstr "Résultats mis à jour."
 
 msgid "Do you really want to regenerate the token?"
 msgstr "Voulez-vous vraiment renouveler le token ?"
@@ -831,29 +831,29 @@ msgid "Delete mapping"
 msgstr "Supprimer la cartographie"
 
 msgid "Data source added."
-msgstr ""
+msgstr "Source de données ajoutée."
 
 msgid "Token regenerated."
-msgstr ""
+msgstr "Token régénéré."
 
 msgid "Data source deleted."
-msgstr ""
+msgstr "Source de données supprimée."
 
 msgid "Mapping added."
-msgstr ""
+msgstr "Cartographie ajoutée."
 
 msgid "Mapping modified."
-msgstr ""
+msgstr "Cartographie modifiée."
 
 msgid "Mapping deleted."
-msgstr ""
+msgstr "Cartographie supprimée."
 
 msgid "Edit election"
 msgstr "Modifier l’élection"
 
 #, python-format
 msgid "Do you really want to clear all results of \"${item}\"?"
-msgstr ""
+msgstr "Voulez-vous vraiment effacer tous les résultats de \"${item}\" ?"
 
 msgid "Delete election"
 msgstr "Supprimer l'élection"
@@ -869,25 +869,25 @@ msgid "Do you really want to retrigger the notfications?"
 msgstr "Voulez-vous vraiment réactiver les notifications ?"
 
 msgid "Election added."
-msgstr ""
+msgstr "Élection ajoutée."
 
 msgid "Election modified."
-msgstr ""
+msgstr "Élection modifiée."
 
 msgid "Results deleted."
-msgstr ""
+msgstr "Résultats supprimés."
 
 msgid "Election deleted."
-msgstr ""
+msgstr "Élection supprimée."
 
 msgid "Notifications triggered."
-msgstr ""
+msgstr "Notifications activées."
 
 msgid "Delete subscriber"
 msgstr "Supprimer l'abonné(e)"
 
 msgid "Subscriber deleted."
-msgstr ""
+msgstr "Souscripteur supprimé."
 
 msgid "Edit vote"
 msgstr "Modifier la votation"
@@ -896,13 +896,13 @@ msgid "Delete vote"
 msgstr "Supprimer la votation"
 
 msgid "Vote added."
-msgstr ""
+msgstr "Vote ajouté."
 
 msgid "Vote modified."
-msgstr ""
+msgstr "Vote modifié."
 
 msgid "Vote deleted."
-msgstr ""
+msgstr "Vote supprimé."
 
 #, python-format
 msgid "The year ${year} is not yet supported"

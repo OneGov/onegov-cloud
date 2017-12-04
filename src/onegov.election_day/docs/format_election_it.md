@@ -29,7 +29,7 @@ Nome|Descrizione
 `election_status`|`unknown`, `interim` or `final`.
 `election_counted_entities`|Numero di comuni scrutinati. Se `election_counted_entities = election_total_entities`, allora l'elezione è considerata completamente scrutinata.
 `election_total_entities`|Numero totale dei comuni. Se non sono disponibili notizie certe sullo stato dell'elezione (perché l'elezione è stata importata da Wabsti) allora questo valore è `0`.
-`entity_id`|Numero BFS del comune. A value of `0` can be used for expats.
+`entity_id`|Numero BFS del comune. Si può usare il valore `0` per gli espatriati
 `entity_name`|The name of the municipality.
 `entity_elegible_voters`|Numero di aventi diritto al voto nel Comune.
 `entity_received_ballots`|Numero di schede presentate nel Comune.
@@ -46,25 +46,25 @@ Nome|Descrizione
 `candidate_family_name`|Cognome del candidato.
 `candidate_first_name`|Nome del candidato.
 `candidate_elected`|Vero, se il candidato è stato eletto.
-`candidate_party`|The name of the party.
+`candidate_party`|Il nome del partito.
 `candidate_votes`|Numero di voti per il candidato nel Comune.
 
-#### Panachage results
+#### Risultati panachage
 
-The results may contain panachage results by adding one column per list:
+I risultati possono contenere dei risultati di panachage aggiungendo una colonna per lista:
 
 Nome|Descrizione
 ---|---
-`panachage_votes_from_list_{XX}`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
+`panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con ‘list_id = XX’. Se ‘list_id’ vale ‘999’, i voti provengono dalla lista vuota.
 
 ### Risultati temporanei
 
 I comuni non ancora completamente scrutinati non sono inclusi nei file.
 
-If the status is
-- `interim`, the whole election is considered not yet completed
-- `final`, the whole election is considered completed
-- `unknown`, the whole vote is considered completed, if `election_counted_entities` and `election_total_entities` match
+Se lo stato è
+- `interim`, l’intera elezione non è ancora stata completata
+- `final`, l’intera elezione è stata completata
+- `unknown`, l’intera fase di voto è stata completata se `election_counted_entities` e `election_total_entities` corrispondono
 
 ### Modello
 
@@ -83,7 +83,7 @@ Nell'esportazione dei dati, è presente una riga per ogni comune, i candidati so
 Nome|Descrizione
 ---|---
 `AnzMandate`|
-`BFS`|The municipality number (BFS number) at the time of the election. A value of `0` can be used for expats.
+`BFS`|Numero BFS del comune. Si può usare il valore `0` per gli espatriati
 `EinheitBez`|
 `StimmBer`|
 `StimmAbgegeben`|
@@ -137,7 +137,7 @@ Il formato di file ha bisogno di quattro tabelle separate: l'esportazione dei da
 
 Nome|Descrizione
 ---|---
-`Einheit_BFS`|The municipality number (BFS number) at the time of the election. A value of `0` can be used for expats.
+`Einheit_BFS`|Numero BFS del comune. Si può usare il valore `0` per gli espatriati
 `Einheit_Name`|
 `Kand_Nachname`|
 `Kand_Vorname`|
@@ -147,13 +147,13 @@ Nome|Descrizione
 `Kand_StimmenTotal`|
 `Liste_ParteistimmenTotal`|
 
-#### Panachage results
+#### Risultati panachage
 
-The results may contain panachage results by adding one column per list:
+I risultati possono contenere dei risultati di panachage aggiungendo una colonna per lista:
 
 Nome|Descrizione
 ---|---
-`{List ID}.{List code}`|The number of votes the list got from the list with the given `Liste_ID`. A `Liste_ID` with the value `99` (`99.WoP`) marks the votes from the blank list.
+`{List ID}.{List code}`|Il numero dei voti ottenuti dalla lista proveniente dalla lista con il ‘Liste_ID’ specificato. Se ‘Liste_ID’ vale ‘99’ (’99.WoP’), i voti provengono dalla lista vuota.
 
 ### Colonne esportazione di dati di statistica
 
@@ -206,30 +206,30 @@ Il formato del file, inoltre, non contiene alcuna informazione sul fatto che un 
 4 WabstiCExport Sistema Maggioritario
 -------------------------------------
 
-Version `2.2` is supported, please refer to the documentation provided by the exporter program for more information about the columns of the different files.
+La versione `2.2` è supportata. Consulta la documentazione del programma di esportazione per ulteriori informazioni riguardo le colonne dei vari file.
 
 
 5 WabstiCExport Sistema Proporzionale
 -------------------------------------
 
-Version `2.2` is supported, please refer to the documentation provided by the exporter program for more information about the columns of the different files.
+La versione `2.2` è supportata. Consulta la documentazione del programma di esportazione per ulteriori informazioni riguardo le colonne dei vari file.
 
 
 6 Party results
 ---------------
 
-Each (proporz) election may contain party results. These results are independent of the other results and typically contain the already aggregated results of the different lists of a party.
+Ciascuna elezione ("proporz") può contenere i risultati di partito. Questi risultati sono indipendenti dagli altri risultati e di solito contengono i valori già aggregati delle varie liste di un partito.
 
-The following columns will be evaluated and should exist:
+Le seguenti colonne verranno valutate e devono esistere:
 
 Nome|Descrizione
 ---|---
-`year`|The year of the election.
-`total_votes`|The total votes of the election.
-`name`|The name of the party.
-`color`|The color of the party.
-`mandates`|The number of mandates.
-`votes`|The number of votes.
+`year`|L’anno dell’elezione.
+`total_votes`|Il totale dei voti dell’elezione.
+`name`|Il nome del partito.
+`color`|Il colore del partito.
+`mandates`|Il numero di mandati.
+`votes`|Il numero di voti.
 
 ### Modelli
 
@@ -239,4 +239,4 @@ Nome|Descrizione
 7 Elezione tacita
 -----------------
 
-Tacit elections can be uploaded by using the internal format with every vote set to `0`.
+Si possono caricare delle elezioni tacite usando il formato interno con ogni voto impostato a `0`.
