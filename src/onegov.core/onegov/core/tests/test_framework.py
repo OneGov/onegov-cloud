@@ -13,7 +13,7 @@ from itsdangerous import BadSignature, Signer
 from onegov.core.redirect import Redirect
 from onegov.core.framework import Framework
 from onegov.core.upgrade import UpgradeState
-from onegov.core.mail import convert_to_plaintext
+from onegov.core.html import html_to_text
 from onegov.server import Config, Server
 from unittest.mock import patch
 from webtest import TestApp as Client
@@ -731,13 +731,13 @@ def test_send_email_unicode(smtp):
     )
 
 
-def test_convert_to_plaintext():
+def test_html_to_text():
     html = (
         "<h1>Date</h1><p>6. April 1984</p>\n"
         "<h1>Path</h1><p>/foo-bar</p>\n"
     )
 
-    plaintext = convert_to_plaintext(html)
+    plaintext = html_to_text(html)
     assert plaintext == "# Date\n\n6. April 1984\n\n# Path\n\n/foo-bar"
 
 

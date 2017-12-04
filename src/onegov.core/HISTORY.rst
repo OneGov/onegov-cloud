@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Generalises the html to plaintext function to be useable outside mail.
+  [href]
+
 0.54.0 (2017-12-01)
 ~~~~~~~~~~~~~~~~~~~
 
