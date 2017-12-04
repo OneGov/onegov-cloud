@@ -14,7 +14,7 @@
         <p i18n:translate>If you did not subscribe to this newsletter you can simply ignore this e-mail. We will not bother you again.</p>
 
         <p i18n:translate>Best regards,</p>
-        <p i18n:translate>The OneGov Cloud Team</p>
-        
+        <tal:b metal:use-macro="layout.macros['sender']" />
+
     </tal:block>
 </div>

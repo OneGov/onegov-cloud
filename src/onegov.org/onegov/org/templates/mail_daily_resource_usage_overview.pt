@@ -71,7 +71,7 @@
         </tal:block>
 
         <p i18n:translate>Have a great day!</p>
-        <p i18n:translate>The OneGov Cloud Team</p>
+        <tal:b metal:use-macro="layout.macros['sender']" />
     </tal:block>
     <tal:block metal:fill-slot="above-footer">
         <p>

@@ -45,5 +45,9 @@
     </p>
 </metal:event>
 
+<metal:sender define-macro="sender" i18n:domain="onegov.org">
+    <p i18n:translate>The OneGov Cloud Team</p>
+</metal:sender>
+
 </body>
 </html>
