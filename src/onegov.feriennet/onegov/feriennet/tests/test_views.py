@@ -1078,8 +1078,8 @@ def test_booking_view(feriennet_app):
             period=period
         ))
 
-    m1 = users.add('m1@example.org', 'hunter2', 'member')
-    m2 = users.add('m2@example.org', 'hunter2', 'member')
+    m1 = users.add('m1@example.org', 'hunter2', 'member', realname="Tom")
+    m2 = users.add('m2@example.org', 'hunter2', 'member', realname="Harry")
 
     a1 = attendees.add(m1, 'Dustin', date(2000, 1, 1), 'female')
     a2 = attendees.add(m2, 'Mike', date(2000, 1, 1), 'female')
