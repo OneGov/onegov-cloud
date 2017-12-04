@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a text version of the html output in activites exports.
+  [href]
+
 - Hides users without realname from the booking/payment selectors.
   [href]
 

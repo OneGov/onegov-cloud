@@ -1,3 +1,4 @@
+from onegov.core.mail import html_to_text
 from onegov.feriennet import _
 from onegov.feriennet.exports.const import ACTIVITY_STATES
 from onegov.feriennet.exports.const import BOOKING_STATES
@@ -13,7 +14,8 @@ class FeriennetExport(Export):
     def activity_fields(self, activity):
         yield _("Activity Title"), activity.title
         yield _("Activity Lead"), activity.lead
-        yield _("Activity Text"), activity.text
+        yield _("Activity Text"), html_to_text(activity.text)
+        yield _("Activity Text (HTML)"), activity.text
         yield _("Activity Status"), ACTIVITY_STATES[activity.state]
         yield _("Activity Location"), activity.location
 
