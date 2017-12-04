@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.19.1 (2017-12-04)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to override the sender line in e-mails.
   [href]
 
