@@ -6,7 +6,7 @@ from onegov.election_day.layouts.manage import ManageDataSourcesLayout
 from onegov.election_day.layouts.manage import ManageElectionsLayout
 from onegov.election_day.layouts.manage import ManageLayout
 from onegov.election_day.layouts.manage import ManageSubscribersLayout
-from onegov.election_day.layouts.manage import ManageVotessLayout
+from onegov.election_day.layouts.manage import ManageVotesLayout
 from onegov.election_day.layouts.vote import VoteLayout
 
 
@@ -19,6 +19,6 @@ __all__ = [
     'ManageElectionsLayout',
     'ManageLayout',
     'ManageSubscribersLayout',
-    'ManageVotessLayout',
+    'ManageVotesLayout',
     'VoteLayout',
 ]

@@ -72,7 +72,7 @@ class ManageElectionsLayout(ManageLayout):
         )
 
 
-class ManageVotessLayout(ManageLayout):
+class ManageVotesLayout(ManageLayout):
 
     @cached_property
     def manage_model_link(self):

@@ -12,7 +12,7 @@ from onegov.election_day.layouts import ManageDataSourceItemsLayout
 from onegov.election_day.layouts import ManageDataSourcesLayout
 from onegov.election_day.layouts import ManageElectionsLayout
 from onegov.election_day.layouts import ManageSubscribersLayout
-from onegov.election_day.layouts import ManageVotessLayout
+from onegov.election_day.layouts import ManageVotesLayout
 from onegov.election_day.layouts import VoteLayout
 from onegov.election_day.collections import DataSourceCollection
 from onegov.election_day.collections import DataSourceItemCollection
@@ -270,7 +270,7 @@ def test_votes_layout(session):
 
 def test_manage_layout(session):
     # Votes
-    layout = ManageVotessLayout(
+    layout = ManageVotesLayout(
         VoteCollection(session),
         DummyRequest()
     )
@@ -285,7 +285,7 @@ def test_manage_layout(session):
     ]
 
     # ... with full menu
-    layout = ManageVotessLayout(
+    layout = ManageVotesLayout(
         VoteCollection(session),
         DummyRequest()
     )
