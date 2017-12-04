@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-30 17:05+0100\n"
-"PO-Revision-Date: 2017-12-04 07:23+0100\n"
+"POT-Creation-Date: 2017-12-04 13:58+0100\n"
+"PO-Revision-Date: 2017-12-04 13:19+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -13,57 +13,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
 "X-Generator: Poedit 2.0.4\n"
-
-msgid "Expats"
-msgstr "Suisses de l'étranger"
-
-msgid "Lists"
-msgstr "Listes"
-
-msgid "Candidates"
-msgstr "Candidats"
-
-msgid "List connections"
-msgstr "Connexions de listes"
-
-msgid "Parties"
-msgstr "Partis"
-
-msgid "Election statistics"
-msgstr "Statistiques des élections"
-
-msgid "Panachage"
-msgstr "Panachage"
-
-msgid "Downloads"
-msgstr "Téléchargements"
-
-msgid "Proposal"
-msgstr "Objet de la votation"
-
-msgid "Counter Proposal"
-msgstr "Contre-projet"
-
-msgid "Tie-Breaker"
-msgstr "Question subsidiaire"
-
-msgid "Votes"
-msgstr "Votations"
-
-msgid "Elections"
-msgstr "Elections"
-
-msgid "Manage"
-msgstr "Gérer"
-
-msgid "Subscribers"
-msgstr "Abonnés"
-
-msgid "Data sources"
-msgstr "Sources de données"
-
-msgid "Mappings"
-msgstr "Cartographie"
 
 msgid "Not a valid phone number."
 msgstr "N'est pas un numéro de téléphone valide."
@@ -151,11 +100,26 @@ msgstr "Candidats élus"
 msgid "Unknown candidate"
 msgstr "Candidat inconnu"
 
+msgid "List connections"
+msgstr "Connexions de listes"
+
+msgid "Election statistics"
+msgstr "Statistiques des élections"
+
 msgid "Invalid id"
 msgstr "Mauvaise référence"
 
 msgid "Could not read the elegible voters"
 msgstr "Impossible de connaître les électeurs valides"
+
+msgid "Proposal"
+msgstr "Objet de la votation"
+
+msgid "Counter Proposal"
+msgstr "Contre-projet"
+
+msgid "Tie-Breaker"
+msgstr "Question subsidiaire"
 
 msgid "Missing municipality/district"
 msgstr "Municipalité manquante/District manquant"
@@ -238,6 +202,9 @@ msgstr "Election selon le système majoritaire"
 msgid "Election based on proportional representation"
 msgstr "Election selon le système proportionnel"
 
+msgid "Email"
+msgstr "Email"
+
 msgid "Phone number"
 msgstr "Téléphone"
 
@@ -285,6 +252,48 @@ msgstr "Numéro de votation"
 
 msgid "Default"
 msgstr "Défaut"
+
+msgid "Expats"
+msgstr "Suisses de l'étranger"
+
+msgid "Lists"
+msgstr "Listes"
+
+msgid "Candidates"
+msgstr "Candidats"
+
+msgid "Parties"
+msgstr "Partis"
+
+msgid "Panachage"
+msgstr "Panachage"
+
+msgid "Downloads"
+msgstr "Téléchargements"
+
+msgid "Votes"
+msgstr "Votations"
+
+msgid "Elections"
+msgstr "Elections"
+
+msgid "Manage"
+msgstr "Gérer"
+
+msgid "Data sources"
+msgstr "Sources de données"
+
+msgid "Mappings"
+msgstr "Cartographie"
+
+msgid "SMS subscribers"
+msgstr "Abonnés SMS"
+
+msgid "Email subscribers"
+msgstr "Abonnés e-mail"
+
+msgid "Subscribers"
+msgstr "Abonnés"
 
 #, python-format
 msgid "Final results are available on ${url}"
@@ -434,8 +443,25 @@ msgstr "Résultats intermédiaires"
 msgid "Last change"
 msgstr "Actualisé"
 
+msgid "Alerts"
+msgstr ""
+
+msgid "Email alerts"
+msgstr ""
+
 msgid "SMS alerts"
 msgstr "Alertes SMS"
+
+msgid ""
+"The email service provides free information on the publication of new "
+"results (intermediate results, final results):"
+msgstr ""
+
+msgid "Get email alerts"
+msgstr ""
+
+msgid "Stop email subscription"
+msgstr ""
 
 msgid ""
 "The SMS service provides free information on the publication of new results "
@@ -790,6 +816,21 @@ msgid ""
 msgstr ""
 "Résultats finaux de l'élection fédérale \"${title}\", ${date}, ${principal}, "
 "répartis par municipalités et par candidats."
+
+msgid ""
+"Successfully subscribed to the email services. You will receive an email "
+"every time new results are published."
+msgstr ""
+
+msgid ""
+"You will receive an email as soon as new results have been published. You "
+"can unsubscribe at any time."
+msgstr ""
+
+msgid ""
+"Successfully unsubscribed from the email services. You will no longer "
+"receive an email when new results are published."
+msgstr ""
 
 msgid ""
 "You will receive an SMS as soon as new results have been published. The SMS "

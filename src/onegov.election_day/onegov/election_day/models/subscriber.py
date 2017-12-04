@@ -11,11 +11,33 @@ class Subscriber(Base, TimestampMixin):
 
     __tablename__ = 'subscribers'
 
+    #: the type of the item, this can be used to create custom polymorphic
+    #: subclasses of this class. See
+    #: `<http://docs.sqlalchemy.org/en/improve_toc/\
+    #: orm/extensions/declarative/inheritance.html>`_.
+    type = Column(Text, nullable=True)
+
+    __mapper_args__ = {
+        'polymorphic_on': type,
+        'polymorphic_identity': None
+    }
+
     #: Identifies the subscriber
     id = Column(UUID, primary_key=True, default=uuid4)
 
-    #: The phone number of the subscriber
-    phone_number = Column(Text, nullable=False)
+    #: The address of the subscriber, e.g. the phone number or the email
+    #: address.
+    address = Column(Text, nullable=False)
 
     #: The locale used by the subscriber
     locale = Column(Text, nullable=False)
+
+
+class SmsSubscriber(Subscriber):
+
+    __mapper_args__ = {'polymorphic_identity': 'sms'}
+
+
+class EmailSubscriber(Subscriber):
+
+    __mapper_args__ = {'polymorphic_identity': 'email'}

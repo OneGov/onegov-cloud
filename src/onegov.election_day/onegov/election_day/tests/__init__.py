@@ -9,6 +9,7 @@ class DummyPrincipal(object):
         self.name = 'name'
         self.webhooks = []
         self.sms_notification = None
+        self.email_notification = None
         self.domain = 'canton'
         self.wabsti_import = False
 

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-30 17:05+0100\n"
-"PO-Revision-Date: 2017-11-30 16:44+0100\n"
+"POT-Creation-Date: 2017-12-04 13:58+0100\n"
+"PO-Revision-Date: 2017-12-04 13:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -13,57 +13,6 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.0.4\n"
-
-msgid "Expats"
-msgstr "Auslandschweizer"
-
-msgid "Lists"
-msgstr "Listen"
-
-msgid "Candidates"
-msgstr "Kandidierende"
-
-msgid "List connections"
-msgstr "Listenverbindungen"
-
-msgid "Parties"
-msgstr "Parteien"
-
-msgid "Election statistics"
-msgstr "Wahlstatistik"
-
-msgid "Panachage"
-msgstr "Panaschierstatistik"
-
-msgid "Downloads"
-msgstr "Downloads"
-
-msgid "Proposal"
-msgstr "Vorlage"
-
-msgid "Counter Proposal"
-msgstr "Gegenentwurf"
-
-msgid "Tie-Breaker"
-msgstr "Stichfrage"
-
-msgid "Votes"
-msgstr "Abstimmungen"
-
-msgid "Elections"
-msgstr "Wahlen"
-
-msgid "Manage"
-msgstr "Verwalten"
-
-msgid "Subscribers"
-msgstr "Abonnenten"
-
-msgid "Data sources"
-msgstr "Datenquellen"
-
-msgid "Mappings"
-msgstr "Zuordnungen"
 
 msgid "Not a valid phone number."
 msgstr "Ungültige Telefonnummer."
@@ -151,11 +100,26 @@ msgstr "Gewählte Kandidierende"
 msgid "Unknown candidate"
 msgstr "Unbekannter Kandidierender"
 
+msgid "List connections"
+msgstr "Listenverbindungen"
+
+msgid "Election statistics"
+msgstr "Wahlstatistik"
+
 msgid "Invalid id"
 msgstr "Ungültige ID"
 
 msgid "Could not read the elegible voters"
 msgstr "Konnte 'Stimmberechtigte' nicht lesen"
+
+msgid "Proposal"
+msgstr "Vorlage"
+
+msgid "Counter Proposal"
+msgstr "Gegenentwurf"
+
+msgid "Tie-Breaker"
+msgstr "Stichfrage"
 
 msgid "Missing municipality/district"
 msgstr "Fehlende Bezeichnung"
@@ -238,6 +202,9 @@ msgstr "Majorzwahl"
 msgid "Election based on proportional representation"
 msgstr "Proporzwahl"
 
+msgid "Email"
+msgstr "E-Mail"
+
 msgid "Phone number"
 msgstr "Telefonnummer"
 
@@ -285,6 +252,48 @@ msgstr "Vorlagen-Nummer"
 
 msgid "Default"
 msgstr "Standard"
+
+msgid "Expats"
+msgstr "Auslandschweizer"
+
+msgid "Lists"
+msgstr "Listen"
+
+msgid "Candidates"
+msgstr "Kandidierende"
+
+msgid "Parties"
+msgstr "Parteien"
+
+msgid "Panachage"
+msgstr "Panaschierstatistik"
+
+msgid "Downloads"
+msgstr "Downloads"
+
+msgid "Votes"
+msgstr "Abstimmungen"
+
+msgid "Elections"
+msgstr "Wahlen"
+
+msgid "Manage"
+msgstr "Verwalten"
+
+msgid "Data sources"
+msgstr "Datenquellen"
+
+msgid "Mappings"
+msgstr "Zuordnungen"
+
+msgid "SMS subscribers"
+msgstr "SMS-Abonnenten"
+
+msgid "Email subscribers"
+msgstr "E-Mail-Abonnenten"
+
+msgid "Subscribers"
+msgstr "Abonnenten"
 
 #, python-format
 msgid "Final results are available on ${url}"
@@ -433,8 +442,27 @@ msgstr "Zwischenergebnisse"
 msgid "Last change"
 msgstr "Aktualisiert"
 
+msgid "Alerts"
+msgstr "Benachrichtigungen"
+
+msgid "Email alerts"
+msgstr "E-Mail-Benachrichtigungen"
+
 msgid "SMS alerts"
 msgstr "SMS Benachrichtigung"
+
+msgid ""
+"The email service provides free information on the publication of new "
+"results (intermediate results, final results):"
+msgstr ""
+"Der E-Mail-Service informiert kostenlos über die Publikation neuer Resultate "
+"(Zwischenresultate, Schlussresultate):"
+
+msgid "Get email alerts"
+msgstr "E-Mail-Benachrichtigung abonnieren"
+
+msgid "Stop email subscription"
+msgstr "E-Mail-Abonnement beenden"
 
 msgid ""
 "The SMS service provides free information on the publication of new results "
@@ -788,6 +816,27 @@ msgid ""
 msgstr ""
 "Schlussresultate der eidgenössischen Wahl \"${title}\", ${date}, "
 "${principal}, aufgeschlüsselt nach Kandidaten und Gemeinden."
+
+msgid ""
+"Successfully subscribed to the email services. You will receive an email "
+"every time new results are published."
+msgstr ""
+"Die E-Mail-Benachrichtigung wurde abonniert. Sie erhalten in Zukunft eine E-"
+"Mail, sobald neue Resultate publiziert wurden."
+
+msgid ""
+"You will receive an email as soon as new results have been published. You "
+"can unsubscribe at any time."
+msgstr ""
+"Sie erhalten eine E-Mail, sobald neue Resultate publiziert wurden. Sie "
+"können sich jederzeit vom Service abmelden."
+
+msgid ""
+"Successfully unsubscribed from the email services. You will no longer "
+"receive an email when new results are published."
+msgstr ""
+"Die E-Mail-Benachrichtigung wurde beendet. Sie erhalten in Zukunft keine E-"
+"Mail mehr."
 
 msgid ""
 "You will receive an SMS as soon as new results have been published. The SMS "

@@ -9,7 +9,9 @@ from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.models import ArchivedResult
+from onegov.election_day.models import Subscriber
 from sqlalchemy import Column
+from sqlalchemy import Text
 
 
 @upgrade_task('Create archived results')
@@ -143,3 +145,28 @@ def change_last_change_columns(context):
                 'notifications', 'last_modified'
             )
         )
+
+
+@upgrade_task('Make subscriber polymorphic')
+def make_subscriber_polymorphic(context):
+    if not context.has_column('subscribers', 'type'):
+        context.operations.add_column(
+            'subscribers',
+            Column('type', Text, nullable=True)
+        )
+
+    if (
+        context.has_column('subscribers', 'phone_number') and
+        not context.has_column('subscribers', 'address')
+    ):
+        context.operations.execute(
+            'ALTER TABLE {} RENAME COLUMN {} TO {};'.format(
+                'subscribers', 'phone_number', 'address'
+            )
+        )
+
+    if context.has_column('subscribers', 'type'):
+        susbscribers = context.session.query(Subscriber)
+        susbscribers = susbscribers.filter(Subscriber.type.is_(None))
+        for subscriber in susbscribers:
+            subscriber.type = 'sms'

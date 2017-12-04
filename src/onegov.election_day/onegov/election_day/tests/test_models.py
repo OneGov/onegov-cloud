@@ -9,9 +9,11 @@ from onegov.ballot import Vote
 from onegov.election_day.models import ArchivedResult
 from onegov.election_day.models import DataSource
 from onegov.election_day.models import DataSourceItem
+from onegov.election_day.models import EmailSubscriber
 from onegov.election_day.models import Notification
 from onegov.election_day.models import Principal
 from onegov.election_day.models import SmsNotification
+from onegov.election_day.models import SmsSubscriber
 from onegov.election_day.models import Subscriber
 from onegov.election_day.models import UploadToken
 from onegov.election_day.models import WebhookNotification
@@ -53,6 +55,7 @@ def test_principal_load():
     assert principal.fetch == {}
     assert principal.webhooks == {}
     assert principal.sms_notification == None
+    assert principal.email_notification == None
     assert principal.wabsti_import == False
     assert principal.pdf_signing == {}
     assert principal.open_data == {}
@@ -74,6 +77,7 @@ def test_principal_load():
             'http://abc.com/2':
                 My-Header: My-Value
         sms_notification: 'https://wab.zg.ch'
+        email_notification: true
         pdf_signing:
             url: 'http://abc.com/3'
             login: user
@@ -107,6 +111,7 @@ def test_principal_load():
         }
     }
     assert principal.sms_notification == 'https://wab.zg.ch'
+    assert principal.email_notification == True
     assert principal.wabsti_import == True
     assert principal.pdf_signing == {
         'url': 'http://abc.com/3',
@@ -141,6 +146,7 @@ def test_principal_load():
     assert principal.fetch == {}
     assert principal.webhooks == {}
     assert principal.sms_notification == None
+    assert principal.email_notification == None
     assert principal.wabsti_import == False
     assert principal.pdf_signing == {}
 
@@ -166,6 +172,7 @@ def test_principal_load():
     assert principal.fetch == {}
     assert principal.webhooks == {}
     assert principal.sms_notification == None
+    assert principal.email_notification == None
     assert principal.wabsti_import == False
     assert principal.pdf_signing == {}
 
@@ -294,7 +301,14 @@ def test_principal_notifications_enabled():
 
     assert Principal(
         name='Kriens', municipality='1059',
-        webhooks={'a', 'b'}, sms_notification='https://wab.kriens.ch'
+        email_notification=True
+    ).notifications == True
+
+    assert Principal(
+        name='Kriens', municipality='1059',
+        webhooks={'a', 'b'},
+        sms_notification='https://wab.kriens.ch',
+        email_notification=True
     ).notifications == True
 
 
@@ -693,8 +707,9 @@ def test_sms_notification(request, election_day_app, session):
         assert notification.last_modified == freezed
         assert election_day_app.send_sms.call_count == 0
 
-        session.add(Subscriber(phone_number='+41791112233', locale='en'))
-        session.add(Subscriber(phone_number='+41791112233', locale='de_CH'))
+        session.add(SmsSubscriber(address='+41791112233', locale='en'))
+        session.add(SmsSubscriber(address='+41791112233', locale='de_CH'))
+        session.add(EmailSubscriber(address='t@rg.et', locale='fr_CH'))
 
         # Intermediate election results
         notification = SmsNotification()
@@ -768,17 +783,22 @@ def test_sms_notification(request, election_day_app, session):
 
 
 def test_subscriber(session):
-    subscriber = Subscriber()
-    subscriber.phone_number = '+41791112233'
-    subscriber.locale = 'de_CH'
-
-    session.add(subscriber)
+    session.add(Subscriber(address='endpoint', locale='de_CH'))
+    session.add(EmailSubscriber(address='end@poi.nt', locale='fr_CH'))
+    session.add(SmsSubscriber(address='+41791112233', locale='it_CH'))
     session.flush()
 
-    subscriber = session.query(Subscriber).one()
+    assert session.query(Subscriber).count() == 3
+
+    subscriber = session.query(EmailSubscriber).one()
     assert subscriber.id
-    assert subscriber.phone_number == '+41791112233'
-    assert subscriber.locale == 'de_CH'
+    assert subscriber.address == 'end@poi.nt'
+    assert subscriber.locale == 'fr_CH'
+
+    subscriber = session.query(SmsSubscriber).one()
+    assert subscriber.id
+    assert subscriber.address == '+41791112233'
+    assert subscriber.locale == 'it_CH'
 
 
 def test_data_source(session):

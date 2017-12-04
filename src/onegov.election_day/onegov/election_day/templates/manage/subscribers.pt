@@ -36,14 +36,14 @@
                 <table class="subscribers stackable" tal:condition="subscribers">
                     <thead>
                         <tr>
-                            <th i18n:translate>Phone number</th>
+                            <th>${address_title}</th>
                             <th i18n:translate>Locale</th>
                             <th i18n:translate class="row-actions right-aligned">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                     <tr tal:repeat="subscriber subscribers">
-                        <td>${subscriber.phone_number}</td>
+                        <td>${subscriber.address}</td>
                         <td>${subscriber.locale}</td>
                         <td class="right-aligned">
                             <ul class="actions" data-title="Actions" i18n:attributes="data-title">

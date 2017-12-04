@@ -9,6 +9,8 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import DataSourceCollection
 from onegov.election_day.collections import DataSourceItemCollection
+from onegov.election_day.collections import EmailSubscriberCollection
+from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.collections import SubscriberCollection
 from onegov.election_day.models import DataSource
 from onegov.election_day.models import DataSourceItem
@@ -37,9 +39,18 @@ def get_manage_votes(app, page=0):
     return VoteCollection(app.session(), page=page)
 
 
-@ElectionDayApp.path(model=SubscriberCollection, path='/manage/subscribers')
-def get_manage_subscribers(app, page=0, term=None):
-    return SubscriberCollection(app.session(), page=page, term=term)
+@ElectionDayApp.path(
+    model=SmsSubscriberCollection, path='/manage/subscribers/sms'
+)
+def get_manage_sms_subscribers(app, page=0, term=None):
+    return SmsSubscriberCollection(app.session(), page=page, term=term)
+
+
+@ElectionDayApp.path(
+    model=EmailSubscriberCollection, path='/manage/subscribers/email'
+)
+def get_manage_email_subscribers(app, page=0, term=None):
+    return EmailSubscriberCollection(app.session(), page=page, term=term)
 
 
 @ElectionDayApp.path(model=DataSourceCollection,

@@ -5,9 +5,21 @@ from onegov.election_day.validators import ValidPhoneNumber
 from onegov.form import Form
 from wtforms import StringField
 from wtforms.validators import InputRequired
+from wtforms.validators import Email
 
 
-class SubscribeForm(Form):
+class EmailSubscriptionForm(Form):
+
+    email = StringField(
+        label=_("Email"),
+        validators=[
+            InputRequired(),
+            Email()
+        ]
+    )
+
+
+class SmsSubscriptionForm(Form):
 
     phone_number = StringField(
         label=_("Phone number"),

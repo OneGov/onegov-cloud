@@ -7,7 +7,7 @@ from onegov.ballot import Vote
 from onegov.election_day.forms import DataSourceForm
 from onegov.election_day.forms import DataSourceItemForm
 from onegov.election_day.forms import ElectionForm
-from onegov.election_day.forms import SubscribeForm
+from onegov.election_day.forms import SmsSubscriptionForm
 from onegov.election_day.forms import UploadElectionPartyResultsForm
 from onegov.election_day.forms import UploadMajorzElectionForm
 from onegov.election_day.forms import UploadProporzElectionForm
@@ -60,13 +60,15 @@ def test_phone_number_validator():
         validator(None, Field('00791112233'))
 
 
-def test_subscribe_form():
-    assert SubscribeForm().formatted_phone_number == None
-    assert SubscribeForm(phone_number='').formatted_phone_number == None
-    assert SubscribeForm(phone_number=123456).formatted_phone_number == None
+def test_sms_subscription_form():
+    assert SmsSubscriptionForm().formatted_phone_number == None
+    assert SmsSubscriptionForm(phone_number='').formatted_phone_number == None
+    assert SmsSubscriptionForm(
+        phone_number=123456
+    ).formatted_phone_number == None
 
     for number in ('0791112233', '0041791112233', '+41791112233'):
-        assert SubscribeForm(
+        assert SmsSubscriptionForm(
             phone_number=number
         ).formatted_phone_number == '+41791112233'
 

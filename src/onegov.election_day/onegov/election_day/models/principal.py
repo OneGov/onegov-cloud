@@ -55,6 +55,7 @@ class Principal(object):
         fetch=None,
         webhooks=None,
         sms_notification=None,
+        email_notification=None,
         wabsti_import=False,
         pdf_signing=None,
         open_data=None
@@ -75,6 +76,7 @@ class Principal(object):
         self.fetch = fetch or {}
         self.webhooks = webhooks or {}
         self.sms_notification = sms_notification
+        self.email_notification = email_notification
         self.wabsti_import = wabsti_import
         self.pdf_signing = pdf_signing or {}
         self.open_data = open_data or {}
@@ -180,7 +182,11 @@ class Principal(object):
 
     @cached_property
     def notifications(self):
-        if (len(self.webhooks) > 0) or self.sms_notification:
+        if (
+            (len(self.webhooks) > 0) or
+            self.sms_notification or
+            self.email_notification
+        ):
             return True
         return False
 

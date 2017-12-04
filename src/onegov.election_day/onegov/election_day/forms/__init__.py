@@ -2,7 +2,8 @@ from onegov.election_day.forms.common import EmptyForm
 from onegov.election_day.forms.data_source import DataSourceForm
 from onegov.election_day.forms.data_source import DataSourceItemForm
 from onegov.election_day.forms.election import ElectionForm
-from onegov.election_day.forms.subscribe import SubscribeForm
+from onegov.election_day.forms.subscription import EmailSubscriptionForm
+from onegov.election_day.forms.subscription import SmsSubscriptionForm
 from onegov.election_day.forms.upload import UploadElectionPartyResultsForm
 from onegov.election_day.forms.upload import UploadMajorzElectionForm
 from onegov.election_day.forms.upload import UploadProporzElectionForm
@@ -18,9 +19,10 @@ __all__ = [
     'DataSourceForm',
     'DataSourceItemForm',
     'ElectionForm',
+    'EmailSubscriptionForm',
     'EmptyForm',
     'EmptyForm',
-    'SubscribeForm',
+    'SmsSubscriptionForm',
     'UploadElectionPartyResultsForm',
     'UploadMajorzElectionForm',
     'UploadProporzElectionForm',

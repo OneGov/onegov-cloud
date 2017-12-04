@@ -169,16 +169,29 @@
 </metal:status_callout>
 
 <metal:subscription_links define-macro="subscription_links" i18n:domain="onegov.election_day">
-    <div class="row subscription-links" tal:condition="python: not request.browser_session.get('headerless') and layout.principal.sms_notification">
-        <div class="columns small-12">
-            <h2 i18n:translate>SMS alerts</h2>
-            <p i18n:translate>The SMS service provides free information on the publication of new results (intermediate results, final results):</p>
-            <ul>
-                <li><a href="${layout.subscribe_link}" i18n:translate>Get SMS alerts</a></li>
-                <li><a href="${layout.unsubscribe_link}" i18n:translate>Stop SMS subscription</a></li>
-            </ul>
+    <tal:block tal:condition="python: not request.browser_session.get('headerless')">
+        <div class="row subscription-links" tal:condition="layout.principal.email_notification or layout.principal.sms_notification">
+            <div class="columns small-12">
+                <h2 tal:condition="layout.principal.email_notification and layout.principal.sms_notification" i18n:translate>Alerts</h2>
+                <h2 tal:condition="layout.principal.email_notification and not layout.principal.sms_notification" i18n:translate>Email alerts</h2>
+                <h2 tal:condition="not layout.principal.email_notification and layout.principal.sms_notification" i18n:translate>SMS alerts</h2>
+                <tal:block tal:condition="layout.principal.email_notification">
+                    <p i18n:translate>The email service provides free information on the publication of new results (intermediate results, final results):</p>
+                    <ul>
+                        <li><a href="${request.link(layout.principal, 'subscribe-email')}" i18n:translate>Get email alerts</a></li>
+                        <li><a href="${request.link(layout.principal, 'unsubscribe-email')}" i18n:translate>Stop email subscription</a></li>
+                    </ul>
+                </tal:block>
+                <tal:block tal:condition="layout.principal.sms_notification">
+                    <p i18n:translate>The SMS service provides free information on the publication of new results (intermediate results, final results):</p>
+                    <ul>
+                        <li><a href="${request.link(layout.principal, 'subscribe-sms')}" i18n:translate>Get SMS alerts</a></li>
+                        <li><a href="${request.link(layout.principal, 'unsubscribe-sms')}" i18n:translate>Stop SMS subscription</a></li>
+                    </ul>
+                </tal:block>
+            </div>
         </div>
-    </div>
+    </tal:block>
 </metal:subscription_links>
 
 <metal:election_day_link define-macro="election_day_link" i18n:domain="onegov.election_day">

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-30 17:05+0100\n"
-"PO-Revision-Date: 2017-11-30 16:44+0100\n"
+"POT-Creation-Date: 2017-12-04 13:58+0100\n"
+"PO-Revision-Date: 2017-12-04 12:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -12,57 +12,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
 "X-Generator: Poedit 2.0.4\n"
-
-msgid "Expats"
-msgstr "Svizzers a l'exteriur"
-
-msgid "Lists"
-msgstr "Glistas"
-
-msgid "Candidates"
-msgstr "Candidatas e candidats"
-
-msgid "List connections"
-msgstr "Colliaziuns da glistas"
-
-msgid "Parties"
-msgstr "Partidas"
-
-msgid "Election statistics"
-msgstr "Statistica electorala"
-
-msgid "Panachage"
-msgstr "Statistica da panaschar"
-
-msgid "Downloads"
-msgstr "Telechargiadas"
-
-msgid "Proposal"
-msgstr "Project da votaziun"
-
-msgid "Counter Proposal"
-msgstr "Cuntraproposta"
-
-msgid "Tie-Breaker"
-msgstr "Dumonda decisiva"
-
-msgid "Votes"
-msgstr "Votaziuns"
-
-msgid "Elections"
-msgstr "Elecziuns"
-
-msgid "Manage"
-msgstr "Administrar"
-
-msgid "Subscribers"
-msgstr "Abunents"
-
-msgid "Data sources"
-msgstr "Funtaunas da datas"
-
-msgid "Mappings"
-msgstr "Attribuziuns"
 
 msgid "Not a valid phone number."
 msgstr "Numer da telefon nunvalaivel."
@@ -151,11 +100,26 @@ msgstr "Candidat(a)s elegid(a)s"
 msgid "Unknown candidate"
 msgstr "Candidat(a) nunenconuschent(a)"
 
+msgid "List connections"
+msgstr "Colliaziuns da glistas"
+
+msgid "Election statistics"
+msgstr "Statistica electorala"
+
 msgid "Invalid id"
 msgstr "ID nunvalaivel"
 
 msgid "Could not read the elegible voters"
 msgstr "I n'è betg stà pussaivel da leger las persunas cun dretg da votar"
+
+msgid "Proposal"
+msgstr "Project da votaziun"
+
+msgid "Counter Proposal"
+msgstr "Cuntraproposta"
+
+msgid "Tie-Breaker"
+msgstr "Dumonda decisiva"
 
 msgid "Missing municipality/district"
 msgstr "Lieu che manca"
@@ -238,6 +202,9 @@ msgstr "Elecziun da maiorz"
 msgid "Election based on proportional representation"
 msgstr "Elecziun da proporz"
 
+msgid "Email"
+msgstr "E-mail"
+
 msgid "Phone number"
 msgstr "Numer da telefon"
 
@@ -285,6 +252,48 @@ msgstr "Numer dal project"
 
 msgid "Default"
 msgstr "Standard"
+
+msgid "Expats"
+msgstr "Svizzers a l'exteriur"
+
+msgid "Lists"
+msgstr "Glistas"
+
+msgid "Candidates"
+msgstr "Candidatas e candidats"
+
+msgid "Parties"
+msgstr "Partidas"
+
+msgid "Panachage"
+msgstr "Statistica da panaschar"
+
+msgid "Downloads"
+msgstr "Telechargiadas"
+
+msgid "Votes"
+msgstr "Votaziuns"
+
+msgid "Elections"
+msgstr "Elecziuns"
+
+msgid "Manage"
+msgstr "Administrar"
+
+msgid "Data sources"
+msgstr "Funtaunas da datas"
+
+msgid "Mappings"
+msgstr "Attribuziuns"
+
+msgid "SMS subscribers"
+msgstr "SMS abunents"
+
+msgid "Email subscribers"
+msgstr "E-mail abunents"
+
+msgid "Subscribers"
+msgstr "Abunents"
 
 #, python-format
 msgid "Final results are available on ${url}"
@@ -470,8 +479,25 @@ msgstr "Resultats intermediars"
 msgid "Last change"
 msgstr "Actualisà"
 
+msgid "Alerts"
+msgstr ""
+
+msgid "Email alerts"
+msgstr ""
+
 msgid "SMS alerts"
 msgstr "Communicaziun per SMS"
+
+msgid ""
+"The email service provides free information on the publication of new "
+"results (intermediate results, final results):"
+msgstr ""
+
+msgid "Get email alerts"
+msgstr ""
+
+msgid "Stop email subscription"
+msgstr ""
 
 msgid ""
 "The SMS service provides free information on the publication of new results "
@@ -830,6 +856,21 @@ msgid ""
 msgstr ""
 "Resultats finals da l'elecziun federala \"${title}\", ${date}, ${principal}, "
 "resultats da tut las candidatas e da tut ils candidats tenor vischnancas."
+
+msgid ""
+"Successfully subscribed to the email services. You will receive an email "
+"every time new results are published."
+msgstr ""
+
+msgid ""
+"You will receive an email as soon as new results have been published. You "
+"can unsubscribe at any time."
+msgstr ""
+
+msgid ""
+"Successfully unsubscribed from the email services. You will no longer "
+"receive an email when new results are published."
+msgstr ""
 
 msgid ""
 "You will receive an SMS as soon as new results have been published. The SMS "

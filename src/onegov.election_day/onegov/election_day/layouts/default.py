@@ -74,14 +74,6 @@ class DefaultLayout(ChameleonLayout):
         ).format(lang)
 
     @cached_property
-    def subscribe_link(self):
-        return self.request.link(self.principal, 'subscribe')
-
-    @cached_property
-    def unsubscribe_link(self):
-        return self.request.link(self.principal, 'unsubscribe')
-
-    @cached_property
     def font_awesome_path(self):
         static_file = StaticFile.from_application(
             self.app, 'font-awesome/css/font-awesome.min.css')

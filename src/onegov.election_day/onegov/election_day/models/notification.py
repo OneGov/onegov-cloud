@@ -7,7 +7,7 @@ from onegov.core.orm.types import UTCDateTime
 from onegov.core.orm.types import UUID
 from onegov.core.utils import PostThread
 from onegov.election_day import _
-from onegov.election_day.models.subscriber import Subscriber
+from onegov.election_day.models.subscriber import SmsSubscriber
 from onegov.election_day.utils import get_summary
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
@@ -114,10 +114,10 @@ class SmsNotification(Notification):
             )
 
         session = request.app.session()
-        subscribers = session.query(Subscriber).all()
+        subscribers = session.query(SmsSubscriber).all()
         for subscriber in subscribers:
             translator = request.app.translations.get(subscriber.locale)
             translated = translator.gettext(content) if translator else content
             translated = content.interpolate(translated)
 
-            request.app.send_sms(subscriber.phone_number, translated)
+            request.app.send_sms(subscriber.address, translated)

@@ -4,8 +4,12 @@ from onegov.ballot import VoteCollection
 from onegov.election_day import _
 from onegov.election_day.collections import DataSourceCollection
 from onegov.election_day.collections import DataSourceItemCollection
+from onegov.election_day.collections import EmailSubscriberCollection
+from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.collections import SubscriberCollection
 from onegov.election_day.layouts.default import DefaultLayout
+from onegov.election_day.models import EmailSubscriber
+from onegov.election_day.models import SmsSubscriber
 
 
 class ManageLayout(DefaultLayout):
@@ -37,9 +41,14 @@ class ManageLayout(DefaultLayout):
             menu.append((_("Data sources"), link, class_))
 
         if self.principal.sms_notification:
-            link = self.request.link(SubscriberCollection(session))
+            link = self.request.link(SmsSubscriberCollection(session))
             class_ = 'active' if link == self.manage_model_link else ''
-            menu.append((_("Subscribers"), link, class_))
+            menu.append((_("SMS subscribers"), link, class_))
+
+        if self.principal.email_notification:
+            link = self.request.link(EmailSubscriberCollection(session))
+            class_ = 'active' if link == self.manage_model_link else ''
+            menu.append((_("Email subscribers"), link, class_))
 
         return menu
 
@@ -91,15 +100,34 @@ class ManageSubscribersLayout(ManageLayout):
 
     @cached_property
     def manage_model_link(self):
-        return self.request.link(
-            SubscriberCollection(self.request.app.session())
-        )
+        if isinstance(self.model, SubscriberCollection):
+            return self.request.link(self.model)
+
+        if isinstance(self.model, SmsSubscriber):
+            return self.request.link(
+                SmsSubscriberCollection(self.request.app.session())
+            )
+        elif isinstance(self.model, EmailSubscriber):
+            return self.request.link(
+                EmailSubscriberCollection(self.request.app.session())
+            )
+
+        raise NotImplementedError()
 
     def __init__(self, model, request):
         super().__init__(model, request)
-        self.breadcrumbs.append(
-            (_("Subscribers"), request.link(self.model), ''),
-        )
+        if isinstance(self.model, EmailSubscriberCollection):
+            self.breadcrumbs.append(
+                (_("Email subscribers"), request.link(self.model), ''),
+            )
+        elif isinstance(self.model, SmsSubscriberCollection):
+            self.breadcrumbs.append(
+                (_("SMS subscribers"), request.link(self.model), ''),
+            )
+        else:
+            self.breadcrumbs.append(
+                (_("Subscribers"), request.link(self.model), ''),
+            )
 
 
 class ManageDataSourcesLayout(ManageLayout):

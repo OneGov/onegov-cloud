@@ -16,7 +16,8 @@ from onegov.election_day.layouts import ManageVotesLayout
 from onegov.election_day.layouts import VoteLayout
 from onegov.election_day.collections import DataSourceCollection
 from onegov.election_day.collections import DataSourceItemCollection
-from onegov.election_day.collections import SubscriberCollection
+from onegov.election_day.collections import SmsSubscriberCollection
+from onegov.election_day.collections import EmailSubscriberCollection
 from onegov.election_day.tests import DummyRequest
 from unittest.mock import Mock
 
@@ -38,12 +39,6 @@ def test_layout_links():
 
     assert layout_de.homepage_link == 'DummyPrincipal/archive'
     assert layout_en.homepage_link == 'DummyPrincipal/archive'
-
-    assert layout_de.subscribe_link == 'DummyPrincipal/subscribe'
-    assert layout_en.subscribe_link == 'DummyPrincipal/subscribe'
-
-    assert layout_de.unsubscribe_link == 'DummyPrincipal/unsubscribe'
-    assert layout_en.unsubscribe_link == 'DummyPrincipal/unsubscribe'
 
     assert layout_de.manage_link == 'VoteCollection/archive'
     assert layout_en.manage_link == 'VoteCollection/archive'
@@ -290,12 +285,14 @@ def test_manage_layout(session):
         DummyRequest()
     )
     layout.principal.sms_notification = 'http://example.com'
+    layout.principal.email_notification = True
     layout.principal.wabsti_import = True
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', 'active'),
         ('Elections', 'ElectionCollection/archive', ''),
         ('Data sources', 'DataSourceCollection/archive', ''),
-        ('Subscribers', 'SubscriberCollection/archive', '')
+        ('SMS subscribers', 'SmsSubscriberCollection/archive', ''),
+        ('Email subscribers', 'EmailSubscriberCollection/archive', ''),
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
@@ -352,19 +349,36 @@ def test_manage_layout(session):
         ('Mappings', 'DataSourceItemCollection/source', '')
     ]
 
-    # Subscribers
+    # Email subscribers
     layout = ManageSubscribersLayout(
-        SubscriberCollection(session),
+        EmailSubscriberCollection(session),
         DummyRequest()
     )
-    layout.principal.sms_notification = 'http://example.com'
-    assert layout.manage_model_link == 'SubscriberCollection/archive'
+    layout.principal.email_notification = True
+    assert layout.manage_model_link == 'EmailSubscriberCollection/archive'
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', ''),
         ('Elections', 'ElectionCollection/archive', ''),
-        ('Subscribers', 'SubscriberCollection/archive', 'active')
+        ('Email subscribers', 'EmailSubscriberCollection/archive', 'active')
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
-        ('Subscribers', 'SubscriberCollection/archive', '')
+        ('Email subscribers', 'EmailSubscriberCollection/archive', '')
+    ]
+
+    # SMS subscribers
+    layout = ManageSubscribersLayout(
+        SmsSubscriberCollection(session),
+        DummyRequest()
+    )
+    layout.principal.sms_notification = 'http://example.com'
+    assert layout.manage_model_link == 'SmsSubscriberCollection/archive'
+    assert layout.menu == [
+        ('Votes', 'VoteCollection/archive', ''),
+        ('Elections', 'ElectionCollection/archive', ''),
+        ('SMS subscribers', 'SmsSubscriberCollection/archive', 'active')
+    ]
+    assert layout.breadcrumbs == [
+        ('Manage', 'VoteCollection/archive', 'unavailable'),
+        ('SMS subscribers', 'SmsSubscriberCollection/archive', '')
     ]

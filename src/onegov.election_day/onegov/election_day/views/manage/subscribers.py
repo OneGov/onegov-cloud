@@ -1,25 +1,43 @@
-""" The manage subscription views. """
-
-import morepath
-
+from morepath import redirect
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
+from onegov.election_day.collections import EmailSubscriberCollection
+from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.collections import SubscriberCollection
 from onegov.election_day.layouts import ManageSubscribersLayout
 from onegov.election_day.models import Subscriber
 
 
 @ElectionDayApp.manage_html(
-    model=SubscriberCollection,
-    template='manage/subsribers.pt'
+    model=SmsSubscriberCollection,
+    template='manage/subscribers.pt'
 )
-def view_subscribers(self, request):
+def view_sms_subscribers(self, request):
 
-    """ View a list with all subscribers. """
+    """ View a list with all SMS subscribers. """
 
     return {
         'layout': ManageSubscribersLayout(self, request),
-        'title': _("Subscribers"),
+        'title': _("SMS subscribers"),
+        'address_title': _("Phone number"),
+        'count': self.query().count(),
+        'subscribers': self.batch,
+        'term': self.term
+    }
+
+
+@ElectionDayApp.manage_html(
+    model=EmailSubscriberCollection,
+    template='manage/subscribers.pt'
+)
+def view_email_subscribers(self, request):
+
+    """ View a list with all email subscribers. """
+
+    return {
+        'layout': ManageSubscribersLayout(self, request),
+        'title': _("Email subscribers"),
+        'address_title': _("Email"),
         'count': self.query().count(),
         'subscribers': self.batch,
         'term': self.term
@@ -38,20 +56,20 @@ def delete_subscriber(self, request, form):
 
     if form.submitted(request):
         subscribers = SubscriberCollection(request.app.session())
-        subscribers.unsubscribe(self.phone_number)
+        subscribers.unsubscribe(self.address)
         request.message(_("Subscriber deleted."), 'success')
-        return morepath.redirect(layout.manage_model_link)
+        return redirect(layout.manage_model_link)
 
     return {
         'message': _(
             'Do you really want to delete "${item}"?',
             mapping={
-                'item': self.phone_number
+                'item': self.address
             }
         ),
         'layout': layout,
         'form': form,
-        'title': self.phone_number,
+        'title': self.address,
         'subtitle': _("Delete subscriber"),
         'button_text': _("Delete subscriber"),
         'button_class': 'alert',
