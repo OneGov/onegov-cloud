@@ -546,7 +546,13 @@ def offer_activity_again(self, request):
 
 def administer_activity(model, request, action, template, subject):
     session = request.app.session()
-    publication_request = model.request_by_period(request.app.active_period)
+
+    # publish the request from the current period, or the latest
+    publication_request = (
+        model.request_by_period(request.app.active_period) or
+        model.latest_request
+    )
+
     tickets = TicketCollection(session)
     ticket = tickets.by_handler_id(publication_request.id.hex)
 

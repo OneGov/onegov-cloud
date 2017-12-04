@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Allows the publication/archival of activities from inactive periods.
+  [href]
+
 - Improves the look of the occasions in the activity view.
   [href]
 

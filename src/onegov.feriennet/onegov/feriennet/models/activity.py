@@ -4,7 +4,7 @@ from onegov.activity import PublicationRequestCollection
 from onegov.activity.models import DAYS
 from onegov.core.templates import render_macro
 from onegov.feriennet import _
-from onegov.org.elements import Link, ConfirmLink
+from onegov.org.new_elements import Link, Confirm, Intercooler
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.ticket import OrgTicketExtraText
 from onegov.search import ORMSearchable
@@ -143,37 +143,53 @@ class VacationActivityHandler(Handler):
             }
         )
 
-    def get_links(self, request):
-
-        links = []
-
+    def get_period_bound_links(self, request):
         if self.activity.state in ('proposed', 'archived'):
-            links.append(ConfirmLink(
+            yield Link(
                 text=_("Publish"),
                 url=request.link(self.activity, name='accept'),
-                confirm=_("Do you really want to publish this activity?"),
-                extra_information=_("This cannot be undone."),
-                classes=('confirm', 'accept-activity'),
-                yes_button_text=_("Publish Activity")
-            ))
+                attrs={'class': 'accept-activity'},
+                traits=(
+                    Confirm(
+                        _("Do you really want to publish this activity?"),
+                        _("This cannot be undone."),
+                        _("Publish Activity"),
+                    ),
+                    Intercooler(
+                        request_method='POST',
+                        redirect_after=request.url
+                    )
+                )
+            )
 
         if self.activity.state == 'accepted':
-            links.append(ConfirmLink(
+            yield Link(
                 text=_("Archive"),
                 url=request.link(self.activity, name='archive'),
-                confirm=_("Do you really want to archive this activity?"),
-                extra_information=_(
-                    "This cannot be undone. "
-                    "The activity will be made private as a result."
-                ),
-                classes=('confirm', 'archive-activity'),
-                yes_button_text=_("Archive Activity")
-            ))
+                attrs={'class': 'archive-activity'},
+                traits=(
+                    Confirm(
+                        _("Do you really want to publish this activity?"),
+                        _(
+                            "This cannot be undone. "
+                            "The activity will be made private as a result."
+                        ),
+                        _("Archive Activity"),
+                    ),
+                    Intercooler(
+                        request_method='POST',
+                        redirect_after=request.url
+                    )
+                )
+            )
 
+    def get_links(self, request):
+
+        links = list(self.get_period_bound_links(request))
         links.append(Link(
-            text=_('Show activity'),
+            text=_("Show activity"),
             url=request.return_here(request.link(self.activity)),
-            classes=('show-activity', )
+            attrs={'class': 'show-activity'}
         ))
 
         return links
