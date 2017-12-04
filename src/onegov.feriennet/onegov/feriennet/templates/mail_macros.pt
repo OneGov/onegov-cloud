@@ -23,5 +23,9 @@
     </p>
 </metal:reservations>
 
+<metal:sender define-macro="sender" i18n:domain="onegov.org">
+    <p>${layout.org.name}</p>
+</metal:sender>
+
 </body>
 </html>

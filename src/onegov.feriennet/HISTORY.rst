@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Uses the Ferienpass name for email senders.
+  [href]
+
 - Adds a text version of the html output in activites exports.
   [href]
 
