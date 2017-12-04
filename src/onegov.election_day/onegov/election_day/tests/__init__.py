@@ -3,6 +3,14 @@ from unittest.mock import Mock
 from webtest.forms import Upload
 
 
+class DummyPostData(dict):
+    def getlist(self, key):
+        v = self[key]
+        if not isinstance(v, (list, tuple)):
+            v = [v]
+        return v
+
+
 class DummyPrincipal(object):
 
     def __init__(self):
