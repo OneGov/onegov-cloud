@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-11-08 16:16+0100\n"
+"POT-Creation-Date: 2017-12-05 09:57+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1607,9 +1607,6 @@ msgstr ""
 msgid "Best regards,"
 msgstr "Cordialement,"
 
-msgid "The OneGov Cloud Team"
-msgstr "L'équipe de OneGov Cloud"
-
 msgid "Good morning,"
 msgstr "Bonjour,"
 
@@ -1696,6 +1693,9 @@ msgstr "Vérifier l'état du ticket"
 msgid "Your event has unfortunately been rejected:"
 msgstr "Votre événement a malheureusement été rejeté :"
 
+msgid "The OneGov Cloud Team"
+msgstr "L'équipe de OneGov Cloud"
+
 msgid "An administrator just created a new account on ${org} for you."
 msgstr ""
 "Un administrateur vient de créer un nouveau compte sur ${org} pour vous."
@@ -1709,6 +1709,12 @@ msgstr ""
 
 msgid "Set Account Password"
 msgstr "Définir le mot de passe du compte"
+
+msgid ""
+"If the password link has expired, you can also request a new password here:"
+msgstr ""
+"Si le lien pour le mot de passe a expiré, vous pouvez également demander un "
+"nouveau mot de passe ici :"
 
 msgid "To use your account you need the Yubikey with the serial ${number}"
 msgstr ""
@@ -2143,6 +2149,14 @@ msgstr ""
 "informations d'identification."
 
 #, python-format
+msgid ""
+"A password reset link has been sent to ${email}, provided an account exists "
+"for this email address."
+msgstr ""
+"Un lien de réinitialisation de mot de passe a été envoyé à ${number}, pour "
+"peu qu'un compte existe pour cette adresse e-mail."
+
+#, python-format
 msgid "Your ${org} Registration"
 msgstr "Votre inscription sur ${org}"
 
@@ -2162,6 +2176,14 @@ msgstr "Jeton d'activation non valide"
 msgid "Your account has already been activated."
 msgstr "Votre compte a déjà été activé."
 
+msgid "Password changed."
+msgstr "Mot de passe modifié."
+
+msgid "Wrong username or password reset link not valid any more."
+msgstr ""
+"Mauvais nom d'utilisateur ou lien de réinitialisation de mot de passe plus "
+"valide."
+
 msgid "Your userprofile is incomplete. Please update it before you continue."
 msgstr ""
 "Votre profil utilisateur est incomplet. Veuillez le mettre à jour avant de "
@@ -2175,6 +2197,9 @@ msgstr "Un utilisateur avec cette adresse existe déjà"
 
 msgid "This signup link has expired"
 msgstr "Ce lien d'inscription a expiré"
+
+msgid "Password reset"
+msgstr "Réinitialisation de mot de passe"
 
 msgid "A link was added to the clipboard"
 msgstr "Un lien a été ajouté au presse-papiers"
@@ -2429,25 +2454,6 @@ msgstr "Les réservations suivantes ont été rejetées"
 msgid "Your reservations were accepted"
 msgstr "Vos réservations ont été acceptées"
 
-#, python-format
-msgid ""
-"A password reset link has been sent to ${email}, provided an account exists "
-"for this email address."
-msgstr ""
-"Un lien de réinitialisation de mot de passe a été envoyé à ${number}, pour "
-"peu qu'un compte existe pour cette adresse e-mail."
-
-msgid "Password changed."
-msgstr "Mot de passe modifié."
-
-msgid "Wrong username or password reset link not valid any more."
-msgstr ""
-"Mauvais nom d'utilisateur ou lien de réinitialisation de mot de passe plus "
-"valide."
-
-msgid "Password reset"
-msgstr "Réinitialisation de mot de passe"
-
 msgid "Added a new daypass"
 msgstr "Nouvel abonnement à la journée ajouté"
 
@@ -2535,18 +2541,6 @@ msgstr "Votre demande a été envoyée"
 msgid "Your note was added"
 msgstr "Votre note a été ajoutée"
 
-#, python-format
-msgid "You have accepted ticket ${number}"
-msgstr "Vous avez accepté ${number} ticket(s)"
-
-#, python-format
-msgid "You have closed ticket ${number}"
-msgstr "Vous avez clôturé ${number} ticket(s)"
-
-#, python-format
-msgid "You have reopened ticket ${number}"
-msgstr "Vous avez réouvert ${number} ticket(s)"
-
 msgid "Your request is currently pending"
 msgstr "Votre demande est actuellement en attente"
 
@@ -2556,14 +2550,23 @@ msgstr "Statut du ticket"
 msgid "The ticket cannot be accepted because it's not open"
 msgstr "Le ticket ne peut pas être accepté car il n'est pas ouvert"
 
+#, python-format
+msgid "You have accepted ticket ${number}"
+msgstr "Vous avez accepté ${number} ticket(s)"
+
 msgid "The ticket cannot be closed because it's not pending"
 msgstr "Le ticket ne peut pas être clôturé car il est en attente"
+
+#, python-format
+msgid "You have closed ticket ${number}"
+msgstr "Vous avez clôturé ${number} ticket(s)"
 
 msgid "The ticket cannot be re-opened because it's not closed"
 msgstr "Le ticket ne peut pas être réouvert car il n'est pas clôturé"
 
-msgid "Your ticket has been repoened"
-msgstr "Votre ticket a été réouvert"
+#, python-format
+msgid "You have reopened ticket ${number}"
+msgstr "Vous avez réouvert ${number} ticket(s)"
 
 msgid "Your request has been processed"
 msgstr "Votre demande a été traitée"
@@ -2573,6 +2576,9 @@ msgstr "Tout"
 
 msgid "All Tickets"
 msgstr "Tous les tickets"
+
+msgid "Your ticket has been repoened"
+msgstr "Votre ticket a été réouvert"
 
 msgid "All Users"
 msgstr "Tous les utilisateurs"

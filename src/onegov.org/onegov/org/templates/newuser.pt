@@ -12,7 +12,7 @@
 
                 <tal:block tal:condition="not sent_email">
                     <p i18n:translate>
-                        The user <em i18n:name="username">${username}</em> was created successfully.
+                        The user <strong i18n:name="username">${username}</strong> was created successfully.
                         Please write down the user's password, as it won't be shown to you again:
                     </p>
 
@@ -24,7 +24,7 @@
 
                 <tal:block tal:condition="sent_email">
                     <p i18n:translate>
-                        The user <em i18n:name="username">${username}</em> was created successfully.
+                        The user <strong i18n:name="username">${username}</strong> was created successfully.
                         An e-mail has been sent to the user with login instructions.
                     </p>
                 </tal:block>

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a note to the new-user e-mail to inform them about password resets.
+  [href]
+
 0.19.1 (2017-12-04)
 ~~~~~~~~~~~~~~~~~~~
 
