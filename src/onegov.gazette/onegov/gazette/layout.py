@@ -238,7 +238,7 @@ class Layout(ChameleonLayout):
         return '<br>'.join((text or '').splitlines())
 
     def format_text(self, text):
-        return '<br>'.join(text.splitlines())
+        return '<br>'.join((text or '').splitlines())
 
 
 class MailLayout(Layout):
