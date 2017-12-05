@@ -44,8 +44,6 @@ def view_notice(self, request):
 
     layout = Layout(self, request)
 
-    actions = []
-
     user_ids, group_ids = get_user_and_group(request)
     editor = request.is_personal(self)
     publisher = request.is_private(self)
@@ -53,123 +51,51 @@ def view_notice(self, request):
     owner = self.user_id in user_ids
     same_group = self.group_id in group_ids
 
+    def _action(label, name, class_, target='_self'):
+        return (label, request.link(self, name), class_, target)
+
+    action = {
+        'submit': _action(_("Submit"), 'submit', 'primary'),
+        'edit': _action(_("Edit"), 'edit', 'secondary'),
+        'delete': _action(_("Delete"), 'delete', 'alert right'),
+        'accept': _action(_("Accept"), 'accept', 'primary'),
+        'reject': _action(_("Reject"), 'reject', 'alert right'),
+        'publish': _action(_("Publish"), 'publish', 'primary'),
+        'edit_un': _action(_("Edit"), 'edit_unrestricted', 'secondary'),
+        'preview': _action(_("Preview"), 'preview', 'secondary', '_blank'),
+        'copy': (
+            _("Copy"),
+            request.link(
+                GazetteNoticeCollection(
+                    request.app.session(),
+                    state=self.state,
+                    source=self.id
+                ), name='new-notice'
+            ),
+            'secondary',
+            '_self'
+        )
+    }
+
+    actions = []
     if self.state == 'drafted' or self.state == 'rejected':
         if publisher or (editor and (same_group or owner)):
-            actions.append((
-                _("Submit"),
-                request.link(self, 'submit'),
-                'primary',
-                '_self'
-            ))
-            actions.append((
-                _("Edit"),
-                request.link(self, 'edit'),
-                'secondary',
-                '_self'
-            ))
-            actions.append((
-                _("Delete"),
-                request.link(self, 'delete'),
-                'alert right',
-                '_self'
-            ))
-
-    if self.state == 'submitted':
+            actions.append(action['submit'])
+            actions.append(action['edit'])
+            actions.append(action['delete'])
+    elif self.state == 'submitted':
         if publisher:
-            actions.append((
-                _("Accept"),
-                request.link(self, 'accept'),
-                'primary',
-                '_self'
-            ))
-            actions.append((
-                _("Edit"),
-                request.link(self, 'edit'),
-                'secondary',
-                '_self'
-            ))
-            actions.append((
-                _("Reject"),
-                request.link(self, 'reject'),
-                'alert right',
-                '_self'
-            ))
+            actions.append(action['accept'])
+            actions.append(action['edit'])
+            actions.append(action['reject'])
             if admin:
-                actions.append((
-                    _("Delete"),
-                    request.link(self, 'delete'),
-                    'alert right',
-                    '_self'
-                ))
-
-    if self.state == 'accepted':
-        if publisher:
-            actions.append((
-                _("Publish"),
-                request.link(self, 'publish'),
-                'primary',
-                '_self'
-            ))
+                actions.append(action['delete'])
+    elif self.state == 'accepted':
+        actions.append(action['copy'])
         if admin:
-            actions.append((
-                _("Edit"),
-                request.link(self, 'edit_unrestricted'),
-                'secondary',
-                '_self'
-            ))
-        actions.append((
-            _("Copy"),
-            request.link(
-                GazetteNoticeCollection(
-                    request.app.session(),
-                    state=self.state,
-                    source=self.id
-                ), name='new-notice'
-            ),
-            'secondary',
-            '_self'
-        ))
-        if admin:
-            actions.append((
-                _("Delete"),
-                request.link(self, 'delete'),
-                'alert right',
-                '_self'
-            ))
-
-    if self.state == 'published':
-        actions.append((
-            _("Copy"),
-            request.link(
-                GazetteNoticeCollection(
-                    request.app.session(),
-                    state=self.state,
-                    source=self.id
-                ), name='new-notice'
-            ),
-            'secondary',
-            '_self'
-        ))
-        if admin:
-            actions.append((
-                _("Edit"),
-                request.link(self, 'edit_unrestricted'),
-                'secondary',
-                '_self'
-            ))
-            actions.append((
-                _("Delete"),
-                request.link(self, 'delete'),
-                'alert right',
-                '_self'
-            ))
-
-    actions.append((
-        _("Preview"),
-        request.link(self, 'preview'),
-        'secondary',
-        '_blank'
-    ))
+            actions.append(action['edit_un'])
+            actions.append(action['delete'])
+    actions.append(action['preview'])
 
     return {
         'layout': layout,
