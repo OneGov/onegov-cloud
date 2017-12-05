@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-14 15:23+0100\n"
-"PO-Revision-Date: 2017-11-10 10:28+0100\n"
+"POT-Creation-Date: 2017-12-04 15:47+0100\n"
+"PO-Revision-Date: 2017-12-04 15:47+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -123,11 +123,20 @@ msgstr "Rubrik"
 msgid "Liable to pay costs"
 msgstr "Kostenpflichtig 85% vom Normalpreis"
 
+msgid "Billing address"
+msgstr "Rechnungsadresse"
+
 msgid "Issue(s)"
 msgstr "Ausgabe(n)"
 
 msgid "Text"
 msgstr "Text"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "Yes"
+msgstr "Ja"
 
 msgid "Select one"
 msgstr "Bitte auswählen"
@@ -259,12 +268,6 @@ msgstr "Sehr geehrte Damen und Herren,"
 msgid "Your official notice has been rejected:"
 msgstr ""
 "Ihr Inserat für den amtlichen Teil des Amtsblatts wurde zurückgewiesen:"
-
-msgid "Yes"
-msgstr "Ja"
-
-msgid "No"
-msgstr "Nein"
 
 msgid "Dear Sir or Madam,"
 msgstr "Sehr geehrte Dame, sehr geehrter Herr"

@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from datetime import date
 from onegov.chat import Message
+from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import meta_property
 from onegov.gazette import _
 from onegov.gazette.models.category import Category
@@ -126,6 +127,9 @@ class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
 
     #: True, if the official notice needs to be paid for
     at_cost = meta_property('at_cost')
+
+    #: The billing address in case the official notice need to be paid for
+    billing_address = content_property('billing_address')
 
     @observes('user', 'user.realname', 'user.username')
     def user_observer(self, user, realname, username):

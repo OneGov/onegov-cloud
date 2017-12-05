@@ -703,7 +703,7 @@ def test_notice_apply_meta(session, categories, organizations, issues):
     )
 
 
-def test_gazette_notice_overdue_issues(session, issues):
+def test_notice_overdue_issues(session, issues):
     session.add(GazetteNotice(title='notice'))
     session.flush()
     notice = session.query(GazetteNotice).one()
@@ -721,7 +721,7 @@ def test_gazette_notice_overdue_issues(session, issues):
         assert notice.overdue_issues
 
 
-def test_gazette_notice_expired_issues(session, issues):
+def test_notice_expired_issues(session, issues):
     session.add(GazetteNotice(title='notice'))
     session.flush()
     notice = session.query(GazetteNotice).one()
@@ -739,7 +739,7 @@ def test_gazette_notice_expired_issues(session, issues):
         assert notice.expired_issues
 
 
-def test_gazette_notice_invalid_category(session, categories):
+def test_notice_invalid_category(session, categories):
     session.add(GazetteNotice(title='notice'))
     session.flush()
     notice = session.query(GazetteNotice).one()
@@ -755,7 +755,7 @@ def test_gazette_notice_invalid_category(session, categories):
     assert not notice.invalid_category
 
 
-def test_gazette_notice_invalid_organization(session, organizations):
+def test_notice_invalid_organization(session, organizations):
     session.add(GazetteNotice(title='notice'))
     session.flush()
     notice = session.query(GazetteNotice).one()

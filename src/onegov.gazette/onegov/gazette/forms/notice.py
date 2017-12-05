@@ -8,10 +8,11 @@ from onegov.gazette.models import Category
 from onegov.gazette.models import Issue
 from onegov.gazette.models import Organization
 from onegov.quill import QuillField
-from wtforms import BooleanField
-from wtforms import StringField
-from wtforms.validators import InputRequired
 from sedate import utcnow
+from wtforms import RadioField
+from wtforms import StringField
+from wtforms import TextAreaField
+from wtforms.validators import InputRequired
 
 
 class NoticeForm(Form):
@@ -46,8 +47,19 @@ class NoticeForm(Form):
         ]
     )
 
-    at_cost = BooleanField(
-        label=_("Liable to pay costs")
+    at_cost = RadioField(
+        label=_("Liable to pay costs"),
+        default='no',
+        choices=[
+            ('no', _("No")),
+            ('yes', _("Yes"))
+        ]
+    )
+
+    billing_address = TextAreaField(
+        label=_("Billing address"),
+        render_kw={'rows': 3},
+        depends_on=('at_cost', 'yes')
     )
 
     issues = MultiCheckboxField(
@@ -123,7 +135,8 @@ class NoticeForm(Form):
         model.organization_id = self.organization.data
         model.category_id = self.category.data
         model.text = self.text.data
-        model.at_cost = self.at_cost.data
+        model.at_cost = self.at_cost.data == 'yes'
+        model.billing_address = self.billing_address.data
         model.issues = self.issues.data
 
         model.apply_meta(self.request.app.session())
@@ -133,7 +146,8 @@ class NoticeForm(Form):
         self.organization.data = model.organization_id
         self.category.data = model.category_id
         self.text.data = model.text
-        self.at_cost.data = model.at_cost
+        self.at_cost.data = 'yes' if model.at_cost else 'no'
+        self.billing_address.data = model.billing_address or ''
         self.issues.data = list(model.issues.keys())
 
 

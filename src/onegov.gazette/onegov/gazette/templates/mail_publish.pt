@@ -16,6 +16,8 @@
             <dd>${model.category}</dd>
 
             <dt i18n:translate tal:condition="model.at_cost">Liable to pay costs</dt>
+            <dt i18n:translate tal:condition="model.at_cost">Billing address</dt>
+            <dd tal:condition="model.at_cost" tal:content="structure layout.format_text(model.billing_address)"></dd>
 
             <dt i18n:translate>Title</dt>
             <dd>${model.title}</dd>

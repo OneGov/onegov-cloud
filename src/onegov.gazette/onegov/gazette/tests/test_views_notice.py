@@ -144,6 +144,8 @@ def test_view_notice1(gazette_app):
             manage.form['title'] = 'Titel {}'.format(count + 1)
             manage.form['organization'] = '200'
             manage.form['category'] = '11'
+            manage.form['at_cost'].select('yes')
+            manage.form['billing_address'] = 'someone\nstreet\r\nplace'
             manage.form['issues'] = ['2017-44', '2017-45']
             manage.form['text'] = "1. Oktober 2017"
             manage.form.submit()
@@ -160,6 +162,8 @@ def test_view_notice1(gazette_app):
                 assert "1. Oktober 2017" in view
                 assert "Civic Community" in view
                 assert "Education" in view
+                assert "<dd>Ja</dd>" in view
+                assert "someone<br>street<br>place" in view
                 assert owner in view
                 if group:
                     assert "TestGroup" in view
@@ -505,6 +509,8 @@ def test_view_notice_accept(gazette_app):
             manage.form['title'] = 'Titel {}'.format(count + 1)
             manage.form['organization'] = '410'
             manage.form['category'] = '11'
+            manage.form['at_cost'].select('yes')
+            manage.form['billing_address'] = 'someone\nstreet\nplace'
             manage.form['issues'] = ['2017-44', '2017-45']
             manage.form['text'] = "1. Oktober 2017"
             manage.form.submit()
@@ -561,6 +567,8 @@ def test_view_notice_accept(gazette_app):
         payload = message.get_payload(1).get_payload(decode=True)
         payload = payload.decode('utf-8')
         assert '44  Titel 2' in payload
+        assert "Kostenpflichtig 85% vom Normalpreis" in payload
+        assert "someone<br>street<br>place" in payload
 
         message = gazette_app.smtp.outbox.pop()
         assert message['From'] == 'mails@govikon.ch'

@@ -43,6 +43,8 @@ def create_notice(self, request, form):
             text=form.text.data,
             organization_id=form.organization.data,
             category_id=form.category.data,
+            at_cost=form.at_cost.data == 'yes',
+            billing_address=form.billing_address.data,
             user=get_user(request),
             issues=form.issues.data
         )

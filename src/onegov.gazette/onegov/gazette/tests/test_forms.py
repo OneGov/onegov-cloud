@@ -441,12 +441,16 @@ def test_notice_form(session, categories, organizations, issues):
     assert form.title.data == 'Title'
     assert form.organization.data == '200'
     assert form.category.data == '13'
+    assert form.at_cost.data == 'no'
+    assert form.billing_address.data == ''
     assert form.text.data == 'A <b>text</b>.'
     assert form.issues.data == ['2017-43']
 
     form.title.data = 'Notice'
     form.organization.data = '300'
     form.category.data = '11'
+    form.at_cost.data = 'yes'
+    form.billing_address.data = 'someone\nsomewhere'
     form.text.data = 'A <b>notice</b>.'
     form.issues.data = ['2017-44']
 
@@ -454,6 +458,8 @@ def test_notice_form(session, categories, organizations, issues):
     assert notice.title == 'Notice'
     assert notice.organization == 'Municipality'
     assert notice.category == 'Education'
+    assert notice.at_cost == True
+    assert notice.billing_address == 'someone\nsomewhere'
     assert notice.text == 'A <b>notice</b>.'
     assert notice.issues == {'2017-44': None}
     assert notice.first_issue == standardize_date(datetime(2017, 11, 3), 'UTC')

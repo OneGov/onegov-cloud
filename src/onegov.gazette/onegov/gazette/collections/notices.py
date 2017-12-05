@@ -121,7 +121,8 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
             source=self.source
         )
 
-    def add(self, title, text, organization_id, category_id, user, issues):
+    def add(self, title, text, organization_id, category_id, user, issues,
+            **kwargs):
         """ Add a new notice.
 
         A unique, URL-friendly name is created automatically for this notice
@@ -138,7 +139,8 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
             title=title,
             text=text,
             name=self._get_unique_name(title),
-            issues=issues
+            issues=issues,
+            **kwargs
         )
         notice.user = user
         notice.group = user.group if user else None
