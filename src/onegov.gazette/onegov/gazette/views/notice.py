@@ -91,10 +91,18 @@ def view_notice(self, request):
             if admin:
                 actions.append(action['delete'])
     elif self.state == 'accepted':
+        if publisher:
+            actions.append(action['publish'])
+        if admin:
+            actions.append(action['edit_un'])
+        actions.append(action['copy'])
+        if admin:
+            actions.append(action['delete'])
+    elif self.state == 'published':
         actions.append(action['copy'])
         if admin:
             actions.append(action['edit_un'])
-            actions.append(action['delete'])
+
     actions.append(action['preview'])
 
     return {
