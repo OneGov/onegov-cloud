@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.5.1 (2017-12-05)
+~~~~~~~~~~~~~~~~~~~
 
 - No longer raises an error when a proposed activity is proposed again.
   [href]
