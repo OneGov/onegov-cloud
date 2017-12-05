@@ -51,7 +51,7 @@
                             <dd i18n:translate tal:condition="not: notice.at_cost">No</dd>
 
                             <dt i18n:translate tal:condition="notice.at_cost">Billing address</dt>
-                            <dd i18n:translate tal:condition="notice.at_cost" tal:content="structure layout.format_text(notice.billing_address)"></dd>
+                            <dd tal:condition="notice.at_cost" tal:content="structure layout.format_text(notice.billing_address)"></dd>
 
                             <dt i18n:translate>User</dt>
                             <dd>${notice.user_name}</dd>
