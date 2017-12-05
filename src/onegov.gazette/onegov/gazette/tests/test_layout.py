@@ -149,5 +149,6 @@ def test_layout_format(session, principal):
     ) == 'No. 1, 02.01.2017 / 10'
 
     # Text
+    assert layout.format_text(None) == ''
     assert layout.format_text('abc') == 'abc'
     assert layout.format_text('a\nb\r\nc') == 'a<br>b<br>c'
