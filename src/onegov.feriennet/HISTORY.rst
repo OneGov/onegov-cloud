@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.9 (2017-12-05)
+~~~~~~~~~~~~~~~~~~~
 
 - Uses the Ferienpass name for email senders.
   [href]
