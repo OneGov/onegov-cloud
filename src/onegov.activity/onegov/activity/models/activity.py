@@ -158,7 +158,7 @@ class Activity(Base, ContentMixin, TimestampMixin):
         self._tags = {k: '' for k in value} if value else None
 
     def propose(self):
-        assert self.state == 'preview'
+        assert self.state in ('preview', 'proposed')
         self.state = 'proposed'
 
         return self

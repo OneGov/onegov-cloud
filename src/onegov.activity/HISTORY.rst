@@ -1,11 +1,14 @@
 Changelog
 ---------
 
-- Changes the activity filter to have more useful options.
+- No longer raises an error when a proposed activity is proposed again.
   [href]
 
 1.5.0 (2017-10-16)
 ~~~~~~~~~~~~~~~~~~~
+
+- Changes the activity filter to have more useful options.
+  [href]
 
 - Adds some matching of manual payments to iso20022 matcher.
   [href]
