@@ -539,6 +539,8 @@ def test_view_notice_accept(gazette_app):
         payload = message.get_payload(1).get_payload(decode=True)
         payload = payload.decode('utf-8')
         assert '44  Titel 2' in payload
+        assert "Kostenpflichtig 85% vom Normalpreis" in payload
+        assert "someone<br>street<br>place" in payload
 
         message = gazette_app.smtp.outbox.pop()
         assert message['From'] == 'mails@govikon.ch'

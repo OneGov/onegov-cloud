@@ -121,7 +121,8 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
             source=self.source
         )
 
-    def add(self, title, text, organization_id, category_id, user, issues):
+    def add(self, title, text, organization_id, category_id, user, issues,
+            **kwargs):
         """ Add a new notice.
 
         A unique, URL-friendly name is created automatically for this notice
@@ -157,19 +158,6 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         )
 
         return notice
-
-    # def on_request(self, request):
-    #     """ Limits the issues to the date filters. """
-    #     self.issues = None
-    #     if self.from_date or self.to_date:
-    #         issues = request.app.principal.issues_by_date
-    #         self.issues = [
-    #             str(issue) for date_, issue in issues.items()
-    #             if (
-    #                 ((not self.from_date) or (date_ >= self.from_date)) and
-    #                 ((not self.to_date) or (date_ <= self.to_date))
-    #             )
-    #         ]
 
     def count_by_organization(self):
         """ Returns the total number of notices by organizations.
