@@ -39,13 +39,6 @@ class MultiCheckboxField(MultiCheckboxFieldBase):
             self.render_kw['data-fold-title']
         )
 
-    def __iter__(self):
-        for opt in super(MultiCheckboxField, self).__iter__():
-            if 'disabled' in self.render_kw:
-                opt.render_kw = opt.render_kw or {}
-                opt.render_kw['disabled'] = self.render_kw['disabled']
-            yield opt
-
 
 class DateTimeLocalField(DateTimeLocalFieldBase):
     """ A custom implementation of the DateTimeLocalField to fix issues with

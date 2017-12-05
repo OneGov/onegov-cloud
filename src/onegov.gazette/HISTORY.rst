@@ -1,9 +1,5 @@
 Changelog
 ---------
-
-- Adds billing address to notices.
-  [msom]
-
 1.10.5 (2017-11-27)
 ~~~~~~~~~~~~~~~~~~~
 

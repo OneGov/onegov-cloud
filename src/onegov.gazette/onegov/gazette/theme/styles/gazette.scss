@@ -510,12 +510,6 @@ a.button.right {
     margin-right: .75ex;
 }
 
-.action-generate::before {
-    content: '\f1c1';
-    font-family: 'FontAwesome';
-    margin-right: .75ex;
-}
-
 .action-order::before {
     content: '\f047';
     font-family: 'FontAwesome';
@@ -530,12 +524,6 @@ a.button.right {
 
 .action-print::before {
     content: '\f02f';
-    font-family: 'FontAwesome';
-    margin-right: .75ex;
-}
-
-.action-publish::before {
-    content: '\f00c';
     font-family: 'FontAwesome';
     margin-right: .75ex;
 }

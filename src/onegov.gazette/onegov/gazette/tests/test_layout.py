@@ -130,15 +130,8 @@ def test_layout_format(session, principal):
         layout.format_issue('')
 
     assert layout.format_issue(Issue()) == 'No. , '
-
+    assert layout.format_issue(Issue(number=1, date=date(2017, 1, 2))) \
+        == 'No. 1, 02.01.2017'
     assert layout.format_issue(
-        Issue(number=1, date=date(2017, 1, 2))
-    ) == 'No. 1, 02.01.2017'
-    assert layout.format_issue(
-        Issue(number=1, date=date(2017, 1, 2)),
-        date_format='date_with_weekday'
+        Issue(number=1, date=date(2017, 1, 2)), date_format='date_with_weekday'
     ) == 'No. 1, Montag 02.01.2017'
-
-    # Text
-    assert layout.format_text('abc') == 'abc'
-    assert layout.format_text('a\nb\r\nc') == 'a<br>b<br>c'

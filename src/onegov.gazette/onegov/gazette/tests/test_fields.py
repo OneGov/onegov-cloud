@@ -31,16 +31,6 @@ def test_multi_checkbox_field():
     assert 'data-expand-title="Show all"' in field()
     assert 'data-limit="10"' in field()
 
-    form = Form()
-    field = MultiCheckboxField(
-        choices=(('a', 'b'),),
-        render_kw={'disabled': True}
-    )
-    field = field.bind(form, 'choice')
-
-    field.data = ''
-    assert 'input disabled' in field()
-
 
 def test_date_time_local_field():
     form = Form()

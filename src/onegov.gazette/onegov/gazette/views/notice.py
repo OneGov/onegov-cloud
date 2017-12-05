@@ -157,6 +157,12 @@ def view_notice(self, request):
                 'secondary',
                 '_self'
             ))
+            actions.append((
+                _("Delete"),
+                request.link(self, 'delete'),
+                'alert right',
+                '_self'
+            ))
 
     actions.append((
         _("Preview"),
@@ -292,15 +298,6 @@ def edit_notice_unrestricted(self, request, form):
     """
 
     layout = Layout(self, request)
-
-    if self.state == 'published':
-        form.disable_issues()
-
-    if form.submitted(request):
-        form.update_model(self)
-        self.add_change(request, _("edited"))
-        request.message(_("Official notice modified."), 'success')
-        return redirect(request.link(self))
 
     if self.state == 'accepted':
         request.message(

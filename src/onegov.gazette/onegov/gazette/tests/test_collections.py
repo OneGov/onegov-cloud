@@ -80,45 +80,19 @@ def test_issue_collection(session):
         name='2017-2', number=2, date=date(2017, 2, 2),
         deadline=standardize_date(datetime(2017, 2, 1, 12, 0), 'UTC')
     )
-    issue_4 = collection.add(
-        name='2018-1', number=1, date=date(2018, 1, 1),
-        deadline=standardize_date(datetime(2017, 12, 20, 12, 0), 'UTC')
-    )
 
-    # test query
     assert [issue.name for issue in collection.query()] == [
-        '2017-1', '2017-2', '2017-3', '2018-1'
+        '2017-1', '2017-2', '2017-3'
     ]
 
-    # test current issue
     with freeze_time("2017-01-01 11:00"):
         assert collection.current_issue == issue_1
     with freeze_time("2017-01-01 13:00"):
         assert collection.current_issue == issue_2
     with freeze_time("2017-02-10 13:00"):
         assert collection.current_issue == issue_3
-    with freeze_time("2017-12-10 13:00"):
-        assert collection.current_issue == issue_4
-    with freeze_time("2018-04-10 13:00"):
+    with freeze_time("2017-04-10 13:00"):
         assert collection.current_issue is None
-
-    # test by name
-    assert collection.by_name('2017-1') == issue_1
-    assert collection.by_name('2017-2') == issue_2
-    assert collection.by_name('2017-3') == issue_3
-    assert collection.by_name('2018-1') == issue_4
-    assert collection.by_name('2018-2') is None
-
-    # test years
-    assert collection.years == [2017, 2018]
-    assert collection.by_years() == OrderedDict((
-        (2017, [issue_1, issue_2, issue_3]),
-        (2018, [issue_4]),
-    ))
-    assert collection.by_years(desc=True) == OrderedDict((
-        (2018, [issue_4]),
-        (2017, [issue_3, issue_2, issue_1]),
-    ))
 
 
 def test_notice_collection(session, organizations, categories, issues):
