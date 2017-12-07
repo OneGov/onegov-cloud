@@ -173,6 +173,8 @@ def test_issue(session):
 
     # Test query etc
     assert len(issue.notices().all()) == 0
+    assert issue.notices('accepted').all() == []
+    assert issue.notices('submitted').all() == []
     assert issue.in_use is False
 
     issues = [issue.name]
@@ -184,6 +186,8 @@ def test_issue(session):
     session.flush()
 
     assert len(issue.notices().all()) == 4
+    assert issue.notices('accepted').all()[0].title == 'a'
+    assert issue.notices('submitted').one().title == 's'
     assert issue.in_use is True
 
     # Test date observer
