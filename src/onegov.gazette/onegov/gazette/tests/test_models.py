@@ -210,6 +210,7 @@ def test_principal():
     assert principal.logo == 'logo.svg'
     assert principal.publish_to == 'printer@govikon.org'
     assert principal.publish_from == ''
+    assert principal.show_archive is False
 
     principal = Principal.from_yaml(dedent("""
         name: Govikon
@@ -218,6 +219,7 @@ def test_principal():
         publish_to: 'printer@govikon.org'
         publish_from: 'publisher@govikon.org'
         help_link: 'https://help.me'
+        show_archive: True
     """))
     assert principal.name == 'Govikon'
     assert principal.color == '#aabbcc'
@@ -225,6 +227,7 @@ def test_principal():
     assert principal.publish_to == 'printer@govikon.org'
     assert principal.publish_from == 'publisher@govikon.org'
     assert principal.help_link == 'https://help.me'
+    assert principal.show_archive is True
 
 
 def test_notice_organization(session):

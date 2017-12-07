@@ -10,6 +10,7 @@ def test_view_principal(gazette_app):
     client = Client(gazette_app)
 
     assert 'Startseite' in client.get('/').maybe_follow()
+    assert '<h2>Anmelden</h2>' in client.get('/').maybe_follow()
 
     login_admin(client)
     assert '/notices' in client.get('/').maybe_follow().request.url
@@ -22,6 +23,10 @@ def test_view_principal(gazette_app):
 
 
 def test_view_archive(gazette_app):
+    principal = gazette_app.principal
+    principal.show_archive = True
+    gazette_app.cache.set('principal', principal)
+
     with freeze_time("2017-11-01 12:00"):
         client = Client(gazette_app)
 

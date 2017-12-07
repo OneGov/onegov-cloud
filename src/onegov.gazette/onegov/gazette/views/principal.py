@@ -34,8 +34,10 @@ def view_principal(self, request):
     if request.is_personal(self):
         return redirect(layout.dashboard_link)
 
-    issues = IssueCollection(request.app.session()).by_years(desc=True)
+    if not request.app.principal.show_archive:
+        return redirect(layout.login_link)
 
+    issues = IssueCollection(request.app.session()).by_years(desc=True)
     return {
         'layout': layout,
         'title': "{} {}".format(_("Gazette"), request.app.principal.name),
