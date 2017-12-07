@@ -36,9 +36,7 @@ def write_principal(temporary_directory, principal, params=None):
     params.update({
         'name': principal,
         'color': '#fff',
-        'logo': 'logo.svg',
-        'categories': '',
-        'issues': ''
+        'logo': 'logo.svg'
     })
     path = os.path.join(
         temporary_directory,
