@@ -162,20 +162,35 @@ msgstr "Herausgeber"
 msgid "Editor"
 msgstr "Redaktor"
 
-msgid "New"
-msgstr "Neu"
+msgid "Close"
+msgstr "Schliessen"
+
+msgid "Attachment"
+msgstr "Anhang"
 
 msgid "Actions"
 msgstr "Aktionen"
+
+msgid "No attachments."
+msgstr "Keine Anhänge."
+
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "Drop files to upload"
+msgstr "Dateien zum Hochladen hier ablegen"
+
+msgid "Upload"
+msgstr "Hochladen"
+
+msgid "New"
+msgstr "Neu"
 
 msgid "No categories."
 msgstr "Keine Rubriken."
 
 msgid "Edit"
 msgstr "Bearbeiten"
-
-msgid "Delete"
-msgstr "Löschen"
 
 msgid "No official notices."
 msgstr "Keine Meldungen."
@@ -316,6 +331,9 @@ msgstr "Diese Meldung wurde zurückgewiesen."
 msgid "State"
 msgstr "Status"
 
+msgid "Attachments"
+msgstr "Anhänge"
+
 msgid "Changes"
 msgstr "Änderungen"
 
@@ -339,9 +357,6 @@ msgstr "Keine Organisationen."
 
 msgid "Order Organizations"
 msgstr "Organisationen ordnen"
-
-msgid "Close"
-msgstr "Schliessen"
 
 msgid "Print"
 msgstr "Drucken"
@@ -517,19 +532,26 @@ msgstr "\"${item}\" zurückweisen?"
 msgid "Reject Official Note"
 msgstr "Meldung zurückweisen"
 
-#, python-format
-msgid ""
-"Do you really want to publish \"${item}\"? This will assign the publication "
-"numbers for the following issues: ${issues}."
-msgstr ""
-"\"${item}\" veröffentlichen? Es werden Publikationsnummern für die folgenden "
-"Ausgaben vergeben: ${issues}."
+msgid "Attachment added."
+msgstr "Anhang hinzugefügt."
 
-msgid "Publish Official Note"
-msgstr "Meldung veröffentlichen"
+msgid "Accept"
+msgstr "Annehmen"
+
+msgid "Copy"
+msgstr "Kopieren"
 
 msgid "Preview"
 msgstr "Vorschau"
+
+msgid "Publish"
+msgstr "Veröffentlichen"
+
+msgid "Reject"
+msgstr "Zurückweisen"
+
+msgid "Submit"
+msgstr "Einreichen"
 
 msgid "Accepted official notices may not be edited."
 msgstr "Angenommene Meldungen können nicht mehr bearbeitet werden."
@@ -583,14 +605,8 @@ msgstr "Es können nur eingereichte Meldungen zurückgewiesen werden."
 msgid "Official notice rejected."
 msgstr "Meldung zurückgewiesen."
 
-msgid "Only accepted official notices may be published."
-msgstr "Es können nur angenommene Meldungen veröffentlicht werden."
-
-msgid "Official notice published."
-msgstr "Meldung veröffentlicht."
-
-msgid "Copy"
-msgstr "Kopieren"
+msgid "Attachment deleted."
+msgstr "Anhang gelöscht."
 
 msgid ""
 "The official notice has issues for which the deadlines are reached. Please "
@@ -602,15 +618,6 @@ msgstr "Diese Meldung wurde bereits veröffentlicht!"
 
 msgid "mail sent"
 msgstr "Druck beauftragt"
-
-msgid "Submit"
-msgstr "Einreichen"
-
-msgid "Accept"
-msgstr "Annehmen"
-
-msgid "Reject"
-msgstr "Zurückweisen"
 
 #, python-format
 msgid "Official Notice Rejected ${id}"
@@ -691,3 +698,6 @@ msgstr "Benutzer gelöscht."
 
 msgid "User account created"
 msgstr "Benutzerkonto Amtsblattredaktion erstellt"
+
+#~ msgid "Do you really want to delete the attachment?"
+#~ msgstr "Anhang löschen?"

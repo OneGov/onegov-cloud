@@ -1,8 +1,10 @@
 from morepath import redirect
+from onegov.core.crypto import random_token
 from onegov.core.security import Personal
 from onegov.core.security import Private
 from onegov.core.security import Secret
 from onegov.core.templates import render_template
+from onegov.file.utils import as_fileintent
 from onegov.gazette import _
 from onegov.gazette import GazetteApp
 from onegov.gazette.collections import GazetteNoticeCollection
@@ -13,7 +15,9 @@ from onegov.gazette.forms import UnrestrictedNoticeForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.layout import MailLayout
 from onegov.gazette.models import GazetteNotice
+from onegov.gazette.models import GazetteNoticeFile
 from onegov.gazette.views import get_user_and_group
+from webob import exc
 from webob.exc import HTTPForbidden
 
 
@@ -55,14 +59,8 @@ def view_notice(self, request):
         return (label, request.link(self, name), class_, target)
 
     action = {
-        'submit': _action(_("Submit"), 'submit', 'primary'),
-        'edit': _action(_("Edit"), 'edit', 'secondary'),
-        'delete': _action(_("Delete"), 'delete', 'alert right'),
         'accept': _action(_("Accept"), 'accept', 'primary'),
-        'reject': _action(_("Reject"), 'reject', 'alert right'),
-        'publish': _action(_("Publish"), 'publish', 'primary'),
-        'edit_un': _action(_("Edit"), 'edit_unrestricted', 'secondary'),
-        'preview': _action(_("Preview"), 'preview', 'secondary', '_blank'),
+        'attachments': _action(_("Attachments"), 'attachments', 'secondary'),
         'copy': (
             _("Copy"),
             request.link(
@@ -74,7 +72,14 @@ def view_notice(self, request):
             ),
             'secondary',
             '_self'
-        )
+        ),
+        'delete': _action(_("Delete"), 'delete', 'alert right'),
+        'edit_un': _action(_("Edit"), 'edit_unrestricted', 'secondary'),
+        'edit': _action(_("Edit"), 'edit', 'secondary'),
+        'preview': _action(_("Preview"), 'preview', 'secondary', '_blank'),
+        'publish': _action(_("Publish"), 'publish', 'primary'),
+        'reject': _action(_("Reject"), 'reject', 'alert right'),
+        'submit': _action(_("Submit"), 'submit', 'primary'),
     }
 
     actions = []
@@ -83,20 +88,22 @@ def view_notice(self, request):
             actions.append(action['submit'])
             actions.append(action['edit'])
             actions.append(action['delete'])
+        if publisher:
+            actions.append(action['attachments'])
     elif self.state == 'submitted':
         if publisher:
             actions.append(action['accept'])
             actions.append(action['edit'])
             actions.append(action['reject'])
-            if admin:
-                actions.append(action['delete'])
+            actions.append(action['attachments'])
+        if admin:
+            actions.append(action['delete'])
     elif self.state == 'accepted':
         if publisher:
             actions.append(action['publish'])
         if admin:
             actions.append(action['edit_un'])
-        actions.append(action['copy'])
-        if admin:
+            actions.append(action['attachments'])
             actions.append(action['delete'])
     elif self.state == 'published':
         actions.append(action['copy'])
@@ -118,7 +125,7 @@ def view_notice(self, request):
     name='preview',
     permission=Personal
 )
-def view_notice_preview(self, request):
+def preview_notice(self, request):
     """ Preview the notice. """
 
     layout = Layout(self, request)
@@ -439,6 +446,9 @@ def accept_notice(self, request, form):
                 request.app.mail_sender
             )
             subject = construct_subject(self)
+            attachments = (
+                file.reference.file._file_path for file in self.files
+            )
             request.app.send_email(
                 subject=subject,
                 receivers=(request.app.principal.publish_to, ),
@@ -451,7 +461,8 @@ def accept_notice(self, request, form):
                         'model': self,
                         'layout': MailLayout(self, request)
                     }
-                )
+                ),
+                attachments=attachments
             )
             self.add_change(request, _("mail sent"))
         return redirect(layout.dashboard_or_notices_link)
@@ -542,53 +553,84 @@ def reject_notice(self, request, form):
     }
 
 
-@GazetteApp.form(
+@GazetteApp.html(
     model=GazetteNotice,
-    name='publish',
-    template='form.pt',
-    permission=Private,
-    form=EmptyForm
+    template='attachments.pt',
+    name='attachments',
+    permission=Private
 )
-def publish_notice(self, request, form):
-    """ Publish a notice.
-
-    This view is used by the publishers to publish an accepted notice.
-
-    Only accepted notices may be published.
+def view_notice_attachments(self, request):
+    """ View all attachments to a single notice and allow to drop new
+    attachments.
 
     """
 
     layout = Layout(self, request)
+    upload_url = layout.csrf_protected_url(request.link(self, name='upload'))
 
-    if self.state != 'accepted':
-        return {
-            'layout': layout,
-            'title': self.title,
-            'subtitle': _("Publish Official Note"),
-            'callout': _("Only accepted official notices may be published."),
-            'show_form': False
-        }
+    return {
+        'layout': layout,
+        'title': self.title,
+        'subtitle': _("Attachments"),
+        'upload_url': upload_url,
+        'files': self.files,
+        'notice': self,
+    }
+
+
+@GazetteApp.view(
+    model=GazetteNotice,
+    name='upload',
+    permission=Private,
+    request_method='POST'
+)
+def view_upload_file(self, request):
+    """ Upload an attachment and add it to the notice. """
+    request.assert_valid_csrf_token()
+
+    attachment = GazetteNoticeFile(id=random_token())
+    attachment.name = request.params['file'].filename
+    attachment.reference = as_fileintent(
+        request.params['file'].file,
+        request.params['file'].filename
+    )
+    if attachment.reference.content_type != 'application/pdf':
+        raise exc.HTTPUnsupportedMediaType()
+
+    self.files.append(attachment)
+
+    request.message(_("Attachment added."), 'success')
+    return redirect(request.link(self, 'attachments'))
+
+
+@GazetteApp.form(
+    model=GazetteNoticeFile,
+    name='delete',
+    template='form.pt',
+    permission=Private,
+    form=EmptyForm
+)
+def delete_attachment(self, request, form):
+    """ Delete a notice attachment. """
+
+    layout = Layout(self, request)
 
     if form.submitted(request):
-        self.publish(request)
-        request.message(_("Official notice published."), 'success')
-        return redirect(layout.dashboard_or_notices_link)
+        url = request.link(self.linked_official_notices[0], 'attachments')
+        request.app.session().delete(self)
+        request.message(_("Attachment deleted."), 'success')
+        return redirect(url)
 
     return {
         'message': _(
-            (
-                'Do you really want to publish "${item}"? This will assign '
-                'the publication numbers for the following issues: ${issues}.'
-            ),
-            mapping={
-                'item': self.title,
-                'issues': ', '.join(self.issues.keys())
-            }
+            'Do you really want to delete "${item}"?',
+            mapping={'item': self.name}
         ),
         'layout': layout,
         'form': form,
-        'title': self.title,
-        'subtitle': _("Publish Official Note"),
-        'button_text': _("Publish Official Note"),
+        'title': self.name,
+        'subtitle': _("Delete"),
+        'button_text': _("Delete"),
+        'button_class': 'alert',
         'cancel': request.link(self)
     }

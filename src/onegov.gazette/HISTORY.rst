@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds attachments to notices.
+  [msom]
+
 - Cleanup code.
   [msom]
 

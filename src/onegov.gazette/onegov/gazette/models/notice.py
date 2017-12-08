@@ -3,6 +3,8 @@ from datetime import date
 from onegov.chat import Message
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import meta_property
+from onegov.file import AssociatedFiles
+from onegov.file import File
 from onegov.gazette import _
 from onegov.gazette.models.category import Category
 from onegov.gazette.models.issue import Issue
@@ -102,7 +104,13 @@ class CachedGroupNameMixin(object):
         self._group_name = group_name
 
 
-class GazetteNotice(OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin):
+class GazetteNoticeFile(File):
+    __mapper_args__ = {'polymorphic_identity': 'gazette_notice'}
+
+
+class GazetteNotice(
+    OfficialNotice, CachedUserNameMixin, CachedGroupNameMixin, AssociatedFiles
+):
     """ An official notice with extras.
 
     We use a combination of the categories/organizations HSTORE and the

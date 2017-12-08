@@ -1,9 +1,11 @@
 from datetime import date
 from datetime import datetime
 from freezegun import freeze_time
+from onegov.file.utils import as_fileintent
 from onegov.gazette.collections import OrganizationCollection
 from onegov.gazette.models import Category
 from onegov.gazette.models import GazetteNotice
+from onegov.gazette.models import GazetteNoticeFile
 from onegov.gazette.models import Issue
 from onegov.gazette.models import IssueName
 from onegov.gazette.models import Organization
@@ -609,3 +611,27 @@ def test_notice_invalid_organization(session, organizations):
 
     notice.organization_id = '410'
     assert not notice.invalid_organization
+
+
+def test_notice_file(gazette_app, session):
+    session.add(GazetteNotice(title='notice'))
+    session.flush()
+
+    notice = session.query(GazetteNotice).one()
+    notice.files.append(
+        GazetteNoticeFile(
+            id='abcd',
+            name='test.txt',
+            reference=as_fileintent('Test text.'.encode('utf-8'), 'test.txt')
+        )
+    )
+    session.flush()
+
+    file = session.query(GazetteNoticeFile).one()
+    assert file.id == 'abcd'
+    assert file.name == 'test.txt'
+    assert file.type == 'gazette_notice'
+    assert file.reference.file.read().decode('utf-8') == 'Test text.'
+
+    assert notice.files[0] == file
+    assert file.linked_official_notices[0] == notice
