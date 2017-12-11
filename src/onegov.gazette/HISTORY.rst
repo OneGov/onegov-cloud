@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds changelog entries when editing attachments.
+  [msom]
+
 1.12.0 (2017-12-11)
 ~~~~~~~~~~~~~~~~~~~
 

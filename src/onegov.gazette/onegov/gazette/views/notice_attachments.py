@@ -77,6 +77,7 @@ def upload_attachment(self, request):
         raise exc.HTTPUnsupportedMediaType()
 
     self.files.append(attachment)
+    self.add_change(request, _("Attachment added."))
 
     request.message(_("Attachment added."), 'success')
     return redirect(request.link(self, 'attachments'))
@@ -112,6 +113,7 @@ def delete_attachment(self, request, form):
         url = request.link(self.linked_official_notices[0], 'attachments')
         request.app.session().delete(self)
         request.message(_("Attachment deleted."), 'success')
+        notice.add_change(request, _("Attachment deleted."))
         return redirect(url)
 
     return {
