@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.12.0 (2017-12-11)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds attachments to notices.
   [msom]
