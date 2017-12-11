@@ -46,7 +46,9 @@ def random_namespace():
 
 
 def create_app(app_class, request, use_elasticsearch=False,
-               reuse_filestorage=True, use_smtp=True):
+               reuse_filestorage=True, use_smtp=True,
+               depot_backend='depot.io.memory.MemoryFileStorage',
+               depot_storage_path=None):
 
     # filestorage can be reused between tries as it is nowadays mainly (if not
     # exclusively) used by the theme compiler
@@ -72,7 +74,8 @@ def create_app(app_class, request, use_elasticsearch=False,
         dsn=request.getfixturevalue('postgres_dsn'),
         filestorage='fs.osfs.OSFS',
         filestorage_object=filestorage_object,
-        depot_backend='depot.io.memory.MemoryFileStorage',
+        depot_backend=depot_backend,
+        depot_storage_path=depot_storage_path,
         identity_secure=False,
         disable_memcached=True,
         enable_elasticsearch=use_elasticsearch,
