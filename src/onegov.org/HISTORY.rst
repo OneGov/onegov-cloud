@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Automatically adds confirm dialogs to intercooler responses.
+  [href]
+
+- Changes the confirmation setup to be idempotent.
+  [href]
+
 0.19.3 (2017-12-11)
 ~~~~~~~~~~~~~~~~~~~
 

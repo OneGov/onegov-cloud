@@ -141,3 +141,17 @@ $(document).find('[ic-once]').on('success.ic', function(_e, element) {
         element.data('ic-request-in-flight', true);
     }, 0);
 });
+
+// automatically setup redirect after / confirmation dialogs for
+// things loaded by intercooler
+Intercooler.ready(function(element) {
+    var el = $(element);
+
+    // the ready event is fired on the body as well -> no action required there
+    if (el.is('body')) {
+        return;
+    }
+
+    $(el).find('a.confirm').confirmation();
+    setupRedirectAfter(el);
+});

@@ -112,7 +112,13 @@ var show_confirmation = function(question, yes, no, extra, handle_yes) {
 
 */
 var intercept = function(element, event, handler) {
-    var existing_events = $._data(element, 'events')[event];
+    var el = $(element);
+
+    if (el.data('is-intercepted')) {
+        return;
+    }
+
+    var existing_events = ($._data(element, 'events') || {})[event] || [];
     var existing_handlers = _.map(existing_events, _.property('handler'));
 
     var new_handler = function(e) {
@@ -127,8 +133,9 @@ var intercept = function(element, event, handler) {
         handler.call(that, e, on_confirm);
     };
 
-    $(element).unbind(event);
-    $(element)[event](new_handler);
+    el.unbind(event);
+    el[event](new_handler);
+    el.data('is-intercepted', true);
 };
 
 // focus the yes button upon opening
