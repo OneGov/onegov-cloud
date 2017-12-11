@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes mails with attachments.
+  [msom]
+
 - Adds changelog entries when editing attachments.
   [msom]
 

@@ -64,15 +64,15 @@ def test_view_notice_attachments(gazette_app, temporary_path, pdf_1, pdf_2):
 
         # Check email
         message = gazette_app.smtp.outbox.pop()
-        payload_1 = message.get_payload(1).get_payload(decode=True)
-        payload_1 = payload_1.decode('utf-8')
-        assert '1.pdf' in payload_1
+        html = message.get_payload(0).get_payload(1).get_payload(decode=True)
+        html = html.decode('utf-8')
+        assert '1.pdf' in html
 
+        assert message.get_payload(1).get_filename() == '1.pdf'
         assert message.get_payload(2).get_filename() == '1.pdf'
-        assert message.get_payload(3).get_filename() == '1.pdf'
 
-        attachment_1 = message.get_payload(2).get_payload(decode=True)
-        attachment_2 = message.get_payload(3).get_payload(decode=True)
+        attachment_1 = message.get_payload(1).get_payload(decode=True)
+        attachment_2 = message.get_payload(2).get_payload(decode=True)
         assert attachment_1 != attachment_2
         assert attachment_1 == content_1 or attachment_1 == content_2
         assert attachment_2 == content_1 or attachment_2 == content_2
