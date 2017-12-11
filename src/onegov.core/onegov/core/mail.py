@@ -32,27 +32,33 @@ def email(sender=None, receivers=(), cc=(), bcc=(),
     else:
         plaintext = None
 
-    # According to RFC 2046, the last part of a multipart message, in this case
-    # the HTML message, is best and preferred
-    enclosure = [
-        PlainText(plaintext, encoding),
-        HTML(content, encoding),
+    headers_ = [
+        headers.subject(subject),
+        headers.sender(sender),
+        headers.to(*receivers),
+        headers.cc(*cc),
+        headers.bcc(*bcc),
+        headers.date(),
+        headers.message_id(),
     ]
-    enclosure.extend(
-        k if isinstance(k, Enclosure) else Attachment(k) for k in attachments
-    )
-    return Envelope(
-        headers=[
-            headers.subject(subject),
-            headers.sender(sender),
-            headers.to(*receivers),
-            headers.cc(*cc),
-            headers.bcc(*bcc),
-            headers.date(),
-            headers.message_id(),
-        ],
-        enclosure=enclosure,
-    )
+
+    # According to RFC 2046, the last part of a multipart message, in this
+    # case the HTML message, is best and preferred
+    enclosure = [PlainText(plaintext, encoding), HTML(content, encoding)]
+
+    if not attachments:
+        # simple 'mime-multipart/alternative'
+        envelope = Envelope(headers=headers_, enclosure=enclosure)
+    else:
+        # 'multipart/mixed' with 'mime-multipart/alternative' and attachments
+        enclosure = [Envelope(headers=[], enclosure=enclosure)]
+        enclosure.extend(
+            k if isinstance(k, Enclosure) else Attachment(k)
+            for k in attachments
+        )
+        envelope = BaseEnvelope(headers=headers_, enclosure=enclosure)
+
+    return envelope
 
 
 class Envelope(BaseEnvelope):

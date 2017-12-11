@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes composition of mails with attachments.
+  [msom]
+
 0.54.2 (2017-12-11)
 ~~~~~~~~~~~~~~~~~~~
 
