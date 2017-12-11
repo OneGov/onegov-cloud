@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.54.2 (2017-12-11)
+~~~~~~~~~~~~~~~~~~~
 
 - Allows more flexibility when adding attachments to mails.
   [msom]
