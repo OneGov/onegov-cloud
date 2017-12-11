@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.12.1 (2017-12-11)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes mails with attachments.
   [msom]
