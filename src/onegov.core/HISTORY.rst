@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes composition of mails with attachments.
+  [msom]
+
 - Adds the ability to turn raw SQL statements into SQLAlchemy selectables.
   [href]
 
