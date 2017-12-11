@@ -19,13 +19,13 @@
             <dt i18n:translate tal:condition="model.at_cost">Billing address</dt>
             <dd tal:condition="model.at_cost" tal:content="structure layout.format_text(model.billing_address)"></dd>
 
-            <dt i18n:translate>Title</dt>
-            <dd>${model.title}</dd>
-
             <dt tal:condition="model.files" i18n:translate>Attachments</dt>
             <dd tal:condition="model.files">
                 <span style="display:block" tal:repeat="file model.files">${file.name}</span>
             </dd>
+
+            <dt i18n:translate>Title</dt>
+            <dd>${model.title}</dd>
 
             <dt i18n:translate>Text</dt>
             <dd class="callout" tal:content="structure model.text"></dd>

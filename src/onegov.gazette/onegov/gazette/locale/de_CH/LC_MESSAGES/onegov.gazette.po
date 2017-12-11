@@ -315,6 +315,9 @@ msgstr "Sehr geehrte Amtsblattredaktion"
 msgid "Please publish the following official notice:"
 msgstr "Bitte publizieren Sie folgendes Inserat für den amtlichen Teil"
 
+msgid "Attachments"
+msgstr "Anhänge"
+
 msgid "Your user account has been created."
 msgstr ""
 "Ihr Benutzerkonto für die Einreichung von Amtsblattinseraten wurde erstellt."
@@ -330,9 +333,6 @@ msgstr "Diese Meldung wurde zurückgewiesen."
 
 msgid "State"
 msgstr "Status"
-
-msgid "Attachments"
-msgstr "Anhänge"
 
 msgid "Changes"
 msgstr "Änderungen"
@@ -511,30 +511,6 @@ msgstr "Meldung bearbeiten"
 msgid "Delete Official Notice"
 msgstr "Meldung löschen"
 
-#, python-format
-msgid "Do you really want to submit \"${item}\"?"
-msgstr "\"${item}\" einreichen?"
-
-msgid "Submit Official Note"
-msgstr "Meldung einreichen"
-
-#, python-format
-msgid "Do you really want to accept \"${item}\"?"
-msgstr "\"${item}\" annehmen?"
-
-msgid "Accept Official Note"
-msgstr "Meldung annehmen"
-
-#, python-format
-msgid "Do you really want to reject \"${item}\"?"
-msgstr "\"${item}\" zurückweisen?"
-
-msgid "Reject Official Note"
-msgstr "Meldung zurückweisen"
-
-msgid "Attachment added."
-msgstr "Anhang hinzugefügt."
-
 msgid "Accept"
 msgstr "Annehmen"
 
@@ -585,6 +561,44 @@ msgstr ""
 msgid "Official notice deleted."
 msgstr "Meldung gelöscht."
 
+msgid ""
+"The official notice has issues for which the deadlines are reached. Please "
+"re-select valid issues."
+msgstr "Bitte Ausgaben neu wählen."
+
+msgid "This official notice has already been published!"
+msgstr "Diese Meldung wurde bereits veröffentlicht!"
+
+msgid "Attachment added."
+msgstr "Anhang hinzugefügt."
+
+msgid "Attachment deleted."
+msgstr "Anhang gelöscht."
+
+msgid "Attachments of accepted notices can not be deleted."
+msgstr "Anhänge von angenommenen Meldungen können nicht gelöscht werden."
+
+#, python-format
+msgid "Do you really want to submit \"${item}\"?"
+msgstr "\"${item}\" einreichen?"
+
+msgid "Submit Official Note"
+msgstr "Meldung einreichen"
+
+#, python-format
+msgid "Do you really want to accept \"${item}\"?"
+msgstr "\"${item}\" annehmen?"
+
+msgid "Accept Official Note"
+msgstr "Meldung annehmen"
+
+#, python-format
+msgid "Do you really want to reject \"${item}\"?"
+msgstr "\"${item}\" zurückweisen?"
+
+msgid "Reject Official Note"
+msgstr "Meldung zurückweisen"
+
 msgid "Only drafted or rejected official notices may be submitted."
 msgstr ""
 "Es können nur zurückgewiesene Meldungen oder Meldungen in Arbeit eingereicht "
@@ -604,17 +618,6 @@ msgstr "Es können nur eingereichte Meldungen zurückgewiesen werden."
 
 msgid "Official notice rejected."
 msgstr "Meldung zurückgewiesen."
-
-msgid "Attachment deleted."
-msgstr "Anhang gelöscht."
-
-msgid ""
-"The official notice has issues for which the deadlines are reached. Please "
-"re-select valid issues."
-msgstr "Bitte Ausgaben neu wählen."
-
-msgid "This official notice has already been published!"
-msgstr "Diese Meldung wurde bereits veröffentlicht!"
 
 msgid "mail sent"
 msgstr "Druck beauftragt"

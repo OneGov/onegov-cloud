@@ -16,6 +16,30 @@ from transaction import commit
 from uuid import uuid4
 
 
+def pytest_addoption(parser):
+    """ Adds a command line argument to scans all the onegov.* sources to
+    make sure that the database tables are created.
+
+    Set this option if you run into  sqlalchemy erorrs like:
+        "relation XXX does not exist"
+
+    Run it like this:
+        py.test src/onegov.election-day/onegov/gazette/tests/
+            -k test_view_notice_attachments
+            --import-scan
+
+    """
+    parser.addoption('--import-scan', action="store_true")
+
+
+def pytest_cmdline_main(config):
+    option = config.getoption('--import-scan')
+    if option:
+        import importscan
+        import onegov
+        importscan.scan(onegov, ignore=['.test', '.tests'])
+
+
 PRINCIPAL = """
     name: Govikon
     color: '#006FB5'
@@ -127,8 +151,14 @@ def create_issues(session):
     return issues.query().all()
 
 
-def create_gazette(request):
-    app = create_app(GazetteApp, request, use_smtp=True)
+def create_gazette(request, temporary_path):
+    app = create_app(
+        GazetteApp,
+        request,
+        use_smtp=True,
+        depot_backend='depot.io.local.LocalFileStorage',
+        depot_storage_path=str(temporary_path),
+    )
     app.session_manager.set_locale('de_CH', 'de_CH')
     app.filestorage.settext('principal.yml', dedent(PRINCIPAL))
 
@@ -175,21 +205,6 @@ def create_gazette(request):
     return app
 
 
-@fixture(scope="session")
-def import_scan():
-    """ Scans all the onegov.* sources to make sure that the tables are
-    created.
-
-    Include this fixtures as first argument if needed (that is if you run a
-    single test and get sqlalchemy relation errors).
-
-    """
-
-    import importscan
-    import onegov
-    importscan.scan(onegov, ignore=['.test', '.tests'])
-
-
 @fixture(scope='session')
 def gazette_password():
     return hash_password('hunter2')
@@ -219,7 +234,7 @@ def principal(organizations, categories, issues):
 
 
 @fixture(scope="function")
-def gazette_app(request):
-    app = create_gazette(request)
+def gazette_app(request, temporary_path):
+    app = create_gazette(request, temporary_path)
     yield app
     app.session_manager.dispose()
