@@ -58,6 +58,7 @@ setup(
         'ordered-set',
         'passlib',
         'polib',
+        'psqlparse',
         'python-magic>=0.4.12',
         'python-memcached>=1.57',
         'psycopg2',

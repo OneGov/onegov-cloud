@@ -10,7 +10,7 @@ from datetime import datetime
 from dogpile.cache.api import NO_VALUE
 from onegov.core.framework import Framework
 from onegov.core.orm import (
-    ModelBase, SessionManager, translation_hybrid, find_models
+    ModelBase, SessionManager, as_selectable, translation_hybrid, find_models
 )
 from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.abstract import Associable, associated
@@ -24,7 +24,7 @@ from onegov.core.security import Private
 from onegov.core.utils import scan_morepath_modules
 from psycopg2.extensions import TransactionRollbackError
 from pytz import timezone
-from sqlalchemy import Column, Integer, Text, ForeignKey, func
+from sqlalchemy import Column, Integer, Text, ForeignKey, func, select, and_
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.mutable import MutableDict
@@ -1640,3 +1640,43 @@ def test_associable_many_to_many(postgres_dsn):
     session.flush()
 
     assert session.query(Address).count() == 1
+
+
+def test_selectable_sql_query(session):
+    stmt = as_selectable("""
+        SELECT
+            table_name,         -- Text
+            column_name,        -- Text
+            CASE
+                WHEN is_updatable = 'YES'
+                    THEN TRUE
+                ELSE
+                    FALSE
+            END as is_updatable -- Boolean
+        FROM information_schema.columns
+    """)
+
+    columns = session.execute(
+        select((stmt.c.column_name, )).where(
+            and_(
+                stmt.c.table_name == 'pg_group',
+                stmt.c.is_updatable == True
+            )
+        )
+    ).fetchall()
+
+    assert columns == [('groname', )]
+    assert columns[0].column_name == 'groname'
+
+    columns = session.execute(
+        select((stmt.c.column_name, )).where(
+            and_(
+                stmt.c.table_name == 'pg_group',
+                stmt.c.is_updatable == False
+            )
+        ).order_by(stmt.c.column_name)
+    ).fetchall()
+
+    assert columns == [('grolist', ), ('grosysid', )]
+    assert columns[0].column_name == 'grolist'
+    assert columns[1].column_name == 'grosysid'
