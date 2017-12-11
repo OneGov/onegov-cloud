@@ -3,7 +3,7 @@ import os.path
 
 from email.mime.multipart import MIMEMultipart
 from mailbox import Maildir, MaildirMessage
-from mailthon.enclosure import HTML, PlainText, Attachment
+from mailthon.enclosure import HTML, PlainText, Attachment, Enclosure
 from mailthon.envelope import Envelope as BaseEnvelope
 from mailthon.postman import Postman
 from onegov.core.html import html_to_text
@@ -18,8 +18,8 @@ def email(sender=None, receivers=(), cc=(), bcc=(),
 
     :param content: HTML content.
     :param encoding: Encoding of the email.
-    :param attachments: List of filenames to
-        attach to the email.
+    :param attachments: Either a list of :class:`mailthon.enclosure.Enclosure`
+        or a list of filenames to attach to the email.
 
     Note: this is basically a copy of :func:`mailthon.api.email`, though it
     adds the plaintext alternative.
@@ -38,7 +38,9 @@ def email(sender=None, receivers=(), cc=(), bcc=(),
         PlainText(plaintext, encoding),
         HTML(content, encoding),
     ]
-    enclosure.extend(Attachment(k) for k in attachments)
+    enclosure.extend(
+        k if isinstance(k, Enclosure) else Attachment(k) for k in attachments
+    )
     return Envelope(
         headers=[
             headers.subject(subject),

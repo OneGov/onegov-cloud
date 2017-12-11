@@ -5,16 +5,19 @@ import transaction
 import pytest
 
 from base64 import b64decode
+from base64 import b64encode
 from datetime import datetime, timedelta
 from email.header import decode_header
 from email.utils import parseaddr
 from freezegun import freeze_time
 from itsdangerous import BadSignature, Signer
-from onegov.core.redirect import Redirect
+from mailthon.enclosure import Attachment
 from onegov.core.framework import Framework
-from onegov.core.upgrade import UpgradeState
 from onegov.core.html import html_to_text
+from onegov.core.redirect import Redirect
+from onegov.core.upgrade import UpgradeState
 from onegov.server import Config, Server
+from tempfile import NamedTemporaryFile
 from unittest.mock import patch
 from webtest import TestApp as Client
 from wtforms import Form, StringField
@@ -729,6 +732,42 @@ def test_send_email_unicode(smtp):
         'Content-Transfer-Encoding: base64\n\n'
         '8J+RjQ==\n'
     )
+
+
+def test_email_attachments(temporary_directory):
+    app = Framework()
+    app.mail_sender = 'noreply@example.org'
+    app.mail_use_directory = True
+    app.mail_directory = temporary_directory
+
+    tempfile = NamedTemporaryFile(suffix='.txt', mode='w', delete=False)
+    tempfile.write('First')
+    tempfile.close()
+    attachments = [tempfile.name]
+
+    tempfile = NamedTemporaryFile(mode='w', delete=False)
+    tempfile.write('Second')
+    tempfile.close()
+    attachment = Attachment(tempfile.name)
+    attachment.headers['Content-Disposition'] = 'attachment; filename="at.txt"'
+    attachments.append(attachment)
+
+    app.send_email(
+        reply_to='Govikon <info@example.org>',
+        receivers=['recipient@example.org'],
+        subject="Test E-Mail",
+        content="This e-mail is just a test",
+        attachments=attachments
+    )
+    transaction.commit()
+    new_emails = os.path.join(temporary_directory, 'new')
+    new_email = os.path.join(new_emails, os.listdir(new_emails)[0])
+    with open(new_email, 'r') as f:
+        email = f.read()
+
+    assert b64encode('First'.encode('utf-8')).decode('utf-8') in email
+    assert b64encode('Second'.encode('utf-8')).decode('utf-8') in email
+    assert 'Content-Disposition: attachment; filename="at.txt"' in email
 
 
 def test_html_to_text():
