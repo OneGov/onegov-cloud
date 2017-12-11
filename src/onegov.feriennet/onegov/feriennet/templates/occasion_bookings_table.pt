@@ -1,0 +1,55 @@
+<tal:b i18n:domain="onegov.feriennet">
+    <table class="matches">
+        <thead>
+            <tr>
+                <th></th>
+                <th i18n:translate>Name</th>
+                <th i18n:translate>Age</th>
+                <th i18n:translate>State</th>
+                <th>
+                    <tal:block
+                        define="
+                            action_id 'action-{}'.format(oid);
+                            links occasion_links(oid)
+                        "
+                        metal:use-macro="layout.macros.actions_button"
+                    />
+                </th>
+            </tr>
+        </thead>
+        <tbody tal:condition="not:bookings">
+            <tr class="booking booking-none">
+                <td colspan="5"><span i18n:translate>No bookings.</span></td>
+            </tr>
+        </tbody>
+        <tbody tal:condition="bookings">
+            <tal:b repeat="kind ('accepted', 'other')">
+                <tr tal:repeat="booking bookings[kind]" class="booking booking-${kind} ${booking.state}" id="${booking.id}">
+                    <td>
+                        <a tal:condition="not period.confirmed" ic-post-to="${request.link(booking, 'toggle-nobble')}">
+                            <tal:block metal:use-macro="layout.macros['nobble']" />
+                        </a>
+                        <tal:block condition="period.confirmed" metal:use-macro="layout.macros['nobble']" />
+                    </td>
+                    <td><span>${booking.attendee.name}</span></td>
+                    <td><span>${booking.attendee.age}</span></td>
+                    <td>
+                        <tal:block
+                            define="state booking.state"
+                            metal:use-macro="layout.macros.booking_state"
+                        />
+                    </td>
+                    <td>
+                        <tal:block
+                            define="
+                                action_id 'action-{}-{}'.format(oid, booking.attendee_id);
+                                links booking_links(booking)
+                            "
+                            metal:use-macro="layout.macros.actions_button"
+                        />
+                    </td>
+                </tr>
+            </tal:b>
+        </tbody>
+    </table>
+</tal:b>

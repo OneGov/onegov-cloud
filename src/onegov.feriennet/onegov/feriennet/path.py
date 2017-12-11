@@ -74,7 +74,7 @@ def get_vacation_activity(request, app, name):
 
 @FeriennetApp.path(
     model=Occasion,
-    path='/occurrences/{id}',
+    path='/occasions/{id}',
     converters=dict(id=UUID))
 def get_occasion(request, app, id):
     return OccasionCollection(app.session()).by_id(id)

@@ -14,7 +14,7 @@ class AngebotRedirect(Redirect):
 
 @FeriennetApp.path(path='/durchfuehrungen', absorb=True)
 class DurchfuehrungenRedirect(Redirect):
-    to = '/occurrences'
+    to = '/occasions'
 
 
 @FeriennetApp.path(path='/perioden')
