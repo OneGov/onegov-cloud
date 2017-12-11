@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.19.4 (2017-12-11)
+~~~~~~~~~~~~~~~~~~~
+
 - Automatically adds confirm dialogs to intercooler responses.
   [href]
 
