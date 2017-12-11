@@ -3,8 +3,9 @@ import pytest
 
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.initial_content import create_new_organisation
-from onegov_testing.utils import create_app
 from onegov.user import User
+from onegov_testing.utils import create_app
+from pytest_localserver.http import WSGIServer
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -27,6 +28,21 @@ def feriennet_app(request):
 @pytest.yield_fixture(scope='function')
 def es_feriennet_app(request):
     yield create_feriennet_app(request, use_elasticsearch=True)
+
+
+@pytest.fixture(scope='function')
+def browser(browser, feriennet_app_url):
+    browser.baseurl = feriennet_app_url
+    yield browser
+
+
+@pytest.fixture(scope='function')
+def feriennet_app_url(request, feriennet_app):
+    feriennet_app.print_exceptions = True
+    server = WSGIServer(application=feriennet_app)
+    server.start()
+    yield server.url
+    server.stop()
 
 
 def create_feriennet_app(request, use_elasticsearch):

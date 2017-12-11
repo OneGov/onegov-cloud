@@ -56,7 +56,7 @@
                                 total occasion.total_bookings;
                                 min_spots occasion.min_spots;
                                 max_spots occasion.max_spots;
-                                cancelled occasion.cancelled;
+                                cancelled occasion.state == 'cancelled';
                             ">
                                 <tal:b define="state cancelled and 'cancelled' or accepted >= min_spots and 'success' or 'alert'">
                                     <div class="progress ${state}" onclick="$('#button-${oid}').click();">
@@ -71,7 +71,7 @@
                                         </span>
                                     </div>
 
-                                    <button id="button-${oid}" data-toggle="#details-${oid}" class="untoggled ${state}">
+                                    <button id="button-${oid}" data-toggle="#details-${oid}" class="untoggled ${state} ic-use-transition">
                                         <span i18n:translate class="show-for-sr">Show Details</span>
                                         <i class="fa fa-angle-double-down" aria-hidden="true"></i>
                                     </button>
@@ -82,7 +82,8 @@
                                             id="ic-${oid}"
                                             ic-trigger-from="#button-${oid}"
                                             ic-get-from="${occasion_table_link(oid)}"
-                                            ic-replace-target="#details-${oid}"
+                                            ic-indicator="#button-${oid}"
+                                            ic-once
                                             >
                                         </div>
                                     </div>

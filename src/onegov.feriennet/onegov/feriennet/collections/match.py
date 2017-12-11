@@ -1,15 +1,16 @@
 from onegov.activity import Booking, Attendee, Occasion
 from onegov.core.utils import toggle
-from onegov.core.orm import SQLQuery
+from onegov.core.orm import as_selectable_from_path
 from sqlalchemy import func
+from sqlalchemy import select, and_
+from onegov.core.utils import module_path
 from statistics import mean
 
 
 class MatchCollection(object):
 
-    occasions_by_state = SQLQuery.from_path(
-        'queries/occasions_by_state.sql', 'onegov.feriennet'
-    )
+    occasions_by_state = as_selectable_from_path(
+        module_path('onegov.feriennet', 'queries/occasions_by_state.sql'))
 
     def __init__(self, session, period, states=None):
         self.session = session
@@ -74,14 +75,17 @@ class MatchCollection(object):
 
     @property
     def occasions(self):
-        if self.states:
-            query = self.occasions_by_state(
-                period_id=self.period_id,
-                states=tuple(self.states)
-            )
+        columns = self.occasions_by_state.c
+        query = select(columns)
+
+        if not self.states:
+            query = query.where(columns.period_id == self.period_id)
         else:
-            query = self.occasions_by_state(
-                period_id=self.period_id
-            )
+            query = query.where(and_(
+                columns.period_id == self.period_id,
+                columns.state.in_(self.states)
+            ))
+
+        query = query.order_by(columns.title, columns.start)
 
         return self.session.execute(query)

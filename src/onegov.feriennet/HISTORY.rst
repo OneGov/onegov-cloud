@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves the performance of the matching view by an order of magnitude.
+  [href]
+
 1.3.9 (2017-12-05)
 ~~~~~~~~~~~~~~~~~~~
 

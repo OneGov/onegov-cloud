@@ -43,6 +43,8 @@ def handle_matches(self, request, form):
         else:
             request.success(_("The matching run executed successfully"))
 
+        self.session.flush()
+
     elif not request.POST:
         form.process_scoring(self.period.scoring)
 
@@ -107,11 +109,12 @@ def view_occasion_bookings_table(self, request):
         if self.period.finalized:
             yield Link(
                 text=_("Signup Attendee"),
+                url='#',
                 traits=(
                     Block(_(
                         "The period has already been finalized. No new "
                         "attendees may be added."
-                    ))
+                    )),
                 )
             )
         else:

@@ -1078,7 +1078,6 @@ ul.tags {
 /*
     Matching view
 */
-
 .matched-occasion {
     margin-bottom: 1rem;
 
@@ -1182,6 +1181,7 @@ ul.tags {
             height: 2.5rem;
             line-height: 1.2rem;
             margin-bottom: 0;
+            outline: 0;
             padding: 0;
             width: 2.5rem;
 
@@ -1203,6 +1203,16 @@ ul.tags {
                     background-color: $green;
                 }
             }
+        }
+
+        > button:not(.ic-use-transition) {
+            animation: oscillate-opacity 1s infinite;
+        }
+
+        @keyframes oscillate-opacity {
+            0% { opacity: 1; }
+            50% { opacity: .5; }
+            100% { opacity: 1; }
         }
     }
 

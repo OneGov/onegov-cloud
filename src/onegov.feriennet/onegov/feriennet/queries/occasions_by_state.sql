@@ -2,78 +2,59 @@
     loads the occasions for the matching view, categorising them into
     states, like 'operable' or 'overfull'
 */
-
--- the period_id to which the occasions are scoped to
-SET vars.period_id = :'';
-SET vars.states = :'{cancaelled,overfull,empty,unoperable,full}'; -- ('cancelled', 'overfull', 'empty', 'unoperable', 'operable', 'full')
-
 WITH
+
 -- the first start/end pair of each occasion
 first_date AS (
     SELECT DISTINCT ON(occasion_id)
-        ((occasion_dates.start AT TIME ZONE 'UTC')
-            AT TIME ZONE occasion_dates.timezone) as start,
-        ((occasion_dates.end AT TIME ZONE 'UTC')
-            AT TIME ZONE occasion_dates.timezone) as end,
+        ((occasion_dates.START AT TIME ZONE 'UTC')
+            AT TIME ZONE occasion_dates.timezone) AS START,
+        ((occasion_dates.END AT TIME ZONE 'UTC')
+            AT TIME ZONE occasion_dates.timezone) AS END,
         occasion_dates.occasion_id
     FROM occasion_dates
     ORDER BY occasion_id, "start"
 ),
 
 -- the number of accepted bookings per occasion
-accepted AS (
+booking_states AS (
     SELECT
         occasion_id,
-        COUNT(*) as count
+    period_id,
+    SUM(CASE WHEN "state" = 'accepted' THEN 1 ELSE 0 END) AS accepted_count,
+    SUM(CASE WHEN "state" = 'accepted' THEN 0 ELSE 1 END) AS other_count
     FROM bookings
-    WHERE state = 'accepted'
-      AND bookings.period_id = current_setting('vars.period_id')::uuid
-    GROUP BY occasion_id
-),
-
--- the number of other non-accepted bookings per occasion
-other AS (
-    SELECT
-        occasion_id,
-        COUNT(*) as count
-    FROM bookings
-    WHERE state != 'accepted'
-      AND bookings.period_id = current_setting('vars.period_id')::uuid
-    GROUP BY occasion_id
+    GROUP BY occasion_id, period_id
 ),
 
 -- the occasion parameters needed to assign a state
 occasion_parameters AS (
     SELECT
-        occasions.id as occasion_id,
+        occasions.id AS occasion_id,
         activities.title,
         first_date.start,
         first_date.end,
         occasions.cancelled,
-        lower(occasions.spots) as min_spots,
-        upper(occasions.spots) - 1 as max_spots,
-        lower(occasions.age) as min_age,
-        upper(occasions.age) - 1 as max_age,
-        coalesce(accepted.count, 0) as accepted_bookings,
-        coalesce(other.count, 0) as other_bookings,
-        coalesce(accepted.count, 0) + coalesce(other.count, 0) as total_bookings
+        LOWER(occasions.spots) AS min_spots,
+        UPPER(occasions.spots) - 1 AS max_spots,
+        LOWER(occasions.age) AS min_age,
+        UPPER(occasions.age) - 1 AS max_age,
+        COALESCE(booking_states.accepted_count, 0) AS accepted_bookings,
+    COALESCE(booking_states.other_count, 0) AS other_bookings,
+    COALESCE(booking_states.accepted_count + booking_states.other_count, 0) AS total_bookings,
+    occasions.period_id
     FROM
         occasions
 
     LEFT JOIN activities
-      ON activities.id = occasions.activity_id
+      ON activities.ID = occasions.activity_id
 
     LEFT JOIN first_date
-      ON occasions.id = first_date.occasion_id
+      ON occasions.ID = first_date.occasion_id
 
-    LEFT JOIN other
-      ON occasions.id = other.occasion_id
-
-    LEFT JOIN accepted
-      ON occasions.id = accepted.occasion_id
-
-    WHERE
-        occasions.period_id = current_setting('vars.period_id')::uuid
+    LEFT JOIN booking_states
+      ON occasions.ID = booking_states.occasion_id
+     AND occasions.period_id = booking_states.period_id
 ),
 
 -- the occasion paramters combined with the state
@@ -93,12 +74,25 @@ occasion_states AS (
         WHEN accepted_bookings >= max_spots
             THEN 'full'
         ELSE NULL
-    END as "state",
+    END AS "state",
     *
     FROM occasion_parameters
-    ORDER BY
-        title, "start"
 )
 
--- the result
-SELECT * FROM occasion_states WHERE "state" IN (SELECT unnest(current_setting('vars.states')::text[]));
+-- the resulting query
+SELECT
+    "state",           -- Text
+    occasion_id,       -- Integer
+    title,             -- Text
+    "start",           -- DateTime
+    "end",             -- DateTime
+    min_spots,         -- Integer
+    max_spots,         -- Integer
+    min_age,           -- Integer
+    max_age,           -- Integer
+    accepted_bookings, -- Integer
+    other_bookings,    -- Integer
+    total_bookings,    -- Integer
+    period_id          -- UUID
+FROM
+    occasion_states
