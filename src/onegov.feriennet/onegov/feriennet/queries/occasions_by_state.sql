@@ -100,18 +100,5 @@ occasion_states AS (
         title, "start"
 )
 
--- the resulting query
-SELECT
-    occasion_id,       -- UUID
-    title,             -- Text
-    start,             -- UTCDateTime
-    end,               -- UTCDateTime
-    cancelled,         -- Boolean
-    min_spots,         -- Integer
-    max_spots,         -- Integer
-    min_age,           -- Integer
-    accepted_bookings, -- Integer
-    other_bookings,    -- Integer
-    total_bookings,    -- Integer
-    state              -- Text
-FROM occasion_states;
+-- the result
+SELECT * FROM occasion_states WHERE "state" IN (SELECT unnest(current_setting('vars.states')::text[]));
