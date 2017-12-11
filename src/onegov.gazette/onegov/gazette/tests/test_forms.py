@@ -553,6 +553,41 @@ def test_notice_form(session, categories, organizations, issues):
 
 
 def test_unrestricted_notice_form(session, categories, organizations, issues):
+    # Test apply / update
+    form = UnrestrictedNoticeForm()
+    form.request = DummyRequest(session)
+
+    notice = GazetteNotice(title='Title', text='A <b>text</b>.')
+    notice.organization_id = '200'
+    notice.category_id = '13'
+    notice.issues = ['2017-43']
+
+    form.apply_model(notice)
+    assert form.title.data == 'Title'
+    assert form.organization.data == '200'
+    assert form.category.data == '13'
+    assert form.text.data == 'A <b>text</b>.'
+    assert form.issues.data == ['2017-43']
+
+    form.title.data = 'Notice'
+    form.organization.data = '300'
+    form.category.data = '11'
+    form.text.data = 'A <b>notice</b>.'
+    form.issues.data = ['2017-44']
+
+    form.update_model(notice)
+    assert notice.title == 'Notice'
+    assert notice.organization == 'Municipality'
+    assert notice.category == 'Education'
+    assert notice.text == 'A <b>notice</b>.'
+    assert notice.issues == {'2017-44': None}
+    assert notice.first_issue == standardize_date(datetime(2017, 11, 3), 'UTC')
+
+    notice.state = 'published'
+    form.issues.data = ['2017-45']
+    form.update_model(notice)
+    assert notice.issues == {'2017-44': None}
+
     # Test on request
     with freeze_time("2019-11-01 14:00"):
         form = UnrestrictedNoticeForm()
@@ -592,3 +627,12 @@ def test_unrestricted_notice_form(session, categories, organizations, issues):
             ('14', 'Elections'),
             ('12', 'Submissions'),
         ]
+
+    # Test disable issues
+    form = UnrestrictedNoticeForm()
+    form.model = None
+    form.request = DummyRequest(session)
+    form.on_request()
+    form.disable_issues()
+    assert form.issues.validators == []
+    assert all([field.render_kw['disabled'] for field in form.issues])

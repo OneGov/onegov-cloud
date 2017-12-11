@@ -1,6 +1,8 @@
 from freezegun import freeze_time
+from io import BytesIO
 from onegov.gazette.tests import login_editor_1
 from onegov.gazette.tests import login_publisher
+from PyPDF2 import PdfFileReader
 from pyquery import PyQuery as pq
 from webtest import TestApp as Client
 
@@ -47,23 +49,23 @@ def test_view_issues(gazette_app):
             for tr in manage.pyquery('table.issues.past tbody tr')
         ]
         assert upcoming_issues == [
-            ['2017-44', '03.11.2017', 'Mittwoch 01.11.2017 13:00', ''],
-            ['2017-45', '10.11.2017', 'Mittwoch 08.11.2017 13:00', ''],
-            ['2017-46', '17.11.2017', 'Mittwoch 15.11.2017 13:00', ''],
-            ['2017-47', '24.11.2017', 'Mittwoch 22.11.2017 13:00', ''],
-            ['2017-48', '01.12.2017', 'Mittwoch 29.11.2017 13:00', ''],
-            ['2017-49', '08.12.2017', 'Mittwoch 06.12.2017 13:00', ''],
-            ['2017-50', '15.12.2017', 'Mittwoch 13.12.2017 13:00', ''],
-            ['2017-51', '22.12.2017', 'Mittwoch 20.12.2017 13:00', ''],
-            ['2017-52', '29.12.2017', 'Mittwoch 27.12.2017 13:00', ''],
-            ['2018-1', '05.01.2018', 'Mittwoch 03.01.2018 13:00', ''],
-            ['2019-1', '02.01.2019', 'Dienstag 01.01.2019 12:00', '']
+            ['2017-44', '03.11.2017', 'Mittwoch 01.11.2017 13:00', '', ''],
+            ['2017-45', '10.11.2017', 'Mittwoch 08.11.2017 13:00', '', ''],
+            ['2017-46', '17.11.2017', 'Mittwoch 15.11.2017 13:00', '', ''],
+            ['2017-47', '24.11.2017', 'Mittwoch 22.11.2017 13:00', '', ''],
+            ['2017-48', '01.12.2017', 'Mittwoch 29.11.2017 13:00', '', ''],
+            ['2017-49', '08.12.2017', 'Mittwoch 06.12.2017 13:00', '', ''],
+            ['2017-50', '15.12.2017', 'Mittwoch 13.12.2017 13:00', '', ''],
+            ['2017-51', '22.12.2017', 'Mittwoch 20.12.2017 13:00', '', ''],
+            ['2017-52', '29.12.2017', 'Mittwoch 27.12.2017 13:00', '', ''],
+            ['2018-1', '05.01.2018', 'Mittwoch 03.01.2018 13:00', '', ''],
+            ['2019-1', '02.01.2019', 'Dienstag 01.01.2019 12:00', '', '']
         ]
         assert past_issues == [
-            ['2017-43', '27.10.2017', 'Mittwoch 25.10.2017 14:00', ''],
-            ['2017-42', '20.10.2017', 'Mittwoch 18.10.2017 14:00', ''],
-            ['2017-41', '13.10.2017', 'Mittwoch 11.10.2017 14:00', ''],
-            ['2017-40', '06.10.2017', 'Mittwoch 04.10.2017 14:00', ''],
+            ['2017-43', '27.10.2017', 'Mittwoch 25.10.2017 14:00', '', ''],
+            ['2017-42', '20.10.2017', 'Mittwoch 18.10.2017 14:00', '', ''],
+            ['2017-41', '13.10.2017', 'Mittwoch 11.10.2017 14:00', '', ''],
+            ['2017-40', '06.10.2017', 'Mittwoch 04.10.2017 14:00', '', ''],
         ]
 
         # use the first available issue in a notice
@@ -94,23 +96,23 @@ def test_view_issues(gazette_app):
             for tr in manage.pyquery('table.issues.past tbody tr')
         ]
         assert upcoming_issues == [
-            ['2017-44', '02.11.2017', 'Mittwoch 01.11.2017 12:00', ''],
-            ['2017-45', '10.11.2017', 'Mittwoch 08.11.2017 13:00', ''],
-            ['2017-46', '17.11.2017', 'Mittwoch 15.11.2017 13:00', ''],
-            ['2017-47', '24.11.2017', 'Mittwoch 22.11.2017 13:00', ''],
-            ['2017-48', '01.12.2017', 'Mittwoch 29.11.2017 13:00', ''],
-            ['2017-49', '08.12.2017', 'Mittwoch 06.12.2017 13:00', ''],
-            ['2017-50', '15.12.2017', 'Mittwoch 13.12.2017 13:00', ''],
-            ['2017-51', '22.12.2017', 'Mittwoch 20.12.2017 13:00', ''],
-            ['2017-52', '29.12.2017', 'Mittwoch 27.12.2017 13:00', ''],
-            ['2018-1', '05.01.2018', 'Mittwoch 03.01.2018 13:00', ''],
-            ['2019-1', '02.01.2019', 'Dienstag 01.01.2019 12:00', '']
+            ['2017-44', '02.11.2017', 'Mittwoch 01.11.2017 12:00', '', ''],
+            ['2017-45', '10.11.2017', 'Mittwoch 08.11.2017 13:00', '', ''],
+            ['2017-46', '17.11.2017', 'Mittwoch 15.11.2017 13:00', '', ''],
+            ['2017-47', '24.11.2017', 'Mittwoch 22.11.2017 13:00', '', ''],
+            ['2017-48', '01.12.2017', 'Mittwoch 29.11.2017 13:00', '', ''],
+            ['2017-49', '08.12.2017', 'Mittwoch 06.12.2017 13:00', '', ''],
+            ['2017-50', '15.12.2017', 'Mittwoch 13.12.2017 13:00', '', ''],
+            ['2017-51', '22.12.2017', 'Mittwoch 20.12.2017 13:00', '', ''],
+            ['2017-52', '29.12.2017', 'Mittwoch 27.12.2017 13:00', '', ''],
+            ['2018-1', '05.01.2018', 'Mittwoch 03.01.2018 13:00', '', ''],
+            ['2019-1', '02.01.2019', 'Dienstag 01.01.2019 12:00', '', '']
         ]
         assert past_issues == [
-            ['2017-43', '27.10.2017', 'Mittwoch 25.10.2017 14:00', ''],
-            ['2017-42', '20.10.2017', 'Mittwoch 18.10.2017 14:00', ''],
-            ['2017-41', '13.10.2017', 'Mittwoch 11.10.2017 14:00', ''],
-            ['2017-40', '06.10.2017', 'Mittwoch 04.10.2017 14:00', ''],
+            ['2017-43', '27.10.2017', 'Mittwoch 25.10.2017 14:00', '', ''],
+            ['2017-42', '20.10.2017', 'Mittwoch 18.10.2017 14:00', '', ''],
+            ['2017-41', '13.10.2017', 'Mittwoch 11.10.2017 14:00', '', ''],
+            ['2017-40', '06.10.2017', 'Mittwoch 04.10.2017 14:00', '', ''],
         ]
 
         # check if the notice has been updated
@@ -141,7 +143,7 @@ def test_view_issues(gazette_app):
             for tr in manage.pyquery('table.issues tbody tr')
         ]
         assert issues == [
-            ['2017-44', '02.11.2017', 'Mittwoch 01.11.2017 12:00', '']
+            ['2017-44', '02.11.2017', 'Mittwoch 01.11.2017 12:00', '', '']
         ]
 
         # Try to delete the used issue
@@ -168,3 +170,127 @@ def test_view_issues_permissions(gazette_app):
         client.get('/issues', status=403)
         client.get(edit_link, status=403)
         client.get(delete_link, status=403)
+
+
+def test_view_issues_publish(gazette_app):
+    with freeze_time("2017-11-01 12:00"):
+        client = Client(gazette_app)
+        login_publisher(client)
+
+        for number, issues in enumerate(((44, 45), (45, 46), (45,))):
+            slug = 'notice-{}'.format(number)
+            manage = client.get('/notices/drafted/new-notice')
+            manage.form['title'] = slug
+            manage.form['organization'] = '200'
+            manage.form['category'] = '13'
+            manage.form['issues'] = ['2017-{}'.format(i) for i in issues]
+            manage.form['text'] = 'Text'
+            manage = manage.form.submit()
+
+            client.get('/notice/{}/submit'.format(slug)).form.submit()
+            if len(issues) > 1:
+                client.get('/notice/{}/accept'.format(slug)).form.submit()
+
+        # publish 44
+        manage = client.get('/issues').click('Veröffentlichen', index=0)
+        assert "Publikationsnummern für 1 Meldung(en) vergeben." in manage
+        manage.form.submit()
+
+        notice_0 = client.get('/notice/notice-0')
+        notice_1 = client.get('/notice/notice-1')
+        notice_2 = client.get('/notice/notice-2')
+        assert '<li>Nr. 44, 03.11.2017 / 1</li>' in notice_0
+        assert '<li>Nr. 45, 10.11.2017 / 2</li>' in notice_0
+        assert '<li>Nr. 45, 10.11.2017</li>' in notice_1
+        assert '<li>Nr. 46, 17.11.2017</li>' in notice_1
+        assert '<li>Nr. 45, 10.11.2017</li>' in notice_2
+
+        # publish 45
+        manage = client.get('/issues').click('Veröffentlichen', index=1)
+        assert "Diese Ausgabe hat eingereichte Meldungen!" in manage
+        assert "Publikationsnummern für 1 Meldung(en) vergeben." in manage
+        manage.form.submit()
+
+        notice_0 = client.get('/notice/notice-0')
+        notice_1 = client.get('/notice/notice-1')
+        notice_2 = client.get('/notice/notice-2')
+        assert '<li>Nr. 44, 03.11.2017 / 1</li>' in notice_0
+        assert '<li>Nr. 45, 10.11.2017 / 2</li>' in notice_0
+        assert '<li>Nr. 45, 10.11.2017 / 3</li>' in notice_1
+        assert '<li>Nr. 46, 17.11.2017 / 4</li>' in notice_1
+        assert '<li>Nr. 45, 10.11.2017</li>' in notice_2
+
+
+def test_view_issues_generate(gazette_app):
+    with freeze_time("2017-11-01 12:00"):
+        client = Client(gazette_app)
+        login_publisher(client)
+
+        # add a notice
+        manage = client.get('/notices/drafted/new-notice')
+        manage.form['title'] = 'First notice'
+        manage.form['organization'] = '200'
+        manage.form['category'] = '13'
+        manage.form['issues'] = ['2017-44']
+        manage.form['text'] = 'This is the first notice'
+        manage = manage.form.submit()
+
+        client.get('/notice/first-notice/submit').form.submit()
+        client.get('/notice/first-notice/accept').form.submit()
+        client.get('/notice/first-notice/publish').form.submit()
+
+        # generate 44
+        manage = client.get('/issues').click('Erzeugen', index=0)
+        manage = manage.form.submit().maybe_follow()
+        assert "PDF erstellt." in manage
+        assert "2017-44.pdf" in manage
+
+        manage = manage.click('2017-44.pdf')
+        assert manage.content_type == 'application/pdf'
+
+        reader = PdfFileReader(BytesIO(manage.body))
+        text = ''.join([page.extractText() for page in reader.pages])
+        assert text == (
+            '© 2017 Govikon\n'
+            '1\nAmtsblatt Nr. 44, 03.11.2017\n'
+            'Civic Community\n'
+            'Commercial Register\n'
+            'First notice 1\n'
+            'This is the first notice\n'
+        )
+
+        # add another notice
+        manage = client.get('/notices/drafted/new-notice')
+        manage.form['title'] = 'Second notice'
+        manage.form['organization'] = '100'
+        manage.form['category'] = '11'
+        manage.form['issues'] = ['2017-44']
+        manage.form['text'] = 'This is the second notice'
+        manage = manage.form.submit()
+
+        client.get('/notice/second-notice/submit').form.submit()
+        client.get('/notice/second-notice/accept').form.submit()
+        client.get('/notice/second-notice/publish').form.submit()
+
+        # generate again
+        manage = client.get('/issues').click('Erzeugen', index=0)
+        manage = manage.form.submit().maybe_follow()
+        assert "PDF erstellt." in manage
+
+        manage = manage.click('2017-44.pdf')
+        assert manage.content_type == 'application/pdf'
+
+        reader = PdfFileReader(BytesIO(manage.body))
+        text = ''.join([page.extractText() for page in reader.pages])
+        assert text == (
+            '© 2017 Govikon\n'
+            '1\nAmtsblatt Nr. 44, 03.11.2017\n'
+            'State Chancellery\n'
+            'Education\n'
+            'Second notice 2\n'
+            'This is the second notice\n'
+            'Civic Community\n'
+            'Commercial Register\n'
+            'First notice 1\n'
+            'This is the first notice\n'
+        )

@@ -20,6 +20,20 @@ from sedate import standardize_date
 from textwrap import dedent
 
 
+class DummyApp(object):
+    def __init__(self, session):
+        self._session = session
+
+    def session(self):
+        return self._session
+
+
+class DummyRequest(object):
+    def __init__(self, session):
+        self.app = DummyApp(session)
+        self.identity = None
+
+
 def test_category(session):
     session.add(
         Category(
@@ -152,16 +166,34 @@ def test_issue_name():
     assert IssueName.from_string(str(issue_name)) == issue_name
 
 
-def test_issue(session):
+def test_issue_file(gazette_app, session):
     session.add(
-        Issue(
-            id=0,
-            name='2018-7',
-            number=7,
-            date=date(2017, 7, 1),
-            deadline=standardize_date(datetime(2017, 6, 25, 12, 0), 'UTC')
+        IssuePdfFile(
+            id='abcd',
+            name='test.txt',
+            reference=as_fileintent('Test text.'.encode('utf-8'), 'test.txt')
         )
     )
+    session.flush()
+
+    file = session.query(IssuePdfFile).one()
+
+    assert file.id == 'abcd'
+    assert file.name == 'test.txt'
+    assert file.type == 'gazette_issue'
+    assert file.reference.file.read().decode('utf-8') == 'Test text.'
+
+
+def test_issue(gazette_app, session):
+    issue = Issue(
+        id=0,
+        name='2018-7',
+        number=7,
+        date=date(2017, 7, 1),
+        deadline=standardize_date(datetime(2017, 6, 25, 12, 0), 'UTC'),
+    )
+    issue.pdf = 'PDF'.encode('utf-8')
+    session.add(issue)
     session.flush()
     issue = session.query(Issue).one()
 
@@ -172,6 +204,10 @@ def test_issue(session):
     assert issue.deadline == standardize_date(
         datetime(2017, 6, 25, 12, 0), 'UTC'
     )
+    assert issue.pdf.id
+    assert issue.pdf.name == '2018-7.pdf'
+    assert issue.pdf.type == 'gazette_issue'
+    assert issue.pdf.reference.file.read().decode('utf-8') == 'PDF'
 
     # Test query etc
     assert len(issue.notices().all()) == 0
@@ -198,6 +234,39 @@ def test_issue(session):
     dates = [i.first_issue for i in session.query(GazetteNotice)]
     dates = [d.date() for d in dates if d]
     assert set(dates) == set([issue.date])
+
+    # Test publish
+    issue.publish(DummyRequest(session))
+    assert len(issue.notices().all()) == 4
+    assert issue.notices('accepted').all() == []
+    assert issue.notices('published').one().issues == {'2018-7': '1'}
+
+
+def test_issue_publication_numbers(session):
+    assert Issue.publication_numbers(session) == {}
+
+    session.add(Issue(name='2016-1', number=1, date=date(2016, 1, 1)))
+    session.add(Issue(name='2017-1', number=1, date=date(2017, 1, 1)))
+    session.add(Issue(name='2017-2', number=2, date=date(2017, 2, 2)))
+    session.add(Issue(name='2018-1', number=1, date=date(2018, 1, 1)))
+    session.add(Issue(name='2018-2', number=2, date=date(2018, 2, 2)))
+    session.add(Issue(name='2018-3', number=2, date=date(2018, 3, 3)))
+    session.flush()
+
+    assert Issue.publication_numbers(session) == {2016: 0, 2017: 0, 2018: 0}
+
+    session.add(GazetteNotice(title='1', _issues={'2016-1': '5'}))
+    session.add(GazetteNotice(title='2', _issues={'2017-1': None}))
+    session.add(GazetteNotice(title='3', _issues={'2017-1': '5',
+                                                  '2017-2': '6'}))
+    session.add(GazetteNotice(title='4', _issues={'2017-1': None,
+                                                  '2018-3': '4'}))
+    session.add(GazetteNotice(title='4', _issues={'2017-2': '9',
+                                                  '2018-1': '1',
+                                                  '2018-2': '2'}))
+    session.flush()
+
+    assert Issue.publication_numbers(session) == {2016: 5, 2017: 9, 2018: 4}
 
 
 def test_principal():
@@ -510,6 +579,46 @@ def test_notice_states(session):
     ] == [
         ('finished', user, 'all went well')
     ]
+
+
+def test_notice_publish(session):
+    request = DummyRequest(session)
+
+    # No issues
+    session.add(
+        GazetteNotice(state='accepted', title='title', name='notice')
+    )
+    session.flush()
+    notice = session.query(GazetteNotice).filter_by(state='accepted').one()
+    notice.publish(request)
+    assert notice.issues == {}
+
+    # With issues
+    session.add(Issue(name='2016-1', number=1, date=date(2016, 1, 1)))
+    session.add(Issue(name='2017-1', number=1, date=date(2017, 1, 1)))
+    session.add(Issue(name='2017-2', number=1, date=date(2017, 2, 2)))
+    session.add(Issue(name='2018-1', number=1, date=date(2018, 1, 1)))
+    session.add(
+        GazetteNotice(
+            state='accepted', title='title', name='notice',
+            issues=['2017-1', '2017-2', '2018-1']
+        )
+    )
+    session.flush()
+    notice = session.query(GazetteNotice).filter_by(state='accepted').one()
+    notice.publish(request)
+    assert notice.issues == {'2017-1': '1', '2017-2': '2', '2018-1': '1'}
+
+    session.add(
+        GazetteNotice(
+            state='accepted', title='title', name='notice',
+            issues=['2017-1', '2017-3']
+        )
+    )
+    session.flush()
+    notice = session.query(GazetteNotice).filter_by(state='accepted').one()
+    notice.publish(request)
+    assert notice.issues == {'2017-1': '3', '2017-3': None}
 
 
 def test_notice_apply_meta(session, categories, organizations, issues):

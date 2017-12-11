@@ -8,6 +8,7 @@ from onegov.gazette.forms import EmptyForm
 from onegov.gazette.forms import IssueForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import Issue
+from onegov.gazette.pdf import Pdf
 
 
 @GazetteApp.html(
@@ -149,4 +150,82 @@ def delete_issue(self, request, form):
         'button_text': _("Delete Issue"),
         'button_class': 'alert',
         'cancel': layout.manage_issues_link
+    }
+
+
+@GazetteApp.form(
+    model=Issue,
+    name='publish',
+    template='form.pt',
+    permission=Private,
+    form=EmptyForm
+)
+def publish_issue(self, request, form):
+    """ Publish an issue.
+
+    If the issue has not already been published before, we redirect to the
+    PDF generation view afterwards.
+
+    This view is only visible by a publisher.
+
+    """
+
+    if self.notices('submitted').first():
+        request.message(
+            _("There are submitted notices for this issue!"), 'warning'
+        )
+
+    layout = Layout(self, request)
+    if form.submitted(request):
+        self.publish(request)
+        request.message(_("All notices published."), 'success')
+        return redirect(request.link(self, name='generate'))
+
+    return {
+        'layout': layout,
+        'form': form,
+        'title': self.name,
+        'subtitle': _("Publish all notices"),
+        'button_text': _("Publish"),
+        'cancel': layout.manage_issues_link,
+        'message': _(
+            (
+                'Do you really want to publish all notices of "${item}"? This '
+                'will assign the publication numbers for ${number} notice(s).'
+            ),
+            mapping={
+                'item': self.name,
+                'number': len(self.notices('accepted').all())
+            }
+        ),
+    }
+
+
+@GazetteApp.form(
+    model=Issue,
+    name='generate',
+    template='form.pt',
+    permission=Private,
+    form=EmptyForm
+)
+def generate_issue(self, request, form):
+    """ Generates the PDF of the issue.
+
+    This view is only visible by a publisher.
+
+    """
+
+    layout = Layout(self, request)
+    if form.submitted(request):
+        self.pdf = Pdf.from_issue(self, request)
+        request.message(_("PDF generated."), 'success')
+        return redirect(layout.manage_issues_link)
+
+    return {
+        'layout': layout,
+        'form': form,
+        'title': self.name,
+        'subtitle': _("Generate PDF"),
+        'button_text': _("Generate"),
+        'cancel': layout.manage_issues_link,
     }

@@ -33,8 +33,12 @@ msgid "Show less"
 msgstr "Weniger anzeigen"
 
 #, python-format
-msgid "No. ${number}, ${issue_date}"
-msgstr "Nr. ${number}, ${issue_date}"
+msgid "No. ${issue_number}, ${issue_date} / ${notice_number}"
+msgstr "Nr. ${issue_number}, ${issue_date} / ${notice_number}"
+
+#, python-format
+msgid "No. ${issue_number}, ${issue_date}"
+msgstr "Nr. ${issue_number}, ${issue_date}"
 
 msgid "Official Notices"
 msgstr "Meldungen"
@@ -65,9 +69,6 @@ msgstr "Veröffentlichte Meldungen"
 
 msgid "Gazette"
 msgstr "Amtsblatt"
-
-msgid "This value already exists."
-msgstr "Dieser Wert ist bereits vorhanden."
 
 msgid "This value already exists."
 msgstr "Dieser Wert ist bereits vorhanden."
@@ -222,15 +223,6 @@ msgstr "Kommende Ausgaben"
 
 msgid "Issue"
 msgstr "Ausgabe"
-
-msgid "No upcoming issues."
-msgstr "Keine kommenden Ausgaben."
-
-msgid "Past Issues"
-msgstr "Vergangene Ausgaben"
-
-msgid "No past issues."
-msgstr "Keine vergangenen Ausgaben."
 
 msgid "PDF"
 msgstr "PDF"
@@ -493,6 +485,20 @@ msgstr "Ausgabe bearbeiten"
 msgid "Delete Issue"
 msgstr "Ausgabe löschen"
 
+msgid "Publish all notices"
+msgstr "Alle Meldungen veröffentlichen"
+
+#, python-format
+msgid ""
+"Do you really want to publish all notices of \"${item}\"? This will assign "
+"the publication numbers for ${number} notice(s)."
+msgstr ""
+"Alle Meldungen von \"${item}\" veröffentlichen? Es werden "
+"Publikationsnummern für ${number} Meldung(en) vergeben."
+
+msgid "Generate PDF"
+msgstr "PDF erstellen"
+
 msgid "Issue added."
 msgstr "Ausgabe hinzugefügt."
 
@@ -504,6 +510,15 @@ msgstr "Es können nur unbenutzte Ausgaben gelöscht werden."
 
 msgid "Issue deleted."
 msgstr "Ausgabe gelöscht."
+
+msgid "There are submitted notices for this issue!"
+msgstr "Diese Ausgabe hat eingereichte Meldungen!"
+
+msgid "All notices published."
+msgstr "Alle Meldungen veröffentlicht."
+
+msgid "PDF generated."
+msgstr "PDF erstellt."
 
 msgid "Edit Official Notice"
 msgstr "Meldung bearbeiten"
@@ -517,8 +532,8 @@ msgstr "Annehmen"
 msgid "Copy"
 msgstr "Kopieren"
 
-msgid "Submit"
-msgstr "Einreichen"
+msgid "Preview"
+msgstr "Vorschau"
 
 msgid "Reject"
 msgstr "Zurückweisen"
@@ -715,6 +730,3 @@ msgstr "Benutzer gelöscht."
 
 msgid "User account created"
 msgstr "Benutzerkonto Amtsblattredaktion erstellt"
-
-#~ msgid "Do you really want to delete the attachment?"
-#~ msgstr "Anhang löschen?"

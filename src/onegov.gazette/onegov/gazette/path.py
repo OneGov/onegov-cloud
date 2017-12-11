@@ -70,6 +70,14 @@ def get_organization(app, id):
     return OrganizationCollection(app.session()).by_id(id)
 
 
+@GazetteApp.path(
+    model=OrganizationMove,
+    path='/move/organization/{subject_id}/{direction}/{target_id}',
+    converters=dict(subject_id=int, target_id=int))
+def get_page_move(app, subject_id, direction, target_id):
+    return OrganizationMove(app.session(), subject_id, target_id, direction)
+
+
 @GazetteApp.path(model=IssueCollection, path='/issues')
 def get_issues(app):
     return IssueCollection(app.session())
@@ -80,12 +88,11 @@ def get_issue(app, id):
     return IssueCollection(app.session()).by_id(id)
 
 
-@GazetteApp.path(
-    model=OrganizationMove,
-    path='/move/organization/{subject_id}/{direction}/{target_id}',
-    converters=dict(subject_id=int, target_id=int))
-def get_page_move(app, subject_id, direction, target_id):
-    return OrganizationMove(app.session(), subject_id, target_id, direction)
+@GazetteApp.path(model=IssuePdfFile, path='/pdf/{name}')
+def get_issue_pdf(request, app, name):
+    issue = IssueCollection(app.session()).by_name(name.replace('.pdf', ''))
+    if issue and issue.pdf:
+        return get_file(app, issue.pdf.id)
 
 
 @GazetteApp.path(
