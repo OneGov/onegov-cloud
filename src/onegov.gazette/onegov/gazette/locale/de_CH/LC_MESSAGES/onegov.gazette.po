@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-04 15:47+0100\n"
+"POT-Creation-Date: 2017-12-11 10:20+0100\n"
 "PO-Revision-Date: 2017-12-04 15:47+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -517,11 +517,8 @@ msgstr "Annehmen"
 msgid "Copy"
 msgstr "Kopieren"
 
-msgid "Preview"
-msgstr "Vorschau"
-
-msgid "Publish"
-msgstr "Veröffentlichen"
+msgid "Submit"
+msgstr "Einreichen"
 
 msgid "Reject"
 msgstr "Zurückweisen"
@@ -599,6 +596,17 @@ msgstr "\"${item}\" zurückweisen?"
 msgid "Reject Official Note"
 msgstr "Meldung zurückweisen"
 
+#, python-format
+msgid ""
+"Do you really want to publish \"${item}\"? This will assign the publication "
+"numbers for the following issues: ${issues}."
+msgstr ""
+"\"${item}\" veröffentlichen? Es werden Publikationsnummern für die folgenden "
+"Ausgaben vergeben: ${issues}."
+
+msgid "Publish Official Note"
+msgstr "Meldung veröffentlichen"
+
 msgid "Only drafted or rejected official notices may be submitted."
 msgstr ""
 "Es können nur zurückgewiesene Meldungen oder Meldungen in Arbeit eingereicht "
@@ -618,6 +626,12 @@ msgstr "Es können nur eingereichte Meldungen zurückgewiesen werden."
 
 msgid "Official notice rejected."
 msgstr "Meldung zurückgewiesen."
+
+msgid "Only accepted official notices may be published."
+msgstr "Es können nur angenommene Meldungen veröffentlicht werden."
+
+msgid "Official notice published."
+msgstr "Meldung veröffentlicht."
 
 msgid "mail sent"
 msgstr "Druck beauftragt"

@@ -2,11 +2,12 @@ from freezegun import freeze_time
 from onegov.gazette.tests import accept_notice
 from onegov.gazette.tests import edit_notice
 from onegov.gazette.tests import login_users
+from onegov.gazette.tests import publish_notice
 from onegov.gazette.tests import reject_notice
 from onegov.gazette.tests import submit_notice
 
 
-def test_view_notice(gazette_app):
+def test_view_notice1(gazette_app):
     # Check if the details of the notice is displayed correctly in the
     # display view (that is: organization, owner, group etc).
 
@@ -198,10 +199,38 @@ def test_view_notice_actions(gazette_app):
         accept_notice(publisher, 'titel-4')
 
         check((
-            (admin, 'titel-1', 'ptedc'),
-            (admin, 'titel-2', 'ptedc'),
-            (admin, 'titel-3', 'ptedc'),
-            (admin, 'titel-4', 'ptedc'),
+            (admin, 'titel-1', 'ptedcx'),
+            (admin, 'titel-2', 'ptedcx'),
+            (admin, 'titel-3', 'ptedcx'),
+            (admin, 'titel-4', 'ptedcx'),
+            (publisher, 'titel-1', 'pcx'),
+            (publisher, 'titel-2', 'pcx'),
+            (publisher, 'titel-3', 'pcx'),
+            (publisher, 'titel-4', 'pcx'),
+            (editor_1, 'titel-1', 'pc'),
+            (editor_1, 'titel-2', 'pc'),
+            (editor_1, 'titel-3', 'pc'),
+            (editor_1, 'titel-4', 'pc'),
+            (editor_2, 'titel-1', 'pc'),
+            (editor_2, 'titel-2', 'pc'),
+            (editor_2, 'titel-3', 'pc'),
+            (editor_2, 'titel-4', 'pc'),
+            (editor_3, 'titel-1', 'pc'),
+            (editor_3, 'titel-2', 'pc'),
+            (editor_3, 'titel-3', 'pc'),
+            (editor_3, 'titel-4', 'pc'),
+        ))
+
+        # ... when published
+        publish_notice(publisher, 'titel-1')
+        publish_notice(publisher, 'titel-2')
+        publish_notice(publisher, 'titel-3')
+        publish_notice(publisher, 'titel-4')
+        check((
+            (admin, 'titel-1', 'ptec'),
+            (admin, 'titel-2', 'ptec'),
+            (admin, 'titel-3', 'ptec'),
+            (admin, 'titel-4', 'ptec'),
             (publisher, 'titel-1', 'pc'),
             (publisher, 'titel-2', 'pc'),
             (publisher, 'titel-3', 'pc'),
@@ -319,7 +348,7 @@ def test_view_notice_delete(gazette_app):
             manage.form.submit().maybe_follow()
 
         # delete a published notice
-        manage = editor.get('/notices/drafted/new-notice')
+        manage = editor_1.get('/notices/drafted/new-notice')
         manage.form['title'] = "Erneuerungswahlen"
         manage.form['organization'] = '200'
         manage.form['category'] = '11'
@@ -327,11 +356,11 @@ def test_view_notice_delete(gazette_app):
         manage.form['text'] = "1. Oktober 2017"
         manage.form.submit()
 
-        submit_notice(editor, 'erneuerungswahlen')
+        submit_notice(editor_1, 'erneuerungswahlen')
         accept_notice(publisher, 'erneuerungswahlen')
         publish_notice(publisher, 'erneuerungswahlen')
 
-        for user in (admin, editor, publisher):
+        for user in (admin, editor_1, publisher):
             manage = user.get('/notice/erneuerungswahlen/delete')
             assert manage.forms == {}
 
