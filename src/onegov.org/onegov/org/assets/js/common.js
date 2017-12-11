@@ -133,3 +133,11 @@ $(document).ready(function() {
         window.location = $(this).find('a:first').attr('href');
     });
 });
+
+// support a custom intercooler attribute that limits the number
+// of times a request by intercooler is trigger
+$(document).find('[ic-once]').on('success.ic', function(_e, element) {
+    setTimeout(function() {
+        element.data('ic-request-in-flight', true);
+    }, 0);
+});

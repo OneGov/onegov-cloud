@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to trigger an intercooler request only once.
+  [href]
+
 0.19.2 (2017-12-05)
 ~~~~~~~~~~~~~~~~~~~
 
