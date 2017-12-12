@@ -529,7 +529,8 @@ def test_send_email(smtp):
         reply_to='info@example.org',
         receivers=['recipient@example.org'],
         subject="Test E-Mail",
-        content="This e-mail is just a test"
+        content="This e-mail is just a test",
+        headers={'List-Unsubscribe': '<mailto:unsubscribe@example.org>'}
     )
 
     transaction.commit()
@@ -541,6 +542,7 @@ def test_send_email(smtp):
     assert message['From'] == 'noreply@example.org'
     assert message['Reply-To'] == 'info@example.org'
     assert message['Subject'] == 'Test E-Mail'
+    assert message['List-Unsubscribe'] == '<mailto:unsubscribe@example.org>'
     assert message.get_payload()[0].as_string() == (
         'Content-Type: text/plain; charset="utf-8"\n'
         'MIME-Version: 1.0\n'

@@ -614,7 +614,7 @@ class Framework(TransactionApp, WebassetsApp, OrmCacheApp, ServerApplication):
 
     def send_email(self, reply_to, receivers=(), cc=(), bcc=(),
                    subject=None, content=None, encoding='utf-8',
-                   attachments=()):
+                   attachments=(), headers={}):
         """ Sends a plain-text e-mail using :attr:`postman` to the given
         recipients. A reply to address is used to enable people to answer
         to the e-mail which is usually sent by a noreply kind of e-mail
@@ -655,6 +655,8 @@ class Framework(TransactionApp, WebassetsApp, OrmCacheApp, ServerApplication):
 
         envelope.headers['Sender'] = mail_sender
         envelope.headers['Reply-To'] = formataddr((name, address))
+        for key, value in headers.items():
+            envelope.headers[key] = value
 
         # send e-mails through the transaction machinery
         MailDataManager.send_email(self.postman, envelope)
