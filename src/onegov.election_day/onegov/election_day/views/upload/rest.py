@@ -37,7 +37,7 @@ def authenticate(request):
     permission=Public,
     request_method='POST'
 )
-def view_upload_test(self, request):
+def view_upload_rest(self, request):
 
     """ Upload election or vote results via REST using the internal format.
 
