@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.13.0 (2017-12-12)
+~~~~~~~~~~~~~~~~~~~
 
 - Allows to publish notices and to generate weekly PDFs.
   [msom]
