@@ -56,7 +56,7 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
 
         if values:
             query = query.filter(
-                self.model_class._keywords.has_all(array(values)))
+                self.model_class._keywords.has_any(array(values)))
 
         return query
 

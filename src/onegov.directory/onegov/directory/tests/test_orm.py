@@ -201,7 +201,7 @@ def test_directory_entry_collection(session):
 
     assert albums.for_filter(genre='Rock').query().count() == 2
     assert albums.for_filter(genre='Rock')\
-        .for_filter(genre='Pop').query().count() == 1
+        .for_filter(genre='Pop').query().count() == 2
 
     kettcar = albums.for_filter(genre='Pop').query().one()
     assert kettcar.values == {
@@ -223,7 +223,7 @@ def test_directory_entry_collection(session):
         german='Yes', singular=False
     ).for_filter(
         german='No', singular=False
-    ).query().count() == 0
+    ).query().count() == 3
 
 
 def test_validation_error(session):

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Changes the category filter from AND to OR.
+  [href]
+
 - Adds support for radio to checkbox migration.
   [href]
 
