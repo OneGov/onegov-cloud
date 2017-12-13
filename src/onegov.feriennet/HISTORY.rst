@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes booking link in matching view not returning to the right view.
+  [href]
+
 1.3.11 (2017-12-13)
 ~~~~~~~~~~~~~~~~~~~
 
