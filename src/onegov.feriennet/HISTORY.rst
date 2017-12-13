@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.11 (2017-12-13)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes booking link in matching view.
   [href]
