@@ -121,7 +121,7 @@ def view_occasion_bookings_table(self, request):
             yield Link(
                 text=_("Signup Attendee"),
                 url=request.return_here(
-                    request.class_link(Occasion, {'id': oid}, 'anmelden')
+                    request.class_link(Occasion, {'id': oid}, 'book')
                 )
             )
 
