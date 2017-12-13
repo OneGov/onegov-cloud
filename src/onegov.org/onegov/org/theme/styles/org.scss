@@ -651,6 +651,10 @@ form {
             padding: 0 .75rem;
             text-align: center;
         }
+
+        &:focus-within {
+            border-color: $body-font-color;
+        }
     }
 
     .upload-widget.without-data {
