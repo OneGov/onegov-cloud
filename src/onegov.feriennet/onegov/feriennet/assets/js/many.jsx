@@ -141,9 +141,13 @@ var DateTimeField = React.createClass({
     renderDateTimeButton: function() {
         var onChange = this.props.onChange;
         if (!Modernizr.inputtypes.datetime) {
+            // ensures a valid date
             if (this.props.extra && this.props.extra.defaultDate) {
-                this.props.extra.defaultDate = new Date(
-                    this.props.extra.defaultDate);
+                if (isNaN(new Date(this.props.extra.defaultDate))) {
+                    delete this.props.extra.defaultDate;
+                } else {
+                    this.props.extra.defaultDate = new Date(this.props.extra.defaultDate);
+                }
             }
 
             setup_datetimepicker('datetime', '#' + this.id, function(e) {

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes datetime pickers on occasion forms not working without active period.
+  [href]
+
 - Improves the performance of the billing view by an order of magnitude.
   [href]
 
