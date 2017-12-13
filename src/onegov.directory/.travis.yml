@@ -18,6 +18,9 @@ matrix:
       python: "3.4"
       env: TOXENV=pep8
 
+addons:
+  postgresql: "9.6"
+
 install:
     - pip install tox
     - if [ "$TOXENV" = 'py34' ]; then pip install coveralls; fi
