@@ -5,10 +5,10 @@ from decimal import Decimal
 from itertools import groupby
 from onegov.activity import Activity, Attendee, Booking, Occasion, InvoiceItem
 from onegov.activity import BookingCollection, InvoiceItemCollection
-from onegov.core.utils import normalize_for_url
+from onegov.core.orm import as_selectable_from_path
+from onegov.core.utils import module_path, Bunch
 from onegov.pay import Price
-from onegov.user import User
-from sortedcontainers import SortedDict
+from sqlalchemy import select
 
 
 class BillingDetails(object):
@@ -20,6 +20,7 @@ class BillingDetails(object):
 
     def __init__(self, title, items):
         self.title = title
+        self.items = items
         self.total = Decimal()
         self.outstanding = Decimal()
         self.paid = True
@@ -50,19 +51,22 @@ class BillingDetails(object):
             in groupby((tally(i) for i in items), lambda i: i.group)
         }
 
-        self.id = self.item_id(self.first)
+        self.id = self.invoice_id(self.first)
 
     @property
     def price(self):
         return Price(self.outstanding, 'CHF')
 
     @staticmethod
-    def item_id(item):
+    def invoice_id(item):
         components = (item.invoice, item.username)
-        return hashlib.md5('/'.join(components).encode('utf-8')).hexdigest()
+        return hashlib.md5(''.join(components).encode('utf-8')).hexdigest()
 
 
 class BillingCollection(object):
+
+    invoices_by_period = as_selectable_from_path(
+        module_path('onegov.feriennet', 'queries/invoices_by_period.sql'))
 
     def __init__(self, session, period, username=None, expand=False):
         self.session = session
@@ -90,26 +94,36 @@ class BillingCollection(object):
         return self.__class__(self.session, self.period, self.username, expand)
 
     @property
+    def invoices(self):
+        invoices = self.invoices_by_period.c
+
+        query = select(invoices).where(invoices.period_id == self.period_id)
+
+        if self.username:
+            query = query.where(invoices.username == self.username)
+
+        return self.session.execute(query)
+
+    @property
     def bills(self):
-        q = self.invoice_items.query()
-        q = q.order_by(
-            InvoiceItem.username,
-            InvoiceItem.group,
-            InvoiceItem.text
-        )
+        bills = OrderedDict()
 
-        titles = OrderedDict(
-            (user.username, user.realname or user.username) for user
-            in self.session.query(User.username, User.realname).order_by(
-                User.title
+        for username, items in groupby(self.invoices, lambda i: i.username):
+            items = tuple(items)
+            first = items[0]
+
+            bills[username] = Bunch(
+                items=items,
+                first=first,
+                id=first.id,
+                invoice_id=first.invoice_id,
+                title=first.realname or first.username,
+                paid=first.invoice_paid,
+                total=first.invoice_amount,
+                outstanding=first.invoice_outstanding,
+                discourage_changes=first.invoice_changes == 'discouraged',
+                disable_changes=first.invoice_changes == 'impossible'
             )
-        )
-
-        bills = SortedDict(
-            lambda username: normalize_for_url(titles[username]))
-
-        for user, items in groupby(q, lambda i: i.username):
-            bills[user] = BillingDetails(titles[user], items)
 
         return bills
 

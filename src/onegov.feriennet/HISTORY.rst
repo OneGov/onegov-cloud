@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves the performance of the billing view by an order of magnitude.
+  [href]
+
 - Improves the performance of the matching view by an order of magnitude.
   [href]
 

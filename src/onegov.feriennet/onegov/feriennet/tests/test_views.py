@@ -1435,148 +1435,6 @@ def test_cancel_occasion(feriennet_app):
     client.delete(get_delete_link(page))
 
 
-def test_billing(feriennet_app):
-
-    activities = ActivityCollection(feriennet_app.session(), type='vacation')
-    attendees = AttendeeCollection(feriennet_app.session())
-    periods = PeriodCollection(feriennet_app.session())
-    occasions = OccasionCollection(feriennet_app.session())
-    bookings = BookingCollection(feriennet_app.session())
-
-    owner = Bunch(username='admin@example.org')
-
-    prebooking = tuple(d.date() for d in (
-        datetime.now() - timedelta(days=1),
-        datetime.now() + timedelta(days=1)
-    ))
-
-    execution = tuple(d.date() for d in (
-        datetime.now() + timedelta(days=10),
-        datetime.now() + timedelta(days=12)
-    ))
-
-    period = periods.add(
-        title="Ferienpass 2016",
-        prebooking=prebooking,
-        execution=execution,
-        active=True
-    )
-    period.confirmed = True
-
-    member = UserCollection(feriennet_app.session()).add(
-        'member@example.org', 'hunter2', 'member')
-
-    foobar = activities.add("Foobar", username='admin@example.org')
-    foobar.propose().accept()
-
-    o1 = occasions.add(
-        start=datetime(2016, 11, 25, 8),
-        end=datetime(2016, 11, 25, 16),
-        age=(0, 10),
-        spots=(0, 2),
-        timezone="Europe/Zurich",
-        activity=foobar,
-        period=period,
-        cost=100,
-    )
-
-    o2 = occasions.add(
-        start=datetime(2016, 11, 25, 17),
-        end=datetime(2016, 11, 25, 20),
-        age=(0, 10),
-        spots=(0, 2),
-        timezone="Europe/Zurich",
-        activity=foobar,
-        period=period,
-        cost=1000,
-    )
-
-    a1 = attendees.add(owner, 'Dustin', date(2000, 1, 1), 'female')
-    a2 = attendees.add(member, 'Mike', date(2000, 1, 1), 'female')
-
-    b1 = bookings.add(owner, a1, o1)
-    b2 = bookings.add(owner, a1, o2)
-    b3 = bookings.add(member, a2, o1)
-    b4 = bookings.add(member, a2, o2)
-
-    b1.state = 'accepted'
-    b2.state = 'cancelled'
-    b3.state = 'accepted'
-    b4.state = 'accepted'
-
-    b1.cost = 100
-    b2.cost = 1000
-    b3.cost = 100
-    b4.cost = 1000
-
-    transaction.commit()
-
-    admin = Client(feriennet_app)
-    admin.login_admin()
-
-    member = Client(feriennet_app)
-    member.login('member@example.org', 'hunter2')
-
-    page = admin.get('/activities').click('Fakturierung')
-    assert "noch keine Rechnungen" in page
-
-    page = page.form.submit()
-    assert "member@example.org" in page
-    assert "admin@example.org" in page
-
-    # as long as the period is not finalized, there's no way to pay
-    page = admin.get('/billing?username=admin@example.org')
-    assert page.pyquery('.outstanding').text() == '100.00 Ausstehend'
-
-    page = admin.get('/billing?username=member@example.org')
-    assert page.pyquery('.outstanding').text() == '1100.00 Ausstehend'
-
-    assert 'mark-paid' not in page
-
-    # as long as the period is not finalized, there are no invoices
-    assert member.get('/').pyquery('.invoices-count').attr['data-count'] == '0'
-    assert admin.get('/').pyquery('.invoices-count').attr['data-count'] == '0'
-    assert "noch keine Rechnungen" in member.get('/my-bills')
-    assert "noch keine Rechnungen" in admin.get('/my-bills')
-
-    # once the period is finalized, the invoices become public and they
-    # may be marked as paid
-    page = admin.get('/activities').click('Fakturierung')
-    page.form['confirm'] = 'yes'
-    page.form['sure'] = 'yes'
-    page = page.form.submit()
-
-    assert member.get('/').pyquery('.invoices-count').attr['data-count'] == '1'
-    assert admin.get('/').pyquery('.invoices-count').attr['data-count'] == '1'
-    assert "noch keine Rechnungen" not in member.get('/my-bills')
-    assert "noch keine Rechnungen" not in admin.get('/my-bills')
-    assert "Ferienpass 2016" in member.get('/my-bills')
-    assert "Ferienpass 2016" in admin.get('/my-bills')
-
-    page = admin.get('/billing?username=member@example.org')
-    assert '1100.00 Ausstehend' in page.pyquery('.outstanding').text()
-
-    admin.post(get_post_url(page, 'mark-paid:last'))
-
-    page = admin.get('/billing?username=member@example.org')
-
-    # occsaions with the same title (here the same activity) is not defined
-    assert '1000.00 Ausstehend' in page.pyquery('.outstanding').text() or\
-        '100.00 Ausstehend' in page.pyquery('.outstanding').text()
-
-    admin.post(get_post_url(page, 'mark-unpaid'))
-
-    page = admin.get('/billing?username=member@example.org')
-    assert '1100.00 Ausstehend' in page.pyquery('.outstanding').text()
-
-    admin.post(get_post_url(page, 'mark-paid:first'))
-
-    page = admin.get('/billing?username=member@example.org')
-    assert 'Bezahlt' in page.pyquery('.outstanding').text()
-
-    assert member.get('/').pyquery('.invoices-count').attr['data-count'] == '0'
-
-
 def test_reactivate_cancelled_booking(feriennet_app):
 
     activities = ActivityCollection(feriennet_app.session(), type='vacation')
@@ -2180,7 +2038,7 @@ def test_online_payment(feriennet_app):
             "has_more": False,
         })
 
-        page = client.get('/billing')
+        page = client.get('/billing?expand=1')
         page = page.click('Online Zahlungen synchronisieren').follow()
 
         assert "Synchronisierung erfolgreich" in page
@@ -2209,7 +2067,7 @@ def test_online_payment(feriennet_app):
         m.post('https://api.stripe.com/v1/refunds', json=charge)
         client.post(get_post_url(page, 'payment-refund'))
 
-    page = client.get('/billing')
+    page = client.get('/billing?expand=1')
     assert ">Unbezahlt<" in page
 
     page = client.get('/payments')

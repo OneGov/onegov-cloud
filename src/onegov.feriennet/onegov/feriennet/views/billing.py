@@ -60,8 +60,8 @@ def view_billing(self, request, form):
         return actions(
             item,
             item.paid,
-            item.discourage_changes,
-            item.disable_changes
+            item.changes == 'discouraged',
+            item.changes == 'impossible'
         )
 
     def actions(item, paid, discourage_changes, disable_changes,
@@ -122,7 +122,9 @@ def view_billing(self, request, form):
                 yield Link(
                     _("Show online payments"),
                     attrs={'class': 'show-online-payments'},
-                    url=request.link(item, 'online-payments')
+                    url=request.class_link(
+                        InvoiceItem, {'id': item.id}, name='online-payments'
+                    )
                 )
         elif discourage_changes:
             yield Link(
@@ -243,7 +245,7 @@ def execute_invoice_action(self, request):
     def trigger_bill_update(response):
         response.headers.add('X-IC-Trigger', 'reload-from')
         response.headers.add('X-IC-Trigger-Data', json.dumps({
-            'selector': '#' + BillingDetails.item_id(self.item)
+            'selector': '#' + BillingDetails.invoice_id(self.item)
         }))
 
 

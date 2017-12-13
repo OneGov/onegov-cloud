@@ -12,6 +12,15 @@
 }
 
 /*
+    css animations keyframes
+*/
+@keyframes oscillate-opacity {
+    0% { opacity: 1; }
+    50% { opacity: .5; }
+    100% { opacity: 1; }
+}
+
+/*
     Clickable headers are kept dark, but we ensure that the hover works.
 */
 a > h1,
@@ -1208,12 +1217,6 @@ ul.tags {
         > button:not(.ic-use-transition) {
             animation: oscillate-opacity 1s infinite;
         }
-
-        @keyframes oscillate-opacity {
-            0% { opacity: 1; }
-            50% { opacity: .5; }
-            100% { opacity: 1; }
-        }
     }
 
     .progress {
@@ -1342,6 +1345,10 @@ ul.tags {
         right: 0;
         top: 0;
         width: 40px;
+    }
+
+    > button:not(.ic-use-transition) {
+        animation: oscillate-opacity 1s infinite;
     }
 
     .f-dropdown {
