@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.10 (2017-12-13)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes datetime pickers on occasion forms not working without active period.
   [href]
