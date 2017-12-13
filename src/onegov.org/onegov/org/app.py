@@ -360,7 +360,6 @@ def get_common_asset():
     yield 'foundation.js'
     yield 'foundation.alert.js'
     yield 'foundation.dropdown.js'
-    yield 'foundation.equalizer.js'
     yield 'foundation.orbit.js'
     yield 'foundation.reveal.js'
     yield 'foundation.topbar.js'

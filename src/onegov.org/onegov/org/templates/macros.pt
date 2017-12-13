@@ -240,21 +240,17 @@
 </metal:fields>
 
 <metal:homepage-tiles define-macro="homepage-tiles" i18n:domain="onegov.org">
-    <div class="homepage-tiles" tal:define="show_title show_title|nothing">
+    <div tal:define="show_title show_title|nothing">
         <h2 i18n:translate class="${'' if show_title else 'show-for-sr'}">Selected Topics</h2>
-        <div tal:repeat="chunk layout.chunks(tiles, 2)" class="row" data-equalizer>
-            <div tal:repeat="tile chunk" class="columns small-12 medium-6 large-6">
-                <tal:block condition="tile">
-                    <div class="homepage-tile" id="homepage-tile-${tile.number}" data-equalizer-watch>
-                        <a href="${tile.page.url}" class="tile-link">
-                            <div class="tile-image"></div>
-                            <h3>${tile.page.text}</h3>
-                        </a>
-                        <div class="child-links">
-                            <tal:block repeat="link tile.links" tal:content="structure link(layout)" />
-                        </div>
-                    </div>
-                </tal:block>
+        <div class="homepage-tiles">
+            <div tal:repeat="tile tiles" class="homepage-tile" id="homepage-tile-${tile.number}">
+                <a href="${tile.page.url}" class="tile-link">
+                    <div class="tile-image"></div>
+                    <h3>${tile.page.text}</h3>
+                </a>
+                <div class="child-links">
+                    <tal:block repeat="link tile.links" tal:content="structure link(layout)" />
+                </div>
             </div>
         </div>
     </div>

@@ -939,6 +939,18 @@ input[type=color] {
     homepage tiles
 */
 
+@media #{$large-up} {
+    .homepage-tiles {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+
+        .homepage-tile {
+            width: calc(50% - 1rem);
+        }
+    }
+}
+
 .homepage-tile {
     border: 1px solid $gray;
     display: block;
