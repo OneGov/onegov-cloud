@@ -242,9 +242,7 @@ class OccasionForm(Form):
                 'defaultDate': (
                     self.request.app.active_period and
                     self.request.app.active_period.execution_start.isoformat()
-
-                    or
-
+                ) or (
                     self.request.app.periods and
                     self.request.app.periods[0].execution_start.isoformat()
                 ),
