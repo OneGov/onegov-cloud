@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for radio to checkbox migration.
+  [href]
+
 0.0.2 (2017-11-30)
 ~~~~~~~~~~~~~~~~~~~~~
 

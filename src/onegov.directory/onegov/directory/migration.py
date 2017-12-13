@@ -144,6 +144,9 @@ class FieldTypeMigrations(object):
     def time_to_text(self, value):
         return '{:%H:%M}'.format(value)
 
+    def radio_to_checkbox(self, value):
+        return value
+
 
 class StructuralChanges(object):
     """ Tries to detect structural changes between two formcode blocks.
