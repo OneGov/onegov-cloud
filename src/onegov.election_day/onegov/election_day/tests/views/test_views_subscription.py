@@ -6,8 +6,71 @@ from webtest import TestApp as Client
 
 
 def test_view_email_subscription(election_day_app):
-    # todo:
-    pass
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    # Subscribe using the form
+    subscribe = client.get('/subscribe-email')
+    subscribe.form['email'] = 'abcd'
+    subscribe = subscribe.form.submit()
+    assert "Ungültige Email-Adresse" in subscribe
+
+    subscribe.form['email'] = 'howard@example.com'
+    subscribe = subscribe.form.submit()
+    assert "E-Mail-Benachrichtigung wurde abonniert" in subscribe
+    assert election_day_app.session().query(Subscriber).one().locale == 'de_CH'
+
+    message = election_day_app.smtp.outbox.pop()
+    assert message['Subject'] == 'E-Mail-Benachrichtigung abonniert'
+    assert message['To'] == 'howard@example.com'
+    assert message['From'] == 'Kanton Govikon <mails@govikon.ch>'
+    assert message['Sender'] == 'Kanton Govikon <mails@govikon.ch>'
+    assert message['Reply-To'] == 'Kanton Govikon <mails@govikon.ch>'
+    assert '/unsubscribe-email?opaque=' in message['List-Unsubscribe']
+    assert message['List-Unsubscribe-Post'] == 'List-Unsubscribe=One-Click'
+
+    optout = message['List-Unsubscribe'].strip('<>')
+
+    html = message.get_payload(1).get_payload(decode=True)
+    html = html.decode('utf-8')
+    assert '<a href="http://localhost/unsubscribe-email">Abmelden</a>' in html
+    assert 'Die E-Mail-Benachrichtigung wurde abonniert.' in html
+
+    # Change the language
+    client.get('/locale/fr_CH').follow()
+    subscribe = client.get('/subscribe-email')
+    subscribe.form['email'] = 'howard@example.com'
+    subscribe = subscribe.form.submit()
+    assert election_day_app.session().query(Subscriber).one().locale == 'fr_CH'
+    assert election_day_app.smtp.outbox == []
+
+    manage = Client(election_day_app)
+    login(manage)
+    assert 'howard@example.com' in manage.get('/manage/subscribers/email')
+
+    # Unsubscribe using the list-unsubscribe
+    Client(election_day_app).post(optout)
+    assert election_day_app.session().query(Subscriber).count() == 0
+
+    # Subscribe again
+    client.get('/locale/de_CH').follow()
+    subscribe = client.get('/subscribe-email')
+    subscribe.form['email'] = 'howard@example.com'
+    subscribe = subscribe.form.submit()
+
+    assert election_day_app.session().query(Subscriber).one()
+    election_day_app.smtp.outbox.pop()
+
+    # Unsubscribe using the form
+    unsubscribe = client.get('/unsubscribe-email')
+    unsubscribe.form['email'] = 'abcd'
+    unsubscribe = unsubscribe.form.submit()
+    assert "Ungültige Email-Adresse" in unsubscribe
+
+    unsubscribe.form['email'] = 'howard@example.com'
+    unsubscribe = unsubscribe.form.submit()
+    assert "E-Mail-Benachrichtigung wurde beendet." in unsubscribe
+    assert election_day_app.smtp.outbox == []
 
 
 def test_view_manage_email_subscription(election_day_app):

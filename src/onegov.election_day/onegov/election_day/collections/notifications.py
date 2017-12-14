@@ -1,6 +1,7 @@
+from onegov.election_day.models import EmailNotification
 from onegov.election_day.models import Notification
-from onegov.election_day.models import WebhookNotification
 from onegov.election_day.models import SmsNotification
+from onegov.election_day.models import WebhookNotification
 
 
 class NotificationCollection(object):
@@ -33,15 +34,20 @@ class NotificationCollection(object):
             Notification.last_modified == vote.last_modified
         ).all()
 
-    def trigger(self, request, model):
-        """ Triggers and adds all notifications. """
+    def trigger(self, request, model, options):
+        """ Triggers and adds the selected notifications. """
 
-        if request.app.principal.sms_notification:
+        if 'email' in options and request.app.principal.email_notification:
+            notification = EmailNotification()
+            notification.trigger(request, model)
+            self.session.add(notification)
+
+        if 'sms' in options and request.app.principal.sms_notification:
             notification = SmsNotification()
             notification.trigger(request, model)
             self.session.add(notification)
 
-        if request.app.principal.webhooks:
+        if 'webhooks' in options and request.app.principal.webhooks:
             notification = WebhookNotification()
             notification.trigger(request, model)
             self.session.add(notification)

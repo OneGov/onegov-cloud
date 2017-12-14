@@ -18,11 +18,14 @@ msgid "Not a valid phone number."
 msgstr "N'est pas un numéro de téléphone valide."
 
 msgid ""
-"Successfully subscribed to the SMS services. You will receive an SMS every "
+"Successfully subscribed to the SMS service. You will receive a SMS every "
 "time new results are published."
 msgstr ""
 "Inscription réussie aux services SMS. Vous recevrez un SMS à chaque fois que "
 "de nouveaux résultats seront publiés."
+
+msgid "Successfully subscribed to the email service"
+msgstr ""
 
 #, python-format
 msgid "Missing columns: '${cols}'"
@@ -202,8 +205,17 @@ msgstr "Election selon le système majoritaire"
 msgid "Election based on proportional representation"
 msgstr "Election selon le système proportionnel"
 
+msgid "Notifications"
+msgstr "Notifications"
+
 msgid "Email"
 msgstr "Email"
+
+msgid "SMS"
+msgstr "SMS"
+
+msgid "Webhooks"
+msgstr "Webhooks"
 
 msgid "Phone number"
 msgstr "Téléphone"
@@ -302,6 +314,9 @@ msgstr "Les résultats finaux sont disponibles sur ${url}"
 #, python-format
 msgid "New intermediate results are available on ${url}"
 msgstr "Les nouveaux résultats intermédiaires sont disponibles sur ${url}"
+
+msgid "Password reset"
+msgstr "Réinitialisation du mot de passe"
 
 msgid "Federal"
 msgstr "Fédéral"
@@ -572,6 +587,14 @@ msgstr ""
 "Si vous ne souhaitez pas modifier votre mot de passe, vous pouvez ignorer ce "
 "message."
 
+msgid ""
+"Successfully subscribed to the email service. You will receive an email "
+"every time new results are published."
+msgstr ""
+
+msgid "Unsubscribe"
+msgstr ""
+
 msgid "Upload results"
 msgstr "Mettre à jour les résultats"
 
@@ -770,9 +793,6 @@ msgstr ""
 "Identifiant ou mot de passe erroné. Le lien de réinitialisation du mot de "
 "passe a expiré."
 
-msgid "Password reset"
-msgstr "Réinitialisation du mot de passe"
-
 msgid "Access Denied"
 msgstr "Accès refusé"
 
@@ -818,11 +838,6 @@ msgstr ""
 "répartis par municipalités et par candidats."
 
 msgid ""
-"Successfully subscribed to the email services. You will receive an email "
-"every time new results are published."
-msgstr ""
-
-msgid ""
 "You will receive an email as soon as new results have been published. You "
 "can unsubscribe at any time."
 msgstr ""
@@ -833,7 +848,7 @@ msgid ""
 msgstr ""
 
 msgid ""
-"You will receive an SMS as soon as new results have been published. The SMS "
+"You will receive a SMS as soon as new results have been published. The SMS "
 "service is free of charge. You can unsubscribe at any time."
 msgstr ""
 "Vous recevrez un SMS dès que de nouveaux résultats seront publiés. Le "

@@ -7,7 +7,7 @@ from onegov.election_day.models import Principal
 
 def test_vote_form_domains():
     form = VoteForm()
-    assert form.domain.choices == None
+    assert form.domain.choices is None
 
     form.set_domain(Principal(name='be', canton='be'))
     assert sorted(form.domain.choices) == [

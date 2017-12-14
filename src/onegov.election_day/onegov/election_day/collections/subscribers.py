@@ -1,4 +1,5 @@
 from onegov.core.collection import Pagination
+from onegov.core.templates import render_template
 from onegov.election_day import _
 from onegov.election_day.models import EmailSubscriber
 from onegov.election_day.models import SmsSubscriber
@@ -93,6 +94,48 @@ class SubscriberCollection(SubscriberCollectionPagination):
         self.session.flush()
 
 
+class EmailSubscriberCollection(SubscriberCollection):
+
+    @property
+    def model_class(self):
+        return EmailSubscriber
+
+    def confirm_subscription(self, subscriber, request):
+        """ Give the (new) subscriber a confirmation that he successfully
+        subscribed. """
+
+        from onegov.election_day.layouts import MailLayout  # circular
+
+        optout = request.link(request.app.principal, 'unsubscribe-email')
+        token = request.new_url_safe_token({'address': subscriber.address})
+
+        request.app.send_email(
+            subject=request.translate(
+                _("Successfully subscribed to the email service")
+            ),
+            receivers=(subscriber.address, ),
+            reply_to='{} <{}>'.format(
+                request.app.principal.name, request.app.mail_sender
+            ),
+            content=render_template(
+                'mail_subscribed.pt',
+                request,
+                {
+                    'title': request.translate(
+                        _("Successfully subscribed to the email service")
+                    ),
+                    'model': None,
+                    'optout': optout,
+                    'layout': MailLayout(self, request)
+                }
+            ),
+            headers={
+                'List-Unsubscribe': '<{}?opaque={}>'.format(optout, token),
+                'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+            }
+        )
+
+
 class SmsSubscriberCollection(SubscriberCollection):
 
     @property
@@ -104,22 +147,8 @@ class SmsSubscriberCollection(SubscriberCollection):
         subscribed. """
 
         content = _(
-            "Successfully subscribed to the SMS services. You will"
-            " receive an SMS every time new results are published."
+            "Successfully subscribed to the SMS service. You will"
+            " receive a SMS every time new results are published."
         )
         content = request.translate(content)
         request.app.send_sms(subscriber.address, content)
-
-
-class EmailSubscriberCollection(SubscriberCollection):
-
-    @property
-    def model_class(self):
-        return EmailSubscriber
-
-    def confirm_subscription(self, subscriber, request):
-        """ Give the (new) subscriber a confirmation that he successfully
-        subscribed. """
-
-        # todo:
-        pass

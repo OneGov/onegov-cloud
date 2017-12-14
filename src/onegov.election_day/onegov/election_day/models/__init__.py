@@ -1,6 +1,7 @@
 from onegov.election_day.models.archived_result import ArchivedResult
 from onegov.election_day.models.data_source import DataSource
 from onegov.election_day.models.data_source import DataSourceItem
+from onegov.election_day.models.notification import EmailNotification
 from onegov.election_day.models.notification import Notification
 from onegov.election_day.models.notification import SmsNotification
 from onegov.election_day.models.notification import WebhookNotification
@@ -14,6 +15,7 @@ __all__ = [
     'ArchivedResult',
     'DataSource',
     'DataSourceItem',
+    'EmailNotification',
     'EmailSubscriber',
     'Notification',
     'Principal',

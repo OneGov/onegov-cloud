@@ -18,11 +18,14 @@ msgid "Not a valid phone number."
 msgstr "Non è un numero di telefono valido."
 
 msgid ""
-"Successfully subscribed to the SMS services. You will receive an SMS every "
+"Successfully subscribed to the SMS service. You will receive a SMS every "
 "time new results are published."
 msgstr ""
 "Ti sei iscritto con successo al servizio SMS. Riceverai un SMS ogni volta "
 "che un nuovo risultato verrà pubblicato."
+
+msgid "Successfully subscribed to the email service"
+msgstr ""
 
 #, python-format
 msgid "Missing columns: '${cols}'"
@@ -202,8 +205,17 @@ msgstr "Elezione secondo il sistema maggioritario"
 msgid "Election based on proportional representation"
 msgstr "Elezione secondo il sistema proporzionale"
 
+msgid "Notifications"
+msgstr "Notifiche"
+
 msgid "Email"
 msgstr "E-mail"
+
+msgid "SMS"
+msgstr "SMS"
+
+msgid "Webhooks"
+msgstr "Webhooks"
 
 msgid "Phone number"
 msgstr "Numero di telefono"
@@ -302,6 +314,9 @@ msgstr "Risultati finali sono disponibili su ${url}"
 #, python-format
 msgid "New intermediate results are available on ${url}"
 msgstr "Nuovi risultati intermedi sono disponibili su ${url}"
+
+msgid "Password reset"
+msgstr "Ripristino della password"
 
 msgid "Federal"
 msgstr "Nazionale"
@@ -569,6 +584,14 @@ msgstr "Fare clic sul collegamento seguente per impostare una nuova password:"
 msgid "If you don't want to change your password, you can ignore this email."
 msgstr "Se non si desidera modificare la password, ignorare questa e-mail."
 
+msgid ""
+"Successfully subscribed to the email service. You will receive an email "
+"every time new results are published."
+msgstr ""
+
+msgid "Unsubscribe"
+msgstr ""
+
 msgid "Upload results"
 msgstr "Caricare risultati"
 
@@ -767,9 +790,6 @@ msgstr ""
 "Il collegamento per reimpostare il nuome utente o la password errati non è "
 "più valido."
 
-msgid "Password reset"
-msgstr "Ripristino della password"
-
 msgid "Access Denied"
 msgstr "Accesso Negato"
 
@@ -815,11 +835,6 @@ msgstr ""
 "${principal}, suddivisi per municipalit e candidati."
 
 msgid ""
-"Successfully subscribed to the email services. You will receive an email "
-"every time new results are published."
-msgstr ""
-
-msgid ""
 "You will receive an email as soon as new results have been published. You "
 "can unsubscribe at any time."
 msgstr ""
@@ -830,7 +845,7 @@ msgid ""
 msgstr ""
 
 msgid ""
-"You will receive an SMS as soon as new results have been published. The SMS "
+"You will receive a SMS as soon as new results have been published. The SMS "
 "service is free of charge. You can unsubscribe at any time."
 msgstr ""
 "Riceverai un SMS appena un nuovo risultato verrà pubblicato. Il servizio SMS "

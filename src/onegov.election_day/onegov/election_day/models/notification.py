@@ -7,6 +7,7 @@ from onegov.core.orm.types import UTCDateTime
 from onegov.core.orm.types import UUID
 from onegov.core.utils import PostThread
 from onegov.election_day import _
+from onegov.election_day.models.subscriber import EmailSubscriber
 from onegov.election_day.models.subscriber import SmsSubscriber
 from onegov.election_day.utils import get_summary
 from sqlalchemy import Column
@@ -96,6 +97,25 @@ class WebhookNotification(Notification):
                     data,
                     tuple((key, value) for key, value in headers.items())
                 ).start()
+
+
+class EmailNotification(Notification):
+
+    __mapper_args__ = {'polymorphic_identity': 'email'}
+
+    def trigger(self, request, model):
+        """ Sends the results of the vote or election to all subscribers.
+
+        Adds unsubscribe headers (RFC 2369, RFC 8058).
+
+        """
+        self.update_from_model(model)
+
+        session = request.app.session()
+        subscribers = session.query(EmailSubscriber).all()
+        for subscriber in subscribers:
+            # todo:
+            pass
 
 
 class SmsNotification(Notification):

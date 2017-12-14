@@ -1,13 +1,11 @@
-""" The manage views. """
-
-import morepath
-
+from morepath import redirect
 from onegov.ballot import Vote, VoteCollection
 from onegov.core.utils import groupbylist
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import NotificationCollection
+from onegov.election_day.forms import TriggerNotificationForm
 from onegov.election_day.forms import VoteForm
 from onegov.election_day.layouts import ManageVotesLayout
 
@@ -17,7 +15,6 @@ from onegov.election_day.layouts import ManageVotesLayout
     template='manage/votes.pt',
 )
 def view_votes(self, request):
-
     """ View a list of all votes. """
 
     return {
@@ -34,7 +31,6 @@ def view_votes(self, request):
     form=VoteForm
 )
 def create_vote(self, request, form):
-
     """ Create a new vote. """
 
     layout = ManageVotesLayout(self, request)
@@ -47,7 +43,7 @@ def create_vote(self, request, form):
         form.update_model(vote)
         archive.add(vote, request)
         request.message(_("Vote added."), 'success')
-        return morepath.redirect(layout.manage_model_link)
+        return redirect(layout.manage_model_link)
 
     return {
         'layout': layout,
@@ -63,7 +59,6 @@ def create_vote(self, request, form):
     form=VoteForm
 )
 def edit_vote(self, request, form):
-
     """ Edit an existing vote. """
 
     layout = ManageVotesLayout(self, request)
@@ -75,7 +70,7 @@ def edit_vote(self, request, form):
         form.update_model(self)
         archive.update(self, request)
         request.message(_("Vote modified."), 'success')
-        return morepath.redirect(layout.manage_model_link)
+        return redirect(layout.manage_model_link)
 
     if not form.errors:
         form.apply_model(self)
@@ -95,7 +90,6 @@ def edit_vote(self, request, form):
     name='clear'
 )
 def clear_vote(self, request, form):
-
     """ Clear the results of a vote. """
 
     layout = ManageVotesLayout(self, request)
@@ -104,7 +98,7 @@ def clear_vote(self, request, form):
     if form.submitted(request):
         archive.clear(self, request)
         request.message(_("Results deleted."), 'success')
-        return morepath.redirect(layout.manage_model_link)
+        return redirect(layout.manage_model_link)
 
     return {
         'message': _(
@@ -129,7 +123,6 @@ def clear_vote(self, request, form):
     name='delete'
 )
 def delete_vote(self, request, form):
-
     """ Delete an existing vote. """
 
     layout = ManageVotesLayout(self, request)
@@ -138,7 +131,7 @@ def delete_vote(self, request, form):
     if form.submitted(request):
         archive.delete(self, request)
         request.message(_("Vote deleted."), 'success')
-        return morepath.redirect(layout.manage_model_link)
+        return redirect(layout.manage_model_link)
 
     return {
         'message': _(
@@ -160,10 +153,10 @@ def delete_vote(self, request, form):
 
 @ElectionDayApp.manage_form(
     model=Vote,
-    name='trigger'
+    name='trigger',
+    form=TriggerNotificationForm
 )
 def trigger_vote(self, request, form):
-
     """ Trigger the notifications related to a vote. """
 
     session = request.app.session()
@@ -171,9 +164,9 @@ def trigger_vote(self, request, form):
     layout = ManageVotesLayout(self, request)
 
     if form.submitted(request):
-        notifications.trigger(request, self)
+        notifications.trigger(request, self, form.notifications.data)
         request.message(_("Notifications triggered."), 'success')
-        return morepath.redirect(layout.manage_model_link)
+        return redirect(layout.manage_model_link)
 
     callout = None
     message = ''

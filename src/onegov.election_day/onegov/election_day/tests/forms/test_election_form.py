@@ -6,7 +6,7 @@ from onegov.election_day.models import Principal
 
 def test_election_form_domains():
     form = ElectionForm()
-    assert ElectionForm().domain.choices == None
+    assert ElectionForm().domain.choices is None
 
     form.set_domain(Principal(name='be', canton='be'))
     assert sorted(form.domain.choices) == [
@@ -48,7 +48,7 @@ def test_election_form_model(election_day_app):
     assert form.election_type.data == 'proporz'
     assert form.mandates.data == 5
     assert form.related_link.data == 'http://u.rl'
-    assert form.tacit.data == False
+    assert form.tacit.data is False
 
     form.election_de.data = 'An Election (DE)'
     form.election_fr.data = 'An Election (FR)'
@@ -77,4 +77,4 @@ def test_election_form_model(election_day_app):
     assert model.number_of_mandates == 2
     assert model.absolute_majority == 10000
     assert model.related_link == 'http://ur.l'
-    assert model.tacit == True
+    assert model.tacit is True

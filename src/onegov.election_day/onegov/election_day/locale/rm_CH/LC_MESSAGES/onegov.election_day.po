@@ -17,11 +17,14 @@ msgid "Not a valid phone number."
 msgstr "Numer da telefon nunvalaivel."
 
 msgid ""
-"Successfully subscribed to the SMS services. You will receive an SMS every "
+"Successfully subscribed to the SMS service. You will receive a SMS every "
 "time new results are published."
 msgstr ""
 "La communicaziun per SMS è vegnida abunada. A partir d'ussa survegnis Vus in "
 "SMS, uschespert che novs resultats èn vegnids publitgads."
+
+msgid "Successfully subscribed to the email service"
+msgstr ""
 
 #, python-format
 msgid "Missing columns: '${cols}'"
@@ -202,8 +205,17 @@ msgstr "Elecziun da maiorz"
 msgid "Election based on proportional representation"
 msgstr "Elecziun da proporz"
 
+msgid "Notifications"
+msgstr ""
+
 msgid "Email"
 msgstr "E-mail"
+
+msgid "SMS"
+msgstr ""
+
+msgid "Webhooks"
+msgstr ""
 
 msgid "Phone number"
 msgstr "Numer da telefon"
@@ -302,6 +314,9 @@ msgstr "Resultats finals disponibels sin ${url}"
 #, python-format
 msgid "New intermediate results are available on ${url}"
 msgstr "Novs resultats intermediars disponibels sin ${url}"
+
+msgid "Password reset"
+msgstr "Redefinir il pled-clav"
 
 msgid "Federal"
 msgstr "Sin plaun naziunal"
@@ -609,6 +624,14 @@ msgstr ""
 "Vus pudais ignorar quest e-mail, sche Vus na vulessas betg midar Voss pled-"
 "clav."
 
+msgid ""
+"Successfully subscribed to the email service. You will receive an email "
+"every time new results are published."
+msgstr ""
+
+msgid "Unsubscribe"
+msgstr ""
+
 msgid "Upload results"
 msgstr "Chargiar si resultats"
 
@@ -807,9 +830,6 @@ msgstr "Midà il pled-clav."
 msgid "Wrong username or password reset link not valid any more."
 msgstr "L'adressa è nunvalaivla u il link è nunvalaivel."
 
-msgid "Password reset"
-msgstr "Redefinir il pled-clav"
-
 msgid "Access Denied"
 msgstr "Refusà l'access"
 
@@ -858,11 +878,6 @@ msgstr ""
 "resultats da tut las candidatas e da tut ils candidats tenor vischnancas."
 
 msgid ""
-"Successfully subscribed to the email services. You will receive an email "
-"every time new results are published."
-msgstr ""
-
-msgid ""
 "You will receive an email as soon as new results have been published. You "
 "can unsubscribe at any time."
 msgstr ""
@@ -873,7 +888,7 @@ msgid ""
 msgstr ""
 
 msgid ""
-"You will receive an SMS as soon as new results have been published. The SMS "
+"You will receive a SMS as soon as new results have been published. The SMS "
 "service is free of charge. You can unsubscribe at any time."
 msgstr ""
 "Vus survegnis in SMS, uschespert che novs resultats èn vegnids publitgads. "

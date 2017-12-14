@@ -9,7 +9,7 @@ from onegov.election_day.models import ArchivedResult
 from onegov.election_day.tests import DummyRequest
 
 
-def test_archive(session):
+def test_archived_result_collection(session):
     archive = ArchivedResultCollection(session)
 
     assert archive.for_date(2015).date == 2015
@@ -83,7 +83,7 @@ def test_archive(session):
         assert groups[date(year, 1, 1)]['federation']['vote'] == [item]
 
 
-def test_archive_grouping(session):
+def test_archived_result_collection_grouping(session):
     for domain in ('federation', 'canton', 'municipality'):
         session.add(
             Election(
@@ -146,7 +146,7 @@ def test_archive_grouping(session):
     assert all([list(group) == expected for group in grouped.values()])
 
 
-def test_archived_results(session):
+def test_archived_result_collection_updates(session):
     archive = ArchivedResultCollection(session)
     request = DummyRequest()
 
@@ -221,14 +221,14 @@ def test_archived_results(session):
     assert result.schema
     assert result.domain == 'federation'
     assert result.date == date(2001, 1, 1)
-    assert result.shortcode == None
+    assert result.shortcode is None
     assert result.title == 'Election 2001'
     assert result.title_translations == {'de_CH': 'Election 2001'}
     assert result.last_modified is not None
     assert result.last_result_change is None
     assert result.type == 'election'
-    assert result.counted_entities == None
-    assert result.total_entities == None
+    assert result.counted_entities is None
+    assert result.total_entities is None
     assert result.progress == (0, 0)
     assert result.external_id == 'election-2001'
     assert result.elected_candidates == []
@@ -264,7 +264,7 @@ def test_archived_results(session):
     assert result.schema
     assert result.domain == 'federation'
     assert result.date == date(2001, 1, 1)
-    assert result.shortcode == None
+    assert result.shortcode is None
     assert result.title == 'Vote 2001'
     assert result.title_translations == {'de_CH': 'Vote 2001'}
     assert result.last_modified is not None

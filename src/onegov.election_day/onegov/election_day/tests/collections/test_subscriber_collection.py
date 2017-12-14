@@ -63,18 +63,43 @@ def test_subscriber_collection(session):
     assert collection.query().count() == 0
 
 
-def test_subscriber_collection_confirm(session):
+def test_subscriber_collection_confirm_email(session):
     request = DummyRequest(locale='de_CH')
-
-    # todo: Test EmailSubscriberCollection
+    request.new_url_safe_token = lambda x: x
+    request.get_translate = lambda for_chameleon: None
+    collection = EmailSubscriberCollection(session)
 
     with patch.object(request, 'app') as app:
-        collection = SmsSubscriberCollection(session)
+        collection.subscribe('howard@example.org', request)
+        assert app.send_email.call_count == 1
 
+        kw = app.send_email.call_args[1]
+        assert kw['receivers'] == ('howard@example.org',)
+        assert kw['subject'] == 'Successfully subscribed to the email service'
+        headers = kw['headers']
+        assert headers['List-Unsubscribe-Post'] == 'List-Unsubscribe=One-Click'
+        assert (
+            "/unsubscribe-email?opaque={'address': 'howard@example.org'}"
+            in headers['List-Unsubscribe']
+        )
+
+        collection.subscribe('howard@example.org', request)
+        assert app.send_email.call_count == 1
+
+        collection.unsubscribe('howard@example.org')
+        collection.subscribe('howard@example.org', request)
+        assert app.send_email.call_count == 2
+
+
+def test_subscriber_collection_confirm_sms(session):
+    request = DummyRequest(locale='de_CH')
+    collection = SmsSubscriberCollection(session)
+
+    with patch.object(request, 'app') as app:
         collection.subscribe('+41791112233', request)
         assert app.send_sms.call_count == 1
         assert app.send_sms.call_args[0][0] == '+41791112233'
-        assert 'Successfully subscribed to the SMS services' in \
+        assert 'Successfully subscribed to the SMS service' in \
             app.send_sms.call_args[0][1]
 
         collection.subscribe('+41791112233', request)

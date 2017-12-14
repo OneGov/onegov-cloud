@@ -18,11 +18,14 @@ msgid "Not a valid phone number."
 msgstr "Ungültige Telefonnummer."
 
 msgid ""
-"Successfully subscribed to the SMS services. You will receive an SMS every "
+"Successfully subscribed to the SMS service. You will receive a SMS every "
 "time new results are published."
 msgstr ""
 "Die SMS-Benachrichtigung wurde abonniert. Sie erhalten in Zukunft eine SMS, "
 "sobald neue Resultate publiziert wurden."
+
+msgid "Successfully subscribed to the email service"
+msgstr "E-Mail-Benachrichtigung abonniert"
 
 #, python-format
 msgid "Missing columns: '${cols}'"
@@ -202,8 +205,17 @@ msgstr "Majorzwahl"
 msgid "Election based on proportional representation"
 msgstr "Proporzwahl"
 
+msgid "Notifications"
+msgstr "Benachrichtigungen"
+
 msgid "Email"
 msgstr "E-Mail"
+
+msgid "SMS"
+msgstr "SMS"
+
+msgid "Webhooks"
+msgstr "Webhooks"
 
 msgid "Phone number"
 msgstr "Telefonnummer"
@@ -302,6 +314,9 @@ msgstr "Schlussresultate verfügbar auf ${url}"
 #, python-format
 msgid "New intermediate results are available on ${url}"
 msgstr "Neue Zwischenresultate verfügbar auf ${url}"
+
+msgid "Password reset"
+msgstr "Passwort zurücksetzen"
 
 msgid "Federal"
 msgstr "National"
@@ -571,6 +586,16 @@ msgstr ""
 "Sie können dieses E-Mail ignorieren, falls Sie Ihr Passwort nicht ändern "
 "möchten."
 
+msgid ""
+"Successfully subscribed to the email service. You will receive an email "
+"every time new results are published."
+msgstr ""
+"Die E-Mail-Benachrichtigung wurde abonniert. Sie erhalten in Zukunft eine E-"
+"Mail, sobald neue Resultate publiziert wurden."
+
+msgid "Unsubscribe"
+msgstr "Abmelden"
+
 msgid "Upload results"
 msgstr "Resultate hochladen"
 
@@ -769,9 +794,6 @@ msgstr "Passwort geändert."
 msgid "Wrong username or password reset link not valid any more."
 msgstr "Ungültige Addresse oder abgelaufener Link."
 
-msgid "Password reset"
-msgstr "Passwort zurücksetzen"
-
 msgid "Access Denied"
 msgstr "Zugriff verweigert"
 
@@ -818,13 +840,6 @@ msgstr ""
 "${principal}, aufgeschlüsselt nach Kandidaten und Gemeinden."
 
 msgid ""
-"Successfully subscribed to the email services. You will receive an email "
-"every time new results are published."
-msgstr ""
-"Die E-Mail-Benachrichtigung wurde abonniert. Sie erhalten in Zukunft eine E-"
-"Mail, sobald neue Resultate publiziert wurden."
-
-msgid ""
 "You will receive an email as soon as new results have been published. You "
 "can unsubscribe at any time."
 msgstr ""
@@ -839,7 +854,7 @@ msgstr ""
 "Mail mehr."
 
 msgid ""
-"You will receive an SMS as soon as new results have been published. The SMS "
+"You will receive a SMS as soon as new results have been published. The SMS "
 "service is free of charge. You can unsubscribe at any time."
 msgstr ""
 "Sie erhalten eine SMS, sobald neue Resultate publiziert wurden. Der SMS "
@@ -958,6 +973,3 @@ msgstr "Keine Proporzwahl"
 
 msgid "The data source is not configured properly"
 msgstr "Die Datenquellekonfiguration ist ungültig"
-
-#~ msgid "Select at least one title."
-#~ msgstr "Geben Sie mindestens einen Titel ein."
