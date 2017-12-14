@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Updates fullcalendar to latest release.
+  [href]
+
 0.19.4 (2017-12-11)
 ~~~~~~~~~~~~~~~~~~~
 

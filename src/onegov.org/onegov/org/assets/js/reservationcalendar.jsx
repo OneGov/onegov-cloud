@@ -192,7 +192,7 @@ rc.getFullcalendarOptions = function(options) {
     fcOptions.eventRenderers.push(rc.setupEventPopups);
 
     fcOptions.eventAfterRender = function(event, element, view) {
-        var renderers = view.calendar.options.eventRenderers;
+        var renderers = view.options.eventRenderers;
         for (var i = 0; i < renderers.length; i++) {
             renderers[i](event, element, view);
         }
@@ -200,7 +200,7 @@ rc.getFullcalendarOptions = function(options) {
 
     // view change rendering
     fcOptions.viewRender = function(view, element) {
-        var renderers = view.calendar.options.viewRenderers;
+        var renderers = view.options.viewRenderers;
         for (var i = 0; i < renderers.length; i++) {
             renderers[i](view, element);
         }
@@ -256,8 +256,8 @@ rc.setupEventPopups = function(event, element, view) {
 
 // highlight events implementation
 rc.highlightEvents = function(event, element, view) {
-    var min = view.calendar.options.highlights_min;
-    var max = view.calendar.options.highlights_max;
+    var min = view.options.highlights_min;
+    var max = view.options.highlights_max;
 
     if (min === null || max === null) {
         return;
@@ -476,7 +476,7 @@ rc.setupReservationSelect = function(fcOptions) {
             .insertAfter(view);
         $('<div class="clearfix"></div>').insertAfter(selection);
 
-        calendar.fullCalendar('option', 'aspectRatio', 1.1415926);
+        calendar.fullCalendar('option', 'aspectRatio', 1.2);
 
         calendar.on('rc-reservation-error', function(_e, data, _calendar, target) {
             var event = calendar.find('.has-popup');
