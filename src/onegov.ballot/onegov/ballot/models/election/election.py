@@ -214,7 +214,7 @@ class Election(Base, TimestampMixin, DerivedAttributesMixin,
         )
         results = results.filter(
             Candidate.election_id == self.id,
-            Candidate.elected == True
+            Candidate.elected.is_(True)
         )
         results = results.order_by(
             Candidate.family_name,

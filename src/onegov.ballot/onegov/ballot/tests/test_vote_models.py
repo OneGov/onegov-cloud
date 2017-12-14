@@ -85,7 +85,7 @@ def test_ballot(session):
 
     result = ballot.results.one()
     assert result.group == 'ZG/Rotkreuz'
-    assert result.counted == True
+    assert result.counted is True
     assert result.yeas == 4982
     assert result.nays == 4452
     assert result.empty == 500
@@ -558,7 +558,7 @@ def test_vote_last_change(session):
         session.flush()
 
     assert vote.last_modified.isoformat().startswith('2014-01-01')
-    assert vote.last_result_change == None
+    assert vote.last_result_change is None
 
     # Add results
     with freeze_time("2014-01-02"):
@@ -921,7 +921,7 @@ def test_clear_ballot(session):
 
     vote.proposal.clear_results()
 
-    assert vote.proposal.results.first() == None
+    assert vote.proposal.results.first() is None
 
 
 def test_clear_vote(session):
@@ -950,4 +950,4 @@ def test_clear_vote(session):
     vote.clear_results()
 
     assert vote.status is None
-    assert vote.proposal.results.first() == None
+    assert vote.proposal.results.first() is None

@@ -124,7 +124,7 @@ def test_election_create_all_models(session):
 
     assert connection.election == election
     assert connection.lists.all() == []
-    assert connection.parent == None
+    assert connection.parent is None
     assert connection.children.one() == subconnection
 
     assert subconnection.election is None
@@ -282,27 +282,27 @@ def test_election_counted(session):
     session.add(election)
     session.flush()
 
-    assert election.counted == False
+    assert election.counted is False
     assert election.progress == (0, 0)
 
     election.total_entities = 2
-    assert election.counted == False
+    assert election.counted is False
     assert election.progress == (0, 2)
 
     election.counted_entities = 1
-    assert election.counted == False
+    assert election.counted is False
     assert election.progress == (1, 2)
 
     election.counted_entities = 2
-    assert election.counted == True
+    assert election.counted is True
     assert election.progress == (2, 2)
 
     election.total_entities = 0
-    assert election.counted == False
+    assert election.counted is False
     assert election.progress == (2, 0)
 
     election.total_entities = None
-    assert election.counted == False
+    assert election.counted is False
     assert election.progress == (2, 0)
 
 
@@ -318,7 +318,7 @@ def test_election_last_change(session):
         session.flush()
 
     assert election.last_modified.isoformat().startswith('2014-01-01')
-    assert election.last_result_change == None
+    assert election.last_result_change is None
 
     # Add a result
     with freeze_time("2014-01-02"):
@@ -420,7 +420,7 @@ def test_election_last_change_proporz(session):
         session.flush()
 
     assert election.last_modified.isoformat().startswith('2014-01-01')
-    assert election.last_result_change == None
+    assert election.last_result_change is None
 
     # Add a result
     with freeze_time("2014-01-02"):
@@ -1365,11 +1365,11 @@ def test_election_status(session):
         ):
             election.counted_entities = counted
             election.total_entities = total
-            assert election.completed == False
+            assert election.completed is False
 
         election.counted_entities = 5
         election.total_entities = 5
-        assert election.completed == True
+        assert election.completed is True
 
     for status, completed in (('interim', False), ('final', True)):
         election.status = status
