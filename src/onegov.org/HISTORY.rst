@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes redactor not working in Chrome 60+.
+  [href]
+
 - Updates fullcalendar to latest release.
   [href]
 
