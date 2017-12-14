@@ -147,6 +147,9 @@ class FieldTypeMigrations(object):
     def radio_to_checkbox(self, value):
         return value
 
+    def text_to_url(self, value):
+        return value
+
 
 class StructuralChanges(object):
     """ Tries to detect structural changes between two formcode blocks.

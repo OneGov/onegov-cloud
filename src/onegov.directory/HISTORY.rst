@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for text to url migration.
+  [href]
+
 - Changes the category filter from AND to OR.
   [href]
 
