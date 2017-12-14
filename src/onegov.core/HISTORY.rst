@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.54.4 (2017-12-14)
+~~~~~~~~~~~~~~~~~~~
 
 - Allows to specify extra mail headers.
   [msom]
