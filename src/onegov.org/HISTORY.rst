@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.19.5 (2017-12-14)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes redactor not working in Chrome 60+.
   [href]
 
