@@ -1465,3 +1465,31 @@ def test_clear_election(session):
     assert election.candidates.all() == []
     assert election.results.all() == []
     assert election.party_results.all() == []
+
+
+def test_election_has_results(session):
+    election = Election(
+        title='Election',
+        domain='federation',
+        date=date(2015, 6, 14),
+        number_of_mandates=1
+    )
+    session.add(election)
+    session.flush()
+
+    assert election.has_results is False
+
+    election.results.append(
+        ElectionResult(
+            group='group',
+            entity_id=1,
+            elegible_voters=100,
+            received_ballots=2,
+            blank_ballots=3,
+            invalid_ballots=4,
+            blank_votes=5,
+            invalid_votes=6
+        )
+    )
+
+    assert election.has_results is True

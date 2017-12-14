@@ -951,3 +951,47 @@ def test_clear_vote(session):
 
     assert vote.status is None
     assert vote.proposal.results.first() is None
+
+
+def test_vote_has_results(session):
+    vote = Vote(
+        title="Vote",
+        domain='federation',
+        date=date(2015, 6, 14)
+    )
+    session.add(vote)
+    session.flush()
+
+    assert vote.has_results is False
+
+    # Simple vote
+    vote.ballots.append(Ballot(type='proposal'))
+    vote.proposal.results.append(
+        BallotResult(
+            group='A',
+            counted=True,
+            yeas=100,
+            nays=50,
+            entity_id=1,
+        )
+    )
+    assert vote.has_results is True
+
+    # Complex vote
+    vote.ballots.append(Ballot(type='counter-proposal'))
+    vote.ballots.append(Ballot(type='tie-breaker'))
+    vote.type = 'complex'
+    vote.__class__ = ComplexVote
+    session.delete(vote.proposal.results.one())
+    assert vote.has_results is False
+
+    vote.counter_proposal.results.append(
+        BallotResult(
+            group='D',
+            counted=True,
+            yeas=100,
+            nays=50,
+            entity_id=1,
+        )
+    )
+    assert vote.has_results is True

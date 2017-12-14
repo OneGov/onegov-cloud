@@ -97,6 +97,8 @@ class Vote(Base, TimestampMixin, DerivedBallotsCountMixin,
 
     @property
     def counted(self):
+        """ Checks if there are results for all entitites. """
+
         if not self.ballots.first():
             return False
 
@@ -105,6 +107,20 @@ class Vote(Base, TimestampMixin, DerivedBallotsCountMixin,
                 return False
 
         return True
+
+    @property
+    def has_results(self):
+        """ Returns True, if there are any results. """
+
+        if not self.ballots.first():
+            return False
+
+        for ballot in self.ballots:
+            for result in ballot.results:
+                if result.counted:
+                    return True
+
+        return False
 
     @property
     def answer(self):

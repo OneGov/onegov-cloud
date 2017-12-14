@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a helper to check if elections and votes have results.
+  [msom]
+
 1.10.1 (2017-12-01)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -109,6 +109,14 @@ class Election(Base, TimestampMixin, DerivedAttributesMixin,
 
         return False
 
+    @property
+    def has_results(self):
+        """ Returns True, if the election has any results. """
+
+        if self.results.first():
+            return True
+        return False
+
     #: An election contains n candidates
     candidates = relationship(
         'Candidate',
