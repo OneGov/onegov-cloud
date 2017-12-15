@@ -307,6 +307,12 @@ msgstr "Email iscritti"
 msgid "Subscribers"
 msgstr "Iscritti"
 
+msgid "Final results"
+msgstr "Risultati finali"
+
+msgid "New intermediate results"
+msgstr "Nuovi risultati intermedi"
+
 #, python-format
 msgid "Final results are available on ${url}"
 msgstr "Risultati finali sono disponibili su ${url}"
@@ -315,8 +321,14 @@ msgstr "Risultati finali sono disponibili su ${url}"
 msgid "New intermediate results are available on ${url}"
 msgstr "Nuovi risultati intermedi sono disponibili su ${url}"
 
-msgid "Password reset"
-msgstr "Ripristino della password"
+msgid "Accepted"
+msgstr "Accolto"
+
+msgid "Rejected"
+msgstr "Respinto"
+
+msgid "Counter proposal accepted"
+msgstr "Controprogetto accettata"
 
 msgid "Federal"
 msgstr "Nazionale"
@@ -423,12 +435,6 @@ msgstr "Hai dimenticato la password?"
 msgid "Reset password"
 msgstr "Ripristina password"
 
-msgid "Accepted"
-msgstr "Accolto"
-
-msgid "Rejected"
-msgstr "Respinto"
-
 #, python-format
 msgid "${counted} of ${total}"
 msgstr "${counted} di ${total}"
@@ -495,9 +501,6 @@ msgstr "Iniziativa e controprogetto sono state rifiutate"
 
 msgid "Proposal accepted"
 msgstr "Iniziativa accettata"
-
-msgid "Counter proposal accepted"
-msgstr "Controprogetto accettata"
 
 msgid "Tie breaker in favor of the proposal"
 msgstr "Spareggio a favore della iniziativa"
@@ -789,6 +792,9 @@ msgid "Wrong username or password reset link not valid any more."
 msgstr ""
 "Il collegamento per reimpostare il nuome utente o la password errati non è "
 "più valido."
+
+msgid "Password reset"
+msgstr "Ripristino della password"
 
 msgid "Access Denied"
 msgstr "Accesso Negato"

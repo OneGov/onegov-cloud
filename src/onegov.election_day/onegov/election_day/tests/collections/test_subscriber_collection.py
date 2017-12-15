@@ -2,7 +2,7 @@ from onegov.election_day.collections import EmailSubscriberCollection
 from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.collections import SubscriberCollection
 from onegov.election_day.tests import DummyRequest
-from unittest.mock import patch
+from unittest.mock import Mock
 
 
 def test_subscriber_collection(session):
@@ -63,51 +63,56 @@ def test_subscriber_collection(session):
     assert collection.query().count() == 0
 
 
-def test_subscriber_collection_confirm_email(session):
-    request = DummyRequest(locale='de_CH')
-    request.new_url_safe_token = lambda x: x
-    request.get_translate = lambda for_chameleon: None
+def test_subscriber_collection_confirm_email(election_day_app, session):
+    mock = Mock()
+    election_day_app.send_email = mock
+    request = DummyRequest(
+        app=election_day_app, session=session, locale='de_CH'
+    )
     collection = EmailSubscriberCollection(session)
 
-    with patch.object(request, 'app') as app:
-        collection.subscribe('howard@example.org', request)
-        assert app.send_email.call_count == 1
+    collection.subscribe('howard@example.org', request)
+    assert mock.call_count == 1
+    assert mock.call_args[1]['receivers'] == ('howard@example.org',)
+    assert mock.call_args[1]['subject'] == 'E-Mail-Benachrichtigung abonniert'
+    assert mock.call_args[1]['headers']['List-Unsubscribe-Post'] == (
+        'List-Unsubscribe=One-Click'
+    )
+    assert mock.call_args[1]['headers']['List-Unsubscribe'] == (
+        "<Principal/unsubscribe-email?"
+        "opaque={'address': 'howard@example.org'}>"
+    )
 
-        kw = app.send_email.call_args[1]
-        assert kw['receivers'] == ('howard@example.org',)
-        assert kw['subject'] == 'Successfully subscribed to the email service'
-        headers = kw['headers']
-        assert headers['List-Unsubscribe-Post'] == 'List-Unsubscribe=One-Click'
-        assert (
-            "/unsubscribe-email?opaque={'address': 'howard@example.org'}"
-            in headers['List-Unsubscribe']
-        )
+    collection.subscribe('howard@example.org', request)
+    assert mock.call_count == 1
 
-        collection.subscribe('howard@example.org', request)
-        assert app.send_email.call_count == 1
-
-        collection.unsubscribe('howard@example.org')
-        collection.subscribe('howard@example.org', request)
-        assert app.send_email.call_count == 2
+    collection.unsubscribe('howard@example.org')
+    collection.subscribe('howard@example.org', request)
+    assert mock.call_count == 2
 
 
-def test_subscriber_collection_confirm_sms(session):
-    request = DummyRequest(locale='de_CH')
+def test_subscriber_collection_confirm_sms(election_day_app, session):
+    mock = Mock()
+    election_day_app.send_sms = mock
+    request = DummyRequest(
+        app=election_day_app, session=session, locale='de_CH'
+    )
     collection = SmsSubscriberCollection(session)
 
-    with patch.object(request, 'app') as app:
-        collection.subscribe('+41791112233', request)
-        assert app.send_sms.call_count == 1
-        assert app.send_sms.call_args[0][0] == '+41791112233'
-        assert 'Successfully subscribed to the SMS service' in \
-            app.send_sms.call_args[0][1]
+    collection.subscribe('+41791112233', request)
+    assert mock.call_count == 1
+    assert mock.call_args[0][0] == '+41791112233'
+    assert mock.call_args[0][1] == (
+        "Die SMS-Benachrichtigung wurde abonniert. Sie erhalten in Zukunft "
+        "eine SMS, sobald neue Resultate publiziert wurden."
+    )
 
-        collection.subscribe('+41791112233', request)
-        assert app.send_sms.call_count == 1
+    collection.subscribe('+41791112233', request)
+    assert mock.call_count == 1
 
-        collection.unsubscribe('+41791112233')
-        collection.subscribe('+41791112233', request)
-        assert app.send_sms.call_count == 2
+    collection.unsubscribe('+41791112233')
+    collection.subscribe('+41791112233', request)
+    assert mock.call_count == 2
 
 
 def test_subscriber_collection_pagination(session):

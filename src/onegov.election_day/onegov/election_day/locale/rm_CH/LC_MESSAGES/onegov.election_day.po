@@ -307,6 +307,12 @@ msgstr "E-mail abunents"
 msgid "Subscribers"
 msgstr "Abunents"
 
+msgid "Final results"
+msgstr "Resultats finals"
+
+msgid "New intermediate results"
+msgstr "Novs resultats intermediars"
+
 #, python-format
 msgid "Final results are available on ${url}"
 msgstr "Resultats finals disponibels sin ${url}"
@@ -315,8 +321,14 @@ msgstr "Resultats finals disponibels sin ${url}"
 msgid "New intermediate results are available on ${url}"
 msgstr "Novs resultats intermediars disponibels sin ${url}"
 
-msgid "Password reset"
-msgstr "Redefinir il pled-clav"
+msgid "Accepted"
+msgstr "Acceptà"
+
+msgid "Rejected"
+msgstr "Refusà"
+
+msgid "Counter proposal accepted"
+msgstr "Acceptà la cuntraproposta"
 
 msgid "Federal"
 msgstr "Sin plaun naziunal"
@@ -424,12 +436,6 @@ msgstr "Emblidà il pled-clav?"
 msgid "Reset password"
 msgstr "Redefinir il pled-clav"
 
-msgid "Accepted"
-msgstr "Acceptà"
-
-msgid "Rejected"
-msgstr "Refusà"
-
 #, python-format
 msgid "${counted} of ${total}"
 msgstr "${counted} da ${total}"
@@ -532,9 +538,6 @@ msgstr "Refusà l'iniziativa e la cuntraproposta"
 
 msgid "Proposal accepted"
 msgstr "Acceptà l'iniziativa"
-
-msgid "Counter proposal accepted"
-msgstr "Acceptà la cuntraproposta"
 
 msgid "Tie breaker in favor of the proposal"
 msgstr "Dumonda decisiva a favur da l'iniziativa"
@@ -829,6 +832,9 @@ msgstr "Midà il pled-clav."
 
 msgid "Wrong username or password reset link not valid any more."
 msgstr "L'adressa è nunvalaivla u il link è nunvalaivel."
+
+msgid "Password reset"
+msgstr "Redefinir il pled-clav"
 
 msgid "Access Denied"
 msgstr "Refusà l'access"

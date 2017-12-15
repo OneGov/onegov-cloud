@@ -307,6 +307,12 @@ msgstr "E-Mail-Abonnenten"
 msgid "Subscribers"
 msgstr "Abonnenten"
 
+msgid "Final results"
+msgstr "Schlussresultate"
+
+msgid "New intermediate results"
+msgstr "Neue Zwischenresultate"
+
 #, python-format
 msgid "Final results are available on ${url}"
 msgstr "Schlussresultate verfügbar auf ${url}"
@@ -315,8 +321,14 @@ msgstr "Schlussresultate verfügbar auf ${url}"
 msgid "New intermediate results are available on ${url}"
 msgstr "Neue Zwischenresultate verfügbar auf ${url}"
 
-msgid "Password reset"
-msgstr "Passwort zurücksetzen"
+msgid "Accepted"
+msgstr "Angenommen"
+
+msgid "Rejected"
+msgstr "Abgelehnt"
+
+msgid "Counter proposal accepted"
+msgstr "Gegenentwurf angenommen"
 
 msgid "Federal"
 msgstr "National"
@@ -423,12 +435,6 @@ msgstr "Passwort vergessen?"
 msgid "Reset password"
 msgstr "Passwort zurücksetzen"
 
-msgid "Accepted"
-msgstr "Angenommen"
-
-msgid "Rejected"
-msgstr "Abgelehnt"
-
 #, python-format
 msgid "${counted} of ${total}"
 msgstr "${counted} von ${total}"
@@ -497,9 +503,6 @@ msgstr "Initative und Gegenentwurf abgelehnt"
 
 msgid "Proposal accepted"
 msgstr "Initiative angenommen"
-
-msgid "Counter proposal accepted"
-msgstr "Gegenentwurf angenommen"
 
 msgid "Tie breaker in favor of the proposal"
 msgstr "Stichfrage zugunsten der Initiative"
@@ -793,6 +796,9 @@ msgstr "Passwort geändert."
 
 msgid "Wrong username or password reset link not valid any more."
 msgstr "Ungültige Addresse oder abgelaufener Link."
+
+msgid "Password reset"
+msgstr "Passwort zurücksetzen"
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"

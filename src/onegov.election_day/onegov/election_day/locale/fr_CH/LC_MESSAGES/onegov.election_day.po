@@ -307,6 +307,12 @@ msgstr "Abonnés e-mail"
 msgid "Subscribers"
 msgstr "Abonnés"
 
+msgid "Final results"
+msgstr "Résultats finaux"
+
+msgid "New intermediate results"
+msgstr "Nouveaux résultats intermédiaires"
+
 #, python-format
 msgid "Final results are available on ${url}"
 msgstr "Les résultats finaux sont disponibles sur ${url}"
@@ -315,8 +321,14 @@ msgstr "Les résultats finaux sont disponibles sur ${url}"
 msgid "New intermediate results are available on ${url}"
 msgstr "Les nouveaux résultats intermédiaires sont disponibles sur ${url}"
 
-msgid "Password reset"
-msgstr "Réinitialisation du mot de passe"
+msgid "Accepted"
+msgstr "Accepté"
+
+msgid "Rejected"
+msgstr "Refusé"
+
+msgid "Counter proposal accepted"
+msgstr "Contre-projet accepté"
 
 msgid "Federal"
 msgstr "Fédéral"
@@ -424,12 +436,6 @@ msgstr "Mot de passe oublié?"
 msgid "Reset password"
 msgstr "Réinitialiser mot de passe"
 
-msgid "Accepted"
-msgstr "Accepté"
-
-msgid "Rejected"
-msgstr "Refusé"
-
 #, python-format
 msgid "${counted} of ${total}"
 msgstr "${counted} de ${total}"
@@ -496,9 +502,6 @@ msgstr "Initiative et contre-projet rejetées"
 
 msgid "Proposal accepted"
 msgstr "Initiative acceptée"
-
-msgid "Counter proposal accepted"
-msgstr "Contre-projet accepté"
 
 msgid "Tie breaker in favor of the proposal"
 msgstr "Jeu décisif en faveur de l'initiative"
@@ -792,6 +795,9 @@ msgid "Wrong username or password reset link not valid any more."
 msgstr ""
 "Identifiant ou mot de passe erroné. Le lien de réinitialisation du mot de "
 "passe a expiré."
+
+msgid "Password reset"
+msgstr "Réinitialisation du mot de passe"
 
 msgid "Access Denied"
 msgstr "Accès refusé"

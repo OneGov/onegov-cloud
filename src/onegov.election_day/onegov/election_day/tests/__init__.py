@@ -55,11 +55,26 @@ class DummyRequest(object):
         )
 
     def translate(self, text):
-        return text.interpolate()
+        try:
+            return text.interpolate(
+                self.app.translations.get(self.locale).gettext(text)
+            )
+        except Exception:
+            return text.interpolate()
 
     def include(self, resource):
         self.includes.append(resource)
         self.includes = list(set(self.includes))
+
+    def new_url_safe_token(self, data):
+        return str(data)
+
+    def get_translate(self, for_chameleon=False):
+        if not self.app.locales:
+            return None
+        if for_chameleon:
+            return self.app.chameleon_translations.get(self.locale)
+        return self.app.translations.get(self.locale)
 
 
 def login(client):

@@ -22,16 +22,6 @@
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
     <title><div metal:define-slot="title"></div></title>
     <style tal:define="primary_color layout.primary_color">
-    /*csslint
-        important:false,
-        universal-selector:false,
-        unique-headings:false,
-        box-model:false
-    */
-
-    /*
-        Global
-    */
     * {
         margin: 0;
         padding: 0;
@@ -53,64 +43,10 @@
         font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
     }
 
-    /*
-        Elements
-    */
     a {
         color: <tal:block replace="primary_color" />;
     }
 
-    .btn-primary {
-        text-decoration: none;
-        color: #FFF;
-        background-color: <tal:block replace="primary_color" />;
-        border: solid <tal:block replace="primary_color" />;
-        border-width: 10px 20px;
-        line-height: 2;
-        font-weight: bold;
-        margin-right: 10px;
-        margin-top: 10px;
-        text-align: center;
-        cursor: pointer;
-        display: inline-block;
-        border-radius: 5px;
-    }
-
-    .btn-secondary {
-        text-decoration: none;
-        color: #FFF;
-        background-color: #aaa;
-        border: solid #aaa;
-        border-width: 10px 20px;
-        line-height: 2;
-        font-weight: bold;
-        margin-right: 10px;
-        text-align: center;
-        cursor: pointer;
-        display: inline-block;
-        border-radius: 5px;
-    }
-
-    .last {
-        margin-bottom: 0;
-    }
-
-    .first {
-        margin-top: 0;
-    }
-
-    .padding {
-        padding: 10px 0;
-    }
-
-    .ticket-number {
-        font-family: Consolas, "Liberation Mono", Courier, monospace;
-        font-weight: bold;
-    }
-
-    /*
-        Body
-    */
     table.body-wrap {
         width: 100%;
         padding: 20px;
@@ -150,16 +86,16 @@
     }
 
     h1 {
-        font-size: 36px;
-    }
-    h2 {
         font-size: 28px;
     }
-    h3 {
+    h2 {
         font-size: 22px;
     }
+    h3 {
+        font-size: 28px;
+    }
 
-    a, p, ul, ol {
+    a, p, ul, ol, dl {
         margin-bottom: 10px;
         font-weight: normal;
         font-size: 14px;
@@ -181,33 +117,14 @@
         margin-bottom: 10px;
     }
 
-    /*
-        Rulers
-    */
+    dt {
+        font-weight: bold;
+    }
+
     hr {
         border: 1px solid #ddd;
         border-width: 1px 0 0 0;
         margin-bottom: 20px;
-    }
-
-    /*
-        Reservations
-    */
-
-    .reservation {
-        border: 1px solid #eee;
-        color: #222;
-        margin-bottom: 10px;
-        padding: 0;
-    }
-
-    .header {
-        background-color: #eee;
-        padding: 5px 10px;
-    }
-
-    .body {
-        padding: 0 10px;
     }
 
     /*

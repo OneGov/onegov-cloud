@@ -17,6 +17,7 @@ def test_view_notifications_votes(election_day_app):
     new.form['domain'] = 'federation'
     new.form.submit()
 
+    # Test retrigger messages
     assert "Benachrichtigungen auslösen" not in client.get('/manage/votes')
     assert "Benachrichtigungen auszulösen" not in upload_vote(client, False)
 
@@ -34,6 +35,33 @@ def test_view_notifications_votes(election_day_app):
     upload_vote(client, False)
     assert "erneut auslösen" not in client.get('/vote/vote/trigger')
 
+    # Test email
+    principal = election_day_app.principal
+    principal.email_notification = True
+    election_day_app.cache.set('principal', principal)
+
+    anom = Client(election_day_app)
+    anom.get('/locale/fr_CH').follow()
+    subscribe = anom.get('/subscribe-email')
+    subscribe.form['email'] = 'hans@example.org'
+    subscribe.form.submit()
+
+    client.get('/vote/vote/trigger').form.submit()
+
+    message = election_day_app.smtp.outbox.pop()
+    assert message['To'] == 'hans@example.org'
+    assert message['Subject'] == '=?utf-8?q?Vote_-_Refus=C3=A9?='
+    unsubscribe = message['List-Unsubscribe'].strip('<>')
+
+    message = message.get_payload(1).get_payload(decode=True)
+    message = message.decode('utf-8')
+    assert "http://localhost/unsubscribe-email" in message
+    assert "Vote - Refusé" in message
+
+    assert 'hans@example.org' in client.get('/manage/subscribers/email')
+    anom.post(unsubscribe)
+    assert 'hans@example.org' not in client.get('/manage/subscribers/email')
+
 
 def test_view_notifications_elections(election_day_app_gr):
     client = Client(election_day_app_gr)
@@ -49,6 +77,7 @@ def test_view_notifications_elections(election_day_app_gr):
     new.form['domain'] = 'federation'
     new.form.submit()
 
+    # Test retrigger messages
     assert "Benachrichtigungen auslösen" not in client.get('/manage/elections')
     assert "Benachrichtigungen auszulösen" not in upload_majorz_election(
         client, False
@@ -73,3 +102,6 @@ def test_view_notifications_elections(election_day_app_gr):
     assert "erneut auslösen" not in client.get(
         '/election/majorz-election/trigger'
     )
+
+    # Test email
+    # todo:
