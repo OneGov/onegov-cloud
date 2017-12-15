@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-12-15 09:14+0100\n"
+"POT-Creation-Date: 2017-12-15 10:05+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -536,6 +536,9 @@ msgstr "Von"
 msgid "Until"
 msgstr "Bis zum"
 
+msgid "Submissions"
+msgstr "Eingaben"
+
 msgid "Title"
 msgstr "Titel"
 
@@ -548,8 +551,14 @@ msgstr "Beschreibt worum es bei diesem Verzeichnis geht"
 msgid "Definition"
 msgstr "Definition"
 
+msgid "Directory entries may have coordinates"
+msgstr "Zu Verzeichnis-Einträgen können Koordinaten erfasst werden"
+
 msgid "Title-Format"
 msgstr "Titel-Format"
+
+msgid "Display"
+msgstr "Anzeige"
 
 msgid "Lead-Format"
 msgstr "Lead-Format"
@@ -563,8 +572,23 @@ msgstr "Adresse"
 msgid "Filters"
 msgstr "Filter"
 
-msgid "Directory entries may have coordinates"
-msgstr "Zu Verzeichnis-Einträgen können Koordinaten erfasst werden"
+msgid "Users may propose new entries"
+msgstr "Benutzer können neue Einträge vorschlagen"
+
+msgid "New entries"
+msgstr "Neue Einträge"
+
+msgid "Guideline"
+msgstr "Wegleitung"
+
+msgid "Price"
+msgstr "Preis"
+
+msgid "Price per submission"
+msgstr "Preis pro Eingabe"
+
+msgid "Currency"
+msgstr "Währung"
 
 msgid "Apply directory configuration"
 msgstr "Verzeichniskonfiguration anwenden"
@@ -575,6 +599,12 @@ msgstr "Modus"
 #, python-format
 msgid "The following fields are unknown: ${fields}"
 msgstr "Die folgenden Felder sind unbekannt: ${fields}"
+
+msgid "Free of charge"
+msgstr "Kostenlos"
+
+msgid "Paid"
+msgstr "Bezahlt"
 
 msgid "Yes, import configuration and entries"
 msgstr "Ja, Konfiguration und Einträge importieren"
@@ -813,20 +843,11 @@ msgstr "Dient zur Gruppierung in der Übersicht"
 msgid "Extra Fields Definition"
 msgstr "Extra-Felder Definition"
 
-msgid "Price"
-msgstr "Preis"
-
 msgid "Price per item"
 msgstr "Preis pro Eintrag"
 
 msgid "Price per hour"
 msgstr "Preis pro Stunde"
-
-msgid "Currency"
-msgstr "Währung"
-
-msgid "Free of charge"
-msgstr "Kostenlos"
 
 msgid "Per item"
 msgstr "Pro Eintrag"
@@ -1424,9 +1445,6 @@ msgstr "In Bearbeitung"
 
 msgid "Closed"
 msgstr "Abgeschlossen"
-
-msgid "Paid"
-msgstr "Bezahlt"
 
 msgid "Failed"
 msgstr "Fehlgeschlagen"

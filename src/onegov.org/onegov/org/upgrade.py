@@ -5,7 +5,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 from onegov.core.upgrade import upgrade_task
 from onegov.form import FormDefinition
 from onegov.reservation import Resource
-from onegov.org.models import Organisation, Topic, News
+from onegov.org.models import Organisation, Topic, News, ExtendedDirectory
 from onegov.org.utils import annotate_html
 
 
@@ -70,3 +70,11 @@ def remove_official_notices_table(context):
         return False
 
     context.operations.drop_table("official_notices")
+
+
+@upgrade_task('Add new defaults to existing directories')
+def add_new_defaults_to_existing_directories(context):
+    for directory in context.session.query(ExtendedDirectory):
+        directory.enable_submissions = False
+        directory.price = 'free'
+        directory.currency = 'CHF'

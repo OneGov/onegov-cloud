@@ -2,14 +2,22 @@ from cached_property import cached_property
 from onegov.core.utils import safe_format_keys
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryZipArchive
-from onegov.form import Form, flatten_fieldsets, parse_formcode, as_internal_id
+from onegov.form import as_internal_id
+from onegov.form import flatten_fieldsets
+from onegov.form import Form
+from onegov.form import merge_forms
+from onegov.form import parse_formcode
 from onegov.form.fields import UploadField
+from onegov.form.filters import as_float
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import ValidFormDefinition
 from onegov.form.validators import WhitelistedMimeType
 from onegov.org import _
+from onegov.org.forms.fields import HtmlField
+from onegov.org.forms.generic import PaymentMethodForm
 from sqlalchemy.orm import object_session
 from wtforms import BooleanField
+from wtforms import DecimalField
 from wtforms import RadioField
 from wtforms import StringField
 from wtforms import TextAreaField
@@ -17,39 +25,53 @@ from wtforms import ValidationError
 from wtforms import validators
 
 
-class DirectoryForm(Form):
+class DirectoryBaseForm(Form):
     """ Form for directories. """
 
-    title = StringField(_("Title"), [validators.InputRequired()])
+    title = StringField(
+        label=_("Title"),
+        fieldset=_("General"),
+        validators=[validators.InputRequired()])
 
     lead = TextAreaField(
         label=_("Lead"),
+        fieldset=_("General"),
         description=_("Describes what this directory is about"),
         render_kw={'rows': 4})
 
     structure = TextAreaField(
         label=_("Definition"),
+        fieldset=_("General"),
         validators=[
             validators.InputRequired(),
             ValidFormDefinition(require_email_field=False)
         ],
         render_kw={'rows': 32, 'data-editor': 'form'})
 
+    enable_map = BooleanField(
+        label=_("Directory entries may have coordinates"),
+        fieldset=_("General"),
+        default=True)
+
     title_format = StringField(
         label=_("Title-Format"),
+        fieldset=_("Display"),
         validators=[validators.InputRequired()],
         render_kw={'class_': 'formcode-format'})
 
     lead_format = StringField(
         label=_("Lead-Format"),
+        fieldset=_("Display"),
         render_kw={'class_': 'formcode-format'})
 
     content_fields = TextAreaField(
         label=_("Main view"),
+        fieldset=_("Display"),
         render_kw={'class_': 'formcode-select'})
 
     contact_fields = TextAreaField(
         label=_("Address"),
+        fieldset=_("Display"),
         render_kw={
             'class_': 'formcode-select',
             'data-fields-exclude': 'fileinput,radio,checkbox'
@@ -57,15 +79,45 @@ class DirectoryForm(Form):
 
     keyword_fields = TextAreaField(
         label=_("Filters"),
+        fieldset=_("Display"),
         render_kw={
             'class_': 'formcode-select',
             'data-fields-include': 'radio,checkbox'
         })
 
-    enable_map = BooleanField(
-        label=_("Directory entries may have coordinates"),
-        default=True
-    )
+    enable_submissions = BooleanField(
+        label=_("Users may propose new entries"),
+        fieldset=_("New entries"),
+        default=True)
+
+    guideline = HtmlField(
+        label=_("Guideline"),
+        fieldset=_("New entries"),
+        depends_on=('enable_submissions', 'y'))
+
+    price = RadioField(
+        label=_("Price"),
+        fieldset=_("New entries"),
+        choices=[
+            ('free', _("Free of charge")),
+            ('paid', _("Paid"))
+        ],
+        default='free',
+        depends_on=('enable_submissions', 'y'))
+
+    price_per_submission = DecimalField(
+        label=_("Price per submission"),
+        fieldset=_("New entries"),
+        filters=(as_float, ),
+        validators=[validators.Optional()],
+        depends_on=('price', 'paid'))
+
+    currency = StringField(
+        label=_("Currency"),
+        fieldset=_("New entries"),
+        default="CHF",
+        depends_on=('price', 'paid'),
+        validators=[validators.InputRequired()])
 
     @cached_property
     def known_field_ids(self):
@@ -131,6 +183,15 @@ class DirectoryForm(Form):
 
     def process_obj(self, obj):
         self.configuration = obj.configuration
+
+
+class DirectoryForm(merge_forms(DirectoryBaseForm, PaymentMethodForm)):
+
+    payment_method_args = PaymentMethodForm.payment_method.kwargs.copy()
+    payment_method_args['fieldset'] = _("New entries")
+    payment_method_args['depends_on'] = ('price', 'paid')
+
+    payment_method = RadioField(**payment_method_args)
 
 
 class DirectoryImportForm(Form):

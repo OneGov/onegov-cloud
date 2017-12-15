@@ -611,6 +611,10 @@ form {
         min-height: 250px;
     }
 
+    .redactor-box > textarea {
+        display: none !important;
+    }
+
     .formcode-select {
         @include form-element;
         height: 100%;

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-12-15 09:14+0100\n"
+"POT-Creation-Date: 2017-12-15 10:05+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -534,6 +534,9 @@ msgstr "De"
 msgid "Until"
 msgstr "Jusqu'à"
 
+msgid "Submissions"
+msgstr ""
+
 msgid "Title"
 msgstr "Titre"
 
@@ -546,8 +549,14 @@ msgstr "Décrit le contenu de votre dossier"
 msgid "Definition"
 msgstr "Définition"
 
+msgid "Directory entries may have coordinates"
+msgstr "les entrées du dossier peuvent avoir des coordonnées"
+
 msgid "Title-Format"
 msgstr "Format Titre"
+
+msgid "Display"
+msgstr ""
 
 msgid "Lead-Format"
 msgstr "Format Principal"
@@ -561,8 +570,23 @@ msgstr "Adresse"
 msgid "Filters"
 msgstr "Filtres"
 
-msgid "Directory entries may have coordinates"
-msgstr "les entrées du dossier peuvent avoir des coordonnées"
+msgid "Users may propose new entries"
+msgstr ""
+
+msgid "New entries"
+msgstr ""
+
+msgid "Guideline"
+msgstr ""
+
+msgid "Price"
+msgstr "Prix"
+
+msgid "Price per submission"
+msgstr ""
+
+msgid "Currency"
+msgstr "Devise"
 
 msgid "Apply directory configuration"
 msgstr "Appliquer la configuration du dossier"
@@ -573,6 +597,12 @@ msgstr "Mode"
 #, python-format
 msgid "The following fields are unknown: ${fields}"
 msgstr "Les champs suivants sont inconnus : ${fields}"
+
+msgid "Free of charge"
+msgstr "Gratuit"
+
+msgid "Paid"
+msgstr "Payé"
 
 msgid "Yes, import configuration and entries"
 msgstr "Oui, importer la configuration et les entrées"
@@ -812,20 +842,11 @@ msgstr "Utilisé pour grouper la ressource dans la vue d'ensemble"
 msgid "Extra Fields Definition"
 msgstr "Définition de champs supplémentaires"
 
-msgid "Price"
-msgstr "Prix"
-
 msgid "Price per item"
 msgstr "Prix par article"
 
 msgid "Price per hour"
 msgstr "Prix par heure"
-
-msgid "Currency"
-msgstr "Devise"
-
-msgid "Free of charge"
-msgstr "Gratuit"
 
 msgid "Per item"
 msgstr "Par article"
@@ -1428,9 +1449,6 @@ msgstr "En attente"
 
 msgid "Closed"
 msgstr "Fermé"
-
-msgid "Paid"
-msgstr "Payé"
 
 msgid "Failed"
 msgstr "Échoué"
