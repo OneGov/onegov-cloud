@@ -371,7 +371,6 @@ def webdriver():
 @pytest.fixture(scope="session")
 def webdriver_options():
     options = Options()
-    options.add_argument('--no-sandbox')
 
     if os.environ.get('SHOW_BROWSER') != '1':
         options.add_argument('--headless')
