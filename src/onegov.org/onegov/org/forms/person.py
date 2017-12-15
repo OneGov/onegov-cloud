@@ -21,7 +21,7 @@ class PersonForm(Form):
 
     email = EmailField(_("E-Mail"))
     phone = StringField(_("Phone"))
-    website = StringField(_("Website"), filters=[ensure_scheme])
+    website = StringField(_("Website"), filters=(ensure_scheme, ))
 
     address = TextAreaField(
         label=_("Address"),

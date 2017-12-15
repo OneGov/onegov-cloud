@@ -1,5 +1,6 @@
 from onegov.form import Form, merge_forms
 from onegov.form.validators import ValidFormDefinition
+from onegov.form.filters import as_float
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import DateRangeForm
@@ -12,13 +13,6 @@ from wtforms import TextAreaField
 from wtforms import TextField
 from wtforms import validators
 from wtforms.fields.html5 import DecimalField
-
-
-def as_float(value):
-    if not value:
-        return 0.0
-
-    return float(value)
 
 
 class ResourceBaseForm(Form):

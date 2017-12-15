@@ -1,4 +1,5 @@
 from onegov.form import Form, merge_forms
+from onegov.form.filters import yubikey_identifier
 from onegov.org import _
 from onegov.user import UserCollection, is_valid_yubikey_format
 from wtforms import BooleanField, RadioField, TextField, validators
@@ -26,7 +27,7 @@ class ManageUserForm(Form):
     yubikey = TextField(
         label=_("Yubikey"),
         description=_("Plug your YubiKey into a USB slot and press it."),
-        filters=[lambda v: v and v[:12] or ''],
+        filters=(yubikey_identifier, ),
         render_kw={'autocomplete': 'off'}
     )
 
