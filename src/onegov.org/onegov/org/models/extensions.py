@@ -60,7 +60,9 @@ class HiddenFromPublicExtension(ContentExtension):
     def extend_form(self, form_class, request):
 
         class HiddenPageForm(form_class):
-            is_hidden_from_public = BooleanField(_("Hide from the public"))
+            is_hidden_from_public = BooleanField(
+                label=_("Hide from the public"),
+                fieldset=_("Visibility"))
 
         return HiddenPageForm
 
@@ -124,7 +126,8 @@ class VisibleOnHomepageExtension(ContentExtension):
         class VisibleOnHomepageForm(form_class):
             # pass label by keyword to give the News model access
             is_visible_on_homepage = BooleanField(
-                label=_("Visible on homepage"))
+                label=_("Visible on homepage"),
+                fieldset=_("Visibility"))
 
         return VisibleOnHomepageForm
 

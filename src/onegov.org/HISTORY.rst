@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Puts visibility related options in a separate fieldset.
+  [href]
+
 0.19.5 (2017-12-14)
 ~~~~~~~~~~~~~~~~~~~
 

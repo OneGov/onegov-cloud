@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-12-05 09:57+0100\n"
+"POT-Creation-Date: 2017-12-15 09:14+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1046,6 +1046,9 @@ msgstr "1 Eintrag"
 msgid "Hide from the public"
 msgstr "Vor der Öffentlichkeit verstecken"
 
+msgid "Visibility"
+msgstr "Sichtbarkeit"
+
 msgid "Map"
 msgstr "Karte"
 
@@ -1704,7 +1707,9 @@ msgstr "Passwort setzen"
 
 msgid ""
 "If the password link has expired, you can also request a new password here:"
-msgstr "Falls der Passwort-Link abgelaufen ist, können Sie hier ein neues Passwort anfordern:"
+msgstr ""
+"Falls der Passwort-Link abgelaufen ist, können Sie hier ein neues Passwort "
+"anfordern:"
 
 msgid "To use your account you need the Yubikey with the serial ${number}"
 msgstr ""
