@@ -613,7 +613,7 @@ form {
     .redactor-box {
         margin-bottom: .75rem;
 
-        & > textarea {
+        > textarea {
             display: none !important;
         }
     }
@@ -2760,6 +2760,10 @@ button {
     padding-bottom: .5rem;
 }
 
+.occurrences-filter-panel {
+    margin-bottom: 2rem;
+}
+
 .occurrences-filter-tags,
 .date-range-selector {
     margin-bottom: .5em;
@@ -3779,7 +3783,7 @@ ul.recipients {
     Filter panels
 */
 .filter-panel {
-    margin-bottom: .5rem;
+    margin-bottom: 1rem;
 
     .filter-title {
         border-bottom: 2px solid $primary-color;
@@ -4255,7 +4259,6 @@ h2 + div.timeline {
     @include panel;
     @include smooth-edges;
 
-    margin-top: 2em;
     padding: 1rem 1rem .5rem;
 
     h2 {
