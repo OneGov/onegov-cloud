@@ -43,7 +43,7 @@ class VoteLayout(DefaultLayout):
         return self.model.proposal
 
     def visible(self, tab=None):
-        if not self.has_results:
+        if not self.model.has_results:
             return False
 
         tab = self.tab if tab is None else tab
@@ -56,19 +56,12 @@ class VoteLayout(DefaultLayout):
         return True
 
     @cached_property
-    def has_results(self):
-        proposal = self.model.ballots.first()
-        if not proposal:
-            return False
-        return any((r.counted for r in proposal.results))
-
-    @cached_property
     def summarize(self):
         return self.ballot.results.count() != 1
 
     @cached_property
     def menu(self):
-        if not self.has_results:
+        if not self.model.has_results:
             return []
 
         if self.type == 'simple':

@@ -156,9 +156,9 @@
 
 <metal:status_callout define-macro="status_callout" i18n:domain="onegov.election_day">
     <div class="panel callout radius" tal:condition="not:item.completed">
-         <h5 i18n:translate="" tal:condition="not layout.has_results">No results yet</h5>
-         <h5 i18n:translate="" tal:condition="layout.has_results">Intermediate results</h5>
-         <p tal:condition="layout.has_results">
+         <h5 i18n:translate="" tal:condition="not item.has_results">No results yet</h5>
+         <h5 i18n:translate="" tal:condition="item.has_results">Intermediate results</h5>
+         <p tal:condition="item.has_results">
              <span i18n:translate="">Last change</span>:
              <strong>${layout.format_date(item.last_result_change, 'relative')} / ${layout.format_date(item.last_result_change, 'datetime_long')}</strong>
          </p>
@@ -245,7 +245,7 @@
 
     <div class="clearfix"></div>
 
-    <tal:block tal:condition="layout.has_results and ballot">
+    <tal:block tal:condition="vote.has_results and ballot">
         <div class="row percentages">
             <div class="columns small-6">
                 <dl>
@@ -266,7 +266,7 @@
             <div class="nays right" style="width:${'{0:.2f}'.format(ballot.nays_percentage)}%"></div>
         </div>
     </tal:block>
-    <tal:block tal:condition="not: layout.has_results and ballot">
+    <tal:block tal:condition="not: vote.has_results and ballot">
         <hr />
     </tal:block>
 </metal:vote_header>

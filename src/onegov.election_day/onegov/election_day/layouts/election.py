@@ -45,7 +45,7 @@ class ElectionLayout(DefaultLayout):
         return ''
 
     def visible(self, tab=None):
-        if not self.has_results:
+        if not self.model.has_results:
             return False
 
         tab = self.tab if tab is None else tab
@@ -77,12 +77,6 @@ class ElectionLayout(DefaultLayout):
             )
 
         return True
-
-    @cached_property
-    def has_results(self):
-        if self.model.results.first():
-            return True
-        return False
 
     @cached_property
     def majorz(self):

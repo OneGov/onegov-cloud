@@ -127,7 +127,6 @@ def test_elections_layout(session):
     assert layout.majorz
     assert not layout.proporz
     assert layout.main_view == 'Election/candidates'
-    assert not layout.has_results
     assert list(layout.menu) == []
     assert not layout.tacit
 
@@ -135,7 +134,6 @@ def test_elections_layout(session):
     assert not layout.majorz
     assert layout.proporz
     assert layout.main_view == 'Election/lists'
-    assert not layout.has_results
     assert list(layout.menu) == []
     assert not layout.tacit
 
@@ -214,7 +212,6 @@ def test_votes_layout(session):
     assert layout.title('tie-breaker') == 'Tie-Breaker'
     assert layout.title('data') == 'Downloads'
 
-    assert not layout.has_results
     assert list(layout.menu) == []
 
     with freeze_time("2014-01-01 12:00"):
