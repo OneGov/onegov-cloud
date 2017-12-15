@@ -578,6 +578,14 @@ msgstr "I Suoi risultati non hanno potuto essere caricati."
 msgid "Line"
 msgstr "Riga"
 
+#. Default: Votes
+#.
+msgid "single_votes"
+msgstr "Voti"
+
+msgid "Unsubscribe"
+msgstr ""
+
 msgid "Dear Sir or Madam,"
 msgstr "Gentilissimo Signore o Signora,"
 
@@ -590,9 +598,6 @@ msgstr "Se non si desidera modificare la password, ignorare questa e-mail."
 msgid ""
 "Successfully subscribed to the email service. You will receive an email "
 "every time new results are published."
-msgstr ""
-
-msgid "Unsubscribe"
 msgstr ""
 
 msgid "Upload results"
@@ -621,11 +626,6 @@ msgstr "Scarica"
 
 msgid "Candidate"
 msgstr "Candidato"
-
-#. Default: Votes
-#.
-msgid "single_votes"
-msgstr "Voti"
 
 msgid "Party"
 msgstr "Partito"

@@ -98,10 +98,37 @@ def test_view_notifications_elections(election_day_app_gr):
     client.get('/election/majorz-election/trigger').form.submit()
     assert "erneut auslösen" in client.get('/election/majorz-election/trigger')
 
-    upload_majorz_election(client)
+    upload_majorz_election(client, False)
     assert "erneut auslösen" not in client.get(
         '/election/majorz-election/trigger'
     )
 
     # Test email
-    # todo:
+    principal = election_day_app_gr.principal
+    principal.email_notification = True
+    election_day_app_gr.cache.set('principal', principal)
+
+    anom = Client(election_day_app_gr)
+    anom.get('/locale/fr_CH').follow()
+    subscribe = anom.get('/subscribe-email')
+    subscribe.form['email'] = 'hans@example.org'
+    subscribe.form.submit()
+
+    client.get('/election/majorz-election/trigger').form.submit()
+
+    message = election_day_app_gr.smtp.outbox.pop()
+    assert message['To'] == 'hans@example.org'
+    assert message['Subject'] == (
+        '=?utf-8?q?Majorz_Election_-_'
+        'Nouveaux_r=C3=A9sultats_interm=C3=A9diaires?='
+    )
+    unsubscribe = message['List-Unsubscribe'].strip('<>')
+
+    message = message.get_payload(1).get_payload(decode=True)
+    message = message.decode('utf-8')
+    assert "http://localhost/unsubscribe-email" in message
+    assert "Majorz Election - Nouveaux résultats intermédiaires" in message
+
+    assert 'hans@example.org' in client.get('/manage/subscribers/email')
+    anom.post(unsubscribe)
+    assert 'hans@example.org' not in client.get('/manage/subscribers/email')

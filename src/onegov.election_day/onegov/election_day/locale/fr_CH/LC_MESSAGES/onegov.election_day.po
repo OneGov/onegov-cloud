@@ -579,6 +579,14 @@ msgstr "Vos résultats n'ont pas pu être mis à jour."
 msgid "Line"
 msgstr "Ligne"
 
+#. Default: Votes
+#.
+msgid "single_votes"
+msgstr "Votes"
+
+msgid "Unsubscribe"
+msgstr ""
+
 msgid "Dear Sir or Madam,"
 msgstr "Madame, Monsieur,"
 
@@ -593,9 +601,6 @@ msgstr ""
 msgid ""
 "Successfully subscribed to the email service. You will receive an email "
 "every time new results are published."
-msgstr ""
-
-msgid "Unsubscribe"
 msgstr ""
 
 msgid "Upload results"
@@ -624,11 +629,6 @@ msgstr "Télécharger"
 
 msgid "Candidate"
 msgstr "Candidat"
-
-#. Default: Votes
-#.
-msgid "single_votes"
-msgstr "Votes"
 
 msgid "Party"
 msgstr "Parti"

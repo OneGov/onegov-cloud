@@ -578,6 +578,14 @@ msgstr "Ihre Resultate konnten leider nicht hochgeladen werden."
 msgid "Line"
 msgstr "Zeile"
 
+#. Default: Votes
+#.
+msgid "single_votes"
+msgstr "Stimmen"
+
+msgid "Unsubscribe"
+msgstr "Abmelden"
+
 msgid "Dear Sir or Madam,"
 msgstr "Sehr geehrte Damen und Herren,"
 
@@ -595,9 +603,6 @@ msgid ""
 msgstr ""
 "Die E-Mail-Benachrichtigung wurde abonniert. Sie erhalten in Zukunft eine E-"
 "Mail, sobald neue Resultate publiziert wurden."
-
-msgid "Unsubscribe"
-msgstr "Abmelden"
 
 msgid "Upload results"
 msgstr "Resultate hochladen"
@@ -626,11 +631,6 @@ msgstr "Herunterladen"
 
 msgid "Candidate"
 msgstr "Kandidierende"
-
-#. Default: Votes
-#.
-msgid "single_votes"
-msgstr "Stimmen"
 
 msgid "Party"
 msgstr "Partei"
