@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-12-15 10:05+0100\n"
+"POT-Creation-Date: 2017-12-15 14:48+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -536,8 +536,8 @@ msgstr "Von"
 msgid "Until"
 msgstr "Bis zum"
 
-msgid "Submissions"
-msgstr "Eingaben"
+msgid "New entries"
+msgstr "Neue Einträge"
 
 msgid "Title"
 msgstr "Titel"
@@ -574,9 +574,6 @@ msgstr "Filter"
 
 msgid "Users may propose new entries"
 msgstr "Benutzer können neue Einträge vorschlagen"
-
-msgid "New entries"
-msgstr "Neue Einträge"
 
 msgid "Guideline"
 msgstr "Wegleitung"
@@ -1256,6 +1253,12 @@ msgstr "Noch keine Verzeichnisse definiert."
 
 msgid "No entries found."
 msgstr "Keine Einträge gefunden."
+
+msgid "New entry"
+msgstr "Neuer Eintrag"
+
+msgid "Propose a new entry"
+msgstr "Einen neuen Eintrag vorschlagen"
 
 msgid ""
 "Your edit requires a migration of existing entries. Please confirm the "
@@ -2610,3 +2613,6 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "Submissions"
+#~ msgstr "Eingaben"

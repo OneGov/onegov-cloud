@@ -110,13 +110,13 @@ class DirectoryBaseForm(Form):
         fieldset=_("New entries"),
         filters=(as_float, ),
         validators=[validators.Optional()],
-        depends_on=('price', 'paid'))
+        depends_on=('enable_submissions', 'y', 'price', 'paid'))
 
     currency = StringField(
         label=_("Currency"),
         fieldset=_("New entries"),
         default="CHF",
-        depends_on=('price', 'paid'),
+        depends_on=('enable_submissions', 'y', 'price', 'paid'),
         validators=[validators.InputRequired()])
 
     @cached_property
@@ -189,7 +189,8 @@ class DirectoryForm(merge_forms(DirectoryBaseForm, PaymentMethodForm)):
 
     payment_method_args = PaymentMethodForm.payment_method.kwargs.copy()
     payment_method_args['fieldset'] = _("New entries")
-    payment_method_args['depends_on'] = ('price', 'paid')
+    payment_method_args['depends_on'] = (
+        'enable_submissions', 'y', 'price', 'paid')
 
     payment_method = RadioField(**payment_method_args)
 

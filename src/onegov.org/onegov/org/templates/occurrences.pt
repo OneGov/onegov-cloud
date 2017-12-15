@@ -43,7 +43,7 @@
                     </tal:block>
                 </metal:block>
 
-                <div class="occurrences-add-box">
+                <div class="submit-yours">
                     <dl>
                         <dt>
                             <a href="${add_link}">

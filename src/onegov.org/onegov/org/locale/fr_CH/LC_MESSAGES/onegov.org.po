@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-12-15 10:05+0100\n"
+"POT-Creation-Date: 2017-12-15 14:48+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -534,7 +534,7 @@ msgstr "De"
 msgid "Until"
 msgstr "Jusqu'à"
 
-msgid "Submissions"
+msgid "New entries"
 msgstr ""
 
 msgid "Title"
@@ -571,9 +571,6 @@ msgid "Filters"
 msgstr "Filtres"
 
 msgid "Users may propose new entries"
-msgstr ""
-
-msgid "New entries"
 msgstr ""
 
 msgid "Guideline"
@@ -1257,6 +1254,12 @@ msgstr "Aucun dossier défini pour l'instant."
 
 msgid "No entries found."
 msgstr "Aucune entrée trouvée."
+
+msgid "New entry"
+msgstr ""
+
+msgid "Propose a new entry"
+msgstr ""
 
 msgid ""
 "Your edit requires a migration of existing entries. Please confirm the "
