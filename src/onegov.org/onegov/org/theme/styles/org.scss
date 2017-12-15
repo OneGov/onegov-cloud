@@ -563,7 +563,7 @@ form {
         list-style: none;
 
         margin: 0;
-        margin-bottom: 1rem;
+        margin-bottom: .75rem;
 
         li input[type="checkbox"],
         li input[type="radio"] {
@@ -589,7 +589,6 @@ form {
         + .label-text,
         + label {
             display: inline-block;
-            margin-bottom: .2rem;
             margin-left: 0;
             vertical-align: text-top;
         }
@@ -611,8 +610,12 @@ form {
         min-height: 250px;
     }
 
-    .redactor-box > textarea {
-        display: none !important;
+    .redactor-box {
+        margin-bottom: .75rem;
+
+        & > textarea {
+            display: none !important;
+        }
     }
 
     .formcode-select {
@@ -650,7 +653,7 @@ form {
         legend {
             color: $input-font-color;
             font-size: $input-font-size;
-            margin-bottom: 1rem;
+            margin-bottom: .75rem;
             padding: 0 .75rem;
             text-align: center;
         }
@@ -725,9 +728,8 @@ form {
     /*
         Some fields need extra margins
     */
-    #charge_fee_to_customer,
-    #daily_ticket_statistics {
-        margin-bottom: 1.5rem !important;
+    .field-type-booleanfield > div {
+        margin-bottom: .75rem;
     }
 
     /*
@@ -739,7 +741,7 @@ form {
     .code-editor-wrapper {
         @include form-element;
         height: auto;
-        margin-bottom: 1em;
+        margin-bottom: .75rem;
         padding: 0;
 
         // focused is a class because the wrapper doesn't get ':focus'
