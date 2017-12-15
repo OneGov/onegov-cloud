@@ -119,6 +119,7 @@
 
     dt {
         font-weight: bold;
+        margin-top: 10px;
     }
 
     hr {
