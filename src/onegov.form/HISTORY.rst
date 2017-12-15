@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.27.0 (2017-12-15)
+~~~~~~~~~~~~~~~~~~~
 
 - Gathers often used field filters in onegov.form.filters.
   [href]
