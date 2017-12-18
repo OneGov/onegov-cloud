@@ -43,14 +43,14 @@
 
             <dt i18n:translate>Counter Proposal</dt>
             <dd>
-                ${'{0:.2f}'.format(model.proposal.yeas_percentage)}% <tal:block i18n:translate>Yeas</tal:block> /
-                ${'{0:.2f}'.format(model.proposal.nays_percentage)}% <tal:block i18n:translate>Nays</tal:block>
+                ${'{0:.2f}'.format(model.counter_proposal.yeas_percentage)}% <tal:block i18n:translate>Yeas</tal:block> /
+                ${'{0:.2f}'.format(model.counter_proposal.nays_percentage)}% <tal:block i18n:translate>Nays</tal:block>
             </dd>
 
             <dt i18n:translate>Tie-Breaker</dt>
             <dd>
-                ${'{0:.2f}'.format(model.proposal.yeas_percentage)}% <tal:block i18n:translate>Yeas</tal:block> /
-                ${'{0:.2f}'.format(model.proposal.nays_percentage)}% <tal:block i18n:translate>Nays</tal:block>
+                ${'{0:.2f}'.format(model.tie_breaker.yeas_percentage)}% <tal:block i18n:translate>Yeas</tal:block> /
+                ${'{0:.2f}'.format(model.tie_breaker.nays_percentage)}% <tal:block i18n:translate>Nays</tal:block>
             </dd>
         </dl>
 
@@ -96,14 +96,14 @@
 
                 <dt i18n:translate>Counter Proposal</dt>
                 <dd>
-                    ${'{0:.2f}'.format(model.proposal.yeas_percentage)}% <tal:block i18n:translate>Yeas</tal:block> /
-                    ${'{0:.2f}'.format(model.proposal.nays_percentage)}% <tal:block i18n:translate>Nays</tal:block>
+                    ${'{0:.2f}'.format(model.counter_proposal.yeas_percentage)}% <tal:block i18n:translate>Yeas</tal:block> /
+                    ${'{0:.2f}'.format(model.counter_proposal.nays_percentage)}% <tal:block i18n:translate>Nays</tal:block>
                 </dd>
 
                 <dt i18n:translate>Tie-Breaker</dt>
                 <dd>
-                    ${'{0:.2f}'.format(model.proposal.yeas_percentage)}% <tal:block i18n:translate>Yeas</tal:block> /
-                    ${'{0:.2f}'.format(model.proposal.nays_percentage)}% <tal:block i18n:translate>Nays</tal:block>
+                    ${'{0:.2f}'.format(model.tie_breaker.yeas_percentage)}% <tal:block i18n:translate>Yeas</tal:block> /
+                    ${'{0:.2f}'.format(model.tie_breaker.nays_percentage)}% <tal:block i18n:translate>Nays</tal:block>
                 </dd>
 
                 <dt i18n:translate="turnout_vote">Voter turnout</dt>
