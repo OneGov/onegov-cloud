@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.19.0 (2017-12-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds email alerts.
   [msom]
