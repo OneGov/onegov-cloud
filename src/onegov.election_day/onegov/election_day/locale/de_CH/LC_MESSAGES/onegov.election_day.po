@@ -473,17 +473,18 @@ msgid "SMS alerts"
 msgstr "SMS Benachrichtigung"
 
 msgid ""
+"The service provides free information on the publication of new results "
+"(intermediate results, final results):"
+msgstr ""
+"Der Service informiert kostenlos über die Publikation neuer Resultate "
+"(Zwischenresultate, Schlussresultate):"
+
+msgid ""
 "The email service provides free information on the publication of new "
 "results (intermediate results, final results):"
 msgstr ""
 "Der E-Mail-Service informiert kostenlos über die Publikation neuer Resultate "
 "(Zwischenresultate, Schlussresultate):"
-
-msgid "Get email alerts"
-msgstr "E-Mail-Benachrichtigung abonnieren"
-
-msgid "Stop email subscription"
-msgstr "E-Mail-Abonnement beenden"
 
 msgid ""
 "The SMS service provides free information on the publication of new results "
@@ -491,6 +492,12 @@ msgid ""
 msgstr ""
 "Der SMS Service informiert kostenlos über die Publikation neuer Resultate "
 "(Zwischenresultate, Schlussresultate):"
+
+msgid "Get email alerts"
+msgstr "E-Mail-Benachrichtigung abonnieren"
+
+msgid "Stop email subscription"
+msgstr "E-Mail-Abonnement beenden"
 
 msgid "Get SMS alerts"
 msgstr "SMS-Benachrichtigung abonnieren"

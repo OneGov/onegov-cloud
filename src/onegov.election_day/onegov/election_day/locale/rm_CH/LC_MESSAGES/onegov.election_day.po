@@ -510,14 +510,15 @@ msgid "SMS alerts"
 msgstr "Communicaziun per SMS"
 
 msgid ""
+"The service provides free information on the publication of new results "
+"(intermediate results, final results):"
+msgstr ""
+"Il servetsch infurmescha gratuitamain davart la publicaziun da novs "
+"resultats (resultats intermediars, resultats finals):"
+
+msgid ""
 "The email service provides free information on the publication of new "
 "results (intermediate results, final results):"
-msgstr ""
-
-msgid "Get email alerts"
-msgstr ""
-
-msgid "Stop email subscription"
 msgstr ""
 
 msgid ""
@@ -526,6 +527,12 @@ msgid ""
 msgstr ""
 "Il servetsch dad SMS infurmescha gratuitamain davart la publicaziun da novs "
 "resultats (resultats intermediars, resultats finals):"
+
+msgid "Get email alerts"
+msgstr ""
+
+msgid "Stop email subscription"
+msgstr ""
 
 msgid "Get SMS alerts"
 msgstr "Abunar la communicaziun per SMS"

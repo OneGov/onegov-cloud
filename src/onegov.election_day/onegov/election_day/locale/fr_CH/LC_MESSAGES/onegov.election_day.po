@@ -474,6 +474,13 @@ msgid "SMS alerts"
 msgstr "Alertes SMS"
 
 msgid ""
+"The service provides free information on the publication of new results "
+"(intermediate results, final results):"
+msgstr ""
+"Le service fournit des informations gratuites sur la publication de nouveaux "
+"résultats (résultats intermédiaires, résultats finaux) :"
+
+msgid ""
 "The email service provides free information on the publication of new "
 "results (intermediate results, final results):"
 msgstr ""
@@ -481,18 +488,18 @@ msgstr ""
 "publication de nouveaux résultats (résultats intermédiaires, résultats "
 "finaux):"
 
-msgid "Get email alerts"
-msgstr "Recevez des alertes par e-mail"
-
-msgid "Stop email subscription"
-msgstr "Arrêter l'abonnement par courrier"
-
 msgid ""
 "The SMS service provides free information on the publication of new results "
 "(intermediate results, final results):"
 msgstr ""
 "Le service SMS fournit des informations gratuites sur la publication de "
 "nouveaux résultats (résultats intermédiaires, résultats finaux) :"
+
+msgid "Get email alerts"
+msgstr "Recevez des alertes par e-mail"
+
+msgid "Stop email subscription"
+msgstr "Arrêter l'abonnement par courrier"
 
 msgid "Get SMS alerts"
 msgstr "Recevoir des alertes SMS"
