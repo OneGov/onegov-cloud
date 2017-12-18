@@ -10,6 +10,7 @@ from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryEntryCollection
 from onegov.directory import DirectoryZipArchive
 from onegov.directory.errors import ValidationError, MissingColumnError
+from onegov.form import FormCollection
 from onegov.org import OrgApp, _
 from onegov.org.forms import DirectoryForm, DirectoryImportForm
 from onegov.org.forms.generic import ExportForm
@@ -308,6 +309,24 @@ def handle_submit_directory_entry(self, request, form):
 
     # some fields are not available to the public
     form.delete_field('is_hidden_from_public')
+
+    # validation is done later
+    if request.POST:
+        forms = FormCollection(request.app.session())
+
+        # required to be able to store the data as json
+        form.coordinates.data = form.coordinates.data.as_dict()
+
+        submission = forms.submissions.add_external(
+            form=form,
+            state='pending',
+            payment_method=self.directory.payment_method,
+            georeferencable=self.directory.enable_map,
+            source=self.directory.structure
+        )
+
+        forms.submissions.update(submission, form)
+        return request.redirect(request.link(submission))
 
     title = _("Submit a New Directory Entry")
 
