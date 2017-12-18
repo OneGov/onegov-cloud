@@ -19,10 +19,8 @@
             <dd><span metal:use-macro="layout.macros['progress']" tal:define="progress model.progress" /></dd>
 
             <dl tal:define="candidates python: sorted([(c.votes, c.family_name, c.first_name) for c in model.candidates], reverse=True)">
-                <dt i18n:translate>Candidates</dt>
-                <dd tal:repeat="candidate candidates">
-                    ${candidate[1]} ${candidate[2]} ${layout.format_number(candidate[0])} <tal:block i18n:translate="single_votes">Votes</tal:block>
-                </dd>
+                <dt><span i18n:translate>Candidates</span> / <span i18n:translate="single_votes">Votes</span></dt>
+                <dd tal:repeat="candidate candidates"><span>${candidate[1]} ${candidate[2]}<span> / <span>${layout.format_number(candidate[0])}</span></dd>
             </dl>
         </dl>
 
@@ -37,8 +35,8 @@
             <dd><span metal:use-macro="layout.macros['progress']" tal:define="progress model.progress" /></dd>
 
             <dl tal:define="lists python: sorted([(l.votes, l.name) for l in model.lists], reverse=True)">
-                <dt i18n:translate>Lists</dt>
-                <dd tal:repeat="list lists">${list[1]} ${list[0]} <tal:block i18n:translate="single_votes">Votes</tal:block></dd>
+                <dt><span i18n:translate>Lists</span> / <span i18n:translate="single_votes">Votes</span></dt>
+                <dd tal:repeat="list lists"><span>${list[1]}</span> / <span>${layout.format_number(list[0])}</span></dd>
             </dl>
 
         </dl>
@@ -65,8 +63,8 @@
             -->
 
             <dl tal:define="lists python: sorted([(l.number_of_mandates, l.name) for l in model.lists if l.number_of_mandates], reverse=True)">
-                <dt i18n:translate>Lists</dt>
-                <dd tal:repeat="list lists">${list[1]} ${list[0]} <tal:block i18n:translate>Mandates</tal:block></dd>
+                <dt><span i18n:translate>Lists</span> / <span i18n:translate>Mandates</span></dt>
+                <dd tal:repeat="list lists"><span>${list[1]}<span> / <span>${list[0]}</span></dd>
 
                 <dt i18n:translate>Elected Candidates</dt>
                 <dd tal:repeat="name model.elected_candidates">${name[1]} ${name[0]}</dd>
