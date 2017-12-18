@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.19.1 (2017-12-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes mail notification reply to address.
   [msom]
