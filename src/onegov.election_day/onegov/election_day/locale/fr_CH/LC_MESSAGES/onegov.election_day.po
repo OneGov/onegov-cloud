@@ -594,6 +594,9 @@ msgstr "Ligne"
 msgid "single_votes"
 msgstr "Votes"
 
+msgid "View all details online"
+msgstr "Voir tous les détails en ligne"
+
 msgid "Unsubscribe"
 msgstr "Se désabonner"
 

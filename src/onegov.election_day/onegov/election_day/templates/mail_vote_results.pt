@@ -111,7 +111,7 @@
             </dl>
         </tal:block>
 
-        <p><a href="${request.link(model)}">View all details online</a></p>
+        <p><a href="${request.link(model)}" i18n:translate>View all details online</a></p>
 
     </tal:block>
     <tal:block metal:fill-slot="footer">

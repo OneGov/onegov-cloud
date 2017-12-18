@@ -628,6 +628,9 @@ msgstr "Lingia"
 msgid "single_votes"
 msgstr "Vuschs"
 
+msgid "View all details online"
+msgstr ""
+
 msgid "Unsubscribe"
 msgstr ""
 

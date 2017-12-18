@@ -7,6 +7,9 @@ Changelog
 - Fixes notification options not working.
   [msom]
 
+- Adds missing translation.
+  [msom]
+
 1.19.0 (2017-12-18)
 ~~~~~~~~~~~~~~~~~~~
 

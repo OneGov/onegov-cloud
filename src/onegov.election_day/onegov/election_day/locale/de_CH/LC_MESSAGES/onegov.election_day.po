@@ -590,6 +590,9 @@ msgstr "Zeile"
 msgid "single_votes"
 msgstr "Stimmen"
 
+msgid "View all details online"
+msgstr "Alle Details online ansehen"
+
 msgid "Unsubscribe"
 msgstr "Abmelden"
 
