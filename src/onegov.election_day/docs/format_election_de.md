@@ -104,7 +104,7 @@ Name|Beschreibung
 
 Zudem werden die leeren und ungültigen Stimmen auch als Kandidaten erfasst mittels der folgenden Kandidatennamen:
 
-- `KandName_{XX} = 'Leere Zeilen'`
+- `KandName_{XX} = 'Leere Zeilen'` (Leere Stimmen)
 - `KandName_{XX} = 'Ungültige Stimmen'`
 
 ### Spalten Kandidatenresultate

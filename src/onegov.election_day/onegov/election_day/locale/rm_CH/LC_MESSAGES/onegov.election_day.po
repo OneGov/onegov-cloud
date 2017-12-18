@@ -212,7 +212,7 @@ msgid "Email"
 msgstr "E-mail"
 
 msgid "SMS"
-msgstr ""
+msgstr "SMS"
 
 msgid "Webhooks"
 msgstr ""

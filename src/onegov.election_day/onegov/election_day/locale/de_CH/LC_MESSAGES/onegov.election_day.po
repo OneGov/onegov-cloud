@@ -857,7 +857,7 @@ msgid ""
 "receive an email when new results are published."
 msgstr ""
 "Die E-Mail-Benachrichtigung wurde beendet. Sie erhalten in Zukunft keine E-"
-"Mail mehr."
+"Mails mehr."
 
 msgid ""
 "You will receive a SMS as soon as new results have been published. The SMS "

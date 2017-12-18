@@ -25,7 +25,7 @@ msgstr ""
 "che un nuovo risultato verrà pubblicato."
 
 msgid "Successfully subscribed to the email service"
-msgstr ""
+msgstr "Iscrizione al servizio di posta elettronica avvenuta con successo"
 
 #, python-format
 msgid "Missing columns: '${cols}'"
@@ -464,10 +464,10 @@ msgid "Last change"
 msgstr "Aggiornato"
 
 msgid "Alerts"
-msgstr ""
+msgstr "Avvisi"
 
 msgid "Email alerts"
-msgstr ""
+msgstr "Avvisi per posta elettronica"
 
 msgid "SMS alerts"
 msgstr "SMS Alert"
@@ -476,12 +476,14 @@ msgid ""
 "The email service provides free information on the publication of new "
 "results (intermediate results, final results):"
 msgstr ""
+"Il servizio di posta elettronica fornisce informazioni gratuite sulla "
+"pubblicazione di nuovi risultati (risultati intermedi, risultati finali):"
 
 msgid "Get email alerts"
-msgstr ""
+msgstr "Ottieni e-mail di avviso"
 
 msgid "Stop email subscription"
-msgstr ""
+msgstr "Interrompi iscrizione e-mail"
 
 msgid ""
 "The SMS service provides free information on the publication of new results "
@@ -584,7 +586,7 @@ msgid "single_votes"
 msgstr "Voti"
 
 msgid "Unsubscribe"
-msgstr ""
+msgstr "Annulla iscrizione"
 
 msgid "Dear Sir or Madam,"
 msgstr "Gentilissimo Signore o Signora,"
@@ -599,6 +601,8 @@ msgid ""
 "Successfully subscribed to the email service. You will receive an email "
 "every time new results are published."
 msgstr ""
+"Iscrizione al servizio di posta elettronica avvenuta con successo. Riceverai "
+"una e-mail ogni volta che dei nuovi risultati saranno pubblicati."
 
 msgid "Upload results"
 msgstr "Caricare risultati"
@@ -800,7 +804,7 @@ msgid "Access Denied"
 msgstr "Accesso Negato"
 
 msgid "You are trying to open a page for which you are not authorized."
-msgstr "Non sei Autorizzato"
+msgstr "Non sei Autorizzato."
 
 msgid "Page not Found"
 msgstr "Pagina non trovata"
@@ -844,11 +848,16 @@ msgid ""
 "You will receive an email as soon as new results have been published. You "
 "can unsubscribe at any time."
 msgstr ""
+"Riceverai una e-mail appena qualche nuovo risultato è stato pubblicato. Puoi "
+"annullare l’iscrizione in qualunque momento."
 
 msgid ""
 "Successfully unsubscribed from the email services. You will no longer "
 "receive an email when new results are published."
 msgstr ""
+"Annullamento iscrizione di posta elettronica avvenuto con successo. Non "
+"verrai più informato via e-mail quando dei nuovi risultati sono stati "
+"pubblicati."
 
 msgid ""
 "You will receive a SMS as soon as new results have been published. The SMS "
