@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.19.2 (2017-12-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes notification mail percentages for complex votes.
   [msom]
