@@ -161,7 +161,9 @@ class EmailNotification(Notification):
             request.app.send_email(
                 subject=subject,
                 receivers=(subscriber.address, ),
-                reply_to=request.app.mail_sender,
+                reply_to='{} <{}>'.format(
+                    request.app.principal.name, request.app.mail_sender
+                ),
                 content=render_template(
                     template,
                     request,

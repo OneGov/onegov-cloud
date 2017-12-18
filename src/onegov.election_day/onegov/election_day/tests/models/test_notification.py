@@ -242,7 +242,7 @@ def test_email_notification_vote(election_day_app, session):
             ('rm@examp.le',)
         ]
         assert set([call[2]['reply_to'] for call in mock.mock_calls]) == {
-            'mails@govikon.ch'
+            'Kanton Govikon <mails@govikon.ch>'
         }
         assert set([
             call[2]['headers']['List-Unsubscribe-Post']
@@ -474,7 +474,7 @@ def test_email_notification_election(election_day_app, session):
             ('rm@examp.le',)
         ]
         assert set([call[2]['reply_to'] for call in mock.mock_calls]) == {
-            'mails@govikon.ch'
+            'Kanton Govikon <mails@govikon.ch>'
         }
         assert set([
             call[2]['headers']['List-Unsubscribe-Post']

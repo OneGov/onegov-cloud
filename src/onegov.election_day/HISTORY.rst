@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes mail notification reply to address.
+  [msom]
+
 - Fixes notification options not working.
   [msom]
 
