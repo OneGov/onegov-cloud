@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes notification options not working.
+  [msom]
+
 1.19.0 (2017-12-18)
 ~~~~~~~~~~~~~~~~~~~
 

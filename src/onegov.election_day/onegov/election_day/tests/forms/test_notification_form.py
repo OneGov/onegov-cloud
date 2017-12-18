@@ -12,12 +12,13 @@ def test_notification_form():
     form.request.app.principal.email_notification = True
     form.on_request()
     assert form.notifications.choices == [('email', 'Email')]
-    assert form.notifications.data == ['email']
+    assert 'email' in form.notifications.default
 
     form.request.app.principal.sms_notification = 'http://example.com'
     form.on_request()
     assert form.notifications.choices == [('email', 'Email'), ('sms', 'SMS')]
-    assert form.notifications.data == ['email', 'sms']
+    assert 'email' in form.notifications.default
+    assert 'sms' in form.notifications.default
 
     form.request.app.principal.webhooks = {'http://abc.com/1': None}
     form.on_request()
@@ -25,3 +26,5 @@ def test_notification_form():
         ('email', 'Email'), ('sms', 'SMS'), ('webhooks', 'Webhooks')
     ]
     assert form.notifications.data == ['email', 'sms', 'webhooks']
+    assert 'sms' in form.notifications.default
+    assert 'webhooks' in form.notifications.default
