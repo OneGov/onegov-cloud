@@ -1,0 +1,14 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <tal:b condition="directory.guideline" replace="structure directory.guideline" />
+
+        <div class="row">
+            <div class="small-12 medium-8 large-6 columns">
+                <div metal:use-macro="layout.macros['form']" />
+            </div>
+        </div>
+    </tal:b>
+</div>

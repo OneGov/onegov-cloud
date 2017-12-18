@@ -20,6 +20,7 @@ from onegov.org.models import ExtendedDirectory, ExtendedDirectoryEntry
 from onegov.org.new_elements import Link
 from purl import URL
 from tempfile import NamedTemporaryFile
+from webob.exc import HTTPForbidden
 
 
 def get_directory_form_class(model, request):
@@ -292,6 +293,33 @@ def handle_edit_directory_entry(self, request, form):
         'layout': layout,
         'title': self.title,
         'form': form,
+    }
+
+
+@OrgApp.form(model=DirectoryEntryCollection,
+             permission=Public,
+             template='directory_entry_submission_form.pt',
+             form=get_directory_entry_form_class,
+             name='submit')
+def handle_submit_directory_entry(self, request, form):
+
+    if not self.directory.enable_submissions:
+        raise HTTPForbidden()
+
+    # some fields are not available to the public
+    form.delete_field('is_hidden_from_public')
+
+    title = _("Submit a New Directory Entry")
+
+    layout = DirectoryEntryCollectionLayout(self, request)
+    layout.breadcrumbs.append(Link(title, '#'))
+    layout.editbar_links = []
+
+    return {
+        'directory': self.directory,
+        'form': form,
+        'layout': layout,
+        'title': title,
     }
 
 

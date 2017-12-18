@@ -17,6 +17,8 @@ class OrgTicketExtraText(object):
 
     @property
     def extra_localized_text(self):
+        """ Localized text indexed by elasticsearch. """
+
         q = object_session(self).query(TicketNote)
         q = q.filter_by(channel_id=self.number)
         q = q.filter_by(type='ticket_note')
@@ -38,6 +40,11 @@ class ReservationTicket(OrgTicketExtraText, Ticket):
 class EventSubmissionTicket(OrgTicketExtraText, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'EVN'}
     es_type_name = 'event_tickets'
+
+
+class DirectoryEntryTicket(OrgTicketExtraText, Ticket):
+    __mapper_args__ = {'polymorphic_identity': 'DIR'}
+    es_type_name = 'directory_entry_tickets'
 
 
 @handlers.registered_handler('FRM')
@@ -419,5 +426,27 @@ class EventSubmissionHandler(Handler):
                     )
                 )
             ), right_side=False))
+
+        return links
+
+
+@handlers.registered_handler('DIR')
+class DirectoryEntryHandler(FormSubmissionHandler):
+
+    handler_title = _("Directory Entries")
+
+    def get_links(self, request):
+        links = []
+
+        edit_link = URL(request.link(self.submission))
+        edit_link = edit_link.query_param('edit', '').as_string()
+
+        links.append(
+            Link(
+                text=_('Edit directory entry'),
+                url=request.return_here(edit_link),
+                attrs={'class': 'edit-link'}
+            )
+        )
 
         return links
