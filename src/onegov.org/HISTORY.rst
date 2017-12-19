@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.19.6 (2017-12-19)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds compatibility with the latest onegov.form release.
   [href]
 
