@@ -6,7 +6,7 @@ import transaction
 from alembic.migration import MigrationContext
 from alembic.operations import Operations
 from inspect import getmembers, isfunction, ismethod
-from onegov.core.orm import Base
+from onegov.core.orm import Base, find_models
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON
 from sqlalchemy import Column, Text
@@ -387,6 +387,39 @@ class UpgradeContext(object):
     def has_table(self, table):
         inspector = Inspector(self.operations_connection)
         return table in inspector.get_table_names(schema=self.schema)
+
+    def models(self, table):
+        def has_matching_tablename(model):
+            if not hasattr(model, '__tablename__'):
+                return False  # abstract bases
+
+            return model.__tablename__ == table
+
+        for base in self.request.app.session_manager.bases:
+            yield from find_models(base, has_matching_tablename)
+
+    def records_per_table(self, table):
+        for model in self.models(table):
+            yield from self.session.query(model)
+
+    def add_column_with_defaults(self, table, column, default):
+        # add a nullable column
+        nullable_column = column.copy()
+        nullable_column.nullable = True
+
+        self.operations.add_column(table, nullable_column)
+
+        # fill it with defaults
+        for record in self.records_per_table(table):
+            value = default(record) if callable(default) else default
+            setattr(record, column.name, value)
+
+        # activate non-null constraint
+        if not column.nullable:
+            self.operations.alter_column(table, column.name, nullable=False)
+
+        # propagate to db
+        self.session.flush()
 
 
 class RawUpgradeRunner(object):

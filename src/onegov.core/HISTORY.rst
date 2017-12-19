@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a convenience method to add a new columns with defaults during upgrades.
+  [href]
+
 0.54.4 (2017-12-14)
 ~~~~~~~~~~~~~~~~~~~
 
