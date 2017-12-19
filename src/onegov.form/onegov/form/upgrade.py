@@ -10,6 +10,7 @@ from onegov.core.utils import dictionary_to_binary
 from onegov.form import FormDefinitionCollection
 from onegov.form import FormFile
 from onegov.form import FormSubmission
+from sqlalchemy import Column, Text
 
 
 @upgrade_task('Enable external form submissions')
@@ -73,3 +74,30 @@ def migrate_form_submission_files_to_onegov_file(context):
 
     context.session.flush()
     context.session.execute("DROP TABLE IF EXISTS submission_files")
+
+
+@upgrade_task('Add payment_method to definitions and submissions')
+def add_payment_method_to_definitions_and_submissions(context):
+
+    context.add_column_with_defaults(
+        table='forms',
+        column=Column(
+            'payment_method', Text, nullable=False, default='manual'
+        ),
+        default=lambda form: form.content.get('payment_method', 'manual')
+    )
+
+    context.add_column_with_defaults(
+        table='submissions',
+        column=Column(
+            'payment_method', Text, nullable=False, default='manual'
+        ),
+        default=lambda submission: (
+            submission.form and
+            submission.form.content.get('payment_method', 'manual') or
+            'manual'
+        )
+    )
+
+    for form in context.records_per_table('forms'):
+        form.content.pop('payment_method', None)

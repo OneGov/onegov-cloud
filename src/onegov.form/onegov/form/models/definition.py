@@ -61,7 +61,7 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, SearchableDefinition):
 
     #: payment options ('manual' for out of band payments without cc, 'free'
     #: for both manual and cc payments, 'cc' for forced cc payments)
-    payment_method = content_property('payment_method')
+    payment_method = Column(Text, nullable=False, default='manual')
 
     __mapper_args__ = {
         "polymorphic_on": 'type'

@@ -58,6 +58,11 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles):
         nullable=False
     )
 
+    #: payment options -> copied from the dfinition at the moment of
+    #: submission. This is stored alongside the submission as the original
+    #: form setting may change later.
+    payment_method = Column(Text, nullable=False, default='manual')
+
     __mapper_args__ = {
         "polymorphic_on": 'state'
     }
@@ -131,8 +136,7 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles):
         """
 
         if price and price.amount > 0:
-            return process_payment(
-                self.form.payment_method, price, provider, token)
+            return process_payment(self.payment_method, price, provider, token)
 
         return True
 

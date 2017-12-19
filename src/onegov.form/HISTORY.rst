@@ -1,5 +1,12 @@
 Changelog
 ---------
+
+- Denormalises the payment_method from forms <-> submissions. A change in
+  a form's payment method no longer has an impact on existing submissions.
+
+  Also, external submissions can now have a payment method.
+  [href]
+
 0.27.0 (2017-12-15)
 ~~~~~~~~~~~~~~~~~~~
 

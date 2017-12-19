@@ -133,7 +133,7 @@ class FormSubmissionCollection(object):
 
         return query
 
-    def add(self, name, form, state, id=None):
+    def add(self, name, form, state, id=None, payment_method=None):
         """ Takes a filled-out form instance and stores the submission
         in the database. The form instance is expected to have a ``_source``
         parameter, which contains the source used to build the form (as only
@@ -153,14 +153,27 @@ class FormSubmissionCollection(object):
         else:
             form.validate()
 
+        if name is None:
+            definition = None
+        else:
+            definition = (
+                self.session.query(FormDefinition)
+                    .filter_by(name=name).one())
+
         # look up the right class depending on the type
         submission_class = FormSubmission.get_polymorphic_class(
             state, FormSubmission
         )
+
         submission = submission_class()
         submission.id = id or uuid4()
         submission.name = name
         submission.state = state
+        submission.payment_method = (
+            payment_method or
+            definition and definition.payment_method or
+            'manual'
+        )
 
         self.update(submission, form)
 
@@ -176,7 +189,7 @@ class FormSubmissionCollection(object):
 
         return submission
 
-    def add_external(self, form, state, id=None):
+    def add_external(self, form, state, id=None, payment_method=None):
         """ Takes a filled-out form instance and stores the submission
         in the database. The form instance is expected to have a ``_source``
         parameter, which contains the source used to build the form (as only
@@ -187,7 +200,13 @@ class FormSubmissionCollection(object):
 
         """
 
-        return self.add(name=None, form=form, state=state, id=id)
+        return self.add(
+            name=None,
+            form=form,
+            state=state,
+            id=id,
+            payment_method=payment_method
+        )
 
     def complete_submission(self, submission):
         """ Changes the state to 'complete', if the data is valid. """
