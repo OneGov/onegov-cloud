@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.28.0 (2017-12-19)
+~~~~~~~~~~~~~~~~~~~
 
 - Denormalises the payment_method from forms <-> submissions. A change in
   a form's payment method no longer has an impact on existing submissions.
