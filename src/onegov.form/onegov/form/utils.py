@@ -1,6 +1,7 @@
 import re
 
 from decimal import Decimal
+from hashlib import md5
 from unidecode import unidecode
 
 _unwanted_characters = re.compile(r'[^a-zA-Z0-9]+')
@@ -81,3 +82,7 @@ class decimal_range(object):
             raise StopIteration
 
         return result
+
+
+def hash_definition(definition):
+    return md5(definition.encode('utf-8')).hexdigest()

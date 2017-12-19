@@ -8,7 +8,7 @@ from onegov.form import FormCollection
 from onegov.form import parse_form
 from onegov.form import PendingFormSubmission
 from onegov.form.errors import UnableToComplete
-from onegov.form.models import hash_definition
+from onegov.form.utils import hash_definition
 from sedate import utcnow
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError
