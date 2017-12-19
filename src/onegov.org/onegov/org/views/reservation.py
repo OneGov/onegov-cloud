@@ -196,7 +196,8 @@ def handle_reservation_form(self, request, form):
             submission = forms.submissions.add_external(
                 form=self.form_class(),
                 state='pending',
-                id=token
+                id=token,
+                payment_method=self.payment_method
             )
 
         # update the data on the submission

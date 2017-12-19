@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds compatibility with the latest onegov.form release.
+  [href]
+
 - Puts visibility related options in a separate fieldset.
   [href]
 
