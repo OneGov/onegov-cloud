@@ -209,7 +209,8 @@ def view_directory(self, request):
         'entries': request.exclude_invisible(self.query()),
         'directory': self.directory,
         'filters': filters,
-        'geojson': request.link(self, name='+geojson')
+        'geojson': request.link(self, name='+geojson'),
+        'submit': request.link(self, name='+submit')
     }
 
 
@@ -310,6 +311,8 @@ def handle_submit_directory_entry(self, request, form):
     # some fields are not available to the public
     form.delete_field('is_hidden_from_public')
 
+    title = _("Submit a New Directory Entry")
+
     # validation is done later
     if request.POST:
         forms = FormCollection(request.app.session())
@@ -317,18 +320,25 @@ def handle_submit_directory_entry(self, request, form):
         # required to be able to store the data as json
         form.coordinates.data = form.coordinates.data.as_dict()
 
+        # required by the form submissions collection
+        form._source = self.directory.structure
+
         submission = forms.submissions.add_external(
             form=form,
             state='pending',
             payment_method=self.directory.payment_method,
-            georeferencable=self.directory.enable_map,
-            source=self.directory.structure
+            meta={
+                'handler_code': 'DIR',
+                'directory': self.directory.id.hex
+            }
         )
 
         forms.submissions.update(submission, form)
-        return request.redirect(request.link(submission))
 
-    title = _("Submit a New Directory Entry")
+        url = URL(request.link(submission))
+        url = url.query_param('title', request.translate(title))
+
+        return request.redirect(url.as_string())
 
     layout = DirectoryEntryCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(title, '#'))

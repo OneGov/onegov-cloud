@@ -571,10 +571,6 @@ form {
         }
     }
 
-    > input[type="submit"] {
-        margin-top: .4rem;
-    }
-
     .group-label {
         color: $form-label-font-color;
         font-size: $form-label-font-size;
@@ -1199,7 +1195,7 @@ $mark-as-unpaid: '\f057';
 $mute: '\f131';
 $new-daypass-icon: '\f145';
 $new-directory-icon: '\f0e8';
-$new-directory-entry-icon: '\f192';
+$new-directory-entry-icon: '\f114';
 $new-recipient: '\f1fa';
 $new-form-icon: '\f044';
 $new-link-icon: '\f0c1';
@@ -2167,6 +2163,7 @@ $all-handler-icon: '\f069';
 $frm-handler-icon: '\f044';
 $rsv-handler-icon: '\f073';
 $evn-handler-icon: '\f133';
+$dir-handler-icon: '\f114';
 $open-ticket-icon: '\f10c';
 $pending-ticket-icon: '\f192';
 $closed-ticket-icon: '\f05d';
@@ -2261,11 +2258,13 @@ $all-ticket-icon: '\f055';
 .FRM-link::before { @include icon($frm-handler-icon); }
 .RSV-link::before { @include icon($rsv-handler-icon); }
 .EVN-link::before { @include icon($evn-handler-icon); }
+.DIR-link::before { @include icon($dir-handler-icon); }
 
 .ALL-link::before,
 .FRM-link::before,
 .RSV-link::before,
-.EVN-link::before {
+.EVN-link::before,
+.DIR-link::before {
     display: inline-block;
     margin-right: 1ex;
 }
@@ -2281,6 +2280,10 @@ $all-ticket-icon: '\f055';
 .ticket-handler-EVN td:first-child::before {
     @include icon($evn-handler-icon);
     color: $monsoon;
+}
+
+.ticket-handler-DIR td:first-child::before {
+    @include icon($dir-handler-icon);
 }
 
 tr.ticket:hover {

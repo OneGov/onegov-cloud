@@ -1,6 +1,7 @@
 from cached_property import cached_property
 from onegov.core import utils
 from onegov.core.templates import render_macro
+from onegov.directory import Directory
 from onegov.event import EventCollection
 from onegov.form import FormSubmissionCollection
 from onegov.org import _
@@ -9,16 +10,14 @@ from onegov.org.models.message import TicketNote
 from onegov.org.new_elements import Link, LinkGroup, Confirm, Intercooler
 from onegov.reservation import Allocation, Resource, Reservation
 from onegov.ticket import Ticket, Handler, handlers
-from sqlalchemy.orm import object_session
 from purl import URL
+from sqlalchemy.orm import object_session
 
 
 class OrgTicketExtraText(object):
 
     @property
     def extra_localized_text(self):
-        """ Localized text indexed by elasticsearch. """
-
         q = object_session(self).query(TicketNote)
         q = q.filter_by(channel_id=self.number)
         q = q.filter_by(type='ticket_note')
@@ -44,7 +43,7 @@ class EventSubmissionTicket(OrgTicketExtraText, Ticket):
 
 class DirectoryEntryTicket(OrgTicketExtraText, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'DIR'}
-    es_type_name = 'directory_entry_tickets'
+    es_type_name = 'directory_tickets'
 
 
 @handlers.registered_handler('FRM')
@@ -431,20 +430,77 @@ class EventSubmissionHandler(Handler):
 
 
 @handlers.registered_handler('DIR')
-class DirectoryEntryHandler(FormSubmissionHandler):
+class DirectoryEntryHandler(Handler):
 
-    handler_title = _("Directory Entries")
+    handler_title = _("Directory Entry Submissions")
+
+    @cached_property
+    def collection(self):
+        return FormSubmissionCollection(self.session)
+
+    @cached_property
+    def submission(self):
+        return self.collection.by_id(self.id)
+
+    @cached_property
+    def form(self):
+        return self.submission.form_class(data=self.submission.data)
+
+    @cached_property
+    def directory(self):
+        return self.session.query(Directory).filter_by(
+            id=self.submission.meta['directory']).first()
+
+    @property
+    def deleted(self):
+        return self.submission is None
+
+    @property
+    def email(self):
+        return self.submission.email
+
+    @property
+    def title(self):
+        return self.submission.title
+
+    @property
+    def subtitle(self):
+        return None
+
+    @property
+    def group(self):
+        return self.directory.title
+
+    @property
+    def payment(self):
+        return self.submission and self.submission.payment
+
+    @property
+    def extra_data(self):
+        return self.submission and [
+            v for v in self.submission.data.values()
+            if not utils.is_non_string_iterable(v)
+        ]
+
+    def get_summary(self, request):
+        layout = DefaultLayout(self.submission, request)
+        return render_macro(layout.macros['display_form'], request, {
+            'form': self.form,
+            'layout': layout
+        })
 
     def get_links(self, request):
         links = []
 
         edit_link = URL(request.link(self.submission))
-        edit_link = edit_link.query_param('edit', '').as_string()
+        edit_link = edit_link.query_param('edit', '')
+        edit_link = edit_link.query_param(
+            'title', request.translate(_("Submission")))
 
         links.append(
             Link(
-                text=_('Edit directory entry'),
-                url=request.return_here(edit_link),
+                text=_('Edit submission'),
+                url=request.return_here(edit_link.as_string()),
                 attrs={'class': 'edit-link'}
             )
         )

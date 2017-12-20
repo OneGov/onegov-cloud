@@ -17,6 +17,16 @@ from onegov.org.models import TicketMessage
 from purl import URL
 
 
+def copy_query(request, url, fields):
+    url = URL(url)
+
+    for field in fields:
+        if field in request.GET:
+            url = url.query_param(field, request.GET[field])
+
+    return url.as_string()
+
+
 @OrgApp.form(model=FormDefinition, template='form.pt', permission=Public,
              form=lambda self, request: self.form_class)
 def handle_defined_form(self, request, form):
@@ -61,10 +71,14 @@ def handle_pending_submission(self, request):
     user to turn the submission into a complete submission, once all data
     is valid.
 
+    This view has two states, a completeable state where the form values
+    are displayed without a form and an edit state, where a form is rendered
+    to change the values.
+
     Takes the following query parameters for customization::
 
-        * ``edit`` no validation is done on the first load if present
-        * ``return-to`` the view redirects to this url once complete if present
+        * ``edit`` render the view in the edit state
+        * ``return-to`` the view redirects to this url once complete
         * ``title`` a custom title (required if external submission)
         * ``quiet`` no success messages are rendered if present
 
@@ -81,12 +95,6 @@ def handle_pending_submission(self, request):
         form.ignore_csrf_error()
     elif not form.errors:
         collection.submissions.update(self, form)
-
-    # these parameters keep between form requests (the rest throw away)
-    for param in {'return-to', 'title', 'quiet'}:
-        if param in request.GET:
-            action = URL(form.action).query_param(param, request.GET[param])
-            form.action = action.as_string()
 
     completable = not form.errors and 'edit' not in request.GET
 
@@ -105,15 +113,24 @@ def handle_pending_submission(self, request):
 
     price = request.app.adjust_price(form.total())
 
+    # retain some parameters in links (the rest throw away)
+    form.action = copy_query(
+        request, form.action, ('return-to', 'title', 'quiet'))
+
+    edit_link = URL(copy_query(
+        request, request.link(self), ('title', )))
+
+    # the edit link always points to the editable state
+    edit_link = edit_link.query_param('edit', '')
+    edit_link = edit_link.as_string()
+
     return {
         'layout': FormSubmissionLayout(self, request, title),
         'title': title,
         'form': form,
         'completable': completable,
-        'edit_link': request.link(self) + '?edit',
+        'edit_link': edit_link,
         'complete_link': request.link(self, 'complete'),
-        'is_pending': self.state == 'pending',
-        'readonly': 'readonly' in request.GET,
         'model': self,
         'price': price,
         'checkout_button': price and request.app.checkout_button(
@@ -171,7 +188,8 @@ def handle_complete_submission(self, request):
             # flushing at all
             with collection.session.no_autoflush:
                 ticket = TicketCollection(request.app.session()).open_ticket(
-                    handler_code='FRM', handler_id=self.id.hex
+                    handler_code=self.meta.get('handler_code', 'FRM'),
+                    handler_id=self.id.hex
                 )
                 TicketMessage.create(ticket, request, 'opened')
 

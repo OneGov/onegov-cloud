@@ -39,7 +39,7 @@
                 <div class="submit-yours" tal:condition="directory.enable_submissions">
                     <dl>
                         <dt>
-                            <a href="${request.link(model, '+submit')}">
+                            <a href="${submit}">
                                 <h2 i18n:translate="">New entry</h2>
                             </a>
                         </dt>
