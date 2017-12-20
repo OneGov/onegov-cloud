@@ -414,6 +414,9 @@ class UpgradeContext(object):
             value = default(record) if callable(default) else default
             setattr(record, column.name, value)
 
+            if hasattr(getattr(record, column.name), 'changed'):
+                getattr(record, column.name).changed()
+
         # activate non-null constraint
         if not column.nullable:
             self.operations.alter_column(table, column.name, nullable=False)

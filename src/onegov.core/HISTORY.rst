@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes empty dicts not working with new non-nullable columns.
+  [href]
+
 0.55.0 (2017-12-19)
 ~~~~~~~~~~~~~~~~~~~
 
