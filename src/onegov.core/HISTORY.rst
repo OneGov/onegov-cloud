@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.55.1 (2017-12-20)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes empty dicts not working with new non-nullable columns.
   [href]
