@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a meta column to the submissions table.
+  [href]
+
 0.28.0 (2017-12-19)
 ~~~~~~~~~~~~~~~~~~~
 

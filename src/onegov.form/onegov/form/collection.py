@@ -133,7 +133,7 @@ class FormSubmissionCollection(object):
 
         return query
 
-    def add(self, name, form, state, id=None, payment_method=None):
+    def add(self, name, form, state, id=None, payment_method=None, meta=None):
         """ Takes a filled-out form instance and stores the submission
         in the database. The form instance is expected to have a ``_source``
         parameter, which contains the source used to build the form (as only
@@ -169,6 +169,7 @@ class FormSubmissionCollection(object):
         submission.id = id or uuid4()
         submission.name = name
         submission.state = state
+        submission.meta = meta or {}
         submission.payment_method = (
             payment_method or
             definition and definition.payment_method or
@@ -189,7 +190,8 @@ class FormSubmissionCollection(object):
 
         return submission
 
-    def add_external(self, form, state, id=None, payment_method=None):
+    def add_external(self, form, state, id=None, payment_method=None,
+                     meta=None):
         """ Takes a filled-out form instance and stores the submission
         in the database. The form instance is expected to have a ``_source``
         parameter, which contains the source used to build the form (as only
@@ -205,7 +207,8 @@ class FormSubmissionCollection(object):
             form=form,
             state=state,
             id=id,
-            payment_method=payment_method
+            payment_method=payment_method,
+            meta=meta,
         )
 
     def complete_submission(self, submission):

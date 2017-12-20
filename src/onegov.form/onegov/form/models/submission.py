@@ -49,6 +49,9 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles):
     #: checksums are guaranteed to have the exact same definition
     checksum = Column(Text, nullable=False)
 
+    #: metadata about this submission
+    meta = Column(JSON, nullable=False)
+
     #: the submission data
     data = Column(JSON, nullable=False)
 

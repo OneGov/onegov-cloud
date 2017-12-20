@@ -10,6 +10,7 @@ from onegov.core.utils import dictionary_to_binary
 from onegov.form import FormDefinitionCollection
 from onegov.form import FormFile
 from onegov.form import FormSubmission
+from onegov.core.orm.types import JSON
 from sqlalchemy import Column, Text
 
 
@@ -97,3 +98,13 @@ def add_payment_method_to_definitions_and_submissions(context):
 
     for form in context.records_per_table('forms'):
         form.content.pop('payment_method', None)
+
+
+@upgrade_task('Add meta dictionary to submissions')
+def add_meta_directory_to_submissions(context):
+
+    context.add_column_with_defaults(
+        table='submissions',
+        column=Column('meta', JSON, nullable=False),
+        default=lambda submission: dict()
+    )
