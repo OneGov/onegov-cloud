@@ -18,7 +18,7 @@ Ina "vischnanca" po er esser in district, in circul electoral e.u.v.
 1 Onegov
 --------
 
-The format, which will be used by the web application for the export, consists of a single file per election. There is a row for each municipality and candidate.
+Il format che vegn duvrà da l'applicaziun web per l'export sa cumpona d'ina singula datoteca per elecziun. Per mintga vischnanca e candidata u candidat datti ina lingia.
 
 ### Colonnas
 
@@ -30,8 +30,8 @@ Num|Descripziun
 `election_status`|`unknown`, `interim` or `final`.
 `election_counted_municipalites`|Dumber da las vischnancas ch'èn dumbradas ora. Sche `election_counted_municipalites = election_total_municipalites`, vala l'elecziun sco dumbrada ora cumplettamain.
 `election_total_municipalites`|Dumber total da vischnancas. Sch'i na po betg vegnir dada ina infurmaziun exacta davart il status da l'elecziun (damai che Wahlt è vegnì importà da Wabsti), è questa valur `0`.
-`entity_bfs_number`|Numer UST da la vischnanca. A value of `0` can be used for expats.
-`entity_name`|The name of the municipality.
+`entity_bfs_number`|Numer UST da la vischnanca. La valur `0` po vegnir duvrada per persunas che vivan a l'exteriur.
+`entity_name`|Il num da la vischnanca.
 `entity_elegible_voters`|Dumber da persunas cun dretg da votar da la vischnanca.
 `entity_received_ballots`|Dumber da cedels da votar consegnads da la vischnanca.
 `entity_blank_ballots`|Dumber da cedels da votar vids da la vischnanca.
@@ -47,12 +47,12 @@ Num|Descripziun
 `candidate_family_name`|Num da famiglia da la candidata u dal candidat.
 `candidate_first_name`|Prenum da la candidata u dal candidat.
 `candidate_elected`|True, sche la candidata u il candidat è vegnì elegì.
-`candidate_party`|The name of the party.
+`candidate_party`|Il num da la partida.
 `candidate_votes`|Dumber da vuschs da candidat en la vischnanca.
 
 #### Panachage results
 
-The results may contain panachage results by adding one column per list:
+Ils resultats pon cuntegnair datas panaschadas, tras quai ch'i vegn agiuntada ina colonna per glista:
 
 Num|Descripziun
 ---|---
@@ -63,10 +63,10 @@ Num|Descripziun
 
 Las vischnancas che n'èn anc betg dumbradas ora n'èn betg cuntegnidas en las datas.
 
-If the status is
-- `interim`, the whole election is considered not yet completed
-- `final`, the whole election is considered completed
-- `unknown`, the whole vote is considered completed, if `election_counted_entities` and `election_total_entities` match
+Sch'il status è
+- `interim`, vala la votaziun sco betg anc terminada
+- `final`, vala la votaziun sco terminada
+- `unknown` vala la votaziun sco terminada, premess che tut ils `election_counted_entities` ed `election_total_entities` correspundian in a l'auter
 
 ### Project
 
@@ -85,7 +85,7 @@ En l'export da datas datti ina lingia per mintga vischnanca, las candidatas ed i
 Num|Descripziun
 ---|---
 `AnzMandate`|
-`BFS`|The municipality number (BFS number) at the time of the election. A value of `0` can be used for expats.
+`BFS`|Il numer UST da la vischnanca. La valur `0` po vegnir duvrada per persunas che vivan a l'exteriur.
 `EinheitBez`|
 `StimmBer`|
 `StimmAbgegeben`|
@@ -104,8 +104,8 @@ Num|Descripziun
 
 Ultra da quai vegnan las vuschs vidas e nunvalaivlas er registradas sco candidatas e candidats, e quai a maun dals suandants nums da candidat:
 
-- `KandName_{XX} = 'Leere Zeilen'` (Empty votes)
-- `KandName_{XX} = 'Ungültige Stimmen'` (Invalid votes)
+- `KandName_{XX} = 'Leere Zeilen'` (Vuschs vidas)
+- `KandName_{XX} = 'Ungültige Stimmen'` (Vuschs nunvalaivlas)
 
 ### Colonnas "Resultats da las candidatas e dals candidats"
 
@@ -139,7 +139,7 @@ En l'export da datas datti ina lingia per candidata u candidat e per vischnanca.
 
 Num|Descripziun
 ---|---
-`Einheit_BFS`|The municipality number (BFS number) at the time of the election. A value of `0` can be used for expats.
+`Einheit_BFS`|Il numer UST da la vischnanca. La valur `0` po vegnir duvrada per persunas che vivan a l'exteriur.
 `Einheit_Name`|
 `Kand_Nachname`|
 `Kand_Vorname`|
@@ -151,11 +151,12 @@ Num|Descripziun
 
 #### Panachage results
 
-The results may contain panachage results by adding one column per list:
+Ils resultats pon cuntegnair datas panaschadas, tras quai ch'i vegn agiuntada ina colonna per glista:
 
 Num|Descripziun
 ---|---
-``{List ID}.{List code}`|The number of votes the list got from the list with the given `Liste_ID`. A `Liste_ID` with the value `99` (`99.WoP`) marks the votes from the blank list.
+``{List ID}.{List code}`|
+Il dumber da vuschs da la glista cun `Liste_ID`. La `Liste_ID` cun la valur `99` (`99.WoP`) stat per la glista vida.
 
 ### Colonnas "Export da datas da la statistica"
 
@@ -208,30 +209,30 @@ Il format da datoteca na cuntegna naginas infurmaziuns definitivas, sch'ina sing
 4 WabstiCExport Maiorz
 ----------------------
 
-Version `2.2` is supported, please refer to the documentation provided by the exporter program for more information about the columns of the different files.
+Sustegnida vegn la versiun '2.2'. Las differentas colonnas da las differentas datotecas èn definidas en la documentaziun dal program d'export.
 
 
 5 WabstiCExport Proporz
 -----------------------
 
-Version `2.2` is supported, please refer to the documentation provided by the exporter program for more information about the columns of the different files.
+Sustegnida vegn la versiun '2.2'. Las differentas colonnas da las differentas datotecas èn definidas en la documentaziun dal program d'export.
 
 
 6 Party results
 ---------------
 
-Each (proporz) election may contain party results. These results are independent of the other results and typically contain the already aggregated results of the different lists of a party.
+Mintga elecziun da proporz po cuntegnair resultats da partidas. Quels èn independents dals auters resultats e cuntegnan tipicamain ils resultats cumulads da las differentas glistas d'ina singula partida.
 
-The following columns will be evaluated and should exist:
+Las suandantas colonnas vegnan evaluadas e duessan esser avant maun:
 
 Num|Descripziun
 ---|---
-`year`|The year of the election.
-`total_votes`|The total votes of the election.
-`name`|The name of the party.
-`color`|The color of the party.
-`mandates`|The number of mandates.
-`votes`|The number of votes.
+`year`|L'onn da l'elecziun.
+`total_votes`|Il dumber total da vuschs da l'elecziun.
+`name`|Il num da la partida.
+`color`|La colur da la partida.
+`mandates`|Il dumber da sezs da la partida.
+`votes`|Il dumber da vuschs da la partida.
 
 ### Template
 
@@ -241,4 +242,4 @@ Num|Descripziun
 7 Elecziun taciturna
 --------------------
 
-Tacit elections can be uploaded by using the internal format with every vote set to `0`.
+Per elecziuns taciturnas po vegnir duvrà il format intern. En quest cas vegnan tut las vuschs messas a `0`.

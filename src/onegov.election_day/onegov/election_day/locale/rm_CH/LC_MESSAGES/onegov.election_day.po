@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-04 13:58+0100\n"
-"PO-Revision-Date: 2017-12-04 12:59+0100\n"
+"POT-Creation-Date: 2017-12-21 07:25+0100\n"
+"PO-Revision-Date: 2017-12-21 07:25+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 2.0.4\n"
+"X-Generator: Poedit 2.0.5\n"
 
 msgid "Not a valid phone number."
 msgstr "Numer da telefon nunvalaivel."
@@ -24,7 +24,7 @@ msgstr ""
 "SMS, uschespert che novs resultats èn vegnids publitgads."
 
 msgid "Successfully subscribed to the email service"
-msgstr ""
+msgstr "Abunà las communicaziuns per e-mail"
 
 #, python-format
 msgid "Missing columns: '${cols}'"
@@ -179,7 +179,7 @@ msgid "German"
 msgstr "Tudestg"
 
 msgid "Title of the election"
-msgstr ""
+msgstr "Titel da l'elecziun"
 
 msgid "French"
 msgstr "Franzos"
@@ -197,7 +197,7 @@ msgid "Absolute majority"
 msgstr "Maioritad absoluta"
 
 msgid "Provide at least one title."
-msgstr ""
+msgstr "Endatai almain in titel."
 
 msgid "Election based on the simple majority system"
 msgstr "Elecziun da maiorz"
@@ -206,7 +206,7 @@ msgid "Election based on proportional representation"
 msgstr "Elecziun da proporz"
 
 msgid "Notifications"
-msgstr ""
+msgstr "Communicaziuns"
 
 msgid "Email"
 msgstr "E-mail"
@@ -215,19 +215,19 @@ msgid "SMS"
 msgstr "SMS"
 
 msgid "Webhooks"
-msgstr ""
+msgstr "Webhooks"
 
 msgid "Phone number"
 msgstr "Numer da telefon"
 
 msgid "Title of the the vote/proposal"
-msgstr ""
+msgstr "Titel da la votaziun / dal project"
 
 msgid "Title of the counter proposal"
-msgstr ""
+msgstr "Titel da la cuntraproposta"
 
 msgid "Title of the tie breaker"
-msgstr ""
+msgstr "Titel da la dumonda decisiva"
 
 msgid "Simple Vote"
 msgstr "Project da votaziun simpel"
@@ -501,10 +501,10 @@ msgid "Last change"
 msgstr "Actualisà"
 
 msgid "Alerts"
-msgstr ""
+msgstr "Communicaziuns"
 
 msgid "Email alerts"
-msgstr ""
+msgstr "Communicaziuns per e-mail"
 
 msgid "SMS alerts"
 msgstr "Communicaziun per SMS"
@@ -520,6 +520,8 @@ msgid ""
 "The email service provides free information on the publication of new "
 "results (intermediate results, final results):"
 msgstr ""
+"Il servetsch dad e-mail infurmescha gratuitamain davart la publicaziun da "
+"novs resultats (resultats intermediars, resultats finals):"
 
 msgid ""
 "The SMS service provides free information on the publication of new results "
@@ -529,10 +531,10 @@ msgstr ""
 "resultats (resultats intermediars, resultats finals):"
 
 msgid "Get email alerts"
-msgstr ""
+msgstr "Abunar las communicaziuns per e-mail"
 
 msgid "Stop email subscription"
-msgstr ""
+msgstr "Terminar l'abunament dad e-mail"
 
 msgid "Get SMS alerts"
 msgstr "Abunar la communicaziun per SMS"
@@ -629,10 +631,10 @@ msgid "single_votes"
 msgstr "Vuschs"
 
 msgid "View all details online"
-msgstr ""
+msgstr "Guardar tut ils detagls online"
 
 msgid "Unsubscribe"
-msgstr ""
+msgstr "Deconnectar"
 
 msgid "Dear Sir or Madam,"
 msgstr "Stimadas dunnas e stimads signurs,"
@@ -649,6 +651,8 @@ msgid ""
 "Successfully subscribed to the email service. You will receive an email "
 "every time new results are published."
 msgstr ""
+"Las communicaziuns per e-mail èn vegnidas abunadas. A partir d'ussa "
+"survegnis Vus in e-mail, uschespert che novs resultats èn vegnids publitgads."
 
 msgid "Upload results"
 msgstr "Chargiar si resultats"
@@ -803,7 +807,7 @@ msgid "View"
 msgstr "Mussar"
 
 msgid "Clear results"
-msgstr ""
+msgstr "Stizzar ils resultats"
 
 msgid "Upload party results"
 msgstr "Chargiar si ils resultats da las partidas"
@@ -897,11 +901,15 @@ msgid ""
 "You will receive an email as soon as new results have been published. You "
 "can unsubscribe at any time."
 msgstr ""
+"Vus survegnis in e-mail, uschespert che novs resultats èn vegnids "
+"publitgads. Vus pudais terminar da tut temp il servetsch dad e-mail."
 
 msgid ""
 "Successfully unsubscribed from the email services. You will no longer "
 "receive an email when new results are published."
 msgstr ""
+"Las communicaziuns per e-mail èn vegnidas terminadas. A partir d'ussa na "
+"survegnis Vus pli nagins e-mails en chaussa."
 
 msgid ""
 "You will receive a SMS as soon as new results have been published. The SMS "
@@ -922,10 +930,10 @@ msgid "Blank list"
 msgstr "Glista en blanco"
 
 msgid "Update results"
-msgstr ""
+msgstr "Actualisar ils resultats"
 
 msgid "Results updated."
-msgstr ""
+msgstr "Actualisà ils resultats."
 
 msgid "Do you really want to regenerate the token?"
 msgstr "Vulais Vus propi generar da nov il token?"
@@ -944,29 +952,29 @@ msgid "Delete mapping"
 msgstr "Stizzar l'attribuziun"
 
 msgid "Data source added."
-msgstr ""
+msgstr "Agiuntà la funtauna da datas."
 
 msgid "Token regenerated."
-msgstr ""
+msgstr "Generà da nov il token."
 
 msgid "Data source deleted."
-msgstr ""
+msgstr "Stizzà la funtauna da datas."
 
 msgid "Mapping added."
-msgstr ""
+msgstr "Agiuntà l'attribuziun."
 
 msgid "Mapping modified."
-msgstr ""
+msgstr "Midà l'attribuziun."
 
 msgid "Mapping deleted."
-msgstr ""
+msgstr "Stizzà l'attribuziun."
 
 msgid "Edit election"
 msgstr "Modifitgar l'elecziun"
 
 #, python-format
 msgid "Do you really want to clear all results of \"${item}\"?"
-msgstr ""
+msgstr "Vulais Vus propi stizzar tut ils resultats da \"${item}\"?"
 
 msgid "Delete election"
 msgstr "Stizzar l'elecziun"
@@ -982,25 +990,25 @@ msgid "Do you really want to retrigger the notfications?"
 msgstr "Propi trametter danovamain communicaziuns als abunents?"
 
 msgid "Election added."
-msgstr ""
+msgstr "Agiuntà l'elecziun."
 
 msgid "Election modified."
-msgstr ""
+msgstr "Midà l'elecziun."
 
 msgid "Results deleted."
-msgstr ""
+msgstr "Stizzà ils resultats."
 
 msgid "Election deleted."
-msgstr ""
+msgstr "Stizzà l'elecziun."
 
 msgid "Notifications triggered."
-msgstr ""
+msgstr "Activà las communicaziuns."
 
 msgid "Delete subscriber"
 msgstr "Stizzar l'abunent(a)"
 
 msgid "Subscriber deleted."
-msgstr ""
+msgstr "Stizzà l'abunent(a)."
 
 msgid "Edit vote"
 msgstr "Modifitgar la votaziun"
@@ -1009,13 +1017,13 @@ msgid "Delete vote"
 msgstr "Stizzar la votaziun"
 
 msgid "Vote added."
-msgstr ""
+msgstr "Agiuntà la votaziun."
 
 msgid "Vote modified."
-msgstr ""
+msgstr "Midà la votaziun."
 
 msgid "Vote deleted."
-msgstr ""
+msgstr "Stizzà la votaziun."
 
 #, python-format
 msgid "The year ${year} is not yet supported"
