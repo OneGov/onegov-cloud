@@ -1,12 +1,12 @@
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.utils import linkify
 from onegov.directory import Directory, DirectoryEntry
-from onegov.form import as_internal_id
+from onegov.form import as_internal_id, Extendable
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import HiddenFromPublicExtension
 
 
-class ExtendedDirectory(Directory, HiddenFromPublicExtension):
+class ExtendedDirectory(Directory, HiddenFromPublicExtension, Extendable):
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
     es_type_name = 'extended_directories'
@@ -20,6 +20,17 @@ class ExtendedDirectory(Directory, HiddenFromPublicExtension):
     currency = content_property('currency')
 
     payment_method = meta_property('payment_method')
+
+    @property
+    def form_class_for_submissions(self):
+        return self.extend_form_class(self.form_class, self.extensions)
+
+    @property
+    def extensions(self):
+        if self.enable_map:
+            return ('coordinates', 'submitter')
+        else:
+            return ('submitter', )
 
 
 class ExtendedDirectoryEntry(DirectoryEntry, CoordinatesExtension,

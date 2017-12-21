@@ -2,8 +2,8 @@ from collections import OrderedDict
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.utils import linkify
 from onegov.form import FieldDependency, WTFormsClassBuilder
-from onegov.gis import CoordinatesField
 from onegov.org import _
+from onegov.org.forms.extensions import CoordinatesFormExtension
 from onegov.people import Person, PersonCollection
 from sqlalchemy.orm import object_session
 from wtforms import BooleanField, StringField, TextAreaField
@@ -95,18 +95,7 @@ class CoordinatesExtension(ContentExtension):
         return self.coordinates.get('zoom')
 
     def extend_form(self, form_class, request):
-
-        class CoordinatesForm(form_class):
-            coordinates = CoordinatesField(
-                label=_("Coordinates"),
-                description=_(
-                    "The marker can be moved by dragging it with the mouse"
-                ),
-                fieldset=_("Map"),
-                render_kw={'data-map-type': 'marker'}
-            )
-
-        return CoordinatesForm
+        return CoordinatesFormExtension(form_class).create()
 
 
 class VisibleOnHomepageExtension(ContentExtension):

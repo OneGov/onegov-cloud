@@ -40,6 +40,10 @@ def get_directory_entry_form_class(model, request):
     return OptionalMapForm
 
 
+def get_submission_form_class(model, request):
+    return model.directory.form_class_for_submissions
+
+
 @OrgApp.html(
     model=DirectoryCollection,
     template='directories.pt',
@@ -301,15 +305,12 @@ def handle_edit_directory_entry(self, request, form):
 @OrgApp.form(model=DirectoryEntryCollection,
              permission=Public,
              template='directory_entry_submission_form.pt',
-             form=get_directory_entry_form_class,
+             form=get_submission_form_class,
              name='submit')
 def handle_submit_directory_entry(self, request, form):
 
     if not self.directory.enable_submissions:
         raise HTTPForbidden()
-
-    # some fields are not available to the public
-    form.delete_field('is_hidden_from_public')
 
     title = _("Submit a New Directory Entry")
 
@@ -329,7 +330,8 @@ def handle_submit_directory_entry(self, request, form):
             payment_method=self.directory.payment_method,
             meta={
                 'handler_code': 'DIR',
-                'directory': self.directory.id.hex
+                'directory': self.directory.id.hex,
+                'extensions': self.directory.extensions
             }
         )
 
