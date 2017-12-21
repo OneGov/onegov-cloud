@@ -3,19 +3,11 @@ cache: pip
 matrix:
   include:
     - language: python
-      python: "3.4"
-      env: TOXENV=py34
-
-    - language: python
-      python: "3.5"
-      env: TOXENV=py35
-
-    - language: python
       python: "3.6"
       env: TOXENV=py36
 
     - language: python
-      python: "3.4"
+      python: "3.6"
       env: TOXENV=pep8
 
 addons:
@@ -24,13 +16,13 @@ addons:
 
 install:
     - pip install tox
-    - if [ "$TOXENV" = 'py34' ]; then pip install coveralls; fi
+    - if [ "$TOXENV" = 'py36' ]; then pip install coveralls; fi
 
 script:
     - tox -e $TOXENV
 
 after_success:
-    - if [ "$TOXENV" = 'py34' ]; then coveralls; fi
+    - if [ "$TOXENV" = 'py36' ]; then coveralls; fi
 
 deploy:
     provider: pypi
@@ -40,4 +32,4 @@ deploy:
         secure: yauL+U5Oz/AXuosvcTWFbKBp4yuKbOACIFNS59pMZqQjfe+WOm7JBsSpTRiHl6hnen9fEDnCBErOBd9HKAS7JXXjMdlS7igCYDuva/VfwJm1Sd5RmnFZQux55h1wndoYXyJA8yYu8KapfsERMNmK515Ckq5Jxskn0mp5/3gmwzc=
     on:
         tags: true
-        condition: $TOXENV = py34
+        condition: $TOXENV = py36

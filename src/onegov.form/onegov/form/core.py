@@ -122,6 +122,12 @@ class Form(BaseForm):
         for processor in preprocessors:
             next(processor, None)
 
+    @classmethod
+    def clone(cls):
+        """ Creates an independent copy of the form class. """
+
+        raise NotImplementedError
+
     def process_fieldset(self):
         """ Processes the fieldset parameter on the fields, which puts
         fields into fieldsets.
