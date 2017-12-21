@@ -549,3 +549,39 @@ def test_nested_dependent_pricing():
         'really_give': 'yes',
         'donation': 'small'
     })).total() == Price(Decimal(10.0), 'CHF')
+
+
+def test_clone_form():
+
+    class FooForm(Form):
+        base = StringField('123')
+        name = StringField('Foo')
+
+    class BarForm(FooForm):
+        name = StringField('Bar')
+
+    assert BarForm().base.label.text == '123'
+    assert FooForm().base.label.text == '123'
+
+    assert BarForm().name.label.text == 'Bar'
+    assert FooForm().name.label.text == 'Foo'
+
+    FooForm.name.args = ('Noo', )
+    FooForm.base.args = ('Abc', )
+
+    assert BarForm().base.label.text == 'Abc'
+    assert FooForm().base.label.text == 'Abc'
+
+    assert BarForm().name.label.text == 'Bar'
+    assert FooForm().name.label.text == 'Noo'
+
+    NewForm = FooForm.clone()
+    NewForm.base.args = ('Xyz', )
+
+    assert BarForm().base.label.text == 'Abc'
+    assert FooForm().base.label.text == 'Abc'
+    assert NewForm().base.label.text == 'Xyz'
+
+    assert BarForm().name.label.text == 'Bar'
+    assert FooForm().name.label.text == 'Noo'
+    assert NewForm().name.label.text == 'Noo'

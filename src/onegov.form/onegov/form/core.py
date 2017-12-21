@@ -124,9 +124,23 @@ class Form(BaseForm):
 
     @classmethod
     def clone(cls):
-        """ Creates an independent copy of the form class. """
+        """ Creates an independent copy of the form class.
 
-        raise NotImplementedError
+        The fields of the so called class may be manipulated without affecting
+        the original class.
+
+        """
+
+        class ClonedForm(cls):
+            pass
+
+        for key, unbound_field in cls._unbound_fields:
+            setattr(ClonedForm, key, unbound_field.field_class(
+                *unbound_field.args,
+                **unbound_field.kwargs
+            ))
+
+        return ClonedForm
 
     def process_fieldset(self):
         """ Processes the fieldset parameter on the fields, which puts
