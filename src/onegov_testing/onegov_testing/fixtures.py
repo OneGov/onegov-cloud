@@ -394,7 +394,11 @@ def browser(webdriver, webdriver_options, webdriver_executable_path,
 
     config = {
         'executable_path': webdriver_executable_path,
-        'options': webdriver_options
+        'options': webdriver_options,
+
+        # preselect a port as selenium picks it in a way that triggers the
+        # macos firewall to display a confirmation dialog
+        'port': port_for.select_random()
     }
 
     with browser_extension.spawn(Browser, webdriver, **config) as browser:
