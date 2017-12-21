@@ -66,6 +66,9 @@ class Extendable(object):
             return form_class
 
         for extension in extensions:
+            if extension not in form_extensions:
+                raise KeyError(f"Unknown form extension: {extension}")
+
             form_class = form_extensions[extension](form_class).create()
 
         return form_class
