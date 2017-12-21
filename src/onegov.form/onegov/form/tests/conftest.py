@@ -3,6 +3,7 @@ import pytest
 from depot.manager import DepotManager
 from onegov.core import Framework
 from onegov.form import FormApp
+from onegov.form.extensions import form_extensions
 from onegov_testing.utils import create_app
 from pytest_localserver.http import WSGIServer
 
@@ -16,6 +17,17 @@ def depot():
     yield DepotManager.get()
 
     DepotManager._clear()
+
+
+@pytest.fixture(scope='function', autouse=True)
+def extensions():
+    # discards form extensions defined in tests
+    known_extensions = form_extensions.copy()
+
+    yield
+
+    form_extensions.clear()
+    form_extensions.update(known_extensions)
 
 
 @pytest.fixture(scope='function')

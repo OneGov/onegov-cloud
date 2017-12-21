@@ -4,6 +4,7 @@ from onegov.core.orm.mixins import meta_property, content_property
 from onegov.form.models.submission import FormSubmission
 from onegov.form.parser import parse_form
 from onegov.form.utils import hash_definition
+from onegov.form.extensions import Extendable
 from onegov.search import ORMSearchable
 from sqlalchemy import Column, Text
 from sqlalchemy.orm import object_session, relationship
@@ -27,7 +28,8 @@ class SearchableDefinition(ORMSearchable):
     }
 
 
-class FormDefinition(Base, ContentMixin, TimestampMixin, SearchableDefinition):
+class FormDefinition(Base, ContentMixin, TimestampMixin, SearchableDefinition,
+                     Extendable):
     """ Defines a form stored in the database. """
 
     __tablename__ = 'forms'
@@ -71,7 +73,8 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, SearchableDefinition):
     def form_class(self):
         """ Parses the form definition and returns a form class. """
 
-        return parse_form(self.definition)
+        return self.extend_form_class(
+            parse_form(self.definition), self.meta.get('extensions'))
 
     @observes('definition')
     def definition_observer(self, definition):

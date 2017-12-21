@@ -18,6 +18,7 @@ from onegov.form.core import (
     with_options,
 )
 from onegov.form.display import render_field
+from onegov.form.extensions import FormExtension, Extendable
 from onegov.form.integration import FormApp
 from onegov.form.models import (
     FormDefinition,
@@ -39,12 +40,14 @@ __all__ = [
     'decimal_range',
     'find_field',
     'flatten_fieldsets',
+    'Extendable',
     'FieldDependency',
     'Form',
     'FormApp',
     'FormCollection',
     'FormDefinition',
     'FormDefinitionCollection',
+    'FormExtension',
     'FormFile',
     'FormSubmission',
     'FormSubmissionCollection',

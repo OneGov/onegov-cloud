@@ -5,7 +5,7 @@ class FormExtension(object):
     """ Enables the extension of form definitions/submissions.
 
     When either of those models create a form class they will take the
-    'form_extensions' key in the meta dictionary to extend those formcode
+    'extensions' key in the meta dictionary to extend those formcode
     based forms.
 
     This allows for specialised behaviour of formcode forms with the drawback
@@ -38,6 +38,9 @@ class FormExtension(object):
 
     """
 
+    def __init__(self, form_class):
+        self.form_class = form_class
+
     def __init_subclass__(cls, name, **kwargs):
         super().__init_subclass__(**kwargs)
 
@@ -49,3 +52,20 @@ class FormExtension(object):
 
     def apply(self):
         raise NotImplementedError
+
+
+class Extendable(object):
+    """ Models extending their form classes use this mixin to create the
+    extended forms. It also serves as a marker to possibly keep track of all
+    classes that use extended forms.
+
+    """
+
+    def extend_form_class(self, form_class, extensions):
+        if not extensions:
+            return form_class
+
+        for extension in extensions:
+            form_class = form_extensions[extension](form_class).apply()
+
+        return form_class

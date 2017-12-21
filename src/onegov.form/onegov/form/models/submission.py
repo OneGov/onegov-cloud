@@ -8,6 +8,7 @@ from onegov.file import AssociatedFiles, File
 from onegov.form.display import render_field
 from onegov.form.parser import parse_form
 from onegov.form.utils import extract_text_from_html, hash_definition
+from onegov.form.extensions import Extendable
 from onegov.pay import Payable
 from onegov.pay import process_payment
 from sedate import utcnow
@@ -18,7 +19,8 @@ from wtforms import StringField, TextAreaField
 from wtforms.fields.html5 import EmailField
 
 
-class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles):
+class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
+                     Extendable):
     """ Defines a submitted form in the database. """
 
     __tablename__ = 'submissions'
@@ -74,7 +76,8 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles):
     def form_class(self):
         """ Parses the form definition and returns a form class. """
 
-        return parse_form(self.definition)
+        return self.extend_form_class(
+            parse_form(self.definition), self.meta.get('extensions'))
 
     @property
     def form_obj(self):

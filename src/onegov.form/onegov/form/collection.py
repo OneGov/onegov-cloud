@@ -149,7 +149,7 @@ class FormSubmissionCollection(object):
 
         # this should happen way earlier, we just double check here
         if state == 'complete':
-            assert form.validate()
+            assert form.validate(), "the given form doesn't validate"
         else:
             form.validate()
 
@@ -175,6 +175,16 @@ class FormSubmissionCollection(object):
             definition and definition.payment_method or
             'manual'
         )
+
+        # extensions are inherited from definitions
+        if definition:
+            assert 'extensions' not in submission.meta, """
+                For submissions based on definitions, the extensions need
+                to be defined on the definition!
+            """
+
+            if 'extensions' in definition.meta:
+                submission.meta['extensions'] = definition.meta['extensions']
 
         self.update(submission, form)
 
