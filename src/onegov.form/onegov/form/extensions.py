@@ -39,7 +39,7 @@ class FormExtension(object):
     """
 
     def __init_subclass__(cls, name, **kwargs):
-        super().__init_subclass__(cls, **kwargs)
+        super().__init_subclass__(**kwargs)
 
         assert name not in form_extensions, (
             f"A form extension named {name} already exists"
