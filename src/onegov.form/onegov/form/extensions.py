@@ -16,7 +16,7 @@ class FormExtension(object):
     To create and register a form extension subclass as follows::
 
         class MyExtension(FormExtension, name='my-extension'):
-            def apply(self):
+            def create(self):
                 return self.form_class
 
     Note that you *should not* change the form_class provided to you. Instead
@@ -24,11 +24,11 @@ class FormExtension(object):
     to clone it::
 
         class MyExtension(FormExtension, name='my-extension'):
-            def apply(self):
+            def create(self):
                 return self.form_class.clone()
 
         class MyExtension(FormExtension, name='my-extension'):
-            def apply(self):
+            def create(self):
                 class ExtendedForm(self.form_class):
                     pass
 
@@ -50,7 +50,7 @@ class FormExtension(object):
 
         form_extensions[name] = cls
 
-    def apply(self):
+    def create(self):
         raise NotImplementedError
 
 
@@ -66,6 +66,6 @@ class Extendable(object):
             return form_class
 
         for extension in extensions:
-            form_class = form_extensions[extension](form_class).apply()
+            form_class = form_extensions[extension](form_class).create()
 
         return form_class

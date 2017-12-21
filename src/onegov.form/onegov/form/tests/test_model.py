@@ -39,7 +39,7 @@ def test_form_extensions(session):
 
     class CorporateOnlyExtension(FormExtension, name='corporate-emails-only'):
 
-        def apply(self):
+        def create(self):
             class ExtendedForm(self.form_class, CorporateOnly):
                 pass
 
