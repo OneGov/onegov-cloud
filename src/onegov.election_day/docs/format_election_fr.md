@@ -79,29 +79,22 @@ Le format de fichier nécessite deux diagrammes individuels : l'exportation des 
 ### Exportation des données de colonnes
 
 Dans l'exportation des données, une ligne est présente pour chaque municipalité, les candidats sont disposés en colonnes. Les colonnes suivantes seront évaluées et on devrait au moins avoir celles-ci :
-
-Nom|Description
----|---
-`AnzMandate`|Nombre de places
-`BFS`|Numéro BFS de la municipalité. Une valeur de `0` peut être utilisée pour les expatriés.
-`EinheitBez`|
-`StimmBer`|Autorisé à voter
-`StimmAbgegeben`|Votes
-`StimmLeer`|Votes vides
-`StimmUngueltig`|Votes non valides
-`StimmGueltig`|Votes valides
+- `AnzMandate`
+- `BFS`
+- `EinheitBez`
+- `StimmBer`
+- `StimmAbgegeben`
+- `StimmLeer`
+- `StimmUngueltig`
+- `StimmGueltig`
 
 Ainsi que pour chaque candidat:
-
-Nom|Description
----|---
-`KandID_{XX}`|
-`KandName_{XX}`|
-`KandVorname_{XX}`|
-`Stimmen_{XX}`|
+- `KandID_{XX}`
+- `KandName_{XX}`
+- `KandVorname_{XX}`
+- `Stimmen_{XX}`
 
 De plus, les votes vides et non valides ainsi que les candidats seront saisis par les noms de candidats suivants :
-
 - `KandName_{XX} = 'Leere Zeilen` (Bulletins vides)
 - `KandName_{XX} = 'Ungültige Stimmen` (Bulletins non valides)
 
@@ -134,50 +127,37 @@ Le format de fichier nécessite quatre diagrammes individuels : l'exportation de
 ### Exportation des données de résultats pour les colonnes
 
 Une ligne est présente par candidat et municipalité dans l'exportation des données. Les colonnes suivantes seront évaluées et devraient exister :
-
-Nom|Description
----|---
-`Einheit_BFS`|Numéro BFS de la municipalité. Une valeur de `0` peut être utilisée pour les expatriés.)
-`Einheit_Name`|
-`Kand_Nachname`|Nom de famille du candidat)
-`Kand_Vorname`|Prénom du candidat)
-`Liste_KandID`|Identifiant du candidat)
-`Liste_ID`|Identifiant de la liste de candidats)
-`Liste_Code`|Nom de la liste de candidats)
-`Kand_StimmenTotal`|Nombre de votes de candidats dans la municipalité)
-`Liste_ParteistimmenTotal`|Nombre total de votes de liste.)
+- `Einheit_BFS`
+- `Einheit_Name`
+- `Kand_Nachname`
+- `Kand_Vorname`
+- `Liste_KandID`
+- `Liste_ID`
+- `Liste_Code`
+- `Kand_StimmenTotal`
+- `Liste_ParteistimmenTotal`
 
 #### Résultats du panachage
 
-Les résultats sont susceptibles de contenir les résultats du panachage, ce qui suppose une colonne supplémentaire par liste :
-
-Nom|Description
----|---
-`{List ID}.{List code}`|Le nombre de votes que la liste a obtenu de la liste portant un `Liste_ID` donné. Le fait que `Liste_ID` comporte la valeur `99` (`99.WoP`) indique qu’il s’agit des votes de la liste vide.
+Les résultats sont susceptibles de contenir les résultats du panachage, ce qui suppose une colonne supplémentaire par liste (`{List ID}.{List code}`: le nombre de votes que la liste a obtenu de la liste portant un `Liste_ID` donné). Le fait que `Liste_ID` comporte la valeur `99` (`99.WoP`) indique qu’il s’agit des votes de la liste vide.
 
 ### Exportation des données de statistiques pour les colonnes
 
 Le fichier avec les statistiques des municipalités individuelles devrait contenir les colonnes suivantes :
-
-Nom|Description
----|---
-`Einheit_BFS`|Numéro BFS de la municipalité.
-`Einheit_Name`|
-`StimBerTotal`|Autorisé à voter
-`WZEingegangen`|Bulletins
-`WZLeer`|Bulletins vides
-`WZUngueltig`|Bulletins non valides
-`StmWZVeraendertLeerAmtlLeer`|
+- `Einheit_BFS`
+- `Einheit_Name`
+- `StimBerTotal`
+- `WZEingegangen`
+- `WZLeer`
+- `WZUngueltig`
+- `StmWZVeraendertLeerAmtlLeer`
 
 ### Connexions de liste des colonnes
 
 Le fichier avec les connexions de liste devrait contenir les colonnes suivantes :
-
-Nom|Description
----|---
-`Liste`|Liste
-`LV`|
-`LUV`|
+- `Liste`
+- `LV`
+- `LUV`
 
 ### Résultats de candidats des colonnes
 

@@ -82,29 +82,22 @@ The file format needs two individual charts: the data export and the list of ele
 ### Columns data export
 
 In the data export, there is a row for each municipality, candidates are arranged in columns. The following columns will be evaluated and should exist:
-
-Name|Description
----|---
-`AnzMandate`|
-`BFS`|The municipality number (BFS number) at the time of the election. A value of `0` can be used for expats.
-`EinheitBez`|
-`StimmBer`|
-`StimmAbgegeben`|
-`StimmLeer`|
-`StimmUngueltig`|
-`StimmGueltig`|
+- `AnzMandate`
+- `BFS`
+- `EinheitBez`
+- `StimmBer`
+- `StimmAbgegeben`
+- `StimmLeer`
+- `StimmUngueltig`
+- `StimmGueltig`
 
 As well as for each candidate:
-
-Name|Description
----|---
-`KandID_{XX}`|
-`KandName_{XX}`|
-`KandVorname_{XX}`|
-`Stimmen_{XX}`|
+- `KandID_{XX}`
+- `KandName_{XX}`
+- `KandVorname_{XX}`
+- `Stimmen_{XX}`
 
 Additionally the empty and invalid votes as well as candidates will be captured by the following candidate names:
-
 - `KandName_{XX} = 'Leere Zeilen'**` (Empty votes)
 - `KandName_{XX} = 'Ungültige Stimmen'**` (Invalid votes)
 
@@ -137,50 +130,37 @@ The file format needs four individual charts: the data export of the results, th
 ### Columns data export of the results
 
 There is a line per candidate and municipality in the data export. The following columns will be evaluated and should exist:
-
-Name|Description
----|---
-`Einheit_BFS`|The municipality number (BFS number) at the time of the election. A value of `0` can be used for expats.
-`Einheit_Name`|
-`Kand_Nachname`|
-`Kand_Vorname`|
-`Liste_KandID`|
-`Liste_ID`|
-`Liste_Code`|
-`Kand_StimmenTotal`|
-`Liste_ParteistimmenTotal`|
+- `Einheit_BFS`
+- `Einheit_Name`
+- `Kand_Nachname`
+- `Kand_Vorname`
+- `Liste_KandID`
+- `Liste_ID`
+- `Liste_Code`
+- `Kand_StimmenTotal`
+- `Liste_ParteistimmenTotal`
 
 #### Panachage results
 
-The results may contain panachage results by adding one column per list:
-
-Name|Description
----|---
-`{List ID}.{List code}`|The number of votes the list got from the list with the given `Liste_ID`. A `Liste_ID` with the value `99` (`99.WoP`) marks the votes from the blank list.
+The results may contain panachage results by adding one column per list (`{List ID}.{List code}`: the number of votes the list got from the list with the given `Liste_ID`). A `Liste_ID` with the value `99` (`99.WoP`) marks the votes from the blank list.
 
 ### Columns data export of the statistic
 
 The file with the statistics of the individual municipalities should contain the following columns:
-
-Name|Description
----|---
-`Einheit_BFS`|
-`Einheit_Name`|
-`StimBerTotal`|
-`WZEingegangen`|
-`WZLeer`|
-`WZUngueltig`|
-`StmWZVeraendertLeerAmtlLeer`|
+- `Einheit_BFS`
+- `Einheit_Name`
+- `StimBerTotal`
+- `WZEingegangen`
+- `WZLeer`
+- `WZUngueltig`
+- `StmWZVeraendertLeerAmtlLeer`
 
 ### Columns list connections
 
 The file with list connections should contain the following columns:
-
-Name|Description
----|---
-`Liste`|
-`LV`|
-`LUV`|
+- `Liste`
+- `LV`
+- `LUV`
 
 ### Columns candidate results
 

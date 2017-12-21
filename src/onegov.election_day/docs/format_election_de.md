@@ -81,29 +81,22 @@ Das Datenformat benötig zwei einzelne Tabellen: den Datenexport und die Liste d
 ### Spalten Datenexport
 
 Im Datenexport gibt es für jede Gemeinde eine Zeile, Kandidaten sind in Spalten angeordnet. Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
-
-Name|Beschreibung
----|---
-`AnzMandate`|
-`BFS`|Die BFS Nummer der Gemeinde. Der Wert `0` kann für Auslandslebende verwendet werden.
-`EinheitBez`|
-`StimmBer`|
-`StimmAbgegeben`|
-`StimmLeer`|
-`StimmUngueltig`|
-`StimmGueltig`|
+- `AnzMandate`
+- `BFS`
+- `EinheitBez`
+- `StimmBer`
+- `StimmAbgegeben`
+- `StimmLeer`
+- `StimmUngueltig`
+- `StimmGueltig`
 
 Sowie für jeden Kandidaten:
-
-Name|Beschreibung
----|---
-`KandID_{XX}`|
-`KandName_{XX}`|
-`KandVorname_{XX}`|
-`Stimmen_{XX}`|
+- `KandID_{XX}`
+- `KandName_{XX}`
+- `KandVorname_{XX}`
+- `Stimmen_{XX}`
 
 Zudem werden die leeren und ungültigen Stimmen auch als Kandidaten erfasst mittels der folgenden Kandidatennamen:
-
 - `KandName_{XX} = 'Leere Zeilen'` (Leere Stimmen)
 - `KandName_{XX} = 'Ungültige Stimmen'`
 
@@ -136,50 +129,37 @@ Das Datenformat benötig vier einzelne Tabellen: den Datenexport der Resultate, 
 ### Spalten Datenexport der Resultate
 
 Im Datenexport gibt es eine Zeile pro Kandidat und Gemeinde. Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
-
-Name|Beschreibung
----|---
-`Einheit_BFS`|Die BFS Nummer der Gemeinde. Der Wert `0` kann für Auslandslebende verwendet werden.
-`Einheit_Name`|
-`Kand_Nachname`|
-`Kand_Vorname`|
-`Liste_KandID`|
-`Liste_ID`|
-`Liste_Code`|
-`Kand_StimmenTotal`|
-`Liste_ParteistimmenTotal`|
+- `Einheit_BFS`
+- `Einheit_Name`
+- `Kand_Nachname`
+- `Kand_Vorname`
+- `Liste_KandID`
+- `Liste_ID`
+- `Liste_Code`
+- `Kand_StimmenTotal`
+- `Liste_ParteistimmenTotal`
 
 #### Panaschierdaten
 
-Die Resultaten können Panaschierdaten enthlaten, indem pro Liste eine Spalte hinzugefügt wird:
-
-Name|Beschreibung
----|---
-`{List ID}.{List Code}`|Die Anzahl Stimmen von der Liste mit `Liste_ID`. Die `Liste_ID` mit dem Wert `99` (`99.WoP`) steht für die Blankoliste.
+Die Resultaten können Panaschierdaten enthalten, indem pro Liste eine Spalte hinzugefügt wird (`{List ID}.{List Code}`: die Anzahl Stimmen von der Liste mit `Liste_ID`). Die `Liste_ID` mit dem Wert `99` (`99.WoP`) steht für die Blankoliste.
 
 ### Spalten Datenexport der Statistik
 
 Die Datei mit den Statistiken zu den einzelnen Gemeinden sollte folgende Spalten enthalten:
-
-Name|Beschreibung
----|---
-`Einheit_BFS`|
-`Einheit_Name`|
-`StimBerTotal`|
-`WZEingegangen`|
-`WZLeer`|
-`WZUngueltig`|
-`StmWZVeraendertLeerAmtlLeer`|
+- `Einheit_BFS`
+- `Einheit_Name`
+- `StimBerTotal`
+- `WZEingegangen`
+- `WZLeer`
+- `WZUngueltig`
+- `StmWZVeraendertLeerAmtlLeer`
 
 ### Spalten Listenverbindungen
 
 Die Datei mit den Listenverbindungen sollte folgende Spalten enthalten:
-
-Name|Beschreibung
----|---
-`Liste`|
-`LV`|
-`LUV`|
+- `Liste`
+- `LV`
+- `LUV`
 
 ### Spalten Kandidatenresultate
 

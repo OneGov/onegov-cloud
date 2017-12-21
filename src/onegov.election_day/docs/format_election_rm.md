@@ -81,29 +81,22 @@ Il format da datoteca premetta duas singulas tabellas: l'export da datas e la gl
 ### Colonnas "Export da datas"
 
 En l'export da datas datti ina lingia per mintga vischnanca, las candidatas ed ils candidats figureschan en colonnas. Las suandantas colonnas vegnan evaluadas e duessan esser avant maun:
-
-Num|Descripziun
----|---
-`AnzMandate`|
-`BFS`|Il numer UST da la vischnanca. La valur `0` po vegnir duvrada per persunas che vivan a l'exteriur.
-`EinheitBez`|
-`StimmBer`|
-`StimmAbgegeben`|
-`StimmLeer`|
-`StimmUngueltig`|
-`StimmGueltig`|
+- `AnzMandate`
+- `BFS`
+- `EinheitBez`
+- `StimmBer`
+- `StimmAbgegeben`
+- `StimmLeer`
+- `StimmUngueltig`
+- `StimmGueltig`
 
 Sco er per mintga candidata u candidat:
-
-Num|Descripziun
----|---
-`KandID_{XX}`|
-`KandName_{XX}`|
-`KandVorname_{XX}`|
-`Stimmen_{XX}`|
+- `KandID_{XX}`
+- `KandName_{XX}`
+- `KandVorname_{XX}`
+- `Stimmen_{XX}`
 
 Ultra da quai vegnan las vuschs vidas e nunvalaivlas er registradas sco candidatas e candidats, e quai a maun dals suandants nums da candidat:
-
 - `KandName_{XX} = 'Leere Zeilen'` (Vuschs vidas)
 - `KandName_{XX} = 'Ungültige Stimmen'` (Vuschs nunvalaivlas)
 
@@ -113,9 +106,9 @@ Cunquai ch'il format da datoteca na furnescha naginas infurmaziuns davart las ca
 
 Num|Descripziun
 ---|---
-`ID`|La ID da la candidata u dal candidat (`KandID_{XX}`)
-`Name`|Il num da famiglia da la candidata u dal candidat
-`Vorname`|Il prenum da la candidata u dal candidat
+`ID`|La ID da la candidata u dal candidat (`KandID_{XX}`).
+`Name`|Il num da famiglia da la candidata u dal candidat.
+`Vorname`|Il prenum da la candidata u dal candidat.
 
 ### Resultats temporars
 
@@ -136,51 +129,37 @@ Il format da datoteca premetta quatter singulas tabellas: l'export da datas dals
 ### Colonnas "Export da datas dals resultats"
 
 En l'export da datas datti ina lingia per candidata u candidat e per vischnanca. Las suandantas colonnas vegnan evaluadas e duessan esser avant maun:
-
-Num|Descripziun
----|---
-`Einheit_BFS`|Il numer UST da la vischnanca. La valur `0` po vegnir duvrada per persunas che vivan a l'exteriur.
-`Einheit_Name`|
-`Kand_Nachname`|
-`Kand_Vorname`|
-`Liste_KandID`|
-`Liste_ID`|
-`Liste_Code`|
-`Kand_StimmenTotal`|
-`Liste_ParteistimmenTotal`|
+- `Einheit_BFS`
+- `Einheit_Name`
+- `Kand_Nachname`
+- `Kand_Vorname`
+- `Liste_KandID`
+- `Liste_ID`
+- `Liste_Code`
+- `Kand_StimmenTotal`
+- `Liste_ParteistimmenTotal`
 
 #### Panachage results
 
-Ils resultats pon cuntegnair datas panaschadas, tras quai ch'i vegn agiuntada ina colonna per glista:
-
-Num|Descripziun
----|---
-``{List ID}.{List code}`|
-Il dumber da vuschs da la glista cun `Liste_ID`. La `Liste_ID` cun la valur `99` (`99.WoP`) stat per la glista vida.
+Ils resultats pon cuntegnair datas panaschadas, tras quai ch'i vegn agiuntada ina colonna per glista (`{List ID}.{List code}`: il dumber da vuschs da la glista cun `Liste_ID`). La `Liste_ID` cun la valur `99` (`99.WoP`) stat per la glista vida.
 
 ### Colonnas "Export da datas da la statistica"
 
 La datoteca cun las statisticas tar las singulas vischnancas duess cuntegnair las suandantas colonnas:
-
-Num|Descripziun
----|---
-`Einheit_BFS`|
-`Einheit_Name`|
-`StimBerTotal`|
-`WZEingegangen`|
-`WZLeer`|
-`WZUngueltig`|
-`StmWZVeraendertLeerAmtlLeer`|
+- `Einheit_BFS`
+- `Einheit_Name`
+- `StimBerTotal`
+- `WZEingegangen`
+- `WZLeer`
+- `WZUngueltig`
+- `StmWZVeraendertLeerAmtlLeer`
 
 ### Colonnas "Colliaziuns da glistas"
 
 La datoteca cun las colliaziuns da glistas duess cuntegnair las suandantas colonnas:
-
-Num|Descripziun
----|---
-`Liste`|
-`LV`|
-`LUV`|
+- `Liste`
+- `LV`
+- `LUV`
 
 ### Colonnas "Resultats da las candidatas e dals candidats"
 

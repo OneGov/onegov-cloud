@@ -79,29 +79,22 @@ Il formato del file ha bisogno di due tabelle separate: l'esportazione dei dati 
 ### Esportazione delle colonne dati
 
 Nell'esportazione dei dati, è presente una riga per ogni comune, i candidati sono disposti in colonne. Saranno prese in considerazione le seguenti colonne e devono essere presenti:
-
-Nome|Descrizione
----|---
-`AnzMandate`|
-`BFS`|Numero BFS del comune. Si può usare il valore `0` per gli espatriati
-`EinheitBez`|
-`StimmBer`|
-`StimmAbgegeben`|
-`StimmLeer`|
-`StimmUngueltig`|
-`StimmGueltig`|
+- `AnzMandate`
+- `BFS`
+- `EinheitBez`
+- `StimmBer`
+- `StimmAbgegeben`
+- `StimmLeer`
+- `StimmUngueltig`
+- `StimmGueltig`
 
 Così come per ogni candidato
-
-Nome|Descrizione
----|---
-`KandID_{XX}`|ID del candidato
-`KandName_{XX}`|Cognome del candidato
-`KandVorname_{XX}`|
-`Stimmen_{XX}`|
+- `KandID_{XX}`
+- `KandName_{XX}`
+- `KandVorname_{XX}`
+- `Stimmen_{XX}`
 
 Inoltre i voti, così come i candidati, nulli e non validi saranno attribuiti ai seguenti nomi di candidati:
-
 - `KandName_{XX} = 'Leere Zeilen'`
 - `KandName_{XX} = 'Ungültige Stimmen'`
 
@@ -113,7 +106,7 @@ Nome|Descrizione
 ---|---
 `ID`|ID del candidato (`KandID_{XX}`).
 `Name`|Cognome del candidato.
-`Vorname`|Nome del candidato
+`Vorname`|Nome del candidato.
 
 ### Risultati temporanei
 
@@ -134,50 +127,37 @@ Il formato di file ha bisogno di quattro tabelle separate: l'esportazione dei da
 ### Colonne esportazione dei dati dei risultati
 
 È presente una linea per candidato e comune nell'esportazione dei dati. Saranno prese in considerazione le seguenti colonne e devono essere presenti:
-
-Nome|Descrizione
----|---
-`Einheit_BFS`|Numero BFS del comune. Si può usare il valore `0` per gli espatriati
-`Einheit_Name`|
-`Kand_Nachname`|
-`Kand_Vorname`|
-`Liste_KandID`|
-`Liste_ID`|
-`Liste_Code`|
-`Kand_StimmenTotal`|
-`Liste_ParteistimmenTotal`|
+- `Einheit_BFS`
+- `Einheit_Name`
+- `Kand_Nachname`
+- `Kand_Vorname`
+- `Liste_KandID`
+- `Liste_ID`
+- `Liste_Code`
+- `Kand_StimmenTotal`
+- `Liste_ParteistimmenTotal`
 
 #### Risultati panachage
 
-I risultati possono contenere dei risultati di panachage aggiungendo una colonna per lista:
-
-Nome|Descrizione
----|---
-`{List ID}.{List code}`|Il numero dei voti ottenuti dalla lista proveniente dalla lista con il ‘Liste_ID’ specificato. Se ‘Liste_ID’ vale ‘99’ (’99.WoP’), i voti provengono dalla lista vuota.
+I risultati possono contenere dei risultati di panachage aggiungendo una colonna per lista (`{List ID}.{List code}`: il numero dei voti ottenuti dalla lista proveniente dalla lista con il ‘Liste_ID’ specificato). Se ‘Liste_ID’ vale ‘99’ (’99.WoP’), i voti provengono dalla lista vuota.
 
 ### Colonne esportazione di dati di statistica
 
 Il file con le statistiche dei singoli comuni devono contenere le seguenti colonne:
-
-Nome|Descrizione
----|---
-`Einheit_BFS`|
-`Einheit_Name`|
-`StimBerTotal`|
-`WZEingegangen`|
-`WZLeer`|
-`WZUngueltig`|
-`StmWZVeraendertLeerAmtlLeer`|
+- `Einheit_BFS`
+- `Einheit_Name`
+- `StimBerTotal`
+- `WZEingegangen`
+- `WZLeer`
+- `WZUngueltig`
+- `StmWZVeraendertLeerAmtlLeer`
 
 ### Colonne apparentamenti delle liste
 
 Il file con gli apparentamenti delle liste dovrebbe contenere le seguenti colonne:
-
-Nome|Descrizione
----|---
-`Liste`|
-`LV`|
-`LUV`|
+- `Liste`
+- `LV`
+- `LUV`
 
 ### Colonne risultati candidati
 
