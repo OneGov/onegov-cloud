@@ -1,24 +1,7 @@
 Changelog
 ---------
-1.13.0 (2017-12-12)
-~~~~~~~~~~~~~~~~~~~
 
-- Allows to publish notices and to generate weekly PDFs.
-  [msom]
-
-1.12.1 (2017-12-11)
-~~~~~~~~~~~~~~~~~~~
-
-- Fixes mails with attachments.
-  [msom]
-
-- Adds changelog entries when editing attachments.
-  [msom]
-
-1.12.0 (2017-12-11)
-~~~~~~~~~~~~~~~~~~~
-
-- Adds attachments to notices.
+- Updates dependencies.
   [msom]
 
 1.11.1 (2017-12-08)
