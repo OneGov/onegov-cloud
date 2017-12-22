@@ -1,10 +1,9 @@
-import json
-
 from base64 import b64decode
 from gzip import GzipFile
 from io import BytesIO
 from onegov.activity import InvoiceItem, InvoiceItemCollection
 from onegov.activity.iso20022 import match_iso_20022_to_usernames
+from onegov.core.custom import json
 from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.collections import BillingCollection, BillingDetails

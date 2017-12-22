@@ -1,4 +1,3 @@
-import json
 import onegov.feriennet
 import requests_mock
 import transaction
@@ -11,6 +10,7 @@ from onegov.activity import BookingCollection
 from onegov.activity import OccasionCollection
 from onegov.activity import PeriodCollection
 from onegov.activity.utils import generate_xml
+from onegov.core.custom import json
 from onegov.core.utils import Bunch
 from onegov.pay import Payment, PaymentProviderCollection
 from onegov_testing import Client as BaseClient

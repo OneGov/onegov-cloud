@@ -1,4 +1,3 @@
-import json
 import morepath
 
 from decimal import Decimal
@@ -7,6 +6,7 @@ from onegov.activity import Activity, AttendeeCollection
 from onegov.activity import Booking
 from onegov.activity import BookingCollection
 from onegov.activity import Occasion
+from onegov.core.custom import json
 from onegov.core.security import Personal, Secret
 from onegov.core.templates import render_macro
 from onegov.core.utils import normalize_for_url

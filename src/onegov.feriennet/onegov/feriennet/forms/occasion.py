@@ -1,10 +1,10 @@
 import isodate
-import json
 
 from cached_property import cached_property
 from collections import namedtuple
 from onegov.activity import Occasion, OccasionCollection
 from onegov.activity import Period, PeriodCollection
+from onegov.core.custom import json
 from onegov.feriennet import _
 from onegov.form import Form
 from sedate import to_timezone, standardize_date, overlaps
