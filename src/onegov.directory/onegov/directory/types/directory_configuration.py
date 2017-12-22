@@ -3,7 +3,7 @@ import yaml
 from collections import defaultdict
 from datetime import date, datetime, time
 from more_itertools import collapse
-from onegov.core import custom_json as json
+from onegov.core.custom import json
 from onegov.core.utils import normalize_for_url, safe_format, safe_format_keys
 from onegov.form import parse_formcode, flatten_fieldsets, as_internal_id
 from sqlalchemy.ext.mutable import Mutable

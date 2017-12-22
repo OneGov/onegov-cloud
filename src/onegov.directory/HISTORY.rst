@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Switches to onegov core's custom json module.
+  [href]
+
 - Adds support for text to url migration.
   [href]
 

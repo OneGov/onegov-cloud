@@ -1,8 +1,8 @@
-import json
 import pytest
 import transaction
 
 from datetime import date
+from onegov.core.custom import json
 from onegov.core.utils import Bunch
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryConfiguration
