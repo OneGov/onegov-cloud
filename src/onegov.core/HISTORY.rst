@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to add additional serializers for JSON.
+  [href]
+
 - Now requires Python 3.6+.
   [href]
 

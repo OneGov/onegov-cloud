@@ -5,6 +5,16 @@ from decimal import Decimal
 from onegov.core.custom import json
 
 
+class Point(object):
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
+
+
 def test_custom_json():
 
     dt = datetime(2015, 6, 25, 12, 0)
@@ -42,3 +52,68 @@ def test_sort_keys():
 def test_deprecated_custom_json():
     from onegov.core import custom_json
     assert custom_json.dumps is json.dumps
+
+
+def test_prefix_serializer():
+    prefix = json.PrefixSerializer(
+        target=str,
+        prefix='upper',
+        encode=lambda s: s.upper(),
+        decode=lambda s: s.lower()
+    )
+
+    assert prefix.encode('test') == '__upper__@TEST'
+    assert prefix.decode('__upper__@TEST') == 'test'
+
+
+def test_dictionary_serializer():
+
+    d = json.DictionarySerializer(
+        target=Point,
+        keys=('x', 'y')
+    )
+
+    d.encode(Point(1, 2)) == {'x': 1, 'y': 2}
+    d.decode({'x': 1, 'y': 2}) == Point(1, 2)
+
+    with pytest.raises(TypeError):
+        d.decode({'x': 1, 'y': 2, 'z': 3})
+
+
+def test_serializers():
+    serializers = json.Serializers()
+
+    serializers.register(json.PrefixSerializer(
+        target=str,
+        prefix='upper',
+        encode=lambda s: s.upper(),
+        decode=lambda s: s.lower()
+    ))
+
+    serializers.register(json.DictionarySerializer(
+        target=Point,
+        keys=('x', 'y')
+    ))
+
+    assert serializers.encode('asdf') == '__upper__@ASDF'
+    assert serializers.encode(Point(1, 2)) == {'x': 1, 'y': 2}
+    assert serializers.decode('ASDF') == 'ASDF'
+    assert serializers.decode('__upper__@ASDF') == 'asdf'
+    assert serializers.decode({'x': 1, 'y': 2}) == Point(1, 2)
+    assert serializers.decode({'x': 1, 'y': 2, 'z': 3}) == {
+        'x': 1,
+        'y': 2,
+        'z': 3
+    }
+
+
+def test_serializable():
+    serializers = json.Serializers()
+
+    class SerializablePoint(Point, json.Serializable, keys=('x', 'y')):
+
+        @classmethod
+        def serializers(cls):
+            return serializers  # for testing
+
+    assert serializers.encode(SerializablePoint(1, 2)) == {'x': 1, 'y': 2}
