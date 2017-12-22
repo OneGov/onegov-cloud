@@ -1,8 +1,8 @@
 import hashlib
-import json
 import os
 import re
 
+from onegov.core.custom import json
 from langdetect import DetectorFactory, PROFILES_DIRECTORY
 from langdetect.utils.lang_profile import LangProfile
 from onegov.core.orm import find_models
