@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.11.2 (2017-12-22)
+~~~~~~~~~~~~~~~~~~~
 
 - Updates dependencies.
   [msom]
