@@ -1,4 +1,3 @@
-import json
 import morepath
 import os.path
 
@@ -7,6 +6,7 @@ from depot.manager import DepotManager
 from depot.middleware import FileServeApp
 from more.transaction.main import transaction_tween_factory
 from morepath import App
+from onegov.core.custom import json
 from onegov.core.security import Private, Public
 from onegov.file.collection import FileCollection
 from onegov.file.models import File
@@ -152,7 +152,6 @@ def respond_with_alt_text(reference, request):
         # JSON before showing it
         response.headers.add('X-File-Note', json.dumps(
             {'note': reference.note or ''},
-            separators=(',', ':')
         ))
 
 
