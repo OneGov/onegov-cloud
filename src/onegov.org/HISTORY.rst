@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Switches to onegov core's custom json module.
+  [href]
+
 0.19.6 (2017-12-19)
 ~~~~~~~~~~~~~~~~~~~
 

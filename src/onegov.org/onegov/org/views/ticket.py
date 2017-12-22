@@ -1,7 +1,7 @@
-import json
 import morepath
 
 from onegov.chat import MessageCollection
+from onegov.core.custom import json
 from onegov.core.security import Public, Private
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
@@ -50,8 +50,7 @@ def view_ticket(self, request):
         'deleted': handler.deleted,
         'handler': handler,
         'feed_data': json.dumps(
-            view_messages_feed(messages, request),
-            separators=(',', ':')
+            view_messages_feed(messages, request)
         ),
     }
 

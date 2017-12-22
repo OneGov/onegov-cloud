@@ -1,4 +1,3 @@
-import json
 import onegov.core
 import onegov.org
 import pytest
@@ -11,6 +10,7 @@ from base64 import b64decode, b64encode
 from datetime import datetime, date, timedelta
 from libres.modules.errors import AffectedReservationError
 from lxml.html import document_fromstring
+from onegov.core.custom import json
 from onegov.core.utils import Bunch
 from onegov.form import FormCollection, FormSubmission
 from onegov.newsletter import RecipientCollection

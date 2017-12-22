@@ -1,8 +1,7 @@
-import json
-
 from collections import namedtuple
 from onegov.chat import Message
 from onegov.chat import MessageCollection
+from onegov.core.custom import json
 from onegov.core.security import Private
 from onegov.org import OrgApp, _
 from onegov.org.layout import MessageCollectionLayout
@@ -86,8 +85,7 @@ def view_messages(self, request):
         'title': _("Timeline"),
         'feed': request.link(self, 'feed'),
         'feed_data': json.dumps(
-            view_messages_feed(self, request),
-            separators=(',', ':')
+            view_messages_feed(self, request)
         ),
         'feed_interval': 15
     }

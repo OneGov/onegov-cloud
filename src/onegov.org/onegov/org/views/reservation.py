@@ -1,10 +1,10 @@
-import json
 import morepath
 import sedate
 import transaction
 
 from datetime import time
 from libres.modules.errors import LibresError
+from onegov.core.custom import json
 from onegov.core.security import Public, Private
 from onegov.form import FormCollection, merge_forms
 from onegov.org import _, OrgApp
