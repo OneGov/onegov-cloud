@@ -94,7 +94,7 @@ class DictionarySerializer(Serializer):
     def __init__(self, target, keys):
         super().__init__(target)
 
-        self.keys = tuple(keys)
+        self.keys = frozenset(keys)
 
     def encode(self, obj):
         return {k: obj.__dict__[k] for k in self.keys}
@@ -114,6 +114,7 @@ class Serializers(object):
     def __init__(self):
         self.by_prefix = {}
         self.by_keys = {}
+        self.known_key_lengths = set()
 
     @property
     def registered(self):
@@ -125,6 +126,7 @@ class Serializers(object):
 
         elif isinstance(serializer, DictionarySerializer):
             self.by_keys[serializer.keys] = serializer
+            self.known_key_lengths.add(len(serializer.keys))
 
         else:
             raise NotImplementedError
@@ -144,7 +146,14 @@ class Serializers(object):
         return self.by_prefix.get(match.group('prefix') if match else None)
 
     def serializer_for_dict(self, dictionary):
-        return self.by_keys.get(tuple(dictionary.keys()))
+
+        # we can exit early for all dictionaries which cannot possibly match
+        # the keys we're looking for by comparing the number of keys in the
+        # dictionary - this is much cheaper than the next lookup
+        if len(dictionary.keys()) not in self.known_key_lengths:
+            return
+
+        return self.by_keys.get(frozenset(dictionary.keys()))
 
     @lru_cache(maxsize=16)
     def serializer_for_class(self, cls):
