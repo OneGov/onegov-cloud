@@ -1,4 +1,4 @@
-from json import dumps, loads
+from onegov.core.custom import json
 from onegov.user.auth import Auth
 from onegov.user.collections import UserCollection
 from onegov.user.forms import LoginForm
@@ -27,7 +27,7 @@ class DummyRequest():
         if not token:
             return None
 
-        return loads(token)
+        return json.loads(token)
 
 
 class DummyPostData(dict):
@@ -146,7 +146,7 @@ def test_password_reset_form(session):
     form.process(DummyPostData({
         'email': 'info@example.com',
         'password': 'much_secret',
-        'token': dumps({'username': 'username'})
+        'token': json.dumps({'username': 'username'})
     }))
     assert form.validate()
     assert not form.update_password(request)
@@ -154,7 +154,7 @@ def test_password_reset_form(session):
     form.process(DummyPostData({
         'email': 'info@example.com',
         'password': 'much_secret',
-        'token': dumps({'username': 'info@example.com'})
+        'token': json.dumps({'username': 'info@example.com'})
     }))
     assert form.validate()
     assert not form.update_password(request)
@@ -162,7 +162,7 @@ def test_password_reset_form(session):
     form.process(DummyPostData({
         'email': 'info@example.com',
         'password': 'much_secret',
-        'token': dumps({'username': 'info@example.com'})
+        'token': json.dumps({'username': 'info@example.com'})
     }))
     assert form.validate()
     assert not form.update_password(request)
@@ -173,7 +173,7 @@ def test_password_reset_form(session):
     form.process(DummyPostData({
         'email': 'info@example.com',
         'password': 'much_secret',
-        'token': dumps({'username': 'info@example.com'})
+        'token': json.dumps({'username': 'info@example.com'})
     }))
     assert form.validate()
     assert not form.update_password(request)
@@ -181,7 +181,7 @@ def test_password_reset_form(session):
     form.process(DummyPostData({
         'email': 'info@example.com',
         'password': 'much_secret',
-        'token': dumps({
+        'token': json.dumps({
             'username': 'info@example.com',
             'modified': 'now'
         })
@@ -192,7 +192,7 @@ def test_password_reset_form(session):
     form.process(DummyPostData({
         'email': 'info@example.com',
         'password': 'much_secret',
-        'token': dumps({
+        'token': json.dumps({
             'username': 'info@example.com',
             'modified': ''
         })
@@ -203,7 +203,7 @@ def test_password_reset_form(session):
     form.process(DummyPostData({
         'email': 'info@example.com',
         'password': 'much_secret',
-        'token': dumps({
+        'token': json.dumps({
             'username': 'info@example.com',
             'modified': ''
         })

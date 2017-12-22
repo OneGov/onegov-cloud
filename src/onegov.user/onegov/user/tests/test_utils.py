@@ -1,4 +1,4 @@
-from json import dumps
+from onegov.core.custom import json
 from onegov.user.utils import password_reset_url
 from onegov.user.collections import UserCollection
 
@@ -7,7 +7,7 @@ class DummyRequest():
     client_addr = '127.0.0.1'
 
     def new_url_safe_token(self, token):
-        return dumps(token, sort_keys=True)
+        return json.dumps(token, sort_keys=True)
 
 
 def test_password_reset_url(session):
@@ -19,5 +19,5 @@ def test_password_reset_url(session):
     url = password_reset_url(user, request, 'http://localhost/reset')
     assert url == (
         'http://localhost/reset?'
-        'token={"modified": "", "username": "info@example.com"}'
+        'token={"modified":"","username":"info@example.com"}'
     )
