@@ -11,7 +11,6 @@ don't support decoding...
 
 import datetime
 import isodate
-import types
 
 from decimal import Decimal
 from rapidjson import Encoder as RapidJsonEncoder
