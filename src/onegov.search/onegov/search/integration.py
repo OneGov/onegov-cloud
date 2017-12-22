@@ -248,7 +248,7 @@ class ElasticsearchApp(morepath.App):
 
         for base in self.session_manager.bases:
             for model in searchable_sqlalchemy_models(base):
-                for obj in session.query(model).all():
+                for obj in session.query(model):
                     self.es_orm_events.index(self.schema, obj)
                     self.es_indexer.process()
 

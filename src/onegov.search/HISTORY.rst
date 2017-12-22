@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Uses less memory during reindexing.
+  [href]
+
 - Switches to onegov core's custom json module.
   [href]
 
