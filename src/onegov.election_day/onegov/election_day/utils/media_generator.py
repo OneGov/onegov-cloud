@@ -4,10 +4,10 @@ from base64 import b64decode
 from copy import deepcopy
 from io import BytesIO
 from io import StringIO
-from json import loads
 from onegov.ballot import Ballot
 from onegov.ballot import Election
 from onegov.ballot import Vote
+from onegov.core.custom import json
 from onegov.core.utils import groupbylist
 from onegov.core.utils import module_path
 from onegov.election_day import _
@@ -140,7 +140,7 @@ class MediaGenerator():
             'static/mapdata/{}/{}.json'.format(year, self.app.principal.id)
         )
         with open(path, 'r') as f:
-            mapdata = loads(f.read())
+            mapdata = json.loads(f.read())
 
         params = params or {}
         params.update({

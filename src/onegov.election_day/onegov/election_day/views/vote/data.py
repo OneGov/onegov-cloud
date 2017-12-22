@@ -1,8 +1,8 @@
-from json import dumps
 from morepath.request import Response
 from onegov.ballot import Vote
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.csv import convert_list_of_dicts_to_xlsx
+from onegov.core.custom import json
 from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
@@ -42,7 +42,7 @@ def view_vote_data_as_json(self, request):
         add_last_modified_header(response, self.last_modified)
 
     return Response(
-        dumps(self.export(), sort_keys=True, indent=2).encode('utf-8'),
+        json.dumps(self.export(), sort_keys=True, indent=2).encode('utf-8'),
         content_type='application/json',
         content_disposition='inline; filename={}.json'.format(
             normalize_for_url(self.title)

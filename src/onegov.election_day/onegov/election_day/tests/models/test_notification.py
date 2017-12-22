@@ -2,7 +2,6 @@ from datetime import date
 from datetime import datetime
 from datetime import timezone
 from freezegun import freeze_time
-from json import loads
 from onegov.ballot import BallotResult
 from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
@@ -13,6 +12,7 @@ from onegov.ballot import List
 from onegov.ballot import ListResult
 from onegov.ballot import ProporzElection
 from onegov.ballot import Vote
+from onegov.core.custom import json
 from onegov.election_day.models import EmailNotification
 from onegov.election_day.models import EmailSubscriber
 from onegov.election_day.models import Notification
@@ -137,7 +137,7 @@ def test_webhook_notification(session):
             assert headers['Content-type'] == 'application/json; charset=utf-8'
             assert headers['Content-length'] == len(data)
 
-            assert loads(data.decode('utf-8')) == {
+            assert json.loads(data.decode('utf-8')) == {
                 'completed': False,
                 'date': '2011-01-01',
                 'domain': 'federation',
@@ -158,7 +158,7 @@ def test_webhook_notification(session):
             assert headers['Content-type'] == 'application/json; charset=utf-8'
             assert headers['Content-length'] == len(data)
 
-            assert loads(data.decode('utf-8')) == {
+            assert json.loads(data.decode('utf-8')) == {
                 'answer': None,
                 'completed': False,
                 'date': '2011-01-01',

@@ -1,10 +1,11 @@
 import onegov.election_day
 import yaml
-import json
+
 
 from datetime import date
 from cached_property import cached_property
 from collections import OrderedDict
+from onegov.core.custom import json
 from onegov.core import utils
 from onegov.election_day import _
 from pathlib import Path

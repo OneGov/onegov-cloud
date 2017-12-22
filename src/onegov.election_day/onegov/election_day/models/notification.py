@@ -1,6 +1,6 @@
-from json import dumps
 from onegov.ballot.models import Election
 from onegov.ballot.models import Vote
+from onegov.core.custom import json
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UTCDateTime
@@ -88,7 +88,7 @@ class WebhookNotification(Notification):
         webhooks = request.app.principal.webhooks
         if webhooks:
             summary = get_summary(model, request)
-            data = dumps(summary).encode('utf-8')
+            data = json.dumps(summary).encode('utf-8')
             for url, headers in webhooks.items():
                 headers = headers or {}
                 headers['Content-Type'] = 'application/json; charset=utf-8'
