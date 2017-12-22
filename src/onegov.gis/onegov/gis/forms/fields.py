@@ -1,6 +1,5 @@
-import json
-
 from base64 import b64decode, b64encode
+from onegov.core.custom import json
 from onegov.gis.forms.widgets import CoordinatesWidget
 from onegov.gis.models import Coordinates
 from wtforms.fields import StringField

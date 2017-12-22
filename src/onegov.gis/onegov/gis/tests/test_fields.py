@@ -1,6 +1,5 @@
-import json
-
 from base64 import b64encode
+from onegov.core.custom import json
 from onegov.form import Form
 from onegov.gis.models import Coordinates
 from onegov.gis.forms import CoordinatesField

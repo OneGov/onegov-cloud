@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Switches to onegov core's custom json module.
+  [href]
+
 - Renders icon in marker as svg, not html.
   [href]
 
