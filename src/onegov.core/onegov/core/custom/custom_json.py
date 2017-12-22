@@ -227,9 +227,20 @@ class Serializable(object):
     def serializers(cls):
         return default_serializers  # for testing
 
+    def as_dict(self):
+        """ Not actually used by onegov.core itself, this method is useful
+        in a number of contexts where we want a dictionary representation of
+        without having to go through the encoding process.
+
+        Dictionary so produced get decoded into the proper class.
+
+        """
+        return {k: self.__dict__[k] for k in self.serialized_keys}
+
     def __init_subclass__(cls, keys, **kwargs):
         super().__init_subclass__(**kwargs)
 
+        cls.serialized_keys = keys
         cls.serializers().register(DictionarySerializer(
             target=cls,
             keys=keys
