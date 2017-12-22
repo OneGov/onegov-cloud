@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.2.3 (2017-12-22)
+~~~~~~~~~~~~~~~~~~~
+
 - Uses less memory during reindexing.
   [href]
 
