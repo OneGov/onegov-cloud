@@ -1,3 +1,5 @@
+import pytest
+
 from datetime import datetime
 from decimal import Decimal
 from onegov.core.custom import json
@@ -25,6 +27,16 @@ def test_custom_json():
 
     data['generator'] = [x for x in range(0, 4)]
     assert json.loads(text) == data
+
+
+def test_not_serializable():
+    with pytest.raises(TypeError):
+        json.dumps({'x': object()})
+
+
+def test_sort_keys():
+    data = {'c': 1, 'a': 2}
+    assert json.dumps(data, sort_keys=True) == '{"a":2,"c":1}'
 
 
 def test_deprecated_custom_json():

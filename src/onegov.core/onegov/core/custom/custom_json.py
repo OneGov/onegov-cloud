@@ -14,7 +14,6 @@ import isodate
 import types
 
 from decimal import Decimal
-from onegov.core import utils
 from rapidjson import Encoder as RapidJsonEncoder
 from rapidjson import Decoder as RapidJsonDecoder
 
@@ -31,16 +30,8 @@ class Encoder(RapidJsonEncoder):
             return '__time__@' + isodate.time_isoformat(o)
         elif isinstance(o, types.GeneratorType):
             return list(o)
-        else:
-            if isinstance(o, str):
-                # make sure the reserved words can't be added as a string by
-                # some smartass that wants to screw with us
-                o = utils.lchop(o, '__date__@')
-                o = utils.lchop(o, '__datetime__@')
-                o = utils.lchop(o, '__decimal__@')
-                o = utils.lchop(o, '__time__@')
 
-            return super().default(o)
+        raise TypeError('{} is not JSON serializable'.format(repr(o)))
 
 
 class Decoder(RapidJsonDecoder):
