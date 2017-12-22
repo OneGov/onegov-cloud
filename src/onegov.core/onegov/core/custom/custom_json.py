@@ -28,8 +28,6 @@ class Encoder(RapidJsonEncoder):
             return '__decimal__@' + str(o)
         elif isinstance(o, datetime.time):
             return '__time__@' + isodate.time_isoformat(o)
-        elif isinstance(o, types.GeneratorType):
-            return list(o)
 
         raise TypeError('{} is not JSON serializable'.format(repr(o)))
 
