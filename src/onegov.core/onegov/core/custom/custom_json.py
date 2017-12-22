@@ -11,14 +11,15 @@ don't support decoding...
 
 import datetime
 import isodate
-import json
 import types
 
 from decimal import Decimal
 from onegov.core import utils
+from rapidjson import Encoder as RapidJsonEncoder
+from rapidjson import Decoder as RapidJsonDecoder
 
 
-class CustomJSONEncoder(json.JSONEncoder):
+class Encoder(RapidJsonEncoder):
     def default(self, o):
         if isinstance(o, datetime.datetime):
             return '__datetime__@' + isodate.datetime_isoformat(o)
@@ -42,52 +43,40 @@ class CustomJSONEncoder(json.JSONEncoder):
             return super().default(o)
 
 
-def custom_json_decoder(value):
-    if not isinstance(value, str):
+class Decoder(RapidJsonDecoder):
+    def string(self, value):
+        if value.startswith('__date__@'):
+            return isodate.parse_date(value[9:])
+
+        if value.startswith('__datetime__@'):
+            return isodate.parse_datetime(value[13:])
+
+        if value.startswith('__decimal__@'):
+            return Decimal(value[12:])
+
+        if value.startswith('__time__@'):
+            return isodate.parse_time(value[9:])
+
         return value
 
-    if value.startswith('__date__@'):
-        return isodate.parse_date(value[9:])
 
-    if value.startswith('__datetime__@'):
-        return isodate.parse_datetime(value[13:])
-
-    if value.startswith('__decimal__@'):
-        return Decimal(value[12:])
-
-    if value.startswith('__time__@'):
-        return isodate.parse_time(value[9:])
-
-    return value
-
-
-def json_loads_object_hook(dictionary):
-    for key, value in dictionary.items():
-
-        if isinstance(value, str):
-            dictionary[key] = custom_json_decoder(value)
-
-        elif isinstance(value, (list, tuple)):
-            dictionary[key] = list(map(custom_json_decoder, value))
-
-    return dictionary
-
-
-def encode_decimal(o):
-    """ Encodes a Python decimal.Decimal object as an ECMA-262 compliant
-    decimal string."""
-    return str(o)
-
-
-def dumps(obj):
+def dumps(obj, *args, **kwargs):
     if obj is not None:
-        return json.dumps(obj, cls=CustomJSONEncoder)
+        return Encoder(*args, **kwargs)(obj)
     else:
         return None
 
 
-def loads(value):
+def loads(value, *args, **kwargs):
     if value is not None:
-        return json.loads(value, object_hook=json_loads_object_hook)
+        return Decoder(*args, **kwargs)(value)
     else:
         return {}
+
+
+def dump(data, fp, *args, **kwargs):
+    return fp.write(dumps(data, *args, **kwargs))
+
+
+def load(fp, *args, **kwargs):
+    return loads(fp.read(), *args, **kwargs)

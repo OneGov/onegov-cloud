@@ -1,10 +1,10 @@
-import json
 import onegov.core
 import os.path
 import pytest
 import transaction
 
 from onegov.core import utils
+from onegov.core.custom import json
 from onegov.core.orm import SessionManager
 from onegov.core.orm.types import HSTORE
 from sqlalchemy import Column, Integer

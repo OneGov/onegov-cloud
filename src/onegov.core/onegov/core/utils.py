@@ -4,7 +4,6 @@ import gzip
 import hashlib
 import importlib
 import inspect
-import json
 import magic
 import mimetypes
 import morepath
@@ -19,6 +18,7 @@ from contextlib import contextmanager
 from cProfile import Profile
 from datetime import datetime
 from onegov.core.cache import lru_cache
+from onegov.core.custom import json
 from importlib import import_module
 from itertools import groupby, tee, zip_longest
 from onegov.core import log

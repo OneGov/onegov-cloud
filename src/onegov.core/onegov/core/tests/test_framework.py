@@ -1,4 +1,3 @@
-import json
 import morepath
 import os
 import transaction
@@ -12,6 +11,7 @@ from email.utils import parseaddr
 from freezegun import freeze_time
 from itsdangerous import BadSignature, Signer
 from mailthon.enclosure import Attachment
+from onegov.core.custom import json
 from onegov.core.framework import Framework
 from onegov.core.html import html_to_text
 from onegov.core.redirect import Redirect
@@ -956,7 +956,7 @@ def test_send_hipchat(session):
         assert headers == {
             'Content-type': 'application/json; charset=utf-8',
             'Authorization': 'Bearer abcd',
-            'Content-length': 122
+            'Content-length': 113
         }
 
         thread = app.send_hipchat(

@@ -19,7 +19,6 @@ Using the framework does not really differ from using Morepath::
 import dectate
 import hashlib
 import inspect
-import json
 import morepath
 import pylru
 import traceback
@@ -38,6 +37,7 @@ from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
 from more.webassets.tweens import METHODS, CONTENT_TYPES
 from onegov.core import cache, log, utils
+from onegov.core.custom import json
 from onegov.core import directives
 from onegov.core.datamanager import MailDataManager
 from onegov.core.mail import email, Postman, MaildirPostman

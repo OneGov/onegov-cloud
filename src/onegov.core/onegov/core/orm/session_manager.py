@@ -5,7 +5,7 @@ import zope.sqlalchemy
 
 from blinker import Signal
 from onegov.core.cache import lru_cache
-from onegov.core import custom_json
+from onegov.core.custom import json
 from sqlalchemy import create_engine, event, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.pool import QueuePool
@@ -189,8 +189,8 @@ class SessionManager(object):
         assert 'json_serializer' not in engine_config
         assert 'json_deserializer' not in engine_config
 
-        engine_config['json_serializer'] = custom_json.dumps
-        engine_config['json_deserializer'] = custom_json.loads
+        engine_config['json_serializer'] = json.dumps
+        engine_config['json_deserializer'] = json.loads
 
         if pool_config:
             engine_config.update(pool_config)

@@ -61,6 +61,7 @@ setup(
         'psqlparse',
         'python-magic>=0.4.12',
         'python-memcached>=1.57',
+        'python-rapidjson',
         'psycopg2',
         'pylru',
         'pycurl',

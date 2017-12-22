@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Switches default json implementation to rapidjson.
+  [href]
+
 0.55.1 (2017-12-20)
 ~~~~~~~~~~~~~~~~~~~
 
