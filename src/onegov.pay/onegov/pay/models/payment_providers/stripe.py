@@ -63,7 +63,7 @@ class StripeCaptureManager(object):
         try:
             with stripe_api_key(self.api_key):
                 self.charge.capture()
-        except:
+        except Exception as e:
             # we can never fail or we might end up with an incosistent
             # database -> so must swallow any errors and report them
             log.exception("Stripe charge with capture id {} failed".format(
@@ -379,12 +379,12 @@ class StripeConnect(PaymentProvider):
                 code=self.authorization_code,
             )
 
-        assert token['scope'] == 'read_write'
+        assert token.data['scope'] == 'read_write'
 
-        self.publishable_key = token['stripe_publishable_key']
-        self.user_id = token['stripe_user_id']
-        self.refresh_token = token['refresh_token']
-        self.access_token = token['access_token']
+        self.publishable_key = token.data['stripe_publishable_key']
+        self.user_id = token.data['stripe_user_id']
+        self.refresh_token = token.data['refresh_token']
+        self.access_token = token.data['access_token']
 
     def sync(self):
         session = object_session(self)

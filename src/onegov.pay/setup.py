@@ -36,7 +36,7 @@ setup(
         'onegov.core>=0.4.0',
         'purl',
         'requests',
-        'stripe'
+        'stripe>=1.77.0'
     ],
     extras_require=dict(
         test=[

@@ -3,6 +3,7 @@ import pytest
 import requests_mock
 import transaction
 
+from onegov.core.utils import Bunch
 from onegov.pay.models.payment_providers.stripe import (
     StripeConnect,
     StripeFeePolicy,
@@ -46,13 +47,13 @@ def test_process_oauth_response():
 
     assert e.value.args == ('Stripe OAuth request failed (foo: bar)', )
 
-    with mock.patch('stripe.OAuth.token', return_value={
+    with mock.patch('stripe.OAuth.token', return_value=Bunch(data={
         'scope': 'read_write',
         'stripe_publishable_key': 'pubkey',
         'stripe_user_id': 'uid',
         'refresh_token': 'rtoken',
         'access_token': 'atoken',
-    }):
+    })):
         provider.process_oauth_response({
             'code': '0xdeadbeef',
             'oauth_redirect_secret': 'foo'
