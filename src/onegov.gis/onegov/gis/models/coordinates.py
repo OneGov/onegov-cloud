@@ -21,6 +21,9 @@ class Coordinates(json.Serializable, keys=('lon', 'lat', 'zoom')):
         return False if None in (self.lat, self.lon) else True
 
     def __eq__(self, other):
+        if not isinstance(other, Coordinates):
+            return False
+
         return self.lat == other.lat and\
             self.lon == other.lon and\
             self.zoom == other.zoom
