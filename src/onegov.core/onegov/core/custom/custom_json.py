@@ -89,6 +89,17 @@ class DictionarySerializer(Serializer):
 
         {'x': 1, 'y': 2}
 
+    As the internal __dict__ represenation is of no concern, __slots__ may
+    be used:
+
+        class Point(object):
+
+            __slots__ = ('x', 'y')
+
+            def __init__(self, x, y):
+                self.x = x
+                self.y = y
+
     """
 
     def __init__(self, target, keys):
@@ -97,7 +108,7 @@ class DictionarySerializer(Serializer):
         self.keys = frozenset(keys)
 
     def encode(self, obj):
-        return {k: obj.__dict__[k] for k in self.keys}
+        return {k: getattr(obj, k) for k in self.keys}
 
     def decode(self, dictionary):
         return self.target(**dictionary)
@@ -226,16 +237,6 @@ class Serializable(object):
     @classmethod
     def serializers(cls):
         return default_serializers  # for testing
-
-    def as_dict(self):
-        """ Not actually used by onegov.core itself, this method is useful
-        in a number of contexts where we want a dictionary representation of
-        without having to go through the encoding process.
-
-        Dictionary so produced get decoded into the proper class.
-
-        """
-        return {k: self.__dict__[k] for k in self.serialized_keys}
 
     def __init_subclass__(cls, keys, **kwargs):
         super().__init_subclass__(**kwargs)
