@@ -846,6 +846,11 @@ form {
         img {
             margin-top: .5rem;
         }
+
+        .marker-map {
+            max-height: 300px;
+            max-width: 500px;
+        }
     }
 }
 
