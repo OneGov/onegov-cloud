@@ -2,6 +2,7 @@ from collections import OrderedDict
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.utils import linkify
 from onegov.form import FieldDependency, WTFormsClassBuilder
+from onegov.gis import CoordinatesField
 from onegov.gis import CoordinatesMixin
 from onegov.org import _
 from onegov.org.forms.extensions import CoordinatesFormExtension
