@@ -1,5 +1,4 @@
 from cached_property import cached_property
-from onegov.core import utils
 from onegov.core.templates import render_macro
 from onegov.directory import Directory
 from onegov.event import EventCollection
@@ -91,7 +90,7 @@ class FormSubmissionHandler(Handler):
     def extra_data(self):
         return self.submission and [
             v for v in self.submission.data.values()
-            if not utils.is_non_string_iterable(v)
+            if isinstance(v, str)
         ]
 
     def get_summary(self, request):
@@ -157,7 +156,7 @@ class ReservationHandler(Handler):
     def extra_data(self):
         return self.submission and [
             v for v in self.submission.data.values()
-            if not utils.is_non_string_iterable(v)
+            if isinstance(v, str)
         ]
 
     @property
@@ -479,7 +478,7 @@ class DirectoryEntryHandler(Handler):
     def extra_data(self):
         return self.submission and [
             v for v in self.submission.data.values()
-            if not utils.is_non_string_iterable(v)
+            if isinstance(v, str)
         ]
 
     def get_summary(self, request):
