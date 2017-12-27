@@ -36,25 +36,25 @@ class CoordinatesField(StringField):
         self.data = getattr(self, 'data', Coordinates())
 
     def _value(self):
-        text = json.dumps(self.data.as_dict())
+        text = json.dumps(self.data) or '{}'
         text = b64encode(text.encode('ascii'))
         text = text.decode('ascii')
 
         return text
 
     def process_data(self, value):
-        if isinstance(value, Coordinates):
-            self.data = value
+        if isinstance(value, dict):
+            self.data = Coordinates(**value)
         else:
-            self.data = value and Coordinates(**value) or Coordinates()
+            self.data = value
 
     def populate_obj(self, obj, name):
-        setattr(obj, name, self.data and self.data.as_dict() or None)
+        setattr(obj, name, self.data)
 
     def process_formdata(self, valuelist):
         if valuelist and valuelist[0]:
             text = b64decode(valuelist[0])
             text = text.decode('ascii')
-            self.data = Coordinates(**json.loads(text))
+            self.data = json.loads(text)
         else:
             self.data = Coordinates()

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Automatically turns the corodinates model into a json and vice-versa.
+  [href]
+
 0.5.2 (2017-12-22)
 ~~~~~~~~~~~~~~~~~~~
 

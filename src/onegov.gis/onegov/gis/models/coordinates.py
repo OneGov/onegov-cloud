@@ -1,4 +1,7 @@
-class Coordinates(object):
+from onegov.core.custom import json
+
+
+class Coordinates(json.Serializable, keys=('lon', 'lat', 'zoom')):
     """ Represents a pair of coordinates.
 
     May contain zoom factor and other information like marker icon and
@@ -6,6 +9,8 @@ class Coordinates(object):
     may or may not be used.
 
     """
+
+    __slots__ = ('lon', 'lat', 'zoom')
 
     def __init__(self, lat=None, lon=None, zoom=None):
         self.lat = lat
@@ -15,12 +20,10 @@ class Coordinates(object):
     def __bool__(self):
         return False if None in (self.lat, self.lon) else True
 
-    def as_dict(self):
-        return {
-            'lat': self.lat,
-            'lon': self.lon,
-            'zoom': self.zoom
-        }
+    def __eq__(self, other):
+        return self.lat == other.lat and\
+            self.lon == other.lon and\
+            self.zoom == other.zoom
 
 
 class CoordinatesMixin(object):
@@ -31,14 +34,8 @@ class CoordinatesMixin(object):
 
     @property
     def coordinates(self):
-        return Coordinates(**self.content.get('coordinates', {}))
+        return self.content.get('coordinates') or Coordinates()
 
     @coordinates.setter
     def coordinates(self, value):
-        if value is None:
-            value = {}
-
-        if not isinstance(value, dict):
-            value = value.as_dict()
-
-        self.content['coordinates'] = value
+        self.content['coordinates'] = value or {}
