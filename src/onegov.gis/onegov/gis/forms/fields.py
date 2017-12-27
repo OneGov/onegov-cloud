@@ -1,5 +1,6 @@
 from base64 import b64decode, b64encode
 from onegov.core.custom import json
+from onegov.form.display import registry, BaseRenderer
 from onegov.gis.forms.widgets import CoordinatesWidget
 from onegov.gis.models import Coordinates
 from wtforms.fields import StringField
@@ -58,3 +59,19 @@ class CoordinatesField(StringField):
             self.data = json.loads(text)
         else:
             self.data = Coordinates()
+
+
+@registry.register_for('CoordinatesField')
+class CoordinatesFieldRenderer(BaseRenderer):
+    def __call__(self, field):
+        return """
+            <div class="marker-map"
+                 data-map-type="thumbnail"
+                 data-lat="{lat}"
+                 data-lon="{lon}"
+                 data-zoom="{zoom}"></div>
+        """.format(
+            lat=field.data.lat,
+            lon=field.data.lon,
+            zoom=field.data.zoom
+        )

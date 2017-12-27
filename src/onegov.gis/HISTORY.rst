@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a display renderer for the coordinates field.
+  [href]
+
 - Automatically turns the corodinates model into a json and vice-versa.
   [href]
 
