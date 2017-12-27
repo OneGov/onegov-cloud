@@ -18,8 +18,8 @@
                     <p tal:content="structure description"></p>
                 </div>
 
-                <div class="occurrence-map" tal:condition="occurrence.has_coordinates">
-                    <div class="marker-map" data-lat="${occurrence.lat}" data-lon="${occurrence.lon}" data-zoom="${occurrence.zoom}"></div>
+                <div class="occurrence-map" tal:define="coordinates occurrence.event.coordinates" tal:condition="coordinates">
+                    <div class="marker-map" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}"></div>
                 </div>
 
                 <div class="occurrence-organizer" tal:condition="organizer">

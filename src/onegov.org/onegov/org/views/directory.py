@@ -229,8 +229,10 @@ def view_geojson(self, request):
         DirectoryEntry.name,
         DirectoryEntry.title,
         DirectoryEntry.lead,
-        DirectoryEntry.content["coordinates"].label('coordinates')
+        DirectoryEntry.content["coordinates"]["lat"].label('lat'),
+        DirectoryEntry.content["coordinates"]["lon"].label('lon')
     )
+    q = q.filter(DirectoryEntry.content["coordinates"]["lat"] != None)
 
     url_prefix = request.class_link(DirectoryEntry, {
         'directory_name': self.directory.name,
@@ -246,10 +248,10 @@ def view_geojson(self, request):
             'link': url_prefix + e.name
         },
         'geometry': {
-            'coordinates': [e.coordinates['lon'], e.coordinates['lat']],
+            'coordinates': [e.lon, e.lat],
             'type': "Point"
         }
-    } for e in q if e.coordinates)
+    } for e in q)
 
 
 @OrgApp.form(

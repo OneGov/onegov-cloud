@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Unifies the coordinates usage across different modules.
+  [href]
+
 0.19.7 (2017-12-22)
 ~~~~~~~~~~~~~~~~~~~
 

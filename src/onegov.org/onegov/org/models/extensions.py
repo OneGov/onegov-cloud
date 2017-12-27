@@ -2,6 +2,7 @@ from collections import OrderedDict
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.utils import linkify
 from onegov.form import FieldDependency, WTFormsClassBuilder
+from onegov.gis import CoordinatesMixin
 from onegov.org import _
 from onegov.org.forms.extensions import CoordinatesFormExtension
 from onegov.people import Person, PersonCollection
@@ -67,32 +68,11 @@ class HiddenFromPublicExtension(ContentExtension):
         return HiddenPageForm
 
 
-class CoordinatesExtension(ContentExtension):
+class CoordinatesExtension(ContentExtension, CoordinatesMixin):
     """ Extends any class that has a data dictionary field with the ability
     to add coordinates to it.
 
     """
-
-    coordinates = content_property('coordinates')
-
-    @property
-    def has_coordinates(self):
-        if self.coordinates:
-            return self.coordinates.get('lat') and self.coordinates.get('lon')
-        else:
-            return False
-
-    @property
-    def lat(self):
-        return self.coordinates.get('lat')
-
-    @property
-    def lon(self):
-        return self.coordinates.get('lon')
-
-    @property
-    def zoom(self):
-        return self.coordinates.get('zoom')
 
     def extend_form(self, form_class, request):
         return CoordinatesFormExtension(form_class).create()
