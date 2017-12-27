@@ -334,8 +334,6 @@ def handle_submit_directory_entry(self, request, form):
             }
         )
 
-        forms.submissions.update(submission, form)
-
         url = URL(request.link(submission))
         url = url.query_param('title', request.translate(title))
 

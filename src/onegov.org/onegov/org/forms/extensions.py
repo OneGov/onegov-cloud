@@ -2,7 +2,7 @@ from onegov.form.extensions import FormExtension
 from onegov.gis import CoordinatesField
 from onegov.org import _
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import InputRequired
+from wtforms.validators import DataRequired
 
 
 class CoordinatesFormExtension(FormExtension, name='coordinates'):
@@ -28,7 +28,7 @@ class SubmitterFormExtension(FormExtension, name='submitter'):
             submitter = EmailField(
                 label=_("E-Mail"),
                 fieldset=_("Submitter"),
-                validators=[InputRequired()]
+                validators=[DataRequired()]
             )
 
         return SubmitterForm
