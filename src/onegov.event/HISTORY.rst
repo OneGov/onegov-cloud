@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Moves the coordinates field to the model provided by onegov.gis.
+  [href]
+
 0.6.0 (2017-09-26)
 ~~~~~~~~~~~~~~~~~~~
 

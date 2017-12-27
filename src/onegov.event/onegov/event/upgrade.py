@@ -12,3 +12,25 @@ def add_coordinates_column(context):
     for table in ('events', 'event_occurrences'):
         context.operations.add_column(
             table, Column('coordinates', JSON(), nullable=True))
+
+
+@upgrade_task('Drop coordinates column from occurrences')
+def drop_coordinates_column(context):
+    context.operations.drop_column('event_occurrences', 'coordinates')
+
+
+@upgrade_task('Migrate coordinates column in events')
+def migrate_coordinates_column(context):
+    # merge the separate coordinates column into the content column
+    # (gotta love postgres' json support!)
+    context.session.execute("""
+        UPDATE events
+        SET "content" = (
+            "content" || (
+                '{"coordinates": ' || "coordinates"::text || '}'
+            )::jsonb
+        )
+        WHERE coordinates IS NOT NULL
+    """)
+
+    context.operations.drop_column('events', 'coordinates')
