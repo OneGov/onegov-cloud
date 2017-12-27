@@ -320,9 +320,6 @@ def handle_submit_directory_entry(self, request, form):
     if request.POST:
         forms = FormCollection(request.app.session())
 
-        # required to be able to store the data as json
-        form.coordinates.data = form.coordinates.data.as_dict()
-
         # required by the form submissions collection
         form._source = self.directory.structure
 
