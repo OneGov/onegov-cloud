@@ -321,10 +321,14 @@ def handle_submit_directory_entry(self, request, form):
             form=form,
             state='pending',
             payment_method=self.directory.payment_method,
+            email=form.submitter.data,
             meta={
                 'handler_code': 'DIR',
                 'directory': self.directory.id.hex,
-                'extensions': self.directory.extensions
+                'extensions': tuple(
+                    ext for ext in self.directory.extensions
+                    if ext != 'submitter'
+                )
             }
         )
 

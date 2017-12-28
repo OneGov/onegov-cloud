@@ -3389,14 +3389,32 @@ ul.search-results {
 }
 
 /*
-    Reservations list in ticket summary
+    Ticket summary customisations
 */
-.ticket-summary .reservations {
-    list-style: none;
-    margin: 0;
+.ticket-summary {
+    h2 {
+        font-size: $h3-font-size;
+    }
 
-    li {
-        margin-bottom: 1.5rem;
+    h3 {
+        font-size: $h4-font-size;
+    }
+
+    h4 {
+        font-size: $h5-font-size;
+    }
+
+    h6 {
+        font-size: $h6-font-size;
+    }
+
+    .reservations {
+        list-style: none;
+        margin: 0;
+
+        li {
+            margin-bottom: 1.5rem;
+        }
     }
 }
 
