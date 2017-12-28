@@ -1,0 +1,17 @@
+<tal:b i18n:domain="onegov.org">
+    <metal:b use-macro="layout.macros['generic_message']">
+        <metal:b fill-slot="title">
+            <a href="${model.link(request)}">${model.channel_id}</a> - ${model.meta.group}
+        </metal:b>
+        <metal:b fill-slot="text">
+            <tal:b switch="model.meta['action']">
+                <tal:b case="'adopted'" i18n:translate>
+                    Directory entry adopted.
+                </tal:b>
+                <tal:b case="'rejected'" i18n:translate>
+                    Directory entry rejected.
+                </tal:b>
+            </tal:b>
+        </metal:b>
+    </metal:b>
+</tal:b>

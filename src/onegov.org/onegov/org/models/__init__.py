@@ -20,6 +20,7 @@ from onegov.org.models.legacy_file import (
     LegacyFileCollection,
     LegacyImageCollection,
 )
+from onegov.org.models.message import DirectoryMessage
 from onegov.org.models.message import EventMessage
 from onegov.org.models.message import PaymentMessage
 from onegov.org.models.message import ReservationMessage
@@ -61,6 +62,7 @@ __all__ = [
     'CoordinatesExtension',
     'CustomFormDefinition',
     'DaypassResource',
+    'DirectoryMessage',
     'DirectorySubmissionAction',
     'Editor',
     'EventMessage',

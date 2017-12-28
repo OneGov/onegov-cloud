@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-12-28 11:49+0100\n"
+"POT-Creation-Date: 2017-12-28 14:22+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1067,6 +1067,12 @@ msgstr "${count} entrées"
 msgid "1 entry"
 msgstr "1 entrée"
 
+msgid "The submission was rejected"
+msgstr ""
+
+msgid "Your directory submission has been rejected"
+msgstr ""
+
 msgid "Hide from the public"
 msgstr "Cacher au public"
 
@@ -1714,14 +1720,17 @@ msgstr "se désabonner"
 msgid "Or by changing the settings in your user profile."
 msgstr "Ou en changeant les réglages dans votre profil d'utilisateur."
 
-msgid "Your event has been accepted:"
-msgstr "Votre événement a été accepté :"
+msgid "Your directory submission has unfortunately been rejected:"
+msgstr ""
 
 msgid "The ticket number is"
 msgstr "Le numéro du ticket est"
 
 msgid "Check ticket status"
 msgstr "Vérifier l'état du ticket"
+
+msgid "Your event has been accepted:"
+msgstr "Votre événement a été accepté :"
 
 msgid "Your event has unfortunately been rejected:"
 msgstr "Votre événement a malheureusement été rejeté :"
@@ -1813,6 +1822,12 @@ msgstr ""
 
 msgid "Your ticket has been reopened"
 msgstr "Votre ticket a été ré-ouvert"
+
+msgid "Directory entry adopted."
+msgstr ""
+
+msgid "Directory entry rejected."
+msgstr ""
 
 #. Canonical text for ${event} is: "Event"
 msgid "${event} published."

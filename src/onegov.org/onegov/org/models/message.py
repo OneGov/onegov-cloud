@@ -145,3 +145,18 @@ class PaymentMessage(TicketBasedMessage):
             amount=float(payment.amount),
             currency=payment.currency
         )
+
+
+class DirectoryMessage(TicketBasedMessage):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'directory'
+    }
+
+    @classmethod
+    def create(cls, directory, ticket, request, action):
+        return super().create(
+            ticket, request,
+            directory_id=directory.id.hex,
+            action=action
+        )

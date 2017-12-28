@@ -1,0 +1,16 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="body">
+        <p i18n:translate>Dear Sir or Madam,</p>
+        <p i18n:translate>Your directory submission has unfortunately been rejected:</p>
+
+        <p>${ticket.group} - ${ticket.title}</p>
+
+        <tal:block tal:condition="ticket">
+            <p><span i18n:translate>The ticket number is</span>: <span class="ticket-number">${ticket.number}</span></p>
+            <a href="${request.link(ticket, 'status')}" i18n:translate>Check ticket status</a>
+        </tal:block>
+    </tal:block>
+</div>

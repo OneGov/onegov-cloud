@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-12-28 11:49+0100\n"
+"POT-Creation-Date: 2017-12-28 14:22+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1067,6 +1067,12 @@ msgstr "${count} Einträge"
 msgid "1 entry"
 msgstr "1 Eintrag"
 
+msgid "The submission was rejected"
+msgstr "Die Eingabe wurde abgelehnt"
+
+msgid "Your directory submission has been rejected"
+msgstr "Ihre Eingabe wurde abgelehnt"
+
 msgid "Hide from the public"
 msgstr "Vor der Öffentlichkeit verstecken"
 
@@ -1713,14 +1719,17 @@ msgid "Or by changing the settings in your user profile."
 msgstr ""
 "Alternativ können Sie die Einstellungen in Ihrem Benutzerprofil anpassen."
 
-msgid "Your event has been accepted:"
-msgstr "Ihre Veranstaltung wurde angenommen:"
+msgid "Your directory submission has unfortunately been rejected:"
+msgstr "Ihre Verzeichniseintrag Eintabe wurde leider abgelehnt:"
 
 msgid "The ticket number is"
 msgstr "Ihre Ticket Referenz"
 
 msgid "Check ticket status"
 msgstr "Ticket Status abfragen"
+
+msgid "Your event has been accepted:"
+msgstr "Ihre Veranstaltung wurde angenommen:"
 
 msgid "Your event has unfortunately been rejected:"
 msgstr "Ihre Veranstaltung musste leider abgelehnt werden:"
@@ -1810,6 +1819,12 @@ msgstr ""
 
 msgid "Your ticket has been reopened"
 msgstr "Ihr Ticket wurde wieder geöffnet"
+
+msgid "Directory entry adopted."
+msgstr "Verzeichniseintrag übernommen."
+
+msgid "Directory entry rejected."
+msgstr "Verzeichniseintrag abgelehnt."
 
 #. Canonical text for ${event} is: "Event"
 msgid "${event} published."

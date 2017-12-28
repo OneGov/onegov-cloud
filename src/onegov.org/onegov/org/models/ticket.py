@@ -1,6 +1,6 @@
 from cached_property import cached_property
 from onegov.core.templates import render_macro
-from onegov.directory import Directory
+from onegov.directory import Directory, DirectoryEntry
 from onegov.event import EventCollection
 from onegov.form import FormSubmissionCollection
 from onegov.org import _
@@ -447,8 +447,12 @@ class DirectoryEntryHandler(Handler):
 
     @cached_property
     def directory(self):
-        return self.session.query(Directory).filter_by(
-            id=self.submission.meta['directory']).first()
+        if self.submission:
+            directory_id = self.submission.meta['directory']
+        else:
+            directory_id = self.ticket.handler_data['directory']
+
+        return self.session.query(Directory).filter_by(id=directory_id).first()
 
     @property
     def deleted(self):
@@ -512,7 +516,17 @@ class DirectoryEntryHandler(Handler):
             )
 
         if self.directory and not self.submission:
-            raise NotImplementedError("TODO: Implement view link")
+            if 'entry_name' in self.ticket.handler_data:
+                links.append(
+                    Link(
+                        text=_("View"),
+                        url=request.class_link(DirectoryEntry, {
+                            'directory_name': self.directory.name,
+                            'name': self.ticket.handler_data['entry_name']
+                        }),
+                        attrs={'class': 'view-link'},
+                    )
+                )
 
         advanced_links = []
 

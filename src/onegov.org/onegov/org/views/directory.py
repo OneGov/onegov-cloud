@@ -473,8 +473,7 @@ def view_import(self, request, form):
 @OrgApp.view(
     model=DirectorySubmissionAction,
     permission=Private,
-    method="POST"
+    request_method='POST'
 )
 def execute_submission_action(self, request):
-    self.execute()
-    return request.redirect(request.link(self.directory))
+    return self.execute(request)

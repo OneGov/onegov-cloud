@@ -2,10 +2,14 @@ import sedate
 
 from cached_property import cached_property
 from datetime import timedelta
+from morepath import reify
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.utils import linkify
 from onegov.directory import Directory, DirectoryEntry
 from onegov.form import as_internal_id, Extendable, FormSubmission
+from onegov.ticket import Ticket
+from onegov.org import _
+from onegov.org.models.message import DirectoryMessage
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import HiddenFromPublicExtension
 from sqlalchemy import and_
@@ -32,21 +36,53 @@ class DirectorySubmissionAction(object):
             .filter_by(id=self.directory_id)\
             .first()
 
+    @cached_property
+    def ticket(self):
+        return self.session.query(Ticket)\
+            .filter_by(handler_id=self.submission_id.hex)\
+            .first()
+
+    @reify
+    def send_html_mail(self, **kwargs):
+        # XXX circular import
+        from onegov.org.mail import send_html_mail
+        return send_html_mail
+
     @property
     def valid(self):
         return self.action in ('adopt', 'reject') and\
             self.directory and\
             self.submission
 
-    def execute(self):
+    def execute(self, request):
         assert self.valid
-        getattr(self, self.action)()
+        getattr(self, self.action)(request)
 
-    def adopt(self):
+    def adopt(self, request):
         import pdb; pdb.set_trace()
 
-    def reject(self):
-        import pdb; pdb.set_trace()
+    def reject(self, request):
+        self.ticket.create_snapshot(request)
+        self.ticket.handler_data['directory'] = self.directory.id.hex
+
+        if self.ticket.ticket_email != request.current_username:
+            self.send_html_mail(
+                request=request,
+                template='mail_directory_entry_rejected.pt',
+                subject=_("Your directory submission has been rejected"),
+                receivers=(self.ticket.ticket_email, ),
+                content={
+                    'model': self.directory,
+                    'ticket': self.ticket,
+                }
+            )
+
+        self.session.delete(self.submission)
+        request.success(_("The submission was rejected"))
+
+        DirectoryMessage.create(
+            self.directory, self.ticket, request, 'rejected'
+        )
 
 
 class ExtendedDirectory(Directory, HiddenFromPublicExtension, Extendable):
