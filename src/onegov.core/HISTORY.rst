@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds an 'add_by_form' method to generic collections.
+  [href]
+
 - Adds the ability to add additional serializers for JSON.
   [href]
 

@@ -31,6 +31,14 @@ class GenericCollection(object):
 
         return item
 
+    def add_by_form(self, form):
+        cls = self.model_class
+
+        return self.add(**{
+            key: value for key, value in form.get_useful_data().items()
+            if hasattr(cls, key)
+        })
+
     def delete(self, item):
         self.session.delete(item)
         self.session.flush()
