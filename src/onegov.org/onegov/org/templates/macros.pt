@@ -644,48 +644,67 @@
 
 <metal:display_event define-macro="display_event" i18n:domain="onegov.org">
     <dl>
-        <tal:block tal:condition="request.is_manager">
+        <tal:b condition="request.is_manager">
             <dt i18n:translate>State</dt>
             <dd i18n:translate tal:condition="event.state == 'initiated'">Initiated</dd>
             <dd i18n:translate tal:condition="event.state == 'submitted'">Submitted</dd>
             <dd i18n:translate tal:condition="event.state == 'published'">Published</dd>
             <dd i18n:translate tal:condition="event.state == 'withdrawn'">Withdrawn</dd>
-        </tal:block>
-        <tal:block tal:condition="request.is_manager" tal:define="submitter event.meta.get('submitter_email') if event.meta else ''">
-            <dt i18n:translate>Submitter</dt>
-            <dd>${submitter}</dd>
-        </tal:block>
+
+            <tal:b define="submitter event.meta.get('submitter_email') if event.meta else ''">
+                <dt i18n:translate>Submitter</dt>
+                <dd>${submitter}</dd>
+            </tal:b>
+        </tal:b>
+
         <dt i18n:translate>Title</dt>
         <dd>${event.title}</dd>
+
         <dt i18n:translate>Description</dt>
         <dd tal:content="structure event.description.replace('\n', '<br>')" />
+
         <dt i18n:translate>Location</dt>
         <dd>${event.location}</dd>
-        <dt i18n:translate tal:condition="event.coordinates">Map</dt>
-        <dd tal:condition="event.coordinates">
-            <div class="marker-map" data-map-type="thumbnail" data-lat="${event.coordinates.lat}" data-lon="${event.coordinates.lon}" data-zoom="${event.coordinates.zoom}"></div>
-        </dd>
-        <dt i18n:translate>Organizer</dt>
-        <dd tal:content="event.organizer" />
-        <dt i18n:translate>Tags</dt>
-        <dd>
-            <ul>
-                <li tal:repeat="tag event.tags" i18n:translate>${tag}</li>
-            </ul>
-        </dd>
+
+        <tal:b condition="event.coordinates">
+            <dt i18n:translate>Map</dt>
+            <dd>
+                <div class="marker-map" data-map-type="thumbnail" data-lat="${event.coordinates.lat}" data-lon="${event.coordinates.lon}" data-zoom="${event.coordinates.zoom}"></div>
+            </dd>
+        </tal:b>
+
+        <tal:b condition="event.organizer">
+            <dt i18n:translate>Organizer</dt>
+            <dd tal:content="event.organizer" />
+        </tal:b>
+
+        <tal:b condition="event.tags">
+            <dt i18n:translate>Tags</dt>
+            <dd>
+                <ul class="no-margin-bottom">
+                    <li tal:repeat="tag event.tags" i18n:translate>${tag}</li>
+                </ul>
+            </dd>
+        </tal:b>
+
         <dt i18n:translate>Date and time</dt>
         <dd>
-            <tal:block>${layout.format_date(event.localized_start, 'datetime')}-${layout.format_date(event.localized_end, 'time')}</tal:block>
-            <tal:block tal:condition="request.is_manager">(${event.timezone})</tal:block>
+            ${layout.format_datetime_range(event.localized_start, event.localized_end, with_year=True)}
         </dd>
-        <dt i18n:translate>Recurrence</dt>
-        <dd>${layout.format_recurrence(event.recurrence)}</dd>
-        <dt i18n:translate>All dates</dt>
-        <dd tal:define="occurrences event.occurrence_dates(localize=True)">
-            <ul>
-                <li tal:repeat="occurrence occurrences">${layout.format_date(occurrence, 'weekday_long')} ${layout.format_date(occurrence, 'date')}</li>
-            </ul>
-        </dd>
+
+        <tal:b condition="event.recurrence">
+            <dt i18n:translate>Recurrence</dt>
+            <dd>${layout.format_recurrence(event.recurrence)}</dd>
+        </tal:b>
+
+        <tal:b define="dates event.occurrence_dates(localize=True)" condition="len(dates) > 1">
+            <dt i18n:translate>All dates</dt>
+            <dd tal:define="occurrences event.occurrence_dates(localize=True)">
+                <ul>
+                    <li tal:repeat="occurrence occurrences">${layout.format_date(occurrence, 'weekday_long')} ${layout.format_date(occurrence, 'date')}</li>
+                </ul>
+            </dd>
+        </tal:b>
     </dl>
 </metal:display_event>
 

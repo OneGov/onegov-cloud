@@ -368,16 +368,20 @@ class Layout(ChameleonLayout):
                 self.format_date(end, 'date')
             ))
 
-    def format_datetime_range(self, start, end):
+    def format_datetime_range(self, start, end, with_year=False):
         if (end - start) <= timedelta(hours=23):
+            fmt = with_year and 'date_long' or 'date_long_without_year'
+
             return ' '.join((
-                self.format_date(start, 'date_long_without_year'),
+                self.format_date(start, fmt),
                 self.format_time_range(start, end)
             ))
         else:
+            fmt = with_year and 'datetime_long' or 'datetime_long_without_year'
+
             return ' - '.join((
-                self.format_date(start, 'datetime_long_without_year'),
-                self.format_date(end, 'datetime_long_without_year')
+                self.format_date(start, fmt),
+                self.format_date(end, fmt)
             ))
 
     def format_timedelta(self, delta):
