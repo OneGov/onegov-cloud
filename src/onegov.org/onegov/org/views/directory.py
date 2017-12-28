@@ -328,6 +328,9 @@ def handle_submit_directory_entry(self, request, form):
             }
         )
 
+        # remove old submission while we are at it
+        self.directory.remove_old_pending_submissions()
+
         url = URL(request.link(submission))
         url = url.query_param('title', request.translate(title))
 

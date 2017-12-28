@@ -1,9 +1,14 @@
+import sedate
+
+from datetime import timedelta
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.utils import linkify
 from onegov.directory import Directory, DirectoryEntry
-from onegov.form import as_internal_id, Extendable
+from onegov.form import as_internal_id, Extendable, FormSubmission
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import HiddenFromPublicExtension
+from sqlalchemy import and_
+from sqlalchemy.orm import object_session
 
 
 class ExtendedDirectory(Directory, HiddenFromPublicExtension, Extendable):
@@ -31,6 +36,19 @@ class ExtendedDirectory(Directory, HiddenFromPublicExtension, Extendable):
             return ('coordinates', 'submitter')
         else:
             return ('submitter', )
+
+    def remove_old_pending_submissions(self):
+        session = object_session(self)
+        horizon = sedate.utcnow() - timedelta(hours=24)
+
+        submissions = session.query(FormSubmission).filter(and_(
+            FormSubmission.state == 'pending',
+            FormSubmission.meta['directory'] == self.id.hex,
+            FormSubmission.last_change < horizon
+        ))
+
+        for submission in submissions:
+            session.delete(submission)
 
 
 class ExtendedDirectoryEntry(DirectoryEntry, CoordinatesExtension,
