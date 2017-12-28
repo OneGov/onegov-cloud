@@ -72,13 +72,7 @@ def view_directory_redirect(self, request):
              permission=Secret, form=get_directory_form_class)
 def handle_new_directory(self, request, form):
     if form.submitted(request):
-        directory = self.add(
-            title=form.title.data,
-            lead=form.lead.data,
-            structure=form.structure.data,
-            configuration=form.configuration,
-            enable_map=form.enable_map.data
-        )
+        directory = self.add_by_form(form)
 
         request.success(_("Added a new directory"))
         return request.redirect(
