@@ -1233,6 +1233,7 @@ $sync-icon: '\f021';
 $occupancy-link-icon: '\f022';
 $unmute: '\f130';
 $upload-icon: '\f0ee';
+$view-link: '\f06e';
 
 $editbar-bg-color: $topbar-link-bg-hover;
 
@@ -1338,6 +1339,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .sync::before { @include icon($sync-icon); }
     .unmute::before { @include icon($unmute); }
     .upload::before { @include icon($upload-icon); }
+    .view-link::before { @include icon($view-link); }
 }
 
 /*

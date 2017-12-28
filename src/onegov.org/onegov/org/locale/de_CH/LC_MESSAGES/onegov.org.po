@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-12-28 14:22+0100\n"
+"POT-Creation-Date: 2017-12-28 16:24+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1067,11 +1067,20 @@ msgstr "${count} Einträge"
 msgid "1 entry"
 msgstr "1 Eintrag"
 
+msgid "The submission was adopted"
+msgstr "Der Eintrag wurde übernommen"
+
 msgid "The submission was rejected"
 msgstr "Die Eingabe wurde abgelehnt"
 
+msgid "Your directory submission has been adopted"
+msgstr "Ihr Verzeichniseintrag wurde übernommen"
+
 msgid "Your directory submission has been rejected"
 msgstr "Ihre Eingabe wurde abgelehnt"
+
+msgid "An entry with this name already exists"
+msgstr "Ein Eintrag mit diesem Namen existiert bereits"
 
 msgid "Hide from the public"
 msgstr "Vor der Öffentlichkeit verstecken"
@@ -1154,6 +1163,9 @@ msgstr "Die Absage aller Reservationen kann nicht rückgängig gemacht werden."
 
 msgid "Reject reservations"
 msgstr "Reservationen absagen"
+
+msgid "View directory entry"
+msgstr "Verzeichniseintrag Anzeigen"
 
 msgid "Do you really want to reject this reservation?"
 msgstr "Möchten Sie diese Reservation wirklich absagen?"
@@ -1719,14 +1731,17 @@ msgid "Or by changing the settings in your user profile."
 msgstr ""
 "Alternativ können Sie die Einstellungen in Ihrem Benutzerprofil anpassen."
 
-msgid "Your directory submission has unfortunately been rejected:"
-msgstr "Ihre Verzeichniseintrag Eintabe wurde leider abgelehnt:"
+msgid "Your directory submission has been adopted:"
+msgstr "Ihr Verzeichniseintrag wurde übernommen:"
 
 msgid "The ticket number is"
 msgstr "Ihre Ticket Referenz"
 
 msgid "Check ticket status"
 msgstr "Ticket Status abfragen"
+
+msgid "Your directory submission has unfortunately been rejected:"
+msgstr "Ihre Verzeichniseintrag Eintabe wurde leider abgelehnt:"
 
 msgid "Your event has been accepted:"
 msgstr "Ihre Veranstaltung wurde angenommen:"

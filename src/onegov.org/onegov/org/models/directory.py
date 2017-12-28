@@ -2,16 +2,18 @@ import sedate
 
 from cached_property import cached_property
 from datetime import timedelta
-from morepath import reify
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.utils import linkify
 from onegov.directory import Directory, DirectoryEntry
+from onegov.directory.errors import DuplicateEntryError
+from onegov.directory.migration import DirectoryMigration
 from onegov.form import as_internal_id, Extendable, FormSubmission
-from onegov.ticket import Ticket
 from onegov.org import _
-from onegov.org.models.message import DirectoryMessage
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import HiddenFromPublicExtension
+from onegov.org.models.message import DirectoryMessage
+from onegov.ticket import Ticket
+from purl import URL
 from sqlalchemy import and_
 from sqlalchemy.orm import object_session
 
@@ -42,11 +44,20 @@ class DirectorySubmissionAction(object):
             .filter_by(handler_id=self.submission_id.hex)\
             .first()
 
-    @reify
-    def send_html_mail(self, **kwargs):
+    def send_html_mail(self, request, subject, template):
         # XXX circular import
         from onegov.org.mail import send_html_mail
-        return send_html_mail
+
+        return send_html_mail(
+            request=request,
+            template=template,
+            subject=subject,
+            receivers=(self.ticket.ticket_email, ),
+            content={
+                'model': self.directory,
+                'ticket': self.ticket
+            }
+        )
 
     @property
     def valid(self):
@@ -56,28 +67,68 @@ class DirectorySubmissionAction(object):
 
     def execute(self, request):
         assert self.valid
-        getattr(self, self.action)(request)
 
-    def adopt(self, request):
-        import pdb; pdb.set_trace()
-
-    def reject(self, request):
         self.ticket.create_snapshot(request)
         self.ticket.handler_data['directory'] = self.directory.id.hex
 
+        return getattr(self, self.action)(request)
+
+    def adopt(self, request):
+        # the directory might have changed -> migrate what we can
+        migration = DirectoryMigration(
+            directory=self.directory,
+            new_structure=self.submission.definition
+        )
+
+        # if the migration failes, update the form on the submission
+        # and redirect to it so it can be fixed
+        if not migration.possible:
+            self.submission.definition = self.directory.structure
+
+            link = URL(request.link(self.submission))
+            link = link.query_param('edit', '')
+
+            return request.redirect(link.as_string())
+        else:
+            data = self.submission.data.copy()
+            migration.migrate_values(data)
+
+            try:
+                entry = self.directory.add(data)
+            except DuplicateEntryError:
+                request.alert(_("An entry with this name already exists"))
+                return
+
+            self.ticket.handler_data['entry_name'] = entry.name
+            entry.coordinates = self.submission.data.get('coordinates')
+
+        if self.ticket.ticket_email != request.current_username:
+            self.send_html_mail(
+                request=request,
+                template='mail_directory_entry_adopted.pt',
+                subject=_("Your directory submission has been adopted"),
+            )
+
+        # delete after creating the e-mail which includes the submission
+        self.session.delete(self.submission)
+
+        request.success(_("The submission was adopted"))
+
+        DirectoryMessage.create(
+            self.directory, self.ticket, request, 'adopted'
+        )
+
+    def reject(self, request):
         if self.ticket.ticket_email != request.current_username:
             self.send_html_mail(
                 request=request,
                 template='mail_directory_entry_rejected.pt',
                 subject=_("Your directory submission has been rejected"),
-                receivers=(self.ticket.ticket_email, ),
-                content={
-                    'model': self.directory,
-                    'ticket': self.ticket,
-                }
             )
 
+        # delete after creating the e-mail which includes the submission
         self.session.delete(self.submission)
+
         request.success(_("The submission was rejected"))
 
         DirectoryMessage.create(

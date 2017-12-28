@@ -519,7 +519,7 @@ class DirectoryEntryHandler(Handler):
             if 'entry_name' in self.ticket.handler_data:
                 links.append(
                     Link(
-                        text=_("View"),
+                        text=_("View directory entry"),
                         url=request.class_link(DirectoryEntry, {
                             'directory_name': self.directory.name,
                             'name': self.ticket.handler_data['entry_name']

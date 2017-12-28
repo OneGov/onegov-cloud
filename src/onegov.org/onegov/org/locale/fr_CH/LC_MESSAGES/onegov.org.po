@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-12-28 14:22+0100\n"
+"POT-Creation-Date: 2017-12-28 16:24+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1067,10 +1067,19 @@ msgstr "${count} entrées"
 msgid "1 entry"
 msgstr "1 entrée"
 
+msgid "The submission was adopted"
+msgstr ""
+
 msgid "The submission was rejected"
 msgstr ""
 
+msgid "Your directory submission has been adopted"
+msgstr ""
+
 msgid "Your directory submission has been rejected"
+msgstr ""
+
+msgid "An entry with this name already exists"
 msgstr ""
 
 msgid "Hide from the public"
@@ -1154,6 +1163,9 @@ msgstr "Le refus de ces réservations est irréversible."
 
 msgid "Reject reservations"
 msgstr "Refuser les réservations"
+
+msgid "View directory entry"
+msgstr ""
 
 msgid "Do you really want to reject this reservation?"
 msgstr "Voulez-vous vraiment refuser cette réservation ?"
@@ -1720,7 +1732,7 @@ msgstr "se désabonner"
 msgid "Or by changing the settings in your user profile."
 msgstr "Ou en changeant les réglages dans votre profil d'utilisateur."
 
-msgid "Your directory submission has unfortunately been rejected:"
+msgid "Your directory submission has been adopted:"
 msgstr ""
 
 msgid "The ticket number is"
@@ -1728,6 +1740,9 @@ msgstr "Le numéro du ticket est"
 
 msgid "Check ticket status"
 msgstr "Vérifier l'état du ticket"
+
+msgid "Your directory submission has unfortunately been rejected:"
+msgstr ""
 
 msgid "Your event has been accepted:"
 msgstr "Votre événement a été accepté :"
