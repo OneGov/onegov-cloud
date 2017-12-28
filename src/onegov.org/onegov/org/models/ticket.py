@@ -489,19 +489,74 @@ class DirectoryEntryHandler(Handler):
         })
 
     def get_links(self, request):
+
         links = []
 
-        edit_link = URL(request.link(self.submission))
-        edit_link = edit_link.query_param('edit', '')
-        edit_link = edit_link.query_param(
-            'title', request.translate(_("Submission")))
-
-        links.append(
-            Link(
-                text=_('Edit submission'),
-                url=request.return_here(edit_link.as_string()),
-                attrs={'class': 'edit-link'}
+        if self.submission:
+            links.append(
+                Link(
+                    text=_("Adopt"),
+                    url=request.link(
+                        self.directory.submission_action(
+                            'adopt', self.submission.id
+                        )
+                    ),
+                    attrs={'class': 'accept-link'},
+                    traits=(
+                        Intercooler(
+                            request_method='POST',
+                            redirect_after=request.url
+                        ),
+                    )
+                )
             )
-        )
+
+        if self.directory and not self.submission:
+            raise NotImplementedError("TODO: Implement view link")
+
+        advanced_links = []
+
+        if self.submission:
+            link = URL(request.link(self.submission))
+            link = link.query_param('edit', '')
+            link = link.query_param('title', request.translate(
+                _("Edit details")))
+            link = request.return_here(link.as_string())
+
+            advanced_links.append(
+                Link(
+                    text=_('Edit details'),
+                    url=link,
+                    attrs={'class': ('edit-link', 'border')}
+                )
+            )
+
+        if self.directory and self.submission:
+            advanced_links.append(Link(
+                text=_("Reject"),
+                url=request.link(
+                    self.directory.submission_action(
+                        'reject', self.submission.id
+                    )
+                ),
+                attrs={'class': 'delete-link'},
+                traits=(
+                    Confirm(
+                        _("Do you really want to reject this entry?"),
+                        _("This cannot be undone."),
+                        _("Reject entry")
+                    ),
+                    Intercooler(
+                        request_method='POST',
+                        redirect_after=request.url
+                    )
+                )
+            ))
+
+        links.append(LinkGroup(
+            _("Advanced"),
+            links=advanced_links,
+            right_side=False
+        ))
 
         return links

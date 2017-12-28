@@ -35,6 +35,7 @@ from onegov.org.app import OrgApp
 from onegov.org.models import (
     AtoZPages,
     Clipboard,
+    DirectorySubmissionAction,
     Editor,
     Export,
     ExportCollection,
@@ -556,3 +557,18 @@ def get_directory_entry(app, directory_name, name):
             directory=directory,
             type='extended'
         ).by_name(name)
+
+
+@OrgApp.path(
+    model=DirectorySubmissionAction,
+    path='/directory-submission/{directory_id}/{submission_id}/{action}',
+    converters=dict(directory_id=UUID, submission_id=UUID))
+def get_directory_submission_action(app, directory_id, submission_id, action):
+    action = DirectorySubmissionAction(
+        session=app.session(),
+        directory_id=directory_id,
+        submission_id=submission_id,
+        action=action)
+
+    if action.valid:
+        return action

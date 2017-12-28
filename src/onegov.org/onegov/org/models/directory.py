@@ -1,5 +1,6 @@
 import sedate
 
+from cached_property import cached_property
 from datetime import timedelta
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.utils import linkify
@@ -9,6 +10,43 @@ from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import HiddenFromPublicExtension
 from sqlalchemy import and_
 from sqlalchemy.orm import object_session
+
+
+class DirectorySubmissionAction(object):
+
+    def __init__(self, session, directory_id, action, submission_id):
+        self.session = session
+        self.directory_id = directory_id
+        self.action = action
+        self.submission_id = submission_id
+
+    @cached_property
+    def submission(self):
+        return self.session.query(FormSubmission)\
+            .filter_by(id=self.submission_id)\
+            .first()
+
+    @cached_property
+    def directory(self):
+        return self.session.query(Directory)\
+            .filter_by(id=self.directory_id)\
+            .first()
+
+    @property
+    def valid(self):
+        return self.action in ('adopt', 'reject') and\
+            self.directory and\
+            self.submission
+
+    def execute(self):
+        assert self.valid
+        getattr(self, self.action)()
+
+    def adopt(self):
+        import pdb; pdb.set_trace()
+
+    def reject(self):
+        import pdb; pdb.set_trace()
 
 
 class ExtendedDirectory(Directory, HiddenFromPublicExtension, Extendable):
@@ -36,6 +74,14 @@ class ExtendedDirectory(Directory, HiddenFromPublicExtension, Extendable):
             return ('coordinates', 'submitter')
         else:
             return ('submitter', )
+
+    def submission_action(self, action, submission_id):
+        return DirectorySubmissionAction(
+            session=object_session(self),
+            directory_id=self.id,
+            action=action,
+            submission_id=submission_id
+        )
 
     def remove_old_pending_submissions(self):
         session = object_session(self)

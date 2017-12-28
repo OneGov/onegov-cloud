@@ -17,6 +17,7 @@ from onegov.org.forms.generic import ExportForm
 from onegov.org.layout import DirectoryCollectionLayout
 from onegov.org.layout import DirectoryEntryCollectionLayout
 from onegov.org.layout import DirectoryEntryLayout
+from onegov.org.models import DirectorySubmissionAction
 from onegov.org.models import ExtendedDirectory, ExtendedDirectoryEntry
 from onegov.org.new_elements import Link
 from purl import URL
@@ -467,3 +468,13 @@ def view_import(self, request, form):
         'error': error,
         'error_translate': lambda text: request.translate(_(text)),
     }
+
+
+@OrgApp.view(
+    model=DirectorySubmissionAction,
+    permission=Private,
+    method="POST"
+)
+def execute_submission_action(self, request):
+    self.execute()
+    return request.redirect(request.link(self.directory))

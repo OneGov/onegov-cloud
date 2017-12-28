@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-12-15 14:48+0100\n"
+"POT-Creation-Date: 2017-12-28 11:49+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -722,6 +722,12 @@ msgid "The weekday of the start date must be selected."
 msgstr ""
 "Le jour de la semaine correspondant à la date de début doit être sélectionné."
 
+msgid "Map"
+msgstr "Carte"
+
+msgid "Submitter"
+msgstr "Auteur"
+
 msgid "Describes what this form is about"
 msgstr "Décrit le contenu de ce formulaire"
 
@@ -1067,9 +1073,6 @@ msgstr "Cacher au public"
 msgid "Visibility"
 msgstr "Visibilité"
 
-msgid "Map"
-msgstr "Carte"
-
 msgid "Visible on homepage"
 msgstr "Visible sur la page d'accueil"
 
@@ -1100,6 +1103,9 @@ msgstr "Toujours visible sur la page d'accueil"
 msgid "Form Submissions"
 msgstr "Envois de formulaire"
 
+msgid "Directory Entry Submissions"
+msgstr ""
+
 #.
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
@@ -1115,11 +1121,11 @@ msgstr "Détails à propos de la réservation"
 msgid "Reject all"
 msgstr "Tout refuser"
 
-msgid "Accept all reservations"
-msgstr "Accepter toutes les réservations"
-
 msgid "Edit details"
 msgstr "Modifier les détails"
+
+msgid "Accept all reservations"
+msgstr "Accepter toutes les réservations"
 
 #, python-format
 msgid "Reject ${title}"
@@ -1127,6 +1133,12 @@ msgstr "Refuser ${title}"
 
 msgid "Accept event"
 msgstr "Accepter l'événement"
+
+msgid "Adopt"
+msgstr ""
+
+msgid "Reject"
+msgstr ""
 
 msgid "Do you really want to reject all reservations?"
 msgstr "Voulez-vous vraiment refuser toutes les réservations ?"
@@ -1146,6 +1158,12 @@ msgstr "Refuser ${title} est irréversible."
 
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
+
+msgid "Do you really want to reject this entry?"
+msgstr ""
+
+msgid "Reject entry"
+msgstr ""
 
 msgid "Edit event"
 msgstr "Modifier l'événement"
@@ -1488,9 +1506,6 @@ msgstr "Publié"
 
 msgid "Withdrawn"
 msgstr "Retiré"
-
-msgid "Submitter"
-msgstr "Auteur"
 
 msgid "Date and time"
 msgstr "Date et heure"
@@ -2025,15 +2040,6 @@ msgstr ""
 "Votre lien d'inscription a été créé comme suit. Copiez-le avant de "
 "continuer, il ne vous sera pas montré à nouveau :"
 
-msgid "Show"
-msgstr "Afficher"
-
-msgid "Do you really want to delete the submission?"
-msgstr "Voulez-vous vraiment supprimer la soumission ?"
-
-msgid "Delete Submission"
-msgstr "Supprimer la soumission"
-
 msgid "No e-mails will be sent for this ticket."
 msgstr "Aucun e-mail ne sera envoyé pour ce ticket."
 
@@ -2220,6 +2226,9 @@ msgstr "Réinitialisation de mot de passe"
 
 msgid "A link was added to the clipboard"
 msgstr "Un lien a été ajouté au presse-papiers"
+
+msgid "Submit a New Directory Entry"
+msgstr ""
 
 msgid "New Directory"
 msgstr "Nouveau dossier"
@@ -2619,3 +2628,12 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
+
+#~ msgid "Show"
+#~ msgstr "Afficher"
+
+#~ msgid "Do you really want to delete the submission?"
+#~ msgstr "Voulez-vous vraiment supprimer la soumission ?"
+
+#~ msgid "Delete Submission"
+#~ msgstr "Supprimer la soumission"
