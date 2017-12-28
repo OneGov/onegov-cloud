@@ -124,7 +124,10 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
                     for id in title_fields
                 ))
 
-            self.email = self.get_email_field_data(form=form)
+            if not self.email:
+                self.email = self.get_email_field_data(form=form)
+
+            assert self.email
 
             # only set the date the first time around
             if not self.received:
