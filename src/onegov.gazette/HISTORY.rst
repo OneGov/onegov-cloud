@@ -4,6 +4,9 @@ Changelog
 - Adds a print only option to notices.
   [msom]
 
+- Requires Python 3.6.
+  [href]
+
 1.12.2 (2017-12-22)
 ~~~~~~~~~~~~~~~~~~~
 
