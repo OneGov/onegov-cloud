@@ -6,28 +6,20 @@ addons:
 matrix:
   include:
     - language: python
-      python: "3.4"
-      env: TOXENV=py34
-
-    - language: python
-      python: "3.5"
-      env: TOXENV=py35
-
-    - language: python
       python: "3.6"
       env: TOXENV=py36
 
     - language: python
-      python: "3.4"
+      python: "3.6"
       env: TOXENV=pep8
 
 install:
     - pip install tox
-    - if [ "$TOXENV" = 'py34' ]; then pip install coveralls; fi
+    - if [ "$TOXENV" = 'py36' ]; then pip install coveralls; fi
 script:
     - tox -e $TOXENV
 after_success:
-    - if [ "$TOXENV" = 'py34' ]; then coveralls; fi
+    - if [ "$TOXENV" = 'py36' ]; then coveralls; fi
 
 deploy:
     provider: pypi
@@ -37,4 +29,4 @@ deploy:
       secure: "MBTh9HJu3nA3QLZBDrWqiYVidXODz3vEeYMyPbqkYKmc404uN1n67/XYS9jFPDOetT/r2j+KmyKMgJ8oyLf1Oc/WiMCXzRLuoV5hmrf0H28XOYunhejNUXnVhlkP/nmdXOcK9n2FnXf+bciMqtujqvOMckrxesPJAH5BpToK0a2mjHwFgTUeKZNlE9n7pmkVhDSADKnGNUkh9RFt1EBddWaeK3s8yMsF+n0qpK0MdLhzmpZkIXeGhP5+jtrGj+whC+jhRewYwMSS5Xn+Otjq72mFe8JYX03EIY5Jm4KcN13LO6PjkMtdvyaXiPKyuIQfx7U3jO2tOfZyd8Iek1HGrbfXR/22mhhR0KHCNG2g63cS+oB782xgV2MkdcFwsJRTABTHta/goc94YLmdZhePzo58EgBzA7RKqnvAAnpBwWjZmlTBX9y9vNkgxooZ5X0KfcCe7cBixtU2G1fuxu+vA6SVQjatFZd9u8nxggFmjoCahq0lEDpCgXbYuvXjhSg+HgsSJbpo4LYY6EhkbR9OX6I8zpbUINSu5SIUUcVTQluPdcyDGuu2Yo7xQxr/4E8OKSWlzatt5VbJxbp+Jyv+iXkRrTRTKeQ8eM4Eye46x2jb5xEqw8M9sxAcrt9Lkl+Jx8s/C1wI0GhOsKTT1m/vdDSnj9ujGMLu0wmRogOrSO0="
     on:
         tags: true
-        condition: $TOXENV = py34
+        condition: $TOXENV = py36
