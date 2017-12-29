@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Requires Python 3.6.
+  [href]
+
 - Speeds up the first load slightly.
   [href]
 
