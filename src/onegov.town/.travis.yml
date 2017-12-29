@@ -3,19 +3,11 @@ cache: pip
 matrix:
   include:
     - language: python
-      python: "3.4"
-      env: TOXENV=py34 ES_VERSION=5.6.0
-
-    - language: python
-      python: "3.5"
-      env: TOXENV=py35 ES_VERSION=5.6.0
-
-    - language: python
       python: "3.6"
       env: TOXENV=py36 ES_VERSION=5.6.0
 
     - language: python
-      python: "3.4"
+      python: "3.6"
       env: TOXENV=pep8 ES_VERSION=5.6.0
 
 install: ./.travis-install.sh
@@ -30,9 +22,9 @@ script:
     - tox -e $TOXENV
 
 after_success:
-    - if [ "$TOXENV" = 'py34' ]; then coveralls; fi
-    - 'if [ "$TOXENV" = "py34" ]; then $TRAVIS_BUILD_DIR/.tox/py34/bin/pip freeze | sed -r "s/^-e git.*?egg=([a-z\._]+)$/\1==${TRAVIS_TAG:1}/g" > $TRAVIS_BUILD_DIR/requirements.txt; fi'
-    - if [ "$TOXENV" = 'py34' ]; then cat requirements.txt; fi
+    - if [ "$TOXENV" = 'py36' ]; then coveralls; fi
+    - 'if [ "$TOXENV" = "py36" ]; then $TRAVIS_BUILD_DIR/.tox/py36/bin/pip freeze | sed -r "s/^-e git.*?egg=([a-z\._]+)$/\1==${TRAVIS_TAG:1}/g" > $TRAVIS_BUILD_DIR/requirements.txt; fi'
+    - if [ "$TOXENV" = 'py36' ]; then cat requirements.txt; fi
 
 deploy:
 
@@ -43,7 +35,7 @@ deploy:
     skip_cleanup: true
     on:
         tags: true
-        condition: $TOXENV = py34
+        condition: $TOXENV = py36
 
   - provider: pypi
     distributions: "sdist bdist_wheel"
@@ -52,4 +44,4 @@ deploy:
         secure: "TfCasvV0u5OHsD1uO74Tn7IqkVM271WzmRuI61uIAY9AyC+IBRfso/Ch8o+D7dw12BVCeWX6g89Vb1Z+FcsxRr7aeBbPZj9zg8duo/oyov6GpJivB8qbAIKGuKy5OmQTAjGE9DxncY0/XB3GtJDqzxiEu8t5rEKG6usOmGBV/G0="
     on:
         tags: true
-        condition: $TOXENV = py34
+        condition: $TOXENV = py36
