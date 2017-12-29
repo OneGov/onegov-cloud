@@ -31,6 +31,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     platforms='any',
+    python_requires='>=3.6',
     install_requires=[
         'click',
         'itsdangerous',
@@ -59,8 +60,8 @@ setup(
     classifiers=[
         'Intended Audience :: Developers',
         'Programming Language :: Python :: 3 :: Only',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
     ]
