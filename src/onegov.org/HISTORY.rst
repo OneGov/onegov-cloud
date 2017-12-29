@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Requires Python 3.6.
+  [href]
+
 - Unifies the coordinates usage across different modules.
   [href]
 

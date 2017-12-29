@@ -6,19 +6,11 @@ dist: trusty
 matrix:
   include:
     - language: python
-      python: "3.4"
-      env: TOXENV=py34 ES_VERSION=5.6.0
-
-    - language: python
-      python: "3.5"
-      env: TOXENV=py35 ES_VERSION=5.6.0
-
-    - language: python
       python: "3.6"
       env: TOXENV=py36 ES_VERSION=5.6.0
 
     - language: python
-      python: "3.4"
+      python: "3.6"
       env: TOXENV=pep8
 
 addons:
@@ -34,9 +26,9 @@ script:
     - tox -e $TOXENV
 
 after_success:
-    - if [ "$TOXENV" = 'py34' ]; then coveralls; fi
-    - 'if [ "$TOXENV" = "py34" ]; then $TRAVIS_BUILD_DIR/.tox/py34/bin/pip freeze | sed -r "s/^-e git.*?egg=([a-z\._]+)$/\1==${TRAVIS_TAG:1}/g" > $TRAVIS_BUILD_DIR/requirements.txt; fi'
-    - if [ "$TOXENV" = 'py34' ]; then cat requirements.txt; fi
+    - if [ "$TOXENV" = 'py36' ]; then coveralls; fi
+    - 'if [ "$TOXENV" = "py36" ]; then $TRAVIS_BUILD_DIR/.tox/py36/bin/pip freeze | sed -r "s/^-e git.*?egg=([a-z\._]+)$/\1==${TRAVIS_TAG:1}/g" > $TRAVIS_BUILD_DIR/requirements.txt; fi'
+    - if [ "$TOXENV" = 'py36' ]; then cat requirements.txt; fi
 
 deploy:
 
@@ -47,7 +39,7 @@ deploy:
     skip_cleanup: true
     on:
         tags: true
-        condition: $TOXENV = py34
+        condition: $TOXENV = py36
 
   - provider: pypi
     distributions: "sdist bdist_wheel"
@@ -56,4 +48,4 @@ deploy:
         secure: "gN38WfPyD7jE7kqJwyCprn8pl1xuw5qZmjd8/EhKAp4cqdHxDdrgYqoQ0ZR78CY/UZKfTpb4Iap/jsrClOGvkrgurKo6XB5Lfs2Ykr2OzcjVlBt1JCP/LnaP68YE2UF+Klegv0rXWOcR9nX7d1VuTkXKSn9Rj2QrhClGKyUtd7UsRjgqo+fSZ2jDp6kqW+jCywVAi0NotHvxO+J9F4RsGhAk32P6ZdX3SHwgaLdtdYaD+4CzcncezO29ghc1eEtza1XNpe5VttY7u7VymOhstoKVKLGhQksAdl7i6hju+snMBdwSRgXD1LP24t2poJJLsZ+Qj1UT3Z57VBlW8LQACdHDkEJMCRbwhkyvoOTN7Zb69Y4OnwwoAgRNjgF+7BoiDA+ytslQCxsAwxUzHcbwNUIwIhVd+2K8Au85wIdTSWp/IERp3BCLB8ykh+spDNv5/TSj9eV9woQ6vGFeq4x1FBX2TPy+C4ERVrqXv6YlRZKMtEoazWJHWX4P9LfUjWROBCnXhkmvGl6h22Y6obLdkffW5isUvidnyiJG28oLHbC7tuCIwaqcrekQAROGkXOQUsdtb2iWXNUgIucozEvxj4Y952IaRtSAvlAhNQU1uBMGya0kA055zFfdI+jArUsVlQtEAa2OH1If7kMUmfSdbgV6CFZ7ePt3tjD9+MYUv7k="
     on:
         tags: true
-        condition: $TOXENV = py34
+        condition: $TOXENV = py36
