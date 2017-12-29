@@ -4,7 +4,7 @@ name = 'onegov.directory'
 description = (
     'Directories for the OneGov Cloud.'
 )
-version = '0.1.0'
+version = '0.1.1'
 
 
 def get_long_description():
