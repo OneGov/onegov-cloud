@@ -3,19 +3,11 @@ cache: pip
 matrix:
   include:
     - language: python
-      python: "3.4"
-      env: TOXENV=py34
-
-    - language: python
-      python: "3.5"
-      env: TOXENV=py35
-
-    - language: python
       python: "3.6"
       env: TOXENV=py36
 
     - language: python
-      python: "3.4"
+      python: "3.6"
       env: TOXENV=pep8
 
 addons:
@@ -23,15 +15,15 @@ addons:
 
 install:
     - pip install tox
-    - if [ "$TOXENV" = 'py34' ]; then pip install codecov; fi
+    - if [ "$TOXENV" = 'py36' ]; then pip install codecov; fi
 
 script:
     - tox -e $TOXENV
 
 after_success:
-    - if [ "$TOXENV" = 'py34' ]; then codecov; fi
-    - 'if [ "$TOXENV" = "py34" ]; then $TRAVIS_BUILD_DIR/.tox/py34/bin/pip freeze | sed -r "s/^-e git.*?egg=([a-z\._]+)$/\1==${TRAVIS_TAG:1}/g" > $TRAVIS_BUILD_DIR/requirements.txt; fi'
-    - if [ "$TOXENV" = 'py34' ]; then cat requirements.txt; fi
+    - if [ "$TOXENV" = 'py36' ]; then codecov; fi
+    - 'if [ "$TOXENV" = "py36" ]; then $TRAVIS_BUILD_DIR/.tox/py36/bin/pip freeze | sed -r "s/^-e git.*?egg=([a-z\._]+)$/\1==${TRAVIS_TAG:1}/g" > $TRAVIS_BUILD_DIR/requirements.txt; fi'
+    - if [ "$TOXENV" = 'py36' ]; then cat requirements.txt; fi
 
 deploy:
 
@@ -42,7 +34,7 @@ deploy:
     skip_cleanup: true
     on:
         tags: true
-        condition: $TOXENV = py34
+        condition: $TOXENV = py36
 
   - provider: pypi
     distributions: "sdist bdist_wheel"
@@ -51,4 +43,4 @@ deploy:
         secure: "jBTg9034cXbx9zkNW/W3fBmve+zoBHVuUbyUNKh7zwV+cl0vnzJtWNyJ/Zr+7SwBTbZIOasudz/vmIEk6lRUOGmyWHRjJzpxVAKuZflmdoNMLKvFqcb685ZagqTqyEKvRtCo53uQHNjdDdCER56zk4E4IeflZ93NBBnOJPEwTDyuJ4/aTpT1+v1+wJv7iTAxBhYIB1pPY5qrRpudDpvkK7pYhCFlyl+HXgfeDScOfj6wvtiGn8jNHlJnsMfCsQWXeXJq6W/Z9gKDBPRbHBdZ36yZpECpzoWiu0LsKyjPhj4wStYDoV8lq+wcAPhrTqxTTSHgzBlJ6yaDfYLMUcm0aYLn3Bq9DcLJq48hpMXX0zzIhZxtyQ8e27P8E0ZVt/uKmyx+RaZJhNCNKtTNNgiUVgF91gShTHwN374IiPl3gGWh8BwJJWAZYIlN3C1vD5DcURkU3DyaMyz6fBGwFAOHdKSIdMEaXSabkcJyvBQ6Umkk106d9oXlJ/iGwGzBtEWFH9gTaKi8glUSVq1HzrXZvUeC7eAjsWXW29oHshorSTFYY51jYpTDldjls4lIcYXK8m5YyBqXgcOcaswvzvBYQb0T4QO0zgoqdNYYZhONDpcOYM9a5TuB2y3ILlrLH4SdOtl1UjOkHLyPZlsgjw0h91lBQEeXyFdKS8DI2lPmOXA="
     on:
         tags: true
-        condition: $TOXENV = py34
+        condition: $TOXENV = py36
