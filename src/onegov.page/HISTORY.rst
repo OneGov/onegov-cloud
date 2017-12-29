@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Requires Python 3.6.
+  [href]
+
 0.2.1 (2015-10-21)
 ~~~~~~~~~~~~~~~~~~~
 
