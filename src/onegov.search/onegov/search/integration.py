@@ -8,6 +8,7 @@ from onegov.search.indexer import Indexer
 from onegov.search.indexer import ORMEventTranslator
 from onegov.search.indexer import TypeMappingRegistry
 from onegov.search.utils import searchable_sqlalchemy_models
+from sqlalchemy import inspect
 
 
 class ElasticsearchApp(morepath.App):
@@ -248,7 +249,16 @@ class ElasticsearchApp(morepath.App):
 
         for base in self.session_manager.bases:
             for model in searchable_sqlalchemy_models(base):
-                for obj in session.query(model):
+                query = session.query(model)
+
+                # if the model has a polymorphic identity, limit the query
+                # by it, or we'll index too many things
+                info = inspect(model)
+                if info.polymorphic_on is not None:
+                    query = query.filter(
+                        info.polymorphic_on == info.polymorphic_identity)
+
+                for obj in query:
                     self.es_orm_events.index(self.schema, obj)
                     self.es_indexer.process()
 

@@ -3,6 +3,7 @@
 import click
 
 from onegov.core.cli import command_group, pass_group_context
+from sedate import utcnow
 
 
 cli = command_group()
@@ -17,11 +18,15 @@ def reindex(group_context):
         if not hasattr(request.app, 'es_client'):
             return
 
-        title = "Reindexing {}".format(request.app.application_id)
+        title = f"Reindexing {request.app.application_id}"
         print(click.style(title, underline=True))
+
+        start = utcnow()
 
         session = request.app.session()
         request.app.es_perform_reindex()
+
+        print(f"took {utcnow() - start}")
 
         @request.after
         def cleanup(response):

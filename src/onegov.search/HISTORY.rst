@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Slightly improves reindex performance.
+  [href]
+
 - Requires Python 3.6.
   [href]
 
