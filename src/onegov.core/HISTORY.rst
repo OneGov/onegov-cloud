@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.57.0 (2017-12-29)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds an 'add_by_form' method to generic collections.
   [href]
