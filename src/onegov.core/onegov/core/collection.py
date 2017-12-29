@@ -31,12 +31,15 @@ class GenericCollection(object):
 
         return item
 
-    def add_by_form(self, form):
+    def add_by_form(self, form, properties=None):
         cls = self.model_class
 
         return self.add(**{
-            key: value for key, value in form.get_useful_data().items()
-            if hasattr(cls, key)
+            # fields
+            k: v for k, v in form.get_useful_data().items() if hasattr(cls, k)
+        }, **{
+            # attributes
+            k: getattr(form, k) for k in properties or tuple()
         })
 
     def delete(self, item):

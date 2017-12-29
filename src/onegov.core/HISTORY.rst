@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the ability to pass extra properties to "add_by_form".
+  [href]
+
 0.57.0 (2017-12-29)
 ~~~~~~~~~~~~~~~~~~~
 
