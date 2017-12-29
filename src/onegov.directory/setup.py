@@ -31,6 +31,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     platforms='any',
+    python_requires='>=3.6',
     install_requires=[
         'more_itertools',
         'onegov.core>=0.4.0',
