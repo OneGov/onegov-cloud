@@ -3,19 +3,11 @@ cache: pip
 matrix:
   include:
     - language: python
-      python: "3.4"
-      env: TOXENV=py34
-
-    - language: python
-      python: "3.5"
-      env: TOXENV=py35
-
-    - language: python
       python: "3.6"
       env: TOXENV=py36
 
     - language: python
-      python: "3.4"
+      python: "3.6"
       env: TOXENV=pep8
 
 addons:
@@ -23,15 +15,15 @@ addons:
 
 install:
     - pip install tox
-    - if [ "$TOXENV" = 'py34' ]; then pip install coveralls; fi
+    - if [ "$TOXENV" = 'py36' ]; then pip install coveralls; fi
 
 script:
     - tox -e $TOXENV
 
 after_success:
-    - if [ "$TOXENV" = 'py34' ]; then coveralls; fi
-    - 'if [ "$TOXENV" = "py34" ]; then $TRAVIS_BUILD_DIR/.tox/py34/bin/pip freeze | sed -r "s/^-e git.*?egg=([a-z\._]+)$/\1==${TRAVIS_TAG:1}/g" > $TRAVIS_BUILD_DIR/requirements.txt; fi'
-    - if [ "$TOXENV" = 'py34' ]; then cat requirements.txt; fi
+    - if [ "$TOXENV" = 'py36' ]; then coveralls; fi
+    - 'if [ "$TOXENV" = "py36" ]; then $TRAVIS_BUILD_DIR/.tox/py36/bin/pip freeze | sed -r "s/^-e git.*?egg=([a-z\._]+)$/\1==${TRAVIS_TAG:1}/g" > $TRAVIS_BUILD_DIR/requirements.txt; fi'
+    - if [ "$TOXENV" = 'py36' ]; then cat requirements.txt; fi
 
 deploy:
 
@@ -42,7 +34,7 @@ deploy:
     skip_cleanup: true
     on:
         tags: true
-        condition: $TOXENV = py34
+        condition: $TOXENV = py36
 
   - provider: pypi
     distributions: "sdist bdist_wheel"
@@ -51,4 +43,4 @@ deploy:
         secure: "aVqJCW/anipZ+K/oAM/6LdmuIRSUF8tdmkCyyH0VofLyH+FJtiq/dfr+zxdb0NkTYrbVgt2YdmzWuudyW/gWTBnXeaNd6YAVINMhbf2N01ltYanKmgXoD40f/tc3cJKrZona2+F7Re0DmryMuw9dU8ojZYdY0npYZk13GaLhkwIdVjkncOEVwQGB7x4zQaC4ednk/uXkrfqdvO7oFS9y3mLR9XHzS6FcSY8nOpGISz2mJUSEbJd82bBcBGDffWD1o6Ru4FWrwtTssfaxCWL8IiGFxFMk15IV5ET4xNb5wW0ObUwVdkw4nRF5FtjvKd7evdNwgymTJuJ3+iNHLJp72IoKTMEyWFgpJ1TnyVRpYaH5fm2vBLlKr2T4HhUPFnokUlln2SvcAPT2WxllTsnqcy1UYSC2owhMs8OHA/V6biwzdQPHpRaZ1YikfqXbldgrdhN/dbd6j3K+p0AmeabeOcr1e5YjHo9Z/KCP0yW3d3OS4nVSta5ZGEg7w7avRCi9MFHRDQkVx5kb0ClctsQL02fxPJGd/DKfHrO9mQV2pssJl11tpA/yFyqi/F27l6PUqRYa9LWLWkdUaOudc0zI23R3EP5sSjIxXh2ye9zQ6NKA5onXF6Dkr0dK96H39YNSlpZ54eFhnmvgn8IniKmoKtHoUvbtTG97ijszDWQVERY="
     on:
         tags: true
-        condition: $TOXENV = py34
+        condition: $TOXENV = py36

@@ -1,6 +1,10 @@
 Changelog
 ---------
-1.12.2 (2017-12-22)
+
+- Requires Python 3.6.
+  [href]
+
+1.13.0 (2017-12-12)
 ~~~~~~~~~~~~~~~~~~~
 
 - Updates dependencies.
