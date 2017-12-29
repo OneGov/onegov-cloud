@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes a case where invalid entries would be added to the directory.
+  [href]
+
 0.1.1 (2017-12-29)
 ~~~~~~~~~~~~~~~~~~~~~
 

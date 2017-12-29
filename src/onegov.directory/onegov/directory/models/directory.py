@@ -205,6 +205,11 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
         form = self.form_class(data=entry.values)
 
         if not form.validate():
+
+            # if the validaiton error is captured, the entry is added
+            # to the directory, unless we expunge it
+            session and session.expunge(entry)
+
             raise ValidationError(entry, form.errors)
 
         # mark the values as dirty (required because values is only part
