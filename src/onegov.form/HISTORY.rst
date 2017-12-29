@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.29.0 (2017-12-29)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to provide an e-mail address when creating a submission.
   [href]
