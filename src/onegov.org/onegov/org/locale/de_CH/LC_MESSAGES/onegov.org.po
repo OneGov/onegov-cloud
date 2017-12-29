@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-12-29 14:15+0100\n"
+"POT-Creation-Date: 2017-12-29 14:40+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1073,14 +1073,17 @@ msgstr "Der Eintrag wurde übernommen"
 msgid "The submission was rejected"
 msgstr "Die Eingabe wurde abgelehnt"
 
+msgid "The entry is not valid, please adjust it"
+msgstr "Der Eintrag ist nicht gültig, bitte korrigieren"
+
+msgid "An entry with this name already exists"
+msgstr "Ein Eintrag mit diesem Namen existiert bereits"
+
 msgid "Your directory submission has been adopted"
 msgstr "Ihr Verzeichniseintrag wurde übernommen"
 
 msgid "Your directory submission has been rejected"
 msgstr "Ihre Eingabe wurde abgelehnt"
-
-msgid "An entry with this name already exists"
-msgstr "Ein Eintrag mit diesem Namen existiert bereits"
 
 msgid "Hide from the public"
 msgstr "Vor der Öffentlichkeit verstecken"

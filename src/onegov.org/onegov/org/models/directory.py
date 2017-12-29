@@ -5,7 +5,7 @@ from datetime import timedelta
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.utils import linkify
 from onegov.directory import Directory, DirectoryEntry
-from onegov.directory.errors import DuplicateEntryError
+from onegov.directory.errors import DuplicateEntryError, ValidationError
 from onegov.directory.migration import DirectoryMigration
 from onegov.form import as_internal_id, Extendable, FormSubmission
 from onegov.org import _
@@ -13,7 +13,6 @@ from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import HiddenFromPublicExtension
 from onegov.org.models.message import DirectoryMessage
 from onegov.ticket import Ticket
-from purl import URL
 from sqlalchemy import and_
 from sqlalchemy.orm import object_session
 
@@ -80,27 +79,31 @@ class DirectorySubmissionAction(object):
             new_structure=self.submission.definition
         )
 
+        # whenever we try to adopt a submission, we update its structure
+        # so we can edit the entry with the updated structure if the adoption
+        # fails
+        self.submission.definition = self.directory.structure
+
         # if the migration failes, update the form on the submission
         # and redirect to it so it can be fixed
         if not migration.possible:
-            self.submission.definition = self.directory.structure
+            request.alert(_("The entry is not valid, please adjust it"))
+            return
 
-            link = URL(request.link(self.submission))
-            link = link.query_param('edit', '')
+        data = self.submission.data.copy()
+        migration.migrate_values(data)
 
-            return request.redirect(link.as_string())
-        else:
-            data = self.submission.data.copy()
-            migration.migrate_values(data)
+        try:
+            entry = self.directory.add(data)
+        except DuplicateEntryError:
+            request.alert(_("An entry with this name already exists"))
+            return
+        except ValidationError:
+            request.alert(_("The entry is not valid, please adjust it"))
+            return
 
-            try:
-                entry = self.directory.add(data)
-            except DuplicateEntryError:
-                request.alert(_("An entry with this name already exists"))
-                return
-
-            self.ticket.handler_data['entry_name'] = entry.name
-            entry.coordinates = self.submission.data.get('coordinates')
+        self.ticket.handler_data['entry_name'] = entry.name
+        entry.coordinates = self.submission.data.get('coordinates')
 
         if self.ticket.ticket_email != request.current_username:
             self.send_html_mail(
