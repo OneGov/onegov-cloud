@@ -40,7 +40,7 @@
                     <dl>
                         <dt>
                             <a href="${submit}">
-                                <h2 i18n:translate="">New entry</h2>
+                                <h2 i18n:translate="">Propose entry</h2>
                             </a>
                         </dt>
                         <dd i18n:translate="">Propose a new entry</dd>

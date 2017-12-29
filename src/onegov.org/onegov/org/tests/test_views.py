@@ -1,3 +1,4 @@
+import babel.dates
 import onegov.core
 import onegov.org
 import pytest
@@ -2355,8 +2356,12 @@ def test_submit_event(org_app):
     assert "Ausstellung" in preview_page
     assert "The Organizer" in preview_page
     assert "Gastronomie" in preview_page
-    assert "{} 18:00-22:00".format(start_date.strftime('%d.%m.%Y')) in \
-        preview_page
+    assert "{} 18:00 - 22:00".format(
+        babel.dates.format_date(
+            start_date, format='dd. MMMM yyyy', locale='de'
+        )
+    ) in preview_page
+
     assert "Jeden Mo, Di, Mi, Do, Fr, Sa, So bis zum {}".format(
         end_date.strftime('%d.%m.%Y')
     ) in preview_page
@@ -2408,9 +2413,13 @@ def test_submit_event(org_app):
     assert "The Organizer" in ticket_page
     assert "Ausstellung" in ticket_page
     assert "Gastronomie" in ticket_page
-    assert "{} 18:00-22:00".format(start_date.strftime('%d.%m.%Y')) in \
-        ticket_page
-    assert "(Europe/Zurich)" in ticket_page
+
+    assert "{} 18:00 - 22:00".format(
+        babel.dates.format_date(
+            start_date, format='dd. MMMM yyyy', locale='de'
+        )
+    ) in ticket_page
+
     assert "Jeden Mo, Di, Mi, Do, Fr, Sa, So bis zum {}".format(
         end_date.strftime('%d.%m.%Y')
     ) in ticket_page
@@ -2434,7 +2443,8 @@ def test_submit_event(org_app):
     assert "Ausstellung" in message
     assert "Gastronomie" in message
     assert "The Organizer" in message
-    assert "{} 18:00-22:00".format(start_date.strftime('%d.%m.%Y')) in message
+    assert "{} 18:00 - 22:00".format(
+        start_date.strftime('%d.%m.%Y')) in message
     for days in range(5):
         assert (start_date + timedelta(days=days)).strftime('%d.%m.%Y') in \
             message
@@ -3840,7 +3850,7 @@ def test_directory_visibility(org_app):
     page.form.submit()
 
     page = client.get('/directories/clubs')
-    page = page.click('Eintrag')
+    page = page.click('Eintrag', index=0)
     page.form['name'] = 'Soccer Club'
     page.form.submit()
 

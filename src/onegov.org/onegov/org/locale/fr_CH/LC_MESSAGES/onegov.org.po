@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-12-28 16:24+0100\n"
+"POT-Creation-Date: 2017-12-29 14:15+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1291,7 +1291,7 @@ msgstr "Aucun dossier défini pour l'instant."
 msgid "No entries found."
 msgstr "Aucune entrée trouvée."
 
-msgid "New entry"
+msgid "Propose entry"
 msgstr ""
 
 msgid "Propose a new entry"

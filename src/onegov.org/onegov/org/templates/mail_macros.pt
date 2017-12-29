@@ -37,7 +37,7 @@
     <p tal:content="structure model.description.replace('\n', '<br />')" />
     <p>
         <ul tal:define="occurrences model.occurrence_dates(localize=True)">
-            <li tal:repeat="occurrence occurrences">${layout.format_date(occurrence, 'datetime')}-${layout.format_date(model.localized_end, 'time')}</li>
+            <li tal:repeat="occurrence occurrences">${layout.format_date(occurrence, 'datetime')} - ${layout.format_date(model.localized_end, 'time')}</li>
         </ul>
     </p>
     <p>
