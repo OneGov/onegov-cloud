@@ -66,41 +66,60 @@ class DirectoryMigration(object):
         return False
 
     def execute(self):
+        """ To run the migration, run this method. The other methods below
+        should only be used if you know what you are doing.
+
+        """
         assert self.possible
 
+        self.migrate_directory()
+
+        for entry in self.directory.entries:
+            self.migrate_entry(entry)
+
+    def migrate_directory(self):
         self.directory.structure = self.new_structure
         self.directory.configuration = self.new_configuration
 
+    def migrate_entry(self, entry):
         for entry in self.directory.entries:
-            # XXX this is currently rather destructive and automatic, we would
-            # want to change this into something that is save for the user
-            # by maybe keeping the old values around somehow
-            for added in self.changes.added_fields:
-                added = as_internal_id(added)
-                entry.values[added] = None
-
-            for removed in self.changes.removed_fields:
-                removed = as_internal_id(removed)
-                del entry.values[removed]
-
-            for old, new in self.changes.renamed_fields.items():
-                old, new = as_internal_id(old), as_internal_id(new)
-                entry.values[new] = entry.values[old]
-                del entry.values[old]
-
-            for changed in self.changes.changed_fields:
-                convert = self.fieldtype_migrations.get_converter(
-                    self.changes.old[changed].type,
-                    self.changes.new[changed].type
-                )
-
-                changed = as_internal_id(changed)
-                entry.values[changed] = convert(entry.values[changed])
-
+            self.migrate_values(entry.values)
             self.directory.update(entry, entry.values)
 
             # force an elasticsearch reindex
             flag_modified(entry, 'title')
+
+    def migrate_values(self, values):
+        self.add_new_fields(values)
+        self.remove_old_fields(values)
+        self.rename_fields(values)
+        self.convert_fields(values)
+
+    def add_new_fields(self, values):
+        for added in self.changes.added_fields:
+            added = as_internal_id(added)
+            values[added] = None
+
+    def remove_old_fields(self, values):
+        for removed in self.changes.removed_fields:
+            removed = as_internal_id(removed)
+            del values[removed]
+
+    def rename_fields(self, values):
+        for old, new in self.changes.renamed_fields.items():
+            old, new = as_internal_id(old), as_internal_id(new)
+            values[new] = values[old]
+            del values[old]
+
+    def convert_fields(self, values):
+        for changed in self.changes.changed_fields:
+            convert = self.fieldtype_migrations.get_converter(
+                self.changes.old[changed].type,
+                self.changes.new[changed].type
+            )
+
+            changed = as_internal_id(changed)
+            values[changed] = convert(values[changed])
 
 
 class FieldTypeMigrations(object):
