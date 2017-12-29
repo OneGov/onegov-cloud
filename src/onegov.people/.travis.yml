@@ -3,14 +3,6 @@ cache: pip
 matrix:
   include:
     - language: python
-      python: "3.4"
-      env: TOXENV=py34
-
-    - language: python
-      python: "3.5"
-      env: TOXENV=py35
-
-    - language: python
       python: "3.6"
       env: TOXENV=py36
 
@@ -23,13 +15,13 @@ addons:
 
 install:
     - pip install tox
-    - if [ "$TOXENV" = 'py34' ]; then pip install coveralls; fi
+    - if [ "$TOXENV" = 'py36' ]; then pip install coveralls; fi
 
 script:
     - tox -e $TOXENV
 
 after_success:
-    - if [ "$TOXENV" = 'py34' ]; then coveralls; fi
+    - if [ "$TOXENV" = 'py36' ]; then coveralls; fi
 
 deploy:
     provider: pypi
@@ -39,4 +31,4 @@ deploy:
       secure: "L4ne43QYh1C/wl77/38/JT9QNhBJCmNxkNQxDkYd1KohAV+U8ynur5OU2C0qV5W6XIyOLHnR1Y3qNgiNONAsfJoFBlpyk8VO7AEbPt2WTCyXoLIIRDUI5/wAFiwU0VZOQ2DYVWGs890eNJ9b5hqc98XWPkk2tlXWA+Ciw0XMzRNC+TYHHWm0JlMTOlmKrHkSKKnb6jHz1QgSSkztkT4db0v+UQaQ+w4T/WcWJ4UEE+9NrMxVHwxB+pMaMojz9UKrRHs+MpegCa4uaxpmA6H4hM66IjyYZmn8TTW/CIBPXb+VnldIVsek3KW/g6/ZgrB3/oCVQA1gt1kEq+ZQkiX53D+iGG6aYlmX97HY8cdmxfurAN7FYmS3RW53FRBKaGvqIiOroMYNUCis53DMNZMfbbISi12IaPCng4VD0U2GKA1e0e0l+AV3VGOWlXUK486IHe3nryenfKXokuOL6QuURlsUMUxFSmqzIhT8mJPs3QVB+AOtgQlU/IWKX7U9aP3v3m+VG40AtkzFR1Mvz9RqzbFgu3IghkDyXg9piGEp1rMhnDE+oWnHZUMHA8my3zL+i7poTXxMC6NJLCQwurGfl1PNtf5SMacoNjnRs1KG0TBxN+TZZs6mKzbDIq1SApeplsI2Hsp0CGYg06YlgQRzqrS8Pb3yDDEzVU+wJliUdO0="
     on:
         tags: true
-        condition: $TOXENV = py34
+        condition: $TOXENV = py36
