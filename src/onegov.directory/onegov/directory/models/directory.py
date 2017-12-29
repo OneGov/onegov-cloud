@@ -7,7 +7,7 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
-from onegov.directory.errors import ValidationError
+from onegov.directory.errors import ValidationError, DuplicateEntryError
 from onegov.directory.migration import DirectoryMigration
 from onegov.directory.types import DirectoryConfigurationStorage
 from onegov.file import File
@@ -191,7 +191,15 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
         # update the title
         if set_name:
-            entry.name = self.configuration.extract_name(values)
+            name = self.configuration.extract_name(values)
+
+            if session:
+                with session.no_autoflush:
+                    if self.entry_with_name_exists(name):
+                        session.expunge(entry)
+                        raise DuplicateEntryError(name)
+
+            entry.name = name
 
         # validate the values
         form = self.form_class(data=entry.values)
@@ -216,6 +224,11 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
     @observes('structure', 'configuration')
     def structure_configuration_observer(self, structure, configuration):
         self.migration(structure, configuration).execute()
+
+    def entry_with_name_exists(self, name):
+        q = object_session(self).query(self.entry_cls).filter_by(name=name)
+
+        return q.first()
 
     def migration(self, new_structure, new_configuration):
         return DirectoryMigration(

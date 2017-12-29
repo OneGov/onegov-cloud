@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Throws an error early if an entry with a duplicate name is created.
+  [href]
+
 0.1.0 (2017-12-22)
 ~~~~~~~~~~~~~~~~~~~~~
 
