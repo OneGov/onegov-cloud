@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.2.4 (2017-12-29)
+~~~~~~~~~~~~~~~~~~~
+
 - Slightly improves reindex performance.
   [href]
 
