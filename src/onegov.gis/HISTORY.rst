@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Requires Python 3.6.
+  [href]
+
 - Adds a display renderer for the coordinates field.
   [href]
 
