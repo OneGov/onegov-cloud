@@ -311,8 +311,7 @@ def handle_submit_directory_entry(self, request, form):
 
     title = _("Submit a New Directory Entry")
 
-    # validation is done later
-    if request.POST:
+    if form.submitted(request):
         forms = FormCollection(request.app.session())
 
         # required by the form submissions collection
