@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Requires Python 3.6.
+  [href]
+
 - Moves the coordinates field to the model provided by onegov.gis.
   [href]
 
