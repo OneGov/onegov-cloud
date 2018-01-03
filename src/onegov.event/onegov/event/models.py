@@ -126,10 +126,10 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
     )
 
     #: description of the event
-    description = content_property('description')
+    description = content_property()
 
     #: the event organizer
-    organizer = content_property('organizer')
+    organizer = content_property()
 
     #: Recurrence of the event (RRULE, see RFC2445)
     recurrence = Column(Text, nullable=True)
