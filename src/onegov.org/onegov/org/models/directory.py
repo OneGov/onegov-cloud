@@ -73,6 +73,12 @@ class DirectorySubmissionAction(object):
         return getattr(self, self.action)(request)
 
     def adopt(self, request):
+
+        # be idempotent
+        if self.ticket.handler_data.get('state') == 'adopted':
+            request.success(_("The submission was adopted"))
+            return
+
         # the directory might have changed -> migrate what we can
         migration = DirectoryMigration(
             directory=self.directory,
@@ -103,6 +109,8 @@ class DirectorySubmissionAction(object):
             return
 
         self.ticket.handler_data['entry_name'] = entry.name
+        self.ticket.handler_data['state'] = 'adopted'
+
         entry.coordinates = self.submission.data.get('coordinates')
 
         if self.ticket.ticket_email != request.current_username:
@@ -112,16 +120,19 @@ class DirectorySubmissionAction(object):
                 subject=_("Your directory submission has been adopted"),
             )
 
-        # delete after creating the e-mail which includes the submission
-        self.session.delete(self.submission)
-
         request.success(_("The submission was adopted"))
-
         DirectoryMessage.create(
-            self.directory, self.ticket, request, 'adopted'
-        )
+            self.directory, self.ticket, request, 'adopted')
 
     def reject(self, request):
+
+        # be idempotent
+        if self.ticket.handler_data.get('state') == 'rejected':
+            request.success(_("The submission was rejected"))
+            return
+
+        self.ticket.handler_data['state'] = 'rejected'
+
         if self.ticket.ticket_email != request.current_username:
             self.send_html_mail(
                 request=request,
@@ -129,14 +140,9 @@ class DirectorySubmissionAction(object):
                 subject=_("Your directory submission has been rejected"),
             )
 
-        # delete after creating the e-mail which includes the submission
-        self.session.delete(self.submission)
-
         request.success(_("The submission was rejected"))
-
         DirectoryMessage.create(
-            self.directory, self.ticket, request, 'rejected'
-        )
+            self.directory, self.ticket, request, 'rejected')
 
 
 class ExtendedDirectory(Directory, HiddenFromPublicExtension, Extendable):

@@ -456,7 +456,14 @@ class DirectoryEntryHandler(Handler):
 
     @property
     def deleted(self):
-        return self.submission is None
+        if not self.directory:
+            return True
+
+        if self.state == 'adopted':
+            name = self.ticket.handler_data.get('entry_name')
+            return not self.directory.entry_with_name_exists(name)
+
+        return False
 
     @property
     def email(self):
@@ -479,6 +486,10 @@ class DirectoryEntryHandler(Handler):
         return self.submission and self.submission.payment
 
     @property
+    def state(self):
+        return self.ticket.handler_data.get('state')
+
+    @property
     def extra_data(self):
         return self.submission and [
             v for v in self.submission.data.values()
@@ -496,7 +507,10 @@ class DirectoryEntryHandler(Handler):
 
         links = []
 
-        if self.submission:
+        if not self.directory or self.deleted:
+            return links
+
+        if self.state is None:
             links.append(
                 Link(
                     text=_("Adopt"),
@@ -515,22 +529,21 @@ class DirectoryEntryHandler(Handler):
                 )
             )
 
-        if self.directory and not self.submission:
-            if 'entry_name' in self.ticket.handler_data:
-                links.append(
-                    Link(
-                        text=_("View directory entry"),
-                        url=request.class_link(DirectoryEntry, {
-                            'directory_name': self.directory.name,
-                            'name': self.ticket.handler_data['entry_name']
-                        }),
-                        attrs={'class': 'view-link'},
-                    )
+        if self.state == 'adopted':
+            links.append(
+                Link(
+                    text=_("View directory entry"),
+                    url=request.class_link(DirectoryEntry, {
+                        'directory_name': self.directory.name,
+                        'name': self.ticket.handler_data['entry_name']
+                    }),
+                    attrs={'class': 'view-link'},
                 )
+            )
 
         advanced_links = []
 
-        if self.submission:
+        if self.state is None:
             link = URL(request.link(self.submission))
             link = link.query_param('edit', '')
             link = link.query_param('title', request.translate(
@@ -545,7 +558,6 @@ class DirectoryEntryHandler(Handler):
                 )
             )
 
-        if self.directory and self.submission:
             advanced_links.append(Link(
                 text=_("Reject"),
                 url=request.link(
