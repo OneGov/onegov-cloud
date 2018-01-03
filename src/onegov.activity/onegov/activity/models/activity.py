@@ -50,13 +50,13 @@ class Activity(Base, ContentMixin, TimestampMixin):
     order = Column(Text, nullable=False, index=True)
 
     #: Describes the activity briefly
-    lead = meta_property('lead')
+    lead = meta_property()
 
     #: Describes the activity in detail
-    text = content_property('text')
+    text = content_property()
 
     #: The thumbnail shown in the overview
-    thumbnail = meta_property('thumbnail')
+    thumbnail = meta_property()
 
     #: Tags/Categories of the activity
     _tags = Column(MutableDict.as_mutable(HSTORE), nullable=True, name='tags')
