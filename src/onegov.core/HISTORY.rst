@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.58.0 (2018-01-03)
+~~~~~~~~~~~~~~~~~~~
 
 - Replaces the dictionary based property with a more complete and easier
   to use implementation (backwards compatible).
