@@ -69,16 +69,16 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
     type = Column(Text, nullable=True)
 
     #: the payment method
-    payment_method = content_property('payment_method')
+    payment_method = content_property()
 
     #: the currency of the price to pay
-    currency = content_property('currency')
+    currency = content_property()
 
     #: the pricing method to use
-    pricing_method = content_property('pricing_method')
+    pricing_method = content_property()
 
     #: the reservations cost a given amount per hour
-    price_per_hour = content_property('price_per_hour')
+    price_per_hour = content_property()
 
     #: the reservations cost a given amount per unit (allocations * quota)
     price_per_item = content_property('price_per_reservation')
