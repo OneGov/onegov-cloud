@@ -6,8 +6,13 @@ import pytest
 from gettext import GNUTranslations, NullTranslations
 from onegov.core import i18n, utils
 from webob import Request
-from webob.acceptparse import Accept
 from wtforms import Label
+
+# compatibility shim for webob 1.8 before its release
+try:
+    from webob.acceptparse import create_accept_language_header
+except ImportError:
+    from webob.acceptparse import Accept as create_accept_language_header
 
 
 def test_pofiles(temporary_directory):
@@ -121,19 +126,20 @@ def test_get_translations(temporary_directory):
 
 
 def test_default_locale_negotiator():
+
     negotiate = i18n.default_locale_negotiator
     request = Request.blank('/')
 
-    request.accept_language = Accept('fr')
+    request.accept_language = create_accept_language_header('fr')
     assert negotiate(['en', 'de'], request) is None
 
-    request.accept_language = Accept('en')
+    request.accept_language = create_accept_language_header('en')
     assert negotiate(['en', 'de'], request) == 'en'
 
-    request.accept_language = Accept('de')
+    request.accept_language = create_accept_language_header('de')
     assert negotiate(['en', 'de'], request) == 'de'
 
-    request.accept_language = Accept('de')
+    request.accept_language = create_accept_language_header('de')
     request.cookies['locale'] = 'en'
     assert negotiate(['en', 'de'], request) == 'en'
 
