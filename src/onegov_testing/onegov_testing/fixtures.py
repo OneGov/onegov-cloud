@@ -21,7 +21,7 @@ from pathlib import Path
 from selenium.webdriver.chrome.options import Options
 from splinter import Browser
 from sqlalchemy import create_engine
-from testing.postgresql import Postgresql
+from onegov_testing.postgresql import Postgresql
 from uuid import uuid4
 from webdriver_manager.chrome import ChromeDriverManager
 
@@ -142,6 +142,8 @@ def postgres_dsn(postgres):
     after running the tests.
 
     """
+    postgres.reset_snapshots()
+
     yield postgres.url()
 
     transaction.abort()
