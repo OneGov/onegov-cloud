@@ -14,9 +14,11 @@ from onegov.core.orm import (
 )
 from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.abstract import Associable, associated
-from onegov.core.orm.mixins import (
-    meta_property, content_property, ContentMixin, TimestampMixin
-)
+from onegov.core.orm.mixins import meta_property
+from onegov.core.orm.mixins import content_property
+from onegov.core.orm.mixins import dict_property
+from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm import orm_cached
 from onegov.core.orm.types import HSTORE, JSON, UTCDateTime, UUID
 from onegov.core.orm.types import LowercaseText
@@ -1136,6 +1138,18 @@ def test_get_polymorphic_class():
         Base.get_polymorphic_class('C')
 
     assert "No such polymorphic_identity: C" in str(assertion_info.value)
+
+
+def test_dict_properties():
+
+    class Site(object):
+        users = {}
+        names = dict_property('users')
+
+    site = Site()
+    site.names = ['foo', 'bar']
+
+    assert site.users == {'names': ['foo', 'bar']}
 
 
 def test_content_properties():

@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Replaces the dictionary based property with a more complete and easier
+  to use implementation (backwards compatible).
+  [href]
+
 - Adds the ability to pass extra properties to "add_by_form".
   [href]
 
