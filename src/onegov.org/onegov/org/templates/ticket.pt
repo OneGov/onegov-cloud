@@ -21,7 +21,7 @@
 
                 <div class="ticket-timeline">
                     <h2 i18n:translate>Timeline</h2>
-                    <div class="timeline" data-feed-data="${feed_data}"></div>
+                    <div class="timeline" data-feed-data="${feed_data}" data-feed='static'></div>
                     <p class="timeline-no-messages" i18n:translate style="display: none;">
                         No activities yet.
                     </p>
@@ -126,7 +126,7 @@
 
                 <div class="ticket-timeline">
                     <h2 i18n:translate>Timeline</h2>
-                    <div class="timeline" data-feed-data="${feed_data}"></div>
+                    <div class="timeline" data-feed-data="${feed_data}" data-feed='static'></div>
                     <p class="timeline-no-messages" i18n:translate style="display: none;">
                         No activities yet.
                     </p>
