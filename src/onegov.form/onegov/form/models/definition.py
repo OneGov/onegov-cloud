@@ -56,10 +56,10 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, SearchableDefinition,
     submissions = relationship('FormSubmission', backref='form')
 
     #: lead text describing the form
-    lead = meta_property('lead')
+    lead = meta_property()
 
     #: content associated with the form
-    text = content_property('text')
+    text = content_property()
 
     #: payment options ('manual' for out of band payments without cc, 'free'
     #: for both manual and cc payments, 'cc' for forced cc payments)
