@@ -317,6 +317,12 @@ def handle_submit_directory_entry(self, request, form):
         # required by the form submissions collection
         form._source = self.directory.structure
 
+        # the price per submission
+        if self.directory.price == 'paid':
+            amount = self.directory.price_per_submission
+        else:
+            amount = 0.0
+
         submission = forms.submissions.add_external(
             form=form,
             state='pending',
@@ -325,6 +331,10 @@ def handle_submit_directory_entry(self, request, form):
             meta={
                 'handler_code': 'DIR',
                 'directory': self.directory.id.hex,
+                'price': {
+                    'amount': amount,
+                    'currency': self.directory.currency
+                },
                 'extensions': tuple(
                     ext for ext in self.directory.extensions
                     if ext != 'submitter'

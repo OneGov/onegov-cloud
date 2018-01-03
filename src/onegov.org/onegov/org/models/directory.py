@@ -12,6 +12,7 @@ from onegov.org import _
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import HiddenFromPublicExtension
 from onegov.org.models.message import DirectoryMessage
+from onegov.pay import Price
 from onegov.ticket import Ticket
 from sqlalchemy import and_
 from sqlalchemy.orm import object_session
@@ -170,6 +171,13 @@ class ExtendedDirectory(Directory, HiddenFromPublicExtension, Extendable):
             return ('coordinates', 'submitter')
         else:
             return ('submitter', )
+
+    @property
+    def actual_price(self):
+        return self.price == 'paid' and Price(
+            amount=self.price_per_submission,
+            currency=self.currency
+        )
 
     def submission_action(self, action, submission_id):
         return DirectorySubmissionAction(

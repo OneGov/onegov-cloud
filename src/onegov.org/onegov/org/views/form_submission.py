@@ -14,6 +14,7 @@ from onegov.org import _, OrgApp
 from onegov.org.layout import FormSubmissionLayout
 from onegov.org.mail import send_html_mail
 from onegov.org.models import TicketMessage
+from onegov.pay import Price
 from purl import URL
 
 
@@ -25,6 +26,18 @@ def copy_query(request, url, fields):
             url = url.query_param(field, request.GET[field])
 
     return url.as_string()
+
+
+def get_price(request, form, submission):
+    total = form.total()
+
+    if 'price' in submission.meta:
+        if total is not None:
+            total += Price(**submission.meta['price'])
+        else:
+            total = Price(**submission.meta['price'])
+
+    return request.app.adjust_price(total)
 
 
 @OrgApp.form(model=FormDefinition, template='form.pt', permission=Public,
@@ -111,7 +124,7 @@ def handle_pending_submission(self, request):
     else:
         title = self.form.title
 
-    price = request.app.adjust_price(form.total())
+    price = get_price(request, form, self)
 
     # retain some parameters in links (the rest throw away)
     form.action = copy_query(
@@ -137,7 +150,7 @@ def handle_pending_submission(self, request):
             button_label=request.translate(_("Pay Online and Complete")),
             title=title,
             price=price,
-            email=self.get_email_field_data(form),
+            email=self.email or self.get_email_field_data(form),
             locale=request.locale
         )
     }
@@ -171,8 +184,8 @@ def handle_complete_submission(self, request):
             provider = request.app.default_payment_provider
             token = request.params.get('payment_token')
 
-            payment = self.process_payment(
-                request.app.adjust_price(form.total()), provider, token)
+            price = get_price(request, form, self)
+            payment = self.process_payment(price, provider, token)
 
             if not payment:
                 request.alert(_("Your payment could not be processed"))
