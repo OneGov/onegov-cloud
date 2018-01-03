@@ -3878,3 +3878,87 @@ def test_directory_visibility(org_app):
     assert "Clubs" not in anon.get('/directories')
     assert anon.get('/directories/clubs', status=403)
     assert anon.get('/directories/clubs/soccer-club')
+
+
+def test_adopt_directory_submission(org_app, postgres):
+
+    client = Client(org_app)
+    client.login_admin()
+
+    # create a directory does not accept submissions
+    page = client.get('/directories').click('Verzeichnis')
+    page.form['title'] = "Points of Interest"
+    page.form['structure'] = """
+        Name *= ___
+        Description = ...
+    """
+    page.form['enable_submissions'] = False
+    page.form['title_format'] = '[Name]'
+    page.form['price'] = 'paid'
+    page.form['price_per_submission'] = 100
+    page.form['payment_method'] = 'manual'
+    page = page.form.submit().follow()
+
+    assert "Eintrag vorschlagen" not in page
+
+    # change it to accept submissions
+    page = page.click("Konfigurieren")
+    page.form['enable_submissions'] = True
+    page = page.form.submit().follow()
+
+    assert "Eintrag vorschlagen" in page
+
+    # create a submission with a missing field
+    page = page.click("Eintrag vorschlagen")
+    page.form['description'] = (
+        "The Washington Monument is an obelisk on the National Mall in "
+        "Washington, D.C., built to commemorate George Washington, once "
+        "commander-in-chief of the Continental Army and the first President "
+        "of the United States"
+    )
+    page.form['submitter'] = 'info@example.org'
+    page = page.form.submit()
+
+    assert "error" in page
+
+    # add the missing field
+    page.form['name'] = 'Washingtom Monument'
+    page = page.form.submit().follow()
+
+    # check the result
+    assert "error" not in page
+    assert "100.00" in page
+    assert "Washingtom Monument" in page
+    assert "George Washington" in page
+
+    # fix the result
+    page = page.click("Bearbeiten", index=1)
+    page.form['name'] = "Washington Monument"
+    page = page.form.submit()
+
+    assert "Washingtom Monument" not in page
+    page = page.form.submit().follow()
+
+    assert "DIR-" in page
+
+    # the submission has not yet resulted in an entry
+    assert 'Washington' not in client.get('/directories/points-of-interest')
+
+    # adopt the submission through the ticket
+    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+    assert "Offen" in page
+    assert "100.00" in page
+    assert "Übernehmen" in page
+    assert "info@example.org" in page
+    assert "Washington" in page
+    assert "National Mall" in page
+
+    # if we adopt it it'll show up
+    postgres.save()
+    client.post(page.pyquery('.accept-link').attr('ic-post-to'))
+    assert 'Washington' in client.get('/directories/points-of-interest')
+
+    # if we don't, it won't
+    postgres.undo()
+    client.post(page.pyquery('.delete-link').attr('ic-post-to'))
+    assert 'Washington' not in client.get('/directories/points-of-interest')
