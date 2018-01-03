@@ -21,8 +21,8 @@ from uuid import uuid4, uuid5
 
 class SharedMethods(object):
 
-    lead = meta_property('lead')
-    text = content_property('text')
+    lead = meta_property()
+    text = content_property()
 
     @property
     def deletable(self):

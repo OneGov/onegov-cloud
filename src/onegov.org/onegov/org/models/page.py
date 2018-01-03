@@ -23,9 +23,9 @@ class SearchablePage(ORMSearchable):
         'text': {'type': 'localized_html'}
     }
 
-    lead = content_property('lead')
-    text = content_property('text')
-    url = content_property('url')
+    lead = content_property()
+    text = content_property()
+    url = content_property()
 
     @property
     def es_public(self):

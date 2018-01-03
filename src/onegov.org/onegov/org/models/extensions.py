@@ -57,7 +57,7 @@ class HiddenFromPublicExtension(ContentExtension):
 
     """
 
-    is_hidden_from_public = meta_property('is_hidden_from_public')
+    is_hidden_from_public = meta_property()
 
     def extend_form(self, form_class, request):
 
@@ -85,7 +85,7 @@ class VisibleOnHomepageExtension(ContentExtension):
 
     """
 
-    is_visible_on_homepage = meta_property('is_visible_on_homepage')
+    is_visible_on_homepage = meta_property()
 
     def extend_form(self, form_class, request):
 
@@ -108,7 +108,7 @@ class ContactExtension(ContentExtension):
 
     """
 
-    contact = content_property('contact')
+    contact = content_property()
 
     @contact.setter
     def contact(self, value):

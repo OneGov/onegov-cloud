@@ -144,15 +144,15 @@ class ExtendedDirectory(Directory, HiddenFromPublicExtension, Extendable):
 
     es_type_name = 'extended_directories'
 
-    enable_map = meta_property('enable_map')
-    enable_submissions = meta_property('enable_submissions')
+    enable_map = meta_property()
+    enable_submissions = meta_property()
 
-    guideline = content_property('guideline')
-    price = content_property('price')
-    price_per_submission = content_property('price_per_submission')
-    currency = content_property('currency')
+    guideline = content_property()
+    price = content_property()
+    price_per_submission = content_property()
+    currency = content_property()
 
-    payment_method = meta_property('payment_method')
+    payment_method = meta_property()
 
     @property
     def form_class_for_submissions(self):

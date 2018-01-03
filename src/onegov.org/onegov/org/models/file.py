@@ -139,10 +139,10 @@ class ImageSet(FileSet, HiddenFromPublicExtension, ORMSearchable):
             "input": [self.title.lower()]
         }
 
-    lead = meta_property('lead')
-    view = meta_property('view')
+    lead = meta_property()
+    view = meta_property()
 
-    show_images_on_homepage = meta_property('show_images_on_homepage')
+    show_images_on_homepage = meta_property()
 
 
 class ImageSetCollection(FileSetCollection):
