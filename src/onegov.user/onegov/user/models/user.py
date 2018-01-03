@@ -214,7 +214,7 @@ class User(Base, TimestampMixin, ORMSearchable):
         return yubikey and yubikey_otp_to_serial(yubikey) or None
 
     #: sessions of this user
-    sessions = data_property('sessions')
+    sessions = data_property()
 
     def cleanup_sessions(self, request):
         """ Removes stored sessions not valid anymore. """
