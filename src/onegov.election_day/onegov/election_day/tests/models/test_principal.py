@@ -5,7 +5,7 @@ from onegov.election_day.models.principal import cantons
 from textwrap import dedent
 
 
-SUPPORTED_YEARS = list(range(2002, 2017 + 1))
+SUPPORTED_YEARS = list(range(2002, 2018 + 1))
 
 SUPPORTED_YEARS_MAP = list(range(2013, 2017 + 1))
 SUPPORTED_YEARS_NO_MAP = list(set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP))
@@ -189,7 +189,6 @@ def test_principal_municipalities():
             assert principal.municipalities[year]
 
 
-@pytest.mark.xfail(reason="2018 has not been implemented yet")
 def test_principal_districts():
     # Canton Zug (cantons have municipalities, not districts)
     principal = Principal(name='Zug', canton='zg')
