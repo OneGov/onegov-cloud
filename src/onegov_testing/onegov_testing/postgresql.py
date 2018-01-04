@@ -1,24 +1,35 @@
 from testing.postgresql import Postgresql as Base
-from subprocess import run, PIPE, DEVNULL
+from subprocess import run, PIPE, DEVNULL, TimeoutExpired
 
 
 class Snapshot(object):
     def __init__(self, url):
         self.url = url
-        self.restored = False
         self.dump = self.create_dump()
 
     def create_dump(self):
-        process = run(('pg_dump', self.url, '--clean'), stdout=PIPE)
-        process.check_returncode()
-
-        return process.stdout
+        return run(
+            ('pg_dump', '-Fc', self.url),
+            stdout=PIPE,
+            check=True
+        ).stdout
 
     def restore(self):
-        process = run(('psql', self.url), input=self.dump, stdout=DEVNULL)
-        process.check_returncode()
+        try:
+            run(
+                ('pg_restore', '--clean', '-d', self.url),
+                input=self.dump,
+                stdout=DEVNULL,
+                check=True,
+                timeout=10
+            )
+        except TimeoutExpired:
+            raise RuntimeError("""
+                pg_restore has stalled, probably due to an idle transaction
 
-        self.restored = True
+                be sure to close all connections through either
+                transaction.abort() or transaction.commit()
+            """)
 
 
 class Postgresql(Base):
@@ -32,10 +43,11 @@ class Postgresql(Base):
         self.snapshots.append(Snapshot(self.url()))
         return self.snapshots[-1]
 
-    def undo(self):
-        # snapshots can be restored outside this stack
-        self.snapshots = [s for s in self.snapshots if not s.restored]
-        self.snapshots.pop().restore()
+    def undo(self, pop=True):
+        if pop:
+            self.snapshots.pop().restore()
+        else:
+            self.snapshots[-1].restore()
 
     def reset_snapshots(self):
         self.snapshots = []
