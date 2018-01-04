@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.20.0 (2018-01-04)
+~~~~~~~~~~~~~~~~~~~
+
 - Updates intercooler to latest release.
   [href]
 
