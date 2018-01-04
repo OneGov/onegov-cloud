@@ -196,6 +196,7 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
             if session:
                 with session.no_autoflush:
                     if self.entry_with_name_exists(name):
+                        entry.directory = None
                         session.expunge(entry)
                         raise DuplicateEntryError(name)
 
@@ -208,6 +209,7 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
             # if the validaiton error is captured, the entry is added
             # to the directory, unless we expunge it
+            entry.directory = None
             session and session.expunge(entry)
 
             raise ValidationError(entry, form.errors)
