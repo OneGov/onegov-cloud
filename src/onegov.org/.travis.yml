@@ -17,7 +17,7 @@ addons:
     postgresql: "9.6"
     apt:
         packages:
-            - oracle-java8-set-default
+            - oracle-java9-set-default
             - google-chrome-stable
 
 install: ./.travis-install.sh
