@@ -80,7 +80,11 @@ class GenericResponseExtension(object):
 
         """
 
-        elements = self.pyquery('input[name="{}"]'.format(groupname))
+        elements = self.pyquery(f'input[name="{groupname}"]')
+
+        if not elements:
+            raise KeyError(f"No input named {groupname} found")
+
         form = form or self.form
 
         for ix, el in enumerate(elements):
