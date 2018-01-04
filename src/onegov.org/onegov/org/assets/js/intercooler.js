@@ -1101,7 +1101,7 @@ var Intercooler = Intercooler || (function() {
         $(getTriggeredElement(elt)).on(event, function(e) {
             var onBeforeTrigger = closestAttrValue(elt, 'ic-on-beforeTrigger');
             if (onBeforeTrigger) {
-              if (globalEval(onError, [["elt", elt], ["evt", e], ["elt", elt]]) == false) {
+              if (globalEval(onBeforeTrigger, [["elt", elt], ["evt", e], ["elt", elt]]) == false) {
                 log(elt, "ic-trigger cancelled by ic-on-beforeTrigger", "DEBUG");
                 return false;
               }
@@ -1112,6 +1112,12 @@ var Intercooler = Intercooler || (function() {
               var previousVal = elt.data('ic-previous-val');
               elt.data('ic-previous-val', currentVal);
               if (currentVal != previousVal) {
+                fireICRequest(elt);
+              }
+            } else if (triggerOn[1] == 'once') {
+              var alreadyTriggered = elt.data('ic-already-triggered');
+              elt.data('ic-already-triggered', true);
+              if (alreadyTriggered !== true) {
                 fireICRequest(elt);
               }
             } else {
@@ -1289,11 +1295,16 @@ var Intercooler = Intercooler || (function() {
     triggerEvent(target, 'beforeSwap.ic');
   }
 
-  function processICResponse(responseContent, elt, forHistory) {
+  function processICResponse(responseContent, elt, forHistory, url) {
     if (responseContent && responseContent != "" && responseContent != " ") {
 
       log(elt, "response content: \n" + responseContent, "DEBUG");
       var target = getTarget(elt);
+
+      var transformer = closestAttrValue(elt, 'ic-transform-response');
+      if(transformer) {
+        responseContent = globalEval(transformer, [["content", responseContent], ["url", url], ["elt", elt]]);
+      }
 
       var contentToSwap = maybeFilter(responseContent, closestAttrValue(elt, 'ic-select-from-response'));
 
@@ -1488,7 +1499,7 @@ var Intercooler = Intercooler || (function() {
               } else if (attrTarget) {
                 elt.attr(attrTarget, data);
               } else {
-                processICResponse(data, elt);
+                processICResponse(data, elt, false, url);
                 if (verb != 'GET') {
                   refreshDependencies(getICAttribute(elt, 'ic-src'), elt);
                 }

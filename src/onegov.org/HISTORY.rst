@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Updates intercooler to latest release.
+  [href]
+
 - Adds the ability to submit directory entries.
   [href]
 

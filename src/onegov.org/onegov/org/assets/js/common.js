@@ -134,14 +134,6 @@ $(document).ready(function() {
     });
 });
 
-// support a custom intercooler attribute that limits the number
-// of times a request by intercooler is trigger
-$(document).find('[ic-once]').on('success.ic', function(_e, element) {
-    setTimeout(function() {
-        element.data('ic-request-in-flight', true);
-    }, 0);
-});
-
 // automatically setup redirect after / confirmation dialogs for
 // things loaded by intercooler
 Intercooler.ready(function(element) {
