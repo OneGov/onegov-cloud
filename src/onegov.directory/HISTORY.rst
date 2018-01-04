@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves the flexibility of the migration helper.
+  [href]
+
 - Fixes a case where invalid entries would be added to the directory.
   [href]
 

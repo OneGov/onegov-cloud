@@ -14,12 +14,16 @@ class DirectoryMigration(object):
 
     """
 
-    def __init__(self, directory, new_structure=None, new_configuration=None):
+    def __init__(self, directory, new_structure=None, new_configuration=None,
+                 old_structure=None):
 
         self.directory = directory
+        self.old_structure = old_structure or self.old_directory_structure
+
         self.new_structure = new_structure or directory.structure
         self.new_configuration = new_configuration or directory.configuration
-        self.new_form_class = parse_form(new_structure)
+
+        self.new_form_class = parse_form(self.new_structure)
         self.fieldtype_migrations = FieldTypeMigrations()
 
         self.changes = StructuralChanges(
@@ -28,7 +32,7 @@ class DirectoryMigration(object):
         )
 
     @property
-    def old_structure(self):
+    def old_directory_structure(self):
         history = get_history(self.directory, 'structure')
 
         if history.deleted:
