@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Skips test_principal_districts due to missing 2018 maps.
+  [href]
+
 - Requires Python 3.6.
   [href]
 

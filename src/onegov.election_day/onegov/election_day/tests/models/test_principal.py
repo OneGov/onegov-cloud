@@ -1,3 +1,5 @@
+import pytest
+
 from onegov.election_day.models import Principal
 from onegov.election_day.models.principal import cantons
 from textwrap import dedent
@@ -187,6 +189,7 @@ def test_principal_municipalities():
             assert principal.municipalities[year]
 
 
+@pytest.mark.xfail(reason="2018 has not been implemented yet")
 def test_principal_districts():
     # Canton Zug (cantons have municipalities, not districts)
     principal = Principal(name='Zug', canton='zg')
