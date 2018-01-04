@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to submit directory entries.
+  [href]
+
 0.19.8 (2017-12-29)
 ~~~~~~~~~~~~~~~~~~~
 
