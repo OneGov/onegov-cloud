@@ -1,5 +1,4 @@
 import sedate
-import transaction
 
 from cached_property import cached_property
 from datetime import timedelta
