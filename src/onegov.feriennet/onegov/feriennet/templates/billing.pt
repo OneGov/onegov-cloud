@@ -53,10 +53,10 @@
                             tal:condition="not:model.expand"
                             id="ic-${details.id}"
                             ic-trigger-from="#button-${details.id}"
+                            ic-trigger-on="click once"
                             ic-get-from="${request.link(model.for_username(username).for_expand(True))}"
                             ic-indicator="#button-${details.id}"
                             ic-select-from-response=".bill-details"
-                            ic-once
                             >
                         </div>
                         <div class="bill-details">

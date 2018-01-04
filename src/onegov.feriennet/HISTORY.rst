@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Depends on latest onegov.org release.
+  [href]
+
 - Requires Python 3.6.
   [href]
 

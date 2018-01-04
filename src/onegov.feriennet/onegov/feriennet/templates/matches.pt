@@ -81,9 +81,9 @@
                                         <div
                                             id="ic-${oid}"
                                             ic-trigger-from="#button-${oid}"
+                                            ic-trigger-on="click once"
                                             ic-get-from="${occasion_table_link(oid)}"
                                             ic-indicator="#button-${oid}"
-                                            ic-once
                                             >
                                         </div>
                                     </div>
