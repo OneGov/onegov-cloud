@@ -14,6 +14,7 @@ from lxml.html import document_fromstring
 from onegov.core.custom import json
 from onegov.core.utils import Bunch
 from onegov.form import FormCollection, FormSubmission
+from onegov.directory import DirectoryEntry
 from onegov.gis import Coordinates
 from onegov.newsletter import RecipientCollection
 from onegov_testing import Client as BaseClient
@@ -3880,7 +3881,7 @@ def test_directory_visibility(org_app):
     assert anon.get('/directories/clubs/soccer-club')
 
 
-def test_adopt_directory_submission(org_app, postgres):
+def test_directory_submissions(org_app, postgres):
 
     client = Client(org_app)
     client.login_admin()
@@ -3910,12 +3911,12 @@ def test_adopt_directory_submission(org_app, postgres):
 
     # create a submission with a missing field
     page = page.click("Eintrag vorschlagen")
-    page.form['description'] = (
-        "The Washington Monument is an obelisk on the National Mall in "
-        "Washington, D.C., built to commemorate George Washington, once "
-        "commander-in-chief of the Continental Army and the first President "
-        "of the United States"
-    )
+    page.form['description'] = '\n'.join((
+        "The Washington Monument is an obelisk on the National Mall in",
+        "Washington, D.C., built to commemorate George Washington, once",
+        "commander-in-chief of the Continental Army and the first President",
+        "of the United States",
+    ))
     page.form['submitter'] = 'info@example.org'
     page = page.form.submit()
 
@@ -3955,10 +3956,73 @@ def test_adopt_directory_submission(org_app, postgres):
 
     # if we adopt it it'll show up
     postgres.save()
-    client.post(page.pyquery('.accept-link').attr('ic-post-to'))
+    ticket_url = page.request.url
+    accept_url = page.pyquery('.accept-link').attr('ic-post-to')
+    client.post(accept_url)
     assert 'Washington' in client.get('/directories/points-of-interest')
 
+    # the description here is a multiline field
+    desc = org_app.session().query(DirectoryEntry).one().values['description']
+    assert '\n' in desc
+    transaction.abort()
+
     # if we don't, it won't
-    postgres.undo()
+    postgres.undo(pop=False)
     client.post(page.pyquery('.delete-link').attr('ic-post-to'))
     assert 'Washington' not in client.get('/directories/points-of-interest')
+
+    # if the structure changes we might not be able to accept the submission
+    postgres.undo(pop=False)
+    page = client.get('/directories/points-of-interest').click('Konfigurieren')
+    page.form['structure'] = """
+        Name *= ___
+        Description = ...
+        Category *=
+            [ ] Monument
+            [ ] Vista
+    """
+    page.form.submit()
+
+    client.post(accept_url)
+
+    page = client.get(ticket_url)
+    assert "Der Eintrag ist nicht gültig" in page
+
+    # in which case we can edit the submission to get it up to snuff
+    page = page.click("Details bearbeiten")
+    page.select_checkbox('category', "Monument")
+    page.form.submit().follow()
+
+    client.post(accept_url)
+
+    page = client.get(ticket_url)
+    assert 'Washington' in client.get('/directories/points-of-interest')
+
+    # another way this can fail is with duplicate entries of the same name
+    postgres.undo(pop=False)
+    page = client.get('/directories/points-of-interest').click(
+        'Eintrag', index=0)
+
+    page.form['name'] = 'Washington Monument'
+    page.form.submit()
+
+    client.post(accept_url)
+
+    page = client.get(ticket_url)
+    assert "Ein Eintrag mit diesem Namen existiert bereits" in page
+
+    # less severe structural changes are automatically applied
+    postgres.undo(pop=False)
+    page = client.get('/directories/points-of-interest').click('Konfigurieren')
+    page.form['structure'] = """
+        Name *= ___
+        Description = ___
+    """
+    page.form.submit()
+
+    client.post(accept_url)
+
+    # the description here is no longer a multiline field
+    desc = org_app.session().query(DirectoryEntry).one().values['description']
+    assert '\n' not in desc
+    transaction.abort()

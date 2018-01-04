@@ -1,4 +1,5 @@
 import sedate
+import transaction
 
 from cached_property import cached_property
 from datetime import timedelta
@@ -83,7 +84,7 @@ class DirectorySubmissionAction(object):
         # the directory might have changed -> migrate what we can
         migration = DirectoryMigration(
             directory=self.directory,
-            new_structure=self.submission.definition
+            old_structure=self.submission.definition
         )
 
         # whenever we try to adopt a submission, we update its structure
