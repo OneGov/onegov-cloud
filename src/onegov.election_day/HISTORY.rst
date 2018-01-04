@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.19.5 (2018-01-04)
+~~~~~~~~~~~~~~~~~~~
 
 - Skips test_principal_districts due to missing 2018 maps.
   [href]
