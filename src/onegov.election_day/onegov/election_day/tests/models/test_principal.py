@@ -1,5 +1,3 @@
-import pytest
-
 from onegov.election_day.models import Principal
 from onegov.election_day.models.principal import cantons
 from textwrap import dedent
