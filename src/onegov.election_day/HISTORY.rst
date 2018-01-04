@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.19.6 (2018-01-04)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds static data for 2018.
   [msom]
