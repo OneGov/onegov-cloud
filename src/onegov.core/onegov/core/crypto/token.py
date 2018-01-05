@@ -1,5 +1,5 @@
 import hashlib
-import os
+import secrets
 
 
 # for external reference, update if the hashing function ever changes
@@ -36,4 +36,4 @@ def random_token(nbytes=512):
 
     """
     assert nbytes >= 512
-    return hashlib.sha256(os.urandom(nbytes)).hexdigest()
+    return hashlib.sha256(secrets.token_bytes(nbytes)).hexdigest()
