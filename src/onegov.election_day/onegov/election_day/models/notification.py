@@ -1,6 +1,7 @@
 from onegov.ballot.models import Election
 from onegov.ballot.models import Vote
 from onegov.core.custom import json
+from onegov.core.i18n import SiteLocale
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UTCDateTime
@@ -147,13 +148,15 @@ class EmailNotification(Notification):
 
         subscribers = request.app.session().query(EmailSubscriber).all()
         for subscriber in subscribers:
-            self.set_locale(request, subscriber.locale)
+            locale = subscriber.locale
+            self.set_locale(request, locale)
 
             optout = request.link(request.app.principal, 'unsubscribe-email')
             token = request.new_url_safe_token({'address': subscriber.address})
 
-            model_title = model.title_translations.get(subscriber.locale)
+            model_title = model.title_translations.get(locale)
             model_title = model_title or model.title
+            model_url = request.link(SiteLocale(locale, request.link(model)))
             subject = '{} - {}'.format(
                 model_title, request.translate(subject_prefix)
             )
@@ -171,6 +174,7 @@ class EmailNotification(Notification):
                         'title': subject,
                         'model': model,
                         'model_title': model_title,
+                        'model_url': model_url,
                         'optout': optout,
                         'layout': MailLayout(self, request)
                     }

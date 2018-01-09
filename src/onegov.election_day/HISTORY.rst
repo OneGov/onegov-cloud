@@ -4,6 +4,9 @@ Changelog
 - Updates translations.
   [msom]
 
+- Localizes notification mails.
+  [msom]
+
 1.19.6 (2018-01-04)
 ~~~~~~~~~~~~~~~~~~~
 
