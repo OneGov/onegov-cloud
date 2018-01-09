@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.58.1 (2018-01-09)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds supports for date/time CLDR skeleton patterns.
   [msom]
