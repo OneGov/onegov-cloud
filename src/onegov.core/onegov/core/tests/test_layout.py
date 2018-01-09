@@ -31,6 +31,9 @@ def test_format_date():
     assert layout.format_date(date(2016, 1, 3), 'date') == '03.01.2016'
     assert layout.format_date(None, 'datetime') == ''
 
+    layout.day_long_format = 'skeleton:MMMMd'
+    assert layout.format_date(dt, 'day_long') == '17. Juni'
+
 
 def test_format_number():
 

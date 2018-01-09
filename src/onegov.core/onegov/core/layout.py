@@ -44,12 +44,16 @@ class Layout(object):
     #
     #: http://www.unicode.org/reports/tr35/tr35-39/tr35-dates.html
     #: #Date_Format_Patterns
+    #: Skeleton Patterns:
+    #
+    #: http://cldr.unicode.org/translation/date-time-patterns
     #:
     #: Classes inheriting from :class:`Layout` may add their own formats, as
     #: long as they end in ``_format``. For example::
     #:
     #:     class MyLayout(Layout):
     #:         my_format = 'dd.MMMM'
+    #:         my_skeleton_format = 'skeleton:yMMM'
     #:
     #:     MyLayout().format_date(dt, 'my')
     #:
@@ -109,16 +113,19 @@ class Layout(object):
             except ValueError:
                 return dt.humanize(locale=self.request.locale.split('_')[0])
 
-        if hasattr(dt, 'hour'):
-            formatter = babel.dates.format_datetime
+        locale = self.request.locale
+        fmt = getattr(self, format + '_format')
+        if fmt.startswith('skeleton:'):
+            return babel.dates.format_skeleton(
+                fmt.replace('skeleton:', ''),
+                datetime=dt,
+                fuzzy=False,
+                locale=locale
+            )
+        elif hasattr(dt, 'hour'):
+            return babel.dates.format_datetime(dt, format=fmt, locale=locale)
         else:
-            formatter = babel.dates.format_date
-
-        return formatter(
-            dt,
-            format=getattr(self, format + '_format'),
-            locale=self.request.locale
-        )
+            return babel.dates.format_date(dt, format=fmt, locale=locale)
 
     def isodate(self, date):
         """ Returns the given date in the ISO 8601 format. """
