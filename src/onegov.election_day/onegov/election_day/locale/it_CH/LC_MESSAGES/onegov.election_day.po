@@ -281,7 +281,7 @@ msgid "Panachage"
 msgstr "Panachage"
 
 msgid "Downloads"
-msgstr "Downloads"
+msgstr "Download"
 
 msgid "Votes"
 msgstr "Votazioni"
@@ -311,7 +311,7 @@ msgid "Final results"
 msgstr "Risultati finali"
 
 msgid "New intermediate results"
-msgstr "Nuovi risultati intermedi"
+msgstr "Nuovi risultati provvisori"
 
 #, python-format
 msgid "Final results are available on ${url}"
@@ -319,7 +319,7 @@ msgstr "Risultati finali sono disponibili su ${url}"
 
 #, python-format
 msgid "New intermediate results are available on ${url}"
-msgstr "Nuovi risultati intermedi sono disponibili su ${url}"
+msgstr "Nuovi risultati provvisori sono disponibili su ${url}"
 
 msgid "Accepted"
 msgstr "Accolto"
@@ -397,16 +397,16 @@ msgid "Yes %"
 msgstr "Sì %"
 
 msgid "No %"
-msgstr "NO %"
+msgstr "No %"
 
 msgid "Archive"
 msgstr "Archivio"
 
 msgid "Yay"
-msgstr "SÌ"
+msgstr "Sì"
 
 msgid "Nay"
-msgstr "NO"
+msgstr "No"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
@@ -418,7 +418,7 @@ msgid "homepage"
 msgstr "Pagina iniziale"
 
 msgid "Open Data"
-msgstr "Dati aperti"
+msgstr "Open Data"
 
 msgid "Login"
 msgstr "Login"
@@ -458,7 +458,7 @@ msgid "No results yet"
 msgstr "Ancora nessun risultato"
 
 msgid "Intermediate results"
-msgstr "Risultati intermedi"
+msgstr "Risultati provvisori"
 
 msgid "Last change"
 msgstr "Aggiornato"
@@ -477,21 +477,21 @@ msgid ""
 "(intermediate results, final results):"
 msgstr ""
 "Il servizio garantisce informazione gratuita sulla pubblicazione di nuovi "
-"risultati (risultati intermedi, risultati finali):"
+"risultati (risultati provvisori, risultati finali):"
 
 msgid ""
 "The email service provides free information on the publication of new "
 "results (intermediate results, final results):"
 msgstr ""
 "Il servizio di posta elettronica fornisce informazioni gratuite sulla "
-"pubblicazione di nuovi risultati (risultati intermedi, risultati finali):"
+"pubblicazione di nuovi risultati (risultati provvisori, risultati finali):"
 
 msgid ""
 "The SMS service provides free information on the publication of new results "
 "(intermediate results, final results):"
 msgstr ""
 "Il servizio SMS garantisce informazione gratuita sulla pubblicazione di "
-"nuovi risultati (risultati intermedi, risultati finali):"
+"nuovi risultati (risultati provvisori, risultati finali):"
 
 msgid "Get email alerts"
 msgstr "Ottieni e-mail di avviso"
@@ -533,12 +533,12 @@ msgid "Received Ballots"
 msgstr "Schede ricevute"
 
 msgid "Counted"
-msgstr "Contati"
+msgstr "Scrutinati"
 
 #. Default: Voter turnout
 #.
 msgid "turnout_vote"
-msgstr "Partecipazione alla votazione"
+msgstr "Partecipazione al voto"
 
 #. Default: Elegible Voters
 #.

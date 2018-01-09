@@ -230,7 +230,7 @@ def test_email_notification_vote(election_day_app, session):
         assert sorted([call[2]['subject'] for call in mock.mock_calls]) == [
             'Abstimmung - Neue Zwischenresultate',
             'Abstimmung - New intermediate results',
-            'Votazione - Nuovi risultati intermedi',
+            'Votazione - Nuovi risultati provvisori',
             'Votaziun - Novs resultats intermediars',
             'Vote - Nouveaux résultats intermédiaires'
         ]
@@ -275,7 +275,7 @@ def test_email_notification_vote(election_day_app, session):
             'Project cun cuntraproposta - Novs resultats intermediars',
             'Vorlage mit Gegenentwurf - Neue Zwischenresultate',
             'Vorlage mit Gegenentwurf - New intermediate results',
-            'Vorlage mit Gegenentwurf - Nuovi risultati intermedi',
+            'Vorlage mit Gegenentwurf - Nuovi risultati provvisori',
             'Vote avec contre-projet - Nouveaux résultats intermédiaires'
         ]
         contents = ''.join(call[2]['content'] for call in mock.mock_calls)
@@ -315,7 +315,7 @@ def test_email_notification_vote(election_day_app, session):
         assert sorted([call[2]['subject'] for call in mock.mock_calls]) == [
             'Abstimmung - Neue Zwischenresultate',
             'Abstimmung - New intermediate results',
-            'Votazione - Nuovi risultati intermedi',
+            'Votazione - Nuovi risultati provvisori',
             'Votaziun - Novs resultats intermediars',
             'Vote - Nouveaux résultats intermédiaires'
         ]
@@ -336,7 +336,7 @@ def test_email_notification_vote(election_day_app, session):
             'Project cun cuntraproposta - Novs resultats intermediars',
             'Vorlage mit Gegenentwurf - Neue Zwischenresultate',
             'Vorlage mit Gegenentwurf - New intermediate results',
-            'Vorlage mit Gegenentwurf - Nuovi risultati intermedi',
+            'Vorlage mit Gegenentwurf - Nuovi risultati provvisori',
             'Vote avec contre-projet - Nouveaux résultats intermédiaires'
         ]
         contents = ''.join(call[2]['content'] for call in mock.mock_calls)
@@ -461,7 +461,7 @@ def test_email_notification_election(election_day_app, session):
             'Elecziun da maiorz - Novs resultats intermediars',
             (
                 'Elezione secondo il sistema maggioritario - '
-                'Nuovi risultati intermedi'
+                'Nuovi risultati provvisori'
             ),
             'Majorzwahl - Neue Zwischenresultate',
             'Majorzwahl - New intermediate results'
@@ -511,7 +511,7 @@ def test_email_notification_election(election_day_app, session):
             'Elecziun da proporz - Novs resultats intermediars',
             'Proporzwahl - Neue Zwischenresultate',
             'Proporzwahl - New intermediate results',
-            'Proporzwahl - Nuovi risultati intermedi'
+            'Proporzwahl - Nuovi risultati provvisori'
         ]
         contents = ''.join(call[2]['content'] for call in mock.mock_calls)
         assert "Noch keine Resultate" in contents
@@ -601,7 +601,7 @@ def test_email_notification_election(election_day_app, session):
             'Elecziun da maiorz - Novs resultats intermediars',
             (
                 'Elezione secondo il sistema maggioritario - '
-                'Nuovi risultati intermedi'
+                'Nuovi risultati provvisori'
             ),
             'Majorzwahl - Neue Zwischenresultate',
             'Majorzwahl - New intermediate results'
@@ -633,7 +633,7 @@ def test_email_notification_election(election_day_app, session):
             'Elecziun da proporz - Novs resultats intermediars',
             'Proporzwahl - Neue Zwischenresultate',
             'Proporzwahl - New intermediate results',
-            'Proporzwahl - Nuovi risultati intermedi'
+            'Proporzwahl - Nuovi risultati provvisori'
         ]
         contents = ''.join(call[2]['content'] for call in mock.mock_calls)
         assert "11 of 12" in contents

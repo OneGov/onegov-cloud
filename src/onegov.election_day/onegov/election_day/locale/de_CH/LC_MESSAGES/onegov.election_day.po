@@ -394,19 +394,19 @@ msgid "Result"
 msgstr "Resultat"
 
 msgid "Yes %"
-msgstr "JA %"
+msgstr "Ja %"
 
 msgid "No %"
-msgstr "NEIN %"
+msgstr "Nein %"
 
 msgid "Archive"
 msgstr "Archiv"
 
 msgid "Yay"
-msgstr "JA"
+msgstr "Ja"
 
 msgid "Nay"
-msgstr "NEIN"
+msgstr "Nein"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
@@ -518,10 +518,10 @@ msgid "Tie breaker in favor of the counter proposal"
 msgstr "Stichfrage zugunsten des Gegenentwurfs"
 
 msgid "Yeas"
-msgstr "JA Stimmen"
+msgstr "Ja Stimmen"
 
 msgid "Nays"
-msgstr "NEIN Stimmen"
+msgstr "Nein Stimmen"
 
 msgid "Turnout"
 msgstr "Wahlbeteiligung"

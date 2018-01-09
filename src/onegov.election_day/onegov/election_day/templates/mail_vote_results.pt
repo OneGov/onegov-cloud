@@ -13,7 +13,7 @@
             <!--!
                 Intermediate results, simple vote
             -->
-            <h2>Intermediate results</h2>
+            <h2 i18n:translate>Intermediate results</h2>
 
             <dt i18n:translate>Counted</dt>
             <dd><span metal:use-macro="layout.macros['progress']" tal:define="progress model.progress" /></dd>
@@ -30,7 +30,7 @@
             <!--!
                 Intermediate results, complex vote
             -->
-            <h2>Intermediate results</h2>
+            <h2 i18n:translate>Intermediate results</h2>
 
             <dt i18n:translate>Counted</dt>
             <dd><span metal:use-macro="layout.macros['progress']" tal:define="progress model.progress" /></dd>

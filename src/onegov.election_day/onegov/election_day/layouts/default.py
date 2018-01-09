@@ -12,7 +12,9 @@ from onegov.user import Auth
 
 class DefaultLayout(ChameleonLayout):
 
-    day_long_format = 'dd. MMMM'
+    day_long_format = 'skeleton:MMMMd'
+    date_long_format = 'long'
+    datetime_long_format = 'medium'
 
     def __init__(self, model, request):
         super().__init__(model, request)
