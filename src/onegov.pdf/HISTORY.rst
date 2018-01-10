@@ -4,6 +4,9 @@ Changelog
 - Requires Python 3.6.
   [href]
 
+- Adds compatibility with onegov.file.
+  [msom]
+
 0.3.0 (2017-11-17)
 ~~~~~~~~~~~~~~~~~~~~~
 
