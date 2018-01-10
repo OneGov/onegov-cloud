@@ -1,4 +1,5 @@
 from copy import deepcopy
+from datetime import date
 from io import BytesIO
 from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header
@@ -11,8 +12,8 @@ from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.enums import TA_RIGHT
 from reportlab.lib.units import cm
-from reportlab.platypus import Paragraph
 from reportlab.platypus import ListFlowable
+from reportlab.platypus import Paragraph
 
 
 def test_pdf_fit_size():
@@ -237,6 +238,8 @@ def test_page_fn_header():
 
 
 def test_page_fn_footer():
+    year = date.today().year
+
     # no author
     file = BytesIO()
     pdf = Pdf(file)
@@ -271,10 +274,12 @@ def test_page_fn_footer():
     file.seek(0)
     reader = PdfFileReader(file)
     assert reader.getNumPages() == 1
-    assert reader.getPage(0).extractText() == '© 2017 author\n1\n'
+    assert reader.getPage(0).extractText() == f'© {year} author\n1\n'
 
 
 def test_page_fn_header_and_footer():
+    year = date.today().year
+
     file = BytesIO()
     pdf = Pdf(file, title='title', author='author')
     pdf.init_a4_portrait(page_fn_header_and_footer)
@@ -285,5 +290,5 @@ def test_page_fn_header_and_footer():
     file.seek(0)
     reader = PdfFileReader(file)
     assert reader.getNumPages() == 2
-    assert reader.getPage(0).extractText() == 'title\n© 2017 author\n1\n'
-    assert reader.getPage(1).extractText() == 'title\n© 2017 author\n2\n'
+    assert reader.getPage(0).extractText() == f'title\n© {year} author\n1\n'
+    assert reader.getPage(1).extractText() == f'title\n© {year} author\n2\n'
