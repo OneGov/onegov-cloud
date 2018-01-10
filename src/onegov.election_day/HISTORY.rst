@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds compatibility with latest onegov.pdf.
+  [msom]
+
 1.19.7 (2018-01-09)
 ~~~~~~~~~~~~~~~~~~~
 
