@@ -5,6 +5,7 @@ from html5lib.filters.whitespace import Filter as whitespace_filter
 from io import StringIO
 from lxml import etree
 from onegov.pdf.flowables import InlinePDF
+from pdfdocument.document import Empty
 from pdfdocument.document import MarkupParagraph
 from pdfdocument.document import PDFDocument
 from reportlab.lib import colors
@@ -180,8 +181,16 @@ class Pdf(PDFDocument):
         self.style.paragraph.spaceAfter = 2 * self.style.paragraph.fontSize
         self.style.paragraph.leading = 1.2 * self.style.paragraph.fontSize
 
-        self.style.ol_bullet = '1'
-        self.style.ul_bullet = 'bulletchar'
+        self.style.ol = Empty()
+        self.style.ol.bullet = '1'
+        self.style.ol.leftIndent = 0
+        self.style.ol.liIndent = 18  # from start of bullet to start of li
+
+        self.style.ul = Empty()
+        self.style.ul.bullet = 'bulletchar'
+        self.style.ul.leftIndent = 0
+        self.style.ul.liIndent = 18  # from start of bullet to start of li
+
         self.style.li = deepcopy(self.style.normal)
         self.style.li.leading = 1.2 * self.style.li.fontSize
 
@@ -342,21 +351,29 @@ class Pdf(PDFDocument):
             if element.tag == 'p':
                 self.p_markup(inner_html(element), self.style.paragraph)
             elif element.tag in 'ol':
+                style = deepcopy(self.style.li)
+                style.leftIndent += self.style.ol.leftIndent
                 items = [
-                    MarkupParagraph(inner_html(item), self.style.li)
+                    MarkupParagraph(inner_html(item), style)
                     for item in element
                 ]
                 self.story.append(
                     ListFlowable(
                         items,
-                        bulletType=self.style.ol_bullet,
+                        bulletType=self.style.ol.bullet,
                         bulletFontName=self.style.li.fontName,
                         bulletFontSize=self.style.li.fontSize,
+                        leftIndent=self.style.ol.liIndent,
+                        bulletDedent=(
+                            self.style.ol.liIndent - self.style.ol.leftIndent
+                        )
                     )
                 )
             elif element.tag == 'ul':
+                style = deepcopy(self.style.li)
+                style.leftIndent += self.style.ul.leftIndent
                 items = [
-                    MarkupParagraph(inner_html(item), self.style.li)
+                    MarkupParagraph(inner_html(item), style)
                     for item in element
                 ]
                 self.story.append(
@@ -365,6 +382,10 @@ class Pdf(PDFDocument):
                         bulletType='bullet',
                         bulletFontName=self.style.li.fontName,
                         bulletFontSize=self.style.li.fontSize,
-                        start=self.style.ul_bullet
+                        start=self.style.ul.bullet,
+                        leftIndent=self.style.ul.liIndent,
+                        bulletDedent=(
+                            self.style.ul.liIndent - self.style.ul.leftIndent
+                        )
                     )
                 )

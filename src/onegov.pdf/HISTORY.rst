@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for indentation of lists.
+  [msom]
+
 - Fixes handling of whitespace in mini html.
   [msom]
 
