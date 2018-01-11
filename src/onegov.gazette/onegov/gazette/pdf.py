@@ -43,7 +43,7 @@ class Pdf(PdfBase):
         else:
             getattr(self, 'h{}'.format(min(level, 4)))(title)
 
-    def unfold_data(self, data, level=1):
+    def unfold_data(self, session, issue, data, level=1):
         """ Take a nested list of dicts and add it. """
 
         for item in data:
@@ -53,21 +53,24 @@ class Pdf(PdfBase):
                 self.story[-1].keepWithNext = True
 
             notices = item.get('notices', [])
-            for notice in notices:
+            for id_ in notices:
+                notice = session.query(GazetteNotice).filter_by(id=id_).one()
                 self.p_markup(
                     '<b>{}</b> <i><font size="{}">{}</font></i>'.format(
-                        notice[0],
+                        notice.title,
                         0.875 * self.style.h_notice.fontSize,
-                        notice[2]
+                        notice.issues[issue]
                     ),
                     self.style.h_notice
                 )
                 self.story[-1].keepWithNext = True
-                self.mini_html(notice[1])
+                self.mini_html(notice.text)
+                for file in notice.files:
+                    self.pdf(file.reference.file)
 
             children = item.get('children', [])
             if children:
-                self.unfold_data(children, level + 1)
+                self.unfold_data(session, issue, children, level + 1)
 
     @staticmethod
     def query_notices(session, issue, organization, category):
@@ -77,9 +80,7 @@ class Pdf(PdfBase):
         """
 
         notices = session.query(
-            GazetteNotice.title,
-            GazetteNotice.text,
-            GazetteNotice._issues[issue]
+            GazetteNotice.id
         )
         notices = notices.filter(
             GazetteNotice._issues.has_key(issue),  # noqa
@@ -90,7 +91,7 @@ class Pdf(PdfBase):
         notices = notices.order_by(
             GazetteNotice._issues[issue]
         )
-        return notices.all()
+        return [notice[0] for notice in notices]
 
     @classmethod
     def from_issue(cls, issue, request, file=None):
@@ -178,7 +179,7 @@ class Pdf(PdfBase):
             page_fn_later=page_fn_header_and_footer
         )
         pdf.h(title)
-        pdf.unfold_data(data)
+        pdf.unfold_data(session, issue.name, data)
         pdf.generate()
 
         file.seek(0)

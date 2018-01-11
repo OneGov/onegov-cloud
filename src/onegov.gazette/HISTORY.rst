@@ -1,7 +1,22 @@
 Changelog
 ---------
 
-- Adds a print only option to notices.
+- Includes attachments in PDFs.
+  [msom]
+
+- Requires Python 3.6.
+  [href]
+
+1.13.0 (2017-12-12)
+~~~~~~~~~~~~~~~~~~~
+
+- Allows to publish notices and to generate weekly PDFs.
+  [msom]
+
+1.12.1 (2017-12-11)
+~~~~~~~~~~~~~~~~~~~
+
+- Fixes mails with attachments.
   [msom]
 
 - Requires Python 3.6.

@@ -1,6 +1,9 @@
 from freezegun import freeze_time
 from io import BytesIO
+from onegov.core.crypto import random_token
+from onegov.file.utils import as_fileintent
 from onegov.gazette.models import GazetteNotice
+from onegov.gazette.models import GazetteNoticeFile
 from onegov.gazette.models import Issue
 from onegov.gazette.pdf import Pdf
 from PyPDF2 import PdfFileReader
@@ -53,7 +56,20 @@ def test_pdf_h():
         assert h4.called
 
 
-def test_pdf_unfold_data():
+def test_pdf_unfold_data(session):
+    def notice(title, text):
+        notice = GazetteNotice(
+            title=title,
+            text=text,
+            _issues={'2017-40': '1'},
+            organization_id='100',
+            category_id='10',
+            state='published'
+        )
+        session.add(notice)
+        session.flush()
+        return notice
+
     data = [
         {
             'title': 'title-1',
@@ -61,19 +77,19 @@ def test_pdf_unfold_data():
                 {
                     'title': 'title-1-1',
                     'children': [{'title': 'title-1-1-1'}],
-                    'notices': [['title-1-1-a', 'text-1-1-a', '1']]
+                    'notices': [notice('title-1-1-a', 'text-1-1-a').id]
                 },
                 {
                     'title': 'title-1-2',
                     'notices': [
-                        ['title-1-2-a', 'text-1-2-a', '1'],
-                        ['title-1-2-b', 'text-1-2-b', '1'],
-                        ['title-1-2-c', 'text-1-2-c', '1'],
+                        notice('title-1-2-a', 'text-1-2-a').id,
+                        notice('title-1-2-b', 'text-1-2-b').id,
+                        notice('title-1-2-c', 'text-1-2-c').id,
                     ],
                     'children': [{
                         'notices': [
-                            ['title-1-2-1-a', 'text-1-2-1-a', '1'],
-                            ['title-1-2-1-b', 'text-1-2-1-b', '1'],
+                            notice('title-1-2-1-a', 'text-1-2-1-a').id,
+                            notice('title-1-2-1-b', 'text-1-2-1-b').id,
                         ]
                     }]
                 }
@@ -82,19 +98,19 @@ def test_pdf_unfold_data():
         {
             'title': 'title-2',
 
-            'notices': [['title-2-a', 'text-2-a', '1']],
+            'notices': [notice('title-2-a', 'text-2-a').id],
             'children': [
-                {'notices': [['title-2-1-a', 'text-2-1-a', '1']]},
-                {'notices': [['title-2-2-a', 'text-2-2-a', '1']]},
-                {'notices': [['title-2-3-a', 'text-2-3-a', '1']]}
+                {'notices': [notice('title-2-1-a', 'text-2-1-a').id]},
+                {'notices': [notice('title-2-2-a', 'text-2-2-a').id]},
+                {'notices': [notice('title-2-3-a', 'text-2-3-a').id]}
             ]
         },
         {
             'notices': [
-                ['title-3-a', 'text-3-a', '1'],
-                ['title-3-b', 'text-3-b', '1'],
-                ['title-3-c', 'text-3-c', '1'],
-                ['title-3-d', 'text-3-d', '1'],
+                notice('title-3-a', 'text-3-a').id,
+                notice('title-3-b', 'text-3-b').id,
+                notice('title-3-c', 'text-3-c').id,
+                notice('title-3-d', 'text-3-d').id,
             ]
         }
     ]
@@ -102,7 +118,7 @@ def test_pdf_unfold_data():
     file = BytesIO()
     pdf = Pdf(file)
     pdf.init_a4_portrait()
-    pdf.unfold_data(data)
+    pdf.unfold_data(session, '2017-40', data)
 
     expected = [
         'title-1',
@@ -165,21 +181,22 @@ def test_pdf_query_notices(session, issues, organizations, categories):
         )
     session.flush()
 
+    query = session.query(GazetteNotice)
     assert Pdf.query_notices(session, '2017-40', '100', '10') == [
-        ('100-10', '2017-40-1, 2017-41-4', '1'),
-        ('100-10', '2017-40-2, 2017-41-3', '2'),
-        ('100-10', '2017-40-3, 2017-41-2', '3'),
-        ('100-10', '2017-40-4, 2017-41-1', '4')
+        query.filter_by(text='2017-40-1, 2017-41-4').one().id,
+        query.filter_by(text='2017-40-2, 2017-41-3').one().id,
+        query.filter_by(text='2017-40-3, 2017-41-2').one().id,
+        query.filter_by(text='2017-40-4, 2017-41-1').one().id
     ]
     assert Pdf.query_notices(session, '2017-41', '100', '10') == [
-        ('100-10', '2017-40-4, 2017-41-1', '1'),
-        ('100-10', '2017-40-3, 2017-41-2', '2'),
-        ('100-10', '2017-40-2, 2017-41-3', '3'),
-        ('100-10', '2017-40-1, 2017-41-4', '4'),
-        ('100-10', '2017-41-5, 2017-42-1', '5')
+        query.filter_by(text='2017-40-4, 2017-41-1').one().id,
+        query.filter_by(text='2017-40-3, 2017-41-2').one().id,
+        query.filter_by(text='2017-40-2, 2017-41-3').one().id,
+        query.filter_by(text='2017-40-1, 2017-41-4').one().id,
+        query.filter_by(text='2017-41-5, 2017-42-1').one().id
     ]
     assert Pdf.query_notices(session, '2017-42', '100', '10') == [
-        ('100-10', '2017-41-5, 2017-42-1', '1')
+        query.filter_by(text='2017-41-5, 2017-42-1').one().id
     ]
 
 
@@ -187,92 +204,110 @@ def test_pdf_from_issue(gazette_app):
     session = gazette_app.session()
     principal = gazette_app.principal
 
-    for _issues, organization_id, category_id in (
-        ({'2017-40': '1', '2017-41': '4'}, '100', '10'),
-        ({'2017-40': '2', '2017-41': '3'}, '200', '10'),
-        ({'2017-40': '3', '2017-41': '2'}, '100', '10'),
-        ({'2017-40': '4', '2017-41': '1'}, '410', '11'),
-        ({'2017-41': '5', '2017-42': '1'}, '420', '11'),
+    def pdf(content):
+        pdf = BytesIO()
+        inline = Pdf(pdf)
+        inline.init_report()
+        inline.p(content)
+        inline.generate()
+        pdf.seek(0)
+        return pdf
+
+    for _issues, organization_id, category_id, attachments in (
+        ({'2017-40': '1', '2017-41': '4'}, '100', '10', []),
+        ({'2017-40': '2', '2017-41': '3'}, '200', '10', ['--a--']),
+        ({'2017-40': '3', '2017-41': '2'}, '100', '10', []),
+        ({'2017-40': '4', '2017-41': '1'}, '410', '11', ['--c--', '--d--']),
+        ({'2017-41': '5', '2017-42': '1'}, '420', '11', []),
     ):
-        session.add(
-            GazetteNotice(
-                title='{}-{}'.format(organization_id, category_id),
-                text=', '.join([
-                    '{}-{}'.format(issue, _issues[issue])
-                    for issue in sorted(_issues)
-                ]),
-                _issues=_issues,
-                organization_id=organization_id,
-                category_id=category_id,
-                state='published'
-            )
+        notice = GazetteNotice(
+            title='{}-{}'.format(organization_id, category_id),
+            text=', '.join([
+                '{}-{}'.format(issue, _issues[issue])
+                for issue in sorted(_issues)
+            ]),
+            _issues=_issues,
+            organization_id=organization_id,
+            category_id=category_id,
+            state='published'
         )
+        for content in attachments:
+            attachment = GazetteNoticeFile(id=random_token())
+            attachment.name = 'file.pdf'
+            attachment.reference = as_fileintent(pdf(content), 'file.pdf')
+            notice.files.append(attachment)
+
+        session.add(notice)
     session.flush()
 
     with freeze_time("2017-01-01 12:00"):
         issue = session.query(Issue).filter_by(number=40).one()
         file = Pdf.from_issue(issue, DummyRequest(session, principal))
         reader = PdfFileReader(file)
-        text = ''.join([page.extractText() for page in reader.pages])
-        assert text == (
-            '© 2017 Govikon\n1\n'
-            'Gazette No. 40, 06.10.2017\n'
+        assert [page.extractText() for page in reader.pages] == [
+            # page 1
+            '© 2017 Govikon\n1\nGazette No. 40, 06.10.2017\n'
             'State Chancellery\n'
             'Complaints\n'
-            '100-10 1\n'
-            '2017-40-1, 2017-41-4\n'
-            '100-10 3\n'
-            '2017-40-3, 2017-41-2\n'
+            '100-10 1\n2017-40-1, 2017-41-4\n'
+            '100-10 3\n2017-40-3, 2017-41-2\n'
             'Civic Community\n'
             'Complaints\n'
-            '200-10 2\n'
-            '2017-40-2, 2017-41-3\n'
+            '200-10 2\n2017-40-2, 2017-41-3\n',
+            # page 2 (--a--)
+            'Gazette No. 40, 06.10.2017\n© 2017 Govikon\n2\n',
+            # page 3
+            'Gazette No. 40, 06.10.2017\n© 2017 Govikon\n3\n'
             'Churches\n'
             'Evangelical Reformed Parish\n'
             'Education\n'
-            '410-11 4\n'
-            '2017-40-4, 2017-41-1\n'
-        )
+            '410-11 4\n2017-40-4, 2017-41-1\n',
+            # page 4 (--c--)
+            'Gazette No. 40, 06.10.2017\n© 2017 Govikon\n4\n',
+            # page 5 (--d--)
+            'Gazette No. 40, 06.10.2017\n© 2017 Govikon\n5\n'
+        ]
 
         issue = session.query(Issue).filter_by(number=41).one()
         file = Pdf.from_issue(issue, DummyRequest(session, principal))
         reader = PdfFileReader(file)
-        text = ''.join([page.extractText() for page in reader.pages])
-        assert text == (
-            '© 2017 Govikon\n1\n'
-            'Gazette No. 41, 13.10.2017\n'
+        assert [page.extractText() for page in reader.pages] == [
+            # page 1
+            '© 2017 Govikon\n1\nGazette No. 41, 13.10.2017\n'
             'State Chancellery\n'
             'Complaints\n'
-            '100-10 2\n'
-            '2017-40-3, 2017-41-2\n'
-            '100-10 4\n'
-            '2017-40-1, 2017-41-4\n'
+            '100-10 2\n2017-40-3, 2017-41-2\n'
+            '100-10 4\n2017-40-1, 2017-41-4\n'
             'Civic Community\n'
             'Complaints\n'
-            '200-10 3\n'
-            '2017-40-2, 2017-41-3\n'
+            '200-10 3\n2017-40-2, 2017-41-3\n',
+            # page 2 (--a--)
+            'Gazette No. 41, 13.10.2017\n© 2017 Govikon\n2\n',
+            # page 3
+            'Gazette No. 41, 13.10.2017\n© 2017 Govikon\n3\n'
             'Churches\n'
             'Evangelical Reformed Parish\n'
             'Education\n'
-            '410-11 1\n'
-            '2017-40-4, 2017-41-1\n'
+            '410-11 1\n2017-40-4, 2017-41-1\n',
+            # page 4 (--c--)
+            'Gazette No. 41, 13.10.2017\n© 2017 Govikon\n4\n',
+            # page 5 (--d--)
+            'Gazette No. 41, 13.10.2017\n© 2017 Govikon\n5\n',
+            # page 6
+            'Gazette No. 41, 13.10.2017\n© 2017 Govikon\n6\n'
             'Sikh Community\n'
             'Education\n'
-            '420-11 5\n'
-            '2017-41-5, 2017-42-1\n'
-        )
+            '420-11 5\n2017-41-5, 2017-42-1\n'
+        ]
 
     with freeze_time("2018-01-01 12:00"):
         issue = session.query(Issue).filter_by(number=42).one()
         file = Pdf.from_issue(issue, DummyRequest(session, principal))
         reader = PdfFileReader(file)
-        text = ''.join([page.extractText() for page in reader.pages])
-        assert text == (
-            '© 2018 Govikon\n1\n'
-            'Gazette No. 42, 20.10.2017\n'
+        assert [page.extractText() for page in reader.pages] == [
+            '© 2018 Govikon\n1\nGazette No. 42, 20.10.2017\n'
             'Churches\n'
             'Sikh Community\n'
             'Education\n'
-            '420-11 1\n'
-            '2017-41-5, 2017-42-1\n'
-        )
+            '420-11 1\n2017-41-5, 2017-42-1\n'
+        ]
