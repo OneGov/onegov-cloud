@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes handling of whitespace in mini html.
+  [msom]
+
 - Includes attachments in PDFs.
   [msom]
 
