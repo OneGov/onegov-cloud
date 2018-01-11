@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.13.1 (2018-01-11)
+~~~~~~~~~~~~~~~~~~~
 
 - Includes attachments in PDFs.
   [msom]
