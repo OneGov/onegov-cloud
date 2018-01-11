@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.3.2 (2018-01-11)
+~~~~~~~~~~~~~~~~~~~~~
 
 - Adds support for indentation of lists.
   [msom]
