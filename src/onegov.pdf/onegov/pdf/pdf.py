@@ -311,6 +311,12 @@ class Pdf(PDFDocument):
 
         """
 
+        def strip(text):
+            text = text.strip('\r\n')
+            prefix = ' ' if text.startswith(' ') else ''
+            postfix = ' ' if text.endswith(' ') else ''
+            return prefix + text.strip() + postfix
+
         # Remove unwanted markup
         cleaner = Cleaner(
             tags=('p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li'),
@@ -322,12 +328,12 @@ class Pdf(PDFDocument):
 
         def inner_html(element):
             return '{}{}{}'.format(
-                (element.text or '').strip(),
+                strip(element.text or ''),
                 ''.join((
                     etree.tostring(child, encoding='unicode').strip()
                     for child in element
                 )),
-                (element.tail or '').strip()
+                strip(element.tail or '')
             )
 
         # Walk the tree

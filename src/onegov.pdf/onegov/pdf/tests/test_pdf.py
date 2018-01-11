@@ -138,19 +138,21 @@ def test_pdf_mini_html():
     pdf.mini_html(html)
 
     paragraphs = [p.text for p in pdf.story if isinstance(p, Paragraph)]
-    assert paragraphs == [
-        'Ipsum',
-        (
-            '<strong>Pellentesque habitant morbi tristique</strong> senectus '
-            'et netus et malesuada fames ac turpis.'
-        ),
-        (
-            'Donec eu libero sit amet quam egestas semper.<em>Aenean '
-            'ultricies mi vitae est</em>. Mauris commodo vitae.'
-        ),
-        'Donec non enim in turpis pulvinar facilisis. Ut felis.Aliquam',
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.Aenean'
-    ]
+    assert paragraphs[0] == 'Ipsum'
+    assert paragraphs[1] == (
+        '<strong>Pellentesque habitant morbi tristique</strong> senectus '
+        'et netus et malesuada fames ac turpis.'
+    )
+    assert paragraphs[2] == (
+        'Donec eu libero sit amet quam egestas semper. <em>Aenean '
+        'ultricies mi vitae est</em>. Mauris commodo vitae.'
+    )
+    assert paragraphs[3] == (
+        'Donec non enim in turpis pulvinar facilisis. Ut felis. Aliquam'
+    )
+    assert paragraphs[4] == (
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean'
+    )
 
     lists = [
         [li.text for li in l._flowables]
@@ -176,15 +178,85 @@ def test_pdf_mini_html():
         'Ipsum\n'
         'Pellentesque habitant morbi tristique senectus et netus et '
         'malesuada fames ac turpis.\n'
-        'Donec eu libero sit amet quam egestas semper.Aenean ultricies mi '
+        'Donec eu libero sit amet quam egestas semper. Aenean ultricies mi '
         'vitae est. Mauris commodo vitae.\n'
-        'Donec non enim in turpis pulvinar facilisis. Ut felis.Aliquam\n'
+        'Donec non enim in turpis pulvinar facilisis. Ut felis. Aliquam\n'
         '1\nLorem ipsum dolor sit amet, consectetuer adipiscing elit.\n'
         '2\nAliquam tincidunt mauris eu risus.\n'
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.Aenean\n'
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean\n'
         '\nLorem ipsum dolor sit amet, consectetuer adipiscing elit.\n'
         '\nAliquam tincidunt mauris eu risus.\n'
     )
+
+
+def test_pdf_mini_html_cleaner():
+    file = BytesIO()
+    pdf = Pdf(file)
+    pdf.init_a4_portrait()
+
+    html = (
+        '<p>Eins zwei drei.</p>'
+        '<p> Eins zwei drei.</p>'
+        '<p>Eins zwei drei. </p>'
+        '<p> Eins zwei drei. </p>'
+        '<p><em>Eins</em> zwei drei.</p>'
+        '<p><em>Eins </em>zwei drei.</p>'
+        '<p>Eins <em>zwei</em> drei.</p>'
+        '<p>Eins<em> zwei</em> drei.</p>'
+        '<p>Eins <em>zwei </em>drei.</p>'
+        '<p>Eins<em> zwei </em>drei.</p>'
+        '<p>Eins zwei <em>drei</em>.</p>'
+        '<p>Eins zwei<em> drei</em>.</p>'
+    )
+    pdf.mini_html(html)
+    paras = [p.text for p in pdf.story if isinstance(p, Paragraph)]
+    assert paras == [
+        'Eins zwei drei.',
+        'Eins zwei drei.',
+        'Eins zwei drei.',
+        'Eins zwei drei.',
+        '<em>Eins</em> zwei drei.',
+        '<em>Eins </em>zwei drei.',
+        'Eins <em>zwei</em> drei.',
+        'Eins<em> zwei</em> drei.',
+        'Eins <em>zwei </em>drei.',
+        'Eins<em> zwei </em>drei.',
+        'Eins zwei <em>drei</em>.',
+        'Eins zwei<em> drei</em>.'
+    ]
+    paras = [p.replace('<em>', '').replace('</em>', '') for p in paras]
+    assert set(paras) == {'Eins zwei drei.'}
+
+    # file = BytesIO()
+    # pdf = Pdf(file)
+    # pdf.init_a4_portrait()
+    # html = (
+    #     '<p> Vier Fünf </p>'
+    #     '<p> <em>Vier</em> Fünf </p>'
+    #     '<p><em> Vier</em> Fünf </p>'
+    #     '<p> <em>Vier </em>Fünf </p>'
+    #     '<p><em> Vier </em>Fünf </p>'
+    #     '<p> Vier <em>Fünf</em> </p>'
+    #     '<p> Vier<em> Fünf</em> </p>'
+    #     '<p> Vier <em>Fünf </em></p>'
+    #     '<p> Vier<em> Fünf </em></p>'
+    # )
+    # pdf.mini_html(html)
+    # paras = [p.text for p in pdf.story if isinstance(p, Paragraph)]
+    # import pdb; pdb.set_trace()
+    # assert paras == [
+    #     'Eins zwei drei.',
+    #     '<em>Eins</em> zwei drei.',
+    #     '<em>Eins </em>zwei drei.',
+    #     'Eins <em>zwei</em> drei.',
+    #     'Eins<em> zwei</em> drei.',
+    #     'Eins <em>zwei </em>drei.',
+    #     'Eins<em> zwei </em>drei.',
+    #     'Eins zwei <em>drei</em>.',
+    #     'Eins zwei<em> drei</em>.'
+    # ]
+    # paras = [p.replace('<em>', '').replace('</em>', '') for p in paras]
+    # assert set(paras) == {'Eins zwei drei.'}
 
 
 def test_page_fn_header():
