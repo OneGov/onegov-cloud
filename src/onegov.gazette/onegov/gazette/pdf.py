@@ -87,6 +87,9 @@ class Pdf(PdfBase):
             if children:
                 self.unfold_data(session, issue, children, level + 1)
 
+            if item.get('break_after', False):
+                self.pagebreak()
+
     @staticmethod
     def query_notices(session, issue, organization, category):
         """ Queries all notices with the given values, ordered by publication
@@ -168,7 +171,8 @@ class Pdf(PdfBase):
                         if child_data:
                             root_data.append({
                                 'title': child.title,
-                                'children': child_data
+                                'children': child_data,
+                                'break_after': True if child_data else False
                             })
                 if root_data:
                     data.append({
