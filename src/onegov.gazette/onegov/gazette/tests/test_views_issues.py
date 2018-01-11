@@ -255,7 +255,7 @@ def test_view_issues_generate(gazette_app):
             '1\nAmtsblatt Nr. 44, 03.11.2017\n'
             'Civic Community\n'
             'Commercial Register\n'
-            'First notice 1\n'
+            '1\nFirst notice\n'
             'This is the first notice\n'
         )
 
@@ -287,10 +287,10 @@ def test_view_issues_generate(gazette_app):
             '1\nAmtsblatt Nr. 44, 03.11.2017\n'
             'State Chancellery\n'
             'Education\n'
-            'Second notice 2\n'
+            '2\nSecond notice\n'
             'This is the second notice\n'
             'Civic Community\n'
             'Commercial Register\n'
-            'First notice 1\n'
+            '1\nFirst notice\n'
             'This is the first notice\n'
         )

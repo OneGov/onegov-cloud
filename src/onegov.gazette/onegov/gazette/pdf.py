@@ -8,6 +8,7 @@ from onegov.gazette.models import Organization
 from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header_and_footer
 from onegov.pdf import Pdf as PdfBase
+from pdfdocument.document import MarkupParagraph
 
 
 class Pdf(PdfBase):
@@ -23,17 +24,29 @@ class Pdf(PdfBase):
         self.style.title.spaceBefore = 0
         self.style.title.spaceAfter = 0.67 * self.style.title.fontSize
 
-        self.style.h_notice = deepcopy(self.style.normal)
+        self.style.h_notice = deepcopy(self.style.bold)
         self.style.h_notice.fontSize = 1.125 * self.style.fontSize
-        self.style.h_notice.spaceBefore = 1.275 * self.style.h_notice.fontSize
-        self.style.h_notice.spaceAfter = 0.275 * self.style.h_notice.fontSize
+        self.style.table_h_notice = self.style.table + (
+            ('TOPPADDING', (0, 0), (0, 0), 2),
+        )
 
         self.style.paragraph.spaceAfter = 0.675 * self.style.paragraph.fontSize
         self.style.paragraph.leading = 1.275 * self.style.paragraph.fontSize
 
-        self.style.ul_bullet = '-'
+        self.style.ul.bullet = '-'
         self.style.li.spaceAfter = 0.275 * self.style.li.fontSize
         self.style.li.leading = 1.275 * self.style.li.fontSize
+
+        # Indent left everthing to stress the issue number
+        self.style.leftIndent = 30
+        self.style.title.leftIndent = self.style.leftIndent
+        self.style.heading1.leftIndent = self.style.leftIndent
+        self.style.heading2.leftIndent = self.style.leftIndent
+        self.style.heading3.leftIndent = self.style.leftIndent
+        self.style.heading4.leftIndent = self.style.leftIndent
+        self.style.paragraph.leftIndent = self.style.leftIndent
+        self.style.ol.leftIndent = self.style.leftIndent
+        self.style.ul.leftIndent = self.style.leftIndent
 
     def h(self, title, level=0):
         """ Adds a title according to the given level. """
@@ -55,13 +68,15 @@ class Pdf(PdfBase):
             notices = item.get('notices', [])
             for id_ in notices:
                 notice = session.query(GazetteNotice).filter_by(id=id_).one()
-                self.p_markup(
-                    '<b>{}</b> <i><font size="{}">{}</font></i>'.format(
-                        notice.title,
-                        0.875 * self.style.h_notice.fontSize,
-                        notice.issues[issue]
-                    ),
-                    self.style.h_notice
+                self.table(
+                    [[
+                        MarkupParagraph(
+                            notice.issues[issue], self.style.normal
+                        ),
+                        MarkupParagraph(notice.title, self.style.h_notice)
+                    ]],
+                    [self.style.leftIndent, None],
+                    style=self.style.table_h_notice
                 )
                 self.story[-1].keepWithNext = True
                 self.mini_html(notice.text)

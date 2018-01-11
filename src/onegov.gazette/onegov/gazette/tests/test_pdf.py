@@ -57,7 +57,7 @@ def test_pdf_h():
 
 
 def test_pdf_unfold_data(session):
-    def notice(title, text):
+    def notice(title, text, number=None):
         notice = GazetteNotice(
             title=title,
             text=text,
@@ -123,32 +123,36 @@ def test_pdf_unfold_data(session):
     expected = [
         'title-1',
         'title-1-1',
-        'title-1-1-a 1', 'text-1-1-a',
+        '1', 'title-1-1-a', 'text-1-1-a',
         'title-1-1-1',
         'title-1-2',
-        'title-1-2-a 1', 'text-1-2-a',
-        'title-1-2-b 1', 'text-1-2-b',
-        'title-1-2-c 1', 'text-1-2-c',
-        'title-1-2-1-a 1', 'text-1-2-1-a',
-        'title-1-2-1-b 1', 'text-1-2-1-b',
+        '1', 'title-1-2-a', 'text-1-2-a',
+        '1', 'title-1-2-b', 'text-1-2-b',
+        '1', 'title-1-2-c', 'text-1-2-c',
+        '1', 'title-1-2-1-a', 'text-1-2-1-a',
+        '1', 'title-1-2-1-b', 'text-1-2-1-b',
         'title-2',
-        'title-2-a 1', 'text-2-a',
-        'title-2-1-a 1', 'text-2-1-a',
-        'title-2-2-a 1', 'text-2-2-a',
-        'title-2-3-a 1', 'text-2-3-a',
-        'title-3-a 1', 'text-3-a',
-        'title-3-b 1', 'text-3-b',
-        'title-3-c 1', 'text-3-c',
-        'title-3-d 1', 'text-3-d',
+        '1', 'title-2-a', 'text-2-a',
+        '1', 'title-2-1-a', 'text-2-1-a',
+        '1', 'title-2-2-a', 'text-2-2-a',
+        '1', 'title-2-3-a', 'text-2-3-a',
+        '1', 'title-3-a', 'text-3-a',
+        '1', 'title-3-b', 'text-3-b',
+        '1', 'title-3-c', 'text-3-c',
+        '1', 'title-3-d', 'text-3-d',
     ]
 
-    story = [
-        x.text.replace('<b>', '')
-              .replace('</b>', '')
-              .replace('<i><font size="9.84375">', '')
-              .replace('</font></i>', '')
-        for x in pdf.story if hasattr(x, 'text')
-    ]
+    story = []
+    for element in pdf.story:
+        if hasattr(element, 'text'):
+            story.append(
+                element.text.replace('<b>', '')
+                       .replace('</b>', '')
+                       .replace('<i><font size="9.84375">', '')
+                       .replace('</font></i>', '')
+            )
+        elif hasattr(element, '_cellvalues'):
+            story.extend([x.text for x in element._cellvalues[0]])
     assert story == expected
 
     pdf.generate()
@@ -249,11 +253,11 @@ def test_pdf_from_issue(gazette_app):
             '© 2017 Govikon\n1\nGazette No. 40, 06.10.2017\n'
             'State Chancellery\n'
             'Complaints\n'
-            '100-10 1\n2017-40-1, 2017-41-4\n'
-            '100-10 3\n2017-40-3, 2017-41-2\n'
+            '1\n100-10\n2017-40-1, 2017-41-4\n'
+            '3\n100-10\n2017-40-3, 2017-41-2\n'
             'Civic Community\n'
             'Complaints\n'
-            '200-10 2\n2017-40-2, 2017-41-3\n',
+            '2\n200-10\n2017-40-2, 2017-41-3\n',
             # page 2 (--a--)
             'Gazette No. 40, 06.10.2017\n© 2017 Govikon\n2\n',
             # page 3
@@ -261,7 +265,7 @@ def test_pdf_from_issue(gazette_app):
             'Churches\n'
             'Evangelical Reformed Parish\n'
             'Education\n'
-            '410-11 4\n2017-40-4, 2017-41-1\n',
+            '4\n410-11\n2017-40-4, 2017-41-1\n',
             # page 4 (--c--)
             'Gazette No. 40, 06.10.2017\n© 2017 Govikon\n4\n',
             # page 5 (--d--)
@@ -276,11 +280,11 @@ def test_pdf_from_issue(gazette_app):
             '© 2017 Govikon\n1\nGazette No. 41, 13.10.2017\n'
             'State Chancellery\n'
             'Complaints\n'
-            '100-10 2\n2017-40-3, 2017-41-2\n'
-            '100-10 4\n2017-40-1, 2017-41-4\n'
+            '2\n100-10\n2017-40-3, 2017-41-2\n'
+            '4\n100-10\n2017-40-1, 2017-41-4\n'
             'Civic Community\n'
             'Complaints\n'
-            '200-10 3\n2017-40-2, 2017-41-3\n',
+            '3\n200-10\n2017-40-2, 2017-41-3\n',
             # page 2 (--a--)
             'Gazette No. 41, 13.10.2017\n© 2017 Govikon\n2\n',
             # page 3
@@ -288,7 +292,7 @@ def test_pdf_from_issue(gazette_app):
             'Churches\n'
             'Evangelical Reformed Parish\n'
             'Education\n'
-            '410-11 1\n2017-40-4, 2017-41-1\n',
+            '1\n410-11\n2017-40-4, 2017-41-1\n',
             # page 4 (--c--)
             'Gazette No. 41, 13.10.2017\n© 2017 Govikon\n4\n',
             # page 5 (--d--)
@@ -297,7 +301,7 @@ def test_pdf_from_issue(gazette_app):
             'Gazette No. 41, 13.10.2017\n© 2017 Govikon\n6\n'
             'Sikh Community\n'
             'Education\n'
-            '420-11 5\n2017-41-5, 2017-42-1\n'
+            '5\n420-11\n2017-41-5, 2017-42-1\n'
         ]
 
     with freeze_time("2018-01-01 12:00"):
@@ -309,5 +313,5 @@ def test_pdf_from_issue(gazette_app):
             'Churches\n'
             'Sikh Community\n'
             'Education\n'
-            '420-11 1\n2017-41-5, 2017-42-1\n'
+            '1\n420-11\n2017-41-5, 2017-42-1\n'
         ]

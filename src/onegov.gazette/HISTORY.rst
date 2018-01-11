@@ -1,10 +1,13 @@
 Changelog
 ---------
 
-- Fixes handling of whitespace in mini html.
+- Includes attachments in PDFs.
   [msom]
 
-- Includes attachments in PDFs.
+- Fixes handling of whitespace in the PDF.
+  [msom]
+
+- Improves the readability of the PDF layout.
   [msom]
 
 - Requires Python 3.6.
