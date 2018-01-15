@@ -6,7 +6,7 @@ from onegov.ballot import Vote
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.utils import module_path
 from onegov.election_day.formats import import_vote_internal
-from onegov.election_day.models import Principal
+from onegov.election_day.models import Canton
 from pytest import mark
 
 
@@ -25,7 +25,7 @@ def test_import_internal_vote(session, tar_file):
         csv = f.extractfile(f.next()).read()
 
     # Test federal results
-    principal = Principal(canton='sg')
+    principal = Canton(canton='sg')
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_internal(vote, entities, BytesIO(csv), 'text/plain')
@@ -64,7 +64,7 @@ def test_import_internal_vote_missing_headers(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Principal(canton='sg')
+    principal = Canton(canton='sg')
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_internal(
@@ -97,7 +97,7 @@ def test_import_internal_vote_invalid_values(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Principal(canton='zg')
+    principal = Canton(canton='zg')
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_internal(
@@ -192,7 +192,7 @@ def test_import_internal_vote_expats(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Principal(canton='zg')
+    principal = Canton(canton='zg')
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_internal(
@@ -285,7 +285,7 @@ def test_import_internal_vote_temporary_results(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Principal(canton='zg')
+    principal = Canton(canton='zg')
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_internal(

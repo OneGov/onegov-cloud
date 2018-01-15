@@ -50,8 +50,11 @@ class DummyRequest(object):
         self.params = {}
 
     def link(self, model, name=''):
+        class_name = model.__class__.__name__
+        if class_name == 'Canton' or class_name == 'Municipality':
+            class_name = 'Principal'
         return '{}/{}'.format(
-            model.__class__.__name__, name or getattr(model, 'id', 'archive')
+            class_name, name or getattr(model, 'id', 'archive')
         )
 
     def translate(self, text):

@@ -2,19 +2,20 @@ from datetime import date
 from onegov.ballot import ComplexVote
 from onegov.ballot import Vote
 from onegov.election_day.forms import VoteForm
-from onegov.election_day.models import Principal
+from onegov.election_day.models import Canton
+from onegov.election_day.models import Municipality
 
 
 def test_vote_form_domains():
     form = VoteForm()
     assert form.domain.choices is None
 
-    form.set_domain(Principal(name='be', canton='be'))
+    form.set_domain(Canton(name='be', canton='be'))
     assert sorted(form.domain.choices) == [
         ('canton', 'Cantonal'), ('federation', 'Federal')
     ]
 
-    form.set_domain(Principal(name='bern', municipality='351'))
+    form.set_domain(Municipality(name='bern', municipality='351'))
     assert sorted(form.domain.choices) == [
         ('canton', 'Cantonal'), ('federation', 'Federal'),
         ('municipality', 'Communal')

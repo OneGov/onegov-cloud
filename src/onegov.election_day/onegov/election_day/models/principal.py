@@ -12,41 +12,31 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 
-cantons = {
-    'ag', 'ai', 'ar', 'be', 'bl', 'bs', 'fr', 'ge', 'gl', 'gr', 'ju', 'lu',
-    'ne', 'nw', 'ow', 'sg', 'sh', 'so', 'sz', 'tg', 'ti', 'ur', 'vd', 'vs',
-    'zg', 'zh'
-}
-
-
 class Principal(object):
     """ The principal is the political entity running the election day app.
 
-    If the principal is canton:
-    * the ``canton`` shortcut must be set to a valid canton shortcut
-    (e.g. ``be``)
-    * the available domains are ``federation`` and ``canton``
-    * use_maps is always true
-    * ``muncipalities``/``entities`` returns the BFS numbers of the
-    municipalties
-    * there should be static data (BFS numbers and map data) for each canton
-    for a bunch of years
+    There are currently two different types of principals supported: Cantons
+    and Municipalitites.
 
-    If the principal is a municipality:
-    * the ``municipality`` shortcut must be set to a valid BFS number
-    (e.g. ``351``)
-    * the available domains are ``federation``, ``canton`` and ``municipality``
-    * use_maps can be set to enable / display maps in the application
-    * ``districts``/``entities`` returns the the districts of the muncipality,
-    if there are any defined
-    * there can optionally be static data (districts and map data)
+    A principal is identitifed by its ID (municipalitites: BFS number, cantons:
+    canton code).
+
+    A principal may consist of different entitites (municipalitites: quarters,
+    cantons: municipalities) grouped by districts. The label of the entity and
+    districts may vary and can be queried with `label`.
+
+    A principal is part of a domain (municipalitites: municipality, canton:
+    canton) and supports different types of domains (typically all higher
+    domains).
 
     """
 
     def __init__(
         self,
-        canton=None,
-        municipality=None,
+        id_=None,
+        domain=None,
+        available_domains=None,
+        entities=None,
         name=None,
         logo=None,
         color='#000',
@@ -61,19 +51,17 @@ class Principal(object):
         pdf_signing=None,
         open_data=None
     ):
-        assert (
-            (canton in cantons and municipality is None) or
-            (canton is None and municipality is not None)
-        )
-
+        assert all((id_, domain, available_domains, entities))
+        self.id = id_
+        self.domain = domain
+        self.available_domains = available_domains
+        self.entities = entities
         self.name = name
         self.logo = logo
-        self.canton = canton
-        self.municipality = municipality
         self.color = color
         self.base = base
         self.analytics = analytics
-        self.use_maps = True if canton is not None else use_maps
+        self.use_maps = use_maps
         self.fetch = fetch or {}
         self.webhooks = webhooks or {}
         self.sms_notification = sms_notification
@@ -84,91 +72,18 @@ class Principal(object):
 
     @classmethod
     def from_yaml(cls, yaml_source):
-        return cls(**yaml.load(yaml_source))
+        kwargs = yaml.load(yaml_source)
+        assert 'canton' in kwargs or 'municipality' in kwargs
+        assert not ('canton' in kwargs and 'municipality' in kwargs)
+        if 'canton' in kwargs:
+            return Canton(**kwargs)
+        else:
+            return Municipality(**kwargs)
 
     @cached_property
     def base_domain(self):
         if self.base:
             return urlsplit(self.base).hostname.replace('www.', '')
-
-    @cached_property
-    def domain(self):
-        """ the domain of influcence """
-        if self.canton is not None:
-            return 'canton'
-
-        return 'municipality'
-
-    @cached_property
-    def id(self):
-        """ the BFS code / district ID """
-        return self.canton if self.domain == 'canton' else self.municipality
-
-    @cached_property
-    def available_domains(self):
-        """ the usable domains of influence """
-        result = OrderedDict()
-        result['federation'] = _("Federal")
-        result['canton'] = _("Cantonal")
-        if self.domain == 'municipality':
-            result['municipality'] = _("Communal")
-        return result
-
-    @cached_property
-    def municipalities(self):
-        result = {}
-
-        if self.domain == 'canton':
-            path = utils.module_path(onegov.election_day,
-                                     'static/municipalities')
-            paths = (p for p in Path(path).iterdir() if p.is_dir())
-            for path in paths:
-                year = int(path.name)
-
-                with (path / '{}.json'.format(self.canton)).open('r') as f:
-                    result[year] = {int(k): v for k, v in json.load(f).items()}
-
-        return result
-
-    @cached_property
-    def has_quarters(self):
-        """ Returns true if a communal instance has different quarters. """
-
-        if self.districts:
-            key = sorted(self.districts.keys())[-1]
-            return len(self.districts[key]) > 1
-
-        return False
-
-    @cached_property
-    def districts(self):
-        # todo: rename me to quarters!
-        result = {}
-
-        if self.domain == 'municipality':
-            path = utils.module_path(onegov.election_day, 'static/districts')
-            paths = (p for p in Path(path).iterdir() if p.is_dir())
-            for path in paths:
-                year = int(path.name)
-
-                path = path / '{}.json'.format(self.municipality)
-                if path.exists():
-                    with (path).open('r') as f:
-                        result[year] = {
-                            int(k): v for k, v in json.load(f).items()
-                        }
-
-            if not result:
-                result = {
-                    year: {int(self.id): {'name': self.name}}
-                    for year in range(2002, date.today().year + 1)
-                }
-
-        return result
-
-    @cached_property
-    def entities(self):
-        return self.municipalities or self.districts
 
     def is_year_available(self, year, map_required=True):
         if self.entities and year not in self.entities:
@@ -176,8 +91,9 @@ class Principal(object):
 
         if map_required:
             path = utils.module_path(onegov.election_day, 'static/mapdata')
-            name = self.canton or self.municipality
-            return Path('{}/{}/{}.json'.format(path, year, name)).exists()
+            return Path(
+                '{}/{}/{}.json'.format(path, year, self.id)
+            ).exists()
 
         return True
 
@@ -192,15 +108,102 @@ class Principal(object):
         return False
 
     def label(self, value):
-        """ Returns the right label of the given thing. """
+        raise NotImplementedError()
 
-        quarters = self.has_quarters
+
+class Canton(Principal):
+    """ A cantonal instance. """
+
+    CANTONS = {
+        'ag', 'ai', 'ar', 'be', 'bl', 'bs', 'fr', 'ge', 'gl', 'gr', 'ju', 'lu',
+        'ne', 'nw', 'ow', 'sg', 'sh', 'so', 'sz', 'tg', 'ti', 'ur', 'vd', 'vs',
+        'zg', 'zh'
+    }
+
+    def __init__(self, canton=None, **kwargs):
+        assert canton in self.CANTONS
+
+        kwargs.pop('use_maps', None)
+
+        available_domains = OrderedDict((
+            ('federation', _("Federal")),
+            ('canton', _("Cantonal"))
+        ))
+
+        # Read the municipalties for each year from our static data
+        entities = {}
+        path = utils.module_path(onegov.election_day, 'static/municipalities')
+        paths = (p for p in Path(path).iterdir() if p.is_dir())
+        for path in paths:
+            year = int(path.name)
+            with (path / '{}.json'.format(canton)).open('r') as f:
+                entities[year] = {int(k): v for k, v in json.load(f).items()}
+
+        super(Canton, self).__init__(
+            id_=canton,
+            domain='canton',
+            available_domains=available_domains,
+            entities=entities,
+            use_maps=True,
+            **kwargs
+        )
+
+    def label(self, value):
         if value == 'entity':
-            return _("Quarter") if quarters else _("Municipality")
+            return _("Municipality")
         if value == 'entities':
-            return _("Quarters") if quarters else _("Municipalities")
-        if value == 'grouping' and not quarters:
+            return _("Municipalities")
+        if value == 'district':
             return _("Electoral district")
-        if value == 'groupings' and not quarters:
+        if value == 'district':
             return _("Electoral districts")
+        return ''
+
+
+class Municipality(Principal):
+    """ A communal instance. """
+
+    def __init__(self, municipality=None, **kwargs):
+        assert municipality
+        available_domains = OrderedDict((
+            ('federation', _("Federal")),
+            ('canton', _("Cantonal")),
+            ('municipality', _("Communal"))
+        ))
+
+        # Try to read the quarters for each year from our static data
+        entities = {}
+        path = utils.module_path(onegov.election_day, 'static/quarters')
+        paths = (p for p in Path(path).iterdir() if p.is_dir())
+        for path in paths:
+            year = int(path.name)
+            path = path / '{}.json'.format(municipality)
+            if path.exists():
+                with (path).open('r') as f:
+                    entities[year] = {
+                        int(k): v for k, v in json.load(f).items()
+                    }
+        if entities:
+            self.has_quarters = True
+        else:
+            # ... we have no static data, autogenerate it!
+            self.has_quarters = False
+            entities = {
+                year: {int(municipality): {'name': kwargs.get('name', '')}}
+                for year in range(2002, date.today().year + 1)
+            }
+
+        super(Municipality, self).__init__(
+            id_=municipality,
+            domain='municipality',
+            available_domains=available_domains,
+            entities=entities,
+            **kwargs
+        )
+
+    def label(self, value):
+        if value == 'entity':
+            return _("Quarter") if self.has_quarters else _("Municipality")
+        if value == 'entities':
+            return _("Quarters") if self.has_quarters else _("Municipalities")
         return ''

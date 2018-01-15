@@ -7,7 +7,7 @@ from onegov.ballot import ProporzElection
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.utils import module_path
 from onegov.election_day.formats import import_election_internal_proporz
-from onegov.election_day.models import Principal
+from onegov.election_day.models import Canton
 from pytest import mark
 
 
@@ -28,7 +28,7 @@ def test_import_internal_proporz(session, tar_file):
     session.flush()
     election = session.query(Election).one()
 
-    principal = Principal(canton='zg')
+    principal = Canton(canton='zg')
     entities = principal.entities.get(election.date.year, {})
 
     # The tar file contains results from ZG from the 18.10.2015 (v1.13.1)
@@ -49,7 +49,7 @@ def test_import_internal_proporz(session, tar_file):
     assert election.counted_entities == 11
     assert election.total_entities == 11
     assert election.results.count() == 11
-    assert election.absolute_majority == None
+    assert election.absolute_majority is None
     assert election.elegible_voters == 74803
     assert election.accounted_ballots == 39067
     assert election.accounted_votes == 116689
@@ -80,7 +80,7 @@ def test_import_internal_proporz(session, tar_file):
     assert election.counted_entities == 11
     assert election.total_entities == 11
     assert election.results.count() == 11
-    assert election.absolute_majority == None
+    assert election.absolute_majority is None
     assert election.elegible_voters == 74803
     assert election.accounted_ballots == 39067
     assert election.accounted_votes == 116689
@@ -111,7 +111,7 @@ def test_import_internal_proporz_missing_headers(session):
     )
     session.flush()
     election = session.query(Election).one()
-    principal = Principal(canton='sg')
+    principal = Canton(canton='sg')
     entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_internal_proporz(
@@ -161,7 +161,7 @@ def test_import_internal_proporz_invalid_values(session):
     )
     session.flush()
     election = session.query(Election).one()
-    principal = Principal(canton='sg')
+    principal = Canton(canton='sg')
     entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_internal_proporz(
@@ -271,7 +271,7 @@ def test_import_internal_proporz_expats(session):
     )
     session.flush()
     election = session.query(Election).one()
-    principal = Principal(canton='zg')
+    principal = Canton(canton='zg')
     entities = principal.entities.get(election.date.year, {})
 
     for entity_id in (9170, 0):

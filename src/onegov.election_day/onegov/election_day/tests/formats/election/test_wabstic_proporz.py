@@ -7,7 +7,7 @@ from onegov.ballot import ProporzElection
 from onegov.ballot import List
 from onegov.core.utils import module_path
 from onegov.election_day.formats import import_election_wabstic_proporz
-from onegov.election_day.models import Principal
+from onegov.election_day.models import Canton
 from pytest import mark
 
 
@@ -27,7 +27,7 @@ def test_import_wabstic_proporz(session, tar_file):
     session.flush()
     election = session.query(Election).one()
 
-    principal = Principal(canton='sg')
+    principal = Canton(canton='sg')
     entities = principal.entities.get(election.date.year, {})
 
     # The tar file contains results from SG from the 18.10.2015
@@ -99,7 +99,7 @@ def test_import_wabstic_proporz_missing_headers(session):
     )
     session.flush()
     election = session.query(Election).one()
-    principal = Principal(canton='sg')
+    principal = Canton(canton='sg')
     entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabstic_proporz(
@@ -198,7 +198,7 @@ def test_import_wabstic_proporz_invalid_values(session):
     )
     session.flush()
     election = session.query(Election).one()
-    principal = Principal(canton='sg')
+    principal = Canton(canton='sg')
     entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabstic_proporz(
@@ -369,7 +369,7 @@ def test_import_wabstic_proporz_expats(session):
     )
     session.flush()
     election = session.query(Election).one()
-    principal = Principal(canton='sg')
+    principal = Canton(canton='sg')
     entities = principal.entities.get(election.date.year, {})
 
     for entity_id, sub_entity_id in (

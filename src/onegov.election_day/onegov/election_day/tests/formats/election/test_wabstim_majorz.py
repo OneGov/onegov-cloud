@@ -5,7 +5,7 @@ from io import BytesIO
 from onegov.ballot import Election
 from onegov.core.utils import module_path
 from onegov.election_day.formats import import_election_wabstim_majorz
-from onegov.election_day.models import Principal
+from onegov.election_day.models import Municipality
 from pytest import mark
 
 
@@ -24,7 +24,7 @@ def test_import_wabstim_majorz(session, tar_file):
     session.flush()
     election = session.query(Election).one()
 
-    principal = Principal(municipality='3231', name='Au')
+    principal = Municipality(municipality='3231', name='Au')
     entities = principal.entities.get(election.date.year, {})
 
     # The tar file contains results from AU from the 25.9.2016
@@ -74,7 +74,7 @@ def test_import_wabstim_majorz_utf16(session):
     )
     session.flush()
     election = session.query(Election).one()
-    principal = Principal(municipality='3427')
+    principal = Municipality(municipality='3427')
     entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabstim_majorz(
@@ -107,7 +107,7 @@ def test_import_wabstim_majorz_missing_headers(session):
     )
     session.flush()
     election = session.query(Election).one()
-    principal = Principal(municipality='3427')
+    principal = Municipality(municipality='3427')
     entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabstim_majorz(
@@ -141,7 +141,7 @@ def test_import_wabstim_majorz_invalid_values(session):
     )
     session.flush()
     election = session.query(Election).one()
-    principal = Principal(municipality='3427')
+    principal = Municipality(municipality='3427')
     entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabstim_majorz(
@@ -276,7 +276,7 @@ def test_import_wabstim_majorz_expats(session):
     )
     session.flush()
     election = session.query(Election).one()
-    principal = Principal(municipality='3427')
+    principal = Municipality(municipality='3427')
     entities = principal.entities.get(election.date.year, {})
 
     for entity_id in (9170, 0):

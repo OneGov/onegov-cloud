@@ -1,19 +1,20 @@
 from datetime import date
 from onegov.ballot import Election
 from onegov.election_day.forms import ElectionForm
-from onegov.election_day.models import Principal
+from onegov.election_day.models import Canton
+from onegov.election_day.models import Municipality
 
 
 def test_election_form_domains():
     form = ElectionForm()
     assert ElectionForm().domain.choices is None
 
-    form.set_domain(Principal(name='be', canton='be'))
+    form.set_domain(Canton(name='be', canton='be'))
     assert sorted(form.domain.choices) == [
         ('canton', 'Cantonal'), ('federation', 'Federal')
     ]
 
-    form.set_domain(Principal(name='bern', municipality='351'))
+    form.set_domain(Municipality(name='bern', municipality='351'))
     assert sorted(form.domain.choices) == [
         ('canton', 'Cantonal'), ('federation', 'Federal'),
         ('municipality', 'Communal')

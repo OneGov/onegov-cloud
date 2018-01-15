@@ -51,7 +51,7 @@ def view_archive_json(self, request):
         add_last_modified_header(response, last_modified)
 
     return {
-        'canton': request.app.principal.canton,
+        'canton': request.app.principal.id,
         'name': request.app.principal.name,
         'results': results,
         'archive': get_archive_links(self, request)
@@ -103,7 +103,7 @@ def view_principal_json(self, request):
         add_last_modified_header(response, last_modified)
 
     return {
-        'canton': self.canton,
+        'canton': self.id,
         'name': self.name,
         'results': latest,
         'archive': get_archive_links(archive, request)

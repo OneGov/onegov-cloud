@@ -129,25 +129,25 @@ def view_vote_json(self, request):
                         'turnout': ballot.turnout,
                         'counted': ballot.counted,
                     },
-                    'districts': [
+                    'entitites': [
                         {
-                            'accepted': district.accepted,
-                            'yeas': district.yeas,
-                            'nays': district.nays,
-                            'empty': district.empty,
-                            'invalid': district.invalid,
-                            'yeas_percentage': district.yeas_percentage,
-                            'nays_percentage': district.nays_percentage,
-                            'elegible_voters': district.elegible_voters,
-                            'cast_ballots': district.cast_ballots,
-                            'turnout': district.turnout,
-                            'counted': district.counted,
+                            'accepted': entity.accepted,
+                            'yeas': entity.yeas,
+                            'nays': entity.nays,
+                            'empty': entity.empty,
+                            'invalid': entity.invalid,
+                            'yeas_percentage': entity.yeas_percentage,
+                            'nays_percentage': entity.nays_percentage,
+                            'elegible_voters': entity.elegible_voters,
+                            'cast_ballots': entity.cast_ballots,
+                            'turnout': entity.turnout,
+                            'counted': entity.counted,
                             'name': (
-                                district.group if district.entity_id
+                                entity.group if entity.entity_id
                                 else 'Expats'
                             ),
-                            'id': district.entity_id,
-                        } for district in ballot.results
+                            'id': entity.entity_id,
+                        } for entity in ballot.results
                     ],
                 },
             } for ballot in self.ballots

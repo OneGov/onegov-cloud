@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Makes principal polymorphic.
+  [msom]
+
 1.19.8 (2018-01-11)
 ~~~~~~~~~~~~~~~~~~~
 

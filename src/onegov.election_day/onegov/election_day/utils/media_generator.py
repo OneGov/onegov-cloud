@@ -137,7 +137,10 @@ class MediaGenerator():
         mapdata = None
         path = module_path(
             'onegov.election_day',
-            'static/mapdata/{}/{}.json'.format(year, self.app.principal.id)
+            'static/mapdata/{}/{}.json'.format(
+                year,
+                self.app.principal.id
+            )
         )
         with open(path, 'r') as f:
             mapdata = json.loads(f.read())
@@ -145,7 +148,7 @@ class MediaGenerator():
         params = params or {}
         params.update({
             'mapdata': mapdata,
-            'canton': self.app.principal.canton
+            'canton': self.app.principal.id
         })
 
         return self.get_chart('map', fmt, data, width, params)

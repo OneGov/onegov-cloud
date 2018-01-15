@@ -6,7 +6,8 @@ from onegov.ballot import Vote
 from onegov.ballot import ComplexVote
 from onegov.core.utils import module_path
 from onegov.election_day.formats import import_vote_wabstic
-from onegov.election_day.models import Principal
+from onegov.election_day.models import Canton
+from onegov.election_day.models import Municipality
 from pytest import mark
 
 
@@ -33,7 +34,7 @@ def test_import_wabstic_vote(session, tar_file):
     assert sgstatic_geschaefte  # we don't need this file atm
 
     # Test federal results
-    principal = Principal(name='sg', canton='sg')
+    principal = Canton(name='sg', canton='sg')
     entities = principal.entities.get(vote.date.year, {})
     for number, yeas, completed in (
         ('1', 70821, True),
@@ -71,7 +72,7 @@ def test_import_wabstic_vote(session, tar_file):
         ('68', '2', 3374, 337),
         ('69', '1', 3375, 365),
     ):
-        principal = Principal(name=str(entity_id), municipality=entity_id)
+        principal = Municipality(name=str(entity_id), municipality=entity_id)
         entities = principal.entities.get(vote.date.year, {})
         errors = import_vote_wabstic(
             vote, entities, district, number,
@@ -89,7 +90,7 @@ def test_import_wabstic_vote(session, tar_file):
         ('3', '5', 3204, 'municipality'),  # number missing
     ):
         vote.domain = domain
-        principal = Principal(name=str(entity_id), municipality=entity_id)
+        principal = Municipality(name=str(entity_id), municipality=entity_id)
         entities = principal.entities.get(vote.date.year, {})
         errors = import_vote_wabstic(
             vote, entities, district, number,
@@ -108,7 +109,7 @@ def test_import_wabstic_vote(session, tar_file):
     )
     session.flush()
     vote = session.query(ComplexVote).one()
-    principal = Principal(name=str(3402), municipality=3402)
+    principal = Municipality(name=str(3402), municipality=3402)
     entities = principal.entities.get(vote.date.year, {})
     errors = import_vote_wabstic(
         vote, entities, '83', '1',
@@ -129,7 +130,7 @@ def test_import_wabstic_vote_missing_headers(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Principal(canton='sg')
+    principal = Canton(canton='sg')
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabstic(
@@ -180,7 +181,7 @@ def test_import_wabstic_vote_invalid_values(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Principal(canton='sg')
+    principal = Canton(canton='sg')
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabstic(
@@ -295,7 +296,7 @@ def test_import_wabstic_vote_expats(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Principal(canton='sg')
+    principal = Canton(canton='sg')
     entities = principal.entities.get(vote.date.year, {})
 
     for entity_id, sub_entity_id in (

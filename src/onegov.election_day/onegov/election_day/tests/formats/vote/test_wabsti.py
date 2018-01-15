@@ -6,7 +6,7 @@ from onegov.ballot import ComplexVote
 from onegov.ballot import Vote
 from onegov.core.utils import module_path
 from onegov.election_day.formats import import_vote_wabsti
-from onegov.election_day.models import Principal
+from onegov.election_day.models import Canton
 from pytest import mark
 
 
@@ -26,7 +26,7 @@ def test_import_wabsti_vote(session, tar_file):
         csv = f.extractfile(f.next()).read()
 
     # Test federal results
-    principal = Principal(canton='sg')
+    principal = Canton(canton='sg')
     entities = principal.entities.get(vote.date.year, {})
     for number, yeas, nays, yeas_p, nays_p, turnout in (
         (1, 102759, 91138, 53.0, 47.0, 61.7),
@@ -90,7 +90,7 @@ def test_import_wabsti_vote_utf16(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Principal(canton='sg')
+    principal = Canton(canton='sg')
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabsti(
@@ -127,7 +127,7 @@ def test_import_wabsti_vote_missing_headers(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Principal(canton='sg')
+    principal = Canton(canton='sg')
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabsti(
@@ -164,7 +164,7 @@ def test_import_wabsti_vote_invalid_values(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Principal(canton='zg')
+    principal = Canton(canton='zg')
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabsti(
@@ -281,7 +281,7 @@ def test_import_wabsti_vote_expats(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Principal(canton='zg')
+    principal = Canton(canton='zg')
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabsti(
@@ -399,7 +399,7 @@ def test_import_wabsti_vote_temporary_results(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Principal(canton='zg')
+    principal = Canton(canton='zg')
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabsti(

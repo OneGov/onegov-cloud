@@ -5,7 +5,7 @@ from io import BytesIO
 from onegov.ballot import Vote
 from onegov.core.utils import module_path
 from onegov.election_day.formats import import_vote_wabstim
-from onegov.election_day.models import Principal
+from onegov.election_day.models import Municipality
 from pytest import mark
 
 
@@ -23,7 +23,7 @@ def test_import_wabstim_vote(session, tar_file):
     with tarfile.open(tar_file, 'r|gz') as f:
         xlsx = f.extractfile(f.next()).read()
 
-    principal = Principal(municipality='3298', name='Walenstadt')
+    principal = Municipality(municipality='3298', name='Walenstadt')
     entities = principal.entities.get(vote.date.year, {})
     errors = import_vote_wabstim(
         vote, entities, BytesIO(xlsx), 'application/excel'
@@ -46,7 +46,7 @@ def test_import_wabstim_vote_utf16(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Principal(municipality='3427')
+    principal = Municipality(municipality='3427')
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabstim(
@@ -82,7 +82,7 @@ def test_import_wabstim_vote_missing_headers(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Principal(municipality='3427')
+    principal = Municipality(municipality='3427')
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabstim(
@@ -119,7 +119,7 @@ def test_import_wabstim_vote_invalid_values(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Principal(municipality='3427')
+    principal = Municipality(municipality='3427')
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabstim(
@@ -230,7 +230,7 @@ def test_import_wabstim_vote_expats(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Principal(municipality='3427')
+    principal = Municipality(municipality='3427')
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabstim(
@@ -282,7 +282,7 @@ def test_import_wabstim_vote_temporary_results(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Principal(municipality='3427', name='Wil')
+    principal = Municipality(municipality='3427', name='Wil')
     entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabstim(

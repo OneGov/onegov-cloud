@@ -23,7 +23,7 @@
                 <div class="small-12 small-centered medium-8 large-6 columns map-container">
                     <div class="ballot-map"
                         data-type="${ballot.type}"
-                        data-canton="${layout.app.principal.canton}"
+                        data-canton="${layout.app.principal.id}"
                         data-mapurl="${layout.get_topojson_link(layout.app.principal.id, vote.date.year)}"
                         data-dataurl="${request.link(ballot, name='by-entity')}"
                         data-embed-link="Embed"

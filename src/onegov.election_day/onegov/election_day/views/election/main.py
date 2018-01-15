@@ -74,18 +74,18 @@ def view_election_json(self, request):
                 'accounted_votes': self.accounted_votes,
                 'turnout': self.turnout,
             },
-            'districts': [
+            'entitites': [
                 {
-                    'elegible_voters': district.elegible_voters,
-                    'received_ballots': district.received_ballots,
-                    'accounted_ballots': district.accounted_ballots,
-                    'blank_ballots': district.blank_ballots,
-                    'invalid_ballots': district.invalid_ballots,
-                    'accounted_votes': district.accounted_votes,
-                    'turnout': district.turnout,
-                    'name': district.group if district.entity_id else 'Expats',
-                    'id': district.entity_id,
-                } for district in self.results
+                    'elegible_voters': entity.elegible_voters,
+                    'received_ballots': entity.received_ballots,
+                    'accounted_ballots': entity.accounted_ballots,
+                    'blank_ballots': entity.blank_ballots,
+                    'invalid_ballots': entity.invalid_ballots,
+                    'accounted_votes': entity.accounted_votes,
+                    'turnout': entity.turnout,
+                    'name': entity.group if entity.entity_id else 'Expats',
+                    'id': entity.entity_id,
+                } for entity in self.results
             ],
         },
         'election_type': self.type,

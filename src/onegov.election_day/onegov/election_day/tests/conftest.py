@@ -39,7 +39,7 @@ def election_day_password():
     return hash_password('hunter2')
 
 
-def create_election_day(request, canton="", municipality="", use_maps="false"):
+def create_election_day(request, canton='', municipality='', use_maps='false'):
 
     tmp = request.getfixturevalue('temporary_directory')
 
@@ -51,12 +51,17 @@ def create_election_day(request, canton="", municipality="", use_maps="false"):
     app.filestorage.settext('principal.yml', textwrap.dedent("""
         name: Kanton Govikon
         logo: logo.jpg
-        canton: {}
-        municipality: {}
+        {}
         use_maps: {}
         color: '#000'
         wabsti_import: true
-    """.format(canton, municipality, use_maps)))
+    """.format(
+        (
+            'canton: {}'.format(canton) if canton else
+            'municipality: {}'.format(municipality)
+        ),
+        use_maps
+    )))
 
     app.session().add(User(
         username='admin@example.org',

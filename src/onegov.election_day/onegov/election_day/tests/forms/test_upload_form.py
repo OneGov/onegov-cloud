@@ -11,13 +11,14 @@ from onegov.election_day.forms import UploadRestForm
 from onegov.election_day.forms import UploadVoteForm
 from onegov.election_day.models import DataSource
 from onegov.election_day.models import DataSourceItem
-from onegov.election_day.models import Principal
+from onegov.election_day.models import Canton
+from onegov.election_day.models import Municipality
 from onegov.election_day.tests import DummyPostData
 
 
 def test_upload_vote_form(session):
-    cantonal_principal = Principal(name='be', canton='be')
-    communal_principal = Principal(name='bern', municipality='351')
+    cantonal_principal = Canton(name='be', canton='be')
+    communal_principal = Municipality(name='bern', municipality='351')
 
     simple_vote = Vote(title='Vote', date=date(2017, 1, 1), domain='canton')
     complex_vote = ComplexVote()
@@ -130,8 +131,8 @@ def test_upload_vote_form(session):
 
 
 def test_upload_election_form(session):
-    cantonal_principal = Principal(name='be', canton='be')
-    communal_principal = Principal(name='bern', municipality='351')
+    cantonal_principal = Canton(name='be', canton='be')
+    communal_principal = Municipality(name='bern', municipality='351')
 
     election = Election(
         title='Election', date=date(2017, 1, 1), domain='canton', type='majorz'

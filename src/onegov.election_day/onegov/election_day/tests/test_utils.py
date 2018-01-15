@@ -8,7 +8,8 @@ from onegov.ballot import Vote
 from onegov.ballot import ComplexVote
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.models import ArchivedResult
-from onegov.election_day.models import Principal
+from onegov.election_day.models import Canton
+from onegov.election_day.models import Municipality
 from onegov.election_day.tests import DummyRequest
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import add_local_results
@@ -233,8 +234,8 @@ def test_get_archive_links(session):
 def test_add_local_results_simple(session):
     target = ArchivedResult()
 
-    be = Principal(name='BE', canton='be')
-    bern = Principal(name='Bern', municipality='351')
+    be = Canton(name='BE', canton='be')
+    bern = Municipality(name='Bern', municipality='351')
 
     # wrong principal domain
     add_local_results(ArchivedResult(), target, be, session)
@@ -306,8 +307,8 @@ def test_add_local_results_simple(session):
 def test_add_local_results_complex(session):
     target = ArchivedResult()
 
-    be = Principal(name='BE', canton='be')
-    bern = Principal(name='Bern', municipality='351')
+    be = Canton(name='BE', canton='be')
+    bern = Municipality(name='Bern', municipality='351')
 
     # wrong principal domain
     add_local_results(ArchivedResult(), target, be, session)
