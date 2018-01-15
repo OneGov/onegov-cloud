@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-21 07:25+0100\n"
-"PO-Revision-Date: 2017-12-21 07:25+0100\n"
+"POT-Creation-Date: 2018-01-15 14:48+0100\n"
+"PO-Revision-Date: 2018-01-15 14:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -330,6 +330,50 @@ msgstr "Refusà"
 msgid "Counter proposal accepted"
 msgstr "Acceptà la cuntraproposta"
 
+msgid "Municipality"
+msgstr "Vischnanca"
+
+msgid "Municipalities"
+msgstr "Vischnancas"
+
+#. Default: Constituency
+msgid "district_label_default"
+msgstr "Circul electoral"
+
+#. Default: Constituencies
+msgid "districts_label_default"
+msgstr "Circuls electorals"
+
+#. Default: District
+msgid "district_label_gr"
+msgstr "Regiun"
+
+#. Default: Constituency
+msgid "district_label_sg"
+msgstr "Circul electoral"
+
+#. Default: District
+msgid "district_label_sz"
+msgstr "Circul electoral"
+
+#. Default: Districts
+msgid "districts_label_gr"
+msgstr "Regiuns"
+
+#. Default: Constituencies
+msgid "districts_label_sg"
+msgstr "Circuls electorals"
+
+#. Default: Districts
+msgid "districts_label_sz"
+msgstr "Circuls electorals"
+
+msgid "Quarter"
+msgstr "Quartier"
+
+msgid "Quarters"
+msgstr "Quartiers"
+
 msgid "Federal"
 msgstr "Sin plaun naziunal"
 
@@ -338,24 +382,6 @@ msgstr "Sin plaun chantunal"
 
 msgid "Communal"
 msgstr "Sin plaun communal"
-
-msgid "Electoral district"
-msgstr "Circul electoral"
-
-msgid "Electoral districts"
-msgstr "Circuls electorals"
-
-msgid "Quarter"
-msgstr "Quartier"
-
-msgid "Municipality"
-msgstr "Vischnanca"
-
-msgid "Quarters"
-msgstr "Quartiers"
-
-msgid "Municipalities"
-msgstr "Vischnancas"
 
 msgid "Elections &amp; Votes"
 msgstr "Elecziuns &amp; votaziuns"
@@ -1034,3 +1060,9 @@ msgstr "Nagina elecziun da proporz"
 
 msgid "The data source is not configured properly"
 msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
+
+#~ msgid "Electoral district"
+#~ msgstr "Circul electoral"
+
+#~ msgid "Electoral districts"
+#~ msgstr "Circuls electorals"

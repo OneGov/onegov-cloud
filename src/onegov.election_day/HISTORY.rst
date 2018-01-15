@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds district translations.
+  [msom]
+
 - Makes principal polymorphic.
   [msom]
 

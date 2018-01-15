@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-21 07:25+0100\n"
-"PO-Revision-Date: 2017-12-21 07:25+0100\n"
+"POT-Creation-Date: 2018-01-15 14:48+0100\n"
+"PO-Revision-Date: 2018-01-15 14:55+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -330,6 +330,50 @@ msgstr "Abgelehnt"
 msgid "Counter proposal accepted"
 msgstr "Gegenentwurf angenommen"
 
+msgid "Municipality"
+msgstr "Gemeinde"
+
+msgid "Municipalities"
+msgstr "Gemeinden"
+
+#. Default: Constituency
+msgid "district_label_default"
+msgstr "Wahlkreis"
+
+#. Default: Constituencies
+msgid "districts_label_default"
+msgstr "Wahlkreise"
+
+#. Default: District
+msgid "district_label_gr"
+msgstr "Region"
+
+#. Default: Constituency
+msgid "district_label_sg"
+msgstr "Wahlkreis"
+
+#. Default: District
+msgid "district_label_sz"
+msgstr "Bezirk"
+
+#. Default: Districts
+msgid "districts_label_gr"
+msgstr "Regionen"
+
+#. Default: Constituencies
+msgid "districts_label_sg"
+msgstr "Wahlkreise"
+
+#. Default: Districts
+msgid "districts_label_sz"
+msgstr "Bezirke"
+
+msgid "Quarter"
+msgstr "Stadtteil"
+
+msgid "Quarters"
+msgstr "Stadtteile"
+
 msgid "Federal"
 msgstr "National"
 
@@ -338,24 +382,6 @@ msgstr "Kantonal"
 
 msgid "Communal"
 msgstr "Kommunal"
-
-msgid "Electoral district"
-msgstr "Wahlkreis"
-
-msgid "Electoral districts"
-msgstr "Wahlkreise"
-
-msgid "Quarter"
-msgstr "Stadtteil"
-
-msgid "Municipality"
-msgstr "Gemeinde"
-
-msgid "Quarters"
-msgstr "Stadtteile"
-
-msgid "Municipalities"
-msgstr "Gemeinden"
 
 msgid "Elections &amp; Votes"
 msgstr "Wahlen &amp; Abstimmungen"
@@ -989,3 +1015,9 @@ msgstr "Keine Proporzwahl"
 
 msgid "The data source is not configured properly"
 msgstr "Die Datenquellekonfiguration ist ungültig"
+
+#~ msgid "Electoral district"
+#~ msgstr "Wahlkreis"
+
+#~ msgid "Electoral districts"
+#~ msgstr "Wahlkreise"

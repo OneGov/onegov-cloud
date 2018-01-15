@@ -284,3 +284,60 @@ def test_principal_notifications_enabled():
         sms_notification='https://wab.kriens.ch',
         email_notification=True
     ).notifications is True
+
+
+def test_principal_label(election_day_app):
+    # Only test the label/principal combination which are really used
+
+    def translate(text, locale):
+        translator = election_day_app.translations.get(locale)
+        return text.interpolate(translator.gettext(text))
+
+    principal = Canton(name='gr', canton='gr')
+    for label, locale, result in (
+        ('entity', 'de_CH', 'Gemeinde'),
+        ('entity', 'it_CH', 'Comune'),
+        ('entity', 'rm_CH', 'Vischnanca'),
+        ('entities', 'de_CH', 'Gemeinden'),
+        ('entities', 'it_CH', 'Comuni'),
+        ('entities', 'rm_CH', 'Vischnancas'),
+        ('district', 'de_CH', 'Region'),
+        ('district', 'it_CH', 'Regione'),
+        ('district', 'rm_CH', 'Regiun'),
+        ('districts', 'de_CH', 'Regionen'),
+        ('districts', 'it_CH', 'Regioni'),
+        ('districts', 'rm_CH', 'Regiuns'),
+    ):
+        assert translate(principal.label(label), locale) == result
+
+    principal = Canton(name='sz', canton='sz')
+    for label, locale, result in (
+        ('entity', 'de_CH', 'Gemeinde'),
+        ('entities', 'de_CH', 'Gemeinden'),
+        ('district', 'de_CH', 'Bezirk'),
+        ('districts', 'de_CH', 'Bezirke'),
+    ):
+        assert translate(principal.label(label), locale) == result
+
+    principal = Canton(name='sg', canton='sg')
+    for label, locale, result in (
+        ('entity', 'de_CH', 'Gemeinde'),
+        ('entities', 'de_CH', 'Gemeinden'),
+        ('district', 'de_CH', 'Wahlkreis'),
+        ('districts', 'de_CH', 'Wahlkreise'),
+    ):
+        assert translate(principal.label(label), locale) == result
+
+    principal = Canton(name='Zug', canton='zg')
+    for label, locale, result in (
+        ('entity', 'de_CH', 'Gemeinde'),
+        ('entities', 'de_CH', 'Gemeinden')
+    ):
+        assert translate(principal.label(label), locale) == result
+
+    principal = Municipality(name='Be', municipality='351')
+    for label, locale, result in (
+        ('entity', 'de_CH', 'Stadtteil'),
+        ('entities', 'de_CH', 'Stadtteile')
+    ):
+        assert translate(principal.label(label), locale) == result

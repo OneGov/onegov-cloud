@@ -154,9 +154,21 @@ class Canton(Principal):
         if value == 'entities':
             return _("Municipalities")
         if value == 'district':
-            return _("Electoral district")
-        if value == 'district':
-            return _("Electoral districts")
+            if self.id == 'gr':
+                return _("district_label_gr", default="District")
+            if self.id == 'sg':
+                return _("district_label_sg", default="Constituency")
+            if self.id == 'sz':
+                return _("district_label_sz", default="District")
+            return _("district_label_default", default="Constituency")
+        if value == 'districts':
+            if self.id == 'gr':
+                return _("districts_label_gr", default="Districts")
+            if self.id == 'sg':
+                return _("districts_label_sg", default="Constituencies")
+            if self.id == 'sz':
+                return _("districts_label_sz", default="Districts")
+            return _("districts_label_default", default="Constituencies")
         return ''
 
 

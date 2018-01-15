@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-21 07:25+0100\n"
-"PO-Revision-Date: 2017-12-21 07:25+0100\n"
+"POT-Creation-Date: 2018-01-15 14:48+0100\n"
+"PO-Revision-Date: 2018-01-15 14:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -330,6 +330,50 @@ msgstr "Respinto"
 msgid "Counter proposal accepted"
 msgstr "Controprogetto accettata"
 
+msgid "Municipality"
+msgstr "Comune"
+
+msgid "Municipalities"
+msgstr "Comuni"
+
+#. Default: Constituency
+msgid "district_label_default"
+msgstr "Distretto elettorale"
+
+#. Default: Constituencies
+msgid "districts_label_default"
+msgstr "Distretti elettorali"
+
+#. Default: District
+msgid "district_label_gr"
+msgstr "Regione"
+
+#. Default: Constituency
+msgid "district_label_sg"
+msgstr "Distretto elettorale"
+
+#. Default: District
+msgid "district_label_sz"
+msgstr "Distretto elettorale"
+
+#. Default: Districts
+msgid "districts_label_gr"
+msgstr "Regioni"
+
+#. Default: Constituencies
+msgid "districts_label_sg"
+msgstr "Distretti elettorali"
+
+#. Default: Districts
+msgid "districts_label_sz"
+msgstr "Distretti elettorali"
+
+msgid "Quarter"
+msgstr "Quartiere"
+
+msgid "Quarters"
+msgstr "Quartieri"
+
 msgid "Federal"
 msgstr "Nazionale"
 
@@ -338,24 +382,6 @@ msgstr "Cantonale"
 
 msgid "Communal"
 msgstr "Comunale"
-
-msgid "Electoral district"
-msgstr "Distretto elettorale"
-
-msgid "Electoral districts"
-msgstr "Distretti elettorali"
-
-msgid "Quarter"
-msgstr "Quartiere"
-
-msgid "Municipality"
-msgstr "Comune"
-
-msgid "Quarters"
-msgstr "Quartieri"
-
-msgid "Municipalities"
-msgstr "Comuni"
 
 msgid "Elections &amp; Votes"
 msgstr "Elezioni &amp; votazioni"
@@ -991,3 +1017,9 @@ msgstr "Nessuna elezione secondo il sistema proporzionale"
 
 msgid "The data source is not configured properly"
 msgstr "L'origine dati non è configurata correttamente"
+
+#~ msgid "Electoral district"
+#~ msgstr "Distretto elettorale"
+
+#~ msgid "Electoral districts"
+#~ msgstr "Distretti elettorali"
