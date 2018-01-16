@@ -990,7 +990,7 @@ input[type=color] {
         font-size: .875rem;
     }
 
-    .tile-sub-link:after {
+    .tile-sub-link::after {
         color: $body-font-color;
         content: ' / ';
         display: inline-block;
@@ -998,7 +998,7 @@ input[type=color] {
         margin-right: .7ex;
     }
 
-    .tile-sub-link:last-child:after {
+    .tile-sub-link:last-child::after {
         content: '';
     }
 
@@ -1750,14 +1750,14 @@ div#redactor-droparea {
         margin-left: 0;
         margin-right: 1rem;
 
-        a:after {
+        a::after {
             color: transparentize($primary-color, .8);
             content: ' | ';
             display: inline-block;
             margin-left: 1rem;
         }
 
-        &:last-child a:after {
+        &:last-child a::after {
             content: '';
         }
     }
@@ -1866,20 +1866,20 @@ div#redactor-droparea {
     100% { color: transparent; }
 }
 
-.flash > a:after {
+.flash > a::after {
     @include prefix(animation-duration, .7s);
     @include prefix(animation-fill-mode, forwards);
     font-family: 'FontAwesome';
     margin-left: 3px;
 }
 
-.flash.success > a:after {
+.flash.success > a::after {
     @include prefix(animation-name, flash-success);
     color: $primary-color;
     content: ' \f0c7';
 }
 
-.flash.failure > a:after {
+.flash.failure > a::after {
     @include prefix(animation-name, flash-failure);
     color: $alert-color;
     content: ' \f05e';
