@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.19.9 (2018-01-16)
+~~~~~~~~~~~~~~~~~~~
 
 - Requires that the title translations of election and votes for the default
   locale is provided.
