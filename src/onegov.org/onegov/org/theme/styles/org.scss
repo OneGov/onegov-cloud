@@ -578,6 +578,10 @@ form {
         }
     }
 
+    label > ul label {
+        width: 90%;
+    }
+
     .group-label {
         color: $form-label-font-color;
         font-size: $form-label-font-size;
