@@ -6,6 +6,7 @@ from onegov.ballot.models.election.mixins import DerivedAttributesMixin
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.ballot.models.mixins import StatusMixin
 from onegov.ballot.models.mixins import summarized_property
+from onegov.ballot.models.mixins import TitleTranslationsMixin
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
@@ -27,8 +28,9 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 
 
-class Election(Base, TimestampMixin, DerivedAttributesMixin,
-               DomainOfInfluenceMixin, ContentMixin, StatusMixin):
+class Election(Base, ContentMixin, TimestampMixin,
+               DomainOfInfluenceMixin, StatusMixin, TitleTranslationsMixin,
+               DerivedAttributesMixin):
 
     __tablename__ = 'elections'
 
@@ -46,14 +48,18 @@ class Election(Base, TimestampMixin, DerivedAttributesMixin,
     #: Identifies the result, may be used in the url
     id = Column(Text, primary_key=True)
 
-    #: Title of the election
+    #: all translations of the title
     title_translations = Column(HSTORE, nullable=False)
+
+    #: the translated title (uses the locale of the request, falls back to the
+    #: default locale of the app)
     title = translation_hybrid(title_translations)
 
     @observes('title_translations')
     def title_observer(self, translations):
         if not self.id:
-            id = normalize_for_url(self.title) or 'election'
+            title = self.get_title(self.session_manager.default_locale)
+            id = normalize_for_url(title or 'election')
             session = object_session(self)
             while session.query(Election.id).filter(Election.id == id).first():
                 id = increment_name(id)

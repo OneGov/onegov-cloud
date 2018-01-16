@@ -2,6 +2,7 @@ from collections import OrderedDict
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.ballot.models.mixins import StatusMixin
 from onegov.ballot.models.mixins import summarized_property
+from onegov.ballot.models.mixins import TitleTranslationsMixin
 from onegov.ballot.models.vote.ballot import Ballot
 from onegov.ballot.models.vote.ballot_result import BallotResult
 from onegov.ballot.models.vote.mixins import DerivedBallotsCountMixin
@@ -25,8 +26,9 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 
 
-class Vote(Base, TimestampMixin, DerivedBallotsCountMixin,
-           DomainOfInfluenceMixin, ContentMixin, StatusMixin):
+class Vote(Base, ContentMixin, TimestampMixin,
+           DomainOfInfluenceMixin, StatusMixin, TitleTranslationsMixin,
+           DerivedBallotsCountMixin):
     """ A vote describes the issue being voted on. For example,
     "Vote for Net Neutrality" or "Vote for Basic Income".
 
@@ -51,9 +53,22 @@ class Vote(Base, TimestampMixin, DerivedBallotsCountMixin,
     #: shortcode for cantons that use it
     shortcode = Column(Text, nullable=True)
 
-    #: title of the vote
+    #: all translations of the title
     title_translations = Column(HSTORE, nullable=False)
+
+    #: the translated title (uses the locale of the request, falls back to the
+    #: default locale of the app)
     title = translation_hybrid(title_translations)
+
+    @observes('title_translations')
+    def title_observer(self, translations):
+        if not self.id:
+            title = self.get_title(self.session_manager.default_locale)
+            id = normalize_for_url(title or 'vote')
+            session = object_session(self)
+            while session.query(Vote.id).filter(Vote.id == id).first():
+                id = increment_name(id)
+            self.id = id
 
     #: identifies the date of the vote
     date = Column(Date, nullable=False)
@@ -85,15 +100,6 @@ class Vote(Base, TimestampMixin, DerivedBallotsCountMixin,
     @property
     def proposal(self):
         return self.ballot('proposal', create=True)
-
-    @observes('title_translations')
-    def title_observer(self, translations):
-        if not self.id:
-            id = normalize_for_url(self.title) or 'vote'
-            session = object_session(self)
-            while session.query(Vote.id).filter(Vote.id == id).first():
-                id = increment_name(id)
-            self.id = id
 
     @property
     def counted(self):

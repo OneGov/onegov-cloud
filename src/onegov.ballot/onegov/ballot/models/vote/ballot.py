@@ -1,4 +1,5 @@
 from onegov.ballot.models.mixins import summarized_property
+from onegov.ballot.models.mixins import TitleTranslationsMixin
 from onegov.ballot.models.vote.ballot_result import BallotResult
 from onegov.ballot.models.vote.mixins import DerivedAttributesMixin
 from onegov.ballot.models.vote.mixins import DerivedBallotsCountMixin
@@ -20,8 +21,8 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
-class Ballot(Base, TimestampMixin, DerivedAttributesMixin,
-             DerivedBallotsCountMixin):
+class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
+             DerivedAttributesMixin, DerivedBallotsCountMixin):
     """ A ballot contains a single question asked for a vote.
 
     Usually each vote has exactly one ballot, but it's possible for votes to
@@ -58,8 +59,11 @@ class Ballot(Base, TimestampMixin, DerivedAttributesMixin,
     #: identifies the vote this ballot result belongs to
     vote_id = Column(Text, ForeignKey('votes.id'), nullable=False)
 
-    #: title of the ballot
+    #: all translations of the title
     title_translations = Column(HSTORE, nullable=True)
+
+    #: the translated title (uses the locale of the request, falls back to the
+    #: default locale of the app)
     title = translation_hybrid(title_translations)
 
     #: a ballot contains n results
