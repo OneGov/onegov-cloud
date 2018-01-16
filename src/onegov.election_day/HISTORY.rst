@@ -1,10 +1,7 @@
 Changelog
 ---------
 
-- Adds district translations.
-  [msom]
-
-- Makes principal polymorphic.
+- Updates translations.
   [msom]
 
 1.19.8 (2018-01-11)

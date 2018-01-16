@@ -281,7 +281,7 @@ msgid "Panachage"
 msgstr "Statistica da panaschar"
 
 msgid "Downloads"
-msgstr "Telechargiadas"
+msgstr "Downloads"
 
 msgid "Votes"
 msgstr "Votaziuns"

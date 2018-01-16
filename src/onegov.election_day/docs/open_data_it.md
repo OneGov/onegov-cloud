@@ -1,5 +1,5 @@
-Elezioni & votazioni: Dati aperti
-=================================
+Elezioni & votazioni: Open Data
+===============================
 
 Condizioni d’uso
 ----------------

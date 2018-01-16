@@ -43,7 +43,7 @@ setup(
         'onegov.foundation>=0.0.4',
         'onegov.pdf>=0.2.0',
         'onegov.shared>=0.2.0',
-        'onegov.user>=0.15.0',
+        'onegov.user>=0.17.1',
         'phonenumbers',
         'pyyaml',
         'raven',
