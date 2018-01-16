@@ -70,11 +70,12 @@ class TitleTranslationsMixin(object):
         given default locale if provided.
 
         """
+        translations = self.title_translations or {}
         if default_locale is None:
-            return self.title_translations.get(locale, None)
+            return translations.get(locale, None)
         return (
-            self.title_translations.get(locale, None) or
-            self.title_translations.get(default_locale, None)
+            translations.get(locale, None) or
+            translations.get(default_locale, None)
         )
 
 
