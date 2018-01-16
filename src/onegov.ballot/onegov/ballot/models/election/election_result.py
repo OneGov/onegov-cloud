@@ -24,11 +24,14 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
     #: the election this result belongs to
     election_id = Column(Text, ForeignKey('elections.id'), nullable=False)
 
-    #: groups the result in whatever structure makes sense
-    group = Column(Text, nullable=False)
-
     #: entity id (e.g. a BFS number).
     entity_id = Column(Integer, nullable=False)
+
+    #: the name of the entity
+    name = Column(Text, nullable=False)
+
+    #: the district this entity belongs to
+    district = Column(Text, nullable=True)
 
     #: number of elegible voters
     elegible_voters = Column(Integer, nullable=False, default=lambda: 0)

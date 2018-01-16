@@ -13,6 +13,7 @@ from sqlalchemy import Text
 from sqlalchemy.engine.reflection import Inspector
 
 
+# todo: remove the always_run argument
 @upgrade_task('Rename yays to yeas', always_run=True)
 def rename_yays_to_yeas(context):
 
@@ -249,3 +250,19 @@ def change_election_type_column(context):
         'ALTER TABLE elections ALTER COLUMN type TYPE Text'
     )
     type_.drop(context.operations.get_bind(), checkfirst=False)
+
+
+@upgrade_task('Replaces results group with name and district')
+def replace_results_group(context):
+    for table in ('ballot_results', 'election_results'):
+        if (
+            context.has_column(table, 'group') and
+            not context.has_column(table, 'name')
+        ):
+            context.operations.alter_column(
+                table, 'group', new_column_name='name'
+            )
+        if not context.has_column(table, 'district'):
+            context.operations.add_column(
+                table, Column('district', Text, nullable=True)
+            )

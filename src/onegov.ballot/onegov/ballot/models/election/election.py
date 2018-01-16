@@ -132,7 +132,7 @@ class Election(Base, TimestampMixin, DerivedAttributesMixin,
         cascade='all, delete-orphan',
         backref=backref('election'),
         lazy='dynamic',
-        order_by='ElectionResult.group',
+        order_by='ElectionResult.district, ElectionResult.name',
     )
 
     #: The total elegible voters
@@ -278,7 +278,8 @@ class Election(Base, TimestampMixin, DerivedAttributesMixin,
             Election.status,
             Election.counted_entities,
             Election.total_entities,
-            ElectionResult.group,
+            ElectionResult.district,
+            ElectionResult.name,
             ElectionResult.entity_id,
             ElectionResult.elegible_voters,
             ElectionResult.received_ballots,
@@ -300,7 +301,8 @@ class Election(Base, TimestampMixin, DerivedAttributesMixin,
         results = results.outerjoin(Candidate.election)
         results = results.filter(CandidateResult.election_result_id.in_(ids))
         results = results.order_by(
-            ElectionResult.group,
+            ElectionResult.district,
+            ElectionResult.name,
             Candidate.family_name,
             Candidate.first_name
         )
@@ -319,23 +321,24 @@ class Election(Base, TimestampMixin, DerivedAttributesMixin,
             row['election_counted_entities'] = result[8]
             row['election_total_entities'] = result[9]
 
-            row['entity_name'] = result[10]
-            row['entity_id'] = result[11]
-            row['entity_elegible_voters'] = result[12]
-            row['entity_received_ballots'] = result[13]
-            row['entity_blank_ballots'] = result[14]
-            row['entity_invalid_ballots'] = result[15]
-            row['entity_unaccounted_ballots'] = result[16]
-            row['entity_accounted_ballots'] = result[17]
-            row['entity_blank_votes'] = result[18]
-            row['entity_invalid_votes'] = result[19]
-            row['entity_accounted_votes'] = result[20]
+            row['entity_district'] = result[10] or ''
+            row['entity_name'] = result[11]
+            row['entity_id'] = result[12]
+            row['entity_elegible_voters'] = result[13]
+            row['entity_received_ballots'] = result[14]
+            row['entity_blank_ballots'] = result[15]
+            row['entity_invalid_ballots'] = result[16]
+            row['entity_unaccounted_ballots'] = result[17]
+            row['entity_accounted_ballots'] = result[18]
+            row['entity_blank_votes'] = result[19]
+            row['entity_invalid_votes'] = result[20]
+            row['entity_accounted_votes'] = result[21]
 
-            row['candidate_family_name'] = result[21]
-            row['candidate_first_name'] = result[22]
-            row['candidate_id'] = result[23]
-            row['candidate_elected'] = result[24]
-            row['candidate_party'] = result[25]
+            row['candidate_family_name'] = result[22]
+            row['candidate_first_name'] = result[23]
+            row['candidate_id'] = result[24]
+            row['candidate_elected'] = result[25]
+            row['candidate_party'] = result[26]
             row['candidate_votes'] = result[0]
 
             rows.append(row)

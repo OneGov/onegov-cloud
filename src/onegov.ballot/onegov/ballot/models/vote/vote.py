@@ -265,7 +265,8 @@ class Vote(Base, TimestampMixin, DerivedBallotsCountMixin,
                 row['domain'] = self.domain
                 row['status'] = self.status or 'unknown'
                 row['type'] = ballot.type
-                row['group'] = result.group
+                row['district'] = result.district or ''
+                row['name'] = result.name
                 row['entity_id'] = result.entity_id
                 row['counted'] = result.counted
                 row['yeas'] = result.yeas

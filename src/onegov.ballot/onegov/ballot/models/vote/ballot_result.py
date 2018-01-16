@@ -23,15 +23,14 @@ class BallotResult(Base, TimestampMixin, DerivedAttributesMixin,
     #: identifies the result, may be used in the url
     id = Column(UUID, primary_key=True, default=uuid4)
 
-    #: groups the ballots in whatever structure makes sense. For example:
-    #: /ZH/Bezirk Zürich/Stadt Zürich/Kreis 1
-    #: the idea is to have an instrument to group ballot results at various
-    #: levels. We could use the example, to group by '/ZH' or by
-    #: '/ZH/Bezirk Zürich/Stadt Zürich'
-    group = Column(Text, nullable=False)
-
     #: The entity id (e.g. BFS number).
     entity_id = Column(Integer, nullable=False)
+
+    #: the name of the entity
+    name = Column(Text, nullable=False)
+
+    #: the district this entity belongs to
+    district = Column(Text, nullable=True)
 
     #: True if the result has been counted and no changes will be made anymore.
     #: If the result is definite, all the values below must be specified.

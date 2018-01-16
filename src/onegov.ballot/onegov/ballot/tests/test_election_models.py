@@ -76,7 +76,7 @@ def test_election_create_all_models(session):
 
     election_result = ElectionResult(
         election_id=election.id,
-        group='group',
+        name='name',
         entity_id=1000,
         elegible_voters=0,
         received_ballots=0,
@@ -202,7 +202,7 @@ def test_election_summarized_properties(session):
     for x in range(1, 4):
         election.results.append(
             ElectionResult(
-                group='group',
+                name='name',
                 entity_id=x,
                 elegible_voters=100 * x,
                 received_ballots=80 * x,
@@ -231,7 +231,7 @@ def test_derived_properties(session):
         date=date(2015, 6, 14),
     )
     election.results.append(ElectionResult(
-        group='group',
+        name='name',
         entity_id=1,
         elegible_voters=100,
         received_ballots=50,
@@ -241,7 +241,7 @@ def test_derived_properties(session):
         invalid_votes=3
     ))
     election.results.append(ElectionResult(
-        group='group',
+        name='name',
         entity_id=2,
         elegible_voters=200,
         received_ballots=150,
@@ -323,7 +323,7 @@ def test_election_last_change(session):
     # Add a result
     with freeze_time("2014-01-02"):
         election.results.append(ElectionResult(
-            group='group',
+            name='name',
             entity_id=1,
             elegible_voters=100,
             received_ballots=50,
@@ -340,7 +340,7 @@ def test_election_last_change(session):
     # Add another result
     with freeze_time("2014-01-03"):
         election.results.append(ElectionResult(
-            group='group',
+            name='name',
             entity_id=2,
             elegible_voters=200,
             received_ballots=150,
@@ -425,7 +425,7 @@ def test_election_last_change_proporz(session):
     # Add a result
     with freeze_time("2014-01-02"):
         election.results.append(ElectionResult(
-            group='group',
+            name='name',
             entity_id=1,
             elegible_voters=100,
             received_ballots=50,
@@ -442,7 +442,7 @@ def test_election_last_change_proporz(session):
     # Add another result
     with freeze_time("2014-01-03"):
         election.results.append(ElectionResult(
-            group='group',
+            name='name',
             entity_id=2,
             elegible_voters=200,
             received_ballots=150,
@@ -664,7 +664,7 @@ def test_election_results(session):
 
     # Add two entities
     election_result_1 = ElectionResult(
-        group='group',
+        name='name',
         entity_id=1,
         elegible_voters=1000,
         received_ballots=500,
@@ -674,7 +674,7 @@ def test_election_results(session):
         invalid_votes=120
     )
     election_result_2 = ElectionResult(
-        group='group',
+        name='name',
         entity_id=2,
         elegible_voters=100,
         received_ballots=50,
@@ -1026,7 +1026,7 @@ def test_election_export(session):
     assert election.export() == []
 
     election_result = ElectionResult(
-        group='group',
+        name='name',
         entity_id=1,
         elegible_voters=1000,
         received_ballots=500,
@@ -1064,7 +1064,8 @@ def test_election_export(session):
             'election_status': 'unknown',
             'election_counted_entities': 1,
             'election_total_entities': 2,
-            'entity_name': 'group',
+            'entity_district': '',
+            'entity_name': 'name',
             'entity_id': 1,
             'entity_elegible_voters': 1000,
             'entity_received_ballots': 500,
@@ -1092,7 +1093,8 @@ def test_election_export(session):
             'election_status': 'unknown',
             'election_counted_entities': 1,
             'election_total_entities': 2,
-            'entity_name': 'group',
+            'entity_district': '',
+            'entity_name': 'name',
             'entity_id': 1,
             'entity_elegible_voters': 1000,
             'entity_received_ballots': 500,
@@ -1178,7 +1180,7 @@ def test_election_export_proporz(session):
     assert election.export() == []
 
     election_result = ElectionResult(
-        group='group',
+        name='name',
         entity_id=1,
         elegible_voters=1000,
         received_ballots=500,
@@ -1236,7 +1238,8 @@ def test_election_export_proporz(session):
             'election_status': 'unknown',
             'election_counted_entities': 1,
             'election_total_entities': 2,
-            'entity_name': 'group',
+            'entity_district': '',
+            'entity_name': 'name',
             'entity_id': 1,
             'entity_elegible_voters': 1000,
             'entity_received_ballots': 500,
@@ -1273,7 +1276,8 @@ def test_election_export_proporz(session):
             'election_status': 'unknown',
             'election_counted_entities': 1,
             'election_total_entities': 2,
-            'entity_name': 'group',
+            'entity_district': '',
+            'entity_name': 'name',
             'entity_id': 1,
             'entity_elegible_voters': 1000,
             'entity_received_ballots': 500,
@@ -1425,7 +1429,7 @@ def test_clear_election(session):
     election.results.append(
         ElectionResult(
             id=eid,
-            group='group',
+            name='name',
             entity_id=1,
             elegible_voters=100,
             received_ballots=2,
@@ -1481,7 +1485,7 @@ def test_election_has_results(session):
 
     election.results.append(
         ElectionResult(
-            group='group',
+            name='name',
             entity_id=1,
             elegible_voters=100,
             received_ballots=2,

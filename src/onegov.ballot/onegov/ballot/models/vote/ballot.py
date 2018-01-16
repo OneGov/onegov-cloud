@@ -68,7 +68,7 @@ class Ballot(Base, TimestampMixin, DerivedAttributesMixin,
         cascade='all, delete-orphan',
         backref=backref('ballot'),
         lazy='dynamic',
-        order_by='BallotResult.group',
+        order_by='BallotResult.district, BallotResult.name',
     )
 
     @hybrid_property
