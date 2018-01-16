@@ -196,9 +196,6 @@ msgstr "Ulteriori informazioni"
 msgid "Absolute majority"
 msgstr "Maggioranza assoluta"
 
-msgid "Provide at least one title."
-msgstr "Fornisci almeno un titolo."
-
 msgid "Election based on the simple majority system"
 msgstr "Elezione secondo il sistema maggioritario"
 
