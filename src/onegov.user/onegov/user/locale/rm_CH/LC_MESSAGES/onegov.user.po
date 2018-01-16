@@ -17,7 +17,7 @@ msgstr ""
 "X-Generator: Poedit 2.0.2\n"
 
 msgid "E-Mail Address"
-msgstr "Emagl"
+msgstr "E-Mail"
 
 msgid "Password"
 msgstr "Pled-clav"
@@ -26,7 +26,7 @@ msgid "YubiKey"
 msgstr "YubiKey"
 
 msgid "Plug your YubiKey into a USB slot and press it."
-msgstr "Attatgar la YubiKey e smatgar il buttun."
+msgstr "Endatar la YubiKey e smatgar il buttun."
 
 msgid "Password Confirmation"
 msgstr "Confermar il pled-clav"

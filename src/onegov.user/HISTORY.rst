@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Updates translations.
+  [msom]
+
 - Requires Python 3.6.
   [href]
 
