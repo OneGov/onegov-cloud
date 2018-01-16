@@ -114,22 +114,21 @@ class VoteForm(Form):
         label=_("Related link")
     )
 
-    def validate(self):
-        result = super(VoteForm, self).validate()
-        if not any((
-            self.vote_de.data,
-            self.vote_fr.data,
-            self.vote_it.data,
-            self.vote_rm.data
-        )):
-            message = _("Provide at least one title.")
-            self.vote_de.errors.append(message)
-            self.vote_fr.errors.append(message)
-            self.vote_it.errors.append(message)
-            self.vote_rm.errors.append(message)
-            result = False
+    def on_request(self):
+        self.vote_de.validators = []
+        self.vote_fr.validators = []
+        self.vote_it.validators = []
+        self.vote_rm.validators = []
 
-        return result
+        default_locale = self.request.default_locale
+        if default_locale.startswith('de'):
+            self.vote_de.validators.append(InputRequired())
+        if default_locale.startswith('fr'):
+            self.vote_fr.validators.append(InputRequired())
+        if default_locale.startswith('it'):
+            self.vote_de.validators.append(InputRequired())
+        if default_locale.startswith('rm'):
+            self.vote_de.validators.append(InputRequired())
 
     def set_domain(self, principal):
         self.domain.choices = [

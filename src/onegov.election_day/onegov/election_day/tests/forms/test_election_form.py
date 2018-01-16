@@ -1,8 +1,9 @@
 from datetime import date
 from onegov.ballot import Election
 from onegov.election_day.forms import ElectionForm
-from onegov.election_day.models import Canton
-from onegov.election_day.models import Municipality
+from onegov.election_day.models import Principal
+from onegov.election_day.tests import DummyRequest
+from wtforms.validators import InputRequired
 
 
 def test_election_form_domains():
@@ -19,6 +20,26 @@ def test_election_form_domains():
         ('canton', 'Cantonal'), ('federation', 'Federal'),
         ('municipality', 'Communal')
     ]
+
+
+def test_election_form_translations():
+    form = ElectionForm()
+    form.request = DummyRequest()
+    form.request.default_locale = 'de_CH'
+    form.on_request()
+    assert isinstance(form.election_de.validators[0], InputRequired)
+    assert form.election_fr.validators == []
+    assert form.election_it.validators == []
+    assert form.election_rm.validators == []
+
+    form = ElectionForm()
+    form.request = DummyRequest()
+    form.request.default_locale = 'fr_CH'
+    form.on_request()
+    assert form.election_de.validators == []
+    assert isinstance(form.election_fr.validators[0], InputRequired)
+    assert form.election_it.validators == []
+    assert form.election_rm.validators == []
 
 
 def test_election_form_model(election_day_app):

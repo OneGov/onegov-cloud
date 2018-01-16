@@ -92,22 +92,21 @@ class ElectionForm(Form):
         depends_on=('election_type', 'majorz'),
     )
 
-    def validate(self):
-        result = super(ElectionForm, self).validate()
-        if not any((
-            self.election_de.data,
-            self.election_fr.data,
-            self.election_it.data,
-            self.election_rm.data
-        )):
-            message = _("Provide at least one title.")
-            self.election_de.errors.append(message)
-            self.election_fr.errors.append(message)
-            self.election_it.errors.append(message)
-            self.election_rm.errors.append(message)
-            result = False
+    def on_request(self):
+        self.election_de.validators = []
+        self.election_fr.validators = []
+        self.election_it.validators = []
+        self.election_rm.validators = []
 
-        return result
+        default_locale = self.request.default_locale
+        if default_locale.startswith('de'):
+            self.election_de.validators.append(InputRequired())
+        if default_locale.startswith('fr'):
+            self.election_fr.validators.append(InputRequired())
+        if default_locale.startswith('it'):
+            self.election_de.validators.append(InputRequired())
+        if default_locale.startswith('rm'):
+            self.election_de.validators.append(InputRequired())
 
     def set_domain(self, principal):
         self.domain.choices = [

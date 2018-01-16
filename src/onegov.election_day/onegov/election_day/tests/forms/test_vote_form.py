@@ -2,8 +2,9 @@ from datetime import date
 from onegov.ballot import ComplexVote
 from onegov.ballot import Vote
 from onegov.election_day.forms import VoteForm
-from onegov.election_day.models import Canton
-from onegov.election_day.models import Municipality
+from onegov.election_day.models import Principal
+from onegov.election_day.tests import DummyRequest
+from wtforms.validators import InputRequired
 
 
 def test_vote_form_domains():
@@ -20,6 +21,26 @@ def test_vote_form_domains():
         ('canton', 'Cantonal'), ('federation', 'Federal'),
         ('municipality', 'Communal')
     ]
+
+
+def test_vote_form_translations():
+    form = VoteForm()
+    form.request = DummyRequest()
+    form.request.default_locale = 'de_CH'
+    form.on_request()
+    assert isinstance(form.vote_de.validators[0], InputRequired)
+    assert form.vote_fr.validators == []
+    assert form.vote_it.validators == []
+    assert form.vote_rm.validators == []
+
+    form = VoteForm()
+    form.request = DummyRequest()
+    form.request.default_locale = 'fr_CH'
+    form.on_request()
+    assert form.vote_de.validators == []
+    assert isinstance(form.vote_fr.validators[0], InputRequired)
+    assert form.vote_it.validators == []
+    assert form.vote_rm.validators == []
 
 
 def test_vote_form_model(election_day_app):

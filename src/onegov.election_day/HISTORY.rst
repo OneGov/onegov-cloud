@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Requires that the title translations of election and votes for the default
+  locale is provided.
+  [msom]
+
 - Updates translations.
   [msom]
 
