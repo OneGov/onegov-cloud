@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.17.1 (2018-01-16)
+~~~~~~~~~~~~~~~~~~~
 
 - Updates translations.
   [msom]
