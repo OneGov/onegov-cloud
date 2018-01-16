@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Shows the reason why the matching button is hidden before the wishlist phase.
+  [href]
+
 1.3.14 (2018-01-04)
 ~~~~~~~~~~~~~~~~~~~
 

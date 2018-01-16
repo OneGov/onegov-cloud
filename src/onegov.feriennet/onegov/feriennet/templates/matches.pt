@@ -114,6 +114,15 @@
                             </a>
                         </tal:block>
 
+                        <tal:block condition="period.active and not period.wishlist_phase and not period.confirmed">
+                            <p>
+                                <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
+                                <span i18n:translate>
+                                    This period is not yet in the wishlist phase. Only once the wishlist phase has started can the period be matched.
+                                </span>
+                            </p>
+                        </tal:block>
+
                         <tal:block condition="not period.active and not period.confirmed">
                             <p>
                                 <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
