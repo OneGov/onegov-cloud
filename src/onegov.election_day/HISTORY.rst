@@ -5,6 +5,9 @@ Changelog
   locale is provided.
   [msom]
 
+- Improves title translations fallbacks.
+  [msom]
+
 - Updates translations.
   [msom]
 

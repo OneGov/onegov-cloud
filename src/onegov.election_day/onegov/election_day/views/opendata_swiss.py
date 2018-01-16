@@ -49,6 +49,8 @@ def view_rdf(self, request):
 
     layout = DefaultLayout(self, request)
     domains = dict(self.available_domains)
+    locales = {k: k[:2] for k in request.app.locales}
+    default_locale = request.default_locale
 
     rdf = Element('rdf:RDF', attrib={
         'xmlns:dct': 'http://purl.org/dc/terms/',
@@ -119,19 +121,18 @@ def view_rdf(self, request):
             _("Vote") if is_vote else _("Election"),
             domains[item.domain]
         ):
-            for lang in ('de', 'fr', 'it', 'en'):
-                value = translate(keyword, '{}_CH'.format(lang)).lower()
+            for locale, lang in locales.items():
+                value = translate(keyword, locale).lower()
                 sub(ds, 'dcat:keyword', {'xml:lang': lang}, value)
 
         # Title
-        for lang in ('de', 'fr', 'it', 'en'):
-            title = item.title_translations.get('{}_CH'.format(lang))
-            title = title or item.title
+        for locale, lang in locales.items():
+            title = item.get_title(locale, default_locale) or ''
             sub(ds, 'dct:title', {'xml:lang': lang}, title)
 
         # Description
-        for lang in ('de', 'fr', 'it', 'en'):
-            locale = '{}_CH'.format(lang)
+        for locale, lang in locales.items():
+            locale = locale
             if is_vote:
                 if item.domain == 'canton':
                     des = _(
@@ -140,8 +141,7 @@ def view_rdf(self, request):
                         "broken down by municipalities.",
                         mapping={
                             'title': (
-                                item.title_translations.get(locale) or
-                                item.title
+                                item.get_title(locale, default_locale) or ''
                             ),
                             'date': format_date(
                                 item.date, format='long', locale=locale
@@ -156,8 +156,7 @@ def view_rdf(self, request):
                         "broken down by municipalities.",
                         mapping={
                             'title': (
-                                item.title_translations.get(locale) or
-                                item.title
+                                item.get_title(locale, default_locale) or ''
                             ),
                             'date': format_date(
                                 item.date, format='long', locale=locale
@@ -173,8 +172,7 @@ def view_rdf(self, request):
                         "broken down by candidates and municipalities.",
                         mapping={
                             'title': (
-                                item.title_translations.get(locale) or
-                                item.title
+                                item.get_title(locale, default_locale) or ''
                             ),
                             'date': format_date(
                                 item.date, format='long', locale=locale
@@ -189,8 +187,7 @@ def view_rdf(self, request):
                         "broken down by candidates and municipalities.",
                         mapping={
                             'title': (
-                                item.title_translations.get(locale) or
-                                item.title
+                                item.get_title(locale, default_locale) or ''
                             ),
                             'date': format_date(
                                 item.date, format='long', locale=locale
@@ -202,8 +199,8 @@ def view_rdf(self, request):
             sub(ds, 'dct:description', {'xml:lang': lang}, des)
 
         # Format description
-        for lang in ('de', 'fr', 'it', 'en'):
-            label = translate(_("Format Description"), '{}_CH'.format(lang))
+        for locale, lang in locales.items():
+            label = translate(_("Format Description"), locale)
             url = layout.get_opendata_link(lang)
 
             fmt_des = sub(ds, 'dct:relation')
@@ -252,9 +249,8 @@ def view_rdf(self, request):
             sub(dist, 'dct:identifier', {}, fmt)
 
             # Title
-            for lang in ('de', 'fr', 'it', 'en'):
-                title = item.title_translations.get('{}_CH'.format(lang))
-                title = title or item.title
+            for locale, lang in locales.items():
+                title = item.get_title(locale, default_locale) or item.id
                 title = '{}.{}'.format(normalize_for_url(title), fmt)
                 sub(dist, 'dct:title', {'xml:lang': lang}, title)
 

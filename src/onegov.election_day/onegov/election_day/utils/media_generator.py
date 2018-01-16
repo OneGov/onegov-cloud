@@ -49,6 +49,7 @@ class MediaGenerator():
         self.renderer = app.configuration.get('d3_renderer').rstrip('/')
         self.session = self.app.session()
         self.pdf_signing = self.app.principal.pdf_signing
+        self.default_locale = self.app.settings.i18n.default_locale
 
         self.supported_charts = {
             'bar': {
@@ -187,7 +188,7 @@ class MediaGenerator():
 
             pdf = Pdf(
                 f,
-                title=item.title_translations.get(locale) or item.title,
+                title=item.get_title(locale, self.default_locale),
                 author=principal.name
             )
             pdf.init_a4_portrait(
@@ -218,7 +219,7 @@ class MediaGenerator():
                 return style
 
             # Add Header
-            pdf.h1(item.title_translations.get(locale) or item.title)
+            pdf.h1(item.get_title(locale, self.default_locale))
 
             # Add dates
             changed = item.last_result_change
@@ -615,12 +616,11 @@ class MediaGenerator():
                     )
                 for title, ballot in ballots:
                     if title:
-                        pdf.h2(
-                            '{}{}'.format(
-                                translate(title),
-                                ': ' + ballot.title if ballot.title else ''
-                            )
-                        )
+                        detail = ballot.get_title(locale, self.default_locale)
+                        if detail:
+                            pdf.h2('{}: {}'.format(translate(title), detail))
+                        else:
+                            pdf.h2(translate(title))
 
                     # Factoids
                     pdf.table(

@@ -154,8 +154,7 @@ class EmailNotification(Notification):
             optout = request.link(request.app.principal, 'unsubscribe-email')
             token = request.new_url_safe_token({'address': subscriber.address})
 
-            model_title = model.title_translations.get(locale)
-            model_title = model_title or model.title
+            model_title = model.get_title(locale, request.default_locale)
             model_url = request.link(SiteLocale(locale, request.link(model)))
             subject = '{} - {}'.format(
                 model_title, request.translate(subject_prefix)
