@@ -166,7 +166,6 @@ class ArchivedResult(Base, DomainOfInfluenceMixin, ContentMixin,
         self.counted_entities = source.counted_entities
         self.url = source.url
         self.title_translations = deepcopy(dict(source.title_translations))
-        self.title = source.title
         self.shortcode = source.shortcode
         self.domain = source.domain
         self.meta = deepcopy(dict(source.meta))
