@@ -2,7 +2,8 @@ from datetime import date
 from onegov.ballot import ComplexVote
 from onegov.ballot import Vote
 from onegov.election_day.forms import VoteForm
-from onegov.election_day.models import Principal
+from onegov.election_day.models import Canton
+from onegov.election_day.models import Municipality
 from onegov.election_day.tests import DummyRequest
 from wtforms.validators import InputRequired
 
