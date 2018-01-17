@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.58.2 (2018-01-17)
+~~~~~~~~~~~~~~~~~~~
 
 - Categorises e-mails as 'onegov' for mailjet monitoring.
   [href]
