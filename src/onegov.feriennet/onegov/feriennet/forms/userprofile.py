@@ -118,6 +118,7 @@ class UserProfileForm(Form):
 
     def on_request(self):
         self.toggle_political_municipality()
+        self.toggle_daily_ticket_statistics()
 
     @property
     def show_political_municipality(self):
@@ -126,6 +127,15 @@ class UserProfileForm(Form):
     def toggle_political_municipality(self):
         if not self.show_political_municipality:
             self.delete_field('political_municipality')
+
+    @property
+    def show_daily_ticket_statistics(self):
+        roles = self.request.app.settings.org.status_mail_roles
+        return self.request.current_role in roles
+
+    def toggle_daily_ticket_statistics(self):
+        if not self.show_daily_ticket_statistics:
+            self.delete_field('daily_ticket_statistics')
 
     def validate_emergency(self, field):
         if field.data:
@@ -145,6 +155,17 @@ class UserProfileForm(Form):
             ))
             return False
 
+    def should_skip_key(self, key):
+        if key == 'political_municipality':
+            if not self.show_political_municipality:
+                return True
+
+        if key == 'daily_ticket_statistics':
+            if not self.show_daily_ticket_statistics:
+                return True
+
+        return False
+
     def populate_obj(self, model):
         super().populate_obj(model)
 
@@ -153,9 +174,9 @@ class UserProfileForm(Form):
             model.realname = self.name
 
             for key in self.extra_fields:
-                if key == 'political_municipality':
-                    if not self.show_political_municipality:
-                        continue
+
+                if self.should_skip_key(key):
+                    continue
 
                 model.data[key] = self.data.get(key)
 
@@ -171,8 +192,8 @@ class UserProfileForm(Form):
             self.name = model.realname
 
             for key in self.extra_fields:
-                if key == 'political_municipality':
-                    if not self.show_political_municipality:
-                        continue
+
+                if self.should_skip_key(key):
+                    continue
 
                 getattr(self, key).data = modeldata.get(key)

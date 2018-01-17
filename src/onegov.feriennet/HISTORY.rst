@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes daily report e-mail setting being shown on member profiles.
+  [href]
+
 - Shows the reason why the matching button is hidden before the wishlist phase.
   [href]
 
