@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.17.2 (2018-01-17)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a tags property to the user model.
   [href]
