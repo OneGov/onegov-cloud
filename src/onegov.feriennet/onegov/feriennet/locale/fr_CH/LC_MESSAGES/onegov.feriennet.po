@@ -1992,8 +1992,8 @@ msgstr "Voulez-vous vraiment supprimer la réservation de ${attendee} ?"
 msgid "Do you really want to cancel ${attendee}'s booking?"
 msgstr "Voulez-vous vraiment annuler la réservation de ${attendee} ?"
 
-#~ msgid "Do you really want to archive this activity?"
-#~ msgstr "Voulez-vous vraiment archiver cette activité ?"
+msgid "Do you really want to archive this activity?"
+msgstr "Voulez-vous vraiment archiver cette activité ?"
 
 #~ msgid "Extra Features"
 #~ msgstr "Paramètres supplémentaires"

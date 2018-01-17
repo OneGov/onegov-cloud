@@ -1969,8 +1969,8 @@ msgstr "Möchten Sie ${attendee}s Buchung wirklich löschen?"
 msgid "Do you really want to cancel ${attendee}'s booking?"
 msgstr "Möchten Sie ${attendee}s Buchung wirklich absagen?"
 
-#~ msgid "Do you really want to archive this activity?"
-#~ msgstr "Möchten Sie dieses Angebot wirklich archivieren?"
+msgid "Do you really want to archive this activity?"
+msgstr "Möchten Sie dieses Angebot wirklich archivieren?"
 
 #~ msgid "Extra Features"
 #~ msgstr "Extra Funktionalitäten"

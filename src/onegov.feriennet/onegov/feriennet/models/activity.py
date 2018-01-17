@@ -169,7 +169,7 @@ class VacationActivityHandler(Handler):
                 attrs={'class': 'archive-activity'},
                 traits=(
                     Confirm(
-                        _("Do you really want to publish this activity?"),
+                        _("Do you really want to archive this activity?"),
                         _(
                             "This cannot be undone. "
                             "The activity will be made private as a result."

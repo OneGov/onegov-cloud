@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes wrong hint in activity archival dialog.
+  [href]
+
 - Fixes daily report e-mail setting being shown on member profiles.
   [href]
 
