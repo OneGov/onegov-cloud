@@ -75,9 +75,16 @@ class UserCollection(object):
 
         for key, values in self.filters.items():
             if values:
-                query = query.filter(getattr(User, key).in_(values))
+                apply = getattr(self, f'apply_{key}_filter', self.apply_filter)
+                query = apply(query, key, values)
 
         return query
+
+    def apply_filter(self, query, key, values):
+        return query.filter(getattr(User, key).in_(values))
+
+    def apply_tag_filter(self, query, key, values):
+        return query.filter(User.data['tags'].contains(tuple(values)))
 
     def add(self, username, password, role,
             data=None, second_factor=None, active=True, realname=None,
@@ -108,6 +115,18 @@ class UserCollection(object):
         self.session.flush()
 
         return user
+
+    @property
+    def tags(self):
+        """ All available tags. """
+        records = self.session.execute("""
+            SELECT DISTINCT tags FROM (
+                SELECT jsonb_array_elements(data->'tags') AS tags
+                FROM users
+            ) AS elements ORDER BY tags
+        """)
+
+        return tuple(r[0] for r in records)
 
     def exists(self, username):
         """ Returns True if the given username exists.
