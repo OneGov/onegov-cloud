@@ -540,7 +540,7 @@ msgid "Cannot create a booking outside the prebooking period"
 msgstr "Anmeldungen können nur während der Wunschphase gemacht werden"
 
 msgid "This occasion is already fully booked"
-msgstr "Diese Durchüfhrung ist bereits ausgebucht"
+msgstr "Diese Durchführung ist bereits ausgebucht"
 
 msgid "This is an unapproved activity"
 msgstr "Dies ist ein unbestätigtes Angebot"
@@ -1126,7 +1126,7 @@ msgid ""
 "To remove this activity from the public part of the website, you can archive "
 "it."
 msgstr ""
-"Um die Angebot vom öffentlichen Teil der Webseite zu entfernen, können Sie "
+"Um das Angebot vom öffentlichen Teil der Webseite zu entfernen, können Sie "
 "es archivieren."
 
 msgid "Edit contact info"
