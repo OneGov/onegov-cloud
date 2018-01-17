@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.20.1 (2018-01-17)
+~~~~~~~~~~~~~~~~~~~
+
 - Various small bugfixes.
   [href]
 
