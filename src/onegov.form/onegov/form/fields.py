@@ -5,8 +5,13 @@ from onegov.core.utils import binary_to_dictionary
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form.widgets import MultiCheckboxWidget
 from onegov.form.widgets import OrderedMultiCheckboxWidget
+from onegov.form.widgets import TagsWidget
 from onegov.form.widgets import UploadWidget
-from wtforms import FileField, SelectMultipleField, TextAreaField, widgets
+from wtforms import FileField
+from wtforms import SelectMultipleField
+from wtforms import StringField
+from wtforms import TextAreaField
+from wtforms import widgets
 from wtforms.validators import DataRequired, InputRequired
 
 
@@ -107,3 +112,25 @@ class HtmlField(TextAreaField):
 
     def pre_validate(self, form):
         self.data = sanitize_html(self.data)
+
+
+class TagsField(StringField):
+    """ A tags field for use in conjunction with this library:
+
+    https://github.com/developit/tags-input
+
+    """
+
+    widget = TagsWidget()
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            values = (v.strip() for v in valuelist[0].split(','))
+            values = (v for v in values if v)
+
+            self.data = list(values)
+        else:
+            self.data = []
+
+    def process_data(self, value):
+        self.data = value and ','.join(value) or ''

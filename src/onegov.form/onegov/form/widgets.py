@@ -128,3 +128,8 @@ class UploadWidget(FileInput):
                 delete_label=field.gettext(_('Delete file')),
                 replace_label=field.gettext(_('Replace file'))
             ))
+
+
+class TagsWidget(TextInput):
+    # for use with https://github.com/developit/tags-input
+    input_type = 'tags'

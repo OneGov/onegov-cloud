@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a tags input field.
+  [href]
+
 0.29.0 (2017-12-29)
 ~~~~~~~~~~~~~~~~~~~
 
