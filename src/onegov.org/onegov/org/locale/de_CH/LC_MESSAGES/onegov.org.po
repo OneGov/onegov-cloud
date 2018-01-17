@@ -1642,7 +1642,7 @@ msgid ""
 "will become the author of the whole note."
 msgstr ""
 "Diese Notiz wurde von jemand anderem erstellt. Durch Ihre Änderung werden "
-"Sie der neue Author der ganzen Notiz."
+"Sie der neue Autor der ganzen Notiz."
 
 msgid ""
 "Notes are private and only shown to logged-in members. You can use links/e-"
