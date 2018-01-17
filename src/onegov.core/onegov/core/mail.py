@@ -11,7 +11,7 @@ from onegov.core.html import html_to_text
 
 def email(sender=None, receivers=(), cc=(), bcc=(),
           subject=None, content=None, encoding='utf8',
-          attachments=()):
+          attachments=(), category='onegov'):
     """
     Creates an Envelope object with a HTML *content*, as well as a *plaintext*
     alternative generated from the HTML content.
@@ -40,6 +40,9 @@ def email(sender=None, receivers=(), cc=(), bcc=(),
         headers.bcc(*bcc),
         headers.date(),
         headers.message_id(),
+
+        # mailjet e-mail monitoring
+        ('X-MJ-MonitoringCategory', category),
     ]
 
     # According to RFC 2046, the last part of a multipart message, in this
