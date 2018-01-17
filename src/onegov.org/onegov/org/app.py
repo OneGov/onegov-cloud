@@ -349,6 +349,12 @@ def get_photoswipe_asset():
     yield 'photoswipe-custom.js'
 
 
+@OrgApp.webasset('tags-input')
+def get_tags_input():
+    yield 'tags-input.js'
+    yield 'tags-input-setup.js'
+
+
 @OrgApp.webasset('common')
 def get_common_asset():
     yield 'global.js'

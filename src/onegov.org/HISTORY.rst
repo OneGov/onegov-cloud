@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to categorise users into tags and to filter them by it.
+  [href]
+
 0.20.1 (2018-01-17)
 ~~~~~~~~~~~~~~~~~~~
 

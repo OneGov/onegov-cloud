@@ -1,4 +1,5 @@
 from onegov.form import Form, merge_forms
+from onegov.form.fields import TagsField
 from onegov.form.filters import yubikey_identifier
 from onegov.org import _
 from onegov.user import UserCollection, is_valid_yubikey_format
@@ -22,6 +23,10 @@ class ManageUserForm(Form):
         default='member'
     )
 
+    tags = TagsField(
+        label=_("Tags"),
+    )
+
     active = BooleanField(_("Active"), default=True)
 
     yubikey = TextField(
@@ -30,6 +35,9 @@ class ManageUserForm(Form):
         filters=(yubikey_identifier, ),
         render_kw={'autocomplete': 'off'}
     )
+
+    def on_request(self):
+        self.request.include('tags-input')
 
     def validate_yubikey(self, field):
         if not self.active.data:

@@ -92,10 +92,10 @@ def get_user(app, id):
 @OrgApp.path(
     model=UserCollection,
     path='/usermanagement',
-    converters=dict(active=[bool], role=[str])
+    converters=dict(active=[bool], role=[str], tag=[str])
 )
-def get_users(app, active=None, role=None):
-    return UserCollection(app.session(), active=active, role=role)
+def get_users(app, active=None, role=None, tag=None):
+    return UserCollection(app.session(), active=active, role=role, tag=tag)
 
 
 @OrgApp.path(model=Topic, path='/topics', absorb=True)

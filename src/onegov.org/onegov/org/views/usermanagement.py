@@ -55,6 +55,14 @@ def view_usermanagement(self, request):
         )
     ]
 
+    filters['tag'] = [
+        Link(
+            text=tag,
+            active=tag in self.filters.get('tag', tuple()),
+            url=request.link(self.for_filter(tag=tag))
+        ) for tag in self.tags
+    ]
+
     return {
         'layout': layout,
         'title': _("User Management"),

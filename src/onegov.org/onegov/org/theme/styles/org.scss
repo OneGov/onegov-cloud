@@ -4308,3 +4308,55 @@ h2 + div.timeline {
         font-weight: bold;
     }
 }
+
+
+/*
+    Tags input
+*/
+.tags-input {
+    @include form-element;
+    height: auto;
+
+    .tag {
+        background: $silver;
+        border-radius: 2px;
+        color: $body-font-color;
+        cursor: pointer;
+        display: inline-block;
+        font: inherit;
+        margin-right: 8px;
+        outline: 1px solid $gainsboro;
+        padding: 0 4px;
+        transition: all 100ms ease;
+        user-select: none;
+
+        &.selected {
+            background-color: $blue;
+            border-radius: 0;
+            color: $white;
+            outline-color: $blue-dark;
+        }
+
+        &.dupe {
+            transform: scale3d(1.2, 1.2, 1.2);
+        }
+    }
+
+    input {
+        appearance: none !important;
+        background: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        display: inline-block !important;
+        font: inherit !important;
+        font-size: 100% !important;
+        height: auto !important;
+        margin: 0 !important;
+        outline: none !important;
+        padding: 0 !important;
+    }
+
+    .selected ~ input {
+        opacity: .3;
+    }
+}
