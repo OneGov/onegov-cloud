@@ -100,8 +100,12 @@ class InvoiceItemForm(Form):
             (t, t) for t in self.usercollection.tags)
 
     def load_usernames(self):
+        # non-realname accounts cannot have invoices
         self.username.choices = tuple(
-            (u, u) for u in self.usercollection.usernames)
+            (username, realname) for username, realname
+            in self.usercollection.usernames
+            if realname
+        )
 
 
 class RebateForm(InvoiceItemForm):
