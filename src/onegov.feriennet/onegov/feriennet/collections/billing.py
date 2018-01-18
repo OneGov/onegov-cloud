@@ -135,6 +135,20 @@ class BillingCollection(object):
     def outstanding(self):
         return self.invoice_items.outstanding or Decimal("0.00")
 
+    def add_manual_position(self, users, text, amount):
+        invoice = self.period.id.hex
+        session = self.session
+
+        for username in users:
+            session.add(InvoiceItem(
+                username=username,
+                invoice=invoice,
+                group='manual',
+                text=text,
+                unit=amount,
+                quantity=1
+            ))
+
     def create_invoices(self, all_inclusive_booking_text=None):
         assert not self.period.finalized
 

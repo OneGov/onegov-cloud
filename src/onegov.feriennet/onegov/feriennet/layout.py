@@ -403,6 +403,19 @@ class BillingCollectionLayout(DefaultLayout):
                     self.request.class_link(
                         PaymentProviderCollection, name='sync')),
                 attrs={'class': 'sync'},
+            ),
+            LinkGroup(
+                title=_("Add"),
+                links=[
+                    Link(
+                        text=_("Rebate"),
+                        url=self.request.link(
+                            self.model,
+                            name='rebate'
+                        ),
+                        attrs={'class': 'new-rebate'}
+                    )
+                ]
             )
         )
 
@@ -453,6 +466,21 @@ class BillingCollectionImportLayout(DefaultLayout):
             ),
             Link(_("Billing"), self.request.link(self.model)),
             Link(_("Import Bank Statement"), '#')
+        )
+
+
+class BillingCollectionRebateLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return (
+            Link(_("Homepage"), self.homepage_url),
+            Link(
+                _("Activities"),
+                self.request.class_link(VacationActivityCollection)
+            ),
+            Link(_("Billing"), self.request.link(self.model)),
+            Link(_("Rebate"), '#')
         )
 
 

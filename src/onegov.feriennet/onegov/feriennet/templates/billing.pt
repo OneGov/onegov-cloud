@@ -73,7 +73,8 @@
                                     <tbody>
                                         <tal:block repeat="item details.items">
                                             <tr class="group" tal:condition="repeat.item.start or details.items[repeat.item.index - 1].group != item.group">
-                                                <td colspan="4">${item.group}</td>
+                                                <td colspan="4" tal:condition="item.group != 'manual'">${item.group}</td>
+                                                <td colspan="4" tal:condition="item.group == 'manual'" i18n:translate>Appendages</td>
                                             </tr>
                                             <tr class="${item.paid and 'paid' or 'unpaid'}" tal:define="groupid hash(str(item.group) + str(repeat.item.index))">
                                                 <td>${item.text}</td>

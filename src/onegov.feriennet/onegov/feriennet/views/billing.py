@@ -7,9 +7,12 @@ from onegov.core.custom import json
 from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.collections import BillingCollection, BillingDetails
-from onegov.feriennet.forms import BillingForm, BankStatementImportForm
+from onegov.feriennet.forms import BillingForm
+from onegov.feriennet.forms import BankStatementImportForm
+from onegov.feriennet.forms import RebateForm
 from onegov.feriennet.layout import BillingCollectionImportLayout
 from onegov.feriennet.layout import BillingCollectionLayout
+from onegov.feriennet.layout import BillingCollectionRebateLayout
 from onegov.feriennet.layout import OnlinePaymentsLayout
 from onegov.feriennet.models import InvoiceAction, PeriodMessage
 from onegov.org.new_elements import Link, Confirm, Intercooler, Block
@@ -364,4 +367,23 @@ def view_billing_import(self, request, form):
         'post_url': layout.csrf_protected_url(
             request.link(self, 'execute-import')
         )
+    }
+
+
+@FeriennetApp.form(
+    model=BillingCollection,
+    form=RebateForm,
+    permission=Secret,
+    name='rebate',
+    template='form.pt'
+)
+def view_rebate_form(self, request, form):
+    if form.submitted(request):
+        self.add_manual_position(form.users, form.text, form.amount)
+        return request.redirect(request.link(self))
+
+    return {
+        'layout': BillingCollectionRebateLayout(self, request),
+        'title': _("Add Rebate"),
+        'form': form
     }

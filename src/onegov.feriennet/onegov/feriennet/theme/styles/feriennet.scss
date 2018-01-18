@@ -194,6 +194,7 @@ ul.single-line {
     .new-notification::before { @include icon('\f003'); }
     .new-occasion::before { @include icon('\f133'); }
     .new-period::before { @include icon('\f055'); }
+    .new-rebate::before { @include icon('\f1ec'); }
     .request-publication::before { @include icon('\f087'); }
     .reset-matching::before { @include icon('\f12d'); }
     .run-matching::before { @include icon('\f0d0'); }
@@ -567,7 +568,7 @@ ul.tags {
     > div {
         margin-left: 1.5rem;
 
-        &:before {
+        &::before {
             display: inline-block;
             left: 1rem;
             position: absolute;
@@ -885,7 +886,7 @@ ul.tags {
         font-size: .8rem;
         padding-top: .15rem;
 
-        &:before {
+        &::before {
             @include icon('\f06a');
             color: $orange-dark;
             margin: 0 1ex;
@@ -926,12 +927,12 @@ ul.tags {
                 font-size: .875rem;
                 margin: 0;
 
-                &:after {
+                &::after {
                     color: $body-font-color;
                     content: ' | ';
                 }
 
-                &:first-child:after {
+                &:first-child::after {
                     content: '';
                 }
             }
@@ -1127,7 +1128,7 @@ ul.tags {
             }
         }
 
-        td:before {
+        td::before {
             content: '&nbsp;';
             visibility: hidden;
         }
@@ -1740,7 +1741,7 @@ ul.tags {
 .notifications li {
     margin-bottom: .5rem;
 
-    &:before {
+    &::before {
         @include icon('\f003');
         display: inline-block;
         font-size: 1.1rem;

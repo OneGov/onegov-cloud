@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-01-16 14:01+0100\n"
+"POT-Creation-Date: 2018-01-18 11:35+0100\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -75,11 +75,17 @@ msgstr "Kontoauszug importieren"
 msgid "Synchronise Online Payments"
 msgstr "Online Zahlungen synchronisieren"
 
+msgid "Rebate"
+msgstr "Rabatt"
+
 msgid "Notification Templates"
 msgstr "Mitteilungs-Vorlagen"
 
 msgid "Submit Activity"
 msgstr "Angebot erfassen"
+
+msgid "Add"
+msgstr "Hinzufügen"
 
 msgid "New Notification Template"
 msgstr "Neue Mitteilungs-Vorlage"
@@ -234,11 +240,32 @@ msgid "I know that this stops all changes including cancellations."
 msgstr ""
 "Mir ist bewusst dass danach keine Buchungsänderungen mehr möglich sind."
 
+msgid "Target"
+msgstr "Ziel"
+
+msgid "Tags"
+msgstr "Kategorien"
+
+msgid "User"
+msgstr "Benutzer"
+
+msgid "Description"
+msgstr "Beschreibung"
+
+msgid "All"
+msgstr "Alle"
+
+msgid "For a specific user"
+msgstr "Für einen spezifischen Benutzer"
+
 msgid "No, preview only"
 msgstr "Nein, nur Vorschau"
 
 msgid "Yes, confirm billing"
 msgstr "Ja, Fakturierung abschliessen"
+
+msgid "For users with tags"
+msgstr "Für Benutzer einer bestimmten Kategorie"
 
 msgid "Period"
 msgstr "Zeitraum"
@@ -313,9 +340,6 @@ msgstr "Start"
 msgid "End"
 msgstr "Ende"
 
-msgid "Add"
-msgstr "Hinzufügen"
-
 msgid "Remove"
 msgstr "Entfernen"
 
@@ -336,9 +360,6 @@ msgstr "Beschreibt kurz um was es beim Angebot geht"
 
 msgid "Text"
 msgstr "Text"
-
-msgid "Tags"
-msgstr "Kategorien"
 
 msgid "Organiser"
 msgstr "Veranstalter"
@@ -702,6 +723,9 @@ msgstr "Möchten Sie dieses Angebot wirklich veröffentlichen?"
 
 msgid "Publish Activity"
 msgstr "Angebot veröffentlichen"
+
+msgid "Do you really want to archive this activity?"
+msgstr "Möchten Sie dieses Angebot wirklich archivieren?"
 
 msgid "This cannot be undone. The activity will be made private as a result."
 msgstr ""
@@ -1227,9 +1251,6 @@ msgid ""
 "other booking is permitted."
 msgstr "Nötige Transferzeit zwischen zwei Durchführungen: ${minutes} Minuten."
 
-msgid "User"
-msgstr "Benutzer"
-
 msgid "Actions"
 msgstr "Aktionen"
 
@@ -1398,7 +1419,9 @@ msgstr "Zuteilung zurücksetzen"
 msgid ""
 "This period is not yet in the wishlist phase. Only once the wishlist phase "
 "has started can the period be matched."
-msgstr "Dieser Zeitraumt befindet sich noch nicht in der Wunschphase. Erst in dieser können Zuteilungen gemacht werden."
+msgstr ""
+"Dieser Zeitraumt befindet sich noch nicht in der Wunschphase. Erst in dieser "
+"können Zuteilungen gemacht werden."
 
 msgid "This period is not active. Only the active period may be matched."
 msgstr ""
@@ -1421,6 +1444,9 @@ msgstr "Der Totalbetrag beläuft sich auf ${amount} CHF."
 
 msgid "The outstanding amount is ${amount} CHF."
 msgstr "Der ausstehende Betrag beläuft sich auf ${amount} CHF."
+
+msgid "Appendages"
+msgstr "Zusätze"
 
 msgid "Unpaid"
 msgstr "Unbezahlt"
@@ -1561,6 +1587,9 @@ msgstr "Fakturierung für ${title}"
 
 msgid "Create Bills"
 msgstr "Rechnungen erstellen"
+
+msgid "Add Rebate"
+msgstr "Rabatt hinzufügen"
 
 #, python-format
 msgid "Imported ${count} payments"
@@ -1968,9 +1997,6 @@ msgstr "Möchten Sie ${attendee}s Buchung wirklich löschen?"
 #, python-format
 msgid "Do you really want to cancel ${attendee}'s booking?"
 msgstr "Möchten Sie ${attendee}s Buchung wirklich absagen?"
-
-msgid "Do you really want to archive this activity?"
-msgstr "Möchten Sie dieses Angebot wirklich archivieren?"
 
 #~ msgid "Extra Features"
 #~ msgstr "Extra Funktionalitäten"
