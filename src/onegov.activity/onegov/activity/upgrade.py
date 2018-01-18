@@ -423,3 +423,10 @@ def add_municipality_column_to_activites(context):
 
     for activity in ActivityCollection(context.session).query():
         activity.location_observer(None)
+
+
+@upgrade_task('Add family to invoice items')
+def add_family_to_invoice_items(context):
+    context.operations.add_column('invoice_items', Column(
+        'family', Text, nullable=True
+    ))

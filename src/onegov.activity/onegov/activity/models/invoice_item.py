@@ -36,6 +36,9 @@ class InvoiceItem(Base, TimestampMixin, PayableManyTimes):
     #: the item group (all items with the same text are visually grouped)
     group = Column(Text, nullable=False)
 
+    #: a secondary group who is not necessarily grouped visually
+    family = Column(Text, nullable=True)
+
     #: the item text
     text = Column(Text, nullable=False)
 

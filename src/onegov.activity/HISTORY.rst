@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds family column.
+  [href]
+
 - Requires Python 3.6.
   [href]
 
