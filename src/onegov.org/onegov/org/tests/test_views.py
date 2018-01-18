@@ -3263,9 +3263,8 @@ def test_edit_user_settings(org_app):
     edit.form.get('daily_ticket_statistics').checked = False
     edit.form.submit()
 
-    assert users.by_username('new@example.org').data == {
-        'daily_ticket_statistics': False
-    }
+    assert not users.by_username('new@example.org')\
+        .data['daily_ticket_statistics']
 
 
 def test_homepage(org_app):
