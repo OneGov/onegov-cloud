@@ -159,9 +159,11 @@ class BillingCollection(object):
 
         # each time we add a manual position, we group it using a family
         family = f"manual-{ulid()}"
+        count = 0
 
         for username in users:
             if username in useable:
+                count += 1
                 session.add(InvoiceItem(
                     username=username,
                     invoice=invoice,
@@ -172,6 +174,8 @@ class BillingCollection(object):
                     paid=amount <= 0,
                     family=family
                 ))
+
+        return count
 
     @property
     def usernames_with_invoices(self):

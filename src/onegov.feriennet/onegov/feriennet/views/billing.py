@@ -9,10 +9,10 @@ from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.collections import BillingCollection, BillingDetails
 from onegov.feriennet.forms import BillingForm
 from onegov.feriennet.forms import BankStatementImportForm
-from onegov.feriennet.forms import RebateForm
+from onegov.feriennet.forms import AdjustmentForm
 from onegov.feriennet.layout import BillingCollectionImportLayout
 from onegov.feriennet.layout import BillingCollectionLayout
-from onegov.feriennet.layout import BillingCollectionRebateLayout
+from onegov.feriennet.layout import BillingCollectionAdjustmentsLayout
 from onegov.feriennet.layout import OnlinePaymentsLayout
 from onegov.feriennet.models import InvoiceAction, PeriodMessage
 from onegov.org.new_elements import Link, Confirm, Intercooler, Block
@@ -372,18 +372,26 @@ def view_billing_import(self, request, form):
 
 @FeriennetApp.form(
     model=BillingCollection,
-    form=RebateForm,
+    form=AdjustmentForm,
     permission=Secret,
-    name='rebate',
+    name='adjustment',
     template='form.pt'
 )
 def view_rebate_form(self, request, form):
     if form.submitted(request):
-        self.add_manual_position(form.users, form.text, form.amount)
+        count = self.add_manual_position(form.users, form.text, form.amount)
+
+        if not count:
+            request.alert(_("No adjustments were created"))
+        else:
+            request.success(_("Created ${count} adjustments", mapping={
+                'count': count
+            }))
+
         return request.redirect(request.link(self))
 
     return {
-        'layout': BillingCollectionRebateLayout(self, request),
-        'title': _("Add Rebate"),
+        'layout': BillingCollectionAdjustmentsLayout(self, request),
+        'title': _("Add Adjustment"),
         'form': form
     }

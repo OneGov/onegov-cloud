@@ -29,12 +29,11 @@ class BillingForm(Form):
         return self.confirm.data == 'yes' and self.sure.data is True
 
 
-class InvoiceItemForm(Form):
+class AdjustmentForm(Form):
 
     target = RadioField(
         label=_("Target"),
         default='all',
-        validators=(InputRequired(), ),
         choices=tuple()
     )
 
@@ -56,9 +55,35 @@ class InvoiceItemForm(Form):
         validators=(InputRequired(), )
     )
 
+    kind = RadioField(
+        label=_("Kind"),
+        default='rebate',
+        choices=(
+            ('rebate', _("Rebate")),
+            ('surcharge', _("Surcharge"))
+        )
+    )
+
+    rebate = DecimalField(
+        label=_("Rebate"),
+        validators=(InputRequired(), ),
+        depends_on=('kind', 'rebate')
+    )
+
+    surcharge = DecimalField(
+        label=_("Surcharge"),
+        validators=(InputRequired(), ),
+        depends_on=('kind', 'surcharge')
+    )
+
     @property
     def amount(self):
-        raise NotImplementedError
+        if self.kind.data == 'rebate':
+            return -self.rebate.data
+        elif self.kind.data == 'surcharge':
+            return self.surcharge.data
+        else:
+            raise NotImplementedError
 
     @property
     def text(self):
@@ -109,15 +134,3 @@ class InvoiceItemForm(Form):
             in self.usercollection.usernames
             if realname
         )
-
-
-class RebateForm(InvoiceItemForm):
-
-    rebate = DecimalField(
-        label=_("Rebate"),
-        validators=(InputRequired(), ),
-    )
-
-    @property
-    def amount(self):
-        return -self.rebate.data

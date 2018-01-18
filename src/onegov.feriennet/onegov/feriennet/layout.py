@@ -405,15 +405,15 @@ class BillingCollectionLayout(DefaultLayout):
                 attrs={'class': 'sync'},
             ),
             LinkGroup(
-                title=_("Add"),
+                title=_("Adjustments"),
                 links=[
                     Link(
-                        text=_("Rebate"),
+                        text=_("Add"),
                         url=self.request.link(
                             self.model,
-                            name='rebate'
+                            name='adjustment'
                         ),
-                        attrs={'class': 'new-rebate'}
+                        attrs={'class': 'new-adjustment'}
                     )
                 ]
             )
@@ -469,7 +469,7 @@ class BillingCollectionImportLayout(DefaultLayout):
         )
 
 
-class BillingCollectionRebateLayout(DefaultLayout):
+class BillingCollectionAdjustmentsLayout(DefaultLayout):
 
     @cached_property
     def breadcrumbs(self):
@@ -480,7 +480,7 @@ class BillingCollectionRebateLayout(DefaultLayout):
                 self.request.class_link(VacationActivityCollection)
             ),
             Link(_("Billing"), self.request.link(self.model)),
-            Link(_("Rebate"), '#')
+            Link(_("Adjustments"), '#')
         )
 
 

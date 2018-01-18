@@ -3,8 +3,8 @@ from onegov.feriennet.forms.attendee import AttendeeForm
 from onegov.feriennet.forms.attendee import AttendeeSignupForm
 from onegov.feriennet.forms.attendee import AttendeeLimitForm
 from onegov.feriennet.forms.bank_statement import BankStatementImportForm
+from onegov.feriennet.forms.billing import AdjustmentForm
 from onegov.feriennet.forms.billing import BillingForm
-from onegov.feriennet.forms.billing import RebateForm
 from onegov.feriennet.forms.occasion import OccasionForm
 from onegov.feriennet.forms.period import PeriodForm
 from onegov.feriennet.forms.period import PeriodSelectForm
@@ -18,6 +18,7 @@ from onegov.feriennet.forms.notification_template import (
 )
 
 __all__ = [
+    'AdjustmentForm',
     'AttendeeForm',
     'AttendeeLimitForm',
     'AttendeeSignupForm',
@@ -30,7 +31,6 @@ __all__ = [
     'PeriodExportForm',
     'PeriodForm',
     'PeriodSelectForm',
-    'RebateForm',
     'UserProfileForm',
     'VacationActivityForm'
 ]
