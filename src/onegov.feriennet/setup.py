@@ -45,7 +45,8 @@ setup(
             'pytest',
             'pytest-localserver',
             'pyquery',
-            'requests-mock'
+            'requests-mock',
+            'ulid'
         ],
     ),
     entry_points={

@@ -67,7 +67,10 @@ class InvoiceItemForm(Form):
     @property
     def users(self):
         if self.target.data == 'all':
-            return self.usercollection.usernames
+            return tuple(
+                username for (username, realname)
+                in self.usercollection.usernames if realname
+            )
 
         elif self.target.data == 'for-user':
             return (self.username.data, )

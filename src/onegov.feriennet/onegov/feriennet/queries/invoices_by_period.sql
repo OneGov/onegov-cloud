@@ -10,6 +10,7 @@ details AS (
         username,
         "group",
         "text",
+        "family",
         paid as paid,
         unit * quantity as amount,
         invoice::uuid as period_id,
@@ -54,6 +55,7 @@ invoices AS (
         INITCAP(users.realname) as realname,
         details.group,
         details.text,
+        details.family,
         details.paid,
         details.amount,
         details.period_id,
@@ -83,6 +85,7 @@ invoices AS (
             LOWER(users.realname),
             '[\u00A0]+', ' ', 'g'
         ),
+        details.family NULLS FIRST,
         lower(details."group"),
         lower(details."text")
 )
@@ -94,6 +97,7 @@ SELECT
     username,            -- Text
     "group",             -- Text
     "text",              -- Text
+    "family",            -- Text
     paid,                -- Boolean
     amount,              -- Numeric
     source,              -- Text

@@ -10,6 +10,7 @@ from onegov.feriennet.views.shared import all_users
 from onegov.pay import process_payment
 from sortedcontainers import SortedDict
 from stdnum import iban
+from sqlalchemy import nullsfirst
 from uuid import UUID
 
 
@@ -53,6 +54,7 @@ def view_my_invoices(self, request):
         q = self.query()
         q = q.order_by(
             InvoiceItem.invoice,
+            nullsfirst(InvoiceItem.family),
             InvoiceItem.group,
             InvoiceItem.text
         )

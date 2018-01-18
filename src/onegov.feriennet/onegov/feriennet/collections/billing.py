@@ -9,7 +9,7 @@ from onegov.core.orm import as_selectable_from_path
 from onegov.core.utils import module_path, Bunch
 from onegov.pay import Price
 from sqlalchemy import select, distinct
-from uuid import uuid4
+from ulid import ulid
 
 
 class BillingDetails(object):
@@ -158,7 +158,7 @@ class BillingCollection(object):
         }
 
         # each time we add a manual position, we group it using a family
-        family = f"manual-{uuid4().hex}"
+        family = f"manual-{ulid()}"
 
         for username in users:
             if username in useable:
