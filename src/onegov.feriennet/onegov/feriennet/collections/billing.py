@@ -9,6 +9,7 @@ from onegov.core.orm import as_selectable_from_path
 from onegov.core.utils import module_path, Bunch
 from onegov.pay import Price
 from sqlalchemy import select, distinct
+from uuid import uuid4
 
 
 class BillingDetails(object):
@@ -156,6 +157,9 @@ class BillingCollection(object):
             )
         }
 
+        # each time we add a manual position, we group it using a family
+        family = f"manual-{uuid4().hex}"
+
         for username in users:
             if username in useable:
                 session.add(InvoiceItem(
@@ -165,7 +169,8 @@ class BillingCollection(object):
                     text=text,
                     unit=amount,
                     quantity=1,
-                    paid=amount <= 0
+                    paid=amount <= 0,
+                    family=family
                 ))
 
     @property
