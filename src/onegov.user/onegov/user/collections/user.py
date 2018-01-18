@@ -134,10 +134,11 @@ class UserCollection(object):
     def usernames(self):
         """ All available usernames. """
         records = self.session.execute("""
-            SELECT username FROM users ORDER BY username
+            SELECT username, initcap(realname)
+            FROM users ORDER BY COALESCE(initcap(realname), username)
         """)
 
-        return tuple(r[0] for r in records)
+        return tuple((r[0], r[1]) for r in records)
 
     def usernames_by_tags(self, tags):
         """ All usernames where the user's tags match at least one tag
