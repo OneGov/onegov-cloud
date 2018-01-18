@@ -63,7 +63,10 @@ class InvoiceAction(object):
 
     def execute_mark_unpaid(self, targets):
         for target in targets:
-            target.paid = False
+
+            # negative amounts remain paid
+            target.paid = False if target.amount > 0 else True
+
             target.tid = None
             target.source = None
             assert not target.disable_changes, "item was paid online"

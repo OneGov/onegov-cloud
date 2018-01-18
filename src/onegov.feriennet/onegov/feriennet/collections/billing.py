@@ -8,7 +8,7 @@ from onegov.activity import BookingCollection, InvoiceItemCollection
 from onegov.core.orm import as_selectable_from_path
 from onegov.core.utils import module_path, Bunch
 from onegov.pay import Price
-from sqlalchemy import select
+from sqlalchemy import select, distinct
 
 
 class BillingDetails(object):
@@ -21,8 +21,8 @@ class BillingDetails(object):
     def __init__(self, title, items):
         self.title = title
         self.items = items
-        self.total = Decimal()
-        self.outstanding = Decimal()
+        self.total = Decimal("0.00")
+        self.outstanding = Decimal("0.00")
         self.paid = True
         self.first = None
         self.discourage_changes = False
@@ -50,6 +50,12 @@ class BillingDetails(object):
             group: tuple(groupitems) for group, groupitems
             in groupby((tally(i) for i in items), lambda i: i.group)
         }
+
+        self.total = max(self.total, Decimal("0.00"))
+        self.outstanding = max(self.outstanding, Decimal("0.00"))
+
+        if not self.outstanding:
+            self.paid = True
 
         self.id = self.invoice_id(self.first)
 
@@ -129,25 +135,42 @@ class BillingCollection(object):
 
     @property
     def total(self):
-        return self.invoice_items.total or Decimal("0.00")
+        # bills can technically be negative, which is not useful for us
+        zero = Decimal("0.00")
+        return max(zero, self.invoice_items.total or zero)
 
     @property
     def outstanding(self):
-        return self.invoice_items.outstanding or Decimal("0.00")
+        zero = Decimal("0.00")
+        return max(zero, self.invoice_items.outstanding or zero)
 
     def add_manual_position(self, users, text, amount):
         invoice = self.period.id.hex
         session = self.session
 
+        # only add these positions to people who actually have an invoice
+        useable = {
+            i[0] for i in
+            self.invoice_items.query().with_entities(
+                distinct(InvoiceItem.username)
+            )
+        }
+
         for username in users:
-            session.add(InvoiceItem(
-                username=username,
-                invoice=invoice,
-                group='manual',
-                text=text,
-                unit=amount,
-                quantity=1
-            ))
+            if username in useable:
+                session.add(InvoiceItem(
+                    username=username,
+                    invoice=invoice,
+                    group='manual',
+                    text=text,
+                    unit=amount,
+                    quantity=1,
+                    paid=amount <= 0
+                ))
+
+    @property
+    def usernames_with_invoices(self):
+        self.invoice_items.query().with_entites(InvoiceItem.username)
 
     def create_invoices(self, all_inclusive_booking_text=None):
         assert not self.period.finalized

@@ -36,8 +36,8 @@ totals AS (
         period_id,
         username,
         every(paid) as paid,
-        sum(amount) as amount,
-        sum(outstanding) as outstanding,
+        greatest(sum(amount), 0.0) as amount,
+        greatest(sum(outstanding), 0.0) as outstanding,
         array_agg(distinct changes) as changes
     FROM
         details
