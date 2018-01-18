@@ -10,7 +10,7 @@ from onegov.user.errors import (
     InvalidActivationTokenError,
     UnknownUserError,
 )
-from sqlalchemy import sql
+from sqlalchemy import sql, or_
 
 
 MIN_PASSWORD_LENGTH = 8
@@ -84,7 +84,9 @@ class UserCollection(object):
         return query.filter(getattr(User, key).in_(values))
 
     def apply_tag_filter(self, query, key, values):
-        return query.filter(User.data['tags'].contains(tuple(values)))
+        return query.filter(or_(
+            User.data['tags'].contains((v, )) for v in values
+        ))
 
     def add(self, username, password, role,
             data=None, second_factor=None, active=True, realname=None,

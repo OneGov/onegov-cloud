@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Changes tags filter to use OR instead of AND.
+  [href]
+
 0.17.2 (2018-01-17)
 ~~~~~~~~~~~~~~~~~~~
 
