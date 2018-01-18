@@ -1,10 +1,7 @@
 Changelog
 ---------
-1.11.3 (2018-01-18)
+1.12.3 (2018-01-18)
 ~~~~~~~~~~~~~~~~~~~
-
-- Fixes handling of whitespace in the PDF.
-  [msom]
 
 - Adds a print only option to notices.
   [msom]
