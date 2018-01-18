@@ -130,6 +130,28 @@ class UserCollection(object):
 
         return tuple(r[0] for r in records)
 
+    @property
+    def usernames(self):
+        """ All available usernames. """
+        records = self.session.execute("""
+            SELECT username FROM users ORDER BY username
+        """)
+
+        return tuple(r[0] for r in records)
+
+    def usernames_by_tags(self, tags):
+        """ All usernames where the user's tags match at least one tag
+        from the given list.
+
+        """
+
+        records = self.session.execute("""
+            SELECT username FROM users
+            WHERE data->'tags' ?| :tags
+        """, {'tags': tags})
+
+        return tuple(r.username for r in records)
+
     def exists(self, username):
         """ Returns True if the given username exists.
 
