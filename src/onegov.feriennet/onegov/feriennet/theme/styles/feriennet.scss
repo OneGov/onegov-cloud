@@ -1322,6 +1322,14 @@ ul.tags {
 /*
     Billing View
 */
+.billing {
+    .bill {
+        > button:not(.ic-use-transition) {
+            animation: oscillate-opacity 1s infinite;
+        }
+    }
+}
+
 .bill {
     border-radius: 2px;
     margin-bottom: 1rem;
@@ -1346,10 +1354,6 @@ ul.tags {
         right: 0;
         top: 0;
         width: 40px;
-    }
-
-    > button:not(.ic-use-transition) {
-        animation: oscillate-opacity 1s infinite;
     }
 
     .f-dropdown {
