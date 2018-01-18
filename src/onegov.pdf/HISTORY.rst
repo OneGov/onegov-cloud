@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.3.3 (2018-01-18)
+~~~~~~~~~~~~~~~~~~~~~
 
 - Fixes handling of whitespace in mini html.
   [msom]
