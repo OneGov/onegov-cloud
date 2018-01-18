@@ -339,7 +339,7 @@ class Pdf(PDFDocument):
             return '{}{}{}'.format(
                 strip(element.text or ''),
                 ''.join((
-                    etree.tostring(child, encoding='unicode').strip()
+                    strip(etree.tostring(child, encoding='unicode'))
                     for child in element
                 )),
                 strip(element.tail or '')

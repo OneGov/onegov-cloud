@@ -189,24 +189,33 @@ def test_pdf_mini_html():
     )
 
 
-def test_pdf_mini_html_cleaner():
+def test_pdf_mini_html_strip():
     file = BytesIO()
     pdf = Pdf(file)
     pdf.init_a4_portrait()
-
     html = (
         '<p>Eins zwei drei.</p>'
         '<p> Eins zwei drei.</p>'
+        '<p>   Eins zwei drei.</p>'
         '<p>Eins zwei drei. </p>'
+        '<p>Eins zwei drei.   </p>'
         '<p> Eins zwei drei. </p>'
+        '<p>   Eins zwei drei.   </p>'
         '<p><em>Eins</em> zwei drei.</p>'
         '<p><em>Eins </em>zwei drei.</p>'
+        '<p><em>Eins   </em>zwei drei.</p>'
         '<p>Eins <em>zwei</em> drei.</p>'
+        '<p>Eins  <em>zwei</em>  drei.</p>'
         '<p>Eins<em> zwei</em> drei.</p>'
+        '<p>Eins<em>  zwei</em>  drei.</p>'
         '<p>Eins <em>zwei </em>drei.</p>'
+        '<p>Eins  <em>zwei  </em>drei.</p>'
         '<p>Eins<em> zwei </em>drei.</p>'
+        '<p>Eins<em>  zwei  </em>drei.</p>'
         '<p>Eins zwei <em>drei</em>.</p>'
+        '<p>Eins zwei  <em>drei</em>.</p>'
         '<p>Eins zwei<em> drei</em>.</p>'
+        '<p>Eins zwei<em>  drei</em>.</p>'
     )
     pdf.mini_html(html)
     paras = [p.text for p in pdf.story if isinstance(p, Paragraph)]
@@ -215,48 +224,64 @@ def test_pdf_mini_html_cleaner():
         'Eins zwei drei.',
         'Eins zwei drei.',
         'Eins zwei drei.',
+        'Eins zwei drei.',
+        'Eins zwei drei.',
+        'Eins zwei drei.',
         '<em>Eins</em> zwei drei.',
         '<em>Eins </em>zwei drei.',
+        '<em>Eins </em>zwei drei.',
+        'Eins <em>zwei</em> drei.',
         'Eins <em>zwei</em> drei.',
         'Eins<em> zwei</em> drei.',
+        'Eins<em> zwei</em> drei.',
+        'Eins <em>zwei </em>drei.',
         'Eins <em>zwei </em>drei.',
         'Eins<em> zwei </em>drei.',
+        'Eins<em> zwei </em>drei.',
         'Eins zwei <em>drei</em>.',
-        'Eins zwei<em> drei</em>.'
+        'Eins zwei <em>drei</em>.',
+        'Eins zwei<em> drei</em>.',
+        'Eins zwei<em> drei</em>.',
     ]
     paras = [p.replace('<em>', '').replace('</em>', '') for p in paras]
     assert set(paras) == {'Eins zwei drei.'}
 
-    # file = BytesIO()
-    # pdf = Pdf(file)
-    # pdf.init_a4_portrait()
-    # html = (
-    #     '<p> Vier Fünf </p>'
-    #     '<p> <em>Vier</em> Fünf </p>'
-    #     '<p><em> Vier</em> Fünf </p>'
-    #     '<p> <em>Vier </em>Fünf </p>'
-    #     '<p><em> Vier </em>Fünf </p>'
-    #     '<p> Vier <em>Fünf</em> </p>'
-    #     '<p> Vier<em> Fünf</em> </p>'
-    #     '<p> Vier <em>Fünf </em></p>'
-    #     '<p> Vier<em> Fünf </em></p>'
-    # )
-    # pdf.mini_html(html)
-    # paras = [p.text for p in pdf.story if isinstance(p, Paragraph)]
-    # import pdb; pdb.set_trace()
-    # assert paras == [
-    #     'Eins zwei drei.',
-    #     '<em>Eins</em> zwei drei.',
-    #     '<em>Eins </em>zwei drei.',
-    #     'Eins <em>zwei</em> drei.',
-    #     'Eins<em> zwei</em> drei.',
-    #     'Eins <em>zwei </em>drei.',
-    #     'Eins<em> zwei </em>drei.',
-    #     'Eins zwei <em>drei</em>.',
-    #     'Eins zwei<em> drei</em>.'
-    # ]
-    # paras = [p.replace('<em>', '').replace('</em>', '') for p in paras]
-    # assert set(paras) == {'Eins zwei drei.'}
+    file = BytesIO()
+    pdf = Pdf(file)
+    pdf.init_a4_portrait()
+    html = (
+        '<p>Eins <em>zwei</em> drei <em>vier</em> .</p>'
+        '<p>Eins   <em>zwei</em>   drei   <em>vier</em>   .</p>'
+        '<p> Eins<em> zwei</em> drei<em> vier</em> .</p>'
+        '<p>  Eins<em>  zwei</em>  drei<em>  vier</em>  .</p>'
+        '<p>Eins <em>zwei </em>drei <em>vier </em>.</p>'
+        '<p>Eins  <em>zwei  </em>drei  <em>vier  </em>.</p>'
+        '<p>Eins<em> zwei </em>drei<em> vier </em>.</p>'
+        '<p>Eins<em>   zwei   </em>drei<em>   vier   </em>.</p>'
+        '<p>Eins <em>zwei</em> drei<em> vier </em>.</p>'
+        '<p>Eins   <em>zwei</em>   drei<em>   vier   </em>.</p>'
+        '<p>Eins<em> zwei</em> drei <em>vier </em>.</p>'
+        '<p>Eins<em>   zwei</em>   drei   <em>vier   </em>.</p>'
+    )
+    pdf.mini_html(html)
+    paras = [p.text for p in pdf.story if isinstance(p, Paragraph)]
+    assert paras == [
+        'Eins <em>zwei</em> drei <em>vier</em> .',
+        'Eins <em>zwei</em> drei <em>vier</em> .',
+        'Eins<em> zwei</em> drei<em> vier</em> .',
+        'Eins<em> zwei</em> drei<em> vier</em> .',
+        'Eins <em>zwei </em>drei <em>vier </em>.',
+        'Eins <em>zwei </em>drei <em>vier </em>.',
+        'Eins<em> zwei </em>drei<em> vier </em>.',
+        'Eins<em> zwei </em>drei<em> vier </em>.',
+        'Eins <em>zwei</em> drei<em> vier </em>.',
+        'Eins <em>zwei</em> drei<em> vier </em>.',
+        'Eins<em> zwei</em> drei <em>vier </em>.',
+        'Eins<em> zwei</em> drei <em>vier </em>.',
+
+    ]
+    paras = [p.replace('<em>', '').replace('</em>', '') for p in paras]
+    assert set(paras) == {'Eins zwei drei vier .'}
 
 
 def test_page_fn_header():
