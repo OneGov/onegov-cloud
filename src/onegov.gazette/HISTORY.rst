@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.11.4 (2018-01-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes print only option not set when creating a new notice.
   [msom]
