@@ -124,6 +124,9 @@ msgstr "Organisation"
 msgid "Category"
 msgstr "Rubrik"
 
+msgid "Print only"
+msgstr "Nur Druck"
+
 msgid "Liable to pay costs"
 msgstr "Kostenpflichtig 85% vom Normalpreis"
 
@@ -532,14 +535,23 @@ msgstr "Annehmen"
 msgid "Copy"
 msgstr "Kopieren"
 
-msgid "Preview"
-msgstr "Vorschau"
+msgid "Submit"
+msgstr "Einreichen"
+
+msgid "Accept"
+msgstr "Annehmen"
 
 msgid "Reject"
 msgstr "Zurückweisen"
 
-msgid "Submit"
-msgstr "Einreichen"
+msgid "Publish"
+msgstr "Veröffentlichen"
+
+msgid "Preview"
+msgstr "Vorschau"
+
+msgid "Copy"
+msgstr "Kopieren"
 
 msgid "Accepted official notices may not be edited."
 msgstr "Angenommene Meldungen können nicht mehr bearbeitet werden."
@@ -642,11 +654,13 @@ msgstr "Es können nur eingereichte Meldungen zurückgewiesen werden."
 msgid "Official notice rejected."
 msgstr "Meldung zurückgewiesen."
 
-msgid "Only accepted official notices may be published."
-msgstr "Es können nur angenommene Meldungen veröffentlicht werden."
+msgid ""
+"The official notice has issues for which the deadlines are reached. Please "
+"re-select valid issues."
+msgstr "Bitte Ausgaben neu wählen."
 
-msgid "Official notice published."
-msgstr "Meldung veröffentlicht."
+msgid "This official notice has already been published!"
+msgstr "Diese Meldung wurde bereits veröffentlicht!"
 
 msgid "mail sent"
 msgstr "Druck beauftragt"

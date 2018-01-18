@@ -1,16 +1,10 @@
 Changelog
 ---------
 
-- Requires Python 3.6.
-  [href]
-
-1.13.0 (2017-12-12)
-~~~~~~~~~~~~~~~~~~~
-
-- Updates dependencies.
+- Adds a print only option to notices.
   [msom]
 
-1.12.1 (2017-12-11)
+1.11.2 (2017-12-22)
 ~~~~~~~~~~~~~~~~~~~
 
 - Updates dependencies.

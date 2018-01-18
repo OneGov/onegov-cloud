@@ -133,6 +133,9 @@ class GazetteNotice(
 
     __mapper_args__ = {'polymorphic_identity': 'gazette'}
 
+    #: True, if the official notice only appears in the print version
+    print_only = meta_property('print_only')
+
     #: True, if the official notice needs to be paid for
     at_cost = meta_property('at_cost')
 

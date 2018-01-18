@@ -68,7 +68,7 @@ def test_category_form(session):
     form.request = request
     form.apply_model(category)
     assert form.title.data == 'ABC'
-    assert form.active.data == True
+    assert form.active.data is True
     assert form.name.data == '1'
 
     form.title.data = 'DEF'
@@ -76,7 +76,7 @@ def test_category_form(session):
     form.name.data = '3'
     form.update_model(category)
     assert category.title == 'DEF'
-    assert category.active == False
+    assert category.active is False
     assert category.name == '3'
 
     # ... used
@@ -139,21 +139,21 @@ def test_organization_form(session):
     # ... unused
     form.apply_model(parent)
     assert form.title.data == 'parent'
-    assert form.active.data == True
+    assert form.active.data is True
     assert form.parent.data == ''
     assert form.name.data == '1'
-    assert form.external_name.data == None
+    assert form.external_name.data is None
 
     form.apply_model(child)
     assert form.title.data == 'child'
-    assert form.active.data == True
+    assert form.active.data is True
     assert form.parent.data == '1'
     assert form.name.data == '2'
-    assert form.external_name.data == None
+    assert form.external_name.data is None
 
     form.apply_model(other)
     assert form.title.data == 'other'
-    assert form.active.data == True
+    assert form.active.data is True
     assert form.parent.data == ''
     assert form.name.data == '3'
     assert form.external_name.data == 'xxx'
@@ -166,7 +166,7 @@ def test_organization_form(session):
     session.flush()
     session.expire(other)
     assert other.title == 'DEF'
-    assert other.active == False
+    assert other.active is False
     assert other.parent == parent
     assert other.siblings.filter_by(id='3')
     assert other.name == '3'
@@ -441,6 +441,7 @@ def test_notice_form(session, categories, organizations, issues):
     assert form.title.data == 'Title'
     assert form.organization.data == '200'
     assert form.category.data == '13'
+    assert form.print_only.data is False
     assert form.at_cost.data == 'no'
     assert form.billing_address.data == ''
     assert form.text.data == 'A <b>text</b>.'
@@ -449,6 +450,7 @@ def test_notice_form(session, categories, organizations, issues):
     form.title.data = 'Notice'
     form.organization.data = '300'
     form.category.data = '11'
+    form.print_only.data = True
     form.at_cost.data = 'yes'
     form.billing_address.data = 'someone\nsomewhere'
     form.text.data = 'A <b>notice</b>.'
@@ -458,7 +460,8 @@ def test_notice_form(session, categories, organizations, issues):
     assert notice.title == 'Notice'
     assert notice.organization == 'Municipality'
     assert notice.category == 'Education'
-    assert notice.at_cost == True
+    assert notice.print_only is True
+    assert notice.at_cost is True
     assert notice.billing_address == 'someone\nsomewhere'
     assert notice.text == 'A <b>notice</b>.'
     assert notice.issues == {'2017-44': None}
@@ -517,6 +520,7 @@ def test_notice_form(session, categories, organizations, issues):
             ('14', 'Elections'),
             ('12', 'Submissions'),
         ]
+        assert form.print_only is None
 
         form = NoticeForm()
         form.model = None
@@ -550,6 +554,7 @@ def test_notice_form(session, categories, organizations, issues):
             ('12', 'Submissions'),
         ]
         assert form.issues.render_kw['data-hot-issue'] == '2017-44'
+        assert form.print_only is not None
 
 
 def test_unrestricted_notice_form(session, categories, organizations, issues):

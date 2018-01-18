@@ -9,6 +9,7 @@ from onegov.gazette.models import Issue
 from onegov.gazette.models import Organization
 from onegov.quill import QuillField
 from sedate import utcnow
+from wtforms import BooleanField
 from wtforms import RadioField
 from wtforms import StringField
 from wtforms import TextAreaField
@@ -45,6 +46,11 @@ class NoticeForm(Form):
         validators=[
             InputRequired()
         ]
+    )
+
+    print_only = BooleanField(
+        label=_("Print only"),
+        default=False
     )
 
     at_cost = RadioField(
@@ -89,7 +95,7 @@ class NoticeForm(Form):
             ('', self.request.translate(_("Select one")))
         )
         query = session.query(Organization)
-        query = query.filter(Organization.active == True)
+        query = query.filter(Organization.active.is_(True))
         query = query.filter(Organization.parent_id.is_(None))
         query = query.order_by(Organization.order)
         for root in query:
@@ -104,7 +110,7 @@ class NoticeForm(Form):
 
         # populate categories
         query = session.query(Category.name, Category.title)
-        query = query.filter(Category.active == True)
+        query = query.filter(Category.active.is_(True))
         query = query.order_by(Category.order)
         self.category.choices = query.all()
 
@@ -130,6 +136,10 @@ class NoticeForm(Form):
         # translate the string of the mutli select field
         self.issues.translate(self.request)
 
+        # Remove the print only option if not publisher
+        if not self.request.is_private(self.model):
+            self.delete_field('print_only')
+
     def update_model(self, model):
         model.title = self.title.data
         model.organization_id = self.organization.data
@@ -138,6 +148,8 @@ class NoticeForm(Form):
         model.at_cost = self.at_cost.data == 'yes'
         model.billing_address = self.billing_address.data
         model.issues = self.issues.data
+        if self.print_only:
+            model.print_only = self.print_only.data
 
         model.apply_meta(self.request.app.session())
 
@@ -149,6 +161,8 @@ class NoticeForm(Form):
         self.at_cost.data = 'yes' if model.at_cost else 'no'
         self.billing_address.data = model.billing_address or ''
         self.issues.data = list(model.issues.keys())
+        if self.print_only:
+            self.print_only.data = True if model.print_only else False
 
 
 class UnrestrictedNoticeForm(NoticeForm):
