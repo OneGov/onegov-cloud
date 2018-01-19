@@ -63,6 +63,9 @@ def view_billing(self, request, form):
         )
 
     def invoice_links(details):
+        if not self.period.finalized:
+            return
+
         if details.disable_changes:
             traits = (
                 Block(_(
@@ -95,6 +98,9 @@ def view_billing(self, request, form):
         yield from (as_link(a, traits) for a in invoice_actions(details))
 
     def item_links(item):
+        if not self.period.finalized:
+            return
+
         if item.changes == 'impossible':
             traits = (
                 Block(_(
