@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-01-19 10:25+0100\n"
+"POT-Creation-Date: 2018-01-19 10:44+0100\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -75,14 +75,17 @@ msgstr "Kontoauszug importieren"
 msgid "Synchronise Online Payments"
 msgstr "Online Zahlungen synchronisieren"
 
-msgid "Adjustments"
-msgstr ""
+msgid "Manual Booking"
+msgstr "Manuelle Buchung"
 
 msgid "Notification Templates"
 msgstr "Mitteilungs-Vorlagen"
 
 msgid "Submit Activity"
 msgstr "Angebot erfassen"
+
+msgid "Accounting"
+msgstr "Buchhaltung"
 
 msgid "New Notification Template"
 msgstr "Neue Mitteilungs-Vorlage"
@@ -121,9 +124,6 @@ msgid ""
 msgstr ""
 "Es existieren zur Zeit keine Zeiträume. Mindestens ein Zeitraum muss "
 "bestehen bevor Durchführungen erfasst werden können"
-
-msgid "Add"
-msgstr "Hinzufügen"
 
 #, python-format
 msgid "Do you really want to discard \"${title}\"?"
@@ -249,14 +249,14 @@ msgstr "Kategorien"
 msgid "User"
 msgstr "Benutzer"
 
-msgid "Description"
-msgstr "Beschreibung"
+msgid "Booking Text"
+msgstr "Buchungstext"
 
 msgid "Kind"
 msgstr "Art"
 
-msgid "Rebate"
-msgstr "Rabatt"
+msgid "Discount"
+msgstr "Abzug"
 
 msgid "Surcharge"
 msgstr "Zuschlag"
@@ -348,6 +348,9 @@ msgstr "Start"
 
 msgid "End"
 msgstr "Ende"
+
+msgid "Add"
+msgstr "Hinzufügen"
 
 msgid "Remove"
 msgstr "Entfernen"
@@ -1050,9 +1053,6 @@ msgstr "Konto Besitzer"
 msgid "Reference Number"
 msgstr "Referenz-Nummer"
 
-msgid "Booking Text"
-msgstr "Buchungstext"
-
 msgid "Investigate"
 msgstr "Nachforschungen"
 
@@ -1597,8 +1597,8 @@ msgstr "Fakturierung für ${title}"
 msgid "Create Bills"
 msgstr "Rechnungen erstellen"
 
-msgid "Add Adjustment"
-msgstr ""
+msgid "Add manual booking"
+msgstr "Manuelle Buchung hinzufügen"
 
 #, python-format
 msgid "Imported ${count} payments"
@@ -1616,12 +1616,12 @@ msgstr "Buchung als bezahlt markieren"
 msgid "No transactions were found in the given file"
 msgstr "In der angegebenen Datei wurden keine Transaktionen gefunden"
 
-msgid "No adjustments were created"
-msgstr ""
+msgid "No manual bookings were created"
+msgstr "Es wurden keine manuellen Buchungen erstellt"
 
 #, python-format
-msgid "Created ${count} adjustments"
-msgstr ""
+msgid "Created ${count} manual bookings"
+msgstr "${count} manuelle Buchungen wurden erstellt"
 
 msgid "Mark whole bill as unpaid"
 msgstr "Rechnung als unbezahlt markieren"
@@ -2013,3 +2013,9 @@ msgstr "Möchten Sie ${attendee}s Buchung wirklich löschen?"
 #, python-format
 msgid "Do you really want to cancel ${attendee}'s booking?"
 msgstr "Möchten Sie ${attendee}s Buchung wirklich absagen?"
+
+#~ msgid "Rebate"
+#~ msgstr "Rabatt"
+
+#~ msgid "Description"
+#~ msgstr "Beschreibung"

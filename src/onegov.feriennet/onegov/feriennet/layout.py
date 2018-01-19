@@ -405,15 +405,15 @@ class BillingCollectionLayout(DefaultLayout):
                 attrs={'class': 'sync'},
             ),
             LinkGroup(
-                title=_("Adjustments"),
+                title=_("Accounting"),
                 links=[
                     Link(
-                        text=_("Add"),
+                        text=_("Manual Booking"),
                         url=self.request.link(
                             self.model,
-                            name='adjustment'
+                            name='booking'
                         ),
-                        attrs={'class': 'new-adjustment'}
+                        attrs={'class': 'new-booking'}
                     )
                 ]
             )
@@ -469,7 +469,7 @@ class BillingCollectionImportLayout(DefaultLayout):
         )
 
 
-class BillingCollectionAdjustmentsLayout(DefaultLayout):
+class BillingCollectionManualBookingLayout(DefaultLayout):
 
     @cached_property
     def breadcrumbs(self):
@@ -480,7 +480,7 @@ class BillingCollectionAdjustmentsLayout(DefaultLayout):
                 self.request.class_link(VacationActivityCollection)
             ),
             Link(_("Billing"), self.request.link(self.model)),
-            Link(_("Adjustments"), '#')
+            Link(_("Manual Booking"), '#')
         )
 
 

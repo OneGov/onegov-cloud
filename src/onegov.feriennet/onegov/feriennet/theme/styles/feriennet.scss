@@ -194,7 +194,7 @@ ul.single-line {
     .new-notification::before { @include icon('\f003'); }
     .new-occasion::before { @include icon('\f133'); }
     .new-period::before { @include icon('\f055'); }
-    .new-adjustment::before { @include icon('\f1ec'); }
+    .new-booking::before { @include icon('\f1ec'); }
     .request-publication::before { @include icon('\f087'); }
     .reset-matching::before { @include icon('\f12d'); }
     .run-matching::before { @include icon('\f0d0'); }

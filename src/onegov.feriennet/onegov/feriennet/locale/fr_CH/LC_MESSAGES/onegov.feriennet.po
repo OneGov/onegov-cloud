@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-01-19 10:25+0100\n"
+"POT-Creation-Date: 2018-01-19 10:44+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -76,7 +76,7 @@ msgstr "Importer un relevé bancaire"
 msgid "Synchronise Online Payments"
 msgstr "Synchroniser les paiements en ligne"
 
-msgid "Adjustments"
+msgid "Manual Booking"
 msgstr ""
 
 msgid "Notification Templates"
@@ -84,6 +84,9 @@ msgstr "Modèles de notification"
 
 msgid "Submit Activity"
 msgstr "Soumettre l'activité"
+
+msgid "Accounting"
+msgstr ""
 
 msgid "New Notification Template"
 msgstr "Nouveau modèle de notification"
@@ -122,9 +125,6 @@ msgid ""
 msgstr ""
 "Il n'y a encore aucune période de définie. Il doit y avoir au moins une "
 "période définie avant que les occasions ne puissent être créées"
-
-msgid "Add"
-msgstr "Ajouter"
 
 #, python-format
 msgid "Do you really want to discard \"${title}\"?"
@@ -249,13 +249,13 @@ msgstr "Catégories"
 msgid "User"
 msgstr "Utilisateur"
 
-msgid "Description"
-msgstr ""
+msgid "Booking Text"
+msgstr "Message de réservation"
 
 msgid "Kind"
 msgstr ""
 
-msgid "Rebate"
+msgid "Discount"
 msgstr ""
 
 msgid "Surcharge"
@@ -351,6 +351,9 @@ msgstr "Début"
 
 msgid "End"
 msgstr "Fin"
+
+msgid "Add"
+msgstr "Ajouter"
 
 msgid "Remove"
 msgstr "Supprimer"
@@ -1058,9 +1061,6 @@ msgstr "Titulaire du compte"
 msgid "Reference Number"
 msgstr "Numéro de référence"
 
-msgid "Booking Text"
-msgstr "Message de réservation"
-
 msgid "Investigate"
 msgstr "Enquêter"
 
@@ -1614,7 +1614,7 @@ msgstr "Facture pour ${title}"
 msgid "Create Bills"
 msgstr "Générer des factures"
 
-msgid "Add Adjustment"
+msgid "Add manual booking"
 msgstr ""
 
 #, python-format
@@ -1633,11 +1633,11 @@ msgstr "Signalé comme payé"
 msgid "No transactions were found in the given file"
 msgstr "Aucune transaction n'a été trouvée dans le fichier donné"
 
-msgid "No adjustments were created"
+msgid "No manual bookings were created"
 msgstr ""
 
 #, python-format
-msgid "Created ${count} adjustments"
+msgid "Created ${count} manual bookings"
 msgstr ""
 
 msgid "Mark whole bill as unpaid"

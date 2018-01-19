@@ -29,7 +29,7 @@ class BillingForm(Form):
         return self.confirm.data == 'yes' and self.sure.data is True
 
 
-class AdjustmentForm(Form):
+class ManualBookingForm(Form):
 
     target = RadioField(
         label=_("Target"),
@@ -50,24 +50,24 @@ class AdjustmentForm(Form):
         depends_on=('target', 'for-user'),
     )
 
-    description = StringField(
-        label=_("Description"),
+    booking_text = StringField(
+        label=_("Booking Text"),
         validators=(InputRequired(), )
     )
 
     kind = RadioField(
         label=_("Kind"),
-        default='rebate',
+        default='discount',
         choices=(
-            ('rebate', _("Rebate")),
+            ('discount', _("Discount")),
             ('surcharge', _("Surcharge"))
         )
     )
 
-    rebate = DecimalField(
-        label=_("Rebate"),
+    discount = DecimalField(
+        label=_("Discount"),
         validators=(InputRequired(), ),
-        depends_on=('kind', 'rebate')
+        depends_on=('kind', 'discount')
     )
 
     surcharge = DecimalField(
@@ -78,8 +78,8 @@ class AdjustmentForm(Form):
 
     @property
     def amount(self):
-        if self.kind.data == 'rebate':
-            return -self.rebate.data
+        if self.kind.data == 'discount':
+            return -self.discount.data
         elif self.kind.data == 'surcharge':
             return self.surcharge.data
         else:
@@ -87,7 +87,7 @@ class AdjustmentForm(Form):
 
     @property
     def text(self):
-        return self.description.data
+        return self.booking_text.data
 
     @property
     def users(self):
