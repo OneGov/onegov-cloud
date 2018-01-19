@@ -46,108 +46,125 @@ def view_billing(self, request, form):
     # as quick as possible, which is why we only use one token
     csrf_token = request.new_csrf_token().decode('utf-8')
 
-    def insert_csrf(url):
+    def csrf_protected(url):
         return URL(url).query_param('csrf-token', csrf_token).as_string()
 
-    def invoice_actions(details):
-        return actions(
-            details.first,
-            details.paid,
-            details.discourage_changes,
-            details.disable_changes,
-            'invoice'
+    def as_link(action, traits):
+        traits = (
+            *(traits or tuple()),
+            Intercooler(request_method='POST')
         )
 
-    def item_actions(item):
-        return actions(
-            item,
-            item.paid,
-            item.changes == 'discouraged',
-            item.changes == 'impossible'
+        return Link(
+            action.text,
+            attrs={'class': action.action},
+            url=csrf_protected(request.link(action)),
+            traits=traits
         )
 
-    def actions(item, paid, discourage_changes, disable_changes,
-                extend_to=None):
-
-        if not self.period.finalized:
-            return
-
-        if paid:
-            action = 'mark-unpaid'
-            text = extend_to and\
-                _("Mark whole bill as unpaid") or\
-                _("Mark as unpaid")
-        else:
-            action = 'mark-paid'
-            text = extend_to and\
-                _("Mark whole bill as paid") or\
-                _("Mark as paid")
-
-        link_arguments = dict(
-            text=text,
-            url=insert_csrf(request.link(InvoiceAction(
-                session=session,
-                id=item.id,
-                action=action,
-                extend_to=extend_to
-            ))),
-            attrs={
-                'class': [action],
-            }
-        )
-
-        if not discourage_changes and not disable_changes:
-            yield Link(traits=(
-                Intercooler(request_method='POST'),
-            ), **link_arguments)
-        elif disable_changes:
-            yield Link(
-                traits=(
-                    Block(
-                        extend_to and
-                        _(
-                            "This bill or parts of it have been paid online. "
-                            "To change the state of the bill the payment "
-                            "needs to be charged back."
-                        ) or
-                        _(
-                            "This position has been paid online. To change "
-                            "the state of the position the payment needs to "
-                            "be charged back."
-                        )
-                    )
-                ),
-                **link_arguments
+    def invoice_links(details):
+        if details.disable_changes:
+            traits = (
+                Block(_(
+                    "This bill or parts of it have been paid online. "
+                    "To change the state of the bill the payment "
+                    "needs to be charged back."
+                )),
             )
 
-            if extend_to == 'invoice':
-                yield Link(
-                    _("Show online payments"),
-                    attrs={'class': 'show-online-payments'},
-                    url=request.class_link(
-                        InvoiceItem, {'id': item.id}, name='online-payments'
-                    )
-                )
-        elif discourage_changes:
             yield Link(
-                traits=(
-                    Confirm(
-                        extend_to and
-                        _(
-                            "This bill or parts of it have been confirmed by "
-                            "the bank, do you really want to change the "
-                            "payment status?"
-                        ) or
-                        _(
-                            "This position has been confirmed by the bank, do "
-                            "you really want to change the payment status?"
-                        ),
-                        None,
-                        text
-                    ),
-                    Intercooler(request_method='POST')
-                ),
-                **link_arguments
+                _("Show online payments"),
+                attrs={'class': 'show-online-payments'},
+                url=request.class_link(
+                    InvoiceItem, {'id': details.first.id},
+                    name='online-payments'
+                )
+            )
+
+        elif details.discourage_changes:
+            traits = (
+                Confirm(_(
+                    "This bill or parts of it have been confirmed by "
+                    "the bank, do you really want to change the "
+                    "payment status?"
+                )),
+            )
+        else:
+            traits = None
+
+        yield from (as_link(a, traits) for a in invoice_actions(details))
+
+    def item_links(item):
+        if item.changes == 'impossible':
+            traits = (
+                Block(_(
+                    "This bill or parts of it have been paid online. "
+                    "To change the state of the bill the payment "
+                    "needs to be charged back."
+                )),
+            )
+
+        elif item.changes == 'discouraged':
+            traits = (
+                Confirm(_(
+                    "This bill or parts of it have been confirmed by "
+                    "the bank, do you really want to change the "
+                    "payment status?"
+                )),
+            )
+        else:
+            traits = None
+
+        yield from (as_link(a, traits) for a in item_actions(item))
+
+    def invoice_actions(details):
+        if details.paid:
+            yield InvoiceAction(
+                session=session,
+                id=details.first.id,
+                action='mark-unpaid',
+                extend_to='invoice',
+                text=_("Mark whole bill as unpaid")
+            )
+        else:
+            yield InvoiceAction(
+                session=session,
+                id=details.first.id,
+                action='mark-paid',
+                extend_to='invoice',
+                text=_("Mark whole bill as paid")
+            )
+
+    def item_actions(item):
+        if item.paid:
+            yield InvoiceAction(
+                session=session,
+                id=item.id,
+                action='mark-unpaid',
+                text=_("Mark as unpaid")
+            )
+        else:
+            yield InvoiceAction(
+                session=session,
+                id=item.id,
+                action='mark-paid',
+                text=_("Mark as paid")
+            )
+
+        if item.family:
+            yield InvoiceAction(
+                session=session,
+                id=item.id,
+                action='remove-manual',
+                text=_("Remove manual booking")
+            )
+
+            yield InvoiceAction(
+                session=session,
+                id=item.id,
+                action='remove-manual',
+                extend_to='family',
+                text=_("Remove manual bookings of this kind")
             )
 
     return {
@@ -162,8 +179,8 @@ def view_billing(self, request, form):
         'form': form,
         'outstanding': self.outstanding,
         'button_text': _("Create Bills"),
-        'invoice_actions': invoice_actions,
-        'item_actions': item_actions
+        'invoice_links': invoice_links,
+        'item_links': item_links
     }
 
 

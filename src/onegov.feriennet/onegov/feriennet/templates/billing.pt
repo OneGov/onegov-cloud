@@ -35,7 +35,7 @@
                                 <tal:block i18n:name="amount" tal:replace="'{:.2f}'.format(details.outstanding * -1)" /> overpaid
                             </tal:block>
 
-                            <tal:block tal:define="actions tuple(invoice_actions(details))" tal:condition="actions">
+                            <tal:block tal:define="actions tuple(invoice_links(details))" tal:condition="actions">
                                 <tal:block
                                     define="
                                         action_id 'item-dropdown-{}'.format(details.id);
@@ -91,7 +91,7 @@
                                                     <i class="fa ${item.source == 'stripe_connect' and 'fa-credit-card' or 'fa-check-circle'}" aria-hidden="true"></i>
                                                 </td>
                                                 <td class="actions">
-                                                    <tal:block tal:define="actions tuple(item_actions(item))" tal:condition="actions">
+                                                    <tal:block tal:define="actions tuple(item_links(item))" tal:condition="actions">
                                                         <tal:block
                                                             define="
                                                                 action_id 'item-dropdown-{}-{}-{}'.format(details.id, groupid, repeat.item.index);
