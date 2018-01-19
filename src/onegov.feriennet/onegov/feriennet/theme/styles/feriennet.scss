@@ -1357,7 +1357,7 @@ ul.tags {
     }
 
     .f-dropdown {
-        max-width: 250px;
+        max-width: 300px;
     }
 
     table {
@@ -1474,6 +1474,16 @@ ul.tags {
 
     .show-online-payments::before {
         @include icon('\f283');
+        margin-right: 1ex;
+    }
+
+    .remove-manual::before {
+        @include icon('\f014');
+        margin-right: 1ex;
+    }
+
+    .remove-manual.extend-to-family::before {
+        @include icon('\f1f8');
         margin-right: 1ex;
     }
 

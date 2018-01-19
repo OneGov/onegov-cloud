@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-01-19 11:15+0100\n"
+"POT-Creation-Date: 2018-01-19 15:51+0100\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1610,12 +1610,6 @@ msgstr "${count} Zahlungen wurden importiert"
 msgid "No payments could be imported"
 msgstr "Es konnten keine Zahlungen importiert werden"
 
-msgid "Mark as unpaid"
-msgstr "Buchung als unbezahlt markieren"
-
-msgid "Mark as paid"
-msgstr "Buchung als bezahlt markieren"
-
 msgid "No transactions were found in the given file"
 msgstr "In der angegebenen Datei wurden keine Transaktionen gefunden"
 
@@ -1626,25 +1620,15 @@ msgstr "Es wurden keine manuellen Buchungen erstellt"
 msgid "Created ${count} manual bookings"
 msgstr "${count} manuelle Buchungen wurden erstellt"
 
-msgid "Mark whole bill as unpaid"
-msgstr "Rechnung als unbezahlt markieren"
-
-msgid "Mark whole bill as paid"
-msgstr "Rechnung als bezahlt markieren"
-
-msgid "Refund Payment"
-msgstr "Zahlung rückerstatten"
+msgid ""
+"This bill or parts of it have been paid online. To change the state of the "
+"bill the payment needs to be charged back."
+msgstr ""
+"Diese Rechnung oder Teile davon wurden online bezahlt. Um den Status zu "
+"ändern muss die Zahlung rückgebucht werden."
 
 msgid "Show online payments"
 msgstr "Online Zahlungen anzeigen"
-
-#, python-format
-msgid "Do you really want to refund ${amount}?"
-msgstr "Möchten Sie ${amount} wirklich rückerstatten?"
-
-#, python-format
-msgid "Refund ${amount}"
-msgstr "${amount} rückerstatten"
 
 msgid ""
 "This position has been paid online. To change the state of the position the "
@@ -1654,11 +1638,11 @@ msgstr ""
 "Zahlung rückgebucht werden."
 
 msgid ""
-"This bill or parts of it have been paid online. To change the state of the "
-"bill the payment needs to be charged back."
+"This bill or parts of it have been confirmed by the bank, do you really want "
+"to change the payment status?"
 msgstr ""
-"Diese Rechnung oder Teile davon wurden online bezahlt. Um den Status zu "
-"ändern muss die Zahlung rückgebucht werden."
+"Diese Rechnung oder Teile davon wurden von der Bank bestätigt. Möchten Sie "
+"den Zahlungsstatus wirklich ändern?"
 
 msgid ""
 "This position has been confirmed by the bank, do you really want to change "
@@ -1667,12 +1651,34 @@ msgstr ""
 "Diese Position wurde von der Bank bestätigt. Möchten Sie den Zahlungsstatus "
 "wirklich ändern?"
 
-msgid ""
-"This bill or parts of it have been confirmed by the bank, do you really want "
-"to change the payment status?"
-msgstr ""
-"Diese Rechnung oder Teile davon wurden von der Bank bestätigt. Möchten Sie "
-"den Zahlungsstatus wirklich ändern?"
+msgid "Mark whole bill as unpaid"
+msgstr "Rechnung als unbezahlt markieren"
+
+msgid "Mark whole bill as paid"
+msgstr "Rechnung als bezahlt markieren"
+
+msgid "Mark as unpaid"
+msgstr "Buchung als unbezahlt markieren"
+
+msgid "Mark as paid"
+msgstr "Buchung als bezahlt markieren"
+
+msgid "Remove manual booking"
+msgstr "Manuelle Buchung entfernen"
+
+msgid "Remove manual bookings of this kind"
+msgstr "Manuelle Buchungen dieser Art entfernen"
+
+msgid "Refund Payment"
+msgstr "Zahlung rückerstatten"
+
+#, python-format
+msgid "Do you really want to refund ${amount}?"
+msgstr "Möchten Sie ${amount} wirklich rückerstatten?"
+
+#, python-format
+msgid "Refund ${amount}"
+msgstr "${amount} rückerstatten"
 
 msgid "Enroll Attendee"
 msgstr "Teilnehmer anmelden"

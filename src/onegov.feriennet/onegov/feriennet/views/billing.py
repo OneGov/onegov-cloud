@@ -57,7 +57,7 @@ def view_billing(self, request, form):
 
         return Link(
             action.text,
-            attrs={'class': action.action},
+            attrs={'class': (action.action, f'extend-to-{action.extend_to}')},
             url=csrf_protected(request.link(action)),
             traits=traits
         )
@@ -104,18 +104,17 @@ def view_billing(self, request, form):
         if item.changes == 'impossible':
             traits = (
                 Block(_(
-                    "This bill or parts of it have been paid online. "
-                    "To change the state of the bill the payment "
-                    "needs to be charged back."
+                    "This position has been paid online. To change "
+                    "the state of the position the payment needs to "
+                    "be charged back."
                 )),
             )
 
         elif item.changes == 'discouraged':
             traits = (
                 Confirm(_(
-                    "This bill or parts of it have been confirmed by "
-                    "the bank, do you really want to change the "
-                    "payment status?"
+                    "This position has been confirmed by the bank, do "
+                    "you really want to change the payment status?"
                 )),
             )
         else:
@@ -268,10 +267,15 @@ def execute_invoice_action(self, request):
 
     @request.after
     def trigger_bill_update(response):
-        response.headers.add('X-IC-Trigger', 'reload-from')
-        response.headers.add('X-IC-Trigger-Data', json.dumps({
-            'selector': '#' + BillingDetails.invoice_id(self.item)
-        }))
+        if self.extend_to == 'family':
+            response.headers.add('X-IC-Redirect', request.class_link(
+                BillingCollection
+            ))
+        else:
+            response.headers.add('X-IC-Trigger', 'reload-from')
+            response.headers.add('X-IC-Trigger-Data', json.dumps({
+                'selector': '#' + BillingDetails.invoice_id(self.item)
+            }))
 
 
 @FeriennetApp.view(
