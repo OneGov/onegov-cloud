@@ -1477,60 +1477,44 @@ ul.tags {
         margin-right: 1ex;
     }
 
-    &.paid {
-        background-color: $green-pastel;
-        border: 1px solid $green-pastel;
+    @mixin payment-state-color($pastel, $light, $dark) {
+        background-color: $pastel;
+        border: 1px solid $pastel;
 
         > * {
-            color: $green-dark;
+            color: $dark;
         }
 
         button {
-            background-color: $green-light;
+            background-color: $light;
             color: $white;
-            outline: 1px solid $green-light;
+            outline: 1px solid $light;
         }
 
         button.toggled,
         button:hover {
-            background-color: $green-dark;
-            outline: 1px solid $green-dark;
+            background-color: $dark;
+            outline: 1px solid $dark;
         }
 
         .total td {
-            background-color: $green-pastel;
-            color: $green-dark;
+            background-color: $pastel;
+            color: $dark;
             font-size: 1rem;
             text-decoration: none;
         }
     }
 
+    &.paid {
+        @include payment-state-color($green-pastel, $green-light, $green-dark);
+    }
+
     &.unpaid {
-        background-color: $red-pastel;
-        border: 1px solid $red-pastel;
+        @include payment-state-color($red-pastel, $red-light, $red-dark);
+    }
 
-        > * {
-            color: $red-dark;
-        }
-
-        button {
-            background-color: $red-light;
-            color: $white;
-            outline: 1px solid $red-light;
-        }
-
-        button.toggled,
-        button:hover {
-            background-color: $red-dark;
-            outline: 1px solid $red-dark;
-        }
-
-        .total td {
-            background-color: $red-pastel;
-            color: $red-dark;
-            font-size: 1rem;
-            text-decoration: none;
-        }
+    &.overpaid {
+        @include payment-state-color($yellow-pastel, $yellow-light, $yellow-dark);
     }
 
     > .outstanding {

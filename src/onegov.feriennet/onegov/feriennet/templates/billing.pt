@@ -23,13 +23,16 @@
                 <tal:block condition="not: bills" i18n:translate>No bills created yet.</tal:block>
 
                 <div class="bills billing">
-                    <div class="bill ${details.paid and 'paid' or 'unpaid'}" id="${details.invoice_id}" tal:repeat="(username, details) bills.items()" data-reload-from="${request.link(model.for_username(username).for_expand(True))}" data-reload-from-selector=".bill">
+                    <div class="bill ${details.outstanding == 0 and 'paid'} ${details.outstanding > 0 and 'unpaid'} ${details.outstanding < 0 and 'overpaid'}" id="${details.invoice_id}" tal:repeat="(username, details) bills.items()" data-reload-from="${request.link(model.for_username(username).for_expand(True))}" data-reload-from-selector=".bill">
                         <h3>${details.title}</h3>
 
                         <strong class="outstanding">
-                            <tal:block condition="details.paid" i18n:translate>Paid</tal:block>
-                            <tal:block condition="not: details.paid" i18n:translate>
+                            <tal:block condition="details.outstanding == 0" i18n:translate>Paid</tal:block>
+                            <tal:block condition="details.outstanding > 0" i18n:translate>
                                 <tal:block i18n:name="amount" tal:replace="'{:.2f}'.format(details.outstanding)" /> unpaid
+                            </tal:block>
+                            <tal:block condition="details.outstanding < 0" i18n:translate>
+                                <tal:block i18n:name="amount" tal:replace="'{:.2f}'.format(details.outstanding * -1)" /> overpaid
                             </tal:block>
 
                             <tal:block tal:define="actions tuple(invoice_actions(details))" tal:condition="actions">

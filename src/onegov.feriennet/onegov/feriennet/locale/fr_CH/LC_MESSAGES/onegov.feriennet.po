@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-01-18 11:35+0100\n"
+"POT-Creation-Date: 2018-01-19 10:25+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -76,7 +76,7 @@ msgstr "Importer un relevé bancaire"
 msgid "Synchronise Online Payments"
 msgstr "Synchroniser les paiements en ligne"
 
-msgid "Rebate"
+msgid "Adjustments"
 msgstr ""
 
 msgid "Notification Templates"
@@ -84,9 +84,6 @@ msgstr "Modèles de notification"
 
 msgid "Submit Activity"
 msgstr "Soumettre l'activité"
-
-msgid "Add"
-msgstr "Ajouter"
 
 msgid "New Notification Template"
 msgstr "Nouveau modèle de notification"
@@ -125,6 +122,9 @@ msgid ""
 msgstr ""
 "Il n'y a encore aucune période de définie. Il doit y avoir au moins une "
 "période définie avant que les occasions ne puissent être créées"
+
+msgid "Add"
+msgstr "Ajouter"
 
 #, python-format
 msgid "Do you really want to discard \"${title}\"?"
@@ -250,6 +250,15 @@ msgid "User"
 msgstr "Utilisateur"
 
 msgid "Description"
+msgstr ""
+
+msgid "Kind"
+msgstr ""
+
+msgid "Rebate"
+msgstr ""
+
+msgid "Surcharge"
 msgstr ""
 
 msgid "All"
@@ -1457,7 +1466,7 @@ msgstr "Le montant total est de ${amount} CHF."
 msgid "The outstanding amount is ${amount} CHF."
 msgstr "Le montant impayé est de ${amount} CHF."
 
-msgid "Appendages"
+msgid "${amount} overpaid"
 msgstr ""
 
 msgid "Unpaid"
@@ -1605,7 +1614,7 @@ msgstr "Facture pour ${title}"
 msgid "Create Bills"
 msgstr "Générer des factures"
 
-msgid "Add Rebate"
+msgid "Add Adjustment"
 msgstr ""
 
 #, python-format
@@ -1623,6 +1632,13 @@ msgstr "Signalé comme payé"
 
 msgid "No transactions were found in the given file"
 msgstr "Aucune transaction n'a été trouvée dans le fichier donné"
+
+msgid "No adjustments were created"
+msgstr ""
+
+#, python-format
+msgid "Created ${count} adjustments"
+msgstr ""
 
 msgid "Mark whole bill as unpaid"
 msgstr "Signaler la facture entière comme impayée"
