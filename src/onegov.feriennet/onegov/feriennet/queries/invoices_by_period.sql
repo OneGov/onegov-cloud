@@ -36,9 +36,9 @@ totals AS (
     SELECT
         period_id,
         username,
-        every(paid) as paid,
-        greatest(sum(amount), 0.0) as amount,
-        greatest(sum(outstanding), 0.0) as outstanding,
+        sum(outstanding) >= 0 as paid,
+        sum(amount) as amount,
+        sum(outstanding) as outstanding,
         array_agg(distinct changes) as changes
     FROM
         details

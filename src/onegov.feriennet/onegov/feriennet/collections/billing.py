@@ -171,7 +171,7 @@ class BillingCollection(object):
                     text=text,
                     unit=amount,
                     quantity=1,
-                    paid=amount <= 0,
+                    paid=False,
                     family=family
                 ))
 
