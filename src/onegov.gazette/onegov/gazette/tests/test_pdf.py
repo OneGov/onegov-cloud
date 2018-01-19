@@ -118,7 +118,7 @@ def test_pdf_unfold_data(session):
     file = BytesIO()
     pdf = Pdf(file)
     pdf.init_a4_portrait()
-    pdf.unfold_data(session, '2017-40', data)
+    assert pdf.unfold_data(session, '2017-40', data, 1) == 15
 
     expected = [
         'title-1',
@@ -126,20 +126,20 @@ def test_pdf_unfold_data(session):
         '1', 'title-1-1-a', 'text-1-1-a',
         'title-1-1-1',
         'title-1-2',
-        '1', 'title-1-2-a', 'text-1-2-a',
-        '1', 'title-1-2-b', 'text-1-2-b',
-        '1', 'title-1-2-c', 'text-1-2-c',
-        '1', 'title-1-2-1-a', 'text-1-2-1-a',
-        '1', 'title-1-2-1-b', 'text-1-2-1-b',
+        '2', 'title-1-2-a', 'text-1-2-a',
+        '3', 'title-1-2-b', 'text-1-2-b',
+        '4', 'title-1-2-c', 'text-1-2-c',
+        '5', 'title-1-2-1-a', 'text-1-2-1-a',
+        '6', 'title-1-2-1-b', 'text-1-2-1-b',
         'title-2',
-        '1', 'title-2-a', 'text-2-a',
-        '1', 'title-2-1-a', 'text-2-1-a',
-        '1', 'title-2-2-a', 'text-2-2-a',
-        '1', 'title-2-3-a', 'text-2-3-a',
-        '1', 'title-3-a', 'text-3-a',
-        '1', 'title-3-b', 'text-3-b',
-        '1', 'title-3-c', 'text-3-c',
-        '1', 'title-3-d', 'text-3-d',
+        '7', 'title-2-a', 'text-2-a',
+        '8', 'title-2-1-a', 'text-2-1-a',
+        '9', 'title-2-2-a', 'text-2-2-a',
+        '10', 'title-2-3-a', 'text-2-3-a',
+        '11', 'title-3-a', 'text-3-a',
+        '12', 'title-3-b', 'text-3-b',
+        '13', 'title-3-c', 'text-3-c',
+        '14', 'title-3-d', 'text-3-d',
     ]
 
     story = []
@@ -246,18 +246,18 @@ def test_pdf_from_issue(gazette_app):
 
     with freeze_time("2017-01-01 12:00"):
         issue = session.query(Issue).filter_by(number=40).one()
-        file = Pdf.from_issue(issue, DummyRequest(session, principal))
+        file = Pdf.from_issue(issue, DummyRequest(session, principal), 5)
         reader = PdfFileReader(file)
         assert [page.extractText() for page in reader.pages] == [
             # page 1
             '© 2017 Govikon\n1\nGazette No. 40, 06.10.2017\n'
             'State Chancellery\n'
             'Complaints\n'
-            '1\n100-10\n2017-40-1, 2017-41-4\n'
-            '3\n100-10\n2017-40-3, 2017-41-2\n'
+            '5\n100-10\n2017-40-1, 2017-41-4\n'
+            '6\n100-10\n2017-40-3, 2017-41-2\n'
             'Civic Community\n'
             'Complaints\n'
-            '2\n200-10\n2017-40-2, 2017-41-3\n',
+            '7\n200-10\n2017-40-2, 2017-41-3\n',
             # page 2 (--a--)
             'Gazette No. 40, 06.10.2017\n© 2017 Govikon\n2\n',
             # page 3
@@ -265,7 +265,7 @@ def test_pdf_from_issue(gazette_app):
             'Churches\n'
             'Evangelical Reformed Parish\n'
             'Education\n'
-            '4\n410-11\n2017-40-4, 2017-41-1\n',
+            '8\n410-11\n2017-40-4, 2017-41-1\n',
             # page 4 (--c--)
             'Gazette No. 40, 06.10.2017\n© 2017 Govikon\n4\n',
             # page 5 (--d--)
@@ -273,18 +273,18 @@ def test_pdf_from_issue(gazette_app):
         ]
 
         issue = session.query(Issue).filter_by(number=41).one()
-        file = Pdf.from_issue(issue, DummyRequest(session, principal))
+        file = Pdf.from_issue(issue, DummyRequest(session, principal), 5)
         reader = PdfFileReader(file)
         assert [page.extractText() for page in reader.pages] == [
             # page 1
             '© 2017 Govikon\n1\nGazette No. 41, 13.10.2017\n'
             'State Chancellery\n'
             'Complaints\n'
-            '2\n100-10\n2017-40-3, 2017-41-2\n'
-            '4\n100-10\n2017-40-1, 2017-41-4\n'
+            '5\n100-10\n2017-40-3, 2017-41-2\n'
+            '6\n100-10\n2017-40-1, 2017-41-4\n'
             'Civic Community\n'
             'Complaints\n'
-            '3\n200-10\n2017-40-2, 2017-41-3\n',
+            '7\n200-10\n2017-40-2, 2017-41-3\n',
             # page 2 (--a--)
             'Gazette No. 41, 13.10.2017\n© 2017 Govikon\n2\n',
             # page 3
@@ -292,7 +292,7 @@ def test_pdf_from_issue(gazette_app):
             'Churches\n'
             'Evangelical Reformed Parish\n'
             'Education\n'
-            '1\n410-11\n2017-40-4, 2017-41-1\n',
+            '8\n410-11\n2017-40-4, 2017-41-1\n',
             # page 4 (--c--)
             'Gazette No. 41, 13.10.2017\n© 2017 Govikon\n4\n',
             # page 5 (--d--)
@@ -301,17 +301,17 @@ def test_pdf_from_issue(gazette_app):
             'Gazette No. 41, 13.10.2017\n© 2017 Govikon\n6\n'
             'Sikh Community\n'
             'Education\n'
-            '5\n420-11\n2017-41-5, 2017-42-1\n'
+            '9\n420-11\n2017-41-5, 2017-42-1\n'
         ]
 
     with freeze_time("2018-01-01 12:00"):
         issue = session.query(Issue).filter_by(number=42).one()
-        file = Pdf.from_issue(issue, DummyRequest(session, principal))
+        file = Pdf.from_issue(issue, DummyRequest(session, principal), 5)
         reader = PdfFileReader(file)
         assert [page.extractText() for page in reader.pages] == [
             '© 2018 Govikon\n1\nGazette No. 42, 20.10.2017\n'
             'Churches\n'
             'Sikh Community\n'
             'Education\n'
-            '1\n420-11\n2017-41-5, 2017-42-1\n'
+            '5\n420-11\n2017-41-5, 2017-42-1\n'
         ]

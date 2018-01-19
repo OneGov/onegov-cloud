@@ -52,9 +52,6 @@
                                             <a i18n:translate class="action-publish" href="${request.link(issue, 'publish')}">Publish</a>
                                         </li>
                                         <li>
-                                            <a i18n:translate class="action-generate" href="${request.link(issue, 'generate')}">Generate</a>
-                                        </li>
-                                        <li>
                                             <a i18n:translate class="action-delete" href="${request.link(issue, 'delete')}">Delete</a>
                                         </li>
                                     </ul>
@@ -94,9 +91,6 @@
                                         </li>
                                         <li>
                                             <a i18n:translate class="action-publish" href="${request.link(issue, 'publish')}">Publish</a>
-                                        </li>
-                                        <li>
-                                            <a i18n:translate class="action-generate" href="${request.link(issue, 'generate')}">Generate</a>
                                         </li>
                                         <li>
                                             <a i18n:translate class="action-delete" href="${request.link(issue, 'delete')}">Delete</a>

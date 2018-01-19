@@ -8,7 +8,6 @@ from onegov.gazette.forms import EmptyForm
 from onegov.gazette.forms import IssueForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import Issue
-from onegov.gazette.pdf import Pdf
 
 
 @GazetteApp.html(
@@ -163,8 +162,9 @@ def delete_issue(self, request, form):
 def publish_issue(self, request, form):
     """ Publish an issue.
 
-    If the issue has not already been published before, we redirect to the
-    PDF generation view afterwards.
+    This moves all accepted notices related to this issue to the published
+    state (if not already) and generates the PDF. The publication numbers are
+    assigned during PDF creation.
 
     This view is only visible by a publisher.
 
@@ -174,58 +174,50 @@ def publish_issue(self, request, form):
         request.message(
             _("There are submitted notices for this issue!"), 'warning'
         )
+    if self.pdf:
+        request.message(
+            _("A PDF already exists for this issue!"), 'warning'
+        )
+
+    old_numbers = self.publication_numbers()
+    if any(old_numbers.values()):
+        request.message(
+            _("There are already official notices with publication numbers!"),
+            'warning'
+        )
 
     layout = Layout(self, request)
     if form.submitted(request):
         self.publish(request)
-        request.message(_("All notices published."), 'success')
-        return redirect(request.link(self, name='generate'))
+        request.message(_("Issue published."), 'success')
 
-    return {
-        'layout': layout,
-        'form': form,
-        'title': self.name,
-        'subtitle': _("Publish all notices"),
-        'button_text': _("Publish"),
-        'cancel': layout.manage_issues_link,
-        'message': _(
-            (
-                'Do you really want to publish all notices of "${item}"? This '
-                'will assign the publication numbers for ${number} notice(s).'
-            ),
-            mapping={
-                'item': self.name,
-                'number': len(self.notices('accepted').all())
-            }
-        ),
-    }
+        new_numbers = self.publication_numbers()
+        if any(old_numbers.values()) and old_numbers != new_numbers:
+            request.message(
+                _(
+                    "The already assigned publication numbers have been "
+                    "changed. Recreating the following issues might be needed."
+                ), 'warning'
+            )
 
-
-@GazetteApp.form(
-    model=Issue,
-    name='generate',
-    template='form.pt',
-    permission=Private,
-    form=EmptyForm
-)
-def generate_issue(self, request, form):
-    """ Generates the PDF of the issue.
-
-    This view is only visible by a publisher.
-
-    """
-
-    layout = Layout(self, request)
-    if form.submitted(request):
-        self.pdf = Pdf.from_issue(self, request)
-        request.message(_("PDF generated."), 'success')
         return redirect(layout.manage_issues_link)
 
     return {
         'layout': layout,
         'form': form,
         'title': self.name,
-        'subtitle': _("Generate PDF"),
-        'button_text': _("Generate"),
+        'subtitle': _("Publish"),
+        'button_text': _("Publish"),
         'cancel': layout.manage_issues_link,
+        'message': _(
+            (
+                'Do you really want to publish "${item}"? This will assign '
+                'the publication numbers to the official notices and create '
+                'the PDF.'
+            ),
+            mapping={
+                'item': self.name,
+                'number': len(self.notices('accepted').all())
+            }
+        ),
     }

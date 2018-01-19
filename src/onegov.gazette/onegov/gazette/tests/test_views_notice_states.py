@@ -3,7 +3,6 @@ from onegov.gazette.tests import accept_notice
 from onegov.gazette.tests import change_category
 from onegov.gazette.tests import change_organization
 from onegov.gazette.tests import login_users
-from onegov.gazette.tests import publish_notice
 from onegov.gazette.tests import reject_notice
 from onegov.gazette.tests import submit_notice
 
@@ -203,33 +202,3 @@ def test_view_notice_accept(gazette_app):
         payload = message.get_payload(1).get_payload(decode=True)
         payload = payload.decode('utf-8')
         assert '44 xxx Titel 3' in payload
-
-
-def test_view_notice_publish(gazette_app):
-    admin, editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
-
-    with freeze_time("2017-11-01 11:00"):
-        # create a notice for each editor
-        for count, user in enumerate((editor_1, editor_2, editor_3)):
-            manage = user.get('/notices/drafted/new-notice')
-            manage.form['title'] = 'Titel {}'.format(count + 1)
-            manage.form['organization'] = '410'
-            manage.form['category'] = '11'
-            manage.form['issues'] = ['2017-44', '2017-45']
-            manage.form['text'] = "1. Oktober 2017"
-            manage.form.submit()
-            submit_notice(user, 'titel-{}'.format(count + 1))
-            accept_notice(publisher, 'titel-{}'.format(count + 1))
-
-    with freeze_time("2017-11-01 15:00"):
-        # check if the notices can be published
-        for user, slug, forbidden in (
-            (editor_1, 'titel-1', True),
-            (editor_1, 'titel-2', True),
-            (editor_1, 'titel-3', True),
-            (editor_3, 'titel-3', True),
-            (publisher, 'titel-1', False),
-            (publisher, 'titel-2', False),
-            (publisher, 'titel-3', False),
-        ):
-            publish_notice(user, slug, forbidden=forbidden)

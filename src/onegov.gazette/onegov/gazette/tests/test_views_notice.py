@@ -2,12 +2,12 @@ from freezegun import freeze_time
 from onegov.gazette.tests import accept_notice
 from onegov.gazette.tests import edit_notice
 from onegov.gazette.tests import login_users
-from onegov.gazette.tests import publish_notice
+from onegov.gazette.tests import publish_issue
 from onegov.gazette.tests import reject_notice
 from onegov.gazette.tests import submit_notice
 
 
-def test_view_notice1(gazette_app):
+def test_view_notice(gazette_app):
     # Check if the details of the notice is displayed correctly in the
     # display view (that is: organization, owner, group etc).
 
@@ -57,15 +57,14 @@ def test_view_notice1(gazette_app):
         accept_notice(publisher, 'titel-1')
         accept_notice(publisher, 'titel-2')
         accept_notice(publisher, 'titel-3')
-        publish_notice(publisher, 'titel-1')
-        publish_notice(publisher, 'titel-2')
-        publish_notice(publisher, 'titel-3')
+        publish_issue(publisher, '2017-44')
+        publish_issue(publisher, '2017-45')
 
-        for number in range(3):
+        for number in range(1, 4):
             for user in (editor_1, editor_2, editor_3, publisher):
-                view = user.get('/notice/titel-{}'.format(number + 1))
-                assert "Nr. 44, 03.11.2017 / {}".format(2 * number + 1) in view
-                assert "Nr. 45, 10.11.2017 / {}".format(2 * number + 2) in view
+                view = user.get('/notice/titel-{}'.format(number))
+                assert "Nr. 44, 03.11.2017 / {}".format(number) in view
+                assert "Nr. 45, 10.11.2017 / {}".format(number + 3) in view
 
 
 def test_view_notice_actions(gazette_app):
@@ -95,8 +94,7 @@ def test_view_notice_actions(gazette_app):
             'd': 'action-delete',
             's': 'action-submit',
             'a': 'action-accept',
-            'r': 'action-reject',
-            'x': 'action-publish'
+            'r': 'action-reject'
         }
 
         def check(values):
@@ -199,14 +197,14 @@ def test_view_notice_actions(gazette_app):
         accept_notice(publisher, 'titel-4')
 
         check((
-            (admin, 'titel-1', 'ptedcx'),
-            (admin, 'titel-2', 'ptedcx'),
-            (admin, 'titel-3', 'ptedcx'),
-            (admin, 'titel-4', 'ptedcx'),
-            (publisher, 'titel-1', 'pcx'),
-            (publisher, 'titel-2', 'pcx'),
-            (publisher, 'titel-3', 'pcx'),
-            (publisher, 'titel-4', 'pcx'),
+            (admin, 'titel-1', 'ptedc'),
+            (admin, 'titel-2', 'ptedc'),
+            (admin, 'titel-3', 'ptedc'),
+            (admin, 'titel-4', 'ptedc'),
+            (publisher, 'titel-1', 'pc'),
+            (publisher, 'titel-2', 'pc'),
+            (publisher, 'titel-3', 'pc'),
+            (publisher, 'titel-4', 'pc'),
             (editor_1, 'titel-1', 'pc'),
             (editor_1, 'titel-2', 'pc'),
             (editor_1, 'titel-3', 'pc'),
@@ -222,10 +220,7 @@ def test_view_notice_actions(gazette_app):
         ))
 
         # ... when published
-        publish_notice(publisher, 'titel-1')
-        publish_notice(publisher, 'titel-2')
-        publish_notice(publisher, 'titel-3')
-        publish_notice(publisher, 'titel-4')
+        publish_issue(publisher, '2017-44')
         check((
             (admin, 'titel-1', 'ptec'),
             (admin, 'titel-2', 'ptec'),
@@ -358,7 +353,7 @@ def test_view_notice_delete(gazette_app):
 
         submit_notice(editor_1, 'erneuerungswahlen')
         accept_notice(publisher, 'erneuerungswahlen')
-        publish_notice(publisher, 'erneuerungswahlen')
+        publish_issue(publisher, '2017-44')
 
         for user in (admin, editor_1, publisher):
             manage = user.get('/notice/erneuerungswahlen/delete')
@@ -393,7 +388,7 @@ def test_view_notice_changelog(gazette_app):
         accept_notice(publisher, 'erneuerungswahlen')
 
     with freeze_time("2017-11-01 16:00"):
-        publish_notice(publisher, 'erneuerungswahlen')
+        publish_issue(publisher, '2017-44')
 
     view = editor_1.get('/notice/erneuerungswahlen')
 

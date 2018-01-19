@@ -193,23 +193,112 @@ def test_view_issues_publish(gazette_app):
 
         # publish 44
         manage = client.get('/issues').click('Veröffentlichen', index=0)
-        assert "Publikationsnummern für 1 Meldung(en) vergeben." in manage
-        manage.form.submit()
+        manage = manage.form.submit().maybe_follow()
+        assert "Ausgabe veröffentlicht." in manage
+        assert "2017-44.pdf" in manage
+
+        manage = manage.click('2017-44.pdf')
+        assert manage.content_type == 'application/pdf'
+        reader = PdfFileReader(BytesIO(manage.body))
+        text = ''.join([page.extractText() for page in reader.pages])
+        assert text == (
+            '© 2017 Govikon\n'
+            '1\nAmtsblatt Nr. 44, 03.11.2017\n'
+            'Civic Community\n'
+            'Commercial Register\n'
+            '1\nnotice-0\n'
+            'Text\n'
+        )
+
+        notice_0 = client.get('/notice/notice-0')
+        notice_1 = client.get('/notice/notice-1')
+        notice_2 = client.get('/notice/notice-2')
+        assert '<li>Nr. 44, 03.11.2017 / 1</li>' in notice_0
+        assert '<li>Nr. 45, 10.11.2017</li>' in notice_0
+        assert '<li>Nr. 45, 10.11.2017</li>' in notice_1
+        assert '<li>Nr. 46, 17.11.2017</li>' in notice_1
+        assert '<li>Nr. 45, 10.11.2017</li>' in notice_2
+
+        # publish 46
+        manage = client.get('/issues').click('Veröffentlichen', index=2)
+        manage = manage.form.submit().maybe_follow()
+        assert "Ausgabe veröffentlicht." in manage
+        assert "2017-46.pdf" in manage
+
+        manage = manage.click('2017-46.pdf')
+        assert manage.content_type == 'application/pdf'
+        reader = PdfFileReader(BytesIO(manage.body))
+        text = ''.join([page.extractText() for page in reader.pages])
+        assert text == (
+            '© 2017 Govikon\n'
+            '1\nAmtsblatt Nr. 46, 17.11.2017\n'
+            'Civic Community\n'
+            'Commercial Register\n'
+            '2\nnotice-1\n'
+            'Text\n'
+        )
+
+        notice_0 = client.get('/notice/notice-0')
+        notice_1 = client.get('/notice/notice-1')
+        notice_2 = client.get('/notice/notice-2')
+        assert '<li>Nr. 44, 03.11.2017 / 1</li>' in notice_0
+        assert '<li>Nr. 45, 10.11.2017</li>' in notice_0
+        assert '<li>Nr. 45, 10.11.2017</li>' in notice_1
+        assert '<li>Nr. 46, 17.11.2017 / 2</li>' in notice_1
+        assert '<li>Nr. 45, 10.11.2017</li>' in notice_2
+
+        # publish 45
+        manage = client.get('/issues').click('Veröffentlichen', index=1)
+        assert "Diese Ausgabe hat eingereichte Meldungen!" in manage
+        manage = manage.form.submit().maybe_follow()
+        assert "Ausgabe veröffentlicht." in manage
+        assert "2017-45.pdf" in manage
+
+        manage = manage.click('2017-45.pdf')
+        assert manage.content_type == 'application/pdf'
+        reader = PdfFileReader(BytesIO(manage.body))
+        text = ''.join([page.extractText() for page in reader.pages])
+        assert text == (
+            '© 2017 Govikon\n'
+            '1\nAmtsblatt Nr. 45, 10.11.2017\n'
+            'Civic Community\n'
+            'Commercial Register\n'
+            '2\nnotice-0\n'
+            'Text\n'
+            '3\nnotice-1\n'
+            'Text\n'
+        )
 
         notice_0 = client.get('/notice/notice-0')
         notice_1 = client.get('/notice/notice-1')
         notice_2 = client.get('/notice/notice-2')
         assert '<li>Nr. 44, 03.11.2017 / 1</li>' in notice_0
         assert '<li>Nr. 45, 10.11.2017 / 2</li>' in notice_0
-        assert '<li>Nr. 45, 10.11.2017</li>' in notice_1
-        assert '<li>Nr. 46, 17.11.2017</li>' in notice_1
-        assert '<li>Nr. 45, 10.11.2017</li>' in notice_2
+        assert '<li>Nr. 45, 10.11.2017 / 3</li>' in notice_1
+        assert '<li>Nr. 46, 17.11.2017 / 2</li>' in notice_1
+        assert '<li>Nr. 45, 10.11.2017</li>' in notice_2  # submitted
 
-        # publish 45
-        manage = client.get('/issues').click('Veröffentlichen', index=1)
-        assert "Diese Ausgabe hat eingereichte Meldungen!" in manage
-        assert "Publikationsnummern für 1 Meldung(en) vergeben." in manage
-        manage.form.submit()
+        # re-publish 46
+        manage = client.get('/issues').click('Veröffentlichen', index=2)
+        assert "Diese Ausgabe hat bereits ein PDF!" in manage
+        assert "Diese Ausgabe hat bereits Publikationsnummern!" in manage
+        manage = manage.form.submit().maybe_follow()
+        assert "Ausgabe veröffentlicht." in manage
+        assert "2017-46.pdf" in manage
+        assert "Publikationsnummern haben geändert" in manage
+
+        manage = manage.click('2017-46.pdf')
+        assert manage.content_type == 'application/pdf'
+        reader = PdfFileReader(BytesIO(manage.body))
+        text = ''.join([page.extractText() for page in reader.pages])
+        assert text == (
+            '© 2017 Govikon\n'
+            '1\nAmtsblatt Nr. 46, 17.11.2017\n'
+            'Civic Community\n'
+            'Commercial Register\n'
+            '4\nnotice-1\n'
+            'Text\n'
+        )
 
         notice_0 = client.get('/notice/notice-0')
         notice_1 = client.get('/notice/notice-1')
@@ -218,79 +307,4 @@ def test_view_issues_publish(gazette_app):
         assert '<li>Nr. 45, 10.11.2017 / 2</li>' in notice_0
         assert '<li>Nr. 45, 10.11.2017 / 3</li>' in notice_1
         assert '<li>Nr. 46, 17.11.2017 / 4</li>' in notice_1
-        assert '<li>Nr. 45, 10.11.2017</li>' in notice_2
-
-
-def test_view_issues_generate(gazette_app):
-    with freeze_time("2017-11-01 12:00"):
-        client = Client(gazette_app)
-        login_publisher(client)
-
-        # add a notice
-        manage = client.get('/notices/drafted/new-notice')
-        manage.form['title'] = 'First notice'
-        manage.form['organization'] = '200'
-        manage.form['category'] = '13'
-        manage.form['issues'] = ['2017-44']
-        manage.form['text'] = 'This is the first notice'
-        manage = manage.form.submit()
-
-        client.get('/notice/first-notice/submit').form.submit()
-        client.get('/notice/first-notice/accept').form.submit()
-        client.get('/notice/first-notice/publish').form.submit()
-
-        # generate 44
-        manage = client.get('/issues').click('Erzeugen', index=0)
-        manage = manage.form.submit().maybe_follow()
-        assert "PDF erstellt." in manage
-        assert "2017-44.pdf" in manage
-
-        manage = manage.click('2017-44.pdf')
-        assert manage.content_type == 'application/pdf'
-
-        reader = PdfFileReader(BytesIO(manage.body))
-        text = ''.join([page.extractText() for page in reader.pages])
-        assert text == (
-            '© 2017 Govikon\n'
-            '1\nAmtsblatt Nr. 44, 03.11.2017\n'
-            'Civic Community\n'
-            'Commercial Register\n'
-            '1\nFirst notice\n'
-            'This is the first notice\n'
-        )
-
-        # add another notice
-        manage = client.get('/notices/drafted/new-notice')
-        manage.form['title'] = 'Second notice'
-        manage.form['organization'] = '100'
-        manage.form['category'] = '11'
-        manage.form['issues'] = ['2017-44']
-        manage.form['text'] = 'This is the second notice'
-        manage = manage.form.submit()
-
-        client.get('/notice/second-notice/submit').form.submit()
-        client.get('/notice/second-notice/accept').form.submit()
-        client.get('/notice/second-notice/publish').form.submit()
-
-        # generate again
-        manage = client.get('/issues').click('Erzeugen', index=0)
-        manage = manage.form.submit().maybe_follow()
-        assert "PDF erstellt." in manage
-
-        manage = manage.click('2017-44.pdf')
-        assert manage.content_type == 'application/pdf'
-
-        reader = PdfFileReader(BytesIO(manage.body))
-        text = ''.join([page.extractText() for page in reader.pages])
-        assert text == (
-            '© 2017 Govikon\n'
-            '1\nAmtsblatt Nr. 44, 03.11.2017\n'
-            'State Chancellery\n'
-            'Education\n'
-            '2\nSecond notice\n'
-            'This is the second notice\n'
-            'Civic Community\n'
-            'Commercial Register\n'
-            '1\nFirst notice\n'
-            'This is the first notice\n'
-        )
+        assert '<li>Nr. 45, 10.11.2017</li>' in notice_2  # submitted

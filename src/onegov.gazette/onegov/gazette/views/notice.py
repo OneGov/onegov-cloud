@@ -57,7 +57,6 @@ def view_notice(self, request):
         'edit_un': _action(_("Edit"), 'edit_unrestricted', 'secondary'),
         'edit': _action(_("Edit"), 'edit', 'secondary'),
         'preview': _action(_("Preview"), 'preview', 'secondary', '_blank'),
-        'publish': _action(_("Publish"), 'publish', 'primary'),
         'reject': _action(_("Reject"), 'reject', 'alert right'),
         'submit': _action(_("Submit"), 'submit', 'primary'),
     }
@@ -79,8 +78,6 @@ def view_notice(self, request):
         if admin:
             actions.append(action['delete'])
     elif self.state == 'accepted':
-        if publisher:
-            actions.append(action['publish'])
         actions.append(action['copy'])
         if admin:
             actions.append(action['edit_un'])

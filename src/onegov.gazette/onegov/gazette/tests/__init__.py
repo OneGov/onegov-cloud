@@ -98,18 +98,6 @@ def reject_notice(user, slug, unable=False, forbidden=False):
         assert "Meldung zurückgewiesen" in manage.maybe_follow()
 
 
-def publish_notice(user, slug, unable=False, forbidden=False):
-    url = '/notice/{}/publish'.format(slug)
-    if unable:
-        assert not user.get(url).forms
-    elif forbidden:
-        assert user.get(url, status=403)
-    else:
-        manage = user.get(url)
-        manage = manage.form.submit()
-        assert "Meldung veröffentlicht" in manage.maybe_follow()
-
-
 def edit_notice(user, slug, unable=False, forbidden=False, **kwargs):
     url = '/notice/{}/edit'.format(slug)
     if unable:
@@ -161,3 +149,15 @@ def change_organization(gazette_app, name, **kwargs):
     for key, value in kwargs.items():
         manage.form[key] = value
     manage.form.submit()
+
+
+def publish_issue(user, slug, unable=False, forbidden=False, **kwargs):
+    url = '/issue/{}/publish'.format(slug)
+    if unable:
+        assert not user.get(url).forms
+    elif forbidden:
+        assert user.get(url, status=403)
+    else:
+        manage = user.get(url)
+        manage = manage.form.submit()
+        assert "Ausgabe veröffentlicht" in manage.maybe_follow()

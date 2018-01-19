@@ -83,9 +83,9 @@ def get_issues(app):
     return IssueCollection(app.session())
 
 
-@GazetteApp.path(model=Issue, path='/issue/{id}')
-def get_issue(app, id):
-    return IssueCollection(app.session()).by_id(id)
+@GazetteApp.path(model=Issue, path='/issue/{name}')
+def get_issue(app, name):
+    return IssueCollection(app.session()).by_name(name)
 
 
 @GazetteApp.path(model=IssuePdfFile, path='/pdf/{name}')

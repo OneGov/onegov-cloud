@@ -201,30 +201,15 @@ class GazetteNotice(
         super(GazetteNotice, self).accept()
         self.add_change(request, _("accepted"))
 
-    def publish(self, request, publication_numbers=None):
+    def publish(self, request):
         """ Publish an accepted notice.
 
-        This automatically adds en entry to the changelog and assigns the
-        publication numbers.
-
-        Returns the updated publications numbers to allow batch-publishing.
+        This automatically adds en entry to the changelog.
 
         """
 
-        if not publication_numbers:
-            session = request.app.session()
-            publication_numbers = Issue.publication_numbers(session)
-
-        issues = dict(self.issues)
-        for issue in self.issue_objects:
-            publication_numbers[issue.date.year] += 1
-            issues[issue.name] = str(publication_numbers[issue.date.year])
-        self._issues = issues
-
         super(GazetteNotice, self).publish()
         self.add_change(request, _("published"))
-
-        return publication_numbers
 
     @property
     def rejected_comment(self):
@@ -260,6 +245,12 @@ class GazetteNotice(
             query = query.order_by(Issue.date)
             return query.all()
         return []
+
+    def set_publication_number(self, issue, number):
+        assert issue in self.issues
+        issues = dict(self.issues)
+        issues[issue] = str(number)
+        self._issues = issues
 
     @property
     def category_id(self):

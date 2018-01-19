@@ -56,7 +56,7 @@ class Pdf(PdfBase):
         else:
             getattr(self, 'h{}'.format(min(level, 4)))(title)
 
-    def unfold_data(self, session, issue, data, level=1):
+    def unfold_data(self, session, issue, data, publication_number, level=1):
         """ Take a nested list of dicts and add it. """
 
         for item in data:
@@ -68,6 +68,8 @@ class Pdf(PdfBase):
             notices = item.get('notices', [])
             for id_ in notices:
                 notice = session.query(GazetteNotice).filter_by(id=id_).one()
+                notice.set_publication_number(issue, publication_number)
+                publication_number = publication_number + 1
                 self.table(
                     [[
                         MarkupParagraph(
@@ -85,10 +87,14 @@ class Pdf(PdfBase):
 
             children = item.get('children', [])
             if children:
-                self.unfold_data(session, issue, children, level + 1)
+                publication_number = self.unfold_data(
+                    session, issue, children, publication_number, level + 1
+                )
 
             if item.get('break_after', False):
                 self.pagebreak()
+
+        return publication_number
 
     @staticmethod
     def query_notices(session, issue, organization, category):
@@ -107,13 +113,18 @@ class Pdf(PdfBase):
             GazetteNotice._categories.has_key(category)
         )
         notices = notices.order_by(
-            GazetteNotice._issues[issue]
+            GazetteNotice._issues[issue],
+            GazetteNotice.title
         )
         return [notice[0] for notice in notices]
 
     @classmethod
-    def from_issue(cls, issue, request, file=None):
-        """ Generate a PDF for one issue. """
+    def from_issue(cls, issue, request, first_publication_number):
+        """ Generate a PDF for one issue.
+
+        Uses the given number as a starting point for the publication numbers.
+
+        """
 
         # Collect the data
         data = []
@@ -125,14 +136,14 @@ class Pdf(PdfBase):
             GazetteNotice._issues.has_key(issue.name),  # noqa
             GazetteNotice.state == 'published',
         )
-        used_categories = [cat[0][0] for cat in used_categories]
+        used_categories = [c[0][0] for c in used_categories if c[0]]
 
         used_organizations = session.query(GazetteNotice._organizations.keys())
         used_organizations = used_organizations.filter(
             GazetteNotice._issues.has_key(issue.name),  # noqa
             GazetteNotice.state == 'published',
         )
-        used_organizations = [cat[0][0] for cat in used_organizations]
+        used_organizations = [o[0][0] for o in used_organizations if o[0]]
 
         if used_categories and used_organizations:
             categories = session.query(Category)
@@ -187,7 +198,7 @@ class Pdf(PdfBase):
             layout.format_issue(issue, date_format='date')
         )
 
-        file = file or BytesIO()
+        file = BytesIO()
         pdf = cls(
             file,
             title=title,
@@ -198,7 +209,7 @@ class Pdf(PdfBase):
             page_fn_later=page_fn_header_and_footer
         )
         pdf.h(title)
-        pdf.unfold_data(session, issue.name, data)
+        pdf.unfold_data(session, issue.name, data, first_publication_number)
         pdf.generate()
 
         file.seek(0)

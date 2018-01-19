@@ -34,10 +34,11 @@ def test_view_archive(gazette_app):
         login_publisher(publisher)
 
         # generate past issues
-        for idx in range(13, 9, -1):
-            manage = publisher.get('/issues').click('Erzeugen', index=idx)
+        for index in range(13, 9, -1):
+            manage = publisher.get('/issues')
+            manage = manage.click('Veröffentlichen', index=index)
             manage = manage.form.submit().maybe_follow()
-            assert "PDF erstellt." in manage
+            assert "Ausgabe veröffentlicht." in manage
 
         archive = client.get('/').maybe_follow()
         assert "<h2>2017</h2>" in archive
@@ -58,10 +59,11 @@ def test_view_archive(gazette_app):
         ]
 
         # publish the generate
-        for idx in range(0, 10):
-            manage = publisher.get('/issues').click('Erzeugen', index=idx)
+        for index in range(0, 10):
+            manage = publisher.get('/issues')
+            manage = manage.click('Veröffentlichen', index=index)
             manage = manage.form.submit().maybe_follow()
-            assert "PDF erstellt." in manage
+            assert "Ausgabe veröffentlicht." in manage
 
         archive = client.get('/').maybe_follow()
         assert "<h2>2017</h2>" in archive

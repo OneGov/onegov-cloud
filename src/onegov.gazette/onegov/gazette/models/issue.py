@@ -86,30 +86,42 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
 
         return notices
 
-    @staticmethod
-    def publication_numbers(session):
-        """ Returns the current publication numbers by year. """
+    @property
+    def first_publication_number(self):
+        """ Returns the first publication number of this issue based on the
+        last issue of the same year. """
 
         from onegov.gazette.models.notice import GazetteNotice  # circular
-        from onegov.gazette.collections.issues import IssueCollection  # circ.
 
-        result = {}
+        session = object_session(self)
 
-        for year in IssueCollection(session).years:
-            numbers = []
+        issues = session.query(Issue.name)
+        issues = issues.filter(extract('year', Issue.date) == self.date.year)
+        issues = issues.filter(Issue.date < self.date)
+        issues = [issue[0] for issue in issues]
+        if not issues:
+            return 1
 
-            issues = session.query(Issue.name)
-            issues = issues.filter(extract('year', Issue.date) == year)
-            for issue in issues:
-                numbers.extend([
-                    x[0] for x in session.query(GazetteNotice._issues[issue])
-                    if x[0]
-                ])
-            numbers = [int(number) for number in numbers]
+        numbers = []
+        for issue in issues:
+            query = session.query(GazetteNotice._issues[issue])
+            query = query.filter(GazetteNotice._issues.has_key(issue))  # noqa
+            numbers.extend([int(x[0]) for x in query if x[0]])
+        return max(numbers) + 1 if numbers else 1
 
-            result[year] = max(numbers) if numbers else 0
+    def publication_numbers(self, state=None):
+        """ Returns a dictionary containing all publication numbers (by notice)
+        of this issue.
 
-        return result
+        """
+
+        from onegov.gazette.models.notice import GazetteNotice  # circular
+
+        query = self.notices(state).with_entities(
+            GazetteNotice.id,
+            GazetteNotice._issues[self.name]
+        )
+        return dict(query)
 
     @property
     def in_use(self):
@@ -144,11 +156,17 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
             notice.first_issue = min(dates)
 
     def publish(self, request):
-        """ Ensures that every accepted notice of this issue has been
-        published.
+        """ Publishes the issue.
+
+        This ensures that every accepted notice of this issue is published. It
+        then creates the PDF while assigning the publications numbers (it uses
+        the highest publication number of the last issue of the same year as a
+        starting point.
 
         """
 
-        publication_numbers = None
         for notice in self.notices('accepted'):
-            publication_numbers = notice.publish(request, publication_numbers)
+            notice.publish(request)
+
+        from onegov.gazette.pdf import Pdf  # circular
+        self.pdf = Pdf.from_issue(self, request, self.first_publication_number)
