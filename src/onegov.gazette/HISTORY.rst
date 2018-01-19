@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.13.4 (2018-01-19)
+~~~~~~~~~~~~~~~~~~~
 
 - Assigns publication numbers when publishing the issue.
   [msom]
