@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-01-19 10:44+0100\n"
+"POT-Creation-Date: 2018-01-19 11:15+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1359,6 +1359,9 @@ msgstr "${amount} non payés"
 
 msgid "Show Details"
 msgstr "Afficher les détails"
+
+msgid "Discounts / Surcharges"
+msgstr ""
 
 msgid "Total"
 msgstr "Total"

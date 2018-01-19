@@ -27,7 +27,8 @@
                         <ul>
                             <tal:block repeat="(group, groupitems) details.items.items()">
                                 <li class="item-group">
-                                    <strong>${group}</strong>
+                                    <strong tal:condition="group != 'manual'">${group}</strong>
+                                    <strong tal:condition="group == 'manual'" i18n:translate>Discounts / Surcharges</strong>
                                 </li>
                                 <li tal:repeat="item groupitems" class="${item.paid and 'paid' or 'unpaid'} ${item.source and item.source or ''}">
                                     <span class="item-text">${item.text}</span>
