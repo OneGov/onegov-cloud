@@ -736,6 +736,7 @@ form {
     /*
         Some fields need extra margins
     */
+    .field-type-booleanfield + .clearfix,
     .field-type-booleanfield:last-of-type > div {
         margin-bottom: .75rem;
     }

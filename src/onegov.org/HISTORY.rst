@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes links wrongly transforming class attributes.
+  [href]
+
 - Adds the ability to categorise users into tags and to filter them by it.
   [href]
 

@@ -96,7 +96,8 @@ class Element(object):
             self.attrs['class'].update(extra_classes)
 
         if self.attrs['class']:
-            self.attrs['class'] = ' '.join(self.attrs['class'])
+            if not isinstance(self.attrs['class'], str):
+                self.attrs['class'] = ' '.join(self.attrs['class'])
         else:
             del self.attrs['class']
 
