@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.20.2 (2018-01-22)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes links wrongly transforming class attributes.
   [href]
 
