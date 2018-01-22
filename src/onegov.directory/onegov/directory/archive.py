@@ -249,8 +249,13 @@ class DirectoryArchiveWriter(object):
             data = OrderedDict(as_tuples(entry))
 
             coordinates = entry.content.get('coordinates', {})
-            data['Latitude'] = coordinates.get('lat')
-            data['Longitude'] = coordinates.get('lon')
+
+            if isinstance(coordinates, dict):
+                data['Latitude'] = coordinates.get('lat')
+                data['Longitude'] = coordinates.get('lon')
+            else:
+                data['Latitude'] = coordinates.lat
+                data['Longitude'] = coordinates.lon
 
             return data
 

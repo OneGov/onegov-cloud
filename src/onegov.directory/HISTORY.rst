@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes coordinates export.
+  [href]
+
 0.1.2 (2018-01-04)
 ~~~~~~~~~~~~~~~~~~~~~
 
