@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.3 (2018-01-22)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Fixes coordinates export.
   [href]
 
