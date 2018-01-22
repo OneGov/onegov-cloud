@@ -57,7 +57,7 @@ def view_billing(self, request, form):
 
         return Link(
             action.text,
-            attrs={'class': (action.action, f'extend-to-{action.extend_to}')},
+            attrs={'class': action.action},
             url=csrf_protected(request.link(action)),
             traits=traits
         )
@@ -162,14 +162,6 @@ def view_billing(self, request, form):
                 id=item.id,
                 action='remove-manual',
                 text=_("Remove manual booking")
-            )
-
-            yield InvoiceAction(
-                session=session,
-                id=item.id,
-                action='remove-manual',
-                extend_to='family',
-                text=_("Remove manual bookings of this kind")
             )
 
     return {

@@ -195,6 +195,7 @@ ul.single-line {
     .new-occasion::before { @include icon('\f133'); }
     .new-period::before { @include icon('\f055'); }
     .new-booking::before { @include icon('\f1ec'); }
+    .remove-manual::before { @include icon('\f014'); }
     .request-publication::before { @include icon('\f087'); }
     .reset-matching::before { @include icon('\f12d'); }
     .run-matching::before { @include icon('\f0d0'); }
@@ -1322,6 +1323,10 @@ ul.tags {
 /*
     Billing View
 */
+#page-billing .f-dropdown {
+    max-width: 350px;
+}
+
 .billing {
     .bill {
         > button:not(.ic-use-transition) {
@@ -1354,10 +1359,6 @@ ul.tags {
         right: 0;
         top: 0;
         width: 40px;
-    }
-
-    .f-dropdown {
-        max-width: 300px;
     }
 
     table {

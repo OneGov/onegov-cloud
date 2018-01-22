@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-01-19 15:51+0100\n"
+"POT-Creation-Date: 2018-01-22 09:39+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -46,6 +46,10 @@ msgstr "Exportations"
 
 msgid "Bookings"
 msgstr "Réservations"
+
+#, python-format
+msgid "Delete \"${text}\" (${count} entries)"
+msgstr ""
 
 msgid "Homepage"
 msgstr "Page d'accueil"
@@ -93,6 +97,25 @@ msgstr "Nouveau modèle de notification"
 
 msgid "Edit Activity"
 msgstr "Modifier l'activité"
+
+msgid ""
+"This booking cannot be removed, at least one booking has been paid online."
+msgstr ""
+
+msgid "You may remove the bookings manually one by one."
+msgstr ""
+
+#, python-format
+msgid "Do you really want to remove \"${text}\"?"
+msgstr ""
+
+#, python-format
+msgid "${count} bookings will be removed"
+msgstr ""
+
+#, python-format
+msgid "Remove ${count} bookings"
+msgstr ""
 
 #, python-format
 msgid "Do you really want to provide \"${title}\" again?"
@@ -1681,9 +1704,6 @@ msgid "Mark as paid"
 msgstr "Signalé comme payé"
 
 msgid "Remove manual booking"
-msgstr ""
-
-msgid "Remove manual bookings of this kind"
 msgstr ""
 
 msgid "Refund Payment"

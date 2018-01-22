@@ -6,7 +6,7 @@ from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.const import OWNER_EDITABLE_STATES
-from onegov.feriennet.models import VacationActivity
+from onegov.feriennet.models import InvoiceAction, VacationActivity
 from onegov.org.new_elements import Link, Confirm, Intercooler, Block
 from onegov.org.new_elements import LinkGroup
 from onegov.org.layout import DefaultLayout as BaseLayout
@@ -378,6 +378,83 @@ class MatchCollectionLayout(DefaultLayout):
 
 class BillingCollectionLayout(DefaultLayout):
 
+    @property
+    def families(self):
+        yield from self.app.session().execute("""
+            SELECT
+                text
+                    || ' ('
+                    || replace(avg(unit * quantity)::money::text, '$', '')
+                    || ' CHF)'
+                AS text
+                ,
+                MIN(id::text) AS item,
+                COUNT(*) AS count,
+                family IN (
+                    SELECT DISTINCT(family)
+                    FROM invoice_items
+                    WHERE source IS NOT NULL and source != 'xml'
+                ) AS has_online_payments,
+                family IN (
+                    SELECT DISTINCT(family)
+                    FROM invoice_items
+                    WHERE source = 'xml'
+                ) AS has_imported_payments
+            FROM invoice_items
+            WHERE family IS NOT NULL
+            GROUP BY family, text
+            ORDER BY text
+        """)
+
+    @property
+    def family_removal_links(self):
+        attrs = {
+            'class': ('remove-manual', 'extend-to-family')
+        }
+
+        for record in self.families:
+            text = _('Delete "${text}"', mapping={
+                'text': record.text,
+            })
+
+            url = self.csrf_protected_url(
+                self.request.class_link(InvoiceAction, {
+                    'id': record.item,
+                    'action': 'remove-manual',
+                    'extend_to': 'family'
+                })
+            )
+
+            if record.has_online_payments:
+                traits = (
+                    Block(
+                        _(
+                            "This booking cannot be removed, at least one "
+                            "booking has been paid online."
+                        ),
+                        _(
+                            "You may remove the bookings manually one by one."
+                        )
+                    ),
+                )
+            else:
+                traits = (
+                    Confirm(
+                        _('Do you really want to remove "${text}"?', mapping={
+                            'text': record.text
+                        }),
+                        _("${count} bookings will be removed", mapping={
+                            'count': record.count
+                        }),
+                        _("Remove ${count} bookings", mapping={
+                            'count': record.count
+                        })
+                    ),
+                    Intercooler(request_method='POST')
+                )
+
+            yield Link(text=text, url=url, attrs=attrs, traits=traits)
+
     @cached_property
     def breadcrumbs(self):
         return (
@@ -414,7 +491,8 @@ class BillingCollectionLayout(DefaultLayout):
                             name='booking'
                         ),
                         attrs={'class': 'new-booking'}
-                    )
+                    ),
+                    *self.family_removal_links
                 ]
             )
         )
