@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds manual bookings to billing.
+  [href]
+
 - Fixes wrong hint in activity archival dialog.
   [href]
 

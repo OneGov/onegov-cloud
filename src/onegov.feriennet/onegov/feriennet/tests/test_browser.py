@@ -114,7 +114,7 @@ def test_browse_matching(browser, feriennet_app):
     assert browser.is_text_present("Abgeschlossen")
 
 
-def test_browse_billing(browser, feriennet_app):
+def test_browse_billing(browser, feriennet_app, postgres):
 
     activities = ActivityCollection(feriennet_app.session(), type='vacation')
     attendees = AttendeeCollection(feriennet_app.session())
@@ -142,8 +142,11 @@ def test_browse_billing(browser, feriennet_app):
     )
     period.confirmed = True
 
-    member = UserCollection(feriennet_app.session()).add(
-        'member@example.org', 'hunter2', 'member')
+    users = UserCollection(feriennet_app.session())
+    users.by_username('admin@example.org').realname = 'Jane Doe'
+
+    member = users.add('member@example.org', 'hunter2', 'member')
+    member.realname = 'John Doe'
 
     foobar = activities.add("Foobar", username='admin@example.org')
     foobar.propose().accept()
@@ -202,8 +205,8 @@ def test_browse_billing(browser, feriennet_app):
 
     # they can be created
     admin.find_by_css("input[type='submit']").click()
-    assert admin.is_text_present("member@example.org")
-    assert admin.is_text_present("admin@example.org")
+    assert admin.is_text_present("John Doe")
+    assert admin.is_text_present("Jane Doe")
 
     # as long as the period is not finalized, there's no way to pay
     admin.visit('/billing?username=admin@example.org')
@@ -240,6 +243,9 @@ def test_browse_billing(browser, feriennet_app):
     admin.visit('/billing?username=member@example.org')
     assert client.is_text_present('1100.00 Ausstehend')
 
+    # we'll test a few scenarios here
+    postgres.save()
+
     # pay the bill bit by bit
     assert not admin.is_element_present_by_css('.paid')
 
@@ -257,3 +263,29 @@ def test_browse_billing(browser, feriennet_app):
     time.sleep(0.25)
     assert admin.is_element_present_by_css('.paid')
     assert not admin.is_element_present_by_css('.unpaid')
+
+    # try to introduce a manual booking
+    postgres.undo()
+
+    admin.visit('/billing')
+    admin.find_by_css('.dropdown.right-side').click()
+    admin.find_by_css('.new-booking').click()
+
+    admin.choose('target', 'all')
+    admin.choose('kind', 'discount')
+    admin.find_by_css('#booking_text').fill('Rabatt')
+    admin.find_by_css('#discount').fill('1.00')
+    admin.find_by_value("Absenden").click()
+
+    assert admin.is_text_present("2 manuelle Buchungen wurden erstellt")
+    assert admin.is_element_present_by_css('.remove-manual')
+
+    # remove the manual booking
+    admin.find_by_css('.dropdown.right-side').click()
+    admin.find_by_css('.remove-manual').click()
+
+    assert admin.is_text_present("2 Buchungen entfernen")
+    admin.find_by_text("2 Buchungen entfernen").click()
+
+    time.sleep(0.25)
+    assert not admin.is_element_present_by_css('.remove-manual')

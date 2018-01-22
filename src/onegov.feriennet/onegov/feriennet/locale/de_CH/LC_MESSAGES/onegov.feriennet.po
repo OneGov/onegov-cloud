@@ -1616,7 +1616,7 @@ msgstr "Teilnehmer ${period}"
 
 #, python-format
 msgid "Online Payments by ${name}"
-msgstr ""
+msgstr "Online Zahlungen von ${name}"
 
 #, python-format
 msgid "Billing for ${title}"
