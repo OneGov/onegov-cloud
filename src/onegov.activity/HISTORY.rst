@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.6.0 (2018-01-22)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds family column.
   [href]
