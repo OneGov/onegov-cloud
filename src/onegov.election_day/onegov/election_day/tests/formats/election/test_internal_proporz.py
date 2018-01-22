@@ -123,7 +123,6 @@ def test_import_internal_proporz_missing_headers(session):
                     'election_counted_entities',
                     'election_total_entities',
                     'entity_id',
-                    'entity_name',
                     'entity_elegible_voters',
                     'entity_received_ballots',
                     'entity_blank_ballots',
@@ -173,7 +172,6 @@ def test_import_internal_proporz_invalid_values(session):
                     'election_counted_entities',
                     'election_total_entities',
                     'entity_id',
-                    'entity_name',
                     'entity_elegible_voters',
                     'entity_received_ballots',
                     'entity_blank_ballots',
@@ -198,7 +196,6 @@ def test_import_internal_proporz_invalid_values(session):
                     'xxx',  # election_counted_entities
                     'xxx',  # election_total_entities
                     'xxx',  # entity_id
-                    'xxx',  # entity_name
                     'xxx',  # entity_elegible_voters
                     'xxx',  # entity_received_ballots
                     'xxx',  # entity_blank_ballots
@@ -223,7 +220,6 @@ def test_import_internal_proporz_invalid_values(session):
                     '1',  # election_counted_entities
                     '78',  # election_total_entities
                     '1234',  # entity_id
-                    'xxx',  # entity_name
                     '100',  # entity_elegible_voters
                     '10',  # entity_received_ballots
                     '0',  # entity_blank_ballots
@@ -284,7 +280,6 @@ def test_import_internal_proporz_expats(session):
                         'election_counted_entities',
                         'election_total_entities',
                         'entity_id',
-                        'entity_name',
                         'entity_elegible_voters',
                         'entity_received_ballots',
                         'entity_blank_ballots',
@@ -309,7 +304,6 @@ def test_import_internal_proporz_expats(session):
                         '1',  # election_counted_entities
                         '11',  # election_total_entities
                         str(entity_id),  # entity_id
-                        'Expats',  # entity_name
                         '111',  # entity_elegible_voters
                         '11',  # entity_received_ballots
                         '1',  # entity_blank_ballots

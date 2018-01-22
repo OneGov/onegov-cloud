@@ -197,7 +197,7 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager):
             if with_result:
                 vote.proposal.results.append(
                     BallotResult(
-                        group='Bern', entity_id=351,
+                        name='Bern', entity_id=351,
                         counted=True, yeas=30, nays=10, empty=0, invalid=0
                     )
                 )
@@ -209,13 +209,13 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager):
                 if with_result:
                     vote.counter_proposal.results.append(
                         BallotResult(
-                            group='Bern', entity_id=351,
+                            name='Bern', entity_id=351,
                             counted=True, yeas=35, nays=5, empty=0, invalid=0
                         )
                     )
                     vote.tie_breaker.results.append(
                         BallotResult(
-                            group='Bern', entity_id=351,
+                            name='Bern', entity_id=351,
                             counted=True, yeas=0, nays=40, empty=0, invalid=0
                         )
                     )
@@ -333,7 +333,7 @@ def test_generate_media(postgres_dsn, temporary_directory, session_manager):
         vote.ballots.append(Ballot(type='proposal'))
         vote.proposal.results.append(
             BallotResult(
-                group='x', entity_id=1, counted=True, yeas=30, nays=10
+                name='x', entity_id=1, counted=True, yeas=30, nays=10
             )
         )
         transaction.commit()

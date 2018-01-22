@@ -245,7 +245,7 @@ def test_archived_result_collection_updates(session):
 
     elections[2001].results.append(
         ElectionResult(
-            group='group',
+            name='name',
             entity_id=1,
             elegible_voters=100,
             received_ballots=50,
@@ -284,7 +284,7 @@ def test_archived_result_collection_updates(session):
     votes[2001].ballots.append(Ballot(type='proposal'))
     votes[2001].proposal.results.append(
         BallotResult(
-            group='x', yeas=100, nays=0, counted=True, entity_id=1
+            name='x', yeas=100, nays=0, counted=True, entity_id=1
         )
     )
     result = archive.update(votes[2001], request)

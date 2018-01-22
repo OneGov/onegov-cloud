@@ -31,7 +31,6 @@ Num|Descripziun
 `election_counted_municipalites`|Dumber da las vischnancas ch'èn dumbradas ora. Sche `election_counted_municipalites = election_total_municipalites`, vala l'elecziun sco dumbrada ora cumplettamain.
 `election_total_municipalites`|Dumber total da vischnancas. Sch'i na po betg vegnir dada ina infurmaziun exacta davart il status da l'elecziun (damai che Wahlt è vegnì importà da Wabsti), è questa valur `0`.
 `entity_bfs_number`|Numer UST da la vischnanca. La valur `0` po vegnir duvrada per persunas che vivan a l'exteriur.
-`entity_name`|Il num da la vischnanca.
 `entity_elegible_voters`|Dumber da persunas cun dretg da votar da la vischnanca.
 `entity_received_ballots`|Dumber da cedels da votar consegnads da la vischnanca.
 `entity_blank_ballots`|Dumber da cedels da votar vids da la vischnanca.
@@ -83,7 +82,6 @@ Il format da datoteca premetta duas singulas tabellas: l'export da datas e la gl
 En l'export da datas datti ina lingia per mintga vischnanca, las candidatas ed ils candidats figureschan en colonnas. Las suandantas colonnas vegnan evaluadas e duessan esser avant maun:
 - `AnzMandate`
 - `BFS`
-- `EinheitBez`
 - `StimmBer`
 - `StimmAbgegeben`
 - `StimmLeer`
@@ -130,7 +128,6 @@ Il format da datoteca premetta quatter singulas tabellas: l'export da datas dals
 
 En l'export da datas datti ina lingia per candidata u candidat e per vischnanca. Las suandantas colonnas vegnan evaluadas e duessan esser avant maun:
 - `Einheit_BFS`
-- `Einheit_Name`
 - `Kand_Nachname`
 - `Kand_Vorname`
 - `Liste_KandID`

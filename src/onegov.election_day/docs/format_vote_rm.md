@@ -24,9 +24,7 @@ Each line contains the result of a single municipality, provided that this has b
 
 Num|Descripziun
 ---|---
-`Bezirk`|The district in which the municipality is located. If the municipality is not located in a district, this field can be left empty.
 `ID`|The municipality number (BFS number) at the time of the vote. A value of `0` can be used for expats.
-`Name`|The name of the municipality.
 `Ja Stimmen`|The number of “yes” votes. If the word `unbekannt` is entered, the line will be ignored (not yet counted).
 `Nein Stimmen`|The number of “no” votes. If the word `unbekannt` is entered, the line will be ignored (not yet counted).
 `Stimmberechtigte`|The number of persons eligible to vote. If the word `unbekannt` is entered, the line will be ignored (not yet counted).
@@ -55,7 +53,6 @@ Num|Descripziun
 ---|---
 `status`|`unknown`, `interim` or `final`.
 `type`|`proposal` (proposta), `counter-proposal` (cuntraproposta) or "tie-breaker" (dumonda decisiva).
-`group`|La derivanza dal resultat. Quai po esser il district e la vischnanca, separads cun in stritg diagonal, il num da la citad ed il num dal circul, er separads cun in stritg diagonal, u simplamain il num da la vischnanca. Quai dependa dal chantun respectiv.
 `entity_id`|La ID da la vischnanca/dal lieu. A value `0` represents the expats.
 `counted`|Gist, sch'il resultat è vegnì eruì. Fauss, sch'il resultat n'è anc betg enconuschent (las valurs n'èn anc betg correctas).
 `yeas`|Il dumber da las vuschs affirmativas

@@ -6,12 +6,10 @@ from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import STATI
-from onegov.election_day.utils import guessed_group
 
 HEADERS = [
     'status',
     'type',
-    'group',
     'entity_id',
     'counted',
     'yeas',
@@ -40,7 +38,6 @@ def import_vote_internal(vote, entities, file, mimetype):
     ballot_results = {}
     errors = []
     added_entity_ids = {}
-    added_groups = {}
     ballot_types = set()
     status = 'unknown'
 
@@ -57,7 +54,6 @@ def import_vote_internal(vote, entities, file, mimetype):
             line_errors.append(_("Invalid ballot type"))
         ballot_types.add(ballot_type)
         added_entity_ids.setdefault(ballot_type, set())
-        added_groups.setdefault(ballot_type, set())
         ballot_results.setdefault(ballot_type, [])
 
         # the id of the entity
@@ -83,16 +79,6 @@ def import_vote_internal(vote, entities, file, mimetype):
                     }))
             else:
                 added_entity_ids[ballot_type].add(entity_id)
-
-        # the name of the entity
-        group = line.group.strip()
-        if entity_id and not group:
-            line_errors.append(_("Missing municipality/district"))
-        if group in added_groups[ballot_type]:
-            line_errors.append(_("${name} was found twice", mapping={
-                'name': group
-            }))
-        added_groups[ballot_type].add(group)
 
         # Counted
         counted = line.counted.strip().lower() == 'true'
@@ -146,9 +132,11 @@ def import_vote_internal(vote, entities, file, mimetype):
 
         # all went well (only keep doing this as long as there are no errors)
         if not errors:
+            entity = entities.get(entity_id, {})
             ballot_results[ballot_type].append(
                 BallotResult(
-                    group=group,
+                    name=entity.get('name', ''),
+                    district=entity.get('district', ''),
                     counted=counted,
                     yeas=yeas,
                     nays=nays,
@@ -173,13 +161,14 @@ def import_vote_internal(vote, entities, file, mimetype):
         remaining = (
             entities.keys() - added_entity_ids[ballot_type]
         )
-        for id in remaining:
-            entity = entities[id]
+        for entity_id in remaining:
+            entity = entities[entity_id]
             ballot_results[ballot_type].append(
                 BallotResult(
-                    group=guessed_group(entity, ballot_results[ballot_type]),
+                    name=entity.get('name', ''),
+                    district=entity.get('district', ''),
                     counted=False,
-                    entity_id=id
+                    entity_id=entity_id
                 )
             )
 

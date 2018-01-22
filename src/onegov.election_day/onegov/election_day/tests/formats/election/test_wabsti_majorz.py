@@ -78,7 +78,7 @@ def test_import_wabsti_majorz(session, tar_file):
     assert sorted([candidate.votes for candidate in election.candidates]) == [
         36282, 53308, 54616
     ]
-    assert election.absolute_majority == None
+    assert election.absolute_majority is None
     assert election.allocated_mandates == 1
     assert election.elected_candidates == [('Paul', 'Rechsteiner')]
 
@@ -104,7 +104,6 @@ def test_import_wabsti_majorz_utf16(session):
                 ','.join((
                     'AnzMandate',
                     'BFS',
-                    'EinheitBez',
                     'StimmBer',
                     'StimmAbgegeben',
                     'StimmLeer',
@@ -150,7 +149,6 @@ def test_import_wabsti_majorz_missing_headers(session):
                 ','.join((
                     'AnzMandate',
                     'BFS',
-                    'EinheitBez',
                     'StimmBer',
                     'StimmLeer',
                     'StimmUngueltig',
@@ -193,7 +191,6 @@ def test_import_wabsti_majorz_invalid_values(session):
                 ','.join((
                     'AnzMandate',
                     'BFS',
-                    'EinheitBez',
                     'StimmBer',
                     'StimmAbgegeben',
                     'StimmLeer',
@@ -214,12 +211,10 @@ def test_import_wabsti_majorz_invalid_values(session):
                     'xxx',
                     'xxx',
                     'xxx',
-                    'xxx',
                 )),
                 ','.join((
                     '',
                     '1234',
-                    '',
                     '100',
                     '90',
                     '1',
@@ -279,7 +274,6 @@ def test_import_wabsti_majorz_expats(session):
                     ','.join((
                         'AnzMandate',
                         'BFS',
-                        'EinheitBez',
                         'StimmBer',
                         'StimmAbgegeben',
                         'StimmLeer',
@@ -292,7 +286,6 @@ def test_import_wabsti_majorz_expats(session):
                     ','.join((
                         '',
                         str(entity_id),
-                        '',
                         '100',
                         '90',
                         '1',

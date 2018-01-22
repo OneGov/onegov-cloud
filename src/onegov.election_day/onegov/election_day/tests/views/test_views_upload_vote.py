@@ -8,9 +8,7 @@ from webtest import TestApp as Client
 from webtest.forms import Upload
 
 COLUMNS = [
-    'Bezirk',
     'ID',
-    'Name',
     'Ja Stimmen',
     'Nein Stimmen',
     'Stimmberechtigte',
@@ -38,8 +36,8 @@ def test_upload_vote_unknown_result(election_day_app):
 
     proposal = '\n'.join((
         ','.join(COLUMNS),
-        ',1711,Zug,3821,7405,16516,80,1',
-        ',1706,Oberägeri,unbekannt,7405,16516,80,1',
+        '1711,3821,7405,16516,80,1',
+        '1706,unbekannt,7405,16516,80,1',
     ))
 
     upload.form['proposal'] = Upload(
@@ -58,7 +56,7 @@ def test_upload_vote_unknown_result(election_day_app):
 
     proposal = '\n'.join((
         ','.join(COLUMNS),
-        ',1711,Zug,unbekannt,7405,16516,80,1',
+        '1711,unbekannt,7405,16516,80,1',
     ))
 
     upload.form['proposal'] = Upload(
@@ -213,17 +211,17 @@ def test_upload_vote_invalidate_cache(election_day_app):
 
     csv = '\n'.join((
         ','.join(COLUMNS),
-        ',1711,Zug,3821,7405,16516,80,1',
-        ',1706,Oberägeri,811,1298,3560,18,',
-        ',1709,Unterägeri,1096,2083,5245,18,1',
-        ',1704,Menzingen,599,1171,2917,17,',
-        ',1701,Baar,3049,5111,13828,54,3',
-        ',1702,Cham,2190,3347,9687,60,',
-        ',1703,Hünenberg,1497,2089,5842,15,1',
-        ',1708,Steinhausen,1211,2350,5989,17,',
-        ',1707,Risch,1302,1779,6068,17,',
-        ',1710,Walchwil,651,743,2016,8,',
-        ',1705,Neuheim,307,522,1289,10,1',
+        '1711,3821,7405,16516,80,1',
+        '1706,811,1298,3560,18,',
+        '1709,1096,2083,5245,18,1',
+        '1704,599,1171,2917,17,',
+        '1701,3049,5111,13828,54,3',
+        '1702,2190,3347,9687,60,',
+        '1703,1497,2089,5842,15,1',
+        '1708,1211,2350,5989,17,',
+        '1707,1302,1779,6068,17,',
+        '1710,651,743,2016,8,',
+        '1705,307,522,1289,10,1',
     ))
     upload.form['proposal'] = Upload(
         'data.csv', csv.encode('utf-8'), 'text/plain'
@@ -332,7 +330,7 @@ def test_upload_vote_notify_hipchat(election_day_app):
 
     csv = '\n'.join((
         ','.join(COLUMNS),
-        ',1706,Oberägeri,811,1298,3560,18,',
+        '1706,811,1298,3560,18,',
     )).encode('utf-8')
 
     with patch('urllib.request.urlopen') as urlopen:
@@ -383,12 +381,12 @@ def test_upload_vote_all_or_nothing(election_day_app):
 
     passes = '\n'.join((
         ','.join(COLUMNS),
-        ',1711,Zug,8321,7405,16516,80,1'
+        '1711,8321,7405,16516,80,1'
     ))
 
     fails = '\n'.join((
         ','.join(COLUMNS),
-        ',abc,Zug,8321,7405,16516,80,1'
+        'abc,8321,7405,16516,80,1'
     ))
 
     upload.form['proposal'] = Upload(

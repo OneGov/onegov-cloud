@@ -22,9 +22,7 @@ Each line contains the result of a single municipality, provided that this has b
 
 Nom|Description
 ---|---
-`Bezirk`|The district in which the municipality is located. If the municipality is not located in a district, this field can be left empty.
 `ID`|The municipality number (BFS number) at the time of the vote. A value of `0` can be used for expats.
-`Name`|The name of the municipality.
 `Ja Stimmen`|The number of “yes” votes. If the word `unbekannt` is entered, the line will be ignored (not yet counted).
 `Nein Stimmen`|The number of “no” votes. If the word `unbekannt` is entered, the line will be ignored (not yet counted).
 `Stimmberechtigte`|The number of persons eligible to vote. If the word `unbekannt` is entered, the line will be ignored (not yet counted).
@@ -53,7 +51,6 @@ Nom|Description
 ---|---
 `status`|`unknown`, `interim` or `final`.
 `type`|`proposal` (proposition), `counter-proposal` (contre-proposition) ou `tie-breaker` (jeu décisif).
-`group`|La désignation du résultat. Peut être le district, le nom de la ville divisé par un slash, le nom de la ville et le district de la ville divisés par un slash ou simplement le nom de la ville. Cela dépend entièrement du canton.
 `entity_id`|La référence de la municipalité/localité. A value `0` represents the expats.
 `counted`|Vrai si le résultat a été compté, faux si le résultat n'est pas encore connu (le compte des votes n'est pas encore fini).
 `yeas`|Nombre de votes oui

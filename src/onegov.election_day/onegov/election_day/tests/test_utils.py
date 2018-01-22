@@ -274,7 +274,7 @@ def test_add_local_results_simple(session):
     # not yet counted
     vote.proposal.results.append(
         BallotResult(
-            group='Bern', entity_id=351,
+            name='Bern', entity_id=351,
             counted=False, yeas=1000, nays=3000, empty=0, invalid=0
         )
     )
@@ -347,19 +347,19 @@ def test_add_local_results_complex(session):
     # not yet counted
     vote.proposal.results.append(
         BallotResult(
-            group='Bern', entity_id=351,
+            name='Bern', entity_id=351,
             counted=True, yeas=7000, nays=3000, empty=0, invalid=0
         )
     )
     vote.counter_proposal.results.append(
         BallotResult(
-            group='Bern', entity_id=351,
+            name='Bern', entity_id=351,
             counted=False, yeas=4000, nays=6000, empty=0, invalid=0
         )
     )
     vote.tie_breaker.results.append(
         BallotResult(
-            group='Bern', entity_id=351,
+            name='Bern', entity_id=351,
             counted=False, yeas=2000, nays=8000, empty=0, invalid=0
         )
     )

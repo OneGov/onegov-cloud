@@ -22,26 +22,24 @@ def test_import_default_vote(session):
         BytesIO((
             '\n'.join((
                 ','.join((
-                    'Bezirk',
                     'ID',
-                    'Name',
                     'Ja Stimmen',
                     'Nein Stimmen',
                     'Stimmberechtigte',
                     'Leere Stimmzettel',
                     'Ungültige Stimmzettel'
                 )),
-                ',1711,Zug,3821,7405,16516,80,1',
-                ',1706,Oberägeri,811,1298,3560,18,',
-                ',1709,Unterägeri,1096,2083,5245,18,1',
-                ',1704,Menzingen,599,1171,2917,17,',
-                ',1701,Baar,3049,5111,13828,54,3',
-                ',1702,Cham,2190,3347,9687,60,',
-                ',1703,Hünenberg,1497,2089,5842,15,1',
-                ',1708,Steinhausen,1211,2350,5989,17,',
-                ',1707,Risch,1302,1779,6068,17,',
-                ',1710,Walchwil,651,743,2016,8,',
-                ',1705,Neuheim,307,522,1289,10,1',
+                '1711,3821,7405,16516,80,1',
+                '1706,811,1298,3560,18,',
+                '1709,1096,2083,5245,18,1',
+                '1704,599,1171,2917,17,',
+                '1701,3049,5111,13828,54,3',
+                '1702,2190,3347,9687,60,',
+                '1703,1497,2089,5842,15,1',
+                '1708,1211,2350,5989,17,',
+                '1707,1302,1779,6068,17,',
+                '1710,651,743,2016,8,',
+                '1705,307,522,1289,10,1',
             ))
         ).encode('utf-8')),
         'text/plain'
@@ -68,16 +66,14 @@ def test_import_default_vote(session):
         BytesIO((
             '\n'.join((
                 ','.join((
-                    'Bezirk',
                     'ID',
-                    'Name',
                     'Ja Stimmen',
                     'Nein Stimmen',
                     'Stimmberechtigte',
                     'Leere Stimmzettel',
                     'Ungültige Stimmzettel'
                 )),
-                ',1059,Kriens,2182,4913,18690,56,27'
+                '1059,2182,4913,18690,56,27'
             ))
         ).encode('utf-8')),
         'text/plain'
@@ -102,21 +98,19 @@ def test_import_default_vote(session):
         BytesIO((
             '\n'.join((
                 ','.join((
-                    'Bezirk',
                     'ID',
-                    'Name',
                     'Ja Stimmen',
                     'Nein Stimmen',
                     'Stimmberechtigte',
                     'Leere Stimmzettel',
                     'Ungültige Stimmzettel'
                 )),
-                ',1,Innere Stadt,4142,1121,14431,218,2',
-                ',2,Länggasse/Felsenau,2907,676,9788,129,7',
-                ',3,Mattenhof/Weissenbühl,3978,1043,13750,201,2',
-                ',4,Kirchenfeld/Schosshalde,5459,1730,19329,146,9',
-                ',5,Breitenrain/Lorraine,3742,1139,13410,211,3',
-                ',6,Bümpliz/Bethlehem,3491,1036,12276,133,4',
+                '1,4142,1121,14431,218,2',
+                '2,2907,676,9788,129,7',
+                '3,3978,1043,13750,201,2',
+                '4,5459,1730,19329,146,9',
+                '5,3742,1139,13410,211,3',
+                '6,3491,1036,12276,133,4',
             ))
         ).encode('utf-8')),
         'text/plain'
@@ -148,9 +142,7 @@ def test_import_default_vote_missing_headers(session):
         BytesIO((
             '\n'.join((
                 ','.join((
-                    'Bezirk',
                     'ID',
-                    'Name',
                     'Nein Stimmen',
                     'Stimmberechtigte',
                     'Leere Stimmzettel',
@@ -179,9 +171,7 @@ def test_import_default_vote_invalid_values(session):
         BytesIO((
             '\n'.join((
                 ','.join((
-                    'Bezirk',
                     'ID',
-                    'Name',
                     'Ja Stimmen',
                     'Nein Stimmen',
                     'Ungültige Stimmzettel',
@@ -189,9 +179,7 @@ def test_import_default_vote_invalid_values(session):
                     'Stimmberechtigte',
                 )),
                 ','.join((
-                    'xxx',  # Bezirk
                     'xxx',  # ID
-                    'xxx',  # Name
                     'xxx',  # Ja Stimmen
                     'xxx',  # Nein Stimmen
                     'xxx',  # Ungültige Stimmzettel
@@ -199,9 +187,7 @@ def test_import_default_vote_invalid_values(session):
                     'xxx',  # Stimmberechtigte
                 )),
                 ','.join((
-                    'xxx',  # Bezirk
                     '1234',  # ID
-                    'Govikon',  # Name
                     '1',  # Ja Stimmen
                     '1',  # Nein Stimmen
                     '1',  # Ungültige Stimmzettel
@@ -209,9 +195,7 @@ def test_import_default_vote_invalid_values(session):
                     '0',  # Stimmberechtigte
                 )),
                 ','.join((
-                    'xxx',  # Bezirk
                     '1711',  # ID
-                    'Zug',  # Name
                     '1',  # Ja Stimmen
                     '1',  # Nein Stimmen
                     '1',  # Ungültige Stimmzettel
@@ -219,9 +203,7 @@ def test_import_default_vote_invalid_values(session):
                     '100',  # Stimmberechtigte
                 )),
                 ','.join((
-                    'xxx',  # Bezirk
                     '1711',  # ID
-                    'Zug',  # Name
                     '1',  # Ja Stimmen
                     '1',  # Nein Stimmen
                     '1',  # Ungültige Stimmzettel
@@ -245,8 +227,7 @@ def test_import_default_vote_invalid_values(session):
         (3, '1234 is unknown'),
         (3, 'More cast votes than elegible voters'),
         (3, 'No elegible voters'),
-        (5, '1711 was found twice'),
-        (5, 'xxx/Zug was found twice'),
+        (5, '1711 was found twice')
     ]
 
 
@@ -264,9 +245,7 @@ def test_import_default_vote_expats(session):
         BytesIO((
             '\n'.join((
                 ','.join((
-                    'Bezirk',
                     'ID',
-                    'Name',
                     'Ja Stimmen',
                     'Nein Stimmen',
                     'Ungültige Stimmzettel',
@@ -274,9 +253,7 @@ def test_import_default_vote_expats(session):
                     'Stimmberechtigte',
                 )),
                 ','.join((
-                    '',  # Bezirk
                     '9170',  # ID
-                    'Expats',  # Name
                     '20',  # Ja Stimmen
                     '10',  # Nein Stimmen
                     '0',  # Ungültige Stimmzettel
@@ -284,9 +261,7 @@ def test_import_default_vote_expats(session):
                     '100',  # Stimmberechtigte
                 )),
                 ','.join((
-                    '',  # Bezirk
                     '0',  # ID
-                    'Auslandschweizer',  # Name
                     '20',  # Ja Stimmen
                     '10',  # Nein Stimmen
                     '0',  # Ungültige Stimmzettel
@@ -306,9 +281,7 @@ def test_import_default_vote_expats(session):
         BytesIO((
             '\n'.join((
                 ','.join((
-                    'Bezirk',
                     'ID',
-                    'Name',
                     'Ja Stimmen',
                     'Nein Stimmen',
                     'Ungültige Stimmzettel',
@@ -316,9 +289,7 @@ def test_import_default_vote_expats(session):
                     'Stimmberechtigte',
                 )),
                 ','.join((
-                    '',  # Bezirk
                     '0',  # ID
-                    'Auslandschweizer',  # Name
                     '20',  # Ja Stimmen
                     '10',  # Nein Stimmen
                     '0',  # Ungültige Stimmzettel
@@ -347,9 +318,7 @@ def test_import_default_vote_temporary_results(session):
         BytesIO((
             '\n'.join((
                 ','.join((
-                    'Bezirk',
                     'ID',
-                    'Name',
                     'Ja Stimmen',
                     'Nein Stimmen',
                     'Ungültige Stimmzettel',
@@ -357,9 +326,7 @@ def test_import_default_vote_temporary_results(session):
                     'Stimmberechtigte',
                 )),
                 ','.join((
-                    '',  # Bezirk
                     '0',  # ID
-                    'Expats',  # Name
                     '20',  # Ja Stimmen
                     '10',  # Nein Stimmen
                     '1',  # Ungültige Stimmzettel
@@ -367,9 +334,7 @@ def test_import_default_vote_temporary_results(session):
                     '100',  # Stimmberechtigte
                 )),
                 ','.join((
-                    '',  # Bezirk
                     '1701',  # ID
-                    'Baar',  # Name
                     '20',  # Ja Stimmen
                     '10',  # Nein Stimmen
                     '1',  # Ungültige Stimmzettel
@@ -377,9 +342,7 @@ def test_import_default_vote_temporary_results(session):
                     '100',  # Stimmberechtigte
                 )),
                 ','.join((
-                    '',  # Bezirk
                     '1702',  # ID
-                    'Cham',  # Name
                     'unbekannt',  # Ja Stimmen
                     '10',  # Nein Stimmen
                     '1',  # Ungültige Stimmzettel
@@ -387,9 +350,7 @@ def test_import_default_vote_temporary_results(session):
                     '100',  # Stimmberechtigte
                 )),
                 ','.join((
-                    '',  # Bezirk
                     '1703',  # ID
-                    'Hünenberg',  # Name
                     '20',  # Ja Stimmen
                     '10',  # Nein Stimmen
                     '1',  # Ungültige Stimmzettel

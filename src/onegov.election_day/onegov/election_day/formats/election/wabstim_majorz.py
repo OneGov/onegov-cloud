@@ -73,9 +73,11 @@ def parse_election_result(line, errors, entities, added_entities):
                 }))
         else:
             added_entities.add(entity_id)
+            entity = entities.get(entity_id, {})
             return ElectionResult(
                 id=uuid4(),
-                group=entities.get(entity_id, {}).get('name', ''),
+                name=entity.get('name', ''),
+                district=entity.get('district', ''),
                 entity_id=entity_id,
                 elegible_voters=elegible_voters,
                 received_ballots=received_ballots,
@@ -192,6 +194,8 @@ def import_election_wabstim_majorz(
 
     if errors:
         return errors
+
+    # todo: Add missing entities as uncounted
 
     if results:
         election.clear_results()

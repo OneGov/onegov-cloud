@@ -96,8 +96,9 @@ Num|Descripziun
 `election_status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
 `election_counted_entities`|Il dumber da vischnancas ch'èn dumbradas ora.
 `election_total_entities`|Il dumber total da vischnancas.
-`entity_name`|Il num da la vischnanca/dal lieu
 `entity_id`|La ID da la vischnanca/dal lieu. A value `0` represents the expats.
+`entity_name`|Il num da la vischnanca/dal lieu.
+`entity_district`|Wahlkreis/Bezirk/Region der Gemeinde.
 `entity_elegible_voters`|Il dumber da las votantas e dals votants da la vischnanca/dal lieu.
 `entity_received_ballots`|Il dumber dals cedels electorals consegnads da la vischnanca/dal lieu.
 `entity_blank_ballots`|Il dumber dals cedels electorals vids da la vischnanca/dal lieu.

@@ -83,7 +83,8 @@ def view_election_json(self, request):
                     'invalid_ballots': entity.invalid_ballots,
                     'accounted_votes': entity.accounted_votes,
                     'turnout': entity.turnout,
-                    'name': entity.group if entity.entity_id else 'Expats',
+                    'name': entity.name if entity.entity_id else 'Expats',
+                    'district': entity.district if entity.entity_id else '',
                     'id': entity.entity_id,
                 } for entity in self.results
             ],

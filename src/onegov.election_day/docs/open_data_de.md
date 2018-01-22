@@ -94,8 +94,9 @@ Name|Beschreibung
 `election_status`|Zwischenergebnisse (`interim`), Endergebnisse (`final`) oder unbekannt (`unknown`).
 `election_counted_entities`|Die Anzahl ausgezählter Gemeinden.
 `election_total_entities`|Die Gesamtanzahl an Gemeinden.
-`entity_name`|Der Name der Gemeinde
 `entity_id`|Die ID der Gemeinde. Der Wert `0` steht für Auslandschweizer.
+`entity_name`|Der Name der Gemeinde.
+`entity_district`|Wahlkreis/Bezirk/Region der Gemeinde.
 `entity_elegible_voters`|Die Anzahl Stimmberechtigter der Gemeinde.
 `entity_received_ballots`|Die Anzahl abgegebener Stimmzettel der Gemeinde.
 `entity_blank_ballots`|Die Anzahl leerer Stimmzettel der Gemeinde.

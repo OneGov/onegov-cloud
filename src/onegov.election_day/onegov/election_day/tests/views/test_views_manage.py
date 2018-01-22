@@ -8,18 +8,6 @@ from onegov.election_day.tests import upload_vote
 from webtest import TestApp as Client
 
 
-COLUMNS = [
-    'Bezirk',
-    'BFS Nummer',
-    'Gemeinde',
-    'Ja Stimmen',
-    'Nein Stimmen',
-    'Stimmberechtigte',
-    'Leere Stimmzettel',
-    'Ungültige Stimmzettel'
-]
-
-
 def test_view_login_logout(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()

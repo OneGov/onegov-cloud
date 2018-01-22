@@ -131,7 +131,6 @@ def test_import_wabsti_proporz_utf16(session):
             '\n'.join((
                 ','.join((
                     'Einheit_BFS',
-                    'Einheit_Name',
                     'Liste_KandID',
                     'Kand_Nachname',
                     'Kand_Vorname',
@@ -197,7 +196,6 @@ def test_import_wabsti_proporz_missing_headers(session):
             '\n'.join((
                 ','.join((
                     'Einheit_BFS',
-                    'Liste_KandID',
                     'Kand_Nachname',
                     'Kand_Vorname',
                     'Liste_ID',
@@ -240,7 +238,7 @@ def test_import_wabsti_proporz_missing_headers(session):
         ('Elected Candidates', "Missing columns: 'id'"),
         ('Election statistics', "Missing columns: 'wzleer'"),
         ('List connections', "Missing columns: 'lv'"),
-        ('Results', "Missing columns: 'einheit_name'")
+        ('Results', "Missing columns: 'liste_kandid'")
     ]
 
 
@@ -264,7 +262,6 @@ def test_import_wabsti_proporz_invalid_values(session):
             '\n'.join((
                 ','.join((
                     'Einheit_BFS',
-                    'Einheit_Name',
                     'Liste_KandID',
                     'Kand_Nachname',
                     'Kand_Vorname',
@@ -282,11 +279,9 @@ def test_import_wabsti_proporz_invalid_values(session):
                     'xxx',
                     'xxx',
                     'xxx',
-                    'xxx',
                 )),
                 ','.join((
                     '1234',
-                    'xxx',
                     '7',
                     'xxx',
                     'xxx',
@@ -392,7 +387,6 @@ def test_import_wabsti_proporz_expats(session):
                 '\n'.join((
                     ','.join((
                         'Einheit_BFS',
-                        'Einheit_Name',
                         'Liste_KandID',
                         'Kand_Nachname',
                         'Kand_Vorname',
@@ -403,7 +397,6 @@ def test_import_wabsti_proporz_expats(session):
                     )),
                     ','.join((
                         str(entity_id),
-                        'xxx',
                         '7',
                         'xxx',
                         'xxx',

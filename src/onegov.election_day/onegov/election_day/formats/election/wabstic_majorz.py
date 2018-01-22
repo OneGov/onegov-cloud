@@ -193,8 +193,10 @@ def import_election_wabstic_majorz(
             )
             continue
 
+        entity = entities.get(entity_id, {})
         added_entities[entity_id] = {
-            'group': entities.get(entity_id, {}).get('name', ''),
+            'name': entity.get('name', ''),
+            'district': entity.get('district', ''),
             'elegible_voters': elegible_voters
         }
 
@@ -216,8 +218,10 @@ def import_election_wabstic_majorz(
                     _("${name} is unknown", mapping={'name': entity_id}))
 
             if entity_id not in added_entities:
+                entity = entities.get(entity_id, {})
                 added_entities[entity_id] = {
-                    'group': entities.get(entity_id, {}).get('name', '')
+                    'name': entity.get('name', ''),
+                    'district': entity.get('district', ''),
                 }
 
         entity = added_entities[entity_id]
@@ -336,6 +340,8 @@ def import_election_wabstic_majorz(
     if errors:
         return errors
 
+    # todo: Add missing entities as uncounted
+
     if added_results:
         election.clear_results()
 
@@ -358,7 +364,8 @@ def import_election_wabstic_majorz(
             result = ElectionResult(
                 id=uuid4(),
                 entity_id=entity_id,
-                group=entity['group'],
+                name=entity['name'],
+                district=entity['district'],
                 elegible_voters=entity['elegible_voters'],
                 received_ballots=entity['received_ballots'],
                 blank_ballots=entity['blank_ballots'],

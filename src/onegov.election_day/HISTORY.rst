@@ -7,7 +7,13 @@ Changelog
   locale is provided.
   [msom]
 
-- Improves title translations fallbacks.
+- Splits the group of an entity into a name and a district.
+  [msom]
+
+- Use the static data for entity names and districts.
+  [msom]
+
+- Adds district translations.
   [msom]
 
 - Updates translations.

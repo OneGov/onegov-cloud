@@ -183,8 +183,8 @@ class MediaGenerator():
             def translate(content):
                 return self.translate(content, locale)
 
-            def format_group(item):
-                return item.group if item.entity_id else translate(_("Expats"))
+            def format_name(item):
+                return item.name if item.entity_id else translate(_("Expats"))
 
             pdf = Pdf(
                 f,
@@ -541,7 +541,7 @@ class MediaGenerator():
                             translate(_('Elegible Voters')),
                             translate(_('Accounted Votes')),
                         ]] + [[
-                            format_group(result),
+                            format_name(result),
                             '{0:.2f} %'.format(result.turnout),
                             result.elegible_voters,
                             result.accounted_votes,
@@ -564,7 +564,7 @@ class MediaGenerator():
                             translate(_('Invalid Ballots')),
 
                         ]] + [[
-                            format_group(result),
+                            format_name(result),
                             result.received_ballots or '0',
                             result.accounted_ballots or '0',
                             result.blank_ballots or '0',
@@ -679,7 +679,7 @@ class MediaGenerator():
                                 translate(_('Yes %')),
                                 translate(_('No %')),
                             ]] + [[
-                                format_group(result),
+                                format_name(result),
                                 translate(_('Accepted')) if result.accepted
                                 else translate(_('Rejected')),
                                 '{0:.2f}%'.format(result.yeas_percentage),
@@ -703,7 +703,7 @@ class MediaGenerator():
                                 translate(_('Yes %')).replace('%', '').strip(),
                                 translate(_('No %')).replace('%', '').strip(),
                             ]] + [[
-                                format_group(result),
+                                format_name(result),
                                 result.empty or '0',
                                 result.invalid or '0',
                                 result.yeas or '0',

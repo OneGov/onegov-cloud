@@ -188,3 +188,47 @@ def make_notifications_polymorphic(context):
                 'notifications', 'type'
             )
         )
+
+
+@upgrade_task(
+    'Apply static data',
+    requires='onegov.ballot:Replaces results group with name and district',
+    always_run=True
+)
+def apply_static_data(context):
+    principal = getattr(context.app, 'principal', None)
+    if not principal:
+        return
+
+    for vote in context.session.query(Vote):
+        for ballot in vote.ballots:
+            assert vote.date and vote.date.year in principal.entities
+            for result in ballot.results:
+                assert (
+                    result.entity_id in principal.entities[vote.date.year] or
+                    result.entity_id == 0
+                )
+                result.name = principal.entities.\
+                    get(vote.date.year, {}).\
+                    get(result.entity_id, {}).\
+                    get('name', '')
+                result.district = principal.entities.\
+                    get(vote.date.year, {}).\
+                    get(result.entity_id, {}).\
+                    get('district', '')
+
+    for election in context.session.query(Election):
+        assert election.date and election.date.year in principal.entities
+        for result in election.results:
+            assert (
+                result.entity_id in principal.entities[election.date.year] or
+                result.entity_id == 0
+            )
+            result.name = principal.entities.\
+                get(election.date.year, {}).\
+                get(result.entity_id, {}).\
+                get('name', '')
+            result.district = principal.entities.\
+                get(election.date.year, {}).\
+                get(result.entity_id, {}).\
+                get('district', '')

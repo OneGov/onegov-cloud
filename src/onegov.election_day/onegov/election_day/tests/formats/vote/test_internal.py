@@ -74,7 +74,6 @@ def test_import_internal_vote_missing_headers(session):
                 ','.join((
                     'status',
                     'type',
-                    'group',
                     'entity_id',
                     'counted',
                     'nays',
@@ -107,7 +106,6 @@ def test_import_internal_vote_invalid_values(session):
                 ','.join((
                     'status',
                     'type',
-                    'group',
                     'entity_id',
                     'counted',
                     'yeas',
@@ -119,7 +117,6 @@ def test_import_internal_vote_invalid_values(session):
                 ','.join((
                     'xxx',  # status
                     'xxx',  # type
-                    'xxx',  # group
                     'xxx',  # entity_id
                     'xxx',  # counted
                     'xxx',  # yeas
@@ -131,7 +128,6 @@ def test_import_internal_vote_invalid_values(session):
                 ','.join((
                     'unknown',  # status
                     'proposal',  # type
-                    'Govikon',  # group
                     '1234',  # entity_id
                     'true',  # counted
                     '1',  # yeas
@@ -143,7 +139,6 @@ def test_import_internal_vote_invalid_values(session):
                 ','.join((
                     'unknown',  # status
                     'proposal',  # type
-                    'Zug',  # group
                     '1711',  # entity_id
                     'true',  # counted
                     '1',  # yeas
@@ -155,7 +150,6 @@ def test_import_internal_vote_invalid_values(session):
                 ','.join((
                     'unknown',  # status
                     'proposal',  # type
-                    'Zug',  # group
                     '1711',  # entity_id
                     'true',  # counted
                     '1',  # yeas
@@ -181,8 +175,7 @@ def test_import_internal_vote_invalid_values(session):
         (3, '1234 is unknown'),
         (3, 'More cast votes than elegible voters'),
         (3, 'No elegible voters'),
-        (5, '1711 was found twice'),
-        (5, 'Zug was found twice'),
+        (5, '1711 was found twice')
     ]
 
 
@@ -202,7 +195,6 @@ def test_import_internal_vote_expats(session):
                 ','.join((
                     'status',
                     'type',
-                    'group',
                     'entity_id',
                     'counted',
                     'yeas',
@@ -214,7 +206,6 @@ def test_import_internal_vote_expats(session):
                 ','.join((
                     'unknown',  # status
                     'proposal',  # type
-                    'Expats',  # group
                     '9170',  # entity_id
                     'true',  # counted
                     '20',  # yeas
@@ -226,7 +217,6 @@ def test_import_internal_vote_expats(session):
                 ','.join((
                     'unknown',  # status
                     'proposal',  # type
-                    'Auslandschweizer',  # group
                     '0',  # entity_id
                     'true',  # counted
                     '20',  # yeas
@@ -250,7 +240,6 @@ def test_import_internal_vote_expats(session):
                 ','.join((
                     'status',
                     'type',
-                    'group',
                     'entity_id',
                     'counted',
                     'yeas',
@@ -262,7 +251,6 @@ def test_import_internal_vote_expats(session):
                 ','.join((
                     'unknown',  # status
                     'proposal',  # type
-                    'Expats',  # group
                     '9170',  # entity_id
                     'true',  # counted
                     '20',  # yeas
@@ -295,7 +283,6 @@ def test_import_internal_vote_temporary_results(session):
                 ','.join((
                     'status',
                     'type',
-                    'group',
                     'entity_id',
                     'counted',
                     'yeas',
@@ -307,7 +294,6 @@ def test_import_internal_vote_temporary_results(session):
                 ','.join((
                     'unknown',  # status
                     'proposal',  # type
-                    'Expats',  # group
                     '0',  # entity_id
                     'true',  # counted
                     '20',  # yeas
@@ -319,7 +305,6 @@ def test_import_internal_vote_temporary_results(session):
                 ','.join((
                     'unknown',  # status
                     'proposal',  # type
-                    'Baar',  # group
                     '1701',  # entity_id
                     'true',  # counted
                     '20',  # yeas
@@ -331,7 +316,6 @@ def test_import_internal_vote_temporary_results(session):
                 ','.join((
                     'unknown',  # status
                     'proposal',  # type
-                    'Cham',  # group
                     '1702',  # entity_id
                     'false',  # counted
                     '20',  # yeas

@@ -30,7 +30,6 @@ Nom|Description
 `election_counted_entities`|Nombre de municipalités comptées. Si `election_counted_entities = election_total_entities`, on considère alors que l'élection est entièrement comptée.
 `election_total_entities`|Nombre total de municipalités. Si aucune information précise à propos de la situation de l'élection n'est possible (parce que l'élection a été importée par Wabsti), alors cette valeur est `0`.
 `entity_id`|Numéro BFS de la municipalité. Une valeur de `0` peut être utilisée pour les expatriés.
-`entity_name`|Nom de la municipalité.
 `entity_elegible_voters`|Nombre de personnes autorisées à voter dans la municipalité.
 `entity_received_ballots`|Nombre de bulletins soumis dans la municipalité.
 `entity_blank_ballots`|Nombre de bulletins vides dans la municipalité.
@@ -81,7 +80,6 @@ Le format de fichier nécessite deux diagrammes individuels : l'exportation des 
 Dans l'exportation des données, une ligne est présente pour chaque municipalité, les candidats sont disposés en colonnes. Les colonnes suivantes seront évaluées et on devrait au moins avoir celles-ci :
 - `AnzMandate`
 - `BFS`
-- `EinheitBez`
 - `StimmBer`
 - `StimmAbgegeben`
 - `StimmLeer`
@@ -128,7 +126,6 @@ Le format de fichier nécessite quatre diagrammes individuels : l'exportation de
 
 Une ligne est présente par candidat et municipalité dans l'exportation des données. Les colonnes suivantes seront évaluées et devraient exister :
 - `Einheit_BFS`
-- `Einheit_Name`
 - `Kand_Nachname`
 - `Kand_Vorname`
 - `Liste_KandID`

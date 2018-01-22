@@ -215,6 +215,7 @@ def svg_filename(item, type_, locale=None):
     return '{}-{}.{}.{}.{}.svg'.format(name, hash, ts, type_, locale or 'any')
 
 
+# todo: remove me!
 def guessed_group(entity, other):
     """ Guess the grouping from another group name.
 

@@ -180,12 +180,12 @@ def test_view_election_parties(election_day_app_gr):
     assert parties['2011-FDP']['color'] == '#4068c8'
     assert parties['2015-FDP']['color'] == '#4068c8'
 
-    assert parties['2011-BDP']['active'] == False
-    assert parties['2011-CVP']['active'] == False
-    assert parties['2011-FDP']['active'] == False
-    assert parties['2015-BDP']['active'] == True
-    assert parties['2015-CVP']['active'] == True
-    assert parties['2015-FDP']['active'] == True
+    assert parties['2011-BDP']['active'] is False
+    assert parties['2011-CVP']['active'] is False
+    assert parties['2011-FDP']['active'] is False
+    assert parties['2015-BDP']['active'] is True
+    assert parties['2015-CVP']['active'] is True
+    assert parties['2015-FDP']['active'] is True
 
     assert parties['2011-BDP']['value']['front'] == 1
     assert parties['2011-CVP']['value']['front'] == 1
@@ -390,7 +390,6 @@ def test_view_election_tacit(election_day_app_gr):
     csv = (
         'election_status,'
         'entity_id,'
-        'entity_name,'
         'entity_elegible_voters,'
         'entity_received_ballots,'
         'entity_invalid_ballots,'
@@ -409,10 +408,10 @@ def test_view_election_tacit(election_day_app_gr):
         '\n'
     )
     csv += (
-        "final,3503,Mutten,56,0,0,0,0,0,1,True,Engler,Stefan,0,1,125,,\n"
+        "final,3503,56,0,0,0,0,0,1,True,Engler,Stefan,0,1,125,,\n"
     )
     csv += (
-        "final,3503,Mutten,56,0,0,0,0,0,2,True,Schmid,Martin,0,1,125,,\n"
+        "final,3503,56,0,0,0,0,0,2,True,Schmid,Martin,0,1,125,,\n"
     )
     csv = csv.encode('utf-8')
 

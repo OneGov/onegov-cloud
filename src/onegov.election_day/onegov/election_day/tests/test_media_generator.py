@@ -48,7 +48,7 @@ def add_majorz_election(session):
     session.flush()
 
     result = ElectionResult(
-        group='group',
+        name='name',
         entity_id=1,
         elegible_voters=1000,
         received_ballots=500,
@@ -100,7 +100,7 @@ def add_proporz_election(session, year=2015):
     session.flush()
 
     result = ElectionResult(
-        group='group',
+        name='name',
         entity_id=1,
         elegible_voters=1000,
         received_ballots=500,
@@ -212,14 +212,14 @@ def add_vote(session, type_):
     session.flush()
 
     vote.proposal.results.append(BallotResult(
-        group='x', yeas=0, nays=100, counted=True, entity_id=1
+        name='x', yeas=0, nays=100, counted=True, entity_id=1
     ))
     if type_ == 'complex':
         vote.counter_proposal.results.append(BallotResult(
-            group='x', yeas=90, nays=10, counted=True, entity_id=1
+            name='x', yeas=90, nays=10, counted=True, entity_id=1
         ))
         vote.tie_breaker.results.append(BallotResult(
-            group='x', yeas=0, nays=0, counted=True, entity_id=1
+            name='x', yeas=0, nays=0, counted=True, entity_id=1
         ))
     session.flush()
 
@@ -372,7 +372,7 @@ def test_generate_pdf_vote(session, election_day_app):
 
     # Simple vote with more than one entity
     vote.proposal.results.append(BallotResult(
-        group='y', yeas=200, nays=0, counted=True, entity_id=1
+        name='y', yeas=200, nays=0, counted=True, entity_id=1
     ))
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(vote, 'vote.pdf', locale)
@@ -404,7 +404,7 @@ def test_generate_pdf_long_title(session, election_day_app):
     session.flush()
 
     vote.proposal.results.append(
-        BallotResult(group='x', yeas=0, nays=100, counted=True, entity_id=1)
+        BallotResult(name='x', yeas=0, nays=100, counted=True, entity_id=1)
     )
     session.flush()
 

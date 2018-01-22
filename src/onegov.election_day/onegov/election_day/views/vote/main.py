@@ -143,8 +143,10 @@ def view_vote_json(self, request):
                             'turnout': entity.turnout,
                             'counted': entity.counted,
                             'name': (
-                                entity.group if entity.entity_id
-                                else 'Expats'
+                                entity.name if entity.entity_id else 'Expats'
+                            ),
+                            'district': (
+                                entity.district if entity.entity_id else ''
                             ),
                             'id': entity.entity_id,
                         } for entity in ballot.results

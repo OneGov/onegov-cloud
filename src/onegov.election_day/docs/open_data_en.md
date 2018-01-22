@@ -93,8 +93,9 @@ Name|Description
 `election_status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
 `election_counted_entities`|The number of already counted municipalities.
 `election_total_entities`|The total number of municipalities.
-`entity_name`|The name of the municipality.
 `entity_id`|The id of the municipality/locale. A value `0` represents the expats. A value `0` represents the expats.
+`entity_name`|The name of the municipality.
+`entity_district`|The district of the municipality.
 `entity_elegible_voters`|The number of people eligible to vote for this municipality.
 `entity_received_ballots`|The number of received ballots for this municipality.
 `entity_blank_ballots`|The number of blank ballots for this municipality.

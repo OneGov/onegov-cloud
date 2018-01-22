@@ -94,8 +94,9 @@ Nome|Descrizione
 `election_status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
 `election_counted_entities`|Il numero di comuni già contati.
 `election_total_entities`|Il numero totale dei comuni.
-`entity_name`|Nome del comune.
 `entity_id`|Identificativo del comune. A value `0` represents the expats.
+`entity_name`|Nome del comune.
+`entity_district`|The district of the municipality.
 `entity_elegible_voters`|Numero degli aventi diritto al voto di questo comune.
 `entity_received_ballots`|Numero di schede ricevute per questo comune.
 `entity_blank_ballots`|Numero di schede bianche per questo comune.

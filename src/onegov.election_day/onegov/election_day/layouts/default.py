@@ -128,8 +128,8 @@ class DefaultLayout(ChameleonLayout):
             for locale in sorted(self.app.locales)
         ]
 
-    def format_group(self, item):
-        return item.group if item.entity_id else _("Expats")
+    def format_name(self, item):
+        return item.name if item.entity_id else _("Expats")
 
     @cached_property
     def sentry_js(self):

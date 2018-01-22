@@ -213,10 +213,12 @@ def import_vote_wabstic(vote, entities, district, number,
         # all went well (only keep doing this as long as there are no errors)
         if not errors:
             for ballot_type in used_ballot_types:
+                entity = entities.get(entity_id, {})
                 ballot_results[ballot_type].append(
                     BallotResult(
                         entity_id=entity_id,
-                        group=entities.get(entity_id, {}).get('name', ''),
+                        name=entity.get('name', ''),
+                        district=entity.get('district', ''),
                         counted=counted,
                         elegible_voters=elegible_voters,
                         invalid=invalid,
@@ -244,10 +246,12 @@ def import_vote_wabstic(vote, entities, district, number,
             set(result.entity_id for result in ballot_results[ballot_type])
         )
         for entity_id in remaining:
+            entity = entities[entity_id]
             ballot_results[ballot_type].append(
                 BallotResult(
                     entity_id=entity_id,
-                    group=entities.get(entity_id, {}).get('name', ''),
+                    name=entity.get('name', ''),
+                    district=entity.get('district', ''),
                     counted=False,
                 )
             )

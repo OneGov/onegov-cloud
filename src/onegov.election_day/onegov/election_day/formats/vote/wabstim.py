@@ -2,7 +2,6 @@ from onegov.ballot import BallotResult
 from onegov.election_day import _
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
-from onegov.election_day.utils import guessed_group
 
 
 HEADERS = (
@@ -135,9 +134,11 @@ def import_vote_wabstim(vote, entities, file, mimetype):
         # all went well (only keep doing this as long as there are no errors)
         if not errors:
             for ballot_type in used_ballot_types:
+                entity = entities.get(entity_id, {})
                 ballot_results[ballot_type].append(
                     BallotResult(
-                        group=entities.get(entity_id, {}).get('name', ''),
+                        name=entity.get('name', ''),
+                        district=entity.get('district', ''),
                         counted=counted,
                         yeas=yeas[ballot_type],
                         nays=nays[ballot_type],
@@ -167,7 +168,8 @@ def import_vote_wabstim(vote, entities, file, mimetype):
             entity = entities[id]
             ballot_results[ballot_type].append(
                 BallotResult(
-                    group=guessed_group(entity, ballot_results[ballot_type]),
+                    name=entity.get('name', ''),
+                    district=entity.get('district', ''),
                     counted=False,
                     entity_id=id
                 )

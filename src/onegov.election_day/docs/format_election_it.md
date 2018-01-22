@@ -30,7 +30,6 @@ Nome|Descrizione
 `election_counted_entities`|Numero di comuni scrutinati. Se `election_counted_entities = election_total_entities`, allora l'elezione è considerata completamente scrutinata.
 `election_total_entities`|Numero totale dei comuni. Se non sono disponibili notizie certe sullo stato dell'elezione (perché l'elezione è stata importata da Wabsti) allora questo valore è `0`.
 `entity_id`|Numero BFS del comune. Si può usare il valore `0` per gli espatriati
-`entity_name`|The name of the municipality.
 `entity_elegible_voters`|Numero di aventi diritto al voto nel Comune.
 `entity_received_ballots`|Numero di schede presentate nel Comune.
 `entity_blank_ballots`|Numero di schede bianche nel Comune.
@@ -81,7 +80,6 @@ Il formato del file ha bisogno di due tabelle separate: l'esportazione dei dati 
 Nell'esportazione dei dati, è presente una riga per ogni comune, i candidati sono disposti in colonne. Saranno prese in considerazione le seguenti colonne e devono essere presenti:
 - `AnzMandate`
 - `BFS`
-- `EinheitBez`
 - `StimmBer`
 - `StimmAbgegeben`
 - `StimmLeer`
@@ -128,7 +126,6 @@ Il formato di file ha bisogno di quattro tabelle separate: l'esportazione dei da
 
 È presente una linea per candidato e comune nell'esportazione dei dati. Saranno prese in considerazione le seguenti colonne e devono essere presenti:
 - `Einheit_BFS`
-- `Einheit_Name`
 - `Kand_Nachname`
 - `Kand_Vorname`
 - `Liste_KandID`

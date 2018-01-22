@@ -4,13 +4,10 @@ from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import BALLOT_TYPES
-from onegov.election_day.utils import guessed_group
 
 
 HEADERS = [
-    'bezirk',
     'id',
-    'name',
     'ja stimmen',
     'nein stimmen',
     'Stimmberechtigte',
@@ -50,7 +47,6 @@ def import_vote_default(vote, entities, ballot_type, file, mimetype):
     errors = []
 
     added_entity_ids = set()
-    added_groups = set()
 
     # if we have the value "unknown" or "unbekannt" in any of the following
     # colums, we ignore the whole line
@@ -80,19 +76,6 @@ def import_vote_default(vote, entities, ballot_type, file, mimetype):
             continue
 
         line_errors = []
-
-        # the name of the entity
-        group = '/'.join(p for p in (line.bezirk, line.name) if p)
-
-        if not group.strip().replace('/', ''):
-            line_errors.append(_("Missing municipality/district"))
-
-        if group in added_groups:
-            line_errors.append(_("${name} was found twice", mapping={
-                'name': group
-            }))
-
-        added_groups.add(group)
 
         # the id of the municipality or district
         try:
@@ -168,9 +151,11 @@ def import_vote_default(vote, entities, ballot_type, file, mimetype):
 
         # all went well (only keep doing this as long as there are no errors)
         if not errors:
+            entity = entities.get(entity_id, {})
             ballot_results.append(
                 BallotResult(
-                    group=group,
+                    name=entity.get('name', ''),
+                    district=entity.get('district', ''),
                     counted=True,
                     yeas=yeas,
                     nays=nays,
@@ -185,15 +170,15 @@ def import_vote_default(vote, entities, ballot_type, file, mimetype):
         errors.append(FileImportError(_("No data found")))
 
     if not errors:
-        # Add the missing entities as uncounted results, try to guess the
-        # used grouping
-        for id in (entities.keys() - added_entity_ids):
-            entity = entities[id]
+        # Add the missing entities as uncounted results
+        for entity_id in (entities.keys() - added_entity_ids):
+            entity = entities[entity_id]
             ballot_results.append(
                 BallotResult(
-                    group=guessed_group(entity, ballot_results),
+                    name=entity.get('name', ''),
+                    district=entity.get('district', ''),
                     counted=False,
-                    entity_id=id
+                    entity_id=entity_id
                 )
             )
 

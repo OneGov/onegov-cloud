@@ -97,7 +97,6 @@ def test_import_internal_majorz(session, tar_file):
                 'election_counted_entities',
                 'election_total_entities',
                 'entity_id',
-                'entity_name',
                 'entity_elegible_voters',
                 'entity_received_ballots',
                 'entity_blank_ballots',
@@ -118,19 +117,19 @@ def test_import_internal_majorz(session, tar_file):
                 'candidate_party',
             )),
             (
-                '3294,,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
+                '3294,,1,1,1059,18699,6761,124,51,0,0,,,,,,,'
                 'Koch,Patrick,1,False,,1621,'
             ),
             (
-                '3294,,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
+                '3294,,1,1,1059,18699,6761,124,51,0,0,,,,,,,'
                 'Konrad,Simon,2,False,,1707,'
             ),
             (
-                '3294,,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
+                '3294,,1,1,1059,18699,6761,124,51,0,0,,,,,,,'
                 'Faé,Franco,3,False,,3176,'
             ),
             (
-                '3294,,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
+                '3294,,1,1,1059,18699,6761,124,51,0,0,,,,,,,'
                 'Vereinzelte,,4,False,,82,'
             ),
         ))
@@ -241,7 +240,6 @@ def test_import_internal_majorz_missing_headers(session):
                     'election_counted_entities',
                     'election_total_entities',
                     'entity_id',
-                    'entity_name',
                     'entity_elegible_voters',
                     'entity_received_ballots',
                     'entity_blank_ballots',
@@ -286,7 +284,6 @@ def test_import_internal_majorz_invalid_values(session):
                     'election_counted_entities',
                     'election_total_entities',
                     'entity_id',
-                    'entity_name',
                     'entity_elegible_voters',
                     'entity_received_ballots',
                     'entity_blank_ballots',
@@ -306,7 +303,6 @@ def test_import_internal_majorz_invalid_values(session):
                     'xxx',  # election_counted_entities
                     'xxx',  # election_total_entities
                     'xxx',  # entity_id
-                    'xxx',  # entity_name
                     'xxx',  # entity_elegible_voters
                     'xxx',  # entity_received_ballots
                     'xxx',  # entity_blank_ballots
@@ -326,7 +322,6 @@ def test_import_internal_majorz_invalid_values(session):
                     '1',  # election_counted_entities
                     '78',  # election_total_entities
                     '1234',  # entity_id
-                    'xxx',  # entity_name
                     '100',  # entity_elegible_voters
                     '10',  # entity_received_ballots
                     '0',  # entity_blank_ballots
@@ -379,7 +374,6 @@ def test_import_internal_majorz_expats(session):
                         'election_counted_entities',
                         'election_total_entities',
                         'entity_id',
-                        'entity_name',
                         'entity_elegible_voters',
                         'entity_received_ballots',
                         'entity_blank_ballots',
@@ -399,7 +393,6 @@ def test_import_internal_majorz_expats(session):
                         '1',  # election_counted_entities
                         '11',  # election_total_entities
                         str(entity_id),  # entity_id
-                        'Expats',  # entity_name
                         '111',  # entity_elegible_voters
                         '11',  # entity_received_ballots
                         '1',  # entity_blank_ballots

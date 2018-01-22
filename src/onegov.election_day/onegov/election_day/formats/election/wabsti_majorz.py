@@ -11,7 +11,6 @@ from uuid import uuid4
 HEADERS = [
     'anzmandate',
     'bfs',
-    'einheitbez',
     'stimmber',
     'stimmabgegeben',
     'stimmleer',
@@ -36,7 +35,6 @@ def parse_election(line, errors):
 
 def parse_election_result(line, errors, entities):
     try:
-        group = line.einheitbez.strip()
         entity_id = int(line.bfs or 0)
         elegible_voters = int(line.stimmber or 0)
         received_ballots = int(line.stimmabgegeben or 0)
@@ -75,9 +73,11 @@ def parse_election_result(line, errors, entities):
                 _("${name} is unknown", mapping={'name': entity_id})
             ))
         else:
+            entity = entities.get(entity_id, {})
             return ElectionResult(
                 id=uuid4(),
-                group=group,
+                name=entity.get('name', ''),
+                district=entity.get('district', ''),
                 entity_id=entity_id,
                 elegible_voters=elegible_voters,
                 received_ballots=received_ballots,
@@ -222,6 +222,8 @@ def import_election_wabsti_majorz(
 
     if errors:
         return errors
+
+    # todo: Add missing entities as uncounted
 
     if results:
         election.clear_results()
