@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.15 (2018-01-22)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds manual bookings to billing.
   [href]
