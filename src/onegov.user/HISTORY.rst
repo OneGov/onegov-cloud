@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.17.4 (2018-01-22)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a few query helper methods to the user collection.
   [href]
