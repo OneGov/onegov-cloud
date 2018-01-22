@@ -49,11 +49,6 @@ def test_sort_keys():
     assert json.dumps(data, sort_keys=True) == '{"a":2,"c":1}'
 
 
-def test_deprecated_custom_json():
-    from onegov.core import custom_json
-    assert custom_json.dumps is json.dumps
-
-
 def test_prefix_serializer():
     prefix = json.PrefixSerializer(
         target=str,
