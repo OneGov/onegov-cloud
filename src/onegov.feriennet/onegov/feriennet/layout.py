@@ -394,12 +394,7 @@ class BillingCollectionLayout(DefaultLayout):
                     SELECT DISTINCT(family)
                     FROM invoice_items
                     WHERE source IS NOT NULL and source != 'xml'
-                ) AS has_online_payments,
-                family IN (
-                    SELECT DISTINCT(family)
-                    FROM invoice_items
-                    WHERE source = 'xml'
-                ) AS has_imported_payments
+                ) AS has_online_payments
             FROM invoice_items
             WHERE family IS NOT NULL
             GROUP BY family, text
