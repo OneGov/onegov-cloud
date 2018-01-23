@@ -1,10 +1,7 @@
 Changelog
 ---------
-1.10.4 (2018-01-16)
+2.0.0 (2018-01-23)
 ~~~~~~~~~~~~~~~~~~~
-
-- Adds a helper for getting the title translations.
-  [msom]
 
 - Splits the group attribute of results to a district and a name atttribute.
   [msom]
