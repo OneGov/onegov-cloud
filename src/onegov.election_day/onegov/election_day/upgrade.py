@@ -192,8 +192,7 @@ def make_notifications_polymorphic(context):
 
 @upgrade_task(
     'Apply static data',
-    requires='onegov.ballot:Replaces results group with name and district',
-    always_run=True
+    requires='onegov.ballot:Replaces results group with name and district'
 )
 def apply_static_data(context):
     principal = getattr(context.app, 'principal', None)
