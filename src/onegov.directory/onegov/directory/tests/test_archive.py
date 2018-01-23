@@ -220,5 +220,6 @@ def test_corodinates(session, temporary_path):
     assert directory.title == "Points of interest"
     assert directory.entries[0].content['coordinates'] == {
         'lat': 34.1341151,
-        'lon': -118.3215482
+        'lon': -118.3215482,
+        'zoom': None
     }

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Ensures the imported lat/lon values are proper coordinates.
+  [href]
+
 0.1.3 (2018-01-22)
 ~~~~~~~~~~~~~~~~~~~~~
 

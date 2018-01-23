@@ -142,7 +142,8 @@ class DirectoryArchiveReader(object):
                 if record.get(lat) and record.get(lon):
                     entry.content['coordinates'] = {
                         'lon': record[lon],
-                        'lat': record[lat]
+                        'lat': record[lat],
+                        'zoom': None
                     }
 
             amount += 1
