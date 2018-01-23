@@ -25,8 +25,10 @@ def get_missing_entities(election, request, session):
     used = [item[0] for item in used]
 
     for id_ in set(all_.keys()) - set(used):
-        name = all_[id_]['name']
-        result.append(name)
+        result.append({
+            'name': all_[id_]['name'],
+            'district': all_[id_].get('district', '')
+        })
 
     return result
 

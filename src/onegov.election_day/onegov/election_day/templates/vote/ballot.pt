@@ -45,6 +45,7 @@
                 <thead>
                     <tr>
                         <th i18n:translate="" class="left-aligned">${layout.principal.label('entity')}</th>
+                        <th i18n:translate="" class="left-aligned" tal:condition="layout.principal.use_districts">${layout.principal.label('district')}</th>
                         <th i18n:translate="" class="left-aligned">Result</th>
                         <th i18n:translate="" class="right-aligned">Yeas</th>
                         <th i18n:translate="" class="right-aligned">Nays</th>
@@ -57,6 +58,7 @@
                 <tbody>
                     <tr class="total static" tal:condition="layout.summarize">
                         <td i18n:translate="">Total</td>
+                        <td tal:condition="layout.principal.use_districts"></td>
                         <td class="answer" tal:condition="not:vote.completed" i18n:translate="">Not yet counted.</td>
                         <td class="answer accepted" tal:condition="vote.completed and ballot.accepted" i18n:translate="">Accepted</td>
                         <td class="answer rejected" tal:condition="vote.completed and not ballot.accepted" i18n:translate="">Rejected</td>
@@ -70,11 +72,13 @@
 
                     <tr tal:repeat="result ballot.results" data-municipality-id="${result.entity_id}">
                         <tal:block condition="not: result.counted">
-                            <td tal:condition="layout.summarize">${layout.format_name(result)}</td>
+                            <td>${layout.format_name(result)}</td>
+                            <td tal:condition="layout.principal.use_districts">${result.district}</td>
                             <td class="answer" colspan="7" i18n:translate="">Not yet counted.</td>
                         </tal:block>
                         <tal:block condition="result.counted">
                             <td>${layout.format_name(result)}</td>
+                            <td tal:condition="layout.principal.use_districts">${result.district}</td>
                             <td class="answer accepted" tal:condition="result.accepted" i18n:translate="">Accepted</td>
                             <td class="answer rejected" tal:condition="not: result.accepted" i18n:translate="">Rejected</td>
                             <td class="right-aligned">${layout.format_number(result.yeas)}</td>
@@ -88,6 +92,7 @@
 
                     <tr class="total static" tal:condition="layout.summarize">
                         <td i18n:translate="">Total</td>
+                        <td tal:condition="layout.principal.use_districts"></td>
                         <td class="answer" tal:condition="not:vote.completed" i18n:translate="">Not yet counted.</td>
                         <td class="answer accepted" tal:condition="vote.completed and ballot.accepted" i18n:translate="">Accepted</td>
                         <td class="answer rejected" tal:condition="vote.completed and not ballot.accepted" i18n:translate="">Rejected</td>

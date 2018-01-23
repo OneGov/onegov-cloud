@@ -35,6 +35,7 @@ def test_principal_load_canton():
     assert principal.base_domain is None
     assert principal.analytics is None
     assert principal.use_maps is True
+    assert principal.use_districts is True
     assert principal.fetch == {}
     assert principal.webhooks == {}
     assert principal.sms_notification is None
@@ -66,6 +67,7 @@ def test_principal_load_municipality_with_static_data():
     assert principal.base_domain is None
     assert principal.analytics is None
     assert principal.use_maps is False
+    assert principal.use_districts is True
     assert principal.fetch == {}
     assert principal.webhooks == {}
     assert principal.sms_notification is None
@@ -96,6 +98,7 @@ def test_principal_load_municipality_wo_static_data():
     assert principal.base_domain is None
     assert principal.analytics is None
     assert principal.use_maps is False
+    assert principal.use_districts is True
     assert principal.fetch == {}
     assert principal.webhooks == {}
     assert principal.sms_notification is None
@@ -111,6 +114,7 @@ def test_principal_load_options():
         base: 'http://www.zg.ch'
         analytics: "<script type=\\"text/javascript\\"></script>"
         use_maps: false
+        use_districts: false
         wabsti_import: true
         fetch:
             steinhausen:
@@ -145,6 +149,7 @@ def test_principal_load_options():
     assert principal.base_domain == 'zg.ch'
     assert principal.analytics == '<script type="text/javascript"></script>'
     assert principal.use_maps is True
+    assert principal.use_districts is False
     assert principal.fetch == {
         'steinhausen': ['municipality'],
         'baar': ['municipality']

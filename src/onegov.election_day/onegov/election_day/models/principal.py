@@ -42,6 +42,7 @@ class Principal(object):
         color='#000',
         base=None,
         analytics=None,
+        use_districts=True,
         use_maps=False,
         fetch=None,
         webhooks=None,
@@ -61,6 +62,7 @@ class Principal(object):
         self.color = color
         self.base = base
         self.analytics = analytics
+        self.use_districts = use_districts
         self.use_maps = use_maps
         self.fetch = fetch or {}
         self.webhooks = webhooks or {}

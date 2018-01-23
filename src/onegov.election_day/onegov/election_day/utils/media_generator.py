@@ -533,7 +533,7 @@ class MediaGenerator():
                         'even'
                     )
 
-                else:
+                elif not principal.use_districts:
                     pdf.table(
                         [[
                             translate(principal.label('entity')),
@@ -577,6 +577,59 @@ class MediaGenerator():
                             item.invalid_ballots or '0',
                         ]],
                         [None, 2.8 * cm, 2.8 * cm, 2.8 * cm, 2.8 * cm],
+                        style=table_style_results(1)
+                    )
+
+                else:
+                    pdf.table(
+                        [[
+                            translate(principal.label('entity')),
+                            translate(principal.label('district')),
+                            translate(_('Turnout')),
+                            translate(_('Elegible Voters')),
+                            translate(_('Accounted Votes')),
+                        ]] + [[
+                            format_name(result),
+                            result.district,
+                            '{0:.2f} %'.format(result.turnout),
+                            result.elegible_voters,
+                            result.accounted_votes,
+                        ] for result in item.results] + [[
+                            translate(_('Total')),
+                            '',
+                            '{0:.2f} %'.format(item.turnout),
+                            item.elegible_voters,
+                            item.accounted_votes,
+                        ]],
+                        [None, None, 2.8 * cm, 2.8 * cm, 2.8 * cm],
+                        style=table_style_results(1)
+                    )
+                    pdf.spacer()
+                    pdf.table(
+                        [[
+                            translate(principal.label('entity')),
+                            translate(principal.label('district')),
+                            translate(_('Received Ballots')),
+                            translate(_('Accounted Ballots')),
+                            translate(_('Blank Ballots')),
+                            translate(_('Invalid Ballots')),
+
+                        ]] + [[
+                            format_name(result),
+                            result.district,
+                            result.received_ballots or '0',
+                            result.accounted_ballots or '0',
+                            result.blank_ballots or '0',
+                            result.invalid_ballots or '0',
+                        ] for result in item.results] + [[
+                            translate(_('Total')),
+                            '',
+                            item.received_ballots or '0',
+                            item.accounted_ballots or '0',
+                            item.blank_ballots or '0',
+                            item.invalid_ballots or '0',
+                        ]],
+                        [None, None, 2.8 * cm, 2.8 * cm, 2.8 * cm, 2.8 * cm],
                         style=table_style_results(1)
                     )
                 pdf.pagebreak()
@@ -670,7 +723,7 @@ class MediaGenerator():
                         )
                         pdf.spacer()
 
-                    else:
+                    elif not principal.use_districts:
                         pdf.spacer()
                         pdf.table(
                             [[
@@ -716,6 +769,68 @@ class MediaGenerator():
                                 ballot.nays or '0',
                             ]],
                             [None, 2.5 * cm, 2.5 * cm, 2.5 * cm, 2.5 * cm],
+                            style=table_style_results(1)
+                        )
+
+                    else:
+                        pdf.spacer()
+                        pdf.table(
+                            [[
+                                translate(principal.label('entity')),
+                                translate(principal.label('district')),
+                                translate(_('Result')),
+                                translate(_('Yes %')),
+                                translate(_('No %')),
+                            ]] + [[
+                                format_name(result),
+                                result.district,
+                                translate(_('Accepted')) if result.accepted
+                                else translate(_('Rejected')),
+                                '{0:.2f}%'.format(result.yeas_percentage),
+                                '{0:.2f}%'.format(result.nays_percentage),
+                            ] for result in ballot.results] + [[
+                                translate(_('Total')),
+                                '',
+                                translate(_('Accepted')) if ballot.accepted
+                                else translate(_('Rejected')),
+                                '{0:.2f}%'.format(ballot.yeas_percentage),
+                                '{0:.2f}%'.format(ballot.nays_percentage),
+                            ]],
+                            [None, None, 2.3 * cm, 2 * cm, 2 * cm],
+                            style=table_style_results(2)
+                        )
+                        pdf.pagebreak()
+                        pdf.table(
+                            [[
+                                translate(principal.label('entity')),
+                                translate(principal.label('district')),
+                                translate(_('Empty')),
+                                translate(_('Invalid')),
+                                translate(_('Yes %')).replace('%', '').strip(),
+                                translate(_('No %')).replace('%', '').strip(),
+                            ]] + [[
+                                format_name(result),
+                                result.district,
+                                result.empty or '0',
+                                result.invalid or '0',
+                                result.yeas or '0',
+                                result.nays or '0',
+                            ] for result in ballot.results] + [[
+                                translate(_('Total')),
+                                '',
+                                ballot.empty or '0',
+                                ballot.invalid or '0',
+                                ballot.yeas or '0',
+                                ballot.nays or '0',
+                            ]],
+                            [
+                                None,
+                                None,
+                                2.3 * cm,
+                                2.3 * cm,
+                                2.0 * cm,
+                                2.0 * cm
+                            ],
                             style=table_style_results(1)
                         )
 

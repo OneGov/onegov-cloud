@@ -13,6 +13,9 @@ Changelog
 - Use the static data for entity names and districts.
   [msom]
 
+- Display districts as a separate column.
+  [msom]
+
 - Adds district translations.
   [msom]
 
