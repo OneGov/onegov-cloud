@@ -44,6 +44,7 @@ Name|Description
 `list_votes`|Total number if list votes. Only with Proporz elections.
 `list_connection`|ID of the list connection. Only with Proporz elections.
 `list_connection_parent`|ID of the superordinate list connection. Only with Proporz elections and if it is a sub-list connection.
+`candidate_id`|ID of the candidate.
 `candidate_family_name`|Surname of the candidate.
 `candidate_first_name`|First name of the candidate.
 `candidate_elected`|True, if the candidate was elected.

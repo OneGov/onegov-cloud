@@ -42,6 +42,7 @@ Nom|Description
 `list_votes`|Nombre total de votes de liste. Uniquement avec les élections Proporz.
 `list_connection`|Identifiant de la connexion de liste. Uniquement avec les élections Proporz.
 `list_connection_parent`|Identifiant de la connexion de liste au niveau supérieur. Uniquement avec les élections Proporz et si c'est une connexion de sous-liste.
+`candidate_id`|Identifiant du candidat.
 `candidate_family_name`|Nom de famille du candidat.
 `candidate_first_name`|Prénom du candidat.
 `candidate_elected`|Vrai, si le candidat a été élu.

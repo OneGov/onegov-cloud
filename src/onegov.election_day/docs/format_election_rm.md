@@ -43,6 +43,7 @@ Num|Descripziun
 `list_votes`|Dumber total da vuschs da la glista. Mo tar elecziuns da proporz.
 `list_connection`|ID da la colliaziun da glistas. Mo tar elecziuns da proporz.
 `list_connection_parent`|ID da la colliaziun da glistas surordinada. Mo tar elecziuns da proporz e sch'i sa tracta d'ina sutcolliaziun da glistas.
+`candidate_id`|La ID da la candidata u dal candidat.
 `candidate_family_name`|Num da famiglia da la candidata u dal candidat.
 `candidate_first_name`|Prenum da la candidata u dal candidat.
 `candidate_elected`|True, sche la candidata u il candidat è vegnì elegì.

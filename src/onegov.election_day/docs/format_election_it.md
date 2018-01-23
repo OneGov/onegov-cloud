@@ -42,6 +42,7 @@ Nome|Descrizione
 `list_votes`|Numero totale di voti di lista. Solo con elezioni con sistema proporzionale.
 `list_connection`|ID dell'apparentamento della lista. Solo con elezioni con sistema proporzionale.
 `list_connection_parent`|ID dell'apparentamento della lista di livello superiore. Solo con elezioni con sistema proporzionale e se è un apparentamento con una sottolista.
+`candidate_id`|ID del candidato.
 `candidate_family_name`|Cognome del candidato.
 `candidate_first_name`|Nome del candidato.
 `candidate_elected`|Vero, se il candidato è stato eletto.

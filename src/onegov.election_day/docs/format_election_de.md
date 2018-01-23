@@ -43,7 +43,8 @@ Name|Beschreibung
 `list_votes`|Gesamte Anzahl der Listenstimmen. Nur bei Proporzwahlen.
 `list_connection`|ID der Listenverbindung. Nur bei Proporzwahlen.
 `list_connection_parent`|ID der übergeordneten Listenverbidnung. Nur bei Proporzwahlen und falls es sich um eine Unterlistenverbindung handelt.
-`candidate_family_name`|Nachnahme des Kandidierenden.
+`candidate_id`|ID des Kandidierenden.
+`candidate_family_name`|Nachname des Kandidierenden.
 `candidate_first_name`|Vorname des Kandidaten.
 `candidate_elected`|True, falls der Kandidierenden gewählt wurde.
 `candidate_party`|Der Name der Partei.
