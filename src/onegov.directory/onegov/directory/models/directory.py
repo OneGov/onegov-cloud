@@ -160,6 +160,11 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
                     updated[field.id] = {}
                     continue
 
+                # if there was no file supplied, we can't add it
+                if not getattr(values[field.id], 'file', None):
+                    updated[field.id] = {}
+                    continue
+
                 # create a new file
                 new_file = DirectoryFile(
                     id=random_token(),

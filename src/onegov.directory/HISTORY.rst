@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes a case where an empty image field would result in an error.
+  [href]
+
 0.1.4 (2018-01-23)
 ~~~~~~~~~~~~~~~~~~~~~
 
