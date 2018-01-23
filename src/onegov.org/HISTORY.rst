@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes a case where an empty image field would result in an error.
+  [href]
+
 - The check password function hasn't worked in a long time -> removed.
   ]href
 

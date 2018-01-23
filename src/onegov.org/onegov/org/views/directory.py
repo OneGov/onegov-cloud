@@ -11,6 +11,7 @@ from onegov.directory import DirectoryEntryCollection
 from onegov.directory import DirectoryZipArchive
 from onegov.directory.errors import ValidationError, MissingColumnError
 from onegov.form import FormCollection
+from onegov.form.fields import UploadField
 from onegov.org import OrgApp, _
 from onegov.org.forms import DirectoryForm, DirectoryImportForm
 from onegov.org.forms.generic import ExportForm
@@ -261,6 +262,10 @@ def handle_new_directory_entry(self, request, form):
 
         request.success(_("Added a new directory entry"))
         return request.redirect(request.link(entry))
+
+    if form.errors:
+        for field in form.match_fields(include_classes=(UploadField, )):
+            getattr(form, field).data = {}
 
     layout = DirectoryEntryCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))

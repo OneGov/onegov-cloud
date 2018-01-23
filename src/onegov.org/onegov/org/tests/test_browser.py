@@ -94,6 +94,51 @@ def test_browse_directory_uploads(browser, org_app, field):
         assert browser.is_text_present("Dieses Feld wird benötigt")
 
 
+def test_upload_image_with_error(browser, org_app):
+    DirectoryCollection(org_app.session(), type='extended').add(
+        title="Crime Scenes",
+        structure="""
+            Name *= ___
+            Description *= ...
+            Photo = *.jpg|*.png
+        """,
+        configuration="""
+            title:
+                - name
+            order:
+                - name
+            display:
+                content:
+                    - name
+                    - description
+                    - photo
+        """,
+        type='extended'
+    )
+
+    transaction.commit()
+
+    # create a new page with a missing field (but do supply the picture)
+    photo = create_image(output=NamedTemporaryFile(suffix='.png'))
+
+    browser.login_admin()
+    browser.visit('/directories/crime-scenes/+new')
+    browser.fill('name', "Seven Seas Motel")
+    browser.fill('photo', photo.name)
+    browser.find_by_value("Absenden").click()
+
+    assert browser.is_text_present("Dieses Feld wird benötigt")
+
+    # try again with the missing field present
+    browser.fill('description', "First victim of Ice Truck Killer")
+    browser.find_by_value("Absenden").click()
+
+    assert browser.is_text_present("Seven Seas Motel")
+
+    # the image won't be there however (it gets cleared in between requests)
+    assert not browser.is_element_present_by_css('.field-display img')
+
+
 def test_browse_directory_editor(browser, org_app):
     browser.login_admin()
     browser.visit('/directories/+new')
