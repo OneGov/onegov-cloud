@@ -227,8 +227,6 @@ def handle_password_reset_request(self, request, form):
 @OrgApp.form(model=Auth, name='reset-password', template='form.pt',
              permission=Public, form=PasswordResetForm)
 def handle_password_reset(self, request, form):
-    request.include('check_password')
-
     if form.submitted(request):
         # do NOT log the user in at this point - only onegov.user.auth does
         # logins - we only ever want one path to be able to login, which makes

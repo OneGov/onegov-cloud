@@ -289,12 +289,6 @@ def get_check_contrast_asset():
     yield 'check_contrast.js'
 
 
-@OrgApp.webasset('check_password')
-def get_check_password_asset():
-    yield 'zxcvbn.js'
-    yield 'check_password.js'
-
-
 @OrgApp.webasset('code_editor')
 def get_code_editor_asset():
     yield 'ace.js'

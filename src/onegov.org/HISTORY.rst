@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- The check password function hasn't worked in a long time -> removed.
+  ]href
+
 0.20.2 (2018-01-22)
 ~~~~~~~~~~~~~~~~~~~
 
