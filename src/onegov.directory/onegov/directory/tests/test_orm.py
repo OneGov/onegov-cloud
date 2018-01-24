@@ -474,3 +474,32 @@ def test_introduce_required_field(session):
     """
 
     session.flush()
+
+
+def test_change_number_range_fail(session):
+    rooms = DirectoryCollection(session).add(
+        title="Prediction",
+        structure="""
+            Description *= ___
+            Confidence = 0..1000
+        """,
+        configuration=DirectoryConfiguration(
+            title=('Description', ),
+            order=('Description', ),
+        )
+    )
+
+    rooms.add(values=dict(
+        description="Bitcoin is a Bubble",
+        confidence=1000
+    ))
+
+    session.flush()
+
+    rooms.structure = """
+        Description *= ___
+        Confidence = 0..100
+    """
+
+    with pytest.raises(ValidationError):
+        session.flush()

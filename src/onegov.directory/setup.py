@@ -36,7 +36,7 @@ setup(
         'more_itertools',
         'onegov.core>=0.4.0',
         'onegov.file',
-        'onegov.form',
+        'onegov.form>=0.31.0',
         'onegov.gis',
         'onegov.search',
         'pyyaml',

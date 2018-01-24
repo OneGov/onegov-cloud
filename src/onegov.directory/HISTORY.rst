@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes number ranges not being validated during migrations.
+  [href]
+
 0.1.5 (2018-01-24)
 ~~~~~~~~~~~~~~~~~~~~~
 
