@@ -130,7 +130,10 @@ def handle_edit_directory(self, request, form):
                 self.session.flush()
             except ValidationError as e:
                 error = e
-                error.link = request.link(e.entry)
+                error.link = request.class_link(DirectoryEntry, {
+                    'directory_name': self.directory.name,
+                    'name': e.entry.name
+                })
                 transaction.abort()
             else:
                 request.success(_("Your changes were saved"))
