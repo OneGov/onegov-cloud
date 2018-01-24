@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.31.0 (2018-01-24)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds an Optional validator that does not ignore "data" and defaults to it.
   [href]
