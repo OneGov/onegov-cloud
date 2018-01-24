@@ -130,11 +130,12 @@ class DirectoryArchiveReader(object):
             values = parser.parse(record)
 
             if skip_existing:
-                if directory.configuration.extract_name(values) in existing:
+                name = directory.configuration.extract_name(values)
+
+                if name in existing:
                     continue
 
-            if limit and amount > limit:
-                continue
+                existing.add(name)
 
             try:
                 entry = directory.add(values)

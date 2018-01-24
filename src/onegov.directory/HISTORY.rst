@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes import duplicates not being detected in all instances.
+  [href]
+
 - Fixes limit not being applied correctly (off by one).
   [href]
 
