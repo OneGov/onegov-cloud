@@ -1,0 +1,29 @@
+language: python
+python: "3.6"
+cache: pip
+
+matrix:
+  include:
+    - language: python
+      python: "3.6"
+      env: TOXENV=py36
+
+    - language: python
+      python: "3.6"
+      env: TOXENV=pep8
+
+install:
+  - pip install tox
+
+script:
+  - tox -e $TOXENV
+
+deploy:
+  - provider: pypi
+    distributions: "sdist bdist_wheel"
+    user: seantis
+    password:
+      secure: "G2zZGP4FJ7861pqBszAoEtr2EpOFa8LyPkxk/XObtgNE6wSb4LQmgV4VfOGa1uFL8EOMpP+uqNU3qsR0YLOIYeTqVIwsEu+x8xxm/75Ti4MCUynhdFZ18hbpkKbBb9OTuyWsFT1oCE0ReJLmwowa14ls/0cz5askGjNhIQjXo3r3HTIC2Y5XvE0ord9LnsdwBOvF/P/lpWBmO+UdkbGic0m7JvqjTkFBSa2W2XRdKoN/vnYeXTD/fFsuhTgxtlSWRNvcge7MR2mHqX3XsQkhisTLX46IIUDleJwZXnsBC4WRbQFqKW1uIOlhYVTWzNSNcGWIxmsWi4ZnrWtNKBm5jaUQp1sR2nTwTdIugD25QlVxlrVs4yyBqPdjqEySV+19Z5f5MfmiqcAQduWP4NFFc0Jn1CqtFsVP/bHYYrru3W21IGFPGtfO9nZNrz4mpRHwfNiFp2EcAU+mpFcbAdzi5b8hYNFgMcy2etw2D0OkVLSFK/e30S7ck6NHf850SevQ8zQHE0418vIYwRNOiIUzpCvUp6xvrkg24iGP+dEOPiimQsvXHQXV0RWAhGnP7vPSXHeicRTVUCUB25HbDSzQkhcfdPj5bEggmQx2DEeF2xX3goD1Nc1Y8Pvb+s1mRCDvSlUiQHNs46Y6XfydV68vsNhCbcBQr8FKCy0Op+YHa/U="
+    on:
+      tags: true
+      condition: $TOXENV = py36
