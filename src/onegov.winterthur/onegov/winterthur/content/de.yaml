@@ -1,0 +1,91 @@
+page-default: &lorem-ipsum
+  text: |
+    <p>
+      Weit hinten, hinter den Wortbergen, fern der Länder Vokalien und
+      Konsonantien leben die Blindtexte. Abgeschieden wohnen sie in
+      Buchstabhausen an der Küste des Semantik, eines grossen Sprachozeans.
+    </p>
+
+    <p>
+      Ein kleines Bächlein namens Duden fließt durch ihren Ort und versorgt
+      sie mit den nötigen Regelialien. Es ist ein paradiesmatisches Land,
+      in dem einem gebratene Satzteile in den Mund fliegen.
+    </p>
+
+    <p>
+      Nicht einmal von der allmächtigen Interpunktion werden die Blindtexte
+      beherrscht – ein geradezu unorthographisches Leben. Eines Tages aber
+      beschloss eine kleine Zeile Blindtext, ihr Name war Lorem Ipsum,
+      hinaus zu gehen in die weite Grammatik.
+    </p>
+
+pages:
+  - title: Über uns
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        In diesem Bereich der Website wird die Organisation beschrieben.
+  - title: Aktuelles
+    type: news
+    name: news
+    meta:
+      trait: news
+  - title: Wir haben eine neue Webseite!
+    parent: news
+    type: news
+    meta:
+      trait: news
+    content:
+      lead: >
+        Die neue Webseite läuft auf Feriennet, der Buchungsplattform für
+        betreute Ferienangebote der Stiftung Pro Juventute.
+      text: |
+        <p>
+          Feriennet ist die umfassende, komplett webbasierte Softwarelösung
+          für die einfache, zeit- und kostensparende Organisation von
+          betreuten Ferienangeboten.
+        </p>
+        <p>
+          Weitere Informationen auf
+          <a href="http://feriennet.projuventute.ch">
+            feriennet.projuventute.ch
+          </a>
+        </p>
+
+organisation:
+  theme_options:
+    footer-height: 235px
+    primary-color: '#e33521'
+  meta:
+    homepage_structure: |
+      <row>
+        <column span="8">
+          <slider />
+          <news />
+        </column>
+        <column span="4">
+          <panel>
+            <links>
+                <link url="./people"
+                    description="Personen">
+                    Team
+                </link>
+                <link url="./forms/kontakt"
+                    description="Anfragen">
+                    Kontakt
+                </link>
+                <link url="./news"
+                    description="Neuigkeiten">
+                    Aktuelles
+                </link>
+                <link url="./photoalbums"
+                    description="Impressionen">
+                    Fotoalben
+                </link>
+            </links>
+          </panel>
+        </column>
+      </row>
