@@ -2,14 +2,15 @@ from html import escape
 from onegov.form import errors
 from onegov.form.core import FieldDependency
 from onegov.form.core import Form
-from onegov.form.core import with_options
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import UploadField
 from onegov.form.parser.core import parse_formcode
 from onegov.form.utils import as_internal_id
+from onegov.form.utils import with_options
 from onegov.form.validators import ExpectedExtensions
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import Stdnum
+from onegov.form.validators import StrictOptional
 from wtforms import PasswordField
 from wtforms import RadioField
 from wtforms import StringField
@@ -23,7 +24,6 @@ from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired
 from wtforms.validators import Length
 from wtforms.validators import NumberRange
-from wtforms.validators import Optional
 from wtforms.validators import Regexp
 from wtforms.validators import URL
 from wtforms.widgets import TextArea
@@ -180,7 +180,9 @@ def handle_field(builder, field, dependency=None):
             required=field.required,
             choices=[(c.key, c.label) for c in field.choices],
             default=next((c.key for c in field.choices if c.selected), None),
-            pricing=field.pricing
+            pricing=field.pricing,
+            # do not coerce None into 'None'
+            coerce=lambda v: str(v) if v is not None else v
         )
 
     elif field.type == 'checkbox':
@@ -192,7 +194,9 @@ def handle_field(builder, field, dependency=None):
             required=field.required,
             choices=[(c.key, c.label) for c in field.choices],
             default=[c.key for c in field.choices if c.selected],
-            pricing=field.pricing
+            pricing=field.pricing,
+            # do not coerce None into 'None'
+            coerce=lambda v: str(v) if v is not None else v
         )
 
     elif field.type == 'integer_range':
@@ -287,7 +291,7 @@ class WTFormsClassBuilder(object):
         validators.insert(0, validator)
 
     def validators_add_optional(self, validators):
-        validators.insert(0, Optional())
+        validators.insert(0, StrictOptional())
 
     def mark_as_dependent(self, field_id, dependency):
         field = getattr(self.form_class, field_id)

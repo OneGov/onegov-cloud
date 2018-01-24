@@ -1,12 +1,16 @@
 import importlib
 import humanize
 
+from cgi import FieldStorage
 from mimetypes import types_map
 from onegov.form import _
-from onegov.form.core import with_options
+from onegov.form.utils import with_options
 from onegov.form.errors import InvalidFormSyntax, DuplicateLabelError
 from stdnum.exceptions import ValidationError as StdnumValidationError
 from wtforms import ValidationError
+from wtforms.fields import SelectField
+from wtforms.validators import StopValidation, Optional
+from wtforms.compat import string_types
 
 
 class Stdnum(object):
@@ -152,3 +156,38 @@ class ValidFormDefinition(object):
                                     label=formfield.label.text
                                 )
                             )
+
+
+class StrictOptional(Optional):
+    """ A copy of wtform's Optional validator, but with a more strict approach
+    to optional validation checking.
+
+    See https://github.com/wtforms/wtforms/issues/350
+
+    """
+
+    def is_missing(self, value):
+        if isinstance(value, FieldStorage):
+            return False
+
+        if not value:
+            return True
+
+        if isinstance(value, string_types):
+            return not self.string_check(value)
+
+        return False
+
+    def __call__(self, form, field):
+        raw = field.raw_data and field.raw_data[0]
+        val = field.data
+
+        # the selectfields have this annyoing habit of coercing all values
+        # that are added to them -> this includes the None, which is turned
+        # into 'None'
+        if isinstance(field, SelectField) and val == 'None':
+            val = None
+
+        if self.is_missing(raw) and self.is_missing(val):
+            field.errors[:] = []
+            raise StopValidation()

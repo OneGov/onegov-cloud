@@ -15,7 +15,6 @@ from onegov.form.core import (
     Form,
     merge_forms,
     move_fields,
-    with_options,
 )
 from onegov.form.display import render_field
 from onegov.form.extensions import FormExtension, Extendable
@@ -32,7 +31,7 @@ from onegov.form.parser import flatten_fieldsets
 from onegov.form.parser import parse_form
 from onegov.form.parser import parse_formcode
 from onegov.form.parser import WTFormsClassBuilder
-from onegov.form.utils import decimal_range, as_internal_id
+from onegov.form.utils import decimal_range, as_internal_id, with_options
 
 __all__ = [
     'as_internal_id',

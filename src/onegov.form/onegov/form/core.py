@@ -1,15 +1,15 @@
-import inspect
 import weakref
 
 from collections import OrderedDict
 from decimal import Decimal
 from itertools import groupby
 from onegov.form import utils
+from onegov.form.validators import StrictOptional
 from onegov.pay import Price
 from operator import itemgetter
 from wtforms import Form as BaseForm
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import InputRequired, DataRequired, Optional
+from wtforms.validators import InputRequired, DataRequired
 from wtforms_components import If, Chain
 
 
@@ -216,7 +216,7 @@ class Form(BaseForm):
                     ),
                     If(
                         field.depends_on.unfulfilled,
-                        Optional()
+                        StrictOptional()
                     ),
                 )
 
@@ -532,42 +532,6 @@ class Fieldset(object):
         """ Returns only the fields which are not empty. """
         return OrderedDict(
             (id, field) for id, field in self.fields.items() if field.data)
-
-
-def with_options(widget, **render_options):
-    """ Takes a widget class or instance and returns a child-instance of the
-    widget class, with the given options set on the render call.
-
-    This makes it easy to use existing WTForms widgets with custom render
-    options:
-
-    field = StringField(widget=with_options(TextArea, class_="markdown"))
-
-    Note: With wtforms 2.1 this is no longer necssary. Instead use the
-    render_kw parameter of the field class. This function will be deprecated
-    in a future release.
-
-    """
-
-    if inspect.isclass(widget):
-        class Widget(widget):
-
-            def __call__(self, *args, **kwargs):
-                render_options.update(kwargs)
-                return super().__call__(*args, **render_options)
-
-        return Widget()
-    else:
-        class Widget(widget.__class__):
-
-            def __init__(self):
-                self.__dict__.update(widget.__dict__)
-
-            def __call__(self, *args, **kwargs):
-                render_options.update(kwargs)
-                return widget.__call__(*args, **render_options)
-
-        return Widget()
 
 
 class FieldDependency(object):

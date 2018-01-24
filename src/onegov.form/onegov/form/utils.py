@@ -1,3 +1,4 @@
+import inspect
 import re
 
 from decimal import Decimal
@@ -86,3 +87,39 @@ class decimal_range(object):
 
 def hash_definition(definition):
     return md5(definition.encode('utf-8')).hexdigest()
+
+
+def with_options(widget, **render_options):
+    """ Takes a widget class or instance and returns a child-instance of the
+    widget class, with the given options set on the render call.
+
+    This makes it easy to use existing WTForms widgets with custom render
+    options:
+
+    field = StringField(widget=with_options(TextArea, class_="markdown"))
+
+    Note: With wtforms 2.1 this is no longer necssary. Instead use the
+    render_kw parameter of the field class. This function will be deprecated
+    in a future release.
+
+    """
+
+    if inspect.isclass(widget):
+        class Widget(widget):
+
+            def __call__(self, *args, **kwargs):
+                render_options.update(kwargs)
+                return super().__call__(*args, **render_options)
+
+        return Widget()
+    else:
+        class Widget(widget.__class__):
+
+            def __init__(self):
+                self.__dict__.update(widget.__dict__)
+
+            def __call__(self, *args, **kwargs):
+                render_options.update(kwargs)
+                return widget.__call__(*args, **render_options)
+
+        return Widget()
