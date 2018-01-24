@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to provide a callback for each successful entry import.
+  [href]
+
 - Fixes a case where an empty image field would result in an error.
   [href]
 

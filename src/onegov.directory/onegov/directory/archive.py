@@ -81,7 +81,7 @@ class DirectoryArchiveReader(object):
     """ Reading part of :class:`DirectoryArchive`. """
 
     def read(self, target=None, skip_existing=True, limit=0,
-             apply_metadata=True):
+             apply_metadata=True, after_import=None):
         """ Reads the archive resulting in a dictionary and entries.
 
         :param target:
@@ -99,6 +99,9 @@ class DirectoryArchiveReader(object):
         :param apply_metadata:
             True if the metadata found in the archive should be applied
             to the directory.
+
+        :param after_import:
+            Called with the newly added entry, right after it has been added.
 
         """
 
@@ -147,6 +150,9 @@ class DirectoryArchiveReader(object):
                     }
 
             amount += 1
+
+            if after_import is not None:
+                after_import(entry)
 
         return directory
 
