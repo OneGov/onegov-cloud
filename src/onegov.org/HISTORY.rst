@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.20.3 (2018-01-24)
+~~~~~~~~~~~~~~~~~~~
+
 - Shows how many entries were imported during directory import.
   [href]
 
