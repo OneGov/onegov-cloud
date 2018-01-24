@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.5 (2018-01-24)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Fixes import duplicates not being detected in all instances.
   [href]
 
