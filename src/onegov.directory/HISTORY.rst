@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes limit not being applied correctly (off by one).
+  [href]
+
 - Adds the ability to provide a callback for each successful entry import.
   [href]
 

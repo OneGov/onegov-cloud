@@ -123,6 +123,10 @@ class DirectoryArchiveReader(object):
         amount = 0
 
         for record in self.read_data():
+
+            if limit and amount >= limit:
+                break
+
             values = parser.parse(record)
 
             if skip_existing:
