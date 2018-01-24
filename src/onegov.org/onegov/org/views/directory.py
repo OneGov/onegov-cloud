@@ -456,7 +456,7 @@ def view_import(self, request, form):
 
     if form.submitted(request):
         try:
-            form.run_import(target=self.directory)
+            imported = form.run_import(target=self.directory)
         except MissingColumnError as e:
             request.alert(_("The column ${name} is missing", mapping={
                 'name': self.directory.field_by_id(e.column).human_id
@@ -466,6 +466,11 @@ def view_import(self, request, form):
             error = e
             transaction.abort()
         else:
+            notify = imported and request.success or request.warning
+            notify(_("Imported ${count} entries", mapping={
+                'count': imported
+            }))
+
             return request.redirect(request.link(self))
 
     return {

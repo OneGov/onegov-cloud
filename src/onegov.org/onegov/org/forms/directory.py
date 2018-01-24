@@ -233,6 +233,12 @@ class DirectoryImportForm(Form):
     def run_import(self, target):
         session = object_session(target)
 
+        count = 0
+
+        def count_entry(entry):
+            nonlocal count
+            count += 1
+
         if self.mode.data == 'replace':
             for existing in target.entries:
                 session.delete(existing)
@@ -245,5 +251,8 @@ class DirectoryImportForm(Form):
             target=target,
             skip_existing=True,
             limit=100,
-            apply_metadata=self.import_config.data == 'yes'
+            apply_metadata=self.import_config.data == 'yes',
+            after_import=count_entry
         )
+
+        return count

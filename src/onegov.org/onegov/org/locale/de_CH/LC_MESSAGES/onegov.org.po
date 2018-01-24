@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-01-03 15:48+0100\n"
+"POT-Creation-Date: 2018-01-24 09:33+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -512,6 +512,9 @@ msgstr "Aktiv"
 msgid "Role"
 msgstr "Rolle"
 
+msgid "Tags"
+msgstr "Schlagworte"
+
 msgid "Yubikey"
 msgstr "YubiKey"
 
@@ -623,9 +626,6 @@ msgstr "Koordinaten"
 
 msgid "The marker can be moved by dragging it with the mouse"
 msgstr "Der Marker kann mit der Maus verschoben werden"
-
-msgid "Tags"
-msgstr "Schlagworte"
 
 msgid "Date"
 msgstr "Datum"
@@ -2632,6 +2632,10 @@ msgstr "Ein neues Verzeichnis wurde hinzugefügt"
 
 msgid "Added a new directory entry"
 msgstr "Ein neuer Verzeichniseintrag wurde hinzugefügt"
+
+#, python-format
+msgid "Imported ${count} entries"
+msgstr "${count} Einträge importiert"
 
 #, python-format
 msgid "The column ${name} is missing"

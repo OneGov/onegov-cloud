@@ -1,11 +1,14 @@
 Changelog
 ---------
 
+- Shows how many entries were imported during directory import.
+  [href]
+
 - Fixes a case where an empty image field would result in an error.
   [href]
 
 - The check password function hasn't worked in a long time -> removed.
-  ]href
+  [href]
 
 0.20.2 (2018-01-22)
 ~~~~~~~~~~~~~~~~~~~
