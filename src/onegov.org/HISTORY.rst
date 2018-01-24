@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.20.4 (2018-01-24)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes entry link during directory migration not working.
   [href]
 
