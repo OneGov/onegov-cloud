@@ -1,8 +1,8 @@
-from onegov.winterthur.collections import WinterthurAddressCollection
+from onegov.winterthur.collections import AddressCollection
 
 
 def test_synchronise_addresses(session):
-    addresses = WinterthurAddressCollection(session)
+    addresses = AddressCollection(session)
     addresses.synchronise()
 
     count = addresses.query().count()

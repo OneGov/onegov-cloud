@@ -4,19 +4,25 @@ from onegov.core.collection import GenericCollection
 from onegov.core.csv import CSVFile
 from onegov.winterthur.models import WinterthurAddress
 from pycurl import Curl
+from sqlalchemy import distinct
 
 HOST = 'https://stadt.winterthur.ch'
 STREETS = f'{HOST}/_static/strassenverzeichnis/gswpl_strver_str.csv'
 ADDRESSES = f'{HOST}/_static/strassenverzeichnis/gswpl_strver_adr.csv'
 
 
-class WinterthurAddressCollection(GenericCollection):
+class AddressCollection(GenericCollection):
 
     @property
     def model_class(self):
         return WinterthurAddress
 
-    def synchronise(self, streets=STREETS, addresses=ADDRESSES):
+    def streets(self):
+        return self.query().with_entities(
+            distinct(WinterthurAddress.street).label('street')
+        ).order_by(WinterthurAddress.street)
+
+    def update(self, streets=STREETS, addresses=ADDRESSES):
         streets, addresses = self.load_urls(streets, addresses)
 
         streets = {s.strc: s.bez for s in streets.lines}

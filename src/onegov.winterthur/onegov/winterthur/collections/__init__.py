@@ -1,3 +1,3 @@
-from onegov.winterthur.collections.address import WinterthurAddressCollection
+from onegov.winterthur.collections.address import AddressCollection
 
-__all__ = ('WinterthurAddressCollection', )
+__all__ = ('AddressCollection', )
