@@ -12,6 +12,9 @@ matrix:
       python: "3.6"
       env: TOXENV=pep8
 
+addons:
+    postgresql: "9.6"
+
 install:
   - pip install tox
 
