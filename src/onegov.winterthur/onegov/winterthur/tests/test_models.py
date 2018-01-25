@@ -24,3 +24,7 @@ def test_synchronise_addresses(session):
     # synchronise again -> the count should stay the same
     addresses.synchronise()
     assert count == addresses.query().count()
+
+    # check the encoding
+    a = addresses.query().filter_by(street="Alte Römerstrasse").first()
+    assert a.street == "Alte Römerstrasse"
