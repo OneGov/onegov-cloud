@@ -1,0 +1,15 @@
+.streetlist {
+    @media #{$small-up} {
+        @include prefix(column-count, 1);
+    }
+
+    @media #{$medium-up} {
+        @include prefix(column-count, 2);
+    }
+
+    @media #{$large-up} {
+        @include prefix(column-count, 3);
+    }
+
+    list-style-position: inside;
+}
