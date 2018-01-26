@@ -1,4 +1,6 @@
+from onegov.core import utils
 from onegov.org import OrgApp
+from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 from onegov.winterthur.initial_content import create_new_organisation
 from onegov.winterthur.theme import WinterthurTheme
 
@@ -27,3 +29,9 @@ def get_theme():
 @WinterthurApp.setting(section='org', name='create_new_organisation')
 def get_create_new_organisation_factory():
     return create_new_organisation
+
+
+@WinterthurApp.setting(section='i18n', name='localedirs')
+def get_i18n_localedirs():
+    mine = utils.module_path('onegov.winterthur', 'locale')
+    return [mine] + get_org_i18n_localedirs()

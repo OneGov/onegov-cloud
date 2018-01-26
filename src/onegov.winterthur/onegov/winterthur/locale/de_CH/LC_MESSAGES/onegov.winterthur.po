@@ -1,0 +1,32 @@
+msgid "Homepage"
+msgstr "Startseite"
+
+msgid "Addresses"
+msgstr "Adressen"
+
+msgid "Update"
+msgstr "Aktualisieren"
+
+msgid "No streets found."
+msgstr "Keine Strassen gefunden."
+
+msgid "Show street on map"
+msgstr "Strasse auf Karte anzeigen"
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "Place"
+msgstr "Ort"
+
+msgid "City District"
+msgstr "Stadtkreis"
+
+msgid "Neighbourhood"
+msgstr "Quartier"
+
+msgid "Streets Directory"
+msgstr "Strassenverzeichnis"
+
+msgid "The streets directory has been updated"
+msgstr "Das Strassenverzeichnis wurde aktualisiert"
