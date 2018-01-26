@@ -2,7 +2,15 @@
     <tal:b metal:fill-slot="title">
         ${title}
     </tal:b>
+
     <tal:b metal:fill-slot="content">
+        <a href="https://stadtplan.winterthur.ch/?locate=strasse&locations=${addresses[0].street_id}"
+           rel="noopener noreferrer"
+           target="_blank"
+           i18n:translate>
+            Show street on map
+        </a>
+
         <table>
             <thead>
                 <tr>
@@ -15,7 +23,7 @@
             <tbody>
                 <tr tal:repeat="address addresses">
                     <td tal:define="name string:${address.street} ${address.house_number}${address.house_extra}">
-                        <a href="http://stadtplan.winterthur.ch/?locate=adresse&locations=${name.replace(' ', '+')}"
+                        <a href="https://stadtplan.winterthur.ch/?locate=adresse&locations=${name.replace(' ', '+')}"
                            rel="noopener noreferrer"
                            target="_blank">
                             ${name}
