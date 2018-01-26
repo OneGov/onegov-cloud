@@ -34,8 +34,9 @@ class AddressCollection(GenericCollection):
         return self.session.execute(select(query.c))
 
     def update(self, streets=STREETS, addresses=ADDRESSES):
-        streets, addresses = self.load_urls(streets, addresses)
+        self.update_by_csv(*self.load_urls(streets, addresses))
 
+    def update_by_csv(self, streets, addresses):
         streets = {s.strc: s.bez for s in streets.lines}
         current = {address.id: address for address in self.query()}
 

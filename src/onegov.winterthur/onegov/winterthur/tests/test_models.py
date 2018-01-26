@@ -1,9 +1,19 @@
+import pytest
+
 from onegov.winterthur.collections import AddressCollection
 
 
-def test_update_addresses(session):
+@pytest.mark.xfail(reason="the remote host providing the csv might be down")
+def test_download_addresses(session):
     addresses = AddressCollection(session)
     addresses.update()
+
+    assert addresses.query().count() >= 18_000
+
+
+def test_update_adresses(session, streets_csv, addresses_csv):
+    addresses = AddressCollection(session)
+    addresses.update_by_csv(streets_csv, addresses_csv)
 
     count = addresses.query().count()
 
