@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.59.0 (2018-01-26)
+~~~~~~~~~~~~~~~~~~~
 
 - Enables the 'unaccent' extension for postgres.
   [href]
