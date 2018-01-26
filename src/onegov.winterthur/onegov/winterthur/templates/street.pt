@@ -1,0 +1,31 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.winterthur">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <table>
+            <thead>
+                <tr>
+                    <th i18n:translate>Address</th>
+                    <th i18n:translate>Place</th>
+                    <th i18n:translate>City District</th>
+                    <th i18n:translate>Neighbourhood</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr tal:repeat="address addresses">
+                    <td tal:define="name string:${address.street} ${address.house_number}${address.house_extra}">
+                        <a href="http://stadtplan.winterthur.ch/?locate=adresse&locations=${name.replace(' ', '+')}"
+                           rel="noopener noreferrer"
+                           target="_blank">
+                            ${name}
+                        </a>
+                    </td>
+                    <td>${address.zipcode} ${address.place}</td>
+                    <td>${address.district}</td>
+                    <td>${address.neighbourhood}</td>
+                </tr>
+            </tbody>
+        </table>
+    </tal:b>
+</div>

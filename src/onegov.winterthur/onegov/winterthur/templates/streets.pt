@@ -9,7 +9,7 @@
             <a name="${letter}" class="anchor">${letter}</a>
             <ul class="streetlist letter-${letter}">
                 <li tal:repeat="street streets">
-                    <a href="#">${street.street}</a>
+                    <a href="${link_to_street(street.street)}">${street.street}</a>
                 </li>
             </ul>
         </div>

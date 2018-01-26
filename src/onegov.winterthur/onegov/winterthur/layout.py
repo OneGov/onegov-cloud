@@ -1,7 +1,8 @@
 from cached_property import cached_property
 from onegov.org.layout import DefaultLayout
-from onegov.winterthur import _
 from onegov.org.new_elements import Link, Intercooler
+from onegov.winterthur import _
+from onegov.winterthur.collections import AddressCollection
 
 
 class AddressLayout(DefaultLayout):
@@ -22,7 +23,7 @@ class AddressLayout(DefaultLayout):
             Link(
                 text=_("Update"),
                 url=self.csrf_protected_url(
-                    self.request.link(self.model, 'update')
+                    self.request.link(self.model, '+update')
                 ),
                 attrs={'class': 'sync'},
                 traits=Intercooler(
@@ -30,4 +31,15 @@ class AddressLayout(DefaultLayout):
                     redirect_after=self.request.url
                 )
             )
+        ]
+
+
+class AddressSubsetLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Addresses"), self.request.class_link(AddressCollection)),
+            Link(_(self.model.street), '#')
         ]

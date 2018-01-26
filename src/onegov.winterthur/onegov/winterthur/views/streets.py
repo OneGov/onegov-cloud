@@ -1,8 +1,11 @@
 from itertools import groupby
+from onegov.core.cache import lru_cache
 from onegov.core.security import Public, Private
 from onegov.winterthur import WinterthurApp, _
 from onegov.winterthur.collections import AddressCollection
+from onegov.winterthur.collections import AddressSubsetCollection
 from onegov.winterthur.layout import AddressLayout
+from onegov.winterthur.layout import AddressSubsetLayout
 
 
 @WinterthurApp.html(
@@ -17,10 +20,15 @@ def view_streets(self, request):
         )
     }
 
+    @lru_cache(maxsize=1)
+    def link_to_street(street):
+        return request.class_link(AddressSubsetCollection, {'street': street})
+
     return {
         'layout': AddressLayout(self, request),
         'title': _("Streets Directory"),
-        'streets': by_letter
+        'streets': by_letter,
+        'link_to_street': link_to_street
     }
 
 
@@ -36,3 +44,17 @@ def update_streets(self, request):
     self.update()
 
     request.success(_("The streets directory has been updated"))
+
+
+@WinterthurApp.html(
+    model=AddressSubsetCollection,
+    permission=Public,
+    template='street.pt'
+)
+def view_street(self, request):
+
+    return {
+        'layout': AddressSubsetLayout(self, request),
+        'title': self.street,
+        'addresses': self.subset()
+    }

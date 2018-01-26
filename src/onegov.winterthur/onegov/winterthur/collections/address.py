@@ -5,7 +5,7 @@ from onegov.core.csv import CSVFile
 from onegov.core.orm import as_selectable
 from onegov.winterthur.models import WinterthurAddress
 from pycurl import Curl
-from sqlalchemy import select
+from sqlalchemy import select, func
 
 HOST = 'https://stadt.winterthur.ch'
 STREETS = f'{HOST}/_static/strassenverzeichnis/gswpl_strver_str.csv'
@@ -50,6 +50,7 @@ class AddressCollection(GenericCollection):
                 self.session.add(address)
 
             address.id = address_id
+            address.street_id = int(r.strc)
             address.street = streets[r.strc]
             address.house_number = int(r.hnr)
             address.house_extra = r.hnrzu
@@ -76,3 +77,26 @@ class AddressCollection(GenericCollection):
         c.close()
 
         return CSVFile(buffer)
+
+
+class AddressSubsetCollection(GenericCollection):
+
+    def __init__(self, session, street):
+        super().__init__(session)
+        self.street = street
+
+    @property
+    def model_class(self):
+        return WinterthurAddress
+
+    def subset(self):
+        subset = self.query().filter_by(street=self.street)
+
+        return subset.order_by(
+            func.unaccent(WinterthurAddress.street),
+            WinterthurAddress.house_number,
+            WinterthurAddress.house_extra
+        )
+
+    def exists(self):
+        return self.session.query(self.subset().exists()).scalar()

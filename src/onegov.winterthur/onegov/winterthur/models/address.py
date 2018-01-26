@@ -12,6 +12,7 @@ class WinterthurAddress(Base):
     id = Column(Integer, nullable=False, primary_key=True)
 
     #: the street
+    street_id = Column(Integer, nullable=False)
     street = Column(Text, nullable=False)
 
     #: the house
