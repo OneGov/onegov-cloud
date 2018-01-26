@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a generic loading animation for ic-post buttons in the editbar.
+  [href]
+
 0.20.4 (2018-01-24)
 ~~~~~~~~~~~~~~~~~~~
 

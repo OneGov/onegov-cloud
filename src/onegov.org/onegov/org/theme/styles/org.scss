@@ -1278,6 +1278,25 @@ $editbar-bg-color: $topbar-link-bg-hover;
         }
     }
 
+    // animation for intercooler buttons
+    @keyframes oscillate-button {
+        0% { opacity: .75; }
+        50% { opacity: 0; }
+        100% { opacity: .75; }
+    }
+
+    .button[ic-post-to].disabled::after {
+        animation: oscillate-button 2s infinite linear;
+        background-blend-mode: multiply;
+        background-color: $primary-color;
+        bottom: 0;
+        content: '';
+        height: 3px;
+        left: 0;
+        position: absolute;
+        width: 100%;
+    }
+
     button.tiny {
         font-size: .8rem;
         margin-bottom: 0;
