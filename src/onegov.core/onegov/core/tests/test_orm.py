@@ -658,7 +658,7 @@ def test_extensions_schema(postgres_dsn):
         assert obj.data['index'] == str(ix)
         assert obj.data['schema'] == schema
 
-    assert mgr.created_extensions == {'hstore'}
+    assert mgr.created_extensions == {'hstore', 'unaccent'}
 
 
 def test_serialization_failure(postgres_dsn):
