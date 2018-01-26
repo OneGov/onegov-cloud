@@ -1,9 +1,9 @@
 from onegov.winterthur.collections import AddressCollection
 
 
-def test_synchronise_addresses(session):
+def test_update_addresses(session):
     addresses = AddressCollection(session)
-    addresses.synchronise()
+    addresses.update()
 
     count = addresses.query().count()
 
@@ -22,7 +22,7 @@ def test_synchronise_addresses(session):
     assert a.district == 'Winterthur-Stadt'
 
     # synchronise again -> the count should stay the same
-    addresses.synchronise()
+    addresses.update()
     assert count == addresses.query().count()
 
     # check the encoding
