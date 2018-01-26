@@ -13,7 +13,7 @@ from onegov.winterthur.layout import AddressLayout
 def view_streets(self, request):
     by_letter = {
         letter: tuple(streets) for letter, streets in groupby(
-            self.streets(), lambda s: s.street[0].upper()
+            self.streets(), lambda s: s.letter
         )
     }
 

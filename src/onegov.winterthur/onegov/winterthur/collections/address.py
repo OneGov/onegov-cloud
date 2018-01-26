@@ -2,9 +2,10 @@ from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 from onegov.core.collection import GenericCollection
 from onegov.core.csv import CSVFile
+from onegov.core.orm import as_selectable
 from onegov.winterthur.models import WinterthurAddress
 from pycurl import Curl
-from sqlalchemy import distinct
+from sqlalchemy import select
 
 HOST = 'https://stadt.winterthur.ch'
 STREETS = f'{HOST}/_static/strassenverzeichnis/gswpl_strver_str.csv'
@@ -18,9 +19,19 @@ class AddressCollection(GenericCollection):
         return WinterthurAddress
 
     def streets(self):
-        return self.query().with_entities(
-            distinct(WinterthurAddress.street).label('street')
-        ).order_by(WinterthurAddress.street)
+        query = as_selectable("""
+            SELECT
+                UPPER(UNACCENT(LEFT(street, 1))) AS letter, -- Text
+                street                                      -- Text
+            FROM
+                winterthur_addresses
+            GROUP BY
+                street
+            ORDER BY
+                unaccent(street)
+        """)
+
+        return self.session.execute(select(query.c))
 
     def update(self, streets=STREETS, addresses=ADDRESSES):
         streets, addresses = self.load_urls(streets, addresses)
