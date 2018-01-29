@@ -6,10 +6,10 @@ from textwrap import dedent
 
 SUPPORTED_YEARS = list(range(2002, 2018 + 1))
 
-SUPPORTED_YEARS_MAP = list(range(2013, 2017 + 1))
+SUPPORTED_YEARS_MAP = list(range(2013, 2018 + 1))
 SUPPORTED_YEARS_NO_MAP = list(set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP))
 
-SUPPORTED_YEARS_MAP_SG = list(range(2004, 2017 + 1))
+SUPPORTED_YEARS_MAP_SG = list(range(2004, 2018 + 1))
 SUPPORTED_YEARS_NO_MAP_SG = list(
     set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP_SG)
 )
