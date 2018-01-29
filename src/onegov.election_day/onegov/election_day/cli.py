@@ -146,8 +146,8 @@ def generate_media(sentry):
 
         try:
             lockfile.touch(exist_ok=False)
-        except OSError:
-            pass
+        except FileExistsError:
+            return
         else:
             try:
                 media_generator = MediaGenerator(app)

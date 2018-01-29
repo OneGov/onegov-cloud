@@ -1,7 +1,10 @@
 Changelog
 ---------
 
-- Use a more generic PDF signing error log entry.
+- Uses a more generic PDF signing error log entry.
+  [msom]
+
+- Fixes media generation removing the lock file of other instances.
   [msom]
 
 2.0.1 (2018-01-29)
