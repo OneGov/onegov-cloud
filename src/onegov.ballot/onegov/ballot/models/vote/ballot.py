@@ -98,8 +98,8 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
     @property
     def progress(self):
         """ Returns a tuple with the first value being the number of counted
-        ballot result groups and the second value being the number of total
-        result groups related to this vote.
+        ballot results and the second value being the number of total ballot
+        results.
 
         """
 

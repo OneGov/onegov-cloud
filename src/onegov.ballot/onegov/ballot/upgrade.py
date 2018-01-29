@@ -6,6 +6,7 @@ from onegov.ballot import Vote
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
+from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import Integer
@@ -13,8 +14,7 @@ from sqlalchemy import Text
 from sqlalchemy.engine.reflection import Inspector
 
 
-# todo: remove the always_run argument
-@upgrade_task('Rename yays to yeas', always_run=True)
+@upgrade_task('Rename yays to yeas')
 def rename_yays_to_yeas(context):
 
     if context.has_column('ballot_results', 'yeas'):
@@ -266,3 +266,21 @@ def replace_results_group(context):
             context.operations.add_column(
                 table, Column('district', Text, nullable=True)
             )
+
+
+@upgrade_task('Change counted columns of elections')
+def change_counted_columns_of_elections(context):
+    if not context.has_column('election_results', 'counted'):
+        # import pdb; pdb.set_trace()
+        context.operations.add_column(
+            'election_results', Column(
+                'counted', Boolean, nullable=False, server_default='TRUE'
+            )
+        )
+
+    # todo:
+    # if context.has_column('elections', 'total_entities'):
+    #     context.operations.drop_column('elections', 'total_entities')
+    #
+    # if context.has_column('elections', 'counted_entities'):
+    #     context.operations.drop_column('elections', 'counted_entities')

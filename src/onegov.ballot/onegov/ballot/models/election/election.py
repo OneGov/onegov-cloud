@@ -23,6 +23,7 @@ from sqlalchemy import Integer
 from sqlalchemy import select
 from sqlalchemy import Text
 from sqlalchemy_utils import observes
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
@@ -91,36 +92,50 @@ class Election(Base, ContentMixin, TimestampMixin,
     #: Absolute majority
     absolute_majority = Column(Integer, nullable=True, default=lambda: 0)
 
-    #: Total number of political entities
-    total_entities = Column(Integer, nullable=True)
+    @hybrid_property
+    def counted(self):
+        """ True if all results have been counted. """
 
-    #: Number of already counted political entitites
-    counted_entities = Column(Integer, nullable=True)
+        count = self.results.count()
+        if not count:
+            return False
+
+        return (sum(1 for r in self.results if r.counted) == count)
+
+    @counted.expression
+    def counted(cls):
+        expr = select([
+            func.coalesce(func.bool_and(ElectionResult.counted), False)
+        ])
+        expr = expr.where(ElectionResult.election_id == cls.id)
+        expr = expr.label('counted')
+
+        return expr
 
     @property
     def progress(self):
         """ Returns a tuple with the first value being the number of counted
-        entities and the second value being the number of total entities.
+        election results and the second value being the number of total
+        results.
 
         """
 
-        return (self.counted_entities or 0, self.total_entities or 0)
+        query = object_session(self).query(ElectionResult)
+        query = query.with_entities(ElectionResult.counted)
+        query = query.filter(ElectionResult.election_id == self.id)
 
-    @property
-    def counted(self):
-        """ Checks if there are results for all entitites. """
+        results = query.all()
 
-        if self.total_entities and self.counted_entities:
-            return self.total_entities == self.counted_entities
-
-        return False
+        return sum(1 for r in results if r[0]), len(results)
 
     @property
     def has_results(self):
         """ Returns True, if the election has any results. """
 
-        if self.results.first():
-            return True
+        for result in self.results:
+            if result.counted:
+                return True
+
         return False
 
     #: An election contains n candidates
@@ -245,8 +260,6 @@ class Election(Base, ContentMixin, TimestampMixin,
     def clear_results(self):
         """ Clears all the results. """
 
-        self.counted_entities = 0
-        self.total_entities = 0
         self.absolute_majority = None
         self.status = None
 
@@ -282,11 +295,10 @@ class Election(Base, ContentMixin, TimestampMixin,
             Election.number_of_mandates,
             Election.absolute_majority,
             Election.status,
-            Election.counted_entities,
-            Election.total_entities,
             ElectionResult.district,
             ElectionResult.name,
             ElectionResult.entity_id,
+            ElectionResult.counted,
             ElectionResult.elegible_voters,
             ElectionResult.received_ballots,
             ElectionResult.blank_ballots,
@@ -324,27 +336,26 @@ class Election(Base, ContentMixin, TimestampMixin,
             row['election_mandates'] = result[5]
             row['election_absolute_majority'] = result[6]
             row['election_status'] = result[7] or 'unknown'
-            row['election_counted_entities'] = result[8]
-            row['election_total_entities'] = result[9]
 
-            row['entity_district'] = result[10] or ''
-            row['entity_name'] = result[11]
-            row['entity_id'] = result[12]
-            row['entity_elegible_voters'] = result[13]
-            row['entity_received_ballots'] = result[14]
-            row['entity_blank_ballots'] = result[15]
-            row['entity_invalid_ballots'] = result[16]
-            row['entity_unaccounted_ballots'] = result[17]
-            row['entity_accounted_ballots'] = result[18]
-            row['entity_blank_votes'] = result[19]
-            row['entity_invalid_votes'] = result[20]
-            row['entity_accounted_votes'] = result[21]
+            row['entity_district'] = result[8] or ''
+            row['entity_name'] = result[9]
+            row['entity_id'] = result[10]
+            row['entity_counted'] = result[11]
+            row['entity_elegible_voters'] = result[12]
+            row['entity_received_ballots'] = result[13]
+            row['entity_blank_ballots'] = result[14]
+            row['entity_invalid_ballots'] = result[15]
+            row['entity_unaccounted_ballots'] = result[16]
+            row['entity_accounted_ballots'] = result[17]
+            row['entity_blank_votes'] = result[18]
+            row['entity_invalid_votes'] = result[19]
+            row['entity_accounted_votes'] = result[20]
 
-            row['candidate_family_name'] = result[22]
-            row['candidate_first_name'] = result[23]
-            row['candidate_id'] = result[24]
-            row['candidate_elected'] = result[25]
-            row['candidate_party'] = result[26]
+            row['candidate_family_name'] = result[21]
+            row['candidate_first_name'] = result[22]
+            row['candidate_id'] = result[23]
+            row['candidate_elected'] = result[24]
+            row['candidate_party'] = result[25]
             row['candidate_votes'] = result[0]
 
             rows.append(row)

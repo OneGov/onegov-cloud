@@ -2,6 +2,7 @@ from onegov.ballot.models.election.mixins import DerivedAttributesMixin
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
@@ -32,6 +33,10 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
 
     #: the district this entity belongs to
     district = Column(Text, nullable=True)
+
+    #: True if the result has been counted and no changes will be made anymore.
+    #: If the result is definite, all the values below must be specified.
+    counted = Column(Boolean, nullable=False)
 
     #: number of elegible voters
     elegible_voters = Column(Integer, nullable=False, default=lambda: 0)

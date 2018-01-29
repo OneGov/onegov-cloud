@@ -158,11 +158,10 @@ class ProporzElection(Election):
             Election.number_of_mandates,
             Election.absolute_majority,
             Election.status,
-            Election.counted_entities,
-            Election.total_entities,
             ElectionResult.district,
             ElectionResult.name,
             ElectionResult.entity_id,
+            ElectionResult.counted,
             ElectionResult.elegible_voters,
             ElectionResult.received_ballots,
             ElectionResult.blank_ballots,
@@ -256,42 +255,41 @@ class ProporzElection(Election):
             row['election_mandates'] = result[5]
             row['election_absolute_majority'] = result[6]
             row['election_status'] = result[7] or 'unknown'
-            row['election_counted_entities'] = result[8]
-            row['election_total_entities'] = result[9]
 
-            row['entity_district'] = result[10] or ''
-            row['entity_name'] = result[11]
-            row['entity_id'] = result[12]
-            row['entity_elegible_voters'] = result[13]
-            row['entity_received_ballots'] = result[14]
-            row['entity_blank_ballots'] = result[15]
-            row['entity_invalid_ballots'] = result[16]
-            row['entity_unaccounted_ballots'] = result[17]
-            row['entity_accounted_ballots'] = result[18]
-            row['entity_blank_votes'] = result[19]
-            row['entity_invalid_votes'] = result[20]
-            row['entity_accounted_votes'] = result[21]
+            row['entity_district'] = result[8] or ''
+            row['entity_name'] = result[9]
+            row['entity_id'] = result[10]
+            row['entity_counted'] = result[11]
+            row['entity_elegible_voters'] = result[12]
+            row['entity_received_ballots'] = result[13]
+            row['entity_blank_ballots'] = result[14]
+            row['entity_invalid_ballots'] = result[15]
+            row['entity_unaccounted_ballots'] = result[16]
+            row['entity_accounted_ballots'] = result[17]
+            row['entity_blank_votes'] = result[18]
+            row['entity_invalid_votes'] = result[19]
+            row['entity_accounted_votes'] = result[20]
 
-            row['list_name'] = result[22]
-            row['list_id'] = result[23]
-            row['list_number_of_mandates'] = result[24]
+            row['list_name'] = result[21]
+            row['list_id'] = result[22]
+            row['list_number_of_mandates'] = result[23]
             row['list_votes'] = list_results_grouped.get(
                 row['entity_id'], {}
             ).get(row['list_id'], 0)
 
-            row['list_connection'] = result[25]
-            row['list_connection_parent'] = result[26]
+            row['list_connection'] = result[24]
+            row['list_connection_parent'] = result[25]
 
-            row['candidate_family_name'] = result[27]
-            row['candidate_first_name'] = result[28]
-            row['candidate_id'] = result[29]
-            row['candidate_elected'] = result[30]
-            row['candidate_party'] = result[31]
+            row['candidate_family_name'] = result[26]
+            row['candidate_first_name'] = result[27]
+            row['candidate_id'] = result[28]
+            row['candidate_elected'] = result[29]
+            row['candidate_party'] = result[30]
             row['candidate_votes'] = result[0]
 
             for target_id in panachage_lists:
                 key = 'panachage_votes_from_list_{}'.format(target_id)
-                row[key] = panachage.get(result[23], {}).get(target_id)
+                row[key] = panachage.get(result[22], {}).get(target_id)
 
             rows.append(row)
 

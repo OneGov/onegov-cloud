@@ -78,6 +78,7 @@ def test_election_create_all_models(session):
         election_id=election.id,
         name='name',
         entity_id=1000,
+        counted=False,
         elegible_voters=0,
         received_ballots=0,
         blank_ballots=0,
@@ -204,6 +205,7 @@ def test_election_summarized_properties(session):
             ElectionResult(
                 name='name',
                 entity_id=x,
+                counted=True,
                 elegible_voters=100 * x,
                 received_ballots=80 * x,
                 blank_ballots=4 * x,
@@ -233,6 +235,7 @@ def test_derived_properties(session):
     election.results.append(ElectionResult(
         name='name',
         entity_id=1,
+        counted=True,
         elegible_voters=100,
         received_ballots=50,
         blank_ballots=2,
@@ -243,6 +246,7 @@ def test_derived_properties(session):
     election.results.append(ElectionResult(
         name='name',
         entity_id=2,
+        counted=True,
         elegible_voters=200,
         received_ballots=150,
         blank_ballots=6,
@@ -285,25 +289,41 @@ def test_election_counted(session):
     assert election.counted is False
     assert election.progress == (0, 0)
 
-    election.total_entities = 2
-    assert election.counted is False
-    assert election.progress == (0, 2)
+    election.results.append(ElectionResult(
+        name='name',
+        entity_id=1,
+        counted=False,
+        elegible_voters=200,
+        received_ballots=150,
+        blank_ballots=6,
+        invalid_ballots=15,
+        blank_votes=12,
+        invalid_votes=9
+    ))
 
-    election.counted_entities = 1
+    assert election.counted is False
+    assert election.progress == (0, 1)
+
+    election.results.append(ElectionResult(
+        name='name',
+        entity_id=2,
+        counted=True,
+        elegible_voters=200,
+        received_ballots=150,
+        blank_ballots=6,
+        invalid_ballots=15,
+        blank_votes=12,
+        invalid_votes=9
+    ))
+
     assert election.counted is False
     assert election.progress == (1, 2)
 
-    election.counted_entities = 2
+    for result in election.results:
+        result.counted = True
+
     assert election.counted is True
     assert election.progress == (2, 2)
-
-    election.total_entities = 0
-    assert election.counted is False
-    assert election.progress == (2, 0)
-
-    election.total_entities = None
-    assert election.counted is False
-    assert election.progress == (2, 0)
 
 
 def test_election_last_change(session):
@@ -325,6 +345,7 @@ def test_election_last_change(session):
         election.results.append(ElectionResult(
             name='name',
             entity_id=1,
+            counted=True,
             elegible_voters=100,
             received_ballots=50,
             blank_ballots=2,
@@ -342,6 +363,7 @@ def test_election_last_change(session):
         election.results.append(ElectionResult(
             name='name',
             entity_id=2,
+            counted=True,
             elegible_voters=200,
             received_ballots=150,
             blank_ballots=6,
@@ -427,6 +449,7 @@ def test_election_last_change_proporz(session):
         election.results.append(ElectionResult(
             name='name',
             entity_id=1,
+            counted=True,
             elegible_voters=100,
             received_ballots=50,
             blank_ballots=2,
@@ -444,6 +467,7 @@ def test_election_last_change_proporz(session):
         election.results.append(ElectionResult(
             name='name',
             entity_id=2,
+            counted=True,
             elegible_voters=200,
             received_ballots=150,
             blank_ballots=6,
@@ -666,6 +690,7 @@ def test_election_results(session):
     election_result_1 = ElectionResult(
         name='name',
         entity_id=1,
+        counted=True,
         elegible_voters=1000,
         received_ballots=500,
         blank_ballots=10,
@@ -676,6 +701,7 @@ def test_election_results(session):
     election_result_2 = ElectionResult(
         name='name',
         entity_id=2,
+        counted=True,
         elegible_voters=100,
         received_ballots=50,
         blank_ballots=1,
@@ -995,9 +1021,7 @@ def test_election_export(session):
         domain='federation',
         date=date(2015, 6, 14),
         number_of_mandates=1,
-        absolute_majority=144,
-        counted_entities=1,
-        total_entities=2
+        absolute_majority=144
     )
     election.title_translations['it_CH'] = 'Elezione'
 
@@ -1028,6 +1052,7 @@ def test_election_export(session):
     election_result = ElectionResult(
         name='name',
         entity_id=1,
+        counted=True,
         elegible_voters=1000,
         received_ballots=500,
         blank_ballots=10,
@@ -1062,11 +1087,10 @@ def test_election_export(session):
             'election_mandates': 1,
             'election_absolute_majority': 144,
             'election_status': 'unknown',
-            'election_counted_entities': 1,
-            'election_total_entities': 2,
             'entity_district': '',
             'entity_name': 'name',
             'entity_id': 1,
+            'entity_counted': True,
             'entity_elegible_voters': 1000,
             'entity_received_ballots': 500,
             'entity_blank_ballots': 10,
@@ -1091,11 +1115,10 @@ def test_election_export(session):
             'election_mandates': 1,
             'election_absolute_majority': 144,
             'election_status': 'unknown',
-            'election_counted_entities': 1,
-            'election_total_entities': 2,
             'entity_district': '',
             'entity_name': 'name',
             'entity_id': 1,
+            'entity_counted': True,
             'entity_elegible_voters': 1000,
             'entity_received_ballots': 500,
             'entity_blank_ballots': 10,
@@ -1121,9 +1144,7 @@ def test_election_export_proporz(session):
         domain='federation',
         date=date(2015, 6, 14),
         number_of_mandates=1,
-        absolute_majority=144,
-        counted_entities=1,
-        total_entities=2
+        absolute_majority=144
     )
     election.title_translations['it_CH'] = 'Elezione'
 
@@ -1182,6 +1203,7 @@ def test_election_export_proporz(session):
     election_result = ElectionResult(
         name='name',
         entity_id=1,
+        counted=True,
         elegible_voters=1000,
         received_ballots=500,
         blank_ballots=10,
@@ -1236,11 +1258,10 @@ def test_election_export_proporz(session):
             'election_mandates': 1,
             'election_absolute_majority': 144,
             'election_status': 'unknown',
-            'election_counted_entities': 1,
-            'election_total_entities': 2,
             'entity_district': '',
             'entity_name': 'name',
             'entity_id': 1,
+            'entity_counted': True,
             'entity_elegible_voters': 1000,
             'entity_received_ballots': 500,
             'entity_blank_ballots': 10,
@@ -1274,11 +1295,10 @@ def test_election_export_proporz(session):
             'election_mandates': 1,
             'election_absolute_majority': 144,
             'election_status': 'unknown',
-            'election_counted_entities': 1,
-            'election_total_entities': 2,
             'entity_district': '',
             'entity_name': 'name',
             'entity_id': 1,
+            'entity_counted': True,
             'entity_elegible_voters': 1000,
             'entity_received_ballots': 500,
             'entity_blank_ballots': 10,
@@ -1337,11 +1357,11 @@ def test_election_status(session):
         date=date(2015, 6, 14),
         number_of_mandates=1
     )
-    assert election.status is None
-    assert election.completed is False
-
     session.add(election)
     session.flush()
+
+    assert election.status is None
+    assert election.completed is False
 
     # Set status
     election.status = 'unknown'
@@ -1361,29 +1381,51 @@ def test_election_status(session):
     assert election.status is None
 
     # Test completed calcuation
-    for status in (None, 'unknown'):
+    # ... empty election
+    for status, completed in (
+        (None, False), ('unknown', False), ('interim', False), ('final', True)
+    ):
         election.status = status
-        for counted, total in (
-            (None, None), (0, 0), (None, 0), (0, None), (5, None), (None, 5),
-            (0, 5), (2, 5), (6, 5)
-        ):
-            election.counted_entities = counted
-            election.total_entities = total
-            assert election.completed is False
+        assert election.completed == completed
 
-        election.counted_entities = 5
-        election.total_entities = 5
-        assert election.completed is True
+    # ... election with some results
+    election.results.append(ElectionResult(
+        name='name',
+        entity_id=1,
+        counted=True,
+        elegible_voters=200,
+        received_ballots=150,
+        blank_ballots=6,
+        invalid_ballots=15,
+        blank_votes=12,
+        invalid_votes=9
+    ))
+    election.results.append(ElectionResult(
+        name='name',
+        entity_id=2,
+        counted=False,
+        elegible_voters=200,
+        received_ballots=150,
+        blank_ballots=6,
+        invalid_ballots=15,
+        blank_votes=12,
+        invalid_votes=9
+    ))
 
-    for status, completed in (('interim', False), ('final', True)):
+    for status, completed in (
+        (None, False), ('unknown', False), ('interim', False), ('final', True)
+    ):
         election.status = status
-        for counted, total in (
-            (None, None), (0, 0), (None, 0), (0, None), (5, None), (None, 5),
-            (0, 5), (2, 5), (6, 5), (5, 5)
-        ):
-            election.counted_entities = counted
-            election.total_entities = total
-            assert election.completed == completed
+        assert election.completed == completed
+
+    # ... vote with all results
+    for result in election.results:
+        result.counted = True
+    for status, completed in (
+        (None, True), ('unknown', True), ('interim', False), ('final', True)
+    ):
+        election.status = status
+        assert election.completed == completed
 
 
 def test_clear_election(session):
@@ -1397,8 +1439,6 @@ def test_clear_election(session):
         domain='canton',
         date=date(2017, 1, 1),
         status='interim',
-        counted_entities=1,
-        total_entities=2,
         absolute_majority=10000
     )
     election.list_connections.append(
@@ -1431,6 +1471,7 @@ def test_clear_election(session):
             id=eid,
             name='name',
             entity_id=1,
+            counted=True,
             elegible_voters=100,
             received_ballots=2,
             blank_ballots=3,
@@ -1460,8 +1501,6 @@ def test_clear_election(session):
 
     election.clear_results()
 
-    assert election.counted_entities == 0
-    assert election.total_entities == 0
     assert election.absolute_majority is None
     assert election.status is None
     assert election.list_connections.all() == []
@@ -1487,6 +1526,7 @@ def test_election_has_results(session):
         ElectionResult(
             name='name',
             entity_id=1,
+            counted=False,
             elegible_voters=100,
             received_ballots=2,
             blank_ballots=3,
@@ -1495,5 +1535,9 @@ def test_election_has_results(session):
             invalid_votes=6
         )
     )
+
+    assert election.has_results is False
+
+    election.results.one().counted = True
 
     assert election.has_results is True
