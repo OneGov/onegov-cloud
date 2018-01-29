@@ -35,3 +35,14 @@ def get_create_new_organisation_factory():
 def get_i18n_localedirs():
     mine = utils.module_path('onegov.winterthur', 'locale')
     return [mine] + get_org_i18n_localedirs()
+
+
+@WinterthurApp.webasset_path()
+def get_js_path():
+    return 'assets/js'
+
+
+@WinterthurApp.webasset('street-search')
+def get_search_asset():
+    yield 'wade.js'
+    yield 'street-search.js'

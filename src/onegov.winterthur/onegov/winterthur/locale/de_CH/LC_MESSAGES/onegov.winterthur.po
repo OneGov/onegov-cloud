@@ -10,6 +10,9 @@ msgstr "Aktualisieren"
 msgid "No streets found."
 msgstr "Keine Strassen gefunden."
 
+msgid "Search streets"
+msgstr "Strassen suchen"
+
 msgid "Show street on map"
 msgstr "Strasse auf Karte anzeigen"
 

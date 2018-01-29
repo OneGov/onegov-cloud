@@ -14,6 +14,8 @@ from onegov.winterthur.layout import AddressSubsetLayout
     template='streets.pt'
 )
 def view_streets(self, request):
+    request.include('street-search')
+
     by_letter = {
         letter: tuple(streets) for letter, streets in groupby(
             self.streets(), lambda s: s.letter

@@ -3,12 +3,18 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <p tal:condition="not:streets" i18n:translate="">No streets found.</p>
+        <div tal:condition="streets">
+            <input type="text" data-street-search placeholder="Search streets" i18n:attributes="placeholder">
+        </div>
 
-        <div tal:condition="streets" tal:repeat="(letter, streets) streets.items()" class="letter-block letter-${letter}">
+        <p style="display: ${streets and 'none' or 'block'};" i18n:translate="" data-no-results>No streets found.</p>
+
+        <div tal:condition="streets" tal:repeat="(letter, streets) streets.items()"
+             data-letter="${letter}" class="letter-block letter-${letter}" >
+
             <a name="${letter}" class="anchor">${letter}</a>
             <ul class="streetlist letter-${letter}">
-                <li tal:repeat="street streets">
+                <li tal:repeat="street streets" data-street="${street.street}" data-letter="${letter}">
                     <a href="${link_to_street(street.street)}">${street.street}</a>
                 </li>
             </ul>
