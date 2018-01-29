@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Use a more generic PDF signing error log entry.
+  [msom]
+
 2.0.1 (2018-01-29)
 ~~~~~~~~~~~~~~~~~~~
 

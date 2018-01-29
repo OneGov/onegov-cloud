@@ -167,7 +167,8 @@ class MediaGenerator():
                 try:
                     data = signer.sign(file, filename, reason)
                 except Exception as e:
-                    log.error("Could not sign PDF {}: {}".format(filename, e))
+                    log.error("Could not sign PDF: {}".format(e))
+                    log.warning("PDF {} could not be signed".format(filename))
                     return
 
             self.app.filestorage.remove(path)
