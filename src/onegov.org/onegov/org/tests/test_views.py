@@ -161,7 +161,7 @@ def test_view_images(org_app):
 def test_login(org_app):
     client = Client(org_app)
 
-    links = client.get('/').pyquery('#global-tools a.login')
+    links = client.get('/').pyquery('.globals a.login')
     assert links.text() == 'Login'
 
     login_page = client.get(links.attr('href'))
@@ -184,20 +184,20 @@ def test_login(org_app):
     index_page = login_page.form.submit().follow()
     assert "Sie wurden eingeloggt" in index_page.text
 
-    links = index_page.pyquery('#global-tools a.logout')
+    links = index_page.pyquery('.globals a.logout')
     assert links.text() == 'Logout'
 
     index_page = client.get(links.attr('href')).follow()
     assert "Sie wurden ausgeloggt" in index_page.text
 
-    links = index_page.pyquery('#global-tools a.login')
+    links = index_page.pyquery('.globals a.login')
     assert links.text() == 'Login'
 
 
 def test_reset_password(org_app):
     client = Client(org_app)
 
-    links = client.get('/').pyquery('#global-tools a.login')
+    links = client.get('/').pyquery('.globals a.login')
     assert links.text() == 'Login'
     login_page = client.get(links.attr('href'))
 

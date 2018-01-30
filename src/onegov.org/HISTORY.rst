@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds more classes to the blocks of the global layout.
+  [href]
+
 - Adds a generic loading animation for ic-post buttons in the editbar.
   [href]
 

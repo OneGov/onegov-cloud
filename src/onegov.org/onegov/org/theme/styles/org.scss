@@ -184,13 +184,13 @@ body {
 /*
     The global tools header
 */
-$global-tools-margin: .75rem;
-$global-tools-height: 2.5rem;
+$globals-margin: .75rem;
+$globals-height: 2.5rem;
 
-#global-tools {
+.globals {
     @include primary-color-background;
-    margin-bottom: $global-tools-margin;
-    min-height: $global-tools-height;
+    margin-bottom: $globals-margin;
+    min-height: $globals-height;
     width: 100%;
 
     .row > .columns > ul {
@@ -216,8 +216,8 @@ $global-tools-height: 2.5rem;
                 color: $primary-fg-color;
                 display: inline-block;
                 font-size: .875rem;
-                height: $global-tools-height;
-                line-height: $global-tools-height;
+                height: $globals-height;
+                line-height: $globals-height;
                 padding: 0 .5rem;
 
                 &:hover {
@@ -302,7 +302,7 @@ $global-tools-height: 2.5rem;
     // the header is fixed and the logo in it tries to fill it out
     // therefore an svg logo should be used!
     height: 7em;
-    margin-bottom: $global-tools-margin;
+    margin-bottom: $globals-margin;
 
     img {
         height: 7em;
@@ -4094,7 +4094,7 @@ h2 + div.timeline {
     Print Styles
 */
 @media print {
-    #global-tools,
+    .globals,
     .alert-box,
     .date-range-selector,
     .date-range-selector-result,

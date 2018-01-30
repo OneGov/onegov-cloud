@@ -28,7 +28,7 @@
     <link rel="stylesheet" type="text/css" href="${request.theme_link}">
     <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
 
-    <tal:block metal:use-macro="layout.macros.favicon" />
+    <tal:b metal:use-macro="layout.macros.favicon" />
 
     <tal:b define="sentry_js layout.app.sentry_js" condition="sentry_js">
       <script src="https://cdn.ravenjs.com/3.20.1/raven.min.js" crossorigin="anonymous"></script>
@@ -48,23 +48,24 @@
     <a class="show-for-sr" href="#content" i18n:translate>Skip navigation</a>
 
     <div id="inner-body">
-      <div id="global-tools">
+
+      <div class="globals">
         <div class="row">
           <div class="columns small-12">
             <ul tal:condition="global_tools|nothing">
-                <li tal:repeat="tool global_tools">
-                    <tal:block condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">
-                          <a href="#" data-dropdown="${dropdown_id}" class="dropdown ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
-                          <ul id="${dropdown_id}" data-dropdown-content class="f-dropdown disable-scroll">
-                              <li tal:repeat="link tool.links">
-                                  <tal:block replace="structure link(layout)" />
-                              </li>
-                          </ul>
-                    </tal:block>
-                    <tal:block condition="tool.url|tool.id|nothing" define="link tool">
-                        <tal:block replace="structure link(layout)" />
-                    </tal:block>
-                </li>
+              <li tal:repeat="tool global_tools">
+                <tal:b condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">
+                  <a href="#" data-dropdown="${dropdown_id}" class="dropdown ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
+                  <ul id="${dropdown_id}" data-dropdown-content class="f-dropdown disable-scroll">
+                      <li tal:repeat="link tool.links">
+                          <tal:b replace="structure link(layout)" />
+                      </li>
+                  </ul>
+                </tal:b>
+                <tal:b condition="tool.url|tool.id|nothing" define="link tool">
+                  <tal:b replace="structure link(layout)" />
+                </tal:b>
+              </li>
             </ul>
           </div>
         </div>
@@ -98,7 +99,8 @@
           </form>
         </div>
       </div>
-      <div class="row">
+
+      <div class="row locals">
           <div class="small-12 columns">
               <div metal:use-macro="layout.macros['top_navigation']"></div>
               <div metal:use-macro="layout.macros['editbar']"></div>
@@ -106,11 +108,11 @@
           </div>
       </div>
 
-      <div class="row">
+      <div class="row alerts">
         <div class="small-12 columns" id="alert-boxes">
           <!--! If there's a form object with errors, show an alert box - works for all views that use a form -->
           <div tal:condition="form.errors|nothing" data-alert class="alert-box alert">
-            <tal:block i18n:translate>The form contains errors. Please check the fields marked in red.</tal:block>
+            <tal:b i18n:translate>The form contains errors. Please check the fields marked in red.</tal:b>
             <a href="#" class="close">&times;</a>
           </div>
           <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">
@@ -150,7 +152,7 @@
       <div class="push"></div>
     </div>
     <metal:footer use-macro="layout.macros['footer']" />
-    <tal:block tal:content="structure layout.org.meta.analytics_code|nothing" />
+    <tal:b tal:content="structure layout.org.meta.analytics_code|nothing" />
 </body>
 
 </html>
