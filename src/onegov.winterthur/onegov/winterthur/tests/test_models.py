@@ -1,3 +1,4 @@
+import math
 import pytest
 
 from onegov.winterthur.collections import AddressCollection
@@ -11,7 +12,7 @@ def test_download_addresses(session):
     assert addresses.query().count() >= 18_000
 
 
-def test_update_adresses(session, streets_csv, addresses_csv):
+def test_update_addresses(session, streets_csv, addresses_csv):
     addresses = AddressCollection(session)
     addresses.update_by_csv(streets_csv, addresses_csv)
 
@@ -31,9 +32,10 @@ def test_update_adresses(session, streets_csv, addresses_csv):
     assert a.place == 'Winterthur'
     assert a.district == 'Winterthur-Stadt'
 
-    # synchronise again -> the count should stay the same
+    # synchronise again -> the count should roughly stay the same
+    # if not, the file on the remote end has been updated!
     addresses.update()
-    assert count == addresses.query().count()
+    assert math.isclose(count, addresses.query().count(), rel_tol=0.1)
 
     # check the encoding
     a = addresses.query().filter_by(street="Alte Römerstrasse").first()
