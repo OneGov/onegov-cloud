@@ -182,6 +182,7 @@ ul.single-line {
     global/editbar icons
 */
 #global-tools,
+.globals,
 .edit-bar {
     .accept-activity::before { @include icon('\f087'); }
     .archive-activity::before { @include icon('\f187'); }
