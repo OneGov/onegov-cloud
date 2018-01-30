@@ -69,6 +69,10 @@ organisation:
         <column span="4">
           <panel>
             <links>
+                <link url="./streets"
+                    description="Strassen in Winterthur">
+                    Strassenverzeichnis
+                </link>
                 <link url="./people"
                     description="Personen">
                     Team
