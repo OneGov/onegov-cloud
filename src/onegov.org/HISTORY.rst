@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a class to the body if it is shown in an iframe.
+  [href]
+
 - Adds more classes to the blocks of the global layout.
   [href]
 
