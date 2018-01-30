@@ -46,3 +46,8 @@ def get_js_path():
 def get_search_asset():
     yield 'wade.js'
     yield 'street-search.js'
+
+
+@WinterthurApp.webasset('iframe-resizer')
+def get_iframe_resizer():
+    yield 'iframe-resizer-contentwindow.js'

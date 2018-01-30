@@ -1,3 +1,11 @@
+/*
+    Streets view
+*/
+.streetname {
+    font-size: $h3-font-size - $h3-font-reduction;
+    margin-bottom: 1rem;
+}
+
 .streetlist {
     @media #{$small-up} {
         @include prefix(column-count, 1);
@@ -12,4 +20,48 @@
     }
 
     list-style-position: inside;
+}
+
+.small {
+    font-size: .875rem;
+}
+
+/*
+    Views inside iFrames
+*/
+.framed-only {
+    display: none;
+}
+
+.framed {
+    .framed-only {
+        display: block;
+    }
+
+    .unframed-only {
+        display: none;
+    }
+
+    #inner-body {
+        height: auto;
+        min-height: 1px;
+    }
+
+    .globals,
+    .header,
+    .locals,
+    .main-title,
+    .push,
+    footer {
+        display: none;
+    }
+
+    .content {
+        margin: 0;
+        max-width: 100%;
+
+        > .columns {
+            padding: 0;
+        }
+    }
 }

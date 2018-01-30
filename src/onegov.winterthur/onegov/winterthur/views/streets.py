@@ -15,6 +15,7 @@ from onegov.winterthur.layout import AddressSubsetLayout
 )
 def view_streets(self, request):
     request.include('street-search')
+    request.include('iframe-resizer')
 
     by_letter = {
         letter: tuple(streets) for letter, streets in groupby(
@@ -54,9 +55,11 @@ def update_streets(self, request):
     template='street.pt'
 )
 def view_street(self, request):
+    request.include('iframe-resizer')
 
     return {
         'layout': AddressSubsetLayout(self, request),
         'title': self.street,
-        'addresses': self.subset()
+        'addresses': self.subset(),
+        'parent': request.class_link(AddressCollection)
     }
