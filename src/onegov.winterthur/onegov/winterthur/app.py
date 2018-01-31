@@ -8,7 +8,7 @@ from onegov.winterthur.theme import WinterthurTheme
 class WinterthurApp(OrgApp):
 
     #: the version of this application (do not change manually!)
-    version = '0.0.0'
+    version = '0.1.0'
 
     def configure_organisation(self, **cfg):
         cfg.setdefault('enable_user_registration', False)

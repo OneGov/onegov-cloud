@@ -4,7 +4,7 @@ name = 'onegov.winterthur'
 description = (
     'OneGov Cloud for the City of Winterthur'
 )
-version = '0.0.0'
+version = '0.1.0'
 
 
 def get_long_description():
