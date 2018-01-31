@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.21.0 (2018-01-31)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a class to the body if it is shown in an iframe.
   [href]
 
