@@ -67,7 +67,13 @@ class Server(object):
 
     """
 
-    def __init__(self, config, configure_morepath=True, post_mortem=False):
+    def __init__(
+            self,
+            config,
+            configure_morepath=True,
+            post_mortem=False,
+            environ_overrides=None):
+
         self.applications = ApplicationCollection(config.applications)
         self.wildcard_applications = set(
             a.root for a in config.applications if not a.is_static)
@@ -78,6 +84,7 @@ class Server(object):
             self.configure_morepath()
 
         self.post_mortem = post_mortem
+        self.environ_overrides = environ_overrides
 
     def configure_logging(self, config):
         """ Configures the python logging.
@@ -99,6 +106,10 @@ class Server(object):
             morepath.autoscan()
 
     def __call__(self, environ, start_response):
+
+        if self.environ_overrides:
+            environ.update(self.environ_overrides)
+
         request = Request(environ)
         path_fragments = request.path.split('/')
 

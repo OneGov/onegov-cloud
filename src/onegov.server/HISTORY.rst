@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to override/extend wsgi environ contents.
+  [href]
+
 0.4.0 (2017-12-29)
 ~~~~~~~~~~~~~~~~~~~
 
