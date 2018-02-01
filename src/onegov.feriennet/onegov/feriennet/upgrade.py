@@ -100,3 +100,18 @@ def remove_extra_space_from_user(context):
         user.realname = NAME_SEPARATOR.join(
             p.strip() for p in user.realname.split(NAME_SEPARATOR)
         )
+
+
+@upgrade_task('Fix contact link')
+def fix_contact_link(context):
+    org = context.session.query(Organisation).first()
+
+    if org is None:
+        return
+
+    # not a feriennet
+    if '<registration />' not in org.meta['homepage_structure']:
+        return
+
+    org.meta['homepage_structure'] = org.meta['homepage_structure'].replace(
+        './forms/', './form/')
