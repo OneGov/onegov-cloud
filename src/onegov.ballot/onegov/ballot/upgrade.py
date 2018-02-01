@@ -271,16 +271,14 @@ def replace_results_group(context):
 @upgrade_task('Change counted columns of elections')
 def change_counted_columns_of_elections(context):
     if not context.has_column('election_results', 'counted'):
-        # import pdb; pdb.set_trace()
         context.operations.add_column(
             'election_results', Column(
                 'counted', Boolean, nullable=False, server_default='TRUE'
             )
         )
 
-    # todo:
-    # if context.has_column('elections', 'total_entities'):
-    #     context.operations.drop_column('elections', 'total_entities')
-    #
-    # if context.has_column('elections', 'counted_entities'):
-    #     context.operations.drop_column('elections', 'counted_entities')
+    if context.has_column('elections', 'total_entities'):
+        context.operations.drop_column('elections', 'total_entities')
+
+    if context.has_column('elections', 'counted_entities'):
+        context.operations.drop_column('elections', 'counted_entities')
