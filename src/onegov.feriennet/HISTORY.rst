@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes contact link for new organisations.
+  [href]
+
 1.3.15 (2018-01-22)
 ~~~~~~~~~~~~~~~~~~~
 

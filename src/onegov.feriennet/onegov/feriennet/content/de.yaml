@@ -132,7 +132,7 @@ organisation:
                     description="Personen">
                     Team
                 </link>
-                <link url="./forms/kontakt"
+                <link url="./form/kontakt"
                     description="Anfragen">
                     Kontakt
                 </link>
