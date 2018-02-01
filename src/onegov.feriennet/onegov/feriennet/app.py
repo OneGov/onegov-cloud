@@ -34,7 +34,7 @@ BANNER_TEMPLATE = """
 class FeriennetApp(OrgApp):
 
     #: the version of this application (do not change manually!)
-    version = '1.3.15'
+    version = '1.3.16'
 
     request_class = FeriennetRequest
 
