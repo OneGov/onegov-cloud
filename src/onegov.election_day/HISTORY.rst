@@ -1,5 +1,7 @@
 Changelog
 ---------
+2.0.2 (2018-02-01)
+~~~~~~~~~~~~~~~~~~~
 
 - Harmonizes the progress implementation of elections and votes.
 
