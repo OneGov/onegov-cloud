@@ -98,7 +98,7 @@ class ElectionLayout(DefaultLayout):
 
     @cached_property
     def summarize(self):
-        return self.model.total_entities != 1
+        return self.model.results.count() != 1
 
     @cached_property
     def main_view(self):

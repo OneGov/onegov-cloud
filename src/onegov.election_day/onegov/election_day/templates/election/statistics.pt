@@ -44,20 +44,22 @@
                         <td class="right-aligned" tal:condition="election.completed">${'{0:.2f}'.format(election.turnout)} %</td>
                     </tr>
                     <tr tal:repeat="result election.results">
-                        <td>${layout.format_name(result)}</td>
-                        <td tal:condition="layout.principal.use_districts">${result.district}</td>
-                        <td class="right-aligned">${layout.format_number(result.elegible_voters)}</td>
-                        <td class="right-aligned">${layout.format_number(result.received_ballots)}</td>
-                        <td class="right-aligned">${layout.format_number(result.accounted_ballots)}</td>
-                        <td class="right-aligned">${layout.format_number(result.blank_ballots)}</td>
-                        <td class="right-aligned">${layout.format_number(result.invalid_ballots)}</td>
-                        <td class="right-aligned">${layout.format_number(result.accounted_votes)}</td>
-                        <td class="right-aligned" tal:condition="election.completed">${'{0:.2f}'.format(result.turnout)} %</td>
-                    </tr>
-                    <tr tal:repeat="entity missing_entities">
-                        <td tal:condition="layout.summarize">${entity.name}</td>
-                        <td tal:condition="layout.principal.use_districts">${entity.district}</td>
-                        <td i18n:translate="" colspan="6">Not yet counted.</td>
+                        <tal:block condition="not: result.counted">
+                            <td>${layout.format_name(result)}</td>
+                            <td tal:condition="layout.principal.use_districts">${result.district}</td>
+                            <td class="answer" colspan="7" i18n:translate="">Not yet counted.</td>
+                        </tal:block>
+                        <tal:block condition="result.counted">
+                            <td>${layout.format_name(result)}</td>
+                            <td tal:condition="layout.principal.use_districts">${result.district}</td>
+                            <td class="right-aligned">${layout.format_number(result.elegible_voters)}</td>
+                            <td class="right-aligned">${layout.format_number(result.received_ballots)}</td>
+                            <td class="right-aligned">${layout.format_number(result.accounted_ballots)}</td>
+                            <td class="right-aligned">${layout.format_number(result.blank_ballots)}</td>
+                            <td class="right-aligned">${layout.format_number(result.invalid_ballots)}</td>
+                            <td class="right-aligned">${layout.format_number(result.accounted_votes)}</td>
+                            <td class="right-aligned" tal:condition="election.completed">${'{0:.2f}'.format(result.turnout)} %</td>
+                        </tal:block>
                     </tr>
                     <tr class="total static" tal:condition="layout.summarize">
                         <td i18n:translate="">Total</td>

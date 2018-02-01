@@ -48,8 +48,7 @@ def test_import_wabsti_proporz(session, tar_file):
 
     assert not errors
     assert election.completed
-    assert election.counted_entities == 11
-    assert election.total_entities == 11
+    assert election.progress == (11, 11)
     assert election.results.count() == 11
     assert election.progress == (11, 11)
     assert round(election.turnout, 2) == 0
@@ -79,8 +78,7 @@ def test_import_wabsti_proporz(session, tar_file):
 
     assert not errors
     assert election.completed
-    assert election.counted_entities == 11
-    assert election.total_entities == 11
+    assert election.progress == (11, 11)
     assert election.results.count() == 11
     assert election.progress == (11, 11)
     assert round(election.turnout, 2) == 53.74
@@ -415,4 +413,50 @@ def test_import_wabsti_proporz_expats(session):
         assert candidate.results.one().election_result.entity_id == 0
         assert candidate.votes == 50
 
-# todo: test temporary results
+
+def test_import_wabsti_proporz_temporary_results(session):
+    session.add(
+        ProporzElection(
+            title='election',
+            domain='canton',
+            date=date(2015, 10, 18),
+            number_of_mandates=6,
+        )
+    )
+    session.flush()
+    election = session.query(Election).one()
+    principal = Canton(canton='sg')
+    entities = principal.entities.get(election.date.year, {})
+
+    errors = import_election_wabsti_proporz(
+        election, entities,
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'Einheit_BFS',
+                    'Liste_KandID',
+                    'Kand_Nachname',
+                    'Kand_Vorname',
+                    'Liste_ID',
+                    'Liste_Code',
+                    'Kand_StimmenTotal',
+                    'Liste_ParteistimmenTotal',
+                )),
+                ','.join((
+                    '3203',
+                    '7',
+                    'xxx',
+                    'xxx',
+                    '8',
+                    '9',
+                    '50',
+                    '60',
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+    )
+
+    assert not errors
+
+    # 1 Present, 76 Missing
+    assert election.progress == (1, 77)

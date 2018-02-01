@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Harmonizes the progress implementation of elections and votes.
+
+  **Breaking changes: The import and export formats of elections have changed!
+  There are no more election_counted_entities and election_total_entitites,
+  instead there is a new "counted" attribute.**
+
 - Uses a more generic PDF signing error log entry.
   [msom]
 

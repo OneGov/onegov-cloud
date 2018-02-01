@@ -38,9 +38,7 @@ def test_import_wabstim_majorz(session, tar_file):
 
     assert not errors
     assert election.completed
-    assert election.counted_entities == 1
-    assert election.total_entities == 1
-    assert election.results.count() == 1
+    assert election.progress == (1, 1)
     assert election.progress == (1, 1)
     assert round(election.turnout, 2) == 27.03
     assert election.elegible_voters == 4021
@@ -331,4 +329,71 @@ def test_import_wabstim_majorz_expats(session):
         )
         assert '0 is unknown' in [e.error.interpolate() for e in errors]
 
-# todo: test temporary results
+
+def test_import_wabstim_majorz_temporary_results(session):
+    session.add(
+        Election(
+            title='election',
+            domain='municipality',
+            date=date(2016, 2, 28),
+            number_of_mandates=6,
+        )
+    )
+    session.flush()
+    election = session.query(Election).one()
+    principal = Municipality(municipality='351')
+    entities = principal.entities.get(election.date.year, {})
+
+    errors = import_election_wabstim_majorz(
+        election, entities,
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'AnzMandate',
+                    'AbsolutesMehr',
+                    'BFS',
+                    'StimmBer',
+                    'WzAbgegeben',
+                    'WzLeer',
+                    'WzUngueltig',
+                    'KandName_1',
+                    'KandVorname_1',
+                    'Stimmen_1',
+                    'KandResultArt_1',
+                    'KandName_2',
+                    'KandVorname_2',
+                    'Stimmen_2',
+                    'KandResultArt_2',
+                    'KandName_3',
+                    'KandVorname_3',
+                    'Stimmen_3',
+                    'KandResultArt_3',
+                )),
+                ','.join((
+                    '1',
+                    '1000',
+                    '1',
+                    '5000',
+                    '4000',
+                    '100',
+                    '200',
+                    'Leere Zeilen',
+                    '',
+                    '300',
+                    '9',
+                    'Ungültige Stimmen',
+                    '',
+                    '400',
+                    '9',
+                    'Meier',
+                    'Peter',
+                    '1800',
+                    '2',
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain'
+    )
+    assert not errors
+
+    # 1 Present, 5 Missing
+    assert election.progress == (1, 6)

@@ -64,6 +64,7 @@ def parse_election_result(line, errors, entities):
                 name=entity.get('name', ''),
                 district=entity.get('district', ''),
                 entity_id=entity_id,
+                counted=True
             )
 
 
@@ -407,34 +408,39 @@ def import_election_wabsti_proporz(
     if errors:
         return errors
 
-    # todo: Add missing entities as uncounted
+    remaining = entities.keys() - results.keys()
+    for entity_id in remaining:
+        entity = entities[entity_id]
+        results[entity_id] = ElectionResult(
+            id=uuid4(),
+            name=entity.get('name', ''),
+            district=entity.get('district', ''),
+            entity_id=entity_id,
+            counted=False
+        )
 
-    if results:
-        election.clear_results()
+    election.clear_results()
 
-        election.counted_entities = len(results)
-        election.total_entities = max(len(entities), len(results))
+    for connection in connections.values():
+        election.list_connections.append(connection)
+    for connection in subconnections.values():
+        election.list_connections.append(connection)
 
-        for connection in connections.values():
-            election.list_connections.append(connection)
-        for connection in subconnections.values():
-            election.list_connections.append(connection)
+    for list_ in lists.values():
+        election.lists.append(list_)
+        if list_.list_id in panachage:
+            for source, votes in panachage[list_.list_id].items():
+                list_.panachage_results.append(
+                    PanachageResult(source_list_id=source, votes=votes)
+                )
 
-        for list_ in lists.values():
-            election.lists.append(list_)
-            if list_.list_id in panachage:
-                for source, votes in panachage[list_.list_id].items():
-                    list_.panachage_results.append(
-                        PanachageResult(source_list_id=source, votes=votes)
-                    )
+    for candidate in candidates.values():
+        election.candidates.append(candidate)
 
-        for candidate in candidates.values():
-            election.candidates.append(candidate)
-
-        for result in results.values():
-            id = result.entity_id
-            for list_result in list_results.get(id, {}).values():
-                result.list_results.append(list_result)
-            election.results.append(result)
+    for result in results.values():
+        id = result.entity_id
+        for list_result in list_results.get(id, {}).values():
+            result.list_results.append(list_result)
+        election.results.append(result)
 
     return []

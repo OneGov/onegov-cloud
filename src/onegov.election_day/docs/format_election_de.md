@@ -28,9 +28,8 @@ Name|Beschreibung
 ---|---
 `election_absolute_majority`|Absolutes Mehr der Wahl, nur falls Majorzwahl.
 `election_status`|`unknown`, `interim` oder `final`.
-`election_counted_entities`|Anzahl ausgezählter Gemeinden. Falls `election_counted_entities = election_total_entities` ist, gilt die Wahl als fertig ausgezählt.
-`election_total_entities`|Totale Anzahl Gemeinden. Falls keine eindeutige Auskunft über den Status der Wahl möglich ist (da die Wahl von Wabsti importiert wurde), ist dieser Wert `0`.
 `entity_id`|BFS Nummer der Gemeinde. Der Wert `0` kann für Auslandslebende verwendet werden.
+`entity_counted`|`True`, wenn das Resultat ausgezählt wurde.
 `entity_elegible_voters`|Anzahl Stimmberechtigte der Gemeinde.
 `entity_received_ballots`|Anzahl abgegebene Stimmzettel der Gemeinde.
 `entity_blank_ballots`|Anzahl leere Stimmzettel der Gemeinde.
@@ -60,12 +59,14 @@ Name|Beschreibung
 
 ### Temporäre Resultate
 
-Noch nicht ausgezählte Gemeinden sind nicht in den Daten enthalten.
+Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedinungen zutrifft:
+- `counted = false`
+- die Gemeinde ist nicht in den Resultaten enthalten
 
 Falls der Status
-- `interim` ist, gilt die Abstimmung als noch nicht abgeschlossen
-- `final` ist, gilt die Abstimmung als abgeschlossen
-- `unknown` ist, gilt die Abstimmung als abgeschlossen, falls alle `election_counted_entities` und `election_total_entities` übereinstimmen
+- `interim` ist, gilt die Wahl als noch nicht abgeschlossen
+- `final` ist, gilt die Wahl als abgeschlossen
+- `unknown` ist, gilt die Wahl als abgeschlossen, falls alle (erwarteten) Gemeinden ausgezählt sind
 
 
 ### Vorlage
@@ -113,7 +114,7 @@ Name|Beschreibung
 
 Das Datenformat enthält keine eindeutige Informationen dazu, ob die gesamte Wahl fertig ausgezählt ist. Diese Information muss direkt auf dem Formular für den Datenupload mitgeben werden.
 
-Das Datenformat enhält auch keine Information dazu, ob eine einzelne Gemeinde fertig ausgezählt ist. Daher wird, solange die gesamte Wahl nicht abgeschlossen ist, für Wabsti auch keine Fortschrittsanzeige angezeigt. Falls aber Gemeinden ganz fehlen in den Resultaten, gelten diese als noch nicht ausgezählt.
+Das Datenformat enhält auch keine Information dazu, ob eine einzelne Gemeinde fertig ausgezählt ist. Falls Gemeinden ganz fehlen in den Resultaten, gelten diese als noch nicht ausgezählt.
 
 ### Vorlagen
 
@@ -173,7 +174,7 @@ Name|Beschreibung
 
 Das Datenformat enthält keine eindeutige Informationen dazu, ob die gesamte Wahl fertig ausgezählt ist. Diese Information muss direkt auf dem Formular für den Datenupload mitgeben werden.
 
-Das Datenformat enhält auch keine Information dazu, ob eine einzelne Gemeinde fertig ausgezählt ist. Daher wird, solange die gesamte Wahl nicht abgeschlossen ist, für Wabsti auch keine Fortschrittsanzeige angezeigt. Falls aber Gemeinden ganz fehlen in den Resultaten, gelten diese als noch nicht ausgezählt.
+Das Datenformat enhält auch keine Information dazu, ob eine einzelne Gemeinde fertig ausgezählt ist. Falls Gemeinden ganz fehlen in den Resultaten, gelten diese als noch nicht ausgezählt.
 
 ### Vorlagen
 

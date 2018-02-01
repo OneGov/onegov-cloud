@@ -414,8 +414,7 @@ def test_email_notification_election(election_day_app, session):
                 },
                 domain='federation',
                 date=date(2011, 1, 1),
-                number_of_mandates=1,
-                total_entities=12
+                number_of_mandates=1
             )
         )
         majorz = session.query(Election).one()
@@ -430,8 +429,7 @@ def test_email_notification_election(election_day_app, session):
                 },
                 domain='federation',
                 date=date(2011, 1, 1),
-                number_of_mandates=1,
-                total_entities=12
+                number_of_mandates=1
             )
         )
         proporz = session.query(ProporzElection).one()
@@ -546,21 +544,22 @@ def test_email_notification_election(election_day_app, session):
         }
 
         keys = [
-            'entity_id', 'name', 'elegible_voters', 'received_ballots',
-            'blank_ballots', 'invalid_ballots', 'blank_votes', 'invalid_votes'
+            'entity_id', 'name', 'counted', 'elegible_voters',
+            'received_ballots', 'blank_ballots', 'invalid_ballots',
+            'blank_votes', 'invalid_votes'
         ]
         for values in (
-            (1711, 'Zug', 16516, 8516, 80, 1, 0, 0),
-            (1706, 'Oberägeri', 3560, 1560, 18, 0, 0, 0),
-            (1709, 'Unterägeri', 5245, 2245, 18, 1, 0, 0),
-            (1704, 'Menzingen', 2917, 1917, 17, 0, 0, 0),
-            (1701, 'Baar', 13828, 6828, 54, 3, 0, 0),
-            (1702, 'Cham', 9687, 4687, 60, 0, 0, 0),
-            (1703, 'Hünenberg', 5842, 2842, 15, 1, 0, 0),
-            (1708, 'Steinhausen', 5989, 2989, 17, 0, 0, 0),
-            (1707, 'Risch', 6068, 3068, 17, 0, 0, 0),
-            (1710, 'Walchwil', 2016, 1016, 8, 0, 0, 0),
-            (1705, 'Neuheim', 1289, 689, 10, 1, 0, 0),
+            (1711, 'Zug', False, 16516, 8516, 80, 1, 0, 0),
+            (1706, 'Oberägeri', True, 3560, 1560, 18, 0, 0, 0),
+            (1709, 'Unterägeri', True, 5245, 2245, 18, 1, 0, 0),
+            (1704, 'Menzingen', True, 2917, 1917, 17, 0, 0, 0),
+            (1701, 'Baar', True, 13828, 6828, 54, 3, 0, 0),
+            (1702, 'Cham', True, 9687, 4687, 60, 0, 0, 0),
+            (1703, 'Hünenberg', True, 5842, 2842, 15, 1, 0, 0),
+            (1708, 'Steinhausen', True, 5989, 2989, 17, 0, 0, 0),
+            (1707, 'Risch', True, 6068, 3068, 17, 0, 0, 0),
+            (1710, 'Walchwil', True, 2016, 1016, 8, 0, 0, 0),
+            (1705, 'Neuheim', True, 1289, 689, 10, 1, 0, 0),
         ):
             kw = {key: values[index] for index, key in enumerate(keys)}
             result = ElectionResult(**kw)
@@ -586,8 +585,6 @@ def test_email_notification_election(election_day_app, session):
                 ListResult(list_id=lids['2'], votes=600)
             )
             proporz.results.append(result)
-        majorz.counted_entities = 11
-        proporz.counted_entities = 11
 
         # ... majorz
         mock.reset_mock()
@@ -607,11 +604,11 @@ def test_email_notification_election(election_day_app, session):
             'Majorzwahl - New intermediate results'
         ]
         contents = ''.join(call[2]['content'] for call in mock.mock_calls)
-        assert "11 of 12" in contents
-        assert "11 da 12" in contents
-        assert "11 di 12" in contents
-        assert "11 de 12" in contents
-        assert "11 von 12" in contents
+        assert "10 of 11" in contents
+        assert "10 da 11" in contents
+        assert "10 di 11" in contents
+        assert "10 de 11" in contents
+        assert "10 von 11" in contents
         assert "Maier Peter" in contents
         assert "5'500" in contents
         assert "5 500" in contents
@@ -636,11 +633,11 @@ def test_email_notification_election(election_day_app, session):
             'Proporzwahl - Nuovi risultati provvisori'
         ]
         contents = ''.join(call[2]['content'] for call in mock.mock_calls)
-        assert "11 of 12" in contents
-        assert "11 da 12" in contents
-        assert "11 di 12" in contents
-        assert "11 de 12" in contents
-        assert "11 von 1" in contents
+        assert "10 of 11" in contents
+        assert "10 da 11" in contents
+        assert "10 di 11" in contents
+        assert "10 de 11" in contents
+        assert "10 von 11" in contents
         assert "FDP" in contents
         assert "7'700" in contents
         assert "7 700" in contents
@@ -651,8 +648,10 @@ def test_email_notification_election(election_day_app, session):
         assert "6,600" in contents
 
         # Final results
-        majorz.total_entities = 11
-        proporz.total_entities = 11
+        for result in majorz.results:
+            result.counted = True
+        for result in proporz.results:
+            result.counted = True
         for candidate in session.query(Candidate).filter_by(candidate_id='1'):
             candidate.elected = True
         for list_ in session.query(List).filter_by(list_id='1'):

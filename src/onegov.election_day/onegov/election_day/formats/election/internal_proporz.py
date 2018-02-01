@@ -16,9 +16,8 @@ from uuid import uuid4
 
 HEADERS = [
     'election_status',
-    'election_counted_entities',
-    'election_total_entities',
     'entity_id',
+    'entity_counted',
     'entity_elegible_voters',
     'entity_received_ballots',
     'entity_blank_ballots',
@@ -41,23 +40,20 @@ HEADERS = [
 
 
 def parse_election(line, errors):
-    counted = 0
-    total = 0
     status = None
     try:
-        counted = int(line.election_counted_entities or 0)
-        total = int(line.election_total_entities or 0)
         status = line.election_status or 'unknown'
     except ValueError:
         errors.append(_("Invalid election values"))
     if status not in STATI:
         errors.append(_("Invalid status"))
-    return counted, total, status
+    return status
 
 
 def parse_election_result(line, errors, entities):
     try:
         entity_id = int(line.entity_id or 0)
+        counted = line.entity_counted.strip().lower() == 'true'
         elegible_voters = int(line.entity_elegible_voters or 0)
         received_ballots = int(line.entity_received_ballots or 0)
         blank_ballots = int(line.entity_blank_ballots or 0)
@@ -85,6 +81,7 @@ def parse_election_result(line, errors, entities):
                 id=uuid4(),
                 name=entity.get('name', ''),
                 district=entity.get('district', ''),
+                counted=counted,
                 entity_id=entity_id,
                 elegible_voters=elegible_voters,
                 received_ballots=received_ballots,
@@ -232,14 +229,12 @@ def import_election_internal_proporz(election, entities, file, mimetype):
     panachage = {'headers': parse_panachage_headers(csv)}
 
     # This format has one candiate per entity per line
-    counted = 0
-    total = 0
     status = None
     for line in csv.lines:
         line_errors = []
 
         # Parse the line
-        counted, total, status = parse_election(line, line_errors)
+        status = parse_election(line, line_errors)
         result = parse_election_result(line, line_errors, entities)
         candidate = parse_candidate(line, line_errors)
         candidate_result = parse_candidate_result(line, line_errors)
@@ -293,35 +288,41 @@ def import_election_internal_proporz(election, entities, file, mimetype):
     if errors:
         return errors
 
-    # todo: Add missing entities as uncounted
+    remaining = entities.keys() - results.keys()
+    for entity_id in remaining:
+        entity = entities[entity_id]
+        results[entity_id] = ElectionResult(
+            id=uuid4(),
+            name=entity.get('name', ''),
+            district=entity.get('district', ''),
+            entity_id=entity_id,
+            counted=False
+        )
 
-    if results:
-        election.clear_results()
+    election.clear_results()
 
-        election.status = status
-        election.counted_entities = counted
-        election.total_entities = total
+    election.status = status
 
-        for connection in connections.values():
-            election.list_connections.append(connection)
-        for connection in subconnections.values():
-            election.list_connections.append(connection)
+    for connection in connections.values():
+        election.list_connections.append(connection)
+    for connection in subconnections.values():
+        election.list_connections.append(connection)
 
-        for list_ in lists.values():
-            election.lists.append(list_)
-            if list_.list_id in panachage:
-                for source, votes in panachage[list_.list_id].items():
-                    list_.panachage_results.append(
-                        PanachageResult(source_list_id=source, votes=votes)
-                    )
+    for list_ in lists.values():
+        election.lists.append(list_)
+        if list_.list_id in panachage:
+            for source, votes in panachage[list_.list_id].items():
+                list_.panachage_results.append(
+                    PanachageResult(source_list_id=source, votes=votes)
+                )
 
-        for candidate in candidates.values():
-            election.candidates.append(candidate)
+    for candidate in candidates.values():
+        election.candidates.append(candidate)
 
-        for result in results.values():
-            id = result.entity_id
-            for list_result in list_results.get(id, {}).values():
-                result.list_results.append(list_result)
-            election.results.append(result)
+    for result in results.values():
+        id = result.entity_id
+        for list_result in list_results.get(id, {}).values():
+            result.list_results.append(list_result)
+        election.results.append(result)
 
     return []

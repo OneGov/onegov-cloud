@@ -13,9 +13,8 @@ from uuid import uuid4
 HEADERS = [
     'election_absolute_majority',
     'election_status',
-    'election_counted_entities',
-    'election_total_entities',
     'entity_id',
+    'entity_counted',
     'entity_elegible_voters',
     'entity_received_ballots',
     'entity_blank_ballots',
@@ -32,27 +31,24 @@ HEADERS = [
 
 
 def parse_election(line, errors):
-    counted = 0
-    total = 0
     majority = None
     status = None
     try:
         if line.election_absolute_majority:
             majority = int(line.election_absolute_majority or 0)
             majority = majority if majority else None
-        counted = int(line.election_counted_entities or 0)
-        total = int(line.election_total_entities or 0)
         status = line.election_status or 'unknown'
     except ValueError:
         errors.append(_("Invalid election values"))
     if status not in STATI:
         errors.append(_("Invalid status"))
-    return counted, total, majority, status
+    return majority, status
 
 
 def parse_election_result(line, errors, entities):
     try:
         entity_id = int(line.entity_id or 0)
+        counted = line.entity_counted.strip().lower() == 'true'
         elegible_voters = int(line.entity_elegible_voters or 0)
         received_ballots = int(line.entity_received_ballots or 0)
         blank_ballots = int(line.entity_blank_ballots or 0)
@@ -81,6 +77,7 @@ def parse_election_result(line, errors, entities):
                 name=entity.get('name', ''),
                 district=entity.get('district', ''),
                 entity_id=entity_id,
+                counted=counted,
                 elegible_voters=elegible_voters,
                 received_ballots=received_ballots,
                 blank_ballots=blank_ballots,
@@ -146,15 +143,13 @@ def import_election_internal_majorz(election, entities, file, mimetype):
     results = {}
 
     # This format has one candiate per entity per line
-    counted = 0
-    total = 0
     absolute_majority = None
     status = None
     for line in csv.lines:
         line_errors = []
 
         # Parse the line
-        counted, total, absolute_majority, status = parse_election(
+        absolute_majority, status = parse_election(
             line, line_errors
         )
         result = parse_election_result(line, line_errors, entities)
@@ -184,20 +179,26 @@ def import_election_internal_majorz(election, entities, file, mimetype):
     if errors:
         return errors
 
-    # todo: Add missing entities as uncounted
+    remaining = entities.keys() - results.keys()
+    for entity_id in remaining:
+        entity = entities[entity_id]
+        results[entity_id] = ElectionResult(
+            id=uuid4(),
+            name=entity.get('name', ''),
+            district=entity.get('district', ''),
+            entity_id=entity_id,
+            counted=False
+        )
 
-    if results:
-        election.clear_results()
+    election.clear_results()
 
-        election.absolute_majority = absolute_majority
-        election.status = status
-        election.counted_entities = counted
-        election.total_entities = total
+    election.absolute_majority = absolute_majority
+    election.status = status
 
-        for candidate in candidates.values():
-            election.candidates.append(candidate)
+    for candidate in candidates.values():
+        election.candidates.append(candidate)
 
-        for result in results.values():
-            election.results.append(result)
+    for result in results.values():
+        election.results.append(result)
 
     return []

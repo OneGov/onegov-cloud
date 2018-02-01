@@ -503,7 +503,7 @@ class MediaGenerator():
                     pdf.pagebreak()
 
                 # Statistics
-                summarize = item.total_entities != 1
+                summarize = item.results.count() != 1
 
                 pdf.h2(translate(_('Election statistics')))
                 if not summarize:

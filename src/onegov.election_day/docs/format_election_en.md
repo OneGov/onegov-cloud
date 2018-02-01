@@ -29,9 +29,8 @@ Name|Description
 ---|---
 `election_absolute_majority`|Absolute majority of the election, only if Majorz election.
 `election_status`|`unknown`, `interim` or `final`.
-`election_counted_entities`|Number of counted municipalities. If `election_counted_entities = election_total_entities`, then the election is considered completely counted.
-`election_total_entities`|Total number of municipalities. If no definite information about the status of the election is possible (because the election was imported by Wabsti), then this value is `0`.
 `entity_id`|BFS number of the municipality. A value of `0` can be used for expats.
+`entity_counted`|`True` if the result was counted.
 `entity_elegible_voters`|Number of persons entitled to vote in municipality.
 `entity_received_ballots`|Number of submitted ballots in municipality.
 `entity_blank_ballots`|Number empty ballots in municipality.
@@ -61,12 +60,14 @@ Name|Description
 
 ### Temporary results
 
-Not yet completely counted municipalities are not included in the files.
+Municipalities are deemed not to have been counted yet if one of the following two conditions apply:
+- `counted = false`
+- the municipality is not included in the results
 
 If the status is
 - `interim`, the whole election is considered not yet completed
 - `final`, the whole election is considered completed
-- `unknown`, the whole vote is considered completed, if `election_counted_entities` and `election_total_entities` match
+- `unknown`, the whole election is considered completed, if all (expected) municipalities are counted
 
 
 ### Template
@@ -114,7 +115,7 @@ Name|Description
 
 The file format does not contain any clear information on whether the overall election is completely counted. This information must be given directly on the form for the data upload.
 
-The file format also does not contain any information on whether an individual municipality is completely counted. Therefore, as long as the entire election is not completed, no progress notification will be shown for Wabsti. If municipalities are missing entirely in the results, they are considered not yet counted.
+The file format also does not contain any information on whether an individual municipality is completely counted. If municipalities are missing entirely in the results, they are considered not yet counted.
 
 ### Templates
 
@@ -174,7 +175,7 @@ Name|Description
 
 The file format does not contain any clear information on whether the overall election is completely counted. This information must be given directly on the form for the data upload.
 
-The file format also does not contain any information on whether an individual municipality is completely counted. Therefore, as long as the entire election is not completed, no progress notification will be shown for Wabsti. If municipalities are missing entirely in the results, they are considered not yet counted.
+The file format also does not contain any information on whether an individual municipality is completely counted. If municipalities are missing entirely in the results, they are considered not yet counted.
 
 ### Templates
 

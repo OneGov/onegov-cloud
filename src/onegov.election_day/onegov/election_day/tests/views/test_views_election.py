@@ -63,12 +63,12 @@ def test_view_election_statistics(election_day_app_gr):
 
     statistics = client.get('/election/majorz-election/statistics')
     assert all((expected in statistics for expected in (
-        "Grüsch", "56", "25", "21", "41"
+        "1 von 125", "Grüsch", "56", "25", "21", "41", "Noch nicht ausgezählt"
     )))
 
     statistics = client.get('/election/proporz-election/statistics')
     assert all((expected in statistics for expected in (
-        "Grüsch", "56", "32", "31", "153"
+        "1 von 125", "Grüsch", "56", "32", "31", "153", "Noch nicht ausgezählt"
     )))
 
 
@@ -389,7 +389,9 @@ def test_view_election_tacit(election_day_app_gr):
 
     csv = (
         'election_status,'
+        'election_absolute_majority,'
         'entity_id,'
+        'entity_counted,'
         'entity_elegible_voters,'
         'entity_received_ballots,'
         'entity_invalid_ballots,'
@@ -401,17 +403,12 @@ def test_view_election_tacit(election_day_app_gr):
         'candidate_family_name,'
         'candidate_first_name,'
         'candidate_votes,'
-        'election_counted_entities,'
-        'election_total_entities,'
-        'election_absolute_majority,'
         'candidate_party,'
         '\n'
     )
     csv += (
-        "final,3503,56,0,0,0,0,0,1,True,Engler,Stefan,0,1,125,,\n"
-    )
-    csv += (
-        "final,3503,56,0,0,0,0,0,2,True,Schmid,Martin,0,1,125,,\n"
+        "final,,3503,True,56,0,0,0,0,0,1,True,Engler,Stefan,0,\n"
+        "final,,3503,True,56,0,0,0,0,0,2,True,Schmid,Martin,0,\n"
     )
     csv = csv.encode('utf-8')
 

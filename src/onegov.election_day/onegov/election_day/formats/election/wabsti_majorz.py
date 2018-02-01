@@ -78,6 +78,7 @@ def parse_election_result(line, errors, entities):
                 id=uuid4(),
                 name=entity.get('name', ''),
                 district=entity.get('district', ''),
+                counted=True,
                 entity_id=entity_id,
                 elegible_voters=elegible_voters,
                 received_ballots=received_ballots,
@@ -139,7 +140,7 @@ def import_election_wabsti_majorz(
 
     errors = []
     candidates = {}
-    results = []
+    results = {}
 
     # This format has one entity per line and every candidate as row
     filename = _("Results")
@@ -181,7 +182,7 @@ def import_election_wabsti_majorz(
                 )
                 continue
 
-            results.append(result)
+            results.setdefault(result.entity_id, result)
 
     # The results file has one elected candidate per line
     filename = _("Elected Candidates")
@@ -223,19 +224,24 @@ def import_election_wabsti_majorz(
     if errors:
         return errors
 
-    # todo: Add missing entities as uncounted
+    remaining = entities.keys() - results.keys()
+    for entity_id in remaining:
+        entity = entities[entity_id]
+        results[entity_id] = ElectionResult(
+            id=uuid4(),
+            name=entity.get('name', ''),
+            district=entity.get('district', ''),
+            entity_id=entity_id,
+            counted=False
+        )
 
-    if results:
-        election.clear_results()
+    election.clear_results()
+    election.number_of_mandates = mandates
 
-        election.number_of_mandates = mandates
-        election.counted_entities = len(results)
-        election.total_entities = max(len(entities), len(results))
+    for candidate in candidates.values():
+        election.candidates.append(candidate)
 
-        for candidate in candidates.values():
-            election.candidates.append(candidate)
-
-        for result in results:
-            election.results.append(result)
+    for result in results.values():
+        election.results.append(result)
 
     return []

@@ -27,9 +27,8 @@ Nome|Descrizione
 ---|---
 `election_absolute_majority`|Maggioranza assoluta delle elezioni, solo se elezione con sistema maggioritario.
 `election_status`|`unknown`, `interim` or `final`.
-`election_counted_entities`|Numero di comuni scrutinati. Se `election_counted_entities = election_total_entities`, allora l'elezione è considerata completamente scrutinata.
-`election_total_entities`|Numero totale dei comuni. Se non sono disponibili notizie certe sullo stato dell'elezione (perché l'elezione è stata importata da Wabsti) allora questo valore è `0`.
 `entity_id`|Numero BFS del comune. Si può usare il valore `0` per gli espatriati
+`entity_counted`|`True`, se lo spoglio è stato completato.
 `entity_elegible_voters`|Numero di aventi diritto al voto nel Comune.
 `entity_received_ballots`|Numero di schede presentate nel Comune.
 `entity_blank_ballots`|Numero di schede bianche nel Comune.
@@ -59,12 +58,14 @@ Nome|Descrizione
 
 ### Risultati temporanei
 
-I comuni non ancora completamente scrutinati non sono inclusi nei file.
+Municipalities are deemed not to have been counted yet if one of the following two conditions apply:
+- `counted = false`
+- the municipality is not included in the results
 
 Se lo stato è
 - `interim`, l’intera elezione non è ancora stata completata
 - `final`, l’intera elezione è stata completata
-- `unknown`, l’intera fase di voto è stata completata se `election_counted_entities` e `election_total_entities` corrispondono
+- `unknown`, the whole election is considered completed, if all (expected) municipalities are counted
 
 ### Modello
 
@@ -111,7 +112,7 @@ Nome|Descrizione
 
 Il formato del file non contiene alcuna informazione chiara sul fatto che l'elezione complessiva sia stata completamente scrutinata. Questa informazione deve essere fornita direttamente sul modulo per il caricamento dei dati.
 
-Il formato del file, inoltre, non contiene alcuna informazione sul fatto che un comune specifico sia stato completamente scrutinato. Pertanto finché l'intera elezione non è scrutinata non sarà notificato alcun avanzamento per Wabsti. Se i comuni mancano del tutto di risultati, essi sono considerati non ancora scrutinati.
+Il formato del file, inoltre, non contiene alcuna informazione sul fatto che un comune specifico sia stato completamente scrutinato. Se i comuni mancano del tutto di risultati, essi sono considerati non ancora scrutinati.
 
 ### Modelli
 
@@ -171,7 +172,7 @@ Nome|Descrizione
 
 Il formato del file non contiene alcuna informazione chiara sul fatto che l'elezione complessiva sia stata completamente scrutinata. Questa informazione deve essere fornita direttamente sul modulo per il caricamento dei dati.
 
-Il formato del file, inoltre, non contiene alcuna informazione sul fatto che un comune specifico sia stato completamente scrutinato. Pertanto finché l'intera elezione non è scrutinata non sarà notificato alcun avanzamento per Wabsti. Se i comuni mancano del tutto di risultati, essi sono considerati non ancora scrutinati.
+Il formato del file, inoltre, non contiene alcuna informazione sul fatto che un comune specifico sia stato completamente scrutinato. Se i comuni mancano del tutto di risultati, essi sono considerati non ancora scrutinati.
 
 ### Modelli
 

@@ -27,9 +27,8 @@ Nom|Description
 ---|---
 `election_absolute_majority`|Majorité absolue de l'élection, seulement si c'est une élection Majorz.
 `election_status`|`unknown`, `interim` or `final`.
-`election_counted_entities`|Nombre de municipalités comptées. Si `election_counted_entities = election_total_entities`, on considère alors que l'élection est entièrement comptée.
-`election_total_entities`|Nombre total de municipalités. Si aucune information précise à propos de la situation de l'élection n'est possible (parce que l'élection a été importée par Wabsti), alors cette valeur est `0`.
 `entity_id`|Numéro BFS de la municipalité. Une valeur de `0` peut être utilisée pour les expatriés.
+`entity_counted`|`True` si le résultat a été compté.
 `entity_elegible_voters`|Nombre de personnes autorisées à voter dans la municipalité.
 `entity_received_ballots`|Nombre de bulletins soumis dans la municipalité.
 `entity_blank_ballots`|Nombre de bulletins vides dans la municipalité.
@@ -59,12 +58,14 @@ Nom|Description
 
 ### Résultats temporaires
 
-Les municipalités pas encore entièrement comptées ne sont pas incluses dans les fichiers.
+Municipalities are deemed not to have been counted yet if one of the following two conditions apply:
+- `counted = false`
+- the municipality is not included in the results
 
 Si le statut est
 - `interim`, le scrutin n'a pas été terminé dans sa totalité
 - `final`, la totalité du scrutin est considérée comme terminée
-- `unknown`, la totalité du scrutin est considérée comme terminée si les valeurs `election_counted_entities` et `election_total_entities` se correspondent
+- `unknown`, the whole election is considered completed, if all (expected) municipalities are counted
 
 ### Modèle
 
@@ -111,7 +112,7 @@ Nom|Description
 
 Le format de fichier ne contient aucune information claire sur la situation du comptage complet de l'élection globale. Cette information sera fournie directement dans un formulaire destiné au téléchargement des données.
 
-Le format de fichier ne contient également aucune information sur l'état du comptage complet d'une municipalité individuelle. Ainsi, tant que l'élection entière n'est pas terminée, aucune notification de progrès ne sera affichée pour Wabsti. Si des municipalités manquent complètement dans les résultats, on les considèrera comme pas encore comptées.
+Le format de fichier ne contient également aucune information sur l'état du comptage complet d'une municipalité individuelle. Si des municipalités manquent complètement dans les résultats, on les considèrera comme pas encore comptées.
 
 ### Modèles
 
@@ -171,7 +172,7 @@ Nom|Description
 
 Le format de fichier ne contient aucune information claire sur la situation du comptage complet de l'élection globale. Cette information sera fournie directement dans un formulaire destiné au téléchargement des données.
 
-Le format de fichier ne contient également aucune information sur l'état du comptage complet d'une municipalité individuelle. Ainsi, tant que l'élection entière n'est pas terminée, aucune notification de progrès ne sera affichée pour Wabsti. Si des municipalités manquent complètement dans les résultats, on les considèrera comme pas encore comptées.
+Le format de fichier ne contient également aucune information sur l'état du comptage complet d'une municipalité individuelle. Si des municipalités manquent complètement dans les résultats, on les considèrera comme pas encore comptées.
 
 ### Modèles
 

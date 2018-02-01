@@ -227,8 +227,8 @@ def test_archived_result_collection_updates(session):
     assert result.last_modified is not None
     assert result.last_result_change is None
     assert result.type == 'election'
-    assert result.counted_entities is None
-    assert result.total_entities is None
+    assert result.counted_entities is 0
+    assert result.total_entities is 0
     assert result.progress == (0, 0)
     assert result.external_id == 'election-2001'
     assert result.elected_candidates == []
@@ -247,6 +247,7 @@ def test_archived_result_collection_updates(session):
         ElectionResult(
             name='name',
             entity_id=1,
+            counted=True,
             elegible_voters=100,
             received_ballots=50,
             blank_ballots=2,

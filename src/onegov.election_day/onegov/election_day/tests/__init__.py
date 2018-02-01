@@ -135,7 +135,9 @@ def upload_majorz_election(client, create=True, canton='gr'):
 
     csv = (
         'election_status,'
+        'election_absolute_majority,'
         'entity_id,'
+        'entity_counted,'
         'entity_elegible_voters,'
         'entity_received_ballots,'
         'entity_invalid_ballots,'
@@ -147,35 +149,18 @@ def upload_majorz_election(client, create=True, canton='gr'):
         'candidate_family_name,'
         'candidate_first_name,'
         'candidate_votes,'
-        'election_counted_entities,'
-        'election_total_entities,'
-        'election_absolute_majority,'
-        'list_name,'
-        'list_id,'
-        'list_number_of_mandates,'
-        'list_votes,'
-        'list_connection,'
-        'list_connection_parent,'
         'candidate_party,'
         '\n'
     )
     if canton == 'gr':
         csv += (
-            "unknown,3503,56,25,0,4,1,0,1,True,"
-            "Engler,Stefan,20,1,125,,,,,,,,\n"
-        )
-        csv += (
-            "unknown,3503,56,25,0,4,1,0,2,True,"
-            "Schmid,Martin,18,1,125,,,,,,,,\n"
+            'unknown,,3503,True,56,25,0,4,1,0,1,True,Engler,Stefan,20,\n'
+            'unknown,,3503,True,56,25,0,4,1,0,2,True,Schmid,Martin,18,\n'
         )
     if canton == 'zg':
         csv += (
-            "unknown,1711,56,25,0,4,1,0,1,True,"
-            "Engler,Stefan,20,1,125,,,,,,,,\n"
-        )
-        csv += (
-            "unknown,1710,56,25,0,4,1,0,2,True,"
-            "Schmid,Martin,18,1,125,,,,,,,,\n"
+            'unknown,,1711,True,56,25,0,4,1,0,1,True,Engler,Stefan,20,\n'
+            'unknown,,1710,True,56,25,0,4,1,0,2,True,Schmid,Martin,18,\n'
         )
     csv = csv.encode('utf-8')
 
@@ -201,6 +186,7 @@ def upload_proporz_election(client, create=True, canton='gr'):
     csv = (
         'election_status,'
         'entity_id,'
+        'entity_counted,'
         'entity_elegible_voters,'
         'entity_received_ballots,'
         'entity_invalid_ballots,'
@@ -218,9 +204,6 @@ def upload_proporz_election(client, create=True, canton='gr'):
         'candidate_family_name,'
         'candidate_first_name,'
         'candidate_votes,'
-        'election_counted_entities,'
-        'election_total_entities,'
-        'election_absolute_majority,'
         'candidate_party,'
         'panachage_votes_from_list_1,'
         'panachage_votes_from_list_2'
@@ -228,21 +211,21 @@ def upload_proporz_election(client, create=True, canton='gr'):
     )
     if canton == 'gr':
         csv += (
-            "unknown,3503,56,32,1,0,1,1,1,FDP,1,1,0,8,"
-            "101,False,Casanova,Angela,0,1,125,,,0,1\n"
+            'unknown,3503,True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
+            '101,False,Casanova,Angela,0,,0,1\n'
         )
         csv += (
-            "unknown,3503,56,32,1,0,1,2,2,CVP,1,2,0,6,"
-            "201,False,Caluori,Corina,2,1,125,,,2,0\n"
+            'unknown,3503,True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
+            '201,False,Caluori,Corina,2,,2,0\n'
         )
     elif canton == 'zg':
         csv += (
-            "unknown,1711,56,32,1,0,1,1,1,FDP,1,1,0,8,"
-            "101,False,Casanova,Angela,0,1,125,,,0,1\n"
+            'unknown,1711,True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
+            '101,False,Casanova,Angela,0,,0,1\n'
         )
         csv += (
-            "unknown,1711,56,32,1,0,1,2,2,CVP,1,2,0,5,"
-            "201,False,Caluori,Corina,2,1,125,,,2,0\n"
+            'unknown,1711,True,56,32,1,0,1,2,2,CVP,1,2,0,5,'
+            '201,False,Caluori,Corina,2,,2,0\n'
         )
     csv = csv.encode('utf-8')
 

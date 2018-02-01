@@ -39,8 +39,7 @@ def test_import_wabsti_majorz(session, tar_file):
 
     assert not errors
     assert election.completed
-    assert election.counted_entities == 85
-    assert election.total_entities == 85
+    assert election.progress == (85, 85)
     assert election.results.count() == 85
     assert election.progress == (85, 85)
     assert round(election.turnout, 2) == 47.79
@@ -64,8 +63,7 @@ def test_import_wabsti_majorz(session, tar_file):
 
     assert not errors
     assert election.completed
-    assert election.counted_entities == 85
-    assert election.total_entities == 85
+    assert election.progress == (85, 85)
     assert election.results.count() == 85
     assert election.progress == (85, 85)
     assert round(election.turnout, 2) == 47.79
@@ -302,4 +300,54 @@ def test_import_wabsti_majorz_expats(session):
         assert not errors
         assert election.results.filter_by(entity_id=0).one().invalid_votes == 1
 
-# todo: test temporary results
+
+def test_import_wabsti_majorz_temporary_results(session):
+    session.add(
+        Election(
+            title='election',
+            domain='canton',
+            date=date(2016, 2, 28),
+            number_of_mandates=6,
+        )
+    )
+    session.flush()
+    election = session.query(Election).one()
+    principal = Canton(canton='sg')
+    entities = principal.entities.get(election.date.year, {})
+
+    errors = import_election_wabsti_majorz(
+        election, entities,
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'AnzMandate',
+                    'BFS',
+                    'StimmBer',
+                    'StimmAbgegeben',
+                    'StimmLeer',
+                    'StimmUngueltig',
+                    'KandName_1',
+                    'Stimmen_1',
+                    'KandName_2',
+                    'Stimmen_2',
+                )),
+                ','.join((
+                    '',
+                    '3203',
+                    '100',
+                    '90',
+                    '1',
+                    '1',
+                    'Leere Zeilen',
+                    '0',
+                    'Ungültige Stimmen',
+                    '1'
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain'
+    )
+
+    assert not errors
+
+    # 1 Present, 76 Missing
+    assert election.progress == (1, 77)

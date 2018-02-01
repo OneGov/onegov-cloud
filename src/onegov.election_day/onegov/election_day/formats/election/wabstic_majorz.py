@@ -76,8 +76,8 @@ def import_election_wabstic_majorz(
 ):
     """ Tries to import the files in the given folder.
 
-    We assume that the files there have been uploaded via FTP using the
-    WabstiCExport 2.1.
+    We assume that the files there have been uploaded using the WabstiCExport
+    2.1.
 
     """
     errors = []
@@ -340,46 +340,53 @@ def import_election_wabstic_majorz(
     if errors:
         return errors
 
-    # todo: Add missing entities as uncounted
+    election.clear_results()
 
-    if added_results:
-        election.clear_results()
+    election.absolute_majority = absolute_majority
+    election.status = 'unknown'
+    if complete == 1:
+        election.status = 'interim'
+    if complete == 2:
+        election.status = 'final'
 
-        election.absolute_majority = absolute_majority
-        election.counted_entities = sum([
-            1 for value in added_entities.values() if value['counted']
-        ])
-        election.total_entities = max(len(entities), len(added_results.keys()))
-        election.status = 'unknown'
-        if complete == 1:
-            election.status = 'interim'
-        if complete == 2:
-            election.status = 'final'
+    for candidate in added_candidates.values():
+        election.candidates.append(candidate)
 
-        for candidate in added_candidates.values():
-            election.candidates.append(candidate)
-
-        for entity_id in added_results.keys():
-            entity = added_entities[entity_id]
-            result = ElectionResult(
-                id=uuid4(),
-                entity_id=entity_id,
-                name=entity['name'],
-                district=entity['district'],
-                elegible_voters=entity['elegible_voters'],
-                received_ballots=entity['received_ballots'],
-                blank_ballots=entity['blank_ballots'],
-                invalid_ballots=entity['invalid_ballots'],
-                blank_votes=entity['blank_votes'],
-                invalid_votes=entity['invalid_votes']
-            )
-            for candidate_id, votes in added_results[entity_id].items():
-                result.candidate_results.append(
-                    CandidateResult(
-                        votes=votes,
-                        candidate_id=added_candidates[candidate_id].id
-                    )
+    for entity_id in added_results.keys():
+        entity = added_entities[entity_id]
+        result = ElectionResult(
+            id=uuid4(),
+            name=entity['name'],
+            district=entity['district'],
+            entity_id=entity_id,
+            counted=entity['counted'],
+            elegible_voters=entity['elegible_voters'],
+            received_ballots=entity['received_ballots'],
+            blank_ballots=entity['blank_ballots'],
+            invalid_ballots=entity['invalid_ballots'],
+            blank_votes=entity['blank_votes'],
+            invalid_votes=entity['invalid_votes']
+        )
+        for candidate_id, votes in added_results[entity_id].items():
+            result.candidate_results.append(
+                CandidateResult(
+                    votes=votes,
+                    candidate_id=added_candidates[candidate_id].id
                 )
-            election.results.append(result)
+            )
+        election.results.append(result)
+
+    remaining = entities.keys() - added_results.keys()
+    for entity_id in remaining:
+        entity = entities[entity_id]
+        election.results.append(
+            ElectionResult(
+                id=uuid4(),
+                name=entity.get('name', ''),
+                district=entity.get('district', ''),
+                entity_id=entity_id,
+                counted=False
+            )
+        )
 
     return []

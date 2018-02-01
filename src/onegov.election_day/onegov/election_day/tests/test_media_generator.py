@@ -40,9 +40,7 @@ def add_majorz_election(session):
         domain='federation',
         date=date(2015, 6, 14),
         number_of_mandates=1,
-        absolute_majority=200,
-        counted_entities=1,
-        total_entities=1
+        absolute_majority=200
     )
     session.add(election)
     session.flush()
@@ -50,6 +48,7 @@ def add_majorz_election(session):
     result = ElectionResult(
         name='name',
         entity_id=1,
+        counted=True,
         elegible_voters=1000,
         received_ballots=500,
         blank_ballots=10,
@@ -92,9 +91,7 @@ def add_proporz_election(session, year=2015):
         title='Proporz Election',
         domain='federation',
         date=date(year, 6, 14),
-        number_of_mandates=1,
-        counted_entities=1,
-        total_entities=1
+        number_of_mandates=1
     )
     session.add(election)
     session.flush()
@@ -102,6 +99,7 @@ def add_proporz_election(session, year=2015):
     result = ElectionResult(
         name='name',
         entity_id=1,
+        counted=True,
         elegible_voters=1000,
         received_ballots=500,
         blank_ballots=10,
@@ -345,8 +343,7 @@ def test_generate_pdf_election(session, election_day_app):
             assert len(PdfReader(f, decompress=False).pages) == 7
 
     # Proporz election with more than one entitiy
-    proporz.counted_entities = 5
-    proporz.total_entities = 5
+    proporz.status = 'final'
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(proporz, 'election.pdf', locale)
         with election_day_app.filestorage.open('election.pdf', 'rb') as f:

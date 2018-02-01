@@ -31,8 +31,8 @@ def get_election_summary(election, request, url=None):
         'elected': election.elected_candidates,
         'last_modified': last_modified,
         'progress': {
-            'counted': election.counted_entities or 0,
-            'total': election.total_entities or 0
+            'counted': election.progress[0] or 0,
+            'total': election.progress[1] or 0
         },
         'title': election.title_translations,
         'type': 'election',
@@ -213,24 +213,3 @@ def svg_filename(item, type_, locale=None):
         ts = int(item.last_modified.timestamp())
 
     return '{}-{}.{}.{}.{}.svg'.format(name, hash, ts, type_, locale or 'any')
-
-
-# todo: remove me!
-def guessed_group(entity, other):
-    """ Guess the grouping from another group name.
-
-    This should become soon obsolete
-    """
-
-    result = entity['name']
-
-    if other:
-        if '/' in other[0].group:
-            result = '/'.join(
-                p for p in (
-                    entity.get('district'),
-                    entity.get('name')
-                ) if p is not None
-            )
-
-    return result

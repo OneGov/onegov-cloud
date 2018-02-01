@@ -92,11 +92,10 @@ Nom|Description
 `election_mandates`|Nombre de mandats.
 `election_absolute_majority`|La majorité absolue. Uniquement valable pour les élections basées sur le système majoritaire.
 `election_status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
-`election_counted_entities`|Le nombre de municipalités déjà comptées.
-`election_total_entities`|Le nombre total de municipalités.
 `entity_id`|L'identifiant de la municipalité. A value `0` represents the expats.
 `entity_name`|Le nom de la municipalité.
 `entity_district`|The district of the municipality.
+`entity_counted`|`True` si le résultat a été compté.
 `entity_elegible_voters`|Le nombre de personnes éligible à voter pour cette municipalité.
 `entity_received_ballots`|Le nombre de bulletins de vote reçus pour cette municipalité.
 `entity_blank_ballots`|Le nombre de bulletins blancs pour cette municipalité.

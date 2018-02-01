@@ -14,25 +14,6 @@ def to_int(value):
         return value
 
 
-def get_missing_entities(election, request, session):
-    result = []
-
-    all_ = request.app.principal.entities[election.date.year]
-
-    used = session.query(ElectionResult.entity_id)
-    used = used.filter(ElectionResult.election_id == election.id)
-    used = used.distinct()
-    used = [item[0] for item in used]
-
-    for id_ in set(all_.keys()) - set(used):
-        result.append({
-            'name': all_[id_]['name'],
-            'district': all_[id_].get('district', '')
-        })
-
-    return result
-
-
 def get_candidates_results(election, session):
     """ Returns the aggregated candidates results as list. """
 
@@ -93,7 +74,7 @@ def get_connection_results(election, session):
     )
     parents = parents.filter(
         ListConnection.election_id == election.id,
-        ListConnection.parent_id == None
+        ListConnection.parent_id.is_(None)
     )
     parents = parents.order_by(ListConnection.connection_id)
 
@@ -105,7 +86,7 @@ def get_connection_results(election, session):
     )
     children = children.filter(
         ListConnection.election_id == election.id,
-        ListConnection.parent_id != None
+        ListConnection.parent_id.isnot(None)
     )
     children = children.order_by(
         ListConnection.parent_id,
@@ -120,7 +101,7 @@ def get_connection_results(election, session):
         List.list_id
     )
     sublists = sublists.filter(
-        List.connection_id != None,
+        List.connection_id.isnot(None),
         List.election_id == election.id
     )
     sublists = sublists.order_by(List.connection_id)

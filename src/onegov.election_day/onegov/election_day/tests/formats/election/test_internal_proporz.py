@@ -46,8 +46,7 @@ def test_import_internal_proporz(session, tar_file):
 
     assert not errors
     assert election.completed
-    assert election.counted_entities == 11
-    assert election.total_entities == 11
+    assert election.progress == (11, 11)
     assert election.results.count() == 11
     assert election.absolute_majority is None
     assert election.elegible_voters == 74803
@@ -77,8 +76,7 @@ def test_import_internal_proporz(session, tar_file):
 
     assert not errors
     assert election.completed
-    assert election.counted_entities == 11
-    assert election.total_entities == 11
+    assert election.progress == (11, 11)
     assert election.results.count() == 11
     assert election.absolute_majority is None
     assert election.elegible_voters == 74803
@@ -120,9 +118,8 @@ def test_import_internal_proporz_missing_headers(session):
             '\n'.join((
                 ','.join((
                     'election_status',
-                    'election_counted_entities',
-                    'election_total_entities',
                     'entity_id',
+                    'entity_counted',
                     'entity_elegible_voters',
                     'entity_received_ballots',
                     'entity_blank_ballots',
@@ -169,9 +166,8 @@ def test_import_internal_proporz_invalid_values(session):
             '\n'.join((
                 ','.join((
                     'election_status',
-                    'election_counted_entities',
-                    'election_total_entities',
                     'entity_id',
+                    'entity_counted',
                     'entity_elegible_voters',
                     'entity_received_ballots',
                     'entity_blank_ballots',
@@ -193,9 +189,8 @@ def test_import_internal_proporz_invalid_values(session):
                 )),
                 ','.join((
                     'xxx',  # election_status
-                    'xxx',  # election_counted_entities
-                    'xxx',  # election_total_entities
                     'xxx',  # entity_id
+                    'xxx',  # entity_counted
                     'xxx',  # entity_elegible_voters
                     'xxx',  # entity_received_ballots
                     'xxx',  # entity_blank_ballots
@@ -217,9 +212,8 @@ def test_import_internal_proporz_invalid_values(session):
                 )),
                 ','.join((
                     'unknown',  # election_status
-                    '1',  # election_counted_entities
-                    '78',  # election_total_entities
                     '1234',  # entity_id
+                    'True',  # entity_counted
                     '100',  # entity_elegible_voters
                     '10',  # entity_received_ballots
                     '0',  # entity_blank_ballots
@@ -246,7 +240,6 @@ def test_import_internal_proporz_invalid_values(session):
     assert sorted([(e.line, e.error.interpolate()) for e in errors]) == [
         (2, 'Invalid candidate results'),
         (2, 'Invalid candidate values'),
-        (2, 'Invalid election values'),
         (2, 'Invalid entity values'),
         (2, 'Invalid list results'),
         (2, 'Invalid list results'),
@@ -277,9 +270,8 @@ def test_import_internal_proporz_expats(session):
                 '\n'.join((
                     ','.join((
                         'election_status',
-                        'election_counted_entities',
-                        'election_total_entities',
                         'entity_id',
+                        'entity_counted',
                         'entity_elegible_voters',
                         'entity_received_ballots',
                         'entity_blank_ballots',
@@ -301,9 +293,8 @@ def test_import_internal_proporz_expats(session):
                     )),
                     ','.join((
                         'unknown',  # election_status
-                        '1',  # election_counted_entities
-                        '11',  # election_total_entities
                         str(entity_id),  # entity_id
+                        'True',  # entity_counted
                         '111',  # entity_elegible_voters
                         '11',  # entity_received_ballots
                         '1',  # entity_blank_ballots
@@ -330,4 +321,97 @@ def test_import_internal_proporz_expats(session):
         assert election.results.filter_by(entity_id=0).one().invalid_votes == 1
 
 
-# todo: test temporary results
+def test_import_internal_proporz_temporary_results(session):
+    session.add(
+        ProporzElection(
+            title='election',
+            domain='canton',
+            date=date(2015, 10, 18),
+            number_of_mandates=6,
+        )
+    )
+    session.flush()
+    election = session.query(Election).one()
+    principal = Canton(canton='zg')
+    entities = principal.entities.get(election.date.year, {})
+
+    errors = import_election_internal_proporz(
+        election, entities,
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'election_status',
+                    'entity_id',
+                    'entity_counted',
+                    'entity_elegible_voters',
+                    'entity_received_ballots',
+                    'entity_blank_ballots',
+                    'entity_invalid_ballots',
+                    'entity_blank_votes',
+                    'entity_invalid_votes',
+                    'list_name',
+                    'list_id',
+                    'list_number_of_mandates',
+                    'list_votes',
+                    'list_connection',
+                    'list_connection_parent',
+                    'candidate_family_name',
+                    'candidate_first_name',
+                    'candidate_id',
+                    'candidate_elected',
+                    'candidate_votes',
+                    'candidate_party',
+                )),
+                ','.join((
+                    'unknown',  # election_status
+                    '1701',  # entity_id
+                    'True',  # entity_counted
+                    '111',  # entity_elegible_voters
+                    '11',  # entity_received_ballots
+                    '1',  # entity_blank_ballots
+                    '1',  # entity_invalid_ballots
+                    '1',  # entity_blank_votes
+                    '1',  # entity_invalid_votes
+                    '',  # list_name
+                    '',  # list_id
+                    '',  # list_number_of_mandates
+                    '',  # list_votes
+                    '',  # list_connection
+                    '',  # list_connection_parent
+                    'xxx',  # candidate_family_name
+                    'xxx',  # candidate_first_name
+                    '1',  # candidate_id
+                    'false',  # candidate_elected
+                    '1',  # candidate_votes
+                    '',  # candidate_party
+                )),
+                ','.join((
+                    'unknown',  # election_status
+                    '1702',  # entity_id
+                    'False',  # entity_counted
+                    '111',  # entity_elegible_voters
+                    '11',  # entity_received_ballots
+                    '1',  # entity_blank_ballots
+                    '1',  # entity_invalid_ballots
+                    '1',  # entity_blank_votes
+                    '1',  # entity_invalid_votes
+                    '',  # list_name
+                    '',  # list_id
+                    '',  # list_number_of_mandates
+                    '',  # list_votes
+                    '',  # list_connection
+                    '',  # list_connection_parent
+                    'xxx',  # candidate_family_name
+                    'xxx',  # candidate_first_name
+                    '1',  # candidate_id
+                    'false',  # candidate_elected
+                    '1',  # candidate_votes
+                    '',  # candidate_party
+                ))
+            ))
+        ).encode('utf-8')), 'text/plain',
+    )
+    assert not errors
+
+    # 1 Counted, 1 Uncounted, 10 Missing
+    assert election.progress == (1, 11)

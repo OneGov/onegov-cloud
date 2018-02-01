@@ -159,16 +159,14 @@ class ArchivedResultCollection(object):
         result.external_id = item.id
         result.counted = item.counted
         result.completed = item.completed
+        result.counted_entities, result.total_entities = item.progress
 
         if isinstance(item, Election):
             result.type = 'election'
-            result.counted_entities = item.counted_entities
-            result.total_entities = item.total_entities
             result.elected_candidates = item.elected_candidates
 
         if isinstance(item, Vote):
             result.type = 'vote'
-            result.counted_entities, result.total_entities = item.progress
             result.answer = item.answer
             result.nays_percentage = item.nays_percentage
             result.yeas_percentage = item.yeas_percentage

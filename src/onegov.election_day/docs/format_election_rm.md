@@ -28,9 +28,8 @@ Num|Descripziun
 ---|---
 `election_absolute_majority`|Maioritad absoluta da l'elecziun, mo tar elecziuns da maiorz.
 `election_status`|`unknown`, `interim` or `final`.
-`election_counted_municipalites`|Dumber da las vischnancas ch'èn dumbradas ora. Sche `election_counted_municipalites = election_total_municipalites`, vala l'elecziun sco dumbrada ora cumplettamain.
-`election_total_municipalites`|Dumber total da vischnancas. Sch'i na po betg vegnir dada ina infurmaziun exacta davart il status da l'elecziun (damai che Wahlt è vegnì importà da Wabsti), è questa valur `0`.
-`entity_bfs_number`|Numer UST da la vischnanca. La valur `0` po vegnir duvrada per persunas che vivan a l'exteriur.
+`entity_id`|Numer UST da la vischnanca. La valur `0` po vegnir duvrada per persunas che vivan a l'exteriur.
+`entity_counted`|`True`, sch'il resultat è vegnì eruì.
 `entity_elegible_voters`|Dumber da persunas cun dretg da votar da la vischnanca.
 `entity_received_ballots`|Dumber da cedels da votar consegnads da la vischnanca.
 `entity_blank_ballots`|Dumber da cedels da votar vids da la vischnanca.
@@ -61,12 +60,14 @@ Num|Descripziun
 
 ### Resultats temporars
 
-Las vischnancas che n'èn anc betg dumbradas ora n'èn betg cuntegnidas en las datas.
+Municipalities are deemed not to have been counted yet if one of the following two conditions apply:
+- `counted = false`
+- the municipality is not included in the results
 
 Sch'il status è
 - `interim`, vala la votaziun sco betg anc terminada
 - `final`, vala la votaziun sco terminada
-- `unknown` vala la votaziun sco terminada, premess che tut ils `election_counted_entities` ed `election_total_entities` correspundian in a l'auter
+- `unknown`, the whole election is considered completed, if all (expected) municipalities are counted
 
 ### Project
 
@@ -113,7 +114,7 @@ Num|Descripziun
 
 Il format da datoteca na cuntegna naginas infurmaziuns definitivas, sche tut l'elecziun è dumbrada ora cumplettamain. Questa infurmaziun sto vegnir furnida directamain sin il formular per l'upload da las datas.
 
-Il format da datoteca na cuntegna naginas infurmaziuns definitivas, sch'ina singula vischnanca è dumbrada ora cumplettamain. Perquai na vegn, uscheditg che l'entira elecziun n'è betg terminada, er betg mussà il progress en Wabsti. Sch'i mancan però cumplettamain vischnancas en ils resultats, valan quellas sco anc betg dumbradas ora.
+Il format da datoteca na cuntegna naginas infurmaziuns definitivas, sch'ina singula vischnanca è dumbrada ora cumplettamain. Sch'i mancan però cumplettamain vischnancas en ils resultats, valan quellas sco anc betg dumbradas ora.
 
 ### Projects
 
@@ -173,7 +174,7 @@ Num|Descripziun
 
 Il format che vegn duvrà da l'applicaziun web per l'export sa cumpona d'ina singula datoteca per elecziun. Per mintga vischnanca e candidata u candidat datti ina lingia.
 
-Il format da datoteca na cuntegna naginas infurmaziuns definitivas, sch'ina singula vischnanca è dumbrada ora cumplettamain. Perquai na vegn, uscheditg che l'entira elecziun n'è betg terminada, er betg mussà il progress en Wabsti. Sch'i mancan però cumplettamain vischnancas en ils resultats, valan quellas sco anc betg dumbradas ora.
+Il format da datoteca na cuntegna naginas infurmaziuns definitivas, sch'ina singula vischnanca è dumbrada ora cumplettamain. Sch'i mancan però cumplettamain vischnancas en ils resultats, valan quellas sco anc betg dumbradas ora.
 
 ### Projects
 

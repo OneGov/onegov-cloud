@@ -58,8 +58,8 @@ def view_election_json(self, request):
             'total': self.number_of_mandates or 0,
         },
         'progress': {
-            'counted': self.counted_entities or 0,
-            'total': self.total_entities or 0,
+            'counted': self.progress[0] or 0,
+            'total': self.progress[1] or 0
         },
         'related_link': self.related_link,
         'title': self.title_translations,
