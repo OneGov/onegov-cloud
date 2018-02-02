@@ -17,6 +17,7 @@ class DomainOfInfluenceMixin(object):
         return Column(
             Enum(
                 'federation',
+                'region',
                 'canton',
                 'municipality',
                 name='domain_of_influence'

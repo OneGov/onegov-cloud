@@ -5,6 +5,9 @@ Changelog
   counted_entities from election.
   [msom]
 
+- Adds a new domain of influence: region.
+  [msom]
+
 2.0.0 (2018-01-23)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -8,6 +8,7 @@ The domain of influence is used in elections and votes (cantonal elections, comm
 | -------------- | ------------------------------------ | ----------------------------- | ---------------------- |
 | CH: Bund       | federation                           |                               |                        |
 | CT: Kanton     | canton                               | canton                        | shortcut (be, zh, ...) |
+| BZ: Bezirk     | region                               |                               |                        |
 | MU: Gemeinde   | municipality                         | municipality                  | BFS                    |
 | SK: Stadtkreis | -                                    |                               | district_id            |
 

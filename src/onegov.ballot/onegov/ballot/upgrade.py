@@ -282,3 +282,47 @@ def change_counted_columns_of_elections(context):
 
     if context.has_column('elections', 'counted_entities'):
         context.operations.drop_column('elections', 'counted_entities')
+
+
+@upgrade_task('Add region domain of influence')
+def add_region_domain(context):
+    # Add the new domain, see http://stackoverflow.com/a/14845740
+    table_names = []
+    inspector = Inspector(context.operations_connection)
+    if 'elections' in inspector.get_table_names(context.schema):
+        table_names.append('elections')
+    if 'votes' in inspector.get_table_names(context.schema):
+        table_names.append('votes')
+    if 'archived_results' in inspector.get_table_names(context.schema):
+        table_names.append('archived_results')
+
+    old_type = Enum('federation', 'canton', 'municipality',
+                    name='domain_of_influence')
+    new_type = Enum('federation', 'region', 'canton', 'municipality',
+                    name='domain_of_influence')
+    tmp_type = Enum('federation', 'region', 'canton', 'municipality',
+                    name='_domain_of_influence')
+
+    tmp_type.create(context.operations.get_bind(), checkfirst=False)
+
+    for table_name in table_names:
+        context.operations.execute(
+            (
+                'ALTER TABLE {} ALTER COLUMN domain TYPE _domain_of_influence '
+                'USING domain::text::_domain_of_influence'
+            ).format(table_name)
+        )
+
+    old_type.drop(context.operations.get_bind(), checkfirst=False)
+
+    new_type.create(context.operations.get_bind(), checkfirst=False)
+
+    for table_name in table_names:
+        context.operations.execute(
+            (
+                'ALTER TABLE {} ALTER COLUMN domain TYPE domain_of_influence '
+                'USING domain::text::domain_of_influence'
+            ).format(table_name)
+        )
+
+    tmp_type.drop(context.operations.get_bind(), checkfirst=False)
