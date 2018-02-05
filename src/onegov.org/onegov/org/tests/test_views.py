@@ -4026,3 +4026,23 @@ def test_directory_submissions(org_app, postgres):
     desc = org_app.session().query(DirectoryEntry).one().values['description']
     assert '\n' not in desc
     transaction.abort()
+
+
+def test_dependent_number_form(org_app):
+    collection = FormCollection(org_app.session())
+    collection.definitions.add('Profile', definition=textwrap.dedent("""
+        E-Mail *= @@@
+        Country =
+            ( ) Switzerland
+                Email *= @@@
+            (x) Other
+    """), type='custom')
+
+    transaction.commit()
+
+    client = Client(org_app)
+    page = client.get('/form/profile')
+    page.form['e_mail'] = 'info@example.org'
+    page = page.form.submit().follow()
+
+    assert "Bitte überprüfen Sie Ihre Angaben" in page
