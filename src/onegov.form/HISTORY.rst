@@ -1,5 +1,10 @@
 Changelog
 ---------
+
+- Fixes validators of depndent fields being invoked for empty values when
+  they should not.
+  [href]
+
 0.31.0 (2018-01-24)
 ~~~~~~~~~~~~~~~~~~~
 

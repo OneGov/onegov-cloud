@@ -284,8 +284,14 @@ class WTFormsClassBuilder(object):
         validators.insert(0, DataRequired())
 
     def validators_add_dependency(self, validators, dependency):
-        # set the requried flag, even if it's not always required
-        # as it's better to show it too often, than not often enough
+
+        # if the dependency is not fulfilled, the field may be empty
+        # but it must still validate otherwise (invalid = nok, empty = ok)
+        validator = If(dependency.unfulfilled, StrictOptional())
+        validator.field_flags = ('required', )
+        validators.insert(0, validator)
+
+        # if the dependency is fulfilled, the field is required
         validator = If(dependency.fulfilled, DataRequired())
         validator.field_flags = ('required', )
         validators.insert(0, validator)

@@ -739,3 +739,34 @@ def test_field_ids():
     assert fs[0].find_field('First Name').id == 'first_name'
     assert fs[1].find_field('first_name') is None
     assert fs[1].find_field('First Name') is None
+
+
+@pytest.mark.parametrize("field,invalid", [
+    ('@@@', 'foo'),
+    ('0..99', 100),
+    ('0.00..99.99', 100.00),
+    ('# iban', 'foo')
+])
+def test_dependency_validation_chain(field, invalid):
+    for required in (True, False):
+        code = """
+            select *=
+                ( ) ya
+                    value {}= {}
+                (x) no
+        """.format(required and '*' or '', field)
+
+        form = parse_form(code)
+
+        # we cannot supply an empty value if the depencency is fulfilled
+        # and an input is required
+        if required:
+            assert not form(data={'select': 'ya'}).validate()
+
+        # we can supply an empty value if the dependency is not fulfilled
+        assert form(data={'select': 'no'}).validate()
+
+        # we cannot supply an invalid value in any case
+        inv = invalid
+        assert not form(data={'select': 'no', 'select_value': inv}).validate()
+        assert not form(data={'select': 'ya', 'select_value': inv}).validate()
