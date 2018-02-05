@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.31.1 (2018-02-05)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes validators of depndent fields being invoked for empty values when
   they should not.
