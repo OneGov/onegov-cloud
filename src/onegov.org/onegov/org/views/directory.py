@@ -466,14 +466,17 @@ def view_import(self, request, form):
             request.alert(_("The column ${name} is missing", mapping={
                 'name': self.directory.field_by_id(e.column).human_id
             }))
-            transaction.abort()
         except DuplicateEntryError as e:
             request.alert(_("The entry ${name} exists twice", mapping={
                 'name': e.name
             }))
         except ValidationError as e:
             error = e
-            transaction.abort()
+        except NotImplementedError as e:
+            request.alert(_(
+                "The given file is invalid, does it include a metadata.json "
+                "with a data.xlsx, data.csv, or data.json?"
+            ))
         else:
             notify = imported and request.success or request.warning
             notify(_("Imported ${count} entries", mapping={
@@ -481,6 +484,9 @@ def view_import(self, request, form):
             }))
 
             return request.redirect(request.link(self))
+
+        # no success if we land here
+        transaction.abort()
 
     return {
         'layout': layout,

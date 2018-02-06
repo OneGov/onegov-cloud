@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-02-06 15:07+0100\n"
+"POT-Creation-Date: 2018-02-06 16:16+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2305,6 +2305,13 @@ msgstr "Die Spalte ${name} fehlt"
 #, python-format
 msgid "The entry ${name} exists twice"
 msgstr "Der Eintrag ${name} existiert zweimal"
+
+msgid ""
+"The given file is invalid, does it include a metadata.json with a data.xlsx, "
+"data.csv, or data.json?"
+msgstr ""
+"Die angegebene Datei ist ungültig. Enthält sie eine metadata.json Datei mit "
+"einer data.xlsx, data.csv oder data.json Datei?"
 
 msgid ""
 "The requested change cannot be performed, as it is incompatible with "

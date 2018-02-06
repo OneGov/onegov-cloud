@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Shows a better error message a directory import archive is invalid.
+  [href]
+
 - Shows an error when an entry is specified twice in a directory import.
   [href]
 
