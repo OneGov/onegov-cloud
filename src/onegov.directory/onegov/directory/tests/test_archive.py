@@ -223,3 +223,52 @@ def test_corodinates(session, temporary_path):
         'lon': -118.3215482,
         'zoom': None
     }
+
+
+def test_import_duplicates(session, temporary_path):
+    directories = DirectoryCollection(session)
+    foos = directories.add(
+        title="Foos",
+        structure="Name *= ___",
+        configuration=DirectoryConfiguration(
+            title="[name]",
+            order=['name']
+        )
+    )
+
+    bars = directories.add(
+        title="Bars",
+        structure="Name *= ___",
+        configuration=DirectoryConfiguration(
+            title="[name]",
+            order=['name']
+        )
+    )
+
+    bars.add(values=dict(name='foobar'))
+    foos.add(values=dict(name='foobar'))
+
+    session.flush()
+
+    foo_path = temporary_path / 'foo'
+    bar_path = temporary_path / 'bar'
+
+    foo_path.mkdir()
+    bar_path.mkdir()
+
+    foo_archive = DirectoryArchive(foo_path, 'json')
+    foo_archive.write(foos)
+
+    bar_archive = DirectoryArchive(bar_path, 'json')
+    bar_archive.write(bars)
+
+    for entry in foos.entries:
+        session.delete(entry)
+
+    for entry in bars.entries:
+        session.delete(entry)
+
+    session.flush()
+
+    foo_archive.read(foos)
+    bar_archive.read(bars)

@@ -17,7 +17,7 @@ from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import Text
-from sqlalchemy import func
+from sqlalchemy import func, exists, and_
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.attributes import InstrumentedAttribute
@@ -238,9 +238,10 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
         self.migration(structure, configuration).execute()
 
     def entry_with_name_exists(self, name):
-        q = object_session(self).query(self.entry_cls).filter_by(name=name)
-
-        return q.first()
+        return object_session(self).query(exists().where(and_(
+            self.entry_cls.name == name,
+            self.entry_cls.directory_id == self.id
+        ))).scalar()
 
     def migration(self, new_structure, new_configuration):
         return DirectoryMigration(

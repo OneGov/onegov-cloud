@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes entries from other directories being considered as duplicates.
+  [href]
+
 0.1.6 (2018-01-24)
 ~~~~~~~~~~~~~~~~~~~~~
 

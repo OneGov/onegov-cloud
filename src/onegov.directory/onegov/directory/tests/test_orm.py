@@ -8,7 +8,7 @@ from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryEntryCollection
-from onegov.directory.errors import ValidationError
+from onegov.directory.errors import DuplicateEntryError, ValidationError
 from onegov.file import File
 
 
@@ -503,3 +503,21 @@ def test_change_number_range_fail(session):
 
     with pytest.raises(ValidationError):
         session.flush()
+
+
+def test_add_duplicate_entry(session):
+
+    foos = DirectoryCollection(session).add(
+        title="Foos",
+        structure="Name *= ___",
+        configuration=DirectoryConfiguration(
+            title=('Name', ),
+            order=('Name', ),
+        )
+    )
+
+    foos.add(values=dict(name='foobar'))
+    session.flush()
+
+    with pytest.raises(DuplicateEntryError):
+        foos.add(values=dict(name='foobar'))
