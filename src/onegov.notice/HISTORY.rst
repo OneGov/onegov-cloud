@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.4.0 (2018-02-06)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds author fields (name, date, place) to notices.
   [msom]
