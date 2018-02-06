@@ -11,6 +11,7 @@ from itsdangerous import (
     URLSafeSerializer,
     URLSafeTimedSerializer
 )
+from more.content_security import ContentSecurityRequest
 from more.webassets.core import IncludeRequest
 from morepath.authentication import NO_IDENTITY
 from onegov.core import utils
@@ -82,7 +83,7 @@ class ReturnToMixin(object):
         return morepath.redirect(url)
 
 
-class CoreRequest(IncludeRequest, ReturnToMixin):
+class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
     """ Extends the default Morepath request with virtual host support and
     other useful methods.
 

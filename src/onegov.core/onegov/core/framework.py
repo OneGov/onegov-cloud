@@ -31,6 +31,9 @@ from email.utils import parseaddr, formataddr
 from itsdangerous import BadSignature, Signer
 from mailthon.middleware import TLS, Auth
 from morepath.publish import resolve_model, get_view_name
+from more.content_security import ContentSecurityApp
+from more.content_security import ContentSecurityPolicy
+from more.content_security import SELF, UNSAFE_INLINE, UNSAFE_EVAL
 from more.transaction import TransactionApp
 from more.transaction.main import transaction_tween_factory
 from more.webassets import WebassetsApp
@@ -54,7 +57,13 @@ from uuid import uuid4 as new_uuid
 from webob.exc import HTTPConflict
 
 
-class Framework(TransactionApp, WebassetsApp, OrmCacheApp, ServerApplication):
+class Framework(
+    TransactionApp,
+    WebassetsApp,
+    OrmCacheApp,
+    ContentSecurityApp,
+    ServerApplication
+):
     """ Baseclass for Morepath OneGov applications. """
 
     request_class = CoreRequest
@@ -432,6 +441,16 @@ class Framework(TransactionApp, WebassetsApp, OrmCacheApp, ServerApplication):
     def configure_hipchat(self, **cfg):
         self.hipchat_token = cfg.get('hipchat_token', None)
         self.hipchat_room_id = cfg.get('hipchat_room_id', None)
+
+    def configure_content_security_policy(self, **cfg):
+        self.content_security_policy_enabled\
+            = cfg.get('content_security_policy_enabled', True)
+
+        self.content_security_policy_report_uri\
+            = cfg.get('content_security_policy_report_uri', None)
+
+        self.content_security_policy_report_only\
+            = cfg.get('content_security_policy_report_only', False)
 
     def set_application_id(self, application_id):
         """ Set before the request is handled. Gets the schema from the
@@ -962,6 +981,53 @@ def get_cronjobs_enabled():
 
     """
     return True
+
+
+@Framework.setting(section='content_security_policy', name='default')
+def default_content_security_policy():
+    """ The default content security policy used throughout OneGov. """
+
+    return ContentSecurityPolicy(
+        # by default limit to self
+        default_src={SELF},
+
+        # allow fonts from practically anywhere (no mixed content though)
+        font_src={SELF, "http:", "https:", "data:"},
+
+        # allow images from practically anywhere (no mixed content though)
+        img_src={SELF, "http:", "https:", "data:"},
+
+        # enable inline styles and external stylesheets
+        style_src={SELF, "https:", UNSAFE_INLINE},
+
+        # enable inline scripts, eval and external scripts
+        script_src={SELF, "https:", UNSAFE_INLINE, UNSAFE_EVAL},
+
+        # disable all mixed content (https -> http)
+        block_all_mixed_content=True
+    )
+
+
+@Framework.setting(section='content_security_policy', name='apply_policy')
+def default_policy_apply_factory():
+    """ Adds the content security policy report settings from the yaml. """
+
+    def apply_policy(policy, request, response):
+        if not request.app.content_security_policy_enabled:
+            return
+
+        report_uri = request.app.content_security_policy_report_uri
+        report_only = request.app.content_security_policy_report_only
+
+        if report_uri:
+            policy.report_uri = report_uri
+
+        if report_only:
+            policy.report_only = report_only
+
+        policy.apply(response)
+
+    return apply_policy
 
 
 @Framework.tween_factory(over=transaction_tween_factory)

@@ -53,6 +53,7 @@ setup(
         'lazy-object-proxy',
         'mailthon>=0.1.1',
         'morepath>=0.18',
+        'more.content_security',
         'more.transaction>=0.5',
         'more.webassets>=0.3.1',
         'onegov.server>=0.3.2',
