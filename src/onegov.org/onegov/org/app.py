@@ -4,6 +4,7 @@ from chameleon import PageTemplate
 from collections import defaultdict
 from dectate import directive
 from onegov.core import Framework, utils
+from onegov.core.framework import default_content_security_policy
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.orm import orm_cached
 from onegov.file import DepotApp
@@ -228,6 +229,16 @@ def get_template_directory():
 @OrgApp.setting(section='core', name='theme')
 def get_theme():
     return OrgTheme()
+
+
+@OrgApp.setting(section='content_security_policy', name='default')
+def org_content_security_policy():
+    policy = default_content_security_policy()
+
+    policy.child_src.add('https://*.youtube.com')
+    policy.child_src.add('https://*.vimeo.com')
+
+    return policy
 
 
 @OrgApp.setting(section='org', name='create_new_organisation')
