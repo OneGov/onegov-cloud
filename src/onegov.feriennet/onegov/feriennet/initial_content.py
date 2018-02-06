@@ -28,8 +28,8 @@ def create_new_organisation(app, name, create_files=True, path=None,
 
     if locale == 'de_CH':
         forms.add(
-            name='contact',
-            title="Contact",
+            name='kontakt',
+            title="Kontakt",
             meta={
                 'lead': (
                     "Haben Sie Fragen oder eine Anregung? "
