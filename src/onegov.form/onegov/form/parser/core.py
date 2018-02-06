@@ -884,6 +884,7 @@ def translate_to_yaml(text):
     lines = ((ix, l) for ix, l in prepare(text))
     expect_nested = False
     actual_fields = 0
+    ix = 0
 
     for ix, line in lines:
 
