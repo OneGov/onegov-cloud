@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.60.0 (2018-02-06)
+~~~~~~~~~~~~~~~~~~~
 
 - Implements a default content security policy.
   [href]
