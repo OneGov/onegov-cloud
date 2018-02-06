@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.5.2 (2018-02-06)
+~~~~~~~~~~~~~~~~~~~
+
 - Excludes pdf/postscript files from the supported image formats.
   [href]
 
