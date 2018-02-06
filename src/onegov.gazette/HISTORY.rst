@@ -1,12 +1,10 @@
 Changelog
 ---------
-1.13.4 (2018-01-19)
-~~~~~~~~~~~~~~~~~~~
 
-- Assigns publication numbers when publishing the issue.
+- Shows print only options only to publishers.
   [msom]
 
-1.13.3 (2018-01-18)
+1.11.4 (2018-01-18)
 ~~~~~~~~~~~~~~~~~~~
 
 - Fixes print only option not set when creating a new notice.
