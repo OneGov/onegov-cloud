@@ -7,6 +7,9 @@ Changelog
 - Print only is always disabled when copying notices.
   [msom]
 
+- Updates translations.
+  [msom]
+
 1.11.4 (2018-01-18)
 ~~~~~~~~~~~~~~~~~~~
 

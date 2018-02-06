@@ -125,7 +125,7 @@ msgid "Category"
 msgstr "Rubrik"
 
 msgid "Print only"
-msgstr "Nur Druck"
+msgstr "Stop Internet"
 
 msgid "Liable to pay costs"
 msgstr "Kostenpflichtig 85% vom Normalpreis"
