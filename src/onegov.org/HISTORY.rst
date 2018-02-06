@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.22.0 (2018-02-06)
+~~~~~~~~~~~~~~~~~~~
+
 - Shows a better error message a directory import archive is invalid.
   [href]
 
