@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds author fields (name, date, place) to notices.
+  [msom]
+
 - Requires Python 3.6.
   [href]
 

@@ -71,6 +71,15 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     #: The text of the notice.
     text = Column(Text, nullable=True)
 
+    #: The author of the notice.
+    author_name = Column(Text, nullable=True)
+
+    #: The place (part of the signature).
+    author_place = Column(Text, nullable=True)
+
+    #: The date (part of the signature)
+    author_date = Column(UTCDateTime, nullable=True)
+
     #: The issues this notice appears in.
     _issues = Column(
         MutableDict.as_mutable(HSTORE), name='issues', nullable=True

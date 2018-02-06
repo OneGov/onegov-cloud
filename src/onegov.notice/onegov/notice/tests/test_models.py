@@ -11,6 +11,9 @@ def test_create_notice(session):
     notice.state = 'drafted'
     notice.title = 'Very Important Official Announcement'
     notice.text = '<em>Important</em> things happened!'
+    notice.author_name = 'Renward Cysat'
+    notice.author_place = 'Wynmärkt'
+    notice.author_date = datetime(1545, 1, 1, 0, 0, tzinfo=timezone.utc)
     notice.name = 'notice'
     notice.first_issue = datetime(2008, 1, 1, 0, 0, tzinfo=timezone.utc)
     notice.category = 'category'
@@ -26,6 +29,11 @@ def test_create_notice(session):
     assert notice.state == 'published'
     assert notice.title == 'Very Important Official Announcement'
     assert notice.text == '<em>Important</em> things happened!'
+    assert notice.author_name == 'Renward Cysat'
+    assert notice.author_place == 'Wynmärkt'
+    assert notice.author_date == datetime(
+        1545, 1, 1, 0, 0, tzinfo=timezone.utc
+    )
     assert notice.name == 'notice'
     assert notice.category == 'category'
     assert notice.organization == 'organization'
