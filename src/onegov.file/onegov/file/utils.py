@@ -82,7 +82,10 @@ def get_supported_image_mime_types():
     }
 
     for mime in Image.MIME.values():
-        supported_types.add(mime)
+
+        # exclude pdfs, postscripts and the like
+        if not mime.startswith('application/'):
+            supported_types.add(mime)
 
     return supported_types
 

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Excludes pdf/postscript files from the supported image formats.
+  [href]
+
 - Requires Python 3.6.
   [href]
 
