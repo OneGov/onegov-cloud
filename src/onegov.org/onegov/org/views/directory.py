@@ -9,7 +9,9 @@ from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryEntry
 from onegov.directory import DirectoryEntryCollection
 from onegov.directory import DirectoryZipArchive
-from onegov.directory.errors import ValidationError, MissingColumnError
+from onegov.directory.errors import DuplicateEntryError
+from onegov.directory.errors import MissingColumnError
+from onegov.directory.errors import ValidationError
 from onegov.form import FormCollection
 from onegov.form.fields import UploadField
 from onegov.org import OrgApp, _
@@ -465,6 +467,10 @@ def view_import(self, request, form):
                 'name': self.directory.field_by_id(e.column).human_id
             }))
             transaction.abort()
+        except DuplicateEntryError as e:
+            request.alert(_("The entry ${name} exists twice", mapping={
+                'name': e.name
+            }))
         except ValidationError as e:
             error = e
             transaction.abort()

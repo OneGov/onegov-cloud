@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Shows an error when an entry is specified twice in a directory import.
+  [href]
+
 - Fixes form errors in directories not reaching the user.
   [href]
 
