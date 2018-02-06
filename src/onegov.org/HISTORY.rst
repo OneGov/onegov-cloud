@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes form errors in directories not reaching the user.
+  [href]
+
 - Upgrades raven.js
   [href]
 

@@ -11,6 +11,7 @@ from onegov.form.fields import UploadField
 from onegov.form.filters import as_float
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import ValidFormDefinition
+from onegov.form.errors import FormError
 from onegov.form.validators import WhitelistedMimeType
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
@@ -121,16 +122,25 @@ class DirectoryBaseForm(Form):
 
     @cached_property
     def known_field_ids(self):
-        return {
-            field.id for field in
-            flatten_fieldsets(parse_formcode(self.structure.data))
-        }
+        try:
+            return {
+                field.id for field in
+                flatten_fieldsets(parse_formcode(self.structure.data))
+            }
+        except FormError:
+            return None
 
     @cached_property
     def missing_fields(self):
-        return self.configuration.missing_fields(self.structure.data)
+        try:
+            return self.configuration.missing_fields(self.structure.data)
+        except FormError:
+            return None
 
     def extract_field_ids(self, field):
+        if not self.known_field_ids:
+            return
+
         for line in field.data.splitlines():
             line = line.strip()
 
@@ -138,14 +148,14 @@ class DirectoryBaseForm(Form):
                 yield line
 
     def validate_title_format(self, field):
-        if 'title' in self.missing_fields:
+        if self.missing_fields and 'title' in self.missing_fields:
             raise ValidationError(
                 _("The following fields are unknown: ${fields}", mapping={
                     'fields': ', '.join(self.missing_fields['title'])
                 }))
 
     def validate_lead_format(self, field):
-        if 'lead' in self.missing_fields:
+        if self.missing_fields and 'lead' in self.missing_fields:
             raise ValidationError(
                 _("The following fields are unknown: ${fields}", mapping={
                     'fields': ', '.join(self.missing_fields['lead'])
