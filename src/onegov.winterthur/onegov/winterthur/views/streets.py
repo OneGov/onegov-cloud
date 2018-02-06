@@ -14,6 +14,8 @@ from onegov.winterthur.layout import AddressSubsetLayout
     template='streets.pt'
 )
 def view_streets(self, request):
+    request.app.enable_iframes(request)
+
     request.include('street-search')
     request.include('iframe-resizer')
 
@@ -55,6 +57,8 @@ def update_streets(self, request):
     template='street.pt'
 )
 def view_street(self, request):
+    request.app.enable_iframes(request)
+
     request.include('iframe-resizer')
 
     return {

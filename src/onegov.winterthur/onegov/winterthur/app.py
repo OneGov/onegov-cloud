@@ -10,10 +10,18 @@ class WinterthurApp(OrgApp):
     #: the version of this application (do not change manually!)
     version = '0.1.0'
 
+    frame_ancestors = {
+        'https://winterthur.ch',
+        'https://*.winterthur.ch'
+    }
+
     def configure_organisation(self, **cfg):
         cfg.setdefault('enable_user_registration', False)
         cfg.setdefault('enable_yubikey', False)
         super().configure_organisation(**cfg)
+
+    def enable_iframes(self, request):
+        request.content_security_policy.frame_ancestors |= self.frame_ancestors
 
 
 @WinterthurApp.template_directory()
