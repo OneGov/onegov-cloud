@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.17 (2018-02-06)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes wrong form title for contact forms in German.
   [href]
