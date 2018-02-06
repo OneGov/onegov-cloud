@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.31.2 (2018-02-06)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes invalid variable reference.
   [href]
