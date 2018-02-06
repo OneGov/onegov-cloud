@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.6.1 (2018-02-06)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes javascript error occurring on empty maps.
   [href]
 
