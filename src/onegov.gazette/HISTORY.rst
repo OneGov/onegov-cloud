@@ -1,18 +1,6 @@
 Changelog
 ---------
-1.11.5 (2018-02-06)
-~~~~~~~~~~~~~~~~~~~
-
-- Shows print only options only to publishers.
-  [msom]
-
-- Print only is always disabled when copying notices.
-  [msom]
-
-- Updates translations.
-  [msom]
-
-1.13.4 (2018-01-19)
+1.12.5 (2018-02-06)
 ~~~~~~~~~~~~~~~~~~~
 
 - Shows print only options only to publishers.
