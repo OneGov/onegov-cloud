@@ -55,6 +55,8 @@ def create_notice(self, request, form):
         source = self.query().filter(GazetteNotice.id == self.source).first()
         if source:
             form.apply_model(source)
+            if form.print_only:
+                form.print_only.data = False
 
     return {
         'layout': layout,

@@ -4,6 +4,9 @@ Changelog
 - Shows print only options only to publishers.
   [msom]
 
+- Print only is always disabled when copying notices.
+  [msom]
+
 1.11.4 (2018-01-18)
 ~~~~~~~~~~~~~~~~~~~
 
