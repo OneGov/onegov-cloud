@@ -385,6 +385,10 @@ var MapboxGeojsonMap = function(target) {
     };
 
     $.getJSON(target.data('geojson'), function(features) {
+        if (features.length === 0) {
+            return;
+        }
+
         var layer = L.geoJSON(features, {
             pointToLayer: pointToLayer,
             onEachFeature: onEachFeature
