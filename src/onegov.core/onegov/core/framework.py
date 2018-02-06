@@ -33,7 +33,7 @@ from mailthon.middleware import TLS, Auth
 from morepath.publish import resolve_model, get_view_name
 from more.content_security import ContentSecurityApp
 from more.content_security import ContentSecurityPolicy
-from more.content_security import SELF, UNSAFE_INLINE, UNSAFE_EVAL
+from more.content_security import SELF, UNSAFE_INLINE, UNSAFE_EVAL, NONE
 from more.transaction import TransactionApp
 from more.transaction.main import transaction_tween_factory
 from more.webassets import WebassetsApp
@@ -1002,6 +1002,9 @@ def default_content_security_policy():
 
         # enable inline scripts, eval and external scripts
         script_src={SELF, "https:", UNSAFE_INLINE, UNSAFE_EVAL},
+
+        # do not enable any object/embed/applet elements
+        object_src={NONE},
 
         # disable all mixed content (https -> http)
         block_all_mixed_content=True
