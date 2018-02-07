@@ -19,6 +19,9 @@ def test_view_notice_edit(gazette_app):
         manage.form['category'] = '11'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1. Oktober 2017"
+        manage.form['author_place'] = 'Govikon'
+        manage.form['author_name'] = 'State Chancellerist'
+        manage.form['author_date'] = '2019-01-01'
         manage.form.submit()
 
         edit_notice(
@@ -90,6 +93,9 @@ def test_view_notice_edit_deadlines(gazette_app):
         manage.form['category'] = '11'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1. Oktober 2017"
+        manage.form['author_place'] = 'Govikon'
+        manage.form['author_name'] = 'State Chancellerist'
+        manage.form['author_date'] = '2019-01-01'
         manage.form.submit()
 
     marker = "Bitte Ausgaben neu wählen."
@@ -116,6 +122,9 @@ def test_view_notice_edit_invalid_category(gazette_app):
         manage.form['category'] = '11'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1. Oktober 2017"
+        manage.form['author_place'] = 'Govikon'
+        manage.form['author_name'] = 'State Chancellerist'
+        manage.form['author_date'] = '2019-01-01'
         manage.form.submit()
 
         marker = "Bitte Rubrik neu wählen."
@@ -136,6 +145,9 @@ def test_view_notice_edit_invalid_organization(gazette_app):
         manage.form['category'] = '11'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1. Oktober 2017"
+        manage.form['author_place'] = 'Govikon'
+        manage.form['author_name'] = 'State Chancellerist'
+        manage.form['author_date'] = '2019-01-01'
         manage.form.submit()
 
         marker = "Bitte Organisation neu wählen."
@@ -159,6 +171,9 @@ def test_view_notice_edit_unrestricted(gazette_app):
         manage.form['category'] = '11'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1. Oktober 2017"
+        manage.form['author_place'] = 'Govikon'
+        manage.form['author_name'] = 'State Chancellerist'
+        manage.form['author_date'] = '2019-01-01'
         manage.form.submit()
 
     # drafted

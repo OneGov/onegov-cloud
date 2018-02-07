@@ -22,6 +22,9 @@ def test_view_notice_attachments(gazette_app, temporary_path, pdf_1, pdf_2):
         manage.form['category'] = '11'
         manage.form['issues'] = ['2017-40']
         manage.form['text'] = "1. Oktober 2017"
+        manage.form['author_place'] = 'Govikon'
+        manage.form['author_name'] = 'State Chancellerist'
+        manage.form['author_date'] = '2019-01-01'
         manage.form.submit()
 
         editor_1.get('/notice/erneuerungswahlen/attachments', status=403)

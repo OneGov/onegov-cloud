@@ -19,6 +19,9 @@ def test_view_notice_submit(gazette_app):
             manage.form['category'] = '11'
             manage.form['issues'] = ['2017-44', '2017-45']
             manage.form['text'] = "1. Oktober 2017"
+            manage.form['author_place'] = 'Govikon'
+            manage.form['author_name'] = 'State Chancellerist'
+            manage.form['author_date'] = '2019-01-01'
             manage.form.submit()
 
         # check invalid actions
@@ -76,6 +79,9 @@ def test_view_notice_reject(gazette_app):
             manage.form['category'] = '11'
             manage.form['issues'] = ['2017-44', '2017-45']
             manage.form['text'] = "1. Oktober 2017"
+            manage.form['author_place'] = 'Govikon'
+            manage.form['author_name'] = 'State Chancellerist'
+            manage.form['author_date'] = '2019-01-01'
             manage.form.submit()
             submit_notice(user, 'titel-{}'.format(count + 1))
 
@@ -120,6 +126,9 @@ def test_view_notice_accept(gazette_app):
             manage.form['billing_address'] = 'someone\nstreet\nplace'
             manage.form['issues'] = ['2017-44', '2017-45']
             manage.form['text'] = "1. Oktober 2017"
+            manage.form['author_place'] = 'Govikon'
+            manage.form['author_name'] = 'State Chancellerist'
+            manage.form['author_date'] = '2019-01-01'
             manage.form.submit()
             submit_notice(user, 'titel-{}'.format(count + 1))
 
@@ -175,6 +184,8 @@ def test_view_notice_accept(gazette_app):
         payload = payload.decode('utf-8')
         assert '44  Titel 2' in payload
         assert "Kostenpflichtig 85% vom Normalpreis" in payload
+        assert "Govikon, 1. Januar 2019" in payload
+        assert "State Chancellerist" in payload
         assert "someone<br>street<br>place" in payload
 
         message = gazette_app.smtp.outbox.pop()
