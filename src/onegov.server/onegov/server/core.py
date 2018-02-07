@@ -72,7 +72,8 @@ class Server(object):
             config,
             configure_morepath=True,
             post_mortem=False,
-            environ_overrides=None):
+            environ_overrides=None,
+            exception_hook=None):
 
         self.applications = ApplicationCollection(config.applications)
         self.wildcard_applications = set(
@@ -85,6 +86,7 @@ class Server(object):
 
         self.post_mortem = post_mortem
         self.environ_overrides = environ_overrides
+        self.exception_hook = exception_hook
 
     def configure_logging(self, config):
         """ Configures the python logging.
@@ -105,7 +107,7 @@ class Server(object):
             import morepath
             morepath.autoscan()
 
-    def __call__(self, environ, start_response):
+    def handle_request(self, environ, start_response):
 
         if self.environ_overrides:
             environ.update(self.environ_overrides)
@@ -158,9 +160,16 @@ class Server(object):
         application.set_application_id(
             application.namespace + '/' + application_id)
 
+        return application(environ, start_response)
+
+    def __call__(self, environ, start_response):
         try:
-            return application(environ, start_response)
+            return self.handle_request(environ, start_response)
         except Exception:
+            if self.exception_hook:
+                self.exception_hook()
+
             if self.post_mortem:
                 import pdb; pdb.post_mortem()  # noqa
+
             raise
