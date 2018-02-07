@@ -118,7 +118,7 @@ def test_pdf_unfold_data(session):
     file = BytesIO()
     pdf = Pdf(file)
     pdf.init_a4_portrait()
-    assert pdf.unfold_data(session, '2017-40', data, 1) == 15
+    assert pdf.unfold_data(session, None, '2017-40', data, 1) == 15
 
     expected = [
         'title-1',

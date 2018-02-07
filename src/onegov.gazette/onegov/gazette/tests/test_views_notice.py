@@ -582,6 +582,9 @@ def test_view_notice_delete(gazette_app):
         manage.form['category'] = '11'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1. Oktober 2017"
+        manage.form['author_place'] = 'Govikon'
+        manage.form['author_name'] = 'State Chancellerist'
+        manage.form['author_date'] = '2019-01-01'
         manage.form.submit()
 
         submit_notice(editor_1, 'erneuerungswahlen')

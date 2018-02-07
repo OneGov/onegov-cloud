@@ -265,6 +265,9 @@ class UnrestrictedNoticeForm(NoticeForm):
         model.organization_id = self.organization.data
         model.category_id = self.category.data
         model.text = self.text.data
+        model.author_place = self.author_place.data
+        model.author_date = self.author_date_utc
+        model.author_name = self.author_name.data
         model.at_cost = self.at_cost.data
         if model.state != 'published':
             model.issues = self.issues.data

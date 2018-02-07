@@ -188,6 +188,9 @@ def test_view_issues_publish(gazette_app):
             manage.form['category'] = '13'
             manage.form['issues'] = ['2017-{}'.format(i) for i in issues]
             manage.form['text'] = 'Text'
+            manage.form['author_place'] = 'Govikon'
+            manage.form['author_name'] = 'State Chancellerist'
+            manage.form['author_date'] = '2019-01-01'
             manage = manage.form.submit()
 
             client.get('/notice/{}/submit'.format(slug)).form.submit()
@@ -211,6 +214,8 @@ def test_view_issues_publish(gazette_app):
             'Commercial Register\n'
             '1\nnotice-0\n'
             'Text\n'
+            'Govikon, 1. Januar 2019\n'
+            'State Chancellerist\n'
         )
 
         notice_0 = client.get('/notice/notice-0')
@@ -239,6 +244,8 @@ def test_view_issues_publish(gazette_app):
             'Commercial Register\n'
             '2\nnotice-1\n'
             'Text\n'
+            'Govikon, 1. Januar 2019\n'
+            'State Chancellerist\n'
         )
 
         notice_0 = client.get('/notice/notice-0')
@@ -268,8 +275,12 @@ def test_view_issues_publish(gazette_app):
             'Commercial Register\n'
             '2\nnotice-0\n'
             'Text\n'
+            'Govikon, 1. Januar 2019\n'
+            'State Chancellerist\n'
             '3\nnotice-1\n'
             'Text\n'
+            'Govikon, 1. Januar 2019\n'
+            'State Chancellerist\n'
         )
 
         notice_0 = client.get('/notice/notice-0')
@@ -301,6 +312,8 @@ def test_view_issues_publish(gazette_app):
             'Commercial Register\n'
             '4\nnotice-1\n'
             'Text\n'
+            'Govikon, 1. Januar 2019\n'
+            'State Chancellerist\n'
         )
 
         notice_0 = client.get('/notice/notice-0')

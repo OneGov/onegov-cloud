@@ -56,7 +56,9 @@ class Pdf(PdfBase):
         else:
             getattr(self, 'h{}'.format(min(level, 4)))(title)
 
-    def unfold_data(self, session, issue, data, publication_number, level=1):
+    def unfold_data(
+        self, session, layout, issue, data, publication_number, level=1
+    ):
         """ Take a nested list of dicts and add it. """
 
         for item in data:
@@ -82,13 +84,24 @@ class Pdf(PdfBase):
                 )
                 self.story[-1].keepWithNext = True
                 self.mini_html(notice.text)
+                if notice.author_place and notice.author_date:
+                    self.mini_html(
+                        "{}, {}<br>{}".format(
+                            notice.author_place,
+                            layout.format_date(
+                                notice.author_date, 'date_long'
+                            ),
+                            notice.author_name
+                        )
+                    )
                 for file in notice.files:
                     self.pdf(file.reference.file)
 
             children = item.get('children', [])
             if children:
                 publication_number = self.unfold_data(
-                    session, issue, children, publication_number, level + 1
+                    session, layout, issue, children, publication_number,
+                    level + 1
                 )
 
             if item.get('break_after', False):
@@ -209,7 +222,9 @@ class Pdf(PdfBase):
             page_fn_later=page_fn_header_and_footer
         )
         pdf.h(title)
-        pdf.unfold_data(session, issue.name, data, first_publication_number)
+        pdf.unfold_data(
+            session, layout, issue.name, data, first_publication_number
+        )
         pdf.generate()
 
         file.seek(0)
