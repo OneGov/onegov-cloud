@@ -620,10 +620,12 @@ form {
 
     .redactor-box {
         margin-bottom: .75rem;
+    }
 
-        > textarea {
-            display: none !important;
-        }
+    // fixes redactor not working right in dependant field configurations
+    label[style*="display: block;"] .redactor-editor:not([style]) + textarea[data-depends-on],
+    label[style*="display: block;"] .redactor-editor[style*="block"] + textarea[data-depends-on] {
+        display: none !important;
     }
 
     .formcode-select {
@@ -739,6 +741,10 @@ form {
     .field-type-booleanfield + .clearfix,
     .field-type-booleanfield:last-of-type > div {
         margin-bottom: .75rem;
+    }
+
+    .field-type-booleanfield + .field-type-htmlfield {
+        margin-top: 1rem;
     }
 
     /*

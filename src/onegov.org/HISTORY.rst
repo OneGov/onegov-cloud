@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes redactor html mode showing nothing.
+  [href]
+
 0.22.0 (2018-02-06)
 ~~~~~~~~~~~~~~~~~~~
 
