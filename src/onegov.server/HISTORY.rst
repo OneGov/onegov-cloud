@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.6.0 (2018-02-07)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to pass a generic exception handler to the server.
   [href]
 
