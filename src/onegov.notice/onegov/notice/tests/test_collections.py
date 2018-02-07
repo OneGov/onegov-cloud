@@ -66,24 +66,61 @@ def test_notice_collection_search(session):
     user_b = users.add('b@example.org', 'password', 'editor')
 
     notices = OfficialNoticeCollection(session)
-    for state, title, text, category, organization, user, group in (
-        ('drafted', 'First', 'Lorem Ipsum', 'Cat1', None, None, group_a),
-        ('submitted', 'Second', 'A text', 'Cat1', 'Org1', user_a, group_b),
-        ('drafted', 'Third', 'Anöther text', 'Cat2', None, None, None),
-        ('published', 'Fourth', 'A fourth text', None, 'Org2', None, None),
-        ('rejected', 'Fifth', 'Lorem Ipsum', None, None, user_a, None),
-        ('published', 'Sixt', '<p>Six</p>', None, None, user_b, group_a),
-        ('drafted', 'Sübent', 'Sübent', None, None, None, None),
-    ):
-        notice = notices.add(
-            title=title,
-            text=text,
-            category=category,
-            organization=organization,
-            user=user,
-            group=group
-        )
-        notice.state = state
+
+    notice = notices.add(
+        title='First',
+        text='Lorem Ipsum',
+        category='Cat1',
+        group=group_a
+    )
+    notice.state = 'drafted'
+
+    notice = notices.add(
+        title='Second',
+        text='A text',
+        category='Cat1',
+        organization='Org1',
+        user=user_a,
+        group=group_b
+    )
+    notice.state = 'submitted'
+
+    notice = notices.add(
+        title='Third',
+        text='Anöther text',
+        category='Cat2'
+    )
+    notice.state = 'drafted'
+
+    notice = notices.add(
+        title='Fourth',
+        text='A fourth text',
+        organization='Org2'
+    )
+    notice.state = 'published'
+
+    notice = notices.add(
+        title='Fifth',
+        text='Lorem Ipsum',
+        user=user_a
+    )
+    notice.state = 'rejected'
+
+    notice = notices.add(
+        title='Sixt',
+        text='<p>Six</p>',
+        author_name='Cysat',
+        user=user_b,
+        group=group_a
+    )
+    notice.state = 'published'
+
+    notice = notices.add(
+        title='Sübent',
+        text='Sübent',
+        author_place='Wynmärkt'
+    )
+    notice.state = 'drafted'
 
     assert notices.query().count() == 7
 
@@ -114,6 +151,10 @@ def test_notice_collection_search(session):
 
     assert notices.for_term('group').query().count() == 3
     assert notices.for_term('groupb').query().count() == 1
+
+    assert notices.for_term('Cysat').query().count() == 1
+
+    assert notices.for_term('Wynmärkt').query().count() == 1
 
 
 def test_notice_collection_users_and_groups(session):

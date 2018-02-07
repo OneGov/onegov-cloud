@@ -173,6 +173,8 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
                 or_(
                     self.model_class.title.ilike(term),
                     self.model_class.text.ilike(term),
+                    self.model_class.author_name.ilike(term),
+                    self.model_class.author_place.ilike(term),
                     self.model_class.category.ilike(term),
                     self.model_class.organization.ilike(term),
                     UserGroup.name.ilike(term),

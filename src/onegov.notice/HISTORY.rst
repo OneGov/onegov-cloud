@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Allows to search by author name and place.
+  [msom]
+
 0.4.0 (2018-02-06)
 ~~~~~~~~~~~~~~~~~~~
 
