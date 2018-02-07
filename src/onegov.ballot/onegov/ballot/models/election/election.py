@@ -18,6 +18,7 @@ from onegov.core.utils import normalize_for_url
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import desc
+from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import Integer
 from sqlalchemy import select
@@ -46,8 +47,13 @@ class Election(Base, ContentMixin, TimestampMixin,
         'polymorphic_identity': 'majorz'
     }
 
-    #: Identifies the result, may be used in the url
+    #: Identifies the election, may be used in the url
     id = Column(Text, primary_key=True)
+
+    #: the election composite this election belongs to
+    composite_id = Column(
+        Text, ForeignKey('election_composites.id'), nullable=True
+    )
 
     #: all translations of the title
     title_translations = Column(HSTORE, nullable=False)
@@ -69,7 +75,7 @@ class Election(Base, ContentMixin, TimestampMixin,
     #: Shortcode for cantons that use it
     shortcode = Column(Text, nullable=True)
 
-    #: Identifies the date of the vote
+    #: The date of the election
     date = Column(Date, nullable=False)
 
     #: Number of mandates

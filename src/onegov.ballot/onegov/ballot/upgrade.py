@@ -9,6 +9,7 @@ from onegov.core.upgrade import upgrade_task
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Enum
+from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy.engine.reflection import Inspector
@@ -326,3 +327,22 @@ def add_region_domain(context):
         )
 
     tmp_type.drop(context.operations.get_bind(), checkfirst=False)
+
+
+@upgrade_task('Add election composites', always_run=True)
+def add_election_composites(context):
+    inspector = Inspector(context.operations_connection)
+    if 'election_composites' not in inspector.get_table_names(context.schema):
+        return False
+
+    if context.has_column('elections', 'composite_id'):
+        return False
+
+    context.operations.add_column(
+        'elections', Column(
+            'composite_id',
+            Text,
+            ForeignKey('election_composites.id'),
+            nullable=True
+        )
+    )
