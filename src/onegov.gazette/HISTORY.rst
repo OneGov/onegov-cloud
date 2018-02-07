@@ -1,6 +1,10 @@
 Changelog
 ---------
-1.12.5 (2018-02-06)
+
+- Fixes label of rich text editor fields not visible.
+  [msom]
+
+1.11.5 (2018-02-06)
 ~~~~~~~~~~~~~~~~~~~
 
 - Shows print only options only to publishers.

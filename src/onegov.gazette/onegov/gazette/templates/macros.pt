@@ -39,6 +39,12 @@
         <div class="row"><div class="large-12 columns">
         <tal:block define="input_type field.widget.input_type|None">
             <tal:block condition="input_type == 'hidden'">
+                <tal:block condition="field.type == 'QuillField'">
+                    <label tal:attributes="class field.errors and 'error' or None">
+                        <span class="label-text">${field.label.text}</span>
+                        <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+                    </label>
+                </tal:block>
                 ${field()}
                 <small class="error" tal:repeat="error field.errors">${error}</small>
             </tal:block>
