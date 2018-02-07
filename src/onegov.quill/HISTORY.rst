@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Uses Quill 1.3.5.
+  [msom]
+
 - Uses quoted proptery names in the widget.
   [msom]
 
