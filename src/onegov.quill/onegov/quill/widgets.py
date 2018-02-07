@@ -37,9 +37,9 @@ class QuillInput(HiddenInput):
         if 'em' in tags:
             self.toolbar.append("'italic'")
         if 'ol' in tags:
-            self.toolbar.append("{list: 'ordered'}")
+            self.toolbar.append("{'list': 'ordered'}")
         if 'ul' in tags:
-            self.toolbar.append("{list: 'bullet'}")
+            self.toolbar.append("{'list': 'bullet'}")
 
     def __call__(self, field, **kwargs):
         kwargs['id'] = self.input_id

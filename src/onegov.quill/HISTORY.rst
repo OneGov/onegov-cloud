@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Uses quoted proptery names in the widget.
+  [msom]
+
 - Requires Python 3.6.
   [href]
 
