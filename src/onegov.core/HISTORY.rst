@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Limits the content security policy reporting to 1/1000 requests by default.
+  [href]
+
 0.60.0 (2018-02-06)
 ~~~~~~~~~~~~~~~~~~~
 

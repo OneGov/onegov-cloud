@@ -22,6 +22,7 @@ import inspect
 import morepath
 import pylru
 import traceback
+import random
 import sys
 
 from cached_property import cached_property
@@ -451,6 +452,9 @@ class Framework(
 
         self.content_security_policy_report_only\
             = cfg.get('content_security_policy_report_only', False)
+
+        self.content_security_policy_report_sample_rate\
+            = cfg.get('content_security_policy_report_sample_rate', 0.001)
 
     def set_application_id(self, application_id):
         """ Set before the request is handled. Gets the schema from the
@@ -1019,14 +1023,16 @@ def default_policy_apply_factory():
         if not request.app.content_security_policy_enabled:
             return
 
-        report_uri = request.app.content_security_policy_report_uri
+        sample_rate = request.app.content_security_policy_report_sample_rate
         report_only = request.app.content_security_policy_report_only
 
-        if report_uri:
-            policy.report_uri = report_uri
+        if random.uniform(0, 1) <= sample_rate:
+            report_uri = request.app.content_security_policy_report_uri
+        else:
+            report_uri = None
 
-        if report_only:
-            policy.report_only = report_only
+        policy.report_uri = report_uri or ''
+        policy.report_only = report_only
 
         policy.apply(response)
 
