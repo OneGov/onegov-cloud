@@ -1,6 +1,6 @@
 Changelog
 ---------
-1.12.6 (2018-02-07)
+1.13.6 (2018-02-07)
 ~~~~~~~~~~~~~~~~~~~
 
 - Adds author fields (name, date, place) to notices.
