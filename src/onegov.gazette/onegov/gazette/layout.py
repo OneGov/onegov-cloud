@@ -19,6 +19,7 @@ from sedate import to_timezone
 class Layout(ChameleonLayout):
 
     date_with_weekday_format = 'EEEE dd.MM.yyyy'
+    date_long_format = 'd. MMMM yyyy'
     datetime_with_weekday_format = 'EEEE dd.MM.yyyy HH:mm'
 
     def __init__(self, model, request):

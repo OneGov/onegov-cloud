@@ -431,11 +431,17 @@ def test_notice_form(session, categories, organizations, issues):
 
     notice = GazetteNotice(
         title='Title',
-        text='A <b>text</b>.'
+        text='A <b>text</b>.',
+        author_place='Govikon',
+        author_name='State Chancellerist',
+        author_date=standardize_date(datetime(2018, 1, 1), 'UTC'),
     )
     notice.organization_id = '200'
     notice.category_id = '13'
     notice.issues = ['2017-43']
+
+    notice.author_date is None
+    notice.author_name is None
 
     form.apply_model(notice)
     assert form.title.data == 'Title'
@@ -445,6 +451,11 @@ def test_notice_form(session, categories, organizations, issues):
     assert form.at_cost.data == 'no'
     assert form.billing_address.data == ''
     assert form.text.data == 'A <b>text</b>.'
+    assert form.author_place.data == 'Govikon'
+    assert form.author_name.data == 'State Chancellerist'
+    assert form.author_date.data == standardize_date(
+        datetime(2018, 1, 1), 'UTC'
+    )
     assert form.issues.data == ['2017-43']
 
     form.title.data = 'Notice'
@@ -454,6 +465,9 @@ def test_notice_form(session, categories, organizations, issues):
     form.at_cost.data = 'yes'
     form.billing_address.data = 'someone\nsomewhere'
     form.text.data = 'A <b>notice</b>.'
+    form.author_place.data = 'Govtown'
+    form.author_name.data = 'Bureau of Public Affairs'
+    form.author_date.data = standardize_date(datetime(2019, 1, 1), 'UTC')
     form.issues.data = ['2017-44']
 
     form.update_model(notice)
@@ -464,6 +478,9 @@ def test_notice_form(session, categories, organizations, issues):
     assert notice.at_cost is True
     assert notice.billing_address == 'someone\nsomewhere'
     assert notice.text == 'A <b>notice</b>.'
+    assert notice.author_place == 'Govtown'
+    assert notice.author_name == 'Bureau of Public Affairs'
+    assert notice.author_date == standardize_date(datetime(2019, 1, 1), 'UTC')
     assert notice.issues == {'2017-44': None}
     assert notice.first_issue == standardize_date(datetime(2017, 11, 3), 'UTC')
 
@@ -483,10 +500,20 @@ def test_notice_form(session, categories, organizations, issues):
             'organization': 'onegov',
             'category': 'important',
             'issues': ['2017-5'],
-            'text': 'Text'
+            'text': 'Text',
+            'author_place': 'Govtown',
+            'author_name': 'Bureau of Public Affairs',
+            'author_date': '2019-01-01'
         })
     )
     assert form.validate()
+
+    # Test UTC conversion
+    assert form.author_date.data == date(2019, 1, 1)
+    assert form.author_date_utc == standardize_date(
+        datetime(2019, 1, 1), 'UTC'
+    )
+    assert NoticeForm().author_date_utc is None
 
     # Test on request
     with freeze_time("2017-11-01 14:00"):

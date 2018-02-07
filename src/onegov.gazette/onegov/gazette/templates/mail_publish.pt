@@ -30,7 +30,7 @@
             <dd>${model.title}</dd>
 
             <dt i18n:translate>Text</dt>
-            <dd class="callout" tal:content="structure model.text"></dd>
+            <dd class="callout"><tal:block metal:use-macro="layout.macros['notice_text']" tal:define="notice model"></dd>
         </dl>
     </tal:block>
 </div>

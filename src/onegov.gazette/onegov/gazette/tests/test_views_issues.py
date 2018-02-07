@@ -75,6 +75,9 @@ def test_view_issues(gazette_app):
         manage.form['category'] = '13'
         manage.form['issues'] = ['2017-44']
         manage.form['text'] = 'Text'
+        manage.form['author_place'] = 'Govikon'
+        manage.form['author_name'] = 'State Chancellerist'
+        manage.form['author_date'] = '2019-01-01'
         manage = manage.form.submit().maybe_follow()
         assert '<h2>Titel</h2>' in manage
         assert 'Nr. 44, 03.11.2017' in manage

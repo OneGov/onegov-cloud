@@ -41,6 +41,9 @@ def create_notice(self, request, form):
         notice = self.add(
             title=form.title.data,
             text=form.text.data,
+            author_place=form.author_place.data,
+            author_date=form.author_date_utc,
+            author_name=form.author_name.data,
             organization_id=form.organization.data,
             category_id=form.category.data,
             print_only=form.print_only.data if form.print_only else False,

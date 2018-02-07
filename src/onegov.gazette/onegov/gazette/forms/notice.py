@@ -8,11 +8,14 @@ from onegov.gazette.models import Category
 from onegov.gazette.models import Issue
 from onegov.gazette.models import Organization
 from onegov.quill import QuillField
+from sedate import as_datetime
+from sedate import standardize_date
 from sedate import utcnow
 from wtforms import BooleanField
 from wtforms import RadioField
 from wtforms import StringField
 from wtforms import TextAreaField
+from wtforms.fields.html5 import DateField
 from wtforms.validators import InputRequired
 
 
@@ -85,6 +88,34 @@ class NoticeForm(Form):
         ]
     )
 
+    author_place = StringField(
+        label=_("Place"),
+        validators=[
+            InputRequired()
+        ]
+    )
+
+    author_date = DateField(
+        label=_("Date"),
+        validators=[
+            InputRequired()
+        ]
+    )
+
+    author_name = StringField(
+        label=_("Author"),
+        validators=[
+            InputRequired()
+        ]
+    )
+
+    @property
+    def author_date_utc(self):
+        if self.author_date.data:
+            return standardize_date(as_datetime(self.author_date.data), 'UTC')
+            self.author_date.data
+        return None
+
     def on_request(self):
         session = self.request.app.session()
 
@@ -145,6 +176,9 @@ class NoticeForm(Form):
         model.organization_id = self.organization.data
         model.category_id = self.category.data
         model.text = self.text.data
+        model.author_place = self.author_place.data
+        model.author_date = self.author_date_utc
+        model.author_name = self.author_name.data
         model.at_cost = self.at_cost.data == 'yes'
         model.billing_address = self.billing_address.data
         model.issues = self.issues.data
@@ -158,6 +192,9 @@ class NoticeForm(Form):
         self.organization.data = model.organization_id
         self.category.data = model.category_id
         self.text.data = model.text
+        self.author_place.data = model.author_place
+        self.author_date.data = model.author_date
+        self.author_name.data = model.author_name
         self.at_cost.data = 'yes' if model.at_cost else 'no'
         self.billing_address.data = model.billing_address or ''
         self.issues.data = list(model.issues.keys())

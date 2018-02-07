@@ -30,7 +30,9 @@
                 <div class="row">
                     <div class="small-12 medium-7 columns">
                         <h2>${notice.title}</h2>
-                        <div tal:content="structure notice.text"></div>
+                        <div>
+                            <tal:block metal:use-macro="layout.macros['notice_text']" />
+                        </div>
                     </div>
                     <div class="small-12 medium-5 columns">
                         <dl>

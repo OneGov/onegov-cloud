@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds author fields (name, date, place) to notices.
+  [msom]
+
 - Fixes label of rich text editor fields not visible.
   [msom]
 

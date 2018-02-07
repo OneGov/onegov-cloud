@@ -114,6 +114,8 @@ def test_layout_format(session, principal):
     assert layout.principal.time_zone == 'Europe/Zurich'
     assert layout.format_date(date(2019, 1, 2), 'date') == '02.01.2019'
     assert layout.format_date(datetime(2019, 1, 2, 12), 'date') == '02.01.2019'
+    assert layout.format_date(datetime(2019, 1, 2, 12), 'date_long') == \
+        '2. Januar 2019'
     assert layout.format_date(datetime(2019, 1, 2, 12), 'datetime') == \
         '02.01.2019 12:00'
     assert layout.format_date(

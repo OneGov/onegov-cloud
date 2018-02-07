@@ -41,6 +41,9 @@ def test_view_notices(gazette_app):
         manage.form['category'] = '11'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1. Oktober 2017"
+        manage.form['author_place'] = 'Govikon'
+        manage.form['author_name'] = 'State Chancellerist'
+        manage.form['author_date'] = '2019-01-01'
         manage.form.submit()
 
         manage = editor_3.get('/notices/drafted/new-notice')
@@ -49,6 +52,9 @@ def test_view_notices(gazette_app):
         manage.form['category'] = '11'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1. Oktober 2017"
+        manage.form['author_place'] = 'Govikon'
+        manage.form['author_name'] = 'State Chancellerist'
+        manage.form['author_date'] = '2019-01-01'
         manage.form.submit()
 
         for user in (publisher, editor_1, editor_2, editor_3):
@@ -146,6 +152,9 @@ def test_view_notices_search(gazette_app):
         manage.form['category'] = '11'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1. Oktober 2017"
+        manage.form['author_place'] = 'Govikon'
+        manage.form['author_name'] = 'State Chancellerist'
+        manage.form['author_date'] = '2019-01-01'
         manage.form.submit()
         client.get('/notice/erneuerungswahlen/submit').form.submit()
         client.get('/notice/erneuerungswahlen/accept').form.submit()
@@ -156,6 +165,9 @@ def test_view_notices_search(gazette_app):
         manage.form['category'] = '11'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "10. Oktober 2017"
+        manage.form['author_place'] = 'Govikon'
+        manage.form['author_name'] = 'State Chancellerist'
+        manage.form['author_date'] = '2019-01-01'
         manage.form.submit()
         client.get('/notice/kantonsratswahlen/submit').form.submit()
         client.get('/notice/kantonsratswahlen/accept').form.submit()
@@ -201,6 +213,9 @@ def test_view_notices_order(gazette_app):
         manage.form['category'] = '11'
         manage.form['issues'] = ['2017-44', '2017-46']
         manage.form['text'] = "1. Oktober 2017"
+        manage.form['author_place'] = 'Govikon'
+        manage.form['author_name'] = 'State Chancellerist'
+        manage.form['author_date'] = '2019-01-01'
         manage.form.submit()
         client.get('/notice/erneuerungswahlen/submit').form.submit()
         client.get('/notice/erneuerungswahlen/accept').form.submit()
@@ -211,6 +226,9 @@ def test_view_notices_order(gazette_app):
         manage.form['category'] = '13'
         manage.form['issues'] = ['2017-45', '2017-47']
         manage.form['text'] = "10. Oktober 2017"
+        manage.form['author_place'] = 'Govikon'
+        manage.form['author_name'] = 'State Chancellerist'
+        manage.form['author_date'] = '2019-01-01'
         manage.form.submit()
         client.get('/notice/kantonsratswahlen/submit').form.submit()
         client.get('/notice/kantonsratswahlen/accept').form.submit()
@@ -481,6 +499,9 @@ def test_view_notices_statistics(gazette_app):
             manage.form['organization'] = organization
             manage.form['category'] = category
             manage.form['text'] = "Text"
+            manage.form['author_place'] = 'Govikon'
+            manage.form['author_name'] = 'State Chancellerist'
+            manage.form['author_date'] = '2019-01-01'
             manage.form['issues'] = issues
             manage = manage.form.submit().maybe_follow()
             if submit:
@@ -584,6 +605,9 @@ def test_view_notices_update(gazette_app):
         manage.form['category'] = '11'
         manage.form['issues'] = ['2017-44', '2017-46']
         manage.form['text'] = "1. Oktober 2017"
+        manage.form['author_place'] = 'Govikon'
+        manage.form['author_name'] = 'State Chancellerist'
+        manage.form['author_date'] = '2019-01-01'
         manage.form.submit()
         client.get('/notice/erneuerungswahlen/submit').form.submit()
         client.get('/notice/erneuerungswahlen/accept').form.submit()

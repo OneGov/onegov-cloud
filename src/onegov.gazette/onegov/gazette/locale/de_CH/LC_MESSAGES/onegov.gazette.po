@@ -139,6 +139,12 @@ msgstr "Ausgabe(n)"
 msgid "Text"
 msgstr "Text"
 
+msgid "Place"
+msgstr "Ort"
+
+msgid "Author"
+msgstr "Absender"
+
 msgid "No"
 msgstr "Nein"
 

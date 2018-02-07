@@ -14,7 +14,9 @@
         </div>
         <div class="preview">
             <h2>${notice.title}</h2>
-            <div tal:content="structure notice.text"></div>
+            <div>
+                <tal:block metal:use-macro="layout.macros['notice_text']" />
+            </div>
         </div>
     </tal:block>
     <tal:block metal:fill-slot="footer"></tal:block>
