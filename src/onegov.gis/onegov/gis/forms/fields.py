@@ -60,6 +60,11 @@ class CoordinatesField(StringField):
         else:
             self.data = Coordinates()
 
+        # if the data we receive doesn't result in a coordinates value
+        # for some reason, we create one
+        if not isinstance(self.data, Coordinates):
+            self.data = Coordinates()
+
 
 @registry.register_for('CoordinatesField')
 class CoordinatesFieldRenderer(BaseRenderer):

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Ensures that incorrect coordinates cannot be submitted in forms.
+  [href]
+
 0.6.1 (2018-02-06)
 ~~~~~~~~~~~~~~~~~~~
 
