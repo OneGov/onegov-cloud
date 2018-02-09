@@ -13,12 +13,15 @@ def test_election_form_domains():
 
     form.set_domain(Canton(name='be', canton='be'))
     assert sorted(form.domain.choices) == [
-        ('canton', 'Cantonal'), ('federation', 'Federal')
+        ('canton', 'Cantonal'),
+        ('federation', 'Federal'),
+        ('region', 'Regional'),
     ]
 
     form.set_domain(Municipality(name='bern', municipality='351'))
     assert sorted(form.domain.choices) == [
-        ('canton', 'Cantonal'), ('federation', 'Federal'),
+        ('canton', 'Cantonal'),
+        ('federation', 'Federal'),
         ('municipality', 'Communal')
     ]
 

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-15 14:48+0100\n"
+"POT-Creation-Date: 2018-02-09 15:02+0100\n"
 "PO-Revision-Date: 2018-01-15 14:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -81,6 +81,9 @@ msgstr "Risultati del candidato non validi"
 msgid "No data found"
 msgstr "Nessun dato trovato"
 
+msgid "No distinct region"
+msgstr "Nessuna regione chiara"
+
 msgid "Invalid list values"
 msgstr "Valori della lista non validi"
 
@@ -123,9 +126,6 @@ msgstr "Controprogetto"
 
 msgid "Tie-Breaker"
 msgstr "Domanda risolutiva"
-
-msgid "Missing municipality/district"
-msgstr "Località/Distretto mancante"
 
 msgid "Could not read yeas"
 msgstr "Impossibile leggere 'SÌ'"
@@ -374,6 +374,9 @@ msgstr "Quartieri"
 msgid "Federal"
 msgstr "Nazionale"
 
+msgid "Regional"
+msgstr "Regionale"
+
 msgid "Cantonal"
 msgstr "Cantonale"
 
@@ -392,6 +395,9 @@ msgstr "Elezioni e votazioni del ${date}"
 msgid "Federal Elections"
 msgstr "Elezioni federali"
 
+msgid "Regional Elections"
+msgstr "Elezioni regionali"
+
 msgid "Cantonal Elections"
 msgstr "Elezioni cantonali"
 
@@ -400,6 +406,9 @@ msgstr "Elezioni communali"
 
 msgid "Federal Votes"
 msgstr "Votazioni federali"
+
+msgid "Regional Votes"
+msgstr "Votazioni regionali"
 
 msgid "Cantonal Votes"
 msgstr "Votazioni cantonali"
@@ -1014,9 +1023,3 @@ msgstr "Nessuna elezione secondo il sistema proporzionale"
 
 msgid "The data source is not configured properly"
 msgstr "L'origine dati non è configurata correttamente"
-
-#~ msgid "Electoral district"
-#~ msgstr "Distretto elettorale"
-
-#~ msgid "Electoral districts"
-#~ msgstr "Distretti elettorali"

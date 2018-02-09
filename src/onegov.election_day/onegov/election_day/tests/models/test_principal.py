@@ -25,7 +25,9 @@ def test_principal_load_canton():
     assert principal.name == 'Kanton Zug'
     assert principal.id == 'zg'
     assert principal.domain == 'canton'
-    assert list(principal.domains_election.keys()) == ['federation', 'canton']
+    assert list(principal.domains_election.keys()) == [
+        'federation', 'region', 'canton'
+    ]
     assert list(principal.domains_vote.keys()) == ['federation', 'canton']
     assert len(principal.entities)
     assert len(list(principal.entities.values())[0])
@@ -146,7 +148,9 @@ def test_principal_load_options():
     assert isinstance(principal, Canton)
     assert principal.id == 'zg'
     assert principal.domain == 'canton'
-    assert list(principal.domains_election.keys()) == ['federation', 'canton']
+    assert list(principal.domains_election.keys()) == [
+        'federation', 'region', 'canton'
+    ]
     assert list(principal.domains_vote.keys()) == ['federation', 'canton']
 
     assert principal.name == 'Kanton Zug'

@@ -9,6 +9,9 @@ Changelog
 
   [msom]
 
+- Supports regional elections.
+  [msom]
+
 - Uses seperate domain definitions for elections and votes in the principals.
   [msom]
 

@@ -40,6 +40,7 @@
                                 <td><span class="shortcode" tal:condition="election.shortcode">${election.shortcode}</span></td>
                                 <td>${layout.format_date(election.date, 'date')}</td>
                                 <td tal:condition="election.domain == 'federation'" i18n:translate>Federal</td>
+                                <td tal:condition="election.domain == 'region'" i18n:translate>Regional</td>
                                 <td tal:condition="election.domain == 'canton'" i18n:translate>Cantonal</td>
                                 <td tal:condition="election.domain == 'municipality'" i18n:translate>Communal</td>
                                 <td tal:condition="election.type == 'majorz'" i18n:translate>Election based on the simple majority system</td>

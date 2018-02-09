@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-15 14:48+0100\n"
+"POT-Creation-Date: 2018-02-09 15:02+0100\n"
 "PO-Revision-Date: 2018-01-15 14:55+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -81,6 +81,9 @@ msgstr "Ungültige Kandidierendenresultate"
 msgid "No data found"
 msgstr "Keine Daten gefunden"
 
+msgid "No distinct region"
+msgstr "Keine eindeutige Region"
+
 msgid "Invalid list values"
 msgstr "Ungültige Listendaten"
 
@@ -123,9 +126,6 @@ msgstr "Gegenentwurf"
 
 msgid "Tie-Breaker"
 msgstr "Stichfrage"
-
-msgid "Missing municipality/district"
-msgstr "Fehlende Bezeichnung"
 
 msgid "Could not read yeas"
 msgstr "Konnte 'Ja Stimmen' nicht lesen"
@@ -374,6 +374,9 @@ msgstr "Stadtteile"
 msgid "Federal"
 msgstr "National"
 
+msgid "Regional"
+msgstr "Regional"
+
 msgid "Cantonal"
 msgstr "Kantonal"
 
@@ -392,6 +395,9 @@ msgstr "Urnengang vom ${date}"
 msgid "Federal Elections"
 msgstr "Eidgenössische Wahlen"
 
+msgid "Regional Elections"
+msgstr "Regionale Wahlen"
+
 msgid "Cantonal Elections"
 msgstr "Kantonale Wahlen"
 
@@ -400,6 +406,9 @@ msgstr "Kommunale Wahlen"
 
 msgid "Federal Votes"
 msgstr "Eidgenössische Abstimmungen"
+
+msgid "Regional Votes"
+msgstr "Regionale Abstimmungen"
 
 msgid "Cantonal Votes"
 msgstr "Kantonale Abstimmungen"
@@ -1012,9 +1021,3 @@ msgstr "Keine Proporzwahl"
 
 msgid "The data source is not configured properly"
 msgstr "Die Datenquellekonfiguration ist ungültig"
-
-#~ msgid "Electoral district"
-#~ msgstr "Wahlkreis"
-
-#~ msgid "Electoral districts"
-#~ msgstr "Wahlkreise"

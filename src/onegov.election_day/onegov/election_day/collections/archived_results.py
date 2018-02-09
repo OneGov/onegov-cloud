@@ -55,9 +55,9 @@ class ArchivedResultCollection(object):
             return None
 
         dates = groupbydict(items, lambda i: i.date)
-        order = ('federation', 'canton', 'municipality')
+        order = ('federation', 'region', 'canton', 'municipality')
         if request.app.principal.domain == 'municipality':
-            order = ('municipality', 'federation', 'canton')
+            order = ('municipality', 'federation', 'region', 'canton')
 
         for date_, items_by_date in dates.items():
             domains = groupbydict(

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-15 14:48+0100\n"
+"POT-Creation-Date: 2018-02-09 15:02+0100\n"
 "PO-Revision-Date: 2018-01-15 14:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -81,6 +81,9 @@ msgstr "Resultats da candidat nunvalaivels"
 msgid "No data found"
 msgstr "Chattà naginas datas"
 
+msgid "No distinct region"
+msgstr ""
+
 msgid "Invalid list values"
 msgstr "Datas da glista nunvalaivlas"
 
@@ -123,9 +126,6 @@ msgstr "Cuntraproposta"
 
 msgid "Tie-Breaker"
 msgstr "Dumonda decisiva"
-
-msgid "Missing municipality/district"
-msgstr "Lieu che manca"
 
 msgid "Could not read yeas"
 msgstr "I n'è betg stà pussaivel da leger las vuschs affirmativas"
@@ -374,6 +374,9 @@ msgstr "Quartiers"
 msgid "Federal"
 msgstr "Sin plaun naziunal"
 
+msgid "Regional"
+msgstr "Sin plaun regiunal"
+
 msgid "Cantonal"
 msgstr "Sin plaun chantunal"
 
@@ -392,6 +395,9 @@ msgstr "Votaziun dals ${date}"
 msgid "Federal Elections"
 msgstr "Elecziuns federalas"
 
+msgid "Regional Elections"
+msgstr "Elecziuns regionalas"
+
 msgid "Cantonal Elections"
 msgstr "Elecziuns chantunalas"
 
@@ -400,6 +406,9 @@ msgstr "Elecziuns communalas"
 
 msgid "Federal Votes"
 msgstr "Votaziuns federalas"
+
+msgid "Regional Votes"
+msgstr "Votaziuns regionalas"
 
 msgid "Cantonal Votes"
 msgstr "Votaziuns chantunalas"
@@ -1057,9 +1066,3 @@ msgstr "Nagina elecziun da proporz"
 
 msgid "The data source is not configured properly"
 msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
-
-#~ msgid "Electoral district"
-#~ msgstr "Circul electoral"
-
-#~ msgid "Electoral districts"
-#~ msgstr "Circuls electorals"

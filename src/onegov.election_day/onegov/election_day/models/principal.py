@@ -131,6 +131,7 @@ class Canton(Principal):
 
         domains_election = OrderedDict((
             ('federation', _("Federal")),
+            ('region', _("Regional")),
             ('canton', _("Cantonal"))
         ))
         domains_vote = OrderedDict((
