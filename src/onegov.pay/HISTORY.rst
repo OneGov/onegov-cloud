@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.2 (2018-02-09)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Fixes oauth not working with latest stripe python release (again).
   [href]
 
