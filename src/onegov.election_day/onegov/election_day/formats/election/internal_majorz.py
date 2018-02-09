@@ -179,6 +179,7 @@ def import_election_internal_majorz(election, entities, file, mimetype):
     if errors:
         return errors
 
+    # Add the missing entities
     remaining = entities.keys() - results.keys()
     for entity_id in remaining:
         entity = entities[entity_id]

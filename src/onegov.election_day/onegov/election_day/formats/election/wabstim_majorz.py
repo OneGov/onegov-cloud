@@ -196,6 +196,7 @@ def import_election_wabstim_majorz(
     if errors:
         return errors
 
+    # Add the missing entities
     remaining = entities.keys() - results.keys()
     for entity_id in remaining:
         entity = entities[entity_id]

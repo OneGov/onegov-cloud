@@ -586,6 +586,7 @@ def import_election_wabstic_proporz(
                 ))
         election.results.append(result)
 
+    # Add the missing entities
     remaining = entities.keys() - added_results.keys()
     for entity_id in remaining:
         entity = entities[entity_id]
