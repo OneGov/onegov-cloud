@@ -67,7 +67,7 @@ def get_entity_id(line, entities):
 
 
 def import_election_wabstic_majorz(
-    election, entities, district, number,
+    election, principal, district, number,
     file_wm_wahl, mimetype_wm_wahl,
     file_wmstatic_gemeinden, mimetype_wmstatic_gemeinden,
     file_wm_gemeinden, mimetype_wm_gemeinden,
@@ -81,6 +81,7 @@ def import_election_wabstic_majorz(
 
     """
     errors = []
+    entities = principal.entities[election.date.year]
 
     # Read the files
     wm_wahl, error = load_csv(

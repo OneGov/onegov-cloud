@@ -24,7 +24,7 @@ HEADERS = (
 )
 
 
-def import_vote_wabsti(vote, entities, vote_number, file, mimetype):
+def import_vote_wabsti(vote, principal, vote_number, file, mimetype):
     """ Tries to import the given csv, xls or xlsx file.
 
     This is the format used by Wabsti. Since there is no format description,
@@ -51,6 +51,7 @@ def import_vote_wabsti(vote, entities, vote_number, file, mimetype):
     errors = []
     added_entity_ids = set()
     skipped = 0
+    entities = principal.entities[vote.date.year]
 
     for line in csv.lines:
 

@@ -40,18 +40,17 @@ def view_upload(self, request, form):
             map_available = principal.is_year_available(
                 self.date.year, principal.use_maps
             )
-            entities = principal.entities.get(self.date.year, [])
             if form.file_format.data == 'internal':
                 errors = import_vote_internal(
                     self,
-                    entities,
+                    principal,
                     form.proposal.raw_data[0].file,
                     form.proposal.data['mimetype']
                 )
             elif form.file_format.data == 'wabsti':
                 errors = import_vote_wabsti(
                     self,
-                    entities,
+                    principal,
                     form.vote_number.data,
                     form.proposal.raw_data[0].file,
                     form.proposal.data['mimetype']
@@ -61,7 +60,7 @@ def view_upload(self, request, form):
                     errors.extend(
                         import_vote_wabstic(
                             self,
-                            entities,
+                            principal,
                             source.district,
                             source.number,
                             form.sg_geschaefte.raw_data[0].file,
@@ -73,7 +72,7 @@ def view_upload(self, request, form):
             elif form.file_format.data == 'wabsti_m':
                 errors = import_vote_wabstim(
                     self,
-                    entities,
+                    principal,
                     form.proposal.raw_data[0].file,
                     form.proposal.data['mimetype']
                 )
@@ -87,7 +86,7 @@ def view_upload(self, request, form):
                     errors.extend(
                         import_vote_default(
                             self,
-                            entities,
+                            principal,
                             ballot_type,
                             field.raw_data[0].file,
                             field.data['mimetype']

@@ -16,7 +16,7 @@ HEADERS = [
 ]
 
 
-def import_vote_default(vote, entities, ballot_type, file, mimetype):
+def import_vote_default(vote, principal, ballot_type, file, mimetype):
     """ Tries to import the given csv, xls or xlsx file to the given ballot
     result type.
 
@@ -45,8 +45,8 @@ def import_vote_default(vote, entities, ballot_type, file, mimetype):
 
     ballot_results = []
     errors = []
-
     added_entity_ids = set()
+    entities = principal.entities[vote.date.year]
 
     # if we have the value "unknown" or "unbekannt" in any of the following
     # colums, we ignore the whole line

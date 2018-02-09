@@ -27,7 +27,6 @@ def test_import_wabsti_vote(session, tar_file):
 
     # Test federal results
     principal = Canton(canton='sg')
-    entities = principal.entities.get(vote.date.year, {})
     for number, yeas, nays, yeas_p, nays_p, turnout in (
         (1, 102759, 91138, 53.0, 47.0, 61.7),
         (2, 90715, 106942, 45.9, 54.1, 62.4),
@@ -35,7 +34,7 @@ def test_import_wabsti_vote(session, tar_file):
         (4, 109503, 85790, 56.1, 43.9, 62.0),
     ):
         errors = import_vote_wabsti(
-            vote, entities, number, BytesIO(csv), 'text/plain'
+            vote, principal, number, BytesIO(csv), 'text/plain'
         )
         assert not errors
         assert vote.completed
@@ -53,9 +52,8 @@ def test_import_wabsti_vote(session, tar_file):
     session.flush()
     vote = session.query(ComplexVote).one()
 
-    entities = principal.entities.get(vote.date.year, {})
     errors = import_vote_wabsti(
-        vote, entities, 5, BytesIO(csv), 'text/plain'
+        vote, principal, 5, BytesIO(csv), 'text/plain'
     )
     assert not errors
     assert vote.completed
@@ -91,10 +89,9 @@ def test_import_wabsti_vote_utf16(session):
     session.flush()
     vote = session.query(Vote).one()
     principal = Canton(canton='sg')
-    entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabsti(
-        vote, entities, 0,
+        vote, principal, 0,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -128,10 +125,9 @@ def test_import_wabsti_vote_missing_headers(session):
     session.flush()
     vote = session.query(Vote).one()
     principal = Canton(canton='sg')
-    entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabsti(
-        vote, entities, 0,
+        vote, principal, 0,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -165,10 +161,9 @@ def test_import_wabsti_vote_invalid_values(session):
     session.flush()
     vote = session.query(Vote).one()
     principal = Canton(canton='zg')
-    entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabsti(
-        vote, entities, 0,
+        vote, principal, 0,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -282,10 +277,9 @@ def test_import_wabsti_vote_expats(session):
     session.flush()
     vote = session.query(Vote).one()
     principal = Canton(canton='zg')
-    entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabsti(
-        vote, entities, 0,
+        vote, principal, 0,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -348,7 +342,7 @@ def test_import_wabsti_vote_expats(session):
     ]
 
     errors = import_vote_wabsti(
-        vote, entities, 0,
+        vote, principal, 0,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -400,10 +394,9 @@ def test_import_wabsti_vote_temporary_results(session):
     session.flush()
     vote = session.query(Vote).one()
     principal = Canton(canton='zg')
-    entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_wabsti(
-        vote, entities, 0,
+        vote, principal, 0,
         BytesIO((
             '\n'.join((
                 ','.join((

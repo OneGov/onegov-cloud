@@ -25,7 +25,6 @@ def test_import_wabstic_majorz(session, tar_file):
     election = session.query(Election).one()
 
     principal = Canton(canton='sg')
-    entities = principal.entities.get(election.date.year, {})
 
     # The tar file contains results from SG from the 28.02.2016
     with tarfile.open(tar_file, 'r|gz') as f:
@@ -36,7 +35,7 @@ def test_import_wabstic_majorz(session, tar_file):
         wm_wahl = f.extractfile(f.next()).read()
 
     errors = import_election_wabstic_majorz(
-        election, entities, '9', '9',
+        election, principal, '9', '9',
         BytesIO(wm_wahl), 'text/plain',
         BytesIO(wmstatic_gemeinden), 'text/plain',
         BytesIO(wm_gemeinden), 'text/plain',
@@ -76,10 +75,9 @@ def test_import_wabstic_majorz_missing_headers(session):
     session.flush()
     election = session.query(Election).one()
     principal = Canton(canton='sg')
-    entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabstic_majorz(
-        election, entities, '0', '0',
+        election, principal, '0', '0',
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -154,10 +152,9 @@ def test_import_wabstic_majorz_invalid_values(session):
     session.flush()
     election = session.query(Election).one()
     principal = Canton(canton='sg')
-    entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabstic_majorz(
-        election, entities, '0', '0',
+        election, principal, '0', '0',
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -306,7 +303,6 @@ def test_import_wabstic_majorz_expats(session):
     session.flush()
     election = session.query(Election).one()
     principal = Canton(canton='sg')
-    entities = principal.entities.get(election.date.year, {})
 
     for entity_id, sub_entity_id in (
         ('9170', ''),
@@ -315,7 +311,7 @@ def test_import_wabstic_majorz_expats(session):
         ('', '0'),
     ):
         errors = import_election_wabstic_majorz(
-            election, entities, '0', '0',
+            election, principal, '0', '0',
             BytesIO((
                 '\n'.join((
                     ','.join((
@@ -430,10 +426,9 @@ def test_import_wabstic_majorz_temporary_results(session):
     session.flush()
     election = session.query(Election).one()
     principal = Canton(canton='sg')
-    entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabstic_majorz(
-        election, entities, '0', '0',
+        election, principal, '0', '0',
         BytesIO((
             '\n'.join((
                 ','.join((

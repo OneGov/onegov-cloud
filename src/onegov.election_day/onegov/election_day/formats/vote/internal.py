@@ -20,7 +20,7 @@ HEADERS = [
 ]
 
 
-def import_vote_internal(vote, entities, file, mimetype):
+def import_vote_internal(vote, principal, file, mimetype):
     """ Tries to import the given csv, xls or xlsx file.
 
     This is the format used by onegov.ballot.Vote.export().
@@ -40,6 +40,7 @@ def import_vote_internal(vote, entities, file, mimetype):
     added_entity_ids = {}
     ballot_types = set()
     status = 'unknown'
+    entities = principal.entities[vote.date.year]
 
     for line in csv.lines:
 

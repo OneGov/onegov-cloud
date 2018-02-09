@@ -26,7 +26,6 @@ def test_import_wabsti_proporz(session, tar_file):
     election = session.query(Election).one()
 
     principal = Canton(canton='zg')
-    entities = principal.entities.get(election.date.year, {})
 
     # The tar file contains results from ZG from the 18.10.2015
     with tarfile.open(tar_file, 'r|gz') as f:
@@ -42,7 +41,7 @@ def test_import_wabsti_proporz(session, tar_file):
     ).encode('utf-8')
 
     errors = import_election_wabsti_proporz(
-        election, entities,
+        election, principal,
         BytesIO(csv), 'text/plain',
     )
 
@@ -69,7 +68,7 @@ def test_import_wabsti_proporz(session, tar_file):
     assert election.allocated_mandates == 0
 
     errors = import_election_wabsti_proporz(
-        election, entities,
+        election, principal,
         BytesIO(csv), 'text/plain',
         BytesIO(connections), 'text/plain',
         BytesIO(elected), 'text/plain',
@@ -121,10 +120,9 @@ def test_import_wabsti_proporz_utf16(session):
     session.flush()
     election = session.query(Election).one()
     principal = Canton(canton='sg')
-    entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabsti_proporz(
-        election, entities,
+        election, principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -186,10 +184,9 @@ def test_import_wabsti_proporz_missing_headers(session):
     session.flush()
     election = session.query(Election).one()
     principal = Canton(canton='sg')
-    entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabsti_proporz(
-        election, entities,
+        election, principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -252,10 +249,9 @@ def test_import_wabsti_proporz_invalid_values(session):
     session.flush()
     election = session.query(Election).one()
     principal = Canton(canton='sg')
-    entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabsti_proporz(
-        election, entities,
+        election, principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -376,11 +372,10 @@ def test_import_wabsti_proporz_expats(session):
     session.flush()
     election = session.query(Election).one()
     principal = Canton(canton='sg')
-    entities = principal.entities.get(election.date.year, {})
 
     for entity_id in (9170, 0):
         errors = import_election_wabsti_proporz(
-            election, entities,
+            election, principal,
             BytesIO((
                 '\n'.join((
                     ','.join((
@@ -426,10 +421,9 @@ def test_import_wabsti_proporz_temporary_results(session):
     session.flush()
     election = session.query(Election).one()
     principal = Canton(canton='sg')
-    entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabsti_proporz(
-        election, entities,
+        election, principal,
         BytesIO((
             '\n'.join((
                 ','.join((

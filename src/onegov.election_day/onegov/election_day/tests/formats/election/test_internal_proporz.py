@@ -29,7 +29,6 @@ def test_import_internal_proporz(session, tar_file):
     election = session.query(Election).one()
 
     principal = Canton(canton='zg')
-    entities = principal.entities.get(election.date.year, {})
 
     # The tar file contains results from ZG from the 18.10.2015 (v1.13.1)
     # and results from Bern from the 25.11.2015 (v1.13.1)
@@ -41,7 +40,7 @@ def test_import_internal_proporz(session, tar_file):
     # Test federal proporz
     election.number_of_mandates = 3
     errors = import_election_internal_proporz(
-        election, entities, BytesIO(csv_proporz), 'text/plain',
+        election, principal, BytesIO(csv_proporz), 'text/plain',
     )
 
     assert not errors
@@ -71,7 +70,7 @@ def test_import_internal_proporz(session, tar_file):
     csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
 
     errors = import_election_internal_proporz(
-        election, entities, BytesIO(csv), 'text/plain'
+        election, principal, BytesIO(csv), 'text/plain'
     )
 
     assert not errors
@@ -110,10 +109,9 @@ def test_import_internal_proporz_missing_headers(session):
     session.flush()
     election = session.query(Election).one()
     principal = Canton(canton='sg')
-    entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_internal_proporz(
-        election, entities,
+        election, principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -158,10 +156,9 @@ def test_import_internal_proporz_invalid_values(session):
     session.flush()
     election = session.query(Election).one()
     principal = Canton(canton='sg')
-    entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_internal_proporz(
-        election, entities,
+        election, principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -261,11 +258,10 @@ def test_import_internal_proporz_expats(session):
     session.flush()
     election = session.query(Election).one()
     principal = Canton(canton='zg')
-    entities = principal.entities.get(election.date.year, {})
 
     for entity_id in (9170, 0):
         errors = import_election_internal_proporz(
-            election, entities,
+            election, principal,
             BytesIO((
                 '\n'.join((
                     ','.join((
@@ -333,10 +329,9 @@ def test_import_internal_proporz_temporary_results(session):
     session.flush()
     election = session.query(Election).one()
     principal = Canton(canton='zg')
-    entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_internal_proporz(
-        election, entities,
+        election, principal,
         BytesIO((
             '\n'.join((
                 ','.join((

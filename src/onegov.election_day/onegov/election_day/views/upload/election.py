@@ -56,11 +56,10 @@ def view_upload_majorz_election(self, request, form):
         if not principal.is_year_available(self.date.year, map_required=False):
             errors = [unsupported_year_error(self.date.year)]
         else:
-            entities = principal.entities[self.date.year]
             if form.file_format.data == 'internal':
                 errors = import_election_internal_majorz(
                     self,
-                    entities,
+                    principal,
                     form.results.raw_data[0].file,
                     form.results.data['mimetype']
                 )
@@ -68,7 +67,7 @@ def view_upload_majorz_election(self, request, form):
                 elected = len(form.elected.data)
                 errors = import_election_wabsti_majorz(
                     self,
-                    entities,
+                    principal,
                     form.results.raw_data[0].file,
                     form.results.data['mimetype'],
                     form.elected.raw_data[0].file if elected else None,
@@ -79,7 +78,7 @@ def view_upload_majorz_election(self, request, form):
             elif form.file_format.data == 'wabsti_m':
                 errors = import_election_wabstim_majorz(
                     self,
-                    entities,
+                    principal,
                     form.results.raw_data[0].file,
                     form.results.data['mimetype'],
                 )
@@ -88,7 +87,7 @@ def view_upload_majorz_election(self, request, form):
                     errors.extend(
                         import_election_wabstic_majorz(
                             self,
-                            entities,
+                            principal,
                             source.district,
                             source.number,
                             form.wm_wahl.raw_data[0].file,
@@ -158,11 +157,10 @@ def view_upload_proporz_election(self, request, form):
         if not principal.is_year_available(self.date.year, map_required=False):
             errors = [unsupported_year_error(self.date.year)]
         else:
-            entities = principal.entities[self.date.year]
             if form.file_format.data == 'internal':
                 errors = import_election_internal_proporz(
                     self,
-                    entities,
+                    principal,
                     form.results.raw_data[0].file,
                     form.results.data['mimetype']
                 )
@@ -172,7 +170,7 @@ def view_upload_proporz_election(self, request, form):
                 elected = len(form.elected.data)
                 errors = import_election_wabsti_proporz(
                     self,
-                    entities,
+                    principal,
                     form.results.raw_data[0].file,
                     form.results.data['mimetype'],
                     form.connections.raw_data[0].file if connections else None,
@@ -188,7 +186,7 @@ def view_upload_proporz_election(self, request, form):
                     errors.extend(
                         import_election_wabstic_proporz(
                             self,
-                            entities,
+                            principal,
                             source.district,
                             source.number,
                             form.wp_wahl.raw_data[0].file,

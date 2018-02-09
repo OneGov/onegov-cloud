@@ -25,14 +25,13 @@ def test_import_wabstim_majorz(session, tar_file):
     election = session.query(Election).one()
 
     principal = Municipality(municipality='3231', name='Au')
-    entities = principal.entities.get(election.date.year, {})
 
     # The tar file contains results from AU from the 25.9.2016
     with tarfile.open(tar_file, 'r|gz') as f:
         csv = f.extractfile(f.next()).read()
 
     errors = import_election_wabstim_majorz(
-        election, entities,
+        election, principal,
         BytesIO(csv), 'text/plain',
     )
 
@@ -73,10 +72,9 @@ def test_import_wabstim_majorz_utf16(session):
     session.flush()
     election = session.query(Election).one()
     principal = Municipality(municipality='3427')
-    entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabstim_majorz(
-        election, entities,
+        election, principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -106,10 +104,9 @@ def test_import_wabstim_majorz_missing_headers(session):
     session.flush()
     election = session.query(Election).one()
     principal = Municipality(municipality='3427')
-    entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabstim_majorz(
-        election, entities,
+        election, principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -140,10 +137,9 @@ def test_import_wabstim_majorz_invalid_values(session):
     session.flush()
     election = session.query(Election).one()
     principal = Municipality(municipality='3427')
-    entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabstim_majorz(
-        election, entities,
+        election, principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -275,11 +271,10 @@ def test_import_wabstim_majorz_expats(session):
     session.flush()
     election = session.query(Election).one()
     principal = Municipality(municipality='3427')
-    entities = principal.entities.get(election.date.year, {})
 
     for entity_id in (9170, 0):
         errors = import_election_wabstim_majorz(
-            election, entities,
+            election, principal,
             BytesIO((
                 '\n'.join((
                     ','.join((
@@ -342,10 +337,9 @@ def test_import_wabstim_majorz_temporary_results(session):
     session.flush()
     election = session.query(Election).one()
     principal = Municipality(municipality='351')
-    entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabstim_majorz(
-        election, entities,
+        election, principal,
         BytesIO((
             '\n'.join((
                 ','.join((

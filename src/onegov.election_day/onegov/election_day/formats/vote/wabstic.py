@@ -52,7 +52,7 @@ def line_is_relevant(line, domain, district, number):
     )
 
 
-def import_vote_wabstic(vote, entities, district, number,
+def import_vote_wabstic(vote, principal, district, number,
                         file_sg_geschaefte, mimetype_sg_geschaefte,
                         file_sg_gemeinden, mimetype_sg_gemeinden):
     """ Tries to import the files in the given folder.
@@ -64,6 +64,7 @@ def import_vote_wabstic(vote, entities, district, number,
 
     """
     errors = []
+    entities = principal.entities[vote.date.year]
 
     # Read the files
     sg_geschaefte, error = load_csv(

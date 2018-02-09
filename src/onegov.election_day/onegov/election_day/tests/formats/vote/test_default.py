@@ -15,10 +15,9 @@ def test_import_default_vote(session):
 
     # Test federal results
     principal = Canton(canton='zg')
-    entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_default(
-        vote, entities, 'proposal',
+        vote, principal, 'proposal',
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -60,9 +59,8 @@ def test_import_default_vote(session):
 
     # Test communal results without quarters
     principal = Municipality(municipality='1059')
-    entities = principal.entities.get(vote.date.year, {})
     errors = import_vote_default(
-        vote, entities, 'proposal',
+        vote, principal, 'proposal',
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -92,9 +90,8 @@ def test_import_default_vote(session):
 
     # Test communal results with quarters
     principal = Municipality(municipality='351')
-    entities = principal.entities.get(vote.date.year, {})
     errors = import_vote_default(
-        vote, entities, 'proposal',
+        vote, principal, 'proposal',
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -135,10 +132,9 @@ def test_import_default_vote_missing_headers(session):
     session.flush()
     vote = session.query(Vote).one()
     principal = Canton(canton='sg')
-    entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_default(
-        vote, entities, 'proposal',
+        vote, principal, 'proposal',
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -164,10 +160,9 @@ def test_import_default_vote_invalid_values(session):
     session.flush()
     vote = session.query(Vote).one()
     principal = Canton(canton='zg')
-    entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_default(
-        vote, entities, 'proposal',
+        vote, principal, 'proposal',
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -238,10 +233,9 @@ def test_import_default_vote_expats(session):
     session.flush()
     vote = session.query(Vote).one()
     principal = Canton(canton='zg')
-    entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_default(
-        vote, entities, 'proposal',
+        vote, principal, 'proposal',
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -277,7 +271,7 @@ def test_import_default_vote_expats(session):
     ]
 
     errors = import_vote_default(
-        vote, entities, 'proposal',
+        vote, principal, 'proposal',
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -311,10 +305,9 @@ def test_import_default_vote_temporary_results(session):
     session.flush()
     vote = session.query(Vote).one()
     principal = Canton(canton='zg')
-    entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_default(
-        vote, entities, 'proposal',
+        vote, principal, 'proposal',
         BytesIO((
             '\n'.join((
                 ','.join((

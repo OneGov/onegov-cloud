@@ -91,9 +91,8 @@ def view_upload_wabsti_vote(self, request):
             errors[vote.id].append(unsupported_year_error(vote.date.year))
             continue
 
-        entities = self.entities.get(vote.date.year, {})
         errors[vote.id] = import_vote_wabstic(
-            vote, entities, item.district, item.number,
+            vote, self, item.district, item.number,
             form.sg_geschaefte.raw_data[0].file,
             form.sg_geschaefte.data['mimetype'],
             form.sg_gemeinden.raw_data[0].file,
@@ -181,9 +180,8 @@ def view_upload_wabsti_majorz(self, request):
             )
             continue
 
-        entities = self.entities.get(election.date.year, {})
         errors[election.id] = import_election_wabstic_majorz(
-            election, entities, item.district, item.number,
+            election, self, item.district, item.number,
             form.wm_wahl.raw_data[0].file,
             form.wm_wahl.data['mimetype'],
             form.wmstatic_gemeinden.raw_data[0].file,
@@ -279,9 +277,8 @@ def view_upload_wabsti_proporz(self, request):
             )
             continue
 
-        entities = self.entities.get(election.date.year, {})
         errors[election.id] = import_election_wabstic_proporz(
-            election, entities, item.district, item.number,
+            election, self, item.district, item.number,
             form.wp_wahl.raw_data[0].file,
             form.wp_wahl.data['mimetype'],
             form.wpstatic_gemeinden.raw_data[0].file,

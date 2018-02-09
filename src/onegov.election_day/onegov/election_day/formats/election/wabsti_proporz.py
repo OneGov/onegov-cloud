@@ -179,7 +179,7 @@ def parse_connection(line, errors):
 
 
 def import_election_wabsti_proporz(
-    election, entities, file, mimetype,
+    election, principal, file, mimetype,
     connections_file=None, connections_mimetype=None,
     elected_file=None, elected_mimetype=None,
     statistics_file=None, statistics_mimetype=None
@@ -201,6 +201,7 @@ def import_election_wabsti_proporz(
     connections = {}
     subconnections = {}
     results = {}
+    entities = principal.entities[election.date.year]
 
     # This format has one candiate per entity per line
     filename = _("Results")

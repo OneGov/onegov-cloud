@@ -96,21 +96,20 @@ def view_upload_rest(self, request):
             )
 
     if not errors:
-        entities = self.entities.get(item.date.year, {})
         file = form.results.raw_data[0].file
         mimetype = form.results.data['mimetype']
 
         err = []
         if form.type.data == 'vote':
-            err = import_vote_internal(item, entities, file, mimetype)
+            err = import_vote_internal(item, self, file, mimetype)
         if form.type.data == 'election':
             if item.type == 'proporz':
                 err = import_election_internal_proporz(
-                    item, entities, file, mimetype
+                    item, self, file, mimetype
                 )
             else:
                 err = import_election_internal_majorz(
-                    item, entities, file, mimetype
+                    item, self, file, mimetype
                 )
         if form.type.data == 'parties':
             err = import_party_results(item, file, mimetype)

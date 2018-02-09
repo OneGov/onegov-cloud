@@ -201,7 +201,7 @@ def parse_connection(line, errors):
         return connection, subconnection
 
 
-def import_election_internal_proporz(election, entities, file, mimetype):
+def import_election_internal_proporz(election, principal, file, mimetype):
     """ Tries to import the given file (internal format).
 
     This is the format used by onegov.ballot.Election.export().
@@ -227,6 +227,7 @@ def import_election_internal_proporz(election, entities, file, mimetype):
     subconnections = {}
     results = {}
     panachage = {'headers': parse_panachage_headers(csv)}
+    entities = principal.entities[election.date.year]
 
     # This format has one candiate per entity per line
     status = None

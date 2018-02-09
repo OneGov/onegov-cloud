@@ -26,9 +26,8 @@ def test_import_internal_vote(session, tar_file):
 
     # Test federal results
     principal = Canton(canton='sg')
-    entities = principal.entities.get(vote.date.year, {})
 
-    errors = import_vote_internal(vote, entities, BytesIO(csv), 'text/plain')
+    errors = import_vote_internal(vote, principal, BytesIO(csv), 'text/plain')
     assert not errors
     assert vote.completed
     assert vote.ballots.count() == 1
@@ -44,7 +43,7 @@ def test_import_internal_vote(session, tar_file):
     # Test a roundtrip
     csv = convert_list_of_dicts_to_csv(vote.export()).encode('utf-8')
 
-    errors = import_vote_internal(vote, entities, BytesIO(csv), 'text/plain')
+    errors = import_vote_internal(vote, principal, BytesIO(csv), 'text/plain')
     assert not errors
     assert vote.completed
     assert vote.ballots.count() == 1
@@ -65,10 +64,9 @@ def test_import_internal_vote_missing_headers(session):
     session.flush()
     vote = session.query(Vote).one()
     principal = Canton(canton='sg')
-    entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_internal(
-        vote, entities,
+        vote, principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -97,10 +95,9 @@ def test_import_internal_vote_invalid_values(session):
     session.flush()
     vote = session.query(Vote).one()
     principal = Canton(canton='zg')
-    entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_internal(
-        vote, entities,
+        vote, principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -186,10 +183,9 @@ def test_import_internal_vote_expats(session):
     session.flush()
     vote = session.query(Vote).one()
     principal = Canton(canton='zg')
-    entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_internal(
-        vote, entities,
+        vote, principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -234,7 +230,7 @@ def test_import_internal_vote_expats(session):
     ]
 
     errors = import_vote_internal(
-        vote, entities,
+        vote, principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -274,10 +270,9 @@ def test_import_internal_vote_temporary_results(session):
     session.flush()
     vote = session.query(Vote).one()
     principal = Canton(canton='zg')
-    entities = principal.entities.get(vote.date.year, {})
 
     errors = import_vote_internal(
-        vote, entities,
+        vote, principal,
         BytesIO((
             '\n'.join((
                 ','.join((

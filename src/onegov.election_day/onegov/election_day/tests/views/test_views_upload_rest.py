@@ -5,6 +5,7 @@ from io import BytesIO
 from onegov.ballot import Vote
 from onegov.ballot import Election
 from onegov.election_day.collections import UploadTokenCollection
+from onegov.election_day.models import Canton
 from onegov.election_day.tests import login
 from unittest.mock import patch
 from webtest import TestApp as Client
@@ -168,7 +169,7 @@ def test_view_rest_vote(election_day_app):
 
         assert import_.called
         assert isinstance(import_.call_args[0][0], Vote)
-        assert 1701 in import_.call_args[0][1]
+        assert isinstance(import_.call_args[0][1], Canton)
         assert isinstance(import_.call_args[0][2], BytesIO)
         assert import_.call_args[0][3] == 'application/octet-stream'
 
@@ -200,7 +201,7 @@ def test_view_rest_majorz(election_day_app):
 
         assert import_.called
         assert isinstance(import_.call_args[0][0], Election)
-        assert 1701 in import_.call_args[0][1]
+        assert isinstance(import_.call_args[0][1], Canton)
         assert isinstance(import_.call_args[0][2], BytesIO)
         assert import_.call_args[0][3] == 'application/octet-stream'
 
@@ -232,7 +233,7 @@ def test_view_rest_proporz(election_day_app):
 
         assert import_.called
         assert isinstance(import_.call_args[0][0], Election)
-        assert 1701 in import_.call_args[0][1]
+        assert isinstance(import_.call_args[0][1], Canton)
         assert isinstance(import_.call_args[0][2], BytesIO)
         assert import_.call_args[0][3] == 'application/octet-stream'
 

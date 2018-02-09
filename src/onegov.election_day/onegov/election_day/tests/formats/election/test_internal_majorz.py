@@ -28,7 +28,6 @@ def test_import_internal_majorz(session, tar_file):
     election = session.query(Election).one()
 
     principal = Canton(canton='zg')
-    entities = principal.entities.get(election.date.year, {})
 
     # The tar file contains results from ZG from the 18.10.2015 (v1.13.1)
     # and results from Bern from the 25.11.2015 (v1.13.1)
@@ -39,7 +38,7 @@ def test_import_internal_majorz(session, tar_file):
 
     # Test federal majorz
     errors = import_election_internal_majorz(
-        election, entities, BytesIO(csv_majorz), 'text/plain',
+        election, principal, BytesIO(csv_majorz), 'text/plain',
     )
 
     assert not errors
@@ -62,7 +61,7 @@ def test_import_internal_majorz(session, tar_file):
     csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
 
     errors = import_election_internal_majorz(
-        election, entities, BytesIO(csv), 'text/plain'
+        election, principal, BytesIO(csv), 'text/plain'
     )
 
     assert not errors
@@ -85,7 +84,6 @@ def test_import_internal_majorz(session, tar_file):
     election.type = 'majorz'
     election.number_of_mandates = 1
     principal = Municipality(municipality='1059')
-    entities = principal.entities.get(election.date.year, {})
 
     csv = (
         '\n'.join((
@@ -133,7 +131,7 @@ def test_import_internal_majorz(session, tar_file):
     ).encode('utf-8')
 
     errors = import_election_internal_majorz(
-        election, entities, BytesIO(csv), 'text/plain',
+        election, principal, BytesIO(csv), 'text/plain',
     )
 
     assert not errors
@@ -152,7 +150,7 @@ def test_import_internal_majorz(session, tar_file):
     csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
 
     errors = import_election_internal_majorz(
-        election, entities, BytesIO(csv), 'text/plain'
+        election, principal, BytesIO(csv), 'text/plain'
     )
 
     assert not errors
@@ -171,10 +169,9 @@ def test_import_internal_majorz(session, tar_file):
     election.type = 'majorz'
     election.number_of_mandates = 1
     principal = Municipality(municipality='351')
-    entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_internal_majorz(
-        election, entities, BytesIO(csv_communal), 'text/plain',
+        election, principal, BytesIO(csv_communal), 'text/plain',
     )
 
     assert not errors
@@ -193,7 +190,7 @@ def test_import_internal_majorz(session, tar_file):
     csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
 
     errors = import_election_internal_majorz(
-        election, entities, BytesIO(csv), 'text/plain'
+        election, principal, BytesIO(csv), 'text/plain'
     )
 
     assert not errors
@@ -221,10 +218,9 @@ def test_import_internal_majorz_missing_headers(session):
     session.flush()
     election = session.query(Election).one()
     principal = Canton(canton='sg')
-    entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_internal_majorz(
-        election, entities,
+        election, principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -264,10 +260,9 @@ def test_import_internal_majorz_invalid_values(session):
     session.flush()
     election = session.query(Election).one()
     principal = Canton(canton='sg')
-    entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_internal_majorz(
-        election, entities,
+        election, principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -350,11 +345,10 @@ def test_import_internal_majorz_expats(session):
     session.flush()
     election = session.query(Election).one()
     principal = Canton(canton='zg')
-    entities = principal.entities.get(election.date.year, {})
 
     for entity_id in (9170, 0):
         errors = import_election_internal_majorz(
-            election, entities,
+            election, principal,
             BytesIO((
                 '\n'.join((
                     ','.join((
@@ -412,10 +406,9 @@ def test_import_internal_majorz_temporary_results(session):
     session.flush()
     election = session.query(Election).one()
     principal = Canton(canton='zg')
-    entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_internal_majorz(
-        election, entities,
+        election, principal,
         BytesIO((
             '\n'.join((
                 ','.join((

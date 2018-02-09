@@ -28,7 +28,6 @@ def test_import_wabstic_proporz(session, tar_file):
     election = session.query(Election).one()
 
     principal = Canton(canton='sg')
-    entities = principal.entities.get(election.date.year, {})
 
     # The tar file contains results from SG from the 18.10.2015
     with tarfile.open(tar_file, 'r|gz') as f:
@@ -42,7 +41,7 @@ def test_import_wabstic_proporz(session, tar_file):
         wp_wahl = f.extractfile(f.next()).read()
 
     errors = import_election_wabstic_proporz(
-        election, entities, '1', '1',
+        election, principal, '1', '1',
         BytesIO(wp_wahl), 'text/plain',
         BytesIO(wpstatic_gemeinden), 'text/plain',
         BytesIO(wp_gemeinden), 'text/plain',
@@ -99,10 +98,9 @@ def test_import_wabstic_proporz_missing_headers(session):
     session.flush()
     election = session.query(Election).one()
     principal = Canton(canton='sg')
-    entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabstic_proporz(
-        election, entities, '0', '0',
+        election, principal, '0', '0',
         BytesIO('Ausmittlungsstand,\n'.encode('utf-8')), 'text/plain',
         BytesIO((
             '\n'.join((
@@ -198,10 +196,9 @@ def test_import_wabstic_proporz_invalid_values(session):
     session.flush()
     election = session.query(Election).one()
     principal = Canton(canton='sg')
-    entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabstic_proporz(
-        election, entities, '0', '0',
+        election, principal, '0', '0',
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -369,7 +366,6 @@ def test_import_wabstic_proporz_expats(session):
     session.flush()
     election = session.query(Election).one()
     principal = Canton(canton='sg')
-    entities = principal.entities.get(election.date.year, {})
 
     for entity_id, sub_entity_id in (
         ('9170', ''),
@@ -378,7 +374,7 @@ def test_import_wabstic_proporz_expats(session):
         ('', '0'),
     ):
         errors = import_election_wabstic_proporz(
-            election, entities, '0', '0',
+            election, principal, '0', '0',
             BytesIO((  # wp_wahl
                 '\n'.join((
                     ','.join((
@@ -533,10 +529,9 @@ def test_import_wabstic_proporz_temporary_results(session):
     session.flush()
     election = session.query(Election).one()
     principal = Canton(canton='sg')
-    entities = principal.entities.get(election.date.year, {})
 
     errors = import_election_wabstic_proporz(
-        election, entities, '0', '0',
+        election, principal, '0', '0',
         BytesIO((  # wp_wahl
             '\n'.join((
                 ','.join((

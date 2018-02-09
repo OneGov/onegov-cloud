@@ -98,7 +98,7 @@ def get_list_id(line):
 
 
 def import_election_wabstic_proporz(
-    election, entities, district, number,
+    election, principal, district, number,
     file_wp_wahl, mimetype_wp_wahl,
     file_wpstatic_gemeinden, mimetype_wpstatic_gemeinden,
     file_wp_gemeinden, mimetype_wp_gemeinden,
@@ -116,6 +116,7 @@ def import_election_wabstic_proporz(
     """
 
     errors = []
+    entities = principal.entities[election.date.year]
 
     # Read the files
     wp_wahl, error = load_csv(

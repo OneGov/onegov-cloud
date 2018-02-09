@@ -126,9 +126,7 @@ def parse_candidates(line, errors):
     return results
 
 
-def import_election_wabstim_majorz(
-    election, entities, file, mimetype
-):
+def import_election_wabstim_majorz(election, principal, file, mimetype):
     """ Tries to import the given csv, xls or xlsx file.
 
     This is the format used by Wabsti for majorz elections for municipalities.
@@ -144,6 +142,7 @@ def import_election_wabstim_majorz(
     candidates = {}
     results = {}
     added_entities = set()
+    entities = principal.entities[election.date.year]
 
     # This format has one entity per line and every candidate as row
     filename = _("Results")

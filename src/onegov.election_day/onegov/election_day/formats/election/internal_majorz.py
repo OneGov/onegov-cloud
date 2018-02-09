@@ -120,7 +120,7 @@ def parse_candidate_result(line, errors):
         )
 
 
-def import_election_internal_majorz(election, entities, file, mimetype):
+def import_election_internal_majorz(election, principal, file, mimetype):
     """ Tries to import the given file (internal format).
 
     This is the format used by onegov.ballot.Election.export().
@@ -138,9 +138,9 @@ def import_election_internal_majorz(election, entities, file, mimetype):
         return [error]
 
     errors = []
-
     candidates = {}
     results = {}
+    entities = principal.entities[election.date.year]
 
     # This format has one candiate per entity per line
     absolute_majority = None
