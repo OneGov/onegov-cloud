@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes oauth not working with latest stripe python release (again).
+  [href]
+
 - Requires Python 3.6.
   [href]
 

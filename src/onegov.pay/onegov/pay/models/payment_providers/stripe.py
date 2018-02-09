@@ -374,17 +374,17 @@ class StripeConnect(PaymentProvider):
         self.authorization_code = request_params['code']
 
         with stripe_api_key(self.client_secret):
-            token = stripe.OAuth.token(
+            data = stripe.OAuth.token(
                 grant_type='authorization_code',
                 code=self.authorization_code,
             )
 
-        assert token.data['scope'] == 'read_write'
+        assert data['scope'] == 'read_write'
 
-        self.publishable_key = token.data['stripe_publishable_key']
-        self.user_id = token.data['stripe_user_id']
-        self.refresh_token = token.data['refresh_token']
-        self.access_token = token.data['access_token']
+        self.publishable_key = data['stripe_publishable_key']
+        self.user_id = data['stripe_user_id']
+        self.refresh_token = data['refresh_token']
+        self.access_token = data['access_token']
 
     def sync(self):
         session = object_session(self)
