@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.2.0 (2018-02-09)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Filters values within one category using OR (existing behaviour) and values
   between categories using AND (was OR).
   [jref]
