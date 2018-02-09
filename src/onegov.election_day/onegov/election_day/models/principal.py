@@ -2,11 +2,11 @@ import onegov.election_day
 import yaml
 
 
-from datetime import date
 from cached_property import cached_property
 from collections import OrderedDict
-from onegov.core.custom import json
+from datetime import date
 from onegov.core import utils
+from onegov.core.custom import json
 from onegov.election_day import _
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -147,15 +147,13 @@ class Canton(Principal):
             with (path / '{}.json'.format(canton)).open('r') as f:
                 entities[year] = {int(k): v for k, v in json.load(f).items()}
 
-        # Test if all entities have districts
+        # Test if all entities have districts (use none, if ambiguous)
         districts = set([
             entity.get('district', None)
             for year in entities.values()
             for entity in year.values()
         ])
-        has_districts = districts != {None}
-        if has_districts:
-            assert None not in districts
+        has_districts = None not in districts
 
         super(Canton, self).__init__(
             id_=canton,
@@ -217,15 +215,13 @@ class Municipality(Principal):
                     }
         if entities:
             self.has_quarters = True
-            # Test if all entities have districts
+            # Test if all entities have districts (use none, if ambiguous)
             districts = set([
                 entity.get('district', None)
                 for year in entities.values()
                 for entity in year.values()
             ])
-            has_districts = districts != {None}
-            if has_districts:
-                assert None not in districts
+            has_districts = None not in districts
         else:
             # ... we have no static data, autogenerate it!
             self.has_quarters = False
