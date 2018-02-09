@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Ensures editor path ids are integers.
+  [href]
+
 - Fixes redactor html mode showing nothing.
   [href]
 

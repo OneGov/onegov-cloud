@@ -185,7 +185,7 @@ def get_file_for_org(request, app, id):
 
 
 @OrgApp.path(model=Editor, path='/editor/{action}/{trait}/{page_id}')
-def get_editor(app, action, trait, page_id):
+def get_editor(app, action, trait, page_id=0):
     if not Editor.is_supported_action(action):
         return None
 
