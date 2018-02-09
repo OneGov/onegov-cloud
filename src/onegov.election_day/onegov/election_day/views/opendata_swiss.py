@@ -48,7 +48,8 @@ def view_rdf(self, request):
         response.headers['Content-Type'] = 'application/rdf+xml; charset=UTF-8'
 
     layout = DefaultLayout(self, request)
-    domains = dict(self.available_domains)
+    domains = dict(self.domains_election)
+    domains.update(self.domains_vote)
     locales = {k: k[:2] for k in request.app.locales}
     default_locale = request.default_locale
 

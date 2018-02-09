@@ -25,7 +25,8 @@ def test_principal_load_canton():
     assert principal.name == 'Kanton Zug'
     assert principal.id == 'zg'
     assert principal.domain == 'canton'
-    assert list(principal.available_domains.keys()) == ['federation', 'canton']
+    assert list(principal.domains_election.keys()) == ['federation', 'canton']
+    assert list(principal.domains_vote.keys()) == ['federation', 'canton']
     assert len(principal.entities)
     assert len(list(principal.entities.values())[0])
 
@@ -54,7 +55,10 @@ def test_principal_load_municipality_with_static_data():
     assert principal.name == 'Stadt Bern'
     assert principal.id == '351'
     assert principal.domain == 'municipality'
-    assert list(principal.available_domains.keys()) == [
+    assert list(principal.domains_election.keys()) == [
+        'federation', 'canton', 'municipality'
+    ]
+    assert list(principal.domains_vote.keys()) == [
         'federation', 'canton', 'municipality'
     ]
     assert principal.has_quarters is True
@@ -85,7 +89,10 @@ def test_principal_load_municipality_wo_static_data():
     assert principal.name == 'Kriens'
     assert principal.id == '1059'
     assert principal.domain == 'municipality'
-    assert list(principal.available_domains.keys()) == [
+    assert list(principal.domains_election.keys()) == [
+        'federation', 'canton', 'municipality'
+    ]
+    assert list(principal.domains_vote.keys()) == [
         'federation', 'canton', 'municipality'
     ]
     assert principal.has_quarters is False
@@ -140,7 +147,8 @@ def test_principal_load_options():
     assert isinstance(principal, Canton)
     assert principal.id == 'zg'
     assert principal.domain == 'canton'
-    assert list(principal.available_domains.keys()) == ['federation', 'canton']
+    assert list(principal.domains_election.keys()) == ['federation', 'canton']
+    assert list(principal.domains_vote.keys()) == ['federation', 'canton']
 
     assert principal.name == 'Kanton Zug'
     assert principal.logo is None

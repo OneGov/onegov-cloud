@@ -35,7 +35,8 @@ class Principal(object):
         self,
         id_=None,
         domain=None,
-        available_domains=None,
+        domains_election=None,
+        domains_vote=None,
         entities=None,
         name=None,
         logo=None,
@@ -52,10 +53,11 @@ class Principal(object):
         pdf_signing=None,
         open_data=None
     ):
-        assert all((id_, domain, available_domains, entities))
+        assert all((id_, domain, domains_election, domains_vote, entities))
         self.id = id_
         self.domain = domain
-        self.available_domains = available_domains
+        self.domains_election = domains_election
+        self.domains_vote = domains_vote
         self.entities = entities
         self.name = name
         self.logo = logo
@@ -127,7 +129,11 @@ class Canton(Principal):
 
         kwargs.pop('use_maps', None)
 
-        available_domains = OrderedDict((
+        domains_election = OrderedDict((
+            ('federation', _("Federal")),
+            ('canton', _("Cantonal"))
+        ))
+        domains_vote = OrderedDict((
             ('federation', _("Federal")),
             ('canton', _("Cantonal"))
         ))
@@ -144,7 +150,8 @@ class Canton(Principal):
         super(Canton, self).__init__(
             id_=canton,
             domain='canton',
-            available_domains=available_domains,
+            domains_election=domains_election,
+            domains_vote=domains_vote,
             entities=entities,
             use_maps=True,
             **kwargs
@@ -179,7 +186,7 @@ class Municipality(Principal):
 
     def __init__(self, municipality=None, **kwargs):
         assert municipality
-        available_domains = OrderedDict((
+        domains = OrderedDict((
             ('federation', _("Federal")),
             ('canton', _("Cantonal")),
             ('municipality', _("Communal"))
@@ -210,7 +217,8 @@ class Municipality(Principal):
         super(Municipality, self).__init__(
             id_=municipality,
             domain='municipality',
-            available_domains=available_domains,
+            domains_election=domains,
+            domains_vote=domains,
             entities=entities,
             **kwargs
         )

@@ -9,6 +9,9 @@ Changelog
   There are no more election_counted_entities and election_total_entitites,
   instead there is a new "counted" attribute.**
 
+- Uses seperate domain definitions for elections and votes in the principals.
+  [msom]
+
 - Uses a more generic PDF signing error log entry.
   [msom]
 

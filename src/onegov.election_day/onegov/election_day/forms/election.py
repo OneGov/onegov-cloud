@@ -110,8 +110,7 @@ class ElectionForm(Form):
 
     def set_domain(self, principal):
         self.domain.choices = [
-            (key, text)
-            for key, text in principal.available_domains.items()
+            (key, text) for key, text in principal.domains_election.items()
         ]
 
     def update_model(self, model):
