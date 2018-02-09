@@ -225,6 +225,13 @@ def test_directory_entry_collection(session):
         german='No', singular=False
     ).query().count() == 3
 
+    # between categories, the filter is AND
+    assert albums.for_filter(
+        german='Yes'
+    ).for_filter(
+        genre='Rock'
+    ).query().count() == 1
+
 
 def test_validation_error(session):
     places = DirectoryCollection(session).add(

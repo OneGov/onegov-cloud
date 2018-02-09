@@ -1,7 +1,9 @@
+from itertools import groupby
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.core.utils import toggle
 from onegov.directory.models import DirectoryEntry
 from onegov.form import as_internal_id
+from sqlalchemy import and_
 from sqlalchemy.orm import object_session
 from sqlalchemy.dialects.postgresql import array
 
@@ -48,15 +50,20 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
         query = super().query().filter_by(directory_id=self.directory.id)
         keywords = self.valid_keywords(self.keywords)
 
-        values = {
+        def keyword_group(value):
+            return value.split(':')[0]
+
+        values = [
             ':'.join((keyword, value))
             for keyword in keywords
             for value in keywords[keyword]
-        }
+        ]
+        values.sort(key=keyword_group)
 
-        if values:
-            query = query.filter(
-                self.model_class._keywords.has_any(array(values)))
+        query = query.filter(and_(
+            self.model_class._keywords.has_any(array(group_values))
+            for group, group_values in groupby(values, key=keyword_group)
+        ))
 
         return query
 
