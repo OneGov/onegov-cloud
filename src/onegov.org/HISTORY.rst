@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.22.1 (2018-02-09)
+~~~~~~~~~~~~~~~~~~~
+
 - Ensures editor path ids are integers.
   [href]
 
