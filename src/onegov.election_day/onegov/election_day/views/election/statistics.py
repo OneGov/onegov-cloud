@@ -2,7 +2,6 @@ from onegov.ballot import Election
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionLayout
-from sqlalchemy.orm import object_session
 
 
 @ElectionDayApp.html(
