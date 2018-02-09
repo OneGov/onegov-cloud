@@ -43,7 +43,7 @@ class Principal(object):
         color='#000',
         base=None,
         analytics=None,
-        use_districts=True,
+        has_districts=True,
         use_maps=False,
         fetch=None,
         webhooks=None,
@@ -64,7 +64,7 @@ class Principal(object):
         self.color = color
         self.base = base
         self.analytics = analytics
-        self.use_districts = use_districts
+        self.has_districts = has_districts
         self.use_maps = use_maps
         self.fetch = fetch or {}
         self.webhooks = webhooks or {}
@@ -147,12 +147,23 @@ class Canton(Principal):
             with (path / '{}.json'.format(canton)).open('r') as f:
                 entities[year] = {int(k): v for k, v in json.load(f).items()}
 
+        # Test if all entities have districts
+        districts = set([
+            entity.get('district', None)
+            for year in entities.values()
+            for entity in year.values()
+        ])
+        has_districts = districts != {None}
+        if has_districts:
+            assert None not in districts
+
         super(Canton, self).__init__(
             id_=canton,
             domain='canton',
             domains_election=domains_election,
             domains_vote=domains_vote,
             entities=entities,
+            has_districts=has_districts,
             use_maps=True,
             **kwargs
         )
@@ -206,9 +217,19 @@ class Municipality(Principal):
                     }
         if entities:
             self.has_quarters = True
+            # Test if all entities have districts
+            districts = set([
+                entity.get('district', None)
+                for year in entities.values()
+                for entity in year.values()
+            ])
+            has_districts = districts != {None}
+            if has_districts:
+                assert None not in districts
         else:
             # ... we have no static data, autogenerate it!
             self.has_quarters = False
+            has_districts = False
             entities = {
                 year: {int(municipality): {'name': kwargs.get('name', '')}}
                 for year in range(2002, date.today().year + 1)
@@ -220,6 +241,7 @@ class Municipality(Principal):
             domains_election=domains,
             domains_vote=domains,
             entities=entities,
+            has_districts=has_districts,
             **kwargs
         )
 

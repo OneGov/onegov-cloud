@@ -36,7 +36,7 @@ def test_principal_load_canton():
     assert principal.base_domain is None
     assert principal.analytics is None
     assert principal.use_maps is True
-    assert principal.use_districts is True
+    assert principal.has_districts is False
     assert principal.fetch == {}
     assert principal.webhooks == {}
     assert principal.sms_notification is None
@@ -71,7 +71,7 @@ def test_principal_load_municipality_with_static_data():
     assert principal.base_domain is None
     assert principal.analytics is None
     assert principal.use_maps is False
-    assert principal.use_districts is True
+    assert principal.has_districts is False
     assert principal.fetch == {}
     assert principal.webhooks == {}
     assert principal.sms_notification is None
@@ -105,7 +105,7 @@ def test_principal_load_municipality_wo_static_data():
     assert principal.base_domain is None
     assert principal.analytics is None
     assert principal.use_maps is False
-    assert principal.use_districts is True
+    assert principal.has_districts is False
     assert principal.fetch == {}
     assert principal.webhooks == {}
     assert principal.sms_notification is None
@@ -121,7 +121,6 @@ def test_principal_load_options():
         base: 'http://www.zg.ch'
         analytics: "<script type=\\"text/javascript\\"></script>"
         use_maps: false
-        use_districts: false
         wabsti_import: true
         fetch:
             steinhausen:
@@ -157,7 +156,7 @@ def test_principal_load_options():
     assert principal.base_domain == 'zg.ch'
     assert principal.analytics == '<script type="text/javascript"></script>'
     assert principal.use_maps is True
-    assert principal.use_districts is False
+    assert principal.has_districts is False
     assert principal.fetch == {
         'steinhausen': ['municipality'],
         'baar': ['municipality']
@@ -208,6 +207,13 @@ def test_canton_entities():
         principal = Canton(name=canton, canton=canton)
         for year in SUPPORTED_YEARS:
             assert principal.entities[year]
+
+
+def test_canton_has_districts():
+    assert Canton(name='gr', canton='gr').has_districts is True
+    assert Canton(name='sg', canton='sg').has_districts is True
+    assert Canton(name='sz', canton='sz').has_districts is True
+    assert Canton(name='zg', canton='zg').has_districts is False
 
 
 def test_municipality_entities():

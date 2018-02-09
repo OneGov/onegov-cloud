@@ -534,7 +534,7 @@ class MediaGenerator():
                         'even'
                     )
 
-                elif not principal.use_districts:
+                elif not principal.has_districts:
                     pdf.table(
                         [[
                             translate(principal.label('entity')),
@@ -724,7 +724,7 @@ class MediaGenerator():
                         )
                         pdf.spacer()
 
-                    elif not principal.use_districts:
+                    elif not principal.has_districts:
                         pdf.spacer()
                         pdf.table(
                             [[

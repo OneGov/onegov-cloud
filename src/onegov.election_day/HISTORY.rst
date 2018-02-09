@@ -12,6 +12,9 @@ Changelog
 - Uses seperate domain definitions for elections and votes in the principals.
   [msom]
 
+- Uses the static data to detect if a principal has districts or not.
+  [msom]
+
 2.0.2 (2018-02-01)
 ~~~~~~~~~~~~~~~~~~~
 
