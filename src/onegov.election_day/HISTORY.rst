@@ -1,7 +1,5 @@
 Changelog
 ---------
-2.0.2 (2018-02-01)
-~~~~~~~~~~~~~~~~~~~
 
 - Harmonizes the progress implementation of elections and votes.
 
@@ -11,6 +9,9 @@ Changelog
 
 - Uses seperate domain definitions for elections and votes in the principals.
   [msom]
+
+2.0.2 (2018-02-01)
+~~~~~~~~~~~~~~~~~~~
 
 - Uses a more generic PDF signing error log entry.
   [msom]
