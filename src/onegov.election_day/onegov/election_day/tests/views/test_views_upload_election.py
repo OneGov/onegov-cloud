@@ -129,8 +129,8 @@ def test_upload_election_temporary_results_majorz(election_day_app):
             'KandResultArt_4'
         ),
         (
-            '7,1701,13567,40,0,0,40,1,Hegglin,Peter,36,2,2,'
-            'Hürlimann,Urs,25,2,1000,Leere Zeilen,,18,9,1001,'
+            '7,1701,13567,40,0,0,40,1,Hegglin,Peter,36,1,2,'
+            'Hürlimann,Urs,25,1,1000,Leere Zeilen,,18,9,1001,'
             'Ungültige Stimmen,,0,9'
         ),
         (
@@ -568,7 +568,7 @@ def test_upload_election_submit(election_day_app):
 
     with patch(
         'onegov.election_day.views.upload.election.'
-        'import_election_wabstim_majorz'
+        'import_election_wabsti_majorz'
     ) as import_:
         import_.return_value = []
 

@@ -15,6 +15,9 @@ Changelog
 - Uses the static data to detect if a principal has districts or not.
   [msom]
 
+- Uses a single function to import wabsti majorz elections.
+  [msom]
+
 2.0.2 (2018-02-01)
 ~~~~~~~~~~~~~~~~~~~
 

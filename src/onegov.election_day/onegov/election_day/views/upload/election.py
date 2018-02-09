@@ -11,7 +11,6 @@ from onegov.election_day.formats import import_election_wabsti_majorz
 from onegov.election_day.formats import import_election_wabsti_proporz
 from onegov.election_day.formats import import_election_wabstic_majorz
 from onegov.election_day.formats import import_election_wabstic_proporz
-from onegov.election_day.formats import import_election_wabstim_majorz
 from onegov.election_day.forms import UploadMajorzElectionForm
 from onegov.election_day.forms import UploadProporzElectionForm
 from onegov.election_day.layouts import ManageElectionsLayout
@@ -73,10 +72,11 @@ def view_upload_majorz_election(self, request, form):
                     form.elected.raw_data[0].file if elected else None,
                     form.elected.data['mimetype'] if elected else None,
                 )
-                self.absolute_majority = form.majority.data
+                if form.majority.data:
+                    self.absolute_majority = form.majority.data
                 self.status = 'final' if form.complete.data else 'interim'
             elif form.file_format.data == 'wabsti_m':
-                errors = import_election_wabstim_majorz(
+                errors = import_election_wabsti_majorz(
                     self,
                     principal,
                     form.results.raw_data[0].file,

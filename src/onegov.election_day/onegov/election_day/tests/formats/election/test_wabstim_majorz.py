@@ -4,7 +4,7 @@ from datetime import date
 from io import BytesIO
 from onegov.ballot import Election
 from onegov.core.utils import module_path
-from onegov.election_day.formats import import_election_wabstim_majorz
+from onegov.election_day.formats import import_election_wabsti_majorz
 from onegov.election_day.models import Municipality
 from pytest import mark
 
@@ -30,7 +30,7 @@ def test_import_wabstim_majorz(session, tar_file):
     with tarfile.open(tar_file, 'r|gz') as f:
         csv = f.extractfile(f.next()).read()
 
-    errors = import_election_wabstim_majorz(
+    errors = import_election_wabsti_majorz(
         election, principal,
         BytesIO(csv), 'text/plain',
     )
@@ -73,7 +73,7 @@ def test_import_wabstim_majorz_utf16(session):
     election = session.query(Election).one()
     principal = Municipality(municipality='3427')
 
-    errors = import_election_wabstim_majorz(
+    errors = import_election_wabsti_majorz(
         election, principal,
         BytesIO((
             '\n'.join((
@@ -105,14 +105,13 @@ def test_import_wabstim_majorz_missing_headers(session):
     election = session.query(Election).one()
     principal = Municipality(municipality='3427')
 
-    errors = import_election_wabstim_majorz(
+    errors = import_election_wabsti_majorz(
         election, principal,
         BytesIO((
             '\n'.join((
                 ','.join((
                     'AnzMandate',
                     'AbsolutesMehr',
-                    'BFS',
                     'StimmBer',
                     'WzAbgegeben',
                     'WzUngueltig',
@@ -121,7 +120,7 @@ def test_import_wabstim_majorz_missing_headers(session):
         ).encode('utf-8')), 'text/plain'
     )
     assert sorted([e.error.interpolate() for e in errors]) == [
-        "Missing columns: 'wzleer'"
+        "Missing columns: 'bfs'"
     ]
 
 
@@ -138,7 +137,7 @@ def test_import_wabstim_majorz_invalid_values(session):
     election = session.query(Election).one()
     principal = Municipality(municipality='3427')
 
-    errors = import_election_wabstim_majorz(
+    errors = import_election_wabsti_majorz(
         election, principal,
         BytesIO((
             '\n'.join((
@@ -273,7 +272,7 @@ def test_import_wabstim_majorz_expats(session):
     principal = Municipality(municipality='3427')
 
     for entity_id in (9170, 0):
-        errors = import_election_wabstim_majorz(
+        errors = import_election_wabsti_majorz(
             election, principal,
             BytesIO((
                 '\n'.join((
@@ -312,7 +311,7 @@ def test_import_wabstim_majorz_expats(session):
                         '9',
                         'Ungültige Stimmen',
                         '',
-                        '400',
+                        '4',
                         '9',
                         'Meier',
                         'Peter',
@@ -322,7 +321,8 @@ def test_import_wabstim_majorz_expats(session):
                 ))
             ).encode('utf-8')), 'text/plain'
         )
-        assert '0 is unknown' in [e.error.interpolate() for e in errors]
+        assert not errors
+        assert election.results.filter_by(entity_id=0).one().invalid_votes == 4
 
 
 def test_import_wabstim_majorz_temporary_results(session):
@@ -338,7 +338,7 @@ def test_import_wabstim_majorz_temporary_results(session):
     election = session.query(Election).one()
     principal = Municipality(municipality='351')
 
-    errors = import_election_wabstim_majorz(
+    errors = import_election_wabsti_majorz(
         election, principal,
         BytesIO((
             '\n'.join((

@@ -10,11 +10,12 @@ from uuid import uuid4
 
 HEADERS = [
     'anzmandate',
+    # 'absolutesmehr' optional
     'bfs',
     'stimmber',
-    'stimmabgegeben',
-    'stimmleer',
-    'stimmungueltig',
+    # 'stimmabgegeben' or 'wzabgegeben'
+    # 'wzleer' or 'stimmleer'
+    # 'wzungueltig' or 'stimmungueltig'
 ]
 
 HEADERS_RESULT = [
@@ -25,21 +26,34 @@ HEADERS_RESULT = [
 
 
 def parse_election(line, errors):
+    mandates = None
+    majority = None
     try:
         mandates = int(line.anzmandate or 0)
+        if hasattr(line, 'absolutesmehr'):
+            majority = int(line.absolutesmehr or 0)
     except ValueError:
         errors.append(_("Invalid election values"))
-    else:
-        return mandates
+
+    return mandates, majority
 
 
-def parse_election_result(line, errors, entities):
+def parse_election_result(line, errors, entities, added_entities):
     try:
         entity_id = int(line.bfs or 0)
         elegible_voters = int(line.stimmber or 0)
-        received_ballots = int(line.stimmabgegeben or 0)
-        blank_ballots = int(line.stimmleer or 0)
-        invalid_ballots = int(line.stimmungueltig or 0)
+        received_ballots = int(
+            getattr(line, 'wzabgegeben', 0) or
+            getattr(line, 'stimmabgegeben', 0)
+        )
+        blank_ballots = int(
+            getattr(line, 'wzleer', 0) or
+            getattr(line, 'stimmleer', 0)
+        )
+        invalid_ballots = int(
+            getattr(line, 'wzungueltig', 0) or
+            getattr(line, 'stimmungueltig', 0)
+        )
 
         blank_votes = None
         invalid_votes = None
@@ -72,7 +86,13 @@ def parse_election_result(line, errors, entities):
             errors.append(_(
                 _("${name} is unknown", mapping={'name': entity_id})
             ))
+        elif entity_id in added_entities:
+            errors.append(
+                _("${name} was found twice", mapping={
+                    'name': entity_id
+                }))
         else:
+            added_entities.add(entity_id)
             entity = entities.get(entity_id, {})
             return ElectionResult(
                 id=uuid4(),
@@ -95,10 +115,15 @@ def parse_candidates(line, errors):
     while True:
         index += 1
         try:
-            id = getattr(line, 'kandid_{}'.format(index))
+            candidate_id = getattr(line, 'kandid_{}'.format(index), str(index))
             family_name = getattr(line, 'kandname_{}'.format(index))
             first_name = getattr(line, 'kandvorname_{}'.format(index))
             votes = int(getattr(line, 'stimmen_{}'.format(index)) or 0)
+            elected = False
+            if hasattr(line, 'kandresultart_{}'.format(index)):
+                elected = int(
+                    getattr(line, 'kandresultart_{}'.format(index)) or 0
+                ) == 2
         except AttributeError:
             break
         except ValueError:
@@ -111,10 +136,10 @@ def parse_candidates(line, errors):
             results.append((
                 Candidate(
                     id=uuid4(),
-                    candidate_id=id,
+                    candidate_id=candidate_id,
                     family_name=family_name,
                     first_name=first_name,
-                    elected=False
+                    elected=elected
                 ),
                 CandidateResult(
                     id=uuid4(),
@@ -141,6 +166,7 @@ def import_election_wabsti_majorz(
     errors = []
     candidates = {}
     results = {}
+    added_entities = set()
     entities = principal.entities[election.date.year]
 
     # This format has one entity per line and every candidate as row
@@ -159,12 +185,15 @@ def import_election_wabsti_majorz(
             error = None
     if not error:
         mandates = 0
+        majority = None
         for line in csv.lines:
             line_errors = []
 
             # Parse the line
-            mandates = parse_election(line, line_errors)
-            result = parse_election_result(line, line_errors, entities)
+            mandates, majority = parse_election(line, line_errors)
+            result = parse_election_result(
+                line, line_errors, entities, added_entities
+            )
             if result:
                 for candidate, c_result in parse_candidates(line, line_errors):
                     candidate = candidates.setdefault(
@@ -239,6 +268,7 @@ def import_election_wabsti_majorz(
 
     election.clear_results()
     election.number_of_mandates = mandates
+    election.absolute_majority = majority
 
     for candidate in candidates.values():
         election.candidates.append(candidate)

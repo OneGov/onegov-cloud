@@ -143,7 +143,6 @@ def test_import_wabsti_majorz_missing_headers(session):
             '\n'.join((
                 ','.join((
                     'AnzMandate',
-                    'BFS',
                     'StimmBer',
                     'StimmLeer',
                     'StimmUngueltig',
@@ -161,7 +160,7 @@ def test_import_wabsti_majorz_missing_headers(session):
     )
     assert sorted([(e.filename, e.error.interpolate()) for e in errors]) == [
         ('Elected Candidates', "Missing columns: 'id'"),
-        ('Results', "Missing columns: 'stimmabgegeben'"),
+        ('Results', "Missing columns: 'bfs'"),
     ]
 
 
