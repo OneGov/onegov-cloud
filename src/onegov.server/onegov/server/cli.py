@@ -58,7 +58,6 @@ import sys
 import time
 import resource
 import traceback
-import warnings
 
 from datetime import datetime
 from onegov.server import Server
@@ -67,12 +66,6 @@ from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 from wsgiref.simple_server import make_server, WSGIRequestHandler
 from xtermcolor import colorize
-
-
-def ignore_warnings(*messages):
-    # we're going to be using the default psycopg2, not the new psycopg2-wheel
-    for message in messages:
-        warnings.filterwarnings("ignore", message=message)
 
 
 @click.command()
@@ -115,16 +108,6 @@ def run(config_file, port, pdb):
     # <- the docs are currently duplicated somewhat at the top of the module
     # because click does not play well with sphinx yet
     # see https://github.com/mitsuhiko/click/issues/127
-
-    # not necessarily where you would expect this kind of filter, but since
-    # it is one of the earliast lines of code to be executed we kind of have
-    # no choice - the later we do this, the less effective our filters are,
-    # even though later would be more correct
-
-    ignore_warnings(
-        # we will keep using psycopg2 instead of psycogp2-binary
-        "The psycopg2 wheel package will be renamed from release 2.8"
-    )
 
     def wsgi_factory():
         return Server(Config.from_yaml_file(config_file), post_mortem=pdb)
