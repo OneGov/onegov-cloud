@@ -35,7 +35,7 @@ def test_import_wabstic_majorz(session, tar_file):
         wm_wahl = f.extractfile(f.next()).read()
 
     errors = import_election_wabstic_majorz(
-        election, principal, '9', '9',
+        election, principal, '9', '1',
         BytesIO(wm_wahl), 'text/plain',
         BytesIO(wmstatic_gemeinden), 'text/plain',
         BytesIO(wm_gemeinden), 'text/plain',
@@ -215,7 +215,7 @@ def test_import_wabstic_majorz_invalid_values(session):
                     'StimmenUngueltig',
                 )),
                 ','.join((
-                    '100',  # SortGemeinde
+                    '3215',  # SortGemeinde
                     '200',  # SortGemeindeSub
                     'xxx',  # Stimmberechtigte
                     'xxx',  # Sperrung
@@ -278,7 +278,6 @@ def test_import_wabstic_majorz_invalid_values(session):
     assert sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
     ]) == [
-        ('wm_gemeinden', 2, '100 is unknown'),
         ('wm_gemeinden', 2, 'Invalid entity values'),
         ('wm_gemeinden', 2, 'Invalid entity values'),
         ('wm_gemeinden', 2, 'Invalid entity values'),

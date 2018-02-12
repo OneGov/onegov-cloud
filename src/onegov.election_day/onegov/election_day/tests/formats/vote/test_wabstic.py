@@ -40,7 +40,7 @@ def test_import_wabstic_vote(session, tar_file):
         ('2', 84247, False),
     ):
         errors = import_vote_wabstic(
-            vote, principal, '1', number,
+            vote, principal, number, '1',
             BytesIO(sg_geschaefte), 'text/plain',
             BytesIO(sg_gemeinden), 'text/plain'
         )
@@ -52,7 +52,7 @@ def test_import_wabstic_vote(session, tar_file):
     # Test cantonal results
     vote.domain = 'canton'
     errors = import_vote_wabstic(
-        vote, principal, '1', '3',
+        vote, principal, '3', '1',
         BytesIO(sg_geschaefte), 'text/plain',
         BytesIO(sg_gemeinden), 'text/plain'
     )
@@ -74,7 +74,7 @@ def test_import_wabstic_vote(session, tar_file):
         principal = Municipality(name=str(entity_id), municipality=entity_id)
         entities = principal.entities.get(vote.date.year, {})
         errors = import_vote_wabstic(
-            vote, principal, district, number,
+            vote, principal, number, district,
             BytesIO(sg_geschaefte), 'text/plain',
             BytesIO(sg_gemeinden), 'text/plain'
         )
@@ -90,9 +90,8 @@ def test_import_wabstic_vote(session, tar_file):
     ):
         vote.domain = domain
         principal = Municipality(name=str(entity_id), municipality=entity_id)
-        entities = principal.entities.get(vote.date.year, {})
         errors = import_vote_wabstic(
-            vote, principal, district, number,
+            vote, principal, number, district,
             BytesIO(sg_geschaefte), 'text/plain',
             BytesIO(sg_gemeinden), 'text/plain'
         )
@@ -110,7 +109,7 @@ def test_import_wabstic_vote(session, tar_file):
     vote = session.query(ComplexVote).one()
     principal = Municipality(name=str(3402), municipality=3402)
     errors = import_vote_wabstic(
-        vote, principal, '83', '1',
+        vote, principal, '1', '83',
         BytesIO(sg_geschaefte), 'text/plain',
         BytesIO(sg_gemeinden), 'text/plain'
     )

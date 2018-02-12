@@ -43,19 +43,16 @@ class DataSourceItemForm(Form):
         ]
     )
 
-    district = StringField(
-        label="'SortWahlkreis'",
+    number = StringField(
+        label="'SortGeschaeft'",
         validators=[
             InputRequired()
         ],
         render_kw=dict(force_simple=True)
     )
 
-    number = StringField(
-        label="'SortGeschaeft'",
-        validators=[
-            InputRequired()
-        ],
+    district = StringField(
+        label="'SortWahlkreis'",
         render_kw=dict(force_simple=True)
     )
 

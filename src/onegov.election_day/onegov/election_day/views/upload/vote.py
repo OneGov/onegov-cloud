@@ -61,8 +61,8 @@ def view_upload(self, request, form):
                         import_vote_wabstic(
                             self,
                             principal,
-                            source.district,
                             source.number,
+                            source.district,
                             form.sg_geschaefte.raw_data[0].file,
                             form.sg_geschaefte.data['mimetype'],
                             form.sg_gemeinden.raw_data[0].file,

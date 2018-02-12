@@ -88,8 +88,8 @@ def view_upload_majorz_election(self, request, form):
                         import_election_wabstic_majorz(
                             self,
                             principal,
-                            source.district,
                             source.number,
+                            source.district,
                             form.wm_wahl.raw_data[0].file,
                             form.wm_wahl.data['mimetype'],
                             form.wmstatic_gemeinden.raw_data[0].file,
@@ -187,8 +187,8 @@ def view_upload_proporz_election(self, request, form):
                         import_election_wabstic_proporz(
                             self,
                             principal,
-                            source.district,
                             source.number,
+                            source.district,
                             form.wp_wahl.raw_data[0].file,
                             form.wp_wahl.data['mimetype'],
                             form.wpstatic_gemeinden.raw_data[0].file,

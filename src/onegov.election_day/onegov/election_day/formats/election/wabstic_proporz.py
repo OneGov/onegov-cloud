@@ -66,7 +66,6 @@ HEADERS_WP_KANDIDATENGDE = (
 
 
 def line_is_relevant(line, number, district=None):
-    # why is 'SortWahlkreis' only in the static file??!
     if district:
         return line.sortwahlkreis == district and line.sortgeschaeft == number
     else:
@@ -98,7 +97,7 @@ def get_list_id(line):
 
 
 def import_election_wabstic_proporz(
-    election, principal, district, number,
+    election, principal, number, district,
     file_wp_wahl, mimetype_wp_wahl,
     file_wpstatic_gemeinden, mimetype_wpstatic_gemeinden,
     file_wp_gemeinden, mimetype_wp_gemeinden,
@@ -257,10 +256,6 @@ def import_election_wabstic_proporz(
     for line in wp_gemeinden.lines:
         line_errors = []
 
-        # Why is there no 'SortGeschaeft'??!
-        # if not line_is_relevant(line, number):
-        #     continue
-
         # Parse the id of the entity
         try:
             entity_id = get_entity_id(line, entities)
@@ -272,13 +267,8 @@ def import_election_wabstic_proporz(
                     _("${name} is unknown", mapping={'name': entity_id}))
 
             if entity_id not in added_entities:
-                # We can live with this, the static file previously above
-                # only contains eligible voters
-                entity = entities.get(entity_id, {})
-                added_entities[entity_id] = {
-                    'name': entity.get('name', ''),
-                    'district': entity.get('district', ''),
-                }
+                # Only add it if present (there is there no SortGeschaeft)
+                continue
 
         entity = added_entities[entity_id]
 
@@ -385,10 +375,6 @@ def import_election_wabstic_proporz(
     for line in wp_listengde.lines:
         line_errors = []
 
-        # Why is there no Sort Geschaeft?
-        # if not line_is_relevant(line, number):
-        #     continue
-
         try:
             entity_id = get_entity_id(line, entities)
             list_id = get_list_id(line)
@@ -396,6 +382,11 @@ def import_election_wabstic_proporz(
         except ValueError:
             line_errors.append(_("Invalid list results"))
         else:
+            if entity_id not in added_entities:
+                # Only add the list result if the entity is present (there is
+                # no SortGeschaeft in this file)
+                continue
+
             if entity_id not in added_entities:
                 line_errors.append(_("Invalid entity values"))
 
@@ -498,16 +489,17 @@ def import_election_wabstic_proporz(
         try:
             entity_id = get_entity_id(line, entities)
             candidate_id = get_candidate_id(line)
-            if candidate_id not in added_candidates:
-                # There is there no Sort Geschaeft, we can not check if the
-                # line_is_relevant
-                continue
             votes = int(line.stimmen)
-        except (ValueError, AssertionError):
+        except ValueError:
             line_errors.append(_("Invalid candidate results"))
         else:
-            if entity_id not in added_entities:
-                line_errors.append(_("Invalid entity values"))
+            if (
+                entity_id not in added_entities or
+                candidate_id not in added_candidates
+            ):
+                # Only add the candidate result if the entity and the candidate
+                # are present (there is no SortGeschaeft in this file)
+                continue
 
             if candidate_id in added_results.get(entity_id, {}):
                 line_errors.append(

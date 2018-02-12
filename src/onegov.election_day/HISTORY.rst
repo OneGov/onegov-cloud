@@ -21,6 +21,9 @@ Changelog
 - Uses a single function to import wabsti majorz elections.
   [msom]
 
+- Improves handling of wabsti exporter formats.
+  [msom]
+
 2.0.2 (2018-02-01)
 ~~~~~~~~~~~~~~~~~~~
 

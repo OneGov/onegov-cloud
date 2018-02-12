@@ -48,7 +48,6 @@ HEADERS_WM_KANDIDATENGDE = (
 
 
 def line_is_relevant(line, number, district=None):
-    # why is 'SortWahlkreis' only in the static file??!
     if district:
         return line.sortwahlkreis == district and line.sortgeschaeft == number
     else:
@@ -67,7 +66,7 @@ def get_entity_id(line, entities):
 
 
 def import_election_wabstic_majorz(
-    election, principal, district, number,
+    election, principal, number, district,
     file_wm_wahl, mimetype_wm_wahl,
     file_wmstatic_gemeinden, mimetype_wmstatic_gemeinden,
     file_wm_gemeinden, mimetype_wm_gemeinden,
@@ -204,10 +203,6 @@ def import_election_wabstic_majorz(
     for line in wm_gemeinden.lines:
         line_errors = []
 
-        # Why is there no 'SortGeschaeft'??!
-        # if not line_is_relevant(line, number):
-        #     continue
-
         # Parse the id of the entity
         try:
             entity_id = get_entity_id(line, entities)
@@ -219,11 +214,8 @@ def import_election_wabstic_majorz(
                     _("${name} is unknown", mapping={'name': entity_id}))
 
             if entity_id not in added_entities:
-                entity = entities.get(entity_id, {})
-                added_entities[entity_id] = {
-                    'name': entity.get('name', ''),
-                    'district': entity.get('district', ''),
-                }
+                # Only add it if present (there is there no SortGeschaeft)
+                continue
 
         entity = added_entities[entity_id]
 

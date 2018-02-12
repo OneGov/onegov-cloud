@@ -92,7 +92,7 @@ def view_upload_wabsti_vote(self, request):
             continue
 
         errors[vote.id] = import_vote_wabstic(
-            vote, self, item.district, item.number,
+            vote, self, item.number, item.district,
             form.sg_geschaefte.raw_data[0].file,
             form.sg_geschaefte.data['mimetype'],
             form.sg_gemeinden.raw_data[0].file,
@@ -181,7 +181,7 @@ def view_upload_wabsti_majorz(self, request):
             continue
 
         errors[election.id] = import_election_wabstic_majorz(
-            election, self, item.district, item.number,
+            election, self, item.number, item.district,
             form.wm_wahl.raw_data[0].file,
             form.wm_wahl.data['mimetype'],
             form.wmstatic_gemeinden.raw_data[0].file,
@@ -278,7 +278,7 @@ def view_upload_wabsti_proporz(self, request):
             continue
 
         errors[election.id] = import_election_wabstic_proporz(
-            election, self, item.district, item.number,
+            election, self, item.number, item.district,
             form.wp_wahl.raw_data[0].file,
             form.wp_wahl.data['mimetype'],
             form.wpstatic_gemeinden.raw_data[0].file,

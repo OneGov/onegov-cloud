@@ -41,7 +41,7 @@ def test_import_wabstic_proporz(session, tar_file):
         wp_wahl = f.extractfile(f.next()).read()
 
     errors = import_election_wabstic_proporz(
-        election, principal, '1', '1',
+        election, principal, '1', None,
         BytesIO(wp_wahl), 'text/plain',
         BytesIO(wpstatic_gemeinden), 'text/plain',
         BytesIO(wp_gemeinden), 'text/plain',
@@ -172,15 +172,15 @@ def test_import_wabstic_proporz_missing_headers(session):
             ))
         ).encode('utf-8')), 'text/plain'
     )
-    assert [(e.filename, e.error.interpolate()) for e in errors] == [
-        ('wp_wahl', "Missing columns: 'sortgeschaeft'"),
-        ('wpstatic_gemeinden', "Missing columns: 'sortgeschaeft'"),
+    assert sorted([(e.filename, e.error.interpolate()) for e in errors]) == [
         ('wp_gemeinden', "Missing columns: 'sortgemeinde'"),
+        ('wp_kandidaten', "Missing columns: 'sortgeschaeft'"),
+        ('wp_kandidatengde', "Missing columns: 'sortgemeinde'"),
         ('wp_listen', "Missing columns: 'sortgeschaeft'"),
         ('wp_listengde', "Missing columns: 'sortgemeinde'"),
+        ('wp_wahl', "Missing columns: 'sortgeschaeft'"),
+        ('wpstatic_gemeinden', "Missing columns: 'sortgeschaeft'"),
         ('wpstatic_kandidaten', "Missing columns: 'sortgeschaeft'"),
-        ('wp_kandidaten', "Missing columns: 'sortgeschaeft'"),
-        ('wp_kandidatengde', "Missing columns: 'sortgemeinde'")
     ]
 
 
@@ -227,6 +227,13 @@ def test_import_wabstic_proporz_invalid_values(session):
                     '200',  # SortGemeindeSub
                     '',  # Stimmberechtigte
                 )),
+                ','.join((
+                    '0',
+                    '0',
+                    '3215',  # SortGemeinde
+                    '200',  # SortGemeindeSub
+                    '10',  # Stimmberechtigte
+                )),
             ))
         ).encode('utf-8')), 'text/plain',
         BytesIO((
@@ -242,7 +249,7 @@ def test_import_wabstic_proporz_invalid_values(session):
                     'AnzWZAmtLeer',
                 )),
                 ','.join((
-                    '100',  # SortGemeinde
+                    '3215',  # SortGemeinde
                     '200',  # SortGemeindeSub
                     'xxx',  # Stimmberechtigte
                     'xxx',  # Sperrung
@@ -340,7 +347,6 @@ def test_import_wabstic_proporz_invalid_values(session):
     assert sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
     ]) == [
-        ('wp_gemeinden', 2, '100 is unknown'),
         ('wp_gemeinden', 2, 'Invalid entity values'),
         ('wp_gemeinden', 2, 'Invalid entity values'),
         ('wp_gemeinden', 2, 'Invalid entity values'),
