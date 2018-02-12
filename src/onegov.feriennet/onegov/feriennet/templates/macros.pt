@@ -239,25 +239,11 @@
                 tal:content="organiser.data.organisation">
             </li>
             <li class="organiser-name"
-                tal:condition="organiser.realname|nothing"
+                tal:condition="organiser.realname.strip()|nothing"
                 tal:content="organiser.realname">
             </li>
-            <li class="organiser-address"
-                tal:condition="organiser.data.address|organiser.data.zip_code|organiser.data.place|nothing">
-                <span class="newlines" tal:condition="organiser.data.address|nothing">${organiser.data.address}</span>
-                <div tal:condition="organiser.data.zip_code|organiser.data.place|nothing">
-                    <span tal:condition="organiser.data.zip_code|nothing">${organiser.data.zip_code}</span>
-                    <span tal:condition="organiser.data.place|nothing">${organiser.data.place}</span>
-                </div>
-            </li>
-            <li class="organiser-email" tal:define="email organiser.data.email or organiser.username|organiser.username">
-                <a href="mailto:${email}">${email}</a>
-            </li>
-            <li class="organiser-phone" tal:condition="organiser.data.phone|nothing">
-                <a href="tel:${organiser.data.phone}">${organiser.data.phone}</a>
-            </li>
             <li class="organiser-website" tal:condition="organiser.data.website|nothing">
-                <a href="${organiser.data.website}">${organiser.data.website.replace('http://', '').replace('https://', '')}</a>
+                <a href="${organiser.data.website}">${organiser.data.website.replace('http://', '').replace('https://', '').rstrip('/')}</a>
             </li>
         </ul>
     </div>

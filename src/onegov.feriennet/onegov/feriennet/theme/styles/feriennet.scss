@@ -460,6 +460,10 @@ ul.tags {
     Organiser contact
 */
 .organiser {
+    a {
+        font-size: 1rem !important;
+    }
+
     a::before {
         width: 2ex;
     }
@@ -471,36 +475,6 @@ ul.tags {
 
     .organiser-name:first-child {
         font-weight: bold;
-    }
-
-    .organiser-email {
-        margin-top: .5rem;
-
-        a::before {
-            @include icon('\f0e0');
-        }
-    }
-
-    .organiser-phone a::before {
-        @include icon('\f095');
-    }
-
-    .organiser-website a::before {
-        @include icon('\f0c1');
-    }
-
-    .organiser-phone,
-    .organiser-email,
-    .organiser-website {
-        font-size: .875rem;
-    }
-
-    .organiser-phone a::before,
-    .organiser-email a::before,
-    .organiser-website a::before {
-        color: $body-font-color;
-        display: inline-block;
-        margin-right: 1ex;
     }
 }
 

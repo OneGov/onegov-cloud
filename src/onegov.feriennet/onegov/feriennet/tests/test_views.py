@@ -507,15 +507,16 @@ def test_organiser_info(feriennet_app):
 
     transaction.commit()
 
-    # by default the email address of the owner is shown
-    assert 'editor@example.org' in admin.get('/activity/play-with-legos')
-    assert 'admin@example.org' in editor.get('/activity/play-with-playmobil')
+    # by default no information is shown
+    for id in ('play-with-legos', 'play-with-playmobil'):
+        assert not editor.get(f'/activity/{id}').pyquery('.organiser li')
+        assert not admin.get(f'/activity/{id}').pyquery('.organiser li')
 
-    # only the owner gets the change contact link
+    # owners only see kontakt change links for their own
     assert "Kontakt ändern" in editor.get('/activity/play-with-legos')
     assert "Kontakt ändern" not in editor.get('/activity/play-with-playmobil')
 
-    # admins get the change contact link as well
+    # admins see it for everyone
     assert "Kontakt ändern" in admin.get('/activity/play-with-legos')
     assert "Kontakt ändern" in admin.get('/activity/play-with-playmobil')
 
@@ -538,11 +539,11 @@ def test_organiser_info(feriennet_app):
 
     assert "Editors Association" in activity
     assert "Ed\u00A0Itor" in activity
-    assert "Washington" in activity
-    assert "20001" in activity
-    assert "K Street" in activity
-    assert "editors-association@example.org" in activity
-    assert "+41 23 456 789" in activity
+    assert "Washington" not in activity
+    assert "20001" not in activity
+    assert "K Street" not in activity
+    assert "editors-association@example.org" not in activity
+    assert "+41 23 456 789" not in activity
     assert "https://www.example.org" in activity
 
     # admin changes are reflected on the activity

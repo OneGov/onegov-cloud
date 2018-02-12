@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Shows fewer details about oragnisers.
+  [href]
+
 1.3.17 (2018-02-06)
 ~~~~~~~~~~~~~~~~~~~
 
