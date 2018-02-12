@@ -1,5 +1,6 @@
 from morepath import redirect
-from onegov.ballot import Vote, VoteCollection
+from onegov.ballot import Vote
+from onegov.ballot import VoteCollection
 from onegov.core.utils import groupbylist
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp

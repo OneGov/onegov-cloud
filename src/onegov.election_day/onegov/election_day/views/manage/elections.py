@@ -1,5 +1,7 @@
 from morepath import redirect
-from onegov.ballot import Election, ElectionCollection
+from onegov.ballot import Election
+from onegov.ballot import ElectionCollection
+from onegov.core.utils import groupbylist
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
@@ -19,7 +21,7 @@ def view_elections(self, request):
     return {
         'layout': ManageElectionsLayout(self, request),
         'title': _("Elections"),
-        'elections': self.batch,
+        'groups': groupbylist(self.batch, key=lambda election: election.date),
         'new_election': request.link(self, 'new-election')
     }
 
