@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Only shows weeks with existing occasions in the filter view.
+  [href]
+
 - Shows fewer details about oragnisers.
   [href]
 

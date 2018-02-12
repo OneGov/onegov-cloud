@@ -354,9 +354,9 @@ def test_activity_filter_tags(feriennet_app):
     assert "Learn How to Program" not in page
     assert "Learn How to Dance" in page
 
-    # anyone can filter by week
-    page = editor.get('/activities').click('04.01.2016 - 10.01.2016', index=0)
-    assert "Keine Angebote" in page
+    # anyone can filter by week, only weeks with activites are shown
+    assert "04.01.2016 - 10.01.2016" not in page
+    assert "01.01.2016 - 03.01.2016" in page
 
     page = editor.get('/activities').click('01.01.2016 - 03.01.2016', index=0)
     assert "Learn How to Cook" in page

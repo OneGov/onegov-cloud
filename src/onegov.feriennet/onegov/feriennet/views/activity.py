@@ -1,5 +1,3 @@
-import sedate
-
 from datetime import date
 from itertools import groupby
 from onegov.activity import Booking
@@ -133,10 +131,7 @@ def view_activities(self, request):
                     active=daterange in self.dateranges,
                     url=request.link(self.for_filter(daterange=daterange))
                 ) for nth, daterange in enumerate(
-                    sedate.weekrange(
-                        active_period.execution_start,
-                        active_period.execution_end
-                    ),
+                    self.available_weeks(active_period),
                     start=1
                 )
             )
