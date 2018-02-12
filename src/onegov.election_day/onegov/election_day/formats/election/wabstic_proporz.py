@@ -495,14 +495,13 @@ def import_election_wabstic_proporz(
     for line in wp_kandidatengde.lines:
         line_errors = []
 
-        # Why is there no Sort Geschaeft?
-        # if not line_is_relevant(line, number):
-        #     continue
-
         try:
             entity_id = get_entity_id(line, entities)
             candidate_id = get_candidate_id(line)
-            assert candidate_id in added_candidates
+            if candidate_id not in added_candidates:
+                # There is there no Sort Geschaeft, we can not check if the
+                # line_is_relevant
+                continue
             votes = int(line.stimmen)
         except (ValueError, AssertionError):
             line_errors.append(_("Invalid candidate results"))
