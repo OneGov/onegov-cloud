@@ -341,3 +341,22 @@ class ActivityCollection(Pagination):
 
         self.session.delete(activity)
         self.session.flush()
+
+    def available_weeks(self, period):
+        if not period:
+            return
+
+        weeknumbers = {n[0] for n in self.session.execute(text("""
+            SELECT DISTINCT
+                EXTRACT(week FROM start::date)
+            FROM OCCASION_DATES
+                LEFT JOIN occasions
+                ON occasion_id = occasions.id
+            WHERE period_id = :period_id
+        """), {'period_id': period.id})}
+
+        weeks = sedate.weekrange(period.execution_start, period.execution_end)
+
+        for start, end in weeks:
+            if sedate.weeknumber(start) in weeknumbers:
+                yield start, end
