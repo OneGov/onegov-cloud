@@ -87,7 +87,7 @@ class FeriennetApp(OrgApp):
             id=id,
             src=winner.url_for(request, winner.banners[id]['src']),
             url=winner.banners[id]['url'],
-            tracker=winner.banners[id].get('tracker')
+            tracker=winner.banners[id].get('tracker', '')
         )
 
     def configure_organisation(self, **cfg):
