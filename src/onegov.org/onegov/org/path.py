@@ -191,11 +191,13 @@ def get_editor(app, action, trait, page_id=0):
 
     page = PageCollection(app.session()).by_id(page_id)
 
+    if not page:
+        return None
+
     if not page.is_supported_trait(trait):
         return None
 
-    if page is not None:
-        return Editor(action=action, page=page, trait=trait)
+    return Editor(action=action, page=page, trait=trait)
 
 
 @OrgApp.path(model=PersonCollection, path='/people')

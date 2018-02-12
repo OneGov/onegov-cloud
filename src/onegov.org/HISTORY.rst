@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes unknown page id in editor leading to an exception.
+  [href]
+
 0.22.1 (2018-02-09)
 ~~~~~~~~~~~~~~~~~~~
 
