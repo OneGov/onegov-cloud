@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.6.1 (2018-02-12)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds an available_weeks function to the actiity collection.
   [href]
