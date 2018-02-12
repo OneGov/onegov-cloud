@@ -1694,3 +1694,19 @@ def test_selectable_sql_query(session):
     assert columns == [('grolist', ), ('grosysid', )]
     assert columns[0].column_name == 'grolist'
     assert columns[1].column_name == 'grosysid'
+
+
+def test_selectable_sql_query_with_array(session):
+    stmt = as_selectable("""
+        SELECT
+            table_name AS table,                    -- Text
+            array_agg(column_name::text) AS columns -- ARRAY(Text)
+        FROM information_schema.columns
+        GROUP BY "table"
+    """)
+
+    query = session.execute(select((stmt.c.table, stmt.c.columns)))
+    table = next(query, None)
+
+    assert isinstance(table.columns, list)
+    assert len(table.columns) > 0

@@ -1,10 +1,14 @@
 import os
 import psqlparse
+import re
 
 from onegov.core.orm import types as onegov_types
 from sqlalchemy import text
 from sqlalchemy import types as sqlalchemy_types
 from uuid import uuid4
+
+
+NESTED_TYPE = re.compile(r'(\w+)\((\w+)\)')
 
 
 def as_selectable(query, alias=None):
@@ -40,10 +44,9 @@ def as_selectable(query, alias=None):
 
     # find the columns and use the comment to load types
     columns = {
-        column: (
-            getattr(onegov_types, comment, None) or
-            getattr(sqlalchemy_types, comment)
-        ) for column, comment in column_names_with_comments(statement, query)
+        column: type_by_string(comment)
+        for column, comment
+        in column_names_with_comments(statement, query)
     }
 
     # an alias is required to reuse this query later
@@ -51,6 +54,17 @@ def as_selectable(query, alias=None):
 
     # turn the query into a selectable
     return text(query).columns(**columns).alias(alias)
+
+
+def type_by_string(expression):
+    nested = NESTED_TYPE.match(expression)
+
+    if nested:
+        name, nested = nested.groups()
+        return type_by_string(name)(type_by_string(nested))
+
+    return getattr(onegov_types, expression, None) \
+        or getattr(sqlalchemy_types, expression)
 
 
 def as_selectable_from_path(path):

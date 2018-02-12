@@ -1,7 +1,15 @@
 Changelog
 ---------
+
+- Adds support for arrays in selectable statements.
+  [href]
+
 0.60.2 (2018-02-12)
 ~~~~~~~~~~~~~~~~~~~
+
+- Hides psycopg2 warning.
+  [href]
+
 0.60.1 (2018-02-07)
 ~~~~~~~~~~~~~~~~~~~
 
