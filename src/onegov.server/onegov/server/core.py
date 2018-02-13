@@ -167,7 +167,7 @@ class Server(object):
             return self.handle_request(environ, start_response)
         except Exception:
             if self.exception_hook:
-                self.exception_hook()
+                self.exception_hook(environ)
 
             if self.post_mortem:
                 import pdb; pdb.post_mortem()  # noqa

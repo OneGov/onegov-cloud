@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Passes the environ to the exception handler.
+  [href]
+
 0.6.0 (2018-02-07)
 ~~~~~~~~~~~~~~~~~~~
 
