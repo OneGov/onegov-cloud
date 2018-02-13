@@ -82,7 +82,7 @@ $(document).on('show-alert', function(_, data) {
     showAlertMessage(data.message, data.type, data.target);
 });
 
-$('button[data-toggle]').toggleButton();
+$('[data-toggle]').toggleButton();
 
 // handle intercooler errors generically
 $(document).ajaxError(function(_e, xhr, _settings, error) {

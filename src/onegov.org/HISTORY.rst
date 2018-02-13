@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to use the toggle button script for any element.
+  [href]
+
 - Fixes unknown page id in editor leading to an exception.
   [href]
 
