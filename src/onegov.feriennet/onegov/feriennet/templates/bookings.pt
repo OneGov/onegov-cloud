@@ -1,9 +1,9 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.feriennet">
-    <tal:block metal:fill-slot="title">
+    <tal:b metal:fill-slot="title">
         ${title}
-    </tal:block>
-    <tal:block metal:fill-slot="content">
-        <tal:block condition="show_emergency_info">
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <tal:b condition="show_emergency_info">
             <div class="emergency-contact-missing emergency-contact" tal:condition="not:has_emergency_contact">
                 <div i18n:translate>
                     You haven't added an emergency contact to your profile yet.
@@ -20,7 +20,7 @@
                 </div>
                 <a i18n:translate href="${request.return_here(request.link(request.app.org, 'userprofile'))}">Change in Userprofile</a>
             </div>
-        </tal:block>
+        </tal:b>
 
         <div tal:condition="not:period" i18n:translate>
             No bookings yet.
@@ -38,7 +38,7 @@
                 <div class="columns small-12 medium-8">
                     <div class="callout panel">
                         <div class="hints">
-                            <tal:block metal:use-macro="layout.macros.period_hints" />
+                            <tal:b metal:use-macro="layout.macros.period_hints" />
 
                             <div class="hint hint-favorites" tal:condition="period.wishlist_phase" i18n:translate>
                                 Mark up to three occasions per child as favorites.
@@ -81,12 +81,12 @@
                                 <div class="booking-limit">
                                     <span i18n:translate tal:condition="period.all_inclusive and period.max_bookings_per_attendee">
                                         Limited to
-                                            <tal:block i18n:name="number">${period.max_bookings_per_attendee}</tal:block>
+                                            <tal:b i18n:name="number">${period.max_bookings_per_attendee}</tal:b>
                                         bookings
                                     </span>
                                     <a i18n:translate tal:condition="not period.all_inclusive and attendee.limit" href="${request.link(attendee, 'limit')}">
                                         Limited to
-                                            <tal:block i18n:name="number">${attendee.limit or 100}</tal:block>
+                                            <tal:b i18n:name="number">${attendee.limit or 100}</tal:b>
                                         bookings
                                     </a>
                                     <span i18n:translate tal:condition="period.all_inclusive and not period.max_bookings_per_attendee">
@@ -102,7 +102,7 @@
                                         <div class="row ${booking.occasion.operable and 'operable' or 'non-operable'} collapse">
                                             <div class="columns small-1 text-center">
                                                 <a ic-post-to="${request.link(booking, 'toggle-star')}">
-                                                    <tal:block metal:use-macro="layout.macros['star']" />
+                                                    <tal:b metal:use-macro="layout.macros['star']" />
                                                 </a>
                                             </div>
                                             <div class="columns small-11">
@@ -118,16 +118,16 @@
                                                 </div>
                                                 <div class="cost">
                                                     <span class="${period.confirmed and booking.state != 'accepted' and 'strikethrough' or ''}" tal:define="cost booking_cost(booking)">
-                                                        <tal:block condition="cost">
+                                                        <tal:b condition="cost">
                                                             ${cost}
-                                                        </tal:block>
-                                                        <tal:block condition="not:cost" i18n:translate>
+                                                        </tal:b>
+                                                        <tal:b condition="not:cost" i18n:translate>
                                                             Free of charge
-                                                        </tal:block>
+                                                        </tal:b>
                                                     </span>
                                                 </div>
                                                 <div>
-                                                    <tal:block metal:use-macro="layout.macros.booking_state" define="state booking.period_bound_booking_state(period)" />
+                                                    <tal:b metal:use-macro="layout.macros.booking_state" define="state booking.period_bound_booking_state(period)" />
 
                                                     <span class="operability-warning" tal:condition="booking.state == 'accepted' and not period.wishlist_phase and not booking.occasion.operable" i18n:translate>
                                                         This occasion does not have enough attendees yet.
@@ -137,6 +137,56 @@
                                                     <ul tal:condition="actions">
                                                         <li tal:repeat="action actions" tal:content="structure action(request)" />
                                                     </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row collapse" tal:condition="related">
+                                            <div class="columns small-12">
+                                                <div class="attendees" tal:define="count related[booking.occasion_id][0].attendee_count">
+                                                    <div class="attendees-table" id="attendees-table-${booking.id}" style="display: none;">
+                                                        <table>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th i18n:translate>Parent</th>
+                                                                    <th i18n:translate>Children</th>
+                                                                    <th i18n:translate>Place</th>
+                                                                    <th i18n:translate>Contact</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr tal:repeat="row related[booking.occasion_id]">
+                                                                    <td>${row.parent}</td>
+                                                                    <td>
+                                                                        <span class="show-for-sr">
+                                                                            ${row.children} <tal:b i18n:translate>Children</tal:b>
+                                                                        </span>
+                                                                        <tal:b repeat="n tuple(range(0, row.children))">
+                                                                            <i class="fa fa-child" aria-hidden="true"></i>
+                                                                        </tal:b>
+                                                                    </td>
+                                                                    <td>${row.place}</td>
+                                                                    <td>
+                                                                        <a href="mailto:${row.email}" tal:condition="row.email" title="${row.email}">
+                                                                            <span class="show-for-sr" i18n:translate>
+                                                                                E-Mail <tal:b i18n:name="name">${row.parent}</tal:b>
+                                                                            </span>
+                                                                            <i class="fa fa-envelope" aria-hidden="true"></i>
+                                                                        </a>
+
+                                                                        <a href="tel:${row.phone}" tal:condition="row.phone" title="${row.phone}">
+                                                                            <span class="show-for-sr" i18n:translate>
+                                                                                Call <tal:b i18n:name="name">${row.parent}</tal:b>
+                                                                            </span>
+                                                                            <i class="fa fa-phone" aria-hidden="true"></i>
+                                                                        </a>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <div class="attendees-toggle" data-toggle="#attendees-table-${booking.id}">
+                                                        <div><span>${count}</span> <span i18n:translate>Attendees</span></div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -168,10 +218,10 @@
                     </div>
                 </div>
                 <div class="columns small-12 medium-4">
-                    <tal:block metal:use-macro="layout.macros.periods" />
-                    <tal:block metal:use-macro="layout.macros.users" />
+                    <tal:b metal:use-macro="layout.macros.periods" />
+                    <tal:b metal:use-macro="layout.macros.users" />
                 </div>
             </div>
         </div>
-    </tal:block>
+    </tal:b>
 </div>

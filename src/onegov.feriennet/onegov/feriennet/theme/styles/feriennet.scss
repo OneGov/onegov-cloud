@@ -133,6 +133,7 @@ ul.single-line {
     margin-bottom: 0;
 }
 
+.field-show_related_contacts,
 .field-show_political_municipality {
     padding-bottom: 1rem;
 }
@@ -2035,6 +2036,69 @@ ul.tags {
         &::before {
             @include icon('\f09d');
             margin-right: 1ex;
+        }
+    }
+}
+
+/*
+    Attendee Details in Bookings View
+*/
+.attendees-toggle {
+    align-items: center;
+    border-top: 1px dashed $gainsboro;
+    display: flex;
+    justify-content: center;
+    margin-bottom: -.875rem;
+    margin-top: 1rem;
+    padding-left: grid-calc(1, $total-columns);
+
+    > div {
+        background: $white;
+        border: 1px dashed #aaa;
+        border-radius: 50px;
+        font-size: .875rem;
+        padding: 0 12px;
+        position: relative;
+        top: -.8rem;
+    }
+
+    :hover,
+    &.toggled {
+        color: $anchor-font-color;
+        cursor: pointer;
+    }
+
+    span:first-child::before {
+        @include icon('\f13a');
+        margin-right: .75ex;
+    }
+
+    &.toggled span:first-child::before {
+        content: '\f139';
+    }
+}
+
+.attendees-table {
+    $column-width: grid-calc(1, $total-columns);
+
+    font-size: .8rem;
+    margin-left: $column-width;
+    margin-right: $column-gutter / 2;
+    padding: .75rem 0 1rem;
+    width: calc(100% - #{$column-width} - #{$column-gutter / 2});
+
+    table {
+        margin: 0;
+        width: 100%;
+
+        tbody {
+            td:first-child {
+                width: 40%;
+            }
+
+            td:last-child .fa {
+                margin-right: 1ex;
+            }
         }
     }
 }

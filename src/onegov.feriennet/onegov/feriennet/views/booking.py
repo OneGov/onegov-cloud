@@ -1,5 +1,6 @@
 import morepath
 
+from collections import defaultdict
 from decimal import Decimal
 from itertools import groupby
 from onegov.activity import Activity, AttendeeCollection
@@ -7,18 +8,23 @@ from onegov.activity import Booking
 from onegov.activity import BookingCollection
 from onegov.activity import Occasion
 from onegov.core.custom import json
+from onegov.core.orm import as_selectable_from_path
 from onegov.core.security import Personal, Secret
 from onegov.core.templates import render_macro
-from onegov.core.utils import normalize_for_url
+from onegov.core.utils import normalize_for_url, module_path
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.layout import BookingCollectionLayout
 from onegov.feriennet.views.shared import all_users
 from onegov.org.elements import ConfirmLink, DeleteLink
+from sqlalchemy import select
 from sqlalchemy.orm import contains_eager
 from uuid import UUID
 
 
 DELETABLE_STATES = ('open', 'cancelled', 'denied', 'blocked')
+
+RELATED_ATTENDEES = as_selectable_from_path(
+    module_path('onegov.feriennet', 'queries/related_attendees.sql'))
 
 
 def all_bookings(collection):
@@ -69,6 +75,23 @@ def total_by_bookings(period, bookings):
         total += period.booking_cost
 
     return total
+
+
+def related_attendees(session, occasion_ids):
+    stmt = RELATED_ATTENDEES
+
+    related = session.execute(
+        select(stmt.c).where(
+            stmt.c.occasion_id.in_(occasion_ids)
+        )
+    )
+
+    result = defaultdict(list)
+
+    for r in related:
+        result[r.occasion_id].append(r)
+
+    return result
 
 
 def attendees_by_username(request, username):
@@ -153,6 +176,13 @@ def view_my_bookings(self, request):
     periods = request.app.periods
     period = next((p for p in periods if p.id == self.period_id), None)
 
+    if period.confirmed and request.app.org.meta.get('show_related_contacts'):
+        related = related_attendees(self.session, occasion_ids={
+            b.occasion_id for b in bookings
+        })
+    else:
+        related = None
+
     if request.is_admin:
         users = all_users(request)
         user = next(u for u in users if u.username == self.username)
@@ -186,6 +216,7 @@ def view_my_bookings(self, request):
         'model': self,
         'period': period,
         'periods': periods,
+        'related': related,
         'user': user,
         'users': users,
         'title': layout.title,

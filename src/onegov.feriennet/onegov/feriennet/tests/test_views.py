@@ -1211,6 +1211,15 @@ def test_confirmed_booking_view(feriennet_app):
     assert "Entfernen" in page
     assert "Angenommen" not in page
 
+    # Related contacts are hidden at this point
+    page = client.get('/settings')
+    page.form['show_related_contacts'] = True
+    page.form.submit()
+
+    page = client.get('/my-bookings')
+    assert not page.pyquery('.attendees-toggle')
+    assert "Elternteil" not in page
+
     # When the period is confirmed, the state is shown
     periods.query().one().confirmed = True
     bookings.query().one().state = 'accepted'
@@ -1222,6 +1231,19 @@ def test_confirmed_booking_view(feriennet_app):
     assert "Stornieren" in page
     assert "Entfernen" not in page
     assert "nicht genügend Teilnehmer" not in page
+
+    # Related contacts are now visible
+    assert page.pyquery('.attendees-toggle').text() == '1 Teilnehmer'
+    assert "Elternteil" in page
+
+    # Unless that option was disabled
+    page = client.get('/settings')
+    page.form['show_related_contacts'] = False
+    page.form.submit()
+
+    page = client.get('/my-bookings')
+    assert not page.pyquery('.attendees-toggle')
+    assert "Elternteil" not in page
 
     # Other states are shown too
     states = [

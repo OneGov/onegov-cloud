@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-01-22 09:39+0100\n"
+"POT-Creation-Date: 2018-02-14 11:07+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -48,8 +48,8 @@ msgid "Bookings"
 msgstr "Réservations"
 
 #, python-format
-msgid "Delete \"${text}\" (${count} entries)"
-msgstr "Supprimer « ${text} » (${count} entrées)"
+msgid "Delete \"${text}\""
+msgstr "Supprimer « ${text} »"
 
 msgid "Homepage"
 msgstr "Page d'accueil"
@@ -1600,6 +1600,21 @@ msgstr "Réservations illimitées"
 msgid "This occasion does not have enough attendees yet."
 msgstr "Cet événement n'a pas encore assez de participants."
 
+msgid "Parent"
+msgstr "Parent"
+
+msgid "Children"
+msgstr "Enfants"
+
+msgid "Contact"
+msgstr "Contact"
+
+msgid "E-Mail ${name}"
+msgstr "Courriel ${name}"
+
+msgid "Call ${name}"
+msgstr "Appeler ${name}"
+
 msgid "Passport"
 msgstr "Passeport"
 
@@ -1973,6 +1988,10 @@ msgstr "Limite de réservation de ${name}"
 msgid "Require the political municipality in the userprofile"
 msgstr "Commune politique requise dans le profil de l'utilisateur"
 
+msgid "Parents can see the contacts of other parents in the same activity"
+msgstr ""
+"Les parents peuvent voir les contacts d'autres parents pour la même activité"
+
 msgid "Mailing"
 msgstr "Envoi"
 
@@ -2065,6 +2084,9 @@ msgstr "Voulez-vous vraiment supprimer la réservation de ${attendee} ?"
 #, python-format
 msgid "Do you really want to cancel ${attendee}'s booking?"
 msgstr "Voulez-vous vraiment annuler la réservation de ${attendee} ?"
+
+#~ msgid "Delete \"${text}\" (${count} entries)"
+#~ msgstr "Supprimer « ${text} » (${count} entrées)"
 
 #~ msgid "Extra Features"
 #~ msgstr "Paramètres supplémentaires"

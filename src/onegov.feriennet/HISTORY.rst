@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Optionally shows contact details of other parents for the same activity.
+  [href]
+
 - Only shows weeks with existing occasions in the filter view.
   [href]
 
