@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.11.7 (2018-02-14)
+~~~~~~~~~~~~~~~~~~~
 
 - Makes the author name a multi line text field.
   [msom]
