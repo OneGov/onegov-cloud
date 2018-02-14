@@ -36,6 +36,12 @@
                     </div>
                     <div class="small-12 medium-5 columns">
                         <dl>
+                            <tal:block>
+                                <dt i18n:translate>Print only</dt>
+                                <dd i18n:translate tal:condition="notice.print_only">Yes</dd>
+                                <dd i18n:translate tal:condition="not: notice.print_only">No</dd>
+                            </tal:block>
+
                             <dt i18n:translate>State</dt>
                             <dd i18n:translate>${notice.state}</dd>
 
@@ -47,8 +53,6 @@
 
                             <dt i18n:translate>Category</dt>
                             <dd>${notice.category}</dd>
-
-                            <dt i18n:translate tal:condition="notice.print_only and publisher">Print only</dt>
 
                             <dt i18n:translate>Liable to pay costs</dt>
                             <dd tal:condition="notice.at_cost" i18n:translate>Yes</dd>

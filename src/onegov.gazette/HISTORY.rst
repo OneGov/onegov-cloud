@@ -7,6 +7,9 @@ Changelog
 - Adds some help texts to the notice form.
   [msom]
 
+- Changes layout of print only and at cost options.
+  [msom]
+
 1.11.6 (2018-02-07)
 ~~~~~~~~~~~~~~~~~~~
 
