@@ -163,7 +163,7 @@ def edit_notice(self, request, form):
             'title': self.title,
             'subtitle': _("Edit Official Notice"),
             'callout': _(
-                'Accepted official notices may not be edited.'
+                "Accepted official notices may not be edited."
             ),
             'show_form': False
         }
@@ -214,6 +214,9 @@ def edit_notice(self, request, form):
         'form': form,
         'title': self.title,
         'subtitle': _("Edit Official Notice"),
+        'helptext': _(
+            "The fields marked with an asterisk * are mandatory fields."
+        ),
         'button_text': _("Save"),
         'cancel': request.link(self),
         'current_issue': layout.current_issue
@@ -262,6 +265,9 @@ def edit_notice_unrestricted(self, request, form):
         'form': form,
         'title': self.title,
         'subtitle': _("Edit Official Notice"),
+        'helptext': _(
+            "The fields marked with an asterisk * are mandatory fields."
+        ),
         'button_text': _("Save"),
         'cancel': request.link(self)
     }

@@ -65,6 +65,9 @@ def create_notice(self, request, form):
         'layout': layout,
         'form': form,
         'title': _("New Official Notice"),
+        'helptext': _(
+            "The fields marked with an asterisk * are mandatory fields."
+        ),
         'button_text': _("Save"),
         'cancel': layout.dashboard_or_notices_link,
         'current_issue': layout.current_issue
