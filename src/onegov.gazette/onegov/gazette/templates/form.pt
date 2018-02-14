@@ -16,6 +16,7 @@
                     <tal:block tal:condition="not:form.error_message|nothing" i18n:translate>The form contains errors. Please check the fields marked in red.</tal:block>
                     <tal:block tal:condition="form.error_message|nothing" i18n:translate>${form.error_message}</tal:block>
                 </div>
+                <p i18n:translate>The fields marked with an asterisk * are mandatory fields. </p>
                 <div metal:use-macro="layout.macros['form']" />
             </div>
         </div>

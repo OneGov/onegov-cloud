@@ -96,7 +96,7 @@ class NoticeForm(Form):
     )
 
     author_date = DateField(
-        label=_("Date"),
+        label=_("Date (usually the date of the issue)"),
         validators=[
             InputRequired()
         ]

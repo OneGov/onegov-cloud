@@ -4,6 +4,9 @@ Changelog
 - Makes the author name a multi line text field.
   [msom]
 
+- Adds some help texts to the notice form.
+  [msom]
+
 1.11.6 (2018-02-07)
 ~~~~~~~~~~~~~~~~~~~
 

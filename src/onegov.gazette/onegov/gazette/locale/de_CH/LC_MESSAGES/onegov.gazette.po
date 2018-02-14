@@ -142,6 +142,9 @@ msgstr "Text"
 msgid "Place"
 msgstr "Ort"
 
+msgid "Date (usually the date of the issue)"
+msgstr "Datum (entspricht in der Regel dem Ausgabedatum)"
+
 msgid "Author"
 msgstr "Absender"
 
@@ -220,6 +223,9 @@ msgstr "Eingereicht"
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
+
+msgid "The fields marked with an asterisk * are mandatory fields."
+msgstr "Die mit einem Stern * gekennzeichneten Felder sind Pflichtfelder."
 
 msgid "Number of Users"
 msgstr "Anzahl Benutzer"
