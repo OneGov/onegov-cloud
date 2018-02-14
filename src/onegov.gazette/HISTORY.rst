@@ -1,6 +1,10 @@
 Changelog
 ---------
-1.13.6 (2018-02-07)
+
+- Makes the author name a multi line text field.
+  [msom]
+
+1.11.6 (2018-02-07)
 ~~~~~~~~~~~~~~~~~~~
 
 - Adds author fields (name, date, place) to notices.

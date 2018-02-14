@@ -102,11 +102,12 @@ class NoticeForm(Form):
         ]
     )
 
-    author_name = StringField(
+    author_name = TextAreaField(
         label=_("Author"),
         validators=[
             InputRequired()
-        ]
+        ],
+        render_kw={'rows': 4},
     )
 
     @property

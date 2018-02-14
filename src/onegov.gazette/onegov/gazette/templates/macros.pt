@@ -157,7 +157,7 @@
     <tal:block tal:content="structure notice.text"></tal:block>
     <p tal:condition="notice.author_place and notice.author_date">
         ${notice.author_place}, ${layout.format_date(notice.author_date, 'date_long')}<br>
-        ${notice.author_name}
+        <tal:block tal:content="structure layout.format_text(notice.author_name)" />
     </p>
 </metal:notice_text>
 
