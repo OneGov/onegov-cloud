@@ -2,6 +2,7 @@ from freezegun import freeze_time
 from onegov.gazette.tests import accept_notice
 from onegov.gazette.tests import change_category
 from onegov.gazette.tests import change_organization
+from onegov.gazette.tests import edit_notice
 from onegov.gazette.tests import login_users
 from onegov.gazette.tests import reject_notice
 from onegov.gazette.tests import submit_notice
@@ -132,6 +133,8 @@ def test_view_notice_accept(gazette_app):
             manage.form.submit()
             submit_notice(user, 'titel-{}'.format(count + 1))
 
+        edit_notice(publisher, 'titel-1', print_only=True)
+
         # check wrong actions
         submit_notice(publisher, 'titel-1', unable=True)
         submit_notice(publisher, 'titel-2', unable=True)
@@ -179,11 +182,10 @@ def test_view_notice_accept(gazette_app):
         assert message['From'] == 'mails@govikon.ch'
         assert message['To'] == 'printer@onegov.org'
         assert message['Reply-To'] == 'mails@govikon.ch'
-        assert '44  Titel 2' in message['Subject']
+        assert message['Subject'].startswith('44  Titel 2')
         payload = message.get_payload(1).get_payload(decode=True)
         payload = payload.decode('utf-8')
         assert '44  Titel 2' in payload
-        assert "Kostenpflichtig 85% vom Normalpreis" in payload
         assert "Govikon, 1. Januar 2019" in payload
         assert "State Chancellerist" in payload
         assert "someone<br>street<br>place" in payload
@@ -192,7 +194,7 @@ def test_view_notice_accept(gazette_app):
         assert message['From'] == 'mails@govikon.ch'
         assert message['To'] == 'printer@onegov.org'
         assert message['Reply-To'] == 'mails@govikon.ch'
-        assert '44  Titel 1' in message['Subject']
+        assert message['Subject'].startswith('Stopp Internet - 44  Titel 1')
         payload = message.get_payload(1).get_payload(decode=True)
         payload = payload.decode('utf-8')
         assert '44  Titel 1' in payload

@@ -23,22 +23,27 @@ def send_publish_mail(request, notice):
 
     """
 
-    def construct_subject(notice):
+    def construct_subject(notice, request):
         issues = notice.issue_objects
         number = issues[0].number if issues else ''
 
         organization = notice.organization_object
         parent = organization.parent if organization else None
         parent_id = (parent.external_name or '') if parent else ''
+        prefix = ''
+        if notice.print_only:
+            prefix = "{} - ".format(request.translate(_("Print only")))
 
-        return "{} {} {} {}".format(number, parent_id, notice.title, notice.id)
+        return "{}{} {} {} {}".format(
+            prefix, number, parent_id, notice.title, notice.id
+        )
 
     reply_to = (
         request.app.principal.publish_from or
         request.app.mail_sender
     )
 
-    subject = construct_subject(notice)
+    subject = construct_subject(notice, request)
     content = render_template(
         'mail_publish.pt',
         request,
