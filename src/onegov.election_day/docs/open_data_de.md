@@ -13,7 +13,7 @@ Freie Nutzung. Quellenangabe ist Pflicht.
 Einleitung
 ----------
 
-Für jede wichtige Seite gibt es eine enstprechende JSON-Alternative. Alle Responses enthalten den `Last-Modified` HTTP Header, welcher Auskunft über den Zeitpunkt der letzten Änderung gibt (z.B., wann zum letzten Mal Ergebnisse einer Wahl oder Abstimmung hochgeladen wurden).
+Für jede wichtige Seite gibt es eine entsprechende JSON-Alternative. Alle Antworten enthalten den `Last-Modified` HTTP-Header, welcher Auskunft über den Zeitpunkt der letzten Änderung gibt (z. B., wann zum letzten Mal Ergebnisse einer Wahl oder Abstimmung hochgeladen wurden).
 
 Eine "Gemeinde" kann auch ein Bezirk, ein Wahlkreis etc. sein.
 
@@ -35,7 +35,7 @@ URL (Wahl): /election/{id}/summary
 URL (Abstimmung): /vote/{id}/summary
 ```
 
-Die auf der Startseite und den Archivseiten dargestellten Ergebnisse sind im JSON Format verfügbar. Die Daten enthalten neben einigen globalen Informationen für jede Wahl / Abstimmung die folgenden Informationen:
+Die auf der Startseite und den Archivseiten dargestellten Ergebnisse sind im JSON-Format verfügbar. Die Daten enthalten neben einigen globalen Informationen für jede Wahl / Abstimmung die folgenden Informationen:
 
 Name|Beschreibung
 ---|---
@@ -44,8 +44,8 @@ Name|Beschreibung
 `date`|Das Datum (ISO 8601).
 `domain`|Einflussbereich (Bund, Kanton, ...).
 `url`|Ein Link zur Detailansicht.
-`completed`|True, falls die Abstimmung oder Wahl abgeschlossen ist.
-`progess`|Ein Objekt welches die Anzahl ausgezählter Gemeinden (`counted`) und die Gesamtzahl an Gemeinden (`total`) enthält.
+`completed`|Wahr, falls die Abstimmung oder Wahl abgeschlossen ist.
+`progress`|Ein Objekt, welches die Anzahl ausgezählter Gemeinden (`counted`) und die Gesamtzahl an Gemeinden (`total`) enthält.
 
 
 Abstimmungsresultate enthalten die folgenden zusätzlichen Informationen:
@@ -74,7 +74,7 @@ Es werden dieselben Daten wie in der normalen Ansicht in einer strukturierten Fo
 URL: /election/{id}/{data-format}
 ```
 
-Die Rohdaten die zur Anzeige der Resultate verwendet werden, sind in den folgenden Formaten verfügbar:
+Die Rohdaten, die zur Anzeige der Resultate verwendet werden, sind in den folgenden Formaten verfügbar:
 
 Format|URL
 ---|---
@@ -86,7 +86,7 @@ Die folgenden Felder sind in allen Formaten enthalten:
 
 Name|Beschreibung
 ---|---
-`election_title_{locale}`|Übersetzter Titel, z.B. `title_de_ch` für den deutschen Titel.
+`election_title_{locale}`|Übersetzter Titel, z. B. `title_de_ch` für den deutschen Titel.
 `election_date`|Das Datum der Wahl (ein ISO 8601 String)
 `election_type`|`proporz` falls Proporzwahl, `majorz` falls Majorzwahl
 `election_mandates`|Die Anzahl der Sitze.
@@ -110,11 +110,11 @@ Name|Beschreibung
 `list_number_of_mandates`|Die Anzahl Sitze der Liste. Nur bei Proporzwahlen.
 `list_votes`|Die Anzahl der Listenstimmen. Nur bei Proporzwahlen.
 `list_connection`|Die ID der Listenverbindung. Nur bei Proporzwahlen.
-`list_connection_parent`|Die ID der übergeorndeten Listenverbidnung. Nur bei Proporzwahlen und falls es sich um eine Unterlistenverbindung handelt.
+`list_connection_parent`|Die ID der übergeordneten Listenverbidnung. Nur bei Proporzwahlen und falls es sich um eine Unterlistenverbindung handelt.
 `candidate_family_name`|Der Nachnahme des Kandidierenden.
 `candidate_first_name`|Der Vorname des Kandidierenden.
 `candidate_id`|Die ID des Kandidierenden.
-`candidate_elected`|True, falls der Kandidierenden gewählt wurde.
+`candidate_elected`|Wahr, falls der Kandidierenden gewählt wurde.
 `candidate_votes`|Die Anzahl Kandidierendenstimmen der Gemeinde.
 `panachage_votes_from_list_XX`|Die Anzahl Stimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
 
@@ -154,7 +154,7 @@ Es werden dieselben Daten wie in der normalen Ansicht in einer strukturierten Fo
 URL: /vote/{id}/{data-format}
 ```
 
-Die Rohdaten die zur Anzeige der Resultate verwendet werden, sind in den folgenden Formaten verfügbar:
+Die Rohdaten, die zur Anzeige der Resultate verwendet werden, sind in den folgenden Formaten verfügbar:
 
 Format|URL
 ---|---
@@ -166,17 +166,17 @@ Die folgenden Felder sind in allen Formaten enthalten:
 
 Name|Beschreibung
 ---|---
-`title_{locale}`|Übersetzter Titel, z.B. `title_de_ch` für den deutschen Titel.
-`date`|Das Datum der Abstimmung (ein ISO 8601 String).
+`title_{locale}`|Übersetzter Titel, z. B. `title_de_ch` für den deutschen Titel.
+`date`|Das Datum der Abstimmung (eine ISO-8601-Zeichenkette).
 `shortcode`|Internes Kürzel (definiert die Reihenfolge von mehreren Abstimmungen an einem Tag).
-`domain`|`federation` für Nationale Abstimmungen, `canton` für Kantonale Abstimmungen
+`domain`|`federation` für nationale Abstimmungen, `canton` für kantonale Abstimmungen
 `status`|Zwischenergebnisse (`interim`), Endergebnisse (`final`) oder unbekannt (`unknown`).
 `type`|`proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag) or `tie-breaker` (Stichfrage).
-`group`|Woher das Resultat kommt. Das kann der Bezirk und die Gemeinde, getrennt mittels eines Schrägstrichs, der Name der Stadt und der Name des Kreises, ebenfalls getrennt mittels eines Schrägstrichts, oder ein einfacher Gemeinde Name sein. All dies hängt vom jeweiligen Kanton ab.
+`group`|Woher das Resultat kommt. Das kann der Bezirk und die Gemeinde, getrennt mittels eines Schrägstrichs, der Name der Stadt und der Name des Kreises, ebenfalls getrennt mittels eines Schrägstrichts, oder ein einfacher Gemeindename sein. All dies hängt vom jeweiligen Kanton ab.
 `entity_id`|Die ID der Gemeinde. Der Wert `0` steht für Auslandschweizer.
 `counted`|Wahr, wenn das Resultat ausgezählt wurde. Falsch, wenn das Resultat noch nicht bekannt ist (die Werte sind noch nicht korrekt).
-`yeas`|Die Anzahl Ja Stimmen
-`nays`|Die Anzahl Nein Stimmen
+`yeas`|Die Anzahl Ja-Stimmen
+`nays`|Die Anzahl Nein-Stimmen
 `invalid`|Die Anzahl ungültiger Stimmen
 `empty`|Die Anzahl leerer Stimmen
 `elegible_voters`|Die Anzahl Stimmberechtigter
