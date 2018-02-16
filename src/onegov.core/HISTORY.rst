@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.61.0 (2018-02-16)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes columns with dots not working as selectable statements.
   [href]
