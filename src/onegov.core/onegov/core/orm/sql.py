@@ -83,7 +83,7 @@ def column_names_with_comments(statement, query):
 
         # ordinary column
         elif 'val' in target and 'ColumnRef' in target['val']:
-            column = target['val']['ColumnRef']['fields'][0]['String']['str']
+            column = target['val']['ColumnRef']['fields'][-1]['String']['str']
 
         else:
             raise NotImplementedError

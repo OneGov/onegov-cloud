@@ -1710,3 +1710,15 @@ def test_selectable_sql_query_with_array(session):
 
     assert isinstance(table.columns, list)
     assert len(table.columns) > 0
+
+
+def test_selectable_sql_query_with_dots(session):
+    stmt = as_selectable("""
+        SELECT
+            column_name,                                     -- Text
+            information_schema.columns.table_name,           -- Text
+            information_schema.columns.column_name as column -- Text
+        FROM information_schema.columns
+    """)
+
+    assert tuple(stmt.c.keys()) == ('column_name', 'table_name', 'column')

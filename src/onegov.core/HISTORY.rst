@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes columns with dots not working as selectable statements.
+  [href]
+
 - Adds support for arrays in selectable statements.
   [href]
 
