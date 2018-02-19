@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.6.2 (2018-02-19)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a subscription token to the attendee.
   [href]
