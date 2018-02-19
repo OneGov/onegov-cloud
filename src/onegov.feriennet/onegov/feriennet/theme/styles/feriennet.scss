@@ -167,6 +167,10 @@ ul.single-line {
     @include generic-icon('\f133');
 }
 
+.calendar-add-icon {
+    @include generic-icon('\f271');
+}
+
 .location-icon {
     @include generic-icon('\f041');
 }
@@ -714,7 +718,7 @@ ul.tags {
 */
 .my-bookings {
 
-    > .print-icon {
+    > .icons {
         margin-top: -5px;
     }
 
@@ -744,7 +748,7 @@ ul.tags {
             margin-bottom: 0;
         }
 
-        .print-icon {
+        .icons {
             position: absolute;
             right: 32px;
             top: 24px;
@@ -1611,7 +1615,7 @@ ul.tags {
     Occassion-Attendee View
 */
 
-.print {
+.icons {
     display: block;
     font-size: .9em;
     margin-bottom: .5rem;

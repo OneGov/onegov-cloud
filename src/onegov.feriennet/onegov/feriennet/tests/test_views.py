@@ -2116,3 +2116,86 @@ def test_online_payment(feriennet_app):
     page = client.get('/payments')
     assert ">Offen<" in page
     assert ">Rückerstattet<" in page
+
+
+def test_icalendar_subscription(feriennet_app):
+    activities = ActivityCollection(feriennet_app.session(), type='vacation')
+    attendees = AttendeeCollection(feriennet_app.session())
+    bookings = BookingCollection(feriennet_app.session())
+    periods = PeriodCollection(feriennet_app.session())
+    occasions = OccasionCollection(feriennet_app.session())
+
+    owner = Bunch(username='admin@example.org')
+
+    prebooking = tuple(d.date() for d in (
+        datetime.now() - timedelta(days=1),
+        datetime.now() + timedelta(days=1)
+    ))
+
+    execution = tuple(d.date() for d in (
+        datetime.now() + timedelta(days=10),
+        datetime.now() + timedelta(days=12)
+    ))
+
+    period = periods.add(
+        title="Ferienpass 2016",
+        prebooking=prebooking,
+        execution=execution,
+        active=True
+    )
+
+    o = occasions.add(
+        start=datetime(2016, 11, 25, 8),
+        end=datetime(2016, 11, 25, 16),
+        note="Children might get wet",
+        age=(0, 10),
+        spots=(0, 10),
+        timezone="Europe/Zurich",
+        activity=activities.add("Fishing", username='admin@example.org'),
+        period=period
+    )
+
+    a = attendees.add(owner, 'Dustin', date(2000, 1, 1), 'female')
+    bookings.add(owner, a, o)
+
+    transaction.commit()
+
+    client = Client(feriennet_app)
+    client.login_admin()
+
+    # When the period is unconfirmed, the events are not shown in the calendar
+    periods.query().one().confirmed = False
+    bookings.query().one().state = 'accepted'
+
+    transaction.commit()
+
+    page = client.get('/my-bookings')
+
+    url = page.pyquery('.calendar-add-icon').attr('href')
+    url = url.replace('webcal', 'http')
+
+    calendar = client.get(url).text
+    assert 'VEVENT' not in calendar
+
+    # Once the period is confirmed, the state has to be accepted as well
+    periods.query().one().confirmed = True
+    bookings.query().one().state = 'open'
+
+    transaction.commit()
+
+    calendar = client.get(url).text
+    assert 'VEVENT' not in calendar
+
+    # Only with a confirmed period and accepted booking are we getting anything
+    periods.query().one().confirmed = True
+    bookings.query().one().state = 'accepted'
+
+    transaction.commit()
+
+    calendar = client.get(url).text
+    assert 'VEVENT' in calendar
+
+    assert 'SUMMARY:Fishing' in calendar
+    assert 'DESCRIPTION:Children might get wet' in calendar
+    assert 'DTSTART;VALUE=DATE-TIME:20161125T070000Z' in calendar
+    assert 'DTEND;VALUE=DATE-TIME:20161125T150000Z' in calendar

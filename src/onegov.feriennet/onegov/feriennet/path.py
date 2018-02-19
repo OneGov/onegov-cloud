@@ -11,6 +11,7 @@ from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.converters import age_range_converter
 from onegov.feriennet.converters import date_range_converter
+from onegov.feriennet.models import Calendar
 from onegov.feriennet.models import InvoiceAction, VacationActivity
 from onegov.feriennet.models import NotificationTemplate
 from uuid import UUID
@@ -241,3 +242,10 @@ def get_notification_template_collection(request, app):
     converters=dict(id=UUID))
 def get_notification_template(request, app, id):
     return NotificationTemplateCollection(app.session()).by_id(id)
+
+
+@FeriennetApp.path(
+    model=Calendar,
+    path='/calendar/{name}/{token}')
+def get_calendar(request, name, token):
+    return Calendar.from_name_and_token(request.app.session(), name, token)

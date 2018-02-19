@@ -14,6 +14,7 @@ from onegov.core.templates import render_macro
 from onegov.core.utils import normalize_for_url, module_path
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.layout import BookingCollectionLayout
+from onegov.feriennet.models import AttendeeCalendar
 from onegov.feriennet.views.shared import all_users
 from onegov.org.elements import ConfirmLink, DeleteLink
 from sqlalchemy import select
@@ -189,6 +190,13 @@ def view_my_bookings(self, request):
     else:
         users, user = None, request.current_user
 
+    def subscribe_link(attendee):
+        url = request.link(AttendeeCalendar(self.session, attendee))
+        url = url.replace('https://', 'webcal://')
+        url = url.replace('http://', 'webcal://')
+
+        return url
+
     def get_total(attendee):
         return total_by_bookings(period, bookings_by_attendee.get(attendee))
 
@@ -207,6 +215,7 @@ def view_my_bookings(self, request):
     return {
         'actions_by_booking': lambda b: actions_by_booking(layout, period, b),
         'attendees': attendees,
+        'subscribe_link': subscribe_link,
         'bookings_by_attendee': bookings_by_attendee.get,
         'attendee_has_bookings': lambda a: a in bookings_by_attendee,
         'total_by_attendee': get_total,

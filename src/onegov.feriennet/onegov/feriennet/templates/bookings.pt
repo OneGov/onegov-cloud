@@ -69,12 +69,17 @@
                             <div class="attendee-bookings">
                                 <h3 class="${attendee.gender == 'male' and 'icon-male' or 'icon-female'}"><a href="${request.link(attendee)}">${attendee.name}</a></h3>
 
-                                <a class="print print-icon before hide-for-print"
-                                    data-print-selector="html" data-print-title="${title}"
-                                    data-print-css="${request.link(model, 'mask') + '&id=' + attendee.id.hex}"
-                                    i18n:translate>
-                                    Print
-                                </a>
+                                <div class="icons">
+                                    <a class="print print-icon before hide-for-print"
+                                        data-print-selector="html" data-print-title="${title}"
+                                        data-print-css="${request.link(model, 'mask') + '&id=' + attendee.id.hex}" title="Print" i18n:attributes="title">
+                                        <span class="show-for-sr" i18n:translate>Print</span>
+                                    </a>
+
+                                    <a href="${subscribe_link(attendee)}" class="calendar-add-icon before hide-for-print" i18n:translate title="Add to calendar" i18n:attributes="title">
+                                        <span class="show-for-sr" i18n:translate>Add to calendar</span>
+                                    </a>
+                                </div>
 
                                 <div id="alert-boxes-for-${attendee.id}"></div>
 

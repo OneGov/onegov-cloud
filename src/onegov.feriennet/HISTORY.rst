@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a subscribable calendar to each attendee.
+  [href]
+
 - Optionally shows contact details of other parents for the same activity.
   [href]
 

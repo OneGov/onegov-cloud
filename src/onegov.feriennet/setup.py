@@ -34,6 +34,7 @@ setup(
     python_requires='>=3.6',
     install_requires=[
         'faker',
+        'icalendar',
         'onegov.activity',
         'onegov.org>=0.20.0',
     ],
