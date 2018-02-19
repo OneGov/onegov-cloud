@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-02-14 11:07+0100\n"
+"POT-Creation-Date: 2018-02-19 16:21+0100\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1572,6 +1572,14 @@ msgstr ""
 "Wir können nicht garantieren dass jedes Kind in sein Lieblingsangebot "
 "eingeteilt wird."
 
+#.
+#. Used in sentence: "<dynamic element>"
+msgid "Add to calendar"
+msgstr ""
+
+msgid "<dynamic element>"
+msgstr ""
+
 msgid "Limited to ${number} bookings"
 msgstr "Limitiert auf ${number} Buchungen"
 
@@ -1967,7 +1975,8 @@ msgid "Require the political municipality in the userprofile"
 msgstr "Verlange die politische Gemeinde im Benutzerprofil"
 
 msgid "Parents can see the contacts of other parents in the same activity"
-msgstr "Eltern können die Kontaktdaten anderer Eltern des gleichen Angebots sehen"
+msgstr ""
+"Eltern können die Kontaktdaten anderer Eltern des gleichen Angebots sehen"
 
 msgid "Mailing"
 msgstr "Versand"
@@ -2016,8 +2025,8 @@ msgstr "Zuteilungen für ${title}"
 msgid "Run Matching"
 msgstr "Zuteilung ausführen"
 
-msgid "The period was successfully reset"
-msgstr "Der Zeitraum wurde erfolgreich zurückgesetzt"
+msgid "The matching was successfully reset"
+msgstr "Die Zuteilung wurde erfolgreich zurückgesetzt"
 
 msgid "The matching was confirmed successfully"
 msgstr "Die Zuteilung wurde erfolgreich abgeschlossen"
@@ -2062,6 +2071,9 @@ msgstr "Möchten Sie ${attendee}s Buchung wirklich löschen?"
 #, python-format
 msgid "Do you really want to cancel ${attendee}'s booking?"
 msgstr "Möchten Sie ${attendee}s Buchung wirklich absagen?"
+
+#~ msgid "The period was successfully reset"
+#~ msgstr "Der Zeitraum wurde erfolgreich zurückgesetzt"
 
 #~ msgid "Remove manual bookings of this kind"
 #~ msgstr "Manuelle Buchungen dieser Art entfernen"

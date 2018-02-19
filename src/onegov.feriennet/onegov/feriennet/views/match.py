@@ -251,4 +251,4 @@ def reset_matching(self, request):
     for booking in bookings.query().filter(Booking.state != 'cancelled'):
         booking.state = 'open'
 
-    request.success(_("The period was successfully reset"))
+    request.success(_("The matching was successfully reset"))
