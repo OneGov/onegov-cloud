@@ -47,7 +47,7 @@ Num|Descripziun
 `domain`|Champ d'influenza (confederaziun, chantun, ...).
 `url`|In link a la vista detagliada.
 `completed`|True, if the vote or election is completed.
-`progess`|In object che cuntegna il dumber da las vischnancas dumbradas ora (`counted`) ed il dumber total da vischnancas (`total`).
+`progress`|In object che cuntegna il dumber da las vischnancas dumbradas ora (`counted`) ed il dumber total da vischnancas (`total`).
 
 Ils resultats da la votaziun cuntegnan las suandantas infurmaziuns supplementaras:
 

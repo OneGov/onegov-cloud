@@ -45,7 +45,7 @@ Nome|Descrizione
 `domain`|Il dominio di influenza (federazione, cantone, ...).
 `url`|Un collegamento alla visualizzazione dettagliata.
 `completed`|True, if the vote or election is completed.
-`progess`|Un oggetto contenente il numero dei comuni già contati (`counted`) e il numero totale di comuni (`total`).
+`progress`|Un oggetto contenente il numero dei comuni già contati (`counted`) e il numero totale di comuni (`total`).
 
 I risultati della votazione contengono le seguenti informazioni aggiuntive:
 

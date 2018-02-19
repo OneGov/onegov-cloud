@@ -732,7 +732,7 @@ Changelog
 - Displays the percentages of intermediate results in the overview, too.
   [msom]
 
-- Fixes displaying the progess of complex votes.
+- Fixes displaying the progress of complex votes.
   [msom]
 
 - Fixes displaing tooltips on iOS.

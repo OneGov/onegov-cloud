@@ -45,7 +45,7 @@ Name|Description
 `domain`|The domain of influence (federation, canton, ...).
 `url`|A link to the detailed view.
 `completed`|True, if the vote or election is completed.
-`progess`|An object containing the number already counted municipalities (`counted`) and the total number of municipalities (`total`).
+`progress`|An object containing the number already counted municipalities (`counted`) and the total number of municipalities (`total`).
 
 Vote results contain the following additional information:
 
