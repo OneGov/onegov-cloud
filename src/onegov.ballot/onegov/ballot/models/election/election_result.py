@@ -38,8 +38,8 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
     #: If the result is definite, all the values below must be specified.
     counted = Column(Boolean, nullable=False)
 
-    #: number of elegible voters
-    elegible_voters = Column(Integer, nullable=False, default=lambda: 0)
+    #: number of eligible voters
+    eligible_voters = Column(Integer, nullable=False, default=lambda: 0)
 
     #: number of received ballots
     received_ballots = Column(Integer, nullable=False, default=lambda: 0)

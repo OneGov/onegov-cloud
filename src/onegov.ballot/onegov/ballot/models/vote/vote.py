@@ -183,8 +183,8 @@ class Vote(Base, ContentMixin, TimestampMixin,
     #: the total invalid votes
     invalid = summarized_property('invalid')
 
-    #: the total elegible voters
-    elegible_voters = summarized_property('elegible_voters')
+    #: the total eligible voters
+    eligible_voters = summarized_property('eligible_voters')
 
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
@@ -279,7 +279,7 @@ class Vote(Base, ContentMixin, TimestampMixin,
                 row['nays'] = result.nays
                 row['invalid'] = result.invalid
                 row['empty'] = result.empty
-                row['elegible_voters'] = result.elegible_voters
+                row['eligible_voters'] = result.eligible_voters
 
                 rows.append(row)
 

@@ -8,7 +8,7 @@ Changelog
 - Adds a new domain of influence: region.
   [msom]
 
-- Adds election composites.
+- Fixes spelling of "eligible voters".
   [msom]
 
 2.0.0 (2018-01-23)

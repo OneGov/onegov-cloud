@@ -50,8 +50,8 @@ class BallotResult(Base, TimestampMixin, DerivedAttributesMixin,
     #: number of invalid votes
     invalid = Column(Integer, nullable=False, default=lambda: 0)
 
-    #: number of elegible voters
-    elegible_voters = Column(Integer, nullable=False, default=lambda: 0)
+    #: number of eligible voters
+    eligible_voters = Column(Integer, nullable=False, default=lambda: 0)
 
     #: the ballot this result belongs to
     ballot_id = Column(UUID, ForeignKey('ballots.id'), nullable=False)

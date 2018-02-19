@@ -162,7 +162,7 @@ class ProporzElection(Election):
             ElectionResult.name,
             ElectionResult.entity_id,
             ElectionResult.counted,
-            ElectionResult.elegible_voters,
+            ElectionResult.eligible_voters,
             ElectionResult.received_ballots,
             ElectionResult.blank_ballots,
             ElectionResult.invalid_ballots,
@@ -260,7 +260,7 @@ class ProporzElection(Election):
             row['entity_name'] = result[9]
             row['entity_id'] = result[10]
             row['entity_counted'] = result[11]
-            row['entity_elegible_voters'] = result[12]
+            row['entity_eligible_voters'] = result[12]
             row['entity_received_ballots'] = result[13]
             row['entity_blank_ballots'] = result[14]
             row['entity_invalid_ballots'] = result[15]

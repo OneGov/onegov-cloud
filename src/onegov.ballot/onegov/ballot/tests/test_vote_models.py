@@ -381,7 +381,7 @@ def test_vote_turnout(session):
         BallotResult(
             name='1',
             counted=True,
-            elegible_voters=100,
+            eligible_voters=100,
             yeas=10,
             entity_id=1
         )
@@ -408,13 +408,13 @@ def test_vote_percentage_by_entity(session):
     vote.proposal.results.append(
         BallotResult(
             name='1', entity_id=1,
-            counted=True, elegible_voters=100, yeas=75, nays=25
+            counted=True, eligible_voters=100, yeas=75, nays=25
         )
     )
     vote.proposal.results.append(
         BallotResult(
             name='1', entity_id=1,
-            counted=True, elegible_voters=100, yeas=25, nays=75
+            counted=True, eligible_voters=100, yeas=25, nays=75
         )
     )
 
@@ -661,7 +661,7 @@ def test_vote_export(session):
             nays=45,
             invalid=5,
             empty=10,
-            elegible_voters=150,
+            eligible_voters=150,
             entity_id=1,
         )
     )
@@ -699,7 +699,7 @@ def test_vote_export(session):
             'nays': 0,
             'invalid': 0,
             'empty': 0,
-            'elegible_voters': 0
+            'eligible_voters': 0
         },
         {
             'title_de_CH': "Abstimmung",
@@ -717,7 +717,7 @@ def test_vote_export(session):
             'nays': 45,
             'invalid': 5,
             'empty': 10,
-            'elegible_voters': 150,
+            'eligible_voters': 150,
         },
         {
             'title_de_CH': "Gegenvorschlag",
@@ -735,7 +735,7 @@ def test_vote_export(session):
             'nays': 0,
             'invalid': 0,
             'empty': 0,
-            'elegible_voters': 0
+            'eligible_voters': 0
         }
     ]
 

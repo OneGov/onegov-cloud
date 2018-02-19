@@ -22,7 +22,7 @@ class DerivedAttributesMixin(object):
     def turnout(self):
         """ The turnout of the election. """
 
-        if not self.elegible_voters:
+        if not self.eligible_voters:
             return 0
 
-        return self.received_ballots / self.elegible_voters * 100
+        return self.received_ballots / self.eligible_voters * 100
