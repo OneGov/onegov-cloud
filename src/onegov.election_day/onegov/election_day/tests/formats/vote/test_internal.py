@@ -32,7 +32,7 @@ def test_import_internal_vote(session, tar_file):
     assert vote.completed
     assert vote.ballots.count() == 1
     assert round(vote.turnout, 2) == 40.91
-    assert vote.elegible_voters == 320996
+    assert vote.eligible_voters == 320996
     assert vote.progress == (78, 78)
     assert vote.proposal.results.count() == 78
     assert vote.proposal.yeas == 68346
@@ -48,7 +48,7 @@ def test_import_internal_vote(session, tar_file):
     assert vote.completed
     assert vote.ballots.count() == 1
     assert round(vote.turnout, 2) == 40.91
-    assert vote.elegible_voters == 320996
+    assert vote.eligible_voters == 320996
     assert vote.progress == (78, 78)
     assert vote.proposal.results.count() == 78
     assert vote.proposal.yeas == 68346
@@ -77,7 +77,7 @@ def test_import_internal_vote_missing_headers(session):
                     'nays',
                     'invalid',
                     'empty',
-                    'elegible_voters',
+                    'eligible_voters',
                 )),
             ))
         ).encode('utf-8')),
@@ -109,7 +109,7 @@ def test_import_internal_vote_invalid_values(session):
                     'nays',
                     'invalid',
                     'empty',
-                    'elegible_voters',
+                    'eligible_voters',
                 )),
                 ','.join((
                     'xxx',  # status
@@ -120,7 +120,7 @@ def test_import_internal_vote_invalid_values(session):
                     'xxx',  # nays
                     'xxx',  # invalid
                     'xxx',  # empty
-                    'xxx',  # elegible_voters
+                    'xxx',  # eligible_voters
                 )),
                 ','.join((
                     'unknown',  # status
@@ -131,7 +131,7 @@ def test_import_internal_vote_invalid_values(session):
                     '1',  # nays
                     '1',  # invalid
                     '1',  # empty
-                    '0',  # elegible_voters
+                    '0',  # eligible_voters
                 )),
                 ','.join((
                     'unknown',  # status
@@ -142,7 +142,7 @@ def test_import_internal_vote_invalid_values(session):
                     '1',  # nays
                     '1',  # invalid
                     '1',  # empty
-                    '100',  # elegible_voters
+                    '100',  # eligible_voters
                 )),
                 ','.join((
                     'unknown',  # status
@@ -153,7 +153,7 @@ def test_import_internal_vote_invalid_values(session):
                     '1',  # nays
                     '1',  # invalid
                     '1',  # empty
-                    '100',  # elegible_voters
+                    '100',  # eligible_voters
                 )),
             ))
         ).encode('utf-8')),
@@ -162,7 +162,7 @@ def test_import_internal_vote_invalid_values(session):
 
     assert sorted(set([(e.line, e.error.interpolate()) for e in errors])) == [
         (2, 'Could not read nays'),
-        (2, 'Could not read the elegible voters'),
+        (2, 'Could not read the eligible voters'),
         (2, 'Could not read the empty votes'),
         (2, 'Could not read the invalid votes'),
         (2, 'Could not read yeas'),
@@ -170,8 +170,8 @@ def test_import_internal_vote_invalid_values(session):
         (2, 'Invalid id'),
         (2, 'Invalid status'),
         (3, '1234 is unknown'),
-        (3, 'More cast votes than elegible voters'),
-        (3, 'No elegible voters'),
+        (3, 'More cast votes than eligible voters'),
+        (3, 'No eligible voters'),
         (5, '1711 was found twice')
     ]
 
@@ -197,7 +197,7 @@ def test_import_internal_vote_expats(session):
                     'nays',
                     'invalid',
                     'empty',
-                    'elegible_voters',
+                    'eligible_voters',
                 )),
                 ','.join((
                     'unknown',  # status
@@ -208,7 +208,7 @@ def test_import_internal_vote_expats(session):
                     '10',  # nays
                     '0',  # invalid
                     '0',  # empty
-                    '100',  # elegible_voters
+                    '100',  # eligible_voters
                 )),
                 ','.join((
                     'unknown',  # status
@@ -219,7 +219,7 @@ def test_import_internal_vote_expats(session):
                     '10',  # nays
                     '0',  # invalid
                     '0',  # empty
-                    '100',  # elegible_voters
+                    '100',  # eligible_voters
                 )),
             ))
         ).encode('utf-8')),
@@ -242,7 +242,7 @@ def test_import_internal_vote_expats(session):
                     'nays',
                     'invalid',
                     'empty',
-                    'elegible_voters',
+                    'eligible_voters',
                 )),
                 ','.join((
                     'unknown',  # status
@@ -253,7 +253,7 @@ def test_import_internal_vote_expats(session):
                     '10',  # nays
                     '0',  # invalid
                     '0',  # empty
-                    '100',  # elegible_voters
+                    '100',  # eligible_voters
                 )),
             ))
         ).encode('utf-8')),
@@ -284,7 +284,7 @@ def test_import_internal_vote_temporary_results(session):
                     'nays',
                     'invalid',
                     'empty',
-                    'elegible_voters',
+                    'eligible_voters',
                 )),
                 ','.join((
                     'unknown',  # status
@@ -295,7 +295,7 @@ def test_import_internal_vote_temporary_results(session):
                     '10',  # nays
                     '1',  # invalid
                     '1',  # empty
-                    '100',  # elegible_voters
+                    '100',  # eligible_voters
                 )),
                 ','.join((
                     'unknown',  # status
@@ -306,7 +306,7 @@ def test_import_internal_vote_temporary_results(session):
                     '10',  # nays
                     '1',  # invalid
                     '1',  # empty
-                    '100',  # elegible_voters
+                    '100',  # eligible_voters
                 )),
                 ','.join((
                     'unknown',  # status
@@ -317,7 +317,7 @@ def test_import_internal_vote_temporary_results(session):
                     '10',  # nays
                     '1',  # invalid
                     '1',  # empty
-                    '100',  # elegible_voters
+                    '100',  # eligible_voters
                 )),
             ))
         ).encode('utf-8')),

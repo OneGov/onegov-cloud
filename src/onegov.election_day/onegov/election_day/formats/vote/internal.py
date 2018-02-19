@@ -16,7 +16,7 @@ HEADERS = [
     'nays',
     'invalid',
     'empty',
-    'elegible_voters',
+    'eligible_voters',
 ]
 
 
@@ -96,11 +96,11 @@ def import_vote_internal(vote, principal, file, mimetype):
         except ValueError:
             line_errors.append(_("Could not read nays"))
 
-        # the elegible voters
+        # the eligible voters
         try:
-            elegible_voters = int(line.elegible_voters or 0)
+            eligible_voters = int(line.eligible_voters or 0)
         except ValueError:
-            line_errors.append(_("Could not read the elegible voters"))
+            line_errors.append(_("Could not read the eligible voters"))
 
         # the empty votes
         try:
@@ -116,10 +116,10 @@ def import_vote_internal(vote, principal, file, mimetype):
 
         # now let's do some sanity checks
         try:
-            if not elegible_voters:
-                line_errors.append(_("No elegible voters"))
-            if (yeas + nays + empty + invalid) > elegible_voters:
-                line_errors.append(_("More cast votes than elegible voters"))
+            if not eligible_voters:
+                line_errors.append(_("No eligible voters"))
+            if (yeas + nays + empty + invalid) > eligible_voters:
+                line_errors.append(_("More cast votes than eligible voters"))
         except UnboundLocalError:
             pass
 
@@ -141,7 +141,7 @@ def import_vote_internal(vote, principal, file, mimetype):
                     counted=counted,
                     yeas=yeas,
                     nays=nays,
-                    elegible_voters=elegible_voters,
+                    eligible_voters=eligible_voters,
                     entity_id=entity_id,
                     empty=empty,
                     invalid=invalid

@@ -118,14 +118,14 @@ def import_vote_wabsti(vote, principal, vote_number, file, mimetype):
         except ValueError:
             line_errors.append(_("Could not read nays"))
 
-        # the elegible voters
+        # the eligible voters
         try:
-            elegible_voters = int(line.stimmberechtigte or 0)
+            eligible_voters = int(line.stimmberechtigte or 0)
         except ValueError:
-            line_errors.append(_("Could not read the elegible voters"))
+            line_errors.append(_("Could not read the eligible voters"))
         else:
             # Ignore the expats if no eligible voters
-            if not entity_id and not elegible_voters:
+            if not entity_id and not eligible_voters:
                 continue
 
         # the empty votes
@@ -163,7 +163,7 @@ def import_vote_wabsti(vote, principal, vote_number, file, mimetype):
                         counted=True,
                         yeas=yeas[ballot_type],
                         nays=nays[ballot_type],
-                        elegible_voters=elegible_voters,
+                        eligible_voters=eligible_voters,
                         entity_id=entity_id,
                         empty=empty[ballot_type],
                         invalid=invalid

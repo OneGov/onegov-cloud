@@ -57,7 +57,7 @@ Name|Description
 `nays`|The number of “no” votes.
 `invalid`|The number of spoilt votes.
 `empty`|The number of blank votes.
-`elegible_voters`|The number of persons eligible to vote.
+`eligible_voters`|The number of persons eligible to vote.
 
 ### Temporary results
 

@@ -48,7 +48,7 @@ def test_import_wabstic_majorz(session, tar_file):
     assert election.progress == (78, 78)
     assert election.results.count() == 78
     assert election.absolute_majority == 79412
-    assert election.elegible_voters == 311828
+    assert election.eligible_voters == 311828
     assert election.accounted_ballots == 158822
     assert election.accounted_votes == 626581
 
@@ -285,7 +285,7 @@ def test_import_wabstic_majorz_invalid_values(session):
         ('wm_kandidatengde', 3, 'Invalid candidate results'),
         ('wm_wahl', 2, 'Invalid values'),
         ('wmstatic_gemeinden', 2, '100 is unknown'),
-        ('wmstatic_gemeinden', 2, 'Could not read the elegible voters'),
+        ('wmstatic_gemeinden', 2, 'Could not read the eligible voters'),
         ('wmstatic_gemeinden', 4, '3215 was found twice')
     ]
 

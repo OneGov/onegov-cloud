@@ -248,7 +248,7 @@ def test_archived_result_collection_updates(session):
             name='name',
             entity_id=1,
             counted=True,
-            elegible_voters=100,
+            eligible_voters=100,
             received_ballots=50,
             blank_ballots=2,
             invalid_ballots=5,

@@ -378,7 +378,7 @@ def import_election_wabsti_proporz(
                 try:
                     group = line.einheit_name.strip()
                     entity_id = int(line.einheit_bfs or 0)
-                    elegible_voters = int(line.stimbertotal or 0)
+                    eligible_voters = int(line.stimbertotal or 0)
                     received_ballots = int(line.wzeingegangen or 0)
                     blank_ballots = int(line.wzleer or 0)
                     invalid_ballots = int(line.wzungueltig or 0)
@@ -397,7 +397,7 @@ def import_election_wabsti_proporz(
                         entity_id = 0
 
                     if entity_id in results:
-                        results[entity_id].elegible_voters = elegible_voters
+                        results[entity_id].eligible_voters = eligible_voters
                         results[entity_id].received_ballots = received_ballots
                         results[entity_id].blank_ballots = blank_ballots
                         results[entity_id].invalid_ballots = invalid_ballots

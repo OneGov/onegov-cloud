@@ -46,7 +46,7 @@ def test_import_internal_majorz(session, tar_file):
     assert election.progress == (11, 11)
     assert election.results.count() == 11
     assert election.absolute_majority == 18191
-    assert election.elegible_voters == 73355
+    assert election.eligible_voters == 73355
     assert election.accounted_ballots == 38710
     assert election.accounted_votes == 72761
     assert election.blank_ballots == 63
@@ -69,7 +69,7 @@ def test_import_internal_majorz(session, tar_file):
     assert election.progress == (11, 11)
     assert election.results.count() == 11
     assert election.absolute_majority == 18191
-    assert election.elegible_voters == 73355
+    assert election.eligible_voters == 73355
     assert election.accounted_ballots == 38710
     assert election.accounted_votes == 72761
     assert election.blank_ballots == 63
@@ -92,7 +92,7 @@ def test_import_internal_majorz(session, tar_file):
                 'election_status',
                 'entity_id',
                 'entity_counted',
-                'entity_elegible_voters',
+                'entity_eligible_voters',
                 'entity_received_ballots',
                 'entity_blank_ballots',
                 'entity_invalid_ballots',
@@ -139,7 +139,7 @@ def test_import_internal_majorz(session, tar_file):
     assert election.progress == (1, 1)
     assert election.results.count() == 1
     assert election.absolute_majority == 3294
-    assert election.elegible_voters == 18699
+    assert election.eligible_voters == 18699
     assert election.blank_ballots == 124
     assert election.invalid_ballots == 51
     assert round(election.turnout, 2) == 36.16
@@ -158,7 +158,7 @@ def test_import_internal_majorz(session, tar_file):
     assert election.progress == (1, 1)
     assert election.results.count() == 1
     assert election.absolute_majority == 3294
-    assert election.elegible_voters == 18699
+    assert election.eligible_voters == 18699
     assert election.blank_ballots == 124
     assert election.invalid_ballots == 51
     assert round(election.turnout, 2) == 36.16
@@ -179,7 +179,7 @@ def test_import_internal_majorz(session, tar_file):
     assert election.progress == (6, 6)
     assert election.results.count() == 6
     assert election.absolute_majority == 12606
-    assert election.elegible_voters == 82497
+    assert election.eligible_voters == 82497
     assert election.blank_ballots == 1274
     assert election.invalid_ballots == 2797
     assert round(election.turnout, 2) == 35.49
@@ -198,7 +198,7 @@ def test_import_internal_majorz(session, tar_file):
     assert election.progress == (6, 6)
     assert election.results.count() == 6
     assert election.absolute_majority == 12606
-    assert election.elegible_voters == 82497
+    assert election.eligible_voters == 82497
     assert election.blank_ballots == 1274
     assert election.invalid_ballots == 2797
     assert round(election.turnout, 2) == 35.49
@@ -228,7 +228,7 @@ def test_import_internal_majorz_missing_headers(session):
                     'election_status',
                     'entity_id',
                     'entity_counted',
-                    'entity_elegible_voters',
+                    'entity_eligible_voters',
                     'entity_received_ballots',
                     'entity_blank_ballots',
                     'entity_invalid_ballots',
@@ -270,7 +270,7 @@ def test_import_internal_majorz_invalid_values(session):
                     'election_status',
                     'entity_id',
                     'entity_counted',
-                    'entity_elegible_voters',
+                    'entity_eligible_voters',
                     'entity_received_ballots',
                     'entity_blank_ballots',
                     'entity_invalid_ballots',
@@ -288,7 +288,7 @@ def test_import_internal_majorz_invalid_values(session):
                     'xxx',  # election_status
                     'xxx',  # entity_id
                     'xxx',  # entity_counted
-                    'xxx',  # entity_elegible_voters
+                    'xxx',  # entity_eligible_voters
                     'xxx',  # entity_received_ballots
                     'xxx',  # entity_blank_ballots
                     'xxx',  # entity_invalid_ballots
@@ -306,7 +306,7 @@ def test_import_internal_majorz_invalid_values(session):
                     'unknown',  # election_status
                     '1234',  # entity_id
                     'True',  # entity_counted
-                    '100',  # entity_elegible_voters
+                    '100',  # entity_eligible_voters
                     '10',  # entity_received_ballots
                     '0',  # entity_blank_ballots
                     '0',  # entity_invalid_ballots
@@ -356,7 +356,7 @@ def test_import_internal_majorz_expats(session):
                         'election_status',
                         'entity_id',
                         'entity_counted',
-                        'entity_elegible_voters',
+                        'entity_eligible_voters',
                         'entity_received_ballots',
                         'entity_blank_ballots',
                         'entity_invalid_ballots',
@@ -374,7 +374,7 @@ def test_import_internal_majorz_expats(session):
                         'unknown',  # election_status
                         str(entity_id),  # entity_id
                         'True',  # entity_counted
-                        '111',  # entity_elegible_voters
+                        '111',  # entity_eligible_voters
                         '11',  # entity_received_ballots
                         '1',  # entity_blank_ballots
                         '1',  # entity_invalid_ballots
@@ -416,7 +416,7 @@ def test_import_internal_majorz_temporary_results(session):
                     'election_status',
                     'entity_id',
                     'entity_counted',
-                    'entity_elegible_voters',
+                    'entity_eligible_voters',
                     'entity_received_ballots',
                     'entity_blank_ballots',
                     'entity_invalid_ballots',
@@ -434,7 +434,7 @@ def test_import_internal_majorz_temporary_results(session):
                     'unknown',  # election_status
                     '1701',  # entity_id
                     'True',  # entity_counted
-                    '111',  # entity_elegible_voters
+                    '111',  # entity_eligible_voters
                     '11',  # entity_received_ballots
                     '1',  # entity_blank_ballots
                     '1',  # entity_invalid_ballots
@@ -452,7 +452,7 @@ def test_import_internal_majorz_temporary_results(session):
                     'unknown',  # election_status
                     '1702',  # entity_id
                     'False',  # entity_counted
-                    '111',  # entity_elegible_voters
+                    '111',  # entity_eligible_voters
                     '11',  # entity_received_ballots
                     '1',  # entity_blank_ballots
                     '1',  # entity_invalid_ballots

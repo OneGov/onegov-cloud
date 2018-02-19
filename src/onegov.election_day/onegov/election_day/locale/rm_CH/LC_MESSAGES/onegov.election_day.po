@@ -115,7 +115,7 @@ msgstr "Statistica electorala"
 msgid "Invalid id"
 msgstr "ID nunvalaivel"
 
-msgid "Could not read the elegible voters"
+msgid "Could not read the eligible voters"
 msgstr "I n'è betg stà pussaivel da leger las persunas cun dretg da votar"
 
 msgid "Proposal"
@@ -139,10 +139,10 @@ msgstr "I n'è betg stà pussaivel da leger ils cedels da votar vids"
 msgid "Could not read the invalid votes"
 msgstr "I n'è betg stà pussaivel da leger ils cedels da votar nunvalaivels"
 
-msgid "No elegible voters"
+msgid "No eligible voters"
 msgstr "Naginas persunas cun dretg da votar"
 
-msgid "More cast votes than elegible voters"
+msgid "More cast votes than eligible voters"
 msgstr "Dapli vuschs entradas che persunas cun dretg da votar"
 
 msgid "Invalid ballot type"
@@ -595,7 +595,7 @@ msgstr "Vuschs negativas"
 msgid "Turnout"
 msgstr "Participaziun a las elecziuns"
 
-msgid "Elegible Voters"
+msgid "eligible Voters"
 msgstr "Persunas cun dretg d’eleger"
 
 msgid "Received Ballots"
@@ -609,9 +609,9 @@ msgstr "Dumbrà ora"
 msgid "turnout_vote"
 msgstr "Participaziun a la votaziun"
 
-#. Default: Elegible Voters
+#. Default: eligible Voters
 #.
-msgid "elegible_voters_vote"
+msgid "eligible_voters_vote"
 msgstr "Persunas cun dretg da votar"
 
 msgid "Cast Ballots"

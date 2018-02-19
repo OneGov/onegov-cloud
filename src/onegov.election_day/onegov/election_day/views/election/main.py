@@ -66,7 +66,7 @@ def view_election_json(self, request):
         'type': 'election',
         'statistics': {
             'total': {
-                'elegible_voters': self.elegible_voters,
+                'eligible_voters': self.eligible_voters,
                 'received_ballots': self.received_ballots,
                 'accounted_ballots': self.accounted_ballots,
                 'blank_ballots': self.blank_ballots,
@@ -76,7 +76,7 @@ def view_election_json(self, request):
             },
             'entitites': [
                 {
-                    'elegible_voters': entity.elegible_voters,
+                    'eligible_voters': entity.eligible_voters,
                     'received_ballots': entity.received_ballots,
                     'accounted_ballots': entity.accounted_ballots,
                     'blank_ballots': entity.blank_ballots,

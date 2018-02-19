@@ -62,7 +62,7 @@ Name|Beschreibung
 `nays`|Die Anzahl Nein Stimmen
 `invalid`|Die Anzahl ungültiger Stimmen
 `empty`|Die Anzahl leerer Stimmen
-`elegible_voters`|Die Anzahl Stimmberechtigter
+`eligible_voters`|Die Anzahl Stimmberechtigter
 
 
 ### Temporäre Resultate

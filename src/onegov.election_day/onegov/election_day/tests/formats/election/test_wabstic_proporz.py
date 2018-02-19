@@ -57,7 +57,7 @@ def test_import_wabstic_proporz(session, tar_file):
     assert election.progress == (78, 78)
     assert election.results.count() == 78
     assert election.absolute_majority is None
-    assert election.elegible_voters == 317969
+    assert election.eligible_voters == 317969
     assert election.accounted_ballots == 145631
     assert election.accounted_votes == 1732456
 

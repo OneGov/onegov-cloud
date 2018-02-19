@@ -47,7 +47,7 @@ def test_import_default_vote(session):
     assert vote.completed
     assert vote.ballots.count() == 1
     assert round(vote.turnout, 2) == 61.34
-    assert vote.elegible_voters == 72957
+    assert vote.eligible_voters == 72957
     assert vote.progress == (11, 11)
     assert vote.proposal.results.count() == 11
     assert vote.proposal.yeas == 16534
@@ -80,7 +80,7 @@ def test_import_default_vote(session):
     assert vote.completed
     assert vote.ballots.count() == 1
     assert round(vote.turnout, 2) == 38.41
-    assert vote.elegible_voters == 18690
+    assert vote.eligible_voters == 18690
     assert vote.progress == (1, 1)
     assert vote.proposal.results.count() == 1
     assert vote.proposal.yeas == 2182
@@ -116,7 +116,7 @@ def test_import_default_vote(session):
     assert vote.completed
     assert vote.ballots.count() == 1
     assert round(vote.turnout, 2) == 37.99
-    assert vote.elegible_voters == 82984
+    assert vote.eligible_voters == 82984
     assert vote.progress == (6, 6)
     assert vote.proposal.results.count() == 6
     assert vote.proposal.yeas == 23719
@@ -214,14 +214,14 @@ def test_import_default_vote_invalid_values(session):
         (e.line, e.error.interpolate()) for e in errors
     ])) == [
         (2, 'Could not read nays'),
-        (2, 'Could not read the elegible voters'),
+        (2, 'Could not read the eligible voters'),
         (2, 'Could not read the empty votes'),
         (2, 'Could not read the invalid votes'),
         (2, 'Could not read yeas'),
         (2, 'Invalid id'),
         (3, '1234 is unknown'),
-        (3, 'More cast votes than elegible voters'),
-        (3, 'No elegible voters'),
+        (3, 'More cast votes than eligible voters'),
+        (3, 'No eligible voters'),
         (5, '1711 was found twice')
     ]
 

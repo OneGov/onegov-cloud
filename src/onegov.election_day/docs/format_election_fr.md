@@ -29,7 +29,7 @@ Nom|Description
 `election_status`|`unknown`, `interim` or `final`.
 `entity_id`|Numéro BFS de la municipalité. Une valeur de `0` peut être utilisée pour les expatriés.
 `entity_counted`|`True` si le résultat a été compté.
-`entity_elegible_voters`|Nombre de personnes autorisées à voter dans la municipalité.
+`entity_eligible_voters`|Nombre de personnes autorisées à voter dans la municipalité.
 `entity_received_ballots`|Nombre de bulletins soumis dans la municipalité.
 `entity_blank_ballots`|Nombre de bulletins vides dans la municipalité.
 `entity_invalid_ballots`|Nombre de bulletins non valides dans la municipalité.

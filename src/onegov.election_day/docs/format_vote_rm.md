@@ -59,7 +59,7 @@ Num|Descripziun
 `nays`|Il dumber da las vuschs negativas
 `invalid`|Il dumber da las vuschs nunvalaivlas
 `empty`|Il dumber da las vuschs vidas
-`elegible_voters`|Il dumber da las persunas cun dretg da votar
+`eligible_voters`|Il dumber da las persunas cun dretg da votar
 
 
 ### Resultats temporars

@@ -30,7 +30,7 @@ Name|Beschreibung
 `election_status`|`unknown`, `interim` oder `final`.
 `entity_id`|BFS Nummer der Gemeinde. Der Wert `0` kann für Auslandslebende verwendet werden.
 `entity_counted`|`True`, wenn das Resultat ausgezählt wurde.
-`entity_elegible_voters`|Anzahl Stimmberechtigte der Gemeinde.
+`entity_eligible_voters`|Anzahl Stimmberechtigte der Gemeinde.
 `entity_received_ballots`|Anzahl abgegebene Stimmzettel der Gemeinde.
 `entity_blank_ballots`|Anzahl leere Stimmzettel der Gemeinde.
 `entity_invalid_ballots`|Anzahl ungültige Stimmzettel der Gemeinde.

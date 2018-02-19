@@ -292,11 +292,11 @@ class MediaGenerator():
                     [
                         [
                             translate(_('Turnout')),
-                            translate(_('Elegible Voters')),
+                            translate(_('eligible Voters')),
                             translate(_('Received Ballots')),
                         ], [
                             '{0:.2f}%'.format(item.turnout),
-                            item.elegible_voters,
+                            item.eligible_voters,
                             item.received_ballots,
                         ]
                     ],
@@ -513,8 +513,8 @@ class MediaGenerator():
                             translate(_('Turnout')),
                             '{0:.2f} %'.format(res.turnout)
                         ], [
-                            translate(_('Elegible Voters')),
-                            res.elegible_voters
+                            translate(_('eligible Voters')),
+                            res.eligible_voters
                         ], [
                             translate(_('Accounted Votes')),
                             res.accounted_votes
@@ -539,17 +539,17 @@ class MediaGenerator():
                         [[
                             translate(principal.label('entity')),
                             translate(_('Turnout')),
-                            translate(_('Elegible Voters')),
+                            translate(_('eligible Voters')),
                             translate(_('Accounted Votes')),
                         ]] + [[
                             format_name(result),
                             '{0:.2f} %'.format(result.turnout),
-                            result.elegible_voters,
+                            result.eligible_voters,
                             result.accounted_votes,
                         ] for result in item.results] + [[
                             translate(_('Total')),
                             '{0:.2f} %'.format(item.turnout),
-                            item.elegible_voters,
+                            item.eligible_voters,
                             item.accounted_votes,
                         ]],
                         [None, 2.8 * cm, 2.8 * cm, 2.8 * cm],
@@ -587,19 +587,19 @@ class MediaGenerator():
                             translate(principal.label('entity')),
                             translate(principal.label('district')),
                             translate(_('Turnout')),
-                            translate(_('Elegible Voters')),
+                            translate(_('eligible Voters')),
                             translate(_('Accounted Votes')),
                         ]] + [[
                             format_name(result),
                             result.district,
                             '{0:.2f} %'.format(result.turnout),
-                            result.elegible_voters,
+                            result.eligible_voters,
                             result.accounted_votes,
                         ] for result in item.results] + [[
                             translate(_('Total')),
                             '',
                             '{0:.2f} %'.format(item.turnout),
-                            item.elegible_voters,
+                            item.eligible_voters,
                             item.accounted_votes,
                         ]],
                         [None, None, 2.8 * cm, 2.8 * cm, 2.8 * cm],
@@ -681,11 +681,11 @@ class MediaGenerator():
                         [
                             [
                                 translate(_('turnout_vote')),
-                                translate(_('elegible_voters_vote')),
+                                translate(_('eligible_voters_vote')),
                                 translate(_('Cast Ballots')),
                             ], [
                                 '{0:.2f}%'.format(ballot.turnout),
-                                ballot.elegible_voters,
+                                ballot.eligible_voters,
                                 ballot.cast_ballots,
                             ]
                         ],

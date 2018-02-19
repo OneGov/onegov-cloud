@@ -51,7 +51,7 @@ def test_import_wabsti_proporz(session, tar_file):
     assert election.results.count() == 11
     assert election.progress == (11, 11)
     assert round(election.turnout, 2) == 0
-    assert election.elegible_voters == 0
+    assert election.eligible_voters == 0
     assert election.accounted_ballots == 0
     assert election.accounted_votes == 0
     assert election.received_ballots == 0
@@ -81,7 +81,7 @@ def test_import_wabsti_proporz(session, tar_file):
     assert election.results.count() == 11
     assert election.progress == (11, 11)
     assert round(election.turnout, 2) == 53.74
-    assert election.elegible_voters == 74803
+    assert election.eligible_voters == 74803
     assert election.accounted_ballots == 39067
     assert election.accounted_votes == 116689
     assert election.received_ballots == 40200

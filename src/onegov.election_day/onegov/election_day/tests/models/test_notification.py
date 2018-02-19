@@ -286,7 +286,7 @@ def test_email_notification_vote(election_day_app, session):
 
         # Intermediate results
         keys = [
-            'entity_id', 'name', 'yeas', 'nays', 'elegible_voters', 'empty',
+            'entity_id', 'name', 'yeas', 'nays', 'eligible_voters', 'empty',
             'invalid', 'counted'
         ]
         for values in (
@@ -544,7 +544,7 @@ def test_email_notification_election(election_day_app, session):
         }
 
         keys = [
-            'entity_id', 'name', 'counted', 'elegible_voters',
+            'entity_id', 'name', 'counted', 'eligible_voters',
             'received_ballots', 'blank_ballots', 'invalid_ballots',
             'blank_votes', 'invalid_votes'
         ]

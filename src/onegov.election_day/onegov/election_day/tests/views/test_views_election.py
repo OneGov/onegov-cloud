@@ -392,7 +392,7 @@ def test_view_election_tacit(election_day_app_gr):
         'election_absolute_majority,'
         'entity_id,'
         'entity_counted,'
-        'entity_elegible_voters,'
+        'entity_eligible_voters,'
         'entity_received_ballots,'
         'entity_invalid_ballots,'
         'entity_blank_ballots,'

@@ -115,7 +115,7 @@ msgstr "Wahlstatistik"
 msgid "Invalid id"
 msgstr "Ungültige ID"
 
-msgid "Could not read the elegible voters"
+msgid "Could not read the eligible voters"
 msgstr "Konnte 'Stimmberechtigte' nicht lesen"
 
 msgid "Proposal"
@@ -139,10 +139,10 @@ msgstr "Konnte 'Leere Stimmzettel' nicht lesen"
 msgid "Could not read the invalid votes"
 msgstr "Konnte 'Ungültige Stimmzettel' nicht lesen"
 
-msgid "No elegible voters"
+msgid "No eligible voters"
 msgstr "Keine Stimmberechtigten"
 
-msgid "More cast votes than elegible voters"
+msgid "More cast votes than eligible voters"
 msgstr "Mehr eingelegte Stimmen als Stimmberechtigte"
 
 msgid "Invalid ballot type"
@@ -558,7 +558,7 @@ msgstr "Nein Stimmen"
 msgid "Turnout"
 msgstr "Wahlbeteiligung"
 
-msgid "Elegible Voters"
+msgid "eligible Voters"
 msgstr "Wahlberechtigte"
 
 msgid "Received Ballots"
@@ -572,9 +572,9 @@ msgstr "Ausgezählt"
 msgid "turnout_vote"
 msgstr "Stimmbeteiligung"
 
-#. Default: Elegible Voters
+#. Default: eligible Voters
 #.
-msgid "elegible_voters_vote"
+msgid "eligible_voters_vote"
 msgstr "Stimmberechtigte"
 
 msgid "Cast Ballots"

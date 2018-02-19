@@ -102,11 +102,11 @@ def import_vote_wabstim(vote, principal, file, mimetype):
         except ValueError:
             line_errors.append(_("Could not read nays"))
 
-        # the elegible voters
+        # the eligible voters
         try:
-            elegible_voters = int(line.stimmberechtigte or 0)
+            eligible_voters = int(line.stimmberechtigte or 0)
         except ValueError:
-            line_errors.append(_("Could not read the elegible voters"))
+            line_errors.append(_("Could not read the eligible voters"))
 
         # the empty votes
         empty = {}
@@ -143,7 +143,7 @@ def import_vote_wabstim(vote, principal, file, mimetype):
                         counted=counted,
                         yeas=yeas[ballot_type],
                         nays=nays[ballot_type],
-                        elegible_voters=elegible_voters,
+                        eligible_voters=eligible_voters,
                         entity_id=entity_id,
                         empty=empty[ballot_type],
                         invalid=invalid

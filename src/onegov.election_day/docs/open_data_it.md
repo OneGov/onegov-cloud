@@ -96,7 +96,7 @@ Nome|Descrizione
 `entity_name`|Nome del comune.
 `entity_district`|The district of the municipality.
 `entity_counted`|`True`, se lo spoglio è stato completato.
-`entity_elegible_voters`|Numero degli aventi diritto al voto di questo comune.
+`entity_eligible_voters`|Numero degli aventi diritto al voto di questo comune.
 `entity_received_ballots`|Numero di schede ricevute per questo comune.
 `entity_blank_ballots`|Numero di schede bianche per questo comune.
 `entity_invalid_ballots`|Numero di schede nulle per questo comune.
@@ -179,4 +179,4 @@ Nome|Descrizione
 `nays`|Numero di voti contrari
 `invalid`|Numero di voti nulli
 `empty`|Numero di voti in bianco
-`elegible_voters`|Numero di aventi diritto di voto
+`eligible_voters`|Numero di aventi diritto di voto

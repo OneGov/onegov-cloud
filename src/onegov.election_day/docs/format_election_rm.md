@@ -30,7 +30,7 @@ Num|Descripziun
 `election_status`|`unknown`, `interim` or `final`.
 `entity_id`|Numer UST da la vischnanca. La valur `0` po vegnir duvrada per persunas che vivan a l'exteriur.
 `entity_counted`|`True`, sch'il resultat è vegnì eruì.
-`entity_elegible_voters`|Dumber da persunas cun dretg da votar da la vischnanca.
+`entity_eligible_voters`|Dumber da persunas cun dretg da votar da la vischnanca.
 `entity_received_ballots`|Dumber da cedels da votar consegnads da la vischnanca.
 `entity_blank_ballots`|Dumber da cedels da votar vids da la vischnanca.
 `entity_invalid_ballots`|Dumber da cedels da votar nunvalaivels da la vischnanca.

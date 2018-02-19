@@ -42,7 +42,7 @@ def test_import_wabsti_majorz(session, tar_file):
     assert election.results.count() == 85
     assert election.progress == (85, 85)
     assert round(election.turnout, 2) == 47.79
-    assert election.elegible_voters == 304850
+    assert election.eligible_voters == 304850
     assert election.accounted_ballots == 144529
     assert election.accounted_votes == 144529
     assert election.received_ballots == 145694
@@ -66,7 +66,7 @@ def test_import_wabsti_majorz(session, tar_file):
     assert election.results.count() == 85
     assert election.progress == (85, 85)
     assert round(election.turnout, 2) == 47.79
-    assert election.elegible_voters == 304850
+    assert election.eligible_voters == 304850
     assert election.accounted_ballots == 144529
     assert election.accounted_votes == 144529
     assert election.received_ballots == 145694

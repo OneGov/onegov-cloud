@@ -31,7 +31,7 @@ def test_import_wabstim_vote(session, tar_file):
     assert vote.completed
     assert vote.ballots.count() == 1
     assert round(vote.turnout, 2) == 47.44
-    assert vote.elegible_voters == 3638
+    assert vote.eligible_voters == 3638
     assert vote.cast_ballots == 1726
     assert vote.answer == 'rejected'
     assert vote.proposal.results.count() == 1
@@ -210,7 +210,7 @@ def test_import_wabstim_vote_invalid_values(session):
         (e.line, e.error.interpolate()) for e in errors
     ])) == [
         (2, 'Could not read nays'),
-        (2, 'Could not read the elegible voters'),
+        (2, 'Could not read the eligible voters'),
         (2, 'Could not read the empty votes'),
         (2, 'Could not read the invalid votes'),
         (2, 'Could not read yeas'),

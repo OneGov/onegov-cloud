@@ -230,11 +230,11 @@ def import_election_wabstic_proporz(
                 line_errors.append(
                     _("${name} was found twice", mapping={'name': entity_id}))
 
-        # Parse the elegible voters
+        # Parse the eligible voters
         try:
-            elegible_voters = int(line.stimmberechtigte or 0)
+            eligible_voters = int(line.stimmberechtigte or 0)
         except ValueError:
-            line_errors.append(_("Could not read the elegible voters"))
+            line_errors.append(_("Could not read the eligible voters"))
 
         if line_errors:
             errors.extend(
@@ -250,7 +250,7 @@ def import_election_wabstic_proporz(
         added_entities[entity_id] = {
             'name': entity.get('name', ''),
             'district': entity.get('district', ''),
-            'elegible_voters': elegible_voters
+            'eligible_voters': eligible_voters
         }
 
     for line in wp_gemeinden.lines:
@@ -278,17 +278,17 @@ def import_election_wabstic_proporz(
         except ValueError:
             line_errors.append(_("Invalid entity values"))
 
-        # Parse the elegible voters
+        # Parse the eligible voters
         try:
-            elegible_voters = int(line.stimmberechtigte or 0)
+            eligible_voters = int(line.stimmberechtigte or 0)
         except ValueError:
             line_errors.append(_("Invalid entity values"))
         else:
-            elegible_voters = (
-                elegible_voters or
-                added_entities.get(entity_id, {}).get('elegible_voters', 0)
+            eligible_voters = (
+                eligible_voters or
+                added_entities.get(entity_id, {}).get('eligible_voters', 0)
             )
-            entity['elegible_voters'] = elegible_voters
+            entity['eligible_voters'] = eligible_voters
 
         # Parse the ballots and votes
         try:
@@ -566,7 +566,7 @@ def import_election_wabstic_proporz(
             district=entity['district'],
             entity_id=entity_id,
             counted=entity['counted'],
-            elegible_voters=entity['elegible_voters'],
+            eligible_voters=entity['eligible_voters'],
             received_ballots=entity['received_ballots'],
             blank_ballots=entity['blank_ballots'],
             invalid_ballots=entity['invalid_ballots'],

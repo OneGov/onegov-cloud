@@ -115,7 +115,7 @@ msgstr "Statistiche delle elezioni"
 msgid "Invalid id"
 msgstr "ID non valido"
 
-msgid "Could not read the elegible voters"
+msgid "Could not read the eligible voters"
 msgstr "Impossibile leggere 'Aventi diritto di voto'"
 
 msgid "Proposal"
@@ -139,10 +139,10 @@ msgstr "Impossibile leggere 'Schede bianche'"
 msgid "Could not read the invalid votes"
 msgstr "Impossibile leggere 'Schede nulle'"
 
-msgid "No elegible voters"
+msgid "No eligible voters"
 msgstr "Nessun avente diritto di voto"
 
-msgid "More cast votes than elegible voters"
+msgid "More cast votes than eligible voters"
 msgstr "Il numero di voti espressi supera quello degli aventi diritto di voto"
 
 msgid "Invalid ballot type"
@@ -558,7 +558,7 @@ msgstr "Voti contrari"
 msgid "Turnout"
 msgstr "Partecipazione elettorale"
 
-msgid "Elegible Voters"
+msgid "eligible Voters"
 msgstr "Elettores"
 
 msgid "Received Ballots"
@@ -572,9 +572,9 @@ msgstr "Scrutinati"
 msgid "turnout_vote"
 msgstr "Partecipazione al voto"
 
-#. Default: Elegible Voters
+#. Default: eligible Voters
 #.
-msgid "elegible_voters_vote"
+msgid "eligible_voters_vote"
 msgstr "Aventi diritto di voto"
 
 msgid "Cast Ballots"

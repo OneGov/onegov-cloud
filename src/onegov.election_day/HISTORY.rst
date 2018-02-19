@@ -2,11 +2,6 @@ Changelog
 ---------
 
 - Harmonizes the progress implementation of elections and votes.
-
-  **Breaking changes: The import and export formats of elections have changed!
-  There are no more election_counted_entities and election_total_entitites,
-  instead there is a new "counted" attribute.**
-
   [msom]
 
 - Supports regional elections.
@@ -21,8 +16,14 @@ Changelog
 - Uses a single function to import wabsti majorz elections.
   [msom]
 
-- Improves handling of wabsti exporter formats.
+- Fixes spelling of "eligible voters".
   [msom]
+
+  **Breaking changes: The import and export formats have changed!**
+
+  - ``election_counted_entities`` and ``election_total_entitites`` have been
+    replaced with a ``counted`` column
+  - ``elegible_voters`` have been renamed to ``eligible_voters``
 
 2.0.2 (2018-02-01)
 ~~~~~~~~~~~~~~~~~~~

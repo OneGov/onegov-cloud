@@ -259,7 +259,7 @@ def test_import_wabsti_vote_invalid_values(session):
         (e.line, e.error.interpolate()) for e in errors
     ])) == [
         (2, 'Could not read nays'),
-        (2, 'Could not read the elegible voters'),
+        (2, 'Could not read the eligible voters'),
         (2, 'Could not read the empty votes'),
         (2, 'Could not read the invalid votes'),
         (2, 'Could not read yeas'),

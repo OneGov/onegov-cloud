@@ -57,7 +57,7 @@ Nom|Description
 `nays`|Nombre de votes non
 `invalid`|Nombre de votes invalides.
 `empty`|Nombre de votes blancs
-`elegible_voters`|Nombre de personne aptes à voter.
+`eligible_voters`|Nombre de personne aptes à voter.
 
 
 ### Résultats temporaires

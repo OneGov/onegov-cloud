@@ -15,7 +15,7 @@ HEADERS = [
     'election_status',
     'entity_id',
     'entity_counted',
-    'entity_elegible_voters',
+    'entity_eligible_voters',
     'entity_received_ballots',
     'entity_blank_ballots',
     'entity_invalid_ballots',
@@ -49,14 +49,14 @@ def parse_election_result(line, errors, entities):
     try:
         entity_id = int(line.entity_id or 0)
         counted = line.entity_counted.strip().lower() == 'true'
-        elegible_voters = int(line.entity_elegible_voters or 0)
+        eligible_voters = int(line.entity_eligible_voters or 0)
         received_ballots = int(line.entity_received_ballots or 0)
         blank_ballots = int(line.entity_blank_ballots or 0)
         invalid_ballots = int(line.entity_invalid_ballots or 0)
         blank_votes = int(line.entity_blank_votes or 0)
         invalid_votes = int(line.entity_invalid_votes or 0)
 
-        if not elegible_voters:
+        if not eligible_voters:
             raise ValueError()
 
     except ValueError:
@@ -78,7 +78,7 @@ def parse_election_result(line, errors, entities):
                 district=entity.get('district', ''),
                 entity_id=entity_id,
                 counted=counted,
-                elegible_voters=elegible_voters,
+                eligible_voters=eligible_voters,
                 received_ballots=received_ballots,
                 blank_ballots=blank_ballots,
                 invalid_ballots=invalid_ballots,

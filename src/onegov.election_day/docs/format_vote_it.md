@@ -57,7 +57,7 @@ Nome|Descrizione
 `nays`|Numero di voti contrari
 `invalid`|Numero di voti nulli
 `empty`|Numero di voti in bianco
-`elegible_voters`|Numero di aventi diritto di voto
+`eligible_voters`|Numero di aventi diritto di voto
 
 
 ### Risultati temporanei

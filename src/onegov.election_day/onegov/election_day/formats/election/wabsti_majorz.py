@@ -41,7 +41,7 @@ def parse_election(line, errors):
 def parse_election_result(line, errors, entities, added_entities):
     try:
         entity_id = int(line.bfs or 0)
-        elegible_voters = int(line.stimmber or 0)
+        eligible_voters = int(line.stimmber or 0)
         received_ballots = int(
             getattr(line, 'wzabgegeben', 0) or
             getattr(line, 'stimmabgegeben', 0)
@@ -73,7 +73,7 @@ def parse_election_result(line, errors, entities, added_entities):
                 elif name == 'Ungültige Stimmen':
                     invalid_votes = votes
 
-        if not elegible_voters or blank_votes is None or invalid_votes is None:
+        if not eligible_voters or blank_votes is None or invalid_votes is None:
             raise ValueError()
 
     except ValueError:
@@ -100,7 +100,7 @@ def parse_election_result(line, errors, entities, added_entities):
                 district=entity.get('district', ''),
                 counted=True,
                 entity_id=entity_id,
-                elegible_voters=elegible_voters,
+                eligible_voters=eligible_voters,
                 received_ballots=received_ballots,
                 blank_ballots=blank_ballots,
                 invalid_ballots=invalid_ballots,

@@ -278,8 +278,8 @@
                 <strong>${'{0:.2f}'.format(election.turnout)} %</strong>
             </li>
             <li>
-                <span i18n:translate="">Elegible Voters</span>
-                <strong>${layout.format_number(election.elegible_voters)}</strong>
+                <span i18n:translate="">eligible Voters</span>
+                <strong>${layout.format_number(election.eligible_voters)}</strong>
             </li>
             <li>
                 <span i18n:translate="">Received Ballots</span>
@@ -310,8 +310,8 @@
             <strong>${'{0:.2f}'.format(ballot.turnout)} %</strong>
         </li>
         <li>
-            <span i18n:translate="elegible_voters_vote">Elegible Voters</span>
-            <strong>${layout.format_number(ballot.elegible_voters)}</strong>
+            <span i18n:translate="eligible_voters_vote">eligible Voters</span>
+            <strong>${layout.format_number(ballot.eligible_voters)}</strong>
         </li>
         <li>
             <span i18n:translate="">Cast Ballots</span>

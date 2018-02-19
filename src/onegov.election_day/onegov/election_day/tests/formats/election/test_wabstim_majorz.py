@@ -40,7 +40,7 @@ def test_import_wabstim_majorz(session, tar_file):
     assert election.progress == (1, 1)
     assert election.progress == (1, 1)
     assert round(election.turnout, 2) == 27.03
-    assert election.elegible_voters == 4021
+    assert election.eligible_voters == 4021
     assert election.received_ballots == 1087
     assert election.accounted_ballots == 1036
     assert election.blank_ballots == 28

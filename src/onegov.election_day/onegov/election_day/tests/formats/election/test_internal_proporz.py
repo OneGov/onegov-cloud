@@ -48,7 +48,7 @@ def test_import_internal_proporz(session, tar_file):
     assert election.progress == (11, 11)
     assert election.results.count() == 11
     assert election.absolute_majority is None
-    assert election.elegible_voters == 74803
+    assert election.eligible_voters == 74803
     assert election.accounted_ballots == 39067
     assert election.accounted_votes == 116689
     assert election.blank_ballots == 118
@@ -78,7 +78,7 @@ def test_import_internal_proporz(session, tar_file):
     assert election.progress == (11, 11)
     assert election.results.count() == 11
     assert election.absolute_majority is None
-    assert election.elegible_voters == 74803
+    assert election.eligible_voters == 74803
     assert election.accounted_ballots == 39067
     assert election.accounted_votes == 116689
     assert election.blank_ballots == 118
@@ -118,7 +118,7 @@ def test_import_internal_proporz_missing_headers(session):
                     'election_status',
                     'entity_id',
                     'entity_counted',
-                    'entity_elegible_voters',
+                    'entity_eligible_voters',
                     'entity_received_ballots',
                     'entity_blank_ballots',
                     'entity_invalid_ballots',
@@ -165,7 +165,7 @@ def test_import_internal_proporz_invalid_values(session):
                     'election_status',
                     'entity_id',
                     'entity_counted',
-                    'entity_elegible_voters',
+                    'entity_eligible_voters',
                     'entity_received_ballots',
                     'entity_blank_ballots',
                     'entity_invalid_ballots',
@@ -188,7 +188,7 @@ def test_import_internal_proporz_invalid_values(session):
                     'xxx',  # election_status
                     'xxx',  # entity_id
                     'xxx',  # entity_counted
-                    'xxx',  # entity_elegible_voters
+                    'xxx',  # entity_eligible_voters
                     'xxx',  # entity_received_ballots
                     'xxx',  # entity_blank_ballots
                     'xxx',  # entity_invalid_ballots
@@ -211,7 +211,7 @@ def test_import_internal_proporz_invalid_values(session):
                     'unknown',  # election_status
                     '1234',  # entity_id
                     'True',  # entity_counted
-                    '100',  # entity_elegible_voters
+                    '100',  # entity_eligible_voters
                     '10',  # entity_received_ballots
                     '0',  # entity_blank_ballots
                     '0',  # entity_invalid_ballots
@@ -268,7 +268,7 @@ def test_import_internal_proporz_expats(session):
                         'election_status',
                         'entity_id',
                         'entity_counted',
-                        'entity_elegible_voters',
+                        'entity_eligible_voters',
                         'entity_received_ballots',
                         'entity_blank_ballots',
                         'entity_invalid_ballots',
@@ -291,7 +291,7 @@ def test_import_internal_proporz_expats(session):
                         'unknown',  # election_status
                         str(entity_id),  # entity_id
                         'True',  # entity_counted
-                        '111',  # entity_elegible_voters
+                        '111',  # entity_eligible_voters
                         '11',  # entity_received_ballots
                         '1',  # entity_blank_ballots
                         '1',  # entity_invalid_ballots
@@ -338,7 +338,7 @@ def test_import_internal_proporz_temporary_results(session):
                     'election_status',
                     'entity_id',
                     'entity_counted',
-                    'entity_elegible_voters',
+                    'entity_eligible_voters',
                     'entity_received_ballots',
                     'entity_blank_ballots',
                     'entity_invalid_ballots',
@@ -361,7 +361,7 @@ def test_import_internal_proporz_temporary_results(session):
                     'unknown',  # election_status
                     '1701',  # entity_id
                     'True',  # entity_counted
-                    '111',  # entity_elegible_voters
+                    '111',  # entity_eligible_voters
                     '11',  # entity_received_ballots
                     '1',  # entity_blank_ballots
                     '1',  # entity_invalid_ballots
@@ -384,7 +384,7 @@ def test_import_internal_proporz_temporary_results(session):
                     'unknown',  # election_status
                     '1702',  # entity_id
                     'False',  # entity_counted
-                    '111',  # entity_elegible_voters
+                    '111',  # entity_eligible_voters
                     '11',  # entity_received_ballots
                     '1',  # entity_blank_ballots
                     '1',  # entity_invalid_ballots

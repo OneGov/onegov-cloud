@@ -96,7 +96,7 @@ Name|Beschreibung
 `entity_name`|Der Name der Gemeinde.
 `entity_district`|Wahlkreis/Bezirk/Region der Gemeinde.
 `entity_counted`|`True`, wenn das Resultat ausgezählt wurde.
-`entity_elegible_voters`|Die Anzahl Stimmberechtigter der Gemeinde.
+`entity_eligible_voters`|Die Anzahl Stimmberechtigter der Gemeinde.
 `entity_received_ballots`|Die Anzahl abgegebener Stimmzettel der Gemeinde.
 `entity_blank_ballots`|Die Anzahl leerer Stimmzettel der Gemeinde.
 `entity_invalid_ballots`|Die Anzahl ungültiger Stimmzettel der Gemeinde.
@@ -179,4 +179,4 @@ Name|Beschreibung
 `nays`|Die Anzahl Nein-Stimmen
 `invalid`|Die Anzahl ungültiger Stimmen
 `empty`|Die Anzahl leerer Stimmen
-`elegible_voters`|Die Anzahl Stimmberechtigter
+`eligible_voters`|Die Anzahl Stimmberechtigter
