@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes non-nullable columns upgrade failing in certain cases.
+  [href]
+
 0.61.0 (2018-02-16)
 ~~~~~~~~~~~~~~~~~~~
 

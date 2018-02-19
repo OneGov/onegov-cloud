@@ -417,6 +417,9 @@ class UpgradeContext(object):
             if hasattr(getattr(record, column.name), 'changed'):
                 getattr(record, column.name).changed()
 
+        # make sure all generated values are flushed
+        self.session.flush()
+
         # activate non-null constraint
         if not column.nullable:
             self.operations.alter_column(table, column.name, nullable=False)
