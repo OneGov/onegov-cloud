@@ -519,3 +519,159 @@ def test_import_wabsti_proporz_temporary_results(session):
 
     # 1 Present, 76 Missing
     assert election.progress == (1, 77)
+
+
+def test_import_wabsti_proporz_regional(session):
+    session.add(
+        ProporzElection(
+            title='election',
+            domain='region',
+            date=date(2018, 2, 19),
+            number_of_mandates=1
+        )
+    )
+    session.flush()
+    election = session.query(Election).one()
+    principal_zg = Canton(canton='zg')
+    principal_sg = Canton(canton='sg')
+
+    # Too many districts
+    errors = import_election_wabsti_proporz(
+        election, principal_zg,
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'Einheit_BFS',
+                    'Liste_KandID',
+                    'Kand_Nachname',
+                    'Kand_Vorname',
+                    'Liste_ID',
+                    'Liste_Code',
+                    'Kand_StimmenTotal',
+                    'Liste_ParteistimmenTotal',
+                )),
+                ','.join((
+                    '1701',
+                    '7',
+                    'xxx',
+                    'xxx',
+                    '8',
+                    '9',
+                    '50',
+                    '60',
+                )),
+                ','.join((
+                    '1702',
+                    '7',
+                    'xxx',
+                    'xxx',
+                    '8',
+                    '9',
+                    '50',
+                    '60',
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+    )
+    assert [error.error for error in errors] == ['No distinct region']
+
+    errors = import_election_wabsti_proporz(
+        election, principal_sg,
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'Einheit_BFS',
+                    'Liste_KandID',
+                    'Kand_Nachname',
+                    'Kand_Vorname',
+                    'Liste_ID',
+                    'Liste_Code',
+                    'Kand_StimmenTotal',
+                    'Liste_ParteistimmenTotal',
+                )),
+                ','.join((
+                    '3231',
+                    '7',
+                    'xxx',
+                    'xxx',
+                    '8',
+                    '9',
+                    '50',
+                    '60',
+                )),
+                ','.join((
+                    '3276',
+                    '7',
+                    'xxx',
+                    'xxx',
+                    '8',
+                    '9',
+                    '50',
+                    '60',
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+    )
+    assert [error.error for error in errors] == ['No distinct region']
+
+    # OK
+    errors = import_election_wabsti_proporz(
+        election, principal_zg,
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'Einheit_BFS',
+                    'Liste_KandID',
+                    'Kand_Nachname',
+                    'Kand_Vorname',
+                    'Liste_ID',
+                    'Liste_Code',
+                    'Kand_StimmenTotal',
+                    'Liste_ParteistimmenTotal',
+                )),
+                ','.join((
+                    '1701',
+                    '7',
+                    'xxx',
+                    'xxx',
+                    '8',
+                    '9',
+                    '50',
+                    '60',
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+    )
+    assert not errors
+    assert election.progress == (1, 1)
+
+    # Temporary
+    errors = import_election_wabsti_proporz(
+        election, principal_sg,
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'Einheit_BFS',
+                    'Liste_KandID',
+                    'Kand_Nachname',
+                    'Kand_Vorname',
+                    'Liste_ID',
+                    'Liste_Code',
+                    'Kand_StimmenTotal',
+                    'Liste_ParteistimmenTotal',
+                )),
+                ','.join((
+                    '3231',
+                    '7',
+                    'xxx',
+                    'xxx',
+                    '8',
+                    '9',
+                    '50',
+                    '60',
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+    )
+    assert not errors
+    assert election.progress == (1, 13)

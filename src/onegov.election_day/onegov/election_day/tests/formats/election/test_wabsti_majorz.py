@@ -410,3 +410,178 @@ def test_import_wabsti_majorz_temporary_results(session):
 
     # 1 Present, 76 Missing
     assert election.progress == (1, 77)
+
+
+def test_import_wabsti_majorz_regional(session):
+    session.add(
+        Election(
+            title='election',
+            domain='region',
+            date=date(2018, 2, 19),
+            number_of_mandates=1
+        )
+    )
+    session.flush()
+    election = session.query(Election).one()
+    principal_zg = Canton(canton='zg')
+    principal_sg = Canton(canton='sg')
+
+    # Too many districts
+    errors = import_election_wabsti_majorz(
+        election, principal_zg,
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'AnzMandate',
+                    'BFS',
+                    'StimmBer',
+                    'StimmAbgegeben',
+                    'StimmLeer',
+                    'StimmUngueltig',
+                    'KandName_1',
+                    'Stimmen_1',
+                    'KandName_2',
+                    'Stimmen_2',
+                )),
+                ','.join((
+                    '',
+                    '1701',
+                    '100',
+                    '90',
+                    '1',
+                    '1',
+                    'Leere Zeilen',
+                    '0',
+                    'Ungültige Stimmen',
+                    '1'
+                )),
+                ','.join((
+                    '',
+                    '1702',
+                    '100',
+                    '90',
+                    '1',
+                    '1',
+                    'Leere Zeilen',
+                    '0',
+                    'Ungültige Stimmen',
+                    '1'
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain'
+    )
+    assert [error.error for error in errors] == ['No distinct region']
+
+    errors = import_election_wabsti_majorz(
+        election, principal_sg,
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'AnzMandate',
+                    'BFS',
+                    'StimmBer',
+                    'StimmAbgegeben',
+                    'StimmLeer',
+                    'StimmUngueltig',
+                    'KandName_1',
+                    'Stimmen_1',
+                    'KandName_2',
+                    'Stimmen_2',
+                )),
+                ','.join((
+                    '',
+                    '3231',
+                    '100',
+                    '90',
+                    '1',
+                    '1',
+                    'Leere Zeilen',
+                    '0',
+                    'Ungültige Stimmen',
+                    '1'
+                )),
+                ','.join((
+                    '',
+                    '3276',
+                    '100',
+                    '90',
+                    '1',
+                    '1',
+                    'Leere Zeilen',
+                    '0',
+                    'Ungültige Stimmen',
+                    '1'
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain'
+    )
+    assert [error.error for error in errors] == ['No distinct region']
+
+    # OK
+    errors = import_election_wabsti_majorz(
+        election, principal_zg,
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'AnzMandate',
+                    'BFS',
+                    'StimmBer',
+                    'StimmAbgegeben',
+                    'StimmLeer',
+                    'StimmUngueltig',
+                    'KandName_1',
+                    'Stimmen_1',
+                    'KandName_2',
+                    'Stimmen_2',
+                )),
+                ','.join((
+                    '',
+                    '1701',
+                    '100',
+                    '90',
+                    '1',
+                    '1',
+                    'Leere Zeilen',
+                    '0',
+                    'Ungültige Stimmen',
+                    '1'
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain'
+    )
+    assert not errors
+    assert election.progress == (1, 1)
+
+    errors = import_election_wabsti_majorz(
+        election, principal_sg,
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'AnzMandate',
+                    'BFS',
+                    'StimmBer',
+                    'StimmAbgegeben',
+                    'StimmLeer',
+                    'StimmUngueltig',
+                    'KandName_1',
+                    'Stimmen_1',
+                    'KandName_2',
+                    'Stimmen_2',
+                )),
+                ','.join((
+                    '',
+                    '3231',
+                    '100',
+                    '90',
+                    '1',
+                    '1',
+                    'Leere Zeilen',
+                    '0',
+                    'Ungültige Stimmen',
+                    '1'
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain'
+    )
+    assert not errors
+    assert election.progress == (1, 13)

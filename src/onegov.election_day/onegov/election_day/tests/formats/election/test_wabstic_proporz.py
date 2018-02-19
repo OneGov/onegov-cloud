@@ -753,3 +753,645 @@ def test_import_wabstic_proporz_temporary_results(session):
 
     # 1 Counted, 1 Uncounted, 75 Missing
     assert election.progress == (1, 77)
+
+
+def test_import_wabstic_proporz_regional(session):
+    session.add(
+        ProporzElection(
+            title='election',
+            domain='region',
+            date=date(2018, 2, 19),
+            number_of_mandates=1
+        )
+    )
+    session.flush()
+    election = session.query(Election).one()
+    principal_zg = Canton(canton='zg')
+    principal_sg = Canton(canton='sg')
+
+    # Too many districts
+    errors = import_election_wabstic_proporz(
+        election, principal_zg, '0', '0',
+        BytesIO((  # wp_wahl
+            '\n'.join((
+                ','.join((
+                    'SortGeschaeft',
+                    'Ausmittlungsstand',
+                )),
+                ','.join((
+                    '0',
+                    '0',  # Ausmittlungsstand
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wpstatic_gemeinden
+            '\n'.join((
+                ','.join((
+                    'SortWahlkreis',
+                    'SortGeschaeft',
+                    'SortGemeinde',
+                    'SortGemeindeSub',
+                    'Stimmberechtigte',
+                )),
+                ','.join((
+                    '0',
+                    '0',
+                    '1701',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '',  # Stimmberechtigte
+                )),
+                ','.join((
+                    '0',
+                    '0',
+                    '1702',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '',  # Stimmberechtigte
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wp_gemeinden
+            '\n'.join((
+                ','.join((
+                    'SortGemeinde',
+                    'SortGemeindeSub',
+                    'Stimmberechtigte',
+                    'Sperrung',
+                    'StmAbgegeben',
+                    'StmLeer',
+                    'StmUngueltig',
+                    'AnzWZAmtLeer',
+                )),
+                ','.join((
+                    '1701',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '10000',  # Stimmberechtigte
+                    '1200',  # Sperrung
+                    '',  # StmAbgegeben
+                    '1',  # StmLeer
+                    '',  # StmUngueltig
+                    '',  # AnzWZAmtLeer
+                )),
+                ','.join((
+                    '1702',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '10000',  # Stimmberechtigte
+                    '',  # Sperrung
+                    '',  # StmAbgegeben
+                    '1',  # StmLeer
+                    '',  # StmUngueltig
+                    '',  # AnzWZAmtLeer
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wp_listen
+            '\n'.join((
+                ','.join((
+                    'SortGeschaeft',
+                    'ListNr',
+                    'ListCode',
+                    'Sitze',
+                    'ListVerb',
+                    'ListUntVerb',
+                )),
+                ','.join((
+                    '0',
+                    '1',  # ListNr
+                    '1',  # ListCode
+                    '',  # Sitze
+                    '',  # ListVerb
+                    '',  # ListUntVerb
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wp_listengde
+            '\n'.join((
+                ','.join((
+                    'SortGemeinde',
+                    'SortGemeindeSub',
+                    'ListNr',
+                    'StimmenTotal',
+                )),
+                ','.join((
+                    '1701',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '1',  # ListNr
+                    '0',  # StimmenTotal
+                )),
+                ','.join((
+                    '1702',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '1',  # ListNr
+                    '0',  # StimmenTotal
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wpstatic_kandidaten
+            '\n'.join((
+                ','.join((
+                    'SortGeschaeft',
+                    'KNR',
+                    'Nachname',
+                    'Vorname',
+                )),
+                ','.join((
+                    '0',
+                    '101',  # KNR
+                    'xxx',  # Nachname
+                    'xxx',  # Vorname
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wp_kandidaten
+            '\n'.join((
+                ','.join((
+                    'SortGeschaeft',
+                    'KNR',
+                    'Gewahlt',
+                )),
+                ','.join((
+                    '0',
+                    '101',  # KNR
+                    '',  # Gewahlt
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wp_kandidatengde
+            '\n'.join((
+                ','.join((
+                    'SortGemeinde',
+                    'SortGemeindeSub',
+                    'KNR',
+                    'Stimmen',
+                )),
+                ','.join((
+                    '1701',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '101',  # KNR
+                    '100',  # Stimmen
+                )),
+                ','.join((
+                    '1702',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '101',  # KNR
+                    '100',  # Stimmen
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain'
+    )
+    assert [error.error for error in errors] == ['No distinct region']
+
+    errors = import_election_wabstic_proporz(
+        election, principal_sg, '0', '0',
+        BytesIO((  # wp_wahl
+            '\n'.join((
+                ','.join((
+                    'SortGeschaeft',
+                    'Ausmittlungsstand',
+                )),
+                ','.join((
+                    '0',
+                    '0',  # Ausmittlungsstand
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wpstatic_gemeinden
+            '\n'.join((
+                ','.join((
+                    'SortWahlkreis',
+                    'SortGeschaeft',
+                    'SortGemeinde',
+                    'SortGemeindeSub',
+                    'Stimmberechtigte',
+                )),
+                ','.join((
+                    '0',
+                    '0',
+                    '3231',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '',  # Stimmberechtigte
+                )),
+                ','.join((
+                    '0',
+                    '0',
+                    '3276',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '',  # Stimmberechtigte
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wp_gemeinden
+            '\n'.join((
+                ','.join((
+                    'SortGemeinde',
+                    'SortGemeindeSub',
+                    'Stimmberechtigte',
+                    'Sperrung',
+                    'StmAbgegeben',
+                    'StmLeer',
+                    'StmUngueltig',
+                    'AnzWZAmtLeer',
+                )),
+                ','.join((
+                    '3231',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '10000',  # Stimmberechtigte
+                    '1200',  # Sperrung
+                    '',  # StmAbgegeben
+                    '1',  # StmLeer
+                    '',  # StmUngueltig
+                    '',  # AnzWZAmtLeer
+                )),
+                ','.join((
+                    '3276',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '10000',  # Stimmberechtigte
+                    '',  # Sperrung
+                    '',  # StmAbgegeben
+                    '1',  # StmLeer
+                    '',  # StmUngueltig
+                    '',  # AnzWZAmtLeer
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wp_listen
+            '\n'.join((
+                ','.join((
+                    'SortGeschaeft',
+                    'ListNr',
+                    'ListCode',
+                    'Sitze',
+                    'ListVerb',
+                    'ListUntVerb',
+                )),
+                ','.join((
+                    '0',
+                    '1',  # ListNr
+                    '1',  # ListCode
+                    '',  # Sitze
+                    '',  # ListVerb
+                    '',  # ListUntVerb
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wp_listengde
+            '\n'.join((
+                ','.join((
+                    'SortGemeinde',
+                    'SortGemeindeSub',
+                    'ListNr',
+                    'StimmenTotal',
+                )),
+                ','.join((
+                    '3231',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '1',  # ListNr
+                    '0',  # StimmenTotal
+                )),
+                ','.join((
+                    '3276',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '1',  # ListNr
+                    '0',  # StimmenTotal
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wpstatic_kandidaten
+            '\n'.join((
+                ','.join((
+                    'SortGeschaeft',
+                    'KNR',
+                    'Nachname',
+                    'Vorname',
+                )),
+                ','.join((
+                    '0',
+                    '101',  # KNR
+                    'xxx',  # Nachname
+                    'xxx',  # Vorname
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wp_kandidaten
+            '\n'.join((
+                ','.join((
+                    'SortGeschaeft',
+                    'KNR',
+                    'Gewahlt',
+                )),
+                ','.join((
+                    '0',
+                    '101',  # KNR
+                    '',  # Gewahlt
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wp_kandidatengde
+            '\n'.join((
+                ','.join((
+                    'SortGemeinde',
+                    'SortGemeindeSub',
+                    'KNR',
+                    'Stimmen',
+                )),
+                ','.join((
+                    '3231',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '101',  # KNR
+                    '100',  # Stimmen
+                )),
+                ','.join((
+                    '3276',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '101',  # KNR
+                    '100',  # Stimmen
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain'
+    )
+    assert [error.error for error in errors] == ['No distinct region']
+
+    # OK
+    errors = import_election_wabstic_proporz(
+        election, principal_zg, '0', '0',
+        BytesIO((  # wp_wahl
+            '\n'.join((
+                ','.join((
+                    'SortGeschaeft',
+                    'Ausmittlungsstand',
+                )),
+                ','.join((
+                    '0',
+                    '0',  # Ausmittlungsstand
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wpstatic_gemeinden
+            '\n'.join((
+                ','.join((
+                    'SortWahlkreis',
+                    'SortGeschaeft',
+                    'SortGemeinde',
+                    'SortGemeindeSub',
+                    'Stimmberechtigte',
+                )),
+                ','.join((
+                    '0',
+                    '0',
+                    '1701',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '',  # Stimmberechtigte
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wp_gemeinden
+            '\n'.join((
+                ','.join((
+                    'SortGemeinde',
+                    'SortGemeindeSub',
+                    'Stimmberechtigte',
+                    'Sperrung',
+                    'StmAbgegeben',
+                    'StmLeer',
+                    'StmUngueltig',
+                    'AnzWZAmtLeer',
+                )),
+                ','.join((
+                    '1701',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '10000',  # Stimmberechtigte
+                    '1200',  # Sperrung
+                    '',  # StmAbgegeben
+                    '1',  # StmLeer
+                    '',  # StmUngueltig
+                    '',  # AnzWZAmtLeer
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wp_listen
+            '\n'.join((
+                ','.join((
+                    'SortGeschaeft',
+                    'ListNr',
+                    'ListCode',
+                    'Sitze',
+                    'ListVerb',
+                    'ListUntVerb',
+                )),
+                ','.join((
+                    '0',
+                    '1',  # ListNr
+                    '1',  # ListCode
+                    '',  # Sitze
+                    '',  # ListVerb
+                    '',  # ListUntVerb
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wp_listengde
+            '\n'.join((
+                ','.join((
+                    'SortGemeinde',
+                    'SortGemeindeSub',
+                    'ListNr',
+                    'StimmenTotal',
+                )),
+                ','.join((
+                    '1701',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '1',  # ListNr
+                    '0',  # StimmenTotal
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wpstatic_kandidaten
+            '\n'.join((
+                ','.join((
+                    'SortGeschaeft',
+                    'KNR',
+                    'Nachname',
+                    'Vorname',
+                )),
+                ','.join((
+                    '0',
+                    '101',  # KNR
+                    'xxx',  # Nachname
+                    'xxx',  # Vorname
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wp_kandidaten
+            '\n'.join((
+                ','.join((
+                    'SortGeschaeft',
+                    'KNR',
+                    'Gewahlt',
+                )),
+                ','.join((
+                    '0',
+                    '101',  # KNR
+                    '',  # Gewahlt
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wp_kandidatengde
+            '\n'.join((
+                ','.join((
+                    'SortGemeinde',
+                    'SortGemeindeSub',
+                    'KNR',
+                    'Stimmen',
+                )),
+                ','.join((
+                    '1701',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '101',  # KNR
+                    '100',  # Stimmen
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain'
+    )
+    assert not errors
+    assert election.progress == (1, 1)
+
+    # Temporary
+    errors = import_election_wabstic_proporz(
+        election, principal_sg, '0', '0',
+        BytesIO((  # wp_wahl
+            '\n'.join((
+                ','.join((
+                    'SortGeschaeft',
+                    'Ausmittlungsstand',
+                )),
+                ','.join((
+                    '0',
+                    '0',  # Ausmittlungsstand
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wpstatic_gemeinden
+            '\n'.join((
+                ','.join((
+                    'SortWahlkreis',
+                    'SortGeschaeft',
+                    'SortGemeinde',
+                    'SortGemeindeSub',
+                    'Stimmberechtigte',
+                )),
+                ','.join((
+                    '0',
+                    '0',
+                    '3231',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '',  # Stimmberechtigte
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wp_gemeinden
+            '\n'.join((
+                ','.join((
+                    'SortGemeinde',
+                    'SortGemeindeSub',
+                    'Stimmberechtigte',
+                    'Sperrung',
+                    'StmAbgegeben',
+                    'StmLeer',
+                    'StmUngueltig',
+                    'AnzWZAmtLeer',
+                )),
+                ','.join((
+                    '3231',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '10000',  # Stimmberechtigte
+                    '1200',  # Sperrung
+                    '',  # StmAbgegeben
+                    '1',  # StmLeer
+                    '',  # StmUngueltig
+                    '',  # AnzWZAmtLeer
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wp_listen
+            '\n'.join((
+                ','.join((
+                    'SortGeschaeft',
+                    'ListNr',
+                    'ListCode',
+                    'Sitze',
+                    'ListVerb',
+                    'ListUntVerb',
+                )),
+                ','.join((
+                    '0',
+                    '1',  # ListNr
+                    '1',  # ListCode
+                    '',  # Sitze
+                    '',  # ListVerb
+                    '',  # ListUntVerb
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wp_listengde
+            '\n'.join((
+                ','.join((
+                    'SortGemeinde',
+                    'SortGemeindeSub',
+                    'ListNr',
+                    'StimmenTotal',
+                )),
+                ','.join((
+                    '3231',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '1',  # ListNr
+                    '0',  # StimmenTotal
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wpstatic_kandidaten
+            '\n'.join((
+                ','.join((
+                    'SortGeschaeft',
+                    'KNR',
+                    'Nachname',
+                    'Vorname',
+                )),
+                ','.join((
+                    '0',
+                    '101',  # KNR
+                    'xxx',  # Nachname
+                    'xxx',  # Vorname
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wp_kandidaten
+            '\n'.join((
+                ','.join((
+                    'SortGeschaeft',
+                    'KNR',
+                    'Gewahlt',
+                )),
+                ','.join((
+                    '0',
+                    '101',  # KNR
+                    '',  # Gewahlt
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain',
+        BytesIO((  # wp_kandidatengde
+            '\n'.join((
+                ','.join((
+                    'SortGemeinde',
+                    'SortGemeindeSub',
+                    'KNR',
+                    'Stimmen',
+                )),
+                ','.join((
+                    '3231',  # SortGemeinde
+                    '',  # SortGemeindeSub
+                    '101',  # KNR
+                    '100',  # Stimmen
+                )),
+            ))
+        ).encode('utf-8')), 'text/plain'
+    )
+    assert not errors
+    assert election.progress == (1, 13)
