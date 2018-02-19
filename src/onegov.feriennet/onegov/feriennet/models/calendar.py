@@ -67,6 +67,9 @@ class AttendeeCalendar(Calendar, name='attendee'):
         calendar = self.new()
         calendar.add('x-wr-calname', self.attendee.name)
 
+        # refresh every 120 minutes by default (Outlook and maybe others)
+        calendar.add('x-published-ttl', 'PT120M')
+
         for event in self.events(request):
             calendar.add_component(event)
 
