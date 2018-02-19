@@ -6,13 +6,14 @@ from onegov.ballot import Election
 from onegov.core.utils import module_path
 from onegov.election_day.formats import import_election_wabsti_majorz
 from onegov.election_day.models import Canton
+from onegov.election_day.models import Municipality
 from pytest import mark
 
 
 @mark.parametrize("tar_file", [
     module_path('onegov.election_day', 'tests/fixtures/wabsti_majorz.tar.gz'),
 ])
-def test_import_wabsti_majorz(session, tar_file):
+def test_import_wabsti_majorz1(session, tar_file):
     session.add(
         Election(
             title='election',
@@ -26,14 +27,17 @@ def test_import_wabsti_majorz(session, tar_file):
 
     principal = Canton(canton='sg')
 
-    # The tar file contains results from SG from the 23.10.2011
+    # The tar file contains cantonl results from SG from the 23.10.2011 and
+    # communal results from 25.09.2016
     with tarfile.open(tar_file, 'r|gz') as f:
-        csv = f.extractfile(f.next()).read()
+        cantonal = f.extractfile(f.next()).read()
+        communal = f.extractfile(f.next()).read()
     elected = "ID,Name,Vorname\n3,Rechsteiner,Paul".encode('utf-8')
 
+    # Test cantonal election without elected candiates
     errors = import_election_wabsti_majorz(
         election, principal,
-        BytesIO(csv), 'text/plain',
+        BytesIO(cantonal), 'text/plain',
     )
 
     assert not errors
@@ -54,9 +58,10 @@ def test_import_wabsti_majorz(session, tar_file):
     assert election.absolute_majority is None
     assert election.allocated_mandates == 0
 
+    # Test cantonal election with elected candidates
     errors = import_election_wabsti_majorz(
         election, principal,
-        BytesIO(csv), 'text/plain',
+        BytesIO(cantonal), 'text/plain',
         BytesIO(elected), 'text/plain',
     )
 
@@ -78,6 +83,42 @@ def test_import_wabsti_majorz(session, tar_file):
     assert election.absolute_majority is None
     assert election.allocated_mandates == 1
     assert election.elected_candidates == [('Paul', 'Rechsteiner')]
+
+    # Test communal election
+    election.domain = 'municipality'
+    election.date = date(2016, 9, 25)
+    election.number_of_mandates = 6
+
+    principal = Municipality(municipality='3231', name='Au')
+
+    errors = import_election_wabsti_majorz(
+        election, principal,
+        BytesIO(communal), 'text/plain',
+    )
+
+    assert not errors
+    assert election.completed
+    assert election.progress == (1, 1)
+    assert election.progress == (1, 1)
+    assert round(election.turnout, 2) == 27.03
+    assert election.eligible_voters == 4021
+    assert election.received_ballots == 1087
+    assert election.accounted_ballots == 1036
+    assert election.blank_ballots == 28
+    assert election.invalid_ballots == 23
+    assert sorted([candidate.votes for candidate in election.candidates]) == [
+        556, 665, 678, 715, 790, 810, 830
+    ]
+    assert election.absolute_majority == 519
+    assert election.allocated_mandates == 6
+    assert sorted(election.elected_candidates) == [
+        ('Alex', 'Frei'),
+        ('Carola', 'Espanhol'),
+        ('Ernst', 'Brändle'),
+        ('Franco', 'Frisenda'),
+        ('Gloria', 'Schöbi'),
+        ('Markus', 'Bernet')
+    ]
 
 
 def test_import_wabsti_majorz_utf16(session):
