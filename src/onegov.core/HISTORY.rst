@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.61.2 (2018-02-19)
+~~~~~~~~~~~~~~~~~~~
 
 - Excludes SQLAlchemy 1.2.3 from supported versions as it has a major bug.
   [href]
