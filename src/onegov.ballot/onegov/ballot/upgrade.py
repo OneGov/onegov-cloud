@@ -340,3 +340,28 @@ def renmame_elegible_voters_columns(context):
             context.operations.alter_column(
                 table, 'elegible_voters', new_column_name='eligible_voters'
             )
+
+
+@upgrade_task('Add election composites', always_run=True)
+def add_election_composites(context):
+    inspector = Inspector(context.operations_connection)
+    if 'election_composites' not in inspector.get_table_names(context.schema):
+        return False
+
+    if context.has_column('elections', 'composite_id'):
+        return False
+
+    context.operations.add_column(
+        'elections', Column(
+            'composite_id',
+            Text,
+            ForeignKey('election_composites.id'),
+            nullable=True
+        )
+    )
+
+    for table in tables:
+        if context.has_column(table, 'elegible_voters'):
+            context.operations.alter_column(
+                table, 'elegible_voters', new_column_name='eligible_voters'
+            )
