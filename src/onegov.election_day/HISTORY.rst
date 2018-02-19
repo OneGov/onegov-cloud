@@ -19,6 +19,9 @@ Changelog
 - Fixes spelling of "eligible voters".
   [msom]
 
+- Fixes spelling of "eligible voters".
+  [msom]
+
   **Breaking changes: The import and export formats have changed!**
 
   - ``election_counted_entities`` and ``election_total_entitites`` have been
