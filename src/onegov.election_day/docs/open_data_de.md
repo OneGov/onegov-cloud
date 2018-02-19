@@ -88,7 +88,8 @@ Name|Beschreibung
 ---|---
 `election_title_{locale}`|Übersetzter Titel, z. B. `title_de_ch` für den deutschen Titel.
 `election_date`|Das Datum der Wahl (ein ISO 8601 String)
-`election_type`|`proporz` falls Proporzwahl, `majorz` falls Majorzwahl
+`election_domain`|national (`federation`), kantonal (`canton`), regional (`region`) oder kommunal (`municipality`)
+`election_type`|Proporzwahl (`proporz`) oder Majorzwahl (`majorz`)
 `election_mandates`|Die Anzahl der Sitze.
 `election_absolute_majority`|Das absolute Mehr. Nur bei Majorzwahlen.
 `election_status`|Zwischenergebnisse (`interim`), Endergebnisse (`final`) oder unbekannt (`unknown`).

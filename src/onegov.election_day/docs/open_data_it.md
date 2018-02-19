@@ -88,7 +88,8 @@ Nome|Descrizione
 ---|---
 `election_title_{locale}`|Translated titles, for example `title_de_ch` for the German title.
 `election_date`|Data dell'elezione (stringa data in formato ISO 8601)
-`election_type`|`proporz` per il sistema proporzionale, `majorz` per il sistema maggioritario.
+`election_domain`|federale (`federation`), cantonale (`canton`), regionale (`region`) o comunale (`municipality`)
+`election_type`|sistema proporzionale (`proporz`) o sistema maggioritario (`majorz`)
 `election_mandates`|Numero di mandati.
 `election_absolute_majority`|La maggioranza assoluta. Rilevante solo per le elezioni basate sul sistema di maggioranza.
 `election_status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).

@@ -90,7 +90,8 @@ Num|Descripziun
 ---|---
 `election_title_{locale}`|Translated titles of the vote. For example `title_de_ch` for the German title.
 `election_date`|La data da l'elecziun (sco segns ISO 8601)
-`election_type`|`proporz` en cas d'ina elecziun da proporz, `majorz` en cas d'ina elecziun da maiorz
+`election_domain`|sin plaun naziunal (`federation`), regiunal (`region`), chantunal (`canton`) u communal (`municipality`)
+`election_type`|elecziun da proporz (`proporz`) u elecziun da maiorz (`majorz`)
 `election_mandates`|Il dumber dals sezs.
 `election_absolute_majority`|La maioritad absoluta. Mo tar elecziuns da maiorz.
 `election_status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
