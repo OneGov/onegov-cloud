@@ -10,6 +10,7 @@ from onegov.activity import InvoiceItem
 from onegov.activity import Occasion
 from onegov.activity import Period
 from onegov.activity import PeriodCollection
+from onegov.core.crypto import random_token
 from onegov.core.orm.types import UUID, JSON
 from onegov.core.upgrade import upgrade_task
 from sqlalchemy import Boolean
@@ -430,3 +431,12 @@ def add_family_to_invoice_items(context):
     context.operations.add_column('invoice_items', Column(
         'family', Text, nullable=True
     ))
+
+
+@upgrade_task('Add subscription_token to attendeeds')
+def add_subscription(context):
+    context.add_column_with_defaults(
+        table='attendees',
+        column=Column('subscription_token', Text, nullable=False, unique=True),
+        default=lambda attendee: random_token()
+    )

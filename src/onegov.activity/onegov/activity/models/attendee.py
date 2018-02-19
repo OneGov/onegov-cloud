@@ -3,6 +3,7 @@ from onegov.activity.models.booking import Booking
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.core.crypto import random_token
 from onegov.search import ORMSearchable
 from sqlalchemy import case, cast, func, select, and_, type_coerce
 from sqlalchemy import Column
@@ -66,6 +67,16 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
 
     #: access the user linked to this booking
     user = relationship('User')
+
+    #: a secondary id used for subscriptions only - subscriptions are ical urls
+    #: with public permission, by using a separate id we mitigate the risk of
+    #: someone figuring out all the attendee ids and gaining access to the
+    #: the calendars of all attendees
+    #:
+    #: furthermore, subscription ids can be changed in the future to invalidate
+    #: all existing subscription urls for one or all attendees.
+    subscription_token = Column(
+        Text, nullable=False, unique=True, default=random_token)
 
     @validates('gender')
     def validate_gender(self, field, value):
