@@ -29,33 +29,43 @@ def test_import_wabstic_proporz(session, tar_file):
 
     principal = Canton(canton='sg')
 
-    # The tar file contains results from SG from the 18.10.2015
+    # The tar file contains
+    #  - cantonal results from SG from the 18.10.2015
+    #  - regional results from SG from the 28.02.2016
     with tarfile.open(tar_file, 'r|gz') as f:
-        wpstatic_gemeinden = f.extractfile(f.next()).read()
-        wpstatic_kandidaten = f.extractfile(f.next()).read()
-        wp_gemeinden = f.extractfile(f.next()).read()
-        wp_kandidaten = f.extractfile(f.next()).read()
-        wp_kandidatengde = f.extractfile(f.next()).read()
-        wp_listen = f.extractfile(f.next()).read()
-        wp_listengde = f.extractfile(f.next()).read()
-        wp_wahl = f.extractfile(f.next()).read()
+        cantonal_wpstatic_gemeinden = f.extractfile(f.next()).read()
+        cantonal_wpstatic_kandidaten = f.extractfile(f.next()).read()
+        cantonal_wp_gemeinden = f.extractfile(f.next()).read()
+        cantonal_wp_kandidaten = f.extractfile(f.next()).read()
+        cantonal_wp_kandidatengde = f.extractfile(f.next()).read()
+        cantonal_wp_listen = f.extractfile(f.next()).read()
+        cantonal_wp_listengde = f.extractfile(f.next()).read()
+        cantonal_wp_wahl = f.extractfile(f.next()).read()
+        regional_wpstatic_gemeinden = f.extractfile(f.next()).read()
+        regional_wpstatic_kandidaten = f.extractfile(f.next()).read()
+        regional_wp_gemeinden = f.extractfile(f.next()).read()
+        regional_wp_kandidaten = f.extractfile(f.next()).read()
+        regional_wp_kandidatengde = f.extractfile(f.next()).read()
+        regional_wp_listen = f.extractfile(f.next()).read()
+        regional_wp_listengde = f.extractfile(f.next()).read()
+        regional_wp_wahl = f.extractfile(f.next()).read()
 
+    # Test cantonal election
     errors = import_election_wabstic_proporz(
         election, principal, '1', None,
-        BytesIO(wp_wahl), 'text/plain',
-        BytesIO(wpstatic_gemeinden), 'text/plain',
-        BytesIO(wp_gemeinden), 'text/plain',
-        BytesIO(wp_listen), 'text/plain',
-        BytesIO(wp_listengde), 'text/plain',
-        BytesIO(wpstatic_kandidaten), 'text/plain',
-        BytesIO(wp_kandidaten), 'text/plain',
-        BytesIO(wp_kandidatengde), 'text/plain',
+        BytesIO(cantonal_wp_wahl), 'text/plain',
+        BytesIO(cantonal_wpstatic_gemeinden), 'text/plain',
+        BytesIO(cantonal_wp_gemeinden), 'text/plain',
+        BytesIO(cantonal_wp_listen), 'text/plain',
+        BytesIO(cantonal_wp_listengde), 'text/plain',
+        BytesIO(cantonal_wpstatic_kandidaten), 'text/plain',
+        BytesIO(cantonal_wp_kandidaten), 'text/plain',
+        BytesIO(cantonal_wp_kandidatengde), 'text/plain',
     )
 
     assert not errors
     assert election.completed
     assert election.progress == (78, 78)
-    assert election.results.count() == 78
     assert election.absolute_majority is None
     assert election.eligible_voters == 317969
     assert election.accounted_ballots == 145631
@@ -84,6 +94,40 @@ def test_import_wabstic_proporz(session, tar_file):
     assert election.lists.filter(List.name == 'SVP').one().votes == 620183
 
     assert sorted((c.votes for c in election.list_connections))[-1] == 636317
+
+    # Test regional elections
+    election.domain = 'region'
+    election.date = date(2016, 2, 28)
+
+    for number, district, mandates, entities, votes, turnout in (
+        ('1', '1', 29, 9, 949454, 44.45),  # SG
+        ('2', '2', 10, 9, 105959, 43.07),  # RO
+        ('3', '3', 17, 13, 318662, 46.86),  # RH
+        ('4', '5', 9, 6, 83098, 43.94),  # WE
+        ('5', '6', 10, 8, 119157, 48.10),  # SA
+        ('6', '7', 16, 10, 301843, 44.65),  # SE
+        ('7', '8', 11, 12, 159038, 49.15),  # TO
+        ('8', '13', 18, 10, 352595, 43.94),  # WI
+    ):
+        election.number_of_mandates = mandates
+
+        errors = import_election_wabstic_proporz(
+            election, principal, number, district,
+            BytesIO(regional_wp_wahl), 'text/plain',
+            BytesIO(regional_wpstatic_gemeinden), 'text/plain',
+            BytesIO(regional_wp_gemeinden), 'text/plain',
+            BytesIO(regional_wp_listen), 'text/plain',
+            BytesIO(regional_wp_listengde), 'text/plain',
+            BytesIO(regional_wpstatic_kandidaten), 'text/plain',
+            BytesIO(regional_wp_kandidaten), 'text/plain',
+            BytesIO(regional_wp_kandidatengde), 'text/plain',
+        )
+
+        assert not errors
+        assert election.completed
+        assert election.progress == (entities, entities)
+        assert election.accounted_votes == votes
+        assert round(election.turnout, 2) == turnout
 
 
 def test_import_wabstic_proporz_missing_headers(session):

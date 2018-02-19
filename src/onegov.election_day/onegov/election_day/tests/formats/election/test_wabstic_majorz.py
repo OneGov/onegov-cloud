@@ -26,7 +26,8 @@ def test_import_wabstic_majorz(session, tar_file):
 
     principal = Canton(canton='sg')
 
-    # The tar file contains results from SG from the 28.02.2016
+    # The tar file contains
+    # - cantonal results from SG from the 28.02.2016
     with tarfile.open(tar_file, 'r|gz') as f:
         wmstatic_gemeinden = f.extractfile(f.next()).read()
         wm_gemeinden = f.extractfile(f.next()).read()

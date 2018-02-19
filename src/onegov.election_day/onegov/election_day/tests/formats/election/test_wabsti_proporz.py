@@ -27,22 +27,21 @@ def test_import_wabsti_proporz(session, tar_file):
 
     principal = Canton(canton='zg')
 
-    # The tar file contains results from ZG from the 18.10.2015
+    # The tar file contains
+    # - cantonal results from ZG from the 18.10.2015
+    # - regional results from Rheintal from the 28.02.2016
     with tarfile.open(tar_file, 'r|gz') as f:
-        csv = f.extractfile(f.next()).read()
-        connections = f.extractfile(f.next()).read()
-        stats = f.extractfile(f.next()).read()
+        cantonal_csv = f.extractfile(f.next()).read()
+        cantonal_connections = f.extractfile(f.next()).read()
+        cantonal_stats = f.extractfile(f.next()).read()
+        regional_csv = f.extractfile(f.next()).read()
+        regional_elected = f.extractfile(f.next()).read()
+        regional_stats = f.extractfile(f.next()).read()
 
-    elected = (
-        'ID,Name,Vorname\n'
-        '401,Pfister,Gerhard\n'
-        '601,Pezzatti,Bruno\n'
-        '1501,Aeschi,Thomas\n'
-    ).encode('utf-8')
-
+    # Test cantonal election without elected candidates, connections and stats
     errors = import_election_wabsti_proporz(
         election, principal,
-        BytesIO(csv), 'text/plain',
+        BytesIO(cantonal_csv), 'text/plain',
     )
 
     assert not errors
@@ -67,18 +66,24 @@ def test_import_wabsti_proporz(session, tar_file):
     assert election.absolute_majority is None
     assert election.allocated_mandates == 0
 
+    # Test cantonal election with elected candidates, connections and stats
+    cantonal_elected = (
+        'ID,Name,Vorname\n'
+        '401,Pfister,Gerhard\n'
+        '601,Pezzatti,Bruno\n'
+        '1501,Aeschi,Thomas\n'
+    ).encode('utf-8')
+
     errors = import_election_wabsti_proporz(
         election, principal,
-        BytesIO(csv), 'text/plain',
-        BytesIO(connections), 'text/plain',
-        BytesIO(elected), 'text/plain',
-        BytesIO(stats), 'text/plain',
+        BytesIO(cantonal_csv), 'text/plain',
+        BytesIO(cantonal_connections), 'text/plain',
+        BytesIO(cantonal_elected), 'text/plain',
+        BytesIO(cantonal_stats), 'text/plain',
     )
 
     assert not errors
     assert election.completed
-    assert election.progress == (11, 11)
-    assert election.results.count() == 11
     assert election.progress == (11, 11)
     assert round(election.turnout, 2) == 53.74
     assert election.eligible_voters == 74803
@@ -105,6 +110,66 @@ def test_import_wabsti_proporz(session, tar_file):
     ]
     assert sorted((c.votes for c in election.list_connections)) == [
         0, 1128, 4178, 8352, 16048, 20584, 30856, 35543
+    ]
+
+    # Test regional election
+    principal = Canton(canton='sg')
+    election.domain = 'region'
+    election.date = date(2016, 2, 28)
+    election.number_of_mandates = 17
+
+    mime = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    errors = import_election_wabsti_proporz(
+        election, principal,
+        BytesIO(regional_csv), mime,
+        None, None,
+        BytesIO(regional_elected), mime,
+        BytesIO(regional_stats), mime,
+    )
+
+    assert not errors
+    assert election.completed
+    assert election.progress == (13, 13)
+    assert round(election.turnout, 2) == 46.86
+    assert election.eligible_voters == 41843
+    assert election.accounted_ballots == 19270
+    assert election.accounted_votes == 318662
+    assert election.received_ballots == 19607
+    assert election.blank_ballots == 31
+    assert election.invalid_ballots == 306
+    assert sorted([candidate.votes for candidate in election.candidates]) == [
+        385, 527, 555, 583, 608, 754, 857, 865, 950, 1133, 1200, 1201, 1303,
+        1341, 1406, 1434, 1444, 1450, 1454, 1515, 1520, 1577, 1588, 1615,
+        1689, 1691, 1734, 1830, 1863, 1864, 2077, 2082, 2151, 2159, 2249,
+        2328, 2374, 2460, 2524, 2552, 2571, 2653, 2699, 2779, 2916, 2919,
+        3070, 3098, 3296, 3299, 3374, 3546, 3617, 3778, 3901, 4356, 4437,
+        4716, 4784, 4849, 4999, 5136, 5211, 5229, 5251, 5376, 5564, 5610,
+        5950, 5965, 5965, 6078, 6085, 6184, 6435, 6738, 6901, 6949, 7152,
+        7415, 9055, 9144, 9242
+    ]
+    assert election.absolute_majority is None
+    assert election.allocated_mandates == 17
+    assert sorted(election.elected_candidates) == [
+        ('Alexander', 'Bartl'),
+        ('Andreas', 'Broger'),
+        ('Christian', 'Willi'),
+        ('Laura', 'Bucher'),
+        ('Marcel', 'Dietsche'),
+        ('Markus', 'Wüst'),
+        ('Meinrad', 'Gschwend'),
+        ('Michael', 'Schöbi'),
+        ('Mike', 'Egger'),
+        ('Patrick', 'Dürr'),
+        ('Peter', 'Eggenberger'),
+        ('Peter', 'Kuster'),
+        ('Remo', 'Maurer'),
+        ('Rolf', 'Huber'),
+        ('Sandro', 'Hess'),
+        ('Stefan', 'Britschgi'),
+        ('Walter', 'Freund')
+    ]
+    assert sorted((l.votes for l in election.lists)) == [
+        12568, 15823, 36027, 61935, 75656, 116653
     ]
 
 

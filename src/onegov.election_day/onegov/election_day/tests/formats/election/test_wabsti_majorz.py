@@ -13,7 +13,7 @@ from pytest import mark
 @mark.parametrize("tar_file", [
     module_path('onegov.election_day', 'tests/fixtures/wabsti_majorz.tar.gz'),
 ])
-def test_import_wabsti_majorz1(session, tar_file):
+def test_import_wabsti_majorz(session, tar_file):
     session.add(
         Election(
             title='election',
@@ -27,12 +27,14 @@ def test_import_wabsti_majorz1(session, tar_file):
 
     principal = Canton(canton='sg')
 
-    # The tar file contains cantonl results from SG from the 23.10.2011 and
-    # communal results from 25.09.2016
+    # The tar file contains
+    # - cantonal results from SG from the 23.10.2011
+    # - regional results from Rohrschach the 25.09.2016
+    # - communal results from the 25.09.2016
     with tarfile.open(tar_file, 'r|gz') as f:
         cantonal = f.extractfile(f.next()).read()
+        regional = f.extractfile(f.next()).read()
         communal = f.extractfile(f.next()).read()
-    elected = "ID,Name,Vorname\n3,Rechsteiner,Paul".encode('utf-8')
 
     # Test cantonal election without elected candiates
     errors = import_election_wabsti_majorz(
@@ -42,8 +44,6 @@ def test_import_wabsti_majorz1(session, tar_file):
 
     assert not errors
     assert election.completed
-    assert election.progress == (85, 85)
-    assert election.results.count() == 85
     assert election.progress == (85, 85)
     assert round(election.turnout, 2) == 47.79
     assert election.eligible_voters == 304850
@@ -59,6 +59,8 @@ def test_import_wabsti_majorz1(session, tar_file):
     assert election.allocated_mandates == 0
 
     # Test cantonal election with elected candidates
+    elected = "ID,Name,Vorname\n3,Rechsteiner,Paul".encode('utf-8')
+
     errors = import_election_wabsti_majorz(
         election, principal,
         BytesIO(cantonal), 'text/plain',
@@ -67,8 +69,6 @@ def test_import_wabsti_majorz1(session, tar_file):
 
     assert not errors
     assert election.completed
-    assert election.progress == (85, 85)
-    assert election.results.count() == 85
     assert election.progress == (85, 85)
     assert round(election.turnout, 2) == 47.79
     assert election.eligible_voters == 304850
@@ -84,6 +84,32 @@ def test_import_wabsti_majorz1(session, tar_file):
     assert election.allocated_mandates == 1
     assert election.elected_candidates == [('Paul', 'Rechsteiner')]
 
+    # Test regional election
+    election.domain = 'region'
+    election.date = date(2016, 9, 25)
+    election.number_of_mandates = 1
+
+    errors = import_election_wabsti_majorz(
+        election, principal,
+        BytesIO(regional), 'text/plain',
+    )
+
+    assert not errors
+    assert election.completed
+    assert election.progress == (9, 9)
+    assert round(election.turnout, 2) == 42.0
+    assert election.eligible_voters == 25438
+    assert election.received_ballots == 10685
+    assert election.accounted_ballots == 10150
+    assert election.blank_ballots == 456
+    assert election.invalid_ballots == 79
+
+    assert sorted([candidate.votes for candidate in election.candidates]) == [
+        2804, 3602, 3721
+    ]
+    assert election.absolute_majority == 5076
+    assert election.allocated_mandates == 0
+
     # Test communal election
     election.domain = 'municipality'
     election.date = date(2016, 9, 25)
@@ -98,7 +124,6 @@ def test_import_wabsti_majorz1(session, tar_file):
 
     assert not errors
     assert election.completed
-    assert election.progress == (1, 1)
     assert election.progress == (1, 1)
     assert round(election.turnout, 2) == 27.03
     assert election.eligible_voters == 4021

@@ -13,7 +13,7 @@ from pytest import mark
 
 @mark.parametrize("tar_file", [
     module_path('onegov.election_day',
-                'tests/fixtures/internal_election.tar.gz'),
+                'tests/fixtures/internal_proporz.tar.gz'),
 ])
 def test_import_internal_proporz(session, tar_file):
     session.add(
@@ -30,23 +30,22 @@ def test_import_internal_proporz(session, tar_file):
 
     principal = Canton(canton='zg')
 
-    # The tar file contains results from ZG from the 18.10.2015 (v1.13.1)
-    # and results from Bern from the 25.11.2015 (v1.13.1)
+    # The tar file contains
+    # - cantonal results from ZG from the 18.10.2015
+    # - regional results from ZG from the 05.10.2014
     with tarfile.open(tar_file, 'r|gz') as f:
-        f.extractfile(f.next()).read()
-        csv_proporz = f.extractfile(f.next()).read()
-        f.extractfile(f.next()).read()
+        csv_cantonal = f.extractfile(f.next()).read()
+        csv_regional = f.extractfile(f.next()).read()
 
-    # Test federal proporz
+    # Test federal election
     election.number_of_mandates = 3
     errors = import_election_internal_proporz(
-        election, principal, BytesIO(csv_proporz), 'text/plain',
+        election, principal, BytesIO(csv_cantonal), 'text/plain',
     )
 
     assert not errors
     assert election.completed
     assert election.progress == (11, 11)
-    assert election.results.count() == 11
     assert election.absolute_majority is None
     assert election.eligible_voters == 74803
     assert election.accounted_ballots == 39067
@@ -76,7 +75,6 @@ def test_import_internal_proporz(session, tar_file):
     assert not errors
     assert election.completed
     assert election.progress == (11, 11)
-    assert election.results.count() == 11
     assert election.absolute_majority is None
     assert election.eligible_voters == 74803
     assert election.accounted_ballots == 39067
@@ -94,6 +92,51 @@ def test_import_internal_proporz(session, tar_file):
     ]
     assert sorted([list.votes for list in election.list_connections]) == [
         0, 1128, 4178, 8352, 16048, 20584, 30856, 35543
+    ]
+
+    # Test regional election
+    election.domain = 'region'
+    election.number_of_mandates = 19
+
+    errors = import_election_internal_proporz(
+        election, principal, BytesIO(csv_regional), 'text/plain',
+    )
+
+    assert not errors
+    assert election.completed
+    assert election.progress == (1, 1)
+    assert election.absolute_majority is None
+    assert election.eligible_voters == 16481
+    assert election.received_ballots == 7471
+    assert election.blank_ballots == 59
+    assert election.invalid_ballots == 204
+    assert election.accounted_votes == 131899
+    assert round(election.turnout, 2) == 45.33
+    assert election.allocated_mandates == 19
+    assert sorted([list.votes for list in election.lists]) == [
+        1175, 9557, 15580, 23406, 23653, 27116, 31412
+    ]
+
+    # ... roundtrip
+    csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
+
+    errors = import_election_internal_proporz(
+        election, principal, BytesIO(csv), 'text/plain'
+    )
+
+    assert not errors
+    assert election.completed
+    assert election.progress == (1, 1)
+    assert election.absolute_majority is None
+    assert election.eligible_voters == 16481
+    assert election.received_ballots == 7471
+    assert election.blank_ballots == 59
+    assert election.invalid_ballots == 204
+    assert election.accounted_votes == 131899
+    assert round(election.turnout, 2) == 45.33
+    assert election.allocated_mandates == 19
+    assert sorted([list.votes for list in election.lists]) == [
+        1175, 9557, 15580, 23406, 23653, 27116, 31412
     ]
 
 

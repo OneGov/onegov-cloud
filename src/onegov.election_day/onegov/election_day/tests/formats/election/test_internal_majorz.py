@@ -13,7 +13,7 @@ from pytest import mark
 
 @mark.parametrize("tar_file", [
     module_path('onegov.election_day',
-                'tests/fixtures/internal_election.tar.gz'),
+                'tests/fixtures/internal_majorz.tar.gz'),
 ])
 def test_import_internal_majorz(session, tar_file):
     session.add(
@@ -29,22 +29,25 @@ def test_import_internal_majorz(session, tar_file):
 
     principal = Canton(canton='zg')
 
-    # The tar file contains results from ZG from the 18.10.2015 (v1.13.1)
-    # and results from Bern from the 25.11.2015 (v1.13.1)
+    # The tar file contains
+    # - cantonal results from ZG from the 18.10.2015
+    # - regional results form Zug from the 24.06.2012
+    # - communal results from Bern from the 25.11.2015
+    # - communal results from Kriens from the 23.08.2015
     with tarfile.open(tar_file, 'r|gz') as f:
-        csv_majorz = f.extractfile(f.next()).read()
-        f.extractfile(f.next()).read()
-        csv_communal = f.extractfile(f.next()).read()
+        csv_cantonal = f.extractfile(f.next()).read()
+        csv_regional = f.extractfile(f.next()).read()
+        csv_communal_1 = f.extractfile(f.next()).read()
+        csv_communal_2 = f.extractfile(f.next()).read()
 
-    # Test federal majorz
+    # Test federal election
     errors = import_election_internal_majorz(
-        election, principal, BytesIO(csv_majorz), 'text/plain',
+        election, principal, BytesIO(csv_cantonal), 'text/plain',
     )
 
     assert not errors
     assert election.completed
     assert election.progress == (11, 11)
-    assert election.results.count() == 11
     assert election.absolute_majority == 18191
     assert election.eligible_voters == 73355
     assert election.accounted_ballots == 38710
@@ -67,7 +70,6 @@ def test_import_internal_majorz(session, tar_file):
     assert not errors
     assert election.completed
     assert election.progress == (11, 11)
-    assert election.results.count() == 11
     assert election.absolute_majority == 18191
     assert election.eligible_voters == 73355
     assert election.accounted_ballots == 38710
@@ -80,64 +82,54 @@ def test_import_internal_majorz(session, tar_file):
         ('Joachim', 'Eder'), ('Peter', 'Hegglin')
     ]
 
-    # Test communal majorz without quarters
-    election.type = 'majorz'
+    # Test regional election
+    election.domain = 'region'
     election.number_of_mandates = 1
+
+    errors = import_election_internal_majorz(
+        election, principal, BytesIO(csv_regional), 'text/plain',
+    )
+
+    assert not errors
+    assert election.completed
+    assert election.progress == (1, 1)
+    assert election.absolute_majority == 3237
+    assert election.eligible_voters == 16174
+    assert election.blank_ballots == 89
+    assert election.invalid_ballots == 72
+    assert round(election.turnout, 2) == 41.02
+    assert election.elected_candidates == [('Johannes', 'Stöckli')]
+
+    # ... roundtrip
+    csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
+
+    errors = import_election_internal_majorz(
+        election, principal, BytesIO(csv), 'text/plain'
+    )
+
+    assert not errors
+    assert election.completed
+    assert election.progress == (1, 1)
+    assert election.absolute_majority == 3237
+    assert election.eligible_voters == 16174
+    assert election.blank_ballots == 89
+    assert election.invalid_ballots == 72
+    assert round(election.turnout, 2) == 41.02
+    assert election.elected_candidates == [('Johannes', 'Stöckli')]
+
+    # Test communal election without quarters
     principal = Municipality(municipality='1059')
 
-    csv = (
-        '\n'.join((
-            ','.join((
-                'election_absolute_majority',
-                'election_status',
-                'entity_id',
-                'entity_counted',
-                'entity_eligible_voters',
-                'entity_received_ballots',
-                'entity_blank_ballots',
-                'entity_invalid_ballots',
-                'entity_blank_votes',
-                'entity_invalid_votes',
-                'list_name',
-                'list_id',
-                'list_number_of_mandates',
-                'list_votes',
-                'list_connection',
-                'list_connection_parent',
-                'candidate_family_name',
-                'candidate_first_name',
-                'candidate_id',
-                'candidate_elected',
-                'candidate_votes',
-                'candidate_party',
-            )),
-            (
-                '3294,,1059,True,18699,6761,124,51,0,0,,,,,,,'
-                'Koch,Patrick,1,False,,1621,'
-            ),
-            (
-                '3294,,1059,True,18699,6761,124,51,0,0,,,,,,,'
-                'Konrad,Simon,2,False,,1707,'
-            ),
-            (
-                '3294,,1059,True,18699,6761,124,51,0,0,,,,,,,'
-                'Faé,Franco,3,False,,3176,'
-            ),
-            (
-                '3294,,1059,True,18699,6761,124,51,0,0,,,,,,,'
-                'Vereinzelte,,4,False,,82,'
-            ),
-        ))
-    ).encode('utf-8')
+    election.domain = 'municipality'
+    election.number_of_mandates = 1
 
     errors = import_election_internal_majorz(
-        election, principal, BytesIO(csv), 'text/plain',
+        election, principal, BytesIO(csv_communal_1), 'text/plain',
     )
 
     assert not errors
     assert election.completed
     assert election.progress == (1, 1)
-    assert election.results.count() == 1
     assert election.absolute_majority == 3294
     assert election.eligible_voters == 18699
     assert election.blank_ballots == 124
@@ -156,7 +148,6 @@ def test_import_internal_majorz(session, tar_file):
     assert not errors
     assert election.completed
     assert election.progress == (1, 1)
-    assert election.results.count() == 1
     assert election.absolute_majority == 3294
     assert election.eligible_voters == 18699
     assert election.blank_ballots == 124
@@ -165,19 +156,16 @@ def test_import_internal_majorz(session, tar_file):
     assert election.allocated_mandates == 0
     assert election.candidates.count() == 4
 
-    # Test communal majorz with quarters
-    election.type = 'majorz'
-    election.number_of_mandates = 1
+    # Test communal election with quarters
     principal = Municipality(municipality='351')
 
     errors = import_election_internal_majorz(
-        election, principal, BytesIO(csv_communal), 'text/plain',
+        election, principal, BytesIO(csv_communal_2), 'text/plain',
     )
 
     assert not errors
     assert election.completed
     assert election.progress == (6, 6)
-    assert election.results.count() == 6
     assert election.absolute_majority == 12606
     assert election.eligible_voters == 82497
     assert election.blank_ballots == 1274
@@ -196,7 +184,6 @@ def test_import_internal_majorz(session, tar_file):
     assert not errors
     assert election.completed
     assert election.progress == (6, 6)
-    assert election.results.count() == 6
     assert election.absolute_majority == 12606
     assert election.eligible_voters == 82497
     assert election.blank_ballots == 1274
