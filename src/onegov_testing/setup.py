@@ -38,7 +38,6 @@ setup(
         'Pillow',
         'port-for',
         'pytest>=3.0.6',
-        'sqlalchemy',
         'splinter',
         'webdriver-manager',
         'testing.postgresql',
