@@ -19,9 +19,16 @@ class InjectedBrowserExtension(object):
         browser = browser_factory(*args, **kwargs)
 
         class LeechedExtendedBrowser(cls, browser.__class__):
-            pass
 
-        browser.spawn_parameters = browser_factory, args, kwargs
+            clones = []
+
+            def quit(self):
+                for clone in self.clones:
+                    clone.quit()
+
+                super().quit()
+
+        browser.spawn_parameters = cls, browser_factory, args, kwargs
         browser.__class__ = LeechedExtendedBrowser
         return browser
 
@@ -31,8 +38,10 @@ class InjectedBrowserExtension(object):
 
         """
 
-        browser_factory, args, kwargs = self.spawn_parameters
-        browser = self.__class__.spawn(browser_factory, *args, **kwargs)
+        cls, browser_factory, args, kwargs = self.spawn_parameters
+        browser = cls.spawn(browser_factory, *args, **kwargs)
+
+        self.clones.append(browser)
 
         for key, value in self.clone_parameters.items():
             setattr(browser, key, value)
