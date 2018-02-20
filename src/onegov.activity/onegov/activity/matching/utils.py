@@ -3,7 +3,7 @@ from onegov.activity.utils import dates_overlap
 from sortedcontainers import SortedSet
 
 
-def overlaps(booking, other, minutes_between=0):
+def overlaps(booking, other, minutes_between=0, alignment=None):
     """ Returns true if the two given bookings overlap. """
 
     assert booking != other
@@ -17,7 +17,8 @@ def overlaps(booking, other, minutes_between=0):
     return dates_overlap(
         tuple((b.start, b.end) for b in booking.dates),
         tuple((o.start, o.end) for o in other.dates),
-        minutes_between=minutes_between
+        minutes_between=minutes_between,
+        alignment=alignment
     )
 
 

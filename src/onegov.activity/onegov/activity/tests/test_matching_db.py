@@ -32,7 +32,7 @@ def new_occasion(collections, period, offset, length,
 
     return collections.occasions.add(
         start=period.prebooking_start + timedelta(days=offset),
-        end=period.prebooking_end + timedelta(days=offset + length),
+        end=period.prebooking_start + timedelta(days=offset + length),
         timezone="Europe/Zurich",
         activity=activity,
         period=period,
@@ -211,8 +211,7 @@ def test_prefer_admin_children(session, owner, member, collections,
     assert b2.state == 'open'
 
 
-def test_multiple_overlapping_dates(session, owner, collections,
-                                    prebooking_period):
+def test_interleaved_dates(session, owner, collections, prebooking_period):
 
     o1 = new_occasion(collections, prebooking_period, 0, 1)
     collections.occasions.add_date(
@@ -237,5 +236,57 @@ def test_multiple_overlapping_dates(session, owner, collections,
 
     match(session, prebooking_period.id)
 
+    assert b1.state == 'accepted'
+    assert b2.state == 'accepted'
+
+
+def test_overlapping_dates(session, owner, collections, prebooking_period):
+
+    # only the second dates overlap
+    o1 = new_occasion(collections, prebooking_period, 0, 1)
+    collections.occasions.add_date(
+        o1,
+        o1.dates[0].end + timedelta(days=3, seconds=1),
+        o1.dates[0].end + timedelta(days=5),
+        o1.dates[0].timezone
+    )
+
+    o2 = new_occasion(collections, prebooking_period, 2, 1)
+    collections.occasions.add_date(
+        o2,
+        o2.dates[0].end + timedelta(days=2, seconds=1),
+        o2.dates[0].end + timedelta(days=3),
+        o2.dates[0].timezone
+    )
+
+    a1 = new_attendee(collections, user=owner)
+
+    b1 = collections.bookings.add(owner, a1, o1, priority=1)
+    b2 = collections.bookings.add(owner, a1, o2, priority=0)
+
+    match(session, prebooking_period.id)
+
+    assert b1.state == 'accepted'
+    assert b2.state == 'blocked'
+
+
+def test_alignment(session, owner, collections, prebooking_period):
+
+    o1 = new_occasion(collections, prebooking_period, 0, 0.5)
+    o2 = new_occasion(collections, prebooking_period, 0.5, 0.5)
+
+    a1 = new_attendee(collections, user=owner)
+
+    b1 = collections.bookings.add(owner, a1, o1, priority=0)
+    b2 = collections.bookings.add(owner, a1, o2, priority=0)
+
+    match(session, prebooking_period.id)
+
+    assert b1.state == 'accepted'
+    assert b2.state == 'accepted'
+
+    prebooking_period.alignment = 'day'
+
+    match(session, prebooking_period.id)
     assert b1.state == 'accepted'
     assert b2.state == 'blocked'

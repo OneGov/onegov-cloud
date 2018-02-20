@@ -232,5 +232,6 @@ class Booking(Base, TimestampMixin):
         return dates_overlap(
             tuple((d.start, d.end) for d in self.dates),
             tuple((o.start, o.end) for o in other.dates),
-            minutes_between=self.period.minutes_between
+            minutes_between=self.period.minutes_between,
+            alignment=self.period.alignment
         )

@@ -75,6 +75,9 @@ class Period(Base, TimestampMixin):
     #: Time between bookings in minutes
     minutes_between = Column(Integer, nullable=True, default=0)
 
+    #: The alignment of bookings in the matching
+    alignment = Column(Text, nullable=True)
+
     #: Date after which no bookings are possible anymore
     deadline_date = Column(Date, nullable=True)
 

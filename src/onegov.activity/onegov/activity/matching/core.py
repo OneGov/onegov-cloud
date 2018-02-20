@@ -29,16 +29,18 @@ class AttendeeAgent(hashable('id')):
 
     __slots__ = ('id', 'wishlist', 'accepted', 'blocked')
 
-    def __init__(self, id, bookings, limit=None, minutes_between=0):
+    def __init__(self, id, bookings, limit=None, minutes_between=0,
+                 alignment=None):
         self.id = id
         self.limit = limit
         self.wishlist = SortedSet(bookings, key=booking_order)
         self.accepted = set()
         self.blocked = set()
         self.minutes_between = minutes_between
+        self.alignment = alignment
 
     def blocks(self, subject, other):
-        return overlaps(subject, other, self.minutes_between)
+        return overlaps(subject, other, self.minutes_between, self.alignment)
 
     def accept(self, booking):
         """ Accepts the given booking. """
@@ -197,7 +199,8 @@ def deferred_acceptance_from_database(session, period_id, **kwargs):
     bookings = deferred_acceptance(
         bookings=b, occasions=o,
         default_limit=default_limit, attendee_limits=attendee_limits,
-        minutes_between=period.minutes_between, **kwargs)
+        minutes_between=period.minutes_between, alignment=period.alignment,
+        **kwargs)
 
     # write the changes to the database
     def update_states(bookings, state):
@@ -224,7 +227,8 @@ def deferred_acceptance(bookings, occasions,
                         hard_budget=True,
                         default_limit=None,
                         attendee_limits=None,
-                        minutes_between=0):
+                        minutes_between=0,
+                        alignment=None):
     """ Matches bookings with occasions.
 
     :score_function:
@@ -261,7 +265,33 @@ def deferred_acceptance(bookings, occasions,
         attendee. Keyed by the attendee id, this dictionary contains
         per-attendee limits. Those fall back to the default_limit.
 
+    :minutes_between:
+        The minutes between each booking that should be considered
+        transfer-time. That is the time it takes to get from one booking
+        to another. Basically acts as a suffix to each booking, extending
+        it's end time by n minutes.
+
+    :alignment:
+        Align the date range to the given value. Currently only 'day' is
+        supported. When an alignment is active, all bookings are internally
+        stretched to at least cover the alignment.
+
+        For example, if 'day' is given, a booking that lasts 4 hours is
+        considered to last the whole day and it will block out bookings
+        on the same day.
+
+        Note that the ``minutes_between`` parameter is independent of this.
+        That is if there's 90 minutes between bookigns and the bookings are
+        aligned to the day, there can only be a booking every other day::
+
+            10:00 - 19:00 becomes 00:00 - 24:00 + 90mins.
+
+        Usually you probably do not want minutes_between combined with
+        an alignment.
+
     """
+    assert alignment in (None, 'day')
+
     attendee_limits = attendee_limits or {}
     score_function = eager_score(bookings, score_function or Scoring())
 
@@ -277,7 +307,8 @@ def deferred_acceptance(bookings, occasions,
             aid,
             limit=attendee_limits.get(aid, default_limit),
             bookings=bookings,
-            minutes_between=minutes_between
+            minutes_between=minutes_between,
+            alignment=alignment
         )
         for aid, bookings in groupby(bookings, key=lambda b: b.attendee_id)
     }

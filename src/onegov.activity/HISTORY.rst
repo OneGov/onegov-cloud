@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the ability to limit attendees to one activity per day.
+  [href]
+
 1.6.2 (2018-02-19)
 ~~~~~~~~~~~~~~~~~~~
 

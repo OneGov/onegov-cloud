@@ -440,3 +440,11 @@ def add_subscription(context):
         column=Column('subscription_token', Text, nullable=False, unique=True),
         default=lambda attendee: random_token()
     )
+
+
+@upgrade_task('Add alignment to periods')
+def add_alignment(context):
+    if not context.has_column('periods', 'alignment'):
+        context.operations.add_column('periods', Column(
+            'alignment', Text, nullable=True
+        ))

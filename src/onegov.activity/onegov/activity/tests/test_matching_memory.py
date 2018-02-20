@@ -13,6 +13,7 @@ from onegov.activity.matching import PreferOrganiserChildren
 from onegov.activity.matching import Scoring
 from onegov.activity.matching.core import is_stable, OccasionAgent
 from onegov.core.utils import Bunch
+from sedate import standardize_date
 
 
 today = date.today
@@ -76,8 +77,14 @@ class Occasion(MatchableOccasion):
     def __init__(self, name, dates, max_spots=10, no_overlap_check=False):
         self.name = name
         self._max_spots = max_spots
-        self._dates = dates
         self._no_overlap_check = no_overlap_check
+
+        def standardize(dt):
+            if isinstance(dt, datetime):
+                return standardize_date(dt, 'Europe/Zurich')
+            return dt
+
+        self._dates = [(standardize(s), standardize(e)) for s, e in dates]
 
     @property
     def id(self):
@@ -576,3 +583,71 @@ def test_booking_limit():
         bookings[4],
         bookings[5],
     }
+
+
+def test_day_alignment():
+    o1 = Occasion(1, [
+        [datetime(2017, 2, 20, 8), datetime(2017, 2, 20, 16)]
+    ])
+    o2 = Occasion(2, [
+        [datetime(2017, 2, 21, 8), datetime(2017, 2, 21, 16)],
+        [datetime(2017, 2, 22, 8), datetime(2017, 2, 22, 12)]
+    ])
+    o3 = Occasion(3, [
+        [datetime(2017, 2, 22, 13), datetime(2017, 2, 22, 16)]
+    ])
+
+    bookings = [
+        o1.booking("Tom", 'open', 0),
+        o2.booking("Tom", 'open', 0),
+        o3.booking("Tom", 'open', 0)
+    ]
+
+    # o2 and o3 do not overlap, but they have an occasion on the same day
+    # which should be catpured by our occasions_per_day limit
+    result = match(bookings, (o1, o2, o3))
+    assert len(result.accepted) == 3
+
+    result = match(bookings, (o1, o2, o3), alignment='day')
+    assert len(result.accepted) == 2
+
+
+def test_split_day_alignment():
+    o1 = Occasion(1, [
+        [datetime(2017, 2, 20, 8), datetime(2017, 2, 20, 16)]
+    ])
+    o2 = Occasion(2, [
+        [datetime(2017, 2, 21, 8), datetime(2017, 2, 21, 12)],
+        [datetime(2017, 2, 21, 13), datetime(2017, 2, 21, 16)]
+    ])
+
+    bookings = [
+        o1.booking("Tom", 'open', 0),
+        o2.booking("Tom", 'open', 0),
+    ]
+
+    # the occasion o2 is split into two occasions on the same day ->
+    # we however do not consider this to be a block, since it's the same
+    # occasion
+    assert len(match(bookings, (o1, o2)).accepted) == 2
+    assert len(match(bookings, (o1, o2), alignment='day').accepted) == 2
+
+
+def test_multi_day_alignment():
+    o1 = Occasion(1, [
+        [datetime(2017, 2, 20, 8), datetime(2017, 2, 21, 16)]
+    ])
+    o2 = Occasion(2, [
+        [datetime(2017, 2, 21, 17), datetime(2017, 2, 21, 18)]
+    ])
+
+    bookings = [
+        o1.booking("Tom", 'open', 0),
+        o2.booking("Tom", 'open', 0),
+    ]
+
+    # the occasion o2 is split into two occasions on the same day ->
+    # we however do not consider this to be a block, since it's the same
+    # occasion
+    assert len(match(bookings, (o1, o2)).accepted) == 2
+    assert len(match(bookings, (o1, o2), alignment='day').accepted) == 1

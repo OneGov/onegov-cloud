@@ -5,6 +5,7 @@ import string
 import re
 
 from datetime import timedelta
+from functools import partial
 from itertools import chain
 from onegov.core.utils import chunks
 from pyquery import PyQuery as pq
@@ -279,7 +280,7 @@ def generate_xml(payments):
     """.format('\n'.join(transactions))
 
 
-def dates_overlap(a, b, minutes_between=0, cut_end=True):
+def dates_overlap(a, b, minutes_between=0, cut_end=True, alignment=None):
     """ Returns true if any time tuple in the list of tuples in a overlaps
     with a time tuple in b.
 
@@ -294,8 +295,22 @@ def dates_overlap(a, b, minutes_between=0, cut_end=True):
     # make sure that 11:00 - 12:00 and 12:00 - 13:00 are not overlapping
     ms = timedelta(microseconds=1)
 
+    if alignment:
+
+        # alignment function
+        align = getattr(sedate, f'align_range_to_{alignment}')
+
+        # it is highliy unlikely that this will ever be anything else as this
+        # module is pretty much tailored for Switzerland
+        align = partial(align, timezone='Europe/Zurich')
+
     for s, e in a:
         for os, oe in b:
+
+            if alignment:
+                s, e = align(s, e)
+                os, oe = align(os, oe)
+
             if sedate.overlaps(
                 s - offset, e + offset - ms,
                 os - offset, oe + offset - ms
