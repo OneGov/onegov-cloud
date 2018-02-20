@@ -277,7 +277,7 @@ def test_alignment(session, owner, collections, prebooking_period):
 
     a1 = new_attendee(collections, user=owner)
 
-    b1 = collections.bookings.add(owner, a1, o1, priority=0)
+    b1 = collections.bookings.add(owner, a1, o1, priority=1)
     b2 = collections.bookings.add(owner, a1, o2, priority=0)
 
     match(session, prebooking_period.id)
