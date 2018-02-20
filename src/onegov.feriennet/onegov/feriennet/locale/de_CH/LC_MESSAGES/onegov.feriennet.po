@@ -1572,13 +1572,8 @@ msgstr ""
 "Wir können nicht garantieren dass jedes Kind in sein Lieblingsangebot "
 "eingeteilt wird."
 
-#.
-#. Used in sentence: "<dynamic element>"
 msgid "Add to calendar"
-msgstr ""
-
-msgid "<dynamic element>"
-msgstr ""
+msgstr "Zum Kalender hinzufügen"
 
 msgid "Limited to ${number} bookings"
 msgstr "Limitiert auf ${number} Buchungen"

@@ -1588,13 +1588,8 @@ msgstr ""
 "Nous ne pouvons garantir que tout le monde pourra participer à son activité "
 "préféré."
 
-#.
-#. Used in sentence: "<dynamic element>"
 msgid "Add to calendar"
-msgstr ""
-
-msgid "<dynamic element>"
-msgstr ""
+msgstr "Ajouter au calendrier"
 
 msgid "Limited to ${number} bookings"
 msgstr "Limité à ${number} réservations"
@@ -2095,6 +2090,9 @@ msgstr "Voulez-vous vraiment supprimer la réservation de ${attendee} ?"
 #, python-format
 msgid "Do you really want to cancel ${attendee}'s booking?"
 msgstr "Voulez-vous vraiment annuler la réservation de ${attendee} ?"
+
+#~ msgid "<dynamic element>"
+#~ msgstr "<dynamic element>"
 
 #~ msgid "The period was successfully reset"
 #~ msgstr "La période a été réinitialisée avec succès"

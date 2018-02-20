@@ -76,7 +76,7 @@
                                         <span class="show-for-sr" i18n:translate>Print</span>
                                     </a>
 
-                                    <a href="${subscribe_link(attendee)}" class="calendar-add-icon before hide-for-print" i18n:translate title="Add to calendar" i18n:attributes="title">
+                                    <a href="${subscribe_link(attendee)}" class="calendar-add-icon before hide-for-print" title="Add to calendar" i18n:attributes="title">
                                         <span class="show-for-sr" i18n:translate>Add to calendar</span>
                                     </a>
                                 </div>
