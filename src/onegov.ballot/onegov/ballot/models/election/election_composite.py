@@ -12,7 +12,6 @@ from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
 from sqlalchemy import Column
 from sqlalchemy import Date
-from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy_utils import observes
 from sqlalchemy.orm import backref
@@ -53,8 +52,13 @@ class ElectionComposite(
     #: The date of the elections
     date = Column(Date, nullable=False)
 
-    #: The (total) number of mandates
-    number_of_mandates = Column(Integer, nullable=False, default=lambda: 0)
+    @property
+    def number_of_mandates(self):
+        """ The (total) number of mandates. """
+
+        return sum([
+            election.number_of_mandates for election in self.elections
+        ])
 
     @property
     def allocated_mandates(self):
@@ -97,10 +101,9 @@ class ElectionComposite(
     #: An election composite contains n elections
     elections = relationship(
         'Election',
-        # cascade='all, delete-orphan',  todo:
         backref=backref('composite'),
         lazy='dynamic',
-        # order_by='Election.election_id',  todo:
+        order_by='Election.shortcode',
     )
 
     @property
@@ -132,9 +135,6 @@ class ElectionComposite(
 
     #: may be used to store a link related to this election
     related_link = meta_property('related_link')
-
-    #: may be used to mark an election as a tacit election
-    tacit = meta_property('tacit', default=False)
 
     def clear_results(self):
         """ Clears all the results of all elections. """

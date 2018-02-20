@@ -10,6 +10,7 @@ See:
 from onegov.ballot.models.election import Candidate
 from onegov.ballot.models.election import CandidateResult
 from onegov.ballot.models.election import Election
+from onegov.ballot.models.election import ElectionComposite
 from onegov.ballot.models.election import ElectionResult
 from onegov.ballot.models.election import List
 from onegov.ballot.models.election import ListConnection
@@ -29,6 +30,7 @@ __all__ = [
     'CandidateResult',
     'ComplexVote',
     'Election',
+    'ElectionComposite',
     'ElectionResult',
     'List',
     'ListConnection',
