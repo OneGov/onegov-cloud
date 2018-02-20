@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-02-19 16:21+0100\n"
+"POT-Creation-Date: 2018-02-20 09:06+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1747,6 +1747,13 @@ msgstr "Inscrire participant"
 
 msgid "Clone Occasion"
 msgstr "Copier l'offre"
+
+msgid ""
+"The period of this occasion has already been confirmed. It is not "
+"recommended to change the period associated with this occasion. "
+msgstr ""
+"La période de cette occasion a déjà été confirmée. Il n'est pas recommandé "
+"de changer la période associée à cette dernière."
 
 msgid "Edit Occasion"
 msgstr "Modifier l'événement"

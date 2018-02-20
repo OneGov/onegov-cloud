@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Shows a warning when changing occasions of confirmed periods.
+  [href]
+
+- Hides archived occasions from organisers.
+  [href]
+
 - Adds a subscriptable calendar to each attendee.
   [href]
 

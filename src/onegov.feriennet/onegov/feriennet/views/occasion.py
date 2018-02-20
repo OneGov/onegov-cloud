@@ -91,6 +91,15 @@ def clone_occasion(self, request, form):
     name='edit')
 def edit_occasion(self, request, form):
 
+    if self.period.confirmed:
+        warning = _(
+            "The period of this occasion has already been confirmed. "
+            "It is not recommended to change the period associated with "
+            "this occasion. "
+        )
+    else:
+        warning = None
+
     if form.submitted(request):
         form.populate_obj(self)
         request.success(_("Your changes were saved"))
@@ -104,6 +113,7 @@ def edit_occasion(self, request, form):
             self.activity, request, _("Edit Occasion")),
         'title': _("Edit Occasion"),
         'form': form,
+        'callout': warning
     }
 
 

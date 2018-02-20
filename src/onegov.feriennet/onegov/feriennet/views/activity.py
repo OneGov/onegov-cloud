@@ -54,15 +54,18 @@ def get_activity_form_class(model, request):
     return model.with_content_extensions(VacationActivityForm, request)
 
 
-def occasions_by_period(session, activity, active_only):
+def occasions_by_period(session, activity, show_inactive, show_archived):
     query = OccasionCollection(session).query()
     query = query.filter(Occasion.activity_id == activity.id)
 
-    if active_only:
-        query = query.filter(Occasion.active == True)
-
     query = query.join(Occasion.period)
     query = query.options(contains_eager(Occasion.period))
+
+    if not show_inactive:
+        query = query.filter(Occasion.active == True)
+
+    if not show_archived:
+        query = query.filter(Period.archived == False)
 
     query = query.order_by(
         desc(Period.active),
@@ -374,7 +377,8 @@ def view_activity(self, request):
         'occasions_by_period': occasions_by_period(
             session=session,
             activity=self,
-            active_only=not request.is_organiser
+            show_inactive=request.is_organiser,
+            show_archived=request.is_admin
         ),
     }
 
