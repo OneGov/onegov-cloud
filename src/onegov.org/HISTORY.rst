@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to use a callout in the generic form template.
+  [href]
+
 - Adds the ability to use the toggle button script for any element.
   [href]
 
