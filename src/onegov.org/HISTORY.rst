@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.23.0 (2018-02-20)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to use a callout in the generic form template.
   [href]
 
