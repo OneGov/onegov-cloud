@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to limit attendees to one activity per day.
+  [href]
+
 - Shows a warning when changing occasions of confirmed periods.
   [href]
 

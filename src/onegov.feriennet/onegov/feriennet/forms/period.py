@@ -130,11 +130,22 @@ class PeriodForm(Form):
     minutes_between = IntegerField(
         label=_("Required minutes between bookings"),
         fieldset=_("Bookings"),
+        filters=(lambda x: x or 0, ),
         validators=[
-            InputRequired(),
+            Optional(),
             NumberRange(0, 360)
         ],
         default=0
+    )
+
+    one_booking_per_day = RadioField(
+        label=_("Attendees are limited to one activity per day"),
+        fieldset=_("Bookings"),
+        choices=[
+            ('yes', _("Yes")),
+            ('no', _("No"))
+        ],
+        default='no'
     )
 
     deadline = RadioField(
@@ -178,6 +189,7 @@ class PeriodForm(Form):
             'booking_cost',
             'deadline_days',
             'deadline_date',
+            'one_booking_per_day',
         })
 
         if self.pass_system.data == 'yes':
@@ -196,6 +208,11 @@ class PeriodForm(Form):
             model.deadline_days = self.deadline_days.data or None
             model.deadline_date = None
 
+        if self.one_booking_per_day.data == 'yes':
+            model.alignment = 'day'
+        else:
+            model.alignment = None
+
     def process_obj(self, model):
         super().process_obj(model)
 
@@ -211,6 +228,11 @@ class PeriodForm(Form):
             self.deadline.data = 'fix'
         else:
             self.deadline.data = 'rel'
+
+        if model.alignment is None:
+            self.one_booking_per_day.data = 'no'
+        else:
+            self.one_booking_per_day.data = 'yes'
 
     @cached_property
     def conflicting_activities(self):
@@ -297,3 +319,12 @@ class PeriodForm(Form):
                         "settings since the period has already been confirmed"
                     ))
                     return False
+
+    def ensure_minutes_between_or_one_booking_per_day(self):
+        if self.minutes_between.data:
+            if self.one_booking_per_day.data != 'no':
+                self.minutes_between.errors.append(_(
+                    "It is not possible to have required minutes between "
+                    "bookings when limiting attendees to one activity per day"
+                ))
+                return False

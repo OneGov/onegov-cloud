@@ -427,6 +427,10 @@
          class="hint hint-minutes" i18n:translate>
             Between each booking we enforce <tal:block i18n:name="minutes" tal:replace="period.minutes_between" /> minutes of block-time in which no other booking is permitted.
     </div>
+
+    <div tal:condition="period.alignment == 'day'"
+        class="hint hint-minutes" i18n:translate>
+            Attendees are limited to one activity per day</div>.
 </metal:hints>
 
 <metal:booking_state define-macro="booking_state" i18n:domain="onegov.feriennet">
