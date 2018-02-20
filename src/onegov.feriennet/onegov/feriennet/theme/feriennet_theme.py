@@ -14,7 +14,7 @@ class FeriennetTheme(OrgTheme):
 
     # don't touch this number, it's incremented using bumpversion, so every
     # release will automatically trigger a rebuild of the theme
-    version = '1.3.17'
+    version = '1.3.18'
 
     @property
     def post_imports(self):
