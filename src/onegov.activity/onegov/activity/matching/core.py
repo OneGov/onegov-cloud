@@ -37,6 +37,9 @@ class AttendeeAgent(hashable('id')):
         self.blocked = set()
         self.minutes_between = minutes_between
 
+    def blocks(self, subject, other):
+        return overlaps(subject, other, self.minutes_between)
+
     def accept(self, booking):
         """ Accepts the given booking. """
 
@@ -47,8 +50,7 @@ class AttendeeAgent(hashable('id')):
             self.blocked |= self.wishlist
         else:
             self.blocked |= {
-                b for b in self.wishlist
-                if overlaps(booking, b, self.minutes_between)
+                b for b in self.wishlist if self.blocks(booking, b)
             }
 
         self.wishlist -= self.blocked
@@ -76,7 +78,7 @@ class AttendeeAgent(hashable('id')):
 
         """
         for a, b in product(self.accepted, self.accepted):
-            if a != b and overlaps(a, b, self.minutes_between):
+            if a != b and self.blocks(a, b):
                 return False
 
         return True
