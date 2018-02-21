@@ -1,6 +1,7 @@
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.mixins import meta_property, content_property
+from onegov.core.utils import normalize_for_url
 from onegov.form.models.submission import FormSubmission
 from onegov.form.parser import parse_form
 from onegov.form.utils import hash_definition
@@ -43,6 +44,12 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, SearchableDefinition,
     #: the form as parsable string
     definition = Column(Text, nullable=False)
 
+    #: the group to which this resource belongs to (may be any kind of string)
+    group = Column(Text, nullable=True)
+
+    #: The normalized title for sorting
+    order = Column(Text, nullable=False, index=True)
+
     #: the checksum of the definition, forms and submissions with matching
     #: checksums are guaranteed to have the exact same definition
     checksum = Column(Text, nullable=False)
@@ -79,6 +86,10 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, SearchableDefinition,
     @observes('definition')
     def definition_observer(self, definition):
         self.checksum = hash_definition(definition)
+
+    @observes('title')
+    def title_observer(self, title):
+        self.order = normalize_for_url(title)
 
     def has_submissions(self, with_state=None):
         query = object_session(self).query(FormSubmission.id)

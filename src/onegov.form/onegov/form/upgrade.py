@@ -5,12 +5,13 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 from depot.io.utils import FileIntent
 from io import BytesIO
 from onegov.core.crypto import random_token
+from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
 from onegov.core.utils import dictionary_to_binary
+from onegov.core.utils import normalize_for_url
 from onegov.form import FormDefinitionCollection
 from onegov.form import FormFile
 from onegov.form import FormSubmission
-from onegov.core.orm.types import JSON
 from sqlalchemy import Column, Text
 
 
@@ -107,4 +108,18 @@ def add_meta_directory_to_submissions(context):
         table='submissions',
         column=Column('meta', JSON, nullable=False),
         default=lambda submission: dict()
+    )
+
+
+@upgrade_task('Add group/order to form definitions')
+def add_group_order_to_form_definitions(context):
+
+    context.operations.add_column('forms', Column(
+        'group', Text, nullable=True
+    ))
+
+    context.add_column_with_defaults(
+        table='forms',
+        column=Column('order', Text, nullable=False, index=True),
+        default=lambda form: normalize_for_url(form.title)
     )

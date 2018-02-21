@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the ability to attach a group to each form definition.
+  [href]
+
 0.31.2 (2018-02-06)
 ~~~~~~~~~~~~~~~~~~~
 
