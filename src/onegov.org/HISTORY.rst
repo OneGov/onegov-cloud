@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to group forms hierarchically.
+  [href]
+
 0.23.0 (2018-02-20)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -1149,3 +1149,21 @@
         </li>
     </ul>
 </metal:directory_error>
+
+<metal:group_by_column define-macro="group_by_column" i18n:domain="onegov.org">
+    <tal:b repeat="group grouped">
+        <h2 class="h3-size" tal:condition="len(grouped) > 1">${group}</h2>
+
+        <ul class="with-lead">
+            <li tal:repeat="record grouped[group]">
+
+                <a class="list-title" tal:attributes="href request.link(record)">
+                    ${record.title}
+                </a>
+                <metal:hint use-macro="layout.macros['hidden-from-public-hint']" tal:define="item record" />
+
+                <div class="list-lead">${record.meta.get('lead')}</div>
+            </li>
+        </ul>
+    </tal:b>
+</metal:group_by_column>

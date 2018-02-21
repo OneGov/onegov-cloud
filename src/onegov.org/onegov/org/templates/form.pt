@@ -23,6 +23,10 @@
         ?>
 
         <tal:block tal:define="item definition|nothing" tal:condition="item">
+            <div class="resource-group blank-label" tal:condition="item.group|nothing">
+                ${item.group}
+            </div>
+
             <metal:hint use-macro="layout.macros['hidden_from_public_hint_long']" />
             <metal:hint use-macro="layout.macros['empty_page_lead_hint']" />
         </tal:block>

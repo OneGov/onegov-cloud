@@ -15,8 +15,8 @@ from onegov.org.forms import (
 )
 from onegov.org.layout import ResourcesLayout, ResourceLayout
 from onegov.org.models.resource import DaypassResource, RoomResource
+from onegov.org.utils import group_by_column
 from onegov.ticket import Ticket
-from sqlalchemy.sql.expression import nullsfirst
 from webob import exc
 
 
@@ -52,36 +52,17 @@ def get_resource_form(self, request, type=None):
     return model.with_content_extensions(ResourceForm, request)
 
 
-def get_grouped_resources(resources, request, transform=None, emptygroup=None):
-    resources = resources.query().order_by(nullsfirst(Resource.group))
-    resources = request.exclude_invisible(resources)
-
-    grouped = OrderedDict()
-
-    def group_key(resource):
-        return resource.group or request.translate(_("General"))
-
-    def sort_key(resource):
-        return resource.title
-
-    transform = transform or (lambda value: value)
-
-    for group, items in groupby(resources, group_key):
-        grouped[group] = sorted([i for i in items], key=sort_key)
-        grouped[group] = [transform(i) for i in grouped[group]]
-
-    if len(grouped) == 1:
-        grouped = {emptygroup: tuple(grouped.values())[0]}
-
-    return grouped
-
-
 @OrgApp.html(model=ResourceCollection, template='resources.pt',
              permission=Public)
 def view_resources(self, request):
     return {
         'title': _("Reservations"),
-        'resources': get_grouped_resources(self, request),
+        'resources': group_by_column(
+            request=request,
+            query=self.query(),
+            group_column=Resource.group,
+            sort_column=Resource.title
+        ),
         'layout': ResourcesLayout(self, request)
     }
 
@@ -101,10 +82,13 @@ def view_resources_json(self, request):
         # only update once every minute
         response.cache_control.max_age = 60
 
-    return get_grouped_resources(
-        self, request,
+    return group_by_column(
+        request=request,
+        query=self.query(),
+        group_column=Resource.group,
+        sort_column=Resource.title,
         transform=transform,
-        emptygroup=request.translate(_("Reservations"))
+        default_group=request.translate(_("Reservations"))
     )
 
 

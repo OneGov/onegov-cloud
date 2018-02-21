@@ -2,7 +2,7 @@ import colorsys
 import re
 import sedate
 
-from collections import defaultdict, Counter
+from collections import defaultdict, Counter, OrderedDict
 from datetime import datetime, time
 from onegov.core.cache import lru_cache
 from isodate import parse_date, parse_datetime
@@ -14,6 +14,7 @@ from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
 from onegov.ticket import TicketCollection
 from operator import attrgetter
+from sqlalchemy import nullsfirst
 from purl import URL
 
 
@@ -574,3 +575,50 @@ def predict_next_value(values, min_probability=0.8,
         return add_delta(values[-1], predicted_delta)
     else:
         return None
+
+
+def group_by_column(request, query, group_column, sort_column,
+                    default_group=None, transform=None):
+    """ Groups the given query by the given group.
+
+        :param request:
+            The current request used for translation and to exclude invisible
+            records.
+
+        :param query:
+            The query that should be grouped
+
+        :param group_column:
+            The column by which the grouping should happen.
+
+        :param sort_column:
+            The column by which the records should be sorted.
+
+        :param default_group:
+            The group in use if the found group is empty (optional).
+
+        :param transform:
+            Called with each record to transform the result (optional).
+
+    """
+
+    default_group = default_group or request.translate(_("General"))
+
+    records = query.order_by(nullsfirst(group_column))
+    records = request.exclude_invisible(records)
+
+    grouped = OrderedDict()
+
+    def group_key(record):
+        return getattr(record, group_column.name) or default_group
+
+    def sort_key(record):
+        return getattr(record, sort_column.name)
+
+    transform = transform or (lambda v: v)
+
+    for group, items in groupby(records, group_key):
+        grouped[group] = sorted([i for i in items], key=sort_key)
+        grouped[group] = [transform(i) for i in grouped[group]]
+
+    return grouped

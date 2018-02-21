@@ -19,6 +19,10 @@ class FormDefinitionBaseForm(Form):
     text = HtmlField(
         label=_("Text"))
 
+    group = StringField(
+        label=_("Group"),
+        description=_("Used to group the form in the overview"))
+
     definition = TextAreaField(
         label=_("Definition"),
         validators=[validators.InputRequired(), ValidFormDefinition()],
