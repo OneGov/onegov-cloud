@@ -92,4 +92,11 @@ class InvoiceItem(Base, TimestampMixin, PayableManyTimes):
 
     @property
     def disable_changes(self):
-        return self.source and self.source != 'xml'
+        if not self.source:
+            return False
+
+        if self.source == 'xml':
+            return False
+
+        states = {p.state for p in self.payments}
+        return 'open' in states or 'paid' in states
