@@ -1152,7 +1152,7 @@
 
 <metal:group_by_column define-macro="group_by_column" i18n:domain="onegov.org">
     <tal:b repeat="group grouped">
-        <h2 class="h3-size" tal:condition="len(grouped) > 1">${group}</h2>
+        <h2 tal:condition="len(grouped) > 1">${group}</h2>
 
         <ul class="with-lead">
             <li tal:repeat="record grouped[group]">
