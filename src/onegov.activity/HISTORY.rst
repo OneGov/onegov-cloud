@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.7.1 (2018-02-21)
+~~~~~~~~~~~~~~~~~~~
 
 - Allows changes on refunded or failed online payments.
   [href]
