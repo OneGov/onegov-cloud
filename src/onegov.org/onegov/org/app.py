@@ -3,6 +3,7 @@
 from chameleon import PageTemplate
 from collections import defaultdict
 from dectate import directive
+from more.content_security import SELF
 from onegov.core import Framework, utils
 from onegov.core.framework import default_content_security_policy
 from onegov.core.i18n import default_locale_negotiator
@@ -235,8 +236,13 @@ def get_theme():
 def org_content_security_policy():
     policy = default_content_security_policy()
 
+    policy.child_src.add(SELF)
     policy.child_src.add('https://*.youtube.com')
     policy.child_src.add('https://*.vimeo.com')
+    policy.child_src.add('https://checkout.stripe.com')
+
+    policy.connect_src.add(SELF)
+    policy.connect_src.add('https://checkout.stripe.com')
 
     return policy
 

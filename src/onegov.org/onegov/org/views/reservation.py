@@ -341,13 +341,22 @@ def finalize_reservation(self, request):
             TicketMessage.create(ticket, request, 'opened')
 
         if reservations[0].email != request.current_username:
+            show_submission = request.params.get('send_by_email') == 'yes'
+
+            if submission and show_submission:
+                form = submission.form_obj
+            else:
+                form = None
+
             send_html_mail(
                 request=request,
                 template='mail_ticket_opened.pt',
                 subject=_("A ticket has been opened"),
                 receivers=(reservations[0].email, ),
                 content={
-                    'model': ticket
+                    'model': ticket,
+                    'form': form,
+                    'show_submission': show_submission
                 }
             )
 

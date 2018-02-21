@@ -555,6 +555,30 @@ def test_submit_form(org_app):
     assert tickets[0].title == 'Kung, Fury, kung.fury@example.org'
     assert tickets[0].group == 'Profile'
 
+    # the user should have gotten an e-mail with the entered data
+    message = org_app.smtp.outbox[-1]
+    message = message.get_payload(0).get_payload(decode=True)
+    message = message.decode('iso-8859-1')
+
+    assert 'Fury' in message
+
+    # unless he opts out of it
+    form_page = client.get('/forms').click('Profile')
+    form_page = form_page.form.submit().follow()
+    form_page.form['your_details_first_name'] = 'Kung'
+    form_page.form['your_details_last_name'] = 'Fury'
+    form_page.form['your_details_e_mail'] = 'kung.fury@example.org'
+    form_page = form_page.form.submit()
+
+    form_page.form.get('send_by_email', index=0).value = False
+    ticket_page = form_page.form.submit().follow()
+
+    message = org_app.smtp.outbox[-1]
+    message = message.get_payload(0).get_payload(decode=True)
+    message = message.decode('iso-8859-1')
+
+    assert 'Fury' not in message
+
 
 def test_pending_submission_error_file_upload(org_app):
     collection = FormCollection(org_app.session())

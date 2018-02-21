@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-02-21 09:54+0100\n"
+"POT-Creation-Date: 2018-02-21 12:58+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1609,6 +1609,12 @@ msgstr ""
 "Ihre Anfrage wurde erfolgreich abgeschlossen. Falls Sie Dokumente über den "
 "Postweg verlangt haben, sollten Sie in den kommenden Tagen Post erhalten. "
 "Falls Sie Dokumente am Schalter abholen wollten, so können Sie das jetzt tun."
+
+msgid "Privacy"
+msgstr "Privatsphäre"
+
+msgid "Send me my entered data by e-mail."
+msgstr "Versand meiner Eingaben an meine E-Mail Adresse."
 
 msgid "Pay Online Now"
 msgstr "Jetzt online bezahlen"

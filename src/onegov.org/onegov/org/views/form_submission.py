@@ -207,13 +207,17 @@ def handle_complete_submission(self, request):
                 TicketMessage.create(ticket, request, 'opened')
 
             if self.email != request.current_username:
+                show_submission = request.params.get('send_by_email') == 'yes'
+
                 send_html_mail(
                     request=request,
                     template='mail_ticket_opened.pt',
                     subject=_("A ticket has been opened"),
                     receivers=(self.email, ),
                     content={
-                        'model': ticket
+                        'model': ticket,
+                        'form': form,
+                        'show_submission': show_submission
                     }
                 )
 

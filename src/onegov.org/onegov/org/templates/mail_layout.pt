@@ -159,10 +159,23 @@
         font-size: 22px;
     }
 
-    a, p, ul, ol {
+    a, p, ul, ol, dt, dd {
         margin-bottom: 10px;
         font-weight: normal;
         font-size: 14px;
+    }
+
+    dt {
+        margin-bottom: 0;
+        font-weight: bold;
+    }
+
+    .fieldset {
+        background: #efefef;
+        font-size: 14px;
+        font-weight: normal;
+        margin-bottom: 10px;
+        text-transform: uppercase;
     }
 
     ul li, ol li {
@@ -188,6 +201,10 @@
         border: 1px solid #ddd;
         border-width: 1px 0 0 0;
         margin-bottom: 20px;
+    }
+
+    hr.large {
+        margin-top: 20px;
     }
 
     /*

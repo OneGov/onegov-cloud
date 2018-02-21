@@ -393,22 +393,18 @@
         </tal:block>
     </div>
     <tal:b condition="price|nothing">
-        <div class="field-display">
-            <div class="field-display-block">
-                <div class="field-display-label" i18n:translate>Total Amount</div>
-                <div class="field-display-data">
-                    <metal:b use-macro="layout.macros['price']" />
-                </div>
-            </div>
-        </div>
+        <dl class="field-display">
+            <dt i18n:translate>Total Amount</dt>
+            <dd><metal:b use-macro="layout.macros['price']" /></dd>
+        </dl>
     </tal:b>
 </metal:display_form>
 
 <metal:display_field define-macro="display_fields" i18n:domain="onegov.org">
-    <div class="field-display" tal:repeat="field fields" tal:define="allow_downloads allow_downloads|request.is_manager; allow_views allow_views|False">
-        <div class="field-display-block" tal:define="rendered layout.render_field(field)|nothing" tal:condition="rendered">
-            <div class="field-display-label">${field.label.text}</div>
-            <div class="field-display-data">
+    <dl class="field-display" tal:repeat="field fields" tal:define="allow_downloads allow_downloads|request.is_manager; allow_views allow_views|False">
+        <tal:b define="rendered layout.render_field(field)|nothing" condition="rendered">
+            <dt>${field.label.text}</dt>
+            <dd>
                 <tal:b condition="(allow_downloads or allow_views) and field.type == 'UploadField'">
                     <tal:b define="url layout.field_download_link(field)">
                         <a href="${url}" tal:condition="not allow_views or not field.is_image">
@@ -417,13 +413,13 @@
                         <img src="${url}" tal:condition="allow_views and field.is_image" />
                     </tal:b>
                 </tal:b>
-                <tal:block condition="not (allow_downloads or allow_views) or field.type != 'UploadField'">
-                    <tal:block replace="structure rendered" />
-                </tal:block>
-            </div>
-        </div>
+                <tal:b condition="not (allow_downloads or allow_views) or field.type != 'UploadField'">
+                    <tal:b replace="structure rendered" />
+                </tal:b>
+            </dd>
+        </tal:b>
         <div class="clearfix"></div>
-    </div>
+    </dl>
 </metal:display_field>
 
 <metal:price define-macro="price">
@@ -944,6 +940,18 @@
 
 <metal:checkout_form define-macro="checkout_form" i18n:domain="onegov.org">
     <form action="${complete_link}" method="POST" class="checkout">
+        <dl class="field-display" tal:condition="show_privacy_settings|nothing">
+            <dt i18n:translate>Privacy</dt>
+            <dd>
+                <label class="common-text">
+                    <input type="checkbox" name="send_by_email" value="yes" checked>
+                    <span class="label-text" i18n:translate style="max-width: 100%">
+                        Send me my entered data by e-mail.
+                    </span>
+                </label>
+            </dd>
+        </dl>
+
         <tal:b condition="price" switch="payment_method">
             <tal:b case="'manual'">
                 <label style="display: none;">

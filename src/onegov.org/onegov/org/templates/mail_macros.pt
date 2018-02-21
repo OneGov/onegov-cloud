@@ -49,5 +49,25 @@
     <p i18n:translate>The OneGov Cloud Team</p>
 </metal:sender>
 
+<metal:display_form define-macro="display_form" i18n:domain="onegov.org">
+    <p tal:condition="form" tal:repeat="fieldset form.fieldsets">
+        <tal:block define="fields fieldset.non_empty_fields" condition="fields">
+            <div class="fieldset" tal:condition="fieldset.is_visible">${fieldset.label}</div>
+            <metal:b use-macro="layout.macros['display_fields']" tal:define="fields fields.values()">
+        </tal:block>
+    </p>
+</metal:display_form>
+
+<metal:display_field define-macro="display_fields" i18n:domain="onegov.org">
+    <dl class="field-display" tal:repeat="field fields">
+        <tal:b define="rendered layout.render_field(field)|nothing" condition="rendered">
+            <dt>${field.label.text}</dt>
+            <dd>
+                <tal:b replace="structure rendered" />
+            </dd>
+        </tal:b>
+    </dl>
+</metal:display_field>
+
 </body>
 </html>

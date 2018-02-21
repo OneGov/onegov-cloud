@@ -858,7 +858,13 @@ form {
     margin-bottom: 1em;
 }
 
+dl.field-display,
+dl.field-display > dt {
+    margin-bottom: 0;
+}
+
 .field-display {
+    > dd,
     .field-display-data {
         margin-bottom: 1rem;
 
