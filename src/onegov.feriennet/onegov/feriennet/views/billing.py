@@ -66,15 +66,7 @@ def view_billing(self, request, form):
         if not self.period.finalized:
             return
 
-        if details.disable_changes:
-            traits = (
-                Block(_(
-                    "This bill or parts of it have been paid online. "
-                    "To change the state of the bill the payment "
-                    "needs to be charged back."
-                )),
-            )
-
+        if details.has_online_payments:
             yield Link(
                 _("Show online payments"),
                 attrs={'class': 'show-online-payments'},
@@ -82,6 +74,15 @@ def view_billing(self, request, form):
                     InvoiceItem, {'id': details.first.id},
                     name='online-payments'
                 )
+            )
+
+        if details.disable_changes:
+            traits = (
+                Block(_(
+                    "This bill or parts of it have been paid online. "
+                    "To change the state of the bill the payment "
+                    "needs to be charged back."
+                )),
             )
 
         elif details.discourage_changes:

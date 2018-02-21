@@ -16,7 +16,7 @@ class BillingDetails(object):
 
     __slots__ = (
         'id', 'items', 'paid', 'total', 'title', 'outstanding', 'first',
-        'discourage_changes', 'disable_changes'
+        'discourage_changes', 'disable_changes', 'has_online_payments'
     )
 
     def __init__(self, title, items):
@@ -28,6 +28,7 @@ class BillingDetails(object):
         self.first = None
         self.discourage_changes = False
         self.disable_changes = False
+        self.has_online_payments = False
 
         def tally(item):
             self.total += item.amount
@@ -41,6 +42,9 @@ class BillingDetails(object):
 
             if item.disable_changes:
                 self.disable_changes = True
+
+            if item.source and item.source != 'xml':
+                self.has_online_payments = True
 
             if not self.first:
                 self.first = item
@@ -129,7 +133,8 @@ class BillingCollection(object):
                 total=first.invoice_amount,
                 outstanding=first.invoice_outstanding,
                 discourage_changes=first.invoice_changes == 'discouraged',
-                disable_changes=first.invoice_changes == 'impossible'
+                disable_changes=first.invoice_changes == 'impossible',
+                has_online_payments=first.has_online_payments
             )
 
         return bills

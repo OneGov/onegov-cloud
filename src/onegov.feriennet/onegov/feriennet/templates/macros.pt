@@ -429,8 +429,9 @@
     </div>
 
     <div tal:condition="period.alignment == 'day'"
-        class="hint hint-minutes" i18n:translate>
-            Attendees are limited to one activity per day</div>.
+        class="hint hint-minutes">
+        <tal:b i18n:translate>Attendees are limited to one activity per day</tal:b>.
+    </div>
 </metal:hints>
 
 <metal:booking_state define-macro="booking_state" i18n:domain="onegov.feriennet">

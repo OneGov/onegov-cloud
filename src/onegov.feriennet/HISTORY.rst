@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes being unable to mark a refunded payment as paid.
+  [href]
+
 1.3.18 (2018-02-20)
 ~~~~~~~~~~~~~~~~~~~
 

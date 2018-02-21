@@ -15,6 +15,7 @@ details AS (
         unit * quantity as amount,
         invoice::uuid as period_id,
         source,
+        ARRAY_LENGTH(payment.states, 1) > 0 AS has_online_payments,
         CASE
             WHEN paid
                 THEN 0
@@ -25,10 +26,22 @@ details AS (
                 THEN 'possible'
             WHEN "source" = 'xml'
                 THEN 'discouraged'
+            WHEN "source" = 'stripe_connect' AND NOT payment.states && ARRAY['open', 'paid']
+                THEN 'possible'
             ELSE 'impossible'
         END AS changes
     FROM
         invoice_items
+    LEFT JOIN (
+        SELECT
+            payments_for_invoice_items.invoice_items_id,
+            ARRAY_AGG(payments."state")::text[] as states
+        
+        FROM payments_for_invoice_items
+        LEFT JOIN payments
+            ON payments_for_invoice_items.payment_id = payments.id
+        GROUP BY invoice_items_id
+    ) AS payment ON invoice_items_id = id
 ),
 
 -- the totals
@@ -61,6 +74,7 @@ invoices AS (
         details.period_id,
         details.changes,
         details.source,
+        details.has_online_payments,
         MD5(replace(details.period_id::text, '-', '') || details.username) as invoice_id,
         totals.paid as invoice_paid,
         totals.amount as invoice_amount,
@@ -99,6 +113,7 @@ SELECT
     "text",              -- Text
     "family",            -- Text
     paid,                -- Boolean
+    has_online_payments, -- Boolean
     amount,              -- Numeric
     source,              -- Text
     period_id,           -- UUID

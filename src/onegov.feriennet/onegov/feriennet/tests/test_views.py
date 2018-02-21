@@ -2100,6 +2100,13 @@ def test_online_payment(feriennet_app):
     assert 'checkout-button' in page
     assert "Jetzt online bezahlen" in page
 
+    # it should be possible to change the payment state again
+    mark_paid_url = get_post_url(client.get('/billing'), 'mark-paid')
+    client.post(mark_paid_url)
+
+    mark_unpaid_url = get_post_url(client.get('/billing'), 'mark-unpaid')
+    client.post(mark_unpaid_url)
+
     # pay again (leading to a refunded and an open charge)
     with requests_mock.Mocker() as m:
         charge = {
