@@ -234,4 +234,4 @@ def delete_file(self, request):
 
     """
     request.assert_valid_csrf_token()
-    FileCollection(request.app.session()).delete(self)
+    FileCollection(request.session).delete(self)
