@@ -22,6 +22,7 @@ class DummyRequest():
     def __init__(self, session):
         self.app = DummyApp(session)
         self.client_addr = '127.0.0.1'
+        self.session = session
 
     def load_url_safe_token(self, token, **kwargs):
         if not token:

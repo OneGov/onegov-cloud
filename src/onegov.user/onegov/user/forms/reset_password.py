@@ -39,7 +39,7 @@ class PasswordResetForm(Form):
         if data['username'].lower() != self.email.data.lower():
             return False
 
-        users = UserCollection(request.app.session())
+        users = UserCollection(request.session)
         user = users.by_username(self.email.data)
 
         if not user:
