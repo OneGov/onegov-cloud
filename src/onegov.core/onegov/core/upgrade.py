@@ -351,6 +351,12 @@ class UpgradeContext(object):
     """
 
     def __init__(self, request):
+
+        # we need to reset the request session property every time because
+        # we reuse the request over various session managers
+        if 'session' in request.__dict__:
+            del request.__dict__['session']
+
         self.request = request
         self.session = request.session
         self.app = request.app

@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes core upgrades no longer working.
+  [href]
+
 0.62.0 (2018-02-22)
 ~~~~~~~~~~~~~~~~~~~
 
