@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to export form submissions.
+  [href]
+
 - Gives users the ability to get a copy of their data by e-mail when submitting
   a form or a reservation.
   [href]

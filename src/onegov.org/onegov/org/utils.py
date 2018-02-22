@@ -381,7 +381,7 @@ class AllocationEventInfo(object):
             yield Link(
                 _("Tickets"),
                 self.request.link(TicketCollection(
-                    session=self.request.app.session,
+                    session=self.request.session,
                     handler='RSV',
                     state='all',
                     extra_parameters={
@@ -622,3 +622,17 @@ def group_by_column(request, query, group_column, sort_column,
         grouped[group] = [transform(i) for i in grouped[group]]
 
     return grouped
+
+
+def keywords_first(keywords):
+    """ Returns a sort key which preferrs values matching the given keywords
+    before other values which are sorted alphabetically.
+
+    """
+    assert hasattr(keywords, 'index')
+
+    def sort_key(v):
+        try:
+            return keywords.index(v) - len(keywords), ''
+        except ValueError:
+            return 0, v

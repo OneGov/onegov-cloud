@@ -573,7 +573,7 @@ class FormSubmissionLayout(DefaultLayout):
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Forms"), self.request.link(collection)),
-            Link(self.title, '#')
+            Link(self.title, self.request.link(self.model))
         ]
 
     @cached_property
@@ -632,9 +632,13 @@ class FormSubmissionLayout(DefaultLayout):
                 )
             )
 
-        return [
-            edit_link, delete_link
-        ]
+        export_link = Link(
+            text=_("Export"),
+            url=self.request.link(self.form, name='export'),
+            attrs={'class': 'export-link'}
+        )
+
+        return [edit_link, delete_link, export_link]
 
 
 class FormCollectionLayout(DefaultLayout):

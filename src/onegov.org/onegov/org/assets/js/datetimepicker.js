@@ -208,10 +208,12 @@ var setup_datetimepicker = function(type, selector, onChange, extraOptions) {
     });
 
     $('form').submit(function() {
-        if ($(this).data('submitted') !== true) {
-            $(this).data('submitted', true);
+        var form = $(this);
 
-            $(this).find(selector).each(function() {
+        if (form.data('submitted') !== true) {
+            form.data('submitted', true);
+
+            form.find(selector).each(function() {
                 var field = $(this);
                 var oldval = field.val();
 
@@ -219,10 +221,12 @@ var setup_datetimepicker = function(type, selector, onChange, extraOptions) {
 
                 // reset the value after submitting it, which helps with certain
                 // browsers that will otherwise retain this value when pressing
-                // the back button (Safari + Firefox)
+                // the back button (Safari)
                 _.defer(function() {
                     field.val(oldval);
+                    form.data('submitted', false);
                 });
+
                 return true;
             });
         }

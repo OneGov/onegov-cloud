@@ -15,7 +15,7 @@ from onegov.org.forms import (
 )
 from onegov.org.layout import ResourcesLayout, ResourceLayout
 from onegov.org.models.resource import DaypassResource, RoomResource
-from onegov.org.utils import group_by_column
+from onegov.org.utils import group_by_column, keywords_first
 from onegov.ticket import Ticket
 from webob import exc
 
@@ -350,22 +350,13 @@ def view_export(self, request, form):
     # a good API story anyway we don't have spend to much energy on it here
     # - instead we should do this in a comprehensive fashion
     if form.submitted(request):
-        constant_fields, results = run_export(
+        field_order, results = run_export(
             resource=self,
-            request=request,
             start=form.data['start'],
             end=form.data['end'],
             nested=form.format == 'json',
             formatter=layout.export_formatter(form.format)
         )
-
-        def field_order(field):
-            # known fields come first in a defined order (-x -> -1)
-            # unknown fields are ordered from a-z (second item in tuple)
-            if field in constant_fields:
-                return constant_fields.index(field) - len(constant_fields), ''
-            else:
-                return 0, field
 
         return form.as_export_response(results, self.title, key=field_order)
 
@@ -380,7 +371,7 @@ def view_export(self, request, form):
     }
 
 
-def run_export(resource, request, start, end, nested, formatter):
+def run_export(resource, start, end, nested, formatter):
     start = sedate.replace_timezone(
         datetime(start.year, start.month, start.day),
         resource.timezone
@@ -405,9 +396,7 @@ def run_export(resource, request, start, end, nested, formatter):
     )
 
     results = []
-
-    # update me: reused outside this function
-    constant_fields = ('start', 'end', 'quota', 'email', 'ticket', 'title')
+    keywords = ('start', 'end', 'quota', 'email', 'ticket', 'title')
 
     for record in query:
         result = OrderedDict()
@@ -427,11 +416,8 @@ def run_export(resource, request, start, end, nested, formatter):
             result['form'] = record[6]
         else:
             for key, value in record[6].items():
-                if isinstance(value, list):
-                    result['form_' + key] = ', '.join(value)
-                else:
-                    result['form_' + key] = value
+                result['form_' + key] = formatter(value)
 
         results.append(result)
 
-    return constant_fields, results
+    return keywords_first(keywords), results
