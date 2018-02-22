@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.24.0 (2018-02-22)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to export form submissions.
   [href]
 
