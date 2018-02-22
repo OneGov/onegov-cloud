@@ -23,7 +23,7 @@ def reindex(group_context):
 
         start = utcnow()
 
-        session = request.app.session()
+        session = request.session
         request.app.es_perform_reindex()
 
         print(f"took {utcnow() - start}")

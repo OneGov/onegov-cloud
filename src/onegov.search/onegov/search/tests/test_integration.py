@@ -190,7 +190,7 @@ def test_orm_integration(es_url, postgres_dsn):
 
     @App.json(model=Root, name='new')
     def view_add_document(self, request):
-        session = request.app.session()
+        session = request.session
         session.add(Document(
             id=request.params.get('id'),
             title=request.params.get('title'),
@@ -199,7 +199,7 @@ def test_orm_integration(es_url, postgres_dsn):
 
     @App.json(model=Root, name='update')
     def view_update_document(self, request):
-        session = request.app.session()
+        session = request.session
         query = session.query(Document)
         query = query.filter(Document.id == request.params.get('id'))
 
@@ -209,7 +209,7 @@ def test_orm_integration(es_url, postgres_dsn):
 
     @App.json(model=Root, name='delete')
     def view_delete_document(self, request):
-        session = request.app.session()
+        session = request.session
         query = session.query(Document)
         query = query.filter(Document.id == request.params.get('id'))
         query.delete('fetch')
