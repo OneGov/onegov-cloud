@@ -55,7 +55,7 @@ def delete_subscriber(self, request, form):
     layout = ManageSubscribersLayout(self, request)
 
     if form.submitted(request):
-        subscribers = SubscriberCollection(request.app.session())
+        subscribers = SubscriberCollection(request.session)
         subscribers.unsubscribe(self.address)
         request.message(_("Subscriber deleted."), 'success')
         return redirect(layout.manage_model_link)

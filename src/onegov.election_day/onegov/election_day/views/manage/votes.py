@@ -35,7 +35,7 @@ def create_vote(self, request, form):
     """ Create a new vote. """
 
     layout = ManageVotesLayout(self, request)
-    archive = ArchivedResultCollection(request.app.session())
+    archive = ArchivedResultCollection(request.session)
 
     form.set_domain(request.app.principal)
 
@@ -63,7 +63,7 @@ def edit_vote(self, request, form):
     """ Edit an existing vote. """
 
     layout = ManageVotesLayout(self, request)
-    archive = ArchivedResultCollection(request.app.session())
+    archive = ArchivedResultCollection(request.session)
 
     form.set_domain(request.app.principal)
 
@@ -94,7 +94,7 @@ def clear_vote(self, request, form):
     """ Clear the results of a vote. """
 
     layout = ManageVotesLayout(self, request)
-    archive = ArchivedResultCollection(request.app.session())
+    archive = ArchivedResultCollection(request.session)
 
     if form.submitted(request):
         archive.clear(self, request)
@@ -127,7 +127,7 @@ def delete_vote(self, request, form):
     """ Delete an existing vote. """
 
     layout = ManageVotesLayout(self, request)
-    archive = ArchivedResultCollection(request.app.session())
+    archive = ArchivedResultCollection(request.session)
 
     if form.submitted(request):
         archive.delete(self, request)
@@ -160,7 +160,7 @@ def delete_vote(self, request, form):
 def trigger_vote(self, request, form):
     """ Trigger the notifications related to a vote. """
 
-    session = request.app.session()
+    session = request.session
     notifications = NotificationCollection(session)
     layout = ManageVotesLayout(self, request)
 

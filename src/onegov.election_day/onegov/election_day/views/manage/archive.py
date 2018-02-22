@@ -23,10 +23,10 @@ def view_update_results(self, request, form):
     """
 
     layout = DefaultLayout(self, request)
-    archive = ArchivedResultCollection(request.app.session())
+    archive = ArchivedResultCollection(request.session)
 
     if form.submitted(request):
-        archive = ArchivedResultCollection(request.app.session())
+        archive = ArchivedResultCollection(request.session)
         archive.update_all(request)
         request.message(_("Results updated."), 'success')
         return redirect(layout.manage_link)

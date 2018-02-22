@@ -32,7 +32,7 @@ def view_upload(self, request, form):
     status = 'open'
     map_available = True
     if form.submitted(request):
-        session = request.app.session()
+        session = request.session
         principal = request.app.principal
         if not principal.is_year_available(self.date.year, False):
             errors = [unsupported_year_error(self.date.year)]

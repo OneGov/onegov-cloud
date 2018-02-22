@@ -146,7 +146,7 @@ class EmailNotification(Notification):
             'vote' if isinstance(model, Vote) else 'election'
         )
 
-        subscribers = request.app.session().query(EmailSubscriber).all()
+        subscribers = request.session.query(EmailSubscriber).all()
         for subscriber in subscribers:
             locale = subscriber.locale
             self.set_locale(request, locale)
@@ -212,7 +212,7 @@ class SmsNotification(Notification):
                 mapping={'url': request.app.principal.sms_notification}
             )
 
-        subscribers = request.app.session().query(SmsSubscriber).all()
+        subscribers = request.session.query(SmsSubscriber).all()
         for subscriber in subscribers:
             translator = request.app.translations.get(subscriber.locale)
             translated = translator.gettext(content) if translator else content

@@ -26,7 +26,7 @@ def authenticate(request):
             request.authorization[1]
         ).decode('utf-8').split(':')[1]
 
-        request.app.session().query(UploadToken).filter_by(token=token).one()
+        request.session.query(UploadToken).filter_by(token=token).one()
     except Exception:
         raise HTTPUnauthorized()
 
@@ -74,7 +74,7 @@ def view_upload_rest(self, request):
         }
 
     # Check the ID
-    session = request.app.session()
+    session = request.session
     item = session.query(
         Vote if form.type.data == 'vote' else Election
     ).filter_by(id=form.id.data).first()

@@ -111,7 +111,7 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def archive(self):
-        return ArchivedResultCollection(self.request.app.session())
+        return ArchivedResultCollection(self.request.session)
 
     @cached_property
     def locales(self):

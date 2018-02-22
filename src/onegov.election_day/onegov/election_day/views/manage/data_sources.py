@@ -114,7 +114,7 @@ def delete_data_source(self, request, form):
     layout = ManageDataSourcesLayout(self, request)
 
     if form.submitted(request):
-        data_sources = DataSourceCollection(request.app.session())
+        data_sources = DataSourceCollection(request.session)
         data_sources.delete(self)
         request.message(_("Data source deleted."), 'success')
         return morepath.redirect(layout.manage_model_link)
@@ -224,7 +224,7 @@ def delete_data_source_item(self, request, form):
     layout = ManageDataSourceItemsLayout(self.source, request)
 
     if form.submitted(request):
-        data_source_items = DataSourceItemCollection(request.app.session())
+        data_source_items = DataSourceItemCollection(request.session)
         data_source_items.delete(self)
         request.message(_("Mapping deleted."), 'success')
         return morepath.redirect(layout.manage_model_link)

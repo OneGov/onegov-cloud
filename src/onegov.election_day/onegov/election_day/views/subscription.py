@@ -24,7 +24,7 @@ def subscribe_email(self, request, form):
 
     callout = None
     if form.submitted(request):
-        subscribers = EmailSubscriberCollection(request.app.session())
+        subscribers = EmailSubscriberCollection(request.session)
         subscribers.subscribe(form.email.data, request)
         callout = _(
             "Successfully subscribed to the email service. You will receive "
@@ -61,7 +61,7 @@ def unsubscribe_email(self, request, form):
     """
 
     layout = DefaultLayout(self, request)
-    subscribers = EmailSubscriberCollection(request.app.session())
+    subscribers = EmailSubscriberCollection(request.session)
 
     token = request.params.get('opaque', None)
     if request.method == 'POST' and token:
@@ -101,7 +101,7 @@ def subscribe_sms(self, request, form):
 
     callout = None
     if form.submitted(request):
-        subscribers = SmsSubscriberCollection(request.app.session())
+        subscribers = SmsSubscriberCollection(request.session)
         subscribers.subscribe(form.formatted_phone_number, request)
         callout = _(
             "Successfully subscribed to the SMS service. You will receive a "
@@ -137,7 +137,7 @@ def unsubscribe_sms(self, request, form):
 
     callout = None
     if form.submitted(request):
-        subscribers = SmsSubscriberCollection(request.app.session())
+        subscribers = SmsSubscriberCollection(request.session)
         subscribers.unsubscribe(form.formatted_phone_number)
         callout = _(
             "Successfully unsubscribed from the SMS services. You will no "

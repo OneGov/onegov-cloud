@@ -71,7 +71,7 @@ def view_principal(self, request):
     """
 
     layout = DefaultLayout(self, request)
-    archive = ArchivedResultCollection(request.app.session())
+    archive = ArchivedResultCollection(request.session)
     latest, last_modified = archive.latest()
     latest = archive.group_items(latest, request)
 
@@ -94,7 +94,7 @@ def view_principal_json(self, request):
 
     """
 
-    archive = ArchivedResultCollection(request.app.session())
+    archive = ArchivedResultCollection(request.session)
     latest, last_modified = archive.latest()
     latest = get_summaries(latest, request)
 

@@ -105,7 +105,7 @@ def view_upload_majorz_election(self, request, form):
             else:
                 raise NotImplementedError("Unsupported import format")
 
-            archive = ArchivedResultCollection(request.app.session())
+            archive = ArchivedResultCollection(request.session)
             archive.update(self, request)
 
             if errors:
@@ -210,7 +210,7 @@ def view_upload_proporz_election(self, request, form):
             else:
                 raise NotImplementedError("Unsupported import format")
 
-            archive = ArchivedResultCollection(request.app.session())
+            archive = ArchivedResultCollection(request.session)
             archive.update(self, request)
 
             if errors:

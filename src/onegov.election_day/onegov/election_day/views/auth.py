@@ -71,7 +71,7 @@ def handle_password_reset_request(self, request, form):
     callout = None
 
     if form.submitted(request):
-        users = UserCollection(request.app.session())
+        users = UserCollection(request.session)
         user = users.by_username(form.email.data)
         if user:
             url = password_reset_url(

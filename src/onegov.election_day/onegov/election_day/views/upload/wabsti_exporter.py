@@ -25,7 +25,7 @@ def authenticated_source(request):
             request.authorization[1]
         ).decode('utf-8').split(':')[1]
 
-        query = request.app.session().query(DataSource)
+        query = request.session.query(DataSource)
         query = query.filter(DataSource.token == token)
         return query.one()
     except Exception:
@@ -79,7 +79,7 @@ def view_upload_wabsti_vote(self, request):
         }
 
     errors = {}
-    session = request.app.session()
+    session = request.session
     archive = ArchivedResultCollection(session)
     for item in data_source.items:
         vote = item.item
@@ -166,7 +166,7 @@ def view_upload_wabsti_majorz(self, request):
         }
 
     errors = {}
-    session = request.app.session()
+    session = request.session
     archive = ArchivedResultCollection(session)
     for item in data_source.items:
         election = item.item
@@ -263,7 +263,7 @@ def view_upload_wabsti_proporz(self, request):
         }
 
     errors = {}
-    session = request.app.session()
+    session = request.session
     archive = ArchivedResultCollection(session)
     for item in data_source.items:
         election = item.item
