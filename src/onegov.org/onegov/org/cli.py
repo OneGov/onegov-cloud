@@ -396,7 +396,7 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
             forms.submissions.complete_submission(submission)
 
             with forms.session.no_autoflush:
-                ticket = TicketCollection(request.app.session()).open_ticket(
+                ticket = TicketCollection(request.session).open_ticket(
                     handler_code='RSV', handler_id=token
                 )
                 ticket.accept_ticket(user)

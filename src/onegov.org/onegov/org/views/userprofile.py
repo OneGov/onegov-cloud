@@ -21,7 +21,7 @@ def handle_user_profile(self, request, form):
 
     layout = DefaultLayout(self, request)
 
-    collection = UserCollection(request.app.session())
+    collection = UserCollection(request.session)
     user = collection.by_username(request.identity.userid)
 
     if form.submitted(request):
@@ -80,7 +80,7 @@ def handle_unsubscribe(self, request):
     if not data:
         return HTTPForbidden()
 
-    user = UserCollection(request.app.session()).by_username(data['user'])
+    user = UserCollection(request.session).by_username(data['user'])
 
     if not user:
         return HTTPForbidden()

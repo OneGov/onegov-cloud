@@ -229,7 +229,7 @@ class Layout(ChameleonLayout):
     @cached_property
     def events_url(self):
         return self.request.link(
-            OccurrenceCollection(self.request.app.session())
+            OccurrenceCollection(self.request.session)
         )
 
     @cached_property
@@ -568,7 +568,7 @@ class FormSubmissionLayout(DefaultLayout):
 
     @cached_property
     def breadcrumbs(self):
-        collection = FormCollection(self.request.app.session())
+        collection = FormCollection(self.request.session)
 
         return [
             Link(_("Homepage"), self.homepage_url),
@@ -589,7 +589,7 @@ class FormSubmissionLayout(DefaultLayout):
         if hasattr(self.model, 'form'):
             return
 
-        collection = FormCollection(self.request.app.session())
+        collection = FormCollection(self.request.session)
 
         edit_link = Link(
             text=_("Edit"),
@@ -699,7 +699,7 @@ class PersonLayout(DefaultLayout):
 
     @cached_property
     def collection(self):
-        return PersonCollection(self.request.app.session())
+        return PersonCollection(self.request.session)
 
     @cached_property
     def breadcrumbs(self):
@@ -757,7 +757,7 @@ class TicketLayout(DefaultLayout):
 
     @cached_property
     def collection(self):
-        return TicketCollection(self.request.app.session())
+        return TicketCollection(self.request.session)
 
     @cached_property
     def breadcrumbs(self):
@@ -933,7 +933,7 @@ class TicketNoteLayout(DefaultLayout):
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Tickets"), self.request.link(
-                TicketCollection(self.request.app.session())
+                TicketCollection(self.request.session)
             )),
             Link(self.ticket.number, self.request.link(self.ticket)),
             Link(self.title, '#')
@@ -1240,7 +1240,7 @@ class OccurrenceLayout(EventBaseLayout):
 
     @cached_property
     def collection(self):
-        return OccurrenceCollection(self.request.app.session())
+        return OccurrenceCollection(self.request.session)
 
     @cached_property
     def breadcrumbs(self):
@@ -1505,7 +1505,7 @@ class ImageSetLayout(DefaultLayout):
 
     @property
     def collection(self):
-        return ImageSetCollection(self.request.app.session())
+        return ImageSetCollection(self.request.session)
 
     @cached_property
     def breadcrumbs(self):

@@ -71,7 +71,7 @@ def handle_edit_definition(self, request, form):
     elif not request.POST:
         form.process(obj=self)
 
-    collection = FormCollection(request.app.session())
+    collection = FormCollection(request.session)
 
     layout = FormEditorLayout(self, request)
     layout.breadcrumbs = [
@@ -101,5 +101,5 @@ def delete_form_definition(self, request):
     if self.has_submissions(with_state='complete'):
         raise exc.HTTPMethodNotAllowed()
 
-    FormCollection(request.app.session()).definitions.delete(
+    FormCollection(request.session).definitions.delete(
         self.name, with_submissions=False)

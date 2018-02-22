@@ -33,13 +33,13 @@ def get_newsletter_form(model, request):
 
     form = NewsletterForm
 
-    query = request.app.session().query(News)
+    query = request.session.query(News)
     query = query.filter(News.parent != None)
     query = query.order_by(desc(News.created))
     query = query.options(undefer('created'))
     form = form.with_news(request, query.all())
 
-    query = OccurrenceCollection(request.app.session()).query(outdated=False)
+    query = OccurrenceCollection(request.session).query(outdated=False)
     subquery = query.with_entities(Occurrence.id)
     subquery = subquery.order_by(None)
     subquery = subquery.order_by(
@@ -55,7 +55,7 @@ def get_newsletter_form(model, request):
 
 
 def get_newsletter_send_form(model, request):
-    query = RecipientCollection(request.app.session()).query()
+    query = RecipientCollection(request.session).query()
     query = query.order_by(Recipient.address)
 
     return NewsletterSendForm.for_newsletter(model, query.all())
@@ -67,7 +67,7 @@ def news_by_newsletter(newsletter, request):
     if not news_ids:
         return None
 
-    query = request.app.session().query(News)
+    query = request.session.query(News)
     query = query.order_by(desc(News.created))
     query = query.options(undefer('created'))
     query = query.options(undefer('content'))
@@ -82,7 +82,7 @@ def occurrences_by_newsletter(newsletter, request):
     if not occurrence_ids:
         return None
 
-    query = request.app.session().query(Occurrence)
+    query = request.session.query(Occurrence)
     query = query.order_by(Occurrence.start, Occurrence.title)
     query = query.filter(Occurrence.id.in_(occurrence_ids))
 
@@ -94,7 +94,7 @@ def occurrences_by_newsletter(newsletter, request):
 def handle_newsletters(self, request, form):
 
     if form.submitted(request):
-        recipients = RecipientCollection(request.app.session())
+        recipients = RecipientCollection(request.session)
         recipient = recipients.by_address(form.address.data)
 
         # do not show a specific error message if the user already signed up,
@@ -236,7 +236,7 @@ def edit_newsletter(self, request, form):
 def delete_page(self, request):
     request.assert_valid_csrf_token()
 
-    NewsletterCollection(request.app.session()).delete(self)
+    NewsletterCollection(request.session).delete(self)
     request.success("The newsletter was deleted")
 
 
@@ -245,7 +245,7 @@ def delete_page(self, request):
 def handle_send_newsletter(self, request, form):
 
     if form.submitted(request):
-        query = RecipientCollection(request.app.session()).query()
+        query = RecipientCollection(request.session).query()
         query = query.filter(Recipient.id.in_(form.recipients.data))
         recipients = (r for r in query.all() if r not in self.recipients)
 

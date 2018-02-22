@@ -172,7 +172,7 @@ def handle_edit_directory(self, request, form):
 def delete_directory(self, request):
     request.assert_valid_csrf_token()
 
-    session = request.app.session()
+    session = request.session
 
     for entry in self.directory.entries:
         session.delete(entry)
@@ -322,7 +322,7 @@ def handle_submit_directory_entry(self, request, form):
     title = _("Submit a New Directory Entry")
 
     if form.submitted(request):
-        forms = FormCollection(request.app.session())
+        forms = FormCollection(request.session)
 
         # required by the form submissions collection
         form._source = self.directory.structure
@@ -392,7 +392,7 @@ def view_directory_entry(self, request):
 def delete_directory_entry(self, request):
     request.assert_valid_csrf_token()
 
-    session = request.app.session()
+    session = request.session
     session.delete(self)
 
     request.success(_("The entry was deleted"))

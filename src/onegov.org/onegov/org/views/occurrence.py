@@ -58,7 +58,7 @@ def view_get_occurrence(self, request):
     occurrences = self.event.occurrence_dates(localize=True)
     occurrences = list(filter(lambda x: x >= today, occurrences))
     description = linkify(self.event.description).replace('\n', '<br>')
-    session = request.app.session()
+    session = request.session
     ticket = TicketCollection(session).by_handler_id(self.event.id.hex)
 
     return {
@@ -111,7 +111,7 @@ def view_export(self, request, form):
 
 
 def run_export(request, formatter):
-    occasions = OccurrenceCollection(request.app.session())
+    occasions = OccurrenceCollection(request.session)
 
     query = occasions.query(outdated=False)
     query = query.options(joinedload(Occurrence.event))

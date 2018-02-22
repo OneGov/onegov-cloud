@@ -124,7 +124,7 @@ def new_stripe_connect_provider(self, request):
     if not self.query().count():
         provider.default = True
 
-    request.app.session().add(provider)
+    request.session.add(provider)
 
 
 @OrgApp.view(
@@ -151,7 +151,7 @@ def new_stripe_connection_error(self, request):
     permission=Secret,
     request_method='POST')
 def handle_default_provider(self, request):
-    providers = PaymentProviderCollection(request.app.session())
+    providers = PaymentProviderCollection(request.session)
     providers.as_default(self)
 
     request.success(_("Changed the default payment provider."))
@@ -164,7 +164,7 @@ def handle_default_provider(self, request):
 def delete_provider(self, request):
     request.assert_valid_csrf_token()
 
-    providers = PaymentProviderCollection(request.app.session())
+    providers = PaymentProviderCollection(request.session)
     providers.delete(self)
 
     request.success(_("The payment provider was deleted."))

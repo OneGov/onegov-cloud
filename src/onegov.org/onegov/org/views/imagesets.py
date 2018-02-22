@@ -44,7 +44,7 @@ def view_imagesets(self, request):
              permission=Private, request_method='GET')
 def select_images(self, request):
 
-    collection = ImageFileCollection(request.app.session())
+    collection = ImageFileCollection(request.session)
     selected = {f.id for f in self.files}
 
     def produce_image(id):
@@ -85,7 +85,7 @@ def handle_select_images(self, request):
     if not request.POST:
         self.files = []
     else:
-        self.files = request.app.session().query(ImageFile)\
+        self.files = request.session.query(ImageFile)\
             .filter(ImageFile.id.in_(request.POST)).all()
 
     request.success(_("Your changes were saved"))
@@ -142,7 +142,7 @@ def handle_edit_imageset(self, request, form):
 def handle_delete_imageset(self, request):
     request.assert_valid_csrf_token()
 
-    collection = ImageSetCollection(request.app.session())
+    collection = ImageSetCollection(request.session)
     collection.delete(self)
 
 

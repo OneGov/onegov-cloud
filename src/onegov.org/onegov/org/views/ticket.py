@@ -38,7 +38,7 @@ def view_ticket(self, request):
         self.handler.payment.sync()
 
     messages = MessageCollection(
-        request.app.session(),
+        request.session,
         channel_id=self.number
     )
 
@@ -108,7 +108,7 @@ def delete_ticket_note(self, request):
     # force a change of the ticket to make sure that it gets reindexed
     self.ticket.force_update()
 
-    request.app.session().delete(self)
+    request.session.delete(self)
     request.success(_("The note was deleted"))
 
 
@@ -140,7 +140,7 @@ def handle_edit_note(self, request, form):
 
 @OrgApp.view(model=Ticket, name='accept', permission=Private)
 def accept_ticket(self, request):
-    user = UserCollection(request.app.session()).by_username(
+    user = UserCollection(request.session).by_username(
         request.identity.userid)
 
     was_pending = self.state == 'open'
@@ -185,12 +185,12 @@ def close_ticket(self, request):
             )
 
     return morepath.redirect(
-        request.link(TicketCollection(request.app.session())))
+        request.link(TicketCollection(request.session)))
 
 
 @OrgApp.view(model=Ticket, name='reopen', permission=Private)
 def reopen_ticket(self, request):
-    user = UserCollection(request.app.session()).by_username(
+    user = UserCollection(request.session).by_username(
         request.identity.userid)
 
     was_closed = self.state == 'closed'
@@ -317,7 +317,7 @@ def view_tickets(self, request):
 
     def get_owners():
 
-        users = UserCollection(request.app.session())
+        users = UserCollection(request.session)
         users = users.by_roles('admin', 'editor')
         users = users.order_by(User.title)
 

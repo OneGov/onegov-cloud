@@ -145,7 +145,7 @@ def handle_activation(self, request):
     if not request.app.enable_user_registration:
         raise exc.HTTPNotFound()
 
-    users = UserCollection(request.app.session())
+    users = UserCollection(request.session)
 
     username = request.params.get('username')
     token = request.params.get('token')
@@ -188,7 +188,7 @@ def handle_password_reset_request(self, request, form):
 
     if form.submitted(request):
 
-        user = UserCollection(request.app.session())\
+        user = UserCollection(request.session)\
             .by_username(form.email.data)
 
         url = layout.password_reset_url(user)

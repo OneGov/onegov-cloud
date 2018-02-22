@@ -33,7 +33,7 @@ def view_messages_feed(self, request):
     usernames = {m.owner for m in messages if m.owner}
 
     if usernames:
-        q = request.app.session().query(User)
+        q = request.session.query(User)
         q = q.with_entities(User.username, User.realname)
         q = q.filter(User.username.in_(usernames))
 

@@ -36,7 +36,7 @@ def view_export(self, request, form):
 
         rows = tuple(
             OrderedDict((f(k), f(v)) for k, v in row)
-            for row in self.run(form, request.app.session())
+            for row in self.run(form, request.session)
         )
 
         return form.as_export_response(

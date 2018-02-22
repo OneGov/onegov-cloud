@@ -118,7 +118,7 @@ def send_daily_resource_usage_overview(request):
     weekday = WEEKDAYS[today.weekday()]
 
     # get all recipients which require an e-mail today
-    q = ResourceRecipientCollection(request.app.session()).query()
+    q = ResourceRecipientCollection(request.session).query()
     q = q.filter(ResourceRecipient.medium == 'email')
     q = q.order_by(ResourceRecipient.address)
     q = q.with_entities(
@@ -174,7 +174,7 @@ def send_daily_resource_usage_overview(request):
     end = align_date_to_day(today, 'Europe/Zurich', 'up')
 
     # load all approved reservations for all required resources
-    q = request.app.session().query(Reservation)
+    q = request.session.query(Reservation)
     q = q.filter(Reservation.resource.in_(resource_ids))
     q = q.filter(Reservation.status == 'approved')
     q = q.filter(Reservation.data != None)
@@ -185,7 +185,7 @@ def send_daily_resource_usage_overview(request):
 
     # load all linked form submissions
     if all_reservations:
-        q = request.app.session().query(FormSubmission)
+        q = request.session.query(FormSubmission)
         q = q.filter(FormSubmission.id.in_(
             {r.token for r in all_reservations}
         ))

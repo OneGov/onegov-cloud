@@ -180,7 +180,7 @@ class AtoZPages(AtoZ):
     def get_items(self):
 
         # XXX implement correct collation support on the database level
-        topics = self.request.app.session().query(Topic).all()
+        topics = self.request.session.query(Topic).all()
         topics = sorted(topics, key=self.sortkey)
 
         if self.request.is_manager:

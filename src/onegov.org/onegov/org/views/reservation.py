@@ -178,7 +178,7 @@ def handle_reservation_form(self, request, form):
     token = reservations[0].token
 
     # the submission shares the reservation token
-    forms = FormCollection(request.app.session())
+    forms = FormCollection(request.session)
     submission = forms.submissions.by_id(token)
 
     # update the data if the form is submitted (even if invalid)
@@ -248,7 +248,7 @@ def confirm_reservation(self, request):
 
     token = reservations[0].token.hex
 
-    forms = FormCollection(request.app.session())
+    forms = FormCollection(request.session)
     submission = forms.submissions.by_id(token)
 
     if submission:
@@ -299,7 +299,7 @@ def finalize_reservation(self, request):
     session_id = self.bound_session_id(request)
     token = reservations[0].token.hex
 
-    forms = FormCollection(request.app.session())
+    forms = FormCollection(request.session)
     submission = forms.submissions.by_id(token)
 
     try:
@@ -335,7 +335,7 @@ def finalize_reservation(self, request):
             forms.submissions.complete_submission(submission)
 
         with forms.session.no_autoflush:
-            ticket = TicketCollection(request.app.session()).open_ticket(
+            ticket = TicketCollection(request.session).open_ticket(
                 handler_code='RSV', handler_id=token
             )
             TicketMessage.create(ticket, request, 'opened')
@@ -392,7 +392,7 @@ def accept_reservation(self, request):
             # libres does not automatically detect changes yet
             flag_modified(reservation, 'data')
 
-        tickets = TicketCollection(request.app.session())
+        tickets = TicketCollection(request.session)
         ticket = tickets.by_handler_id(self.token.hex)
 
         ReservationMessage.create(
@@ -420,10 +420,10 @@ def reject_reservation(self, request):
         r.id for r in targeted
     })
 
-    forms = FormCollection(request.app.session())
+    forms = FormCollection(request.session)
     submission = forms.submissions.by_id(token)
 
-    tickets = TicketCollection(request.app.session())
+    tickets = TicketCollection(request.session)
     ticket = tickets.by_handler_id(token)
 
     # if there's a acptured payment we cannot continue
@@ -441,7 +441,7 @@ def reject_reservation(self, request):
 
     # we need to delete the payment at the same time
     if payment:
-        request.app.session().delete(payment)
+        request.session.delete(payment)
 
     if self.email != request.current_username:
         send_html_mail(

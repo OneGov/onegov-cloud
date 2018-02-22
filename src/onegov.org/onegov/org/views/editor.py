@@ -40,7 +40,7 @@ def handle_page_form(self, request, form):
 def handle_new_page(self, request, form, src=None):
 
     if form.submitted(request):
-        pages = PageCollection(request.app.session())
+        pages = PageCollection(request.session)
         page = pages.add(
             parent=self.page,
             title=form.title.data,

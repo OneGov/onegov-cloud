@@ -25,7 +25,7 @@ def ticket_by_link(tickets, link):
 
 
 def send_ticket_notifications(payment, request, change):
-    session = request.app.session()
+    session = request.session
     tickets = TicketCollection(session)
 
     for link in payment.links:
@@ -61,7 +61,7 @@ def send_ticket_notifications(payment, request, change):
     template='payments.pt',
     permission=Private)
 def view_payments(self, request):
-    session = request.app.session()
+    session = request.session
     tickets = TicketCollection(session)
 
     providers = {

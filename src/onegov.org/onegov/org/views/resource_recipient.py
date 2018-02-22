@@ -102,7 +102,7 @@ def handle_edit_resource_recipient(self, request, form):
     request_method='DELETE')
 def delete_notification(self, request):
     request.assert_valid_csrf_token()
-    ResourceRecipientCollection(request.app.session()).delete(self)
+    ResourceRecipientCollection(request.session).delete(self)
 
     @request.after
     def remove_target(response):

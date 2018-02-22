@@ -175,7 +175,7 @@ class PersonLinkExtension(ContentExtension):
     def get_selectable_people(self, request):
         """ Returns a list of people which may be linked. """
 
-        query = PersonCollection(request.app.session()).query()
+        query = PersonCollection(request.session).query()
         query = query.order_by(Person.last_name, Person.first_name)
 
         return query.all()

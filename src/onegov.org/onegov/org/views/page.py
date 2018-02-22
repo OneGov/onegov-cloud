@@ -20,7 +20,7 @@ def delete_page(self, request):
     if not self.deletable:
         raise exc.HTTPMethodNotAllowed()
 
-    PageCollection(request.app.session()).delete(self)
+    PageCollection(request.session).delete(self)
     request.success(self.trait_messages[self.trait]['delete_message'])
 
 

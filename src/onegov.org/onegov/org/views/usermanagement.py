@@ -118,7 +118,7 @@ def view_user(self, request):
 
 @OrgApp.userlinks()
 def ticket_links(request, user):
-    tickets = TicketCollection(request.app.session()).query()
+    tickets = TicketCollection(request.session).query()
     tickets = tickets.filter_by(user_id=user.id)
     tickets = tickets.order_by(Ticket.number)
     tickets = tickets.with_entities(

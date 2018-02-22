@@ -58,7 +58,7 @@ def publish_event(self, request):
         'title': self.title
     }))
 
-    session = request.app.session()
+    session = request.session
     ticket = TicketCollection(session).by_handler_id(self.id.hex)
 
     if self.meta['submitter_email'] != request.current_username:
@@ -152,7 +152,7 @@ def view_event(self, request):
 
         self.submit()
 
-        session = request.app.session()
+        session = request.session
         with session.no_autoflush:
             ticket = TicketCollection(session).open_ticket(
                 handler_code='EVN', handler_id=self.id.hex
@@ -174,7 +174,7 @@ def view_event(self, request):
 
         return morepath.redirect(request.link(ticket, 'status'))
 
-    session = request.app.session()
+    session = request.session
     ticket = TicketCollection(session).by_handler_id(self.id.hex)
 
     return {
@@ -226,7 +226,7 @@ def handle_delete_event(self, request):
     request.assert_valid_csrf_token()
 
     # Create a snapshot of the ticket to keep the useful information.
-    tickets = TicketCollection(request.app.session())
+    tickets = TicketCollection(request.session)
     ticket = tickets.by_handler_id(self.id.hex)
     if ticket:
         ticket.create_snapshot(request)
@@ -246,7 +246,7 @@ def handle_delete_event(self, request):
     if ticket:
         EventMessage.create(self, ticket, request, 'deleted')
 
-    EventCollection(request.app.session()).delete(self)
+    EventCollection(request.session).delete(self)
 
 
 @OrgApp.view(model=Event, name='ical', permission=Public)

@@ -49,7 +49,7 @@ def handle_defined_form(self, request, form):
 
     """
 
-    collection = FormCollection(request.app.session())
+    collection = FormCollection(request.session)
 
     if request.POST:
         submission = collection.submissions.add(
@@ -96,7 +96,7 @@ def handle_pending_submission(self, request):
         * ``quiet`` no success messages are rendered if present
 
     """
-    collection = FormCollection(request.app.session())
+    collection = FormCollection(request.session)
 
     form = request.get_form(self.form_class, data=self.data)
     form.action = request.link(self)
@@ -177,7 +177,7 @@ def handle_complete_submission(self, request):
             request.success(_("Your changes were saved"))
 
             return morepath.redirect(request.link(
-                FormCollection(request.app.session()).scoped_submissions(
+                FormCollection(request.session).scoped_submissions(
                     self.name, ensure_existance=False)
             ))
         else:
@@ -193,14 +193,14 @@ def handle_complete_submission(self, request):
             elif payment is not True:
                 self.payment = payment
 
-            collection = FormCollection(request.app.session())
+            collection = FormCollection(request.session)
             collection.submissions.complete_submission(self)
 
             # make sure accessing the submission doesn't flush it, because
             # it uses sqlalchemy utils observe, which doesn't like premature
             # flushing at all
             with collection.session.no_autoflush:
-                ticket = TicketCollection(request.app.session()).open_ticket(
+                ticket = TicketCollection(request.session).open_ticket(
                     handler_code=self.meta.get('handler_code', 'FRM'),
                     handler_id=self.id.hex
                 )

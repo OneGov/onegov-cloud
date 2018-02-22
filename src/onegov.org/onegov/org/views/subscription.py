@@ -23,7 +23,7 @@ def view_confirm(self, request):
         ))
 
     return morepath.redirect(
-        request.link(NewsletterCollection(request.app.session()))
+        request.link(NewsletterCollection(request.session))
     )
 
 
@@ -45,5 +45,5 @@ def view_unsubscribe(self, request):
         ))
 
     return morepath.redirect(
-        request.link(NewsletterCollection(request.app.session()))
+        request.link(NewsletterCollection(request.session))
     )

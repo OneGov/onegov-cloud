@@ -57,7 +57,7 @@ class ManageUserForm(Form):
         if not is_valid_yubikey_format(field.data):
             raise validators.ValidationError(_("Invalid Yubikey"))
 
-        users = UserCollection(self.request.app.session())
+        users = UserCollection(self.request.session)
         user = users.by_yubikey(field.data)
 
         if not hasattr(self, 'current_username'):
@@ -92,7 +92,7 @@ class PartialNewUserForm(Form):
         return self.username.data
 
     def validate_username(self, field):
-        users = UserCollection(self.request.app.session())
+        users = UserCollection(self.request.session)
 
         if users.by_username(field.data):
             raise validators.ValidationError(
