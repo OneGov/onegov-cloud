@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.62.0 (2018-02-22)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds request.session, a shortcut to the session through the request.
   [href]
