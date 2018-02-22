@@ -755,7 +755,7 @@ def test_application_retries(postgres_dsn, number_of_retries):
 
     @App.view(model=Document, permission=Private)
     def provoke_serialization_failure(self, request):
-        session = request.app.session()
+        session = request.session
         session.add(Record())
         session.query(Record).delete('fetch')
 

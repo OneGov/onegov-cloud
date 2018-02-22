@@ -352,7 +352,7 @@ class UpgradeContext(object):
 
     def __init__(self, request):
         self.request = request
-        self.session = request.app.session()
+        self.session = request.session
         self.app = request.app
         self.schema = request.app.session_manager.current_schema
         self.engine = self.session.bind
@@ -519,7 +519,7 @@ class UpgradeRunner(object):
         return context.session.merge(self.states[module], load=False)
 
     def register_modules(self, request):
-        register_modules(request.app.session(), self.modules, self.tasks)
+        register_modules(request.session, self.modules, self.tasks)
 
         if self.commit:
             transaction.commit()

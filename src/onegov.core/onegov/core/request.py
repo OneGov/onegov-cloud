@@ -96,6 +96,10 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
     def identity_secret(self):
         return self.app.identity_secret
 
+    @cached_property
+    def session(self):
+        return self.app.session()
+
     def link_prefix(self, *args, **kwargs):
         """ Override the `link_prefix` with the application base path provided
         by onegov.server, because the default link_prefix contains the
