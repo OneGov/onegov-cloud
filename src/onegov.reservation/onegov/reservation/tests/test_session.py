@@ -129,8 +129,8 @@ def test_transaction_integration(postgres_dsn):
         )
 
         # this will fail and then abort everything
-        request.app.session().add(Document(id=1))
-        request.app.session().add(Document(id=1))
+        request.session.add(Document(id=1))
+        request.session.add(Document(id=1))
 
     # this is required for the transactions to actually work, usually this
     # would be onegov.server's job
