@@ -29,7 +29,7 @@ class BankStatementImportForm(Form):
 
     @property
     def period_choices(self):
-        periods = PeriodCollection(self.request.app.session())
+        periods = PeriodCollection(self.request.session)
 
         q = periods.query()
         q = q.with_entities(Period.id, Period.title)
@@ -50,7 +50,7 @@ class BankStatementImportForm(Form):
         self.load_periods()
 
     def validate_period(self, field):
-        periods = PeriodCollection(self.request.app.session())
+        periods = PeriodCollection(self.request.session)
         period = periods.by_id(field.data)
 
         if not period.finalized:

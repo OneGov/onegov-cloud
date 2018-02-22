@@ -122,7 +122,7 @@ def get_is_complete_userprofile_handler():
 
     def is_complete_userprofile(request, username, user=None):
         user = user or UserCollection(
-            request.app.session()).by_username(username)
+            request.session).by_username(username)
 
         form = UserProfileForm()
         form.request = request

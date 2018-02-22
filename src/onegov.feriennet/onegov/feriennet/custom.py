@@ -104,7 +104,7 @@ def get_admin_tools(request):
 def get_personal_tools(request):
     # for logged-in users show the number of open bookings
     if request.is_logged_in:
-        session = request.app.session()
+        session = request.session
         username = request.current_username
 
         period = request.app.active_period

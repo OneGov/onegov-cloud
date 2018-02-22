@@ -15,7 +15,7 @@ def edit_attendee(self, request, form):
     # note: attendees are added in the views/occasion.py file
     assert request.is_admin or self.username == request.current_username
 
-    bookings = BookingCollection(request.app.session())
+    bookings = BookingCollection(request.session)
     bookings = bookings.for_username(self.username)
 
     if form.submitted(request):
@@ -48,7 +48,7 @@ def edit_attendee(self, request, form):
 def edit_attendee_limit(self, request, form):
     assert request.is_admin or self.username == request.current_username
 
-    bookings = BookingCollection(request.app.session())
+    bookings = BookingCollection(request.session)
     bookings = bookings.for_username(self.username)
 
     if form.submitted(request):

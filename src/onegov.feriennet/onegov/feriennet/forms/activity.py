@@ -72,7 +72,7 @@ class VacationActivityForm(Form):
     def username_choices(self):
         assert self.request.is_admin  # safety net
 
-        users = UserCollection(self.request.app.session())
+        users = UserCollection(self.request.session)
         users = users.by_roles('admin', 'editor')
         users = users.with_entities(User.username, User.title)
 

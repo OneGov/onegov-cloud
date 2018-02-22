@@ -98,7 +98,7 @@ class OccasionForm(Form):
 
     @cached_property
     def selected_period(self):
-        return PeriodCollection(self.request.app.session()).by_id(
+        return PeriodCollection(self.request.session).by_id(
             self.period_id.data)
 
     @cached_property
@@ -122,7 +122,7 @@ class OccasionForm(Form):
         return result
 
     def setup_period_choices(self):
-        query = PeriodCollection(self.request.app.session()).query()
+        query = PeriodCollection(self.request.session).query()
         query = query.order_by(desc(Period.active), Period.title)
 
         def choice(period):
@@ -261,7 +261,7 @@ class OccasionForm(Form):
 
         assert self.parsed_dates, "should have been caught earlier"
 
-        occasions = OccasionCollection(self.request.app.session())
+        occasions = OccasionCollection(self.request.session)
         occasions.clear_dates(model)
 
         for date in sorted(self.parsed_dates):

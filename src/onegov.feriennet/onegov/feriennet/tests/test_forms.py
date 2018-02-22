@@ -35,9 +35,7 @@ def test_vacation_activity_form(session, test_password):
     form.request = Bunch(
         is_admin=True,
         current_username='editor@example.org',
-        app=Bunch(
-            session=lambda: session
-        )
+        session=session
     )
 
     form.on_request()
@@ -140,9 +138,9 @@ def test_notification_template_send_form(session):
     def request(admin):
         return Bunch(
             app=Bunch(
-                session=lambda: session,
                 active_period=periods.query().one()
             ),
+            session=session,
             include=lambda *args: None,
             model=None,
             is_admin=admin,

@@ -44,7 +44,7 @@ class AttendeeBase(Form):
             'username', self.request.current_username)
 
     def ensure_no_duplicate_child(self):
-        attendees = AttendeeCollection(self.request.app.session())
+        attendees = AttendeeCollection(self.request.session)
         query = attendees.by_username(self.username)
         query = query.filter(Attendee.name == self.name)
         query = query.filter(Attendee.id != self.model.id)
@@ -140,13 +140,13 @@ class AttendeeSignupForm(AttendeeBase):
 
     @cached_property
     def user(self):
-        users = UserCollection(self.request.app.session())
+        users = UserCollection(self.request.session)
         return users.by_username(self.username)
 
     @cached_property
     def booking_collection(self):
         return BookingCollection(
-            session=self.request.app.session(),
+            session=self.request.session,
             period_id=self.model.period_id)
 
     def for_username(self, username):
@@ -158,7 +158,7 @@ class AttendeeSignupForm(AttendeeBase):
     def populate_attendees(self):
         assert self.request.is_logged_in
 
-        attendees = AttendeeCollection(self.request.app.session())
+        attendees = AttendeeCollection(self.request.session)
         attendees = attendees.by_username(self.username)
         attendees = attendees.with_entities(Attendee.id, Attendee.name)
         attendees = attendees.order_by(Attendee.name)
@@ -257,7 +257,7 @@ class AttendeeSignupForm(AttendeeBase):
             if self.model.period.booking_limit:
                 limit = self.model.period.booking_limit
             else:
-                limit = self.request.app.session().query(Attendee.limit)\
+                limit = self.request.session.query(Attendee.limit)\
                     .filter(Attendee.id == self.attendee.data)\
                     .one()\
                     .limit
@@ -290,7 +290,7 @@ class AttendeeSignupForm(AttendeeBase):
 
         query = bookings.query().with_entities(Booking.id)
         query = query.filter(Booking.occasion_id.in_(
-            self.request.app.session().query(Occasion.id)
+            self.request.session.query(Occasion.id)
             .filter(Occasion.activity_id == self.model.activity_id)
             .subquery()
         ))
@@ -334,7 +334,7 @@ class AttendeeSignupForm(AttendeeBase):
         if self.is_new:
             birth_date = self.birth_date.data
         else:
-            attendees = AttendeeCollection(self.request.app.session())
+            attendees = AttendeeCollection(self.request.session)
             birth_date = attendees.by_id(self.attendee.data).birth_date
 
         if self.model.is_too_old(birth_date):

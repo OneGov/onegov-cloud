@@ -10,7 +10,7 @@ from onegov.org.new_elements import Link, LinkGroup
 @FeriennetApp.userlinks()
 def activity_links(request, user):
     activities = VacationActivityCollection(
-        session=request.app.session(),
+        session=request.session,
         identity=request.identity
     )
 
@@ -35,7 +35,7 @@ def activity_links(request, user):
 
 @FeriennetApp.userlinks()
 def attendee_links(request, user):
-    attendees = AttendeeCollection(request.app.session()).query()
+    attendees = AttendeeCollection(request.session).query()
     attendees = attendees.filter_by(username=user.username)
     attendees = attendees.order_by(Attendee.name)
     attendees = attendees.with_entities(Attendee.id, Attendee.name)

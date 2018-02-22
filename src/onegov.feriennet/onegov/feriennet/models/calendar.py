@@ -76,7 +76,7 @@ class AttendeeCalendar(Calendar, name='attendee'):
         return calendar.to_ical()
 
     def events(self, request):
-        session = request.app.session()
+        session = request.session
         stmt = self.attendee_calendar
 
         records = session.execute(select(stmt.c).where(and_(

@@ -29,8 +29,8 @@ def view_occasion(self, request):
 def new_occasion(self, request, form):
 
     if form.submitted(request):
-        occasions = OccasionCollection(request.app.session())
-        periods = PeriodCollection(request.app.session())
+        occasions = OccasionCollection(request.session)
+        periods = PeriodCollection(request.session)
 
         form.populate_obj(occasions.add(
             activity=self,
@@ -59,8 +59,8 @@ def new_occasion(self, request, form):
 def clone_occasion(self, request, form):
 
     if form.submitted(request):
-        occasions = OccasionCollection(request.app.session())
-        periods = PeriodCollection(request.app.session())
+        occasions = OccasionCollection(request.session)
+        periods = PeriodCollection(request.session)
 
         form.populate_obj(occasions.add(
             activity=self.activity,
@@ -124,7 +124,7 @@ def edit_occasion(self, request, form):
 def delete_occasion(self, request):
     request.assert_valid_csrf_token()
 
-    OccasionCollection(request.app.session()).delete(self)
+    OccasionCollection(request.session).delete(self)
 
 
 @FeriennetApp.view(
@@ -158,7 +158,7 @@ def reinstate_occasion(self, request):
 def book_occasion(self, request, form):
 
     if form.submitted(request):
-        attendees = AttendeeCollection(request.app.session())
+        attendees = AttendeeCollection(request.session)
         user = form.user
 
         if form.is_new:
@@ -177,13 +177,13 @@ def book_occasion(self, request, form):
         assert not (self.full and self.period.confirmed)
         assert self.activity.state == 'accepted'
 
-        bookings = BookingCollection(request.app.session())
+        bookings = BookingCollection(request.session)
 
         # if there's a cancelled/denied booking blocking the way, reactivate it
         booking = None
 
         if not form.is_new:
-            o = OccasionCollection(request.app.session()).query()
+            o = OccasionCollection(request.session).query()
             o = o.with_entities(Occasion.id)
             o = o.filter(Occasion.activity_id == self.activity_id)
             o = o.filter(Occasion.period_id == self.period_id)
@@ -233,7 +233,7 @@ def book_occasion(self, request, form):
     users = []
 
     if request.is_admin:
-        u = UserCollection(request.app.session()).query()
+        u = UserCollection(request.session).query()
         u = u.with_entities(User.username, User.title)
         u = u.order_by(User.title)
 

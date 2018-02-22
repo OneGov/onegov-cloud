@@ -101,7 +101,7 @@ def attendees_by_username(request, username):
 
     """
 
-    a = AttendeeCollection(request.app.session()).by_username(username).all()
+    a = AttendeeCollection(request.session).by_username(username).all()
     a.sort(key=lambda a: normalize_for_url(a.name))
 
     return a
@@ -247,7 +247,7 @@ def delete_booking(self, request):
 
         return
 
-    BookingCollection(request.app.session()).delete(self)
+    BookingCollection(request.session).delete(self)
 
     @request.after
     def remove_target(response):
@@ -264,7 +264,7 @@ def cancel_booking(self, request):
 
     assert self.period.wishlist_phase or request.is_admin
 
-    BookingCollection(request.app.session()).cancel_booking(
+    BookingCollection(request.session).cancel_booking(
         booking=self,
         score_function=self.period.scoring,
         cascade=False)

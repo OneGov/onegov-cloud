@@ -189,7 +189,7 @@ def view_billing(self, request, form):
     template='online-payments.pt')
 def view_online_payments(self, request):
     table = payments_association_table_for(InvoiceItem)
-    session = request.app.session()
+    session = request.session
 
     invoice_item_ids = self.invoice_items.query()
     invoice_item_ids = invoice_item_ids.with_entities(InvoiceItem.id)
@@ -285,7 +285,7 @@ def view_execute_import(self, request):
     xml = xml.decode('utf-8')
 
     invoice = cache['invoice']
-    invoices = InvoiceItemCollection(request.app.session())
+    invoices = InvoiceItemCollection(request.session)
 
     transactions = list(
         match_iso_20022_to_usernames(xml, invoices, invoice))
@@ -295,7 +295,7 @@ def view_execute_import(self, request):
     }
 
     if payments:
-        invoices = InvoiceItemCollection(request.app.session())
+        invoices = InvoiceItemCollection(request.session)
         invoices = invoices.for_invoice(cache['invoice'])
         invoices = invoices.query()
         invoices = invoices.filter(InvoiceItem.username.in_(payments.keys()))
@@ -346,7 +346,7 @@ def view_billing_import(self, request, form):
         xml = xml.decode('utf-8')
 
         invoice = cache['invoice']
-        invoices = InvoiceItemCollection(request.app.session())
+        invoices = InvoiceItemCollection(request.session)
 
         transactions = list(
             match_iso_20022_to_usernames(xml, invoices, invoice))
@@ -361,7 +361,7 @@ def view_billing_import(self, request, form):
     else:
         transactions = None
 
-    users = UserCollection(request.app.session())
+    users = UserCollection(request.session)
     users = {
         u.username: (u.realname or u.username)
         for u in users.query().with_entities(User.username, User.realname)

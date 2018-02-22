@@ -129,7 +129,7 @@ class VacationActivityHandler(Handler):
         from onegov.feriennet.layout import DefaultLayout
         layout = DefaultLayout(self.activity, request)
 
-        a = ActivityCollection(request.app.session())
+        a = ActivityCollection(request.session)
         a = a.by_username(self.activity.username)
 
         return render_macro(

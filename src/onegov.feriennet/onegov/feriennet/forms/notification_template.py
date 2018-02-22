@@ -120,7 +120,7 @@ class NotificationTemplateSendForm(Form):
 
     @property
     def recipients_pool(self):
-        users = UserCollection(self.request.app.session())
+        users = UserCollection(self.request.session)
         users = users.query()
 
         if self.state.data == ['active']:
@@ -136,7 +136,7 @@ class NotificationTemplateSendForm(Form):
         if not roles:
             return []
 
-        users = UserCollection(self.request.app.session())
+        users = UserCollection(self.request.session)
 
         q = users.by_roles(*roles)
         q = q.filter(User.active == True)
@@ -145,7 +145,7 @@ class NotificationTemplateSendForm(Form):
         return [u.username for u in q]
 
     def recipients_with_wishes(self):
-        bookings = BookingCollection(self.request.app.session())
+        bookings = BookingCollection(self.request.session)
         period = self.request.app.active_period
 
         if not period.wishlist_phase:
@@ -160,7 +160,7 @@ class NotificationTemplateSendForm(Form):
         return [b.username for b in q]
 
     def recipients_with_bookings(self):
-        bookings = BookingCollection(self.request.app.session())
+        bookings = BookingCollection(self.request.session)
         period = self.request.app.active_period
 
         if period.wishlist_phase:
@@ -175,7 +175,7 @@ class NotificationTemplateSendForm(Form):
         return [b.username for b in q]
 
     def recipients_which_are_active_organisers(self):
-        occasions = OccasionCollection(self.request.app.session())
+        occasions = OccasionCollection(self.request.session)
 
         q = occasions.query()
         q = q.join(Activity)
@@ -188,7 +188,7 @@ class NotificationTemplateSendForm(Form):
 
     def recipients_with_unpaid_bills(self):
         period = self.request.app.active_period
-        billing = BillingCollection(self.request.app.session(), period)
+        billing = BillingCollection(self.request.session, period)
 
         return [
             username for username, bill in billing.bills.items()
@@ -196,7 +196,7 @@ class NotificationTemplateSendForm(Form):
         ]
 
     def recipients_by_occasion_query(self, occasions):
-        bookings = BookingCollection(self.request.app.session())
+        bookings = BookingCollection(self.request.session)
 
         q = bookings.query()
         q = q.join(Period)
@@ -230,7 +230,7 @@ class NotificationTemplateSendForm(Form):
         return {r.occasion_id: r.count for r in q}
 
     def populate_occasion(self):
-        q = OccasionCollection(self.request.app.session()).query()
+        q = OccasionCollection(self.request.session).query()
         q = q.join(Activity)
         q = q.join(Period)
         q = q.filter(Period.active == True)

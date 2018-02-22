@@ -202,7 +202,7 @@ def delete_period(self, request):
     request.assert_valid_csrf_token()
 
     try:
-        PeriodCollection(request.app.session()).delete(self)
+        PeriodCollection(request.session).delete(self)
     except IntegrityError:
         request.alert(
             _("The period could not be deleted as it is still in use"))

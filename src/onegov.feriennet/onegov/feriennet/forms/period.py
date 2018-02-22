@@ -21,7 +21,7 @@ class PeriodSelectForm(Form):
 
     @property
     def period_choices(self):
-        q = PeriodCollection(self.request.app.session()).query()
+        q = PeriodCollection(self.request.session).query()
         q = q.with_entities(Period.id, Period.title)
         q = q.order_by(Period.execution_start)
 
@@ -29,7 +29,7 @@ class PeriodSelectForm(Form):
 
     @property
     def selected_period(self):
-        return PeriodCollection(self.request.app.session()).by_id(
+        return PeriodCollection(self.request.session).by_id(
             self.period.data)
 
     @property
@@ -239,7 +239,7 @@ class PeriodForm(Form):
         if not isinstance(self.model, Period):
             return None
 
-        session = self.request.app.session()
+        session = self.request.session
 
         mindate = self.execution_start.data
         maxdate = self.execution_end.data

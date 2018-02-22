@@ -206,7 +206,7 @@ class VacationActivityLayout(DefaultLayout):
         request = self.model.latest_request
 
         if request:
-            tickets = TicketCollection(self.request.app.session())
+            tickets = TicketCollection(self.request.session)
             return tickets.by_handler_id(request.id.hex)
 
     @cached_property

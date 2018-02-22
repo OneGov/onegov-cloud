@@ -17,7 +17,7 @@ from sedate import utcnow
 
 
 def get_variables(request):
-    period = PeriodCollection(request.app.session()).active()
+    period = PeriodCollection(request.session).active()
     variables = TemplateVariables(request, period).bound
 
     return OrderedDict(
@@ -123,7 +123,7 @@ def edit_notification(self, request, form):
 def delete_notification(self, request):
     request.assert_valid_csrf_token()
 
-    NotificationTemplateCollection(request.app.session()).delete(self)
+    NotificationTemplateCollection(request.session).delete(self)
 
     @request.after
     def remove_target(response):
@@ -138,7 +138,7 @@ def delete_notification(self, request):
     form=NotificationTemplateSendForm)
 def handle_send_notification(self, request, form):
 
-    period = PeriodCollection(request.app.session()).active()
+    period = PeriodCollection(request.session).active()
     variables = TemplateVariables(request, period)
     layout = NotificationTemplateLayout(self, request)
 

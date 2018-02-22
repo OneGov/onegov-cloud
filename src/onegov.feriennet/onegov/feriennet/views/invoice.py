@@ -21,7 +21,7 @@ from uuid import UUID
 def redirect_to_invoice_view(self, request):
     return request.redirect(request.link(
         InvoiceItemCollection(
-            request.app.session(), username=self.username, invoice=self.invoice
+            request.session, username=self.username, invoice=self.invoice
         )
     ))
 

@@ -253,7 +253,7 @@ def view_activities(self, request):
     permission=Public)
 def view_activity(self, request):
 
-    session = request.app.session()
+    session = request.session
     layout = VacationActivityLayout(self, request)
 
     occasion_ids = {o.id for o in self.occasions}
@@ -447,7 +447,7 @@ def discard_activity(self, request):
         raise exc.HTTPMethodNotAllowed()
 
     activities = VacationActivityCollection(
-        request.app.session(),
+        request.session,
         request.identity
     )
     activities.delete(self)
@@ -463,7 +463,7 @@ def discard_activity(self, request):
 def propose_activity(self, request):
     assert request.app.active_period, "An active period is required"
 
-    session = request.app.session()
+    session = request.session
 
     with session.no_autoflush:
         self.propose()
@@ -544,7 +544,7 @@ def offer_activity_again(self, request):
 
 
 def administer_activity(model, request, action, template, subject):
-    session = request.app.session()
+    session = request.session
 
     # publish the request from the current period, or the latest
     publication_request = (

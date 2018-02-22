@@ -121,7 +121,7 @@ class ManualBookingForm(Form):
 
     @property
     def usercollection(self):
-        return UserCollection(self.request.app.session())
+        return UserCollection(self.request.session)
 
     def load_user_tags(self):
         self.tags.choices = tuple(

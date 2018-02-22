@@ -248,4 +248,4 @@ def get_notification_template(request, app, id):
     model=Calendar,
     path='/calendar/{name}/{token}')
 def get_calendar(request, name, token):
-    return Calendar.from_name_and_token(request.app.session(), name, token)
+    return Calendar.from_name_and_token(request.session, name, token)

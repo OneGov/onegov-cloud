@@ -30,11 +30,11 @@ def handle_matches(self, request, form):
         assert self.period.active and not self.period.confirmed
 
         deferred_acceptance_from_database(
-            session=request.app.session(),
+            session=request.session,
             period_id=self.period_id,
-            score_function=form.scoring(request.app.session()))
+            score_function=form.scoring(request.session))
 
-        self.period.scoring = form.scoring(request.app.session())
+        self.period.scoring = form.scoring(request.session)
 
         if form.confirm_period:
             self.period.confirm()
@@ -101,7 +101,7 @@ def view_occasion_bookings_table(self, request):
     booking_phase = self.period.booking_phase
     phase_title = wishlist_phase and _("Wishlist") or _("Bookings")
 
-    users = UserCollection(request.app.session()).query()
+    users = UserCollection(request.session).query()
     users = users.with_entities(User.username, User.id)
     users = {u.username: u.id.hex for u in users}
 
@@ -218,7 +218,7 @@ def view_occasion_bookings_table(self, request):
 
     bookings = {'accepted': [], 'other': []}
 
-    q = request.app.session().query(Booking).filter_by(occasion_id=self.id)
+    q = request.session.query(Booking).filter_by(occasion_id=self.id)
     q = q.options(joinedload(Booking.attendee))
 
     for booking in q:
@@ -246,7 +246,7 @@ def view_occasion_bookings_table(self, request):
 def reset_matching(self, request):
     assert self.period.active and not self.period.confirmed
 
-    bookings = BookingCollection(request.app.session(), self.period_id)
+    bookings = BookingCollection(request.session, self.period_id)
 
     for booking in bookings.query().filter(Booking.state != 'cancelled'):
         booking.state = 'open'
