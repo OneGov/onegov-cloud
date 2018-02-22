@@ -250,7 +250,7 @@ def view_notices_update(self, request, form):
     """
 
     layout = Layout(self, request)
-    session = request.app.session()
+    session = request.session
 
     if form.submitted(request):
         for notice in self.query():

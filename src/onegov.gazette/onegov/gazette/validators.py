@@ -24,7 +24,7 @@ class UniqueColumnValue(object):
                     return
 
         column = getattr(self.table, field.name)
-        query = form.request.app.session().query(column)
+        query = form.request.session.query(column)
         query = query.filter(column == field.data)
         if query.first():
             raise ValidationError(_("This value already exists."))
@@ -50,7 +50,7 @@ class UnusedColumnKeyValue(object):
             if hasattr(form.model, field.name):
                 data = getattr(form.model, field.name)
                 if data != field.data:
-                    query = form.request.app.session().query(self.column)
+                    query = form.request.session.query(self.column)
                     query = query.filter(self.column.has_key(data))  # noqa
                     if query.first():
                         raise ValidationError(_("This value is in use."))

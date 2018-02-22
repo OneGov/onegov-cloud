@@ -111,7 +111,7 @@ def delete_attachment(self, request, form):
 
     if form.submitted(request):
         url = request.link(self.linked_official_notices[0], 'attachments')
-        request.app.session().delete(self)
+        request.session.delete(self)
         request.message(_("Attachment deleted."), 'success')
         notice.add_change(request, _("Attachment deleted."))
         return redirect(url)

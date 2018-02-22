@@ -37,7 +37,7 @@ def view_principal(self, request):
     if not request.app.principal.show_archive:
         return redirect(layout.login_link)
 
-    issues = IssueCollection(request.app.session()).by_years(desc=True)
+    issues = IssueCollection(request.session).by_years(desc=True)
     return {
         'layout': layout,
         'title': "{} {}".format(_("Gazette"), request.app.principal.name),
@@ -62,7 +62,7 @@ def view_dashboard(self, request):
 
     user_ids, group_ids = get_user_and_group(request)
     collection = GazetteNoticeCollection(
-        request.app.session(),
+        request.session,
         user_ids=user_ids,
         group_ids=group_ids
     )

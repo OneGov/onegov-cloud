@@ -28,7 +28,7 @@ class Layout(ChameleonLayout):
         self.request.include('quill')
         self.request.include('common')
         self.breadcrumbs = []
-        self.session = request.app.session()
+        self.session = request.session
 
     def title(self):
         return ''

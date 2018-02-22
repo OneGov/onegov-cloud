@@ -157,7 +157,7 @@ def delete_user(self, request, form):
         )
 
     if form.submitted(request):
-        collection = UserCollection(request.app.session())
+        collection = UserCollection(request.session)
         user = collection.by_username(self.username)
         if user.role != 'admin':
             self.logout_all_sessions(request)
@@ -217,7 +217,7 @@ def clear_user_sessions(self, request, form):
 
     layout = Layout(self, request)
     cancel = request.link(
-        UserCollection(request.app.session()), name='sessions'
+        UserCollection(request.session), name='sessions'
     )
 
     if form.submitted(request):

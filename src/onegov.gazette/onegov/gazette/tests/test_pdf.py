@@ -23,6 +23,7 @@ class DummyRequest(object):
     def __init__(self, session, principal):
         self.app = DummyApp(session, principal)
         self.locale = 'de_CH'
+        self.session = session
 
     def translate(self, text):
         return text.interpolate()

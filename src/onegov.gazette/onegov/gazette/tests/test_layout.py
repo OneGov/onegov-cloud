@@ -21,6 +21,7 @@ class DummyRequest(object):
     def __init__(self, session, principal=None):
         self.app = DummyApp(session, principal)
         self.locale = 'de_CH'
+        self.session = session
         self._is_secret = False
         self._is_private = False
         self._is_personal = False

@@ -38,6 +38,7 @@ class DummyRequest(object):
         self.app = DummyApp(session)
         self.identity = None
         self.locale = 'de_CH'
+        self.session = session
 
     def include(self, resource):
         pass

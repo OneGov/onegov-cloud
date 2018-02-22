@@ -61,7 +61,7 @@ def view_notice(self, request):
             _("Copy"),
             request.link(
                 GazetteNoticeCollection(
-                    request.app.session(),
+                    request.session,
                     state=self.state,
                     source=self.id
                 ), name='new-notice'
@@ -321,7 +321,7 @@ def delete_notice(self, request, form):
         )
 
     if form.submitted(request):
-        collection = GazetteNoticeCollection(request.app.session())
+        collection = GazetteNoticeCollection(request.session)
         collection.delete(self)
         request.message(_("Official notice deleted."), 'success')
         return redirect(layout.dashboard_or_notices_link)

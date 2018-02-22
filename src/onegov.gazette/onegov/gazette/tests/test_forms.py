@@ -34,6 +34,7 @@ class DummyApp(object):
 class DummyRequest(object):
     def __init__(self, session, principal=None, private=False):
         self.app = DummyApp(session, principal)
+        self.session = session
         self.private = private
         self.locale = 'de_CH'
         self.time_zone = 'Europe/Zurich'

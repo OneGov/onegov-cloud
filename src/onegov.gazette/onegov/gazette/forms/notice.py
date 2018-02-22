@@ -118,7 +118,7 @@ class NoticeForm(Form):
         return None
 
     def on_request(self):
-        session = self.request.app.session()
+        session = self.request.session
 
         # populate organization (active root elements with no children or
         # active children (but not their parents))
@@ -186,7 +186,7 @@ class NoticeForm(Form):
         if self.print_only:
             model.print_only = self.print_only.data
 
-        model.apply_meta(self.request.app.session())
+        model.apply_meta(self.request.session)
 
     def apply_model(self, model):
         self.title.data = model.title
@@ -212,7 +212,7 @@ class UnrestrictedNoticeForm(NoticeForm):
     """
 
     def on_request(self):
-        session = self.request.app.session()
+        session = self.request.session
         layout = Layout(None, self.request)
 
         def title(item):
@@ -273,4 +273,4 @@ class UnrestrictedNoticeForm(NoticeForm):
         if model.state != 'published':
             model.issues = self.issues.data
 
-        model.apply_meta(self.request.app.session())
+        model.apply_meta(self.request.session)

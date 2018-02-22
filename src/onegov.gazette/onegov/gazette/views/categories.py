@@ -110,7 +110,7 @@ def delete_category(self, request, form):
 
     """
     layout = Layout(self, request)
-    session = request.app.session()
+    session = request.session
 
     if self.in_use:
         request.message(

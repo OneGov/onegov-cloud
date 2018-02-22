@@ -142,7 +142,7 @@ class Pdf(PdfBase):
         # Collect the data
         data = []
 
-        session = request.app.session()
+        session = request.session
 
         used_categories = session.query(GazetteNotice._categories.keys())
         used_categories = used_categories.filter(

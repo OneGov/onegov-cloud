@@ -127,7 +127,7 @@ def delete_group(self, request, form):
         }
 
     if form.submitted(request):
-        UserGroupCollection(request.app.session()).delete(self)
+        UserGroupCollection(request.session).delete(self)
         request.message(_("Group deleted."), 'success')
         return redirect(layout.manage_groups_link)
 

@@ -48,7 +48,7 @@ class UserForm(Form):
     )
 
     def on_request(self):
-        session = self.request.app.session()
+        session = self.request.session
         self.group.choices = session.query(
             cast(UserGroup.id, String), UserGroup.name
         ).all()

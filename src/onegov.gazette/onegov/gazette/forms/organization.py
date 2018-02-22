@@ -45,7 +45,7 @@ class OrganizationForm(Form):
     )
 
     def on_request(self):
-        session = self.request.app.session()
+        session = self.request.session
         query = session.query(
             cast(Organization.id, String),
             Organization.title

@@ -20,6 +20,7 @@ class DummyApp(object):
 class DummyRequest(object):
     def __init__(self, session):
         self.app = DummyApp(session)
+        self.session = session
 
 
 class DummyForm(object):

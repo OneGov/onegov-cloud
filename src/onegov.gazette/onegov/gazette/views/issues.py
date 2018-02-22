@@ -55,7 +55,7 @@ def create_issue(self, request, form):
     if form.submitted(request):
         issue = Issue()
         form.update_model(issue)
-        request.app.session().add(issue)
+        request.session.add(issue)
         request.message(_("Issue added."), 'success')
         return redirect(layout.manage_issues_link)
 
@@ -117,7 +117,7 @@ def delete_issue(self, request, form):
 
     """
     layout = Layout(self, request)
-    session = request.app.session()
+    session = request.session
 
     if self.in_use:
         request.message(
