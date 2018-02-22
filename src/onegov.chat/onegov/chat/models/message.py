@@ -73,7 +73,7 @@ class Message(Base):
         from onegov.chat import MessageCollection  # XXX circular import
 
         return MessageCollection(
-            request.app.session(),
+            request.session,
             type=cls.__mapper_args__['polymorphic_identity']
         )
 
