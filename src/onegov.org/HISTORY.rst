@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.24.1 (2018-02-23)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds an additional description to the directory.
   [href]
 
