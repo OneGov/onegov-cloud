@@ -1,3 +1,5 @@
+from onegov.core.utils import increment_name
+from onegov.core.utils import normalize_for_url
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy.ext.declarative import declared_attr
@@ -27,7 +29,7 @@ class DomainOfInfluenceMixin(object):
 
 
 class StatusMixin(object):
-    """ Mixin providing status indication for votes and elections."""
+    """ Mixin providing status indication for votes and elections. """
 
     #: Status of the election or vote
     @declared_attr
@@ -64,7 +66,9 @@ class StatusMixin(object):
 
 class TitleTranslationsMixin(object):
     """ Adds a helper to return the translation of the title without depending
-    on the locale of the request."""
+    on the locale of the request.
+
+    """
 
     def get_title(self, locale, default_locale=None):
         """ Returns the requested translation of the title, falls back to the
@@ -78,6 +82,20 @@ class TitleTranslationsMixin(object):
             translations.get(locale, None) or
             translations.get(default_locale, None)
         )
+
+    def id_from_title(self, session):
+        """ Returns a unique, user friendly id derived from the title. """
+
+        title = self.get_title(self.session_manager.default_locale)
+        id = normalize_for_url(title or self.__class__.__name__)
+        while True:
+            items = [
+                item for item in session.query(self.__class__).filter_by(id=id)
+                if item != self
+            ]
+            if not items:
+                return id
+            id = increment_name(id)
 
 
 def summarized_property(name):

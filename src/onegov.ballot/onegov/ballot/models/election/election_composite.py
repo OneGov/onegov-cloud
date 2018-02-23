@@ -1,5 +1,4 @@
 from collections import OrderedDict
-from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.ballot.models.mixins import StatusMixin
 from onegov.ballot.models.mixins import TitleTranslationsMixin
 from onegov.core.orm import Base
@@ -8,8 +7,6 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE
-from onegov.core.utils import increment_name
-from onegov.core.utils import normalize_for_url
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Text
@@ -20,8 +17,7 @@ from sqlalchemy.orm import relationship
 
 
 class ElectionComposite(
-    Base, ContentMixin, TimestampMixin,
-    DomainOfInfluenceMixin, StatusMixin, TitleTranslationsMixin
+    Base, ContentMixin, TimestampMixin, StatusMixin, TitleTranslationsMixin
 ):
 
     __tablename__ = 'election_composites'
@@ -39,12 +35,7 @@ class ElectionComposite(
     @observes('title_translations')
     def title_observer(self, translations):
         if not self.id:
-            title = self.get_title(self.session_manager.default_locale)
-            id = normalize_for_url(title or 'election-composite')
-            session = object_session(self)
-            while session.query(ElectionComposite.id).filter_by(id=id).first():
-                id = increment_name(id)
-            self.id = id
+            self.id = self.id_from_title(object_session(self))
 
     #: Shortcode for cantons that use it
     shortcode = Column(Text, nullable=True)
@@ -159,7 +150,6 @@ class ElectionComposite(
         for locale, title in self.title_translations.items():
             common['composite_title_{}'.format(locale)] = (title or '').strip()
         common['composite_date'] = self.date.isoformat()
-        common['composite_domain'] = self.domain
         common['composite_mandates'] = self.number_of_mandates
         common['composite_status'] = self.stats
 

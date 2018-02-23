@@ -12,8 +12,6 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE
-from onegov.core.utils import increment_name
-from onegov.core.utils import normalize_for_url
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import desc
@@ -63,12 +61,7 @@ class Vote(Base, ContentMixin, TimestampMixin,
     @observes('title_translations')
     def title_observer(self, translations):
         if not self.id:
-            title = self.get_title(self.session_manager.default_locale)
-            id = normalize_for_url(title or 'vote')
-            session = object_session(self)
-            while session.query(Vote.id).filter(Vote.id == id).first():
-                id = increment_name(id)
-            self.id = id
+            self.id = self.id_from_title(object_session(self))
 
     #: identifies the date of the vote
     date = Column(Date, nullable=False)
