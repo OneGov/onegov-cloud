@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.2.1 (2018-02-23)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Fixes a serious performance regression.
   [href]
 
