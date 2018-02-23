@@ -186,13 +186,19 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
                 }
 
         # update the values
-        entry.values = updated
+        if entry.values != updated:
+            entry.values = updated
+
+            # mark the values as dirty (required because values is only part
+            # of the actual content dictionary)
+            entry.content.changed()
 
         # update the metadata
-        entry.title = self.configuration.extract_title(values)
-        entry.lead = self.configuration.extract_lead(values)
-        entry.order = self.configuration.extract_order(values)
-        entry.keywords = self.configuration.extract_keywords(values)
+        for attr in ('title', 'lead', 'order', 'keywords'):
+            new = getattr(self.configuration, f'extract_{attr}')(values)
+
+            if new != getattr(entry, attr):
+                setattr(entry, attr, new)
 
         # update the title
         if set_name:
@@ -208,7 +214,8 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
             entry.name = name
 
         # validate the values
-        form = self.form_class(data=entry.values)
+        form = self.form_obj
+        form.process(data=entry.values)
 
         if not form.validate():
 
@@ -218,10 +225,6 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
             session and session.expunge(entry)
 
             raise ValidationError(entry, form.errors)
-
-        # mark the values as dirty (required because values is only part
-        # of the actual content dictionary)
-        entry.content.changed()
 
         if session and not session._flushing:
             session.flush()
@@ -271,8 +274,16 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
         return next(query, None)
 
     @property
+    def form_obj(self):
+        return self.form_obj_from_structure(self.structure)
+
+    @property
     def form_class(self):
         return self.form_class_from_structure(self.structure)
+
+    @lru_cache(maxsize=1)
+    def form_obj_from_structure(self, structure):
+        return self.form_class_from_structure(structure)()
 
     @lru_cache(maxsize=1)
     def form_class_from_structure(self, structure):

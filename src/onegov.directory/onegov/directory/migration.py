@@ -1,8 +1,9 @@
+from onegov.directory.models.directory_entry import DirectoryEntry
 from onegov.form import as_internal_id
 from onegov.form import flatten_fieldsets
 from onegov.form import parse_form
 from onegov.form import parse_formcode
-from sqlalchemy.orm.attributes import flag_modified
+from sqlalchemy.orm import object_session, joinedload, undefer
 from sqlalchemy.orm.attributes import get_history
 
 
@@ -69,6 +70,20 @@ class DirectoryMigration(object):
 
         return False
 
+    @property
+    def entries(self):
+        session = object_session(self.directory)
+
+        if not session:
+            return self.directory.entries
+
+        e = session.query(DirectoryEntry)
+        e = e.filter_by(directory_id=self.directory.id)
+        e = e.options(joinedload(DirectoryEntry.files))
+        e = e.options(undefer(DirectoryEntry.content))
+
+        return e
+
     def execute(self):
         """ To run the migration, run this method. The other methods below
         should only be used if you know what you are doing.
@@ -78,7 +93,7 @@ class DirectoryMigration(object):
 
         self.migrate_directory()
 
-        for entry in self.directory.entries:
+        for entry in self.entries:
             self.migrate_entry(entry)
 
     def migrate_directory(self):
@@ -86,12 +101,8 @@ class DirectoryMigration(object):
         self.directory.configuration = self.new_configuration
 
     def migrate_entry(self, entry):
-        for entry in self.directory.entries:
-            self.migrate_values(entry.values)
-            self.directory.update(entry, entry.values)
-
-            # force an elasticsearch reindex
-            flag_modified(entry, 'title')
+        self.migrate_values(entry.values)
+        self.directory.update(entry, entry.values)
 
     def migrate_values(self, values):
         self.add_new_fields(values)
