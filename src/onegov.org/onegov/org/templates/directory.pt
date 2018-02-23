@@ -26,6 +26,12 @@
                         <div class="list-lead">${entry.lead}</div>
                     </li>
                 </ul>
+
+                <tal:b define="text directory.content.get('text')" condition="text">
+                    <h2 i18n:translate>Further Information</h2>
+                    <tal:b content="structure text" />
+                </tal:b>
+
             </div>
 
             <div class="columns medium-4">

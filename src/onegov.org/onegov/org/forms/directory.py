@@ -7,11 +7,11 @@ from onegov.form import flatten_fieldsets
 from onegov.form import Form
 from onegov.form import merge_forms
 from onegov.form import parse_formcode
+from onegov.form.errors import FormError
 from onegov.form.fields import UploadField
 from onegov.form.filters import as_float
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import ValidFormDefinition
-from onegov.form.errors import FormError
 from onegov.form.validators import WhitelistedMimeType
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
@@ -39,6 +39,10 @@ class DirectoryBaseForm(Form):
         fieldset=_("General"),
         description=_("Describes what this directory is about"),
         render_kw={'rows': 4})
+
+    text = HtmlField(
+        label=_("Further Information"),
+        fieldset=_("General"))
 
     structure = TextAreaField(
         label=_("Definition"),

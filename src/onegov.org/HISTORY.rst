@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds an additional description to the directory.
+  [href]
+
 0.24.0 (2018-02-22)
 ~~~~~~~~~~~~~~~~~~~
 

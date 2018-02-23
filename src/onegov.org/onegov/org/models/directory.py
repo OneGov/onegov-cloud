@@ -154,6 +154,7 @@ class ExtendedDirectory(Directory, HiddenFromPublicExtension, Extendable):
     enable_map = meta_property()
     enable_submissions = meta_property()
 
+    text = content_property()
     guideline = content_property()
     price = content_property()
     price_per_submission = content_property()
