@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Enables the 'btree_gist' extension for postgres.
+  [href]
+
 0.62.2 (2018-02-26)
 ~~~~~~~~~~~~~~~~~~~
 
