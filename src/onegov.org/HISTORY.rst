@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.24.2 (2018-02-26)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes reservation/form exports not working for json.
   [href]
 
