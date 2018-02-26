@@ -48,9 +48,9 @@ class Election(Base, ContentMixin, TimestampMixin,
     #: Identifies the election, may be used in the url
     id = Column(Text, primary_key=True)
 
-    #: the election composite this election belongs to
-    composite_id = Column(
-        Text, ForeignKey('election_composites.id'), nullable=True
+    #: the election compound this election belongs to
+    compound_id = Column(
+        Text, ForeignKey('election_compounds.id'), nullable=True
     )
 
     #: all translations of the title

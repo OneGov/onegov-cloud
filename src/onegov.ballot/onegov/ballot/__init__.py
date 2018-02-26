@@ -1,6 +1,6 @@
 from onegov.ballot.collections import BallotCollection
 from onegov.ballot.collections import ElectionCollection
-from onegov.ballot.collections import ElectionCompositeCollection
+from onegov.ballot.collections import ElectionCompoundCollection
 from onegov.ballot.collections import VoteCollection
 from onegov.ballot.models import Ballot
 from onegov.ballot.models import BallotResult
@@ -8,7 +8,7 @@ from onegov.ballot.models import Candidate
 from onegov.ballot.models import CandidateResult
 from onegov.ballot.models import ComplexVote
 from onegov.ballot.models import Election
-from onegov.ballot.models import ElectionComposite
+from onegov.ballot.models import ElectionCompound
 from onegov.ballot.models import ElectionResult
 from onegov.ballot.models import List
 from onegov.ballot.models import ListConnection
@@ -27,8 +27,8 @@ __all__ = [
     'ComplexVote',
     'Election',
     'ElectionCollection',
-    'ElectionComposite',
-    'ElectionCompositeCollection',
+    'ElectionCompound',
+    'ElectionCompoundCollection',
     'ElectionResult',
     'List',
     'ListConnection',

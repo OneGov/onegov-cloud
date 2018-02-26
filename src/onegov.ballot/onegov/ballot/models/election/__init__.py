@@ -1,7 +1,7 @@
 from onegov.ballot.models.election.candidate import Candidate
 from onegov.ballot.models.election.candidate_result import CandidateResult
 from onegov.ballot.models.election.election import Election
-from onegov.ballot.models.election.election_composite import ElectionComposite
+from onegov.ballot.models.election.election_compound import ElectionCompound
 from onegov.ballot.models.election.election_result import ElectionResult
 from onegov.ballot.models.election.list import List
 from onegov.ballot.models.election.list_connection import ListConnection
@@ -15,7 +15,7 @@ __all__ = [
     'Candidate',
     'CandidateResult',
     'Election',
-    'ElectionComposite',
+    'ElectionCompound',
     'ElectionResult',
     'List',
     'ListConnection',

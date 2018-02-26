@@ -11,7 +11,7 @@ Changelog
 - Fixes spelling of "eligible voters".
   [msom]
 
-- Adds election composites.
+- Adds election compounds.
   [msom]
 
 2.0.0 (2018-01-23)

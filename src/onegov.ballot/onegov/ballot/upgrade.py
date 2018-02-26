@@ -342,20 +342,20 @@ def renmame_elegible_voters_columns(context):
             )
 
 
-@upgrade_task('Add election composites', always_run=True)
-def add_election_composites(context):
+@upgrade_task('Add election compounds', always_run=True)
+def add_election_compounds(context):
     inspector = Inspector(context.operations_connection)
-    if 'election_composites' not in inspector.get_table_names(context.schema):
+    if 'election_compounds' not in inspector.get_table_names(context.schema):
         return False
 
-    if context.has_column('elections', 'composite_id'):
+    if context.has_column('elections', 'compound_id'):
         return False
 
     context.operations.add_column(
         'elections', Column(
-            'composite_id',
+            'compound_id',
             Text,
-            ForeignKey('election_composites.id'),
+            ForeignKey('election_compounds.id'),
             nullable=True
         )
     )

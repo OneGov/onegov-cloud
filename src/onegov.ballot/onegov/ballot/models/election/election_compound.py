@@ -16,13 +16,13 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 
 
-class ElectionComposite(
+class ElectionCompound(
     Base, ContentMixin, TimestampMixin, StatusMixin, TitleTranslationsMixin
 ):
 
-    __tablename__ = 'election_composites'
+    __tablename__ = 'election_compounds'
 
-    #: Identifies the election composite, may be used in the url
+    #: Identifies the election compound, may be used in the url
     id = Column(Text, primary_key=True)
 
     #: all translations of the title
@@ -89,10 +89,10 @@ class ElectionComposite(
 
         return False
 
-    #: An election composite contains n elections
+    #: An election compound contains n elections
     elections = relationship(
         'Election',
-        backref=backref('composite'),
+        backref=backref('compound'),
         lazy='dynamic',
         order_by='Election.shortcode',
     )
@@ -134,7 +134,7 @@ class ElectionComposite(
             election.clear_results()
 
     def export(self):
-        """ Returns all data connected to this election composite as list with
+        """ Returns all data connected to this election compound as list with
         dicts.
 
         This is meant as a base for json/csv/excel exports. The result is
@@ -148,10 +148,10 @@ class ElectionComposite(
 
         common = OrderedDict()
         for locale, title in self.title_translations.items():
-            common['composite_title_{}'.format(locale)] = (title or '').strip()
-        common['composite_date'] = self.date.isoformat()
-        common['composite_mandates'] = self.number_of_mandates
-        common['composite_status'] = self.stats
+            common['compound_title_{}'.format(locale)] = (title or '').strip()
+        common['compound_date'] = self.date.isoformat()
+        common['compound_mandates'] = self.number_of_mandates
+        common['compound_status'] = self.stats
 
         rows = []
         for election in self.elections:
