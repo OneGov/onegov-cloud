@@ -1,5 +1,12 @@
 from collections import OrderedDict
-from onegov.ballot.models.mixins import StatusMixin
+from onegov.ballot.models.election.candidate import Candidate
+from onegov.ballot.models.election.candidate_result import CandidateResult
+from onegov.ballot.models.election.election_result import ElectionResult
+from onegov.ballot.models.election.list import List
+from onegov.ballot.models.election.list_connection import ListConnection
+from onegov.ballot.models.election.list_result import ListResult
+from onegov.ballot.models.election.panachage_result import PanachageResult
+from onegov.ballot.models.election.party_result import PartyResult
 from onegov.ballot.models.mixins import TitleTranslationsMixin
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
@@ -9,6 +16,8 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE
 from sqlalchemy import Column
 from sqlalchemy import Date
+from sqlalchemy import desc
+from sqlalchemy import func
 from sqlalchemy import Text
 from sqlalchemy_utils import observes
 from sqlalchemy.orm import backref
@@ -17,7 +26,7 @@ from sqlalchemy.orm import relationship
 
 
 class ElectionCompound(
-    Base, ContentMixin, TimestampMixin, StatusMixin, TitleTranslationsMixin
+    Base, ContentMixin, TimestampMixin, TitleTranslationsMixin
 ):
 
     __tablename__ = 'election_compounds'
@@ -46,7 +55,6 @@ class ElectionCompound(
     @property
     def number_of_mandates(self):
         """ The (total) number of mandates. """
-
         return sum([
             election.number_of_mandates for election in self.elections
         ])
@@ -55,12 +63,17 @@ class ElectionCompound(
     def allocated_mandates(self):
         """ Number of already allocated mandates/elected candidates. """
 
-        return sum([
-            election.allocated_mandates for election in self.elections
-        ])
+        election_ids = [election.id for election in self.elections]
+        session = object_session(self)
+        mandates = session.query(
+            func.count(func.nullif(Candidate.elected, False))
+        )
+        mandates = mandates.filter(Candidate.election_id.in_(election_ids))
+        mandates = mandates.first()
+        return mandates[0] if mandates else 0
 
     def counted(self):
-        """ True if all results have been counted. """
+        """ True if all elections have been counted. """
 
         for election in self.elections:
             if not election.counted:
@@ -71,23 +84,32 @@ class ElectionCompound(
     @property
     def progress(self):
         """ Returns a tuple with the first value being the number of counted
-        election results and the second value being the number of total
-        results.
+        elections and the second value being the number of total elections.
 
         """
 
-        progresses = [election.progress for election in self.elections]
-        return sum(p[0] for p in progresses), sum(p[1] for p in progresses)
+        results = [election.completed for election in self.elections]
+        return sum(1 for result in results if result), len(results)
 
     @property
     def has_results(self):
-        """ Returns True, if the election has any results. """
+        """ Returns True, if the election compound has any results. """
 
         for election in self.elections:
             if election.has_results:
                 return True
 
         return False
+
+    @property
+    def completed(self):
+        """ Returns True, if the all elections are completed. """
+
+        for election in self.elections:
+            if not election.completed:
+                return False
+
+        return True
 
     #: An election compound contains n elections
     elections = relationship(
@@ -101,8 +123,28 @@ class ElectionCompound(
     def last_modified(self):
         """ Returns last change of the elections. """
 
-        changes = [election.last_modified for election in self.elections]
-        changes.append(self.last_change)
+        changes = [self.last_change, self.last_result_change]
+        session = object_session(self)
+        election_ids = [election.id for election in self.elections]
+
+        # Get the last candidate change
+        result = object_session(self).query(Candidate.last_change)
+        result = result.order_by(desc(Candidate.last_change))
+        result = result.filter(Candidate.election_id.in_(election_ids))
+        changes.append(result.first()[0] if result.first() else None)
+
+        # Get the last list connection change
+        result = session.query(ListConnection.last_change)
+        result = result.order_by(desc(ListConnection.last_change))
+        result = result.filter(ListConnection.election_id.in_(election_ids))
+        changes.append(result.first()[0] if result.first() else None)
+
+        # Get the last list change
+        result = session.query(List.last_change)
+        result = result.order_by(desc(List.last_change))
+        result = result.filter(List.election_id == self.id)
+        changes.append(result.first()[0] if result.first() else None)
+
         changes = [change for change in changes if change]
         return max(changes) if changes else None
 
@@ -110,7 +152,46 @@ class ElectionCompound(
     def last_result_change(self):
         """ Returns the last change of the results of the elections. """
 
-        changes = [election.last_result_change for election in self.elections]
+        changes = []
+        session = object_session(self)
+        election_ids = [election.id for election in self.elections]
+
+        # Get the last election result change
+        result = session.query(ElectionResult.last_change)
+        result = result.order_by(desc(ElectionResult.last_change))
+        result = result.filter(ElectionResult.election_id.in_(election_ids))
+        changes.append(result.first()[0] if result.first() else None)
+
+        # Get the last candidate result change
+        ids = session.query(Candidate.id)
+        ids = ids.filter(Candidate.election_id.in_(election_ids)).all()
+        result = session.query(CandidateResult.last_change)
+        result = result.order_by(desc(CandidateResult.last_change))
+        result = result.filter(CandidateResult.candidate_id.in_(ids))
+        changes.append(result.first()[0] if result.first() else None)
+
+        # Get the last list result changes
+        ids = session.query(List.id)
+        ids = ids.filter(List.election_id.in_(election_ids)).all()
+        if ids:
+            result = session.query(ListResult.last_change)
+            result = result.order_by(desc(ListResult.last_change))
+            result = result.filter(ListResult.list_id.in_(ids))
+            changes.append(result.first()[0] if result.first() else None)
+
+        # Get the last panachage result changes
+        if ids:
+            result = session.query(PanachageResult.last_change)
+            result = result.order_by(desc(PanachageResult.last_change))
+            result = result.filter(PanachageResult.target_list_id.in_(ids))
+            changes.append(result.first()[0] if result.first() else None)
+
+        # Get the last party result changes
+        result = session.query(PartyResult.last_change)
+        result = result.order_by(desc(PartyResult.last_change))
+        result = result.filter(PartyResult.election_id.in_(election_ids))
+        changes.append(result.first()[0] if result.first() else None)
+
         changes = [change for change in changes if change]
         return max(changes) if changes else None
 
@@ -126,12 +207,6 @@ class ElectionCompound(
 
     #: may be used to store a link related to this election
     related_link = meta_property('related_link')
-
-    def clear_results(self):
-        """ Clears all the results of all elections. """
-
-        for election in self.elections:
-            election.clear_results()
 
     def export(self):
         """ Returns all data connected to this election compound as list with
@@ -151,9 +226,11 @@ class ElectionCompound(
             common['compound_title_{}'.format(locale)] = (title or '').strip()
         common['compound_date'] = self.date.isoformat()
         common['compound_mandates'] = self.number_of_mandates
-        common['compound_status'] = self.stats
 
         rows = []
         for election in self.elections:
             for row in election.export():
-                rows.append(OrderedDict(common.items() + row.items()))
+                rows.append(
+                    OrderedDict(list(common.items()) + list(row.items()))
+                )
+        return rows
