@@ -87,7 +87,10 @@ def run_export(session, definition, start, end, timezone, nested, formatter):
             r[keyword] = formatter(getattr(submission, keyword))
 
         if nested:
-            r['form'] = submission.data
+            r['form'] = {
+                k: formatter(v)
+                for k, v in submission.data.items()
+            }
         else:
             for k, v in submission.data.items():
                 r[f'form_{k}'] = formatter(v)

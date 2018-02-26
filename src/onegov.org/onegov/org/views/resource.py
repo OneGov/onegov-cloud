@@ -413,7 +413,10 @@ def run_export(resource, start, end, nested, formatter):
         result['title'] = formatter(record[5])
 
         if nested:
-            result['form'] = record[6]
+            result['form'] = {
+                k: formatter(v)
+                for k, v in record[6].items()
+            }
         else:
             for key, value in record[6].items():
                 result['form_' + key] = formatter(value)
