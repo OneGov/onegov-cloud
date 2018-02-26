@@ -72,7 +72,7 @@ setup(
         'purl',
         'rcssmin',
         'sedate',
-        'sqlalchemy!=1.2.3',
+        'sqlalchemy>=1.2.4',
         'sqlalchemy-utils',
         'sqlparse',
         'translationstring',

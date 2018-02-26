@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Uses the better supported sqlalchemy>=1.2.3 notation now that 1.2.3+ is out.
+  [href]
+
 0.62.1 (2018-02-22)
 ~~~~~~~~~~~~~~~~~~~
 
