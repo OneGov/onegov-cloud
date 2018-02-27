@@ -49,7 +49,7 @@ def create_vote(self, request, form):
     return {
         'layout': layout,
         'form': form,
-        'title': _("New Vote"),
+        'title': _("New vote"),
         'cancel': layout.manage_model_link
     }
 

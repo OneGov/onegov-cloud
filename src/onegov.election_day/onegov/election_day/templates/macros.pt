@@ -155,12 +155,12 @@
 </metal:tab_menu>
 
 <metal:status_callout define-macro="status_callout" i18n:domain="onegov.election_day">
-    <div class="panel callout radius" tal:condition="not:item.completed">
+    <div class="panel callout radius" tal:condition="not:item.completed" tal:define="last_result_change item.last_result_change">
          <h5 i18n:translate="" tal:condition="not item.has_results">No results yet</h5>
          <h5 i18n:translate="" tal:condition="item.has_results">Intermediate results</h5>
          <p tal:condition="item.has_results">
              <span i18n:translate="">Last change</span>:
-             <strong>${layout.format_date(item.last_result_change, 'relative')} / ${layout.format_date(item.last_result_change, 'datetime_long')}</strong>
+             <strong>${layout.format_date(last_result_change, 'relative')} / ${layout.format_date(last_result_change, 'datetime_long')}</strong>
          </p>
     </div>
     <div class="panel radius" tal:condition="item.completed">
@@ -202,7 +202,6 @@
         </ul>
     </nav>
 </metal:election_day_link>
-
 
 <metal:election_header define-macro="election_header" i18n:domain="onegov.election_day">
     <div metal:use-macro="layout.macros['election_day_link']" tal:define="date election.date"/>
@@ -303,6 +302,19 @@
     </tal:block>
 </metal:election_factoids>
 
+<metal:election_compound_factoids define-macro="election_compound_factoids" i18n:domain="onegov.election_day">
+    <ul class="small-block-grid-1 medium-block-grid-4 factoids">
+        <li>
+            <span i18n:translate="">Counted</span>
+            <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress election_compound.progress" /></strong>
+        </li>
+        <li>
+            <span i18n:translate="">Mandates</span>
+            <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress (election_compound.allocated_mandates, election_compound.number_of_mandates)" /></strong>
+        </li>
+    </ul>
+</metal:election_compound_factoids>
+
 <metal:vote_factoids define-macro="vote_factoids" i18n:domain="onegov.election_day">
     <ul class="small-block-grid-1 medium-block-grid-4 factoids">
         <li>
@@ -353,12 +365,11 @@
             <li i18n:translate="">You may use this dataset for commercial purposes.</li>
             <li>
                 <tal:block i18n:translate="">You must provide the source (author, title and link to the dataset).</tal:block>
-                <ol class="citations">
-                    <li>${layout.principal.name} (${layout.format_date(model.last_result_change, 'datetime_long')}). <cite>${model.title} (JSON)</cite>. ${request.link(model, 'data-json')}.</li>
-                    <li>${layout.principal.name} (${layout.format_date(model.last_result_change, 'datetime_long')}). <cite>${model.title} (CSV)</cite>. ${request.link(model, 'data-csv')}.</li>
-                    <li>${layout.principal.name} (${layout.format_date(model.last_result_change, 'datetime_long')}). <cite>${model.title} (XLSX)</cite>. ${request.link(model, 'data-xlsx')}.</li>
-                <ol>
-
+                <ol class="citations" tal:define="last_result_change layout.format_date(model.last_result_change, 'datetime_long')">
+                    <li>${layout.principal.name} (${last_result_change}). <cite>${model.title} (JSON)</cite>. ${request.link(model, 'data-json')}.</li>
+                    <li>${layout.principal.name} (${last_result_change}). <cite>${model.title} (CSV)</cite>. ${request.link(model, 'data-csv')}.</li>
+                    <li>${layout.principal.name} (${last_result_change}). <cite>${model.title} (XLSX)</cite>. ${request.link(model, 'data-xlsx')}.</li>
+                </ol>
             </li>
         </ul>
         <a href="${layout.terms_link}"><img width="100" height="80" src="${layout.terms_icon}" alt="terms"></a>

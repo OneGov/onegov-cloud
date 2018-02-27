@@ -71,7 +71,7 @@ It's important to test the code manually, to see visual flaws etc. One can use t
   - [ ] Panachage Charts
   - [ ] Party Charts
 - [ ] Are PDFs and SVGs created? (`onegov-election-day generate-media`)
-  - [ ] New Votes and Elections
+  - [ ] New votes and Elections
   - [ ] Changed Votes and Elections
   - [ ] Do the PDFs look ok?
     - [ ] Simple Votes

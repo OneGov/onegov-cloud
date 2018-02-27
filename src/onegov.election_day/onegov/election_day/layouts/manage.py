@@ -1,5 +1,6 @@
 from cached_property import cached_property
 from onegov.ballot import ElectionCollection
+from onegov.ballot import ElectionCompoundCollection
 from onegov.ballot import VoteCollection
 from onegov.election_day import _
 from onegov.election_day.collections import DataSourceCollection
@@ -30,6 +31,10 @@ class ManageLayout(DefaultLayout):
         link = self.request.link(ElectionCollection(session))
         class_ = 'active' if link == self.manage_model_link else ''
         menu.append((_("Elections"), link, class_))
+
+        link = self.request.link(ElectionCompoundCollection(session))
+        class_ = 'active' if link == self.manage_model_link else ''
+        menu.append((_("Election compounds"), link, class_))
 
         if self.principal.wabsti_import:
             link = self.request.link(DataSourceCollection(session))
@@ -78,6 +83,21 @@ class ManageElectionsLayout(ManageLayout):
         super().__init__(model, request)
         self.breadcrumbs.append(
             (_("Elections"), request.link(self.model), '')
+        )
+
+
+class ManageElectionCompoundsLayout(ManageLayout):
+
+    @cached_property
+    def manage_model_link(self):
+        return self.request.link(
+            ElectionCompoundCollection(self.request.app.session())
+        )
+
+    def __init__(self, model, request):
+        super().__init__(model, request)
+        self.breadcrumbs.append(
+            (_("Election compsites"), request.link(self.model), '')
         )
 
 

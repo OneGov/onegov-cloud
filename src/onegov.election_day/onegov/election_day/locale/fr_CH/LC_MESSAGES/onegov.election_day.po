@@ -794,7 +794,7 @@ msgstr "Token"
 msgid "Regenerate token"
 msgstr "Renouveler le token"
 
-msgid "New Election"
+msgid "New election"
 msgstr "Nouveau election"
 
 msgid "View"
@@ -815,7 +815,7 @@ msgstr "Pas encore d’abonnés."
 msgid "Locale"
 msgstr "Locaux"
 
-msgid "New Vote"
+msgid "New vote"
 msgstr "Nouvelle votation"
 
 msgid "Empty"

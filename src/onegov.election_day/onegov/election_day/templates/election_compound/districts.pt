@@ -1,0 +1,41 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
+    <tal:block metal:fill-slot="title">${election_compound.title}</tal:block>
+    <tal:block metal:fill-slot="before-content">
+        <div metal:use-macro="layout.macros['election_header']" tal:define="election election_compound"/>
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+
+        <div metal:use-macro="layout.macros['status_callout']" tal:define="item election_compound" />
+
+        <tal:block tal:condition="layout.visible()">
+
+            <h2 i18n:translate="">Results</h2>
+
+            <div metal:use-macro="layout.macros['election_compound_factoids']" />
+
+            <div metal:use-macro="layout.macros['tab_menu']" />
+
+            <h3 tal:content="layout.title()" />
+
+            <table class="ballot-results stackable sortable">
+                <thead>
+                    <tr>
+                        <th i18n:translate="" class="left-aligned">${layout.principal.label('district')}</th>
+                        <th i18n:translate="" class="right-aligned">Mandates</th>
+                        <th i18n:translate="" class="right-aligned">Counted</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr tal:repeat="election election_compound.elections">
+                        <td class="left-aligned"><a href="${request.link(election)}">${election.title}</a></td>
+                        <td class="right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress (election.allocated_mandates, election.number_of_mandates)" /></td>
+                        <td class="right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" /></td>
+                    </tr>
+                </tbody>
+            </table>
+        </tal:block>
+
+        <div metal:use-macro="layout.macros['related_link']" tal:define="meta election_compound.meta" />
+
+    </tal:block>
+</div>

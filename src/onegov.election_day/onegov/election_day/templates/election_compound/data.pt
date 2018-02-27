@@ -1,0 +1,35 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
+    <tal:block metal:fill-slot="title">${election_compound.title}</tal:block>
+    <tal:block metal:fill-slot="before-content">
+        <div metal:use-macro="layout.macros['election_header']" tal:define="election election_compound"/>
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+
+        <div metal:use-macro="layout.macros['status_callout']" tal:define="item election_compound" />
+
+        <tal:block tal:condition="layout.visible()">
+
+            <h2 i18n:translate="">Results</h2>
+
+            <div metal:use-macro="layout.macros['election_compound_factoids']" />
+
+            <div metal:use-macro="layout.macros['tab_menu']"/>
+
+            <div metal:use-macro="layout.macros['open_data_download']" tal:define="model election_compound"/>
+
+            <tal:block tal:condition="layout.visible('parties')">
+                <h4 i18n:translate="">Party results</h4>
+                <p>
+                    <span i18n:translate="">The raw data is available as:</span> <a href="${request.link(election_compound, 'data-parties')}">CSV</a>.
+                    <span i18n:translate="">The format of the data is described here:</span> <a href="${layout.opendata_link}"><span i18n:translate="">Format Description</span></a>.
+                </p>
+            </tal:block>
+
+            <div metal:use-macro="layout.macros['terms_of_use']" tal:define="model election_compound"/>
+
+        </tal:block>
+
+        <div metal:use-macro="layout.macros['related_link']" tal:define="meta election_compound.meta" />
+
+    </tal:block>
+</div>

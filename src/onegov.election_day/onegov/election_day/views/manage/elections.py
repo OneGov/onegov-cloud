@@ -49,7 +49,7 @@ def create_election(self, request, form):
     return {
         'layout': layout,
         'form': form,
-        'title': _("New Election"),
+        'title': _("New election"),
         'cancel': layout.manage_model_link
     }
 

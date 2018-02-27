@@ -36,7 +36,7 @@
                             <thead>
                                 <tr>
                                     <th i18n:translate="">Election</th>
-                                    <th i18n:translate="" class="right-aligned" tal:condition="not: communal_instance">Reported</th>
+                                    <th i18n:translate="" class="right-aligned" tal:condition="not: communal_instance">Counted</th>
                                     <th i18n:translate="" class="right-aligned">Updated</th>
                                 </tr>
                             </thead>
@@ -62,7 +62,7 @@
                                     <th i18n:translate="">Result</th>
                                     <th i18n:translate="" class="right-aligned">Yes %</th>
                                     <th i18n:translate="" class="right-aligned">No %</th>
-                                    <th i18n:translate="" class="right-aligned" tal:condition="not: communal_instance">Reported</th>
+                                    <th i18n:translate="" class="right-aligned" tal:condition="not: communal_instance">Counted</th>
                                     <th i18n:translate="" class="right-aligned">Updated</th>
                                 </tr>
                             </thead>

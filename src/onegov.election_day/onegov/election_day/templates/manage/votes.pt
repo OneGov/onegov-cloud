@@ -14,7 +14,7 @@
                     </div>
                     <div class="small-12 medium-6 columns">
                         <ul class="top-actions text-right">
-                            <li><a class="action-new" href="${new_vote}" i18n:translate>New Vote</a></li>
+                            <li><a class="action-new" href="${new_vote}" i18n:translate>New vote</a></li>
                         </ul>
                     </div>
                 </div>
@@ -26,7 +26,7 @@
                 <table class="votes stackable" tal:condition="groups">
                     <thead>
                         <tr>
-                            <th i18n:translate>Vote</th>
+                            <th i18n:translate>Title</th>
                             <th i18n:translate>Shortcode</th>
                             <th i18n:translate>Date</th>
                             <th i18n:translate>Type</th>

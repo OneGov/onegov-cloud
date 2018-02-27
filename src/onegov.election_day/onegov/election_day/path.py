@@ -2,6 +2,8 @@ from onegov.ballot import Ballot
 from onegov.ballot import BallotCollection
 from onegov.ballot import Election
 from onegov.ballot import ElectionCollection
+from onegov.ballot import ElectionCompound
+from onegov.ballot import ElectionCompoundCollection
 from onegov.ballot import Vote
 from onegov.ballot import VoteCollection
 from onegov.core.i18n import SiteLocale
@@ -32,6 +34,13 @@ def get_principal(app):
 @ElectionDayApp.path(model=ElectionCollection, path='/manage/elections')
 def get_manage_elections(app, page=0):
     return ElectionCollection(app.session(), page=page)
+
+
+@ElectionDayApp.path(
+    model=ElectionCompoundCollection, path='/manage/election-compounds'
+)
+def get_manage_election_compsites(app, page=0):
+    return ElectionCompoundCollection(app.session(), page=page)
 
 
 @ElectionDayApp.path(model=VoteCollection, path='/manage/votes')
@@ -68,6 +77,11 @@ def get_manage_data_source_items(app, id, page=0):
 @ElectionDayApp.path(model=Election, path='/election/{id}')
 def get_election(app, id):
     return ElectionCollection(app.session()).by_id(id)
+
+
+@ElectionDayApp.path(model=ElectionCompound, path='/elections/{id}')
+def get_election_compound(app, id):
+    return ElectionCompoundCollection(app.session()).by_id(id)
 
 
 @ElectionDayApp.path(model=Vote, path='/vote/{id}')
