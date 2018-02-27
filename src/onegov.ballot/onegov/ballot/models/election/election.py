@@ -248,7 +248,8 @@ class Election(Base, ContentMixin, TimestampMixin,
             Candidate.family_name,
             Candidate.first_name
         )
-        return results.all()
+
+        return [(r.first_name, r.family_name) for r in results]
 
     #: may be used to store a link related to this election
     related_link = meta_property('related_link')

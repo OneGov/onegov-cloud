@@ -1,18 +1,8 @@
 Changelog
 ---------
 
-- Adds a counted attribute to election results, removes total_entities and
-  counted_entities from election.
-  [msom]
-
-- Adds a new domain of influence: region.
-  [msom]
-
-- Fixes spelling of "eligible voters".
-  [msom]
-
-- Adds election compounds.
-  [msom]
+- Fixes json output of elected candidates.
+  [href]
 
 2.0.0 (2018-01-23)
 ~~~~~~~~~~~~~~~~~~~
