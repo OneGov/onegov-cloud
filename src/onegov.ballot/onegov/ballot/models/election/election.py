@@ -16,7 +16,6 @@ from onegov.core.orm.types import HSTORE
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import desc
-from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import Integer
 from sqlalchemy import select
@@ -47,11 +46,6 @@ class Election(Base, ContentMixin, TimestampMixin,
 
     #: Identifies the election, may be used in the url
     id = Column(Text, primary_key=True)
-
-    #: the election compound this election belongs to
-    compound_id = Column(
-        Text, ForeignKey('election_compounds.id'), nullable=True
-    )
 
     #: all translations of the title
     title_translations = Column(HSTORE, nullable=False)

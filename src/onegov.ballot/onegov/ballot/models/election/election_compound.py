@@ -1,12 +1,14 @@
 from collections import OrderedDict
 from onegov.ballot.models.election.candidate import Candidate
 from onegov.ballot.models.election.candidate_result import CandidateResult
+from onegov.ballot.models.election.election import Election
 from onegov.ballot.models.election.election_result import ElectionResult
 from onegov.ballot.models.election.list import List
 from onegov.ballot.models.election.list_connection import ListConnection
 from onegov.ballot.models.election.list_result import ListResult
 from onegov.ballot.models.election.panachage_result import PanachageResult
 from onegov.ballot.models.election.party_result import PartyResult
+from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.ballot.models.mixins import TitleTranslationsMixin
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
@@ -20,13 +22,13 @@ from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy import Text
 from sqlalchemy_utils import observes
-from sqlalchemy.orm import backref
+from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import object_session
-from sqlalchemy.orm import relationship
 
 
 class ElectionCompound(
-    Base, ContentMixin, TimestampMixin, TitleTranslationsMixin
+    Base, ContentMixin, TimestampMixin,
+    DomainOfInfluenceMixin, TitleTranslationsMixin
 ):
 
     __tablename__ = 'election_compounds'
@@ -52,6 +54,17 @@ class ElectionCompound(
     #: The date of the elections
     date = Column(Date, nullable=False)
 
+    #: An election compound contains n elections
+    _elections = Column(
+        MutableDict.as_mutable(HSTORE), name='elections', nullable=True
+    )
+
+    @property
+    def elections(self):
+        query = object_session(self).query(Election)
+        query = query.filter(Election.id.in_(self._elections))
+        return query
+
     @property
     def number_of_mandates(self):
         """ The (total) number of mandates. """
@@ -72,6 +85,7 @@ class ElectionCompound(
         mandates = mandates.first()
         return mandates[0] if mandates else 0
 
+    @property
     def counted(self):
         """ True if all elections have been counted. """
 
@@ -110,14 +124,6 @@ class ElectionCompound(
                 return False
 
         return True
-
-    #: An election compound contains n elections
-    elections = relationship(
-        'Election',
-        backref=backref('compound'),
-        lazy='dynamic',
-        order_by='Election.shortcode',
-    )
 
     @property
     def last_modified(self):

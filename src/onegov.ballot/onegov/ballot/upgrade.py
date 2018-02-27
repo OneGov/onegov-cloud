@@ -9,7 +9,6 @@ from onegov.core.upgrade import upgrade_task
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Enum
-from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy.engine.reflection import Inspector
@@ -333,31 +332,6 @@ def add_region_domain(context):
 def renmame_elegible_voters_columns(context):
     tables = (
         'elections', 'election_results', 'ballots', 'ballot_results', 'votes'
-    )
-
-    for table in tables:
-        if context.has_column(table, 'elegible_voters'):
-            context.operations.alter_column(
-                table, 'elegible_voters', new_column_name='eligible_voters'
-            )
-
-
-@upgrade_task('Add election compounds', always_run=True)
-def add_election_compounds(context):
-    inspector = Inspector(context.operations_connection)
-    if 'election_compounds' not in inspector.get_table_names(context.schema):
-        return False
-
-    if context.has_column('elections', 'compound_id'):
-        return False
-
-    context.operations.add_column(
-        'elections', Column(
-            'compound_id',
-            Text,
-            ForeignKey('election_compounds.id'),
-            nullable=True
-        )
     )
 
     for table in tables:
