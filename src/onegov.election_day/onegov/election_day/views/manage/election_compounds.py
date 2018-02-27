@@ -18,7 +18,7 @@ def view_election_compounds(self, request):
 
     return {
         'layout': ManageElectionCompoundsLayout(self, request),
-        'title': _("Election compounds"),
+        'title': _("Compounds of elections"),
         'groups': groupbylist(self.batch, key=lambda items: items.date),
         'new_election_compound': request.link(self, 'new-election-compound')
     }
@@ -33,23 +33,19 @@ def create_election_compound(self, request, form):
     """ Create a new election compound. """
 
     layout = ManageElectionCompoundsLayout(self, request)
-    # todo:
-    # archive = ArchivedResultCollection(request.app.session())
+    archive = ArchivedResultCollection(request.session)
 
     if form.submitted(request):
-        session = request.app.session()
         election_compound = ElectionCompound()
         form.update_model(election_compound)
-        session.add(election_compound)
-        # todo: use archive instead of adding it directly
-        # archive.add(election_compound, request)
-        request.message(_("Election compound added."), 'success')
+        archive.add(election_compound, request)
+        request.message(_("Compound added."), 'success')
         return redirect(layout.manage_model_link)
 
     return {
         'layout': layout,
         'form': form,
-        'title': _("New election compound"),
+        'title': _("New compound"),
         'cancel': layout.manage_model_link
     }
 
@@ -63,14 +59,12 @@ def edit_election_compound(self, request, form):
     """ Edit an existing election compound. """
 
     layout = ManageElectionCompoundsLayout(self, request)
-    # todo:
-    # archive = ArchivedResultCollection(request.app.session())
+    archive = ArchivedResultCollection(request.session)
 
     if form.submitted(request):
         form.update_model(self)
-        # todo: ?
-        # archive.update(self, request)
-        request.message(_("Election compound modified."), 'success')
+        archive.update(self, request)
+        request.message(_("Compound modified."), 'success')
         return redirect(layout.manage_model_link)
 
     if not form.errors:
@@ -81,7 +75,7 @@ def edit_election_compound(self, request, form):
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Edit election compound"),
+        'subtitle': _("Edit compound"),
         'cancel': layout.manage_model_link
     }
 
@@ -94,15 +88,12 @@ def delete_election_compound(self, request, form):
     """ Delete an existing election compound. """
 
     layout = ManageElectionCompoundsLayout(self, request)
-    # toodo:
-    # archive = ArchivedResultCollection(request.app.session())
+    archive = ArchivedResultCollection(request.session)
 
     if form.submitted(request):
-        # todo: use archive instead of deleting it directly
-        request.app.session().delete(self)
-        # archive.delete(self, request)
+        archive.delete(self, request)
 
-        request.message(_("Election compound deleted."), 'success')
+        request.message(_("Compound deleted."), 'success')
         return redirect(layout.manage_model_link)
 
     return {
@@ -116,8 +107,8 @@ def delete_election_compound(self, request, form):
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Delete election compound"),
-        'button_text': _("Delete election compound"),
+        'subtitle': _("Delete compound"),
+        'button_text': _("Delete compound"),
         'button_class': 'alert',
         'cancel': layout.manage_model_link
     }

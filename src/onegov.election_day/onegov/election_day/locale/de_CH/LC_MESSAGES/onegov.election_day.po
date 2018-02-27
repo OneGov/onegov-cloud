@@ -202,6 +202,15 @@ msgstr "Majorzwahl"
 msgid "Election based on proportional representation"
 msgstr "Proporzwahl"
 
+msgid "Elections"
+msgstr "Wahlen"
+
+msgid "Select either majorz or proporz elections."
+msgstr "Wählen Sie entweder Majorz- oder Proporz-Wahlen."
+
+msgid "Cantonal"
+msgstr "Kantonal"
+
 msgid "Notifications"
 msgstr "Benachrichtigungen"
 
@@ -280,11 +289,14 @@ msgstr "Panaschierstatistik"
 msgid "Downloads"
 msgstr "Downloads"
 
+msgid "Elected candidates"
+msgstr "Gewählte Kandidierende"
+
 msgid "Votes"
 msgstr "Abstimmungen"
 
-msgid "Elections"
-msgstr "Wahlen"
+msgid "Compounds of elections"
+msgstr "Verbundene Wahlen"
 
 msgid "Manage"
 msgstr "Verwalten"
@@ -377,9 +389,6 @@ msgstr "National"
 msgid "Regional"
 msgstr "Regional"
 
-msgid "Cantonal"
-msgstr "Kantonal"
-
 msgid "Communal"
 msgstr "Kommunal"
 
@@ -416,8 +425,8 @@ msgstr "Kantonale Abstimmungen"
 msgid "Communal Votes"
 msgstr "Kommunale Abstimmungen"
 
-msgid "Reported"
-msgstr "Gemeldet"
+msgid "Counted"
+msgstr "Ausgezählt"
 
 msgid "Updated"
 msgstr "Aktualisiert"
@@ -563,9 +572,6 @@ msgstr "Wahlberechtigte"
 
 msgid "Received Ballots"
 msgstr "Abgegebene Wahlzettel"
-
-msgid "Counted"
-msgstr "Ausgezählt"
 
 #. Default: Voter turnout
 #.
@@ -793,11 +799,20 @@ msgstr "Token"
 msgid "Regenerate token"
 msgstr "Token neu erzeugen"
 
-msgid "New election"
-msgstr "Neue Wahl"
+msgid "New compound"
+msgstr "Neue Verbindung"
+
+msgid "No compounds yet."
+msgstr "Noch keine Verbindungen."
+
+msgid "Title"
+msgstr "Titel"
 
 msgid "View"
 msgstr "Anzeigen"
+
+msgid "New election"
+msgstr "Neue Wahl"
 
 msgid "Clear results"
 msgstr "Resultate löschen"
@@ -958,6 +973,21 @@ msgstr "Zuordnung geändert."
 msgid "Mapping deleted."
 msgstr "Zuordnung gelöscht."
 
+msgid "Edit compound"
+msgstr "Verbindung bearbeiten"
+
+msgid "Delete compound"
+msgstr "Verbindung löschen"
+
+msgid "Compound added."
+msgstr "Verbindung hinzugefügt."
+
+msgid "Compound modified."
+msgstr "Verbindung geändert."
+
+msgid "Compound deleted."
+msgstr "Verbindung gelöscht."
+
 msgid "Edit election"
 msgstr "Wahl bearbeiten"
 
@@ -1021,3 +1051,6 @@ msgstr "Keine Proporzwahl"
 
 msgid "The data source is not configured properly"
 msgstr "Die Datenquellekonfiguration ist ungültig"
+
+#~ msgid "Reported"
+#~ msgstr "Gemeldet"

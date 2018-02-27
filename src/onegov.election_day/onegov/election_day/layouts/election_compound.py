@@ -1,7 +1,6 @@
 from cached_property import cached_property
 from onegov.election_day import _
 from onegov.election_day.layouts.default import DefaultLayout
-from onegov.election_day.utils import pdf_filename
 
 
 class ElectionCompoundLayout(DefaultLayout):
@@ -14,7 +13,6 @@ class ElectionCompoundLayout(DefaultLayout):
     def all_tabs(self):
         return (
             'districts',
-            'parties',
             'candidates',
             'data'
         )
@@ -26,8 +24,6 @@ class ElectionCompoundLayout(DefaultLayout):
             return self.request.app.principal.label('districts')
         if tab == 'candidates':
             return _("Elected candidates")
-        if tab == 'parties':
-            return _("Parties")
         if tab == 'data':
             return _("Downloads")
 
@@ -36,12 +32,6 @@ class ElectionCompoundLayout(DefaultLayout):
     def visible(self, tab=None):
         if not self.model.has_results:
             return False
-
-        tab = self.tab if tab is None else tab
-
-        if tab == 'parties':
-            return False
-            # todo: self.model.party_results.first()
 
         return True
 
@@ -58,18 +48,6 @@ class ElectionCompoundLayout(DefaultLayout):
                 'active' if self.tab == tab else ''
             ) for tab in self.all_tabs if self.visible(tab)
         ]
-
-    # todo:
-    # @cached_property
-    # def pdf_path(self):
-    #     """ Returns the path to the PDF file or None, if it is not available.
-    #     """
-    #
-    #     path = 'pdf/{}'.format(pdf_filename(self.model, self.request.locale))
-    #     if self.request.app.filestorage.exists(path):
-    #         return path
-    #
-    #     return None
 
     @cached_property
     def majorz(self):

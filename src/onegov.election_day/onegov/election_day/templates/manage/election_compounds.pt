@@ -13,13 +13,13 @@
                     </div>
                     <div class="small-12 medium-6 columns">
                         <ul class="top-actions text-right">
-                            <li><a class="action-new" href="${new_election_compound}" i18n:translate>New election compound</a></li>
+                            <li><a class="action-new" href="${new_election_compound}" i18n:translate>New compound</a></li>
                         </ul>
                     </div>
                 </div>
 
                 <p tal:condition="not:groups" i18n:translate>
-                    No election compounds yet.
+                    No compounds yet.
                 </p>
 
                 <table class="elections stackable" tal:condition="groups">

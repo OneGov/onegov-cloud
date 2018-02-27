@@ -44,6 +44,7 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     type = Column(
         Enum(
             'election',
+            'election_compound',
             'vote',
             name='type_of_result'
         ),
@@ -87,6 +88,9 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
 
     #: The names of the elected candidates.
     elected_candidates = meta_property('elected_candidates', default=list)
+
+    #: The URLs of the elections (if it is a compound)
+    elections = meta_property('elections', default=list)
 
     #: The answer of a vote (accepted, rejected, counter-proposal).
     answer = meta_property('answer', default='')

@@ -202,6 +202,15 @@ msgstr "Elezione secondo il sistema maggioritario"
 msgid "Election based on proportional representation"
 msgstr "Elezione secondo il sistema proporzionale"
 
+msgid "Elections"
+msgstr "Elezioni"
+
+msgid "Select either majorz or proporz elections."
+msgstr ""
+
+msgid "Cantonal"
+msgstr "Cantonale"
+
 msgid "Notifications"
 msgstr "Notifiche"
 
@@ -280,11 +289,14 @@ msgstr "Panachage"
 msgid "Downloads"
 msgstr "Download"
 
+msgid "Elected candidates"
+msgstr ""
+
 msgid "Votes"
 msgstr "Votazioni"
 
-msgid "Elections"
-msgstr "Elezioni"
+msgid "Compounds of elections"
+msgstr ""
 
 msgid "Manage"
 msgstr "Amministrare"
@@ -377,9 +389,6 @@ msgstr "Nazionale"
 msgid "Regional"
 msgstr "Regionale"
 
-msgid "Cantonal"
-msgstr "Cantonale"
-
 msgid "Communal"
 msgstr "Comunale"
 
@@ -416,8 +425,8 @@ msgstr "Votazioni cantonali"
 msgid "Communal Votes"
 msgstr "Votazioni commuali"
 
-msgid "Reported"
-msgstr "Comunicati"
+msgid "Counted"
+msgstr "Scrutinati"
 
 msgid "Updated"
 msgstr "Aggiornato"
@@ -563,9 +572,6 @@ msgstr "Elettores"
 
 msgid "Received Ballots"
 msgstr "Schede ricevute"
-
-msgid "Counted"
-msgstr "Scrutinati"
 
 #. Default: Voter turnout
 #.
@@ -790,11 +796,20 @@ msgstr "Token"
 msgid "Regenerate token"
 msgstr "Rigenera token"
 
-msgid "New election"
-msgstr "Nuova elezione"
+msgid "New compound"
+msgstr ""
+
+msgid "No compounds yet."
+msgstr ""
+
+msgid "Title"
+msgstr ""
 
 msgid "View"
 msgstr "Mostrare"
+
+msgid "New election"
+msgstr "Nuova elezione"
 
 msgid "Clear results"
 msgstr "Ripristina risultati"
@@ -958,6 +973,21 @@ msgstr "Mapping modificata."
 msgid "Mapping deleted."
 msgstr "Mappatura eliminata."
 
+msgid "Edit compound"
+msgstr ""
+
+msgid "Delete compound"
+msgstr ""
+
+msgid "Compound added."
+msgstr ""
+
+msgid "Compound modified."
+msgstr ""
+
+msgid "Compound deleted."
+msgstr ""
+
 msgid "Edit election"
 msgstr "Modifica elezione"
 
@@ -1023,3 +1053,6 @@ msgstr "Nessuna elezione secondo il sistema proporzionale"
 
 msgid "The data source is not configured properly"
 msgstr "L'origine dati non è configurata correttamente"
+
+#~ msgid "Reported"
+#~ msgstr "Comunicati"

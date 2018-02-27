@@ -3,6 +3,8 @@ from datetime import date
 from itertools import groupby
 from onegov.ballot import Election
 from onegov.ballot import ElectionCollection
+from onegov.ballot import ElectionCompound
+from onegov.ballot import ElectionCompoundCollection
 from onegov.ballot import Vote
 from onegov.ballot import VoteCollection
 from onegov.election_day.models import ArchivedResult
@@ -49,15 +51,23 @@ class ArchivedResultCollection(object):
         return list(r[0] for r in query.all())
 
     def group_items(self, items, request):
-        """ Groups a list of elections/votes. """
+        """ Groups a list of archived results.
+
+        Groups election compounds and elections to the same group. Removes
+        elections already covered by an election compound.
+        """
 
         if not items:
             return None
 
+        compounded = [
+            id_ for item in items for id_ in getattr(item, 'elections', [])
+        ]
+
         dates = groupbydict(items, lambda i: i.date)
-        order = ('federation', 'region', 'canton', 'municipality')
+        order = ('federation', 'canton', 'region', 'municipality')
         if request.app.principal.domain == 'municipality':
-            order = ('municipality', 'federation', 'region', 'canton')
+            order = ('municipality', 'federation', 'canton', 'region')
 
         for date_, items_by_date in dates.items():
             domains = groupbydict(
@@ -67,7 +77,11 @@ class ArchivedResultCollection(object):
             )
             for domain, items_by_domain in domains.items():
                 types = groupbydict(
-                    items_by_domain, lambda i: i.type
+                    [
+                        item for item in items_by_domain
+                        if item.url not in compounded
+                    ],
+                    lambda i: 'vote' if i.type == 'vote' else 'election'
                 )
                 domains[domain] = types
             dates[date_] = domains
@@ -160,10 +174,24 @@ class ArchivedResultCollection(object):
         result.counted = item.counted
         result.completed = item.completed
         result.counted_entities, result.total_entities = item.progress
+        result.meta = {}
 
         if isinstance(item, Election):
             result.type = 'election'
             result.elected_candidates = item.elected_candidates
+
+            outdated_compounds = self.session.query(ElectionCompound)
+            outdated_compounds = outdated_compounds.filter(
+                ElectionCompound._elections.has_key(item.id)  # noqa
+            )
+            for compound in outdated_compounds:
+                self.update(compound, request)
+
+        if isinstance(item, ElectionCompound):
+            result.type = 'election_compound'
+            result.elections = [
+                request.link(election) for election in item.elections
+            ]
 
         if isinstance(item, Vote):
             result.type = 'vote'
@@ -187,13 +215,20 @@ class ArchivedResultCollection(object):
         for item in ElectionCollection(self.session).query():
             self.update(item, request)
 
+        for item in ElectionCompoundCollection(self.session).query():
+            self.update(item, request)
+
         for item in VoteCollection(self.session).query():
             self.update(item, request)
 
     def add(self, item, request):
         """ Add a new election or vote and create a result entry.  """
 
-        assert isinstance(item, Election) or isinstance(item, Vote)
+        assert (
+            isinstance(item, Election) or
+            isinstance(item, ElectionCompound) or
+            isinstance(item, Vote)
+        )
 
         self.session.add(item)
         self.session.flush()
@@ -214,7 +249,11 @@ class ArchivedResultCollection(object):
     def delete(self, item, request):
         """ Deletes an election or vote and the associated result entry.  """
 
-        assert isinstance(item, Election) or isinstance(item, Vote)
+        assert (
+            isinstance(item, Election) or
+            isinstance(item, ElectionCompound) or
+            isinstance(item, Vote)
+        )
 
         for result in self.query().filter_by(url=request.link(item)):
             self.session.delete(result)

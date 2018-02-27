@@ -3,6 +3,7 @@ from onegov.ballot import Election
 from onegov.election_day import _
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
+from wtforms import RadioField
 from wtforms import StringField
 from wtforms.fields.html5 import DateField
 from wtforms.fields.html5 import URLField
@@ -10,6 +11,17 @@ from wtforms.validators import InputRequired
 
 
 class ElectionCompoundForm(Form):
+
+    domain = RadioField(
+        label=_("Type"),
+        choices=[
+            ('canton', _("Cantonal"))
+        ],
+        default='canton',
+        validators=[
+            InputRequired()
+        ]
+    )
 
     date = DateField(
         label=_("Date"),
@@ -59,7 +71,7 @@ class ElectionCompoundForm(Form):
     def validate(self):
         result = super(ElectionCompoundForm, self).validate()
 
-        query = self.request.app.session().query(Election.type.distinct())
+        query = self.request.session.query(Election.type.distinct())
         query = query.filter(Election.id.in_(self.elections.data))
         if query.count() > 1:
             self.elections.errors.append(
@@ -85,7 +97,7 @@ class ElectionCompoundForm(Form):
         if default_locale.startswith('rm'):
             self.election_de.validators.append(InputRequired())
 
-        query = self.request.app.session().query(Election)
+        query = self.request.session.query(Election)
         query = query.order_by(Election.date, Election.shortcode)
         query = query.filter(Election.domain == 'region')
         self.elections.choices = [
@@ -94,9 +106,11 @@ class ElectionCompoundForm(Form):
         ]
 
     def update_model(self, model):
+        model.domain = self.domain.data
         model.date = self.date.data
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
+        model._elections = {id_: None for id_ in self.elections.data}
 
         titles = {}
         if self.election_de.data:
@@ -109,16 +123,6 @@ class ElectionCompoundForm(Form):
             titles['rm_CH'] = self.election_rm.data
         model.title_translations = titles
 
-        # make sure we have a valid id when creating a new compound, before
-        # adding the references to the elections
-        session = self.request.app.session()
-        with session.no_autoflush:
-            if not model.id:
-                model.id = model.id_from_title(session)
-            query = session.query(Election)
-            for election in self.elections.data:
-                query.filter_by(id=election).one().compound_id = model.id
-
     def apply_model(self, model):
         titles = model.title_translations or {}
         self.election_de.data = titles.get('de_CH')
@@ -126,8 +130,8 @@ class ElectionCompoundForm(Form):
         self.election_it.data = titles.get('it_CH')
         self.election_rm.data = titles.get('rm_CH')
 
+        self.domain.data = model.domain
         self.date.data = model.date
         self.shortcode.data = model.shortcode
         self.related_link.data = model.related_link
-
-        self.elections.data = [election.id for election in model.elections]
+        self.elections.data = list(model._elections.keys())

@@ -202,6 +202,15 @@ msgstr "Elecziun da maiorz"
 msgid "Election based on proportional representation"
 msgstr "Elecziun da proporz"
 
+msgid "Elections"
+msgstr "Elecziuns"
+
+msgid "Select either majorz or proporz elections."
+msgstr ""
+
+msgid "Cantonal"
+msgstr "Sin plaun chantunal"
+
 msgid "Notifications"
 msgstr "Communicaziuns"
 
@@ -280,11 +289,14 @@ msgstr "Statistica da panaschar"
 msgid "Downloads"
 msgstr "Downloads"
 
+msgid "Elected candidates"
+msgstr ""
+
 msgid "Votes"
 msgstr "Votaziuns"
 
-msgid "Elections"
-msgstr "Elecziuns"
+msgid "Compounds of elections"
+msgstr ""
 
 msgid "Manage"
 msgstr "Administrar"
@@ -377,9 +389,6 @@ msgstr "Sin plaun naziunal"
 msgid "Regional"
 msgstr "Sin plaun regiunal"
 
-msgid "Cantonal"
-msgstr "Sin plaun chantunal"
-
 msgid "Communal"
 msgstr "Sin plaun communal"
 
@@ -416,8 +425,8 @@ msgstr "Votaziuns chantunalas"
 msgid "Communal Votes"
 msgstr "Votaziuns communalas"
 
-msgid "Reported"
-msgstr "Annunzià"
+msgid "Counted"
+msgstr "Dumbrà ora"
 
 msgid "Updated"
 msgstr "Actualisà"
@@ -600,9 +609,6 @@ msgstr "Persunas cun dretg d’eleger"
 
 msgid "Received Ballots"
 msgstr "Cedels electorals consegnads"
-
-msgid "Counted"
-msgstr "Dumbrà ora"
 
 #. Default: Voter turnout
 #.
@@ -832,11 +838,20 @@ msgstr "Token"
 msgid "Regenerate token"
 msgstr "Generar da nov il token"
 
-msgid "New election"
-msgstr "Nova elecziun"
+msgid "New compound"
+msgstr ""
+
+msgid "No compounds yet."
+msgstr ""
+
+msgid "Title"
+msgstr ""
 
 msgid "View"
 msgstr "Mussar"
+
+msgid "New election"
+msgstr "Nova elecziun"
 
 msgid "Clear results"
 msgstr "Stizzar ils resultats"
@@ -1001,6 +1016,21 @@ msgstr "Midà l'attribuziun."
 msgid "Mapping deleted."
 msgstr "Stizzà l'attribuziun."
 
+msgid "Edit compound"
+msgstr ""
+
+msgid "Delete compound"
+msgstr ""
+
+msgid "Compound added."
+msgstr ""
+
+msgid "Compound modified."
+msgstr ""
+
+msgid "Compound deleted."
+msgstr ""
+
 msgid "Edit election"
 msgstr "Modifitgar l'elecziun"
 
@@ -1066,3 +1096,6 @@ msgstr "Nagina elecziun da proporz"
 
 msgid "The data source is not configured properly"
 msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
+
+#~ msgid "Reported"
+#~ msgstr "Annunzià"

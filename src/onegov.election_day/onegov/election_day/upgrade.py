@@ -11,6 +11,7 @@ from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.models import ArchivedResult
 from onegov.election_day.models import Subscriber
 from sqlalchemy import Column
+from sqlalchemy import Enum
 from sqlalchemy import Text
 
 
@@ -231,3 +232,30 @@ def apply_static_data(context):
                 get(election.date.year, {}).\
                 get(result.entity_id, {}).\
                 get('district', '')
+
+
+@upgrade_task('Add election compound to archive')
+def add_election_compound_to_archive(context):
+    old_type = Enum('election', 'vote', name='type_of_result')
+    new_type = Enum(
+        'election', 'election_compound', 'vote', name='type_of_result'
+    )
+    tmp_type = Enum(
+        'election', 'election_compound', 'vote', name='_type_of_result'
+    )
+
+    tmp_type.create(context.operations.get_bind(), checkfirst=False)
+    context.operations.execute(
+        'ALTER TABLE archived_results ALTER COLUMN type '
+        'TYPE _type_of_result USING type::text::_type_of_result'
+    )
+
+    old_type.drop(context.operations.get_bind(), checkfirst=False)
+
+    new_type.create(context.operations.get_bind(), checkfirst=False)
+    context.operations.execute(
+        'ALTER TABLE archived_results ALTER COLUMN type '
+        'TYPE type_of_result USING type::text::type_of_result'
+    )
+
+    tmp_type.drop(context.operations.get_bind(), checkfirst=False)

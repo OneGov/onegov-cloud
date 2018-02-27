@@ -34,7 +34,7 @@ class ManageLayout(DefaultLayout):
 
         link = self.request.link(ElectionCompoundCollection(session))
         class_ = 'active' if link == self.manage_model_link else ''
-        menu.append((_("Election compounds"), link, class_))
+        menu.append((_("Compounds of elections"), link, class_))
 
         if self.principal.wabsti_import:
             link = self.request.link(DataSourceCollection(session))
@@ -91,13 +91,13 @@ class ManageElectionCompoundsLayout(ManageLayout):
     @cached_property
     def manage_model_link(self):
         return self.request.link(
-            ElectionCompoundCollection(self.request.app.session())
+            ElectionCompoundCollection(self.request.session)
         )
 
     def __init__(self, model, request):
         super().__init__(model, request)
         self.breadcrumbs.append(
-            (_("Election compsites"), request.link(self.model), '')
+            (_("Compounds of elections"), request.link(self.model), '')
         )
 
 

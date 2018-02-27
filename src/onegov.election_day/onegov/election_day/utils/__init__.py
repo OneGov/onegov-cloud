@@ -2,6 +2,7 @@ from hashlib import sha256
 from onegov.ballot import Ballot
 from onegov.ballot import ComplexVote
 from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
 from onegov.ballot import Vote
 from onegov.election_day.models import ArchivedResult
 
@@ -37,6 +38,29 @@ def get_election_summary(election, request, url=None):
         'title': election.title_translations,
         'type': 'election',
         'url': url or request.link(election),
+    }
+
+
+def get_election_compound_summary(election_compound, request, url=None):
+
+    last_modified = election_compound.last_modified
+    if last_modified:
+        last_modified = last_modified.isoformat()
+
+    return {
+        'completed': election_compound.completed,
+        'date': election_compound.date.isoformat(),
+        'last_modified': last_modified,
+        'progress': {
+            'counted': election_compound.progress[0] or 0,
+            'total': election_compound.progress[1] or 0
+        },
+        'title': election_compound.title_translations,
+        'type': 'election_compound',
+        'url': url or request.link(election_compound),
+        'elections': [
+            request.link(election) for election in election_compound.elections
+        ]
     }
 
 
@@ -84,8 +108,12 @@ def get_vote_summary(vote, request, url=None):
 def get_summary(item, request):
     """ Returns some basic informations about the given election/vote as a JSON
     seriazable dict. """
+
     if isinstance(item, Election):
         return get_election_summary(item, request)
+
+    if isinstance(item, ElectionCompound):
+        return get_election_compound_summary(item, request)
 
     if isinstance(item, Vote):
         return get_vote_summary(item, request)
@@ -93,6 +121,8 @@ def get_summary(item, request):
     if isinstance(item, ArchivedResult):
         if item.type == 'election':
             return get_election_summary(item, None, item.url)
+        if item.type == 'election_compound':
+            return get_election_compound_summary(item, None, item.url)
         if item.type == 'vote':
             return get_vote_summary(item, None, item.url)
 
