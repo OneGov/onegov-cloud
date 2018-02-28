@@ -76,6 +76,9 @@ def sendmail(group_context,
 
                 msg = email.message_from_string(msg_str)
 
+                # mailgun support
+                msg['h:Reply-To'] = msg['Reply-To']
+
                 try:
                     connection.sendmail(msg['From'], msg['To'], msg_str)
                     status, message = connection.noop()

@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds mailgun support for reply-to.
+  [href]
+
 0.63.0 (2018-02-26)
 ~~~~~~~~~~~~~~~~~~~
 
