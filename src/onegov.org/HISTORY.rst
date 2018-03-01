@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.24.3 (2018-03-01)
+~~~~~~~~~~~~~~~~~~~
+
 - Adapt hints style from feriennet.
   [href]
 
