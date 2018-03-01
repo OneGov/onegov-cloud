@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.20 (2018-03-01)
+~~~~~~~~~~~~~~~~~~~
 
 - Blocks manual bookings from being added before the billing is confirmed.
   [href]
