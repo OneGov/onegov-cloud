@@ -4332,3 +4332,48 @@ h2 + div.timeline {
         opacity: .3;
     }
 }
+
+/*
+    Hints
+*/
+.hints {
+    @include hairline();
+
+    margin: 0 0 .5rem;
+    padding: 0 0 .5rem;
+    position: relative;
+
+    .hint-date::before { @include icon('\f133'); }
+    .hint-count::before { @include icon('\f2c0'); }
+    .hint-stop::before { @include icon('\f05e'); }
+
+    .hint {
+        margin-left: 1.5rem;
+        padding-bottom: .25rem;
+
+        &::before {
+            display: inline-block;
+            left: 0;
+            margin-right: 1ex;
+            margin-top: -1px;
+            position: absolute;
+            text-align: center;
+            width: 1rem;
+        }
+    }
+}
+
+.panel .hints { // scss-lint:disable MergeableSelector
+    border: 0;
+    margin: 0;
+    padding: 0;
+
+    .hint:last-child {
+        padding-bottom: 0;
+    }
+}
+
+.hint {
+    font-size: .875rem;
+    line-height: 1.4rem;
+}
