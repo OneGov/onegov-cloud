@@ -61,8 +61,12 @@ class ElectionCompound(
 
     @property
     def elections(self):
+        if not self._elections:
+            return []
+
         query = object_session(self).query(Election)
         query = query.filter(Election.id.in_(self._elections))
+        query = query.order_by(Election.shortcode)
         return query
 
     @property

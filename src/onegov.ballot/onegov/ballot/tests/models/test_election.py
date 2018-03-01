@@ -226,7 +226,7 @@ def test_election_summarized_properties(session):
     assert election.accounted_votes == 858
 
 
-def test_derived_properties(session):
+def test_election_derived_properties(session):
     election = Election(
         title='Legislative Election',
         domain='federation',
@@ -1428,7 +1428,7 @@ def test_election_status(session):
         assert election.completed == completed
 
 
-def test_clear_election(session):
+def test_election_clear_results(session):
     eid = uuid4()
     pid = uuid4()
     cid = uuid4()
