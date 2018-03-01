@@ -380,12 +380,6 @@ ul.tags {
 }
 
 .hints {
-    @include hairline();
-
-    margin: 0 0 .5rem;
-    padding: 0 0 .5rem;
-    position: relative;
-
     .hint-prebooking::before { @include icon('\f133'); }
     .hint-max-activities::before { @include icon('\f2c3'); }
     .hint-costs::before { @include icon('\f0d6'); }
@@ -399,36 +393,6 @@ ul.tags {
     .hint-finalized::before { @include icon('\f256'); }
     .hint-minutes::before { @include icon('\f017'); }
     .hint-deadline::before { @include icon('\f05a'); }
-
-    .hint {
-        margin-left: 1.5rem;
-        padding-bottom: .25rem;
-
-        &::before {
-            display: inline-block;
-            left: 0;
-            margin-right: 1ex;
-            margin-top: -1px;
-            position: absolute;
-            text-align: center;
-            width: 1rem;
-        }
-    }
-}
-
-.panel .hints {
-    border: 0;
-    margin: 0;
-    padding: 0;
-
-    .hint:last-child {
-        padding-bottom: 0;
-    }
-}
-
-.hint {
-    font-size: .875rem;
-    line-height: 1.4rem;
 }
 
 /*
