@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.2 (2018-03-01)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Applies Winterthur's CD to the framed version.
   [href]
 
