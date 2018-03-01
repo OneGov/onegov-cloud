@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-02-20 13:56+0100\n"
+"POT-Creation-Date: 2018-03-01 16:33+0100\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -164,6 +164,9 @@ msgid "Please add at least one occasion before requesting publication."
 msgstr ""
 "Bitte fügen Sie mindestens eine Durchführung hinzu bevor Sie die Publikation "
 "beantragen."
+
+msgid "Manual bookings can only be added once the billing has been confirmed"
+msgstr "Manuelle Buchungen können erst nach Bestätigung der Fakturierung erstellt werden"
 
 msgid "Editor"
 msgstr "Veranstalter"
@@ -1504,6 +1507,9 @@ msgstr "${amount} überbezahlt"
 msgid "Unpaid"
 msgstr "Unbezahlt"
 
+msgid "Reset Billing"
+msgstr "Fakturierung zurücksetzen"
+
 msgid "The matching of this period has not been confirmed yet."
 msgstr "Die Zuteilung dieses Zeitraums wurde noch nicht bestätigt."
 
@@ -1659,6 +1665,9 @@ msgstr "Fakturierung für ${title}"
 msgid "Create Bills"
 msgstr "Rechnungen erstellen"
 
+msgid "The billing was successfully reset"
+msgstr "Die Fakturierung wurde erfolgreich zurückgesetzt"
+
 msgid "Add manual booking"
 msgstr "Manuelle Buchung hinzufügen"
 
@@ -1679,15 +1688,15 @@ msgstr "Es wurden keine manuellen Buchungen erstellt"
 msgid "Created ${count} manual bookings"
 msgstr "${count} manuelle Buchungen wurden erstellt"
 
+msgid "Show online payments"
+msgstr "Online Zahlungen anzeigen"
+
 msgid ""
 "This bill or parts of it have been paid online. To change the state of the "
 "bill the payment needs to be charged back."
 msgstr ""
 "Diese Rechnung oder Teile davon wurden online bezahlt. Um den Status zu "
 "ändern muss die Zahlung rückgebucht werden."
-
-msgid "Show online payments"
-msgstr "Online Zahlungen anzeigen"
 
 msgid ""
 "This position has been paid online. To change the state of the position the "

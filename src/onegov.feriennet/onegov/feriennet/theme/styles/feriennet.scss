@@ -204,6 +204,7 @@ ul.single-line {
     .remove-manual::before { @include icon('\f014'); }
     .request-publication::before { @include icon('\f087'); }
     .reset-matching::before { @include icon('\f12d'); }
+    .reset-billing::before { @include icon('\f12d'); }
     .run-matching::before { @include icon('\f0d0'); }
     .show-activity::before { @include icon('\f135'); }
     .show-attendees::before { @include icon('\f0c0'); }

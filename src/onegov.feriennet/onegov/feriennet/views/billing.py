@@ -182,6 +182,24 @@ def view_billing(self, request, form):
     }
 
 
+@FeriennetApp.view(
+    model=BillingCollection,
+    name='reset',
+    permission=Secret,
+    request_method="POST")
+def reset_billing(self, request):
+    assert self.period.active and self.period.booking_phase
+
+    invoice = self.period.id.hex
+    session = request.session
+
+    for item in self.invoice_items.query():
+        assert item.invoice == invoice
+        session.delete(item)
+
+    request.success(_("The billing was successfully reset"))
+
+
 @FeriennetApp.html(
     model=BillingCollection,
     permission=Secret,

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-02-20 13:56+0100\n"
+"POT-Creation-Date: 2018-03-01 16:33+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -164,6 +164,11 @@ msgstr "Voulez-vous vraiment demander la publication ?"
 msgid "Please add at least one occasion before requesting publication."
 msgstr ""
 "Veuillez saisir au moins un événement avant de demande la publication."
+
+msgid "Manual bookings can only be added once the billing has been confirmed"
+msgstr ""
+"Des réservations manuelles peuvent être ajoutées uniquement lorsque la "
+"facturation a été confirmée."
 
 msgid "Editor"
 msgstr "Éditeur"
@@ -1519,6 +1524,9 @@ msgstr "${amount} trop payés"
 msgid "Unpaid"
 msgstr "Non payé(s)"
 
+msgid "Reset Billing"
+msgstr "Réinitialiser la facturation."
+
 msgid "The matching of this period has not been confirmed yet."
 msgstr "L'attribution de cette période n'a pas encore été confirmée."
 
@@ -1680,6 +1688,9 @@ msgstr "Facture pour ${title}"
 msgid "Create Bills"
 msgstr "Générer des factures"
 
+msgid "The billing was successfully reset"
+msgstr "La facturation a bien été réinitialisée."
+
 msgid "Add manual booking"
 msgstr "Ajouter une réservation manuelle"
 
@@ -1700,15 +1711,15 @@ msgstr "Aucune réservation manuelle n'a été créée"
 msgid "Created ${count} manual bookings"
 msgstr "${count} réservations manuelles créées"
 
+msgid "Show online payments"
+msgstr "Montrer les paiements en ligne"
+
 msgid ""
 "This bill or parts of it have been paid online. To change the state of the "
 "bill the payment needs to be charged back."
 msgstr ""
 "Cette facture a été payée entièrement ou partiellement en ligne. Pour "
 "changer le statut de la facture, le paiement doit être crédité à nouveau."
-
-msgid "Show online payments"
-msgstr "Montrer les paiements en ligne"
 
 msgid ""
 "This position has been paid online. To change the state of the position the "

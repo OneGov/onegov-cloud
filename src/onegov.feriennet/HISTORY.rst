@@ -1,5 +1,12 @@
 Changelog
 ---------
+
+- Blocks manual bookings from being added before the billing is confirmed.
+  [href]
+
+- Adds billing reset function.
+  [href]
+
 1.3.19 (2018-02-22)
 ~~~~~~~~~~~~~~~~~~~
 

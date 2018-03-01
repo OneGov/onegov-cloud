@@ -485,7 +485,13 @@ class BillingCollectionLayout(DefaultLayout):
                             self.model,
                             name='booking'
                         ),
-                        attrs={'class': 'new-booking'}
+                        attrs={'class': 'new-booking'},
+                        traits=(
+                            Block(_(
+                                "Manual bookings can only be added "
+                                "once the billing has been confirmed"
+                            )),
+                        ) if not self.model.period.finalized else tuple()
                     ),
                     *self.family_removal_links
                 ]
