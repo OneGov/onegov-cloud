@@ -3,6 +3,7 @@ from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.utils import normalize_for_url
 from onegov.form.models.submission import FormSubmission
+from onegov.form.models.registration_window import FormRegistrationWindow
 from onegov.form.parser import parse_form
 from onegov.form.utils import hash_definition
 from onegov.form.extensions import Extendable
@@ -62,6 +63,48 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, SearchableDefinition,
     #: link between forms and submissions
     submissions = relationship('FormSubmission', backref='form')
 
+    #: link between forms and registration windows
+    registration_windows = relationship(
+        'FormRegistrationWindow',
+        backref='form',
+        order_by='FormRegistrationWindow.start')
+
+    #: the currently active registration window
+    #:
+    #: this sorts the registration windows by the smaller k-nearest neighbour
+    #: result of both start and end in relation to the current date
+    #:
+    #: the result is the *nearest* date range in relation to today:
+    #: * during an active registration window, it's that active window
+    #: * outside of active windows, it's last window half way until
+    #:   the next window starts
+    #:
+    #: this could of course be done more conventionally, but this is cooler 😅
+    current_registration_window = relationship(
+        'FormRegistrationWindow', viewonly=True, uselist=False,
+        primaryjoin="""and_(
+            FormRegistrationWindow.name == FormDefinition.name,
+            FormRegistrationWindow.id == select((
+                FormRegistrationWindow.id,
+            )).where(
+                FormRegistrationWindow.name == FormDefinition.name
+            ).order_by(
+                func.least(
+                    cast(
+                        func.now().op('AT TIME ZONE')(
+                            FormRegistrationWindow.timezone
+                        ), Date
+                    ).op('<->')(FormRegistrationWindow.start),
+                    cast(
+                        func.now().op('AT TIME ZONE')(
+                            FormRegistrationWindow.timezone
+                        ), Date
+                    ).op('<->')(FormRegistrationWindow.end)
+                )
+            ).limit(1)
+        )"""
+    )
+
     #: lead text describing the form
     lead = meta_property()
 
@@ -99,3 +142,14 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, SearchableDefinition,
             query = query.filter(FormSubmission.state == with_state)
 
         return query.first() and True or False
+
+    def add_registration_window(self, start, end, **options):
+        window = FormRegistrationWindow(
+            start=start,
+            end=end,
+            **options
+        )
+
+        self.registration_windows.append(window)
+
+        return window

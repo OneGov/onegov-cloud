@@ -3,12 +3,14 @@ import warnings
 from datetime import datetime, timedelta
 from onegov.core.crypto import random_token
 from onegov.core.utils import normalize_for_url
+from onegov.core.collection import GenericCollection
 from onegov.file.utils import as_fileintent
 from onegov.form.errors import UnableToComplete
 from onegov.form.fields import UploadField
 from onegov.form.models import (
     FormDefinition,
     FormSubmission,
+    FormRegistrationWindow,
     FormFile
 )
 from sedate import replace_timezone, utcnow
@@ -29,6 +31,10 @@ class FormCollection(object):
     @property
     def submissions(self):
         return FormSubmissionCollection(self.session)
+
+    @property
+    def registration_windows(self):
+        return FormRegistrationWindowCollection(self.session)
 
     def scoped_submissions(self, name, ensure_existance=True):
         if not ensure_existance or self.definitions.by_name(name):
@@ -134,7 +140,7 @@ class FormSubmissionCollection(object):
         return query
 
     def add(self, name, form, state, id=None, payment_method=None,
-            meta=None, email=None):
+            meta=None, email=None, spots=None):
         """ Takes a filled-out form instance and stores the submission
         in the database. The form instance is expected to have a ``_source``
         parameter, which contains the source used to build the form (as only
@@ -161,6 +167,14 @@ class FormSubmissionCollection(object):
                 self.session.query(FormDefinition)
                     .filter_by(name=name).one())
 
+        if definition is None:
+            registration_window = None
+        else:
+            registration_window = definition.current_registration_window
+
+        if registration_window:
+            assert registration_window.accepts_submissions
+
         # look up the right class depending on the type
         submission_class = FormSubmission.get_polymorphic_class(
             state, FormSubmission
@@ -172,6 +186,8 @@ class FormSubmissionCollection(object):
         submission.state = state
         submission.meta = meta or {}
         submission.email = email
+        submission.registration_window = registration_window
+        submission.spots = spots
         submission.payment_method = (
             payment_method or
             definition and definition.payment_method or
@@ -371,3 +387,22 @@ class FormSubmissionCollection(object):
         """ Deletes the given submission and all the files belonging to it. """
         self.session.delete(submission)
         self.session.flush()
+
+
+class FormRegistrationWindowCollection(GenericCollection):
+
+    def __init__(self, session, name=None):
+        super().__init__(session)
+        self.name = name
+
+    @property
+    def model_class(self):
+        return FormRegistrationWindow
+
+    def query(self):
+        query = super().query()
+
+        if self.name:
+            query = query.filter_by(FormRegistrationWindow.name == self.name)
+
+        return query

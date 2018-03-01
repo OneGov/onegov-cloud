@@ -23,6 +23,7 @@ from onegov.form.models import (
     FormDefinition,
     FormFile,
     FormSubmission,
+    FormRegistrationWindow,
     PendingFormSubmission,
     CompleteFormSubmission
 )
@@ -48,6 +49,7 @@ __all__ = [
     'FormDefinitionCollection',
     'FormExtension',
     'FormFile',
+    'FormRegistrationWindow',
     'FormSubmission',
     'FormSubmissionCollection',
     'merge_forms',

@@ -12,7 +12,7 @@ from onegov.form.extensions import Extendable
 from onegov.pay import Payable
 from onegov.pay import process_payment
 from sedate import utcnow
-from sqlalchemy import Column, Enum, ForeignKey, Text
+from sqlalchemy import Column, Enum, ForeignKey, Integer, Text
 from sqlalchemy_utils import observes
 from uuid import uuid4
 from wtforms import StringField, TextAreaField
@@ -62,6 +62,20 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
         Enum('pending', 'complete', name='submission_state'),
         nullable=False
     )
+
+    #: the number of spots this submission wants to claim
+    #: (only relevant if there's a registration window)
+    spots = Column(Integer, nullable=False, default=0)
+
+    #: the number of spots this submission has actually received
+    #: None => the decision if spots should be given is still open
+    #: 0 => the decision was negative, no spots were given
+    #: 1-x => the decision was positive, at least some spots were given
+    claimed = Column(Integer, nullable=True, default=None)
+
+    #: the registration window linked with this submission
+    registration_window_id = Column(
+        UUID, ForeignKey("registration_windows.id"), nullable=True)
 
     #: payment options -> copied from the dfinition at the moment of
     #: submission. This is stored alongside the submission as the original

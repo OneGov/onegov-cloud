@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the ability to define registration windows for forms.
+  [href]
+
 0.32.0 (2018-02-21)
 ~~~~~~~~~~~~~~~~~~~
 
