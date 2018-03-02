@@ -174,7 +174,7 @@ class ArchivedResultCollection(object):
         result.counted = item.counted
         result.completed = item.completed
         result.counted_entities, result.total_entities = item.progress
-        result.meta = {}
+        result.meta = result.meta or {}
 
         if isinstance(item, Election):
             result.type = 'election'

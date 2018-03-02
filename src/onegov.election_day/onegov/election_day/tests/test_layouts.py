@@ -1,23 +1,24 @@
 from datetime import date
 from freezegun import freeze_time
 from onegov.ballot import Ballot
-from onegov.ballot import Election
-from onegov.ballot import Vote
 from onegov.ballot import ComplexVote
+from onegov.ballot import Election
 from onegov.ballot import ElectionCollection
+from onegov.ballot import Vote
 from onegov.ballot import VoteCollection
-from onegov.election_day.layouts import ElectionLayout
+from onegov.election_day.collections import DataSourceCollection
+from onegov.election_day.collections import DataSourceItemCollection
+from onegov.election_day.collections import EmailSubscriberCollection
+from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.layouts import DefaultLayout
+from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.layouts import ManageDataSourceItemsLayout
 from onegov.election_day.layouts import ManageDataSourcesLayout
+from onegov.election_day.layouts import ManageElectionCompoundsLayout
 from onegov.election_day.layouts import ManageElectionsLayout
 from onegov.election_day.layouts import ManageSubscribersLayout
 from onegov.election_day.layouts import ManageVotesLayout
 from onegov.election_day.layouts import VoteLayout
-from onegov.election_day.collections import DataSourceCollection
-from onegov.election_day.collections import DataSourceItemCollection
-from onegov.election_day.collections import SmsSubscriberCollection
-from onegov.election_day.collections import EmailSubscriberCollection
 from onegov.election_day.tests import DummyRequest
 from unittest.mock import Mock
 
@@ -269,7 +270,8 @@ def test_manage_layout(session):
     assert layout.manage_model_link == 'VoteCollection/archive'
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', 'active'),
-        ('Elections', 'ElectionCollection/archive', '')
+        ('Elections', 'ElectionCollection/archive', ''),
+        ('Compounds of elections', 'ElectionCompoundCollection/archive', '')
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
@@ -287,6 +289,7 @@ def test_manage_layout(session):
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', 'active'),
         ('Elections', 'ElectionCollection/archive', ''),
+        ('Compounds of elections', 'ElectionCompoundCollection/archive', ''),
         ('Data sources', 'DataSourceCollection/archive', ''),
         ('SMS subscribers', 'SmsSubscriberCollection/archive', ''),
         ('Email subscribers', 'EmailSubscriberCollection/archive', ''),
@@ -304,11 +307,32 @@ def test_manage_layout(session):
     assert layout.manage_model_link == 'ElectionCollection/archive'
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', ''),
-        ('Elections', 'ElectionCollection/archive', 'active')
+        ('Elections', 'ElectionCollection/archive', 'active'),
+        ('Compounds of elections', 'ElectionCompoundCollection/archive', '')
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
         ('Elections', 'ElectionCollection/archive', '')
+    ]
+
+    # Election compounds
+    layout = ManageElectionCompoundsLayout(
+        ElectionCollection(session),
+        DummyRequest()
+    )
+    assert layout.manage_model_link == 'ElectionCompoundCollection/archive'
+    assert layout.menu == [
+        ('Votes', 'VoteCollection/archive', ''),
+        ('Elections', 'ElectionCollection/archive', ''),
+        (
+            'Compounds of elections',
+            'ElectionCompoundCollection/archive',
+            'active'
+        )
+    ]
+    assert layout.breadcrumbs == [
+        ('Manage', 'VoteCollection/archive', 'unavailable'),
+        ('Compounds of elections', 'ElectionCollection/archive', '')
     ]
 
     # Data sources
@@ -321,6 +345,7 @@ def test_manage_layout(session):
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', ''),
         ('Elections', 'ElectionCollection/archive', ''),
+        ('Compounds of elections', 'ElectionCompoundCollection/archive', ''),
         ('Data sources', 'DataSourceCollection/archive', 'active'),
     ]
     assert layout.breadcrumbs == [
@@ -338,6 +363,7 @@ def test_manage_layout(session):
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', ''),
         ('Elections', 'ElectionCollection/archive', ''),
+        ('Compounds of elections', 'ElectionCompoundCollection/archive', ''),
         ('Data sources', 'DataSourceCollection/archive', 'active'),
     ]
     assert layout.breadcrumbs == [
@@ -356,6 +382,7 @@ def test_manage_layout(session):
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', ''),
         ('Elections', 'ElectionCollection/archive', ''),
+        ('Compounds of elections', 'ElectionCompoundCollection/archive', ''),
         ('Email subscribers', 'EmailSubscriberCollection/archive', 'active')
     ]
     assert layout.breadcrumbs == [
@@ -373,6 +400,7 @@ def test_manage_layout(session):
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', ''),
         ('Elections', 'ElectionCollection/archive', ''),
+        ('Compounds of elections', 'ElectionCompoundCollection/archive', ''),
         ('SMS subscribers', 'SmsSubscriberCollection/archive', 'active')
     ]
     assert layout.breadcrumbs == [
