@@ -2,7 +2,7 @@ import babel.dates
 
 from babel import Locale
 from cached_property import cached_property
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from dateutil import rrule
 from decimal import Decimal
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
@@ -369,7 +369,15 @@ class Layout(ChameleonLayout):
             ))
 
     def format_datetime_range(self, start, end, with_year=False):
-        if (end - start) <= timedelta(hours=23):
+
+        if start.date() == end.date():
+            show_single_day = True
+        elif (end - start) <= timedelta(hours=23) and end.time() < time(6, 0):
+            show_single_day = True
+        else:
+            show_single_day = False
+
+        if show_single_day:
             fmt = with_year and 'date_long' or 'date_long_without_year'
 
             return ' '.join((

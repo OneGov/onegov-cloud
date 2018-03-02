@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves format_date_range to output saner results.
+  [href]
+
 0.24.3 (2018-03-01)
 ~~~~~~~~~~~~~~~~~~~
 
