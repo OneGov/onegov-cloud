@@ -1,5 +1,8 @@
 import time
 
+from contextlib import suppress
+from http.client import RemoteDisconnected
+
 
 class InjectedBrowserExtension(object):
     """ Offers methods to inject an extended browser into the Splinter browser
@@ -24,9 +27,11 @@ class InjectedBrowserExtension(object):
 
             def quit(self):
                 for clone in self.clones:
-                    clone.quit()
+                    with suppress(RemoteDisconnected):
+                        clone.quit()
 
-                super().quit()
+                with suppress(RemoteDisconnected):
+                    super().quit()
 
         browser.spawn_parameters = cls, browser_factory, args, kwargs
         browser.__class__ = LeechedExtendedBrowser
