@@ -7,6 +7,10 @@ class ComplexVote(Vote):
     __mapper_args__ = {'polymorphic_identity': 'complex'}
 
     @property
+    def polymorphic_base(self):
+        return Vote
+
+    @property
     def proposal(self):
         return self.ballot('proposal', create=True)
 

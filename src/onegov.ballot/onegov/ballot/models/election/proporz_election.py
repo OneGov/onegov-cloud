@@ -47,6 +47,10 @@ class ProporzElection(Election):
     )
 
     @property
+    def polymorphic_base(self):
+        return Election
+
+    @property
     def last_modified(self):
         """ Returns last change of the election, its candidates, lists, list
         connections and any of its results.

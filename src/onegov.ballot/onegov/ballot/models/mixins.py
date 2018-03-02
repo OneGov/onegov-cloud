@@ -83,16 +83,18 @@ class TitleTranslationsMixin(object):
             translations.get(default_locale, None)
         )
 
+    @property
+    def polymorphic_base(self):
+        return self.__class__
+
     def id_from_title(self, session):
         """ Returns a unique, user friendly id derived from the title. """
 
         title = self.get_title(self.session_manager.default_locale)
         id = normalize_for_url(title or self.__class__.__name__)
         while True:
-            items = [
-                item for item in session.query(self.__class__).filter_by(id=id)
-                if item != self
-            ]
+            query = session.query(self.polymorphic_base).filter_by(id=id)
+            items = [item for item in query if item != self]
             if not items:
                 return id
             id = increment_name(id)

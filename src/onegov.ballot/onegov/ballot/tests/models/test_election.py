@@ -192,6 +192,17 @@ def test_election_id_generation(session):
 
     assert election.id == 'legislative-election-1'
 
+    election = ProporzElection(
+        title='Legislative Election',
+        domain='federation',
+        date=date(2015, 6, 14),
+    )
+
+    session.add(election)
+    session.flush()
+
+    assert election.id == 'legislative-election-2'
+
 
 def test_election_summarized_properties(session):
     election = Election(
