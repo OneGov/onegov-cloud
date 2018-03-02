@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Enables changes of max booking count after booking confirmation.
+  [href]
+
 1.3.20 (2018-03-01)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -308,8 +308,7 @@ class PeriodForm(Form):
 
             fields = (
                 'all_inclusive',
-                'booking_cost',
-                'max_bookings_per_attendee',
+                'booking_cost'
             )
 
             for field in fields:
