@@ -1,32 +1,8 @@
 Changelog
 ---------
 
-- Harmonizes the progress implementation of elections and votes.
+- Adds zulip integration.
   [msom]
-
-- Supports regional elections.
-  [msom]
-
-- Uses seperate domain definitions for elections and votes in the principals.
-  [msom]
-
-- Uses the static data to detect if a principal has districts or not.
-  [msom]
-
-- Uses a single function to import wabsti majorz elections.
-  [msom]
-
-- Fixes spelling of "eligible voters".
-  [msom]
-
-- Fixes spelling of "eligible voters".
-  [msom]
-
-  **Breaking changes: The import and export formats have changed!**
-
-  - ``election_counted_entities`` and ``election_total_entitites`` have been
-    replaced with a ``counted`` column
-  - ``elegible_voters`` have been renamed to ``eligible_voters``
 
 2.0.2 (2018-02-01)
 ~~~~~~~~~~~~~~~~~~~

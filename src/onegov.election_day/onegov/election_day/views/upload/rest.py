@@ -119,10 +119,10 @@ def view_upload_rest(self, request):
         if not errors:
             archive = ArchivedResultCollection(session)
             archive.update(item, request)
-            request.app.send_hipchat(
+            request.app.send_zulip(
                 self.name,
-                'New results available: <a href="{}">{}</a>'.format(
-                    request.link(item), item.title
+                'New results available: [{}]({})'.format(
+                    item.title, request.link(item)
                 )
             )
 

@@ -100,10 +100,10 @@ def view_upload_wabsti_vote(self, request):
         )
         if not errors[vote.id]:
             archive.update(vote, request)
-            request.app.send_hipchat(
+            request.app.send_zulip(
                 self.name,
-                'New results available: <a href="{}">{}</a>'.format(
-                    request.link(vote), vote.title
+                'New results available: [{}]({})'.format(
+                    vote.title, request.link(vote)
                 )
             )
 
@@ -195,10 +195,10 @@ def view_upload_wabsti_majorz(self, request):
         )
         if not errors[election.id]:
             archive.update(election, request)
-            request.app.send_hipchat(
+            request.app.send_zulip(
                 self.name,
-                'New results available: <a href="{}">{}</a>'.format(
-                    request.link(election), election.title
+                'New results available: [{}]({})'.format(
+                    election.title, request.link(election)
                 )
             )
 
@@ -298,10 +298,10 @@ def view_upload_wabsti_proporz(self, request):
         )
         if not errors[election.id]:
             archive.update(election, request)
-            request.app.send_hipchat(
+            request.app.send_zulip(
                 self.name,
-                'New results available: <a href="{}">{}</a>'.format(
-                    request.link(election), election.title
+                'New results available: [{}]({})'.format(
+                    election.title, request.link(election)
                 )
             )
 
