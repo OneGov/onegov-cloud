@@ -19,6 +19,7 @@ from onegov.core.upgrade import UpgradeState
 from onegov.server import Config, Server
 from tempfile import NamedTemporaryFile
 from unittest.mock import patch
+from urllib.parse import parse_qsl
 from webtest import TestApp as Client
 from wtforms import Form, StringField
 from wtforms.validators import InputRequired
@@ -982,6 +983,43 @@ def test_send_hipchat(session):
             'message_format': 'text',
             'message': 'This is a test message',
             'notify': False,
+        }
+
+
+def test_send_zulip(session):
+    with patch('urllib.request.urlopen') as urlopen:
+        app = Framework()
+        app.configure_application()
+
+        thread = app.send_zulip('Zulip integration', 'It works!')
+        assert thread is None
+
+        app.zulip_url = 'https://seantis.zulipchat.com/api/v1/messages'
+        app.zulip_stream = 'Testing'
+        app.zulip_user = 'test-bot@seantis.zulipchat.com'
+        app.zulip_key = 'aabbcc'
+
+        thread = app.send_zulip('Zulip integration', 'It works!')
+        assert thread is not None
+        thread.join()
+
+        assert urlopen.called
+        url = urlopen.call_args[0][0].get_full_url()
+        data = dict(parse_qsl(urlopen.call_args[0][1].decode('utf-8')))
+        headers = urlopen.call_args[0][0].headers
+
+        assert url == 'https://seantis.zulipchat.com/api/v1/messages'
+        assert data == {
+            'type': 'stream',
+            'to': 'Testing',
+            'subject': 'Zulip integration',
+            'content': 'It works!'
+        }
+        assert headers == {
+            'Authorization':
+            'Basic dGVzdC1ib3RAc2VhbnRpcy56dWxpcGNoYXQuY29tOmFhYmJjYw==',
+            'Content-length': 68,
+            'Content-type': 'application/x-www-form-urlencoded'
         }
 
 

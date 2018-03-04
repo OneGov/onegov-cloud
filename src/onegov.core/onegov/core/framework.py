@@ -25,6 +25,7 @@ import traceback
 import random
 import sys
 
+from base64 import b64encode
 from cached_property import cached_property
 from datetime import datetime
 from dectate import directive
@@ -55,6 +56,7 @@ from psycopg2.extensions import TransactionRollbackError
 from purl import URL
 from sqlalchemy.exc import OperationalError
 from uuid import uuid4 as new_uuid
+from urllib.parse import urlencode
 from webob.exc import HTTPConflict
 
 
@@ -443,6 +445,12 @@ class Framework(
         self.hipchat_token = cfg.get('hipchat_token', None)
         self.hipchat_room_id = cfg.get('hipchat_room_id', None)
 
+    def configure_zulip(self, **cfg):
+        self.zulip_url = cfg.get('zulip_url', None)
+        self.zulip_stream = cfg.get('zulip_stream', None)
+        self.zulip_user = cfg.get('zulip_user', None)
+        self.zulip_key = cfg.get('zulip_key', None)
+
     def configure_content_security_policy(self, **cfg):
         self.content_security_policy_enabled\
             = cfg.get('content_security_policy_enabled', True)
@@ -718,6 +726,40 @@ class Framework(
             )
 
             thread = PostThread(url, data, headers)
+            thread.start()
+
+            return thread
+
+    def send_zulip(self, subject, content):
+        """ Sends a hipchat message asynchronously.
+
+        We are using the stream message method of zulip:
+        `<https://zulipchat.com/api/stream-message>`_
+
+        Returns the thread object to allow waiting by calling join.
+
+        """
+
+        if all((
+            self.zulip_url, self.zulip_stream, self.zulip_user, self.zulip_key
+        )):
+            data = urlencode({
+                'type': 'stream',
+                'to': self.zulip_stream,
+                'subject': subject,
+                'content': content
+            }).encode('utf-8')
+
+            auth = b64encode(
+                '{}:{}'.format(self.zulip_user, self.zulip_key).encode('ascii')
+            )
+            headers = (
+                ('Authorization', 'Basic {}'.format(auth.decode("ascii"))),
+                ('Content-Type', 'application/x-www-form-urlencoded'),
+                ('Content-Length', len(data)),
+            )
+
+            thread = PostThread(self.zulip_url, data, headers)
             thread.start()
 
             return thread

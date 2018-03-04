@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a function to send zulip messages.
+  [msom]
+
 0.63.1 (2018-02-28)
 ~~~~~~~~~~~~~~~~~~~
 
