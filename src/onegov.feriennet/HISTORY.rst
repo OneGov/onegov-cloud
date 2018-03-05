@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Splits e-mails into transactional/marketing.
+  [href]
+
 - Enables changes of max booking count after booking confirmation.
   [href]
 

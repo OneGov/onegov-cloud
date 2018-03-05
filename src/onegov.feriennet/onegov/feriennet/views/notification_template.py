@@ -161,7 +161,7 @@ def handle_send_notification(self, request, form):
             })
 
             for recipient in recipients:
-                request.app.send_email(
+                request.app.send_marketing_email(
                     receivers=(recipient, ),
                     subject=subject,
                     content=content,

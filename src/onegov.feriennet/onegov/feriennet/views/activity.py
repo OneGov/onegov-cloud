@@ -19,7 +19,7 @@ from onegov.feriennet.layout import VacationActivityFormLayout
 from onegov.feriennet.layout import VacationActivityLayout
 from onegov.feriennet.models import ActivityMessage
 from onegov.feriennet.models import VacationActivity
-from onegov.org.mail import send_html_mail
+from onegov.org.mail import send_transactional_html_mail
 from onegov.org.models import TicketMessage
 from onegov.org.new_elements import Link, Confirm, Intercooler
 from onegov.ticket import TicketCollection
@@ -477,7 +477,7 @@ def propose_activity(self, request):
         TicketMessage.create(ticket, request, 'opened')
 
     if request.is_organiser_only or request.current_username != self.username:
-        send_html_mail(
+        send_transactional_html_mail(
             request=request,
             template='mail_ticket_opened.pt',
             subject=_("A ticket has been opened"),
@@ -559,7 +559,7 @@ def administer_activity(model, request, action, template, subject):
     getattr(model, action)()
 
     if request.current_username != model.username and not ticket.muted:
-        send_html_mail(
+        send_transactional_html_mail(
             request=request,
             template=template,
             subject=subject,
