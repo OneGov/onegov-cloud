@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Splits e-mails into transactional/marketing.
+  [href]
+
 - Requires Python 3.6.
   [href]
 

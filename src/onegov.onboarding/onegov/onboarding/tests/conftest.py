@@ -39,12 +39,25 @@ def onboarding_app(postgres_dsn, temporary_directory, smtp, es_url):
     )
     app.set_application_id(app.namespace + '/' + 'test')
 
-    app.mail_host, app.mail_port = smtp.address
-    app.mail_sender = 'mails@govikon.ch'
-    app.mail_force_tls = False
-    app.mail_username = None
-    app.mail_password = None
-    app.mail_use_directory = False
-    app.smtp = smtp
+    app.mail = {
+        'marketing': {
+            'host': smtp.address[0],
+            'port': smtp.address[1],
+            'force_tls': False,
+            'username': None,
+            'password': None,
+            'use_directory': False,
+            'sender': 'mails@govikon.ch'
+        },
+        'transactional': {
+            'host': smtp.address[0],
+            'port': smtp.address[1],
+            'force_tls': False,
+            'username': None,
+            'password': None,
+            'use_directory': False,
+            'sender': 'mails@govikon.ch'
+        }
+    }
 
     yield app
