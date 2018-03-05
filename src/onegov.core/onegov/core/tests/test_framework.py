@@ -519,12 +519,18 @@ def test_get_localized_form():
 def test_send_email(smtp):
 
     app = Framework()
-    app.mail_host, app.mail_port = smtp.address
-    app.mail_sender = 'noreply@example.org'
-    app.mail_force_tls = False
-    app.mail_username = None
-    app.mail_password = None
-    app.mail_use_directory = False
+
+    app.mail = {
+        'marketing': {
+            'host': smtp.address[0],
+            'port': smtp.address[1],
+            'force_tls': False,
+            'username': None,
+            'password': None,
+            'use_directory': False,
+            'sender': 'noreply@example.org'
+        }
+    }
 
     app.send_email(
         reply_to='info@example.org',
@@ -561,12 +567,17 @@ def test_send_email(smtp):
 def test_send_email_with_name(smtp):
 
     app = Framework()
-    app.mail_host, app.mail_port = smtp.address
-    app.mail_sender = 'noreply@example.org'
-    app.mail_force_tls = False
-    app.mail_username = None
-    app.mail_password = None
-    app.mail_use_directory = False
+    app.mail = {
+        'marketing': {
+            'host': smtp.address[0],
+            'port': smtp.address[1],
+            'force_tls': False,
+            'username': None,
+            'password': None,
+            'use_directory': False,
+            'sender': 'noreply@example.org'
+        }
+    }
 
     app.send_email(
         reply_to='Govikon <info@example.org>',
@@ -601,9 +612,13 @@ def test_send_email_with_name(smtp):
 def test_send_email_to_maildir(temporary_directory):
 
     app = Framework()
-    app.mail_sender = 'noreply@example.org'
-    app.mail_use_directory = True
-    app.mail_directory = temporary_directory
+    app.mail = {
+        'marketing': {
+            'use_directory': True,
+            'directory': temporary_directory,
+            'sender': 'noreply@example.org'
+        }
+    }
 
     app.send_email(
         reply_to='Govikon <info@example.org>',
@@ -634,12 +649,17 @@ def test_send_email_to_maildir(temporary_directory):
 
 def test_send_email_iso_8859_1(smtp):
     app = Framework()
-    app.mail_host, app.mail_port = smtp.address
-    app.mail_sender = 'noreply@example.org'
-    app.mail_force_tls = False
-    app.mail_username = None
-    app.mail_password = None
-    app.mail_use_directory = False
+    app.mail = {
+        'marketing': {
+            'host': smtp.address[0],
+            'port': smtp.address[1],
+            'force_tls': False,
+            'username': None,
+            'password': None,
+            'use_directory': False,
+            'sender': 'noreply@example.org'
+        }
+    }
 
     app.send_email(
         reply_to='Gövikon <info@example.org>',
@@ -687,12 +707,17 @@ def test_send_email_iso_8859_1(smtp):
 
 def test_send_email_unicode(smtp):
     app = Framework()
-    app.mail_host, app.mail_port = smtp.address
-    app.mail_sender = 'noreply@example.org'
-    app.mail_force_tls = False
-    app.mail_username = None
-    app.mail_password = None
-    app.mail_use_directory = False
+    app.mail = {
+        'marketing': {
+            'host': smtp.address[0],
+            'port': smtp.address[1],
+            'force_tls': False,
+            'username': None,
+            'password': None,
+            'use_directory': False,
+            'sender': 'noreply@example.org'
+        }
+    }
 
     app.send_email(
         reply_to='👴 <info@example.org>',
@@ -739,9 +764,13 @@ def test_send_email_unicode(smtp):
 
 def test_email_attachments(temporary_directory):
     app = Framework()
-    app.mail_sender = 'noreply@example.org'
-    app.mail_use_directory = True
-    app.mail_directory = temporary_directory
+    app.mail = {
+        'marketing': {
+            'use_directory': True,
+            'directory': temporary_directory,
+            'sender': 'noreply@example.org'
+        }
+    }
 
     tempfile = NamedTemporaryFile(suffix='.txt', mode='w', delete=False)
     tempfile.write('First')
@@ -853,12 +882,17 @@ def test_send_email_transaction(smtp):
     app = App()
     app.application_id = 'test'
     app.configure_application(identity_secure=False)  # allow http
-    app.mail_host, app.mail_port = smtp.address
-    app.mail_sender = 'noreply@example.org'
-    app.mail_force_tls = False
-    app.mail_username = None
-    app.mail_password = None
-    app.mail_use_directory = False
+    app.mail = {
+        'marketing': {
+            'host': smtp.address[0],
+            'port': smtp.address[1],
+            'force_tls': False,
+            'username': None,
+            'password': None,
+            'use_directory': False,
+            'sender': 'noreply@example.org'
+        }
+    }
 
     app.cache_backend = 'dogpile.cache.memory'
     app.cache_backend_arguments = {}
@@ -876,12 +910,17 @@ def test_send_email_transaction(smtp):
 
 def test_send_email_plaintext_alternative(smtp):
     app = Framework()
-    app.mail_host, app.mail_port = smtp.address
-    app.mail_sender = 'noreply@example.org'
-    app.mail_force_tls = False
-    app.mail_username = None
-    app.mail_password = None
-    app.mail_use_directory = False
+    app.mail = {
+        'marketing': {
+            'host': smtp.address[0],
+            'port': smtp.address[1],
+            'force_tls': False,
+            'username': None,
+            'password': None,
+            'use_directory': False,
+            'sender': 'noreply@example.org'
+        }
+    }
 
     app.send_email(
         reply_to='Govikon <info@example.org>',

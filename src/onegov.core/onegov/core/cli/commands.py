@@ -6,6 +6,7 @@ import platform
 import subprocess
 import sys
 
+from cached_property import cached_property
 from mailthon.middleware import TLS, Auth
 from onegov.core.cli.core import command_group, pass_group_context
 from onegov.core.mail import Postman
@@ -34,64 +35,93 @@ cli = command_group()
 @click.option('--password', help="The password to authenticate", default=None)
 @click.option('--limit', default=25,
               help="Max number of mails to send before exiting")
+@click.option('--category', help="Only send e-mails of the given category",
+              default=None)
 @pass_group_context
 def sendmail(group_context,
-             hostname, port, force_tls, username, password, limit):
+             hostname, port, force_tls, username, password, limit, category):
     """ Iterates over all applications and processes the maildir for each
     application that uses maildir e-mail delivery.
 
     """
-    success = True
+    exit_code = 0
 
-    for appcfg in group_context.appcfgs:
+    class Mail(object):
 
-        if not appcfg.configuration.get('mail_use_directory'):
-            continue
+        def __init__(self, maildir, filename):
+            self.maildir = maildir
+            self.filename = filename
 
-        maildir = mailbox.Maildir(
-            appcfg.configuration.get('mail_directory'), create=False)
+        @cached_property
+        def message(self):
+            return email.message_from_string(self.text)
 
-        if not len(maildir):
-            return
+        @cached_property
+        def text(self):
+            return self.maildir.get_file(self.filename).read().decode('utf-8')
 
-        middlewares = []
+        @property
+        def category(self):
+            return self.message.get('X-Category')
 
-        if force_tls:
-            middlewares.append(TLS(force=True))
+        def remove(self):
+            self.maildir.remove(self.filename)
 
-        if username:
-            middlewares.append(Auth(username, password))
+        def send(self, connection):
+            connection.sendmail(
+                self.message['From'],
+                self.message['To'],
+                self.text)
 
-        postman = Postman(hostname, port, middlewares)
+            return connection.noop()[0]
 
-        with postman.connection() as connection:
+    # applications with a maildir configuration
+    cfgs = (c for c in group_context.appcfgs if 'mail' in c.configuration)
+    cfgs = (v for c in cfgs for v in c.configuration['mail'].values())
+    cfgs = (c for c in cfgs if c.get('use_directory'))
 
-            for n, filename in enumerate(maildir.keys(), start=1):
+    # non-empty maildirs
+    dirs = set(c['directory'] for c in cfgs)
+    dirs = (mailbox.Maildir(d, create=False) for d in dirs)
+    dirs = (d for d in dirs if len(d))
 
-                if limit and n > limit:
-                    break
+    # emails
+    mails = (Mail(d, f) for d in dirs for f in d.keys())
+    mails = (m for m in mails if category is None or m.category == category)
 
-                msg_str = maildir.get_file(filename).read()
-                msg_str = msg_str.decode('utf-8')
+    # load all the mails we're going to process
+    if limit:
+        mails = tuple(x for _, x in zip(range(limit), mails))
+    else:
+        mails = tuple(mails)
 
-                msg = email.message_from_string(msg_str)
+    if not mails:
+        sys.exit(exit_code)
 
-                # mailgun support
-                msg['h:Reply-To'] = msg['Reply-To']
+    # create the connection handler
+    postman = Postman(hostname, port)
 
-                try:
-                    connection.sendmail(msg['From'], msg['To'], msg_str)
-                    status, message = connection.noop()
-                except SMTPRecipientsRefused as e:
-                    success = False
-                    print("Could not send e-mail: {}".format(e.recipients))
-                    maildir.remove(filename)
-                else:
-                    if status == 250:
-                        maildir.remove(filename)
+    if force_tls:
+        postman.middlewares.append(TLS(force=True))
 
-        if not success:
-            sys.exit(1)
+    if username:
+        postman.middlewares.append(Auth(username, password))
+
+    # send the messages
+    with postman.connection() as connection:
+
+        for mail in mails:
+            try:
+                status = mail.send(connection)
+            except SMTPRecipientsRefused as e:
+                exit_code = 1
+                print(f"Could not send e-mail: {e.recipients}")
+                mail.remove()
+            else:
+                if status == 250:
+                    mail.remove()
+
+    sys.exit(exit_code)
 
 
 @cli.command()

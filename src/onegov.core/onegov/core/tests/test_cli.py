@@ -154,7 +154,24 @@ def test_create_command_default_selector(cli, cli_config):
         assert cli.called_request
 
 
-def test_sendmail(smtp, temporary_directory):
+@pytest.fixture(scope='function')
+def maildir_app(temporary_directory):
+    app_cfg = {
+        'mail': {
+            'marketing': {
+                'sender': 'noreply@example.org',
+                'use_directory': True,
+                'directory': os.path.join(
+                    temporary_directory, 'mails')
+            },
+            'transactional': {
+                'sender': 'noreply@example.org',
+                'use_directory': True,
+                'directory': os.path.join(
+                    temporary_directory, 'mails')
+            }
+        }
+    }
 
     cfg = {
         'applications': [
@@ -162,11 +179,7 @@ def test_sendmail(smtp, temporary_directory):
                 'path': '/foobar/*',
                 'application': 'onegov.core.Framework',
                 'namespace': 'foobar',
-                'configuration': {
-                    'mail_use_directory': True,
-                    'mail_directory': os.path.join(
-                        temporary_directory, 'mails')
-                }
+                'configuration': app_cfg
             }
         ]
     }
@@ -179,6 +192,15 @@ def test_sendmail(smtp, temporary_directory):
     with open(os.path.join(temporary_directory, 'onegov.yml'), 'w') as f:
         f.write(yaml.dump(cfg))
 
+    app = Framework()
+    app.configure_application(**app_cfg)
+
+    return app
+
+
+def test_sendmail(smtp, temporary_directory, maildir_app):
+    app = maildir_app
+
     runner = CliRunner()
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
@@ -189,11 +211,6 @@ def test_sendmail(smtp, temporary_directory):
 
     assert result.exit_code == 0
     assert len(smtp.outbox) == 0
-
-    app = Framework()
-    app.mail_sender = 'noreply@example.org'
-    app.mail_use_directory = True
-    app.mail_directory = os.path.join(temporary_directory, 'mails')
 
     app.send_email(
         reply_to='Govikon <info@example.org>',
@@ -246,30 +263,8 @@ def test_sendmail(smtp, temporary_directory):
     )
 
 
-def test_sendmail_limit(smtp, temporary_directory):
-
-    cfg = {
-        'applications': [
-            {
-                'path': '/foobar/*',
-                'application': 'onegov.core.Framework',
-                'namespace': 'foobar',
-                'configuration': {
-                    'mail_use_directory': True,
-                    'mail_directory': os.path.join(
-                        temporary_directory, 'mails')
-                }
-            }
-        ]
-    }
-
-    os.makedirs(os.path.join(temporary_directory, 'mails'))
-    os.makedirs(os.path.join(temporary_directory, 'mails', 'new'))
-    os.makedirs(os.path.join(temporary_directory, 'mails', 'cur'))
-    os.makedirs(os.path.join(temporary_directory, 'mails', 'tmp'))
-
-    with open(os.path.join(temporary_directory, 'onegov.yml'), 'w') as f:
-        f.write(yaml.dump(cfg))
+def test_sendmail_limit(smtp, temporary_directory, maildir_app):
+    app = maildir_app
 
     runner = CliRunner()
     result = runner.invoke(cli, [
@@ -281,11 +276,6 @@ def test_sendmail_limit(smtp, temporary_directory):
 
     assert result.exit_code == 0
     assert len(smtp.outbox) == 0
-
-    app = Framework()
-    app.mail_sender = 'noreply@example.org'
-    app.mail_use_directory = True
-    app.mail_directory = os.path.join(temporary_directory, 'mails')
 
     app.send_email(
         reply_to='Govikon <info@example.org>',
@@ -359,35 +349,8 @@ def test_sendmail_limit(smtp, temporary_directory):
     assert len(smtp.outbox) == 5
 
 
-def test_sendmail_unicode(smtp, temporary_directory):
-
-    cfg = {
-        'applications': [
-            {
-                'path': '/foobar/*',
-                'application': 'onegov.core.Framework',
-                'namespace': 'foobar',
-                'configuration': {
-                    'mail_use_directory': True,
-                    'mail_directory': os.path.join(
-                        temporary_directory, 'mails')
-                }
-            }
-        ]
-    }
-
-    os.makedirs(os.path.join(temporary_directory, 'mails'))
-    os.makedirs(os.path.join(temporary_directory, 'mails', 'new'))
-    os.makedirs(os.path.join(temporary_directory, 'mails', 'cur'))
-    os.makedirs(os.path.join(temporary_directory, 'mails', 'tmp'))
-
-    with open(os.path.join(temporary_directory, 'onegov.yml'), 'w') as f:
-        f.write(yaml.dump(cfg))
-
-    app = Framework()
-    app.mail_sender = 'noreply@example.org'
-    app.mail_use_directory = True
-    app.mail_directory = os.path.join(temporary_directory, 'mails')
+def test_sendmail_unicode(smtp, temporary_directory, maildir_app):
+    app = maildir_app
 
     app.send_email(
         reply_to='Gövikon <info@example.org>',
@@ -438,36 +401,8 @@ def test_sendmail_unicode(smtp, temporary_directory):
     )
 
 
-def test_sender_refused(smtp, temporary_directory):
-
-    cfg = {
-        'applications': [
-            {
-                'path': '/foobar/*',
-                'application': 'onegov.core.Framework',
-                'namespace': 'foobar',
-                'configuration': {
-                    'mail_use_directory': True,
-                    'mail_directory': os.path.join(
-                        temporary_directory, 'mails')
-                }
-            }
-        ]
-    }
-
-    os.makedirs(os.path.join(temporary_directory, 'mails'))
-    os.makedirs(os.path.join(temporary_directory, 'mails', 'new'))
-    os.makedirs(os.path.join(temporary_directory, 'mails', 'cur'))
-    os.makedirs(os.path.join(temporary_directory, 'mails', 'tmp'))
-
-    with open(os.path.join(temporary_directory, 'onegov.yml'), 'w') as f:
-        f.write(yaml.dump(cfg))
-
-    app = Framework()
-    app.mail_sender = 'noreply@example.org'
-    app.mail_use_directory = True
-    app.mail_directory = os.path.join(temporary_directory, 'mails')
-
+def test_sender_refused(smtp, temporary_directory, maildir_app):
+    app = maildir_app
     app.send_email(
         reply_to='Gövikon <info@example.org>',
         receivers=['recipient@example.org'],
@@ -492,3 +427,58 @@ def test_sender_refused(smtp, temporary_directory):
     assert len(smtp.outbox) == 0
     assert "Could not send e-mail: {'foo': 'bar'}" in result.output
     assert result.exit_code == 1
+
+
+def test_sendmail_category(smtp, temporary_directory, maildir_app):
+    app = maildir_app
+
+    runner = CliRunner()
+    result = runner.invoke(cli, [
+        '--config', os.path.join(temporary_directory, 'onegov.yml'),
+        'sendmail',
+        '--hostname', smtp.address[0],
+        '--port', smtp.address[1]
+    ])
+
+    assert result.exit_code == 0
+    assert len(smtp.outbox) == 0
+
+    app.send_marketing_email(
+        reply_to='Govikon <info@example.org>',
+        receivers=['recipient@example.org'],
+        subject="Newsletter",
+        content="Stuff that's happening"
+    )
+
+    app.send_transactional_email(
+        reply_to='Govikon <info@example.org>',
+        receivers=['recipient@example.org'],
+        subject="Password Reset",
+        content="Click here to reset"
+    )
+
+    transaction.commit()
+
+    assert len(smtp.outbox) == 0
+
+    result = runner.invoke(cli, [
+        '--config', os.path.join(temporary_directory, 'onegov.yml'),
+        'sendmail',
+        '--hostname', smtp.address[0],
+        '--port', smtp.address[1],
+        '--category', 'marketing'
+    ])
+
+    assert result.exit_code == 0
+    assert len(smtp.outbox) == 1
+
+    result = runner.invoke(cli, [
+        '--config', os.path.join(temporary_directory, 'onegov.yml'),
+        'sendmail',
+        '--hostname', smtp.address[0],
+        '--port', smtp.address[1],
+        '--category', 'transactional'
+    ])
+
+    assert result.exit_code == 0
+    assert len(smtp.outbox) == 2

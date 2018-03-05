@@ -44,6 +44,7 @@ from more.webassets.tweens import METHODS, CONTENT_TYPES
 from onegov.core import cache, log, utils
 from onegov.core.custom import json
 from onegov.core import directives
+from onegov.core.cache import lru_cache
 from onegov.core.datamanager import MailDataManager
 from onegov.core.mail import email, Postman, MaildirPostman
 from onegov.core.orm import Base, SessionManager, debug
@@ -283,24 +284,18 @@ class Framework(
 
             Defaults to 1'200s (20 minutes).
 
-        :mail_host:
-            The mail server to send e-mails from.
+        :mail:
+            A dictionary keyed by e-mail category (i.e. 'marketing',
+            'transactional') with the following subkeys:
 
-        :mail_port:
-            The port used for the mail server.
-
-        :mail_force_tls:
-            True if TLS should be forced when connecting to the mail server.
-            Defaults to ``True``.
-
-        :mail_username:
-            The username used for mail server authentication.
-
-        :mail_password:
-            The password used for mail server authentication.
-
-        :mail_sender:
-            The sender e-mail address.
+                - host: The mail server to send e-mails from.
+                - port: The port used for the mail server.
+                - force_tls: True if TLS should be forced.
+                - username: The mail username
+                - password: The mail password
+                - sender: The mail sender
+                - use_directory: True if a mail directory should be used
+                - directory: Path to the directory that should be used
 
         :mail_use_directory:
             If true, mails are stored in the maildir defined through
@@ -432,14 +427,12 @@ class Framework(
         self.print_exceptions = cfg.get('print_exceptions', False)
 
     def configure_mail(self, **cfg):
-        self.mail_host = cfg.get('mail_host', None)
-        self.mail_port = cfg.get('mail_port', None)
-        self.mail_force_tls = cfg.get('mail_force_tls', True)
-        self.mail_username = cfg.get('mail_username', None)
-        self.mail_password = cfg.get('mail_password', None)
-        self.mail_sender = cfg.get('mail_sender', None)
-        self.mail_use_directory = cfg.get('mail_use_directory', False)
-        self.mail_directory = cfg.get('mail_directory', None)
+        self.mail = cfg.get('mail', None)
+
+        if self.mail:
+            assert isinstance(self.mail, dict)
+            assert 'transactional' in self.mail
+            assert 'marketing' in self.mail
 
     def configure_hipchat(self, **cfg):
         self.hipchat_token = cfg.get('hipchat_token', None)
@@ -604,48 +597,78 @@ class Framework(
         """ Alias for self.session_manager.session. """
         return self.session_manager.session
 
-    @cached_property
-    def postman(self):
+    @lru_cache(maxsize=2)
+    def postman(self, category):
         """ Returns a Mailthon postman configured with the mail settings in
         the settings view. See `<http://mailthon.readthedocs.org/>`_ for
         more information.
 
         """
+        config = self.mail[category]
 
-        if self.mail_use_directory:
-            assert self.mail_directory
+        if config['use_directory']:
+            assert config['directory']
 
             return MaildirPostman(
                 host=None,
                 port=None,
-                options=dict(maildir=self.mail_directory)
+                options=dict(maildir=config['directory'])
             )
         else:
-            assert self.mail_host
-            assert self.mail_port
+            assert config['host']
+            assert config['port']
 
             middlewares = []
 
-            if self.mail_force_tls:
+            if config['force_tls']:
                 middlewares.append(TLS(force=True))
 
-            if self.mail_username:
+            if config['username']:
                 middlewares.append(
                     Auth(
-                        username=self.mail_username,
-                        password=self.mail_password
+                        username=config['username'],
+                        password=config['password']
                     )
                 )
 
             return Postman(
-                host=self.mail_host,
-                port=self.mail_port,
+                host=config['host'],
+                port=config['port'],
                 middlewares=middlewares
             )
 
-    def send_email(self, reply_to, receivers=(), cc=(), bcc=(),
-                   subject=None, content=None, encoding='utf-8',
-                   attachments=(), headers={}):
+    def send_marketing_email(self, *args, **kwargs):
+        """ Sends an e-mail categorised as marketing. This includes but is not
+        limited to:
+
+            * Announcements
+            * Newsletters
+            * Promotional E-Mails
+
+        When in doubt, send a marketing e-mail. Transactional e-mails are
+        sacred and should only be used if necessary. This ensures that the
+        important stuff is reaching our customers!
+
+        """
+        kwargs['category'] = 'marketing'
+        return self.send_email(*args, **kwargs)
+
+    def send_transactional_email(self, *args, **kwargs):
+        """ Sends an e-mail categorised as transactional. This is limited to:
+
+            * Welcome emails
+            * Reset passwords emails
+            * Notifications
+            * Weekly digests
+            * Receipts and invoices
+
+        """
+        kwargs['category'] = 'transactional'
+        return self.send_email(*args, **kwargs)
+
+    def send_email(self, reply_to, category='marketing',
+                   receivers=(), cc=(), bcc=(), subject=None, content=None,
+                   encoding='utf-8', attachments=(), headers={}):
         """ Sends a plain-text e-mail using :attr:`postman` to the given
         recipients. A reply to address is used to enable people to answer
         to the e-mail which is usually sent by a noreply kind of e-mail
@@ -661,36 +684,39 @@ class Framework(
         `<http://mailthon.readthedocs.org/>`_.
 
         """
-        assert self.mail_sender
+        assert category in ('transactional', 'marketing')
+
+        sender = self.mail[category]['sender']
+        assert sender
 
         # if the reply to address has a name part (Name <address@host>), use
         # the name part for the sender address as well to somewhat hide the
         # fact that we're using a noreply email
         name, address = parseaddr(reply_to)
 
-        if name and not parseaddr(self.mail_sender)[0]:
-            mail_sender = formataddr((name, self.mail_sender))
-        else:
-            mail_sender = self.mail_sender
+        if name and not parseaddr(sender)[0]:
+            sender = formataddr((name, sender))
 
         envelope = email(
-            sender=mail_sender,
+            sender=sender,
             receivers=receivers,
             cc=cc,
             bcc=bcc,
             subject=subject,
             content=content,
             encoding=encoding,
-            attachments=attachments
+            attachments=attachments,
+            category=category
         )
 
-        envelope.headers['Sender'] = mail_sender
+        envelope.headers['Sender'] = sender
         envelope.headers['Reply-To'] = formataddr((name, address))
+
         for key, value in headers.items():
             envelope.headers[key] = value
 
         # send e-mails through the transaction machinery
-        MailDataManager.send_email(self.postman, envelope)
+        MailDataManager.send_email(self.postman(category), envelope)
 
     def send_hipchat(self, message_from, message, message_format='html',
                      color='green', notify=True):
