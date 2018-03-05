@@ -12,7 +12,7 @@ from onegov.org import utils
 from onegov.org.elements import Link
 from onegov.org.forms import ReservationForm
 from onegov.org.layout import ReservationLayout
-from onegov.org.mail import send_html_mail
+from onegov.org.mail import send_transactional_html_mail
 from onegov.org.models import TicketMessage, ReservationMessage
 from onegov.reservation import Allocation, Reservation, Resource
 from onegov.ticket import TicketCollection
@@ -348,7 +348,7 @@ def finalize_reservation(self, request):
             else:
                 form = None
 
-            send_html_mail(
+            send_transactional_html_mail(
                 request=request,
                 template='mail_ticket_opened.pt',
                 subject=_("A ticket has been opened"),
@@ -373,7 +373,7 @@ def accept_reservation(self, request):
         reservations = reservations.order_by(Reservation.start)
 
         if self.email != request.current_username:
-            send_html_mail(
+            send_transactional_html_mail(
                 request=request,
                 template='mail_reservation_accepted.pt',
                 subject=_("Your reservations were accepted"),
@@ -444,7 +444,7 @@ def reject_reservation(self, request):
         request.session.delete(payment)
 
     if self.email != request.current_username:
-        send_html_mail(
+        send_transactional_html_mail(
             request=request,
             template='mail_reservation_rejected.pt',
             subject=_("The following reservations were rejected"),

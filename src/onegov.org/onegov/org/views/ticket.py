@@ -10,7 +10,7 @@ from onegov.org.layout import DefaultLayout
 from onegov.org.layout import TicketLayout
 from onegov.org.layout import TicketNoteLayout
 from onegov.org.layout import TicketsLayout
-from onegov.org.mail import send_html_mail
+from onegov.org.mail import send_transactional_html_mail
 from onegov.org.models import TicketMessage, TicketNote
 from onegov.org.views.message import view_messages_feed
 from onegov.ticket import handlers as ticket_handlers
@@ -66,7 +66,7 @@ def send_email_if_enabled(ticket, request, template, subject):
     if ticket.muted:
         return
 
-    send_html_mail(
+    send_transactional_html_mail(
         request=request,
         template=template,
         subject=subject,

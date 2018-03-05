@@ -2,7 +2,7 @@ from functools import partial
 from onegov.core.security import Private
 from onegov.org import OrgApp, _
 from onegov.org.layout import PaymentCollectionLayout
-from onegov.org.mail import send_html_mail
+from onegov.org.mail import send_transactional_html_mail
 from onegov.org.models import PaymentMessage
 from onegov.pay import Payment
 from onegov.pay import PaymentCollection
@@ -43,7 +43,7 @@ def send_ticket_notifications(payment, request, change):
         # send an e-mail
         email = ticket.snapshot.get('email') or ticket.handler.email
         if email != request.current_username:
-            send_html_mail(
+            send_transactional_html_mail(
                 request=request,
                 template='mail_payment_change.pt',
                 subject=EMAIL_SUBJECTS[change],

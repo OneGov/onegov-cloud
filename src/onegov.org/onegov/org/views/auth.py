@@ -7,7 +7,7 @@ from onegov.org import _, OrgApp
 from onegov.org import log
 from onegov.org.elements import Link
 from onegov.org.layout import DefaultLayout
-from onegov.org.mail import send_html_mail
+from onegov.org.mail import send_transactional_html_mail
 from onegov.user import Auth, UserCollection
 from onegov.user.errors import AlreadyActivatedError
 from onegov.user.errors import ExistingUserError
@@ -109,7 +109,7 @@ def handle_registration(self, request, form):
                 })
             )
 
-            send_html_mail(
+            send_transactional_html_mail(
                 request=request,
                 template='mail_activation.pt',
                 subject=subject,
@@ -194,7 +194,7 @@ def handle_password_reset_request(self, request, form):
         url = layout.password_reset_url(user)
 
         if url:
-            send_html_mail(
+            send_transactional_html_mail(
                 request=request,
                 template='mail_password_reset.pt',
                 subject=_("Password reset"),

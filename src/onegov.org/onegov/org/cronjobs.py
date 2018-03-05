@@ -105,7 +105,7 @@ def send_daily_ticket_statistics(request):
             'mail_daily_ticket_statistics.pt', request, args
         )
 
-        app.send_email(
+        app.send_transactional_email(
             subject=args['title'],
             receivers=(user.username, ),
             content=content
@@ -223,7 +223,7 @@ def send_daily_resource_usage_overview(request):
             'mail_daily_resource_usage_overview.pt', request, args
         )
 
-        request.app.send_email(
+        request.app.send_transactional_email(
             subject=args['title'],
             receivers=(address, ),
             content=content

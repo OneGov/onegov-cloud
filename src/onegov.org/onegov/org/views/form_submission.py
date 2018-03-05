@@ -12,7 +12,7 @@ from onegov.form import (
 )
 from onegov.org import _, OrgApp
 from onegov.org.layout import FormSubmissionLayout
-from onegov.org.mail import send_html_mail
+from onegov.org.mail import send_transactional_html_mail
 from onegov.org.models import TicketMessage
 from onegov.pay import Price
 from purl import URL
@@ -209,7 +209,7 @@ def handle_complete_submission(self, request):
             if self.email != request.current_username:
                 show_submission = request.params.get('send_by_email') == 'yes'
 
-                send_html_mail(
+                send_transactional_html_mail(
                     request=request,
                     template='mail_ticket_opened.pt',
                     subject=_("A ticket has been opened"),

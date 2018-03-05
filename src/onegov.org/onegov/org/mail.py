@@ -30,3 +30,13 @@ def send_html_mail(request, template, content, **kwargs):
 
     # the email is queued here, not actually sent!
     request.app.send_email(**kwargs)
+
+
+def send_transactional_html_mail(*args, **kwargs):
+    kwargs['category'] = 'transactional'
+    return send_html_mail(*args, **kwargs)
+
+
+def send_marketing_html_mail(*args, **kwargs):
+    kwargs['category'] = 'marketing'
+    return send_html_mail(*args, **kwargs)

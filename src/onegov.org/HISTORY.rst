@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Splits e-mails into transactional/marketing.
+  [href]
+
 - Improves format_date_range to output saner results.
   [href]
 

@@ -247,7 +247,7 @@ def handle_new_user(self, request, form):
                     'title': subject
                 })
 
-                request.app.send_email(
+                request.app.send_transactional_email(
                     subject=subject,
                     receivers=(user.username, ),
                     content=content,

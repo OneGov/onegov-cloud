@@ -46,9 +46,9 @@ class DirectorySubmissionAction(object):
 
     def send_html_mail(self, request, subject, template):
         # XXX circular import
-        from onegov.org.mail import send_html_mail
+        from onegov.org.mail import send_transactional_html_mail
 
-        return send_html_mail(
+        return send_transactional_html_mail(
             request=request,
             template=template,
             subject=subject,

@@ -27,12 +27,26 @@ def test_send_email(smtp):
             )
 
     app = App()
-    app.mail_host, app.mail_port = smtp.address
-    app.mail_sender = 'mails@govikon.ch'
-    app.mail_force_tls = False
-    app.mail_username = None
-    app.mail_password = None
-    app.mail_use_directory = False
+    app.mail = {
+        'marketing': {
+            'host': smtp.address[0],
+            'port': smtp.address[1],
+            'force_tls': False,
+            'username': None,
+            'password': None,
+            'use_directory': False,
+            'sender': 'mails@govikon.ch'
+        },
+        'transactional': {
+            'host': smtp.address[0],
+            'port': smtp.address[1],
+            'force_tls': False,
+            'username': None,
+            'password': None,
+            'use_directory': False,
+            'sender': 'mails@govikon.ch'
+        }
+    }
 
     app.send_email(receivers=['civilian@example.org'], subject='Test')
     assert len(smtp.outbox) == 0

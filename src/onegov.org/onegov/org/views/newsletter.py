@@ -117,7 +117,7 @@ def handle_newsletters(self, request, form):
                 'title': title
             })
 
-            request.app.send_email(
+            request.app.send_marketing_email(
                 subject=title,
                 receivers=(recipient.address, ),
                 content=confirm_mail
@@ -269,7 +269,7 @@ def handle_send_newsletter(self, request, form):
                 }
             )
 
-            request.app.send_email(
+            request.app.send_marketing_email(
                 subject=self.title,
                 receivers=(recipient.address, ),
                 content=mail
