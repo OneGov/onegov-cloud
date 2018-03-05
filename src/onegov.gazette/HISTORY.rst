@@ -1,6 +1,10 @@
 Changelog
 ---------
-1.13.7 (2018-02-14)
+
+- Splits e-mails into transactional/marketing.
+  [href]
+
+1.11.7 (2018-02-14)
 ~~~~~~~~~~~~~~~~~~~
 
 - Makes the author name a multi line text field.

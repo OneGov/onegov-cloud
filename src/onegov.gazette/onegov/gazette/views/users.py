@@ -73,10 +73,10 @@ def create_user(self, request, form):
             request,
             request.link(request.app.principal, name='reset-password')
         )
-        request.app.send_email(
+        request.app.send_transactional_email(
             subject=request.translate(_("User account created")),
             receivers=(user.username, ),
-            reply_to=request.app.mail_sender,
+            reply_to=request.app.mail['transactional']['sender'],
             content=render_template(
                 'mail_user_created.pt',
                 request,

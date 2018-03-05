@@ -448,10 +448,10 @@ def accept_notice(self, request, form):
         if request.app.principal.publish_to:
             reply_to = (
                 request.app.principal.publish_from or
-                request.app.mail_sender
+                request.app.mail['transactional']['sender']
             )
             subject = construct_subject(self, request)
-            request.app.send_email(
+            request.app.send_transactional_email(
                 subject=subject,
                 receivers=(request.app.principal.publish_to, ),
                 reply_to=reply_to,
@@ -513,7 +513,7 @@ def reject_notice(self, request, form):
         self.reject(request, form.comment.data)
         request.message(_("Official notice rejected."), 'success')
         if self.user:
-            request.app.send_email(
+            request.app.send_transactional_email(
                 subject=request.translate(
                     _(
                         "Official Notice Rejected ${id}",
@@ -521,7 +521,7 @@ def reject_notice(self, request, form):
                     )
                 ),
                 receivers=(self.user.username, ),
-                reply_to=request.app.mail_sender,
+                reply_to=request.app.mail['transactional']['sender'],
                 content=render_template(
                     'mail_notice_rejected.pt',
                     request,
