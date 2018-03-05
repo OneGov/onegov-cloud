@@ -1,5 +1,7 @@
 Changelog
 ---------
+2.1.0 (2018-03-05)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds zulip integration.
   [msom]
