@@ -109,13 +109,17 @@ class EmailSubscriberCollection(SubscriberCollection):
         optout = request.link(request.app.principal, 'unsubscribe-email')
         token = request.new_url_safe_token({'address': subscriber.address})
 
-        request.app.send_email(
+        # even though this is technically a transactional e-mail we send
+        # it as marketing, since the actual subscription is sent as
+        # a marketing e-mail as well
+        request.app.send_marketing_email(
             subject=request.translate(
                 _("Successfully subscribed to the email service")
             ),
             receivers=(subscriber.address, ),
             reply_to='{} <{}>'.format(
-                request.app.principal.name, request.app.mail_sender
+                request.app.principal.name,
+                request.app.mail['marketing']['sender']
             ),
             content=render_template(
                 'mail_subscribed.pt',

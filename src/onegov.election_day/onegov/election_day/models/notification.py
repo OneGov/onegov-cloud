@@ -147,7 +147,8 @@ class EmailNotification(Notification):
         )
         optout = request.link(request.app.principal, 'unsubscribe-email')
         reply_to = '{} <{}>'.format(
-            request.app.principal.name, request.app.mail_sender
+            request.app.principal.name,
+            request.app.mail['marketing']['sender']
         )
 
         for locale in request.app.locales:
@@ -164,6 +165,7 @@ class EmailNotification(Notification):
             subject = '{} - {}'.format(
                 model_title, request.translate(subject_prefix)
             )
+
             content = render_template(
                 template,
                 request,
@@ -178,7 +180,7 @@ class EmailNotification(Notification):
             )
 
             for address in addresses:
-                request.app.send_email(
+                request.app.send_marketing_email(
                     subject=subject,
                     receivers=(address, ),
                     reply_to=reply_to,
