@@ -7,6 +7,9 @@ Changelog
 - Splits e-mails into transactional/marketing.
   [href]
 
+- Makes some columns of the wabsti vote format optional.
+  [msom]
+
 2.1.0 (2018-03-05)
 ~~~~~~~~~~~~~~~~~~~
 

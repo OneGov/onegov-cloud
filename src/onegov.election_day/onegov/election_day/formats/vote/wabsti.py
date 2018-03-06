@@ -13,13 +13,10 @@ HEADERS = (
     'ungultige sz',
     'ja',
     'nein',
-    'initoantw',
     'gegenvja',
     'gegenvnein',
-    'gegenvoantw',
     'stichfrja',
     'stichfrnein',
-    'stichfroantw',
     'stimmbet',
 )
 
@@ -132,9 +129,15 @@ def import_vote_wabsti(vote, principal, vote_number, file, mimetype):
         empty = {}
         try:
             e_ballots = int(line.leere_sz or 0)
-            empty['proposal'] = int(line.initoantw or 0) + e_ballots
-            empty['counter-proposal'] = int(line.gegenvoantw or 0) + e_ballots
-            empty['tie-breaker'] = int(line.stichfroantw or 0) + e_ballots
+            empty['proposal'] = (
+                int(getattr(line, 'initoantw', 0) or 0) + e_ballots
+            )
+            empty['counter-proposal'] = (
+                int(getattr(line, 'gegenvoantw', 0) or 0) + e_ballots
+            )
+            empty['tie-breaker'] = (
+                int(getattr(line, 'stichfroantw', 0) or 0) + e_ballots
+            )
         except ValueError:
             line_errors.append(_("Could not read the empty votes"))
 
