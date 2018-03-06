@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.65.0 (2018-03-06)
+~~~~~~~~~~~~~~~~~~~
 
 - Splits all e-mails into transactional/marketing pools. By default, e-mails
   are sent through the marketing pool.
