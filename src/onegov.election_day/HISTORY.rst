@@ -1,5 +1,7 @@
 Changelog
 ---------
+2.1.1 (2018-03-06)
+~~~~~~~~~~~~~~~~~~~
 
 - Optimizes sending email notifications.
   [msom]
