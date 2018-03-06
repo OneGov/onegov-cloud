@@ -145,44 +145,52 @@ class EmailNotification(Notification):
         template = 'mail_{}_results.pt'.format(
             'vote' if isinstance(model, Vote) else 'election'
         )
+        optout = request.link(request.app.principal, 'unsubscribe-email')
+        reply_to = '{} <{}>'.format(
+            request.app.principal.name, request.app.mail_sender
+        )
 
-        subscribers = request.session.query(EmailSubscriber).all()
-        for subscriber in subscribers:
-            locale = subscriber.locale
+        for locale in request.app.locales:
+            addresses = request.session.query(EmailSubscriber.address)
+            addresses = addresses.filter(EmailSubscriber.locale == locale)
+            addresses = addresses.all()
+            addresses = [address[0] for address in addresses]
+            if not addresses:
+                continue
+
             self.set_locale(request, locale)
-
-            optout = request.link(request.app.principal, 'unsubscribe-email')
-            token = request.new_url_safe_token({'address': subscriber.address})
-
             model_title = model.get_title(locale, request.default_locale)
             model_url = request.link(SiteLocale(locale, request.link(model)))
             subject = '{} - {}'.format(
                 model_title, request.translate(subject_prefix)
             )
-
-            request.app.send_email(
-                subject=subject,
-                receivers=(subscriber.address, ),
-                reply_to='{} <{}>'.format(
-                    request.app.principal.name, request.app.mail_sender
-                ),
-                content=render_template(
-                    template,
-                    request,
-                    {
-                        'title': subject,
-                        'model': model,
-                        'model_title': model_title,
-                        'model_url': model_url,
-                        'optout': optout,
-                        'layout': MailLayout(self, request)
-                    }
-                ),
-                headers={
-                    'List-Unsubscribe': '<{}?opaque={}>'.format(optout, token),
-                    'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+            content = render_template(
+                template,
+                request,
+                {
+                    'title': subject,
+                    'model': model,
+                    'model_title': model_title,
+                    'model_url': model_url,
+                    'optout': optout,
+                    'layout': MailLayout(self, request)
                 }
             )
+
+            for address in addresses:
+                request.app.send_email(
+                    subject=subject,
+                    receivers=(address, ),
+                    reply_to=reply_to,
+                    content=content,
+                    headers={
+                        'List-Unsubscribe': '<{}?opaque={}>'.format(
+                            optout,
+                            request.new_url_safe_token({'address': address})
+                        ),
+                        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+                    }
+                )
 
         self.set_locale(request)
 

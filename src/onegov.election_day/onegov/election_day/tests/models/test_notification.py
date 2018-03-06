@@ -217,7 +217,6 @@ def test_email_notification_vote(election_day_app, session):
         session.add(EmailSubscriber(address='fr@examp.le', locale='fr_CH'))
         session.add(EmailSubscriber(address='it@examp.le', locale='it_CH'))
         session.add(EmailSubscriber(address='rm@examp.le', locale='rm_CH'))
-        session.add(EmailSubscriber(address='en@examp.le', locale='en'))
 
         # No results yet
         # ... simple
@@ -226,17 +225,15 @@ def test_email_notification_vote(election_day_app, session):
         assert notification.type == 'email'
         assert notification.vote_id == simple_vote.id
         assert notification.last_modified == freezed
-        assert mock.call_count == 5
+        assert mock.call_count == 4
         assert sorted([call[2]['subject'] for call in mock.mock_calls]) == [
             'Abstimmung - Neue Zwischenresultate',
-            'Abstimmung - New intermediate results',
             'Votazione - Nuovi risultati provvisori',
             'Votaziun - Novs resultats intermediars',
             'Vote - Nouveaux résultats intermédiaires'
         ]
         assert sorted([call[2]['receivers'] for call in mock.mock_calls]) == [
             ('de@examp.le',),
-            ('en@examp.le',),
             ('fr@examp.le',),
             ('it@examp.le',),
             ('rm@examp.le',)
@@ -252,7 +249,6 @@ def test_email_notification_vote(election_day_app, session):
             call[2]['headers']['List-Unsubscribe'] for call in mock.mock_calls
         ]) == [
             "<Principal/unsubscribe-email?opaque={'address': 'de@examp.le'}>",
-            "<Principal/unsubscribe-email?opaque={'address': 'en@examp.le'}>",
             "<Principal/unsubscribe-email?opaque={'address': 'fr@examp.le'}>",
             "<Principal/unsubscribe-email?opaque={'address': 'it@examp.le'}>",
             "<Principal/unsubscribe-email?opaque={'address': 'rm@examp.le'}>"
@@ -270,11 +266,10 @@ def test_email_notification_vote(election_day_app, session):
         assert notification.type == 'email'
         assert notification.vote_id == complex_vote.id
         assert notification.last_modified == freezed
-        assert mock.call_count == 5
+        assert mock.call_count == 4
         assert sorted([call[2]['subject'] for call in mock.mock_calls]) == [
             'Project cun cuntraproposta - Novs resultats intermediars',
             'Vorlage mit Gegenentwurf - Neue Zwischenresultate',
-            'Vorlage mit Gegenentwurf - New intermediate results',
             'Vorlage mit Gegenentwurf - Nuovi risultati provvisori',
             'Vote avec contre-projet - Nouveaux résultats intermédiaires'
         ]
@@ -314,13 +309,11 @@ def test_email_notification_vote(election_day_app, session):
         notification.trigger(request, simple_vote)
         assert sorted([call[2]['subject'] for call in mock.mock_calls]) == [
             'Abstimmung - Neue Zwischenresultate',
-            'Abstimmung - New intermediate results',
             'Votazione - Nuovi risultati provvisori',
             'Votaziun - Novs resultats intermediars',
             'Vote - Nouveaux résultats intermédiaires'
         ]
         contents = ''.join(call[2]['content'] for call in mock.mock_calls)
-        assert "9 of 11" in contents
         assert "9 da 11" in contents
         assert "9 di 11" in contents
         assert "9 de 11" in contents
@@ -335,12 +328,10 @@ def test_email_notification_vote(election_day_app, session):
         assert sorted([call[2]['subject'] for call in mock.mock_calls]) == [
             'Project cun cuntraproposta - Novs resultats intermediars',
             'Vorlage mit Gegenentwurf - Neue Zwischenresultate',
-            'Vorlage mit Gegenentwurf - New intermediate results',
             'Vorlage mit Gegenentwurf - Nuovi risultati provvisori',
             'Vote avec contre-projet - Nouveaux résultats intermédiaires'
         ]
         contents = ''.join(call[2]['content'] for call in mock.mock_calls)
-        assert "9 of 11" in contents
         assert "9 da 11" in contents
         assert "9 di 11" in contents
         assert "9 de 11" in contents
@@ -364,7 +355,6 @@ def test_email_notification_vote(election_day_app, session):
         notification.trigger(request, simple_vote)
         assert sorted([call[2]['subject'] for call in mock.mock_calls]) == [
             'Abstimmung - Abgelehnt',
-            'Abstimmung - Rejected',
             'Votazione - Respinto',
             'Votaziun - Refusà',
             'Vote - Refusé'
@@ -381,7 +371,6 @@ def test_email_notification_vote(election_day_app, session):
         assert sorted([call[2]['subject'] for call in mock.mock_calls]) == [
             'Project cun cuntraproposta - Refusà',
             'Vorlage mit Gegenentwurf - Abgelehnt',
-            'Vorlage mit Gegenentwurf - Rejected',
             'Vorlage mit Gegenentwurf - Respinto',
             'Vote avec contre-projet - Refusé'
         ]
@@ -441,7 +430,6 @@ def test_email_notification_election(election_day_app, session):
         session.add(EmailSubscriber(address='fr@examp.le', locale='fr_CH'))
         session.add(EmailSubscriber(address='it@examp.le', locale='it_CH'))
         session.add(EmailSubscriber(address='rm@examp.le', locale='rm_CH'))
-        session.add(EmailSubscriber(address='en@examp.le', locale='en'))
 
         # No results yet
         # ... majorz
@@ -450,7 +438,7 @@ def test_email_notification_election(election_day_app, session):
         assert notification.type == 'email'
         assert notification.election_id == majorz.id
         assert notification.last_modified == freezed
-        assert mock.call_count == 5
+        assert mock.call_count == 4
         assert sorted([call[2]['subject'] for call in mock.mock_calls]) == [
             (
                 'Election selon le système majoritaire - '
@@ -461,12 +449,10 @@ def test_email_notification_election(election_day_app, session):
                 'Elezione secondo il sistema maggioritario - '
                 'Nuovi risultati provvisori'
             ),
-            'Majorzwahl - Neue Zwischenresultate',
-            'Majorzwahl - New intermediate results'
+            'Majorzwahl - Neue Zwischenresultate'
         ]
         assert sorted([call[2]['receivers'] for call in mock.mock_calls]) == [
             ('de@examp.le',),
-            ('en@examp.le',),
             ('fr@examp.le',),
             ('it@examp.le',),
             ('rm@examp.le',)
@@ -482,7 +468,6 @@ def test_email_notification_election(election_day_app, session):
             call[2]['headers']['List-Unsubscribe'] for call in mock.mock_calls
         ]) == [
             "<Principal/unsubscribe-email?opaque={'address': 'de@examp.le'}>",
-            "<Principal/unsubscribe-email?opaque={'address': 'en@examp.le'}>",
             "<Principal/unsubscribe-email?opaque={'address': 'fr@examp.le'}>",
             "<Principal/unsubscribe-email?opaque={'address': 'it@examp.le'}>",
             "<Principal/unsubscribe-email?opaque={'address': 'rm@examp.le'}>"
@@ -500,7 +485,7 @@ def test_email_notification_election(election_day_app, session):
         assert notification.type == 'email'
         assert notification.election_id == proporz.id
         assert notification.last_modified == freezed
-        assert mock.call_count == 5
+        assert mock.call_count == 4
         assert sorted([call[2]['subject'] for call in mock.mock_calls]) == [
             (
                 'Election selon le système proportionnel - '
@@ -508,7 +493,6 @@ def test_email_notification_election(election_day_app, session):
             ),
             'Elecziun da proporz - Novs resultats intermediars',
             'Proporzwahl - Neue Zwischenresultate',
-            'Proporzwahl - New intermediate results',
             'Proporzwahl - Nuovi risultati provvisori'
         ]
         contents = ''.join(call[2]['content'] for call in mock.mock_calls)
@@ -600,15 +584,13 @@ def test_email_notification_election(election_day_app, session):
                 'Elezione secondo il sistema maggioritario - '
                 'Nuovi risultati provvisori'
             ),
-            'Majorzwahl - Neue Zwischenresultate',
-            'Majorzwahl - New intermediate results'
+            'Majorzwahl - Neue Zwischenresultate'
         ]
         contents = ''.join(call[2]['content'] for call in mock.mock_calls)
-        assert "10 of 11" in contents
-        assert "10 da 11" in contents
-        assert "10 di 11" in contents
-        assert "10 de 11" in contents
-        assert "10 von 11" in contents
+        assert "11 da 12" in contents
+        assert "11 di 12" in contents
+        assert "11 de 12" in contents
+        assert "11 von 12" in contents
         assert "Maier Peter" in contents
         assert "5'500" in contents
         assert "5 500" in contents
@@ -629,15 +611,13 @@ def test_email_notification_election(election_day_app, session):
             ),
             'Elecziun da proporz - Novs resultats intermediars',
             'Proporzwahl - Neue Zwischenresultate',
-            'Proporzwahl - New intermediate results',
             'Proporzwahl - Nuovi risultati provvisori'
         ]
         contents = ''.join(call[2]['content'] for call in mock.mock_calls)
-        assert "10 of 11" in contents
-        assert "10 da 11" in contents
-        assert "10 di 11" in contents
-        assert "10 de 11" in contents
-        assert "10 von 11" in contents
+        assert "11 da 12" in contents
+        assert "11 di 12" in contents
+        assert "11 de 12" in contents
+        assert "11 von 1" in contents
         assert "FDP" in contents
         assert "7'700" in contents
         assert "7 700" in contents
@@ -665,7 +645,6 @@ def test_email_notification_election(election_day_app, session):
             'Election selon le système majoritaire - Résultats finaux',
             'Elecziun da maiorz - Resultats finals',
             'Elezione secondo il sistema maggioritario - Risultati finali',
-            'Majorzwahl - Final results',
             'Majorzwahl - Schlussresultate'
         ]
         contents = ''.join(call[2]['content'] for call in mock.mock_calls)
@@ -680,7 +659,6 @@ def test_email_notification_election(election_day_app, session):
         assert sorted([call[2]['subject'] for call in mock.mock_calls]) == [
             'Election selon le système proportionnel - Résultats finaux',
             'Elecziun da proporz - Resultats finals',
-            'Proporzwahl - Final results',
             'Proporzwahl - Risultati finali',
             'Proporzwahl - Schlussresultate'
         ]
