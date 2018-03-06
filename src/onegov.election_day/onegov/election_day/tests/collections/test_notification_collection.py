@@ -78,7 +78,7 @@ def test_notification_collection(session):
 
         # Add a email, SMS notification and webhook
         request = DummyRequest(session=session)
-        request.app.mail_sender = 'info@onegov.ch'
+        request.app.mail = {'marketing': {'sender': 'info@onegov.ch'}}
         request.app.locales = ['de_CH', 'it_CH', 'fr_CH', 'rm_CH']
         request.app.principal.email_notification = True
         request.app.principal.sms_notification = 'http://example.com'
