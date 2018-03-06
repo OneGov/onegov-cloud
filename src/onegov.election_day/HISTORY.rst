@@ -18,6 +18,30 @@ Changelog
 - Adds zulip integration.
   [msom]
 
+  **Breaking changes: The import and export formats have changed!**
+
+  - ``election_counted_entities`` and ``election_total_entitites`` have been
+    replaced with a ``counted`` column
+  - ``elegible_voters`` have been renamed to ``eligible_voters``
+
+2.1.1 (2018-03-06)
+~~~~~~~~~~~~~~~~~~~
+
+- Optimizes sending email notifications.
+  [msom]
+
+- Splits e-mails into transactional/marketing.
+  [href]
+
+- Makes some columns of the wabsti vote format optional.
+  [msom]
+
+2.1.0 (2018-03-05)
+~~~~~~~~~~~~~~~~~~~
+
+- Adds zulip integration.
+  [msom]
+
 2.0.2 (2018-02-01)
 ~~~~~~~~~~~~~~~~~~~
 

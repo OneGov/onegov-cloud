@@ -587,10 +587,10 @@ def test_email_notification_election(election_day_app, session):
             'Majorzwahl - Neue Zwischenresultate'
         ]
         contents = ''.join(call[2]['content'] for call in mock.mock_calls)
-        assert "11 da 12" in contents
-        assert "11 di 12" in contents
-        assert "11 de 12" in contents
-        assert "11 von 12" in contents
+        assert "10 da 11" in contents
+        assert "10 di 11" in contents
+        assert "10 de 11" in contents
+        assert "10 von 11" in contents
         assert "Maier Peter" in contents
         assert "5'500" in contents
         assert "5 500" in contents
@@ -614,10 +614,10 @@ def test_email_notification_election(election_day_app, session):
             'Proporzwahl - Nuovi risultati provvisori'
         ]
         contents = ''.join(call[2]['content'] for call in mock.mock_calls)
-        assert "11 da 12" in contents
-        assert "11 di 12" in contents
-        assert "11 de 12" in contents
-        assert "11 von 1" in contents
+        assert "10 da 11" in contents
+        assert "10 di 11" in contents
+        assert "10 de 11" in contents
+        assert "10 von 11" in contents
         assert "FDP" in contents
         assert "7'700" in contents
         assert "7 700" in contents

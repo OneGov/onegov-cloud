@@ -298,12 +298,8 @@ def test_upload_vote_notify_zulip(election_day_app):
     login(client)
 
     with patch('urllib.request.urlopen') as urlopen:
-
         # No settings
-        upload = client.get('/vote/vote/upload')
-        upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
-        assert 'erfolgreich hochgeladen' in upload.form.submit()
-
+        upload_vote(client)
         sleep(5)
         assert not urlopen.called
 
@@ -311,11 +307,7 @@ def test_upload_vote_notify_zulip(election_day_app):
         election_day_app.zulip_stream = 'WAB'
         election_day_app.zulip_user = 'wab-bot@seantis.zulipchat.com'
         election_day_app.zulip_key = 'aabbcc'
-
-        upload = client.get('/vote/vote/upload')
-        upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
-        assert 'erfolgreich hochgeladen' in upload.form.submit()
-
+        upload_vote(client)
         sleep(5)
         assert urlopen.called
         assert 'xx.zulipchat.com' in urlopen.call_args[0][0].get_full_url()
