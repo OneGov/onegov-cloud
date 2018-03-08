@@ -3,6 +3,7 @@ import sys
 from datetime import date, timedelta, datetime
 from functools import partial
 from itertools import count
+from onegov.activity.utils import dates_overlap
 from onegov.activity.matching import deferred_acceptance
 from onegov.activity.matching import MatchableBooking
 from onegov.activity.matching import MatchableOccasion
@@ -12,6 +13,7 @@ from onegov.activity.matching import PreferMotivated
 from onegov.activity.matching import PreferOrganiserChildren
 from onegov.activity.matching import Scoring
 from onegov.activity.matching.core import is_stable, OccasionAgent
+from onegov.activity.matching.utils import unblockable
 from onegov.core.utils import Bunch
 from sedate import standardize_date
 
@@ -70,6 +72,15 @@ class Booking(MatchableBooking):
     @property
     def dates(self):
         return [Bunch(start=s, end=e) for s, e in self._dates]
+
+    def overlaps(self, other):
+        if self.id == other.id:
+            return True
+
+        return dates_overlap(
+            tuple((d.start, d.end) for d in self.dates),
+            tuple((o.start, o.end) for o in other.dates)
+        )
 
 
 class Occasion(MatchableOccasion):
@@ -651,3 +662,28 @@ def test_multi_day_alignment():
     # occasion
     assert len(match(bookings, (o1, o2)).accepted) == 2
     assert len(match(bookings, (o1, o2), alignment='day').accepted) == 1
+
+
+def test_unblockable_regression():
+    def booking(start, end):
+        start = datetime(2018, 3, 8, *start)
+        end = datetime(2018, 3, 8, *end)
+
+        return Booking(
+            occasion=None,
+            attendee=None,
+            state=None,
+            priority=0,
+            dates=[(start, end)]
+        )
+
+    accepted = {
+        booking((7, 0), (8, 0)),
+        booking((8, 0), (13, 0))
+    }
+
+    blocked = {
+        booking((7, 0), (9, 0))
+    }
+
+    assert not unblockable(accepted, blocked)

@@ -81,9 +81,9 @@ def unblockable(accepted, blocked, key=booking_order):
 
     unblockable = SortedSet(blocked, key=key)
 
-    for accepted in accepted:
-        for booking in blocked:
-            if accepted.overlaps(booking):
-                unblockable.remove(booking)
+    for a in accepted:
+        for b in blocked:
+            if a.overlaps(b):
+                unblockable.discard(b)
 
     return unblockable

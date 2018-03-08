@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes an exception occuring during certain matching runs.
+  [href]
+
 1.7.1 (2018-02-21)
 ~~~~~~~~~~~~~~~~~~~
 
