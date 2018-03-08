@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes iframe height being calculated incorrectly.
+  [href]
+
 0.1.2 (2018-03-01)
 ~~~~~~~~~~~~~~~~~~~~~
 

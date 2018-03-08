@@ -58,4 +58,5 @@ def get_search_asset():
 
 @WinterthurApp.webasset('iframe-resizer')
 def get_iframe_resizer():
+    yield 'iframe-resizer-options.js'
     yield 'iframe-resizer-contentwindow.js'
