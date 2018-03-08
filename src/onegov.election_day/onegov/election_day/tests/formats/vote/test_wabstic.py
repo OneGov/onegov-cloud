@@ -72,7 +72,6 @@ def test_import_wabstic_vote(session, tar_file):
         ('69', '1', 3375, 365),
     ):
         principal = Municipality(name=str(entity_id), municipality=entity_id)
-        entities = principal.entities.get(vote.date.year, {})
         errors = import_vote_wabstic(
             vote, principal, number, district,
             BytesIO(sg_geschaefte), 'text/plain',
