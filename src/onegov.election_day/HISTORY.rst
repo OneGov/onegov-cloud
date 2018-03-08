@@ -1,6 +1,6 @@
 Changelog
 ---------
-2.1.1 (2018-03-06)
+3.0.0 (2018-03-08)
 ~~~~~~~~~~~~~~~~~~~
 
 - Optimizes sending email notifications.

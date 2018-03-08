@@ -4,7 +4,7 @@ name = 'onegov.election_day'
 description = (
     'OneGov ballot results website used on election day.'
 )
-version = '2.1.1'
+version = '3.0.0'
 
 
 def get_long_description():
