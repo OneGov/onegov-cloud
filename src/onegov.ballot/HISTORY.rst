@@ -1,6 +1,6 @@
 Changelog
 ---------
-2.0.1 (2018-02-27)
+3.0.0 (2018-03-08)
 ~~~~~~~~~~~~~~~~~~~
 
 - Fixes json output of elected candidates.

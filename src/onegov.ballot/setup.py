@@ -4,7 +4,7 @@ name = 'onegov.ballot'
 description = (
     'Models ballot results for OneGov.'
 )
-version = '2.0.1'
+version = '3.0.0'
 
 
 def get_long_description():
