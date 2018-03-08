@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.7.2 (2018-03-08)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes an exception occuring during certain matching runs.
   [href]
