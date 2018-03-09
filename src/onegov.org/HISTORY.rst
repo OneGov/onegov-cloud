@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves elasticsearch outages handling.
+  [href]
+
 0.24.4 (2018-03-06)
 ~~~~~~~~~~~~~~~~~~~
 

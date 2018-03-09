@@ -1,11 +1,11 @@
 import morepath
 
-from elasticsearch import TransportError
 from onegov.core.security import Public
-from onegov.org import _, log, OrgApp
+from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.layout import DefaultLayout
 from onegov.org.models import Search
+from onegov.search import SearchOfflineError
 from webob import exc
 
 
@@ -22,8 +22,7 @@ def search(self, request):
         resultslabel = _("${count} Results", mapping={
             'count': self.subset_count
         })
-    except TransportError:
-        log.exception("Elasticsearch cluster is offline")
+    except SearchOfflineError:
         return {
             'title': _("Search Unavailable"),
             'layout': layout,
@@ -51,5 +50,5 @@ def search(self, request):
 def suggestions(self, request):
     try:
         return tuple(self.suggestions())
-    except TransportError:
+    except SearchOfflineError:
         raise exc.HTTPNotFound()
