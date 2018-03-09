@@ -177,6 +177,10 @@ table {
         }
     }
 
+    &.tablesaw thead th.right-aligned {
+        text-align: right;
+    }
+
     tr.total {
         border: 1px solid $iron;
         border-width: 1px 0;
@@ -184,37 +188,14 @@ table {
     }
 
 
-    // overview table on the homepage -> specified widths because we have
-    // multiple tables which should align vertically
-    &.overview {
-        margin-bottom: 2rem;
-
-        &.vote {
-            td:nth-child(2) {
-                width: 12.5%;
+    &.results {
+        &:not(.tablesaw-stack) {
+            tr:hover {
+                outline: 1px solid $gainsboro;
             }
 
-            td:nth-child(3),
-            td:nth-child(4) {
-                width: 7.5%;
-            }
-
-            td:nth-child(5) {
-                width: 12.5%;
-            }
-
-            td:nth-child(6) {
-                width: 10%;
-            }
-        }
-
-        &.election {
-            td:nth-child(2) {
-                width: 12.5%;
-            }
-
-            td:nth-child(3) {
-                width: 10%;
+            tr.total:hover {
+                outline: 0;
             }
         }
     }
@@ -272,46 +253,79 @@ table {
 /*
     Responsive tables
 */
+// overview table on the homepage -> specified widths because we have
+// multiple tables which should align vertically
+@media (min-width: 40em) {
+    &.overview {
+        margin-bottom: 2rem;
 
-.stacktable.large-only { display: table; }
-.stacktable.small-only { display: none; }
+        &.vote {
+            td:nth-child(2) {
+                width: 12.5%;
+            }
 
-@media #{$small-only} {
-    .stacktable.large-only { display: none; }
-    .stacktable.small-only { display: table; }
-    .stacktable th.st-head-row-main { display: none; }
-    .stackable .answer {
-        text-align: right;
-    }
+            td:nth-child(3),
+            td:nth-child(4) {
+                width: 7.5%;
+            }
 
-    .st-head-row {
-        background-color: $white;
-        border-bottom: 3px solid $gainsboro;
-        font-size: 1.2em;
-        padding-top: 2em;
-        text-align: center;
-    }
+            td:nth-child(5) {
+                width: 12.5%;
+            }
 
-    .stackable .answer {
-        text-align: right;
-    }
+            td:nth-child(6) {
+                width: 10%;
+            }
+        }
 
-    table tr.total {
-        border: 0;
-        font-weight: bold;
+        &.election {
+            td:nth-child(2) {
+                width: 12.5%;
+            }
+
+            td:nth-child(3) {
+                width: 10%;
+            }
+        }
     }
 }
 
-/*
-    Results table
-*/
-.ballot-results {
-    tr:hover {
-        outline: 1px solid $gainsboro;
-    }
+// Style stack mode
+@media (max-width: 39.9375em) {
+    .tablesaw-stack tbody {
+        tr {
+            border: 0 !important;
+        }
 
-    tr.total:hover {
-        outline: 0;
+        td,
+        th {
+            text-align: left;
+        }
+
+        td {
+            .tablesaw-cell-label {
+                font-weight: normal;
+                color: $black;
+            }
+            .tablesaw-cell-content {
+                float: right;
+            }
+        }
+
+        td:first-child {
+            .tablesaw-cell-label {
+                display: none;
+            }
+            .tablesaw-cell-content {
+                border-bottom: 3px solid $gainsboro;
+                font-size: 1.2em;
+                font-weight: bold;
+                padding-top: 2em;
+                text-align: center;
+                width: 100%;
+                max-width: 100%;
+            }
+        }
     }
 }
 

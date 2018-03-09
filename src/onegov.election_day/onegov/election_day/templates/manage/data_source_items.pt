@@ -25,7 +25,7 @@
                     No mappings yet.
                 </p>
 
-                <table class="data_source_items stackable" tal:condition="items">
+                <table class="data_source_items tablesaw" data-tablesaw-mode="stack" tal:condition="items">
                     <thead>
                         <tr>
                             <th>${item_name}</th>

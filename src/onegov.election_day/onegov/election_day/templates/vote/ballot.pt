@@ -41,18 +41,22 @@
             </div>
 
             <h4 tal:condition="show_map" i18n:translate="">${layout.principal.label('entities')}</h4>
-            <table class="ballot-results stackable sortable">
+            <table
+                class="results tablesaw sortable"
+                data-tablesaw-mode="columntoggle"
+                data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
+                data-tablesaw-minimap="">
                 <thead>
                     <tr>
-                        <th i18n:translate="" class="left-aligned">${layout.principal.label('entity')}</th>
-                        <th i18n:translate="" class="left-aligned" tal:condition="layout.principal.has_districts">${layout.principal.label('district')}</th>
-                        <th i18n:translate="" class="left-aligned">Result</th>
-                        <th i18n:translate="" class="right-aligned">Yeas</th>
-                        <th i18n:translate="" class="right-aligned">Nays</th>
-                        <th i18n:translate="" class="right-aligned">Empty</th>
-                        <th i18n:translate="" class="right-aligned">Invalid</th>
-                        <th i18n:translate="" class="right-aligned">Yes %</th>
-                        <th i18n:translate="" class="right-aligned">No %</th>
+                        <th data-tablesaw-priority="persist" i18n:translate="" class="left-aligned">${layout.principal.label('entity')}</th>
+                        <th data-tablesaw-priority="3" i18n:translate="" class="left-aligned" tal:condition="layout.principal.has_districts">${layout.principal.label('district')}</th>
+                        <th data-tablesaw-priority="1" i18n:translate="" class="left-aligned">Result</th>
+                        <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Yeas</th>
+                        <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Nays</th>
+                        <th data-tablesaw-priority="4" i18n:translate="" class="right-aligned">Empty</th>
+                        <th data-tablesaw-priority="4" i18n:translate="" class="right-aligned">Invalid</th>
+                        <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">Yes %</th>
+                        <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">No %</th>
                     </tr>
                 </thead>
                 <tbody>

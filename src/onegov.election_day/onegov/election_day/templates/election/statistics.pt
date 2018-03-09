@@ -17,18 +17,23 @@
 
             <h3 tal:content="layout.title()" />
 
-            <table class="ballot-results stackable sortable">
+            <table
+                class="results tablesaw sortable"
+                data-tablesaw-mode="columntoggle"
+                data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
+                data-tablesaw-minimap=""
+                >
                 <thead>
                     <tr>
-                        <th i18n:translate="" class="left-aligned">${layout.principal.label('entity')}</th>
-                        <th i18n:translate="" class="left-aligned" tal:condition="layout.principal.has_districts">${layout.principal.label('district')}</th>
-                        <th i18n:translate="" class="right-aligned">eligible Voters</th>
-                        <th i18n:translate="" class="right-aligned">Received Ballots</th>
-                        <th i18n:translate="" class="right-aligned">Accounted Ballots</th>
-                        <th i18n:translate="" class="right-aligned">Blank Ballots</th>
-                        <th i18n:translate="" class="right-aligned">Invalid Ballots</th>
-                        <th i18n:translate="" class="right-aligned">Accounted Votes</th>
-                        <th i18n:translate="" class="right-aligned" tal:condition="election.completed">Turnout</th>
+                        <th data-tablesaw-priority="persist" i18n:translate="" class="left-aligned">${layout.principal.label('entity')}</th>
+                        <th data-tablesaw-priority="3" i18n:translate="" class="left-aligned" tal:condition="layout.principal.has_districts">${layout.principal.label('district')}</th>
+                        <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">eligible Voters</th>
+                        <th data-tablesaw-priority="4" i18n:translate="" class="right-aligned">Received Ballots</th>
+                        <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Accounted Ballots</th>
+                        <th data-tablesaw-priority="6" i18n:translate="" class="right-aligned">Blank Ballots</th>
+                        <th data-tablesaw-priority="6" i18n:translate="" class="right-aligned">Invalid Ballots</th>
+                        <th data-tablesaw-priority="4" i18n:translate="" class="right-aligned">Accounted Votes</th>
+                        <th data-tablesaw-priority="1" i18n:translate="" class="right-aligned" tal:condition="election.completed">Turnout</th>
                     </tr>
                 </thead>
                 <tbody>

@@ -33,12 +33,17 @@
                 </div>
             </div>
 
-            <table class="ballot-results stackable sortable">
+            <table
+                class="results tablesaw sortable"
+                data-tablesaw-mode="columntoggle"
+                data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
+                data-tablesaw-minimap=""
+                >
                 <thead>
                     <tr>
-                        <th i18n:translate="">List</th>
-                        <th i18n:translate="single_votes" class="right-aligned">Votes</th>
-                        <th i18n:translate="" class="right-aligned">Mandates</th>
+                        <th data-tablesaw-priority="persist" i18n:translate="">List</th>
+                        <th data-tablesaw-priority="1" i18n:translate="single_votes" class="right-aligned">Votes</th>
+                        <th data-tablesaw-priority="1" i18n:translate="" class="right-aligned">Mandates</th>
                     </tr>
                 </thead>
                 <tbody>

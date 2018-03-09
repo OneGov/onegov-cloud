@@ -1,9 +1,6 @@
 // initialize all foundation functions
 $(document).foundation();
 
-// stack tables wishing to be stacked
-$('.stackable').stacktable();
-
 // collapse tables whising to be collapsible
 $('.collapsible.collapsed tbody tr:not(.total):not(.sticky-row):not(.more)').hide();
 $('.collapsible .more, .collapsible .less').click(function() {

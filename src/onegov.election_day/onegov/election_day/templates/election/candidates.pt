@@ -33,14 +33,18 @@
                 </div>
             </div>
 
-            <table class="ballot-results stackable collapsible collapsed sortable">
+            <table class="results tablesaw collapsible collapsed sortable"
+                data-tablesaw-mode="columntoggle"
+                data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
+                data-tablesaw-minimap=""
+                >
                 <thead>
                     <tr>
-                        <th i18n:translate="">Candidate</th>
-                        <th tal:condition="not:layout.tacit" i18n:translate="single_votes" class="right-aligned">Votes</th>
-                        <th tal:condition="layout.majorz" i18n:translate="" class="right-aligned">Party</th>
-                        <th tal:condition="layout.proporz" i18n:translate="" class="right-aligned">List</th>
-                        <th i18n:translate="" class="right-aligned">Elected</th>
+                        <th data-tablesaw-priority="persist" i18n:translate="">Candidate</th>
+                        <th data-tablesaw-priority="2" tal:condition="not:layout.tacit" i18n:translate="single_votes" class="right-aligned">Votes</th>
+                        <th data-tablesaw-priority="3" tal:condition="layout.majorz" i18n:translate="" class="right-aligned">Party</th>
+                        <th data-tablesaw-priority="3" tal:condition="layout.proporz" i18n:translate="" class="right-aligned">List</th>
+                        <th data-tablesaw-priority="1" i18n:translate="" class="right-aligned">Elected</th>
                     </tr>
                 </thead>
                 <tbody>

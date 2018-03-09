@@ -42,7 +42,7 @@
             </div>
 
             <tal:block tal:repeat="connection connections">
-                <table class="ballot-results">
+                <table class="results">
                     <thead>
                         <tr>
                             <th><span i18n:translate="">List connection</span> ${connection[0]}</th>

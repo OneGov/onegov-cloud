@@ -38,17 +38,22 @@
                 </div>
             </div>
 
-            <table class="ballot-results stackable sortable">
+            <table
+                class="results tablesaw sortable"
+                data-tablesaw-mode="columntoggle"
+                data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
+                data-tablesaw-minimap=""
+                >
                 <thead>
                     <tr>
-                        <th i18n:translate="">Party</th>
+                        <th data-tablesaw-priority="persist" i18n:translate="">Party</th>
                         <tal:block tal:repeat="year years">
-                            <th class="right-aligned"><tal:block i18n:translate="">Mandates</tal:block><tal:block tal:condition="deltas"> (${year})</tal:block></th>
-                            <th class="right-aligned"><tal:block i18n:translate="single_votes">Votes</tal:block><tal:block tal:condition="deltas"> (${year})</tal:block></th>
-                            <th class="right-aligned"><tal:block i18n:translate="single_votes">Votes</tal:block><tal:block tal:condition="deltas"> (${year})</tal:block></th>
+                            <th data-tablesaw-priority="2" class="right-aligned"><tal:block i18n:translate="">Mandates</tal:block><tal:block tal:condition="deltas"> (${year})</tal:block></th>
+                            <th data-tablesaw-priority="5" class="right-aligned"><tal:block i18n:translate="single_votes">Votes</tal:block><tal:block tal:condition="deltas"> (${year})</tal:block></th>
+                            <th data-tablesaw-priority="4" class="right-aligned"><tal:block i18n:translate="single_votes">Votes</tal:block><tal:block tal:condition="deltas"> (${year})</tal:block></th>
                         </tal:block>
                         <tal:block tal:condition="deltas">
-                            <th class="right-aligned" i18n:translate="">Difference</th>
+                            <th data-tablesaw-priority="1" class="right-aligned" i18n:translate="">Difference</th>
                         </tal:block>
                     </tr>
                 </thead>

@@ -32,7 +32,7 @@
                         <h3 i18n:translate="" tal:condition="type == 'vote' and domain == 'canton'">Cantonal Votes</h3>
                         <h3 i18n:translate="" tal:condition="type == 'vote' and domain == 'municipality'">Communal Votes</h3>
 
-                        <table class="overview election stackable" tal:condition="type == 'election'">
+                        <table class="overview election tablesaw" data-tablesaw-mode="stack" tal:condition="type == 'election'">
                             <thead>
                                 <tr>
                                     <th i18n:translate="">Election</th>
@@ -55,7 +55,7 @@
                             </tbody>
                         </table>
 
-                        <table class="overview vote stackable" tal:condition="type == 'vote'">
+                        <table class="overview vote tablesaw" data-tablesaw-mode="stack"  tal:condition="type == 'vote'">
                             <thead>
                                 <tr>
                                     <th i18n:translate="">Vote</th>

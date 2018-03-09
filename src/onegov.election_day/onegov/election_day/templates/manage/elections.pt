@@ -22,7 +22,7 @@
                     No elections yet.
                 </p>
 
-                <table class="elections stackable" tal:condition="groups">
+                <table class="elections tablesaw" data-tablesaw-mode="stack" tal:condition="groups">
                     <thead>
                         <tr>
                             <th i18n:translate>Title</th>

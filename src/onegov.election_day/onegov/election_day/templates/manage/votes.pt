@@ -23,7 +23,7 @@
                     No votes yet.
                 </p>
 
-                <table class="votes stackable" tal:condition="groups">
+                <table class="votes tablesaw" data-tablesaw-mode="stack" tal:condition="groups">
                     <thead>
                         <tr>
                             <th i18n:translate>Title</th>

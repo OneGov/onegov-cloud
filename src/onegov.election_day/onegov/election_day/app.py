@@ -232,11 +232,15 @@ def get_common_asset():
     yield 'd3.tip.js'
     yield 'd3.sankey.js'
 
+    # Tablesaw
+    yield 'tablesaw.css'
+    yield 'tablesaw.jquery.js'
+    yield 'tablesaw-init.js'
+
     # other frameworks
     yield 'fastclick.js'
     yield 'foundation.js'
     yield 'underscore.js'
-    yield 'stacktable.js'
     yield 'iframeResizer.contentWindow.js'
 
 

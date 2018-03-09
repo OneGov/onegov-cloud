@@ -23,7 +23,7 @@
                     No data sources yet.
                 </p>
 
-                <table class="data_sources stackable" tal:condition="data_sources">
+                <table class="data_sources tablesaw" data-tablesaw-mode="stack" tal:condition="data_sources">
                     <thead>
                         <tr>
                             <th i18n:translate>Name</th>

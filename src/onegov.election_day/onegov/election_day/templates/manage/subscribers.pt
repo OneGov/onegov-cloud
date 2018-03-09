@@ -33,7 +33,7 @@
                     No subscribers yet.
                 </p>
 
-                <table class="subscribers stackable" tal:condition="subscribers">
+                <table class="subscribers tablesaw" data-tablesaw-mode="stack" tal:condition="subscribers">
                     <thead>
                         <tr>
                             <th>${address_title}</th>
