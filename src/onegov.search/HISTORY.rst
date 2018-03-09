@@ -1,6 +1,16 @@
 Changelog
 ---------
 
+- Improves the handling of elasticsearch outages.
+
+  Now, whenver elasticsearch is offline, a SearchOfflineError is raised. During
+  subsequent method calls to the elasticsearch client reconnects are only
+  attempted after increasingly longer timeouts (up to 5 minutes).
+
+  This ensures that an elasticsearch outage doesn't slow down the rest of the
+  application as it attempts to reconnect to the server.
+  [href]
+
 1.2.4 (2017-12-29)
 ~~~~~~~~~~~~~~~~~~~
 

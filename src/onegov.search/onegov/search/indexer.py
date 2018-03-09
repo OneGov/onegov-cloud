@@ -2,10 +2,11 @@ import platform
 import re
 
 from copy import deepcopy
-from elasticsearch.exceptions import NotFoundError, TransportError
+from elasticsearch.exceptions import NotFoundError
 from langdetect.lang_detect_exception import LangDetectException
 from onegov.core.utils import is_non_string_iterable
 from onegov.search import log, Searchable, utils
+from onegov.search.errors import SearchOfflineError
 from queue import Queue, Empty, Full
 
 
@@ -172,8 +173,7 @@ class Indexer(object):
     def process_task(self, task):
         try:
             getattr(self, task['action'])(task)
-        except TransportError as e:
-            log.exception("Failure during elasticsearch index task")
+        except SearchOfflineError as e:
             return False
 
         self.queue.task_done()

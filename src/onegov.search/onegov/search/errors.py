@@ -1,0 +1,2 @@
+class SearchOfflineError(Exception):
+    pass

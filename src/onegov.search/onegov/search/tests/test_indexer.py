@@ -2,9 +2,7 @@ import logging
 import pytest
 
 from datetime import datetime
-from elasticsearch import Elasticsearch
-from elasticsearch.exceptions import TransportError
-from onegov.search import Searchable, utils
+from onegov.search import Searchable, SearchOfflineError, utils
 from onegov.search.indexer import (
     Indexer,
     IndexManager,
@@ -555,7 +553,9 @@ def test_elasticsearch_outage(es_client, es_url):
         }
     })
 
-    indexer.es_client.index = Mock(side_effect=TransportError)
+    original = indexer.es_client.transport.perform_request
+    indexer.es_client.transport.perform_request = Mock(
+        side_effect=SearchOfflineError)
 
     for i in range(0, 2):
         assert indexer.process() == 0
@@ -579,7 +579,7 @@ def test_elasticsearch_outage(es_client, es_url):
         assert not indexer.queue.empty()
         assert indexer.failed_task is not None
 
-    indexer.es_client = Elasticsearch(es_url)
+    indexer.es_client.transport.perform_request = original
 
     indexer.es_client.indices.refresh(index='_all')
     assert indexer.es_client.search(index='_all')['hits']['total'] == 0

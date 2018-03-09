@@ -1,14 +1,73 @@
 import certifi
 import morepath
 
+from datetime import datetime
+from elasticsearch import ConnectionError  # shadows a python builtin!
 from elasticsearch import Elasticsearch
+from elasticsearch import Transport
 from more.transaction.main import transaction_tween_factory
-from onegov.search import Search
+from onegov.search import Search, log
+from onegov.search.errors import SearchOfflineError
 from onegov.search.indexer import Indexer
 from onegov.search.indexer import ORMEventTranslator
 from onegov.search.indexer import TypeMappingRegistry
 from onegov.search.utils import searchable_sqlalchemy_models
 from sqlalchemy import inspect
+
+
+class TolerantTransport(Transport):
+    """ A transport class that is less eager to rejoin connections when there's
+    a failure. Additionally logs all Elasticsearch transport errors in one
+    location.
+
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.failure_time = None
+        self.failures = 0
+
+    @property
+    def skip_request(self):
+        """ Returns True if the request should be skipped. """
+
+        if not self.failures:
+            return False
+
+        if not self.seconds_remaining:
+            return False
+
+        return True
+
+    @property
+    def seconds_remaining(self):
+        """ Returns the seconds remaining until the next try or 0.
+
+        For each failure we wait an additional 10s (10s, then 20s, 30s, etc),
+        up to a maximum of 300s (5 minutes).
+        """
+
+        timeout = min((self.failures * 10), 300)
+        elapsed = (datetime.utcnow() - self.failure_time).total_seconds()
+
+        return int(max(timeout - elapsed, 0))
+
+    def perform_request(self, *args, **kwargs):
+        if self.skip_request:
+            log.info(f"Elasticsearch down, retry in {self.seconds_remaining}s")
+            raise SearchOfflineError()
+
+        try:
+            response = super().perform_request(*args, **kwargs)
+        except ConnectionError as e:
+            self.failures += 1
+            self.failure_time = datetime.utcnow()
+
+            log.exception("Elasticsearch cluster is offline")
+            raise SearchOfflineError()
+        else:
+            self.failures = 0
+            return response
 
 
 class ElasticsearchApp(morepath.App):
@@ -81,14 +140,16 @@ class ElasticsearchApp(morepath.App):
         verify_certs = cfg.get('elasticsearch_verify_certs', True)
 
         if verify_certs:
-            self.es_client = Elasticsearch(
-                hosts, verify_certs=True, ca_certs=certifi.where(),
-                sniff_on_connection_fail=True, timeout=5
-            )
+            extra = {'verify_certs': True, 'ca_certs': certifi.where()}
         else:
-            self.es_client = Elasticsearch(
-                hosts, sniff_on_connection_fail=True, timeout=5
-            )
+            extra = {}
+
+        self.es_client = Elasticsearch(
+            hosts=hosts,
+            timeout=3,
+            max_retries=1,
+            transport_class=TolerantTransport,
+            **extra)
 
         if self.has_database_connection:
             self.es_mappings = TypeMappingRegistry()
