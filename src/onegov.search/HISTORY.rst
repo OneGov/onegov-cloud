@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.3.0 (2018-03-09)
+~~~~~~~~~~~~~~~~~~~
+
 - Improves the handling of elasticsearch outages.
 
   Now, whenver elasticsearch is offline, a SearchOfflineError is raised. During
