@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves French translation.
+  [href]
+
 1.3.21 (2018-03-06)
 ~~~~~~~~~~~~~~~~~~~
 

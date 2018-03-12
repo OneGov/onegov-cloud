@@ -171,10 +171,10 @@ msgstr ""
 "facturation a été confirmée."
 
 msgid "Editor"
-msgstr "Éditeur"
+msgstr "Prestataire"
 
 msgid "Editors"
-msgstr "Éditeurs"
+msgstr "Prestataires"
 
 msgid "Opening Hours"
 msgstr "Horaires d'ouverture"
@@ -735,7 +735,7 @@ msgid "Organisers"
 msgstr "Organisateurs"
 
 msgid "Members"
-msgstr "Membres"
+msgstr "Participants"
 
 msgid "Active users"
 msgstr "Utilisateurs actifs"
@@ -1148,7 +1148,7 @@ msgid "Check ticket status"
 msgstr "Vérifier l'état du ticket"
 
 msgid "Pro Juventute Feriennet"
-msgstr "Feriennet de Pro Juventute"
+msgstr "Réseau Vacances de Pro Juventute"
 
 msgid "Pro Juventute Logo"
 msgstr "Logo Pro Juventute"
