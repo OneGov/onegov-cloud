@@ -363,12 +363,20 @@ class AllocationEventInfo(object):
 
     @property
     def event_class(self):
-        if self.availability >= 80.0:
-            return 'event-available'
-        if self.availability >= 20.0:
-            return 'event-partly-available'
+        if self.quota > 1:
+            if self.quota_left == self.quota:
+                return 'event-available'
+            elif self.quota_left > 0:
+                return 'event-partly-available'
+            else:
+                return 'event-unavailable'
         else:
-            return 'event-unavailable'
+            if self.availability >= 80.0:
+                return 'event-available'
+            if self.availability >= 20.0:
+                return 'event-partly-available'
+            else:
+                return 'event-unavailable'
 
     @property
     def event_actions(self):
