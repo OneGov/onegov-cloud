@@ -5,10 +5,12 @@ from onegov.notice.models import OfficialNotice
 from onegov.user import User
 from onegov.user import UserGroup
 from sqlalchemy import asc
+from sqlalchemy import cast
 from sqlalchemy import desc
+from sqlalchemy import func
 from sqlalchemy import inspect
 from sqlalchemy import or_
-from sqlalchemy import func
+from sqlalchemy import String
 
 
 class OfficialNoticeCollectionPagination(Pagination):
@@ -171,6 +173,7 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
             term = '%{}%'.format(self.term)
             query = query.filter(
                 or_(
+                    cast(self.model_class.id, String).ilike(term),
                     self.model_class.title.ilike(term),
                     self.model_class.text.ilike(term),
                     self.model_class.author_name.ilike(term),

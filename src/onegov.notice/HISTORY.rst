@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Allows to search by notice id.
+  [msom]
+
 0.5.0 (2018-02-07)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -143,9 +143,6 @@ def test_notice_collection_search(session):
     assert notices.for_term('Org1').query().count() == 1
     assert notices.for_term('Org').query().count() == 4
 
-    assert notices.for_term('1').query().count() == 2
-    assert notices.for_term('2').query().count() == 2
-
     assert notices.for_term('@example.org').query().count() == 3
     assert notices.for_term('ans').query().count() == 2
 
@@ -155,6 +152,8 @@ def test_notice_collection_search(session):
     assert notices.for_term('Cysat').query().count() == 1
 
     assert notices.for_term('Wynmärkt').query().count() == 1
+
+    assert notices.for_term(str(notice.id).split('-')[0]).query().count() == 1
 
 
 def test_notice_collection_users_and_groups(session):
