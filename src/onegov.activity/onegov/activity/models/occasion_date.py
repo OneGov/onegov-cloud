@@ -1,12 +1,11 @@
 import sedate
 
+from datetime import time
 from enum import IntEnum
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID, UTCDateTime
-from sqlalchemy import case
 from sqlalchemy import event
-from sqlalchemy import func
 from sqlalchemy import CheckConstraint
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
@@ -81,30 +80,25 @@ class OccasionDate(Base, TimestampMixin):
     def duration_in_seconds(self):
         return (self.end - self.start).total_seconds()
 
-    @duration_in_seconds.expression
-    def duration_in_seconds(self):
-        return func.extract('epoch', self.end - self.start)
-
     @hybrid_property
     def duration(self):
         hours = self.duration_in_seconds / 3600
 
-        # defined here and in the expression below!
         if hours <= 6:
             return DAYS.half
         elif hours <= 24:
+            start, end = self.localized_start, self.localized_end
+
+            # if a less than 24 hours long activity ends on another day, the
+            # end time is relevant. An end before 06:00 indicates that this
+            # is an activity that lasts very long. An end after 06:00 is an
+            # multi-day activity.
+            if start.date() != end.date() and end.time() >= time(6, 0):
+                return DAYS.many
+
             return DAYS.full
         else:
             return DAYS.many
-
-    @duration.expression
-    def duration(self):
-
-        # defined here and in the property above!
-        return case((
-            (OccasionDate.duration_in_seconds <= (6 * 3600), int(DAYS.half)),
-            (OccasionDate.duration_in_seconds <= (24 * 3600), int(DAYS.full)),
-        ), else_=int(DAYS.many))
 
     def overlaps(self, other):
         return sedate.overlaps(self.start, self.end, other.start, other.end)

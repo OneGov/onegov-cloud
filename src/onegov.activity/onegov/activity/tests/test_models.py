@@ -629,6 +629,21 @@ def test_occasion_durations(session, owner):
     assert not DAYS.has(retreat.durations, DAYS.full)
     assert not DAYS.has(retreat.durations, DAYS.many)
 
+    # add an occasion with overnight stay which should be categorised as 'many'
+    weekend = occasions.add(
+        start=datetime(2018, 10, 1, 13, 30),
+        end=datetime(2018, 10, 2, 10),
+        timezone="Europe/Zurich",
+        activity=retreat,
+        period=periods.active()
+    )
+    transaction.commit()
+
+    retreat = activities.query().first()
+    assert not DAYS.has(retreat.durations, DAYS.half)
+    assert not DAYS.has(retreat.durations, DAYS.full)
+    assert DAYS.has(retreat.durations, DAYS.many)
+
 
 def test_occasion_durations_query(session, owner):
 
@@ -694,6 +709,24 @@ def test_occasion_durations_query(session, owner):
         .for_filter(duration=DAYS.half)\
         .for_filter(duration=DAYS.many)\
         .query().count() == 2
+
+    # add an occasion with overnight stay which should be categorised as 'many'
+    assert activities.for_filter(duration=DAYS.half).query().count() == 1
+    assert activities.for_filter(duration=DAYS.full).query().count() == 1
+    assert activities.for_filter(duration=DAYS.many).query().count() == 1
+
+    occasions.add(
+        start=datetime(2018, 10, 1, 13, 30),
+        end=datetime(2018, 10, 2, 10),
+        timezone="Europe/Zurich",
+        activity=meeting,
+        period=periods.active()
+    )
+    transaction.commit()
+
+    assert activities.for_filter(duration=DAYS.half).query().count() == 1
+    assert activities.for_filter(duration=DAYS.full).query().count() == 1
+    assert activities.for_filter(duration=DAYS.many).query().count() == 2
 
 
 def test_occasion_ages(session, owner):

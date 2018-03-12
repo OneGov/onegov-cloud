@@ -448,3 +448,9 @@ def add_alignment(context):
         context.operations.add_column('periods', Column(
             'alignment', Text, nullable=True
         ))
+
+
+@upgrade_task('Update duration categories')
+def update_duration_categories(context):
+    for occasion in context.session.query(Occasion):
+        occasion.on_date_change()
