@@ -68,11 +68,13 @@
                                 <td class="right-aligned">${layout.format_number(int(subconnection[1]))}</td>
                             </tr>
                         </tal:block>
+                    </tbody>
+                    <tfoot>
                         <tr class="total">
                             <td i18n:translate="">Total</td>
                             <td class="right-aligned">${layout.format_number(int(connection[1]))}</td>
                         </tr>
-                    </tbody>
+                    </tfoot>
                 </table>
             </tal:block>
         </tal:block>

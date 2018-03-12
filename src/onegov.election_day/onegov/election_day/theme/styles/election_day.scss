@@ -207,6 +207,7 @@ table {
                 background-color: $white;
                 color: $primary-color;
                 cursor: pointer;
+                font-weight: normal;
             }
 
             .st-head-row {
@@ -292,7 +293,10 @@ table {
 
 // Style stack mode
 @media (max-width: 39.9375em) {
-    .tablesaw-stack tbody {
+    .tablesaw-stack tbody,
+    .tablesaw-stack tfoot {
+        background-color: $white;
+
         tr {
             border: 0 !important;
         }

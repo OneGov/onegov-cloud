@@ -57,13 +57,15 @@
                         <td class="answer rejected right-aligned" tal:condition="candidate[2] == False" i18n:translate="">No</td>
                         <td class="answer right-aligned" tal:condition="candidate[2] == None" i18n:translate=""></td>
                     </tr>
-                    <tr class="more static" tal:condition="not: election.tacit">
+                </tbody>
+                <tfoot>
+                    <tr class="more" tal:condition="not: election.tacit">
                         <td colspan="4" i18n:translate="">All candidates</td>
                     </tr>
-                    <tr class="less static" tal:condition="not: election.tacit">
+                    <tr class="less" tal:condition="not: election.tacit">
                         <td colspan="4" i18n:translate="">Elected candidates only</td>
                     </tr>
-                </tbody>
+                </tfoot>
             </table>
         </tal:block>
 

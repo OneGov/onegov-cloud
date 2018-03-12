@@ -37,17 +37,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="total static" tal:condition="layout.summarize">
-                        <td i18n:translate="">Total</td>
-                        <td tal:condition="layout.principal.has_districts"></td>
-                        <td class="right-aligned">${layout.format_number(election.eligible_voters)}</td>
-                        <td class="right-aligned">${layout.format_number(election.received_ballots)}</td>
-                        <td class="right-aligned">${layout.format_number(election.accounted_ballots)}</td>
-                        <td class="right-aligned">${layout.format_number(election.blank_ballots)}</td>
-                        <td class="right-aligned">${layout.format_number(election.invalid_ballots)}</td>
-                        <td class="right-aligned">${layout.format_number(election.accounted_votes)}</td>
-                        <td class="right-aligned" tal:condition="election.completed">${'{0:.2f}'.format(election.turnout)} %</td>
-                    </tr>
                     <tr tal:repeat="result election.results">
                         <tal:block condition="not: result.counted">
                             <td>${layout.format_name(result)}</td>
@@ -66,7 +55,9 @@
                             <td class="right-aligned" tal:condition="election.completed">${'{0:.2f}'.format(result.turnout)} %</td>
                         </tal:block>
                     </tr>
-                    <tr class="total static" tal:condition="layout.summarize">
+                </tbody>
+                <tfoot tal:condition="layout.summarize">
+                    <tr class="total">
                         <td i18n:translate="">Total</td>
                         <td tal:condition="layout.principal.has_districts"></td>
                         <td class="right-aligned">${layout.format_number(election.eligible_voters)}</td>
@@ -77,7 +68,7 @@
                         <td class="right-aligned">${layout.format_number(election.accounted_votes)}</td>
                         <td class="right-aligned" tal:condition="election.completed">${'{0:.2f}'.format(election.turnout)} %</td>
                     </tr>
-                </tbody>
+                </tfoot>
             </table>
 
         </tal:block>
