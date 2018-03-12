@@ -4,7 +4,10 @@ Changelog
 - Allows to search by notice id.
   [msom]
 
-1.13.8 (2018-03-06)
+- Limits the title of a notice to 60 characters.
+  [msom]
+
+1.11.8 (2018-03-06)
 ~~~~~~~~~~~~~~~~~~~
 
 - Splits e-mails into transactional/marketing.

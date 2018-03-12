@@ -17,6 +17,7 @@ from wtforms import StringField
 from wtforms import TextAreaField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import InputRequired
+from wtforms.validators import Length
 
 
 class NoticeForm(Form):
@@ -31,8 +32,10 @@ class NoticeForm(Form):
     title = StringField(
         label=_("Title"),
         validators=[
-            InputRequired()
-        ]
+            InputRequired(),
+            Length(max=60)
+        ],
+        render_kw={'maxlength': 60},
     )
 
     organization = SelectField(
