@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.1.0 (2018-03-12)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds election compounds.
   [msom]
