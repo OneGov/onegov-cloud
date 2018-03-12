@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a setter for elections to election compounds.
+  [msom]
+
 3.1.0 (2018-03-12)
 ~~~~~~~~~~~~~~~~~~~
 

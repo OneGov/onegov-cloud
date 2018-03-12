@@ -212,10 +212,14 @@ def test_election_compound(session):
     )
     session.flush()
 
-    election_compound._elections = {
-        id_: None
-        for id_ in ('invalid-election', 'first-election', 'second-election')
+    election_compound.elections = session.query(Election).all()
+    assert set([election.id for election in election_compound.elections]) == {
+        'first-election', 'second-election'
     }
+
+    election_compound.elections = (
+        'invalid-election', 'first-election', 'second-election'
+    )
     assert set([election.id for election in election_compound.elections]) == {
         'first-election', 'second-election'
     }
@@ -345,7 +349,7 @@ def test_election_compound_changes(session):
     assert election_compound.last_result_change is None
 
     with freeze_time("2011-01-01"):
-        election_compound._elections = {'majorz': None, 'proporz': None}
+        election_compound.elections = ['majorz', 'proporz']
         session.flush()
     assert election_compound.last_modified.isoformat().startswith('2016')
     assert election_compound.last_result_change.isoformat().startswith('2016')
@@ -373,7 +377,7 @@ def test_election_compound_export(session):
 
     assert election_compound.export() == []
 
-    election_compound._elections = {'majorz': None}
+    election_compound.elections = ['majorz']
     assert election_compound.export() == [
         {
             'compound_title_de_CH': 'Elections',
@@ -442,7 +446,7 @@ def test_election_compound_export(session):
         }
     ]
 
-    election_compound._elections = {'majorz': None, 'proporz': None}
+    election_compound.elections = ['majorz', 'proporz']
     assert election_compound.export() == [
         {
             'compound_title_de_CH': 'Elections',

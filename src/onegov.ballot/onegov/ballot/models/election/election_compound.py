@@ -69,6 +69,10 @@ class ElectionCompound(
         query = query.order_by(Election.shortcode)
         return query
 
+    @elections.setter
+    def elections(self, value):
+        self._elections = {getattr(item, 'id', item): None for item in value}
+
     @property
     def number_of_mandates(self):
         """ The (total) number of mandates. """
