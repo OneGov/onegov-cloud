@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.25.1 (2018-03-12)
+~~~~~~~~~~~~~~~~~~~
+
 - Changes availability display for resources with quotas.
   [href]
 
