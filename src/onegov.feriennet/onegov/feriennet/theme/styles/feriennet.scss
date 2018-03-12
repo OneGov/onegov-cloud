@@ -583,6 +583,12 @@ ul.tags {
     }
 }
 
+@media print {
+    .factoids > div {
+        margin-left: 2.5rem;
+    }
+}
+
 /*
     Call to Action
 */

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves activity print result.
+  [href]
+
 - Improves French translation.
   [href]
 
