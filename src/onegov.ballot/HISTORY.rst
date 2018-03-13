@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.1.2 (2018-03-13)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes upgrade steps.
   [msom]
