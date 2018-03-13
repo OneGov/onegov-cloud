@@ -71,13 +71,14 @@ class ElectionCompoundForm(Form):
     def validate(self):
         result = super(ElectionCompoundForm, self).validate()
 
-        query = self.request.session.query(Election.type.distinct())
-        query = query.filter(Election.id.in_(self.elections.data))
-        if query.count() > 1:
-            self.elections.errors.append(
-                _("Select either majorz or proporz elections.")
-            )
-            result = False
+        if self.elections.data:
+            query = self.request.session.query(Election.type.distinct())
+            query = query.filter(Election.id.in_(self.elections.data))
+            if query.count() > 1:
+                self.elections.errors.append(
+                    _("Select either majorz or proporz elections.")
+                )
+                result = False
 
         return result
 
@@ -110,7 +111,7 @@ class ElectionCompoundForm(Form):
         model.date = self.date.data
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
-        model._elections = {id_: None for id_ in self.elections.data}
+        model.elections = self.elections.data
 
         titles = {}
         if self.election_de.data:

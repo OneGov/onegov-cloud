@@ -4,7 +4,6 @@ from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.models import Principal
 from onegov.election_day.utils import add_last_modified_header
-from onegov.election_day.utils import get_archive_links
 from onegov.election_day.utils import get_summaries
 
 
@@ -54,7 +53,10 @@ def view_archive_json(self, request):
         'canton': request.app.principal.id,
         'name': request.app.principal.name,
         'results': results,
-        'archive': get_archive_links(self, request)
+        'archive': {
+            str(year): request.link(self.for_date(year))
+            for year in self.get_years()
+        }
     }
 
 
@@ -106,5 +108,8 @@ def view_principal_json(self, request):
         'canton': self.id,
         'name': self.name,
         'results': latest,
-        'archive': get_archive_links(archive, request)
+        'archive': {
+            str(year): request.link(archive.for_date(year))
+            for year in archive.get_years()
+        }
     }

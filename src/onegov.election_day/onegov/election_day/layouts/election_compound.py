@@ -51,11 +51,12 @@ class ElectionCompoundLayout(DefaultLayout):
 
     @cached_property
     def majorz(self):
-        return not self.proporz
+        if not self.model.elections:
+            return False
+        return self.model.elections[0].type == 'majorz'
 
     @cached_property
     def proporz(self):
-        election = self.model.elections.first()
-        if election and election.type == 'proporz':
-            return True
-        return False
+        if not self.model.elections:
+            return False
+        return self.model.elections[0].type == 'proporz'

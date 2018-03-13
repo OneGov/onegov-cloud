@@ -19,6 +19,7 @@ def test_archived_result(session):
     result.name = 'name'
     result.shortcode = 'shortcode'
     result.elected_candidates = [('Joe', 'Quimby')]
+    result.elections = ['https://localhost/1', 'https://localhost/1']
     result.answer = 'rejected'
     result.nays_percentage = 20.5
     result.yeas_percentage = 79.5
@@ -46,6 +47,7 @@ def test_archived_result(session):
     assert result.name == 'name'
     assert result.shortcode == 'shortcode'
     assert result.elected_candidates == [('Joe', 'Quimby')]
+    assert result.elections == ['https://localhost/1', 'https://localhost/1']
     assert result.answer == 'rejected'
     assert result.nays_percentage == 20.5
     assert result.yeas_percentage == 79.5
@@ -60,7 +62,8 @@ def test_archived_result(session):
         'yeas_percentage': 79.5,
         'counted': True,
         'completed': True,
-        'elected_candidates': [('Joe', 'Quimby')]
+        'elected_candidates': [('Joe', 'Quimby')],
+        'elections': ['https://localhost/1', 'https://localhost/1']
     }
 
     # Test progress
@@ -106,6 +109,8 @@ def test_archived_result(session):
     assert copied.type == 'vote'
     assert copied.name == 'name'
     assert copied.shortcode == 'shortcode'
+    assert copied.elected_candidates == [('Joe', 'Quimby')]
+    assert copied.elections == ['https://localhost/1', 'https://localhost/1']
     assert copied.total_entities == 10
     assert copied.counted_entities == 5
     assert copied.progress == (5, 10)
@@ -120,7 +125,8 @@ def test_archived_result(session):
         'yeas_percentage': 79.5,
         'counted': True,
         'completed': True,
-        'elected_candidates': [('Joe', 'Quimby')]
+        'elected_candidates': [('Joe', 'Quimby')],
+        'elections': ['https://localhost/1', 'https://localhost/1']
     }
     assert copied.shortcode == 'shortcode'
 
