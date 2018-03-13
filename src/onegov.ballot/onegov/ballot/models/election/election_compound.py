@@ -67,7 +67,7 @@ class ElectionCompound(
         query = object_session(self).query(Election)
         query = query.filter(Election.id.in_(self._elections))
         query = query.order_by(Election.shortcode)
-        return query
+        return query.all()
 
     @elections.setter
     def elections(self, value):

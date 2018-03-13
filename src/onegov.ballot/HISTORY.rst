@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Returns elections of election compounds alwyas as lists.
+  [msom]
+
 3.1.2 (2018-03-13)
 ~~~~~~~~~~~~~~~~~~~
 
