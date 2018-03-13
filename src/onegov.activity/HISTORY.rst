@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.7.3 (2018-03-13)
+~~~~~~~~~~~~~~~~~~~
 
 - Categorises occasions as spanning multiple days more eagerly.
   [href]
