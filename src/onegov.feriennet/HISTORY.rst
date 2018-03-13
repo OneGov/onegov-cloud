@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.22 (2018-03-13)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to view and print the invoice via the billing.
   [href]
