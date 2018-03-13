@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.25.2 (2018-03-13)
+~~~~~~~~~~~~~~~~~~~
+
 - Improves page hidden link hint.
   [href]
 
