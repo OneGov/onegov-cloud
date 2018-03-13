@@ -66,6 +66,17 @@ def view_billing(self, request, form):
         if not self.period.finalized:
             return
 
+        yield Link(
+            _("Show invoice"),
+            attrs={'class': 'show-invoice'},
+            url=request.class_link(
+                InvoiceItemCollection, {
+                    'username': details.first.username,
+                    'invoice': self.period.id.hex
+                }
+            )
+        )
+
         if details.has_online_payments:
             yield Link(
                 _("Show online payments"),

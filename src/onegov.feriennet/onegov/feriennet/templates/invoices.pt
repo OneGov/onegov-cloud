@@ -8,6 +8,33 @@
             <tal:block condition="not: bills" i18n:translate>No bills created yet.</tal:block>
 
             <div class="bills" tal:condition="bills">
+                <div class="bills-header show-for-print">
+                    <div class="bill-creditor"
+                         tal:define="contact layout.org.meta.contact_html|nothing; contact_url None"
+                         condition="contact">
+
+                        <metal:b use-macro="layout.macros['footer_contact']" />
+                    </div>
+
+                    <div class="bill-debtor">
+                        <tal:b condition="user.data.get('organisation')">
+                            <span>${user.data['organisation']}</span><br>
+                        </tal:b>
+
+                        <tal:b condition="user.realname">
+                            <span>${user.realname}</span><br>
+                        </tal:b>
+
+                        <tal:b condition="user.data.get('address')">
+                            <span class="newlines">${user.data['address']}</span><br>
+                        </tal:b>
+
+                        <span tal:condition="user.data.get('zip_code')">${user.data['zip_code']}</span>
+                        <span tal:condition="user.data.get('place')">${user.data['place']}</span>
+                        <br tal:condition="user.data.get('zip_code') or user.data.get('place')">
+                    </div>
+                </div>
+
                 <div class="bill ${details.paid and 'paid' or 'unpaid'}" id="${details.id}" tal:repeat="(title, details) bills.items()">
                     <h3>${details.title}</h3>
 
@@ -18,12 +45,12 @@
                         </tal:block>
                     </strong>
 
-                    <button id="button-${details.id}" data-toggle="#details-${details.id}" class="untoggled">
+                    <button id="button-${details.id}" data-toggle="#details-${details.id}" class="${details.paid and 'untoggled' or 'toggled'} hide_for-print">
                         <span i18n:translate class="show-for-sr">Show Details</span>
                         <i class="fa fa-angle-double-down" aria-hidden="true"></i>
                     </button>
 
-                    <div id="details-${details.id}" class="invoice-items-list" style="display: none;">
+                    <div id="details-${details.id}" class="invoice-items-list" style="${details.paid and 'display: none;' or ''}">
                         <ul>
                             <tal:block repeat="(group, groupitems) details.items.items()">
                                 <li class="item-group">
@@ -42,7 +69,7 @@
                         </ul>
                     </div>
 
-                    <div class="invoice-items-payment" tal:condition="payment_provider and not details.paid">
+                    <div class="invoice-items-payment hide-for-print" tal:condition="payment_provider and not details.paid">
                         <div class="row">
                             <div class="columns small-12">
                                 <h4 i18n:translate>Online Payment</h4>
@@ -98,8 +125,8 @@
                 </div>
             </div>
         </div>
-        <div class="columns small-12 medium-4">
-            <tal:block metal:use-macro="layout.macros.users" />
+        <div class="columns small-12 medium-4 hide-for-print">
+            <tal:block metal:use-macro="layout.macros.users" define="model model.for_invoice(invoice=None)"/>
         </div>
     </div>
 

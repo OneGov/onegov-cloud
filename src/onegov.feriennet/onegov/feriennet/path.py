@@ -186,17 +186,18 @@ def get_invoice_action(request, app, id, action, extend_to=None):
 @FeriennetApp.path(
     model=InvoiceItemCollection,
     path='/my-bills')
-def get_my_invoies(request, app, username=None):
+def get_my_invoies(request, app, username=None, invoice=None):
 
-    # only admins can actually specify the username
+    # only admins can actually specify the username and/or invoice
     if not request.is_admin:
         username = request.current_username
+        invoice = None
 
     # the default username is the current user
     if not username:
         username = request.current_username
 
-    return InvoiceItemCollection(app.session(), username)
+    return InvoiceItemCollection(app.session(), username, invoice)
 
 
 @FeriennetApp.path(

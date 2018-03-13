@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to view and print the invoice via the billing.
+  [href]
+
 - Improves activity print result.
   [href]
 

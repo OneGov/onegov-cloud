@@ -1286,6 +1286,19 @@ ul.tags {
     }
 }
 
+.bills-header {
+    display: flex;
+    padding-left: 1.6rem;
+
+    .bill-creditor {
+        width: 50%;
+
+        h2 {
+            display: none;
+        }
+    }
+}
+
 .bill {
     border-radius: 2px;
     margin-bottom: 1rem;
@@ -1436,6 +1449,11 @@ ul.tags {
 
     .remove-manual.extend-to-family::before {
         @include icon('\f1f8');
+        margin-right: 1ex;
+    }
+
+    .show-invoice::before {
+        @include icon('\f002');
         margin-right: 1ex;
     }
 

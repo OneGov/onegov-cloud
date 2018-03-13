@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-03-01 16:33+0100\n"
+"POT-Creation-Date: 2018-03-13 13:17+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1700,6 +1700,9 @@ msgstr "${count} paiements importés"
 
 msgid "No payments could be imported"
 msgstr "Aucun paiement n'a pu être importé"
+
+msgid "Show invoice"
+msgstr "Afficher la facture"
 
 msgid "No transactions were found in the given file"
 msgstr "Aucune transaction n'a été trouvée dans le fichier donné"
