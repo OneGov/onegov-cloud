@@ -188,13 +188,13 @@ The file format also does not contain any information on whether an individual m
 4 WabstiCExport Majorz
 ----------------------
 
-Version `2.2` is supported, please refer to the documentation provided by the exporter program for more information about the columns of the different files.
+Version `>= 2.2` is supported, please refer to the documentation provided by the exporter program for more information about the columns of the different files.
 
 
 5 WabstiCExport Proporz
 -----------------------
 
-Version `2.2` is supported, please refer to the documentation provided by the exporter program for more information about the columns of the different files.
+Version `>= 2.2` is supported, please refer to the documentation provided by the exporter program for more information about the columns of the different files.
 
 
 6 Party results
@@ -221,4 +221,4 @@ Name|Description
 7 Tacit Election
 ----------------
 
-Tacit elections can be uploaded by using the internal format with every vote set to `0`.
+Tacit elections can be uploaded by using the OneGov format with every vote set to `0`.

@@ -117,4 +117,4 @@ Municipalities are deemed not to have been counted yet if one of the following t
 4 WabstiCExport
 ---------------
 
-Version `2.2` is supported, please refer to the documentation provided by the exporter program for more information about the columns of the different files.
+Version `>= 2.2` is supported, please refer to the documentation provided by the exporter program for more information about the columns of the different files.

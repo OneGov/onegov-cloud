@@ -187,13 +187,13 @@ Il format da datoteca na cuntegna naginas infurmaziuns definitivas, sch'ina sing
 4 WabstiCExport Maiorz
 ----------------------
 
-Sustegnida vegn la versiun '2.2'. Las differentas colonnas da las differentas datotecas èn definidas en la documentaziun dal program d'export.
+Sustegnida vegn la versiun '>= 2.2'. Las differentas colonnas da las differentas datotecas èn definidas en la documentaziun dal program d'export.
 
 
 5 WabstiCExport Proporz
 -----------------------
 
-Sustegnida vegn la versiun '2.2'. Las differentas colonnas da las differentas datotecas èn definidas en la documentaziun dal program d'export.
+Sustegnida vegn la versiun '>= 2.2'. Las differentas colonnas da las differentas datotecas èn definidas en la documentaziun dal program d'export.
 
 
 6 Party results
@@ -220,4 +220,4 @@ Num|Descripziun
 7 Elecziun taciturna
 --------------------
 
-Per elecziuns taciturnas po vegnir duvrà il format intern. En quest cas vegnan tut las vuschs messas a `0`.
+Per elecziuns taciturnas po vegnir duvrà il format OneGov. En quest cas vegnan tut las vuschs messas a `0`.

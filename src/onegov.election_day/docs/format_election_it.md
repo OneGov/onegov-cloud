@@ -185,13 +185,13 @@ Il formato del file, inoltre, non contiene alcuna informazione sul fatto che un 
 4 WabstiCExport Sistema Maggioritario
 -------------------------------------
 
-La versione `2.2` è supportata. Consulta la documentazione del programma di esportazione per ulteriori informazioni riguardo le colonne dei vari file.
+La versione `>= 2.2` è supportata. Consulta la documentazione del programma di esportazione per ulteriori informazioni riguardo le colonne dei vari file.
 
 
 5 WabstiCExport Sistema Proporzionale
 -------------------------------------
 
-La versione `2.2` è supportata. Consulta la documentazione del programma di esportazione per ulteriori informazioni riguardo le colonne dei vari file.
+La versione `>= 2.2` è supportata. Consulta la documentazione del programma di esportazione per ulteriori informazioni riguardo le colonne dei vari file.
 
 
 6 Party results
@@ -218,4 +218,4 @@ Nome|Descrizione
 7 Elezione tacita
 -----------------
 
-Si possono caricare delle elezioni tacite usando il formato interno con ogni voto impostato a `0`.
+Si possono caricare delle elezioni tacite usando il formato OneGov con ogni voto impostato a `0`.

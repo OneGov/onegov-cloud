@@ -16,7 +16,7 @@ Eine "Gemeinde" kann auch ein Bezirk, ein Wahlkreis etc. sein.
 7. [Stille Wahl](#7-stille-wahl)
 
 1 OneGov
-----------
+--------
 
 Das Format, welche von der Web-Applikation für den Export verwendet wird, besteht aus einer einzelnen Datei pro Wahl. Es gibt für jede Gemeinde und Kandidat eine Zeile.
 
@@ -186,12 +186,12 @@ Das Datenformat enhält auch keine Information dazu, ob eine einzelne Gemeinde f
 4 WabstiCExport Majorz
 ----------------------
 
-Es wird die Version `2.2` wird unterstützt. Die verschiedenen Spalten der verschiedenen Dateien sind in der Dokumentation des Exporter-Programms definiert.
+Es wird die Version `>= 2.2` unterstützt. Die verschiedenen Spalten der verschiedenen Dateien sind in der Dokumentation des Exporter-Programms definiert.
 
 5 WabstiCExport Proporz
 -----------------------
 
-Es wird die Version `2.2` wird unterstützt. Die verschiedenen Spalten der verschiedenen Dateien sind in der Dokumentation des Exporter-Programms definiert.
+Es wird die Version `>= 2.2` unterstützt. Die verschiedenen Spalten der verschiedenen Dateien sind in der Dokumentation des Exporter-Programms definiert.
 
 
 6 Parteiresultate
@@ -219,4 +219,4 @@ Name|Beschreibung
 7 Stille Wahl
 -------------
 
-Für stille Wahlen kann das interne Format verwendet werden. Alle Stimmen werden dabei auf `0` gesetzt.
+Für stille Wahlen kann das OneGov Format verwendet werden. Alle Stimmen werden dabei auf `0` gesetzt.

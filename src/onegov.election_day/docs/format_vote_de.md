@@ -15,7 +15,7 @@ Inhalt
 
 
 1 Standardformat
-------------------
+----------------
 
 Pro Abstimmungsvorlage besteht in der Regel eine CSV/Excel Datei. Beinhaltet die Abstimmung jedoch ein Gegenvorschlag und eine Stichfrage, dann müssen drei Dateien geliefert werden: Eine Datei mit den Resultaten der Abstimmung, eine Datei mit den Resultaten des Gegenvorschlags und eine Datei mit den Resultaten der Stichfrage.
 
@@ -120,4 +120,4 @@ Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bed
 4 WabstiCExport
 ---------------
 
-Es wird die Version `2.2` wird unterstützt. Die verschiedenen Spalten der verschiedenen Dateien sind in der Dokumenation des Exporter-Programms definiert.
+Es wird die Version `>= 2.2` unterstützt. Die verschiedenen Spalten der verschiedenen Dateien sind in der Dokumenation des Exporter-Programms definiert.

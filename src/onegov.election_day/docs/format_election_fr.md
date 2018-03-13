@@ -185,13 +185,13 @@ Le format de fichier ne contient également aucune information sur l'état du co
 4 WabstiCExport Majorz
 ----------------------
 
-La version `2.2` est prise en charge, veuillez vous référer à la documentation fournie par le programme exportateur pour plus d'informations concernant les colonnes des différents fichiers.
+La version `>= 2.2` est prise en charge, veuillez vous référer à la documentation fournie par le programme exportateur pour plus d'informations concernant les colonnes des différents fichiers.
 
 
 5 WabstiCExport Proporz
 -----------------------
 
-La version `2.2` est prise en charge, veuillez vous référer à la documentation fournie par le programme exportateur pour plus d'informations concernant les colonnes des différents fichiers.
+La version `>= 2.2` est prise en charge, veuillez vous référer à la documentation fournie par le programme exportateur pour plus d'informations concernant les colonnes des différents fichiers.
 
 
 6 Party results
@@ -219,4 +219,4 @@ Nom|Description
 7 Élection tacite
 -----------------
 
-Les élections tacites peuvent être mises en ligne en utilisant le format interne, chaque vote devant être configuré sur `0`.
+Les élections tacites peuvent être mises en ligne en utilisant le format OneGov, chaque vote devant être configuré sur `0`.
