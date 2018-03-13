@@ -1903,7 +1903,7 @@ div#redactor-droparea {
     @include prefix(animation-duration, .7s);
     @include prefix(animation-fill-mode, forwards);
     font-family: 'FontAwesome';
-    margin-left: 3px;
+    margin-left: 5px;
 }
 
 .flash.success > a::after {
