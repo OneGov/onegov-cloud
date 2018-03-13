@@ -29,8 +29,8 @@ HEADERS_CONNECTIONS = [
     'luv',
 ]
 
-HEADERS_RESULT = [
-    'id',
+HEADERS_CANDIDATES = [
+    'id'
 ]
 
 HEADERS_STATS = [
@@ -70,14 +70,14 @@ def parse_election_result(line, errors, entities):
 
 def parse_list(line, errors):
     try:
-        id = int(line.liste_id or 0)
+        list_id = int(line.liste_id or 0)
         name = line.liste_code
     except ValueError:
         errors.append(_("Invalid list values"))
     else:
         return List(
             id=uuid4(),
-            list_id=id,
+            list_id=list_id,
             number_of_mandates=0,
             name=name,
         )
@@ -130,7 +130,7 @@ def parse_panachage_results(line, errors, panachage):
 
 def parse_candidate(line, errors):
     try:
-        id = int(line.liste_kandid or 0)
+        candidate_id = int(line.liste_kandid or 0)
         family_name = line.kand_nachname
         first_name = line.kand_vorname
     except ValueError:
@@ -138,7 +138,7 @@ def parse_candidate(line, errors):
     else:
         return Candidate(
             id=uuid4(),
-            candidate_id=id,
+            candidate_id=candidate_id,
             family_name=family_name,
             first_name=first_name,
             elected=False
@@ -159,7 +159,7 @@ def parse_candidate_result(line, errors):
 
 def parse_connection(line, errors):
     try:
-        id = int(line.liste or 0)
+        list_id = int(line.liste or 0)
         connection_id = line.lv
         subconnection_id = line.luv
     except ValueError:
@@ -173,7 +173,7 @@ def parse_connection(line, errors):
             id=uuid4(),
             connection_id=subconnection_id,
         ) if subconnection_id else None
-        return id, connection, subconnection
+        return list_id, connection, subconnection
 
     return None, None, None
 
@@ -282,8 +282,9 @@ def import_election_wabsti_proporz(
             indexes = dict([(item.id, key) for key, item in lists.items()])
             for line in csv.lines:
                 line_errors = []
-                id, connection, subconnection = parse_connection(line,
-                                                                 line_errors)
+                list_id, connection, subconnection = parse_connection(
+                    line, line_errors
+                )
 
                 if line_errors:
                     errors.extend(
@@ -294,33 +295,34 @@ def import_election_wabsti_proporz(
                     )
                     continue
 
-                if id not in lists:
+                if list_id not in lists:
                     continue
 
                 if connection:
                     connection = connections.setdefault(
                         connection.connection_id, connection
                     )
-                    lists[id].connection_id = connection.id
+                    lists[list_id].connection_id = connection.id
                     if subconnection:
                         subconnection = subconnections.setdefault(
                             subconnection.connection_id, subconnection
                         )
                         subconnection.parent_id = connection.id
-                        lists[id].connection_id = subconnection.id
+                        lists[list_id].connection_id = subconnection.id
 
     # The results file has one elected candidate per line
     filename = _("Elected Candidates")
     if elected_file and elected_mimetype:
         csv, error = load_csv(
-            elected_file, elected_mimetype, expected_headers=HEADERS_RESULT,
+            elected_file, elected_mimetype,
+            expected_headers=HEADERS_CANDIDATES,
             filename=filename
         )
         if error:
             # Wabsti files are sometimes UTF-16
             csv, utf16_error = load_csv(
                 elected_file, elected_mimetype,
-                expected_headers=HEADERS_RESULT, filename=filename,
+                expected_headers=HEADERS_CANDIDATES, filename=filename,
                 encoding='utf-16-le'
             )
             if utf16_error:
@@ -331,7 +333,7 @@ def import_election_wabsti_proporz(
             indexes = dict([(item.id, key) for key, item in lists.items()])
             for line in csv.lines:
                 try:
-                    id = int(line.id or 0)
+                    candidate_id = int(line.id or 0)
                 except ValueError:
                     errors.append(
                         FileImportError(
@@ -341,9 +343,9 @@ def import_election_wabsti_proporz(
                         )
                     )
                 else:
-                    if id in candidates:
-                        candidates[id].elected = True
-                        index = indexes[candidates[id].list_id]
+                    if candidate_id in candidates:
+                        candidates[candidate_id].elected = True
+                        index = indexes[candidates[candidate_id].list_id]
                         lists[index].number_of_mandates = 1 + \
                             lists[index].number_of_mandates
                     else:
@@ -456,8 +458,7 @@ def import_election_wabsti_proporz(
         election.candidates.append(candidate)
 
     for result in results.values():
-        id = result.entity_id
-        for list_result in list_results.get(id, {}).values():
+        for list_result in list_results.get(result.entity_id, {}).values():
             result.list_results.append(list_result)
         election.results.append(result)
 

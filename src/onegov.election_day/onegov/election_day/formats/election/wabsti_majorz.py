@@ -18,7 +18,7 @@ HEADERS = [
     # 'wzungueltig' or 'stimmungueltig'
 ]
 
-HEADERS_RESULT = [
+HEADERS_CANDIDATES = [
     'id',
     'name',
     'vorname',
@@ -218,14 +218,15 @@ def import_election_wabsti_majorz(
     filename = _("Elected Candidates")
     if elected_file and elected_mimetype:
         csv, error = load_csv(
-            elected_file, elected_mimetype, expected_headers=HEADERS_RESULT,
+            elected_file, elected_mimetype,
+            expected_headers=HEADERS_CANDIDATES,
             filename=filename
         )
         if error:
             # Wabsti files are sometimes UTF-16
             csv, utf16_error = load_csv(
                 elected_file, elected_mimetype,
-                expected_headers=HEADERS_RESULT, encoding='utf-16-le'
+                expected_headers=HEADERS_CANDIDATES, encoding='utf-16-le'
             )
             if utf16_error:
                 errors.append(error)
