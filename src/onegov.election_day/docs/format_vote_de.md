@@ -1,25 +1,48 @@
-Format Spezifikation Abstimmungen
-=================================
+# Format Spezifikation Abstimmungen
 
 Als Dateiformate werden Dateien akzeptiert, welche von Hand, vom Wahlprogrammen "Wabsti Wahlen und Abstimmungen (VRSG)" oder der Webapplikation selbst generiert werden.
 
 Eine "Gemeinde" kann auch ein Bezirk, ein Wahlkreis etc. sein.
 
-Inhalt
-------
+## Inhalt
 
-1. [Standardformat](#1-standardformat)
-2. [OneGov](#2-onegov)
-3. [Wabsti](#3-wabsti)
-4. [WabstiCExport](#4-wabsticexport)
+<!-- TOC START min:1 max:4 link:true update:true -->
+- [Format Spezifikation Abstimmungen](#format-spezifikation-abstimmungen)
+  - [Inhalt](#inhalt)
+  - [Vorbemerkungen](#vorbemerkungen)
+    - [Einheiten](#einheiten)
+  - [Formate](#formate)
+    - [Standardformat](#standardformat)
+      - [Spalten](#spalten)
+      - [Temporäre Resultate](#temporre-resultate)
+      - [Vorlage](#vorlage)
+    - [OneGov](#onegov)
+      - [Spalten](#spalten-1)
+      - [Temporäre Resultate](#temporre-resultate-1)
+      - [Vorlage](#vorlage-1)
+    - [Wabsti](#wabsti)
+      - [Spalten](#spalten-2)
+      - [Temporäre Resultate](#temporre-resultate-2)
+      - [Vorlage](#vorlage-2)
+    - [WabstiCExport](#wabsticexport)
+
+<!-- TOC END -->
 
 
-1 Standardformat
-----------------
+
+## Vorbemerkungen
+
+### Einheiten
+
+Eine Einheit entspricht einer Gemeinde (kantonale Instanzen, kommunale Instanzen ohne Stadtteilen) oder einem Stadtteil (kommunale Instanzen mit Stadtteilen).
+
+## Formate
+
+### Standardformat
 
 Pro Abstimmungsvorlage besteht in der Regel eine CSV/Excel Datei. Beinhaltet die Abstimmung jedoch ein Gegenvorschlag und eine Stichfrage, dann müssen drei Dateien geliefert werden: Eine Datei mit den Resultaten der Abstimmung, eine Datei mit den Resultaten des Gegenvorschlags und eine Datei mit den Resultaten der Stichfrage.
 
-### Spalten
+#### Spalten
 
 Jede Zeile enthält das Resultat einer einzelnen Gemeinde, sofern diese
 vollständig ausgezählt wurde. Folgende Spalten werden dabei in der hier
@@ -34,21 +57,20 @@ Name|Beschreibung
 `Leere Stimmzettel`|Die Anzahl leer eingelegter Stimmzettel. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
 `Ungültige Stimmzettel`|Die Anzahl ungültiger Stimmzettel. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
 
-### Temporäre Resultate
+#### Temporäre Resultate
 
 Gemeinden gelten als noch nicht ausgezählt, falls die Gemeinde nicht in den Resultaten enthalten ist.
 
-### Vorlage
+#### Vorlage
 
 - [vote_standard.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/vote_standard.csv)
 
+### OneGov
 
-2 OneGov
---------
 
 Das Format, welche von der Web-Applikation für den Export verwendet wird, besteht aus einer einzelnen Datei pro Abstimmung. Es gibt für jede Gemeinde und Abstimmungstyp (Vorschlag, Gegenvorschlag, Stichfrage) eine Zeile.
 
-### Spalten
+#### Spalten
 
 Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
@@ -65,7 +87,7 @@ Name|Beschreibung
 `eligible_voters`|Die Anzahl Stimmberechtigter
 
 
-### Temporäre Resultate
+#### Temporäre Resultate
 
 Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedinungen zutrifft:
 - `counted = false`
@@ -76,17 +98,16 @@ Falls der Status
 - `final` ist, gilt die Abstimmung als abgeschlossen
 - `unknown` ist, gilt die Abstimmung als abgeschlossen, falls alle (erwarteten) Gemeinden ausgezählt sind
 
-### Vorlage
+#### Vorlage
 
 - [vote_onegov.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/vote_onegov.csv)
 
 
-3 Wabsti
---------
+### Wabsti
 
 Das Format des Wahlprogrammen "Wabsti Wahlen und Abstimmungen (VRSG)" besteht aus einer einzelnen Datei, welche alle Daten für mehrere Abstimmungen enthält. Es gibt für jede Abstimmung und Gemeinde eine Zeile.
 
-### Spalten
+#### Spalten
 
 Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
@@ -106,18 +127,17 @@ Name|Beschreibung
 `StichfrNein`|Die Anzahl Nein Stimmen zur Stichfrage.
 `StimmBet`|Die Stimmbeteilgung in Prozent. Wird verwendet, um zu entscheiden, ob die Gemeinde bereits ausgezählt wurde. Ist die Stimmbeteilgung `0`, wird die Zeile ignoriert (noch nicht ausgezählt).
 
-### Temporäre Resultate
+#### Temporäre Resultate
 
 Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedinungen zutrifft:
 - `StimmBet = 0`
 - die Gemeinde ist nicht in den Resultaten enthalten
 
-### Vorlage
+#### Vorlage
 
 - [vote_wabsti.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/vote_wabsti.csv)
 
 
-4 WabstiCExport
----------------
+### WabstiCExport
 
 Es wird die Version `>= 2.2` unterstützt. Die verschiedenen Spalten der verschiedenen Dateien sind in der Dokumenation des Exporter-Programms definiert.

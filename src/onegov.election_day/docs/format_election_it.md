@@ -1,25 +1,63 @@
-Specifica Formato Elezioni
-==========================
+# Specifica Formato Elezioni
 
-Sono accettati come formati di file CSV, XLS o XLSX generati dai "Wabsti elezioni e voti (VRSG)" oppure dall'applicazione web stessa. Se una tabella deve essere creata a mano allora il formato dell'applicazione web è il più semplice.
+Sono accettati come formati di file CSV, XLS o XLSX generati dai "Wabsti elezioni e voti (VRSG)" oppure dall'applicazione web stessa. Se una tabella deve essere creata a mano allora il formato dell'applicazione web (OneGov) è il più semplice.
 
 ## Contenuto
 
-1. [OneGov](#1-onegov)
-2. [Wabsti Sistema Maggioritario](#2-wabsti-sistema-maggioritario)
-3. [Wabsti Sistema Proporzionale](#3-wabsti-sistema-proporzionale)
-4. [WabstiCExport Sistema Maggioritario](#4-wabsticexport-sistema-maggioritario)
-5. [WabstiCExport Sistema Proporzionale](#5-wabsticexport-sistema-proporzionale)
-6. [Party results](#6-party-results)
-7. [Elezione tacita](#7-elezione-tacita)
+<!-- TOC START min:1 max:4 link:true update:true -->
+- [Specifica Formato Elezioni](#specifica-formato-elezioni)
+  - [Contenuto](#contenuto)
+  - [Preface](#preface)
+    - [Entities](#entities)
+    - [Elezioni tacite](#elezioni-tacite)
+    - [Regional Elections](#regional-elections)
+  - [Formats](#formats)
+    - [Onegov](#onegov)
+      - [Colonne](#colonne)
+      - [Risultati panachage](#risultati-panachage)
+      - [Risultati temporanei](#risultati-temporanei)
+      - [Modello](#modello)
+    - [Wabsti Sistema Maggioritario](#wabsti-sistema-maggioritario)
+      - [Esportazione delle colonne dati](#esportazione-delle-colonne-dati)
+      - [Colonne risultati candidati](#colonne-risultati-candidati)
+      - [Risultati temporanei](#risultati-temporanei-1)
+      - [Modelli](#modelli)
+    - [Wabsti Sistema Proporzionale](#wabsti-sistema-proporzionale)
+      - [Colonne esportazione dei dati dei risultati](#colonne-esportazione-dei-dati-dei-risultati)
+      - [Risultati panachage](#risultati-panachage-1)
+      - [Colonne esportazione di dati di statistica](#colonne-esportazione-di-dati-di-statistica)
+      - [Colonne apparentamenti delle liste](#colonne-apparentamenti-delle-liste)
+      - [Colonne risultati candidati](#colonne-risultati-candidati-1)
+      - [Risultati temporanei](#risultati-temporanei-2)
+      - [Modelli](#modelli-1)
+    - [WabstiCExport Sistema Maggioritario](#wabsticexport-sistema-maggioritario)
+    - [WabstiCExport Sistema Proporzionale](#wabsticexport-sistema-proporzionale)
+    - [Party results](#party-results)
+      - [Modelli](#modelli-2)
 
+<!-- TOC END -->
 
-1 Onegov
---------
+## Preface
+
+### Entities
+
+An entity is either a municipality (cantonal instances, communal instances without quarters) or a quarter (communal instances with quarters).
+
+### Elezioni tacite
+
+Si possono caricare delle elezioni tacite usando il formato OneGov con ogni voto impostato a `0`.
+
+### Regional Elections
+
+When uploading results of a regional election, only entities of one district are excepted to be present.
+
+## Formats
+
+### Onegov
 
 Il formato che sarà utilizzato dall'applicazione web per l'esportazione è costituito da un unico file per ogni elezione. È presente una riga per ogni comune e candidato.
 
-### Colonne
+#### Colonne
 
 Saranno prese in considerazione le seguenti colonne e devono essere presenti:
 
@@ -56,7 +94,7 @@ Nome|Descrizione
 ---|---
 `panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con ‘list_id = XX’. Se ‘list_id’ vale ‘999’, i voti provengono dalla lista vuota.
 
-### Risultati temporanei
+#### Risultati temporanei
 
 Municipalities are deemed not to have been counted yet if one of the following two conditions apply:
 - `counted = false`
@@ -67,17 +105,16 @@ Se lo stato è
 - `final`, l’intera elezione è stata completata
 - `unknown`, the whole election is considered completed, if all (expected) municipalities are counted
 
-### Modello
+#### Modello
 
 - [election_onegov_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_majorz.csv)
 - [election_onegov_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_proporz.csv)
 
-2 Wabsti Sistema Maggioritario
-------------------------------
+### Wabsti Sistema Maggioritario
 
 Il formato del file ha bisogno di due tabelle separate: l'esportazione dei dati e l'elenco dei candidati eletti.
 
-### Esportazione delle colonne dati
+#### Esportazione delle colonne dati
 
 Nell'esportazione dei dati, è presente una riga per ogni comune, i candidati sono disposti in colonne. Saranno prese in considerazione le seguenti colonne e devono essere presenti:
 - `AnzMandate`
@@ -98,7 +135,7 @@ Inoltre i voti, così come i candidati, nulli e non validi saranno attribuiti ai
 - `KandName_{XX} = 'Leere Zeilen'`
 - `KandName_{XX} = 'Ungültige Stimmen'`
 
-### Colonne risultati candidati
+#### Colonne risultati candidati
 
 Poiché il formato di file non fornisce alcuna informazione sul candidato eletto, questi devono essere inclusi in una seconda colonna. Ogni riga è composta da un candidato eletto con le seguenti colonne:
 
@@ -106,23 +143,22 @@ Nome|Descrizione
 ---|---
 `KandID`|ID del candidato (`KandID_{XX}`).
 
-### Risultati temporanei
+#### Risultati temporanei
 
 Il formato del file non contiene alcuna informazione chiara sul fatto che l'elezione complessiva sia stata completamente scrutinata. Questa informazione deve essere fornita direttamente sul modulo per il caricamento dei dati.
 
 Il formato del file, inoltre, non contiene alcuna informazione sul fatto che un comune specifico sia stato completamente scrutinato. Se i comuni mancano del tutto di risultati, essi sono considerati non ancora scrutinati.
 
-### Modelli
+#### Modelli
 
 - [election_wabsti_majorz_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_majorz_results.csv)
 - [election_wabsti_majorz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_majorz_candidates.csv)
 
-3 Wabsti Sistema Proporzionale
-------------------------------
+### Wabsti Sistema Proporzionale
 
 Il formato di file ha bisogno di quattro tabelle separate: l'esportazione dei dati dei risultati, l'esportazione dei dati di statistica, gli apparentamenti delle liste e i candidati di lista eletti.
 
-### Colonne esportazione dei dati dei risultati
+#### Colonne esportazione dei dati dei risultati
 
 È presente una linea per candidato e comune nell'esportazione dei dati. Saranno prese in considerazione le seguenti colonne e devono essere presenti:
 - `Einheit_BFS`
@@ -138,7 +174,7 @@ Il formato di file ha bisogno di quattro tabelle separate: l'esportazione dei da
 
 I risultati possono contenere dei risultati di panachage aggiungendo una colonna per lista (`{List ID}.{List code}`: il numero dei voti ottenuti dalla lista proveniente dalla lista con il ‘Liste_ID’ specificato). Se ‘Liste_ID’ vale ‘99’ (’99.WoP’), i voti provengono dalla lista vuota.
 
-### Colonne esportazione di dati di statistica
+#### Colonne esportazione di dati di statistica
 
 Il file con le statistiche dei singoli comuni devono contenere le seguenti colonne:
 - `Einheit_BFS`
@@ -149,14 +185,14 @@ Il file con le statistiche dei singoli comuni devono contenere le seguenti colon
 - `WZUngueltig`
 - `StmWZVeraendertLeerAmtlLeer`
 
-### Colonne apparentamenti delle liste
+#### Colonne apparentamenti delle liste
 
 Il file con gli apparentamenti delle liste dovrebbe contenere le seguenti colonne:
 - `Liste`
 - `LV`
 - `LUV`
 
-### Colonne risultati candidati
+#### Colonne risultati candidati
 
 Poiché il formato di file non fornisce alcuna informazione sul candidato eletto, questi devono essere inclusi in una seconda colonna. Ogni riga è composta da un candidato eletto con le seguenti colonne:
 
@@ -164,13 +200,13 @@ Nome|Descrizione
 ---|---
 `Liste_KandID`|ID del candidato.
 
-### Risultati temporanei
+#### Risultati temporanei
 
 Il formato del file non contiene alcuna informazione chiara sul fatto che l'elezione complessiva sia stata completamente scrutinata. Questa informazione deve essere fornita direttamente sul modulo per il caricamento dei dati.
 
 Il formato del file, inoltre, non contiene alcuna informazione sul fatto che un comune specifico sia stato completamente scrutinato. Se i comuni mancano del tutto di risultati, essi sono considerati non ancora scrutinati.
 
-### Modelli
+#### Modelli
 
 - [election_wabsti_proporz_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_results.csv)
 - [election_wabsti_proporz_statistics.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_statistics.csv)
@@ -178,20 +214,17 @@ Il formato del file, inoltre, non contiene alcuna informazione sul fatto che un 
 - [election_wabsti_proporz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_wabsti_proporz_candidates.csv)
 
 
-4 WabstiCExport Sistema Maggioritario
--------------------------------------
+### WabstiCExport Sistema Maggioritario
 
 La versione `>= 2.2` è supportata. Consulta la documentazione del programma di esportazione per ulteriori informazioni riguardo le colonne dei vari file.
 
 
-5 WabstiCExport Sistema Proporzionale
--------------------------------------
+### WabstiCExport Sistema Proporzionale
 
 La versione `>= 2.2` è supportata. Consulta la documentazione del programma di esportazione per ulteriori informazioni riguardo le colonne dei vari file.
 
 
-6 Party results
----------------
+### Party results
 
 Ciascuna elezione ("proporz") può contenere i risultati di partito. Questi risultati sono indipendenti dagli altri risultati e di solito contengono i valori già aggregati delle varie liste di un partito.
 
@@ -206,12 +239,6 @@ Nome|Descrizione
 `mandates`|Il numero di mandati.
 `votes`|Il numero di voti.
 
-### Modelli
+#### Modelli
 
 - [election_party_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_party_results.csv)
-
-
-7 Elezione tacita
------------------
-
-Si possono caricare delle elezioni tacite usando il formato OneGov con ogni voto impostato a `0`.
