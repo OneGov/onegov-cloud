@@ -106,9 +106,7 @@ Da das Datenformat keine Informationen über die gewählten Kandidaten liefert, 
 
 Name|Beschreibung
 ---|---
-`ID`|Die ID des Kandidaten (`KandID_{XX}`).
-`Name`|Der Familienname des Kandidaten.
-`Vorname`|Der Vorname des Kandidaten.
+`KandID`|Die ID des Kandidaten (`KandID_{XX}`).
 
 ### Temporäre Resultate
 
@@ -166,9 +164,7 @@ Da das Datenformat keine Informationen über die gewählten Kandidaten liefert, 
 
 Name|Beschreibung
 ---|---
-`ID`|Die ID des Kandidaten (`Liste_KandID`).
-`Name`|Der Familienname des Kandidaten.
-`Vorname`|Der Vorname des Kandidaten.
+`Liste_KandID`|Die ID des Kandidaten.
 
 ### Temporäre Resultate
 

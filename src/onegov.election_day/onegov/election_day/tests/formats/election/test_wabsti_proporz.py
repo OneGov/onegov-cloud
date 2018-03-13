@@ -68,7 +68,7 @@ def test_import_wabsti_proporz(session, tar_file):
 
     # Test cantonal election with elected candidates, connections and stats
     cantonal_elected = (
-        'ID,Name,Vorname\n'
+        'Liste_KandID,Name,Vorname\n'
         '401,Pfister,Gerhard\n'
         '601,Pezzatti,Bruno\n'
         '1501,Aeschi,Thomas\n'
@@ -214,7 +214,7 @@ def test_import_wabsti_proporz_utf16(session):
         BytesIO((
             '\n'.join((
                 ','.join((
-                    'ID',
+                    'Liste_KandID',
                     'ignore1',
                     'ignore2',
                 )),
@@ -295,7 +295,7 @@ def test_import_wabsti_proporz_missing_headers(session):
         ).encode('utf-8')), 'text/plain',
     )
     assert sorted([(e.filename, e.error.interpolate()) for e in errors]) == [
-        ('Elected Candidates', "Missing columns: 'id'"),
+        ('Elected Candidates', "Missing columns: 'liste_kandid'"),
         ('Election statistics', "Missing columns: 'wzleer'"),
         ('List connections', "Missing columns: 'lv'"),
         ('Results', "Missing columns: 'liste_kandid'")
@@ -368,7 +368,7 @@ def test_import_wabsti_proporz_invalid_values(session):
         BytesIO((
             '\n'.join((
                 ','.join((
-                    'ID',
+                    'Liste_KandID',
                     'ignore1',
                     'ignore2',
                 )),

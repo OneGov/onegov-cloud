@@ -59,7 +59,7 @@ def test_import_wabsti_majorz(session, tar_file):
     assert election.allocated_mandates == 0
 
     # Test cantonal election with elected candidates
-    elected = "ID,Name,Vorname\n3,Rechsteiner,Paul".encode('utf-8')
+    elected = "KandID,Name,Vorname\n3,Rechsteiner,Paul".encode('utf-8')
 
     errors = import_election_wabsti_majorz(
         election, principal,
@@ -180,7 +180,7 @@ def test_import_wabsti_majorz_utf16(session):
         BytesIO((
             '\n'.join((
                 ','.join((
-                    'ID',
+                    'KandID',
                     'Name',
                     'Vorname',
                 )),
@@ -225,7 +225,7 @@ def test_import_wabsti_majorz_missing_headers(session):
         ).encode('utf-8')), 'text/plain'
     )
     assert sorted([(e.filename, e.error.interpolate()) for e in errors]) == [
-        ('Elected Candidates', "Missing columns: 'id'"),
+        ('Elected Candidates', "Missing columns: 'kandid'"),
         ('Results', "Missing columns: 'bfs'"),
     ]
 
@@ -288,7 +288,7 @@ def test_import_wabsti_majorz_invalid_values(session):
         BytesIO((
             '\n'.join((
                 ','.join((
-                    'ID',
+                    'KandID',
                     'Name',
                     'Vorname',
                 )),

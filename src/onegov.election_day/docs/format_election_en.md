@@ -107,9 +107,7 @@ Because the file format does not supply any information on the elected candidate
 
 Name|Description
 ---|---
-`ID`|ID of the candidate (`KandID_{XX}`).
-`Name`|The surname of the candidate.
-`Vorname`|The first name of the candidate.
+`KandID`|ID of the candidate (`KandID_{XX}`).
 
 ### Temporary results
 
@@ -167,9 +165,7 @@ Because the file format does not supply any information on the elected candidate
 
 Name|Description
 ---|---
-`ID`|ID of the candidate (`Liste_KandID`).
-`Name`|The surname of the candidate.
-`Vorname`|The first name of the candidate.
+`Liste_KandID`|ID of the candidate.
 
 ### Temporary results
 

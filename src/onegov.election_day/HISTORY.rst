@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adjusts the custom wabsti import files.
+  [msom]
+
 3.1.0 (2018-03-13)
 ~~~~~~~~~~~~~~~~~~~
 

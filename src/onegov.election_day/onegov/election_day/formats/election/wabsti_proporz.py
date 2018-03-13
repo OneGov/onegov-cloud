@@ -30,7 +30,7 @@ HEADERS_CONNECTIONS = [
 ]
 
 HEADERS_CANDIDATES = [
-    'id'
+    'liste_kandid'
 ]
 
 HEADERS_STATS = [
@@ -310,7 +310,7 @@ def import_election_wabsti_proporz(
                         subconnection.parent_id = connection.id
                         lists[list_id].connection_id = subconnection.id
 
-    # The results file has one elected candidate per line
+    # The candidates file has one elected candidate per line
     filename = _("Elected Candidates")
     if elected_file and elected_mimetype:
         csv, error = load_csv(
@@ -333,7 +333,7 @@ def import_election_wabsti_proporz(
             indexes = dict([(item.id, key) for key, item in lists.items()])
             for line in csv.lines:
                 try:
-                    candidate_id = int(line.id or 0)
+                    candidate_id = int(line.liste_kandid or 0)
                 except ValueError:
                     errors.append(
                         FileImportError(

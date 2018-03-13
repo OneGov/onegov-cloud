@@ -19,9 +19,7 @@ HEADERS = [
 ]
 
 HEADERS_CANDIDATES = [
-    'id',
-    'name',
-    'vorname',
+    'kandid',
 ]
 
 
@@ -214,7 +212,7 @@ def import_election_wabsti_majorz(
 
             results.setdefault(result.entity_id, result)
 
-    # The results file has one elected candidate per line
+    # The candidates file has one elected candidate per line
     filename = _("Elected Candidates")
     if elected_file and elected_mimetype:
         csv, error = load_csv(
@@ -234,20 +232,27 @@ def import_election_wabsti_majorz(
                 error = None
         if not error:
             for line in csv.lines:
-                line_errors = []
-
-                if line.id in candidates and \
-                        candidates[line.id].family_name == line.name and \
-                        candidates[line.id].first_name == line.vorname:
-                    candidates[line.id].elected = True
-                else:
+                try:
+                    candidate_id = line.kandid
+                except ValueError:
                     errors.append(
                         FileImportError(
-                            error=_("Unknown candidate"),
+                            error=_("Invalid values"),
                             line=line.rownumber,
                             filename=filename
                         )
                     )
+                else:
+                    if candidate_id in candidates:
+                        candidates[candidate_id].elected = True
+                    else:
+                        errors.append(
+                            FileImportError(
+                                error=_("Unknown candidate"),
+                                line=line.rownumber,
+                                filename=filename
+                            )
+                        )
 
     if not errors and not results:
         errors.append(FileImportError(_("No data found")))

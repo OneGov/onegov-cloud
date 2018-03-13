@@ -106,9 +106,7 @@ Cunquai ch'il format da datoteca na furnescha naginas infurmaziuns davart las ca
 
 Num|Descripziun
 ---|---
-`ID`|La ID da la candidata u dal candidat (`KandID_{XX}`).
-`Name`|Il num da famiglia da la candidata u dal candidat.
-`Vorname`|Il prenum da la candidata u dal candidat.
+`KandID`|La ID da la candidata u dal candidat (`KandID_{XX}`).
 
 ### Resultats temporars
 
@@ -166,9 +164,7 @@ Cunquai ch'il format da datoteca na furnescha naginas infurmaziuns davart las ca
 
 Num|Descripziun
 ---|---
-`ID`|La ID da la candidata u dal candidat (`Liste_KandID`).
-`Name`|Il num da famiglia da la candidata u dal candidat.
-`Vorname`|Il prenum da la candidata u dal candidat.
+`Liste_KandID`|La ID da la candidata u dal candidat.
 
 ### Resultats temporars
 

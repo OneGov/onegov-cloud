@@ -104,9 +104,7 @@ Poiché il formato di file non fornisce alcuna informazione sul candidato eletto
 
 Nome|Descrizione
 ---|---
-`ID`|ID del candidato (`KandID_{XX}`).
-`Name`|Cognome del candidato.
-`Vorname`|Nome del candidato.
+`KandID`|ID del candidato (`KandID_{XX}`).
 
 ### Risultati temporanei
 
@@ -164,9 +162,7 @@ Poiché il formato di file non fornisce alcuna informazione sul candidato eletto
 
 Nome|Descrizione
 ---|---
-`ID`|ID del candidato (`Liste_KandID`).
-`Name`|Cognome del candidato.
-`Vorname`|Nome del candidato.
+`Liste_KandID`|ID del candidato.
 
 ### Risultati temporanei
 

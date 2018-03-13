@@ -104,9 +104,7 @@ Parce que ce format de fichier n'offre aucune information concernant les candida
 
 Nom|Description
 ---|---
-`ID`|Identifiant du candidat (`KandID_{XX}`).
-`Name`|Le nom de famille du candidat.
-`Vorname`|Le prénom du candidat.
+`KandID`|Identifiant du candidat (`KandID_{XX}`).
 
 ### Résultats temporaires
 
@@ -164,9 +162,7 @@ Le fichier avec les connexions de liste devrait contenir les colonnes suivantes 
 
 Nom|Description
 ---|---
-`ID`|L'identifiant du candidat (`Liste_KandID`).
-`Name`|Le nom de famille du candidat.
-`Vorname`|Le prénom du candidat.
+`Liste_KandID`|L'identifiant du candidat.
 
 ### Résultats temporaires
 
