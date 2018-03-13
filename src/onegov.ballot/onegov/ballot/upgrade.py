@@ -292,7 +292,7 @@ def add_region_domain(context):
     if 'elections' in inspector.get_table_names(context.schema):
         table_names.append('elections')
     if 'election_compounds' in inspector.get_table_names(context.schema):
-        table_names.append('elections')
+        table_names.append('election_compounds')
     if 'votes' in inspector.get_table_names(context.schema):
         table_names.append('votes')
     if 'archived_results' in inspector.get_table_names(context.schema):
