@@ -2206,3 +2206,22 @@ def test_icalendar_subscription(feriennet_app):
     assert 'DESCRIPTION:Children might get wet' in calendar
     assert 'DTSTART;VALUE=DATE-TIME:20161125T070000Z' in calendar
     assert 'DTEND;VALUE=DATE-TIME:20161125T150000Z' in calendar
+
+
+def test_fill_out_contact_form(feriennet_app):
+    client = Client(feriennet_app)
+
+    page = client.get('/form/kontakt')
+    page.form['vorname'] = 'Foo'
+    page.form['nachname'] = 'Bar'
+    page.form['telefon'] = '1234'
+    page.form['e_mail'] = 'info@example.org'
+    page.form['mitteilung'] = 'Hello'
+
+    page = page.form.submit().follow()
+    assert "Abschliessen" in page
+
+    page = page.form.submit().follow()
+    assert "Anfrage eingereicht" in page
+
+    assert len(feriennet_app.smtp.outbox) == 1
