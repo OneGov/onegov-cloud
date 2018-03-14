@@ -453,7 +453,7 @@ class DefaultMailLayout(Layout):
 
     @cached_property
     def macros(self):
-        return self.template_loader['mail_macros.pt']
+        return self.template_loader.mail_macros
 
     @cached_property
     def contact_html(self):
