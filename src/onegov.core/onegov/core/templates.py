@@ -66,7 +66,11 @@ class TemplateLoader(PageTemplateLoader):
 
     @cached_property
     def macros(self):
-        return MacrosLookup(self.search_path)
+        return MacrosLookup(self.search_path, name='macros.pt')
+
+    @cached_property
+    def mail_macros(self):
+        return MacrosLookup(self.search_path, name='mail_macros.pt')
 
 
 class MacrosLookup(object):
