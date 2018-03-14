@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes long address lines breaking the attendee print output.
+  [href]
+
 1.3.22 (2018-03-13)
 ~~~~~~~~~~~~~~~~~~~
 
