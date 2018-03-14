@@ -205,11 +205,11 @@ msgstr "Election selon le système proportionnel"
 msgid "Elections"
 msgstr "Elections"
 
-msgid "Select either majorz or proporz elections."
-msgstr ""
-
 msgid "Cantonal"
 msgstr "Cantonal"
+
+msgid "Select either majorz or proporz elections."
+msgstr ""
 
 msgid "Notifications"
 msgstr "Notifications"
@@ -899,6 +899,14 @@ msgstr ""
 
 #, python-format
 msgid ""
+"Final results of the regional election \"${title}\", ${date}, ${principal}, "
+"broken down by candidates and municipalities."
+msgstr ""
+"Résultats finaux de l'élection régionale \"${title}\", ${date}, ${principal}, "
+"répartis par municipalités et par candidats."
+
+#, python-format
+msgid ""
 "Final results of the federal election \"${title}\", ${date}, ${principal}, "
 "broken down by candidates and municipalities."
 msgstr ""
@@ -1056,6 +1064,3 @@ msgstr "Aucune election selon le système proportionnel"
 
 msgid "The data source is not configured properly"
 msgstr "La source de données n'est pas configurée correctement"
-
-#~ msgid "Reported"
-#~ msgstr "Reportés"

@@ -205,11 +205,11 @@ msgstr "Elecziun da proporz"
 msgid "Elections"
 msgstr "Elecziuns"
 
-msgid "Select either majorz or proporz elections."
-msgstr ""
-
 msgid "Cantonal"
 msgstr "Sin plaun chantunal"
+
+msgid "Select either majorz or proporz elections."
+msgstr ""
 
 msgid "Notifications"
 msgstr "Communicaziuns"
@@ -938,6 +938,14 @@ msgstr ""
 
 #, python-format
 msgid ""
+"Final results of the regional election \"${title}\", ${date}, ${principal}, "
+"broken down by candidates and municipalities."
+msgstr ""
+"Resultats finals da l'elecziun regiunala \"${title}\", ${date}, ${principal}, "
+"resultats da tut las candidatas e da tut ils candidats tenor vischnancas."
+
+#, python-format
+msgid ""
 "Final results of the federal election \"${title}\", ${date}, ${principal}, "
 "broken down by candidates and municipalities."
 msgstr ""
@@ -1096,6 +1104,3 @@ msgstr "Nagina elecziun da proporz"
 
 msgid "The data source is not configured properly"
 msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
-
-#~ msgid "Reported"
-#~ msgstr "Annunzià"

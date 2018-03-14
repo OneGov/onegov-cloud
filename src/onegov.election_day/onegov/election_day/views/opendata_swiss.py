@@ -2,6 +2,7 @@ from babel.dates import format_date
 from datetime import datetime
 from io import BytesIO
 from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
 from onegov.ballot import Vote
 from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
@@ -69,6 +70,7 @@ def view_rdf(self, request):
 
     session = request.session
     items = session.query(Election).all()
+    items.extend(session.query(ElectionCompound).all())
     items.extend(session.query(Vote).all())
 
     translations = request.app.translations
@@ -181,6 +183,22 @@ def view_rdf(self, request):
                             'principal': principal_name
                         }
                     )
+                elif item.domain == 'region':
+                    des = _(
+                        "Final results of the regional election \"${title}\", "
+                        "${date}, ${principal}, "
+                        "broken down by candidates and municipalities.",
+                        mapping={
+                            'title': (
+                                item.get_title(locale, default_locale) or ''
+                            ),
+                            'date': format_date(
+                                item.date, format='long', locale=locale
+                            ),
+                            'principal': principal_name
+                        }
+                    )
+                # todo: region
                 else:
                     des = _(
                         "Final results of the federal election \"${title}\", "
