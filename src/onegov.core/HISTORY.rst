@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.65.1 (2018-03-14)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a mail macros lookup property.
   [href]
