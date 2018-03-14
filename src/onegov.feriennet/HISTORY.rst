@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds extra space to bill print-out.
+  [href]
+
 - Fixes long address lines breaking the attendee print output.
   [href]
 

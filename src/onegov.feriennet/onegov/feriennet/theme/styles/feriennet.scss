@@ -1288,6 +1288,7 @@ ul.tags {
 
 .bills-header {
     display: flex;
+    margin-bottom: 1rem;
     padding-left: 1.6rem;
 
     .bill-creditor {
@@ -1637,8 +1638,8 @@ ul.tags {
         .organisation {
             border: 1px solid $monsoon;
             border-radius: 2px;
-            padding: 1rem 1rem 0;
             max-width: 30%;
+            padding: 1rem 1rem 0;
             position: absolute;
             right: 0;
         }
