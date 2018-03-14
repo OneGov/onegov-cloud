@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Optimizes some views.
+  [msom]
+
 3.1.1 (2018-03-13)
 ~~~~~~~~~~~~~~~~~~~
 

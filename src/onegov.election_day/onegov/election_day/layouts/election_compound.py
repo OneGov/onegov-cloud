@@ -1,9 +1,9 @@
 from cached_property import cached_property
 from onegov.election_day import _
-from onegov.election_day.layouts.default import DefaultLayout
+from onegov.election_day.layouts.detail import DetailLayout
 
 
-class ElectionCompoundLayout(DefaultLayout):
+class ElectionCompoundLayout(DetailLayout):
 
     def __init__(self, model, request, tab=None):
         super().__init__(model, request)
@@ -30,7 +30,7 @@ class ElectionCompoundLayout(DefaultLayout):
         return ''
 
     def visible(self, tab=None):
-        if not self.model.has_results:
+        if not self.has_results:
             return False
 
         return True

@@ -5,7 +5,7 @@
       xmlns:tal="http://xml.zope.org/namespaces/tal">
 <body>
 
-<metal:navigation define-macro="answer" i18n:domain="onegov.election_day">
+<metal:answer define-macro="answer" i18n:domain="onegov.election_day">
     <span tal:condition="answer == 'accepted'" class="answer accepted" i18n:translate="">
         Accepted
     </span>
@@ -18,15 +18,15 @@
     <span tal:condition="answer == 'counter-proposal'" class="answer rejected" i18n:translate="">
         Counter Proposal
     </span>
-</metal:navigation>
+</metal:answer>
 
-<metal:navigation define-macro="progress" i18n:domain="onegov.election_day">
+<metal:progress define-macro="progress" i18n:domain="onegov.election_day">
     <tal:block i18n:translate="" condition="progress[1]">
         <span tal:replace="progress[0]" i18n:name='counted' />
             of
         <span tal:replace="progress[1]" i18n:name='total' />
     </tal:block>
-</metal:navigation>
+</metal:progress>
 
 <metal:search define-macro="form" i18n:domain="onegov.election_day">
     <form tal:attributes="action form.action" method="POST" enctype="multipart/form-data">
@@ -87,11 +87,11 @@
 </metal:fields>
 
 <metal:related_link define-macro="related_link" i18n:domain="onegov.election_day">
-    <div class="row related" tal:condition="meta.get('related_link', '')|nothing">
+    <div class="row related" tal:condition="layout.related_link">
         <div class="columns small-12">
             <h2 i18n:translate="">Related link</h2>
-            <p tal:define="link meta.get('related_link', '')">
-                <a href="${link}" class="related-link">${link}</a>
+            <p>
+                <a href="${layout.related_link}" class="related-link">${layout.related_link}</a>
             </p>
         </div>
     </div>
@@ -155,16 +155,16 @@
 </metal:tab_menu>
 
 <metal:status_callout define-macro="status_callout" i18n:domain="onegov.election_day">
-    <div class="panel callout radius" tal:condition="not:item.completed" tal:define="last_result_change item.last_result_change">
-         <h5 i18n:translate="" tal:condition="not item.has_results">No results yet</h5>
-         <h5 i18n:translate="" tal:condition="item.has_results">Intermediate results</h5>
-         <p tal:condition="item.has_results">
+    <div class="panel callout radius" tal:condition="not:layout.completed">
+         <h5 i18n:translate="" tal:condition="not layout.has_results">No results yet</h5>
+         <h5 i18n:translate="" tal:condition="layout.has_results">Intermediate results</h5>
+         <p tal:condition="layout.has_results">
              <span i18n:translate="">Last change</span>:
-             <strong>${layout.format_date(last_result_change, 'relative')} / ${layout.format_date(last_result_change, 'datetime_long')}</strong>
+             <strong>${layout.format_date(layout.last_result_change, 'relative')} / ${layout.format_date(layout.last_result_change, 'datetime_long')}</strong>
          </p>
     </div>
-    <div class="panel radius" tal:condition="item.completed">
-        <span i18n:translate="">Last change</span>: ${layout.format_date(item.last_result_change, 'datetime_long')}
+    <div class="panel radius" tal:condition="layout.completed">
+        <span i18n:translate="">Last change</span>: ${layout.format_date(layout.last_result_change, 'datetime_long')}
     </div>
 </metal:status_callout>
 
@@ -213,9 +213,9 @@
     <div metal:use-macro="layout.macros['election_day_link']" tal:define="date vote.date"/>
     <h1>
         ${vote.title}
-        <small tal:condition="vote.answer">
-            <div tal:condition="vote.type == 'simple'" metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer"/>
-            <div tal:condition="vote.type == 'complex'">
+        <small tal:condition="layout.answer">
+            <div tal:condition="layout.type == 'simple'" metal:use-macro="layout.macros['answer']" tal:define="answer layout.answer"/>
+            <div tal:condition="layout.type == 'complex'">
                 <tal:block tal:define="proposal vote.proposal.accepted;
                                        counter_proposal vote.counter_proposal.accepted;
                                        tie_breaker vote.tie_breaker.accepted">
@@ -243,7 +243,7 @@
 
     <div class="clearfix"></div>
 
-    <tal:block tal:condition="vote.has_results and ballot">
+    <tal:block tal:condition="layout.has_results and ballot">
         <div class="row percentages">
             <div class="columns small-6">
                 <dl>
@@ -264,7 +264,7 @@
             <div class="nays right" style="width:${'{0:.2f}'.format(ballot.nays_percentage)}%"></div>
         </div>
     </tal:block>
-    <tal:block tal:condition="not: vote.has_results and ballot">
+    <tal:block tal:condition="not: layout.has_results and ballot">
         <hr />
     </tal:block>
 </metal:vote_header>
@@ -365,10 +365,10 @@
             <li i18n:translate="">You may use this dataset for commercial purposes.</li>
             <li>
                 <tal:block i18n:translate="">You must provide the source (author, title and link to the dataset).</tal:block>
-                <ol class="citations" tal:define="last_result_change layout.format_date(model.last_result_change, 'datetime_long')">
-                    <li>${layout.principal.name} (${last_result_change}). <cite>${model.title} (JSON)</cite>. ${request.link(model, 'data-json')}.</li>
-                    <li>${layout.principal.name} (${last_result_change}). <cite>${model.title} (CSV)</cite>. ${request.link(model, 'data-csv')}.</li>
-                    <li>${layout.principal.name} (${last_result_change}). <cite>${model.title} (XLSX)</cite>. ${request.link(model, 'data-xlsx')}.</li>
+                <ol class="citations">
+                    <li>${layout.principal.name} (${layout.format_date(layout.last_result_change, 'datetime_long')}). <cite>${model.title} (JSON)</cite>. ${request.link(model, 'data-json')}.</li>
+                    <li>${layout.principal.name} (${layout.format_date(layout.last_result_change, 'datetime_long')}). <cite>${model.title} (CSV)</cite>. ${request.link(model, 'data-csv')}.</li>
+                    <li>${layout.principal.name} (${layout.format_date(layout.last_result_change, 'datetime_long')}). <cite>${model.title} (XLSX)</cite>. ${request.link(model, 'data-xlsx')}.</li>
                 </ol>
             </li>
         </ul>
