@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.23 (2018-03-15)
+~~~~~~~~~~~~~~~~~~~
 
 - Only show admins in the tickets view.
   [href]
