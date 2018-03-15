@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Only show admins in the tickets view.
+  [href]
+
 - Adds the e-mail and the place to the attendee list.
   [href]
 
