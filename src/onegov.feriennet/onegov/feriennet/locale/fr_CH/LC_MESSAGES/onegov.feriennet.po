@@ -179,7 +179,7 @@ msgid "Editors"
 msgstr "Prestataires"
 
 msgid "Opening Hours"
-msgstr "Horaires d'ouverture"
+msgstr "Périodes"
 
 msgid "Opening Hours Link"
 msgstr "Lien vers les horaires d'ouvertures"
