@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Shows the full username in the identicon tooltip.
+  [href]
+
 0.25.3 (2018-03-15)
 ~~~~~~~~~~~~~~~~~~~
 

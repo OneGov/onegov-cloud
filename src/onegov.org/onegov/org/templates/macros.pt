@@ -807,7 +807,7 @@
 
 <metal:identicon define-macro="identicon" i18n:domain="onegov.org">
     <tal:block define="identicon_size size|'small'">
-        <span class="user-initials-${identicon_size}" style="background-color: ${layout.get_user_color(username)}">
+        <span class="user-initials-${identicon_size}" style="background-color: ${layout.get_user_color(username)}" title="${username}">
             ${initials}
         </span>
     </tal:block>
