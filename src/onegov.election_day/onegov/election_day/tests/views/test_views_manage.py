@@ -30,14 +30,13 @@ def test_view_login_logout(election_day_app):
     assert 'Anmelden' in client.get('/').click('Abmelden').follow()
 
 
-def test_view_manage(election_day_app):
+def test_view_manage_elections(election_day_app):
     archive = ArchivedResultCollection(election_day_app.session())
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
     assert client.get('/manage/elections',
                       expect_errors=True).status_code == 403
-    assert client.get('/manage/votes', expect_errors=True).status_code == 403
 
     login(client)
 
@@ -54,6 +53,7 @@ def test_view_manage(election_day_app):
     manage = new.form.submit().follow()
 
     assert "Elect a new president" in manage
+
     edit = manage.click('Bearbeiten')
     edit.form['election_de'] = 'Elect a new federal councillor'
     edit.form['absolute_majority'] = None
@@ -72,6 +72,80 @@ def test_view_manage(election_day_app):
 
     assert archive.query().count() == 0
 
+
+def test_view_manage_election_compounds(election_day_app):
+    archive = ArchivedResultCollection(election_day_app.session())
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    assert client.get('/manage/election-compounds',
+                      expect_errors=True).status_code == 403
+
+    login(client)
+
+    manage = client.get('/manage/election-compounds')
+
+    assert "Noch keine Verbindungen" in manage
+
+    # Add two elections
+    new = client.get('/manage/elections').click('Neue Wahl')
+    new.form['election_de'] = 'Elect a new parliament (Region A)'
+    new.form['date'] = date(2016, 1, 1)
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'region'
+    new.form['mandates'] = 10
+    new.form.submit().follow()
+
+    new = client.get('/manage/elections').click('Neue Wahl')
+    new.form['election_de'] = 'Elect a new parliament (Region B)'
+    new.form['date'] = date(2016, 1, 1)
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'region'
+    new.form['mandates'] = 5
+    new.form.submit().follow()
+
+    # Add a compound
+    new = client.get('/manage/election-compounds').click('Neue Verbindung')
+    new.form['election_de'] = 'Elect a new parliament'
+    new.form['date'] = date(2016, 1, 1)
+    new.form['domain'] = 'canton'
+    new.form['elections'] = ['elect-a-new-parliament-region-a']
+    manage = new.form.submit().follow()
+
+    assert "Elect a new parliament" in manage
+    edit = manage.click('Bearbeiten')
+    edit.form['election_de'] = 'Elect a new cantonal parliament'
+    edit.form['elections'] = [
+        'elect-a-new-parliament-region-a',
+        'elect-a-new-parliament-region-b'
+    ]
+    manage = edit.form.submit().follow()
+
+    assert "Elect a new cantonal parliament" in manage
+    assert "Elect a new cantonal parliament" in [
+        a.title for a in archive.query()
+    ]
+
+    delete = manage.click("Löschen")
+    assert "Verbindung löschen" in delete
+    assert "Elect a new cantonal parliament" in delete
+    assert "Bearbeiten" in delete.click("Abbrechen")
+
+    manage = delete.form.submit().follow()
+    assert "Noch keine Verbindungen" in manage
+
+    assert archive.query().count() == 2
+
+
+def test_view_manage_votes(election_day_app):
+    archive = ArchivedResultCollection(election_day_app.session())
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    assert client.get('/manage/votes', expect_errors=True).status_code == 403
+
+    login(client)
+
     manage = client.get('/manage/votes')
 
     assert "Noch keine Abstimmungen erfasst" in manage
@@ -83,6 +157,7 @@ def test_view_manage(election_day_app):
     manage = new.form.submit().follow()
 
     assert "Vote for a better yesterday" in manage
+
     edit = manage.click('Bearbeiten')
     edit.form['vote_de'] = 'Vote for a better tomorrow'
     manage = edit.form.submit().follow()
