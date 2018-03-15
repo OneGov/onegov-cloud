@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.25.4 (2018-03-15)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to limit the roles shown in the tickets view.
   [href]
 
