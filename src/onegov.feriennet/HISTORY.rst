@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Limits attendee display in my bookings to attendees who were accepted.
+  [href]
+
 - Adds extra space to bill print-out.
   [href]
 

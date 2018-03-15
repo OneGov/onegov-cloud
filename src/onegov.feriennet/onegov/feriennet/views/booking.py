@@ -17,7 +17,7 @@ from onegov.feriennet.layout import BookingCollectionLayout
 from onegov.feriennet.models import AttendeeCalendar
 from onegov.feriennet.views.shared import all_users
 from onegov.org.elements import ConfirmLink, DeleteLink
-from sqlalchemy import select
+from sqlalchemy import select, and_
 from sqlalchemy.orm import contains_eager
 from uuid import UUID
 
@@ -83,7 +83,10 @@ def related_attendees(session, occasion_ids):
 
     related = session.execute(
         select(stmt.c).where(
-            stmt.c.occasion_id.in_(occasion_ids)
+            and_(
+                stmt.c.occasion_id.in_(occasion_ids),
+                stmt.c.booking_state == 'accepted'
+            )
         )
     )
 

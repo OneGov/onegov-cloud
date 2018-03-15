@@ -9,7 +9,8 @@ SELECT
     COUNT(child) AS children,     -- Integer
     phone,                        -- Text
     place,                        -- Text
-    email                         -- Text
+    email,                        -- Text
+    booking_state                 -- Text
 FROM (
     SELECT
         users.username AS parent_username,
@@ -28,5 +29,5 @@ FROM (
         LEFT JOIN attendees ON attendee_id = attendees.id
         LEFT JOIN users ON bookings.username = users.username
 ) AS attendee_list
-GROUP BY occasion_id, attendee_count, parent, parent_username, phone, place, email
+GROUP BY occasion_id, attendee_count, parent, parent_username, phone, place, email, booking_state
 ORDER BY occasion_id, lower(unaccent(parent))
