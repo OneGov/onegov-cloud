@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.25.3 (2018-03-15)
+~~~~~~~~~~~~~~~~~~~
+
 - Lookup mail macros instead of just loading it from the current file.
   [href]
 
