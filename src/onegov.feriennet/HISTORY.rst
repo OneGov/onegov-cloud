@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the e-mail and the place to the attendee list.
+  [href]
+
 - Moves the attendee print view to the activity edit-bar.
   [href]
 

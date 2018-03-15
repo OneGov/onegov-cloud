@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-03-15 11:56+0100\n"
+"POT-Creation-Date: 2018-03-15 13:48+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1558,6 +1558,12 @@ msgstr "(Utilisateur : ${user})"
 
 msgid "Notes:"
 msgstr "Notifications :"
+
+msgid "E-Mail:"
+msgstr "E-Mail:"
+
+msgid "Place:"
+msgstr "Lieu:"
 
 msgid "Your activity has been published:"
 msgstr "Votre offre a été publiée :"

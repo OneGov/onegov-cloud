@@ -39,8 +39,8 @@
                             <strong class="${details.attendee.gender or ''}">${details.attendee.name} (${details.attendee.age})</strong>
                             <div>
                                 <span i18n:translate>Emergency Contact:</span>
-                                <span tal:condition="details.contact">${details.contact}</span>
-                                <span tal:condition="not:details.contact">
+                                <span tal:condition="details.info.emergency">${details.info.emergency}</span>
+                                <span tal:condition="not:details.info.emergency">
                                     <strong i18n:translate>Missing!</strong>
                                     <span i18n:translate>(User: <a i18n:name="user" href="mailto:${details.attendee.username}">${details.attendee.username}</a>)</span>
                                 </span>
@@ -48,6 +48,14 @@
                             <div tal:condition="details.attendee.notes">
                                 <span i18n:translate>Notes:</span>
                                 <span>${details.attendee.notes}</span>
+                            </div>
+                            <div tal:condition="details.info.email">
+                                <span i18n:translate>E-Mail:</span>
+                                <span>${details.info.email}</span>
+                            </div>
+                            <div tal:condition="details.info.place">
+                                <span i18n:translate>Place:</span>
+                                <span>${details.info.place}</span>
                             </div>
                         </li>
                     </ul>

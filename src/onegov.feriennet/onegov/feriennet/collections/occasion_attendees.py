@@ -3,7 +3,7 @@ from onegov.activity import Activity, Attendee, Occasion, OccasionCollection
 from onegov.user import User
 
 
-OccasionAttendee = namedtuple('OccasionAttendee', ('attendee', 'contact'))
+OccasionAttendee = namedtuple('OccasionAttendee', ('attendee', 'info'))
 
 
 class OccasionAttendeeCollection(OccasionCollection):
@@ -49,7 +49,11 @@ class OccasionAttendeeCollection(OccasionCollection):
         }
 
         contacts = {
-            u.username: u.data and u.data.get('emergency')
+            u.username: {
+                'emergency': u.data and u.data.get('emergency'),
+                'email': u.data and u.data.get('email', u.username),
+                'place': u.data and u.data.get('place')
+            }
             for u in self.session.query(
                 User.username, User.data
             )
@@ -58,8 +62,8 @@ class OccasionAttendeeCollection(OccasionCollection):
         for o in self.query():
             occasions[o] = [
                 OccasionAttendee(
-                    attendees[b.attendee_id],
-                    contacts[b.username]
+                    attendee=attendees[b.attendee_id],
+                    info=contacts[b.username]
                 ) for b in sorted(
                     o.accepted,
                     key=lambda b: attendees[b.attendee_id].name
