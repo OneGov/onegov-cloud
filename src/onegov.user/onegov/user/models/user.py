@@ -114,11 +114,19 @@ class User(Base, TimestampMixin, ORMSearchable):
     def title(self):
         """ Returns the realname or the username of the user, depending on
         what's available first. """
-        return self.realname or self.username
+        if self.realname is None:
+            return self.username
+
+        if self.realname.strip():
+            return self.realname
+
+        return self.username
 
     @title.expression
     def title(cls):
-        return func.coalesce(func.nullif(cls.realname, ''), cls.username)
+        return func.coalesce(
+            func.nullif(func.trim(cls.realname), ''), cls.username
+        )
 
     @hybrid_property
     def password(self):
@@ -157,7 +165,7 @@ class User(Base, TimestampMixin, ORMSearchable):
         # for e-mail addresses assume the dot splits the name and use
         # the first two parts of said split (probably won't have a middle
         # name in the e-mail address)
-        if not realname:
+        if realname is None or not realname.strip():
             username = username.split('@')[0]
             parts = username.split('.')[:2]
 

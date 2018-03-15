@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Better handle realnames containing only spaces.
+  [href]
+
 0.17.4 (2018-01-22)
 ~~~~~~~~~~~~~~~~~~~
 
