@@ -318,7 +318,7 @@ def view_tickets(self, request):
     def get_owners():
 
         users = UserCollection(request.session)
-        users = users.by_roles('admin', 'editor')
+        users = users.by_roles(*request.app.settings.org.ticket_manager_roles)
         users = users.order_by(User.title)
 
         yield Link(

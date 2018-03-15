@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to limit the roles shown in the tickets view.
+  [href]
+
 - Shows the full username in the identicon tooltip.
   [href]
 

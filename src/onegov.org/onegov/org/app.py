@@ -258,6 +258,11 @@ def get_status_mail_roles():
     return ('admin', 'editor')
 
 
+@OrgApp.setting(section='org', name='ticket_manager_roles')
+def get_ticket_manager_roles():
+    return ('admin', )
+
+
 @OrgApp.setting(section='org', name='require_complete_userprofile')
 def get_require_complete_userprofile():
     return False
