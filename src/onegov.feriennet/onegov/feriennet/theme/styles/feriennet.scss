@@ -203,6 +203,7 @@ ul.single-line {
     .new-booking::before { @include icon('\f1ec'); }
     .remove-manual::before { @include icon('\f014'); }
     .request-publication::before { @include icon('\f087'); }
+    .offer-again::before { @include icon('\f087'); }
     .reset-matching::before { @include icon('\f12d'); }
     .reset-billing::before { @include icon('\f12d'); }
     .run-matching::before { @include icon('\f0d0'); }

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Moves the attendee print view to the activity edit-bar.
+  [href]
+
 - Limits attendee display in my bookings to attendees who were accepted.
   [href]
 

@@ -8,17 +8,23 @@ OccasionAttendee = namedtuple('OccasionAttendee', ('attendee', 'contact'))
 
 class OccasionAttendeeCollection(OccasionCollection):
 
-    def __init__(self, session, period, username=None):
+    def __init__(self, session, period, activity, username=None):
         super().__init__(session)
         self.period = period
         self.username = username
+        self.activity = activity
 
     @property
     def period_id(self):
         return self.period.id
 
+    @property
+    def activity_name(self):
+        return self.activity.name
+
     def for_period(self, period):
-        return self.__class__(self.session, period, self.username)
+        return self.__class__(
+            self.session, period, self.activity, self.username)
 
     def query(self):
         q = super().query()
@@ -28,6 +34,7 @@ class OccasionAttendeeCollection(OccasionCollection):
         q = q.join(Occasion.accepted)
 
         q = q.filter(Occasion.period_id == self.period_id)
+        q = q.filter(Occasion.activity_id == self.activity.id)
 
         if self.username:
             q = q.filter(Activity.username == self.username)

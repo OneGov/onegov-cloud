@@ -5,7 +5,6 @@ from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.collections import NotificationTemplateCollection
-from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.layout import DefaultLayout
 from onegov.org.custom import get_global_tools as get_base_tools
@@ -61,14 +60,6 @@ def get_admin_tools(request):
                 )
 
         if periods:
-            links.append(
-                Link(
-                    text=_("Attendees"),
-                    url=request.class_link(OccasionAttendeeCollection),
-                    attrs={'class': 'show-attendees'}
-                )
-            )
-
             if request.is_admin:
                 links.append(
                     Link(

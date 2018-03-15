@@ -4,6 +4,7 @@ from onegov.feriennet import _
 from onegov.feriennet import security
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.collections import NotificationTemplateCollection
+from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.const import OWNER_EDITABLE_STATES
 from onegov.feriennet.models import InvoiceAction, VacationActivity
@@ -35,6 +36,33 @@ class DefaultLayout(BaseLayout):
             return self.model.activity.state in OWNER_EDITABLE_STATES
 
         return True
+
+    def offer_again_link(self, activity, title):
+        return Link(
+            text=title,
+            url=self.request.class_link(
+                VacationActivity,
+                {'name': activity.name},
+                name="offer-again"
+            ),
+            traits=(
+                Confirm(
+                    _(
+                        'Do you really want to provide "${title}" again?',
+                        mapping={'title': activity.title}
+                    ),
+                    _("You will have to request publication again"),
+                    _("Provide Again")
+                ),
+                Intercooler(
+                    request_method="POST",
+                    redirect_after=self.request.class_link(
+                        VacationActivity, {'name': activity.name},
+                    )
+                )
+            ),
+            attrs={'class': 'offer-again'}
+        )
 
 
 class VacationActivityCollectionLayout(DefaultLayout):
@@ -70,36 +98,10 @@ class VacationActivityCollectionLayout(DefaultLayout):
 
         activities = tuple(q)
 
-        def link_for_activity(activity):
-            return Link(
-                text=activity.title,
-                url=self.request.class_link(
-                    VacationActivity,
-                    {'name': activity.name},
-                    name="offer-again"
-                ),
-                traits=(
-                    Confirm(
-                        _(
-                            'Do you really want to provide "${title}" again?',
-                            mapping={'title': activity.title}
-                        ),
-                        _("You will have to request publication again"),
-                        _("Provide Again")
-                    ),
-                    Intercooler(
-                        request_method="POST",
-                        redirect_after=self.request.class_link(
-                            VacationActivity, {'name': activity.name},
-                        )
-                    )
-                )
-            )
-
         if activities:
             return LinkGroup(
                 _("Provide activity again"),
-                tuple(link_for_activity(a) for a in activities),
+                tuple(self.offer_again_link(a, a.title) for a in activities),
                 right_side=False,
                 classes=('provide-activity-again', )
             )
@@ -210,10 +212,27 @@ class VacationActivityLayout(DefaultLayout):
             return tickets.by_handler_id(request.id.hex)
 
     @cached_property
+    def attendees(self):
+        request = self.model.latest_request
+
+        if request:
+            return OccasionAttendeeCollection(
+                self.request.session,
+                self.request.app.active_period,
+                self.model
+            )
+
+    @cached_property
     def editbar_links(self):
+        links = []
+        period = self.request.app.active_period
+
+        if self.request.is_admin or self.is_owner:
+            if self.model.state == 'archived' and period:
+                links.append(
+                    self.offer_again_link(self.model, _("Provide Again")))
+
         if self.is_editable:
-            links = []
-            period = self.request.app.active_period
 
             if self.model.state == 'preview':
                 if period and self.model.has_occasion_in_period(period):
@@ -252,7 +271,7 @@ class VacationActivityLayout(DefaultLayout):
                     ))
 
                 links.append(Link(
-                    text=_("Discard Activity"),
+                    text=_("Discard"),
                     url=self.csrf_protected_url(self.request.link(self.model)),
                     attrs={'class': 'delete-link'},
                     traits=(
@@ -274,7 +293,7 @@ class VacationActivityLayout(DefaultLayout):
                 ))
 
             links.append(Link(
-                text=_("Edit Activity"),
+                text=_("Edit"),
                 url=self.request.link(self.model, name='edit'),
                 attrs={'class': 'edit-link'}
             ))
@@ -302,14 +321,22 @@ class VacationActivityLayout(DefaultLayout):
                     attrs={'class': 'new-occasion'}
                 ))
 
-            if self.request.is_admin and self.ticket:
+        if self.request.is_admin or self.is_owner:
+            if self.attendees:
                 links.append(Link(
-                    text=_("Show Ticket"),
-                    url=self.request.link(self.ticket),
-                    attrs={'class': 'show-ticket'}
+                    text=_("Attendees"),
+                    url=self.request.link(self.attendees),
+                    attrs={'class': 'show-attendees'}
                 ))
 
-            return links
+        if self.request.is_admin and self.ticket:
+            links.append(Link(
+                text=_("Show Ticket"),
+                url=self.request.link(self.ticket),
+                attrs={'class': 'show-ticket'}
+            ))
+
+        return links
 
 
 class PeriodCollectionLayout(DefaultLayout):
@@ -586,6 +613,10 @@ class OccasionAttendeeLayout(DefaultLayout):
             Link(
                 _("Activities"),
                 self.request.class_link(VacationActivityCollection)
+            ),
+            Link(
+                self.model.activity.title,
+                self.request.link(self.model.activity)
             ),
             Link(_("Attendees"), '#')
         )

@@ -209,9 +209,17 @@ def get_my_invoice_item(request, app, id):
 
 @FeriennetApp.path(
     model=OccasionAttendeeCollection,
-    path='/attendees',
+    path='/attendees/{activity_name}',
     converters=dict(period_id=UUID))
-def get_occasion_attendee_collection(request, app, period_id=None):
+def get_occasion_attendee_collection(request, app, activity_name,
+                                     period_id=None):
+
+    # load the activity
+    activity = get_vacation_activity(request, app, activity_name)
+
+    if not activity:
+        return None
+
     # the default period is the active period or the first we can find
     if not period_id:
         period = app.active_period or app.periods and app.periods[0]
@@ -227,7 +235,8 @@ def get_occasion_attendee_collection(request, app, period_id=None):
     else:
         username = request.current_username
 
-    return OccasionAttendeeCollection(app.session(), period, username)
+    return OccasionAttendeeCollection(
+        app.session(), period, activity, username)
 
 
 @FeriennetApp.path(

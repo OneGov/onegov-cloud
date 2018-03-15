@@ -605,7 +605,7 @@ def test_occasions_form(feriennet_app):
     assert "Franz Karl Weber" in activity
     assert "No griefers" in activity
 
-    occasion = activity.click("Bearbeiten")
+    occasion = activity.click("Bearbeiten", index=1)
     occasion.form['min_age'] = 15
     activity = occasion.form.submit().follow()
     assert "15 - 20 Jahre" in activity
@@ -1633,15 +1633,17 @@ def test_occasion_attendance_collection(feriennet_app):
 
     # anonymous has no access
     anon = Client(feriennet_app)
-    assert anon.get('/attendees', status=403)
+    assert anon.get('/attendees/foo', status=403)
+    assert anon.get('/attendees/bar', status=403)
 
     # if the period is unconfirmed the attendees are not shown
     admin = Client(feriennet_app)
     admin.login_admin()
 
-    page = admin.get('/attendees')
-    assert "noch keine Zuteilung" in page
-    assert "Dustin" not in page
+    for id in ('foo', 'bar'):
+        page = admin.get(f'/attendees/{id}')
+        assert "noch keine Zuteilung" in page
+        assert "Dustin" not in page
 
     # organisers only see their own occasions
     periods.active().confirmed = True
@@ -1650,13 +1652,17 @@ def test_occasion_attendance_collection(feriennet_app):
     editor = Client(feriennet_app)
     editor.login_editor()
 
-    page = editor.get('/attendees')
+    page = editor.get('/attendees/foo')
     assert "Dustin" not in page
+
+    page = editor.get('/attendees/bar')
     assert "Mike" in page
 
     # admins seel all the occasions
-    page = admin.get('/attendees')
+    page = admin.get('/attendees/foo')
     assert "Dustin" in page
+
+    page = admin.get('/attendees/bar')
     assert "Mike" in page
 
     # if the emergency info is given, it is shown
@@ -1669,7 +1675,8 @@ def test_occasion_attendance_collection(feriennet_app):
     page.form['emergency'] = '123456789 Admin'
     page.form.submit()
 
-    assert "123456789 Admin" in admin.get('/attendees')
+    assert "123456789 Admin" in admin.get('/attendees/foo')
+    assert "123456789 Admin" in admin.get('/attendees/bar')
 
 
 def test_send_email(feriennet_app):
