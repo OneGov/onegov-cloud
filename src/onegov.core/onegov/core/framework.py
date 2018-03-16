@@ -1075,8 +1075,8 @@ def default_content_security_policy():
         # enable inline scripts, eval and external scripts
         script_src={SELF, "https:", UNSAFE_INLINE, UNSAFE_EVAL},
 
-        # do not enable any object/embed/applet elements
-        object_src={NONE},
+        # by default limit to self (allow pdf viewer etc)
+        object_src={SELF},
 
         # disable all mixed content (https -> http)
         block_all_mixed_content=True
