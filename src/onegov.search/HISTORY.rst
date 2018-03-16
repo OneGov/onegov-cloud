@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Catches more connection related errors.
+  [href]
+
 - Fixes verify_cert=False option being ignored.
   [href]
 

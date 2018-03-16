@@ -5,6 +5,7 @@ from datetime import datetime
 from elasticsearch import ConnectionError  # shadows a python builtin!
 from elasticsearch import Elasticsearch
 from elasticsearch import Transport
+from elasticsearch import TransportError
 from more.transaction.main import transaction_tween_factory
 from onegov.search import Search, log
 from onegov.search.errors import SearchOfflineError
@@ -13,6 +14,7 @@ from onegov.search.indexer import ORMEventTranslator
 from onegov.search.indexer import TypeMappingRegistry
 from onegov.search.utils import searchable_sqlalchemy_models
 from sqlalchemy import inspect
+from urllib3.exceptions import HTTPError
 
 
 class TolerantTransport(Transport):
@@ -59,7 +61,11 @@ class TolerantTransport(Transport):
 
         try:
             response = super().perform_request(*args, **kwargs)
-        except ConnectionError as e:
+        except (ConnectionError, TransportError, HTTPError) as e:
+
+            if is_transport_error(e) and not is_5xx_error(e):
+                raise
+
             self.failures += 1
             self.failure_time = datetime.utcnow()
 
@@ -68,6 +74,14 @@ class TolerantTransport(Transport):
         else:
             self.failures = 0
             return response
+
+
+def is_transport_error(error):
+    return isinstance(error, TransportError)
+
+
+def is_5xx_error(error):
+    return error.status_code and str(error.status_code).startswith('5')
 
 
 class ElasticsearchApp(morepath.App):
