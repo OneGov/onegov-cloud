@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes transport catching not working right.
+  [href]
+
 1.3.1 (2018-03-16)
 ~~~~~~~~~~~~~~~~~~~
 

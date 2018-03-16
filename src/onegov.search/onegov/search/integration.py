@@ -61,23 +61,26 @@ class TolerantTransport(Transport):
 
         try:
             response = super().perform_request(*args, **kwargs)
-        except (ConnectionError, TransportError, HTTPError) as e:
 
-            if is_transport_error(e) and not is_5xx_error(e):
-                raise
+        except (TransportError, HTTPError) as e:
+
+            # transport errors might be caused by bugs (for example, when we
+            # refer to a non-existant index) -> we are only tolerant of
+            # connection errors
+            if isinstance(e, TransportError):
+                if not isinstance(e, ConnectionError):
+                    if not is_5xx_error(e):
+                        raise
 
             self.failures += 1
             self.failure_time = datetime.utcnow()
 
             log.exception("Elasticsearch cluster is offline")
             raise SearchOfflineError()
+
         else:
             self.failures = 0
             return response
-
-
-def is_transport_error(error):
-    return isinstance(error, TransportError)
 
 
 def is_5xx_error(error):
