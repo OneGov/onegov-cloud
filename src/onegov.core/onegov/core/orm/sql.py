@@ -2,6 +2,7 @@ import os
 import psqlparse
 import re
 
+from onegov.core.cache import lru_cache
 from onegov.core.orm import types as onegov_types
 from sqlalchemy import text
 from sqlalchemy import types as sqlalchemy_types
@@ -67,6 +68,7 @@ def type_by_string(expression):
         or getattr(sqlalchemy_types, expression)
 
 
+@lru_cache(maxsize=64)
 def as_selectable_from_path(path):
     alias = os.path.basename(path).split('.', 1)[0]
 
