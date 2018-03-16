@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes verify_cert=False option being ignored.
+  [href]
+
 1.3.0 (2018-03-09)
 ~~~~~~~~~~~~~~~~~~~
 

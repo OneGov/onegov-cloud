@@ -142,7 +142,7 @@ class ElasticsearchApp(morepath.App):
         if verify_certs:
             extra = {'verify_certs': True, 'ca_certs': certifi.where()}
         else:
-            extra = {}
+            extra = {'verify_certs': False}
 
         self.es_client = Elasticsearch(
             hosts=hosts,
