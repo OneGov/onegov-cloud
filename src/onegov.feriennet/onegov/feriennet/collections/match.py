@@ -9,9 +9,6 @@ from statistics import mean
 
 class MatchCollection(object):
 
-    occasions_by_state = as_selectable_from_path(
-        module_path('onegov.feriennet', 'queries/occasions_by_state.sql'))
-
     def __init__(self, session, period, states=None):
         self.session = session
         self.period = period
@@ -44,6 +41,11 @@ class MatchCollection(object):
             return mean(values)
         else:
             return 0
+
+    @property
+    def occasions_by_state(self):
+        return as_selectable_from_path(
+            module_path('onegov.feriennet', 'queries/occasions_by_state.sql'))
 
     @property
     def operability(self):

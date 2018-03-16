@@ -76,9 +76,6 @@ class BillingDetails(object):
 
 class BillingCollection(object):
 
-    invoices_by_period = as_selectable_from_path(
-        module_path('onegov.feriennet', 'queries/invoices_by_period.sql'))
-
     def __init__(self, session, period, username=None, expand=False):
         self.session = session
         self.period = period
@@ -90,6 +87,11 @@ class BillingCollection(object):
             username=username,
             invoice=self.period.id.hex
         )
+
+    @property
+    def invoices_by_period(self):
+        return as_selectable_from_path(
+            module_path('onegov.feriennet', 'queries/invoices_by_period.sql'))
 
     @property
     def period_id(self):

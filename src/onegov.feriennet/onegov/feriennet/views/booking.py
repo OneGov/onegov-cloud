@@ -24,9 +24,6 @@ from uuid import UUID
 
 DELETABLE_STATES = ('open', 'cancelled', 'denied', 'blocked')
 
-RELATED_ATTENDEES = as_selectable_from_path(
-    module_path('onegov.feriennet', 'queries/related_attendees.sql'))
-
 
 def all_bookings(collection):
     """ Loads all bookings together with the linked occasions, attendees and
@@ -79,7 +76,8 @@ def total_by_bookings(period, bookings):
 
 
 def related_attendees(session, occasion_ids):
-    stmt = RELATED_ATTENDEES
+    stmt = as_selectable_from_path(
+        module_path('onegov.feriennet', 'queries/related_attendees.sql'))
 
     related = session.execute(
         select(stmt.c).where(

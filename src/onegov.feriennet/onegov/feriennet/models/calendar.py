@@ -40,12 +40,14 @@ class Calendar(object):
 class AttendeeCalendar(Calendar, name='attendee'):
     """ Renders all confirmed activites of the given attendee. """
 
-    attendee_calendar = as_selectable_from_path(
-        module_path('onegov.feriennet', 'queries/attendee_calendar.sql'))
-
     def __init__(self, session, attendee):
         self.session = session
         self.attendee = attendee
+
+    @property
+    def attendee_calendar(self):
+        return as_selectable_from_path(
+            module_path('onegov.feriennet', 'queries/attendee_calendar.sql'))
 
     @property
     def attendee_id(self):
