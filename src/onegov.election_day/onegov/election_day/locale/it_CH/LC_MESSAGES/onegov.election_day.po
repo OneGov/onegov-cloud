@@ -625,6 +625,15 @@ msgstr "I Suoi risultati non hanno potuto essere caricati."
 msgid "Line"
 msgstr "Riga"
 
+msgid "Stack"
+msgstr ""
+
+msgid "Toggle"
+msgstr ""
+
+msgid "Columns"
+msgstr ""
+
 #. Default: Votes
 #.
 msgid "single_votes"

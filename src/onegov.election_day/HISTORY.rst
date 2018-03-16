@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves display of tables.
+  [msom]
+
 - Optimizes some views.
   [msom]
 

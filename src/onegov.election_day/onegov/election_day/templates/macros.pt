@@ -391,4 +391,16 @@
     </div>
 </metal:upload_errors>
 
+<metal:tablesaw_translations define-macro="tablesaw_translations" i18n:domain="onegov.election_day">
+    <script>
+        TablesawConfig = {
+            i18n: {
+                modeStack: '<tal:block i18n:translate>Stack</tal:block>',
+                modeToggle: '<tal:block i18n:translate>Toggle</tal:block>',
+                modeSwitchColumns: '<tal:block i18n:translate>Columns</tal:block>',
+            }
+        };
+    </script>
+</metal:tablesaw_translations>
+
 </body>

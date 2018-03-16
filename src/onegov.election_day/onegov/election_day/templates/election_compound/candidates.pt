@@ -17,13 +17,18 @@
 
             <h3 tal:content="layout.title()" />
 
-            <table class="ballot-results stackable sortable">
+            <table
+                class="results tablesaw sortable"
+                data-tablesaw-mode="columntoggle"
+                data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
+                data-tablesaw-minimap=""
+                >
                 <thead>
                     <tr>
-                        <th i18n:translate="">Candidate</th>
-                        <th i18n:translate="" class="right-aligned" tal:condition="layout.majorz">Party</th>
-                        <th i18n:translate="" class="right-aligned" tal:condition="layout.proporz">List</th>
-                        <th i18n:translate="" class="right-aligned">${layout.principal.label('district')}</th>
+                        <th data-tablesaw-priority="persist" i18n:translate="">Candidate</th>
+                        <th data-tablesaw-priority="1" i18n:translate="" class="right-aligned" tal:condition="layout.majorz">Party</th>
+                        <th data-tablesaw-priority="1" i18n:translate="" class="right-aligned" tal:condition="layout.proporz">List</th>
+                        <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">${layout.principal.label('district')}</th>
                     </tr>
                 </thead>
                 <tbody>

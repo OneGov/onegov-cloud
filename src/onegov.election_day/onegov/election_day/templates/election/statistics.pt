@@ -25,29 +25,18 @@
                 >
                 <thead>
                     <tr>
-                        <th i18n:translate="" class="left-aligned">${layout.principal.label('entity')}</th>
-                        <th i18n:translate="" class="left-aligned" tal:condition="layout.principal.has_districts">${layout.principal.label('district')}</th>
-                        <th i18n:translate="" class="right-aligned">eligible Voters</th>
-                        <th i18n:translate="" class="right-aligned">Received Ballots</th>
-                        <th i18n:translate="" class="right-aligned">Accounted Ballots</th>
-                        <th i18n:translate="" class="right-aligned">Blank Ballots</th>
-                        <th i18n:translate="" class="right-aligned">Invalid Ballots</th>
-                        <th i18n:translate="" class="right-aligned">Accounted Votes</th>
-                        <th i18n:translate="" class="right-aligned" tal:condition="layout.completed">Turnout</th>
+                        <th data-tablesaw-priority="persist" i18n:translate="" class="left-aligned">${layout.principal.label('entity')}</th>
+                        <th data-tablesaw-priority="3" i18n:translate="" class="left-aligned" tal:condition="layout.principal.has_districts">${layout.principal.label('district')}</th>
+                        <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">eligible Voters</th>
+                        <th data-tablesaw-priority="4" i18n:translate="" class="right-aligned">Received Ballots</th>
+                        <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Accounted Ballots</th>
+                        <th data-tablesaw-priority="6" i18n:translate="" class="right-aligned">Blank Ballots</th>
+                        <th data-tablesaw-priority="6" i18n:translate="" class="right-aligned">Invalid Ballots</th>
+                        <th data-tablesaw-priority="4" i18n:translate="" class="right-aligned">Accounted Votes</th>
+                        <th data-tablesaw-priority="1" i18n:translate="" class="right-aligned" tal:condition="layout.completed">Turnout</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="total static" tal:condition="layout.summarize">
-                        <td i18n:translate="">Total</td>
-                        <td tal:condition="layout.principal.has_districts"></td>
-                        <td class="right-aligned">${layout.format_number(election.eligible_voters)}</td>
-                        <td class="right-aligned">${layout.format_number(election.received_ballots)}</td>
-                        <td class="right-aligned">${layout.format_number(election.accounted_ballots)}</td>
-                        <td class="right-aligned">${layout.format_number(election.blank_ballots)}</td>
-                        <td class="right-aligned">${layout.format_number(election.invalid_ballots)}</td>
-                        <td class="right-aligned">${layout.format_number(election.accounted_votes)}</td>
-                        <td class="right-aligned" tal:condition="layout.completed">${'{0:.2f}'.format(election.turnout)} %</td>
-                    </tr>
                     <tr tal:repeat="result election.results">
                         <tal:block condition="not: result.counted">
                             <td>${layout.format_name(result)}</td>

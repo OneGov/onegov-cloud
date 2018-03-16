@@ -623,6 +623,15 @@ msgstr "Ihre Resultate konnten leider nicht hochgeladen werden."
 msgid "Line"
 msgstr "Zeile"
 
+msgid "Stack"
+msgstr "Gestapelt"
+
+msgid "Toggle"
+msgstr "Auswahl"
+
+msgid "Columns"
+msgstr "Spalten"
+
 #. Default: Votes
 #.
 msgid "single_votes"
@@ -899,8 +908,8 @@ msgid ""
 "Final results of the regional election \"${title}\", ${date}, ${principal}, "
 "broken down by candidates and municipalities."
 msgstr ""
-"Schlussresultate der regionalen Wahl \"${title}\", ${date}, "
-"${principal}, aufgeschlüsselt nach Kandidaten und Gemeinden."
+"Schlussresultate der regionalen Wahl \"${title}\", ${date}, ${principal}, "
+"aufgeschlüsselt nach Kandidaten und Gemeinden."
 
 #, python-format
 msgid ""

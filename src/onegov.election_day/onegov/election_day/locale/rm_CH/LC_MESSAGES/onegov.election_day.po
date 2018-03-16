@@ -663,6 +663,15 @@ msgstr "Voss resultats n'han displaschaivlamain betg pudì vegnir chargiads si."
 msgid "Line"
 msgstr "Lingia"
 
+msgid "Stack"
+msgstr ""
+
+msgid "Toggle"
+msgstr ""
+
+msgid "Columns"
+msgstr ""
+
 #. Default: Votes
 #.
 msgid "single_votes"
@@ -941,8 +950,9 @@ msgid ""
 "Final results of the regional election \"${title}\", ${date}, ${principal}, "
 "broken down by candidates and municipalities."
 msgstr ""
-"Resultats finals da l'elecziun regiunala \"${title}\", ${date}, ${principal}, "
-"resultats da tut las candidatas e da tut ils candidats tenor vischnancas."
+"Resultats finals da l'elecziun regiunala \"${title}\", ${date}, "
+"${principal}, resultats da tut las candidatas e da tut ils candidats tenor "
+"vischnancas."
 
 #, python-format
 msgid ""
