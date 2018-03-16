@@ -35,7 +35,7 @@ from mailthon.middleware import TLS, Auth
 from morepath.publish import resolve_model, get_view_name
 from more.content_security import ContentSecurityApp
 from more.content_security import ContentSecurityPolicy
-from more.content_security import SELF, UNSAFE_INLINE, UNSAFE_EVAL, NONE
+from more.content_security import SELF, UNSAFE_INLINE, UNSAFE_EVAL
 from more.transaction import TransactionApp
 from more.transaction.main import transaction_tween_factory
 from more.webassets import WebassetsApp
