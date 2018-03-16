@@ -260,7 +260,7 @@ def get_status_mail_roles():
 
 @OrgApp.setting(section='org', name='ticket_manager_roles')
 def get_ticket_manager_roles():
-    return ('admin', )
+    return ('admin', 'editor')
 
 
 @OrgApp.setting(section='org', name='require_complete_userprofile')

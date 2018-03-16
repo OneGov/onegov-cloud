@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes wrong roles shown in ticket view by default.
+  [href]
+
 0.25.4 (2018-03-15)
 ~~~~~~~~~~~~~~~~~~~
 
