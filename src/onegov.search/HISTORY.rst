@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.3.1 (2018-03-16)
+~~~~~~~~~~~~~~~~~~~
+
 - Catches more connection related errors.
   [href]
 
