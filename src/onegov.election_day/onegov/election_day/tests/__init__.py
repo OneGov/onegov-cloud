@@ -249,3 +249,30 @@ def upload_party_results(client, create=True, canton='gr'):
     upload = client.get('/election/proporz-election/upload-party-results')
     upload.form['parties'] = Upload('parties.csv', csv_parties, 'text/plain')
     upload = upload.form.submit()
+
+
+def create_election_compound(client):
+    # Add two elections
+    new = client.get('/manage/elections').click('Neue Wahl')
+    new.form['election_de'] = 'Regional Election A'
+    new.form['date'] = date(2016, 1, 1)
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'region'
+    new.form['mandates'] = 10
+    new.form.submit()
+
+    new = client.get('/manage/elections').click('Neue Wahl')
+    new.form['election_de'] = 'Regional Election B'
+    new.form['date'] = date(2016, 1, 1)
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'region'
+    new.form['mandates'] = 5
+    new.form.submit()
+
+    # Add a compound
+    new = client.get('/manage/election-compounds').click('Neue Verbindung')
+    new.form['election_de'] = 'Elections'
+    new.form['date'] = date(2016, 1, 1)
+    new.form['domain'] = 'canton'
+    new.form['elections'] = ['regional-election-a', 'regional-election-b']
+    new.form.submit()

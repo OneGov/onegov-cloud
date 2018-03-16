@@ -3,6 +3,7 @@ import onegov.election_day
 from datetime import date
 from freezegun import freeze_time
 from onegov.ballot import Ballot
+from onegov.election_day.tests import create_election_compound
 from onegov.election_day.tests import login
 from onegov.election_day.tests import upload_majorz_election
 from onegov.election_day.tests import upload_proporz_election
@@ -362,6 +363,7 @@ def test_opendata_catalog(election_day_app):
     upload_vote(client)
     upload_majorz_election(client, canton='zg')
     upload_proporz_election(client, canton='zg')
+    create_election_compound(client)
 
     root = fromstring(client.get('/catalog.rdf').text)
     assert set([
@@ -381,14 +383,24 @@ def test_opendata_catalog(election_day_app):
         'Proporz Election',
         'proporz-election.csv',
         'proporz-election.json',
-        'vote.csv',
-        'vote.json',
+        'Regional Election A',
+        'regional-election-a.csv',
+        'regional-election-a.json',
+        'Regional Election B',
+        'regional-election-b.csv',
+        'regional-election-b.json',
+        'Elections',
+        'elections.csv',
+        'elections.json',
         'Vote',
+        'vote.csv',
+        'vote.json'
     }
-    assert set([
-        list(x[0].attrib.values())[0] for x in root[0]
-    ]) == {
+    assert set([list(x[0].attrib.values())[0] for x in root[0]]) == {
         'http://kanton-govikon/election-majorz-election',
         'http://kanton-govikon/election-proporz-election',
-        'http://kanton-govikon/vote-vote',
+        'http://kanton-govikon/election-regional-election-a',
+        'http://kanton-govikon/election-regional-election-b',
+        'http://kanton-govikon/election-elections',
+        'http://kanton-govikon/vote-vote'
     }
