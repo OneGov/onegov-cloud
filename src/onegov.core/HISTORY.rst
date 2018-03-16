@@ -1,9 +1,18 @@
 Changelog
 ---------
 
+- Caches selectables loaded by path.
+  [href]
+
 - Changes the object_src of the default content security policy to self. This
   allows PDF viewers of browser to work properly.
   [msom]
+
+0.65.1 (2018-03-14)
+~~~~~~~~~~~~~~~~~~~
+
+- Adds a mail macros lookup property.
+  [href]
 
 0.65.0 (2018-03-06)
 ~~~~~~~~~~~~~~~~~~~
