@@ -89,7 +89,7 @@ def test_view_manage_election_compounds(election_day_app):
 
     # Add two elections
     new = client.get('/manage/elections').click('Neue Wahl')
-    new.form['election_de'] = 'Regional Election A'
+    new.form['election_de'] = 'Elect a new parliament (Region A)'
     new.form['date'] = date(2016, 1, 1)
     new.form['election_type'] = 'proporz'
     new.form['domain'] = 'region'
@@ -97,7 +97,7 @@ def test_view_manage_election_compounds(election_day_app):
     new.form.submit().follow()
 
     new = client.get('/manage/elections').click('Neue Wahl')
-    new.form['election_de'] = 'Regional Election B'
+    new.form['election_de'] = 'Elect a new parliament (Region B)'
     new.form['date'] = date(2016, 1, 1)
     new.form['election_type'] = 'proporz'
     new.form['domain'] = 'region'

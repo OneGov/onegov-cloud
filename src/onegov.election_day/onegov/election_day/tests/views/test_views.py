@@ -135,8 +135,15 @@ def test_view_last_modified(election_day_app):
         new.form['election_de'] = "Election"
         new.form['date'] = date(2013, 1, 1)
         new.form['mandates'] = 1
-        new.form['election_type'] = 'majorz'
-        new.form['domain'] = 'federation'
+        new.form['election_type'] = 'proporz'
+        new.form['domain'] = 'region'
+        new.form.submit()
+
+        new = client.get('/manage/election-compounds/new-election-compound')
+        new.form['election_de'] = "Elections"
+        new.form['date'] = date(2013, 1, 1)
+        new.form['elections'] = ['election']
+        new.form['domain'] = 'canton'
         new.form.submit()
 
         client = Client(election_day_app)
@@ -149,6 +156,11 @@ def test_view_last_modified(election_day_app):
             '/election/election/data-json',
             '/election/election/data-csv',
             '/election/election/data-xlsx',
+            '/elections/elections/summary',
+            '/elections/elections/json',
+            '/elections/elections/data-json',
+            '/elections/elections/data-csv',
+            '/elections/elections/data-xlsx',
             '/vote/vote/summary',
             '/vote/vote/json',
             '/vote/vote/data-json',
@@ -165,6 +177,12 @@ def test_view_last_modified(election_day_app):
             '/election/election/lists',
             '/election/election/candidates',
             '/election/election/statistics',
+            '/election/election/panachage',
+            '/election/election/parties',
+            '/election/election/data',
+            '/elections/elections',
+            '/elections/elections/districts',
+            '/elections/elections/data',
             '/vote/vote/',
             '/vote/vote/counter-proposal',
             '/vote/vote/tie-breaker',
