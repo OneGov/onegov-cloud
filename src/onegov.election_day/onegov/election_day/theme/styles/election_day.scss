@@ -332,6 +332,11 @@ table {
         }
     }
 }
+@media (min-width: 40em) {
+    .tablesaw-modeswitch {
+        display: none;
+    }
+}
 
 /*
     Sortable table
