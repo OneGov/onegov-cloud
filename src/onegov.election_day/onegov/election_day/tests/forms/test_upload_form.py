@@ -4,7 +4,7 @@ from datetime import date
 from onegov.ballot import ComplexVote
 from onegov.ballot import Election
 from onegov.ballot import Vote
-from onegov.election_day.forms import UploadElectionPartyResultsForm
+from onegov.election_day.forms import UploadPartyResultsForm
 from onegov.election_day.forms import UploadMajorzElectionForm
 from onegov.election_day.forms import UploadProporzElectionForm
 from onegov.election_day.forms import UploadRestForm
@@ -217,10 +217,10 @@ def test_upload_election_form(session):
 
 
 def test_upload_party_results_form():
-    form = UploadElectionPartyResultsForm()
+    form = UploadPartyResultsForm()
     assert not form.validate()
 
-    form = UploadElectionPartyResultsForm(
+    form = UploadPartyResultsForm(
         DummyPostData({'parties': 'internal'})
     )
     form.parties.data = {'mimetype': 'text/plain'}

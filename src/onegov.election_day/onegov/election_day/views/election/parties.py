@@ -8,23 +8,25 @@ from onegov.election_day.utils import add_last_modified_header
 from sqlalchemy.orm import object_session
 
 
-def get_party_results(election):
+def get_party_results(item):
 
     """ Returns the aggregated party results as list. """
 
-    if election.type != 'proporz' or not election.party_results.first():
+    proporz = getattr(item, 'type', 'proporz') == 'proporz'
+    has_result = item.party_results.first()
+    if not proporz or not has_result:
         return [], {}
 
-    session = object_session(election)
+    session = object_session(item)
 
     # Get the totals votes per year
     query = session.query(PartyResult.year, PartyResult.total_votes)
-    query = query.filter(PartyResult.election_id == election.id).distinct()
+    query = query.filter(PartyResult.owner == item.id).distinct()
     totals = dict(query)
     years = sorted((str(key) for key in totals.keys()))
 
     parties = {}
-    for result in election.party_results:
+    for result in item.party_results:
         party = parties.setdefault(result.name, {})
         year = party.setdefault(str(result.year), {})
         year['color'] = result.color

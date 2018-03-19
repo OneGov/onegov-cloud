@@ -1,6 +1,7 @@
 from hashlib import sha256
 from onegov.ballot import Ballot
 from onegov.ballot import Election
+from onegov.ballot import Vote
 
 
 def pdf_filename(item, locale):
@@ -28,8 +29,12 @@ def svg_filename(item, type_, locale=None):
         name = 'ballot'
         hash = str(item.id)
         ts = int(item.vote.last_modified.timestamp())
+    elif isinstance(item, Vote):
+        name = 'vote'
+        hash = sha256(item.id.encode('utf-8')).hexdigest()
+        ts = int(item.last_modified.timestamp())
     else:
-        name = 'election' if isinstance(item, Election) else 'vote'
+        name = 'election'
         hash = sha256(item.id.encode('utf-8')).hexdigest()
         ts = int(item.last_modified.timestamp())
 

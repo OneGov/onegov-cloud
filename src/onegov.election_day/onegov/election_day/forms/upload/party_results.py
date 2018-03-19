@@ -8,7 +8,7 @@ from onegov.form.validators import WhitelistedMimeType
 from wtforms.validators import DataRequired
 
 
-class UploadElectionPartyResultsForm(Form):
+class UploadPartyResultsForm(Form):
 
     parties = UploadField(
         label=_("Party results"),

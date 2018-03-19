@@ -6,8 +6,8 @@ from onegov.election_day.forms.election_compound import ElectionCompoundForm
 from onegov.election_day.forms.notification import TriggerNotificationForm
 from onegov.election_day.forms.subscription import EmailSubscriptionForm
 from onegov.election_day.forms.subscription import SmsSubscriptionForm
-from onegov.election_day.forms.upload import UploadElectionPartyResultsForm
 from onegov.election_day.forms.upload import UploadMajorzElectionForm
+from onegov.election_day.forms.upload import UploadPartyResultsForm
 from onegov.election_day.forms.upload import UploadProporzElectionForm
 from onegov.election_day.forms.upload import UploadRestForm
 from onegov.election_day.forms.upload import UploadVoteForm
@@ -27,8 +27,8 @@ __all__ = [
     'EmptyForm',
     'SmsSubscriptionForm',
     'TriggerNotificationForm',
-    'UploadElectionPartyResultsForm',
     'UploadMajorzElectionForm',
+    'UploadPartyResultsForm',
     'UploadProporzElectionForm',
     'UploadRestForm',
     'UploadVoteForm',

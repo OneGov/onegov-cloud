@@ -82,6 +82,40 @@ def edit_election_compound(self, request, form):
 
 @ElectionDayApp.manage_form(
     model=ElectionCompound,
+    name='clear'
+)
+def clear_election_compound(self, request, form):
+    """ Clear the results of an election ompound. """
+
+    layout = ManageElectionCompoundsLayout(self, request)
+    archive = ArchivedResultCollection(request.session)
+
+    if form.submitted(request):
+        archive.clear(self, request)
+        request.message(_("Results deleted."), 'success')
+        return redirect(layout.manage_model_link)
+
+    return {
+        'message': _(
+            'Do you really want to clear all results (party results) '
+            'of "${item}"?',
+            mapping={
+                'item': self.title
+            }
+        ),
+        'layout': layout,
+        'form': form,
+        'title': self.title,
+        'shortcode': self.shortcode,
+        'subtitle': _("Clear results"),
+        'button_text': _("Clear results"),
+        'button_class': 'alert',
+        'cancel': layout.manage_model_link
+    }
+
+
+@ElectionDayApp.manage_form(
+    model=ElectionCompound,
     name='delete'
 )
 def delete_election_compound(self, request, form):

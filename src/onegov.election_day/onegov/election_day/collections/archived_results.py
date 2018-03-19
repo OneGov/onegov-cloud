@@ -239,7 +239,11 @@ class ArchivedResultCollection(object):
     def clear(self, item, request):
         """ Clears an election or vote and the associated result entry.  """
 
-        assert isinstance(item, Election) or isinstance(item, Vote)
+        assert (
+            isinstance(item, Election) or
+            isinstance(item, ElectionCompound) or
+            isinstance(item, Vote)
+        )
 
         item.clear_results()
         self.update(item, request)

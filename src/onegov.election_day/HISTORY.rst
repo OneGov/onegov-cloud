@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds party results to election compounds.
+  [msom]
+
 - Improves display of tables.
   [msom]
 

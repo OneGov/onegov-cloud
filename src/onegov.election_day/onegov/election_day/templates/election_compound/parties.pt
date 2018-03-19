@@ -1,0 +1,74 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
+    <tal:block metal:fill-slot="title">${election_compound.title}</tal:block>
+    <tal:block metal:fill-slot="before-content">
+        <div metal:use-macro="layout.macros['election_header']" tal:define="election election_compound"/>
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+
+        <div metal:use-macro="layout.macros['status_callout']" />
+
+        <tal:block tal:condition="layout.visible()">
+
+            <h2 i18n:translate="">Results</h2>
+
+            <div metal:use-macro="layout.macros['election_compound_factoids']" />
+
+            <div metal:use-macro="layout.macros['tab_menu']" />
+
+            <h3 tal:content="layout.title()" />
+
+            <div class="row">
+                <div class="small-12 small-centered large-10 columns">
+                    <figure>
+                        <div class="grouped-bar-chart"
+                            i18n:attributes="data-embed-link"
+                            data-dataurl="${request.link(election_compound, name='parties-data')}"
+                            data-embed-link="Embed"
+                            data-embed-source="${request.link(election_compound, name='parties-chart')}">
+                        </div>
+                        <a class="svg-download" tal:condition="layout.svg_path" href="${layout.svg_link}">
+                            <i class="fa fa-download"></i><tal:block i18n:translate="">Download</tal:block>
+                        </a>
+                        <figcaption i18n:translate="figcaption_parties">
+                            The diagram shows the votes and mandates of the parties. The rimmed bars
+                            (left scale) correspond to the number of seats, the colored bars (right scale)
+                            to the voices (percentages).
+                        </figcaption>
+                    </figure>
+                </div>
+            </div>
+
+            <table
+                class="results tablesaw sortable"
+                data-tablesaw-mode="columntoggle"
+                data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
+                data-tablesaw-minimap=""
+                >
+                <thead>
+                    <tr>
+                        <th data-tablesaw-priority="persist" i18n:translate="">Party</th>
+                        <tal:block tal:repeat="year years">
+                            <th data-tablesaw-priority="2" class="right-aligned"><tal:block i18n:translate="">Mandates</tal:block><tal:block tal:condition="deltas"> (${year})</tal:block></th>
+                            <th data-tablesaw-priority="5" class="right-aligned"><tal:block i18n:translate="single_votes">Votes</tal:block><tal:block tal:condition="deltas"> (${year})</tal:block></th>
+                            <th data-tablesaw-priority="4" class="right-aligned"><tal:block i18n:translate="single_votes">Votes</tal:block><tal:block tal:condition="deltas"> (${year})</tal:block></th>
+                        </tal:block>
+                        <tal:block tal:condition="deltas">
+                            <th data-tablesaw-priority="1" class="right-aligned" i18n:translate="">Difference</th>
+                        </tal:block>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr tal:repeat="line results">
+                        <tal:block tal:repeat="cell line">
+                            <td tal:condition="repeat.cell.start">${cell}</td>
+                            <td tal:condition="not: repeat.cell.start" class="right-aligned">${cell}</td>
+                        </tal:block>
+                    </tr>
+                </tbody>
+            </table>
+        </tal:block>
+
+        <div metal:use-macro="layout.macros['related_link']" />
+
+    </tal:block>
+</div>

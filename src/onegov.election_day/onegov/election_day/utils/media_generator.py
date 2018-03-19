@@ -6,6 +6,7 @@ from io import BytesIO
 from io import StringIO
 from onegov.ballot import Ballot
 from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
 from onegov.ballot import Vote
 from onegov.core.custom import json
 from onegov.core.utils import groupbylist
@@ -27,6 +28,8 @@ from onegov.election_day.views.election.parties import get_party_deltas
 from onegov.election_day.views.election.parties import get_party_results
 from onegov.election_day.views.election.parties import \
     view_election_parties_data
+from onegov.election_day.views.election_compound.parties import \
+    view_election_compound_parties_data
 from onegov.pdf import LexworkSigner
 from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header_and_footer
@@ -920,8 +923,6 @@ class MediaGenerator():
     def generate_svg(self, item, type_, locale=None):
         """ Creates the requested SVG. """
 
-        is_election = isinstance(item, Election)
-
         assert type_ in (
             'lists', 'candidates', 'connections', 'parties', 'panachage', 'map'
         )
@@ -940,33 +941,36 @@ class MediaGenerator():
             self.app.filestorage.remove(path)
 
         chart = None
-        if type_ == 'lists' and is_election:
+        if type_ == 'lists':
             data = view_election_lists_data(item, None)
             if data and data.get('results'):
                 chart = self.get_chart('bar', 'svg', data)
 
-        if type_ == 'candidates' and is_election:
+        if type_ == 'candidates':
             data = view_election_candidates_data(item, None)
             if data and data.get('results'):
                 chart = self.get_chart('bar', 'svg', data)
 
-        if type_ == 'connections' and is_election:
+        if type_ == 'connections':
             data = view_election_connections_data(item, None)
             if data and data.get('links') and data.get('nodes'):
                 chart = self.get_chart('sankey', 'svg', data,
                                        params={'inverse': True})
 
-        if type_ == 'parties' and is_election:
-            data = view_election_parties_data(item, None)
+        if type_ == 'parties':
+            if isinstance(item, Election):
+                data = view_election_parties_data(item, None)
+            else:
+                data = view_election_compound_parties_data(item, None)
             if data and data.get('results'):
                 chart = self.get_chart('grouped', 'svg', data)
 
-        if type_ == 'panachage' and is_election:
+        if type_ == 'panachage':
             data = view_election_panachage_data(item, None)
             if data and data.get('links') and data.get('nodes'):
                 chart = self.get_chart('sankey', 'svg', data)
 
-        if type_ == 'map' and not is_election:
+        if type_ == 'map':
             data = item.percentage_by_entity()
             params = {
                 'yay': self.translate(_('Yay'), locale),
@@ -1004,6 +1008,8 @@ class MediaGenerator():
                 self.generate_svg(election, 'connections')
                 self.generate_svg(election, 'parties')
                 self.generate_svg(election, 'panachage')
+        for election_compound in self.session.query(ElectionCompound):
+            self.generate_svg(election_compound, 'parties')
         if principal.use_maps:
             for ballot in self.session.query(Ballot):
                 if principal.is_year_available(ballot.vote.date.year):
@@ -1022,6 +1028,7 @@ class MediaGenerator():
             svg_filename(item, '', '').split('.')[0]
             for item in
             self.session.query(Election).all() +
+            self.session.query(ElectionCompound).all() +
             self.session.query(Ballot).all() +
             self.session.query(Vote).all()
         ]
