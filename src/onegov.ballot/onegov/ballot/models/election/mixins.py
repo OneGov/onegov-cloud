@@ -35,6 +35,17 @@ class PartyResultsExportMixin(object):
     """ Adds a function to export the party results. """
 
     def export_parties(self):
+        """ Returns all party results as list with dicts.
+
+        This is meant as a base for json/csv/excel exports. The result is
+        therefore a flat list of dictionaries with repeating values to avoid
+        the nesting of values. Each record in the resulting list is a single
+        candidate result for each political entity. Party results are not
+        included in the export (since they are not really connected with the
+        lists).
+
+        """
+
         results = self.party_results.order_by(
             PartyResult.year.desc(),
             PartyResult.name
