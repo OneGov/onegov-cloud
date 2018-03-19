@@ -24,6 +24,7 @@ from sqlalchemy import Text
 from sqlalchemy_utils import observes
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import object_session
+from sqlalchemy.orm import relationship
 
 
 class ElectionCompound(
@@ -57,6 +58,16 @@ class ElectionCompound(
     #: An election compound contains n elections
     _elections = Column(
         MutableDict.as_mutable(HSTORE), name='elections', nullable=True
+    )
+
+    #: An election compound may contains n party results
+    party_results = relationship(
+        'PartyResult',
+        primaryjoin=(
+            'foreign(PartyResult.owner) == ElectionCompound.id'
+        ),
+        cascade='all, delete-orphan',
+        lazy='dynamic',
     )
 
     @property
@@ -203,7 +214,7 @@ class ElectionCompound(
         # Get the last party result changes
         result = session.query(PartyResult.last_change)
         result = result.order_by(desc(PartyResult.last_change))
-        result = result.filter(PartyResult.election_id.in_(election_ids))
+        result = result.filter(PartyResult.owner.in_(election_ids + [self.id]))
         changes.append(result.first()[0] if result.first() else None)
 
         changes = [change for change in changes if change]
@@ -221,6 +232,13 @@ class ElectionCompound(
 
     #: may be used to store a link related to this election
     related_link = meta_property('related_link')
+
+    def clear_results(self):
+        """ Clears all own results. """
+
+        session = object_session(self)
+        for result in self.party_results:
+            session.delete(result)
 
     def export(self):
         """ Returns all data connected to this election compound as list with

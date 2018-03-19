@@ -9,6 +9,7 @@ from onegov.ballot import List
 from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
 from onegov.ballot import PanachageResult
+from onegov.ballot import PartyResult
 from onegov.ballot import ProporzElection
 from uuid import uuid4
 
@@ -50,7 +51,7 @@ def majorz_election():
         )
     )
 
-    # resutls
+    # results
     election_result = ElectionResult(
         name='name',
         entity_id=1,
@@ -300,6 +301,23 @@ def test_election_compound(session):
         ('Miro', 'Max'), ('Peter', 'Paul')
     }
 
+    # Add party results
+    party_result = PartyResult(
+        owner=election_compound.id,
+        number_of_mandates=0,
+        votes=0,
+        total_votes=100,
+        name='Libertarian',
+        color='black'
+    )
+    session.add(party_result)
+    session.flush()
+    assert election_compound.party_results.one() == party_result
+
+    # Clear results
+    election_compound.clear_results()
+    assert election_compound.party_results.first() == None
+
 
 def test_election_compound_id_generation(session):
     election_compound = ElectionCompound(
@@ -359,6 +377,20 @@ def test_election_compound_changes(session):
         session.flush()
     assert election_compound.last_modified.isoformat().startswith('2017')
     assert election_compound.last_result_change.isoformat().startswith('2016')
+
+    with freeze_time("2018-01-01"):
+        election_compound.party_results.append(
+            PartyResult(
+                number_of_mandates=0,
+                votes=0,
+                total_votes=100,
+                name='Libertarian',
+                color='black'
+            )
+        )
+        session.flush()
+    assert election_compound.last_modified.isoformat().startswith('2018')
+    assert election_compound.last_result_change.isoformat().startswith('2018')
 
 
 def test_election_compound_export(session):

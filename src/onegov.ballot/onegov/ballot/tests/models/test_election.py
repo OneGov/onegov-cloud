@@ -63,7 +63,7 @@ def test_election_create_all_models(session):
     session.flush()
 
     party_result = PartyResult(
-        election_id=election.id,
+        owner=election.id,
         number_of_mandates=0,
         votes=0,
         total_votes=100,
@@ -141,7 +141,7 @@ def test_election_create_all_models(session):
     assert candidate.election == election
     assert candidate.list == list
 
-    assert party_result.election == election
+    assert party_result.owner == election.id
 
     assert election_result.list_results.one() == list_result
     assert election_result.candidate_results.one() == candidate_result

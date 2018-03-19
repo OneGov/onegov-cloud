@@ -41,8 +41,10 @@ class ProporzElection(Election):
     #: An election may contains n party results
     party_results = relationship(
         'PartyResult',
+        primaryjoin=(
+            'foreign(PartyResult.owner) == ProporzElection.id'
+        ),
         cascade='all, delete-orphan',
-        backref=backref('election'),
         lazy='dynamic',
     )
 
@@ -101,7 +103,7 @@ class ProporzElection(Election):
 
         parties = session.query(PartyResult.last_change)
         parties = parties.order_by(desc(PartyResult.last_change))
-        parties = parties.filter(PartyResult.election_id == self.id)
+        parties = parties.filter(PartyResult.owner == self.id)
         parties = parties.first()[0] if parties.first() else None
 
         changes = [changed, lists, pan, parties]

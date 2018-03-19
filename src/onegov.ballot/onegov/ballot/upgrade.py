@@ -343,3 +343,18 @@ def renmame_elegible_voters_columns(context):
             context.operations.alter_column(
                 table, 'elegible_voters', new_column_name='eligible_voters'
             )
+
+
+@upgrade_task('Add party results to compounds')
+def add_party_results_to_compounds(context):
+    if context.has_column('party_results', 'election_id'):
+        context.operations.drop_constraint(
+            'party_results_election_id_fkey',
+            'party_results',
+            type_='foreignkey'
+        )
+        context.operations.alter_column(
+            'party_results',
+            'election_id',
+            new_column_name='owner'
+        )

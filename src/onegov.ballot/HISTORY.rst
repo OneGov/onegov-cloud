@@ -1,9 +1,13 @@
 Changelog
 ---------
+
+- Adds party results to election compounds.
+  [msom]
+
 3.1.3 (2018-03-13)
 ~~~~~~~~~~~~~~~~~~~
 
-- Returns elections of election compounds alwyas as lists.
+- Returns elections of election compounds always as lists.
   [msom]
 
 3.1.2 (2018-03-13)
