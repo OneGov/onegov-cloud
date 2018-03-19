@@ -124,22 +124,22 @@ def add_proporz_election(session, year=2015):
     )
 
     list_1.panachage_results.append(
-        PanachageResult(target_list_id=list_1.id, source_list_id=2, votes=1)
+        PanachageResult(target=str(list_1.id), source=2, votes=1)
     )
     list_1.panachage_results.append(
-        PanachageResult(target_list_id=list_1.id, source_list_id=3, votes=1)
+        PanachageResult(target=str(list_1.id), source=3, votes=1)
     )
     list_2.panachage_results.append(
-        PanachageResult(target_list_id=list_2.id, source_list_id=1, votes=2)
+        PanachageResult(target=str(list_2.id), source=1, votes=2)
     )
     list_2.panachage_results.append(
-        PanachageResult(target_list_id=list_2.id, source_list_id=3, votes=2)
+        PanachageResult(target=str(list_2.id), source=3, votes=2)
     )
     list_3.panachage_results.append(
-        PanachageResult(target_list_id=list_3.id, source_list_id=1, votes=3)
+        PanachageResult(target=str(list_3.id), source=1, votes=3)
     )
     list_3.panachage_results.append(
-        PanachageResult(target_list_id=list_3.id, source_list_id=2, votes=3)
+        PanachageResult(target=str(list_3.id), source=2, votes=3)
     )
 
     candidate_1 = Candidate(

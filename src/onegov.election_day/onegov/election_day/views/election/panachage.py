@@ -46,10 +46,9 @@ def view_election_panachage_data(self, request):
             [r.votes for r in list_target.panachage_results]
         )
         for result in list_target.panachage_results:
-            source_list_id = result.source_list_id
-            source = node_keys.index('left.{}'.format(source_list_id))
+            source = node_keys.index('left.{}'.format(result.source))
             votes = result.votes
-            if list_target.list_id == result.source_list_id:
+            if list_target.list_id == result.source:
                 votes += remaining
             links.append({
                 'source': source,

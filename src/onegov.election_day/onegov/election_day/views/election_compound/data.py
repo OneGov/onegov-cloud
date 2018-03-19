@@ -1,7 +1,5 @@
-from collections import OrderedDict
 from morepath.request import Response
 from onegov.ballot import ElectionCompound
-from onegov.ballot import PartyResult
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.csv import convert_list_of_dicts_to_xlsx
 from onegov.core.custom import json
@@ -112,24 +110,8 @@ def view_election_compound_parties_data_as_csv(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_modified)
 
-    results = self.party_results.order_by(
-        PartyResult.year.desc(),
-        PartyResult.name
-    )
-
-    rows = []
-    for result in results:
-        row = OrderedDict()
-        row['year'] = result.year
-        row['total_votes'] = result.total_votes
-        row['name'] = result.name
-        row['color'] = result.color
-        row['mandates'] = result.number_of_mandates
-        row['votes'] = result.votes
-        rows.append(row)
-
     return Response(
-        convert_list_of_dicts_to_csv(rows),
+        convert_list_of_dicts_to_csv(self.export_parties()),
         content_type='text/csv',
         content_disposition='inline; filename={}.csv'.format(
             normalize_for_url(

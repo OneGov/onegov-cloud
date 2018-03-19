@@ -451,7 +451,7 @@ def import_election_wabsti_proporz(
         if list_.list_id in panachage:
             for source, votes in panachage[list_.list_id].items():
                 list_.panachage_results.append(
-                    PanachageResult(source_list_id=source, votes=votes)
+                    PanachageResult(source=source, votes=votes)
                 )
 
     for candidate in candidates.values():
