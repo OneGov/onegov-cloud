@@ -653,3 +653,90 @@ def test_election_compound_export(session):
             'candidate_votes': 520,
         }
     ]
+
+
+def test_election_compound_export_parties(session):
+    session.add(
+        ElectionCompound(
+            title='Elections',
+            domain='canton',
+            date=date(2015, 6, 14),
+        )
+    )
+    session.flush()
+    election_compound = session.query(ElectionCompound).one()
+
+    assert election_compound.export_parties() == []
+
+    # Add party results
+    election_compound.party_results.append(
+        PartyResult(
+            number_of_mandates=0,
+            votes=0,
+            total_votes=100,
+            name='Libertarian',
+            color='black',
+            year=2012
+        )
+    )
+    election_compound.party_results.append(
+        PartyResult(
+            number_of_mandates=2,
+            votes=2,
+            total_votes=50,
+            name='Libertarian',
+            color='black',
+            year=2016
+        )
+    )
+    election_compound.party_results.append(
+        PartyResult(
+            number_of_mandates=1,
+            votes=1,
+            total_votes=100,
+            name='Conservative',
+            color='red',
+            year=2012
+        )
+    )
+    election_compound.party_results.append(
+        PartyResult(
+            number_of_mandates=3,
+            votes=3,
+            total_votes=50,
+            name='Conservative',
+            color='red',
+            year=2016
+        )
+    )
+    assert election_compound.export_parties() == [
+        {
+            'color': 'red',
+            'mandates': 3,
+            'name': 'Conservative',
+            'total_votes': 50,
+            'votes': 3,
+            'year': 2016
+        }, {
+            'color': 'black',
+            'mandates': 2,
+            'name': 'Libertarian',
+            'total_votes': 50,
+            'votes': 2,
+            'year': 2016
+        }, {
+            'color': 'red',
+            'mandates': 1,
+            'name': 'Conservative',
+            'total_votes': 100,
+            'votes': 1,
+            'year': 2012
+        }, {
+            'color': 'black',
+            'mandates': 0,
+            'name': 'Libertarian',
+            'total_votes': 100,
+            'votes': 0,
+            'year': 2012
+        }
+    ]

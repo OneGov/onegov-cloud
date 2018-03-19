@@ -1,3 +1,5 @@
+from collections import OrderedDict
+from onegov.ballot.models.election.party_result import PartyResult
 from sqlalchemy.ext.hybrid import hybrid_property
 
 
@@ -26,3 +28,27 @@ class DerivedAttributesMixin(object):
             return 0
 
         return self.received_ballots / self.eligible_voters * 100
+
+
+class PartyResultsExportMixin(object):
+
+    """ Adds a function to export the party results. """
+
+    def export_parties(self):
+        results = self.party_results.order_by(
+            PartyResult.year.desc(),
+            PartyResult.name
+        )
+
+        rows = []
+        for result in results:
+            row = OrderedDict()
+            row['year'] = result.year
+            row['total_votes'] = result.total_votes
+            row['name'] = result.name
+            row['color'] = result.color
+            row['mandates'] = result.number_of_mandates
+            row['votes'] = result.votes
+            rows.append(row)
+
+        return rows

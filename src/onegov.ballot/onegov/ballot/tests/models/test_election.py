@@ -1337,6 +1337,95 @@ def test_election_export_proporz(session):
     ]
 
 
+def test_election_export_parties(session):
+    session.add(
+        ProporzElection(
+            title='Wahl',
+            domain='federation',
+            date=date(2015, 6, 14),
+            number_of_mandates=1,
+            absolute_majority=144
+        )
+    )
+    session.flush()
+    election = session.query(ProporzElection).one()
+
+    assert election.export_parties() == []
+
+    # Add party results
+    election.party_results.append(
+        PartyResult(
+            number_of_mandates=0,
+            votes=0,
+            total_votes=100,
+            name='Libertarian',
+            color='black',
+            year=2012
+        )
+    )
+    election.party_results.append(
+        PartyResult(
+            number_of_mandates=2,
+            votes=2,
+            total_votes=50,
+            name='Libertarian',
+            color='black',
+            year=2016
+        )
+    )
+    election.party_results.append(
+        PartyResult(
+            number_of_mandates=1,
+            votes=1,
+            total_votes=100,
+            name='Conservative',
+            color='red',
+            year=2012
+        )
+    )
+    election.party_results.append(
+        PartyResult(
+            number_of_mandates=3,
+            votes=3,
+            total_votes=50,
+            name='Conservative',
+            color='red',
+            year=2016
+        )
+    )
+    assert election.export_parties() == [
+        {
+            'color': 'red',
+            'mandates': 3,
+            'name': 'Conservative',
+            'total_votes': 50,
+            'votes': 3,
+            'year': 2016
+        }, {
+            'color': 'black',
+            'mandates': 2,
+            'name': 'Libertarian',
+            'total_votes': 50,
+            'votes': 2,
+            'year': 2016
+        }, {
+            'color': 'red',
+            'mandates': 1,
+            'name': 'Conservative',
+            'total_votes': 100,
+            'votes': 1,
+            'year': 2012
+        }, {
+            'color': 'black',
+            'mandates': 0,
+            'name': 'Libertarian',
+            'total_votes': 100,
+            'votes': 0,
+            'year': 2012
+        }
+    ]
+
+
 def test_election_meta_data(session):
     election = Election(
         title='Election',

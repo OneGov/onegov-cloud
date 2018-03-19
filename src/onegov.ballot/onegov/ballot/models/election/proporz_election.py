@@ -7,8 +7,9 @@ from onegov.ballot.models.election.election_result import ElectionResult
 from onegov.ballot.models.election.list import List
 from onegov.ballot.models.election.list_connection import ListConnection
 from onegov.ballot.models.election.list_result import ListResult
+from onegov.ballot.models.election.mixins import PartyResult
+from onegov.ballot.models.election.mixins import PartyResultsExportMixin
 from onegov.ballot.models.election.panachage_result import PanachageResult
-from onegov.ballot.models.election.party_result import PartyResult
 from sqlalchemy import cast
 from sqlalchemy import desc
 from sqlalchemy import String
@@ -18,7 +19,7 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 
 
-class ProporzElection(Election):
+class ProporzElection(Election, PartyResultsExportMixin):
     __mapper_args__ = {
         'polymorphic_identity': 'proporz'
     }

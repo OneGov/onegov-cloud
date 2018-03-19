@@ -4,6 +4,9 @@ Changelog
 - Adds panachage results to election compounds.
   [msom]
 
+- Adds party results export.
+  [msom]
+
 3.2.0 (2018-03-19)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -6,6 +6,7 @@ from onegov.ballot.models.election.election_result import ElectionResult
 from onegov.ballot.models.election.list import List
 from onegov.ballot.models.election.list_connection import ListConnection
 from onegov.ballot.models.election.list_result import ListResult
+from onegov.ballot.models.election.mixins import PartyResultsExportMixin
 from onegov.ballot.models.election.panachage_result import PanachageResult
 from onegov.ballot.models.election.party_result import PartyResult
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
@@ -30,7 +31,8 @@ from sqlalchemy.orm import relationship
 
 class ElectionCompound(
     Base, ContentMixin, TimestampMixin,
-    DomainOfInfluenceMixin, TitleTranslationsMixin
+    DomainOfInfluenceMixin, TitleTranslationsMixin,
+    PartyResultsExportMixin
 ):
 
     __tablename__ = 'election_compounds'
