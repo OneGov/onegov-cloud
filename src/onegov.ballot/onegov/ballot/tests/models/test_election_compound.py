@@ -740,3 +740,44 @@ def test_election_compound_export_parties(session):
             'year': 2012
         }
     ]
+
+
+def test_election_compound_export_panachage(session):
+    session.add(
+        ElectionCompound(
+            title='Elections',
+            domain='canton',
+            date=date(2015, 6, 14),
+        )
+    )
+    session.flush()
+    election_compound = session.query(ElectionCompound).one()
+
+    assert election_compound.export_panachage() == []
+
+    # Add panachage results
+    election_compound.panachage_results.append(
+        PanachageResult(
+            votes=10,
+            source='Libertarian',
+            target='Conservative',
+        )
+    )
+    election_compound.panachage_results.append(
+        PanachageResult(
+            votes=20,
+            source='Conservative',
+            target='Libertarian',
+        )
+    )
+    assert election_compound.export_panachage() == [
+        {
+            'source': 'Conservative',
+            'target': 'Libertarian',
+            'votes': 20,
+        }, {
+            'source': 'Libertarian',
+            'target': 'Conservative',
+            'votes': 10,
+        }
+    ]

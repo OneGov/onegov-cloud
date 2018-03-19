@@ -291,3 +291,31 @@ class ElectionCompound(
                     OrderedDict(list(common.items()) + list(row.items()))
                 )
         return rows
+
+    def export_panachage(self):
+        """ Returns all panachage results as list with dicts.
+
+        This is meant as a base for json/csv/excel exports. The result is
+        therefore a flat list of dictionaries with repeating values to avoid
+        the nesting of values. Each record in the resulting list is a single
+        candidate result for each political entity. Party results are not
+        included in the export (since they are not really connected with the
+        lists).
+
+        """
+
+        results = self.panachage_results.order_by(
+            PanachageResult.source,
+            PanachageResult.target,
+            PanachageResult.votes
+        )
+
+        rows = []
+        for result in results:
+            row = OrderedDict()
+            row['source'] = result.source
+            row['target'] = result.target
+            row['votes'] = result.votes
+            rows.append(row)
+
+        return rows
