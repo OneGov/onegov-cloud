@@ -68,6 +68,10 @@ class FeriennetApp(OrgApp):
     def sponsors(self):
         return load_sponsors(utils.module_path('onegov.feriennet', 'sponsors'))
 
+    @property
+    def default_period(self):
+        return self.active_period or self.periods and self.periods[0]
+
     def banner(self, request, id):
         """ Randomly returns the html to one of the available booking banners.
 

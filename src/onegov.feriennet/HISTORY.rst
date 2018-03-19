@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes activity discard being available when it's no longer possible.
+  [href]
+
 - Fixes related attendees query returning in a wrong attendee count.
   [href]
 

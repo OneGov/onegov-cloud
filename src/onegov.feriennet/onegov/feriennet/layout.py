@@ -204,21 +204,21 @@ class VacationActivityLayout(DefaultLayout):
         )
 
     @cached_property
-    def ticket(self):
-        request = self.model.latest_request
+    def latest_request(self):
+        return self.model.latest_request
 
-        if request:
+    @cached_property
+    def ticket(self):
+        if self.latest_request:
             tickets = TicketCollection(self.request.session)
-            return tickets.by_handler_id(request.id.hex)
+            return tickets.by_handler_id(self.latest_request.id.hex)
 
     @cached_property
     def attendees(self):
-        request = self.model.latest_request
-
-        if request:
+        if self.request.app.default_period:
             return OccasionAttendeeCollection(
                 self.request.session,
-                self.request.app.active_period,
+                self.request.app.default_period,
                 self.model
             )
 
@@ -270,27 +270,30 @@ class VacationActivityLayout(DefaultLayout):
                         )
                     ))
 
-                links.append(Link(
-                    text=_("Discard"),
-                    url=self.csrf_protected_url(self.request.link(self.model)),
-                    attrs={'class': 'delete-link'},
-                    traits=(
-                        Confirm(
-                            _(
+                if not self.model.publication_requests:
+                    links.append(Link(
+                        text=_("Discard"),
+                        url=self.csrf_protected_url(
+                            self.request.link(self.model)
+                        ),
+                        attrs={'class': 'delete-link'},
+                        traits=(
+                            Confirm(_(
                                 'Do you really want to discard "${title}"?',
                                 mapping={'title': self.model.title}
+                            ), _(
+                                "This cannot be undone."
+                            ), _(
+                                "Discard Activity")
                             ),
-                            _("This cannot be undone."),
-                            _("Discard Activity")
-                        ),
-                        Intercooler(
-                            request_method="DELETE",
-                            redirect_after=self.request.class_link(
-                                VacationActivityCollection
+                            Intercooler(
+                                request_method="DELETE",
+                                redirect_after=self.request.class_link(
+                                    VacationActivityCollection
+                                )
                             )
                         )
-                    )
-                ))
+                    ))
 
             links.append(Link(
                 text=_("Edit"),
