@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.2.0 (2018-03-19)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds party results to election compounds.
   [msom]
