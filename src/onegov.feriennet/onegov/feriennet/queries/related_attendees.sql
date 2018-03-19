@@ -24,7 +24,7 @@ FROM (
         END as email,
         occasion_id,
         bookings.state AS booking_state,
-        COUNT(*) OVER (PARTITION BY occasion_id) AS attendee_count
+        COUNT(*) OVER (PARTITION BY occasion_id, bookings.state) AS attendee_count
     FROM bookings
         LEFT JOIN attendees ON attendee_id = attendees.id
         LEFT JOIN users ON bookings.username = users.username

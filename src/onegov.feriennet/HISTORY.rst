@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes related attendees query returning in a wrong attendee count.
+  [href]
+
 1.3.23 (2018-03-15)
 ~~~~~~~~~~~~~~~~~~~
 
