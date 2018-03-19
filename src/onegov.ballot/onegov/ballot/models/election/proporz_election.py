@@ -7,8 +7,7 @@ from onegov.ballot.models.election.election_result import ElectionResult
 from onegov.ballot.models.election.list import List
 from onegov.ballot.models.election.list_connection import ListConnection
 from onegov.ballot.models.election.list_result import ListResult
-from onegov.ballot.models.election.mixins import PartyResult
-from onegov.ballot.models.election.mixins import PartyResultsExportMixin
+from onegov.ballot.models.election.party_result import PartyResult
 from onegov.ballot.models.election.panachage_result import PanachageResult
 from sqlalchemy import cast
 from sqlalchemy import desc
@@ -19,7 +18,7 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 
 
-class ProporzElection(Election, PartyResultsExportMixin):
+class ProporzElection(Election):
     __mapper_args__ = {
         'polymorphic_identity': 'proporz'
     }
@@ -301,6 +300,36 @@ class ProporzElection(Election, PartyResultsExportMixin):
                 key = 'panachage_votes_from_list_{}'.format(target_id)
                 row[key] = panachage.get(result[22], {}).get(target_id)
 
+            rows.append(row)
+
+        return rows
+
+    def export_parties(self):
+        """ Returns all party results as list with dicts.
+
+        This is meant as a base for json/csv/excel exports. The result is
+        therefore a flat list of dictionaries with repeating values to avoid
+        the nesting of values. Each record in the resulting list is a single
+        candidate result for each political entity. Party results are not
+        included in the export (since they are not really connected with the
+        lists).
+
+        """
+
+        results = self.party_results.order_by(
+            PartyResult.year.desc(),
+            PartyResult.name
+        )
+
+        rows = []
+        for result in results:
+            row = OrderedDict()
+            row['year'] = result.year
+            row['total_votes'] = result.total_votes
+            row['name'] = result.name
+            row['color'] = result.color
+            row['mandates'] = result.number_of_mandates
+            row['votes'] = result.votes
             rows.append(row)
 
         return rows

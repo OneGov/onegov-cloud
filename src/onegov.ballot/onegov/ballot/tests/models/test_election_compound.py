@@ -660,7 +660,7 @@ def test_election_compound_export_parties(session):
         ElectionCompound(
             title='Elections',
             domain='canton',
-            date=date(2015, 6, 14),
+            date=date(2016, 6, 14),
         )
     )
     session.flush()
@@ -709,51 +709,46 @@ def test_election_compound_export_parties(session):
             year=2016
         )
     )
+
     assert election_compound.export_parties() == [
         {
+            'year': 2016,
+            'name': 'Conservative',
             'color': 'red',
             'mandates': 3,
-            'name': 'Conservative',
             'total_votes': 50,
             'votes': 3,
-            'year': 2016
+            'panachage_votes_from_conservative': '',
+            'panachage_votes_from_libertarian': ''
         }, {
+            'year': 2016,
+            'name': 'Libertarian',
             'color': 'black',
             'mandates': 2,
-            'name': 'Libertarian',
             'total_votes': 50,
             'votes': 2,
-            'year': 2016
+            'panachage_votes_from_conservative': '',
+            'panachage_votes_from_libertarian': ''
         }, {
+            'year': 2012,
+            'name': 'Conservative',
             'color': 'red',
             'mandates': 1,
-            'name': 'Conservative',
             'total_votes': 100,
             'votes': 1,
-            'year': 2012
+            'panachage_votes_from_conservative': '',
+            'panachage_votes_from_libertarian': ''
         }, {
+            'year': 2012,
+            'name': 'Libertarian',
             'color': 'black',
             'mandates': 0,
-            'name': 'Libertarian',
             'total_votes': 100,
             'votes': 0,
-            'year': 2012
+            'panachage_votes_from_conservative': '',
+            'panachage_votes_from_libertarian': ''
         }
     ]
-
-
-def test_election_compound_export_panachage(session):
-    session.add(
-        ElectionCompound(
-            title='Elections',
-            domain='canton',
-            date=date(2015, 6, 14),
-        )
-    )
-    session.flush()
-    election_compound = session.query(ElectionCompound).one()
-
-    assert election_compound.export_panachage() == []
 
     # Add panachage results
     election_compound.panachage_results.append(
@@ -770,14 +765,54 @@ def test_election_compound_export_panachage(session):
             target='Libertarian',
         )
     )
-    assert election_compound.export_panachage() == [
+    election_compound.panachage_results.append(
+        PanachageResult(
+            votes=1,
+            source='Other',
+            target='Conservative',
+        )
+    )
+
+    assert election_compound.export_parties() == [
         {
-            'source': 'Conservative',
-            'target': 'Libertarian',
-            'votes': 20,
+            'year': 2016,
+            'name': 'Conservative',
+            'color': 'red',
+            'mandates': 3,
+            'total_votes': 50,
+            'votes': 3,
+            'panachage_votes_from_conservative': '',
+            'panachage_votes_from_libertarian': 10,
+            'panachage_votes_from_other': 1
         }, {
-            'source': 'Libertarian',
-            'target': 'Conservative',
-            'votes': 10,
+            'year': 2016,
+            'name': 'Libertarian',
+            'color': 'black',
+            'mandates': 2,
+            'total_votes': 50,
+            'votes': 2,
+            'panachage_votes_from_conservative': 20,
+            'panachage_votes_from_libertarian': '',
+            'panachage_votes_from_other': ''
+        }, {
+            'year': 2012,
+            'name': 'Conservative',
+            'color': 'red',
+            'mandates': 1,
+            'total_votes': 100,
+            'votes': 1,
+            'panachage_votes_from_conservative': '',
+            'panachage_votes_from_libertarian': '',
+            'panachage_votes_from_other': ''
+        }, {
+            'year': 2012,
+            'name': 'Libertarian',
+            'color': 'black',
+            'mandates': 0,
+            'total_votes': 100,
+            'votes': 0,
+            'panachage_votes_from_conservative': '',
+            'panachage_votes_from_libertarian': '',
+            'panachage_votes_from_other': ''
         }
     ]
