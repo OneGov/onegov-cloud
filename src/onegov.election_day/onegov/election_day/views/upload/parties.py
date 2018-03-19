@@ -4,6 +4,7 @@ import transaction
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
 from onegov.election_day import ElectionDayApp
+from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.formats import import_party_results
 from onegov.election_day.forms import UploadPartyResultsForm
 from onegov.election_day.layouts import ManageElectionCompoundsLayout
@@ -30,12 +31,21 @@ def view_upload_election_party_results(self, request, form):
             form.parties.data['mimetype']
         )
 
+        archive = ArchivedResultCollection(request.session)
+        archive.update(self, request)
+
         if errors:
             status = 'error'
             transaction.abort()
         else:
             status = 'success'
             request.app.pages_cache.invalidate()
+            request.app.send_zulip(
+                request.app.principal.name,
+                'New party results available: [{}]({})'.format(
+                    self.title, request.link(self)
+                )
+            )
 
     layout = ManageElectionsLayout(self, request)
 
@@ -71,12 +81,21 @@ def view_upload_election_compound_party_results(self, request, form):
             form.parties.data['mimetype']
         )
 
+        archive = ArchivedResultCollection(request.session)
+        archive.update(self, request)
+
         if errors:
             status = 'error'
             transaction.abort()
         else:
             status = 'success'
             request.app.pages_cache.invalidate()
+            request.app.send_zulip(
+                request.app.principal.name,
+                'New party results available: [{}]({})'.format(
+                    self.title, request.link(self)
+                )
+            )
 
     layout = ManageElectionCompoundsLayout(self, request)
 
