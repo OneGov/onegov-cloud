@@ -164,10 +164,10 @@ def proporz_election():
     election.results.append(election_result)
 
     list_1.panachage_results.append(
-        PanachageResult(source_list_id=list_2.list_id, votes=12)
+        PanachageResult(source=list_2.list_id, votes=12)
     )
     list_1.panachage_results.append(
-        PanachageResult(source_list_id='99', votes=4)
+        PanachageResult(source='99', votes=4)
     )
 
     return election
@@ -314,9 +314,21 @@ def test_election_compound(session):
     session.flush()
     assert election_compound.party_results.one() == party_result
 
+    # Add panachage results
+    panachage_result = PanachageResult(
+        owner=election_compound.id,
+        source='A',
+        target='B',
+        votes=0,
+    )
+    session.add(panachage_result)
+    session.flush()
+    assert election_compound.panachage_results.one() == panachage_result
+
     # Clear results
     election_compound.clear_results()
     assert election_compound.party_results.first() == None
+    assert election_compound.panachage_results.first() == None
 
 
 def test_election_compound_id_generation(session):
@@ -391,6 +403,18 @@ def test_election_compound_changes(session):
         session.flush()
     assert election_compound.last_modified.isoformat().startswith('2018')
     assert election_compound.last_result_change.isoformat().startswith('2018')
+
+    with freeze_time("2019-01-01"):
+        election_compound.panachage_results.append(
+            PanachageResult(
+                source='A',
+                target='B',
+                votes=0
+            )
+        )
+        session.flush()
+    assert election_compound.last_modified.isoformat().startswith('2019')
+    assert election_compound.last_result_change.isoformat().startswith('2019')
 
 
 def test_election_compound_export(session):

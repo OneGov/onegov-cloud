@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds panachage results to election compounds.
+  [msom]
+
 3.2.0 (2018-03-19)
 ~~~~~~~~~~~~~~~~~~~
 

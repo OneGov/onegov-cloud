@@ -9,7 +9,9 @@ from onegov.ballot.models.election.list_connection import ListConnection
 from onegov.ballot.models.election.list_result import ListResult
 from onegov.ballot.models.election.panachage_result import PanachageResult
 from onegov.ballot.models.election.party_result import PartyResult
+from sqlalchemy import cast
 from sqlalchemy import desc
+from sqlalchemy import String
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
@@ -96,9 +98,10 @@ class ProporzElection(Election):
             lists = lists.filter(ListResult.list_id.in_(ids))
             lists = lists.first()[0] if lists.first() else None
 
+            ids = [str(id_[0]) for id_ in ids]
             pan = session.query(PanachageResult.last_change)
             pan = pan.order_by(desc(PanachageResult.last_change))
-            pan = pan.filter(PanachageResult.target_list_id.in_(ids))
+            pan = pan.filter(PanachageResult.target.in_(ids))
             pan = pan.first()[0] if pan.first() else None
 
         parties = session.query(PartyResult.last_change)
@@ -116,11 +119,11 @@ class ProporzElection(Election):
 
         session = object_session(self)
 
-        ids = session.query(List.id)
+        ids = session.query(cast(List.id, String))
         ids = ids.filter(List.election_id == self.id)
 
         results = session.query(PanachageResult)
-        results = results.filter(PanachageResult.target_list_id.in_(ids))
+        results = results.filter(PanachageResult.target.in_(ids))
 
         return results.first() is not None
 
@@ -231,7 +234,7 @@ class ProporzElection(Election):
         if self.has_panachage_data:
             panachage_results = session.query(PanachageResult)
             panachage_results = panachage_results.filter(
-                PanachageResult.target_list_id.in_((id[0] for id in list_ids))
+                PanachageResult.target.in_((str(id[0]) for id in list_ids))
             )
 
             panachage_lists = session.query(List.list_id)
@@ -241,14 +244,14 @@ class ProporzElection(Election):
             panachage_lists = [t[0] for t in panachage_lists]
             panachage_lists = sorted(
                 set(panachage_lists) |
-                set([r.source_list_id for r in panachage_results])
+                set([r.source for r in panachage_results])
             )
 
-            list_lookup = {id[0]: id[1] for id in list_ids}
+            list_lookup = {str(id[0]): id[1] for id in list_ids}
             panachage = {id: {} for id in panachage_lists}
             for result in panachage_results:
-                key = list_lookup.get(result.target_list_id)
-                panachage[key][result.source_list_id] = result.votes
+                key = list_lookup.get(result.target)
+                panachage[key][result.source] = result.votes
 
         rows = []
         for result in results:

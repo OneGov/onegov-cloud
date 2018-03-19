@@ -358,3 +358,33 @@ def add_party_results_to_compounds(context):
             'election_id',
             new_column_name='owner'
         )
+
+
+@upgrade_task('Add panachage results to compounds')
+def add_panachage_results_to_compounds(context):
+    if not context.has_column('panachage_results', 'owner'):
+        context.operations.add_column(
+            'panachage_results',
+            Column('owner', Text())
+        )
+    if context.has_column('panachage_results', 'source_list_id'):
+        context.operations.alter_column(
+            'panachage_results',
+            'source_list_id',
+            new_column_name='source'
+        )
+    if context.has_column('panachage_results', 'target_list_id'):
+        context.operations.drop_constraint(
+            'panachage_results_target_list_id_fkey',
+            'panachage_results',
+            type_='foreignkey'
+        )
+        context.operations.execute(
+            'ALTER TABLE panachage_results '
+            'ALTER COLUMN target_list_id TYPE Text'
+        )
+        context.operations.alter_column(
+            'panachage_results',
+            'target_list_id',
+            new_column_name='target'
+        )

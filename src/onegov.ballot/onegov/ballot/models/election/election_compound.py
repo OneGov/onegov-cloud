@@ -20,6 +20,7 @@ from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import desc
 from sqlalchemy import func
+from sqlalchemy import or_
 from sqlalchemy import Text
 from sqlalchemy_utils import observes
 from sqlalchemy.ext.mutable import MutableDict
@@ -65,6 +66,16 @@ class ElectionCompound(
         'PartyResult',
         primaryjoin=(
             'foreign(PartyResult.owner) == ElectionCompound.id'
+        ),
+        cascade='all, delete-orphan',
+        lazy='dynamic',
+    )
+
+    #: An election compound may contains n panachage results
+    panachage_results = relationship(
+        'PanachageResult',
+        primaryjoin=(
+            'foreign(PanachageResult.owner) == ElectionCompound.id'
         ),
         cascade='all, delete-orphan',
         lazy='dynamic',
@@ -128,6 +139,10 @@ class ElectionCompound(
     def has_results(self):
         """ Returns True, if the election compound has any results. """
 
+        if self.party_results.first():
+            return True
+        if self.panachage_results.first():
+            return True
         for election in self.elections:
             if election.has_results:
                 return True
@@ -206,9 +221,15 @@ class ElectionCompound(
 
         # Get the last panachage result changes
         if ids:
+            ids = [str(id_[0]) for id_ in ids]
             result = session.query(PanachageResult.last_change)
             result = result.order_by(desc(PanachageResult.last_change))
-            result = result.filter(PanachageResult.target_list_id.in_(ids))
+            result = result.filter(
+                or_(
+                    PanachageResult.target.in_(ids),
+                    PanachageResult.owner == self.id,
+                )
+            )
             changes.append(result.first()[0] if result.first() else None)
 
         # Get the last party result changes
@@ -238,6 +259,8 @@ class ElectionCompound(
 
         session = object_session(self)
         for result in self.party_results:
+            session.delete(result)
+        for result in self.panachage_results:
             session.delete(result)
 
     def export(self):

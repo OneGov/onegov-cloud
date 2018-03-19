@@ -100,8 +100,8 @@ def test_election_create_all_models(session):
     session.flush()
 
     panachage_result = PanachageResult(
-        target_list_id=list.id,
-        source_list_id=1,
+        target=list.id,
+        source=1,
         votes=0
     )
 
@@ -151,7 +151,6 @@ def test_election_create_all_models(session):
     assert list_result.list == list
 
     assert list.panachage_results.one() == panachage_result
-    assert panachage_result.list == list
 
     assert candidate_result.election_result == election_result
     assert candidate_result.candidate == candidate
@@ -544,7 +543,7 @@ def test_election_last_change_proporz(session):
     # Add a panachage result
     with freeze_time("2014-01-09"):
         election.lists.first().panachage_results.append(
-            PanachageResult(source_list_id=2, votes=1)
+            PanachageResult(source=2, votes=1)
         )
         session.flush()
 
@@ -664,15 +663,15 @@ def test_election_has_panachage_data(session):
 
     election.lists[0].panachage_results.append(
         PanachageResult(
-            target_list_id=election.lists[0].id,
-            source_list_id=2,
+            target=election.lists[0].id,
+            source=2,
             votes=0
         )
     )
     election.lists[1].panachage_results.append(
         PanachageResult(
-            target_list_id=election.lists[1].id,
-            source_list_id=1,
+            target=election.lists[1].id,
+            source=1,
             votes=0
         )
     )
@@ -775,43 +774,43 @@ def test_election_results(session):
 
     # Add panachage results
     list_1.panachage_results.append(
-        PanachageResult(target_list_id=list_1.id, source_list_id=2, votes=1)
+        PanachageResult(target=list_1.id, source=2, votes=1)
     )
     list_1.panachage_results.append(
-        PanachageResult(target_list_id=list_1.id, source_list_id=3, votes=1)
+        PanachageResult(target=list_1.id, source=3, votes=1)
     )
     list_1.panachage_results.append(
-        PanachageResult(target_list_id=list_1.id, source_list_id=4, votes=1)
+        PanachageResult(target=list_1.id, source=4, votes=1)
     )
 
     list_2.panachage_results.append(
-        PanachageResult(target_list_id=list_2.id, source_list_id=1, votes=2)
+        PanachageResult(target=list_2.id, source=1, votes=2)
     )
     list_2.panachage_results.append(
-        PanachageResult(target_list_id=list_2.id, source_list_id=3, votes=2)
+        PanachageResult(target=list_2.id, source=3, votes=2)
     )
     list_2.panachage_results.append(
-        PanachageResult(target_list_id=list_2.id, source_list_id=4, votes=2)
+        PanachageResult(target=list_2.id, source=4, votes=2)
     )
 
     list_3.panachage_results.append(
-        PanachageResult(target_list_id=list_3.id, source_list_id=1, votes=3)
+        PanachageResult(target=list_3.id, source=1, votes=3)
     )
     list_3.panachage_results.append(
-        PanachageResult(target_list_id=list_3.id, source_list_id=2, votes=3)
+        PanachageResult(target=list_3.id, source=2, votes=3)
     )
     list_3.panachage_results.append(
-        PanachageResult(target_list_id=list_3.id, source_list_id=4, votes=3)
+        PanachageResult(target=list_3.id, source=4, votes=3)
     )
 
     list_4.panachage_results.append(
-        PanachageResult(target_list_id=list_4.id, source_list_id=1, votes=4)
+        PanachageResult(target=list_4.id, source=1, votes=4)
     )
     list_4.panachage_results.append(
-        PanachageResult(target_list_id=list_4.id, source_list_id=2, votes=4)
+        PanachageResult(target=list_4.id, source=2, votes=4)
     )
     list_4.panachage_results.append(
-        PanachageResult(target_list_id=list_4.id, source_list_id=3, votes=4)
+        PanachageResult(target=list_4.id, source=3, votes=4)
     )
 
     # Add 5 candidates
@@ -1251,10 +1250,10 @@ def test_election_export_proporz(session):
     election.results.append(election_result)
 
     list_1.panachage_results.append(
-        PanachageResult(source_list_id=list_2.list_id, votes=12)
+        PanachageResult(source=list_2.list_id, votes=12)
     )
     list_1.panachage_results.append(
-        PanachageResult(source_list_id='99', votes=4)
+        PanachageResult(source='99', votes=4)
     )
 
     session.flush()
@@ -1502,7 +1501,7 @@ def test_election_clear_results(session):
     )
 
     session.add(ListResult(election_result_id=eid, list_id=lid, votes=10))
-    session.add(PanachageResult(target_list_id=lid, source_list_id=1, votes=0))
+    session.add(PanachageResult(target=lid, source=1, votes=0))
     session.add(
         CandidateResult(election_result_id=eid, candidate_id=cid, votes=0)
     )
