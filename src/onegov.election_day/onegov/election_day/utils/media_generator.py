@@ -923,6 +923,9 @@ class MediaGenerator():
     def generate_svg(self, item, type_, locale=None):
         """ Creates the requested SVG. """
 
+        is_election = isinstance(item, Election)
+        is_election_compound = isinstance(item, ElectionCompound)
+
         assert type_ in (
             'lists', 'candidates', 'connections', 'parties', 'panachage', 'map'
         )
@@ -941,36 +944,38 @@ class MediaGenerator():
             self.app.filestorage.remove(path)
 
         chart = None
-        if type_ == 'lists':
+        if type_ == 'lists' and is_election:
             data = view_election_lists_data(item, None)
             if data and data.get('results'):
                 chart = self.get_chart('bar', 'svg', data)
 
-        if type_ == 'candidates':
+        if type_ == 'candidates' and is_election:
             data = view_election_candidates_data(item, None)
             if data and data.get('results'):
                 chart = self.get_chart('bar', 'svg', data)
 
-        if type_ == 'connections':
+        if type_ == 'connections' and is_election:
             data = view_election_connections_data(item, None)
             if data and data.get('links') and data.get('nodes'):
                 chart = self.get_chart('sankey', 'svg', data,
                                        params={'inverse': True})
 
-        if type_ == 'parties':
-            if isinstance(item, Election):
-                data = view_election_parties_data(item, None)
-            else:
-                data = view_election_compound_parties_data(item, None)
+        if type_ == 'parties' and is_election:
+            data = view_election_parties_data(item, None)
             if data and data.get('results'):
                 chart = self.get_chart('grouped', 'svg', data)
 
-        if type_ == 'panachage':
+        if type_ == 'parties' and is_election_compound:
+            data = view_election_compound_parties_data(item, None)
+            if data and data.get('results'):
+                chart = self.get_chart('grouped', 'svg', data)
+
+        if type_ == 'panachage' and is_election:
             data = view_election_panachage_data(item, None)
             if data and data.get('links') and data.get('nodes'):
                 chart = self.get_chart('sankey', 'svg', data)
 
-        if type_ == 'map':
+        if type_ == 'map' and not is_election:
             data = item.percentage_by_entity()
             params = {
                 'yay': self.translate(_('Yay'), locale),

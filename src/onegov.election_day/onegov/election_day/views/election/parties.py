@@ -12,10 +12,11 @@ def get_party_results(item):
 
     """ Returns the aggregated party results as list. """
 
-    proporz = getattr(item, 'type', 'proporz') == 'proporz'
-    has_result = item.party_results.first()
-    if not proporz or not has_result:
-        return [], {}
+    if (
+        getattr(item, 'type', 'proporz') != 'proporz' or
+        not item.party_results.first()
+    ):
+            return [], {}
 
     session = object_session(item)
 

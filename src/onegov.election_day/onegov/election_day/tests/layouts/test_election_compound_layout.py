@@ -15,11 +15,12 @@ def test_election_compound_layout(session):
     compound = session.query(ElectionCompound).one()
 
     layout = ElectionCompoundLayout(compound, DummyRequest())
-    assert layout.all_tabs == ('districts', 'candidates', 'data')
+    assert layout.all_tabs == ('districts', 'candidates', 'parties', 'data')
     assert layout.title() == ''
     assert layout.title('undefined') == ''
     assert layout.title('districts') == '__districts'
     assert layout.title('candidates') == 'Elected candidates'
+    assert layout.title('parties') == 'Parties'
     assert layout.title('data') == 'Downloads'
     assert layout.main_view == 'ElectionCompound/districts'
     assert list(layout.menu) == []
