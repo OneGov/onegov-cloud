@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.65.2 (2018-03-20)
+~~~~~~~~~~~~~~~~~~~
 
 - Caches selectables loaded by path.
   [href]
