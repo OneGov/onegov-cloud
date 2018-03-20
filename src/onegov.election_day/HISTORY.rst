@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.2.1 (2018-03-20)
+~~~~~~~~~~~~~~~~~~~
 
 - Includes a distinct ID the party results export.
   [msom]
