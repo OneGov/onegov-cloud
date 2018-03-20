@@ -12,7 +12,7 @@
         <div tal:condition="streets" tal:repeat="(letter, streets) streets.items()"
              data-letter="${letter}" class="letter-block letter-${letter}" >
 
-            <a name="${letter}" class="anchor">${letter}</a>
+            <strong class="anchor">${letter}</strong>
             <ul class="streetlist letter-${letter}">
                 <li tal:repeat="street streets" data-street="${street.street}" data-letter="${letter}">
                     <a href="${link_to_street(street.street)}">${street.street}</a>

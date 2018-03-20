@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adjusts framed style.
+  [href]
+
 - Discards completely irrevant search results.
   [href]
 

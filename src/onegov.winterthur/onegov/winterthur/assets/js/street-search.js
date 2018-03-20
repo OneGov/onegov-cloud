@@ -40,6 +40,7 @@ var dashesToSpace = function(text) {
 };
 
 var streetSuffixExpression = new RegExp([
+    'acker',
     'allee',
     'berg',
     'büel',
