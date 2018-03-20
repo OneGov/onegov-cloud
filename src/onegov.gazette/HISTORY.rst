@@ -4,7 +4,7 @@ Changelog
 - Makes the rich text editor bigger.
   [msom]
 
-1.12.11 (2018-03-20)
+1.13.11 (2018-03-20)
 ~~~~~~~~~~~~~~~~~~~
 
 - Fixes PDF attachments not displayed in browser.
