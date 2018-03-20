@@ -1,12 +1,10 @@
 Changelog
 ---------
-1.12.11 (2018-03-20)
-~~~~~~~~~~~~~~~~~~~
 
 - Fixes PDF attachments not displayed in browser.
   [msom]
 
-1.12.10 (2018-03-20)
+1.13.10 (2018-03-20)
 ~~~~~~~~~~~~~~~~~~~
 
 - Adds some help texts to the notice form.
