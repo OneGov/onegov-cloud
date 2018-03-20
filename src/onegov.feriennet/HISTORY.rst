@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.24 (2018-03-20)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes activity discard being available when it's no longer possible.
   [href]
