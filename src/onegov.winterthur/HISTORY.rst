@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.4 (2018-03-20)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Adjusts framed style.
   [href]
 
