@@ -78,7 +78,7 @@ var streetsSearch = function() {
     return function(term) {
         return search(term)
             .filter(function(result) {
-                return result.score >= 0.7;
+                return streets[names[result.index]].name.score(term) >= 0.25;
             })
             .map(function(result) {
                 return streets[names[result.index]];

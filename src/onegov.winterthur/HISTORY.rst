@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Discards completely irrevant search results.
+  [href]
+
 - Adds support for streets without addresses.
   [href]
 

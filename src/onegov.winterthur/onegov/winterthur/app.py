@@ -53,6 +53,7 @@ def get_js_path():
 @WinterthurApp.webasset('street-search')
 def get_search_asset():
     yield 'wade.js'
+    yield 'string-score.js'
     yield 'street-search.js'
 
 
