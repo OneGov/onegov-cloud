@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.3.1 (2018-03-20)
+~~~~~~~~~~~~~~~~~~~
 
 - Export the election compound panachage data together with the party results.
   [msom]
