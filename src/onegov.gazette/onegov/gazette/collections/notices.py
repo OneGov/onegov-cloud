@@ -69,6 +69,24 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         self.to_date = to_date
         self.source = source
 
+    def page_by_index(self, index):
+        return self.__class__(
+            self.session,
+            page=index,
+            state=self.state,
+            term=self.term,
+            order=self.order,
+            direction=self.direction,
+            issues=self.issues,
+            categories=self.categories,
+            organizations=self.organizations,
+            user_ids=self.user_ids,
+            group_ids=self.group_ids,
+            from_date=self.from_date,
+            to_date=self.to_date,
+            source=self.source
+        )
+
     def for_state(self, state):
         """ Returns a new instance of the collection with the given state. """
 
