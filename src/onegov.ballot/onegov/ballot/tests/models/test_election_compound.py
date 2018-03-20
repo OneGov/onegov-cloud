@@ -714,39 +714,43 @@ def test_election_compound_export_parties(session):
         {
             'year': 2016,
             'name': 'Conservative',
+            'id': 0,
             'color': 'red',
             'mandates': 3,
             'total_votes': 50,
             'votes': 3,
-            'panachage_votes_from_conservative': '',
-            'panachage_votes_from_libertarian': ''
+            'panachage_votes_from_0': '',
+            'panachage_votes_from_1': ''
         }, {
             'year': 2016,
             'name': 'Libertarian',
+            'id': 1,
             'color': 'black',
             'mandates': 2,
             'total_votes': 50,
             'votes': 2,
-            'panachage_votes_from_conservative': '',
-            'panachage_votes_from_libertarian': ''
+            'panachage_votes_from_0': '',
+            'panachage_votes_from_1': ''
         }, {
             'year': 2012,
             'name': 'Conservative',
+            'id': 0,
             'color': 'red',
             'mandates': 1,
             'total_votes': 100,
             'votes': 1,
-            'panachage_votes_from_conservative': '',
-            'panachage_votes_from_libertarian': ''
+            'panachage_votes_from_0': '',
+            'panachage_votes_from_1': ''
         }, {
             'year': 2012,
             'name': 'Libertarian',
+            'id': 1,
             'color': 'black',
             'mandates': 0,
             'total_votes': 100,
             'votes': 0,
-            'panachage_votes_from_conservative': '',
-            'panachage_votes_from_libertarian': ''
+            'panachage_votes_from_0': '',
+            'panachage_votes_from_1': ''
         }
     ]
 
@@ -777,42 +781,46 @@ def test_election_compound_export_parties(session):
         {
             'year': 2016,
             'name': 'Conservative',
+            'id': 0,
             'color': 'red',
             'mandates': 3,
             'total_votes': 50,
             'votes': 3,
-            'panachage_votes_from_conservative': '',
-            'panachage_votes_from_libertarian': 10,
-            'panachage_votes_from_other': 1
+            'panachage_votes_from_0': '',
+            'panachage_votes_from_1': 10,
+            'panachage_votes_from_2': 1
         }, {
             'year': 2016,
             'name': 'Libertarian',
+            'id': 1,
             'color': 'black',
             'mandates': 2,
             'total_votes': 50,
             'votes': 2,
-            'panachage_votes_from_conservative': 20,
-            'panachage_votes_from_libertarian': '',
-            'panachage_votes_from_other': ''
+            'panachage_votes_from_0': 20,
+            'panachage_votes_from_1': '',
+            'panachage_votes_from_2': ''
         }, {
             'year': 2012,
             'name': 'Conservative',
+            'id': 0,
             'color': 'red',
             'mandates': 1,
             'total_votes': 100,
             'votes': 1,
-            'panachage_votes_from_conservative': '',
-            'panachage_votes_from_libertarian': '',
-            'panachage_votes_from_other': ''
+            'panachage_votes_from_0': '',
+            'panachage_votes_from_1': '',
+            'panachage_votes_from_2': ''
         }, {
             'year': 2012,
             'name': 'Libertarian',
+            'id': 1,
             'color': 'black',
             'mandates': 0,
             'total_votes': 100,
             'votes': 0,
-            'panachage_votes_from_conservative': '',
-            'panachage_votes_from_libertarian': '',
-            'panachage_votes_from_other': ''
+            'panachage_votes_from_0': '',
+            'panachage_votes_from_1': '',
+            'panachage_votes_from_2': ''
         }
     ]

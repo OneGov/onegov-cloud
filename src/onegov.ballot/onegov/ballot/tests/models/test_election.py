@@ -1398,6 +1398,7 @@ def test_election_export_parties(session):
             'color': 'red',
             'mandates': 3,
             'name': 'Conservative',
+            'id': 0,
             'total_votes': 50,
             'votes': 3,
             'year': 2016
@@ -1405,6 +1406,7 @@ def test_election_export_parties(session):
             'color': 'black',
             'mandates': 2,
             'name': 'Libertarian',
+            'id': 1,
             'total_votes': 50,
             'votes': 2,
             'year': 2016
@@ -1412,6 +1414,7 @@ def test_election_export_parties(session):
             'color': 'red',
             'mandates': 1,
             'name': 'Conservative',
+            'id': 0,
             'total_votes': 100,
             'votes': 1,
             'year': 2012
@@ -1419,6 +1422,7 @@ def test_election_export_parties(session):
             'color': 'black',
             'mandates': 0,
             'name': 'Libertarian',
+            'id': 1,
             'total_votes': 100,
             'votes': 0,
             'year': 2012

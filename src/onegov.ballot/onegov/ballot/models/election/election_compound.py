@@ -10,6 +10,7 @@ from onegov.ballot.models.election.panachage_result import PanachageResult
 from onegov.ballot.models.election.party_result import PartyResult
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.ballot.models.mixins import TitleTranslationsMixin
+from onegov.ballot.models.election.mixins import PartyResultExportMixin
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
@@ -30,7 +31,8 @@ from sqlalchemy.orm import relationship
 
 class ElectionCompound(
     Base, ContentMixin, TimestampMixin,
-    DomainOfInfluenceMixin, TitleTranslationsMixin
+    DomainOfInfluenceMixin, TitleTranslationsMixin,
+    PartyResultExportMixin
 ):
 
     __tablename__ = 'election_compounds'
@@ -288,49 +290,4 @@ class ElectionCompound(
                 rows.append(
                     OrderedDict(list(common.items()) + list(row.items()))
                 )
-        return rows
-
-    def export_parties(self):
-        """ Returns all party results with the panachage as list with dicts.
-
-        This is meant as a base for json/csv/excel exports. The result is
-        therefore a flat list of dictionaries with repeating values to avoid
-        the nesting of values. Each record in the resulting list is a single
-        candidate result for each political entity. Party results are not
-        included in the export (since they are not really connected with the
-        lists).
-
-        """
-
-        results = {}
-        parties = set()
-        for result in self.party_results:
-            year = results.setdefault(result.year, {})
-            year[result.name] = {
-                'total_votes': result.total_votes,
-                'color': result.color,
-                'mandates': result.number_of_mandates,
-                'votes': result.votes
-            }
-            parties |= set([result.name])
-        for result in self.panachage_results:
-            year = results.setdefault(self.date.year, {})
-            target = year.setdefault(result.target, {})
-            target[result.source] = result.votes
-            parties |= set([result.source, result.target])
-        parties = sorted(parties)
-
-        rows = []
-        for year in sorted(results.keys(), reverse=True):
-            for party in sorted(results[year].keys()):
-                row = OrderedDict()
-                row['year'] = year
-                row['name'] = party
-                for column in ('total_votes', 'color', 'mandates', 'votes'):
-                    row[column] = results[year][party].get(column, '')
-                for source in parties:
-                    column = 'panachage_votes_from_{}'.format(source.lower())
-                    row[column] = results[year][party].get(source, '')
-                rows.append(row)
-
         return rows
