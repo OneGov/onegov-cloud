@@ -15,7 +15,7 @@ def test_view_addresses(winterthur_app, streets_csv, addresses_csv):
     assert "Keine Strassen gefunden" in page
 
     addresses = AddressCollection(winterthur_app.session())
-    addresses.update_by_csv(streets_csv, addresses_csv)
+    addresses.import_from_csv(streets_csv, addresses_csv)
 
     transaction.commit()
 

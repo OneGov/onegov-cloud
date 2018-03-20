@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for streets without addresses.
+  [href]
+
 0.1.3 (2018-03-08)
 ~~~~~~~~~~~~~~~~~~~~~
 

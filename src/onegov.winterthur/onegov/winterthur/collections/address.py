@@ -34,23 +34,24 @@ class AddressCollection(GenericCollection):
         return self.session.execute(select(query.c))
 
     def update(self, streets=STREETS, addresses=ADDRESSES):
-        self.update_by_csv(*self.load_urls(streets, addresses))
+        self.delete_existing()
+        self.import_from_csv(*self.load_urls(streets, addresses))
 
-    def update_by_csv(self, streets, addresses):
+    def delete_existing(self):
+        for address in self.query():
+            self.session.delete(address)
+
+    def import_from_csv(self, streets, addresses):
         streets = {s.strc: s.bez for s in streets.lines}
-        current = {address.id: address for address in self.query()}
+
+        addressless = set(streets.keys())
+        max_id = 0
 
         for r in addresses.lines:
+            addressless.discard(r.strc)
 
-            address_id = int(r.einid)
-
-            if address_id in current:
-                address = current[address_id]
-            else:
-                address = WinterthurAddress()
-                self.session.add(address)
-
-            address.id = address_id
+            address = WinterthurAddress()
+            address.id = int(r.einid)
             address.street_id = int(r.strc)
             address.street = streets[r.strc]
             address.house_number = int(r.hnr)
@@ -60,6 +61,21 @@ class AddressCollection(GenericCollection):
             address.place = r.ort
             address.district = r.kreisname
             address.neighbourhood = r.quartiername
+
+            self.session.add(address)
+
+            max_id = max(max_id, address.id)
+
+        # some streets do not have addresses -> we write a special record for
+        # those streets so they still show up in our UI
+        #
+        # not the most elegant solution, but better than introducing a separate
+        # table at least for now
+        for id, key in enumerate(addressless, start=max_id + 1):
+            address = self.model_class.as_addressless(int(key), streets[key])
+            address.id = id
+
+            self.session.add(address)
 
         self.session.flush()
 

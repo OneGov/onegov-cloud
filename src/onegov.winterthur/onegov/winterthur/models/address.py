@@ -30,3 +30,19 @@ class WinterthurAddress(Base):
 
     #: the neighbourhood
     neighbourhood = Column(Text, nullable=False)
+
+    @classmethod
+    def as_addressless(cls, street_id, street):
+        return cls(
+            street_id=street_id,
+            street=street,
+            house_number=-1,
+            zipcode=-1,
+            place="",
+            district="",
+            neighbourhood="",
+        )
+
+    @property
+    def is_addressless(self):
+        return self.house_number == -1

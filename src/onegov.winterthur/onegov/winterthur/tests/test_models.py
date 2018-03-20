@@ -14,7 +14,7 @@ def test_download_addresses(session):
 
 def test_update_addresses(session, streets_csv, addresses_csv):
     addresses = AddressCollection(session)
-    addresses.update_by_csv(streets_csv, addresses_csv)
+    addresses.import_from_csv(streets_csv, addresses_csv)
 
     count = addresses.query().count()
 
