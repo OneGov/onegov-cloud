@@ -118,6 +118,9 @@ msgstr "Datum"
 msgid "Deadline"
 msgstr "Eingabeschluss"
 
+msgid "Title (maximum 60 characters)"
+msgstr "Titel (höchstens 60 Zeichen)"
+
 msgid "Organization"
 msgstr "Organisation"
 
@@ -223,9 +226,6 @@ msgstr "Eingereicht"
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
-
-msgid "The fields marked with an asterisk * are mandatory fields."
-msgstr "Die mit einem Stern * gekennzeichneten Felder sind Pflichtfelder."
 
 msgid "Number of Users"
 msgstr "Anzahl Benutzer"
@@ -538,6 +538,9 @@ msgstr ""
 
 msgid "Edit Official Notice"
 msgstr "Meldung bearbeiten"
+
+msgid "The fields marked with an asterisk * are mandatory fields."
+msgstr "Die mit einem Stern * gekennzeichneten Felder sind Pflichtfelder."
 
 msgid "Delete Official Notice"
 msgstr "Meldung löschen"

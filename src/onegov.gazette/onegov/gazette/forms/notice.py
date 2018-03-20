@@ -30,7 +30,7 @@ class NoticeForm(Form):
     """
 
     title = StringField(
-        label=_("Title"),
+        label=_("Title (maximum 60 characters)"),
         validators=[
             InputRequired(),
             Length(max=60)
