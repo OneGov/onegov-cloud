@@ -24,7 +24,7 @@ from onegov.election_day.views.election.connections import \
 from onegov.election_day.views.election.lists import view_election_lists_data
 from onegov.election_day.views.election.panachage import \
     view_election_panachage_data
-from onegov.election_day.views.election.parties import get_party_deltas
+from onegov.election_day.views.election.parties import get_party_results_deltas
 from onegov.election_day.views.election.parties import get_party_results
 from onegov.election_day.views.election.parties import \
     view_election_parties_data
@@ -459,7 +459,9 @@ class MediaGenerator():
                     pdf.figcaption(translate(_('figcaption_parties')))
                     pdf.spacer()
                     years, parties = get_party_results(item)
-                    deltas, results = get_party_deltas(item, years, parties)
+                    deltas, results = get_party_results_deltas(
+                        item, years, parties
+                    )
                     if deltas:
                         pdf.table(
                             [[

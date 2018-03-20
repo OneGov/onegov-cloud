@@ -8,15 +8,21 @@ from onegov.election_day.utils import add_last_modified_header
 from sqlalchemy.orm import object_session
 
 
+def has_party_results(item):
+    """ Returns True, if the item has party results. """
+
+    if getattr(item, 'type', 'proporz') == 'proporz':
+        if item.party_results.first():
+            return True
+    return False
+
+
 def get_party_results(item):
 
     """ Returns the aggregated party results as list. """
 
-    if (
-        getattr(item, 'type', 'proporz') != 'proporz' or
-        not item.party_results.first()
-    ):
-            return [], {}
+    if not has_party_results(item):
+        return [], {}
 
     session = object_session(item)
 
@@ -42,7 +48,7 @@ def get_party_results(item):
     return years, parties
 
 
-def get_party_deltas(election, years, parties):
+def get_party_results_deltas(election, years, parties):
 
     """ Returns the aggregated party results with the differences to the
     last elections.
@@ -82,25 +88,20 @@ def get_party_deltas(election, years, parties):
     return deltas, results
 
 
-@ElectionDayApp.json(
-    model=Election,
-    name='parties-data',
-    permission=Public
-)
-def view_election_parties_data(self, request):
+def get_party_results_data(item):
 
     """ Retuns the data used for the grouped bar diagram showing the party
     results.
 
     """
 
-    if self.type == 'majorz':
+    if not has_party_results(item):
         return {
             'results': [],
-            'title': self.title
+            'title': item.title
         }
 
-    years, parties = get_party_results(self)
+    years, parties = get_party_results(item)
     names = sorted(parties.keys())
 
     results = []
@@ -117,7 +118,7 @@ def view_election_parties_data(self, request):
                     'front': front,
                     'back': back,
                 },
-                'active': year == str(self.date.year),
+                'active': year == str(item.date.year),
                 'color': color
             })
 
@@ -125,7 +126,7 @@ def view_election_parties_data(self, request):
         'groups': names,
         'labels': years,
         'maximum': {
-            'front': self.number_of_mandates,
+            'front': item.number_of_mandates,
             'back': 100,
         },
         'axis_units': {
@@ -133,8 +134,23 @@ def view_election_parties_data(self, request):
             'back': '%'
         },
         'results': results,
-        'title': self.title
+        'title': item.title
     }
+
+
+@ElectionDayApp.json(
+    model=Election,
+    name='parties-data',
+    permission=Public
+)
+def view_election_parties_data(self, request):
+
+    """ Retuns the data used for the grouped bar diagram showing the party
+    results.
+
+    """
+
+    return get_party_results_data(self)
 
 
 @ElectionDayApp.html(
@@ -173,7 +189,7 @@ def view_election_parties(self, request):
     layout = ElectionLayout(self, request, 'parties')
 
     years, parties = get_party_results(self)
-    deltas, results = get_party_deltas(self, years, parties)
+    deltas, results = get_party_results_deltas(self, years, parties)
 
     return {
         'election': self,

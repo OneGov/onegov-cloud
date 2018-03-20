@@ -5,8 +5,9 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.utils import add_last_modified_header
-from onegov.election_day.views.election.parties import get_party_deltas
 from onegov.election_day.views.election.parties import get_party_results
+from onegov.election_day.views.election.parties import get_party_results_data
+from onegov.election_day.views.election.parties import get_party_results_deltas
 
 
 @ElectionDayApp.json(
@@ -21,41 +22,7 @@ def view_election_compound_parties_data(self, request):
 
     """
 
-    years, parties = get_party_results(self)
-    names = sorted(parties.keys())
-
-    results = []
-    for party in names:
-        for year in parties[party]:
-            front = parties[party].get(year, {}).get('mandates', 0)
-            back = parties[party].get(year, {}).get('votes', {})
-            back = back.get('permille', 0) / 10.0
-            color = parties[party].get(year, {}).get('color', '#999999')
-            results.append({
-                'group': party,
-                'item': year,
-                'value': {
-                    'front': front,
-                    'back': back,
-                },
-                'active': year == str(self.date.year),
-                'color': color
-            })
-
-    return {
-        'groups': names,
-        'labels': years,
-        'maximum': {
-            'front': self.number_of_mandates,
-            'back': 100,
-        },
-        'axis_units': {
-            'front': '',
-            'back': '%'
-        },
-        'results': results,
-        'title': self.title
-    }
+    return get_party_results_data(self)
 
 
 @ElectionDayApp.html(
@@ -94,7 +61,7 @@ def view_election_compound_parties(self, request):
     layout = ElectionCompoundLayout(self, request, 'parties')
 
     years, parties = get_party_results(self)
-    deltas, results = get_party_deltas(self, years, parties)
+    deltas, results = get_party_results_deltas(self, years, parties)
 
     return {
         'election_compound': self,
