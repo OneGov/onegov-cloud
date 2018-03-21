@@ -213,7 +213,7 @@ class StripeConnect(PaymentProvider):
     charge_fee_to_customer = meta_property()
 
     def adjust_price(self, price):
-        if self.charge_fee_to_customer:
+        if price and self.charge_fee_to_customer:
             new_price = self.fee_policy.compensate(price.amount)
             new_fee = self.fee_policy.from_amount(new_price)
 
