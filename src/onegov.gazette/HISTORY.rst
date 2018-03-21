@@ -7,7 +7,7 @@ Changelog
 - Remember notice filter settings when changing states.
   [msom]
 
-1.12.12 (2018-03-20)
+1.13.12 (2018-03-20)
 ~~~~~~~~~~~~~~~~~~~
 
 - Makes the rich text editor bigger.
