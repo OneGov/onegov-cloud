@@ -1,7 +1,7 @@
 Changelog
 ---------
-1.13.13 (2018-03-21)
-~~~~~~~~~~~~~~~~~~~
+1.12.13 (2018-03-21)
+~~~~~~~~~~~~~~~~~~~~
 
 - Let the rich text editor grow when needed.
   [msom]
@@ -9,8 +9,8 @@ Changelog
 - Remember notice filter settings when changing states.
   [msom]
 
-1.13.12 (2018-03-20)
-~~~~~~~~~~~~~~~~~~~
+1.12.12 (2018-03-20)
+~~~~~~~~~~~~~~~~~~~~
 
 - Makes the rich text editor bigger.
   [msom]
@@ -18,14 +18,14 @@ Changelog
 - Fixes collection filters not used in pagination.
   [msom]
 
-1.13.11 (2018-03-20)
-~~~~~~~~~~~~~~~~~~~
+1.12.11 (2018-03-20)
+~~~~~~~~~~~~~~~~~~~~
 
 - Fixes PDF attachments not displayed in browser.
   [msom]
 
-1.13.10 (2018-03-20)
-~~~~~~~~~~~~~~~~~~~
+1.12.10 (2018-03-20)
+~~~~~~~~~~~~~~~~~~~~
 
 - Adds some help texts to the notice form.
   [msom]
