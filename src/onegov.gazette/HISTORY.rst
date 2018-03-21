@@ -1,6 +1,6 @@
 Changelog
 ---------
-1.12.13 (2018-03-21)
+1.13.13 (2018-03-21)
 ~~~~~~~~~~~~~~~~~~~
 
 - Let the rich text editor grow when needed.
