@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.3 (2018-03-21)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Fixes missing price leading to error when 'charge fee to customer' is active.
   [href]
 
