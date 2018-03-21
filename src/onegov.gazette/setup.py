@@ -4,7 +4,7 @@ name = 'onegov.gazette'
 description = (
     'OneGov official notices website.'
 )
-version = '1.13.12'
+version = '1.12.13'
 
 
 def get_long_description():
