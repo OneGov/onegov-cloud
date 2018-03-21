@@ -21,50 +21,35 @@
                 </div>
 
 
-                <div>
+                <form action="" method="GET">
                     <dl class="sub-nav" tal:condition="filters">
                       <dt><tal:block i18n:translate>State</tal:block>:</dt>
                       <dd tal:repeat="filter filters" class="${filter['class']}">
-                          <a href="${filter['link']}">${filter['title']}</a>
+                          <a href="${filter['link']}" class="notice-filter">${filter['title']}</a>
                       </dd>
                     </dl>
 
                     <dl class="sub-nav">
-                        <form action="" method="GET">
-                            <input type="hidden" name="from_date" value="${from_date}">
-                            <input type="hidden" name="to_date" value="${to_date}">
-                            <dt><tal:block i18n:translate>Search</tal:block>:</dt>
-                            <dd>
-                                <input type="text" name="term" value="${term}"/>
-                            </dd>
-                            <dd>
-                                <button type="submit" aria-label="Search" i18n:attributes="aria-label">
-                                    <i class="fa fa-search"></i>
-                                </button>
-                            </dd>
-                            <dd tal:condition="term">
-                                <a href="${clear_term}"><i class="fa fa-close" aria-hidden="true"></i></a>
-                            </dd>
-                        </form>
+                        <dt><tal:block i18n:translate>Search</tal:block>:</dt>
+                        <dd>
+                            <input type="text" name="term" value="${term}"/>
+                        </dd>
                     </dl>
 
                     <dl class="sub-nav">
-                        <form action="" method="GET">
-                            <input type="hidden" name="term" value="${term}"/>
-                            <dt><tal:block i18n:translate>Date</tal:block>:</dt>
-                            <dd><input type="date" name="from_date" value="${from_date}" placeholder="${layout.today().isoformat()}"></dd>
-                            <dd><input type="date" name="to_date" value="${to_date}" placeholder="${layout.today().isoformat()}"></dd>
-                            <dd>
-                                <button type="submit" aria-label="Filter by date" i18n:attributes="aria-label">
-                                    <i class="fa fa-check"></i>
-                                </button>
-                            </dd>
-                            <dd tal:condition="from_date or to_date">
-                                <a href="${clear_dates}"><i class="fa fa-close" aria-hidden="true"></i></a>
-                            </dd>
-                        </form>
+                        <dt><tal:block i18n:translate>Date</tal:block>:</dt>
+                        <dd><input type="date" name="from_date" value="${from_date}" placeholder=""></dd>
+                        <dd><input type="date" name="to_date" value="${to_date}" placeholder=""></dd>
+                        <dd tal:condition="from_date or to_date or term">
+                            <a href="${clear}"><i class="fa fa-close" aria-hidden="true"></i></a>
+                        </dd>
+                        <dd>
+                            <button type="submit" aria-label="Submit" i18n:attributes="aria-label">
+                                <i class="fa fa-check"></i>
+                            </button>
+                        </dd>
                     </dl>
-                </div>
+                </form>
 
                 <table class="notices stackable">
                     <thead>

@@ -72,3 +72,11 @@ $('ul[data-hot-issue]').each(function() {
     var input = $("input[value='" + issue + "']").attr('id');
     $("label[for='" + input + "']").addClass('warning');
 });
+
+// Submit the whole notice selection when clicking on the state links
+$('a.notice-filter').click(function(event) {
+    var form = $(this).parents('form');
+    form.attr('action', this.getAttribute('href'));
+    form.submit();
+    event.preventDefault();
+});
