@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.4.5 (2018-03-22)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes url in zulip chat.
   [href]
