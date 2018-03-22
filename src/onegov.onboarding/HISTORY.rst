@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.4.4 (2018-03-22)
+~~~~~~~~~~~~~~~~~~~
 
 - Switch notificaiton to zulip chat.
   [href]
