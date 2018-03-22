@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.66.0 (2018-03-22)
+~~~~~~~~~~~~~~~~~~~
 
 - Removes hipchat method.
   [href]
