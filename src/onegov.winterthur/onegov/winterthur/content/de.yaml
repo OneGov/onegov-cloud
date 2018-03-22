@@ -33,27 +33,6 @@ pages:
     name: news
     meta:
       trait: news
-  - title: Wir haben eine neue Webseite!
-    parent: news
-    type: news
-    meta:
-      trait: news
-    content:
-      lead: >
-        Die neue Webseite läuft auf Feriennet, der Buchungsplattform für
-        betreute Ferienangebote der Stiftung Pro Juventute.
-      text: |
-        <p>
-          Feriennet ist die umfassende, komplett webbasierte Softwarelösung
-          für die einfache, zeit- und kostensparende Organisation von
-          betreuten Ferienangeboten.
-        </p>
-        <p>
-          Weitere Informationen auf
-          <a href="http://feriennet.projuventute.ch">
-            feriennet.projuventute.ch
-          </a>
-        </p>
 
 organisation:
   theme_options:
