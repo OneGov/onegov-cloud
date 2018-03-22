@@ -102,7 +102,7 @@ def test_view_election_lists(election_day_app_gr):
     assert '/election/proporz-election/lists-data' in chart
 
 
-def test_view_election_parties(election_day_app_gr):
+def test_view_election_party_strengths(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
     login(client)
@@ -110,33 +110,34 @@ def test_view_election_parties(election_day_app_gr):
     # Majorz election
     upload_majorz_election(client)
 
-    main = client.get('/election/majorz-election/parties')
-    assert '<h3>Parteien</h3>' not in main
+    main = client.get('/election/majorz-election/party-strengths')
+    assert '<h3>Parteistärken</h3>' not in main
 
-    parties = client.get('/election/majorz-election/parties-data')
+    parties = client.get('/election/majorz-election/party-strengths-data')
     assert parties.json['results'] == []
 
-    chart = client.get('/election/majorz-election/parties-chart')
+    chart = client.get('/election/majorz-election/party-strengths-chart')
     assert chart.status_code == 200
-    assert '/election/majorz-election/parties' in chart
+    assert '/election/majorz-election/party-strengths' in chart
 
     # Proporz election
     upload_proporz_election(client)
     upload_party_results(client)
 
-    main = client.get('/election/proporz-election/parties')
-    assert '<h3>Parteien</h3>' in main
+    main = client.get('/election/proporz-election/party-strengths')
+    assert '<h3>Parteistärken</h3>' in main
 
-    parties = client.get('/election/proporz-election/parties-data').json
+    parties = client.get('/election/proporz-election/party-strengths-data')
+    parties = parties.json
     assert parties['groups'] == ['BDP', 'CVP', 'FDP']
     assert parties['labels'] == ['2015']
     assert parties['maximum']['back'] == 100
     assert parties['maximum']['front'] == 5
     assert parties['results']
 
-    chart = client.get('/election/proporz-election/parties-chart')
+    chart = client.get('/election/proporz-election/party-strengths-chart')
     assert chart.status_code == 200
-    assert '/election/proporz-election/parties-data' in chart
+    assert '/election/proporz-election/party-strengths-data' in chart
 
     export = client.get('/election/proporz-election/data-parties').text
     assert export == (
@@ -162,7 +163,8 @@ def test_view_election_parties(election_day_app_gr):
     upload = upload.form.submit()
     assert "erfolgreich hochgeladen" in upload
 
-    parties = client.get('/election/proporz-election/parties-data').json
+    parties = client.get('/election/proporz-election/party-strengths-data')
+    parties = parties.json
     assert parties['groups'] == ['BDP', 'CVP', 'FDP']
     assert parties['labels'] == ['2011', '2015']
     assert parties['maximum']['back'] == 100
@@ -201,7 +203,7 @@ def test_view_election_parties(election_day_app_gr):
     assert parties['2015-CVP']['value']['back'] == 50
     assert parties['2015-FDP']['value']['back'] == 33.3
 
-    results = client.get('/election/proporz-election/parties').text
+    results = client.get('/election/proporz-election/party-strengths').text
     assert '2.5%' in results
     assert '16.7%' in results
     assert '14.2%' in results

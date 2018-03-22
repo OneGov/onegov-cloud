@@ -39,12 +39,14 @@ def view_election_json(self, request):
     media = {'charts': {}}
     if ElectionLayout(self, request).pdf_path:
         media['pdf'] = request.link(self, 'pdf')
-    for tab in ('candidates', 'lists', 'connections', 'panachage', 'parties'):
+    for tab in (
+        'candidates', 'lists', 'connections', 'panachage', 'party-strengths'
+    ):
         if ElectionLayout(self, request, tab=tab).svg_path:
             media['charts'][tab] = request.link(self, '{}-svg'.format(tab))
 
     embed = {'candidates': request.link(self, 'candidates-chart')}
-    for item in ('lists', 'connections', 'panachage', 'parties'):
+    for item in ('lists', 'connections', 'panachage', 'party-strengths'):
         if ElectionLayout(self, request).visible(item):
             embed[item] = request.link(self, '{}-chart'.format(item))
 

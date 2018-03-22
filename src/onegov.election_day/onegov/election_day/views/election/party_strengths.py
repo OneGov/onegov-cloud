@@ -56,11 +56,12 @@ def get_party_results_deltas(election, years, parties):
     """
 
     deltas = len(years) > 1
-    results = []
-    for key in sorted(parties.keys()):
-        result = [key]
-        party = parties[key]
-        for year in years:
+    results = {}
+    for index, year in enumerate(years):
+        results[year] = []
+        for key in sorted(parties.keys()):
+            result = [key]
+            party = parties[key]
             values = party.get(year)
             if values:
                 result.append(values.get('mandates', ''))
@@ -72,18 +73,19 @@ def get_party_results_deltas(election, years, parties):
                 result.append('')
                 result.append('')
 
-        if deltas:
-            now = party.get(years[-1])
-            then = party.get(years[-2])
-            if now and then:
-                result.append('{}%'.format(
-                    ((now.get('votes', {}).get('permille', 0) or 0) -
-                     (then.get('votes', {}).get('permille', 0) or 0)) / 10
-                ))
-            else:
-                result.append('')
+            if deltas:
+                delta = ''
+                if index:
+                    last = party.get(years[index - 1])
+                    if values and last:
+                        diff = (
+                            (values.get('votes', {}).get('permille', 0) or 0) -
+                            (last.get('votes', {}).get('permille', 0) or 0)
+                        ) / 10
+                        delta = '{}%'.format(diff)
+                result.append(delta)
 
-        results.append(result)
+            results[year].append(result)
 
     return deltas, results
 
@@ -140,10 +142,10 @@ def get_party_results_data(item):
 
 @ElectionDayApp.json(
     model=Election,
-    name='parties-data',
+    name='party-strengths-data',
     permission=Public
 )
-def view_election_parties_data(self, request):
+def view_election_party_strengths_data(self, request):
 
     """ Retuns the data used for the grouped bar diagram showing the party
     results.
@@ -155,13 +157,13 @@ def view_election_parties_data(self, request):
 
 @ElectionDayApp.html(
     model=Election,
-    name='parties-chart',
+    name='party-strengths-chart',
     template='embed.pt',
     permission=Public
 )
-def view_election_parties_chart(self, request):
+def view_election_party_strengths_chart(self, request):
 
-    """" View the parties as grouped bar chart. """
+    """" View the party strengths as grouped bar chart. """
 
     @request.after
     def add_last_modified(response):
@@ -171,22 +173,22 @@ def view_election_parties_chart(self, request):
         'model': self,
         'layout': DefaultLayout(self, request),
         'data': {
-            'grouped_bar': request.link(self, name='parties-data')
+            'grouped_bar': request.link(self, name='party-strengths-data')
         }
     }
 
 
 @ElectionDayApp.html(
     model=Election,
-    name='parties',
-    template='election/parties.pt',
+    name='party-strengths',
+    template='election/party_strengths.pt',
     permission=Public
 )
-def view_election_parties(self, request):
+def view_election_party_strengths(self, request):
 
     """" The main view. """
 
-    layout = ElectionLayout(self, request, 'parties')
+    layout = ElectionLayout(self, request, 'party-strengths')
 
     years, parties = get_party_results(self)
     deltas, results = get_party_results_deltas(self, years, parties)
@@ -202,14 +204,14 @@ def view_election_parties(self, request):
 
 @ElectionDayApp.json(
     model=Election,
-    name='parties-svg',
+    name='party-strengths-svg',
     permission=Public
 )
-def view_election_parties_svg(self, request):
+def view_election_party_strengths_svg(self, request):
 
-    """ View the parties as SVG. """
+    """ View the party strengths as SVG. """
 
-    layout = ElectionLayout(self, request, 'parties')
+    layout = ElectionLayout(self, request, 'party-strengths')
     if not layout.svg_path:
         return Response(status='503 Service Unavailable')
 

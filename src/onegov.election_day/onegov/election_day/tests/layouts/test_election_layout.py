@@ -10,7 +10,7 @@ def test_election_layout(session):
     layout = ElectionLayout(None, DummyRequest())
 
     assert layout.all_tabs == (
-        'lists', 'candidates', 'connections', 'parties', 'statistics',
+        'lists', 'candidates', 'connections', 'party-strengths', 'statistics',
         'panachage', 'data'
     )
 
@@ -19,7 +19,7 @@ def test_election_layout(session):
     assert layout.title('lists') == 'Lists'
     assert layout.title('candidates') == 'Candidates'
     assert layout.title('connections') == 'List connections'
-    assert layout.title('parties') == 'Parties'
+    assert layout.title('party-strengths') == 'Party strengths'
     assert layout.title('statistics') == 'Election statistics'
     assert layout.title('data') == 'Downloads'
     assert layout.title('panachage') == 'Panachage'
@@ -61,43 +61,37 @@ def test_election_layout(session):
         request.app.filestorage = Mock()
 
         layout = ElectionLayout(election, request)
-        assert layout.pdf_path == 'pdf/election-{}.de.pdf'.format(ts)
-        assert layout.svg_path == 'svg/election-{}.None.any.svg'.format(ts)
+        assert layout.pdf_path == f'pdf/election-{ts}.de.pdf'
+        assert layout.svg_path == f'svg/election-{ts}.None.any.svg'
         assert layout.svg_link == 'Election/None-svg'
         assert layout.svg_name == 'election.svg'
 
         layout = ElectionLayout(election, request, 'lists')
-        assert layout.pdf_path == 'pdf/election-{}.de.pdf'.format(ts)
-        assert layout.svg_path == 'svg/election-{}.lists.any.svg'.format(ts)
+        assert layout.pdf_path == f'pdf/election-{ts}.de.pdf'
+        assert layout.svg_path == f'svg/election-{ts}.lists.any.svg'
         assert layout.svg_link == 'Election/lists-svg'
         assert layout.svg_name == 'election-lists.svg'
 
         layout = ElectionLayout(election, request, 'candidates')
-        assert layout.pdf_path == 'pdf/election-{}.de.pdf'.format(ts)
-        assert layout.svg_path == 'svg/election-{}.candidates.any.svg'.format(
-            ts
-        )
+        assert layout.pdf_path == f'pdf/election-{ts}.de.pdf'
+        assert layout.svg_path == f'svg/election-{ts}.candidates.any.svg'
         assert layout.svg_link == 'Election/candidates-svg'
         assert layout.svg_name == 'election-candidates.svg'
 
         layout = ElectionLayout(election, request, 'connections')
-        assert layout.pdf_path == 'pdf/election-{}.de.pdf'.format(ts)
-        assert layout.svg_path == 'svg/election-{}.connections.any.svg'.format(
-            ts
-        )
+        assert layout.pdf_path == f'pdf/election-{ts}.de.pdf'
+        assert layout.svg_path == f'svg/election-{ts}.connections.any.svg'
         assert layout.svg_link == 'Election/connections-svg'
         assert layout.svg_name == 'election-list-connections.svg'
 
         layout = ElectionLayout(election, request, 'panachage')
-        assert layout.pdf_path == 'pdf/election-{}.de.pdf'.format(ts)
-        assert layout.svg_path == 'svg/election-{}.panachage.any.svg'.format(
-            ts
-        )
+        assert layout.pdf_path == f'pdf/election-{ts}.de.pdf'
+        assert layout.svg_path == f'svg/election-{ts}.panachage.any.svg'
         assert layout.svg_link == 'Election/panachage-svg'
         assert layout.svg_name == 'election-panachage.svg'
 
-        layout = ElectionLayout(election, request, 'parties')
-        assert layout.pdf_path == 'pdf/election-{}.de.pdf'.format(ts)
-        assert layout.svg_path == 'svg/election-{}.parties.any.svg'.format(ts)
-        assert layout.svg_link == 'Election/parties-svg'
-        assert layout.svg_name == 'election-parties.svg'
+        layout = ElectionLayout(election, request, 'party-strengths')
+        assert layout.pdf_path == f'pdf/election-{ts}.de.pdf'
+        assert layout.svg_path == f'svg/election-{ts}.party-strengths.any.svg'
+        assert layout.svg_link == 'Election/party-strengths-svg'
+        assert layout.svg_name == 'election-party-strengths.svg'

@@ -280,8 +280,8 @@ msgstr "Listes"
 msgid "Candidates"
 msgstr "Candidats"
 
-msgid "Parties"
-msgstr "Partis"
+msgid "Party strengths"
+msgstr "Force des partis"
 
 msgid "Panachage"
 msgstr "Panachage"
@@ -636,10 +636,35 @@ msgstr ""
 msgid "Columns"
 msgstr ""
 
+msgid "Embed"
+msgstr "Intégration"
+
+msgid "Download"
+msgstr "Télécharger"
+
+#. Default: The diagram shows the votes and mandates of the parties. The rimmed
+#. bars (left scale) correspond to the number of seats, the colored bars (right
+#. scale) to the voices (percentages).
+#.
+msgid "figcaption_party_strengths"
+msgstr ""
+"Le diagramme montre les votes et les mandats des partis. Les barres à rebord "
+"(échelle de gauche) correspondent au nombre de sièges, les barres colorées "
+"(échelle de droite) aux voix (pourcentages)."
+
+msgid "Year"
+msgstr "Année"
+
+msgid "Party"
+msgstr "Parti"
+
 #. Default: Votes
 #.
 msgid "single_votes"
 msgstr "Votes"
+
+msgid "Difference"
+msgstr "Différence"
 
 msgid "View all details online"
 msgstr "Voir tous les détails en ligne"
@@ -683,17 +708,8 @@ msgstr "Veuillez utiliser le format suivant:"
 msgid "No map available for this year."
 msgstr "Aucune carte disponible pour cette année."
 
-msgid "Embed"
-msgstr "Intégration"
-
-msgid "Download"
-msgstr "Télécharger"
-
 msgid "Candidate"
 msgstr "Candidat"
-
-msgid "Party"
-msgstr "Parti"
 
 msgid "List"
 msgstr "Liste"
@@ -754,19 +770,6 @@ msgstr ""
 "barres du côté droit aux résultats de la liste finale. La largeur des barres "
 "et des connexions est proportionnelle aux votes."
 
-#. Default: The diagram shows the votes and mandates of the parties. The rimmed
-#. bars (left scale) correspond to the number of seats, the colored bars (right
-#. scale) to the voices (percentages).
-#.
-msgid "figcaption_parties"
-msgstr ""
-"Le diagramme montre les votes et les mandats des partis. Les barres à rebord "
-"(échelle de gauche) correspondent au nombre de sièges, les barres colorées "
-"(échelle de droite) aux voix (pourcentages)."
-
-msgid "Difference"
-msgstr "Différence"
-
 msgid "Accounted Ballots"
 msgstr "Bulletins de vote comptabilisés"
 
@@ -821,14 +824,14 @@ msgstr ""
 msgid "View"
 msgstr "Voir"
 
-msgid "New election"
-msgstr "Nouveau election"
+msgid "Upload party results"
+msgstr "Uploader les résultats par parti"
 
 msgid "Clear results"
 msgstr "Effacer les résultats"
 
-msgid "Upload party results"
-msgstr "Uploader les résultats par parti"
+msgid "New election"
+msgstr "Nouveau election"
 
 msgid "Trigger notifications"
 msgstr "Activer les notifications"
@@ -950,6 +953,9 @@ msgstr ""
 "Désabonnement aux services SMS réussi. Vous ne recevrez plus de SMS quand de "
 "nouveaux résultats seront publiés."
 
+msgid "Parties"
+msgstr "Partis"
+
 msgid "Blank list"
 msgstr "Liste vierge"
 
@@ -996,6 +1002,10 @@ msgstr "Cartographie supprimée."
 msgid "Edit compound"
 msgstr ""
 
+#, python-format
+msgid "Do you really want to clear all results (party results) of \"${item}\"?"
+msgstr ""
+
 msgid "Delete compound"
 msgstr ""
 
@@ -1004,6 +1014,9 @@ msgstr ""
 
 msgid "Compound modified."
 msgstr ""
+
+msgid "Results deleted."
+msgstr "Résultats supprimés."
 
 msgid "Compound deleted."
 msgstr ""
@@ -1033,9 +1046,6 @@ msgstr "Élection ajoutée."
 
 msgid "Election modified."
 msgstr "Élection modifiée."
-
-msgid "Results deleted."
-msgstr "Résultats supprimés."
 
 msgid "Election deleted."
 msgstr "Élection supprimée."

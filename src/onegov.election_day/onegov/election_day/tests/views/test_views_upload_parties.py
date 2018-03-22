@@ -18,13 +18,21 @@ def test_upload_parties_invalidate_cache(election_day_app):
 
     upload_proporz_election(client, canton='zg')
 
-    assert '49117' not in client.get('/election/proporz-election/parties')
-    assert '49117' not in anonymous.get('/election/proporz-election/parties')
+    assert '49117' not in client.get(
+        '/election/proporz-election/party-strengths'
+    )
+    assert '49117' not in anonymous.get(
+        '/election/proporz-election/party-strengths'
+    )
 
     upload_party_results(client)
 
-    assert '49117' in client.get('/election/proporz-election/parties')
-    assert '49117' in anonymous.get('/election/proporz-election/parties')
+    assert '49117' in client.get(
+        '/election/proporz-election/party-strengths'
+    )
+    assert '49117' in anonymous.get(
+        '/election/proporz-election/party-strengths'
+    )
 
 
 def test_upload_parties_submit(election_day_app):

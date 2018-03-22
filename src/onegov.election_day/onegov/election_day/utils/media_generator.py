@@ -17,19 +17,21 @@ from onegov.election_day.utils import pdf_filename
 from onegov.election_day.utils import svg_filename
 from onegov.election_day.views.election import get_candidates_results
 from onegov.election_day.views.election import get_connection_results
-from onegov.election_day.views.election.candidates import \
-    view_election_candidates_data
-from onegov.election_day.views.election.connections import \
-    view_election_connections_data
+from onegov.election_day.views.election.candidates \
+    import view_election_candidates_data
+from onegov.election_day.views.election.connections \
+    import view_election_connections_data
 from onegov.election_day.views.election.lists import view_election_lists_data
 from onegov.election_day.views.election.panachage import \
     view_election_panachage_data
-from onegov.election_day.views.election.parties import get_party_results_deltas
-from onegov.election_day.views.election.parties import get_party_results
-from onegov.election_day.views.election.parties import \
-    view_election_parties_data
-from onegov.election_day.views.election_compound.parties import \
-    view_election_compound_parties_data
+from onegov.election_day.views.election.party_strengths  \
+    import get_party_results_deltas
+from onegov.election_day.views.election.party_strengths  \
+    import get_party_results
+from onegov.election_day.views.election.party_strengths \
+    import view_election_party_strengths_data
+from onegov.election_day.views.election_compound.party_strengths \
+    import view_election_compound_party_strengths_data
 from onegov.pdf import LexworkSigner
 from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header_and_footer
@@ -452,16 +454,17 @@ class MediaGenerator():
                     pdf.pagebreak()
 
                 # Parties
-                data = view_election_parties_data(item, None)
+                data = view_election_party_strengths_data(item, None)
                 if data and data.get('results'):
-                    pdf.h2(translate(_('Parties')))
+                    pdf.h2(translate(_('Party strengths')))
                     pdf.pdf(self.get_chart('grouped', 'pdf', data))
-                    pdf.figcaption(translate(_('figcaption_parties')))
+                    pdf.figcaption(translate(_('figcaption_party_strengths')))
                     pdf.spacer()
                     years, parties = get_party_results(item)
                     deltas, results = get_party_results_deltas(
                         item, years, parties
                     )
+                    results = results[sorted(results.keys())[-1]]
                     if deltas:
                         pdf.table(
                             [[
@@ -472,10 +475,10 @@ class MediaGenerator():
                                 'Δ {}'.format(years[0]),
                             ]] + [[
                                 r[0],
-                                r[-4],
-                                r[-2],
-                                r[-3],
-                                r[-1],
+                                r[1],
+                                r[3],
+                                r[2],
+                                r[4],
                             ] for r in results],
                             [None, 2 * cm, 2 * cm, 2 * cm, 2 * cm],
                             style=table_style_results(1)
@@ -963,12 +966,12 @@ class MediaGenerator():
                                        params={'inverse': True})
 
         if type_ == 'parties' and is_election:
-            data = view_election_parties_data(item, None)
+            data = view_election_party_strengths_data(item, None)
             if data and data.get('results'):
                 chart = self.get_chart('grouped', 'svg', data)
 
         if type_ == 'parties' and is_election_compound:
-            data = view_election_compound_parties_data(item, None)
+            data = view_election_compound_party_strengths_data(item, None)
             if data and data.get('results'):
                 chart = self.get_chart('grouped', 'svg', data)
 

@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Redesign the party strengths view.
+  [msom]
+
 3.2.1 (2018-03-20)
 ~~~~~~~~~~~~~~~~~~~
 

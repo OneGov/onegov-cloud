@@ -280,8 +280,8 @@ msgstr "Listen"
 msgid "Candidates"
 msgstr "Kandidierende"
 
-msgid "Parties"
-msgstr "Parteien"
+msgid "Party strengths"
+msgstr "Parteistärken"
 
 msgid "Panachage"
 msgstr "Panaschierstatistik"
@@ -632,10 +632,35 @@ msgstr "Auswahl"
 msgid "Columns"
 msgstr "Spalten"
 
+msgid "Embed"
+msgstr "Einbetten"
+
+msgid "Download"
+msgstr "Herunterladen"
+
+#. Default: The diagram shows the votes and mandates of the parties. The rimmed
+#. bars (left scale) correspond to the number of seats, the colored bars (right
+#. scale) to the voices (percentages).
+#.
+msgid "figcaption_party_strengths"
+msgstr ""
+"Das Diagramm zeigt die gewonnen Stimmen und Sitze der Parteien. Die "
+"umrandeten Balken (linke Skala) entsprechen den Anzahl Sitzen, die "
+"eingefärbten Balken (rechte Skala) den Stimmanteilen in Prozent."
+
+msgid "Year"
+msgstr "Jahr"
+
+msgid "Party"
+msgstr "Partei"
+
 #. Default: Votes
 #.
 msgid "single_votes"
 msgstr "Stimmen"
+
+msgid "Difference"
+msgstr "Differenz"
 
 msgid "View all details online"
 msgstr "Alle Details online ansehen"
@@ -680,17 +705,8 @@ msgstr "Bitte verwenden Sie das folgende Format:"
 msgid "No map available for this year."
 msgstr "Keine Karte für dieses Jahr verfügbar."
 
-msgid "Embed"
-msgstr "Einbetten"
-
-msgid "Download"
-msgstr "Herunterladen"
-
 msgid "Candidate"
 msgstr "Kandidierende"
-
-msgid "Party"
-msgstr "Partei"
 
 msgid "List"
 msgstr "Liste"
@@ -753,19 +769,6 @@ msgstr ""
 "Listenstimmen. Die Breite der Balken und der Verbindungen ist proportional "
 "zu den Stimmen."
 
-#. Default: The diagram shows the votes and mandates of the parties. The rimmed
-#. bars (left scale) correspond to the number of seats, the colored bars (right
-#. scale) to the voices (percentages).
-#.
-msgid "figcaption_parties"
-msgstr ""
-"Das Diagramm zeigt die gewonnen Stimmen und Sitze der Parteien. Die "
-"umrandeten Balken (linke Skala) entsprechen den Anzahl Sitzen, die "
-"eingefärbten Balken (rechte Skala) den Stimmanteilen in Prozent."
-
-msgid "Difference"
-msgstr "Differenz"
-
 msgid "Accounted Ballots"
 msgstr "Gültige Wahlzettel"
 
@@ -820,14 +823,14 @@ msgstr "Titel"
 msgid "View"
 msgstr "Anzeigen"
 
-msgid "New election"
-msgstr "Neue Wahl"
+msgid "Upload party results"
+msgstr "Parteiresultate hochladen"
 
 msgid "Clear results"
 msgstr "Resultate löschen"
 
-msgid "Upload party results"
-msgstr "Parteiresultate hochladen"
+msgid "New election"
+msgstr "Neue Wahl"
 
 msgid "Trigger notifications"
 msgstr "Benachrichtigungen auslösen"
@@ -947,6 +950,9 @@ msgstr ""
 "Die SMS-Benachrichtigung wurde beendet. Sie erhalten in Zukunft keine SMS "
 "mehr."
 
+msgid "Parties"
+msgstr "Parteien"
+
 msgid "Blank list"
 msgstr "Blankoliste"
 
@@ -993,6 +999,10 @@ msgstr "Zuordnung gelöscht."
 msgid "Edit compound"
 msgstr "Verbindung bearbeiten"
 
+#, python-format
+msgid "Do you really want to clear all results (party results) of \"${item}\"?"
+msgstr ""
+
 msgid "Delete compound"
 msgstr "Verbindung löschen"
 
@@ -1001,6 +1011,9 @@ msgstr "Verbindung hinzugefügt."
 
 msgid "Compound modified."
 msgstr "Verbindung geändert."
+
+msgid "Results deleted."
+msgstr "Ergebnisse gelöscht."
 
 msgid "Compound deleted."
 msgstr "Verbindung gelöscht."
@@ -1028,9 +1041,6 @@ msgstr "Wahl hinzugefügt."
 
 msgid "Election modified."
 msgstr "Wahl geändert."
-
-msgid "Results deleted."
-msgstr "Ergebnisse gelöscht."
 
 msgid "Election deleted."
 msgstr "Wahl gelöscht."

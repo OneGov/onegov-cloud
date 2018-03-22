@@ -403,23 +403,71 @@
     </script>
 </metal:tablesaw_translations>
 
-<metal:party_results_figure define-macro="party_results_figure" i18n:domain="onegov.election_day">
+<metal:party_strengths_figure define-macro="party_strengths_figure" i18n:domain="onegov.election_day">
     <figure>
         <div class="grouped-bar-chart"
             i18n:attributes="data-embed-link"
-            data-dataurl="${request.link(election, name='parties-data')}"
+            data-dataurl="${request.link(election, name='party-strengths-data')}"
             data-embed-link="Embed"
-            data-embed-source="${request.link(election, name='parties-chart')}">
+            data-embed-source="${request.link(election, name='party-strengths-chart')}">
         </div>
         <a class="svg-download" tal:condition="layout.svg_path" href="${layout.svg_link}">
             <i class="fa fa-download"></i><tal:block i18n:translate="">Download</tal:block>
         </a>
-        <figcaption i18n:translate="figcaption_parties">
+        <figcaption i18n:translate="figcaption_party_strengths">
             The diagram shows the votes and mandates of the parties. The rimmed bars
             (left scale) correspond to the number of seats, the colored bars (right scale)
             to the voices (percentages).
         </figcaption>
     </figure>
-</metal:party_results_figure>
+</metal:party_strengths_figure>
+
+<metal:party_strengths define-macro="party_strengths" i18n:domain="onegov.election_day">
+    <div class="tab-navigation clearfix">
+        <nav class="top-bar" data-topbar role="navigation">
+            <ul class="title-area">
+                <li class="name menu-icon"><span i18n:translate="">Year</span></li>
+                <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+            </ul>
+            <section class="top-bar-section">
+                <ul class="left tabs" data-tab>
+                    <tal:block tal:repeat="year sorted(years, reverse=True)">
+                        <li tal:attributes="class 'active' if repeat.year.start else ''"><a href="#panel_${year}">${year}</a></li>
+                    </tal:block>                </ul>
+
+            </section>
+        </nav>
+    </div>
+    <div class="tabs-content">
+        <tal:block tal:repeat="year sorted(years, reverse=True)">
+            <div tal:attributes="class 'content active' if repeat.year.start else 'content'" id="panel_${year}">
+                <table
+                    class="results tablesaw sortable"
+                    data-tablesaw-mode="columntoggle"
+                    data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
+                    data-tablesaw-minimap=""
+                    >
+                    <thead>
+                        <tr>
+                            <th data-tablesaw-priority="persist" i18n:translate="">Party</th>
+                            <th data-tablesaw-priority="1" class="right-aligned" i18n:translate="">Mandates</th>
+                            <th data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
+                            <th data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
+                            <th data-tablesaw-priority="5" class="right-aligned" i18n:translate="" tal:condition="deltas">Difference</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr tal:repeat="line results[year]">
+                            <tal:block tal:repeat="cell line">
+                                <td tal:condition="repeat.cell.start">${cell}</td>
+                                <td tal:condition="not: repeat.cell.start" class="right-aligned">${cell}</td>
+                            </tal:block>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </tal:block>
+    </div>
+</metal:party_strengths>
 
 </body>

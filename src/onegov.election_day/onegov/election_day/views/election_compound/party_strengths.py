@@ -5,17 +5,20 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.utils import add_last_modified_header
-from onegov.election_day.views.election.parties import get_party_results
-from onegov.election_day.views.election.parties import get_party_results_data
-from onegov.election_day.views.election.parties import get_party_results_deltas
+from onegov.election_day.views.election.party_strengths import \
+    get_party_results
+from onegov.election_day.views.election.party_strengths import \
+    get_party_results_data
+from onegov.election_day.views.election.party_strengths import \
+    get_party_results_deltas
 
 
 @ElectionDayApp.json(
     model=ElectionCompound,
-    name='parties-data',
+    name='party-strengths-data',
     permission=Public
 )
-def view_election_compound_parties_data(self, request):
+def view_election_compound_party_strengths_data(self, request):
 
     """ Retuns the data used for the grouped bar diagram showing the party
     results.
@@ -27,13 +30,13 @@ def view_election_compound_parties_data(self, request):
 
 @ElectionDayApp.html(
     model=ElectionCompound,
-    name='parties-chart',
+    name='party-strengths-chart',
     template='embed.pt',
     permission=Public
 )
-def view_election_compound_parties_chart(self, request):
+def view_election_compound_party_strengths_chart(self, request):
 
-    """" View the parties as grouped bar chart. """
+    """" View the party strengths as grouped bar chart. """
 
     @request.after
     def add_last_modified(response):
@@ -43,22 +46,22 @@ def view_election_compound_parties_chart(self, request):
         'model': self,
         'layout': DefaultLayout(self, request),
         'data': {
-            'grouped_bar': request.link(self, name='parties-data')
+            'grouped_bar': request.link(self, name='party-strengths-data')
         }
     }
 
 
 @ElectionDayApp.html(
     model=ElectionCompound,
-    name='parties',
-    template='election_compound/parties.pt',
+    name='party-strengths',
+    template='election_compound/party_strengths.pt',
     permission=Public
 )
-def view_election_compound_parties(self, request):
+def view_election_compound_party_strengths(self, request):
 
     """" The main view. """
 
-    layout = ElectionCompoundLayout(self, request, 'parties')
+    layout = ElectionCompoundLayout(self, request, 'party-strengths')
 
     years, parties = get_party_results(self)
     deltas, results = get_party_results_deltas(self, years, parties)
@@ -74,14 +77,14 @@ def view_election_compound_parties(self, request):
 
 @ElectionDayApp.json(
     model=ElectionCompound,
-    name='parties-svg',
+    name='party-strengths-svg',
     permission=Public
 )
-def view_election_compound_parties_svg(self, request):
+def view_election_compound_party_strengths_svg(self, request):
 
-    """ View the parties as SVG. """
+    """ View the party strengths as SVG. """
 
-    layout = ElectionCompoundLayout(self, request, 'parties')
+    layout = ElectionCompoundLayout(self, request, 'party-strengths')
     if not layout.svg_path:
         return Response(status='503 Service Unavailable')
 

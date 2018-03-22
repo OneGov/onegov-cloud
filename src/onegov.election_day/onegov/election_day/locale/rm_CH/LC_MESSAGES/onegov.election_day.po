@@ -280,8 +280,8 @@ msgstr "Glistas"
 msgid "Candidates"
 msgstr "Candidatas e candidats"
 
-msgid "Parties"
-msgstr "Partidas"
+msgid "Party strengths"
+msgstr "Forza da las partidas"
 
 msgid "Panachage"
 msgstr "Statistica da panaschar"
@@ -672,10 +672,35 @@ msgstr ""
 msgid "Columns"
 msgstr ""
 
+msgid "Embed"
+msgstr "Incorporar"
+
+msgid "Download"
+msgstr "Telechargiar"
+
+#. Default: The diagram shows the votes and mandates of the parties. The rimmed
+#. bars (left scale) correspond to the number of seats, the colored bars (right
+#. scale) to the voices (percentages).
+#.
+msgid "figcaption_party_strengths"
+msgstr ""
+"Il diagram mussa las vuschs gudagnadas ed ils sezs da las partidas. Las "
+"travs cun ur (scala sanestra) correspundan al dumber da sezs, las travs "
+"coluradas (scala dretga) a las quotas da vuschs en pertschients."
+
+msgid "Year"
+msgstr "Onn"
+
+msgid "Party"
+msgstr "Partida"
+
 #. Default: Votes
 #.
 msgid "single_votes"
 msgstr "Vuschs"
+
+msgid "Difference"
+msgstr "Differenza"
 
 msgid "View all details online"
 msgstr "Guardar tut ils detagls online"
@@ -719,17 +744,8 @@ msgstr "Duvrai per plaschair il suandant format:"
 msgid "No map available for this year."
 msgstr "Per quest onn n'è disponibla nagina carta."
 
-msgid "Embed"
-msgstr "Incorporar"
-
-msgid "Download"
-msgstr "Telechargiar"
-
 msgid "Candidate"
 msgstr "Persuna che candidescha"
-
-msgid "Party"
-msgstr "Partida"
 
 msgid "List"
 msgstr "Glista"
@@ -792,19 +808,6 @@ msgstr ""
 "vuschs da glista panaschadas. La ladezza da las travs e da las colliaziuns è "
 "proporziunala a las vuschs."
 
-#. Default: The diagram shows the votes and mandates of the parties. The rimmed
-#. bars (left scale) correspond to the number of seats, the colored bars (right
-#. scale) to the voices (percentages).
-#.
-msgid "figcaption_parties"
-msgstr ""
-"Il diagram mussa las vuschs gudagnadas ed ils sezs da las partidas. Las "
-"travs cun ur (scala sanestra) correspundan al dumber da sezs, las travs "
-"coluradas (scala dretga) a las quotas da vuschs en pertschients."
-
-msgid "Difference"
-msgstr "Differenza"
-
 msgid "Accounted Ballots"
 msgstr "Cedels valaivels"
 
@@ -859,14 +862,14 @@ msgstr ""
 msgid "View"
 msgstr "Mussar"
 
-msgid "New election"
-msgstr "Nova elecziun"
+msgid "Upload party results"
+msgstr "Chargiar si ils resultats da las partidas"
 
 msgid "Clear results"
 msgstr "Stizzar ils resultats"
 
-msgid "Upload party results"
-msgstr "Chargiar si ils resultats da las partidas"
+msgid "New election"
+msgstr "Nova elecziun"
 
 msgid "Trigger notifications"
 msgstr "Trametter communicaziuns als abunents"
@@ -991,6 +994,9 @@ msgstr ""
 "La communicaziun per SMS è vegnida terminada. A partir d'ussa na survegnis "
 "Vus pli nagins SMS en chaussa."
 
+msgid "Parties"
+msgstr "Partidas"
+
 msgid "Blank list"
 msgstr "Glista en blanco"
 
@@ -1037,6 +1043,10 @@ msgstr "Stizzà l'attribuziun."
 msgid "Edit compound"
 msgstr ""
 
+#, python-format
+msgid "Do you really want to clear all results (party results) of \"${item}\"?"
+msgstr ""
+
 msgid "Delete compound"
 msgstr ""
 
@@ -1045,6 +1055,9 @@ msgstr ""
 
 msgid "Compound modified."
 msgstr ""
+
+msgid "Results deleted."
+msgstr "Stizzà ils resultats."
 
 msgid "Compound deleted."
 msgstr ""
@@ -1074,9 +1087,6 @@ msgstr "Agiuntà l'elecziun."
 
 msgid "Election modified."
 msgstr "Midà l'elecziun."
-
-msgid "Results deleted."
-msgstr "Stizzà ils resultats."
 
 msgid "Election deleted."
 msgstr "Stizzà l'elecziun."

@@ -16,7 +16,7 @@ class ElectionCompoundLayout(DetailLayout):
         return (
             'districts',
             'candidates',
-            'parties',
+            'party-strengths',
             'data'
         )
 
@@ -27,8 +27,8 @@ class ElectionCompoundLayout(DetailLayout):
             return self.request.app.principal.label('districts')
         if tab == 'candidates':
             return _("Elected candidates")
-        if tab == 'parties':
-            return _("Parties")
+        if tab == 'party-strengths':
+            return _("Party strengths")
         if tab == 'data':
             return _("Downloads")
 
@@ -37,7 +37,7 @@ class ElectionCompoundLayout(DetailLayout):
     def visible(self, tab=None):
         if not self.has_results:
             return False
-        if tab == 'parties':
+        if tab == 'party-strengths':
             return self.model.party_results.first()
 
         return True
