@@ -42,7 +42,6 @@ from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
 from more.webassets.tweens import METHODS, CONTENT_TYPES
 from onegov.core import cache, log, utils
-from onegov.core.custom import json
 from onegov.core import directives
 from onegov.core.cache import lru_cache
 from onegov.core.datamanager import MailDataManager
@@ -717,44 +716,6 @@ class Framework(
 
         # send e-mails through the transaction machinery
         MailDataManager.send_email(self.postman(category), envelope)
-
-    def send_hipchat(self, message_from, message, message_format='html',
-                     color='green', notify=True):
-        """ Sends a hipchat message asynchronously.
-
-        We are using the room notification method of the hipchat API V2:
-        `<https://www.hipchat.com/docs/apiv2/method/send_room_notification/>`_
-
-        Make sure to generate a token for the room (Scope: Send Notifications)
-        and define it in the configuration.
-
-        Returns the thread object to allow waiting by calling join.
-
-        """
-
-        if self.hipchat_token and self.hipchat_room_id:
-            data = json.dumps({
-                'from': message_from,
-                'message': message,
-                'message_format': message_format,
-                'color': color,
-                'notify': notify
-            }).encode('utf-8')
-
-            headers = (
-                ('Authorization', 'Bearer {}'.format(self.hipchat_token)),
-                ('Content-Type', 'application/json; charset=utf-8'),
-                ('Content-Length', len(data)),
-            )
-
-            url = 'https://api.hipchat.com/v2/room/{}/notification'.format(
-                self.hipchat_room_id
-            )
-
-            thread = PostThread(url, data, headers)
-            thread.start()
-
-            return thread
 
     def send_zulip(self, subject, content):
         """ Sends a hipchat message asynchronously.
