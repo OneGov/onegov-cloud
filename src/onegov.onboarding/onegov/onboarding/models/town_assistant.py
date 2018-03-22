@@ -65,12 +65,12 @@ class TownAssistant(Assistant):
                     "your town but you did not create it? Please contact us."
                 )
             else:
-                self.app.send_hipchat(
-                    'Onboarding',
-                    (
-                        'A new OneGov Cloud instance was started by {}: '
-                        '<a href="{}">{}</a>'
-                    ).format(user, product['url'], name)
+                self.app.send_zulip(
+                    subject='OneGov Onboarding',
+                    content='\n'.join((
+                        f"A new OneGov Cloud instance was started by {user}:",
+                        f"[{product['url']}]({name})"
+                    ))
                 )
             finally:
                 del request.browser_session['name']
