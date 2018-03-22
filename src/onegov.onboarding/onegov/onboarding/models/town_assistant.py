@@ -69,7 +69,7 @@ class TownAssistant(Assistant):
                     subject='OneGov Onboarding',
                     content='\n'.join((
                         f"A new OneGov Cloud instance was started by {user}:",
-                        f"[{product['url']}]({name})"
+                        f"[{name}]({product['url']})"
                     ))
                 )
             finally:
