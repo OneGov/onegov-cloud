@@ -659,6 +659,9 @@ msgstr "Meldung zurückgewiesen."
 msgid "mail sent"
 msgstr "Druck beauftragt"
 
+msgid "With costs"
+msgstr "Kostenpflichtig"
+
 #, python-format
 msgid "Official Notice Rejected ${id}"
 msgstr "Inserat für den amtlichen Teil zurückgewiesen ${id}"

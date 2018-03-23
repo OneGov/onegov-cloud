@@ -118,12 +118,12 @@ def test_view_notice_accept(gazette_app):
 
     with freeze_time("2017-11-01 11:00"):
         # create a notice for each editor
-        for count, user in enumerate((editor_1, editor_2, editor_3)):
+        for count, user in enumerate((editor_1, editor_2, editor_3, editor_3)):
             manage = user.get('/notices/drafted/new-notice')
             manage.form['title'] = 'Titel {}'.format(count + 1)
             manage.form['organization'] = '410'
             manage.form['category'] = '11'
-            manage.form['at_cost'].select('yes')
+            manage.form['at_cost'].select('no')
             manage.form['billing_address'] = 'someone\nstreet\nplace'
             manage.form['issues'] = ['2017-44', '2017-45']
             manage.form['text'] = "1. Oktober 2017"
@@ -133,7 +133,8 @@ def test_view_notice_accept(gazette_app):
             manage.form.submit()
             submit_notice(user, 'titel-{}'.format(count + 1))
 
-        edit_notice(publisher, 'titel-1', print_only=True)
+        edit_notice(publisher, 'titel-1', print_only=True, at_cost='yes')
+        edit_notice(publisher, 'titel-2', at_cost='yes')
 
         # check wrong actions
         submit_notice(publisher, 'titel-1', unable=True)
@@ -174,7 +175,7 @@ def test_view_notice_accept(gazette_app):
             (editor_3, 'titel-3', True),
             (publisher, 'titel-1', False),
             (publisher, 'titel-2', False),
-            # (publisher, 'titel-3', False),
+            (publisher, 'titel-3', False),
         ):
             accept_notice(user, slug, forbidden=forbidden)
 
@@ -182,7 +183,19 @@ def test_view_notice_accept(gazette_app):
         assert message['From'] == 'mails@govikon.ch'
         assert message['To'] == 'printer@onegov.org'
         assert message['Reply-To'] == 'mails@govikon.ch'
-        assert message['Subject'].startswith('44  Titel 2')
+        assert message['Subject'].startswith('44  Titel 3')
+        payload = message.get_payload(1).get_payload(decode=True)
+        payload = payload.decode('utf-8')
+        assert '44  Titel 3' in payload
+        assert "Govikon, 1. Januar 2019" in payload
+        assert "State Chancellerist" in payload
+        assert "someone<br>street<br>place" not in payload
+
+        message = gazette_app.smtp.outbox.pop()
+        assert message['From'] == 'mails@govikon.ch'
+        assert message['To'] == 'printer@onegov.org'
+        assert message['Reply-To'] == 'mails@govikon.ch'
+        assert message['Subject'].startswith('Kostenpflichtig - 44  Titel 2')
         payload = message.get_payload(1).get_payload(decode=True)
         payload = payload.decode('utf-8')
         assert '44  Titel 2' in payload
@@ -194,7 +207,9 @@ def test_view_notice_accept(gazette_app):
         assert message['From'] == 'mails@govikon.ch'
         assert message['To'] == 'printer@onegov.org'
         assert message['Reply-To'] == 'mails@govikon.ch'
-        assert message['Subject'].startswith('Stopp Internet - 44  Titel 1')
+        assert message['Subject'].startswith(
+            'Kostenpflichtig / Stopp Internet - 44  Titel 1'
+        )
         payload = message.get_payload(1).get_payload(decode=True)
         payload = payload.decode('utf-8')
         assert '44  Titel 1' in payload
@@ -205,13 +220,13 @@ def test_view_notice_accept(gazette_app):
 
         change_organization(gazette_app, '400', external_name='xxx')
 
-        accept_notice(publisher, 'titel-3')
+        accept_notice(publisher, 'titel-4')
 
         message = gazette_app.smtp.outbox.pop()
         assert message['From'] == 'mails@govikon.ch'
         assert message['To'] == 'printer@onegov.org'
         assert message['Reply-To'] == 'publisher@govikon.ch'
-        assert '44 xxx Titel 3' in message['Subject']
+        assert '44 xxx Titel 4' in message['Subject']
         payload = message.get_payload(1).get_payload(decode=True)
         payload = payload.decode('utf-8')
-        assert '44 xxx Titel 3' in payload
+        assert '44 xxx Titel 4' in payload

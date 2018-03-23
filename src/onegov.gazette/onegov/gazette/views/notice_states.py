@@ -30,9 +30,12 @@ def send_publish_mail(request, notice):
         organization = notice.organization_object
         parent = organization.parent if organization else None
         parent_id = (parent.external_name or '') if parent else ''
-        prefix = ''
+        prefixes = []
+        if notice.at_cost:
+            prefixes.append(request.translate(_("With costs")))
         if notice.print_only:
-            prefix = "{} - ".format(request.translate(_("Print only")))
+            prefixes.append(request.translate(_("Print only")))
+        prefix = '' if not prefixes else "{} - ".format(" / ".join(prefixes))
 
         return "{}{} {} {} {}".format(
             prefix, number, parent_id, notice.title, notice.id
