@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds election compounds PDFs.
+  [msom]
+
 - Redesign the party strengths view.
   [msom]
 

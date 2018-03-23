@@ -1,6 +1,5 @@
 from hashlib import sha256
 from onegov.ballot import Ballot
-from onegov.ballot import Election
 from onegov.ballot import Vote
 
 
@@ -11,7 +10,7 @@ def pdf_filename(item, locale):
 
     """
     return '{}-{}.{}.{}.pdf'.format(
-        'election' if isinstance(item, Election) else 'vote',
+        'vote' if isinstance(item, Vote) else 'election',
         sha256(item.id.encode('utf-8')).hexdigest(),
         int(item.last_modified.timestamp()),
         locale

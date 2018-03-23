@@ -2,6 +2,7 @@ from cached_property import cached_property
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day.layouts.detail import DetailLayout
+from onegov.election_day.utils import pdf_filename
 from onegov.election_day.utils import svg_filename
 
 
@@ -67,6 +68,17 @@ class ElectionCompoundLayout(DetailLayout):
         if not self.model.elections:
             return False
         return self.model.elections[0].type == 'proporz'
+
+    @cached_property
+    def pdf_path(self):
+        """ Returns the path to the PDF file or None, if it is not available.
+        """
+
+        path = 'pdf/{}'.format(pdf_filename(self.model, self.request.locale))
+        if self.request.app.filestorage.exists(path):
+            return path
+
+        return None
 
     @cached_property
     def svg_path(self):

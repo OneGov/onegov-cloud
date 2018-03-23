@@ -1,6 +1,8 @@
 from morepath import redirect
+from morepath.request import Response
 from onegov.ballot import ElectionCompound
 from onegov.core.security import Public
+from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.utils import add_last_modified_header
@@ -30,16 +32,18 @@ def view_election_compound_json(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_modified)
 
-    media = {'charts': {}}
     embed = {}
+    media = {'charts': {}}
+    if ElectionCompoundLayout(self, request).pdf_path:
+        media['pdf'] = request.link(self, 'pdf')
     for tab in ('party-strengths', ):
-        layout = ElectionCompoundLayout(self, request, tab='party-strengths')
-        if layout.svg_path:
-            media['charts'][tab] = request.link(self, '{}-svg'.format(tab))
+        layout = ElectionCompoundLayout(self, request, tab=tab)
         if layout.visible:
             embed['party-strengths'] = request.link(self, '{}-chart'.format(
                 'party-strengths'
             ))
+        if layout.svg_path:
+            media['charts'][tab] = request.link(self, '{}-svg'.format(tab))
 
     return {
         'completed': self.completed,
@@ -85,3 +89,30 @@ def view_election_compound_summary(self, request):
         add_last_modified_header(response, self.last_modified)
 
     return get_election_compound_summary(self, request)
+
+
+@ElectionDayApp.view(
+    model=ElectionCompound,
+    name='pdf',
+    permission=Public
+)
+def view_election_compound_pdf(self, request):
+
+    """ View the generated PDF. """
+
+    layout = ElectionCompoundLayout(self, request)
+
+    if not layout.pdf_path:
+        return Response(status='503 Service Unavailable')
+
+    content = None
+    with request.app.filestorage.open(layout.pdf_path, 'rb') as f:
+        content = f.read()
+
+    return Response(
+        content,
+        content_type='application/pdf',
+        content_disposition='inline; filename={}.pdf'.format(
+            normalize_for_url(self.title)
+        )
+    )

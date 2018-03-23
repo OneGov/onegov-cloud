@@ -1,4 +1,5 @@
 from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
 from onegov.ballot import Vote
 from onegov.core.utils import groupbylist
 from onegov.election_day import _
@@ -14,6 +15,7 @@ from onegov.election_day.views.election.party_strengths  \
     import get_party_results_deltas
 from onegov.election_day.views.election.party_strengths  \
     import get_party_results
+from onegov.election_day.views.election_compound import get_elected_candidates
 from onegov.pdf import LexworkSigner
 from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header_and_footer
@@ -98,10 +100,13 @@ class PdfGenerator():
             pdf.spacer()
 
             if isinstance(item, Election) and item.tacit:
-                self.add_tacit_election(principal, item, pdf, locale)
+                self.add_tacit_election(principal, item, pdf)
 
             elif isinstance(item, Election):
-                self.add_election(principal, item, pdf, locale)
+                self.add_election(principal, item, pdf)
+
+            elif isinstance(item, ElectionCompound):
+                self.add_election_compound(principal, item, pdf)
 
             elif isinstance(item, Vote):
                 self.add_vote(principal, item, pdf, locale)
@@ -114,7 +119,7 @@ class PdfGenerator():
 
             pdf.generate()
 
-    def add_tacit_election(self, principal, election, pdf, locale):
+    def add_tacit_election(self, principal, election, pdf):
 
         # Candidates
         data = view_election_candidates_data(election, None)
@@ -157,7 +162,7 @@ class PdfGenerator():
                 )
             pdf.pagebreak()
 
-    def add_election(self, principal, election, pdf, locale):
+    def add_election(self, principal, election, pdf):
 
         def format_name(item):
             return item.name if item.entity_id else pdf.translate(_("Expats"))
@@ -498,6 +503,123 @@ class PdfGenerator():
             )
         pdf.pagebreak()
 
+    def add_election_compound(self, principal, compound, pdf):
+
+        def format_name(item):
+            return item.name if item.entity_id else pdf.translate(_("Expats"))
+
+        majorz = False
+        if compound.elections and compound.elections[0].type == 'majorz':
+            majorz = True
+
+        districts = {
+            election.id: election.results.first().district
+            for election in compound.elections if election.results.first()
+        }
+
+        # Factoids
+        pdf.factoids(
+            [_('Mandates'), '', ''],
+            [compound.allocated_mandates, '', '']
+        )
+        pdf.spacer()
+        pdf.spacer()
+
+        # Districts
+        pdf.h2(principal.label('districts'))
+        pdf.results(
+            [principal.label('district'), _('Mandates')],
+            [[e.title, e.allocated_mandates] for e in compound.elections],
+            [None, 2 * cm],
+            pdf.style.table_results_1
+        )
+        pdf.pagebreak()
+
+        # Elected candidates
+        pdf.h2(_('Elected candidates'))
+        pdf.spacer()
+        if majorz:
+            pdf.results(
+                [
+                    _('Candidate'),
+                    _('Party'),
+                    principal.label('district'),
+                ],
+                [[
+                    '{} {}'.format(r[0], r[1]),
+                    r[2],
+                    districts.get(r[5], '')
+                ] for r in get_elected_candidates(compound, self.session)],
+                [None, 2 * cm, 2 * cm],
+                pdf.style.table_results_2
+            )
+        else:
+            pdf.results(
+                [
+                    _('Candidate'),
+                    _('List'),
+                    principal.label('district'),
+                ],
+                [[
+                    '{} {}'.format(r[0], r[1]),
+                    r[3],
+                    districts.get(r[5], '')
+                ] for r in get_elected_candidates(compound, self.session)],
+                [None, None, 2.3 * cm, 2 * cm],
+                pdf.style.table_results_3
+            )
+        pdf.pagebreak()
+
+        # Parties
+        chart = self.renderer.get_party_strengths_chart(compound, 'pdf')
+        if chart:
+            pdf.h2(_('Party strengths'))
+            pdf.pdf(chart)
+            pdf.figcaption(_('figcaption_party_strengths'))
+            pdf.spacer()
+            years, parties = get_party_results(compound)
+            deltas, results = get_party_results_deltas(
+                compound, years, parties
+            )
+            results = results[sorted(results.keys())[-1]]
+            if deltas:
+                pdf.results(
+                    [
+                        _('Party'),
+                        _('Mandates'),
+                        _('single_votes'),
+                        _('single_votes'),
+                        'Δ {}'.format(years[0]),
+                    ],
+                    [[
+                        r[0],
+                        r[1],
+                        r[3],
+                        r[2],
+                        r[4],
+                    ] for r in results],
+                    [None, 2 * cm, 2 * cm, 2 * cm, 2 * cm],
+                    pdf.style.table_results_1
+                )
+            else:
+                pdf.results(
+                    [
+                        _('Party'),
+                        _('Mandates'),
+                        _('single_votes'),
+                        _('single_votes'),
+                    ],
+                    [[
+                        r[0],
+                        r[1],
+                        r[3],
+                        r[2],
+                    ] for r in results],
+                    [None, 2 * cm, 2 * cm, 2 * cm],
+                    pdf.style.table_results_1
+                )
+            pdf.pagebreak()
+
     def add_vote(self, principal, vote, pdf, locale):
 
         def format_name(item):
@@ -725,6 +847,7 @@ class PdfGenerator():
 
         # Get all elections and votes
         items = self.session.query(Election).all()
+        items.extend(self.session.query(ElectionCompound).all())
         items.extend(self.session.query(Vote).all())
 
         # Read existing PDFs
