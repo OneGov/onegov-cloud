@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.12.14 (2018-03-23)
+~~~~~~~~~~~~~~~~~~~~
 
 - Adjusts texts/translations.
   [msom]
