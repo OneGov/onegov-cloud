@@ -2,7 +2,6 @@ from datetime import date
 from onegov.ballot import Ballot
 from onegov.ballot import BallotResult
 from onegov.ballot import Vote
-from onegov.election_day import _
 from onegov.election_day.tests.utils import add_majorz_election
 from onegov.election_day.tests.utils import add_proporz_election
 from onegov.election_day.tests.utils import add_vote
@@ -17,15 +16,6 @@ class PatchedPdfGenerator(PdfGenerator):
     def __init__(self, app):
         super(PatchedPdfGenerator, self).__init__(app)
         self.renderer = PatchedD3Renderer(app)
-
-
-def test_media_generator_translatation(election_day_app):
-    generator = PdfGenerator(election_day_app)
-
-    assert generator.translate(_('Election'), 'de_CH') == 'Wahl'
-    assert generator.translate(_('Election'), 'fr_CH') == 'Election'
-    assert generator.translate(_('Election'), 'it_CH') == 'Elezione'
-    assert generator.translate(_('Election'), 'rm_CH') == 'Elecziun'
 
 
 def test_generate_pdf_election(session, election_day_app):
