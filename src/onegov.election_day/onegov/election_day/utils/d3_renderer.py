@@ -1,7 +1,9 @@
 from base64 import b64decode
 from io import BytesIO
 from io import StringIO
+from onegov.ballot import Ballot
 from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
 from onegov.core.custom import json
 from onegov.election_day import _
 from onegov.election_day.views.election.candidates \
@@ -118,54 +120,66 @@ class D3Renderer():
 
         return self.get_chart('map', fmt, data, width, params)
 
-    def get_lists_chart(self, election, fmt, return_data=False):
+    def get_lists_chart(self, item, fmt, return_data=False):
         chart = None
-        data = view_election_lists_data(election, None)
-        if data and data.get('results'):
-            chart = self.get_chart('bar', fmt, data)
+        data = None
+        if isinstance(item, Election):
+            data = view_election_lists_data(item, None)
+            if data and data.get('results'):
+                chart = self.get_chart('bar', fmt, data)
         return (chart, data) if return_data else chart
 
-    def get_candidates_chart(self, election, fmt, return_data=False):
+    def get_candidates_chart(self, item, fmt, return_data=False):
         chart = None
-        data = view_election_candidates_data(election, None)
-        if data and data.get('results'):
-            chart = self.get_chart('bar', fmt, data)
+        data = None
+        if isinstance(item, Election):
+            data = view_election_candidates_data(item, None)
+            if data and data.get('results'):
+                chart = self.get_chart('bar', fmt, data)
         return (chart, data) if return_data else chart
 
-    def get_connections_chart(self, election, fmt, return_data=False):
+    def get_connections_chart(self, item, fmt, return_data=False):
         chart = None
-        data = view_election_connections_data(election, None)
-        if data and data.get('links') and data.get('nodes'):
-            chart = self.get_chart(
-                'sankey', fmt, data, params={'inverse': True}
-            )
+        data = None
+        if isinstance(item, Election):
+            data = view_election_connections_data(item, None)
+            if data and data.get('links') and data.get('nodes'):
+                chart = self.get_chart(
+                    'sankey', fmt, data, params={'inverse': True}
+                )
         return (chart, data) if return_data else chart
 
-    def get_party_strengths_chart(self, election, fmt, return_data=False):
+    def get_party_strengths_chart(self, item, fmt, return_data=False):
         chart = None
-        if isinstance(election, Election):
-            data = view_election_party_strengths_data(election, None)
+        data = None
+        if isinstance(item, Election):
+            data = view_election_party_strengths_data(item, None)
             if data and data.get('results'):
                 chart = self.get_chart('grouped', fmt, data)
-        else:
-            data = view_election_compound_party_strengths_data(election, None)
+        elif isinstance(item, ElectionCompound):
+            data = view_election_compound_party_strengths_data(item, None)
             if data and data.get('results'):
                 chart = self.get_chart('grouped', fmt, data)
         return (chart, data) if return_data else chart
 
-    def get_panachage_chart(self, election, fmt, return_data=False):
+    def get_panachage_chart(self, item, fmt, return_data=False):
         chart = None
-        data = view_election_panachage_data(election, None)
-        if data and data.get('links') and data.get('nodes'):
-            return self.get_chart('sankey', fmt, data)
+        data = None
+        if isinstance(item, Election):
+            data = view_election_panachage_data(item, None)
+            if data and data.get('links') and data.get('nodes'):
+                return self.get_chart('sankey', fmt, data)
         return (chart, data) if return_data else chart
 
-    def get_map_chart(self, ballot, fmt, locale=None, return_data=False):
-        data = ballot.percentage_by_entity()
-        params = {
-            'yay': self.translate(_('Yay'), locale),
-            'nay': self.translate(_('Nay'), locale),
-        }
-        year = ballot.vote.date.year
-        chart = self.get_map(fmt, data, year, params=params)
+    def get_map_chart(self, item, fmt, locale=None, return_data=False):
+        chart = None
+        data = None
+        if isinstance(item, Ballot):
+            data = item.percentage_by_entity()
+            params = {
+                'yay': self.translate(_('Yay'), locale),
+                'nay': self.translate(_('Nay'), locale),
+            }
+            year = item.vote.date.year
+            chart = self.get_map(fmt, data, year, params=params)
         return (chart, data) if return_data else chart

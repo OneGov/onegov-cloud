@@ -30,6 +30,17 @@ def view_election_compound_json(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_modified)
 
+    media = {'charts': {}}
+    embed = {}
+    for tab in ('party-strengths', ):
+        layout = ElectionCompoundLayout(self, request, tab='party-strengths')
+        if layout.svg_path:
+            media['charts'][tab] = request.link(self, '{}-svg'.format(tab))
+        if layout.visible:
+            embed['party-strengths'] = request.link(self, '{}-chart'.format(
+                'party-strengths'
+            ))
+
     return {
         'completed': self.completed,
         'date': self.date.isoformat(),
@@ -50,6 +61,8 @@ def view_election_compound_json(self, request):
         'title': self.title_translations,
         'type': 'election_compound',
         'url': request.link(self),
+        'embed': embed,
+        'media': media,
         'data': {
             'json': request.link(self, 'data-json'),
             'csv': request.link(self, 'data-csv'),

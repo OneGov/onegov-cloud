@@ -19,7 +19,7 @@ def test_generate_svg(election_day_app, session):
 
     generator = SvgGenerator(election_day_app)
 
-    with raises(AssertionError):
+    with raises(AttributeError):
         generator.generate_svg(None, 'things', 'de_CH')
 
     svg = StringIO('<svg></svg>')
@@ -31,7 +31,7 @@ def test_generate_svg(election_day_app, session):
             generator.generate_svg(item, 'candidates', 'de_CH')
             generator.generate_svg(item, 'candidates')
             generator.generate_svg(item, 'connections', 'de_CH')
-            generator.generate_svg(item, 'parties', 'de_CH')
+            generator.generate_svg(item, 'party-strengths', 'de_CH')
             generator.generate_svg(item, 'panachage', 'de_CH')
             generator.generate_svg(item, 'map', 'de_CH')
 
@@ -39,7 +39,7 @@ def test_generate_svg(election_day_app, session):
             generator.generate_svg(item, 'lists', 'de_CH')
             generator.generate_svg(item, 'candidates', 'de_CH')
             generator.generate_svg(item, 'connections', 'de_CH')
-            generator.generate_svg(item, 'parties', 'de_CH')
+            generator.generate_svg(item, 'party-strengths', 'de_CH')
             generator.generate_svg(item, 'panachage', 'de_CH')
             generator.generate_svg(item, 'map', 'de_CH')
 
@@ -47,7 +47,7 @@ def test_generate_svg(election_day_app, session):
             generator.generate_svg(item, 'lists', 'de_CH')
             generator.generate_svg(item, 'candidates', 'de_CH')
             generator.generate_svg(item, 'connections', 'de_CH')
-            generator.generate_svg(item, 'parties', 'de_CH')
+            generator.generate_svg(item, 'party-strengths', 'de_CH')
             generator.generate_svg(item, 'panachage', 'de_CH')
             generator.generate_svg(item, 'map', 'de_CH')
             generator.generate_svg(item, 'map', 'it_CH')
@@ -67,7 +67,7 @@ def test_generate_svg(election_day_app, session):
             'election-{}.{}.lists.de_CH.svg'.format(h2, ts),
             'election-{}.{}.candidates.de_CH.svg'.format(h2, ts),
             'election-{}.{}.connections.de_CH.svg'.format(h2, ts),
-            'election-{}.{}.parties.de_CH.svg'.format(h2, ts),
+            'election-{}.{}.party-strengths.de_CH.svg'.format(h2, ts),
             'election-{}.{}.panachage.de_CH.svg'.format(h2, ts),
             'ballot-{}.{}.map.de_CH.svg'.format(h3, ts),
             'ballot-{}.{}.map.it_CH.svg'.format(h3, ts)

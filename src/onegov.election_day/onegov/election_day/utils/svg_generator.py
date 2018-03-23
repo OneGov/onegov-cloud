@@ -34,12 +34,6 @@ class SvgGenerator():
     def generate_svg(self, item, type_, locale=None):
         """ Creates the requested SVG. """
 
-        is_election = isinstance(item, Election)
-
-        assert type_ in (
-            'lists', 'candidates', 'connections', 'parties', 'panachage', 'map'
-        )
-
         if not self.app.filestorage.exists(self.svg_dir):
             self.app.filestorage.makedir(self.svg_dir)
 
@@ -54,18 +48,18 @@ class SvgGenerator():
             self.app.filestorage.remove(path)
 
         chart = None
-        if type_ == 'lists' and is_election:
-            chart = self.renderer.get_lists_chart(item, 'svg')
-        if type_ == 'candidates' and is_election:
+        if type_ == 'candidates':
             chart = self.renderer.get_candidates_chart(item, 'svg')
-        if type_ == 'connections' and is_election:
+        if type_ == 'connections':
             chart = self.renderer.get_connections_chart(item, 'svg')
-        if type_ == 'parties' and is_election:
-            chart = self.renderer.get_party_strengths_chart(item, 'svg')
-        if type_ == 'panachage' and is_election:
-            chart = self.renderer.get_panachage_chart(item, 'svg')
-        if type_ == 'map' and not is_election:
+        if type_ == 'lists':
+            chart = self.renderer.get_lists_chart(item, 'svg')
+        if type_ == 'map':
             chart = self.renderer.get_map_chart(item, 'svg', locale)
+        if type_ == 'panachage':
+            chart = self.renderer.get_panachage_chart(item, 'svg')
+        if type_ == 'party-strengths':
+            chart = self.renderer.get_party_strengths_chart(item, 'svg')
         if chart:
             with self.app.filestorage.open(path, 'w') as f:
                 copyfileobj(chart, f)
@@ -93,10 +87,10 @@ class SvgGenerator():
             if election.type == 'proporz':
                 self.generate_svg(election, 'lists')
                 self.generate_svg(election, 'connections')
-                self.generate_svg(election, 'parties')
+                self.generate_svg(election, 'party-strengths')
                 self.generate_svg(election, 'panachage')
         for election_compound in self.session.query(ElectionCompound):
-            self.generate_svg(election_compound, 'parties')
+            self.generate_svg(election_compound, 'party-strengths')
         if principal.use_maps:
             for ballot in self.session.query(Ballot):
                 if principal.is_year_available(ballot.vote.date.year):
