@@ -150,21 +150,13 @@
     }
 
     .streetlist {
-        list-style: none;
-
         li {
-            padding-bottom: 0.273em;
-        }
-
-        li::before {
-            background-color: #44443f;
-            border-radius: 50%;
-            content: "";
-            float: left;
-            height: 6px;
-            line-height: 1em;
-            margin: 12px .5em 0;
-            width: 6px;
+            list-style-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI3IiBoZWlnaHQ9IjkiIHZpZXdCb3g9IjAgMCA3IDkiPgogIDxjaXJjbGUgY3g9IjMuNSIgY3k9IjMuNSIgcj0iMi41IiBmaWxsPSIjNDQ0NDNGIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz4KPC9zdmc+Cg==");
+            overflow: hidden;
+            padding-bottom: .273em;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            white-space: nowrap;
         }
     }
 }

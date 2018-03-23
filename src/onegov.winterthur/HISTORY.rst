@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes streetnames getting wrapped.
+  [href]
+
 0.1.4 (2018-03-20)
 ~~~~~~~~~~~~~~~~~~~~~
 
