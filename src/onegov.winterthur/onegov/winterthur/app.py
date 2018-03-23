@@ -8,7 +8,7 @@ from onegov.winterthur.theme import WinterthurTheme
 class WinterthurApp(OrgApp):
 
     #: the version of this application (do not change manually!)
-    version = '0.1.4'
+    version = '0.1.5'
 
     frame_ancestors = {
         'https://winterthur.ch',
