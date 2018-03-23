@@ -149,7 +149,7 @@ msgid "Date (usually the date of the issue)"
 msgstr "Datum (entspricht in der Regel dem Ausgabedatum)"
 
 msgid "Author"
-msgstr "Absender"
+msgstr "Absender (z.B. Gemeindeverwaltung Baar, Bau und Unterhalt)"
 
 msgid "No"
 msgstr "Nein"
@@ -350,8 +350,11 @@ msgstr "Änderung"
 msgid "Search"
 msgstr "Suche"
 
-msgid "Filter by date"
-msgstr "Nach Datum filtern"
+msgid "Issue date"
+msgstr "Ausgabedatum"
+
+msgid "Submit"
+msgstr "Einreichen"
 
 msgid "Order"
 msgstr "Ordnen"
@@ -379,6 +382,9 @@ msgstr "Browser"
 
 msgid "Clear Sessions"
 msgstr "Sitzungen beenden"
+
+msgid "Filter by date"
+msgstr "Nach Datum filtern"
 
 msgid "By Organizations"
 msgstr "Organisationen"
@@ -559,15 +565,6 @@ msgstr "Annehmen"
 
 msgid "Reject"
 msgstr "Zurückweisen"
-
-msgid "Publish"
-msgstr "Veröffentlichen"
-
-msgid "Preview"
-msgstr "Vorschau"
-
-msgid "Copy"
-msgstr "Kopieren"
 
 msgid "Accepted official notices may not be edited."
 msgstr "Angenommene Meldungen können nicht mehr bearbeitet werden."

@@ -20,7 +20,7 @@
                     </dl>
 
                     <dl class="sub-nav">
-                        <dt><tal:block i18n:translate>Date</tal:block>:</dt>
+                        <dt><tal:block i18n:translate>Issue date</tal:block>:</dt>
                         <dd><input type="date" name="from_date" value="${from_date}" placeholder=""></dd>
                         <dd><input type="date" name="to_date" value="${to_date}" placeholder=""></dd>
                         <dd tal:condition="from_date or to_date">
