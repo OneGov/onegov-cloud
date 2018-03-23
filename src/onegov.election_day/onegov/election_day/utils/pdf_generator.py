@@ -1,37 +1,21 @@
 from babel.dates import format_date
 from babel.dates import format_time
-from base64 import b64decode
 from copy import deepcopy
-from io import BytesIO
-from io import StringIO
-from onegov.ballot import Ballot
 from onegov.ballot import Election
-from onegov.ballot import ElectionCompound
 from onegov.ballot import Vote
-from onegov.core.custom import json
 from onegov.core.utils import groupbylist
-from onegov.core.utils import module_path
 from onegov.election_day import _
 from onegov.election_day import log
 from onegov.election_day.utils import pdf_filename
-from onegov.election_day.utils import svg_filename
+from onegov.election_day.utils.d3_renderer import D3Renderer
 from onegov.election_day.views.election import get_candidates_results
 from onegov.election_day.views.election import get_connection_results
 from onegov.election_day.views.election.candidates \
     import view_election_candidates_data
-from onegov.election_day.views.election.connections \
-    import view_election_connections_data
-from onegov.election_day.views.election.lists import view_election_lists_data
-from onegov.election_day.views.election.panachage import \
-    view_election_panachage_data
 from onegov.election_day.views.election.party_strengths  \
     import get_party_results_deltas
 from onegov.election_day.views.election.party_strengths  \
     import get_party_results
-from onegov.election_day.views.election.party_strengths \
-    import view_election_party_strengths_data
-from onegov.election_day.views.election_compound.party_strengths \
-    import view_election_compound_party_strengths_data
 from onegov.pdf import LexworkSigner
 from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header_and_footer
@@ -40,51 +24,17 @@ from os.path import basename
 from pdfdocument.document import MarkupParagraph
 from pytz import timezone
 from reportlab.lib.units import cm
-from requests import post
-from rjsmin import jsmin
-from shutil import copyfileobj
 
 
-class MediaGenerator():
+class PdfGenerator():
 
-    def __init__(self, app):
+    def __init__(self, app, renderer=None):
         self.app = app
         self.pdf_dir = 'pdf'
-        self.svg_dir = 'svg'
-        self.renderer = app.configuration.get('d3_renderer').rstrip('/')
         self.session = self.app.session()
         self.pdf_signing = self.app.principal.pdf_signing
         self.default_locale = self.app.settings.i18n.default_locale
-
-        self.supported_charts = {
-            'bar': {
-                'main': 'barChart',
-                'scripts': ('d3.chart.bar.js',),
-            },
-            'grouped': {
-                'main': 'groupedChart',
-                'scripts': ('d3.chart.grouped.js',),
-            },
-            'sankey': {
-                'main': 'sankeyChart',
-                'scripts': ('d3.sankey.js', 'd3.chart.sankey.js'),
-            },
-            'map': {
-                'main': 'ballotMap',
-                'scripts': ('topojson.js', 'd3.chart.map.js'),
-            }
-        }
-
-        # Read and minify the javascript sources
-        self.scripts = {}
-        for chart in self.supported_charts:
-            self.scripts[chart] = []
-            for script in self.supported_charts[chart]['scripts']:
-                path = module_path(
-                    'onegov.election_day', 'assets/js/{}'.format(script)
-                )
-                with open(path, 'r') as f:
-                    self.scripts[chart].append(jsmin(f.read()))
+        self.renderer = renderer or D3Renderer(app)
 
     def translate(self, text, locale):
         """ Translates the given string. """
@@ -105,59 +55,6 @@ class MediaGenerator():
             path = '{}/{}'.format(directory, file.name)
             if fs.exists(path) and not file.is_dir:
                 fs.remove(path)
-
-    def get_chart(self, chart, fmt, data, width=1000, params=None):
-        """ Returns the requested chart from the d3-render service as a
-        PNG/PDF/SVG.
-
-        """
-
-        assert chart in self.supported_charts
-        assert fmt in ('pdf', 'svg')
-
-        params = params or {}
-        params.update({
-            'data': data,
-            'width': width,
-            'viewport_width': width  # only used for PDF and PNG
-        })
-
-        response = post('{}/d3/{}'.format(self.renderer, fmt), json={
-            'scripts': self.scripts[chart],
-            'main': self.supported_charts[chart]['main'],
-            'params': params
-        })
-
-        response.raise_for_status()
-
-        if fmt == 'svg':
-            return StringIO(response.text)
-        else:
-            return BytesIO(b64decode(response.text))
-
-    def get_map(self, fmt, data, year, width=1000, params=None):
-        """ Returns the request chart from the d3-render service as a
-        PNG/PDF/SVG.
-
-        """
-        mapdata = None
-        path = module_path(
-            'onegov.election_day',
-            'static/mapdata/{}/{}.json'.format(
-                year,
-                self.app.principal.id
-            )
-        )
-        with open(path, 'r') as f:
-            mapdata = json.loads(f.read())
-
-        params = params or {}
-        params.update({
-            'mapdata': mapdata,
-            'canton': self.app.principal.id
-        })
-
-        return self.get_chart('map', fmt, data, width, params)
 
     def sign_pdf(self, path):
         if self.pdf_signing:
@@ -334,10 +231,10 @@ class MediaGenerator():
                 pdf.spacer()
 
                 # Lists
-                data = view_election_lists_data(item, None)
+                chart, data = self.renderer.get_lists_chart(item, 'pdf', True)
                 if data and data.get('results'):
                     pdf.h2(translate(_('Lists')))
-                    pdf.pdf(self.get_chart('bar', 'pdf', data))
+                    pdf.pdf(chart)
                     pdf.spacer()
                     pdf.table(
                         [[
@@ -355,10 +252,10 @@ class MediaGenerator():
                     pdf.pagebreak()
 
                 # Candidates
-                data = view_election_candidates_data(item, None)
-                if data and data.get('results'):
+                chart = self.renderer.get_candidates_chart(item, 'pdf')
+                if chart:
                     pdf.h2(translate(_('Candidates')))
-                    pdf.pdf(self.get_chart('bar', 'pdf', data))
+                    pdf.pdf(chart)
                     pdf.spacer()
                     if majorz:
                         pdf.table(
@@ -399,11 +296,10 @@ class MediaGenerator():
                     pdf.pagebreak()
 
                 # Connections
-                data = view_election_connections_data(item, None)
-                if data and data.get('links') and data.get('nodes'):
+                chart = self.renderer.get_connections_chart(item, 'pdf')
+                if chart:
                     pdf.h2(translate(_('List connections')))
-                    pdf.pdf(self.get_chart('sankey', 'pdf', data,
-                                           params={'inverse': True}))
+                    pdf.pdf(chart)
                     pdf.figcaption(translate(_('figcaption_connections')))
                     pdf.spacer()
 
@@ -454,10 +350,12 @@ class MediaGenerator():
                     pdf.pagebreak()
 
                 # Parties
-                data = view_election_party_strengths_data(item, None)
-                if data and data.get('results'):
+                chart = self.renderer.get_party_strengths_chart(
+                    item, 'pdf'
+                )
+                if chart:
                     pdf.h2(translate(_('Party strengths')))
-                    pdf.pdf(self.get_chart('grouped', 'pdf', data))
+                    pdf.pdf(chart)
                     pdf.figcaption(translate(_('figcaption_party_strengths')))
                     pdf.spacer()
                     years, parties = get_party_results(item)
@@ -502,10 +400,10 @@ class MediaGenerator():
                     pdf.pagebreak()
 
                 # Panachage
-                data = view_election_panachage_data(item, None)
-                if data and data.get('links') and data.get('nodes'):
+                chart = self.renderer.get_panachage_chart(item, 'pdf')
+                if chart:
                     pdf.h2(translate(_('Panachage')))
-                    pdf.pdf(self.get_chart('sankey', 'pdf', data))
+                    pdf.pdf(chart)
                     pdf.figcaption(translate(_('figcaption_panachage')))
                     pdf.spacer()
                     pdf.pagebreak()
@@ -846,14 +744,8 @@ class MediaGenerator():
                     # Map
                     if principal.is_year_available(item.date.year):
                         pdf.pagebreak()
-                        data = ballot.percentage_by_entity()
-                        params = {
-                            'yay': translate(_('Yay')),
-                            'nay': translate(_('Nay')),
-                        }
-                        year = item.date.year
                         pdf.pdf(
-                            self.get_map('pdf', data, year, params=params),
+                            self.renderer.get_map_chart(ballot, 'pdf', locale),
                             0.8
                         )
                         pdf.pagebreak()
@@ -924,138 +816,3 @@ class MediaGenerator():
         for files in existing.values():
             files = sorted(files, reverse=True)
             self.remove(self.pdf_dir, files[len(self.app.locales):])
-
-    def generate_svg(self, item, type_, locale=None):
-        """ Creates the requested SVG. """
-
-        is_election = isinstance(item, Election)
-        is_election_compound = isinstance(item, ElectionCompound)
-
-        assert type_ in (
-            'lists', 'candidates', 'connections', 'parties', 'panachage', 'map'
-        )
-
-        if not self.app.filestorage.exists(self.svg_dir):
-            self.app.filestorage.makedir(self.svg_dir)
-
-        existing = self.app.filestorage.listdir(self.svg_dir)
-        filename = svg_filename(item, type_, locale)
-
-        if filename in existing:
-            return None
-
-        path = '{}/{}'.format(self.svg_dir, filename)
-        if self.app.filestorage.exists(path):
-            self.app.filestorage.remove(path)
-
-        chart = None
-        if type_ == 'lists' and is_election:
-            data = view_election_lists_data(item, None)
-            if data and data.get('results'):
-                chart = self.get_chart('bar', 'svg', data)
-
-        if type_ == 'candidates' and is_election:
-            data = view_election_candidates_data(item, None)
-            if data and data.get('results'):
-                chart = self.get_chart('bar', 'svg', data)
-
-        if type_ == 'connections' and is_election:
-            data = view_election_connections_data(item, None)
-            if data and data.get('links') and data.get('nodes'):
-                chart = self.get_chart('sankey', 'svg', data,
-                                       params={'inverse': True})
-
-        if type_ == 'parties' and is_election:
-            data = view_election_party_strengths_data(item, None)
-            if data and data.get('results'):
-                chart = self.get_chart('grouped', 'svg', data)
-
-        if type_ == 'parties' and is_election_compound:
-            data = view_election_compound_party_strengths_data(item, None)
-            if data and data.get('results'):
-                chart = self.get_chart('grouped', 'svg', data)
-
-        if type_ == 'panachage' and is_election:
-            data = view_election_panachage_data(item, None)
-            if data and data.get('links') and data.get('nodes'):
-                chart = self.get_chart('sankey', 'svg', data)
-
-        if type_ == 'map' and not is_election:
-            data = item.percentage_by_entity()
-            params = {
-                'yay': self.translate(_('Yay'), locale),
-                'nay': self.translate(_('Nay'), locale),
-            }
-            year = item.vote.date.year
-            chart = self.get_map('svg', data, year, params=params)
-
-        if chart:
-            with self.app.filestorage.open(path, 'w') as f:
-                copyfileobj(chart, f)
-            log.info("{} created".format(filename))
-
-    def create_svgs(self):
-        """ Generates all SVGs for the given application.
-
-        Only generates SVGs if not already generated since the last change of
-        the election or vote.
-
-        Optionally cleans up unused SVGs.
-
-        """
-
-        # Read existing SVGs
-        fs = self.app.filestorage
-        if not fs.exists(self.svg_dir):
-            fs.makedir(self.svg_dir)
-
-        # Generate the SVGs
-        principal = self.app.principal
-        for election in self.session.query(Election):
-            self.generate_svg(election, 'candidates')
-            if election.type == 'proporz':
-                self.generate_svg(election, 'lists')
-                self.generate_svg(election, 'connections')
-                self.generate_svg(election, 'parties')
-                self.generate_svg(election, 'panachage')
-        for election_compound in self.session.query(ElectionCompound):
-            self.generate_svg(election_compound, 'parties')
-        if principal.use_maps:
-            for ballot in self.session.query(Ballot):
-                if principal.is_year_available(ballot.vote.date.year):
-                    for locale in self.app.locales:
-                        self.generate_svg(ballot, 'map', locale)
-
-        # Delete old SVGs
-        existing = fs.listdir(self.svg_dir)
-        existing = dict(groupbylist(
-            sorted(existing),
-            key=lambda a: a.split('.')[0]
-        ))
-
-        # ... orphaned files
-        created = [
-            svg_filename(item, '', '').split('.')[0]
-            for item in
-            self.session.query(Election).all() +
-            self.session.query(ElectionCompound).all() +
-            self.session.query(Ballot).all() +
-            self.session.query(Vote).all()
-        ]
-        diff = set(existing.keys()) - set(created)
-        files = ['{}*'.format(file) for file in diff if file]
-        self.remove(self.svg_dir, files)
-        if '' in existing:
-            self.remove(self.svg_dir, existing[''])
-
-        # ... old files
-        for files in existing.values():
-            if len(files):
-                files = sorted(files, reverse=True)
-                try:
-                    ts = str(int(files[0].split('.')[1]))
-                except (IndexError, ValueError):
-                    pass
-                else:
-                    files = [f for f in files if ts not in f]
-                    self.remove(self.svg_dir, files)

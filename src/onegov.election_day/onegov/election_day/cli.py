@@ -10,8 +10,10 @@ from onegov.election_day import log
 from onegov.election_day.collections import UploadTokenCollection
 from onegov.election_day.models import ArchivedResult
 from onegov.election_day.utils import add_local_results
-from onegov.election_day.utils.media_generator import MediaGenerator
+from onegov.election_day.utils.d3_renderer import D3Renderer
+from onegov.election_day.utils.pdf_generator import PdfGenerator
 from onegov.election_day.utils.sms_processor import SmsQueueProcessor
+from onegov.election_day.utils.svg_generator import SvgGenerator
 from pathlib import Path
 from raven import Client
 
@@ -150,9 +152,9 @@ def generate_media(sentry):
             return
         else:
             try:
-                media_generator = MediaGenerator(app)
-                media_generator.create_pdfs()
-                media_generator.create_svgs()
+                renderer = D3Renderer(app)
+                SvgGenerator(app, renderer).create_svgs()
+                PdfGenerator(app, renderer).create_pdfs()
             except Exception as e:
                 log.error(
                     "An exception happened while generating media files",
