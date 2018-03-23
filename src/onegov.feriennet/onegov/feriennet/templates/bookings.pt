@@ -147,8 +147,8 @@
                                         </div>
                                         <div class="row collapse" tal:condition="related">
                                             <div class="columns small-12">
-                                                <div class="attendees" tal:define="count related[booking.occasion_id][0].attendee_count">
-                                                    <div class="attendees-table" id="attendees-table-${booking.id}" style="display: none;">
+                                                <div class="attendees" tal:define="count related[booking.occasion_id][0].attendee_count|0">
+                                                    <div class="attendees-table" id="attendees-table-${booking.id}" style="display: none;" tal:condition="count">
                                                         <table>
                                                             <thead>
                                                                 <tr>
@@ -190,7 +190,9 @@
                                                         </table>
                                                     </div>
                                                     <div class="attendees-toggle" data-toggle="#attendees-table-${booking.id}">
-                                                        <div><span>${count}</span> <span i18n:translate>Attendees</span></div>
+                                                        <div style="visibility: ${count and 'visible' or 'hidden'}">
+                                                            <span>${count}</span> <span i18n:translate>Attendees</span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

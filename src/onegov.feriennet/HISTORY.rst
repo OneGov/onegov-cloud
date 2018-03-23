@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes related bookings not working for cancelled bookings.
+  [href]
+
 1.3.24 (2018-03-20)
 ~~~~~~~~~~~~~~~~~~~
 
