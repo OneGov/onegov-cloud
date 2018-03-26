@@ -56,7 +56,7 @@ class SvgGenerator():
             chart = self.renderer.get_lists_chart(item, 'svg')
         if type_ == 'map':
             chart = self.renderer.get_map_chart(item, 'svg', locale)
-        if type_ == 'panachage':
+        if type_ == 'lists-panachage':
             chart = self.renderer.get_panachage_chart(item, 'svg')
         if type_ == 'party-strengths':
             chart = self.renderer.get_party_strengths_chart(item, 'svg')
@@ -88,7 +88,7 @@ class SvgGenerator():
                 self.generate_svg(election, 'lists')
                 self.generate_svg(election, 'connections')
                 self.generate_svg(election, 'party-strengths')
-                self.generate_svg(election, 'panachage')
+                self.generate_svg(election, 'lists-panachage')
         for election_compound in self.session.query(ElectionCompound):
             self.generate_svg(election_compound, 'party-strengths')
         if principal.use_maps:

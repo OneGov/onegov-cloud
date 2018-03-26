@@ -11,7 +11,7 @@ def test_election_layout(session):
 
     assert layout.all_tabs == (
         'lists', 'candidates', 'connections', 'party-strengths', 'statistics',
-        'panachage', 'data'
+        'lists-panachage', 'data'
     )
 
     assert layout.title() == ''
@@ -22,7 +22,7 @@ def test_election_layout(session):
     assert layout.title('party-strengths') == 'Party strengths'
     assert layout.title('statistics') == 'Election statistics'
     assert layout.title('data') == 'Downloads'
-    assert layout.title('panachage') == 'Panachage'
+    assert layout.title('lists-panachage') == 'Panachage (lists)'
 
     layout = ElectionLayout(Election(type='majorz'), DummyRequest())
     assert layout.majorz
@@ -84,11 +84,11 @@ def test_election_layout(session):
         assert layout.svg_link == 'Election/connections-svg'
         assert layout.svg_name == 'election-list-connections.svg'
 
-        layout = ElectionLayout(election, request, 'panachage')
+        layout = ElectionLayout(election, request, 'lists-panachage')
         assert layout.pdf_path == f'pdf/election-{ts}.de.pdf'
-        assert layout.svg_path == f'svg/election-{ts}.panachage.any.svg'
-        assert layout.svg_link == 'Election/panachage-svg'
-        assert layout.svg_name == 'election-panachage.svg'
+        assert layout.svg_path == f'svg/election-{ts}.lists-panachage.any.svg'
+        assert layout.svg_link == 'Election/lists-panachage-svg'
+        assert layout.svg_name == 'election-panachage-lists.svg'
 
         layout = ElectionLayout(election, request, 'party-strengths')
         assert layout.pdf_path == f'pdf/election-{ts}.de.pdf'

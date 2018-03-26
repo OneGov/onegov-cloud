@@ -11,10 +11,10 @@ from onegov.election_day.utils import add_last_modified_header
 
 @ElectionDayApp.json(
     model=Election,
-    name='panachage-data',
+    name='lists-panachage-data',
     permission=Public
 )
-def view_election_panachage_data(self, request):
+def view_election_lists_panachage_data(self, request):
 
     """" View the panachage data as JSON. Used to for the panachage sankey
     chart.
@@ -70,11 +70,11 @@ def view_election_panachage_data(self, request):
 
 @ElectionDayApp.html(
     model=Election,
-    name='panachage-chart',
+    name='lists-panachage-chart',
     template='embed.pt',
     permission=Public
 )
-def view_election_panachage_chart(self, request):
+def view_election_lists_panachage_chart(self, request):
 
     """" View the panachage data as sankey chart. """
 
@@ -86,22 +86,22 @@ def view_election_panachage_chart(self, request):
         'model': self,
         'layout': DefaultLayout(self, request),
         'data': {
-            'sankey': request.link(self, name='panachage-data')
+            'sankey': request.link(self, name='lists-panachage-data')
         }
     }
 
 
 @ElectionDayApp.html(
     model=Election,
-    name='panachage',
-    template='election/panachage.pt',
+    name='lists-panachage',
+    template='election/lists_panachage.pt',
     permission=Public
 )
-def view_election_panachage(self, request):
+def view_election_lists_panachage(self, request):
 
     """" The main view. """
 
-    layout = ElectionLayout(self, request, 'panachage')
+    layout = ElectionLayout(self, request, 'lists-panachage')
 
     return {
         'election': self,
@@ -111,14 +111,14 @@ def view_election_panachage(self, request):
 
 @ElectionDayApp.json(
     model=Election,
-    name='panachage-svg',
+    name='lists-panachage-svg',
     permission=Public
 )
-def view_election_panachage_svg(self, request):
+def view_election_lists_panachage_svg(self, request):
 
     """ View the panachage as SVG. """
 
-    layout = ElectionLayout(self, request, 'panachage')
+    layout = ElectionLayout(self, request, 'lists-panachage')
     if not layout.svg_path:
         return Response(status='503 Service Unavailable')
 

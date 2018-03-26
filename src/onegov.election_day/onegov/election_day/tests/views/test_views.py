@@ -177,7 +177,7 @@ def test_view_last_modified(election_day_app):
             '/election/election/lists',
             '/election/election/candidates',
             '/election/election/statistics',
-            '/election/election/panachage',
+            '/election/election/',
             '/election/election/party-strengths',
             '/election/election/data',
             '/elections/elections',
@@ -298,7 +298,7 @@ def test_view_svg(election_day_app):
         '/election/majorz-election/candidates-svg',
         '/election/proporz-election/lists-svg',
         '/election/proporz-election/candidates-svg',
-        '/election/proporz-election/panachage-svg',
+        '/election/proporz-election/lists-panachage-svg',
         '/election/proporz-election/connections-svg',
         '/election/proporz-election/party-strengths-svg',
     )
@@ -349,7 +349,7 @@ def test_view_svg(election_day_app):
         'proporz-election-candidates.svg',
         'proporz-election-list-connections.svg',
         'proporz-election-lists.svg',
-        'proporz-election-panachage.svg',
+        'proporz-election-panachage-lists.svg',
         'proporz-election-party-strengths.svg',
         'vote-proposal.svg'
     ]

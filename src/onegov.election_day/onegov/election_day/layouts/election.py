@@ -20,7 +20,7 @@ class ElectionLayout(DetailLayout):
             'connections',
             'party-strengths',
             'statistics',
-            'panachage',
+            'lists-panachage',
             'data'
         )
 
@@ -37,8 +37,8 @@ class ElectionLayout(DetailLayout):
             return _("Party strengths")
         if tab == 'statistics':
             return _("Election statistics")
-        if tab == 'panachage':
-            return _("Panachage")
+        if tab == 'lists-panachage':
+            return _("Panachage (lists)")
         if tab == 'data':
             return _("Downloads")
 
@@ -69,7 +69,7 @@ class ElectionLayout(DetailLayout):
             )
         if tab == 'statistics':
             return not self.tacit
-        if tab == 'panachage':
+        if tab == 'lists-panachage':
             return (
                 self.proporz and
                 not self.tacit and

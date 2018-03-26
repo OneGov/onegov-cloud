@@ -14,6 +14,9 @@ msgstr ""
 "Generated-By: xls-to-po 1.0\n"
 "X-Generator: Poedit 2.0.5\n"
 
+msgid "Last change"
+msgstr "Aggiornato"
+
 msgid "Not a valid phone number."
 msgstr "Non è un numero di telefono valido."
 
@@ -283,8 +286,8 @@ msgstr "Candidati"
 msgid "Party strengths"
 msgstr "Forza delle parti"
 
-msgid "Panachage"
-msgstr "Panachage"
+msgid "Panachage (lists)"
+msgstr "Panachage (liste)"
 
 msgid "Downloads"
 msgstr "Download"
@@ -476,7 +479,6 @@ msgstr "Hai dimenticato la password?"
 msgid "Reset password"
 msgstr "Ripristina password"
 
-#, python-format
 msgid "${counted} of ${total}"
 msgstr "${counted} di ${total}"
 
@@ -500,9 +502,6 @@ msgstr "Ancora nessun risultato"
 
 msgid "Intermediate results"
 msgstr "Risultati provvisori"
-
-msgid "Last change"
-msgstr "Aggiornato"
 
 msgid "Alerts"
 msgstr "Avvisi"
@@ -846,6 +845,9 @@ msgstr "Bianche"
 
 msgid "Invalid"
 msgstr "Nulle"
+
+msgid "Panachage"
+msgstr "Panachage"
 
 msgid "Wrong username or password"
 msgstr "Nome utente sconosciuto o password errata"

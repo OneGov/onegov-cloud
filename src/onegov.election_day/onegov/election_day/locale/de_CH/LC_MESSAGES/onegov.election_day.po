@@ -14,6 +14,9 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.0.5\n"
 
+msgid "Last change"
+msgstr "Aktualisiert"
+
 msgid "Not a valid phone number."
 msgstr "Ungültige Telefonnummer."
 
@@ -283,8 +286,8 @@ msgstr "Kandidierende"
 msgid "Party strengths"
 msgstr "Parteistärken"
 
-msgid "Panachage"
-msgstr "Panaschierstatistik"
+msgid "Panachage (lists)"
+msgstr "Panaschierstatistik (Listen)"
 
 msgid "Downloads"
 msgstr "Downloads"
@@ -476,7 +479,6 @@ msgstr "Passwort vergessen?"
 msgid "Reset password"
 msgstr "Passwort zurücksetzen"
 
-#, python-format
 msgid "${counted} of ${total}"
 msgstr "${counted} von ${total}"
 
@@ -500,9 +502,6 @@ msgstr "Noch keine Resultate"
 
 msgid "Intermediate results"
 msgstr "Zwischenergebnisse"
-
-msgid "Last change"
-msgstr "Aktualisiert"
 
 msgid "Alerts"
 msgstr "Benachrichtigungen"
@@ -849,6 +848,9 @@ msgstr "Leer"
 
 msgid "Invalid"
 msgstr "Ungültig"
+
+msgid "Panachage"
+msgstr "Panaschierstatistik"
 
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"

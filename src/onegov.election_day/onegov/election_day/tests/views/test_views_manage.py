@@ -193,7 +193,7 @@ def test_view_clear_results(election_day_app):
         '/election/proporz-election/candidates',
         '/election/proporz-election/connections',
         '/election/proporz-election/party-strengths',
-        '/election/proporz-election/panachage',
+        '/election/proporz-election/lists-panachage',
         '/election/proporz-election/statistics',
         '/vote/vote'
     )

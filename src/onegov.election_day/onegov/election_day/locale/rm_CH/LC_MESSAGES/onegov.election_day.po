@@ -13,6 +13,9 @@ msgstr ""
 "Generated-By: xls-to-po 1.0\n"
 "X-Generator: Poedit 2.0.5\n"
 
+msgid "Last change"
+msgstr "Actualisà"
+
 msgid "Not a valid phone number."
 msgstr "Numer da telefon nunvalaivel."
 
@@ -283,8 +286,8 @@ msgstr "Candidatas e candidats"
 msgid "Party strengths"
 msgstr "Forza da las partidas"
 
-msgid "Panachage"
-msgstr "Statistica da panaschar"
+msgid "Panachage (lists)"
+msgstr "Statistica da panaschar (glistas)"
 
 msgid "Downloads"
 msgstr "Downloads"
@@ -477,7 +480,6 @@ msgstr "Emblidà il pled-clav?"
 msgid "Reset password"
 msgstr "Redefinir il pled-clav"
 
-#, python-format
 msgid "${counted} of ${total}"
 msgstr "${counted} da ${total}"
 
@@ -537,9 +539,6 @@ msgstr "Anc nagins resultats avant maun"
 
 msgid "Intermediate results"
 msgstr "Resultats intermediars"
-
-msgid "Last change"
-msgstr "Actualisà"
 
 msgid "Alerts"
 msgstr "Communicaziuns"
@@ -888,6 +887,9 @@ msgstr "Vid"
 
 msgid "Invalid"
 msgstr "Nunvalaivel"
+
+msgid "Panachage"
+msgstr "Statistica da panaschar"
 
 msgid "Wrong username or password"
 msgstr ""

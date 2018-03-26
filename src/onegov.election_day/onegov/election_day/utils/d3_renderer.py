@@ -11,8 +11,8 @@ from onegov.election_day.views.election.candidates \
 from onegov.election_day.views.election.connections \
     import view_election_connections_data
 from onegov.election_day.views.election.lists import view_election_lists_data
-from onegov.election_day.views.election.panachage import \
-    view_election_panachage_data
+from onegov.election_day.views.election.lists_panachage import \
+    view_election_lists_panachage_data
 from onegov.election_day.views.election.party_strengths \
     import view_election_party_strengths_data
 from onegov.election_day.views.election_compound.party_strengths \
@@ -166,7 +166,7 @@ class D3Renderer():
         chart = None
         data = None
         if isinstance(item, Election):
-            data = view_election_panachage_data(item, None)
+            data = view_election_lists_panachage_data(item, None)
             if data and data.get('links') and data.get('nodes'):
                 return self.get_chart('sankey', fmt, data)
         return (chart, data) if return_data else chart
