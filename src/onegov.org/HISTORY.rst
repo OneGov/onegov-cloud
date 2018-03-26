@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.25.6 (2018-03-26)
+~~~~~~~~~~~~~~~~~~~
+
 - Shows missing directory actions for editors.
   [href]
 
