@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Renames has_panachage_data to has_lists_panachage_data
+  [msom]
+
 3.3.1 (2018-03-20)
 ~~~~~~~~~~~~~~~~~~~
 

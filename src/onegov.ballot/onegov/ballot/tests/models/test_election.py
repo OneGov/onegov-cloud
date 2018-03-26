@@ -635,7 +635,7 @@ def test_election_last_change_proporz(session):
     assert election.last_result_change.isoformat().startswith('2014-01-15')
 
 
-def test_election_has_panachage_data(session):
+def test_election_has_lists_panachage_data(session):
     election = ProporzElection(
         title='Legislative Election',
         domain='federation',
@@ -659,7 +659,7 @@ def test_election_has_panachage_data(session):
     session.add(election)
     session.flush()
 
-    assert not election.has_panachage_data
+    assert not election.has_lists_panachage_data
 
     election.lists[0].panachage_results.append(
         PanachageResult(
@@ -678,7 +678,7 @@ def test_election_has_panachage_data(session):
 
     session.flush()
 
-    assert election.has_panachage_data
+    assert election.has_lists_panachage_data
 
 
 def test_election_results(session):

@@ -115,8 +115,8 @@ class ProporzElection(Election, PartyResultExportMixin):
         return max(changes) if changes else None
 
     @property
-    def has_panachage_data(self):
-        """ Checks if there are panachage data available. """
+    def has_lists_panachage_data(self):
+        """ Checks if there are lists panachage data available. """
 
         session = object_session(self)
 
@@ -232,7 +232,7 @@ class ProporzElection(Election, PartyResultExportMixin):
 
         panachage_lists = []
         panachage = {}
-        if self.has_panachage_data:
+        if self.has_lists_panachage_data:
             panachage_results = session.query(PanachageResult)
             panachage_results = panachage_results.filter(
                 PanachageResult.target.in_((str(id[0]) for id in list_ids))
