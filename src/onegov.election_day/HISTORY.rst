@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.3.0 (2018-03-26)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds election compounds PDFs.
   [msom]
