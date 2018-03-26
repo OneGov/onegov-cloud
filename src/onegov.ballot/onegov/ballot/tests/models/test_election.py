@@ -1404,6 +1404,7 @@ def test_election_export_parties(session):
             'year': 2016,
             'panachage_votes_from_0': '',
             'panachage_votes_from_1': '',
+            'panachage_votes_from_999': '',
 
         }, {
             'color': 'black',
@@ -1415,6 +1416,7 @@ def test_election_export_parties(session):
             'year': 2016,
             'panachage_votes_from_0': '',
             'panachage_votes_from_1': '',
+            'panachage_votes_from_999': '',
         }, {
             'color': 'red',
             'mandates': 1,
@@ -1424,7 +1426,8 @@ def test_election_export_parties(session):
             'votes': 1,
             'year': 2012,
             'panachage_votes_from_0': '',
-            'panachage_votes_from_1': ''
+            'panachage_votes_from_1': '',
+            'panachage_votes_from_999': '',
         }, {
             'color': 'black',
             'mandates': 0,
@@ -1434,29 +1437,24 @@ def test_election_export_parties(session):
             'votes': 0,
             'year': 2012,
             'panachage_votes_from_0': '',
-            'panachage_votes_from_1': ''
+            'panachage_votes_from_1': '',
+            'panachage_votes_from_999': '',
         }
     ]
 
-    election.panachage_results.append(
-        PanachageResult(
-            votes=10,
-            source='Libertarian',
-            target='Conservative',
+    for idx, source in enumerate(('Conservative', 'Libertarian', 'Other', '')):
+        election.panachage_results.append(
+            PanachageResult(
+                target='Conservative',
+                source=source,
+                votes=idx + 1
+            )
         )
-    )
     election.panachage_results.append(
         PanachageResult(
-            votes=20,
-            source='Conservative',
             target='Libertarian',
-        )
-    )
-    election.panachage_results.append(
-        PanachageResult(
-            votes=1,
-            source='Other',
-            target='Conservative',
+            source='Conservative',
+            votes=5,
         )
     )
     assert election.export_parties() == [
@@ -1468,9 +1466,10 @@ def test_election_export_parties(session):
             'total_votes': 50,
             'votes': 3,
             'year': 2016,
-            'panachage_votes_from_0': '',
-            'panachage_votes_from_1': 10,
-            'panachage_votes_from_2': 1,
+            'panachage_votes_from_0': 1,
+            'panachage_votes_from_1': 2,
+            'panachage_votes_from_2': 3,
+            'panachage_votes_from_999': 4,
 
         }, {
             'color': 'black',
@@ -1480,9 +1479,10 @@ def test_election_export_parties(session):
             'total_votes': 50,
             'votes': 2,
             'year': 2016,
-            'panachage_votes_from_0': 20,
+            'panachage_votes_from_0': 5,
             'panachage_votes_from_1': '',
             'panachage_votes_from_2': '',
+            'panachage_votes_from_999': '',
         }, {
             'color': '',
             'mandates': '',
@@ -1494,6 +1494,7 @@ def test_election_export_parties(session):
             'panachage_votes_from_0': '',
             'panachage_votes_from_1': '',
             'panachage_votes_from_2': '',
+            'panachage_votes_from_999': '',
         }, {
             'color': 'red',
             'mandates': 1,
@@ -1505,6 +1506,7 @@ def test_election_export_parties(session):
             'panachage_votes_from_0': '',
             'panachage_votes_from_1': '',
             'panachage_votes_from_2': '',
+            'panachage_votes_from_999': '',
         }, {
             'color': 'black',
             'mandates': 0,
@@ -1516,6 +1518,7 @@ def test_election_export_parties(session):
             'panachage_votes_from_0': '',
             'panachage_votes_from_1': '',
             'panachage_votes_from_2': '',
+            'panachage_votes_from_999': '',
         }, {
             'color': '',
             'mandates': '',
@@ -1527,6 +1530,7 @@ def test_election_export_parties(session):
             'panachage_votes_from_0': '',
             'panachage_votes_from_1': '',
             'panachage_votes_from_2': '',
+            'panachage_votes_from_999': '',
         }
     ]
 

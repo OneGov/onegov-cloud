@@ -34,6 +34,9 @@ class PartyResultExportMixin(object):
     """ A mixin allowing to export the party results optionally including the
     panachage data.
 
+    Panachage data with an empty source is assumed to represent the votes from
+    the blank list and exported with ID '999'.
+
     """
 
     def export_parties(self):
@@ -69,11 +72,10 @@ class PartyResultExportMixin(object):
             target[result.source] = result.votes
             parties |= set([result.source, result.target])
 
-        parties = sorted(parties)
+        parties = sorted([party for party in parties if party])
 
         rows = []
         for year in sorted(results.keys(), reverse=True):
-            # for party in sorted(results[year].keys()):
             for party in parties:
                 result = results[year].get(party, {})
 
@@ -89,10 +91,10 @@ class PartyResultExportMixin(object):
 
                 # add the panachage results
                 for source in parties:
-                    column = 'panachage_votes_from_{}'.format(
-                        parties.index(source)
-                    )
+                    id_ = parties.index(source)
+                    column = 'panachage_votes_from_{}'.format(id_)
                     row[column] = result.get(source, '')
+                row['panachage_votes_from_999'] = result.get('', '')
                 rows.append(row)
 
         return rows

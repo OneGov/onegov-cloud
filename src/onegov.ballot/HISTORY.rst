@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Exports the parties panachage data from the blank lists.
+  [msom]
+
 3.4.0 (2018-03-26)
 ~~~~~~~~~~~~~~~~~~~
 
