@@ -1782,14 +1782,18 @@ class DirectoryEntryCollectionLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_admin:
-            return [
-                Link(
+
+        def links():
+
+            if self.request.is_admin:
+                yield Link(
                     text=_("Configure"),
                     url=self.request.link(self.model, '+edit'),
                     attrs={'class': 'edit-link'}
-                ),
-                Link(
+                )
+
+            if self.request.is_manager:
+                yield Link(
                     text=_("Export"),
                     url=self.request.class_link(
                         DirectoryEntryCollection, {
@@ -1797,8 +1801,9 @@ class DirectoryEntryCollectionLayout(DefaultLayout):
                         }, name='+export'
                     ),
                     attrs={'class': 'export-link'}
-                ),
-                Link(
+                )
+
+                yield Link(
                     text=_("Import"),
                     url=self.request.class_link(
                         DirectoryEntryCollection, {
@@ -1806,8 +1811,10 @@ class DirectoryEntryCollectionLayout(DefaultLayout):
                         }, name='+import'
                     ),
                     attrs={'class': 'import-link'}
-                ),
-                Link(
+                )
+
+            if self.request.is_admin:
+                yield Link(
                     text=_("Delete"),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)
@@ -1831,8 +1838,10 @@ class DirectoryEntryCollectionLayout(DefaultLayout):
                             )
                         )
                     )
-                ),
-                LinkGroup(
+                )
+
+            if self.request.is_manager:
+                yield LinkGroup(
                     title=_("Add"),
                     links=[
                         Link(
@@ -1844,8 +1853,9 @@ class DirectoryEntryCollectionLayout(DefaultLayout):
                             attrs={'class': 'new-directory-entry'}
                         )
                     ]
-                ),
-            ]
+                )
+
+        return list(links())
 
 
 class DirectoryEntryLayout(DefaultLayout):
