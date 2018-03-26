@@ -6,13 +6,18 @@ from onegov.core.orm.types import JSON, UUID
 from onegov.core.orm.types import UTCDateTime
 from onegov.file import AssociatedFiles, File
 from onegov.form.display import render_field
+from onegov.form.extensions import Extendable
 from onegov.form.parser import parse_form
 from onegov.form.utils import extract_text_from_html, hash_definition
-from onegov.form.extensions import Extendable
 from onegov.pay import Payable
 from onegov.pay import process_payment
 from sedate import utcnow
-from sqlalchemy import Column, Enum, ForeignKey, Integer, Text
+from sqlalchemy import CheckConstraint
+from sqlalchemy import Column
+from sqlalchemy import Enum
+from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
+from sqlalchemy import Text
 from sqlalchemy_utils import observes
 from uuid import uuid4
 from wtforms import StringField, TextAreaField
@@ -85,6 +90,13 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     __mapper_args__ = {
         "polymorphic_on": 'state'
     }
+
+    __table_args__ = (
+        CheckConstraint(
+            'COALESCE(claimed, 0) <= spots',
+            name='claimed_no_more_than_requested'
+        ),
+    )
 
     @property
     def form_class(self):
@@ -160,6 +172,37 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
             return process_payment(self.payment_method, price, provider, token)
 
         return True
+
+    def claim(self, spots=None):
+        """ Claimes the given number of spots (defaults to the requested
+        number of spots).
+
+        """
+        spots = spots or self.spots
+
+        assert self.registration_window
+
+        if self.registration_window.limit:
+            limit = self.registration_window.limit
+            claimed = self.registration_window.claimed_spots
+
+            assert spots <= (limit - claimed)
+
+        self.claimed = spots
+
+    def disclaim(self, spots=None):
+        """ Disclaims the given number of spots (defaults to all spots that
+        were claimed so far).
+
+        """
+        spots = spots or self.claimed
+
+        assert self.registration_window
+
+        if self.claimed is None:
+            self.claimed = 0
+        else:
+            self.claimed = max(0, self.claimed - spots)
 
 
 class PendingFormSubmission(FormSubmission):

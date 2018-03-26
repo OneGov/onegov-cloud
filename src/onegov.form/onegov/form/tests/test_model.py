@@ -182,28 +182,28 @@ def test_registration_window_spots(session):
     session.flush()
 
     window.enabled = False
-    assert not window.accepts_submissions
+    assert not window.accepts_submissions()
 
     window.enabled = True
     window.end = today - days(1)
-    assert not window.accepts_submissions
+    assert not window.accepts_submissions()
 
     window.start = today + days(1)
     window.end = today + days(5)
-    assert not window.accepts_submissions
+    assert not window.accepts_submissions()
 
     window.start = today - days(5)
     window.overflow = True
-    assert window.accepts_submissions
+    assert window.accepts_submissions()
 
     window.overflow = False
     window.limit = None
-    assert window.accepts_submissions
+    assert window.accepts_submissions()
     assert window.claimed_spots == 0
     assert window.requested_spots == 0
 
     window.limit = 2
-    assert window.accepts_submissions
+    assert window.accepts_submissions()
     assert window.claimed_spots == 0
     assert window.requested_spots == 0
 
@@ -214,7 +214,7 @@ def test_registration_window_spots(session):
         spots=1
     )
 
-    assert window.accepts_submissions
+    assert window.accepts_submissions()
     assert window.claimed_spots == 0
     assert window.requested_spots == 1
 
@@ -225,29 +225,146 @@ def test_registration_window_spots(session):
         spots=1
     )
 
-    assert not window.accepts_submissions
+    assert not window.accepts_submissions()
     assert window.claimed_spots == 0
     assert window.requested_spots == 2
 
     window.overflow = True
-    assert window.accepts_submissions
+    assert window.accepts_submissions()
 
-    s1.claimed = 1
+    s1.claim(1)
     session.flush()
 
-    assert window.accepts_submissions
+    assert window.accepts_submissions()
     assert window.claimed_spots == 1
     assert window.requested_spots == 1
 
     window.overflow = False
-    assert not window.accepts_submissions
+    assert not window.accepts_submissions()
 
-    s2.claimed = 1
+    s2.claim(1)
     session.flush()
 
-    assert not window.accepts_submissions
+    assert not window.accepts_submissions()
     assert window.claimed_spots == 2
     assert window.requested_spots == 0
 
     window.overflow = True
-    assert window.accepts_submissions
+    assert window.accepts_submissions()
+
+
+def test_registration_claims_with_no_limit(session):
+    forms = FormCollection(session)
+    today = date.today()
+
+    summer = forms.definitions.add('Summercamp', definition="E-Mail = @@@")
+
+    window = summer.add_registration_window(today - days(5), today + days(5))
+    window.limit = None
+
+    session.flush()
+
+    submission = forms.submissions.add(
+        name='summercamp',
+        form=summer.form_class(data={'e_mail': 'info@example.org'}),
+        state='complete',
+        spots=100
+    )
+
+    submission.claim()
+    session.flush()
+
+    assert submission.claimed == 100
+    assert submission.spots == 100
+    assert window.claimed_spots == 100
+    assert window.requested_spots == 0
+
+    submission.disclaim()
+    session.flush()
+
+    assert submission.claimed == 0
+    assert submission.spots == 100
+    assert window.claimed_spots == 0
+    assert window.requested_spots == 100
+
+    submission.claim(50)
+    session.flush()
+
+    assert submission.claimed == 50
+    assert submission.spots == 100
+    assert window.claimed_spots == 50
+    assert window.requested_spots == 50
+
+
+def test_registration_claims_with_a_limit(session):
+    forms = FormCollection(session)
+    today = date.today()
+
+    summer = forms.definitions.add('Summercamp', definition="E-Mail = @@@")
+
+    window = summer.add_registration_window(today - days(5), today + days(5))
+    window.limit = 10
+    window.overflow = True
+
+    session.flush()
+
+    submission = forms.submissions.add(
+        name='summercamp',
+        form=summer.form_class(data={'e_mail': 'info@example.org'}),
+        state='complete',
+        spots=100
+    )
+
+    with pytest.raises(AssertionError):
+        submission.claim()
+
+    with pytest.raises(AssertionError):
+        submission.claim(11)
+
+    submission.claim(spots=10)
+    session.flush()
+
+    assert window.claimed_spots == 10
+    assert window.requested_spots == 90
+    assert window.available_spots == 0
+
+    submission.disclaim()
+    session.flush()
+
+    assert window.claimed_spots == 0
+    assert window.requested_spots == 100
+    assert window.available_spots == 0
+
+
+def test_register_more_than_allowed(session):
+    forms = FormCollection(session)
+    today = date.today()
+
+    summer = forms.definitions.add('Summercamp', definition="E-Mail = @@@")
+
+    window = summer.add_registration_window(today - days(5), today + days(5))
+    window.limit = 1
+    window.overflow = False
+
+    session.flush()
+
+    with pytest.raises(AssertionError):
+        forms.submissions.add(
+            name='summercamp',
+            form=summer.form_class(data={'e_mail': 'info@example.org'}),
+            state='complete',
+            spots=2
+        )
+
+    window.overflow = True
+    session.flush()
+
+    forms.submissions.add(
+        name='summercamp',
+        form=summer.form_class(data={'e_mail': 'info@example.org'}),
+        state='complete',
+        spots=2
+    )
+
+    window.overflow = False
+    session.flush()

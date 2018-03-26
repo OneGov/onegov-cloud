@@ -173,7 +173,7 @@ class FormSubmissionCollection(object):
             registration_window = definition.current_registration_window
 
         if registration_window:
-            assert registration_window.accepts_submissions
+            assert registration_window.accepts_submissions(spots)
 
         # look up the right class depending on the type
         submission_class = FormSubmission.get_polymorphic_class(

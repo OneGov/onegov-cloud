@@ -94,8 +94,7 @@ class FormRegistrationWindow(Base, TimestampMixin):
             ), self.timezone, 'up'
         )
 
-    @property
-    def accepts_submissions(self):
+    def accepts_submissions(self, required_spots=1):
         if not self.enabled:
             return False
 
@@ -108,17 +107,18 @@ class FormRegistrationWindow(Base, TimestampMixin):
         if self.limit is None:
             return True
 
-        return self.available_spots > 0
+        return self.available_spots >= required_spots
 
     def disassociate(self):
         """ Disassociates all records linked to this window. """
 
         for submission in self.submissions:
+            submission.disclaim()
             submission.registration_window_id = None
 
     @property
     def available_spots(self):
-        return self.limit - self.claimed_spots - self.requested_spots
+        return max(self.limit - self.claimed_spots - self.requested_spots, 0)
 
     @property
     def claimed_spots(self):
@@ -132,7 +132,7 @@ class FormRegistrationWindow(Base, TimestampMixin):
     @property
     def requested_spots(self):
         return object_session(self).execute(text("""
-            SELECT SUM(GREATEST(COALESCE(spots, 0) - COALESCE(claimed, 0), 0))
+            SELECT GREATEST(SUM(spots - COALESCE(claimed, 0)), 0)
             FROM submissions
             WHERE registration_window_id = :id
             AND submissions.state = 'complete'
