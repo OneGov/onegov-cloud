@@ -1342,7 +1342,7 @@ def test_election_export_parties(session):
         ProporzElection(
             title='Wahl',
             domain='federation',
-            date=date(2015, 6, 14),
+            date=date(2016, 6, 14),
             number_of_mandates=1,
             absolute_majority=144
         )
@@ -1401,7 +1401,10 @@ def test_election_export_parties(session):
             'id': 0,
             'total_votes': 50,
             'votes': 3,
-            'year': 2016
+            'year': 2016,
+            'panachage_votes_from_0': '',
+            'panachage_votes_from_1': '',
+
         }, {
             'color': 'black',
             'mandates': 2,
@@ -1409,7 +1412,9 @@ def test_election_export_parties(session):
             'id': 1,
             'total_votes': 50,
             'votes': 2,
-            'year': 2016
+            'year': 2016,
+            'panachage_votes_from_0': '',
+            'panachage_votes_from_1': '',
         }, {
             'color': 'red',
             'mandates': 1,
@@ -1417,7 +1422,9 @@ def test_election_export_parties(session):
             'id': 0,
             'total_votes': 100,
             'votes': 1,
-            'year': 2012
+            'year': 2012,
+            'panachage_votes_from_0': '',
+            'panachage_votes_from_1': ''
         }, {
             'color': 'black',
             'mandates': 0,
@@ -1425,7 +1432,101 @@ def test_election_export_parties(session):
             'id': 1,
             'total_votes': 100,
             'votes': 0,
-            'year': 2012
+            'year': 2012,
+            'panachage_votes_from_0': '',
+            'panachage_votes_from_1': ''
+        }
+    ]
+
+    election.panachage_results.append(
+        PanachageResult(
+            votes=10,
+            source='Libertarian',
+            target='Conservative',
+        )
+    )
+    election.panachage_results.append(
+        PanachageResult(
+            votes=20,
+            source='Conservative',
+            target='Libertarian',
+        )
+    )
+    election.panachage_results.append(
+        PanachageResult(
+            votes=1,
+            source='Other',
+            target='Conservative',
+        )
+    )
+    assert election.export_parties() == [
+        {
+            'color': 'red',
+            'mandates': 3,
+            'name': 'Conservative',
+            'id': 0,
+            'total_votes': 50,
+            'votes': 3,
+            'year': 2016,
+            'panachage_votes_from_0': '',
+            'panachage_votes_from_1': 10,
+            'panachage_votes_from_2': 1,
+
+        }, {
+            'color': 'black',
+            'mandates': 2,
+            'name': 'Libertarian',
+            'id': 1,
+            'total_votes': 50,
+            'votes': 2,
+            'year': 2016,
+            'panachage_votes_from_0': 20,
+            'panachage_votes_from_1': '',
+            'panachage_votes_from_2': '',
+        }, {
+            'color': '',
+            'mandates': '',
+            'name': 'Other',
+            'id': 2,
+            'total_votes': '',
+            'votes': '',
+            'year': 2016,
+            'panachage_votes_from_0': '',
+            'panachage_votes_from_1': '',
+            'panachage_votes_from_2': '',
+        }, {
+            'color': 'red',
+            'mandates': 1,
+            'name': 'Conservative',
+            'id': 0,
+            'total_votes': 100,
+            'votes': 1,
+            'year': 2012,
+            'panachage_votes_from_0': '',
+            'panachage_votes_from_1': '',
+            'panachage_votes_from_2': '',
+        }, {
+            'color': 'black',
+            'mandates': 0,
+            'name': 'Libertarian',
+            'id': 1,
+            'total_votes': 100,
+            'votes': 0,
+            'year': 2012,
+            'panachage_votes_from_0': '',
+            'panachage_votes_from_1': '',
+            'panachage_votes_from_2': '',
+        }, {
+            'color': '',
+            'mandates': '',
+            'name': 'Other',
+            'id': 2,
+            'total_votes': '',
+            'votes': '',
+            'year': 2012,
+            'panachage_votes_from_0': '',
+            'panachage_votes_from_1': '',
+            'panachage_votes_from_2': '',
         }
     ]
 

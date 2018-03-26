@@ -50,7 +50,6 @@ class PartyResultExportMixin(object):
 
         results = {}
         parties = set()
-        include_panachage = hasattr(self, 'panachage_results')
 
         # get the party results
         for result in self.party_results:
@@ -64,20 +63,21 @@ class PartyResultExportMixin(object):
             parties |= set([result.name])
 
         # get the panachage results
-        if include_panachage:
-            for result in self.panachage_results:
-                year = results.setdefault(self.date.year, {})
-                target = year.setdefault(result.target, {})
-                target[result.source] = result.votes
-                parties |= set([result.source, result.target])
+        for result in self.panachage_results:
+            year = results.setdefault(self.date.year, {})
+            target = year.setdefault(result.target, {})
+            target[result.source] = result.votes
+            parties |= set([result.source, result.target])
 
         parties = sorted(parties)
 
         rows = []
         for year in sorted(results.keys(), reverse=True):
-            for party in sorted(results[year].keys()):
-                result = results[year][party]
+            # for party in sorted(results[year].keys()):
+            for party in parties:
+                result = results[year].get(party, {})
 
+                # add the party results
                 row = OrderedDict()
                 row['year'] = year
                 row['name'] = party
@@ -87,12 +87,12 @@ class PartyResultExportMixin(object):
                 row['mandates'] = result.get('mandates', '')
                 row['votes'] = result.get('votes', '')
 
-                if include_panachage:
-                    for source in parties:
-                        column = 'panachage_votes_from_{}'.format(
-                            parties.index(source)
-                        )
-                        row[column] = results[year][party].get(source, '')
+                # add the panachage results
+                for source in parties:
+                    column = 'panachage_votes_from_{}'.format(
+                        parties.index(source)
+                    )
+                    row[column] = result.get(source, '')
                 rows.append(row)
 
         return rows

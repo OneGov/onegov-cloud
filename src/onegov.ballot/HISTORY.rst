@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds (party) panachage results to proporz elections.
+  [msom]
+
 - Renames has_panachage_data to has_lists_panachage_data
   [msom]
 

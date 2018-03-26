@@ -51,6 +51,16 @@ class ProporzElection(Election, PartyResultExportMixin):
         lazy='dynamic',
     )
 
+    #: An election may contains n (party) panachage results
+    panachage_results = relationship(
+        'PanachageResult',
+        primaryjoin=(
+            'foreign(PanachageResult.owner) == Election.id'
+        ),
+        cascade='all, delete-orphan',
+        lazy='dynamic',
+    )
+
     @property
     def polymorphic_base(self):
         return Election

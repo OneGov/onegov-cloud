@@ -801,6 +801,17 @@ def test_election_compound_export_parties(session):
             'panachage_votes_from_1': '',
             'panachage_votes_from_2': ''
         }, {
+            'color': '',
+            'mandates': '',
+            'name': 'Other',
+            'id': 2,
+            'total_votes': '',
+            'votes': '',
+            'year': 2016,
+            'panachage_votes_from_0': '',
+            'panachage_votes_from_1': '',
+            'panachage_votes_from_2': '',
+        }, {
             'year': 2012,
             'name': 'Conservative',
             'id': 0,
@@ -822,5 +833,16 @@ def test_election_compound_export_parties(session):
             'panachage_votes_from_0': '',
             'panachage_votes_from_1': '',
             'panachage_votes_from_2': ''
+        }, {
+            'color': '',
+            'mandates': '',
+            'name': 'Other',
+            'id': 2,
+            'total_votes': '',
+            'votes': '',
+            'year': 2012,
+            'panachage_votes_from_0': '',
+            'panachage_votes_from_1': '',
+            'panachage_votes_from_2': '',
         }
     ]
