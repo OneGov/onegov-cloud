@@ -22,7 +22,7 @@
             <tal:block tal:condition="layout.visible('party-strengths')">
                 <h4 i18n:translate="">Party results</h4>
                 <p>
-                    <span i18n:translate="">The raw data is available as:</span> <a href="${request.link(election, 'data-party-strengths')}">CSV</a>.
+                    <span i18n:translate="">The raw data is available as:</span> <a href="${request.link(election, 'data-parties')}">CSV</a>.
                     <span i18n:translate="">The format of the data is described here:</span> <a href="${layout.opendata_link}"><span i18n:translate="">Format Description</span></a>.
                 </p>
             </tal:block>
