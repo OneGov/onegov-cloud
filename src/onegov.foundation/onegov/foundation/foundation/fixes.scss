@@ -1,0 +1,6 @@
+/*
+    Fixes a weird namespacing bug we've been seing in our error reporting
+*/
+.foundation-data-attribute-namespace {
+    font-family: false;
+}

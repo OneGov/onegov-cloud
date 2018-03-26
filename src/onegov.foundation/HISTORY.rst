@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Possibly fixes unrecognized expression errors in some browsers.
+  [href]
+
 - Requires Python 3.6.
   [href]
 

@@ -125,6 +125,7 @@ class BaseTheme(object):
                 'foundation/components/{}'.format(component)
                 for component in self.foundation_components
             ),
+            ('fixes', ),
             self.post_imports
         )
 
