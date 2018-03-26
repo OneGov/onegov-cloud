@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.4.0 (2018-03-26)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds (party) panachage results to proporz elections.
   [msom]
