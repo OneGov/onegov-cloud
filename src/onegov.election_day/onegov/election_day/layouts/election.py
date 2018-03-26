@@ -73,7 +73,7 @@ class ElectionLayout(DetailLayout):
             return (
                 self.proporz and
                 not self.tacit and
-                self.model.has_panachage_data
+                self.model.has_lists_panachage_data
             )
 
         return True

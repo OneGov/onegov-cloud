@@ -26,7 +26,7 @@ def view_election_lists_panachage_data(self, request):
     if self.type == 'majorz':
         return {}
 
-    if not self.has_panachage_data:
+    if not self.has_lists_panachage_data:
         return {}
 
     blank = request.translate(_("Blank list")) if request else '-'

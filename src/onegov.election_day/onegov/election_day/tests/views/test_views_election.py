@@ -141,21 +141,25 @@ def test_view_election_party_strengths(election_day_app_gr):
 
     export = client.get('/election/proporz-election/data-parties').text
     assert export == (
-        "year,name,id,total_votes,color,mandates,votes\r\n"
-        "2015,BDP,0,11270,#0571b0,1,60387\r\n"
-        "2015,CVP,1,11270,#0571b0,1,49117\r\n"
-        "2015,FDP,2,11270,#0571b0,0,35134\r\n"
+        'year,name,id,total_votes,color,mandates,votes,'
+        'panachage_votes_from_0,panachage_votes_from_1,panachage_votes_from_2'
+        '\r\n'
+        '2015,BDP,0,11270,#0571b0,1,60387,,,\r\n'
+        '2015,CVP,1,11270,#0571b0,1,49117,,,\r\n'
+        '2015,FDP,2,11270,#0571b0,0,35134,,,\r\n'
     )
 
     # Historical data
     csv_parties = (
-        "year,name,id,total_votes,color,mandates,votes\r\n"
-        "2015,BDP,0,60000,#efb52c,1,10000\r\n"
-        "2015,CVP,1,60000,#ff6300,1,30000\r\n"
-        "2015,FDP,2,60000,#4068c8,0,20000\r\n"
-        "2011,BDP,0,40000,#efb52c,1,1000\r\n"
-        "2011,CVP,1,40000,#ff6300,1,15000\r\n"
-        "2011,FDP,2,40000,#4068c8,1,10000\r\n"
+        'year,name,id,total_votes,color,mandates,votes,'
+        'panachage_votes_from_0,panachage_votes_from_1,panachage_votes_from_2'
+        '\r\n'
+        '2015,BDP,0,60000,#efb52c,1,10000,,,\r\n'
+        '2015,CVP,1,60000,#ff6300,1,30000,,,\r\n'
+        '2015,FDP,2,60000,#4068c8,0,20000,,,\r\n'
+        '2011,BDP,0,40000,#efb52c,1,1000,,,\r\n'
+        '2011,CVP,1,40000,#ff6300,1,15000,,,\r\n'
+        '2011,FDP,2,40000,#4068c8,1,10000,,,\r\n'
     ).encode('utf-8')
 
     upload = client.get('/election/proporz-election/upload-party-results')

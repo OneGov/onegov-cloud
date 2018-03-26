@@ -38,7 +38,7 @@ setup(
         'cached_property',
         'cssmin',
         'onegov.core>=0.64',
-        'onegov.ballot>=3.3.1',
+        'onegov.ballot>=3.4.0',
         'onegov.form>=0.12.0',
         'onegov.foundation>=0.0.4',
         'onegov.pdf>=0.2.0',
