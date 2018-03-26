@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.1 (2018-03-26)
+~~~~~~~~~~~~~~~~~~~
+
 - Possibly fixes unrecognized expression errors in some browsers.
   [href]
 
