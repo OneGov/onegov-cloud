@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds support for colorized sankey charts.
+  [msom]
+
 3.3.0 (2018-03-26)
 ~~~~~~~~~~~~~~~~~~~
 

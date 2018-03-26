@@ -35,6 +35,10 @@
             if (params.options) options = params.options;
         }
 
+        var isUndefined = function(obj) {
+            return obj === void 0;
+        };
+
         // We need some more margins to display the (vertically centered)
         // node names
         margin.top += 0.5 * parseInt(options.fontSize);
@@ -136,7 +140,7 @@
                 var bar = node.append('rect')
                     .attr('height', function(d) { return d.dy; })
                     .attr('width', options.nodeWidth)
-                    .style('fill', options.colorInactive)
+                    .style('fill', function(d) { return isUndefined(d.color) ? options.colorInactive : d.color; })
                     .style('shape-rendering', 'crispEdges');
                 bar.append('title')
                     .text(function(d) { return d.name ? d.name + '\n' + d.value : d.value; });
@@ -204,7 +208,11 @@
                     .enter().append('path')
                     .attr('class', 'link')
                     .attr('d', path)
-                    .attr('style', function(d) { return 'stroke: #000; stroke-opacity: 0.2; fill: none; stroke-width: ' + Math.round(Math.max(1, d.dy)) + 'px'; })
+                    .attr('style', function(d) {
+                        var color = isUndefined(d.color) ? options.colorInactive : d.color;
+                        var width = Math.round(Math.max(1, d.dy));
+                        return 'stroke: ' + color + '; stroke-opacity: 0.5; fill: none; stroke-width: ' + width + 'px';
+                    })
                     .sort(function(a, b) { return b.dy - a.dy; });
 
                 link.append('title')

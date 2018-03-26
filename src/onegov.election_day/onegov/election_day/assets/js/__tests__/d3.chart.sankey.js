@@ -162,4 +162,36 @@ describe('Sankey bar chart', () => {
     expect(chart.height()).toBe(734);
     expect(chart.width()).toBe(720);
   });
+
+  it('renders a svg with colors', () => {
+    var document = jsdom.jsdom();
+
+    var chart = sankeyChart({
+      width: 700,
+      data: {
+        "nodes": [
+          //
+          {"active": false, "id": 0, "display_value": "0", "name": "0", "color": "#337f43"},
+          {"active": false, "id": 1, "display_value": "1", "name": "1", "color": "#7fb237"},
+          {"active": false, "id": 2, "display_value": "2", "name": "2", "color": "#77d815"},
+          {"active": false, "id": 3, "display_value": "3", "name": "3", "color": "#d8d100"},
+          {"active": false, "id": 4, "display_value": "4", "name": "4", "color": "#e5e500"},
+          {"active": true, "id": 5, "display_value": "5", "name": "5", "color": "#732c2c"},
+          {"active": false, "id": 6, "display_value": "6", "name": "6"},
+        ],
+        "links":[
+          {"source": 0, "target": 2, "value": 10, "color": "#337f43"},
+          {"source": 1, "target": 2, "value": 10, "color": "#7fb237"},
+          {"source": 2, "target": 4, "value": 20, "color": "#77d815"},
+          {"source": 3, "target": 4, "value": 10, "color": "#d8d100"},
+          {"source": 5, "target": 6, "value": 10},
+        ]
+      }
+    });
+    chart(document.body);
+    // require('fs').writeFile("sankey_color.svg", document.svg());
+    expect(document.svg()).toMatchSnapshot();
+    expect(chart.height()).toBe(734);
+    expect(chart.width()).toBe(720);
+  });
 });
