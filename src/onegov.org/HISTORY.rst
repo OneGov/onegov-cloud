@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes rrulestr not working with latest dateutil release.
+  [href]
+
 0.25.6 (2018-03-26)
 ~~~~~~~~~~~~~~~~~~~
 

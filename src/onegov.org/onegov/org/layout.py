@@ -35,6 +35,7 @@ from onegov.org.models import (
     SiteCollection,
 )
 from onegov.org.theme.org_theme import user_options
+from onegov.org.utils import rrulestr
 from onegov.pay import PaymentCollection, PaymentProviderCollection
 from onegov.reservation import ResourceCollection
 from onegov.people import PersonCollection
@@ -1206,7 +1207,8 @@ class EventBaseLayout(DefaultLayout):
                     _("Su"))
 
         if recurrence:
-            rule = rrule.rrulestr(recurrence)
+            rule = rrulestr(recurrence)
+
             if rule._freq == rrule.WEEKLY:
                 return _(
                     "Every ${days} until ${end}",

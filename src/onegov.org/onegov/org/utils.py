@@ -4,6 +4,7 @@ import sedate
 
 from collections import defaultdict, Counter, OrderedDict
 from datetime import datetime, time
+from dateutil import rrule
 from onegov.core.cache import lru_cache
 from isodate import parse_date, parse_datetime
 from itertools import groupby
@@ -644,3 +645,15 @@ def keywords_first(keywords):
             return keywords.index(v) - len(keywords), ''
         except ValueError:
             return 0, v
+
+
+def rrulestr(recurrence, **kwargs):
+    """ A dateutil rrulestr wrapper that works around
+    https://github.com/dateutil/dateutil/issues/652
+
+    """
+
+    if 'DTSTART' not in recurrence and 'dtstart' not in kwargs:
+        kwargs['dtstart'] = sedate.utcnow()
+
+    return rrule.rrulestr(recurrence, **kwargs)

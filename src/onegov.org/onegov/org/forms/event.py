@@ -4,6 +4,7 @@ from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.gis import CoordinatesField
 from onegov.org import _
+from onegov.org.utils import rrulestr
 from sedate import replace_timezone, to_timezone
 from wtforms import StringField, TextAreaField, validators
 from wtforms.fields.html5 import DateField, EmailField
@@ -226,7 +227,7 @@ class EventForm(Form):
             last_occurrence = model.occurrence_dates(localize=True)[-1]
             self.end_date.data = last_occurrence.date()
 
-            rule = rrule.rrulestr(model.recurrence)
+            rule = rrulestr(model.recurrence)
             if rule._freq == rrule.WEEKLY:
                 self.weekly.data = [
                     WEEKDAYS[day][0] for day in rule._byweekday
