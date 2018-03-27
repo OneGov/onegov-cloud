@@ -62,19 +62,19 @@ class ElectionLayout(DetailLayout):
             return (
                 self.proporz and
                 not self.tacit and
-                self.model.list_connections.first()
+                self.model.list_connections.first() is not None
             )
         if tab == 'party-strengths':
             return (
                 self.proporz and
                 not self.tacit and
-                self.model.party_results.first()
+                self.model.party_results.first() is not None
             )
         if tab == 'parties-panachage':
             return (
                 self.proporz and
                 not self.tacit and
-                self.model.panachage_results.first()
+                self.model.panachage_results.first() is not None
             )
         if tab == 'statistics':
             return not self.tacit

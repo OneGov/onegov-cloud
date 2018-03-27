@@ -19,12 +19,9 @@
 
             <div class="row">
                 <div class="small-12 small-centered large-10 columns">
-                    <figure metal:use-macro="layout.macros['party_strengths_figure']" tal:define="election election_compound"/>
+                    <figure metal:use-macro="layout.macros['parties_panachage_figure']" tal:define="election election_compound"/>
                 </div>
             </div>
-
-            <div metal:use-macro="layout.macros['party_strengths']" />
-
         </tal:block>
 
         <div metal:use-macro="layout.macros['related_link']" />

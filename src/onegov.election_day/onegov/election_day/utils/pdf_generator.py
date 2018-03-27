@@ -629,6 +629,15 @@ class PdfGenerator():
                 )
             pdf.pagebreak()
 
+        # Parties Panachage
+        chart = self.renderer.get_parties_panachage_chart(compound, 'pdf')
+        if chart:
+            pdf.h2(_('Panachage (parties)'))
+            pdf.pdf(chart)
+            pdf.figcaption(_('figcaption_panachage'))
+            pdf.spacer()
+            pdf.pagebreak()
+
     def add_vote(self, principal, vote, pdf, locale):
 
         def format_name(item):

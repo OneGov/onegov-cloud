@@ -19,19 +19,7 @@
 
             <div class="row">
                 <div class="small-12 small-centered large-10 columns">
-                    <figure>
-                        <div class="sankey-chart"
-                            i18n:attributes="data-embed-link"
-                            data-dataurl="${request.link(election, name='parties-panachage-data')}"
-                            data-inverse="false"
-                            data-embed-link="Embed"
-                            data-embed-source="${request.link(election, name='parties-panachage-chart')}">
-                        </div>
-                        <a class="svg-download" tal:condition="layout.svg_path" href="${layout.svg_link}">
-                            <i class="fa fa-download"></i><tal:block i18n:translate="">Download</tal:block>
-                        </a>
-                        <figure metal:use-macro="layout.macros['figcaption_panachage']" />
-                    </figure>
+                    <figure metal:use-macro="layout.macros['parties_panachage_figure']" />
                 </div>
             </div>
         </tal:block>

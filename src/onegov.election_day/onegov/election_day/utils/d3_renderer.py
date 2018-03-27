@@ -17,6 +17,8 @@ from onegov.election_day.views.election.parties_panachage import \
     view_election_parties_panachage_data
 from onegov.election_day.views.election.party_strengths \
     import view_election_party_strengths_data
+from onegov.election_day.views.election_compound.parties_panachage import \
+    view_election_compound_parties_panachage_data
 from onegov.election_day.views.election_compound.party_strengths \
     import view_election_compound_party_strengths_data
 from onegov.core.utils import module_path
@@ -178,6 +180,10 @@ class D3Renderer():
         data = None
         if isinstance(item, Election):
             data = view_election_parties_panachage_data(item, None)
+            if data and data.get('links') and data.get('nodes'):
+                return self.get_chart('sankey', fmt, data)
+        elif isinstance(item, ElectionCompound):
+            data = view_election_compound_parties_panachage_data(item, None)
             if data and data.get('links') and data.get('nodes'):
                 return self.get_chart('sankey', fmt, data)
         return (chart, data) if return_data else chart

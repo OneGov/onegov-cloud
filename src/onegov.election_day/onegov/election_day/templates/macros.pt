@@ -479,4 +479,18 @@
     </figcaption>
 </metal:figcaption_panachage>
 
+<metal:parties_panachage_figure define-macro="parties_panachage_figure" i18n:domain="onegov.election_day">
+    <div class="sankey-chart"
+        i18n:attributes="data-embed-link"
+        data-dataurl="${request.link(election, name='parties-panachage-data')}"
+        data-inverse="false"
+        data-embed-link="Embed"
+        data-embed-source="${request.link(election, name='parties-panachage-chart')}">
+    </div>
+    <a class="svg-download" tal:condition="layout.svg_path" href="${layout.svg_link}">
+        <i class="fa fa-download"></i><tal:block i18n:translate="">Download</tal:block>
+    </a>
+    <figure metal:use-macro="layout.macros['figcaption_panachage']" />
+</metal:parties_panachage_figure>
+
 </body>

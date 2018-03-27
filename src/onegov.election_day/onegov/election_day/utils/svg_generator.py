@@ -94,6 +94,7 @@ class SvgGenerator():
                 self.generate_svg(election, 'lists-panachage')
         for election_compound in self.session.query(ElectionCompound):
             self.generate_svg(election_compound, 'party-strengths')
+            self.generate_svg(election_compound, 'parties-panachage')
         if principal.use_maps:
             for ballot in self.session.query(Ballot):
                 if principal.is_year_available(ballot.vote.date.year):

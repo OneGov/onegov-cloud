@@ -36,7 +36,7 @@ def view_election_compound_json(self, request):
     media = {'charts': {}}
     if ElectionCompoundLayout(self, request).pdf_path:
         media['pdf'] = request.link(self, 'pdf')
-    for tab in ('party-strengths', ):
+    for tab in ('party-strengths', 'parties-panachage'):
         layout = ElectionCompoundLayout(self, request, tab=tab)
         if layout.visible:
             embed[tab] = request.link(self, '{}-chart'.format(tab))

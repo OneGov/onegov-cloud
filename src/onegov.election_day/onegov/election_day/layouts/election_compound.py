@@ -18,6 +18,7 @@ class ElectionCompoundLayout(DetailLayout):
             'districts',
             'candidates',
             'party-strengths',
+            'parties-panachage',
             'data'
         )
 
@@ -30,6 +31,8 @@ class ElectionCompoundLayout(DetailLayout):
             return _("Elected candidates")
         if tab == 'party-strengths':
             return _("Party strengths")
+        if tab == 'parties-panachage':
+            return _("Panachage (parties)")
         if tab == 'data':
             return _("Downloads")
 
@@ -39,7 +42,9 @@ class ElectionCompoundLayout(DetailLayout):
         if not self.has_results:
             return False
         if tab == 'party-strengths':
-            return self.model.party_results.first()
+            return self.model.party_results.first() is not None
+        if tab == 'parties-panachage':
+            return self.model.panachage_results.first() is not None
 
         return True
 
