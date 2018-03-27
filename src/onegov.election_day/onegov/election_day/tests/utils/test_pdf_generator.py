@@ -2,6 +2,7 @@ from datetime import date
 from onegov.ballot import Ballot
 from onegov.ballot import BallotResult
 from onegov.ballot import Vote
+from onegov.election_day.tests.utils import add_election_compound
 from onegov.election_day.tests.utils import add_majorz_election
 from onegov.election_day.tests.utils import add_proporz_election
 from onegov.election_day.tests.utils import add_vote
@@ -33,21 +34,21 @@ def test_generate_pdf_election(session, election_day_app):
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(proporz, 'election.pdf', locale)
         with election_day_app.filestorage.open('election.pdf', 'rb') as f:
-            assert len(PdfReader(f, decompress=False).pages) == 7
+            assert len(PdfReader(f, decompress=False).pages) == 8
 
     # Proporz election with deltas
     add_proporz_election(session, year=2011)
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(proporz, 'election.pdf', locale)
         with election_day_app.filestorage.open('election.pdf', 'rb') as f:
-            assert len(PdfReader(f, decompress=False).pages) == 7
+            assert len(PdfReader(f, decompress=False).pages) == 8
 
     # Proporz election with more than one entitiy
     proporz.status = 'final'
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(proporz, 'election.pdf', locale)
         with election_day_app.filestorage.open('election.pdf', 'rb') as f:
-            assert len(PdfReader(f, decompress=False).pages) == 7
+            assert len(PdfReader(f, decompress=False).pages) == 8
 
     # Tacit election
     majorz.tacit = True
@@ -55,6 +56,16 @@ def test_generate_pdf_election(session, election_day_app):
         generator.generate_pdf(majorz, 'election.pdf', locale)
         with election_day_app.filestorage.open('election.pdf', 'rb') as f:
             assert len(PdfReader(f, decompress=False).pages) == 1
+
+
+def test_generate_pdf_election_compound(session, election_day_app):
+    generator = PatchedPdfGenerator(election_day_app)
+
+    compound = add_election_compound(session)
+    for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
+        generator.generate_pdf(compound, 'election.pdf', locale)
+        with election_day_app.filestorage.open('election.pdf', 'rb') as f:
+            assert len(PdfReader(f, decompress=False).pages) == 4
 
 
 def test_generate_pdf_vote(session, election_day_app):

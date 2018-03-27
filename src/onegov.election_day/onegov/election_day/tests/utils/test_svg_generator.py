@@ -1,5 +1,6 @@
 from freezegun import freeze_time
 from io import StringIO
+from onegov.election_day.tests.utils import add_election_compound
 from onegov.election_day.tests.utils import add_majorz_election
 from onegov.election_day.tests.utils import add_proporz_election
 from onegov.election_day.tests.utils import add_vote
@@ -32,6 +33,7 @@ def test_generate_svg(election_day_app, session):
             generator.generate_svg(item, 'candidates')
             generator.generate_svg(item, 'connections', 'de_CH')
             generator.generate_svg(item, 'party-strengths', 'de_CH')
+            generator.generate_svg(item, 'parties-panachage', 'de_CH')
             generator.generate_svg(item, 'lists-panachage', 'de_CH')
             generator.generate_svg(item, 'map', 'de_CH')
 
@@ -40,6 +42,16 @@ def test_generate_svg(election_day_app, session):
             generator.generate_svg(item, 'candidates', 'de_CH')
             generator.generate_svg(item, 'connections', 'de_CH')
             generator.generate_svg(item, 'party-strengths', 'de_CH')
+            generator.generate_svg(item, 'parties-panachage', 'de_CH')
+            generator.generate_svg(item, 'lists-panachage', 'de_CH')
+            generator.generate_svg(item, 'map', 'de_CH')
+
+            item = add_election_compound(session)
+            generator.generate_svg(item, 'lists', 'de_CH')
+            generator.generate_svg(item, 'candidates', 'de_CH')
+            generator.generate_svg(item, 'connections', 'de_CH')
+            generator.generate_svg(item, 'party-strengths', 'de_CH')
+            generator.generate_svg(item, 'parties-panachage', 'de_CH')
             generator.generate_svg(item, 'lists-panachage', 'de_CH')
             generator.generate_svg(item, 'map', 'de_CH')
 
@@ -48,6 +60,7 @@ def test_generate_svg(election_day_app, session):
             generator.generate_svg(item, 'candidates', 'de_CH')
             generator.generate_svg(item, 'connections', 'de_CH')
             generator.generate_svg(item, 'party-strengths', 'de_CH')
+            generator.generate_svg(item, 'parties-panachage', 'de_CH')
             generator.generate_svg(item, 'lists-panachage', 'de_CH')
             generator.generate_svg(item, 'map', 'de_CH')
             generator.generate_svg(item, 'map', 'it_CH')
@@ -55,22 +68,26 @@ def test_generate_svg(election_day_app, session):
         with freeze_time("2015-05-05 15:00"):
             generator.generate_svg(item, 'map', 'it_CH')
 
-        assert gc.call_count == 9  # 2 + 5 + 2 + 0
+        assert gc.call_count == 12  # 2 + 6 + 2 + 2 + 0
 
         ts = '1396620000'
-        h1 = '41c18975bf916862ed817b7c569b6f242ca7ad9f86ca73bbabd8d9cb26858440'
-        h2 = '624b5f68761f574adadba4145283baf97f21e2bd8b87d054b57d936dac6dedff'
-        h3 = item.id
+        hm = '41c18975bf916862ed817b7c569b6f242ca7ad9f86ca73bbabd8d9cb26858440'
+        hp = '624b5f68761f574adadba4145283baf97f21e2bd8b87d054b57d936dac6dedff'
+        hc = '9130b66132f65a4d5533fecad8cdf1f9620a42733d6dfd7d23ea123babecf4c7'
+        hb = item.id
         assert sorted(election_day_app.filestorage.listdir('svg')) == sorted([
-            'election-{}.{}.candidates.de_CH.svg'.format(h1, ts),
-            'election-{}.{}.candidates.any.svg'.format(h1, ts),
-            'election-{}.{}.lists.de_CH.svg'.format(h2, ts),
-            'election-{}.{}.candidates.de_CH.svg'.format(h2, ts),
-            'election-{}.{}.connections.de_CH.svg'.format(h2, ts),
-            'election-{}.{}.party-strengths.de_CH.svg'.format(h2, ts),
-            'election-{}.{}.lists-panachage.de_CH.svg'.format(h2, ts),
-            'ballot-{}.{}.map.de_CH.svg'.format(h3, ts),
-            'ballot-{}.{}.map.it_CH.svg'.format(h3, ts)
+            f'election-{hm}.{ts}.candidates.de_CH.svg',
+            f'election-{hm}.{ts}.candidates.any.svg',
+            f'election-{hp}.{ts}.lists.de_CH.svg',
+            f'election-{hp}.{ts}.candidates.de_CH.svg',
+            f'election-{hp}.{ts}.connections.de_CH.svg',
+            f'election-{hp}.{ts}.party-strengths.de_CH.svg',
+            f'election-{hp}.{ts}.parties-panachage.de_CH.svg',
+            f'election-{hp}.{ts}.lists-panachage.de_CH.svg',
+            f'election-{hc}.{ts}.party-strengths.de_CH.svg',
+            f'election-{hc}.{ts}.parties-panachage.de_CH.svg',
+            f'ballot-{hb}.{ts}.map.de_CH.svg',
+            f'ballot-{hb}.{ts}.map.it_CH.svg'
         ])
 
 
@@ -86,44 +103,46 @@ def test_create_svgs(election_day_app):
         assert gc.call_count == 0
         assert election_day_app.filestorage.listdir('svg') == []
 
-        majorz_election = add_majorz_election(session)
-        proporz_election = add_proporz_election(session)
+        majorz = add_majorz_election(session)
+        proporz = add_proporz_election(session)
+        compound = add_election_compound(session)
         vote = add_vote(session, 'complex')
 
         generator.create_svgs()
-        assert gc.call_count == 18
-        assert len(fs.listdir('svg')) == 18
+        assert gc.call_count == 21
+        assert len(fs.listdir('svg')) == 21
 
         generator.create_svgs()
-        assert gc.call_count == 18
-        assert len(fs.listdir('svg')) == 18
+        assert gc.call_count == 21
+        assert len(fs.listdir('svg')) == 21
 
         fs.touch('svg/somefile')
         fs.touch('svg/some.file')
         fs.touch('svg/.somefile')
 
         generator.create_svgs()
-        assert gc.call_count == 18
-        assert len(fs.listdir('svg')) == 18
+        assert gc.call_count == 21
+        assert len(fs.listdir('svg')) == 21
 
         session.delete(vote)
-        session.delete(proporz_election)
+        session.delete(proporz)
+        session.delete(compound)
         session.flush()
 
         generator.create_svgs()
-        assert gc.call_count == 18
+        assert gc.call_count == 21
         assert len(fs.listdir('svg')) == 1
 
-        majorz_election.title = 'Election'
+        majorz.title = 'Election'
         session.flush()
 
         generator.create_svgs()
-        assert gc.call_count == 19
+        assert gc.call_count == 22
         assert len(fs.listdir('svg')) == 1
 
-        session.delete(majorz_election)
+        session.delete(majorz)
         session.flush()
 
         generator.create_svgs()
-        assert gc.call_count == 19
+        assert gc.call_count == 22
         assert len(fs.listdir('svg')) == 0

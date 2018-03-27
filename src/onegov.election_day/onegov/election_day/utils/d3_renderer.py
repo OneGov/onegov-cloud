@@ -148,11 +148,11 @@ class D3Renderer():
         chart = None
         data = None
         if isinstance(item, Election):
-            data = get_party_results_data(item, None)
+            data = get_party_results_data(item)
             if data and data.get('results'):
                 chart = self.get_chart('grouped', fmt, data)
         elif isinstance(item, ElectionCompound):
-            data = get_party_results_data(item, None)
+            data = get_party_results_data(item)
             if data and data.get('results'):
                 chart = self.get_chart('grouped', fmt, data)
         return (chart, data) if return_data else chart

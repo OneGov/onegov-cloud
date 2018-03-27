@@ -5,6 +5,7 @@ from onegov.ballot import BallotResult
 from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
 from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
 from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.ballot import ListConnection
@@ -116,6 +117,12 @@ def add_proporz_election(session, year=2015):
     election.party_results.append(
         PartyResult(name='Party 2', number_of_mandates=1, votes=20)
     )
+    election.panachage_results.append(
+        PanachageResult(source='Party 1', target='Party 2', votes=12)
+    )
+    election.panachage_results.append(
+        PanachageResult(source='Party 2', target='Party 1', votes=21)
+    )
 
     list_1.panachage_results.append(
         PanachageResult(target=str(list_1.id), source=2, votes=1)
@@ -216,3 +223,29 @@ def add_vote(session, type_):
     session.flush()
 
     return vote
+
+
+def add_election_compound(session, year=2015, elections=None):
+    compound = ElectionCompound(
+        title='Election Compound',
+        domain='canton',
+        date=date(year, 6, 14),
+        elections=elections or []
+    )
+    session.add(compound)
+    session.flush()
+
+    compound.party_results.append(
+        PartyResult(name='Party 1', number_of_mandates=1, votes=10)
+    )
+    compound.party_results.append(
+        PartyResult(name='Party 2', number_of_mandates=1, votes=20)
+    )
+    compound.panachage_results.append(
+        PanachageResult(source='Party 1', target='Party 2', votes=12)
+    )
+    compound.panachage_results.append(
+        PanachageResult(source='Party 2', target='Party 1', votes=21)
+    )
+
+    return compound
