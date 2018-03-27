@@ -1,12 +1,12 @@
 from morepath.request import Response
-from onegov.ballot import Candidate, Election
+from onegov.ballot import Election
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
-from onegov.election_day.views.election import get_candidates_results
-from sqlalchemy import desc
+from onegov.election_day.utils.election import get_candidates_data
+from onegov.election_day.utils.election import get_candidates_results
 from sqlalchemy.orm import object_session
 
 
@@ -23,38 +23,7 @@ def view_election_candidates_data(self, request):
 
     """
 
-    session = object_session(self)
-
-    candidates = session.query(
-        Candidate.family_name,
-        Candidate.first_name,
-        Candidate.elected,
-        Candidate.votes
-    )
-    candidates = candidates.order_by(
-        desc(Candidate.elected),
-        desc(Candidate.votes),
-        Candidate.family_name,
-        Candidate.first_name
-    )
-    candidates = candidates.filter(Candidate.election_id == self.id)
-
-    majority = 0
-    if self.type == 'majorz' and self.absolute_majority is not None:
-        majority = self.absolute_majority
-
-    return {
-        'results': [
-            {
-                'text': '{} {}'.format(candidate[0], candidate[1]),
-                'value': candidate[3],
-                'class': 'active' if candidate[2] else 'inactive'
-            } for candidate in candidates.all()
-            if self.type == 'majorz' or self.type == 'proporz' and candidate[2]
-        ],
-        'majority': majority,
-        'title': self.title
-    }
+    return get_candidates_data(self, request)
 
 
 @ElectionDayApp.html(

@@ -5,23 +5,14 @@ from onegov.ballot import Ballot
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
 from onegov.core.custom import json
-from onegov.election_day import _
-from onegov.election_day.views.election.candidates \
-    import view_election_candidates_data
-from onegov.election_day.views.election.connections \
-    import view_election_connections_data
-from onegov.election_day.views.election.lists import view_election_lists_data
-from onegov.election_day.views.election.lists_panachage import \
-    view_election_lists_panachage_data
-from onegov.election_day.views.election.parties_panachage import \
-    view_election_parties_panachage_data
-from onegov.election_day.views.election.party_strengths \
-    import view_election_party_strengths_data
-from onegov.election_day.views.election_compound.parties_panachage import \
-    view_election_compound_parties_panachage_data
-from onegov.election_day.views.election_compound.party_strengths \
-    import view_election_compound_party_strengths_data
 from onegov.core.utils import module_path
+from onegov.election_day import _
+from onegov.election_day.utils.election import get_candidates_data
+from onegov.election_day.utils.election import get_connections_data
+from onegov.election_day.utils.election import get_lists_data
+from onegov.election_day.utils.election import get_lists_panachage_data
+from onegov.election_day.utils.election import get_parties_panachage_data
+from onegov.election_day.utils.election import get_party_results_data
 from requests import post
 from rjsmin import jsmin
 
@@ -128,7 +119,7 @@ class D3Renderer():
         chart = None
         data = None
         if isinstance(item, Election):
-            data = view_election_lists_data(item, None)
+            data = get_lists_data(item, None)
             if data and data.get('results'):
                 chart = self.get_chart('bar', fmt, data)
         return (chart, data) if return_data else chart
@@ -137,7 +128,7 @@ class D3Renderer():
         chart = None
         data = None
         if isinstance(item, Election):
-            data = view_election_candidates_data(item, None)
+            data = get_candidates_data(item, None)
             if data and data.get('results'):
                 chart = self.get_chart('bar', fmt, data)
         return (chart, data) if return_data else chart
@@ -146,7 +137,7 @@ class D3Renderer():
         chart = None
         data = None
         if isinstance(item, Election):
-            data = view_election_connections_data(item, None)
+            data = get_connections_data(item, None)
             if data and data.get('links') and data.get('nodes'):
                 chart = self.get_chart(
                     'sankey', fmt, data, params={'inverse': True}
@@ -157,11 +148,11 @@ class D3Renderer():
         chart = None
         data = None
         if isinstance(item, Election):
-            data = view_election_party_strengths_data(item, None)
+            data = get_party_results_data(item, None)
             if data and data.get('results'):
                 chart = self.get_chart('grouped', fmt, data)
         elif isinstance(item, ElectionCompound):
-            data = view_election_compound_party_strengths_data(item, None)
+            data = get_party_results_data(item, None)
             if data and data.get('results'):
                 chart = self.get_chart('grouped', fmt, data)
         return (chart, data) if return_data else chart
@@ -170,7 +161,7 @@ class D3Renderer():
         chart = None
         data = None
         if isinstance(item, Election):
-            data = view_election_lists_panachage_data(item, None)
+            data = get_lists_panachage_data(item, None)
             if data and data.get('links') and data.get('nodes'):
                 return self.get_chart('sankey', fmt, data)
         return (chart, data) if return_data else chart
@@ -179,11 +170,11 @@ class D3Renderer():
         chart = None
         data = None
         if isinstance(item, Election):
-            data = view_election_parties_panachage_data(item, None)
+            data = get_parties_panachage_data(item, None)
             if data and data.get('links') and data.get('nodes'):
                 return self.get_chart('sankey', fmt, data)
         elif isinstance(item, ElectionCompound):
-            data = view_election_compound_parties_panachage_data(item, None)
+            data = get_parties_panachage_data(item, None)
             if data and data.get('links') and data.get('nodes'):
                 return self.get_chart('sankey', fmt, data)
         return (chart, data) if return_data else chart

@@ -2,7 +2,7 @@ from onegov.ballot import ElectionCompound
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
-from onegov.election_day.views.election_compound import get_elected_candidates
+from onegov.election_day.utils.election import get_elected_candidates
 
 
 @ElectionDayApp.html(

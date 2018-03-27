@@ -7,9 +7,9 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_election_summary
-from onegov.election_day.views.election import get_candidates_results
-from onegov.election_day.views.election import get_connection_results
-from onegov.election_day.views.election.lists import get_list_results
+from onegov.election_day.utils.election import get_candidates_results
+from onegov.election_day.utils.election import get_connection_results
+from onegov.election_day.utils.election.lists import get_list_results
 from sqlalchemy.orm import object_session
 
 

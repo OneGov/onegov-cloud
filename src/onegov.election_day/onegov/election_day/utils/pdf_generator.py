@@ -7,15 +7,12 @@ from onegov.election_day import log
 from onegov.election_day.pdf import Pdf
 from onegov.election_day.utils import pdf_filename
 from onegov.election_day.utils.d3_renderer import D3Renderer
-from onegov.election_day.views.election import get_candidates_results
-from onegov.election_day.views.election import get_connection_results
-from onegov.election_day.views.election.candidates \
-    import view_election_candidates_data
-from onegov.election_day.views.election.party_strengths  \
-    import get_party_results_deltas
-from onegov.election_day.views.election.party_strengths  \
-    import get_party_results
-from onegov.election_day.views.election_compound import get_elected_candidates
+from onegov.election_day.utils.election import get_candidates_data
+from onegov.election_day.utils.election import get_candidates_results
+from onegov.election_day.utils.election import get_connection_results
+from onegov.election_day.utils.election import get_elected_candidates
+from onegov.election_day.utils.election import get_party_results
+from onegov.election_day.utils.election import get_party_results_deltas
 from onegov.pdf import LexworkSigner
 from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header_and_footer
@@ -122,7 +119,7 @@ class PdfGenerator():
     def add_tacit_election(self, principal, election, pdf):
 
         # Candidates
-        data = view_election_candidates_data(election, None)
+        data = get_candidates_data(election, None)
         if data and data.get('results'):
             pdf.h2(_('Candidates'))
             pdf.spacer()

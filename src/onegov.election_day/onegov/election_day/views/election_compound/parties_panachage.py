@@ -5,8 +5,7 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.utils import add_last_modified_header
-from onegov.election_day.views.election.parties_panachage \
-    import get_parties_panachage
+from onegov.election_day.utils.election import get_parties_panachage_data
 
 
 @ElectionDayApp.json(
@@ -19,11 +18,9 @@ def view_election_compound_parties_panachage_data(self, request):
     """" View the panachage data as JSON. Used to for the panachage sankey
     chart.
 
-    Returns for every list: The number of votes from other parties. The
-    modified xplus remaining votes from the own list.
     """
 
-    return get_parties_panachage(self, request)
+    return get_parties_panachage_data(self, request)
 
 
 @ElectionDayApp.html(
