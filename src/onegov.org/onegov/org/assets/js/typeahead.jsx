@@ -21,6 +21,10 @@
       list of results.
 */
 
+var getSearchUrl = function(target, query, lucky) {
+    return target + (lucky && '?lucky&q=' || '?q=') + encodeURIComponent(query);
+};
+
 /*
     Renders the result list
 */
@@ -38,7 +42,7 @@ var TypeaheadList = React.createClass({
                 {results.map(function(result) {
                     return (
                         <li key={result} className={active === result ? 'active' : ''}>
-                            <a href={target + '?q=' + result}>{result}</a>
+                            <a href={getSearchUrl(target, result)}>{result}</a>
                         </li>
                     );
                 })}
@@ -50,7 +54,7 @@ var TypeaheadList = React.createClass({
             return false;
         }
 
-        window.location = this.props.target + '?q=' + encodeURIComponent(this.state.active);
+        window.location = getSearchUrl(this.props.target, this.state.active);
         return true;
     },
     right: function() {
@@ -58,7 +62,7 @@ var TypeaheadList = React.createClass({
             return false;
         }
 
-        window.location = this.props.target + '?lucky&q=' + encodeURIComponent(this.state.active);
+        window.location = getSearchUrl(this.props.target, this.state.active, true);
         return true;
     },
     up: function() {
@@ -106,7 +110,7 @@ var TypeAhead = function(form) {
             return;
         }
 
-        var request = $.get(source + '?q=' + encodeURIComponent(text));
+        var request = $.get(getSearchUrl(source, text));
 
         request.always(function() {
             spinner.attr('class', 'fa fa-search');
