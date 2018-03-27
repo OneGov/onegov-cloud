@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.25.8 (2018-03-27)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes some typeahead search results failing on IE.
   [href]
 
