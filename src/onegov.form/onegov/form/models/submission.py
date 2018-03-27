@@ -188,14 +188,15 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
 
             assert spots <= (limit - claimed)
 
-        self.claimed = spots
+        assert ((self.claimed or 0) + spots) <= self.spots
+        self.claimed = (self.claimed or 0) + spots
 
     def disclaim(self, spots=None):
         """ Disclaims the given number of spots (defaults to all spots that
         were claimed so far).
 
         """
-        spots = spots or self.claimed
+        spots = spots or self.spots
 
         assert self.registration_window
 

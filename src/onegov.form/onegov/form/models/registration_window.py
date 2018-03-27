@@ -123,7 +123,9 @@ class FormRegistrationWindow(Base, TimestampMixin):
     @property
     def claimed_spots(self):
         return object_session(self).execute(text("""
-            SELECT SUM(COALESCE(claimed, 0))
+            SELECT SUM(
+                COALESCE(claimed, 0)
+            )
             FROM submissions
             WHERE registration_window_id = :id
             AND submissions.state = 'complete'
@@ -132,7 +134,14 @@ class FormRegistrationWindow(Base, TimestampMixin):
     @property
     def requested_spots(self):
         return object_session(self).execute(text("""
-            SELECT GREATEST(SUM(spots - COALESCE(claimed, 0)), 0)
+            SELECT GREATEST(
+                SUM(
+                    CASE WHEN claimed IS NULL THEN spots
+                         WHEN claimed = 0 THEN 0
+                         ELSE spots - claimed
+                    END
+                ), 0
+            )
             FROM submissions
             WHERE registration_window_id = :id
             AND submissions.state = 'complete'

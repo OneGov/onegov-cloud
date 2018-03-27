@@ -285,7 +285,7 @@ def test_registration_claims_with_no_limit(session):
     assert submission.claimed == 0
     assert submission.spots == 100
     assert window.claimed_spots == 0
-    assert window.requested_spots == 100
+    assert window.requested_spots == 0
 
     submission.claim(50)
     session.flush()
@@ -294,6 +294,38 @@ def test_registration_claims_with_no_limit(session):
     assert submission.spots == 100
     assert window.claimed_spots == 50
     assert window.requested_spots == 50
+
+    submission.claim(25)
+    session.flush()
+
+    assert submission.claimed == 75
+    assert submission.spots == 100
+    assert window.claimed_spots == 75
+    assert window.requested_spots == 25
+
+    submission.claim(25)
+    session.flush()
+
+    assert submission.claimed == 100
+    assert submission.spots == 100
+    assert window.claimed_spots == 100
+    assert window.requested_spots == 0
+
+    submission.disclaim(25)
+    session.flush()
+
+    assert submission.claimed == 75
+    assert submission.spots == 100
+    assert window.claimed_spots == 75
+    assert window.requested_spots == 25
+
+    submission.disclaim()
+    session.flush()
+
+    assert submission.claimed == 0
+    assert submission.spots == 100
+    assert window.claimed_spots == 0
+    assert window.requested_spots == 0
 
 
 def test_registration_claims_with_a_limit(session):
@@ -332,8 +364,8 @@ def test_registration_claims_with_a_limit(session):
     session.flush()
 
     assert window.claimed_spots == 0
-    assert window.requested_spots == 100
-    assert window.available_spots == 0
+    assert window.requested_spots == 0
+    assert window.available_spots == 10
 
 
 def test_register_more_than_allowed(session):
@@ -368,3 +400,38 @@ def test_register_more_than_allowed(session):
 
     window.overflow = False
     session.flush()
+
+
+def test_undo_registration(session):
+    forms = FormCollection(session)
+    today = date.today()
+
+    summer = forms.definitions.add('Summercamp', definition="E-Mail = @@@")
+
+    window = summer.add_registration_window(today - days(5), today + days(5))
+    window.limit = 1
+    window.overflow = False
+
+    session.flush()
+
+    assert window.available_spots == 1
+
+    submission = forms.submissions.add(
+        name='summercamp',
+        form=summer.form_class(data={'e_mail': 'info@example.org'}),
+        state='complete',
+        spots=1
+    )
+    session.flush()
+
+    assert window.available_spots == 0
+
+    submission.claim()
+    session.flush()
+
+    assert window.available_spots == 0
+
+    submission.disclaim()
+    session.flush()
+
+    assert window.available_spots == 1
