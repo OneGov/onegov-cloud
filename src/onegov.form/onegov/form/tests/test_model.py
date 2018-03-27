@@ -435,3 +435,48 @@ def test_undo_registration(session):
     session.flush()
 
     assert window.available_spots == 1
+
+
+def test_registration_window_queue(session):
+    forms = FormCollection(session)
+    today = date.today()
+
+    summer = forms.definitions.add('Summercamp', definition="E-Mail = @@@")
+    window = summer.add_registration_window(today - days(5), today + days(5))
+
+    session.flush()
+
+    first = forms.submissions.add(
+        name='summercamp',
+        form=summer.form_class(data={'e_mail': 'info@example.org'}),
+        state='complete',
+        spots=10
+    )
+    session.flush()
+
+    assert window.next_submission is first
+
+    second = forms.submissions.add(
+        name='summercamp',
+        form=summer.form_class(data={'e_mail': 'info@example.org'}),
+        state='complete',
+        spots=10
+    )
+    session.flush()
+
+    assert window.next_submission is first
+
+    first.claim()
+    session.flush()
+
+    assert window.next_submission is second
+
+    second.claim(5)
+    session.flush()
+
+    assert window.next_submission is second
+
+    second.claim(5)
+    session.flush()
+
+    assert window.next_submission is None

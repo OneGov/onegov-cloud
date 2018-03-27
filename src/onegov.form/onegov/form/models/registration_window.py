@@ -3,11 +3,19 @@ import sedate
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from sqlalchemy import Boolean, Column, Date, ForeignKey, Integer, Text, text
+from onegov.form.models.submission import FormSubmission
+from sqlalchemy import Boolean
+from sqlalchemy import Column
+from sqlalchemy import Date
+from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
+from sqlalchemy import or_
+from sqlalchemy import Text
+from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import ExcludeConstraint
+from sqlalchemy.orm import object_session, relationship
 from sqlalchemy.schema import CheckConstraint
 from sqlalchemy.sql.elements import quoted_name
-from sqlalchemy.orm import object_session, relationship
 from uuid import uuid4
 
 
@@ -122,6 +130,8 @@ class FormRegistrationWindow(Base, TimestampMixin):
 
     @property
     def claimed_spots(self):
+        """ Returns the number of actually claimed spots. """
+
         return object_session(self).execute(text("""
             SELECT SUM(
                 COALESCE(claimed, 0)
@@ -133,6 +143,14 @@ class FormRegistrationWindow(Base, TimestampMixin):
 
     @property
     def requested_spots(self):
+        """ Returns the number of requested spots.
+
+        When the claim has not been made yet, `spots` are counted as
+        requested. When the claim has been partially made, the difference is
+        counted as requested. If the claim has been fully made, the result is
+        0. If the claim has been relinquished, the result is 0.
+
+        """
         return object_session(self).execute(text("""
             SELECT GREATEST(
                 SUM(
@@ -146,6 +164,25 @@ class FormRegistrationWindow(Base, TimestampMixin):
             WHERE registration_window_id = :id
             AND submissions.state = 'complete'
         """), {'id': self.id}).scalar() or 0
+
+    @property
+    def next_submission(self):
+        """ Returns the submission next in line. In other words, the next
+        submission in order of first come, first serve.
+
+        """
+
+        q = object_session(self).query(FormSubmission)
+        q = q.filter(FormSubmission.registration_window_id == self.id)
+        q = q.filter(FormSubmission.state == 'complete')
+        q = q.filter(FormSubmission.claimed != 0)
+        q = q.filter(or_(
+            FormSubmission.claimed == None,
+            FormSubmission.claimed < FormSubmission.spots,
+        ))
+        q = q.order_by(FormSubmission.created)
+
+        return q.first()
 
     @property
     def in_the_future(self):
