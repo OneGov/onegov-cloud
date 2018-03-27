@@ -120,7 +120,12 @@ class ProporzElection(Election, PartyResultExportMixin):
         parties = parties.filter(PartyResult.owner == self.id)
         parties = parties.first()[0] if parties.first() else None
 
-        changes = [changed, lists, pan, parties]
+        panachage = session.query(PanachageResult.last_change)
+        panachage = panachage.order_by(desc(PanachageResult.last_change))
+        panachage = panachage.filter(PanachageResult.owner == self.id)
+        panachage = panachage.first()[0] if panachage.first() else None
+
+        changes = [changed, lists, pan, parties, panachage]
         changes = [change for change in changes if change]
         return max(changes) if changes else None
 
