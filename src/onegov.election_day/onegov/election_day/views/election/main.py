@@ -36,19 +36,19 @@ def view_election_json(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_modified)
 
+    embed = {}
     media = {'charts': {}}
     if ElectionLayout(self, request).pdf_path:
         media['pdf'] = request.link(self, 'pdf')
     for tab in (
-        'candidates', 'lists', 'connections', 'panachage', 'party-strengths'
+        'candidates', 'lists', 'connections', 'lists-panachage',
+        'party-strengths', 'parties-panachage',
     ):
-        if ElectionLayout(self, request, tab=tab).svg_path:
+        layout = ElectionLayout(self, request, tab=tab)
+        if layout.visible:
+            embed[tab] = request.link(self, '{}-chart'.format(tab))
+        if layout.svg_path:
             media['charts'][tab] = request.link(self, '{}-svg'.format(tab))
-
-    embed = {'candidates': request.link(self, 'candidates-chart')}
-    for item in ('lists', 'connections', 'panachage', 'party-strengths'):
-        if ElectionLayout(self, request).visible(item):
-            embed[item] = request.link(self, '{}-chart'.format(item))
 
     data = {
         'completed': self.completed,

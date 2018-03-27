@@ -470,4 +470,13 @@
     </div>
 </metal:party_strengths>
 
+<metal:figcaption_panachage define-macro="figcaption_panachage" i18n:domain="onegov.election_day">
+    <figcaption i18n:translate="figcaption_panachage">
+        The diagram shows the origin of the votes. The bars on the left correspond
+        to the unchanged votes (including the blank list), the bars on the right
+        side to the final results. The width of the bars and connections is
+        proportional to the votes.
+    </figcaption>
+</metal:figcaption_panachage>
+
 </body>

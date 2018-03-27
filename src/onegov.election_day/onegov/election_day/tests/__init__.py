@@ -240,10 +240,10 @@ def upload_proporz_election(client, create=True, canton='gr'):
 
 def upload_party_results(client, create=True, canton='gr'):
     csv_parties = (
-        "year,total_votes,name,color,mandates,votes\n"
-        "2015,11270,BDP,,1,60387\n"
-        "2015,11270,CVP,,1,49117\n"
-        "2015,11270,FDP,,0,35134\n"
+        "year,total_votes,id,name,color,mandates,votes\n"
+        "2015,11270,1,BDP,,1,60387\n"
+        "2015,11270,2,CVP,,1,49117\n"
+        "2015,11270,3,FDP,,0,35134\n"
     ).encode('utf-8')
 
     upload = client.get('/election/proporz-election/upload-party-results')

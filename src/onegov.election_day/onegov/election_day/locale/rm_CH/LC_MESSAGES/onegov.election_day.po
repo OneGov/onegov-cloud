@@ -286,6 +286,9 @@ msgstr "Candidatas e candidats"
 msgid "Party strengths"
 msgstr "Forza da las partidas"
 
+msgid "Panachage (parties)"
+msgstr "Statistica da panaschar (partidas)"
+
 msgid "Panachage (lists)"
 msgstr "Statistica da panaschar (glistas)"
 
@@ -701,6 +704,19 @@ msgstr "Vuschs"
 msgid "Difference"
 msgstr "Differenza"
 
+#. Default: The diagram shows the origin of the votes. The bars on the left
+#. correspond to the unchanged votes (including the blank list), the bars on
+#. the right side to the final results. The width of the bars and connections
+#. is proportional to the votes.
+#.
+msgid "figcaption_panachage"
+msgstr ""
+"Il diagram mussa la derivanza da las vuschs da glista gudagnadas e perdidas "
+"pervia dal panaschar. Da la vart sanestra vegnan mussadas las vuschs betg "
+"midadas da las glistas inclusiv la glista en blanco, da la vart dretga las "
+"vuschs da glista panaschadas. La ladezza da las travs e da las colliaziuns è "
+"proporziunala a las vuschs."
+
 msgid "View all details online"
 msgstr "Guardar tut ils detagls online"
 
@@ -794,19 +810,6 @@ msgstr "Total"
 msgid "The raw data is available as:"
 msgstr "Las datas nunelavuradas èn disponiblas en il suandant format:"
 
-#. Default: The diagram shows the origin of the list votes. The bars on the
-#. left correspond to the unchanged list votes (including the blank list), the
-#. bars on the right side to the final list results. The width of the bars and
-#. connections is proportional to the votes.
-#.
-msgid "figcaption_panachage"
-msgstr ""
-"Il diagram mussa la derivanza da las vuschs da glista gudagnadas e perdidas "
-"pervia dal panaschar. Da la vart sanestra vegnan mussadas las vuschs betg "
-"midadas da las glistas inclusiv la glista en blanco, da la vart dretga las "
-"vuschs da glista panaschadas. La ladezza da las travs e da las colliaziuns è "
-"proporziunala a las vuschs."
-
 msgid "Accounted Ballots"
 msgstr "Cedels valaivels"
 
@@ -887,9 +890,6 @@ msgstr "Vid"
 
 msgid "Invalid"
 msgstr "Nunvalaivel"
-
-msgid "Panachage"
-msgstr "Statistica da panaschar"
 
 msgid "Wrong username or password"
 msgstr ""

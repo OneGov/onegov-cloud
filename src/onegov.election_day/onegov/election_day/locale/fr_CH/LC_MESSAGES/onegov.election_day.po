@@ -286,6 +286,9 @@ msgstr "Candidats"
 msgid "Party strengths"
 msgstr "Force des partis"
 
+msgid "Panachage (parties)"
+msgstr "Panachage (partis)"
+
 msgid "Panachage (lists)"
 msgstr "Panachage (listes)"
 
@@ -665,6 +668,18 @@ msgstr "Votes"
 msgid "Difference"
 msgstr "Différence"
 
+#. Default: The diagram shows the origin of the votes. The bars on the left
+#. correspond to the unchanged votes (including the blank list), the bars on
+#. the right side to the final results. The width of the bars and connections
+#. is proportional to the votes.
+#.
+msgid "figcaption_panachage"
+msgstr ""
+"Le diagramme montre l'origine des votes. Les barres de gauche correspondent "
+"aux votes inchangés (y compris la liste vierge), les barres du côté droit "
+"aux résultats finale. La largeur des barres et des connexions est "
+"proportionnelle aux votes."
+
 msgid "View all details online"
 msgstr "Voir tous les détails en ligne"
 
@@ -757,18 +772,6 @@ msgstr "Total"
 msgid "The raw data is available as:"
 msgstr "Les données brutes sont disponibles comme:"
 
-#. Default: The diagram shows the origin of the list votes. The bars on the
-#. left correspond to the unchanged list votes (including the blank list), the
-#. bars on the right side to the final list results. The width of the bars and
-#. connections is proportional to the votes.
-#.
-msgid "figcaption_panachage"
-msgstr ""
-"Le diagramme montre l'origine des votes de liste. Les barres de gauche "
-"correspondent aux votes de liste inchangés (y compris la liste vierge), les "
-"barres du côté droit aux résultats de la liste finale. La largeur des barres "
-"et des connexions est proportionnelle aux votes."
-
 msgid "Accounted Ballots"
 msgstr "Bulletins de vote comptabilisés"
 
@@ -849,9 +852,6 @@ msgstr "Vide"
 
 msgid "Invalid"
 msgstr "Invalide"
-
-msgid "Panachage"
-msgstr "Panachage"
 
 msgid "Wrong username or password"
 msgstr "Mauvais nom d'utilisateur ou mot de passe"

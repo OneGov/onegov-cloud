@@ -307,7 +307,7 @@ class PdfGenerator():
             )
             pdf.pagebreak()
 
-        # Parties
+        # Party Strengths
         chart = self.renderer.get_party_strengths_chart(
             election, 'pdf'
         )
@@ -359,10 +359,19 @@ class PdfGenerator():
                 )
             pdf.pagebreak()
 
-        # Panachage
-        chart = self.renderer.get_panachage_chart(election, 'pdf')
+        # Parties Panachage
+        chart = self.renderer.get_parties_panachage_chart(election, 'pdf')
         if chart:
-            pdf.h2(_('Panachage'))
+            pdf.h2(_('Panachage (parties)'))
+            pdf.pdf(chart)
+            pdf.figcaption(_('figcaption_panachage'))
+            pdf.spacer()
+            pdf.pagebreak()
+
+        # Lists Panachage
+        chart = self.renderer.get_lists_panachage_chart(election, 'pdf')
+        if chart:
+            pdf.h2(_('Panachage (lists)'))
             pdf.pdf(chart)
             pdf.figcaption(_('figcaption_panachage'))
             pdf.spacer()

@@ -286,6 +286,9 @@ msgstr "Kandidierende"
 msgid "Party strengths"
 msgstr "Parteistärken"
 
+msgid "Panachage (parties)"
+msgstr "Panaschierstatistik (Parteien)"
+
 msgid "Panachage (lists)"
 msgstr "Panaschierstatistik (Listen)"
 
@@ -661,6 +664,18 @@ msgstr "Stimmen"
 msgid "Difference"
 msgstr "Differenz"
 
+#. Default: The diagram shows the origin of the votes. The bars on the left
+#. correspond to the unchanged votes (including the blank list), the bars on
+#. the right side to the final results. The width of the bars and connections
+#. is proportional to the votes.
+#.
+msgid "figcaption_panachage"
+msgstr ""
+"Das Diagramm zeigt die Herkunft der gewonnenen und verlorenen Stimmen durch "
+"Panaschieren. Auf der linken Seite sind die unveränderten Stimmen inklusive "
+"Blankoliste, auf der rechten Seite die panaschierten Stimmen. Die Breite der "
+"Balken und der Verbindungen ist proportional zu den Stimmen."
+
 msgid "View all details online"
 msgstr "Alle Details online ansehen"
 
@@ -755,19 +770,6 @@ msgstr "Total"
 msgid "The raw data is available as:"
 msgstr "Die Rohdaten sind in folgendem Format verfügbar:"
 
-#. Default: The diagram shows the origin of the list votes. The bars on the
-#. left correspond to the unchanged list votes (including the blank list), the
-#. bars on the right side to the final list results. The width of the bars and
-#. connections is proportional to the votes.
-#.
-msgid "figcaption_panachage"
-msgstr ""
-"Das Diagramm zeigt die Herkunft der gewonnenen und verlorenen Listenstimmen "
-"durch Panaschieren. Auf der linken Seite sind die unveränderten Stimmen der "
-"Listen inklusive Blankoliste, auf der rechten Seite die panaschierten "
-"Listenstimmen. Die Breite der Balken und der Verbindungen ist proportional "
-"zu den Stimmen."
-
 msgid "Accounted Ballots"
 msgstr "Gültige Wahlzettel"
 
@@ -848,9 +850,6 @@ msgstr "Leer"
 
 msgid "Invalid"
 msgstr "Ungültig"
-
-msgid "Panachage"
-msgstr "Panaschierstatistik"
 
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"

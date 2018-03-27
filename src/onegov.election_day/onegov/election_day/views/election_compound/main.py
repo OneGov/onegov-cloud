@@ -39,9 +39,7 @@ def view_election_compound_json(self, request):
     for tab in ('party-strengths', ):
         layout = ElectionCompoundLayout(self, request, tab=tab)
         if layout.visible:
-            embed['party-strengths'] = request.link(self, '{}-chart'.format(
-                'party-strengths'
-            ))
+            embed[tab] = request.link(self, '{}-chart'.format(tab))
         if layout.svg_path:
             media['charts'][tab] = request.link(self, '{}-svg'.format(tab))
 

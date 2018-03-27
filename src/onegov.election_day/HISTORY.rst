@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for parties panachage.
+  [msom]
+
 - Adds support for colorized sankey charts.
   [msom]
 
