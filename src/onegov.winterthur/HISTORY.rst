@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Scrolls to top whenever we load the iframe.
+  [href]
+
 0.1.5 (2018-03-23)
 ~~~~~~~~~~~~~~~~~~~~~
 
