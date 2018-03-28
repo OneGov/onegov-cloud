@@ -9,6 +9,7 @@ EXTRACT_HREF = re.compile(
 
 class Client(TestApp):
     skip_first_form = False
+    use_intercooler = False
 
     def login(self, username, password, to=None):
         """ Login a user through the usualy /auth/login path. """
@@ -53,6 +54,9 @@ class Client(TestApp):
 
         if self.skip_first_form:
             bases.append(SkipFirstFormExtension)
+
+        if self.use_intercooler:
+            bases.append(IntercoolerClickExtension)
 
         bases.append(response.__class__)
         response.__class__ = type('ExtendedResponse', tuple(bases), {})
@@ -104,3 +108,61 @@ class SkipFirstFormExtension(object):
             return self.forms[1]
         else:
             return super().form
+
+
+class IntercoolerClickExtension(object):
+
+    def click(self, description=None, linkid=None, href=None,
+              index=None, verbose=False,
+              extra_environ=None):
+        """ Adds intercooler.js support for links (by description). """
+        try:
+            return super().click(
+                description, linkid, href, index, verbose, extra_environ)
+        except IndexError:
+            result = self.find_ic_url(
+                description, linkid, href, index, verbose)
+
+            if not result:
+                raise
+
+            method, url = result
+
+            if method == 'get':
+                return self.test_app.get(url, extra_environ=extra_environ)
+            elif method == 'post':
+                return self.test_app.post(url, extra_environ=extra_environ)
+            elif method == 'delete':
+                return self.test_app.delete(url, extra_environ=extra_environ)
+            else:
+                raise NotImplementedError
+
+    def find_ic_url(self, description, linkid, href, index, verbose):
+
+        attrs = (
+            ('post', 'ic-post-to'),
+            ('delete', 'ic-delete-from'),
+            ('get', 'ic-get-from'),
+        )
+
+        for method, attr in attrs:
+            url = self.find_ic_url_by_attr(
+                attr=attr,
+                content=description,
+                href_extract=None,
+                id=linkid,
+                href_pattern=href,
+                index=index,
+                verbose=verbose)
+
+            if url:
+                return method, url
+
+    def find_ic_url_by_attr(self, attr, **kwargs):
+        try:
+            html, desc, attrs = self._find_element(
+                tag='a', href_attr=attr, **kwargs)
+
+            return attrs[attr]
+        except IndexError:
+            return None
