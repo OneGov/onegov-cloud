@@ -12,12 +12,14 @@ from onegov.form.utils import extract_text_from_html, hash_definition
 from onegov.pay import Payable
 from onegov.pay import process_payment
 from sedate import utcnow
+from sqlalchemy import case
 from sqlalchemy import CheckConstraint
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import observes
 from uuid import uuid4
 from wtforms import StringField, TextAreaField
@@ -110,6 +112,29 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
         """ Returns a form instance containing the submission data. """
 
         return self.form_class(data=self.data)
+
+    @hybrid_property
+    def registration_state(self):
+        if not self.spots:
+            return None
+        if self.claimed is None:
+            return 'open'
+        elif self.claimed == 0:
+            return 'cancelled'
+        elif self.claimed == self.spots:
+            return 'confirmed'
+        elif self.claimed < self.spots:
+            return 'partial'
+
+    @registration_state.expression
+    def registration_state(cls):
+        return case((
+            (cls.spots == 0, None),
+            (cls.claimed == None, 'open'),
+            (cls.claimed == 0, 'cancelled'),
+            (cls.claimed == cls.spots, 'confirmed'),
+            (cls.claimed < cls.spots, 'partial')
+        ), else_=None)
 
     def get_email_field_data(self, form=None):
         form = form or self.form_obj

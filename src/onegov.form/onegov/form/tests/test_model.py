@@ -1,7 +1,9 @@
 import pytest
+import transaction
 
 from datetime import date, timedelta
-from onegov.form import FormCollection, FormExtension
+from onegov.form import FormCollection, FormExtension, FormSubmission
+from sqlalchemy import desc
 from sqlalchemy.exc import IntegrityError
 from webob.multidict import MultiDict
 from wtforms import ValidationError
@@ -480,3 +482,86 @@ def test_registration_window_queue(session):
     session.flush()
 
     assert window.next_submission is None
+
+
+def test_require_spots_if_registration_window(session):
+    forms = FormCollection(session)
+    today = date.today()
+
+    summer = forms.definitions.add('Summercamp', definition="E-Mail = @@@")
+    summer.add_registration_window(today - days(5), today + days(5))
+
+    session.flush()
+
+    with pytest.raises(AssertionError):
+        forms.submissions.add(
+            name='summercamp',
+            form=summer.form_class(data={'e_mail': 'info@example.org'}),
+            state='complete',
+            spots=0
+        )
+
+    with pytest.raises(TypeError):
+        forms.submissions.add(
+            name='summercamp',
+            form=summer.form_class(data={'e_mail': 'info@example.org'}),
+            state='complete',
+            spots=None
+        )
+
+
+def test_registration_submission_state(session):
+    forms = FormCollection(session)
+    today = date.today()
+
+    summer = forms.definitions.add('Summercamp', definition="E-Mail = @@@")
+    session.flush()
+
+    submission = forms.submissions.add(
+        name='summercamp',
+        form=summer.form_class(data={'e_mail': 'info@example.org'}),
+        state='complete',
+    )
+
+    def query_registration_state():
+        q = forms.submissions.query()
+        q = q.with_entities(FormSubmission.registration_state)
+        q = q.order_by(desc(FormSubmission.created))
+
+        return q.first().registration_state
+
+    assert submission.registration_state is None
+    assert query_registration_state() is None
+
+    summer = forms.definitions.by_name('summercamp')
+    summer.add_registration_window(today - days(5), today + days(5), limit=10)
+
+    session.flush()
+
+    # required here for some reason, otherwise there's no current window
+    transaction.commit()
+
+    summer = forms.definitions.by_name('summercamp')
+    submission = forms.submissions.add(
+        name='summercamp',
+        form=summer.form_class(data={'e_mail': 'info@example.org'}),
+        state='complete',
+        spots=2
+    )
+    session.flush()
+
+    assert submission.registration_state == 'open'
+    assert query_registration_state() == 'open'
+
+    submission.claim(1)
+
+    assert submission.registration_state == 'partial'
+    assert query_registration_state() == 'partial'
+
+    submission.claim(1)
+    assert submission.registration_state == 'confirmed'
+    assert query_registration_state() == 'confirmed'
+
+    submission.disclaim()
+    assert submission.registration_state == 'cancelled'
+    assert query_registration_state() == 'cancelled'

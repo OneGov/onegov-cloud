@@ -104,6 +104,8 @@ class FormRegistrationWindow(Base, TimestampMixin):
         )
 
     def accepts_submissions(self, required_spots=1):
+        assert required_spots > 0
+
         if not self.enabled:
             return False
 
