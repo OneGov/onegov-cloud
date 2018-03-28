@@ -343,6 +343,28 @@ def smtp_server():
         def address(self):
             return self.addr[:2]
 
+        def outbox_payloads(self, index):
+            return [
+                m.get_payload(index).get_payload(decode=True).decode('utf-8')
+                for m in self.outbox
+            ]
+
+        @property
+        def sent(self):
+            """ Similar to the outbox property, this property returns the
+            sent e-mails, but only the decoded plaintext format.
+
+            """
+            return self.outbox_payloads(0)
+
+        @property
+        def sent_html(self):
+            """ Similar to the outbox property, this property returns the
+            sent e-mails, but only the decoded html format.
+
+            """
+            return self.outbox_payloads(1)
+
     server = Server()
     server.start()
     yield server
