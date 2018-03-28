@@ -4,6 +4,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.form.models.submission import FormSubmission
+from sqlalchemy import and_
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Date
@@ -175,10 +176,12 @@ class FormRegistrationWindow(Base, TimestampMixin):
         q = object_session(self).query(FormSubmission)
         q = q.filter(FormSubmission.registration_window_id == self.id)
         q = q.filter(FormSubmission.state == 'complete')
-        q = q.filter(FormSubmission.claimed != 0)
         q = q.filter(or_(
             FormSubmission.claimed == None,
-            FormSubmission.claimed < FormSubmission.spots,
+            and_(
+                FormSubmission.claimed > 0,
+                FormSubmission.claimed < FormSubmission.spots,
+            )
         ))
         q = q.order_by(FormSubmission.created)
 
