@@ -241,7 +241,7 @@ def upload_proporz_election(client, create=True, canton='gr'):
     return upload
 
 
-def upload_party_results(client, create=True, canton='gr',
+def upload_party_results(client, create=True,
                          slug='election/proporz-election'):
     csv_parties = (
         "year,total_votes,id,name,color,mandates,votes,"
@@ -284,12 +284,12 @@ def create_election_compound(client):
     new.form.submit()
 
 
-def upload_election_compound(client, create=True):
+def upload_election_compound(client, create=True, canton='gr'):
     if create:
         # Add two elections
         new = client.get('/manage/elections').click('Neue Wahl')
         new.form['election_de'] = 'Regional Election A'
-        new.form['date'] = date(2016, 1, 1)
+        new.form['date'] = date(2015, 1, 1)
         new.form['election_type'] = 'proporz'
         new.form['domain'] = 'region'
         new.form['mandates'] = 10
@@ -297,7 +297,7 @@ def upload_election_compound(client, create=True):
 
         new = client.get('/manage/elections').click('Neue Wahl')
         new.form['election_de'] = 'Regional Election B'
-        new.form['date'] = date(2016, 1, 1)
+        new.form['date'] = date(2015, 1, 1)
         new.form['election_type'] = 'proporz'
         new.form['domain'] = 'region'
         new.form['mandates'] = 5
@@ -306,7 +306,7 @@ def upload_election_compound(client, create=True):
         # Add a compound
         new = client.get('/manage/election-compounds').click('Neue Verbindung')
         new.form['election_de'] = 'Elections'
-        new.form['date'] = date(2016, 1, 1)
+        new.form['date'] = date(2015, 1, 1)
         new.form['domain'] = 'canton'
         new.form['elections'] = ['regional-election-a', 'regional-election-b']
         new.form.submit()
@@ -315,19 +315,22 @@ def upload_election_compound(client, create=True):
         'regional-election-a', 'regional-election-b'
     )):
         csv = PROPORZ_HEADER
+
         if index:
+            entity = 3503 if canton == 'gr' else 1711
             csv += (
-                'unknown,3503,True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
-                '101,True,Hans,Sieger,0,,0,1\n'
-                'unknown,3503,True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
-                '201,False,Peter,Verlierer,2,,2,0\n'
+                f'unknown,{entity},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
+                f'101,True,Hans,Sieger,0,,0,1\n'
+                f'unknown,{entity},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
+                f'201,False,Peter,Verlierer,2,,2,0\n'
             )
         else:
+            entity = 3633 if canton == 'gr' else 1711
             csv += (
-                'unknown,3633,True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
-                '101,False,Anna,Looser,0,,0,1\n'
-                'unknown,3633,True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
-                '201,True,Carol,Winner,2,,2,0\n'
+                f'unknown,{entity},True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
+                f'101,False,Anna,Looser,0,,0,1\n'
+                f'unknown,{entity},True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
+                f'201,True,Carol,Winner,2,,2,0\n'
             )
         csv = csv.encode('utf-8')
 

@@ -47,11 +47,9 @@ class ElectionLayout(DetailLayout):
 
         return ''
 
-    def visible(self, tab=None):
+    def tab_visible(self, tab):
         if not self.has_results:
             return False
-
-        tab = self.tab if tab is None else tab
 
         if tab == 'lists':
             return (
@@ -88,6 +86,10 @@ class ElectionLayout(DetailLayout):
         return True
 
     @cached_property
+    def visible(self):
+        return self.tab_visible(self.tab)
+
+    @cached_property
     def majorz(self):
         if self.model.type == 'majorz':
             return True
@@ -122,7 +124,7 @@ class ElectionLayout(DetailLayout):
                 self.title(tab),
                 self.request.link(self.model, tab),
                 'active' if self.tab == tab else ''
-            ) for tab in self.all_tabs if self.visible(tab)
+            ) for tab in self.all_tabs if self.tab_visible(tab)
         ]
 
     @cached_property

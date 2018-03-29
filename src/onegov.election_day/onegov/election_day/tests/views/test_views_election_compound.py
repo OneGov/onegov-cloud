@@ -32,8 +32,8 @@ def test_view_election_compound_districts(election_day_app_gr):
     assert "1 von 10" in districts  # mandates A
     assert "1 von 5" in districts  # mandates B
     assert "2 von 15" in districts  # overall mandates
-    assert "1 von 24" in districts  # municipalites A
-    assert "1 von 8" in districts  # municipalites B
+    assert "1 von 10" in districts  # municipalites A
+    assert "1 von 24" in districts  # municipalites B
     assert "0 von 2" in districts  # overall counted
 
 
@@ -217,7 +217,7 @@ def test_view_election_compound_summary(election_day_app_gr):
 
         assert client.get('/elections/elections/summary').json == {
             'completed': False,
-            'date': '2016-01-01',
+            'date': '2015-01-01',
             'domain': 'canton',
             'elections': [
                 'http://localhost/election/regional-election-a',

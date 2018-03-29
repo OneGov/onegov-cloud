@@ -42,11 +42,9 @@ class VoteLayout(DetailLayout):
             return None
         return self.model.proposal
 
-    def visible(self, tab=None):
+    def tab_visible(self, tab):
         if not self.has_results:
             return False
-
-        tab = self.tab if tab is None else tab
 
         if tab == 'proposal':
             return True
@@ -54,6 +52,10 @@ class VoteLayout(DetailLayout):
             return self.model.type == 'complex'
 
         return True
+
+    @cached_property
+    def visible(self):
+        return self.tab_visible(self.tab)
 
     @cached_property
     def summarize(self):

@@ -38,15 +38,20 @@ class ElectionCompoundLayout(DetailLayout):
 
         return ''
 
-    def visible(self, tab=None):
+    def tab_visible(self, tab):
         if not self.has_results:
             return False
+
         if tab == 'party-strengths':
             return self.model.party_results.first() is not None
         if tab == 'parties-panachage':
             return self.model.panachage_results.first() is not None
 
         return True
+
+    @cached_property
+    def visible(self):
+        return self.tab_visible(self.tab)
 
     @cached_property
     def main_view(self):
@@ -59,7 +64,7 @@ class ElectionCompoundLayout(DetailLayout):
                 self.title(tab),
                 self.request.link(self.model, tab),
                 'active' if self.tab == tab else ''
-            ) for tab in self.all_tabs if self.visible(tab)
+            ) for tab in self.all_tabs if self.tab_visible(tab)
         ]
 
     @cached_property

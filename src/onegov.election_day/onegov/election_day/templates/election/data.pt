@@ -7,7 +7,7 @@
 
         <div metal:use-macro="layout.macros['status_callout']" />
 
-        <tal:block tal:condition="layout.visible()">
+        <tal:block tal:condition="layout.visible">
 
             <h2 i18n:translate="">Results</h2>
 
@@ -19,7 +19,7 @@
 
             <div metal:use-macro="layout.macros['open_data_download']" tal:define="model election"/>
 
-            <tal:block tal:condition="layout.visible('party-strengths')">
+            <tal:block tal:condition="layout.tab_visible('party-strengths')">
                 <h4 i18n:translate="">Party results</h4>
                 <p>
                     <span i18n:translate="">The raw data is available as:</span> <a href="${request.link(election, 'data-parties')}">CSV</a>.

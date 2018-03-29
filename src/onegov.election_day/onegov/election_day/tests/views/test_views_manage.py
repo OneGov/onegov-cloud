@@ -2,7 +2,9 @@ from datetime import date
 from lxml.html import document_fromstring
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.tests import login
+from onegov.election_day.tests import upload_election_compound
 from onegov.election_day.tests import upload_majorz_election
+from onegov.election_day.tests import upload_party_results
 from onegov.election_day.tests import upload_proporz_election
 from onegov.election_day.tests import upload_vote
 from webtest import TestApp as Client
@@ -183,9 +185,12 @@ def test_view_clear_results(election_day_app):
     login(client)
     upload_majorz_election(client, canton='zg')
     upload_proporz_election(client, canton='zg')
+    upload_election_compound(client, canton='zg')
+    upload_party_results(client)
+    upload_party_results(client, slug='elections/elections')
     upload_vote(client)
 
-    marker = "Noch keine Resultate"
+    marker = "<h2>Resultate</h2>"
     urls = (
         '/election/majorz-election/candidates',
         '/election/majorz-election/statistics',
@@ -193,17 +198,21 @@ def test_view_clear_results(election_day_app):
         '/election/proporz-election/candidates',
         '/election/proporz-election/connections',
         '/election/proporz-election/party-strengths',
+        '/election/proporz-election/parties-panachage',
         '/election/proporz-election/lists-panachage',
         '/election/proporz-election/statistics',
+        '/elections/elections/parties-panachage',
+        '/elections/elections/party-strengths',
         '/vote/vote'
     )
-    assert all((marker not in client.get(url) for url in urls))
+    assert all((marker in client.get(url) for url in urls))
 
     client.get('/election/majorz-election/clear').form.submit()
     client.get('/election/proporz-election/clear').form.submit()
+    client.get('/elections/elections/clear').form.submit()
     client.get('/vote/vote/clear').form.submit()
 
-    assert all((marker in client.get(url) for url in urls))
+    assert all((marker not in client.get(url) for url in urls))
 
 
 def test_view_manage_data_sources(election_day_app):
