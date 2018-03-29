@@ -9,6 +9,7 @@ import transaction
 
 from base64 import b64decode, b64encode
 from datetime import datetime, date, timedelta
+from freezegun import freeze_time
 from libres.modules.errors import AffectedReservationError
 from lxml.html import document_fromstring
 from onegov.core.custom import json
@@ -31,6 +32,7 @@ from webtest import Upload
 
 class Client(BaseClient):
     skip_first_form = True
+    use_intercooler = True
 
 
 def bound_reserve(client, allocation):
@@ -2593,6 +2595,7 @@ def test_delete_event(org_app):
     assert "Generalversammlung" not in client.get('/events')
 
 
+@pytest.mark.flaky(reruns=3)
 def test_basic_search(es_org_app):
     client = Client(es_org_app)
     client.login_admin()
@@ -2631,6 +2634,7 @@ def test_basic_search(es_org_app):
     assert "Now supporting" in client.get('/search?q=fulltext')
 
 
+@pytest.mark.flaky(reruns=3)
 def test_view_search_is_limiting(es_org_app):
     # ensures that the search doesn't just return all results
     # a regression that occured for anonymous uses only
@@ -2665,6 +2669,7 @@ def test_view_search_is_limiting(es_org_app):
     assert "1 Resultat" in search_page
 
 
+@pytest.mark.flaky(reruns=3)
 def test_basic_autocomplete(es_org_app):
     client = Client(es_org_app)
 
@@ -4070,3 +4075,291 @@ def test_dependent_number_form(org_app):
     page = page.form.submit().follow()
 
     assert "Bitte überprüfen Sie Ihre Angaben" in page
+
+
+def test_registration_form_hints(org_app):
+    collection = FormCollection(org_app.session())
+    collection.definitions.add('Meetup', "E-Mail *= @@@", 'custom')
+    transaction.commit()
+
+    client = Client(org_app)
+    client.login_editor()
+
+    page = client.get('/form/meetup')
+    page = page.click("Hinzufügen")
+
+    page.form['start'] = '2018-01-01'
+    page.form['end'] = '2018-01-31'
+    page.form['limit_attendees'] = 'yes'
+    page.form['limit'] = 2
+    page.form['waitinglist'] = 'yes'
+    page.form['stop'] = False
+    page = page.form.submit().follow()
+
+    assert "Der Anmeldezeitraum wurde erfolgreich hinzugefügt" in page
+
+    # the time here is in UTC, offset is +1 hour
+    with freeze_time('2017-12-31 22:59:59'):
+        page = client.get('/form/meetup')
+        assert "Die Anmeldung beginnt am Montag, 01. Januar 2018" in page
+
+    with freeze_time('2017-12-31 23:00:00'):
+        page = client.get('/form/meetup')
+        assert "Die Anmeldung endet am Mittwoch, 31. Januar 2018" in page
+
+    with freeze_time('2018-01-31 22:59:59'):
+        page = client.get('/form/meetup')
+        assert "Die Anmeldung endet am Mittwoch, 31. Januar 2018" in page
+
+    with freeze_time('2018-01-31 23:00:00'):
+        page = client.get('/form/meetup')
+        assert "Die Anmeldung ist nicht mehr möglich" in page
+
+    edit = page.click('01.01.2018 - 31.01.2018').click('Bearbeiten')
+    edit.form['stop'] = True
+    edit.form.submit()
+
+    with freeze_time('2018-01-01'):
+        page = client.get('/form/meetup')
+        assert "Zur Zeit keine Anmeldung möglich" in page
+
+        edit.form['stop'] = False
+        edit.form.submit()
+
+        page = client.get('/form/meetup')
+        assert "Die Anmeldung endet am Mittwoch, 31. Januar 2018" in page
+        assert "Die Anmeldung ist auf 2 Teilnehmer begrenzt" in page
+
+        edit.form['waitinglist'] = 'no'
+        edit.form.submit()
+
+        page = client.get('/form/meetup')
+        assert "Es sind noch 2 Plätze verfügbar" in page
+
+        edit.form['limit'] = 1
+        edit.form.submit()
+
+        page = client.get('/form/meetup')
+        assert "Es ist noch ein Platz verfügbar" in page
+
+        page.form['e_mail'] = 'info@example.org'
+        page.form.submit().follow().form.submit()
+
+        page = client.get('/form/meetup')
+        assert "Keine Plätze mehr verfügbar" in page
+
+
+def test_registration_complete_after_deadline(org_app):
+    collection = FormCollection(org_app.session())
+
+    form = collection.definitions.add('Meetup', "E-Mail *= @@@", 'custom')
+    form.add_registration_window(
+        start=date(2018, 1, 1),
+        end=date(2018, 1, 31),
+    )
+
+    transaction.commit()
+
+    client = Client(org_app)
+
+    # the registration is started before the end of the deadline
+    with freeze_time('2018-01-31 22:59:59'):
+        page = client.get('/form/meetup')
+        page.form['e_mail'] = 'info@example.org'
+        page = page.form.submit().follow()
+
+    # but it is completed after the deadline (no longer possible)
+    with freeze_time('2018-01-31 23:00:00'):
+        page = page.form.submit().follow()
+        assert "Anmeldungen sind nicht mehr möglich" in page
+        assert TicketCollection(org_app.session()).query().count() == 0
+
+
+def test_registration_race_condition(org_app):
+    collection = FormCollection(org_app.session())
+
+    form = collection.definitions.add('Meetup', "E-Mail *= @@@", 'custom')
+    form.add_registration_window(
+        start=date(2018, 1, 1),
+        end=date(2018, 1, 31),
+        limit=1,
+        overflow=False
+    )
+
+    transaction.commit()
+
+    foo = Client(org_app)
+    bar = Client(org_app)
+
+    def fill_out_form(client):
+        page = client.get('/form/meetup')
+        page.form['e_mail'] = 'info@example.org'
+
+        return page.form.submit().follow()
+
+    def complete_form(page):
+        return page.form.submit().follow()
+
+    with freeze_time('2018-01-01'):
+        foo = fill_out_form(foo)
+        bar = fill_out_form(bar)
+
+        assert "Vielen Dank für Ihre Eingabe" in complete_form(foo)
+        assert "Anmeldungen sind nicht mehr möglich" in complete_form(bar)
+
+
+def test_registration_change_limit_after_submissions(org_app):
+    collection = FormCollection(org_app.session())
+
+    form = collection.definitions.add('Meetup', "E-Mail *= @@@", 'custom')
+    form.add_registration_window(
+        start=date(2018, 1, 1),
+        end=date(2018, 1, 31),
+        limit=10,
+        overflow=False
+    )
+
+    transaction.commit()
+
+    client = Client(org_app)
+    client.login_editor()
+
+    with freeze_time('2018-01-01'):
+        for i in range(0, 3):
+            page = client.get('/form/meetup')
+            page.form['e_mail'] = 'info@example.org'
+            page.form.submit().follow().form.submit().follow()
+
+    page = client.get('/form/meetup').click('01.01.2018 - 31.01.2018')
+    page = page.click('Bearbeiten')
+
+    page.form['limit'] = 1
+    assert "nicht tiefer sein als die Summe" in page.form.submit()
+
+    submissions = collection.submissions.query().all()
+    submissions[0].claim()
+    submissions[1].claim()
+    transaction.commit()
+
+    page.form['waitinglist'] = 'yes'
+    assert "nicht tiefer sein als die Anzahl" in page.form.submit()
+
+    page.form['waitinglist'] = 'no'
+    page.form['limit'] = 2
+    assert "nicht tiefer sein als die Summe" in page.form.submit()
+
+    submissions = collection.submissions.query().all()
+    submissions[2].disclaim()
+    transaction.commit()
+
+    page = page.form.submit().follow()
+    assert "Ihre Änderungen wurden gespeichert" in page
+
+    submissions = collection.submissions.query().all()
+    submissions[1].disclaim()
+    transaction.commit()
+
+    page = page.click('01.01.2018 - 31.01.2018').click('Bearbeiten')
+    page.form['limit'] = 1
+    page = page.form.submit().follow()
+
+    assert "Ihre Änderungen wurden gespeichert" in page
+
+
+def test_registration_ticket_workflow(org_app):
+    collection = FormCollection(org_app.session())
+
+    form = collection.definitions.add('Meetup', textwrap.dedent("""
+        E-Mail *= @@@
+        Name *= ___
+    """), 'custom')
+
+    form.add_registration_window(
+        start=date(2018, 1, 1),
+        end=date(2018, 1, 31),
+        limit=10,
+        overflow=False
+    )
+
+    transaction.commit()
+
+    client = Client(org_app)
+    client.login_editor()
+
+    def register(e_mail, name, include_data_in_email):
+
+        with freeze_time('2018-01-01'):
+            page = client.get('/form/meetup')
+            page.form['e_mail'] = 'info@example.org'
+            page.form['name'] = 'Foobar'
+            page = page.form.submit().follow()
+
+            page.form['send_by_email'] = include_data_in_email
+            page.form.submit().follow()
+
+        return client.get('/tickets/ALL/open').click("Annehmen").follow()
+
+    page = register('info@example.org', 'Foobar', include_data_in_email=True)
+
+    assert "bestätigen" in page
+    assert "ablehnen" in page
+
+    msg = org_app.smtp.sent[-1]
+    assert "Ein neues Ticket wurde für Sie eröffnet" in msg
+    assert "Foobar" in msg
+
+    page = page.click("Anmeldung bestätigen").follow()
+
+    msg = org_app.smtp.sent[-1]
+    assert 'Ihre Anmeldung für "Meetup" wurde bestätigt' in msg
+    assert "01.01.2018 - 31.01.2018" in msg
+    assert "Foobar" in msg
+
+    page = page.click("Anmeldung stornieren").follow()
+
+    msg = org_app.smtp.sent[-1]
+    assert 'Ihre Anmeldung für "Meetup" wurde storniert' in msg
+    assert "01.01.2018 - 31.01.2018" in msg
+    assert "Foobar" in msg
+
+    page = register('info@example.org', 'Foobar', include_data_in_email=False)
+
+    msg = org_app.smtp.sent[-1]
+    assert "Ein neues Ticket wurde für Sie eröffnet" in msg
+    assert "Foobar" not in msg
+
+    page.click("Anmeldung ablehnen")
+
+    msg = org_app.smtp.sent[-1]
+    assert 'Ihre Anmeldung für "Meetup" wurde abgelehnt' in msg
+    assert "01.01.2018 - 31.01.2018" in msg
+    assert "Foobar" not in msg
+
+
+def test_registration_not_in_front_of_queue(org_app):
+    collection = FormCollection(org_app.session())
+
+    form = collection.definitions.add('Meetup', "E-Mail *= @@@", 'custom')
+    form.add_registration_window(
+        start=date(2018, 1, 1),
+        end=date(2018, 1, 31),
+        limit=10,
+        overflow=False
+    )
+
+    transaction.commit()
+
+    client = Client(org_app)
+    client.login_editor()
+
+    with freeze_time('2018-01-01'):
+        for i in range(0, 2):
+            page = client.get('/form/meetup')
+            page.form['e_mail'] = 'info@example.org'
+            page.form.submit().follow().form.submit().follow()
+
+    page = client.get('/tickets/ALL/open').click("Annehmen", index=1).follow()
+    assert "Dies ist nicht die älteste offene Eingabe" in page
+
+    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+    assert "Dies ist nicht die älteste offene Eingabe" not in page

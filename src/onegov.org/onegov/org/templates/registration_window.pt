@@ -1,0 +1,38 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <dl class="field-display">
+            <tal:b repeat="(title, group) groups">
+                <tal:b define="submissions registrations[group]|nothing" condition="submissions">
+                    <dt>
+                        <h2 class="h3-size">
+                            <tal:b i18n:translate>${title}</tal:b>
+                            <tal:b tal:condition="submissions">(${len(submissions)})</tal:b>
+                        </h2>
+                    </dt>
+
+                    <dd>
+                        <tal:b condition="submissions">
+                            <ul>
+                                <li tal:repeat="submission submissions">
+                                    <div>
+                                        <strong>
+                                            <a href="${request.link(submission, 'ticket')}">
+                                                ${submission.title}
+                                            </a>
+                                        </strong>
+                                    </div>
+                                    <div>
+                                        ${layout.format_date(submission.received, 'relative')}
+                                    </div>
+                                </li>
+                            </ul>
+                        </tal:b>
+                    </dd>
+                </tal:b>
+            </tal:b>
+        </dl>
+    </tal:b>
+</div>

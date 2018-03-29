@@ -157,28 +157,39 @@ body {
 /*
     Heading sizes
 */
-.h1-size {
-    font-size: $h1-font-size - $h1-font-reduction;
-}
+.h1-size { font-size: $h1-font-size - $h1-font-reduction; }
 
-.h2-size {
-    font-size: $h2-font-size - $h2-font-reduction;
-}
+.h2-size { font-size: $h2-font-size - $h2-font-reduction; }
 
-.h3-size {
-    font-size: $h3-font-size - $h3-font-reduction;
-}
+.h3-size { font-size: $h3-font-size - $h3-font-reduction; }
 
-.h4-size {
-    font-size: $h4-font-size - $h4-font-reduction;
-}
+.h4-size { font-size: $h4-font-size - $h4-font-reduction; }
 
-.h5-size {
-    font-size: $h5-font-size - $h5-font-reduction;
-}
+.h5-size { font-size: $h5-font-size - $h5-font-reduction; }
 
-.h6-size {
-    font-size: $h6-font-size - $h6-font-reduction;
+.h6-size { font-size: $h6-font-size - $h6-font-reduction; }
+
+@media #{$medium-up} {
+    .h1-size,
+    .h2-size,
+    .h3-size,
+    .h4-size,
+    .h5-size,
+    .h6-size {
+        line-height: $header-line-height;
+    }
+
+    .h1-size { font-size: $h1-font-size; }
+
+    .h2-size { font-size: $h2-font-size; }
+
+    .h3-size { font-size: $h3-font-size; }
+
+    .h4-size { font-size: $h4-font-size; }
+
+    .h5-size { font-size: $h5-font-size; }
+
+    .h6-size { font-size: $h6-font-size; }
 }
 
 /*
@@ -743,6 +754,10 @@ form {
         margin-bottom: .75rem;
     }
 
+    .field-type-booleanfield + [class*="field-type"] {
+        margin-top: .5rem;
+    }
+
     .field-type-booleanfield + .field-type-htmlfield {
         margin-top: 1rem;
     }
@@ -824,6 +839,13 @@ form {
     Hide the spam bot honeypot field
 */
 .field-roboter_falle {
+    display: none;
+}
+
+/*
+    Hide hidden fields
+*/
+.field-hidden {
     display: none;
 }
 
@@ -1236,6 +1258,7 @@ $new-page-icon: '\f0f6';
 $new-payment-icon: '\f09d';
 $new-person-icon: '\f007';
 $new-photo-album: '\f03e';
+$new-registration-window: '\f067';
 $new-reservation-icon: '\f271';
 $new-room-icon: '\f015';
 $new-stripe-connect-icon: '\f1f5';
@@ -1361,6 +1384,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .new-person::before { @include icon($new-person-icon); }
     .new-photo-album::before { @include icon($new-photo-album); }
     .new-recipient::before { @include icon($new-recipient); }
+    .new-registration-window::before { @include icon($new-registration-window); }
     .new-reservation::before { @include icon($new-reservation-icon); }
     .new-room::before { @include icon($new-room-icon); }
     .new-stripe-connect::before { @include icon($new-stripe-connect-icon); }
@@ -3769,6 +3793,7 @@ ul.recipients {
     width: 100%;
 
     td {
+        padding-right: 5px;
         vertical-align: top;
     }
 }
@@ -3956,7 +3981,8 @@ h2 + div.timeline {
 .message-reservation,
 .message-payment,
 .message-event,
-.message-directory, {
+.message-directory,
+.message-submission {
     background: $green-pastel;
 }
 

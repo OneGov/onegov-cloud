@@ -35,15 +35,26 @@
              <p>${callout}</p>
         </div>
 
+        <div class="panel" tal:condition="helptext|nothing">
+             <p>${helptext}</p>
+        </div>
+
         <tal:block metal:use-macro="layout.macros.page_content"
                    tal:define="lead lead|nothing;text text|nothing; people people|nothing; contact contact|nothing; coordinates coordinates|nothing">
             <tal:block metal:fill-slot="after-text">
+                <div class="row" tal:condition="hints|nothing">
+                    <div class="columns small-12 panel ${hints_callout and 'callout' or ''}">
+                        <div class="hints" tal:condition="hints|nothing">
+                            <div tal:repeat="(name, hint) hints" class="hint hint-${name}">${hint}</div>
+                        </div>
+                    </div>
+                </div>
                 <div class="row">
                     <div tal:attributes="class boxed_size" tal:condition="people or contact">
-                        <div metal:use-macro="layout.macros['form']" />
+                        <div metal:use-macro="layout.macros['form']" tal:condition="form" />
                     </div>
                     <div tal:attributes="class size" tal:condition="not: people or contact">
-                        <div metal:use-macro="layout.macros['form']" />
+                        <div metal:use-macro="layout.macros['form']" tal:condition="form" />
                     </div>
                 </div>
             </tal:block>

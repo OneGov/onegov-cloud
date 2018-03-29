@@ -13,7 +13,7 @@ from onegov.form import (
 from onegov.org import _, OrgApp
 from onegov.org.layout import FormSubmissionLayout
 from onegov.org.mail import send_transactional_html_mail
-from onegov.org.models import TicketMessage
+from onegov.org.models import TicketMessage, SubmissionMessage
 from onegov.pay import Price
 from purl import URL
 
@@ -40,6 +40,45 @@ def get_price(request, form, submission):
     return request.app.adjust_price(total)
 
 
+def get_hints(layout, window):
+    if not window:
+        return
+
+    if window.in_the_past:
+        yield 'stop', _("The registration has ended")
+    elif not window.enabled:
+        yield 'stop', _("The registration is closed")
+
+    if window.enabled and window.in_the_future:
+        yield 'date', _("The registration opens on ${day}, ${date}", mapping={
+            'day': layout.format_date(window.start, 'weekday_long'),
+            'date': layout.format_date(window.start, 'date_long')
+        })
+
+    if window.enabled and window.in_the_present:
+        yield 'date', _("The registration closes on ${day}, ${date}", mapping={
+            'day': layout.format_date(window.end, 'weekday_long'),
+            'date': layout.format_date(window.end, 'date_long')
+        })
+
+        if window.limit and window.overflow:
+            yield 'count', _("There's a limit of ${count} attendees", mapping={
+                'count': window.limit
+            })
+
+        if window.limit and not window.overflow:
+            spots = window.available_spots
+
+            if spots == 0:
+                yield 'stop', _("There are no spots left")
+            elif spots == 1:
+                yield 'count', _("There is one spot left")
+            else:
+                yield 'count', _("There are ${count} spots left", mapping={
+                    'count': spots
+                })
+
+
 @OrgApp.form(model=FormDefinition, template='form.pt', permission=Public,
              form=lambda self, request: self.form_class)
 def handle_defined_form(self, request, form):
@@ -51,23 +90,34 @@ def handle_defined_form(self, request, form):
 
     collection = FormCollection(request.session)
 
-    if request.POST:
+    if not self.current_registration_window:
+        spots = 0
+        enabled = True
+    else:
+        spots = 1
+        enabled = self.current_registration_window.accepts_submissions(spots)
+
+    if enabled and request.POST:
         submission = collection.submissions.add(
-            self.name, form, state='pending')
+            self.name, form, state='pending', spots=spots)
 
         return morepath.redirect(request.link(submission))
 
+    layout = FormSubmissionLayout(self, request)
+
     return {
-        'layout': FormSubmissionLayout(self, request),
+        'layout': layout,
         'title': self.title,
-        'form': form,
+        'form': enabled and form,
         'definition': self,
         'form_width': 'small',
         'lead': self.meta.get('lead'),
         'text': self.content.get('text'),
         'people': self.people,
         'contact': self.contact_html,
-        'coordinates': self.coordinates
+        'coordinates': self.coordinates,
+        'hints': tuple(get_hints(layout, self.current_registration_window)),
+        'hints_callout': not enabled
     }
 
 
@@ -193,6 +243,16 @@ def handle_complete_submission(self, request):
             elif payment is not True:
                 self.payment = payment
 
+            window = self.registration_window
+            if window and not window.accepts_submissions(self.spots):
+                request.alert(_("Registrations are no longer possible"))
+                return morepath.redirect(request.link(self))
+
+            show_submission = request.params.get('send_by_email') == 'yes'
+
+            self.meta['show_submission'] = show_submission
+            self.meta.changed()
+
             collection = FormCollection(request.session)
             collection.submissions.complete_submission(self)
 
@@ -207,8 +267,6 @@ def handle_complete_submission(self, request):
                 TicketMessage.create(ticket, request, 'opened')
 
             if self.email != request.current_username:
-                show_submission = request.params.get('send_by_email') == 'yes'
-
                 send_transactional_html_mail(
                     request=request,
                     template='mail_ticket_opened.pt',
@@ -217,10 +275,91 @@ def handle_complete_submission(self, request):
                     content={
                         'model': ticket,
                         'form': form,
-                        'show_submission': show_submission
+                        'show_submission': self.meta['show_submission']
                     }
                 )
 
             request.success(_("Thank you for your submission!"))
 
             return morepath.redirect(request.link(ticket, 'status'))
+
+
+@OrgApp.view(model=CompleteFormSubmission, name='ticket', permission=Private)
+def view_submission_ticket(self, request):
+    ticket = TicketCollection(request.session).by_handler_id(self.id.hex)
+    return request.redirect(request.link(ticket))
+
+
+@OrgApp.view(model=CompleteFormSubmission, name='confirm-registration',
+             permission=Private, request_method='POST')
+def handle_accept_registration(self, request):
+    return handle_submission_action(self, request, 'confirmed')
+
+
+@OrgApp.view(model=CompleteFormSubmission, name='deny-registration',
+             permission=Private, request_method='POST')
+def handle_deny_registration(self, request):
+    return handle_submission_action(self, request, 'denied')
+
+
+@OrgApp.view(model=CompleteFormSubmission, name='cancel-registration',
+             permission=Private, request_method='POST')
+def handle_cancel_registration(self, request):
+    return handle_submission_action(self, request, 'cancelled')
+
+
+def handle_submission_action(self, request, action):
+    request.assert_valid_csrf_token()
+
+    if action == 'confirmed':
+        subject = _("Your registration has been confirmed")
+        success = _("The registration has been confirmed")
+        failure = _("The registration could not be confirmed")
+
+        def execute():
+            if self.registration_window and self.claimed is None:
+                return self.claim() or True
+
+    elif action == 'denied':
+        subject = _("Your registration has been denied")
+        success = _("The registration has been denied")
+        failure = _("The registration could not be denied")
+
+        def execute():
+            if self.registration_window and self.claimed is None:
+                return self.disclaim() or True
+
+    elif action == 'cancelled':
+        subject = _("Your registration has been cancelled")
+        success = _("The registration has been cancelled")
+        failure = _("The registration could not be cancelled")
+
+        def execute():
+            if self.registration_window and self.claimed:
+                return self.disclaim() or True
+
+    if execute():
+        ticket = TicketCollection(request.session).by_handler_id(self.id.hex)
+
+        if self.email != request.current_username:
+            send_transactional_html_mail(
+                request=request,
+                template='mail_registration_action.pt',
+                receivers=(self.email, ),
+                content={
+                    'model': self,
+                    'action': action,
+                    'ticket': ticket,
+                    'form': self.form_obj,
+                    'show_submission': self.meta.get('show_submission')
+                },
+                subject=subject
+            )
+
+        SubmissionMessage.create(ticket, request, action)
+
+        request.success(success)
+    else:
+        request.alert(failure)
+
+    return request.redirect(request.link(self))

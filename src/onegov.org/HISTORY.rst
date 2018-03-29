@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Adds the ability to create registration windows for forms.
+  [href]
+
+- Adds the ability to export payments.
+  [href]
+
 0.25.8 (2018-03-27)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -115,6 +115,17 @@ class ReservationMessage(TicketBasedMessage):
         ])
 
 
+class SubmissionMessage(TicketBasedMessage):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'submission'
+    }
+
+    @classmethod
+    def create(cls, ticket, request, change):
+        return super().create(ticket, request, change=change)
+
+
 class EventMessage(TicketBasedMessage):
 
     __mapper_args__ = {

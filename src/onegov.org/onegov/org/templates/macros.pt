@@ -218,7 +218,7 @@
 
 <metal:fields define-macro="fields">
     <tal:block repeat="field fields">
-        <div class="row field-${field.id} field-type-${field.type.lower()}"><div class="large-12 columns">
+        <div tal:define="hidden form.is_hidden(field)|False" class="row field-${field.id} field-type-${field.type.lower()} ${hidden and 'field-hidden'}"><div class="large-12 columns">
         <tal:block define="input_type field.widget.input_type|None">
             <tal:block condition="input_type == 'hidden'">
                 ${field()}
@@ -1081,7 +1081,7 @@
                                 <tal:b define="ticket get_ticket(link)">
                                     <div>
                                         <a href="${request.link(ticket)}">
-                                            <strong>${ticket.number}</strong>
+                                            <strong>${ticket.number}</strong> - ${ticket.group}
                                         </a>
                                         <div>
                                             ${link.title}
@@ -1093,7 +1093,7 @@
                                 <tal:b define="ticket get_ticket(link)">
                                     <div>
                                         <a href="${request.link(ticket)}">
-                                            <strong>${ticket.number}</strong>
+                                            <strong>${ticket.number}</strong> - ${ticket.group}
                                         </a>
                                         <div>
                                             ${link.title}

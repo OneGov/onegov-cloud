@@ -21,9 +21,10 @@ from onegov.file.integration import get_file
 from onegov.form import (
     FormDefinition,
     FormCollection,
+    FormRegistrationWindow,
     CompleteFormSubmission,
     PendingFormSubmission,
-    FormFile
+    FormFile,
 )
 from onegov.newsletter import (
     Newsletter,
@@ -156,6 +157,14 @@ def get_pending_form_submission(app, id):
 def get_complete_form_submission(app, id):
     return FormCollection(app.session()).submissions.by_id(
         id, state='complete', current_only=False)
+
+
+@OrgApp.path(
+    model=FormRegistrationWindow,
+    path='/form-registration-window/{id}',
+    converters=dict(id=UUID))
+def get_form_registration_window(request, id):
+    return FormCollection(request.session).registration_windows.by_id(id)
 
 
 @OrgApp.path(model=File, path='/storage/{id}')

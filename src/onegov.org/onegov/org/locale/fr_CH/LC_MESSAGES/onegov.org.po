@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-02-22 14:04+0100\n"
+"POT-Creation-Date: 2018-03-29 14:01+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -106,6 +106,12 @@ msgstr "Formulaires"
 msgid "Edit"
 msgstr "Modifier"
 
+msgid "Export"
+msgstr "Exporter"
+
+msgid "Registration Windows"
+msgstr "Fenêtres d'inscription"
+
 msgid "People"
 msgstr "Personnes"
 
@@ -189,9 +195,6 @@ msgstr "Nettoyer"
 msgid "Occupancy"
 msgstr "Occupation"
 
-msgid "Export"
-msgstr "Exporter"
-
 msgid "Send"
 msgstr "Envoyer"
 
@@ -203,12 +206,6 @@ msgstr "Choisir des images"
 
 msgid "Synchronise"
 msgstr "Synchroniser"
-
-msgid "Configure"
-msgstr "Configurer"
-
-msgid "Import"
-msgstr "Imprimer"
 
 msgid "Yes"
 msgstr "Oui"
@@ -248,6 +245,12 @@ msgstr "Pour supprimer cet événement, allez sur le ticket et refusez-le."
 
 msgid "Create Signup Link"
 msgstr "Créez un lien d'inscription"
+
+msgid "Configure"
+msgstr "Configurer"
+
+msgid "Import"
+msgstr "Imprimer"
 
 msgid "Do you really want to delete this person?"
 msgstr "Voulez-vous vraiment supprimer cette personne ?"
@@ -292,12 +295,6 @@ msgstr "Supprimer l'album photo"
 #, python-format
 msgid "Do you really want to delete \"${title}\"?"
 msgstr "Voulez-vous vraiment supprimer « ${title} » ?"
-
-msgid "All entries will be deleted as well!"
-msgstr "Toutes les entrées seront également supprimées !"
-
-msgid "Delete directory"
-msgstr "Supprimer le dossier"
 
 msgid "Delete entry"
 msgstr "Supprimer l'entrée"
@@ -345,6 +342,12 @@ msgstr "Stripe Connect"
 
 msgid "Directory"
 msgstr "Dossier"
+
+msgid "All entries will be deleted as well!"
+msgstr "Toutes les entrées seront également supprimées !"
+
+msgid "Delete directory"
+msgstr "Supprimer le dossier"
 
 msgid "Entry"
 msgstr "Entrée"
@@ -494,6 +497,24 @@ msgstr "Association sportive"
 #, python-format
 msgid "150 years {organisation}"
 msgstr "{organisation} de 150 ans"
+
+msgid "Selection"
+msgstr "Sélection"
+
+msgid "Registration Window"
+msgstr "Fenêtre d'inscription"
+
+msgid "Start"
+msgstr "Début"
+
+msgid "End"
+msgstr "Fin"
+
+msgid "By date"
+msgstr "Par date"
+
+msgid "By registration window"
+msgstr "Par fenêtre d'inscription"
 
 msgid "Admin"
 msgstr "Admin"
@@ -690,12 +711,6 @@ msgstr "Notes"
 
 msgid "Public extra information about this person"
 msgstr "Informations publiques supplémentaires à propos de cette semaine"
-
-msgid "Start"
-msgstr "Début"
-
-msgid "End"
-msgstr "Fin"
 
 msgid "Format"
 msgstr "Format"
@@ -992,6 +1007,9 @@ msgstr "Nouvelles entrées"
 msgid "Describes what this directory is about"
 msgstr "Décrit le contenu de votre dossier"
 
+msgid "Further Information"
+msgstr "Plus d'informations"
+
 msgid "Directory entries may have coordinates"
 msgstr "les entrées du dossier peuvent avoir des coordonnées"
 
@@ -1059,6 +1077,53 @@ msgstr "Images de taille normale"
 msgid "Grid layout"
 msgstr "Mise en page en grille"
 
+msgid "Limit the number of attendees"
+msgstr "Limiter le nombre de participants"
+
+msgid "Attendees"
+msgstr "Participants"
+
+msgid "Number of attendees"
+msgstr "Nombre de participants"
+
+msgid "Waitinglist"
+msgstr "Liste d'attente"
+
+msgid "Do not accept any submissions"
+msgstr "N'accepter aucunes soumissions"
+
+#, python-format
+msgid ""
+"The limit cannot be lower than the already confirmed number of attendees "
+"(${claimed_spots})"
+msgstr ""
+"La limite ne peut être inférieure au nombre de participants déjà confirmés "
+"(${claimed_spots})"
+
+#, python-format
+msgid ""
+"The limit cannot be lower than the already confirmed number attendees "
+"(${claimed_spots}) and the number of pending requests (${pending_requests})."
+" Either enable the waiting list, process the pending requests or increase "
+"the limit. "
+msgstr ""
+"La limite ne peut pas être inférieure au nombre de participants déjà "
+"confirmés (${claims_spots}) et au nombre de demandes en attente "
+"(${pending_requests}). Activez la liste d'attente, traitez les demandes en "
+"attente ou augmentez la limite."
+
+msgid "Yes, limit the number of attendees"
+msgstr "Oui, limiter le nombre de participants"
+
+msgid "No, allow an unlimited number of attendees"
+msgstr "Non, autoriser un nombre illimité de participants"
+
+msgid "Yes, allow for more submissions than available spots"
+msgstr "Oui, permettre plus de soumissions que de places disponibles"
+
+msgid "No, ensure that all submissions can be confirmed"
+msgstr "Non, assurez-vous que toutes les soumissions peuvent être confirmées"
+
 msgid "All directories"
 msgstr "Tous les dossiers"
 
@@ -1119,6 +1184,29 @@ msgstr "Voir l'entrée de répertoire"
 
 msgid "Reject"
 msgstr "Rejeter"
+
+msgid ""
+"This is not the oldest undecided submission of this registration window. Do "
+"you really want to confirm this submission?"
+msgstr ""
+"Ce n'est pas la plus ancienne soumission indécise de cette fenêtre "
+"d'inscription. Voulez-vous vraiment confirmer cette soumission ?"
+
+msgid ""
+"By confirming this submission, you will prefer this over a submission that "
+"came in earlier."
+msgstr ""
+"En confirmant cette soumission, vous la préférez à une soumission arrivée "
+"plus tôt."
+
+msgid "Confirm registration"
+msgstr "Confirmer l'inscription"
+
+msgid "Deny registration"
+msgstr "Refuser l'inscription"
+
+msgid "Cancel registration"
+msgstr "Annuler l'inscription"
 
 msgid "Do you really want to reject all reservations?"
 msgstr "Voulez-vous vraiment refuser toutes les réservations ?"
@@ -2099,6 +2187,18 @@ msgstr "Aucun dossier défini pour l'instant."
 msgid "Your directory submission has been adopted:"
 msgstr "Votre proposition de répertoire a été adoptée :"
 
+msgid "Your registration for \"${title}\" has been confirmed."
+msgstr "Votre inscription pour \"${title}\" a été confirmée."
+
+msgid "Your registration for \"${title}\" has been denied."
+msgstr "Votre inscription pour \"${title}\" a été refusée."
+
+msgid "Your registration for \"${title}\" has been cancelled."
+msgstr "Votre inscription pour \"${title}\" a été confirmée."
+
+msgid "Registration"
+msgstr "Inscription "
+
 msgid "Hello"
 msgstr "Bonjour"
 
@@ -2137,6 +2237,15 @@ msgstr ""
 "qu'il n'y a pas d'erreurs dans l'URL ou utilisez la fenêtre de recherche "
 "située en haut."
 
+msgid "Registration confirmed."
+msgstr "Inscription confirmée."
+
+msgid "Registration denied."
+msgstr "Inscription refusée."
+
+msgid "Registration cancelled."
+msgstr "Inscription annulée"
+
 msgid "Your ticket has received a payment."
 msgstr "Votre ticket a reçu un paiement."
 
@@ -2158,9 +2267,6 @@ msgid "Select a free time span in the calendar below to create an allocation."
 msgstr ""
 "Sélectionnez un intervalle de temps libre dans le calendrier ci-dessous pour"
 " créer une allocation."
-
-msgid "Further Information"
-msgstr "Plus d'informations"
 
 msgid "Sign up to our newsletter to always stay up to date:"
 msgstr ""
@@ -2475,6 +2581,64 @@ msgstr "${address} a bien été désinscrite"
 msgid "${address} could not be unsubscribed, wrong token"
 msgstr "${address} n'a pas pu être désinscrite, mauvaise zone de texte"
 
+msgid "Your registration has been confirmed"
+msgstr "Votre inscription a été confirmée"
+
+msgid "The registration has been confirmed"
+msgstr "L'inscription a été confirmée"
+
+msgid "The registration could not be confirmed"
+msgstr "L'inscription n'a pas pu être confirmée"
+
+msgid "Your registration has been denied"
+msgstr "Votre inscription a été refusée"
+
+msgid "The registration has been denied"
+msgstr "L'inscription a été refusée"
+
+msgid "The registration could not be denied"
+msgstr "L'inscription n'a pu être refusée"
+
+msgid "The registration has ended"
+msgstr "L'inscription est terminée"
+
+#, python-format
+msgid "The registration opens on ${day}, ${date}"
+msgstr "L'inscription ouvre le ${day}, ${date}"
+
+#, python-format
+msgid "The registration closes on ${day}, ${date}"
+msgstr "L'inscription s'achève le ${jour}, le ${date}"
+
+msgid "Your registration has been cancelled"
+msgstr "Votre inscription a été annulée"
+
+msgid "The registration has been cancelled"
+msgstr "L'inscription a été annulée"
+
+msgid "The registration could not be cancelled"
+msgstr "L'inscription n'a pu été annulée"
+
+msgid "The registration is closed"
+msgstr "L'inscription est fermée"
+
+#, python-format
+msgid "There's a limit of ${count} attendees"
+msgstr "Il y a une limite de ${count} participants"
+
+msgid "Registrations are no longer possible"
+msgstr "Les inscriptions ne sont plus possibles"
+
+msgid "There are no spots left"
+msgstr "Il n'y a plus de places"
+
+msgid "There is one spot left"
+msgstr "Il reste une place"
+
+#, python-format
+msgid "There are ${count} spots left"
+msgstr "Il reste ${count} places"
+
 msgid "Event Export"
 msgstr "Exporter un événement"
 
@@ -2512,6 +2676,40 @@ msgstr "Exporte les réservations de la période donnée."
 msgid "Successfully removed ${count} unused allocations"
 msgstr "${count} affectations inutilisées ont été supprimées avec succès"
 
+msgid "New Registration Window"
+msgstr "Nouvelle fenêtre d'inscription"
+
+msgid "Edit Registration Window"
+msgstr "Modifier la fenêtre d'inscription"
+
+msgid ""
+"Registration windows limit forms to a set number of submissions and a "
+"specific time-range."
+msgstr ""
+"Les fenêtres d'inscription limitent les formulaires à un nombre déterminé de"
+" soumissions à et une plage de temps spécifique.\n"
+
+msgid "The registration window was deleted"
+msgstr "La fenêtre d'inscription a été supprimée"
+
+msgid "The registration window was added successfully"
+msgstr "La fenêtre d'inscription a été ajoutée avec succès"
+
+msgid "Confirmed"
+msgstr "Confirmé"
+
+msgid "Cancelled"
+msgstr "Annulé"
+
+msgid "Do you really want to delete this registration window?"
+msgstr "Voulez-vous vraiment supprimer cette fenêtre d'inscription ?"
+
+msgid "Existing submissions will be disassociated."
+msgstr "Les soumissions existantes seront dissociées."
+
+msgid "Delete registration window"
+msgstr "Supprimer la fenêtre d'enregistrement"
+
 msgid "Topics A-Z"
 msgstr "Sujets de A à Z"
 
@@ -2533,6 +2731,9 @@ msgstr "Nouvelle lettre d'information"
 
 msgid "Edit Newsletter"
 msgstr "Éditer la lettre d'information"
+
+msgid "The newsletter was deleted"
+msgstr "La newsletter a été supprimée."
 
 #, python-format
 msgid ""

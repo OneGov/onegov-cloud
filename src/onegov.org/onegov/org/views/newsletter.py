@@ -237,7 +237,7 @@ def delete_page(self, request):
     request.assert_valid_csrf_token()
 
     NewsletterCollection(request.session).delete(self)
-    request.success("The newsletter was deleted")
+    request.success(_("The newsletter was deleted"))
 
 
 @OrgApp.form(model=Newsletter, template='send_newsletter.pt', name='send',

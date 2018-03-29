@@ -647,7 +647,27 @@ class FormSubmissionLayout(DefaultLayout):
             attrs={'class': 'export-link'}
         )
 
-        return [edit_link, delete_link, export_link]
+        registration_windows_link = LinkGroup(
+            title=_("Registration Windows"),
+            links=[
+                Link(
+                    text=_("Add"),
+                    url=self.request.link(
+                        self.model, 'new-registration-window'
+                    ),
+                    attrs={'class': 'new-registration-window'}
+                ),
+                *(
+                    Link(
+                        text=self.format_date_range(w.start, w.end),
+                        url=self.request.link(w),
+                        attrs={'class': 'view-link'}
+                    ) for w in self.form.registration_windows
+                )
+            ]
+        )
+
+        return [edit_link, delete_link, export_link, registration_windows_link]
 
 
 class FormCollectionLayout(DefaultLayout):
@@ -1713,6 +1733,14 @@ class PaymentCollectionLayout(DefaultLayout):
                         PaymentProviderCollection, name='sync'
                     ),
                     attrs={'class': 'sync'}
+                )
+            )
+
+            links.append(
+                Link(
+                    text=_("Export"),
+                    url=self.request.link(self.model, 'export'),
+                    attrs={'class': 'export-link'}
                 )
             )
 
