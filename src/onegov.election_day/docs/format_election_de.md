@@ -88,7 +88,7 @@ Name|Beschreibung
 
 #### Panaschierdaten
 
-Die Resultaten können Panaschierdaten enthalten, indem pro Liste eine Spalte hinzugefügt wird:
+Die Resultate können Panaschierdaten enthalten, indem pro Liste eine Spalte hinzugefügt wird:
 
 Name|Beschreibung
 ---|---
@@ -96,14 +96,14 @@ Name|Beschreibung
 
 #### Temporäre Resultate
 
-Einheitn gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedinungen zutrifft:
+Einheiten gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedinungen zutrifft:
 - `counted = false`
 - die Einheit ist nicht in den Resultaten enthalten
 
 Falls der Status
 - `interim` ist, gilt die Wahl als noch nicht abgeschlossen
 - `final` ist, gilt die Wahl als abgeschlossen
-- `unknown` ist, gilt die Wahl als abgeschlossen, falls alle (erwarteten) Einheitn ausgezählt sind
+- `unknown` ist, gilt die Wahl als abgeschlossen, falls alle (erwarteten) Einheiten ausgezählt sind
 
 #### Vorlage
 
@@ -147,7 +147,7 @@ Name|Beschreibung
 
 Das Datenformat enthält keine eindeutige Informationen dazu, ob die gesamte Wahl fertig ausgezählt ist. Diese Information muss direkt auf dem Formular für den Datenupload mitgeben werden.
 
-Das Datenformat enhält auch keine Information dazu, ob eine einzelne Einheit fertig ausgezählt ist. Falls Einheitn ganz fehlen in den Resultaten, gelten diese als noch nicht ausgezählt.
+Das Datenformat enhält auch keine Information dazu, ob eine einzelne Einheit fertig ausgezählt ist. Falls Einheiten ganz fehlen in den Resultaten, gelten diese als noch nicht ausgezählt.
 
 #### Vorlagen
 
@@ -176,7 +176,7 @@ Die Resultate können Panaschierdaten enthalten, indem pro Liste eine Spalte hin
 
 #### Spalten Datenexport der Statistik
 
-Die Datei mit den Statistiken zu den einzelnen Einheitn sollte folgende Spalten enthalten:
+Die Datei mit den Statistiken zu den einzelnen Einheiten sollte folgende Spalten enthalten:
 - `Einheit_BFS`
 - `Einheit_Name`
 - `StimBerTotal`
@@ -204,7 +204,7 @@ Name|Beschreibung
 
 Das Datenformat enthält keine eindeutige Informationen dazu, ob die gesamte Wahl fertig ausgezählt ist. Diese Information muss direkt auf dem Formular für den Datenupload mitgeben werden.
 
-Das Datenformat enhält auch keine Information dazu, ob eine einzelne Einheit fertig ausgezählt ist. Falls Einheitn ganz fehlen in den Resultaten, gelten diese als noch nicht ausgezählt.
+Das Datenformat enhält auch keine Information dazu, ob eine einzelne Einheit fertig ausgezählt ist. Falls Einheiten ganz fehlen in den Resultaten, gelten diese als noch nicht ausgezählt.
 
 #### Vorlagen
 
@@ -233,10 +233,20 @@ Name|Beschreibung
 `year`|Das Jahr der Wahl.
 `total_votes`|Die Gesamtanzahl der Stimmen der Wahl.
 `name`|Der Name der Partei.
+`id`|ID der Partei (beliebige Zahl).
 `color`|Die Farbe der Partei.
 `mandates`|Die Anzahl Mandate der Partei.
 `votes`|Die Anzahl Stimmen der Partei.
 
+Die Resultate können Panaschierdaten enthalten, indem pro Partei eine Spalte hinzugefügt wird:
+
+Name|Beschreibung
+---|---
+`panachage_votes_from_{XX}`|Die Anzahl Stimmen von der Partei mit `id = XX`. Die `id` mit dem Wert `999` steht für die Stimmen aus der Blankoliste.
+
+Panaschierdaten werden nur hinzugefügt, falls:
+- `year` entspricht dem Jahr der Wahl
+- `id (XX)` entspricht nicht `id` der Zeile
 
 #### Vorlagen
 

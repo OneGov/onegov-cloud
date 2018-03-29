@@ -235,9 +235,20 @@ Nome|Descrizione
 `year`|L’anno dell’elezione.
 `total_votes`|Il totale dei voti dell’elezione.
 `name`|Il nome del partito.
+`id`|ID of the party (any number).
 `color`|Il colore del partito.
 `mandates`|Il numero di mandati.
 `votes`|Il numero di voti.
+
+The results may contain panachage results by adding one column per party:
+
+Name|Description
+---|---
+`panachage_votes_from_{XX}`|The number of votes the party got from the party with `id = XX`. An `id` with the value `999` marks the votes from the blank list.
+
+Panachage results are only added if:
+- `year` matches the year of the election
+- `id (XX)` does not match the `id` of the row
 
 #### Modelli
 

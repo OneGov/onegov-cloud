@@ -236,9 +236,20 @@ Num|Descripziun
 `year`|L'onn da l'elecziun.
 `total_votes`|Il dumber total da vuschs da l'elecziun.
 `name`|Il num da la partida.
+`id`|ID der Partei (beliebige Zahl).
 `color`|La colur da la partida.
 `mandates`|Il dumber da sezs da la partida.
 `votes`|Il dumber da vuschs da la partida.
+
+Die Resultate können Panaschierdaten enthalten, indem pro Partei eine Spalte hinzugefügt wird:
+
+Name|Beschreibung
+---|---
+`panachage_votes_from_{XX}`|Die Anzahl Stimmen von der Partei mit `id = XX`. Die `id` mit dem Wert `999` steht für die Stimmen aus der Blankoliste.
+
+Panaschierdaten werden nur hinzugefügt, falls:
+- `year` entspricht dem Jahr der Wahl
+- `id (XX)` entspricht nicht `id` der Zeile
 
 #### Template
 
