@@ -785,7 +785,7 @@ msgid "Accounted Votes"
 msgstr "Votes comptés"
 
 msgid "Not yet counted."
-msgstr "Pas encore compté."
+msgstr "Pas encore compté"
 
 msgid "New mapping"
 msgstr "Nouvelle cartographie"
@@ -852,6 +852,9 @@ msgstr "Vide"
 
 msgid "Invalid"
 msgstr "Invalide"
+
+msgid "Blank list"
+msgstr "Liste vierge"
 
 msgid "Wrong username or password"
 msgstr "Mauvais nom d'utilisateur ou mot de passe"
@@ -957,9 +960,6 @@ msgstr ""
 
 msgid "Parties"
 msgstr "Partis"
-
-msgid "Blank list"
-msgstr "Liste vierge"
 
 msgid "Update results"
 msgstr "Mettre à jour les résultats"

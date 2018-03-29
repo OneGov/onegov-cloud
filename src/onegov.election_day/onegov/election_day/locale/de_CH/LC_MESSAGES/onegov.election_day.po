@@ -783,7 +783,7 @@ msgid "Accounted Votes"
 msgstr "Gültige Stimmen"
 
 msgid "Not yet counted."
-msgstr "Noch nicht ausgezählt."
+msgstr "Noch nicht ausgezählt"
 
 msgid "New mapping"
 msgstr "Neue Zuordnung"
@@ -850,6 +850,9 @@ msgstr "Leer"
 
 msgid "Invalid"
 msgstr "Ungültig"
+
+msgid "Blank list"
+msgstr "Blankoliste"
 
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"
@@ -953,9 +956,6 @@ msgstr ""
 
 msgid "Parties"
 msgstr "Parteien"
-
-msgid "Blank list"
-msgstr "Blankoliste"
 
 msgid "Update results"
 msgstr "Resultate aktualisieren"

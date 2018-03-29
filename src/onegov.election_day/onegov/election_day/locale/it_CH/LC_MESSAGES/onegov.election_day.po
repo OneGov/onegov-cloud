@@ -781,7 +781,7 @@ msgid "Accounted Votes"
 msgstr "Voti validi"
 
 msgid "Not yet counted."
-msgstr "Non ancora conteggiato."
+msgstr ""
 
 msgid "New mapping"
 msgstr "Nuovo mapping"
@@ -848,6 +848,9 @@ msgstr "Bianche"
 
 msgid "Invalid"
 msgstr "Nulle"
+
+msgid "Blank list"
+msgstr "Lista bianca"
 
 msgid "Wrong username or password"
 msgstr "Nome utente sconosciuto o password errata"
@@ -954,9 +957,6 @@ msgstr ""
 
 msgid "Parties"
 msgstr "Parti"
-
-msgid "Blank list"
-msgstr "Lista bianca"
 
 msgid "Update results"
 msgstr "Aggiorna risultati"
@@ -1082,3 +1082,6 @@ msgstr "Nessuna elezione secondo il sistema proporzionale"
 
 msgid "The data source is not configured properly"
 msgstr "L'origine dati non è configurata correttamente"
+
+#~ msgid "Not yet counted"
+#~ msgstr "Non ancora conteggiato."

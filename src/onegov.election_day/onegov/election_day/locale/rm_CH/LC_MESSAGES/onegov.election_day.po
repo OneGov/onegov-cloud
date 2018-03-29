@@ -829,7 +829,7 @@ msgid "New mapping"
 msgstr "Nova attribuziun"
 
 msgid "No mappings yet."
-msgstr "Anc naginas attribuziuns."
+msgstr "Anc naginas attribuziuns"
 
 msgid "Actions"
 msgstr "Acziuns"
@@ -890,6 +890,9 @@ msgstr "Vid"
 
 msgid "Invalid"
 msgstr "Nunvalaivel"
+
+msgid "Blank list"
+msgstr "Glista en blanco"
 
 msgid "Wrong username or password"
 msgstr ""
@@ -998,9 +1001,6 @@ msgstr ""
 
 msgid "Parties"
 msgstr "Partidas"
-
-msgid "Blank list"
-msgstr "Glista en blanco"
 
 msgid "Update results"
 msgstr "Actualisar ils resultats"
