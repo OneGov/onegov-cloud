@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability mark fields as shown/hidden.
+  [href]
+
 - Adds the ability to define registration windows for forms.
   [href]
 

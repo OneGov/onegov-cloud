@@ -122,6 +122,8 @@ class Form(BaseForm):
         for processor in preprocessors:
             next(processor, None)
 
+        self.hidden_fields = set()
+
     @classmethod
     def clone(cls):
         """ Creates an independent copy of the form class.
@@ -273,6 +275,22 @@ class Form(BaseForm):
             self.is_visible_through_dependencies(d['field_id'])
             for d in depends_on.dependencies
         )
+
+    def is_hidden(self, field):
+        """ True if the given field should be hidden. The effect of this is
+        left to the application (it might not render the field, or add a
+        class which hides the field).
+
+        """
+        return field.id in self.hidden_fields
+
+    def hide(self, field):
+        """ Marks the given field as hidden. """
+        self.hidden_fields.add(field.id)
+
+    def show(self, field):
+        """ Marks the given field as visibile. """
+        self.hidden_fields.discard(field.id)
 
     def prices(self):
         """ Returns the prices of all selected items depending on the
