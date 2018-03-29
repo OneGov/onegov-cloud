@@ -7,7 +7,7 @@ from onegov.core import Framework
 from onegov.core import utils
 from onegov.core.datamanager import FileDataManager
 from onegov.core.filestorage import FilestorageFile
-from onegov.core.framework import transaction_tween_factory
+from onegov.core.framework import current_language_tween_factory
 from onegov.election_day.directives import ManageFormAction
 from onegov.election_day.directives import ManageHtmlAction
 from onegov.election_day.models import Principal
@@ -145,7 +145,7 @@ def get_i18n_default_locale():
     return 'de_CH'
 
 
-@ElectionDayApp.tween_factory(over=transaction_tween_factory)
+@ElectionDayApp.tween_factory(under=current_language_tween_factory)
 def micro_cache_anonymous_pages_tween_factory(app, handler):
 
     cache_paths = (
