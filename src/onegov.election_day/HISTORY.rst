@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.4.0 (2018-03-29)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds support for parties panachage.
   [msom]
