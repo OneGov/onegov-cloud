@@ -3,6 +3,34 @@ from unittest.mock import Mock
 from webtest.forms import Upload
 
 
+PROPORZ_HEADER = (
+    'election_status,'
+    'entity_id,'
+    'entity_counted,'
+    'entity_eligible_voters,'
+    'entity_received_ballots,'
+    'entity_invalid_ballots,'
+    'entity_blank_ballots,'
+    'entity_blank_votes,'
+    'entity_invalid_votes,'
+    'list_id,'
+    'list_name,'
+    'list_connection_parent,'
+    'list_connection,'
+    'list_number_of_mandates,'
+    'list_votes,'
+    'candidate_id,'
+    'candidate_elected,'
+    'candidate_family_name,'
+    'candidate_first_name,'
+    'candidate_votes,'
+    'candidate_party,'
+    'panachage_votes_from_list_1,'
+    'panachage_votes_from_list_2'
+    '\n'
+)
+
+
 class DummyPostData(dict):
     def getlist(self, key):
         v = self[key]
@@ -183,32 +211,7 @@ def upload_proporz_election(client, create=True, canton='gr'):
         new.form['domain'] = 'federation'
         new.form.submit()
 
-    csv = (
-        'election_status,'
-        'entity_id,'
-        'entity_counted,'
-        'entity_eligible_voters,'
-        'entity_received_ballots,'
-        'entity_invalid_ballots,'
-        'entity_blank_ballots,'
-        'entity_blank_votes,'
-        'entity_invalid_votes,'
-        'list_id,'
-        'list_name,'
-        'list_connection_parent,'
-        'list_connection,'
-        'list_number_of_mandates,'
-        'list_votes,'
-        'candidate_id,'
-        'candidate_elected,'
-        'candidate_family_name,'
-        'candidate_first_name,'
-        'candidate_votes,'
-        'candidate_party,'
-        'panachage_votes_from_list_1,'
-        'panachage_votes_from_list_2'
-        '\n'
-    )
+    csv = PROPORZ_HEADER
     if canton == 'gr':
         csv += (
             'unknown,3503,True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
@@ -238,15 +241,18 @@ def upload_proporz_election(client, create=True, canton='gr'):
     return upload
 
 
-def upload_party_results(client, create=True, canton='gr'):
+def upload_party_results(client, create=True, canton='gr',
+                         slug='election/proporz-election'):
     csv_parties = (
-        "year,total_votes,id,name,color,mandates,votes\n"
-        "2015,11270,1,BDP,,1,60387\n"
-        "2015,11270,2,CVP,,1,49117\n"
-        "2015,11270,3,FDP,,0,35134\n"
+        "year,total_votes,id,name,color,mandates,votes,"
+        "panachage_votes_from_1,panachage_votes_from_2,"
+        "panachage_votes_from_3,panachage_votes_from_999\n"
+        "2015,11270,1,BDP,#efb52c,1,60387,,11,12,100\n"
+        "2015,11270,2,CVP,#ff6300,1,49117,21,,22,200\n"
+        "2015,11270,3,FDP,,0,35134,31,32,,300\n"
     ).encode('utf-8')
 
-    upload = client.get('/election/proporz-election/upload-party-results')
+    upload = client.get(f'/{slug}/upload-party-results')
     upload.form['parties'] = Upload('parties.csv', csv_parties, 'text/plain')
     upload = upload.form.submit()
 
@@ -255,7 +261,7 @@ def create_election_compound(client):
     # Add two elections
     new = client.get('/manage/elections').click('Neue Wahl')
     new.form['election_de'] = 'Regional Election A'
-    new.form['date'] = date(2016, 1, 1)
+    new.form['date'] = date(2015, 1, 1)
     new.form['election_type'] = 'proporz'
     new.form['domain'] = 'region'
     new.form['mandates'] = 10
@@ -263,7 +269,7 @@ def create_election_compound(client):
 
     new = client.get('/manage/elections').click('Neue Wahl')
     new.form['election_de'] = 'Regional Election B'
-    new.form['date'] = date(2016, 1, 1)
+    new.form['date'] = date(2015, 1, 1)
     new.form['election_type'] = 'proporz'
     new.form['domain'] = 'region'
     new.form['mandates'] = 5
@@ -272,7 +278,62 @@ def create_election_compound(client):
     # Add a compound
     new = client.get('/manage/election-compounds').click('Neue Verbindung')
     new.form['election_de'] = 'Elections'
-    new.form['date'] = date(2016, 1, 1)
+    new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'canton'
     new.form['elections'] = ['regional-election-a', 'regional-election-b']
     new.form.submit()
+
+
+def upload_election_compound(client, create=True):
+    if create:
+        # Add two elections
+        new = client.get('/manage/elections').click('Neue Wahl')
+        new.form['election_de'] = 'Regional Election A'
+        new.form['date'] = date(2016, 1, 1)
+        new.form['election_type'] = 'proporz'
+        new.form['domain'] = 'region'
+        new.form['mandates'] = 10
+        new.form.submit()
+
+        new = client.get('/manage/elections').click('Neue Wahl')
+        new.form['election_de'] = 'Regional Election B'
+        new.form['date'] = date(2016, 1, 1)
+        new.form['election_type'] = 'proporz'
+        new.form['domain'] = 'region'
+        new.form['mandates'] = 5
+        new.form.submit()
+
+        # Add a compound
+        new = client.get('/manage/election-compounds').click('Neue Verbindung')
+        new.form['election_de'] = 'Elections'
+        new.form['date'] = date(2016, 1, 1)
+        new.form['domain'] = 'canton'
+        new.form['elections'] = ['regional-election-a', 'regional-election-b']
+        new.form.submit()
+
+    for index, slug in enumerate((
+        'regional-election-a', 'regional-election-b'
+    )):
+        csv = PROPORZ_HEADER
+        if index:
+            csv += (
+                'unknown,3503,True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
+                '101,True,Hans,Sieger,0,,0,1\n'
+                'unknown,3503,True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
+                '201,False,Peter,Verlierer,2,,2,0\n'
+            )
+        else:
+            csv += (
+                'unknown,3633,True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
+                '101,False,Anna,Looser,0,,0,1\n'
+                'unknown,3633,True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
+                '201,True,Carol,Winner,2,,2,0\n'
+            )
+        csv = csv.encode('utf-8')
+
+        upload = client.get(f'/election/{slug}/upload').follow()
+        upload.form['file_format'] = 'internal'
+        upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+        upload = upload.form.submit()
+
+        assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload

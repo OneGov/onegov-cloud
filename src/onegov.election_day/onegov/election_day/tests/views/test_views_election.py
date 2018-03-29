@@ -142,8 +142,8 @@ def test_view_election_party_strengths(election_day_app_gr):
     export = client.get('/election/proporz-election/data-parties').text
     lines = export.split('\r\n')
     assert lines[0].startswith('year,name,id,total_votes,color,mandates,votes')
-    assert lines[1].startswith('2015,BDP,0,11270,#0571b0,1,60387')
-    assert lines[2].startswith('2015,CVP,1,11270,#0571b0,1,49117')
+    assert lines[1].startswith('2015,BDP,0,11270,#efb52c,1,60387')
+    assert lines[2].startswith('2015,CVP,1,11270,#ff6300,1,49117')
     assert lines[3].startswith('2015,FDP,2,11270,#0571b0,0,35134')
 
     # Historical data
@@ -293,6 +293,50 @@ def test_view_election_lists_panachage(election_day_app_gr):
 
     links = [link['value'] for link in data['links']]
     assert all((i in links for i in (1, 2, 4, 7)))
+
+
+def test_view_election_parties_panachage(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+    upload_majorz_election(client)
+
+    main = client.get('/election/majorz-election/parties-panachage')
+    assert '<h3>Panaschierstatistik (Parteien)</h3>' not in main
+
+    assert client.get(
+        '/election/majorz-election/parties-panachage-data'
+    ).json == {}
+
+    chart = client.get('/election/majorz-election/parties-panachage-chart')
+    assert chart.status_code == 200
+    assert '/election/majorz-election/parties-panachage-data' in chart
+
+    upload_proporz_election(client)
+    upload_party_results(client)
+
+    main = client.get('/election/proporz-election/parties-panachage')
+    assert '<h3>Panaschierstatistik (Parteien)</h3>' in main
+
+    data = client.get('/election/proporz-election/parties-panachage-data').json
+
+    nodes = [node['name'] for node in data['nodes']]
+    assert 'Blankoliste' in nodes
+    assert 'BDP' in nodes
+    assert 'CVP' in nodes
+    assert 'FDP' in nodes
+
+    colors = [node['color'] for node in data['nodes']]
+    assert '#efb52c' in colors
+    assert '#ff6300' in colors
+
+    links = [link['value'] for link in data['links']]
+    assert all((i in links for i in (
+        11, 12, 100, 60387 - 11 - 12 - 100,
+        21, 22, 200, 49117 - 21 - 22 - 200,
+        31, 32, 300, 35134 - 31 - 32 - 300
+    )))
 
 
 def test_view_election_json(election_day_app_gr):
