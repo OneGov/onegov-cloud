@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.33.0 (2018-03-29)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability mark fields as shown/hidden.
   [href]
