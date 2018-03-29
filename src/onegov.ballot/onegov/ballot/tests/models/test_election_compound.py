@@ -416,6 +416,12 @@ def test_election_compound_changes(session):
     assert election_compound.last_modified.isoformat().startswith('2019')
     assert election_compound.last_result_change.isoformat().startswith('2019')
 
+    with freeze_time("2020-01-01"):
+        election_compound.elections[0].shortcode = '8'
+        session.flush()
+    assert election_compound.last_modified.isoformat().startswith('2020')
+    assert election_compound.last_result_change.isoformat().startswith('2019')
+
 
 def test_election_compound_export(session):
     session.add(

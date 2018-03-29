@@ -7,6 +7,9 @@ Changelog
 - Checks the party results of an election in last_result_change.
   [msom]
 
+- Improves calculation of last changes.
+  [msom]
+
 3.4.0 (2018-03-26)
 ~~~~~~~~~~~~~~~~~~~
 

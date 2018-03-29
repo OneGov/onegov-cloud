@@ -169,6 +169,12 @@ class ElectionCompound(
         session = object_session(self)
         election_ids = [election.id for election in self.elections]
 
+        # Get the last election change
+        result = object_session(self).query(Election.last_change)
+        result = result.order_by(desc(Election.last_change))
+        result = result.filter(Election.id.in_(election_ids))
+        changes.append(result.first()[0] if result.first() else None)
+
         # Get the last candidate change
         result = object_session(self).query(Candidate.last_change)
         result = result.order_by(desc(Candidate.last_change))
