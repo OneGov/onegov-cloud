@@ -4,9 +4,6 @@ Changelog
 - Exports the parties panachage data from the blank lists.
   [msom]
 
-- Checks the party results of an election in last_result_change.
-  [msom]
-
 - Improves calculation of last changes.
   [msom]
 
