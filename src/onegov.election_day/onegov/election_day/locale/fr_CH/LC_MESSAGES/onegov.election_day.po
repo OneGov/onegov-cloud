@@ -296,7 +296,7 @@ msgid "Downloads"
 msgstr "Téléchargements"
 
 msgid "Elected candidates"
-msgstr ""
+msgstr "Candidats élus"
 
 msgid "Votes"
 msgstr "Votations"
@@ -636,7 +636,7 @@ msgid "Toggle"
 msgstr ""
 
 msgid "Columns"
-msgstr ""
+msgstr "Colonnes"
 
 msgid "Embed"
 msgstr "Intégration"
@@ -821,7 +821,7 @@ msgid "No compounds yet."
 msgstr ""
 
 msgid "Title"
-msgstr ""
+msgstr "Titre"
 
 msgid "View"
 msgstr "Voir"
@@ -1005,8 +1005,9 @@ msgid "Edit compound"
 msgstr ""
 
 #, python-format
-msgid "Do you really want to clear all results (party results) of \"${item}\"?"
+msgid "Do you really want to clear all party results of \"${item}\"?"
 msgstr ""
+"Voulez-vous vraiment effacer tous les résultats par parti de \"${item}\" ?"
 
 msgid "Delete compound"
 msgstr ""

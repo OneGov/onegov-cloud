@@ -1001,8 +1001,8 @@ msgid "Edit compound"
 msgstr "Verbindung bearbeiten"
 
 #, python-format
-msgid "Do you really want to clear all results (party results) of \"${item}\"?"
-msgstr ""
+msgid "Do you really want to clear all party results of \"${item}\"?"
+msgstr "Möchten Sie wirklich alle Parteiresultate von \"${item}\" löschen?"
 
 msgid "Delete compound"
 msgstr "Verbindung löschen"

@@ -97,8 +97,7 @@ def clear_election_compound(self, request, form):
 
     return {
         'message': _(
-            'Do you really want to clear all results (party results) '
-            'of "${item}"?',
+            'Do you really want to clear all party results of "${item}"?',
             mapping={
                 'item': self.title
             }

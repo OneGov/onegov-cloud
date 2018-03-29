@@ -296,7 +296,7 @@ msgid "Downloads"
 msgstr "Download"
 
 msgid "Elected candidates"
-msgstr ""
+msgstr "Candidati eletti"
 
 msgid "Votes"
 msgstr "Votazioni"
@@ -1002,8 +1002,8 @@ msgid "Edit compound"
 msgstr ""
 
 #, python-format
-msgid "Do you really want to clear all results (party results) of \"${item}\"?"
-msgstr ""
+msgid "Do you really want to clear all party results of \"${item}\"?"
+msgstr "Sicuro di voler eliminare tutti i risultati partito di \"${item}\"?"
 
 msgid "Delete compound"
 msgstr ""
