@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.5.1 (2018-03-30)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds payable_reference property to reservations.
   [href]
 
