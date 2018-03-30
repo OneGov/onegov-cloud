@@ -15,10 +15,12 @@ class PaymentCollection(GenericCollection, Pagination):
 
     """
 
-    def __init__(self, session, source='*', page=0):
+    def __init__(self, session, source='*', page=0, start=None, end=None):
         super().__init__(session)
         self.source = source
         self.page = page
+        self.start = start
+        self.end = end
 
     @property
     def model_class(self):
@@ -30,10 +32,22 @@ class PaymentCollection(GenericCollection, Pagination):
         return super().add(**kwargs)
 
     def __eq__(self, other):
-        return self.source == other.source and self.page == other.page
+        return all((
+            self.source == other.source,
+            self.page == other.page,
+            self.start == other.start,
+            self.end == other.end
+        ))
 
     def subset(self):
         q = self.query().order_by(desc(Payment.created))
+
+        if self.start:
+            q = q.filter(self.start <= Payment.created)
+
+        if self.end:
+            q = q.filter(Payment.created <= self.end)
+
         q = q.options(joinedload(Payment.provider))
         q = q.options(undefer(Payment.created))
         return q
