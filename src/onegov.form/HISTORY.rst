@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds payable_reference property to submissions.
+  [href]
+
 0.33.0 (2018-03-29)
 ~~~~~~~~~~~~~~~~~~~
 

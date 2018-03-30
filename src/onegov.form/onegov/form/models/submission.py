@@ -101,6 +101,13 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     )
 
     @property
+    def payable_reference(self):
+        if self.name:
+            return f'{self.name}/{self.title}@{self.received.isoformat()}'
+        else:
+            return f'{self.title}@{self.received.isoformat()}'
+
+    @property
     def form_class(self):
         """ Parses the form definition and returns a form class. """
 
