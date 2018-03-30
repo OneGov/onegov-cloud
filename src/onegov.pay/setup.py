@@ -4,7 +4,7 @@ name = 'onegov.pay'
 description = (
     'Payments for OneGov Cloud.'
 )
-version = '0.3.3'
+version = '0.3.4'
 
 
 def get_long_description():

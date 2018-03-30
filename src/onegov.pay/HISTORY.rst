@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.4 (2018-03-30)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Adds a payable reference property to all payable models.
   [href]
 
