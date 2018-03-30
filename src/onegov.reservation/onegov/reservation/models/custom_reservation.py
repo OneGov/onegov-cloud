@@ -14,6 +14,10 @@ class CustomReservation(Reservation, ModelBase, Payable):
         return object_session(self).query(Resource)\
             .filter_by(id=self.resource).one()
 
+    @property
+    def payable_reference(self):
+        return f'{self.resource.hex}/{self.email}x{self.quota}'
+
     def price(self, resource=None):
         """ Returns the price of the reservation.
 

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds payable_reference property to reservations.
+  [href]
+
 - Requires Python 3.6.
   [href]
 
