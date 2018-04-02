@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Re-enables the ability to print the attendees of single occasions.
+  [href]
+
 - Fixes bookings print button not working.
   [href]
 

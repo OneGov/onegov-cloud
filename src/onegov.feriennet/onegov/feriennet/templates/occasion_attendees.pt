@@ -15,7 +15,12 @@
 
                 <div class="occasion-attendance" tal:repeat="occasion occasions" id="${occasion.id.hex}" tal:condition="period.confirmed">
                     <div class="attendance-header">
-                        <h2><a href="${request.link(occasion.activity)}">${occasion.activity.title}</a></h2>
+                        <h2>
+                            <a href="${request.link(occasion.activity)}">${occasion.activity.title}</a>
+                            <a class="print print-icon before hide-for-print" data-print-selector="#${occasion.id.hex}" data-print-title="${title}" title="Print" i18n:attributes="title">
+                                <span class="show-for-sr" i18n:translate>Print</span>
+                            </a>
+                        </h2>
 
                         <div class="organisation show-for-print">
                             <strong>${organisation.name}</strong>

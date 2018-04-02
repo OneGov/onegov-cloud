@@ -1613,13 +1613,6 @@ ul.tags {
     margin-top: -.5rem;
 }
 
-.print-all {
-    display: block;
-    font-size: 1.1rem;
-    margin-bottom: .75rem;
-    margin-top: -.75rem;
-}
-
 .occasion-dates ul {
     font-size: 1em;
     list-style: none;
@@ -1647,6 +1640,10 @@ ul.tags {
 
         h2 {
             font-size: $h3-font-size - $h3-font-reduction;
+        }
+
+        .print-icon {
+            font-size: 1rem;
         }
 
         div {
