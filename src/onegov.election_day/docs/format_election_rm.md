@@ -94,7 +94,6 @@ Num|Descripziun
 ---|---
 `panachage_votes_from_list_{XX}`|Die Anzahl Stimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
 
-
 #### Resultats temporars
 
 Einheiten gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedinungen zutrifft:

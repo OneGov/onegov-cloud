@@ -134,9 +134,11 @@ Name|Description
 `year`|Das Jahr der Wahl.
 `total_votes`|Die Gesamtanzahl der Stimmen der Wahl.
 `name`|Der Name der Partei.
+`id`|ID der Partei.
 `color`|Die Farbe der Partei.
 `mandates`|Die Anzahl Mandate der Partei.
 `votes`|Die Anzahl Stimmen der Partei.
+`panachage_votes_from_{XX}`|Die Anzahl Stimmen von der Partei mit `id = XX`. Die `id` mit dem Wert `999` steht für die Stimmen aus der Blankoliste.
 
 3 Abstimmungsresultate
 ----------------------

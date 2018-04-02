@@ -117,7 +117,7 @@ Nome|Descrizione
 `candidate_id`|L'identificativo del candidato.
 `candidate_elected`|Vero se il candidato è stato eletto.
 `candidate_votes`|Numero di voti ricevuti da questo candidato.
-`panachage_votes_from_list_XX`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
+`panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota.
 
 I comuni non ancora contati non sono inclusi.
 
@@ -129,14 +129,16 @@ URL: /election/{id}/{data-parties}
 
 The raw data is available as CSV. The following fields are included:
 
-Name|Description
+Nome|Descrizione
 ---|---
-`year`|The year of the election.
-`total_votes`|The total votes of the election.
-`name`|The name of the party.
-`color`|The color of the party.
-`mandates`|The number of mandates.
-`votes`|The number of votes.
+`year`|L’anno dell’elezione.
+`total_votes`|Il totale dei voti dell’elezione.
+`name`|Il nome del partito.
+`id`|ID del partito.
+`color`|Il colore del partito.
+`mandates`|Il numero di mandati.
+`votes`|Il numero di voti.
+`panachage_votes_from_{XX}`|Il numero di voti che i partito ha ottenuto dal partito con `id = XX`. Un `id`con il valore `999` segna i voti dalla lista vuota.
 
 3 Risultati della votazione
 ---------------------------

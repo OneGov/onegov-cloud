@@ -133,9 +133,11 @@ Name|Description
 `year`|The year of the election.
 `total_votes`|The total votes of the election.
 `name`|The name of the party.
+`id`|ID of the party.
 `color`|The color of the party.
 `mandates`|The number of mandates.
 `votes`|The number of votes.
+`panachage_votes_from_{XX}`|The number of votes the party got from the party with `id = XX`. An `id` with the value `999` marks the votes from the blank list.
 
 3 Vote results
 --------------

@@ -92,7 +92,7 @@ I risultati possono contenere dei risultati di panachage aggiungendo una colonna
 
 Nome|Descrizione
 ---|---
-`panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con ‘list_id = XX’. Se ‘list_id’ vale ‘999’, i voti provengono dalla lista vuota.
+`panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota.
 
 #### Risultati temporanei
 
@@ -172,7 +172,7 @@ Il formato di file ha bisogno di quattro tabelle separate: l'esportazione dei da
 
 #### Risultati panachage
 
-I risultati possono contenere dei risultati di panachage aggiungendo una colonna per lista (`{List ID}.{List code}`: il numero dei voti ottenuti dalla lista proveniente dalla lista con il ‘Liste_ID’ specificato). Se ‘Liste_ID’ vale ‘99’ (’99.WoP’), i voti provengono dalla lista vuota.
+I risultati possono contenere dei risultati di panachage aggiungendo una colonna per lista (`{List ID}.{List code}`: il numero dei voti ottenuti dalla lista proveniente dalla lista con il `Liste_ID` specificato). Se `Liste_ID` vale `99` (`99.WoP`), i voti provengono dalla lista vuota.
 
 #### Colonne esportazione di dati di statistica
 

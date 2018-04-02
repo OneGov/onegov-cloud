@@ -139,7 +139,7 @@ Num|Descripziun
 `color`|Die Farbe der Partei.
 `mandates`|Die Anzahl Mandate der Partei.
 `votes`|Die Anzahl Stimmen der Partei.
-
+`panachage_votes_from_{XX}`|Die Anzahl Stimmen von der Partei mit `id = XX`. Die `id` mit dem Wert `999` steht für die Stimmen aus der Blankoliste.
 
 3 Resultats da la votaziun
 --------------------------

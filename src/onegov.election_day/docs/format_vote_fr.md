@@ -88,10 +88,10 @@ Municipalities are deemed not to have been counted yet if one of the following t
 - `counted = false`
 - the municipality is not included in the results
 
-If the status is
-- `interim`, the whole vote is considered not yet completed
-- `final`, the whole vote is considered completed
-- `unknown`, the whole vote is considered completed, if all (expected) municipalities are counted
+Si le statut est
+- `interim`, le scrutin n'a pas été terminé dans sa totalité
+- `final`, la totalité du scrutin est considérée comme terminée
+- `unknown`, the whole election is considered completed, if all (expected) municipalities are counted
 
 #### Modèle
 
@@ -132,4 +132,4 @@ Municipalities are deemed not to have been counted yet if one of the following t
 
 ### WabstiCExport
 
-Version `>= 2.2` is supported, please refer to the documentation provided by the exporter program for more information about the columns of the different files.
+La version `>= 2.2` est prise en charge, veuillez vous référer à la documentation fournie par le programme exportateur pour plus d'informations concernant les colonnes des différents fichiers.
