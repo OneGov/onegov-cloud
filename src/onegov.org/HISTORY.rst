@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.26.0 (2018-04-02)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to create registration windows for forms.
   [href]
 
