@@ -1,5 +1,3 @@
-import pytest
-
 from chameleon import PageTemplate
 from onegov.core import cache
 from onegov.core.framework import Framework
@@ -92,7 +90,7 @@ def test_cache_connections():
 
 def test_unreachable_backend_proxy():
 
-    region = cache.create_backend('ns', 'dogpile.cache.memcached', arguments={
+    region = cache.create_backend('ns', 'onegov.core.memcached', arguments={
         'url': '127.0.0.1:12345'
     })
 
@@ -108,7 +106,7 @@ def test_unreachable_backend_proxy():
 
 
 def test_cache_key():
-    region = cache.create_backend('ns', 'dogpile.cache.memcached', arguments={
+    region = cache.create_backend('ns', 'onegov.core.memcached', arguments={
         'url': '127.0.0.1:12345'
     })
 
@@ -122,39 +120,6 @@ def test_cache_page_template():
 
     region.set('template', PageTemplate('<!DOCTYPE html>'))
     region.get('template')
-
-
-@pytest.mark.xfail()
-def test_memcached_offline(memcached_url, memcached_server):
-    app = Framework()
-    app.namespace = 'towns'
-    app.set_application_id('towns/detroit')
-    app.configure_application(memcached_url=memcached_url)
-
-    app.cache.set('foobar', Bunch(foo='bar'))
-    app.cache.set('online', True)
-
-    assert app.cache.get('foobar').foo == 'bar'
-    assert app.cache.get('online')
-
-    # temporarily stop the memcached server
-    memcached_server.stop()
-
-    try:
-        assert app.cache.get('foobar') is cache.NO_VALUE
-
-        # setting a value with an offline memcached server should return
-        # the value until the server comes back online
-        app.cache.set('foobar', Bunch(foo='baz'))
-
-        assert app.cache.get('foobar').foo == 'baz'
-        assert not app.cache.get('online')
-    finally:
-        memcached_server.start()
-
-    # when the server is back up, we need to get the updated value
-    assert app.cache.get('online')
-    assert app.cache.get('foobar').foo == 'baz'
 
 
 def test_memcached(memcached_url):

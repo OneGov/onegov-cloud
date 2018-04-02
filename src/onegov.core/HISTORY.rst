@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Replaces python-memcached with libmc.
+  [href]
+
 0.66.0 (2018-03-22)
 ~~~~~~~~~~~~~~~~~~~
 

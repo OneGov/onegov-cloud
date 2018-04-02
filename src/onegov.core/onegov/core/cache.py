@@ -35,22 +35,24 @@ eventually be discarded by memcache if the cache is full).
 """
 
 import dill
-import memcache
+import libmc
 
 from fastcache import clru_cache as lru_cache  # noqa
 from dogpile.cache import make_region, register_backend
-from dogpile.cache.backends.memcached import MemcachedBackend as BaseBackend
+from dogpile.cache.backends.memcached import GenericMemcachedBackend
 from dogpile.cache.api import NO_VALUE
 from dogpile.cache.proxy import ProxyBackend
 from hashlib import sha1
-from onegov.core import log
 
 
-class MemcachedBackend(BaseBackend):
+class MemcachedBackend(GenericMemcachedBackend):
     """ A custom memcached backend used to pick custom memcached clients. """
 
     def _create_client(self):
-        return memcache.Client(self.url)
+        return libmc.Client(self.url)
+
+    def _imports(self):
+        import libmc  # noqa
 
 
 register_backend(
@@ -68,7 +70,7 @@ def create_backend(namespace, backend, arguments={}, expiration_time=None):
         backend,
         expiration_time=expiration_time,
         arguments=arguments,
-        wrap=(DillSerialized, IgnoreUnreachableBackend)
+        wrap=(DillSerialized, )
     )
 
 
@@ -109,51 +111,3 @@ class DillSerialized(ProxyBackend):
     def set_multi(self, mapping):
         mapping = {k: self.serialize(v) for k, v in mapping.items()}
         self.proxied.set_multi(mapping)
-
-
-class IgnoreUnreachableBackend(ProxyBackend):
-    """ A proxy backend that logs an error when memcached is down, but keeps
-    running, albeit without using any caching.
-
-    The idea is that a memcached outage will result in a slower/degraded
-    user experience, not in complete breakage.
-
-    """
-
-    def get(self, key):
-        try:
-            return self.proxied.get(key)
-        except TypeError:
-            log.exception("Error reading from memcached")
-            return NO_VALUE
-
-    def set(self, key, value):
-        try:
-            self.proxied.set(key, value)
-        except TypeError:
-            log.exception("Error writing to memcached")
-
-    def delete(self, key):
-        try:
-            self.proxied.delete(key)
-        except TypeError:
-            log.exception("Error deleting from memcached")
-
-    def get_multi(self, keys):
-        try:
-            return self.proxied.get_multi(keys)
-        except TypeError:
-            log.exception("Error reading from memcached")
-            return [NO_VALUE] * len(keys)
-
-    def set_multi(self, mapping):
-        try:
-            self.proxied.set_multi(mapping)
-        except TypeError:
-            log.exception("Error writing to memcached")
-
-    def delete_multi(self, keys):
-        try:
-            self.proxied.delete_multi(keys)
-        except TypeError:
-            log.exception("Error deleting from memcached")
