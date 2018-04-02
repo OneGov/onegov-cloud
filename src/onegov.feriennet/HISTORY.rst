@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.26 (2018-04-02)
+~~~~~~~~~~~~~~~~~~~
 
 - Re-enables the ability to print the attendees of single occasions.
   [href]
