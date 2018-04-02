@@ -4,7 +4,7 @@ name = 'onegov.core'
 description = (
     'Contains code shared by all OneGov applications.'
 )
-version = '0.66.0'
+version = '0.67.0'
 
 
 def get_long_description():
