@@ -29,11 +29,6 @@
         <div class="my-bookings" tal:condition="period">
             <h2>${period.title}</h2>
 
-            <a class="print print-all print-icon before hide-for-print" data-print-selector="html" data-print-title="${title}" i18n:translate>
-                Print All
-            </a>
-
-
             <div class="row">
                 <div class="columns small-12 medium-8">
                     <div class="callout panel">
