@@ -13,6 +13,7 @@ from _pytest.monkeypatch import MonkeyPatch
 from fs.tempfs import TempFS
 from functools import lru_cache
 from mirakuru import HTTPExecutor as HTTPExecutorBase
+from mirakuru import TCPExecutor
 from mirakuru.compat import HTTPConnection, HTTPException
 from onegov.core.crypto import hash_password
 from onegov.core.orm import Base, SessionManager
@@ -375,6 +376,34 @@ def smtp_server():
 def smtp(smtp_server):
     yield smtp_server
     del smtp_server.outbox[:]
+
+
+@pytest.fixture(scope="session")
+def memcached_server():
+    path = shutil.which('memcached')
+
+    if not path:
+        raise RuntimeError("Could not find memcached executable")
+
+    host = '127.0.0.1'
+    port = port_for.select_random()
+
+    executor = TCPExecutor(f'memcached -l {host} -p {port}', host, port)
+    executor.start()
+
+    yield executor
+
+    executor.stop()
+    executor.kill()
+
+
+@pytest.fixture(scope="function")
+def memcached_url(memcached_server):
+    host, port = memcached_server.host, memcached_server.port
+
+    yield f'{host}:{port}'
+
+    os.system(f"echo 'flush_all' | nc {host} {port} > /dev/null")
 
 
 @pytest.fixture(scope="session")
