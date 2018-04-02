@@ -173,8 +173,9 @@ Name|Beschreibung
 `domain`|`federation` für nationale Abstimmungen, `canton` für kantonale Abstimmungen
 `status`|Zwischenergebnisse (`interim`), Endergebnisse (`final`) oder unbekannt (`unknown`).
 `type`|`proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag) or `tie-breaker` (Stichfrage).
-`group`|Woher das Resultat kommt. Das kann der Bezirk und die Gemeinde, getrennt mittels eines Schrägstrichs, der Name der Stadt und der Name des Kreises, ebenfalls getrennt mittels eines Schrägstrichs, oder ein einfacher Gemeindename sein. All dies hängt vom jeweiligen Kanton ab.
 `entity_id`|Die ID der Gemeinde. Der Wert `0` steht für Auslandschweizer.
+`entity_name`|Der Name der Gemeinde.
+`entity_district`|Wahlkreis/Bezirk/Region der Gemeinde.
 `counted`|Wahr, wenn das Resultat ausgezählt wurde. Falsch, wenn das Resultat noch nicht bekannt ist (die Werte sind noch nicht korrekt).
 `yeas`|Die Anzahl Ja-Stimmen
 `nays`|Die Anzahl Nein-Stimmen

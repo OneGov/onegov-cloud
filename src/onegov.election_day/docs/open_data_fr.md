@@ -173,8 +173,9 @@ Nom|Description
 `domain`|`federation` pour fédéral, `canton` for les votes cantonaux.
 `status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
 `type`|`proposal` (proposition), `counter-proposal` (contre-proposition) ou `tie-breaker` (jeu décisif).
-`group`|La désignation du résultat. Peut être le district, le nom de la ville divisé par un slash, le nom de la ville et le district de la ville divisés par un slash ou simplement le nom de la ville. Cela dépend entièrement du canton.
 `entity_id`|La référence de la municipalité/localité. A value `0` represents the expats.
+`entity_name`|Le nom de la municipalité.
+`entity_district`|The district of the municipality.
 `counted`|Vrai si le résultat a été compté, faux si le résultat n'est pas encore connu (le compte des votes n'est pas encore fini).
 `yeas`|Nombre de votes oui
 `nays`|Nombre de votes non

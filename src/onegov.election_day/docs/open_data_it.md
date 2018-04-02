@@ -173,8 +173,9 @@ Nome|Descrizione
 `domain`|`federation` per votazioni federali, `canton` per votazioni cantonali.
 `status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
 `type`|`proposal` (progetto), `counter-proposal` (controprogetto) or `tie-breaker` (domanda eventuale).
-`group`|Da dove viene il risultato. Si può trattare del distretto e del comune, separati da una barra, del nome della città e del nome del circolo, anch'essi separati da una barra, o del semplice nome di un comune. Tutto ciò dipende dal rispettivo Cantone.
 `entity_id`|ID del comune/dell'ubicazione. A value `0` represents the expats.
+`entity_name`|Nome del comune.
+`entity_district`|The district of the municipality.
 `counted`|Vero, se lo spoglio è stato completato. Falso, se il risultato non è ancora noto (i valori non sono ancora corretti).
 `yeas`|Numero di voti favorevoli
 `nays`|Numero di voti contrari

@@ -176,8 +176,9 @@ Num|Descripziun
 `domain`|`federation` per votaziuns naziunalas, `canton` per votaziuns chantunalas.
 `status`|Zwischenergebnisse (`interim`), Endergebnisse (`final`) oder unbekannt (`unknown`).
 `type`|`proposal` (proposta), `counter-proposal` (cuntraproposta) or "tie-breaker" (dumonda decisiva).
-`group`|La derivanza dal resultat. Quai po esser il district e la vischnanca, separads cun in stritg diagonal, il num da la citad ed il num dal circul, er separads cun in stritg diagonal, u simplamain il num da la vischnanca. Quai dependa dal chantun respectiv.
 `entity_id`|La ID da la vischnanca/dal lieu. A value `0` represents the expats.
+`entity_name`|Il num da la vischnanca/dal lieu.
+`entity_district`|Wahlkreis/Bezirk/Region der Gemeinde.
 `counted`|Gist, sch'il resultat è vegnì eruì. Fauss, sch'il resultat n'è anc betg enconuschent (las valurs n'èn anc betg correctas).
 `yeas`|Il dumber da las vuschs affirmativas
 `nays`|Il dumber da las vuschs negativas
