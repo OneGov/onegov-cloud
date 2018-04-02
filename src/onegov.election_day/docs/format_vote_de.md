@@ -44,9 +44,7 @@ Pro Abstimmungsvorlage besteht in der Regel eine CSV/Excel Datei. Beinhaltet die
 
 #### Spalten
 
-Jede Zeile enthält das Resultat einer einzelnen Gemeinde, sofern diese
-vollständig ausgezählt wurde. Folgende Spalten werden dabei in der hier
-aufgelisteten Reihenfolge erwartet:
+Jede Zeile enthält das Resultat einer einzelnen Gemeinde, sofern diese vollständig ausgezählt wurde. Folgende Spalten werden dabei in der hier aufgelisteten Reihenfolge erwartet:
 
 Name|Beschreibung
 ---|---
@@ -66,7 +64,6 @@ Gemeinden gelten als noch nicht ausgezählt, falls die Gemeinde nicht in den Res
 - [vote_standard.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/vote_standard.csv)
 
 ### OneGov
-
 
 Das Format, welche von der Web-Applikation für den Export verwendet wird, besteht aus einer einzelnen Datei pro Abstimmung. Es gibt für jede Gemeinde und Abstimmungstyp (Vorschlag, Gegenvorschlag, Stichfrage) eine Zeile.
 
@@ -89,7 +86,7 @@ Name|Beschreibung
 
 #### Temporäre Resultate
 
-Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedinungen zutrifft:
+Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedingungen zutrifft:
 - `counted = false`
 - die Gemeinde ist nicht in den Resultaten enthalten
 
@@ -110,26 +107,23 @@ Das Format des Wahlprogrammen "Wabsti Wahlen und Abstimmungen (VRSG)" besteht au
 #### Spalten
 
 Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
-
-Name|Beschreibung
----|---
-`Vorlage-Nr.`|Eine fortlaufende Nummer für jede Vorlage/Abstimmung. Muss beim Upload Dialog angegeben werden.
-`Name`|Der Name der Gemeinde
-`BfS-Nr.`|Die BFS-Nummer der Gemeinde. Es kann jeder beliebige Werte für Auslandschweizer verwendet werden, falls `Name = Auslandschweizer`.
-`Stimmberechtigte`|Die Anzahl Stimmberechtigter.
-`leere SZ`|Die Anzahl leer eingelegter Stimmzettel.
-`ungültige SZ`|Die Anzahl ungültiger Stimmzettel.
-`Ja`|Die Anzahl Ja Stimmen.
-`Nein`|Die Anzahl Nein Stimmen.
-`GegenvJa`|Die Anzahl Ja Stimmen zum Gegenvorschlag.
-`GegenvNein`| Die Anzahl Nein Stimmen zum Gegenvorschlag.
-`StichfrJa`|Die Anzahl Ja Stimmen zur Stichfrage.
-`StichfrNein`|Die Anzahl Nein Stimmen zur Stichfrage.
-`StimmBet`|Die Stimmbeteilgung in Prozent. Wird verwendet, um zu entscheiden, ob die Gemeinde bereits ausgezählt wurde. Ist die Stimmbeteilgung `0`, wird die Zeile ignoriert (noch nicht ausgezählt).
+- `Vorlage-Nr.`
+- `Name`
+- `BfS-Nr.`
+- `Stimmberechtigte`
+- `leere SZ`
+- `ungültige SZ`
+- `Ja`
+- `Nein`
+- `GegenvJa`
+- `GegenvNein`
+- `StichfrJa`
+- `StichfrNein`
+- `StimmBet`
 
 #### Temporäre Resultate
 
-Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedinungen zutrifft:
+Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedingungen zutrifft:
 - `StimmBet = 0`
 - die Gemeinde ist nicht in den Resultaten enthalten
 
@@ -140,4 +134,4 @@ Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bed
 
 ### WabstiCExport
 
-Es wird die Version `>= 2.2` unterstützt. Die verschiedenen Spalten der verschiedenen Dateien sind in der Dokumenation des Exporter-Programms definiert.
+Es wird die Version `>= 2.2` unterstützt. Die verschiedenen Spalten der verschiedenen Dateien sind in der Dokumentation des Exporter-Programms definiert.

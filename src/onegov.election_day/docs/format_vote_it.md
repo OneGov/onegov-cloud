@@ -106,22 +106,19 @@ The format of the "Wabsti Elections and Referenda (VRSG)" election program consi
 #### Colonne
 
 Saranno prese in considerazione le seguenti colonne e devono essere presenti:
-
-Nome|Descrizione
----|---
-`Vorlage-Nr.`|A sequential number for each proposal/referendum. Must be specified at the upload dialog.
-`Name`|The name of the municipality
-`BfS-Nr.`|The municipality number (BFS number). If `name = Auslandschweizer`, any value can be used for exapts.
-`Stimmberechtigte`|The number of persons eligible to vote.
-`leere SZ`|The number of blank ballot papers.
-`ungültige SZ`|The number of spoilt ballot papers.
-`Ja`|The number of “yes” votes.
-`Nein`|The number of “no” votes.
-`GegenvJa`|The number who voted “yes” to the counter-proposal.
-`GegenvNein`|The number who voted “no” to the counter-proposal.
-`StichfrJa`|The number who voted “yes” to the tie-breaker.
-`StichfrNein`|The number who voted “no” to the tie-breaker.
-`StimmBet`|The turnout as a percentage. Is used to decide whether the municipality has already been counted. If the turnout is `0`, the line is ignored (not yet counted).
+- `Vorlage-Nr.`
+- `Name`
+- `BfS-Nr.`
+- `Stimmberechtigte`
+- `leere SZ`
+- `ungültige SZ`
+- `Ja`
+- `Nein`
+- `GegenvJa`
+- `GegenvNein`
+- `StichfrJa`
+- `StichfrNein`
+- `StimmBet`
 
 #### Risultati temporanei
 

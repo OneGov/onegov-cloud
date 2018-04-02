@@ -92,19 +92,19 @@ Ils resultats pon cuntegnair datas panaschadas, tras quai ch'i vegn agiuntada in
 
 Num|Descripziun
 ---|---
-`panachage_votes_from_list_{XX}`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
+`panachage_votes_from_list_{XX}`|Die Anzahl Stimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
 
 
 #### Resultats temporars
 
-Municipalities are deemed not to have been counted yet if one of the following two conditions apply:
+Einheiten gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedinungen zutrifft:
 - `counted = false`
-- the municipality is not included in the results
+- die Einheit ist nicht in den Resultaten enthalten
 
 Sch'il status è
 - `interim`, vala la votaziun sco betg anc terminada
 - `final`, vala la votaziun sco terminada
-- `unknown`, the whole election is considered completed, if all (expected) municipalities are counted
+- `unknown`, gilt die Wahl als abgeschlossen, falls alle (erwarteten) Einheiten ausgezählt sind
 
 #### Project
 
@@ -243,7 +243,7 @@ Num|Descripziun
 
 Die Resultate können Panaschierdaten enthalten, indem pro Partei eine Spalte hinzugefügt wird:
 
-Name|Beschreibung
+Num|Descripziun
 ---|---
 `panachage_votes_from_{XX}`|Die Anzahl Stimmen von der Partei mit `id = XX`. Die `id` mit dem Wert `999` steht für die Stimmen aus der Blankoliste.
 
@@ -251,6 +251,6 @@ Panaschierdaten werden nur hinzugefügt, falls:
 - `year` entspricht dem Jahr der Wahl
 - `id (XX)` entspricht nicht `id` der Zeile
 
-#### Template
+#### Projects
 
 - [election_party_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_party_results.csv)

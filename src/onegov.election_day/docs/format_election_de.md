@@ -96,7 +96,7 @@ Name|Beschreibung
 
 #### Temporäre Resultate
 
-Einheiten gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedinungen zutrifft:
+Einheiten gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedingungen zutrifft:
 - `counted = false`
 - die Einheit ist nicht in den Resultaten enthalten
 
@@ -147,7 +147,7 @@ Name|Beschreibung
 
 Das Datenformat enthält keine eindeutige Informationen dazu, ob die gesamte Wahl fertig ausgezählt ist. Diese Information muss direkt auf dem Formular für den Datenupload mitgeben werden.
 
-Das Datenformat enhält auch keine Information dazu, ob eine einzelne Einheit fertig ausgezählt ist. Falls Einheiten ganz fehlen in den Resultaten, gelten diese als noch nicht ausgezählt.
+Das Datenformat enthält auch keine Information dazu, ob eine einzelne Einheit fertig ausgezählt ist. Falls Einheiten ganz fehlen in den Resultaten, gelten diese als noch nicht ausgezählt.
 
 #### Vorlagen
 
@@ -204,7 +204,7 @@ Name|Beschreibung
 
 Das Datenformat enthält keine eindeutige Informationen dazu, ob die gesamte Wahl fertig ausgezählt ist. Diese Information muss direkt auf dem Formular für den Datenupload mitgeben werden.
 
-Das Datenformat enhält auch keine Information dazu, ob eine einzelne Einheit fertig ausgezählt ist. Falls Einheiten ganz fehlen in den Resultaten, gelten diese als noch nicht ausgezählt.
+Das Datenformat enthält auch keine Information dazu, ob eine einzelne Einheit fertig ausgezählt ist. Falls Einheiten ganz fehlen in den Resultaten, gelten diese als noch nicht ausgezählt.
 
 #### Vorlagen
 
