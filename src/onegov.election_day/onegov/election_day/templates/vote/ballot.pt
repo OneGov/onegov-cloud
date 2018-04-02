@@ -64,7 +64,7 @@
                         <tal:block condition="not: result.counted">
                             <td>${layout.format_name(result)}</td>
                             <td tal:condition="layout.principal.has_districts">${result.district}</td>
-                            <td class="answer" colspan="7" i18n:translate="">Not yet counted.</td>
+                            <td class="answer" colspan="7" i18n:translate="">Not yet counted</td>
                         </tal:block>
                         <tal:block condition="result.counted">
                             <td>${layout.format_name(result)}</td>
@@ -84,7 +84,7 @@
                     <tr class="total">
                         <td i18n:translate="">Total</td>
                         <td tal:condition="layout.principal.has_districts"></td>
-                        <td class="answer" tal:condition="not:layout.completed" i18n:translate="">Not yet counted.</td>
+                        <td class="answer" tal:condition="not:layout.completed" i18n:translate="">Not yet counted</td>
                         <td class="answer accepted" tal:condition="layout.completed and ballot.accepted" i18n:translate="">Accepted</td>
                         <td class="answer rejected" tal:condition="layout.completed and not ballot.accepted" i18n:translate="">Rejected</td>
                         <td class="right-aligned">${layout.format_number(ballot.yeas)}</td>

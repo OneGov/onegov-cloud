@@ -235,20 +235,20 @@ Nome|Descrizione
 `year`|L’anno dell’elezione.
 `total_votes`|Il totale dei voti dell’elezione.
 `name`|Il nome del partito.
-`id`|ID of the party (any number).
+`id`|ID del partito (qualsiasi numero).
 `color`|Il colore del partito.
 `mandates`|Il numero di mandati.
 `votes`|Il numero di voti.
 
-The results may contain panachage results by adding one column per party:
+I risultati potrebbero contenere risultati misti aggiungendo una colonna per partito:
 
 Name|Description
 ---|---
-`panachage_votes_from_{XX}`|The number of votes the party got from the party with `id = XX`. An `id` with the value `999` marks the votes from the blank list.
+`panachage_votes_from_{XX}`|Il numero di voti che i partito ha ottenuto dal partito con `id = XX`. Un `id`con il valore `999` segna i voti dalla lista vuota.
 
-Panachage results are only added if:
-- `year` matches the year of the election
-- `id (XX)` does not match the `id` of the row
+Risultati misti sono aggiunti solo se:
+- `year` corrisponde all'anno dell'elezione
+- `id (XX)` non corrisponde il `id`della fila
 
 #### Modelli
 

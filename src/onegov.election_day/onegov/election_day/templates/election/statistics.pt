@@ -41,7 +41,7 @@
                         <tal:block condition="not: result.counted">
                             <td>${layout.format_name(result)}</td>
                             <td tal:condition="layout.principal.has_districts">${result.district}</td>
-                            <td class="answer" colspan="7" i18n:translate="">Not yet counted.</td>
+                            <td class="answer" colspan="7" i18n:translate="">Not yet counted</td>
                         </tal:block>
                         <tal:block condition="result.counted">
                             <td>${layout.format_name(result)}</td>

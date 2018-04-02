@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-02-09 15:02+0100\n"
-"PO-Revision-Date: 2018-01-15 14:49+0100\n"
+"POT-Creation-Date: 2018-04-02 09:13+0200\n"
+"PO-Revision-Date: 2018-04-02 09:13+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 2.0.5\n"
+"X-Generator: Poedit 2.0.6\n"
 
 msgid "Last change"
 msgstr "Actualisé"
@@ -212,7 +212,7 @@ msgid "Cantonal"
 msgstr "Cantonal"
 
 msgid "Select either majorz or proporz elections."
-msgstr ""
+msgstr "Sélectionnez les élections majeures ou proportionnelles."
 
 msgid "Notifications"
 msgstr "Notifications"
@@ -302,7 +302,7 @@ msgid "Votes"
 msgstr "Votations"
 
 msgid "Compounds of elections"
-msgstr ""
+msgstr "Composantes des élections"
 
 msgid "Manage"
 msgstr "Gérer"
@@ -630,10 +630,10 @@ msgid "Line"
 msgstr "Ligne"
 
 msgid "Stack"
-msgstr ""
+msgstr "Pile"
 
 msgid "Toggle"
-msgstr ""
+msgstr "Levier"
 
 msgid "Columns"
 msgstr "Colonnes"
@@ -784,7 +784,7 @@ msgstr "Bulletins de vote non valides"
 msgid "Accounted Votes"
 msgstr "Votes comptés"
 
-msgid "Not yet counted."
+msgid "Not yet counted"
 msgstr "Pas encore compté"
 
 msgid "New mapping"
@@ -815,10 +815,10 @@ msgid "Regenerate token"
 msgstr "Renouveler le token"
 
 msgid "New compound"
-msgstr ""
+msgstr "Nouvelle composante"
 
 msgid "No compounds yet."
-msgstr ""
+msgstr "Aucune composante pour le moment."
 
 msgid "Title"
 msgstr "Titre"
@@ -1002,7 +1002,7 @@ msgid "Mapping deleted."
 msgstr "Cartographie supprimée."
 
 msgid "Edit compound"
-msgstr ""
+msgstr "Modifiez la composante"
 
 #, python-format
 msgid "Do you really want to clear all party results of \"${item}\"?"
@@ -1010,19 +1010,19 @@ msgstr ""
 "Voulez-vous vraiment effacer tous les résultats par parti de \"${item}\" ?"
 
 msgid "Delete compound"
-msgstr ""
+msgstr "Supprimez la composante"
 
 msgid "Compound added."
-msgstr ""
+msgstr "Composante ajoutée."
 
 msgid "Compound modified."
-msgstr ""
+msgstr "Composante modifiée."
 
 msgid "Results deleted."
 msgstr "Résultats supprimés."
 
 msgid "Compound deleted."
-msgstr ""
+msgstr "Composante supprimée."
 
 msgid "Edit election"
 msgstr "Modifier l’élection"

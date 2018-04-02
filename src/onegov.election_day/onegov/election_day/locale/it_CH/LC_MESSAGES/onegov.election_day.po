@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-02-09 15:02+0100\n"
-"PO-Revision-Date: 2018-01-15 14:50+0100\n"
+"POT-Creation-Date: 2018-04-02 09:13+0200\n"
+"PO-Revision-Date: 2018-04-02 09:13+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 2.0.5\n"
+"X-Generator: Poedit 2.0.6\n"
 
 msgid "Last change"
 msgstr "Aggiornato"
@@ -212,7 +212,7 @@ msgid "Cantonal"
 msgstr "Cantonale"
 
 msgid "Select either majorz or proporz elections."
-msgstr ""
+msgstr "Seleziona o elezioni maggioritarie o proporzionali."
 
 msgid "Notifications"
 msgstr "Notifiche"
@@ -302,7 +302,7 @@ msgid "Votes"
 msgstr "Votazioni"
 
 msgid "Compounds of elections"
-msgstr ""
+msgstr "Componenti delle elezioni"
 
 msgid "Manage"
 msgstr "Amministrare"
@@ -628,13 +628,13 @@ msgid "Line"
 msgstr "Riga"
 
 msgid "Stack"
-msgstr ""
+msgstr "Catasta"
 
 msgid "Toggle"
-msgstr ""
+msgstr "Attivato"
 
 msgid "Columns"
-msgstr ""
+msgstr "Colonne"
 
 msgid "Embed"
 msgstr "Incorporare"
@@ -780,8 +780,8 @@ msgstr "Schede nulle"
 msgid "Accounted Votes"
 msgstr "Voti validi"
 
-msgid "Not yet counted."
-msgstr ""
+msgid "Not yet counted"
+msgstr "Non ancora conteggiato"
 
 msgid "New mapping"
 msgstr "Nuovo mapping"
@@ -811,13 +811,13 @@ msgid "Regenerate token"
 msgstr "Rigenera token"
 
 msgid "New compound"
-msgstr ""
+msgstr "Nuovo componente"
 
 msgid "No compounds yet."
-msgstr ""
+msgstr "Ancora nessun componente."
 
 msgid "Title"
-msgstr ""
+msgstr "Titolo"
 
 msgid "View"
 msgstr "Mostrare"
@@ -999,26 +999,26 @@ msgid "Mapping deleted."
 msgstr "Mappatura eliminata."
 
 msgid "Edit compound"
-msgstr ""
+msgstr "Modifica componente"
 
 #, python-format
 msgid "Do you really want to clear all party results of \"${item}\"?"
 msgstr "Sicuro di voler eliminare tutti i risultati partito di \"${item}\"?"
 
 msgid "Delete compound"
-msgstr ""
+msgstr "Elimina componente"
 
 msgid "Compound added."
-msgstr ""
+msgstr "Componente aggiunto."
 
 msgid "Compound modified."
-msgstr ""
+msgstr "Componente modificato."
 
 msgid "Results deleted."
 msgstr "Risultati eliminata."
 
 msgid "Compound deleted."
-msgstr ""
+msgstr "Componente eliminato."
 
 msgid "Edit election"
 msgstr "Modifica elezione"
@@ -1082,6 +1082,3 @@ msgstr "Nessuna elezione secondo il sistema proporzionale"
 
 msgid "The data source is not configured properly"
 msgstr "L'origine dati non è configurata correttamente"
-
-#~ msgid "Not yet counted"
-#~ msgstr "Non ancora conteggiato."
