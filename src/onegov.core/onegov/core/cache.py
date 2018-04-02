@@ -40,7 +40,6 @@ import memcache
 from fastcache import clru_cache as lru_cache  # noqa
 from dogpile.cache import make_region, register_backend
 from dogpile.cache.backends.memcached import MemcachedBackend as BaseBackend
-from dogpile.cache.backends.memory import MemoryBackend as BaseMemoryBackend
 from dogpile.cache.api import NO_VALUE
 from dogpile.cache.proxy import ProxyBackend
 from hashlib import sha1
@@ -48,18 +47,10 @@ from onegov.core import log
 
 
 class MemcachedBackend(BaseBackend):
-    """ A custom memcached backend with the following improvements:
-
-    * Uses dill instead of pickle, allowing for a wider range of cached objs.
-
-    """
+    """ A custom memcached backend used to pick custom memcached clients. """
 
     def _create_client(self):
-        return memcache.Client(
-            self.url,
-            pickler=DillPickler,
-            unpickler=DillPickler
-        )
+        return memcache.Client(self.url)
 
 
 register_backend(
@@ -68,60 +59,17 @@ register_backend(
     'MemcachedBackend'
 )
 
-dill.settings['recurse'] = True
 
+def create_backend(namespace, backend, arguments={}, expiration_time=None):
 
-class DillPickler(object):
-    """ A python-memcached pickler that uses dill instead of the builtin
-    pickle module.
+    prefix = '{}:'.format(namespace)
 
-    Dill is an alternative implementation that supports a wider variety
-    of objects which it can pickle.
-
-    """
-
-    def __init__(self, file, protocol=None):
-        self.file = file
-
-    def dump(self, value):
-        return dill.dump(value, self.file)
-
-    def load(self):
-        return dill.load(self.file)
-
-
-class MemoryBackend(BaseMemoryBackend):
-    """ A custom memory backend that uses dill to pickle values into a
-    dictionary. This has the added benefit of using the same codepath as the
-    memcached based backend, without actually requiring a memcached server.
-
-    """
-
-    def get(self, key):
-        value = self._cache.get(key, NO_VALUE)
-        return value if value is NO_VALUE else dill.loads(value)
-
-    def get_multi(self, keys):
-        ret = (self._cache.get(key, NO_VALUE) for key in keys)
-        return [
-            value if value is NO_VALUE else dill.loads(value)
-            for value in ret
-        ]
-
-    def set(self, key, value):
-        self._cache[key] = dill.dumps(value)
-
-    def set_multi(self, mapping):
-        for key, value in mapping.items():
-            value = dill.dumps(value)
-            self._cache[key] = value
-
-
-register_backend(
-    'onegov.core.memory',
-    'onegov.core.cache',
-    'MemoryBackend'
-)
+    return make_region(key_mangler=prefix_key_mangler(prefix)).configure(
+        backend,
+        expiration_time=expiration_time,
+        arguments=arguments,
+        wrap=(DillSerialized, IgnoreUnreachableBackend)
+    )
 
 
 def prefix_key_mangler(prefix):
@@ -134,16 +82,33 @@ def prefix_key_mangler(prefix):
     return key_mangler
 
 
-def create_backend(namespace, backend, arguments={}, expiration_time=None):
+class DillSerialized(ProxyBackend):
+    """ A proxy backend that pickles all non-byte values using dill. """
 
-    prefix = '{}:'.format(namespace)
+    def serialize(self, value):
+        if isinstance(value, bytes):
+            return value
 
-    return make_region(key_mangler=prefix_key_mangler(prefix)).configure(
-        backend,
-        expiration_time=expiration_time,
-        arguments=arguments,
-        wrap=[IgnoreUnreachableBackend]
-    )
+        return dill.dumps(value, recurse=True)
+
+    def deserialize(self, value):
+        if value is NO_VALUE:
+            return value
+
+        return dill.loads(value)
+
+    def get(self, key):
+        return self.deserialize(self.proxied.get(key))
+
+    def set(self, key, value):
+        return self.proxied.set(key, self.serialize(value))
+
+    def get_multi(self, keys):
+        return [self.deserialize(v) for v in self.proxied.get_multi(keys)]
+
+    def set_multi(self, mapping):
+        mapping = {k: self.serialize(v) for k, v in mapping.items()}
+        self.proxied.set_multi(mapping)
 
 
 class IgnoreUnreachableBackend(ProxyBackend):

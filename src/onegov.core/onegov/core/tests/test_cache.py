@@ -1,10 +1,23 @@
+import pytest
+
 from chameleon import PageTemplate
 from onegov.core import cache
 from onegov.core.framework import Framework
+from onegov.core.utils import Bunch
 from webtest import TestApp as Client
 
 
 CALL_COUNT = 0
+
+
+# cannot be pickled by the builtin pickler
+class Point(object):
+
+    __slots__ = ('x', 'y')
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
 
 def test_cache_connections():
@@ -109,3 +122,70 @@ def test_cache_page_template():
 
     region.set('template', PageTemplate('<!DOCTYPE html>'))
     region.get('template')
+
+
+@pytest.mark.xfail()
+def test_memcached_offline(memcached_url, memcached_server):
+    app = Framework()
+    app.namespace = 'towns'
+    app.set_application_id('towns/detroit')
+    app.configure_application(memcached_url=memcached_url)
+
+    app.cache.set('foobar', Bunch(foo='bar'))
+    app.cache.set('online', True)
+
+    assert app.cache.get('foobar').foo == 'bar'
+    assert app.cache.get('online')
+
+    # temporarily stop the memcached server
+    memcached_server.stop()
+
+    try:
+        assert app.cache.get('foobar') is cache.NO_VALUE
+
+        # setting a value with an offline memcached server should return
+        # the value until the server comes back online
+        app.cache.set('foobar', Bunch(foo='baz'))
+
+        assert app.cache.get('foobar').foo == 'baz'
+        assert not app.cache.get('online')
+    finally:
+        memcached_server.start()
+
+    # when the server is back up, we need to get the updated value
+    assert app.cache.get('online')
+    assert app.cache.get('foobar').foo == 'baz'
+
+
+def test_memcached(memcached_url):
+    app = Framework()
+    app.namespace = 'towns'
+    app.set_application_id('towns/detroit')
+    app.configure_application(memcached_url=memcached_url)
+    app.cache.set('foobar', Bunch(foo='bar'))
+
+    assert app.cache.get('foobar').foo == 'bar'
+
+
+def test_store_slots_memory():
+    # the following fails without the usage of an advanced pickler
+    app = Framework()
+    app.namespace = 'towns'
+    app.set_application_id('towns/washington')
+
+    app.configure_application(disable_memcached=True)
+    app.cache.set('point', Point(0, 0))
+    assert app.cache.get('point').x == 0
+    assert app.cache.get('point').y == 0
+
+
+def test_store_slots_memcached(memcached_url):
+    # the following fails without the usage of an advanced pickler
+    app = Framework()
+    app.namespace = 'towns'
+    app.set_application_id('towns/washington')
+
+    app.configure_application(memcached_url=memcached_url)
+    app.cache.set('point', Point(0, 0))
+    assert app.cache.get('point').x == 0
+    assert app.cache.get('point').y == 0
