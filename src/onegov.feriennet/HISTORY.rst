@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes bookings print button not working.
+  [href]
+
 1.3.25 (2018-03-23)
 ~~~~~~~~~~~~~~~~~~~
 

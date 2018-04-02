@@ -1,5 +1,5 @@
 /*
- * printThis v1.9.0
+ * printThis v1.12.3
  * @desc Printing plug-in for jQuery
  * @author Jason Day
  *
@@ -16,20 +16,22 @@
  * Usage:
  *
  *  $("#mySelector").printThis({
- *      debug: false,               * show the iframe for debugging
- *      importCSS: true,            * import page CSS
- *      importStyle: false,         * import style tags
- *      printContainer: true,       * grab outer container as well as the contents of the selector
- *      loadCSS: "path/to/my.css",  * path to additional css file - us an array [] for multiple
- *      pageTitle: "",              * add title to print page
- *      removeInline: false,        * remove all inline styles from print elements
- *      printDelay: 333,            * variable print delay
- *      header: null,               * prefix to html
- *      footer: null,               * postfix to html
- *      base: false,                * preserve the BASE tag, or accept a string for the URL
- *      formValues: true            * preserve input/form values
- *      canvas: false               * copy canvas elements (experimental)
- *      doctypeString: '...'        * enter a different doctype for older markup
+ *      debug: false,               // show the iframe for debugging
+ *      importCSS: true,            // import page CSS
+ *      importStyle: false,         // import style tags
+ *      printContainer: true,       // grab outer container as well as the contents of the selector
+ *      loadCSS: "path/to/my.css",  // path to additional css file - us an array [] for multiple
+ *      pageTitle: "",              // add title to print page
+ *      removeInline: false,        // remove all inline styles from print elements
+ *      printDelay: 333,            // variable print delay
+ *      header: null,               // prefix to html
+ *      footer: null,               // postfix to html
+ *      base: false,                // preserve the BASE tag, or accept a string for the URL
+ *      formValues: true,           // preserve input/form values
+ *      canvas: false,              // copy canvas elements (experimental)
+ *      doctypeString: '...',       // enter a different doctype for older markup
+ *      removeScripts: false,       // remove script tags from print content
+ *      copyTagClasses: false       // copy classes from the html & body tag
  *  });
  *
  * Notes:
@@ -37,6 +39,49 @@
  */
 ;
 (function($) {
+
+    function appendContent($el, content) {
+        if (!content) return;
+
+        // Simple test for a jQuery element
+        $el.append(content.jquery ? content.clone() : content);
+    }
+
+    function appendBody($body, $element, opt) {
+        // Clone for safety and convenience
+        // Calls clone(withDataAndEvents = true) to copy form values.
+        var $content = $element.clone(opt.formValues);
+
+        if (opt.formValues) {
+            // Copy original select and textarea values to their cloned counterpart
+            // Makes up for inability to clone select and textarea values with clone(true)
+            copyValues($element, $content, 'select, textarea');
+        }
+
+        if (opt.removeScripts) {
+            $content.find('script').remove();
+        }
+
+        if (opt.printContainer) {
+            // grab $.selector as container
+            $content.appendTo($body);
+        } else {
+            // otherwise just print interior elements of container
+            $content.each(function() {
+                $(this).children().appendTo($body)
+            });
+        }
+    }
+
+    // Copies values from origin to clone for passed in elementSelector
+    function copyValues(origin, clone, elementSelector) {
+        var $originalElements = origin.find(elementSelector);
+
+        clone.find(elementSelector).each(function(index, item) {
+            $(item).val($originalElements.eq(index).val());
+        });
+    }
+
     var opt;
     $.fn.printThis = function(options) {
         opt = $.extend({}, $.fn.printThis.defaults, options);
@@ -61,7 +106,6 @@
             $frame.appendTo("body");
         }
 
-
         var $iframe = $("#" + strFrameName);
 
         // show frame if in debug mode
@@ -73,11 +117,11 @@
             top: "-600px"
         });
 
-        // $iframe.ready() and $iframe.load were inconsistent between browsers    
+        // $iframe.ready() and $iframe.load were inconsistent between browsers
         setTimeout(function() {
 
             // Add doctype to fix the style difference between printing and render
-            function setDocType($iframe,doctype){
+            function setDocType($iframe, doctype){
                 var win, doc;
                 win = $iframe.get(0);
                 win = win.contentWindow || win.contentDocument || win;
@@ -86,8 +130,9 @@
                 doc.write(doctype);
                 doc.close();
             }
-            if(opt.doctypeString){
-                setDocType($iframe,opt.doctypeString);
+
+            if (opt.doctypeString){
+                setDocType($iframe, opt.doctypeString);
             }
 
             var $doc = $iframe.contents(),
@@ -118,10 +163,10 @@
                     $head.append("<link type='text/css' rel='stylesheet' href='" + href + "' media='" + media + "'>");
                 }
             });
-            
+
             // import style tags
             if (opt.importStyle) $("style").each(function() {
-                $(this).clone().appendTo($head);
+                $head.append(this.outerHTML);
             });
 
             // add title of the page
@@ -129,33 +174,40 @@
 
             // import additional stylesheet(s)
             if (opt.loadCSS) {
-               if( $.isArray(opt.loadCSS)) {
+                if ($.isArray(opt.loadCSS)) {
                     jQuery.each(opt.loadCSS, function(index, value) {
-                       $head.append("<link type='text/css' rel='stylesheet' href='" + this + "'>");
+                        $head.append("<link type='text/css' rel='stylesheet' href='" + this + "'>");
                     });
                 } else {
                     $head.append("<link type='text/css' rel='stylesheet' href='" + opt.loadCSS + "'>");
                 }
             }
 
+            // copy 'root' tag classes
+            var tag = opt.copyTagClasses;
+            if (tag) {
+                tag = tag === true ? 'bh' : tag;
+                if (tag.indexOf('b') !== -1) {
+                    $body.addClass($('body')[0].className);
+                }
+                if (tag.indexOf('h') !== -1) {
+                    $doc.find('html').addClass($('html')[0].className);
+                }
+            }
+
             // print header
-            if (opt.header) $body.append(opt.header);
+            appendContent($body, opt.header);
 
             if (opt.canvas) {
-                // add canvas data-ids for easy access after the cloning.
+                // add canvas data-ids for easy access after cloning.
                 var canvasId = 0;
-                $element.find('canvas').each(function(){
+                // .addBack('canvas') adds the top-level element if it is a canvas.
+                $element.find('canvas').addBack('canvas').each(function(){
                     $(this).attr('data-printthis', canvasId++);
                 });
             }
 
-            // grab $.selector as container
-            if (opt.printContainer) $body.append($element.outer());
-
-            // otherwise just print interior elements of container
-            else $element.each(function() {
-                $body.append($(this).html());
-            });
+            appendBody($body, $element, opt);
 
             if (opt.canvas) {
                 // Re-draw new canvases by referencing the originals
@@ -165,59 +217,10 @@
 
                     this.getContext('2d').drawImage($src[0], 0, 0);
 
-                    // Remove the mark-up from the original
+                    // Remove the markup from the original
                     $src.removeData('printthis');
                 });
             }
-
-            // capture form/field values
-            if (opt.formValues) {
-                // loop through inputs
-                var $input = $element.find('input');
-                if ($input.length) {
-                    $input.each(function() {
-                        var $this = $(this),
-                            $name = $(this).attr('name'),
-                            $checker = $this.is(':checkbox') || $this.is(':radio'),
-                            $iframeInput = $doc.find('input[name="' + $name + '"]'),
-                            $value = $this.val();
-
-                        // order matters here
-                        if (!$checker) {
-                            $iframeInput.val($value);
-                        } else if ($this.is(':checked')) {
-                            if ($this.is(':checkbox')) {
-                                $iframeInput.attr('checked', 'checked');
-                            } else if ($this.is(':radio')) {
-                                $doc.find('input[name="' + $name + '"][value="' + $value + '"]').attr('checked', 'checked');
-                            }
-                        }
-
-                    });
-                }
-
-                // loop through selects
-                var $select = $element.find('select');
-                if ($select.length) {
-                    $select.each(function() {
-                        var $this = $(this),
-                            $name = $(this).attr('name'),
-                            $value = $this.val();
-                        $doc.find('select[name="' + $name + '"]').val($value);
-                    });
-                }
-
-                // loop through textareas
-                var $textarea = $element.find('textarea');
-                if ($textarea.length) {
-                    $textarea.each(function() {
-                        var $this = $(this),
-                            $name = $(this).attr('name'),
-                            $value = $this.val();
-                        $doc.find('textarea[name="' + $name + '"]').val($value);
-                    });
-                }
-            } // end capture form/field values
 
             // remove inline styles
             if (opt.removeInline) {
@@ -230,7 +233,7 @@
             }
 
             // print "footer"
-            if (opt.footer) $body.append(opt.footer);
+            appendContent($body, opt.footer);
 
             setTimeout(function() {
                 if ($iframe.hasClass("MSIE")) {
@@ -274,13 +277,10 @@
         header: null,           // prefix to html
         footer: null,           // postfix to html
         formValues: true,       // preserve input/form values
-        canvas: false,          // Copy canvas content (experimental)
+        canvas: false,          // copy canvas content (experimental)
         base: false,            // preserve the BASE tag, or accept a string for the URL
-        doctypeString: '<!DOCTYPE html>' // html doctype
+        doctypeString: '<!DOCTYPE html>', // html doctype
+        removeScripts: false,   // remove script tags before appending
+        copyTagClasses: false   // copy classes from the html & body tag
     };
-
-    // $.selector container
-    jQuery.fn.outer = function() {
-        return $($("<div></div>").html(this.clone())).html();
-    }
 })(jQuery);

@@ -174,3 +174,5 @@ def get_common_asset():
     yield from get_org_common_asset()
     yield 'reloadfrom.js'
     yield 'many.jsx'
+    yield 'printthis.js'
+    yield 'print.js'
