@@ -4,6 +4,9 @@ Changelog
 - Updates translations.
   [msom]
 
+- Adds map data of ZG 2004-2012.
+  [msom]
+
 3.4.0 (2018-03-29)
 ~~~~~~~~~~~~~~~~~~~
 

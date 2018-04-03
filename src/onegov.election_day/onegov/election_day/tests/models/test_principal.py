@@ -14,6 +14,11 @@ SUPPORTED_YEARS_NO_MAP_SG = list(
     set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP_SG)
 )
 
+SUPPORTED_YEARS_MAP_ZG = list(range(2004, 2018 + 1))
+SUPPORTED_YEARS_NO_MAP_ZG = list(
+    set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP_ZG)
+)
+
 
 def test_principal_load_canton():
     principal = Principal.from_yaml(dedent("""
@@ -261,7 +266,7 @@ def test_principal_years_available():
         assert principal.is_year_available(year, map_required=False)
 
     # Cantons
-    for canton in Canton.CANTONS - {'sg'}:
+    for canton in Canton.CANTONS - {'sg', 'zg'}:
         principal = Canton(name=canton, canton=canton)
 
         for year in SUPPORTED_YEARS_NO_MAP:
@@ -277,6 +282,15 @@ def test_principal_years_available():
         assert not principal.is_year_available(year)
         assert principal.is_year_available(year, map_required=False)
     for year in SUPPORTED_YEARS_MAP_SG:
+        assert principal.is_year_available(year)
+        assert principal.is_year_available(year, map_required=False)
+
+    # Canton ZG
+    principal = Canton(name='zg', canton='sg')
+    for year in SUPPORTED_YEARS_NO_MAP_ZG:
+        assert not principal.is_year_available(year)
+        assert principal.is_year_available(year, map_required=False)
+    for year in SUPPORTED_YEARS_MAP_ZG:
         assert principal.is_year_available(year)
         assert principal.is_year_available(year, map_required=False)
 
