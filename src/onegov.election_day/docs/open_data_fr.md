@@ -44,7 +44,7 @@ Nom|Description
 `date`|La date (ISO 8601).
 `domain`|Le domaine d'influence (fédération, canton, ...).
 `url`|Un lien vers la vue détaillée.
-`completed`|True, if the vote or election is completed.
+`completed`|True, si le vote ou l'élection est terminé.
 `progress`|Un objet contenant le nombre de municipalités déjà comptées (`counted`) et le nombre total de municipalités (`total`).
 
 Les résultats de la votation contiennent les informations supplémentaires suivantes :
@@ -86,16 +86,16 @@ Les champs suivants sont inclus dans tous les formats:
 
 Nom|Description
 ---|---
-`election_title_{locale}`|Translated titles, for example `title_de_ch` for the German title.
+`election_title_{locale}`|Les titres traduits, par exemple `title_de_ch` pour le titre en allemand.
 `election_date`|La date de l'élection (an ISO 8601 date string).
 `election_domain`|fédéral (`federation`), cantonal (`canton`), régional (`region`) ou municipal (`municipality`)
 `election_type`|proportionnelle (`proporz`) ou système majoritaire (`majorz`).
 `election_mandates`|Nombre de mandats.
 `election_absolute_majority`|La majorité absolue. Uniquement valable pour les élections basées sur le système majoritaire.
-`election_status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
+`election_status`|Résultats intermédiaires (`interim`), résultats finaux (`final`) or inconnu (`unknown`).
 `entity_id`|L'identifiant de la municipalité. A value `0` represents the expats.
 `entity_name`|Le nom de la municipalité.
-`entity_district`|The district of the municipality.
+`entity_district`|La circonscription de la municipalité.
 `entity_counted`|`True` si le résultat a été compté.
 `entity_eligible_voters`|Le nombre de personnes éligible à voter pour cette municipalité.
 `entity_received_ballots`|Le nombre de bulletins de vote reçus pour cette municipalité.
@@ -121,13 +121,13 @@ Nom|Description
 
 Les municipalités qui n’ont pas encore été comptées ne sont pas incluses.
 
-### Party results
+### Résultats du parti
 
 ```
 URL: /election/{id}/{data-parties}
 ```
 
-The raw data is available as CSV. The following fields are included:
+Les données brutes sont disponibles en tant que CSV. Les champs suivants sont compris :
 
 Nom|Description
 ---|---
@@ -169,7 +169,7 @@ Les champs suivants sont inclus dans tous les formats:
 
 Nom|Description
 ---|---
-`title_{locale}`|Translated titles, for example `title_de_ch` for the German title.
+`title_{locale}`|Les titres traduits, par exemple `title_de_ch` pour le titre en allemand.
 `date`|La date du vote (une chaîne de date ISO 8601).
 `shortcode`|Shortcode interne (définit l'ordre des votes ayant lieu le même jour).
 `domain`|`federation` pour fédéral, `canton` for les votes cantonaux.
@@ -177,7 +177,7 @@ Nom|Description
 `type`|`proposal` (proposition), `counter-proposal` (contre-proposition) ou `tie-breaker` (jeu décisif).
 `entity_id`|La référence de la municipalité/localité. A value `0` represents the expats.
 `entity_name`|Le nom de la municipalité.
-`entity_district`|The district of the municipality.
+`entity_district`|La circonscription de la municipalité.
 `counted`|Vrai si le résultat a été compté, faux si le résultat n'est pas encore connu (le compte des votes n'est pas encore fini).
 `yeas`|Nombre de votes oui
 `nays`|Nombre de votes non
