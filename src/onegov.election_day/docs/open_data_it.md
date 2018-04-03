@@ -86,16 +86,16 @@ I seguenti campi sono contenuti in tutti i formati:
 
 Nome|Descrizione
 ---|---
-`election_title_{locale}`|Translated titles, for example `title_de_ch` for the German title.
+`election_title_{locale}`|Titoli tradotti, ad esempio `title_de_ch` per il titolo tedesco.
 `election_date`|Data dell'elezione (stringa data in formato ISO 8601)
 `election_domain`|federale (`federation`), cantonale (`canton`), regionale (`region`) o comunale (`municipality`)
 `election_type`|sistema proporzionale (`proporz`) o sistema maggioritario (`majorz`)
 `election_mandates`|Numero di mandati.
 `election_absolute_majority`|La maggioranza assoluta. Rilevante solo per le elezioni basate sul sistema di maggioranza.
-`election_status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
+`election_status`|Risultati provvisori (`interim`), risultati finali (`final`) o ignoto (`unknown`).
 `entity_id`|Identificativo del comune. A value `0` represents the expats.
 `entity_name`|Nome del comune.
-`entity_district`|The district of the municipality.
+`entity_district`|Il distretto del comune.
 `entity_counted`|`True`, se lo spoglio è stato completato.
 `entity_eligible_voters`|Numero degli aventi diritto al voto di questo comune.
 `entity_received_ballots`|Numero di schede ricevute per questo comune.
@@ -121,13 +121,13 @@ Nome|Descrizione
 
 I comuni non ancora contati non sono inclusi.
 
-### Party results
+### Risultati dei partiti
 
 ```
 URL: /election/{id}/{data-parties}
 ```
 
-The raw data is available as CSV. The following fields are included:
+I dati grezzi sono disponibili come CSV. Sono inclusi i seguenti campi:
 
 Nome|Descrizione
 ---|---
@@ -169,15 +169,15 @@ I seguenti campi sono contenuti in tutti i formati:
 
 Nome|Descrizione
 ---|---
-`title_{locale}`|Translated titles, for example `title_de_ch` for the German title.
+`title_{locale}`|Titoli tradotti, ad esempio `title_de_ch` per il titolo tedesco.
 `date`|Data della votazione (una stringa ISO 8601).
 `shortcode`|Abbreviazione interna (definisce l'ordine di diverse votazioni in un giorno).
 `domain`|`federation` per votazioni federali, `canton` per votazioni cantonali.
-`status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
+`status`|Risultati provvisori (`interim`), risultati finali (`final`) o ignoto (`unknown`).
 `type`|`proposal` (progetto), `counter-proposal` (controprogetto) or `tie-breaker` (domanda eventuale).
-`entity_id`|ID del comune/dell'ubicazione. A value `0` represents the expats.
+`entity_id`|ID del comune/dell'ubicazione. Un valore `0` rappresenta gli espatriati.
 `entity_name`|Nome del comune.
-`entity_district`|The district of the municipality.
+`entity_district`|Il distretto del comune.
 `counted`|Vero, se lo spoglio è stato completato. Falso, se il risultato non è ancora noto (i valori non sono ancora corretti).
 `yeas`|Numero di voti favorevoli
 `nays`|Numero di voti contrari

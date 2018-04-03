@@ -7,11 +7,11 @@ Sono accettati come formati di file CSV, XLS o XLSX generati dai "Wabsti elezion
 <!-- TOC START min:1 max:4 link:true update:true -->
 - [Specifica Formato Elezioni](#specifica-formato-elezioni)
   - [Contenuto](#contenuto)
-  - [Preface](#preface)
-    - [Entities](#entities)
+  - [Prefazione](#prefazione)
+    - [Enti](#enti)
     - [Elezioni tacite](#elezioni-tacite)
-    - [Regional Elections](#regional-elections)
-  - [Formats](#formats)
+    - [Elezioni regionali](#elezioni-regionali)
+  - [Formati](#formati)
     - [Onegov](#onegov)
       - [Colonne](#colonne)
       - [Risultati panachage](#risultati-panachage)
@@ -32,26 +32,26 @@ Sono accettati come formati di file CSV, XLS o XLSX generati dai "Wabsti elezion
       - [Modelli](#modelli-1)
     - [WabstiCExport Sistema Maggioritario](#wabsticexport-sistema-maggioritario)
     - [WabstiCExport Sistema Proporzionale](#wabsticexport-sistema-proporzionale)
-    - [Party results](#party-results)
+    - [Risultati dei partiti](#risultati-dei-partiti)
       - [Modelli](#modelli-2)
 
 <!-- TOC END -->
 
-## Preface
+## Prefazione
 
-### Entities
+### Enti
 
-An entity is either a municipality (cantonal instances, communal instances without quarters) or a quarter (communal instances with quarters).
+Un ente può essere un comune (esempi cantonali, esempi comunali senza quartieri) o un quartiere (esempi comunali con quartieri)
 
 ### Elezioni tacite
 
 Si possono caricare delle elezioni tacite usando il formato OneGov con ogni voto impostato a `0`.
 
-### Regional Elections
+### Elezioni regionali
 
-When uploading results of a regional election, only entities of one district are excepted to be present.
+Quando si caricano i risultati di un'elezione regionale, solo gli enti di un distretto devono essere presenti.
 
-## Formats
+## Formati
 
 ### Onegov
 
@@ -64,7 +64,7 @@ Saranno prese in considerazione le seguenti colonne e devono essere presenti:
 Nome|Descrizione
 ---|---
 `election_absolute_majority`|Maggioranza assoluta delle elezioni, solo se elezione con sistema maggioritario.
-`election_status`|`unknown`, `interim` or `final`.
+`election_status`|`interim` (risultati provvisori), `final` (risultati finali) o `unknown` (ignoto).
 `entity_id`|Numero BFS del comune. Si può usare il valore `0` per gli espatriati
 `entity_counted`|`True`, se lo spoglio è stato completato.
 `entity_eligible_voters`|Numero di aventi diritto al voto nel Comune.
@@ -96,14 +96,14 @@ Nome|Descrizione
 
 #### Risultati temporanei
 
-Municipalities are deemed not to have been counted yet if one of the following two conditions apply:
+Si ritiene che i comuni non siano stati conteggiati se si verifica una delle due seguenti condizioni:
 - `counted = false`
-- the municipality is not included in the results
+- il comune non è incluso nei risultati
 
 Se lo stato è
 - `interim`, l’intera elezione non è ancora stata completata
 - `final`, l’intera elezione è stata completata
-- `unknown`, the whole election is considered completed, if all (expected) municipalities are counted
+- `unknown`, l'intera elezione viene considerata completata, se vengono contati tutti i comuni (previsti)
 
 #### Modello
 
@@ -224,7 +224,7 @@ La versione `>= 2.2` è supportata. Consulta la documentazione del programma di 
 La versione `>= 2.2` è supportata. Consulta la documentazione del programma di esportazione per ulteriori informazioni riguardo le colonne dei vari file.
 
 
-### Party results
+### Risultati dei partiti
 
 Ciascuna elezione ("proporz") può contenere i risultati di partito. Questi risultati sono indipendenti dagli altri risultati e di solito contengono i valori già aggregati delle varie liste di un partito.
 
