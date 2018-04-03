@@ -46,11 +46,11 @@ Chaque ligne contient les résultats d'une municipalité unique, à condition qu
 Nom|Description
 ---|---
 `ID`|Le nombre de municipalités (nombre de BFS) au moment du vote. Une valeur de `0` peut être utilisée pour les expatriés.
-`Ja Stimmen`|Le nombre de votes « oui ». Si le mot « unbekannt » est saisi, la ligne sera ignorée (pas encore décompté).
-`Nein Stimmen`|Le nombre de votes « non ». Si le mot « unbekannt » est saisi, la ligne sera ignorée (pas encore décompté).
-`Stimmberechtigte`|Le nombre de personnes habilitées à voter. Si le mot « unbekannt » est saisi, la ligne sera ignorée (pas encore décompté).
-`Leere Stimmzettel`|Le nombre de bulletins de vote blancs. Si le mot « unbekannt » est saisi, la ligne sera ignorée (pas encore décompté).
-`Ungültige Stimmzettel`|Le nombre de bulletins de vote nuls. Si le mot « unbekannt » est saisi, la ligne sera ignorée (pas encore décompté).
+`Ja Stimmen`|Le nombre de votes « oui ». Si le mot `unbekannt` est saisi, la ligne sera ignorée (pas encore décompté).
+`Nein Stimmen`|Le nombre de votes « non ». Si le mot `unbekannt` est saisi, la ligne sera ignorée (pas encore décompté).
+`Stimmberechtigte`|Le nombre de personnes habilitées à voter. Si le mot `unbekannt` est saisi, la ligne sera ignorée (pas encore décompté).
+`Leere Stimmzettel`|Le nombre de bulletins de vote blancs. Si le mot `unbekannt` est saisi, la ligne sera ignorée (pas encore décompté).
+`Ungültige Stimmzettel`|Le nombre de bulletins de vote nuls. Si le mot `unbekannt` est saisi, la ligne sera ignorée (pas encore décompté).
 
 #### Résultats temporaires
 
