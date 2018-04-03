@@ -71,7 +71,7 @@ Les colonnes suivantes seront évaluées et devraient exister :
 
 Nom|Description
 ---|---
-`status`|`interim` (Résultats intermédiaires), `final` (résultats finaux) or inconnu (`unknown`).
+`status`|`interim` (résultats intermédiaires), `final` (résultats finaux) or `unknown` (inconnu).
 `type`|`proposal` (proposition), `counter-proposal` (contre-proposition) ou `tie-breaker` (jeu décisif).
 `entity_id`|La référence de la municipalité/localité. Une valeur `0` représente les expatriés.
 `counted`|Vrai si le résultat a été compté, faux si le résultat n'est pas encore connu (le compte des votes n'est pas encore fini).

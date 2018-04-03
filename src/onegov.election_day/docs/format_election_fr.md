@@ -64,7 +64,7 @@ Les colonnes suivantes seront évaluées et devraient exister :
 Nom|Description
 ---|---
 `election_absolute_majority`|Majorité absolue de l'élection, seulement si c'est une élection Majorz.
-`election_status`|`interim` (Résultats intermédiaires), `final` (résultats finaux) or inconnu (`unknown`).
+`election_status`|`interim` (résultats intermédiaires), `final` (résultats finaux) or `unknown` (inconnu).
 `entity_id`|Numéro BFS de la municipalité. Une valeur de `0` peut être utilisée pour les expatriés.
 `entity_counted`|`True` si le résultat a été compté.
 `entity_eligible_voters`|Nombre de personnes autorisées à voter dans la municipalité.
