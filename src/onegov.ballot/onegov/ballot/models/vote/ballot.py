@@ -101,6 +101,7 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
             func.sum(BallotResult.empty).label('empty'),
             func.sum(BallotResult.invalid).label('invalid'),
             func.sum(BallotResult.eligible_voters).label('eligible_voters'),
+            func.array_agg(BallotResult.entity_id).label('entity_ids')
         )
         results = results.group_by(BallotResult.district)
         results = results.order_by(None).order_by(BallotResult.district)

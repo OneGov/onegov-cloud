@@ -424,7 +424,7 @@ def test_vote_results_by_district(session):
     )
     session.flush()
     assert [list(r) for r in vote.proposal.results_by_district] == [
-        [None, True, True, 75, 25, 75.0, 25.0, 0, 0, 100]
+        [None, True, True, 75, 25, 75.0, 25.0, 0, 0, 100, [1]]
     ]
 
     vote.proposal.results.append(
@@ -436,41 +436,41 @@ def test_vote_results_by_district(session):
     )
     session.flush()
     assert [list(r) for r in vote.proposal.results_by_district] == [
-        [None, False, None, 100, 100, 50.0, 50.0, 0, 0, 200]
+        [None, False, None, 100, 100, 50.0, 50.0, 0, 0, 200, [1, 2]]
     ]
 
     vote.proposal.results.append(
         BallotResult(
-            name='1', entity_id=1, district='a',
+            name='1', entity_id=3, district='a',
             counted=True, eligible_voters=100,
             empty=1, invalid=2, yeas=10, nays=30
         )
     )
     vote.proposal.results.append(
         BallotResult(
-            name='2', entity_id=2, district='a',
+            name='2', entity_id=4, district='a',
             counted=True, eligible_voters=200,
             empty=3, invalid=4, yeas=50, nays=10
         )
     )
     vote.proposal.results.append(
         BallotResult(
-            name='3', entity_id=3, district='b',
+            name='3', entity_id=5, district='b',
             counted=True, eligible_voters=300,
             empty=5, invalid=6, yeas=30, nays=10
         )
     )
     vote.proposal.results.append(
         BallotResult(
-            name='4', entity_id=4, district='b',
+            name='4', entity_id=6, district='b',
             counted=True, eligible_voters=400,
             empty=7, invalid=8, yeas=10, nays=50
         )
     )
     assert [list(r) for r in vote.proposal.results_by_district] == [
-        ['a', True, True, 60, 40, 60.0, 40.0, 4, 6, 300],
-        ['b', True, False, 40, 60, 40.0, 60.0, 12, 14, 700],
-        [None, False, None, 100, 100, 50.0, 50.0, 0, 0, 200]
+        ['a', True, True, 60, 40, 60.0, 40.0, 4, 6, 300, [3, 4]],
+        ['b', True, False, 40, 60, 40.0, 60.0, 12, 14, 700, [5, 6]],
+        [None, False, None, 100, 100, 50.0, 50.0, 0, 0, 200, [1, 2]]
     ]
 
 
