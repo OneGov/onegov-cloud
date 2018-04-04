@@ -8,8 +8,11 @@ from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import UUID
+from sqlalchemy import case
+from sqlalchemy import cast
 from sqlalchemy import Column
 from sqlalchemy import Enum
+from sqlalchemy import Float
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import select
@@ -74,6 +77,34 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
         lazy='dynamic',
         order_by='BallotResult.district, BallotResult.name',
     )
+
+    @property
+    def results_by_district(self):
+        """ Returns the results aggregated by the distict.  """
+
+        counted = func.coalesce(func.bool_and(BallotResult.counted), False)
+        yeas = func.sum(BallotResult.yeas)
+        nays = func.sum(BallotResult.nays)
+        yeas_percentage = 100 * yeas / (
+            cast(func.coalesce(func.nullif(yeas + nays, 0), 1), Float)
+        )
+        nays_percentage = 100 - yeas_percentage
+        accepted = case({True: yeas > nays}, counted)
+        results = self.results.with_entities(
+            BallotResult.district.label('name'),
+            counted.label('counted'),
+            accepted.label('accepted'),
+            yeas.label('yeas'),
+            nays.label('nays'),
+            yeas_percentage.label('yeas_percentage'),
+            nays_percentage.label('nays_percentage'),
+            func.sum(BallotResult.empty).label('empty'),
+            func.sum(BallotResult.invalid).label('invalid'),
+            func.sum(BallotResult.eligible_voters).label('eligible_voters'),
+        )
+        results = results.group_by(BallotResult.district)
+        results = results.order_by(None).order_by(BallotResult.district)
+        return results
 
     @hybrid_property
     def counted(self):
@@ -143,43 +174,6 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
         expr = expr.label(attribute)
 
         return expr
-
-    def percentage_by_entity(self):
-        """ Returns the yeas/nays percentage grouped and keyed by
-        entity_id.
-
-        Uncounted entities are not included.
-
-        """
-
-        query = object_session(self).query(BallotResult)
-
-        query = query.with_entities(
-            BallotResult.entity_id,
-            func.sum(BallotResult.yeas),
-            func.sum(BallotResult.nays),
-            BallotResult.counted
-        )
-
-        query = query.group_by(
-            BallotResult.entity_id,
-            BallotResult.counted
-        )
-
-        query = query.filter(BallotResult.ballot_id == self.id)
-
-        result = {}
-
-        for id, yeas, nays, counted in query.all():
-            r = {'counted': counted}
-
-            if counted:
-                r['yeas_percentage'] = yeas / ((yeas + nays) or 1) * 100
-                r['nays_percentage'] = 100 - r['yeas_percentage']
-
-            result[id] = r
-
-        return result
 
     def clear_results(self):
         """ Clear all the results. """
