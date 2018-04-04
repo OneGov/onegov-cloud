@@ -33,8 +33,6 @@ setup(
     install_requires=[
         'cached_property',
         'click',
-        'objgraph',
-        'plotille',
         'PyYAML',
         'watchdog',
         'webob',
@@ -44,6 +42,8 @@ setup(
         test=[
             'coverage',
             'morepath',
+            'objgraph',
+            'plotille',
             'pytest',
             'requests',
             'webtest'

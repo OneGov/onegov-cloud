@@ -51,9 +51,7 @@ A onegov.yml file looks like this:
 
 import click
 import multiprocessing
-import objgraph
 import os
-import plotille
 import resource
 import signal
 import sys
@@ -217,6 +215,10 @@ class WsgiProcess(multiprocessing.Process):
         return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 
     def print_memory_stats(self, signum, frame):
+
+        # these are only installed in the development environment
+        import objgraph
+        import plotille
 
         if len(self.memory_usage) == self.memory_usage_max_count:
             self.memory_usage.pop(0)
