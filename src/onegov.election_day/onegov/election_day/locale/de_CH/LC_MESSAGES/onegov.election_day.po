@@ -646,9 +646,9 @@ msgstr "Herunterladen"
 #.
 msgid "figcaption_party_strengths"
 msgstr ""
-"Das Diagramm zeigt die gewonnen Stimmen und Sitze der Parteien. Die "
-"umrandeten Balken (linke Skala) entsprechen den Anzahl Sitzen, die "
-"eingefärbten Balken (rechte Skala) den Stimmanteilen in Prozent."
+"Das Diagramm zeigt die gewonnen Stimmen und Sitze der Parteien. Die Anzahl "
+"schwarz umrandeter Kästchen entspricht der Anzahl Sitze (linke Skala), die "
+"eingefärbten Balken geben die Stimmanteile in Prozent wieder (rechte Skala)."
 
 msgid "Year"
 msgstr "Jahr"
