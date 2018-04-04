@@ -31,15 +31,15 @@ class Pdf(PdfBase):
         self.style.indent_1.leftIndent = 1 * self.style.indent_1.fontSize
         self.style.indent_2.leftIndent = 2 * self.style.indent_2.fontSize
 
-        self.style.table_results_1 = self.style.table + (
+        self.style.table_results_1 = self.style.tableHead + (
             ('ALIGN', (0, 0), (0, -1), 'LEFT'),
             ('ALIGN', (1, 0), (-1, -1), 'RIGHT'),
         )
-        self.style.table_results_2 = self.style.table + (
+        self.style.table_results_2 = self.style.tableHead + (
             ('ALIGN', (0, 0), (1, -1), 'LEFT'),
             ('ALIGN', (2, 0), (-1, -1), 'RIGHT'),
         )
-        self.style.table_results_3 = self.style.table + (
+        self.style.table_results_3 = self.style.tableHead + (
             ('ALIGN', (0, 0), (2, -1), 'LEFT'),
             ('ALIGN', (3, 0), (-1, -1), 'RIGHT'),
         )
