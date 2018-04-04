@@ -53,10 +53,11 @@ import click
 import multiprocessing
 import objgraph
 import os
+import plotille
+import resource
 import signal
 import sys
 import time
-import resource
 import traceback
 
 from datetime import datetime
@@ -194,6 +195,10 @@ class WsgiProcess(multiprocessing.Process):
         self._actual_port = multiprocessing.Value('i', port)
         self._ready = multiprocessing.Value('i', 0)
 
+        # memory usage over time
+        self.memory_usage = [self.current_memory_usage]
+        self.memory_usage_max_count = 10
+
         try:
             self.stdin_fileno = sys.stdin.fileno()
         except ValueError:
@@ -207,18 +212,44 @@ class WsgiProcess(multiprocessing.Process):
     def port(self):
         return self._actual_port.value
 
+    @property
+    def current_memory_usage(self):
+        return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+
     def print_memory_stats(self, signum, frame):
 
-        total_memory = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss\
-            / 1024 / 1024
+        if len(self.memory_usage) == self.memory_usage_max_count:
+            self.memory_usage.pop(0)
 
-        print("Total memory used: {0:.2f} mb".format(total_memory))
+        self.memory_usage.append(self.current_memory_usage)
+        total_memory = self.memory_usage[-1] / 1024 / 1024
+
+        if len(self.memory_usage) > 1:
+            delta = self.memory_usage[-1] - self.memory_usage[-2]
+        else:
+            delta = 0
+
+        print(f"Total memory used: {total_memory:.2f} mb (Δ {delta}b)")
+        print()
+        print("Memory usage graph:")
+        x = tuple(range(len(self.memory_usage)))
+        y = self.memory_usage
+        print(plotille.plot(
+            X=x,
+            Y=y,
+            height=20,
+            width=40,
+            lc='blue',
+            Y_label='bytes',
+            X_label='invocations'
+        ))
         print()
         print("Most common types:")
         objgraph.show_most_common_types(limit=10)
         print()
         print("Growth since last invocation:")
         objgraph.show_growth(limit=10)
+        print()
 
     def disable_systemwide_darwin_proxies(self):
         # System-wide proxy settings on darwin need to be disabled, because

@@ -34,6 +34,7 @@ setup(
         'cached_property',
         'click',
         'objgraph',
+        'plotille',
         'PyYAML',
         'watchdog',
         'webob',
