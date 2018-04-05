@@ -367,4 +367,82 @@ def test_import_wabstic_vote_expats(session):
         assert not errors
         assert vote.proposal.results.filter_by(entity_id=0).one().empty == 1
 
-# todo: test temporary results
+
+def test_import_wabstic_vote_temporary_results(session):
+    session.add(
+        Vote(title='vote', domain='federation', date=date(2017, 2, 12))
+    )
+    session.flush()
+    vote = session.query(Vote).one()
+    principal = Canton(canton='sg')
+
+    errors = import_vote_wabstic(
+        vote, principal, '0', '0',
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'Art',
+                    'SortWahlkreis',
+                    'SortGeschaeft',
+                    'Ausmittlungsstand'
+                )),
+                ','.join((
+                    'Eidg',
+                    '0',
+                    '0',
+                    '0'
+                )),
+            ))
+        ).encode('utf-8')),
+        'text/plain',
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'Art',
+                    'SortWahlkreis',
+                    'SortGeschaeft',
+                    'SortGemeinde',
+                    'SortGemeindeSub',
+                    'Sperrung',
+                    'Stimmberechtigte',
+                    'StmUngueltig',
+                    'StmLeer',
+                    'StmHGJa',
+                    'StmHGNein',
+                    'StmHGOhneAw',
+                    'StmN1Ja',
+                    'StmN1Nein',
+                    'StmN1OhneAw',
+                    'StmN2Ja',
+                    'StmN2Nein',
+                    'StmN2OhneAw',
+                )),
+                ','.join((
+                    'Eidg',
+                    '0',
+                    '0',
+                    '3203',  # 'SortGemeinde',
+                    '3203',  # 'SortGemeindeSub',
+                    '2000',  # 'Sperrung',
+                    '100',  # 'Stimmberechtigte',
+                    '0',  # 'StmUngueltig',
+                    '1',  # 'StmLeer',
+                    '',  # 'StmHGJa',
+                    '',  # 'StmHGNein',
+                    '',  # 'StmHGOhneAw',
+                    '',  # 'StmN1Ja',
+                    '',  # 'StmN1Nein',
+                    '',  # 'StmN1OhneAw',
+                    '',  # 'StmN2Ja',
+                    '',  # 'StmN2Nein',
+                    '',  # 'StmN2OhneAw',
+                ))
+            ))
+        ).encode('utf-8')),
+        'text/plain'
+    )
+
+    assert not errors
+
+    # 1 Present, 76 Missing
+    assert vote.progress == (1, 77)

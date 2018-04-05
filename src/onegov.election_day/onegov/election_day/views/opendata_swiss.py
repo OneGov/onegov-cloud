@@ -198,7 +198,6 @@ def view_rdf(self, request):
                             'principal': principal_name
                         }
                     )
-                # todo: region
                 else:
                     des = _(
                         "Final results of the federal election \"${title}\", "
