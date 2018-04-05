@@ -1,7 +1,7 @@
 const jsdom = require('jsdom');
 const d3 = require('../d3');
 const topojson = require('../topojson');
-const mapChart = require('../d3.chart.map')(d3, topojson);
+const mapChart = require('../d3.map.entities')(d3, topojson);
 const mapdata = require('../../../static/mapdata/2017/zg.json');
 const data = {
   1701: {counted: true, nays_percentage: 40, yeas_percentage: 60},
