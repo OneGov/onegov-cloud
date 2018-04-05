@@ -363,7 +363,8 @@ table {
     Ballot Map
 */
 
-.municipality {
+.municipality,
+.district {
 
     .selected {
         stroke: $white;

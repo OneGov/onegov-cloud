@@ -7,6 +7,8 @@ from onegov.ballot import ElectionCompound
 from onegov.core.custom import json
 from onegov.core.utils import module_path
 from onegov.election_day import _
+from onegov.election_day.utils.ballot import get_ballot_data_by_district
+from onegov.election_day.utils.ballot import get_ballot_data_by_entity
 from onegov.election_day.utils.election import get_candidates_data
 from onegov.election_day.utils.election import get_connections_data
 from onegov.election_day.utils.election import get_lists_data
@@ -39,9 +41,13 @@ class D3Renderer():
                 'main': 'sankeyChart',
                 'scripts': ('d3.sankey.js', 'd3.chart.sankey.js'),
             },
-            'map': {
-                'main': 'ballotMap',
-                'scripts': ('topojson.js', 'd3.chart.map.js'),
+            'entities-map': {
+                'main': 'entitiesMap',
+                'scripts': ('topojson.js', 'd3.map.entities.js'),
+            },
+            'districts-map': {
+                'main': 'districtsMap',
+                'scripts': ('topojson.js', 'd3.map.districts.js'),
             }
         }
 
@@ -91,7 +97,7 @@ class D3Renderer():
         else:
             return BytesIO(b64decode(response.text))
 
-    def get_map(self, fmt, data, year, width=1000, params=None):
+    def get_map(self, map, fmt, data, year, width=1000, params=None):
         """ Returns the request chart from the d3-render service as a
         PNG/PDF/SVG.
 
@@ -113,7 +119,7 @@ class D3Renderer():
             'canton': self.app.principal.id
         })
 
-        return self.get_chart('map', fmt, data, width, params)
+        return self.get_chart('{}-map'.format(map), fmt, data, width, params)
 
     def get_lists_chart(self, item, fmt, return_data=False):
         chart = None
@@ -163,7 +169,7 @@ class D3Renderer():
         if isinstance(item, Election):
             data = get_lists_panachage_data(item, None)
             if data and data.get('links') and data.get('nodes'):
-                return self.get_chart('sankey', fmt, data)
+                chart = self.get_chart('sankey', fmt, data)
         return (chart, data) if return_data else chart
 
     def get_parties_panachage_chart(self, item, fmt, return_data=False):
@@ -172,22 +178,41 @@ class D3Renderer():
         if isinstance(item, Election):
             data = get_parties_panachage_data(item, None)
             if data and data.get('links') and data.get('nodes'):
-                return self.get_chart('sankey', fmt, data)
+                chart = self.get_chart('sankey', fmt, data)
         elif isinstance(item, ElectionCompound):
             data = get_parties_panachage_data(item, None)
             if data and data.get('links') and data.get('nodes'):
-                return self.get_chart('sankey', fmt, data)
+                chart = self.get_chart('sankey', fmt, data)
         return (chart, data) if return_data else chart
 
-    def get_map_chart(self, item, fmt, locale=None, return_data=False):
+    def get_entities_map(self, item, fmt, locale=None, return_data=False):
         chart = None
         data = None
         if isinstance(item, Ballot):
-            data = item.percentage_by_entity()
-            params = {
-                'yay': self.translate(_('Yay'), locale),
-                'nay': self.translate(_('Nay'), locale),
-            }
-            year = item.vote.date.year
-            chart = self.get_map(fmt, data, year, params=params)
+            data = get_ballot_data_by_entity(item)
+            if data:
+                params = {
+                    'yay': self.translate(_('Yay'), locale),
+                    'nay': self.translate(_('Nay'), locale),
+                }
+                year = item.vote.date.year
+                chart = self.get_map(
+                    'entities', fmt, data, year, params=params
+                )
+        return (chart, data) if return_data else chart
+
+    def get_districts_map(self, item, fmt, locale=None, return_data=False):
+        chart = None
+        data = None
+        if isinstance(item, Ballot):
+            data = get_ballot_data_by_district(item)
+            if data:
+                params = {
+                    'yay': self.translate(_('Yay'), locale),
+                    'nay': self.translate(_('Nay'), locale),
+                }
+                year = item.vote.date.year
+                chart = self.get_map(
+                    'districts', fmt, data, year, params=params
+                )
         return (chart, data) if return_data else chart

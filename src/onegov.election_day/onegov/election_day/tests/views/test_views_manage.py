@@ -203,7 +203,7 @@ def test_view_clear_results(election_day_app):
         '/election/proporz-election/statistics',
         '/elections/elections/parties-panachage',
         '/elections/elections/party-strengths',
-        '/vote/vote'
+        '/vote/vote/entities'
     )
     assert all((marker in client.get(url) for url in urls))
 

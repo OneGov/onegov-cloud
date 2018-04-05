@@ -73,12 +73,6 @@ def test_generate_pdf_vote(session, election_day_app):
 
     # Simple vote
     vote = add_vote(session, 'simple')
-    for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
-        generator.generate_pdf(vote, 'vote.pdf', locale)
-        with election_day_app.filestorage.open('vote.pdf', 'rb') as f:
-            assert len(PdfReader(f, decompress=False).pages) == 2
-
-    # Simple vote with more than one entity
     vote.proposal.results.append(BallotResult(
         name='y', yeas=200, nays=0, counted=True, entity_id=1
     ))
@@ -89,10 +83,67 @@ def test_generate_pdf_vote(session, election_day_app):
 
     # Complex vote
     vote = add_vote(session, 'complex')
+    vote.proposal.results.append(BallotResult(
+        name='y', yeas=200, nays=0, counted=True, entity_id=1
+    ))
+    vote.counter_proposal.results.append(BallotResult(
+        name='y', yeas=200, nays=0, counted=True, entity_id=1
+    ))
+    vote.tie_breaker.results.append(BallotResult(
+        name='y', yeas=200, nays=0, counted=True, entity_id=1
+    ))
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(vote, 'vote.pdf', locale)
         with election_day_app.filestorage.open('vote.pdf', 'rb') as f:
-            assert len(PdfReader(f, decompress=False).pages) == 6
+            assert len(PdfReader(f, decompress=False).pages) == 9
+
+
+def test_generate_pdf_vote_districts(session, election_day_app_gr):
+    generator = PatchedPdfGenerator(election_day_app_gr)
+
+    # Simple vote
+    vote = add_vote(session, 'simple')
+    vote.proposal.results.append(BallotResult(
+        name='y', yeas=200, nays=0, counted=True, entity_id=1
+    ))
+    for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
+        generator.generate_pdf(vote, 'vote.pdf', locale)
+        with election_day_app_gr.filestorage.open('vote.pdf', 'rb') as f:
+            assert len(PdfReader(f, decompress=False).pages) == 5
+
+    # Complex vote
+    vote = add_vote(session, 'complex')
+    vote.proposal.results.append(BallotResult(
+        name='y', yeas=200, nays=0, counted=True, entity_id=1
+    ))
+    vote.counter_proposal.results.append(BallotResult(
+        name='y', yeas=200, nays=0, counted=True, entity_id=1
+    ))
+    vote.tie_breaker.results.append(BallotResult(
+        name='y', yeas=200, nays=0, counted=True, entity_id=1
+    ))
+    for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
+        generator.generate_pdf(vote, 'vote.pdf', locale)
+        with election_day_app_gr.filestorage.open('vote.pdf', 'rb') as f:
+            assert len(PdfReader(f, decompress=False).pages) == 15
+
+
+def test_generate_pdf_vote_single(session, election_day_app):
+    generator = PatchedPdfGenerator(election_day_app)
+
+    # Simple vote, only one entity
+    vote = add_vote(session, 'simple')
+    for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
+        generator.generate_pdf(vote, 'vote.pdf', locale)
+        with election_day_app.filestorage.open('vote.pdf', 'rb') as f:
+            assert len(PdfReader(f, decompress=False).pages) == 1
+
+    # Complex vote, only one entity
+    vote = add_vote(session, 'complex')
+    for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
+        generator.generate_pdf(vote, 'vote.pdf', locale)
+        with election_day_app.filestorage.open('vote.pdf', 'rb') as f:
+            assert len(PdfReader(f, decompress=False).pages) == 3
 
 
 def test_generate_pdf_long_title(session, election_day_app):
@@ -119,7 +170,7 @@ def test_generate_pdf_long_title(session, election_day_app):
     generator = PatchedPdfGenerator(election_day_app)
     generator.generate_pdf(vote, 'vote.pdf', 'de_CH')
     with election_day_app.filestorage.open('vote.pdf', 'rb') as f:
-        assert len(PdfReader(f, decompress=False).pages) == 2
+        assert len(PdfReader(f, decompress=False).pages) == 1
 
 
 def test_sign_pdf(session, election_day_app):

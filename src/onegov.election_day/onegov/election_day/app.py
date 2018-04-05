@@ -253,16 +253,16 @@ def get_custom_asset():
     # common code
     yield 'common.js'
 
-    # D3 charts
+    # D3 charts and maps
     yield 'd3.chart.bar.js'
     yield 'd3.chart.grouped.js'
-    yield 'd3.chart.map.js'
     yield 'd3.chart.sankey.js'
+    yield 'd3.map.districts.js'
+    yield 'd3.map.entities.js'
 
     # Chart initalization
+    yield 'charts-init.js'
     yield 'embed.js'
-    yield 'charts.js'
-    yield 'ballot-map.js'
 
 
 @ElectionDayApp.webasset('backend_common')

@@ -28,7 +28,8 @@
     <body tal:define="bar_url data.get('bar');
                       grouped_bar_url data.get('grouped_bar');
                       sankey_url data.get('sankey');
-                      map_url data.get('map')">
+                      map_url data.get('map');
+                      map_type data.get('type')">
         <div tal:condition="bar_url" class="bar-chart"
             data-dataurl="${bar_url}"
             >
@@ -42,7 +43,7 @@
             data-inverse="${data.get('inverse')}"
             >
         </div>
-        <div tal:condition="map_url" class="ballot-map"
+        <div tal:condition="map_url" class="${map_type}-map"
             data-type="${model.type}"
             data-canton="${layout.app.principal.id}"
             data-mapurl="${layout.get_topojson_link(layout.app.principal.id, model.vote.date.year)}"

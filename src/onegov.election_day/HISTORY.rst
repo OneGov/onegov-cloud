@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds vote views for districts.
+  [msom]
+
 - Updates translations.
   [msom]
 

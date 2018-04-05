@@ -1,3 +1,4 @@
+from morepath import redirect
 from morepath.request import Response
 from onegov.ballot import Vote
 from onegov.core.security import Public
@@ -10,58 +11,13 @@ from onegov.election_day.utils import get_vote_summary
 
 @ElectionDayApp.html(
     model=Vote,
-    template='vote/ballot.pt',
     permission=Public
 )
-def view_vote_proposal(self, request):
+def view_vote(self, request):
 
-    """" The main view (proposal). """
+    """" The main view. """
 
-    layout = VoteLayout(self, request)
-
-    return {
-        'vote': self,
-        'layout': layout,
-        'show_map': request.app.principal.is_year_available(self.date.year)
-    }
-
-
-@ElectionDayApp.html(
-    model=Vote,
-    name='counter-proposal',
-    template='vote/ballot.pt',
-    permission=Public
-)
-def view_vote_counter_proposal(self, request):
-
-    """" The main view (counter-proposal). """
-
-    layout = VoteLayout(self, request, 'counter-proposal')
-
-    return {
-        'vote': self,
-        'layout': layout,
-        'show_map': request.app.principal.is_year_available(self.date.year)
-    }
-
-
-@ElectionDayApp.html(
-    model=Vote,
-    name='tie-breaker',
-    template='vote/ballot.pt',
-    permission=Public
-)
-def view_vote_tie_breaker(self, request):
-
-    """" The main view (tie-breaker). """
-
-    layout = VoteLayout(self, request, 'tie-breaker')
-
-    return {
-        'vote': self,
-        'layout': layout,
-        'show_map': request.app.principal.is_year_available(self.date.year)
-    }
+    return redirect(VoteLayout(self, request).main_view)
 
 
 @ElectionDayApp.json(

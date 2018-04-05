@@ -37,35 +37,28 @@ def test_upload_vote_unknown_result(election_day_app):
 
     proposal = '\n'.join((
         ','.join(COLUMNS),
-        '1711,3821,7405,16516,80,1',
-        '1706,unbekannt,7405,16516,80,1',
-    ))
+        '1711,3821,7405,16516,80,1',  # Zug
+        '1706,unbekannt,7405,16516,80,1',  # Oberägeri
+    )).encode('utf-8')
+    upload.form['proposal'] = Upload('data.csv', proposal, 'text/plain')
+    result = upload.form.submit().click("Hier klicken").maybe_follow()
+    result = ' '.join([td.text for td in result.pyquery('td')])
 
-    upload.form['proposal'] = Upload(
-        'data.csv', proposal.encode('utf-8'), 'text/plain'
-    )
-
-    r = upload.form.submit().click("Hier klicken")
-
-    assert "Abgelehnt" in r.pyquery('tr[data-municipality-id="1711"]').text()
-    assert "Noch nicht ausgezählt" in r.pyquery(
-        'tr[data-municipality-id="1706"]').text()
+    assert "Noch keine Resultate" not in result
+    assert "Zug Abgelehnt" in result
+    assert "Oberägeri Noch nicht ausgezählt" in result
     assert archive.query().one().progress == (1, 11)
 
     # adding unknown results should override existing results
     upload = client.get('/vote/bacon-yea-or-nay/upload')
-
     proposal = '\n'.join((
         ','.join(COLUMNS),
         '1711,unbekannt,7405,16516,80,1',
-    ))
+    )).encode('utf-8')
+    upload.form['proposal'] = Upload('data.csv', proposal, 'text/plain')
+    result = upload.form.submit().click("Hier klicken").maybe_follow()
 
-    upload.form['proposal'] = Upload(
-        'data.csv', proposal.encode('utf-8'), 'text/plain'
-    )
-
-    r = upload.form.submit().click("Hier klicken")
-
+    assert "Noch keine Resultate" in result
     assert archive.query().one().progress == (0, 11)
 
 
@@ -207,7 +200,7 @@ def test_upload_vote_invalidate_cache(election_day_app):
     anonymous = Client(election_day_app)
     anonymous.get('/locale/de_CH').follow()
 
-    assert ">522<" in anonymous.get('/vote/vote/')
+    assert ">522<" in anonymous.get('/vote/vote/entities')
 
     csv = anonymous.get('/vote/vote/data-csv').text
     csv = csv.replace('522', '533').encode('utf-8')
@@ -218,8 +211,8 @@ def test_upload_vote_invalidate_cache(election_day_app):
     upload = upload.form.submit()
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
-    assert ">522<" not in anonymous.get('/vote/vote/')
-    assert ">533<" in anonymous.get('/vote/vote/')
+    assert ">522<" not in anonymous.get('/vote/vote/entities')
+    assert ">533<" in anonymous.get('/vote/vote/entities')
 
 
 def test_upload_vote_available_formats_canton(election_day_app):

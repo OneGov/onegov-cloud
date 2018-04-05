@@ -84,8 +84,7 @@ def test_pages_cache(election_day_app):
 
     # make sure codes != 200 are not cached
     anonymous = Client(election_day_app)
-    anonymous.get('/vote/0xdeadbeef', status=404)
-    anonymous.get('/election/0xdeafbeef', status=404)
+    anonymous.get('/vote/0xdeadbeef/entities', status=404)
 
     login(client)
 
@@ -96,7 +95,7 @@ def test_pages_cache(election_day_app):
     new.form.submit()
 
     assert '0xdeadbeef' in anonymous.get('/')
-    assert '0xdeadbeef' in anonymous.get('/vote/0xdeadbeef')
+    assert '0xdeadbeef' in anonymous.get('/vote/0xdeadbeef/entities')
     assert '0xdeadbeef' in anonymous.get('/catalog.rdf')
 
     edit = client.get('/vote/0xdeadbeef/edit')
@@ -105,8 +104,8 @@ def test_pages_cache(election_day_app):
 
     assert '0xdeadc0de' in client.get('/')
     assert '0xdeadc0de' in anonymous.get('/')
-    assert '0xdeadbeef' in anonymous.get('/vote/0xdeadbeef')
-    assert '0xdeadc0de' in anonymous.get('/vote/0xdeadbeef', headers=[
+    assert '0xdeadbeef' in anonymous.get('/vote/0xdeadbeef/entities')
+    assert '0xdeadc0de' in anonymous.get('/vote/0xdeadbeef/entities', headers=[
         ('Cache-Control', 'no-cache')
     ])
 
@@ -184,8 +183,8 @@ def test_view_last_modified(election_day_app):
             '/elections/elections/districts',
             '/elections/elections/data',
             '/vote/vote/',
-            '/vote/vote/counter-proposal',
-            '/vote/vote/tie-breaker',
+            '/vote/vote/counter-proposal-entities',
+            '/vote/vote/tie-breaker-entities',
         ):
             assert 'Last-Modified' not in client.get(path).headers
 
@@ -205,7 +204,7 @@ def test_view_headerless(election_day_app):
         '/election/majorz-election/candidates',
         '/election/majorz-election/statistics',
         '/election/majorz-election/data',
-        '/vote/vote',
+        '/vote/vote/entities',
     ):
         assert 'manage-links' in client.get(path)
         assert 'manage-links' not in client.get(path + '?headerless')
@@ -291,10 +290,10 @@ def test_view_svg(election_day_app):
     upload_majorz_election(client, canton='zg')
     upload_proporz_election(client, canton='zg')
 
+    ballot_id = election_day_app.session().query(Ballot).one().id
     paths = (
-        '/ballot/{}/svg'.format(
-            election_day_app.session().query(Ballot).one().id
-        ),
+        f'/ballot/{ballot_id}/entities-map-svg',
+        f'/ballot/{ballot_id}/districts-map-svg',
         '/election/majorz-election/candidates-svg',
         '/election/proporz-election/lists-svg',
         '/election/proporz-election/candidates-svg',
@@ -316,21 +315,22 @@ def test_view_svg(election_day_app):
     filenames = []
     with patch('onegov.election_day.layouts.vote.svg_filename',
                return_value='test.svg'):
-        result = client.get(paths[0])
-        assert result.body == svg
-        assert result.headers['Content-Type'] == (
-            'application/svg; charset=utf-8'
-        )
-        assert result.headers['Content-Length'] == '99'
-        assert result.headers['Content-Disposition'].startswith(
-            'inline; filename='
-        )
-        filenames.append(
-            result.headers['Content-Disposition'].split('filename=')[1]
-        )
+        for path in paths[:2]:
+            result = client.get(paths[0])
+            assert result.body == svg
+            assert result.headers['Content-Type'] == (
+                'application/svg; charset=utf-8'
+            )
+            assert result.headers['Content-Length'] == '99'
+            assert result.headers['Content-Disposition'].startswith(
+                'inline; filename='
+            )
+            filenames.append(
+                result.headers['Content-Disposition'].split('filename=')[1]
+            )
     with patch('onegov.election_day.layouts.election.svg_filename',
                return_value='test.svg'):
-        for path in paths[1:]:
+        for path in paths[2:]:
             result = client.get(path)
             assert result.body == svg
             assert result.headers['Content-Type'] == (
@@ -343,7 +343,6 @@ def test_view_svg(election_day_app):
             filenames.append(
                 result.headers['Content-Disposition'].split('filename=')[1]
             )
-
     assert sorted(filenames) == [
         'majorz-election-candidates.svg',
         'proporz-election-candidates.svg',
@@ -351,7 +350,8 @@ def test_view_svg(election_day_app):
         'proporz-election-lists.svg',
         'proporz-election-panachage-lists.svg',
         'proporz-election-party-strengths.svg',
-        'vote-proposal.svg'
+        'vote-gemeinden-vorlage.svg',
+        'vote-gemeinden-vorlage.svg',
     ]
 
 

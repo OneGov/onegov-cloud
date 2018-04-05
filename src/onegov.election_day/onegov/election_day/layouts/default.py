@@ -129,7 +129,9 @@ class DefaultLayout(ChameleonLayout):
         ]
 
     def format_name(self, item):
-        return item.name if item.entity_id else _("Expats")
+        if hasattr(item, 'entity_id'):
+            return item.name if item.entity_id else _("Expats")
+        return item.name or _("Expats")
 
     @cached_property
     def sentry_js(self):

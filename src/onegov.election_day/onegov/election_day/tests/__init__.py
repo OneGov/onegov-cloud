@@ -92,7 +92,10 @@ class DummyRequest(object):
                 self.app.translations.get(self.locale).gettext(text)
             )
         except Exception:
-            return text.interpolate()
+            try:
+                return text.interpolate()
+            except Exception:
+                return text
 
     def include(self, resource):
         self.includes.append(resource)
@@ -116,7 +119,7 @@ def login(client):
     login.form.submit()
 
 
-def upload_vote(client, create=True):
+def upload_vote(client, create=True, canton='zg'):
     if create:
         new = client.get('/manage/votes/new-vote')
         new.form['vote_de'] = 'Vote'
@@ -128,23 +131,74 @@ def upload_vote(client, create=True):
     csv = (
         'ID,Ja Stimmen,Nein Stimmen,'
         'Stimmberechtigte,Leere Stimmzettel,Ungültige Stimmzettel\n'
-        '1711,3821,7405,16516,80,1\n'
-        '1706,811,1298,3560,18,\n'
-        '1709,1096,2083,5245,18,1\n'
-        '1704,599,1171,2917,17,\n'
-        '1701,3049,5111,13828,54,3\n'
-        '1702,2190,3347,9687,60,\n'
-        '1703,1497,2089,5842,15,1\n'
-        '1708,1211,2350,5989,17,\n'
-        '1707,1302,1779,6068,17,\n'
-        '1710,651,743,2016,8,\n'
-        '1705,307,522,1289,10,1\n'
     )
+    if canton == 'zg':
+        csv += (
+            '1701,3049,5111,13828,54,3\n'
+            '1702,2190,3347,9687,60,\n'
+            '1703,1497,2089,5842,15,1\n'
+            '1704,599,1171,2917,17,\n'
+            '1705,307,522,1289,10,1\n'
+            '1706,811,1298,3560,18,\n'
+            '1707,1302,1779,6068,17,\n'
+            '1708,1211,2350,5989,17,\n'
+            '1709,1096,2083,5245,18,1\n'
+            '1710,651,743,2016,8,\n'
+            '1711,3821,7405,16516,80,1\n'
+        )
+    if canton == 'gr':
+        csv += (
+            '3503,3049,5111,13828,54,3\n'
+        )
     csv = csv.encode('utf-8')
 
     upload = client.get('/vote/vote/upload')
     upload.form['type'] = 'simple'
     upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
+    upload = upload.form.submit()
+
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+    return upload
+
+
+def upload_complex_vote(client, create=True, canton='zg'):
+    if create:
+        new = client.get('/manage/votes/new-vote')
+        new.form['vote_de'] = 'Complex Vote'
+        new.form['date'] = date(2015, 1, 1)
+        new.form['domain'] = 'federation'
+        new.form['vote_type'] = 'complex'
+        new.form.submit()
+
+    csv = (
+        'ID,Ja Stimmen,Nein Stimmen,'
+        'Stimmberechtigte,Leere Stimmzettel,Ungültige Stimmzettel\n'
+    )
+    if canton == 'zg':
+        csv += (
+            '1701,3049,5111,13828,54,3\n'
+            '1702,2190,3347,9687,60,\n'
+            '1703,1497,2089,5842,15,1\n'
+            '1704,599,1171,2917,17,\n'
+            '1705,307,522,1289,10,1\n'
+            '1706,811,1298,3560,18,\n'
+            '1707,1302,1779,6068,17,\n'
+            '1708,1211,2350,5989,17,\n'
+            '1709,1096,2083,5245,18,1\n'
+            '1710,651,743,2016,8,\n'
+            '1711,3821,7405,16516,80,1\n'
+        )
+    if canton == 'gr':
+        csv += (
+            '3503,3049,5111,13828,54,3\n'
+        )
+    csv = csv.encode('utf-8')
+
+    upload = client.get('/vote/complex-vote/upload')
+    upload.form['type'] = 'complex'
+    upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
+    upload.form['counter_proposal'] = Upload('data.csv', csv, 'text/plain')
+    upload.form['tie_breaker'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload

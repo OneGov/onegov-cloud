@@ -1,19 +1,81 @@
 from freezegun import freeze_time
-from onegov.election_day.tests import login, upload_vote
+from onegov.election_day.tests import login
+from onegov.election_day.tests import upload_vote
+from onegov.election_day.tests import upload_complex_vote
 from webtest import TestApp as Client
 
 
-def test_view_vote(election_day_app):
+def test_view_vote_redirect(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
     login(client)
+
     upload_vote(client)
+    upload_complex_vote(client)
 
     response = client.get('/vote/vote')
-    assert all((expected in response for expected in (
-        "Zug", "Cham", "599", "1711", "80"
-    )))
+    assert response.status == '302 Found'
+    assert 'vote/vote/entities' in response.headers['Location']
+
+    response = client.get('/vote/complex-vote')
+    assert response.status == '302 Found'
+    assert 'complex-vote/proposal-entities' in response.headers['Location']
+
+
+def test_view_vote_entities(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    upload_vote(client)
+    upload_complex_vote(client)
+
+    for view in (
+        'vote/entities',
+        'complex-vote/proposal-entities',
+        'complex-vote/counter-proposal-entities',
+        'complex-vote/tie-breaker-entities'
+    ):
+        response = client.get(f'/vote/{view}')
+        assert 'Walchwil' in response
+        assert '46.70' in response
+        assert '37.21' in response
+
+        data_url = response.pyquery('.entities-map')[0].attrib['data-dataurl']
+        assert data_url.endswith('/by-entity')
+        assert client.get(data_url).json['1701']['counted'] is True
+
+        url = response.pyquery('.entities-map')[0].attrib['data-embed-source']
+        assert data_url in client.get(url)
+
+
+def test_view_vote_districts(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    upload_vote(client, canton='gr')
+    upload_complex_vote(client, canton='gr')
+
+    for view in (
+        'vote/districts',
+        'complex-vote/proposal-districts',
+        'complex-vote/counter-proposal-districts',
+        'complex-vote/tie-breaker-districts'
+    ):
+        response = client.get(f'/vote/{view}')
+        assert 'Landquart' in response
+        assert '37.37' in response
+
+        data_url = response.pyquery('.districts-map')[0].attrib['data-dataurl']
+        assert data_url.endswith('/by-district')
+        assert client.get(data_url).json['Landquart']['counted'] is False
+
+        url = response.pyquery('.districts-map')[0].attrib['data-embed-source']
+        assert data_url in client.get(url)
 
 
 def test_view_vote_json(election_day_app):

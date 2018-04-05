@@ -5,7 +5,7 @@
   if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     module.exports = factory;
   } else {
-    root.ballotMap = factory(root.d3, root.topojson);
+    root.districtsMap = factory(root.d3, root.topojson);
   }
 }(this, function(d3, topojson) {
     return function(params) {
@@ -85,62 +85,38 @@
                                    ((b.x - p.x > p.x + p.width - b.x - b.width) ? 'w' : 'e');
                         })
                         .html(function(d) {
-                            if (isUndefined(d.properties.result) ||
-                                isUndefined(d.properties.result.yeas_percentage)) {
-                                return '<strong>' + d.properties.name + '</strong>';
+                            console.log(d);
+                            var name = '<strong>' + d.key + '</strong>';
+                            if (d.value.counted) {
+                                var yeas_percentage =  Math.round(d.value.yeas_percentage * 100) / 100;
+                                var nays_percentage =  Math.round(d.value.nays_percentage * 100) / 100;
+                                if (yeas_percentage > nays_percentage) {
+                                    return name + '<br/><i class="fa fa-thumbs-up"></i> ' + yeas_percentage + '%';
+                                } else {
+                                    return name + '<br/><i class="fa fa-thumbs-down"></i> ' + nays_percentage + '%';
+                                }
                             }
-                            var yeas_percentage =  Math.round(d.properties.result.yeas_percentage * 100) / 100;
-                            var nays_percentage =  Math.round(d.properties.result.nays_percentage * 100) / 100;
-
-                            // use symbols to avoid text which we would have to translate
-                            // also, only show the winning side, not both
-                            if (yeas_percentage > nays_percentage) {
-                                return [
-                                    '<strong>' + d.properties.name + '</strong>',
-                                    '<i class="fa fa-thumbs-up"></i> ' + yeas_percentage + '%'
-                                ].join('<br/>');
-                            } else {
-                                return [
-                                    '<strong>' + d.properties.name + '</strong>',
-                                    '<i class="fa fa-thumbs-down"></i> ' + nays_percentage + '%'
-                                ].join('<br/>');
-                            }
+                            return name;
                         });
                 }
 
-                // Add municipalties
+                // Add districts
                 mapdata.transform.translate=[0,0];
-                var municipalities = svg.append('g')
-                    .attr('class', 'municipality')
-                    .style('fill', 'transparent')
-                    .selectAll('path')
-                    .data(
-                        topojson.feature(mapdata, mapdata.objects.municipalities).features
-                    )
-                    .enter().append('path')
-                    .attr('d', path)
-                    .attr('fill', function(d) {
-                        // store the result for the tooltip
-                        d.properties.result = data[d.properties.id];
-                        if (!isUndefined(d.properties.result)) {
-                            if (d.properties.result.counted) {
-                                return scale(d.properties.result.yeas_percentage);
-                            } else {
-                                return 'url(#uncounted)';
-                            }
-                        }
+                var districts = svg.selectAll('g')
+                    .data(d3.entries(data))
+                    .enter().append('g')
+                    .attr('class', 'district')
+                    .append("path")
+                    .attr('d', function(d) {
+                        var selected = d3.set(d.value.municipalities);
+                        var features = mapdata.objects.municipalities.geometries.filter(function(s) { return selected.has(s.id); });
+                        return path(topojson.merge(mapdata, features));
                     })
-                    .attr('class', function(d) {
-                        if (!isUndefined(d.properties.result)) {
-                            if (d.properties.result.counted) {
-                                return 'counted';
-                            } else {
-                                return 'uncounted';
-                            }
-                        }
-                    });
+                    .attr('fill', function(d) {return d.value.counted ? scale(d.value.yeas_percentage) : 'url(#uncounted)';})
+                    .attr('class', function(d) { return d.value.counted ? 'counted' : 'uncounted';});
+
                 if (interactive) {
-                    municipalities
+                    districts
                         .on('mouseover.tooltip', tooltip.show)
                         .on('mouseout.tooltip', tooltip.hide)
                         .on('mouseover.highlight', function(d) {
@@ -171,22 +147,9 @@
                         .attr('d', path);
                 }
 
-                // Add Borders
-                svg.append('g')
-                    .append('path')
-                    .datum(topojson.mesh(
-                        mapdata, mapdata.objects.municipalities, function(a, b) {
-                            return a !== b;
-                        }
-                    ))
-                    .attr('class', 'border')
-                    .style('stroke-width', '1px')
-                    .style('fill', 'none')
-                    .attr('d', path);
-
                 // Add the expats
                 var bboxMap = svg[0][0].getBBox();
-                if (0 in data) {
+                if ("" in data) {
                     // the globe is 230px unscaled, we place it in the lower
                     // left corner for now
                     globe = svg.append('g')
@@ -195,10 +158,8 @@
                             'translate(0,' + Math.round(bboxMap.y + 3 / 4 * bboxMap.height) +  ')'
                         )
                         .property('__data__', {
-                            'properties': {
-                              'name': expats,
-                              'result': data[0]
-                            }
+                            'key': expats,
+                            'value': data[""]
                           }
                         )
                         .append('g')
@@ -210,7 +171,7 @@
                     globe.append('g')
                         .append('path')
                         .attr('fill', 'white')
-                        .attr('fill', scale(data[0].yeas_percentage))
+                        .attr('fill', scale(data[""].yeas_percentage))
                         .attr('stroke', 'none')
                         .attr('d', "M 306.11308,163.17191 C 306.11308,224.93199 256.04569,274.99881 194.2941,274.99881 C 132.53683,274.99881 82.472286,224.93144 82.472286,163.17191 C 82.472286,101.41465 132.53683,51.352937 194.2941,51.352937 C 256.04569,51.352937 306.11308,101.41465 306.11308,163.17191 L 306.11308,163.17191 z ");
 
