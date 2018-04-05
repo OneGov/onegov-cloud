@@ -33,15 +33,18 @@ def view_vote_json(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_modified)
 
-    show_map = request.app.principal.is_year_available(self.date.year)
-    media = {}
+    embed = {}
+    media = {'maps': {}}
     if VoteLayout(self, request).pdf_path:
         media['pdf'] = request.link(self, 'pdf')
-    if show_map:
-        media['maps'] = {}
-        for ballot in self.ballots:
-            if VoteLayout(self, request, tab=ballot.type).svg_path:
-                media['maps'][ballot.type] = request.link(ballot, 'svg')
+    for map in ('entities', 'districts'):
+        for ballot in ('', 'proposal-', 'counter-proposal-', 'tie-breaker-'):
+            tab = f'{ballot}{map}'
+            layout = VoteLayout(self, request, tab)
+            if layout.visible:
+                embed[tab] = request.link(layout.ballot, name=f'{map}-map')
+                if layout.svg_path:
+                    media['maps'][tab] = layout.svg_link
 
     counted = self.progress[0]
     nays_percentage = self.nays_percentage if counted else None
@@ -111,11 +114,7 @@ def view_vote_json(self, request):
             } for ballot in self.ballots
         ],
         'url': request.link(self),
-        'embed': {
-            ballot.type: request.link(ballot, 'map')
-            for ballot in self.ballots if show_map
-
-        },
+        'embed': embed,
         'media': media,
         'data': {
             'json': request.link(self, 'data-json'),
