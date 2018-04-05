@@ -52,7 +52,7 @@ A onegov.yml file looks like this:
 import click
 import multiprocessing
 import os
-import resource
+import psutil
 import signal
 import sys
 import time
@@ -131,6 +131,13 @@ def run(config_file, port, pdb):
     server.join()
 
 
+def current_memory_usage():
+    return psutil.Process(os.getpid()).memory_info().rss
+
+
+LAST_MEMORY_USAGE = current_memory_usage()
+
+
 class CustomWSGIRequestHandler(WSGIRequestHandler):
     """ Measures the time it takes to respond to a request and prints it
     at the end of the request.
@@ -139,6 +146,7 @@ class CustomWSGIRequestHandler(WSGIRequestHandler):
 
     def parse_request(self):
         self._started = datetime.utcnow()
+        self._memory = current_memory_usage()
 
         return WSGIRequestHandler.parse_request(self)
 
@@ -151,7 +159,7 @@ class CustomWSGIRequestHandler(WSGIRequestHandler):
         method = self.command
         path = self.path
 
-        template = "{status} - {duration} - {method} {path}"
+        template = "{status} - {duration} - {method} {path} {c:.3f} ({d:+.3f})"
 
         if status in {302, 304}:
             path = colorize(path, rgb=0x666666)  # grey
@@ -194,7 +202,7 @@ class WsgiProcess(multiprocessing.Process):
         self._ready = multiprocessing.Value('i', 0)
 
         # memory usage over time
-        self.memory_usage = [self.current_memory_usage]
+        self.memory_usage = [current_memory_usage()]
         self.memory_usage_max_count = 10
 
         try:
@@ -223,26 +231,26 @@ class WsgiProcess(multiprocessing.Process):
         if len(self.memory_usage) == self.memory_usage_max_count:
             self.memory_usage.pop(0)
 
-        self.memory_usage.append(self.current_memory_usage)
+        self.memory_usage.append(current_memory_usage())
         total_memory = self.memory_usage[-1] / 1024 / 1024
 
         if len(self.memory_usage) > 1:
-            delta = self.memory_usage[-1] - self.memory_usage[-2]
+            delta = (self.memory_usage[-1] - self.memory_usage[-2]) / 1024
         else:
             delta = 0
 
-        print(f"Total memory used: {total_memory:.2f} mb (Δ {delta}b)")
+        print(f"Total memory used: {total_memory:.2f} mb (Δ {delta}KiB)")
         print()
         print("Memory usage graph:")
         x = tuple(range(len(self.memory_usage)))
-        y = self.memory_usage
+        y = tuple(b / 1024 for b in self.memory_usage)
         print(plotille.plot(
             X=x,
             Y=y,
-            height=20,
-            width=40,
+            height=15,
+            width=50,
             lc='blue',
-            Y_label='bytes',
+            Y_label='KiB',
             X_label='invocations'
         ))
         print()

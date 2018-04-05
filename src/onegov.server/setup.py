@@ -44,6 +44,7 @@ setup(
             'morepath',
             'objgraph',
             'plotille',
+            'psutil',
             'pytest',
             'requests',
             'webtest'
