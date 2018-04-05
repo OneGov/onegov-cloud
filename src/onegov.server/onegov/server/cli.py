@@ -50,6 +50,7 @@ A onegov.yml file looks like this:
 """
 
 import click
+import gc
 import multiprocessing
 import os
 import psutil
@@ -57,6 +58,7 @@ import signal
 import sys
 import time
 import traceback
+import tracemalloc
 
 from datetime import datetime
 from onegov.server import Server
@@ -87,7 +89,26 @@ from xtermcolor import colorize
     default=False,
     is_flag=True
 )
-def run(config_file, port, pdb):
+@click.option(
+    '--tracemalloc-type',
+    help="Set the tracemalloc type",
+    default='lineno',
+    type=click.Choice(('filename', 'lineno', 'traceback'))
+)
+@click.option(
+    '--tracemalloc-frames',
+    help="Number of frames tracemalloc captures",
+    default=2,
+    type=int
+)
+@click.option(
+    '--tracemalloc-top',
+    help="Number of traces to show (in order of size)",
+    default=5,
+    type=int
+)
+def run(config_file, port, pdb,
+        tracemalloc_type, tracemalloc_frames, tracemalloc_top):
     """ Runs the onegov server with the given configuration file in the
     foreground.
 
@@ -111,7 +132,14 @@ def run(config_file, port, pdb):
     def wsgi_factory():
         return Server(Config.from_yaml_file(config_file), post_mortem=pdb)
 
-    server = WsgiServer(wsgi_factory, port=port)
+    server = WsgiServer(
+        wsgi_factory,
+        port=port,
+        tracemalloc_type=tracemalloc_type,
+        tracemalloc_frames=tracemalloc_frames,
+        tracemalloc_top=tracemalloc_top
+    )
+
     server.start()
 
     observer = Observer()
@@ -179,18 +207,32 @@ class CustomWSGIRequestHandler(WSGIRequestHandler):
         if method == 'POST':
             method = click.style(method, underline=True)
 
+        global LAST_MEMORY_USAGE
+        current_usage = current_memory_usage()
+
         print(template.format(
             status=status,
             method=method,
             path=path,
-            duration=duration
+            duration=duration,
+            c=current_usage / 1024 / 1024,
+            d=(current_usage - LAST_MEMORY_USAGE) / 1024 / 1024
         ))
+
+        LAST_MEMORY_USAGE = current_usage
 
 
 class WsgiProcess(multiprocessing.Process):
-    """ Runs the WSGI reference server in a separate process. """
+    """ Runs the WSGI reference server in a separate process. This is a debug
+    process, not used in production.
 
-    def __init__(self, app_factory, host='127.0.0.1', port=8080):
+    """
+
+    def __init__(self, app_factory, host='127.0.0.1', port=8080,
+                 tracemalloc_type='filename',
+                 tracemalloc_frames=2,
+                 tracemalloc_top=10):
+
         multiprocessing.Process.__init__(self)
         self.app_factory = app_factory
 
@@ -205,6 +247,12 @@ class WsgiProcess(multiprocessing.Process):
         self.memory_usage = [current_memory_usage()]
         self.memory_usage_max_count = 10
 
+        # tracemalloc
+        self.snapshots = []
+        self.tracemalloc_type = tracemalloc_type
+        self.tracemalloc_frames = tracemalloc_frames
+        self.tracemalloc_top = tracemalloc_top
+
         try:
             self.stdin_fileno = sys.stdin.fileno()
         except ValueError:
@@ -218,9 +266,46 @@ class WsgiProcess(multiprocessing.Process):
     def port(self):
         return self._actual_port.value
 
-    @property
-    def current_memory_usage(self):
-        return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    def take_tracemalloc_snapshot(self):
+
+        if not tracemalloc.is_tracing():
+            tracemalloc.start(self.tracemalloc_frames)
+
+        # reduces noise
+        gc.collect()
+
+        snapshot = tracemalloc.take_snapshot()
+        self.snapshots.append(snapshot)
+
+        return snapshot
+
+    def compare_snapshots(self, prev, curr):
+
+        # exclude debugging tools
+        excluded = ('tracemalloc', 'linecache', 'objgraph', 'server/cli')
+
+        filters = [
+            tracemalloc.Filter(
+                inclusive=False,
+                filename_pattern=f'*{ex}*',
+                all_frames=False
+            ) for ex in excluded
+        ]
+
+        prev = prev.filter_traces(filters)
+        curr = curr.filter_traces(filters)
+
+        stats = curr.compare_to(prev, self.tracemalloc_type)
+        stats.sort(key=lambda s: s.size_diff, reverse=True)
+
+        for stat in stats[:self.tracemalloc_top]:
+            delta_blocks = stat.count_diff
+            delta_kibyte = stat.size_diff / 1024
+
+            print(f"Δ size: {delta_kibyte} KiB | Δ blocks: {delta_blocks}")
+
+            for line in stat.traceback.format():
+                print(colorize(line, rgb=0x666666))
 
     def print_memory_stats(self, signum, frame):
 
@@ -260,6 +345,15 @@ class WsgiProcess(multiprocessing.Process):
         print("Growth since last invocation:")
         objgraph.show_growth(limit=10)
         print()
+
+        if not self.snapshots:
+            print("No tracemalloc snapshots yet, creating first one.")
+            print()
+            self.take_tracemalloc_snapshot()
+        else:
+            print("Tracemalloc growth:")
+            prev, curr = self.snapshots[-1], self.take_tracemalloc_snapshot()
+            self.compare_snapshots(prev, curr)
 
     def disable_systemwide_darwin_proxies(self):
         # System-wide proxy settings on darwin need to be disabled, because
@@ -319,13 +413,15 @@ class WsgiServer(FileSystemEventHandler):
 
     """
 
-    def __init__(self, app_factory, host='127.0.0.1', port=8080):
+    def __init__(self, app_factory, host='127.0.0.1', port=8080, **extra):
         self.app_factory = app_factory
         self._host = host
         self._port = port
+        self._extra = extra
 
     def spawn(self):
-        return WsgiProcess(self.app_factory, self._host, self._port)
+        return WsgiProcess(
+            self.app_factory, self._host, self._port, **self._extra)
 
     def join(self, timeout=None):
         if self.process.is_alive():
