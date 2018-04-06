@@ -63,7 +63,6 @@ setup(
         'polib',
         'psqlparse',
         'python-magic>=0.4.12',
-        'python-rapidjson',
         'psycopg2',
         'pylru',
         'pycurl',

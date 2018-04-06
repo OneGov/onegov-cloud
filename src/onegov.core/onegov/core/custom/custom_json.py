@@ -11,13 +11,13 @@ don't support decoding...
 
 import datetime
 import isodate
+import json
 import re
+import types
 
 from decimal import Decimal
 from itertools import chain
 from onegov.core.cache import lru_cache
-from rapidjson import Decoder as RapidJsonDecoder
-from rapidjson import Encoder as RapidJsonEncoder
 
 
 class Serializer(object):
@@ -177,13 +177,19 @@ class Serializers(object):
         if serializer:
             return serializer.encode(value)
 
+        if isinstance(value, types.GeneratorType):
+            return tuple(v for v in value)
+
         raise TypeError('{} is not JSON serializable'.format(repr(value)))
 
     def decode(self, value):
         serializer = self.serializer_for(value)
 
         if serializer:
-            return serializer.decode(value)
+            value = serializer.decode(value)
+        elif isinstance(value, dict):
+            for k, v in value.items():
+                value[k] = self.decode(v)
 
         return value
 
@@ -248,41 +254,25 @@ class Serializable(object):
         ))
 
 
-class Encoder(RapidJsonEncoder):
-
-    def __init__(self, *args, **kwargs):
-        self.serializers = kwargs.pop('serializers', default_serializers)
-        super().__init__()
-
-    def default(self, o):
-        return self.serializers.encode(o)
-
-
-class Decoder(RapidJsonDecoder):
-
-    def __init__(self, *args, **kwargs):
-        self.serializers = kwargs.pop('serializers', default_serializers)
-        super().__init__()
-
-    def string(self, value):
-        return self.serializers.decode(value)
-
-    def end_object(self, value):
-        return self.serializers.decode(value)
-
-
-def dumps(obj, *args, **kwargs):
+def dumps(obj, **extra):
     if obj is not None:
-        return Encoder(*args, **kwargs)(obj)
-    else:
-        return None
+        return json.dumps(
+            obj,
+            default=default_serializers.encode,
+            separators=(',', ':'),
+            **extra)
+
+    return None
 
 
-def loads(value, *args, **kwargs):
-    if value is not None:
-        return Decoder(*args, **kwargs)(value)
-    else:
-        return {}
+def loads(txt, **extra):
+    if txt is not None:
+        return json.loads(
+            txt,
+            object_hook=default_serializers.decode,
+            **extra)
+
+    return {}
 
 
 def dump(data, fp, *args, **kwargs):
