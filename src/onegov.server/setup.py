@@ -42,8 +42,6 @@ setup(
         test=[
             'coverage',
             'morepath',
-            'objgraph',
-            'plotille',
             'psutil',
             'pytest',
             'requests',
