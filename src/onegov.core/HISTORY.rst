@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.67.1 (2018-04-06)
+~~~~~~~~~~~~~~~~~~~
 
 - Switches to simplejson from rapidjson to close down a memory leak.
   [href]
