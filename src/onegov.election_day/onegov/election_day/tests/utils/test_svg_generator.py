@@ -28,49 +28,50 @@ def test_generate_svg(election_day_app_gr, session):
 
         with freeze_time("2014-04-04 14:00"):
             item = add_majorz_election(session)
-            generator.generate_svg(item, 'lists', 'de_CH')
-            generator.generate_svg(item, 'candidates', 'de_CH')
-            generator.generate_svg(item, 'candidates')
-            generator.generate_svg(item, 'connections', 'de_CH')
-            generator.generate_svg(item, 'party-strengths', 'de_CH')
-            generator.generate_svg(item, 'parties-panachage', 'de_CH')
-            generator.generate_svg(item, 'lists-panachage', 'de_CH')
-            generator.generate_svg(item, 'entities-map', 'de_CH')
-            generator.generate_svg(item, 'districts-map', 'de_CH')
+            lm = item.last_modified
+            generator.generate_svg(item, 'lists', lm, 'de_CH')
+            generator.generate_svg(item, 'candidates', lm, 'de_CH')
+            generator.generate_svg(item, 'candidates', lm)
+            generator.generate_svg(item, 'connections', lm, 'de_CH')
+            generator.generate_svg(item, 'party-strengths', lm, 'de_CH')
+            generator.generate_svg(item, 'parties-panachage', lm, 'de_CH')
+            generator.generate_svg(item, 'lists-panachage', lm, 'de_CH')
+            generator.generate_svg(item, 'map', lm, 'de_CH')
 
             item = add_proporz_election(session)
-            generator.generate_svg(item, 'lists', 'de_CH')
-            generator.generate_svg(item, 'candidates', 'de_CH')
-            generator.generate_svg(item, 'connections', 'de_CH')
-            generator.generate_svg(item, 'party-strengths', 'de_CH')
-            generator.generate_svg(item, 'parties-panachage', 'de_CH')
-            generator.generate_svg(item, 'lists-panachage', 'de_CH')
-            generator.generate_svg(item, 'entities-map', 'de_CH')
-            generator.generate_svg(item, 'districts-map', 'de_CH')
+            lm = item.last_modified
+            generator.generate_svg(item, 'lists', lm, 'de_CH')
+            generator.generate_svg(item, 'candidates', lm, 'de_CH')
+            generator.generate_svg(item, 'connections', lm, 'de_CH')
+            generator.generate_svg(item, 'party-strengths', lm, 'de_CH')
+            generator.generate_svg(item, 'parties-panachage', lm, 'de_CH')
+            generator.generate_svg(item, 'lists-panachage', lm, 'de_CH')
+            generator.generate_svg(item, 'map', lm, 'de_CH')
 
             item = add_election_compound(session)
-            generator.generate_svg(item, 'lists', 'de_CH')
-            generator.generate_svg(item, 'candidates', 'de_CH')
-            generator.generate_svg(item, 'connections', 'de_CH')
-            generator.generate_svg(item, 'party-strengths', 'de_CH')
-            generator.generate_svg(item, 'parties-panachage', 'de_CH')
-            generator.generate_svg(item, 'lists-panachage', 'de_CH')
-            generator.generate_svg(item, 'entities-map', 'de_CH')
-            generator.generate_svg(item, 'districts-map', 'de_CH')
+            lm = item.last_modified
+            generator.generate_svg(item, 'lists', lm, 'de_CH')
+            generator.generate_svg(item, 'candidates', lm, 'de_CH')
+            generator.generate_svg(item, 'connections', lm, 'de_CH')
+            generator.generate_svg(item, 'party-strengths', lm, 'de_CH')
+            generator.generate_svg(item, 'parties-panachage', lm, 'de_CH')
+            generator.generate_svg(item, 'lists-panachage', lm, 'de_CH')
+            generator.generate_svg(item, 'map', lm, 'de_CH')
 
             item = add_vote(session, 'complex').proposal
-            generator.generate_svg(item, 'lists', 'de_CH')
-            generator.generate_svg(item, 'candidates', 'de_CH')
-            generator.generate_svg(item, 'connections', 'de_CH')
-            generator.generate_svg(item, 'party-strengths', 'de_CH')
-            generator.generate_svg(item, 'parties-panachage', 'de_CH')
-            generator.generate_svg(item, 'lists-panachage', 'de_CH')
-            generator.generate_svg(item, 'entities-map', 'de_CH')
-            generator.generate_svg(item, 'districts-map', 'de_CH')
-            generator.generate_svg(item, 'entities-map', 'it_CH')
+            lm = item.vote.last_modified
+            generator.generate_svg(item, 'lists', lm, 'de_CH')
+            generator.generate_svg(item, 'candidates', lm, 'de_CH')
+            generator.generate_svg(item, 'connections', lm, 'de_CH')
+            generator.generate_svg(item, 'party-strengths', lm, 'de_CH')
+            generator.generate_svg(item, 'parties-panachage', lm, 'de_CH')
+            generator.generate_svg(item, 'lists-panachage', lm, 'de_CH')
+            generator.generate_svg(item, 'map', lm, 'de_CH')
+            generator.generate_svg(item, 'map', lm, 'it_CH')
 
         with freeze_time("2015-05-05 15:00"):
-            generator.generate_svg(item, 'map', 'it_CH')
+            lm = item.vote.last_modified
+            generator.generate_svg(item, 'map', lm, 'it_CH')
 
         assert gc.call_count == 13
 

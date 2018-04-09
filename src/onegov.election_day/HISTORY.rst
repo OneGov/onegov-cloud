@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves performance.
+  [msom]
+
 3.4.1 (2018-04-09)
 ~~~~~~~~~~~~~~~~~~~
 

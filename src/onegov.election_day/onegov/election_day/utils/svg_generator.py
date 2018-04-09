@@ -1,7 +1,6 @@
 from onegov.ballot import Ballot
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
-from onegov.ballot import Vote
 from onegov.core.utils import groupbylist
 from onegov.election_day import log
 from onegov.election_day.utils import svg_filename
@@ -31,14 +30,16 @@ class SvgGenerator():
             if fs.exists(path) and not file.is_dir:
                 fs.remove(path)
 
-    def generate_svg(self, item, type_, locale=None):
+    def generate_svg(self, item, type_, last_modified, locale=None):
         """ Creates the requested SVG. """
 
         if not self.app.filestorage.exists(self.svg_dir):
             self.app.filestorage.makedir(self.svg_dir)
 
         existing = self.app.filestorage.listdir(self.svg_dir)
-        filename = svg_filename(item, type_, locale)
+        filename = svg_filename(
+            item, type_, locale, last_modified=last_modified
+        )
 
         if filename in existing:
             return None
@@ -85,25 +86,36 @@ class SvgGenerator():
             fs.makedir(self.svg_dir)
 
         # Generate the SVGs
+        created = []
         principal = self.app.principal
         for election in self.session.query(Election):
-            self.generate_svg(election, 'candidates')
+            last_modified = election.last_modified
+            created.append(
+                svg_filename(election, '', '', last_modified=last_modified)
+            )
+            self.generate_svg(election, 'candidates', last_modified)
             if election.type == 'proporz':
-                self.generate_svg(election, 'lists')
-                self.generate_svg(election, 'connections')
-                self.generate_svg(election, 'party-strengths')
-                self.generate_svg(election, 'parties-panachage')
-                self.generate_svg(election, 'lists-panachage')
-        for election_compound in self.session.query(ElectionCompound):
-            self.generate_svg(election_compound, 'party-strengths')
-            self.generate_svg(election_compound, 'parties-panachage')
+                self.generate_svg(election, 'lists', last_modified)
+                self.generate_svg(election, 'connections', last_modified)
+                self.generate_svg(election, 'party-strengths', last_modified)
+                self.generate_svg(election, 'parties-panachage', last_modified)
+                self.generate_svg(election, 'lists-panachage', last_modified)
+        for compound in self.session.query(ElectionCompound):
+            last_modified = compound.last_modified
+            created.append(
+                svg_filename(compound, '', '', last_modified=last_modified)
+            )
+            self.generate_svg(compound, 'party-strengths', last_modified)
+            self.generate_svg(compound, 'parties-panachage', last_modified)
         if principal.use_maps:
             for ballot in self.session.query(Ballot):
+                last_modified = ballot.vote.last_modified
+                created.append(
+                    svg_filename(ballot, '', '', last_modified=last_modified)
+                )
                 if principal.is_year_available(ballot.vote.date.year):
                     for locale in self.app.locales:
-                        self.generate_svg(ballot, 'entities-map', locale)
-                        if principal.has_districts:
-                            self.generate_svg(ballot, 'districts-map', locale)
+                        self.generate_svg(ballot, 'map', last_modified, locale)
 
         # Delete old SVGs
         existing = fs.listdir(self.svg_dir)
@@ -113,14 +125,7 @@ class SvgGenerator():
         ))
 
         # ... orphaned files
-        created = [
-            svg_filename(item, '', '').split('.')[0]
-            for item in
-            self.session.query(Election).all() +
-            self.session.query(ElectionCompound).all() +
-            self.session.query(Ballot).all() +
-            self.session.query(Vote).all()
-        ]
+        created = [name.split('.')[0] for name in created]
         diff = set(existing.keys()) - set(created)
         files = ['{}*'.format(file) for file in diff if file]
         self.remove(self.svg_dir, files)

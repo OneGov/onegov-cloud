@@ -946,9 +946,14 @@ class PdfGenerator():
         existing = fs.listdir(self.pdf_dir)
 
         # Generate the PDFs
+        created = []
         for locale in self.app.locales:
             for item in items:
-                filename = pdf_filename(item, locale)
+                last_modified = item.last_modified
+                filename = pdf_filename(
+                    item, locale, last_modified=last_modified
+                )
+                created.append(filename.split('.')[0])
                 if filename not in existing and item.completed:
                     path = '{}/{}'.format(self.pdf_dir, filename)
                     if fs.exists(path):
@@ -971,9 +976,6 @@ class PdfGenerator():
         ))
 
         # ... orphaned files
-        created = [
-            pdf_filename(item, '').split('.')[0] for item in items
-        ]
         for id in set(existing.keys()) - set(created):
             self.remove(self.pdf_dir, existing[id])
 
