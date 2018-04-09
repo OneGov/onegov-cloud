@@ -91,7 +91,8 @@ class ElectionDayApp(Framework):
 
     @property
     def theme_options(self):
-        assert self.principal.color is not None, """ No color defined, be
+        color = self.principal.color
+        assert color is not None, """ No color defined, be
         sure to define one in your principal.yml like this:
 
             color: '#123456'
@@ -99,9 +100,7 @@ class ElectionDayApp(Framework):
         Note how you need to add apostrophes around the definition!
         """
 
-        return {
-            'primary-color': self.principal.color
-        }
+        return {'primary-color': color}
 
     @property
     def pages_cache(self):

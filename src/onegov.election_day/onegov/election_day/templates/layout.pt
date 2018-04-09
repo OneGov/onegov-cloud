@@ -11,7 +11,7 @@ metal:define-macro="layout">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
         <tal:block metal:define-slot="title">
-            <tal:block content="layout.app.principal.name" />:
+            <tal:block content="layout.principal.name" />:
             <tal:block i18n:translate="">Elections &amp; Votes</tal:block>
         </tal:block>
     </title>
@@ -78,7 +78,7 @@ metal:define-macro="layout">
                 </ul>
             </div>
             <div class="small-12 medium-4 medium-pull-4 columns small-only-text-center">
-                <span >&copy; ${layout.copyright_year} ${layout.app.principal.name}</span><br>
+                <span >&copy; ${layout.copyright_year} ${layout.principal.name}</span><br>
                 <a class="onegov-link" href="https://onegovcloud.ch">OneGov Cloud</a> | <a href="https://github.com/OneGov/onegov.election_day/blob/master/HISTORY.rst#changelog">v${layout.app_version}</a><br>
                 <a class="open-data-link" href="${layout.opendata_link}" i18n:translate>Open Data</a>
             </div>
@@ -94,7 +94,7 @@ metal:define-macro="layout">
     </footer>
     <footer tal:condition="request.browser_session.get('headerless')">
         <div class="row">
-            <div class="small-12 columns">&copy; ${layout.copyright_year} ${layout.app.principal.name}</div>
+            <div class="small-12 columns">&copy; ${layout.copyright_year} ${layout.principal.name}</div>
         </div>
     </footer>
     <tal:block tal:content="structure layout.principal.analytics|nothing" />

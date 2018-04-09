@@ -3,7 +3,7 @@
      tal:define="communal_instance layout.principal.domain == 'municipality'">
     <tal:block metal:fill-slot="before-content">
         <h1>
-            <small>${layout.app.principal.name}</small>
+            <small>${layout.principal.name}</small>
             <tal:block i18n:translate="">Elections &amp; Votes</tal:block>
         </h1>
 
