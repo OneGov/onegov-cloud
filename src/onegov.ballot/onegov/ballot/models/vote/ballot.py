@@ -111,11 +111,12 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
     def counted(self):
         """ True if all results have been counted. """
 
-        count = self.results.count()
-        if not count:
-            return False
-
-        return (sum(1 for r in self.results if r.counted) == count)
+        result = self.results.with_entities(
+            func.coalesce(func.bool_and(BallotResult.counted), False)
+        )
+        result = result.order_by(None)
+        result = result.first()
+        return result[0] if result else False
 
     @counted.expression
     def counted(cls):
@@ -161,7 +162,12 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
 
-        return sum(getattr(result, attribute) for result in self.results)
+        result = self.results.with_entities(
+            func.sum(getattr(BallotResult, attribute))
+        )
+        result = result.order_by(None)
+        result = result.first()
+        return (result[0] or 0) if result else 0
 
     @staticmethod
     def aggregate_results_expression(cls, attribute):
