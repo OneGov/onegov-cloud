@@ -14,13 +14,13 @@
 
 - name: CONCORDIA
   logo_url:
-    de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=logo\\|feriennet\\|0\\|0\\|fnet\\|de'
-    fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=logo\\|feriennet\\|0\\|0\\|fnet\\|fr'
-    it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=logo\\|feriennet\\|0\\|0\\|fnet\\|it'
+    de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=logo|feriennet|0|0|fnet|de'
+    fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=logo|feriennet|0|0|fnet|fr'
+    it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=logo|feriennet|0|0|fnet|it'
   mail_url:
-    de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=mail\\|feriennet\\|0\\|0\\|fnet\\|de'
-    fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=mail\\|feriennet\\|0\\|0\\|fnet\\|fr'
-    it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=mail\\|feriennet\\|0\\|0\\|fnet\\|it'
+    de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=mail|feriennet|0|0|fnet|de'
+    fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=mail|feriennet|0|0|fnet|fr'
+    it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=mail|feriennet|0|0|fnet|it'
   logo: sponsors/concordia.svg
   background: '#fff'
   width: 200px
@@ -28,11 +28,14 @@
   top: -5px
   banners:
     bookings:
-      src: sponsors/concordia-banner.jpg
+      src:
+        de: sponsors/concordia-banner-de.jpg
+        fr: sponsors/concordia-banner-fr.jpg
+        it: sponsors/concordia-banner-it.jpg
       url:
-        de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner\\|feriennet\\|0\\|0\\|fnet\\|de'
-        fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner\\|feriennet\\|0\\|0\\|fnet\\|fr'
-        it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=banner\\|feriennet\\|0\\|0\\|fnet\\|it'
+        de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner|feriennet18f|0|0|fnet|de'
+        fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner|feriennet18f|0|0|fnet|fr'
+        it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=banner|feriennet18f|0|0|fnet|it'
 
 - name: CREDIT SUISSE
   logo_url:

@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Enables Concordia's 2018 summer banner.
+  [href]
+
 1.3.26 (2018-04-02)
 ~~~~~~~~~~~~~~~~~~~
 
