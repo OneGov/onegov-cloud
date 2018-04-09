@@ -84,7 +84,13 @@ class ElectionCompoundLayout(DetailLayout):
         """ Returns the path to the PDF file or None, if it is not available.
         """
 
-        path = 'pdf/{}'.format(pdf_filename(self.model, self.request.locale))
+        path = 'pdf/{}'.format(
+            pdf_filename(
+                self.model,
+                self.request.locale,
+                last_modified=self.last_modified
+            )
+        )
         if self.request.app.filestorage.exists(path):
             return path
 
@@ -95,7 +101,11 @@ class ElectionCompoundLayout(DetailLayout):
         """ Returns the path to the SVG or None, if it is not available. """
 
         path = 'svg/{}'.format(
-            svg_filename(self.model, self.tab)
+            svg_filename(
+                self.model,
+                self.tab,
+                last_modified=self.last_modified
+            )
         )
         if self.request.app.filestorage.exists(path):
             return path

@@ -28,16 +28,21 @@ def view_election_compound(self, request):
 def view_election_compound_json(self, request):
     """" The main view as JSON. """
 
+    last_modified = self.last_modified
+
     @request.after
     def add_last_modified(response):
-        add_last_modified_header(response, self.last_modified)
+        add_last_modified_header(response, last_modified)
 
     embed = {}
     media = {'charts': {}}
-    if ElectionCompoundLayout(self, request).pdf_path:
+    layout = ElectionCompoundLayout(self, request)
+    layout.last_modified = last_modified
+    if layout.pdf_path:
         media['pdf'] = request.link(self, 'pdf')
     for tab in ('party-strengths', 'parties-panachage'):
         layout = ElectionCompoundLayout(self, request, tab=tab)
+        layout.last_modified = last_modified
         if layout.visible:
             embed[tab] = request.link(self, '{}-chart'.format(tab))
         if layout.svg_path:
@@ -46,7 +51,7 @@ def view_election_compound_json(self, request):
     return {
         'completed': self.completed,
         'date': self.date.isoformat(),
-        'last_modified': self.last_modified.isoformat(),
+        'last_modified': last_modified.isoformat(),
         'mandates': {
             'allocated': self.allocated_mandates or 0,
             'total': self.number_of_mandates or 0,

@@ -22,5 +22,9 @@ class DetailLayout(DefaultLayout):
         return self.model.last_result_change
 
     @cached_property
+    def last_modified(self):
+        return self.model.last_modified
+
+    @cached_property
     def related_link(self):
         return self.model.related_link
