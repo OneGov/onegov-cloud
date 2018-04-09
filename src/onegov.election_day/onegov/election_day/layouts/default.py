@@ -8,6 +8,8 @@ from onegov.core.static import StaticFile
 from onegov.election_day import _
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.user import Auth
+import babel.numbers
+import numbers
 
 
 class DefaultLayout(ChameleonLayout):
@@ -127,6 +129,33 @@ class DefaultLayout(ChameleonLayout):
             (get_name(locale), get_link(locale))
             for locale in sorted(self.app.locales)
         ]
+
+    @cached_property
+    def symbols(self):
+        return {
+            locale: (
+                babel.numbers.get_decimal_symbol(locale),
+                babel.numbers.get_group_symbol(locale)
+            )
+            for locale in self.app.locales
+        }
+
+    def format_number(self, number, decimal_places=None):
+        """ Takes the given numer and formats it according to locale.
+
+        If the number is an integer, the default decimal places are 0,
+        otherwise 2.
+
+        """
+        if decimal_places is None:
+            if isinstance(number, numbers.Integral):
+                decimal_places = 0
+            else:
+                decimal_places = 2
+
+        decimal, group = self.symbols[self.request.locale]
+        result = '{{:,.{}f}}'.format(decimal_places).format(number)
+        return result.translate({ord(','): group, ord('.'): decimal})
 
     def format_name(self, item):
         if hasattr(item, 'entity_id'):
