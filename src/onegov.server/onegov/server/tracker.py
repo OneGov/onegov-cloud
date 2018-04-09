@@ -37,8 +37,6 @@ class ResourceTracker(object):
         if self.enable_tracemalloc:
             tracemalloc.start()
 
-        self.track()
-
     @property
     def memory_usage(self):
         return self.memory_snapshots[-1]
