@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Greatly improves reindex performance (2x - 10x faster).
+  [href]
+
 1.3.2 (2018-03-16)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -22,15 +22,8 @@ def reindex(group_context):
         print(click.style(title, underline=True))
 
         start = utcnow()
-
-        session = request.session
         request.app.es_perform_reindex()
 
         print(f"took {utcnow() - start}")
-
-        @request.after
-        def cleanup(response):
-            session.invalidate()
-            session.bind.dispose()
 
     return run_reindex

@@ -2,6 +2,7 @@ import platform
 import re
 
 from copy import deepcopy
+from elasticsearch.helpers import streaming_bulk
 from elasticsearch.exceptions import NotFoundError
 from langdetect.lang_detect_exception import LangDetectException
 from onegov.core.utils import is_non_string_iterable
@@ -169,6 +170,43 @@ class Indexer(object):
             pass
 
         return processed
+
+    def bulk_process(self):
+        """ Processes the queue in bulk. This offers better performance but it
+        is less safe at the moment and should only be used as part of
+        reindexing.
+
+        """
+
+        def actions():
+            try:
+                task = self.queue.get(block=False, timeout=None)
+
+                if task['action'] == 'index':
+                    yield {
+                        '_op_type': 'index',
+                        '_index': self.ensure_index(task),
+                        '_type': task['type_name'],
+                        '_id': task['id'],
+                        'doc': task['properties']
+                    }
+                elif task['action'] == 'delete':
+                    yield {
+                        '_op_type': 'delete',
+                        '_index': self.ensure_index(task),
+                        '_type': task['type_name'],
+                        '_id': task['id'],
+                        'doc': task['properties']
+                    }
+                else:
+                    raise NotImplementedError
+
+            except Empty:
+                pass
+
+        for success, info in streaming_bulk(self.es_client, actions()):
+            if success:
+                self.queue.task_done()
 
     def process_task(self, task):
         try:

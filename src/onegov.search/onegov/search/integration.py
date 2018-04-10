@@ -1,6 +1,7 @@
 import certifi
 import morepath
 
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from elasticsearch import ConnectionError  # shadows a python builtin!
 from elasticsearch import Elasticsearch
@@ -14,6 +15,7 @@ from onegov.search.indexer import ORMEventTranslator
 from onegov.search.indexer import TypeMappingRegistry
 from onegov.search.utils import searchable_sqlalchemy_models
 from sqlalchemy import inspect
+from sqlalchemy.orm import undefer
 from urllib3.exceptions import HTTPError
 
 
@@ -322,23 +324,35 @@ class ElasticsearchApp(morepath.App):
         ixs = self.es_indexer.ixmgr.get_managed_indices_wildcard(self.schema)
         self.es_client.indices.delete(ixs)
 
+        # have no queue limit for reindexing (that we're able to change
+        # this here is a bit of a CPython implementation detail) - we can't
+        # necessarily always rely on being able to change this property
+        self.es_orm_events.queue.maxsize = 0
+
         # load all database objects and index them
-        session = self.session()
+        def reindex_model(model):
+            session = self.session()
 
-        for base in self.session_manager.bases:
-            for model in searchable_sqlalchemy_models(base):
-                query = session.query(model)
+            try:
+                q = session.query(model).options(undefer('*'))
+                i = inspect(model)
 
-                # if the model has a polymorphic identity, limit the query
-                # by it, or we'll index too many things
-                info = inspect(model)
-                if info.polymorphic_on is not None:
-                    query = query.filter(
-                        info.polymorphic_on == info.polymorphic_identity)
+                if i.polymorphic_on is not None:
+                    q = q.filter(i.polymorphic_on == i.polymorphic_identity)
 
-                for obj in query:
+                for obj in q:
                     self.es_orm_events.index(self.schema, obj)
-                    self.es_indexer.process()
+            finally:
+                session.invalidate()
+                session.bind.dispose()
+
+        # by loading models in threads we can speed up the whole process
+        with ThreadPoolExecutor() as e:
+            e.map(reindex_model, (
+                m for b in self.session_manager.bases
+                  for m in searchable_sqlalchemy_models(b)))
+
+        self.es_indexer.bulk_process()
 
 
 @ElasticsearchApp.tween_factory(over=transaction_tween_factory)
