@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.4.2 (2018-04-10)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes district/entity not shown in election compounds.
   [msom]
