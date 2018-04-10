@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes district/entity not shown in election compounds.
+  [msom]
+
 - Improves performance.
   [msom]
 
