@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.4.0 (2018-04-10)
+~~~~~~~~~~~~~~~~~~~
+
 - Greatly improves reindex performance (2x - 10x faster).
   [href]
 
