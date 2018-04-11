@@ -10,6 +10,9 @@ Changelog
 - Uses a fixed callout color.
   [msom]
 
+- Adds titles to emails.
+  [msom]
+
 3.4.2 (2018-04-10)
 ~~~~~~~~~~~~~~~~~~~
 

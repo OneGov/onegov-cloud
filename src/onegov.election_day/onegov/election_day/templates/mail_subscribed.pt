@@ -3,6 +3,7 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="body">
+        <h1>${title}</h1>
         <p i18n:translate>Successfully subscribed to the email service. You will receive an email every time new results are published.</p>
     </tal:block>
     <tal:block metal:fill-slot="footer">
