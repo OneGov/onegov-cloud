@@ -243,6 +243,3 @@ def test_view_election_compound_data(election_day_app_gr):
 
     export = client.get('/elections/elections/data-csv')
     assert all((expected in export for expected in ("3503", "Sieger", "153")))
-
-    export = client.get('/elections/elections/data-xlsx')
-    assert export.status == '200 OK'

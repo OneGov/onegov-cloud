@@ -80,7 +80,6 @@ Formato|URL
 ---|---
 JSON|`/data-json`
 CSV|`/data-csv`
-XLSX|`/data-xlsx`
 
 I seguenti campi sono contenuti in tutti i formati:
 
@@ -163,7 +162,6 @@ Formato|URL
 ---|---
 JSON|`/data-json`
 CSV|`/data-csv`
-XLSX|`/data-xlsx`
 
 I seguenti campi sono contenuti in tutti i formati:
 

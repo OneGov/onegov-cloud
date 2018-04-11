@@ -82,7 +82,6 @@ Format|URL
 ---|---
 JSON|`/data-json`
 CSV|`/data-csv`
-XLSX|`/data-xlsx`
 
 Ils suandants champs èn disponibels en tut ils formats:
 
@@ -164,7 +163,6 @@ Format|URL
 ---|---
 JSON|`/data-json`
 CSV|`/data-csv`
-XLSX|`/data-xlsx`
 
 Ils suandants champs èn disponibels en tut ils formats:
 

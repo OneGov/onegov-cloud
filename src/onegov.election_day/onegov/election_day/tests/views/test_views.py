@@ -154,17 +154,14 @@ def test_view_last_modified(election_day_app):
             '/election/election/json',
             '/election/election/data-json',
             '/election/election/data-csv',
-            '/election/election/data-xlsx',
             '/elections/elections/summary',
             '/elections/elections/json',
             '/elections/elections/data-json',
             '/elections/elections/data-csv',
-            '/elections/elections/data-xlsx',
             '/vote/vote/summary',
             '/vote/vote/json',
             '/vote/vote/data-json',
             '/vote/vote/data-csv',
-            '/vote/vote/data-xlsx',
         ):
             assert client.get(path).headers.get('Last-Modified') == \
                 'Wed, 01 Jan 2014 12:00:00 GMT'

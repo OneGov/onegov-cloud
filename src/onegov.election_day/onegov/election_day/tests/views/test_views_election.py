@@ -406,17 +406,11 @@ def test_view_election_data(election_day_app_gr):
     export = client.get('/election/majorz-election/data-csv')
     assert all((expected in export for expected in ("3503", "Engler", "20")))
 
-    export = client.get('/election/majorz-election/data-xlsx')
-    assert export.status == '200 OK'
-
     export = client.get('/election/proporz-election/data-json')
     assert all((expected in export for expected in ("FDP", "Caluori", "56")))
 
     export = client.get('/election/proporz-election/data-csv')
     assert all((expected in export for expected in ("FDP", "Caluori", "56")))
-
-    export = client.get('/election/proporz-election/data-xlsx')
-    assert export.status == '200 OK'
 
 
 def test_view_election_tacit(election_day_app_gr):

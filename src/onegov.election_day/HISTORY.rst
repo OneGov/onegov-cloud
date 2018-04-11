@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Removes XLSX export.
+  [msom]
+
 - Fixes district/entity not shown in election compounds PDF.
   [msom]
 

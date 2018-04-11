@@ -1,7 +1,6 @@
 from morepath.request import Response
 from onegov.ballot import ElectionCompound
 from onegov.core.csv import convert_list_of_dicts_to_csv
-from onegov.core.csv import convert_list_of_dicts_to_xlsx
 from onegov.core.custom import json
 from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
@@ -68,30 +67,6 @@ def view_election_compound_data_as_csv(self, request):
         convert_list_of_dicts_to_csv(self.export()),
         content_type='text/csv',
         content_disposition='inline; filename={}.csv'.format(
-            normalize_for_url(self.title)
-        )
-    )
-
-
-@ElectionDayApp.view(
-    model=ElectionCompound,
-    name='data-xlsx',
-    permission=Public
-)
-def view_election_compound_data_as_xlsx(self, request):
-
-    """ View the raw data as XLSX. """
-
-    @request.after
-    def add_last_modified(response):
-        add_last_modified_header(response, self.last_modified)
-
-    return Response(
-        convert_list_of_dicts_to_xlsx(self.export()),
-        content_type=(
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        ),
-        content_disposition='inline; filename={}.xlsx'.format(
             normalize_for_url(self.title)
         )
     )

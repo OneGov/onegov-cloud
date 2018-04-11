@@ -166,7 +166,6 @@ def view_vote_json(self, request):
         'data': {
             'json': request.link(self, 'data-json'),
             'csv': request.link(self, 'data-csv'),
-            'xlsx': request.link(self, 'data-xlsx'),
         }
     }
 

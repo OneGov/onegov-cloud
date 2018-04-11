@@ -127,6 +127,3 @@ def test_view_vote_data(election_day_app):
 
     export = client.get('/vote/vote/data-csv')
     assert all((expected in export for expected in ("1711", "Zug", "16516")))
-
-    export = client.get('/vote/vote/data-xlsx')
-    assert export.status == '200 OK'

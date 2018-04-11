@@ -79,7 +79,6 @@ Format|URL
 ---|---
 JSON|`/data-json`
 CSV|`/data-csv`
-XLSX|`/data-xlsx`
 
 The following fields are included in all formats:
 
@@ -162,7 +161,6 @@ Format|URL
 ---|---
 JSON|`/data-json`
 CSV|`/data-csv`
-XLSX|`/data-xlsx`
 
 The following fields are included in all formats:
 

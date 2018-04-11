@@ -103,7 +103,6 @@ def view_election_json(self, request):
         'data': {
             'json': request.link(self, 'data-json'),
             'csv': request.link(self, 'data-csv'),
-            'xlsx': request.link(self, 'data-xlsx'),
         }
     }
 

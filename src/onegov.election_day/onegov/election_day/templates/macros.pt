@@ -350,7 +350,6 @@
         <ol>
             <li><a href="${request.link(model, 'data-json')}">JSON</a></li>
             <li><a href="${request.link(model, 'data-csv')}">CSV</a></li>
-            <li><a href="${request.link(model, 'data-xlsx')}">XLSX</a></li>
         </ol>
     </p>
     <p><span i18n:translate="">The format of the data is described here:</span> <a href="${layout.opendata_link}"><span i18n:translate="">Format Description</span></a>.</p>
