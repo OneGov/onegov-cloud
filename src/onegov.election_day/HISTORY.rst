@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.4.3 (2018-04-13)
+~~~~~~~~~~~~~~~~~~~
 
 - Removes XLSX export.
   [msom]
