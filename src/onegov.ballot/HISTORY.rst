@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.4.2 (2018-04-13)
+~~~~~~~~~~~~~~~~~~~
 
 - Optimizes the ballot model.
   [msom]
