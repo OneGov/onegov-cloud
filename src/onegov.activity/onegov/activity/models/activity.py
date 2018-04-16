@@ -79,7 +79,7 @@ class Activity(Base, ContentMixin, TimestampMixin):
 
     @aggregated('occasions', Column(Integer, default=0))
     def durations(self):
-        return func.sum(distinct(Occasion.durations))
+        return func.sum(distinct(Occasion.duration))
 
     @aggregated('occasions', Column(ARRAY(IntRangeType), default=list))
     def ages(self):

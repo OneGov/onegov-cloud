@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Counts activities with multi-date occasions as multi-date.
+  [href]
+
 1.7.3 (2018-03-13)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -454,3 +454,15 @@ def add_alignment(context):
 def update_duration_categories(context):
     for occasion in context.session.query(Occasion):
         occasion.on_date_change()
+
+
+@upgrade_task('Rename occasion durations to the singular')
+def rename_occasion_durations_to_the_singular(context):
+    context.operations.alter_column(
+        table_name='occasions',
+        column_name='durations',
+        new_column_name='duration'
+    )
+
+    for occasion in context.session.query(Occasion):
+        occasion.on_date_change()

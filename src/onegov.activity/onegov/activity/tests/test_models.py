@@ -514,7 +514,7 @@ def test_no_orphan_occasions(session, owner):
         activities.delete(activities.query().first())
 
 
-def test_occasion_durations(session, owner):
+def test_occasion_duration(session, owner):
 
     activities = ActivityCollection(session)
     periods = PeriodCollection(session)
@@ -643,6 +643,72 @@ def test_occasion_durations(session, owner):
     assert not DAYS.has(retreat.durations, DAYS.half)
     assert not DAYS.has(retreat.durations, DAYS.full)
     assert DAYS.has(retreat.durations, DAYS.many)
+
+
+def test_occasion_duration_with_multiple_dates(collections, owner):
+    period = collections.periods.add(
+        "Summer 2018", (
+            datetime(2018, 5, 1),
+            datetime(2018, 5, 31),
+        ), (
+            datetime(2018, 6, 1),
+            datetime(2018, 6, 30)
+        )
+    )
+
+    def with_dates(*ranges):
+        a = collections.activities.add(uuid4().hex, username=owner.username)
+
+        first, *rest = ranges
+
+        occasion = collections.occasions.add(
+            start=datetime(*first[0]),
+            end=datetime(*first[1]),
+            timezone='Europe/Zurich',
+            activity=a,
+            period=period
+        )
+
+        for s, e in rest:
+            s, e = datetime(*s), datetime(*e)
+            collections.occasions.add_date(occasion, s, e, 'Europe/Zurich')
+
+        return occasion
+
+    occasion = with_dates(
+        ((2018, 6, 1, 6, 0), (2018, 6, 1, 7, 0)),
+        ((2018, 6, 1, 8, 0), (2018, 6, 1, 9, 0))
+    )
+
+    assert occasion.duration == DAYS.half
+
+    occasion = with_dates(
+        ((2018, 6, 1, 10, 0), (2018, 6, 1, 12, 0)),
+        ((2018, 6, 1, 14, 0), (2018, 6, 1, 16, 0))
+    )
+
+    assert occasion.duration == DAYS.half
+
+    occasion = with_dates(
+        ((2018, 6, 1, 10, 0), (2018, 6, 1, 12, 0)),
+        ((2018, 6, 1, 14, 0), (2018, 6, 1, 17, 0))
+    )
+
+    assert occasion.duration == DAYS.full
+
+    occasion = with_dates(
+        ((2018, 6, 1, 10, 0), (2018, 6, 1, 12, 0)),
+        ((2018, 6, 1, 22, 0), (2018, 6, 2, 2, 0))
+    )
+
+    assert occasion.duration == DAYS.full
+
+    occasion = with_dates(
+        ((2018, 6, 1, 10, 0), (2018, 6, 1, 12, 0)),
+        ((2018, 6, 2, 14, 0), (2018, 6, 2, 16, 0))
+    )
+
+    assert occasion.duration == DAYS.many
 
 
 def test_occasion_durations_query(session, owner):
@@ -1978,20 +2044,20 @@ def test_date_changes(session, collections, prebooking_period, owner):
     transaction.commit()
 
     o = collections.occasions.query().first()
-    assert DAYS.has(o.durations, DAYS.half)
-    assert not DAYS.has(o.durations, DAYS.full)
-    assert not DAYS.has(o.durations, DAYS.many)
+    assert DAYS.has(o.duration, DAYS.half)
+    assert not DAYS.has(o.duration, DAYS.full)
+    assert not DAYS.has(o.duration, DAYS.many)
 
     o.dates[0].end += timedelta(hours=6)
-    assert DAYS.has(o.durations, DAYS.half)
-    assert not DAYS.has(o.durations, DAYS.full)
-    assert not DAYS.has(o.durations, DAYS.many)
+    assert DAYS.has(o.duration, DAYS.half)
+    assert not DAYS.has(o.duration, DAYS.full)
+    assert not DAYS.has(o.duration, DAYS.many)
 
     session.flush()
 
-    assert not DAYS.has(o.durations, DAYS.half)
-    assert DAYS.has(o.durations, DAYS.full)
-    assert not DAYS.has(o.durations, DAYS.many)
+    assert not DAYS.has(o.duration, DAYS.half)
+    assert DAYS.has(o.duration, DAYS.full)
+    assert not DAYS.has(o.duration, DAYS.many)
 
 
 def test_is_permitted_birth_date():

@@ -24,6 +24,26 @@ class DAYS(IntEnum):
     def has(value, mask):
         return value & mask > 0 if value else False
 
+    @staticmethod
+    def compute(localized_start, localized_end, total_seconds):
+        hours = total_seconds / 3600
+
+        if hours <= 6:
+            return DAYS.half
+        elif hours <= 24:
+            start, end = localized_start, localized_end
+
+            # if a less than 24 hours long activity ends on another day, the
+            # end time is relevant. An end before 06:00 indicates that this
+            # is an activity that lasts very long. An end after 06:00 is an
+            # multi-day activity.
+            if start.date() != end.date() and end.time() >= time(6, 0):
+                return DAYS.many
+
+            return DAYS.full
+        else:
+            return DAYS.many
+
 
 class OccasionDate(Base, TimestampMixin):
     """ A single start/end date of an occurrence (which may have multiple
@@ -82,23 +102,10 @@ class OccasionDate(Base, TimestampMixin):
 
     @hybrid_property
     def duration(self):
-        hours = self.duration_in_seconds / 3600
-
-        if hours <= 6:
-            return DAYS.half
-        elif hours <= 24:
-            start, end = self.localized_start, self.localized_end
-
-            # if a less than 24 hours long activity ends on another day, the
-            # end time is relevant. An end before 06:00 indicates that this
-            # is an activity that lasts very long. An end after 06:00 is an
-            # multi-day activity.
-            if start.date() != end.date() and end.time() >= time(6, 0):
-                return DAYS.many
-
-            return DAYS.full
-        else:
-            return DAYS.many
+        return DAYS.compute(
+            self.localized_start,
+            self.localized_end,
+            self.duration_in_seconds)
 
     def overlaps(self, other):
         return sedate.overlaps(self.start, self.end, other.start, other.end)

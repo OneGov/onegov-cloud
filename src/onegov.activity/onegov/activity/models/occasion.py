@@ -4,6 +4,7 @@ from datetime import timedelta
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.activity.models.occasion_date import DAYS
 from psycopg2.extras import NumericRange
 from sqlalchemy import Boolean
 from sqlalchemy import case
@@ -67,8 +68,8 @@ class Occasion(Base, TimestampMixin):
     #: True if the occasion has been cancelled
     cancelled = Column(Boolean, nullable=False, default=False)
 
-    #: The durations defined by the associated dates
-    durations = Column(Integer, default=0)
+    #: The duration defined by the associated dates
+    duration = Column(Integer, default=0)
 
     #: The default order
     order = Column(Integer, default=0)
@@ -125,26 +126,40 @@ class Occasion(Base, TimestampMixin):
         """
         self.observe_dates(self.dates)
 
+    def compute_duration(self, dates):
+        if not dates:
+            return 0
+
+        if len(dates) <= 1:
+            return int(next(iter(dates)).duration)
+
+        first = min((d for d in dates), key=lambda d: d.start)
+        last = max((d for d in dates), key=lambda d: d.end)
+
+        return int(DAYS.compute(
+            first.localized_start,
+            last.localized_end,
+            (last.end - first.start).total_seconds()
+        ))
+
+    def compute_order(self, dates):
+        if not dates:
+            return -1
+
+        return int(min(d.start for d in dates).timestamp())
+
+    def compute_active_days(self, dates):
+        return [day for date in (dates or ()) for day in date.active_days]
+
+    def compute_weekdays(self, dates):
+        return list({day for date in (dates or ()) for day in date.weekdays})
+
     @observes('dates')
     def observe_dates(self, dates):
-        if dates:
-            self.durations = sum(set(d.duration for d in dates))
-            self.order = int(min(d.start for d in dates).timestamp())
-            self.active_days = [
-                day
-                for date in dates
-                for day in date.active_days
-            ]
-            self.weekdays = list(set(
-                day
-                for date in dates
-                for day in date.weekdays
-            ))
-        else:
-            self.durations = 0
-            self.order = -1
-            self.active_days = []
-            self.weekdays = []
+        self.duration = self.compute_duration(dates)
+        self.order = self.compute_order(dates)
+        self.weekdays = self.compute_weekdays(dates)
+        self.active_days = self.compute_active_days(dates)
 
     @validates('dates')
     def validate_dates(self, key, date):
