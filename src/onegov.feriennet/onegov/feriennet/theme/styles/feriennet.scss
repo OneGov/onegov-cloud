@@ -1196,11 +1196,11 @@ ul.tags {
 
         &.cancelled {
             background: repeating-linear-gradient(
-              45deg,
-              $red-pastel,
-              $red-pastel 15px,
-              $gray-pastel 15px,
-              $gray-pastel 30px
+                45deg,
+                $red-pastel,
+                $red-pastel 15px,
+                $gray-pastel 15px,
+                $gray-pastel 30px
             );
 
             .meter {
@@ -2047,7 +2047,7 @@ ul.tags {
 
     > div {
         background: $white;
-        border: 1px dashed #aaa;
+        border: 1px dashed $base;
         border-radius: 50px;
         font-size: .875rem;
         padding: 0 12px;
