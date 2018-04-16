@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds sentry.io to connect-src whitelist.
+  [href]
+
 0.26.0 (2018-04-02)
 ~~~~~~~~~~~~~~~~~~~
 

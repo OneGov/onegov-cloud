@@ -244,6 +244,7 @@ def org_content_security_policy():
 
     policy.connect_src.add(SELF)
     policy.connect_src.add('https://checkout.stripe.com')
+    policy.connect_src.add('https://sentry.io')
 
     return policy
 
