@@ -72,6 +72,10 @@ class FeriennetApp(OrgApp):
     def default_period(self):
         return self.active_period or self.periods and self.periods[0]
 
+    @property
+    def public_organiser_data(self):
+        return self.org.meta.get('public_organiser_data', ('name', 'website'))
+
     def banner(self, request, id):
         """ Randomly returns the html to one of the available booking banners.
 

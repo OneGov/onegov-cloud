@@ -2,6 +2,7 @@ from onegov.feriennet import _
 from onegov.core.security import Secret
 from onegov.feriennet.app import FeriennetApp
 from onegov.form import Form, merge_forms
+from onegov.form.fields import MultiCheckboxField
 from onegov.org.forms import SettingsForm
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_settings
@@ -20,6 +21,17 @@ def settings_form(model, request):
                 "the same activity"
             )))
 
+        public_organiser_data = MultiCheckboxField(
+            label=_("Public organiser data"),
+            choices=(
+                ('name', _("Name")),
+                ('address', _("Address")),
+                ('email', _("E-Mail")),
+                ('phone', _("Phone")),
+                ('website', _("Website"))
+            )
+        )
+
         def process_obj(self, obj):
             super().process_obj(obj)
 
@@ -29,6 +41,9 @@ def settings_form(model, request):
             self.show_related_contacts.data = obj.meta.get(
                 'show_related_contacts', False)
 
+            self.public_organiser_data.data = obj.meta.get(
+                'public_organiser_data', request.app.public_organiser_data)
+
         def populate_obj(self, obj, *args, **kwargs):
             super().populate_obj(obj, *args, **kwargs)
 
@@ -37,6 +52,9 @@ def settings_form(model, request):
 
             obj.meta['show_related_contacts']\
                 = self.show_related_contacts.data
+
+            obj.meta['public_organiser_data']\
+                = self.public_organiser_data.data
 
     return merge_forms(SettingsForm, CustomFieldsForm)
 

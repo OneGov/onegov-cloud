@@ -555,6 +555,52 @@ def test_organiser_info(feriennet_app):
 
     assert "Admins Association" in activity
 
+    # we can show/hide information individually
+    def with_public_organiser_data(values):
+        page = admin.get('/settings')
+        page.form['public_organiser_data'] = values
+        page.form.submit()
+
+        return editor.get('/activity/play-with-legos')
+
+    page = with_public_organiser_data([])
+    assert 'Veranstalter' not in page
+
+    page = with_public_organiser_data(['name'])
+    assert "Admins Association" in page
+    assert "Washington" not in page
+    assert "editors-association@example.org" not in page
+    assert "+41 23 456 789" not in page
+    assert "https://www.example.org" not in page
+
+    page = with_public_organiser_data(['address'])
+    assert "Admins Association" not in page
+    assert "Washington" in page
+    assert "editors-association@example.org" not in page
+    assert "+41 23 456 789" not in page
+    assert "https://www.example.org" not in page
+
+    page = with_public_organiser_data(['email'])
+    assert "Admins Association" not in page
+    assert "Washington" not in page
+    assert "editors-association@example.org" in page
+    assert "+41 23 456 789" not in page
+    assert "https://www.example.org" not in page
+
+    page = with_public_organiser_data(['phone'])
+    assert "Admins Association" not in page
+    assert "Washington" not in page
+    assert "editors-association@example.org" not in page
+    assert "+41 23 456 789" in page
+    assert "https://www.example.org" not in page
+
+    page = with_public_organiser_data(['website'])
+    assert "Admins Association" not in page
+    assert "Washington" not in page
+    assert "editors-association@example.org" not in page
+    assert "+41 23 456 789" not in page
+    assert "https://www.example.org" in page
+
 
 def test_occasions_form(feriennet_app):
 

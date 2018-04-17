@@ -175,7 +175,7 @@
         </div>
 
         <div metal:fill-slot="before-panels">
-            <div class="side-panel highlighted organiser-panel" tal:define="organiser activity.user">
+            <div class="side-panel highlighted organiser-panel" tal:define="organiser activity.user; public request.app.public_organiser_data" tal:condition="public">
                 <h2 i18n:translate>Organiser</h2>
                 <metal:block use-macro="layout.macros.organiser" />
 
@@ -234,17 +234,40 @@
 <metal:organiser define-macro="organiser" i18n:domain="onegov.feriennet">
     <div class="organiser">
         <ul>
-            <li class="organiser-name"
-                tal:condition="organiser.data.organisation|nothing"
-                tal:content="organiser.data.organisation">
-            </li>
-            <li class="organiser-name"
-                tal:condition="organiser.realname.strip()|nothing"
-                tal:content="organiser.realname">
-            </li>
-            <li class="organiser-website" tal:condition="organiser.data.website|nothing">
-                <a href="${organiser.data.website}">${organiser.data.website.replace('http://', '').replace('https://', '').rstrip('/')}</a>
-            </li>
+            <tal:b condition="'name' in public">
+                <li class="organiser-name"
+                    tal:condition="organiser.data.organisation|nothing"
+                    tal:content="organiser.data.organisation">
+                </li>
+                <li class="organiser-name"
+                    tal:condition="organiser.realname.strip()|nothing"
+                    tal:content="organiser.realname">
+                </li>
+            </tal:b>
+            <tal:b condition="'address' in public">
+                <li class="organiser-address" tal:condition="organiser.data.address|organiser.data.zip_code|organiser.data.place|nothing">
+                    <span class="newlines" tal:condition="organiser.data.address|nothing">${organiser.data.address}</span>
+                    <div tal:condition="organiser.data.zip_code|organiser.data.place|nothing">
+                        <span tal:condition="organiser.data.zip_code|nothing">${organiser.data.zip_code}</span>
+                        <span tal:condition="organiser.data.place|nothing">${organiser.data.place}</span>
+                    </div>
+                </li>
+            </tal:b>
+            <tal:b condition="'email' in public">
+                <li class="organiser-email" tal:define="email organiser.data.email or organiser.username|organiser.username">
+                    <a href="mailto:${email}">${email}</a>
+                </li>
+            </tal:b>
+            <tal:b condition="'phone' in public">
+                <li class="organiser-phone" tal:condition="organiser.data.phone|nothing">
+                    <a href="tel:${organiser.data.phone}">${organiser.data.phone}</a>
+                </li>
+            </tal:b>
+            <tal:b condition="'website' in public">
+                <li class="organiser-website" tal:condition="organiser.data.website|nothing">
+                    <a href="${organiser.data.website}">${organiser.data.website.replace('http://', '').replace('https://', '').rstrip('/')}</a>
+                </li>
+            </tal:b>
         </ul>
     </div>
 </metal:organiser>

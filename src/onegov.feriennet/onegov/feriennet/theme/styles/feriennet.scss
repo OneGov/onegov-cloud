@@ -134,7 +134,8 @@ ul.single-line {
 }
 
 .field-show_related_contacts,
-.field-show_political_municipality {
+.field-show_political_municipality,
+.field-public_organiser_data {
     padding-bottom: 1rem;
 }
 
@@ -446,6 +447,42 @@ ul.tags {
 
     .organiser-name:first-child {
         font-weight: bold;
+    }
+
+    .organiser-address {
+        margin-bottom: .5rem;
+    }
+
+    .organiser-name + .organiser-email,
+    .organiser-name + .organiser-phone,
+    .organiser-name + .organiser-website {
+        margin-top: .5rem;
+    }
+
+    .organiser-email a::before {
+        @include icon('\f0e0');
+    }
+
+    .organiser-phone a::before {
+        @include icon('\f095');
+    }
+
+    .organiser-website a::before {
+        @include icon('\f0c1');
+    }
+
+    .organiser-phone,
+    .organiser-email,
+    .organiser-website {
+        font-size: .875rem;
+    }
+
+    .organiser-phone a::before,
+    .organiser-email a::before,
+    .organiser-website a::before {
+        color: $body-font-color;
+        display: inline-block;
+        margin-right: 1ex;
     }
 }
 

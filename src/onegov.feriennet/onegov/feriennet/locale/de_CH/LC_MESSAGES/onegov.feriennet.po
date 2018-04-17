@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-03-15 13:48+0100\n"
+"POT-Creation-Date: 2018-04-16 17:05+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -131,14 +131,14 @@ msgstr "${count} Buchungen werden entfernt"
 msgid "Remove ${count} bookings"
 msgstr "${count} Buchungen entfernen"
 
-msgid "Discard"
-msgstr "Verwerfen"
-
 msgid "New Occasion"
 msgstr "Neue Durchführung"
 
 msgid "Request Publication"
 msgstr "Publikation beantragen"
+
+msgid "Discard"
+msgstr "Verwerfen"
 
 msgid "Occasions cannot be created yet"
 msgstr "Durchführungen können noch nicht erstellt werden"
@@ -150,23 +150,23 @@ msgstr ""
 "Es existieren zur Zeit keine Zeiträume. Mindestens ein Zeitraum muss "
 "bestehen bevor Durchführungen erfasst werden können"
 
-#, python-format
-msgid "Do you really want to discard \"${title}\"?"
-msgstr "Möchten Sie \"${title}\" wirklich verwerfen?"
+msgid "Do you really want to request publication?"
+msgstr "Möchten Sie die Publikation wirklich beantragen?"
 
 msgid "This cannot be undone."
 msgstr "Dies kann nicht rückgängig gemacht werden."
-
-msgid "Discard Activity"
-msgstr "Angebot verwerfen"
-
-msgid "Do you really want to request publication?"
-msgstr "Möchten Sie die Publikation wirklich beantragen?"
 
 msgid "Please add at least one occasion before requesting publication."
 msgstr ""
 "Bitte fügen Sie mindestens eine Durchführung hinzu bevor Sie die Publikation "
 "beantragen."
+
+#, python-format
+msgid "Do you really want to discard \"${title}\"?"
+msgstr "Möchten Sie \"${title}\" wirklich verwerfen?"
+
+msgid "Discard Activity"
+msgstr "Angebot verwerfen"
 
 msgid "Manual bookings can only be added once the billing has been confirmed"
 msgstr ""
@@ -1534,6 +1534,9 @@ msgstr "In diesem Zeitraum wurde noch keine Zuteilung gemacht."
 msgid "No occasions defined yet."
 msgstr "Es wurden noch keine Durchführungen definiert."
 
+msgid "Print"
+msgstr "Drucken"
+
 msgid "Emergency Contact:"
 msgstr "Notfall:"
 
@@ -1584,9 +1587,6 @@ msgstr "Im Benutzerprofil anpassen"
 msgid "No bookings yet."
 msgstr "Noch keine Buchungen."
 
-msgid "Print All"
-msgstr "Alle drucken"
-
 msgid "Mark up to three occasions per child as favorites."
 msgstr "Sie können bis zu drei Angebote pro Kind als Favorit markieren."
 
@@ -1598,9 +1598,6 @@ msgid "We cannot guarantee that everyone gets into their favorite activity."
 msgstr ""
 "Wir können nicht garantieren dass jedes Kind in sein Lieblingsangebot "
 "eingeteilt wird."
-
-msgid "Print"
-msgstr "Drucken"
 
 msgid "Add to calendar"
 msgstr "Zum Kalender hinzufügen"
@@ -2016,6 +2013,12 @@ msgid "Parents can see the contacts of other parents in the same activity"
 msgstr ""
 "Eltern können die Kontaktdaten anderer Eltern des gleichen Angebots sehen"
 
+msgid "Public organiser data"
+msgstr "Öffentliche Veranstalterdaten"
+
+msgid "E-Mail"
+msgstr "E-Mail"
+
 msgid "Mailing"
 msgstr "Versand"
 
@@ -2109,6 +2112,9 @@ msgstr "Möchten Sie ${attendee}s Buchung wirklich löschen?"
 #, python-format
 msgid "Do you really want to cancel ${attendee}'s booking?"
 msgstr "Möchten Sie ${attendee}s Buchung wirklich absagen?"
+
+#~ msgid "Print All"
+#~ msgstr "Alle drucken"
 
 #~ msgid "Edit Activity"
 #~ msgstr "Angebot bearbeiten"
