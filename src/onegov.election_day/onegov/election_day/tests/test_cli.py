@@ -152,6 +152,7 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager):
 
     def get_session(entity):
         session_manager.set_current_schema(get_schema(entity))
+        session_manager.set_locale('de_ch', 'de_ch')
         return session_manager.session()
 
     for entity, domain, title in results:
