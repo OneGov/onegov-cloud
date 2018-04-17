@@ -468,6 +468,34 @@ def test_session_manager_i18n(postgres_dsn):
     # make sure the locale is shared with the query as well
     assert mgr.session().query(Test).order_by(Test.text).first()
 
+    assert mgr.session().query(Test).filter_by(text='nein').first()
+    assert not mgr.session().query(Test).filter_by(text='no').first()
+
+    mgr.set_locale(default_locale='en_us', current_locale='en_us')
+
+    assert not mgr.session().query(Test).filter_by(text='nein').first()
+    assert mgr.session().query(Test).filter_by(text='no').first()
+
+    # make sure session managers are independent
+    sec = SessionManager(postgres_dsn, Base)
+    sec.set_current_schema('testing')
+
+    mgr.set_locale(default_locale='en_us', current_locale='en_us')
+    sec.set_locale(default_locale='en_us', current_locale='de_ch')
+
+    sec.activate()
+    assert sec.session().query(Test).one().text == 'nein'
+
+    mgr.activate()
+    assert mgr.session().query(Test).one().text == 'no'
+
+    sec.activate()
+    assert sec.session().query(Test).filter_by(text='nein').first()
+
+    mgr.activate()
+    assert mgr.session().query(Test).filter_by(text='no').first()
+
+    sec.dispose()
     mgr.dispose()
 
 
@@ -755,7 +783,7 @@ def test_application_retries(postgres_dsn, number_of_retries):
 
     @App.view(model=Document, permission=Private)
     def provoke_serialization_failure(self, request):
-        session = request.session
+        session = request.app.session()
         session.add(Record())
         session.query(Record).delete('fetch')
 
@@ -964,11 +992,7 @@ def test_pickle_model(postgres_dsn):
     assert page.name == 'foobar'
     assert page.title == 'Foobar'
 
-    # loading the pickle dump will show that we have lost the session_manager
-    assert not hasattr(page, 'session_manager')
-
-    # to get it back we need to merge the object back into the sesssion,
-    # which is standard practice for sqlalchemy objects stored in a cache
+    # make sure the session manager is set after restore
     page = mgr.session().merge(page)
     assert page.session_manager.__repr__.__self__ is mgr
 
@@ -1722,3 +1746,84 @@ def test_selectable_sql_query_with_dots(session):
     """)
 
     assert tuple(stmt.c.keys()) == ('column_name', 'table_name', 'column')
+
+
+def test_i18n_translation_hybrid_independence(postgres_dsn):
+    Base = declarative_base(cls=ModelBase)
+
+    class App(Framework):
+        pass
+
+    class Document(Base):
+        __tablename__ = 'documents'
+
+        id = Column(Integer, primary_key=True)
+
+        title_translations = Column(HSTORE, nullable=False)
+        title = translation_hybrid(title_translations)
+
+    @App.path(model=Document, path='/document')
+    def get_document(app):
+        return app.session().query(Document).first()
+
+    @App.json(model=Document)
+    def view_document(self, request):
+        return {
+            'title': self.title,
+            'locale': self.session_manager.current_locale
+        }
+
+    scan_morepath_modules(App)
+
+    freiburg = App()
+    freiburg.configure_application(dsn=postgres_dsn, base=Base)
+    freiburg.namespace = 'app'
+    freiburg.set_application_id('app/freiburg')
+    freiburg.locales = ['de_CH', 'fr_CH']
+
+    biel = App()
+    biel.configure_application(dsn=postgres_dsn, base=Base)
+    biel.namespace = 'app'
+    biel.set_application_id('app/biel')
+    biel.locales = ['de_CH', 'fr_CH']
+
+    for app in (freiburg, biel):
+        app.session_manager.activate()
+        app.session().add(Document(id=1, title_translations={
+            'de_CH': 'Dokument',
+            'fr_CH': 'Document'
+        }))
+
+    transaction.commit()
+
+    c = Client(freiburg)
+    c.set_cookie('locale', 'de_CH')
+
+    assert c.get('/document').json == {
+        'title': 'Dokument',
+        'locale': 'de_CH'
+    }
+
+    c = Client(biel)
+    c.set_cookie('locale', 'fr_CH')
+
+    assert c.get('/document').json == {
+        'title': 'Document',
+        'locale': 'fr_CH'
+    }
+
+    c = Client(freiburg)
+    c.set_cookie('locale', 'fr_CH')
+
+    assert c.get('/document').json == {
+        'title': 'Document',
+        'locale': 'fr_CH'
+    }
+
+    c = Client(biel)
+    c.set_cookie('locale', 'de_CH')
+
+    assert c.get('/document').json == {
+        'title': 'Dokument',
+        'locale': 'de_CH'
+    }

@@ -1,5 +1,11 @@
 Changelog
 ---------
+
+- Changes the way session managers are bound to the application.
+
+  This fixes #21 by introducing a global session manager reference.
+  [href]
+
 0.67.1 (2018-04-06)
 ~~~~~~~~~~~~~~~~~~~
 

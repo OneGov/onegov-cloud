@@ -47,6 +47,9 @@ class SessionManager(object):
     #   public schema.
     _reserved_schemas = {'information_schema', 'public', 'extensions'}
 
+    # holds thread local data
+    _thread_bound = threading.local()
+
     def __init__(self, dsn, base,
                  engine_config=None, session_config=None, pool_config=None):
         """ Configures the data source name/dsn/database url and sets up the
@@ -162,6 +165,8 @@ class SessionManager(object):
         """
         assert 'postgres' in dsn, "Onegov only supports Postgres!"
 
+        self.activate()
+
         engine_config = engine_config or {}
         session_config = session_config or {}
         pool_config = pool_config or {}
@@ -220,7 +225,6 @@ class SessionManager(object):
             scopefunc=self._scopefunc,
         )
         self.register_session(self.session_factory)
-        self.setup_manager_instance_sharing(self.bases)
 
     def register_engine(self, engine):
         """ Takes the given engine and registers it with the schema
@@ -328,38 +332,62 @@ class SessionManager(object):
 
         zope.sqlalchemy.register(session)
 
-    def setup_manager_instance_sharing(self, bases):
-        """ Shares this instance with all mapped classes of all bases.
+    def activate(self):
+        """ Sets the currently active session_manager - this is basically a
+        global variable we require because we hook into the orm/query events
+        where we don't know yet which session is going to be used and therefore
+        cannot be sure about the used session manager either
 
-        This enables each model to look up the current schema, the current
-        locale and so on.
+        For example, the Document model below needs access to the current
+        session to get the current locale, but since it is instantiated without
+        any session information, this can't be known without a global variable:
 
-        This is a rather complicated way to make sure we don't use a global
-        variable. One might argue that this would warrant an exception
-        to the rule...
+            document = Document(localized_title="Das Dokument")
+
+        We can only work around that with a global variable:
+
+            session_manager.activate()
+            document = Document(localized_title="Das Dokument")
+
+        As a result session managers need to be activated, or they can't be
+        used (at least for translated columns). To do so in tests, use:
+
+            session_manager.activate()
+
+        To ease the use of testing the last session_manager is however also
+        automatically activated when the schema is set, which covers most
+        use-cases outside of testing
 
         """
 
-        # the instance is shared with all classes, loaded or created
-        def share_with_class(target, *args, **kwargs):
-            target.session_manager = weakref.proxy(self)
+        self.__class__.set_active(self)
 
-        # and it is shared with all query types, at which point there is
-        # no type available yet.
-        def share_with_query(query):
-            session_manager = weakref.proxy(self)
+    def deactivate(self):
+        """ Sets the currently active session manager to None, if it is equal
+        to self.
 
-            for desc in query.column_descriptions:
-                desc['type'].session_manager = session_manager
+        """
+        active = self.__class__.get_active()
 
-        event.listen(Query, 'before_compile', share_with_query, retval=False)
+        if active is None:
+            return
 
-        for base in bases:
-            if base:
-                for cls in base._decl_class_registry.values():
-                    if isinstance(cls, base.__class__):
-                        event.listen(cls, 'init', share_with_class)
-                        event.listen(cls, 'load', share_with_class)
+        if active.__repr__.__self__ is self:
+            self.set_active(None)
+
+    @classmethod
+    def set_active(cls, session_manager):
+        if session_manager:
+            cls._thread_bound._active = weakref.proxy(session_manager)
+        else:
+            cls._thread_bound._active = None
+
+    @classmethod
+    def get_active(cls):
+        try:
+            return cls._thread_bound._active
+        except (AttributeError, ReferenceError):
+            return None
 
     def set_locale(self, default_locale, current_locale):
         """ Sets the default locale and the current locale so it may be
@@ -392,6 +420,7 @@ class SessionManager(object):
         """
         self.engine.raw_connection().invalidate()
         self.engine.dispose()
+        self.deactivate()
 
     def is_valid_schema(self, schema):
         """ Returns True if the given schema looks valid enough to be created
@@ -441,6 +470,8 @@ class SessionManager(object):
 
         self.current_schema = schema
         self.ensure_schema_exists(schema)
+
+        self.activate()
 
     def create_schema(self, schema, validate=True):
         """ Creates the given schema. If said schema exists, expect this

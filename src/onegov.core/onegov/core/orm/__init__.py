@@ -4,6 +4,7 @@ from onegov.core.orm.sql import as_selectable, as_selectable_from_path
 from sqlalchemy import event, inspect
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import object_session
+from sqlalchemy.orm import Query
 from sqlalchemy_utils import TranslationHybrid
 from zope.sqlalchemy import mark_changed
 
@@ -17,27 +18,6 @@ class ModelBase(object):
     #: set by :class:`onegov.core.orm.cache.OrmCacheDescriptor`, this attribute
     #: indicates if the current model was loaded from cache
     is_cached = False
-
-    def __getstate__(self):
-        """ Makes sure the session manager attached to the model is not
-        pickled (stored in memcached). Not only does it not make sense to
-        have connection state stored, it also leads to errors.
-
-        Cached instances have to be merged back into the session as a result,
-        but that's something you have to do anyway when pickling sqlalchemy
-        models.
-
-        """
-        state = self.__dict__.copy()
-
-        for key in ('session_manager', ):
-            if key in state:
-                del state[key]
-
-        return state
-
-    def __setstate__(self, state):
-        self.__dict__ = state
 
     @classmethod
     def get_polymorphic_class(cls, identity_value, default=MISSING):
@@ -56,6 +36,10 @@ class ModelBase(object):
             )
 
         return mapper and mapper.class_ or default
+
+    @property
+    def session_manager(self):
+        return SessionManager.get_active()
 
 
 Base = declarative_base(cls=ModelBase)
@@ -108,6 +92,16 @@ def configure_listener(cls, key, instance):
 
 
 event.listen(ModelBase, 'attribute_instrument', configure_listener)
+
+
+def share_session_manager(query):
+    session_manager = SessionManager.get_active()
+
+    for desc in query.column_descriptions:
+        desc['type'].session_manager = session_manager
+
+
+event.listen(Query, 'before_compile', share_session_manager, retval=False)
 
 
 __all__ = [

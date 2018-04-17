@@ -1097,6 +1097,17 @@ def http_conflict_tween_factory(app, handler):
     return http_conflict_tween
 
 
+@Framework.tween_factory(over=transaction_tween_factory)
+def activate_session_manager_factory(app, handler):
+    """ Activate the session manager before each transaction. """
+    def activate_session_manager(request):
+        if app.has_database_connection:
+            request.app.session_manager.activate()
+
+        return handler(request)
+    return activate_session_manager
+
+
 @Framework.tween_factory(under=http_conflict_tween_factory)
 def current_language_tween_factory(app, handler):
     def current_language_tween(request):
