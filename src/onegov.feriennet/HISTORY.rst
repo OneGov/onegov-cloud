@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.28 (2018-04-17)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to pick the data shown about organisers.
   [href]
