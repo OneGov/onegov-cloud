@@ -85,8 +85,9 @@ def test_view_vote_json(election_day_app):
     login(client)
     upload_vote(client)
 
-    data = str(client.get('/vote/vote/json').json)
-    assert all((expected in data for expected in (
+    response = client.get('/vote/vote/json')
+    assert response.headers['Access-Control-Allow-Origin'] == '*'
+    assert all((expected in str(response.json) for expected in (
         "Zug", "Cham", "599", "1711", "80"
     )))
 
@@ -100,7 +101,9 @@ def test_view_vote_summary(election_day_app):
     with freeze_time("2014-01-01 12:00"):
         upload_vote(client)
 
-        assert client.get('/vote/vote/summary').json == {
+        response = client.get('/vote/vote/summary')
+        assert response.headers['Access-Control-Allow-Origin'] == '*'
+        assert response.json == {
             'answer': 'rejected',
             'completed': True,
             'date': '2015-01-01',

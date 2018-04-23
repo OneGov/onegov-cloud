@@ -1,3 +1,4 @@
+from onegov.election_day.utils.common import add_cors_header
 from onegov.election_day.utils.common import add_last_modified_header
 from onegov.election_day.utils.common import add_local_results
 from onegov.election_day.utils.filenames import pdf_filename
@@ -10,6 +11,7 @@ from onegov.election_day.utils.summaries import get_vote_summary
 
 
 __all__ = [
+    'add_cors_header',
     'add_last_modified_header',
     'add_local_results',
     'get_election_compound_summary',

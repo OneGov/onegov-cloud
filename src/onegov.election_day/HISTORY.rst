@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds CORS header to JSON views.
+  [msom]
+
 3.4.3 (2018-04-13)
 ~~~~~~~~~~~~~~~~~~~
 

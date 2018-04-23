@@ -58,6 +58,7 @@ def test_view_latest_json(election_day_app):
     assert list(latest.json['archive'].keys()) == ['2013']
     assert "Abstimmung 1. Januar 2013" in latest
     assert "Wahl 1. Januar 2013" in latest
+    assert latest.headers['Access-Control-Allow-Origin'] == '*'
 
 
 def test_view_archive(election_day_app):
@@ -118,15 +119,18 @@ def test_view_archive_json(election_day_app):
     assert list(archive.json['archive'].keys()) == ['2013']
     assert "Abstimmung 1. Januar 2013" in archive
     assert "Wahl 1. Januar 2013" in archive
+    assert archive.headers['Access-Control-Allow-Origin'] == '*'
 
     archive = client.get('/archive/2013-01-01/json')
     assert list(archive.json['archive'].keys()) == ['2013']
     assert "Abstimmung 1. Januar 2013" in archive
     assert "Wahl 1. Januar 2013" in archive
+    assert archive.headers['Access-Control-Allow-Origin'] == '*'
 
     archive = client.get('/archive/2013-02-02/json')
     assert list(archive.json['archive'].keys()) == ['2013']
     assert archive.json['results'] == []
+    assert archive.headers['Access-Control-Allow-Origin'] == '*'
 
 
 def test_view_update_results(election_day_app):

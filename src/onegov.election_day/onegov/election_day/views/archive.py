@@ -3,6 +3,7 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.models import Principal
+from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_summaries
 
@@ -46,7 +47,8 @@ def view_archive_json(self, request):
     results = get_summaries(results, request)
 
     @request.after
-    def add_last_modified(response):
+    def add_headers(response):
+        add_cors_header(response)
         add_last_modified_header(response, last_modified)
 
     return {
@@ -101,7 +103,8 @@ def view_principal_json(self, request):
     latest = get_summaries(latest, request)
 
     @request.after
-    def add_last_modified(response):
+    def add_headers(response):
+        add_cors_header(response)
         add_last_modified_header(response, last_modified)
 
     return {

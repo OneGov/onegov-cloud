@@ -347,13 +347,15 @@ def test_view_election_json(election_day_app_gr):
     upload_majorz_election(client)
     upload_proporz_election(client)
 
-    data = str(client.get('/election/majorz-election/json').json)
-    assert all((expected in data for expected in (
+    response = client.get('/election/majorz-election/json')
+    assert response.headers['Access-Control-Allow-Origin'] == '*'
+    assert all((expected in str(response.json) for expected in (
         "Engler", "Stefan", "20", "Schmid", "Martin", "18"
     )))
 
-    data = str(client.get('/election/proporz-election/json').json)
-    assert all((expected in data for expected in (
+    response = client.get('/election/proporz-election/json')
+    assert response.headers['Access-Control-Allow-Origin'] == '*'
+    assert all((expected in str(response.json) for expected in (
         "Casanova", "Angela", "56", "Caluori", "Corina", "32", "CVP", "FDP"
     )))
 
@@ -368,7 +370,9 @@ def test_view_election_summary(election_day_app_gr):
         upload_majorz_election(client)
         upload_proporz_election(client)
 
-        assert client.get('/election/majorz-election/summary').json == {
+        response = client.get('/election/majorz-election/summary')
+        assert response.headers['Access-Control-Allow-Origin'] == '*'
+        assert response.json == {
             'completed': False,
             'date': '2015-01-01',
             'domain': 'federation',
@@ -379,7 +383,10 @@ def test_view_election_summary(election_day_app_gr):
             'type': 'election',
             'url': 'http://localhost/election/majorz-election',
         }
-        assert client.get('/election/proporz-election/summary').json == {
+
+        response = client.get('/election/proporz-election/summary')
+        assert response.headers['Access-Control-Allow-Origin'] == '*'
+        assert response.json == {
             'completed': False,
             'date': '2015-01-01',
             'domain': 'federation',

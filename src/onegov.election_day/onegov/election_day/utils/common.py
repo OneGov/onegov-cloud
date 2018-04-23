@@ -12,6 +12,11 @@ def add_last_modified_header(response, last_modified):
         )
 
 
+def add_cors_header(response):
+    """ Adds a header allowing the response being used in scripts. """
+    response.headers.add('Access-Control-Allow-Origin', '*')
+
+
 def add_local_results(source, target, principal, session):
     """ Adds the result of the principal.
 
