@@ -4,6 +4,9 @@ Changelog
 - Adds CORS header to JSON views.
   [msom]
 
+- Runs the CLI tests in a separate process.
+  [msom]
+
 3.4.3 (2018-04-13)
 ~~~~~~~~~~~~~~~~~~~
 
