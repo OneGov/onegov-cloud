@@ -64,7 +64,7 @@ def view_election_lists(self, request):
     }
 
 
-@ElectionDayApp.json(
+@ElectionDayApp.view(
     model=Election,
     name='lists-svg',
     permission=Public

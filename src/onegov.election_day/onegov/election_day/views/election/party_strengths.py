@@ -71,7 +71,7 @@ def view_election_party_strengths(self, request):
     }
 
 
-@ElectionDayApp.json(
+@ElectionDayApp.view(
     model=Election,
     name='party-strengths-svg',
     permission=Public

@@ -79,7 +79,7 @@ def view_election_compound_json(self, request):
     }
 
 
-@ElectionDayApp.json(
+@ElectionDayApp.view(
     model=ElectionCompound,
     name='summary',
     permission=Public

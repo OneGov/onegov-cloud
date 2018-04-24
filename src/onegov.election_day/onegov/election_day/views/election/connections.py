@@ -69,7 +69,7 @@ def view_election_connections(self, request):
     }
 
 
-@ElectionDayApp.json(
+@ElectionDayApp.view(
     model=Election,
     name='connections-svg',
     permission=Public

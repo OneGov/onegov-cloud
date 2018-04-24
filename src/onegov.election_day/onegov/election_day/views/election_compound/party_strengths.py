@@ -72,7 +72,7 @@ def view_election_compound_party_strengths(self, request):
     }
 
 
-@ElectionDayApp.json(
+@ElectionDayApp.view(
     model=ElectionCompound,
     name='party-strengths-svg',
     permission=Public

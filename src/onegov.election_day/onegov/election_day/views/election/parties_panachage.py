@@ -64,7 +64,7 @@ def view_election_parties_panachage(self, request):
     }
 
 
-@ElectionDayApp.json(
+@ElectionDayApp.view(
     model=Election,
     name='parties-panachage-svg',
     permission=Public
