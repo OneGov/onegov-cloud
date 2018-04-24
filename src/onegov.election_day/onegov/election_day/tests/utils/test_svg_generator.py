@@ -110,10 +110,11 @@ def test_create_svgs(election_day_app_gr):
         assert gc.call_count == 0
         assert election_day_app_gr.filestorage.listdir('svg') == []
 
-        majorz = add_majorz_election(session)
-        proporz = add_proporz_election(session)
-        compound = add_election_compound(session)
-        vote = add_vote(session, 'complex')
+        with freeze_time("2014-04-04 14:00"):
+            majorz = add_majorz_election(session)
+            proporz = add_proporz_election(session)
+            compound = add_election_compound(session)
+            vote = add_vote(session, 'complex')
 
         generator.create_svgs()
         assert gc.call_count == 33
@@ -140,8 +141,9 @@ def test_create_svgs(election_day_app_gr):
         assert gc.call_count == 33
         assert len(fs.listdir('svg')) == 1
 
-        majorz.title = 'Election'
-        session.flush()
+        with freeze_time("2014-04-05 14:00"):
+            majorz.title = 'Election'
+            session.flush()
 
         generator.create_svgs()
         assert gc.call_count == 34
