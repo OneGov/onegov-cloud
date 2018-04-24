@@ -7,6 +7,9 @@ Changelog
 - Runs the CLI tests in a separate process.
   [msom]
 
+- Improves the import when using the internal format.
+  [msom]
+
 3.4.3 (2018-04-13)
 ~~~~~~~~~~~~~~~~~~~
 

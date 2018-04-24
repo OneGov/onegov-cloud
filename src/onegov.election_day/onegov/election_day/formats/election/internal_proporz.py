@@ -151,7 +151,7 @@ def parse_candidate(line, errors):
         id = int(line.candidate_id or 0)
         family_name = line.candidate_family_name
         first_name = line.candidate_first_name
-        elected = line.candidate_elected == 'True'
+        elected = str(line.candidate_elected or '').lower() == 'true'
         party = line.candidate_party
 
     except ValueError:
