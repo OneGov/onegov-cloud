@@ -2,7 +2,7 @@ from datetime import date
 from freezegun import freeze_time
 from onegov.ballot import Election
 from onegov.election_day.layouts import ElectionLayout
-from onegov.election_day.tests import DummyRequest
+from onegov.election_day.tests.common import DummyRequest
 from unittest.mock import Mock
 
 

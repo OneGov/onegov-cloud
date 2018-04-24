@@ -3,8 +3,8 @@ from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
 from onegov.ballot import ProporzElection
 from onegov.election_day.forms import ElectionCompoundForm
-from onegov.election_day.tests import DummyPostData
-from onegov.election_day.tests import DummyRequest
+from onegov.election_day.tests.common import DummyPostData
+from onegov.election_day.tests.common import DummyRequest
 from wtforms.validators import InputRequired
 
 

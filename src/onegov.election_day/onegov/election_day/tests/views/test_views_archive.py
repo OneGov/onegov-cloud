@@ -2,7 +2,7 @@ import transaction
 
 from datetime import date
 from onegov.election_day.collections import ArchivedResultCollection
-from onegov.election_day.tests import login
+from onegov.election_day.tests.common import login
 from webtest import TestApp as Client
 
 

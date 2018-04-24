@@ -1,5 +1,5 @@
 from onegov.election_day.forms import TriggerNotificationForm
-from onegov.election_day.tests import DummyRequest
+from onegov.election_day.tests.common import DummyRequest
 
 
 def test_notification_form():

@@ -10,7 +10,7 @@ from onegov.election_day.layouts import ManageElectionCompoundsLayout
 from onegov.election_day.layouts import ManageElectionsLayout
 from onegov.election_day.layouts import ManageSubscribersLayout
 from onegov.election_day.layouts import ManageVotesLayout
-from onegov.election_day.tests import DummyRequest
+from onegov.election_day.tests.common import DummyRequest
 
 
 def test_manage_layouts(session):

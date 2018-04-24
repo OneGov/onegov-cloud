@@ -1,7 +1,7 @@
 from datetime import date
-from onegov.election_day.tests import login
-from onegov.election_day.tests import upload_majorz_election
-from onegov.election_day.tests import upload_vote
+from onegov.election_day.tests.common import login
+from onegov.election_day.tests.common import upload_majorz_election
+from onegov.election_day.tests.common import upload_vote
 from webtest import TestApp as Client
 
 

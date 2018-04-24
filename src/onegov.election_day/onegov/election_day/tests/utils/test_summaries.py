@@ -4,7 +4,7 @@ from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
 from onegov.ballot import Vote
 from onegov.election_day.collections import ArchivedResultCollection
-from onegov.election_day.tests import DummyRequest
+from onegov.election_day.tests.common import DummyRequest
 from onegov.election_day.utils import get_election_summary
 from onegov.election_day.utils import get_election_compound_summary
 from onegov.election_day.utils import get_summaries

@@ -1,7 +1,7 @@
 import os
 
 from onegov.election_day.models import Subscriber
-from onegov.election_day.tests import login
+from onegov.election_day.tests.common import login
 from webtest import TestApp as Client
 
 

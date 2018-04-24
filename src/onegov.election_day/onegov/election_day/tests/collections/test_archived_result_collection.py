@@ -7,7 +7,7 @@ from onegov.ballot.models import ElectionResult
 from onegov.ballot.models import Vote
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.models import ArchivedResult
-from onegov.election_day.tests import DummyRequest
+from onegov.election_day.tests.common import DummyRequest
 
 
 def test_archived_result_collection(session):

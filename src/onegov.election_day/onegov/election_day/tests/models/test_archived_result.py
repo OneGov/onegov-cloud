@@ -2,7 +2,7 @@ from datetime import date
 from datetime import datetime
 from datetime import timezone
 from onegov.election_day.models import ArchivedResult
-from onegov.election_day.tests import DummyRequest
+from onegov.election_day.tests.common import DummyRequest
 
 
 def test_archived_result(session):

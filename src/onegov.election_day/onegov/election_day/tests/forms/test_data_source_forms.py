@@ -5,7 +5,7 @@ from onegov.election_day.forms import DataSourceForm
 from onegov.election_day.forms import DataSourceItemForm
 from onegov.election_day.models import DataSource
 from onegov.election_day.models import DataSourceItem
-from onegov.election_day.tests import DummyPostData
+from onegov.election_day.tests.common import DummyPostData
 
 
 def test_data_source_form():

@@ -1,7 +1,7 @@
 from onegov.election_day.collections import EmailSubscriberCollection
 from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.collections import SubscriberCollection
-from onegov.election_day.tests import DummyRequest
+from onegov.election_day.tests.common import DummyRequest
 from unittest.mock import Mock
 
 

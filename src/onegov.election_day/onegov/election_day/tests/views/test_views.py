@@ -3,11 +3,11 @@ import onegov.election_day
 from datetime import date
 from freezegun import freeze_time
 from onegov.ballot import Ballot
-from onegov.election_day.tests import create_election_compound
-from onegov.election_day.tests import login
-from onegov.election_day.tests import upload_majorz_election
-from onegov.election_day.tests import upload_proporz_election
-from onegov.election_day.tests import upload_vote
+from onegov.election_day.tests.common import create_election_compound
+from onegov.election_day.tests.common import login
+from onegov.election_day.tests.common import upload_majorz_election
+from onegov.election_day.tests.common import upload_proporz_election
+from onegov.election_day.tests.common import upload_vote
 from onegov_testing import utils
 from unittest.mock import patch
 from webtest import TestApp as Client

@@ -1,6 +1,6 @@
 from onegov.ballot import Vote
 from onegov.election_day.layouts import DefaultLayout
-from onegov.election_day.tests import DummyRequest
+from onegov.election_day.tests.common import DummyRequest
 
 
 def test_default_layout():

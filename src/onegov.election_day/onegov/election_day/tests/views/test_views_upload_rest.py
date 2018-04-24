@@ -6,7 +6,7 @@ from onegov.ballot import Vote
 from onegov.ballot import Election
 from onegov.election_day.collections import UploadTokenCollection
 from onegov.election_day.models import Canton
-from onegov.election_day.tests import login
+from onegov.election_day.tests.common import login
 from unittest.mock import patch
 from webtest import TestApp as Client
 from webtest import Upload

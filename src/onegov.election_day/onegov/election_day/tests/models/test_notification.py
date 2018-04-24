@@ -19,7 +19,7 @@ from onegov.election_day.models import Notification
 from onegov.election_day.models import SmsNotification
 from onegov.election_day.models import SmsSubscriber
 from onegov.election_day.models import WebhookNotification
-from onegov.election_day.tests import DummyRequest
+from onegov.election_day.tests.common import DummyRequest
 from pytest import raises
 from time import sleep
 from unittest.mock import Mock

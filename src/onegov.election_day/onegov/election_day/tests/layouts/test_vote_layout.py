@@ -4,7 +4,7 @@ from onegov.ballot import Ballot
 from onegov.ballot import ComplexVote
 from onegov.ballot import Vote
 from onegov.election_day.layouts import VoteLayout
-from onegov.election_day.tests import DummyRequest
+from onegov.election_day.tests.common import DummyRequest
 from unittest.mock import Mock
 
 

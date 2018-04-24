@@ -1,5 +1,5 @@
 from datetime import date
-from onegov.election_day.tests import login
+from onegov.election_day.tests.common import login
 from webtest import TestApp as Client
 from webtest import Upload
 from unittest.mock import patch

@@ -2,11 +2,11 @@ from datetime import date
 from onegov.ballot import Ballot
 from onegov.ballot import BallotResult
 from onegov.ballot import Vote
-from onegov.election_day.tests.utils import add_election_compound
-from onegov.election_day.tests.utils import add_majorz_election
-from onegov.election_day.tests.utils import add_proporz_election
-from onegov.election_day.tests.utils import add_vote
-from onegov.election_day.tests.utils import PatchedD3Renderer
+from onegov.election_day.tests.utils.common import add_election_compound
+from onegov.election_day.tests.utils.common import add_majorz_election
+from onegov.election_day.tests.utils.common import add_proporz_election
+from onegov.election_day.tests.utils.common import add_vote
+from onegov.election_day.tests.utils.common import PatchedD3Renderer
 from onegov.election_day.utils.pdf_generator import PdfGenerator
 from pdfrw import PdfReader
 from unittest.mock import MagicMock

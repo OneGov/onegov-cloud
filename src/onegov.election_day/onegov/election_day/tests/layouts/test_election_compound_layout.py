@@ -4,7 +4,7 @@ from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
 from onegov.ballot import ProporzElection
 from onegov.election_day.layouts import ElectionCompoundLayout
-from onegov.election_day.tests import DummyRequest
+from onegov.election_day.tests.common import DummyRequest
 from unittest.mock import Mock
 
 

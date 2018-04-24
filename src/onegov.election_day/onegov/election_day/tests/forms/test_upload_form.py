@@ -13,7 +13,7 @@ from onegov.election_day.models import DataSource
 from onegov.election_day.models import DataSourceItem
 from onegov.election_day.models import Canton
 from onegov.election_day.models import Municipality
-from onegov.election_day.tests import DummyPostData
+from onegov.election_day.tests.common import DummyPostData
 
 
 def test_upload_vote_form(session):

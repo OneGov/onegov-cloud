@@ -1,9 +1,9 @@
 from datetime import date
-from onegov.election_day.tests import create_election_compound
-from onegov.election_day.tests import login
-from onegov.election_day.tests import upload_election_compound
-from onegov.election_day.tests import upload_party_results
-from onegov.election_day.tests import upload_proporz_election
+from onegov.election_day.tests.common import create_election_compound
+from onegov.election_day.tests.common import login
+from onegov.election_day.tests.common import upload_election_compound
+from onegov.election_day.tests.common import upload_party_results
+from onegov.election_day.tests.common import upload_proporz_election
 from unittest.mock import patch
 from webtest import TestApp as Client
 from webtest.forms import Upload
