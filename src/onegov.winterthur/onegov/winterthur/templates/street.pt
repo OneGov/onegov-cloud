@@ -40,9 +40,7 @@
                 <tr tal:repeat="address addresses">
                     <tal:b condition="address.is_addressless">
                         <td>
-                            <a href="https://stadtplan.winterthur.ch/?locate=strasse&locations=${address.street_id}"
-                               rel="noopener noreferrer"
-                               target="_blank">
+                            <a href="${external_link_to_street(address)}" rel="noopener noreferrer" target="_blank">
                                 ${address.street}
                             </a>
                         </td>
@@ -51,11 +49,9 @@
                         <td>-</td>
                     </tal:b>
                     <tal:b condition="not:address.is_addressless">
-                        <td tal:define="name string:${address.street} ${address.house_number}${address.house_extra}">
-                            <a href="https://stadtplan.winterthur.ch/?locate=adresse&locations=${name.replace(' ', '+')}"
-                               rel="noopener noreferrer"
-                               target="_blank">
-                                ${name}
+                        <td>
+                            <a href="${external_link_to_address(address)}" rel="noopener noreferrer" target="_blank">
+                                ${address.title}
                             </a>
                         </td>
                         <td>${address.zipcode} ${address.place}</td>

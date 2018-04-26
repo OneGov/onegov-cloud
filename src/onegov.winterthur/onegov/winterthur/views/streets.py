@@ -6,6 +6,7 @@ from onegov.winterthur.collections import AddressCollection
 from onegov.winterthur.collections import AddressSubsetCollection
 from onegov.winterthur.layout import AddressLayout
 from onegov.winterthur.layout import AddressSubsetLayout
+from urllib.parse import quote_plus
 
 
 @WinterthurApp.html(
@@ -58,12 +59,21 @@ def update_streets(self, request):
 )
 def view_street(self, request):
     request.app.enable_iframes(request)
-
     request.include('iframe-resizer')
+
+    def external_link_to_street(address):
+        q = quote_plus(str(address.street_id))
+        return f'https://stadtplan.winterthur.ch/?locate=strasse&locations={q}'
+
+    def external_link_to_address(address):
+        q = quote_plus(str(address.title))
+        return f'https://stadtplan.winterthur.ch/?locate=adresse&locations={q}'
 
     return {
         'layout': AddressSubsetLayout(self, request),
         'title': self.street,
         'addresses': self.subset(),
-        'parent': request.class_link(AddressCollection)
+        'parent': request.class_link(AddressCollection),
+        'external_link_to_street': external_link_to_street,
+        'external_link_to_address': external_link_to_address
     }

@@ -46,3 +46,10 @@ class WinterthurAddress(Base):
     @property
     def is_addressless(self):
         return self.house_number == -1
+
+    @property
+    def title(self):
+        if self.is_addressless:
+            return self.street
+        else:
+            return f"{self.street} {self.house_number}{self.house_extra}"
