@@ -84,8 +84,8 @@ msgstr "Ungültige Kandidierendenresultate"
 msgid "No data found"
 msgstr "Keine Daten gefunden"
 
-msgid "No distinct region"
-msgstr "Keine eindeutige Region"
+msgid "No clear district"
+msgstr "Kein eindeutiger Wahlkreis"
 
 msgid "Invalid list values"
 msgstr "Ungültige Listendaten"
@@ -168,6 +168,9 @@ msgstr "System"
 
 msgid "Tacit election"
 msgstr "Stille Wahl"
+
+msgid "Distinct district"
+msgstr "Eindeutiger Wahlkreis"
 
 msgid "Date"
 msgstr "Datum"

@@ -575,7 +575,7 @@ def test_import_wabstic_majorz_regional(session):
     # Too many districts
     for distinct in (False, True):
         election.distinct = distinct
-        expected = ['No distinct region'] if distinct else []
+        expected = ['No clear district'] if distinct else []
 
         errors = import_election_wabstic_majorz(
             election, principal_zg, '0', '0',

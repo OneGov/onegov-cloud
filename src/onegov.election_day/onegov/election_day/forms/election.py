@@ -39,7 +39,7 @@ class ElectionForm(Form):
     )
 
     distinct = BooleanField(
-        label=_("Distinct region"),
+        label=_("Distinct district"),
         render_kw=dict(force_simple=True),
         depends_on=('domain', 'region'),
     )

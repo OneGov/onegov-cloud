@@ -530,10 +530,10 @@ def import_election_wabstic_proporz(
     if election.domain == 'region' and districts and election.distinct:
         if principal.has_districts:
             if len(districts) != 1:
-                errors.append(FileImportError(_("No distinct region")))
+                errors.append(FileImportError(_("No clear district")))
         else:
             if len(added_results) != 1:
-                errors.append(FileImportError(_("No distinct region")))
+                errors.append(FileImportError(_("No clear district")))
 
     if errors:
         return errors

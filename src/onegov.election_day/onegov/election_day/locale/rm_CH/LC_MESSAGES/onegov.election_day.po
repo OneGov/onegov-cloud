@@ -84,7 +84,7 @@ msgstr "Resultats da candidat nunvalaivels"
 msgid "No data found"
 msgstr "Chattà naginas datas"
 
-msgid "No distinct region"
+msgid "No clear district"
 msgstr ""
 
 msgid "Invalid list values"
@@ -168,6 +168,9 @@ msgstr "Sistem"
 
 msgid "Tacit election"
 msgstr "Elecziun taciturna"
+
+msgid "Distinct district"
+msgstr ""
 
 msgid "Date"
 msgstr "Data"
