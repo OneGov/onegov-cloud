@@ -2,6 +2,7 @@ from freezegun import freeze_time
 from onegov.gazette.tests.common import accept_notice
 from onegov.gazette.tests.common import edit_notice
 from onegov.gazette.tests.common import login_users
+from onegov.gazette.tests.common import publish_issue
 from onegov.gazette.tests.common import reject_notice
 from onegov.gazette.tests.common import submit_notice
 
