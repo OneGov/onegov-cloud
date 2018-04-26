@@ -3,6 +3,7 @@ import pytest
 
 from datetime import datetime
 from onegov.search import Searchable, SearchOfflineError, utils
+from onegov.search.indexer import parse_index_name
 from onegov.search.indexer import (
     Indexer,
     IndexManager,
@@ -116,30 +117,26 @@ def test_index_creation(es_client):
 
 
 def test_parse_index_name(es_client):
-    ixmgr = IndexManager('foo', es_client)
-    assert ixmgr.parse_index_name('hostname_org-my_schema-de-posts') == {
-        'hostname': 'hostname_org',
-        'schema': 'my_schema',
-        'language': 'de',
-        'type_name': 'posts',
-        'version': None
-    }
+    result = parse_index_name('hostname_org-my_schema-de-posts')
+    assert result.hostname == 'hostname_org'
+    assert result.schema == 'my_schema'
+    assert result.language == 'de'
+    assert result.type_name == 'posts'
+    assert result.version == None
 
-    assert ixmgr.parse_index_name('hostname_org-my_schema-de-posts-1') == {
-        'hostname': 'hostname_org',
-        'schema': 'my_schema',
-        'language': 'de',
-        'type_name': 'posts',
-        'version': '1'
-    }
+    result = parse_index_name('hostname_org-my_schema-de-posts-1')
+    assert result.hostname == 'hostname_org'
+    assert result.schema == 'my_schema'
+    assert result.language == 'de'
+    assert result.type_name == 'posts'
+    assert result.version == '1'
 
-    assert ixmgr.parse_index_name('asdf') == {
-        'hostname': None,
-        'schema': None,
-        'language': None,
-        'type_name': None,
-        'version': None
-    }
+    result = parse_index_name('asdf')
+    assert result.hostname is None
+    assert result.schema is None
+    assert result.language is None
+    assert result.type_name is None
+    assert result.version is None
 
 
 @pytest.mark.parametrize("is_valid", [
@@ -321,40 +318,82 @@ def test_orm_event_translator_properties():
 
     translator = ORMEventTranslator(mappings)
 
-    for on_event in (translator.on_insert, translator.on_update):
-        on_event('my-schema', Page(
-            id=1,
-            title='About',
-            body='We are Pied Piper',
-            tags=['aboutus', 'company'],
-            date=datetime(2015, 9, 11),
-            published=True,
-            likes=1000
-        ))
+    translator.on_insert('my-schema', Page(
+        id=1,
+        title='About',
+        body='We are Pied Piper',
+        tags=['aboutus', 'company'],
+        date=datetime(2015, 9, 11),
+        published=True,
+        likes=1000
+    ))
 
-        assert translator.queue.get() == {
-            'action': 'index',
-            'schema': 'my-schema',
-            'type_name': 'page',
-            'id': 1,
-            'language': 'en',
-            'properties': {
-                'title': 'About',
-                'body': 'We are Pied Piper',
-                'tags': ['aboutus', 'company'],
-                'date': '2015-09-11T00:00:00',
-                'likes': 1000,
-                'published': True,
-                'es_public': True,
-                'es_suggestion': {
-                    'input': ['About'],
-                    'contexts': {
-                        'es_suggestion_context': ['public']
-                    }
+    assert translator.queue.get() == {
+        'action': 'index',
+        'schema': 'my-schema',
+        'type_name': 'page',
+        'id': 1,
+        'language': 'en',
+        'properties': {
+            'title': 'About',
+            'body': 'We are Pied Piper',
+            'tags': ['aboutus', 'company'],
+            'date': '2015-09-11T00:00:00',
+            'likes': 1000,
+            'published': True,
+            'es_public': True,
+            'es_suggestion': {
+                'input': ['About'],
+                'contexts': {
+                    'es_suggestion_context': ['public']
                 }
             }
         }
-        assert translator.queue.empty()
+    }
+
+    assert translator.queue.empty()
+
+    translator.on_update('my-schema', Page(
+        id=1,
+        title='About',
+        body='We are Pied Piper',
+        tags=['aboutus', 'company'],
+        date=datetime(2015, 9, 11),
+        published=True,
+        likes=1000
+    ))
+
+    assert translator.queue.get() == {
+        'action': 'delete',
+        'schema': 'my-schema',
+        'type_name': 'page',
+        'id': 1
+    }
+
+    assert translator.queue.get() == {
+        'action': 'index',
+        'schema': 'my-schema',
+        'type_name': 'page',
+        'id': 1,
+        'language': 'en',
+        'properties': {
+            'title': 'About',
+            'body': 'We are Pied Piper',
+            'tags': ['aboutus', 'company'],
+            'date': '2015-09-11T00:00:00',
+            'likes': 1000,
+            'published': True,
+            'es_public': True,
+            'es_suggestion': {
+                'input': ['About'],
+                'contexts': {
+                    'es_suggestion_context': ['public']
+                }
+            }
+        }
+    }
+
+    assert translator.queue.empty()
 
 
 def test_orm_event_translator_delete():
@@ -404,7 +443,7 @@ def test_orm_event_queue_overflow(capturelog):
     mappings = TypeMappingRegistry()
     mappings.register_type('tweet', {})
 
-    translator = ORMEventTranslator(mappings, max_queue_size=3)
+    translator = ORMEventTranslator(mappings, max_queue_size=4)
     translator.on_insert('foobar', Tweet(1))
     translator.on_update('foobar', Tweet(2))
     translator.on_delete('foobar', Tweet(3))

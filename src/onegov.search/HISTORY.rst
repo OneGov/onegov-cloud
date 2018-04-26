@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes language changes resulting in duplicated documents in the search index.
+  [href]
+
 1.4.1 (2018-04-26)
 ~~~~~~~~~~~~~~~~~~~
 

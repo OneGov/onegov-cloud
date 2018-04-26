@@ -1,6 +1,7 @@
 import platform
 import re
 
+from collections import namedtuple
 from copy import deepcopy
 from elasticsearch.helpers import streaming_bulk
 from elasticsearch.exceptions import NotFoundError
@@ -110,6 +111,44 @@ ANALYSIS_CONFIG = {
         }
     }
 }
+
+
+IndexParts = namedtuple('IndexParts', (
+    'hostname',
+    'schema',
+    'language',
+    'type_name',
+    'version'
+))
+
+
+def parse_index_name(index_name):
+    """ Takes the given index name and returns the hostname, schema,
+    language and type_name in a dictionary.
+
+    * If the index_name doesn't match the pattern, all values are None.
+    * If the index_name has no version, the version is None.
+
+    """
+    if index_name.count('-') == 3:
+        hostname, schema, language, type_name = index_name.split('-')
+        version = None
+    elif index_name.count('-') == 4:
+        hostname, schema, language, type_name, version = index_name.split('-')
+    else:
+        hostname = None
+        schema = None
+        language = None
+        type_name = None
+        version = None
+
+    return IndexParts(
+        hostname=hostname,
+        schema=schema,
+        language=language,
+        type_name=type_name,
+        version=version
+    )
 
 
 class Indexer(object):
@@ -490,43 +529,14 @@ class IndexManager(object):
 
         count = 0
         for index in self.query_indices():
-            info = self.parse_index_name(index)
+            info = parse_index_name(index)
 
-            if info['version'] and info['version'] not in active_versions:
+            if info.version and info.version not in active_versions:
                 self.es_client.indices.delete(index)
                 self.created_indices.remove(index)
                 count += 1
 
         return count
-
-    def parse_index_name(self, index_name):
-        """ Takes the given index name and returns the hostname, schema,
-        language and type_name in a dictionary.
-
-        * If the index_name doesn't match the pattern, all values are None.
-        * If the index_name has no version, the version is None.
-
-        """
-        if index_name.count('-') == 3:
-            hostname, schema, language, type_name = index_name.split('-')
-            version = None
-        elif index_name.count('-') == 4:
-            hostname, schema, language, type_name, version =\
-                index_name.split('-')
-        else:
-            hostname = None
-            schema = None
-            language = None
-            type_name = None
-            version = None
-
-        return {
-            'hostname': hostname,
-            'schema': schema,
-            'language': language,
-            'type_name': type_name,
-            'version': version
-        }
 
     def get_managed_indices_wildcard(self, schema):
         """ Returns a wildcard index name for all indices managed. """
@@ -643,6 +653,7 @@ class ORMEventTranslator(object):
 
     def on_update(self, schema, obj):
         if isinstance(obj, Searchable):
+            self.delete(schema, obj)
             self.index(schema, obj)
 
     def on_delete(self, schema, obj):

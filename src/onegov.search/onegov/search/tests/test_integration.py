@@ -575,3 +575,56 @@ def test_language_detection(es_url, postgres_dsn):
     assert german[0].title == "Mein Dokument"
     assert french[0].title == "My document"
     assert french[1].title == "Mon document"
+
+
+def test_language_update(es_url, postgres_dsn):
+    class App(Framework, ElasticsearchApp):
+        pass
+
+    Base = declarative_base()
+
+    class Document(Base, ORMSearchable):
+        __tablename__ = 'documents'
+
+        id = Column(Integer, primary_key=True)
+        title = Column(Text, nullable=False)
+
+        es_properties = {
+            'title': {'type': 'localized'}
+        }
+
+        es_public = True
+
+    scan_morepath_modules(App)
+    morepath.commit()
+
+    app = App()
+    app.configure_application(
+        dsn=postgres_dsn,
+        base=Base,
+        elasticsearch_hosts=[es_url]
+    )
+
+    app.namespace = 'documents'
+    app.set_application_id('documents/home')
+
+    session = app.session()
+    session.add(Document(title="Mein Dokument"))
+    transaction.commit()
+    app.es_indexer.process()
+    app.es_client.indices.refresh(index='_all')
+
+    german = app.es_search(languages=['de']).execute().load()
+    french = app.es_search(languages=['fr']).execute().load()
+    assert german
+    assert not french
+
+    session.query(Document).one().title = "Mon document"
+    transaction.commit()
+    app.es_indexer.process()
+    app.es_client.indices.refresh(index='_all')
+
+    german = app.es_search(languages=['de']).execute().load()
+    french = app.es_search(languages=['fr']).execute().load()
+    assert not german
+    assert french
