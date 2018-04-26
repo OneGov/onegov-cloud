@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.12.15 (2018-04-26)
+~~~~~~~~~~~~~~~~~~~~
 
 - Updates translation.
   [msom]
