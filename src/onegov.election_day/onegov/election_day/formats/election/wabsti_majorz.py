@@ -30,6 +30,7 @@ def parse_election(line, errors):
         mandates = int(line.anzmandate or 0)
         if hasattr(line, 'absolutesmehr'):
             majority = int(line.absolutesmehr or 0)
+            majority = majority if majority > 0 else None
     except ValueError:
         errors.append(_("Invalid election values"))
 

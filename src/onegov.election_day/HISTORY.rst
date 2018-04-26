@@ -4,6 +4,9 @@ Changelog
 - Adds an option to allow regional elections to span over several districts.
   [msom]
 
+- Improve wabsti import.
+  [msom]
+
 3.4.4 (2018-04-24)
 ~~~~~~~~~~~~~~~~~~~
 
