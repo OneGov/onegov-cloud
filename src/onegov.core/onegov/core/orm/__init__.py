@@ -1,5 +1,5 @@
 from onegov.core.orm.cache import orm_cached
-from onegov.core.orm.session_manager import SessionManager
+from onegov.core.orm.session_manager import SessionManager, query_schemas
 from onegov.core.orm.sql import as_selectable, as_selectable_from_path
 from sqlalchemy import event, inspect
 from sqlalchemy.ext.declarative import declarative_base
@@ -111,5 +111,6 @@ __all__ = [
     'as_selectable_from_path',
     'translation_hybrid',
     'find_models',
-    'orm_cached'
+    'orm_cached',
+    'query_schemas'
 ]

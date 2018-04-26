@@ -190,12 +190,13 @@ import sqlalchemy
 import sys
 
 from fnmatch import fnmatch
-from onegov.core.orm import Base, SessionManager
 from onegov.core.security import Public
 from onegov.core.utils import scan_morepath_modules
+from onegov.core.orm import query_schemas
 from onegov.server.config import Config
 from onegov.server.core import Server
 from sqlalchemy.pool import NullPool
+from sqlalchemy import create_engine
 from uuid import uuid4
 from webtest import TestApp as Client
 
@@ -321,13 +322,6 @@ class GroupContext(GroupContextGuard):
             self.singular = singular
             self.matches_required = matches_required
 
-    def unbound_session_manager(self, dsn):
-        """ Returns a session manager *not yet bound to a schema!*. """
-
-        return SessionManager(dsn=dsn, base=Base, pool_config={
-            'poolclass': NullPool
-        })
-
     def available_schemas(self, appcfg):
         """ Returns all available schemas, if the application is database
         bound.
@@ -337,8 +331,12 @@ class GroupContext(GroupContextGuard):
         if 'dsn' not in appcfg.configuration:
             return []
 
-        mgr = self.unbound_session_manager(appcfg.configuration['dsn'])
-        return mgr.list_schemas(limit_to_namespace=appcfg.namespace)
+        # creating your engine should usually be avoided, be sure to only
+        # copy this code when you don't need the typical session manager
+        # engine setup
+        engine = create_engine(appcfg.configuration['dsn'], poolclass=NullPool)
+
+        return list(query_schemas(engine, namespace=appcfg.namespace))
 
     def split_match(self, match):
         match = match.lstrip('/')

@@ -24,6 +24,22 @@ class ForceFetchQueryClass(Query):
         return super().delete('fetch')
 
 
+def query_schemas(connection, namespace=None):
+    """ Yields all schemas or the ones with the given namespace. """
+
+    query = text("""
+        SELECT schema_name
+        FROM information_schema.schemata
+        ORDER BY schema_name
+    """)
+
+    prefix = namespace and f'{namespace}-'
+
+    for (schema, ) in connection.execute(query):
+        if not prefix or schema.startswith(prefix):
+            yield schema
+
+
 class SessionManager(object):
     """ Holds sessions and creates schemas before binding sessions to schemas.
 
@@ -527,25 +543,12 @@ class SessionManager(object):
 
         return self.bind_session(self.session_factory())
 
-    def list_schemas(self, limit_to_namespace=None):
-        """ Returns a list containing *all* schemas defined in the current
+    def list_schemas(self, namespace=None):
+        """ Returns a tuple containing *all* schemas defined in the current
         database.
 
         """
-        conn = self.engine.execution_options(schema=None)
-        query = text("""
-            SELECT schema_name
-            FROM information_schema.schemata
-            ORDER BY schema_name
-        """)
-
-        if limit_to_namespace is not None:
-            return [
-                r[0] for r in conn.execute(query).fetchall()
-                if r[0].startswith(limit_to_namespace + '-')
-            ]
-        else:
-            return [r[0] for r in conn.execute(query).fetchall()]
+        return list(query_schemas(self.engine, namespace))
 
     def is_schema_found_on_database(self, schema):
         """ Returns True if the given schema exists on the database. """
