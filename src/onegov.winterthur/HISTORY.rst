@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.7 (2018-04-26)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Fixes external links not working on IE 11.
   [href]
 
