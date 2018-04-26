@@ -36,7 +36,7 @@
                     </div>
                     <div class="small-12 medium-5 columns">
                         <dl>
-                            <tal:block>
+                            <tal:block tal:condition="publisher">
                                 <dt i18n:translate>Print only</dt>
                                 <dd i18n:translate tal:condition="notice.print_only">Yes</dd>
                                 <dd i18n:translate tal:condition="not: notice.print_only">No</dd>

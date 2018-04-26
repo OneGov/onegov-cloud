@@ -4,7 +4,10 @@ Changelog
 - Updates translation.
   [msom]
 
-1.13.14 (2018-03-23)
+- Hides print only option for editors.
+  [msom]
+
+1.12.14 (2018-03-23)
 ~~~~~~~~~~~~~~~~~~~~
 
 - Adjusts texts/translations.
