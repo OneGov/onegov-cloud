@@ -38,6 +38,12 @@ class ElectionForm(Form):
         render_kw=dict(force_simple=True)
     )
 
+    distinct = BooleanField(
+        label=_("Distinct region"),
+        render_kw=dict(force_simple=True),
+        depends_on=('domain', 'region'),
+    )
+
     date = DateField(
         label=_("Date"),
         validators=[
@@ -122,6 +128,7 @@ class ElectionForm(Form):
         model.absolute_majority = self.absolute_majority.data
         model.related_link = self.related_link.data
         model.tacit = self.tacit.data
+        model.distinct = self.distinct.data
 
         titles = {}
         if self.election_de.data:
@@ -149,6 +156,7 @@ class ElectionForm(Form):
         self.absolute_majority.data = model.absolute_majority
         self.related_link.data = model.related_link
         self.tacit.data = model.tacit
+        self.distinct.data = model.distinct
 
         if model.type == 'majorz':
             self.election_type.choices = [

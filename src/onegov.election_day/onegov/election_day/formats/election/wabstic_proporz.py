@@ -527,7 +527,7 @@ def import_election_wabstic_proporz(
 
     # Check if all results are from the same district if regional election
     districts = set([result['district'] for result in added_entities.values()])
-    if election.domain == 'region' and districts:
+    if election.domain == 'region' and districts and election.distinct:
         if principal.has_districts:
             if len(districts) != 1:
                 errors.append(FileImportError(_("No distinct region")))
@@ -594,6 +594,8 @@ def import_election_wabstic_proporz(
         entity = entities[entity_id]
         district = entity.get('district', '')
         if election.domain == 'region':
+            if not election.distinct:
+                continue
             if not principal.has_districts:
                 continue
             if district not in districts:

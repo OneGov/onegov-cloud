@@ -476,133 +476,138 @@ def test_import_internal_majorz_regional(session):
     principal_sg = Canton(canton='sg')
 
     # Too many districts
-    errors = import_election_internal_majorz(
-        election, principal_zg,
-        BytesIO((
-            '\n'.join((
-                ','.join((
-                    'election_absolute_majority',
-                    'election_status',
-                    'entity_id',
-                    'entity_counted',
-                    'entity_eligible_voters',
-                    'entity_received_ballots',
-                    'entity_blank_ballots',
-                    'entity_invalid_ballots',
-                    'entity_blank_votes',
-                    'entity_invalid_votes',
-                    'candidate_family_name',
-                    'candidate_first_name',
-                    'candidate_id',
-                    'candidate_elected',
-                    'candidate_votes',
-                    'candidate_party',
-                )),
-                ','.join((
-                    '',  # election_absolute_majority
-                    'unknown',  # election_status
-                    '1701',  # entity_id
-                    'True',  # entity_counted
-                    '111',  # entity_eligible_voters
-                    '11',  # entity_received_ballots
-                    '1',  # entity_blank_ballots
-                    '1',  # entity_invalid_ballots
-                    '1',  # entity_blank_votes
-                    '1',  # entity_invalid_votes
-                    'xxx',  # candidate_family_name
-                    'xxx',  # candidate_first_name
-                    '1',  # candidate_id
-                    'false',  # candidate_elected
-                    '1',  # candidate_votes
-                    '',  # candidate_party
-                )),
-                ','.join((
-                    '',  # election_absolute_majority
-                    'unknown',  # election_status
-                    '1702',  # entity_id
-                    'False',  # entity_counted
-                    '111',  # entity_eligible_voters
-                    '11',  # entity_received_ballots
-                    '1',  # entity_blank_ballots
-                    '1',  # entity_invalid_ballots
-                    '1',  # entity_blank_votes
-                    '1',  # entity_invalid_votes
-                    'xxx',  # candidate_family_name
-                    'xxx',  # candidate_first_name
-                    '1',  # candidate_id
-                    'false',  # candidate_elected
-                    '1',  # candidate_votes
-                    '',  # candidate_party
-                ))
-            ))
-        ).encode('utf-8')), 'text/plain',
-    )
-    assert [error.error for error in errors] == ['No distinct region']
+    for distinct in (False, True):
+        election.distinct = distinct
+        expected = ['No distinct region'] if distinct else []
 
-    errors = import_election_internal_majorz(
-        election, principal_sg,
-        BytesIO((
-            '\n'.join((
-                ','.join((
-                    'election_absolute_majority',
-                    'election_status',
-                    'entity_id',
-                    'entity_counted',
-                    'entity_eligible_voters',
-                    'entity_received_ballots',
-                    'entity_blank_ballots',
-                    'entity_invalid_ballots',
-                    'entity_blank_votes',
-                    'entity_invalid_votes',
-                    'candidate_family_name',
-                    'candidate_first_name',
-                    'candidate_id',
-                    'candidate_elected',
-                    'candidate_votes',
-                    'candidate_party',
-                )),
-                ','.join((
-                    '',  # election_absolute_majority
-                    'unknown',  # election_status
-                    '3231',  # entity_id
-                    'True',  # entity_counted
-                    '111',  # entity_eligible_voters
-                    '11',  # entity_received_ballots
-                    '1',  # entity_blank_ballots
-                    '1',  # entity_invalid_ballots
-                    '1',  # entity_blank_votes
-                    '1',  # entity_invalid_votes
-                    'xxx',  # candidate_family_name
-                    'xxx',  # candidate_first_name
-                    '1',  # candidate_id
-                    'false',  # candidate_elected
-                    '1',  # candidate_votes
-                    '',  # candidate_party
-                )),
-                ','.join((
-                    '',  # election_absolute_majority
-                    'unknown',  # election_status
-                    '3276',  # entity_id
-                    'True',  # entity_counted
-                    '111',  # entity_eligible_voters
-                    '11',  # entity_received_ballots
-                    '1',  # entity_blank_ballots
-                    '1',  # entity_invalid_ballots
-                    '1',  # entity_blank_votes
-                    '1',  # entity_invalid_votes
-                    'xxx',  # candidate_family_name
-                    'xxx',  # candidate_first_name
-                    '1',  # candidate_id
-                    'false',  # candidate_elected
-                    '1',  # candidate_votes
-                    '',  # candidate_party
+        errors = import_election_internal_majorz(
+            election, principal_zg,
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'election_absolute_majority',
+                        'election_status',
+                        'entity_id',
+                        'entity_counted',
+                        'entity_eligible_voters',
+                        'entity_received_ballots',
+                        'entity_blank_ballots',
+                        'entity_invalid_ballots',
+                        'entity_blank_votes',
+                        'entity_invalid_votes',
+                        'candidate_family_name',
+                        'candidate_first_name',
+                        'candidate_id',
+                        'candidate_elected',
+                        'candidate_votes',
+                        'candidate_party',
+                    )),
+                    ','.join((
+                        '',  # election_absolute_majority
+                        'unknown',  # election_status
+                        '1701',  # entity_id
+                        'True',  # entity_counted
+                        '111',  # entity_eligible_voters
+                        '11',  # entity_received_ballots
+                        '1',  # entity_blank_ballots
+                        '1',  # entity_invalid_ballots
+                        '1',  # entity_blank_votes
+                        '1',  # entity_invalid_votes
+                        'xxx',  # candidate_family_name
+                        'xxx',  # candidate_first_name
+                        '1',  # candidate_id
+                        'false',  # candidate_elected
+                        '1',  # candidate_votes
+                        '',  # candidate_party
+                    )),
+                    ','.join((
+                        '',  # election_absolute_majority
+                        'unknown',  # election_status
+                        '1702',  # entity_id
+                        'False',  # entity_counted
+                        '111',  # entity_eligible_voters
+                        '11',  # entity_received_ballots
+                        '1',  # entity_blank_ballots
+                        '1',  # entity_invalid_ballots
+                        '1',  # entity_blank_votes
+                        '1',  # entity_invalid_votes
+                        'xxx',  # candidate_family_name
+                        'xxx',  # candidate_first_name
+                        '1',  # candidate_id
+                        'false',  # candidate_elected
+                        '1',  # candidate_votes
+                        '',  # candidate_party
+                    ))
                 ))
-            ))
-        ).encode('utf-8')), 'text/plain',
-    )
-    assert [error.error for error in errors] == ['No distinct region']
+            ).encode('utf-8')), 'text/plain',
+        )
+        assert [error.error for error in errors] == expected
+
+        errors = import_election_internal_majorz(
+            election, principal_sg,
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'election_absolute_majority',
+                        'election_status',
+                        'entity_id',
+                        'entity_counted',
+                        'entity_eligible_voters',
+                        'entity_received_ballots',
+                        'entity_blank_ballots',
+                        'entity_invalid_ballots',
+                        'entity_blank_votes',
+                        'entity_invalid_votes',
+                        'candidate_family_name',
+                        'candidate_first_name',
+                        'candidate_id',
+                        'candidate_elected',
+                        'candidate_votes',
+                        'candidate_party',
+                    )),
+                    ','.join((
+                        '',  # election_absolute_majority
+                        'unknown',  # election_status
+                        '3231',  # entity_id
+                        'True',  # entity_counted
+                        '111',  # entity_eligible_voters
+                        '11',  # entity_received_ballots
+                        '1',  # entity_blank_ballots
+                        '1',  # entity_invalid_ballots
+                        '1',  # entity_blank_votes
+                        '1',  # entity_invalid_votes
+                        'xxx',  # candidate_family_name
+                        'xxx',  # candidate_first_name
+                        '1',  # candidate_id
+                        'false',  # candidate_elected
+                        '1',  # candidate_votes
+                        '',  # candidate_party
+                    )),
+                    ','.join((
+                        '',  # election_absolute_majority
+                        'unknown',  # election_status
+                        '3276',  # entity_id
+                        'True',  # entity_counted
+                        '111',  # entity_eligible_voters
+                        '11',  # entity_received_ballots
+                        '1',  # entity_blank_ballots
+                        '1',  # entity_invalid_ballots
+                        '1',  # entity_blank_votes
+                        '1',  # entity_invalid_votes
+                        'xxx',  # candidate_family_name
+                        'xxx',  # candidate_first_name
+                        '1',  # candidate_id
+                        'false',  # candidate_elected
+                        '1',  # candidate_votes
+                        '',  # candidate_party
+                    ))
+                ))
+            ).encode('utf-8')), 'text/plain',
+        )
+        assert [error.error for error in errors] == expected
 
     # OK
+    election.distinct = True
     errors = import_election_internal_majorz(
         election, principal_zg,
         BytesIO((
@@ -650,48 +655,51 @@ def test_import_internal_majorz_regional(session):
     assert election.progress == (1, 1)
 
     # Temporary
-    errors = import_election_internal_majorz(
-        election, principal_sg,
-        BytesIO((
-            '\n'.join((
-                ','.join((
-                    'election_absolute_majority',
-                    'election_status',
-                    'entity_id',
-                    'entity_counted',
-                    'entity_eligible_voters',
-                    'entity_received_ballots',
-                    'entity_blank_ballots',
-                    'entity_invalid_ballots',
-                    'entity_blank_votes',
-                    'entity_invalid_votes',
-                    'candidate_family_name',
-                    'candidate_first_name',
-                    'candidate_id',
-                    'candidate_elected',
-                    'candidate_votes',
-                    'candidate_party',
-                )),
-                ','.join((
-                    '',  # election_absolute_majority
-                    'unknown',  # election_status
-                    '3231',  # entity_id
-                    'True',  # entity_counted
-                    '111',  # entity_eligible_voters
-                    '11',  # entity_received_ballots
-                    '1',  # entity_blank_ballots
-                    '1',  # entity_invalid_ballots
-                    '1',  # entity_blank_votes
-                    '1',  # entity_invalid_votes
-                    'xxx',  # candidate_family_name
-                    'xxx',  # candidate_first_name
-                    '1',  # candidate_id
-                    'false',  # candidate_elected
-                    '1',  # candidate_votes
-                    '',  # candidate_party
+    for distinct, total in ((False, 1), (True, 13)):
+        election.distinct = distinct
+
+        errors = import_election_internal_majorz(
+            election, principal_sg,
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'election_absolute_majority',
+                        'election_status',
+                        'entity_id',
+                        'entity_counted',
+                        'entity_eligible_voters',
+                        'entity_received_ballots',
+                        'entity_blank_ballots',
+                        'entity_invalid_ballots',
+                        'entity_blank_votes',
+                        'entity_invalid_votes',
+                        'candidate_family_name',
+                        'candidate_first_name',
+                        'candidate_id',
+                        'candidate_elected',
+                        'candidate_votes',
+                        'candidate_party',
+                    )),
+                    ','.join((
+                        '',  # election_absolute_majority
+                        'unknown',  # election_status
+                        '3231',  # entity_id
+                        'True',  # entity_counted
+                        '111',  # entity_eligible_voters
+                        '11',  # entity_received_ballots
+                        '1',  # entity_blank_ballots
+                        '1',  # entity_invalid_ballots
+                        '1',  # entity_blank_votes
+                        '1',  # entity_invalid_votes
+                        'xxx',  # candidate_family_name
+                        'xxx',  # candidate_first_name
+                        '1',  # candidate_id
+                        'false',  # candidate_elected
+                        '1',  # candidate_votes
+                        '',  # candidate_party
+                    ))
                 ))
-            ))
-        ).encode('utf-8')), 'text/plain',
-    )
-    assert not errors
-    assert election.progress == (1, 13)
+            ).encode('utf-8')), 'text/plain',
+        )
+        assert not errors
+        assert election.progress == (1, total)
