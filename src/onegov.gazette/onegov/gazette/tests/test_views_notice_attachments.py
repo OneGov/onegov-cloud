@@ -1,8 +1,8 @@
 from freezegun import freeze_time
 from onegov.core.utils import module_path
-from onegov.gazette.tests import accept_notice
-from onegov.gazette.tests import login_users
-from onegov.gazette.tests import submit_notice
+from onegov.gazette.tests.common import accept_notice
+from onegov.gazette.tests.common import login_users
+from onegov.gazette.tests.common import submit_notice
 from pytest import mark
 from webtest.forms import Upload
 

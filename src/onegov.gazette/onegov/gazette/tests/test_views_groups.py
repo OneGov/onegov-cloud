@@ -1,6 +1,6 @@
-from onegov.gazette.tests import login_admin
-from onegov.gazette.tests import login_editor_1
-from onegov.gazette.tests import login_publisher
+from onegov.gazette.tests.common import login_admin
+from onegov.gazette.tests.common import login_editor_1
+from onegov.gazette.tests.common import login_publisher
 from webtest import TestApp as Client
 
 

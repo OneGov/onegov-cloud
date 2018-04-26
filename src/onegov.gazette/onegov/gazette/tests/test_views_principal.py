@@ -1,8 +1,6 @@
-from freezegun import freeze_time
-from onegov.gazette.tests import login_admin
-from onegov.gazette.tests import login_editor_1
-from onegov.gazette.tests import login_publisher
-from pyquery import PyQuery as pq
+from onegov.gazette.tests.common import login_admin
+from onegov.gazette.tests.common import login_editor_1
+from onegov.gazette.tests.common import login_publisher
 from webtest import TestApp as Client
 
 
