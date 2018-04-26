@@ -251,6 +251,10 @@ class Election(Base, ContentMixin, TimestampMixin,
     #: may be used to mark an election as a tacit election
     tacit = meta_property('tacit', default=False)
 
+    #: may be used to mark an election as distinct, e.g. a regional election
+    #: containing only the municipalities of one district of a canton.
+    distinct = meta_property('distinct', default=True)
+
     def clear_results(self):
         """ Clears all the results. """
 
