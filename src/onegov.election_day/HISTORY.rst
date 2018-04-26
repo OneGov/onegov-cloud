@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.4.5 (2018-04-26)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds an option to allow regional elections to span over several districts.
   [msom]
