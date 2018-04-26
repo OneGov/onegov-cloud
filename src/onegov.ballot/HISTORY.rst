@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.5.0 (2018-04-26)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a distinct property to elections.
   [msom]
