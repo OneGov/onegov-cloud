@@ -389,9 +389,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         will see the messages.
 
         """
-        if self.browser_session.has('messages'):
-            yield from self.browser_session.messages
-            del self.browser_session.messages
+        yield from self.browser_session.pop('messages', ())
 
     def success(self, text):
         """ Adds a success message. """

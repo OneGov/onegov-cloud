@@ -1,3 +1,4 @@
+from contextlib import suppress
 from dogpile.cache.api import NO_VALUE
 
 
@@ -49,6 +50,24 @@ class BrowserSession(object):
     def has(self, name):
         """ Returns true if the given name exists in the cache. """
         return self._cache.get(self.mangle(name)) is not NO_VALUE
+
+    def pop(self, name, default=None):
+        """ Returns the value for the given name, removing the value in
+        the process.
+
+        """
+        value = self.get(name, default=default)
+
+        # we can run into a race condition here when two requests come in
+        # simultaneously - one request will get the value and delete it, the
+        # other will get the value and fail with an error when trying to
+        # delete it
+        #
+        # we can be pragmatic - if it's gone, it doesn't need to be deleted
+        with suppress(AttributeError):
+            delattr(self, name)
+
+        return value
 
     def get(self, name, default=None):
         value = self._cache.get(self.mangle(name))

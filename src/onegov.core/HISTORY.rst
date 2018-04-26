@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes a rare race-condition with request messages.
+  [href]
+
 - Changes the way session managers are bound to the application.
 
   This fixes #21 by introducing a global session manager reference.
