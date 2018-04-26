@@ -483,6 +483,41 @@ def test_introduce_required_field(session):
     session.flush()
 
 
+def test_introduce_image_field(session):
+    logos = DirectoryCollection(session).add(
+        title="Logos",
+        structure="""
+            Name *= ___
+        """,
+        configuration=DirectoryConfiguration(
+            title=('Name', ),
+            order=('Name', )
+        )
+    )
+
+    logos.add(values=dict(
+        name="Mc Donalds"
+    ))
+
+    transaction.commit()
+
+    logos = DirectoryCollection(session).query().one()
+    assert logos.entries[0].values == {'name': 'Mc Donalds'}
+
+    logos.structure = """
+        Name *= ___
+        Logo = *.jpg|*.png|*.gif
+    """
+
+    session.flush()
+    assert logos.entries[0].values == {'name': 'Mc Donalds', 'logo': None}
+
+    transaction.commit()
+
+    logos = DirectoryCollection(session).query().one()
+    assert logos.entries[0].values == {'name': 'Mc Donalds', 'logo': None}
+
+
 def test_change_number_range_fail(session):
     rooms = DirectoryCollection(session).add(
         title="Prediction",

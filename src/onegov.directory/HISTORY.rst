@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes some migrations not triggering a database update.
+  [href]
+
 0.2.1 (2018-02-23)
 ~~~~~~~~~~~~~~~~~~~~~
 

@@ -115,7 +115,7 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
         return entry
 
-    def update(self, entry, values, set_name=False):
+    def update(self, entry, values, set_name=False, force_update=False):
         session = object_session(self)
 
         # replace all existing basic fields
@@ -186,7 +186,7 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
                 }
 
         # update the values
-        if entry.values != updated:
+        if force_update or entry.values != updated:
             entry.values = updated
 
             # mark the values as dirty (required because values is only part

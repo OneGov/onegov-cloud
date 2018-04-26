@@ -101,8 +101,10 @@ class DirectoryMigration(object):
         self.directory.configuration = self.new_configuration
 
     def migrate_entry(self, entry):
+        update = self.changes and True or False
+
         self.migrate_values(entry.values)
-        self.directory.update(entry, entry.values)
+        self.directory.update(entry, entry.values, force_update=update)
 
     def migrate_values(self, values):
         self.add_new_fields(values)
