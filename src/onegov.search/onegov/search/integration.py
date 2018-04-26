@@ -150,27 +150,29 @@ class ElasticsearchApp(morepath.App):
             self.es_client = None
             return
 
-        hosts = cfg.get('elasticsearch_hosts', (
+        self.es_hosts = cfg.get('elasticsearch_hosts', (
             'http://localhost:9200',
             'http://localhost:19200'
         ))
 
-        max_queue_size = int(cfg.get('elasticsarch_max_queue_size', '10000'))
-        verify_certs = cfg.get('elasticsearch_verify_certs', True)
+        self.es_verify_certs = cfg.get('elasticsearch_verify_certs', True)
 
-        if verify_certs:
-            extra = {'verify_certs': True, 'ca_certs': certifi.where()}
+        if cfg.get('elasticsearch_verify_certs', True):
+            self.es_extra_params = {
+                'verify_certs': True,
+                'ca_certs': certifi.where()
+            }
         else:
-            extra = {'verify_certs': False}
+            self.es_extra_params = {
+                'verify_certs': False
+            }
 
-        self.es_client = Elasticsearch(
-            hosts=hosts,
-            timeout=3,
-            max_retries=1,
-            transport_class=TolerantTransport,
-            **extra)
+        self.es_configure_client(usage='default')
 
         if self.has_database_connection:
+            max_queue_size = int(cfg.get(
+                'elasticsarch_max_queue_size', '10000'))
+
             self.es_mappings = TypeMappingRegistry()
 
             for base in self.session_manager.bases:
@@ -193,6 +195,25 @@ class ElasticsearchApp(morepath.App):
                 self.es_orm_events.on_update)
             self.session_manager.on_delete.connect(
                 self.es_orm_events.on_delete)
+
+    def es_configure_client(self, usage='default'):
+        usages = {
+            'default': {
+                'timeout': 3,
+                'max_retries': 1
+            },
+            'reindex': {
+                'timeout': 10,
+                'max_retries': 3
+            }
+        }
+
+        self.es_client = Elasticsearch(
+            hosts=self.es_hosts,
+            transport_class=TolerantTransport,
+            **usages[usage],
+            **self.es_extra_params
+        )
 
     def es_search(self, languages='*', types='*', include_private=False,
                   explain=False):
@@ -318,6 +339,7 @@ class ElasticsearchApp(morepath.App):
 
         """
 
+        self.es_configure_client(usage='reindex')
         self.es_indexer.ixmgr.created_indices = set()
 
         # delete all existing indices for this town

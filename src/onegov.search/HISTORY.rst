@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Uses a higher timeout during reindex operations.
+  [href]
+
 1.4.0 (2018-04-10)
 ~~~~~~~~~~~~~~~~~~~
 
