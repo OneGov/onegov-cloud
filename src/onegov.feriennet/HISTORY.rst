@@ -1,6 +1,15 @@
 Changelog
 ---------
 
+- Adds user categories to user export.
+  [href]
+
+- Fixes user e-mail not being correct on the user export.
+  [href]
+
+- Sorts the user export by login.
+  [href]
+
 - Improves user management form organisation.
   [href]
 

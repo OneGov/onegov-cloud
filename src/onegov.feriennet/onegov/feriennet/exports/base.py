@@ -69,6 +69,7 @@ class FeriennetExport(Export):
         yield _("User Login"), user.username
         yield _("User Role"), ROLES[user.role]
         yield _("User Active"), user.active
+        yield _("User Tags"), user_data.get('tags', ())
         yield _("User Salutation"), SALUTATIONS.get(salutation, '')
         yield _("User First Name"), first_name or ''
         yield _("User Last Name"), last_name or ''
@@ -78,7 +79,7 @@ class FeriennetExport(Export):
         yield _("User Location"), user_data.get('place', '')
         yield _("User Political Municipality"), \
             user_data.get('political_municipality', '')
-        yield _("User E-Mail"), user_data.get('e-mail', '')
+        yield _("User E-Mail"), user_data.get('email', '')
         yield _("User Phone"), user_data.get('phone', '')
         yield _("User Emergency"), user_data.get('emergency', '')
         yield _("User Website"), user_data.get('website', '')

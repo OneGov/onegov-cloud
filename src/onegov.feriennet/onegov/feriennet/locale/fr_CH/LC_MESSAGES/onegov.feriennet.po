@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-04-27 14:04+0200\n"
+"POT-Creation-Date: 2018-04-27 15:36+0200\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -928,6 +928,9 @@ msgstr "Rôle de l'utilisateur"
 
 msgid "User Active"
 msgstr "Utilisateur actif"
+
+msgid "User Tags"
+msgstr "Catégories utilisateur"
 
 msgid "User Salutation"
 msgstr "Civilité utilisateur"

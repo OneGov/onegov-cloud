@@ -2,7 +2,7 @@ from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.exports.base import FeriennetExport
 from onegov.org.forms import ExportForm
-from onegov.user import UserCollection
+from onegov.user import UserCollection, User
 
 
 @FeriennetApp.export(
@@ -18,7 +18,7 @@ class UserExport(FeriennetExport):
         return self.rows(session)
 
     def query(self, session):
-        return UserCollection(session).query()
+        return UserCollection(session).query().order_by(User.username)
 
     def rows(self, session):
         for user in self.query(session):
