@@ -5,8 +5,6 @@ from click.testing import CliRunner
 from datetime import date
 from datetime import datetime
 from datetime import timezone
-from multiprocessing import Manager
-from multiprocessing import Process
 from onegov.ballot import Ballot
 from onegov.ballot import BallotResult
 from onegov.ballot import Vote
@@ -69,41 +67,12 @@ def write_principal(temporary_directory, principal, entity='be', params=None):
         )
 
 
-def run_command(cfg_path, principal, commands, patch_call=None):
-
-    class CommandResult(object):
-        exit_code = None
-        output = None
-        patch_called = None
-
-    def _run_command(cfg_path, principal, commands, patch_call, response):
-        runner = CliRunner()
-        args = ['--config', cfg_path]
-        args += ['--select', '/onegov_election_day/{}'.format(principal)]
-        args += commands
-        if not patch_call:
-            result = runner.invoke(cli, args)
-        else:
-            with patch(patch_call) as patched:
-                result = runner.invoke(cli, args)
-                response['patch_called'] = patched.called
-        response['exit_code'] = result.exit_code
-        response['output'] = result.output
-
-    result = CommandResult()
-    with Manager() as manager:
-        response = manager.dict()
-        process = Process(
-            target=_run_command,
-            args=(cfg_path, principal, commands, patch_call, response)
-        )
-        process.start()
-        process.join()
-        result.exit_code = response['exit_code']
-        result.output = response['output']
-        result.patch_called = response.get('patch_called', None)
-
-    return result
+def run_command(cfg_path, principal, commands):
+    runner = CliRunner()
+    return runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/onegov_election_day/{}'.format(principal),
+    ] + commands)
 
 
 def test_add_instance(postgres_dsn, temporary_directory):
@@ -326,19 +295,26 @@ def test_send_sms(postgres_dsn, temporary_directory):
 
     # no sms yet
     send_sms = ['send-sms', 'username', 'password']
-    patch_call = 'onegov.election_day.utils.sms_processor.post'
-    result = run_command(cfg_path, 'govikon', send_sms, patch_call)
-    assert result.exit_code == 0
-    assert result.patch_called == False
+    assert run_command(cfg_path, 'govikon', send_sms).exit_code == 0
 
     with open(os.path.join(sms_path, '+417772211.000000'), 'w') as f:
         f.write('Fancy new results!')
 
-    result = run_command(cfg_path, 'govikon', send_sms, patch_call)
-    assert result.exit_code == 0
-    assert result.patch_called == True
-    assert os.path.exists(os.path.join(sms_path, '+417772211.000000'))
-    assert os.path.exists(os.path.join(sms_path, '.sending-+417772211.000000'))
+    with patch('onegov.election_day.utils.sms_processor.post') as post:
+        assert run_command(cfg_path, 'govikon', send_sms).exit_code == 0
+        assert post.called
+        assert post.call_args[0] == (
+            'https://json.aspsms.com/SendSimpleTextSMS',
+        )
+        assert post.call_args[1] == {
+            'json': {
+                'MessageText': 'Fancy new results!',
+                'Originator': 'OneGov',
+                'Password': 'password',
+                'Recipients': ['+417772211'],
+                'UserName': 'username'
+            }
+        }
 
 
 def test_generate_media(postgres_dsn, temporary_directory, session_manager):
