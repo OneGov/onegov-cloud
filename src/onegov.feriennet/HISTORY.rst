@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.29 (2018-04-27)
+~~~~~~~~~~~~~~~~~~~
 
 - Improves html output in occasion export.
   [href]
