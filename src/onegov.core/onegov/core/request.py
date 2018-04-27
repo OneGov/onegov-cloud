@@ -320,7 +320,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
     @cached_property
     def default_locale(self):
         """ Returns the default locale. """
-        return self.app.settings.i18n.default_locale
+        return self.app.default_locale
 
     @cached_property
     def locale(self):

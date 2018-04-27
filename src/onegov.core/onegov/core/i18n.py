@@ -102,7 +102,8 @@ def default_locale_negotiator(locales, request):
     if user_locale in locales:
         return user_locale
 
-    if bool(request.accept_language):
+    # we need to check if there is a valid header before matching it
+    if request.accept_language:
         return request.accept_language.best_match(locales)
 
     return None
