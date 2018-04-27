@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes a few typos in German.
+  [href]
+
 1.3.28 (2018-04-17)
 ~~~~~~~~~~~~~~~~~~~
 
