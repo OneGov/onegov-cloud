@@ -28,7 +28,7 @@
             </div>
         </div>
         <div class="field-display userprofile-settings">
-            <div class="field-display-label" i18n:translate>Settings</div>
+            <div class="field-display-label"></div>
             <div class="field-display-data">
                 <div class="row">
                     <div class="small-12 medium-6 columns">

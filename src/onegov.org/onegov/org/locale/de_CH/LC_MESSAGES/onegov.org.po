@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-03-29 14:01+0200\n"
+"POT-Creation-Date: 2018-04-27 14:10+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -527,8 +527,8 @@ msgstr "Editor"
 msgid "Member"
 msgstr "Mitglied"
 
-msgid "Active"
-msgstr "Aktiv"
+msgid "State"
+msgstr "Status"
 
 msgid "Role"
 msgstr "Rolle"
@@ -560,6 +560,12 @@ msgstr "Dieser YubiKey wird bereits von ${username} verwendet"
 
 msgid "A user with this e-mail address exists already"
 msgstr "Ein Benutzer mit dieser E-Mail Adresse existiert bereits"
+
+msgid "Active"
+msgstr "Aktiv"
+
+msgid "Inactive"
+msgstr "Inaktiv"
 
 msgid "Administrators and editors must use a Yubikey"
 msgstr "Administratoren und Editoren müssen zwingend einen YubiKey verwenden"
@@ -1624,9 +1630,6 @@ msgstr "Nächste Seite"
 msgid "Quota"
 msgstr "Anzahl"
 
-msgid "State"
-msgstr "Status"
-
 msgid "Initiated"
 msgstr "Initiiert"
 
@@ -1764,9 +1767,6 @@ msgstr "Suche"
 
 msgid "Your search returned no results."
 msgstr "Zu Ihrer Suche wurde nichts gefunden"
-
-msgid "Inactive"
-msgstr "Inaktiv"
 
 msgid "Good morning,"
 msgstr "Guten Morgen"

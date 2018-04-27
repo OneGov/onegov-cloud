@@ -12,16 +12,21 @@
             </div>
 
             <div class="field-display-block">
-                <div class="field-display-label" i18n:translate>Role</div>
+                <div class="field-display-label" i18n:translate>State</div>
                 <div class="field-display-data ticket-state">
-                    <metal:b use-macro="layout.macros['role_singular']" tal:define="role layout.model.role" />
+                    <tal:b condition="layout.model.active">
+                        ✔︎ <span i18n:translate>Active</span>
+                    </tal:b>
+                    <tal:b condition="not: layout.model.active">
+                        ✘︎ <span i18n:translate>Inactive</span>
+                    </tal:b>
                 </div>
             </div>
 
             <div class="field-display-block">
-                <div class="field-display-label" i18n:translate>Active</div>
+                <div class="field-display-label" i18n:translate>Role</div>
                 <div class="field-display-data ticket-state">
-                    ${layout.model.active and '✔︎' or '✘'}
+                    <metal:b use-macro="layout.macros['role_singular']" tal:define="role layout.model.role" />
                 </div>
             </div>
 

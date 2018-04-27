@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves user management form organisation.
+  [href]
+
 0.26.1 (2018-04-16)
 ~~~~~~~~~~~~~~~~~~~
 

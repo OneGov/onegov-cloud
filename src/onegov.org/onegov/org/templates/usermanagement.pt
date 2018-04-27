@@ -18,7 +18,7 @@
                                 </td>
                             </tr>
                             <tr tal:repeat="user users[role]" class="${user.active and 'user-active' or 'user-inactive'}">
-                                <td><a href="mailto:${user.username}">${user.username}</a></td>
+                                <td><a href="${request.link(user)}">${user.username}</a></td>
                                 <td>${user.realname}</td>
                                 <td i18n:translate tal:condition="user.active">Active</td>
                                 <td i18n:translate tal:condition="not:user.active">Inactive</td>
@@ -37,13 +37,13 @@
                 </table>
             </div>
             <div class="columns medium-3 filter-panel">
+                <div tal:condition="filters['active']|nothing" class="filter-active">
+                    <h2 class="filter-title" i18n:translate>State</h2>
+                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['active']" />
+                </div>
                 <div tal:condition="filters['role']|nothing" class="filter-role">
                     <h2 class="filter-title" i18n:translate>Role</h2>
                     <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['role']" />
-                </div>
-                <div tal:condition="filters['active']|nothing" class="filter-active">
-                    <h2 class="filter-title" i18n:translate>Active</h2>
-                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['active']" />
                 </div>
                 <div tal:condition="filters['tag']|nothing" class="filter-tags">
                     <h2 class="filter-title" i18n:translate>Tags</h2>

@@ -6,7 +6,10 @@ from wtforms import BooleanField
 class UserProfileForm(Form):
     """ Defines the settings form for user profiles. """
 
-    daily_ticket_statistics = BooleanField(_("Send a daily status e-mail."))
+    daily_ticket_statistics = BooleanField(
+        label=_("Send a daily status e-mail."),
+        fieldset=_("General")
+    )
 
     @property
     def enable_daily_ticket_statistics(self):

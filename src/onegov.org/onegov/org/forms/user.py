@@ -17,30 +17,57 @@ AVAILABLE_ROLES = [
 class ManageUserForm(Form):
     """ Defines the edit user form. """
 
+    state = RadioField(
+        label=_("State"),
+        fieldset=_("General"),
+        default='active',
+        choices=(
+            ('active', _("Active")),
+            ('inactive', _("Inactive"))
+        ),
+    )
+
     role = RadioField(
         label=_("Role"),
+        fieldset=_("General"),
         choices=AVAILABLE_ROLES,
-        default='member'
+        default='member',
     )
 
     tags = TagsField(
         label=_("Tags"),
+        fieldset=_("General"),
     )
-
-    active = BooleanField(_("Active"), default=True)
 
     yubikey = TextField(
         label=_("Yubikey"),
+        fieldset=_("General"),
         description=_("Plug your YubiKey into a USB slot and press it."),
         filters=(yubikey_identifier, ),
         render_kw={'autocomplete': 'off'}
     )
 
+    @property
+    def active(self):
+        return self.state.data == 'active'
+
+    @active.setter
+    def active(self, value):
+        self.state.data = value and 'active' or 'inactive'
+
     def on_request(self):
         self.request.include('tags-input')
 
+    def populate_obj(self, model):
+        super().populate_obj(model)
+        model.active = self.active
+
+    def process_obj(self, model):
+        super().process_obj(model)
+        self.active = model.active
+
     def validate_yubikey(self, field):
-        if not self.active.data:
+        if not self.active:
             return
 
         if not field.data:

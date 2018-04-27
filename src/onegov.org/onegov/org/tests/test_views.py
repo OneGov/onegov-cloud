@@ -3149,7 +3149,7 @@ def test_disable_users(org_app):
     assert 'editor@example.org' in users
 
     editor = users.click('Bearbeiten', index=1)
-    editor.form['active'] = False
+    editor.form['state'] = 'inactive'
     editor.form.submit()
 
     login = Client(org_app).login_editor()
@@ -3157,7 +3157,7 @@ def test_disable_users(org_app):
 
     editor = users.click('Bearbeiten', index=1)
     editor.form['role'] = 'member'
-    editor.form['active'] = True
+    editor.form['state'] = 'active'
     editor.form.submit()
 
     login = Client(org_app).login_editor()
@@ -3177,17 +3177,17 @@ def test_change_role(org_app):
     assert editor.form.submit().status_code == 302
 
     editor.form['role'] = 'admin'
-    editor.form['active'] = False
+    editor.form['state'] = 'inactive'
     assert editor.form.submit().status_code == 302
 
     editor.form['role'] = 'admin'
-    editor.form['active'] = True
+    editor.form['state'] = 'active'
     editor.form['yubikey'] = 'cccccccdefgh'
     assert editor.form.submit().status_code == 302
 
     org_app.enable_yubikey = False
     editor.form['role'] = 'admin'
-    editor.form['active'] = True
+    editor.form['state'] = 'active'
     editor.form['yubikey'] = ''
     assert editor.form.submit().status_code == 302
 
