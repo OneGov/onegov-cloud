@@ -897,6 +897,15 @@ class Framework(
 
         return set(self.translations.keys())
 
+    @cached_property
+    def default_locale(self):
+        """ Returns the default locale. """
+        try:
+            if self.settings.i18n.default_locale:
+                return self.settings.i18n.default_locale
+        except AttributeError:
+            pass
+
     @property
     def identity_secret(self):
         """ The identity secret, guaranteed to only be valid for the current

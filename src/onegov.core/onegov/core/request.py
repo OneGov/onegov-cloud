@@ -329,7 +329,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         locale = settings.i18n.locale_negotiator(self.app.locales, self)
 
-        return locale or settings.i18n.default_locale
+        return locale or self.app.default_locale
 
     @cached_property
     def html_lang(self):

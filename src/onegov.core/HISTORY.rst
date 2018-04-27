@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes the default locale negotiator.
+  [msom]
+
 - Fixes a rare race-condition with request messages.
   [href]
 

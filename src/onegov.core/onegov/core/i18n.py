@@ -102,7 +102,10 @@ def default_locale_negotiator(locales, request):
     if user_locale in locales:
         return user_locale
 
-    return request.accept_language.best_match(locales)
+    if bool(request.accept_language):
+        return request.accept_language.best_match(locales)
+
+    return None
 
 
 def pofiles(localedir):

@@ -487,6 +487,7 @@ def test_get_localized_form():
 
     class App(Framework):
         locales = {}
+        default_locale = None
 
     @App.path(path='/')
     class Root(object):
@@ -513,6 +514,9 @@ def test_get_localized_form():
     assert client.get('/form').text == 'This field is required.'
 
     App.locales = {'de'}
+    assert client.get('/form').text == 'This field is required.'
+
+    App.default_locale = 'de'
     assert client.get('/form').text == 'Dieses Feld wird benötigt.'
 
 
