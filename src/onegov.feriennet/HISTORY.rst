@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves html output in occasion export.
+  [href]
+
 - Adds user categories to user export.
   [href]
 

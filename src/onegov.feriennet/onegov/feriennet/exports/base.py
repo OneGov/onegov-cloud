@@ -1,4 +1,7 @@
-from onegov.core.mail import html_to_text
+import re
+
+from html import unescape
+from onegov.core import mail
 from onegov.feriennet import _
 from onegov.feriennet.exports.const import ACTIVITY_STATES
 from onegov.feriennet.exports.const import BOOKING_STATES
@@ -7,6 +10,22 @@ from onegov.feriennet.exports.const import ROLES
 from onegov.feriennet.exports.const import SALUTATIONS
 from onegov.feriennet.utils import decode_name
 from onegov.org.models import Export
+
+
+SPACES = re.compile(r'[ ]+')
+
+
+def remove_duplicate_spaces(text):
+    return SPACES.sub(' ', text)
+
+
+def html_to_text(html):
+    return remove_duplicate_spaces(mail.html_to_text(
+        unescape(html),
+        ul_item_mark='•',
+        strong_mark='',
+        emphasis_mark=''
+    ))
 
 
 class FeriennetExport(Export):
