@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves user management form organisation.
+  [href]
+
 - Fixes a few typos in German.
   [href]
 

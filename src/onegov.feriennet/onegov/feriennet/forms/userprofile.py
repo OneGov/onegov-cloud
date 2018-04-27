@@ -28,8 +28,14 @@ class UserProfileForm(Form):
         'political_municipality'
     )
 
+    daily_ticket_statistics = BooleanField(
+        label=_("Send a daily status e-mail."),
+        fieldset=_("General"),
+    )
+
     salutation = RadioField(
         label=_("Salutation"),
+        fieldset=_("Personal"),
         choices=[
             ('mr', _("Mr.")),
             ('ms', _("Ms.")),
@@ -39,70 +45,79 @@ class UserProfileForm(Form):
 
     first_name = StringField(
         label=_("First Name"),
+        fieldset=_("Personal"),
         validators=[InputRequired()]
     )
 
     last_name = StringField(
         label=_("Last Name"),
+        fieldset=_("Personal"),
         validators=[InputRequired()]
     )
 
     organisation = StringField(
         label=_("Organisation"),
+        fieldset=_("Personal"),
     )
 
     address = TextAreaField(
         label=_("Address"),
+        fieldset=_("Personal"),
         render_kw={'rows': 4},
     )
 
     zip_code = StringField(
         label=_("Zip Code"),
+        fieldset=_("Personal"),
         validators=[InputRequired()]
     )
 
     place = StringField(
         label=_("Place"),
+        fieldset=_("Personal"),
         validators=[InputRequired()]
     )
 
     political_municipality = StringField(
         label=_("Political Municipality"),
+        fieldset=_("Personal"),
         validators=[InputRequired()]
     )
 
     email = StringField(
         label=_("Public E-Mail Address"),
+        fieldset=_("Personal"),
         description=_("If different than username")
     )
 
     phone = StringField(
-        label=_("Phone")
+        label=_("Phone"),
+        fieldset=_("Personal"),
     )
 
     emergency = StringField(
         label=_("Emergency Contact"),
+        fieldset=_("Personal"),
         description=_("012 345 67 89 (Peter Muster)"),
         validators=[InputRequired()]
     )
 
     website = URLField(
         label=_("Website"),
+        fieldset=_("Personal"),
         description=_("Website address including http:// or https://"),
         validators=[Optional(), URL()]
     )
 
     bank_account = StringField(
         label=_("Bank Account (IBAN)"),
+        fieldset=_("Personal"),
         validators=[Stdnum(format='iban')]
     )
 
     bank_beneficiary = StringField(
         label=_("Beneficiary"),
-    )
-
-    daily_ticket_statistics = BooleanField(
-        _("Send a daily status e-mail.")
+        fieldset=_("Personal"),
     )
 
     @property
