@@ -4314,6 +4314,7 @@ h2 + div.timeline {
 .tags-input {
     @include form-element;
     height: auto;
+    max-width: 100%;
 
     .tag {
         background: $silver;

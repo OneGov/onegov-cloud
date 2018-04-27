@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes being able to enter invalid tags.
+  [href]
+
 - Improves user management form organisation.
   [href]
 
