@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.67.2 (2018-04-27)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes the default locale negotiator.
   [msom]
