@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.27.0 (2018-04-27)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes being able to enter invalid tags.
   [href]
 
