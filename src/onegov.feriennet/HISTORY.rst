@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds compatibility with latest onegov.core release.
+  [href]
+
 1.3.29 (2018-04-27)
 ~~~~~~~~~~~~~~~~~~~
 
