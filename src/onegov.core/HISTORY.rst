@@ -1,12 +1,13 @@
 Changelog
 ---------
-0.67.2 (2018-04-27)
-~~~~~~~~~~~~~~~~~~~
 
 - Closes database connections after they become stale.
 
   This should help lower the memory usage of servers with many tennantes.
   [href]
+
+0.67.2 (2018-04-27)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes the default locale negotiator.
   [msom]
