@@ -63,6 +63,8 @@ def test_activity_permissions(es_feriennet_app):
     new.form['lead'] = "Using a Raspberry Pi we will learn Python"
     new.form.submit()
 
+    transaction.begin()
+
     periods = PeriodCollection(es_feriennet_app.session())
     activities = ActivityCollection(es_feriennet_app.session())
     occasions = OccasionCollection(es_feriennet_app.session())
@@ -278,6 +280,8 @@ def test_activity_filter_tags(feriennet_app):
     new.select_checkbox("tags", "Wissenschaft")
     new.form.submit()
 
+    transaction.begin()
+
     for activity in ActivityCollection(feriennet_app.session()).query().all():
         activity.propose().accept()
 
@@ -287,6 +291,7 @@ def test_activity_filter_tags(feriennet_app):
     assert "Keine Angebote" in page
 
     # only show activites to anonymous if there's an active period..
+    transaction.begin()
     periods.add(
         title="2016",
         prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
@@ -299,6 +304,7 @@ def test_activity_filter_tags(feriennet_app):
     assert "Keine Angebote" in page
 
     # ..and if there are any occasions for those activities
+    transaction.begin()
     period = periods.active()
 
     for activity in activities.query():
@@ -412,8 +418,8 @@ def test_activity_filter_duration(feriennet_app):
     assert "Retreat" in many_day
 
     # shorten the retreat
+    transaction.begin()
     occasions.by_id(reatreat_occasion_id).dates[0].end -= timedelta(days=1)
-
     transaction.commit()
 
     full_day = client.get('/activities').click('Ganztägig')
@@ -475,6 +481,7 @@ def test_activity_filter_age_ranges(feriennet_app):
     assert "Meeting" in highschool
 
     # change the meeting age
+    transaction.begin()
     occasions.by_id(meeting_occasion_id).age = NumericRange(15, 20)
     transaction.commit()
 
