@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.68.0 (2018-04-30)
+~~~~~~~~~~~~~~~~~~~
 
 - Closes database connections after they become stale.
 
