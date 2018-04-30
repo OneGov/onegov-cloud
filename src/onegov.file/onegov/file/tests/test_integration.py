@@ -44,6 +44,7 @@ def ensure_correct_depot(app):
 def test_serve_file(app):
     ensure_correct_depot(app)
 
+    transaction.begin()
     files = FileCollection(app.session())
     file_id = files.add('readme.txt', b'README').id
     transaction.commit()
@@ -61,6 +62,7 @@ def test_application_separation(app):
     app.set_application_id('apps/one')
     ensure_correct_depot(app)
 
+    transaction.begin()
     files = FileCollection(app.session())
     first_id = files.add('readme.txt', b'README').id
     transaction.commit()
@@ -68,6 +70,7 @@ def test_application_separation(app):
     app.set_application_id('apps/two')
     ensure_correct_depot(app)
 
+    transaction.begin()
     files = FileCollection(app.session())
     second_id = files.add('readme.txt', b'README').id
     transaction.commit()
@@ -95,6 +98,7 @@ def test_application_separation(app):
 def test_serve_thumbnail(app):
     ensure_correct_depot(app)
 
+    transaction.begin()
     files = FileCollection(app.session())
     files.add('avatar.png', create_image(1024, 1024))
     transaction.commit()
@@ -111,6 +115,7 @@ def test_serve_thumbnail(app):
     assert thumb.content_length < image.content_length
 
     # make sure the correct code is returned if there's no thumbnail
+    transaction.begin()
     files.add('readme.txt', b'README')
     transaction.commit()
 
@@ -124,6 +129,7 @@ def test_serve_thumbnail(app):
 def test_file_note_header(app):
     ensure_correct_depot(app)
 
+    transaction.begin()
     files = FileCollection(app.session())
     fid = files.add('avatar.png', create_image(1024, 1024), note='Avatar').id
     transaction.commit()
