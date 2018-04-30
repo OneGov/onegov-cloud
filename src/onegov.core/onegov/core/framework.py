@@ -1114,7 +1114,26 @@ def activate_session_manager_factory(app, handler):
             request.app.session_manager.activate()
 
         return handler(request)
+
     return activate_session_manager
+
+
+@Framework.tween_factory(over=transaction_tween_factory)
+def close_session_after_request_factory(app, handler):
+    """ Closes the session after each request.
+
+    This frees up connections that are unused, without costing us any
+    request performance from what I can measure.
+
+    """
+    def close_session_after_request(request):
+        try:
+            return handler(request)
+        finally:
+            if app.has_database_connection:
+                request.session.close()
+
+    return close_session_after_request
 
 
 @Framework.tween_factory(under=http_conflict_tween_factory)

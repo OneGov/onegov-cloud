@@ -13,6 +13,12 @@ from sqlalchemy.orm.query import Query
 from sqlalchemy_utils.aggregates import manager as aggregates_manager
 
 
+# Limits the lifteime of sessions for n seconds. Postgres will automatically
+# reap connections which are unused for longer and we will automatically
+# recreate connections which are activated after that
+CONNECTION_LIFETIME = 60
+
+
 class ForceFetchQueryClass(Query):
     """ Alters the buitlin query class, ensuring that the delete query always
     fetches the data first, which is important for the bulk delete events
@@ -225,6 +231,7 @@ class SessionManager(object):
 
             # connections which are kept open when returned to the pool
             engine_config['pool_size'] = 5
+            engine_config['pool_recycle'] = CONNECTION_LIFETIME - 1
 
             # connections which are closed when returned (unlimited)
             engine_config['max_overflow'] = -1
@@ -253,25 +260,32 @@ class SessionManager(object):
         """
 
         @event.listens_for(engine, "before_cursor_execute")
-        def _activate_schema(
-            conn, cursor, statement, parameters, context, executemany
-        ):
+        def activate_schema(connection, cursor, *args, **kwargs):
             """ Share the 'info' dictionary of Session with Connection
             objects.
 
             """
 
             # execution options have priority!
-            if 'schema' in conn._execution_options:
-                schema = conn._execution_options['schema']
+            if 'schema' in connection._execution_options:
+                schema = connection._execution_options['schema']
             else:
-                if 'session' in conn.info:
-                    schema = conn.info['session'].info['schema']
+                if 'session' in connection.info:
+                    schema = connection.info['session'].info['schema']
                 else:
                     schema = None
 
             if schema is not None:
                 cursor.execute("SET search_path TO %s, extensions", (schema, ))
+
+        @event.listens_for(engine, "before_cursor_execute")
+        def limit_session_lifetime(connection, cursor, *args, **kwargs):
+            """ Kills idle sessions after a while, freeing up memory. """
+
+            cursor.execute(
+                "SET SESSION idle_in_transaction_session_timeout = %s",
+                (f'{CONNECTION_LIFETIME}s', )
+            )
 
     def register_session(self, session):
         """ Takes the given session and registers it with zope.sqlalchemy and
