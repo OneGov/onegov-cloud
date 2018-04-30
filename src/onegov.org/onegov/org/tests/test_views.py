@@ -1959,6 +1959,8 @@ def test_reserve_reservation_prediction(org_app):
     new.form['title'] = 'Gym'
     new.form.submit()
 
+    transaction.begin()
+
     resource = org_app.libres_resources.by_name('gym')
 
     a1 = resource.scheduler.allocate(
@@ -1980,6 +1982,8 @@ def test_reserve_reservation_prediction(org_app):
 
     reservations_url = '/resource/gym/reservations'
     assert not client.get(reservations_url).json['prediction']
+
+    transaction.begin()
 
     resource = org_app.libres_resources.by_name('gym')
     a3 = resource.scheduler.allocate(
@@ -2009,6 +2013,8 @@ def test_reserve_reservation_prediction(org_app):
 def test_reserve_multiple_allocations(org_app):
     client = Client(org_app)
     client.login_admin()
+
+    transaction.begin()
 
     resource = org_app.libres_resources.by_name('tageskarte')
     thursday = resource.scheduler.allocate(
@@ -2086,6 +2092,8 @@ def test_reserve_multiple_allocations(org_app):
 def test_reserve_and_deny_multiple_dates(org_app):
     client = Client(org_app)
     client.login_admin()
+
+    transaction.begin()
 
     resource = org_app.libres_resources.by_name('tageskarte')
     wednesday = resource.scheduler.allocate(
@@ -2170,6 +2178,8 @@ def test_reserve_failing_multiple(org_app):
 
     c2 = Client(org_app)
     c2.login_admin()
+
+    transaction.begin()
 
     resource = org_app.libres_resources.by_name('tageskarte')
     thursday = resource.scheduler.allocate(

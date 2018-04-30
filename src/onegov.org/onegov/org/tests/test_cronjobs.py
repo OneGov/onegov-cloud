@@ -101,6 +101,8 @@ def test_ticket_statistics(org_app, smtp, handlers):
 
     assert len(smtp.outbox) == 0
 
+    transaction.begin()
+
     session = org_app.session()
     collection = TicketCollection(session)
 
