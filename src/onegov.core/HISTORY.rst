@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.68.1 (2018-05-01)
+~~~~~~~~~~~~~~~~~~~
 
 - Increases the connection recycle time to one hour.
   [href]
