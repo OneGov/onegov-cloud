@@ -37,7 +37,7 @@ URL (election): /election/{id}/summary
 URL (vote): /vote/{id}/summary
 ```
 
-Die auf der Startseite und den Archivseiten dargestellten Ergebnisse sind im JSON-Format verfügbar. Die Daten enthalten neben einigen globalen Informationen für jede Wahl / Abstimmung die folgenden Informationen:
+Ils resultats che vegnan preschentads sin la pagina iniziala e sin las paginas d'archiv èn disponibels en il format JSON. Las datas cuntegnan ultra d'intginas infurmaziuns globalas per mintga elecziun / votaziun las suandantas infurmaziuns:
 
 Num|Descripziun
 ---|---
@@ -87,7 +87,7 @@ Ils suandants champs èn disponibels en tut ils formats:
 
 Num|Descripziun
 ---|---
-`election_title_{locale}`|Übersetzter Titel, z. B. `title_de_ch` für den deutschen Titel.
+`election_title_{locale}`|Titel translatà, p.ex. `title_de_ch` per il titel tudestg.
 `election_date`|La data da l'elecziun (sco segns ISO 8601)
 `election_domain`|sin plaun naziunal (`federation`), regiunal (`region`), chantunal (`canton`) u communal (`municipality`)
 `election_type`|elecziun da proporz (`proporz`) u elecziun da maiorz (`majorz`)
@@ -96,7 +96,7 @@ Num|Descripziun
 `election_status`|Zwischenergebnisse (`interim`), Endergebnisse (`final`) oder unbekannt (`unknown`).
 `entity_id`|La ID da la vischnanca/dal lieu. A value `0` represents the expats.
 `entity_name`|Il num da la vischnanca/dal lieu.
-`entity_district`|Wahlkreis/Bezirk/Region der Gemeinde.
+`entity_district`|Circul electoral/district/regiun da la vischnanca.
 `entity_counted`|`True`, sch'il resultat è vegnì eruì.
 `entity_eligible_voters`|Il dumber da las votantas e dals votants da la vischnanca/dal lieu.
 `entity_received_ballots`|Il dumber dals cedels electorals consegnads da la vischnanca/dal lieu.
@@ -118,7 +118,7 @@ Num|Descripziun
 `candidate_id`|La ID da la candidata u dal candidat.
 `candidate_elected`|True, sche la candidata u il candidat è vegnì elegì.
 `candidate_votes`|Il dumber da las vuschs da candidat(a) da la vischnanca/dal lieu.
-`panachage_votes_from_list_XX`|Die Anzahl Stimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
+`panachage_votes_from_list_XX`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
 
 Las vischnancas che n'èn anc betg dumbradas ora n'èn betg cuntegnidas.
 
@@ -128,17 +128,17 @@ Las vischnancas che n'èn anc betg dumbradas ora n'èn betg cuntegnidas.
 URL: /election/{id}/{data-parties}
 ```
 
-Die Rohdaten sind als CSV verfügbar. Die folgenden Felder sind enthalten:
+Las datas nunelavuradas èn disponiblas sco CSV. Ils suandants champs èn cuntegnids:
 
 Num|Descripziun
 ---|---
-`year`|Das Jahr der Wahl.
-`total_votes`|Die Gesamtanzahl der Stimmen der Wahl.
-`name`|Der Name der Partei.
-`color`|Die Farbe der Partei.
-`mandates`|Die Anzahl Mandate der Partei.
-`votes`|Die Anzahl Stimmen der Partei.
-`panachage_votes_from_{XX}`|Die Anzahl Stimmen von der Partei mit `id = XX`. Die `id` mit dem Wert `999` steht für die Stimmen aus der Blankoliste.
+`year`|L'onn da l'elecziun.
+`total_votes`|Il dumber total da las vuschs da l'elecziun.
+`name`|Il num da la partida.
+`color`|La colur da la partida.
+`mandates`|Il dumber da sezs da la partida.
+`votes`|Il dumber da vuschs da la partida.
+`panachage_votes_from_{XX}`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
 
 3 Resultats da la votaziun
 --------------------------
@@ -168,15 +168,15 @@ Ils suandants champs èn disponibels en tut ils formats:
 
 Num|Descripziun
 ---|---
-`title_{locale}`|Übersetzter Titel, z. B. `title_de_ch` für den deutschen Titel.
+`title_{locale}`|Titel translatà, p.ex. `title_de_ch` per il titel tudestg.
 `date`|La data da la votaziun (sco segns ISO 8601).
 `shortcode`|Scursanida interna (definescha la successiun da pliras votaziuns che han lieu il medem di).
 `domain`|`federation` per votaziuns naziunalas, `canton` per votaziuns chantunalas.
-`status`|Zwischenergebnisse (`interim`), Endergebnisse (`final`) oder unbekannt (`unknown`).
+`status`|Resultats intermediars (`interim`), resultats finals (`final`) u stadi dals resultats nunenconuschent (`unknown`).
 `type`|`proposal` (proposta), `counter-proposal` (cuntraproposta) or "tie-breaker" (dumonda decisiva).
 `entity_id`|La ID da la vischnanca/dal lieu. A value `0` represents the expats.
 `entity_name`|Il num da la vischnanca/dal lieu.
-`entity_district`|Wahlkreis/Bezirk/Region der Gemeinde.
+`entity_district`|Circul electoral/district/regiun da la vischnanca.
 `counted`|Gist, sch'il resultat è vegnì eruì. Fauss, sch'il resultat n'è anc betg enconuschent (las valurs n'èn anc betg correctas).
 `yeas`|Il dumber da las vuschs affirmativas
 `nays`|Il dumber da las vuschs negativas

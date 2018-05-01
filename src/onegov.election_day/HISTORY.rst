@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Updates translations.
+  [msom]
+
 3.4.5 (2018-04-26)
 ~~~~~~~~~~~~~~~~~~~
 

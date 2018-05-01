@@ -1,6 +1,6 @@
 # Format Specification Votes
 
-Als Dateiformate werden Dateien akzeptiert, welche von Hand, vom Wahlprogrammen "Wabsti Wahlen und Abstimmungen (VRSG)" oder der Webapplikation selbst generiert werden.
+Sco formats da datoteca vegnan acceptadas datotecas che vegnan generadas a maun, dals programs d'elecziun "Wabsti Elecziuns e votaziuns (VRSG)", u da l'applicaziun web sezza.
 
 Ina "vischnanca" po er esser in district, in circul electoral e.u.v.
 
@@ -9,10 +9,10 @@ Ina "vischnanca" po er esser in district, in circul electoral e.u.v.
 <!-- TOC START min:1 max:4 link:true update:true -->
 - [Format Specification Votes](#format-specification-votes)
   - [Cuntegn](#cuntegn)
-  - [Vorbemerkungen](#vorbemerkungen)
-    - [Einheiten](#einheiten)
-  - [Formate](#formate)
-    - [Standard format](#standard-format)
+  - [Remartgas preliminaras](#remartgas-preliminaras)
+    - [Unitads](#unitads)
+  - [Formats](#formats)
+    - [Format da standard](#format-da-standard)
       - [Colonnas](#colonnas)
       - [Resultats temporars](#resultats-temporars)
       - [Project](#project)
@@ -29,34 +29,34 @@ Ina "vischnanca" po er esser in district, in circul electoral e.u.v.
 <!-- TOC END -->
 
 
-## Vorbemerkungen
+## Remartgas preliminaras
 
-### Einheiten
+### Unitads
 
-Eine Einheit entspricht einer Gemeinde (kantonale Instanzen, kommunale Instanzen ohne Stadtteilen) oder einem Stadtteil (kommunale Instanzen mit Stadtteilen).
+In'unitad correspunda ad ina vischnanca (instanzas chantunalas, instanzas communalas senza quartiers) u ad in quartier (instanzas communalas cun quartiers).
 
-## Formate
+## Formats
 
-### Standardformat
+### Format da standard
 
-Pro Abstimmungsvorlage besteht in der Regel eine CSV/Excel Datei. Beinhaltet die Abstimmung jedoch ein Gegenvorschlag und eine Stichfrage, dann müssen drei Dateien geliefert werden: Eine Datei mit den Resultaten der Abstimmung, eine Datei mit den Resultaten des Gegenvorschlags und eine Datei mit den Resultaten der Stichfrage.
+Per project da votaziun exista per regla ina datoteca CSV/Excel. Sche la votaziun cuntegna però ina cuntraproposta ed ina dumonda decisiva, ston vegnir furnidas trais datotecas: ina datoteca cun ils resultats da la votaziun, ina datoteca cun ils resultats da la cuntraproposta ed ina datoteca cun ils resultats da la dumonda decisiva.
 
 #### Colonnas
 
-Jede Zeile enthält das Resultat einer einzelnen Gemeinde, sofern diese vollständig ausgezählt wurde. Folgende Spalten werden dabei in der hier aufgelisteten Reihenfolge erwartet:
+Mintga lingia cuntegna il resultat d'ina singula vischnanca, sch'ils cedels da votar èn vegnids dumbrads cumplettamain. Las suandantas colonnas vegnan spetgadas en la successiun menziunada qua:
 
 Num|Descripziun
 ---|---
-`ID`|Die BFS-Nummer der Gemeinde zum Zeitpunkt der Abstimmung. Der Wert `0` kann für Auslandslebende verwendet werden.
-`Ja Stimmen`|Die Anzahl Ja Stimmen zu der Abstimmung. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
-`Nein Stimmen`|Die Anzahl Nein Stimmen der Abstimmung. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
-`Stimmberechtigte`|Die Anzahl Stimmberechtigter. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
-`Leere Stimmzettel`|Die Anzahl leer eingelegter Stimmzettel. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
-`Ungültige Stimmzettel`|Die Anzahl ungültiger Stimmzettel. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
+`ID`|Il numer UST da la vischnanca il mument da la votaziun. La valur `0` po vegnir duvrada per persunas che vivan a l'exteriur.
+`Ja Stimmen`|Il dumber da las vuschs affirmativas da la votaziun. Sch'il text `unbekannt` vegn endatà, vegn la lingia ignorada (cedels da votar anc betg dumbrads).
+`Nein Stimmen`|Il dumber da las vuschs negativas da la votaziun. Sch'il text `unbekannt` vegn endatà, vegn la lingia ignorada (cedels da votar anc betg dumbrads).
+`Stimmberechtigte`|Il dumber da las persunas cun dretg da votar. Sch'il text `unbekannt` vegn endatà, vegn la lingia ignorada (cedels da votar anc betg dumbrads).
+`Leere Stimmzettel`|Il dumber dals cedels da votar ch'èn vegnids dads giu vids. Sch'il text `unbekannt` vegn endatà, vegn la lingia ignorada (cedels da votar anc betg dumbrads).
+`Ungültige Stimmzettel`|Il dumber dals cedels da votar nunvalaivels. Sch'il text `unbekannt` vegn endatà, vegn la lingia ignorada (cedels da votar anc betg dumbrads).
 
 #### Resultats temporars
 
-Gemeinden gelten als noch nicht ausgezählt, falls die Gemeinde nicht in den Resultaten enthalten ist.
+Sche la vischnanca n'è betg cuntegnida en ils resultats, vala ella sco anc betg dumbrada ora.
 
 #### Project
 
@@ -64,7 +64,7 @@ Gemeinden gelten als noch nicht ausgezählt, falls die Gemeinde nicht in den Res
 
 ### OneGov
 
-Das Format, welche von der Web-Applikation für den Export verwendet wird, besteht aus einer einzelnen Datei pro Abstimmung. Es gibt für jede Gemeinde und Abstimmungstyp (Vorschlag, Gegenvorschlag, Stichfrage) eine Zeile.
+Il format che vegn duvrà da l'applicaziun web per l'export sa cumpona d'ina singula datoteca per votaziun. Per mintga vischnanca e per mintga tip da votaziun (proposta, cuntraproposta, dumonda decisiva) datti ina lingia.
 
 ### Colonnas
 
@@ -72,27 +72,27 @@ Las suandantas colonnas vegnan evaluadas e ston almain esser avant maun:
 
 Num|Descripziun
 ---|---
-`status`|`unknown`, `interim` or `final`.
-`type`|`proposal` (proposta), `counter-proposal` (cuntraproposta) or "tie-breaker" (dumonda decisiva).
+`status`|Resultats intermediars (`interim`), resultats finals (`final`) u stadi dals resultats nunenconuschent (`unknown`).
+`type`|`proposal` (proposta), `counter-proposal` (cuntraproposta) or `tie-breaker` (dumonda decisiva).
 `entity_id`|La ID da la vischnanca/dal lieu. A value `0` represents the expats.
 `counted`|Gist, sch'il resultat è vegnì eruì. Fauss, sch'il resultat n'è anc betg enconuschent (las valurs n'èn anc betg correctas).
-`yeas`|Il dumber da las vuschs affirmativas
-`nays`|Il dumber da las vuschs negativas
-`invalid`|Il dumber da las vuschs nunvalaivlas
-`empty`|Il dumber da las vuschs vidas
-`eligible_voters`|Il dumber da las persunas cun dretg da votar
+`yeas`|Il dumber da las vuschs affirmativas.
+`nays`|Il dumber da las vuschs negativas.
+`invalid`|Il dumber da las vuschs nunvalaivlas.
+`empty`|Il dumber da las vuschs vidas.
+`eligible_voters`|Il dumber da las persunas cun dretg da votar.
 
 
 #### Resultats temporars
 
-Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedingungen zutrifft:
+Vischnancas valan sco anc betg dumbradas ora, sch'ina da las duas suandantas cundiziuns constat:
 - `counted = false`
-- die Gemeinde ist nicht in den Resultaten enthalten
+- la vischnanca n'è betg cuntegnida en ils resultats
 
-Falls der Status
-- `interim` ist, gilt die Abstimmung als noch nicht abgeschlossen
-- `final` ist, gilt die Abstimmung als abgeschlossen
-- `unknown` ist, gilt die Abstimmung als abgeschlossen, falls alle (erwarteten) Gemeinden ausgezählt sind
+Sch'il status
+- è `interim`, vala la votaziun sco anc betg terminada
+- è `final`, vala la votaziun sco terminada
+- è `unknown` ist, vala la votaziun sco terminada, sche tut las vischnancas (spetgadas) èn dumbradas ora
 
 #### Project
 
@@ -122,9 +122,9 @@ Las suandantas colonnas vegnan evaluadas e ston almain esser avant maun:
 
 #### Resultats temporars
 
-Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedingungen zutrifft:
+Vischnancas valan sco anc betg dumbradas ora, sch'ina da las duas suandantas cundiziuns constat:
 - `StimmBet = 0`
-- die Gemeinde ist nicht in den Resultaten enthalten
+- la vischnanca n'è betg cuntegnida en ils resultats
 
 #### Project
 
@@ -133,4 +133,4 @@ Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bed
 
 ### WabstiCExport
 
-Es wird die Version `>= 2.2` unterstützt. Die verschiedenen Spalten der verschiedenen Dateien sind in der Dokumentation des Exporter-Programms definiert.
+Sustegnida vegn la versiun `>= 2.2`. Las differentas colonnas da las differentas datotecas èn definidas en la documentaziun dal program Exporter.

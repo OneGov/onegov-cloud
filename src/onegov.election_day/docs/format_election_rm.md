@@ -7,11 +7,11 @@ Sco formats da datoteca vegnan acceptadas datotecas CSV, XLS u XLSX che vegnan g
 <!-- TOC START min:1 max:4 link:true update:true -->
 - [Format Specificaziun Elecziuns](#format-specificaziun-elecziuns)
   - [Cuntegn](#cuntegn)
-  - [Vorbemerkungen](#vorbemerkungen)
-    - [Einheiten](#einheiten)
+  - [Remartgas preliminaras](#remartgas-preliminaras)
+    - [Unitads](#unitads)
     - [Elecziun taciturnas](#elecziun-taciturnas)
-    - [Regionale Wahlen](#regionale-wahlen)
-  - [Formate](#formate)
+    - [Elecziuns regiunalas](#elecziuns-regiunalas)
+  - [Formats](#formats)
     - [Onegov](#onegov)
       - [Colonnas](#colonnas)
       - [Panachage results](#panachage-results)
@@ -24,7 +24,7 @@ Sco formats da datoteca vegnan acceptadas datotecas CSV, XLS u XLSX che vegnan g
       - [Projects](#projects)
     - [Wabsti Proporz](#wabsti-proporz)
       - [Colonnas "Export da datas dals resultats"](#colonnas-export-da-datas-dals-resultats)
-      - [Panachage results](#panachage-results-1)
+      - [Resultats pon cuntegnair datas panaschadas](#resultats-pon-cuntegnair-datas-panaschadas)
       - [Colonnas "Export da datas da la statistica"](#colonnas-export-da-datas-da-la-statistica)
       - [Colonnas "Colliaziuns da glistas"](#colonnas-colliaziuns-da-glistas)
       - [Colonnas "Resultats da las candidatas e dals candidats"](#colonnas-resultats-da-las-candidatas-e-dals-candidats-1)
@@ -32,26 +32,26 @@ Sco formats da datoteca vegnan acceptadas datotecas CSV, XLS u XLSX che vegnan g
       - [Projects](#projects-1)
     - [WabstiCExport Maiorz](#wabsticexport-maiorz)
     - [WabstiCExport Proporz](#wabsticexport-proporz)
-    - [Party results](#party-results)
-      - [Template](#template)
+    - [Resultats da la(s) partida(s)](#resultats-da-las-partidas)
+      - [Projects](#projects-2)
 
 <!-- TOC END -->
 
-## Vorbemerkungen
+## Remartgas preliminaras
 
-### Einheiten
+### Unitads
 
-Eine Einheit entspricht einer Gemeinde (kantonale Instanzen, kommunale Instanzen ohne Stadtteilen) oder einem Stadtteil (kommunale Instanzen mit Stadtteilen).
+In'unitad correspunda ad ina vischnanca (instanzas chantunalas, instanzas communalas senza quartiers) u ad in quartier (instanzas communalas cun quartiers).
 
 ### Elecziun taciturnas
 
 Per elecziuns taciturnas po vegnir duvrà il format OneGov. En quest cas vegnan tut las vuschs messas a `0`.
 
-### Regionale Wahlen
+### Elecziuns regiunalas
 
-Bei regionalen Wahlen werden nur Wahlresultate der Einheiten eines Wahlkreises erwartet.
+En cas d'elecziuns regiunalas vegnan spetgads mo ils resultats da l'elecziun da las unitads d'in circul electoral.
 
-## Formate
+## Formats
 
 ### Onegov
 
@@ -64,7 +64,7 @@ Las suandantas colonnas vegnan evaluadas e duessan esser avant maun:
 Num|Descripziun
 ---|---
 `election_absolute_majority`|Maioritad absoluta da l'elecziun, mo tar elecziuns da maiorz.
-`election_status`|`unknown`, `interim` or `final`.
+`election_status`|Resultats intermediars (`interim`), resultats finals (`final`) u stadi dals resultats nunenconuschent (`unknown`).
 `entity_id`|Numer UST da la vischnanca. La valur `0` po vegnir duvrada per persunas che vivan a l'exteriur.
 `entity_counted`|`True`, sch'il resultat è vegnì eruì.
 `entity_eligible_voters`|Dumber da persunas cun dretg da votar da la vischnanca.
@@ -92,18 +92,18 @@ Ils resultats pon cuntegnair datas panaschadas, tras quai ch'i vegn agiuntada in
 
 Num|Descripziun
 ---|---
-`panachage_votes_from_list_{XX}`|Die Anzahl Stimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
+`panachage_votes_from_list_{XX}`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
 
 #### Resultats temporars
 
-Einheiten gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedinungen zutrifft:
+Unitads valan sco anc betg quintadas ora, sch'ina da las duas suandantas cundiziuns constat:
 - `counted = false`
-- die Einheit ist nicht in den Resultaten enthalten
+- l'unitad n'è betg cuntegnida en ils resultats
 
 Sch'il status è
 - `interim`, vala la votaziun sco betg anc terminada
 - `final`, vala la votaziun sco terminada
-- `unknown`, gilt die Wahl als abgeschlossen, falls alle (erwarteten) Einheiten ausgezählt sind
+- `unknown`, l'elecziun vala sco terminada, sche tut las unitads (spetgadas) èn dumbradas
 
 #### Project
 
@@ -170,7 +170,7 @@ En l'export da datas datti ina lingia per candidata u candidat e per vischnanca.
 - `Kand_StimmenTotal`
 - `Liste_ParteistimmenTotal`
 
-#### Panachage results
+#### Resultats pon cuntegnair datas panaschadas
 
 Ils resultats pon cuntegnair datas panaschadas, tras quai ch'i vegn agiuntada ina colonna per glista (`{List ID}.{List code}`: il dumber da vuschs da la glista cun `Liste_ID`). La `Liste_ID` cun la valur `99` (`99.WoP`) stat per la glista vida.
 
@@ -224,7 +224,7 @@ Sustegnida vegn la versiun '>= 2.2'. Las differentas colonnas da las differentas
 Sustegnida vegn la versiun '>= 2.2'. Las differentas colonnas da las differentas datotecas èn definidas en la documentaziun dal program d'export.
 
 
-### Party results
+### Resultats da la(s) partida(s)
 
 Mintga elecziun da proporz po cuntegnair resultats da partidas. Quels èn independents dals auters resultats e cuntegnan tipicamain ils resultats cumulads da las differentas glistas d'ina singula partida.
 
@@ -235,20 +235,20 @@ Num|Descripziun
 `year`|L'onn da l'elecziun.
 `total_votes`|Il dumber total da vuschs da l'elecziun.
 `name`|Il num da la partida.
-`id`|ID der Partei (beliebige Zahl).
+`id`|ID da la partida (cifra casuala).
 `color`|La colur da la partida.
 `mandates`|Il dumber da sezs da la partida.
 `votes`|Il dumber da vuschs da la partida.
 
-Die Resultate können Panaschierdaten enthalten, indem pro Partei eine Spalte hinzugefügt wird:
+Ils resultats pon cuntegnair datas panaschadas, tras quai ch'i vegn agiuntada ina colonna per partida:
 
 Num|Descripziun
 ---|---
-`panachage_votes_from_{XX}`|Die Anzahl Stimmen von der Partei mit `id = XX`. Die `id` mit dem Wert `999` steht für die Stimmen aus der Blankoliste.
+`panachage_votes_from_{XX}`|Il dumber da vuschs da la partida cun `id = XX`. La `id` cun la valur `999` stat per las vuschs da la glista vida.
 
-Panaschierdaten werden nur hinzugefügt, falls:
-- `year` entspricht dem Jahr der Wahl
-- `id (XX)` entspricht nicht `id` der Zeile
+Datas panaschadas vegnan agiuntadas mo, sche:
+- `year` correspunda a l'onn da l'elecziun
+- `id (XX)` na correspounda betg a `id` da la colonna
 
 #### Projects
 

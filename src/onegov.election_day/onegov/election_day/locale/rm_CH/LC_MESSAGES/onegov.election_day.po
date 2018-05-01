@@ -85,7 +85,7 @@ msgid "No data found"
 msgstr "Chattà naginas datas"
 
 msgid "No clear district"
-msgstr ""
+msgstr "Nagina clera regiun"
 
 msgid "Invalid list values"
 msgstr "Datas da glista nunvalaivlas"
@@ -170,7 +170,7 @@ msgid "Tacit election"
 msgstr "Elecziun taciturna"
 
 msgid "Distinct district"
-msgstr ""
+msgstr "Clera regiun"
 
 msgid "Date"
 msgstr "Data"
@@ -215,7 +215,7 @@ msgid "Cantonal"
 msgstr "Sin plaun chantunal"
 
 msgid "Select either majorz or proporz elections."
-msgstr ""
+msgstr "Tscherni u las elecziuns da maiorz u las elecziuns da proporz."
 
 msgid "Notifications"
 msgstr "Communicaziuns"
@@ -305,7 +305,7 @@ msgid "Votes"
 msgstr "Votaziuns"
 
 msgid "Compounds of elections"
-msgstr ""
+msgstr "Elecziuns colliadas"
 
 msgid "Manage"
 msgstr "Administrar"
@@ -669,13 +669,13 @@ msgid "Line"
 msgstr "Lingia"
 
 msgid "Stack"
-msgstr ""
+msgstr "Mantunà"
 
 msgid "Toggle"
-msgstr ""
+msgstr "Selecziun"
 
 msgid "Columns"
-msgstr ""
+msgstr "Colonnas"
 
 msgid "Embed"
 msgstr "Incorporar"
@@ -856,13 +856,13 @@ msgid "Regenerate token"
 msgstr "Generar da nov il token"
 
 msgid "New compound"
-msgstr ""
+msgstr "Nova colliaziun"
 
 msgid "No compounds yet."
-msgstr ""
+msgstr "Anc nagina colliaziun."
 
 msgid "Title"
-msgstr ""
+msgstr "Titel"
 
 msgid "View"
 msgstr "Mussar"
@@ -1046,26 +1046,26 @@ msgid "Mapping deleted."
 msgstr "Stizzà l'attribuziun."
 
 msgid "Edit compound"
-msgstr ""
+msgstr "Elavurar la colliaziun"
 
 #, python-format
 msgid "Do you really want to clear all party results of \"${item}\"?"
-msgstr ""
+msgstr "Vulais Vus propi stizzar tut ils resultats da partida da \"${item}\"?"
 
 msgid "Delete compound"
-msgstr ""
+msgstr "Stizzar la colliaziun"
 
 msgid "Compound added."
-msgstr ""
+msgstr "Agiuntà colliaziun."
 
 msgid "Compound modified."
-msgstr ""
+msgstr "Midà colliaziun."
 
 msgid "Results deleted."
 msgstr "Stizzà ils resultats."
 
 msgid "Compound deleted."
-msgstr ""
+msgstr "Stizzà la colliaziun."
 
 msgid "Edit election"
 msgstr "Modifitgar l'elecziun"
