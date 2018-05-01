@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Increases the connection recycle time to one hour.
+  [href]
+
 0.68.0 (2018-04-30)
 ~~~~~~~~~~~~~~~~~~~
 

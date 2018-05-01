@@ -15,8 +15,13 @@ from sqlalchemy_utils.aggregates import manager as aggregates_manager
 
 # Limits the lifteime of sessions for n seconds. Postgres will automatically
 # reap connections which are unused for longer and we will automatically
-# recreate connections which are activated after that
-CONNECTION_LIFETIME = 60
+# recreate connections which are activated after that.
+#
+# This boils down to connections being recycled once an hour. As each
+# connection is handled by a separate process by Postgres - a process which
+# may grow quite large - this alleviates memory fragmentation/high water mark
+# issues that we've been seeing on some servers.
+CONNECTION_LIFETIME = 60 * 60
 
 
 class ForceFetchQueryClass(Query):
