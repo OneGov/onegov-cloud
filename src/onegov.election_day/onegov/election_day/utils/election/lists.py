@@ -55,7 +55,7 @@ def get_lists_panachage_data(election, request):
 
     nodes = OrderedDict()
     nodes['left.999'] = {'name': blank}
-    for list_ in election.lists:
+    for list_ in election.lists.order_by(List.name):
         nodes['left.{}'.format(list_.list_id)] = {'name': list_.name}
     for list_ in election.lists:
         nodes['right.{}'.format(list_.list_id)] = {'name': list_.name}

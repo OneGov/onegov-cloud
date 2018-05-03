@@ -4,6 +4,9 @@ Changelog
 - Updates translations.
   [msom]
 
+- Orders the list panachage nodes by alphabet (if possible).
+  [msom]
+
 3.4.5 (2018-04-26)
 ~~~~~~~~~~~~~~~~~~~
 
