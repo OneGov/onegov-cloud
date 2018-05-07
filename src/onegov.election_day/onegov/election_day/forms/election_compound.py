@@ -111,7 +111,10 @@ class ElectionCompoundForm(Form):
         model.date = self.date.data
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
-        model.elections = self.elections.data
+
+        elections = self.request.session.query(Election)
+        elections = elections.filter(Election.id.in_(self.elections.data))
+        model.elections = elections
 
         titles = {}
         if self.election_de.data:
@@ -135,4 +138,4 @@ class ElectionCompoundForm(Form):
         self.date.data = model.date
         self.shortcode.data = model.shortcode
         self.related_link.data = model.related_link
-        self.elections.data = list(model._elections.keys())
+        self.elections.data = [election.id for election in model.elections]

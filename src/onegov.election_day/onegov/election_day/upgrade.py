@@ -259,3 +259,18 @@ def add_election_compound_to_archive(context):
     )
 
     tmp_type.drop(context.operations.get_bind(), checkfirst=False)
+
+
+@upgrade_task('Add contraints to notifications and sources')
+def add_contraints_to_notifications_and_sources(context):
+    # We use SQL (rather than operations.xxx) so that we can drop and add
+    # the constraints in one statement
+    for ref in ('election', 'vote'):
+        for table in ('notifications', 'upload_data_source_item'):
+            context.operations.execute(
+                f'ALTER TABLE {table} '
+                f'DROP CONSTRAINT {table}_{ref}_id_fkey, '
+                f'ADD CONSTRAINT {table}_{ref}_id_fkey'
+                f' FOREIGN KEY ({ref}_id) REFERENCES {ref}s (id)'
+                f' ON UPDATE CASCADE'
+            )

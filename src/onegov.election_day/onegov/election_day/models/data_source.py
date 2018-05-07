@@ -104,14 +104,14 @@ class DataSourceItem(Base, TimestampMixin):
 
     #: the election
     election_id = Column(
-        Text, ForeignKey(Election.id), nullable=True
+        Text, ForeignKey(Election.id, onupdate='CASCADE'), nullable=True
     )
 
     election = relationship("Election", backref="data_sources")
 
     #: the vote
     vote_id = Column(
-        Text, ForeignKey(Vote.id), nullable=True
+        Text, ForeignKey(Vote.id, onupdate='CASCADE'), nullable=True
     )
 
     vote = relationship("Vote", backref="data_sources")

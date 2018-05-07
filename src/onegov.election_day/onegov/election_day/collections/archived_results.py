@@ -179,13 +179,8 @@ class ArchivedResultCollection(object):
         if isinstance(item, Election):
             result.type = 'election'
             result.elected_candidates = item.elected_candidates
-
-            outdated_compounds = self.session.query(ElectionCompound)
-            outdated_compounds = outdated_compounds.filter(
-                ElectionCompound._elections.has_key(item.id)  # noqa
-            )
-            for compound in outdated_compounds:
-                self.update(compound, request)
+            for association in item.associations:
+                self.update(association.election_compound, request)
 
         if isinstance(item, ElectionCompound):
             result.type = 'election_compound'

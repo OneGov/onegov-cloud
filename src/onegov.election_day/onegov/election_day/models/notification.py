@@ -43,13 +43,17 @@ class Notification(Base, TimestampMixin):
     last_modified = Column(UTCDateTime, nullable=True)
 
     #: The corresponding election id
-    election_id = Column(Text, ForeignKey(Election.id), nullable=True)
+    election_id = Column(
+        Text, ForeignKey(Election.id, onupdate='CASCADE'), nullable=True
+    )
 
     #: The corresponding election
     election = relationship('Election', backref=backref('notifications'))
 
     #: The corresponding vote id
-    vote_id = Column(Text, ForeignKey(Vote.id), nullable=True)
+    vote_id = Column(
+        Text, ForeignKey(Vote.id, onupdate='CASCADE'), nullable=True
+    )
 
     #: The corresponding vote
     vote = relationship('Vote', backref=backref('notifications'))

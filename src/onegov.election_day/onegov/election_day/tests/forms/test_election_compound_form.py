@@ -123,7 +123,16 @@ def test_election_compound_form_translations(session):
     assert form.election_rm.validators == []
 
 
-def test_election_compound_form_model(election_day_app):
+def test_election_compound_form_model(session):
+    date_ = date(2001, 1, 1)
+    e1 = Election(domain='region', title='e', id='e-1', date=date_)
+    e2 = Election(domain='region', title='e', id='e-2', date=date_)
+    e3 = Election(domain='region', title='e', id='e-3', date=date_)
+    session.add(e1)
+    session.add(e2)
+    session.add(e3)
+    session.flush()
+
     model = ElectionCompound()
     model.title = 'Elections (DE)'
     model.title_translations['de_CH'] = 'Elections (DE)'
@@ -134,7 +143,8 @@ def test_election_compound_form_model(election_day_app):
     model.domain = 'canton'
     model.shortcode = 'xy'
     model.related_link = 'http://u.rl'
-    model.elections = ['election-1', 'election-2']
+    model.elections = [e1, e2]
+    session.add(model)
 
     form = ElectionCompoundForm()
     form.apply_model(model)
@@ -147,7 +157,7 @@ def test_election_compound_form_model(election_day_app):
     assert form.domain.data == 'canton'
     assert form.shortcode.data == 'xy'
     assert form.related_link.data == 'http://u.rl'
-    assert form.elections.data == ['election-1', 'election-2']
+    assert form.elections.data == ['e-1', 'e-2']
 
     form.election_de.data = 'Some Elections (DE)'
     form.election_fr.data = 'Some Elections (FR)'
@@ -157,8 +167,10 @@ def test_election_compound_form_model(election_day_app):
     form.domain.data = 'canton'
     form.shortcode.data = 'yz'
     form.related_link.data = 'http://ur.l'
-    form.elections.data = ['election-1', 'election-3', 'election-4']
+    form.elections.data = ['e-1', 'e-3', 'e-4']
 
+    form.request = DummyRequest(session=session)
+    form.on_request()
     form.update_model(model)
 
     assert model.title == 'Some Elections (DE)'
@@ -170,6 +182,4 @@ def test_election_compound_form_model(election_day_app):
     assert model.domain == 'canton'
     assert model.shortcode == 'yz'
     assert model.related_link == 'http://ur.l'
-    assert sorted(model._elections.keys()) == [
-        'election-1', 'election-3', 'election-4'
-    ]
+    assert sorted([e.id for e in model.elections]) == ['e-1', 'e-3']

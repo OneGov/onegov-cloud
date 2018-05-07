@@ -145,19 +145,18 @@ def test_archived_result_collection_grouping(session):
         )
 
     # Add a compound for all elections on the first date
-    session.add(
-        ElectionCompound(
-            title='Legislative Elections',
-            domain='canton',
-            date=date(2017, 2, 12),
-            elections=[
-                'federation-election-1',
-                'canton-election-1',
-                'region-election-1',
-                'municipality-election-1'
-            ]
-        )
+    compound = ElectionCompound(
+        title='Legislative Elections',
+        domain='canton',
+        date=date(2017, 2, 12),
     )
+    compound.elections = session.query(Election).filter(Election.id.in_([
+        'federation-election-1',
+        'canton-election-1',
+        'region-election-1',
+        'municipality-election-1'
+    ]))
+    session.add(compound)
     session.flush()
 
     # Get the results for a year
@@ -209,7 +208,6 @@ def test_archived_result_collection_updates(session):
             title="Elections {}".format(year),
             domain='federation',
             date=date(year, 1, 1),
-            elections=['election-{}'.format(year)]
         ) for year in (2001, 2002, 2003)
     }
     votes = {
@@ -226,8 +224,9 @@ def test_archived_result_collection_updates(session):
     session.add(election_compounds[2002])
     session.add(votes[2001])
     session.add(votes[2002])
-
     session.flush()
+    election_compounds[2001].elections = [elections[2001]]
+    election_compounds[2002].elections = [elections[2002]]
 
     # Test get_years / query
     assert archive.get_years() == []
@@ -260,6 +259,8 @@ def test_archived_result_collection_updates(session):
     archive.add(elections[2003], request)
     archive.add(election_compounds[2003], request)
     archive.add(votes[2003], request)
+    session.flush()
+    election_compounds[2003].elections = [elections[2003]]
 
     assert archive.get_years() == [2003, 2002, 2001]
     assert archive.query().count() == 9

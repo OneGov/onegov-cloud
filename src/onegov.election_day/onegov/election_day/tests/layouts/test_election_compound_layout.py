@@ -10,8 +10,10 @@ from unittest.mock import Mock
 
 def test_election_compound_layout(session):
     date_ = date(2011, 1, 1)
-    session.add(Election(title="m", domain='region', date=date_))
-    session.add(ProporzElection(title="p", domain='region', date=date_))
+    majorz = Election(title="majorz", domain='region', date=date_)
+    proporz = ProporzElection(title="proporz", domain='region', date=date_)
+    session.add(majorz)
+    session.add(proporz)
     session.add(ElectionCompound(title="e", domain='canton', date=date_))
     session.flush()
     compound = session.query(ElectionCompound).one()
@@ -36,12 +38,12 @@ def test_election_compound_layout(session):
     assert layout.majorz is False
     assert layout.proporz is False
 
-    compound.elections = ['m']
+    compound.elections = [majorz]
     layout = ElectionCompoundLayout(compound, DummyRequest())
     assert layout.majorz is True
     assert layout.proporz is False
 
-    compound.elections = ['p']
+    compound.elections = [proporz]
     layout = ElectionCompoundLayout(compound, DummyRequest())
     assert layout.majorz is False
     assert layout.proporz is True
