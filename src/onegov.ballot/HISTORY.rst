@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a majority type attribute to elections.
+  [msom]
+
 3.5.0 (2018-04-26)
 ~~~~~~~~~~~~~~~~~~~
 
