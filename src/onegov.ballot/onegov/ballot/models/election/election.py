@@ -83,7 +83,7 @@ class Election(Base, ContentMixin, TimestampMixin,
         return mandates and mandates[0] or 0
 
     #: Defines the type of majority (e.g. 'absolute', 'relative')
-    majority_type = meta_property('majority_type', default=False)
+    majority_type = meta_property('majority_type')
 
     #: Absolute majority
     absolute_majority = Column(Integer, nullable=True, default=lambda: 0)
