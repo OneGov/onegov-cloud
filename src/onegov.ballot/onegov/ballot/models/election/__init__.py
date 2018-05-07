@@ -1,3 +1,4 @@
+from onegov.ballot.models.election.association import ElectionAssociation
 from onegov.ballot.models.election.candidate import Candidate
 from onegov.ballot.models.election.candidate_result import CandidateResult
 from onegov.ballot.models.election.election import Election
@@ -15,6 +16,7 @@ __all__ = [
     'Candidate',
     'CandidateResult',
     'Election',
+    'ElectionAssociation',
     'ElectionCompound',
     'ElectionResult',
     'List',
