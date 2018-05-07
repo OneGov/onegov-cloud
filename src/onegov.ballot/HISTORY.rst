@@ -10,6 +10,9 @@ Changelog
 - Allows to change the ID of elections and votes.
   [msom]
 
+- Refactor election compound model.
+  [msom]
+
 3.5.0 (2018-04-26)
 ~~~~~~~~~~~~~~~~~~~
 

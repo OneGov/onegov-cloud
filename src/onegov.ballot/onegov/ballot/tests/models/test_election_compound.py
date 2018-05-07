@@ -11,6 +11,8 @@ from onegov.ballot import ListResult
 from onegov.ballot import PanachageResult
 from onegov.ballot import PartyResult
 from onegov.ballot import ProporzElection
+from onegov.ballot.models.election.election_compound import \
+    ElectionCompoundAssociation
 from uuid import uuid4
 
 
@@ -214,16 +216,11 @@ def test_election_compound(session):
     session.flush()
 
     election_compound.elections = session.query(Election).all()
+    session.flush()
     assert set([election.id for election in election_compound.elections]) == {
         'first-election', 'second-election'
     }
 
-    election_compound.elections = (
-        'invalid-election', 'first-election', 'second-election'
-    )
-    assert set([election.id for election in election_compound.elections]) == {
-        'first-election', 'second-election'
-    }
     assert election_compound.number_of_mandates == 3
     assert election_compound.progress == (0, 2)
     assert election_compound.counted is False
@@ -379,7 +376,7 @@ def test_election_compound_changes(session):
     assert election_compound.last_result_change is None
 
     with freeze_time("2011-01-01"):
-        election_compound.elections = ['majorz', 'proporz']
+        election_compound.elections = session.query(Election).all()
         session.flush()
     assert election_compound.last_modified.isoformat().startswith('2016')
     assert election_compound.last_result_change.isoformat().startswith('2016')
@@ -439,7 +436,10 @@ def test_election_compound_export(session):
 
     assert election_compound.export() == []
 
-    election_compound.elections = ['majorz']
+    election_compound.elections = session.query(Election).filter_by(
+        id='majorz'
+    ).all()
+    session.flush()
     assert election_compound.export() == [
         {
             'compound_title_de_CH': 'Elections',
@@ -508,7 +508,8 @@ def test_election_compound_export(session):
         }
     ]
 
-    election_compound.elections = ['majorz', 'proporz']
+    election_compound.elections = session.query(Election).all()
+    session.flush()
     assert election_compound.export() == [
         {
             'compound_title_de_CH': 'Elections',
@@ -855,3 +856,32 @@ def test_election_compound_export_parties(session):
             'panachage_votes_from_999': '',
         }
     ]
+
+
+def test_election_compound_rename(session):
+    session.add(majorz_election())
+    session.add(proporz_election())
+    session.flush()
+
+    election_compound = ElectionCompound(
+        title='Elections',
+        id='elerctions',
+        domain='canton',
+        date=date(2015, 6, 14),
+    )
+    election_compound.elections = session.query(Election).all()
+    session.add(election_compound)
+    session.flush()
+
+    query = session.query(
+        ElectionCompoundAssociation.election_compound_id.distinct()
+    )
+    assert query.one()[0] == 'elerctions'
+
+    election_compound.id = 'elections'
+    assert query.one()[0] == 'elections'
+    assert len(election_compound.elections) == 2
+
+    session.flush()
+    assert query.one()[0] == 'elections'
+    assert len(election_compound.elections) == 2

@@ -2,7 +2,10 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from onegov.ballot import Election
 from onegov.ballot import Vote
+from onegov.ballot.models.election.election_compound import \
+    ElectionCompoundAssociation
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
@@ -421,3 +424,27 @@ def add_update_contraints(context):
         f' FOREIGN KEY (election_id) REFERENCES elections (id)'
         f' ON UPDATE CASCADE'
     )
+
+
+@upgrade_task('Migrate election compounds', always_run=True)
+def migrate_election_compounds(context):
+    if (
+        context.has_table('election_compounds') and
+        context.has_table('election_compound_associations') and
+        context.has_column('election_compounds', 'elections')
+    ):
+        session = context.session
+        query = session.execute(
+            'SELECT id, akeys(elections) FROM election_compounds'
+        )
+        for election_compound_id, elections in query.fetchall():
+            for election_id in (elections or []):
+                if session.query(Election).filter_by(id=election_id).first():
+                    session.add(
+                        ElectionCompoundAssociation(
+                            election_compound_id=election_compound_id,
+                            election_id=election_id
+                        )
+                    )
+
+        context.operations.drop_column('election_compounds', 'elections')

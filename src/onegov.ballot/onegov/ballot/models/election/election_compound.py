@@ -6,27 +6,67 @@ from onegov.ballot.models.election.election_result import ElectionResult
 from onegov.ballot.models.election.list import List
 from onegov.ballot.models.election.list_connection import ListConnection
 from onegov.ballot.models.election.list_result import ListResult
+from onegov.ballot.models.election.mixins import PartyResultExportMixin
 from onegov.ballot.models.election.panachage_result import PanachageResult
 from onegov.ballot.models.election.party_result import PartyResult
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.ballot.models.mixins import TitleTranslationsMixin
-from onegov.ballot.models.election.mixins import PartyResultExportMixin
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE
+from onegov.core.orm.types import UUID
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import desc
+from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import or_
 from sqlalchemy import Text
 from sqlalchemy_utils import observes
-from sqlalchemy.ext.mutable import MutableDict
+from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+from uuid import uuid4
+
+
+class ElectionCompoundAssociation(Base):
+
+    __tablename__ = 'election_compound_associations'
+
+    #: identifies the candidate result
+    id = Column(UUID, primary_key=True, default=uuid4)
+
+    #: The election compound ID
+    election_compound_id = Column(
+        Text,
+        ForeignKey('election_compounds.id', onupdate='CASCADE')
+    )
+
+    #: The election ID
+    election_id = Column(
+        Text,
+        ForeignKey('elections.id', onupdate='CASCADE'),
+        primary_key=True
+    )
+
+    election_compound = relationship(
+        'ElectionCompound', backref=backref(
+            'associations',
+            cascade='all, delete-orphan',
+            lazy='dynamic'
+        )
+    )
+
+    election = relationship(
+        'Election', backref=backref(
+            'associations',
+            cascade='all, delete-orphan',
+            lazy='dynamic'
+        )
+    )
 
 
 class ElectionCompound(
@@ -58,11 +98,6 @@ class ElectionCompound(
     #: The date of the elections
     date = Column(Date, nullable=False)
 
-    #: An election compound contains n elections
-    _elections = Column(
-        MutableDict.as_mutable(HSTORE), name='elections', nullable=True
-    )
-
     #: An election compound may contains n party results
     party_results = relationship(
         'PartyResult',
@@ -85,17 +120,15 @@ class ElectionCompound(
 
     @property
     def elections(self):
-        if not self._elections:
-            return []
-
-        query = object_session(self).query(Election)
-        query = query.filter(Election.id.in_(self._elections))
-        query = query.order_by(Election.shortcode)
-        return query.all()
+        elections = [association.election for association in self.associations]
+        return sorted(elections, key=lambda x: x.shortcode or '')
 
     @elections.setter
     def elections(self, value):
-        self._elections = {getattr(item, 'id', item): None for item in value}
+        self.associations = [
+            ElectionCompoundAssociation(election_id=election.id)
+            for election in value
+        ]
 
     @property
     def number_of_mandates(self):
