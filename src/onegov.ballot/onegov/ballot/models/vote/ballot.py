@@ -60,7 +60,9 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
     )
 
     #: identifies the vote this ballot result belongs to
-    vote_id = Column(Text, ForeignKey('votes.id'), nullable=False)
+    vote_id = Column(
+        Text, ForeignKey('votes.id', onupdate='CASCADE'), nullable=False
+    )
 
     #: all translations of the title
     title_translations = Column(HSTORE, nullable=True)

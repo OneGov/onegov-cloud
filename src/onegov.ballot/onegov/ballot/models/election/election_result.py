@@ -23,7 +23,9 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
     id = Column(UUID, primary_key=True, default=uuid4)
 
     #: the election this result belongs to
-    election_id = Column(Text, ForeignKey('elections.id'), nullable=False)
+    election_id = Column(
+        Text, ForeignKey('elections.id', onupdate='CASCADE'), nullable=False
+    )
 
     #: entity id (e.g. a BFS number).
     entity_id = Column(Integer, nullable=False)

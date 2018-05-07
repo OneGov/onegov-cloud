@@ -388,3 +388,36 @@ def add_panachage_results_to_compounds(context):
             'target_list_id',
             new_column_name='target'
         )
+
+
+@upgrade_task(
+    'Add update contraints',
+    requires='onegov.ballot:Rename candidates tables',
+)
+def add_update_contraints(context):
+    # We use SQL (rather than operations.xxx) so that we can drop and add
+    # the constraints in one statement
+    for ref, table in (
+        ('vote', 'ballots'),
+        # ('election', 'candidates'),
+        ('election', 'election_results'),
+        ('election', 'list_connections'),
+        ('election', 'lists'),
+    ):
+        context.operations.execute(
+            f'ALTER TABLE {table} '
+            f'DROP CONSTRAINT {table}_{ref}_id_fkey, '
+            f'ADD CONSTRAINT {table}_{ref}_id_fkey'
+            f' FOREIGN KEY ({ref}_id) REFERENCES {ref}s (id)'
+            f' ON UPDATE CASCADE'
+        )
+
+    # there was a typo
+    context.operations.execute(
+        f'ALTER TABLE candidates '
+        f'DROP CONSTRAINT IF EXISTS candiates_election_id_fkey, '
+        f'DROP CONSTRAINT IF EXISTS candidates_election_id_fkey, '
+        f'ADD CONSTRAINT candidates_election_id_fkey'
+        f' FOREIGN KEY (election_id) REFERENCES elections (id)'
+        f' ON UPDATE CASCADE'
+    )

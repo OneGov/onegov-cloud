@@ -8,6 +8,46 @@ from onegov.ballot import ElectionResult
 from uuid import uuid4
 
 
+def majorz_election():
+    eid = uuid4()
+    cid = uuid4()
+    election = Election(
+        title='Election',
+        domain='canton',
+        date=date(2017, 1, 1),
+        status='interim',
+        absolute_majority=10000
+    )
+    candidate = Candidate(
+        id=cid,
+        candidate_id='0',
+        family_name='X',
+        first_name='Y',
+        elected=False
+    )
+    election_result = ElectionResult(
+        id=eid,
+        name='name',
+        entity_id=1,
+        counted=True,
+        eligible_voters=100,
+        received_ballots=2,
+        blank_ballots=3,
+        invalid_ballots=4,
+        blank_votes=5,
+        invalid_votes=6
+    )
+    candidate_result = CandidateResult(
+        election_result_id=eid,
+        candidate_id=cid,
+        votes=0
+    )
+    election_result.candidate_results.append(candidate_result)
+    election.candidates.append(candidate)
+    election.results.append(election_result)
+    return election
+
+
 def test_election_create_all_models(session):
     election = Election(
         title="Election",
@@ -714,42 +754,7 @@ def test_election_status(session):
 
 
 def test_election_clear_results(session):
-    eid = uuid4()
-    cid = uuid4()
-    election = Election(
-        title='Election',
-        domain='canton',
-        date=date(2017, 1, 1),
-        status='interim',
-        absolute_majority=10000
-    )
-    election.candidates.append(
-        Candidate(
-            id=cid,
-            candidate_id='0',
-            family_name='X',
-            first_name='Y',
-            elected=False
-        )
-    )
-    election.results.append(
-        ElectionResult(
-            id=eid,
-            name='name',
-            entity_id=1,
-            counted=True,
-            eligible_voters=100,
-            received_ballots=2,
-            blank_ballots=3,
-            invalid_ballots=4,
-            blank_votes=5,
-            invalid_votes=6
-        )
-    )
-    session.add(
-        CandidateResult(election_result_id=eid, candidate_id=cid, votes=0)
-    )
-
+    election = majorz_election()
     session.add(election)
     session.flush()
 
@@ -851,3 +856,18 @@ def test_related_elections(session):
     session.delete(first)
     session.flush()
     assert session.query(ElectionAssociation).all() == []
+
+
+def test_election_rename(session):
+    election = majorz_election()
+    session.add(election)
+    session.flush()
+
+    session.query(Candidate).one().election_id == 'election'
+    session.query(ElectionResult).one().election_id == 'election'
+
+    election.id = 'elerction'
+    session.flush()
+
+    session.query(Candidate).one().election_id == 'elerction'
+    session.query(ElectionResult).one().election_id == 'elerction'

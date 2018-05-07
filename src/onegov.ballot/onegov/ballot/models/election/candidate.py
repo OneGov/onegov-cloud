@@ -35,7 +35,9 @@ class Candidate(Base, TimestampMixin):
     elected = Column(Boolean, nullable=False)
 
     #: the election this candidate belongs to
-    election_id = Column(Text, ForeignKey('elections.id'), nullable=False)
+    election_id = Column(
+        Text, ForeignKey('elections.id', onupdate='CASCADE'), nullable=False
+    )
 
     #: the list this candidate belongs to
     list_id = Column(UUID, ForeignKey('lists.id'), nullable=True)

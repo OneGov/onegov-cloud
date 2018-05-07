@@ -12,6 +12,81 @@ from onegov.ballot import ProporzElection
 from uuid import uuid4
 
 
+def proporz_election():
+    eid = uuid4()
+    pid = uuid4()
+    cid = uuid4()
+    sid = uuid4()
+    lid = uuid4()
+    election = ProporzElection(
+        title='Election',
+        domain='canton',
+        date=date(2017, 1, 1),
+        status='interim',
+        absolute_majority=10000
+    )
+    election.list_connections.append(
+        ListConnection(id=pid, connection_id='1')
+    )
+    election.list_connections.append(
+        ListConnection(id=sid, connection_id='2', parent_id=pid)
+    )
+    election.lists.append(
+        List(
+            id=lid,
+            number_of_mandates=0,
+            list_id='A',
+            name='List',
+            connection_id=sid
+        )
+    )
+    election.candidates.append(
+        Candidate(
+            id=cid,
+            candidate_id='0',
+            family_name='X',
+            first_name='Y',
+            elected=False,
+            list_id=lid,
+        )
+    )
+    election_result = ElectionResult(
+        id=eid,
+        name='name',
+        entity_id=1,
+        counted=True,
+        eligible_voters=100,
+        received_ballots=2,
+        blank_ballots=3,
+        invalid_ballots=4,
+        blank_votes=5,
+        invalid_votes=6
+    )
+    election_result.list_results.append(
+        ListResult(list_id=lid, votes=10)
+    )
+    election_result.candidate_results.append(
+        CandidateResult(candidate_id=cid, votes=0)
+    )
+
+    election.results.append(election_result)
+    election.party_results.append(
+        PartyResult(
+            year=2017,
+            number_of_mandates=0,
+            votes=0,
+            total_votes=100,
+            name='A',
+        )
+    )
+
+    election.panachage_results.append(
+        PanachageResult(target=lid, source=1, votes=0)
+    )
+
+    return election
+
+
 def test_proporz_election_create_all_models(session):
     election = ProporzElection(
         title="Election",
@@ -1154,73 +1229,7 @@ def test_proporz_election_export_parties(session):
 
 
 def test_proporz_election_clear_results(session):
-    eid = uuid4()
-    pid = uuid4()
-    cid = uuid4()
-    sid = uuid4()
-    lid = uuid4()
-    election = ProporzElection(
-        title='Election',
-        domain='canton',
-        date=date(2017, 1, 1),
-        status='interim',
-        absolute_majority=10000
-    )
-    election.list_connections.append(
-        ListConnection(id=pid, connection_id='1')
-    )
-    election.list_connections.append(
-        ListConnection(id=sid, connection_id='2', parent_id=pid)
-    )
-    election.lists.append(
-        List(
-            id=lid,
-            number_of_mandates=0,
-            list_id='A',
-            name='List',
-            connection_id=sid
-        )
-    )
-    election.candidates.append(
-        Candidate(
-            id=cid,
-            candidate_id='0',
-            family_name='X',
-            first_name='Y',
-            elected=False,
-            list_id=lid,
-        )
-    )
-    election.results.append(
-        ElectionResult(
-            id=eid,
-            name='name',
-            entity_id=1,
-            counted=True,
-            eligible_voters=100,
-            received_ballots=2,
-            blank_ballots=3,
-            invalid_ballots=4,
-            blank_votes=5,
-            invalid_votes=6
-        )
-    )
-    election.party_results.append(
-        PartyResult(
-            year=2017,
-            number_of_mandates=0,
-            votes=0,
-            total_votes=100,
-            name='A',
-        )
-    )
-
-    session.add(ListResult(election_result_id=eid, list_id=lid, votes=10))
-    session.add(PanachageResult(target=lid, source=1, votes=0))
-    session.add(
-        CandidateResult(election_result_id=eid, candidate_id=cid, votes=0)
-    )
-
+    election = proporz_election()
     session.add(election)
     session.flush()
 
@@ -1233,3 +1242,22 @@ def test_proporz_election_clear_results(session):
     assert election.candidates.all() == []
     assert election.results.all() == []
     assert election.party_results.all() == []
+
+
+def test_proporz_election_rename(session):
+    election = proporz_election()
+    session.add(election)
+    session.flush()
+
+    session.query(Candidate).one().election_id == 'election'
+    session.query(ElectionResult).one().election_id == 'election'
+    session.query(List).one().election_id == 'election'
+    session.query(ListConnection).first().election_id == 'election'
+
+    election.id = 'elerction'
+    session.flush()
+
+    session.query(Candidate).one().election_id == 'elerction'
+    session.query(ElectionResult).one().election_id == 'elerction'
+    session.query(List).one().election_id == 'elerction'
+    session.query(ListConnection).first().election_id == 'elerction'

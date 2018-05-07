@@ -7,6 +7,9 @@ Changelog
 - Allows to store related elections.
   [msom]
 
+- Allows to change the ID of elections and votes.
+  [msom]
+
 3.5.0 (2018-04-26)
 ~~~~~~~~~~~~~~~~~~~
 

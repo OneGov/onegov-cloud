@@ -32,7 +32,9 @@ class List(Base, TimestampMixin):
     name = Column(Text, nullable=False)
 
     #: the election this result belongs to
-    election_id = Column(Text, ForeignKey('elections.id'), nullable=False)
+    election_id = Column(
+        Text, ForeignKey('elections.id', onupdate='CASCADE'), nullable=False
+    )
 
     #: the list connection id
     connection_id = Column(

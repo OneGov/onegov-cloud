@@ -1052,3 +1052,26 @@ def test_vote_has_results(session):
         )
     )
     assert vote.has_results is True
+
+
+def test_vote_rename(session):
+    vote = Vote(
+        title='Vote',
+        id='vorte',
+        domain='canton',
+        date=date(2017, 1, 1)
+    )
+    vote.ballots.append(Ballot(type='proposal'))
+    vote.ballots.append(Ballot(type='counter-proposal'))
+    session.add(vote)
+    session.flush()
+
+    assert session.query(Ballot.vote_id.distinct()).one()[0] == 'vorte'
+
+    vote.id = 'vote'
+    assert session.query(Ballot.vote_id.distinct()).one()[0] == 'vote'
+    assert vote.ballots.count() == 2
+
+    session.flush()
+    assert session.query(Ballot.vote_id.distinct()).one()[0] == 'vote'
+    assert vote.ballots.count() == 2
