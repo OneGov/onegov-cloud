@@ -173,6 +173,7 @@ def deferred_acceptance_from_database(session, period_id, **kwargs):
     b = b.options(joinedload(Booking.occasion))
     b = b.filter(Booking.period_id == period_id)
     b = b.filter(Booking.state != 'cancelled')
+    b = b.order_by(Booking.attendee_id)
     b = b.options(
         defer('group_code'),
     )
@@ -292,11 +293,11 @@ def deferred_acceptance(bookings, occasions,
     """
     assert alignment in (None, 'day')
 
-    attendee_limits = attendee_limits or {}
-    score_function = eager_score(bookings, score_function or Scoring())
-
     bookings = [b for b in bookings]
     bookings.sort(key=lambda b: b.attendee_id)
+
+    attendee_limits = attendee_limits or {}
+    score_function = eager_score(bookings, score_function or Scoring())
 
     occasions = {
         o.id: OccasionAgent(o, score_function) for o in occasions
