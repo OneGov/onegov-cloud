@@ -216,7 +216,12 @@
                     .sort(function(a, b) { return b.dy - a.dy; });
 
                 link.append('title')
-                    .text(function(d) { return d.value; });
+                    .text(function(d) {
+                        if (d.source.name && d.target.name) {
+                          return d.source.name + ' -> ' + d.target.name + ': ' + d.value;
+                        }
+                        return d.value;
+                      });
 
                 // Fade-Effect on mouseover
                 if (interactive) {

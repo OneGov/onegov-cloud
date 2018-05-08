@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the node titles to the sankey links.
+  [msom]
+
 3.4.6 (2018-05-07)
 ~~~~~~~~~~~~~~~~~~~
 
