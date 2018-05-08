@@ -14,6 +14,7 @@ from onegov.org.new_elements import Confirm
 from onegov.org.new_elements import Intercooler
 from onegov.org.new_elements import Link
 from onegov.user import User, UserCollection
+from sqlalchemy import and_
 from sqlalchemy.orm import joinedload
 
 
@@ -247,8 +248,12 @@ def reset_matching(self, request):
     assert self.period.active and not self.period.confirmed
 
     bookings = BookingCollection(request.session, self.period_id)
+    bookings = bookings.query().filter(and_(
+        Booking.state != 'cancelled',
+        Booking.state != 'open'
+    ))
 
-    for booking in bookings.query().filter(Booking.state != 'cancelled'):
+    for booking in bookings:
         booking.state = 'open'
 
     request.success(_("The matching was successfully reset"))

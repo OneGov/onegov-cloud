@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves the performance of the reset-matching function.
+  [href]
+
 1.3.30 (2018-04-30)
 ~~~~~~~~~~~~~~~~~~~
 
