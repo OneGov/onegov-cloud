@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.8.1 (2018-05-08)
+~~~~~~~~~~~~~~~~~~~
 
 - Improves matching performance.
   [href]
