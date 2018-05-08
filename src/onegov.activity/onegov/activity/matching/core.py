@@ -197,28 +197,30 @@ def deferred_acceptance_from_database(session, period_id, **kwargs):
             session.query(Attendee.id, Attendee.limit)
         }
 
-    bookings = deferred_acceptance(
-        bookings=b, occasions=o,
+    # fetch it here as it'll be reused multiple times
+    bookings = list(b)
+
+    results = deferred_acceptance(
+        bookings=bookings, occasions=o,
         default_limit=default_limit, attendee_limits=attendee_limits,
         minutes_between=period.minutes_between, alignment=period.alignment,
-        **kwargs)
+        sort_bookings=False, **kwargs)
 
     # write the changes to the database
-    def update_states(bookings, state):
-        ids = set(b.id for b in bookings)
+    def update_bookings(targets, state):
+        q = session.query(Booking)
+        q = q.filter(Booking.state != state)
+        q = q.filter(Booking.state != 'cancelled')
+        q = q.filter(Booking.period_id == period_id)
+        q = q.filter(Booking.id.in_(t.id for t in targets))
 
-        if not ids:
-            return
-
-        b = session.query(Booking)
-        b = b.filter(Booking.id.in_(ids))
-
-        for booking in b:
+        for booking in q:
             booking.state = state
 
-    update_states(bookings.open, 'open')
-    update_states(bookings.accepted, 'accepted')
-    update_states(bookings.blocked, 'blocked')
+    with session.no_autoflush:
+        update_bookings(results.open, 'open')
+        update_bookings(results.accepted, 'accepted')
+        update_bookings(results.blocked, 'blocked')
 
 
 def deferred_acceptance(bookings, occasions,
@@ -229,7 +231,8 @@ def deferred_acceptance(bookings, occasions,
                         default_limit=None,
                         attendee_limits=None,
                         minutes_between=0,
-                        alignment=None):
+                        alignment=None,
+                        sort_bookings=True):
     """ Matches bookings with occasions.
 
     :score_function:
@@ -293,8 +296,8 @@ def deferred_acceptance(bookings, occasions,
     """
     assert alignment in (None, 'day')
 
-    bookings = [b for b in bookings]
-    bookings.sort(key=lambda b: b.attendee_id)
+    if sort_bookings:
+        bookings = sorted(bookings, key=lambda b: b.attendee_id)
 
     attendee_limits = attendee_limits or {}
     score_function = eager_score(bookings, score_function or Scoring())

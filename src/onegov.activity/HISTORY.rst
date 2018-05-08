@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Improves matching performance slightly.
+- Improves matching performance.
   [href]
 
 1.8.0 (2018-04-16)
