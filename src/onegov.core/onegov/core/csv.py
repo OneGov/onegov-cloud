@@ -11,11 +11,12 @@ from csv import DictWriter, Sniffer, QUOTE_ALL
 from csv import Error as CsvError
 from csv import reader as csv_reader
 from csv import writer as csv_writer
+from datetime import datetime
 from editdistance import eval as distance
-from onegov.core.cache import lru_cache
 from io import BytesIO, StringIO
 from itertools import permutations
 from onegov.core import errors
+from onegov.core.cache import lru_cache
 from ordered_set import OrderedSet
 from unidecode import unidecode
 from xlsxwriter.workbook import Workbook
@@ -282,7 +283,7 @@ def convert_xls_to_csv(xls, sheet_name=None):
                     value = str(cell.value)
             elif cell.ctype == xlrd.XL_CELL_DATE:
                 value = xlrd.xldate_as_tuple(cell.value, excel.datemode)
-                value = value.isoformat()
+                value = datetime(*value).isoformat()
             else:
                 raise NotImplementedError
 

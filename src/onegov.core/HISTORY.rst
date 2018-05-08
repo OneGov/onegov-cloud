@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes conversion of excel date cells.
+  [msom]
+
 0.68.1 (2018-05-01)
 ~~~~~~~~~~~~~~~~~~~
 
