@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-11 10:20+0100\n"
-"PO-Revision-Date: 2017-12-04 15:47+0100\n"
+"POT-Creation-Date: 2018-05-08 13:27+0200\n"
+"PO-Revision-Date: 2018-05-08 13:27+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.0.4\n"
+"X-Generator: Poedit 2.0.7\n"
 
 msgid "Group"
 msgstr "Gruppe"
@@ -131,7 +131,7 @@ msgid "Print only"
 msgstr "Stopp Internet"
 
 msgid "Liable to pay costs"
-msgstr "Kostenpflichtig 85% vom Normalpreis"
+msgstr "Kostenpflichtig"
 
 msgid "Billing address"
 msgstr "Rechnungsadresse"
@@ -210,6 +210,9 @@ msgstr "Keine Rubriken."
 
 msgid "Edit"
 msgstr "Bearbeiten"
+
+msgid "Download all categories as XLSX."
+msgstr "Als XLSX herunterladen."
 
 msgid "No official notices."
 msgstr "Keine Meldungen."
@@ -365,6 +368,12 @@ msgstr "Ordnen"
 msgid "No organizations."
 msgstr "Keine Organisationen."
 
+msgid "Download"
+msgstr "Herunterladen"
+
+msgid "Download all organizations as XLSX."
+msgstr "Als XLSX herunterladen."
+
 msgid "Order Organizations"
 msgstr "Organisationen ordnen"
 
@@ -400,9 +409,6 @@ msgstr "Rubriken"
 
 msgid "By Groups"
 msgstr "Gruppen"
-
-msgid "Download"
-msgstr "Herunterladen"
 
 msgid "Download the results as XLSX."
 msgstr "Als XLSX herunterladen."
@@ -459,6 +465,9 @@ msgstr "Es können nur unbenutzte Rubriken gelöscht werden."
 
 msgid "Category deleted."
 msgstr "Rubrik gelöscht."
+
+msgid "Publishers"
+msgstr "Herausgeber"
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"
@@ -726,9 +735,6 @@ msgstr "Benutzer löschen"
 
 msgid "Do you really clear all active sessions?"
 msgstr "Wollen Sie wirklich alle Sitzungen beenden?"
-
-msgid "Publishers"
-msgstr "Herausgeber"
 
 msgid "User added."
 msgstr "Benutzer hinzugefügt."

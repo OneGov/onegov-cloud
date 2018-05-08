@@ -1,13 +1,18 @@
+from datetime import datetime
+from io import BytesIO
 from morepath import redirect
+from morepath.request import Response
 from onegov.core.security import Private
+from onegov.core.security import Secret
 from onegov.gazette import _
 from onegov.gazette import GazetteApp
 from onegov.gazette.collections import OrganizationCollection
-from onegov.gazette.forms import OrganizationForm
 from onegov.gazette.forms import EmptyForm
+from onegov.gazette.forms import OrganizationForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import Organization
 from onegov.gazette.models import OrganizationMove
+from xlsxwriter import Workbook
 
 
 @GazetteApp.html(
@@ -28,6 +33,7 @@ def view_organizations(self, request):
         'title': _("Organizations"),
         'layout': layout,
         'roots': roots,
+        'export': request.link(self, name='export'),
         'new_organization': request.link(self, name='new-organization'),
         'order': request.link(self, name='order')
     }
@@ -183,3 +189,50 @@ def delete_organization(self, request, form):
         'button_class': 'alert',
         'cancel': layout.manage_organizations_link
     }
+
+
+@GazetteApp.view(
+    model=OrganizationCollection,
+    name='export',
+    permission=Secret
+)
+def export_organizations(self, request):
+    """ Export all organizations as XLSX. The exported file can be re-imported
+    using the import-organizations command line command.
+
+    """
+
+    output = BytesIO()
+    workbook = Workbook(output)
+
+    worksheet = workbook.add_worksheet()
+    worksheet.name = request.translate(_("Organizations"))
+    worksheet.write_row(0, 0, (
+        request.translate(_("ID")),
+        request.translate(_("Title")),
+        request.translate(_("Active")),
+        request.translate(_("Parent Organization"))
+    ))
+
+    for index, organization in enumerate(self.query()):
+        worksheet.write_row(index + 1, 0, (
+            organization.id or '',
+            organization.title or '',
+            organization.active,
+            organization.parent_id or ''
+        ))
+
+    workbook.close()
+    output.seek(0)
+
+    response = Response()
+    response.content_type = (
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response.content_disposition = 'inline; filename={}-{}.xlsx'.format(
+        request.translate(_("Organizations")).lower(),
+        datetime.utcnow().strftime('%Y%m%d%H%M')
+    )
+    response.body = output.read()
+
+    return response
