@@ -1430,17 +1430,20 @@ def test_orm_cache(postgres_dsn):
     assert app.untitled_documents == []
     assert len(app.documents) == 2
 
-    # if we change something in a cached object it is reflected, the caveat
-    # here is though that the secret_document cache won't change because of
-    # it's policy
+    # if we change something in a cached object it is reflected
     app.secret_document.title = None
     transaction.commit()
 
     assert 'test_orm_cache.<locals>.App.secret_document' in app.request_cache
     assert app.untitled_documents[0].title is None
 
+    # the object in the request cache is now detached
     with pytest.raises(DetachedInstanceError):
-        assert app.secret_document.title is None
+        key = 'test_orm_cache.<locals>.App.secret_document'
+        assert app.request_cache[key].title
+
+    # which we transparently undo
+    assert app.secret_document.title is None
 
 
 def test_orm_cache_flush(postgres_dsn):

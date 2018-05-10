@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Fixes a long-standing issues where cached entries would be in a detached
+  state when they were accessed.
+  [href]
+
 - Fixes conversion of excel date cells.
   [msom]
 

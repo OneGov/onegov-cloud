@@ -141,11 +141,28 @@ class OrmCacheDescriptor(object):
         That is it acts like more forgiving session.merge().
 
         """
-
-        if sqlalchemy.inspect(obj, raiseerr=False):
+        if self.requires_merge(obj):
             obj = session.merge(obj, load=False)
             obj.is_cached = True
+
         return obj
+
+    def requires_merge(self, obj):
+        """ Returns true if the given object requires a merge, which is the
+        case if the object is detached.
+
+        """
+
+        # no need for an expensive sqlalchemy.inspect call for these
+        if isinstance(obj, (int, str, bool, float, tuple, list, dict, set)):
+            return False
+
+        info = sqlalchemy.inspect(obj, raiseerr=False)
+
+        if not info:
+            return False
+
+        return info.detached
 
     def load(self, app):
         """ Loads the object from the database or cache. """
@@ -163,12 +180,17 @@ class OrmCacheDescriptor(object):
         # make sure that inside a request we always get the exact same instance
         # (otherwise we don't see changes reflected)
         if self.cache_key in app.request_cache:
-            return app.request_cache[self.cache_key]
 
-        obj = app.cache.get_or_create(
-            key=self.cache_key,
-            creator=lambda: self.create(app)
-        )
+            # it is possible for objects in the request cache to become
+            # detached - in this case we need to merge them again
+            # (the merge function only does this if necessary)
+            return self.merge(session, app.request_cache[self.cache_key])
+
+        else:
+            obj = app.cache.get_or_create(
+                key=self.cache_key,
+                creator=lambda: self.create(app)
+            )
 
         # named tuples
         if isinstance(obj, tuple) and hasattr(obj.__class__, '_make'):
