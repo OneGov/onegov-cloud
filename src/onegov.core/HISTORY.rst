@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.68.2 (2018-05-10)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes a long-standing issues where cached entries would be in a detached
   state when they were accessed.
