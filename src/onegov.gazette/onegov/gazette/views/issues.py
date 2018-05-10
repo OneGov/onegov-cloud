@@ -1,6 +1,10 @@
 from datetime import date
+from datetime import datetime
+from io import BytesIO
 from morepath import redirect
+from morepath.request import Response
 from onegov.core.security import Private
+from onegov.core.security import Secret
 from onegov.gazette import _
 from onegov.gazette import GazetteApp
 from onegov.gazette.collections import IssueCollection
@@ -8,6 +12,8 @@ from onegov.gazette.forms import EmptyForm
 from onegov.gazette.forms import IssueForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import Issue
+from sedate import to_timezone
+from xlsxwriter import Workbook
 
 
 @GazetteApp.html(
@@ -33,7 +39,8 @@ def view_issues(self, request):
         'layout': layout,
         'past_issues': past_issues,
         'next_issues': next_issues,
-        'new_issue': request.link(self, name='new-issue')
+        'new_issue': request.link(self, name='new-issue'),
+        'export': request.link(self, name='export'),
     }
 
 
@@ -221,3 +228,54 @@ def publish_issue(self, request, form):
             }
         ),
     }
+
+
+@GazetteApp.view(
+    model=IssueCollection,
+    name='export',
+    permission=Secret
+)
+def export_issue(self, request):
+    """ Export all issues as XLSX. The exported file can be re-imported
+    using the import-issues command line command.
+
+    """
+
+    output = BytesIO()
+    workbook = Workbook(output, {
+        'default_date_format': 'dd.mm.yy'
+    })
+    datetime_format = workbook.add_format({'num_format': 'dd.mm.yy hh:mm'})
+
+    worksheet = workbook.add_worksheet()
+    worksheet.name = request.translate(_("Issues"))
+    worksheet.write_row(0, 0, (
+        request.translate(_("Number")),
+        request.translate(_("Date")),
+        request.translate(_("Deadline"))
+    ))
+
+    timezone = request.app.principal.time_zone
+    for index, issue in enumerate(self.query()):
+        worksheet.write(index + 1, 0, issue.number)
+        worksheet.write(index + 1, 1, issue.date)
+        worksheet.write_datetime(
+            index + 1, 2,
+            to_timezone(issue.deadline, timezone).replace(tzinfo=None),
+            datetime_format
+        )
+
+    workbook.close()
+    output.seek(0)
+
+    response = Response()
+    response.content_type = (
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response.content_disposition = 'inline; filename={}-{}.xlsx'.format(
+        request.translate(_("Issues")).lower(),
+        datetime.utcnow().strftime('%Y%m%d%H%M')
+    )
+    response.body = output.read()
+
+    return response
