@@ -41,15 +41,15 @@ def test_view_archive(gazette_app):
             assert "Ausgabe veröffentlicht." in manage
 
         archive = client.get('/').maybe_follow()
-        assert "<h2>2017</h2>" in archive
-        assert "<h2>2018</h2>" not in archive
+        assert "<h3>2017</h3>" in archive
+        assert "<h3>2018</h3>" not in archive
 
         issues = pq(archive.body)('li a')
         assert [a.text for a in issues] == [
-            'Nr. 43, 27.10.2017',
-            'Nr. 42, 20.10.2017',
-            'Nr. 41, 13.10.2017',
-            'Nr. 40, 06.10.2017'
+            'Nr. 43, 27.10.2017 (PDF)',
+            'Nr. 42, 20.10.2017 (PDF)',
+            'Nr. 41, 13.10.2017 (PDF)',
+            'Nr. 40, 06.10.2017 (PDF)'
         ]
         assert [a.attrib['href'] for a in issues] == [
             'http://localhost/pdf/2017-43.pdf',
@@ -66,25 +66,25 @@ def test_view_archive(gazette_app):
             assert "Ausgabe veröffentlicht." in manage
 
         archive = client.get('/').maybe_follow()
-        assert "<h2>2017</h2>" in archive
-        assert "<h2>2018</h2>" in archive
+        assert "<h3>2017</h3>" in archive
+        assert "<h3>2018</h3>" in archive
 
         issues = pq(archive.body)('li a')
         assert [a.text for a in issues] == [
-            'Nr. 1, 05.01.2018',
-            'Nr. 52, 29.12.2017',
-            'Nr. 51, 22.12.2017',
-            'Nr. 50, 15.12.2017',
-            'Nr. 49, 08.12.2017',
-            'Nr. 48, 01.12.2017',
-            'Nr. 47, 24.11.2017',
-            'Nr. 46, 17.11.2017',
-            'Nr. 45, 10.11.2017',
-            'Nr. 44, 03.11.2017',
-            'Nr. 43, 27.10.2017',
-            'Nr. 42, 20.10.2017',
-            'Nr. 41, 13.10.2017',
-            'Nr. 40, 06.10.2017'
+            'Nr. 1, 05.01.2018 (PDF)',
+            'Nr. 52, 29.12.2017 (PDF)',
+            'Nr. 51, 22.12.2017 (PDF)',
+            'Nr. 50, 15.12.2017 (PDF)',
+            'Nr. 49, 08.12.2017 (PDF)',
+            'Nr. 48, 01.12.2017 (PDF)',
+            'Nr. 47, 24.11.2017 (PDF)',
+            'Nr. 46, 17.11.2017 (PDF)',
+            'Nr. 45, 10.11.2017 (PDF)',
+            'Nr. 44, 03.11.2017 (PDF)',
+            'Nr. 43, 27.10.2017 (PDF)',
+            'Nr. 42, 20.10.2017 (PDF)',
+            'Nr. 41, 13.10.2017 (PDF)',
+            'Nr. 40, 06.10.2017 (PDF)'
         ]
         assert [a.attrib['href'] for a in issues] == [
             'http://localhost/pdf/2018-1.pdf',
