@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves the archive view.
+  [msom]
+
 1.13.17 (2018-05-15)
 ~~~~~~~~~~~~~~~~~~~~
 

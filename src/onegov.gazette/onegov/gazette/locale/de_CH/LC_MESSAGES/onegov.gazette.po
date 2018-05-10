@@ -178,6 +178,9 @@ msgstr "Herausgeber"
 msgid "Editor"
 msgstr "Redaktor"
 
+msgid "Archive"
+msgstr "Archiv"
+
 msgid "Close"
 msgstr "Schliessen"
 

@@ -14,8 +14,7 @@ from sedate import utcnow
 
 @GazetteApp.html(
     model=Principal,
-    permission=Public,
-    template='archive.pt',
+    permission=Public
 )
 def view_principal(self, request):
     """ The homepage.
@@ -37,11 +36,26 @@ def view_principal(self, request):
     if not request.app.principal.show_archive:
         return redirect(layout.login_link)
 
-    issues = IssueCollection(request.session).by_years(desc=True)
+    return redirect(request.link(self, name='archive'))
+
+
+@GazetteApp.html(
+    model=Principal,
+    permission=Public,
+    name='archive',
+    template='archive.pt',
+)
+def view_archive(self, request):
+    """ The archive.
+
+    Shows all the weekly PDFs by year.
+
+    """
+    layout = Layout(self, request)
+
     return {
         'layout': layout,
-        'title': "{} {}".format(_("Gazette"), request.app.principal.name),
-        'issues': issues
+        'issues': IssueCollection(request.session).by_years(desc=True)
     }
 
 
