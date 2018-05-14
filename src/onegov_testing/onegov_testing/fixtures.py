@@ -10,6 +10,7 @@ import transaction
 import urllib3
 
 from _pytest.monkeypatch import MonkeyPatch
+from distutils.spawn import find_executable
 from fs.tempfs import TempFS
 from functools import lru_cache
 from mirakuru import HTTPExecutor as HTTPExecutorBase
@@ -19,6 +20,8 @@ from onegov.core.crypto import hash_password
 from onegov.core.orm import Base, SessionManager
 from onegov_testing.browser import ExtendedBrowser
 from pathlib import Path
+from pytest_redis import factories
+from redis import Redis
 from selenium.webdriver.chrome.options import Options
 from splinter import Browser
 from sqlalchemy import create_engine
@@ -26,11 +29,16 @@ from onegov_testing.postgresql import Postgresql
 from uuid import uuid4
 from webdriver_manager.chrome import ChromeDriverManager
 
+
 try:
     from elasticsearch import Elasticsearch
 except ImportError:
     def Elasticsearch(*args, **kwargs):
         assert False, "Elasticsearch is not installed"
+
+
+redis_path = find_executable('redis-server')
+redis_server = factories.redis_proc(host='127.0.0.1', executable=redis_path)
 
 
 class HTTPExecutor(HTTPExecutorBase):
@@ -457,3 +465,11 @@ def browser(webdriver, webdriver_options, webdriver_executable_path,
 
     with browser_extension.spawn(Browser, webdriver, **config) as browser:
         yield browser
+
+
+@pytest.fixture(scope="function")
+def redis_url(redis_server):
+    url = f'redis://{redis_server.host}:{redis_server.port}/0'
+    yield url
+
+    Redis.from_url(url).flushall()
