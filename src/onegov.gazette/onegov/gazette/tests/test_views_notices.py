@@ -1,3 +1,5 @@
+import transaction
+
 from freezegun import freeze_time
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.tests.common import login_admin
@@ -6,7 +8,6 @@ from onegov.gazette.tests.common import login_editor_2
 from onegov.gazette.tests.common import login_editor_3
 from onegov.gazette.tests.common import login_publisher
 from onegov.gazette.tests.common import login_users
-from transaction import commit
 from unittest.mock import patch
 from urllib.parse import parse_qs
 from urllib.parse import urlparse
@@ -675,11 +676,12 @@ def test_view_notices_update(gazette_app):
 
         # Change the category and organization of the notice
         # (don't change the category or organization because of the observers!)
+        transaction.begin()
         session = gazette_app.session()
         notice = session.query(GazetteNotice).one()
         notice.category = 'Edurcatio'
         notice.organization = 'Sate Chancelery'
-        commit()
+        transaction.commit()
 
         manage = client.get('/notice/erneuerungswahlen')
         assert 'Education' not in manage
