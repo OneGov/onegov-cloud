@@ -35,9 +35,7 @@ eventually be discarded by memcache if the cache is full).
 """
 
 import dill
-import redis.exceptions
 
-from contextlib import suppress
 from fastcache import clru_cache as lru_cache  # noqa
 from dogpile.cache import make_region
 from dogpile.cache.api import NO_VALUE
