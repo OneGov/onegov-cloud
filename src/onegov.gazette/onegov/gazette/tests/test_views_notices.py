@@ -1,6 +1,7 @@
 import transaction
 
 from freezegun import freeze_time
+from io import BytesIO
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.tests.common import login_admin
 from onegov.gazette.tests.common import login_editor_1
@@ -8,6 +9,7 @@ from onegov.gazette.tests.common import login_editor_2
 from onegov.gazette.tests.common import login_editor_3
 from onegov.gazette.tests.common import login_publisher
 from onegov.gazette.tests.common import login_users
+from PyPDF2 import PdfFileReader
 from unittest.mock import patch
 from urllib.parse import parse_qs
 from urllib.parse import urlparse
@@ -407,6 +409,50 @@ def test_view_notices_order(gazette_app):
             'user.name': 'asc',
             'first_issue': 'asc'
         }
+
+
+def test_view_notices_pdf_preview(gazette_app):
+    with freeze_time("2017-11-01 11:00"):
+
+        client = Client(gazette_app)
+        login_publisher(client)
+
+        # new notice
+        manage = client.get('/notices/drafted/new-notice')
+        manage.form['title'] = "Erneuerungswahlen"
+        manage.form['organization'] = '200'
+        manage.form['category'] = '11'
+        manage.form['issues'] = ['2017-44', '2017-45']
+        manage.form['text'] = "1. Oktober 2017"
+        manage.form['author_place'] = 'Govikon'
+        manage.form['author_name'] = 'State Chancellerist'
+        manage.form['author_date'] = '2019-01-01'
+        manage.form.submit()
+
+        manage = client.get('/notices/drafted/new-notice')
+        manage.form['title'] = "Kantonsratswahlen"
+        manage.form['organization'] = '200'
+        manage.form['category'] = '11'
+        manage.form['issues'] = ['2017-44', '2017-45']
+        manage.form['text'] = "10. Oktober 2017"
+        manage.form['author_place'] = 'Govikon'
+        manage.form['author_name'] = 'State Chancellerist'
+        manage.form['author_date'] = '2019-01-01'
+        manage.form.submit()
+
+        response = client.get('/notices/drafted/preview-pdf')
+        assert response.headers['Content-Type'] == 'application/pdf'
+        assert response.headers['Content-Disposition'] == \
+            'inline; filename=amtsblatt-govikon.pdf'
+
+        reader = PdfFileReader(BytesIO(response.body))
+        assert [page.extractText() for page in reader.pages] == [
+            '© 2017 Govikon\n1\n'
+            'xxx\nErneuerungswahlen\n1. Oktober 2017\n'
+            'Govikon, 1. Januar 2019\nState Chancellerist\n'
+            'xxx\nKantonsratswahlen\n10. Oktober 2017\n'
+            'Govikon, 1. Januar 2019\nState Chancellerist\n'
+        ]
 
 
 def test_view_notices_statistics(gazette_app):

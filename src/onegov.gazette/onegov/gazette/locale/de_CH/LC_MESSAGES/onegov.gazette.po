@@ -220,7 +220,7 @@ msgstr "Bearbeiten"
 msgid "Download"
 msgstr "Herunterladen"
 
-msgid "Download all categories as XLSX."
+msgid "Download as XLSX."
 msgstr "Als XLSX herunterladen."
 
 msgid "No official notices."
@@ -371,14 +371,14 @@ msgstr "Ausgabedatum"
 msgid "Submit"
 msgstr "Einreichen"
 
+msgid "Download as PDF."
+msgstr "Als PDF herunterladen."
+
 msgid "Order"
 msgstr "Ordnen"
 
 msgid "No organizations."
 msgstr "Keine Organisationen."
-
-msgid "Download all organizations as XLSX."
-msgstr "Als XLSX herunterladen."
 
 msgid "Order Organizations"
 msgstr "Organisationen ordnen"
@@ -416,14 +416,8 @@ msgstr "Rubriken"
 msgid "By Groups"
 msgstr "Gruppen"
 
-msgid "Download the results as XLSX."
-msgstr "Als XLSX herunterladen."
-
 msgid "No users."
 msgstr "Keine Benutzer."
-
-msgid "Download all users as XLSX."
-msgstr "Als XLSX herunterladen."
 
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"

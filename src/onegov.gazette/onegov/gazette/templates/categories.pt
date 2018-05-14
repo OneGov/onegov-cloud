@@ -50,7 +50,7 @@
                 </table>
 
                 <h3 i18n:translate>Download</h3>
-                <p><a href="${export}"><i class="fa fa-arrow-circle-o-down" aria-hidden="true"></i> <span i18n:translate>Download all categories as XLSX.</span></a></p>
+                <p><a href="${export}"><i class="fa fa-arrow-circle-o-down" aria-hidden="true"></i> <span i18n:translate>Download as XLSX.</span></a></p>
 
             </div>
         </div>

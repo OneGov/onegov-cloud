@@ -2,6 +2,7 @@ from freezegun import freeze_time
 from io import BytesIO
 from onegov.core.crypto import random_token
 from onegov.file.utils import as_fileintent
+from onegov.gazette.collections import GazetteNoticeCollection
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import GazetteNoticeFile
 from onegov.gazette.models import Issue
@@ -73,8 +74,64 @@ def test_pdf_from_notice(gazette_app):
     ]
 
 
-def test_pdf_from_collection():
-    pass
+def test_pdf_from_collection(gazette_app):
+    session = gazette_app.session()
+
+    with freeze_time("2017-01-01 12:00"):
+        notice = GazetteNotice(
+            title='first title',
+            text='first text',
+            author_place='first place',
+            author_date=utcnow(),
+            author_name='first author',
+            state='submitted'
+        )
+        notice.files.append(pdf_attachment('first attachment'))
+        session.add(notice)
+        session.flush()
+
+    with freeze_time("2017-01-02 12:00"):
+        notice = GazetteNotice(
+            title='second title',
+            text='second text',
+            author_place='second place',
+            author_date=utcnow(),
+            author_name='second author',
+            state='submitted'
+        )
+        session.add(notice)
+        session.flush()
+
+    request = DummyRequest(session, gazette_app.principal)
+    collection = GazetteNoticeCollection(session)
+    file = Pdf.from_collection(collection, request)
+    reader = PdfFileReader(file)
+    assert [page.extractText() for page in reader.pages] == [
+        (
+            '© 2018 Govikon\n1\n'
+            'xxx\nfirst title\nfirst text\n'
+            'first place, 1. Januar 2017\nfirst author\n'
+        ),
+        '© 2018 Govikon\n2\n',
+        (
+            '© 2018 Govikon\n3\n'
+            'xxx\nsecond title\nsecond text\n'
+            'second place, 2. Januar 2017\nsecond author\n'
+        )
+    ]
+
+    file = Pdf.from_collection(collection.for_order('title', 'desc'), request)
+    reader = PdfFileReader(file)
+    assert [page.extractText() for page in reader.pages] == [
+        (
+            '© 2018 Govikon\n1\n'
+            'xxx\nsecond title\nsecond text\n'
+            'second place, 2. Januar 2017\nsecond author\n'
+            'xxx\nfirst title\nfirst text\n'
+            'first place, 1. Januar 2017\nfirst author\n'
+        ),
+        '© 2018 Govikon\n2\n'
+    ]
 
 
 def test_pdf_issues_h():

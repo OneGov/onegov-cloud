@@ -102,18 +102,15 @@ class Pdf(PdfBase):
         """ Create a PDF from a collection of notices. """
 
         layout = Layout(None, request)
-        title = request.translate(_("Gazette"))
         result = BytesIO()
         pdf = cls(
             result,
-            title=title,
             author=request.app.principal.name
         )
         pdf.init_a4_portrait(
             page_fn=page_fn_footer,
             page_fn_later=page_fn_header_and_footer
         )
-        pdf.h1(title)
         for notice in collection.query():
             pdf.spacer()
             pdf.notice(notice, layout)

@@ -13,6 +13,7 @@ from onegov.gazette.forms import EmptyForm
 from onegov.gazette.forms import NoticeForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import GazetteNotice
+from onegov.gazette.pdf import Pdf
 from onegov.gazette.views import get_user
 from onegov.gazette.views import get_user_and_group
 from xlsxwriter import Workbook
@@ -144,8 +145,11 @@ def view_notices(self, request):
         filters = None
         title = _("Published Official Notices")
 
+    preview = request.link(self, name='preview-pdf') if is_publisher else None
+
     return {
         'layout': layout,
+        'is_publisher': is_publisher,
         'notices': self.batch,
         'title': title,
         'filters': filters,
@@ -154,7 +158,8 @@ def view_notices(self, request):
         'to_date': self.to_date,
         'orderings': orderings,
         'clear': request.link(self.for_dates(None, None).for_term(None)),
-        'new_notice': request.link(self, name='new-notice')
+        'new_notice': request.link(self, name='new-notice'),
+        'preview': preview
     }
 
 
@@ -243,6 +248,34 @@ def view_notices_statistics_xlsx(self, request):
     response.body = output.read()
 
     return response
+
+
+@GazetteApp.view(
+    model=GazetteNoticeCollection,
+    name='preview-pdf',
+    permission=Private
+)
+def view_notices_preview_pdf(self, request):
+    """ Preview the notices as PDF.
+
+    This view is only visible by a publisher.
+
+    """
+
+    pdf = Pdf.from_collection(self, request)
+
+    filename = normalize_for_url(
+        '{}-{}'.format(
+            request.translate(_("Gazette")),
+            request.app.principal.name
+        )
+    )
+
+    return Response(
+        pdf.read(),
+        content_type='application/pdf',
+        content_disposition=f'inline; filename={filename}.pdf'
+    )
 
 
 @GazetteApp.form(
