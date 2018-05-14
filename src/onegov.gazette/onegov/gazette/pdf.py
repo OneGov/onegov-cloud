@@ -24,6 +24,11 @@ class Pdf(PdfBase):
         self.style.title.spaceBefore = 0
         self.style.title.spaceAfter = 0.67 * self.style.title.fontSize
 
+        self.style.meta = deepcopy(self.style.normal)
+        self.style.meta.fontSize = 0.85 * self.style.meta.fontSize
+        self.style.meta.spaceBefore = 1 * self.style.meta.fontSize
+        self.style.meta.spaceAfter = 1 * self.style.meta.fontSize
+
         self.style.h_notice = deepcopy(self.style.bold)
         self.style.h_notice.fontSize = 1.125 * self.style.fontSize
         self.style.table_h_notice = self.style.table + (
@@ -36,6 +41,96 @@ class Pdf(PdfBase):
         self.style.ul.bullet = '-'
         self.style.li.spaceAfter = 0.275 * self.style.li.fontSize
         self.style.li.leading = 1.275 * self.style.li.fontSize
+
+    def notice(self, notice, layout):
+        """ Adds an official notice. """
+
+        meta = [notice.organization, notice.category]
+        meta.extend([
+            layout.format_issue(issue, notice=notice)
+            for issue in notice.issue_objects
+        ])
+        meta = ' | '.join(meta)
+
+        self.p_markup(f'<i>{meta}</i>', style=self.style.meta)
+        self.story[-1].keepWithNext = True
+        self.p(notice.title, style=self.style.h_notice)
+        self.story[-1].keepWithNext = True
+        self.mini_html(notice.text)
+        if notice.author_place and notice.author_date:
+            self.mini_html(
+                "{}, {}<br>{}".format(
+                    notice.author_place,
+                    layout.format_date(
+                        notice.author_date, 'date_long'
+                    ),
+                    notice.author_name
+                )
+            )
+        for file in notice.files:
+            self.pdf(file.reference.file)
+
+    @classmethod
+    def from_notice(cls, notice, request):
+        """ Create a PDF from a single notice. """
+
+        layout = Layout(None, request)
+        result = BytesIO()
+        pdf = cls(
+            result,
+            title=notice.title,
+            author=request.app.principal.name
+        )
+        pdf.init_a4_portrait(
+            page_fn=page_fn_footer,
+            page_fn_later=page_fn_header_and_footer
+        )
+        pdf.h1(notice.title)
+
+        pdf.spacer()
+        pdf.notice(notice, layout)
+        pdf.generate()
+
+        result.seek(0)
+        return result
+
+    @classmethod
+    def from_collection(cls, collection, request):
+        """ Create a PDF from a collection of notices. """
+
+        layout = Layout(None, request)
+        title = request.translate(_("Gazette"))
+        result = BytesIO()
+        pdf = cls(
+            result,
+            title=title,
+            author=request.app.principal.name
+        )
+        pdf.init_a4_portrait(
+            page_fn=page_fn_footer,
+            page_fn_later=page_fn_header_and_footer
+        )
+        pdf.h1(title)
+        for notice in collection.query():
+            pdf.spacer()
+            pdf.notice(notice, layout)
+        pdf.generate()
+
+        result.seek(0)
+        return result
+
+
+class IssuePdf(Pdf):
+    """ A PDF containing all the notices of a single issue.
+
+    Generating this PDF automatically assigns publication numbers!
+
+    """
+
+    def adjust_style(self, font_size=10):
+        """ Adds styles for notices. """
+
+        super(IssuePdf, self).adjust_style(font_size)
 
         # Indent left everthing to stress the issue number
         self.style.leftIndent = 30

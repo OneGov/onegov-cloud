@@ -6,6 +6,7 @@ from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import GazetteNoticeFile
 from onegov.gazette.models import Issue
 from onegov.gazette.pdf import Pdf
+from onegov.gazette.pdf import IssuePdf
 from PyPDF2 import PdfFileReader
 from unittest.mock import patch
 
@@ -33,7 +34,7 @@ class DummyRequest(object):
 
 
 def test_pdf_h():
-    pdf = Pdf(BytesIO())
+    pdf = IssuePdf(BytesIO())
     pdf.init_a4_portrait()
 
     with patch.object(pdf, 'h1') as h1:
@@ -117,7 +118,7 @@ def test_pdf_unfold_data(session):
     ]
 
     file = BytesIO()
-    pdf = Pdf(file)
+    pdf = IssuePdf(file)
     pdf.init_a4_portrait()
     assert pdf.unfold_data(session, None, '2017-40', data, 1) == 15
 
@@ -187,20 +188,20 @@ def test_pdf_query_notices(session, issues, organizations, categories):
     session.flush()
 
     query = session.query(GazetteNotice)
-    assert Pdf.query_notices(session, '2017-40', '100', '10') == [
+    assert IssuePdf.query_notices(session, '2017-40', '100', '10') == [
         query.filter_by(text='2017-40-1, 2017-41-4').one().id,
         query.filter_by(text='2017-40-2, 2017-41-3').one().id,
         query.filter_by(text='2017-40-3, 2017-41-2').one().id,
         query.filter_by(text='2017-40-4, 2017-41-1').one().id
     ]
-    assert Pdf.query_notices(session, '2017-41', '100', '10') == [
+    assert IssuePdf.query_notices(session, '2017-41', '100', '10') == [
         query.filter_by(text='2017-40-4, 2017-41-1').one().id,
         query.filter_by(text='2017-40-3, 2017-41-2').one().id,
         query.filter_by(text='2017-40-2, 2017-41-3').one().id,
         query.filter_by(text='2017-40-1, 2017-41-4').one().id,
         query.filter_by(text='2017-41-5, 2017-42-1').one().id
     ]
-    assert Pdf.query_notices(session, '2017-42', '100', '10') == [
+    assert IssuePdf.query_notices(session, '2017-42', '100', '10') == [
         query.filter_by(text='2017-41-5, 2017-42-1').one().id
     ]
 
@@ -247,7 +248,7 @@ def test_pdf_from_issue(gazette_app):
 
     with freeze_time("2017-01-01 12:00"):
         issue = session.query(Issue).filter_by(number=40).one()
-        file = Pdf.from_issue(issue, DummyRequest(session, principal), 5)
+        file = IssuePdf.from_issue(issue, DummyRequest(session, principal), 5)
         reader = PdfFileReader(file)
         assert [page.extractText() for page in reader.pages] == [
             # page 1
@@ -274,7 +275,7 @@ def test_pdf_from_issue(gazette_app):
         ]
 
         issue = session.query(Issue).filter_by(number=41).one()
-        file = Pdf.from_issue(issue, DummyRequest(session, principal), 5)
+        file = IssuePdf.from_issue(issue, DummyRequest(session, principal), 5)
         reader = PdfFileReader(file)
         assert [page.extractText() for page in reader.pages] == [
             # page 1
@@ -307,7 +308,7 @@ def test_pdf_from_issue(gazette_app):
 
     with freeze_time("2018-01-01 12:00"):
         issue = session.query(Issue).filter_by(number=42).one()
-        file = Pdf.from_issue(issue, DummyRequest(session, principal), 5)
+        file = IssuePdf.from_issue(issue, DummyRequest(session, principal), 5)
         reader = PdfFileReader(file)
         assert [page.extractText() for page in reader.pages] == [
             '© 2018 Govikon\n1\nGazette No. 42, 20.10.2017\n'

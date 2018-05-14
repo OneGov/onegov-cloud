@@ -168,5 +168,7 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
         for notice in self.notices('accepted'):
             notice.publish(request)
 
-        from onegov.gazette.pdf import Pdf  # circular
-        self.pdf = Pdf.from_issue(self, request, self.first_publication_number)
+        from onegov.gazette.pdf import IssuePdf  # circular
+        self.pdf = IssuePdf.from_issue(
+            self, request, self.first_publication_number
+        )
