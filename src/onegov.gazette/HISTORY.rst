@@ -4,7 +4,7 @@ Changelog
 - Adds the number of rejections by user to the statistics.
   [msom]
 
-1.12.15 (2018-04-26)
+1.13.15 (2018-04-26)
 ~~~~~~~~~~~~~~~~~~~~
 
 - Updates translation.
