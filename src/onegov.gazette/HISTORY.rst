@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.13.16 (2018-05-14)
+~~~~~~~~~~~~~~~~~~~~
 
 - Adds the number of rejections by user to the statistics.
   [msom]
