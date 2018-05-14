@@ -209,7 +209,7 @@ def test_session_scope(postgres_dsn):
     mgr.dispose()
 
 
-def test_orm_scenario(postgres_dsn):
+def test_orm_scenario(postgres_dsn, redis_url):
     # test a somewhat complete ORM scenario in which create and read data
     # for different applications
     Base = declarative_base(cls=ModelBase)
@@ -269,7 +269,7 @@ def test_orm_scenario(postgres_dsn):
     scan_morepath_modules(App)
 
     app = App()
-    app.configure_application(dsn=postgres_dsn, base=Base)
+    app.configure_application(dsn=postgres_dsn, base=Base, redis_url=redis_url)
     app.namespace = 'municipalities'
 
     c = Client(app)
@@ -305,7 +305,7 @@ def test_orm_scenario(postgres_dsn):
     app.session_manager.dispose()
 
 
-def test_i18n_with_request(postgres_dsn):
+def test_i18n_with_request(postgres_dsn, redis_url):
     Base = declarative_base(cls=ModelBase)
 
     class App(Framework):
@@ -339,7 +339,7 @@ def test_i18n_with_request(postgres_dsn):
     scan_morepath_modules(App)
 
     app = App()
-    app.configure_application(dsn=postgres_dsn, base=Base)
+    app.configure_application(dsn=postgres_dsn, base=Base, redis_url=redis_url)
     app.namespace = 'municipalities'
     app.set_application_id('municipalities/new-york')
     app.locales = ['de_CH', 'en_US']
@@ -744,7 +744,7 @@ def test_serialization_failure(postgres_dsn):
 
 @pytest.mark.flaky(reruns=3)
 @pytest.mark.parametrize("number_of_retries", range(1, 10))
-def test_application_retries(postgres_dsn, number_of_retries):
+def test_application_retries(postgres_dsn, number_of_retries, redis_url):
 
     Base = declarative_base(cls=ModelBase)
 
@@ -814,7 +814,7 @@ def test_application_retries(postgres_dsn, number_of_retries):
         dsn=postgres_dsn,
         base=Base,
         identity_secure=False,
-        disable_memcached=True
+        redis_url=redis_url
     )
     app.namespace = 'municipalities'
 
@@ -1326,7 +1326,7 @@ def test_sqlalchemy_aggregate(postgres_dsn):
         session.query(Comment).update({'content': 'foobar'})
 
 
-def test_orm_cache(postgres_dsn):
+def test_orm_cache(postgres_dsn, redis_url):
 
     Base = declarative_base(cls=ModelBase)
 
@@ -1376,7 +1376,8 @@ def test_orm_cache(postgres_dsn):
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
-        disable_memcached=True)
+        redis_url=redis_url
+    )
     app.namespace = 'foo'
     app.set_application_id('foo/bar')
 
@@ -1446,7 +1447,7 @@ def test_orm_cache(postgres_dsn):
     assert app.secret_document.title is None
 
 
-def test_orm_cache_flush(postgres_dsn):
+def test_orm_cache_flush(postgres_dsn, redis_url):
 
     Base = declarative_base(cls=ModelBase)
 
@@ -1476,7 +1477,8 @@ def test_orm_cache_flush(postgres_dsn):
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
-        disable_memcached=True)
+        redis_url=redis_url
+    )
     app.namespace = 'foo'
     app.set_application_id('foo/bar')
     app.clear_request_cache()
@@ -1751,7 +1753,7 @@ def test_selectable_sql_query_with_dots(session):
     assert tuple(stmt.c.keys()) == ('column_name', 'table_name', 'column')
 
 
-def test_i18n_translation_hybrid_independence(postgres_dsn):
+def test_i18n_translation_hybrid_independence(postgres_dsn, redis_url):
     Base = declarative_base(cls=ModelBase)
 
     class App(Framework):
@@ -1779,13 +1781,21 @@ def test_i18n_translation_hybrid_independence(postgres_dsn):
     scan_morepath_modules(App)
 
     freiburg = App()
-    freiburg.configure_application(dsn=postgres_dsn, base=Base)
+    freiburg.configure_application(
+        dsn=postgres_dsn,
+        base=Base,
+        redis_url=redis_url
+    )
     freiburg.namespace = 'app'
     freiburg.set_application_id('app/freiburg')
     freiburg.locales = ['de_CH', 'fr_CH']
 
     biel = App()
-    biel.configure_application(dsn=postgres_dsn, base=Base)
+    biel.configure_application(
+        dsn=postgres_dsn,
+        base=Base,
+        redis_url=redis_url
+    )
     biel.namespace = 'app'
     biel.set_application_id('app/biel')
     biel.locales = ['de_CH', 'fr_CH']

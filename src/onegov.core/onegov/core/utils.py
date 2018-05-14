@@ -211,10 +211,13 @@ def render_file(file_path, request):
 
     """
 
+    def hash_path(path):
+        return hashlib.sha1(path.encode('utf-8')).hexdigest()
+
     # this is a very cachable result - though it's possible that a file
     # changes it's content type, it should usually not, especially since
     # we emphasize the use of random filenames
-    @request.app.cache.cache_on_arguments()
+    @request.app.cache.cache_on_arguments(to_str=hash_path)
     def get_content_type(file_path):
         content_type = mimetypes.guess_type(file_path)[0]
 

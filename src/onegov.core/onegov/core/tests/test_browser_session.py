@@ -6,19 +6,21 @@ from onegov.core.browser_session import BrowserSession
 
 
 def test_browser_session_mangle():
-    session = BrowserSession('ns', 'token', {})
-    assert session.mangle('test') == 'ns:token:test'
+    session = BrowserSession({}, 'token')
+    assert session._cache.mangle('test')\
+        == 'e352b6fc45b2bc144082d507d6a51faec0bbeab5313974f7:test'
 
     with pytest.raises(AssertionError):
-        session.mangle('')
+        session._cache.mangle('')
 
     with pytest.raises(AssertionError):
-        session.mangle(None)
+        session._cache.mangle(None)
 
 
 def test_browser_session_cache():
     cache = make_region().configure('dogpile.cache.memory')
-    session = BrowserSession('ns', 'token', cache)
+    session = BrowserSession(cache, 'token')
+    key = 'e352b6fc45b2bc144082d507d6a51faec0bbeab5313974f7:name'
 
     assert not session.has('name')
     assert 'name' not in session
@@ -29,14 +31,14 @@ def test_browser_session_cache():
     with pytest.raises(KeyError):
         session['name']
 
-    assert cache.get('ns:token:name') is NO_VALUE
+    assert cache.get(key) is NO_VALUE
 
     session.name = 'test'
     assert session.has('name')
     assert 'name' in session
     assert session.name == 'test'
     assert session['name'] == 'test'
-    assert cache.get('ns:token:name') == 'test'
+    assert cache.get(key) == 'test'
 
     del session.name
     assert not session.has('name')
@@ -48,23 +50,23 @@ def test_browser_session_cache():
     with pytest.raises(KeyError):
         session['name']
 
-    assert cache.get('ns:token:name') is NO_VALUE
+    assert cache.get(key) is NO_VALUE
 
 
-def test_browser_session_cache_namespacing():
+def test_browser_session_cache_prefix():
     cache = make_region().configure('dogpile.cache.memory')
 
-    session = BrowserSession('ns', 'token', cache)
+    session = BrowserSession(cache, 'foo')
     session.name = 'test'
     assert session.name == 'test'
 
-    session = BrowserSession('ns', 'token', cache)
+    session = BrowserSession(cache, 'foo')
     assert session.name == 'test'
 
-    session = BrowserSession('ns', 'token2', cache)
+    session = BrowserSession(cache, 'bar')
     with pytest.raises(AttributeError):
         session.name
 
-    session = BrowserSession('ns2', 'token', cache)
+    session = BrowserSession(cache, 'bar')
     with pytest.raises(AttributeError):
         session.name

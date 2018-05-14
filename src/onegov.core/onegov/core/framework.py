@@ -3,7 +3,7 @@ features for applications deriving from it:
 
  * Virtual hosting in conjunction with :mod:`onegov.server`.
  * Access to an SQLAlchemy session bound to a specific Postgres schema.
- * A cache backed by memcached, shared by multiple processes.
+ * A cache backed by redis, shared by multiple processes.
  * An identity policy with basic rules, permissions and role.
  * The ability to serve static files and css/js assets.
 
@@ -20,7 +20,6 @@ import dectate
 import hashlib
 import inspect
 import morepath
-import pylru
 import traceback
 import random
 import sys
@@ -218,29 +217,8 @@ class Framework(
             a really long, really random key that you will never share
             with anyone!
 
-        :memcached_url:
-            The memcached url (default is 127.0.0.1:11211). If memcached
-            isn't running the cache will not be used, though the memcached
-            server can be started at any time at which point the application
-            will connect to it again.
-
-        :cache_connections:
-            The maximum number of connections to the cache that are available.
-            Defaults to 100. This is mostly relevant for memcached, though
-            it works for all kinds of caches.
-
-            This limit prevents a sophisticated attacker from starting a denial
-            of service attack should he figure out a way to spawn lots of
-            applications.
-
-            Normally you want the combined memcached connection limit of all
-            configured applications to be lower than the actual connection
-            limit configured on memcached.
-
-        :disable_memcached:
-            If True, memcache will not be used. The cache will be entirely in
-            the memory of the current process (so no sharing between multiple
-            processes).
+        :redis_url:
+            The redis url used (default is 'redis://localhost:6379/0').
 
         :file_storage:
             The file_storage module to use. See
@@ -349,24 +327,8 @@ class Framework(
             self.session_manager = SessionManager(
                 self.dsn, cfg.get('base', Base))
 
-    def configure_memcached(self, **cfg):
-
-        self.memcached_url = cfg.get('memcached_url', '127.0.0.1:11211')
-        self.cache_connections = int(cfg.get('cache_connections', 100))
-
-        def on_cache_ejected(key, value):
-            getattr(value, 'disconnect_all', lambda: None)()
-
-        self._caches = pylru.lrucache(self.cache_connections, on_cache_ejected)
-
-        if cfg.get('disable_memcached', False):
-            self.cache_backend = 'dogpile.cache.memory'
-            self.cache_backend_arguments = {}
-        else:
-            self.cache_backend = 'onegov.core.memcached'
-            self.cache_backend_arguments = {
-                'url': self.memcached_url,
-            }
+    def configure_redis(self, **cfg):
+        self.redis_url = cfg.get('redis_url', 'redis://127.0.0.1:6379/0')
 
     def configure_secrets(self, **cfg):
 
@@ -477,43 +439,24 @@ class Framework(
             if not self.is_orm_cache_setup:
                 self.setup_orm_cache()
 
-    def get_cache(self, namespace, expiration_time=None, backend=None,
-                  backend_args=None):
-        """ Creates a new cache backend for this application or reuses an
-        existing one. Each backend is bound to a namespace and has its own
-        expiration time (ttl).
-
-        Once the `cache_connections` limit defined in
-        :meth:`configure_application` is reached, the backends are removed,
-        with the least recently used one being discarded first.
-
-        """
-
-        if namespace not in self._caches:
-            backend = backend or self.cache_backend
-            backend_args = backend_args or self.cache_backend_arguments
-
-            if backend == 'dogpile.cache.memory':
-                expiration_time = backend_args = None
-
-            self._caches[namespace] = cache.create_backend(
-                namespace=namespace,
-                expiration_time=expiration_time,
-                backend=backend,
-                arguments=backend_args,
-            )
-
-        return self._caches[namespace]
+    def get_cache(self, name, expiration_time):
+        """ Gets a cache bound to this application id. """
+        return cache.get(
+            namespace=f'{self.application_id}:{name}',
+            expiration_time=expiration_time,
+            redis_url=self.redis_url
+        )
 
     @property
     def session_cache(self):
-        """ A cache that is kept for as long as possible. """
-        return self.get_cache(self.application_id + ':s')
+        """ A cache that is kept for a long-ish time. """
+        day = 60 * 60 * 24
+        return self.get_cache('sessions', expiration_time=7 * day)
 
     @property
     def cache(self):
         """ A cache that might be invalidated frequently. """
-        return self.get_cache(self.application_id + ':x', expiration_time=3600)
+        return self.get_cache('short-term', expiration_time=3600)
 
     @property
     def settings(self):

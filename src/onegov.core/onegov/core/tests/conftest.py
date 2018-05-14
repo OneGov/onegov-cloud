@@ -28,7 +28,7 @@ def cli(request):
 
 
 @pytest.fixture(scope='function')
-def cli_config(postgres_dsn, temporary_directory):
+def cli_config(postgres_dsn, redis_url, temporary_directory):
     cfg = {
         'applications': [
             {
@@ -36,7 +36,8 @@ def cli_config(postgres_dsn, temporary_directory):
                 'application': 'onegov.core.Framework',
                 'namespace': 'foobar',
                 'configuration': {
-                    'dsn': postgres_dsn
+                    'dsn': postgres_dsn,
+                    'redis_url': redis_url,
                 }
             }
         ]

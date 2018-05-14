@@ -77,7 +77,7 @@ def test_non_5_minutes_cronjobs():
         App.commit()
 
 
-def test_cronjobs_integration(postgres_dsn):
+def test_cronjobs_integration(postgres_dsn, redis_url):
 
     result = 0
     cronjobs.CRONJOB_POLL_RESOLUTION = 1
@@ -101,7 +101,11 @@ def test_cronjobs_integration(postgres_dsn):
     scan_morepath_modules(App)
 
     app = App()
-    app.configure_application(dsn=postgres_dsn, base=declarative_base())
+    app.configure_application(
+        dsn=postgres_dsn,
+        base=declarative_base(),
+        redis_url=redis_url
+    )
     app.namespace = 'municipalities'
     app.set_application_id('municipalities/new-york')
 
@@ -122,7 +126,7 @@ def test_cronjobs_integration(postgres_dsn):
     assert result == 1
 
 
-def test_disable_cronjobs():
+def test_disable_cronjobs(redis_url):
 
     class App(Framework):
         pass
@@ -146,7 +150,7 @@ def test_disable_cronjobs():
     scan_morepath_modules(App)
 
     app = App()
-    app.configure_application()
+    app.configure_application(redis_url=redis_url)
     app.namespace = 'municipalities'
     app.set_application_id('municipalities/new-york')
 

@@ -118,25 +118,27 @@ def test_upgrade_duplicate_function_names():
         get_tasks([('foo', Foo), ('bar', Bar)])
 
 
-def test_upgrade_cli(postgres_dsn, session_manager, temporary_directory):
+def test_upgrade_cli(postgres_dsn, session_manager, temporary_directory,
+                     redis_url):
 
     config = os.path.join(temporary_directory, 'test.yml')
     with open(config, 'w') as cfg:
-        cfg.write(textwrap.dedent("""\
+        cfg.write(textwrap.dedent(f"""\
             applications:
                 - path: /foo/*
                   application: onegov.core.framework.Framework
                   namespace: foo
                   configuration:
-                    dsn: {}
+                    dsn: {postgres_dsn}
+                    redis_url: {redis_url}
                     identity_secure: False
                     identity_secret: asdf
                     csrf_secret: asdfasdf
                     filestorage: fs.osfs.OSFS
                     filestorage_options:
-                      root_path: '{}/file-storage'
+                      root_path: '{temporary_directory}/file-storage'
                       create: true
-        """.format(postgres_dsn, temporary_directory)))
+        """))
 
     session_manager.ensure_schema_exists("foo-bar")
     session_manager.ensure_schema_exists("foo-fah")
@@ -226,25 +228,27 @@ def test_upgrade_cli(postgres_dsn, session_manager, temporary_directory):
             assert result.exit_code == 0
 
 
-def test_raw_upgrade_cli(postgres_dsn, session_manager, temporary_directory):
+def test_raw_upgrade_cli(postgres_dsn, session_manager, temporary_directory,
+                         redis_url):
 
     config = os.path.join(temporary_directory, 'test.yml')
     with open(config, 'w') as cfg:
-        cfg.write(textwrap.dedent("""\
+        cfg.write(textwrap.dedent(f"""\
             applications:
                 - path: /foo/*
                   application: onegov.core.framework.Framework
                   namespace: foo
                   configuration:
-                    dsn: {}
+                    dsn: {postgres_dsn}
+                    redis_url: {redis_url}
                     identity_secure: False
                     identity_secret: asdf
                     csrf_secret: asdfasdf
                     filestorage: fs.osfs.OSFS
                     filestorage_options:
-                      root_path: '{}/file-storage'
+                      root_path: '{temporary_directory}/file-storage'
                       create: true
-        """.format(postgres_dsn, temporary_directory)))
+        """))
 
     session_manager.ensure_schema_exists("foo-bar")
     session_manager.ensure_schema_exists("foo-fah")

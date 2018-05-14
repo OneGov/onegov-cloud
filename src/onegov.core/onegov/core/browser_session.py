@@ -1,5 +1,33 @@
 from contextlib import suppress
 from dogpile.cache.api import NO_VALUE
+from hashlib import blake2b
+
+
+class Prefixed(object):
+
+    def __init__(self, prefix, cache):
+        assert len(prefix) >= 24
+
+        self.prefix = prefix
+        self.cache = cache
+
+    def mangle(self, key):
+        assert key
+        return f'{self.prefix}:{key}'
+
+    def get(self, key):
+        return self.cache.get(self.mangle(key))
+
+    def set(self, key, value):
+        return self.cache.set(self.mangle(key), value)
+
+    def delete(self, key):
+        return self.cache.delete(self.mangle(key))
+
+    def flush(self):
+        return self.cache.backend.proxied.client.eval("""
+            return redis.call('del', unpack(redis.call('keys', ARGV[1])))
+        """, 0, f'*:{self.prefix}:*')
 
 
 class BrowserSession(object):
@@ -23,33 +51,21 @@ class BrowserSession(object):
 
     """
 
-    def __init__(self, namespace, token, cache, on_dirty=None):
-        self._namespace = namespace
+    def __init__(self, cache, token, on_dirty=lambda token: None):
+
+        # make it impossible to get the session token through key listing
+        prefix = blake2b(token.encode('utf-8'), digest_size=24).hexdigest()
+        self._cache = Prefixed(prefix=prefix, cache=cache)
         self._token = token
-        self._cache = cache
-        self._on_dirty = on_dirty or self._on_dirty
+
         self._is_dirty = False
-
-    def _on_dirty(self, namespace, token):
-        """ Called when the browser session gets dirty. That is, the first time
-        a change is made to the cache.
-
-        Use ``on_dirty`` in the :meth:`__init__` method to override.
-
-        """
-        pass
-
-    def mangle(self, name):
-        """ Takes the given name and returns a key bound to the namespace and
-        token.
-
-        """
-        assert name  # may not be empty or None
-        return ':'.join((self._namespace, self._token, name))
+        self._on_dirty = on_dirty
 
     def has(self, name):
-        """ Returns true if the given name exists in the cache. """
-        return self._cache.get(self.mangle(name)) is not NO_VALUE
+        return self._cache.get(name) is not NO_VALUE
+
+    def flush(self):
+        return self._cache.flush()
 
     def pop(self, name, default=None):
         """ Returns the value for the given name, removing the value in
@@ -69,52 +85,48 @@ class BrowserSession(object):
 
         return value
 
+    def mark_as_dirty(self):
+        if not self._is_dirty:
+            self._on_dirty(self._token)
+            self._is_dirty = True
+
     def get(self, name, default=None):
-        value = self._cache.get(self.mangle(name))
-
-        if value is NO_VALUE:
-            return default
-        else:
-            return value
-
-    def __getattr__(self, name):
-        result = self._cache.get(self.mangle(name))
+        result = self._cache.get(name)
 
         if result is NO_VALUE:
-            raise AttributeError
-        else:
-            return result
+            return default
 
-    def __setattr__(self, name, value):
-        if name.startswith('_'):
-            super().__setattr__(name, value)
-        else:
-            self._cache.set(self.mangle(name), value)
+        return result
 
-            if not self._is_dirty:
-                self._on_dirty(self._namespace, self._token)
-
-            self._is_dirty = True
-
-    def __delattr__(self, name):
-        if name.startswith('_'):
-            super().__delattr__(name)
-        else:
-            self._cache.delete(self.mangle(name))
-
-            if not self._is_dirty:
-                self._on_dirty(self._namespace, self._token)
-
-            self._is_dirty = True
-
-    # act like a dict
     def __getitem__(self, name, *args):
-        result = self._cache.get(self.mangle(name))
+        result = self._cache.get(name)
 
         if result is NO_VALUE:
             raise KeyError
-        else:
-            return result
+
+        return result
+
+    def __getattr__(self, name):
+        result = self._cache.get(name)
+
+        if result is NO_VALUE:
+            raise AttributeError
+
+        return result
+
+    def __setattr__(self, name, value):
+        if name.startswith('_'):
+            return super().__setattr__(name, value)
+
+        self._cache.set(name, value)
+        self.mark_as_dirty()
+
+    def __delattr__(self, name):
+        if name.startswith('_'):
+            return super().__delattr__(name)
+
+        self._cache.delete(name)
+        self.mark_as_dirty()
 
     __setitem__ = __setattr__
     __delitem__ = __delattr__

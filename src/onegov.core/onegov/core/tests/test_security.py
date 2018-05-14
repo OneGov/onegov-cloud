@@ -7,7 +7,7 @@ from onegov.core.security import forget, remembered
 from webtest import TestApp as Client
 
 
-def spawn_basic_permissions_app():
+def spawn_basic_permissions_app(redis_url):
 
     class App(Framework):
         pass
@@ -70,14 +70,14 @@ def spawn_basic_permissions_app():
 
     app = App()
     app.namespace = 'test'
-    app.configure_application(identity_secure=False, disable_memcached=True)
+    app.configure_application(identity_secure=False, redis_url=redis_url)
     app.set_application_id('test/app')
 
     return app
 
 
-def test_anonymous_access():
-    client = Client(spawn_basic_permissions_app())
+def test_anonymous_access(redis_url):
+    client = Client(spawn_basic_permissions_app(redis_url))
 
     assert client.get('/public').text == 'public'
     assert client.get('/personal', expect_errors=True).status_code == 403
@@ -87,8 +87,8 @@ def test_anonymous_access():
     assert client.get('/hidden', expect_errors=True).status_code == 403
 
 
-def test_personal_access():
-    client = Client(spawn_basic_permissions_app())
+def test_personal_access(redis_url):
+    client = Client(spawn_basic_permissions_app(redis_url))
     # use the userid 'admin' to be sure that we don't let it matter
     client.post('/login', {'userid': 'admin', 'role': 'member'})
 
@@ -100,8 +100,8 @@ def test_personal_access():
     assert client.get('/hidden', expect_errors=True).status_code == 403
 
 
-def test_private_access():
-    client = Client(spawn_basic_permissions_app())
+def test_private_access(redis_url):
+    client = Client(spawn_basic_permissions_app(redis_url))
     # use the userid 'admin' to be sure that we don't let it matter
     client.post('/login', {'userid': 'admin', 'role': 'editor'})
 
@@ -121,8 +121,8 @@ def test_private_access():
     assert client.get('/hidden', expect_errors=True).status_code == 403
 
 
-def test_secret_access():
-    client = Client(spawn_basic_permissions_app())
+def test_secret_access(redis_url):
+    client = Client(spawn_basic_permissions_app(redis_url))
     # use the userid 'editor' to be sure that we don't let it matter
     client.post('/login', {'userid': 'editor', 'role': 'admin'})
 
@@ -142,8 +142,8 @@ def test_secret_access():
     assert client.get('/hidden', expect_errors=True).status_code == 403
 
 
-def test_secure_cookie():
-    app = spawn_basic_permissions_app()
+def test_secure_cookie(redis_url):
+    app = spawn_basic_permissions_app(redis_url)
     app.identity_secure = True
 
     client = Client(app)
@@ -156,8 +156,8 @@ def test_secure_cookie():
     assert cookie.secure
 
 
-def test_forget():
-    app = spawn_basic_permissions_app()
+def test_forget(redis_url):
+    app = spawn_basic_permissions_app(redis_url)
     client = Client(app)
     response = client.post('/login', {'userid': 'user', 'role': 'admin'})
 

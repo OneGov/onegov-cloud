@@ -11,7 +11,7 @@ from translationstring import TranslationStringFactory
 from webtest import TestApp as Client
 
 
-def test_chameleon_with_translation(temporary_directory):
+def test_chameleon_with_translation(temporary_directory, redis_url):
     # Test chameleon in a real scenario with templating and translations
 
     templates = os.path.join(temporary_directory, 'templates')
@@ -90,7 +90,7 @@ def test_chameleon_with_translation(temporary_directory):
 
     app = App()
     app.namespace = 'foo'
-    app.configure_application(disable_memcached=True)
+    app.configure_application(redis_url=redis_url)
     app.set_application_id('foo/bar')
 
     client = Client(app)
@@ -104,7 +104,7 @@ def test_chameleon_with_translation(temporary_directory):
     assert '<i>Makro</i>' in client.get('/macro').text
 
 
-def test_inject_default_vars(temporary_directory):
+def test_inject_default_vars(temporary_directory, redis_url):
 
     templates = os.path.join(temporary_directory, 'templates')
     os.mkdir(templates)
@@ -161,12 +161,12 @@ def test_inject_default_vars(temporary_directory):
 
     parent = Parent()
     parent.namespace = 'foo'
-    parent.configure_application(disable_memcached=True)
+    parent.configure_application(redis_url=redis_url)
     parent.set_application_id('foo/parent')
 
     child = Child()
     child.namespace = 'foo'
-    child.configure_application(disable_memcached=True)
+    child.configure_application(redis_url=redis_url)
     child.set_application_id('foo/child')
 
     parent_page = Client(parent).get('/')
@@ -182,7 +182,7 @@ def test_inject_default_vars(temporary_directory):
     assert 'niño' in child_page
 
 
-def test_macro_lookup(temporary_directory):
+def test_macro_lookup(temporary_directory, redis_url):
 
     parent = os.path.join(temporary_directory, 'parent')
     child = os.path.join(temporary_directory, 'child')
@@ -267,7 +267,7 @@ def test_macro_lookup(temporary_directory):
 
     child = Child()
     child.namespace = 'foo'
-    child.configure_application(disable_memcached=True)
+    child.configure_application(redis_url=redis_url)
     child.set_application_id('foo/child')
 
     page = Client(child).get('/')

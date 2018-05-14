@@ -35,7 +35,7 @@ def test_static_file(temporary_directory):
     assert StaticFile.from_application(app, '../robots.txt') is None
 
 
-def test_static_file_app(temporary_directory):
+def test_static_file_app(temporary_directory, redis_url):
 
     class App(Framework):
         serve_static_files = True
@@ -51,7 +51,7 @@ def test_static_file_app(temporary_directory):
         f.write('foobar')
 
     app = App()
-    app.configure_application()
+    app.configure_application(redis_url=redis_url)
     app.namespace = 'test'
     app.set_application_id('test/test')
 
@@ -70,7 +70,7 @@ def test_static_file_app(temporary_directory):
     assert c.get('/static/humans.txt', expect_errors=True).status_code == 404
 
 
-def test_root_file_app(temporary_directory):
+def test_root_file_app(temporary_directory, redis_url):
     class App(Framework):
         serve_static_files = True
 
@@ -92,7 +92,7 @@ def test_root_file_app(temporary_directory):
         f.write('foobar')
 
     app = App()
-    app.configure_application()
+    app.configure_application(redis_url=redis_url)
     app.namespace = 'test'
     app.set_application_id('test/test')
 
@@ -100,7 +100,7 @@ def test_root_file_app(temporary_directory):
     assert c.get('/robots.txt').text == 'foobar'
 
 
-def test_static_files_directive(temporary_directory):
+def test_static_files_directive(temporary_directory, redis_url):
 
     a = os.path.join(temporary_directory, 'a')
     b = os.path.join(temporary_directory, 'b')
@@ -135,7 +135,7 @@ def test_static_files_directive(temporary_directory):
     app_b = B()
 
     for app in (app_a, app_b):
-        app.configure_application()
+        app.configure_application(redis_url=redis_url)
         app.namespace = 'test'
         app.set_application_id('test/test')
 

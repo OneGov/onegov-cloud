@@ -17,8 +17,7 @@ Properties defined in this way are accessible through the instance::
     app.users
 
 If there are any changes to the users table, the cache is removed. Since the
-cache is usually a shared memcached instance, this works for multiple
-processes.
+cache is usually a shared redis instance, this works for multiple processes.
 
 """
 

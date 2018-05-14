@@ -29,7 +29,7 @@ def test_get_filename():
     assert get_filename(theme, {'x': 1}) != get_filename(theme, {'x': 2})
 
 
-def test_theme_application(temporary_directory):
+def test_theme_application(temporary_directory, redis_url):
 
     class App(Framework):
         theme_options = {
@@ -58,6 +58,7 @@ def test_theme_application(temporary_directory):
 
     app = App()
     app.configure_application(
+        redis_url=redis_url,
         filestorage='fs.osfs.OSFS',
         filestorage_options={
             'root_path': temporary_directory

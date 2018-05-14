@@ -54,7 +54,7 @@ def test_configure():
     assert app.configured == ['a', 'b']
 
 
-def test_virtual_host_request():
+def test_virtual_host_request(redis_url):
 
     class App(Framework):
         pass
@@ -77,7 +77,7 @@ def test_virtual_host_request():
 
     app = App()
     app.namespace = 'foo'
-    app.configure_application(disable_memcached=True)
+    app.configure_application(redis_url=redis_url)
     app.set_application_id('foo/bar')
 
     c = Client(app)
@@ -132,7 +132,7 @@ def test_registered_upgrade_tasks(postgres_dsn):
     assert app.session().query(UpgradeState).count() > 0
 
 
-def test_browser_session_request():
+def test_browser_session_request(redis_url):
 
     class App(Framework):
         pass
@@ -162,7 +162,7 @@ def test_browser_session_request():
 
     app = App()
     app.application_id = 'test'
-    app.configure_application(identity_secure=False)  # allow http
+    app.configure_application(identity_secure=False, redis_url=redis_url)
 
     app.cache_backend = 'dogpile.cache.memory'
     app.cache_backend_arguments = {}
@@ -189,7 +189,7 @@ def test_browser_session_request():
     c1.get('/status').text == 'logged in'
 
 
-def test_browser_session_dirty():
+def test_browser_session_dirty(redis_url):
 
     class App(Framework):
         pass
@@ -210,7 +210,7 @@ def test_browser_session_dirty():
 
     app = App()
     app.application_id = 'test'
-    app.configure_application(identity_secure=False)  # allow http
+    app.configure_application(identity_secure=False, redis_url=redis_url)
 
     app.cache_backend = 'dogpile.cache.memory'
     app.cache_backend_arguments = {}
@@ -232,7 +232,7 @@ def test_browser_session_dirty():
     assert client.cookies['session_id'] == old_session_id
 
 
-def test_request_messages():
+def test_request_messages(redis_url):
 
     class App(Framework):
         pass
@@ -260,7 +260,7 @@ def test_request_messages():
 
     app = App()
     app.application_id = 'test'
-    app.configure_application(identity_secure=False)  # allow http
+    app.configure_application(identity_secure=False, redis_url=redis_url)
 
     app.cache_backend = 'dogpile.cache.memory'
     app.cache_backend_arguments = {}
@@ -291,7 +291,7 @@ def test_request_messages():
     assert len(messages) == 0
 
 
-def test_fix_webassets_url():
+def test_fix_webassets_url(redis_url):
 
     import onegov.core
     import more.transaction
@@ -321,7 +321,10 @@ def test_fix_webassets_url():
             {
                 'path': '/towns/*',
                 'application': App,
-                'namespace': 'towns'
+                'namespace': 'towns',
+                'configuration': {
+                    'redis_url': redis_url
+                }
             }
         ]
     }))
@@ -395,7 +398,7 @@ def test_csrf_secret_key():
     app.configure_application(identity_secret='x', csrf_secret='y')
 
 
-def test_csrf():
+def test_csrf(redis_url):
 
     class MyForm(Form):
         name = StringField('Name')
@@ -423,8 +426,8 @@ def test_csrf():
     app.application_id = 'test'
     app.configure_application(
         identity_secure=False,
-        disable_memcached=True,
-        csrf_time_limit=60
+        csrf_time_limit=60,
+        redis_url=redis_url
     )
 
     client = Client(app)
@@ -437,7 +440,7 @@ def test_csrf():
         assert client.post('/', {'csrf_token': csrf_token}).text == 'fail'
 
 
-def test_get_form():
+def test_get_form(redis_url):
 
     class PlainForm(Form):
         called = False
@@ -471,8 +474,8 @@ def test_get_form():
     app.application_id = 'test'
     app.configure_application(
         identity_secure=False,
-        disable_memcached=True,
-        csrf_time_limit=60
+        csrf_time_limit=60,
+        redis_url=redis_url,
     )
 
     client = Client(app)
@@ -480,7 +483,7 @@ def test_get_form():
     assert client.get('/on-request').text == 'called'
 
 
-def test_get_localized_form():
+def test_get_localized_form(redis_url):
 
     class LocalizedForm(Form):
         name = StringField('Name', validators=[InputRequired()])
@@ -506,8 +509,8 @@ def test_get_localized_form():
     app.application_id = 'test'
     app.configure_application(
         identity_secure=False,
-        disable_memcached=True,
-        csrf_time_limit=60
+        csrf_time_limit=60,
+        redis_url=redis_url
     )
 
     client = Client(app)
@@ -847,7 +850,7 @@ def test_object_by_path():
     assert app.object_by_path('/asdf/asdf') is None
 
 
-def test_send_email_transaction(smtp):
+def test_send_email_transaction(smtp, redis_url):
 
     import more.transaction
     import more.webassets
@@ -885,7 +888,7 @@ def test_send_email_transaction(smtp):
 
     app = App()
     app.application_id = 'test'
-    app.configure_application(identity_secure=False)  # allow http
+    app.configure_application(identity_secure=False, redis_url=redis_url)
     app.mail = {
         'marketing': {
             'host': smtp.address[0],
@@ -1006,7 +1009,15 @@ def test_send_zulip(session):
         }
 
 
-def test_generic_redirect():
+def test_generic_redirect(redis_url):
+
+    import more.transaction
+    import more.webassets
+    import onegov.core
+
+    morepath.scan(more.transaction)
+    morepath.scan(more.webassets)
+    morepath.scan(onegov.core)
 
     class App(Framework):
         pass
@@ -1022,10 +1033,9 @@ def test_generic_redirect():
     App.commit()
 
     app = App()
-    app.application_id = 'test'
-    app.configure_application(identity_secure=False)
-    app.cache_backend = 'dogpile.cache.memory'
-    app.cache_backend_arguments = {}
+    app.namespace = 'test'
+    app.configure_application(identity_secure=False, redis_url=redis_url)
+    app.set_application_id('test/test')
 
     client = Client(app)
 

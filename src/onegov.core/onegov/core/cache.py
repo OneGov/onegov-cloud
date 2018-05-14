@@ -35,53 +35,36 @@ eventually be discarded by memcache if the cache is full).
 """
 
 import dill
-import libmc
+import redis.exceptions
 
+from contextlib import suppress
 from fastcache import clru_cache as lru_cache  # noqa
-from dogpile.cache import make_region, register_backend
-from dogpile.cache.backends.memcached import GenericMemcachedBackend
+from dogpile.cache import make_region
 from dogpile.cache.api import NO_VALUE
 from dogpile.cache.proxy import ProxyBackend
-from hashlib import sha1
+from redis import ConnectionPool
 
 
-class MemcachedBackend(GenericMemcachedBackend):
-    """ A custom memcached backend used to pick custom memcached clients. """
+@lru_cache(maxsize=1024)
+def get(namespace, expiration_time, redis_url):
 
-    def _create_client(self):
-        return libmc.Client(self.url)
+    def key_mangler(key):
+        return f'{namespace}:{key}'.encode('utf-8')
 
-    def _imports(self):
-        import libmc  # noqa
-
-
-register_backend(
-    'onegov.core.memcached',
-    'onegov.core.cache',
-    'MemcachedBackend'
-)
-
-
-def create_backend(namespace, backend, arguments={}, expiration_time=None):
-
-    prefix = '{}:'.format(namespace)
-
-    return make_region(key_mangler=prefix_key_mangler(prefix)).configure(
-        backend,
-        expiration_time=expiration_time,
-        arguments=arguments,
+    return make_region(key_mangler=key_mangler).configure(
+        'dogpile.cache.redis',
+        arguments={
+            'url': redis_url,
+            'redis_expiration_time': expiration_time + 1,
+            'connection_pool': get_pool(redis_url)
+        },
         wrap=(DillSerialized, )
     )
 
 
-def prefix_key_mangler(prefix):
-
-    prefix = prefix.encode('utf-8')
-
-    def key_mangler(key):
-        return sha1(prefix + key.encode('utf-8')).hexdigest()
-
-    return key_mangler
+@lru_cache(maxsize=16)
+def get_pool(redis_url):
+    return ConnectionPool.from_url(redis_url)
 
 
 class DillSerialized(ProxyBackend):

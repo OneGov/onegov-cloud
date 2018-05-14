@@ -25,9 +25,7 @@ class IdentityPolicy(object):
             request.browser_session[key] = getattr(identity, key)
 
     def forget(self, response, request):
-        for key in self.required_keys:
-            if request.browser_session.has(key):
-                del request.browser_session[key]
+        request.browser_session.flush()
 
 
 @Framework.identity_policy()
@@ -49,10 +47,8 @@ def forget(app, session_id):
 
     """
 
-    session = BrowserSession(app.application_id, session_id, app.session_cache)
-    for key in IdentityPolicy.required_keys:
-        if session.has(key):
-            del session[key]
+    session = BrowserSession(app.session_cache, session_id)
+    session.flush()
 
 
 def remembered(app, session_id):
@@ -60,7 +56,7 @@ def remembered(app, session_id):
     browser session.
 
     """
-    session = BrowserSession(app.application_id, session_id, app.session_cache)
+    session = BrowserSession(app.session_cache, session_id)
     for key in IdentityPolicy.required_keys:
         if session.has(key):
             return True

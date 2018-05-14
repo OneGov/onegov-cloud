@@ -43,7 +43,7 @@ def test_independence(temporary_directory):
         os.path.join(temporary_directory, 'tests-bar/document.txt'))
 
 
-def test_filestorage(temporary_directory):
+def test_filestorage(temporary_directory, redis_url):
 
     class App(Framework):
         pass
@@ -85,7 +85,7 @@ def test_filestorage(temporary_directory):
             'root_path': temporary_directory
         },
         identity_secure=False,
-        disable_memcached=True
+        redis_url=redis_url
     )
     app.namespace = 'tests'
     app.set_application_id('tests/foo')

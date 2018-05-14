@@ -241,7 +241,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         else:
             session_id = random_token()
 
-        def on_dirty(namespace, token):
+        def on_dirty(token):
             self.cookies['session_id'] = self.app.sign(token)
 
             @self.after
@@ -254,9 +254,8 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
                 )
 
         return self.app.modules.browser_session.BrowserSession(
-            namespace=self.app.application_id,
-            token=session_id,
             cache=self.app.session_cache,
+            token=session_id,
             on_dirty=on_dirty
         )
 

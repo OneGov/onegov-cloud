@@ -5,7 +5,7 @@ from webtest import TestApp as Client
 from wtforms import Form
 
 
-def test_form_directive():
+def test_form_directive(redis_url):
 
     class App(Framework):
         pass
@@ -42,10 +42,7 @@ def test_form_directive():
 
     app = App()
     app.application_id = 'test'
-    app.configure_application(
-        identity_secure=False,
-        disable_memcached=True
-    )
+    app.configure_application(identity_secure=False, redis_url=redis_url)
 
     client = Client(app)
     assert client.get('/').text == '1 GET http://localhost/'
@@ -61,7 +58,7 @@ def test_form_directive():
     assert client.post('/3', expect_errors=True).status_code == 403
 
 
-def test_query_form_class():
+def test_query_form_class(redis_url):
 
     class FormA(Form):
         pass
@@ -103,10 +100,7 @@ def test_query_form_class():
 
     app = App()
     app.application_id = 'test'
-    app.configure_application(
-        identity_secure=False,
-        disable_memcached=True
-    )
+    app.configure_application(identity_secure=False, redis_url=redis_url)
 
     client = Client(app)
     assert client.get('/assert-form-a')

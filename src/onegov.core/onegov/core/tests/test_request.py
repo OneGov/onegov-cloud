@@ -68,7 +68,7 @@ def test_return_to_mixin():
     assert r.redirect('http://safe').location == 'http://safe'
 
 
-def test_return_to():
+def test_return_to(redis_url):
 
     class App(Framework):
         pass
@@ -89,10 +89,7 @@ def test_return_to():
 
     app = App()
     app.application_id = 'test'
-    app.configure_application(
-        identity_secure=False,
-        disable_memcached=True
-    )
+    app.configure_application(identity_secure=False, redis_url=redis_url)
 
     c = Client(app)
     do_something_url = c.get('/').text
@@ -101,7 +98,7 @@ def test_return_to():
     assert c.get('/do-something').location == 'http://localhost/default'
 
 
-def test_has_permission():
+def test_has_permission(redis_url):
 
     class App(Framework):
         pass
@@ -148,10 +145,7 @@ def test_has_permission():
     app = App()
 
     app.application_id = 'test'
-    app.configure_application(
-        identity_secure=False,
-        disable_memcached=True
-    )
+    app.configure_application(identity_secure=False, redis_url=redis_url)
 
     c = Client(app)
     assert c.get('/?permission=public').text == 'true'
@@ -167,7 +161,7 @@ def test_has_permission():
     assert c.get('/?permission=secret').text == 'true'
 
 
-def test_permission_by_view():
+def test_permission_by_view(redis_url):
     class App(Framework):
         pass
 
@@ -215,10 +209,7 @@ def test_permission_by_view():
     app = App()
 
     app.application_id = 'test'
-    app.configure_application(
-        identity_secure=False,
-        disable_memcached=True
-    )
+    app.configure_application(identity_secure=False, redis_url=redis_url)
 
     c = Client(app)
 
