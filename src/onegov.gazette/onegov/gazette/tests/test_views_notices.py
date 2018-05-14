@@ -5,6 +5,7 @@ from onegov.gazette.tests.common import login_editor_1
 from onegov.gazette.tests.common import login_editor_2
 from onegov.gazette.tests.common import login_editor_3
 from onegov.gazette.tests.common import login_publisher
+from onegov.gazette.tests.common import login_users
 from transaction import commit
 from unittest.mock import patch
 from urllib.parse import parse_qs
@@ -589,6 +590,62 @@ def test_view_notices_statistics(gazette_app):
         ['Gruppe', 'Anzahl'],
         ['B', 4],
         ['C', 3],
+    ]
+
+
+def test_view_notices_statistics_rejected(gazette_app):
+    admin, editor_1, editor_2, editor_3, publisher = login_users(gazette_app)
+
+    def statistic():
+        result_html = publisher.get('/notices/drafted/statistics')
+        result_html = result_html.pyquery('.statistics-rejected tbody td')
+        result_html = [
+            [result_html[index].text, int(result_html[index + 1].text)]
+            for index in range(0, len(result_html), 2)
+        ]
+
+        result_xslx = publisher.get('/notices/drafted/statistics-xlsx')
+        book = open_workbook(file_contents=result_xslx.body)
+        sheet = book.sheet_by_name('Zurückgewiesen')
+        result_xslx = [
+            [sheet.cell(row, 0).value, int(sheet.cell(row, 1).value)]
+            for row in range(1, sheet.nrows)
+        ]
+
+        assert result_html == result_xslx
+        return result_html
+
+    assert statistic() == []
+
+    # Add notices
+    with freeze_time("2017-11-01 11:00"):
+        for user in 5 * [editor_1] + 2 * [editor_2] + 3 * [editor_3]:
+            manage = user.get('/notices/drafted/new-notice')
+            manage.form['title'] = "Titel"
+            manage.form['organization'] = '100'
+            manage.form['category'] = '13'
+            manage.form['text'] = "Text"
+            manage.form['author_place'] = 'Govikon'
+            manage.form['author_name'] = 'State Chancellerist'
+            manage.form['author_date'] = '2019-01-01'
+            manage.form['issues'] = ['2017-44']
+            manage = manage.form.submit().maybe_follow()
+            manage = manage.click("Einreichen").form.submit()
+            assert "Meldung eingereicht" in manage.maybe_follow()
+
+    assert statistic() == []
+
+    with freeze_time("2017-11-01 12:00"):
+        for url in publisher.get('/notices/submitted').pyquery('td a'):
+            manage = publisher.get(url.attrib['href']).click("Zurückweisen")
+            manage.form['comment'] = 'XYZ'
+            manage = manage.form.submit()
+            assert "Meldung zurückgewiesen" in manage.maybe_follow()
+
+    assert statistic() == [
+        ['First Editor', 5],
+        ['Third Editor', 3],
+        ['Second Editor', 2],
     ]
 
 

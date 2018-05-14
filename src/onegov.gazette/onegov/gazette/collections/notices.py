@@ -1,11 +1,16 @@
+from itertools import groupby
 from onegov.chat import MessageCollection
 from onegov.core.utils import groupbylist
 from onegov.gazette import _
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import Issue
+from onegov.gazette.models.notice import GazetteNoticeChange
 from onegov.notice import OfficialNoticeCollection
+from onegov.user import User
 from onegov.user import UserGroup
 from sqlalchemy import func
+from sqlalchemy import or_
+from sqlalchemy import String
 from uuid import uuid4
 
 
@@ -269,3 +274,44 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
             )
             for group in groupbylist(result, lambda a: a[0])
         ]
+
+    def count_rejected(self):
+        """ Returns the number of rejected notices by user.
+
+        Returns a tuple ``(user name, number of rejections)``
+        for each user. Does not filter by the state of the collection.
+
+        """
+
+        query = self.session.query(
+            GazetteNoticeChange.channel_id,
+            GazetteNoticeChange.meta['event'],
+            GazetteNoticeChange.owner,
+            GazetteNoticeChange.meta['user_name']
+        )
+        query = query.filter(
+            or_(
+                GazetteNoticeChange.meta['event'] == 'rejected',
+                GazetteNoticeChange.meta['event'] == 'submitted'
+            )
+        )
+        query = query.order_by(
+            GazetteNoticeChange.channel_id,
+            GazetteNoticeChange.created.desc()
+        )
+
+        users = dict(
+            self.session.query(func.cast(User.id, String), User.realname).all()
+        )
+
+        result = {}
+        for id_, changes in groupby(query, lambda x: x[0]):
+            marker = False
+            for notice, state, user_id, user_name in changes:
+                if state == 'submitted':
+                    name = users.get(user_id) or user_name
+                    if marker and name:
+                        result.setdefault(name, 0)
+                        result[name] = result[name] + 1
+                marker = state == 'rejected'
+        return sorted(list(result.items()), key=lambda x: x[1], reverse=True)

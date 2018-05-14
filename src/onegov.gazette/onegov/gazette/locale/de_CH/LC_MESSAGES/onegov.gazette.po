@@ -389,7 +389,7 @@ msgstr "Nach Datum filtern"
 msgid "By Organizations"
 msgstr "Organisationen"
 
-msgid "Number of Notices"
+msgid "Count"
 msgstr "Anzahl"
 
 msgid "By Categories"

@@ -189,6 +189,7 @@ def view_notices_statistics(self, request):
         'by_organizations': self.count_by_organization(),
         'by_category': self.count_by_category(),
         'by_groups': self.count_by_group(),
+        'rejected': self.count_rejected(),
         'clear': request.link(self.for_dates(None, None), name='statistics')
     }
 
@@ -207,12 +208,13 @@ def view_notices_statistics_xlsx(self, request):
         (_("Organizations"), _("Organization"), self.count_by_organization),
         (_("Categories"), _("Category"), self.count_by_category),
         (_("Groups"), _("Group"), self.count_by_group),
+        (_("Rejected"), _("Name"), self.count_rejected),
     ):
         worksheet = workbook.add_worksheet()
         worksheet.name = request.translate(title)
         worksheet.write_row(0, 0, (
             request.translate(row),
-            request.translate(_("Number of Notices"))
+            request.translate(_("Count"))
         ))
         for index, row in enumerate(content()):
             worksheet.write_row(index + 1, 0, row)
