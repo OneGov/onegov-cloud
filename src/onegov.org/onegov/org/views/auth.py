@@ -171,7 +171,6 @@ def handle_activation(self, request):
 def view_logout(self, request):
     """ Handles the logout requests. """
 
-    request.info(_("You have been logged out."))
     return self.logout_to(request)
 
 

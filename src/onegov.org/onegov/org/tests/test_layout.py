@@ -148,7 +148,7 @@ def test_page_layout_breadcrumbs(session):
     assert links[2].attrs['href'] == 'grandma/ma'
 
 
-def test_template_layout(postgres_dsn):
+def test_template_layout(postgres_dsn, redis_url):
 
     class Mock(object):
         pass
@@ -192,7 +192,8 @@ def test_template_layout(postgres_dsn):
         dsn=postgres_dsn,
         filestorage='fs.memoryfs.MemoryFS',
         enable_elasticsearch=False,
-        depot_backend='depot.io.memory.MemoryFileStorage'
+        depot_backend='depot.io.memory.MemoryFileStorage',
+        redis_url=redis_url,
     )
     app.set_application_id('tests/foo')
 

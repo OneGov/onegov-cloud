@@ -5,7 +5,7 @@ from click.testing import CliRunner
 from onegov.org.cli import cli
 
 
-def test_manage_orgs(postgres_dsn, temporary_directory):
+def test_manage_orgs(postgres_dsn, temporary_directory, redis_url):
 
     cfg = {
         'applications': [
@@ -15,7 +15,8 @@ def test_manage_orgs(postgres_dsn, temporary_directory):
                 'namespace': 'onegov_org',
                 'configuration': {
                     'dsn': postgres_dsn,
-                    'depot_backend': 'depot.io.memory.MemoryFileStorage'
+                    'depot_backend': 'depot.io.memory.MemoryFileStorage',
+                    'redis_url': redis_url,
                 }
             }
         ]

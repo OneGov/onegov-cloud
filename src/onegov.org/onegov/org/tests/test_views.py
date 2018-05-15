@@ -190,8 +190,6 @@ def test_login(org_app):
     assert links.text() == 'Logout'
 
     index_page = client.get(links.attr('href')).follow()
-    assert "Sie wurden ausgeloggt" in index_page.text
-
     links = index_page.pyquery('.globals a.login')
     assert links.text() == 'Login'
 
