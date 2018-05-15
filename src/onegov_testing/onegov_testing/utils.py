@@ -79,7 +79,8 @@ def create_app(app_class, request, use_elasticsearch=False,
         identity_secure=False,
         memcached_url=request.getfixturevalue('memcached_url'),
         enable_elasticsearch=use_elasticsearch,
-        elasticsearch_hosts=elasticsearch_hosts
+        elasticsearch_hosts=elasticsearch_hosts,
+        redis_url=request.getfixturevalue('redis_url')
     )
 
     app.set_application_id(app.namespace + '/test')
