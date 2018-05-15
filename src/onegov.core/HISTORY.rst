@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.69.0 (2018-05-15)
+~~~~~~~~~~~~~~~~~~~
 
 - Removes memcached in favor of redis.
   [href]
