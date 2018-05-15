@@ -60,7 +60,7 @@ def test_town_valid_values(onboarding_app):
     assert "'grüen' is not a recognized color" in a
 
 
-def test_town_create(onboarding_app, temporary_directory, smtp):
+def test_town_create(onboarding_app, temporary_directory, smtp, redis_url):
     c = Client(onboarding_app)
     a = c.get('/for-towns/1')
 
@@ -96,7 +96,7 @@ def test_town_create(onboarding_app, temporary_directory, smtp):
             'create': True
         },
         identity_secure=False,
-        disable_memcached=True,
+        redis_url=redis_url,
         enable_elasticsearch=False,
         depot_backend='depot.io.memory.MemoryFileStorage'
     )

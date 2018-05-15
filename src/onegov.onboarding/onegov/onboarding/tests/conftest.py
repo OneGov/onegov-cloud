@@ -9,7 +9,7 @@ from uuid import uuid4
 
 
 @pytest.yield_fixture(scope="function")
-def onboarding_app(postgres_dsn, temporary_directory, smtp, es_url):
+def onboarding_app(postgres_dsn, temporary_directory, smtp, es_url, redis_url):
 
     scan_morepath_modules(onegov.onboarding.OnboardingApp)
     morepath.commit(onegov.onboarding.OnboardingApp)
@@ -24,8 +24,8 @@ def onboarding_app(postgres_dsn, temporary_directory, smtp, es_url):
             'create': True
         },
         identity_secure=False,
-        disable_memcached=True,
         depot_backend='depot.io.memory.MemoryFileStorage',
+        redis_url=redis_url,
         onboarding={
             'onegov.town': {
                 'namespace': 'town_' + uuid4().hex,
