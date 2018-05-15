@@ -12,7 +12,7 @@ from webtest import TestApp as Client
 from onegov.core.orm import Base as CoreBase
 
 
-def test_setup_database(postgres_dsn):
+def test_setup_database(postgres_dsn, redis_url):
     Base = declarative_base()
 
     class App(Framework, LibresIntegration):
@@ -36,7 +36,11 @@ def test_setup_database(postgres_dsn):
     morepath.commit(App)
 
     app = App()
-    app.configure_application(dsn=postgres_dsn, base=CoreBase)
+    app.configure_application(
+        dsn=postgres_dsn,
+        base=CoreBase,
+        redis_url=redis_url
+    )
     app.session_manager.bases.append(Base)
     app.namespace = 'libres'
     app.set_application_id('libres/foo')
@@ -104,7 +108,7 @@ def test_libres_context(postgres_dsn):
         'session_provider')
 
 
-def test_transaction_integration(postgres_dsn):
+def test_transaction_integration(postgres_dsn, redis_url):
     Base = declarative_base()
 
     class App(Framework, LibresIntegration):
@@ -138,7 +142,11 @@ def test_transaction_integration(postgres_dsn):
     morepath.commit(App)
 
     app = App()
-    app.configure_application(dsn=postgres_dsn, base=CoreBase)
+    app.configure_application(
+        dsn=postgres_dsn,
+        base=CoreBase,
+        redis_url=redis_url
+    )
     app.session_manager.bases.append(Base)
     app.namespace = 'libres'
     app.set_application_id('libres/foo')
