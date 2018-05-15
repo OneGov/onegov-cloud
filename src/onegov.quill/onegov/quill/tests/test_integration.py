@@ -7,7 +7,7 @@ from onegov.quill import QuillApp
 from webtest import TestApp as Client
 
 
-def test_integration(temporary_directory):
+def test_integration(temporary_directory, redis_url):
 
     class App(Framework, QuillApp):
         pass
@@ -29,7 +29,7 @@ def test_integration(temporary_directory):
     morepath.commit(App)
 
     app = App()
-    app.configure_application()
+    app.configure_application(redis_url=redis_url)
     app.namespace = 'foo'
     app.set_application_id('foo/bar')
 
