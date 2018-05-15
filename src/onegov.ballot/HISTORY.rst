@@ -4,6 +4,9 @@ Changelog
 - Don't use a default absolute majority (of zero).
   [msom]
 
+- Adds an upgrade step to set the a default majority types to elections.
+  [msom]
+
 3.6.0 (2018-05-07)
 ~~~~~~~~~~~~~~~~~~~
 
