@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Don't use a default absolute majority (of zero).
+  [msom]
+
 3.6.0 (2018-05-07)
 ~~~~~~~~~~~~~~~~~~~
 

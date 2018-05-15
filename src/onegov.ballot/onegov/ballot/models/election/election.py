@@ -86,7 +86,7 @@ class Election(Base, ContentMixin, TimestampMixin,
     majority_type = meta_property('majority_type')
 
     #: Absolute majority
-    absolute_majority = Column(Integer, nullable=True, default=lambda: 0)
+    absolute_majority = Column(Integer, nullable=True)
 
     @hybrid_property
     def counted(self):
