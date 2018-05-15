@@ -4,6 +4,9 @@ Changelog
 - Adds the node titles to the sankey links.
   [msom]
 
+- Uses 'mandates' for propoz elections, 'seats' for majorz elections.
+  [msom]
+
 3.4.6 (2018-05-07)
 ~~~~~~~~~~~~~~~~~~~
 

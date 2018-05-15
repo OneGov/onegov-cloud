@@ -88,7 +88,7 @@ Name|Description
 `election_date`|The date of the election (an ISO 8601 date string).
 `election_domain`|federal (`federation`), cantonal (`canton`), regional (`region`) or communal (`municipality`)
 `election_type`|proportional (`proporz`) or majority system (`majorz`)
-`election_mandates`|The number of mandates.
+`election_mandates`|The number of mandates/seats.
 `election_absolute_majority`|The absolute majority. Only relevant for elections based on majority system.
 `election_status`|Interim results (`interim`), final results (`final`) or unknown (`unknown`).
 `entity_id`|The id of the municipality/locale. A value `0` represents the expats. A value `0` represents the expats.

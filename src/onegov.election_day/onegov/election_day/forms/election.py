@@ -53,7 +53,7 @@ class ElectionForm(Form):
     )
 
     mandates = IntegerField(
-        label=_("Mandates"),
+        label=_("Mandates / Seats"),
         validators=[
             InputRequired(),
             NumberRange(min=1)

@@ -89,7 +89,7 @@ Name|Beschreibung
 `election_date`|Das Datum der Wahl (ein ISO 8601 String)
 `election_domain`|national (`federation`), kantonal (`canton`), regional (`region`) oder kommunal (`municipality`)
 `election_type`|Proporzwahl (`proporz`) oder Majorzwahl (`majorz`)
-`election_mandates`|Die Anzahl der Sitze.
+`election_mandates`|Die Anzahl der Mandate/Sitze.
 `election_absolute_majority`|Das absolute Mehr. Nur bei Majorzwahlen.
 `election_status`|Zwischenergebnisse (`interim`), Endergebnisse (`final`) oder unbekannt (`unknown`).
 `entity_id`|Die ID der Gemeinde. Der Wert `0` steht für Auslandschweizer.
@@ -107,7 +107,7 @@ Name|Beschreibung
 `entity_accounted_votes`|Die Anzahl gültiger Stimmen der Gemeinde.
 `list_name`|Der Name der Liste des Kandidierenden. Nur bei Proporzwahlen.
 `list_id`|Die ID der Liste, für welche der Kandidierende kandidiert. Nur bei Proporzwahlen.
-`list_number_of_mandates`|Die Anzahl Sitze der Liste. Nur bei Proporzwahlen.
+`list_number_of_mandates`|Die Anzahl Mandate der Liste. Nur bei Proporzwahlen.
 `list_votes`|Die Anzahl der Listenstimmen. Nur bei Proporzwahlen.
 `list_connection`|Die ID der Listenverbindung. Nur bei Proporzwahlen.
 `list_connection_parent`|Die ID der übergeordneten Listenverbidnung. Nur bei Proporzwahlen und falls es sich um eine Unterlistenverbindung handelt.

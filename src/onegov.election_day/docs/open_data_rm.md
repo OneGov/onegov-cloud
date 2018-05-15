@@ -91,7 +91,7 @@ Num|Descripziun
 `election_date`|La data da l'elecziun (sco segns ISO 8601)
 `election_domain`|sin plaun naziunal (`federation`), regiunal (`region`), chantunal (`canton`) u communal (`municipality`)
 `election_type`|elecziun da proporz (`proporz`) u elecziun da maiorz (`majorz`)
-`election_mandates`|Il dumber dals sezs.
+`election_mandates`|Il dumber dals mandats/sezs.
 `election_absolute_majority`|La maioritad absoluta. Mo tar elecziuns da maiorz.
 `election_status`|Zwischenergebnisse (`interim`), Endergebnisse (`final`) oder unbekannt (`unknown`).
 `entity_id`|La ID da la vischnanca/dal lieu. A value `0` represents the expats.
@@ -109,7 +109,7 @@ Num|Descripziun
 `entity_accounted_votes`|Il dumber da las vuschs valaivlas da la vischnanca/dal lieu.
 `list_name`|Il num da la glista da la persuna che candidescha. Mo en cas d'elecziuns da proporz.
 `list_id`|La ID da la glista, per la quala la candidata u il candidat candidescha. Mo tar elecziuns da proporz.
-`list_number_of_mandates`|Il dumber da sezs da la glista. Mo tar elecziuns da proporz.
+`list_number_of_mandates`|Il dumber da mandats da la glista. Mo tar elecziuns da proporz.
 `list_votes`|Il dumber da las vuschs da las glistas. Mo tar elecziuns da proporz.
 `list_connection`|La ID da la colliaziun da glistas. Mo tar elecziuns da proporz.
 `list_connection_parent`|La ID da la colliaziun da glistas surordinada. Mo en cas d'elecziuns da proporz e sch'i sa tracta d'ina sutcolliaziun da glistas.
@@ -136,7 +136,7 @@ Num|Descripziun
 `total_votes`|Il dumber total da las vuschs da l'elecziun.
 `name`|Il num da la partida.
 `color`|La colur da la partida.
-`mandates`|Il dumber da sezs da la partida.
+`mandates`|Il dumber da mandats da la partida.
 `votes`|Il dumber da vuschs da la partida.
 `panachage_votes_from_{XX}`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
 

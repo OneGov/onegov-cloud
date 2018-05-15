@@ -26,7 +26,8 @@
                 <thead>
                     <tr>
                         <th data-tablesaw-priority="persist" i18n:translate="" class="left-aligned">${layout.principal.label('district')}</th>
-                        <th data-tablesaw-priority="3" i18n:translate="" class="right-aligned">Mandates</th>
+                        <th data-tablesaw-priority="3" i18n:translate="" class="right-aligned" tal:condition="layout.proporz">Mandates</th>
+                        <th data-tablesaw-priority="3" i18n:translate="" class="right-aligned" tal:condition="layout.majorz">Seats</th>
                         <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">Counted</th>
                     </tr>
                 </thead>

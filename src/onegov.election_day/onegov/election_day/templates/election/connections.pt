@@ -31,7 +31,7 @@
                             <i class="fa fa-download"></i><tal:block i18n:translate="">Download</tal:block>
                         </a>
                         <figcaption i18n:translate="figcaption_connections">
-                            The diagram shows the distribution of votes and seats on list and sublists.
+                            The diagram shows the distribution of votes and mandates on list and sublists.
                             The bars on the left correspond to the list connections, the bars in the
                             middle to the sublists, the bars to the right to the lists. The width of
                             the bars and connections is proportional to the votes, blue colored bars

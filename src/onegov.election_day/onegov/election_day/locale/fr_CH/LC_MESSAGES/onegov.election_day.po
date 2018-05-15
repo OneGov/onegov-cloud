@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-02 09:13+0200\n"
-"PO-Revision-Date: 2018-04-02 09:13+0200\n"
+"POT-Creation-Date: 2018-05-15 15:53+0200\n"
+"PO-Revision-Date: 2018-05-15 15:49+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 2.0.6\n"
+"X-Generator: Poedit 2.0.7\n"
 
 msgid "Last change"
 msgstr "Actualisé"
@@ -175,8 +175,8 @@ msgstr "District unique"
 msgid "Date"
 msgstr "Date"
 
-msgid "Mandates"
-msgstr "Mandats"
+msgid "Mandates / Seats"
+msgstr "Mandats / Sièges"
 
 msgid "Shortcode"
 msgstr "Shortcode"
@@ -580,6 +580,12 @@ msgstr "Electeurs"
 msgid "Received Ballots"
 msgstr "Votes reçus"
 
+msgid "Seats"
+msgstr "Sièges"
+
+msgid "Mandates"
+msgstr "Mandats"
+
 #. Default: Voter turnout
 #.
 msgid "turnout_vote"
@@ -648,13 +654,13 @@ msgid "Download"
 msgstr "Télécharger"
 
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
-#. bars (left scale) correspond to the number of seats, the colored bars (right
-#. scale) to the voices (percentages).
+#. bars (left scale) correspond to the number of mandates, the colored bars
+#. (right scale) to the voices (percentages).
 #.
 msgid "figcaption_party_strengths"
 msgstr ""
 "Le diagramme montre les votes et les mandats des partis. Les barres à rebord "
-"(échelle de gauche) correspondent au nombre de sièges, les barres colorées "
+"(échelle de gauche) correspondent au nombre de mandats, les barres colorées "
 "(échelle de droite) aux voix (pourcentages)."
 
 msgid "Year"
@@ -746,15 +752,15 @@ msgstr "Tous les candidats"
 msgid "Elected candidates only"
 msgstr "Candidats élus seulement"
 
-#. Default: The diagram shows the distribution of votes and seats on list and
-#. sublists. The bars on the left correspond to the list connections, the bars
-#. in the middle to the sublists, the bars to the right to the lists. The width
-#. of the bars and connections is proportional to the votes, blue colored bars
-#. contain the number of mandates.
+#. Default: The diagram shows the distribution of votes and mandates on list
+#. and sublists. The bars on the left correspond to the list connections, the
+#. bars in the middle to the sublists, the bars to the right to the lists. The
+#. width of the bars and connections is proportional to the votes, blue colored
+#. bars contain the number of mandates.
 #.
 msgid "figcaption_connections"
 msgstr ""
-"Le diagramme montre la répartition des voix et des sièges sur la liste et "
+"Le diagramme montre la répartition des voix et des mandats sur la liste et "
 "les sous-listes. Les barres de gauche correspondent aux connexions de liste, "
 "les barres au milieu aux sous-listes, les barres à droite aux listes. La "
 "largeur des barres et des connexions est proportionnelle aux votes, les "

@@ -177,7 +177,11 @@ class PdfGenerator():
         )
         pdf.spacer()
         pdf.factoids(
-            [_('Mandates'), _('Absolute majority') if majorz else '', ''],
+            [
+                _('Seats') if majorz else _('Mandates'),
+                _('Absolute majority') if majorz else '',
+                ''
+            ],
             [
                 election.allocated_mandates,
                 election.absolute_majority if majorz else '',
@@ -528,7 +532,7 @@ class PdfGenerator():
 
         # Factoids
         pdf.factoids(
-            [_('Mandates'), '', ''],
+            [_('Seats') if majorz else _('Mandates'), '', ''],
             [compound.allocated_mandates, '', '']
         )
         pdf.spacer()

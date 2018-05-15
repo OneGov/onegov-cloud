@@ -291,7 +291,8 @@
         </ul>
         <ul class="small-block-grid-1 medium-block-grid-4 factoids">
             <li>
-                <span i18n:translate="">Mandates</span>
+                <span i18n:translate="" tal:condition="layout.majorz">Seats</span>
+                <span i18n:translate="" tal:condition="layout.proporz">Mandates</span>
                 <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress (election.allocated_mandates, election.number_of_mandates)" /></strong>
             </li>
             <li tal:condition="layout.majorz">
@@ -309,7 +310,8 @@
             <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress election_compound.progress" /></strong>
         </li>
         <li>
-            <span i18n:translate="">Mandates</span>
+            <span i18n:translate="" tal:condition="layout.majorz">Seats</span>
+            <span i18n:translate="" tal:condition="layout.proporz">Mandates</span>
             <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress (election_compound.allocated_mandates, election_compound.number_of_mandates)" /></strong>
         </li>
     </ul>
@@ -415,7 +417,7 @@
         </a>
         <figcaption i18n:translate="figcaption_party_strengths">
             The diagram shows the votes and mandates of the parties. The rimmed bars
-            (left scale) correspond to the number of seats, the colored bars (right scale)
+            (left scale) correspond to the number of mandates, the colored bars (right scale)
             to the voices (percentages).
         </figcaption>
     </figure>
