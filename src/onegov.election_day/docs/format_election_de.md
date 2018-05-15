@@ -137,7 +137,7 @@ Zudem werden die leeren und ungültigen Stimmen auch als Kandidaten erfasst mitt
 
 #### Spalten Kandidatenresultate
 
-Da das Datenformat keine Informationen über die gewählten Kandidaten liefert, müssen diese in einer zweiten Tabelle mitgeliefert werden. Jede Zeile enthält dabei eine gewählten Kandidaten mit den folgenden Spalten:
+Da das Datenformat nicht zwingend Informationen über die gewählten Kandidaten liefert, können diese in einer zweiten Tabelle mitgeliefert werden. Jede Zeile enthält dabei eine gewählten Kandidaten mit den folgenden Spalten:
 
 Name|Beschreibung
 ---|---

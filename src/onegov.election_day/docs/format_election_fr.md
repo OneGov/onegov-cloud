@@ -137,7 +137,7 @@ De plus, les votes vides et non valides ainsi que les candidats seront saisis pa
 
 #### Résultats des candidats de colonnes
 
-Parce que ce format de fichier n'offre aucune information concernant les candidats élus, ceux-ci doivent être inclus dans une deuxième colonne. Chaque ligne est composée d'un candidat élu avec les colonnes suivantes :
+Comme le format de fichier peut ne pas fournir d'informations sur les candidats élus, ces informations peuvent être fournies dans un deuxième tableau. Chaque ligne est composée d'un candidat élu avec les colonnes suivantes :
 
 Nom|Description
 ---|---

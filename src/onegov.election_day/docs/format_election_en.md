@@ -140,7 +140,7 @@ Additionally the empty and invalid votes as well as candidates will be captured 
 
 #### Columns candidate results
 
-Because the file format does not supply any information on the elected candidate, those must be included in a second column. Each row consists of one elected candidate with the following columns:
+Because the file format might not supply any information on the elected candidates, these informations can be provided in a second table. Each row consists of one elected candidate with the following columns:
 
 Name|Description
 ---|---

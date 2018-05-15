@@ -137,7 +137,7 @@ Inoltre i voti, così come i candidati, nulli e non validi saranno attribuiti ai
 
 #### Colonne risultati candidati
 
-Poiché il formato di file non fornisce alcuna informazione sul candidato eletto, questi devono essere inclusi in una seconda colonna. Ogni riga è composta da un candidato eletto con le seguenti colonne:
+Poiché il formato del file potrebbe non fornire alcuna informazione sui candidati eletti, queste informazioni possono essere fornite in una seconda tabella. Ogni riga è composta da un candidato eletto con le seguenti colonne:
 
 Nome|Descrizione
 ---|---
