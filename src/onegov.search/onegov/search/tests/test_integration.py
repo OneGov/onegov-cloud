@@ -140,7 +140,7 @@ def test_search_query(es_url, postgres_dsn):
     assert document.public
 
 
-def test_orm_integration(es_url, postgres_dsn):
+def test_orm_integration(es_url, postgres_dsn, redis_url):
 
     class App(Framework, ElasticsearchApp):
         pass
@@ -221,7 +221,8 @@ def test_orm_integration(es_url, postgres_dsn):
     app.configure_application(
         dsn=postgres_dsn,
         base=Base,
-        elasticsearch_hosts=[es_url]
+        elasticsearch_hosts=[es_url],
+        redis_url=redis_url
     )
 
     app.namespace = 'documents'
