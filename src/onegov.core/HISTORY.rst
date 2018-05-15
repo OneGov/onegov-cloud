@@ -1,5 +1,15 @@
 Changelog
 ---------
+
+- Removes memcached in favor of redis.
+  [href]
+
+- Removes distributed locking in favor of local locking.
+
+  Distributed locking might be reintroduced in the future.
+
+  [href]
+
 0.68.2 (2018-05-10)
 ~~~~~~~~~~~~~~~~~~~
 
