@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.27.2 (2018-05-15)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds compatibility with latest onegov.core release.
   [href]
 
