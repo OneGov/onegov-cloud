@@ -448,6 +448,8 @@ def migrate_election_compounds(context):
                     )
 
         context.operations.drop_column('election_compounds', 'elections')
+    else:
+        return False
 
 
 @upgrade_task('Adds a default majority type')
