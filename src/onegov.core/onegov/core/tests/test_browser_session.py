@@ -3,6 +3,7 @@ import pytest
 from dogpile.cache import make_region
 from dogpile.cache.api import NO_VALUE
 from onegov.core.browser_session import BrowserSession
+from onegov.core import cache
 
 
 def test_browser_session_mangle():
@@ -70,3 +71,27 @@ def test_browser_session_cache_prefix():
     session = BrowserSession(cache, 'bar')
     with pytest.raises(AttributeError):
         session.name
+
+
+def test_browser_session_count(redis_url):
+    session = BrowserSession(cache.get('sessions', 60, redis_url), 'token')
+
+    assert session.count() == 0
+    session['foo'] = 'bar'
+
+    assert session.count() == 1
+    session['foo'] = 'baz'
+
+    assert session.count() == 1
+    del session['foo']
+
+    assert session.count() == 0
+
+    session['asdf'] = 'qwerty'
+    assert session.count() == 1
+
+    session.flush()
+    assert session.count() == 0
+
+    session.flush()
+    assert session.count() == 0

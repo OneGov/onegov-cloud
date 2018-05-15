@@ -241,17 +241,22 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         else:
             session_id = random_token()
 
-        def on_dirty(token):
-            self.cookies['session_id'] = self.app.sign(token)
+        def on_dirty(session, token):
+            if not session.count():
+                @self.after
+                def delete_session(response):
+                    response.delete_cookie('session_id')
+            else:
+                self.cookies['session_id'] = self.app.sign(token)
 
-            @self.after
-            def store_session(response):
-                response.set_cookie(
-                    'session_id',
-                    self.cookies['session_id'],
-                    secure=self.app.identity_secure,
-                    httponly=True
-                )
+                @self.after
+                def store_session(response):
+                    response.set_cookie(
+                        'session_id',
+                        self.cookies['session_id'],
+                        secure=self.app.identity_secure,
+                        httponly=True
+                    )
 
         return self.app.modules.browser_session.BrowserSession(
             cache=self.app.session_cache,

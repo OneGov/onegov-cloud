@@ -30,7 +30,7 @@ on all morepath views::
 But no such method exists yet.
 
 Currently there is one cache per app that never expires (though values will
-eventually be discarded by memcache if the cache is full).
+eventually be discarded by redis if the cache is full).
 
 """
 

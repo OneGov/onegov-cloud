@@ -24,9 +24,20 @@ class Prefixed(object):
     def delete(self, key):
         return self.cache.delete(self.mangle(key))
 
-    def flush(self):
+    def count(self):
+        # note, this cannot be used in a Redis cluster - if we use that
+        # we have to keep track of all keys separately
         return self.cache.backend.proxied.client.eval("""
-            return redis.call('del', unpack(redis.call('keys', ARGV[1])))
+            return #redis.pcall('keys', ARGV[1])
+        """, 0, f'*:{self.prefix}:*')
+
+    def flush(self):
+        # note, this cannot be used in a Redis cluster - if we use that
+        # we have to keep track of all keys separately
+        return self.cache.backend.proxied.client.eval("""
+            if #redis.pcall('keys', ARGV[1]) > 0 then
+                return redis.pcall('del', unpack(redis.call('keys', ARGV[1])))
+            end
         """, 0, f'*:{self.prefix}:*')
 
 
@@ -51,7 +62,7 @@ class BrowserSession(object):
 
     """
 
-    def __init__(self, cache, token, on_dirty=lambda token: None):
+    def __init__(self, cache, token, on_dirty=lambda session, token: None):
 
         # make it impossible to get the session token through key listing
         prefix = blake2b(token.encode('utf-8'), digest_size=24).hexdigest()
@@ -65,7 +76,11 @@ class BrowserSession(object):
         return self._cache.get(name) is not NO_VALUE
 
     def flush(self):
-        return self._cache.flush()
+        self._cache.flush()
+        self.mark_as_dirty()
+
+    def count(self):
+        return self._cache.count()
 
     def pop(self, name, default=None):
         """ Returns the value for the given name, removing the value in
@@ -87,7 +102,7 @@ class BrowserSession(object):
 
     def mark_as_dirty(self):
         if not self._is_dirty:
-            self._on_dirty(self._token)
+            self._on_dirty(self, self._token)
             self._is_dirty = True
 
     def get(self, name, default=None):
