@@ -6,7 +6,7 @@ from onegov.gazette.cli import cli
 from xlsxwriter import Workbook
 
 
-def write_config(path, postgres_dsn, temporary_directory):
+def write_config(path, postgres_dsn, temporary_directory, redis_url):
     cfg = {
         'applications': [
             {
@@ -15,6 +15,7 @@ def write_config(path, postgres_dsn, temporary_directory):
                 'namespace': 'onegov_gazette',
                 'configuration': {
                     'dsn': postgres_dsn,
+                    'redis_url': redis_url,
                     'depot_backend': 'depot.io.memory.MemoryFileStorage',
                     'filestorage': 'fs.osfs.OSFS',
                     'filestorage_options': {
@@ -57,10 +58,10 @@ def run_command(cfg_path, principal, commands):
     ] + commands)
 
 
-def test_add_instance(postgres_dsn, temporary_directory):
+def test_add_instance(postgres_dsn, temporary_directory, redis_url):
 
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
-    write_config(cfg_path, postgres_dsn, temporary_directory)
+    write_config(cfg_path, postgres_dsn, temporary_directory, redis_url)
     write_principal(temporary_directory, 'Govikon')
 
     result = run_command(cfg_path, 'govikon', ['add'])
@@ -72,10 +73,11 @@ def test_add_instance(postgres_dsn, temporary_directory):
     assert "This selector may not reference an existing path" in result.output
 
 
-def test_add_instance_missing_config(postgres_dsn, temporary_directory):
+def test_add_instance_missing_config(postgres_dsn, temporary_directory,
+                                     redis_url):
 
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
-    write_config(cfg_path, postgres_dsn, temporary_directory)
+    write_config(cfg_path, postgres_dsn, temporary_directory, redis_url)
 
     result = run_command(cfg_path, 'govikon1', ['add'])
     assert result.exit_code == 0
@@ -83,9 +85,9 @@ def test_add_instance_missing_config(postgres_dsn, temporary_directory):
     assert "Instance was created successfully" in result.output
 
 
-def test_import_editors(postgres_dsn, temporary_directory):
+def test_import_editors(postgres_dsn, temporary_directory, redis_url):
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
-    write_config(cfg_path, postgres_dsn, temporary_directory)
+    write_config(cfg_path, postgres_dsn, temporary_directory, redis_url)
     write_principal(temporary_directory, 'Govikon')
     assert run_command(cfg_path, 'govikon', ['add']).exit_code == 0
 
