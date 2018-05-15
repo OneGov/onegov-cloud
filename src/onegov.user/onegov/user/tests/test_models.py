@@ -9,6 +9,9 @@ class DummyBrowserSession():
     def __init__(self, token):
         self._token = token
 
+    def flush(self):
+        pass
+
 
 class DummyRequest():
     def __init__(self, token):

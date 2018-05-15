@@ -168,7 +168,7 @@ def test_auth_logging(session, capturelog):
         == "Successful login by 127.0.0.1 (AzureDiamond)"
 
 
-def test_auth_integration(session):
+def test_auth_integration(session, redis_url):
 
     class App(Framework):
         pass
@@ -202,7 +202,7 @@ def test_auth_integration(session):
     app.application_id = 'test'
     app.configure_application(
         identity_secure=False,
-        disable_memcached=True
+        redis_url=redis_url
     )
 
     client = Client(app)
@@ -222,7 +222,8 @@ def test_auth_integration(session):
     response = client.get('/auth/logout')
     assert response.status_code == 302
     assert response.location == 'http://localhost/go'
-    assert response.headers['Set-Cookie'].startswith('session_id')
+    assert 'session_id=;' in response.headers['set-cookie']
+
     user = UserCollection(session).by_username('AzureDiamond')
     assert not user.sessions
 

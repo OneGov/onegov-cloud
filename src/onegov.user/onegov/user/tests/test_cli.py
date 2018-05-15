@@ -5,7 +5,7 @@ from click.testing import CliRunner
 from onegov.user.cli import cli
 
 
-def test_cli(postgres_dsn, session_manager, temporary_directory):
+def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
 
     cfg = {
         'applications': [
@@ -14,7 +14,8 @@ def test_cli(postgres_dsn, session_manager, temporary_directory):
                 'application': 'onegov.core.Framework',
                 'namespace': 'foo',
                 'configuration': {
-                    'dsn': postgres_dsn
+                    'dsn': postgres_dsn,
+                    'redis_url': redis_url
                 }
             }
         ]
