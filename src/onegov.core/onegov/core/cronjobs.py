@@ -41,7 +41,8 @@ import pycurl
 from contextlib import suppress
 from datetime import datetime, time, timedelta
 from onegov.core.framework import Framework, log
-from onegov.core.locking import lock, AlreadyLockedError
+from onegov.core.utils import local_lock
+from onegov.core.errors import AlreadyLockedError
 from onegov.core.security import Public
 from sedate import ensure_timezone, replace_timezone
 from threading import Thread
@@ -156,16 +157,21 @@ class ApplicationBoundCronjobs(Thread):
 
     Each application id is meant to have its own thread. To avoid extra
     work we make sure that only one thread per application exists on each
-    server. This is accomplished by holding a postgres advisory lock during
+    server. This is accomplished by holding a local lock during
     the lifetime of the thread.
+
+    WARNING This doesn't work on distributed systems. That is if the onegov
+    processes are distributed over many servers the lock isn't shared.
+
+    This can be achieved, but it's difficult to get right, so for now we
+    do not implement it, as we do not have distributed systems yet.
 
     """
 
-    def __init__(self, request, jobs, session_manager):
+    def __init__(self, request, jobs):
         Thread.__init__(self, daemon=True)
         self.application_id = request.app.application_id
         self.jobs = tuple(job.as_request_call(request) for job in jobs)
-        self.session_manager = session_manager
 
         log.info("Starting Cronjob Thread for {}".format(self.application_id))
 
@@ -175,14 +181,13 @@ class ApplicationBoundCronjobs(Thread):
             )
 
     def run(self):
-        session = self.session_manager.session()
         previous_check = datetime.min
 
         # the lock ensures that only one thread per application id is
         # in charge of running the scheduled jobs. If another thread already
         # has the lock, this thread will end immediately and be GC'd.
         with suppress(AlreadyLockedError):
-            with lock(session, 'cronjobs-thread', self.application_id):
+            with local_lock('cronjobs-thread', self.application_id):
                 while not sleep(CRONJOB_POLL_RESOLUTION):
 
                     # make sure we only run the jobs once a minute (we poll
@@ -197,9 +202,6 @@ class ApplicationBoundCronjobs(Thread):
 
                     previous_check = this_check
                     self.run_scheduled_jobs()
-
-        # we need to close the session again or it will stay open forever
-        session.close()
 
         log.info("Stopping Cronjob Thread for {}, already locked!".format(
             self.application_id

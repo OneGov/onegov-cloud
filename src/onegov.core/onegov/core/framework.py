@@ -1110,14 +1110,10 @@ def spawn_cronjob_thread_tween_factory(app, handler):
     if not app.settings.cronjobs.enabled:
         return handler
 
-    assert app.has_database_connection, """
-        Cronjobs require a database connection for inter-process locking.
-    """
-
     def spawn_cronjob_thread_tween(request):
         if app.application_id not in registry.cronjob_threads:
             thread = ApplicationBoundCronjobs(
-                request, registry.cronjobs.values(), app.session_manager
+                request, registry.cronjobs.values()
             )
 
             registry.cronjob_threads[request.app.application_id] = thread

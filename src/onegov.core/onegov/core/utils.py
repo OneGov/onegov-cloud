@@ -1,5 +1,6 @@
 import base64
 import bleach
+import fcntl
 import gzip
 import hashlib
 import importlib
@@ -19,6 +20,7 @@ from cProfile import Profile
 from datetime import datetime
 from onegov.core.cache import lru_cache
 from onegov.core.custom import json
+from onegov.core.errors import AlreadyLockedError
 from importlib import import_module
 from itertools import groupby, tee, zip_longest
 from onegov.core import log
@@ -43,6 +45,29 @@ _email_regex = re.compile((
     "{|}~-]+)*(@|\sat\s)(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(\.|"
     "\sdot\s))+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)"
 ))
+
+
+@contextmanager
+def local_lock(namespace, key):
+    """ Locks the given namespace/key combination on the current system,
+    automatically freeing it after the with statement has been completed or
+    once the process is killed.
+
+    Usage::
+
+        with lock('namespace', 'key'):
+            pass
+
+    """
+    name = f'{namespace}-{key}'.replace('/', '-')
+
+    with open(f'/tmp/{name}', 'w+') as f:
+        try:
+            fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            yield
+            fcntl.flock(f, fcntl.LOCK_UN)
+        except BlockingIOError:
+            raise AlreadyLockedError
 
 
 def normalize_for_url(text):

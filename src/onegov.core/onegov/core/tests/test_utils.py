@@ -5,6 +5,7 @@ import transaction
 
 from onegov.core import utils
 from onegov.core.custom import json
+from onegov.core.errors import AlreadyLockedError
 from onegov.core.orm import SessionManager
 from onegov.core.orm.types import HSTORE
 from sqlalchemy import Column, Integer
@@ -251,3 +252,10 @@ def test_safe_format():
         fmt('[foo]', {}, raise_on_missing=True)
 
     assert 'is unknown' in str(e)
+
+
+def test_local_lock():
+    with utils.local_lock('foo', 'bar'):
+        with pytest.raises(AlreadyLockedError):
+            with utils.local_lock('foo', 'bar'):
+                pass
