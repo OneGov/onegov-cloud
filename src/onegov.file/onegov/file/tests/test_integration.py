@@ -12,7 +12,7 @@ from webtest import TestApp as Client
 
 
 @pytest.fixture(scope='function', params=SUPPORTED_STORAGE_BACKENDS)
-def app(request, postgres_dsn, temporary_path):
+def app(request, postgres_dsn, temporary_path, redis_url):
 
     backend = request.param
 
@@ -26,7 +26,8 @@ def app(request, postgres_dsn, temporary_path):
     app.configure_application(
         dsn=postgres_dsn,
         depot_backend=backend,
-        depot_storage_path=str(temporary_path)
+        depot_storage_path=str(temporary_path),
+        redis_url=redis_url
     )
 
     app.namespace = 'apps'
