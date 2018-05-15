@@ -11,6 +11,7 @@ matrix:
       env: TOXENV=pep8
 
 addons:
+  postgresql: "9.6"
   apt:
     packages:
       - oracle-java8-set-default
