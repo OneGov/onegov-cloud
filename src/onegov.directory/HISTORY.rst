@@ -4,6 +4,9 @@ Changelog
 0.3.0 (2018-05-16)
 ~~~~~~~~~~~~~~~~~~~~~
 
+- Adds the ability to specify the order direction for directory collections.
+  [href]
+
 0.2.2 (2018-04-26)
 ~~~~~~~~~~~~~~~~~~~~~
 
