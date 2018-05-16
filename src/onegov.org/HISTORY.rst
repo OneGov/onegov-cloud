@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to configure the order of directory entries.
+  [href]
+
 0.27.2 (2018-05-15)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-04-27 14:10+0200\n"
+"POT-Creation-Date: 2018-05-16 11:19+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1032,6 +1032,15 @@ msgstr "Hauptansicht"
 msgid "Filters"
 msgstr "Filter"
 
+msgid "Order"
+msgstr "Sortierung"
+
+msgid "Order-Format"
+msgstr "Sortierungs-Format"
+
+msgid "Direction"
+msgstr "Richtung"
+
 msgid "Users may propose new entries"
 msgstr "Benutzer können neue Einträge vorschlagen"
 
@@ -1050,6 +1059,18 @@ msgstr "Modus"
 #, python-format
 msgid "The following fields are unknown: ${fields}"
 msgstr "Die folgenden Felder sind unbekannt: ${fields}"
+
+msgid "By title"
+msgstr "Nach Titel"
+
+msgid "By format"
+msgstr "Nach Format"
+
+msgid "Ascending"
+msgstr "Aufsteigend"
+
+msgid "Descending"
+msgstr "Absteigend"
 
 msgid "Paid"
 msgstr "Bezahlt"
@@ -2288,9 +2309,6 @@ msgstr "${org} Login"
 
 msgid "Account Registration"
 msgstr "Benutzerkonto Registration"
-
-msgid "You have been logged out."
-msgstr "Sie wurden ausgeloggt."
 
 msgid "Wrong e-mail address, password or yubikey."
 msgstr "Falsche E-Mail Adresse, falsches Passwort oder falscher Yubikey."

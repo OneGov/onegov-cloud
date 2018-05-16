@@ -90,6 +90,32 @@ class DirectoryBaseForm(Form):
             'data-fields-include': 'radio,checkbox'
         })
 
+    order = RadioField(
+        label=_("Order"),
+        fieldset=_("Order"),
+        choices=[
+            ('by-title', _("By title")),
+            ('by-format', _("By format"))
+        ],
+        default='by-title')
+
+    order_format = StringField(
+        label=_("Order-Format"),
+        fieldset=_("Order"),
+        render_kw={'class_': 'formcode-format'},
+        validators=[validators.InputRequired()],
+        depends_on=('order', 'by-format'))
+
+    order_direction = RadioField(
+        label=_("Direction"),
+        fieldset=_("Order"),
+        choices=[
+            ('asc', _("Ascending")),
+            ('desc', _("Descending"))
+        ],
+        default='asc'
+    )
+
     enable_submissions = BooleanField(
         label=_("Users may propose new entries"),
         fieldset=_("New entries"),
@@ -171,16 +197,21 @@ class DirectoryBaseForm(Form):
         contact_fields = list(self.extract_field_ids(self.contact_fields))
         keyword_fields = list(self.extract_field_ids(self.keyword_fields))
 
+        order_format = self.data[
+            self.order.data == 'by-title' and 'title_format' or 'order_format'
+        ]
+
         return DirectoryConfiguration(
             title=self.title_format.data,
             lead=self.lead_format.data,
-            order=safe_format_keys(self.title_format.data),
+            order=safe_format_keys(order_format),
             keywords=keyword_fields,
             searchable=content_fields + contact_fields,
             display={
                 'content': content_fields,
                 'contact': contact_fields
-            }
+            },
+            direction=self.order_direction.data
         )
 
     @configuration.setter
@@ -190,6 +221,13 @@ class DirectoryBaseForm(Form):
         self.content_fields.data = '\n'.join(cfg.display.get('content', ''))
         self.contact_fields.data = '\n'.join(cfg.display.get('contact', ''))
         self.keyword_fields.data = '\n'.join(cfg.keywords)
+        self.order_direction = cfg.direction == 'desc' and 'desc' or 'asc'
+
+        if safe_format_keys(cfg.title) == cfg.order:
+            self.order.data = 'by-title'
+        else:
+            self.order.data = 'by-format'
+            self.order_format.data = ''.join(f'[{key}]' for key in cfg.order)
 
     def populate_obj(self, obj):
         super().populate_obj(obj, exclude={'configuration'})
