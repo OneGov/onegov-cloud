@@ -106,6 +106,17 @@ class DirectoryBaseForm(Form):
         validators=[validators.InputRequired()],
         depends_on=('order', 'by-format'))
 
+    link_pattern = StringField(
+        label=_("Pattern"),
+        fieldset=_("External Link"),
+        render_kw={'class_': 'formcode-format'},
+    )
+
+    link_title = StringField(
+        label=_("Title"),
+        fieldset=_("External Link")
+    )
+
     order_direction = RadioField(
         label=_("Direction"),
         fieldset=_("Order"),
@@ -211,7 +222,9 @@ class DirectoryBaseForm(Form):
                 'content': content_fields,
                 'contact': contact_fields
             },
-            direction=self.order_direction.data
+            direction=self.order_direction.data,
+            link_pattern=self.link_pattern.data,
+            link_title=self.link_title.data
         )
 
     @configuration.setter
@@ -222,6 +235,8 @@ class DirectoryBaseForm(Form):
         self.contact_fields.data = '\n'.join(cfg.display.get('contact', ''))
         self.keyword_fields.data = '\n'.join(cfg.keywords)
         self.order_direction = cfg.direction == 'desc' and 'desc' or 'asc'
+        self.link_pattern.data = cfg.link_pattern
+        self.link_title.data = cfg.link_title
 
         if safe_format_keys(cfg.title) == cfg.order:
             self.order.data = 'by-title'

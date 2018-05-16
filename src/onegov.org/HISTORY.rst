@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to define a link pattern for directory entries.
+  [href]
+
 - Adds the ability to configure the order of directory entries.
   [href]
 

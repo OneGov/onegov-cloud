@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-05-16 11:19+0200\n"
+"POT-Creation-Date: 2018-05-16 16:21+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1037,6 +1037,12 @@ msgstr "Sortierung"
 
 msgid "Order-Format"
 msgstr "Sortierungs-Format"
+
+msgid "Pattern"
+msgstr "Muster"
+
+msgid "External Link"
+msgstr "Externer Link"
 
 msgid "Direction"
 msgstr "Richtung"
@@ -2299,6 +2305,12 @@ msgstr "Noch nicht gesendet."
 
 msgid "Your ticket has been closed"
 msgstr "Ihr Ticket wurde geschlossen"
+
+msgid "External link"
+msgstr "Externer Link"
+
+msgid "More information"
+msgstr "Weiterführende Informationen"
 
 msgid "Your event has unfortunately been rejected:"
 msgstr "Ihre Veranstaltung musste leider abgelehnt werden:"
