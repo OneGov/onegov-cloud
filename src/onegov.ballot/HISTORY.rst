@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Don't use a default absolute majority (of zero).
+- Doesn't use a default absolute majority (of zero).
   [msom]
 
 - Adds an upgrade step to set the a default majority types to elections.
