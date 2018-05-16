@@ -105,7 +105,7 @@ class ElectionDayApp(Framework):
     @property
     def pages_cache(self):
         """ A five minute cache for pages. """
-        return self.get_cache(self.application_id + ':5m', expiration_time=300)
+        return self.get_cache('pages', expiration_time=300)
 
     def configure_sentry(self, **cfg):
         self.sentry_js = cfg.get('sentry_js')
