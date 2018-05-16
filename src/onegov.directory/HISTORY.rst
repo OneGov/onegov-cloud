@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to define an external link by pattern on each entry.
+  [href]
+
 0.3.0 (2018-05-16)
 ~~~~~~~~~~~~~~~~~~~~~
 

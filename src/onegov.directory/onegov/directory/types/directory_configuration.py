@@ -9,6 +9,7 @@ from onegov.form import parse_formcode, flatten_fieldsets, as_internal_id
 from sqlalchemy.ext.mutable import Mutable
 from sqlalchemy.types import TypeDecorator, TEXT
 from sqlalchemy_utils.types.scalar_coercible import ScalarCoercible
+from urllib.parse import quote_plus
 
 # XXX i18n
 SAFE_FORMAT_TRANSLATORS = {
@@ -70,11 +71,15 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         'keywords',
         'searchable',
         'display',
-        'direction'
+        'direction',
+        'link_pattern',
+        'link_title'
     )
 
     def __init__(self, title=None, lead=None, order=None, keywords=None,
-                 searchable=None, display=None, direction=None):
+                 searchable=None, display=None, direction=None,
+                 link_pattern=None, link_title=None):
+
         self.title = title
         self.lead = lead
         self.order = order
@@ -82,6 +87,8 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         self.searchable = searchable
         self.display = display
         self.direction = direction
+        self.link_pattern = link_pattern
+        self.link_title = link_title
 
     def __setattr__(self, name, value):
         self.changed()
@@ -132,6 +139,10 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
             data[as_internal_id(key)] for key in getattr(self, attribute)
         ))
 
+    def safe_format(self, fmt, data):
+        return safe_format(
+            fmt, self.for_safe_format(data), adapt=as_internal_id)
+
     def for_safe_format(self, data):
         return {
             k: SAFE_FORMAT_TRANSLATORS.get(type(v), str)(v)
@@ -146,13 +157,15 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         return normalize_for_url(self.extract_title(data))
 
     def extract_title(self, data):
-        return safe_format(
-            self.title, self.for_safe_format(data), adapt=as_internal_id)
+        return self.safe_format(self.title, data)
 
     def extract_lead(self, data):
-        if self.lead:
-            return safe_format(
-                self.lead, self.for_safe_format(data), adapt=as_internal_id)
+        return self.lead and self.safe_format(self.lead, data)
+
+    def extract_link(self, data):
+        return self.link_pattern and self.safe_format(self.link_pattern, {
+            k: quote_plus(v) for k, v in self.for_safe_format(data).items()
+        })
 
     def extract_order(self, data):
         # by default we use the title as order
