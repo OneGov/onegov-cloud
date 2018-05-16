@@ -63,16 +63,25 @@ class StoredConfiguration(object):
 
 class DirectoryConfiguration(Mutable, StoredConfiguration):
 
-    fields = ('title', 'lead', 'order', 'keywords', 'searchable', 'display')
+    fields = (
+        'title',
+        'lead',
+        'order',
+        'keywords',
+        'searchable',
+        'display',
+        'direction'
+    )
 
     def __init__(self, title=None, lead=None, order=None, keywords=None,
-                 searchable=None, display=None):
+                 searchable=None, display=None, direction=None):
         self.title = title
         self.lead = lead
         self.order = order
         self.keywords = keywords
         self.searchable = searchable
         self.display = display
+        self.direction = direction
 
     def __setattr__(self, name, value):
         self.changed()

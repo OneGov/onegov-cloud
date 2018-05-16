@@ -563,3 +563,41 @@ def test_add_duplicate_entry(session):
 
     with pytest.raises(DuplicateEntryError):
         foos.add(values=dict(name='foobar'))
+
+
+def test_custom_order(session):
+
+    names = DirectoryCollection(session).add(
+        title="Names",
+        structure="""
+            First Name *= ___
+            Last Name *= ___
+        """,
+        configuration=DirectoryConfiguration(
+            title='[First Name] [Last Name]',
+            order=('First Name', ),
+        )
+    )
+
+    names.add(values=dict(first_name='Aaron', last_name='Zeebrox'))
+    names.add(values=dict(first_name='Zora', last_name='Anderson'))
+
+    session.flush()
+
+    entries = DirectoryEntryCollection(names)
+
+    names.configuration.order = ['First Name']
+    names.configuration.direction = None
+    assert [r.values['first_name'][0] for r in entries.query()] == ['A', 'Z']
+
+    names.configuration.order = ['First Name']
+    names.configuration.direction = 'asc'
+    assert [r.values['first_name'][0] for r in entries.query()] == ['A', 'Z']
+
+    names.configuration.order = ['Last Name']
+    names.configuration.direction = 'asc'
+    assert [r.values['first_name'][0] for r in entries.query()] == ['Z', 'A']
+
+    names.configuration.order = ['Last Name']
+    names.configuration.direction = 'desc'
+    assert [r.values['first_name'][0] for r in entries.query()] == ['A', 'Z']
