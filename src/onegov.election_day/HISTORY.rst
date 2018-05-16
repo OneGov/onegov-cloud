@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Allows to specify the majority type of a majorz election.
+  [msom]
+
 3.4.7 (2018-05-15)
 ~~~~~~~~~~~~~~~~~~~
 

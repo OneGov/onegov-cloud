@@ -111,7 +111,8 @@ def view_election_json(self, request):
     session = object_session(self)
 
     if self.type == 'majorz':
-        data['absolute_majority'] = self.absolute_majority
+        if self.majority_type == 'absolute':
+            data['absolute_majority'] = self.absolute_majority
         data['candidates'] = [
             {
                 'family_name': candidate[0],

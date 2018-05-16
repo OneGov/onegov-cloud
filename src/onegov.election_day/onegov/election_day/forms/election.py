@@ -26,6 +26,28 @@ class ElectionForm(Form):
         default='majorz'
     )
 
+    majority_type = RadioField(
+        label=_("Majority Type"),
+        choices=[
+            ('absolute', _("Absolute")),
+            ('relative', _("Relative")),
+        ],
+        default='absolute',
+        validators=[
+            InputRequired()
+        ],
+        depends_on=('election_type', 'majorz'),
+    )
+
+    absolute_majority = IntegerField(
+        label=_("Absolute majority"),
+        validators=[
+            Optional(),
+            NumberRange(min=1)
+        ],
+        depends_on=('majority_type', 'absolute'),
+    )
+
     domain = RadioField(
         label=_("Type"),
         validators=[
@@ -89,15 +111,6 @@ class ElectionForm(Form):
         label=_("Related link")
     )
 
-    absolute_majority = IntegerField(
-        label=_("Absolute majority"),
-        validators=[
-            Optional(),
-            NumberRange(min=1)
-        ],
-        depends_on=('election_type', 'majorz'),
-    )
-
     def on_request(self):
         self.election_de.validators = []
         self.election_fr.validators = []
@@ -125,7 +138,8 @@ class ElectionForm(Form):
         model.type = self.election_type.data
         model.shortcode = self.shortcode.data
         model.number_of_mandates = self.mandates.data
-        model.absolute_majority = self.absolute_majority.data
+        model.majority_type = self.majority_type.data
+        model.absolute_majority = self.absolute_majority.data or None
         model.related_link = self.related_link.data
         model.tacit = self.tacit.data
         model.distinct = self.distinct.data
@@ -153,6 +167,7 @@ class ElectionForm(Form):
         self.shortcode.data = model.shortcode
         self.election_type.data = model.type
         self.mandates.data = model.number_of_mandates
+        self.majority_type.data = model.majority_type
         self.absolute_majority.data = model.absolute_majority
         self.related_link.data = model.related_link
         self.tacit.data = model.tacit

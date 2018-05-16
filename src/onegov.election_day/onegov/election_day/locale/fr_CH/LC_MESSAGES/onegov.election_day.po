@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-15 15:53+0200\n"
-"PO-Revision-Date: 2018-05-15 15:49+0200\n"
+"POT-Creation-Date: 2018-05-15 17:20+0200\n"
+"PO-Revision-Date: 2018-05-15 17:21+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -166,6 +166,12 @@ msgstr "Pas de elections actuellement."
 msgid "System"
 msgstr "Système"
 
+msgid "Majority Type"
+msgstr "Type majoritaire"
+
+msgid "Absolute majority"
+msgstr "Majorité absolue"
+
 msgid "Tacit election"
 msgstr "Élection tacite"
 
@@ -199,14 +205,17 @@ msgstr "Roumain"
 msgid "Related link"
 msgstr "Informations complémentaires"
 
-msgid "Absolute majority"
-msgstr "Majorité absolue"
-
 msgid "Election based on the simple majority system"
 msgstr "Election selon le système majoritaire"
 
 msgid "Election based on proportional representation"
 msgstr "Election selon le système proportionnel"
+
+msgid "Absolute"
+msgstr "Absolue"
+
+msgid "Relative"
+msgstr "Relative"
 
 msgid "Elections"
 msgstr "Elections"

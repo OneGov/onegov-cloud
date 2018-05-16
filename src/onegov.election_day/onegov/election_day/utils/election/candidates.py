@@ -50,7 +50,11 @@ def get_candidates_data(election, request):
     candidates = candidates.filter(Candidate.election_id == election.id)
 
     majority = 0
-    if election.type == 'majorz' and election.absolute_majority is not None:
+    if (
+        election.type == 'majorz' and
+        election.majority_type == 'absolute' and
+        election.absolute_majority is not None
+    ):
         majority = election.absolute_majority
 
     return {

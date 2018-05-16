@@ -57,6 +57,7 @@ def test_election_form_model(election_day_app):
     model.domain = 'federation'
     model.shortcode = 'xy'
     model.type = 'proporz'
+    model.majority_type = 'relative'
     model.number_of_mandates = 5
     model.related_link = 'http://u.rl'
     model.tacit = False
@@ -87,6 +88,7 @@ def test_election_form_model(election_day_app):
     form.shortcode.data = 'yz'
     form.election_type.data = 'majorz'
     form.mandates.data = 2
+    form.majority_type.data = 'absolute'
     form.absolute_majority.data = 10000
     form.related_link.data = 'http://ur.l'
     form.tacit.data = True
@@ -104,6 +106,7 @@ def test_election_form_model(election_day_app):
     assert model.shortcode == 'yz'
     assert model.type == 'majorz'
     assert model.number_of_mandates == 2
+    assert model.majority_type == 'absolute'
     assert model.absolute_majority == 10000
     assert model.related_link == 'http://ur.l'
     assert model.tacit is True

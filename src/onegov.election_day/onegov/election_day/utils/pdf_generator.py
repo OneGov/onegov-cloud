@@ -165,6 +165,7 @@ class PdfGenerator():
             return item.name if item.entity_id else pdf.translate(_("Expats"))
 
         majorz = election.type == 'majorz'
+        show_majority = majorz and election.majority_type == 'absolute'
 
         # Factoids
         pdf.factoids(
@@ -179,12 +180,12 @@ class PdfGenerator():
         pdf.factoids(
             [
                 _('Seats') if majorz else _('Mandates'),
-                _('Absolute majority') if majorz else '',
+                _('Absolute majority') if show_majority else '',
                 ''
             ],
             [
                 election.allocated_mandates,
-                election.absolute_majority if majorz else '',
+                election.absolute_majority if show_majority else '',
                 ''
             ],
         )

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-15 15:53+0200\n"
-"PO-Revision-Date: 2018-05-15 15:49+0200\n"
+"POT-Creation-Date: 2018-05-15 17:20+0200\n"
+"PO-Revision-Date: 2018-05-15 17:24+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -166,6 +166,12 @@ msgstr "I n'èn registradas anc naginas elecziuns."
 msgid "System"
 msgstr "Sistem"
 
+msgid "Majority Type"
+msgstr ""
+
+msgid "Absolute majority"
+msgstr "Maioritad absoluta"
+
 msgid "Tacit election"
 msgstr "Elecziun taciturna"
 
@@ -199,14 +205,17 @@ msgstr "Rumantsch"
 msgid "Related link"
 msgstr "Ulteriuras infurmaziuns"
 
-msgid "Absolute majority"
-msgstr "Maioritad absoluta"
-
 msgid "Election based on the simple majority system"
 msgstr "Elecziun da maiorz"
 
 msgid "Election based on proportional representation"
 msgstr "Elecziun da proporz"
+
+msgid "Absolute"
+msgstr "Absolut"
+
+msgid "Relative"
+msgstr "Relativ"
 
 msgid "Elections"
 msgstr "Elecziuns"
