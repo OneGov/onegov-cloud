@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.28.0 (2018-05-17)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes formcode highlighting not correctly matching all choices.
   [href]
 
