@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.5.0 (2018-05-17)
+~~~~~~~~~~~~~~~~~~~
 
 - Allows to add related elections to elections.
   [msom]
