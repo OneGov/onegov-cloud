@@ -26,8 +26,7 @@ class Institution(object):
 
     @property
     def title(self):
-        return ' - '.join(part for part in (
-            self.department,
+        return ' '.join(part for part in (
             self.name,
             self.branch
         ) if part)
@@ -45,7 +44,7 @@ def get_metadata(title, structure):
         'lead': '',
         'structure': structure,
         'configuration': {
-            'title': f'[{fieldnames[0]}]',
+            'title': f'[{fieldnames[0]}] [{fieldnames[1]}]',
             'display': {
                 'contact': [],
                 'content': fieldnames
@@ -53,6 +52,7 @@ def get_metadata(title, structure):
             'keywords': [],
             'searchable': fieldnames,
             'order': [
+                fieldnames[1],
                 fieldnames[0]
             ],
         }
@@ -168,10 +168,9 @@ def transform_vollzug(path, prefix, output_file='vollzug.zip'):
         title='Vollzugsbehörden',
         structure=textwrap.dedent(f"""\
             # Fachstelle
-            Titel *= ___
             Name *= ___
-            Department *= ___
             Abteilung = ___
+            Department *= ___
 
             # Kontakt
             Adresse = ...
@@ -188,7 +187,6 @@ def transform_vollzug(path, prefix, output_file='vollzug.zip'):
 
     data = [
         {
-            'Fachstelle/Titel': i.title,
             'Fachstelle/Name': i.name,
             'Fachstelle/Department': i.department,
             'Fachstelle/Abteilung': i.branch,
