@@ -106,6 +106,16 @@ class DirectoryBaseForm(Form):
         validators=[validators.InputRequired()],
         depends_on=('order', 'by-format'))
 
+    order_direction = RadioField(
+        label=_("Direction"),
+        fieldset=_("Order"),
+        choices=[
+            ('asc', _("Ascending")),
+            ('desc', _("Descending"))
+        ],
+        default='asc'
+    )
+
     link_pattern = StringField(
         label=_("Pattern"),
         fieldset=_("External Link"),
@@ -115,16 +125,6 @@ class DirectoryBaseForm(Form):
     link_title = StringField(
         label=_("Title"),
         fieldset=_("External Link")
-    )
-
-    order_direction = RadioField(
-        label=_("Direction"),
-        fieldset=_("Order"),
-        choices=[
-            ('asc', _("Ascending")),
-            ('desc', _("Descending"))
-        ],
-        default='asc'
     )
 
     enable_submissions = BooleanField(
