@@ -1826,7 +1826,7 @@ msgid ""
 "We will send another e-mail once your ticket has been completed. In the "
 "meantime you can check the status of your ticket at any time:"
 msgstr ""
-"Sie erhalten ein weiteres E-Mail, sobald ihr Ticket abgeschlossen wurde. In "
+"Sie erhalten ein weiteres E-Mail, sobald Ihr Ticket abgeschlossen wurde. In "
 "der Zwischenzeit sehen Sie den Status Ihres Tickets jederzeit hier:"
 
 msgid "Check ticket status"
