@@ -1,9 +1,10 @@
 from datetime import date
 from freezegun import freeze_time
 from onegov.election_day.tests.common import login
+from onegov.election_day.tests.common import MAJORZ_HEADER
 from onegov.election_day.tests.common import upload_majorz_election
-from onegov.election_day.tests.common import upload_proporz_election
 from onegov.election_day.tests.common import upload_party_results
+from onegov.election_day.tests.common import upload_proporz_election
 from webtest import TestApp as Client
 from webtest.forms import Upload
 
@@ -435,25 +436,7 @@ def test_view_election_tacit(election_day_app_gr):
     new.form['tacit'] = True
     new.form.submit()
 
-    csv = (
-        'election_status,'
-        'election_absolute_majority,'
-        'entity_id,'
-        'entity_counted,'
-        'entity_eligible_voters,'
-        'entity_received_ballots,'
-        'entity_invalid_ballots,'
-        'entity_blank_ballots,'
-        'entity_blank_votes,'
-        'entity_invalid_votes,'
-        'candidate_id,'
-        'candidate_elected,'
-        'candidate_family_name,'
-        'candidate_first_name,'
-        'candidate_votes,'
-        'candidate_party,'
-        '\n'
-    )
+    csv = MAJORZ_HEADER
     csv += (
         "final,,3503,True,56,0,0,0,0,0,1,True,Engler,Stefan,0,\n"
         "final,,3503,True,56,0,0,0,0,0,2,True,Schmid,Martin,0,\n"
@@ -470,3 +453,53 @@ def test_view_election_tacit(election_day_app_gr):
     assert "Engler Stefan" in candidates
     assert "Schmid Martin" in candidates
     assert "Wahlbeteiligung" not in candidates
+
+
+def test_view_election_relations(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+    upload_majorz_election
+
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = 'First Election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 2
+    new.form['election_type'] = 'majorz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = 'Second Election'
+    new.form['date'] = date(2015, 1, 2)
+    new.form['mandates'] = 2
+    new.form['election_type'] = 'majorz'
+    new.form['domain'] = 'federation'
+    new.form['related_elections'] = 'first-election'
+    new.form.submit()
+
+    csv = MAJORZ_HEADER
+    csv += (
+        "final,,3503,True,56,0,0,0,0,0,1,True,Engler,Stefan,0,\n"
+        "final,,3503,True,56,0,0,0,0,0,2,True,Schmid,Martin,0,\n"
+    )
+    csv = csv.encode('utf-8')
+
+    for count in ('first', 'second'):
+        upload = client.get(f'/election/{count}-election/upload').follow()
+        upload.form['file_format'] = 'internal'
+        upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+        upload = upload.form.submit()
+        assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+    for page in ('candidates', 'statistics', 'data'):
+        result = client.get(f'/election/first-election/{page}')
+        assert '<h2>Zugehörige Wahlen</h2>' in result
+        assert 'http://localhost/election/second-election' in result
+        assert 'Second Election' in result
+
+        result = client.get(f'/election/second-election/{page}')
+        assert '<h2>Zugehörige Wahlen</h2>' in result
+        assert 'http://localhost/election/first-election' in result
+        assert 'First Election' in result

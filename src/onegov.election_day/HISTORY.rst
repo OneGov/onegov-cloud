@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Allows to add related elections to elections.
+  [msom]
+
 - Allows to specify the majority type of a majorz election.
   [msom]
 

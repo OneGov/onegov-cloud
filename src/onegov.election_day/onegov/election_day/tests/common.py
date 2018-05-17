@@ -31,6 +31,27 @@ PROPORZ_HEADER = (
 )
 
 
+MAJORZ_HEADER = (
+    'election_status,'
+    'election_absolute_majority,'
+    'entity_id,'
+    'entity_counted,'
+    'entity_eligible_voters,'
+    'entity_received_ballots,'
+    'entity_invalid_ballots,'
+    'entity_blank_ballots,'
+    'entity_blank_votes,'
+    'entity_invalid_votes,'
+    'candidate_id,'
+    'candidate_elected,'
+    'candidate_family_name,'
+    'candidate_first_name,'
+    'candidate_votes,'
+    'candidate_party,'
+    '\n'
+)
+
+
 class DummyPostData(dict):
     def getlist(self, key):
         v = self[key]

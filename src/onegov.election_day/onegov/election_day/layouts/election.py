@@ -177,3 +177,13 @@ class ElectionLayout(DetailLayout):
                 )
             )
         )
+
+    @cached_property
+    def related_elections(self):
+        return [
+            (
+                association.target_election.title,
+                self.request.link(association.target_election)
+            )
+            for association in self.model.related_elections
+        ]

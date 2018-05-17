@@ -25,6 +25,7 @@
         </tal:block>
 
         <div metal:use-macro="layout.macros['related_link']" />
+        <div metal:use-macro="layout.macros['related_elections']" />
 
     </tal:block>
 </div>

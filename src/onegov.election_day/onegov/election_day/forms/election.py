@@ -1,6 +1,10 @@
 from datetime import date
+from onegov.ballot import Election
+from onegov.ballot import ElectionAssociation
 from onegov.election_day import _
 from onegov.form import Form
+from onegov.form.fields import MultiCheckboxField
+from sqlalchemy import or_
 from wtforms import BooleanField
 from wtforms import IntegerField
 from wtforms import RadioField
@@ -111,6 +115,11 @@ class ElectionForm(Form):
         label=_("Related link")
     )
 
+    related_elections = MultiCheckboxField(
+        label=_("Related elections"),
+        choices=[]
+    )
+
     def on_request(self):
         self.election_de.validators = []
         self.election_fr.validators = []
@@ -126,6 +135,11 @@ class ElectionForm(Form):
             self.election_de.validators.append(InputRequired())
         if default_locale.startswith('rm'):
             self.election_de.validators.append(InputRequired())
+
+        query = self.request.session.query(Election)
+        query = query.order_by(Election.date, Election.shortcode)
+        choices = [(election.id, election.title) for election in query]
+        self.related_elections.choices = choices
 
     def set_domain(self, principal):
         self.domain.choices = [
@@ -154,6 +168,24 @@ class ElectionForm(Form):
         if self.election_rm.data:
             titles['rm_CH'] = self.election_rm.data
         model.title_translations = titles
+
+        # use symetric relationships
+        session = self.request.session
+        query = session.query(ElectionAssociation)
+        query = query.filter(
+            or_(
+                ElectionAssociation.source_id == model.id,
+                ElectionAssociation.target_id == model.id
+            )
+        )
+        for association in query:
+            session.delete(association)
+
+        for id_ in self.related_elections.data:
+            if not model.id:
+                model.id = model.id_from_title(session)
+            session.add(ElectionAssociation(source_id=model.id, target_id=id_))
+            session.add(ElectionAssociation(source_id=id_, target_id=model.id))
 
     def apply_model(self, model):
         titles = model.title_translations or {}
@@ -184,3 +216,11 @@ class ElectionForm(Form):
                 ('proporz', _("Election based on proportional representation"))
             ]
             self.election_type.data = 'proporz'
+
+        self.related_elections.choices = [
+            choice for choice in self.related_elections.choices
+            if choice[0] != model.id
+        ]
+        self.related_elections.data = [
+            association.target_id for association in model.related_elections
+        ]

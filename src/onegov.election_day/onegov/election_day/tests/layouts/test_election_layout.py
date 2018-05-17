@@ -1,6 +1,7 @@
 from datetime import date
 from freezegun import freeze_time
 from onegov.ballot import Election
+from onegov.ballot import ElectionAssociation
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.tests.common import DummyRequest
 from unittest.mock import Mock
@@ -110,3 +111,25 @@ def test_election_layout(session):
         assert layout.svg_path == f'svg/election-{ts}.lists-panachage.any.svg'
         assert layout.svg_link == 'Election/lists-panachage-svg'
         assert layout.svg_name == 'election-panachage-lists.svg'
+
+    with freeze_time("2014-01-01 13:00"):
+        second_election = Election(
+            title="Second Election",
+            domain='federation',
+            type='proporz',
+            date=date(2011, 1, 1),
+        )
+        session.add(second_election)
+        session.flush()
+
+        association = ElectionAssociation(
+            source_id=election.id,
+            target_id=second_election.id
+        )
+        session.add(association)
+        session.flush()
+
+        assert ElectionLayout(election, request).related_elections == [
+            ('Second Election', 'Election/second-election')
+        ]
+        assert ElectionLayout(second_election, request).related_elections == []
