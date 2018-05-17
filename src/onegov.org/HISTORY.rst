@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes formcode highlighting not correctly matching all choices.
+  [href]
+
 - Adds the ability to define a link pattern for directory entries.
   [href]
 
