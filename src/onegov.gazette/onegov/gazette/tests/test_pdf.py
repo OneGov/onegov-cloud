@@ -74,7 +74,7 @@ def test_pdf_from_notice(gazette_app):
     ]
 
 
-def test_pdf_from_collection(gazette_app):
+def test_pdf_from_notices(gazette_app):
     session = gazette_app.session()
 
     with freeze_time("2017-01-01 12:00"):
@@ -103,8 +103,8 @@ def test_pdf_from_collection(gazette_app):
         session.flush()
 
     request = DummyRequest(session, gazette_app.principal)
-    collection = GazetteNoticeCollection(session)
-    file = Pdf.from_collection(collection, request)
+    notices = GazetteNoticeCollection(session)
+    file = Pdf.from_notices(notices, request)
     reader = PdfFileReader(file)
     assert [page.extractText() for page in reader.pages] == [
         (
@@ -120,7 +120,7 @@ def test_pdf_from_collection(gazette_app):
         )
     ]
 
-    file = Pdf.from_collection(collection.for_order('title', 'desc'), request)
+    file = Pdf.from_notices(notices.for_order('title', 'desc'), request)
     reader = PdfFileReader(file)
     assert [page.extractText() for page in reader.pages] == [
         (

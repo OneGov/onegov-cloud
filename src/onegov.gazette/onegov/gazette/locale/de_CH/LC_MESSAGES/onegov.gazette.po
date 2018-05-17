@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-25 09:01+0200\n"
+"POT-Creation-Date: 2018-07-02 16:48+0200\n"
 "PO-Revision-Date: 2018-06-25 09:01+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -96,6 +96,9 @@ msgstr "Veröffentlichte Meldungen"
 
 msgid "Gazette"
 msgstr "Amtsblatt"
+
+msgid "Index"
+msgstr "Stichwortverzeichnis"
 
 msgid "This value already exists."
 msgstr "Dieser Wert ist bereits vorhanden."

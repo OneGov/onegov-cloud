@@ -1,6 +1,7 @@
 from copy import deepcopy
 from io import BytesIO
 from onegov.gazette import _
+from onegov.gazette.models import IssueName
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import Category
 from onegov.gazette.models import GazetteNotice
@@ -29,6 +30,10 @@ class Pdf(PdfBase):
         self.style.table_h_notice = self.style.table + (
             ('TOPPADDING', (0, 0), (0, 0), 2),
         )
+
+        self.style.index = deepcopy(self.style.normal)
+        self.style.index.firstLineIndent = -2 * self.style.index.fontSize
+        self.style.index.leftIndent = 2 * self.style.index.fontSize
 
         self.style.paragraph.spaceAfter = 0.675 * self.style.paragraph.fontSize
         self.style.paragraph.leading = 1.275 * self.style.paragraph.fontSize
@@ -75,6 +80,76 @@ class Pdf(PdfBase):
         for file in notice.files:
             self.pdf(file.reference.file)
 
+    def category_index(self, notices):
+        """ Adds a category index. """
+
+        last_title = None
+        categories = notices.session.query(Category)
+        if notices.categories:
+            categories = categories.filter(Category.id.in_(notices.categories))
+        categories = categories.order_by(Category.title)
+        for category in categories:
+            numbers = []
+            query = notices.query().with_entities(GazetteNotice._issues)
+            query = query.filter(
+                GazetteNotice._categories.has_key(category.name)  # noqa
+            )
+            for issues in query:
+                numbers.extend([(
+                    IssueName.from_string(name).year,
+                    IssueName.from_string(name).number,
+                    int(number)
+                ) for name, number in issues[0].items() if number])
+            numbers = ', '.join([
+                f'{year}-{issue}-{number}'
+                for year, issue, number in sorted(set(numbers))
+            ])
+            if numbers:
+                title = category.title
+                if not last_title or last_title[0] != title[0]:
+                    self.h3(category.title[0])
+                last_title = category.title
+                self.p_markup(
+                    f'{title}&nbsp;&nbsp;<i>{numbers}</i>',
+                    style=self.style.index
+                )
+
+    def organization_index(self, notices):
+        """ Adds an organization index. """
+
+        last_title = None
+        organizations = notices.session.query(Organization)
+        if notices.organizations:
+            organizations = organizations.filter(
+                Organization.id.in_(notices.organizations)
+            )
+        organizations = organizations.order_by(Organization.title)
+        for organization in organizations:
+            numbers = []
+            query = notices.query().with_entities(GazetteNotice._issues)
+            query = query.filter(
+                GazetteNotice._organizations.has_key(organization.name)  # noqa
+            )
+            for issues in query:
+                numbers.extend([(
+                    IssueName.from_string(name).year,
+                    IssueName.from_string(name).number,
+                    int(number)
+                ) for name, number in issues[0].items() if number])
+            numbers = ', '.join([
+                f'{year}-{issue}-{number}'
+                for year, issue, number in sorted(set(numbers))
+            ])
+            if numbers:
+                title = organization.title
+                if not last_title or last_title[0] != title[0]:
+                    self.h3(organization.title[0])
+                last_title = organization.title
+                self.p_markup(
+                    f'{title}&nbsp;&nbsp;<i>{numbers}</i>',
+                    style=self.style.index
+                )
+
     @classmethod
     def from_notice(cls, notice, request):
         """ Create a PDF from a single notice. """
@@ -98,7 +173,7 @@ class Pdf(PdfBase):
         return result
 
     @classmethod
-    def from_collection(cls, collection, request):
+    def from_notices(cls, notices, request, add_registers=False):
         """ Create a PDF from a collection of notices. """
 
         layout = Layout(None, request)
@@ -107,13 +182,23 @@ class Pdf(PdfBase):
             result,
             author=request.app.principal.name
         )
+
         pdf.init_a4_portrait(
             page_fn=page_fn_footer,
             page_fn_later=page_fn_header_and_footer
         )
-        for notice in collection.query():
+        for notice in notices.query():
             pdf.spacer()
             pdf.notice(notice, layout)
+        if add_registers:
+            pdf.pagebreak()
+            pdf.h1(request.translate(_("Index")))
+            pdf.h2(request.translate(_("Categories")))
+            pdf.category_index(notices)
+
+            pdf.pagebreak()
+            pdf.h2(request.translate(_("Organizations")))
+            pdf.organization_index(notices)
         pdf.generate()
 
         result.seek(0)
