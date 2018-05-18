@@ -9,7 +9,7 @@ import textwrap
 from onegov.core.cache import lru_cache
 from onegov.core.csv import CSVFile
 from onegov.core.html import html_to_text
-from onegov.core.utils import normalize_for_url
+from onegov.core.utils import normalize_for_url, safe_format_keys
 from onegov.form import flatten_fieldsets, parse_formcode
 from pathlib import Path
 
@@ -26,6 +26,66 @@ def geocode(address):
         getattr(result, 'latitude', None),
         getattr(result, 'longitude', None)
     )
+
+
+def contains_number(text):
+    return re.search(r'[0-9]+', text) and True or False
+
+
+def contains_only_numbers(text):
+    return re.match(r'^[0-9\s]+$', text) and True or False
+
+
+def contains_department(text):
+    return 'depart' in text.lower()
+
+
+def contains_street(text):
+    return re.match(r'^[a-zA-Zöäü\s]+ [0-9]+', text) and True or False
+
+
+def contains_location(text):
+    return re.match(r'^[0-9]+ [a-zA-Zöäü\s]+', text) and True or False
+
+
+def contains_website(text):
+    return not contains_email(text) and '.ch' in text or 'www.' in text
+
+
+def contains_email(text):
+    return '@' in text
+
+
+def pop_matching(lines, predicate):
+    for ix, line in enumerate(lines):
+        if predicate(line):
+            break
+    else:
+        return None
+
+    return lines.pop(ix)
+
+
+def match_address(lines):
+    department = pop_matching(lines, contains_department) or ''
+    phone = pop_matching(lines, contains_only_numbers) or ''
+    street = pop_matching(lines, contains_street) or ''
+    location = pop_matching(lines, contains_location) or ''
+    website = pop_matching(lines, contains_website) or ''
+    email = pop_matching(lines, contains_email) or ''
+
+    name = lines.pop(0)
+    branch = lines and lines.pop(0) or ''
+
+    return {
+        'name': name,
+        'branch': branch,
+        'department': department,
+        'address': '\n'.join((p for p in (street, location) if p)),
+        'phone': phone,
+        'website': website and f'http://{website}' or '',
+        'email': email,
+    }
 
 
 @attr.s(auto_attribs=True)
@@ -69,30 +129,12 @@ class Institution(object):
                 print(desc)
                 continue
 
-            department = lines.pop(0).strip()
-            name = lines.pop(0).strip()
-            branch = lines.pop(0).strip()
-            website = lines.pop(-1).strip()
-            email = lines.pop(-1).strip()
-            phone = lines.pop(-1).strip()
-            address = '\n'.join(lines)
-
-            if re.search(r'[0-9]+', branch):
-                address = branch + '\n' + address
-                branch = ''
-
-            yield cls(
-                name=name,
-                branch=branch,
-                department=department,
-                website=website,
-                email=email,
-                phone=phone,
-                address=address
-            )
+            yield cls(**match_address(lines))
 
 
-def get_metadata(title, structure):
+def get_metadata(title, lead, structure, title_format, lead_format,
+                 content_fields, contact_fields, keyword_fields):
+
     fieldnames = tuple(
         f.human_id for f in flatten_fieldsets(parse_formcode(structure))
     )
@@ -101,35 +143,18 @@ def get_metadata(title, structure):
         'type': 'extended',
         'name': normalize_for_url(title),
         'title': title,
-        'lead': 'Die Volzugsbehörden der Stadt Winterthur',
+        'lead': lead,
         'structure': structure,
         'configuration': {
-            'title': f'[{fieldnames[0]}] [{fieldnames[1]}]',
-            'lead': f'[Fachstelle/Department]',
+            'title': title_format,
+            'lead': lead_format,
             'display': {
-                'contact': [
-                    'Fachstelle/Name',
-                    'Fachstelle/Abteilung',
-                    'Fachstelle/Department',
-                    'Kontakt/Adresse',
-                    'Kontakt/E-Mail',
-                    'Kontakt/Telefon',
-                    'Kontakt/Webseite'
-                ],
-                'content': [
-                    'Kategorie/Themen',
-                    'Kategorie/Vollzugsbereiche',
-                    'Kategorie/Vollzugsaufgaben'
-                ]
+                'contact': contact_fields,
+                'content': content_fields,
             },
-            'keywords': [
-                'Kategorie/Themen'
-            ],
+            'keywords': keyword_fields,
             'searchable': fieldnames,
-            'order': [
-                fieldnames[0],
-                fieldnames[1],
-            ],
+            'order': safe_format_keys(title_format)
         }
     }
 
@@ -231,6 +256,26 @@ def transform_vollzug(path, prefix, output_file):
 
     metadata = get_metadata(
         title='Vollzugsbehörden',
+        lead='Die Volzugsbehörden der Stadt Winterthur',
+        title_format='[Fachstelle/Name] [Fachstelle/Abteilung]',
+        lead_format='[Fachstelle/Department]',
+        content_fields=[
+            'Kategorie/Themen',
+            'Kategorie/Vollzugsbereiche',
+            'Kategorie/Vollzugsaufgaben'
+        ],
+        contact_fields=[
+            'Fachstelle/Name',
+            'Fachstelle/Abteilung',
+            'Fachstelle/Department',
+            'Kontakt/Adresse',
+            'Kontakt/E-Mail',
+            'Kontakt/Telefon',
+            'Kontakt/Webseite'
+        ],
+        keyword_fields=[
+            'Kategorie/Themen'
+        ],
         structure=textwrap.dedent(f"""\
             # Fachstelle
             Name *= ___
@@ -239,8 +284,8 @@ def transform_vollzug(path, prefix, output_file):
 
             # Kontakt
             Adresse = ...
-            E-Mail = ___
             Telefon = ___
+            E-Mail = ___
             Webseite = ___
 
             # Kategorie
