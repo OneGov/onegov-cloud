@@ -11,7 +11,7 @@ from onegov.gazette.forms import NoticeForm
 from onegov.gazette.forms import UnrestrictedNoticeForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import GazetteNotice
-from onegov.gazette.pdf import Pdf
+from onegov.gazette.pdf import NoticesPdf
 from onegov.gazette.views import get_user_and_group
 from webob.exc import HTTPForbidden
 
@@ -148,7 +148,7 @@ def preview_notice(self, request):
 def preview_notice_pdf(self, request):
     """ Preview the notice as PDF. """
 
-    pdf = Pdf.from_notice(self, request)
+    pdf = NoticesPdf.from_notice(self, request)
 
     filename = normalize_for_url(
         '{}-{}-{}'.format(

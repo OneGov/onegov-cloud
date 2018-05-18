@@ -31,10 +31,6 @@ class Pdf(PdfBase):
             ('TOPPADDING', (0, 0), (0, 0), 2),
         )
 
-        self.style.index = deepcopy(self.style.normal)
-        self.style.index.firstLineIndent = -2 * self.style.index.fontSize
-        self.style.index.leftIndent = 2 * self.style.index.fontSize
-
         self.style.paragraph.spaceAfter = 0.675 * self.style.paragraph.fontSize
         self.style.paragraph.leading = 1.275 * self.style.paragraph.fontSize
 
@@ -42,43 +38,17 @@ class Pdf(PdfBase):
         self.style.li.spaceAfter = 0.275 * self.style.li.fontSize
         self.style.li.leading = 1.275 * self.style.li.fontSize
 
-        # Indent left everthing to stress the issue number
-        self.style.leftIndent = 30
-        self.style.title.leftIndent = self.style.leftIndent
-        self.style.heading1.leftIndent = self.style.leftIndent
-        self.style.heading2.leftIndent = self.style.leftIndent
-        self.style.heading3.leftIndent = self.style.leftIndent
-        self.style.heading4.leftIndent = self.style.leftIndent
-        self.style.paragraph.leftIndent = self.style.leftIndent
-        self.style.ol.leftIndent = self.style.leftIndent
-        self.style.ul.leftIndent = self.style.leftIndent
 
-    def notice(self, notice, layout, publication_number='xxx'):
-        """ Adds an official notice. """
+class IndexPdf(Pdf):
 
-        self.table(
-            [[
-                MarkupParagraph(publication_number, self.style.normal),
-                MarkupParagraph(notice.title, self.style.h_notice)
-            ]],
-            [self.style.leftIndent, None],
-            style=self.style.table_h_notice
-        )
-        self.story[-1].keepWithNext = True
-        self.mini_html(notice.text)
-        if notice.author_place and notice.author_date:
-            self.story[-1].keepWithNext = True
-            self.mini_html(
-                "{}, {}<br>{}".format(
-                    notice.author_place,
-                    layout.format_date(
-                        notice.author_date, 'date_long'
-                    ),
-                    notice.author_name
-                )
-            )
-        for file in notice.files:
-            self.pdf(file.reference.file)
+    def adjust_style(self, font_size=10):
+        """ Adds styles for notices. """
+
+        super(IndexPdf, self).adjust_style(font_size)
+
+        self.style.index = deepcopy(self.style.normal)
+        self.style.index.firstLineIndent = -2 * self.style.index.fontSize
+        self.style.index.leftIndent = 2 * self.style.index.fontSize
 
     def category_index(self, notices):
         """ Adds a category index. """
@@ -151,6 +121,79 @@ class Pdf(PdfBase):
                 )
 
     @classmethod
+    def from_notices(cls, notices, request):
+        """ Create an index PDF from a collection of notices. """
+
+        title = request.translate(_("Gazette"))
+        result = BytesIO()
+        pdf = cls(
+            result,
+            title=title,
+            author=request.app.principal.name
+        )
+        pdf.init_a4_portrait(
+            page_fn=page_fn_footer,
+            page_fn_later=page_fn_header_and_footer
+        )
+        pdf.h1(title)
+        pdf.h1(request.translate(_("Index")))
+        pdf.h2(request.translate(_("Organizations")))
+        pdf.organization_index(notices)
+        pdf.pagebreak()
+        pdf.h2(request.translate(_("Categories")))
+        pdf.category_index(notices)
+        pdf.generate()
+
+        result.seek(0)
+        return result
+
+
+class NoticesPdf(Pdf):
+
+    def adjust_style(self, font_size=10):
+        """ Adds styles for notices. """
+
+        super(NoticesPdf, self).adjust_style(font_size)
+
+        # Indent left everthing to stress the issue number
+        self.style.leftIndent = 30
+        self.style.title.leftIndent = self.style.leftIndent
+        self.style.heading1.leftIndent = self.style.leftIndent
+        self.style.heading2.leftIndent = self.style.leftIndent
+        self.style.heading3.leftIndent = self.style.leftIndent
+        self.style.heading4.leftIndent = self.style.leftIndent
+        self.style.paragraph.leftIndent = self.style.leftIndent
+        self.style.ol.leftIndent = self.style.leftIndent
+        self.style.ul.leftIndent = self.style.leftIndent
+
+    def notice(self, notice, layout, publication_number='xxx'):
+        """ Adds an official notice. """
+
+        self.table(
+            [[
+                MarkupParagraph(publication_number, self.style.normal),
+                MarkupParagraph(notice.title, self.style.h_notice)
+            ]],
+            [self.style.leftIndent, None],
+            style=self.style.table_h_notice
+        )
+        self.story[-1].keepWithNext = True
+        self.mini_html(notice.text)
+        if notice.author_place and notice.author_date:
+            self.story[-1].keepWithNext = True
+            self.mini_html(
+                "{}, {}<br>{}".format(
+                    notice.author_place,
+                    layout.format_date(
+                        notice.author_date, 'date_long'
+                    ),
+                    notice.author_name
+                )
+            )
+        for file in notice.files:
+            self.pdf(file.reference.file)
+
+    @classmethod
     def from_notice(cls, notice, request):
         """ Create a PDF from a single notice. """
 
@@ -173,7 +216,7 @@ class Pdf(PdfBase):
         return result
 
     @classmethod
-    def from_notices(cls, notices, request, add_registers=False):
+    def from_notices(cls, notices, request):
         """ Create a PDF from a collection of notices. """
 
         layout = Layout(None, request)
@@ -190,22 +233,13 @@ class Pdf(PdfBase):
         for notice in notices.query():
             pdf.spacer()
             pdf.notice(notice, layout)
-        if add_registers:
-            pdf.pagebreak()
-            pdf.h1(request.translate(_("Index")))
-            pdf.h2(request.translate(_("Categories")))
-            pdf.category_index(notices)
-
-            pdf.pagebreak()
-            pdf.h2(request.translate(_("Organizations")))
-            pdf.organization_index(notices)
         pdf.generate()
 
         result.seek(0)
         return result
 
 
-class IssuePdf(Pdf):
+class IssuePdf(NoticesPdf):
     """ A PDF containing all the notices of a single issue.
 
     Generating this PDF automatically assigns publication numbers!

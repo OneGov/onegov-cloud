@@ -13,7 +13,8 @@ from onegov.gazette.forms import EmptyForm
 from onegov.gazette.forms import NoticeForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import GazetteNotice
-from onegov.gazette.pdf import Pdf
+from onegov.gazette.pdf import IndexPdf
+from onegov.gazette.pdf import NoticesPdf
 from onegov.gazette.views import get_user
 from onegov.gazette.views import get_user_and_group
 from xlsxwriter import Workbook
@@ -145,7 +146,12 @@ def view_notices(self, request):
         filters = None
         title = _("Published Official Notices")
 
-    preview = request.link(self, name='preview-pdf') if is_publisher else None
+    preview = None
+    index = None
+    if is_publisher:
+        preview = request.link(self, name='preview-pdf')
+    if is_publisher and self.state == 'published':
+        index = request.link(self, name='index')
 
     return {
         'layout': layout,
@@ -159,7 +165,8 @@ def view_notices(self, request):
         'orderings': orderings,
         'clear': request.link(self.for_dates(None, None).for_term(None)),
         'new_notice': request.link(self, name='new-notice'),
-        'preview': preview
+        'preview': preview,
+        'index': index
     }
 
 
@@ -262,7 +269,35 @@ def view_notices_preview_pdf(self, request):
 
     """
 
-    pdf = Pdf.from_notices(self, request, add_registers=True)
+    pdf = NoticesPdf.from_notices(self, request)
+
+    filename = normalize_for_url(
+        '{}-{}'.format(
+            request.translate(_("Gazette")),
+            request.app.principal.name
+        )
+    )
+
+    return Response(
+        pdf.read(),
+        content_type='application/pdf',
+        content_disposition=f'inline; filename={filename}.pdf'
+    )
+
+
+@GazetteApp.view(
+    model=GazetteNoticeCollection,
+    name='index',
+    permission=Private
+)
+def view_notices_index(self, request):
+    """ Export the index to the notices as PDF.
+
+    This view is only visible by a publisher.
+
+    """
+
+    pdf = IndexPdf.from_notices(self, request)
 
     filename = normalize_for_url(
         '{}-{}'.format(

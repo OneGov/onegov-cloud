@@ -6,7 +6,9 @@ from onegov.gazette.collections import GazetteNoticeCollection
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import GazetteNoticeFile
 from onegov.gazette.models import Issue
+from onegov.gazette.pdf import IndexPdf
 from onegov.gazette.pdf import IssuePdf
+from onegov.gazette.pdf import NoticesPdf
 from onegov.gazette.pdf import Pdf
 from PyPDF2 import PdfFileReader
 from sedate import utcnow
@@ -66,7 +68,7 @@ def test_pdf_from_notice(gazette_app):
         session.flush()
 
     request = DummyRequest(session, gazette_app.principal)
-    file = Pdf.from_notice(notice, request)
+    file = NoticesPdf.from_notice(notice, request)
     reader = PdfFileReader(file)
     assert [page.extractText() for page in reader.pages] == [
         '© 2018 Govikon\n1\nxxx\ntitle\ntext\nplace, 1. Januar 2017\nauthor\n',
@@ -104,7 +106,7 @@ def test_pdf_from_notices(gazette_app):
 
     request = DummyRequest(session, gazette_app.principal)
     notices = GazetteNoticeCollection(session)
-    file = Pdf.from_notices(notices, request)
+    file = NoticesPdf.from_notices(notices, request)
     reader = PdfFileReader(file)
     assert [page.extractText() for page in reader.pages] == [
         (
@@ -120,7 +122,7 @@ def test_pdf_from_notices(gazette_app):
         )
     ]
 
-    file = Pdf.from_notices(notices.for_order('title', 'desc'), request)
+    file = NoticesPdf.from_notices(notices.for_order('title', 'desc'), request)
     reader = PdfFileReader(file)
     assert [page.extractText() for page in reader.pages] == [
         (
