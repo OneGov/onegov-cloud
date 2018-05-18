@@ -1,3 +1,4 @@
+import csv
 import json
 import re
 import shutil
@@ -98,10 +99,16 @@ def build_metadata(title, lead, structure, title_format, lead_format,
 def load_files_by_prefix(path, prefix, mapping):
     files = []
 
+    dialect = csv.excel
+
     for name, fields in mapping:
         for p in Path(path).glob(f'{prefix}*'):
             if name in p.name:
-                files.append(CSVFile(p.open('rb'), fields))
+                files.append(CSVFile(
+                    csvfile=p.open('rb'),
+                    expected_headers=fields,
+                    dialect=dialect
+                ))
                 break
 
     assert all(files)
