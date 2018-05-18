@@ -1,5 +1,6 @@
 import click
 
+from .fachstellen import transform_fachstellen
 from .vollzug import transform_vollzug
 
 
@@ -20,6 +21,19 @@ def cli(pdb):
 def transform_vollzug_cli(path, prefix, output):
     try:
         return transform_vollzug(path, prefix, output)
+    except Exception:
+        if POST_MORTEM:
+            import pdb; pdb.post_mortem()  # noqa
+        raise
+
+
+@cli.command(name='transform-fachstellen')
+@click.argument('path', type=click.Path(exists=True, file_okay=False))
+@click.argument('prefix')
+@click.option('--output', type=click.Path(), default=None)
+def transform_fachstellen_cli(path, prefix, output):
+    try:
+        return transform_fachstellen(path, prefix, output)
     except Exception:
         if POST_MORTEM:
             import pdb; pdb.post_mortem()  # noqa
