@@ -114,7 +114,7 @@ def as_choices(values, indent=16):
     return textwrap.indent(
         '\n'.join(f'[ ] {v}' for v in values),
         ' ' * 16,
-        lambda line: not values[0].endswith(line.split(']')[-1].strip())
+        lambda line: not values[0] == line.split(']')[-1].strip()
     )
 
 
