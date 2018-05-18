@@ -1,15 +1,31 @@
 import attr
+import geopy
 import json
 import re
 import shutil
 import tempfile
 import textwrap
 
+from onegov.core.cache import lru_cache
 from onegov.core.csv import CSVFile
 from onegov.core.html import html_to_text
 from onegov.core.utils import normalize_for_url
 from onegov.form import flatten_fieldsets, parse_formcode
 from pathlib import Path
+
+
+@lru_cache(maxsize=1)
+def geocoder():
+    return geopy.geocoders.Nominatim(user_agent='onegov-cloud-import')
+
+
+@lru_cache(maxsize=64)
+def geocode(address):
+    result = geocoder().geocode(address)
+    return (
+        getattr(result, 'latitude', None),
+        getattr(result, 'longitude', None)
+    )
 
 
 @attr.s(auto_attribs=True)
@@ -44,7 +60,7 @@ class Institution(object):
                 if html_to_text(desc).strip():
                     yield desc
 
-        for desc in split(description):
+        for desc in split(clean(description)):
 
             lines = html_to_text(desc).split('\n\n')
 
@@ -85,19 +101,34 @@ def get_metadata(title, structure):
         'type': 'extended',
         'name': normalize_for_url(title),
         'title': title,
-        'lead': '',
+        'lead': 'Die Volzugsbehörden der Stadt Winterthur',
         'structure': structure,
         'configuration': {
             'title': f'[{fieldnames[0]}] [{fieldnames[1]}]',
+            'lead': f'[Fachstelle/Department]',
             'display': {
-                'contact': [],
-                'content': fieldnames
+                'contact': [
+                    'Fachstelle/Name',
+                    'Fachstelle/Abteilung',
+                    'Fachstelle/Department',
+                    'Kontakt/Adresse',
+                    'Kontakt/E-Mail',
+                    'Kontakt/Telefon',
+                    'Kontakt/Webseite'
+                ],
+                'content': [
+                    'Kategorie/Themen',
+                    'Kategorie/Vollzugsbereiche',
+                    'Kategorie/Vollzugsaufgaben'
+                ]
             },
-            'keywords': [],
+            'keywords': [
+                'Kategorie/Themen'
+            ],
             'searchable': fieldnames,
             'order': [
+                fieldnames[0],
                 fieldnames[1],
-                fieldnames[0]
             ],
         }
     }
@@ -235,7 +266,9 @@ def transform_vollzug(path, prefix, output_file):
             'Kategorie/Vollzugsbereiche': list(i.chapters),
             'Kategorie/Vollzugsaufgaben': '\n'.join(
                 f'- {t}' for t in sorted(list(i.tasks))
-            )
+            ),
+            'Latitude': geocode(i.address)[0],
+            'Longitude': geocode(i.address)[1],
         } for i in institutions
     ]
 
