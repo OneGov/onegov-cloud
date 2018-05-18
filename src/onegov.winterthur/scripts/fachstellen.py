@@ -20,13 +20,13 @@ def transform_fachstellen(path, prefix, output_file):
             'Fachstelle/Telefon': r.phone,
             'Fachstelle/E-Mail': r.email,
             'Fachstelle/Webseite': r.www and f'http://{r.www}' or '',
-            'Fachstelle/Gruppen': [
+            'Fachstelle/Themen': [
                 g.strip() for g in r.addressgroup.split(';')
             ]
         })
 
-    groups = {g for d in data for g in d['Fachstelle/Gruppen']}
-    groups = as_choices(sorted(list(groups)))
+    topics = {g for d in data for g in d['Fachstelle/Themen']}
+    topics = as_choices(sorted(list(topics)))
 
     geo = Geocoder()
 
@@ -42,7 +42,7 @@ def transform_fachstellen(path, prefix, output_file):
         lead='Die Fachstellen der Stadt Winterthur',
         title_format='[Fachstelle/Name]',
         lead_format='[Fachstelle/Beschreibung]',
-        content_fields=['Fachstelle/Gruppen'],
+        content_fields=['Fachstelle/Themen'],
         contact_fields=[
             'Fachstelle/Adresse',
             'Fachstelle/Telefon',
@@ -50,7 +50,7 @@ def transform_fachstellen(path, prefix, output_file):
             'Fachstelle/Webseite',
         ],
         keyword_fields=[
-            'Fachstelle/Gruppen'
+            'Fachstelle/Themen'
         ],
         structure=textwrap.dedent(f"""\
             # Fachstelle
@@ -62,8 +62,8 @@ def transform_fachstellen(path, prefix, output_file):
             E-Mail = @@@
             Webseite = ___
 
-            Gruppen =
-                {groups}
+            Themen =
+                {topics}
         """))
 
     store_in_zip(output_file, {
