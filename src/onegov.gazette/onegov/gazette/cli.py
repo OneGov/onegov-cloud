@@ -202,6 +202,7 @@ def import_categories(ctx, file, clear, dry_run, locale):
         request.locale = locale
         headers = {
             'id': request.translate(_("ID")),
+            'name': request.translate(_("Name")),
             'title': request.translate(_("Title")),
             'active': request.translate(_("Active"))
         }
@@ -228,12 +229,15 @@ def import_categories(ctx, file, clear, dry_run, locale):
         for line in lines:
             count += 1
             id_ = int(getattr(line, columns['id']))
+            name = getattr(line, columns['name'])
             title = getattr(line, columns['title'])
             active = bool(int(getattr(line, columns['active'])))
             categories.add_root(
                 id=id_,
+                name=name,
                 title=title,
-                active=active
+                active=active,
+                order=count
             )
 
         click.secho("{} categorie(s) imported".format(count), fg='green')

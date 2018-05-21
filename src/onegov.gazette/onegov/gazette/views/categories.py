@@ -3,7 +3,6 @@ from io import BytesIO
 from morepath import redirect
 from morepath.request import Response
 from onegov.core.security import Private
-from onegov.core.security import Secret
 from onegov.gazette import _
 from onegov.gazette import GazetteApp
 from onegov.gazette.collections import CategoryCollection
@@ -154,7 +153,7 @@ def delete_category(self, request, form):
 @GazetteApp.view(
     model=CategoryCollection,
     name='export',
-    permission=Secret
+    permission=Private
 )
 def export_categories(self, request):
     """ Export all categories as XLSX. The exported file can be re-imported
@@ -169,6 +168,7 @@ def export_categories(self, request):
     worksheet.name = request.translate(_("Categories"))
     worksheet.write_row(0, 0, (
         request.translate(_("ID")),
+        request.translate(_("Name")),
         request.translate(_("Title")),
         request.translate(_("Active"))
     ))
@@ -176,6 +176,7 @@ def export_categories(self, request):
     for index, category in enumerate(self.query()):
         worksheet.write_row(index + 1, 0, (
             category.id or '',
+            category.name or '',
             category.title or '',
             category.active,
         ))
