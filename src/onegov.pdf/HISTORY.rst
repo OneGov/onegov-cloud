@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.3.4 (2018-05-21)
+~~~~~~~~~~~~~~~~~~~~~
 
 - Fixes adding mini html for an empty string throwing an error.
   [msom]
