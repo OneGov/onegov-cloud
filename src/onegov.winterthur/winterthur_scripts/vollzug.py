@@ -1,5 +1,4 @@
 import attr
-import shutil
 import textwrap
 
 from .utils import as_choices
