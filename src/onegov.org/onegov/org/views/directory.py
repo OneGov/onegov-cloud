@@ -213,6 +213,7 @@ def view_directory(self, request):
         'title': self.directory.title,
         'entries': request.exclude_invisible(self.query()),
         'directory': self.directory,
+        'searchwidget': self.searchwidget,
         'filters': filters,
         'geojson': request.link(self, name='+geojson'),
         'submit': request.link(self, name='+submit')

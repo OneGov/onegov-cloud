@@ -16,6 +16,12 @@
             </div>
         </div>
 
+        <div class="row" tal:condition="searchwidget">
+            <div class="columns medium-12">
+                <tal:b replace="structure searchwidget.html(layout)" />
+            </div>
+        </div>
+
         <div class="row">
             <div class="columns medium-8">
                 <p tal:condition="not:entries" i18n:translate="">No entries found.</p>
@@ -53,6 +59,7 @@
                     </dl>
                 </div>
             </div>
+
         </div>
     </tal:block>
 </div>

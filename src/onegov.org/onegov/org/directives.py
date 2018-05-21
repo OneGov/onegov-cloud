@@ -57,3 +57,25 @@ class UserlinkAction(Action):
 
     def perform(self, func, linkgroup_registry):
         linkgroup_registry.append(func)
+
+
+class DirectorySearchWidgetAction(Action):
+    """ Registers a directory search widget. """
+
+    config = {
+        'directory_search_widget_registry': dict
+    }
+
+    def __init__(self, name):
+        self.name = name
+
+    def identifier(self, directory_search_widget_registry):
+        return self.name
+
+    def perform(self, cls, directory_search_widget_registry):
+        cls.name = self.name
+
+        assert hasattr(cls, 'html')
+        assert hasattr(cls, 'adapt')
+
+        directory_search_widget_registry[self.name] = cls

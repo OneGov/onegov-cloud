@@ -5,7 +5,7 @@ import morepath
 from collections import defaultdict
 from datetime import date
 from onegov.chat import MessageCollection
-from onegov.core.converters import extended_date_converter
+from onegov.core.converters import extended_date_converter, json_converter
 from onegov.directory import Directory
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryEntryCollection
@@ -540,16 +540,27 @@ def get_directory(app, name):
 @OrgApp.path(
     model=DirectoryEntryCollection,
     path='/directories/{directory_name}',
-    converters={'keywords': keywords_converter})
-def get_directory_entries(app, directory_name, keywords, page=0):
+    converters={
+        'keywords': keywords_converter,
+        'search_query': json_converter,
+    })
+def get_directory_entries(app, directory_name, keywords, page=0,
+                          search=None, search_query=None):
     directory = DirectoryCollection(app.session()).by_name(directory_name)
+
+    if search and search in app.config.directory_search_widget_registry:
+        cls = app.config.directory_search_widget_registry[search]
+        searchwidget = cls(app, directory, search_query)
+    else:
+        searchwidget = None
 
     if directory:
         collection = DirectoryEntryCollection(
             directory=directory,
             type='extended',
             keywords=keywords,
-            page=page
+            page=page,
+            searchwidget=searchwidget
         )
 
         collection.is_hidden_from_public = directory.is_hidden_from_public

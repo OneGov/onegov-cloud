@@ -35,6 +35,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     homepage_widget = directive(directives.HomepageWidgetAction)
     export = directive(directives.ExportAction)
     userlinks = directive(directives.UserlinkAction)
+    directory_search_widget = directive(directives.DirectorySearchWidgetAction)
 
     #: the version of this application (do not change manually!)
     version = '0.28.0'

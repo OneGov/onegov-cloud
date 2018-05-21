@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to define a search widget for directory entries.
+  [href]
+
 0.28.0 (2018-05-17)
 ~~~~~~~~~~~~~~~~~~~
 
