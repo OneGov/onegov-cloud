@@ -6,6 +6,7 @@ import morepath
 from datetime import date, datetime
 from onegov.core.framework import Framework
 from onegov.core.utils import is_uuid
+from onegov.core.custom import custom_json as json
 from time import mktime, strptime
 from uuid import UUID
 
@@ -28,6 +29,27 @@ def extended_date_encode(d):
 
 extended_date_converter = morepath.Converter(
     decode=extended_date_decode, encode=extended_date_encode
+)
+
+
+def json_decode(s):
+    """ Decodes a json string to a dict. """
+    if not s:
+        return None
+
+    return json.loads(s)
+
+
+def json_encode(d):
+    """ Encodes a dictionary to json. """
+    if not d:
+        return '{}'
+
+    return json.dumps(d)
+
+
+json_converter = morepath.Converter(
+    decode=json_decode, encode=json_encode
 )
 
 
