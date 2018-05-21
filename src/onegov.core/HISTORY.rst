@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.69.1 (2018-05-21)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a json encoder/decoder for morepath query parameters.
   [href]
