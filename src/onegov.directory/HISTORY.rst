@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to programatically influence the entry collection results.
+  [href]
+
 0.3.1 (2018-05-16)
 ~~~~~~~~~~~~~~~~~~~~~
 

@@ -17,19 +17,29 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
 
     """
 
-    def __init__(self, directory, type='*', keywords=None, page=0):
+    def __init__(self, directory, type='*', keywords=None, page=0,
+                 searchwidget=None):
         super().__init__(object_session(directory))
 
         self.type = type
         self.directory = directory
         self.keywords = keywords or {}
         self.page = page
+        self.searchwidget = searchwidget
 
     def __eq__(self, other):
         return self.type == other.type and self.page == other.page
 
     def subset(self):
         return self.query()
+
+    @property
+    def search(self):
+        return self.searchwidget and self.searchwidget.name
+
+    @property
+    def search_query(self):
+        return self.searchwidget and self.searchwidget.search_query
 
     @property
     def page_index(self):
@@ -71,6 +81,9 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
             query = query.order_by(desc(cls.order))
         else:
             query = query.order_by(cls.order)
+
+        if self.searchwidget:
+            query = self.searchwidget.adapt(query)
 
         return query
 
@@ -123,4 +136,8 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
             elif keyword in parameters:
                 del parameters[keyword]
 
-        return self.__class__(self.directory, self.type, parameters)
+        return self.__class__(
+            directory=self.directory,
+            type=self.type,
+            searchwidget=self.searchwidget,
+            keywords=parameters)
