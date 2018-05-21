@@ -2,10 +2,11 @@ import textwrap
 
 from itertools import chain
 
+from .utils import as_choices
 from .utils import build_metadata
+from .utils import html_to_text
 from .utils import load_files_by_prefix
 from .utils import store_in_zip
-from .utils import as_choices
 
 
 def transform_museum(path, prefix, output_file):
@@ -36,7 +37,7 @@ def transform_museum(path, prefix, output_file):
     for record in chain(history.lines, art.lines):
         data.append({
             'Angebot/Titel': record.titel,
-            'Angebot/Beschreibung': record.beschreibung,
+            'Angebot/Beschreibung': html_to_text(record.beschreibung),
             'Angebot/Einrichtung': record.kultureinrichtungid,
             'Angebot/Dauer': record.dauer,
             'Angebot/Gesamtangebot': [record.gesamtangebotid],
@@ -70,13 +71,13 @@ def transform_museum(path, prefix, output_file):
             'Angebot/Dauer',
             'Angebot/Gesamtangebot',
             'Angebot/Zielgruppe',
-            'Angebot/Datum',
-            'Angebot/Anmeldung',
-            'Angebot/Kosten',
-            'Angebot/Leitung',
-            'Angebot/Besonderes',
+            'Details/Datum',
+            'Details/Anmeldung',
+            'Details/Kosten',
+            'Details/Leitung',
+            'Details/Besonderes',
         ],
-        contact_fields=[''],
+        contact_fields=[],
         keyword_fields=[
             'Angebot/Gesamtangebot',
             'Angebot/Zielgruppe'

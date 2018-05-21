@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      i18n:domain="onegov.winterthur">
+<body>
+
+<metal:hierarchical_search define-macro="hierarchical_search">
+<hr>
+<div style="margin-bottom: .75rem;">
+    <a href="${parent_link}" tal:condition="parent_link">
+        <strong>&laquo; ${parent_name}</strong>
+    </a>
+</div>
+<ul tal:condition="children">
+    <li tal:repeat="(text, link) children">
+        <a tal:condition="link" href="${link}">${text}</a>
+        <span tal:condition="not:link" >${text}</span>
+    </li>
+</ul>
+<hr>
+</metal:hierarchical_search>

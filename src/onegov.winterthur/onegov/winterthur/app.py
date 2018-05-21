@@ -1,4 +1,7 @@
+from cached_property import cached_property
 from onegov.core import utils
+from onegov.core.custom import custom_json as json
+from onegov.core.utils import module_path
 from onegov.org import OrgApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 from onegov.winterthur.initial_content import create_new_organisation
@@ -22,6 +25,15 @@ class WinterthurApp(OrgApp):
 
     def enable_iframes(self, request):
         request.content_security_policy.frame_ancestors |= self.frame_ancestors
+
+    @cached_property
+    def hierarchy(self):
+        path = module_path('onegov.winterthur', 'assets/hierarchy.json')
+
+        with open(path, 'r') as hierarchy:
+            data = json.loads(hierarchy.read())
+
+        return [tuple(line.split('::')) for line in data]
 
 
 @WinterthurApp.template_directory()
