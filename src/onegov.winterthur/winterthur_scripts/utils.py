@@ -9,6 +9,7 @@ from collections import namedtuple
 from geopy.geocoders import Nominatim
 from onegov.core.cache import lru_cache
 from onegov.core.csv import CSVFile
+from onegov.core.html import html_to_text as core_html_to_text
 from onegov.core.utils import normalize_for_url, safe_format_keys
 from onegov.form import flatten_fieldsets, parse_formcode
 from pathlib import Path
@@ -133,3 +134,12 @@ def store_in_zip(output_file, data):
                 f.write(json.dumps(data))
 
         shutil.make_archive(output_file.split('.')[0], 'zip', directory)
+
+
+def html_to_text(html):
+    return core_html_to_text(
+        html,
+        ul_item_mark='•',
+        strong_mark='',
+        emphasis_mark=''
+    ).replace('\n\n', '\n')

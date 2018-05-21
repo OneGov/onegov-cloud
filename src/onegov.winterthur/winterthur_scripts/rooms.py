@@ -1,9 +1,8 @@
 import textwrap
 
-from onegov.core.html import html_to_text
-
 from .utils import as_choices
 from .utils import build_metadata
+from .utils import html_to_text
 from .utils import load_files_by_prefix
 from .utils import store_in_zip
 
@@ -35,7 +34,7 @@ def transform_rooms(path, prefix, output_file):
         data.append({
             'Raum/Name': r.room_name,
             'Raum/Untertitel': r.room_tags,
-            'Raum/Beschreibung': r.room_description,
+            'Raum/Beschreibung': html_to_text(r.room_description),
             'Ort/Zone': [r.zone] if r.zone else [],
             'Ort/Kreis': [r.district] if r.district else [],
             'Details/Plätze': r.size_max,
@@ -43,13 +42,11 @@ def transform_rooms(path, prefix, output_file):
                 r.strip() for r in r.categories.split(';') if r.strip()
             ],
             'Details/Funktionen': html_to_text(r.room_ability),
-            'Details/Infrastruktur': (
-                html_to_text(r.room_infrastructure).replace('\n\n', '\n')
-            ),
+            'Details/Infrastruktur': html_to_text(r.room_infrastructure),
             'Details/Vermieter': r.renter_address,
             'Details/Vermieter Präsenzzeit': r.renter_present_time,
             'Details/Sponsor': r.room_sponsorship,
-            'Details/Nutzungsbedingungen': r.room_tos
+            'Details/Nutzungsbedingungen': html_to_text(r.room_tos)
         })
 
     zones = sorted(

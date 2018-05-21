@@ -2,8 +2,6 @@ import attr
 import shutil
 import textwrap
 
-from onegov.core.html import html_to_text
-
 from .utils import as_choices
 from .utils import build_metadata
 from .utils import contains_department
@@ -13,6 +11,7 @@ from .utils import contains_only_numbers
 from .utils import contains_street
 from .utils import contains_website
 from .utils import Geocoder
+from .utils import html_to_text
 from .utils import load_files_by_prefix
 from .utils import pop_matching
 from .utils import store_in_zip
@@ -200,7 +199,7 @@ class Institution(object):
 
         for desc in split(clean(description)):
 
-            lines = html_to_text(desc).split('\n\n')
+            lines = html_to_text(desc).split('\n')
 
             if len(lines) < 6:
                 print(f"Could not parse a description for {uid}:")
