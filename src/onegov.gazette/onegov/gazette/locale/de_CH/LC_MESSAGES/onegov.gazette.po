@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-08 13:27+0200\n"
+"POT-Creation-Date: 2018-05-28 08:17+0200\n"
 "PO-Revision-Date: 2018-05-08 13:27+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -23,8 +23,38 @@ msgstr "Name"
 msgid "E-Mail"
 msgstr "E-Mail"
 
+msgid "ID"
+msgstr "ID"
+
+msgid "Title"
+msgstr "Titel"
+
+msgid "Active"
+msgstr "Aktiv"
+
+msgid "Parent Organization"
+msgstr "Übergeordnete Organisation"
+
+msgid "Number"
+msgstr "Nummer"
+
+msgid "Date"
+msgstr "Datum"
+
+msgid "Deadline"
+msgstr "Eingabeschluss"
+
 msgid "Editors"
 msgstr "Redaktoren"
+
+msgid "Organizations"
+msgstr "Organisationen"
+
+msgid "Categories"
+msgstr "Rubriken"
+
+msgid "Issues"
+msgstr "Ausgaben"
 
 msgid "Show all"
 msgstr "Alle anzeigen"
@@ -45,15 +75,6 @@ msgstr "Meldungen"
 
 msgid "Statistics"
 msgstr "Statistiken"
-
-msgid "Issues"
-msgstr "Ausgaben"
-
-msgid "Organizations"
-msgstr "Organisationen"
-
-msgid "Categories"
-msgstr "Rubriken"
 
 msgid "Users"
 msgstr "Benutzer"
@@ -94,29 +115,11 @@ msgstr "veröffentlicht"
 msgid "created"
 msgstr "erstellt"
 
-msgid "Title"
-msgstr "Titel"
-
-msgid "Active"
-msgstr "Aktiv"
-
-msgid "ID"
-msgstr "ID"
-
 msgid "Leave blank to set the value automatically."
 msgstr "Leer lassen, um den Wert automatisch zu setzen."
 
 msgid "Comment"
 msgstr "Bemerkung"
-
-msgid "Number"
-msgstr "Nummer"
-
-msgid "Date"
-msgstr "Datum"
-
-msgid "Deadline"
-msgstr "Eingabeschluss"
 
 msgid "Title (maximum 60 characters)"
 msgstr "Titel (höchstens 60 Zeichen)"
@@ -159,9 +162,6 @@ msgstr "Ja"
 
 msgid "Select one"
 msgstr "Bitte auswählen"
-
-msgid "Parent Organization"
-msgstr "Übergeordnete Organisation"
 
 msgid "External ID"
 msgstr "Externe ID"
@@ -210,6 +210,9 @@ msgstr "Keine Rubriken."
 
 msgid "Edit"
 msgstr "Bearbeiten"
+
+msgid "Download"
+msgstr "Herunterladen"
 
 msgid "Download all categories as XLSX."
 msgstr "Als XLSX herunterladen."
@@ -368,9 +371,6 @@ msgstr "Ordnen"
 msgid "No organizations."
 msgstr "Keine Organisationen."
 
-msgid "Download"
-msgstr "Herunterladen"
-
 msgid "Download all organizations as XLSX."
 msgstr "Als XLSX herunterladen."
 
@@ -465,9 +465,6 @@ msgstr "Es können nur unbenutzte Rubriken gelöscht werden."
 
 msgid "Category deleted."
 msgstr "Rubrik gelöscht."
-
-msgid "Publishers"
-msgstr "Herausgeber"
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"
@@ -735,6 +732,9 @@ msgstr "Benutzer löschen"
 
 msgid "Do you really clear all active sessions?"
 msgstr "Wollen Sie wirklich alle Sitzungen beenden?"
+
+msgid "Publishers"
+msgstr "Herausgeber"
 
 msgid "User added."
 msgstr "Benutzer hinzugefügt."

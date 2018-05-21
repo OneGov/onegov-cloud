@@ -3,7 +3,6 @@ from io import BytesIO
 from morepath import redirect
 from morepath.request import Response
 from onegov.core.security import Private
-from onegov.core.security import Secret
 from onegov.gazette import _
 from onegov.gazette import GazetteApp
 from onegov.gazette.collections import OrganizationCollection
@@ -194,7 +193,7 @@ def delete_organization(self, request, form):
 @GazetteApp.view(
     model=OrganizationCollection,
     name='export',
-    permission=Secret
+    permission=Private
 )
 def export_organizations(self, request):
     """ Export all organizations as XLSX. The exported file can be re-imported
@@ -209,6 +208,7 @@ def export_organizations(self, request):
     worksheet.name = request.translate(_("Organizations"))
     worksheet.write_row(0, 0, (
         request.translate(_("ID")),
+        request.translate(_("Name")),
         request.translate(_("Title")),
         request.translate(_("Active")),
         request.translate(_("Parent Organization"))
@@ -217,6 +217,7 @@ def export_organizations(self, request):
     for index, organization in enumerate(self.query()):
         worksheet.write_row(index + 1, 0, (
             organization.id or '',
+            organization.name or '',
             organization.title or '',
             organization.active,
             organization.parent_id or ''
