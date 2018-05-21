@@ -320,6 +320,9 @@ class Pdf(PDFDocument):
 
         """
 
+        if not html:
+            return
+
         def strip(text):
             text = text.strip('\r\n')
             prefix = ' ' if text.startswith(' ') else ''

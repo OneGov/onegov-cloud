@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes adding mini html for an empty string throwing an error.
+  [msom]
+
 0.3.3 (2018-01-18)
 ~~~~~~~~~~~~~~~~~~~~~
 
