@@ -1,7 +1,5 @@
 import textwrap
 
-from itertools import chain
-
 from .utils import as_choices
 from .utils import build_metadata
 from .utils import html_to_text
@@ -11,10 +9,11 @@ from .utils import store_in_zip
 
 def transform_museum(path, prefix, output_file):
     columns = (
+        'type',
+        'category',
+        'uid',
         'titel',
-        'l18n_parent',
-        'gesamtangebotid',
-        'kultureinrichtungid',
+        'organizer',
         'beschreibung',
         'geeignet',
         'dauer',
@@ -23,24 +22,18 @@ def transform_museum(path, prefix, output_file):
         'leitung',
         'besonderes',
         'anmeldung',
-        'onlineanmeldung',
-        'bild',
+        'onlineanmeldung'
     )
 
-    history, art = load_files_by_prefix(path, prefix, (
-        ('Geschichte', columns),
-        ('Kunst', columns)
-    ))
-
+    records = load_files_by_prefix(path, prefix, (('Museum', columns),))
     data = []
 
-    for record in chain(history.lines, art.lines):
+    for record in records.lines:
         data.append({
             'Angebot/Titel': record.titel,
             'Angebot/Beschreibung': html_to_text(record.beschreibung),
-            'Angebot/Einrichtung': record.kultureinrichtungid,
             'Angebot/Dauer': record.dauer,
-            'Angebot/Gesamtangebot': [record.gesamtangebotid],
+            'Angebot/Kategorie': [record.category],
             'Angebot/Zielgruppe': record.geeignet and [record.geeignet] or [],
             'Details/Datum': record.datum,
             'Details/Anmeldung': record.anmeldung,
@@ -49,9 +42,9 @@ def transform_museum(path, prefix, output_file):
             'Details/Besonderes': record.besonderes
         })
 
-    types = sorted(set(
-        d['Angebot/Gesamtangebot'][0]
-        for d in data if d['Angebot/Gesamtangebot']
+    categories = sorted(set(
+        d['Angebot/Kategorie'][0]
+        for d in data if d['Angebot/Kategorie']
     ))
     targets = sorted(set(
         d['Angebot/Zielgruppe'][0]
@@ -67,9 +60,8 @@ def transform_museum(path, prefix, output_file):
         title_format='[Angebot/Titel]',
         lead_format='[Angebot/Beschreibung]',
         content_fields=[
-            'Angebot/Einrichtung',
             'Angebot/Dauer',
-            'Angebot/Gesamtangebot',
+            'Angebot/Kategorie',
             'Angebot/Zielgruppe',
             'Details/Datum',
             'Details/Anmeldung',
@@ -79,7 +71,7 @@ def transform_museum(path, prefix, output_file):
         ],
         contact_fields=[],
         keyword_fields=[
-            'Angebot/Gesamtangebot',
+            'Angebot/Kategorie',
             'Angebot/Zielgruppe'
         ],
         link_pattern=(
@@ -94,13 +86,12 @@ def transform_museum(path, prefix, output_file):
             # Angebot
             Titel *= ___
             Beschreibung *= ...
-            Einrichtung *= ___
-            Dauer *= ___
+            Dauer = ___
 
-            Gesamtangebot *=
-                {as_choices(types)}
+            Kategorie *=
+                {as_choices(categories)}
 
-            Zielgruppe *=
+            Zielgruppe =
                 {as_choices(targets)}
 
             # Details
