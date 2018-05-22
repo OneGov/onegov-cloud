@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes page id being invalid for certain views.
+  [href]
+
 - Increases the size of the directory form.
   [href]
 

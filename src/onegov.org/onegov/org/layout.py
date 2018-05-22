@@ -107,6 +107,7 @@ class Layout(ChameleonLayout):
         page_id = self.request.path_info
         page_id = page_id.lstrip('/')
         page_id = page_id.replace('/', '-')
+        page_id = page_id.replace('+', '')
         page_id = page_id.rstrip('-')
 
         return 'page-' + (page_id or 'root')
