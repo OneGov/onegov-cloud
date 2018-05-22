@@ -319,6 +319,7 @@ def get_code_editor_asset():
     yield 'ace.js'
     yield 'ace-mode-form.js'
     yield 'ace-mode-xml.js'
+    yield 'ace-mode-yaml.js'
     yield 'ace-theme-tomorrow.js'
     yield 'formcode'
     yield 'code_editor.js'
