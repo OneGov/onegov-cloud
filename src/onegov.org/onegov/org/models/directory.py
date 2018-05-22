@@ -162,6 +162,8 @@ class ExtendedDirectory(Directory, HiddenFromPublicExtension, Extendable):
 
     payment_method = meta_property()
 
+    searchwidget_config = content_property()
+
     @property
     def form_class_for_submissions(self):
         return self.extend_form_class(self.form_class, self.extensions)
