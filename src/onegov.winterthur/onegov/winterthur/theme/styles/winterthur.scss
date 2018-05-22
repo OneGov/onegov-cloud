@@ -160,3 +160,14 @@
         }
     }
 }
+
+/*
+    Limit hierarchy fieldset to one specific directory
+*/
+#fieldset-hierarchy {
+    display: none;
+}
+
+#page-directories-vollzugsbehoerden-edit #fieldset-hierarchy {
+    display: block;
+}
