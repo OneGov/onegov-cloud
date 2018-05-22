@@ -52,7 +52,7 @@ class HierarchicalSearch(object):
     @cached_property
     def keys(self):
         return [
-            as_internal_id(k) for k in
+            as_internal_id(k.strip()) for k in
             self.config['search_widget_keys'].split('\n')
         ]
 
