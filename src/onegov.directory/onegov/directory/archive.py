@@ -173,6 +173,12 @@ class DirectoryArchiveReader(object):
             **metadata['configuration']
         )
 
+        if 'meta' in metadata:
+            directory.meta = metadata['meta']
+
+        if 'content' in metadata:
+            directory.content = metadata['content']
+
         return directory
 
     def read_metadata(self):
@@ -228,7 +234,9 @@ class DirectoryArchiveWriter(object):
             'title': directory.title,
             'lead': directory.lead,
             'name': directory.name,
-            'type': directory.type
+            'type': directory.type,
+            'meta': directory.meta,
+            'content': directory.content,
         }
         self.write_json(self.path / 'metadata.json', metadata)
 

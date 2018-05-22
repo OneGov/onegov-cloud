@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for meta/content data in the directory import/export.
+  [href]
+
 0.3.2 (2018-05-21)
 ~~~~~~~~~~~~~~~~~~~~~
 
