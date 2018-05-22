@@ -82,6 +82,14 @@ def transform_museum(path, prefix, output_file):
             'Angebot/Gesamtangebot',
             'Angebot/Zielgruppe'
         ],
+        link_pattern=(
+            'https://forms.winterthur.ch/Kultur/app/portal'
+            '?generalid=KULT_MUSEUMSPAEDAGOGIK'
+            '&new_instance=yes'
+            '&data.Anmeldung_Museumspaedagogik_V1_0.Angebot='
+            '[Angebot/Titel]'
+        ),
+        link_title="Anmeldung",
         structure=textwrap.dedent(f"""\
             # Angebot
             Titel *= ___
