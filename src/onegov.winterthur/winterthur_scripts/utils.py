@@ -71,7 +71,7 @@ def pop_matching(lines, predicate):
 
 
 def build_metadata(title, lead, structure, title_format, lead_format,
-                   content_fields, contact_fields, keyword_fields):
+                   content_fields, contact_fields, keyword_fields, **extra):
 
     fieldnames = tuple(
         f.human_id for f in flatten_fieldsets(parse_formcode(structure))
@@ -93,7 +93,8 @@ def build_metadata(title, lead, structure, title_format, lead_format,
             'keywords': keyword_fields,
             'searchable': fieldnames,
             'order': safe_format_keys(title_format)
-        }
+        },
+        **extra
     }
 
 

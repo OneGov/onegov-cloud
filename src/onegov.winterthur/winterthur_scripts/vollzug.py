@@ -1,5 +1,6 @@
 import attr
 import textwrap
+import yaml
 
 from .utils import as_choices
 from .utils import build_metadata
@@ -72,7 +73,23 @@ def transform_vollzug(path, prefix, output_file):
                 {chapters}
 
             Vollzugsaufgaben = ...[16]
-        """))
+        """),
+        content={
+            'searchwidget_config': {
+                'hierarchical': {
+                    'search_widget_keys': '\n'.join((
+                        'Kategorie/Themen',
+                        'Kategorie/Vollzugsbereiche',
+                        'Kategorie/Vollzugsaufgaben'
+                    )),
+                    'search_widget_hierarchy': yaml.dump(
+                        hierarchy,
+                        default_flow_style=False,
+                        allow_unicode=True
+                    )
+                }
+            }
+        })
 
     geo = Geocoder()
 
@@ -97,8 +114,7 @@ def transform_vollzug(path, prefix, output_file):
 
     store_in_zip(output_file, {
         'metadata.json': metadata,
-        'data.json': data,
-        'hierarchy.json': hierarchy
+        'data.json': data
     })
 
 
@@ -150,7 +166,7 @@ def get_institutions(path, prefix):
                 i.topics.add(topics[chapters[r.uid]])
 
     # hierarchy of categories
-    hierarchy = []
+    hierarchy = {}
 
     for i in institutions.lines:
         task = i.institution
@@ -158,10 +174,13 @@ def get_institutions(path, prefix):
 
         if task and chapter and chapter in topics:
             topic = topics[chapter]
-            hierarchy.append(f'{topic} :: {chapter} :: {task}')
+
+            hierarchy[topic] = hierarchy.get(topic, {})
+            hierarchy[topic][chapter] = hierarchy[topic].get(chapter, list())
+            hierarchy[topic][chapter].append(task)
 
     institutions = sorted([i for i in result.values()], key=lambda i: i.title)
-    return sorted(hierarchy), institutions
+    return hierarchy, institutions
 
 
 @attr.s(auto_attribs=True)
