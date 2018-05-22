@@ -74,6 +74,8 @@ def build_metadata(title, lead, structure, title_format, lead_format,
                    content_fields, contact_fields, keyword_fields,
                    link_pattern=None, link_title=None, **extra):
 
+    print(structure)
+
     fieldnames = tuple(
         f.human_id for f in flatten_fieldsets(parse_formcode(structure))
     )

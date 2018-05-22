@@ -2,8 +2,9 @@ import click
 
 from .fachstellen import transform_fachstellen
 from .museum import transform_museum
-from .vollzug import transform_vollzug
 from .rooms import transform_rooms
+from .theater import transform_theater
+from .vollzug import transform_vollzug
 
 
 POST_MORTEM = False
@@ -62,6 +63,19 @@ def transform_museum_cli(path, prefix, output):
 def transform_rooms_cli(path, prefix, output):
     try:
         return transform_rooms(path, prefix, output)
+    except Exception:
+        if POST_MORTEM:
+            import pdb; pdb.post_mortem()  # noqa
+        raise
+
+
+@cli.command(name='transform-theater')
+@click.argument('path', type=click.Path(exists=True, file_okay=False))
+@click.argument('prefix')
+@click.option('--output', type=click.Path(), default=None)
+def transform_theater_cli(path, prefix, output):
+    try:
+        return transform_theater(path, prefix, output)
     except Exception:
         if POST_MORTEM:
             import pdb; pdb.post_mortem()  # noqa
