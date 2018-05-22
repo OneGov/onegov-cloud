@@ -93,7 +93,7 @@ def handle_new_directory(self, request, form):
         'layout': layout,
         'title': _("New Directory"),
         'form': form,
-        'form_width': 'large',
+        'form_width': 'huge',
     }
 
 

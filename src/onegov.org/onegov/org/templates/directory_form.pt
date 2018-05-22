@@ -57,7 +57,7 @@
         </tal:b>
 
         <div class="row" style="display: ${confirm_migration and 'none' or 'block'}">
-            <div class="small-12 medium-8 large-6 columns" id="confirm-migration">
+            <div class="small-12 medium-10 large-8 columns" id="confirm-migration">
                 <div metal:use-macro="layout.macros['form']" />
             </div>
         </div>

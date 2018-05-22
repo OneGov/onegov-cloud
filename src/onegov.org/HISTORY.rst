@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Increases the size of the directory form.
+  [href]
+
 0.28.1 (2018-05-21)
 ~~~~~~~~~~~~~~~~~~~
 
