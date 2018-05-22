@@ -589,6 +589,21 @@ form {
         }
     }
 
+
+    .group-label > ul li {
+        align-content: flex-start;
+        align-items: flex-start;
+        display: flex;
+
+        label {
+            margin-top: .2rem;
+        }
+
+        input {
+            flex-shrink: 0;
+        }
+    }
+
     .label-text,
     label > ul label {
         max-width: 90%;
