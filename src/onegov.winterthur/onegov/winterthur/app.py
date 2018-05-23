@@ -1,3 +1,5 @@
+import re
+
 from onegov.core import utils
 from onegov.org import OrgApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
@@ -22,6 +24,30 @@ class WinterthurApp(OrgApp):
 
     def enable_iframes(self, request):
         request.content_security_policy.frame_ancestors |= self.frame_ancestors
+        request.include('iframe-resizer')
+
+
+@WinterthurApp.tween_factory()
+def enable_iframes_tween_factory(app, handler):
+    iframe_paths = (
+        r'/streets.*',
+        r'/director(y|ies|y-submission/.*)',
+        r'/ticket/.*'
+    )
+
+    iframe_paths = re.compile(rf"({'|'.join(iframe_paths)})")
+
+    def enable_iframes_tween(request):
+        """ Enables iframes on matching paths. """
+
+        result = handler(request)
+
+        if iframe_paths.match(request.path_info):
+            request.app.enable_iframes(request)
+
+        return result
+
+    return enable_iframes_tween
 
 
 @WinterthurApp.template_directory()

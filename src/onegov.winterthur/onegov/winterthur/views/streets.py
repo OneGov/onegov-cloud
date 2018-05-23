@@ -15,10 +15,7 @@ from urllib.parse import quote_plus
     template='streets.pt'
 )
 def view_streets(self, request):
-    request.app.enable_iframes(request)
-
     request.include('street-search')
-    request.include('iframe-resizer')
 
     by_letter = {
         letter: tuple(streets) for letter, streets in groupby(
@@ -58,9 +55,6 @@ def update_streets(self, request):
     template='street.pt'
 )
 def view_street(self, request):
-    request.app.enable_iframes(request)
-    request.include('iframe-resizer')
-
     def external_link_to_street(address):
         q = quote_plus(str(address.street_id))
         return f'https://stadtplan.winterthur.ch/?locate=strasse&locations={q}'
