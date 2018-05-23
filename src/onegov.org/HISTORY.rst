@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Changes header styles to better support different header heights.
+  [href]
+
 0.28.2 (2018-05-23)
 ~~~~~~~~~~~~~~~~~~~
 

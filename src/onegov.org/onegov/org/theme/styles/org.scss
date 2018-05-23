@@ -312,8 +312,25 @@ $globals-height: 2.5rem;
 .header {
     // the header is fixed and the logo in it tries to fill it out
     // therefore an svg logo should be used!
+    align-items: center;
+    display: flex;
     height: 7em;
+    justify-content: center;
     margin-bottom: $globals-margin;
+
+    @media #{$small-only} {
+        display: block;
+
+        .logo {
+            display: flex;
+            justify-content: center;
+            margin-bottom: $globals-margin;
+        }
+
+        .searchbox {
+            margin-bottom: $globals-margin;
+        }
+    }
 
     img {
         height: 7em;
@@ -3052,8 +3069,6 @@ button {
     Search box
 */
 .searchbox {
-    margin-bottom: 1rem;
-
     input {
         margin-bottom: 0;
     }
@@ -3061,12 +3076,6 @@ button {
     button {
         margin-bottom: 0;
         padding: 0;
-    }
-}
-
-@media #{$medium-up} {
-    .header .searchbox {
-        margin-top: 2.25rem;
     }
 }
 
