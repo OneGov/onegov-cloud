@@ -15,6 +15,14 @@ def fixtures():
     return Path(module_path('onegov.winterthur', 'tests/fixtures'))
 
 
+@pytest.fixture(scope='session', autouse=True)
+def scan_dependencies():
+    import importscan
+    import onegov
+
+    importscan.scan(onegov.org, ignore=['.test', '.tests'])
+
+
 @pytest.fixture()
 def streets_csv(fixtures):
     with (fixtures / 'streets.csv').open('rb') as f:
@@ -38,6 +46,7 @@ def es_winterthur_app(request):
 
 
 def create_winterthur_app(request, use_elasticsearch):
+
     app = create_app(
         app_class=WinterthurApp,
         request=request,
