@@ -27,7 +27,7 @@
             </a>
         </p>
 
-        <table>
+        <table class="streettable">
             <thead>
                 <tr>
                     <th i18n:translate>Address</th>
