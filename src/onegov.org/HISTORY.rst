@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.28.2 (2018-05-23)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes page id being invalid for certain views.
   [href]
 
