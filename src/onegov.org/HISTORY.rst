@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Renders the name of each layout as body class.
+  [href]
+
 - Changes header styles to better support different header heights.
   [href]
 

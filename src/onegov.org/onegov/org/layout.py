@@ -1,4 +1,5 @@
 import babel.dates
+import re
 
 from babel import Locale
 from cached_property import cached_property
@@ -45,6 +46,9 @@ from onegov.user.utils import password_reset_url
 from sedate import to_timezone
 
 
+capitalised_name = re.compile(r'[A-Z]{1}[a-z]+')
+
+
 class Layout(ChameleonLayout):
     """ Contains methods to render a page inheriting from layout.pt.
 
@@ -67,6 +71,17 @@ class Layout(ChameleonLayout):
 
     date_long_without_year_format = 'E d. MMMM'
     datetime_long_without_year_format = 'E d. MMMM HH:mm'
+
+    @property
+    def name(self):
+        """ Takes the class name of the layout and generates a name which
+        can be used as a class. """
+
+        return '-'.join(
+            token.lower() for token in capitalised_name.findall(
+                self.__class__.__name__
+            )
+        )
 
     @property
     def org(self):
@@ -121,6 +136,8 @@ class Layout(ChameleonLayout):
             yield 'role-{}'.format(self.request.current_role)
         else:
             yield 'is-logged-out'
+
+        yield self.name
 
     @cached_property
     def top_navigation(self):
