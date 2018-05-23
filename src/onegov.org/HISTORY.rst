@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.28.3 (2018-05-23)
+~~~~~~~~~~~~~~~~~~~
+
 - Renders the name of each layout as body class.
   [href]
 
