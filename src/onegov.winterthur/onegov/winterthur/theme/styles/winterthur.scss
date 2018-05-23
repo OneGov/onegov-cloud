@@ -25,6 +25,10 @@ input[data-street-search] {
     padding: 10px;
 }
 
+form input[type="radio"] {
+    margin: .55rem .5rem 0 0 !important;
+}
+
 input[data-street-search]::placeholder {
     color: $input-placeholder-color;
 }
