@@ -1,12 +1,17 @@
 /*
-    Custom fonts
-*/
-$base-font-size: 125%;
-$font-family-sans-serif: "NewsGot", Verdana, Arial, sans-serif;
-
-/*
     Custom colors
 */
+$gray-light: #ececea;
+$gray: #dadad6;
+$gray-dark: #44443f;
+$red: #ff1900;
+
+$secondary-color: $gray;
+$panel-bg: $gray-light;
+$f-dropdown-list-hover-bg: $gray;
+$topbar-bg-color: $gray-light;
+$topbar-link-bg-hover: $gray;
+
 $anchor-font-color-hover: #44443f;
 $anchor-font-color: #ff1900;
 $input-bg-color: #ececea;
@@ -17,3 +22,26 @@ $table-border-color: #999;
 $table-even-bg-color: #e9e9ea;
 $table-head-bg-color: #e9e9ea;
 $table-head-border-color: #999;
+
+/*
+    Custom fonts
+*/
+$base-font-size: 125%;
+$body-font-color: $gray-dark;
+$small-font-size: 17px;
+$font-family-sans-serif: "NewsGot", Verdana, Arial, sans-serif;
+
+/*
+    Headings
+*/
+$header-font-weight: bold;
+
+$h1-font-size: rem-calc(32);
+$h2-font-size: rem-calc(18);
+$h3-font-size: rem-calc(16);
+$h4-font-size: rem-calc(14);
+
+$h1-font-reduction: 0;
+$h2-font-reduction: 0;
+$h3-font-reduction: 0;
+$h4-font-reduction: 0;
