@@ -35,16 +35,25 @@ def test_widget_render():
 
     input = QuillInput()
     text = input(field)
-    assert input.container_id in text
-    assert input.input_id in text
+    assert f'quill-container-{input.id}' in text
+    assert f'quill-input-{input.id}' in text
     assert "['bold', 'italic', 'list']" in text
     assert (
-        "['bold', 'italic', {'list': 'ordered'}, {'list': 'bullet'}]}"
+        "['bold', 'italic', {'list': 'ordered'}, {'list': 'bullet'}]"
     ) in text
 
     input = QuillInput(tags=['em', 'ul'])
     text = input(field)
-    assert input.container_id in text
-    assert input.input_id in text
+    assert f'quill-container-{input.id}' in text
+    assert f'quill-input-{input.id}' in text
     assert "['italic', 'list']" in text
-    assert "['italic', {'list': 'bullet'}]}" in text
+    assert "['italic', {'list': 'bullet'}]" in text
+
+    input = QuillInput(placeholders={'Hello World': 'Hello, <b>World</b>!'})
+    text = input(field)
+    assert "{'placeholder': ['Hello World']}" in text
+    assert "delimiters: ['', '']" in text
+    assert (
+        "placeholders: [{id: 'Hello World', label: 'Hello, <b>World</b>!'}]"
+        in text
+    )
