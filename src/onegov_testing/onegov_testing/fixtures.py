@@ -238,7 +238,7 @@ def temporary_path(temporary_directory):
 
 @pytest.fixture(scope="session")
 def es_default_version():
-    return '5.6.9'
+    return '6.2.4'
 
 
 @pytest.fixture(scope="session")
@@ -284,15 +284,8 @@ def es_process(es_binary, es_version):
     port = port_for.select_random()
     pid = es_binary + '.pid'
 
-    command = "{binary} -p {pidfile} --http.port={port}"
-
-    if es_version.startswith('5'):
-        command = command.replace('--', '-E')
-
-    command = command.format(binary=es_binary, pidfile=pid, port=port)
-
-    url = 'http://127.0.0.1:{}/_cluster/health?wait_for_status=green'
-    url = url.format(port)
+    command = f"{es_binary} -p {pid} -E http.port={port}"
+    url = f'http://127.0.0.1:{port}/_cluster/health?wait_for_status=green'
 
     executor = HTTPExecutor(command, url, method='GET')
     executor.start()
