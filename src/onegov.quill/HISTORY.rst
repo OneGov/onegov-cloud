@@ -4,6 +4,9 @@ Changelog
 - Adds support for snippets/templates/boilerplates.
   [msom]
 
+- Uses Quill 1.3.6.
+  [msom]
+
 0.2.4 (2018-02-07)
 ~~~~~~~~~~~~~~~~~~~~~
 
