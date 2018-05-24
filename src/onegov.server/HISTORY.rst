@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Gives applications the ability to react to unhandled exceptions.
+  [href]
+
 0.6.1 (2018-02-13)
 ~~~~~~~~~~~~~~~~~~~
 

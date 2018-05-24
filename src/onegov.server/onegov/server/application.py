@@ -169,3 +169,22 @@ class Application(object):
                 "the alias '{}' is already in use".format(alias))
 
         self._aliases[alias] = application_id
+
+    def handle_exception(self, exception, environ, start_response):
+        """ Default exception handling - this can be used to return a different
+        response when an unhandle exception occurs inside a request or before
+        a request is handled by the application (when any of the above methods
+        are called).
+
+        By default we just raise the exception.
+
+        Typically, returning an error is what you might want to do::
+
+            def handle_exception(exception, environ, start_response):
+                if isinstance(exception, UnderMaintenanceError):
+                    error = webob.exc.HTTPInternalServerError()
+                    return error(environ, start_response)
+
+        """
+
+        raise exception

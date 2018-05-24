@@ -254,3 +254,30 @@ def test_application_id_dashes():
 
     c = Client(server)
     assert c.get('/foo-bar/bar-foo').text == 'foo_bar/bar_foo'
+
+
+def test_exception_handler():
+
+    class ErrorApplication(Application):
+
+        def __call__(self, environ, start_response):
+            raise RuntimeError()
+
+        def handle_exception(self, exception, environ, start_response):
+            response = Response()
+            response.text = exception.__class__.__name__
+
+            return response(environ, start_response)
+
+    server = Server(Config({
+        'applications': [
+            {
+                'path': '/sites/*',
+                'application': ErrorApplication,
+                'namespace': 'sites'
+            }
+        ]
+    }))
+
+    c = Client(server)
+    assert c.get('/sites/test').text == 'RuntimeError'

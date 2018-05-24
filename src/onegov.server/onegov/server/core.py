@@ -122,45 +122,51 @@ class Server(object):
         if application is None:
             return HTTPNotFound()(environ, start_response)
 
-        # make sure the application accepts the given hostname
-        for host in request.hostnames:
-            if host not in local_hostnames:
-                if not application.is_allowed_hostname(host):
-                    return HTTPForbidden()(environ, start_response)
+        # give applications the ability to deal with exceptions
+        try:
 
-        if application_root in self.wildcard_applications:
-            base_path = '/'.join(path_fragments[:3])
-            application_id = ''.join(path_fragments[2:3])
+            # make sure the application accepts the given hostname
+            for host in request.hostnames:
+                if host not in local_hostnames:
+                    if not application.is_allowed_hostname(host):
+                        return HTTPForbidden()(environ, start_response)
 
-            # dealias the application id
-            if application_id in application._aliases:
-                application_id = application._aliases[application_id]
+            if application_root in self.wildcard_applications:
+                base_path = '/'.join(path_fragments[:3])
+                application_id = ''.join(path_fragments[2:3])
 
-        else:
-            base_path = application_root
-            application_id = ''.join(path_fragments[1:2])
+                # dealias the application id
+                if application_id in application._aliases:
+                    application_id = application._aliases[application_id]
 
-        # happens if the root of a wildcard path is requested
-        # ('/wildcard' from '/wildcard/*') - this is not allowed
-        if not application_id:
-            return HTTPNotFound()(environ, start_response)
+            else:
+                base_path = application_root
+                application_id = ''.join(path_fragments[1:2])
 
-        # dashes are not allowed in application ids and are automatically
-        # replaced by underscores
-        application_id = application_id.replace('-', '_')
+            # happens if the root of a wildcard path is requested
+            # ('/wildcard' from '/wildcard/*') - this is not allowed
+            if not application_id:
+                return HTTPNotFound()(environ, start_response)
 
-        environ['PATH_INFO'] = environ['PATH_INFO'][len(base_path):]
-        environ['SCRIPT_NAME'] = base_path
+            # dashes are not allowed in application ids and are automatically
+            # replaced by underscores
+            application_id = application_id.replace('-', '_')
 
-        application.set_application_base_path(base_path)
+            environ['PATH_INFO'] = environ['PATH_INFO'][len(base_path):]
+            environ['SCRIPT_NAME'] = base_path
 
-        if not application.is_allowed_application_id(application_id):
-            return HTTPNotFound()(environ, start_response)
+            application.set_application_base_path(base_path)
 
-        application.set_application_id(
-            application.namespace + '/' + application_id)
+            if not application.is_allowed_application_id(application_id):
+                return HTTPNotFound()(environ, start_response)
 
-        return application(environ, start_response)
+            application.set_application_id(
+                application.namespace + '/' + application_id)
+
+            return application(environ, start_response)
+
+        except Exception as e:
+            return application.handle_exception(e, environ, start_response)
 
     def __call__(self, environ, start_response):
         try:
