@@ -53,10 +53,10 @@ from onegov.server import Application as ServerApplication
 from onegov.server.utils import load_class
 from psycopg2.extensions import TransactionRollbackError
 from purl import URL
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import InterfaceError, OperationalError
 from uuid import uuid4 as new_uuid
 from urllib.parse import urlencode
-from webob.exc import HTTPConflict
+from webob.exc import HTTPConflict, HTTPServiceUnavailable
 
 
 class Framework(
@@ -186,6 +186,16 @@ class Framework(
     def has_filestorage(self):
         """ Returns true if :attr:`fs` is available. """
         return self._global_file_storage is not None
+
+    def handle_exception(self, exception, environ, start_response):
+        """ Stops database connection errors from bubbling all the way up
+        to our exception handling services (sentry.io).
+
+        """
+        if isinstance(exception, (OperationalError, InterfaceError)):
+            return HTTPServiceUnavailable()(environ, start_response)
+
+        return super().handle_exception(exception, environ, start_response)
 
     def configure_application(self, **cfg):
         """ Configures the application. This function calls all methods on

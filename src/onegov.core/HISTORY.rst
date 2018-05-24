@@ -1,5 +1,12 @@
 Changelog
 ---------
+
+- Catches database connection errors, returning a 503 when that happens.
+
+  This allows for live postgres restarts.
+
+  [href]
+
 0.69.1 (2018-05-21)
 ~~~~~~~~~~~~~~~~~~~
 
