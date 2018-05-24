@@ -317,8 +317,7 @@ class TypeMapping(object):
 
     def add_defaults(self, mapping):
         mapping['es_public'] = {
-            'type': 'boolean',
-            'include_in_all': False
+            'type': 'boolean'
         }
 
         mapping['es_suggestion'] = {

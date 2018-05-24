@@ -180,7 +180,6 @@ def test_mapping_for_language():
         },
         'es_public': {
             'type': 'boolean',
-            'include_in_all': False
         },
         'es_suggestion': {
             'analyzer': 'autocomplete',
@@ -201,7 +200,6 @@ def test_mapping_for_language():
         },
         'es_public': {
             'type': 'boolean',
-            'include_in_all': False
         },
         'es_suggestion': {
             'analyzer': 'autocomplete',
@@ -232,7 +230,6 @@ def test_mapping_for_language():
         },
         'es_public': {
             'type': 'boolean',
-            'include_in_all': False
         },
         'es_suggestion': {
             'analyzer': 'autocomplete',
@@ -263,7 +260,6 @@ def test_mapping_for_language():
         },
         'es_public': {
             'type': 'boolean',
-            'include_in_all': False
         },
         'es_suggestion': {
             'analyzer': 'autocomplete',
