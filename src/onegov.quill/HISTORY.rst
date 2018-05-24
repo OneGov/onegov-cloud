@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.3.0 (2018-05-24)
+~~~~~~~~~~~~~~~~~~~~~
 
 - Adds support for snippets/templates/boilerplates.
   [msom]
