@@ -238,7 +238,7 @@ def temporary_path(temporary_directory):
 
 @pytest.fixture(scope="session")
 def es_default_version():
-    return '5.5.1'
+    return '5.6.9'
 
 
 @pytest.fixture(scope="session")
@@ -248,29 +248,18 @@ def es_version(es_default_version):
 
 @pytest.fixture(scope="session")
 def es_archive(es_version):
-    archive = '/tmp/elasticsearch-{}.tar.gz'.format(es_version)
+    archive = f'elasticsearch-{es_version}.tar.gz'
+    archive_path = f'/tmp/{archive}'
 
-    if not os.path.exists(archive):
-        if es_version.startswith('5'):
-            url = """
-                https://artifacts.elastic.co/
-                downloads/elasticsearch/elasticsearch-{}.tar.gz
-            """
-        else:
-            url = """
-                https://download.elastic.co/
-                elasticsearch/elasticsearch/elasticsearch-{}.tar.gz
-            """
-
-        url = url.format(es_version).replace(' ', '').replace('\n', '')
-
+    if not os.path.exists(archive_path):
+        url = f'https://artifacts.elastic.co/downloads/elasticsearch/{archive}'
         http = urllib3.PoolManager()
 
         with http.request('GET', url, preload_content=False) as r:
-            with open(archive, 'wb') as f:
+            with open(archive_path, 'wb') as f:
                 shutil.copyfileobj(r, f)
 
-    return archive
+    return archive_path
 
 
 @pytest.fixture(scope="session")
