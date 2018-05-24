@@ -33,10 +33,7 @@ def assert_explicit_permissions(module, app_class):
     for action, fn in dectate.Query('view')(app_class):
         if fn.__module__.startswith('onegov'):
             assert action.permission is not None, (
-                '{}.{} has no permission'.format(
-                    fn.__module__,
-                    fn.__name__
-                )
+                f'{fn.__module__}.{fn.__name__} has no permission'
             )
 
 

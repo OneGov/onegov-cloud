@@ -177,7 +177,7 @@ def postgres_dsn(postgres):
         # having a bad day because your test doesn't work if run with others?
         # did you use a session manager? if yes, make sure to use mgr.dispose()
         # before finishing your test, or use the sesion_manager fixture!
-        engine.execute('DROP SCHEMA "{}" CASCADE'.format(schema))
+        engine.execute(f'DROP SCHEMA "{schema}" CASCADE')
 
     engine.raw_connection().invalidate()
     engine.dispose()
@@ -268,7 +268,7 @@ def es_binary(es_archive):
 
     try:
         process = subprocess.Popen(
-            shlex.split("tar xzvf {} --strip-components=1".format(es_archive)),
+            shlex.split(f"tar xzvf {es_archive} --strip-components=1"),
             cwd=path,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
