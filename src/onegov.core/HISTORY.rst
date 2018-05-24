@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.70.0 (2018-05-24)
+~~~~~~~~~~~~~~~~~~~
 
 - Catches database connection errors, returning a 503 when that happens.
 
