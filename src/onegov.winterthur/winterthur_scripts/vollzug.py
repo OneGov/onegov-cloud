@@ -33,7 +33,7 @@ def transform_vollzug(path, prefix, output_file):
 
     metadata = build_metadata(
         title='Vollzugsbehörden',
-        lead='Die Volzugsbehörden der Stadt Winterthur',
+        lead='Die Vollzugsbehörden der Stadt Winterthur',
         title_format='[Fachstelle/Name] [Fachstelle/Abteilung]',
         lead_format='[Fachstelle/Department]',
         content_fields=[
