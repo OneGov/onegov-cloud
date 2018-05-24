@@ -295,7 +295,7 @@ class ElasticsearchApp(morepath.App):
             }
         )
 
-        result = search.execute_suggest()
+        result = search.execute().suggest
 
         suggestions = []
 

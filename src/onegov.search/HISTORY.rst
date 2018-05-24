@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Uses elasticesarch/elasticsearch-dsl 6.x releases (backwards compatible).
+  [href]
+
 1.4.2 (2018-04-26)
 ~~~~~~~~~~~~~~~~~~~
 
