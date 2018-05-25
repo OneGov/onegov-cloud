@@ -18,6 +18,7 @@ DB_CONNECTION_ERRORS = (
     OperationalError,
     InterfaceError,
     psycopg2.OperationalError,
+    psycopg2.InterfaceError,
 )
 
 

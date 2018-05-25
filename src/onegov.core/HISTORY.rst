@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds another missing database connection error.
+  [href]
+
 0.70.1 (2018-05-25)
 ~~~~~~~~~~~~~~~~~~~
 
