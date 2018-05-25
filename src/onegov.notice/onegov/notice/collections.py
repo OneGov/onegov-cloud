@@ -13,6 +13,19 @@ from sqlalchemy import or_
 from sqlalchemy import String
 
 
+def get_unique_notice_name(name, session, model_class):
+    """ Create a unique, URL-friendly name. """
+
+    # it's possible for `normalize_for_url` to return an empty string...
+    name = normalize_for_url(name) or "notice"
+
+    while session.query(model_class.name).\
+            filter(model_class.name == name).first():
+        name = increment_name(name)
+
+    return name
+
+
 class OfficialNoticeCollectionPagination(Pagination):
 
     def __init__(
@@ -220,15 +233,7 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
     def _get_unique_name(self, name):
         """ Create a unique, URL-friendly name. """
 
-        # it's possible for `normalize_for_url` to return an empty string...
-        name = normalize_for_url(name) or "notice"
-
-        session = self.session
-        while session.query(self.model_class.name).\
-                filter(self.model_class.name == name).first():
-            name = increment_name(name)
-
-        return name
+        return get_unique_notice_name(name, self.session, self.model_class)
 
     def add(self, title, text, **optional):
         """ Add a new notice.

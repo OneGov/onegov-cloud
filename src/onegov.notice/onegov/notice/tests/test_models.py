@@ -96,6 +96,15 @@ def test_transitions():
     notice.reject()
     assert notice.state == 'rejected'
 
+    # Imported
+    notice = OfficialNotice(state='imported')
+    with raises(AssertionError):
+        notice.submit()
+    with raises(AssertionError):
+        notice.publish()
+    notice.accept()
+    assert notice.state == 'accepted'
+
     # Accepted
     notice = OfficialNotice(state='accepted')
     with raises(AssertionError):

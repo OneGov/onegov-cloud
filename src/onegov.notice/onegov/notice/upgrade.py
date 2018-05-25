@@ -5,6 +5,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task
 from sqlalchemy import Column
+from sqlalchemy import Enum
 from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import HSTORE
 
@@ -43,4 +44,35 @@ def add_author_fields(context):
         context.operations.add_column(
             'official_notices',
             Column('author_date', UTCDateTime, nullable=True)
+        )
+
+
+@upgrade_task('Add an imported state to official notices')
+def add_imported_state_to_notices(context):
+    old = ['drafted', 'submitted', 'published', 'rejected', 'accepted']
+    new = old + ['imported']
+    old_type = Enum(*old, name='official_notice_state')
+    new_type = Enum(*new, name='official_notice_state')
+    tmp_type = Enum(*new, name='_official_notice_state')
+
+    tmp_type.create(context.operations.get_bind(), checkfirst=False)
+    context.operations.execute(
+        'ALTER TABLE official_notices ALTER COLUMN state '
+        'TYPE _official_notice_state USING state::text::_official_notice_state'
+    )
+    old_type.drop(context.operations.get_bind(), checkfirst=False)
+    new_type.create(context.operations.get_bind(), checkfirst=False)
+    context.operations.execute(
+        'ALTER TABLE official_notices ALTER COLUMN state '
+        'TYPE official_notice_state USING state::text::official_notice_state'
+    )
+    tmp_type.drop(context.operations.get_bind(), checkfirst=False)
+
+
+@upgrade_task('Add a souurce column to official notices')
+def add_source_column_to_notices(context):
+    if not context.has_column('official_notices', 'source'):
+        context.operations.add_column(
+            'official_notices',
+            Column('source', Text, nullable=True)
         )

@@ -58,7 +58,12 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     #: The state of the notice.
     state = Column(
         Enum(
-            'drafted', 'submitted', 'published', 'rejected', 'accepted',
+            'drafted',
+            'submitted',
+            'rejected',
+            'imported',
+            'accepted',
+            'published',
             name='official_notice_state'
         ),
         nullable=False,
@@ -149,6 +154,9 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
         UserGroup, backref=backref('official_notices', lazy='select')
     )
 
+    #: The source from where this notice has been imported.
+    source = Column(Text, nullable=True)
+
     def submit(self):
         """ Submit a drafted notice. """
 
@@ -164,7 +172,7 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     def accept(self):
         """ Accept a submitted notice. """
 
-        assert self.state == 'submitted'
+        assert self.state == 'submitted' or self.state == 'imported'
         self.state = 'accepted'
 
     def publish(self):

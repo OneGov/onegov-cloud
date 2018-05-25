@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds and imported state and a import source field to notices.
+  [msom]
+
 0.6.0 (2018-03-12)
 ~~~~~~~~~~~~~~~~~~~
 
