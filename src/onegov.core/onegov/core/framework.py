@@ -45,7 +45,7 @@ from onegov.core import directives
 from onegov.core.cache import lru_cache
 from onegov.core.datamanager import MailDataManager
 from onegov.core.mail import email, Postman, MaildirPostman
-from onegov.core.orm import Base, SessionManager, debug
+from onegov.core.orm import Base, SessionManager, debug, DB_CONNECTION_ERRORS
 from onegov.core.orm.cache import OrmCacheApp
 from onegov.core.request import CoreRequest
 from onegov.core.utils import PostThread
@@ -53,7 +53,7 @@ from onegov.server import Application as ServerApplication
 from onegov.server.utils import load_class
 from psycopg2.extensions import TransactionRollbackError
 from purl import URL
-from sqlalchemy.exc import InterfaceError, OperationalError
+from sqlalchemy.exc import OperationalError
 from uuid import uuid4 as new_uuid
 from urllib.parse import urlencode
 from webob.exc import HTTPConflict, HTTPServiceUnavailable
@@ -192,7 +192,8 @@ class Framework(
         to our exception handling services (sentry.io).
 
         """
-        if isinstance(exception, (OperationalError, InterfaceError)):
+
+        if isinstance(exception, DB_CONNECTION_ERRORS):
             return HTTPServiceUnavailable()(environ, start_response)
 
         return super().handle_exception(exception, environ, start_response)

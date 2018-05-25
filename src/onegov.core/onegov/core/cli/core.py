@@ -186,13 +186,12 @@ is not executed.
 
 import click
 import inspect
-import sqlalchemy
 import sys
 
 from fnmatch import fnmatch
 from onegov.core.security import Public
 from onegov.core.utils import scan_morepath_modules
-from onegov.core.orm import query_schemas
+from onegov.core.orm import query_schemas, DB_CONNECTION_ERRORS
 from onegov.server.config import Config
 from onegov.server.core import Server
 from sqlalchemy.pool import NullPool
@@ -501,12 +500,10 @@ def command_group():
             context_settings = get_context_specific_settings(context)
             context.obj = GroupContext(select, config, **context_settings)
             context.obj.validate_guard_conditions(context)
-        except sqlalchemy.exc.OperationalError as e:
-            if "Connection refused" in ' '.join(e.args):
-                print(e)
-                sys.exit(1)
-            else:
-                raise
+        except DB_CONNECTION_ERRORS as e:
+            print("Could not connect to database:")
+            print(e)
+            sys.exit(1)
 
     @command_group.resultcallback()
     def process_results(processor, select, config):

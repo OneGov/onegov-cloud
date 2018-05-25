@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Catches additional datbase connection errors.
+  [href]
+
 0.70.0 (2018-05-24)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -1,3 +1,5 @@
+import psycopg2
+
 from onegov.core.orm.cache import orm_cached
 from onegov.core.orm.session_manager import SessionManager, query_schemas
 from onegov.core.orm.sql import as_selectable, as_selectable_from_path
@@ -7,9 +9,16 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.orm import Query
 from sqlalchemy_utils import TranslationHybrid
 from zope.sqlalchemy import mark_changed
+from sqlalchemy.exc import InterfaceError, OperationalError
 
 
 MISSING = object()
+
+DB_CONNECTION_ERRORS = (
+    OperationalError,
+    InterfaceError,
+    psycopg2.OperationalError,
+)
 
 
 #: The base for all OneGov Core ORM Models
