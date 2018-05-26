@@ -104,6 +104,9 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     #: The date of the first issue of the notice.
     first_issue = Column(UTCDateTime, nullable=True)
 
+    #: The expiry date of the notice
+    expiry_date = Column(UTCDateTime, nullable=True)
+
     #: The categories of this notice.
     _categories = Column(
         MutableDict.as_mutable(HSTORE), name='categories', nullable=True

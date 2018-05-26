@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds expiry dates to notices.
+  [msom]
+
 0.7.0 (2018-05-25)
 ~~~~~~~~~~~~~~~~~~~
 

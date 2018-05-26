@@ -16,6 +16,7 @@ def test_create_notice(session):
     notice.author_date = datetime(1545, 1, 1, 0, 0, tzinfo=timezone.utc)
     notice.name = 'notice'
     notice.first_issue = datetime(2008, 1, 1, 0, 0, tzinfo=timezone.utc)
+    notice.expiry_date = datetime(2018, 1, 1, 0, 0, tzinfo=timezone.utc)
     notice.category = 'category'
     notice.organization = 'organization'
     session.add(notice)
@@ -39,6 +40,9 @@ def test_create_notice(session):
     assert notice.organization == 'organization'
     assert notice.first_issue == datetime(
         2008, 1, 1, 0, 0, tzinfo=timezone.utc
+    )
+    assert notice.expiry_date == datetime(
+        2018, 1, 1, 0, 0, tzinfo=timezone.utc
     )
     assert notice.categories == {}
     assert notice.organizations == {}
