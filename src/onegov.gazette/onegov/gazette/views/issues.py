@@ -4,7 +4,6 @@ from io import BytesIO
 from morepath import redirect
 from morepath.request import Response
 from onegov.core.security import Private
-from onegov.core.security import Secret
 from onegov.gazette import _
 from onegov.gazette import GazetteApp
 from onegov.gazette.collections import IssueCollection
@@ -233,7 +232,7 @@ def publish_issue(self, request, form):
 @GazetteApp.view(
     model=IssueCollection,
     name='export',
-    permission=Secret
+    permission=Private
 )
 def export_issue(self, request):
     """ Export all issues as XLSX. The exported file can be re-imported
@@ -250,6 +249,7 @@ def export_issue(self, request):
     worksheet = workbook.add_worksheet()
     worksheet.name = request.translate(_("Issues"))
     worksheet.write_row(0, 0, (
+        request.translate(_("Year")),
         request.translate(_("Number")),
         request.translate(_("Date")),
         request.translate(_("Deadline"))
@@ -257,10 +257,11 @@ def export_issue(self, request):
 
     timezone = request.app.principal.time_zone
     for index, issue in enumerate(self.query()):
-        worksheet.write(index + 1, 0, issue.number)
-        worksheet.write(index + 1, 1, issue.date)
+        worksheet.write(index + 1, 0, issue.date.year)
+        worksheet.write(index + 1, 1, issue.number)
+        worksheet.write(index + 1, 2, issue.date)
         worksheet.write_datetime(
-            index + 1, 2,
+            index + 1, 3,
             to_timezone(issue.deadline, timezone).replace(tzinfo=None),
             datetime_format
         )

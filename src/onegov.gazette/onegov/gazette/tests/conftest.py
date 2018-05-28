@@ -68,7 +68,8 @@ def create_organizations(session):
     )
     organizations.add(
         parent=churches,
-        name='420', order=2, title='Sikh Community', active=False
+        name='420', order=2, title='Sikh Community', active=False,
+        external_name='4'
     )
     organizations.add(
         parent=churches,

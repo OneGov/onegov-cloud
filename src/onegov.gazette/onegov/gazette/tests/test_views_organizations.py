@@ -4,6 +4,7 @@ from onegov.gazette.tests.common import login_editor_1
 from onegov.gazette.tests.common import login_publisher
 from pyquery import PyQuery as pq
 from webtest import TestApp as Client
+from xlrd import open_workbook
 
 
 def test_view_organizations(gazette_app):
@@ -209,3 +210,77 @@ def test_view_organizations_order(gazette_app):
         'Sikh Community',
         'Corporation',
     ]
+
+
+def test_view_organizations_export(gazette_app):
+    client = Client(gazette_app)
+
+    client.get('/organizations/export', status=403)
+
+    login_editor_1(client)
+    client.get('/organizations/export', status=403)
+
+    login_publisher(client)
+    response = client.get('/organizations/export')
+
+    book = open_workbook(file_contents=response.body)
+    assert book.nsheets == 1
+
+    sheet = book.sheets()[0]
+    assert sheet.ncols == 6
+    assert sheet.nrows == 9
+
+    assert sheet.cell(0, 0).value == 'ID'
+    assert sheet.cell(0, 1).value == 'Name'
+    assert sheet.cell(0, 2).value == 'Titel'
+    assert sheet.cell(0, 3).value == 'Aktiv'
+    assert sheet.cell(0, 4).value == 'Externe ID'
+    assert sheet.cell(0, 5).value == 'Übergeordnete Organisation'
+
+    assert sheet.cell(1, 1).value == '100'
+    assert sheet.cell(1, 2).value == 'State Chancellery'
+    assert sheet.cell(1, 3).value == 1
+    assert sheet.cell(1, 4).value == ''
+    assert sheet.cell(1, 5).value == ''
+
+    assert sheet.cell(2, 1).value == '200'
+    assert sheet.cell(2, 2).value == 'Civic Community'
+    assert sheet.cell(2, 3).value == 1
+    assert sheet.cell(2, 4).value == ''
+    assert sheet.cell(2, 5).value == ''
+
+    assert sheet.cell(3, 1).value == '300'
+    assert sheet.cell(3, 2).value == 'Municipality'
+    assert sheet.cell(3, 3).value == 1
+    assert sheet.cell(3, 4).value == ''
+    assert sheet.cell(3, 5).value == ''
+
+    assert sheet.cell(4, 1).value == '400'
+    assert sheet.cell(4, 2).value == 'Churches'
+    assert sheet.cell(4, 3).value == 1
+    assert sheet.cell(4, 4).value == ''
+    assert sheet.cell(4, 5).value == ''
+
+    assert sheet.cell(5, 1).value == '410'
+    assert sheet.cell(5, 2).value == 'Evangelical Reformed Parish'
+    assert sheet.cell(5, 3).value == 1
+    assert sheet.cell(5, 4).value == ''
+    assert int(sheet.cell(5, 5).value) == int(sheet.cell(4, 0).value)
+
+    assert sheet.cell(6, 1).value == '420'
+    assert sheet.cell(6, 2).value == 'Sikh Community'
+    assert sheet.cell(6, 3).value == 0
+    assert sheet.cell(6, 4).value == '4'
+    assert int(sheet.cell(6, 5).value) == int(sheet.cell(4, 0).value)
+
+    assert sheet.cell(7, 1).value == '430'
+    assert sheet.cell(7, 2).value == 'Catholic Parish'
+    assert sheet.cell(7, 3).value == 1
+    assert sheet.cell(7, 4).value == ''
+    assert int(sheet.cell(7, 5).value) == int(sheet.cell(4, 0).value)
+
+    assert sheet.cell(8, 1).value == '500'
+    assert sheet.cell(8, 2).value == 'Corporation'
+    assert sheet.cell(8, 3).value == 1
+    assert sheet.cell(8, 4).value == ''
+    assert sheet.cell(8, 5).value == ''

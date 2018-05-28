@@ -211,15 +211,18 @@ def export_organizations(self, request):
         request.translate(_("Name")),
         request.translate(_("Title")),
         request.translate(_("Active")),
+        request.translate(_("External ID")),
         request.translate(_("Parent Organization"))
     ))
 
-    for index, organization in enumerate(self.query()):
+    query = self.query().order_by(None).order_by(Organization.name)
+    for index, organization in enumerate(query):
         worksheet.write_row(index + 1, 0, (
             organization.id or '',
             organization.name or '',
             organization.title or '',
             organization.active,
+            organization.external_name or '',
             organization.parent_id or ''
         ))
 

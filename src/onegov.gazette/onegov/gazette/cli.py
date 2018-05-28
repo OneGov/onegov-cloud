@@ -135,6 +135,7 @@ def import_organizations(ctx, file, clear, dry_run, locale):
             'name': request.translate(_("Name")),
             'title': request.translate(_("Title")),
             'active': request.translate(_("Active")),
+            'external_name': request.translate(_("External ID")),
             'parent': request.translate(_("Parent Organization"))
         }
 
@@ -165,12 +166,14 @@ def import_organizations(ctx, file, clear, dry_run, locale):
             parent = int(parent) if parent else None
             title = getattr(line, columns['title'])
             active = bool(int(getattr(line, columns['active'])))
+            external_name = getattr(line, columns['external_name'])
 
             organization = organizations.add_root(
                 id=id_,
                 name=name,
                 title=title,
                 active=active,
+                external_name=external_name,
                 order=count
             )
             organization.parent_id = parent

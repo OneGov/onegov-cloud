@@ -5,6 +5,9 @@ from onegov.gazette.tests.common import login_publisher
 from PyPDF2 import PdfFileReader
 from pyquery import PyQuery as pq
 from webtest import TestApp as Client
+from xlrd import open_workbook
+from xlrd import xldate_as_tuple
+from datetime import datetime
 
 
 def test_view_issues(gazette_app):
@@ -324,3 +327,57 @@ def test_view_issues_publish(gazette_app):
         assert '<li>Nr. 45, 10.11.2017 / 3</li>' in notice_1
         assert '<li>Nr. 46, 17.11.2017 / 4</li>' in notice_1
         assert '<li>Nr. 45, 10.11.2017</li>' in notice_2  # submitted
+
+
+def test_view_issues_export(gazette_app):
+    client = Client(gazette_app)
+
+    client.get('/issues/export', status=403)
+
+    login_editor_1(client)
+    client.get('/issues/export', status=403)
+
+    login_publisher(client)
+    response = client.get('/issues/export')
+
+    book = open_workbook(file_contents=response.body)
+    assert book.nsheets == 1
+
+    sheet = book.sheets()[0]
+    assert sheet.ncols == 4
+    assert sheet.nrows == 15
+
+    def as_date(cell):
+        return datetime(
+            *xldate_as_tuple(cell.value, book.datemode)
+        ).date().isoformat()
+
+    def as_datetime(cell):
+        return datetime(
+            *xldate_as_tuple(cell.value, book.datemode)
+        ).isoformat()
+
+    assert sheet.cell(0, 0).value == 'Jahr'
+    assert sheet.cell(0, 1).value == 'Nummer'
+    assert sheet.cell(0, 2).value == 'Datum'
+    assert sheet.cell(0, 3).value == 'Eingabeschluss'
+
+    assert int(sheet.cell(1, 0).value) == 2017
+    assert int(sheet.cell(1, 1).value) == 40
+    assert as_date(sheet.cell(1, 2)) == '2017-10-06'
+    assert as_datetime(sheet.cell(1, 3)) == '2017-10-04T14:00:00'
+
+    assert int(sheet.cell(5, 0).value) == 2017
+    assert int(sheet.cell(5, 1).value) == 44
+    assert as_date(sheet.cell(5, 2)) == '2017-11-03'
+    assert as_datetime(sheet.cell(5, 3)) == '2017-11-01T13:00:00'
+
+    assert int(sheet.cell(13, 0).value) == 2017
+    assert int(sheet.cell(13, 1).value) == 52
+    assert as_date(sheet.cell(13, 2)) == '2017-12-29'
+    assert as_datetime(sheet.cell(13, 3)) == '2017-12-27T13:00:00'
+
+    assert int(sheet.cell(14, 0).value) == 2018
+    assert int(sheet.cell(14, 1).value) == 1
+    assert as_date(sheet.cell(14, 2)) == '2018-01-05'
+    assert as_datetime(sheet.cell(14, 3)) == '2018-01-03T13:00:00'

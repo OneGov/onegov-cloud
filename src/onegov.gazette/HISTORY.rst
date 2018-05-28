@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds import/export for issues, categories and organizations.
+  [msom]
+
 - Improves the archive view.
   [msom]
 
