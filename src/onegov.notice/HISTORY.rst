@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds an expired property to notices.
+  [msom]
+
 0.8.0 (2018-05-26)
 ~~~~~~~~~~~~~~~~~~~
 

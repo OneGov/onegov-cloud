@@ -35,10 +35,12 @@ setup(
     install_requires=[
         'onegov.core',
         'onegov.user>=0.15.0',
+        'sedate'
     ],
     extras_require=dict(
         test=[
             'coverage',
+            'freezegun',
             'onegov_testing',
             'pytest',
         ],

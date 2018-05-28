@@ -5,6 +5,7 @@ from onegov.core.orm.types import UTCDateTime
 from onegov.core.orm.types import UUID
 from onegov.user import User
 from onegov.user import UserGroup
+from sedate import utcnow
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
@@ -106,6 +107,14 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
 
     #: The expiry date of the notice
     expiry_date = Column(UTCDateTime, nullable=True)
+
+    @property
+    def expired(self):
+        """ Returns True, if the notice is expired. """
+
+        if self.expiry_date:
+            return self.expiry_date < utcnow()
+        return False
 
     #: The categories of this notice.
     _categories = Column(
