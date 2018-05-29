@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.5.1 (2018-05-29)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds compatibility with babel 2.6.
   [msom]
