@@ -284,6 +284,8 @@ def convert_xls_to_csv(xls, sheet_name=None):
             elif cell.ctype == xlrd.XL_CELL_DATE:
                 value = xlrd.xldate_as_tuple(cell.value, excel.datemode)
                 value = datetime(*value).isoformat()
+            elif cell.ctype == xlrd.XL_CELL_BOOLEAN:
+                value = str(cell.value)
             else:
                 raise NotImplementedError
 

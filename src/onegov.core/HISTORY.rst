@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds support for excel boolean cells.
+  [msom]
+
 0.70.2 (2018-05-25)
 ~~~~~~~~~~~~~~~~~~~
 
