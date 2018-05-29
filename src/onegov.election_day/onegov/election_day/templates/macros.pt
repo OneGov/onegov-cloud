@@ -98,7 +98,7 @@
 </metal:related_link>
 
 <metal:related_elections define-macro="related_elections" i18n:domain="onegov.election_day">
-    <div class="row related" tal:condition="election.related_elections">
+    <div class="row related" tal:condition="layout.related_elections">
         <div class="columns small-12">
             <h2 i18n:translate="">Related elections</h2>
             <p tal:repeat="(title, link) layout.related_elections">
