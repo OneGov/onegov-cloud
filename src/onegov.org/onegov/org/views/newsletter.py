@@ -8,25 +8,21 @@ from onegov.core.security import Public, Private
 from onegov.core.templates import render_template
 from onegov.core.utils import linkify
 from onegov.event import Occurrence, OccurrenceCollection
-from onegov.newsletter import (
-    Newsletter,
-    NewsletterCollection,
-    Recipient,
-    RecipientCollection
-)
+from onegov.newsletter import Newsletter
+from onegov.newsletter import NewsletterCollection
+from onegov.newsletter import Recipient
+from onegov.newsletter import RecipientCollection
 from onegov.newsletter.errors import AlreadyExistsError
 from onegov.org import _, OrgApp
 from onegov.org.forms import NewsletterForm, NewsletterSendForm, SignupForm
-from onegov.org.layout import (
-    DefaultMailLayout,
-    NewsletterLayout,
-    RecipientLayout
-)
+from onegov.org.layout import DefaultMailLayout
+from onegov.org.layout import NewsletterLayout
+from onegov.org.layout import RecipientLayout
 from onegov.org.models import News
-
 from sedate import utcnow
 from sqlalchemy import desc
 from sqlalchemy.orm import undefer
+from string import Template
 
 
 def get_newsletter_form(model, request):
@@ -52,13 +48,6 @@ def get_newsletter_form(model, request):
     form = form.with_occurrences(request, query.all())
 
     return form
-
-
-def get_newsletter_send_form(model, request):
-    query = RecipientCollection(request.session).query()
-    query = query.order_by(Recipient.address)
-
-    return NewsletterSendForm.for_newsletter(model, query.all())
 
 
 def news_by_newsletter(newsletter, request):
@@ -240,57 +229,70 @@ def delete_page(self, request):
     request.success(_("The newsletter was deleted"))
 
 
+def send_newsletter(request, newsletter, recipients):
+    html = Template(render_template(
+        'mail_newsletter.pt', request, {
+            'layout': DefaultMailLayout(newsletter, request),
+            'lead': linkify(newsletter.lead).replace('\n', '<br>'),
+            'newsletter': newsletter,
+            'title': newsletter.title,
+            'unsubscribe': '$unsubscribe',
+            'news': news_by_newsletter(newsletter, request),
+            'occurrences': occurrences_by_newsletter(newsletter, request)
+        }
+    ))
+
+    for count, recipient in enumerate(recipients, start=1):
+        unsubscribe = request.link(recipient.subscription, 'unsubscribe')
+
+        request.app.send_marketing_email(
+            subject=newsletter.title,
+            receivers=(recipient.address, ),
+            content=html.substitute(unsubscribe=unsubscribe)
+        )
+
+        if recipient not in newsletter.recipients:
+            newsletter.recipients.append(recipient)
+
+    newsletter.sent = newsletter.sent or utcnow()
+
+    return count
+
+
 @OrgApp.form(model=Newsletter, template='send_newsletter.pt', name='send',
-             permission=Private, form=get_newsletter_send_form)
+             permission=Private, form=NewsletterSendForm)
 def handle_send_newsletter(self, request, form):
+    layout = NewsletterLayout(self, request)
+
+    open_recipients = self.open_recipients
 
     if form.submitted(request):
-        query = RecipientCollection(request.session).query()
-        query = query.filter(Recipient.id.in_(form.recipients.data))
-        recipients = (r for r in query.all() if r not in self.recipients)
+        if form.send.data == 'now':
+            sent = send_newsletter(request, self, open_recipients)
 
-        sent_mails = 0
+            request.success(_('Sent "${title}" to ${n} recipients', mapping={
+                'title': self.title,
+                'n': sent
+            }))
+        elif form.send.data == 'specify':
+            self.scheduled = form.time.data
 
-        for recipient in recipients:
-
-            # one mail per recipient (each has a specific unsubscribe link)
-            mail = render_template(
-                'mail_newsletter.pt', request, {
-                    'layout': DefaultMailLayout(self, request),
-                    'lead': linkify(self.lead).replace('\n', '<br>'),
-                    'newsletter': self,
+            request.success(
+                _('Scheduled "${title}" to be sent on ${date}', mapping={
                     'title': self.title,
-                    'unsubscribe': request.link(
-                        recipient.subscription,
-                        'unsubscribe'
-                    ),
-                    'news': news_by_newsletter(self, request),
-                    'occurrences': occurrences_by_newsletter(self, request),
-                }
+                    'date': layout.format_date(self.scheduled, 'datetime_long')
+                })
             )
+        else:
+            raise NotImplementedError()
 
-            request.app.send_marketing_email(
-                subject=self.title,
-                receivers=(recipient.address, ),
-                content=mail
-            )
-
-            self.recipients.append(recipient)
-            sent_mails += 1
-
-        if not self.sent:
-            self.sent = utcnow()
-
-        request.success(_('Sent "${title}" to ${n} recipients', mapping={
-            'title': self.title,
-            'n': sent_mails
-        }))
         return morepath.redirect(request.link(self))
 
     return {
-        'layout': NewsletterLayout(self, request),
+        'layout': layout,
         'form': form,
         'title': self.title,
         'newsletter': self,
-        'previous_recipients': self.recipients
+        'previous_recipients': self.recipients,
+        'open_recipients': open_recipients,
     }

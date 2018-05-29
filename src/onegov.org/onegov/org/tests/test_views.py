@@ -2888,21 +2888,15 @@ def test_newsletter_send(org_app):
 
     assert "2 Abonnenten registriert" in client.get('/newsletters')
 
-    # send the newsletter to one recipient
+    # send the newsletter
     send = newsletter.click('Senden')
     assert "Dieser Newsletter wurde noch nicht gesendet." in send
-    assert "one@example.org" in send
-    assert "two@example.org" in send
+    assert "one@example.org" not in send
+    assert "two@example.org" not in send
     assert "xxx@example.org" not in send
 
-    len(send.pyquery('input[name="recipients"]')) == 2
-
-    send.select_checkbox('recipients', 'one@example.org', checked=True)
-    send.select_checkbox('recipients', 'two@example.org', checked=False)
-
     newsletter = send.form.submit().follow()
-
-    assert '"Our town is AWESOME" wurde an 1 Empfänger gesendet' in newsletter
+    assert '"Our town is AWESOME" wurde an 2 Empfänger gesendet' in newsletter
 
     page = anon.get('/newsletters')
     assert "gerade eben" in page
@@ -2911,17 +2905,12 @@ def test_newsletter_send(org_app):
     send = newsletter.click('Senden')
 
     assert "Zum ersten Mal gesendet gerade eben." in send
-    assert "Dieser Newsletter wurde an 1 Abonnenten gesendet." in send
+    assert "Dieser Newsletter wurde an 2 Abonnenten gesendet." in send
     assert "one@example.org" in send
     assert "two@example.org" in send
     assert "xxx@example.org" not in send
 
-    assert len(send.pyquery('input[name="recipients"]')) == 1
-    assert len(send.pyquery('.previous-recipients li')) == 1
-
-    # send to the other mail adress
-    send = send.form.submit().follow().click("Senden")
-    assert "von allen Abonnenten empfangen" in send
+    assert len(send.pyquery('.previous-recipients li')) == 2
 
     # make sure the mail was sent correctly
     assert len(org_app.smtp.outbox) == 2

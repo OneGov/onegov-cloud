@@ -1,8 +1,12 @@
+from datetime import timedelta
 from onegov.core.layout import Layout
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.org import _
-from wtforms import StringField, TextAreaField, validators
+from sedate import replace_timezone, to_timezone, utcnow
+from wtforms import RadioField, StringField, TextAreaField, validators
+from wtforms import ValidationError
+from wtforms.fields.html5 import DateTimeField
 
 
 class NewsletterForm(Form):
@@ -101,6 +105,45 @@ class NewsletterForm(Form):
 
 class NewsletterSendForm(Form):
 
+    send = RadioField(
+        _("Send"),
+        choices=(
+            ('now', _("Now")),
+            ('specify', _("At a specified time"))
+        ),
+        default='now'
+    )
+
+    time = DateTimeField(
+        _("Time"),
+        validators=[validators.InputRequired()],
+        depends_on=('send', 'specify')
+    )
+
+    def validate_time(self, field):
+        from onegov.org.layout import DefaultLayout  # XXX circular import
+        layout = DefaultLayout(self.model, self.request)
+
+        if self.send.data == 'specify':
+            time = replace_timezone(field.data, layout.timezone)
+            time = to_timezone(time, 'UTC')
+
+            if time < (utcnow() + timedelta(seconds=60 * 5)):
+                raise ValidationError(_(
+                    "Scheduled time must be at least 5 minutes in the future"
+                ))
+
+            if time.minute != 0:
+                raise ValidationError(_(
+                    "Newsletters can only be sent on the hour "
+                    "(10:00, 11:00, etc.)"
+                ))
+
+            self.time.data = time
+
+
+class NewsletterTestForm(Form):
+
     @classmethod
     def for_newsletter(cls, newsletter, recipients):
         choices = tuple(
@@ -114,19 +157,9 @@ class NewsletterSendForm(Form):
 
         class NewsletterSendFormWithRecipients(cls):
 
-            recipients = MultiCheckboxField(
+            recipients = RadioField(
                 label=_("Recipients"),
                 choices=choices,
-                default=tuple(c[0] for c in choices),
-                render_kw={
-                    'prefix_label': False
-                },
             )
-
-            def validate_recipients(self, field):
-                if len(field.data) == 0:
-                    raise validators.ValidationError(
-                        _("Please select at least one recipient")
-                    )
 
         return NewsletterSendFormWithRecipients

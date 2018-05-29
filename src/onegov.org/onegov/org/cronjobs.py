@@ -3,9 +3,11 @@ from datetime import datetime, timedelta
 from itertools import groupby
 from onegov.core.templates import render_template
 from onegov.form import FormSubmission, parse_form
+from onegov.newsletter import Newsletter, NewsletterCollection
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.models import ResourceRecipient, ResourceRecipientCollection
+from onegov.org.views.newsletter import send_newsletter
 from onegov.reservation import Reservation, Resource, ResourceCollection
 from onegov.ticket import Ticket, TicketCollection
 from onegov.user import User, UserCollection
@@ -33,6 +35,18 @@ WEEKDAYS = (
     'SA',
     'SU',
 )
+
+
+@OrgApp.cronjob(hour='*', minute=0, timezone='UTC')
+def send_scheduled_newsletter(request):
+    newsletters = NewsletterCollection(request.session).query().filter(and_(
+        Newsletter.scheduled != None,
+        Newsletter.scheduled <= (utcnow() + timedelta(seconds=60)),
+    ))
+
+    for newsletter in newsletters:
+        send_newsletter(request, newsletter, newsletter.open_recipients)
+        newsletter.scheduled = None
 
 
 @OrgApp.cronjob(hour=8, minute=30, timezone='Europe/Zurich')
@@ -112,7 +126,7 @@ def send_daily_ticket_statistics(request):
         )
 
 
-@OrgApp.cronjob(hour=6, minute=0, timezone='Europe/Zurich')
+@OrgApp.cronjob(hour=6, minute=5, timezone='Europe/Zurich')
 def send_daily_resource_usage_overview(request):
     today = to_timezone(utcnow(), 'Europe/Zurich')
     weekday = WEEKDAYS[today.weekday()]

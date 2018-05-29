@@ -19,25 +19,32 @@
                             <span tal:replace='layout.format_date(newsletter.sent, "relative")' i18n:name='time_ago' />.
                         </span>
                     </li>
-                    <li tal:condition="newsletter.recipients">
+                    <li tal:condition="previous_recipients">
                         <i class="fa-li fa fa-check"></i>
                         <span i18n:translate>
-                            This newsletter was sent to <span tal:replace='len(newsletter.recipients)' i18n:name='n' /> subscribers.
+                            This newsletter was sent to <span tal:replace='len(previous_recipients)' i18n:name='n' /> subscribers.
                         </span>
                     </li>
 
-                    <li tal:condition="not:form.recipients.choices">
+                    <li tal:condition="not: open_recipients">
                         <i class="fa-li fa fa-check"></i>
                         <span i18n:translate>
                             All subscribers have already received this newsletter.
                         </span>
                     </li>
+
+                    <li tal:condition="newsletter.scheduled">
+                        <i class="fa-li fa fa-clock-o"></i>
+                        <span i18n:translate>
+                            The newsletter is scheduled to be sent on <tal:b i18n:name="time">${layout.format_date(newsletter.scheduled, 'datetime_long')}</tal:b>
+                        </span>
+                    </li>
                 </ul>
             </div>
         </div>
-        <div class="row" tal:condition="form.recipients.choices">
+        <div class="row" tal:condition="open_recipients">
             <div class="small-12 medium-8 large-6 columns">
-                <h2 i18n:translate>Send Now</h2>
+                <h2 i18n:translate>Delivery</h2>
                 <div metal:use-macro="layout.macros['form']" />
             </div>
         </div>

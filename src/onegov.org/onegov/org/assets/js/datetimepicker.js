@@ -210,8 +210,8 @@ var setup_datetimepicker = function(type, selector, onChange, extraOptions) {
     $('form').submit(function() {
         var form = $(this);
 
-        if (form.data('submitted') !== true) {
-            form.data('submitted', true);
+        if (form.data('submitted' + '-' + selector) !== true) {
+            form.data('submitted' + '-' + selector, true);
 
             form.find(selector).each(function() {
                 var field = $(this);
