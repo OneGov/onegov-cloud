@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.5.2 (2018-05-29)
+~~~~~~~~~~~~~~~~~~~
 
 - Hides related elections title if empty.
   [msom]
