@@ -133,14 +133,27 @@ class CronjobAction(Action):
         self.minute = minute
         self.timezone = timezone
 
-    def identifier(self, cronjob_registry):
-        # return a key to the hour/minute on a fixed day, this way it's
-        # impossible to have two cronjobs running at the exact same time.
+    def identifier_by_hour_and_minute(self, hour, minute):
         return to_timezone(
             replace_timezone(
-                datetime(2016, 1, 1, self.hour, self.minute),
+                datetime(2016, 1, 1, hour, minute),
                 self.timezone
             ), 'UTC'
+        )
+
+    def identifier(self, **kw):
+        # return a key to the hour/minute on a fixed day, this way it's
+        # impossible to have two cronjobs running at the exact same time.
+        hour = 0 if self.hour == '*' else self.hour
+        return self.identifier_by_hour_and_minute(hour, self.minute)
+
+    def discriminators(self, **kw):
+        if self.hour != '*':
+            return ()
+
+        return tuple(
+            self.identifier_by_hour_and_minute(hour, self.minute)
+            for hour in range(0, 24) if hour != 0  # already in identifier
         )
 
     def perform(self, func, cronjob_registry):

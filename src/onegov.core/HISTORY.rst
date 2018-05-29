@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the ability to run a cronjob every hour.
+  [href]
+
 0.70.3 (2018-05-29)
 ~~~~~~~~~~~~~~~~~~~
 

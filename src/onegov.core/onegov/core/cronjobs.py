@@ -39,12 +39,12 @@ initialized.
 import pycurl
 
 from contextlib import suppress
-from datetime import datetime, time, timedelta
+from datetime import datetime, timedelta
 from onegov.core.framework import Framework, log
 from onegov.core.utils import local_lock
 from onegov.core.errors import AlreadyLockedError
 from onegov.core.security import Public
-from sedate import ensure_timezone, replace_timezone
+from sedate import ensure_timezone, replace_timezone, utcnow, to_timezone
 from threading import Thread
 from time import sleep
 from urllib.parse import quote_plus, unquote_plus
@@ -130,12 +130,15 @@ class Job(object):
             to be a match (i.e anywhere within 0' - 59'999.99999)
 
         """
+        assert timezone or point.tzinfo
 
-        assert point.tzinfo or timezone
         point = point if point.tzinfo else replace_timezone(point, timezone)
+        point = to_timezone(point, self.timezone)
 
-        start = datetime.combine(point.date(), time(self.hour, self.minute))
-        start = replace_timezone(start, self.timezone)
+        start = point.replace(
+            hour=point.hour if self.hour == '*' else self.hour,
+            minute=self.minute
+        )
 
         return start <= point < (start + timedelta(minutes=1))
 
@@ -173,12 +176,10 @@ class ApplicationBoundCronjobs(Thread):
         self.application_id = request.app.application_id
         self.jobs = tuple(job.as_request_call(request) for job in jobs)
 
-        log.info("Starting Cronjob Thread for {}".format(self.application_id))
+        log.info(f"Starting Cronjob Thread for {self.application_id}")
 
         for job in jobs:
-            log.info(
-                "Enabling Cronjob {} ({})".format(job.name, request.link(job))
-            )
+            log.info(f"Enabling Cronjob {job.name} ({request.link(job)})")
 
     def run(self):
         previous_check = datetime.min
@@ -208,7 +209,7 @@ class ApplicationBoundCronjobs(Thread):
         ))
 
     def run_scheduled_jobs(self):
-        point = replace_timezone(datetime.utcnow(), 'UTC')
+        point = utcnow()
 
         for job in self.jobs:
             if job.is_scheduled_at(point):
@@ -242,6 +243,7 @@ def run_job(self, request):
 
 def register_cronjob(registry, function, hour, minute, timezone):
     assert minute % 5 == 0, "The cronjobs must be added in 5 minute increments"
+    assert hour == '*' or isinstance(hour, int)
 
     if not hasattr(registry, 'cronjobs'):
         registry.cronjobs = {}
