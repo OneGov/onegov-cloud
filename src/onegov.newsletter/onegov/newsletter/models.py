@@ -4,15 +4,16 @@ from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UTCDateTime, UUID
 from onegov.core.utils import normalize_for_url
 from onegov.search import ORMSearchable
-from sqlalchemy import (
-    column,
-    Boolean,
-    Column,
-    ForeignKey,
-    Index,
-    Table,
-    Text,
-)
+from sqlalchemy import and_
+from sqlalchemy import Boolean
+from sqlalchemy import column
+from sqlalchemy import Column
+from sqlalchemy import ForeignKey
+from sqlalchemy import Index
+from sqlalchemy import not_
+from sqlalchemy import select
+from sqlalchemy import Table
+from sqlalchemy import Text
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import object_session, validates, relationship
 from uuid import uuid4
@@ -72,6 +73,9 @@ class Newsletter(Base, ContentMixin, TimestampMixin, ORMSearchable):
     #: null if not sent yet, otherwise the date this newsletter was first sent
     sent = Column(UTCDateTime, nullable=True)
 
+    #: time the newsletter is scheduled to be sent (in UTC)
+    scheduled = Column(UTCDateTime, nullable=True)
+
     #: the recipients of this newsletter, meant in part as a tracking feature
     #: to answer the question "who got which newsletters?" - for this to work
     #: the user of onegov.newsletter has to make sure that sent out
@@ -81,6 +85,20 @@ class Newsletter(Base, ContentMixin, TimestampMixin, ORMSearchable):
         'Recipient',
         secondary=newsletter_recipients,
         back_populates='newsletters')
+
+    @property
+    def open_recipients(self):
+        received = select([newsletter_recipients.c.recipient_id]).where(
+            newsletter_recipients.c.newsletter_id == self.name)
+
+        return tuple(object_session(self).query(Recipient).filter(
+            and_(
+                not_(
+                    Recipient.id.in_(received)
+                ),
+                Recipient.confirmed == True
+            )
+        ))
 
 
 class Recipient(Base, TimestampMixin):

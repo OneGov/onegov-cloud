@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a "scheduled" column to the newsletter.
+  [href]
+
 - Requires Python 3.6.
   [href]
 
