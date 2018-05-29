@@ -34,7 +34,7 @@ setup(
     python_requires='>=3.6',
     install_requires=[
         'arrow>=0.8.0',
-        'babel',
+        'babel>=2.6.0',
         'cached_property',
         'cssmin',
         'onegov.core>=0.64',

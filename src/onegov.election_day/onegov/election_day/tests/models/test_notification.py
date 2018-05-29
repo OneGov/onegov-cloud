@@ -592,13 +592,11 @@ def test_email_notification_election(election_day_app, session):
         assert "10 de 11" in contents
         assert "10 von 11" in contents
         assert "Maier Peter" in contents
-        assert "5'500" in contents
+        assert "5’500" in contents
         assert "5 500" in contents
-        assert "5,500" in contents
         assert "Müller Hans" in contents
-        assert "2'200" in contents
+        assert "2’200" in contents
         assert "2 200" in contents
-        assert "2,200" in contents
 
         # ... proporz
         mock.reset_mock()
@@ -619,13 +617,11 @@ def test_email_notification_election(election_day_app, session):
         assert "10 de 11" in contents
         assert "10 von 11" in contents
         assert "FDP" in contents
-        assert "7'700" in contents
+        assert "7’700" in contents
         assert "7 700" in contents
-        assert "7,700" in contents
         assert "SP" in contents
-        assert "6'600" in contents
+        assert "6’600" in contents
         assert "6 600" in contents
-        assert "6,600" in contents
 
         # Final results
         for result in majorz.results:
