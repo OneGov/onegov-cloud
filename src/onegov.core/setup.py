@@ -35,7 +35,7 @@ setup(
     install_requires=[
         'alembic',
         'arrow',
-        'babel',
+        'babel>=2.6.0',
         'blinker',
         'bcrypt',
         'bleach>=2.0.0',
