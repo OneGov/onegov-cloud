@@ -14,7 +14,8 @@ class NewsletterCollection(object):
     def by_name(self, name):
         return self.query().filter(Newsletter.name == name).first()
 
-    def add(self, title, html, lead=None, meta=None, content=None):
+    def add(self, title, html, lead=None, meta=None, content=None,
+            scheduled=None):
 
         name = normalize_for_url(title)
 
@@ -27,7 +28,8 @@ class NewsletterCollection(object):
             html=html,
             lead=lead,
             meta=meta or {},
-            content=content or {}
+            content=content or {},
+            scheduled=scheduled
         )
 
         self.session.add(newsletter)
