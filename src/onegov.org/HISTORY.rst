@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to schedule newsletters.
+  [href]
+
 0.28.3 (2018-05-23)
 ~~~~~~~~~~~~~~~~~~~
 
