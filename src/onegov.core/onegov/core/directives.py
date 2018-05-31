@@ -2,7 +2,7 @@ import os.path
 
 from datetime import datetime
 from dectate import Action, Query
-from inspect import isfunction
+from inspect import isclass
 from morepath.directive import HtmlAction
 from onegov.core.utils import Bunch
 from sedate import to_timezone, replace_timezone
@@ -68,10 +68,10 @@ def fetch_form_class(form_class, model, request):
 
     """
 
-    if isfunction(form_class):
-        return form_class(model, request)
-    else:
+    if isclass(form_class):
         return form_class
+    else:
+        return form_class(model, request)
 
 
 def query_form_class(request, model, name=None):

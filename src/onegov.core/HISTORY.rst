@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Enables class-methods as form directive inputs.
+  [href]
+
 - Adds the ability to run a cronjob every hour.
   [href]
 
