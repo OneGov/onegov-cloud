@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.70.4 (2018-05-31)
+~~~~~~~~~~~~~~~~~~~
 
 - Enables class-methods as form directive inputs.
   [href]
