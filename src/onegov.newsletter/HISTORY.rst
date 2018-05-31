@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.0 (2018-05-31)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a "scheduled" column to the newsletter.
   [href]
 
