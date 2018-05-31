@@ -14,7 +14,10 @@ from onegov.newsletter import Recipient
 from onegov.newsletter import RecipientCollection
 from onegov.newsletter.errors import AlreadyExistsError
 from onegov.org import _, OrgApp
-from onegov.org.forms import NewsletterForm, NewsletterSendForm, SignupForm
+from onegov.org.forms import NewsletterForm
+from onegov.org.forms import NewsletterSendForm
+from onegov.org.forms import NewsletterTestForm
+from onegov.org.forms import SignupForm
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.layout import NewsletterLayout
 from onegov.org.layout import RecipientLayout
@@ -229,7 +232,7 @@ def delete_page(self, request):
     request.success(_("The newsletter was deleted"))
 
 
-def send_newsletter(request, newsletter, recipients):
+def send_newsletter(request, newsletter, recipients, is_test=False):
     html = Template(render_template(
         'mail_newsletter.pt', request, {
             'layout': DefaultMailLayout(newsletter, request),
@@ -251,10 +254,11 @@ def send_newsletter(request, newsletter, recipients):
             content=html.substitute(unsubscribe=unsubscribe)
         )
 
-        if recipient not in newsletter.recipients:
+        if not is_test and recipient not in newsletter.recipients:
             newsletter.recipients.append(recipient)
 
-    newsletter.sent = newsletter.sent or utcnow()
+    if not is_test:
+        newsletter.sent = newsletter.sent or utcnow()
 
     return count
 
@@ -295,4 +299,29 @@ def handle_send_newsletter(self, request, form):
         'newsletter': self,
         'previous_recipients': self.recipients,
         'open_recipients': open_recipients,
+    }
+
+
+@OrgApp.form(model=Newsletter, template='form.pt', name='test',
+             permission=Private, form=NewsletterTestForm.build)
+def handle_test_newsletter(self, request, form):
+    layout = NewsletterLayout(self, request)
+
+    if form.submitted(request):
+        send_newsletter(request, self, (form.recipient, ), is_test=True)
+
+        request.success(_('Sent "${title}" to ${recipient}', mapping={
+            'title': self.title,
+            'recipient': form.recipient.address
+        }))
+
+        return morepath.redirect(request.link(self))
+
+    return {
+        'layout': layout,
+        'form': form,
+        'title': self.title,
+        'helptext': _(
+            "Sends a test newsletter to the given address"
+        )
     }

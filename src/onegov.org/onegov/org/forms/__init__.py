@@ -10,7 +10,9 @@ from onegov.org.forms.form_export import FormSubmissionsExport
 from onegov.org.forms.form_registration import FormRegistrationWindowForm
 from onegov.org.forms.generic import ExportForm, DateRangeForm
 from onegov.org.forms.imageset import ImageSetForm
-from onegov.org.forms.newsletter import NewsletterForm, NewsletterSendForm
+from onegov.org.forms.newsletter import NewsletterForm
+from onegov.org.forms.newsletter import NewsletterSendForm
+from onegov.org.forms.newsletter import NewsletterTestForm
 from onegov.org.forms.page import LinkForm, PageForm
 from onegov.org.forms.person import PersonForm
 from onegov.org.forms.reservation import ReservationForm
@@ -41,6 +43,7 @@ __all__ = [
     'ManageUserForm',
     'NewsletterForm',
     'NewsletterSendForm',
+    'NewsletterTestForm',
     'NewUserForm',
     'PageForm',
     'PersonForm',

@@ -2,6 +2,7 @@ from datetime import timedelta
 from onegov.core.layout import Layout
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
+from onegov.newsletter import Recipient
 from onegov.org import _
 from sedate import replace_timezone, to_timezone, utcnow
 from wtforms import RadioField, StringField, TextAreaField, validators
@@ -145,21 +146,24 @@ class NewsletterSendForm(Form):
 class NewsletterTestForm(Form):
 
     @classmethod
-    def for_newsletter(cls, newsletter, recipients):
-        choices = tuple(
-            (
-                (recipient.id.hex, recipient.address)
-                for recipient in recipients
-                if recipient.confirmed and
-                recipient not in newsletter.recipients
-            )
-        )
+    def build(cls, newsletter, request):
+        recipients = request.session.query(Recipient)\
+            .with_entities(Recipient.id, Recipient.address)\
+            .filter_by(confirmed=True)
+
+        choices = tuple((r.id.hex, r.address) for r in recipients)
 
         class NewsletterSendFormWithRecipients(cls):
 
-            recipients = RadioField(
-                label=_("Recipients"),
+            selected_recipient = RadioField(
+                label=_("Recipient"),
                 choices=choices,
             )
+
+            @property
+            def recipient(self):
+                return request.session.query(Recipient)\
+                    .filter_by(id=self.selected_recipient.data)\
+                    .one()
 
         return NewsletterSendFormWithRecipients

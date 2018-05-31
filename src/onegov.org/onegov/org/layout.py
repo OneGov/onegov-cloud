@@ -1475,6 +1475,11 @@ class NewsletterLayout(DefaultLayout):
                     attrs={'class': 'send-link'}
                 ),
                 Link(
+                    text=_("Test"),
+                    url=self.request.link(self.model, 'test'),
+                    attrs={'class': 'test-link'}
+                ),
+                Link(
                     text=_("Edit"),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-link'}

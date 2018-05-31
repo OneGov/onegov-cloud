@@ -1303,6 +1303,7 @@ $payments-icon: '\f09d';
 $select-icon: '\f14a';
 $send-link-icon: '\f1d9';
 $sync-icon: '\f021';
+$test-link-icon: '\f0e9';
 $occupancy-link-icon: '\f022';
 $unmute: '\f130';
 $upload-icon: '\f0ee';
@@ -1429,6 +1430,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .payments::before { @include icon($payments-icon); }
     .select::before { @include icon($select-icon); }
     .send-link::before { @include icon($send-link-icon); }
+    .test-link::before { @include icon($test-link-icon); }
     .sync::before { @include icon($sync-icon); }
     .unmute::before { @include icon($unmute); }
     .upload::before { @include icon($upload-icon); }
