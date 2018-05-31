@@ -122,6 +122,9 @@ class NewsletterSendForm(Form):
     )
 
     def validate_time(self, field):
+        if not field.data:
+            return
+
         from onegov.org.layout import DefaultLayout  # XXX circular import
         layout = DefaultLayout(self.model, self.request)
 

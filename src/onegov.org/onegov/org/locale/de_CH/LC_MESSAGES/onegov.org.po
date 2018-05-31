@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-05-16 16:21+0200\n"
+"POT-Creation-Date: 2018-05-31 09:09+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -196,6 +196,9 @@ msgstr "Belegung"
 
 msgid "Send"
 msgstr "Senden"
+
+msgid "Test"
+msgstr "Test"
 
 msgid "Manage images"
 msgstr "Bilder verwalten"
@@ -807,6 +810,9 @@ msgstr "Karte"
 msgid "Submitter"
 msgstr "Antragsteller/in"
 
+msgid "Time"
+msgstr "Zeit"
+
 msgid "Used in the overview and the e-mail subject"
 msgstr "Wird in der Übersicht und als E-Mail Subjekt verwendet"
 
@@ -822,8 +828,20 @@ msgstr "Aktuelles"
 msgid "Selected News / Events"
 msgstr "Ausgewählte Nachrichten und Veranstaltungen"
 
-msgid "Please select at least one recipient"
-msgstr "Bitte wählen Sie mindestens einen Empfänger"
+msgid "Now"
+msgstr "Jetzt"
+
+msgid "At a specified time"
+msgstr "Zur angegebenen Zeit"
+
+msgid "Scheduled time must be at least 5 minutes in the future"
+msgstr "Die angegebene Zeit muss mindestends 5 Minuten in der Zukunft liegen"
+
+msgid "Newsletters can only be sent on the hour (10:00, 11:00, etc.)"
+msgstr "Newsletter können nur zur vollen Stunde versendet werden (10:00, 11:00, usw.)"
+
+msgid "Recipient"
+msgstr "Empfänger"
 
 msgid "Name"
 msgstr "Name"
@@ -1038,14 +1056,14 @@ msgstr "Sortierung"
 msgid "Order-Format"
 msgstr "Sortierungs-Format"
 
+msgid "Direction"
+msgstr "Richtung"
+
 msgid "Pattern"
 msgstr "Muster"
 
 msgid "External Link"
 msgstr "Externer Link"
-
-msgid "Direction"
-msgstr "Richtung"
 
 msgid "Users may propose new entries"
 msgstr "Benutzer können neue Einträge vorschlagen"
@@ -1587,8 +1605,11 @@ msgstr "Dieser Newsletter wurde an ${n} Abonnenten gesendet."
 msgid "All subscribers have already received this newsletter."
 msgstr "Dieser Newsletter wurde bereits von allen Abonnenten empfangen."
 
-msgid "Send Now"
-msgstr "Jetzt senden"
+msgid "The newsletter is scheduled to be sent on ${time}"
+msgstr "Der Newsletter wird am ${time} versendet"
+
+msgid "Delivery"
+msgstr "Versand"
 
 msgid "The newsletter was already sent to the following addresses:"
 msgstr "Der Newsletter wurde bereits an die folgenden Empfänger gesendet:"
@@ -2749,6 +2770,9 @@ msgstr "Newsletter Bearbeiten"
 msgid "The newsletter was deleted"
 msgstr "Der Newsletter wurde gelöscht"
 
+msgid "Sends a test newsletter to the given address"
+msgstr "Sendet ein Test-Newsletter an die gewählte Adresse"
+
 #, python-format
 msgid ""
 "Success! We have sent a confirmation link to ${address}, if we didn't send "
@@ -2758,8 +2782,8 @@ msgstr ""
 "${address}, sofern Sie noch nicht angemeldet sind."
 
 #, python-format
-msgid "Sent \"${title}\" to ${n} recipients"
-msgstr "\"${title}\" wurde an ${n} Empfänger gesendet"
+msgid "Sent \"${title}\" to ${recipient}"
+msgstr "\"${title}\" wurde an ${recipient} gesendet"
 
 #, python-format
 msgid "Welcome to the ${org} Newsletter"
@@ -2768,8 +2792,16 @@ msgstr "Willkommen beim ${org} Newsletter"
 msgid "Added a new newsletter"
 msgstr "Ein neuer Newsletter wurde hinzugefügt"
 
+#, python-format
+msgid "Sent \"${title}\" to ${n} recipients"
+msgstr "\"${title}\" wurde an ${n} Empfänger gesendet"
+
 msgid "A newsletter with this name already exists"
 msgstr "Ein Newsletter mit diesem Namen existiert bereits"
+
+#, python-format
+msgid "Scheduled \"${title}\" to be sent on ${date}"
+msgstr "\"${title}\" wurde für den Versand am ${date} eingeplant"
 
 msgid "New Recipient"
 msgstr "Neuer Empfänger"

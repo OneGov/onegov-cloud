@@ -236,7 +236,7 @@ def send_newsletter(request, newsletter, recipients, is_test=False):
     html = Template(render_template(
         'mail_newsletter.pt', request, {
             'layout': DefaultMailLayout(newsletter, request),
-            'lead': linkify(newsletter.lead).replace('\n', '<br>'),
+            'lead': linkify(newsletter.lead or '').replace('\n', '<br>'),
             'newsletter': newsletter,
             'title': newsletter.title,
             'unsubscribe': '$unsubscribe',

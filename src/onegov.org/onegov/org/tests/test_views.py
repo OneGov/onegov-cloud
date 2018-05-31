@@ -17,7 +17,7 @@ from onegov.core.utils import Bunch
 from onegov.form import FormCollection, FormSubmission
 from onegov.directory import DirectoryEntry
 from onegov.gis import Coordinates
-from onegov.newsletter import RecipientCollection
+from onegov.newsletter import RecipientCollection, NewsletterCollection
 from onegov_testing import Client as BaseClient
 from onegov.page import PageCollection
 from onegov.pay import PaymentProviderCollection
@@ -2943,6 +2943,85 @@ def test_newsletter_send(org_app):
 
     anon.get(unconfirm_2)
     assert recipients.query().count() == 1
+
+
+def test_newsletter_schedule(org_app):
+    client = Client(org_app)
+    client.login_editor()
+
+    # add a newsletter
+    new = client.get('/newsletters').click('Newsletter')
+    new.form['title'] = "Our town is AWESOME"
+    new.form['lead'] = "Like many of you, I just love our town..."
+
+    new.select_checkbox("news", "Willkommen bei OneGov")
+    new.select_checkbox("occurrences", "150 Jahre Govikon")
+
+    newsletter = new.form.submit().follow()
+
+    # add some recipients the quick wqy
+    recipients = RecipientCollection(org_app.session())
+    recipients.add('one@example.org', confirmed=True)
+    recipients.add('two@example.org', confirmed=True)
+
+    transaction.commit()
+
+    send = newsletter.click('Senden')
+    send.form['send'] = 'specify'
+
+    # schedule the newsletter too close to execute
+    with freeze_time('2018-05-31 09:59'):
+        send.form['time'] = '2018-05-31 12:00:00'
+        assert '5 Minuten in der Zukunft' in send.form.submit()
+
+    # schedule the newsletter outside the hour
+    send.form['time'] = '2018-05-31 11:55:00'
+    assert 'nur zur vollen Stunde' in send.form.submit()
+
+    # schedule the newsletter at a valid time
+    with freeze_time('2018-05-31 09:54:59'):   # in UTC
+        send.form['time'] = '2018-05-31 12:00:00'  # in Europe/Zuricdh
+        send.form.submit().follow()
+
+
+def test_newsletter_test_delivery(org_app):
+    client = Client(org_app)
+    client.login_editor()
+
+    # add a newsletter
+    new = client.get('/newsletters').click('Newsletter')
+    new.form['title'] = "Our town is AWESOME"
+    new.form['lead'] = "Like many of you, I just love our town..."
+
+    new.select_checkbox("news", "Willkommen bei OneGov")
+    new.select_checkbox("occurrences", "150 Jahre Govikon")
+
+    newsletter = new.form.submit().follow()
+
+    # add some recipients the quick wqy
+    recipients = RecipientCollection(org_app.session())
+    recipients.add('one@example.org', confirmed=True)
+    recipients.add('two@example.org', confirmed=True)
+
+    recipient = recipients.query().first().id.hex
+
+    transaction.commit()
+
+    send = newsletter.click('Test')
+    send.form['selected_recipient'] = recipient
+    send.form.submit().follow()
+
+    assert len(org_app.smtp.outbox) == 1
+
+    send = newsletter.click('Test')
+    send.form['selected_recipient'] = recipient
+    send.form.submit().follow()
+
+    assert len(org_app.smtp.outbox) == 2
+
+    newsletter = NewsletterCollection(org_app.session()).query().one()
+    assert newsletter.sent is None
+    assert not newsletter.recipients
 
 
 def test_map_default_view(org_app):

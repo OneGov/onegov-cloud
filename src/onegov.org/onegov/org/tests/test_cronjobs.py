@@ -6,9 +6,10 @@ from freezegun import freeze_time
 from onegov.core.utils import Bunch
 from onegov.ticket import Handler, Ticket, TicketCollection
 from onegov.user import UserCollection
+from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.reservation import ResourceCollection
 from webtest import TestApp as Client
-from sedate import ensure_timezone
+from sedate import ensure_timezone, utcnow
 from onegov.form import FormSubmissionCollection
 from onegov.org.models import ResourceRecipientCollection
 
@@ -358,3 +359,38 @@ def test_daily_reservation_overview(org_app, smtp):
 
     assert 'day-reservation' not in get_mail(smtp.outbox, 1)['text']
     assert 'gym-reservation' in get_mail(smtp.outbox, 1)['text']
+
+
+def test_send_scheduled_newsletters(org_app, smtp):
+    newsletters = NewsletterCollection(org_app.session())
+    recipients = RecipientCollection(org_app.session())
+
+    recipient = recipients.add('info@example.org')
+    recipient.confirmed = True
+
+    with freeze_time('2018-05-31 12:00'):
+        newsletters.add("Foo", "Bar", scheduled=utcnow())
+
+    transaction.commit()
+
+    newsletter = newsletters.query().one()
+    assert newsletter.scheduled
+
+    job = get_cronjob_by_name(org_app, 'send_scheduled_newsletter')
+    job.app = org_app
+
+    with freeze_time('2018-05-31 11:00'):
+        client = Client(org_app)
+        client.get(get_cronjob_url(job))
+
+        newsletter = newsletters.query().one()
+        assert newsletter.scheduled
+        assert len(smtp.outbox) == 0
+
+    with freeze_time('2018-05-31 12:00'):
+        client = Client(org_app)
+        client.get(get_cronjob_url(job))
+
+        newsletter = newsletters.query().one()
+        assert not newsletter.scheduled
+        assert len(smtp.outbox) == 1
