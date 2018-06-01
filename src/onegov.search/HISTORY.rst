@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Drastically reduces the number of shards used.
+  [href]
+
 1.5.0 (2018-05-24)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -505,7 +505,11 @@ class IndexManager(object):
             },
             'settings': {
                 'analysis': ANALYSIS_CONFIG,
-                'index.mapper.dynamic': False
+                'index': {
+                    'number_of_shards': 1,
+                    'number_of_replicas': 0,
+                    'refresh_interval': '5s'
+                }
             }
         })
 
