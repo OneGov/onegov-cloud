@@ -2,9 +2,8 @@
     useful mixins
 */
 
-// scss-lint:disable all
-// the scss linter completely looses it with this one
-@mixin grayscale() {
+// sass-lint:disable-all
+@mixin grayscale {
     filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale");
             filter: grayscale(100%);
        -moz-filter: grayscale(100%);
@@ -14,37 +13,38 @@
     -webkit-filter: grayscale(100%);
 }
 
-@mixin reset-filter() {
+@mixin reset-filter {
        -moz-filter: none;
         -ms-filter: none;
          -o-filter: none;
             filter: none;
     -webkit-filter: none;
 }
-// scss-lint:enable all
+// sass-lint:enable-all
 
-@mixin hairline() {
+@mixin hairline {
     border: 0;
     border-bottom: 1px solid $gray;
 }
 
-@mixin smooth-edges() {
+@mixin smooth-edges {
     border-radius: 2px;
 }
 
-@mixin circle() {
+@mixin circle {
     border-radius: 1000px;
 }
 
 @mixin icon($icon) {
     content: $icon;
+    display: inline-block;
     font-family: 'FontAwesome';
     font-weight: normal;
     width: 1.5ex;
-    display: inline-block;
 }
 
 @mixin prefix ($prop, $val) {
+    // sass-lint:disable-block property-sort-order
     -webkit-#{$prop}: #{$val};
     -moz-#{$prop}: #{$val};
     -ms-#{$prop}: #{$val};
@@ -83,7 +83,7 @@ $full-width-banner-height: 333px;
     apply the placeholder color.
 */
 :-ms-input-placeholder {
-   color: $input-placeholder-font-color !important;
+    color: $input-placeholder-font-color !important;
 }
 
 /*
@@ -305,7 +305,7 @@ $globals-height: 2.5rem;
     margin: 0 auto (-$footer-height);
 
     @media not print {
-      min-height: 100%;
+        min-height: 100%;
     }
 }
 
@@ -726,7 +726,7 @@ form {
         margin-bottom: 0;
     }
 
-    .upload-widget.with-data input[type=file] {
+    .upload-widget.with-data input[type='file'] {
         margin-left: 2em;
     }
 
@@ -963,7 +963,7 @@ dl.field-display > dt {
 /*
     the color picker field does not look right with zurb foundation
 */
-input[type=color] {
+input[type='color'] {
     background-color: transparent;
     border: 0;
     display: block;
@@ -2213,12 +2213,11 @@ $ticket-number-bg: $yellow-light;
 
 .ticket-number {
     @include label(
-        $padding: .25rem .5rem .25rem,
+        $padding: .25rem .5rem,
         $text-size: 1rem,
         $bg: $ticket-number-bg
     );
     font-family: $font-family-monospace;
-    padding-bottom: 1px;
 }
 
 .ticket-date {
@@ -3561,7 +3560,7 @@ ul.search-results {
         }
 
         &.selected {
-            @include reset-filter();
+            @include reset-filter;
 
             img {
                 border-radius: 1px;
@@ -4370,7 +4369,7 @@ h2 + div.timeline {
     input {
         appearance: none !important;
         background: none !important;
-        border: none !important;
+        border: 0 !important;
         box-shadow: none !important;
         display: inline-block !important;
         font: inherit !important;
@@ -4390,7 +4389,7 @@ h2 + div.timeline {
     Hints
 */
 .hints {
-    @include hairline();
+    @include hairline;
 
     margin: 0 0 .5rem;
     padding: 0 0 .5rem;
