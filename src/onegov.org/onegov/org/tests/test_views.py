@@ -26,6 +26,7 @@ from onegov.reservation import ResourceCollection, Reservation
 from onegov_testing import utils
 from onegov.ticket import TicketCollection
 from onegov.user import UserCollection
+from sedate import replace_timezone
 from purl import URL
 from webtest import Upload
 
@@ -2970,7 +2971,9 @@ def test_newsletter_schedule(org_app):
     send.form['send'] = 'specify'
 
     # schedule the newsletter too close to execute
-    with freeze_time('2018-05-31 11:55:01 CET'):
+    time = replace_timezone(datetime(2018, 5, 31, 11, 55, 1), 'Europe/Zurich')
+
+    with freeze_time(time):
         send.form['time'] = '2018-05-31 12:00:00'
         assert '5 Minuten in der Zukunft' in send.form.submit()
 
@@ -2979,7 +2982,9 @@ def test_newsletter_schedule(org_app):
         assert 'nur zur vollen Stunde' in send.form.submit()
 
     # schedule the newsletter at a valid time
-    with freeze_time('2018-05-31 11:55:00 CET'):
+    time = replace_timezone(datetime(2018, 5, 31, 11, 55, 0), 'Europe/Zurich')
+
+    with freeze_time(time):
         send.form['time'] = '2018-05-31 12:00:00'
         send.form.submit().follow()
 
