@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a back-link to the directory entry views inside iframes.
+  [href]
+
 - Shows a bullet instead of a checkmark in the directory choices.
   [href] 
 

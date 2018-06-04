@@ -21,3 +21,11 @@
 </ul>
 <hr>
 </metal:hierarchical_search>
+
+<metal:before_directory_entry_lead define-macro="before_directory_entry_lead">
+  <div class="framed-only">
+    <p>
+      <a class="small" href="${request.link(entry.directory)}" i18n:translate>Back to the overview</a>
+    </p>
+  </div>
+</metal:before_directory_entry_lead>

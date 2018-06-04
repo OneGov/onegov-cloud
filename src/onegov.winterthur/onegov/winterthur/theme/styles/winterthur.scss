@@ -130,6 +130,10 @@ input[data-street-search]::placeholder {
         display: none;
     }
 
+    .directory-back-button {
+        display: block !important;
+    }
+
     &.directory-entry-layout .main-title {
         display: block;
         font-size: $h2-font-size;
