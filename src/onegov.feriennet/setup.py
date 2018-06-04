@@ -36,6 +36,7 @@ setup(
         'faker',
         'icalendar',
         'onegov.activity',
+        'onegov.core>=0.70.5',
         'onegov.org>=0.20.0',
     ],
     extras_require=dict(
