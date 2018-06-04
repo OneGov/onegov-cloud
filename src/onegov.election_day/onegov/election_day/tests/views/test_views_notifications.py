@@ -27,9 +27,12 @@ def test_view_notifications_votes(election_day_app):
 
     assert "Benachrichtigungen auslösen" in client.get('/manage/votes')
     assert "Benachrichtigungen auszulösen" in upload_vote(client, False)
-
     assert "erneut auslösen" not in client.get('/vote/vote/trigger')
-    client.get('/vote/vote/trigger').form.submit()
+
+    trigger = client.get('/vote/vote/trigger')
+    trigger.form['notifications'] = ['webhooks']
+    trigger.form.submit()
+
     assert "erneut auslösen" in client.get('/vote/vote/trigger')
 
     upload_vote(client, False)
@@ -46,7 +49,9 @@ def test_view_notifications_votes(election_day_app):
     subscribe.form['email'] = 'hans@example.org'
     subscribe.form.submit()
 
-    client.get('/vote/vote/trigger').form.submit()
+    trigger = client.get('/vote/vote/trigger')
+    trigger.form['notifications'] = ['email']
+    trigger.form.submit()
 
     message = election_day_app.smtp.outbox.pop()
     assert message['To'] == 'hans@example.org'
@@ -91,11 +96,14 @@ def test_view_notifications_elections(election_day_app_gr):
     assert "Benachrichtigungen auszulösen" in upload_majorz_election(
         client, False
     )
-
     assert "erneut auslösen" not in client.get(
         '/election/majorz-election/trigger'
     )
-    client.get('/election/majorz-election/trigger').form.submit()
+
+    trigger = client.get('/election/majorz-election/trigger')
+    trigger.form['notifications'] = ['webhooks']
+    trigger.form.submit()
+
     assert "erneut auslösen" in client.get('/election/majorz-election/trigger')
 
     upload_majorz_election(client, False)
@@ -114,7 +122,9 @@ def test_view_notifications_elections(election_day_app_gr):
     subscribe.form['email'] = 'hans@example.org'
     subscribe.form.submit()
 
-    client.get('/election/majorz-election/trigger').form.submit()
+    trigger = client.get('/election/majorz-election/trigger')
+    trigger.form['notifications'] = ['email']
+    trigger.form.submit()
 
     message = election_day_app_gr.smtp.outbox.pop()
     assert message['To'] == 'hans@example.org'
