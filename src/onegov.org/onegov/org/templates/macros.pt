@@ -10,6 +10,10 @@
     <!--! To be overridden by other applications -->
 </metal:block>
 
+<metal:block define-macro="before_directory_entry_lead">
+    <!--! To be override by other applications -->
+</metal:block>
+
 <metal:navigation define-macro="top_navigation">
     <div class="main-navigation" tal:define="links top_navigation|layout.top_navigation">
         <nav class="top-bar" data-topbar role="navigation" tal:condition="links">
@@ -346,6 +350,7 @@
     <div class="row" tal:define="show_side_panel show_side_panel|False; location location|False">
         <tal:block condition="not: people or contact or coordinates or location or show_side_panel">
             <div class="small-12 columns page-content-main">
+                <div metal:define-slot="before-lead"></div>
                 <span class="page-lead" tal:condition="lead" tal:content="lead" />
                 <div metal:define-slot="after-lead"></div>
 

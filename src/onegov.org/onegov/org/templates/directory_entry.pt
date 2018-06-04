@@ -6,6 +6,10 @@
         <tal:b metal:use-macro="layout.macros.page_content"
                    tal:define="lead entry.lead;text None; people None; contact entry.contact; coordinates entry.directory.enable_map and entry.coordinates">
 
+            <div metal:fill-slot="before-lead">
+                <metal:b use-macro="layout.macros['before_directory_entry_lead']" />
+            </div>
+
             <div metal:fill-slot="after-lead">
                 <metal:b
                     use-macro="layout.macros['display_fields']"
