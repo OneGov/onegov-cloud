@@ -79,6 +79,7 @@
                     tooltip = d3.tip()
                         .attr('class', 'd3-tip')
                         .direction(function(d) {
+                            if (isUndefined(d.id)) return 'ne';
                             var b = this.getBBox();
                             var p = this.parentNode.getBBox();
                             return ((b.y - p.y > p.y + p.height - b.y - b.height) ? 'n' : 's') +
