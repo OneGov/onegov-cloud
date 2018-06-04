@@ -45,16 +45,18 @@ It's important to test the code manually, to see visual flaws etc. One can use t
   - [ ] The JSON views (`json` and `summary`)
   - [ ] The data exports
   - [ ] Can you subsribe/unsubscribe to SMS notifications?
+  - [ ] Can you subsribe/unsubscribe to email notifications?
 - [ ] Does the backend look OK?
   - [ ] Does the login and logout work?
   - [ ] Does the passwort reset work?
   - [ ] Does the pagination work?
-  - [ ] Can you create/edit/delete elections and votes?
+  - [ ] Can you create/edit/delete elections/election compounds/votes?
   - [ ] Can you create/edit/delete data sources and mappings?
-  - [ ] Can you view/remove the subscribers?
+  - [ ] Can you view/remove the sms/email subscribers?
   - [ ] Does the sorting work?
-- [ ] Does the (SMS) notification work?
-- [ ] Do the (front end) views look OK
+- [ ] Does the SMS notification work?
+- [ ] Does the email notification work?
+- [ ] Do the front end views look OK
   - [ ] On different browsers?
   - [ ] On a mobile?
 - [ ] Does the headerless mode work? (`?headerless` / `?headerful`)
@@ -79,14 +81,16 @@ It's important to test the code manually, to see visual flaws etc. One can use t
     - [ ] Majorz Elections
     - [ ] Proporz Elections with historical party data
     - [ ] Proporz Elections with historical party data
+    - [ ] Election Compounds
   - [ ] Do the SVGs look ok?
     - [ ] Ballot Maps
     - [ ] Candidates Bar Charts
     - [ ] List Bar Charts
     - [ ] List Connection Charts
-    - [ ] Panachage Charts
-    - [ ] Party Charts
-- [ ] Does the HipChat integration work?
+    - [ ] List Panachage Charts
+    - [ ] Party Strength Charts
+    - [ ] Party Panachage Charts
+- [ ] Does the Zulip integration work?
 - [ ] Do the upload of results work?
   - [ ] Typcial scenarios for uploading vote results
     - [ ] Upload a simple cantonal vote on a cantonal instance by using the standard format as described in the docs (VS, DC, IC, FS), e.g. for **GR**
@@ -126,7 +130,6 @@ It's important to test the code manually, to see visual flaws etc. One can use t
 There are a lot of different possiblities to upload results, here are the typical dimension which should be considered for testing:
 
 - Common
-
   - Instance
     - **IC**: Cantonal instance
     - **IM**: Communal instance
@@ -140,9 +143,7 @@ There are a lot of different possiblities to upload results, here are the typica
     - **RN**: No results
     - **RT**: Temporary results
     - **RF**: Full results
-
 - Votes
-
   - Type
     - **VS**: Simple votes
     - **VC**: Complex votes
@@ -150,27 +151,18 @@ There are a lot of different possiblities to upload results, here are the typica
     - **FS**: Standard format
     - **FI**: Internal format
     - **FW**: Wabsti format
-
 - Election
-
   - Type
-
     - **EM**: Majorz elections
     - **EP**: Proporz elections
-
   - Upload format
-
     - **FI**: Internal format
     - **FW**: Wabsti format
     - **FC**: WabstiC format
-
   - Party results
-
     - **PR**: Contains party results
     - **PN**: No party results
-
   - Missing Parts (FW only!)
-
     - **ML**: Missing list connection (EP + FW)
     - **MC**: Missing candidates (EP + FW)
     - **MS**: Missing statistics (EP + FW)
