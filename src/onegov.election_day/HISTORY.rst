@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves responsive behaviour.
+  [msom]
+
 3.5.2 (2018-05-29)
 ~~~~~~~~~~~~~~~~~~~
 
