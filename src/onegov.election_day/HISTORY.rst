@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.5.3 (2018-06-04)
+~~~~~~~~~~~~~~~~~~~
 
 - Improves responsive behaviour.
   [msom]
