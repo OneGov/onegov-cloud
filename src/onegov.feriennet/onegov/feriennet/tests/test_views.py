@@ -2285,3 +2285,83 @@ def test_fill_out_contact_form(feriennet_app):
     assert "Anfrage eingereicht" in page
 
     assert len(feriennet_app.smtp.outbox) == 1
+
+
+def test_book_alternate_occasion(feriennet_app):
+    activities = ActivityCollection(feriennet_app.session(), type='vacation')
+    attendees = AttendeeCollection(feriennet_app.session())
+    bookings = BookingCollection(feriennet_app.session())
+    periods = PeriodCollection(feriennet_app.session())
+    occasions = OccasionCollection(feriennet_app.session())
+
+    owner = Bunch(username='admin@example.org')
+
+    prebooking = tuple(d.date() for d in (
+        datetime.now() - timedelta(days=1),
+        datetime.now() + timedelta(days=1)
+    ))
+
+    execution = tuple(d.date() for d in (
+        datetime.now() + timedelta(days=10),
+        datetime.now() + timedelta(days=12)
+    ))
+
+    period = periods.add(
+        title="Ferienpass 2018",
+        prebooking=prebooking,
+        execution=execution,
+        active=True
+    )
+
+    fishing = activities.add("Fishing", username='admin@example.org')
+    fishing.state = 'accepted'
+
+    o1 = occasions.add(
+        start=datetime(2018, 7, 4, 8),
+        end=datetime(2018, 7, 4, 16),
+        age=(0, 100),
+        spots=(0, 100),
+        timezone="Europe/Zurich",
+        activity=fishing,
+        period=period
+    )
+
+    o2 = occasions.add(
+        start=datetime(2018, 7, 4, 8),
+        end=datetime(2018, 7, 4, 16),
+        age=(0, 100),
+        spots=(0, 100),
+        timezone="Europe/Zurich",
+        activity=fishing,
+        period=period
+    )
+
+    o1_id = o1.id
+    o2_id = o2.id
+
+    a = attendees.add(owner, 'Dustin', date(2010, 1, 1), 'male')
+    b = bookings.add(owner, a, o1)
+    b.state = 'blocked'
+
+    transaction.commit()
+    assert bookings.query().one().occasion_id == o1_id
+
+    client = Client(feriennet_app)
+    client.login_admin()
+    fill_out_profile(client)
+
+    # before period confirmation, the blocked booking must remain
+    page = client.get('/activity/fishing').click('Anmelden', index=1)
+    page = page.form.submit()
+
+    assert "bereits eine andere Durchführung dieses Angebots" in page
+
+    periods.query().one().confirmed = True
+    transaction.commit()
+
+    # we should be able to directly book o2, which should remove o1's booking
+    page = client.get('/activity/fishing').click('Anmelden', index=1)
+    page = page.form.submit().follow()
+
+    assert "bereits eine andere Durchführung dieses Angebots" not in page
+    assert bookings.query().one().occasion_id == o2_id

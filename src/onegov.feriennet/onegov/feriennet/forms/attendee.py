@@ -297,7 +297,11 @@ class AttendeeSignupForm(AttendeeBase):
         query = query.filter(Booking.attendee_id == self.attendee.data)
         query = query.filter(Booking.period_id == self.model.period_id)
         query = query.filter(Booking.occasion_id != self.model.id)
-        query = query.filter(Booking.state != 'cancelled')
+
+        if not self.model.period.confirmed:
+            query = query.filter(Booking.state != 'cancelled')
+        else:
+            query = query.filter(Booking.state == 'accepted')
 
         if query.first():
             self.attendee.errors.append(

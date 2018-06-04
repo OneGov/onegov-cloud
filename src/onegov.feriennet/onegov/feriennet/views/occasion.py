@@ -194,7 +194,8 @@ def book_occasion(self, request, form):
             q = q.filter(Booking.occasion_id.in_(o.subquery()))
             q = q.filter(or_(
                 Booking.state == 'cancelled',
-                Booking.state == 'denied'
+                Booking.state == 'denied',
+                Booking.state == 'blocked'
             ))
 
             # somewhat unnecessary, but let's be extra sure
