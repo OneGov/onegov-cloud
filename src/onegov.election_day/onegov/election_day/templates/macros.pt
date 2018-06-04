@@ -166,7 +166,7 @@
 </metal:tab_menu>
 
 <metal:status_callout define-macro="status_callout" i18n:domain="onegov.election_day">
-    <div class="panel radius" tal:condition="not:layout.completed">
+    <div class="panel" tal:condition="not:layout.completed">
          <h5 i18n:translate="" tal:condition="not layout.has_results">No results yet</h5>
          <h5 i18n:translate="" tal:condition="layout.has_results">Intermediate results</h5>
          <p tal:condition="layout.has_results">
@@ -174,7 +174,7 @@
              <strong>${layout.format_date(layout.last_result_change, 'relative')} / ${layout.format_date(layout.last_result_change, 'datetime_long')}</strong>
          </p>
     </div>
-    <div class="panel radius" tal:condition="layout.completed">
+    <div class="panel" tal:condition="layout.completed">
         <span i18n:translate="">Last change</span>: ${layout.format_date(layout.last_result_change, 'datetime_long')}
     </div>
 </metal:status_callout>
