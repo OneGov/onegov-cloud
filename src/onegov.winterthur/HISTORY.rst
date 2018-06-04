@@ -1,8 +1,14 @@
 Changelog
 ---------
 
+- Shows a bullet instead of a checkmark in the directory choices.
+  [href] 
+
 0.2.0 (2018-05-23)
 ~~~~~~~~~~~~~~~~~~~~~
+
+- Adjusts the style to be closer to the styleguide.
+  [href]
 
 0.1.8 (2018-04-30)
 ~~~~~~~~~~~~~~~~~~~~~
