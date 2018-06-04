@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Pin WTForms to < 2.2 as the latest release breaks a lot of our code.
+  [href]
+
 0.33.1 (2018-03-30)
 ~~~~~~~~~~~~~~~~~~~
 

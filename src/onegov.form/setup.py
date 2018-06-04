@@ -48,7 +48,7 @@ setup(
         'python-stdnum',
         'sedate',
         'sqlalchemy_utils',
-        'wtforms',
+        'wtforms<2.2',  # 2.2 currently breaks everything
 
         # be careful to add extras for wtforms-components by including the
         # needed packages, not by using square brackets, pip doesn't do well
