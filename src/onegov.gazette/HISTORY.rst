@@ -7,6 +7,9 @@ Changelog
 - Improves the archive view.
   [msom]
 
+- Removes fastclick.
+  [msom]
+
 1.13.17 (2018-05-15)
 ~~~~~~~~~~~~~~~~~~~~
 

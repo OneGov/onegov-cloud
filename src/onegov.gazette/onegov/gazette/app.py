@@ -138,7 +138,6 @@ def get_frameworks_asset():
     yield 'jquery.datetimepicker.full.js'
 
     # other frameworks
-    yield 'fastclick.js'
     yield 'foundation.js'
     yield 'underscore.js'
     yield 'stacktable.js'
