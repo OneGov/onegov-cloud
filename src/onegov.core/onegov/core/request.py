@@ -293,7 +293,8 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             meta['csrf_time_limit'] = timedelta(
                 seconds=self.app.csrf_time_limit)
 
-        form = form_class(self.POST, meta=meta, data=data)
+        formdata = self.POST and self.POST or None
+        form = form_class(formdata=formdata, meta=meta, data=data)
 
         assert not hasattr(form, 'request')
         form.request = self

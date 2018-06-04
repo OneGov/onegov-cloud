@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds compatibility with WTForms 2.2.
+  [href]
+
 0.70.4 (2018-05-31)
 ~~~~~~~~~~~~~~~~~~~
 
