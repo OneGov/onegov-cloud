@@ -1,6 +1,5 @@
 import attr
 import textwrap
-import yaml
 
 from .utils import as_choices
 from .utils import build_metadata
@@ -18,7 +17,7 @@ from .utils import store_in_zip
 
 
 def transform_vollzug(path, prefix, output_file):
-    hierarchy, institutions = get_institutions(path, prefix)
+    institutions = get_institutions(path, prefix)
 
     def unique_values(values, attr):
         unique = set()
@@ -29,7 +28,6 @@ def transform_vollzug(path, prefix, output_file):
         return sorted(list(unique))
 
     topics = as_choices(unique_values(institutions, 'topics'))
-    chapters = as_choices(unique_values(institutions, 'chapters'))
 
     metadata = build_metadata(
         title='Vollzugsbehörden',
@@ -69,10 +67,9 @@ def transform_vollzug(path, prefix, output_file):
             Themen =
                 {topics}
 
-            Vollzugsbereiche =
-                {chapters}
-
+            Vollzugsbereiche = ...[16]
             Vollzugsaufgaben = ...[16]
+
         """))
 
     geo = Geocoder()
@@ -87,9 +84,11 @@ def transform_vollzug(path, prefix, output_file):
             'Kontakt/Telefon': i.phone,
             'Kontakt/Webseite': i.website,
             'Kategorie/Themen': list(i.topics),
-            'Kategorie/Vollzugsbereiche': list(i.chapters),
+            'Kategorie/Vollzugsbereiche': '\n'.join(
+                f'- {c.strip()}' for c in sorted(list(i.chapters))
+            ),
             'Kategorie/Vollzugsaufgaben': '\n'.join(
-                f'- {t}' for t in sorted(list(i.tasks))
+                f'- {t.strip()}' for t in sorted(list(i.tasks))
             ),
             'Latitude': geo.geocode(i.address).latitude,
             'Longitude': geo.geocode(i.address).longitude,
@@ -149,22 +148,7 @@ def get_institutions(path, prefix):
             if chapters[r.uid] in topics:
                 i.topics.add(topics[chapters[r.uid]])
 
-    # hierarchy of categories
-    hierarchy = {}
-
-    for i in institutions.lines:
-        task = i.institution
-        chapter = chapters[i.uid]
-
-        if task and chapter and chapter in topics:
-            topic = topics[chapter]
-
-            hierarchy[topic] = hierarchy.get(topic, {})
-            hierarchy[topic][chapter] = hierarchy[topic].get(chapter, list())
-            hierarchy[topic][chapter].append(task)
-
-    institutions = sorted([i for i in result.values()], key=lambda i: i.title)
-    return hierarchy, institutions
+    return sorted([i for i in result.values()], key=lambda i: i.title)
 
 
 @attr.s(auto_attribs=True)
