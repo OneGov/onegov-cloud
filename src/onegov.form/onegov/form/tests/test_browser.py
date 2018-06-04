@@ -1,3 +1,6 @@
+from time import sleep
+
+
 def test_snippets(browser):
     browser.visit('/snippets')
     browser.wait_for_js_variable('initFormSnippets')
@@ -126,8 +129,12 @@ def test_formcode_keep_selection(browser):
     assert len(browser.find_by_css('.formcode-select input:checked')) == 0
     browser.driver.execute_script("document.watcher.update('A = ___');")
 
+    sleep(0.1)
+
     assert len(browser.find_by_css('.formcode-select input:checked')) == 1
     browser.driver.execute_script("document.watcher.update('C = ___');")
+
+    sleep(0.1)
 
     assert len(browser.find_by_css('.formcode-select input:checked')) == 0
 
