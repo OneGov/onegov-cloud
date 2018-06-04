@@ -38,7 +38,7 @@ setup(
         'humanize',
         'jsonpickle',
         'more.webassets',
-        'onegov.core>=0.16.0',
+        'onegov.core>=0.70.5',
         'onegov.file',
         'onegov.pay',
         'onegov.search',
@@ -48,7 +48,7 @@ setup(
         'python-stdnum',
         'sedate',
         'sqlalchemy_utils',
-        'wtforms<2.2',  # 2.2 currently breaks everything
+        'wtforms>=2.2',
 
         # be careful to add extras for wtforms-components by including the
         # needed packages, not by using square brackets, pip doesn't do well
