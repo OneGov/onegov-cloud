@@ -4,6 +4,9 @@ Changelog
 - Fixes placing of the expats/globe tooltip.
   [msom]
 
+- Fixes sankey chart trying to render empty nodes and links.
+  [msom]
+
 3.5.3 (2018-06-04)
 ~~~~~~~~~~~~~~~~~~~
 
