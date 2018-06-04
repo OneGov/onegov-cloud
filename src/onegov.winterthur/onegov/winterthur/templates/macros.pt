@@ -6,22 +6,6 @@
       i18n:domain="onegov.winterthur">
 <body>
 
-<metal:hierarchical_search define-macro="hierarchical_search">
-<hr>
-<div style="margin-bottom: .75rem;">
-    <a href="${parent_link}" tal:condition="parent_link">
-        <strong>&laquo; ${parent_name}</strong>
-    </a>
-</div>
-<ul tal:condition="children">
-    <li tal:repeat="(text, link) children">
-        <a tal:condition="link" href="${link}">${text}</a>
-        <span tal:condition="not:link" >${text}</span>
-    </li>
-</ul>
-<hr>
-</metal:hierarchical_search>
-
 <metal:before_directory_entry_lead define-macro="before_directory_entry_lead">
   <div class="framed-only">
     <p>

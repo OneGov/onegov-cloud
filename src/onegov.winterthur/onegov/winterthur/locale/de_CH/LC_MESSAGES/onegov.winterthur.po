@@ -22,12 +22,6 @@ msgstr "Adressen"
 msgid "Update"
 msgstr "Aktualisieren"
 
-msgid "Hierarchy Fields"
-msgstr "Hierarchie Felder"
-
-msgid "Hierarchy"
-msgstr "Hierarchie"
-
 msgid "Invalid YAML format"
 msgstr "Ungültiges YAML Format"
 

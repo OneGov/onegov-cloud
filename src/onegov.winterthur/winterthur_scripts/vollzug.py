@@ -73,23 +73,7 @@ def transform_vollzug(path, prefix, output_file):
                 {chapters}
 
             Vollzugsaufgaben = ...[16]
-        """),
-        content={
-            'searchwidget_config': {
-                'hierarchical': {
-                    'search_widget_keys': '\n'.join((
-                        'Kategorie/Themen',
-                        'Kategorie/Vollzugsbereiche',
-                        'Kategorie/Vollzugsaufgaben'
-                    )),
-                    'search_widget_hierarchy': yaml.dump(
-                        hierarchy,
-                        default_flow_style=False,
-                        allow_unicode=True
-                    )
-                }
-            }
-        })
+        """))
 
     geo = Geocoder()
 
