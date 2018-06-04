@@ -22,6 +22,7 @@ def test_view_categories(gazette_app):
         manage = client.get('/categories')
         manage = manage.click('Neu')
         manage.form['title'] = 'Rubrik XY'
+        manage.form['active'] = True
         manage = manage.form.submit().maybe_follow()
         assert 'Rubrik hinzugefügt.' in manage
         assert 'Rubrik XY' in manage

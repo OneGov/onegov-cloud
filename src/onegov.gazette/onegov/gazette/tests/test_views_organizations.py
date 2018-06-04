@@ -25,6 +25,7 @@ def test_view_organizations(gazette_app):
         manage = client.get('/organizations')
         manage = manage.click('Neu')
         manage.form['title'] = 'Organisation XY'
+        manage.form['active'] = True
         manage = manage.form.submit().maybe_follow()
         assert 'Organisation hinzugefügt.' in manage
         assert 'Organisation XY' in manage
