@@ -410,6 +410,7 @@
                 modeStack: '<tal:block i18n:translate>Stack</tal:block>',
                 modeToggle: '<tal:block i18n:translate>Toggle</tal:block>',
                 modeSwitchColumns: '<tal:block i18n:translate>Columns</tal:block>',
+                modeSwitchColumnsAbbreviated: '<tal:block i18n:translate>Columns</tal:block>',
             }
         };
     </script>
