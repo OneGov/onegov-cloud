@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.32 (2018-06-04)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to reassign blocked bookings after confirmation.
   [href]
