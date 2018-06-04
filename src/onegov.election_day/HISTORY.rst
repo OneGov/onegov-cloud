@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.5.5 (2018-06-04)
+~~~~~~~~~~~~~~~~~~~
 
 - Removes the radius from the panels.
   [msom]
