@@ -1,5 +1,7 @@
 $(document).ready(function() {
-    $('.field-display dd').text(function() {
-        return $(this).text().replace('✓', '•');
+    $('.field-display dd').html(function() {
+        return $(this).html().split('<br>').map(function(html) {
+            return html.replace(/\s*[✓\-]{1}/, ' •');
+        }).join('<br>');
     });
 });
