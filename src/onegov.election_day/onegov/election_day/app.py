@@ -241,7 +241,6 @@ def get_common_asset():
     yield 'tablesaw-init.js'
 
     # other frameworks
-    yield 'fastclick.js'
     yield 'foundation.js'
     yield 'underscore.js'
     yield 'iframeResizer.contentWindow.js'
