@@ -146,6 +146,16 @@ body {
 }
 
 /*
+    Apply on a row to flip the order of columns on mobile
+*/
+@media #{$small-only} {
+    .reverse-on-mobile {
+        display: flex;
+        flex-direction: column-reverse;
+    }
+}
+
+/*
     The bank settings are hidden by default, they are currently only used
     for onegov.feriennet and should probably replaced by something feriennet
     specific.

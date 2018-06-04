@@ -22,7 +22,7 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row reverse-on-mobile">
             <div class="columns medium-8">
                 <p tal:condition="not:entries" i18n:translate="">No entries found.</p>
 

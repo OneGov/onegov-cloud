@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Flips the order of directory columns on mobile.
+  [href]
+
 - Adds the ability to schedule newsletters.
   [href]
 
