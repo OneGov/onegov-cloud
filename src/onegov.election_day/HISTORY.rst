@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.5.4 (2018-06-04)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes placing of the expats/globe tooltip.
   [msom]
