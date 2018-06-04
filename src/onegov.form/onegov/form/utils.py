@@ -1,5 +1,6 @@
 import inspect
 import re
+import wtforms.widgets.core
 
 from decimal import Decimal
 from hashlib import md5
@@ -7,6 +8,8 @@ from unidecode import unidecode
 
 _unwanted_characters = re.compile(r'[^a-zA-Z0-9]+')
 _html_tags = re.compile(r'<.*?>')
+
+original_html_params = wtforms.widgets.core.html_params
 
 
 def as_internal_id(label):
@@ -33,6 +36,25 @@ def get_fields_from_class(cls):
 
 def extract_text_from_html(html):
     return _html_tags.sub('', html)
+
+
+def use_required_attribute_in_html_inputs(use):
+    used = wtforms.widgets.core.html_params is original_html_params
+
+    if use == used:
+        return
+
+    if use:
+        function = original_html_params
+    else:
+        def patched_html_params(**kwargs):
+            kwargs.pop('required', None)
+            return original_html_params(**kwargs)
+
+        function = patched_html_params
+
+    wtforms.widgets.core.html_params = function
+    wtforms.widgets.core.Input.html_params = staticmethod(function)
 
 
 class decimal_range(object):

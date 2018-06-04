@@ -6,6 +6,12 @@ from onegov.form import FormApp
 from onegov.form.extensions import form_extensions
 from onegov_testing.utils import create_app
 from pytest_localserver.http import WSGIServer
+from onegov.form.utils import use_required_attribute_in_html_inputs
+
+
+@pytest.fixture(scope='session', autouse=True)
+def disable_required_attribute_in_tests():
+    use_required_attribute_in_html_inputs(False)
 
 
 @pytest.fixture(scope='function', autouse=True)

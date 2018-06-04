@@ -4,10 +4,15 @@ from onegov.form import _
 from onegov.form.parser.core import flatten_fieldsets, parse_formcode
 from onegov.form.parser.snippets import Snippets
 from onegov.form.errors import FormError
+from onegov.form.utils import use_required_attribute_in_html_inputs
 
 
 class FormApp(WebassetsApp):
-    pass
+
+    def configure_form(self, **cfg):
+        # disable the required attribute in html forms as introduced by
+        # wtforms 2.2 - we do our own thing here
+        use_required_attribute_in_html_inputs(False)
 
 
 class FormcodeParseFields(object):
