@@ -165,6 +165,10 @@ class ExtendedDirectory(Directory, HiddenFromPublicExtension, Extendable):
     searchwidget_config = content_property()
 
     @property
+    def es_public(self):
+        return not self.is_hidden_from_public
+
+    @property
     def form_class_for_submissions(self):
         return self.extend_form_class(self.form_class, self.extensions)
 
@@ -209,6 +213,10 @@ class ExtendedDirectoryEntry(DirectoryEntry, CoordinatesExtension,
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
     es_type_name = 'extended_directory_entries'
+
+    @property
+    def es_public(self):
+        return not self.is_hidden_from_public
 
     @property
     def display_config(self):

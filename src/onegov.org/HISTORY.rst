@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes directories/entries not being searchable by the public.
+  [href]
+
 - Flips the order of directory columns on mobile.
   [href]
 
