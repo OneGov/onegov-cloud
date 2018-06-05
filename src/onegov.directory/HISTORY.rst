@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.3 (2018-06-05)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Improves the quality of the dynamic elasticsarch content.
   [href]
 
