@@ -73,12 +73,13 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         'display',
         'direction',
         'link_pattern',
-        'link_title'
+        'link_title',
+        'thumbnail'
     )
 
     def __init__(self, title=None, lead=None, order=None, keywords=None,
                  searchable=None, display=None, direction=None,
-                 link_pattern=None, link_title=None):
+                 link_pattern=None, link_title=None, thumbnail=None):
 
         self.title = title
         self.lead = lead
@@ -89,6 +90,7 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         self.direction = direction
         self.link_pattern = link_pattern
         self.link_title = link_title
+        self.thumbnail = thumbnail
 
     def __setattr__(self, name, value):
         self.changed()
