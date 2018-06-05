@@ -134,8 +134,17 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         else:
             return value
 
-    def join(self, data, attribute, separator=' '):
-        return separator.join((s and str(s).strip() or '') for s in (
+    def join(self, data, attribute, separator='\n'):
+        def render(value):
+            if isinstance(value, (list, tuple)):
+                return '\n'.join(v.strip() for v in value)
+
+            if isinstance(value, str):
+                return value.strip()
+
+            return value and str(value) or ''
+
+        return separator.join(render(s) for s in (
             data[as_internal_id(key)] for key in getattr(self, attribute)
         ))
 

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves the quality of the dynamic elasticsarch content.
+  [href]
+
 - Adds the directory_id to the elasticsearch properties.
   [href]
 
