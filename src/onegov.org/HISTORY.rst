@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.28.4 (2018-06-05)
+~~~~~~~~~~~~~~~~~~~
+
 - Gives directory search widgets the ability to influence listed leads.
   [href]
 
