@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.2.1 (2018-06-05)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Adds a back-link to the directory entry views inside iframes.
   [href]
 
