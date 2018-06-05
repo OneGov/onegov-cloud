@@ -967,6 +967,11 @@ dl.field-display > dt {
     .list-lead {
         margin-bottom: .2em;
         max-width: $max-line-width;
+
+        em {
+            font-weight: bold;
+            font-style: normal;
+        }
     }
 }
 

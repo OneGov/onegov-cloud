@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Gives directory search widgets the ability to influence listed leads.
+  [href]
+
 - Fixes directories/entries not being searchable by the public.
   [href]
 

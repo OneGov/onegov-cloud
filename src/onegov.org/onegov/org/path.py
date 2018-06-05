@@ -544,13 +544,13 @@ def get_directory(app, name):
         'keywords': keywords_converter,
         'search_query': json_converter,
     })
-def get_directory_entries(app, directory_name, keywords, page=0,
+def get_directory_entries(request, app, directory_name, keywords, page=0,
                           search=None, search_query=None):
     directory = DirectoryCollection(app.session()).by_name(directory_name)
 
     if search and search in app.config.directory_search_widget_registry:
         cls = app.config.directory_search_widget_registry[search]
-        searchwidget = cls(app, directory, search_query)
+        searchwidget = cls(request, directory, search_query)
     else:
         searchwidget = None
 
