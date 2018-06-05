@@ -28,15 +28,25 @@
         }
     </script>
 
-    <hr>
+    <div class="filter-panel">
+        <h2 class="filter-title" i18n:translate>Search</h2>
 
-    <form id='inline-search' action="${action}" method="GET" onsubmit="return submitInlineSearch();">
-        <input type="text" id='search-term' value="${term or ''}">
-        <input type="hidden" name='search' value='inline'>
-        <input type="hidden" name='search_query'>
-    </form>
+        <form id='inline-search' class="searchbox" action="${action}" method="GET" onsubmit="return submitInlineSearch();">
+            <div class="row collapse">
+                <div class="columns small-10">
+                    <input id="search-term" type="text" placeholder="Suche" autocomplete="off" autocorrect="off" value="${term or ''}">
+                    <input type="hidden" name='search' value='inline'>
+                    <input type="hidden" name='search_query'>
+                </div>
+                <div class="columns small-2">
+                    <button type="submit" class="button postfix" aria-label="Suche">
+                      <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
 
-    <hr>
 </metal:inline_search>
 
 
