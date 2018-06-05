@@ -90,6 +90,15 @@ class DirectoryBaseForm(Form):
             'data-fields-include': 'radio,checkbox'
         })
 
+    thumbnail = TextAreaField(
+        label=_("Thumbnail"),
+        fieldset=_("Display"),
+        render_kw={
+            'class_': 'formcode-select',
+            'data-fields-include': 'fileinput'
+        }
+    )
+
     order = RadioField(
         label=_("Order"),
         fieldset=_("Order"),
@@ -202,6 +211,12 @@ class DirectoryBaseForm(Form):
                     'fields': ', '.join(self.missing_fields['lead'])
                 }))
 
+    def validate_thumbnail(self, field):
+        if field.data and '\n' in field.data:
+            raise ValidationError(
+                _("Please select at most one thumbnail field")
+            )
+
     @property
     def configuration(self):
         content_fields = list(self.extract_field_ids(self.content_fields))
@@ -224,7 +239,8 @@ class DirectoryBaseForm(Form):
             },
             direction=self.order_direction.data,
             link_pattern=self.link_pattern.data,
-            link_title=self.link_title.data
+            link_title=self.link_title.data,
+            thumbnail=(self.thumbnail.data or '').split()[0] or None
         )
 
     @configuration.setter
@@ -237,6 +253,7 @@ class DirectoryBaseForm(Form):
         self.order_direction = cfg.direction == 'desc' and 'desc' or 'asc'
         self.link_pattern.data = cfg.link_pattern
         self.link_title.data = cfg.link_title
+        self.thumbnail.data = cfg.thumbnail
 
         if safe_format_keys(cfg.title) == cfg.order:
             self.order.data = 'by-title'
