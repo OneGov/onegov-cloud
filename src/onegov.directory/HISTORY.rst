@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the directory_id to the elasticsearch properties.
+  [href]
+
 - Adds support for meta/content data in the directory import/export.
   [href]
 
