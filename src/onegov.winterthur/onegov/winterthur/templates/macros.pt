@@ -7,9 +7,48 @@
 <body>
 
 <metal:before_directory_entry_lead define-macro="before_directory_entry_lead">
-  <div class="framed-only">
-    <p>
-      <a class="small" href="${request.link(entry.directory)}" i18n:translate>Back to the overview</a>
-    </p>
-  </div>
+    <div class="framed-only">
+        <p>
+            <a class="small" href="${request.link(entry.directory)}" i18n:translate>Back to the overview</a>
+        </p>
+    </div>
 </metal:before_directory_entry_lead>
+
+
+<metal:inline_search define-macro="inline_search">
+    <script>
+        function submitInlineSearch() {
+            var query = {
+                'term': $('#search-term').val()
+            };
+
+            $('input[name="search_query"]').val(JSON.stringify(query));
+
+            return true;
+        }
+    </script>
+
+    <hr>
+
+    <form id='inline-search' action="${action}" method="GET" onsubmit="return submitInlineSearch();">
+        <input type="text" id='search-term' value="${term or ''}">
+        <input type="hidden" name='search' value='inline'>
+        <input type="hidden" name='search_query'>
+    </form>
+
+    <hr>
+</metal:inline_search>
+
+
+<metal:inline_search_entry_lead define-macro="inline_search_entry_lead">
+    <dl>
+        <tal:b repeat="(name, lines) fragments">
+            <dt>${name}</dt>
+            <dd>
+                <ul>
+                    <li tal:repeat="line lines">${line}</li>
+                </ul>
+            </dd>
+        </tal:b>
+    </dl>
+</metal:inline_search_entry_lead>
