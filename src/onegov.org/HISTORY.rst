@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.28.5 (2018-06-06)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to display thumbnails for entries in the directory.
   [href]
 
