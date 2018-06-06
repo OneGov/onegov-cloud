@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.4 (2018-06-06)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to configure a thumbnail.
   [href]
 
