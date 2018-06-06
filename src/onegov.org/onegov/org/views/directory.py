@@ -12,7 +12,8 @@ from onegov.directory import DirectoryZipArchive
 from onegov.directory.errors import DuplicateEntryError
 from onegov.directory.errors import MissingColumnError
 from onegov.directory.errors import ValidationError
-from onegov.form import FormCollection
+from onegov.file import File
+from onegov.form import FormCollection, as_internal_id
 from onegov.form.fields import UploadField
 from onegov.org import OrgApp, _
 from onegov.org.forms import DirectoryForm, DirectoryImportForm
@@ -208,15 +209,28 @@ def view_directory(self, request):
             ) for value in values
         )))
 
+    entries = request.exclude_invisible(self.query())
+
+    if self.directory.configuration.thumbnail:
+        thumbnail = as_internal_id(self.directory.configuration.thumbnail)
+    else:
+        thumbnail = None
+
+    def thumbnail_link(entry):
+        id = (entry.values.get(thumbnail) or {}).get('data', '').lstrip('@')
+        return id and request.class_link(File, {'id': id}, name='thumbnail')
+
     return {
         'layout': DirectoryEntryCollectionLayout(self, request),
         'title': self.directory.title,
-        'entries': request.exclude_invisible(self.query()),
+        'entries': entries,
         'directory': self.directory,
         'searchwidget': self.searchwidget,
         'filters': filters,
         'geojson': request.link(self, name='+geojson'),
-        'submit': request.link(self, name='+submit')
+        'submit': request.link(self, name='+submit'),
+        'show_thumbnails': thumbnail and True or False,
+        'thumbnail_link': thumbnail_link
     }
 
 

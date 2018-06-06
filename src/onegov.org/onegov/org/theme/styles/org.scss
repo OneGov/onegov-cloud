@@ -969,8 +969,8 @@ dl.field-display > dt {
         max-width: $max-line-width;
 
         em {
-            font-weight: bold;
             font-style: normal;
+            font-weight: bold;
         }
     }
 }
@@ -4061,6 +4061,37 @@ h2 + div.timeline {
 .directories-map {
     height: $full-width-banner-height;
     margin-bottom: 1.4rem;
+}
+
+/*
+    Directory thumbnails
+*/
+.with-thumbnails {
+    list-style-type: none;
+    margin: 0;
+
+    li {
+        display: flex;
+
+        .thumbnail {
+            border-radius: 5px;
+            margin-right: 1rem;
+            flex: 2;
+            overflow: hidden;
+            position: relative;
+
+            & + div {
+                flex: 10;
+            }
+
+            img {
+                border-radius: 5px;
+                max-height: 125px;
+                vertical-align: top;
+                width: 100%;
+            }
+        }
+    }
 }
 
 /*

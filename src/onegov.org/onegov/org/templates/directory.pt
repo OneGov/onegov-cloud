@@ -20,16 +20,24 @@
             <div class="columns medium-8">
                 <p tal:condition="not:entries" i18n:translate="">No entries found.</p>
 
-                <ul class="with-lead" tal:condition="entries">
+                <ul class="with-lead ${show_thumbnails and 'with-thumbnails' or ''}" tal:condition="entries">
                     <li tal:repeat="entry entries">
-                        <a class="list-title" tal:attributes="href request.link(entry)">${entry.title}</a><metal:hint use-macro="layout.macros['hidden-from-public-hint']" tal:define="item entry" />
+                        <div class="thumbnail" tal:condition="show_thumbnails">
+                            <tal:b define="thumbnail thumbnail_link(entry)" condition="thumbnail">
+                                <img data-src="${thumbnail}" class="lazyload" data-no-alt align="top" />
+                            </tal:b>
+                        </div>
 
-                        <tal:b define="custom_lead searchwidget.lead(layout, entry)|nothing">
-                            <div class="list-lead">
-                                <tal:b condition="custom_lead" replace="structure custom_lead" />
-                                <tal:b condition="not:custom_lead" replace="entry.lead" />
-                            </div>
-                        </tal:b>
+                        <div>
+                            <a class="list-title" tal:attributes="href request.link(entry)">${entry.title}</a><metal:hint use-macro="layout.macros['hidden-from-public-hint']" tal:define="item entry" />
+
+                            <tal:b define="custom_lead searchwidget.lead(layout, entry)|nothing">
+                                <div class="list-lead">
+                                    <tal:b condition="custom_lead" replace="structure custom_lead" />
+                                    <tal:b condition="not:custom_lead" replace="entry.lead" />
+                                </div>
+                            </tal:b>
+                        </div>
                     </li>
                 </ul>
 

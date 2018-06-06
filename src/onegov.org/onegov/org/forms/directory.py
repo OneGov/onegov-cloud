@@ -240,7 +240,7 @@ class DirectoryBaseForm(Form):
             direction=self.order_direction.data,
             link_pattern=self.link_pattern.data,
             link_title=self.link_title.data,
-            thumbnail=(self.thumbnail.data or '').split()[0] or None
+            thumbnail=self.thumbnail.data and self.thumbnail.data.split()[0]
         )
 
     @configuration.setter

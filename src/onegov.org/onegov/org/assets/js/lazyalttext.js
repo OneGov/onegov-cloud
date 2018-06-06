@@ -72,11 +72,15 @@ var onLazyLoadAltText = function(element) {
 };
 
 $('.page-text img[alt][alt!=""], .static-alt').each(function() {
-    appendAltText(this, $(this).attr('alt'));
+    if (! $(this).is('[data-no-alt]')) {
+        appendAltText(this, $(this).attr('alt'));
+    }
 });
 
 document.addEventListener('lazybeforeunveil', function(e) {
-    onLazyLoadAltText(e.target);
+    if (! $(e.target).is('[data-no-alt]')) {
+        onLazyLoadAltText(e.target);
+    }
 });
 
 $(document).ready(function() {
