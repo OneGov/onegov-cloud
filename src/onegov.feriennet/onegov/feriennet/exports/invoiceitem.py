@@ -24,6 +24,7 @@ class InvoiceItemExport(FeriennetExport):
 
     def query(self, session, period):
         q = session.query(InvoiceItem)
+        q = q.filter_by(invoice=period.id.hex)
         q = q.options(joinedload(InvoiceItem.user))
         q = q.order_by(
             InvoiceItem.username,
