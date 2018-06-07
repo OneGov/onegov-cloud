@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Switches global map to the Winterthur custom one.
+  [href]
+
 0.2.1 (2018-06-05)
 ~~~~~~~~~~~~~~~~~~~~~
 
