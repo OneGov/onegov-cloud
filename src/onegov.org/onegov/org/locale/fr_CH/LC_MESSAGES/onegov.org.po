@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-05-31 09:09+0200\n"
+"POT-Creation-Date: 2018-06-07 14:33+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1054,6 +1054,9 @@ msgstr "Affichage principal"
 msgid "Filters"
 msgstr "Filtres"
 
+msgid "Thumbnail"
+msgstr "Vignette"
+
 msgid "Order"
 msgstr "Trier"
 
@@ -1087,6 +1090,9 @@ msgstr "Mode"
 #, python-format
 msgid "The following fields are unknown: ${fields}"
 msgstr "Les champs suivants sont inconnus : ${fields}"
+
+msgid "Please select at most one thumbnail field"
+msgstr "Veuillez sélectionner un champ de vignette au maximum"
 
 msgid "By title"
 msgstr "Par titre"

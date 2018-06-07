@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-05-31 09:09+0200\n"
+"POT-Creation-Date: 2018-06-07 14:33+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -838,7 +838,8 @@ msgid "Scheduled time must be at least 5 minutes in the future"
 msgstr "Die angegebene Zeit muss mindestends 5 Minuten in der Zukunft liegen"
 
 msgid "Newsletters can only be sent on the hour (10:00, 11:00, etc.)"
-msgstr "Newsletter können nur zur vollen Stunde versendet werden (10:00, 11:00, usw.)"
+msgstr ""
+"Newsletter können nur zur vollen Stunde versendet werden (10:00, 11:00, usw.)"
 
 msgid "Recipient"
 msgstr "Empfänger"
@@ -1050,6 +1051,9 @@ msgstr "Hauptansicht"
 msgid "Filters"
 msgstr "Filter"
 
+msgid "Thumbnail"
+msgstr "Thumbnail"
+
 msgid "Order"
 msgstr "Sortierung"
 
@@ -1083,6 +1087,9 @@ msgstr "Modus"
 #, python-format
 msgid "The following fields are unknown: ${fields}"
 msgstr "Die folgenden Felder sind unbekannt: ${fields}"
+
+msgid "Please select at most one thumbnail field"
+msgstr "Bitte wählen Sie höchstens ein Thumbnail Feld"
 
 msgid "By title"
 msgstr "Nach Titel"
