@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Support temporary results when using Wabsti Majorz.
+  [msom]
+
 3.5.5 (2018-06-04)
 ~~~~~~~~~~~~~~~~~~~
 
