@@ -72,9 +72,6 @@ def parse_election_result(line, errors, entities, added_entities):
                 elif name == 'Ungültige Stimmen':
                     invalid_votes = votes
 
-        if blank_votes is None or invalid_votes is None:
-            raise ValueError()
-
     except ValueError:
         errors.append(_("Invalid entity values"))
     else:
@@ -97,7 +94,7 @@ def parse_election_result(line, errors, entities, added_entities):
                 id=uuid4(),
                 name=entity.get('name', ''),
                 district=entity.get('district', ''),
-                counted=eligible_voters != 0,
+                counted=True,
                 entity_id=entity_id,
                 eligible_voters=eligible_voters,
                 received_ballots=received_ballots,

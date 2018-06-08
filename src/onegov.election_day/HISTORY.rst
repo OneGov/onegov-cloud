@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Support temporary results when using Wabsti Majorz.
+- Make wabsti (majorz) import more robust.
   [msom]
 
 3.5.5 (2018-06-04)
