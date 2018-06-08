@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.5.6 (2018-06-08)
+~~~~~~~~~~~~~~~~~~~
 
 - Make wabsti (majorz) import more robust.
   [msom]
