@@ -71,6 +71,7 @@ class Layout(ChameleonLayout):
 
     date_long_without_year_format = 'E d. MMMM'
     datetime_long_without_year_format = 'E d. MMMM HH:mm'
+    event_format = 'EEEE, d. MMMM YYYY, HH:mm'
 
     @property
     def name(self):
@@ -1235,8 +1236,6 @@ class AllocationEditFormLayout(DefaultLayout):
 
 
 class EventBaseLayout(DefaultLayout):
-
-    event_format = 'EEEE, d. MMMM YYYY, HH:mm'
 
     def format_recurrence(self, recurrence):
         """ Returns a human readable version of an RRULE used by us. """

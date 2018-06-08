@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves the display of event search results.
+  [href]
+
 0.28.5 (2018-06-06)
 ~~~~~~~~~~~~~~~~~~~
 
