@@ -223,7 +223,7 @@ function getMapboxToken() {
     return $('body').data('mapbox-token') || false;
 }
 
-function getTiles() {
+function getMapboxTiles() {
     var url = 'https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}';
     url += (L.Browser.retina ? '@2x.png' : '.png');
     url += '?access_token=' + getMapboxToken();
@@ -233,10 +233,20 @@ function getTiles() {
     });
 }
 
-function spawnDefaultMap(element, lat, lon, zoom, includeZoomControls) {
+function spawnMapboxMap(target, options) {
+    return L.map(target, options).addLayer(getMapboxTiles());
+}
+
+function spawnDefaultMap(target, options) {
+    return spawnMapboxMap(target, options);
+}
+
+function spawnMap(element, lat, lon, zoom, includeZoomControls) {
+
+    var $el = $(element);
 
     // the height is calculated form the width using the golden ratio
-    element.css('height', $(element).data('map-height') || $(element).width() / 1.618 + 'px');
+    element.css('height', $el.data('map-height') || $el.width() / 1.618 + 'px');
 
     var options = {
         zoomControl: false,
@@ -247,9 +257,7 @@ function spawnDefaultMap(element, lat, lon, zoom, includeZoomControls) {
         preferCanvas: true
     };
 
-    var map = L.map(element[0], options)
-        .addLayer(getTiles())
-        .setView([lat, lon], zoom);
+    var map = spawnDefaultMap(element[0], options).setView([lat, lon], zoom);
 
     if (typeof includeZoomControls === 'undefined' || includeZoomControls) {
         new L.Control.Zoom({position: 'topright'}).addTo(map);
@@ -307,7 +315,7 @@ var MapboxInput = function(input) {
     var el = $('<div class="map">')
         .appendTo(wrapper);
 
-    var map = spawnDefaultMap(el, lat, lon, zoom);
+    var map = spawnMap(el, lat, lon, zoom);
 
     switch (input.data('map-type')) {
         case 'crosshair':
@@ -329,7 +337,7 @@ var MapboxMarkerMap = function(target) {
     var zoom = target.data('zoom') || $('body').data('default-zoom') || 10;
     var includeZoomControls = target.data('map-type') !== 'thumbnail';
 
-    var map = spawnDefaultMap(target, lat, lon, zoom, includeZoomControls);
+    var map = spawnMap(target, lat, lon, zoom, includeZoomControls);
     addExternalLinkButton(map);
 
     /* for now we do not support clicking the marker, so we use marker-noclick
@@ -361,7 +369,7 @@ var MapboxGeojsonMap = function(target) {
     var lon = target.data('lon');
     var zoom = target.data('zoom');
     var includeZoomControls = true;
-    var map = spawnDefaultMap(target, lat, lon, zoom, includeZoomControls);
+    var map = spawnMap(target, lat, lon, zoom, includeZoomControls);
 
     var icon = L.VectorMarkers.icon({
         markerColor: $('body').data('default-marker-color') || '#006fba'
