@@ -4,7 +4,7 @@ name = 'onegov.gis'
 description = (
     'GIS related models and tools for OneGov'
 )
-version = '0.6.2'
+version = '0.6.3'
 
 
 def get_long_description():

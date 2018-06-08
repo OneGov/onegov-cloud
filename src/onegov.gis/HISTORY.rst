@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.6.3 (2018-06-08)
+~~~~~~~~~~~~~~~~~~~
+
 - Makes it easier to override the default map provider.
   [href]
 
