@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a way to get the latest occurrence per event.
+  [href]
+
 0.6.1 (2017-12-29)
 ~~~~~~~~~~~~~~~~~~~
 

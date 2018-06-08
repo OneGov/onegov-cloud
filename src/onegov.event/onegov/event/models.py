@@ -14,9 +14,10 @@ from onegov.search import ORMSearchable
 from pytz import UTC
 from sedate import standardize_date, to_timezone
 from sqlalchemy import Column, Enum, ForeignKey, Text, String
+from sqlalchemy import func, and_, desc
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy.orm import backref, relationship
+from sqlalchemy.orm import backref, relationship, object_session
 from uuid import uuid4
 
 
@@ -161,6 +162,31 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         if name in ('state', 'title', 'name', 'location', 'tags',
                     'start', 'end', 'timezone', 'recurrence'):
             self._update_occurrences()
+
+    @property
+    def latest_occurrence(self):
+        """ Returns the occurrence which is presently occurring, the next
+        one to occur or the last occurrence.
+
+        """
+        session = object_session(self)
+
+        base = session.query(Occurrence).filter_by(event_id=self.id)
+
+        current = base.filter(and_(
+            Occurrence.start >= func.now(),
+            Occurrence.end <= func.now()
+        )).order_by(Occurrence.start).limit(1)
+
+        future = base.filter(and_(
+            func.now() <= Occurrence.start
+        )).order_by(Occurrence.start).limit(1)
+
+        past = base.filter(and_(
+            Occurrence.end <= func.now()
+        )).order_by(desc(Occurrence.start))
+
+        return current.union_all(future, past).first()
 
     def occurrence_dates(self, limit=True, localize=False):
         """ Returns the start dates of all occurrences.
