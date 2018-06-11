@@ -138,7 +138,9 @@ def test_view_notifications_elections(election_day_app_gr):
     message = message.decode('utf-8')
     assert "http://localhost/unsubscribe-email" in message
     assert "Majorz Election - Nouveaux résultats intermédiaires" in message
+    assert unsubscribe in message
 
     assert 'hans@example.org' in client.get('/manage/subscribers/email')
+    assert 'hans@example.org' in anom.get(unsubscribe)
     anom.post(unsubscribe)
     assert 'hans@example.org' not in client.get('/manage/subscribers/email')

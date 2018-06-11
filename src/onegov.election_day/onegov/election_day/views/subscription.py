@@ -63,12 +63,19 @@ def unsubscribe_email(self, request, form):
     layout = DefaultLayout(self, request)
     subscribers = EmailSubscriberCollection(request.session)
 
-    token = request.params.get('opaque', None)
-    if request.method == 'POST' and token:
-        data = request.load_url_safe_token(token) or {}
-        subscribers.unsubscribe(data.get('address', None))
+    try:
+        email = request.params.get('opaque')
+        email = request.load_url_safe_token(email)
+        email = email.get('address')
+    except (AttributeError, TypeError):
+        email = None
+
+    # one-click unsubscribe
+    if request.method == 'POST' and email:
+        subscribers.unsubscribe(email)
         return Response()
 
+    # regular unsubscribe
     callout = None
     if form.submitted(request):
         subscribers.unsubscribe(form.email.data)
@@ -76,6 +83,9 @@ def unsubscribe_email(self, request, form):
             "Successfully unsubscribed from the email services. You will no "
             "longer receive an email when new results are published."
         )
+
+    if email and not form.email.data:
+        form.email.data = email
 
     return {
         'layout': layout,

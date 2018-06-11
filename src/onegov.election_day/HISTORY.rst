@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Prefills the email when unsubscribing from the newsletter.
+  [msom]
+
 3.5.6 (2018-06-08)
 ~~~~~~~~~~~~~~~~~~~
 

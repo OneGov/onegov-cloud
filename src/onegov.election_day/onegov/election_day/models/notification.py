@@ -184,16 +184,15 @@ class EmailNotification(Notification):
             )
 
             for address in addresses:
+                token = request.new_url_safe_token({'address': address})
+                optout_custom = f'{optout}?opaque={token}'
                 request.app.send_marketing_email(
                     subject=subject,
                     receivers=(address, ),
                     reply_to=reply_to,
-                    content=content,
+                    content=content.replace(optout, optout_custom),
                     headers={
-                        'List-Unsubscribe': '<{}?opaque={}>'.format(
-                            optout,
-                            request.new_url_safe_token({'address': address})
-                        ),
+                        'List-Unsubscribe': f'<{optout_custom}>',
                         'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
                     }
                 )
