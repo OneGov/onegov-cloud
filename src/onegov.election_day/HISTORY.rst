@@ -4,6 +4,9 @@ Changelog
 - Prefills the email when unsubscribing from the newsletter.
   [msom]
 
+- Updates javascript libraries.
+  [msom]
+
 3.5.6 (2018-06-08)
 ~~~~~~~~~~~~~~~~~~~
 
