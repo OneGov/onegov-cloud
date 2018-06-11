@@ -46,12 +46,12 @@
                         <tal:block condition="result.counted">
                             <td>${layout.format_name(result)}</td>
                             <td tal:condition="layout.principal.has_districts">${result.district}</td>
-                            <td class="right-aligned">${layout.format_number(result.eligible_voters)}</td>
-                            <td class="right-aligned">${layout.format_number(result.received_ballots)}</td>
-                            <td class="right-aligned">${layout.format_number(result.accounted_ballots)}</td>
-                            <td class="right-aligned">${layout.format_number(result.blank_ballots)}</td>
-                            <td class="right-aligned">${layout.format_number(result.invalid_ballots)}</td>
-                            <td class="right-aligned">${layout.format_number(result.accounted_votes)}</td>
+                            <td class="right-aligned" data-text="${result.eligible_voters}">${layout.format_number(result.eligible_voters)}</td>
+                            <td class="right-aligned" data-text="${result.received_ballots}">${layout.format_number(result.received_ballots)}</td>
+                            <td class="right-aligned" data-text="${result.accounted_ballots}">${layout.format_number(result.accounted_ballots)}</td>
+                            <td class="right-aligned" data-text="${result.blank_ballots}">${layout.format_number(result.blank_ballots)}</td>
+                            <td class="right-aligned" data-text="${result.invalid_ballots}">${layout.format_number(result.invalid_ballots)}</td>
+                            <td class="right-aligned" data-text="${result.accounted_votes}">${layout.format_number(result.accounted_votes)}</td>
                             <td class="right-aligned" tal:condition="layout.completed">${'{0:.2f}'.format(result.turnout)} %</td>
                         </tal:block>
                     </tr>

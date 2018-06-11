@@ -341,19 +341,19 @@ table {
 /*
     Sortable table
 */
-.tablesorter-headerUnSorted .tablesorter-header-inner::after {
+.tablesorter-headerUnSorted:not(.sorter-false) .tablesorter-header-inner::after {
     content: '\f0dc';
     font-family: 'FontAwesome';
     margin-left: .75ex;
 }
 
-.tablesorter-headerAsc .tablesorter-header-inner::after {
+.tablesorter-headerAsc:not(.sorter-false) .tablesorter-header-inner::after {
     content: '\f0de';
     font-family: 'FontAwesome';
     margin-left: .75ex;
 }
 
-.tablesorter-headerDesc .tablesorter-header-inner::after {
+.tablesorter-headerDesc:not(.sorter-false) .tablesorter-header-inner::after {
     content: '\f0dd';
     font-family: 'FontAwesome';
     margin-left: .75ex;

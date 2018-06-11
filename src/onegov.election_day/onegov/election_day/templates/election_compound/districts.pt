@@ -26,9 +26,9 @@
                 <thead>
                     <tr>
                         <th data-tablesaw-priority="persist" i18n:translate="" class="left-aligned">${layout.principal.label('district')}</th>
-                        <th data-tablesaw-priority="3" i18n:translate="" class="right-aligned" tal:condition="layout.proporz">Mandates</th>
-                        <th data-tablesaw-priority="3" i18n:translate="" class="right-aligned" tal:condition="layout.majorz">Seats</th>
-                        <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">Counted</th>
+                        <th data-tablesaw-priority="3" i18n:translate="" class="right-aligned" tal:condition="layout.proporz" data-sorter="false">Mandates</th>
+                        <th data-tablesaw-priority="3" i18n:translate="" class="right-aligned" tal:condition="layout.majorz" data-sorter="false">Seats</th>
+                        <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned" data-sorter="false">Counted</th>
                     </tr>
                 </thead>
                 <tbody>

@@ -7,6 +7,9 @@ Changelog
 - Updates javascript libraries.
   [msom]
 
+- Fixes table sorting.
+  [msom]
+
 3.5.6 (2018-06-08)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -71,10 +71,10 @@
                             <td tal:condition="layout.principal.has_districts">${result.district}</td>
                             <td class="answer accepted" tal:condition="result.accepted" i18n:translate="">Accepted</td>
                             <td class="answer rejected" tal:condition="not: result.accepted" i18n:translate="">Rejected</td>
-                            <td class="right-aligned">${layout.format_number(result.yeas)}</td>
-                            <td class="right-aligned">${layout.format_number(result.nays)}</td>
-                            <td class="right-aligned">${layout.format_number(result.empty)}</td>
-                            <td class="right-aligned">${layout.format_number(result.invalid)}</td>
+                            <td class="right-aligned" data-text="${result.yeas}">${layout.format_number(result.yeas)}</td>
+                            <td class="right-aligned" data-text="${result.nays}">${layout.format_number(result.nays)}</td>
+                            <td class="right-aligned" data-text="${result.empty}">${layout.format_number(result.empty)}</td>
+                            <td class="right-aligned" data-text="${result.invalid}">${layout.format_number(result.invalid)}</td>
                             <td class="right-aligned">${layout.format_number(result.yeas_percentage)}</td>
                             <td class="right-aligned">${layout.format_number(result.nays_percentage)}</td>
                         </tal:block>

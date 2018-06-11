@@ -50,7 +50,7 @@
                 <tbody>
                     <tr tal:repeat="candidate candidates" tal:attributes="class 'sticky-row' if candidate[2] > 0 else ''">
                         <td>${candidate[0]} ${candidate[1]}</td>
-                        <td tal:condition="not:layout.tacit" class="right-aligned">${layout.format_number(candidate[4])}</td>
+                        <td tal:condition="not:layout.tacit" class="right-aligned" data-text="${candidate[4]}">${layout.format_number(candidate[4])}</td>
                         <td tal:condition="layout.majorz" class="right-aligned">${candidate[3]}</td>
                         <td tal:condition="layout.proporz" class="right-aligned">${candidate[5]}</td>
                         <td class="answer accepted right-aligned" tal:condition="candidate[2] == True" i18n:translate="">Yes</td>
