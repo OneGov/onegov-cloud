@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a date decay to search results.
+  [href]
+
 - Improves the display of event search results.
   [href]
 

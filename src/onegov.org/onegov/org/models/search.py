@@ -1,5 +1,6 @@
 from cached_property import cached_property
-from elasticsearch_dsl.query import MultiMatch, MatchPhrase
+from elasticsearch_dsl.query import MultiMatch, MatchPhrase, FunctionScore
+from elasticsearch_dsl.function import SF
 from onegov.core.collection import Pagination
 
 
@@ -66,9 +67,17 @@ class Search(Pagination):
         ], fuzziness='1')
 
         search = search.query(match_title | match_rest)
-        search.query.minimum_should_match = 1
-        search = search[self.offset:self.offset + self.batch_size]
 
+        # favour documents with recent changes, over documents without
+        search.query = FunctionScore(query=search.query, functions=[
+            SF('gauss', es_last_change={
+                'offset': '7d',
+                'scale': '90d',
+                'decay': '0.99'
+            })
+        ])
+
+        search = search[self.offset:self.offset + self.batch_size]
         return search.execute()
 
     def feeling_lucky(self):
