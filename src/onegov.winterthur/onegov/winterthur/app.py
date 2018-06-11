@@ -77,6 +77,11 @@ def get_js_path():
     return 'assets/js'
 
 
+@WinterthurApp.webasset_output()
+def get_webasset_output():
+    return 'assets/bundles'
+
+
 @WinterthurApp.webasset('street-search')
 def get_search_asset():
     yield 'wade.js'

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Ensures separation of Winterthur maps from org.
+  [href]
+
 0.2.3 (2018-06-11)
 ~~~~~~~~~~~~~~~~~~~~~
 

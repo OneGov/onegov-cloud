@@ -51,3 +51,8 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Webassets
+.webassets-cache/
+*.bundle.css
+*.bundle.js
