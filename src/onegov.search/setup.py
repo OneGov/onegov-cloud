@@ -38,6 +38,7 @@ setup(
         'elasticsearch-dsl>=5.1.0,<6.0.0',
         'langdetect',
         'onegov.core>=0.22.0',
+        'sortedcontainers',
         'webtest'
     ],
     extras_require=dict(

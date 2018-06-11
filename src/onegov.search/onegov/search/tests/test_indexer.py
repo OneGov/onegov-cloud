@@ -181,6 +181,9 @@ def test_mapping_for_language():
         'es_public': {
             'type': 'boolean',
         },
+        'es_last_change': {
+            'type': 'date'
+        },
         'es_suggestion': {
             'analyzer': 'autocomplete',
             'contexts': [
@@ -200,6 +203,9 @@ def test_mapping_for_language():
         },
         'es_public': {
             'type': 'boolean',
+        },
+        'es_last_change': {
+            'type': 'date'
         },
         'es_suggestion': {
             'analyzer': 'autocomplete',
@@ -231,6 +237,9 @@ def test_mapping_for_language():
         'es_public': {
             'type': 'boolean',
         },
+        'es_last_change': {
+            'type': 'date'
+        },
         'es_suggestion': {
             'analyzer': 'autocomplete',
             'contexts': [
@@ -260,6 +269,9 @@ def test_mapping_for_language():
         },
         'es_public': {
             'type': 'boolean',
+        },
+        'es_last_change': {
+            'type': 'date'
         },
         'es_suggestion': {
             'analyzer': 'autocomplete',
@@ -309,6 +321,10 @@ def test_orm_event_translator_properties():
         def es_suggest(self):
             return self.title
 
+        @property
+        def es_last_change(self):
+            return self.date
+
     mappings = TypeMappingRegistry()
     mappings.register_type('page', Page.es_properties)
 
@@ -338,6 +354,7 @@ def test_orm_event_translator_properties():
             'likes': 1000,
             'published': True,
             'es_public': True,
+            'es_last_change': '2015-09-11T00:00:00',
             'es_suggestion': {
                 'input': ['About'],
                 'contexts': {
@@ -380,6 +397,7 @@ def test_orm_event_translator_properties():
             'likes': 1000,
             'published': True,
             'es_public': True,
+            'es_last_change': '2015-09-11T00:00:00',
             'es_suggestion': {
                 'input': ['About'],
                 'contexts': {
@@ -469,7 +487,7 @@ def test_type_mapping_registry():
         registry.register_type('page', {})
 
     assert registry.registered_fields == {
-        'title', 'comment', 'es_suggestion', 'es_public'
+        'title', 'comment', 'es_suggestion', 'es_public', 'es_last_change'
     }
 
 

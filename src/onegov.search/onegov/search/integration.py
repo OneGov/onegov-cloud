@@ -14,6 +14,7 @@ from onegov.search.indexer import Indexer
 from onegov.search.indexer import ORMEventTranslator
 from onegov.search.indexer import TypeMappingRegistry
 from onegov.search.utils import searchable_sqlalchemy_models
+from sortedcontainers import SortedSet
 from sqlalchemy import inspect
 from sqlalchemy.orm import undefer
 from urllib3.exceptions import HTTPError
@@ -297,13 +298,13 @@ class ElasticsearchApp(morepath.App):
 
         result = search.execute().suggest
 
-        suggestions = []
+        suggestions = SortedSet()
 
         for suggestion in getattr(result, 'es_suggestion', []):
             for item in suggestion['options']:
-                suggestions.append(item['text'])
+                suggestions.add(item['text'].strip())
 
-        return suggestions
+        return tuple(suggestions)
 
     def es_suggestions_by_request(self, request, query, types='*',
                                   limit_to_request_language=False):

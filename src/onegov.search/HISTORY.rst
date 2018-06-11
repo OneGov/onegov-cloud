@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a date to each document to support decaying date search.
+  [href]
+
 1.5.1 (2018-06-01)
 ~~~~~~~~~~~~~~~~~~~
 

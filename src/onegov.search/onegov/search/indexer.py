@@ -320,6 +320,10 @@ class TypeMapping(object):
             'type': 'boolean'
         }
 
+        mapping['es_last_change'] = {
+            'type': 'date'
+        }
+
         mapping['es_suggestion'] = {
             'analyzer': 'autocomplete',
             'type': 'completion',
@@ -640,7 +644,7 @@ class ORMEventTranslator(object):
     """
 
     converters = {
-        'date': lambda dt: dt.isoformat(),
+        'date': lambda dt: dt and dt.isoformat(),
     }
 
     def __init__(self, mappings, max_queue_size=0, languages=(

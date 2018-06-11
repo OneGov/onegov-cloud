@@ -1,9 +1,14 @@
 import morepath
+import sedate
 import transaction
 
+from datetime import timedelta
+from elasticsearch_dsl.function import SF
+from elasticsearch_dsl.query import MatchPhrase, FunctionScore
 from onegov.core import Framework
-from onegov.search import ElasticsearchApp, ORMSearchable
+from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.utils import scan_morepath_modules
+from onegov.search import ElasticsearchApp, ORMSearchable
 from sqlalchemy import Boolean, Column, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base
 from webtest import TestApp as Client
@@ -629,3 +634,78 @@ def test_language_update(es_url, postgres_dsn):
     french = app.es_search(languages=['fr']).execute().load()
     assert not german
     assert french
+
+
+def test_date_decay(es_url, postgres_dsn):
+
+    class App(Framework, ElasticsearchApp):
+        pass
+
+    Base = declarative_base()
+
+    class Document(Base, ORMSearchable, TimestampMixin):
+        __tablename__ = 'documents'
+
+        id = Column(Integer, primary_key=True)
+        title = Column(Text, nullable=False)
+        body = Column(Text, nullable=False)
+
+        es_properties = {'title': {'type': 'localized'}}
+        es_public = True
+
+    scan_morepath_modules(App)
+    morepath.commit()
+
+    app = App()
+    app.configure_application(
+        dsn=postgres_dsn,
+        base=Base,
+        elasticsearch_hosts=[es_url]
+    )
+
+    app.namespace = 'documents'
+    app.set_application_id('documents/home')
+
+    session = app.session()
+
+    one = Document(id=1, title="Dokument", body="Eins")
+    two = Document(id=2, title="Dokument", body="Zwei")
+
+    one.created = sedate.utcnow() - timedelta(days=30)
+    two.created = sedate.utcnow()
+
+    session.add(one)
+    session.add(two)
+
+    transaction.commit()
+
+    def search(title):
+        app.es_indexer.process()
+        app.es_client.indices.refresh(index='_all')
+
+        search = app.es_search(languages=['de'])
+        search = search.query(MatchPhrase(title={"query": title}))
+
+        search.query = FunctionScore(query=search.query, functions=[
+            SF('gauss', es_last_change={
+                'offset': '7d',
+                'scale': '90d',
+                'decay': '0.5'
+            })
+        ])
+
+        return search.execute()
+
+    assert search("Dokument")[0].meta.id == '2'
+    assert search("Dokument")[1].meta.id == '1'
+
+    one = session.query(Document).filter_by(id=1).one()
+    two = session.query(Document).filter_by(id=2).one()
+
+    one.created = sedate.utcnow()
+    two.created = sedate.utcnow() - timedelta(days=30)
+
+    transaction.commit()
+
+    assert search("Dokument")[0].meta.id == '1'
+    assert search("Dokument")[1].meta.id == '2'

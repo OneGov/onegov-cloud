@@ -123,6 +123,11 @@ class Searchable(object):
         """
         return self.title
 
+    @property
+    def es_last_change(self):
+        """ Returns the date the document was created/last modified. """
+        return None
+
 
 class ORMSearchable(Searchable):
     """ Extends the default :class:`Searchable` class with sensible defaults
@@ -137,3 +142,7 @@ class ORMSearchable(Searchable):
     @classproperty
     def es_type_name(self):
         return self.__tablename__
+
+    @property
+    def es_last_change(self):
+        return getattr(self, 'last_change', None)
