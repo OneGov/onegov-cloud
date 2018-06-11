@@ -1,5 +1,5 @@
 function spawnDefaultMap(target, options) {
-    var service = 'http://stadtplan.winterthur.ch/wms/Hintergrundkarte_LK_AV_Situationsplan?';
+    var service = 'https://stadtplan.winterthur.ch/wms/Hintergrundkarte_LK_AV_Situationsplan?';
     var layers = 'Hintergrundkarte_LK_AV_Situationsplan';
     var projection = L.CRS.EPSG4326
 

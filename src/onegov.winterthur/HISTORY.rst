@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes non-https url for Winterthur map.
+  [href]
+
 0.2.2 (2018-06-11)
 ~~~~~~~~~~~~~~~~~~~~~
 
