@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.29.0 (2018-06-11)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a date decay to search results.
   [href]
 
