@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Customizes the display of directory entries with thumbnails.
+  [href]
+
 0.2.4 (2018-06-11)
 ~~~~~~~~~~~~~~~~~~~~~
 
