@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Decreases fuzziness of search results.
+  [href]
+
 - Customizes the display of directory entries with thumbnails.
   [href]
 

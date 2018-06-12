@@ -47,7 +47,7 @@ class InlineSearch(object):
         )
 
         match_parent = Match(directory_id=str(self.directory.id))
-        match_fields = MultiMatch(query=self.term, fields=fields, fuzziness=1)
+        match_fields = MultiMatch(query=self.term, fields=fields, fuzziness=0)
 
         for field in fields:
             search = search.highlight(field)
