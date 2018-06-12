@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.2.5 (2018-06-12)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Decreases fuzziness of search results.
   [href]
 
