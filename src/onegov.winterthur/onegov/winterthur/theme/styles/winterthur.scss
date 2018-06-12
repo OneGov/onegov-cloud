@@ -105,19 +105,19 @@ input[data-street-search]::placeholder {
 */
 .with-thumbnails {
     li {
-        flex-direction: row-reverse;
+        display: block;
         padding-bottom: .25rem;
+
+        .list-lead {
+            max-width: 100%;
+        }
 
         .thumbnail {
             border-radius: 0;
-            flex: 3;
+            float: right;
             margin-right: 0;
             padding-right: 0;
             text-align: center;
-
-            & + div {
-                flex: 6;
-            }
 
             img {
                 border-radius: 0;

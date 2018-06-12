@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Floats images in directories to the right.
+  [href]
+
 0.2.5 (2018-06-12)
 ~~~~~~~~~~~~~~~~~~~~~
 
