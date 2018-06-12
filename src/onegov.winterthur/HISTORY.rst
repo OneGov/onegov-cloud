@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Limits hover link javascript to .with-thumbnails.
+  [href]
+
 0.2.6 (2018-06-12)
 ~~~~~~~~~~~~~~~~~~~~~
 
