@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Shows a clear button in the search box.
+  [href]
+
 - Limits hover link javascript to .with-thumbnails.
   [href]
 
@@ -44,7 +47,7 @@ Changelog
   [href]
 
 - Shows a bullet instead of a checkmark in the directory choices.
-  [href] 
+  [href]
 
 0.2.0 (2018-05-23)
 ~~~~~~~~~~~~~~~~~~~~~

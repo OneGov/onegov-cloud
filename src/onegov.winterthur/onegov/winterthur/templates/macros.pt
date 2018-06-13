@@ -34,7 +34,9 @@
         <form id='inline-search' class="searchbox" action="${action}" method="GET" onsubmit="return submitInlineSearch();">
             <div class="row collapse">
                 <div class="columns small-10">
-                    <input id="search-term" type="text" placeholder="Suche" autocomplete="off" autocorrect="off" value="${term or ''}">
+                    <input id="search-term" type="text" placeholder="Suche" required autocomplete="off" autocorrect="off" value="${term or ''}">
+                    <button type="reset" class="reset-button" tabindex="-1"></button>
+
                     <input type="hidden" name='search' value='inline'>
                     <input type="hidden" name='search_query'>
                 </div>
