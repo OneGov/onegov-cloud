@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Removes the typeahead spinner.
+  [href]
+
+- Adds a clear button to all search boxes.
+  [href]
+
 0.29.0 (2018-06-11)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -13,10 +13,6 @@
     * data-typeahead-subject is set on the element which should trigger
       the typeahead (that would be a text input element)
 
-    * data-typeahead-spinner is set on the element which will show the
-      spinner. The spinner is meant to be a button with a font awesome icon as
-      value.
-
     * data-typeahead-container is set on the element which will contain the
       list of results.
 */
@@ -89,7 +85,6 @@ var TypeAhead = function(form) {
     var source = form.data('typeahead-source');
     var target = form.data('typeahead-target');
     var subject = form.find('[data-typeahead-subject]');
-    var spinner = form.find('[data-typeahead-spinner]');
     var container = form.find('[data-typeahead-container]');
     var typeahead = null;
 
@@ -106,15 +101,11 @@ var TypeAhead = function(form) {
     var update_suggestions = _.debounce(function(text) {
         if (text.length === 0) {
             update_typeahead([]);
-            spinner.attr('class', 'fa fa-search');
             return;
         }
 
         var request = $.get(getSearchUrl(source, text));
 
-        request.always(function() {
-            spinner.attr('class', 'fa fa-search');
-        });
         request.success(function(data) {
             update_typeahead(data);
         });
@@ -165,7 +156,6 @@ var TypeAhead = function(form) {
     $(subject).on('keyup', function(event) {
         // actual characters or backspace
         if (event.keyCode >= 48 || event.keyCode === 8) {
-            spinner.attr('class', 'fa fa-refresh fa-spin');
             update_suggestions($(this).val());
             event.preventDefault();
         }

@@ -17,11 +17,12 @@
                         <label>${searchlabel}</label>
                         <div class="columns small-11">
                             <label for="search" class="show-for-sr" i18n:translate>Search</label>
-                            <input id="search" data-typeahead-subject type="text" name="q" value="${model.query}" autocomplete="off" autocorrect="off" autofocus onfocus="this.select()"/>
+                            <input id="search" data-typeahead-subject type="text" name="q" value="${model.query}" autocomplete="off" autocorrect="off" required autofocus onfocus="this.select()"/>
+                            <button type="reset" class="reset-button" tabindex="-1"></button>
                         </div>
                         <div class="columns small-1">
                             <button type="submit" class="button postfix" aria-label="Search" i18n:attributes="aria-label">
-                                <i class="fa fa-search" data-typeahead-spinner></i>
+                                <i class="fa fa-search"></i>
                             </button>
                         </div>
                     </div>

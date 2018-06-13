@@ -147,3 +147,15 @@ Intercooler.ready(function(element) {
     $(el).find('a.confirm').confirmation();
     setupRedirectAfter(el);
 });
+
+// search reset buttons reset everything
+$(document).ready(function() {
+    $('.searchbox .reset-button').click(function(e) {
+        var $inputs = $(this).closest('form').find('input');
+
+        $inputs.val('');
+        $inputs.filter(':visible:first').focus();
+
+        e.preventDefault();
+    });
+});

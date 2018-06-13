@@ -3093,6 +3093,31 @@ button {
         margin-bottom: 0;
         padding: 0;
     }
+
+    input[type="text"]:not(:valid) ~ .reset-button {
+        display: none;
+    }
+
+    input::-ms-clear {
+        display: none;
+    }
+
+    .reset-button {
+        $size: 1rem;
+
+        background: transparent;
+        color: $input-font-color;
+        position: absolute;
+        right: $size / 2;
+        top: calc(50% - #{$size / 2});
+
+        &::after {
+            @include icon('\f057');
+            display: block;
+            height: $size;
+            width: $size;
+        }
+    }
 }
 
 /*
@@ -4075,8 +4100,8 @@ h2 + div.timeline {
 
         .thumbnail {
             border-radius: 5px;
-            margin-right: 1rem;
             flex: 2;
+            margin-right: 1rem;
             overflow: hidden;
             position: relative;
 

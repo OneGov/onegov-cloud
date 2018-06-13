@@ -86,11 +86,12 @@
             <div class="row collapse">
                 <div class="columns small-10">
                     <label for="search" class="show-for-sr" i18n:translate>Search</label>
-                    <input id="search" data-typeahead-subject type="text" name="q" placeholder="Search" i18n:attributes="placeholder" autocomplete="off" autocorrect="off" />
+                    <input id="search" data-typeahead-subject type="text" name="q" placeholder="Search" i18n:attributes="placeholder" autocomplete="off" autocorrect="off" required />
+                    <button type="reset" class="reset-button" tabindex="-1"></button>
                 </div>
                 <div class="columns small-2">
                     <button type="submit" class="button postfix" aria-label="Search" i18n:attributes="aria-label">
-                      <i class="fa fa-search" data-typeahead-spinner></i>
+                      <i class="fa fa-search"></i>
                     </button>
                 </div>
             </div>
