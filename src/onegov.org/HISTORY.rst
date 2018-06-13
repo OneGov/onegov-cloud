@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes tags not breaking in directories.
+  [href]
+
 - Removes the typeahead spinner.
   [href]
 

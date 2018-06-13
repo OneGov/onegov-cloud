@@ -3913,10 +3913,12 @@ ul.recipients {
         a {
             font-size: .8rem;
             line-height: .8rem;
+            white-space: normal;
         }
 
         span {
             margin-bottom: 0;
+            text-align: left;
 
             &.rounded {
                 @include circle;
