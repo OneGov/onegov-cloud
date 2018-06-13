@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Sorts search results in order of importance.
+  [href]
+
 - Shows a clear button in the search box.
   [href]
 

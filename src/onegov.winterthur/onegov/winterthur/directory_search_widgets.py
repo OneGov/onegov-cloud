@@ -1,9 +1,12 @@
 from cached_property import cached_property
-from elasticsearch_dsl.query import Match, MultiMatch
-from onegov.form import as_internal_id
+from elasticsearch_dsl.function import SF, ScoreFunction
+from elasticsearch_dsl.query import Match, MultiMatch, FunctionScore
 from onegov.core.templates import render_macro
 from onegov.directory import DirectoryEntry, DirectoryEntryCollection
+from onegov.form import as_internal_id
 from onegov.winterthur.app import WinterthurApp
+from sqlalchemy import cast, func, literal_column, Text
+from sqlalchemy.dialects.postgresql import array
 
 
 def lines(value):
@@ -38,22 +41,26 @@ class InlineSearch(object):
 
         search = self.app.es_search_by_request(
             request=self.request,
-            types=('extended_directory_entries', )
+            types=('extended_directory_entries', ),
+            explain=True
         )
+
+        search = search.filter('term', directory_id=str(self.directory.id))
 
         fields = tuple(
             f for f in DirectoryEntry.es_properties.keys()
             if not f.startswith('es_') and not f == 'directory_id'
         )
 
-        match_parent = Match(directory_id=str(self.directory.id))
-        match_fields = MultiMatch(query=self.term, fields=fields, fuzziness=0)
+        match_approx = MultiMatch(query=self.term, fields=fields, fuzziness=1)
+        match_strict = MultiMatch(query=self.term, fields=fields, fuzziness=0)
+
+        search = search.query(match_approx | match_strict)
 
         for field in fields:
             search = search.highlight(field)
 
-        search = search.query(match_parent & match_fields)
-        return {hit.meta.id: hit for hit in search[0:1000].execute()}
+        return {hit.meta.id: hit for hit in search[0:100].execute()}
 
     def html(self, layout):
         return render_macro(layout.macros['inline_search'], self.request, {
@@ -96,4 +103,19 @@ class InlineSearch(object):
         if not self.term:
             return query
 
-        return query.filter(DirectoryEntry.id.in_(self.hits.keys()))
+        ids = tuple(self.hits.keys())
+
+        query = query.filter(DirectoryEntry.id.in_(ids))
+
+        if ids:
+            query = query.order_by(False)
+            query = query.order_by(
+                func.array_position(
+                    array(ids),
+                    cast(literal_column('id'), Text)
+                )
+            )
+
+        print(query)
+
+        return query
