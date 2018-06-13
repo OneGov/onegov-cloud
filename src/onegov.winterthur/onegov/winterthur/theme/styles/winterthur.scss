@@ -108,6 +108,15 @@ input[data-street-search]::placeholder {
         display: block;
         padding-bottom: .25rem;
 
+        &::after {
+            clear: both;
+            content: " ";
+            display: block;
+            font-size: 0;
+            height: 0;
+            visibility: hidden;
+        }
+
         .list-lead {
             max-width: 100%;
         }
