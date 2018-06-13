@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.33 (2018-06-13)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes billing export including bills from multiple periods.
   [href]
