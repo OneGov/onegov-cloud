@@ -26,3 +26,19 @@ $(document).ready(function() {
         e.preventDefault();
     });
 });
+
+// the search reset button in the directory search resets the whole view
+$(document).ready(function() {
+    $('#inline-search .reset-button').click(function(e) {
+        var $form = $(this).closest('form');
+        var $inputs = $form.find('input');
+
+        $inputs.val('');
+        $form.find('input[name="search"]').val('inline');
+        $inputs.filter(':visible:first').removeAttr('required');
+
+        $form.submit();
+
+        e.preventDefault();
+    });
+});

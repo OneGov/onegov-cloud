@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Resets the whole directory if the reset search button is clicked.
+  [href]
+
 - Sorts search results in order of importance.
   [href]
 
