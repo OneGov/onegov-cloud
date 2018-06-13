@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.2.7 (2018-06-13)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Adjusts directory panel styles.
   [href]
 
