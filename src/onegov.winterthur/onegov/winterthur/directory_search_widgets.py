@@ -41,8 +41,7 @@ class InlineSearch(object):
 
         search = self.app.es_search_by_request(
             request=self.request,
-            types=('extended_directory_entries', ),
-            explain=True
+            types=('extended_directory_entries', )
         )
 
         search = search.filter('term', directory_id=str(self.directory.id))
@@ -52,10 +51,9 @@ class InlineSearch(object):
             if not f.startswith('es_') and not f == 'directory_id'
         )
 
-        match_approx = MultiMatch(query=self.term, fields=fields, fuzziness=1)
-        match_strict = MultiMatch(query=self.term, fields=fields, fuzziness=0)
-
-        search = search.query(match_approx | match_strict)
+        fuzziness = int(self.request.params.get('fuzziness', '1'))
+        match = MultiMatch(query=self.term, fields=fields, fuzziness=fuzziness)
+        search = search.query(match)
 
         for field in fields:
             search = search.highlight(field)
@@ -65,6 +63,7 @@ class InlineSearch(object):
     def html(self, layout):
         return render_macro(layout.macros['inline_search'], self.request, {
             'term': self.term,
+            'directory': self.directory,
             'action': self.request.class_link(
                 DirectoryEntryCollection,
                 variables={

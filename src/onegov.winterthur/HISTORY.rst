@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adjusts directory panel styles.
+  [href]
+
 - Resets the whole directory if the reset search button is clicked.
   [href]
 

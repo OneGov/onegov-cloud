@@ -6,7 +6,7 @@
       i18n:domain="onegov.winterthur">
 <body>
 
-<metal:before_directory_entry_lead define-macro="before_directory_entry_lead">
+<metal:before_directory_entry_lead define-macro="before_directory_entry_lead" i18n:domain="onegov.winterthur">
     <div class="framed-only">
         <p>
             <a class="small" href="${request.link(entry.directory)}" i18n:translate>Back to the overview</a>
@@ -15,7 +15,7 @@
 </metal:before_directory_entry_lead>
 
 
-<metal:inline_search define-macro="inline_search">
+<metal:inline_search define-macro="inline_search" i18n:domain="onegov.winterthur">
     <script>
         function submitInlineSearch() {
             var query = {
@@ -29,7 +29,7 @@
     </script>
 
     <div class="filter-panel">
-        <h2 class="filter-title" i18n:translate>Search</h2>
+        <h2 class="filter-title" i18n:translate>Search in <tal:b i18n:name="directory">${directory.title}</tal:b></h2>
 
         <form id='inline-search' class="searchbox" action="${action}" method="GET" onsubmit="return submitInlineSearch();">
             <div class="row collapse">
@@ -52,7 +52,7 @@
 </metal:inline_search>
 
 
-<metal:inline_search_entry_lead define-macro="inline_search_entry_lead">
+<metal:inline_search_entry_lead define-macro="inline_search_entry_lead" i18n:domain="onegov.winterthur">
     <dl>
         <tal:b repeat="(name, lines) fragments">
             <dt>${name}</dt>
