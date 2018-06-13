@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.29.1 (2018-06-13)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes tags not breaking in directories.
   [href]
 

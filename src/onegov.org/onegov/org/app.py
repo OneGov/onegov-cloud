@@ -38,7 +38,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     directory_search_widget = directive(directives.DirectorySearchWidgetAction)
 
     #: the version of this application (do not change manually!)
-    version = '0.29.0'
+    version = '0.29.1'
 
     def is_allowed_application_id(self, application_id):
         """ Stops onegov.server from ever passing the request to the org
