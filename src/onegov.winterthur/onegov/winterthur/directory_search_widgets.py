@@ -1,6 +1,5 @@
 from cached_property import cached_property
-from elasticsearch_dsl.function import SF, ScoreFunction
-from elasticsearch_dsl.query import Match, MultiMatch, FunctionScore
+from elasticsearch_dsl.query import MultiMatch
 from onegov.core.templates import render_macro
 from onegov.directory import DirectoryEntry, DirectoryEntryCollection
 from onegov.form import as_internal_id
