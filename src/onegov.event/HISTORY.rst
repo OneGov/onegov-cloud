@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.6.3 (2018-06-14)
+~~~~~~~~~~~~~~~~~~~
 
 - Stops indexing events before they are published.
   [href]
