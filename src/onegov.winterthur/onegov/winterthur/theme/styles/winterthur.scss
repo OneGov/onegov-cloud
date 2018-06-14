@@ -67,9 +67,9 @@ input[data-street-search]::placeholder {
 
     button[type="submit"] {
         background: transparent;
-        color: $primary-color;
         border-color: $border-color;
         border-width: $border-width;
+        color: $red;
         padding-right: .75rem;
         text-align: right;
     }
@@ -97,6 +97,8 @@ input[data-street-search]::placeholder {
         span,
         a {
             background-color: $gray-light;
+            font-size: .85rem;
+            line-height: 1.3em;
         }
 
         span.active,
@@ -170,9 +172,13 @@ input[data-street-search]::placeholder {
     Custom thumbnails
 */
 .with-thumbnails {
+    border-bottom: 1px solid $gray-light;
+    border-top: 1px solid $gray-light;
+
     li {
         display: block;
-        padding-bottom: .25rem;
+        padding: 4px 12px;
+        transition: .3s ease all;
 
         &::after {
             clear: both;
