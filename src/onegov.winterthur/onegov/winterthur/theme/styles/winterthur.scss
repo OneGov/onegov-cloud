@@ -76,6 +76,10 @@ input[data-street-search]::placeholder {
 
     .reset-button {
         color: $gray-dark;
+
+        &::after {
+            @include icon('\f00d');
+        }
     }
 }
 
