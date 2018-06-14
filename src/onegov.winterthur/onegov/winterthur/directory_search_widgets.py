@@ -50,8 +50,7 @@ class InlineSearch(object):
             if not f.startswith('es_') and not f == 'directory_id'
         )
 
-        fuzziness = int(self.request.params.get('fuzziness', '1'))
-        match = MultiMatch(query=self.term, fields=fields, fuzziness=fuzziness)
+        match = MultiMatch(query=self.term, fields=fields, fuzziness=1)
         search = search.query(match)
 
         for field in fields:
