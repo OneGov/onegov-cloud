@@ -154,6 +154,10 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
     def es_public(self):
         return self.state == 'published'
 
+    @property
+    def es_skip(self):
+        return self.state == 'submitted'
+
     def __setattr__(self, name, value):
         """ Automatically update the occurrences if shared attributes change.
         """
@@ -169,6 +173,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         one to occur or the last occurrence.
 
         """
+
         session = object_session(self)
 
         base = session.query(Occurrence).filter_by(event_id=self.id)
