@@ -3,6 +3,7 @@ from onegov.core.crypto import random_token
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import Associable
 from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.types import JSON
 from onegov.file.attachments import ProcessedUploadedFile
 from onegov.file.filters import OnlyIfImage, WithThumbnailFilter
 from sqlalchemy import Column, Index, Text
@@ -11,16 +12,20 @@ from sqlalchemy_utils import observes
 
 class UploadedFileField(UploadedFileFieldBase):
     """ A customized version of Depot's uploaded file field. This version
-    stores its data in an unlimited text field, whereas the original uses
-    a limited varchar field.
-
-    We probably won't hit the 4000 character limit any time soon, but to
-    avoid any chance of this happening, we use Text instead.
+    stores its data in a JSONB field, instead of using text.
 
     """
 
     def load_dialect_impl(self, dialect):
-        return dialect.type_descriptor(Text())
+        return dialect.type_descriptor(JSON())
+
+    def process_bind_param(self, value, dialect):
+        if value:
+            return value
+
+    def process_result_value(self, value, dialect):
+        if value:
+            return self._upload_type(value)
 
 
 class File(Base, Associable, TimestampMixin):

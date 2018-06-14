@@ -58,3 +58,12 @@ def add_image_size(context):
 def add_files_by_type_and_name_index(context):
     context.operations.create_index(
         'files_by_type_and_name', 'files', ['type', 'name'])
+
+
+@upgrade_task('Migrate file metadata to JSONB')
+def migrate_file_metadata_to_jsonb(context):
+    context.session.execute("""
+        ALTER TABLE files
+        ALTER COLUMN reference
+        TYPE JSONB USING reference::jsonb
+    """)
