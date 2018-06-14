@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Migrates the metadata storage to JSONB.
+  [href]
+
 - Improves query performance for selecting files in order.
   [href]
 
