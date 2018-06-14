@@ -28,7 +28,7 @@ def view_get_file_collection(self, request):
 
     files = [
         Link(text=f.name, url=request.link(f))
-        for f in self.query().order_by(File.name).all()
+        for f in self.query().order_by(File.name)
     ]
 
     layout = DefaultLayout(self, request)
