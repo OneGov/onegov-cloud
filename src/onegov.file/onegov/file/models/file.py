@@ -5,7 +5,7 @@ from onegov.core.orm.abstract import Associable
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.file.attachments import ProcessedUploadedFile
 from onegov.file.filters import OnlyIfImage, WithThumbnailFilter
-from sqlalchemy import Column, Text
+from sqlalchemy import Column, Index, Text
 from sqlalchemy_utils import observes
 
 
@@ -78,6 +78,10 @@ class File(Base, Associable, TimestampMixin):
     __mapper_args__ = {
         'polymorphic_on': 'type'
     }
+
+    __table_args__ = (
+        Index('files_by_type_and_name', 'type', 'name'),
+    )
 
     @observes('reference')
     def reference_observer(self, reference):

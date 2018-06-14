@@ -52,3 +52,9 @@ def add_image_size(context):
                 image.reference.thumbnail_small = thumbnail_metadata
 
             flag_modified(image, 'reference')
+
+
+@upgrade_task('Add files by type and name index')
+def add_files_by_type_and_name_index(context):
+    context.operations.create_index(
+        'files_by_type_and_name', 'files', ['type', 'name'])

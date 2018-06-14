@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves query performance for selecting files in order.
+  [href]
+
 0.5.2 (2018-02-06)
 ~~~~~~~~~~~~~~~~~~~
 

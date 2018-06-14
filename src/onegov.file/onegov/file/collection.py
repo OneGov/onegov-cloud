@@ -31,8 +31,11 @@ class FileCollection(object):
     def query(self):
         if self.type != '*':
             model_class = File.get_polymorphic_class(self.type, File)
-            query = self.session.query(model_class)
-            return query.filter(model_class.type == self.type)
+
+            if model_class is File:
+                return self.session.query(File).filter_by(type=self.type)
+
+            return self.session.query(model_class)
 
         return self.session.query(File)
 
@@ -115,8 +118,11 @@ class FileSetCollection(object):
     def query(self):
         if self.type != '*':
             model_class = FileSet.get_polymorphic_class(self.type, FileSet)
-            query = self.session.query(model_class)
-            return query.filter(model_class.type == self.type)
+
+            if model_class is FileSet:
+                return self.session.query(File).filter_by(type=self.type)
+
+            return self.session.query(model_class)
 
         return self.session.query(FileSet)
 
