@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.2.8 (2018-06-14)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Small design changes.
   [href]
 
