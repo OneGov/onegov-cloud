@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes overzealous bullet point replacements.
+  [href]
+
 0.2.8 (2018-06-14)
 ~~~~~~~~~~~~~~~~~~~~~
 
