@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.29.2 (2018-06-15)
+~~~~~~~~~~~~~~~~~~~
+
 - Stops rendering an empty filter panel if there are no filters.
   [href]
 
