@@ -44,12 +44,15 @@ from more.webassets.tweens import (
 class StaticFile(object):
     """ Defines a static file served by the application. """
 
-    def __init__(self, path):
+    def __init__(self, path, version=None):
         self.path = path
+        self.version = version
 
     @property
     def absorb(self):
-        # alias for morepath
+        if self.version:
+            return f'{self.path}___{self.version}'
+
         return self.path
 
     @classmethod
@@ -65,13 +68,19 @@ class StaticFile(object):
         if not app.serve_static_files:
             return None
 
-        absorb = unquote(absorb)
+        identity = unquote(absorb)
+        version = None
 
-        if has_insecure_path_element(absorb):
+        position = absorb.find('___')
+
+        if position >= 0:
+            identity, version = identity[:position], identity[position + 4:]
+
+        if has_insecure_path_element(identity):
             return None
 
         for directory in app.static_files:
-            path = os.path.join(directory, absorb)
+            path = os.path.join(directory, identity)
 
             if not is_subpath(directory, path):
                 continue
@@ -79,7 +88,7 @@ class StaticFile(object):
             if not os.path.isfile(path):
                 continue
 
-            return cls(os.path.relpath(path, start=directory))
+            return cls(os.path.relpath(path, start=directory), version=version)
 
 
 @Framework.path(model=StaticFile, path='/static', absorb=True)
@@ -90,6 +99,12 @@ def get_static_file(app, absorb):
 @Framework.view(model=StaticFile, render=render_file, permission=Public)
 def view_static_file(self, request):
     """ Renders the given static file in the browser. """
+
+    if self.version:
+
+        @request.after
+        def cache_forever(response):
+            response.headers['Cache-Control'] = 'max-age=31536000'
 
     for directory in request.app.static_files:
         path = os.path.join(directory, self.path)

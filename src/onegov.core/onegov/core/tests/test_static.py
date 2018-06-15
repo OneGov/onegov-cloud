@@ -69,6 +69,13 @@ def test_static_file_app(temporary_directory, redis_url):
     # make sure inexistant files return a 404
     assert c.get('/static/humans.txt', expect_errors=True).status_code == 404
 
+    # makre sure versioned files are cached forever
+    response = c.get('/static/robots.txt')
+    assert 'Cache-Control' not in response.headers
+
+    response = c.get('/static/robots.txt___v1.0')
+    assert response.headers['Cache-Control'] == 'max-age=31536000'
+
 
 def test_root_file_app(temporary_directory, redis_url):
     class App(Framework):
