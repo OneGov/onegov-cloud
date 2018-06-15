@@ -55,7 +55,7 @@
                     </div>
                 </div>
 
-                <div class="filter-panel">
+                <div class="filter-panel" tal:condition="filters">
                     <div tal:repeat="filter filters" class="filter-periods">
                         <h2 class="filter-title">${filter.title}</h2>
                         <div metal:use-macro="layout.macros['tags']" tal:define="tags filter.tags" />
