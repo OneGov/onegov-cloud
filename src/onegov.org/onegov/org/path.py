@@ -116,8 +116,12 @@ def get_news(app, absorb):
 
 
 @OrgApp.path(model=GeneralFileCollection, path='/files')
-def get_files(app):
-    return GeneralFileCollection(app.session())
+def get_files(app, order_by='name', direction='ascending'):
+    return GeneralFileCollection(
+        app.session(),
+        order_by=order_by,
+        direction=direction
+    )
 
 
 @OrgApp.path(model=ImageFileCollection, path='/images')

@@ -2,11 +2,14 @@
 
 import morepath
 
+from functools import lru_cache
+from itertools import groupby
 from onegov.core.filestorage import view_filestorage_file
 from onegov.core.security import Private, Public
 from onegov.file import File, FileCollection
 from onegov.org import _, OrgApp
-from onegov.org.elements import Img, Link
+from onegov.org.elements import Img
+from onegov.org.new_elements import Link
 from onegov.org.layout import DefaultLayout
 from onegov.org.models import (
     GeneralFile,
@@ -26,21 +29,40 @@ from webob import exc
 def view_get_file_collection(self, request):
     request.include('dropzone')
 
-    files = [
-        Link(text=f.name, url=request.link(f))
-        for f in self.query().order_by(File.name)
-    ]
+    files = tuple(
+        Link(
+            text=f.name,
+            url=request.class_link(File, {'id': f.id}),
+            id=f.id,
+            upload_date=f.upload_date,
+            content_type=f.content_type,
+            group='0-9' if f.name[0].isdigit() else f.name[0].upper()
+        )
+        for f in self.files
+    )
 
     layout = DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
-        Link(_("Files"), request.link(self))
+        Link(_("Files"), '#')
     ]
+
+    @lru_cache(maxsize=len(files) // 4)
+    def format_date(date):
+        return layout.format_date(date, 'datetime')
+
+    grouped = tuple(
+        (group, tuple(f for f in files))
+        for group, files in groupby(files, key=lambda f: f.group)
+    )
 
     return {
         'layout': layout,
         'title': _('Files'),
-        'files': files,
+        'grouped': grouped,
+        'count': len(files),
+        'format_date': format_date,
+        'model': self
     }
 
 

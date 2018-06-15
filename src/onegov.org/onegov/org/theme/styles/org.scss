@@ -4502,3 +4502,22 @@ h2 + div.timeline {
     font-size: .875rem;
     line-height: 1.4rem;
 }
+
+/*
+    Files list
+*/
+.files {
+    table-layout: fixed;
+
+    .file-icon {
+        width: 48px;
+    }
+
+    .file-link {
+        width: 80%;
+    }
+
+    .file-date {
+        white-space: nowrap;
+    }
+}

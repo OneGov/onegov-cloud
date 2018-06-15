@@ -1,8 +1,8 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.org">
-    <tal:block metal:fill-slot="title">
+    <tal:b metal:fill-slot="title">
         ${title}
-    </tal:block>
-    <tal:block metal:fill-slot="content">
+    </tal:b>
+    <tal:b metal:fill-slot="content">
         <div class="row">
             <div class="small-12 columns" tal:define="upload_url layout.file_upload_url">
                 <h2 i18n:translate="">Upload</h2>
@@ -12,24 +12,40 @@
         <div class="row">
             <div class="small-12 columns">
                 <h2 i18n:translate="">All Files</h2>
-                <ul tal:condition="files">
-                    <li tal:repeat="file files" id="file-${repeat.file.index}" class="file-box">
-                        <a href="${file.url}" tal:condition="file">
-                            ${file.text}
-                        </a>
-                        <a class="delete confirm"
-                           ic-delete-from="${file.url}?csrf-token=${layout.csrf_token}"
-                           ic-on-success="$('#file-${repeat.file.index}').remove();"
-                           data-confirm="Do you really want to delete the file?"
-                           data-confirm-yes="Delete File"
-                           data-confirm-no="Cancel"
-                           i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"><i class="fa fa-times" aria-hidden="true"></i></a>
-                    </li>
-                </ul>
-                <tal:block condition="not:files">
+
+                <tal:b condition="not:count">
                     <p i18n:translate="">No files uploaded yet</p>
-                </tal:block>
+                </tal:b>
+
+                <table tal:condition="count" class="files">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th i18n:translate>Name</th>
+                            <th i18n:translate>Upload date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tal:b repeat="(group, files) grouped">
+                            <tr>
+                                <th colspan="3" scope="colgroup">
+                                    ${group}
+                                </th>
+                            </tr>
+
+                            <tr id="${file.id}" tal:repeat="file files">
+                                <td class="file-icon"></td>
+                                <td class="file-link">
+                                    ${structure: file(layout)}
+                                </td>
+                                <td class="file-date">
+                                    ${format_date(file.upload_date)}
+                                </td>
+                            </tr>
+                        </tal:b>
+                    </tbody>
+                </table>
             </div>
         </div>
-    </tal:block>
+    </tal:b>
 </div>

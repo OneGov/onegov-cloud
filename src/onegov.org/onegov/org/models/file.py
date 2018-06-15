@@ -4,6 +4,7 @@ from collections import namedtuple
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from itertools import groupby
+from onegov.core.orm import as_selectable
 from onegov.core.orm.mixins import meta_property
 from onegov.file import File, FileSet, FileCollection, FileSetCollection
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
@@ -11,7 +12,7 @@ from onegov.org import _
 from onegov.org.models.extensions import HiddenFromPublicExtension
 from onegov.search import ORMSearchable
 from sedate import standardize_date, utcnow
-from sqlalchemy import desc
+from sqlalchemy import asc, desc, select
 
 
 DateInterval = namedtuple('DateInterval', ('name', 'start', 'end'))
@@ -155,8 +156,43 @@ class GeneralFileCollection(FileCollection, GroupFilesByDateMixin):
 
     supported_content_types = 'all'
 
-    def __init__(self, session):
+    file_list = as_selectable("""
+        SELECT
+            id,                             -- Text
+            name,                           -- Text
+            CAST(
+                reference->>'uploaded_at'
+                AS timestamp
+            )   AT TIME ZONE 'UTC'
+                AS upload_date,             -- UTCDateTime
+            reference->>'content_type'
+                AS content_type             -- Text
+        FROM files
+        WHERE type = 'general'
+    """)
+
+    def __init__(self, session, order_by='name', direction='ascending'):
         super().__init__(session, type='general', allow_duplicates=False)
+
+        self.order_by = order_by
+        self.direction = direction
+
+    @property
+    def statement(self):
+        stmt = select(self.file_list.c)
+
+        if self.order_by == 'name':
+            order = self.file_list.c.name
+        else:
+            order = self.file_list.c.upload_date
+
+        direction = self.direction == 'ascending' and asc or desc
+
+        return stmt.order_by(direction(order))
+
+    @property
+    def files(self):
+        return self.session.execute(self.statement)
 
 
 class ImageFileCollection(FileCollection, GroupFilesByDateMixin):
