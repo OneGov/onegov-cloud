@@ -25,3 +25,12 @@ def add_entries_count(context):
     context.session.flush()
 
     context.operations.alter_column('directories', 'count', nullable=False)
+
+
+@upgrade_task('Update ordering')
+def update_ordering(context):
+    for directory in context.session.query(Directory):
+        config = directory.configuration
+
+        for entry in directory.entries:
+            entry.order = config.extract_order(entry.values)

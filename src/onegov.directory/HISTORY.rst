@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds natural sorting with a variant of the alphanum algorithm.
+  [href]
+
 0.3.4 (2018-06-06)
 ~~~~~~~~~~~~~~~~~~~~~
 

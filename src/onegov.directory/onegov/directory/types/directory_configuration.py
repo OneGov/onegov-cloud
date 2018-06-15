@@ -1,3 +1,4 @@
+import re
 import yaml
 
 from collections import defaultdict
@@ -17,6 +18,25 @@ SAFE_FORMAT_TRANSLATORS = {
     datetime: lambda d: d.strftime('%d.%m.%Y %H:%M'),
     time: lambda t: t.strftime('%H:%M')
 }
+
+
+number_chunks = re.compile(r'([0-9]+)')
+
+
+def pad_numbers_in_chunks(text, padding=8):
+    """ Alphanumeric sorting by padding all numbers.
+
+    For example:
+        foobar-1-to-10 becomes foobar-0000000001-to-0000000010)
+
+    See:
+        https://nedbatchelder.com/blog/200712/human_sorting.html
+
+    """
+    return ''.join((
+        part.rjust(padding, '0') if part.isdigit() else part
+        for part in number_chunks.split(text)
+    ))
 
 
 class DirectoryConfigurationStorage(TypeDecorator, ScalarCoercible):
@@ -184,7 +204,10 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
             (self.order and 'order') or
             (self.title and 'title')
         )
-        return normalize_for_url(self.join(data, attribute))
+        order = normalize_for_url(self.join(data, attribute))
+        order = pad_numbers_in_chunks(order)
+
+        return order
 
     def extract_searchable(self, data):
         if self.searchable:
