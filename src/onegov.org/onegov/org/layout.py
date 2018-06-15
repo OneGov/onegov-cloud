@@ -108,11 +108,13 @@ class Layout(ChameleonLayout):
 
     @cached_property
     def font_awesome_path(self):
-        return self.request.link(
-            StaticFile('font-awesome/css/font-awesome.min.css'))
+        return self.request.link(StaticFile(
+            f'font-awesome/css/font-awesome.min.css',
+            version=self.app.version
+        ))
 
     def static_file_path(self, path):
-        return self.request.link(StaticFile(path))
+        return self.request.link(StaticFile(path, version=self.app.version))
 
     @cached_property
     def page_id(self):

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Versions the static files for improved caching.
+  [href]
+
 0.29.2 (2018-06-15)
 ~~~~~~~~~~~~~~~~~~~
 
