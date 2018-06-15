@@ -25,7 +25,7 @@ class Sponsor(object):
 
     def url_for(self, request, path):
         assert path.startswith('sponsors/')
-        return request.link(StaticFile(path))
+        return request.link(StaticFile(path, version=request.app.version))
 
     def compiled(self, request, data=None):
         """ Returns an instance of the sponsor with all data localized and
