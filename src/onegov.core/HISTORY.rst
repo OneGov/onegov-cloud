@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.70.6 (2018-06-15)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to version static files to cache them forever.
   [href]
