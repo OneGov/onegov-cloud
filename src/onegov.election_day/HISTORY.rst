@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes importing XLSX files with only one column not working.
+  [msom]
+
 3.5.7 (2018-06-11)
 ~~~~~~~~~~~~~~~~~~~
 

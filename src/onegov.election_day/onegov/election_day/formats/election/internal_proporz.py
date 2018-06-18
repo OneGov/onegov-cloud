@@ -1,4 +1,3 @@
-from csv import excel
 from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
 from onegov.ballot import ElectionResult
@@ -213,7 +212,7 @@ def import_election_internal_proporz(election, principal, file, mimetype):
     filename = _("Results")
     csv, error = load_csv(
         file, mimetype, expected_headers=HEADERS, filename=filename,
-        dialect=excel
+        dialect='excel'
     )
     if error:
         return [error]

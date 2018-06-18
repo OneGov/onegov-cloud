@@ -50,9 +50,11 @@ def load_csv(
     if mimetype != 'text/plain':
         try:
             csvfile = convert_xls_to_csv(file, 'Resultate')
+            dialect = 'excel'
         except IOError:
             try:
                 csvfile = convert_xls_to_csv(file)
+                dialect = 'excel'
             except XLRDError:
                 error = FileImportError(
                     _("Not a valid xls/xlsx file."),

@@ -1,4 +1,3 @@
-from csv import excel
 from onegov.ballot import BallotResult
 from onegov.election_day import _
 from onegov.election_day.formats.common import BALLOT_TYPES
@@ -30,7 +29,7 @@ def import_vote_internal(vote, principal, file, mimetype):
 
     """
     csv, error = load_csv(
-        file, mimetype, expected_headers=HEADERS, dialect=excel
+        file, mimetype, expected_headers=HEADERS, dialect='excel'
     )
     if error:
         return [error]
