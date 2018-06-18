@@ -4,6 +4,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.abstract import Associable
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON
+from onegov.core.utils import normalize_for_url
 from onegov.file.attachments import ProcessedUploadedFile
 from onegov.file.filters import OnlyIfImage, WithThumbnailFilter
 from sqlalchemy import Column, Index, Text
@@ -48,6 +49,9 @@ class File(Base, Associable, TimestampMixin):
     #: a short note about the file (for captions, other information)
     note = Column(Text, nullable=True)
 
+    #: the default order of files
+    order = Column(Text, nullable=False)
+
     #: the type of the file, this can be used to create custom polymorphic
     #: subclasses. See `<http://docs.sqlalchemy.org/en/improve_toc/
     #: orm/extensions/declarative/inheritance.html>`_.
@@ -85,12 +89,16 @@ class File(Base, Associable, TimestampMixin):
     }
 
     __table_args__ = (
-        Index('files_by_type_and_name', 'type', 'name'),
+        Index('files_by_type_and_order', 'type', 'order'),
     )
 
     @observes('reference')
     def reference_observer(self, reference):
         self.checksum = self.reference.get('checksum')
+
+    @observes('name')
+    def name_observer(self, name):
+        self.order = normalize_for_url(name)
 
     @property
     def file_id(self):

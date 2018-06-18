@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a default order to the files.
+  [href]
+
 - Migrates the metadata storage to JSONB.
   [href]
 

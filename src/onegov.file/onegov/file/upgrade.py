@@ -7,6 +7,7 @@ from onegov.core.upgrade import upgrade_task
 from onegov.file import FileCollection
 from onegov.file.attachments import get_svg_size_or_default
 from onegov.file.utils import get_image_size
+from onegov.core.utils import normalize_for_url
 from PIL import Image
 from sqlalchemy import Column, Text
 from sqlalchemy.orm.attributes import flag_modified
@@ -67,3 +68,16 @@ def migrate_file_metadata_to_jsonb(context):
         ALTER COLUMN reference
         TYPE JSONB USING reference::jsonb
     """)
+
+
+@upgrade_task('Add order')
+def add_order(context):
+    context.operations.drop_index('files_by_type_and_name')
+
+    context.add_column_with_defaults(
+        table='files',
+        column=Column('order', Text, nullable=False),
+        default=lambda r: normalize_for_url(r.name))
+
+    context.operations.create_index(
+        'files_by_type_and_order', 'files', ['type', 'order'])
