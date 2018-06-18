@@ -11,6 +11,7 @@ from onegov.core.utils import scan_morepath_modules
 from onegov.search import ElasticsearchApp, ORMSearchable
 from sqlalchemy import Boolean, Column, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base
+from time import sleep
 from webtest import TestApp as Client
 
 
@@ -706,6 +707,8 @@ def test_date_decay(es_url, postgres_dsn):
     two.created = sedate.utcnow() - timedelta(days=30)
 
     transaction.commit()
+
+    sleep(1.0)  # travis needs some time to catch-up, no problem locally
 
     assert search("Dokument")[0].meta.id == '1'
     assert search("Dokument")[1].meta.id == '2'
