@@ -4,7 +4,7 @@ matrix:
   include:
     - language: python
       python: "3.6"
-      env: TOXENV=py36 ES_VERSION=5.6.0 DEPLOY=yes
+      env: TOXENV=py36 DEPLOY=yes
 
     - language: python
       python: "3.6"
