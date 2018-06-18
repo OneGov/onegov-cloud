@@ -13,7 +13,7 @@ addons:
       - google-chrome-stable
 
 env:
-    - TOXENV=py36 DEPLOY=yes ES_VERSION=5.6.0
+    - TOXENV=py36 DEPLOY=yes
     - TOXENV=pep8
 
 install: ./.travis-install.sh
