@@ -1,9 +1,12 @@
 """ Contains the models describing files and images. """
 
+import sedate
+
+from cached_property import cached_property
 from collections import namedtuple
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from itertools import groupby
+from itertools import chain, groupby
 from onegov.core.orm import as_selectable
 from onegov.core.orm.mixins import meta_property
 from onegov.file import File, FileSet, FileCollection, FileSetCollection
@@ -160,29 +163,35 @@ class GeneralFileCollection(FileCollection, GroupFilesByDateMixin):
         SELECT
             id,                             -- Text
             name,                           -- Text
-            CAST(
-                reference->>'uploaded_at'
-                AS timestamp
-            )   AT TIME ZONE 'UTC'
-                AS upload_date,             -- UTCDateTime
+            "order",                        -- Text
+            created as upload_date,         -- UTCDateTime
             reference->>'content_type'
                 AS content_type             -- Text
         FROM files
         WHERE type = 'general'
     """)
 
-    def __init__(self, session, order_by='name', direction='ascending'):
+    def __init__(self, session, order_by='name'):
         super().__init__(session, type='general', allow_duplicates=False)
 
         self.order_by = order_by
-        self.direction = direction
+        self.direction = order_by == 'name' and 'ascending' or 'descending'
+
+        self._last_interval = None
+
+    def for_order(self, order):
+        return self.__class__(self.session, order_by=order)
+
+    @cached_property
+    def intervals(self):
+        return tuple(self.get_date_intervals(today=sedate.utcnow()))
 
     @property
     def statement(self):
         stmt = select(self.file_list.c)
 
         if self.order_by == 'name':
-            order = self.file_list.c.name
+            order = self.file_list.c.order
         else:
             order = self.file_list.c.upload_date
 
@@ -193,6 +202,31 @@ class GeneralFileCollection(FileCollection, GroupFilesByDateMixin):
     @property
     def files(self):
         return self.session.execute(self.statement)
+
+    def group(self, record):
+        if self.order_by == 'name':
+            if record.order[0].isdigit():
+                return '0-9'
+
+            return record.order[0].upper()
+        else:
+            if self._last_interval:
+                intervals = chain((self._last_interval, ), self.intervals)
+            else:
+                intervals = self.intervals
+
+            for interval in intervals:
+                if interval.start <= record.upload_date <= interval.end:
+                    break
+            else:
+                return _("Older")
+
+            # this method is usually called for each item in a sorted set,
+            # we optimise for that by caching the last matching interval
+            # and checking that one first the next time
+            self._last_interval = interval
+
+            return interval.name
 
 
 class ImageFileCollection(FileCollection, GroupFilesByDateMixin):

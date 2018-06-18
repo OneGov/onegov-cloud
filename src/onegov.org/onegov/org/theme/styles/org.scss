@@ -4509,6 +4509,24 @@ h2 + div.timeline {
 .files {
     table-layout: fixed;
 
+    th {
+        padding-top: 2rem;
+    }
+
+    tr:first-child th {
+        padding-top: 1rem;
+    }
+
+    th span {
+        @include circle;
+        @include label($bg: $white);
+        @include primary-color-background;
+
+        border: 1px solid $primary-color;
+        font-size: .875rem;
+        font-weight: bold;
+    }
+
     .file-icon {
         width: 48px;
     }

@@ -36,7 +36,7 @@ def view_get_file_collection(self, request):
             id=f.id,
             upload_date=f.upload_date,
             content_type=f.content_type,
-            group='0-9' if f.name[0].isdigit() else f.name[0].upper()
+            group=self.group(f)
         )
         for f in self.files
     )
