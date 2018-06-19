@@ -1,12 +1,13 @@
 from onegov.core import Framework, utils
 from onegov.core.filestorage import FilestorageFile
 from onegov.file import DepotApp
+from onegov.form import FormApp
 from onegov.gazette.models import Principal
 from onegov.gazette.theme import GazetteTheme
 from onegov.quill import QuillApp
 
 
-class GazetteApp(Framework, DepotApp, QuillApp):
+class GazetteApp(Framework, DepotApp, QuillApp, FormApp):
     """ The gazette application. Include this in your onegov.yml to serve
     it with onegov-server.
 
