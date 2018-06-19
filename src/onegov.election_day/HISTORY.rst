@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.5.9 (2018-06-19)
+~~~~~~~~~~~~~~~~~~~
 
 - Add compatibility with wtforms 2.2.
   [msom]
