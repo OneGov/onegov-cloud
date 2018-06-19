@@ -13,9 +13,10 @@ from onegov.election_day.directives import ManageFormAction
 from onegov.election_day.directives import ManageHtmlAction
 from onegov.election_day.models import Principal
 from onegov.election_day.theme import ElectionDayTheme
+from onegov.form import FormApp
 
 
-class ElectionDayApp(Framework):
+class ElectionDayApp(Framework, FormApp):
     """ The election day application. Include this in your onegov.yml to serve
     it with onegov-server.
 
