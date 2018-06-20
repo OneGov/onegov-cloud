@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.3.1 (2018-06-20)
+~~~~~~~~~~~~~~~~~~~~~
 
 - Fixes JavaScript error.
   [msom]
