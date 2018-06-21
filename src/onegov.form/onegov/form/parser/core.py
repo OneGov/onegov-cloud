@@ -716,7 +716,7 @@ class OptionsField(object):
 
     def parse(self, value):
         if isinstance(value, str):
-            return [v.strip() for v in value.split(',')]
+            return [v.strip() for v in value.split('\n')]
 
         return value
 

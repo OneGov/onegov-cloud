@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Parses options using newlines instead of commas.
+  [href]
+
 0.33.4 (2018-06-21)
 ~~~~~~~~~~~~~~~~~~~
 
