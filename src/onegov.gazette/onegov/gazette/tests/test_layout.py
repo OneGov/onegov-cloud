@@ -81,32 +81,33 @@ def test_layout_menu():
 
     request._is_personal = True
     assert layout.menu == [
-        (
-            'My Drafted and Submitted Official Notices',
-            '/DummyPrincipal/dashboard/',
-            False
-        ),
-        ('My Published Official Notices', '/GazetteNoticeCollection/', False)
+        ('Dashboard', '/DummyPrincipal/dashboard/', False, []),
+        ('Published Official Notices', '/GazetteNoticeCollection/', False, [])
     ]
 
     request._is_private = True
     assert layout.menu == [
-        ('Official Notices', '/GazetteNoticeCollection/', False),
-        ('Statistics', '/GazetteNoticeCollection/statistics/', False),
-        ('Issues', '/IssueCollection/', False),
-        ('Organizations', '/OrganizationCollection/', False),
-        ('Categories', '/CategoryCollection/', False),
+        ('Official Notices', '/GazetteNoticeCollection/', False, []),
+        ('Manage', None, False, [
+            ('Issues', '/IssueCollection/', False, []),
+            ('Organizations', '/OrganizationCollection/', False, []),
+            ('Categories', '/CategoryCollection/', False, []),
+
+        ]),
+        ('Statistics', '/GazetteNoticeCollection/statistics/', False, []),
     ]
 
     request._is_secret = True
     assert layout.menu == [
-        ('Official Notices', '/GazetteNoticeCollection/', False),
-        ('Statistics', '/GazetteNoticeCollection/statistics/', False),
-        ('Issues', '/IssueCollection/', False),
-        ('Organizations', '/OrganizationCollection/', False),
-        ('Categories', '/CategoryCollection/', False),
-        ('Users', '/UserCollection/', False),
-        ('Groups', '/UserGroupCollection/', False),
+        ('Official Notices', '/GazetteNoticeCollection/', False, []),
+        ('Manage', None, False, [
+            ('Issues', '/IssueCollection/', False, []),
+            ('Organizations', '/OrganizationCollection/', False, []),
+            ('Categories', '/CategoryCollection/', False, []),
+            ('Groups', '/UserGroupCollection/', False, []),
+            ('Users', '/UserCollection/', False, []),
+        ]),
+        ('Statistics', '/GazetteNoticeCollection/statistics/', False, []),
     ]
 
 

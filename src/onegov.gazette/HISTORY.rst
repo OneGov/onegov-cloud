@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Reorganizes the backend menu.
+  [msom]
+
 - Adds import/export for issues, categories and organizations.
   [msom]
 

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-21 08:36+0200\n"
-"PO-Revision-Date: 2018-06-21 08:36+0200\n"
+"POT-Creation-Date: 2018-06-21 09:51+0200\n"
+"PO-Revision-Date: 2018-06-21 09:49+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -76,19 +76,22 @@ msgstr "Nr. ${issue_number}, ${issue_date}"
 msgid "Official Notices"
 msgstr "Meldungen"
 
+msgid "Manage"
+msgstr "Verwalten"
+
 msgid "Statistics"
 msgstr "Statistiken"
-
-msgid "Users"
-msgstr "Benutzer"
 
 msgid "Groups"
 msgstr "Gruppen"
 
-msgid "My Drafted and Submitted Official Notices"
+msgid "Users"
+msgstr "Benutzer"
+
+msgid "Dashboard"
 msgstr "Offene Meldungen"
 
-msgid "My Published Official Notices"
+msgid "Published Official Notices"
 msgstr "Veröffentlichte Meldungen"
 
 msgid "Gazette"

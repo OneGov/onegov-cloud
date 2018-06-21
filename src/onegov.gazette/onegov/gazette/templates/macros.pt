@@ -110,15 +110,27 @@
 
 <metal:tab_menu define-macro="tab_menu" i18n:domain="onegov.gazette">
     <div class="tab-navigation clearfix" tal:condition="layout.menu">
-        <nav class="top-bar" data-topbar role="navigation">
+        <nav class="top-bar clearfix" data-topbar data-options="back_text: &lt;; is_hover: false; mobile_show_parent_link: false" role="navigation">
             <ul class="title-area">
                 <li class="name menu-icon"><span>${layout.title()}</span></li>
                 <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
             </ul>
             <section class="top-bar-section">
                 <ul class="left">
-                    <tal:block repeat="item layout.menu">
-                        <li tal:attributes="class 'active' if item[2] else ''"><a href="${item[1]}">${item[0]}</a></li>
+                    <tal:block repeat="(title, link, active, submenu) layout.menu">
+                        <li tal:condition="not submenu" tal:attributes="class 'active' if active else ''">
+                            <a href="${link}">${title}</a>
+                        </li>
+                        <li tal:condition="submenu" tal:attributes="class 'has-dropdown active' if active else 'has-dropdown'">
+                            <a href="#">${title}</a>
+                            <ul class="dropdown">
+                                <tal:block repeat="(title, link, active, submenu) submenu">
+                                    <li tal:attributes="class 'active' if active else ''">
+                                        <a href="${link}">${title}</a>
+                                    </li>
+                                </tal:block>
+                            </ul>
+                        </li>
                     </tal:block>
                 </ul>
             </section>

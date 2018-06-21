@@ -140,7 +140,7 @@ def view_notices(self, request):
     if not is_publisher:
         self.user_ids, self.group_ids = get_user_and_group(request)
         filters = None
-        title = _("My Published Official Notices")
+        title = _("Published Official Notices")
 
     return {
         'layout': layout,

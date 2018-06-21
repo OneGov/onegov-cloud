@@ -137,80 +137,95 @@ class Layout(ChameleonLayout):
         result = []
 
         if self.request.is_private(self.model):
-            # Publisher
-            active = (
-                isinstance(self.model, GazetteNoticeCollection) and
-                'statistics' not in self.request.url
-            )
+            # Publisher and Admin
             result.append((
                 _("Official Notices"),
                 self.manage_notices_link,
-                active
+                (
+                    isinstance(self.model, GazetteNoticeCollection) and
+                    'statistics' not in self.request.url
+                ),
+                []
             ))
 
             active = (
-                isinstance(self.model, GazetteNoticeCollection) and
-                'statistics' in self.request.url
+                isinstance(self.model, IssueCollection) or
+                isinstance(self.model, OrganizationCollection) or
+                isinstance(self.model, CategoryCollection)
             )
-            link = self.request.link(
-                GazetteNoticeCollection(self.session, state='accepted'),
-                name='statistics'
-            )
+            manage = [
+                (
+                    _("Issues"),
+                    self.manage_issues_link,
+                    isinstance(self.model, IssueCollection),
+                    []
+                ),
+                (
+                    _("Organizations"),
+                    self.manage_organizations_link,
+                    isinstance(self.model, OrganizationCollection),
+                    []
+                ),
+                (
+                    _("Categories"),
+                    self.manage_categories_link,
+                    isinstance(self.model, CategoryCollection),
+                    []
+                )
+            ]
+            if self.request.is_secret(self.model):
+                # Admin
+                active = (
+                    active or
+                    isinstance(self.model, UserCollection) or
+                    isinstance(self.model, UserGroupCollection)
+                )
+                manage.append((
+                    _("Groups"),
+                    self.manage_groups_link,
+                    isinstance(self.model, UserGroupCollection),
+                    []
+                ))
+                manage.append((
+                    _("Users"),
+                    self.manage_users_link,
+                    isinstance(self.model, UserCollection),
+                    []
+                ))
+            result.append((_("Manage"), None, active, manage))
+
             result.append((
                 _("Statistics"),
-                link,
-                active
-            ))
-
-            active = isinstance(self.model, IssueCollection)
-            result.append((
-                _("Issues"), self.manage_issues_link, active
-            ))
-
-            active = isinstance(self.model, OrganizationCollection)
-            result.append((
-                _("Organizations"), self.manage_organizations_link, active
-            ))
-
-            active = isinstance(self.model, CategoryCollection)
-            result.append((
-                _("Categories"), self.manage_categories_link, active
+                self.request.link(
+                    GazetteNoticeCollection(self.session, state='accepted'),
+                    name='statistics'
+                ),
+                (
+                    isinstance(self.model, GazetteNoticeCollection) and
+                    'statistics' in self.request.url
+                ),
+                []
             ))
 
         elif self.request.is_personal(self.model):
             # Editor
-            active = isinstance(self.model, Principal)
             result.append((
-                _("My Drafted and Submitted Official Notices"),
+                _("Dashboard"),
                 self.dashboard_link,
-                active
+                isinstance(self.model, Principal),
+                []
             ))
 
-            state = 'published' if self.publishing else 'accepted'
-            active = isinstance(self.model, GazetteNoticeCollection)
-            link = self.request.link(
-                GazetteNoticeCollection(self.session, state=state)
-            )
             result.append((
-                _("My Published Official Notices"),
-                link,
-                active
-            ))
-
-        if self.request.is_secret(self.model):
-            # Admin
-            active = isinstance(self.model, UserCollection)
-            result.append((
-                _("Users"),
-                self.manage_users_link,
-                active
-            ))
-
-            active = isinstance(self.model, UserGroupCollection)
-            result.append((
-                _("Groups"),
-                self.manage_groups_link,
-                active
+                _("Published Official Notices"),
+                self.request.link(
+                    GazetteNoticeCollection(
+                        self.session,
+                        state='published' if self.publishing else 'accepted'
+                    )
+                ),
+                isinstance(self.model, GazetteNoticeCollection),
+                []
             ))
 
         return result
