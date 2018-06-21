@@ -22,6 +22,9 @@ Changelog
 - Adds an option for disabling publishing.
   [msom]
 
+- Resizes chosen responsively.
+  [msom]
+
 1.13.17 (2018-05-15)
 ~~~~~~~~~~~~~~~~~~~~
 
