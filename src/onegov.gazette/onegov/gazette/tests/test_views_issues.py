@@ -45,11 +45,11 @@ def test_view_issues(gazette_app):
         assert '2019-1' in manage
         upcoming_issues = [
             [td.text.strip() for td in pq(tr)('td')]
-            for tr in manage.pyquery('table.issues.upcoming tbody tr')
+            for tr in manage.pyquery('#panel_upcoming table.issues tbody tr')
         ]
         past_issues = [
             [td.text.strip() for td in pq(tr)('td')]
-            for tr in manage.pyquery('table.issues.past tbody tr')
+            for tr in manage.pyquery('#panel_past table.issues tbody tr')
         ]
         assert upcoming_issues == [
             ['2017-44', '03.11.2017', 'Mittwoch 01.11.2017 13:00', '', ''],
@@ -95,11 +95,11 @@ def test_view_issues(gazette_app):
 
         upcoming_issues = [
             [td.text.strip() for td in pq(tr)('td')]
-            for tr in manage.pyquery('table.issues.upcoming tbody tr')
+            for tr in manage.pyquery('#panel_upcoming table.issues tbody tr')
         ]
         past_issues = [
             [td.text.strip() for td in pq(tr)('td')]
-            for tr in manage.pyquery('table.issues.past tbody tr')
+            for tr in manage.pyquery('#panel_past table.issues tbody tr')
         ]
         assert upcoming_issues == [
             ['2017-44', '02.11.2017', 'Mittwoch 01.11.2017 12:00', '', ''],
