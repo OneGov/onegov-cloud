@@ -7,8 +7,10 @@ from collections import namedtuple
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from itertools import chain, groupby
+from mimetypes import guess_extension
 from onegov.core.orm import as_selectable
 from onegov.core.orm.mixins import meta_property
+from onegov.core.templates import render_macro
 from onegov.file import File, FileSet, FileCollection, FileSetCollection
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.org import _
@@ -19,6 +21,23 @@ from sqlalchemy import asc, desc, select
 
 
 DateInterval = namedtuple('DateInterval', ('name', 'start', 'end'))
+
+
+class FileIcon(object):
+
+    def __init__(self, extension, variant='normal'):
+        self.extension = extension
+        self.variant = variant
+
+    @classmethod
+    def from_content_type(cls, content_type, variant='normal'):
+        return cls(guess_extension(content_type, strict=False), variant)
+
+    def render(self, layout):
+        return render_macro(layout.svg['fileicon'], layout.request, {
+            'extension': self.extension,
+            'variant': self.variant
+        })
 
 
 class GroupFilesByDateMixin(object):
