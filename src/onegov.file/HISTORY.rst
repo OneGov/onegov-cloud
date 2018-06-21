@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.6.0 (2018-06-21)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a default order to the files.
   [href]
 
