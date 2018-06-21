@@ -24,7 +24,7 @@ def test_view_principal(gazette_app):
 
 def test_view_archive(gazette_app):
     principal = gazette_app.principal
-    principal.show_archive = True
+    principal.frontend = True
     gazette_app.cache.set('principal', principal)
 
     with freeze_time("2017-11-01 12:00"):

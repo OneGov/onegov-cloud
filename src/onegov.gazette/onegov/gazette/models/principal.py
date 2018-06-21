@@ -13,7 +13,7 @@ class Principal(object):
         publish_from='',
         time_zone='Europe/Zurich',
         help_link='',
-        show_archive=False
+        frontend=False
     ):
         self.name = name
         self.logo = logo
@@ -22,7 +22,7 @@ class Principal(object):
         self.publish_from = publish_from
         self.time_zone = time_zone
         self.help_link = help_link
-        self.show_archive = show_archive
+        self.frontend = frontend
 
     @classmethod
     def from_yaml(cls, yaml_source):

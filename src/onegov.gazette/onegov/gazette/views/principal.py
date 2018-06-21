@@ -33,7 +33,7 @@ def view_principal(self, request):
     if request.is_personal(self):
         return redirect(layout.dashboard_link)
 
-    if not request.app.principal.show_archive:
+    if not request.app.principal.frontend:
         return redirect(layout.login_link)
 
     return redirect(request.link(self, name='archive'))
