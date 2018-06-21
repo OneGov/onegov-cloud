@@ -69,9 +69,6 @@ def migrate_file_metadata_to_jsonb(context):
         TYPE JSONB USING reference::jsonb
     """)
 
-
-@upgrade_task('Add order')
-def add_order(context):
     context.operations.drop_index('files_by_type_and_name')
 
     context.add_column_with_defaults(
