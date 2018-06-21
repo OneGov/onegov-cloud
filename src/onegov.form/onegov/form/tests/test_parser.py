@@ -266,6 +266,25 @@ def test_parse_radio():
     assert form.gender.default == 'Female'
 
 
+def test_parse_radio_escape():
+
+    text = dedent("""
+        # "For sure"
+        Let's go =
+            ( ) Yeah, let's
+            (x) No, let's not
+    """)
+
+    form = parse_form(text)()
+
+    assert len(form._fields) == 1
+    assert form.for_sure_let_s_go.choices == [
+        ("Yeah, let's", "Yeah, let's"),
+        ("No, let's not", "No, let's not"),
+    ]
+    assert form.for_sure_let_s_go.default == "No, let's not"
+
+
 def test_parse_checkbox():
 
     text = dedent("""

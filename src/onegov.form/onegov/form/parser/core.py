@@ -886,13 +886,19 @@ def translate_to_yaml(text):
     actual_fields = 0
     ix = 0
 
+    def escape_single(text):
+        return text.replace("'", "''")
+
+    def escape_double(text):
+        return text.replace('"', '\\"')
+
     for ix, line in lines:
 
         indent = ' ' * (4 + (len(line) - len(line.lstrip())))
 
         # the top level are the fieldsets
         if match(ELEMENTS.fieldset_title, line):
-            yield '- "{}":'.format(line.lstrip('# ').rstrip())
+            yield '- "{}":'.format(escape_double(line.lstrip('# ').rstrip()))
             expect_nested = False
             continue
 
@@ -906,8 +912,8 @@ def translate_to_yaml(text):
             yield '{indent}- "{identifier}": !{type} \'{definition}\''.format(
                 indent=indent,
                 type=parse_result.type,
-                identifier=line.split('=')[0].strip(),
-                definition=line.split('=')[1].strip()
+                identifier=escape_double(line.split('=')[0].strip()),
+                definition=escape_single(line.split('=')[1].strip())
             )
             expect_nested = len(indent) > 4
             actual_fields += 1
@@ -923,7 +929,7 @@ def translate_to_yaml(text):
             yield '{indent}- !{type} \'{definition}\':'.format(
                 indent=indent,
                 type=parse_result.type,
-                definition=line.strip()
+                definition=escape_single(line.strip())
             )
             continue
 
@@ -936,7 +942,7 @@ def translate_to_yaml(text):
 
             yield '{indent}- "{identifier}":'.format(
                 indent=indent,
-                identifier=line.strip()
+                identifier=escape_double(line.strip())
             )
 
             expect_nested = True

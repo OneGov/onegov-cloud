@@ -13,7 +13,7 @@ original_html_params = wtforms.widgets.core.html_params
 
 
 def as_internal_id(label):
-    clean = unidecode(label).strip(' ').lower()
+    clean = unidecode(label).strip(' \"\'').lower()
     clean = _unwanted_characters.sub('_', clean)
 
     return clean
