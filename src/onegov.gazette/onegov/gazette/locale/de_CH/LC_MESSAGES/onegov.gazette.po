@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-28 08:30+0200\n"
-"PO-Revision-Date: 2018-05-28 08:30+0200\n"
+"POT-Creation-Date: 2018-06-21 08:36+0200\n"
+"PO-Revision-Date: 2018-06-21 08:36+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.0.7\n"
+"X-Generator: Poedit 2.0.8\n"
 
 msgid "Group"
 msgstr "Gruppe"
@@ -31,6 +31,9 @@ msgstr "Titel"
 
 msgid "Active"
 msgstr "Aktiv"
+
+msgid "External ID"
+msgstr "Externe ID"
 
 msgid "Parent Organization"
 msgstr "Übergeordnete Organisation"
@@ -162,9 +165,6 @@ msgstr "Ja"
 
 msgid "Select one"
 msgstr "Bitte auswählen"
-
-msgid "External ID"
-msgstr "Externe ID"
 
 msgid "- none -"
 msgstr "- keine -"
@@ -309,6 +309,15 @@ msgid "Your official notice has been rejected:"
 msgstr ""
 "Ihr Inserat für den amtlichen Teil des Amtsblatts wurde zurückgewiesen:"
 
+msgid "Dear Publisher,"
+msgstr "Sehr geehrte Amtsblattredaktion"
+
+msgid "Please publish the following official notice:"
+msgstr "Bitte publizieren Sie folgendes Inserat für den amtlichen Teil"
+
+msgid "Attachments"
+msgstr "Anhänge"
+
 msgid "Dear Sir or Madam,"
 msgstr "Sehr geehrte Dame, sehr geehrter Herr"
 
@@ -321,15 +330,6 @@ msgid "If you don't want to change your password, you can ignore this email."
 msgstr ""
 "Sie können dieses E-Mail ignorieren, falls Sie Ihr Passwort nicht ändern "
 "möchten."
-
-msgid "Dear Publisher,"
-msgstr "Sehr geehrte Amtsblattredaktion"
-
-msgid "Please publish the following official notice:"
-msgstr "Bitte publizieren Sie folgendes Inserat für den amtlichen Teil"
-
-msgid "Attachments"
-msgstr "Anhänge"
 
 msgid "Your user account has been created."
 msgstr ""
@@ -531,6 +531,9 @@ msgstr "Es können nur unbenutzte Ausgaben gelöscht werden."
 
 msgid "Issue deleted."
 msgstr "Ausgabe gelöscht."
+
+msgid "Publishing is disabled."
+msgstr "Veröffentlichung ist deaktiviert."
 
 msgid "There are submitted notices for this issue!"
 msgstr "Diese Ausgabe hat eingereichte Meldungen!"

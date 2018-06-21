@@ -709,3 +709,27 @@ def test_view_notices_update(gazette_app):
         assert 'Edurcatio' not in manage
         assert 'State Chancellery' in manage
         assert 'Sate Chancelery' not in manage
+
+
+def test_view_notices_publishing_disabled(gazette_app):
+    client = Client(gazette_app)
+    login_publisher(client)
+
+    assert "notices/published" in client.get('/notices/drafted')
+    assert "notices/published" in client.get('/notices/drafted/statistics')
+
+    principal = gazette_app.principal
+    principal.publishing = False
+    gazette_app.cache.set('principal', principal)
+
+    assert "notices/rejected" in client.get('/notices/drafted')
+    assert "notices/published" not in client.get('/notices/drafted')
+
+    assert "notices/rejected" in client.get('/notices/published')
+    assert "notices/published" in client.get('/notices/published')
+
+    assert "notices/rejected" in client.get('/notices/drafted/statistics')
+    assert "notices/published" not in client.get('/notices/drafted/statistics')
+
+    assert "notices/rejected" in client.get('/notices/published/statistics')
+    assert "notices/published" in client.get('/notices/published/statistics')

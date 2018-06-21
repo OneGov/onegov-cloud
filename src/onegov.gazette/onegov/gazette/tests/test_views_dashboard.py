@@ -207,3 +207,20 @@ def test_view_dashboard(gazette_app):
         assert "<h3>Zurückgewiesen</h3>" not in manage
         assert "<h3>in Arbeit</h3>" in manage
         assert "<h3>Eingereicht</h3>" not in manage
+
+
+def test_view_dashboard_publishing_disabled(gazette_app):
+    editor = Client(gazette_app)
+    login_editor_1(editor)
+
+    manage = editor.get('/').maybe_follow()
+    assert "notices/accepted" not in manage
+    assert "notices/published" in manage
+
+    principal = gazette_app.principal
+    principal.publishing = False
+    gazette_app.cache.set('principal', principal)
+
+    manage = editor.get('/').maybe_follow()
+    assert "notices/accepted" in manage
+    assert "notices/published" not in manage

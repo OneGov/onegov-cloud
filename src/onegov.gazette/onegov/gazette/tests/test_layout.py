@@ -8,6 +8,11 @@ from pytest import raises
 from sedate import standardize_date
 
 
+class DummyPrincipal(object):
+    def __init__(self, publishing=True):
+        self.publishing = publishing
+
+
 class DummyApp(object):
     def __init__(self, session, principal):
         self._session = session
@@ -69,14 +74,18 @@ def test_sortable_url_template():
 
 
 def test_layout_menu():
-    request = DummyRequest(None)
+    request = DummyRequest(None, DummyPrincipal())
     layout = Layout(None, request)
 
     assert layout.menu == []
 
     request._is_personal = True
     assert layout.menu == [
-        ('My Drafted and Submitted Official Notices', '/dashboard/', False),
+        (
+            'My Drafted and Submitted Official Notices',
+            '/DummyPrincipal/dashboard/',
+            False
+        ),
         ('My Published Official Notices', '/GazetteNoticeCollection/', False)
     ]
 

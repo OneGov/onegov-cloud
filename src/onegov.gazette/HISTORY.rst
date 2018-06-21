@@ -16,6 +16,9 @@ Changelog
 - Add compatibility with wtforms 2.2.
   [msom]
 
+- Adds an option for disabling publishing.
+  [msom]
+
 1.13.17 (2018-05-15)
 ~~~~~~~~~~~~~~~~~~~~
 

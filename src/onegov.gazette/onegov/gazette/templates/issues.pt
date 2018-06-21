@@ -27,7 +27,7 @@
                             <th i18n:translate>Issue</th>
                             <th i18n:translate>Date</th>
                             <th i18n:translate>Deadline</th>
-                            <th i18n:translate>PDF</th>
+                            <th i18n:translate tal:condition="layout.publishing">PDF</th>
                             <th i18n:translate class="row-actions right-aligned">Actions</th>
                         </tr>
                     </thead>
@@ -40,7 +40,7 @@
                                 <td>${issue.name}</td>
                                 <td>${layout.format_date(issue.date, 'date')}</td>
                                 <td>${layout.format_date(issue.deadline, 'datetime_with_weekday')}</td>
-                                <td>
+                                <td tal:condition="layout.publishing">
                                     <a tal:condition="issue.pdf" href="${request.link(issue.pdf)}">${issue.pdf.name}</a>
                                 </td>
                                 <td class="right-aligned">
@@ -48,7 +48,7 @@
                                         <li>
                                             <a i18n:translate class="action-edit" href="${request.link(issue, 'edit')}">Edit</a>
                                         </li>
-                                        <li>
+                                        <li tal:condition="layout.publishing">
                                             <a i18n:translate class="action-publish" href="${request.link(issue, 'publish')}">Publish</a>
                                         </li>
                                         <li>
@@ -68,7 +68,7 @@
                             <th i18n:translate>Issue</th>
                             <th i18n:translate>Date</th>
                             <th i18n:translate>Deadline</th>
-                            <th i18n:translate>PDF</th>
+                            <th i18n:translate tal:condition="layout.publishing">PDF</th>
                             <th i18n:translate class="row-actions right-aligned">Actions</th>
                         </tr>
                     </thead>
@@ -81,7 +81,7 @@
                                 <td>${issue.name}</td>
                                 <td>${layout.format_date(issue.date, 'date')}</td>
                                 <td>${layout.format_date(issue.deadline, 'datetime_with_weekday')}</td>
-                                <td>
+                                <td tal:condition="layout.publishing">
                                     <a tal:condition="issue.pdf" href="${request.link(issue.pdf)}">${issue.pdf.name}</a>
                                 </td>
                                 <td class="right-aligned">
@@ -89,7 +89,7 @@
                                         <li>
                                             <a i18n:translate class="action-edit" href="${request.link(issue, 'edit')}">Edit</a>
                                         </li>
-                                        <li>
+                                        <li tal:condition="layout.publishing">
                                             <a i18n:translate class="action-publish" href="${request.link(issue, 'publish')}">Publish</a>
                                         </li>
                                         <li>

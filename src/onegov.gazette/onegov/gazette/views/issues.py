@@ -176,6 +176,16 @@ def publish_issue(self, request, form):
 
     """
 
+    layout = Layout(self, request)
+    if not layout.publishing:
+        return {
+            'layout': layout,
+            'title': self.name,
+            'subtitle': _("Publish"),
+            'callout': _("Publishing is disabled."),
+            'show_form': False
+        }
+
     if self.notices('submitted').first():
         request.message(
             _("There are submitted notices for this issue!"), 'warning'
@@ -192,7 +202,6 @@ def publish_issue(self, request, form):
             'warning'
         )
 
-    layout = Layout(self, request)
     if form.submitted(request):
         self.publish(request)
         request.message(_("Issue published."), 'success')

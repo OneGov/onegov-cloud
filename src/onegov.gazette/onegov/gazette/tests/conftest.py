@@ -46,6 +46,7 @@ PRINCIPAL = """
     logo: 'govikon.svg'
     on_accept:
         mail_to: 'printer@onegov.org'
+    publishing: True
 """
 
 

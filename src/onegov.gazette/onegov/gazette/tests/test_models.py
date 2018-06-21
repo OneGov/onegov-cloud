@@ -428,6 +428,7 @@ def test_principal():
     assert principal.color == '#aabbcc'
     assert principal.logo == 'logo.svg'
     assert principal.on_accept == {}
+    assert principal.publishing is False
     assert principal.frontend is False
 
     principal = Principal.from_yaml(dedent("""
@@ -438,6 +439,7 @@ def test_principal():
             mail_to: 'printer@govikon.org'
             mail_from: 'publisher@govikon.org'
         help_link: 'https://help.me'
+        publishing: True
         frontend: True
     """))
     assert principal.name == 'Govikon'
@@ -448,6 +450,7 @@ def test_principal():
         'mail_from': 'publisher@govikon.org'
     }
     assert principal.help_link == 'https://help.me'
+    assert principal.publishing is True
     assert principal.frontend is True
 
 

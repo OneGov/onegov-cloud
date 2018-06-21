@@ -128,6 +128,10 @@ class Layout(ChameleonLayout):
             self.request.link(OrganizationMove.for_url_template())
         )
 
+    @cached_property
+    def publishing(self):
+        return self.request.app.principal.publishing
+
     @property
     def menu(self):
         result = []
@@ -182,9 +186,10 @@ class Layout(ChameleonLayout):
                 active
             ))
 
+            state = 'published' if self.publishing else 'accepted'
             active = isinstance(self.model, GazetteNoticeCollection)
             link = self.request.link(
-                GazetteNoticeCollection(self.session, state='published')
+                GazetteNoticeCollection(self.session, state=state)
             )
             result.append((
                 _("My Published Official Notices"),

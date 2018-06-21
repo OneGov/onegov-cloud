@@ -329,6 +329,31 @@ def test_view_issues_publish(gazette_app):
         assert '<li>Nr. 45, 10.11.2017</li>' in notice_2  # submitted
 
 
+def test_view_issues_publish_disabled(gazette_app):
+    client = Client(gazette_app)
+    login_publisher(client)
+
+    manage = client.get('/issues')
+    assert "PDF" in manage
+    assert "Veröffentlichen" in manage
+
+    manage = client.get('/issue/2017-40/publish')
+    assert "Veröffentlichung ist deaktiviert." not in manage
+    assert 'form' in manage
+
+    principal = gazette_app.principal
+    principal.publishing = False
+    gazette_app.cache.set('principal', principal)
+
+    manage = client.get('/issues')
+    assert "PDF" not in manage
+    assert "Veröffentlichen" not in manage
+
+    manage = client.get('/issue/2017-40/publish')
+    assert "Veröffentlichung ist deaktiviert." in manage
+    assert 'form' not in manage
+
+
 def test_view_issues_export(gazette_app):
     client = Client(gazette_app)
 
