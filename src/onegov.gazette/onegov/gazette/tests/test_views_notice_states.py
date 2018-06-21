@@ -215,7 +215,7 @@ def test_view_notice_accept(gazette_app):
         assert '44  Titel 1' in payload
 
         principal = gazette_app.principal
-        principal.publish_from = 'publisher@govikon.ch'
+        principal.on_accept['mail_from'] = 'publisher@govikon.ch'
         gazette_app.cache.set('principal', principal)
 
         change_organization(gazette_app, '400', external_name='xxx')

@@ -14,7 +14,7 @@ from onegov.gazette.views import get_user_and_group
 from webob.exc import HTTPForbidden
 
 
-def send_publish_mail(request, notice):
+def send_accepted_mail(request, notice):
     """ Sends a mail to the publisher with the contents of the notice.
 
     We use named temporary files because the files stored by depot does not
@@ -42,13 +42,13 @@ def send_publish_mail(request, notice):
         )
 
     reply_to = (
-        request.app.principal.publish_from or
+        request.app.principal.on_accept.get('mail_from') or
         request.app.mail['transactional']['sender']
     )
 
     subject = construct_subject(notice, request)
     content = render_template(
-        'mail_publish.pt',
+        'mail_on_accept.pt',
         request,
         {
             'title': subject,
@@ -66,7 +66,7 @@ def send_publish_mail(request, notice):
 
     request.app.send_transactional_email(
         subject=subject,
-        receivers=(request.app.principal.publish_to, ),
+        receivers=(request.app.principal.on_accept['mail_to'], ),
         reply_to=reply_to,
         content=content,
         attachments=attachments
@@ -177,8 +177,8 @@ def accept_notice(self, request, form):
     if form.submitted(request):
         self.accept(request)
         request.message(_("Official notice accepted."), 'success')
-        if request.app.principal.publish_to:
-            send_publish_mail(request, self)
+        if request.app.principal.on_accept:
+            send_accepted_mail(request, self)
             self.add_change(request, _("mail sent"))
         return redirect(layout.dashboard_or_notices_link)
 

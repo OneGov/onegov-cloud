@@ -44,7 +44,8 @@ PRINCIPAL = """
     name: Govikon
     color: '#006FB5'
     logo: 'govikon.svg'
-    publish_to: 'printer@onegov.org'
+    on_accept:
+        mail_to: 'printer@onegov.org'
 """
 
 

@@ -9,8 +9,7 @@ class Principal(object):
         name='',
         logo='',
         color='',
-        publish_to='',
-        publish_from='',
+        on_accept=None,
         time_zone='Europe/Zurich',
         help_link='',
         frontend=False
@@ -18,11 +17,12 @@ class Principal(object):
         self.name = name
         self.logo = logo
         self.color = color
-        self.publish_to = publish_to
-        self.publish_from = publish_from
+        self.on_accept = on_accept or {}
         self.time_zone = time_zone
         self.help_link = help_link
         self.frontend = frontend
+
+        assert not self.on_accept or self.on_accept['mail_to']
 
     @classmethod
     def from_yaml(cls, yaml_source):

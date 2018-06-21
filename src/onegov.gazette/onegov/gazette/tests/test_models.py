@@ -423,29 +423,30 @@ def test_principal():
         name: Govikon
         color: '#aabbcc'
         logo: 'logo.svg'
-        publish_to: 'printer@govikon.org'
     """))
     assert principal.name == 'Govikon'
     assert principal.color == '#aabbcc'
     assert principal.logo == 'logo.svg'
-    assert principal.publish_to == 'printer@govikon.org'
-    assert principal.publish_from == ''
+    assert principal.on_accept == {}
     assert principal.frontend is False
 
     principal = Principal.from_yaml(dedent("""
         name: Govikon
         color: '#aabbcc'
         logo: 'logo.svg'
-        publish_to: 'printer@govikon.org'
-        publish_from: 'publisher@govikon.org'
+        on_accept:
+            mail_to: 'printer@govikon.org'
+            mail_from: 'publisher@govikon.org'
         help_link: 'https://help.me'
         frontend: True
     """))
     assert principal.name == 'Govikon'
     assert principal.color == '#aabbcc'
     assert principal.logo == 'logo.svg'
-    assert principal.publish_to == 'printer@govikon.org'
-    assert principal.publish_from == 'publisher@govikon.org'
+    assert principal.on_accept == {
+        'mail_to': 'printer@govikon.org',
+        'mail_from': 'publisher@govikon.org'
+    }
     assert principal.help_link == 'https://help.me'
     assert principal.frontend is True
 
