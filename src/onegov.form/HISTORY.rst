@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.33.4 (2018-06-21)
+~~~~~~~~~~~~~~~~~~~
 
 - Properly escapes single/double quotes in formcode.
   [href]
