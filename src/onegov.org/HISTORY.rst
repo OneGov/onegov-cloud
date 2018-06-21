@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Uses newlines when exporting options, instead of commas.
+  [href]
+
 - Versions the static files for improved caching.
   [href]
 

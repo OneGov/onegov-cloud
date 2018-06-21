@@ -315,7 +315,7 @@ class Layout(ChameleonLayout):
                 if isinstance(value, date):
                     return self.format_date(value, 'date')
                 if isinstance(value, (list, tuple)):
-                    return ', '.join(formatter(v) for v in value)
+                    return '\n'.join(formatter(v) for v in value)
                 if isinstance(value, bool):
                     value = value and _("Yes") or _("No")
                 return default(value)
