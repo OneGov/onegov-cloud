@@ -1,9 +1,11 @@
 """ The onegov org collection of files uploaded to the site. """
 
 import morepath
+import random
 
 from functools import lru_cache
 from itertools import groupby
+from mimetypes import guess_extension
 from onegov.core.filestorage import view_filestorage_file
 from onegov.core.security import Private, Public
 from onegov.file import File, FileCollection
@@ -51,6 +53,12 @@ def view_get_file_collection(self, request):
     def format_date(date):
         return layout.format_date(date, 'datetime')
 
+    @lru_cache(maxsize=len(files) // 4)
+    def extension_for_content_type(content_type):
+        extension = guess_extension(content_type, strict=False) or ''
+
+        return extension.lstrip('.')
+
     grouped = tuple(
         (group, tuple(f for f in files))
         for group, files in groupby(files, key=lambda f: f.group)
@@ -62,7 +70,9 @@ def view_get_file_collection(self, request):
         'grouped': grouped,
         'count': len(files),
         'format_date': format_date,
-        'model': self
+        'model': self,
+        'extension': lambda f: extension_for_content_type(f.content_type),
+        'signed': lambda r: random.uniform(0, 1) > 0.9
     }
 
 

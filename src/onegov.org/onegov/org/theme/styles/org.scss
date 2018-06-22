@@ -4527,12 +4527,28 @@ h2 + div.timeline {
         font-weight: bold;
     }
 
-    .file-icon {
-        width: 48px;
-    }
-
     .file-link {
         width: 80%;
+    }
+
+    .file-extension {
+        color: $monsoon;
+        text-transform: uppercase;
+        width: 32px;
+
+        span {
+            display: inline-block;
+            padding: 1px 6px;
+        }
+
+        &.signed span {
+            @include circle;
+            background: $green-pastel;
+
+            &::after {
+                content: '✔';
+            }
+        }
     }
 
     .file-date {

@@ -21,7 +21,6 @@
                     <tbody>
                         <tal:b repeat="(group, files) grouped">
                             <tr>
-                                <th></th>
                                 <th>
                                     <span tal:condition="model.order_by == 'name'">
                                         ${group}
@@ -33,6 +32,9 @@
 
                                         Name
                                     </a>
+                                </th>
+                                <th i18n:translate>
+                                    Extension
                                 </th>
                                 <th i18n:translate>
                                     <span tal:condition="model.order_by == 'date'">
@@ -49,9 +51,13 @@
                             </tr>
 
                             <tr id="${file.id}" tal:repeat="file files">
-                                <td class="file-icon"></td>
                                 <td class="file-link">
                                     ${structure: file(layout)}
+                                </td>
+                                <td class="file-extension ${signed(file) and 'signed' or ''}">
+                                    <span>
+                                        ${extension(file)}
+                                    </span>
                                 </td>
                                 <td class="file-date">
                                     ${format_date(file.upload_date)}
