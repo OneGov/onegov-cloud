@@ -548,6 +548,9 @@ def get_directory_entries(request, app, directory_name, keywords, page=0,
                           search=None, search_query=None):
     directory = DirectoryCollection(app.session()).by_name(directory_name)
 
+    if not search:
+        search = app.settings.org.default_directory_search_widget
+
     if search and search in app.config.directory_search_widget_registry:
         cls = app.config.directory_search_widget_registry[search]
         searchwidget = cls(request, directory, search_query)

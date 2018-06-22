@@ -278,6 +278,11 @@ def get_is_complete_userprofile_handler():
     return is_complete_userprofile
 
 
+@OrgApp.setting(section='org', name='default_directory_search_widget')
+def get_default_directory_search_widget():
+    return None
+
+
 @OrgApp.webasset_path()
 def get_js_path():
     return 'assets/js'

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to define a default search widget in directories.
+  [href]
+
 - Uses newlines when exporting options, instead of commas.
   [href]
 
