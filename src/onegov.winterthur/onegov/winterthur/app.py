@@ -66,6 +66,11 @@ def get_create_new_organisation_factory():
     return create_new_organisation
 
 
+@OrgApp.setting(section='org', name='default_directory_search_widget')
+def get_default_directory_search_widget():
+    return 'inline'
+
+
 @WinterthurApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs():
     mine = utils.module_path('onegov.winterthur', 'locale')

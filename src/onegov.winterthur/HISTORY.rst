@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Always enables the search widget for directories.
+  [href]
+
 0.2.9 (2018-06-15)
 ~~~~~~~~~~~~~~~~~~~~~
 
