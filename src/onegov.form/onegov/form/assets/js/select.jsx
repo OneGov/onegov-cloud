@@ -38,6 +38,7 @@ var FormcodeSelect = React.createClass({
         var state = this.cloneState();
         state.fields = fields;
         this.setState(state);
+        this.getTarget().value = this.getSelectionAsText(state.seleted);
     },
     onSelect: function(human_id, selected) {
         var state = this.cloneState();

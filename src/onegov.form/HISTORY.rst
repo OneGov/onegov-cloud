@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes field selection not being reflected when the fields are reodered.
+  [href]
+
 0.33.5 (2018-06-21)
 ~~~~~~~~~~~~~~~~~~~
 
