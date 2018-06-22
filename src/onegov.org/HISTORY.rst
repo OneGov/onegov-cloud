@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.30.0 (2018-06-22)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to define a default search widget in directories.
   [href]
 
