@@ -14,7 +14,6 @@ from onegov.org.layout import DefaultLayout
 from onegov.org.models import (
     GeneralFile,
     GeneralFileCollection,
-    FileIcon,
     ImageFile,
     ImageFileCollection,
     ImageSetCollection,
@@ -23,19 +22,6 @@ from onegov.org.models import (
 )
 from sedate import utcnow
 from webob import exc
-
-
-@OrgApp.view(model=FileIcon, permission=Public)
-def view_file_icon(self, request):
-
-    @request.after
-    def set_headers(response):
-        if self.version:
-            response.headers['Cache-Control'] = 'max-age=31536000'
-
-        response.headers['Content-Type'] = 'image/svg+xml'
-
-    return self.render(DefaultLayout(self, request))
 
 
 @OrgApp.html(model=GeneralFileCollection, template='files.pt',
@@ -65,14 +51,6 @@ def view_get_file_collection(self, request):
     def format_date(date):
         return layout.format_date(date, 'datetime')
 
-    def icon_by_file(file):
-        return icon_by_content_type_and_variant(file.content_type)
-
-    @lru_cache(maxsize=len(files) // 4)
-    def icon_by_content_type_and_variant(content_type, variant=None):
-        return request.link(FileIcon.from_content_type(
-            content_type, variant, request.app.version))
-
     grouped = tuple(
         (group, tuple(f for f in files))
         for group, files in groupby(files, key=lambda f: f.group)
@@ -84,8 +62,7 @@ def view_get_file_collection(self, request):
         'grouped': grouped,
         'count': len(files),
         'format_date': format_date,
-        'model': self,
-        'icon': icon_by_file
+        'model': self
     }
 
 

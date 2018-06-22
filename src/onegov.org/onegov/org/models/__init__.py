@@ -6,7 +6,6 @@ from onegov.org.models.directory import ExtendedDirectoryEntry
 from onegov.org.models.editor import Editor
 from onegov.org.models.export import Export, ExportCollection
 from onegov.org.models.file import (
-    FileIcon,
     GeneralFile,
     GeneralFileCollection,
     ImageFile,
@@ -72,7 +71,6 @@ __all__ = [
     'ExportCollection',
     'ExtendedDirectory',
     'ExtendedDirectoryEntry',
-    'FileIcon',
     'FormPersonMove',
     'GeneralFile',
     'GeneralFileCollection',

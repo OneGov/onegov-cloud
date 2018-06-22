@@ -47,31 +47,4 @@
 </svg>
 </metal:default_logo>
 
-<metal:fileicon define-macro="fileicon">
-<svg width="243px" height="319px" viewBox="0 0 243 319" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <defs>
-        <path d="M241,73.0660172 L241,312 C241,314.761424 238.761424,317 236,317 L5,317 C2.23857625,317 0,314.761424 0,312 L0,5 C0,2.23857625 2.23857625,0 5,0 L167.933983,7.10542736e-15 C170.586148,6.61823257e-15 173.129687,1.0535684 175.005051,2.92893219 L238.071068,65.9949494 C239.946432,67.8703132 241,70.4138523 241,73.0660172 Z" id="path-1"></path>
-    </defs>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Page" transform="translate(1.000000, 1.000000)">
-            <mask id="mask-2" fill="white">
-                <use xlink:href="#path-1"></use>
-            </mask>
-            <use id="Mask" stroke="#DDDDDD" stroke-width="2" fill="#F7F8F8" fill-rule="nonzero" xlink:href="#path-1"></use>
-            <rect id="Corner" fill="#DDDDDD" mask="url(#mask-2)" x="171" y="-5" width="75" height="75" rx="4"></rect>
-        </g>
-        <g id="Banner" transform="translate(1.000000, 220.000000)">
-            <path d="M0.5,0.5 L0.5,93 C0.5,95.4852814 2.51471863,97.5 5,97.5 L236,97.5 C238.485281,97.5 240.5,95.4852814 240.5,93 L240.5,0.5 L0.5,0.5 Z" stroke="#DDDDDD" fill="#CC4C4C"></path>
-            <text id="PDF" font-family="Helvetica Neue, Helvetica, Roboto, Arial, sans-serif" font-size="58" font-weight="bold" fill="#FFFFFF">
-                <tspan x="65.4072266" y="67">${extension.upper()}</tspan>
-            </text>
-        </g>
-        <g id="Checkmark" transform="translate(82.000000, 80.000000)" tal:condition="variant == 'signed'">
-            <circle id="Oval" fill="#5A7F2E" style="mix-blend-mode: color-burn;" cx="40" cy="40" r="40"></circle>
-            <path d="M69,26.7878788 C69,27.7979798 68.6507527,28.6565657 67.9522581,29.3636364 L40.8606452,56.7878788 L35.7716129,61.9393939 C35.0731183,62.6464646 34.2249462,63 33.2270968,63 C32.2292473,63 31.3810753,62.6464646 30.6825806,61.9393939 L25.5935484,56.7878788 L12.0477419,43.0757576 C11.3492473,42.3686869 11,41.510101 11,40.5 C11,39.489899 11.3492473,38.6313131 12.0477419,37.9242424 L17.1367742,32.7727273 C17.8352688,32.0656566 18.6834409,31.7121212 19.6812903,31.7121212 C20.6791398,31.7121212 21.5273118,32.0656566 22.2258065,32.7727273 L33.2270968,43.9469697 L57.7741935,19.0606061 C58.4726882,18.3535354 59.3208602,18 60.3187097,18 C61.3165591,18 62.1647312,18.3535354 62.8632258,19.0606061 L67.9522581,24.2121212 C68.6507527,24.9191919 69,25.7777778 69,26.7878788 Z" id="Shape" fill="#4A4A4A" fill-rule="nonzero" style="mix-blend-mode: color-burn;"></path>
-        </g>
-    </g>
-</svg>
-</metal:fileicon>
-
 </body>
