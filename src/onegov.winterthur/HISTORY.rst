@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.2.11 (2018-06-22)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Fixes conflict error.
   [href]
 
