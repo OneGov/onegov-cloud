@@ -66,7 +66,7 @@ def get_create_new_organisation_factory():
     return create_new_organisation
 
 
-@OrgApp.setting(section='org', name='default_directory_search_widget')
+@WinterthurApp.setting(section='org', name='default_directory_search_widget')
 def get_default_directory_search_widget():
     return 'inline'
 
