@@ -40,6 +40,7 @@ from onegov.org.models import (
     Editor,
     Export,
     ExportCollection,
+    FileIcon,
     FormPersonMove,
     GeneralFileCollection,
     ImageFileCollection,
@@ -597,3 +598,10 @@ def get_directory_submission_action(app, directory_id, submission_id, action):
 
     if action.valid:
         return action
+
+
+@OrgApp.path(
+    model=FileIcon,
+    path='/file-icon/{extension}')
+def get_file_icon(app, extension, variant=None, version=None):
+    return FileIcon(extension, variant, version)

@@ -4508,6 +4508,12 @@ h2 + div.timeline {
 */
 .files {
     table-layout: fixed;
+    width: 100%;
+
+    .file-icon {
+        height: 16px;
+        width: 16px;
+    }
 
     th {
         padding-top: 2rem;
@@ -4527,15 +4533,12 @@ h2 + div.timeline {
         font-weight: bold;
     }
 
-    .file-icon {
-        width: 48px;
-    }
-
     .file-link {
         width: 80%;
     }
 
     .file-date {
         white-space: nowrap;
+        width: 20%;
     }
 }

@@ -25,13 +25,17 @@ DateInterval = namedtuple('DateInterval', ('name', 'start', 'end'))
 
 class FileIcon(object):
 
-    def __init__(self, extension, variant='normal'):
+    def __init__(self, extension, variant=None, version=None):
         self.extension = extension
         self.variant = variant
+        self.version = version
 
     @classmethod
-    def from_content_type(cls, content_type, variant='normal'):
-        return cls(guess_extension(content_type, strict=False), variant)
+    def from_content_type(cls, content_type, variant=None, version=None):
+        extension = guess_extension(content_type, strict=False) or ''
+        extension = extension.lstrip('.')
+
+        return cls(extension, variant, version)
 
     def render(self, layout):
         return render_macro(layout.svg['fileicon'], layout.request, {
