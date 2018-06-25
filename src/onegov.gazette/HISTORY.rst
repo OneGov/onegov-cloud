@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds SOGC import.
+  [msom]
+
 - Reorganizes the backend menu.
   [msom]
 

@@ -132,6 +132,10 @@ class Layout(ChameleonLayout):
     def publishing(self):
         return self.request.app.principal.publishing
 
+    @cached_property
+    def importation(self):
+        return True if self.request.app.principal.sogc_import else False
+
     @property
     def menu(self):
         result = []

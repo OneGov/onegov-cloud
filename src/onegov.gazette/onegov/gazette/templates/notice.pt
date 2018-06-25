@@ -70,6 +70,9 @@
                             <dt i18n:translate>ID</dt>
                             <dd>${notice.id}</dd>
 
+                            <dt i18n:translate tal:condition="notice.source">Source</dt>
+                            <dd tal:condition="notice.source">${notice.source}</dd>
+
                             <dt tal:condition="notice.files" i18n:translate>Attachments</dt>
                             <dd tal:condition="notice.files">
                                 <ul>

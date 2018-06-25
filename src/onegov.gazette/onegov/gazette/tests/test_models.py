@@ -430,6 +430,7 @@ def test_principal():
     assert principal.on_accept == {}
     assert principal.publishing is False
     assert principal.frontend is False
+    assert principal.sogc_import == {}
 
     principal = Principal.from_yaml(dedent("""
         name: Govikon
@@ -441,6 +442,13 @@ def test_principal():
         help_link: 'https://help.me'
         publishing: True
         frontend: True
+        sogc_import:
+            endpoint: 'https://localhost'
+            username: 'user'
+            password: 'pass'
+            canton: 'GV'
+            category: 190
+            organization: 200
     """))
     assert principal.name == 'Govikon'
     assert principal.color == '#aabbcc'
@@ -452,6 +460,14 @@ def test_principal():
     assert principal.help_link == 'https://help.me'
     assert principal.publishing is True
     assert principal.frontend is True
+    assert principal.sogc_import == {
+        'endpoint': 'https://localhost',
+        'username': 'user',
+        'password': 'pass',
+        'canton': 'GV',
+        'category': 190,
+        'organization': 200,
+    }
 
 
 def test_notice_organization(session):

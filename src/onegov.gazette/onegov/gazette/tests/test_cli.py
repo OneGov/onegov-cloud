@@ -5,6 +5,7 @@ from click.testing import CliRunner
 from datetime import date
 from datetime import datetime
 from onegov.gazette.cli import cli
+from unittest.mock import patch
 from xlsxwriter import Workbook
 
 
@@ -406,3 +407,34 @@ def test_import_organizations(temporary_directory, redis_url, session_manager):
         [5, '410', 'Reformed', True, {'external_name': '40'}, 4],
         [6, '420', 'Sikh', False, {'external_name': '40'}, 4]
     ]
+
+
+def test_import_sogc(temporary_directory, redis_url, session_manager):
+    params = {
+        'sogc_import': {
+            'endpoint': 'https://localhost',
+            'username': 'user',
+            'password': 'pass',
+            'canton': 'GV',
+            'category': 190,
+            'organization': 200,
+        }
+    }
+    cfg_path = os.path.join(temporary_directory, 'onegov.yml')
+    write_config(cfg_path, session_manager.dsn, temporary_directory, redis_url)
+    write_principal(temporary_directory, 'Govikon', params)
+    assert run_command(cfg_path, 'govikon', ['add']).exit_code == 0
+
+    with patch('onegov.gazette.cli.SogcImporter') as importer:
+        importer.return_value = lambda: 0
+        result = run_command(cfg_path, 'govikon', ['import-sogc', '--dry-run'])
+        assert result.exit_code == 0
+        assert '0 notice(s) imported' in result.output
+        assert 'Aborting transaction' in result.output
+
+    with patch('onegov.gazette.cli.SogcImporter') as importer:
+        importer.return_value = lambda: 10
+        result = run_command(cfg_path, 'govikon', ['import-sogc'])
+        assert result.exit_code == 0
+        assert '10 notice(s) imported' in result.output
+        assert 'Aborting transaction' not in result.output

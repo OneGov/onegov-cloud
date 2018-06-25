@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-21 09:51+0200\n"
-"PO-Revision-Date: 2018-06-21 09:49+0200\n"
+"POT-Creation-Date: 2018-06-25 09:01+0200\n"
+"PO-Revision-Date: 2018-06-25 09:01+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -117,6 +117,9 @@ msgstr "angenommen"
 
 msgid "published"
 msgstr "veröffentlicht"
+
+msgid "imported"
+msgstr "importiert"
 
 msgid "created"
 msgstr "erstellt"
@@ -248,23 +251,8 @@ msgstr "Keine Gruppen."
 msgid "Upcoming Issues"
 msgstr "Kommende Ausgaben"
 
-msgid "Issue"
-msgstr "Ausgabe"
-
-msgid "PDF"
-msgstr "PDF"
-
-msgid "No upcoming issues."
-msgstr "Keine kommenden Ausgaben."
-
-msgid "Publish"
-msgstr "Veröffentlichen"
-
 msgid "Past Issues"
 msgstr "Vergangene Ausgaben"
-
-msgid "No past issues."
-msgstr "Keine vergangenen Ausgaben."
 
 msgid "homepage"
 msgstr "Startseite"
@@ -304,6 +292,18 @@ msgstr "Aktuelle Seite"
 
 msgid "Next deadline"
 msgstr "Nächster Eingabeschluss"
+
+msgid "Issue"
+msgstr "Ausgabe"
+
+msgid "PDF"
+msgstr "PDF"
+
+msgid "No issues."
+msgstr "Keine Ausgaben."
+
+msgid "Publish"
+msgstr "Veröffentlichen"
 
 msgid "Dear Sirs and Madams,"
 msgstr "Sehr geehrte Damen und Herren,"
@@ -349,6 +349,9 @@ msgstr "Diese Meldung wurde zurückgewiesen."
 
 msgid "State"
 msgstr "Status"
+
+msgid "Source"
+msgstr "Quelle"
 
 msgid "Changes"
 msgstr "Änderungen"

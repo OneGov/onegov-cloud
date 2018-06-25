@@ -158,7 +158,7 @@ def accept_notice(self, request, form):
 
     layout = Layout(self, request)
 
-    if self.state != 'submitted':
+    if self.state != 'submitted' and self.state != 'imported':
         return {
             'layout': layout,
             'title': self.title,
@@ -168,9 +168,11 @@ def accept_notice(self, request, form):
         }
 
     if (
-        self.expired_issues or
-        self.invalid_category or
-        self.invalid_organization
+        self.state == 'submitted' and (
+            self.expired_issues or
+            self.invalid_category or
+            self.invalid_organization
+        )
     ):
         return redirect(request.link(self, name='edit'))
 

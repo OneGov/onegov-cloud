@@ -91,6 +91,8 @@ def view_notices(self, request):
     is_publisher = request.is_private(self)
 
     states = ['drafted', 'submitted', 'accepted', 'rejected']
+    if layout.importation:
+        states.append('imported')
     if layout.publishing:
         states.append('published')
 
@@ -173,6 +175,8 @@ def view_notices_statistics(self, request):
     layout = Layout(self, request)
 
     states = ['drafted', 'submitted', 'accepted', 'rejected']
+    if layout.importation:
+        states.append('imported')
     if layout.publishing:
         states.append('published')
 

@@ -20,6 +20,7 @@ TRANSLATIONS = {
     'rejected': _("rejected"),
     'accepted': _("accepted"),
     'published': _("published"),
+    'imported': _("imported"),
 }
 
 

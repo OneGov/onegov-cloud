@@ -733,3 +733,31 @@ def test_view_notices_publishing_disabled(gazette_app):
 
     assert "notices/rejected" in client.get('/notices/published/statistics')
     assert "notices/published" in client.get('/notices/published/statistics')
+
+
+def test_view_notices_importation(gazette_app):
+    client = Client(gazette_app)
+    login_publisher(client)
+
+    assert "notices/rejected" in client.get('/notices/drafted')
+    assert "notices/imported" not in client.get('/notices/drafted')
+
+    assert "notices/rejected" in client.get('/notices/drafted/statistics')
+    assert "notices/imported" not in client.get('/notices/drafted/statistics')
+
+    principal = gazette_app.principal
+    principal.sogc_import = {
+        'canton': 'GV',
+        'endpoint': 'https://localhost',
+        'username': 'user',
+        'password': 'pass',
+        'category': 100,
+        'organiaztion': 200
+    }
+    gazette_app.cache.set('principal', principal)
+
+    assert "notices/imported" in client.get('/notices/drafted')
+    assert "notices/rejected" in client.get('/notices/drafted')
+
+    assert "notices/imported" in client.get('/notices/drafted/statistics')
+    assert "notices/rejected" in client.get('/notices/drafted/statistics')

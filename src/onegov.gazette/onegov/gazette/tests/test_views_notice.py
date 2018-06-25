@@ -1,4 +1,5 @@
 from freezegun import freeze_time
+from onegov.gazette.models import GazetteNotice
 from onegov.gazette.tests.common import accept_notice
 from onegov.gazette.tests.common import edit_notice
 from onegov.gazette.tests.common import login_users
@@ -250,6 +251,23 @@ def test_view_notice_actions(gazette_app):
             (editor_3, 'titel-2', 'pc'),
             (editor_3, 'titel-3', 'pc'),
             (editor_3, 'titel-4', 'pc'),
+        ))
+
+        # ... when imported
+        session = gazette_app.session()
+        notice = session.query(GazetteNotice).filter_by(name='titel-1').one()
+        notice.user = None
+        notice.group = None
+        notice.source = 'source'
+        notice.state = 'imported'
+        session.flush()
+        import transaction
+        transaction.commit()
+
+        check((
+            (admin, 'titel-1', 'pda'),
+            (publisher, 'titel-1', 'pad'),
+            (editor_1, 'titel-1', 'p'),
         ))
 
 

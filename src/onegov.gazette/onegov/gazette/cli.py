@@ -13,7 +13,9 @@ from onegov.gazette import _
 from onegov.gazette.collections import CategoryCollection
 from onegov.gazette.collections import IssueCollection
 from onegov.gazette.collections import OrganizationCollection
+from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import IssueName
+from onegov.gazette.utils import SogcImporter
 from onegov.user import User
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
@@ -87,9 +89,8 @@ def import_editors(ctx, file, clear, dry_run, locale):
         added_groups = {}
         for group in set([line.gruppe for line in lines]):
             added_groups[group] = groups.add(name=group)
-        click.secho(
-            "{} group(s) imported".format(len(added_groups)), fg='green'
-        )
+        count = len(added_groups)
+        click.secho(f"{count} group(s) imported", fg='green')
 
         count = 0
         for line in lines:
@@ -106,10 +107,11 @@ def import_editors(ctx, file, clear, dry_run, locale):
                 role='member',
             )
 
-        click.secho("{} editor(s) imported".format(count), fg='green')
+        click.secho(f"{count} editor(s) imported", fg='green')
 
         if dry_run:
             transaction.abort()
+            click.secho("Aborting transaction", fg='yellow')
 
     return import_editors_and_groups
 
@@ -178,10 +180,11 @@ def import_organizations(ctx, file, clear, dry_run, locale):
             )
             organization.parent_id = parent
 
-        click.secho("{} organization(s) imported".format(count), fg='green')
+        click.secho(f"{count} organization(s) imported", fg='green')
 
         if dry_run:
             transaction.abort()
+            click.secho("Aborting transaction", fg='yellow')
 
     return _import_organizations
 
@@ -243,10 +246,11 @@ def import_categories(ctx, file, clear, dry_run, locale):
                 order=count
             )
 
-        click.secho("{} categorie(s) imported".format(count), fg='green')
+        click.secho(f"{count} categorie(s) imported", fg='green')
 
         if dry_run:
             transaction.abort()
+            click.secho("Aborting transaction", fg='yellow')
 
     return _import_categories
 
@@ -309,9 +313,43 @@ def import_issues(ctx, file, clear, dry_run, locale, timezone):
                 deadline=deadline
             )
 
-        click.secho("{} categorie(s) imported".format(count), fg='green')
+        click.secho(f"{count} categorie(s) imported", fg='green')
 
         if dry_run:
             transaction.abort()
+            click.secho("Aborting transaction", fg='yellow')
 
     return _import_issues
+
+
+@cli.command(name='import-sogc')
+@click.option('--clear/--no-clear', default=False)
+@click.option('--dry-run/--no-dry-run', default=False)
+@pass_group_context
+def import_sogc(ctx, clear, dry_run):
+    """ Imports from the SOGC. For example:
+
+        onegov-gazette --select '/onegov_gazette/zug' import-sogc
+
+    """
+
+    def _import_sogc(request, app):
+        if not request.app.principal.sogc_import:
+            return
+
+        session = request.session
+        if clear:
+            click.secho("Deleting imported notices", fg='yellow')
+            existing = session.query(GazetteNotice)
+            existing = existing.filter(GazetteNotice.source.isnot(None))
+            existing.delete()
+
+        count = SogcImporter(session, request.app.principal.sogc_import)()
+
+        click.secho(f"{count} notice(s) imported", fg='green')
+
+        if dry_run:
+            transaction.abort()
+            click.secho("Aborting transaction", fg='yellow')
+
+    return _import_sogc
