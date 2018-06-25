@@ -117,7 +117,6 @@ class NoticeForm(Form):
     def author_date_utc(self):
         if self.author_date.data:
             return standardize_date(as_datetime(self.author_date.data), 'UTC')
-            self.author_date.data
         return None
 
     def on_request(self):
