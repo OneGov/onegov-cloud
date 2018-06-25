@@ -8,6 +8,7 @@ from itertools import groupby
 from mimetypes import guess_extension
 from onegov.core.filestorage import view_filestorage_file
 from onegov.core.security import Private, Public
+from onegov.core.templates import render_macro
 from onegov.file import File, FileCollection
 from onegov.org import _, OrgApp
 from onegov.org.elements import Img
@@ -23,6 +24,7 @@ from onegov.org.models import (
     LegacyImage,
 )
 from sedate import utcnow
+from string import Template
 from webob import exc
 
 
@@ -35,7 +37,7 @@ def view_get_file_collection(self, request):
         Link(
             text=f.name,
             url=request.class_link(File, {'id': f.id}),
-            id=f.id,
+            file_id=f.id,
             upload_date=f.upload_date,
             content_type=f.content_type,
             group=self.group(f)
@@ -64,6 +66,8 @@ def view_get_file_collection(self, request):
         for group, files in groupby(files, key=lambda f: f.group)
     )
 
+    file_url = Template(f'{request.link(self, name="details")}&file=$file')
+
     return {
         'layout': layout,
         'title': _('Files'),
@@ -72,8 +76,29 @@ def view_get_file_collection(self, request):
         'format_date': format_date,
         'model': self,
         'extension': lambda f: extension_for_content_type(f.content_type),
-        'signed': lambda r: random.uniform(0, 1) > 0.9
+        'signed': lambda r: random.uniform(0, 1) > 0.9,
+        'actions_url': lambda file_id: file_url.substitute(file=file_id)
     }
+
+
+@OrgApp.html(model=GeneralFileCollection, permission=Private, name='details')
+def view_file_details(self, request):
+
+    # XXX not Morepath-y, but expedient
+    file = self.by_id(request.params.get('file'))
+
+    if not file:
+        return exc.HTTPNotFound()
+
+    layout = DefaultLayout(self, request)
+
+    return render_macro(
+        layout.macros['file-details'],
+        request,
+        {
+            'file': file
+        }
+    )
 
 
 @OrgApp.html(model=ImageFileCollection, template='images.pt',

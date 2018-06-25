@@ -21,7 +21,7 @@
                     <tbody>
                         <tal:b repeat="(group, files) grouped">
                             <tr>
-                                <th>
+                                <th colspan="2">
                                     <span tal:condition="model.order_by == 'name'">
                                         ${group}
                                     </span>
@@ -50,19 +50,41 @@
                                 </th>
                             </tr>
 
-                            <tr id="${file.id}" tal:repeat="file files">
-                                <td class="file-link">
-                                    ${structure: file(layout)}
-                                </td>
-                                <td class="file-extension ${signed(file) and 'signed' or ''}">
-                                    <span>
-                                        ${extension(file)}
-                                    </span>
-                                </td>
-                                <td class="file-date">
-                                    ${format_date(file.upload_date)}
-                                </td>
-                            </tr>
+                            <tal:b tal:repeat="file files">
+                                <tr id="${file.file_id}">
+                                    <td class="file-link">
+                                        ${structure: file(layout)}
+                                    </td>
+                                    <td class="file-toggle">
+                                        <a id="button-${file.file_id}" data-toggle="#details-${file.file_id}" class="untoggled ic-use-transition">
+                                            <span i18n:translate class="show-for-sr">Show Details</span>
+                                            <i class="fa fa-chevron-down" aria-hidden="true"></i>
+                                        </a>
+                                    </td>
+                                    <td class="file-extension ${signed(file) and 'signed' or ''}">
+                                        <span>
+                                            ${extension(file)}
+                                        </span>
+                                    </td>
+                                    <td class="file-date">
+                                        ${format_date(file.upload_date)}
+                                    </td>
+                                </tr>
+                                <tr id="details-${file.file_id}" style="display: none;">
+                                    <td colspan="4">
+                                        <div
+                                            id="ic-${file.file_id}"
+                                            ic-trigger-from="#button-${file.file_id}"
+                                            ic-trigger-on="click once"
+                                            ic-get-from="${actions_url(file.file_id)}"
+                                            ic-indicator="#button-${file.file_id}"
+                                            >
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr style="display: none"></tr> <!--! keeps odd/even shading on track -->
+
+                            </tal:b>
 
                             <tr tal:condition="len(files) % 2 == 0" style="height: 0;"></tr>
                         </tal:b>

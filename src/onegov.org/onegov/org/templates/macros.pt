@@ -1180,3 +1180,14 @@
         </ul>
     </tal:b>
 </metal:group_by_column>
+
+<metal:file_details define-macro="file-details" i18n:domain="onegov.org">
+    <div class="row">
+        <div class="columns small-4">
+        </div>
+        <div class="columns small-4">
+        </div>
+        <div class="columns small-4">
+        </div>
+    </div>
+</metal:file_details>
