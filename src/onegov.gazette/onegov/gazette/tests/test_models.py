@@ -427,6 +427,7 @@ def test_principal():
     assert principal.name == 'Govikon'
     assert principal.color == '#aabbcc'
     assert principal.logo == 'logo.svg'
+    assert principal.canton is None
     assert principal.on_accept == {}
     assert principal.publishing is False
     assert principal.frontend is False
@@ -434,6 +435,7 @@ def test_principal():
 
     principal = Principal.from_yaml(dedent("""
         name: Govikon
+        canton: 'tg'
         color: '#aabbcc'
         logo: 'logo.svg'
         on_accept:
@@ -446,13 +448,13 @@ def test_principal():
             endpoint: 'https://localhost'
             username: 'user'
             password: 'pass'
-            canton: 'GV'
             category: 190
             organization: 200
     """))
     assert principal.name == 'Govikon'
     assert principal.color == '#aabbcc'
     assert principal.logo == 'logo.svg'
+    assert principal.canton == 'tg'
     assert principal.on_accept == {
         'mail_to': 'printer@govikon.org',
         'mail_from': 'publisher@govikon.org'
@@ -464,7 +466,7 @@ def test_principal():
         'endpoint': 'https://localhost',
         'username': 'user',
         'password': 'pass',
-        'canton': 'GV',
+        'canton': 'TG',
         'category': 190,
         'organization': 200,
     }

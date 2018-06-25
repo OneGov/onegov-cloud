@@ -411,11 +411,11 @@ def test_import_organizations(temporary_directory, redis_url, session_manager):
 
 def test_import_sogc(temporary_directory, redis_url, session_manager):
     params = {
+        'canton': 'tg',
         'sogc_import': {
             'endpoint': 'https://localhost',
             'username': 'user',
             'password': 'pass',
-            'canton': 'GV',
             'category': 190,
             'organization': 200,
         }
