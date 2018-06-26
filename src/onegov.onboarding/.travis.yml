@@ -1,5 +1,7 @@
 cache: pip
-group: travis_latest
+
+sudo: required
+dist: trusty
 
 matrix:
   include:
