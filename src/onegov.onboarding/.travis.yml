@@ -1,4 +1,4 @@
-cache: pip
+# cache: pip
 
 matrix:
   include:
