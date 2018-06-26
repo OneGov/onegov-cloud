@@ -1,8 +1,5 @@
 cache: pip
 
-sudo: required
-dist: trusty
-
 matrix:
   include:
     - language: python
@@ -15,6 +12,10 @@ matrix:
 
 addons:
     postgresql: "9.6"
+
+before_install:
+  - sudo apt-get update
+  - sudo apt-get upgrade -y
 
 install:
     - pip install tox
