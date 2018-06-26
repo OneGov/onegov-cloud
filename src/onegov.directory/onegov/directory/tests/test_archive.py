@@ -133,7 +133,7 @@ def test_archive_import(session, temporary_path, archive_format):
             return key, value.strftime('%d.%m.%Y')
 
         if isinstance(value, (list, tuple)):
-            return key, ', '.join(value)
+            return key, '\n'.join(value)
 
         return key, value
 
