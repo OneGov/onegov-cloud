@@ -18,6 +18,7 @@ install:
     - if [ "$TOXENV" = 'py36' ]; then pip install codecov; fi
 
 script:
+    - pip freeze
     - tox -e $TOXENV
 
 after_success:
