@@ -168,7 +168,7 @@ class VoteLayout(DetailLayout):
         path = 'svg/{}'.format(
             svg_filename(
                 self.ballot,
-                'map',
+                self.svg_prefix,
                 self.request.locale,
                 last_modified=self.last_modified
             )

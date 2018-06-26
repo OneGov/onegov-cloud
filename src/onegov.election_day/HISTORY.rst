@@ -141,6 +141,144 @@ Changelog
 - Adds vote views for districts.
   [msom]
 
+3.5.9 (2018-06-19)
+~~~~~~~~~~~~~~~~~~~
+
+- Add compatibility with wtforms 2.2.
+  [msom]
+
+3.5.8 (2018-06-18)
+~~~~~~~~~~~~~~~~~~~
+
+- Fixes importing XLSX files with only one column not working.
+  [msom]
+
+3.5.7 (2018-06-11)
+~~~~~~~~~~~~~~~~~~~
+
+- Prefills the email when unsubscribing from the newsletter.
+  [msom]
+
+- Updates javascript libraries.
+  [msom]
+
+- Fixes table sorting.
+  [msom]
+
+3.5.6 (2018-06-08)
+~~~~~~~~~~~~~~~~~~~
+
+- Make wabsti (majorz) import more robust.
+  [msom]
+
+3.5.5 (2018-06-04)
+~~~~~~~~~~~~~~~~~~~
+
+- Removes the radius from the panels.
+  [msom]
+
+3.5.4 (2018-06-04)
+~~~~~~~~~~~~~~~~~~~
+
+- Fixes placing of the expats/globe tooltip.
+  [msom]
+
+- Fixes sankey chart trying to render empty nodes and links.
+  [msom]
+
+3.5.3 (2018-06-04)
+~~~~~~~~~~~~~~~~~~~
+
+- Improves responsive behaviour.
+  [msom]
+
+3.5.2 (2018-05-29)
+~~~~~~~~~~~~~~~~~~~
+
+- Hides related elections title if empty.
+  [msom]
+
+3.5.1 (2018-05-29)
+~~~~~~~~~~~~~~~~~~~
+
+- Adds compatibility with babel 2.6.
+  [msom]
+
+3.5.0 (2018-05-17)
+~~~~~~~~~~~~~~~~~~~
+
+- Allows to add related elections to elections.
+  [msom]
+
+- Allows to specify the majority type of a majorz election.
+  [msom]
+
+3.4.7 (2018-05-15)
+~~~~~~~~~~~~~~~~~~~
+
+- Adds the node titles to the sankey links.
+  [msom]
+
+- Uses 'mandates' for propoz elections, 'seats' for majorz elections.
+  [msom]
+
+3.4.6 (2018-05-07)
+~~~~~~~~~~~~~~~~~~~
+
+- Updates translations.
+  [msom]
+
+- Orders the list panachage nodes by alphabet (if possible).
+  [msom]
+
+3.4.5 (2018-04-26)
+~~~~~~~~~~~~~~~~~~~
+
+- Adds an option to allow regional elections to span over several districts.
+  [msom]
+
+- Improve wabsti import.
+  [msom]
+
+3.4.4 (2018-04-24)
+~~~~~~~~~~~~~~~~~~~
+
+- Adds CORS header to JSON views.
+  [msom]
+
+- Runs the CLI tests in a separate process.
+  [msom]
+
+- Improves the import when using the internal format.
+  [msom]
+
+3.4.3 (2018-04-13)
+~~~~~~~~~~~~~~~~~~~
+
+- Removes XLSX export.
+  [msom]
+
+- Fixes district/entity not shown in election compounds PDF.
+  [msom]
+
+- Uses a fixed callout color.
+  [msom]
+
+- Adds titles to emails.
+  [msom]
+
+3.4.2 (2018-04-10)
+~~~~~~~~~~~~~~~~~~~
+
+- Fixes district/entity not shown in election compounds.
+  [msom]
+
+- Improves performance.
+  [msom]
+
+3.4.1 (2018-04-09)
+~~~~~~~~~~~~~~~~~~~
+
 - Updates translations.
   [msom]
 

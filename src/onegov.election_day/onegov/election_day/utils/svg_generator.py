@@ -115,7 +115,13 @@ class SvgGenerator():
                 )
                 if principal.is_year_available(ballot.vote.date.year):
                     for locale in self.app.locales:
-                        self.generate_svg(ballot, 'map', last_modified, locale)
+                        self.generate_svg(
+                            ballot, 'entities-map', last_modified, locale
+                        )
+                        if principal.has_districts:
+                            self.generate_svg(
+                                ballot, 'districts-map', last_modified, locale
+                            )
 
         # Delete old SVGs
         existing = fs.listdir(self.svg_dir)

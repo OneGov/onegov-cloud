@@ -1,6 +1,5 @@
 from datetime import date
 from freezegun import freeze_time
-from onegov.ballot import Ballot
 from onegov.ballot import ComplexVote
 from onegov.ballot import Vote
 from onegov.election_day.layouts import VoteLayout
