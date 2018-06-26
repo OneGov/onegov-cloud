@@ -36,6 +36,42 @@ Changelog
 - Optimizes the ballot model.
   [msom]
 
+3.6.1 (2018-05-17)
+~~~~~~~~~~~~~~~~~~~
+
+- Doesn't use a default absolute majority (of zero).
+  [msom]
+
+- Adds an upgrade step to set the a default majority types to elections.
+  [msom]
+
+3.6.0 (2018-05-07)
+~~~~~~~~~~~~~~~~~~~
+
+- Adds a majority type attribute to elections.
+  [msom]
+
+- Allows to store related elections.
+  [msom]
+
+- Allows to change the ID of elections and votes.
+  [msom]
+
+- Refactor election compound model.
+  [msom]
+
+3.5.0 (2018-04-26)
+~~~~~~~~~~~~~~~~~~~
+
+- Adds a distinct property to elections.
+  [msom]
+
+3.4.2 (2018-04-13)
+~~~~~~~~~~~~~~~~~~~
+
+- Optimizes the ballot model.
+  [msom]
+
 3.4.1 (2018-03-29)
 ~~~~~~~~~~~~~~~~~~~
 
