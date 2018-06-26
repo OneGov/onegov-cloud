@@ -1,8 +1,12 @@
+import subprocess
+
 from depot.fields.interfaces import FileFilter
 from depot.io.utils import file_from_content
-from onegov.file.utils import IMAGE_MIME_TYPES, get_image_size
-from PIL import Image
 from io import BytesIO
+from onegov.file.utils import IMAGE_MIME_TYPES, get_image_size
+from pathlib import Path
+from PIL import Image
+from tempfile import TemporaryDirectory
 
 
 class ConditionalFilter(FileFilter):
@@ -32,8 +36,18 @@ class OnlyIfImage(ConditionalFilter):
         return uploaded_file.content_type in IMAGE_MIME_TYPES
 
 
+class OnlyIfPDF(ConditionalFilter):
+    """ A conditional filter that runs the passed filter only if the
+    uploaded file is a pdf.
+
+    """
+
+    def meets_condition(self, uploaded_file):
+        return uploaded_file.content_type == 'application/pdf'
+
+
 class WithThumbnailFilter(FileFilter):
-    """Uploads a thumbnail together with the file.
+    """ Uploads a thumbnail together with the file.
 
     Takes for granted that the file is an image.
 
@@ -70,8 +84,8 @@ class WithThumbnailFilter(FileFilter):
         thumbnail.save(output, self.format, quality=self.quality)
         output.seek(0)
 
-        name = 'thumbnail_{}'.format(self.name)
-        filename = 'thumbnail_{}.{}'.format(self.name, self.format)
+        name = f'thumbnail_{self.name}'
+        filename = f'thumbnail_{self.name}.{self.format}'
 
         path, id = uploaded_file.store_content(output, filename)
 
@@ -79,4 +93,79 @@ class WithThumbnailFilter(FileFilter):
             'id': id,
             'path': path,
             'size': get_image_size(thumbnail)
+        }
+
+
+class WithPDFPreview(FileFilter):
+    """ Uploads a preview thumbnail as PNG together with the file.
+
+    This is basically the PDF implementation for `WithThumbnailFilter`.
+
+    .. warning::
+
+        Requires the presence of ghostscript (gs binary) on the PATH.
+
+    """
+
+    downscale_factor = 4
+
+    def __init__(self, name):
+        self.name = name
+
+    def generate_preview(self, uploaded_file):
+        content = file_from_content(uploaded_file.original_content)
+
+        with TemporaryDirectory() as directory:
+            path = Path(directory)
+
+            with (path / 'input.pdf').open('wb') as pdf:
+                pdf.write(content.read())
+
+            process = subprocess.run((
+                'gs',
+
+                # disable read/writes outside of the given files
+                '-dSAFER',
+                '-dPARANOIDSAFER',
+
+                # do not block for any reason
+                '-dBATCH',
+                '-dNOPAUSE',
+                '-dNOPROMPT',
+
+                # format the page for thumbnails
+                '-dPDFFitPage',
+
+                # render in high resolution before downscaling to 72 dpi
+                f'-r{self.downscale_factor * 72}',
+                f'-dDownScaleFactor={self.downscale_factor}',
+
+                # only use the first page
+                '-dLastPage=1',
+
+                # output to png
+                '-sDEVICE=png16m',
+                f'-sOutputFile={path / "preview.png"}',
+
+                # from pdf
+                str(path / 'input.pdf')
+            ))
+
+            process.check_returncode()
+
+            with (path / 'preview.png').open('rb') as png:
+                return png.read()
+
+    def on_save(self, uploaded_file):
+        thumbnail = self.generate_preview(uploaded_file)
+
+        name = f'thumbnail_{self.name}'
+        filename = f'thumbnail_{self.name}.png'
+
+        path, id = uploaded_file.store_content(thumbnail, filename)
+
+        uploaded_file[name] = {
+            'id': id,
+            'path': path,
+            'size': Image.open(io.BytesIO(thumbnail)).size
         }

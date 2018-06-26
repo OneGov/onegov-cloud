@@ -7,6 +7,7 @@ from onegov.core.orm.types import JSON
 from onegov.core.utils import normalize_for_url
 from onegov.file.attachments import ProcessedUploadedFile
 from onegov.file.filters import OnlyIfImage, WithThumbnailFilter
+from onegov.file.filters import OnlyIfPDF, WithPDFPreview
 from sqlalchemy import Column, Index, Text
 from sqlalchemy_utils import observes
 
@@ -71,6 +72,9 @@ class File(Base, Associable, TimestampMixin):
                 WithThumbnailFilter(
                     name='small', size=(256, 256), format='png'
                 )
+            ),
+            OnlyIfPDF(
+                WithPDFPreview(name='small')
             )
         ]
     ), nullable=False)
