@@ -3,11 +3,11 @@ cache: pip
 matrix:
   include:
     - language: python
-      python: "3.6"
+      python: "3.6.5"
       env: TOXENV=py36
 
     - language: python
-      python: "3.6"
+      python: "3.6.5"
       env: TOXENV=pep8
 
 addons:
