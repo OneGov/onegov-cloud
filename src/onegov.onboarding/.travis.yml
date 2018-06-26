@@ -1,4 +1,4 @@
-# cache: pip
+cache: pip
 
 matrix:
   include:
@@ -14,12 +14,10 @@ addons:
     postgresql: "9.6"
 
 install:
-    - pip list --outdated --format=freeze |  sed 's/==/>/g' | pip install --upgrade -r /dev/stdin
     - pip install tox
     - if [ "$TOXENV" = 'py36' ]; then pip install codecov; fi
 
 script:
-    - pip freeze
     - tox -e $TOXENV
 
 after_success:
