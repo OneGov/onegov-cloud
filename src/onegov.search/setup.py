@@ -34,8 +34,8 @@ setup(
     python_requires='>=3.6',
     install_requires=[
         'certifi',
-        'elasticsearch>=5.0.0,<6.0.0,!=5.5.1',
-        'elasticsearch-dsl>=5.1.0,<6.0.0',
+        'elasticsearch>=6.0.0,<7.0.0',
+        'elasticsearch-dsl>=6.0.0,<7.0.0',
         'langdetect',
         'onegov.core>=0.22.0',
         'sortedcontainers',

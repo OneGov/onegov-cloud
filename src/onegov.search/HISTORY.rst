@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Updates elasticsearch release.
+  [href]
+
 1.6.0 (2018-06-11)
 ~~~~~~~~~~~~~~~~~~~
 
