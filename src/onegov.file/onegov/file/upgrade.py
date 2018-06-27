@@ -2,18 +2,18 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+import multiprocessing
+
 from concurrent.futures import ThreadPoolExecutor
 from copy import copy
-from onegov.core.orm import as_selectable
 from onegov.core.upgrade import upgrade_task
-from onegov.core.utils import chunks
 from onegov.core.utils import normalize_for_url
-from onegov.file import File, FileCollection
+from onegov.file import FileCollection
 from onegov.file.attachments import get_svg_size_or_default
 from onegov.file.filters import WithPDFThumbnailFilter
 from onegov.file.utils import get_image_size
 from PIL import Image
-from sqlalchemy import Column, Text, select
+from sqlalchemy import Column, Text, text
 from sqlalchemy.orm.attributes import flag_modified
 
 
@@ -86,42 +86,50 @@ def migrate_file_metadata_to_jsonb(context):
 
 @upgrade_task('Add thumbnails to PDFs')
 def add_thumbnails_to_pdfs(context):
-    session = context.request.app.session
+    depot = context.request.app.bound_depot
+
+    files = FileCollection(context.session).query()
+    files = iter(files.filter(text(
+        "files.reference->>'content_type' = 'application/pdf'"
+    )))
 
     pdf_filter = WithPDFThumbnailFilter(
         'medium', size=(512, 512), format='png'
     )
 
-    def generate_thumbnail(ids):
-        depot = context.request.app.bound_depot
-        files = FileCollection(session()).query().filter(File.id.in_(ids))
+    # make sure that all cores are used for ghostscript
+    def chunks(size=multiprocessing.cpu_count()):
+        while True:
+            chunk = []
 
-        for pdf in files:
-            # potentially dangerous and might not work with other storage
-            # providers, so don't reuse unless you are sure about the
-            # consequences
-            pdf.reference._thaw()
+            for n in range(size):
+                pdf = next(files, None)
 
-            pdf_filter.store_thumbnail(
-                pdf.reference, pdf_filter.generate_thumbnail(
-                    depot.get(
-                        pdf.reference.file_id
-                    )
-                )
+                if not pdf:
+                    return
+
+                chunk.append((pdf, depot.get(pdf.reference.file_id)))
+
+            yield chunk
+
+    for chunk in chunks():
+        pdfs, contents = zip(*(chunk))
+
+        # each thread will keep one ghostscript process busy
+        with ThreadPoolExecutor() as e:
+            results = zip(
+                pdfs,
+                e.map(pdf_filter.generate_thumbnail, contents)
             )
 
-            flag_modified(pdf, 'reference')
+            for pdf, thumbnail in results:
+                # potentially dangerous and might not work with other storage
+                # providers, so don't reuse unless you are sure about the
+                # consequences
+                pdf.reference._thaw()
 
-    stmt = as_selectable("""
-        SELECT
-            id  -- Text
-        FROM
-            files
-        WHERE
-            files.reference->>'content_type' = 'application/pdf'
-    """)
+                pdf_filter.store_thumbnail(pdf.reference, thumbnail)
 
-    ids = tuple(f.id for f in session().execute(select(stmt.c)))
+                flag_modified(pdf, 'reference')
 
-    with ThreadPoolExecutor() as e:
-        e.map(generate_thumbnail, chunks(ids, 25))
+    assert False
