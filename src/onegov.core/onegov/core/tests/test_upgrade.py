@@ -24,14 +24,14 @@ def test_upgrade_task_registration():
 
     assert len(tasks) == 2
 
-    assert tasks[0][0] == 'onegov.core:Add another field'
-    assert tasks[0][1].task_name == 'Add another field'
-    assert tasks[0][1].always_run is True
+    assert tasks[0][0] == 'onegov.core:Add new field'
+    assert tasks[0][1].task_name == 'Add new field'
+    assert tasks[0][1].always_run is False
     assert tasks[0][1].requires is None
 
-    assert tasks[1][0] == 'onegov.core:Add new field'
-    assert tasks[1][1].task_name == 'Add new field'
-    assert tasks[1][1].always_run is False
+    assert tasks[1][0] == 'onegov.core:Add another field'
+    assert tasks[1][1].task_name == 'Add another field'
+    assert tasks[1][1].always_run is True
     assert tasks[1][1].requires is None
 
 
@@ -312,26 +312,41 @@ def test_raw_upgrade_cli(postgres_dsn, session_manager, temporary_directory,
 
 
 def test_get_module_order_key():
+    def first():
+        pass
+
+    def second():
+        pass
+
+    def third():
+        pass
+
+    def fourth():
+        pass
+
     order_key = get_module_order_key({
-        'click.test': None,
-        'onegov.core:test': None,
-        'sqlalchemy:test': None,
-        'missing_module:test': None
+        'click:test': first,
+        'onegov.core:test': first,
+        'sqlalchemy:aaa': second,
+        'sqlalchemy:bbb': first,
+        'missing_module:test': first
     })
 
     ids = [
         'missing_module:test',
-        'sqlalchemy:test',
+        'sqlalchemy:aaa',
+        'sqlalchemy:bbb',
         'onegov.core:test',
         'click:test'
     ]
     ids.sort(key=order_key)
 
     assert ids == [
-        # sorted a-z
+        # sorted by module, then function order in source
         'click:test',
         'missing_module:test',
-        'sqlalchemy:test',
+        'sqlalchemy:bbb',
+        'sqlalchemy:aaa',
         # sorted after its dependencies
         'onegov.core:test',
     ]

@@ -243,7 +243,16 @@ def get_module_order_key(tasks):
 
     def sortkey(task_id):
         module, name = task_id.split(':', 1)
-        return sorted_modules.get(module, float('inf')), task_id
+        return (
+            # sort by the topological order
+            sorted_modules.get(module, float('inf')),
+
+            # then by module
+            module,
+
+            # then by appearance of update function in the code
+            tasks[task_id].__code__.co_firstlineno
+        )
 
     return sortkey
 
