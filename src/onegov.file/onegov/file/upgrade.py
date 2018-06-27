@@ -2,14 +2,18 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from concurrent.futures import ThreadPoolExecutor
 from copy import copy
+from onegov.core.orm import as_selectable
 from onegov.core.upgrade import upgrade_task
-from onegov.file import FileCollection
-from onegov.file.attachments import get_svg_size_or_default
-from onegov.file.utils import get_image_size
+from onegov.core.utils import chunks
 from onegov.core.utils import normalize_for_url
+from onegov.file import File, FileCollection
+from onegov.file.attachments import get_svg_size_or_default
+from onegov.file.filters import WithPDFThumbnailFilter
+from onegov.file.utils import get_image_size
 from PIL import Image
-from sqlalchemy import Column, Text
+from sqlalchemy import Column, Text, select
 from sqlalchemy.orm.attributes import flag_modified
 
 
@@ -78,3 +82,46 @@ def migrate_file_metadata_to_jsonb(context):
 
     context.operations.create_index(
         'files_by_type_and_order', 'files', ['type', 'order'])
+
+
+@upgrade_task('Add thumbnails to PDFs')
+def add_thumbnails_to_pdfs(context):
+    session = context.request.app.session
+
+    pdf_filter = WithPDFThumbnailFilter(
+        'medium', size=(512, 512), format='png'
+    )
+
+    def generate_thumbnail(ids):
+        depot = context.request.app.bound_depot
+        files = FileCollection(session()).query().filter(File.id.in_(ids))
+
+        for pdf in files:
+            # potentially dangerous and might not work with other storage
+            # providers, so don't reuse unless you are sure about the
+            # consequences
+            pdf.reference._thaw()
+
+            pdf_filter.store_thumbnail(
+                pdf.reference, pdf_filter.generate_thumbnail(
+                    depot.get(
+                        pdf.reference.file_id
+                    )
+                )
+            )
+
+            flag_modified(pdf, 'reference')
+
+    stmt = as_selectable("""
+        SELECT
+            id  -- Text
+        FROM
+            files
+        WHERE
+            files.reference->>'content_type' = 'application/pdf'
+    """)
+
+    ids = tuple(f.id for f in session().execute(select(stmt.c)))
+
+    with ThreadPoolExecutor() as e:
+        e.map(generate_thumbnail, chunks(ids, 25))

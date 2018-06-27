@@ -134,6 +134,10 @@ class WithPDFThumbnailFilter(WithThumbnailFilter):
                 '-dNOPAUSE',
                 '-dNOPROMPT',
 
+                # limit output messages
+                '-dQUIET',
+                '-sstdout=/dev/null',
+
                 # format the page for thumbnails
                 '-dPDFFitPage',
 
