@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.71.0 (2018-06-27)
+~~~~~~~~~~~~~~~~~~~
 
 - Changes the upgrade order to take the source code order into account.
   [href]
