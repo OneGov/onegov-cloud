@@ -72,31 +72,37 @@ class WithThumbnailFilter(FileFilter):
         self.size = size
         self.format = format.lower()
 
-    def on_save(self, uploaded_file):
-        content = file_from_content(uploaded_file.original_content)
+    def generate_thumbnail(self, fp):
+        output = BytesIO()
 
-        thumbnail = Image.open(content)
+        thumbnail = Image.open(fp)
         thumbnail.thumbnail(self.size, Image.LANCZOS)
         thumbnail = thumbnail.convert('RGBA')
         thumbnail.format = self.format
 
-        output = BytesIO()
         thumbnail.save(output, self.format, quality=self.quality)
         output.seek(0)
 
+        return output
+
+    def store_thumbnail(self, uploaded_file, fp):
         name = f'thumbnail_{self.name}'
         filename = f'thumbnail_{self.name}.{self.format}'
 
-        path, id = uploaded_file.store_content(output, filename)
+        path, id = uploaded_file.store_content(fp, filename)
 
         uploaded_file[name] = {
             'id': id,
             'path': path,
-            'size': get_image_size(thumbnail)
+            'size': get_image_size(Image.open(fp))
         }
 
+    def on_save(self, uploaded_file):
+        fp = file_from_content(uploaded_file.original_content)
+        self.store_thumbnail(uploaded_file, self.generate_thumbnail(fp))
 
-class WithPDFPreview(FileFilter):
+
+class WithPDFThumbnailFilter(WithThumbnailFilter):
     """ Uploads a preview thumbnail as PNG together with the file.
 
     This is basically the PDF implementation for `WithThumbnailFilter`.
@@ -109,17 +115,12 @@ class WithPDFPreview(FileFilter):
 
     downscale_factor = 4
 
-    def __init__(self, name):
-        self.name = name
-
-    def generate_preview(self, uploaded_file):
-        content = file_from_content(uploaded_file.original_content)
-
+    def generate_preview(self, fp):
         with TemporaryDirectory() as directory:
             path = Path(directory)
 
             with (path / 'input.pdf').open('wb') as pdf:
-                pdf.write(content.read())
+                pdf.write(fp.read())
 
             process = subprocess.run((
                 'gs',
@@ -154,18 +155,7 @@ class WithPDFPreview(FileFilter):
             process.check_returncode()
 
             with (path / 'preview.png').open('rb') as png:
-                return png.read()
+                return BytesIO(png.read())
 
-    def on_save(self, uploaded_file):
-        thumbnail = self.generate_preview(uploaded_file)
-
-        name = f'thumbnail_{self.name}'
-        filename = f'thumbnail_{self.name}.png'
-
-        path, id = uploaded_file.store_content(thumbnail, filename)
-
-        uploaded_file[name] = {
-            'id': id,
-            'path': path,
-            'size': Image.open(io.BytesIO(thumbnail)).size
-        }
+    def generate_thumbnail(self, fp):
+        return super().generate_thumbnail(self.generate_preview(fp))

@@ -1,5 +1,6 @@
 import morepath
 import os.path
+import shutil
 
 from contextlib import contextmanager
 from depot.manager import DepotManager
@@ -52,6 +53,9 @@ class DepotApp(App):
         assert self.depot_backend in SUPPORTED_STORAGE_BACKENDS, """
             A depot app *must* have a valid storage backend set up.
         """
+
+        if not shutil.which('gs'):
+            raise RuntimeError("onegov.file requires ghostscript")
 
         if self.depot_backend == 'depot.io.local.LocalFileStorage':
             assert os.path.isdir(self.depot_storage_path), """
@@ -166,14 +170,20 @@ def view_file(self, request):
     return self.reference.file
 
 
-@DepotApp.view(model=File, name='thumbnail', render=render_depot_file,
-               permission=Public)
+@DepotApp.view(model=File, name='thumbnail', permission=Public,
+               render=render_depot_file)
+@DepotApp.view(model=File, name='small', permission=Public,
+               render=render_depot_file)
+@DepotApp.view(model=File, name='medium', permission=Public,
+               render=render_depot_file)
 def view_thumbnail(self, request):
-    respond_with_alt_text(self, request)
+    if request.view_name in ('small', 'medium'):
+        size = request.view_name
+    else:
+        size = 'small'
 
-    # we currently only have one thumbnail, in the future we might make this
-    # a query parameter:
-    thumbnail_id = self.get_thumbnail_id(size='small')
+    respond_with_alt_text(self, request)
+    thumbnail_id = self.get_thumbnail_id(size)
 
     if not thumbnail_id:
         return morepath.redirect(request.link(self))

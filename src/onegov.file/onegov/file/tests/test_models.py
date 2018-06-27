@@ -1,8 +1,10 @@
 import transaction
 import pytest
 
+from depot.manager import DepotManager
 from io import BytesIO
 from onegov.core.orm import Base
+from onegov.core.utils import module_path
 from onegov.file import File, FileSet, AssociatedFiles
 from onegov.file.models.fileset import file_to_set_associations
 from onegov_testing.utils import create_image
@@ -125,6 +127,27 @@ def test_thumbnail_creation(session):
 
     assert 'thumbnail_small' in large.reference
     assert 'thumbnail_small' in small.reference
+
+
+def test_pdf_preview_creation(session):
+    path = module_path('onegov.file', 'tests/fixtures/example.pdf')
+
+    with open(path, 'rb') as f:
+        session.add(File(name='example.pdf', reference=f))
+
+    transaction.commit()
+
+    pdf = session.query(File).one()
+    pdf.reference['thumbnail_medium']
+
+    # our example file contains a blue backgorund so we can verify that
+    # the thumbnail for the pdf is generated correctly
+
+    thumb = DepotManager.get().get(pdf.reference['thumbnail_medium']['id'])
+    image = Image.open(thumb)
+
+    assert (0, 91, 161, 255) in set(image.getdata())
+    assert image.size == (395, 512)
 
 
 def test_max_image_size(session):

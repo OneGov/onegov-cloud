@@ -115,6 +115,9 @@ def test_serve_thumbnail(app):
     assert thumb.content_type == 'image/png'
     assert thumb.content_length < image.content_length
 
+    small = client.get('/storage/{}/small'.format(avatar.id))
+    assert small.content_length == thumb.content_length
+
     # make sure the correct code is returned if there's no thumbnail
     transaction.begin()
     files.add('readme.txt', b'README')
