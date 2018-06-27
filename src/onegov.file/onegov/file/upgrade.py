@@ -98,7 +98,10 @@ def add_thumbnails_to_pdfs(context):
     )
 
     # make sure that all cores are used for ghostscript
-    def chunks(size=multiprocessing.cpu_count()):
+    # each thread will keep one ghostscript process busy
+    max_workers = multiprocessing.cpu_count()
+
+    def chunks(size=max_workers):
         while True:
             chunk = []
 
@@ -115,8 +118,7 @@ def add_thumbnails_to_pdfs(context):
     for chunk in chunks():
         pdfs, contents = zip(*(chunk))
 
-        # each thread will keep one ghostscript process busy
-        with ThreadPoolExecutor() as e:
+        with ThreadPoolExecutor(max_workers=max_workers) as e:
             results = zip(
                 pdfs,
                 e.map(pdf_filter.generate_thumbnail, contents)
@@ -131,5 +133,3 @@ def add_thumbnails_to_pdfs(context):
                 pdf_filter.store_thumbnail(pdf.reference, thumbnail)
 
                 flag_modified(pdf, 'reference')
-
-    assert False
