@@ -21,7 +21,8 @@ class Principal(object):
         help_link='',
         publishing=False,
         frontend=False,
-        sogc_import=None
+        sogc_import=None,
+        **kwargs
     ):
         assert not canton or canton in self.CANTONS
         assert not on_accept or on_accept['mail_to']
