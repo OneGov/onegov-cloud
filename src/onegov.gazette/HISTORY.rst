@@ -1,5 +1,5 @@
 Changelog
---------
+---------
 
 - Fixes throwing an error on unexpected principal configuration options.
   [msom]
