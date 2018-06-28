@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes SOGC configuration testing.
+  [msom]
+
 1.15.2 (2018-06-28)
 ~~~~~~~~~~~~~~~~~~~~
 

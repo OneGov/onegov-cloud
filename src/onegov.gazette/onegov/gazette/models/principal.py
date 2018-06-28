@@ -29,8 +29,6 @@ class Principal(object):
         assert not frontend or (frontend and publishing)
         assert not sogc_import or (
             sogc_import['endpoint'] and
-            sogc_import['username'] and
-            sogc_import['password'] and
             sogc_import['category'] and
             sogc_import['organization'] and
             canton
