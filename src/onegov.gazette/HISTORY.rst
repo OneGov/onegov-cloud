@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.15.3 (2018-06-28)
+~~~~~~~~~~~~~~~~~~~~
 
 - Fixes SOGC configuration testing.
   [msom]
