@@ -179,7 +179,7 @@ def accept_notice(self, request, form):
     if form.submitted(request):
         self.accept(request)
         request.message(_("Official notice accepted."), 'success')
-        if request.app.principal.on_accept:
+        if request.app.principal.on_accept and self.state != 'imported':
             send_accepted_mail(request, self)
             self.add_change(request, _("mail sent"))
         return redirect(layout.dashboard_or_notices_link)

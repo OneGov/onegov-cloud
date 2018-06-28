@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Don't send accept mails for imported notices.
+  [msom]
+
 1.15.3 (2018-06-28)
 ~~~~~~~~~~~~~~~~~~~~
 
