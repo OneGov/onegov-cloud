@@ -141,6 +141,9 @@ Changelog
 - Adds vote views for districts.
   [msom]
 
+- Fixes throwing an error on unexpected principal configuration options.
+  [msom]
+
 3.5.9 (2018-06-19)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -51,7 +51,8 @@ class Principal(object):
         email_notification=None,
         wabsti_import=False,
         pdf_signing=None,
-        open_data=None
+        open_data=None,
+        **kwargs
     ):
         assert all((id_, domain, domains_election, domains_vote, entities))
         self.id = id_
