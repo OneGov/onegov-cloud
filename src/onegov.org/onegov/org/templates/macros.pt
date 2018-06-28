@@ -1184,6 +1184,9 @@
 <metal:file_details define-macro="file-details" i18n:domain="onegov.org">
     <div class="row">
         <div class="columns small-4">
+            <a href="${request.link(file)}">
+                <img class="pdf-preview" src="${request.link(file, name='medium')}" onerror="this.style.display='none'">
+            </a>
         </div>
         <div class="columns small-4">
         </div>

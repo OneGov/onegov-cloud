@@ -4554,4 +4554,29 @@ h2 + div.timeline {
     .file-date {
         white-space: nowrap;
     }
+
+    .file-details {
+        background-color: white;
+
+        td {
+            border-top: 1px solid white;
+            position: relative;
+            top: -1px;
+        }
+
+        img {
+            margin: .5rem 0 1rem;
+        }
+    }
+}
+
+/*
+    Pdf Preview
+*/
+.pdf-preview {
+    box-shadow: 4px 4px 10px rgba(100, 100, 100, 0.4);
+    background: white;
+
+    max-width: 256px;
+    max-height: 256px;
 }

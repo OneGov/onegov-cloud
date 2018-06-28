@@ -61,6 +61,11 @@ var ToggleButton = function(button, toggled) {
 
 jQuery.fn.toggleButton = function(toggled) {
     return this.each(function() {
-        ToggleButton($(this), toggled);
+        var button = $(this);
+
+        // do not unduly block the main thread here
+        setTimeout(function() {
+            ToggleButton(button, toggled);
+        }, 0);
     });
 };

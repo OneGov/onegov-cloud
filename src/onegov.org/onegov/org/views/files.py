@@ -66,8 +66,6 @@ def view_get_file_collection(self, request):
         for group, files in groupby(files, key=lambda f: f.group)
     )
 
-    file_url = Template(f'{request.link(self, name="details")}&file=$file')
-
     return {
         'layout': layout,
         'title': _('Files'),
@@ -77,26 +75,21 @@ def view_get_file_collection(self, request):
         'model': self,
         'extension': lambda f: extension_for_content_type(f.content_type),
         'signed': lambda r: random.uniform(0, 1) > 0.9,
-        'actions_url': lambda file_id: file_url.substitute(file=file_id)
+        'actions_url': lambda file_id: request.class_link(
+            GeneralFile, name="details", variables={'id': file_id}
+        )
     }
 
 
-@OrgApp.html(model=GeneralFileCollection, permission=Private, name='details')
+@OrgApp.html(model=GeneralFile, permission=Private, name='details')
 def view_file_details(self, request):
-
-    # XXX not Morepath-y, but expedient
-    file = self.by_id(request.params.get('file'))
-
-    if not file:
-        return exc.HTTPNotFound()
-
     layout = DefaultLayout(self, request)
 
     return render_macro(
         layout.macros['file-details'],
         request,
         {
-            'file': file
+            'file': self
         }
     )
 
