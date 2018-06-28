@@ -10,6 +10,7 @@ from onegov.core.upgrade import upgrade_task
 from onegov.core.utils import normalize_for_url
 from onegov.file import FileCollection
 from onegov.file.attachments import get_svg_size_or_default
+from onegov.file.integration import DepotApp
 from onegov.file.filters import WithPDFThumbnailFilter
 from onegov.file.utils import get_image_size
 from PIL import Image
@@ -86,6 +87,10 @@ def migrate_file_metadata_to_jsonb(context):
 
 @upgrade_task('Add thumbnails to PDFs')
 def add_thumbnails_to_pdfs(context):
+
+    if not isinstance(context.app, DepotApp):
+        return False
+
     depot = context.request.app.bound_depot
 
     files = FileCollection(context.session).query()
