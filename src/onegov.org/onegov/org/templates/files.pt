@@ -21,7 +21,7 @@
                     <tbody>
                         <tal:b repeat="(group, files) grouped">
                             <tr>
-                                <th colspan="2">
+                                <th>
                                     <span tal:condition="model.order_by == 'name'">
                                         ${group}
                                     </span>
@@ -32,6 +32,8 @@
 
                                         Name
                                     </a>
+                                </th>
+                                <th>
                                 </th>
                                 <th i18n:translate>
                                     Extension
@@ -51,33 +53,29 @@
                             </tr>
 
                             <tal:b tal:repeat="file files">
-                                <tr id="${file.file_id}">
-                                    <td class="file-link">
-                                        ${structure: file(layout)}
+                                <tr class="file-info">
+                                    <td>
+                                        ${file.name}
                                     </td>
-                                    <td class="file-toggle">
-                                        <a id="button-${file.file_id}" data-toggle="#details-${file.file_id}" class="untoggled">
-                                            <span i18n:translate class="show-for-sr">Show Details</span>
+                                    <td>
+                                        <a id="button-${file.number}" data-toggle="#details-${file.number}" class="untoggled">
                                             <i class="fa fa-chevron-down" aria-hidden="true"></i>
                                         </a>
                                     </td>
-                                    <td class="file-extension ${signed(file) and 'signed' or ''}">
-                                        <span>
+                                    <td>
+                                        <span class="${signed(file) and 'signed' or ''}">
                                             ${extension(file)}
                                         </span>
                                     </td>
-                                    <td class="file-date">
+                                    <td>
                                         ${format_date(file.upload_date)}
                                     </td>
                                 </tr>
-                                <tr id="details-${file.file_id}" class="file-details" style="display: none;">
+                                <tr id="details-${file.number}" style="display: none;">
                                     <td colspan="4">
-                                        <div
-                                            id="ic-${file.file_id}"
-                                            ic-trigger-from="#button-${file.file_id}"
-                                            ic-trigger-on="click once"
-                                            ic-get-from="${actions_url(file.file_id)}"
-                                            >
+                                        <div ic-trigger-from="#button-${file.number}"
+                                             ic-trigger-on="click once"
+                                             ic-get-from="${actions_url(file.id)}">
                                         </div>
                                     </td>
                                 </tr>

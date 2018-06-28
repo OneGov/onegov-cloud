@@ -4507,7 +4507,9 @@ h2 + div.timeline {
     Files list
 */
 .files {
+    // used for better performance
     table-layout: fixed;
+    width: 100%;
 
     th {
         padding-top: 2rem;
@@ -4515,6 +4517,24 @@ h2 + div.timeline {
 
     tr:first-child th {
         padding-top: 1rem;
+
+        // controls the width of all columns due to the fixed table layout
+        &:nth-child(1) {
+            width: 75%;
+        }
+
+        &:nth-child(2) {
+            width: 2.5%;
+        }
+
+        &:nth-child(4) {
+            width: 15%;
+        }
+
+    }
+
+    th:last-child {
+        text-align: right;
     }
 
     th span {
@@ -4525,37 +4545,47 @@ h2 + div.timeline {
         border: 1px solid $primary-color;
         font-size: .875rem;
         font-weight: bold;
+        text-align: right;
     }
 
-    .file-link {
-        width: 80%;
-    }
-
-    .file-extension {
-        color: $monsoon;
-        text-transform: uppercase;
-        width: 32px;
-
-        span {
-            display: inline-block;
-            padding: 1px 6px;
+    .file-info {
+        td:nth-child(1) {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
-        &.signed span {
-            @include circle;
-            background: $green-pastel;
+        td:nth-child(2) {
+            text-align: center;
+        }
 
-            &::after {
-                content: '✔';
+        td:nth-child(3) {
+            color: $monsoon;
+            text-transform: uppercase;
+            width: 32px;
+
+            span {
+                display: inline-block;
+                padding: 1px 6px;
+
+                .signed {
+                    @include circle;
+                    background: $green-pastel;
+
+                    &::after {
+                        content: '✔';
+                    }
+                }
             }
         }
+
+        td:nth-child(4) {
+            white-space: nowrap;
+            text-align: right;
+        }
     }
 
-    .file-date {
-        white-space: nowrap;
-    }
-
-    .file-details {
+    .file-info + tr {
         background-color: white;
 
         td {

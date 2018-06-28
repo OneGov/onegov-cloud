@@ -161,6 +161,7 @@ class GeneralFileCollection(FileCollection, GroupFilesByDateMixin):
 
     file_list = as_selectable("""
         SELECT
+            row_number() OVER () as number, -- Integer
             id,                             -- Text
             name,                           -- Text
             "order",                        -- Text

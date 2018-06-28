@@ -1,6 +1,7 @@
 """ The onegov org collection of files uploaded to the site. """
 
 import morepath
+import os.path
 import random
 
 from functools import lru_cache
@@ -24,7 +25,6 @@ from onegov.org.models import (
     LegacyImage,
 )
 from sedate import utcnow
-from string import Template
 from webob import exc
 
 
@@ -33,23 +33,13 @@ from webob import exc
 def view_get_file_collection(self, request):
     request.include('dropzone')
 
-    files = tuple(
-        Link(
-            text=f.name,
-            url=request.class_link(File, {'id': f.id}),
-            file_id=f.id,
-            upload_date=f.upload_date,
-            content_type=f.content_type,
-            group=self.group(f)
-        )
-        for f in self.files
-    )
-
     layout = DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
         Link(_("Files"), '#')
     ]
+
+    files = tuple(self.files)
 
     @lru_cache(maxsize=len(files) // 4)
     def format_date(date):
@@ -62,8 +52,8 @@ def view_get_file_collection(self, request):
         return extension.lstrip('.')
 
     grouped = tuple(
-        (group, tuple(f for f in files))
-        for group, files in groupby(files, key=lambda f: f.group)
+        (group, tuple(files))
+        for group, files in groupby(files, key=lambda f: self.group(f))
     )
 
     return {
