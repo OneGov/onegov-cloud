@@ -336,7 +336,7 @@ def import_sogc(ctx, clear, dry_run, sentry):
     """
 
     def _import_sogc(request, app):
-        if not request.app.principal.sogc_import:
+        if not getattr(request.app.principal, 'sogc_import', None):
             return
 
         session = request.session

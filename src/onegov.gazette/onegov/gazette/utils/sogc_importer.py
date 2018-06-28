@@ -15,7 +15,6 @@ from onegov.gazette.utils.sogc_converter import KK09
 from onegov.gazette.utils.sogc_converter import KK10
 from onegov.notice.collections import get_unique_notice_name
 from requests import get
-from requests import post
 from sedate import standardize_date
 from uuid import uuid4
 
@@ -25,12 +24,9 @@ class SogcImporter(object):
     def __init__(self, session, config):
         self.session = session
         self.endpoint = config['endpoint'].rstrip('/')
-        self.username = config['username']
-        self.password = config['password']
         self.canton = config['canton']
         self.category = config['category']
         self.organization = config['organization']
-        self.token = None
         self.converters = {
             'KK01': KK01,
             'KK02': KK02,
@@ -44,18 +40,6 @@ class SogcImporter(object):
             'KK10': KK10,
         }
         self.subrubrics = list(self.converters.keys())
-
-    def login(self):
-        """ Login to the service and store the token. The token will be valid
-        for half an hour.
-
-        """
-        response = post(
-            f'{self.endpoint}/login',
-            data={'username': self.username, 'password': self.password}
-        )
-        response.raise_for_status()
-        self.token = response.headers['x-auth-token']
 
     def get_publication_ids(self):
         """ Returns the IDs of the publications we are interested in. Does not
@@ -75,8 +59,7 @@ class SogcImporter(object):
                     'subRubrics': self.subrubrics,
                     'pageRequest.page': page,
                     'pageRequest.size': 2000,
-                },
-                headers={'X-AUTH-TOKEN': self.token}
+                }
             )
             response.raise_for_status()
 
@@ -103,10 +86,7 @@ class SogcImporter(object):
         """
         session = self.session
 
-        response = get(
-            f'{self.endpoint}/publications/{identifier}/xml',
-            headers={'X-AUTH-TOKEN': self.token}
-        )
+        response = get(f'{self.endpoint}/publications/{identifier}/xml')
         response.raise_for_status()
         response.encoding = 'utf-8'
 
@@ -145,7 +125,6 @@ class SogcImporter(object):
         )
 
     def __call__(self):
-        self.login()
         publication_ids = self.get_publication_ids()
         for id_ in publication_ids:
             self.get_publication(id_)

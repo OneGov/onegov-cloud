@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Removes unnecessary SOGC login.
+  [msom]
+
 1.15.1 (2018-06-28)
 ~~~~~~~~~~~~~~~~~~~~
 

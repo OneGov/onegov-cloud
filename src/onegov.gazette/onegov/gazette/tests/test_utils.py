@@ -84,8 +84,6 @@ def create_importer(session):
         session,
         {
             'endpoint': 'https://localhost',
-            'username': 'user',
-            'password': 'pass',
             'canton': 'GV',
             'category': '190',
             'organization': '200',
@@ -112,12 +110,9 @@ class DummyResponse():
 def test_sogc_importer_create(session):
     importer = create_importer(session)
     assert importer.endpoint == 'https://localhost'
-    assert importer.username == 'user'
-    assert importer.password == 'pass'
     assert importer.canton == 'GV'
     assert importer.category == '190'
     assert importer.organization == '200'
-    assert importer.token == None
     assert sorted(importer.converters.keys()) == [
         'KK01', 'KK02', 'KK03', 'KK04', 'KK05', 'KK06', 'KK07', 'KK08', 'KK09',
         'KK10'
@@ -128,31 +123,18 @@ def test_sogc_importer_create(session):
     ]
 
 
-def test_sogc_importer_login(session):
-    with patch('onegov.gazette.utils.sogc_importer.post') as post:
-        create_importer(session).login()
-
-        assert post.called
-        assert post.call_args == call(
-            'https://localhost/login',
-            data={'username': 'user', 'password': 'pass'}
-        )
-
-
 def test_sogc_importer_get_publication_ids(session):
 
     importer = create_importer(session)
     with patch('onegov.gazette.utils.sogc_importer.get') as get:
         get.return_value = DummyResponse([BULK_EMPTY])
 
-        importer.token = 'xyz'
         result = importer.get_publication_ids()
 
         assert result == []
         assert get.called
         assert get.call_args == call(
             'https://localhost/publications/xml',
-            headers={'X-AUTH-TOKEN': 'xyz'},
             params={
                 'publicationStates': 'PUBLISHED',
                 'cantons': 'GV',
@@ -180,7 +162,6 @@ def test_sogc_importer_get_publication_ids(session):
             BULK_EMPTY
         ])
 
-        importer.token = 'xyz'
         result = importer.get_publication_ids()
 
         assert result == ['XXX1', 'XXX3']
@@ -196,13 +177,11 @@ def test_sogc_importer_get_publication(session):
     with patch('onegov.gazette.utils.sogc_importer.get') as get:
         get.return_value = DummyResponse([SINGLE_KK01])
 
-        importer.token = 'xyz'
         importer.get_publication('XXX1')
 
         assert get.called
         assert get.call_args == call(
             'https://localhost/publications/XXX1/xml',
-            headers={'X-AUTH-TOKEN': 'xyz'}
         )
 
         notice = session.query(GazetteNotice).one()
