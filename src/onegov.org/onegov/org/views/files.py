@@ -4,6 +4,8 @@ import morepath
 import os.path
 import random
 
+from babel.core import Locale
+from babel.dates import parse_pattern
 from functools import lru_cache
 from itertools import groupby
 from mimetypes import guess_extension
@@ -41,9 +43,13 @@ def view_get_file_collection(self, request):
 
     files = tuple(self.files)
 
+    # XXX build somewhat manually for more speed
+    locale = Locale.parse(request.locale)
+    pattern = parse_pattern(layout.datetime_format)
+
     @lru_cache(maxsize=len(files) // 4)
     def format_date(date):
-        return layout.format_date(date, 'datetime')
+        return pattern.apply(date, locale)
 
     @lru_cache(maxsize=len(files) // 4)
     def extension_for_content_type(content_type):
