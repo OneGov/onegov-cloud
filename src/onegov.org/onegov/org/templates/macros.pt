@@ -282,6 +282,13 @@
         <div class="dz-message" i18n:translate>
             Drop files to upload
         </div>
+
+        <!--! fallback for integration tests -->
+        <div class="fallback" style="display: none;">
+            <input name="file" type="file" multiple />
+            <input type="submit" value="Submit" class="button" i18n:attributes="value">
+        </div>
+
     </form>
 </metal:dropzone>
 
