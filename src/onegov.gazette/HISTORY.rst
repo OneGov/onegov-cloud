@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.15.1 (2018-06-28)
+~~~~~~~~~~~~~~~~~~~~
 
 - Fixes throwing an error on unexpected principal configuration options.
   [msom]
