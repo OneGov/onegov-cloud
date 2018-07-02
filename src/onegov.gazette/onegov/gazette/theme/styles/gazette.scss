@@ -483,6 +483,10 @@ footer {
                         border-left: 0;
                         top: 1px;
                         z-index: 20;
+
+                        &.has-dropdown {
+                            z-index: 505;
+                        }
                     }
                 }
             }
