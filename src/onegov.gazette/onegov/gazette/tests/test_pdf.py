@@ -5,9 +5,10 @@ from onegov.file.utils import as_fileintent
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import GazetteNoticeFile
 from onegov.gazette.models import Issue
-from onegov.gazette.pdf import Pdf
 from onegov.gazette.pdf import IssuePdf
+from onegov.gazette.pdf import Pdf
 from PyPDF2 import PdfFileReader
+from sedate import utcnow
 from unittest.mock import patch
 
 
@@ -33,7 +34,50 @@ class DummyRequest(object):
         pass
 
 
-def test_pdf_h():
+def pdf_attachment(content):
+    pdf = BytesIO()
+    inline = Pdf(pdf)
+    inline.init_report()
+    inline.p(content)
+    inline.generate()
+    pdf.seek(0)
+
+    attachment = GazetteNoticeFile(id=random_token())
+    attachment.name = 'file.pdf'
+    attachment.reference = as_fileintent(pdf, 'file.pdf')
+    return attachment
+
+
+def test_pdf_from_notice(gazette_app):
+    session = gazette_app.session()
+
+    with freeze_time("2017-01-01 12:00"):
+        notice = GazetteNotice(
+            title='title',
+            text='text',
+            author_place='place',
+            author_date=utcnow(),
+            author_name='author',
+            state='drafted'
+        )
+        notice.files.append(pdf_attachment('attachment'))
+        session.add(notice)
+        session.flush()
+
+    request = DummyRequest(session, gazette_app.principal)
+    file = Pdf.from_notice(notice, request)
+    reader = PdfFileReader(file)
+    assert [page.extractText() for page in reader.pages] == [
+        '© 2018 Govikon\n1\nxxx\ntitle\ntext\nplace, 1. Januar 2017\nauthor\n',
+        '© 2018 Govikon\n2\n'
+    ]
+
+
+def test_pdf_from_collection():
+    pass
+
+
+def test_pdf_issues_h():
     pdf = IssuePdf(BytesIO())
     pdf.init_a4_portrait()
 
@@ -58,7 +102,7 @@ def test_pdf_h():
         assert h4.called
 
 
-def test_pdf_unfold_data(session):
+def test_pdf_issues_unfold_data(session):
     def notice(title, text, number=None):
         notice = GazetteNotice(
             title=title,
@@ -164,7 +208,7 @@ def test_pdf_unfold_data(session):
     assert text.strip() == '\n'.join(expected)
 
 
-def test_pdf_query_notices(session, issues, organizations, categories):
+def test_pdf_issues_query_notices(session, issues, organizations, categories):
     for _issues, organization_id, category_id in (
         ({'2017-40': '1', '2017-41': '4'}, '100', '10'),
         ({'2017-40': '2', '2017-41': '3'}, '100', '10'),
@@ -206,18 +250,9 @@ def test_pdf_query_notices(session, issues, organizations, categories):
     ]
 
 
-def test_pdf_from_issue(gazette_app):
+def test_pdf_issues_from_issue(gazette_app):
     session = gazette_app.session()
     principal = gazette_app.principal
-
-    def pdf(content):
-        pdf = BytesIO()
-        inline = Pdf(pdf)
-        inline.init_report()
-        inline.p(content)
-        inline.generate()
-        pdf.seek(0)
-        return pdf
 
     for _issues, organization_id, category_id, attachments in (
         ({'2017-40': '1', '2017-41': '4'}, '100', '10', []),
@@ -238,10 +273,7 @@ def test_pdf_from_issue(gazette_app):
             state='published'
         )
         for content in attachments:
-            attachment = GazetteNoticeFile(id=random_token())
-            attachment.name = 'file.pdf'
-            attachment.reference = as_fileintent(pdf(content), 'file.pdf')
-            notice.files.append(attachment)
+            notice.files.append(pdf_attachment(content))
 
         session.add(notice)
     session.flush()

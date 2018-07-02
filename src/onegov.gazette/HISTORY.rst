@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds PDF preview of (single) notices.
+  [msom]
+
 1.15.4 (2018-06-28)
 ~~~~~~~~~~~~~~~~~~~~
 

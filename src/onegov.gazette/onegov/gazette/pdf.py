@@ -24,11 +24,6 @@ class Pdf(PdfBase):
         self.style.title.spaceBefore = 0
         self.style.title.spaceAfter = 0.67 * self.style.title.fontSize
 
-        self.style.meta = deepcopy(self.style.normal)
-        self.style.meta.fontSize = 0.85 * self.style.meta.fontSize
-        self.style.meta.spaceBefore = 1 * self.style.meta.fontSize
-        self.style.meta.spaceAfter = 1 * self.style.meta.fontSize
-
         self.style.h_notice = deepcopy(self.style.bold)
         self.style.h_notice.fontSize = 1.125 * self.style.fontSize
         self.style.table_h_notice = self.style.table + (
@@ -42,22 +37,32 @@ class Pdf(PdfBase):
         self.style.li.spaceAfter = 0.275 * self.style.li.fontSize
         self.style.li.leading = 1.275 * self.style.li.fontSize
 
-    def notice(self, notice, layout):
+        # Indent left everthing to stress the issue number
+        self.style.leftIndent = 30
+        self.style.title.leftIndent = self.style.leftIndent
+        self.style.heading1.leftIndent = self.style.leftIndent
+        self.style.heading2.leftIndent = self.style.leftIndent
+        self.style.heading3.leftIndent = self.style.leftIndent
+        self.style.heading4.leftIndent = self.style.leftIndent
+        self.style.paragraph.leftIndent = self.style.leftIndent
+        self.style.ol.leftIndent = self.style.leftIndent
+        self.style.ul.leftIndent = self.style.leftIndent
+
+    def notice(self, notice, layout, publication_number='xxx'):
         """ Adds an official notice. """
 
-        meta = [notice.organization, notice.category]
-        meta.extend([
-            layout.format_issue(issue, notice=notice)
-            for issue in notice.issue_objects
-        ])
-        meta = ' | '.join(meta)
-
-        self.p_markup(f'<i>{meta}</i>', style=self.style.meta)
-        self.story[-1].keepWithNext = True
-        self.p(notice.title, style=self.style.h_notice)
+        self.table(
+            [[
+                MarkupParagraph(publication_number, self.style.normal),
+                MarkupParagraph(notice.title, self.style.h_notice)
+            ]],
+            [self.style.leftIndent, None],
+            style=self.style.table_h_notice
+        )
         self.story[-1].keepWithNext = True
         self.mini_html(notice.text)
         if notice.author_place and notice.author_date:
+            self.story[-1].keepWithNext = True
             self.mini_html(
                 "{}, {}<br>{}".format(
                     notice.author_place,
@@ -78,14 +83,12 @@ class Pdf(PdfBase):
         result = BytesIO()
         pdf = cls(
             result,
-            title=notice.title,
             author=request.app.principal.name
         )
         pdf.init_a4_portrait(
             page_fn=page_fn_footer,
             page_fn_later=page_fn_header_and_footer
         )
-        pdf.h1(notice.title)
 
         pdf.spacer()
         pdf.notice(notice, layout)
@@ -127,22 +130,6 @@ class IssuePdf(Pdf):
 
     """
 
-    def adjust_style(self, font_size=10):
-        """ Adds styles for notices. """
-
-        super(IssuePdf, self).adjust_style(font_size)
-
-        # Indent left everthing to stress the issue number
-        self.style.leftIndent = 30
-        self.style.title.leftIndent = self.style.leftIndent
-        self.style.heading1.leftIndent = self.style.leftIndent
-        self.style.heading2.leftIndent = self.style.leftIndent
-        self.style.heading3.leftIndent = self.style.leftIndent
-        self.style.heading4.leftIndent = self.style.leftIndent
-        self.style.paragraph.leftIndent = self.style.leftIndent
-        self.style.ol.leftIndent = self.style.leftIndent
-        self.style.ul.leftIndent = self.style.leftIndent
-
     def h(self, title, level=0):
         """ Adds a title according to the given level. """
 
@@ -166,31 +153,8 @@ class IssuePdf(Pdf):
             for id_ in notices:
                 notice = session.query(GazetteNotice).filter_by(id=id_).one()
                 notice.set_publication_number(issue, publication_number)
+                self.notice(notice, layout, publication_number)
                 publication_number = publication_number + 1
-                self.table(
-                    [[
-                        MarkupParagraph(
-                            notice.issues[issue], self.style.normal
-                        ),
-                        MarkupParagraph(notice.title, self.style.h_notice)
-                    ]],
-                    [self.style.leftIndent, None],
-                    style=self.style.table_h_notice
-                )
-                self.story[-1].keepWithNext = True
-                self.mini_html(notice.text)
-                if notice.author_place and notice.author_date:
-                    self.mini_html(
-                        "{}, {}<br>{}".format(
-                            notice.author_place,
-                            layout.format_date(
-                                notice.author_date, 'date_long'
-                            ),
-                            notice.author_name
-                        )
-                    )
-                for file in notice.files:
-                    self.pdf(file.reference.file)
 
             children = item.get('children', [])
             if children:
