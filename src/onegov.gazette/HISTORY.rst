@@ -4,6 +4,9 @@ Changelog
 - Adds PDF previews of notices.
   [msom]
 
+- Adds PDF index.
+  [msom]
+
 1.15.4 (2018-06-28)
 ~~~~~~~~~~~~~~~~~~~~
 

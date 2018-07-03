@@ -51,7 +51,7 @@ def pdf_attachment(content):
     return attachment
 
 
-def test_pdf_from_notice(gazette_app):
+def test_notices_pdf_from_notice(gazette_app):
     session = gazette_app.session()
 
     with freeze_time("2017-01-01 12:00"):
@@ -76,7 +76,7 @@ def test_pdf_from_notice(gazette_app):
     ]
 
 
-def test_pdf_from_notices(gazette_app):
+def test_notices_pdf_from_notices(gazette_app):
     session = gazette_app.session()
 
     with freeze_time("2017-01-01 12:00"):
@@ -136,7 +136,64 @@ def test_pdf_from_notices(gazette_app):
     ]
 
 
-def test_pdf_issues_h():
+def test_index_pdf_from_notices(gazette_app):
+    session = gazette_app.session()
+
+    with freeze_time("2017-01-01 12:00"):
+        notice = GazetteNotice(
+            title='first title',
+            text='first text',
+            organization_id='100',
+            category_id='10',
+            _issues={
+                '2017-40': '1',
+                '2017-41': '3',
+            },
+            state='accepted'
+        )
+        session.add(notice)
+        session.flush()
+
+    with freeze_time("2017-01-02 12:00"):
+        notice = GazetteNotice(
+            title='second title',
+            text='second text',
+            organization_id='200',
+            category_id='11',
+            _issues={
+                '2017-40': '2',
+                '2017-42': '4',
+            },
+            state='published'
+        )
+        session.add(notice)
+        session.flush()
+
+    request = DummyRequest(session, gazette_app.principal)
+    notices = GazetteNoticeCollection(session)
+    file = IndexPdf.from_notices(notices, request)
+    reader = PdfFileReader(file)
+    assert [page.extractText() for page in reader.pages] == [
+        (
+            '© 2018 Govikon\n1\nGazette\nIndex\n'
+            'Organizations\n'
+            'C\n'
+            'Civic Community  2017-40-2, 2017-42-4\n'
+            'S\n'
+            'State Chancellery  2017-40-1, 2017-41-3\n'
+        ),
+        (
+            'Gazette\n© 2018 Govikon\n2\n'
+            'Categories\n'
+            'C\n'
+            'Complaints  2017-40-1, 2017-41-3\n'
+            'E\n'
+            'Education  2017-40-2, 2017-42-4\n'
+        )
+    ]
+
+
+def test_issues_pdf_h():
     pdf = IssuePdf(BytesIO())
     pdf.init_a4_portrait()
 
@@ -161,7 +218,7 @@ def test_pdf_issues_h():
         assert h4.called
 
 
-def test_pdf_issues_unfold_data(session):
+def test_issues_pdf_unfold_data(session):
     def notice(title, text, number=None):
         notice = GazetteNotice(
             title=title,
@@ -267,7 +324,7 @@ def test_pdf_issues_unfold_data(session):
     assert text.strip() == '\n'.join(expected)
 
 
-def test_pdf_issues_query_notices(session, issues, organizations, categories):
+def test_issues_pdf_query_notices(session, issues, organizations, categories):
     for _issues, organization_id, category_id in (
         ({'2017-40': '1', '2017-41': '4'}, '100', '10'),
         ({'2017-40': '2', '2017-41': '3'}, '100', '10'),
@@ -309,7 +366,7 @@ def test_pdf_issues_query_notices(session, issues, organizations, categories):
     ]
 
 
-def test_pdf_issues_from_issue(gazette_app):
+def test_issues_pdf_from_issue(gazette_app):
     session = gazette_app.session()
     principal = gazette_app.principal
 
