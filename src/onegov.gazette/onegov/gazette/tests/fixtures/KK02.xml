@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<KK02:publication xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:KK02="https://shab.ch/shab/KK02-export" xsi:schemaLocation="https://shab.ch/shab/KK02-export https://int.eshab.shab.ch/api/v1/schemas/shab/1.2/KK02-export.xsd">
+<meta>
+  <id>4a6ccc6f-35ee-49a0-8819-b3a93261c958</id>
+  <rubric>KK</rubric>
+  <subRubric>KK02</subRubric>
+  <language>fr</language>
+  <registrationOffice>
+    <id>ba58f8a7-6a54-11e8-bbc0-0050569d0f01</id>
+    <displayName>Office des poursuites et faillites de l'Etat Genève - Faillites</displayName>
+    <street>Rue du Stand</street>
+    <streetNumber>46</streetNumber>
+    <swissZipCode>1204</swissZipCode>
+    <town>Genève</town>
+    <containsPostOfficeBox>false</containsPostOfficeBox>
+    <postOfficeBox/>
+  </registrationOffice>
+  <publicationNumber>KK02-0000000038</publicationNumber>
+  <publicationState>PUBLISHED</publicationState>
+  <publicationDate>2018-07-03</publicationDate>
+  <expirationDate>2023-07-03</expirationDate>
+  <primaryTenantCode>shab</primaryTenantCode>
+  <onBehalfOf>test_sur_mandat_de</onBehalfOf>
+  <legalRemedy>Notification selon LP 231, 232; ORFI, du 23 avril 1920, art. 29 et 123</legalRemedy>
+  <cantons>GE</cantons>
+  <secondaryTenants>
+    <tenantCode>kabge</tenantCode>
+    <publicationDate>2018-07-03</publicationDate>
+  </secondaryTenants>
+  <title>
+    <de>Konkurspublikation/Schuldenruf CK - HAIR SARL, en liquidation</de>
+    <en>Bankruptcy publication/call to creditors CK - HAIR SARL, en liquidation</en>
+    <it>Pubblicazione di fallimento/diffida ai creditori CK - HAIR SARL, en liquidation</it>
+    <fr>Publication de faillite/appel aux créanciers CK - HAIR SARL, en liquidation</fr>
+  </title>
+</meta>
+<content>
+  <proceeding>
+    <selectType>summary</selectType>
+  </proceeding>
+  <debtor>
+    <selectType>company</selectType>
+    <companies>
+      <noUID>false</noUID>
+      <company>
+        <name>CK - HAIR SARL, en liquidation</name>
+        <uid>CHE-260.477.536</uid>
+        <uidOrganisationId>260477536</uidOrganisationId>
+        <uidOrganisationIdCategorie>CHE</uidOrganisationIdCategorie>
+        <legalForm>0107</legalForm>
+        <address>
+          <street>chemin des Beaux-Champs</street>
+          <houseNumber>7</houseNumber>
+          <swissZipCode>1234</swissZipCode>
+          <town>Vessy</town>
+        </address>
+        <canton>GE</canton>
+      </company>
+    </companies>
+  </debtor>
+  <or731b>No</or731b>
+  <resolutionDate>2018-01-01</resolutionDate>
+  <additionalLegalRemedy>test_remarques_juridiques_complémentaires</additionalLegalRemedy>
+  <daysAfterPublication>30</daysAfterPublication>
+  <entryDeadline>2018-08-02</entryDeadline>
+  <commentEntryDeadline>test_commentaire_delai</commentEntryDeadline>
+  <registrationOffice>Office des poursuites et faillites de l'Etat Genève - Faillites
+Rue du Stand 46 
+1204 Genève</registrationOffice>
+  <remarks>test_remaques_autres_indications_publication</remarks>
+</content>
+</KK02:publication>

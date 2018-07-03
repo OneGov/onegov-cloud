@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<KK09:publication xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:KK09="https://shab.ch/shab/KK09-export" xsi:schemaLocation="https://shab.ch/shab/KK09-export https://int.eshab.shab.ch/api/v1/schemas/shab/1.2/KK09-export.xsd">
+<meta>
+  <id>b2d4c3c1-26be-4a48-8344-49f7cfa9c855</id>
+  <rubric>KK</rubric>
+  <subRubric>KK09</subRubric>
+  <language>de</language>
+  <registrationOffice>
+    <id>allrubricsoffice</id>
+    <displayName>All rubrics office</displayName>
+    <street>Galgenfeldweg</street>
+    <streetNumber>150</streetNumber>
+    <swissZipCode>3006</swissZipCode>
+    <town>Bern</town>
+    <containsPostOfficeBox>true</containsPostOfficeBox>
+    <postOfficeBox>
+      <number>18</number>
+      <swissZipCode>3007</swissZipCode>
+      <town>Zurich</town>
+    </postOfficeBox>
+  </registrationOffice>
+  <publicationNumber>KK09-0000000006</publicationNumber>
+  <publicationState>PUBLISHED</publicationState>
+  <publicationDate>2018-07-02</publicationDate>
+  <expirationDate>2020-12-12</expirationDate>
+  <primaryTenantCode>shab</primaryTenantCode>
+  <onBehalfOf>String</onBehalfOf>
+  <legalRemedy>Meldung nach SchKG</legalRemedy>
+  <cantons>BE</cantons>
+  <secondaryTenants>
+    <tenantCode>kabbe</tenantCode>
+    <publicationDate>2018-07-02</publicationDate>
+  </secondaryTenants>
+  <title>
+    <de>Lastenverzeichnisse Body Toning</de>
+    <en>Schedules of claims Body Toning</en>
+    <it>Elenchi degli oneri Body Toning</it>
+    <fr>Etat des charges Body Toning</fr>
+  </title>
+</meta>
+<content>
+  <debtor>
+    <selectType>company</selectType>
+    <companies>
+      <noUID>false</noUID>
+      <company>
+        <name>Body Toning</name>
+        <uid>CHE-123.456.789</uid>
+        <uidOrganisationId>123456789</uidOrganisationId>
+        <uidOrganisationIdCategorie>CHE</uidOrganisationIdCategorie>
+        <legalForm>0106</legalForm>
+        <address>
+          <street>Bösch 128</street>
+          <swissZipCode>1263</swissZipCode>
+          <town>Crassier</town>
+        </address>
+      </company>
+    </companies>
+  </debtor>
+  <affectedLand>Grundstück Nr. 13543, Blaustrasse 23, 300 Bern</affectedLand>
+  <locationCirculationAuthority>Weitere Angaben zum betroffenen Grundstück stehen in diesem Feld</locationCirculationAuthority>
+  <informationAboutEdition>Hier können die Angaben zu der Auflage stehen</informationAboutEdition>
+  <daysAfterPublication>20</daysAfterPublication>
+  <entryDeadline>2018-05-03</entryDeadline>
+  <appeal>
+    <daysAfterPublication>30</daysAfterPublication>
+    <entryDeadline>2018-05-03</entryDeadline>
+    <commentEntryDeadline>Hier kann ein Kommentar zur Frist gemacht werden</commentEntryDeadline>
+  </appeal>
+  <registrationOfficeComplain>Das ist die Anmeldestelle für Klagen</registrationOfficeComplain>
+  <registrationOfficeAppeal>Das ist die Anmeldestelle für Beschwerden</registrationOfficeAppeal>
+  <remarks>110618_VIew</remarks>
+</content>
+</KK09:publication>

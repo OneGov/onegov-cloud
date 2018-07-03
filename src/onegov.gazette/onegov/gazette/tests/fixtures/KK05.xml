@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<KK05:publication xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:KK05="https://shab.ch/shab/KK05-export" xsi:schemaLocation="https://shab.ch/shab/KK05-export https://int.eshab.shab.ch/api/v1/schemas/shab/1.2/KK05-export.xsd">
+<meta>
+  <id>996668e7-23da-4205-90e2-311c1eb58b41</id>
+  <rubric>KK</rubric>
+  <subRubric>KK05</subRubric>
+  <language>de</language>
+  <registrationOffice>
+    <id>allrubricsoffice</id>
+    <displayName>All rubrics office</displayName>
+    <street>Galgenfeldweg</street>
+    <streetNumber>150</streetNumber>
+    <swissZipCode>3006</swissZipCode>
+    <town>Bern</town>
+    <containsPostOfficeBox>true</containsPostOfficeBox>
+    <postOfficeBox>
+      <number>18</number>
+      <swissZipCode>3007</swissZipCode>
+      <town>Zurich</town>
+    </postOfficeBox>
+  </registrationOffice>
+  <publicationNumber>KK05-0000000021</publicationNumber>
+  <publicationState>PUBLISHED</publicationState>
+  <publicationDate>2018-07-02</publicationDate>
+  <expirationDate>2020-12-12</expirationDate>
+  <primaryTenantCode>shab</primaryTenantCode>
+  <onBehalfOf>String</onBehalfOf>
+  <legalRemedy>Meldung nach SchKG 263</legalRemedy>
+  <cantons>GE</cantons>
+  <secondaryTenants>
+    <tenantCode>kabge</tenantCode>
+    <publicationDate>2018-07-02</publicationDate>
+  </secondaryTenants>
+  <title>
+    <de>Verteilungsliste und Schlussrechnung Franklin Simon</de>
+    <en>Distribution list and final accounts Franklin Simon</en>
+    <it>Lista di ripartizione e conteggio finale Franklin Simon</it>
+    <fr>Liste de répartition et décompte final Franklin Simon</fr>
+  </title>
+</meta>
+<content>
+  <debtor>
+    <selectType>company</selectType>
+    <companies>
+      <noUID>false</noUID>
+      <company>
+        <name>Franklin Simon</name>
+        <uid>CHE-123.456.789</uid>
+        <uidOrganisationId>123456789</uidOrganisationId>
+        <uidOrganisationIdCategorie>CHE</uidOrganisationIdCategorie>
+        <legalForm>0106</legalForm>
+        <address>
+          <street>Bahnhofstrasse 114</street>
+          <swissZipCode>6656</swissZipCode>
+          <town>Golino</town>
+        </address>
+      </company>
+    </companies>
+  </debtor>
+  <locationCirculationAuthority>Hier stehen die Angaben zur Auflage</locationCirculationAuthority>
+  <additionalLegalRemedy>Hier können ergänzende rechtliche Hinweise stehen</additionalLegalRemedy>
+  <daysAfterPublication>10</daysAfterPublication>
+  <entryDeadline>2018-05-03</entryDeadline>
+  <commentEntryDeadline>Das ist der Kommentar zur Frist</commentEntryDeadline>
+  <registrationOffice>Konkursamt Bern
+Patricia Test
+8193  Test</registrationOffice>
+  <remarks>110618_VIew</remarks>
+</content>
+</KK05:publication>

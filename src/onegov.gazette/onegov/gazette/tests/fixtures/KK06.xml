@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<KK06:publication xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:KK06="https://shab.ch/shab/KK06-export" xsi:schemaLocation="https://shab.ch/shab/KK06-export https://int.eshab.shab.ch/api/v1/schemas/shab/1.2/KK06-export.xsd">
+<meta>
+  <id>580f95b8-e2b7-4199-9cf3-a5cd6ef3e8f6</id>
+  <rubric>KK</rubric>
+  <subRubric>KK06</subRubric>
+  <language>de</language>
+  <registrationOffice>
+    <id>allrubricsoffice</id>
+    <displayName>All rubrics office</displayName>
+    <street>Galgenfeldweg</street>
+    <streetNumber>150</streetNumber>
+    <swissZipCode>3006</swissZipCode>
+    <town>Bern</town>
+    <containsPostOfficeBox>true</containsPostOfficeBox>
+    <postOfficeBox>
+      <number>18</number>
+      <swissZipCode>3007</swissZipCode>
+      <town>Zurich</town>
+    </postOfficeBox>
+  </registrationOffice>
+  <publicationNumber>KK06-0000000025</publicationNumber>
+  <publicationState>PUBLISHED</publicationState>
+  <publicationDate>2018-07-02</publicationDate>
+  <expirationDate>2020-12-12</expirationDate>
+  <primaryTenantCode>shab</primaryTenantCode>
+  <onBehalfOf>String</onBehalfOf>
+  <legalRemedy>Meldung nach SchKG 268 Abs. 4</legalRemedy>
+  <cantons>JU</cantons>
+  <secondaryTenants>
+    <tenantCode>kabju</tenantCode>
+    <publicationDate>2018-07-02</publicationDate>
+  </secondaryTenants>
+  <title>
+    <de>Schluss des Konkursverfahrens Gamma Gas</de>
+    <en>Closing of bankruptcy proceedings Gamma Gas</en>
+    <it>Conclusione della procedura di fallimento Gamma Gas</it>
+    <fr>Clôture de faillite Gamma Gas</fr>
+  </title>
+</meta>
+<content>
+  <debtor>
+    <selectType>company</selectType>
+    <companies>
+      <noUID>false</noUID>
+      <company>
+        <name>Gamma Gas</name>
+        <uid>CHE-123.456.789</uid>
+        <uidOrganisationId>123456789</uidOrganisationId>
+        <uidOrganisationIdCategorie>CHE</uidOrganisationIdCategorie>
+        <legalForm>0106</legalForm>
+        <address>
+          <street>Obere Bahnhofstrasse 146</street>
+          <swissZipCode>6375</swissZipCode>
+          <town>Beckenried</town>
+        </address>
+      </company>
+    </companies>
+  </debtor>
+  <proceedingEndDate>2018-05-03</proceedingEndDate>
+  <additionalLegalRemedy>Hier können ergänzende rechtliche Hinweise stehen</additionalLegalRemedy>
+  <remarks>110618_VIew</remarks>
+</content>
+</KK06:publication>

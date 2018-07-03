@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<KK04:publication xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:KK04="https://shab.ch/shab/KK04-export" xsi:schemaLocation="https://shab.ch/shab/KK04-export https://int.eshab.shab.ch/api/v1/schemas/shab/1.2/KK04-export.xsd">
+<meta>
+  <id>bcdc9914-13db-4b80-b46a-71bd2903f6ad</id>
+  <rubric>KK</rubric>
+  <subRubric>KK04</subRubric>
+  <language>de</language>
+  <registrationOffice>
+    <id>allrubricsoffice</id>
+    <displayName>All rubrics office</displayName>
+    <street>Galgenfeldweg</street>
+    <streetNumber>150</streetNumber>
+    <swissZipCode>3006</swissZipCode>
+    <town>Bern</town>
+    <containsPostOfficeBox>true</containsPostOfficeBox>
+    <postOfficeBox>
+      <number>18</number>
+      <swissZipCode>3007</swissZipCode>
+      <town>Zurich</town>
+    </postOfficeBox>
+  </registrationOffice>
+  <publicationNumber>KK04-0000000014</publicationNumber>
+  <publicationState>PUBLISHED</publicationState>
+  <publicationDate>2018-07-02</publicationDate>
+  <expirationDate>2020-12-12</expirationDate>
+  <primaryTenantCode>shab</primaryTenantCode>
+  <onBehalfOf>String</onBehalfOf>
+  <legalRemedy>Meldung nach SchKG 221, 249-250</legalRemedy>
+  <cantons>ZG</cantons>
+  <secondaryTenants>
+    <tenantCode>kabzg</tenantCode>
+    <publicationDate>2018-07-02</publicationDate>
+  </secondaryTenants>
+  <title>
+    <de>Kollokationsplan und Inventar American Appliance</de>
+    <en>Collocation plan and inventory American Appliance</en>
+    <it>Graduatoria e inventario American Appliance</it>
+    <fr>Etat de collocation et inventaire American Appliance</fr>
+  </title>
+</meta>
+<content>
+  <debtor>
+    <selectType>company</selectType>
+    <companies>
+      <noUID>false</noUID>
+      <company>
+        <name>American Appliance</name>
+        <uid>CHE-123.456.789</uid>
+        <uidOrganisationId>123456789</uidOrganisationId>
+        <uidOrganisationIdCategorie>CHE</uidOrganisationIdCategorie>
+        <legalForm>0106</legalForm>
+        <address>
+          <street>Hauptstrasse 35</street>
+          <swissZipCode>1870</swissZipCode>
+          <town>Monthey</town>
+        </address>
+      </company>
+    </companies>
+  </debtor>
+  <claimOfCreditors>
+    <daysAfterPublication>20</daysAfterPublication>
+    <entryDeadline>2018-05-03</entryDeadline>
+    <commentEntryDeadline>Kommentar zu Frist 1</commentEntryDeadline>
+  </claimOfCreditors>
+  <inventory>
+    <daysAfterPublication>10</daysAfterPublication>
+    <entryDeadline>2018-05-03</entryDeadline>
+    <commentEntryDeadline>Kommentar zu Frist 2</commentEntryDeadline>
+  </inventory>
+  <registrationOffice>Konkursamt Bern
+Patricia Test
+8193  Test</registrationOffice>
+  <additionalLegalRemedy>Hier können ergänzende rechtliche Hinweise stehen</additionalLegalRemedy>
+  <remarks>110618_VIew</remarks>
+</content>
+</KK04:publication>

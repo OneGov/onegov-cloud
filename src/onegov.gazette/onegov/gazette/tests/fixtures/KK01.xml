@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<KK01:publication xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:KK01="https://shab.ch/shab/KK01-export" xsi:schemaLocation="https://shab.ch/shab/KK01-export https://int.eshab.shab.ch/api/v1/schemas/shab/1.2/KK01-export.xsd">
+<meta>
+  <id>a839d0d2-772e-47bc-b822-6fc21c15dcaa</id>
+  <rubric>KK</rubric>
+  <subRubric>KK01</subRubric>
+  <language>de</language>
+  <registrationOffice>
+    <id>allrubricsoffice</id>
+    <displayName>All rubrics office</displayName>
+    <street>Galgenfeldweg</street>
+    <streetNumber>150</streetNumber>
+    <swissZipCode>3006</swissZipCode>
+    <town>Bern</town>
+    <containsPostOfficeBox>true</containsPostOfficeBox>
+    <postOfficeBox>
+      <number>18</number>
+      <swissZipCode>3007</swissZipCode>
+      <town>Zurich</town>
+    </postOfficeBox>
+  </registrationOffice>
+  <publicationNumber>KK01-0000000008</publicationNumber>
+  <publicationState>PUBLISHED</publicationState>
+  <publicationDate>2018-07-02</publicationDate>
+  <expirationDate>2020-12-12</expirationDate>
+  <primaryTenantCode>shab</primaryTenantCode>
+  <onBehalfOf>String</onBehalfOf>
+  <legalRemedy>Meldung nach Art. 222 SchKG. Die Publikation betreffend Art, Verfahren, Eingabefrist usw. erfolgt später.</legalRemedy>
+  <cantons>AR</cantons>
+  <secondaryTenants>
+    <tenantCode>kabar</tenantCode>
+    <publicationDate>2018-07-02</publicationDate>
+  </secondaryTenants>
+  <title>
+    <de>Vorläufige Konkursanzeige Museum Company mit UID</de>
+    <en>Provisional announcement of bankruptcy Museum Company mit UID</en>
+    <it>Avviso provvisorio di apertura di fallimento Museum Company mit UID</it>
+    <fr>Avis préalable d'ouverture de faillite Museum Company mit UID</fr>
+  </title>
+</meta>
+<content>
+  <debtor>
+    <selectType>company</selectType>
+    <companies>
+      <noUID>false</noUID>
+      <company>
+        <name>Museum Company mit UID</name>
+        <uid>CHE-123.456.789</uid>
+        <uidOrganisationId>123456789</uidOrganisationId>
+        <uidOrganisationIdCategorie>CHE</uidOrganisationIdCategorie>
+        <legalForm>0106</legalForm>
+        <address>
+          <street>Grossmatt 144</street>
+          <swissZipCode>5618</swissZipCode>
+          <town>Bettwil</town>
+        </address>
+      </company>
+    </companies>
+  </debtor>
+  <or731b>No</or731b>
+  <resolutionDate>2018-05-03</resolutionDate>
+  <additionalLegalRemedy>Hier können ergänzende rechtliche Hinweise stehen</additionalLegalRemedy>
+  <remarks>110618_VIew</remarks>
+</content>
+</KK01:publication>

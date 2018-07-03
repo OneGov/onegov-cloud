@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<KK03:publication xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:KK03="https://shab.ch/shab/KK03-export" xsi:schemaLocation="https://shab.ch/shab/KK03-export https://int.eshab.shab.ch/api/v1/schemas/shab/1.2/KK03-export.xsd">
+<meta>
+  <id>2aee3297-6e4b-4eb2-91f8-c9387db43ffb</id>
+  <rubric>KK</rubric>
+  <subRubric>KK03</subRubric>
+  <language>de</language>
+  <registrationOffice>
+    <id>allrubricsoffice</id>
+    <displayName>All rubrics office</displayName>
+    <street>Galgenfeldweg</street>
+    <streetNumber>150</streetNumber>
+    <swissZipCode>3006</swissZipCode>
+    <town>Bern</town>
+    <containsPostOfficeBox>true</containsPostOfficeBox>
+    <postOfficeBox>
+      <number>18</number>
+      <swissZipCode>3007</swissZipCode>
+      <town>Zurich</town>
+    </postOfficeBox>
+  </registrationOffice>
+  <publicationNumber>KK03-0000000004</publicationNumber>
+  <publicationState>PUBLISHED</publicationState>
+  <publicationDate>2018-07-02</publicationDate>
+  <expirationDate>2020-12-12</expirationDate>
+  <primaryTenantCode>shab</primaryTenantCode>
+  <onBehalfOf>String</onBehalfOf>
+  <legalRemedy>Meldung nach SchKG 230, 230a. Das Konkursverfahren wird als geschlossen erklärt, falls nicht ein Gläubiger innert der obgenannten Frist die Durchführung verlangt und für die Deckung der Kosten den erwähnten Vorschuss leistet. Die Nachforderung weiterer Kostenvorschüsse bleibt vorbehalten.</legalRemedy>
+  <cantons>BL</cantons>
+  <secondaryTenants>
+    <tenantCode>kabbl</tenantCode>
+    <publicationDate>2018-07-02</publicationDate>
+  </secondaryTenants>
+  <title>
+    <de>Einstellung des Konkursverfahrens Burger Chef</de>
+    <en>Suspension of bankruptcy proceedings Burger Chef</en>
+    <it>Sospensione della procedura di fallimento Burger Chef</it>
+    <fr>Suspension de la procédure de faillite Burger Chef</fr>
+  </title>
+</meta>
+<content>
+  <debtor>
+    <selectType>company</selectType>
+    <companies>
+      <noUID>false</noUID>
+      <company>
+        <name>Burger Chef</name>
+        <uid>CHE-123.456.789</uid>
+        <uidOrganisationId>123456789</uidOrganisationId>
+        <uidOrganisationIdCategorie>CHE</uidOrganisationIdCategorie>
+        <legalForm>0106</legalForm>
+        <address>
+          <street>Bahnhofstrasse 25</street>
+          <swissZipCode>6525</swissZipCode>
+          <town>Gnosca</town>
+        </address>
+      </company>
+    </companies>
+  </debtor>
+  <or731b>No</or731b>
+  <resolutionDate>2018-08-03</resolutionDate>
+  <cessationDate>2018-05-03</cessationDate>
+  <advanceAmount>125.5</advanceAmount>
+  <additionalLegalRemedy>Hier können ergänzende rechtliche Hinweise stehen</additionalLegalRemedy>
+  <daysAfterPublication>30</daysAfterPublication>
+  <entryDeadline>2018-05-03</entryDeadline>
+  <commentEntryDeadline>Hier kann ein Kommentar stehen</commentEntryDeadline>
+  <registrationOffice>Konkursamt Bern
+Patricia Test
+8193  Test</registrationOffice>
+  <remarks>110618_VIew</remarks>
+</content>
+</KK03:publication>

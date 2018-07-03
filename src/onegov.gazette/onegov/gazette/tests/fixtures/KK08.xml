@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<KK08:publication xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:KK08="https://shab.ch/shab/KK08-export" xsi:schemaLocation="https://shab.ch/shab/KK08-export https://int.eshab.shab.ch/api/v1/schemas/shab/1.2/KK08-export.xsd">
+<meta>
+  <id>f7d56436-42c3-42cc-b9d8-80d1a94d81ba</id>
+  <rubric>KK</rubric>
+  <subRubric>KK08</subRubric>
+  <language>de</language>
+  <registrationOffice>
+    <id>allrubricsoffice</id>
+    <displayName>All rubrics office</displayName>
+    <street>Galgenfeldweg</street>
+    <streetNumber>150</streetNumber>
+    <swissZipCode>3006</swissZipCode>
+    <town>Bern</town>
+    <containsPostOfficeBox>true</containsPostOfficeBox>
+    <postOfficeBox>
+      <number>18</number>
+      <swissZipCode>3007</swissZipCode>
+      <town>Zurich</town>
+    </postOfficeBox>
+  </registrationOffice>
+  <publicationNumber>KK08-0000000009</publicationNumber>
+  <publicationState>PUBLISHED</publicationState>
+  <publicationDate>2018-07-02</publicationDate>
+  <expirationDate>2020-12-12</expirationDate>
+  <primaryTenantCode>shab</primaryTenantCode>
+  <legalRemedy>Meldung nach SchKG 257 - 259</legalRemedy>
+  <cantons>FR</cantons>
+  <secondaryTenants>
+    <tenantCode>kabfr</tenantCode>
+    <publicationDate>2018-07-02</publicationDate>
+  </secondaryTenants>
+  <title>
+    <de>Konkursamtliche Grundstücksteigerung Castle Realty</de>
+    <en>Auction of land by bankruptcy office Castle Realty</en>
+    <it>Vendita all'incanto forzata di fondi Castle Realty</it>
+    <fr>Vente aux enchères forcée d'immeubles Castle Realty</fr>
+  </title>
+</meta>
+<content>
+  <debtor>
+    <selectType>company</selectType>
+    <companies>
+      <noUID>false</noUID>
+      <company>
+        <name>Castle Realty</name>
+        <uid>CHE-123.456.789</uid>
+        <uidOrganisationId>123456789</uidOrganisationId>
+        <uidOrganisationIdCategorie>CHE</uidOrganisationIdCategorie>
+        <legalForm>0106</legalForm>
+        <address>
+          <street>Üerklisweg 136</street>
+          <swissZipCode>3855</swissZipCode>
+          <town>Brienz</town>
+        </address>
+      </company>
+    </companies>
+  </debtor>
+  <auctionObjects>Das sind die betroffenen Objekte</auctionObjects>
+  <auction>
+    <date>2018-05-03</date>
+    <time>14:50</time>
+    <location>Bern</location>
+  </auction>
+  <informationAboutEdition>Hier können Angaben zur Auflage publiziert werden</informationAboutEdition>
+  <additionalLegalRemedy>Hier können ergänzende rechtliche Hinweise stehen</additionalLegalRemedy>
+  <entryStart>2018-05-03</entryStart>
+  <entryDeadline>2018-05-03</entryDeadline>
+  <commentEntryDeadline>Kommentar zur Frist</commentEntryDeadline>
+  <registrationOffice>Konkursamt Test
+        Patricia</registrationOffice>
+  <remarks>110618_VIew</remarks>
+</content>
+</KK08:publication>

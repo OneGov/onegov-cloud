@@ -4,7 +4,7 @@ from textwrap import dedent
 
 
 def html_converter(text):
-    return text.replace('\n', '<br>')
+    return '<br>'.join((line.strip() for line in text.split('\n')))
 
 
 class SogcConverter(object):
@@ -373,12 +373,12 @@ class KK04(KK):
         )
         result += self.p(
             self.get('content/claimOfCreditors/entryDeadline', parse),
-            "Ablauf der Frist",
+            "Ablauf der Auflagefrist Kollokationsplan",
             fmt='date'
         )
         result += self.p(
             self.get('content/claimOfCreditors/commentEntryDeadline'),
-            "Kommentar zur Frist"
+            "Kommentar zur Auflagefrist Kollokationsplan"
         )
         return result
 
@@ -391,12 +391,12 @@ class KK04(KK):
         )
         result += self.p(
             self.get('content/inventory/entryDeadline', parse),
-            "Ablauf der Frist",
+            "Ablauf der Auflagefrist Inventar",
             fmt='date'
         )
         result += self.p(
             self.get('content/inventory/commentEntryDeadline'),
-            "Kommentar zur Frist"
+            "Kommentar zur Auflagefrist Inventar"
         )
         return result
 
@@ -537,18 +537,18 @@ class KK09(KK):
     @property
     def appeal(self):
         result = self.p(
-            self.get('content/appeal/daysAfterPublication', parse),
+            self.get('content/appeal/daysAfterPublication', int),
             "Klage- und Beschwerdefrist",
-            fmt='date'
+            fmt='days'
         )
         result += self.p(
             self.get('content/appeal/entryDeadline', parse),
-            "Ablauf der Frist",
+            "Ablauf der Klage- und Beschwerdefrist",
             fmt='date'
         )
         result += self.p(
             self.get('content/appeal/commentEntryDeadline'),
-            "Kommentar zur Frist"
+            "Kommentar zur Klage- und Beschwerdefrist"
         )
         return result
 
@@ -576,6 +576,7 @@ class KK09(KK):
         return self.dedent(f"""
         {self.debtor}
         {self.affected_land}
+        {self.location_circulation_authority}
         {self.information_about_edition}
         {self.days_after_publication}
         {self.entry_deadline}

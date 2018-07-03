@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<KK10:publication xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:KK10="https://shab.ch/shab/KK10-export" xsi:schemaLocation="https://shab.ch/shab/KK10-export https://int.eshab.shab.ch/api/v1/schemas/shab/1.2/KK10-export.xsd">
+<meta>
+  <id>4a3e3657-2a6c-4628-827b-5c0fd015a683</id>
+  <rubric>KK</rubric>
+  <subRubric>KK10</subRubric>
+  <language>de</language>
+  <registrationOffice>
+    <id>allrubricsoffice</id>
+    <displayName>All rubrics office</displayName>
+    <street>Galgenfeldweg</street>
+    <streetNumber>150</streetNumber>
+    <swissZipCode>3006</swissZipCode>
+    <town>Bern</town>
+    <containsPostOfficeBox>true</containsPostOfficeBox>
+    <postOfficeBox>
+      <number>18</number>
+      <swissZipCode>3007</swissZipCode>
+      <town>Zurich</town>
+    </postOfficeBox>
+  </registrationOffice>
+  <publicationNumber>KK10-0000000022</publicationNumber>
+  <publicationState>PUBLISHED</publicationState>
+  <publicationDate>2018-07-02</publicationDate>
+  <expirationDate>2020-12-12</expirationDate>
+  <primaryTenantCode>shab</primaryTenantCode>
+  <onBehalfOf>String</onBehalfOf>
+  <legalRemedy>Meldung nach SchKG</legalRemedy>
+  <cantons>OW</cantons>
+  <secondaryTenants>
+    <tenantCode>kabow</tenantCode>
+    <publicationDate>2018-07-02</publicationDate>
+  </secondaryTenants>
+  <title>
+    <de>Das ist ein KK verschiedenes, dieser Titel wird durch die Meldung gesteuert</de>
+    <en>Das ist ein KK verschiedenes, dieser Titel wird durch die Meldung gesteuert</en>
+    <it>Das ist ein KK verschiedenes, dieser Titel wird durch die Meldung gesteuert</it>
+    <fr>Das ist ein KK verschiedenes, dieser Titel wird durch die Meldung gesteuert</fr>
+  </title>
+</meta>
+<content>
+  <title>Das ist ein KK verschiedenes, dieser Titel wird durch die Meldung gesteuert</title>
+  <publication>INhalt der Meldung</publication>
+</content>
+</KK10:publication>

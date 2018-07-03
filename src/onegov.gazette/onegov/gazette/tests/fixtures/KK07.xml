@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<KK07:publication xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:KK07="https://shab.ch/shab/KK07-export" xsi:schemaLocation="https://shab.ch/shab/KK07-export https://int.eshab.shab.ch/api/v1/schemas/shab/1.2/KK07-export.xsd">
+<meta>
+  <id>68d93f61-7c8a-4d40-af62-9baaf397c781</id>
+  <rubric>KK</rubric>
+  <subRubric>KK07</subRubric>
+  <language>de</language>
+  <registrationOffice>
+    <id>allrubricsoffice</id>
+    <displayName>All rubrics office</displayName>
+    <street>Galgenfeldweg</street>
+    <streetNumber>150</streetNumber>
+    <swissZipCode>3006</swissZipCode>
+    <town>Bern</town>
+    <containsPostOfficeBox>true</containsPostOfficeBox>
+    <postOfficeBox>
+      <number>18</number>
+      <swissZipCode>3007</swissZipCode>
+      <town>Zurich</town>
+    </postOfficeBox>
+  </registrationOffice>
+  <publicationNumber>KK07-0000000026</publicationNumber>
+  <publicationState>PUBLISHED</publicationState>
+  <publicationDate>2018-07-02</publicationDate>
+  <expirationDate>2020-12-12</expirationDate>
+  <primaryTenantCode>shab</primaryTenantCode>
+  <onBehalfOf>String</onBehalfOf>
+  <legalRemedy>Meldung nach SchKG 195, 196, 332</legalRemedy>
+  <cantons>BS</cantons>
+  <secondaryTenants>
+    <tenantCode>kabbs</tenantCode>
+    <publicationDate>2018-07-02</publicationDate>
+  </secondaryTenants>
+  <title>
+    <de>Widerruf des Konkurses Beatties</de>
+    <en>Revocation of bankruptcy Beatties</en>
+    <it>Revoca del fallimento Beatties</it>
+    <fr>Révocation de faillite Beatties</fr>
+  </title>
+</meta>
+<content>
+  <debtor>
+    <selectType>company</selectType>
+    <companies>
+      <noUID>false</noUID>
+      <company>
+        <name>Beatties</name>
+        <uid>CHE-123.456.789</uid>
+        <uidOrganisationId>123456789</uidOrganisationId>
+        <uidOrganisationIdCategorie>CHE</uidOrganisationIdCategorie>
+        <legalForm>0106</legalForm>
+        <address>
+          <street>Valéestrasse 31</street>
+          <swissZipCode>1937</swissZipCode>
+          <town>Orsières</town>
+        </address>
+      </company>
+    </companies>
+  </debtor>
+  <proceedingRevocationDate>2018-05-03</proceedingRevocationDate>
+  <additionalLegalRemedy>Hier können ergänzende rechtliche Hinweise stehen</additionalLegalRemedy>
+  <remarks>110618_VIew</remarks>
+</content>
+</KK07:publication>
