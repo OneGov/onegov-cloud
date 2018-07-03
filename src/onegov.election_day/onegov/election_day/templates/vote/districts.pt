@@ -28,10 +28,11 @@
                         data-dataurl="${request.link(ballot, name='by-district')}"
                         data-embed-link="Embed"
                         data-embed-source="${request.link(ballot, name='districts-map')}"
-                        data-left-hand="Yay"
-                        data-right-hand="Nay"
-                        data-expats="Expats"
-                        i18n:attributes="data-embed-link; data-left-hand; data-right-hand; data-expats"
+                        data-thumbs="true"
+                        data-label-left-hand="Nay"
+                        data-label-right-hand="Yay"
+                        data-label-expats="Expats"
+                        i18n:attributes="data-embed-link; data-label-left-hand; data-label-right-hand; data-label-expats"
                         >
                     </div>
                     <a class="svg-download" tal:condition="layout.svg_path" href="${layout.svg_link}">

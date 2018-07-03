@@ -72,17 +72,19 @@ var initEntitiesMap = function(el) {
     $.ajax({ url: mapurl }).done(function(mapdata) {
         $.ajax({ url: dataurl }).done(function(data) {
             var canton =  $(el).data('canton');
-            var yay = $(el).data('left-hand');
-            var nay = $(el).data('right-hand');
-            var expats = $(el).data('expats');
+            var thumbs = $(el).data('thumbs');
+            var label_left_hand = $(el).data('label-left-hand');
+            var label_right_hand = $(el).data('label-right-hand');
+            var label_expats = $(el).data('label-expats');
             var map = entitiesMap({
                 mapdata: mapdata,
                 data: data,
                 canton: canton,
                 interactive: true,
-                yay: yay,
-                nay: nay,
-                expats: expats
+                thumbs: thumbs,
+                label_left_hand: label_left_hand,
+                label_right_hand: label_right_hand,
+                label_expats: label_expats
             })(el);
 
             var embed_link = $(el).data('embed-link');
@@ -102,17 +104,21 @@ var initDistrictsMap = function(el) {
     $.ajax({ url: mapurl }).done(function(mapdata) {
         $.ajax({ url: dataurl }).done(function(data) {
             var canton =  $(el).data('canton');
-            var yay = $(el).data('left-hand');
-            var nay = $(el).data('right-hand');
-            var expats = $(el).data('expats');
+            var thumbs = $(el).data('thumbs');
+            var gradient = $(el).data('gradient');
+            var label_left_hand = $(el).data('label-left-hand');
+            var label_right_hand = $(el).data('label-right-hand');
+            var label_expats = $(el).data('label-expats');
             var map = districtsMap({
                 mapdata: mapdata,
                 data: data,
                 canton: canton,
                 interactive: true,
-                yay: yay,
-                nay: nay,
-                expats: expats
+                thumbs: thumbs,
+                gradient: gradient,
+                label_left_hand: label_left_hand,
+                label_right_hand: label_right_hand,
+                label_expats: label_expats
             })(el);
 
             var embed_link = $(el).data('embed-link');

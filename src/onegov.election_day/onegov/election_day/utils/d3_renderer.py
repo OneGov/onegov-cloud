@@ -192,8 +192,8 @@ class D3Renderer():
             data = get_ballot_data_by_entity(item)
             if data:
                 params = {
-                    'yay': self.translate(_('Yay'), locale),
-                    'nay': self.translate(_('Nay'), locale),
+                    'label_left_hand': self.translate(_('Nay'), locale),
+                    'label_right_hand': self.translate(_('Yay'), locale),
                 }
                 year = item.vote.date.year
                 chart = self.get_map(
@@ -208,8 +208,8 @@ class D3Renderer():
             data = get_ballot_data_by_district(item)
             if data:
                 params = {
-                    'yay': self.translate(_('Yay'), locale),
-                    'nay': self.translate(_('Nay'), locale),
+                    'label_left_hand': self.translate(_('Nay'), locale),
+                    'label_right_hand': self.translate(_('Yay'), locale),
                 }
                 year = item.vote.date.year
                 chart = self.get_map(

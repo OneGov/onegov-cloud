@@ -16,9 +16,10 @@
         var height = 0;
         var width = 0;
         var interactive = false;
-        var yay = 'Yay';
-        var nay = 'Nay';
-        var expats = 'Expats';
+        var thumbs = false;
+        var label_left_hand = '0%';
+        var label_right_hand = '100%';
+        var label_expats = 'Expats';
         var options = {
             legendHeight: 10,
             legendMargin: 30,
@@ -32,9 +33,10 @@
             if ('canton' in params) canton = params.canton;
             if ('interactive' in params) interactive = params.interactive;
             if ('width' in params) width = params.width;
-            if ('yay' in params) yay = params.yay;
-            if ('nay' in params) nay = params.nay;
-            if ('expats' in params) expats = params.expats;
+            if ('thumbs' in params) thumbs = params.thumbs;
+            if ('label_right_hand' in params) label_right_hand = params.label_right_hand;
+            if ('label_left_hand' in params) label_left_hand = params.label_left_hand;
+            if ('label_expats' in params) label_expats = params.label_expats;
             if ('options' in params) options = params.options;
         }
 
@@ -69,6 +71,7 @@
                        .attr('stroke', '#999')
                        .attr('stroke-width', 1);
 
+                // Set up the color scale
                 var scale = d3.scale.linear()
                     .domain([30, 49.9999999, 50.000001, 70])
                     .range(['#ca0020', '#f4a582', '#92c5de', '#0571b0']);
@@ -86,26 +89,15 @@
                                    ((b.x - p.x > p.x + p.width - b.x - b.width) ? 'w' : 'e');
                         })
                         .html(function(d) {
-                            if (isUndefined(d.properties.result) ||
-                                isUndefined(d.properties.result.yeas_percentage)) {
-                                return '<strong>' + d.properties.name + '</strong>';
+                            var name = '<strong>' + d.properties.name + '</strong>';
+                            if (!isUndefined(d.properties.result) && !isUndefined(d.properties.result.percentage)) {
+                                var percentage = Math.round(d.properties.result.percentage * 100) / 100;
+                                if (!thumbs) return name + '<br/>' + percentage + '%';
+                                if (percentage > 50) return name + '<br/><i class="fa fa-thumbs-up"></i> ' + percentage + '%';
+                                percentage =  Math.round((100 - percentage) * 100) / 100;
+                                return name + '<br/><i class="fa fa-thumbs-down"></i> ' + percentage + '%';
                             }
-                            var yeas_percentage =  Math.round(d.properties.result.yeas_percentage * 100) / 100;
-                            var nays_percentage =  Math.round(d.properties.result.nays_percentage * 100) / 100;
-
-                            // use symbols to avoid text which we would have to translate
-                            // also, only show the winning side, not both
-                            if (yeas_percentage > nays_percentage) {
-                                return [
-                                    '<strong>' + d.properties.name + '</strong>',
-                                    '<i class="fa fa-thumbs-up"></i> ' + yeas_percentage + '%'
-                                ].join('<br/>');
-                            } else {
-                                return [
-                                    '<strong>' + d.properties.name + '</strong>',
-                                    '<i class="fa fa-thumbs-down"></i> ' + nays_percentage + '%'
-                                ].join('<br/>');
-                            }
+                            return name;
                         });
                 }
 
@@ -125,7 +117,7 @@
                         d.properties.result = data[d.properties.id];
                         if (!isUndefined(d.properties.result)) {
                             if (d.properties.result.counted) {
-                                return scale(d.properties.result.yeas_percentage);
+                                return scale(d.properties.result.percentage);
                             } else {
                                 return 'url(#uncounted)';
                             }
@@ -184,7 +176,7 @@
                         )
                         .property('__data__', {
                             'properties': {
-                              'name': expats,
+                              'name': label_expats,
                               'result': data[0]
                             }
                           }
@@ -198,7 +190,7 @@
                     globe.append('g')
                         .append('path')
                         .attr('fill', 'white')
-                        .attr('fill', scale(data[0].yeas_percentage))
+                        .attr('fill', scale(data[0].percentage))
                         .attr('stroke', 'none')
                         .attr('d', "M 306.11308,163.17191 C 306.11308,224.93199 256.04569,274.99881 194.2941,274.99881 C 132.53683,274.99881 82.472286,224.93144 82.472286,163.17191 C 82.472286,101.41465 132.53683,51.352937 194.2941,51.352937 C 256.04569,51.352937 306.11308,101.41465 306.11308,163.17191 L 306.11308,163.17191 z ");
 
@@ -219,7 +211,7 @@
                 // Add the the legend (we need to up/downscale the elements)
                 var unitScale = d3.scale.linear()
                     .rangeRound([0, (bboxMap.width - bboxMap.x) / (width - margin.left - margin.right)]);
-                var legendValues = [80, 70, 60, 50.001, 49.999, 40, 30, 20];
+                var legendValues = [0, 20, 40, 49.999, 50.001, 60, 80, 100];
                 var legendScale = d3.scale.ordinal()
                     .domain(legendValues)
                     .rangeRoundBands([0.2 * (bboxMap.width - bboxMap.x), 0.8 * (bboxMap.width - bboxMap.x)]);
@@ -234,19 +226,19 @@
                     .attr('width', legendScale.rangeBand())
                     .attr('height', unitScale(options.legendHeight))
                     .style('fill', function(d) {return scale(d);});
-                var text_yay = legend.append('text')
-                    .attr('x', legendScale(80))
+                var text_left_hand = legend.append('text')
+                    .attr('x', legendScale(0))
                     .attr('y', unitScale(options.legendHeight + 1.5 * options.fontSizePx))
                     .style('font-size', unitScale(options.fontSizePx) + 'px')
                     .style('font-family', options.fontFamily)
-                    .text(yay);
-                var text_nay = legend.append('text')
-                    .attr('x', legendScale(20) + legendScale.rangeBand())
+                    .text(label_left_hand);
+                var text_right_hand = legend.append('text')
+                    .attr('x', legendScale(100) + legendScale.rangeBand())
                     .attr('y', unitScale(options.legendHeight + 1.5 * options.fontSizePx))
                     .style('text-anchor', 'end')
-                    .style('font-size',unitScale(options.fontSizePx) + 'px')
+                    .style('font-size', unitScale(options.fontSizePx) + 'px')
                     .style('font-family', options.fontFamily)
-                    .text(nay);
+                    .text(label_right_hand);
 
                 // Set size
                 bbox = svg[0][0].getBBox();
@@ -278,10 +270,10 @@
                             .attr('width', legendScale.rangeBand())
                             .attr('height', unitScale(options.legendHeight))
                             .style('fill', function(d) {return scale(d);});
-                        text_yay.attr('x', legendScale(80))
+                        text_left_hand.attr('x', legendScale(0))
                             .attr('y', unitScale(options.legendHeight + 1.5 * options.fontSizePx))
                             .style('font-size', unitScale(options.fontSizePx) + 'px');
-                        text_nay.attr('x', legendScale(20) + legendScale.rangeBand())
+                        text_right_hand.attr('x', legendScale(100) + legendScale.rangeBand())
                             .attr('y', unitScale(options.legendHeight + 1.5 * options.fontSizePx))
                             .style('font-size', unitScale(options.fontSizePx) + 'px');
 

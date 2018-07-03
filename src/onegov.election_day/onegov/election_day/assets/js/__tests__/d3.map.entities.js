@@ -4,17 +4,17 @@ const topojson = require('../topojson');
 const mapChart = require('../d3.map.entities')(d3, topojson);
 const mapdata = require('../../../static/mapdata/2017/zg.json');
 const data = {
-  1701: {counted: true, nays_percentage: 40, yeas_percentage: 60},
-  1702: {counted: true, nays_percentage: 40, yeas_percentage: 60},
-  1703: {counted: true, nays_percentage: 40, yeas_percentage: 60},
-  1704: {counted: true, nays_percentage: 40, yeas_percentage: 60},
-  1705: {counted: true, nays_percentage: 40, yeas_percentage: 60},
-  1706: {counted: true, nays_percentage: 40, yeas_percentage: 60},
-  1707: {counted: true, nays_percentage: 40, yeas_percentage: 60},
-  1708: {counted: true, nays_percentage: 40, yeas_percentage: 60},
-  1709: {counted: true, nays_percentage: 40, yeas_percentage: 60},
-  1710: {counted: true, nays_percentage: 40, yeas_percentage: 60},
-  1711: {counted: true, nays_percentage: 40, yeas_percentage: 60}
+  1701: {counted: true, percentage: 60},
+  1702: {counted: true, percentage: 60},
+  1703: {counted: true, percentage: 60},
+  1704: {counted: true, percentage: 60},
+  1705: {counted: true, percentage: 60},
+  1706: {counted: true, percentage: 60},
+  1707: {counted: true, percentage: 60},
+  1708: {counted: true, percentage: 60},
+  1709: {counted: true, percentage: 60},
+  1710: {counted: true, percentage: 60},
+  1711: {counted: true, percentage: 60}
 };
 
 describe('Map', () => {
@@ -110,8 +110,8 @@ describe('Map', () => {
       mapdata: mapdata,
       data: data,
       canton: 'zg',
-      yay: 'Ja',
-      nay: 'Nein'
+      label_left_hand: 'Nein',
+      label_right_hand: 'Ja'
     });
 
     chart(document.body);
@@ -123,12 +123,12 @@ describe('Map', () => {
   it('renders a communal svg', () => {
     const communalMapdata = require('../../../static/mapdata/2017/351.json');
     const communalData = {
-      1: {counted: true, nays_percentage: 40, yeas_percentage: 60},
-      2: {counted: true, nays_percentage: 40, yeas_percentage: 60},
-      3: {counted: true, nays_percentage: 40, yeas_percentage: 60},
-      4: {counted: true, nays_percentage: 40, yeas_percentage: 60},
-      5: {counted: true, nays_percentage: 40, yeas_percentage: 60},
-      6: {counted: true, nays_percentage: 40, yeas_percentage: 60},
+      1: {counted: true, percentage: 60},
+      2: {counted: true, percentage: 60},
+      3: {counted: true, percentage: 60},
+      4: {counted: true, percentage: 60},
+      5: {counted: true, percentage: 60},
+      6: {counted: true, percentage: 60},
     };
 
     var document = jsdom.jsdom();
