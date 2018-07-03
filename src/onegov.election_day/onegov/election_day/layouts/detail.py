@@ -28,3 +28,7 @@ class DetailLayout(DefaultLayout):
     @cached_property
     def related_link(self):
         return self.model.related_link
+
+    @cached_property
+    def show_map(self):
+        return self.principal.is_year_available(self.model.date.year)

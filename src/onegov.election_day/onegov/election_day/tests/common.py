@@ -69,6 +69,7 @@ class DummyPrincipal(object):
         self.email_notification = None
         self.domain = 'canton'
         self.wabsti_import = False
+        self.has_districts = False
 
     def label(self, type):
         return '__{}'.format(type)

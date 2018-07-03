@@ -82,13 +82,13 @@ class VoteLayout(DetailLayout):
             return self.type == 'complex'
 
         if tab == 'districts':
-            return self.principal.has_districts and self.type == 'simple'
+            return self.has_districts and self.type == 'simple'
         if tab == 'proposal-districts':
-            return self.principal.has_districts and self.type == 'complex'
+            return self.has_districts and self.type == 'complex'
         if tab == 'counter-proposal-districts':
-            return self.principal.has_districts and self.type == 'complex'
+            return self.has_districts and self.type == 'complex'
         if tab == 'tie-breaker-districts':
-            return self.principal.has_districts and self.type == 'complex'
+            return self.has_districts and self.type == 'complex'
 
         return True
 
@@ -131,10 +131,6 @@ class VoteLayout(DetailLayout):
                 'active' if self.tab == tab else ''
             ) for tab in self.all_tabs if self.tab_visible(tab)
         ]
-
-    @cached_property
-    def show_map(self):
-        return self.principal.is_year_available(self.model.date.year)
 
     @cached_property
     def pdf_path(self):
