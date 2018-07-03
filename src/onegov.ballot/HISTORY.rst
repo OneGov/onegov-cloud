@@ -27,13 +27,13 @@ Changelog
 3.5.0 (2018-04-26)
 ~~~~~~~~~~~~~~~~~~~
 
-- Adds a distinct property to elections.
+- Allows to group ballot results by districts.
+  [msom
+
+- Adds candidate collections.
   [msom]
 
-3.4.2 (2018-04-13)
-~~~~~~~~~~~~~~~~~~~
-
-- Optimizes the ballot model.
+- Adds list collections.
   [msom]
 
 3.6.1 (2018-05-17)
