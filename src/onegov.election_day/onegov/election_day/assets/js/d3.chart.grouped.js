@@ -26,12 +26,12 @@
         var interactive = false;
 
         if (params) {
-            if (params.data) data = params.data;
-            if (params.margin) margin = params.margin;
-            if (params.height) height = params.height - margin.top - margin.bottom;
-            if (params.width) width = params.width - margin.left - margin.right;
-            if (params.options) options = params.options;
-            if (params.interactive) interactive = params.interactive;
+            if ('data' in params) data = params.data;
+            if ('margin' in params) margin = params.margin;
+            if ('height' in params) height = params.height - margin.top - margin.bottom;
+            if ('width' in params) width = params.width - margin.left - margin.right;
+            if ('options' in params) options = params.options;
+            if ('interactive' in params) interactive = params.interactive;
         }
 
         var updateScales = function(scale) {

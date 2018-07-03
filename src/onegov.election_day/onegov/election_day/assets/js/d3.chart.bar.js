@@ -26,11 +26,11 @@
         };
 
         if (params) {
-            if (params.data) data = params.data;
-            if (params.margin) margin = params.margin;
-            if (params.interactive) interactive = params.interactive;
-            if (params.width) width = params.width;
-            if (params.options) options = params.options;
+            if ('data' in params) data = params.data;
+            if ('margin' in params) margin = params.margin;
+            if ('interactive' in params) interactive = params.interactive;
+            if ('width' in params) width = params.width;
+            if ('options' in params) options = params.options;
         }
 
         var updateLabels = function(line) {

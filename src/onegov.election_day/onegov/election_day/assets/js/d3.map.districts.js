@@ -27,15 +27,15 @@
         };
 
         if (params) {
-            if (params.data) data = params.data;
-            if (params.mapdata) mapdata = params.mapdata;
-            if (params.canton) canton = params.canton;
-            if (params.interactive) interactive = params.interactive;
-            if (params.width) width = params.width;
-            if (params.yay) yay = params.yay;
-            if (params.nay) nay = params.nay;
-            if (params.expats) expats = params.expats;
-            if (params.options) options = params.options;
+            if ('data' in params) data = params.data;
+            if ('mapdata' in params) mapdata = params.mapdata;
+            if ('canton' in params) canton = params.canton;
+            if ('interactive' in params) interactive = params.interactive;
+            if ('width' in params) width = params.width;
+            if ('yay' in params) yay = params.yay;
+            if ('nay' in params) nay = params.nay;
+            if ('expats' in params) expats = params.expats;
+            if ('options' in params) options = params.options;
         }
 
         var isUndefined = function(obj) {
@@ -85,7 +85,6 @@
                                    ((b.x - p.x > p.x + p.width - b.x - b.width) ? 'w' : 'e');
                         })
                         .html(function(d) {
-                            console.log(d);
                             var name = '<strong>' + d.key + '</strong>';
                             if (d.value.counted) {
                                 var yeas_percentage =  Math.round(d.value.yeas_percentage * 100) / 100;

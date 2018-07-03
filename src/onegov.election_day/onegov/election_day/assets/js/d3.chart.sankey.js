@@ -26,13 +26,13 @@
         };
 
         if (params) {
-            if (params.data) data = params.data;
-            if (params.margin) margin = params.margin;
-            if (params.height) height = params.height;
-            if (params.width) width = params.width;
-            if (params.interactive) interactive = params.interactive;
-            if (params.inverse) inverse = params.inverse;
-            if (params.options) options = params.options;
+            if ('data' in params) data = params.data;
+            if ('margin' in params) margin = params.margin;
+            if ('height' in params) height = params.height;
+            if ('width' in params) width = params.width;
+            if ('interactive' in params) interactive = params.interactive;
+            if ('inverse' in params) inverse = params.inverse;
+            if ('options' in params) options = params.options;
         }
 
         var isUndefined = function(obj) {
