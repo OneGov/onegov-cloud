@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.16.0 (2018-07-03)
+~~~~~~~~~~~~~~~~~~~~
 
 - Adds PDF previews of notices.
   [msom]
