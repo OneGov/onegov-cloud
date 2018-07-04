@@ -108,7 +108,7 @@
                     .attr('class', 'district')
                     .append("path")
                     .attr('d', function(d) {
-                        var selected = d3.set(d.value.municipalities);
+                        var selected = d3.set(d.value.entities);
                         var features = mapdata.objects.municipalities.geometries.filter(function(s) { return selected.has(s.id); });
                         return path(topojson.merge(mapdata, features));
                     })

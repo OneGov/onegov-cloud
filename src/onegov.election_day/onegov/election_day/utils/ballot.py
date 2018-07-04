@@ -1,9 +1,5 @@
 def get_ballot_data_by_entity(ballot):
-    """ Returns the yeas/nays percentage by entity_id.
-
-    Uncounted entities are not included.
-
-    """
+    """ Returns the yeas/nays percentage by entity_id. """
 
     data = {}
     for result in ballot.results:
@@ -16,17 +12,13 @@ def get_ballot_data_by_entity(ballot):
 
 
 def get_ballot_data_by_district(ballot):
-    """ Returns the yeas/nays percentage grouped and keyed by district.
-
-    Uncounted entities are not included.
-
-    """
+    """ Returns the yeas/nays percentage grouped and keyed by district. """
 
     data = {}
     for result in ballot.results_by_district:
         district = {
             'counted': result.counted,
-            'municipalities': result.entity_ids
+            'entities': result.entity_ids
         }
         if result.counted:
             district['percentage'] = result.yeas_percentage
