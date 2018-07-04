@@ -17,9 +17,9 @@
         var width = 0;
         var interactive = false;
         var thumbs = false;
-        var label_left_hand = '0%';
-        var label_right_hand = '100%';
-        var label_expats = 'Expats';
+        var labelLeftHand = '0%';
+        var labelRightHand = '100%';
+        var labelExpats = 'Expats';
         var options = {
             legendHeight: 10,
             legendMargin: 30,
@@ -34,9 +34,9 @@
             if ('interactive' in params) interactive = params.interactive;
             if ('width' in params) width = params.width;
             if ('thumbs' in params) thumbs = params.thumbs;
-            if ('label_right_hand' in params) label_right_hand = params.label_right_hand;
-            if ('label_left_hand' in params) label_left_hand = params.label_left_hand;
-            if ('label_expats' in params) label_expats = params.label_expats;
+            if ('labelRightHand' in params) labelRightHand = params.labelRightHand;
+            if ('labelLeftHand' in params) labelLeftHand = params.labelLeftHand;
+            if ('labelExpats' in params) labelExpats = params.labelExpats;
             if ('options' in params) options = params.options;
         }
 
@@ -158,7 +158,7 @@
                             'translate(0,' + Math.round(bboxMap.y + 3 / 4 * bboxMap.height) +  ')'
                         )
                         .property('__data__', {
-                            'key': label_expats,
+                            'key': labelExpats,
                             'value': data[""]
                           }
                         )
@@ -207,19 +207,19 @@
                     .attr('width', legendScale.rangeBand())
                     .attr('height', unitScale(options.legendHeight))
                     .style('fill', function(d) {return scale(d);});
-                var text_left_hand = legend.append('text')
+                var textLeftHand = legend.append('text')
                     .attr('x', legendScale(0))
-                    .attr('y', unitScale(options.legendHeight + 1.5 * options.fontSizePx))
-                    .style('font-size',unitScale(options.fontSizePx) + 'px')
-                    .style('font-family', options.fontFamily)
-                    .text(label_left_hand);
-                var text_right_hand = legend.append('text')
-                    .attr('x', legendScale(100) + legendScale.rangeBand())
-                    .style('text-anchor', 'end')
                     .attr('y', unitScale(options.legendHeight + 1.5 * options.fontSizePx))
                     .style('font-size', unitScale(options.fontSizePx) + 'px')
                     .style('font-family', options.fontFamily)
-                    .text(label_right_hand);
+                    .text(labelLeftHand);
+                var textRightHand = legend.append('text')
+                    .attr('x', legendScale(100) + legendScale.rangeBand())
+                    .attr('y', unitScale(options.legendHeight + 1.5 * options.fontSizePx))
+                    .style('text-anchor', 'end')
+                    .style('font-size', unitScale(options.fontSizePx) + 'px')
+                    .style('font-family', options.fontFamily)
+                    .text(labelRightHand);
 
                 // Set size
                 bbox = svg[0][0].getBBox();
@@ -251,10 +251,10 @@
                             .attr('width', legendScale.rangeBand())
                             .attr('height', unitScale(options.legendHeight))
                             .style('fill', function(d) {return scale(d);});
-                        text_left_hand.attr('x', legendScale(0))
+                        textLeftHand.attr('x', legendScale(0))
                             .attr('y', unitScale(options.legendHeight + 1.5 * options.fontSizePx))
                             .style('font-size', unitScale(options.fontSizePx) + 'px');
-                        text_right_hand.attr('x', legendScale(100) + legendScale.rangeBand())
+                        textRightHand.attr('x', legendScale(100) + legendScale.rangeBand())
                             .attr('y', unitScale(options.legendHeight + 1.5 * options.fontSizePx))
                             .style('font-size', unitScale(options.fontSizePx) + 'px');
 

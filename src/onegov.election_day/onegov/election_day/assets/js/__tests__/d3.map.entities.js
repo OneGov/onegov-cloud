@@ -110,8 +110,8 @@ describe('Map', () => {
       mapdata: mapdata,
       data: data,
       canton: 'zg',
-      label_left_hand: 'Nein',
-      label_right_hand: 'Ja'
+      labelLeftHand: 'Nein',
+      labelRightHand: 'Ja'
     });
 
     chart(document.body);
