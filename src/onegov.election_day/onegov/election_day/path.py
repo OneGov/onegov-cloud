@@ -1,9 +1,13 @@
 from onegov.ballot import Ballot
 from onegov.ballot import BallotCollection
+from onegov.ballot import Candidate
+from onegov.ballot import CandidateCollection
 from onegov.ballot import Election
 from onegov.ballot import ElectionCollection
 from onegov.ballot import ElectionCompound
 from onegov.ballot import ElectionCompoundCollection
+from onegov.ballot import List
+from onegov.ballot import ListCollection
 from onegov.ballot import Vote
 from onegov.ballot import VoteCollection
 from onegov.core.i18n import SiteLocale
@@ -77,6 +81,16 @@ def get_manage_data_source_items(app, id, page=0):
 @ElectionDayApp.path(model=Election, path='/election/{id}')
 def get_election(app, id):
     return ElectionCollection(app.session()).by_id(id)
+
+
+@ElectionDayApp.path(model=Candidate, path='/candidate/{id}')
+def get_candidate(app, id):
+    return CandidateCollection(app.session()).by_id(id)
+
+
+@ElectionDayApp.path(model=List, path='/list/{id}')
+def get_list(app, id):
+    return ListCollection(app.session()).by_id(id)
 
 
 @ElectionDayApp.path(model=ElectionCompound, path='/elections/{id}')
