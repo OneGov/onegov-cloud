@@ -46,6 +46,30 @@
             return obj === void 0;
         };
 
+        var scale = d3.scale.linear();
+        if (colorScale === 'r') {
+            scale.domain([10, 70]).range(['#f4a582', '#ca0020']);
+        }
+        else if (colorScale === 'b') {
+            scale.domain([10, 70]).range(['#92c5de', '#0571b0']);
+        } else {
+            scale.domain([30, 49.9999999, 50.000001, 70])
+                .range(['#ca0020', '#f4a582', '#92c5de', '#0571b0']);
+        }
+
+
+        var districts;
+        var applyData = function(districts) {
+            if (districts && scale) {
+                districts.attr('fill', function(d) {
+                    return d.value.counted ? scale(d.value.percentage) : 'url(#uncounted)';
+                })
+                .attr('class', function(d) {
+                    return d.value.counted ? 'counted' : 'uncounted';}
+                );
+            }
+        };
+
         var chart = function(container) {
 
             // Try to read a default width from the container if none is given
@@ -73,18 +97,6 @@
                        .attr('stroke', '#999')
                        .attr('stroke-width', 1);
 
-                // Set up the color scale
-                var scale = d3.scale.linear();
-                if (colorScale === 'r') {
-                    scale.domain([10, 70]).range(['#f4a582', '#ca0020']);
-                }
-                else if (colorScale === 'b') {
-                    scale.domain([10, 70]).range(['#92c5de', '#0571b0']);
-                } else {
-                    scale.domain([30, 49.9999999, 50.000001, 70])
-                        .range(['#ca0020', '#f4a582', '#92c5de', '#0571b0']);
-                }
-
                 // Add tooltips
                 var tooltip = null;
                 if (interactive) {
@@ -111,7 +123,7 @@
 
                 // Add districts
                 mapdata.transform.translate=[0,0];
-                var districts = svg.selectAll('g')
+                districts = svg.selectAll('g')
                     .data(d3.entries(data))
                     .enter().append('g')
                     .attr('class', 'district')
@@ -120,9 +132,8 @@
                         var selected = d3.set(d.value.entities);
                         var features = mapdata.objects.municipalities.geometries.filter(function(s) { return selected.has(s.id); });
                         return path(topojson.merge(mapdata, features));
-                    })
-                    .attr('fill', function(d) {return d.value.counted ? scale(d.value.percentage) : 'url(#uncounted)';})
-                    .attr('class', function(d) { return d.value.counted ? 'counted' : 'uncounted';});
+                    });
+                applyData(districts);
 
                 if (interactive) {
                     districts
@@ -294,6 +305,13 @@
 
         chart.height = function() {
             return height;
+        };
+
+        chart.update = function(url) {
+            d3.json(url, function(data)  {
+                districts.data(d3.entries(data));
+                applyData(districts);
+            });
         };
 
         return chart;

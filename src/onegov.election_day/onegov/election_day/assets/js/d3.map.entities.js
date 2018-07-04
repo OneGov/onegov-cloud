@@ -46,6 +46,40 @@
             return obj === void 0;
         };
 
+        var scale = d3.scale.linear();
+        if (colorScale === 'r') {
+            scale.domain([10, 70]).range(['#f4a582', '#ca0020']);
+        }
+        else if (colorScale === 'b') {
+            scale.domain([10, 70]).range(['#92c5de', '#0571b0']);
+        } else {
+            scale.domain([30, 49.9999999, 50.000001, 70])
+                .range(['#ca0020', '#f4a582', '#92c5de', '#0571b0']);
+        }
+
+        var municipalities;
+        var applyData = function(municipalities, data) {
+            if (municipalities && data && scale) {
+                municipalities.attr('fill', function(d) {
+                    d.properties.result = data[d.properties.id];
+                    if (!isUndefined(d.properties.result)) {
+                        if (d.properties.result.counted) {
+                            return scale(d.properties.result.percentage);
+                        }
+                        return 'url(#uncounted)';
+                    }
+                })
+                .attr('class', function(d) {
+                    if (!isUndefined(d.properties.result)) {
+                        if (d.properties.result.counted) {
+                            return 'counted';
+                        }
+                        return 'uncounted';
+                    }
+                });
+            }
+        };
+
         var chart = function(container) {
 
             // Try to read a default width from the container if none is given
@@ -72,18 +106,6 @@
                        .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
                        .attr('stroke', '#999')
                        .attr('stroke-width', 1);
-
-                // Set up the color scale
-                var scale = d3.scale.linear();
-                if (colorScale === 'r') {
-                    scale.domain([10, 70]).range(['#f4a582', '#ca0020']);
-                }
-                else if (colorScale === 'b') {
-                    scale.domain([10, 70]).range(['#92c5de', '#0571b0']);
-                } else {
-                    scale.domain([30, 49.9999999, 50.000001, 70])
-                        .range(['#ca0020', '#f4a582', '#92c5de', '#0571b0']);
-                }
 
                 // Add tooltips
                 var tooltip = null;
@@ -112,7 +134,7 @@
 
                 // Add municipalties
                 mapdata.transform.translate=[0,0];
-                var municipalities = svg.append('g')
+                municipalities = svg.append('g')
                     .attr('class', 'municipality')
                     .style('fill', 'transparent')
                     .selectAll('path')
@@ -120,27 +142,8 @@
                         topojson.feature(mapdata, mapdata.objects.municipalities).features
                     )
                     .enter().append('path')
-                    .attr('d', path)
-                    .attr('fill', function(d) {
-                        // store the result for the tooltip
-                        d.properties.result = data[d.properties.id];
-                        if (!isUndefined(d.properties.result)) {
-                            if (d.properties.result.counted) {
-                                return scale(d.properties.result.percentage);
-                            } else {
-                                return 'url(#uncounted)';
-                            }
-                        }
-                    })
-                    .attr('class', function(d) {
-                        if (!isUndefined(d.properties.result)) {
-                            if (d.properties.result.counted) {
-                                return 'counted';
-                            } else {
-                                return 'uncounted';
-                            }
-                        }
-                    });
+                    .attr('d', path);
+                applyData(municipalities, data);
                 if (interactive) {
                     municipalities
                         .on('mouseover.tooltip', tooltip.show)
@@ -313,6 +316,10 @@
 
         chart.height = function() {
             return height;
+        };
+
+        chart.update = function(url) {
+            d3.json(url, function(data) { applyData(municipalities, data); });
         };
 
         return chart;
