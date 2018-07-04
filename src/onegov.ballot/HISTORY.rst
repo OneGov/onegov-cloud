@@ -36,6 +36,12 @@ Changelog
 - Adds list collections.
   [msom]
 
+- Adds the percentages of votes by entites and districts to candidates.
+  [msom]
+
+- Adds the percentages of votes by entites and districts to lists.
+  [msom]
+
 3.6.1 (2018-05-17)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -1,3 +1,4 @@
+from onegov.ballot.models.election.election_result import ElectionResult
 from onegov.ballot.models.election.list_result import ListResult
 from onegov.ballot.models.mixins import summarized_property
 from onegov.core.orm import Base
@@ -86,3 +87,94 @@ class List(Base, TimestampMixin):
         expr = expr.where(ListResult.list_id == cls.id)
         expr = expr.label(attribute)
         return expr
+
+    @property
+    def percentage_by_entity(self):
+        """ Returns the percentage of votes by the entity. Includes uncounted
+        entities and entities with no results available.
+
+        """
+
+        results = self.election.results
+        results = results.join(ElectionResult.list_results)
+        results = results.filter(ListResult.list_id == self.id)
+        results = results.with_entities(
+            ElectionResult.entity_id.label('id'),
+            ElectionResult.counted.label('counted'),
+            ElectionResult.accounted_votes.label('total'),
+            ListResult.votes.label('votes')
+        )
+        results = results.all()
+        percentage = {
+            r.id: {
+                'counted': r.counted,
+                'percentage': 100 * (r.votes / r.total) if r.total else 0.0
+            } for r in results
+        }
+
+        empty = self.election.results
+        empty = empty.with_entities(
+            ElectionResult.entity_id.label('id'),
+            ElectionResult.counted.label('counted')
+        )
+        empty = empty.filter(
+            ElectionResult.entity_id.notin_([r.id for r in results])
+        )
+        percentage.update({
+            r.id: {'counted': r.counted, 'percentage': 0.0} for r in empty}
+        )
+        return percentage
+
+    @property
+    def percentage_by_district(self):
+        """ Returns the percentage of votes aggregated by the distict. Includes
+        uncounted districts and districts with no results available.
+
+        """
+
+        results = self.election.results
+        results = results.join(ElectionResult.list_results)
+        results = results.filter(ListResult.list_id == self.id)
+        results = results.with_entities(
+            ElectionResult.district.label('name'),
+            func.array_agg(ElectionResult.entity_id).label('entities'),
+            func.coalesce(
+                func.bool_and(ElectionResult.counted), False
+            ).label('counted'),
+            func.sum(ElectionResult.accounted_votes).label('total'),
+            func.sum(ListResult.votes).label('votes'),
+        )
+        results = results.group_by(ElectionResult.district)
+        results = results.order_by(None)
+        results = results.all()
+        percentage = {
+            r.name: {
+                'counted': r.counted,
+                'entities': r.entities,
+                'percentage': 100 * (r.votes / r.total) if r.total else 0.0
+            } for r in results
+        }
+
+        empty = self.election.results
+        empty = empty.with_entities(
+            ElectionResult.district.label('name'),
+            func.array_agg(ElectionResult.entity_id).label('entities'),
+            func.coalesce(
+                func.bool_and(ElectionResult.counted), False
+            ).label('counted')
+        )
+        empty = empty.group_by(ElectionResult.district)
+        empty = empty.order_by(None)
+        for result in empty:
+            update = (
+                result.name not in percentage or
+                percentage[result.name]['entities'] != result.entities
+            )
+            if update:
+                percentage[result.name] = {
+                    'counted': result.counted,
+                    'entities': result.entities,
+                    'percentage': 0.0
+                }
+
+        return percentage
