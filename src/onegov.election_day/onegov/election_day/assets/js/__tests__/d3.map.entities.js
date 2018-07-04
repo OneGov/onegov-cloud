@@ -103,6 +103,38 @@ describe('Map', () => {
     expect(chart.width()).toBe(2000);
   });
 
+  it('renders a svg @700 with the red colorscale', () => {
+    var document = jsdom.jsdom();
+    var chart = mapChart({
+      width: 700,
+      mapdata: mapdata,
+      data: data,
+      canton: 'zg',
+      colorScale: 'r'
+    });
+
+    chart(document.body);
+    // require('fs').writeFile("map@r.svg", document.svg());
+    expect(document.svg()).toMatchSnapshot();
+    expect(chart.width()).toBe(700);
+  });
+
+  it('renders a svg @700 with the blue colorscale', () => {
+    var document = jsdom.jsdom();
+    var chart = mapChart({
+      width: 700,
+      mapdata: mapdata,
+      data: data,
+      canton: 'zg',
+      colorScale: 'b'
+    });
+
+    chart(document.body);
+    // require('fs').writeFile("map@b.svg", document.svg());
+    expect(document.svg()).toMatchSnapshot();
+    expect(chart.width()).toBe(700);
+  });
+
   it('renders the translations', () => {
     var document = jsdom.jsdom();
     var chart = mapChart({

@@ -6,57 +6,57 @@ const mapdata = require('../../../static/mapdata/2017/gr.json');
 const data = {
   "Albula": {
     counted: true,
-    municipalities: [3506,3514,3513,3521,3543,3542,3522],
+    entities: [3506,3514,3513,3521,3543,3542,3522],
     percentage: 41.8
   },
   "Bernina": {
     counted: true,
-    municipalities: [3561,3551],
+    entities: [3561,3551],
     percentage: 47.1
   },
   "Engiadina": {
     counted: true,
-    municipalities: [3752,3847,3746,3764,3762],
+    entities: [3752,3847,3746,3764,3762],
     percentage: 39.0
   },
   "Imboden": {
     counted: true,
-    municipalities: [3722,3734,3733,3732,3723,3731,3721],
+    entities: [3722,3734,3733,3732,3723,3731,3721],
     percentage: 35.9
   },
   "Landquart": {
     counted: true,
-    municipalities: [3951,3955,3954,3952,3946,3945,3953,3947],
+    entities: [3951,3955,3954,3952,3946,3945,3953,3947],
     percentage: 35.8
   },
   "Maloja": {
     counted: true,
-    municipalities: [3786,3787,3789,3792,3788,3783,3781,3790,3785,3784,3791,3782],
+    entities: [3786,3787,3789,3792,3788,3783,3781,3790,3785,3784,3791,3782],
     percentage: 48.3
   },
   "Moesa": {
     counted: true,
-    municipalities: [3804,3831,3810,3834,3821,3835,3832,3837,3823,3805,3808,3822],
+    entities: [3804,3831,3810,3834,3821,3835,3832,3837,3823,3805,3808,3822],
     percentage: 39.7
   },
   "Plessur": {
     counted: true,
-    municipalities: [3941,3926,3921,3901,3911,3932],
+    entities: [3941,3926,3921,3901,3911,3932],
     percentage: 34.8
   },
   "Pr\u00e4ttigau": {
     counted: true,
-    municipalities: [3861,3862,3962,3972,3882,3881,3863,3891,3871,3851,3961],
+    entities: [3861,3862,3962,3972,3882,3881,3863,3891,3871,3851,3961],
     percentage: 39.3
   },
   "Surselva": {
     counted: true,
-    municipalities: [3985,3988,3611,3616,3619,3575,3986,3581,3618,3981,3987,3983,3582,3672,3982,3603,3572],
+    entities: [3985,3988,3611,3616,3619,3575,3986,3581,3618,3981,3987,3983,3582,3672,3982,3603,3572],
     percentage: 38.1
   },
   "Viamala":{
       counted: true,
-      municipalities: [3695,3638,3708,3670,3633,3662,3503,3712,3668,3705,3703,3691,3711,3707,3694,3681,3663,3713,3673,3637,3669,3640,3661,3701,3693],
+      entities: [3695,3638,3708,3670,3633,3662,3503,3712,3668,3705,3703,3691,3711,3707,3694,3681,3663,3713,3673,3637,3669,3640,3661,3701,3693],
       percentage: 32.3096339924274
   }
 };
@@ -145,6 +145,38 @@ describe('Map', () => {
     // require('fs').writeFile("map@2000.svg", document.svg());
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(2000);
+  });
+
+  it('renders a svg @700 with the red colorscale', () => {
+    var document = jsdom.jsdom();
+    var chart = mapChart({
+      width: 700,
+      mapdata: mapdata,
+      data: data,
+      canton: 'zg',
+      colorScale: 'r'
+    });
+
+    chart(document.body);
+    // require('fs').writeFile("map@r.svg", document.svg());
+    expect(document.svg()).toMatchSnapshot();
+    expect(chart.width()).toBe(700);
+  });
+
+  it('renders a svg @700 with the blue colorscale', () => {
+    var document = jsdom.jsdom();
+    var chart = mapChart({
+      width: 700,
+      mapdata: mapdata,
+      data: data,
+      canton: 'zg',
+      colorScale: 'b'
+    });
+
+    chart(document.body);
+    // require('fs').writeFile("map@b.svg", document.svg());
+    expect(document.svg()).toMatchSnapshot();
+    expect(chart.width()).toBe(700);
   });
 
   it('renders the translations', () => {
