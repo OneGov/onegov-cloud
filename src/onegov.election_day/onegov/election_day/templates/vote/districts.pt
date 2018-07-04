@@ -29,6 +29,7 @@
                         data-embed-link="Embed"
                         data-embed-source="${request.link(ballot, name='districts-map')}"
                         data-thumbs="true"
+                        data-color-scale="rb"
                         data-label-left-hand="Nay"
                         data-label-right-hand="Yay"
                         data-label-expats="Expats"

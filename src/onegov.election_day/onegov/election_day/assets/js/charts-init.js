@@ -73,6 +73,7 @@ var initEntitiesMap = function(el) {
         $.ajax({ url: dataurl }).done(function(data) {
             var canton = $(el).data('canton');
             var thumbs = $(el).data('thumbs');
+            var colorScale = $(el).data('color-scale');
             var labelLeftHand = $(el).data('label-left-hand');
             var labelRightHand = $(el).data('label-right-hand');
             var labelExpats = $(el).data('label-expats');
@@ -82,6 +83,7 @@ var initEntitiesMap = function(el) {
                 canton: canton,
                 interactive: true,
                 thumbs: thumbs,
+                colorScale: colorScale,
                 labelLeftHand: labelLeftHand,
                 labelRightHand: labelRightHand,
                 labelExpats: labelExpats
@@ -105,6 +107,7 @@ var initDistrictsMap = function(el) {
         $.ajax({ url: dataurl }).done(function(data) {
             var canton = $(el).data('canton');
             var thumbs = $(el).data('thumbs');
+            var colorScale = $(el).data('color-scale');
             var labelLeftHand = $(el).data('label-left-hand');
             var labelRightHand = $(el).data('label-right-hand');
             var labelExpats = $(el).data('label-expats');
@@ -114,6 +117,7 @@ var initDistrictsMap = function(el) {
                 canton: canton,
                 interactive: true,
                 thumbs: thumbs,
+                colorScale: colorScale,
                 labelLeftHand: labelLeftHand,
                 labelRightHand: labelRightHand,
                 labelExpats: labelExpats

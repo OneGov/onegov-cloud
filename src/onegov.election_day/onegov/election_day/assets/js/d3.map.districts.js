@@ -17,6 +17,7 @@
         var width = 0;
         var interactive = false;
         var thumbs = false;
+        var colorScale = 'rb';
         var labelLeftHand = '0%';
         var labelRightHand = '100%';
         var labelExpats = 'Expats';
@@ -34,6 +35,7 @@
             if ('interactive' in params) interactive = params.interactive;
             if ('width' in params) width = params.width;
             if ('thumbs' in params) thumbs = params.thumbs;
+            if ('colorScale' in params) colorScale = params.colorScale;
             if ('labelRightHand' in params) labelRightHand = params.labelRightHand;
             if ('labelLeftHand' in params) labelLeftHand = params.labelLeftHand;
             if ('labelExpats' in params) labelExpats = params.labelExpats;
@@ -72,9 +74,16 @@
                        .attr('stroke-width', 1);
 
                 // Set up the color scale
-                var scale = d3.scale.linear()
-                    .domain([30, 49.9999999, 50.000001, 70])
-                    .range(['#ca0020', '#f4a582', '#92c5de', '#0571b0']);
+                var scale = d3.scale.linear();
+                if (colorScale === 'r') {
+                    scale.domain([10, 70]).range(['#f4a582', '#ca0020']);
+                }
+                else if (colorScale === 'b') {
+                    scale.domain([10, 70]).range(['#92c5de', '#0571b0']);
+                } else {
+                    scale.domain([30, 49.9999999, 50.000001, 70])
+                        .range(['#ca0020', '#f4a582', '#92c5de', '#0571b0']);
+                }
 
                 // Add tooltips
                 var tooltip = null;
