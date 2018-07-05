@@ -65,8 +65,8 @@
                     return d.value.counted ? scale(d.value.percentage) : 'url(#uncounted)';
                 })
                 .attr('class', function(d) {
-                    return d.value.counted ? 'counted' : 'uncounted';}
-                );
+                    return d.value.counted ? 'counted' : 'uncounted';
+                });
             }
         };
 
@@ -122,7 +122,8 @@
                 }
 
                 // Add districts
-                mapdata.transform.translate=[0,0];
+                mapdata.transform.translate = [0,0];
+                extraneous = mapdata.objects.municipalities.geometries.map(function(x) {return x.id;});
                 districts = svg.selectAll('g')
                     .data(d3.entries(data))
                     .enter().append('g')
@@ -130,10 +131,25 @@
                     .append("path")
                     .attr('d', function(d) {
                         var selected = d3.set(d.value.entities);
+                        extraneous = extraneous.filter(function(x) { return !selected.has(x); });
                         var features = mapdata.objects.municipalities.geometries.filter(function(s) { return selected.has(s.id); });
                         return path(topojson.merge(mapdata, features));
                     });
                 applyData(districts);
+
+                // Add the unused map data as a single block
+                extraneous = d3.set(extraneous);
+                if (!extraneous.empty()) {
+                    svg.append('g')
+                        .attr('class', 'district')
+                        .append('path')
+                        .attr('class', 'extraneous')
+                        .attr('fill', '#eee')
+                        .attr('d', function(d) {
+                           var features = mapdata.objects.municipalities.geometries.filter(function(s) { return extraneous.has(s.id); });
+                           return path(topojson.merge(mapdata, features));
+                        });
+                }
 
                 if (interactive) {
                     districts

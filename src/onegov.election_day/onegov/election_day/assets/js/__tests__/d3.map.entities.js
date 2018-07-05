@@ -135,6 +135,27 @@ describe('Map', () => {
     expect(chart.width()).toBe(700);
   });
 
+  it('renders a partial svg @700', () => {
+    var document = jsdom.jsdom();
+    var chart = mapChart({
+      width: 700,
+      mapdata: mapdata,
+      data: {
+        1701: {counted: true, percentage: 60},
+        1702: {counted: true, percentage: 60},
+        1703: {counted: false, percentage: 60},
+        1704: {counted: false, percentage: 60},
+      },
+      canton: 'zg',
+      colorScale: 'b'
+    });
+
+    chart(document.body);
+    // require('fs').writeFile("map@partial.svg", document.svg());
+    expect(document.svg()).toMatchSnapshot();
+    expect(chart.width()).toBe(700);
+  });
+
   it('renders the translations', () => {
     var document = jsdom.jsdom();
     var chart = mapChart({

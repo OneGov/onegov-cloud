@@ -179,6 +179,38 @@ describe('Map', () => {
     expect(chart.width()).toBe(700);
   });
 
+  it('renders a partial svg @700', () => {
+    var document = jsdom.jsdom();
+    var chart = mapChart({
+      width: 700,
+      mapdata: mapdata,
+      data: {
+        "Albula": {
+          counted: true,
+          entities: [3506,3514,3513,3521,3543,3542,3522],
+          percentage: 41.8
+        },
+        "Bernina": {
+          counted: true,
+          entities: [3561], // 3551 not included!
+          percentage: 47.1
+        },
+        "Engiadina": {
+          counted: false,
+          entities: [3752,3847,3746,3764,3762],
+          percentage: 39.0
+        },
+      },
+      canton: 'zg',
+      colorScale: 'b'
+    });
+
+    chart(document.body);
+    // require('fs').writeFile("map@partial.svg", document.svg());
+    expect(document.svg()).toMatchSnapshot();
+    expect(chart.width()).toBe(700);
+  });
+
   it('renders the translations', () => {
     var document = jsdom.jsdom();
     var chart = mapChart({

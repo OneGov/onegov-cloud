@@ -68,6 +68,7 @@
                         }
                         return 'url(#uncounted)';
                     }
+                    return '#eee';
                 })
                 .attr('class', function(d) {
                     if (!isUndefined(d.properties.result)) {
@@ -76,6 +77,7 @@
                         }
                         return 'uncounted';
                     }
+                    return 'extraneous';
                 });
             }
         };
@@ -133,7 +135,7 @@
                 }
 
                 // Add municipalties
-                mapdata.transform.translate=[0,0];
+                mapdata.transform.translate = [0,0];
                 municipalities = svg.append('g')
                     .attr('class', 'municipality')
                     .style('fill', 'transparent')
