@@ -54,6 +54,96 @@ def test_view_election_candidates(election_day_app_gr):
     assert '/election/proporz-election/candidates' in chart
 
 
+def test_view_election_candidate_by_entity(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+    upload_majorz_election(client)
+    upload_proporz_election(client)
+
+    for url in (
+        '/election/majorz-election/candidate-by-entity',
+        '/election/majorz-election/candidate-by-entity-chart'
+    ):
+        view = client.get(url)
+        assert '/by-entity">Engler Stefan</option>' in view
+        assert '/by-entity">Schmid Martin</option>' in view
+
+        data = {
+            option.text: client.get(option.attrib['value']).json
+            for option in view.pyquery('option')
+        }
+        assert data['Engler Stefan']['3503']['counted'] == True
+        assert data['Engler Stefan']['3503']['percentage'] == 100 * 20 / 41
+        assert data['Schmid Martin']['3503']['counted'] == True
+        assert data['Schmid Martin']['3503']['percentage'] == 100 * 18 / 41
+
+    for url in (
+        '/election/proporz-election/candidate-by-entity',
+        '/election/proporz-election/candidate-by-entity-chart'
+    ):
+        view = client.get(url)
+        assert '/by-entity">Caluori Corina</option>' in view
+        assert '/by-entity">Casanova Angela</option' in view
+
+        data = {
+            option.text: client.get(option.attrib['value']).json
+            for option in view.pyquery('option')
+        }
+        assert data['Caluori Corina']['3503']['counted'] == True
+        assert data['Caluori Corina']['3503']['percentage'] == 100 * 2 / 153
+        assert data['Casanova Angela']['3503']['counted'] == True
+        assert data['Casanova Angela']['3503']['percentage'] == 0.0
+
+
+def test_view_election_candidate_by_district(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+    upload_majorz_election(client)
+    upload_proporz_election(client)
+
+    for url in (
+        '/election/majorz-election/candidate-by-district',
+        '/election/majorz-election/candidate-by-district-chart'
+    ):
+        view = client.get(url)
+        assert '/by-district">Engler Stefan</option>' in view
+        assert '/by-district">Schmid Martin</option>' in view
+
+        data = {
+            option.text: client.get(option.attrib['value']).json
+            for option in view.pyquery('option')
+        }
+        assert data['Engler Stefan']['Bernina']['entities'] == [3551, 3561]
+        assert data['Engler Stefan']['Bernina']['counted'] == False
+        assert data['Engler Stefan']['Bernina']['percentage'] == 0.0
+        assert data['Schmid Martin']['Bernina']['entities'] == [3551, 3561]
+        assert data['Schmid Martin']['Bernina']['counted'] == False
+        assert data['Schmid Martin']['Bernina']['percentage'] == 0.0
+
+    for url in (
+        '/election/proporz-election/candidate-by-district',
+        '/election/proporz-election/candidate-by-district-chart'
+    ):
+        view = client.get(url)
+        assert '/by-district">Caluori Corina</option>' in view
+        assert '/by-district">Casanova Angela</option' in view
+
+        data = {
+            option.text: client.get(option.attrib['value']).json
+            for option in view.pyquery('option')
+        }
+        assert data['Caluori Corina']['Bernina']['entities'] == [3551, 3561]
+        assert data['Caluori Corina']['Bernina']['counted'] == False
+        assert data['Caluori Corina']['Bernina']['percentage'] == 0.0
+        assert data['Casanova Angela']['Bernina']['entities'] == [3551, 3561]
+        assert data['Casanova Angela']['Bernina']['counted'] == False
+        assert data['Casanova Angela']['Bernina']['percentage'] == 0.0
+
+
 def test_view_election_statistics(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
@@ -101,6 +191,68 @@ def test_view_election_lists(election_day_app_gr):
     chart = client.get('/election/proporz-election/lists-chart')
     assert chart.status_code == 200
     assert '/election/proporz-election/lists-data' in chart
+
+
+def test_view_election_list_by_entity(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+    upload_majorz_election(client)
+    upload_proporz_election(client)
+
+    url = '/election/majorz-election'
+    assert '</option>' not in client.get(f'{url}/list-by-entity')
+    assert '</option>' not in client.get(f'{url}/list-by-entity-chart')
+
+    for url in (
+        '/election/proporz-election/list-by-entity',
+        '/election/proporz-election/list-by-entity-chart'
+    ):
+        view = client.get(url)
+        assert '/by-entity">CVP</option>' in view
+        assert '/by-entity">FDP</option' in view
+
+        data = {
+            option.text: client.get(option.attrib['value']).json
+            for option in view.pyquery('option')
+        }
+        assert data['CVP']['3503']['counted'] == True
+        assert data['CVP']['3503']['percentage'] == 100 * 6 / 153
+        assert data['FDP']['3503']['counted'] == True
+        assert data['FDP']['3503']['percentage'] == 100 * 8 / 153
+
+
+def test_view_election_list_by_district(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+    upload_majorz_election(client)
+    upload_proporz_election(client)
+
+    url = '/election/majorz-election'
+    assert '</option>' not in client.get(f'{url}/list-by-district')
+    assert '</option>' not in client.get(f'{url}/list-by-district-chart')
+
+    for url in (
+        '/election/proporz-election/list-by-district',
+        '/election/proporz-election/list-by-district-chart'
+    ):
+        view = client.get(url)
+        assert '/by-district">CVP</option>' in view
+        assert '/by-district">FDP</option' in view
+
+        data = {
+            option.text: client.get(option.attrib['value']).json
+            for option in view.pyquery('option')
+        }
+        assert data['CVP']['Bernina']['entities'] == [3551, 3561]
+        assert data['CVP']['Bernina']['counted'] == False
+        assert data['CVP']['Bernina']['percentage'] == 0.0
+        assert data['FDP']['Bernina']['entities'] == [3551, 3561]
+        assert data['FDP']['Bernina']['counted'] == False
+        assert data['FDP']['Bernina']['percentage'] == 0.0
 
 
 def test_view_election_party_strengths(election_day_app_gr):

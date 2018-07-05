@@ -1,0 +1,52 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
+    <tal:block metal:fill-slot="title">${election.title}</tal:block>
+    <tal:block metal:fill-slot="before-content">
+        <div metal:use-macro="layout.macros['election_header']" />
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+
+        <div metal:use-macro="layout.macros['status_callout']" />
+
+        <tal:block tal:condition="layout.visible">
+
+            <h2 i18n:translate="">Results</h2>
+
+            <div metal:use-macro="layout.macros['election_factoids']" />
+
+            <div metal:use-macro="layout.macros['tab_menu']"/>
+
+            <h3 tal:content="layout.title()" />
+
+            <select class="map-data-select">
+                <option tal:repeat="(value, label) options" tal:attributes="value value">${label}</option>
+            </select>
+
+            <div class="row" tal:condition="layout.show_map">
+                <div class="small-12 small-centered medium-8 large-6 columns map-container">
+                    <div tal:condition="data_url" class="${map_type}-map"
+                        data-canton="${layout.principal.id}"
+                        data-mapurl="${layout.get_topojson_link(layout.principal.id, election.date.year)}"
+                        data-dataurl="${data_url}"
+                        data-embed-source="${embed_source}"
+                        data-embed-link="Embed"
+                        data-thumbs="false"
+                        data-color-scale="r"
+                        data-label-left-hand="0%"
+                        data-label-right-hand="100%"
+                        data-label-expats="Expats"
+                        i18n:attributes="data-embed-link; data-label-expats"
+                        >
+                    </div>
+                    <a class="svg-download" tal:condition="layout.svg_path" href="${layout.svg_link}">
+                        <i class="fa fa-download"></i><tal:block i18n:translate="">Download</tal:block>
+                    </a>
+                </div>
+            </div>
+
+        </tal:block>
+
+        <div metal:use-macro="layout.macros['related_link']" />
+        <div metal:use-macro="layout.macros['related_elections']" />
+
+    </tal:block>
+</div>

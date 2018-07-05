@@ -47,15 +47,23 @@ def view_election_json(self, request):
     if layout.pdf_path:
         media['pdf'] = request.link(self, 'pdf')
     for tab in (
-        'candidates', 'lists', 'connections', 'lists-panachage',
-        'party-strengths', 'parties-panachage',
+        'candidates',
+        'candidate-by-entity',
+        'candidate-by-district',
+        'lists',
+        'list-by-entity',
+        'list-by-district',
+        'connections',
+        'lists-panachage',
+        'party-strengths',
+        'parties-panachage',
     ):
         layout = ElectionLayout(self, request, tab=tab)
         layout.last_modified = last_modified
         if layout.visible:
-            embed[tab] = request.link(self, '{}-chart'.format(tab))
+            embed[tab] = request.link(self, f'{tab}-chart')
         if layout.svg_path:
-            media['charts'][tab] = request.link(self, '{}-svg'.format(tab))
+            media['charts'][tab] = request.link(self, f'{tab}-svg')
 
     data = {
         'completed': self.completed,

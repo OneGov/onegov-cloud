@@ -16,7 +16,11 @@ class ElectionLayout(DetailLayout):
     def all_tabs(self):
         return (
             'lists',
+            'list-by-entity',
+            'list-by-district',
             'candidates',
+            'candidate-by-entity',
+            'candidate-by-district',
             'connections',
             'party-strengths',
             'parties-panachage',
@@ -30,8 +34,28 @@ class ElectionLayout(DetailLayout):
 
         if tab == 'lists':
             return _("Lists")
+        if tab == 'list-by-entity':
+            return '{} ({})'.format(
+                self.request.translate(_("Lists")),
+                self.request.translate(self.principal.label('entities'))
+            )
+        if tab == 'list-by-district':
+            return '{} ({})'.format(
+                self.request.translate(_("Lists")),
+                self.request.translate(self.principal.label('districts'))
+            )
         if tab == 'candidates':
             return _("Candidates")
+        if tab == 'candidate-by-entity':
+            return '{} ({})'.format(
+                self.request.translate(_("Candidates")),
+                self.request.translate(self.principal.label('entities'))
+            )
+        if tab == 'candidate-by-district':
+            return '{} ({})'.format(
+                self.request.translate(_("Candidates")),
+                self.request.translate(self.principal.label('districts'))
+            )
         if tab == 'connections':
             return _("List connections")
         if tab == 'party-strengths':
@@ -54,6 +78,30 @@ class ElectionLayout(DetailLayout):
         if tab == 'lists':
             return (
                 self.proporz and
+                not self.tacit
+            )
+        if tab == 'list-by-entity':
+            return (
+                self.show_map and
+                self.proporz and
+                not self.tacit
+            )
+        if tab == 'list-by-district':
+            return (
+                self.show_map and
+                self.has_districts and
+                self.proporz and
+                not self.tacit
+            )
+        if tab == 'candidate-by-entity':
+            return (
+                self.show_map and
+                not self.tacit
+            )
+        if tab == 'candidate-by-district':
+            return (
+                self.show_map and
+                self.has_districts and
                 not self.tacit
             )
         if tab == 'connections':

@@ -12,7 +12,11 @@ def test_election_layout(session):
 
     assert layout.all_tabs == (
         'lists',
+        'list-by-entity',
+        'list-by-district',
         'candidates',
+        'candidate-by-entity',
+        'candidate-by-district',
         'connections',
         'party-strengths',
         'parties-panachage',
@@ -24,7 +28,11 @@ def test_election_layout(session):
     assert layout.title() == ''
     assert layout.title('undefined') == ''
     assert layout.title('lists') == 'Lists'
+    assert layout.title('list-by-entity') == 'Lists (__entities)'
+    assert layout.title('list-by-district') == 'Lists (__districts)'
     assert layout.title('candidates') == 'Candidates'
+    assert layout.title('candidate-by-entity') == 'Candidates (__entities)'
+    assert layout.title('candidate-by-district') == 'Candidates (__districts)'
     assert layout.title('connections') == 'List connections'
     assert layout.title('party-strengths') == 'Party strengths'
     assert layout.title('parties-panachage') == 'Panachage (parties)'
