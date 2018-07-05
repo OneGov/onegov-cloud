@@ -88,6 +88,7 @@ var initEntitiesMap = function(el) {
                 labelRightHand: labelRightHand,
                 labelExpats: labelExpats
             })(el);
+            $(el).data('map', map);
 
             var embedLink = $(el).data('embed-link');
             var embedSource = $(el).data('embed-source');
@@ -122,6 +123,7 @@ var initDistrictsMap = function(el) {
                 labelRightHand: labelRightHand,
                 labelExpats: labelExpats
             })(el);
+            $(el).data('map', map);
 
             var embedLink = $(el).data('embed-link');
             var embedSource = $(el).data('embed-source');
@@ -149,6 +151,14 @@ var initDistrictsMap = function(el) {
         });
         $('.districts-map').each(function(ix, el) {
             initDistrictsMap(el);
+        });
+        $('.map-data-select').each(function(ix, el) {
+            $(el).change(function() {
+                var dataurl = $(this).val();
+                $('.entities-map,.districts-map').each(function(ix, el) {
+                    $(el).data('map').update(dataurl);
+                });
+            });
         });
     });
 })(jQuery);

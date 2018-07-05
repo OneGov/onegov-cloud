@@ -43,6 +43,9 @@
                 data-inverse="${inverse}"
                 >
             </div>
+            <select class="map-data-select" tal:condition="options|False">
+                <option tal:repeat="(value, label) options" tal:attributes="value value">${label}</option>
+            </select>
             <div class="${scope}-${type}"
                 tal:condition="type == 'map' and layout.principal.is_year_available(year)"
                 data-canton="${layout.principal.id}"
