@@ -114,6 +114,8 @@ def view_ballot_entities_as_map(self, request):
         'type': 'map',
         'scope': 'entities',
         'year': self.vote.date.year,
+        'thumbs': 'true',
+        'color_scale': 'rb',
         'label_left_hand': _("Nay"),
         'label_right_hand': _("Yay"),
         'data_url': request.link(self, name='by-entity'),

@@ -48,6 +48,8 @@
                 data-canton="${layout.principal.id}"
                 data-mapurl="${layout.get_topojson_link(layout.principal.id, year)}"
                 data-dataurl="${data_url}"
+                data-thumbs="${thumbs}"
+                data-color-scale="${color_scale}"
                 data-label-left-hand="${label_left_hand}"
                 data-label-right-hand="${label_right_hand}"
                 data-label-expats="Expats"
