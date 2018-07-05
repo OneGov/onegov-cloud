@@ -22,7 +22,6 @@
             <div class="row" tal:condition="layout.show_map">
                 <div class="small-12 small-centered medium-8 large-6 columns map-container">
                     <div class="districts-map"
-                        data-type="${ballot.type}"
                         data-canton="${layout.app.principal.id}"
                         data-mapurl="${layout.get_topojson_link(layout.app.principal.id, vote.date.year)}"
                         data-dataurl="${request.link(ballot, name='by-district')}"

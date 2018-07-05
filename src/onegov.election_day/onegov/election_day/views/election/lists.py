@@ -39,9 +39,8 @@ def view_election_lists_chart(self, request):
     return {
         'model': self,
         'layout': DefaultLayout(self, request),
-        'data': {
-            'bar': request.link(self, name='lists-data')
-        }
+        'type': 'bar',
+        'data_url': request.link(self, name='lists-data'),
     }
 
 

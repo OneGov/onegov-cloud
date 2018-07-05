@@ -2,6 +2,7 @@ from morepath.request import Response
 from onegov.ballot import Ballot
 from onegov.ballot import Vote
 from onegov.core.security import Public
+from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts import VoteLayout
@@ -107,14 +108,15 @@ def view_ballot_districts_as_map(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.vote.last_modified)
 
-    show_map = request.app.principal.is_year_available(self.vote.date.year)
     return {
         'model': self,
         'layout': DefaultLayout(self, request),
-        'data': {
-            'map': request.link(self, name='by-district'),
-            'type': 'districts'
-        } if show_map else {}
+        'type': 'map',
+        'scope': 'districts',
+        'year': self.vote.date.year,
+        'label_left_hand': _("Nay"),
+        'label_right_hand': _("Yay"),
+        'data_url': request.link(self, name='by-district'),
     }
 
 

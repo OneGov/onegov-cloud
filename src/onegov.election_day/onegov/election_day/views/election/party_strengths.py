@@ -41,9 +41,8 @@ def view_election_party_strengths_chart(self, request):
     return {
         'model': self,
         'layout': DefaultLayout(self, request),
-        'data': {
-            'grouped_bar': request.link(self, name='party-strengths-data')
-        }
+        'type': 'grouped-bar',
+        'data_url': request.link(self, name='party-strengths-data'),
     }
 
 

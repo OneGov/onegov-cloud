@@ -25,34 +25,35 @@
     <link rel="stylesheet" type="text/css" href="${request.theme_link}">
     <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
     </head>
-    <body tal:define="bar_url data.get('bar');
-                      grouped_bar_url data.get('grouped_bar');
-                      sankey_url data.get('sankey');
-                      map_url data.get('map');
-                      map_type data.get('type')">
-        <div tal:condition="bar_url" class="bar-chart"
-            data-dataurl="${bar_url}"
-            >
-        </div>
-        <div tal:condition="grouped_bar_url" class="grouped-bar-chart"
-            data-dataurl="${grouped_bar_url}"
-            >
-        </div>
-        <div tal:condition="sankey_url" class="sankey-chart"
-            data-dataurl="${sankey_url}"
-            data-inverse="${data.get('inverse')}"
-            >
-        </div>
-        <div tal:condition="map_url" class="${map_type}-map"
-            data-type="${model.type}"
-            data-canton="${layout.principal.id}"
-            data-mapurl="${layout.get_topojson_link(layout.principal.id, model.vote.date.year)}"
-            data-dataurl="${map_url}"
-            data-left-hand="Yay"
-            data-right-hand="Nay"
-            data-expats="Expats"
-            i18n:attributes="data-left-hand; data-right-hand; data-expats"
-            >
-        </div>
+    <body>
+        <tal:block tal:condition="data_url">
+            <div class="bar-chart"
+                tal:condition="type == 'bar'"
+                data-dataurl="${data_url}"
+                >
+            </div>
+            <div class="grouped-bar-chart"
+                tal:condition="type == 'grouped-bar'"
+                data-dataurl="${data_url}"
+                >
+            </div>
+            <div class="sankey-chart"
+                tal:condition="type == 'sankey'"
+                data-dataurl="${data_url}"
+                data-inverse="${inverse}"
+                >
+            </div>
+            <div class="${scope}-${type}"
+                tal:condition="type == 'map' and layout.principal.is_year_available(year)"
+                data-canton="${layout.principal.id}"
+                data-mapurl="${layout.get_topojson_link(layout.principal.id, year)}"
+                data-dataurl="${data_url}"
+                data-label-left-hand="${label_left_hand}"
+                data-label-right-hand="${label_right_hand}"
+                data-label-expats="Expats"
+                i18n:attributes="data-label-left-hand; data-label-right-hand; data-label-expats"
+                >
+            </div>
+        </tal:block>
     </body>
 </html>

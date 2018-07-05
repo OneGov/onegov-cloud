@@ -22,7 +22,6 @@
             <div class="row" tal:condition="layout.show_map">
                 <div class="small-12 small-centered medium-8 large-6 columns map-container">
                     <div class="entities-map"
-                        data-type="${ballot.type}"
                         data-canton="${layout.principal.id}"
                         data-mapurl="${layout.get_topojson_link(layout.principal.id, vote.date.year)}"
                         data-dataurl="${request.link(ballot, name='by-entity')}"

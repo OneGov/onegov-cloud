@@ -40,9 +40,9 @@ def view_election_lists_panachage_chart(self, request):
     return {
         'model': self,
         'layout': DefaultLayout(self, request),
-        'data': {
-            'sankey': request.link(self, name='lists-panachage-data')
-        }
+        'type': 'sankey',
+        'inverse': 'false',
+        'data_url': request.link(self, name='lists-panachage-data'),
     }
 
 

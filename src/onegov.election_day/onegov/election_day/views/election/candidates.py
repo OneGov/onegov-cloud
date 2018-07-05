@@ -43,9 +43,8 @@ def view_election_candidates_chart(self, request):
     return {
         'model': self,
         'layout': DefaultLayout(self, request),
-        'data': {
-            'bar': request.link(self, name='candidates-data')
-        }
+        'type': 'bar',
+        'data_url': request.link(self, name='candidates-data'),
     }
 
 
