@@ -153,7 +153,10 @@ class Candidate(Base, TimestampMixin):
         for result in empty:
             update = (
                 result.name not in percentage or
-                percentage[result.name]['entities'] != result.entities
+                (
+                    set(percentage[result.name]['entities']) !=
+                    set(result.entities)
+                )
             )
             if update:
                 percentage[result.name] = {
