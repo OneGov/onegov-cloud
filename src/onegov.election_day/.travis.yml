@@ -10,6 +10,9 @@ matrix:
       python: "3.6"
       env: TOXENV=pep8
 
+services:
+  - postgresql
+
 addons:
   postgresql: "9.6"
 
