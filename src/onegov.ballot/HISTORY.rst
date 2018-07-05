@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.7.0 (2018-07-05)
+~~~~~~~~~~~~~~~~~~~
 
 - Allows to group ballot results by districts.
   [msom
