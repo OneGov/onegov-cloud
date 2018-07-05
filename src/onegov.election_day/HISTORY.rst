@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.6.0 (2018-07-05)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds vote views for districts.
   [msom]
