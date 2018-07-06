@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.16.1 (2018-07-06)
+~~~~~~~~~~~~~~~~~~~~
 
 - Fixes inactive categories and organizations not striked-through.
   [msom]
