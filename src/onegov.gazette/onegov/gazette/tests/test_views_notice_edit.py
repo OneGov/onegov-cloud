@@ -183,7 +183,7 @@ def test_view_notice_edit_unrestricted(gazette_app):
         edit_notice_unrestricted(admin, 'notice', title='unres_drafted')
         assert 'unres_drafted' in editor_1.get('/notice/notice')
 
-        manage = admin.get('/notice/notice/edit_unrestricted')
+        manage = admin.get('/notice/notice/edit-unrestricted')
         assert "(Complaints)" in manage
         assert "(Sikh Community)" in manage
 
@@ -196,7 +196,7 @@ def test_view_notice_edit_unrestricted(gazette_app):
         edit_notice_unrestricted(admin, 'notice', title='unres_submitted')
         assert 'unres_submitted' in editor_1.get('/notice/notice')
 
-        manage = admin.get('/notice/notice/edit_unrestricted')
+        manage = admin.get('/notice/notice/edit-unrestricted')
         assert "(Complaints)" in manage
         assert "(Sikh Community)" in manage
 
@@ -209,7 +209,7 @@ def test_view_notice_edit_unrestricted(gazette_app):
         edit_notice_unrestricted(admin, 'notice', title='unres_rejected')
         assert 'unres_rejected' in editor_1.get('/notice/notice')
 
-        manage = admin.get('/notice/notice/edit_unrestricted')
+        manage = admin.get('/notice/notice/edit-unrestricted')
         assert "(Complaints)" in manage
         assert "(Sikh Community)" in manage
 
@@ -223,7 +223,7 @@ def test_view_notice_edit_unrestricted(gazette_app):
         edit_notice_unrestricted(admin, 'notice', title='unres_accepted')
         assert 'unres_accepted' in editor_1.get('/notice/notice')
 
-        manage = admin.get('/notice/notice/edit_unrestricted')
+        manage = admin.get('/notice/notice/edit-unrestricted')
         assert "(Complaints)" in manage
         assert "(Sikh Community)" in manage
         assert "Diese Meldung wurde bereits angenommen!" in manage

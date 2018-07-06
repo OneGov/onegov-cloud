@@ -73,7 +73,7 @@ def view_notice(self, request):
             '_self'
         ),
         'delete': _action(_("Delete"), 'delete', 'alert right'),
-        'edit_un': _action(_("Edit"), 'edit_unrestricted', 'secondary'),
+        'edit_un': _action(_("Edit"), 'edit-unrestricted', 'secondary'),
         'edit': _action(_("Edit"), 'edit', 'secondary'),
         'preview': _action(_("Preview"), 'preview', 'secondary', '_blank'),
         'reject': _action(_("Reject"), 'reject', 'alert right'),
@@ -258,7 +258,7 @@ def edit_notice(self, request, form):
 
 @GazetteApp.form(
     model=GazetteNotice,
-    name='edit_unrestricted',
+    name='edit-unrestricted',
     template='form.pt',
     permission=Secret,
     form=UnrestrictedNoticeForm

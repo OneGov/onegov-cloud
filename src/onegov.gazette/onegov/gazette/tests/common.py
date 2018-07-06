@@ -116,7 +116,7 @@ def edit_notice(user, slug, unable=False, forbidden=False, **kwargs):
 
 def edit_notice_unrestricted(user, slug, unable=False, forbidden=False,
                              **kwargs):
-    url = '/notice/{}/edit_unrestricted'.format(slug)
+    url = '/notice/{}/edit-unrestricted'.format(slug)
     if unable:
         assert not user.get(url).forms
     elif forbidden:
