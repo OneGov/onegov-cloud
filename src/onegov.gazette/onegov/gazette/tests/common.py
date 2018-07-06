@@ -108,6 +108,8 @@ def edit_notice(user, slug, unable=False, forbidden=False, **kwargs):
         manage = user.get(url)
         for key, value in kwargs.items():
             manage.form[key] = value
+        if 'at_cost' not in kwargs:
+            manage.form['at_cost'] = 'no'
         manage = manage.form.submit()
         assert "Meldung geändert" in manage.maybe_follow()
 
@@ -123,6 +125,8 @@ def edit_notice_unrestricted(user, slug, unable=False, forbidden=False,
         manage = user.get(url)
         for key, value in kwargs.items():
             manage.form[key] = value
+        if 'at_cost' not in kwargs:
+            manage.form['at_cost'] = 'no'
         manage = manage.form.submit()
         assert "Meldung geändert" in manage.maybe_follow()
 

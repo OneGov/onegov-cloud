@@ -4,6 +4,9 @@ Changelog
 - Fixes inactive categories and organizations not striked-through.
   [msom]
 
+- Requires the user to provide a billing address if liable to pay costs.
+  [msom]
+
 1.16.0 (2018-07-03)
 ~~~~~~~~~~~~~~~~~~~~
 

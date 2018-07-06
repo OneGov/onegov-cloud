@@ -71,7 +71,10 @@ class NoticeForm(Form):
     billing_address = TextAreaField(
         label=_("Billing address"),
         render_kw={'rows': 3},
-        depends_on=('at_cost', 'yes')
+        depends_on=('at_cost', 'yes'),
+        validators=[
+            InputRequired()
+        ]
     )
 
     issues = MultiCheckboxField(
