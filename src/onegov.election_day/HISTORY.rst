@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes absolute majority field beeing visible when editing proporz elections.
+  [msom]
+
 3.6.1 (2018-07-06)
 ~~~~~~~~~~~~~~~~~~~
 

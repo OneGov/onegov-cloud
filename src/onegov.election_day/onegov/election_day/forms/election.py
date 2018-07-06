@@ -49,7 +49,7 @@ class ElectionForm(Form):
             Optional(),
             NumberRange(min=1)
         ],
-        depends_on=('majority_type', 'absolute'),
+        depends_on=('majority_type', 'absolute', 'election_type', 'majorz'),
     )
 
     domain = RadioField(
