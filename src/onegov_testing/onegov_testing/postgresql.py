@@ -39,6 +39,13 @@ class Postgresql(Base):
         super().__init__(*args, **kwargs)
         self.snapshots = []
 
+    def initialize(self):
+        super().initialize()
+        if self.initdb.startswith('/usr/lib/postgresql/9'):
+            self.initdb = '/usr/lib/postgresql/9.6/bin/initdb'
+        if self.postgres.startswith('/usr/lib/postgresql/9'):
+            self.postgres = '/usr/lib/postgresql/9.6/bin/postgres'
+
     def save(self):
         self.snapshots.append(Snapshot(self.url()))
         return self.snapshots[-1]
