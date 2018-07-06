@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.6.1 (2018-07-06)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes percentages of votes aggregations.
   [msom]
