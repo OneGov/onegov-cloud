@@ -298,17 +298,17 @@ msgstr "Glistas"
 msgid "Candidates"
 msgstr "Candidatas e candidats"
 
-msgid "Party strengths"
-msgstr "Forza da las partidas"
-
-msgid "Panachage (parties)"
-msgstr "Statistica da panaschar (partidas)"
-
-msgid "Panachage (lists)"
-msgstr "Statistica da panaschar (glistas)"
+msgid "Parties"
+msgstr "Partidas"
 
 msgid "Downloads"
 msgstr "Downloads"
+
+msgid "Panachage"
+msgstr "Statistica da panaschar"
+
+msgid "Party strengths"
+msgstr "Forza da las partidas"
 
 msgid "Elected candidates"
 msgstr "Candidat(a)s elegid(a)s"
@@ -328,14 +328,14 @@ msgstr "Funtaunas da datas"
 msgid "Mappings"
 msgstr "Attribuziuns"
 
-msgid "SMS subscribers"
-msgstr "SMS abunents"
+msgid "Subscribers"
+msgstr "Abunents"
 
 msgid "Email subscribers"
 msgstr "E-mail abunents"
 
-msgid "Subscribers"
-msgstr "Abunents"
+msgid "SMS subscribers"
+msgstr "SMS abunents"
 
 msgid "Final results"
 msgstr "Resultats finals"
@@ -463,12 +463,6 @@ msgstr "% NA"
 
 msgid "Archive"
 msgstr "Archiv"
-
-msgid "Yay"
-msgstr "GEA"
-
-msgid "Nay"
-msgstr "NA"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
@@ -906,11 +900,23 @@ msgstr "Regiun linguistica"
 msgid "New vote"
 msgstr "Nova votaziun"
 
+msgid "Nay"
+msgstr "NA"
+
+msgid "Yay"
+msgstr "GEA"
+
 msgid "Empty"
 msgstr "Vid"
 
 msgid "Invalid"
 msgstr "Nunvalaivel"
+
+msgid "Panachage (parties)"
+msgstr "Statistica da panaschar (partidas)"
+
+msgid "Panachage (lists)"
+msgstr "Statistica da panaschar (glistas)"
 
 msgid "Blank list"
 msgstr "Glista en blanco"
@@ -1019,9 +1025,6 @@ msgid ""
 msgstr ""
 "La communicaziun per SMS è vegnida terminada. A partir d'ussa na survegnis "
 "Vus pli nagins SMS en chaussa."
-
-msgid "Parties"
-msgstr "Partidas"
 
 msgid "Update results"
 msgstr "Actualisar ils resultats"

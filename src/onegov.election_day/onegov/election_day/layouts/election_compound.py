@@ -32,7 +32,7 @@ class ElectionCompoundLayout(DetailLayout):
         if tab == 'party-strengths':
             return _("Party strengths")
         if tab == 'parties-panachage':
-            return _("Panachage (parties)")
+            return _("Panachage")
         if tab == 'data':
             return _("Downloads")
 
@@ -63,7 +63,8 @@ class ElectionCompoundLayout(DetailLayout):
             (
                 self.title(tab),
                 self.request.link(self.model, tab),
-                'active' if self.tab == tab else ''
+                self.tab == tab,
+                []
             ) for tab in self.all_tabs if self.tab_visible(tab)
         ]
 
@@ -125,7 +126,8 @@ class ElectionCompoundLayout(DetailLayout):
         return '{}.svg'.format(
             normalize_for_url(
                 '{}-{}'.format(
-                    self.model.id, self.title() or ''
+                    self.model.id,
+                    self.request.translate(self.title() or '')
                 )
             )
         )

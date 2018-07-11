@@ -15,6 +15,8 @@
 
             <div metal:use-macro="layout.macros['tab_menu']"/>
 
+            <h3 i18n:translate="">${layout.title()}</h3>
+
             <div metal:use-macro="layout.macros['pdf_download']" tal:define="model election_compound"/>
 
             <div metal:use-macro="layout.macros['open_data_download']" tal:define="model election_compound"/>

@@ -70,6 +70,10 @@ class DummyPrincipal(object):
         self.domain = 'canton'
         self.wabsti_import = False
         self.has_districts = False
+        self._is_year_available = True
+
+    def is_year_available(self, year):
+        return self._is_year_available
 
     def label(self, type):
         return '__{}'.format(type)

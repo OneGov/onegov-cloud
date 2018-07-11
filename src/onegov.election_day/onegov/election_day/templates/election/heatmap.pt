@@ -16,6 +16,7 @@
             <div metal:use-macro="layout.macros['tab_menu']"/>
 
             <h3 tal:content="layout.title()" />
+            <h4 tal:condition="layout.subtitle()" i18n:translate="">${layout.subtitle()}</h4>
 
             <select class="map-data-select">
                 <option tal:repeat="(value, label) options" tal:attributes="value value">${label}</option>

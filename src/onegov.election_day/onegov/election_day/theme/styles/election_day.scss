@@ -588,6 +588,21 @@ footer {
                     }
                 }
             }
+
+             .top-bar-section .dropdown {
+                background-color: $white-smoke;
+                li {
+                    margin-top: 2px;
+                    > a {
+                        background-color: $white-smoke;
+                    }
+
+                    &:not(.has-form):not(.active)>a:not(.button) {
+                        background-color: $white-smoke;
+                        color: black;
+                    }
+                }
+            }
         }
     }
 }

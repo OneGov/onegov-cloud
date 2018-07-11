@@ -27,44 +27,30 @@ class VoteLayout(DetailLayout):
         )
 
     def title(self, tab=None):
-        tab = self.tab if tab is None else tab
+        tab = (self.tab if tab is None else tab) or ''
 
         if tab == 'entities':
             return self.principal.label('entities')
         if tab == 'districts':
             return self.principal.label('districts')
-        if tab == 'proposal-entities':
-            return '{} ({})'.format(
-                self.request.translate(self.principal.label('entities')),
-                self.request.translate(_("Proposal"))
-            )
-        if tab == 'proposal-districts':
-            return '{} ({})'.format(
-                self.request.translate(self.principal.label('districts')),
-                self.request.translate(_("Proposal"))
-            )
-        if tab == 'counter-proposal-entities':
-            return '{} ({})'.format(
-                self.request.translate(self.principal.label('entities')),
-                self.request.translate(_("Counter Proposal"))
-            )
-        if tab == 'counter-proposal-districts':
-            return '{} ({})'.format(
-                self.request.translate(self.principal.label('districts')),
-                self.request.translate(_("Counter Proposal"))
-            )
-        if tab == 'tie-breaker-entities':
-            return '{} ({})'.format(
-                self.request.translate(self.principal.label('entities')),
-                self.request.translate(_("Tie-Breaker"))
-            )
-        if tab == 'tie-breaker-districts':
-            return '{} ({})'.format(
-                self.request.translate(self.principal.label('districts')),
-                self.request.translate(_("Tie-Breaker"))
-            )
+        if tab.startswith('proposal'):
+            return _("Proposal")
+        if tab.startswith('counter-proposal'):
+            return _("Counter Proposal")
+        if tab.startswith('tie-breaker'):
+            return _("Tie-Breaker")
         if tab == 'data':
             return _("Downloads")
+
+        return ''
+
+    def subtitle(self, tab=None):
+        tab = (self.tab if tab is None else tab) or ''
+
+        if tab.endswith('-entities') and self.has_districts:
+            return self.principal.label('entities')
+        if tab.endswith('-districts'):
+            return self.principal.label('districts')
 
         return ''
 
@@ -124,11 +110,44 @@ class VoteLayout(DetailLayout):
 
     @cached_property
     def menu(self):
+        def entry(tab, use_subtitle=False):
+            return (
+                self.subtitle(tab) if use_subtitle else self.title(tab),
+                self.request.link(self.model, tab),
+                self.tab == tab,
+                []
+            )
+
+        if self.type == 'complex' and self.has_districts:
+            result = []
+
+            for title, prefix in (
+                (_("Proposal"), 'proposal'),
+                (_("Counter Proposal"), 'counter-proposal'),
+                (_("Tie-Breaker"), 'tie-breaker')
+            ):
+                result.append((
+                    title, '', self.tab.startswith(prefix), [(
+                        self.subtitle(tab),
+                        self.request.link(self.model, tab),
+                        self.tab == tab,
+                        []
+                    ) for tab in (f'{prefix}-entities', f'{prefix}-districts')]
+                ))
+            result.append((
+                self.title('data'),
+                self.request.link(self.model, 'data'),
+                self.tab == 'data',
+                []
+            ))
+            return result
+
         return [
             (
                 self.title(tab),
                 self.request.link(self.model, tab),
-                'active' if self.tab == tab else ''
+                self.tab == tab,
+                []
             ) for tab in self.all_tabs if self.tab_visible(tab)
         ]
 
@@ -188,8 +207,10 @@ class VoteLayout(DetailLayout):
 
         return '{}.svg'.format(
             normalize_for_url(
-                '{}-{}'.format(
-                    self.model.id, self.title() or ''
-                )
+                '{}-{}-{}'.format(
+                    self.model.id,
+                    self.request.translate(self.title() or ''),
+                    self.request.translate(self.subtitle() or '')
+                ).rstrip('-')
             )
         )

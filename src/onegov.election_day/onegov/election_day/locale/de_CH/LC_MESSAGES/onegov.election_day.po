@@ -298,17 +298,17 @@ msgstr "Listen"
 msgid "Candidates"
 msgstr "Kandidierende"
 
-msgid "Party strengths"
-msgstr "Parteistärken"
-
-msgid "Panachage (parties)"
-msgstr "Panaschierstatistik (Parteien)"
-
-msgid "Panachage (lists)"
-msgstr "Panaschierstatistik (Listen)"
+msgid "Parties"
+msgstr "Parteien"
 
 msgid "Downloads"
 msgstr "Downloads"
+
+msgid "Panachage"
+msgstr "Panaschierstatistik"
+
+msgid "Party strengths"
+msgstr "Parteistärken"
 
 msgid "Elected candidates"
 msgstr "Gewählte Kandidierende"
@@ -328,14 +328,14 @@ msgstr "Datenquellen"
 msgid "Mappings"
 msgstr "Zuordnungen"
 
-msgid "SMS subscribers"
-msgstr "SMS-Abonnenten"
+msgid "Subscribers"
+msgstr "Abonnenten"
 
 msgid "Email subscribers"
 msgstr "E-Mail-Abonnenten"
 
-msgid "Subscribers"
-msgstr "Abonnenten"
+msgid "SMS subscribers"
+msgstr "SMS-Abonnenten"
 
 msgid "Final results"
 msgstr "Schlussresultate"
@@ -463,12 +463,6 @@ msgstr "Nein %"
 
 msgid "Archive"
 msgstr "Archiv"
-
-msgid "Yay"
-msgstr "Ja"
-
-msgid "Nay"
-msgstr "Nein"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
@@ -867,11 +861,23 @@ msgstr "Gebietsschema"
 msgid "New vote"
 msgstr "Neue Abstimmung"
 
+msgid "Nay"
+msgstr "Nein"
+
+msgid "Yay"
+msgstr "Ja"
+
 msgid "Empty"
 msgstr "Leer"
 
 msgid "Invalid"
 msgstr "Ungültig"
+
+msgid "Panachage (parties)"
+msgstr "Panaschierstatistik (Parteien)"
+
+msgid "Panachage (lists)"
+msgstr "Panaschierstatistik (Listen)"
 
 msgid "Blank list"
 msgstr "Blankoliste"
@@ -975,9 +981,6 @@ msgid ""
 msgstr ""
 "Die SMS-Benachrichtigung wurde beendet. Sie erhalten in Zukunft keine SMS "
 "mehr."
-
-msgid "Parties"
-msgstr "Parteien"
 
 msgid "Update results"
 msgstr "Resultate aktualisieren"

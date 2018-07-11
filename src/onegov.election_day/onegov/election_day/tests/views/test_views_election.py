@@ -264,7 +264,7 @@ def test_view_election_party_strengths(election_day_app_gr):
     upload_majorz_election(client)
 
     main = client.get('/election/majorz-election/party-strengths')
-    assert '<h3>Parteistärken</h3>' not in main
+    assert '<h4>Parteistärken</h4>' not in main
 
     parties = client.get('/election/majorz-election/party-strengths-data')
     assert parties.json['results'] == []
@@ -278,7 +278,7 @@ def test_view_election_party_strengths(election_day_app_gr):
     upload_party_results(client)
 
     main = client.get('/election/proporz-election/party-strengths')
-    assert '<h3>Parteistärken</h3>' in main
+    assert '<h4>Parteistärken</h4>' in main
 
     parties = client.get('/election/proporz-election/party-strengths-data')
     parties = parties.json
@@ -384,7 +384,7 @@ def test_view_election_connections(election_day_app_gr):
     upload_majorz_election(client)
 
     main = client.get('/election/majorz-election/connections')
-    assert '<h3>Listenverbindungen</h3>' not in main
+    assert '<h4>Listenverbindungen</h4>' not in main
 
     assert client.get('/election/majorz-election/connections-data').json == {}
 
@@ -395,7 +395,7 @@ def test_view_election_connections(election_day_app_gr):
     upload_proporz_election(client)
 
     main = client.get('/election/proporz-election/connections')
-    assert '<h3>Listenverbindungen</h3>' in main
+    assert '<h4>Listenverbindungen</h4>' in main
 
     data = client.get('/election/proporz-election/connections-data').json
 
@@ -422,7 +422,7 @@ def test_view_election_lists_panachage(election_day_app_gr):
     upload_majorz_election(client)
 
     main = client.get('/election/majorz-election/lists-panachage')
-    assert '<h3>Panaschierstatistik (Listen)</h3>' not in main
+    assert '<h4>Panaschierstatistik</h4>' not in main
 
     assert client.get(
         '/election/majorz-election/lists-panachage-data'
@@ -435,7 +435,7 @@ def test_view_election_lists_panachage(election_day_app_gr):
     upload_proporz_election(client)
 
     main = client.get('/election/proporz-election/lists-panachage')
-    assert '<h3>Panaschierstatistik (Listen)</h3>' in main
+    assert '<h4>Panaschierstatistik</h4>' in main
 
     data = client.get('/election/proporz-election/lists-panachage-data').json
 
@@ -456,7 +456,7 @@ def test_view_election_parties_panachage(election_day_app_gr):
     upload_majorz_election(client)
 
     main = client.get('/election/majorz-election/parties-panachage')
-    assert '<h3>Panaschierstatistik (Parteien)</h3>' not in main
+    assert '<h4>Panaschierstatistik</h4>' not in main
 
     assert client.get(
         '/election/majorz-election/parties-panachage-data'
@@ -470,7 +470,7 @@ def test_view_election_parties_panachage(election_day_app_gr):
     upload_party_results(client)
 
     main = client.get('/election/proporz-election/parties-panachage')
-    assert '<h3>Panaschierstatistik (Parteien)</h3>' in main
+    assert '<h4>Panaschierstatistik</h4>' in main
 
     data = client.get('/election/proporz-election/parties-panachage-data').json
 

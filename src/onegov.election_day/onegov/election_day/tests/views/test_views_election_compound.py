@@ -171,7 +171,7 @@ def test_view_election_compound_parties_panachage(election_day_app_gr):
     upload_party_results(client, slug='elections/elections')
 
     main = client.get('/elections/elections/parties-panachage')
-    assert '<h3>Panaschierstatistik (Parteien)</h3>' in main
+    assert '<h3>Panaschierstatistik</h3>' in main
 
     data = client.get('/elections/elections/parties-panachage-data').json
 

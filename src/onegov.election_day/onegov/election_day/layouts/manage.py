@@ -21,41 +21,80 @@ class ManageLayout(DefaultLayout):
 
     @cached_property
     def menu(self):
-        menu = []
         session = self.request.session
+        principal = self.principal
 
-        link = self.request.link(VoteCollection(session))
-        class_ = 'active' if link == self.manage_model_link else ''
-        menu.append((_("Votes"), link, class_))
+        result = []
+        result.append((
+            _("Votes"),
+            self.request.link(VoteCollection(session)),
+            isinstance(self.model, VoteCollection),
+            []
+        ))
+        result.append((
+            _("Elections"),
+            self.request.link(ElectionCollection(session)),
+            isinstance(self.model, ElectionCollection),
+            []
+        ))
+        result.append((
+            _("Compounds of elections"),
+            self.request.link(ElectionCompoundCollection(session)),
+            isinstance(self.model, ElectionCompoundCollection),
+            []
+        ))
+        if principal.wabsti_import:
+            result.append((
+                _("Data sources"),
+                self.request.link(DataSourceCollection(session)),
+                (
+                    isinstance(self.model, DataSourceCollection) or
+                    isinstance(self.model, DataSourceItemCollection)
+                ),
+                []
+            ))
 
-        link = self.request.link(ElectionCollection(session))
-        class_ = 'active' if link == self.manage_model_link else ''
-        menu.append((_("Elections"), link, class_))
+        if principal.sms_notification and principal.email_notification:
+            result.append((
+                _("Subscribers"),
+                '',
+                (
+                    isinstance(self.model, SmsSubscriberCollection) or
+                    isinstance(self.model, EmailSubscriberCollection)
+                ),
+                [
+                    (
+                        _("SMS subscribers"),
+                        self.request.link(SmsSubscriberCollection(session)),
+                        isinstance(self.model, SmsSubscriberCollection),
+                        []
+                    ),
+                    (
+                        _("Email subscribers"),
+                        self.request.link(EmailSubscriberCollection(session)),
+                        isinstance(self.model, EmailSubscriberCollection),
+                        []
+                    )
+                ]
+            ))
 
-        link = self.request.link(ElectionCompoundCollection(session))
-        class_ = 'active' if link == self.manage_model_link else ''
-        menu.append((_("Compounds of elections"), link, class_))
+        elif principal.sms_notification:
+            result.append((
+                _("SMS subscribers"),
+                self.request.link(SmsSubscriberCollection(session)),
+                isinstance(self.model, SmsSubscriberCollection),
+                []
+            ))
 
-        if self.principal.wabsti_import:
-            link = self.request.link(DataSourceCollection(session))
-            active = (
-                link == self.manage_model_link or
-                isinstance(self.model, DataSourceItemCollection)
-            )
-            class_ = 'active' if active else ''
-            menu.append((_("Data sources"), link, class_))
+        elif self.principal.email_notification:
+            result.append((
+                _("Email subscribers"),
+                self.request.link(EmailSubscriberCollection(session)),
+                isinstance(self.model, EmailSubscriberCollection),
+                []
+            ))
 
-        if self.principal.sms_notification:
-            link = self.request.link(SmsSubscriberCollection(session))
-            class_ = 'active' if link == self.manage_model_link else ''
-            menu.append((_("SMS subscribers"), link, class_))
-
-        if self.principal.email_notification:
-            link = self.request.link(EmailSubscriberCollection(session))
-            class_ = 'active' if link == self.manage_model_link else ''
-            menu.append((_("Email subscribers"), link, class_))
-
-        return menu
+        return result
 
     def title(self):
         try:

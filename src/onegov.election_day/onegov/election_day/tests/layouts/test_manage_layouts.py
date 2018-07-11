@@ -1,4 +1,5 @@
 from onegov.ballot import ElectionCollection
+from onegov.ballot import ElectionCompoundCollection
 from onegov.ballot import VoteCollection
 from onegov.election_day.collections import DataSourceCollection
 from onegov.election_day.collections import DataSourceItemCollection
@@ -21,9 +22,14 @@ def test_manage_layouts(session):
     )
     assert layout.manage_model_link == 'VoteCollection/archive'
     assert layout.menu == [
-        ('Votes', 'VoteCollection/archive', 'active'),
-        ('Elections', 'ElectionCollection/archive', ''),
-        ('Compounds of elections', 'ElectionCompoundCollection/archive', '')
+        ('Votes', 'VoteCollection/archive', True, []),
+        ('Elections', 'ElectionCollection/archive', False, []),
+        (
+            'Compounds of elections',
+            'ElectionCompoundCollection/archive',
+            False,
+            []
+        )
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
@@ -39,12 +45,24 @@ def test_manage_layouts(session):
     layout.principal.email_notification = True
     layout.principal.wabsti_import = True
     assert layout.menu == [
-        ('Votes', 'VoteCollection/archive', 'active'),
-        ('Elections', 'ElectionCollection/archive', ''),
-        ('Compounds of elections', 'ElectionCompoundCollection/archive', ''),
-        ('Data sources', 'DataSourceCollection/archive', ''),
-        ('SMS subscribers', 'SmsSubscriberCollection/archive', ''),
-        ('Email subscribers', 'EmailSubscriberCollection/archive', ''),
+        ('Votes', 'VoteCollection/archive', True, []),
+        ('Elections', 'ElectionCollection/archive', False, []),
+        (
+            'Compounds of elections',
+            'ElectionCompoundCollection/archive',
+            False,
+            []
+        ),
+        ('Data sources', 'DataSourceCollection/archive', False, []),
+        ('Subscribers', '', False, [
+            ('SMS subscribers', 'SmsSubscriberCollection/archive', False, []),
+            (
+                'Email subscribers',
+                'EmailSubscriberCollection/archive',
+                False,
+                []
+            )
+        ])
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
@@ -58,9 +76,14 @@ def test_manage_layouts(session):
     )
     assert layout.manage_model_link == 'ElectionCollection/archive'
     assert layout.menu == [
-        ('Votes', 'VoteCollection/archive', ''),
-        ('Elections', 'ElectionCollection/archive', 'active'),
-        ('Compounds of elections', 'ElectionCompoundCollection/archive', '')
+        ('Votes', 'VoteCollection/archive', False, []),
+        ('Elections', 'ElectionCollection/archive', True, []),
+        (
+            'Compounds of elections',
+            'ElectionCompoundCollection/archive',
+            False,
+            []
+        )
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
@@ -69,22 +92,23 @@ def test_manage_layouts(session):
 
     # Election compounds
     layout = ManageElectionCompoundsLayout(
-        ElectionCollection(session),
+        ElectionCompoundCollection(session),
         DummyRequest()
     )
     assert layout.manage_model_link == 'ElectionCompoundCollection/archive'
     assert layout.menu == [
-        ('Votes', 'VoteCollection/archive', ''),
-        ('Elections', 'ElectionCollection/archive', ''),
+        ('Votes', 'VoteCollection/archive', False, []),
+        ('Elections', 'ElectionCollection/archive', False, []),
         (
             'Compounds of elections',
             'ElectionCompoundCollection/archive',
-            'active'
+            True,
+            []
         )
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
-        ('Compounds of elections', 'ElectionCollection/archive', '')
+        ('Compounds of elections', 'ElectionCompoundCollection/archive', '')
     ]
 
     # Data sources
@@ -95,10 +119,15 @@ def test_manage_layouts(session):
     layout.principal.wabsti_import = True
     assert layout.manage_model_link == 'DataSourceCollection/archive'
     assert layout.menu == [
-        ('Votes', 'VoteCollection/archive', ''),
-        ('Elections', 'ElectionCollection/archive', ''),
-        ('Compounds of elections', 'ElectionCompoundCollection/archive', ''),
-        ('Data sources', 'DataSourceCollection/archive', 'active'),
+        ('Votes', 'VoteCollection/archive', False, []),
+        ('Elections', 'ElectionCollection/archive', False, []),
+        (
+            'Compounds of elections',
+            'ElectionCompoundCollection/archive',
+            False,
+            []
+        ),
+        ('Data sources', 'DataSourceCollection/archive', True, []),
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
@@ -113,10 +142,15 @@ def test_manage_layouts(session):
     layout.principal.wabsti_import = True
     assert layout.manage_model_link == 'DataSourceItemCollection/source'
     assert layout.menu == [
-        ('Votes', 'VoteCollection/archive', ''),
-        ('Elections', 'ElectionCollection/archive', ''),
-        ('Compounds of elections', 'ElectionCompoundCollection/archive', ''),
-        ('Data sources', 'DataSourceCollection/archive', 'active'),
+        ('Votes', 'VoteCollection/archive', False, []),
+        ('Elections', 'ElectionCollection/archive', False, []),
+        (
+            'Compounds of elections',
+            'ElectionCompoundCollection/archive',
+            False,
+            []
+        ),
+        ('Data sources', 'DataSourceCollection/archive', True, []),
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
@@ -132,10 +166,15 @@ def test_manage_layouts(session):
     layout.principal.email_notification = True
     assert layout.manage_model_link == 'EmailSubscriberCollection/archive'
     assert layout.menu == [
-        ('Votes', 'VoteCollection/archive', ''),
-        ('Elections', 'ElectionCollection/archive', ''),
-        ('Compounds of elections', 'ElectionCompoundCollection/archive', ''),
-        ('Email subscribers', 'EmailSubscriberCollection/archive', 'active')
+        ('Votes', 'VoteCollection/archive', False, []),
+        ('Elections', 'ElectionCollection/archive', False, []),
+        (
+            'Compounds of elections',
+            'ElectionCompoundCollection/archive',
+            False,
+            []
+        ),
+        ('Email subscribers', 'EmailSubscriberCollection/archive', True, [])
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
@@ -150,10 +189,15 @@ def test_manage_layouts(session):
     layout.principal.sms_notification = 'http://example.com'
     assert layout.manage_model_link == 'SmsSubscriberCollection/archive'
     assert layout.menu == [
-        ('Votes', 'VoteCollection/archive', ''),
-        ('Elections', 'ElectionCollection/archive', ''),
-        ('Compounds of elections', 'ElectionCompoundCollection/archive', ''),
-        ('SMS subscribers', 'SmsSubscriberCollection/archive', 'active')
+        ('Votes', 'VoteCollection/archive', False, []),
+        ('Elections', 'ElectionCollection/archive', False, []),
+        (
+            'Compounds of elections',
+            'ElectionCompoundCollection/archive',
+            False,
+            []
+        ),
+        ('SMS subscribers', 'SmsSubscriberCollection/archive', True, [])
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),

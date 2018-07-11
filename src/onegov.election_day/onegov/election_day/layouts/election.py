@@ -18,56 +18,46 @@ class ElectionLayout(DetailLayout):
             'lists',
             'list-by-entity',
             'list-by-district',
+            'connections',
+            'lists-panachage',
             'candidates',
             'candidate-by-entity',
             'candidate-by-district',
-            'connections',
             'party-strengths',
             'parties-panachage',
             'statistics',
-            'lists-panachage',
             'data'
         )
 
     def title(self, tab=None):
-        tab = self.tab if tab is None else tab
+        tab = (self.tab if tab is None else tab) or ''
 
-        if tab == 'lists':
+        if tab.startswith('list') or tab == 'connections':
             return _("Lists")
-        if tab == 'list-by-entity':
-            return '{} ({})'.format(
-                self.request.translate(_("Lists")),
-                self.request.translate(self.principal.label('entities'))
-            )
-        if tab == 'list-by-district':
-            return '{} ({})'.format(
-                self.request.translate(_("Lists")),
-                self.request.translate(self.principal.label('districts'))
-            )
-        if tab == 'candidates':
+        if tab.startswith('candidate'):
             return _("Candidates")
-        if tab == 'candidate-by-entity':
-            return '{} ({})'.format(
-                self.request.translate(_("Candidates")),
-                self.request.translate(self.principal.label('entities'))
-            )
-        if tab == 'candidate-by-district':
-            return '{} ({})'.format(
-                self.request.translate(_("Candidates")),
-                self.request.translate(self.principal.label('districts'))
-            )
+        if tab == 'party-strengths' or tab == 'parties-panachage':
+            return _("Parties")
+        if tab == 'statistics':
+            return _("Election statistics")
+        if tab == 'data':
+            return _("Downloads")
+
+        return ''
+
+    def subtitle(self, tab=None):
+        tab = (self.tab if tab is None else tab) or ''
+
+        if tab.endswith('-by-entity'):
+            return self.principal.label('entities')
+        if tab.endswith('-by-district'):
+            return self.principal.label('districts')
+        if tab.endswith('-panachage'):
+            return _("Panachage")
         if tab == 'connections':
             return _("List connections")
         if tab == 'party-strengths':
             return _("Party strengths")
-        if tab == 'parties-panachage':
-            return _("Panachage (parties)")
-        if tab == 'statistics':
-            return _("Election statistics")
-        if tab == 'lists-panachage':
-            return _("Panachage (lists)")
-        if tab == 'data':
-            return _("Downloads")
 
         return ''
 
@@ -167,13 +157,45 @@ class ElectionLayout(DetailLayout):
 
     @cached_property
     def menu(self):
-        return [
-            (
-                self.title(tab),
-                self.request.link(self.model, tab),
-                'active' if self.tab == tab else ''
-            ) for tab in self.all_tabs if self.tab_visible(tab)
-        ]
+        result = []
+
+        submenus = (
+            (_("Lists"), ('lists', 'list-by-entity', 'list-by-district',
+                          'lists-panachage', 'connections')),
+            (_("Candidates"), ('candidates', 'candidate-by-entity',
+                               'candidate-by-district')),
+            (_("Parties"), ('party-strengths', 'parties-panachage'))
+        )
+        for title, group in submenus:
+            if any([self.tab_visible(tab) for tab in group]):
+                submenu = [
+                    (
+                        self.subtitle(tab) or self.title(tab),
+                        self.request.link(self.model, tab),
+                        self.tab == tab,
+                        []
+                    ) for tab in group if self.tab_visible(tab)
+                ]
+                if len(submenu) > 1:
+                    result.append((
+                        title,
+                        '',
+                        any([item[2] for item in submenu]),
+                        submenu
+                    ))
+                elif len(submenu):
+                    result.append(submenu[0])
+
+        for tab in ('statistics', 'data'):
+            if self.tab_visible(tab):
+                result.append((
+                    self.title(tab),
+                    self.request.link(self.model, tab),
+                    self.tab == tab,
+                    []
+                ))
+
+        return result
 
     @cached_property
     def pdf_path(self):
@@ -220,9 +242,11 @@ class ElectionLayout(DetailLayout):
 
         return '{}.svg'.format(
             normalize_for_url(
-                '{}-{}'.format(
-                    self.model.id, self.title() or ''
-                )
+                '{}-{}-{}'.format(
+                    self.model.id,
+                    self.request.translate(self.title() or ''),
+                    self.request.translate(self.subtitle() or '')
+                ).rstrip('-')
             )
         )
 

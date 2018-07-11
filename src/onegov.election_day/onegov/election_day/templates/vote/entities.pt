@@ -18,6 +18,7 @@
             <h3 tal:condition="layout.title()">
                 ${layout.title()}<span tal:condition="ballot.title">: ${ballot.title}</span>
             </h3>
+            <h4 tal:condition="layout.subtitle()" i18n:translate="">${layout.subtitle()}</h4>
 
             <div class="row" tal:condition="layout.show_map">
                 <div class="small-12 small-centered medium-8 large-6 columns map-container">
@@ -41,7 +42,6 @@
                 </div>
             </div>
 
-            <h4 tal:condition="layout.show_map" i18n:translate="">${layout.principal.label('entities')}</h4>
             <table
                 class="results tablesaw sortable"
                 data-tablesaw-mode="columntoggle"

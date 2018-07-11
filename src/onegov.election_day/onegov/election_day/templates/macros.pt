@@ -147,17 +147,29 @@
     </nav>
 </metal:breadcrumbs>
 
-<metal:tab_menu define-macro="tab_menu">
+<metal:tab_menu define-macro="tab_menu" i18n:domain="onegov.election_day">
     <div class="tab-navigation clearfix" tal:condition="layout.menu">
-        <nav class="top-bar" data-topbar role="navigation">
+        <nav class="top-bar clearfix" data-topbar data-options="back_text: &lt;; is_hover: false; mobile_show_parent_link: false" role="navigation">
             <ul class="title-area">
                 <li class="name menu-icon"><span>${layout.title()}</span></li>
                 <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
             </ul>
             <section class="top-bar-section">
                 <ul class="left">
-                    <tal:block repeat="item layout.menu">
-                        <li class="${item[2]}"><a href="${item[1]}">${item[0]}</a></li>
+                    <tal:block repeat="(title, link, active, submenu) layout.menu">
+                        <li tal:condition="not submenu" tal:attributes="class 'active' if active else ''">
+                            <a href="${link}">${title}</a>
+                        </li>
+                        <li tal:condition="submenu" tal:attributes="class 'has-dropdown active' if active else 'has-dropdown'">
+                            <a href="#">${title}</a>
+                            <ul class="dropdown">
+                                <tal:block repeat="(title, link, active, submenu) submenu">
+                                    <li tal:attributes="class 'active' if active else ''">
+                                        <a href="${link}">${title}</a>
+                                    </li>
+                                </tal:block>
+                            </ul>
+                        </li>
                     </tal:block>
                 </ul>
             </section>
@@ -351,13 +363,13 @@
 
 <metal:pdf_download define-macro="pdf_download" i18n:domain="onegov.election_day">
     <tal:block tal:condition="layout.pdf_path">
-        <h3>PDF</h3>
+        <h4>PDF</h4>
         <p><span i18n:translate="">Download a PDF with all the results:</span> <a href="${request.link(model, 'pdf')}">PDF</a></p>
     </tal:block>
 </metal:pdf_download>
 
 <metal:open_data_download define-macro="open_data_download" i18n:domain="onegov.election_day">
-    <h3 i18n:translate="">Open Data</h3>
+    <h4 i18n:translate="">Open Data</h4>
     <p i18n:translate="">The raw data used to display the results is available in the following formats:</p>
     <p>
         <ol>
@@ -369,7 +381,7 @@
 </metal:open_data_download>
 
 <metal:terms_of_use define-macro="terms_of_use" i18n:domain="onegov.election_day">
-    <h4 i18n:translate="">Terms of use</h4>
+    <h5 i18n:translate="">Terms of use</h5>
     <p>
         <span i18n:translate="">Open use. Must provide the source.</span>
         <ul>

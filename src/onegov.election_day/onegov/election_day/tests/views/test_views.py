@@ -341,14 +341,14 @@ def test_view_svg(election_day_app):
                 result.headers['Content-Disposition'].split('filename=')[1]
             )
     assert sorted(filenames) == [
-        'majorz-election-candidates.svg',
-        'proporz-election-candidates.svg',
-        'proporz-election-list-connections.svg',
-        'proporz-election-lists.svg',
-        'proporz-election-panachage-lists.svg',
-        'proporz-election-party-strengths.svg',
-        'vote-gemeinden-vorlage.svg',
-        'vote-gemeinden-vorlage.svg',
+        'majorz-election-kandidierende.svg',
+        'proporz-election-kandidierende.svg',
+        'proporz-election-listen-listenverbindungen.svg',
+        'proporz-election-listen-panaschierstatistik.svg',
+        'proporz-election-listen.svg',
+        'proporz-election-parteien-parteistaerken.svg',
+        'vote-vorlage.svg',
+        'vote-vorlage.svg'
     ]
 
 

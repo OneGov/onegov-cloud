@@ -298,17 +298,17 @@ msgstr "Liste"
 msgid "Candidates"
 msgstr "Candidati"
 
-msgid "Party strengths"
-msgstr "Forza delle parti"
-
-msgid "Panachage (parties)"
-msgstr "Panachage (parti)"
-
-msgid "Panachage (lists)"
-msgstr "Panachage (liste)"
+msgid "Parties"
+msgstr "Parti"
 
 msgid "Downloads"
 msgstr "Download"
+
+msgid "Panachage"
+msgstr "Panachage"
+
+msgid "Party strengths"
+msgstr "Forza delle parti"
 
 msgid "Elected candidates"
 msgstr "Candidati eletti"
@@ -328,14 +328,14 @@ msgstr "Origini dati"
 msgid "Mappings"
 msgstr "Mapping"
 
-msgid "SMS subscribers"
-msgstr "SMS iscritti"
+msgid "Subscribers"
+msgstr "Iscritti"
 
 msgid "Email subscribers"
 msgstr "Email iscritti"
 
-msgid "Subscribers"
-msgstr "Iscritti"
+msgid "SMS subscribers"
+msgstr "SMS iscritti"
 
 msgid "Final results"
 msgstr "Risultati finali"
@@ -463,12 +463,6 @@ msgstr "No %"
 
 msgid "Archive"
 msgstr "Archivio"
-
-msgid "Yay"
-msgstr "Sì"
-
-msgid "Nay"
-msgstr "No"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
@@ -864,11 +858,23 @@ msgstr "Località"
 msgid "New vote"
 msgstr "Nuova votazione"
 
+msgid "Nay"
+msgstr "No"
+
+msgid "Yay"
+msgstr "Sì"
+
 msgid "Empty"
 msgstr "Bianche"
 
 msgid "Invalid"
 msgstr "Nulle"
+
+msgid "Panachage (parties)"
+msgstr "Panachage (parti)"
+
+msgid "Panachage (lists)"
+msgstr "Panachage (liste)"
 
 msgid "Blank list"
 msgstr "Lista bianca"
@@ -975,9 +981,6 @@ msgid ""
 msgstr ""
 "Il tuo abbonamento al servizio SMS è stato annullato con successo. Non "
 "riceverai più SMS quando nuovi risultati saranno pubblicati."
-
-msgid "Parties"
-msgstr "Parti"
 
 msgid "Update results"
 msgstr "Aggiorna risultati"

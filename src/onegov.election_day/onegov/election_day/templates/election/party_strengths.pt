@@ -16,6 +16,7 @@
             <div metal:use-macro="layout.macros['tab_menu']"/>
 
             <h3 tal:content="layout.title()" />
+            <h4 tal:condition="layout.subtitle()" i18n:translate="">${layout.subtitle()}</h4>
 
             <div class="row">
                 <div class="small-12 small-centered large-10 columns">
