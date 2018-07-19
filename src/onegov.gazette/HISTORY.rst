@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes tab menu dropdown styling.
+  [msom]
+
 1.16.1 (2018-07-06)
 ~~~~~~~~~~~~~~~~~~~~
 
