@@ -559,6 +559,11 @@ footer {
                 border-left: 2px solid $primary-color;
             }
         }
+
+        .has-dropdown>a::after {
+            border-color: transparent;
+            border-left-color: $aluminum;
+        }
     }
 }
 
@@ -592,7 +597,12 @@ footer {
                 }
             }
 
-             .top-bar-section .dropdown {
+            .has-dropdown>a::after {
+                border-color: transparent;
+                border-top-color: $aluminum;
+            }
+
+            .top-bar-section .dropdown {
                 background-color: $white-smoke;
 
                 li {
