@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.6.3 (2018-07-19)
+~~~~~~~~~~~~~~~~~~~
 
 - Lists elected candidates and lists with mandates first in the heatmaps.
   [msom]
