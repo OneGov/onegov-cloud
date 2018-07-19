@@ -53,8 +53,8 @@ html {
     }
 
     dl dt {
-        opacity: .5;
         margin-bottom: 0;
+        opacity: .5;
     }
 
     dl dd {
@@ -308,9 +308,10 @@ table {
 
         td {
             .tablesaw-cell-label {
-                font-weight: normal;
                 color: $black;
+                font-weight: normal;
             }
+
             .tablesaw-cell-content {
                 float: right;
             }
@@ -320,18 +321,20 @@ table {
             .tablesaw-cell-label {
                 display: none;
             }
+
             .tablesaw-cell-content {
                 border-bottom: 3px solid $gainsboro;
                 font-size: 1.2em;
                 font-weight: bold;
+                max-width: 100%;
                 padding-top: 2em;
                 text-align: center;
                 width: 100%;
-                max-width: 100%;
             }
         }
     }
 }
+
 @media (min-width: 40em) {
     .tablesaw-modeswitch {
         display: none;
@@ -591,15 +594,17 @@ footer {
 
              .top-bar-section .dropdown {
                 background-color: $white-smoke;
+
                 li {
                     margin-top: 2px;
+
                     > a {
                         background-color: $white-smoke;
                     }
 
                     &:not(.has-form):not(.active)>a:not(.button) {
                         background-color: $white-smoke;
-                        color: black;
+                        color: $black;
                     }
                 }
             }
@@ -617,6 +622,17 @@ ul.breadcrumbs {
     border: 0;
     margin-bottom: 2em;
     padding-left: 0;
+
+    &.back-links {
+        background-color: $white-smoke;
+        margin-bottom: 1em;
+
+        > * {
+            font-size: .875rem;
+            line-height: 1rem;
+        }
+    }
+
 }
 
 /*
@@ -768,7 +784,7 @@ ul.pagination li.last {
     li {
         display: inline-block;
 
-        + li:before {
+        + li::before {
             content: '|';
         }
     }
@@ -777,16 +793,6 @@ ul.pagination li.last {
 /*
     Link back to canton site
 */
-ul.breadcrumbs.back-links {
-    background-color: $white-smoke;
-    margin-bottom: 1em;
-
-    > * {
-        font-size: .875rem;
-        line-height: 1rem;
-    }
-}
-
 .back-to-base {
     display: inline-block;
     font-size: .875rem;
