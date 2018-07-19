@@ -1,6 +1,7 @@
-from onegov.ballot import Election
 from onegov.ballot import Candidate
+from onegov.ballot import Election
 from onegov.core.security import Public
+from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts import ElectionLayout
@@ -9,12 +10,17 @@ from sqlalchemy import func
 
 
 def candidate_options(request, election):
+    elected = request.translate(_("Elected")).lower()
     return [
         (
             request.link(candidate_, name='by-district'),
-            f'{candidate_.family_name} {candidate_.first_name}'
+            '{} {}'.format(
+                f'{candidate_.family_name} {candidate_.first_name}',
+                (f'({elected})' if candidate_.elected else '')
+            ).strip()
         )
         for candidate_ in election.candidates.order_by(None).order_by(
+            Candidate.elected.desc(),
             func.lower(Candidate.family_name),
             func.lower(Candidate.first_name),
         )

@@ -1,6 +1,7 @@
 from onegov.ballot import Election
 from onegov.ballot import List
 from onegov.core.security import Public
+from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts import ElectionLayout
@@ -12,9 +13,22 @@ def list_options(request, election):
     if election.type == 'majorz':
         return []
 
+    mandates = request.translate(_("Mandates"))
     return [
-        (request.link(list_, name='by-entity'), list_.name)
-        for list_ in election.lists.order_by(func.lower(List.name))
+        (
+            request.link(list_, name='by-entity'),
+            '{} {}'.format(
+                list_.name,
+                (
+                    f'({list_.number_of_mandates} {mandates})'
+                    if list_.number_of_mandates else ''
+                )
+            ).strip()
+        )
+        for list_ in election.lists.order_by(None).order_by(
+            List.number_of_mandates.desc(),
+            func.lower(List.name)
+        )
     ]
 
 
