@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds Concordia's winter promotion.
+  [href]
+
 - Versions the static files for improved caching.
   [href]
 
