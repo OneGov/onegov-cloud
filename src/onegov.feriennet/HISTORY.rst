@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.34 (2018-07-30)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds Concordia's winter promotion.
   [href]
