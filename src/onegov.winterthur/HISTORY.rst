@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.2.12 (2018-07-31)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Sets the target of exernal links to "_top".
   [href]
 
