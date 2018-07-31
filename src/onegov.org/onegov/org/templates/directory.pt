@@ -24,7 +24,7 @@
                     <li tal:repeat="entry entries">
                         <div class="thumbnail" tal:condition="show_thumbnails">
                             <tal:b define="thumbnail thumbnail_link(entry)" condition="thumbnail">
-                                <img data-src="${thumbnail}" class="lazyload" data-no-alt align="top" />
+                                <img data-src="${thumbnail}" class="lazyload" data-no-alt align="top" alt="" />
                             </tal:b>
                         </div>
 

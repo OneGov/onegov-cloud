@@ -415,7 +415,7 @@
                         <a href="${url}" tal:condition="not allow_views or not field.is_image">
                             <tal:block replace="structure rendered" />
                         </a>
-                        <img src="${url}" tal:condition="allow_views and field.is_image" />
+                        <img src="${url}" tal:condition="allow_views and field.is_image" alt="" />
                     </tal:b>
                 </tal:b>
                 <tal:b condition="not (allow_downloads or allow_views) or field.type != 'UploadField'">

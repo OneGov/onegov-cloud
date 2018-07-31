@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds an empty alt tag to directory images.
+  [href]
+
 0.30.1 (2018-07-31)
 ~~~~~~~~~~~~~~~~~~~
 
