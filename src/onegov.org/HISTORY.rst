@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Ignores all Google Analytics and GTM errors in Raven.js.
+  [href]
+
 0.30.0 (2018-06-22)
 ~~~~~~~~~~~~~~~~~~~
 

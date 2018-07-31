@@ -36,7 +36,8 @@
         Raven.config('${sentry_js}', {
             release: '${request.app.version}',
             username: '${request.current_username}',
-            role: '${request.current_role}'
+            role: '${request.current_role}',
+            ignoreUrls: [/\/(gtm|ga|analytics)\.js/i]
         }).install();
       </script>
     </tal:b>
