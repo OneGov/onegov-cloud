@@ -21,7 +21,7 @@ $(document).ready(function() {
 
 // add hover clicks to directory entries
 $(document).ready(function() {
-    $('.with-thumbnails li').click(function(e) {
+    $('.directory-entry-collection-layout .with-lead li').click(function(e) {
         window.location = $(this).find('a').attr('href');
         e.preventDefault();
     });

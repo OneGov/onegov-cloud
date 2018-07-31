@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Applies the custom museum layout to all directories.
+  [href]
+
 0.2.11 (2018-06-22)
 ~~~~~~~~~~~~~~~~~~~~~
 

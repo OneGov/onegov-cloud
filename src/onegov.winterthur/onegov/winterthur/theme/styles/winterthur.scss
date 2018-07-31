@@ -175,9 +175,10 @@ input[data-street-search]::placeholder {
 /*
     Custom thumbnails
 */
-.with-thumbnails {
+.directory-entry-collection-layout .with-lead {
     border-bottom: 1px solid $gray-light;
     border-top: 1px solid $gray-light;
+    margin-left: 0;
 
     li {
         display: block;
