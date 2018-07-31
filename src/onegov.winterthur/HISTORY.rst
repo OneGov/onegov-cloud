@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Sets the target of exernal links to "_top".
+  [href]
+
 - Applies the custom museum layout to all directories.
   [href]
 

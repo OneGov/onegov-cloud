@@ -42,3 +42,17 @@ $(document).ready(function() {
         e.preventDefault();
     });
 });
+
+// adjust all links that point to an external domain to target _top in order
+// to escape the iframe we're in
+$(document).ready(function() {
+    var internal = new RegExp("^http[s]?://(forms.winterthur.ch|" + window.location.hostname + ").*", "i");
+
+    $('a[href^="http"]').each(function() {
+        var a = $(this);
+
+        if (! a.attr('href').match(internal)) {
+            a.attr('target', '_top');
+        }
+    });
+});
