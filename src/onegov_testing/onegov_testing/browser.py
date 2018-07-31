@@ -19,7 +19,12 @@ class InjectedBrowserExtension(object):
 
         """
 
-        browser = browser_factory(*args, **kwargs)
+        # spawning Chrome on Travis is rather flaky and succeeds less than
+        # 50% of the time for unknown reasons
+        for _ in range(10):
+            with suppress(ConnectionResetError):
+                browser = browser_factory(*args, **kwargs)
+                break
 
         class LeechedExtendedBrowser(cls, browser.__class__):
 
