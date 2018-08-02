@@ -907,7 +907,7 @@
 <metal:search_result_events define-macro="search_result_events" i18n:domain="onegov.org">
     <a href="${request.link(result, 'latest')}">${result.title}</a>
     <ul tal:define="occurrence result.latest_occurrence">
-        <li>${
+        <li tal:condition="ocurrence">${
             '-'.join((
                 layout.format_date(occurrence.localized_start, 'event'),
                 layout.format_date(occurrence.localized_end, 'time')

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes failure to render certain events in the search results.
+  [href]
+
 - Adds an empty alt tag to directory images.
   [href]
 
