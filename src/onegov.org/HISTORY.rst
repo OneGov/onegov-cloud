@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.30.2 (2018-08-02)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes failure to render certain events in the search results.
   [href]
 
