@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes booking view failing wheren there are no periods defined.
+  [href]
+
 1.3.34 (2018-07-30)
 ~~~~~~~~~~~~~~~~~~~
 
