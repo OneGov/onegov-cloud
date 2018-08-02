@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.8.2 (2018-08-02)
+~~~~~~~~~~~~~~~~~~~
 
 - Ignores invalid values passed to the activity collection instead of raising.
   [href]
