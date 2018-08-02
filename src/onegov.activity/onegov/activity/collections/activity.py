@@ -46,9 +46,10 @@ class ActivityCollection(Pagination):
         self.dateranges = set(dateranges) if dateranges else set()
         self.weekdays = set(weekdays) if weekdays else set()
         self.municipalities = set(municipalities) if municipalities else set()
-        self.available = set(available) if available else set()
 
-        assert self.available <= AVAILABILITY_VALUES
+        self.available = {
+            a for a in available if a in AVAILABILITY_VALUES
+        } if available else set()
 
     def __eq__(self, other):
         return self.type == other.type and self.page == other.page
