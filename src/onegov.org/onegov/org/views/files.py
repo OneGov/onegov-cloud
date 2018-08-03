@@ -1,7 +1,6 @@
 """ The onegov org collection of files uploaded to the site. """
 
 import morepath
-import os.path
 import random
 
 from babel.core import Locale
@@ -34,7 +33,9 @@ from uuid import uuid4
 @OrgApp.html(model=GeneralFileCollection, template='files.pt',
              permission=Private)
 def view_get_file_collection(self, request):
+    request.include('common')
     request.include('dropzone')
+    request.include('prompt')
 
     layout = DefaultLayout(self, request)
     layout.breadcrumbs = [

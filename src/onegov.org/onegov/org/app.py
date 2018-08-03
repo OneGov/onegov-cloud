@@ -365,6 +365,11 @@ def get_editalttext_asset():
     yield 'editalttext.js'
 
 
+@OrgApp.webasset('prompt')
+def get_prompt():
+    yield 'prompt.jsx'
+
+
 @OrgApp.webasset('photoswipe')
 def get_photoswipe_asset():
     yield 'photoswipe.css'

@@ -145,6 +145,11 @@ Intercooler.ready(function(element) {
     }
 
     $(el).find('a.confirm').confirmation();
+
+    if (jQuery.fn.prompt !== undefined) {
+        $(el).find('[data-prompt]').prompt();
+    }
+
     setupRedirectAfter(el);
 });
 

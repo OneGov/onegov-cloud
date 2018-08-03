@@ -24,7 +24,7 @@
 var Confirmation = React.createClass({
     render: function() {
         return (
-            <div className="reveal-modal medium confirm-modal" data-reveal role="dialog">
+            <div className="reveal-modal medium dialog" data-reveal role="dialog">
                 <h2>{this.props.question}</h2>
                 <p>{this.props.extra}</p>
                 <a tabIndex="2" className="button secondary no">
@@ -45,7 +45,7 @@ var Confirmation = React.createClass({
 var DenyConfirmation = React.createClass({
     render: function() {
         return (
-            <div className="reveal-modal medium confirm-modal" data-reveal role="dialog">
+            <div className="reveal-modal medium dialog" data-reveal role="dialog">
                 <h2>{this.props.question}</h2>
                 <p>{this.props.extra}</p>
                 <a tabIndex="1" className="button secondary no">
@@ -144,13 +144,6 @@ $(document).on('opened.fndtn.reveal', '[data-reveal]', function() {
     _.defer(function() {
         modal.find('a.yes').focus();
     });
-});
-
-// remove the div when the dialog closes
-$(document).on('closed.fndtn.reveal', '[data-reveal]', function() {
-    if ($(this).parent().hasClass('confirm')) {
-        $(this).parent().remove();
-    }
 });
 
 // handles the click on the link (or other elements)

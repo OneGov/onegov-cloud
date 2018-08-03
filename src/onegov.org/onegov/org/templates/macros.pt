@@ -1197,22 +1197,44 @@
         </div>
         <div class="columns small-4">
         </div>
-        <div class="columns small-4">
-            <a class="button secondary confirm delete" id="${id}-delete-link"
-               ic-delete-from="${request.link(file)}?csrf-token=${layout.csrf_token}"
-               ic-on-success="
-                    var info = $('#${id}-delete-link').closest('tr');
+        <div class="columns small-4" id="${id}-actions">
+            <a class="button secondary confirm delete" id="${id}-actions"
+                ic-delete-from="${request.link(file)}?csrf-token=${layout.csrf_token}"
+                ic-on-success="
+                    var info = $('#${id}-actions').closest('tr');
                     info.prev().remove();
                     info.remove();
-               "
-               data-confirm="Do you really want to delete this file?"
-               data-confirm-extra="${file.name}"
-               data-confirm-yes="Delete File"
-               data-confirm-no="Cancel"
-               i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"
-               i18n:translate>
-               Delete
-           </a>
+                "
+                data-confirm="Do you really want to delete this file?"
+                data-confirm-extra="${file.name}"
+                data-confirm-yes="Delete File"
+                data-confirm-no="Cancel"
+                i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"
+                i18n:translate>
+                Delete
+            </a>
+            <a class="button secondary rename prompt"
+                data-prompt="Please provide the new name for the file"
+                data-prompt-ok="Rename"
+                data-prompt-cancel="Cancel"
+                data-prompt-value="${file.name}"
+                data-prompt-success="(function(value) {
+                    var url = '${request.link(file, 'rename')}?csrf-token=${layout.csrf_token}';
+                    var ext = '.${file.name.split('.')[-1].strip()}';
+                    value = value.endsWith(ext) && value || value + ext;
+
+                    jQuery.post(url, {'name': value}, function() {
+                        var actions = $('#${id}-actions');
+
+                        actions.closest('tr').prev().find('td:first').text(value);
+                        actions.find('a.prompt').data('prompt-value', value);
+                        actions.find('a.delete').data('confirm-extra', value);
+                    });
+                })"
+                i18n:attributes="data-prompt;data-prompt-ok;data-prompt-cancel"
+                i18n:translate>
+                Rename
+            </a>
         </div>
     </div>
 </metal:file_details>
