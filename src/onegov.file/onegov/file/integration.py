@@ -227,6 +227,20 @@ def handle_note_update(self, request):
         flag_modified(self, 'modified')
 
 
+@DepotApp.view(model=File, name='rename', request_method='POST',
+               permission=Private)
+def handle_rename(self, request):
+    request.assert_valid_csrf_token()
+    self.name = request.POST.get('name')
+
+    # when updating the name we offer the option not to update the
+    # modified date, which is helpful if the files are in modified order
+    # and the order should remain when the note is changed
+    if request.POST.get('keep-timestamp') in ('1', 'true', 'yes'):
+        self.modified = self.modified
+        flag_modified(self, 'modified')
+
+
 @DepotApp.view(model=File, request_method='DELETE', permission=Private)
 def delete_file(self, request):
     """ Deletes the given file. By default the permission is
