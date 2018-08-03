@@ -4597,6 +4597,10 @@ h2 + div.timeline {
         img {
             margin: .5rem 0 1rem;
         }
+
+        .columns:last-child {
+            text-align: right;
+        }
     }
 }
 

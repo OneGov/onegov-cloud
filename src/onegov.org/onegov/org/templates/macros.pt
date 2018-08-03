@@ -1198,6 +1198,21 @@
         <div class="columns small-4">
         </div>
         <div class="columns small-4">
+            <a class="button secondary confirm delete" id="${id}-delete-link"
+               ic-delete-from="${request.link(file)}?csrf-token=${layout.csrf_token}"
+               ic-on-success="
+                    var info = $('#${id}-delete-link').closest('tr');
+                    info.prev().remove();
+                    info.remove();
+               "
+               data-confirm="Do you really want to delete this file?"
+               data-confirm-extra="${file.name}"
+               data-confirm-yes="Delete File"
+               data-confirm-no="Cancel"
+               i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"
+               i18n:translate>
+               Delete
+           </a>
         </div>
     </div>
 </metal:file_details>

@@ -28,6 +28,7 @@ from onegov.org.models import (
 )
 from sedate import utcnow
 from webob import exc
+from uuid import uuid4
 
 
 @OrgApp.html(model=GeneralFileCollection, template='files.pt',
@@ -85,7 +86,9 @@ def view_file_details(self, request):
         layout.macros['file-details'],
         request,
         {
-            'file': self
+            'id': uuid4().hex,
+            'file': self,
+            'layout': layout,
         }
     )
 
