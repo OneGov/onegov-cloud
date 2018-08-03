@@ -1,6 +1,8 @@
 import morepath
 import os.path
+import shlex
 import shutil
+import subprocess
 
 from contextlib import contextmanager
 from depot.manager import DepotManager
@@ -45,10 +47,40 @@ class DepotApp(App):
             file belongs to which application. Additionally it ensures that we
             aren't accidentally opening another application's files.
 
+        :frontend_cache_buster: A script able to bust the frontend cache.
+
+            Our frontend (nginx) caches the files we store in the backend and
+            serves them mostly without bothering us. This can be problematic
+            when the file is deleted or if it is made private. The cache
+            needs to be busted in this case.
+
+            With this configuration a script/command can be specified that
+            receives the url that needs to be busted and in turn busts the
+            content of this url from the cache. This pretty much depends
+            on the platform this is run and on the frontend in use.
+
+            For example, let's say our script is called 'bust-cache', this
+            is the command that will be run when the cache is busted::
+
+                sleep 5
+                bust-cache https://example.org/storage/foo
+
+            As you can see, the command is invoked with a five second delay.
+            This avoids premature cache busting (before the end of the
+            transaction). The command is non-blocking, so those 5 seconds
+            are not counted towards the request-time.
+
+            The script is invoked with the permissions of the user running
+            the backend. If other permissions are required, use suid.
+
+            Note that this script is optional. If omitted, the cache busting
+            turns into a noop.
+
         """
 
         self.depot_backend = cfg.get('depot_backend')
         self.depot_storage_path = cfg.get('depot_storage_path')
+        self.frontend_cache_buster = cfg.get('frontend_cache_buster')
 
         assert self.depot_backend in SUPPORTED_STORAGE_BACKENDS, """
             A depot app *must* have a valid storage backend set up.
@@ -103,6 +135,16 @@ class DepotApp(App):
             self.create_depot()
 
         DepotManager.set_default(self.bound_depot_id)
+
+    def bust_frontend_cache(self, url):
+        if not self.frontend_cache_buster:
+            return
+
+        bin = shlex.quote(self.frontend_cache_buster)
+        url = shlex.quote(url)
+        cmd = f'sleep 5 && {bin} {url}'
+
+        subprocess.Popen(cmd, close_fds=True, shell=True)
 
     def clear_depot_cache(self):
         DepotManager._aliases.clear()
@@ -258,4 +300,5 @@ def delete_file(self, request):
 
     """
     request.assert_valid_csrf_token()
+    request.app.bust_frontend_cache(request.link(self))
     FileCollection(request.session).delete(self)

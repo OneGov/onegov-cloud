@@ -1,18 +1,29 @@
 import morepath
+import os
 import pytest
 import transaction
 
+from datetime import datetime
 from depot.manager import DepotManager
 from onegov.core import Framework
 from onegov.core.utils import scan_morepath_modules
 from onegov.file import DepotApp, FileCollection
 from onegov.file.integration import SUPPORTED_STORAGE_BACKENDS
 from onegov_testing.utils import create_image
+from time import sleep
 from webtest import TestApp as Client
 
 
 @pytest.fixture(scope='function', params=SUPPORTED_STORAGE_BACKENDS)
 def app(request, postgres_dsn, temporary_path, redis_url):
+
+    with (temporary_path / 'bust').open('w') as f:
+        f.write('\n'.join((
+            f'#!/bin/bash',
+            f'touch {temporary_path}/$1'
+        )))
+
+    os.chmod(temporary_path / 'bust', 0o775)
 
     backend = request.param
 
@@ -27,6 +38,7 @@ def app(request, postgres_dsn, temporary_path, redis_url):
         dsn=postgres_dsn,
         depot_backend=backend,
         depot_storage_path=str(temporary_path),
+        frontend_cache_buster=f'{temporary_path}/bust',
         redis_url=redis_url
     )
 
@@ -151,3 +163,19 @@ def test_file_note_header(app):
 
     response = client.head('/storage/{}/thumbnail'.format(fid))
     assert response.headers['X-File-Note'] == '{"note":"Avatar"}'
+
+
+def test_bust_cache(app, temporary_path):
+    ensure_correct_depot(app)
+
+    assert not (temporary_path / 'foobar').exists()
+
+    # ensure that this is non-blocking
+    start = datetime.utcnow()
+    app.bust_frontend_cache('foobar')
+    assert (datetime.utcnow() - start).total_seconds() <= 1
+    assert not (temporary_path / 'foobar').exists()
+
+    # wait for it to complete
+    sleep(5.1)
+    assert (temporary_path / 'foobar').exists()
