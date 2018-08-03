@@ -44,7 +44,13 @@ class DirectorySubmissionAction(object):
             .filter_by(handler_id=self.submission_id.hex)\
             .first()
 
-    def send_html_mail(self, request, subject, template):
+    def send_mail_if_enabled(self, request, subject, template):
+        if self.ticket.muted:
+            return
+
+        if self.ticket.ticket_email == request.current_username:
+            return
+
         # XXX circular import
         from onegov.org.mail import send_transactional_html_mail
 
@@ -114,12 +120,11 @@ class DirectorySubmissionAction(object):
 
         entry.coordinates = self.submission.data.get('coordinates')
 
-        if self.ticket.ticket_email != request.current_username:
-            self.send_html_mail(
-                request=request,
-                template='mail_directory_entry_adopted.pt',
-                subject=_("Your directory submission has been adopted"),
-            )
+        self.send_mail_if_enabled(
+            request=request,
+            template='mail_directory_entry_adopted.pt',
+            subject=_("Your directory submission has been adopted"),
+        )
 
         request.success(_("The submission was adopted"))
         DirectoryMessage.create(
@@ -134,12 +139,11 @@ class DirectorySubmissionAction(object):
 
         self.ticket.handler_data['state'] = 'rejected'
 
-        if self.ticket.ticket_email != request.current_username:
-            self.send_html_mail(
-                request=request,
-                template='mail_directory_entry_rejected.pt',
-                subject=_("Your directory submission has been rejected"),
-            )
+        self.send_mail_if_enabled(
+            request=request,
+            template='mail_directory_entry_rejected.pt',
+            subject=_("Your directory submission has been rejected"),
+        )
 
         request.success(_("The submission was rejected"))
         DirectoryMessage.create(

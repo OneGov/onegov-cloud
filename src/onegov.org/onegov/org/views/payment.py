@@ -47,7 +47,7 @@ def send_ticket_notifications(payment, request, change):
 
         # send an e-mail
         email = ticket.snapshot.get('email') or ticket.handler.email
-        if email != request.current_username:
+        if email != request.current_username and not ticket.muted:
             send_transactional_html_mail(
                 request=request,
                 template='mail_payment_change.pt',

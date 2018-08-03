@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes muted tickets still sending certain e-mails.
+  [href]
+
 0.30.2 (2018-08-02)
 ~~~~~~~~~~~~~~~~~~~
 

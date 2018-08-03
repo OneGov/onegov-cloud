@@ -341,24 +341,25 @@ def finalize_reservation(self, request):
             TicketMessage.create(ticket, request, 'opened')
 
         if reservations[0].email != request.current_username:
-            show_submission = request.params.get('send_by_email') == 'yes'
+            if not ticket.muted:
+                show_submission = request.params.get('send_by_email') == 'yes'
 
-            if submission and show_submission:
-                form = submission.form_obj
-            else:
-                form = None
+                if submission and show_submission:
+                    form = submission.form_obj
+                else:
+                    form = None
 
-            send_transactional_html_mail(
-                request=request,
-                template='mail_ticket_opened.pt',
-                subject=_("A ticket has been opened"),
-                receivers=(reservations[0].email, ),
-                content={
-                    'model': ticket,
-                    'form': form,
-                    'show_submission': show_submission
-                }
-            )
+                send_transactional_html_mail(
+                    request=request,
+                    template='mail_ticket_opened.pt',
+                    subject=_("A ticket has been opened"),
+                    receivers=(reservations[0].email, ),
+                    content={
+                        'model': ticket,
+                        'form': form,
+                        'show_submission': show_submission
+                    }
+                )
 
         request.success(_("Thank you for your reservation!"))
 
@@ -372,7 +373,10 @@ def accept_reservation(self, request):
         reservations = resource.scheduler.reservations_by_token(self.token)
         reservations = reservations.order_by(Reservation.start)
 
-        if self.email != request.current_username:
+        tickets = TicketCollection(request.session)
+        ticket = tickets.by_handler_id(self.token.hex)
+
+        if self.email != request.current_username and not ticket.muted:
             send_transactional_html_mail(
                 request=request,
                 template='mail_reservation_accepted.pt',
@@ -391,9 +395,6 @@ def accept_reservation(self, request):
 
             # libres does not automatically detect changes yet
             flag_modified(reservation, 'data')
-
-        tickets = TicketCollection(request.session)
-        ticket = tickets.by_handler_id(self.token.hex)
 
         ReservationMessage.create(
             reservations, ticket, request, 'accepted')
@@ -443,7 +444,7 @@ def reject_reservation(self, request):
     if payment:
         request.session.delete(payment)
 
-    if self.email != request.current_username:
+    if self.email != request.current_username and not ticket.muted:
         send_transactional_html_mail(
             request=request,
             template='mail_reservation_rejected.pt',

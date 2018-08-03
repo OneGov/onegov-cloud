@@ -266,7 +266,7 @@ def handle_complete_submission(self, request):
                 )
                 TicketMessage.create(ticket, request, 'opened')
 
-            if self.email != request.current_username:
+            if self.email != request.current_username and not ticket.muted:
                 send_transactional_html_mail(
                     request=request,
                     template='mail_ticket_opened.pt',
@@ -341,7 +341,7 @@ def handle_submission_action(self, request, action):
     if execute():
         ticket = TicketCollection(request.session).by_handler_id(self.id.hex)
 
-        if self.email != request.current_username:
+        if self.email != request.current_username and not ticket.muted:
             send_transactional_html_mail(
                 request=request,
                 template='mail_registration_action.pt',
