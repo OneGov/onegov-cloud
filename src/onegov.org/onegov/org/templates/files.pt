@@ -38,17 +38,13 @@
                                 <th i18n:translate>
                                     Extension
                                 </th>
-                                <th i18n:translate>
+                                <th>
                                     <span tal:condition="model.order_by == 'date'">
                                         ${group}
                                     </span>
-                                    <a
-                                        tal:condition="model.order_by != 'date'"
-                                        href="${request.link(model.for_order('date'))}"
-                                        i18n:translate>
-
-                                        Upload Date
-                                    </a>
+                                    <a tal:condition="model.order_by != 'date'"
+                                       href="${request.link(model.for_order('date'))}"
+                                       i18n:translate>Upload Date</a>
                                 </th>
                             </tr>
 

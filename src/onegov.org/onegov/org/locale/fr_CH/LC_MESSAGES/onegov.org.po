@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-06-07 14:33+0200\n"
+"POT-Creation-Date: 2018-08-06 10:23+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1322,6 +1322,9 @@ msgstr "Visibilité"
 msgid "Visible on homepage"
 msgstr "Visible sur la page d'accueil"
 
+msgid "Older"
+msgstr "Plus âgés"
+
 msgid "This month"
 msgstr "Ce mois-ci"
 
@@ -1330,9 +1333,6 @@ msgstr "Le mois dernier"
 
 msgid "Last year"
 msgstr "L'an dernier"
-
-msgid "Older"
-msgstr "Plus âgés"
 
 msgid "This year"
 msgstr "Cette année"
@@ -1436,14 +1436,14 @@ msgstr "La proposition a été rejetée"
 msgid "The entry is not valid, please adjust it"
 msgstr "L'entrée n'est pas valide, veuillez la rectifier"
 
-msgid "An entry with this name already exists"
-msgstr "Une entrée du même nom existe déjà"
-
 msgid "Your directory submission has been adopted"
 msgstr "Votre proposition de répertoire a été adoptée"
 
 msgid "Your directory submission has been rejected"
 msgstr "Votre proposition de répertoire a été rejetée"
+
+msgid "An entry with this name already exists"
+msgstr "Une entrée du même nom existe déjà"
 
 #. Canonical text for ${event} is: "Event"
 msgid "${event} published."
@@ -1799,6 +1799,18 @@ msgstr "Créé"
 
 msgid "Disbursed"
 msgstr "Décaissé"
+
+msgid "Do you really want to delete this file?"
+msgstr "Voulez-vous vraiment supprimer ce fichier ?"
+
+msgid "Delete File"
+msgstr "Supprimez le fichier"
+
+msgid "Please provide the new name for the file"
+msgstr "Veuillez fournir le nouveau nom du fichier "
+
+msgid "Rename"
+msgstr "Renommer"
 
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "
@@ -2179,14 +2191,14 @@ msgstr "L'entrée de répertoire a été rejetée."
 msgid "All Files"
 msgstr "Tous les fichiers"
 
-msgid "Do you really want to delete the file?"
-msgstr "Voulez-vous vraiment supprimer le fichier ?"
-
-msgid "Delete File"
-msgstr "Supprimez le fichier"
-
 msgid "No files uploaded yet"
 msgstr "Aucun fichier téléchargé pour le moment"
+
+msgid "Extension"
+msgstr "Extension"
+
+msgid "Upload Date"
+msgstr "Date de téléchargement"
 
 msgid "The OneGov Cloud Team"
 msgstr "L'équipe de OneGov Cloud"
@@ -2521,14 +2533,14 @@ msgstr "Votre paiement n'a pas pu être traité"
 msgid "The following reservations were rejected"
 msgstr "Les réservations suivantes ont été rejetées"
 
-msgid "A ticket has been opened"
-msgstr "Un ticket a été ouvert"
-
 msgid "Your reservations were accepted"
 msgstr "Vos réservations ont été acceptées"
 
 msgid "Pay Online and Complete"
 msgstr "Payer en ligne et compléter"
+
+msgid "A ticket has been opened"
+msgstr "Un ticket a été ouvert"
 
 msgid "Submit an event"
 msgstr "Soumettre un événement"
@@ -2967,6 +2979,9 @@ msgstr "Votre paiement a été retiré"
 
 msgid "Your payment has been refunded"
 msgstr "Votre paiement a été remboursé"
+
+#~ msgid "Do you really want to delete the file?"
+#~ msgstr "Voulez-vous vraiment supprimer le fichier ?"
 
 #~ msgid "Please select at least one recipient"
 #~ msgstr "Veuillez choisir au moins un destinataire"
