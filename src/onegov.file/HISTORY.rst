@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.7.0 (2018-08-06)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a cache busting hook to bust frontend caches when a file is deleted.
   [href]
 
