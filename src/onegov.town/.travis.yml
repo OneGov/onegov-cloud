@@ -17,6 +17,7 @@ addons:
     apt:
         packages:
             - oracle-java8-set-default
+            - ghostscript
 
 script:
     - tox -e $TOXENV
