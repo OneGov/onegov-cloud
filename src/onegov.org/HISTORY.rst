@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Reworks files dialog with PDF previews and the ability to rename files.
+  [href]
+
 0.30.3 (2018-08-03)
 ~~~~~~~~~~~~~~~~~~~
 
