@@ -11,6 +11,7 @@ addons:
     packages:
       - oracle-java8-set-default
       - google-chrome-stable
+      - ghostscript
 
 env:
     - TOXENV=py36 DEPLOY=yes
