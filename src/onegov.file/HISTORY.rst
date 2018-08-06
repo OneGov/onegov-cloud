@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Adds a cache busting hook to bust frontend caches when a file is deleted.
+  [href]
+
+- Adds PDF previews.
+  [href]
+
 0.6.1 (2018-06-21)
 ~~~~~~~~~~~~~~~~~~~
 
