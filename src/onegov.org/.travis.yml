@@ -19,6 +19,7 @@ addons:
         packages:
             - oracle-java9-set-default
             - google-chrome-stable
+            - ghostscript
 
 install: ./.travis-install.sh
 
