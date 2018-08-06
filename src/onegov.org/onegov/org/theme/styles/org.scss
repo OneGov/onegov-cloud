@@ -4604,6 +4604,14 @@ h2 + div.timeline {
     }
 }
 
+.file-actions a {
+    display: block;
+    margin-bottom: .5rem;
+    padding-left: 0;
+    padding-right: 0;
+    text-align: center;
+}
+
 /*
     Pdf Preview
 */

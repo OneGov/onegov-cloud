@@ -1195,9 +1195,9 @@
                 <img class="pdf-preview" src="${request.link(file, name='medium')}" onerror="this.style.display='none'">
             </a>
         </div>
-        <div class="columns small-4">
+        <div class="columns small-6">
         </div>
-        <div class="columns small-4" id="${id}-actions">
+        <div class="columns small-2 file-actions" id="${id}-actions">
             <a class="button secondary confirm delete" id="${id}-actions"
                 ic-delete-from="${request.link(file)}?csrf-token=${layout.csrf_token}"
                 ic-on-success="
