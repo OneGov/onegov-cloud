@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes typo leading to errors in search.
+  [href]
+
 0.31.0 (2018-08-06)
 ~~~~~~~~~~~~~~~~~~~
 
