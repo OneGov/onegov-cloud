@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.31.2 (2018-08-10)
+~~~~~~~~~~~~~~~~~~~
+
 - Shows a proper error when a file in a directory import is missing.
   [href]
 
