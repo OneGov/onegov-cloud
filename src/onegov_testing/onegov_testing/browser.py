@@ -23,7 +23,7 @@ class InjectedBrowserExtension(object):
         # spawning Chrome on Travis is rather flaky and succeeds less than
         # 50% of the time for unknown reasons
         for _ in range(10):
-            with suppress(ConnectionResetError):
+            with suppress(Exception):
                 browser = browser_factory(*args, **kwargs)
                 break
             sleep(0.5)
