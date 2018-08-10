@@ -11,6 +11,7 @@ from onegov.directory import DirectoryEntryCollection
 from onegov.directory import DirectoryZipArchive
 from onegov.directory.errors import DuplicateEntryError
 from onegov.directory.errors import MissingColumnError
+from onegov.directory.errors import MissingFileError
 from onegov.directory.errors import ValidationError
 from onegov.file import File
 from onegov.form import FormCollection, as_internal_id
@@ -480,6 +481,10 @@ def view_import(self, request, form):
         except MissingColumnError as e:
             request.alert(_("The column ${name} is missing", mapping={
                 'name': self.directory.field_by_id(e.column).human_id
+            }))
+        except MissingFileError as e:
+            request.alert(_("The file ${name} is missing", mapping={
+                'name': e.name
             }))
         except DuplicateEntryError as e:
             request.alert(_("The entry ${name} exists twice", mapping={
