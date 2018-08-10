@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.1 (2018-08-10)
+~~~~~~~~~~~~~~~~~~~~~
+
 - No longer overwrites the directory name during import if it exists already.
   [href]
 
