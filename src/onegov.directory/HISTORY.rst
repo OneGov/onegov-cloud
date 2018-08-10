@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Throws a proper error when a file is missing from an import.
+  [href]
+
 - Ensures that only fields which have choices are actually avilable as filters.
   [href]
 
