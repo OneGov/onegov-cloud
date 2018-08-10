@@ -114,7 +114,7 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
 
         return (
             (k, fields[k].label, sorted([c.label for c in fields[k].choices]))
-            for k in keywords
+            for k in keywords if hasattr(fields[k], 'choices')
         )
 
     def for_filter(self, singular=False, **keywords):

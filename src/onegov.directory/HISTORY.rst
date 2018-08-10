@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Ensures that only fields which have choices are actually avilable as filters.
+  [href]
+
 0.4.0 (2018-06-15)
 ~~~~~~~~~~~~~~~~~~~~~
 
