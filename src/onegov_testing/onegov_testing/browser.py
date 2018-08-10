@@ -2,6 +2,7 @@ import time
 
 from contextlib import suppress
 from http.client import RemoteDisconnected
+from time import sleep
 
 
 class InjectedBrowserExtension(object):
@@ -25,6 +26,7 @@ class InjectedBrowserExtension(object):
             with suppress(ConnectionResetError):
                 browser = browser_factory(*args, **kwargs)
                 break
+            sleep(0.5)
 
         class LeechedExtendedBrowser(cls, browser.__class__):
 
