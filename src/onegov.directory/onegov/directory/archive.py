@@ -167,9 +167,10 @@ class DirectoryArchiveReader(object):
     def apply_metadata(self, directory, metadata):
         """ Applies the metadata to the given directory and returns it. """
 
+        directory.name = directory.name or metadata['name']
+
         directory.title = metadata['title']
         directory.lead = metadata['lead']
-        directory.name = metadata['name']
         directory.type = metadata['type']
         directory.structure = metadata['structure']
         directory.configuration = DirectoryConfiguration(

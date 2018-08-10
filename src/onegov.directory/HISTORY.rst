@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- No longer overwrites the directory name during import if it exists already.
+  [href]
+
 - Throws a proper error when a file is missing from an import.
   [href]
 
