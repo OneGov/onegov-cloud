@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes non-pdf files in file overview not being downloadable.
+  [href]
+
 0.31.2 (2018-08-10)
 ~~~~~~~~~~~~~~~~~~~
 

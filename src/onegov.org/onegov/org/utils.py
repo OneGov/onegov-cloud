@@ -10,6 +10,7 @@ from isodate import parse_date, parse_datetime
 from itertools import groupby
 from libres.modules import errors as libres_errors
 from lxml.html import fragments_fromstring, tostring
+from mimetypes import guess_extension
 from onegov.file import File, FileCollection
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
@@ -42,28 +43,43 @@ def djb2_hash(text, size):
     return hash % size
 
 
-@lru_cache(maxsize=32)
-def get_user_color(username):
-    """ Gets a user color for each username which is used for the
-    user-initials-* elements. Each username is mapped to a color.
+def get_random_color(seed, lightness, saturation):
+    """ Gets a random color using the given seed (a text value).
 
     Since the colorspace is very limited there are lots of collisions.
 
-    :returns: The user color in an css rgb string.
-
     """
 
-    h = 100 / djb2_hash(username, 360)
-    l = 0.9  # noqa
-    s = 0.5
-
-    r, g, b = colorsys.hls_to_rgb(h, l, s)
+    hue = 100 / djb2_hash(seed, 360)
+    r, g, b = colorsys.hls_to_rgb(hue, lightness, saturation)
 
     return '#{0:02x}{1:02x}{2:02x}'.format(
         int(round(r * 255)),
         int(round(g * 255)),
         int(round(b * 255))
     )
+
+
+@lru_cache(maxsize=32)
+def get_user_color(username):
+    """ Gets a user color for each username which is used for the
+    user-initials-* elements. Each username is mapped to a color.
+
+    :returns: The user color in an css rgb string.
+
+    """
+
+    return get_random_color(username, lightness=0.9, saturation=0.5)
+
+
+@lru_cache(maxsize=16)
+def get_extension_color(extension):
+    """ Gets an extension color for each file extension. This is similar to
+    :func:`get_user_color`, but returns a darker color (text is white).
+
+    """
+
+    return get_random_color(extension, lightness=0.5, saturation=0.5)
 
 
 def format_time_range(start, end):
@@ -657,3 +673,16 @@ def rrulestr(recurrence, **kwargs):
         kwargs['dtstart'] = sedate.utcnow()
 
     return rrule.rrulestr(recurrence, **kwargs)
+
+
+def extension_for_content_type(content_type, filename=None):
+    """ Gets the extension for the given content type. Note that this is
+    *meant for display only*. A file claiming to be a PDF might not be one,
+    but this function would not let you know that.
+
+    """
+
+    if filename is not None:
+        return filename.split('.')[-1][:4].lower().lstrip('.')
+
+    return (guess_extension(content_type, strict=False) or '').lstrip('.')

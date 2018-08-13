@@ -7,7 +7,6 @@ from babel.core import Locale
 from babel.dates import parse_pattern
 from functools import lru_cache
 from itertools import groupby
-from mimetypes import guess_extension
 from onegov.core.filestorage import view_filestorage_file
 from onegov.core.security import Private, Public
 from onegov.core.templates import render_macro
@@ -25,6 +24,7 @@ from onegov.org.models import (
     LegacyFile,
     LegacyImage,
 )
+from onegov.org import utils
 from sedate import utcnow
 from webob import exc
 from uuid import uuid4
@@ -54,10 +54,8 @@ def view_get_file_collection(self, request):
         return pattern.apply(date, locale)
 
     @lru_cache(maxsize=len(files) // 4)
-    def extension_for_content_type(content_type):
-        extension = guess_extension(content_type, strict=False) or ''
-
-        return extension.lstrip('.')
+    def extension_for_content_type(content_type, filename):
+        return utils.extension_for_content_type(content_type, filename)
 
     grouped = tuple(
         (group, tuple(files))
@@ -71,7 +69,10 @@ def view_get_file_collection(self, request):
         'count': len(files),
         'format_date': format_date,
         'model': self,
-        'extension': lambda f: extension_for_content_type(f.content_type),
+        'extension': lambda f: extension_for_content_type(
+            f.content_type,
+            f.name
+        ),
         'signed': lambda r: random.uniform(0, 1) > 0.9,
         'actions_url': lambda file_id: request.class_link(
             GeneralFile, name="details", variables={'id': file_id}
@@ -82,6 +83,11 @@ def view_get_file_collection(self, request):
 @OrgApp.html(model=GeneralFile, permission=Private, name='details')
 def view_file_details(self, request):
     layout = DefaultLayout(self, request)
+    extension = utils.extension_for_content_type(
+        self.reference.content_type,
+        self.reference.filename
+    )
+    color = utils.get_extension_color(extension)
 
     return render_macro(
         layout.macros['file-details'],
@@ -90,6 +96,8 @@ def view_file_details(self, request):
             'id': uuid4().hex,
             'file': self,
             'layout': layout,
+            'extension': extension,
+            'color': color
         }
     )
 

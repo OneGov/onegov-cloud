@@ -1191,8 +1191,43 @@
 <metal:file_details define-macro="file-details" i18n:domain="onegov.org">
     <div class="row">
         <div class="columns small-4">
-            <a href="${request.link(file)}">
-                <img class="pdf-preview" src="${request.link(file, name='medium')}" onerror="this.style.display='none'">
+            <a href="${request.link(file)}" tal:condition="extension == 'pdf'">
+                <img class="pdf-preview" src="${request.link(file, name='medium')}">
+            </a>
+            <a href="${request.link(file)}" tal:condition="extension != 'pdf'">
+                <svg width="204px" height="261px" viewBox="0 0 204 261" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:relative; left: -6px;">
+                    <defs>
+                        <filter x="-7.8%" y="-5.9%" width="120.0%" height="115.3%" filterUnits="objectBoundingBox" id="filter-1">
+                            <feOffset dx="4" dy="4" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+                            <feGaussianBlur stdDeviation="5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+                            <feColorMatrix values="0 0 0 0 0.392156863   0 0 0 0 0.392156863   0 0 0 0 0.392156863  0 0 0 0.4 0" type="matrix" in="shadowBlurOuter1" result="shadowMatrixOuter1"></feColorMatrix>
+                            <feMerge>
+                                <feMergeNode in="shadowMatrixOuter1"></feMergeNode>
+                                <feMergeNode in="SourceGraphic"></feMergeNode>
+                            </feMerge>
+                        </filter>
+                        <path d="M180,55.8004032 L180,233.892177 C180,235.962291 178.328034,237.640449 176.26556,237.640449 L3.73443983,237.640449 C1.67196566,237.640449 0,235.962291 0,233.892177 L0,3.74827207 C0,1.67815857 1.67196566,0 3.73443983,0 L124.368614,7.10542736e-15 C127.027185,1.13396268e-14 129.576325,1.05864997 131.452741,2.94201554 L177.084127,48.7424188 C178.9515,50.6167086 180,53.1546434 180,55.8004032 Z" id="path-2"></path>
+                        <path d="M180,55.8004032 L180,233.892177 C180,235.962291 178.328034,237.640449 176.26556,237.640449 L3.73443983,237.640449 C1.67196566,237.640449 0,235.962291 0,233.892177 L0,3.74827207 C0,1.67815857 1.67196566,0 3.73443983,0 L124.368614,7.10542736e-15 C127.027185,1.13396268e-14 129.576325,1.05864997 131.452741,2.94201554 L177.084127,48.7424188 C178.9515,50.6167086 180,53.1546434 180,55.8004032 Z" id="path-4"></path>
+                    </defs>
+                    <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="Group" filter="url(#filter-1)" transform="translate(7.000000, 7.000000)">
+                            <g id="Page">
+                                <mask id="mask-3" fill="white">
+                                    <use xlink:href="#path-2"></use>
+                                </mask>
+                                <use id="Mask" stroke="#DDDDDD" stroke-width="2" fill="#F7F8F8" fill-rule="nonzero" xlink:href="#path-2"></use>
+                                <rect id="Corner" fill="#DDDDDD" mask="url(#mask-3)" x="127.717842" y="-3.74827207" width="56.0165975" height="56.2240811" rx="4"></rect>
+                            </g>
+                            <mask id="mask-5" fill="white">
+                                <use xlink:href="#path-4"></use>
+                            </mask>
+                            <use id="Mask" stroke="#DDDDDD" stroke-width="2" fill="#F7F8F8" fill-rule="nonzero" xlink:href="#path-4"></use>
+                            <rect id="Corner" fill="#DDDDDD" mask="url(#mask-5)" x="128.426966" y="-5.05617978" width="55.6179775" height="56.6292135" rx="4"></rect>
+                            <path d="M-0.0112359551,167.853933 L-0.0112359551,233.651685 C-0.0112359551,235.860824 1.77962505,237.651685 3.98876404,237.651685 L176.011236,237.651685 C178.220375,237.651685 180.011236,235.860824 180.011236,233.651685 L180.011236,167.853933 L-0.0112359551,167.853933 Z" id="Banner" stroke="#DDDDDD" stroke-width="2" fill="${color}" mask="url(#mask-5)"></path>
+                            <text id="PDF" mask="url(#mask-5)" font-family="OpenSans-Bold, Open Sans, Helvetica Neue, Arial, sans-serif" font-size="41" font-weight="bold" fill="#FFFFFF" text-anchor="middle" y="216" x="44.5%">${extension.upper()}</text>
+                        </g>
+                    </g>
+                </svg>
             </a>
         </div>
         <div class="columns small-6">
