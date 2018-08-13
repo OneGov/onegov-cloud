@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.16.3 (2018-08-13)
+~~~~~~~~~~~~~~~~~~~~
 
 - Adds IE 11 compatibility.
   [msom]
