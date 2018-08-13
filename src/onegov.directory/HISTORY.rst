@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.2 (2018-08-13)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Fixes xlsx import failing in certain cases.
   [href]
 
