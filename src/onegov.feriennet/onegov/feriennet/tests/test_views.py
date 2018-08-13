@@ -519,16 +519,8 @@ def test_organiser_info(feriennet_app):
         assert not editor.get(f'/activity/{id}').pyquery('.organiser li')
         assert not admin.get(f'/activity/{id}').pyquery('.organiser li')
 
-    # owners only see kontakt change links for their own
-    assert "Kontakt ändern" in editor.get('/activity/play-with-legos')
-    assert "Kontakt ändern" not in editor.get('/activity/play-with-playmobil')
-
-    # admins see it for everyone
-    assert "Kontakt ändern" in admin.get('/activity/play-with-legos')
-    assert "Kontakt ändern" in admin.get('/activity/play-with-playmobil')
-
     # owner changes are reflected on the activity
-    contact = editor.get('/activity/play-with-legos').click('Kontakt ändern')
+    contact = editor.get('/userprofile')
     contact.form['salutation'] = 'mr'
     contact.form['first_name'] = 'Ed'
     contact.form['last_name'] = 'Itor'
@@ -554,7 +546,10 @@ def test_organiser_info(feriennet_app):
     assert "https://www.example.org" in activity
 
     # admin changes are reflected on the activity
-    contact = admin.get('/activity/play-with-legos').click('Kontakt ändern')
+    contact = admin.get('/usermanagement')\
+        .click('editor@example.org')\
+        .click('Bearbeiten')
+
     contact.form['organisation'] = 'Admins Association'
     contact.form.submit()
 

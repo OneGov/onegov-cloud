@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Removes the ability to edit the userprofile via the activities.
+  [href]
+
 1.3.35 (2018-08-02)
 ~~~~~~~~~~~~~~~~~~~
 

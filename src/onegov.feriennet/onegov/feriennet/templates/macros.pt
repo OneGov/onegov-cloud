@@ -178,14 +178,6 @@
             <div class="side-panel highlighted organiser-panel" tal:define="organiser activity.user; public request.app.public_organiser_data" tal:condition="public">
                 <h2 i18n:translate>Organiser</h2>
                 <metal:block use-macro="layout.macros.organiser" />
-
-                <small tal:condition="show_ticket_panel and not request.is_admin and organiser.username == request.identity.userid|nothing">
-                    <a href="${request.return_here(request.link(request.app.org, 'userprofile'))}" i18n:translate>Edit contact info</a>
-                </small>
-
-                <small tal:condition="show_ticket_panel and request.is_admin">
-                    <a href="${request.return_here(request.link(activity.user, 'edit'))}" i18n:translate>Edit contact info</a>
-                </small>
             </div>
         </div>
 
