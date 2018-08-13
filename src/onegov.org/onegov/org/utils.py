@@ -683,6 +683,8 @@ def extension_for_content_type(content_type, filename=None):
     """
 
     if filename is not None:
-        return filename.split('.')[-1][:4].lower().lstrip('.')
+        ext = filename.split('.')[-1][:4].lower()
+    else:
+        ext = (guess_extension(content_type, strict=False) or '')
 
-    return (guess_extension(content_type, strict=False) or '').lstrip('.')
+    return ext.strip('. ')

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes extensions containing extra space.
+  [href]
+
 0.31.3 (2018-08-13)
 ~~~~~~~~~~~~~~~~~~~
 
