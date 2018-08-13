@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes xlsx import failing in certain cases.
+  [href]
+
 - Raises an error when metadata.json is missing in an import.
   [href]
 

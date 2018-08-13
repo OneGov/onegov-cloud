@@ -218,7 +218,9 @@ class DirectoryArchiveReader(object):
 
     def read_data_from_xlsx(self):
         with (self.path / 'data.xlsx').open('rb') as f:
-            return tuple(CSVFile(convert_xls_to_csv(f), rowtype=dict).lines)
+            return tuple(CSVFile(
+                convert_xls_to_csv(f), rowtype=dict, dialect='excel'
+            ).lines)
 
 
 class DirectoryArchiveWriter(object):
