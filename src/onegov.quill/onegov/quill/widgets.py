@@ -89,7 +89,9 @@ class QuillInput(HiddenInput):
                         document.querySelectorAll(
                             '.ql-placeholder .ql-picker-item'
                         )
-                    ).forEach(item => item.textContent = item.dataset.value);
+                    ).forEach(function(item, index) {{
+                        item.textContent = item.dataset.value
+                    }});
                     var label = document.querySelector(
                         '.ql-placeholder .ql-picker-label'
                     );
