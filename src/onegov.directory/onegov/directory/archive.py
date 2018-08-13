@@ -188,8 +188,11 @@ class DirectoryArchiveReader(object):
     def read_metadata(self):
         """ Returns the metadata as a dictionary. """
 
-        with (self.path / 'metadata.json').open('r') as f:
-            return json.loads(f.read())
+        try:
+            with (self.path / 'metadata.json').open('r') as f:
+                return json.loads(f.read())
+        except FileNotFoundError:
+            raise MissingFileError('metadata.json')
 
     def read_data(self):
         """ Returns the entries as a list of dictionaries. """

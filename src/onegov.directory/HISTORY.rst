@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Raises an error when metadata.json is missing in an import.
+  [href]
+
 0.4.1 (2018-08-10)
 ~~~~~~~~~~~~~~~~~~~~~
 
