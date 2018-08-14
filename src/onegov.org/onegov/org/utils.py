@@ -50,7 +50,7 @@ def get_random_color(seed, lightness, saturation):
 
     """
 
-    hue = 100 / djb2_hash(seed, 360)
+    hue = 100 / (djb2_hash(seed, 360) or 1)
     r, g, b = colorsys.hls_to_rgb(hue, lightness, saturation)
 
     return '#{0:02x}{1:02x}{2:02x}'.format(

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes division by zero error in username color generator.
+  [href]
+
 0.31.4 (2018-08-13)
 ~~~~~~~~~~~~~~~~~~~
 
