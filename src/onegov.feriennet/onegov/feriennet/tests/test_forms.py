@@ -138,7 +138,7 @@ def test_notification_template_send_form(session):
     def request(admin):
         return Bunch(
             app=Bunch(
-                active_period=periods.query().one()
+                active_period=periods.active()
             ),
             session=session,
             include=lambda *args: None,

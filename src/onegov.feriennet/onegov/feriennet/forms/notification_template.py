@@ -2,16 +2,18 @@ from onegov.activity import Activity
 from onegov.activity import Booking, BookingCollection
 from onegov.activity import Occasion, OccasionCollection
 from onegov.activity import Period
+from onegov.core.orm import as_selectable_from_path
 from onegov.feriennet import _
-from onegov.feriennet.layout import DefaultLayout
 from onegov.feriennet.collections import BillingCollection
+from onegov.feriennet.layout import DefaultLayout
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.user import User, UserCollection
-from sqlalchemy import distinct, or_, func, and_
+from onegov.core.utils import module_path
+from sqlalchemy import distinct, or_, func, and_, select
+from uuid import uuid4
 from wtforms.fields import StringField, TextAreaField, RadioField
 from wtforms.validators import InputRequired
-from uuid import uuid4
 
 
 class NotificationTemplateForm(Form):
@@ -93,7 +95,7 @@ class NotificationTemplateSendForm(Form):
     @property
     def recipients(self):
         if self.send_to.data == 'myself':
-            return [self.request.current_username]
+            return {self.request.current_username}
 
         elif self.send_to.data == 'by_role':
             recipients = self.recipients_by_role(self.roles.data)
@@ -116,7 +118,7 @@ class NotificationTemplateSendForm(Form):
         else:
             raise NotImplementedError
 
-        return [r for r in recipients if r in self.recipients_pool]
+        return recipients & self.recipients_pool
 
     @property
     def recipients_pool(self):
@@ -130,11 +132,11 @@ class NotificationTemplateSendForm(Form):
         elif self.state.data != ['active', 'inactive']:
             return set()
 
-        return set(u.username for u in users.with_entities(User.username))
+        return {u.username for u in users.with_entities(User.username)}
 
     def recipients_by_role(self, roles):
         if not roles:
-            return []
+            return set()
 
         users = UserCollection(self.request.session)
 
@@ -142,14 +144,14 @@ class NotificationTemplateSendForm(Form):
         q = q.filter(User.active == True)
         q = q.with_entities(User.username)
 
-        return [u.username for u in q]
+        return {u.username for u in q}
 
     def recipients_with_wishes(self):
         bookings = BookingCollection(self.request.session)
         period = self.request.app.active_period
 
         if not period.wishlist_phase:
-            return []
+            return set()
 
         q = bookings.query()
         q = q.join(Period)
@@ -157,14 +159,14 @@ class NotificationTemplateSendForm(Form):
         q = q.filter(Period.active == True)
         q = q.with_entities(distinct(Booking.username).label('username'))
 
-        return [b.username for b in q]
+        return {b.username for b in q}
 
     def recipients_with_bookings(self):
         bookings = BookingCollection(self.request.session)
         period = self.request.app.active_period
 
         if period.wishlist_phase:
-            return []
+            return set()
 
         q = bookings.query()
         q = q.join(Period)
@@ -172,7 +174,7 @@ class NotificationTemplateSendForm(Form):
         q = q.filter(Period.active == True)
         q = q.with_entities(distinct(Booking.username).label('username'))
 
-        return [b.username for b in q]
+        return {b.username for b in q}
 
     def recipients_which_are_active_organisers(self):
         occasions = OccasionCollection(self.request.session)
@@ -184,16 +186,16 @@ class NotificationTemplateSendForm(Form):
 
         q = q.with_entities(distinct(Activity.username).label('username'))
 
-        return [o.username for o in q]
+        return {o.username for o in q}
 
     def recipients_with_unpaid_bills(self):
         period = self.request.app.active_period
         billing = BillingCollection(self.request.session, period)
 
-        return [
+        return {
             username for username, bill in billing.bills.items()
             if not bill.paid
-        ]
+        }
 
     def recipients_by_occasion_query(self, occasions):
         bookings = BookingCollection(self.request.session)
@@ -218,7 +220,7 @@ class NotificationTemplateSendForm(Form):
         q = self.recipients_by_occasion_query(occasions)
         q = q.with_entities(distinct(Booking.username).label('username'))
 
-        return [b.username for b in q]
+        return {b.username for b in q}
 
     def recipients_count_by_occasion(self, occasions):
         q = self.recipients_by_occasion_query(occasions)
@@ -229,45 +231,46 @@ class NotificationTemplateSendForm(Form):
         q = q.group_by(Booking.occasion_id)
         return {r.occasion_id: r.count for r in q}
 
-    def populate_occasion(self):
-        q = OccasionCollection(self.request.session).query()
-        q = q.join(Activity)
-        q = q.join(Period)
-        q = q.filter(Period.active == True)
-        q = q.order_by(Activity.name, Occasion.order)
+    @property
+    def occasion_choices(self):
+        if not self.request.app.active_period:
+            return
 
         layout = DefaultLayout(self.model, self.request)
 
-        occasions = tuple(q)
-        recipients = self.recipients_count_by_occasion(
-            [o.id for o in occasions]
+        stmt = as_selectable_from_path(
+            module_path(
+                'onegov.feriennet',
+                'queries/occasion_choices.sql'
+            )
         )
 
-        def choice(occasion):
-            if occasion.cancelled:
-                template = _(
-                    "${title} (cancelled) "
-                    "<small>${dates}, ${count} Attendees</small>"
-                )
-            else:
-                template = _(
-                    "${title} "
-                    "<small>${dates}, ${count} Attendees</small>"
-                )
+        query = select(stmt.c).where(
+            stmt.c.period_id == self.request.app.active_period.id
+        )
 
-            return occasion.id.hex, self.request.translate(_(
-                template,
-                mapping={
-                    'title': occasion.activity.title,
-                    'dates': ', '.join(
-                        layout.format_datetime_range(
-                            d.localized_start,
-                            d.localized_end
-                        ) for d in occasion.dates
-                    ),
-                    'count': recipients.get(occasion.id, 0)
-                }
-            ))
+        templates = {
+            True: _(
+                "${title} (cancelled) "
+                "<small>${dates}, ${count} Attendees</small>"
+            ),
+            False: _(
+                "${title} "
+                "<small>${dates}, ${count} Attendees</small>"
+            )
+        }
 
-        assert not self.occasion.choices
-        self.occasion.choices = [choice(o) for o in occasions]
+        for record in self.request.session.execute(query):
+            template = templates[record.cancelled]
+            label = self.request.translate(_(template, mapping={
+                'title': record.title,
+                'count': record.count,
+                'dates': ', '.join(
+                    layout.format_datetime_range(*d) for d in record.dates
+                )
+            }))
+
+            yield record.occasion_id.hex, label
+
+    def populate_occasion(self):
+        self.occasion.choices = list(self.occasion_choices)

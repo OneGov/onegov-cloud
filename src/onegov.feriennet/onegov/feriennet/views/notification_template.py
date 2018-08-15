@@ -1,6 +1,6 @@
 from collections import OrderedDict
-
 from onegov.activity import PeriodCollection
+from onegov.core.html import html_to_text
 from onegov.core.security import Secret
 from onegov.core.templates import render_template
 from onegov.feriennet import _, FeriennetApp
@@ -151,7 +151,7 @@ def handle_send_notification(self, request, form):
             current = request.current_username
 
             if current not in recipients:
-                recipients.append(current)
+                recipients.add(current)
 
             subject = variables.render(self.subject)
             content = render_template('mail_notification.pt', request, {
@@ -159,12 +159,14 @@ def handle_send_notification(self, request, form):
                 'title': subject,
                 'notification': variables.render(self.text)
             })
+            plaintext = html_to_text(content)
 
             for recipient in recipients:
                 request.app.send_marketing_email(
                     receivers=(recipient, ),
                     subject=subject,
                     content=content,
+                    plaintext=plaintext,
                 )
 
             self.last_sent = utcnow()
