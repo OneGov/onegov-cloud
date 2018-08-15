@@ -1156,7 +1156,7 @@ def test_booking_view(feriennet_app):
 
     # make sure the bookings show up under my view
     def count(page):
-        return len(page.pyquery('.attendee-bookings > ul > li'))
+        return len(page.pyquery('.attendee-bookings .booking'))
 
     c1_bookings = c1.get('/').click('Wunschliste')
     c2_bookings = c2.get('/').click('Wunschliste')
@@ -1257,7 +1257,7 @@ def test_confirmed_booking_view(feriennet_app):
     assert "Offen" in page
     assert "Stornieren" not in page
     assert "Entfernen" in page
-    assert "Angenommen" not in page
+    assert "Gebucht" not in page
 
     # Related contacts are hidden at this point
     page = client.get('/settings')
@@ -1275,7 +1275,7 @@ def test_confirmed_booking_view(feriennet_app):
     transaction.commit()
 
     page = client.get('/my-bookings')
-    assert "Angenommen" in page
+    assert "Gebucht" in page
     assert "Stornieren" in page
     assert "Entfernen" not in page
     assert "nicht genügend Teilnehmer" not in page
@@ -1474,7 +1474,7 @@ def test_cancel_occasion(feriennet_app):
     assert "Reaktivieren" not in page
 
     page.click('Anmelden').form.submit()
-    assert "Angenommen" in client.get('/my-bookings')
+    assert "Gebucht" in client.get('/my-bookings')
 
     page = client.get('/activity/foobar')
     assert "Löschen" not in page

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-04-27 15:36+0200\n"
+"POT-Creation-Date: 2018-08-15 11:29+0200\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1227,9 +1227,6 @@ msgstr ""
 "Pour supprimer cette activité de la partie publique du site, vous devez "
 "l'archiver."
 
-msgid "Edit contact info"
-msgstr "Modifier les coordonnées"
-
 msgid "Ticket State"
 msgstr "Statut du ticket"
 
@@ -1632,6 +1629,9 @@ msgstr "Limité à ${number} réservations"
 
 msgid "Unlimited bookings"
 msgstr "Réservations illimitées"
+
+msgid "Booked"
+msgstr "Réservé"
 
 msgid "This occasion does not have enough attendees yet."
 msgstr "Cet événement n'a pas encore assez de participants."
@@ -2138,6 +2138,9 @@ msgstr "Voulez-vous vraiment supprimer la réservation de ${attendee} ?"
 #, python-format
 msgid "Do you really want to cancel ${attendee}'s booking?"
 msgstr "Voulez-vous vraiment annuler la réservation de ${attendee} ?"
+
+#~ msgid "Edit contact info"
+#~ msgstr "Modifier les coordonnées"
 
 #~ msgid "Print All"
 #~ msgstr "Tout imprimer"

@@ -1,8 +1,7 @@
 import morepath
 
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from decimal import Decimal
-from itertools import groupby
 from onegov.activity import Activity, AttendeeCollection
 from onegov.activity import Booking
 from onegov.activity import BookingCollection
@@ -19,6 +18,7 @@ from onegov.feriennet.views.shared import all_users
 from onegov.org.elements import ConfirmLink, DeleteLink
 from sqlalchemy import select, and_
 from sqlalchemy.orm import contains_eager
+from sortedcontainers import SortedList
 from uuid import UUID
 
 
@@ -49,14 +49,42 @@ def all_bookings(collection):
     return query.all()
 
 
-def group_bookings_by_attendee(bookings):
-    """ Takes a list of bookings and groups them by attendee. """
+def group_bookings(period, bookings):
+    """ Takes a (small) list of bookings and groups them by attendee and state
+    and sorting them by date.
 
-    return {
-        attendee: tuple(bookings)
-        for attendee, bookings
-        in groupby(bookings, key=lambda b: b.attendee)
-    }
+    """
+
+    state_order = (
+        'open',
+        'accepted',
+        'denied',
+        'blocked',
+        'cancelled'
+    )
+
+    if period.wishlist_phase:
+        def state(booking):
+            return 'open'
+    else:
+        def state(booking):
+            return booking.state
+
+    grouped = {}
+
+    for b in sorted(bookings, key=lambda b: state_order.index(state(b))):
+
+        if b.attendee not in grouped:
+            # I tried using a SortedDict here, but chameleon has problems
+            # dealing with it, so an ordered dict is used instead
+            grouped[b.attendee] = OrderedDict()
+
+        if state(b) not in grouped[b.attendee]:
+            grouped[b.attendee][state(b)] = SortedList(key=lambda b: b.order)
+
+        grouped[b.attendee][state(b)].add(b)
+
+    return grouped
 
 
 def total_by_bookings(period, bookings):
@@ -172,11 +200,11 @@ def show_error_on_attendee(request, attendee, message):
 def view_my_bookings(self, request):
     attendees = attendees_by_username(request, self.username)
 
-    bookings = all_bookings(self)
-    bookings_by_attendee = group_bookings_by_attendee(bookings)
-
     periods = request.app.periods
     period = next((p for p in periods if p.id == self.period_id), None)
+
+    bookings = all_bookings(self)
+    grouped_bookings = group_bookings(period, bookings)
 
     related = request.app.org.meta.get('show_related_contacts') or None
 
@@ -201,7 +229,12 @@ def view_my_bookings(self, request):
         return url
 
     def get_total(attendee):
-        return total_by_bookings(period, bookings_by_attendee.get(attendee))
+        bookings = (
+            b for state in grouped_bookings[attendee]
+            for b in grouped_bookings[attendee][state]
+        )
+
+        return total_by_bookings(period, bookings)
 
     def booking_cost(booking):
         if period.confirmed:
@@ -219,8 +252,7 @@ def view_my_bookings(self, request):
         'actions_by_booking': lambda b: actions_by_booking(layout, period, b),
         'attendees': attendees,
         'subscribe_link': subscribe_link,
-        'bookings_by_attendee': bookings_by_attendee.get,
-        'attendee_has_bookings': lambda a: a in bookings_by_attendee,
+        'grouped_bookings': grouped_bookings,
         'total_by_attendee': get_total,
         'has_bookings': bookings and True or False,
         'booking_cost': booking_cost,

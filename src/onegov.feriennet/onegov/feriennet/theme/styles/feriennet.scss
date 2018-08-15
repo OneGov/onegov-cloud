@@ -172,6 +172,10 @@ ul.single-line {
     @include generic-icon('\f271');
 }
 
+.calendar-edit-icon {
+    @include generic-icon('\f040');
+}
+
 .location-icon {
     @include generic-icon('\f041');
 }
@@ -725,35 +729,12 @@ ul.tags {
 /*
     My bookings
 */
+$booking-left-margin: 2rem;
+
 .my-bookings {
-
-    > .icons {
-        margin-top: -5px;
-    }
-
-    .icon-male::before {
-        @include icon('\f222');
-
-        left: 2.25rem;
-        position: absolute;
-    }
-
-    .icon-female::before {
-        @include icon('\f221');
-
-        left: 2.25rem;
-        position: absolute;
-    }
-
-    @media #{$small-only} {
-        .icon-male::before,
-        .icon-female::before {
-            left: 1.5rem;
-        }
-    }
-
     .attendee-bookings {
         .alert-box {
+            box-shadow: 3px 3px 5px $white-smoke;
             margin-bottom: 0;
         }
 
@@ -764,25 +745,55 @@ ul.tags {
         }
 
         h3 {
-            background-color: $white-smoke;
             border: 1px solid $gainsboro;
             border-radius: 2px 2px 0 0;
             border-width: 1px 1px 0;
-            font-size: 1.4rem;
+            box-shadow: 3px 3px 5px $white-smoke;
             font-weight: 500;
             margin: 0;
 
             // 8.3333% is 1000 (row-width) / 12 (number of rows)
             // -> one column wide in percentage
-            padding: .75rem 1rem .75rem 8.3333%;
+            padding: .75rem 1rem .75rem $column-gutter / 2;
+        }
+
+        .booking {
+            display: flex;
+            flex-wrap: wrap;
+            position: relative;
+
+            .star {
+                flex: 0 0 2rem;
+            }
+
+            .title {
+                flex: 0 0 calc(100% - #{$booking-left-margin});
+            }
+
+            .occasion {
+                flex: 0 0 100%;
+                margin-left: calc(#{$booking-left-margin} + 1px);
+            }
+
+            .operability-warning {
+                flex: 0 0 100%;
+                margin-bottom: .5rem;
+                margin-left: calc(#{$booking-left-margin} - .4rem);
+            }
+
+            .actions {
+                flex: 0 0 100%;
+                margin-left: calc(#{$booking-left-margin} + 1px);
+            }
         }
 
         .booking-limit {
             background-color: lighten($yellow-pastel, 5%);
             border: 1px solid $gainsboro;
+            box-shadow: 3px 3px 5px $white-smoke;
             font-size: .875rem;
             line-height: .875rem;
-            padding: .5rem 3.5rem;
+            padding: .5rem $column-gutter / 2;
         }
 
         ul {
@@ -795,14 +806,23 @@ ul.tags {
             }
         }
 
-        > ul {
+        .bookings-by-state {
             background-color: $white;
             border: 1px solid $gainsboro;
+            border-bottom-color: $white;
             border-radius: 0 0 2px 2px;
             border-width: 0 1px 1px;
             box-shadow: 3px 3px 5px $white-smoke;
-            margin-bottom: 1.5rem;
-            padding: .5rem 0 .25rem;
+            padding-left: $column-gutter / 2;
+
+            > ul {
+                margin-bottom: 0;
+                padding: .5rem 0 .25rem;
+            }
+        }
+
+        .last-state {
+            padding-bottom: 1rem;
         }
 
         .total-costs {
@@ -813,14 +833,19 @@ ul.tags {
             box-shadow: 3px 3px 5px $white-smoke;
             font-family: $font-family-monospace;
             margin-bottom: 1.5rem;
-            margin-top: -1.5rem;
-            padding: .75rem 1.2rem .75rem 8.3333%;
+            margin-top: 0;
+            padding: .75rem 1.2rem .75rem $booking-left-margin + $column-gutter / 2;
             position: relative;
             top: -1px;
 
             .columns:last-child {
                 text-align: right;
             }
+        }
+
+        .no-total-costs {
+            border-top: 1px solid $gainsboro;
+            margin-bottom: 1.5rem;
         }
 
         .total {
@@ -850,7 +875,28 @@ ul.tags {
         }
     }
 
-    h4 {
+    .state-title {
+        background: $white;
+        margin-top: 0;
+        padding: .75rem 1rem 0 0;
+
+        h4 {
+            border-bottom: 5px solid $gray;
+            font-size: 1.25rem;
+            font-weight: bold;
+            padding-bottom: .5rem;
+        }
+    }
+
+    .state-accepted h4 {
+        border-color: $green-dark;
+    }
+
+    .state-denied h4 {
+        border-color: $red-dark;
+    }
+
+    h5 {
         font-size: 1.2rem;
         font-weight: 500;
         margin-bottom: .25rem;
@@ -863,7 +909,7 @@ ul.tags {
 
 
         > ul {
-            margin-bottom: .25rem;
+            margin-bottom: 0;
 
             li {
                 font-size: .875rem;
@@ -872,7 +918,7 @@ ul.tags {
         }
     }
 
-    .operability-warning {
+    .operability-warning span {
         font-size: .8rem;
         padding-top: .15rem;
 
@@ -905,10 +951,6 @@ ul.tags {
         }
     }
 
-    .non-operable .state.accepted {
-        background-color: $orange;
-    }
-
     .actions {
         ul {
             margin: 0;
@@ -934,6 +976,10 @@ ul.tags {
     My Bookings Print View
 */
 @media print {
+    .sponsor-banner-bookings {
+        display: none;
+    }
+
     .my-bookings {
         .panel {
             display: none;
@@ -944,20 +990,24 @@ ul.tags {
         }
 
         .attendee-bookings {
+            border-bottom: 1px solid $gainsboro;
             box-shadow: none;
+            margin-bottom: 2em;
 
-            ul {
+            * {
                 box-shadow: none !important;
             }
 
             h3 {
                 font-size: 1.4em;
                 line-height: 1.4em;
-                padding: .25em 1em;
+                padding: 1em 1em 0;
             }
 
-            h3::before {
-                display: none;
+            h4 {
+                font-size: 1.1em;
+                line-height: 1.1em;
+                margin-top: -.5rem;
             }
 
             .booking-limit {
@@ -973,7 +1023,7 @@ ul.tags {
                 }
             }
 
-            h4 {
+            h5 {
                 font-size: .9em;
             }
 
@@ -2079,8 +2129,8 @@ ul.tags {
     display: flex;
     justify-content: center;
     margin-bottom: -.875rem;
+    margin-right: 1rem;
     margin-top: 1rem;
-    padding-left: grid-calc(1, $total-columns);
 
     > div {
         background: $white;
@@ -2112,10 +2162,9 @@ ul.tags {
     $column-width: grid-calc(1, $total-columns);
 
     font-size: .8rem;
-    margin-left: $column-width;
-    margin-right: $column-gutter / 2;
+    margin-left: $booking-left-margin;
     padding: .75rem 0 1rem;
-    width: calc(100% - #{$column-width} - #{$column-gutter / 2});
+    width: calc(100% - #{$booking-left-margin} - #{$column-gutter / 2});
 
     table {
         margin: 0;
