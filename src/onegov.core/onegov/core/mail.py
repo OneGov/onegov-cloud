@@ -11,7 +11,7 @@ from onegov.core.html import html_to_text
 
 def email(sender=None, receivers=(), cc=(), bcc=(),
           subject=None, content=None, encoding='utf8',
-          attachments=(), category='marketing'):
+          attachments=(), category='marketing', plaintext=None):
     """
     Creates an Envelope object with a HTML *content*, as well as a *plaintext*
     alternative generated from the HTML content.
@@ -25,12 +25,10 @@ def email(sender=None, receivers=(), cc=(), bcc=(),
     adds the plaintext alternative.
     """
 
-    if content:
+    if content and not plaintext:
         # turn the html email into a plaintext representation
         # this leads to a lower spam rating
         plaintext = html_to_text(content)
-    else:
-        plaintext = None
 
     headers_ = [
         headers.subject(subject),

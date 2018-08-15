@@ -621,7 +621,8 @@ class Framework(
 
     def send_email(self, reply_to, category='marketing',
                    receivers=(), cc=(), bcc=(), subject=None, content=None,
-                   encoding='utf-8', attachments=(), headers={}):
+                   encoding='utf-8', attachments=(), headers={},
+                   plaintext=None):
         """ Sends a plain-text e-mail using :attr:`postman` to the given
         recipients. A reply to address is used to enable people to answer
         to the e-mail which is usually sent by a noreply kind of e-mail
@@ -659,7 +660,8 @@ class Framework(
             content=content,
             encoding=encoding,
             attachments=attachments,
-            category=category
+            category=category,
+            plaintext=plaintext
         )
 
         envelope.headers['Sender'] = sender

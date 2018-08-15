@@ -27,9 +27,38 @@ class MailDataManager(object):
     def sortKey(self):
         return 'mails'
 
+    def bind_connection(self, transaction, connection):
+        assert 'mail_connection' not in transaction.extension
+
+        def after_commit_hook(*args):
+            connection.quit()
+
+        transaction.addAfterCommitHook(after_commit_hook)
+        transaction.extension['mail_connection'] = connection
+
+    def open_connection(self):
+        connection = self.postman.transport(
+            self.postman.host,
+            self.postman.port,
+            **self.postman.options
+        )
+
+        connection.ehlo()
+
+        for item in self.postman.middlewares:
+            item(connection)
+
+        return connection
+
     def commit(self, transaction):
+        if 'mail_connection' not in transaction.extension:
+            self.bind_connection(transaction, self.open_connection())
+
         try:
-            self.postman.send(self.envelope)
+            self.postman.deliver(
+                transaction.extension['mail_connection'],
+                self.envelope
+            )
         except Exception:
             log.exception("Failed to send e-mail")
 
