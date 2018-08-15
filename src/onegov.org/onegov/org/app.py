@@ -246,6 +246,8 @@ def org_content_security_policy():
     policy.connect_src.add(SELF)
     policy.connect_src.add('https://checkout.stripe.com')
     policy.connect_src.add('https://sentry.io')
+    policy.connect_src.add('https://*.google-analytics.com')
+    policy.connect_src.add('https://stats.g.doubleclick.net')
 
     return policy
 
