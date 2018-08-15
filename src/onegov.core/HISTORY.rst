@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.71.1 (2018-08-15)
+~~~~~~~~~~~~~~~~~~~
 
 - Improves the speed of e-mail sending through smtp.
   [href]
