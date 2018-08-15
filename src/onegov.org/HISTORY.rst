@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.31.6 (2018-08-15)
+~~~~~~~~~~~~~~~~~~~
+
 - Allows google analytics tracking in the default Content Security Policy.
   [href]
 
