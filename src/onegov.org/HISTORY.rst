@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Disables the image resize capability in the editor.
+  [href]
+
 0.31.6 (2018-08-15)
 ~~~~~~~~~~~~~~~~~~~
 

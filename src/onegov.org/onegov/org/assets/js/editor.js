@@ -20,6 +20,7 @@ $(function() {
             plugins: ['bufferbuttons', 'filemanager', 'imagemanager', 'definedlinks'],
             lang: language,
             convertVideoLinks: false,
+            imageResizable: false,
             formattingAdd: [
                 {
                     tag: 'h2',
