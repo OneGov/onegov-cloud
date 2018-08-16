@@ -208,7 +208,7 @@ class WsgiProcess(multiprocessing.Process):
 
     """
 
-    def __init__(self, app_factory, host='127.0.0.1', port=8080):
+    def __init__(self, app_factory, host='127.0.0.1', port=8080, env={}):
 
         multiprocessing.Process.__init__(self)
         self.app_factory = app_factory
@@ -219,6 +219,10 @@ class WsgiProcess(multiprocessing.Process):
         self._port = port
         self._actual_port = multiprocessing.Value('i', port)
         self._ready = multiprocessing.Value('i', 0)
+
+        # hook up environment variables
+        for key, value in env.items():
+            os.environ[key] = value
 
         try:
             self.stdin_fileno = sys.stdin.fileno()
@@ -301,15 +305,15 @@ class WsgiServer(FileSystemEventHandler):
 
     """
 
-    def __init__(self, app_factory, host='127.0.0.1', port=8080, **extra):
+    def __init__(self, app_factory, host='127.0.0.1', port=8080):
         self.app_factory = app_factory
         self._host = host
         self._port = port
-        self._extra = extra
 
     def spawn(self):
-        return WsgiProcess(
-            self.app_factory, self._host, self._port, **self._extra)
+        return WsgiProcess(self.app_factory, self._host, self._port, {
+            'ONEGOV_DEVELOPMENT': '1'
+        })
 
     def join(self, timeout=None):
         if self.process.is_alive():
@@ -339,6 +343,9 @@ class WsgiServer(FileSystemEventHandler):
             return
 
         if event.src_path.endswith('scss'):
+            return
+
+        if event.src_path.endswith('pt'):
             return
 
         if '/.git' in event.src_path:
