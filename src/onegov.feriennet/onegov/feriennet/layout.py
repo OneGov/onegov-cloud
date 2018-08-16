@@ -347,12 +347,13 @@ class VacationActivityLayout(DefaultLayout):
                     attrs={'class': 'show-attendees'}
                 ))
 
-        if self.request.is_admin and self.ticket:
-            links.append(Link(
-                text=_("Show Ticket"),
-                url=self.request.link(self.ticket),
-                attrs={'class': 'show-ticket'}
-            ))
+        if self.request.is_admin:
+            if self.model.state != 'preview' and self.ticket:
+                links.append(Link(
+                    text=_("Show Ticket"),
+                    url=self.request.link(self.ticket),
+                    attrs={'class': 'show-ticket'}
+                ))
 
         return links
 

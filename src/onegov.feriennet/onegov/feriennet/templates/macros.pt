@@ -193,7 +193,7 @@
                         <metal:block use-macro="layout.macros.activity_state" />
                     </dd>
 
-                    <tal:block condition="layout.ticket">
+                    <tal:block condition="layout.ticket and layout.model.state != 'preview'">
                         <dt i18n:translate>
                             Ticket State
                         </dt>
