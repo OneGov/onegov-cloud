@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Uses a custom CSRF expired error message.
+  [msom]
+
 1.16.3 (2018-08-13)
 ~~~~~~~~~~~~~~~~~~~~
 
