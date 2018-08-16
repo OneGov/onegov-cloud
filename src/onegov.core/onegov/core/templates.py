@@ -42,6 +42,9 @@ from chameleon.utils import Scope, decode_string
 from onegov.core.framework import Framework
 
 
+AUTO_RELOAD = os.environ.get('ONEGOV_DEVELOPMENT') == '1'
+
+
 def get_default_vars(request, content, suppress_global_variables=False):
 
     default = {
@@ -99,7 +102,7 @@ class MacrosLookup(object):
         self.lookup = {
             name: template
             for template in (
-                PageTemplateFile(path, search_paths)
+                PageTemplateFile(path, search_paths, auto_reload=AUTO_RELOAD)
                 for path in reversed(list(paths))
             )
             for name in template.macros.names
@@ -123,7 +126,7 @@ def get_template_loader(template_directories, settings):
         template_directories,
         default_extension='.pt',
         prepend_relative_search_path=False,
-        auto_reload=False,
+        auto_reload=AUTO_RELOAD,
     )
 
 
