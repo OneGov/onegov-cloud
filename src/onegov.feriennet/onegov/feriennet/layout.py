@@ -235,7 +235,22 @@ class VacationActivityLayout(DefaultLayout):
         if self.is_editable:
 
             if self.model.state == 'preview':
-                if period and self.model.has_occasion_in_period(period):
+                if not period:
+                    links.append(Link(
+                        text=_("Request Publication"),
+                        url='#',
+                        attrs={'class': 'request-publication'},
+                        traits=(
+                            Block(
+                                _(
+                                    "There is currently no active period. "
+                                    "Please retry once a period has been "
+                                    "activated."
+                                )
+                            ),
+                        )
+                    ))
+                elif self.model.has_occasion_in_period(period):
                     links.append(Link(
                         text=_("Request Publication"),
                         url=self.request.link(self.model, name='propose'),
