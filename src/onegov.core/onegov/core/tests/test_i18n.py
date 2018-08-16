@@ -213,8 +213,8 @@ def test_get_translation_bound_form():
 
     form_class = i18n.get_translation_bound_form(MockForm, translate)
 
-    assert form_class.Meta().get_translations(None) is default
-    assert form_class.Meta().get_translations(None)._fallback is translate
+    assert form_class.Meta().get_translations(None) is translate
+    assert form_class.Meta().get_translations(None)._fallback is default
 
     meta = form_class.Meta()
     meta.get_translations(None)

@@ -223,21 +223,27 @@ def get_translation_bound_meta(meta_class, translate):
         cache_translations = False
 
         def get_translations(self, form):
-
+            translations = translate
             try:
                 default = super().get_translations(form)
-                add_fallback_to_tail(translation=default, fallback=translate)
             except FileNotFoundError:
                 # if there are no locales, the file not found error
                 # can safely be ignored as there are no translations if there
                 # are no locales (a wtforms bug)
-                assert not getattr(self, 'locales', None)
-                default = translate
+                pass
+            else:
+                if translations:
+                    add_fallback_to_tail(
+                        translation=translations,
+                        fallback=default
+                    )
+                else:
+                    translations = default
 
             # Cache for reuse in render_field.
-            self._translations = default
+            self._translations = translations
 
-            return default
+            return translations
 
         def render_field(self, field, render_kw):
             """ Wtforms does not actually translate labels, it simply leaves

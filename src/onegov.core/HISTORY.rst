@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Allows to override wtforms translations.
+  [msom]
+
 0.71.1 (2018-08-15)
 ~~~~~~~~~~~~~~~~~~~
 
