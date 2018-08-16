@@ -39,6 +39,7 @@ import os
 import os.path
 import polib
 import re
+import types
 
 from onegov.core.cache import lru_cache
 from io import BytesIO
@@ -314,7 +315,14 @@ def clone(translation):
     """ Clones the given translation, creating an independent copy. """
     clone = gettext.GNUTranslations()
     clone._catalog = translation._catalog.copy()
-
+    if hasattr(translation, 'plural'):
+        clone.plural = types.FunctionType(
+            translation.plural.__code__,
+            translation.plural.__globals__,
+            translation.plural.__name__,
+            translation.plural.__defaults__,
+            translation.plural.__closure__
+        )
     return clone
 
 

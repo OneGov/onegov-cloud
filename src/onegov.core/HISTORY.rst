@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Also clones the pluralization function of a translation.
+  [msom]
+
 0.71.2 (2018-08-16)
 ~~~~~~~~~~~~~~~~~~~
 
