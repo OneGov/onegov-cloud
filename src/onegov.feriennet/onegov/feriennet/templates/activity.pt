@@ -28,29 +28,38 @@
 
         <tal:block metal:use-macro="layout.macros.activity_detailed" tal:define="show_ticket_panel True">
             <metal:block fill-slot="after-text">
-                <tal:block condition="not: occasions_by_period">
+                <div tal:condition="not: occasions_by_period">
                     <h3 i18n:translate>Occasions</h3>
                     <p i18n:translate>
                         There are currently no occasions planned.
                     </p>
-                </tal:block>
+                </div>
 
                 <tal:block define="today layout.today()" condition="occasions_by_period" repeat="(title, occasions) occasions_by_period">
-                    <div tal:define="period occasions[0].period" class="${period.active and 'active-occasions' or 'inactive-occasions'}">
-                        <h3>${title}</h3>
+                    <div tal:define="period occasions[0].period" class="occasions-by-period">
+                        <div class="title-with-toggle">
+                            <h3>${title}</h3>
 
-                        <div class="panel">
-                            <div class="hints">
-                                <tal:block metal:use-macro="layout.macros.period_hints" />
+                            <div class="toggle" data-toggle="#occasions-for-${period.id.hex}" tal:condition="request.is_admin">
+                                <i class="fa fa-plus-circle toggle-on" aria-hidden="true"></i>
+                                <i class="fa fa-minus-circle toggle-off" aria-hidden="true"></i>
                             </div>
                         </div>
 
-                        <ul class="occasions">
-                            <li tal:repeat="occasion occasions">
-                                <h4>${layout.format_datetime_range(occasion.dates[0].localized_start, occasion.dates[0].localized_end)}</h4>
-                                <tal:block metal:use-macro="layout.macros.occasion" tal:define="show_links True; show_enroll show_enroll(occasion)" />
-                            </li>
-                        </ul>
+                        <div id="occasions-for-${period.id.hex}" style="display: ${period.active and 'block' or 'none'};">
+                            <div class="panel">
+                                <div class="hints">
+                                    <tal:block metal:use-macro="layout.macros.period_hints" />
+                                </div>
+                            </div>
+
+                            <ul class="occasions">
+                                <li tal:repeat="occasion occasions">
+                                    <h4>${layout.format_datetime_range(occasion.dates[0].localized_start, occasion.dates[0].localized_end)}</h4>
+                                    <tal:block metal:use-macro="layout.macros.occasion" tal:define="show_links True; show_enroll show_enroll(occasion)" />
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </tal:block>
             </metal:block>

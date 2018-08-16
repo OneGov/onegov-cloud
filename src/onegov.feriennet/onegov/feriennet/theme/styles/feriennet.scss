@@ -493,11 +493,6 @@ ul.tags {
 /*
     Occasions
 */
-.inactive-occasions * {
-    border-bottom-color: $gainsboro !important;
-    color: $charcoal;
-}
-
 .occasions {
     list-style: none;
     margin: 0;
@@ -2179,5 +2174,38 @@ $booking-left-margin: 2rem;
                 margin-right: 1ex;
             }
         }
+    }
+}
+
+/*
+    Occasions toggle
+*/
+.occasions-by-period {
+    margin-bottom: 1rem;
+}
+
+.title-with-toggle {
+    display: flex;
+
+    .toggle {
+        font-size: 1.25rem;
+        line-height: 2.5rem;
+        margin-left: .5rem;
+    }
+
+    .fa {
+        cursor: pointer;
+    }
+
+    .toggle-off {
+        display: none;
+    }
+
+    .toggled .toggle-on {
+        display: none;
+    }
+
+    .toggled .toggle-off {
+        display: inline-block;
     }
 }
