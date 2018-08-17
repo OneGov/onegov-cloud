@@ -6,6 +6,7 @@ import sedate
 
 from cached_property import cached_property
 from datetime import datetime
+from functools import lru_cache
 from onegov.core import utils
 from pytz import timezone
 
@@ -131,6 +132,15 @@ class Layout(object):
         """ Returns the given date in the ISO 8601 format. """
         return datetime.isoformat(date)
 
+    @lru_cache(maxsize=8)
+    def number_symbols(self, locale):
+        """ Returns the locale specific number symbols. """
+
+        return (
+            babel.numbers.get_decimal_symbol(locale),
+            babel.numbers.get_group_symbol(locale)
+        )
+
     def format_number(self, number, decimal_places=None):
         """ Takes the given numer and formats it according to locale.
 
@@ -138,17 +148,16 @@ class Layout(object):
         otherwise 2.
 
         """
+        if number is None:
+            return ''
+
         if decimal_places is None:
             if isinstance(number, numbers.Integral):
                 decimal_places = 0
             else:
                 decimal_places = 2
 
-        locale = self.request.locale
-
-        decimal = babel.numbers.get_decimal_symbol(locale)
-        group = babel.numbers.get_group_symbol(locale)
-
+        decimal, group = self.number_symbols(self.request.locale)
         result = '{{:,.{}f}}'.format(decimal_places).format(number)
         return result.translate({ord(','): group, ord('.'): decimal})
 

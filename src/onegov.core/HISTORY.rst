@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Caches layouts number formatting options.
+  [msom]
+
 0.71.3 (2018-08-16)
 ~~~~~~~~~~~~~~~~~~~
 
