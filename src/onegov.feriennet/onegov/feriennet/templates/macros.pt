@@ -265,98 +265,107 @@
 </metal:organiser>
 
 <metal:occasion define-macro="occasion" i18n:domain="onegov.feriennet">
-    <tal:block define="show_enroll show_enroll|nothing; show_links show_links|nothing; period occasion.period">
-        <div class="row" tal:define="show_stats not period.wishlist_phase">
-            <!--! the width of this column together with the next one doesn't add up to 12 by
-            intention to make space for the icons rendered ::before the first column. -->
-            <div class="small-12 medium-6 columns factoids">
-                <ul tal:condition="len(occasion.dates) > 1">
-                    <li tal:repeat="date occasion.dates[1:]">
+    <div class="occasion" tal:define="
+        show_enroll show_enroll|nothing;
+        show_links show_links|nothing;
+        period occasion.period">
+
+        <div class="state" tal:condition="not period.wishlist_phase">
+            <div class="full" tal:condition="not occasion.cancelled and occasion.full">
+                <span i18n:translate>Fully booked</span>
+            </div>
+
+            <div class="cancelled" tal:condition="occasion.cancelled">
+                <span i18n:translate>Rescinded</span>
+            </div>
+
+            <div class="available-spots" tal:condition="not occasion.cancelled and not occasion.full and not period.finalized">
+                <span i18n:translate><tal:block i18n:name="count" replace="occasion.available_spots" /> spots available</span>
+            </div>
+
+            <div class="spots" tal:condition="not occasion.cancelled and period.finalized">
+                <span i18n:translate><tal:block i18n:name="count" replace="occasion.attendee_count" /> attendees</span>
+            </div>
+        </div>
+
+        <div class="factoids">
+            <div class="dates">
+                <ul>
+                    <li tal:repeat="date occasion.dates">
                         ${layout.format_datetime_range(date.localized_start, date.localized_end)}
                     </li>
                 </ul>
-
-                <div class="full" tal:condition="show_stats and not occasion.cancelled and occasion.full">
-                    <span i18n:translate>Fully booked</span>
-                </div>
-
-                <div class="full" tal:condition="show_stats and occasion.cancelled">
-                    <span i18n:translate>Rescinded</span>
-                </div>
-
-                <div class="available-spots" tal:condition="show_stats and not occasion.cancelled and not occasion.full and not period.finalized">
-                    <span i18n:translate><tal:block i18n:name="count" replace="occasion.available_spots" /> spots available</span>
-                </div>
-
-                <div class="location" tal:condition="occasion.meeting_point">
-                    <span i18n:translate class="show-for-sr">Meeting Point</span>
-                    <span>${occasion.meeting_point}</span>
-                </div>
-
-                <div class="age">
-                    <span i18n:translate class="show-for-sr">Age</span>
-                    <span i18n:translate>
-                        <tal:block replace="occasion.age.lower" i18n:name='min_age' />
-                        -
-                        <tal:block replace="occasion.age.upper - 1" i18n:name='max_age' />
-                        years
-                    </span>
-                </div>
-
-                <div class="spots" tal:condition="not period.finalized">
-                    <span i18n:translate class="show-for-sr">Participants</span>
-
-                    <span i18n:translate tal:condition="occasion.spots.lower">
-                        <tal:block replace="occasion.spots.lower" i18n:name='min_spots' />
-                        -
-                        <tal:block replace="occasion.spots.upper - 1" i18n:name='max_spots' />
-                        participants
-                    </span>
-
-                    <span i18n:translate tal:condition="not:occasion.spots.lower">
-                        up to
-                        <tal:block replace="occasion.spots.upper - 1" i18n:name='max_spots' />
-                        participants
-                    </span>
-                </div>
-
-                <div class="spots" tal:condition="show_stats and not occasion.cancelled and period.finalized">
-                    <span i18n:translate><tal:block i18n:name="count" replace="occasion.attendee_count" /> attendees</span>
-                </div>
-
-                <div class="cost">
-                    <span i18n:translate class="show-for-sr">Cost</span>
-
-                    <tal:block condition="period.all_inclusive">
-                        <tal:block condition="occasion.cost" i18n:translate>
-                            <tal:block i18n:name="cost" replace="occasion.cost" /> CHF
-                        </tal:block>
-                        <tal:block condition="not:occasion.cost" i18n:translate>
-                            No additional costs
-                        </tal:block>
-                    </tal:block>
-                    <tal:block condition="not:period.all_inclusive">
-                        <tal:block condition="occasion.cost or period.booking_cost" i18n:translate>
-                            <tal:block i18n:name="cost" replace="(occasion.cost or 0) + (period.booking_cost or 0)" /> CHF
-                        </tal:block>
-                        <tal:block condition="not:occasion.cost or period.booking_cost" i18n:translate>
-                            Free of charge
-                        </tal:block>
-                    </tal:block>
-                </div>
-
-                <div class="overlap-check" tal:condition="occasion.exclude_from_overlap_check">
-                    <span i18n:translate>Independent of other occasions</span>
-                </div>
-
-                <div class="text-links" tal:condition="show_links and layout.is_editable">
-                    <tal:block repeat="link occasion_links(occasion)">
-                        <tal:block replace="structure link(layout)" />
-                    </tal:block>
-                </div>
             </div>
-            <div class="small-12 medium-6 columns">
+        </div>
+
+        <div class="factoids right-align">
+            <div class="age">
+                <span i18n:translate class="show-for-sr">Age</span>
+                <span i18n:translate>
+                    <tal:block replace="occasion.age.lower" i18n:name='min_age' />
+                    -
+                    <tal:block replace="occasion.age.upper - 1" i18n:name='max_age' />
+                    years
+                </span>
+            </div>
+
+            <div class="spots" tal:condition="not period.finalized">
+                <span i18n:translate class="show-for-sr">Participants</span>
+
+                <span i18n:translate tal:condition="occasion.spots.lower">
+                    <tal:block replace="occasion.spots.lower" i18n:name='min_spots' />
+                    -
+                    <tal:block replace="occasion.spots.upper - 1" i18n:name='max_spots' />
+                    participants
+                </span>
+
+                <span i18n:translate tal:condition="not:occasion.spots.lower">
+                    up to
+                    <tal:block replace="occasion.spots.upper - 1" i18n:name='max_spots' />
+                    participants
+                </span>
+            </div>
+
+            <div class="cost">
+                <span i18n:translate class="show-for-sr">Cost</span>
+
+                <tal:block condition="period.all_inclusive">
+                    <tal:block condition="occasion.cost" i18n:translate>
+                        <tal:block i18n:name="cost" replace="occasion.cost" /> CHF
+                    </tal:block>
+                    <tal:block condition="not:occasion.cost" i18n:translate>
+                        No additional costs
+                    </tal:block>
+                </tal:block>
+                <tal:block condition="not:period.all_inclusive">
+                    <tal:block condition="occasion.cost or period.booking_cost" i18n:translate>
+                        <tal:block i18n:name="cost" replace="(occasion.cost or 0) + (period.booking_cost or 0)" /> CHF
+                    </tal:block>
+                    <tal:block condition="not:occasion.cost or period.booking_cost" i18n:translate>
+                        Free of charge
+                    </tal:block>
+                </tal:block>
+            </div>
+        </div>
+
+        <div class="factoids spacer">
+            <div class="location" tal:condition="occasion.meeting_point">
+                <span i18n:translate class="show-for-sr">Meeting Point</span>
+                <span>${occasion.meeting_point}</span>
+            </div>
+
+            <div class="overlap-check" tal:condition="occasion.exclude_from_overlap_check">
+                <span i18n:translate>Independent of other occasions</span>
+            </div>
+
+            <div class="note" tal:condition="occasion.note">
                 <p tal:condition="occasion.note">${occasion.note}</p>
+            </div>
+
+            <div class="text-links" tal:condition="show_links and layout.is_editable">
+                <tal:block repeat="link occasion_links(occasion)">
+                    <tal:block replace="structure link(layout)" />
+                </tal:block>
             </div>
         </div>
 
@@ -370,7 +379,8 @@
                 <a tal:case="False" class="button" href="${layout.login_to_url(request.link(occasion, 'book'), skip=True)}" i18n:translate>Enroll</a>
             </tal:block>
         </div>
-    </tal:block>
+
+    </div>
 </metal:occasion>
 
 <metal:star define-macro="star" i18n:domain="onegov.feriennet">

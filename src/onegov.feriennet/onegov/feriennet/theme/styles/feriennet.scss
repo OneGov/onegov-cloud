@@ -543,7 +543,7 @@ ul.tags {
     Factoids
 */
 .factoids {
-    margin: 0 0 .75rem;
+    margin: 0 0 .5rem;
 
     span {
         font-size: .875rem;
@@ -551,31 +551,48 @@ ul.tags {
 
     > div {
         margin-left: 1.5rem;
+        position: relative;
 
         &::before {
             display: inline-block;
-            left: 1rem;
+            left: -1.5rem;
             position: absolute;
             text-align: center;
             width: 1rem;
         }
     }
 
-    > ul {
+    @media #{$medium-up} {
+        > div {
+            max-width: 70%;
+        }
+
+        &.spacer {
+            min-height: 2.5rem;
+        }
+
+        &.right-align {
+            position: absolute;
+            right: 1.25rem;
+            text-align: right;
+            top: 0;
+
+            > div {
+                max-width: 100%;
+            }
+
+            > div::before {
+                left: 0;
+                margin-right: 1ex;
+                position: relative;
+            }
+        }
+    }
+
+    ul {
         font-size: .875rem;
         list-style-type: none;
-        margin-bottom: .25rem;
-        margin-left: 0;
-        margin-top: -.25rem;
-
-        li::before {
-            @include icon('\f055');
-
-            display: inline-block;
-            margin-right: .5ex;
-            text-align: center;
-            width: 2ex;
-        }
+        margin: -.25rem 0 0;
     }
 
     .text-links {
@@ -586,6 +603,10 @@ ul.tags {
     .full {
         font-weight: bold;
         margin-bottom: .4rem;
+    }
+
+    .dates::before {
+        @include icon('\f133');
     }
 
     .full::before {
@@ -619,6 +640,10 @@ ul.tags {
     .overlap-check::before {
         @include icon('\f017');
     }
+
+    .note::before {
+        @include icon('\f24a');
+    }
 }
 
 @media print {
@@ -636,7 +661,7 @@ ul.tags {
     border: 1px solid transparentize($primary-color, .90);
     border-radius: 2px;
     min-height: 5rem;
-    padding: 1rem 1.25rem;
+    padding: 1rem 1.25rem 1rem 1.5rem;
 
     span {
         font-size: 1rem;
@@ -719,6 +744,59 @@ ul.tags {
         border-bottom: 1px solid transparentize($primary-color, .85);
         margin-bottom: 1rem;
         padding-bottom: 0;
+    }
+}
+
+.occasion {
+    margin-bottom: 2rem;
+    position: relative;
+    min-height: 3rem;
+
+    .note p {
+        margin-bottom: 0;
+    }
+
+    .call-to-action {
+        margin-top: 1rem;
+    }
+
+    .overlap-check + .note,
+    .location + .note {
+        margin-top: .5rem;
+    }
+
+    .state > div {
+        @include smooth-edges;
+
+        background-color: $blue-pastel;
+        color: $blue-dark;
+        padding: 2px 9px;
+        position: absolute;
+        right: 1.25rem;
+        top: -2.25rem;
+
+        &::before {
+            @include icon('\f05a');
+            margin-right: .5ex;
+        }
+
+        &.cancelled {
+            background-color: $red-pastel;
+            color: $red-dark;
+
+            &::before {
+                content: '\f00d';
+            }
+        }
+
+        &.available-spots {
+            background-color: $green-pastel;
+            color: $green-dark;
+
+            &::before {
+                content: '\f00c';
+            }
+        }
     }
 }
 

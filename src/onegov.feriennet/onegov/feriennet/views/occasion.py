@@ -157,6 +157,15 @@ def reinstate_occasion(self, request):
     template='enroll_form.pt')
 def book_occasion(self, request, form):
 
+    # for the "nth. occasion" title
+    number = request.session.execute("""
+        SELECT count(*) FROM occasions
+        WHERE activity_id = :activity_id AND "order" <= :order
+    """, {
+        'activity_id': self.activity_id,
+        'order': self.order
+    }).scalar()
+
     if form.submitted(request):
         attendees = AttendeeCollection(request.session)
         user = form.user
@@ -246,5 +255,6 @@ def book_occasion(self, request, form):
         'form': form,
         'occasion': self,
         'users': users,
-        'button_text': _("Enroll")
+        'button_text': _("Enroll"),
+        'number': number,
     }

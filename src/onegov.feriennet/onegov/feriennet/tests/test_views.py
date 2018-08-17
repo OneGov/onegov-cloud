@@ -2360,3 +2360,65 @@ def test_book_alternate_occasion(feriennet_app):
 
     assert "bereits eine andere Durchführung dieses Angebots" not in page
     assert bookings.query().one().occasion_id == o2_id
+
+
+def test_occasion_number(feriennet_app):
+    activities = ActivityCollection(feriennet_app.session(), type='vacation')
+    periods = PeriodCollection(feriennet_app.session())
+    occasions = OccasionCollection(feriennet_app.session())
+
+    prebooking = tuple(d.date() for d in (
+        datetime.now() - timedelta(days=1),
+        datetime.now() + timedelta(days=1)
+    ))
+
+    execution = tuple(d.date() for d in (
+        datetime.now() + timedelta(days=10),
+        datetime.now() + timedelta(days=12)
+    ))
+
+    period = periods.add(
+        title="Ferienpass 2018",
+        prebooking=prebooking,
+        execution=execution,
+        active=True
+    )
+
+    fishing = activities.add("Fishing", username='admin@example.org')
+    fishing.state = 'accepted'
+
+    occasions.add(
+        start=datetime(2018, 7, 4, 8),
+        end=datetime(2018, 7, 4, 16),
+        age=(0, 100),
+        spots=(0, 100),
+        timezone="Europe/Zurich",
+        activity=fishing,
+        period=period
+    )
+
+    occasions.add(
+        start=datetime(2018, 7, 5, 8),
+        end=datetime(2018, 7, 5, 16),
+        age=(0, 100),
+        spots=(0, 100),
+        timezone="Europe/Zurich",
+        activity=fishing,
+        period=period
+    )
+
+    transaction.commit()
+
+    client = Client(feriennet_app)
+    client.login_admin()
+    fill_out_profile(client)
+
+    page = client.get('/activity/fishing')
+
+    assert "1. Durchführung" in page
+    assert "2. Durchführung" in page
+
+    assert page.text.find("1. Durch") < page.text.find("2. Durch")
+
+    assert "1. Durchführung" in page.click('Anmelden', index=0)
+    assert "2. Durchführung" in page.click('Anmelden', index=1)
