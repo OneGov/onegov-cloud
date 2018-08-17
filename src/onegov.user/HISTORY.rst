@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves password reset URL generation.
+  [msom]
+
 0.17.6 (2018-03-15)
 ~~~~~~~~~~~~~~~~~~~
 0.17.5 (2018-03-15)

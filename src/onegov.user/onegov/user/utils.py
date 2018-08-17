@@ -1,5 +1,6 @@
 import re
 
+from furl import furl
 from yubico_client import Yubico
 from yubico_client.yubico_exceptions import (
     StatusCodeError,
@@ -136,4 +137,4 @@ def password_reset_url(user, request, url):
         'modified': user.modified.isoformat() if user.modified else ''
     })
 
-    return '{url}?token={token}'.format(url=url.rstrip('/'), token=token)
+    return furl(url).add({'token': token}).url

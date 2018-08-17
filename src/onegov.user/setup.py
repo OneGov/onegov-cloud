@@ -34,6 +34,7 @@ setup(
     python_requires='>=3.6',
     install_requires=[
         'click',
+        'furl',
         'itsdangerous',
         'onegov.core>=0.50.0',
         'onegov.form',
