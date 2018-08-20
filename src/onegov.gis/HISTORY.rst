@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.7.0 (2018-08-20)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to override the default marker icon.
   [href]
 
