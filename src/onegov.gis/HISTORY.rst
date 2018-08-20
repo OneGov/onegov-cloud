@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Adds the ability to override the default marker icon.
+  [href]
+
+- Adds support for light background colors to the marker.
+  [href]
+
 0.6.3 (2018-06-08)
 ~~~~~~~~~~~~~~~~~~~
 

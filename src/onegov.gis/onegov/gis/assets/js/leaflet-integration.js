@@ -65,6 +65,42 @@ L.VectorMarkers.icon = function(options) {
     Leaflet Map Input (setting of coordinates in forms)
 */
 
+function expandShorthandColor(color) {
+    return color.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, function(_m, r, g, b) {
+        return r + r + g + g + b + b;
+    });
+}
+
+// RGB to Luma per ITU BT.601
+function luma(color) {
+    var rgb = parseInt(expandShorthandColor(color).replace('#', ''), 16);
+
+    var r = (rgb >> 16) & 0xff;
+    var g = (rgb >> 8) & 0xff;
+    var b = (rgb >> 0) & 0xff;
+
+    // RGB to Luma per ITU BT.601
+    return 0.299 * r + 0.587 * g + 0.114 * b
+}
+
+function isBrightColor(color) {
+    return luma(color) >= 144;
+}
+
+function getMarkerOptions(input, overrides) {
+    var body = $('body');
+
+    var icon = input.data('marker-icon') || body.data('default-marker-icon') | 'f111';
+    var markerColor = input.data('marker-color') || body.data('default-marker-color') || '#006fba';
+    var iconColor = isBrightColor(markerColor) && '#000' || '#fff';
+
+    return $.extend({
+        markerColor: markerColor,
+        iconColor: iconColor,
+        icon: icon
+    }, overrides || {});
+}
+
 function getCoordinates(input) {
     return JSON.parse(window.atob(input.attr('value')));
 }
@@ -102,9 +138,7 @@ function asMarkerMap(map, input) {
 
     var marker;
     var coordinates = getCoordinates(input);
-    var icon = L.VectorMarkers.icon({
-        markerColor: input.data('marker-color') || $('body').data('default-marker-color') || '#006fba'
-    });
+    var icon = L.VectorMarkers.icon(getMarkerOptions(input));
 
     function addMarker(position, zoom) {
         position = position || map.getCenter();
@@ -342,10 +376,9 @@ var MapboxMarkerMap = function(target) {
 
     /* for now we do not support clicking the marker, so we use marker-noclick
     as a way to disable the pointer cursor */
-    var icon = L.VectorMarkers.icon({
-        extraClasses: ['marker-' + target.data('map-type')],
-        markerColor: target.data('marker-color') || $('body').data('default-marker-color') || '#006fba'
-    });
+    var icon = L.VectorMarkers.icon(getMarkerOptions(target, {
+        extraClasses: ['marker-' + target.data('map-type')]
+    }));
 
     var marker = L.marker({'lat': lat, 'lng': lon}, {
         icon: icon,
@@ -371,9 +404,7 @@ var MapboxGeojsonMap = function(target) {
     var includeZoomControls = true;
     var map = spawnMap(target, lat, lon, zoom, includeZoomControls);
 
-    var icon = L.VectorMarkers.icon({
-        markerColor: $('body').data('default-marker-color') || '#006fba'
-    });
+    var icon = L.VectorMarkers.icon(getMarkerOptions(target));
 
     var pointToLayer = function(_feature, latlng) {
         return L.marker({'lat': latlng.lat, 'lng': latlng.lng}, {
