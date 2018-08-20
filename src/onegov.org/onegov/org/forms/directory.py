@@ -1,4 +1,5 @@
 from cached_property import cached_property
+from colour import Color
 from onegov.core.utils import safe_format_keys
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryZipArchive
@@ -8,6 +9,7 @@ from onegov.form import Form
 from onegov.form import merge_forms
 from onegov.form import parse_formcode
 from onegov.form.errors import FormError
+from onegov.form.fields import IconField
 from onegov.form.fields import UploadField
 from onegov.form.filters import as_float
 from onegov.form.validators import FileSizeLimit
@@ -16,6 +18,7 @@ from onegov.form.validators import WhitelistedMimeType
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import PaymentMethodForm
+from onegov.org.theme.org_theme import user_options
 from sqlalchemy.orm import object_session
 from wtforms import BooleanField
 from wtforms import DecimalField
@@ -24,6 +27,7 @@ from wtforms import StringField
 from wtforms import TextAreaField
 from wtforms import ValidationError
 from wtforms import validators
+from wtforms_components import ColorField
 
 
 class DirectoryBaseForm(Form):
@@ -97,6 +101,27 @@ class DirectoryBaseForm(Form):
             'class_': 'formcode-select',
             'data-fields-include': 'fileinput'
         }
+    )
+
+    marker_icon = IconField(
+        label=_("Icon"),
+        fieldset=_("Marker"),
+    )
+
+    marker_color_type = RadioField(
+        label=_("Marker Color"),
+        fieldset=_("Marker"),
+        choices=[
+            ('default', _("Default")),
+            ('custom', _("Custom"))
+        ],
+        default='default'
+    )
+
+    marker_color_value = ColorField(
+        label=_("Color"),
+        fieldset=_("Marker"),
+        depends_on=('marker_color_type', 'custom')
     )
 
     order = RadioField(
@@ -218,6 +243,21 @@ class DirectoryBaseForm(Form):
             )
 
     @property
+    def default_marker_color(self):
+        return self.request.app.org.theme_options.get('primary-color')\
+            or user_options['primary-color']
+
+    @property
+    def marker_color(self):
+        if self.marker_color_value.data:
+            return self.marker_color_value.data.get_hex()
+
+    @marker_color.setter
+    def marker_color(self, value):
+        self.marker_color_value.data = Color(
+            value or self.default_marker_color)
+
+    @property
     def configuration(self):
         content_fields = list(self.extract_field_ids(self.content_fields))
         contact_fields = list(self.extract_field_ids(self.contact_fields))
@@ -265,8 +305,20 @@ class DirectoryBaseForm(Form):
         super().populate_obj(obj, exclude={'configuration'})
         obj.configuration = self.configuration
 
+        if self.marker_color_type.data == 'default':
+            obj.marker_color = None
+        else:
+            obj.marker_color = self.marker_color
+
     def process_obj(self, obj):
         self.configuration = obj.configuration
+
+        if obj.marker_color:
+            self.marker_color_type.data = 'custom'
+            self.marker_color = obj.marker_color
+        else:
+            self.marker_color_type.data = 'default'
+            self.marker_color = self.default_marker_color
 
 
 class DirectoryForm(merge_forms(DirectoryBaseForm, PaymentMethodForm)):

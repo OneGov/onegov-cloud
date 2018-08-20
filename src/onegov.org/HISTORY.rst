@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to select a custom icon/color for the directory marker.
+  [href]
+
 - Disables the image resize capability in the editor.
   [href]
 

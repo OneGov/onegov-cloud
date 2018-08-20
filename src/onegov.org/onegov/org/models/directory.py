@@ -168,6 +168,9 @@ class ExtendedDirectory(Directory, HiddenFromPublicExtension, Extendable):
 
     searchwidget_config = content_property()
 
+    marker_icon = content_property()
+    marker_color = content_property()
+
     @property
     def es_public(self):
         return not self.is_hidden_from_public

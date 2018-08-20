@@ -4622,3 +4622,15 @@ h2 + div.timeline {
     max-width: 256px;
     max-height: 256px;
 }
+
+/*
+    Icon widget customisation
+*/
+.icon-widget {
+    li:hover,
+    li.active {
+        background: $primary-color !important;
+        border-color: $primary-fg-color !important;
+        color: $primary-fg-color !important;
+    }
+}

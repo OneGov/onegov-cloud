@@ -1790,6 +1790,7 @@ class DirectoryCollectionLayout(DefaultLayout):
         super().__init__(model, request)
         self.include_editor()
         self.include_code_editor()
+        self.request.include('iconwidget')
 
     @cached_property
     def breadcrumbs(self):
