@@ -1,5 +1,6 @@
 from datetime import date
 from freezegun import freeze_time
+from onegov.ballot import Candidate
 from onegov.ballot import Election
 from onegov.ballot import ElectionAssociation
 from onegov.ballot import ElectionResult
@@ -180,6 +181,14 @@ def test_election_layout_menu_majorz(session):
             eligible_voters=500,
         )
     )
+    election.candidates.append(
+        Candidate(
+            candidate_id='1',
+            family_name="1",
+            first_name="1",
+            elected=False
+        )
+    )
     assert ElectionLayout(election, request).menu == [
         ('Candidates', '', False, [
             ('Candidates', 'Election/candidates', False, []),
@@ -251,6 +260,14 @@ def test_election_layout_menu_proporz(session):
             entity_id=1,
             counted=True,
             eligible_voters=500,
+        )
+    )
+    election.candidates.append(
+        Candidate(
+            candidate_id='1',
+            family_name="1",
+            first_name="1",
+            elected=False
         )
     )
     assert ElectionLayout(election, request).menu == [
