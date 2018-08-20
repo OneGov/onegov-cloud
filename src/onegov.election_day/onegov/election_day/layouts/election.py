@@ -85,11 +85,13 @@ class ElectionLayout(DetailLayout):
             )
         if tab == 'candidate-by-entity':
             return (
+                self.has_candidates and
                 self.show_map and
                 not self.tacit
             )
         if tab == 'candidate-by-district':
             return (
+                self.has_candidates and
                 self.show_map and
                 self.has_districts and
                 not self.tacit
@@ -142,6 +144,12 @@ class ElectionLayout(DetailLayout):
     @cached_property
     def tacit(self):
         if self.model.tacit:
+            return True
+        return False
+
+    @cached_property
+    def has_candidates(self):
+        if self.model.candidates.first():
             return True
         return False
 

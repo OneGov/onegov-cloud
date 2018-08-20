@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Displays elections withouth candidacies correctly.
+  [msom]
+
 3.6.3 (2018-07-19)
 ~~~~~~~~~~~~~~~~~~~
 

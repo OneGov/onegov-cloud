@@ -18,7 +18,11 @@
             <h3 tal:content="layout.title()" />
             <h4 tal:condition="layout.subtitle()" i18n:translate="">${layout.subtitle()}</h4>
 
-            <div class="row" tal:condition="not: election.tacit">
+            <p tal:condition="not layout.has_candidates" i18n:translate="">
+                No candidacies.
+            </p>
+
+            <div tal:condition="layout.has_candidates" class="row" tal:condition="not: election.tacit">
                 <div class="small-12 small-centered large-10 columns">
                     <figure>
                         <div class="bar-chart"
@@ -34,7 +38,7 @@
                 </div>
             </div>
 
-            <table class="results tablesaw collapsible collapsed sortable"
+            <table tal:condition="layout.has_candidates" class="results tablesaw collapsible collapsed sortable"
                 data-tablesaw-mode="columntoggle"
                 data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
                 data-tablesaw-minimap=""
