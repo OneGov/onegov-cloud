@@ -3,6 +3,7 @@ import inspect
 from onegov.core.html import sanitize_html
 from onegov.core.utils import binary_to_dictionary
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
+from onegov.form.widgets import IconWidget
 from onegov.form.widgets import MultiCheckboxWidget
 from onegov.form.widgets import OrderedMultiCheckboxWidget
 from onegov.form.widgets import TagsWidget
@@ -134,3 +135,9 @@ class TagsField(StringField):
 
     def process_data(self, value):
         self.data = value and ','.join(value) or ''
+
+
+class IconField(StringField):
+    """ Selects an icon out of a number of icons. """
+
+    widget = IconWidget()

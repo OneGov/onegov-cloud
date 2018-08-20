@@ -1,0 +1,27 @@
+.icon-widget ul {
+    display: flex;
+    list-style: none;
+    margin-left: 0;
+}
+
+.icon-widget li {
+    border-radius: 50px;
+    border: 2px solid #ddd;
+    box-shadow: 2px 2px 2px transparent;
+    box-sizing: content-box;
+    height: 1.7rem;
+    line-height: 1.7rem;
+    margin-right: 7px;
+    opacity: 0.5;
+    text-align: center;
+    width: 1.7rem;
+}
+
+.icon-widget li.active,
+.icon-widget li:hover {
+    border-color: #555;
+    box-shadow: 2px 2px 2px rgba(0,0,0,0.2);
+    box-sizing: content-box;
+    color: #555;
+    opacity: 1.0;
+}

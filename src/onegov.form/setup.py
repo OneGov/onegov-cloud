@@ -34,6 +34,7 @@ setup(
     python_requires='>=3.6',
     install_requires=[
         'cached_property',
+        'chameleon',
         'colour>=0.0.4',
         'humanize',
         'jsonpickle',

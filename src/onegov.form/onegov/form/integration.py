@@ -70,6 +70,11 @@ def get_js_path():
     return 'assets/js'
 
 
+@FormApp.webasset_path()
+def get_css_path():
+    return 'assets/css'
+
+
 @FormApp.webasset('formcode')
 def get_formcode_asset():
     yield 'utils.js'
@@ -78,3 +83,9 @@ def get_formcode_asset():
     yield 'snippets.jsx'
     yield 'format.jsx'
     yield 'select.jsx'
+
+
+@FormApp.webasset('iconwidget')
+def get_iconwidget_asset():
+    yield 'iconwidget.css'
+    yield 'iconwidget.js'

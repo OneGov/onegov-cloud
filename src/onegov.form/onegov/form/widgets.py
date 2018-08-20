@@ -1,3 +1,4 @@
+import chameleon
 import humanize
 
 from cgi import escape
@@ -133,3 +134,50 @@ class UploadWidget(FileInput):
 class TagsWidget(TextInput):
     # for use with https://github.com/developit/tags-input
     input_type = 'tags'
+
+
+class IconWidget(TextInput):
+
+    iconfont = 'FontAwesome'
+    icons = (
+        '&#xf111',  # fa-circle
+        '&#xf005',  # fa-star
+        '&#xf06a',  # fa-exclamation-circle
+        '&#xf059',  # fa-question-circle
+        '&#xf05e',  # fa-ban
+        '&#xf1b9',  # fa-car
+        '&#xf238',  # fa-train
+        '&#xf206',  # fa-bicycle
+        '&#xf291',  # fa-shopping-basket
+        '&#xf1b0',  # fa-paw
+        '&#xf1ae',  # fa-child
+        '&#xf06d',  # fa-fire
+        '&#xf1f8',  # fa-trash
+        '&#xf236',  # fa-hotel
+        '&#xf0f4',  # fa-coffee
+        '&#xf017',  # fa-click
+    )
+
+    template = chameleon.PageTemplate("""
+        <div class="icon-widget">
+            <ul style="font-family: ${iconfont}">
+                <li
+                    tal:repeat="icon icons"
+                    tal:content="structure icon"
+                />
+            </ul>
+
+            <input type="hidden" name="${id}" value="${structure: value}">
+        </div>
+    """)
+
+    def __call__(self, field, **kwargs):
+        iconfont = kwargs.pop('iconfont', self.iconfont)
+        icons = kwargs.pop('icons', self.icons)
+
+        return HTMLString(self.template.render(
+            iconfont=iconfont,
+            icons=icons,
+            id=field.id,
+            value=field.data or icons[0]
+        ))
