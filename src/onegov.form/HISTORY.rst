@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.34.0 (2018-08-20)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds an icon field to select icons from iconsets.
   [href]
