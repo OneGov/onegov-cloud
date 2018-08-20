@@ -22,7 +22,7 @@
                 No candidacies.
             </p>
 
-            <div tal:condition="layout.has_candidates" class="row" tal:condition="not: election.tacit">
+            <div class="row" tal:condition="not election.tacit and layout.has_candidates">
                 <div class="small-12 small-centered large-10 columns">
                     <figure>
                         <div class="bar-chart"

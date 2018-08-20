@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes the election template.
+  [msom]
+
 3.6.4 (2018-08-20)
 ~~~~~~~~~~~~~~~~~~~
 
