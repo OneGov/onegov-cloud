@@ -64,6 +64,7 @@ class UserProfileForm(Form):
         label=_("Address"),
         fieldset=_("Personal"),
         render_kw={'rows': 4},
+        validators=[InputRequired()]
     )
 
     zip_code = StringField(

@@ -37,6 +37,7 @@ def fill_out_profile(client, first_name="Scrooge", last_name="McDuck"):
     profile.form['salutation'] = 'mr'
     profile.form['first_name'] = first_name
     profile.form['last_name'] = last_name
+    profile.form['address'] = 'foobar'
     profile.form['zip_code'] = '1234'
     profile.form['place'] = 'Duckburg'
     profile.form['emergency'] = '0123 456 789 ({} {})'.format(
@@ -1720,6 +1721,7 @@ def test_occasion_attendance_collection(feriennet_app):
     page.form['last_name'] = 'bar'
     page.form['zip_code'] = '123'
     page.form['place'] = 'abc'
+    page.form['address'] = 'abc'
     page.form['emergency'] = '123456789 Admin'
     page.form.submit()
 
@@ -1949,6 +1951,7 @@ def test_userprofile_login(feriennet_app):
     page.form['last_name'] = 'McDuck'
     page.form['zip_code'] = '1234'
     page.form['place'] = 'Duckburg'
+    page.form['address'] = 'Foobar'
     page.form['emergency'] = '0123 456 789 (Scrooge McDuck)'
     page = page.form.submit().follow()
 
