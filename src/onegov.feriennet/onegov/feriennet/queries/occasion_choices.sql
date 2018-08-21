@@ -20,8 +20,7 @@ JOIN activities
 JOIN LATERAL (
     SELECT COUNT(*) as count
     FROM bookings
-    WHERE bookings.state = 'accepted'
-    AND bookings.occasion_id = occasions.id
+    WHERE bookings.occasion_id = occasions.id
 ) AS participants ON TRUE
 
 ORDER BY
