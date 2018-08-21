@@ -261,3 +261,20 @@ def test_notification_template_send_form(session):
 
     form.request = request(admin=True)
     assert len(form.recipients_with_unpaid_bills()) == 1
+
+    # organisers are not counted as active if the occasion has been cancelled
+    occasions = OccasionCollection(session)
+
+    occasions.query().first().cancelled = True
+    transaction.commit()
+
+    form.request = request(admin=True)
+    assert len(form.recipients_which_are_active_organisers()) == 1
+
+    for occasion in occasions.query():
+        occasion.cancelled = False
+
+    transaction.commit()
+
+    form.request = request(admin=True)
+    assert len(form.recipients_which_are_active_organisers()) == 2

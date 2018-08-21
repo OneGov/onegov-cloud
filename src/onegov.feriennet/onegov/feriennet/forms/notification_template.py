@@ -183,6 +183,7 @@ class NotificationTemplateSendForm(Form):
         q = q.join(Activity)
         q = q.join(Period)
         q = q.filter(Period.active == True)
+        q = q.filter(Occasion.cancelled == False)
 
         q = q.with_entities(distinct(Activity.username).label('username'))
 
