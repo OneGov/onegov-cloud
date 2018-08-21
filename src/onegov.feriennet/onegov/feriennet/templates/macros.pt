@@ -358,6 +358,10 @@
                 <span i18n:translate>Independent of other occasions</span>
             </div>
 
+            <div class="bring-cash" tal:condition="period.all_inclusive and occasion.cost and period.pay_organiser_directly" i18n:translate>
+                Please bring <tal:b i18n:name="cost" replace="occasion.cost" /> CHF in cash.
+            </div>
+
             <div class="note" tal:condition="occasion.note">
                 <p tal:condition="occasion.note">${occasion.note}</p>
             </div>

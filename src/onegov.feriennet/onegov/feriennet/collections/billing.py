@@ -236,7 +236,7 @@ class BillingCollection(object):
         for booking in q:
             actual_attendees.add(booking.attendee_id)
 
-            if booking.cost:
+            if not period.pay_organiser_directly and booking.cost:
                 session.add(InvoiceItem(
                     username=booking.username,
                     invoice=invoice,

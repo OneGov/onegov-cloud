@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-08-16 13:42+0200\n"
+"POT-Creation-Date: 2018-08-21 11:37+0200\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -108,9 +108,6 @@ msgstr "Proposer à nouveau"
 msgid "Edit"
 msgstr "Modifier"
 
-msgid "Show Ticket"
-msgstr "Afficher le ticket"
-
 msgid ""
 "This booking cannot be removed, at least one booking has been paid online."
 msgstr ""
@@ -134,6 +131,9 @@ msgstr "Supprimer ${count} réservations"
 
 msgid "New Occasion"
 msgstr "Nouvelle offre"
+
+msgid "Show Ticket"
+msgstr "Afficher le ticket"
 
 msgid "Request Publication"
 msgstr "Demander la publication"
@@ -538,6 +538,9 @@ msgstr "Prix du passeport"
 msgid "The administrative cost of each booking"
 msgstr "Le coût administratif de chaque réservation"
 
+msgid "How is the organiser paid?"
+msgstr "Comment l'organisateur est-il payé ?"
+
 msgid "Required minutes between bookings"
 msgstr "Temps de transfert nécessaire entre les activités, en minutes"
 
@@ -571,6 +574,18 @@ msgid ""
 msgstr ""
 "Chaque participant peut réserver un nombre limité d'activités pour un prix "
 "forfaitaire."
+
+msgid "The parents pay everything by bill, the organisers are paid later"
+msgstr ""
+"Les parents paient tout via facturation, les organisateurs sont payés plus "
+"tard"
+
+msgid ""
+"The parents pay the pass by bill, the organisers are paid in cash at the "
+"beginning of each occasion"
+msgstr ""
+"Les parents paient le passe via facturation, les organisateurs sont payés en"
+" liquide au début de chaque événement"
 
 msgid "Yes"
 msgstr "Oui"
@@ -1248,6 +1263,9 @@ msgstr "Annulé"
 msgid "${count} spots available"
 msgstr "${count} places disponibles"
 
+msgid "${count} attendees"
+msgstr "${count} participants"
+
 msgid "Age"
 msgstr "Âge"
 
@@ -1260,9 +1278,6 @@ msgstr "${min_spots} – ${max_spots} participants"
 msgid "up to ${max_spots} participants"
 msgstr "jusqu'à ${max_spots} participants"
 
-msgid "${count} attendees"
-msgstr "${count} participants"
-
 msgid "${cost} CHF"
 msgstr "${cost} CHF"
 
@@ -1274,6 +1289,9 @@ msgstr "Gratuit"
 
 msgid "Independent of other occasions"
 msgstr "Indépendant d'autres événements"
+
+msgid "Please bring ${cost} CHF in cash."
+msgstr "Veuillez apporter ${cost} CHF en liquide."
 
 msgid "Enroll your child now."
 msgstr "Inscrivez votre enfant dès maintenant."

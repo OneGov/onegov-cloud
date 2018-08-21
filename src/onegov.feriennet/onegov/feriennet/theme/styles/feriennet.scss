@@ -644,6 +644,10 @@ ul.tags {
     .note::before {
         @include icon('\f24a');
     }
+
+    .bring-cash::before {
+        @include icon('\f0a2');
+    }
 }
 
 @media print {

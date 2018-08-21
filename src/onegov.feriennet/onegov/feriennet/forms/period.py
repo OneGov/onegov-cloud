@@ -127,6 +127,23 @@ class PeriodForm(Form):
         depends_on=('pass_system', 'no')
     )
 
+    pay_organiser_directly = RadioField(
+        label=_("How is the organiser paid?"),
+        fieldset=_("Execution"),
+        choices=[
+            ('indirect', _(
+                "The parents pay everything by bill, "
+                "the organisers are paid later"
+            )),
+            ('direct', _(
+                "The parents pay the pass by bill, the organisers are paid in "
+                "cash at the beginning of each occasion"
+            ))
+        ],
+        default='indirect',
+        depends_on=('pass_system', 'yes')
+    )
+
     minutes_between = IntegerField(
         label=_("Required minutes between bookings"),
         fieldset=_("Bookings"),
@@ -190,6 +207,7 @@ class PeriodForm(Form):
             'deadline_days',
             'deadline_date',
             'one_booking_per_day',
+            'pay_organiser_directly'
         })
 
         if self.pass_system.data == 'yes':
@@ -213,6 +231,11 @@ class PeriodForm(Form):
         else:
             model.alignment = None
 
+        if self.pay_organiser_directly.data == 'direct':
+            model.pay_organiser_directly = True
+        else:
+            model.pay_organiser_directly = False
+
     def process_obj(self, model):
         super().process_obj(model)
 
@@ -233,6 +256,11 @@ class PeriodForm(Form):
             self.one_booking_per_day.data = 'no'
         else:
             self.one_booking_per_day.data = 'yes'
+
+        if model.pay_organiser_directly:
+            self.pay_organiser_directly.data = 'direct'
+        else:
+            self.pay_organiser_directly.data = 'indirect'
 
     @cached_property
     def conflicting_activities(self):
