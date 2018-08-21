@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a flag indicating that the organiser should be paid directly.
+  [href]
+
 1.8.2 (2018-08-02)
 ~~~~~~~~~~~~~~~~~~~
 
