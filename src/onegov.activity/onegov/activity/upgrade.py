@@ -466,3 +466,12 @@ def rename_occasion_durations_to_the_singular(context):
 
     for occasion in context.session.query(Occasion):
         occasion.on_date_change()
+
+
+@upgrade_task('Add pay_organiser_directly column')
+def add_pay_organiser_directly_column(context):
+    context.add_column_with_defaults(
+        table='periods',
+        column=Column('pay_organiser_directly', Boolean, nullable=False),
+        default=False
+    )

@@ -72,6 +72,9 @@ class Period(Base, TimestampMixin):
     #: or for each single booking
     all_inclusive = Column(Boolean, nullable=False, default=False)
 
+    #: True if the costs of an occasions need to be paid to the organiser
+    pay_organiser_directly = Column(Boolean, nullable=False, default=False)
+
     #: Time between bookings in minutes
     minutes_between = Column(Integer, nullable=True, default=0)
 
