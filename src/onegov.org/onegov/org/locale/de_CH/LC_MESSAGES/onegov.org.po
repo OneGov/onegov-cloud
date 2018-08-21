@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-08-10 10:57+0200\n"
+"POT-Creation-Date: 2018-08-21 09:49+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1054,6 +1054,18 @@ msgstr "Filter"
 msgid "Thumbnail"
 msgstr "Thumbnail"
 
+msgid "Icon"
+msgstr "Symbol"
+
+msgid "Marker"
+msgstr "Marker"
+
+msgid "Marker Color"
+msgstr "Marker Farbe"
+
+msgid "Color"
+msgstr "Farbe"
+
 msgid "Order"
 msgstr "Sortierung"
 
@@ -1090,6 +1102,12 @@ msgstr "Die folgenden Felder sind unbekannt: ${fields}"
 
 msgid "Please select at most one thumbnail field"
 msgstr "Bitte wählen Sie höchstens ein Thumbnail Feld"
+
+msgid "Default"
+msgstr "Standard"
+
+msgid "Custom"
+msgstr "Eigene"
 
 msgid "By title"
 msgstr "Nach Titel"
