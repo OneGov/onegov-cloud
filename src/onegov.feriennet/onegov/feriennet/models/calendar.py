@@ -92,7 +92,7 @@ class AttendeeCalendar(Calendar, name='attendee'):
         for record in records:
             event = icalendar.Event()
 
-            event.add('uid', record.booking_id.hex)
+            event.add('uid', record.uid)
             event.add('summary', record.title)
 
             if record.note:

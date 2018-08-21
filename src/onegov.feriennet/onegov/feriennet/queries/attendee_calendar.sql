@@ -2,20 +2,21 @@
     Basis for the attendee calendar
 */
 SELECT
-    periods.title as period,                          -- Text
-    periods.confirmed as confirmed,                   -- Boolean
-    activities.title,                                 -- Text
-    activities.name,                                  -- Text
-    activities.content->'coordinates'->>'lat' as lat, -- Text
-    activities.content->'coordinates'->>'lon' as lon, -- Text
-    occasion_dates.start,                             -- UTCDateTime
-    occasion_dates.end,                               -- UTCDateTime
-    occasions.meeting_point,                          -- Text
-    occasions.note,                                   -- Text
-    occasions.cancelled,                              -- Boolean
-    bookings.attendee_id,                             -- UUID
-    bookings.state,                                   -- Text
-    bookings.id as booking_id                         -- UUID
+    bookings.id::text || '-' || to_char(occasion_dates.start, 'YYYY-MM-DD') as uid, --Text
+    periods.title as period,                                                        -- Text
+    periods.confirmed as confirmed,                                                 -- Boolean
+    activities.title,                                                               -- Text
+    activities.name,                                                                -- Text
+    activities.content->'coordinates'->>'lat' as lat,                               -- Text
+    activities.content->'coordinates'->>'lon' as lon,                               -- Text
+    occasion_dates.start,                                                           -- UTCDateTime
+    occasion_dates.end,                                                             -- UTCDateTime
+    occasions.meeting_point,                                                        -- Text
+    occasions.note,                                                                 -- Text
+    occasions.cancelled,                                                            -- Boolean
+    bookings.attendee_id,                                                           -- UUID
+    bookings.state,                                                                 -- Text
+    bookings.id as booking_id                                                       -- UUID
 
 FROM
     occasion_dates
