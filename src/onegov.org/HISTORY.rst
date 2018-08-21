@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.32.0 (2018-08-21)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to select a custom icon/color for the directory marker.
   [href]
 
