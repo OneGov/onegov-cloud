@@ -217,11 +217,23 @@ class NotificationTemplateSendForm(Form):
 
         return q
 
-    def recipients_by_occasion(self, occasions):
+    def recipients_by_occasion(self, occasions, include_organisers=True):
         q = self.recipients_by_occasion_query(occasions)
         q = q.with_entities(distinct(Booking.username).label('username'))
 
-        return {b.username for b in q}
+        attendees = {r.username for r in q}
+
+        if not include_organisers:
+            return attendees
+
+        q = OccasionCollection(self.request.session).query()
+        q = q.join(Activity)
+        q = q.filter(Occasion.id.in_(occasions))
+        q = q.with_entities(distinct(Activity.username).label('username'))
+
+        organisers = {r.username for r in q}
+
+        return attendees | organisers
 
     def recipients_count_by_occasion(self, occasions):
         q = self.recipients_by_occasion_query(occasions)

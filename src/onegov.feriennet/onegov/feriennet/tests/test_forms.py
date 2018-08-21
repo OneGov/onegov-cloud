@@ -122,7 +122,7 @@ def test_notification_template_send_form(session):
     o2.username = organiser.username
 
     a1 = attendees.add(admin, 'Dustin', date(2000, 1, 1), 'male')
-    a2 = attendees.add(admin, 'Mike', date(2000, 1, 1), 'female')
+    a2 = attendees.add(organiser, 'Mike', date(2000, 1, 1), 'female')
 
     b1 = bookings.add(admin, a1, o1)
     b1.state = 'accepted'
@@ -192,7 +192,12 @@ def test_notification_template_send_form(session):
     form.on_request()
 
     occasions = [c[0] for c in form.occasion.choices]
-    assert len(form.recipients_by_occasion(occasions)) == 0
+
+    # with organisers
+    assert len(form.recipients_by_occasion(occasions, True)) == 2
+
+    # without
+    assert len(form.recipients_by_occasion(occasions, False)) == 0
 
     # the number of users is indepenedent of the period
     assert len(form.recipients_by_role(('admin', 'editor', 'member'))) == 3
@@ -208,10 +213,15 @@ def test_notification_template_send_form(session):
     assert len(form.recipients_by_occasion(occasions)) == 2
 
     # only accepted bookings are counted
-    bookings.query().first().state = 'cancelled'
+    parent = admin.username
+    bookings.query().filter_by(username=parent).one().state = 'cancelled'
     transaction.commit()
 
-    assert len(form.recipients_by_occasion(occasions)) == 1
+    # without organisers
+    assert len(form.recipients_by_occasion(occasions, False)) == 1
+
+    # with
+    assert len(form.recipients_by_occasion(occasions, True)) == 2
 
     # inactive users may be exluded
     form.state.data = ['active']
