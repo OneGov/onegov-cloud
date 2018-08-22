@@ -11,6 +11,15 @@ class Client(TestApp):
     skip_first_form = False
     use_intercooler = False
 
+    def spawn(self):
+        """ Spawns a new client that points to the same app.
+
+        All login data / cookies are lost.
+
+        """
+
+        return self.__class__(self.app)
+
     def login(self, username, password, to=None):
         """ Login a user through the usualy /auth/login path. """
 
