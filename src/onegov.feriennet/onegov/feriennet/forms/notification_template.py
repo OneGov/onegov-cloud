@@ -3,14 +3,15 @@ from onegov.activity import Booking, BookingCollection
 from onegov.activity import Occasion, OccasionCollection
 from onegov.activity import Period
 from onegov.core.orm import as_selectable_from_path
+from onegov.core.utils import module_path
 from onegov.feriennet import _
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.layout import DefaultLayout
+from onegov.feriennet.models import NotificationTemplate
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.user import User, UserCollection
-from onegov.core.utils import module_path
-from sqlalchemy import distinct, or_, func, and_, select
+from sqlalchemy import distinct, or_, func, and_, select, exists
 from uuid import uuid4
 from wtforms.fields import StringField, TextAreaField, RadioField
 from wtforms.validators import InputRequired
@@ -28,6 +29,18 @@ class NotificationTemplateForm(Form):
         validators=[InputRequired()],
         render_kw={'rows': 12}
     )
+
+    def ensure_not_duplicate_subject(self):
+        q = self.request.session.query(exists().where(
+            NotificationTemplate.subject == self.subject.data
+        ))
+
+        if q.scalar():
+            self.subject.errors.append(
+                _("A notification with this subject exists already")
+            )
+
+            return False
 
 
 class NotificationTemplateSendForm(Form):

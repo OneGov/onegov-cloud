@@ -1240,6 +1240,17 @@ def test_send_email(client, scenario):
     assert "Ferienpass 2016 body" in message
 
 
+def test_create_duplicate_notification(client):
+    client.login_admin()
+
+    page = client.get('/notifications').click('Neue Mitteilungs-Vorlage')
+    page.form['subject'] = 'Foo'
+    page.form['text'] = 'Bar'
+
+    page.form.submit().follow()
+    assert "existiert bereits" in page.form.submit()
+
+
 def test_import_account_statement(client, scenario):
     scenario.add_period(confirmed=True)
     scenario.add_activity(title="Foobar", state='accepted')
