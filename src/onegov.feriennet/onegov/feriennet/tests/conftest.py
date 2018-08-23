@@ -6,6 +6,34 @@ from onegov.feriennet.initial_content import create_new_organisation
 from onegov.user import User
 from onegov_testing.utils import create_app
 from pytest_localserver.http import WSGIServer
+from fixtures.scenario import Scenario
+from onegov_testing import Client as BaseClient
+
+
+class Client(BaseClient):
+    skip_first_form = True
+    use_intercooler = True
+
+    def fill_out_profile(self, first_name="Scrooge", last_name="McDuck"):
+        profile = self.get('/userprofile')
+        profile.form['salutation'] = 'mr'
+        profile.form['first_name'] = first_name
+        profile.form['last_name'] = last_name
+        profile.form['address'] = 'foobar'
+        profile.form['zip_code'] = '1234'
+        profile.form['place'] = 'Duckburg'
+        profile.form['emergency'] = f'0123 456 789 ({first_name} {last_name})'
+        profile.form.submit()
+
+
+@pytest.fixture(scope='function')
+def client(feriennet_app):
+    return Client(feriennet_app)
+
+
+@pytest.fixture(scope='function')
+def client_with_es(es_feriennet_app):
+    return Client(es_feriennet_app)
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -89,3 +117,8 @@ def create_feriennet_app(request, use_elasticsearch):
     session.close_all()
 
     return app
+
+
+@pytest.fixture(scope='function')
+def scenario(request):
+    yield Scenario(request)

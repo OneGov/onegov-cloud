@@ -1,48 +1,14 @@
 import onegov.feriennet
 import requests_mock
-import transaction
 
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, time
 from freezegun import freeze_time
-from onegov.activity import ActivityCollection
-from onegov.activity import AttendeeCollection
-from onegov.activity import BookingCollection
-from onegov.activity import OccasionCollection
-from onegov.activity import PeriodCollection
 from onegov.activity.utils import generate_xml
 from onegov.core.custom import json
-from onegov.core.utils import Bunch
-from onegov.pay import Payment, PaymentProviderCollection
-from onegov_testing import Client as BaseClient
+from onegov.pay import Payment
 from onegov_testing import utils
-from onegov.user import UserCollection
 from psycopg2.extras import NumericRange
 from webtest import Upload
-
-
-class Client(BaseClient):
-    skip_first_form = True
-
-
-def get_post_url(page, css_class):
-    return page.pyquery('a.{}'.format(css_class)).attr('ic-post-to')
-
-
-def get_delete_link(page, index=0):
-    return page.pyquery('a[ic-delete-from]')[index].attrib['ic-delete-from']
-
-
-def fill_out_profile(client, first_name="Scrooge", last_name="McDuck"):
-    profile = client.get('/userprofile')
-    profile.form['salutation'] = 'mr'
-    profile.form['first_name'] = first_name
-    profile.form['last_name'] = last_name
-    profile.form['address'] = 'foobar'
-    profile.form['zip_code'] = '1234'
-    profile.form['place'] = 'Duckburg'
-    profile.form['emergency'] = '0123 456 789 ({} {})'.format(
-        first_name, last_name)
-    profile.form.submit()
 
 
 def test_view_permissions():
@@ -50,43 +16,21 @@ def test_view_permissions():
         onegov.feriennet, onegov.feriennet.FeriennetApp)
 
 
-def test_activity_permissions(es_feriennet_app):
-    anon = Client(es_feriennet_app)
+def test_activity_permissions(client, scenario):
+    anon = client.spawn()
+    admin = client.spawn()
+    editor = client.spawn()
 
-    admin = Client(es_feriennet_app)
     admin.login_admin()
-
-    editor = Client(es_feriennet_app)
     editor.login_editor()
 
-    new = editor.get('/activities').click("Angebot erfassen")
-    new.form['title'] = "Learn How to Program"
-    new.form['lead'] = "Using a Raspberry Pi we will learn Python"
-    new.form.submit()
-
-    transaction.begin()
-
-    periods = PeriodCollection(es_feriennet_app.session())
-    activities = ActivityCollection(es_feriennet_app.session())
-    occasions = OccasionCollection(es_feriennet_app.session())
-
-    # for the overview we need an active period and existing occasions
-    # (at least for anonymous)
-    period = periods.add(
-        title="2016",
-        prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
-        execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
-        active=True
+    scenario.add_period()
+    scenario.add_activity(
+        title="Learn How to Program",
+        username='editor@example.org'
     )
-    for activity in activities.query():
-        occasions.add(
-            activity, period,
-            datetime(2016, 1, 1, 10),
-            datetime(2016, 1, 1, 18),
-            'Europe/Zurich'
-        )
-
-    transaction.commit()
+    scenario.add_occasion()
+    scenario.commit()
 
     url = '/activity/learn-how-to-program'
 
@@ -97,7 +41,7 @@ def test_activity_permissions(es_feriennet_app):
     assert anon.get(url, status=404)
     assert admin.get(url, status=200)
 
-    editor.post(get_post_url(editor.get(url), 'request-publication'))
+    editor.get(url).click("Publikation beantragen")
 
     assert "Learn How to Program" in editor.get('/activities')
     assert "Learn How to Program" not in anon.get('/activities')
@@ -107,7 +51,7 @@ def test_activity_permissions(es_feriennet_app):
     assert admin.get(url, status=200)
 
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
-    admin.post(get_post_url(ticket, 'accept-activity'))
+    ticket.click("Veröffentlichen")
 
     assert "Learn How to Program" in editor.get('/activities')
     assert "Learn How to Program" in anon.get('/activities')
@@ -117,7 +61,7 @@ def test_activity_permissions(es_feriennet_app):
     assert admin.get(url, status=200)
 
     ticket = admin.get(ticket.request.url)
-    admin.post(get_post_url(ticket, 'archive-activity'))
+    ticket.click("Archivieren")
 
     assert "Learn How to Program" in editor.get('/activities')
     assert "Learn How to Program" not in anon.get('/activities')
@@ -127,198 +71,135 @@ def test_activity_permissions(es_feriennet_app):
     assert admin.get(url, status=200)
 
 
-def test_activity_communication(feriennet_app):
-    periods = PeriodCollection(feriennet_app.session())
-    periods.add(
-        title="2016",
-        prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
-        execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
-        active=True
+def test_activity_communication(client, scenario):
+    scenario.add_period()
+    scenario.add_activity(
+        title="Learn Python",
+        lead="Using a Raspberry Pi we will learn Python",
+        username='editor@example.org'
     )
-    transaction.commit()
+    scenario.add_occasion()
+    scenario.commit()
 
-    admin = Client(feriennet_app)
+    admin = client.spawn()
     admin.login_admin()
 
-    editor = Client(feriennet_app)
+    editor = client.spawn()
     editor.login_editor()
 
-    new = editor.get('/activities').click("Angebot erfassen")
-    new.form['title'] = "Learn Python"
-    new.form['lead'] = "Using a Raspberry Pi we will learn Python"
-    activity = new.form.submit().follow()
+    editor.get('/activity/learn-python').click("Publikation beantragen")
 
-    occasion = activity.click("Neue Durchführung")
-    occasion.form['dates'] = json.dumps({
-        'values': [{
-            'start': '2016-10-04 10:00:00',
-            'end': '2016-10-04 12:00:00'
-        }]
-    })
-    occasion.form['meeting_point'] = "Franz Karl Weber"
-    occasion.form['note'] = "No griefers"
-    occasion.form['min_age'] = 10
-    occasion.form['max_age'] = 20
-    occasion.form['min_spots'] = 30
-    occasion.form['max_spots'] = 40
-    occasion.form.submit()
-
-    editor.post(get_post_url(
-        editor.get('/activity/learn-python'), 'request-publication'))
-
-    assert len(feriennet_app.smtp.outbox) == 1
+    assert len(client.app.smtp.outbox) == 1
     assert "Ein neues Ticket" in admin.get_email(0)
 
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
     assert "Learn Python" in ticket
 
-    admin.post(get_post_url(ticket, 'accept-activity'))
-    assert len(feriennet_app.smtp.outbox) == 2
+    ticket.click("Veröffentlichen")
+    assert len(client.app.smtp.outbox) == 2
+
     message = admin.get_email(1)
     assert "wurde veröffentlicht" in message
     assert "Learn Python" in message
     assert "Using a Raspberry Pi we will learn Python" in message
 
 
-def test_activity_search(es_feriennet_app):
-    periods = PeriodCollection(es_feriennet_app.session())
-    periods.add(
-        title="2016",
-        prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
-        execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
-        active=True
+def test_activity_search(client_with_es, scenario):
+    client = client_with_es
+
+    scenario.add_period()
+    scenario.add_activity(
+        title="Learn How to Program",
+        lead="Using a Raspberry Pi we will learn Python",
+        username='editor@example.org'
     )
-    transaction.commit()
+    scenario.add_occasion()
+    scenario.commit()
 
-    anon = Client(es_feriennet_app)
-
-    admin = Client(es_feriennet_app)
+    admin = client.spawn()
     admin.login_admin()
 
-    editor = Client(es_feriennet_app)
+    editor = client.spawn()
     editor.login_editor()
-
-    new = editor.get('/activities').click("Angebot erfassen")
-    new.form['title'] = "Learn How to Program"
-    new.form['lead'] = "Using a Raspberry Pi we will learn Python"
-    activity = new.form.submit().follow()
-
-    occasion = activity.click("Neue Durchführung")
-    occasion.form['dates'] = json.dumps({
-        'values': [{
-            'start': '2016-10-04 10:00:00',
-            'end': '2016-10-04 12:00:00'
-        }]
-    })
-    occasion.form['meeting_point'] = "Franz Karl Weber"
-    occasion.form['note'] = "No griefers"
-    occasion.form['min_age'] = 10
-    occasion.form['max_age'] = 20
-    occasion.form['min_spots'] = 30
-    occasion.form['max_spots'] = 40
-    occasion.form.submit()
-
-    url = '/activity/learn-how-to-program'
 
     # in preview, activities can't be found
-    es_feriennet_app.es_client.indices.refresh(index='_all')
+    client.app.es_client.indices.refresh(index='_all')
     assert 'search-result-vacation' not in admin.get('/search?q=Learn')
     assert 'search-result-vacation' not in editor.get('/search?q=Learn')
-    assert 'search-result-vacation' not in anon.get('/search?q=Learn')
+    assert 'search-result-vacation' not in client.get('/search?q=Learn')
 
-    editor.post(get_post_url(editor.get(url), 'request-publication'))
+    url = '/activity/learn-how-to-program'
+    editor.get(url).click("Publikation beantragen")
 
     # once proposed, activities can be found by the admin only
-    es_feriennet_app.es_client.indices.refresh(index='_all')
+    client.app.es_client.indices.refresh(index='_all')
     assert 'search-result-vacation' in admin.get('/search?q=Learn')
     assert 'search-result-vacation' not in editor.get('/search?q=Learn')
-    assert 'search-result-vacation' not in anon.get('/search?q=Learn')
+    assert 'search-result-vacation' not in client.get('/search?q=Learn')
 
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
-    admin.post(get_post_url(ticket, 'accept-activity'))
+    ticket.click("Veröffentlichen")
 
     # once accepted, activities can be found by anyone
-    es_feriennet_app.es_client.indices.refresh(index='_all')
+    client.app.es_client.indices.refresh(index='_all')
     assert 'search-result-vacation' in admin.get('/search?q=Learn')
     assert 'search-result-vacation' in editor.get('/search?q=Learn')
-    assert 'search-result-vacation' in anon.get('/search?q=Learn')
+    assert 'search-result-vacation' in client.get('/search?q=Learn')
 
     ticket = admin.get(ticket.request.url)
-    admin.post(get_post_url(ticket, 'archive-activity'))
+    ticket.click("Archivieren")
 
     # archived the search will fail again, except for admins
-    es_feriennet_app.es_client.indices.refresh(index='_all')
+    client.app.es_client.indices.refresh(index='_all')
     assert 'search-result-vacation' in admin.get('/search?q=Learn')
     assert 'search-result-vacation' not in editor.get('/search?q=Learn')
-    assert 'search-result-vacation' not in anon.get('/search?q=Learn')
+    assert 'search-result-vacation' not in client.get('/search?q=Learn')
 
 
-def test_activity_filter_tags(feriennet_app):
+def test_activity_filter_tags(client, scenario):
+    scenario.add_period(
+        prebooking_start=datetime(2015, 1, 1),
+        prebooking_end=datetime(2015, 12, 31),
+        execution_start=datetime(2016, 1, 1),
+        execution_end=datetime(2016, 12, 31)
+    )
 
-    periods = PeriodCollection(feriennet_app.session())
-    activities = ActivityCollection(feriennet_app.session())
-    occasions = OccasionCollection(feriennet_app.session())
+    scenario.add_activity(
+        title="Learn How to Program",
+        lead="Using a Rasperry Pi we will learn Python",
+        tags=['Computer', 'Science'],
+        username='editor@example.org'
+    ).propose().accept()
 
-    anon = Client(feriennet_app)
+    scenario.add_activity(
+        title="Learn How to Cook",
+        lead="Using a Stove we will cook a Python",
+        tags=['Cooking', 'Science'],
+        username='editor@example.org'
+    ).propose().accept()
 
-    editor = Client(feriennet_app)
+    scenario.commit()
+
+    editor = client.spawn()
     editor.login_editor()
 
-    admin = Client(feriennet_app)
+    admin = client.spawn()
     admin.login_admin()
 
-    new = editor.get('/activities').click("Angebot erfassen")
-    new.form['title'] = "Learn How to Program"
-    new.form['lead'] = "Using a Raspberry Pi we will learn Python"
-    new.select_checkbox("tags", "Computer")
-    new.select_checkbox("tags", "Wissenschaft")
-    new.form.submit()
-
-    new = editor.get('/activities').click("Angebot erfassen")
-    new.form['title'] = "Learn How to Cook"
-    new.form['lead'] = "Using a Stove we will cook a Python"
-    new.select_checkbox("tags", "Kochen")
-    new.select_checkbox("tags", "Wissenschaft")
-    new.form.submit()
-
-    transaction.begin()
-
-    for activity in ActivityCollection(feriennet_app.session()).query().all():
-        activity.propose().accept()
-
-    transaction.commit()
-
-    page = anon.get('/activities')
-    assert "Keine Angebote" in page
-
     # only show activites to anonymous if there's an active period..
-    transaction.begin()
-    periods.add(
-        title="2016",
-        prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
-        execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
-        active=True
-    )
-    transaction.commit()
-
-    page = anon.get('/activities')
+    page = client.get('/activities')
     assert "Keine Angebote" in page
 
     # ..and if there are any occasions for those activities
-    transaction.begin()
-    period = periods.active()
+    with scenario.update():
+        for activity in scenario.activities:
+            scenario.add_occasion(
+                activity=activity,
+                start=datetime(2016, 1, 1, 10),
+                end=datetime(2016, 1, 1, 18)
+            )
 
-    for activity in activities.query():
-        occasions.add(
-            activity, period,
-            datetime(2016, 1, 1, 10),
-            datetime(2016, 1, 1, 18),
-            'Europe/Zurich'
-        )
-
-    transaction.commit()
-
-    page = anon.get('/activities')
+    page = client.get('/activities')
     assert "Learn How to Cook" in page
     assert "Learn How to Program" in page
 
@@ -354,7 +235,7 @@ def test_activity_filter_tags(feriennet_app):
     assert "Vorschau" in editor.get('/activities')
 
     # anonymous does not
-    assert "Vorschau" not in anon.get('/activities')
+    assert "Vorschau" not in client.get('/activities')
 
     page = editor.get('/activities').click('Vorschau')
     assert "Learn How to Cook" not in page
@@ -369,45 +250,24 @@ def test_activity_filter_tags(feriennet_app):
     assert "Learn How to Cook" in page
 
 
-def test_activity_filter_duration(feriennet_app):
-    activities = ActivityCollection(feriennet_app.session(), type='vacation')
-    periods = PeriodCollection(feriennet_app.session())
-    occasions = OccasionCollection(feriennet_app.session())
-
-    retreat = activities.add("Retreat", username='admin@example.org')
-    meeting = activities.add("Meeting", username='admin@example.org')
-
-    period = periods.add(
-        title="2016",
-        prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
-        execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
-        active=True
-    )
-
-    retreat.propose().accept()
-    meeting.propose().accept()
+def test_activity_filter_duration(client, scenario):
+    scenario.add_period()
 
     # the retreat lasts a weekend
-    reatreat_occasion_id = occasions.add(
+    scenario.add_activity(title="Retreat", state='accepted')
+    scenario.add_occasion(
         start=datetime(2016, 10, 8, 8),
         end=datetime(2016, 10, 9, 16),
-        timezone="Europe/Zurich",
-        activity=retreat,
-        period=period
-    ).id
-
-    # the meeting lasts half a day
-    occasions.add(
-        start=datetime(2016, 10, 10, 8),
-        end=datetime(2016, 10, 10, 12),
-        timezone="Europe/Zurich",
-        activity=meeting,
-        period=period
     )
 
-    transaction.commit()
+    # the meeting lasts half a day
+    scenario.add_activity(title="Meeting", state='accepted')
+    scenario.add_occasion(
+        start=datetime(2016, 10, 10, 8),
+        end=datetime(2016, 10, 10, 12),
+    )
 
-    client = Client(feriennet_app)
+    scenario.commit()
 
     half_day = client.get('/activities').click('Halbtägig')
     many_day = client.get('/activities').click('Mehrtägig')
@@ -419,9 +279,8 @@ def test_activity_filter_duration(feriennet_app):
     assert "Retreat" in many_day
 
     # shorten the retreat
-    transaction.begin()
-    occasions.by_id(reatreat_occasion_id).dates[0].end -= timedelta(days=1)
-    transaction.commit()
+    with scenario.update():
+        scenario.occasions[0].dates[0].end -= timedelta(days=1)
 
     full_day = client.get('/activities').click('Ganztägig')
     many_day = client.get('/activities').click('Mehrtägig')
@@ -430,47 +289,18 @@ def test_activity_filter_duration(feriennet_app):
     assert "Retreat" not in many_day
 
 
-def test_activity_filter_age_ranges(feriennet_app):
-    activities = ActivityCollection(feriennet_app.session(), type='vacation')
-    periods = PeriodCollection(feriennet_app.session())
-    occasions = OccasionCollection(feriennet_app.session())
+def test_activity_filter_age_ranges(client, scenario):
+    scenario.add_period()
 
-    retreat = activities.add("Retreat", username='admin@example.org')
-    meeting = activities.add("Meeting", username='admin@example.org')
+    # the retreat is for really young kids
+    scenario.add_activity(title="Retreat", state='accepted')
+    scenario.add_occasion(age=(0, 10))
 
-    period = periods.add(
-        title="2016",
-        prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
-        execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
-        active=True
-    )
+    # the meeting is for young to teenage kids
+    scenario.add_activity(title="Meeting", state='accepted')
+    scenario.add_occasion(age=(5, 15))
 
-    retreat.propose().accept()
-    meeting.propose().accept()
-
-    # the retreat lasts a weekend
-    occasions.add(
-        start=datetime(2016, 10, 8, 8),
-        end=datetime(2016, 10, 9, 16),
-        age=(0, 10),
-        timezone="Europe/Zurich",
-        activity=retreat,
-        period=period
-    )
-
-    # the meeting lasts half a day
-    meeting_occasion_id = occasions.add(
-        start=datetime(2016, 10, 8, 8),
-        end=datetime(2016, 10, 9, 16),
-        age=(5, 15),
-        timezone="Europe/Zurich",
-        activity=meeting,
-        period=period
-    ).id
-
-    transaction.commit()
-
-    client = Client(feriennet_app)
+    scenario.commit()
 
     preschool = client.get('/activities').click('3 - 6 Jahre')
     highschool = client.get('/activities').click('14 - 17 Jahre')
@@ -482,9 +312,8 @@ def test_activity_filter_age_ranges(feriennet_app):
     assert "Meeting" in highschool
 
     # change the meeting age
-    transaction.begin()
-    occasions.by_id(meeting_occasion_id).age = NumericRange(15, 20)
-    transaction.commit()
+    with scenario.update():
+        scenario.occasions[1].age = NumericRange(15, 20)
 
     preschool = client.get('/activities').click('3 - 6 Jahre')
 
@@ -492,28 +321,26 @@ def test_activity_filter_age_ranges(feriennet_app):
     assert "Meeting" not in preschool
 
 
-def test_organiser_info(feriennet_app):
+def test_organiser_info(client, scenario):
 
-    admin = Client(feriennet_app)
+    admin = client.spawn()
     admin.login_admin()
 
-    editor = Client(feriennet_app)
+    editor = client.spawn()
     editor.login_editor()
 
-    new = editor.get('/activities').click("Angebot erfassen")
-    new.form['title'] = "Play with Legos"
-    new.form['lead'] = "Like Minecraft, but in the real world"
-    new.form.submit()
-
-    new = admin.get('/activities').click("Angebot erfassen")
-    new.form['title'] = "Play with Playmobil"
-    new.form['lead'] = "Like Second Life, but in the real world"
-    new.form.submit()
-
-    for activity in ActivityCollection(feriennet_app.session()).query().all():
-        activity.propose().accept()
-
-    transaction.commit()
+    scenario.add_period()
+    scenario.add_activity(
+        title="Play with Legos",
+        state='accepted',
+        username='editor@example.org'
+    )
+    scenario.add_activity(
+        title="Play with Playmobil",
+        state='accepted',
+        username='admin@example.org'
+    )
+    scenario.commit()
 
     # by default no information is shown
     for id in ('play-with-legos', 'play-with-playmobil'):
@@ -605,29 +432,28 @@ def test_organiser_info(feriennet_app):
     assert "https://www.example.org" in page
 
 
-def test_occasions_form(feriennet_app):
+def test_occasions_form(client, scenario):
 
-    editor = Client(feriennet_app)
+    editor = client.spawn()
     editor.login_editor()
 
-    admin = Client(feriennet_app)
+    admin = client.spawn()
     admin.login_admin()
 
-    new = editor.get('/activities').click("Angebot erfassen")
-    new.form['title'] = "Play with Legos"
-    new.form['lead'] = "Like Minecraft, but in the real world"
-    new.form.submit().follow()
+    scenario.add_period(
+        prebooking_start=date(2016, 9, 1),
+        prebooking_end=date(2016, 9, 30),
+        execution_start=date(2016, 10, 1),
+        execution_end=date(2016, 10, 31),
+        deadline_date=date(2016, 10, 1)
+    )
 
-    periods = admin.get('/activities').click("Zeiträume")
+    scenario.add_activity(
+        title="Play with Legos",
+        username='editor@example.org'
+    )
 
-    period = periods.click("Neuer Zeitraum")
-    period.form['title'] = "Vacation Program 2016"
-    period.form['prebooking_start'] = '2016-09-01'
-    period.form['prebooking_end'] = '2016-09-30'
-    period.form['execution_start'] = '2016-10-01'
-    period.form['execution_end'] = '2016-10-31'
-    period.form['deadline_date'] = '2016-10-01'
-    period.form.submit()
+    scenario.commit()
 
     activity = editor.get('/activities').click("Play with Legos")
     assert "keine Durchführungen" in activity
@@ -665,34 +491,34 @@ def test_occasions_form(feriennet_app):
     assert "15 - 20 Jahre" in activity
     assert "10 - 20 Jahre" in activity
 
-    editor.delete(get_delete_link(activity, index=1))
-    editor.delete(get_delete_link(activity, index=2))
+    activity.click("Löschen", index=0)
+    activity.click("Löschen", index=1)
+
     assert "keine Durchführungen" in editor.get('/activity/play-with-legos')
 
 
-def test_multiple_dates_occasion(feriennet_app):
+def test_multiple_dates_occasion(client, scenario):
 
-    editor = Client(feriennet_app)
+    editor = client.spawn()
     editor.login_editor()
 
-    admin = Client(feriennet_app)
+    admin = client.spawn()
     admin.login_admin()
 
-    new = editor.get('/activities').click("Angebot erfassen")
-    new.form['title'] = "Play with Legos"
-    new.form['lead'] = "Like Minecraft, but in the real world"
-    new.form.submit().follow()
+    scenario.add_period(
+        prebooking_start=date(2016, 9, 1),
+        prebooking_end=date(2016, 9, 30),
+        execution_start=date(2016, 10, 1),
+        execution_end=date(2016, 10, 31),
+        deadline_date=date(2016, 10, 1)
+    )
 
-    periods = admin.get('/activities').click("Zeiträume")
+    scenario.add_activity(
+        title="Play with Legos",
+        username='editor@example.org'
+    )
 
-    period = periods.click("Neuer Zeitraum")
-    period.form['title'] = "Vacation Program 2016"
-    period.form['prebooking_start'] = '2016-09-01'
-    period.form['prebooking_end'] = '2016-09-30'
-    period.form['execution_start'] = '2016-10-01'
-    period.form['execution_end'] = '2016-10-31'
-    period.form['deadline_date'] = '2016-09-01'
-    period.form.submit()
+    scenario.commit()
 
     activity = editor.get('/activities').click("Play with Legos")
     assert "keine Durchführungen" in activity
@@ -734,30 +560,27 @@ def test_multiple_dates_occasion(feriennet_app):
     assert "2. Oktober 10:00" in activity
 
 
-def test_execution_period(feriennet_app):
+def test_execution_period(client, scenario):
 
-    admin = Client(feriennet_app)
+    admin = client.spawn()
     admin.login_admin()
 
-    new = admin.get('/activities').click("Angebot erfassen")
-    new.form['title'] = "Play with Legos"
-    new.form['lead'] = "Like Minecraft, but in the real world"
-    new.form.submit().follow()
+    scenario.add_period(
+        prebooking_start=date(2016, 9, 1),
+        prebooking_end=date(2016, 9, 30),
+        execution_start=date(2016, 10, 1),
+        execution_end=date(2016, 10, 1),
+        deadline_date=date(2016, 10, 1)
+    )
 
-    periods = admin.get('/activities').click("Zeiträume")
+    scenario.add_activity(
+        title="Play with Lego",
+        username='editor@example.org'
+    )
 
-    period = periods.click("Neuer Zeitraum")
-    period.form['title'] = "Vacation Program 2016"
-    period.form['prebooking_start'] = '2016-09-01'
-    period.form['prebooking_end'] = '2016-09-30'
-    period.form['execution_start'] = '2016-10-01'
-    period.form['execution_end'] = '2016-10-01'
-    period.form['deadline_date'] = '2016-09-01'
-    period.form.submit()
+    scenario.commit()
 
-    occasion = admin.get('/activity/play-with-legos')\
-        .click("Neue Durchführung")
-
+    occasion = admin.get('/activity/play-with-lego').click("Neue Durchführung")
     occasion.form['min_age'] = 10
     occasion.form['max_age'] = 20
     occasion.form['min_spots'] = 30
@@ -794,7 +617,7 @@ def test_execution_period(feriennet_app):
     period = period.form.submit()
 
     assert "in Konflikt" in period
-    assert "Play with Legos" in period
+    assert "Play with Lego" in period
 
     period.form['execution_start'] = '2016-10-01'
     period.form['execution_end'] = '2016-10-01'
@@ -803,45 +626,16 @@ def test_execution_period(feriennet_app):
     assert "gespeichert" in periods
 
 
-def test_enroll_child(feriennet_app):
-    activities = ActivityCollection(feriennet_app.session(), type='vacation')
-    periods = PeriodCollection(feriennet_app.session())
-    occasions = OccasionCollection(feriennet_app.session())
-
-    retreat = activities.add("Retreat", username='admin@example.org')
-    retreat.propose().accept()
-
-    prebooking = tuple(d.date() for d in (
-        datetime.now() - timedelta(days=1),
-        datetime.now() + timedelta(days=1)
-    ))
-
-    execution = tuple(d.date() for d in (
-        datetime.now() + timedelta(days=10),
-        datetime.now() + timedelta(days=12)
-    ))
-
-    occasions.add(
-        start=datetime(2016, 10, 8, 8),
-        end=datetime(2016, 10, 9, 16),
-        age=(0, 10),
-        timezone="Europe/Zurich",
-        activity=retreat,
-        period=periods.add(
-            title="2016",
-            prebooking=prebooking,
-            execution=execution,
-            active=True,
-            deadline_date=(datetime.utcnow() + timedelta(days=1)).date()
-        )
+def test_enroll_child(client, scenario):
+    scenario.add_period()
+    scenario.add_activity(title="Retreat", state='accepted')
+    scenario.add_occasion()
+    scenario.add_user(
+        username='member@example.org',
+        role='member',
+        complete_profile=False
     )
-
-    UserCollection(feriennet_app.session()).add(
-        'member@example.org', 'hunter2', 'member')
-
-    transaction.commit()
-
-    client = Client(feriennet_app)
+    scenario.commit()
 
     activity = client.get('/activity/retreat')
 
@@ -869,7 +663,7 @@ def test_enroll_child(feriennet_app):
 
     # before continuing, the user needs to fill his profile
     assert "Ihr Benutzerprofil ist unvollständig" in enroll
-    fill_out_profile(client)
+    client.fill_out_profile()
 
     activity = enroll.form.submit().follow()
     assert "zu Tom\u00A0Sawyer's Wunschliste hinzugefügt" in activity
@@ -890,8 +684,8 @@ def test_enroll_child(feriennet_app):
         in enroll.form.submit()
 
     # prevent enrollment for inactive periods
-    periods.query().first().active = False
-    transaction.commit()
+    with scenario.update():
+        scenario.latest_period.active = False
 
     enroll.form['first_name'] = "Huckleberry"
     enroll.form['last_name'] = "Finn"
@@ -899,21 +693,17 @@ def test_enroll_child(feriennet_app):
         in enroll.form.submit()
 
     # prevent enrollment outside of prebooking
-    period = periods.query().first()
-    period.active = True
-    period.prebooking_start -= timedelta(days=10)
-    period.prebooking_end -= timedelta(days=10)
-
-    transaction.commit()
+    with scenario.update():
+        scenario.latest_period.active = True
+        scenario.latest_period.prebooking_start -= timedelta(days=10)
+        scenario.latest_period.prebooking_end -= timedelta(days=10)
 
     assert "nur während der Wunschphase" in enroll.form.submit()
 
     # set the record straight again
-    period = periods.query().first()
-    period.prebooking_start += timedelta(days=10)
-    period.prebooking_end += timedelta(days=10)
-
-    transaction.commit()
+    with scenario.update():
+        scenario.latest_period.prebooking_start += timedelta(days=10)
+        scenario.latest_period.prebooking_end += timedelta(days=10)
 
     enroll.form['first_name'] = "Huckleberry"
     enroll.form['last_name'] = "Finn"
@@ -922,23 +712,13 @@ def test_enroll_child(feriennet_app):
     assert "zu Huckleberry\u00A0Finn's Wunschliste hinzugefügt" in activity
 
     # prevent booking over the limit
-    period = periods.query().first()
-    period.all_inclusive = True
-    period.max_bookings_per_attendee = 1
-    period.confirmed = True
+    with scenario.update():
+        scenario.latest_period.all_inclusive = True
+        scenario.latest_period.confirmed = True
+        scenario.latest_period.max_bookings_per_attendee = 1
 
-    retreat = activities.add("Another Retreat", username='admin@example.org')
-    retreat.propose().accept()
-    occasions.add(
-        start=datetime(2016, 10, 8, 8),
-        end=datetime(2016, 10, 9, 16),
-        age=(0, 10),
-        timezone="Europe/Zurich",
-        activity=retreat,
-        period=period
-    )
-
-    transaction.commit()
+        scenario.add_activity(title="Another Retreat", state='accepted')
+        scenario.add_occasion()
 
     enroll = client.get('/activity/another-retreat').click("Anmelden")
     enroll.form.submit()
@@ -946,21 +726,11 @@ def test_enroll_child(feriennet_app):
     assert "maximale Anzahl von 1 Buchungen" in enroll.form.submit()
 
     # prevent booking one activity more than once
-    period = periods.query().first()
-    period.all_inclusive = False
-    period.max_bookings_per_attendee = None
-    period.confirmed = False
-
-    occasions.add(
-        start=datetime(2016, 10, 8, 18),
-        end=datetime(2016, 10, 9, 20),
-        age=(0, 10),
-        timezone="Europe/Zurich",
-        activity=activities.by_name('another-retreat'),
-        period=period
-    )
-
-    transaction.commit()
+    with scenario.update():
+        scenario.latest_period.all_inclusive = False
+        scenario.latest_period.max_bookings_per_attendee = None
+        scenario.latest_period.confirmed = False
+        scenario.add_occasion()
 
     enroll = client.get('/activity/another-retreat').click("Anmelden", index=0)
     enroll = enroll.form.submit()
@@ -971,47 +741,15 @@ def test_enroll_child(feriennet_app):
     assert "bereits eine andere Durchführung dieses Angebots gebucht" in enroll
 
 
-def test_enroll_age_mismatch(feriennet_app):
-    activities = ActivityCollection(feriennet_app.session(), type='vacation')
-    periods = PeriodCollection(feriennet_app.session())
-    occasions = OccasionCollection(feriennet_app.session())
+def test_enroll_age_mismatch(client, scenario):
+    scenario.add_period()
+    scenario.add_activity(title="Retreat", state='accepted')
+    scenario.add_occasion(age=(5, 10))
+    scenario.commit()
 
-    retreat = activities.add("Retreat", username='admin@example.org')
-    retreat.propose().accept()
-
-    prebooking = tuple(d.date() for d in (
-        datetime.now() - timedelta(days=1),
-        datetime.now() + timedelta(days=1)
-    ))
-
-    execution = tuple(d.date() for d in (
-        datetime.now() + timedelta(days=10),
-        datetime.now() + timedelta(days=12)
-    ))
-
-    occasions.add(
-        start=datetime(2016, 10, 8, 8),
-        end=datetime(2016, 10, 9, 16),
-        age=(5, 10),
-        timezone="Europe/Zurich",
-        activity=retreat,
-        period=periods.add(
-            title="2016",
-            prebooking=prebooking,
-            execution=execution,
-            active=True
-        )
-    )
-
-    UserCollection(feriennet_app.session()).add(
-        'member@example.org', 'hunter2', 'member')
-
-    transaction.commit()
-
-    admin = Client(feriennet_app)
+    admin = client.spawn()
     admin.login_admin()
-
-    fill_out_profile(admin)
+    admin.fill_out_profile()
 
     page = admin.get('/activity/retreat').click("Anmelden")
     page.form['first_name'] = "Tom"
@@ -1021,54 +759,22 @@ def test_enroll_age_mismatch(feriennet_app):
     page.form['birth_date'] = "1900-01-01"
     assert "zu alt" in page.form.submit()
 
-    page.form['birth_date'] = "2015-01-01"
+    page.form['birth_date'] = f"{date.today().year - 3}-01-01"
     assert "zu jung" in page.form.submit()
 
     page.form['ignore_age'] = True
     assert "Wunschliste hinzugefügt" in page.form.submit().follow()
 
 
-def test_enroll_after_wishlist_phase(feriennet_app):
-    activities = ActivityCollection(feriennet_app.session(), type='vacation')
-    periods = PeriodCollection(feriennet_app.session())
-    occasions = OccasionCollection(feriennet_app.session())
+def test_enroll_after_wishlist_phase(client, scenario):
+    scenario.add_period()
+    scenario.add_activity(title="Retreat", state='accepted')
+    scenario.add_occasion()
+    scenario.commit()
 
-    retreat = activities.add("Retreat", username='admin@example.org')
-    retreat.propose().accept()
-
-    prebooking = tuple(d.date() for d in (
-        datetime.now() - timedelta(days=1),
-        datetime.now() + timedelta(days=1)
-    ))
-
-    execution = tuple(d.date() for d in (
-        datetime.now() + timedelta(days=10),
-        datetime.now() + timedelta(days=12)
-    ))
-
-    occasions.add(
-        start=datetime(2016, 10, 8, 8),
-        end=datetime(2016, 10, 9, 16),
-        age=(5, 10),
-        timezone="Europe/Zurich",
-        activity=retreat,
-        period=periods.add(
-            title="2016",
-            prebooking=prebooking,
-            execution=execution,
-            active=True
-        )
-    )
-
-    UserCollection(feriennet_app.session()).add(
-        'member@example.org', 'hunter2', 'member')
-
-    transaction.commit()
-
-    admin = Client(feriennet_app)
+    admin = client.spawn()
     admin.login_admin()
-
-    fill_out_profile(admin)
+    admin.fill_out_profile()
 
     page = admin.get('/activity/retreat').click("Anmelden")
     page.form['first_name'] = "Tom"
@@ -1081,74 +787,47 @@ def test_enroll_after_wishlist_phase(feriennet_app):
         assert "nur während der Wunschphase" in page.form.submit()
 
 
-def test_booking_view(feriennet_app):
-    activities = ActivityCollection(feriennet_app.session(), type='vacation')
-    attendees = AttendeeCollection(feriennet_app.session())
-    bookings = BookingCollection(feriennet_app.session())
-    periods = PeriodCollection(feriennet_app.session())
-    occasions = OccasionCollection(feriennet_app.session())
-    users = UserCollection(feriennet_app.session())
-
-    prebooking = tuple(d.date() for d in (
-        datetime.now() - timedelta(days=1),
-        datetime.now() + timedelta(days=1)
-    ))
-
-    execution = tuple(d.date() for d in (
-        datetime.now() + timedelta(days=10),
-        datetime.now() + timedelta(days=12)
-    ))
-
-    period = periods.add(
-        title="2016",
-        prebooking=prebooking,
-        execution=execution,
-        active=True
-    )
-
-    periods.add(
-        title="2017",
-        prebooking=prebooking,
-        execution=execution,
-        active=False
-    )
-
-    o = []
+def test_booking_view(client, scenario):
+    scenario.add_period(title="2017", active=False)
+    scenario.add_period(title="2016", active=True)
 
     for i in range(4):
-        a = activities.add("A {}".format(i), username='admin@example.org')
-        a.propose().accept()
+        scenario.add_activity(title=f"A {i}", state='accepted')
+        scenario.add_occasion()
 
-        o.append(occasions.add(
-            start=datetime(2016, 10, 8, 8),
-            end=datetime(2016, 10, 9, 16),
-            age=(0, 10),
-            timezone="Europe/Zurich",
-            activity=a,
-            period=period
-        ))
+    scenario.add_user(username='m1@example.org', role='member', realname="Tom")
+    scenario.add_attendee(
+        name="Dustin",
+        birth_date=date(2000, 1, 1)
+    )
 
-    m1 = users.add('m1@example.org', 'hunter2', 'member', realname="Tom")
-    m2 = users.add('m2@example.org', 'hunter2', 'member', realname="Harry")
+    scenario.add_user(username='m2@example.org', role='member', realname="Doc")
+    scenario.add_attendee(
+        name="Mike",
+        birth_date=date(2000, 1, 1)
+    )
 
-    a1 = attendees.add(m1, 'Dustin', date(2000, 1, 1), 'female')
-    a2 = attendees.add(m2, 'Mike', date(2000, 1, 1), 'female')
+    # sign Dustin up for all courses
+    for occasion in scenario.occasions:
+        scenario.add_booking(
+            occasion=occasion,
+            user=scenario.users[0],
+            attendee=scenario.attendees[0]
+        )
 
-    # hookup a1 with all courses
-    bookings.add(m1, a1, o[0])
-    bookings.add(m1, a1, o[1])
-    bookings.add(m1, a1, o[2])
-    bookings.add(m1, a1, o[3])
+    # sign Mike up for one course only for the permission check
+    scenario.add_booking(
+        occasion=scenario.occasions[0],
+        user=scenario.users[1],
+        attendee=scenario.attendees[1]
+    )
 
-    # m2 only gets one for the permission check
-    bookings.add(m2, a2, o[0])
+    scenario.commit()
 
-    transaction.commit()
-
-    c1 = Client(feriennet_app)
+    c1 = client.spawn()
     c1.login('m1@example.org', 'hunter2')
 
-    c2 = Client(feriennet_app)
+    c2 = client.spawn()
     c2.login('m2@example.org', 'hunter2')
 
     # make sure the bookings count is correct
@@ -1188,11 +867,11 @@ def test_booking_view(feriennet_app):
     assert "maximal drei Favoriten" in result.headers.get('X-IC-Trigger-Data')
 
     # users may switch between other periods
-    url = c1_bookings.pyquery('select option:last').val()
+    url = c1_bookings.pyquery('select option:first').val()
     assert "Noch keine Buchungen" in c1.get(url)
 
     # admins may switch between other users
-    admin = Client(feriennet_app)
+    admin = client.spawn()
     admin.login_admin()
 
     page = admin.get('/').click('Wunschliste')
@@ -1203,56 +882,21 @@ def test_booking_view(feriennet_app):
     assert count(m1_bookings) == 4
 
 
-def test_confirmed_booking_view(feriennet_app):
-    activities = ActivityCollection(feriennet_app.session(), type='vacation')
-    attendees = AttendeeCollection(feriennet_app.session())
-    bookings = BookingCollection(feriennet_app.session())
-    periods = PeriodCollection(feriennet_app.session())
-    occasions = OccasionCollection(feriennet_app.session())
+def test_confirmed_booking_view(scenario, client):
+    scenario.add_period()
+    scenario.add_activity()
+    scenario.add_occasion()
+    scenario.add_attendee(name='Dustin', birth_date=date(2000, 1, 1))
+    scenario.add_booking()
+    scenario.commit()
 
-    owner = Bunch(username='admin@example.org')
-
-    prebooking = tuple(d.date() for d in (
-        datetime.now() - timedelta(days=1),
-        datetime.now() + timedelta(days=1)
-    ))
-
-    execution = tuple(d.date() for d in (
-        datetime.now() + timedelta(days=10),
-        datetime.now() + timedelta(days=12)
-    ))
-
-    period = periods.add(
-        title="Ferienpass 2016",
-        prebooking=prebooking,
-        execution=execution,
-        active=True
-    )
-
-    o = occasions.add(
-        start=datetime(2016, 11, 25, 8),
-        end=datetime(2016, 11, 25, 16),
-        age=(0, 10),
-        spots=(0, 10),
-        timezone="Europe/Zurich",
-        activity=activities.add("A", username='admin@example.org'),
-        period=period
-    )
-
-    a = attendees.add(owner, 'Dustin', date(2000, 1, 1), 'female')
-    bookings.add(owner, a, o)
-
-    transaction.commit()
-
-    client = Client(feriennet_app)
     client.login_admin()
 
     # When the period is unconfirmed, no storno is available, and the
     # state is always "open"
-    periods.query().one().confirmed = False
-    bookings.query().one().state = 'accepted'
-
-    transaction.commit()
+    with scenario.update():
+        scenario.latest_period.confirmed = False
+        scenario.latest_booking.state = 'accepted'
 
     page = client.get('/my-bookings')
     assert "Offen" in page
@@ -1270,10 +914,8 @@ def test_confirmed_booking_view(feriennet_app):
     assert "Elternteil" not in page
 
     # When the period is confirmed, the state is shown
-    periods.query().one().confirmed = True
-    bookings.query().one().state = 'accepted'
-
-    transaction.commit()
+    with scenario.update():
+        scenario.latest_period.confirmed = True
 
     page = client.get('/my-bookings')
     assert "Gebucht" in page
@@ -1302,78 +944,45 @@ def test_confirmed_booking_view(feriennet_app):
     ]
 
     for state, text in states:
-        bookings.query().one().state = state
-        transaction.commit()
+        with scenario.update():
+            scenario.latest_booking.state = state
 
         assert text in client.get('/my-bookings')
 
     # If there are not enough attendees, show a warning
-    periods.query().one().confirmed = True
-    bookings.query().one().state = 'accepted'
-    occasions.query().one().spots = NumericRange(2, 5)
-
-    transaction.commit()
+    with scenario.update():
+        scenario.latest_period.confirmed = True
+        scenario.latest_booking.state = 'accepted'
+        scenario.latest_occasion.spots = NumericRange(2, 5)
 
     page = client.get('/my-bookings')
     assert "nicht genügend Teilnehmer" in page
 
 
-def test_direct_booking_and_storno(feriennet_app):
-    activities = ActivityCollection(feriennet_app.session(), type='vacation')
-    attendees = AttendeeCollection(feriennet_app.session())
-    periods = PeriodCollection(feriennet_app.session())
-    occasions = OccasionCollection(feriennet_app.session())
-
-    owner = Bunch(username='admin@example.org')
-
-    prebooking = tuple(d.date() for d in (
-        datetime.now() - timedelta(days=1),
-        datetime.now() + timedelta(days=1)
-    ))
-
-    execution = tuple(d.date() for d in (
-        datetime.now() + timedelta(days=10),
-        datetime.now() + timedelta(days=12)
-    ))
-
-    period = periods.add(
-        title="Ferienpass 2016",
-        prebooking=prebooking,
-        execution=execution,
-        active=True,
-        deadline_date=(datetime.utcnow() + timedelta(days=1)).date()
+def test_direct_booking_and_storno(client, scenario):
+    scenario.add_period(confirmed=True)
+    scenario.add_activity(title="Foobar", state='accepted')
+    scenario.add_occasion(spots=(0, 1))
+    scenario.add_user(username='member@example.org', role='member')
+    scenario.add_attendee(
+        name="Dustin",
+        birth_date=date(2008, 1, 1),
+        username='admin@example.org'
     )
-
-    member = UserCollection(feriennet_app.session()).add(
-        'member@example.org', 'hunter2', 'member')
-
-    period.confirmed = True
-
-    foobar = activities.add("Foobar", username='admin@example.org')
-    foobar.propose().accept()
-
-    occasions.add(
-        start=datetime(2016, 11, 25, 8),
-        end=datetime(2016, 11, 25, 16),
-        age=(0, 10),
-        spots=(0, 1),
-        timezone="Europe/Zurich",
-        activity=foobar,
-        period=period
+    scenario.add_attendee(
+        name="Mike",
+        birth_date=date(2008, 1, 1),
+        username='member@example.org'
     )
+    scenario.commit()
 
-    attendees.add(owner, 'Dustin', date(2008, 1, 1), 'female')
-    attendees.add(member, 'Mike', date(2008, 1, 1), 'female')
-
-    transaction.commit()
-
-    client = Client(feriennet_app)
+    client = client.spawn()
     client.login_admin()
-    fill_out_profile(client, "Scrooge", "McDuck")
+    client.fill_out_profile("Scrooge", "McDuck")
 
-    member = Client(feriennet_app)
+    member = client.spawn()
     member.login('member@example.org', 'hunter2')
-    fill_out_profile(member, "Zak", "McKracken")
+    member.fill_out_profile("Zak", "McKracken")
 
     # in a confirmed period parents can book directly
     page = client.get('/activity/foobar')
@@ -1393,8 +1002,7 @@ def test_direct_booking_and_storno(feriennet_app):
     assert "bereits für diese Durchführung angemeldet" in page
 
     # cancel the booking
-    page = client.get('/my-bookings')
-    client.post(get_post_url(page, 'confirm'))
+    client.get('/my-bookings').click("Stornieren")
 
     page = client.get('/activity/foobar')
     assert "1 Plätze frei" in page
@@ -1418,63 +1026,22 @@ def test_direct_booking_and_storno(feriennet_app):
     assert "Mike" in page
 
 
-def test_cancel_occasion(feriennet_app):
-    activities = ActivityCollection(feriennet_app.session(), type='vacation')
-    attendees = AttendeeCollection(feriennet_app.session())
-    periods = PeriodCollection(feriennet_app.session())
-    occasions = OccasionCollection(feriennet_app.session())
+def test_cancel_occasion(client, scenario):
+    scenario.add_period(confirmed=True)
+    scenario.add_activity(title="Foobar", state='accepted')
+    scenario.add_occasion(age=(0, 100))
+    scenario.add_attendee(birth_date=date.today() - timedelta(days=10 * 360))
+    scenario.commit()
 
-    owner = Bunch(username='admin@example.org')
-
-    prebooking = tuple(d.date() for d in (
-        datetime.now() - timedelta(days=1),
-        datetime.now() + timedelta(days=1)
-    ))
-
-    execution = tuple(d.date() for d in (
-        datetime.now() + timedelta(days=10),
-        datetime.now() + timedelta(days=12)
-    ))
-
-    period = periods.add(
-        title="Ferienpass 2016",
-        prebooking=prebooking,
-        execution=execution,
-        active=True
-    )
-    period.confirmed = True
-
-    member = UserCollection(feriennet_app.session()).add(
-        'member@example.org', 'hunter2', 'member')
-
-    foobar = activities.add("Foobar", username='admin@example.org')
-    foobar.propose().accept()
-
-    occasions.add(
-        start=datetime(2016, 11, 25, 8),
-        end=datetime(2016, 11, 25, 16),
-        age=(0, 10),
-        spots=(0, 1),
-        timezone="Europe/Zurich",
-        activity=foobar,
-        period=period
-    )
-
-    attendees.add(owner, 'Dustin', date(2008, 1, 1), 'female')
-    attendees.add(member, 'Mike', date(2008, 1, 1), 'female')
-
-    transaction.commit()
-
-    client = Client(feriennet_app)
     client.login_admin()
-    fill_out_profile(client)
+    client.fill_out_profile()
 
     page = client.get('/activity/foobar')
     assert "Löschen" in page
     assert "Absagen" not in page
     assert "Reaktivieren" not in page
 
-    page.click('Anmelden').form.submit()
+    page = page.click('Anmelden').form.submit()
     assert "Gebucht" in client.get('/my-bookings')
 
     page = client.get('/activity/foobar')
@@ -1482,7 +1049,7 @@ def test_cancel_occasion(feriennet_app):
     assert "Absagen" in page
     assert "Reaktivieren" not in page
 
-    client.post(get_post_url(page, 'confirm'))
+    page.click("Absagen")
     assert "Storniert" in client.get('/my-bookings')
 
     page = client.get('/activity/foobar')
@@ -1490,7 +1057,7 @@ def test_cancel_occasion(feriennet_app):
     assert "Absagen" not in page
     assert "Reaktivieren" in page
 
-    client.post(get_post_url(page, 'confirm'))
+    page.click("Reaktivieren")
     assert "Storniert" in client.get('/my-bookings')
 
     page = client.get('/activity/foobar')
@@ -1498,74 +1065,36 @@ def test_cancel_occasion(feriennet_app):
     assert "Absagen" in page
     assert "Reaktivieren" not in page
 
-    client.delete(get_delete_link(client.get('/my-bookings')))
+    client.get('/my-bookings').click("Entfernen")
     page = client.get('/activity/foobar')
     assert "Löschen" in page
     assert "Absagen" not in page
     assert "Reaktivieren" not in page
 
-    client.delete(get_delete_link(page))
+    page.click("Löschen")
 
 
-def test_reactivate_cancelled_booking(feriennet_app):
-
-    activities = ActivityCollection(feriennet_app.session(), type='vacation')
-    attendees = AttendeeCollection(feriennet_app.session())
-    periods = PeriodCollection(feriennet_app.session())
-    occasions = OccasionCollection(feriennet_app.session())
-    bookings = BookingCollection(feriennet_app.session())
-
-    owner = Bunch(username='admin@example.org')
-
-    prebooking = tuple(d.date() for d in (
-        datetime.now() - timedelta(days=1),
-        datetime.now() + timedelta(days=1)
-    ))
-
-    execution = tuple(d.date() for d in (
-        datetime.now() + timedelta(days=10),
-        datetime.now() + timedelta(days=12)
-    ))
-
-    period = periods.add(
-        title="Ferienpass 2016",
-        prebooking=prebooking,
-        execution=execution,
-        active=True
-    )
-
-    foobar = activities.add("Foobar", username='admin@example.org')
-    foobar.propose().accept()
-
-    occasions.add(
-        start=datetime(2016, 11, 25, 8),
-        end=datetime(2016, 11, 25, 16),
+def test_reactivate_cancelled_booking(client, scenario):
+    scenario.add_period()
+    scenario.add_activity(title="Foobar", state='accepted')
+    scenario.add_occasion(
         age=(0, 10),
         spots=(0, 2),
-        timezone="Europe/Zurich",
-        activity=foobar,
-        period=period,
-        cost=100,
+        cost=100
     )
-
-    occasions.add(
-        start=datetime(2016, 11, 25, 17),
-        end=datetime(2016, 11, 25, 20),
+    scenario.add_occasion(
         age=(0, 10),
         spots=(0, 2),
-        timezone="Europe/Zurich",
-        activity=foobar,
-        period=period,
-        cost=1000,
+        cost=1000
     )
+    scenario.add_attendee(
+        name="Dustin",
+        birth_date=(datetime.today() - timedelta(days=5 * 360))
+    )
+    scenario.commit()
 
-    attendees.add(owner, 'Dustin', date(2008, 1, 1), 'female')
-
-    transaction.commit()
-
-    client = Client(feriennet_app)
     client.login_admin()
-    fill_out_profile(client)
+    client.fill_out_profile()
 
     # by default we block conflicting bookings
     page = client.get('/activity/foobar').click('Anmelden', index=0)
@@ -1580,22 +1109,22 @@ def test_reactivate_cancelled_booking(feriennet_app):
     assert "eine andere Durchführung" in page.form.submit()
 
     # unless they are cancelled
-    bookings.query().first().state = 'cancelled'
-    transaction.commit()  # can be done by cancelling the whole event in UI
+    scenario.c.bookings.query().first().state = 'cancelled'
+    scenario.commit()  # can be done by cancelling the whole event in UI
 
     page = client.get('/activity/foobar').click('Anmelden', index=0)
     assert "Wunschliste hinzugefügt" in page.form.submit().follow()
 
     # this also works between multiple occasions of the same activity
-    bookings.query().first().state = 'cancelled'
-    transaction.commit()  # can be done by cancelling the whole event in UI
+    scenario.c.bookings.query().first().state = 'cancelled'
+    scenario.commit()  # can be done by cancelling the whole event in UI
 
     page = client.get('/activity/foobar').click('Anmelden', index=1)
     assert "Wunschliste hinzugefügt" in page.form.submit().follow()
 
     # including denied bookings
-    bookings.query().first().state = 'denied'
-    transaction.commit()  # can be done by cancelling the whole event in UI
+    scenario.c.bookings.query().first().state = 'denied'
+    scenario.commit()  # can be done by cancelling the whole event in UI
 
     page = client.get('/activity/foobar').click('Anmelden', index=1)
     assert "Wunschliste hinzugefügt" in page.form.submit().follow()
@@ -1606,87 +1135,44 @@ def test_reactivate_cancelled_booking(feriennet_app):
     page.form['sure'] = 'yes'
     page.form.submit()
 
-    page = client.get('/my-bookings')
-    client.post(get_post_url(page, 'confirm'))  # cancel the booking
-
+    client.get('/my-bookings').click("Stornieren")
     page = client.get('/activity/foobar').click('Anmelden', index=0)
-    assert "war erfolgreic" in page.form.submit().follow()
+    assert "war erfolgreich" in page.form.submit().follow()
 
-    page = client.get('/my-bookings')
-    client.post(get_post_url(page, 'confirm'))  # cancel the booking
-
+    page = client.get('/my-bookings').click("Stornieren")
     page = client.get('/activity/foobar').click('Anmelden', index=1)
     assert "war erfolgreich" in page.form.submit().follow()
 
 
-def test_occasion_attendance_collection(feriennet_app):
+def test_occasion_attendance_collection(client, scenario):
+    scenario.add_period()
 
-    activities = ActivityCollection(feriennet_app.session(), type='vacation')
-    attendees = AttendeeCollection(feriennet_app.session())
-    periods = PeriodCollection(feriennet_app.session())
-    occasions = OccasionCollection(feriennet_app.session())
-    bookings = BookingCollection(feriennet_app.session())
-
-    owner = Bunch(username='admin@example.org')
-
-    prebooking = tuple(d.date() for d in (
-        datetime.now() - timedelta(days=1),
-        datetime.now() + timedelta(days=1)
-    ))
-
-    execution = tuple(d.date() for d in (
-        datetime.now() + timedelta(days=10),
-        datetime.now() + timedelta(days=12)
-    ))
-
-    period = periods.add(
-        title="Ferienpass 2016",
-        prebooking=prebooking,
-        execution=execution,
-        active=True
+    scenario.add_activity(
+        title="Foo",
+        username='admin@example.org',
+        state='accepted'
     )
+    scenario.add_occasion()
+    scenario.add_attendee(name="Dustin", username='admin@example.org')
+    scenario.add_booking(username='admin@example.org', state='accepted')
 
-    foo = activities.add("Foo", username='admin@example.org')
-    foo.propose().accept()
-
-    bar = activities.add("Bar", username='editor@example.org')
-    bar.propose().accept()
-
-    o1 = occasions.add(
-        start=datetime(2016, 11, 25, 8),
-        end=datetime(2016, 11, 25, 16),
-        age=(0, 10),
-        spots=(0, 2),
-        timezone="Europe/Zurich",
-        activity=foo,
-        period=period,
+    scenario.add_activity(
+        title="Bar",
+        username='editor@example.org',
+        state='accepted'
     )
+    scenario.add_occasion()
+    scenario.add_attendee(name="Mike", username='editor@example.org')
+    scenario.add_booking(username='admin@example.org', state='accepted')
 
-    o2 = occasions.add(
-        start=datetime(2016, 11, 25, 17),
-        end=datetime(2016, 11, 25, 20),
-        age=(0, 10),
-        spots=(0, 2),
-        timezone="Europe/Zurich",
-        activity=bar,
-        period=period,
-    )
-
-    a1 = attendees.add(owner, 'Dustin', date(2000, 1, 1), 'female')
-    a2 = attendees.add(owner, 'Mike', date(2000, 1, 1), 'female')
-
-    bookings.add(owner, a1, o1).state = 'accepted'
-    bookings.add(owner, a2, o2).state = 'accepted'
-
-    transaction.commit()
+    scenario.commit()
 
     # anonymous has no access
-    anon = Client(feriennet_app)
-    assert anon.get('/attendees/foo', status=403)
-    assert anon.get('/attendees/bar', status=403)
+    assert client.get('/attendees/foo', status=403)
+    assert client.get('/attendees/bar', status=403)
 
     # if the period is unconfirmed the attendees are not shown
-    admin = Client(feriennet_app)
+    admin = client.spawn()
     admin.login_admin()
 
     for id in ('foo', 'bar'):
@@ -1695,10 +1181,10 @@ def test_occasion_attendance_collection(feriennet_app):
         assert "Dustin" not in page
 
     # organisers only see their own occasions
-    periods.active().confirmed = True
-    transaction.commit()
+    with scenario.update():
+        scenario.latest_period.confirmed = True
 
-    editor = Client(feriennet_app)
+    editor = client.spawn()
     editor.login_editor()
 
     page = editor.get('/attendees/foo')
@@ -1729,30 +1215,11 @@ def test_occasion_attendance_collection(feriennet_app):
     assert "123456789 Admin" in admin.get('/attendees/bar')
 
 
-def test_send_email(feriennet_app):
+def test_send_email(client, scenario):
+    scenario.add_period(title="Ferienpass 2016")
+    scenario.commit()
 
-    client = Client(feriennet_app)
     client.login_admin()
-
-    prebooking = tuple(d.date() for d in (
-        datetime.now() - timedelta(days=1),
-        datetime.now() + timedelta(days=1)
-    ))
-
-    execution = tuple(d.date() for d in (
-        datetime.now() + timedelta(days=10),
-        datetime.now() + timedelta(days=12)
-    ))
-
-    periods = PeriodCollection(feriennet_app.session())
-    periods.add(
-        title="Ferienpass 2016",
-        prebooking=prebooking,
-        execution=execution,
-        active=True
-    )
-
-    transaction.commit()
 
     page = client.get('/notifications').click('Neue Mitteilungs-Vorlage')
     page.form['subject'] = '[Zeitraum] subject'
@@ -1766,62 +1233,22 @@ def test_send_email(feriennet_app):
 
     page.form['roles'] = ['admin', 'editor']
     assert "an 2 Empfänger gesendet" in page.form.submit().follow()
-    assert len(feriennet_app.smtp.outbox) == 2
+    assert len(client.app.smtp.outbox) == 2
 
     message = client.get_email(0)
-    assert "Ferienpass 2016 subject" in feriennet_app.smtp.outbox[0]['subject']
+    assert "Ferienpass 2016 subject" in client.app.smtp.outbox[0]['subject']
     assert "Ferienpass 2016 body" in message
 
 
-def test_import_account_statement(feriennet_app):
-    activities = ActivityCollection(feriennet_app.session(), type='vacation')
-    attendees = AttendeeCollection(feriennet_app.session())
-    periods = PeriodCollection(feriennet_app.session())
-    occasions = OccasionCollection(feriennet_app.session())
-    bookings = BookingCollection(feriennet_app.session())
+def test_import_account_statement(client, scenario):
+    scenario.add_period(confirmed=True)
+    scenario.add_activity(title="Foobar", state='accepted')
+    scenario.add_occasion(cost=100)
+    scenario.add_attendee(name="Dustin")
+    scenario.add_booking(state='accepted', cost=100)
+    scenario.commit()
 
-    owner = Bunch(username='admin@example.org')
-
-    prebooking = tuple(d.date() for d in (
-        datetime.now() - timedelta(days=1),
-        datetime.now() + timedelta(days=1)
-    ))
-
-    execution = tuple(d.date() for d in (
-        datetime.now() + timedelta(days=10),
-        datetime.now() + timedelta(days=12)
-    ))
-
-    period = periods.add(
-        title="Ferienpass 2016",
-        prebooking=prebooking,
-        execution=execution,
-        active=True
-    )
-    period.confirmed = True
-
-    foobar = activities.add("Foobar", username='admin@example.org')
-    foobar.propose().accept()
-
-    o = occasions.add(
-        start=datetime(2016, 11, 25, 8),
-        end=datetime(2016, 11, 25, 16),
-        age=(0, 10),
-        spots=(0, 2),
-        timezone="Europe/Zurich",
-        activity=foobar,
-        period=period,
-        cost=100,
-    )
-
-    a = attendees.add(owner, 'Dustin', date(2000, 1, 1), 'female')
-    b = bookings.add(owner, a, o)
-    b.state = 'accepted'
-    b.cost = 100
-
-    transaction.commit()
-
-    admin = Client(feriennet_app)
+    admin = client.spawn()
     admin.login_admin()
 
     page = admin.get('/').click('Fakturierung')
@@ -1856,7 +1283,7 @@ def test_import_account_statement(feriennet_app):
     page = page.form.submit()
 
     assert "1 Zahlungen importieren" in page
-    admin.post(get_post_url(page, 'button'))
+    page.click("1 Zahlungen importieren")
 
     page = admin.get('/my-bills')
     assert "1 Zahlungen wurden importiert" in page
@@ -1873,55 +1300,19 @@ def test_import_account_statement(feriennet_app):
     assert "0 Zahlungen importieren" in page
 
 
-def test_deadline(feriennet_app):
+def test_deadline(client, scenario):
+    deadline = datetime.utcnow().date() - timedelta(days=1)
 
-    activities = ActivityCollection(feriennet_app.session(), type='vacation')
-    periods = PeriodCollection(feriennet_app.session())
-    occasions = OccasionCollection(feriennet_app.session())
-
-    prebooking = tuple(d.date() for d in (
-        datetime.now() - timedelta(days=1),
-        datetime.now() + timedelta(days=1)
-    ))
-
-    execution = tuple(d.date() for d in (
-        datetime.now() + timedelta(days=10),
-        datetime.now() + timedelta(days=12)
-    ))
-
-    period = periods.add(
-        title="Ferienpass 2016",
-        prebooking=prebooking,
-        execution=execution,
-        active=True
-    )
-
-    foo = activities.add("Foo", username='admin@example.org')
-    foo.propose().accept()
-
-    occasions.add(
-        start=datetime(2016, 11, 25, 8),
-        end=datetime(2016, 11, 25, 16),
-        age=(0, 10),
-        spots=(0, 2),
-        timezone="Europe/Zurich",
-        activity=foo,
-        period=period,
-    )
-
-    transaction.commit()
+    scenario.add_period(deadline_date=deadline)
+    scenario.add_activity(title="Foo", state='accepted')
+    scenario.add_occasion()
+    scenario.commit()
 
     # show no 'enroll' for ordinary users past the deadline
-    period = periods.active()
-    period.deadline_date = datetime.utcnow().date() - timedelta(days=1)
-
-    transaction.commit()
-
-    anonymous = Client(feriennet_app)
-    assert "Anmelden" not in anonymous.get('/activity/foo')
+    assert "Anmelden" not in client.get('/activity/foo')
 
     # do show it for admins though and allow signups
-    admin = Client(feriennet_app)
+    admin = client.spawn()
     admin.login_admin()
 
     assert "Anmelden" in admin.get('/activity/foo')
@@ -1930,16 +1321,14 @@ def test_deadline(feriennet_app):
     assert "Der Anmeldeschluss wurde erreicht" not in page.form.submit()
 
     # stop others, even if they get to the form
-    editor = Client(feriennet_app)
+    editor = client.spawn()
     editor.login_editor()
 
     page = editor.get(page.request.url.replace('http://localhost', ''))
     assert "Der Anmeldeschluss wurde erreicht" in page.form.submit()
 
 
-def test_userprofile_login(feriennet_app):
-    client = Client(feriennet_app)
-
+def test_userprofile_login(client):
     page = client.get('/auth/login?to=/settings')
     page.form['username'] = 'admin@example.org'
     page.form['password'] = 'hunter2'
@@ -1957,7 +1346,7 @@ def test_userprofile_login(feriennet_app):
 
     assert 'settings' in page.request.url
 
-    client = Client(feriennet_app)
+    client = client.spawn()
 
     page = client.get('/auth/login?to=/settings')
     page.form['username'] = 'admin@example.org'
@@ -1967,103 +1356,50 @@ def test_userprofile_login(feriennet_app):
     assert 'settings' in page.request.url
 
 
-def test_provide_activity_again(feriennet_app):
-    admin = Client(feriennet_app)
+def test_provide_activity_again(client, scenario):
+    scenario.add_period()
+    scenario.add_activity(title="Learn How to Program")
+    scenario.add_occasion()
+    scenario.commit()
+
+    admin = client.spawn()
     admin.login_admin()
-
-    new = admin.get('/activities').click("Angebot erfassen")
-    new.form['title'] = "Learn How to Program"
-    new.form['lead'] = "Using a Raspberry Pi we will learn Python"
-    new.form.submit()
-
-    periods = PeriodCollection(feriennet_app.session())
-    activities = ActivityCollection(feriennet_app.session())
-
-    periods.add(
-        title="2016",
-        prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
-        execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
-        active=True
-    )
-
-    activity = activities.query().first()
-    transaction.commit()
 
     assert "Erneut anbieten" not in admin.get('/activities')
 
-    activity = activities.query().first()
-    activity.state = 'archived'
-    transaction.commit()
+    with scenario.update():
+        scenario.latest_activity.state = 'archived'
 
     assert "Erneut anbieten" in admin.get('/activities')
 
-    url = get_post_url(admin.get('/activities'), 'confirm')
-
-    editor = Client(feriennet_app)
+    editor = client.spawn()
     editor.login_editor()
-    editor.post(url, status=404)
-    assert activities.query().first().state == 'archived'
 
-    admin.post(url)
-    assert activities.query().first().state == 'preview'
+    editor.post('/activity/learn-how-to-program/offer-again', status=404)
+    scenario.refresh()
+    assert scenario.latest_activity.state == 'archived'
+
+    admin.post('/activity/learn-how-to-program/offer-again')
+    scenario.refresh()
+    assert scenario.latest_activity.state == 'preview'
 
 
-def test_online_payment(feriennet_app):
-    activities = ActivityCollection(feriennet_app.session(), type='vacation')
-    attendees = AttendeeCollection(feriennet_app.session())
-    periods = PeriodCollection(feriennet_app.session())
-    occasions = OccasionCollection(feriennet_app.session())
-    bookings = BookingCollection(feriennet_app.session())
+def test_online_payment(client, scenario):
+    scenario.add_period(title="Ferienpass 2017", confirmed=True)
+    scenario.add_activity(title="Foobar", state='accepted')
+    scenario.add_occasion(cost=100)
+    scenario.add_attendee(name="Dustin")
+    scenario.add_booking(state='accepted', cost=100)
 
-    owner = Bunch(username='admin@example.org')
-
-    prebooking = tuple(d.date() for d in (
-        datetime.now() - timedelta(days=1),
-        datetime.now() + timedelta(days=1)
-    ))
-
-    execution = tuple(d.date() for d in (
-        datetime.now() + timedelta(days=10),
-        datetime.now() + timedelta(days=12)
-    ))
-
-    period = periods.add(
-        title="Ferienpass 2017",
-        prebooking=prebooking,
-        execution=execution,
-        active=True
-    )
-    period.confirmed = True
-
-    foobar = activities.add("Foobar", username='admin@example.org')
-    foobar.propose().accept()
-
-    o = occasions.add(
-        start=datetime(2016, 11, 25, 8),
-        end=datetime(2016, 11, 25, 16),
-        age=(0, 10),
-        spots=(0, 2),
-        timezone="Europe/Zurich",
-        activity=foobar,
-        period=period,
-        cost=100,
+    scenario.c.payment_providers.add(
+        type='stripe_connect', default=True, meta={
+            'publishable_key': '0xdeadbeef',
+            'access_token': 'foobar'
+        }
     )
 
-    a = attendees.add(owner, 'Dustin', date(2000, 1, 1), 'female')
-    b = bookings.add(owner, a, o)
-    b.state = 'accepted'
-    b.cost = 100
+    scenario.commit()
 
-    session = feriennet_app.session()
-    providers = PaymentProviderCollection(session)
-    providers.add(type='stripe_connect', default=True, meta={
-        'publishable_key': '0xdeadbeef',
-        'access_token': 'foobar'
-    })
-
-    transaction.commit()
-
-    client = Client(feriennet_app)
     client.login_admin()
 
     assert 'checkout-button' not in client.get('/my-bills')
@@ -2107,7 +1443,8 @@ def test_online_payment(feriennet_app):
                     'paid': True,
                     'status': 'foobar',
                     'metadata': {
-                        'payment_id': session.query(Payment).one().id.hex
+                        'payment_id':
+                        scenario.session.query(Payment).one().id.hex
                     }
                 }
             ]
@@ -2146,7 +1483,8 @@ def test_online_payment(feriennet_app):
             'id': '123456'
         }
         m.post('https://api.stripe.com/v1/refunds', json=charge)
-        client.post(get_post_url(page, 'payment-refund'))
+        page.click("Zahlung rückerstatten")
+        # client.post(get_post_url(page, 'payment-refund'))
 
     page = client.get('/billing?expand=1')
     assert ">Unbezahlt<" in page
@@ -2159,11 +1497,8 @@ def test_online_payment(feriennet_app):
     assert "Jetzt online bezahlen" in page
 
     # it should be possible to change the payment state again
-    mark_paid_url = get_post_url(client.get('/billing'), 'mark-paid')
-    client.post(mark_paid_url)
-
-    mark_unpaid_url = get_post_url(client.get('/billing'), 'mark-unpaid')
-    client.post(mark_unpaid_url)
+    client.get('/billing').click("Rechnung als bezahlt markieren")
+    client.get('/billing').click("Rechnung als unbezahlt markieren")
 
     # pay again (leading to a refunded and an open charge)
     with requests_mock.Mocker() as m:
@@ -2183,56 +1518,24 @@ def test_online_payment(feriennet_app):
     assert ">Rückerstattet<" in page
 
 
-def test_icalendar_subscription(feriennet_app):
-    activities = ActivityCollection(feriennet_app.session(), type='vacation')
-    attendees = AttendeeCollection(feriennet_app.session())
-    bookings = BookingCollection(feriennet_app.session())
-    periods = PeriodCollection(feriennet_app.session())
-    occasions = OccasionCollection(feriennet_app.session())
-
-    owner = Bunch(username='admin@example.org')
-
-    prebooking = tuple(d.date() for d in (
-        datetime.now() - timedelta(days=1),
-        datetime.now() + timedelta(days=1)
-    ))
-
-    execution = tuple(d.date() for d in (
-        datetime.now() + timedelta(days=10),
-        datetime.now() + timedelta(days=12)
-    ))
-
-    period = periods.add(
-        title="Ferienpass 2016",
-        prebooking=prebooking,
-        execution=execution,
-        active=True
-    )
-
-    o = occasions.add(
+def test_icalendar_subscription(client, scenario):
+    scenario.add_period()
+    scenario.add_activity(title="Fishing")
+    scenario.add_occasion(
         start=datetime(2016, 11, 25, 8),
         end=datetime(2016, 11, 25, 16),
-        note="Children might get wet",
-        age=(0, 10),
-        spots=(0, 10),
-        timezone="Europe/Zurich",
-        activity=activities.add("Fishing", username='admin@example.org'),
-        period=period
+        note="Children might get wet"
     )
+    scenario.add_attendee()
+    scenario.add_booking()
+    scenario.commit()
 
-    a = attendees.add(owner, 'Dustin', date(2000, 1, 1), 'female')
-    bookings.add(owner, a, o)
-
-    transaction.commit()
-
-    client = Client(feriennet_app)
     client.login_admin()
 
     # When the period is unconfirmed, the events are not shown in the calendar
-    periods.query().one().confirmed = False
-    bookings.query().one().state = 'accepted'
-
-    transaction.commit()
+    with scenario.update():
+        scenario.latest_period.confirmed = False
+        scenario.latest_booking.state = 'accepted'
 
     page = client.get('/my-bookings')
 
@@ -2243,19 +1546,17 @@ def test_icalendar_subscription(feriennet_app):
     assert 'VEVENT' not in calendar
 
     # Once the period is confirmed, the state has to be accepted as well
-    periods.query().one().confirmed = True
-    bookings.query().one().state = 'open'
-
-    transaction.commit()
+    with scenario.update():
+        scenario.latest_period.confirmed = True
+        scenario.latest_booking.state = 'open'
 
     calendar = client.get(url).text
     assert 'VEVENT' not in calendar
 
     # Only with a confirmed period and accepted booking are we getting anything
-    periods.query().one().confirmed = True
-    bookings.query().one().state = 'accepted'
-
-    transaction.commit()
+    with scenario.update():
+        scenario.latest_period.confirmed = True
+        scenario.latest_booking.state = 'accepted'
 
     calendar = client.get(url).text
     assert 'VEVENT' in calendar
@@ -2266,9 +1567,7 @@ def test_icalendar_subscription(feriennet_app):
     assert 'DTEND;VALUE=DATE-TIME:20161125T150000Z' in calendar
 
 
-def test_fill_out_contact_form(feriennet_app):
-    client = Client(feriennet_app)
-
+def test_fill_out_contact_form(client):
     page = client.get('/form/kontakt')
     page.form['vorname'] = 'Foo'
     page.form['nachname'] = 'Bar'
@@ -2282,71 +1581,23 @@ def test_fill_out_contact_form(feriennet_app):
     page = page.form.submit().follow()
     assert "Anfrage eingereicht" in page
 
-    assert len(feriennet_app.smtp.outbox) == 1
+    assert len(client.app.smtp.outbox) == 1
 
 
-def test_book_alternate_occasion(feriennet_app):
-    activities = ActivityCollection(feriennet_app.session(), type='vacation')
-    attendees = AttendeeCollection(feriennet_app.session())
-    bookings = BookingCollection(feriennet_app.session())
-    periods = PeriodCollection(feriennet_app.session())
-    occasions = OccasionCollection(feriennet_app.session())
+def test_book_alternate_occasion(client, scenario):
+    scenario.add_period(title="Ferienpass 2018")
+    scenario.add_activity(title="Fishing", state='accepted')
+    scenario.add_occasion()
+    scenario.add_attendee(birth_date=date.today() - timedelta(days=8 * 360))
+    scenario.add_booking(state='blocked')
+    scenario.add_occasion()
+    scenario.commit()
 
-    owner = Bunch(username='admin@example.org')
+    scenario.refresh()
+    assert scenario.latest_booking.occasion == scenario.occasions[0]
 
-    prebooking = tuple(d.date() for d in (
-        datetime.now() - timedelta(days=1),
-        datetime.now() + timedelta(days=1)
-    ))
-
-    execution = tuple(d.date() for d in (
-        datetime.now() + timedelta(days=10),
-        datetime.now() + timedelta(days=12)
-    ))
-
-    period = periods.add(
-        title="Ferienpass 2018",
-        prebooking=prebooking,
-        execution=execution,
-        active=True
-    )
-
-    fishing = activities.add("Fishing", username='admin@example.org')
-    fishing.state = 'accepted'
-
-    o1 = occasions.add(
-        start=datetime(2018, 7, 4, 8),
-        end=datetime(2018, 7, 4, 16),
-        age=(0, 100),
-        spots=(0, 100),
-        timezone="Europe/Zurich",
-        activity=fishing,
-        period=period
-    )
-
-    o2 = occasions.add(
-        start=datetime(2018, 7, 4, 8),
-        end=datetime(2018, 7, 4, 16),
-        age=(0, 100),
-        spots=(0, 100),
-        timezone="Europe/Zurich",
-        activity=fishing,
-        period=period
-    )
-
-    o1_id = o1.id
-    o2_id = o2.id
-
-    a = attendees.add(owner, 'Dustin', date(2010, 1, 1), 'male')
-    b = bookings.add(owner, a, o1)
-    b.state = 'blocked'
-
-    transaction.commit()
-    assert bookings.query().one().occasion_id == o1_id
-
-    client = Client(feriennet_app)
     client.login_admin()
-    fill_out_profile(client)
+    client.fill_out_profile()
 
     # before period confirmation, the blocked booking must remain
     page = client.get('/activity/fishing').click('Anmelden', index=1)
@@ -2354,67 +1605,38 @@ def test_book_alternate_occasion(feriennet_app):
 
     assert "bereits eine andere Durchführung dieses Angebots" in page
 
-    periods.query().one().confirmed = True
-    transaction.commit()
+    with scenario.update():
+        scenario.latest_period.confirmed = True
 
-    # we should be able to directly book o2, which should remove o1's booking
+    # we should be able to directly book occasion two,
+    # which should remove occasion one's booking
     page = client.get('/activity/fishing').click('Anmelden', index=1)
     page = page.form.submit().follow()
 
     assert "bereits eine andere Durchführung dieses Angebots" not in page
-    assert bookings.query().one().occasion_id == o2_id
+
+    scenario.refresh()
+    assert scenario.latest_booking.occasion == scenario.occasions[1]
 
 
-def test_occasion_number(feriennet_app):
-    activities = ActivityCollection(feriennet_app.session(), type='vacation')
-    periods = PeriodCollection(feriennet_app.session())
-    occasions = OccasionCollection(feriennet_app.session())
+def test_occasion_number(client, scenario):
+    period = scenario.add_period()
 
-    prebooking = tuple(d.date() for d in (
-        datetime.now() - timedelta(days=1),
-        datetime.now() + timedelta(days=1)
-    ))
+    scenario.add_activity(name='fishing', state='accepted')
 
-    execution = tuple(d.date() for d in (
-        datetime.now() + timedelta(days=10),
-        datetime.now() + timedelta(days=12)
-    ))
-
-    period = periods.add(
-        title="Ferienpass 2018",
-        prebooking=prebooking,
-        execution=execution,
-        active=True
+    scenario.add_occasion(
+        start=datetime.combine(period.execution_start, time(10, 0)),
+        end=datetime.combine(period.execution_start, time(11, 0))
+    )
+    scenario.add_occasion(
+        start=datetime.combine(period.execution_start, time(11, 0)),
+        end=datetime.combine(period.execution_start, time(12, 0))
     )
 
-    fishing = activities.add("Fishing", username='admin@example.org')
-    fishing.state = 'accepted'
+    scenario.commit()
 
-    occasions.add(
-        start=datetime(2018, 7, 4, 8),
-        end=datetime(2018, 7, 4, 16),
-        age=(0, 100),
-        spots=(0, 100),
-        timezone="Europe/Zurich",
-        activity=fishing,
-        period=period
-    )
-
-    occasions.add(
-        start=datetime(2018, 7, 5, 8),
-        end=datetime(2018, 7, 5, 16),
-        age=(0, 100),
-        spots=(0, 100),
-        timezone="Europe/Zurich",
-        activity=fishing,
-        period=period
-    )
-
-    transaction.commit()
-
-    client = Client(feriennet_app)
     client.login_admin()
-    fill_out_profile(client)
+    client.fill_out_profile()
 
     page = client.get('/activity/fishing')
 

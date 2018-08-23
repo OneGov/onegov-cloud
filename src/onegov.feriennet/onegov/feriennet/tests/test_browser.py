@@ -1,69 +1,26 @@
 import time
-import transaction
 
-from datetime import date, datetime, timedelta
-from onegov.activity import ActivityCollection
-from onegov.activity import AttendeeCollection
-from onegov.activity import BookingCollection
-from onegov.activity import OccasionCollection
-from onegov.activity import PeriodCollection
-from onegov.user import UserCollection
-from onegov.core.utils import Bunch
+from datetime import datetime
 
 
-def test_browse_matching(browser, feriennet_app):
-    activities = ActivityCollection(feriennet_app.session(), type='vacation')
-    attendees = AttendeeCollection(feriennet_app.session())
-    bookings = BookingCollection(feriennet_app.session())
-    periods = PeriodCollection(feriennet_app.session())
-    occasions = OccasionCollection(feriennet_app.session())
-
-    owner = Bunch(username='admin@example.org')
-
-    prebooking = tuple(d.date() for d in (
-        datetime.now() - timedelta(days=1),
-        datetime.now() + timedelta(days=1)
-    ))
-
-    execution = tuple(d.date() for d in (
-        datetime.now() + timedelta(days=10),
-        datetime.now() + timedelta(days=12)
-    ))
-
-    period = periods.add(
-        title="Ferienpass 2016",
-        prebooking=prebooking,
-        execution=execution,
-        active=True
-    )
-
-    o = []
+def test_browse_matching(browser, scenario):
+    scenario.add_period(title="Ferienpass 2016")
 
     for i in range(2):
-        a = activities.add("A {}".format(i), username='admin@example.org')
-        a.propose().accept()
+        scenario.add_activity(title=f"A {i}", state='accepted')
+        scenario.add_occasion(age=(0, 10), spots=(2, 4))
 
-        o.append(occasions.add(
-            start=datetime(2016, 10, 8 + i, 8),
-            end=datetime(2016, 10, 8 + i, 16),
-            age=(0, 10),
-            spots=(2, 4),
-            timezone="Europe/Zurich",
-            activity=a,
-            period=period
-        ))
-
-    a1 = attendees.add(owner, 'Dustin', date(2000, 1, 1), 'female')
-    a2 = attendees.add(owner, 'Mike', date(2000, 1, 1), 'female')
+    dustin = scenario.add_attendee(name="Dustin")
+    mike = scenario.add_attendee(name="Mike")
 
     # the first course has enough attendees
-    bookings.add(owner, a1, o[0])
-    bookings.add(owner, a2, o[0])
+    scenario.add_booking(attendee=dustin, occasion=scenario.occasions[0])
+    scenario.add_booking(attendee=mike, occasion=scenario.occasions[0])
 
     # the second one does not
-    bookings.add(owner, a1, o[1])
+    scenario.add_booking(attendee=mike, occasion=scenario.occasions[1])
 
-    transaction.commit()
+    scenario.commit()
 
     browser.login_admin()
     browser.visit('/matching')
@@ -114,84 +71,46 @@ def test_browse_matching(browser, feriennet_app):
     assert browser.is_text_present("Abgeschlossen")
 
 
-def test_browse_billing(browser, feriennet_app, postgres):
+def test_browse_billing(browser, scenario, postgres):
+    scenario.add_period(title="Ferienpass 2016", confirmed=True)
+    scenario.add_activity(title="Foobar", state='accepted')
+    scenario.add_user(username='member@example.org', role='member')
 
-    activities = ActivityCollection(feriennet_app.session(), type='vacation')
-    attendees = AttendeeCollection(feriennet_app.session())
-    periods = PeriodCollection(feriennet_app.session())
-    occasions = OccasionCollection(feriennet_app.session())
-    bookings = BookingCollection(feriennet_app.session())
+    scenario.c.users.by_username('admin@example.org').realname = 'Jane Doe'
+    scenario.c.users.by_username('member@example.org').realname = 'John Doe'
 
-    owner = Bunch(username='admin@example.org')
+    scenario.add_occasion(age=(0, 10), spots=(0, 2), cost=100)
+    scenario.add_occasion(age=(0, 10), spots=(0, 2), cost=1000)
 
-    prebooking = tuple(d.date() for d in (
-        datetime.now() - timedelta(days=1),
-        datetime.now() + timedelta(days=1)
-    ))
-
-    execution = tuple(d.date() for d in (
-        datetime.now() + timedelta(days=10),
-        datetime.now() + timedelta(days=12)
-    ))
-
-    period = periods.add(
-        title="Ferienpass 2016",
-        prebooking=prebooking,
-        execution=execution,
-        active=True
+    scenario.add_attendee(name="Dustin")
+    scenario.add_booking(
+        username='admin@example.org',
+        occasion=scenario.occasions[0],
+        state='accepted',
+        cost=100
     )
-    period.confirmed = True
-
-    users = UserCollection(feriennet_app.session())
-    users.by_username('admin@example.org').realname = 'Jane Doe'
-
-    member = users.add('member@example.org', 'hunter2', 'member')
-    member.realname = 'John Doe'
-
-    foobar = activities.add("Foobar", username='admin@example.org')
-    foobar.propose().accept()
-
-    o1 = occasions.add(
-        start=datetime(2016, 11, 25, 8),
-        end=datetime(2016, 11, 25, 16),
-        age=(0, 10),
-        spots=(0, 2),
-        timezone="Europe/Zurich",
-        activity=foobar,
-        period=period,
-        cost=100,
+    scenario.add_booking(
+        username='admin@example.org',
+        occasion=scenario.occasions[1],
+        state='cancelled',
+        cost=1000
     )
 
-    o2 = occasions.add(
-        start=datetime(2016, 11, 25, 17),
-        end=datetime(2016, 11, 25, 20),
-        age=(0, 10),
-        spots=(0, 2),
-        timezone="Europe/Zurich",
-        activity=foobar,
-        period=period,
-        cost=1000,
+    scenario.add_attendee(name="Mike")
+    scenario.add_booking(
+        username='member@example.org',
+        occasion=scenario.occasions[0],
+        state='accepted',
+        cost=100
+    )
+    scenario.add_booking(
+        username='member@example.org',
+        occasion=scenario.occasions[1],
+        state='accepted',
+        cost=1000
     )
 
-    a1 = attendees.add(owner, 'Dustin', date(2000, 1, 1), 'female')
-    a2 = attendees.add(member, 'Mike', date(2000, 1, 1), 'female')
-
-    b1 = bookings.add(owner, a1, o1)
-    b2 = bookings.add(owner, a1, o2)
-    b3 = bookings.add(member, a2, o1)
-    b4 = bookings.add(member, a2, o2)
-
-    b1.state = 'accepted'
-    b2.state = 'cancelled'
-    b3.state = 'accepted'
-    b4.state = 'accepted'
-
-    b1.cost = 100
-    b2.cost = 1000
-    b3.cost = 100
-    b4.cost = 1000
-
-    transaction.commit()
+    scenario.commit()
 
     admin = browser
     member = browser.clone()
