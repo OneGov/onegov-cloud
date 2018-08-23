@@ -85,7 +85,6 @@ class Scenario(object):
 
     """
 
-
     def __init__(self, pytest_request):
         self.pytest_request = pytest_request
         self.faker = Faker()

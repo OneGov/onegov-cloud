@@ -1,7 +1,5 @@
 import time
 
-from datetime import datetime
-
 
 def test_browse_matching(browser, scenario):
     scenario.add_period(title="Ferienpass 2016")
