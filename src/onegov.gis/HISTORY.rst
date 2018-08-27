@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.7.2 (2018-08-27)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes a javascript issue with setting markers.
   [href]
 
