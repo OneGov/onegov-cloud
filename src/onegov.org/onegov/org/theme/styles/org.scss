@@ -1877,10 +1877,15 @@ div#redactor-droparea {
     @include hairline;
     font-style: italic;
     margin-bottom: 1rem;
+    overflow: hidden;
     padding-bottom: .7rem;
     padding-left: 1rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
     li {
+        display: inline;
+        float: none;
         line-height: 1rem;
 
         // highlight the parent
@@ -1895,8 +1900,11 @@ div#redactor-droparea {
         padding-left: 0;
 
         li {
-            float: none;
+            display: block;
+            max-width: 100%;
+            overflow: hidden;
             padding-left: 0;
+            text-overflow: ellipsis;
 
             + li {
                 margin-top: .5rem;
@@ -4580,8 +4588,8 @@ h2 + div.timeline {
         }
 
         td:nth-child(4) {
-            white-space: nowrap;
             text-align: right;
+            white-space: nowrap;
         }
     }
 

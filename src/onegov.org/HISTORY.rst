@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes breadcrumbs wrapping onto new lines when becoming too long.
+  [href]
+
 0.32.0 (2018-08-21)
 ~~~~~~~~~~~~~~~~~~~
 
