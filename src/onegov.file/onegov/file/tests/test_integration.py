@@ -167,8 +167,7 @@ def test_file_note_header(app):
 
 def test_bust_cache(app, temporary_path):
     ensure_correct_depot(app)
-
-    assert not (temporary_path / 'foobar').exists()
+    app.frontend_cache_bust_delay = 0.1
 
     # ensure that this is non-blocking
     start = datetime.utcnow()
@@ -177,5 +176,39 @@ def test_bust_cache(app, temporary_path):
     assert not (temporary_path / 'foobar').exists()
 
     # wait for it to complete
-    sleep(5.1)
+    sleep(0.2)
     assert (temporary_path / 'foobar').exists()
+
+
+def test_bust_cache_via_events(app, temporary_path):
+    ensure_correct_depot(app)
+    app.frontend_cache_bust_delay = 0.1
+
+    def busted(fid):
+        sleep(0.2)
+        return (temporary_path / fid).exists()
+
+    def reset(fid):
+        (temporary_path / fid).unlink()
+
+    transaction.begin()
+    files = FileCollection(app.session())
+    fid = files.add('avatar.png', create_image(1024, 1024), note='Avatar').id
+    transaction.commit()
+
+    assert not busted(fid)
+
+    transaction.begin()
+    FileCollection(app.session()).query().first().note = 'Gravatar'
+    transaction.commit()
+
+    assert busted(fid)
+    reset(fid)
+
+    transaction.begin()
+    files = FileCollection(app.session())
+    files.delete(files.query().first())
+    transaction.commit()
+
+    assert busted(fid)
+    reset(fid)

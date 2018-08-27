@@ -4,6 +4,7 @@ import shlex
 import shutil
 import subprocess
 
+from blinker import ANY
 from contextlib import contextmanager
 from depot.manager import DepotManager
 from depot.middleware import FileServeApp
@@ -63,12 +64,17 @@ class DepotApp(App):
             is the command that will be run when the cache is busted::
 
                 sleep 5
-                bust-cache https://example.org/storage/foo
+                bust-cache id-of-the-file
 
             As you can see, the command is invoked with a five second delay.
             This avoids premature cache busting (before the end of the
             transaction). The command is non-blocking, so those 5 seconds
             are not counted towards the request-time.
+
+            Frontend caches might use the domain and the full path to cache
+            a file, but since we can technically have multiple domains/paths
+            point to the same file we simply pass the id and let the cache
+            figure out what urls need to be busted as a result.
 
             The script is invoked with the permissions of the user running
             the backend. If other permissions are required, use suid.
@@ -80,7 +86,10 @@ class DepotApp(App):
 
         self.depot_backend = cfg.get('depot_backend')
         self.depot_storage_path = cfg.get('depot_storage_path')
+
         self.frontend_cache_buster = cfg.get('frontend_cache_buster')
+        self.frontend_cache_bust_delay = cfg.get(
+            'frontend_cache_bust_delay', 5)
 
         assert self.depot_backend in SUPPORTED_STORAGE_BACKENDS, """
             A depot app *must* have a valid storage backend set up.
@@ -93,6 +102,13 @@ class DepotApp(App):
             assert os.path.isdir(self.depot_storage_path), """
                 The depot storage path must exist.
             """
+
+        if self.frontend_cache_buster:
+
+            @self.session_manager.on_update.connect_via(ANY, weak=False)
+            @self.session_manager.on_delete.connect_via(ANY, weak=False)
+            def on_file_change(schema, obj):
+                self.bust_frontend_cache(obj.id)
 
     @property
     def bound_depot_id(self):
@@ -136,13 +152,13 @@ class DepotApp(App):
 
         DepotManager.set_default(self.bound_depot_id)
 
-    def bust_frontend_cache(self, url):
+    def bust_frontend_cache(self, file_id):
         if not self.frontend_cache_buster:
             return
 
         bin = shlex.quote(self.frontend_cache_buster)
-        url = shlex.quote(url)
-        cmd = f'sleep 5 && {bin} {url}'
+        fid = shlex.quote(file_id)
+        cmd = f'sleep {self.frontend_cache_bust_delay} && {bin} {fid}'
 
         subprocess.Popen(cmd, close_fds=True, shell=True)
 
@@ -300,5 +316,4 @@ def delete_file(self, request):
 
     """
     request.assert_valid_csrf_token()
-    request.app.bust_frontend_cache(request.link(self))
     FileCollection(request.session).delete(self)
