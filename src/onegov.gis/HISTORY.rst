@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Prevents 'null' or 'undefined' showing up in popup lead block.
+  [href]
+
 0.7.0 (2018-08-20)
 ~~~~~~~~~~~~~~~~~~~
 

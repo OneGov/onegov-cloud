@@ -418,7 +418,7 @@ var MapboxGeojsonMap = function(target) {
                 '<a class="popup-title" href="' + feature.properties.link + '">' +
                 feature.properties.title +
                 '</a>' +
-                '<div class="popup-lead">' + feature.properties.lead + '</div>'
+                '<div class="popup-lead">' + (feature.properties.lead || '') + '</div>'
             );
         }
     };
