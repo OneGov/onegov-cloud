@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.32.1 (2018-08-27)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes custom directory icons not being used everywhere.
   [href]
 
