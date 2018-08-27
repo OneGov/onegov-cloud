@@ -4594,10 +4594,10 @@ h2 + div.timeline {
     }
 
     .file-info + tr {
-        background-color: white;
+        background-color: $white;
 
         td {
-            border-top: 1px solid white;
+            border-top: 1px solid $white;
             position: relative;
             top: -1px;
         }
@@ -4624,11 +4624,11 @@ h2 + div.timeline {
     Pdf Preview
 */
 .pdf-preview {
-    box-shadow: 4px 4px 10px rgba(100, 100, 100, 0.4);
-    background: white;
+    background: $white;
+    box-shadow: 4px 4px 10px rgba(100, 100, 100, .4);
 
-    max-width: 256px;
     max-height: 256px;
+    max-width: 256px;
 }
 
 /*
