@@ -207,6 +207,15 @@ def add_fallback_to_tail(translation, fallback):
         if translation is fallback:
             return
 
+    # Avoid creating recursive chains
+    for item in (translation, fallback):
+        while item._fallback is not None:
+            item = item._fallback
+            if item is translation or item is fallback:
+                raise RuntimeError(
+                    "Recursive translation fallback chain detected"
+                )
+
     translation.add_fallback(fallback)
 
 
