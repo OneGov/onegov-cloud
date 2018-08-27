@@ -73,6 +73,12 @@ class Layout(ChameleonLayout):
     datetime_long_without_year_format = 'E d. MMMM HH:mm'
     event_format = 'EEEE, d. MMMM YYYY, HH:mm'
 
+    def __init__(self, *args, **kwargs):
+        # overrides body attributes set in the layout template
+        self.custom_body_attributes = {}
+
+        super().__init__(*args, **kwargs)
+
     @property
     def name(self):
         """ Takes the class name of the layout and generates a name which
@@ -1819,7 +1825,25 @@ class DirectoryCollectionLayout(DefaultLayout):
             ]
 
 
-class DirectoryEntryCollectionLayout(DefaultLayout):
+class DirectoryEntryBaseLayout(DefaultLayout):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.directory.marker_color:
+            self.custom_body_attributes['data-default-marker-color']\
+                = self.directory.marker_color
+
+        if self.directory.marker_icon:
+            self.custom_body_attributes['data-default-marker-icon']\
+                = self.directory.marker_icon.encode('unicode-escape')[2:]
+
+    @property
+    def directory(self):
+        return self.model.directory
+
+
+class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
 
     @cached_property
     def breadcrumbs(self):
@@ -1913,7 +1937,7 @@ class DirectoryEntryCollectionLayout(DefaultLayout):
         return list(links())
 
 
-class DirectoryEntryLayout(DefaultLayout):
+class DirectoryEntryLayout(DirectoryEntryBaseLayout):
 
     @cached_property
     def breadcrumbs(self):

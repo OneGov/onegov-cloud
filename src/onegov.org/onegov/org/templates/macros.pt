@@ -373,7 +373,7 @@
                     <tal:block condition="contact" content="structure contact" />
                     <br tal:condition="coordinates and contact" />
                     <h2 i18n:translate tal:condition="not contact">Map</h2>
-                    <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}"></div>
+                    <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div>
                     <div class="location" tal:condition="location">${location}</div>
                 </div>
                 <div class="side-panel people-panel" tal:condition="people">

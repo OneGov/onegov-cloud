@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes custom directory icons not being used everywhere.
+  [href]
+
 - Fixes breadcrumbs wrapping onto new lines when becoming too long.
   [href]
 

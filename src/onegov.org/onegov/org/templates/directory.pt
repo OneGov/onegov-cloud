@@ -12,8 +12,6 @@
                     data-lon="${layout.default_map_view.lon}"
                     data-zoom="${layout.default_map_view.zoom}"
                     data-map-height="333px"
-                    data-marker-icon="${directory.marker_icon.encode('unicode-escape')[2:]|nothing}"
-                    data-marker-color="${directory.marker_color|nothing}"
                 ></div>
             </div>
         </div>
