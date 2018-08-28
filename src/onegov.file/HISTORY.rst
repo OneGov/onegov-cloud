@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a "published" state and a publication date to trigger it.
+  [href]
+
 - Changes frontend cache busting to use ORM events.
   [href]
 

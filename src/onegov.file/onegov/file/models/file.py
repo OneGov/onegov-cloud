@@ -3,12 +3,12 @@ from onegov.core.crypto import random_token
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import Associable
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import JSON
+from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.core.utils import normalize_for_url
 from onegov.file.attachments import ProcessedUploadedFile
 from onegov.file.filters import OnlyIfImage, WithThumbnailFilter
 from onegov.file.filters import OnlyIfPDF, WithPDFThumbnailFilter
-from sqlalchemy import Column, Index, Text
+from sqlalchemy import Boolean, Column, Index, Text
 from sqlalchemy_utils import observes
 
 
@@ -52,6 +52,18 @@ class File(Base, Associable, TimestampMixin):
 
     #: the default order of files
     order = Column(Text, nullable=False)
+
+    #: true if published
+    published = Column(Boolean, nullable=False, default=True)
+
+    #: the date after which this file will be made public - this controls
+    #: the visibility of the object through the ``is_hidden_from_public``
+    #: property which in turn is enforced by :mod:`onegov.core.security.rules`.
+    #:
+    #: To get a file published, be sure to call
+    #: :meth:`onegov.file.collection.FileCollection.publish_files` once an
+    #: hour through a cronjob (see :mod:`onegov.core.cronjobs`)!
+    publish_date = Column(UTCDateTime, nullable=True)
 
     #: the type of the file, this can be used to create custom polymorphic
     #: subclasses. See `<http://docs.sqlalchemy.org/en/improve_toc/
@@ -105,6 +117,10 @@ class File(Base, Associable, TimestampMixin):
     @observes('name')
     def name_observer(self, name):
         self.order = normalize_for_url(name)
+
+    @property
+    def is_hidden_from_public(self):
+        return not self.published
 
     @property
     def file_id(self):

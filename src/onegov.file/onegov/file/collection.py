@@ -1,7 +1,10 @@
+from datetime import timedelta
 from depot.io.utils import file_from_content
 from onegov.file.attachments import calculate_checksum
 from onegov.file.models import File, FileSet
 from onegov.file.utils import as_fileintent
+from sedate import utcnow
+from sqlalchemy import and_
 
 
 class FileCollection(object):
@@ -39,7 +42,8 @@ class FileCollection(object):
 
         return self.session.query(File)
 
-    def add(self, filename, content, note=None):
+    def add(self, filename, content, note=None, published=True,
+            publish_date=None):
         """ Adds a file with the given filename. The content maybe either
         in bytes or a file object.
 
@@ -54,6 +58,8 @@ class FileCollection(object):
         file.name = filename
         file.note = note
         file.type = type
+        file.published = published
+        file.publish_date = publish_date
         file.reference = as_fileintent(content, filename)
 
         self.session.add(file)
@@ -78,6 +84,29 @@ class FileCollection(object):
 
     def delete(self, file):
         self.session.delete(file)
+        self.session.flush()
+
+    def publishable_files(self, horizon=None):
+        """ Yields files which may be published. """
+
+        yield from self.query().filter(and_(
+            File.published == False,
+            File.publish_date != None,
+            File.publish_date <= horizon
+        ))
+
+    def publish_files(self, horizon=None):
+        """ Publishes unpublished files with a publish date older than the
+        given horizon.
+
+        """
+        # default to a horizon slightly into the future as this method is
+        # usually called by cronjob which is not perfectly on time
+        horizon = horizon or (utcnow() + timedelta(seconds=90))
+
+        for f in self.publishable_files(horizon):
+            f.published = True
+
         self.session.flush()
 
     def by_id(self, file_id):

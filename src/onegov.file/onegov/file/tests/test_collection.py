@@ -1,10 +1,12 @@
 import pytest
 import transaction
 
+from datetime import timedelta
 from depot.manager import DepotManager
 from io import BytesIO
 from onegov.file import FileCollection, FileSetCollection
 from onegov_testing.utils import create_image
+from sedate import utcnow
 
 
 @pytest.fixture(scope='function')
@@ -172,3 +174,37 @@ def test_handle_duplicates(files):
     files.allow_duplicates = True
 
     files.add('readme.txt', content=b'README')
+
+
+def test_file_publication(files):
+    horizon = utcnow()
+
+    files.add(
+        filename='foo',
+        content=b'',
+        published=False,
+        publish_date=None
+    )
+    files.add(
+        filename='bar',
+        content=b'',
+        published=False,
+        publish_date=horizon - timedelta(hours=1)
+    )
+    files.add(
+        filename='baz',
+        content=b'',
+        published=False,
+        publish_date=horizon + timedelta(hours=1)
+    )
+
+    assert files.query().filter_by(published=True).count() == 0
+
+    files.publish_files(horizon=horizon - timedelta(hours=1, seconds=1))
+    assert files.query().filter_by(published=True).count() == 0
+
+    files.publish_files(horizon=horizon)
+    assert files.query().filter_by(published=True).count() == 1
+
+    files.publish_files(horizon=horizon + timedelta(hours=1))
+    assert files.query().filter_by(published=True).count() == 2

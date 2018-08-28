@@ -6,15 +6,16 @@ import multiprocessing
 
 from concurrent.futures import ThreadPoolExecutor
 from copy import copy
+from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task
 from onegov.core.utils import normalize_for_url
 from onegov.file import FileCollection
 from onegov.file.attachments import get_svg_size_or_default
-from onegov.file.integration import DepotApp
 from onegov.file.filters import WithPDFThumbnailFilter
+from onegov.file.integration import DepotApp
 from onegov.file.utils import get_image_size
 from PIL import Image
-from sqlalchemy import Column, Text, text
+from sqlalchemy import Boolean, Column, Text, text
 from sqlalchemy.orm.attributes import flag_modified
 
 
@@ -138,3 +139,14 @@ def add_thumbnails_to_pdfs(context):
                 pdf_filter.store_thumbnail(pdf.reference, thumbnail)
 
                 flag_modified(pdf, 'reference')
+
+
+@upgrade_task('Add publication dates')
+def add_publication_dates(context):
+    context.operations.add_column(
+        'files', Column('publish_date', UTCDateTime, nullable=True))
+
+    context.add_column_with_defaults(
+        table='files',
+        column=Column('published', Boolean, nullable=False),
+        default=True)

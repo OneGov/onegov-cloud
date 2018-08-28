@@ -204,6 +204,7 @@ def test_bust_cache_via_events(app, temporary_path):
 
     assert busted(fid)
     reset(fid)
+    assert not busted(fid)
 
     transaction.begin()
     files = FileCollection(app.session())
@@ -212,3 +213,4 @@ def test_bust_cache_via_events(app, temporary_path):
 
     assert busted(fid)
     reset(fid)
+    assert not busted(fid)
