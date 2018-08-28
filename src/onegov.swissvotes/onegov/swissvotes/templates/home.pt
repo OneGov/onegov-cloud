@@ -1,0 +1,5 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.swissvotes">
+    <tal:block metal:fill-slot="content">
+
+    </tal:block>
+</div>

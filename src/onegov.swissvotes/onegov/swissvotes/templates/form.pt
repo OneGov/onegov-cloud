@@ -1,0 +1,20 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.swissvotes">
+    <tal:block metal:fill-slot="title">${layout.title}</tal:block>
+    <tal:block metal:fill-slot="content">
+        <h1>${layout.title}</h1>
+        <h2 tal:condition="subtitle|nothing" class="subheader">${subtitle}</h2>
+        <div class="panel callout" tal:condition="callout|nothing">
+             <p>${callout}</p>
+        </div>
+        <p tal:condition="message|nothing">${message}</p>
+        <div tal:condition="show_form|True" class="row">
+            <div class="small-12 columns">
+                <div tal:condition="form.error_message|form.errors|nothing" data-alert class="alert-box alert">
+                    <tal:block tal:condition="not:form.error_message|nothing" i18n:translate>The form contains errors. Please check the fields marked in red.</tal:block>
+                    <tal:block tal:condition="form.error_message|nothing" i18n:translate>${form.error_message}</tal:block>
+                </div>
+                <div metal:use-macro="layout.macros['form']" />
+            </div>
+        </div>
+    </tal:block>
+</div>

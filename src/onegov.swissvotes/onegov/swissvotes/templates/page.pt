@@ -1,0 +1,7 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.swissvotes">
+    <tal:block metal:fill-slot="title">${layout.title}</tal:block>
+    <tal:block metal:fill-slot="content">
+        <h2>${layout.title}</h2>
+        <tal:block tal:content="structure: layout.model.content"></tal:block>
+    </tal:block>
+</div>

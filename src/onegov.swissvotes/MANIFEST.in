@@ -1,0 +1,9 @@
+recursive-include onegov *
+recursive-include docs *
+include *.txt
+include *.rst
+global-exclude *.mo
+global-exclude *.pyc
+global-exclude __pycache__/*
+global-exclude __tests__/*
+global-exclude __mocks__/*

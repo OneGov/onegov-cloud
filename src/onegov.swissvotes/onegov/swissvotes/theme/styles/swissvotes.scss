@@ -1,0 +1,238 @@
+header {
+    margin-bottom: .75rem;
+
+    .languages {
+        background-color: $primary-color;
+        color: $white;
+
+        ul {
+            margin: 0 .9375rem;
+        }
+
+        li {
+            font-size: .875rem;
+            padding: .5rem 0;
+        }
+
+        a {
+            color: $black;
+        }
+    }
+
+    .title {
+        margin: 1.75rem;
+    }
+
+    h1 {
+        color: darken($primary-color, 15%);
+        font-size: 3.75rem;
+        font-variant: small-caps;
+        letter-spacing: 1px;
+        margin: .5em 0 0;
+    }
+
+    .main-navigation {
+        min-height: 3rem;
+    }
+}
+
+.breadcrumbs {
+    .current a {
+        cursor: pointer;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+footer {
+    border-top: solid 2px $primary-color;
+    font-size: .875rem;
+    margin-top: 3.5rem;
+    padding: 1rem 0 3.5rem;
+}
+
+h2 small {
+    display: block;
+    line-height: 1.25;
+}
+
+.votes {
+    .chosen-container .chosen-results li,
+    select option {
+        &.level-2 {
+            padding-left: 1em;
+        }
+
+        &.level-3 {
+            padding-left: 2em;
+        }
+    }
+}
+
+.vote {
+    table {
+        border-left: solid $table-border-size $table-border-color;
+        border-right: solid $table-border-size $table-border-color;
+        border-top: solid $table-border-size $table-border-color;
+        width: 100%;
+
+        th[rowspan] {
+            background: $table-even-row-bg;
+            border-right: solid $table-border-size $table-border-color;
+        }
+
+        @media (min-width: 40em) {
+            th:first-child {
+                width: 25%;
+            }
+        }
+
+
+        dl {
+            font-size: .875rem;
+            line-height: initial;
+            margin: 0;
+
+            dt {
+                display: inline;
+                font-weight: normal;
+
+                &::after {
+                    content: ':';
+                }
+            }
+
+            dd {
+                display: inline;
+
+                &:not(:last-child)::after {
+                    content: ',';
+                }
+            }
+        }
+    }
+}
+
+.tablesorter {
+    .tablesorter-headerUnSorted:not(.sorter-false) .tablesorter-header-inner::after {
+        content: '\f0dc';
+        font-family: 'FontAwesome';
+        margin-left: .75ex;
+    }
+
+    .tablesorter-headerAsc:not(.sorter-false) .tablesorter-header-inner::after {
+        content: '\f0de';
+        font-family: 'FontAwesome';
+        margin-left: .75ex;
+    }
+
+    .tablesorter-headerDesc:not(.sorter-false) .tablesorter-header-inner::after {
+        content: '\f0dd';
+        font-family: 'FontAwesome';
+        margin-left: .75ex;
+    }
+}
+
+table th {
+    a {
+        color: $black;
+    }
+
+    &.sort-unsorted a::after {
+        content: '\f0dc';
+        font-family: 'FontAwesome';
+        margin-left: .75ex;
+    }
+
+    &.sort-ascending a::after {
+        content: '\f0de';
+        font-family: 'FontAwesome';
+        margin-left: .75ex;
+    }
+
+    &.sort-descending a::after {
+        content: '\f0dd';
+        font-family: 'FontAwesome';
+        margin-left: .75ex;
+    }
+}
+
+.tablesaw {
+    &.tablesaw-columntoggle {
+        border-left: solid $table-border-size $table-border-color;
+        border-right: solid $table-border-size $table-border-color;
+        border-top: solid $table-border-size $table-border-color;
+    }
+
+    &.tablesaw-stack {
+        @media (max-width: 39.9375em) {
+            tbody,
+            tfoot {
+                background-color: $white;
+
+                tr {
+                    border: 0 !important;
+                }
+
+                td,
+                th {
+                    border-bottom: 0;
+                    text-align: left;
+                }
+
+                td {
+                    .tablesaw-cell-label {
+                        color: $black;
+                        font-weight: normal;
+                    }
+
+                    .tablesaw-cell-content {
+                        float: right;
+                        text-align: right;
+                    }
+                }
+
+                td:first-child {
+                    .tablesaw-cell-label {
+                        display: none;
+                    }
+
+                    .tablesaw-cell-content {
+                        border-bottom: 3px solid $gainsboro;
+                        font-size: 1.2em;
+                        font-weight: bold;
+                        max-width: 100%;
+                        padding-top: 2em;
+                        text-align: center;
+                        width: 100%;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.tablesaw-modeswitch {
+    @media (min-width: 40em) {
+        display: none;
+    }
+}
+
+.chosen-container {
+    margin-bottom: 1rem;
+
+    li {
+        font-size: .875rem;
+    }
+}
+
+@media print {
+    .breadcrumbs,
+    .languages,
+    .main-navigation,
+    .title .columns:not(:first-child) {
+        display: none;
+    }
+}

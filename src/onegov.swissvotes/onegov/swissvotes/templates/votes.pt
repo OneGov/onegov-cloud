@@ -1,0 +1,75 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.swissvotes">
+    <tal:block metal:fill-slot="title">${layout.title}</tal:block>
+    <tal:block metal:fill-slot="content" tal:define="votes layout.model">
+        <div class="votes">
+            <h2>${layout.title}</h2>
+
+            <h3 i18n:translate>Filter</h3>
+            <div tal:condition="show_form|True" class="row">
+                <div class="small-12 columns">
+                    <div tal:condition="form.error_message|form.errors|nothing" data-alert class="alert-box alert">
+                        <tal:block tal:condition="not:form.error_message|nothing" i18n:translate>The form contains errors. Please check the fields marked in red.</tal:block>
+                        <tal:block tal:condition="form.error_message|nothing" i18n:translate>${form.error_message}</tal:block>
+                    </div>
+                    <div metal:use-macro="layout.macros['form']" tal:define="form_method 'GET'"/>
+                </div>
+            </div>
+
+            <h3 i18n:translate>Results</h3>
+            <div class="tablesaw-overflow">
+                <table
+                    id="votes"
+                    class="tablesaw"
+                    data-tablesaw-mode="columntoggle"
+                    data-tablesaw-mode-switch
+                    data-tablesaw-mode-exclude="swipe"
+                    data-tablesaw-minimap
+                    >
+                    <thead>
+                        <tr>
+                            <th class="left-aligned sort-${votes.sort_order_by_key('title')}" data-tablesaw-priority="2">
+                                <a href="${request.link(votes.by_order('title'))}" i18n:translate>Title</a>
+                            </th>
+                            <th class="left-aligned sort-${votes.sort_order_by_key('date')}" data-tablesaw-priority="1">
+                                <a href="${request.link(votes.by_order('date'))}" i18n:translate>Date</a>
+                            </th>
+                            <th data-tablesaw-priority="4" i18n:translate>Policy area</th>
+                            <th class="left-aligned sort-${votes.sort_order_by_key('legal_form')}" data-tablesaw-priority="4">
+                                <a href="${request.link(votes.by_order('legal_form'))}" i18n:translate>Legal form</a>
+                            </th>
+                            <th class="left-aligned sort-${votes.sort_order_by_key('result')}" data-tablesaw-priority="1">
+                                <a href="${request.link(votes.by_order('result'))}" i18n:translate>Voting result</a>
+                            </th>
+                            <th class="right-aligned sort-${votes.sort_order_by_key('result_people_yeas_p')}" data-tablesaw-priority="5">
+                                <a href="${request.link(votes.by_order('result_people_yeas_p'))}" i18n:translate>Yeas People</a>
+                            </th>
+                            <th class="left-aligned" data-tablesaw-priority="persist" i18n:translate>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr tal:repeat="vote votes.batch">
+                            <td class="left-aligned">${vote.title}</td>
+                            <td class="left-aligned">${layout.format_date(vote.date, 'date')}</td>
+                            <td class="left-aligned">
+                                <tal:block tal:repeat="area vote.policy_areas">
+                                    <tal:block tal:content="structure area.html(request)" /><tal:block tal:condition="not repeat.area.end">,</tal:block>
+                                </tal:block>
+                            </td>
+                            <td class="left-aligned">${vote.legal_form}</td>
+                            <td class="left-aligned">${vote.result}</td>
+                            <td class="right-aligned">${layout.format_number(vote.result_people_yeas_p)}</td>
+                            <td class="left-aligned"><a href="${request.link(vote)}" i18n:translate>Details</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <script metal:use-macro="layout.macros['tablesaw_translations']" />
+
+                <div class="pagination-centered">
+                    <div metal:use-macro="layout.macros['pagination']" tal:define="collection votes; current_page votes;" />
+                </div>
+            </div>
+
+        </div>
+    </tal:block>
+</div>
