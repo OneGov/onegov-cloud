@@ -131,11 +131,11 @@ h2 small {
     .chosen-container .chosen-results li,
     select option {
         &.level-2 {
-            padding-left: 1em;
+            padding-left: .5em;
         }
 
         &.level-3 {
-            padding-left: 2em;
+            padding-left: 1em;
         }
     }
 }
