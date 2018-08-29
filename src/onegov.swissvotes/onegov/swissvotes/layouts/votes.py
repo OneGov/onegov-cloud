@@ -17,12 +17,12 @@ class VotesLayout(DefaultLayout):
             (
                 _("Update dataset"),
                 self.request.link(self.model, name='update'),
-                'upload'
+                'upload-icon'
             ),
             (
                 _("Download dataset"),
                 self.request.link(self.model, name='csv'),
-                'export-link'
+                'export-icon'
             )
         ]
 

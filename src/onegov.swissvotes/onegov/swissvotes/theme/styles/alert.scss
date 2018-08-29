@@ -1,0 +1,31 @@
+$alert-icon: '\f06a';
+$info-icon: '\f05a';
+$success-icon: '\f058';
+$warning-icon: '\f071';
+
+.alert-box {
+    border: 0;
+    padding: .75rem 1.5rem .75rem .875rem;
+    vertical-align: middle;
+
+    .close {
+        color: $white;
+        opacity: 1;
+        right: .5rem;
+    }
+
+    &::before {
+        font-size: 1.3rem;
+        line-height: .8;
+        margin-right: .5rem;
+        padding-right: .5rem;
+        position: relative;
+        top: -1px;
+        vertical-align: middle;
+    }
+
+    &.alert::before { @include icon($alert-icon); }
+    &.info::before { @include icon($info-icon); }
+    &.success::before { @include icon($success-icon); }
+    &.warning::before { @include icon($warning-icon); }
+}

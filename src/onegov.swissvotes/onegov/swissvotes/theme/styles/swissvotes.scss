@@ -1,63 +1,132 @@
-header {
-    margin-bottom: .75rem;
+/*
+    Fixes a foundation js error
+*/
+.foundation-data-attribute-namespace {
+    font-family: false;
+}
 
-    .languages {
-        background-color: $primary-color;
-        color: $white;
+/*
+    Zurb foundation uses this without !import, which causes IE11 to not
+    apply the placeholder color.
+*/
+:-ms-input-placeholder {
+    color: $input-placeholder-font-color !important;
+}
 
-        ul {
-            margin: 0 .9375rem;
-        }
+/*
+    Hyphenation for browsers which support it.
+*/
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    @include prefix(hyphens, auto);
+}
 
-        li {
-            font-size: .875rem;
-            padding: .5rem 0;
-        }
+/*
+    Get rid of the jump that is introduced when switching from a site with
+    scrollbar to a site without (or vice versa)
 
-        a {
-            color: $black;
-        }
+    As a side-effect, this disables horizontal scrolling, but we don't have
+    that anyway because of our mobile-first design.
+*/
+html {
+    @media #{$medium-up} {
+        overflow-x: hidden;
+        width: 100vw;
+    }
+}
+
+html,
+body {
+    height: 100%;
+}
+
+/*
+    Rounded corners for panels.
+*/
+.panel {
+    border-radius: 2px;
+
+    // Zurb lacks a separate color for callout panels.
+    &.callout {
+        border-color: $callout-panel-border-color;
+    }
+}
+
+/*
+    Print Styles
+*/
+@media print {
+    .alert-box,
+    .date-range-selector,
+    .date-range-selector-result {
+        display: none;
     }
 
-    .title {
-        margin: 1.75rem;
+    html,
+    body {
+        height: 99%; // avoids blank pages at the end
+    }
+
+    body {
+        font-size: 12px !important;
+    }
+
+    .field-display-block .field-display-label,
+    .field-display-block .field-display-data,
+    .field-display-block .field-display-data * {
+        background-color: transparent;
+        color: $body-font-color !important;
+        font-size: 12px !important;
+        margin: 0 !important;
+        padding: 0;
     }
 
     h1 {
-        color: darken($primary-color, 15%);
-        font-size: 3.75rem;
-        font-variant: small-caps;
-        letter-spacing: 1px;
-        margin: .5em 0 0;
+        font-size: 1.6rem;
     }
 
-    .main-navigation {
-        min-height: 3rem;
+    h2 {
+        @include hairline;
+        font-size: 1.2rem;
+        margin-bottom: .25rem;
     }
-}
 
-.breadcrumbs {
-    .current a {
-        cursor: pointer;
+    h3 {
+        font-size: 1.1rem;
+        margin-bottom: .15rem;
+    }
 
-        &:hover {
-            text-decoration: underline;
+    h4,
+    h5,
+    h6 {
+        font-size: 1rem;
+    }
+
+    ul.breadcrumbs {
+        padding: 0 0 .25rem 1rem;
+
+        * {
+            font-size: 9px;
         }
     }
 }
 
-footer {
-    border-top: solid 2px $primary-color;
-    font-size: .875rem;
-    margin-top: 3.5rem;
-    padding: 1rem 0 3.5rem;
-}
-
+/*
+    Subtitles
+*/
 h2 small {
     display: block;
     line-height: 1.25;
 }
 
+/*
+    Votes
+*/
 .votes {
     .chosen-container .chosen-results li,
     select option {
@@ -71,168 +140,15 @@ h2 small {
     }
 }
 
+/*
+    Vote
+*/
 .vote {
     table {
-        border-left: solid $table-border-size $table-border-color;
-        border-right: solid $table-border-size $table-border-color;
-        border-top: solid $table-border-size $table-border-color;
-        width: 100%;
-
-        th[rowspan] {
-            background: $table-even-row-bg;
-            border-right: solid $table-border-size $table-border-color;
-        }
-
         @media (min-width: 40em) {
             th:first-child {
                 width: 25%;
             }
         }
-
-
-        dl {
-            font-size: .875rem;
-            line-height: initial;
-            margin: 0;
-
-            dt {
-                display: inline;
-                font-weight: normal;
-
-                &::after {
-                    content: ':';
-                }
-            }
-
-            dd {
-                display: inline;
-
-                &:not(:last-child)::after {
-                    content: ',';
-                }
-            }
-        }
-    }
-}
-
-.tablesorter {
-    .tablesorter-headerUnSorted:not(.sorter-false) .tablesorter-header-inner::after {
-        content: '\f0dc';
-        font-family: 'FontAwesome';
-        margin-left: .75ex;
-    }
-
-    .tablesorter-headerAsc:not(.sorter-false) .tablesorter-header-inner::after {
-        content: '\f0de';
-        font-family: 'FontAwesome';
-        margin-left: .75ex;
-    }
-
-    .tablesorter-headerDesc:not(.sorter-false) .tablesorter-header-inner::after {
-        content: '\f0dd';
-        font-family: 'FontAwesome';
-        margin-left: .75ex;
-    }
-}
-
-table th {
-    a {
-        color: $black;
-    }
-
-    &.sort-unsorted a::after {
-        content: '\f0dc';
-        font-family: 'FontAwesome';
-        margin-left: .75ex;
-    }
-
-    &.sort-ascending a::after {
-        content: '\f0de';
-        font-family: 'FontAwesome';
-        margin-left: .75ex;
-    }
-
-    &.sort-descending a::after {
-        content: '\f0dd';
-        font-family: 'FontAwesome';
-        margin-left: .75ex;
-    }
-}
-
-.tablesaw {
-    &.tablesaw-columntoggle {
-        border-left: solid $table-border-size $table-border-color;
-        border-right: solid $table-border-size $table-border-color;
-        border-top: solid $table-border-size $table-border-color;
-    }
-
-    &.tablesaw-stack {
-        @media (max-width: 39.9375em) {
-            tbody,
-            tfoot {
-                background-color: $white;
-
-                tr {
-                    border: 0 !important;
-                }
-
-                td,
-                th {
-                    border-bottom: 0;
-                    text-align: left;
-                }
-
-                td {
-                    .tablesaw-cell-label {
-                        color: $black;
-                        font-weight: normal;
-                    }
-
-                    .tablesaw-cell-content {
-                        float: right;
-                        text-align: right;
-                    }
-                }
-
-                td:first-child {
-                    .tablesaw-cell-label {
-                        display: none;
-                    }
-
-                    .tablesaw-cell-content {
-                        border-bottom: 3px solid $gainsboro;
-                        font-size: 1.2em;
-                        font-weight: bold;
-                        max-width: 100%;
-                        padding-top: 2em;
-                        text-align: center;
-                        width: 100%;
-                    }
-                }
-            }
-        }
-    }
-}
-
-.tablesaw-modeswitch {
-    @media (min-width: 40em) {
-        display: none;
-    }
-}
-
-.chosen-container {
-    margin-bottom: 1rem;
-
-    li {
-        font-size: .875rem;
-    }
-}
-
-@media print {
-    .breadcrumbs,
-    .languages,
-    .main-navigation,
-    .title .columns:not(:first-child) {
-        display: none;
     }
 }

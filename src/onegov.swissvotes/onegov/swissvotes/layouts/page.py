@@ -17,7 +17,7 @@ class PageLayout(DefaultLayout):
             (
                 _("Edit page"),
                 self.request.link(self.model, name='edit'),
-                'edit-link'
+                'edit-icon'
             )
         ]
 

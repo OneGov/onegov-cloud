@@ -17,12 +17,12 @@ class VoteLayout(DefaultLayout):
             (
                 _("Manage attachments"),
                 self.request.link(self.model, name='upload'),
-                'upload'
+                'upload-icon'
             ),
             (
                 _("Delete vote"),
                 self.request.link(self.model, name='delete'),
-                'delete-link'
+                'delete-icon'
             )
         ]
 
