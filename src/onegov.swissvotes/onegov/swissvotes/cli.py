@@ -80,6 +80,6 @@ def delete(group_context):
         engine.raw_connection().invalidate()
         engine.dispose()
 
-        click.echo("{} was deleted successfully".format(app.schema))
+        click.echo("Instance was deleted successfully")
 
     return delete_instance
