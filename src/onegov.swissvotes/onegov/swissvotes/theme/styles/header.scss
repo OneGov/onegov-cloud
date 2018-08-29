@@ -148,6 +148,28 @@ header {
                 text-decoration: underline;
             }
         }
+
+        @media #{$small-only} {
+            padding-left: 1rem;
+
+            li {
+                float: none;
+                padding-left: 0;
+
+                + li {
+                    margin-top: .5rem;
+                }
+
+                &:first-child {
+                    list-style: none;
+                    margin-left: -1rem;
+                }
+
+                &::before {
+                    margin-left: 0;
+                }
+            }
+        }
     }
 }
 

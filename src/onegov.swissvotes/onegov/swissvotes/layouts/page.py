@@ -23,9 +23,11 @@ class PageLayout(DefaultLayout):
 
     @cached_property
     def breadcrumbs(self):
+        if self.model.id == 'home':
+            return [(_("Homepage"), self.homepage_link, 'current')]
+
         return [
             (_("Homepage"), self.homepage_link, ''),
-            (_("Votes"), self.votes_link, ''),
             (self.title, '#', 'current'),
         ]
 
@@ -40,7 +42,6 @@ class EditPageLayout(DefaultLayout):
     def breadcrumbs(self):
         return [
             (_("Homepage"), self.homepage_link, ''),
-            (_("Votes"), self.votes_link, ''),
             (self.model.title, self.request.link(self.model), ''),
             (self.title, '#', 'current'),
         ]
