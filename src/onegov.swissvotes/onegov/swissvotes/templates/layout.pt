@@ -44,7 +44,7 @@
         <div class="title">
             <div class="row">
                 <div class="columns small-12 large-7">
-                    <a href="${layout.homepage_link}"><h1>Swissvotes</h1></a>
+                    <a href="${layout.homepage_link}"><h1><img src="${layout.static_path}/images/logo.svg" height="47px" width="333px" alt="Swissvotes"></h1></a>
                 </div>
                 <div class="columns small-6 large-3">
                     <img src="${layout.static_path}/images/logo_aps.svg" height="100px" width="160px" alt="année politique suisse">
