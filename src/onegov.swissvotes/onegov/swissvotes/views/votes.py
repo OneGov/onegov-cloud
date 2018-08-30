@@ -1,11 +1,14 @@
 from morepath.request import Response
 from onegov.core.security import Private
 from onegov.core.security import Public
+from onegov.core.security import Secret
+from onegov.form import Form
 from onegov.swissvotes import _
 from onegov.swissvotes import SwissvotesApp
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.forms import SearchForm
 from onegov.swissvotes.forms import UpdateDatasetForm
+from onegov.swissvotes.layouts import DeleteVotesLayout
 from onegov.swissvotes.layouts import UpdateVotesLayout
 from onegov.swissvotes.layouts import VotesLayout
 from translationstring import TranslationString
@@ -79,3 +82,29 @@ def export_votes(self, request):
     )
     self.export(response.body_file)
     return response
+
+
+@SwissvotesApp.form(
+    model=SwissVoteCollection,
+    permission=Secret,
+    form=Form,
+    template='form.pt',
+    name='delete'
+)
+def delete_vote(self, request, form):
+    layout = DeleteVotesLayout(self, request)
+
+    if form.submitted(request):
+        for vote in self.query():
+            request.session.delete(vote)
+        request.message(_("All votes deleted"), 'success')
+        return request.redirect(layout.votes_link)
+
+    return {
+        'layout': layout,
+        'form': form,
+        'message': _("Do you really want to delete all votes?!"),
+        'button_text': _("Delete all votes"),
+        'button_class': 'alert',
+        'cancel': request.link(self)
+    }

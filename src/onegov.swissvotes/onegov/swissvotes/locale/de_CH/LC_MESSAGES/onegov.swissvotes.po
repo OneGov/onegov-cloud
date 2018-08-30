@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-30 13:33+0200\n"
-"PO-Revision-Date: 2018-08-30 13:33+0200\n"
+"POT-Creation-Date: 2018-08-30 16:17+0200\n"
+"PO-Revision-Date: 2018-08-30 16:17+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -97,6 +97,9 @@ msgstr "Abstimmung löschen"
 
 msgid "Update dataset"
 msgstr "Datensatz aktualisieren"
+
+msgid "Delete all votes"
+msgstr "Alle Abstimmungen löschen"
 
 msgid "Download dataset"
 msgstr "Datensatz herunterladen"
@@ -903,5 +906,15 @@ msgstr "Anhänge aktualisiert"
 msgid "Vote deleted"
 msgstr "Abstimmung gelöscht."
 
+msgid "Do you really want to delete all votes?!"
+msgstr "Möchten Sie wirklich alle Abstimmungen löschen?!"
+
 msgid "Dataset updated"
 msgstr "Datensatz aktualisiert"
+
+msgid "All votes deleted"
+msgstr "Alle Abstimmungen gelöscht"
+
+#, python-format
+msgid "The dataset contains unknown descriptors: ${items}."
+msgstr "Der Datensatz enthält unbekannte Deskriptoren: ${items}."

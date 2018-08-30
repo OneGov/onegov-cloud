@@ -13,7 +13,8 @@ class VotesLayout(DefaultLayout):
     def editbar_links(self):
         if not self.request.has_role('admin', 'editor'):
             return
-        return [
+
+        result = [
             (
                 _("Update dataset"),
                 self.request.link(self.model, name='update'),
@@ -25,12 +26,19 @@ class VotesLayout(DefaultLayout):
                 'export-icon'
             )
         ]
+        if self.request.has_role('admin'):
+            result.append((
+                _("Delete all votes"),
+                self.request.link(self.model, name='delete'),
+                'delete-icon'
+            ))
+        return result
 
     @cached_property
     def breadcrumbs(self):
         return [
             (_("Homepage"), self.homepage_link, ''),
-            (_("Votes"), self.votes_link, 'current'),
+            (self.title, self.votes_link, 'current'),
         ]
 
 
@@ -45,5 +53,20 @@ class UpdateVotesLayout(DefaultLayout):
         return [
             (_("Homepage"), self.homepage_link, ''),
             (_("Votes"), self.votes_link, ''),
-            (_("Update dataset"), '#', 'current'),
+            (self.title, '#', 'current'),
+        ]
+
+
+class DeleteVotesLayout(DefaultLayout):
+
+    @cached_property
+    def title(self):
+        return _("Delete all votes")
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            (_("Homepage"), self.homepage_link, ''),
+            (_("Votes"), self.votes_link, ''),
+            (self.title, '#', 'current'),
         ]
