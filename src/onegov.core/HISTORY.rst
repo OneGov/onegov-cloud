@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.71.5 (2018-08-30)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds an unaccent expression.
   [msom]
