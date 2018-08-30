@@ -14,6 +14,7 @@ from onegov.core.orm import (
 )
 from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.abstract import Associable, associated
+from onegov.core.orm.func import unaccent
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import dict_property
@@ -1840,3 +1841,24 @@ def test_i18n_translation_hybrid_independence(postgres_dsn, redis_url):
         'title': 'Dokument',
         'locale': 'de_CH'
     }
+
+
+def test_unaccent_expression(postgres_dsn):
+    Base = declarative_base(cls=ModelBase)
+
+    class Test(Base):
+        __tablename__ = 'test'
+
+        text = Column(Text, primary_key=True)
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('testing')
+
+    session = mgr.session()
+    session.add(Test(text='Schweiz'))
+    session.add(Test(text='Deutschland'))
+    session.add(Test(text='Österreich'))
+    transaction.commit()
+
+    query = session.query(Test).order_by(unaccent(Test.text))
+    assert [r.text for r in query] == ['Deutschland', 'Österreich', 'Schweiz']

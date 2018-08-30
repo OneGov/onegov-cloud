@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds an unaccent expression.
+  [msom]
+
 0.71.4 (2018-08-27)
 ~~~~~~~~~~~~~~~~~~~
 
