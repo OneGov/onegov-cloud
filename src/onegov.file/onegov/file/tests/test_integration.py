@@ -10,6 +10,7 @@ from onegov.core.utils import scan_morepath_modules
 from onegov.file import DepotApp, FileCollection
 from onegov.file.integration import SUPPORTED_STORAGE_BACKENDS
 from onegov_testing.utils import create_image
+from onegov.core.security.rules import has_permission_not_logged_in
 from time import sleep
 from webtest import TestApp as Client
 
@@ -28,7 +29,14 @@ def app(request, postgres_dsn, temporary_path, redis_url):
     backend = request.param
 
     class App(Framework, DepotApp):
-        pass
+        anonymous_access = False
+
+    @App.permission_rule(model=object, permission=object, identity=None)
+    def test_has_permission_not_logged_in(app, identity, model, permission):
+        if app.anonymous_access:
+            return True
+
+        return has_permission_not_logged_in(app, identity, model, permission)
 
     scan_morepath_modules(App)
     morepath.commit(App)
@@ -214,3 +222,27 @@ def test_bust_cache_via_events(app, temporary_path):
     assert busted(fid)
     reset(fid)
     assert not busted(fid)
+
+
+def test_cache_control(app):
+    ensure_correct_depot(app)
+
+    transaction.begin()
+    files = FileCollection(app.session())
+    fid = files.add('avatar.png', create_image(1024, 1024), published=True).id
+    transaction.commit()
+
+    client = Client(app)
+
+    response = client.get('/storage/{}'.format(fid))
+    assert response.headers['Cache-Control'] == 'max-age=604800, public'
+
+    transaction.begin()
+    files.query().one().published = False
+    transaction.commit()
+
+    response = client.get('/storage/{}'.format(fid), status=403)
+
+    app.anonymous_access = True
+    response = client.get('/storage/{}'.format(fid))
+    assert response.headers['Cache-Control'] == 'private'

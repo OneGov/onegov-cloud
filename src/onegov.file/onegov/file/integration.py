@@ -217,6 +217,13 @@ def respond_with_alt_text(reference, request):
         ))
 
 
+def respond_with_caching_header(reference, request):
+    if not reference.published:
+        @request.after
+        def include_private_header(response):
+            response.headers.add('Cache-Control', 'private')
+
+
 @DepotApp.path(model=File, path='/storage/{id}')
 def get_file(app, id):
     return FileCollection(app.session()).by_id(id)
@@ -225,6 +232,7 @@ def get_file(app, id):
 @DepotApp.view(model=File, render=render_depot_file, permission=Public)
 def view_file(self, request):
     respond_with_alt_text(self, request)
+    respond_with_caching_header(self, request)
     return self.reference.file
 
 
@@ -241,6 +249,8 @@ def view_thumbnail(self, request):
         size = 'small'
 
     respond_with_alt_text(self, request)
+    respond_with_caching_header(self, request)
+
     thumbnail_id = self.get_thumbnail_id(size)
 
     if not thumbnail_id:
