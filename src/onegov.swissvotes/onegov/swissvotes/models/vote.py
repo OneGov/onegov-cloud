@@ -321,18 +321,25 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
             return True
         return False
 
+    def localized_attachment_name(self, name):
+        locale = self.session_manager.current_locale
+        return name if name.endswith(locale) else '{}-{}'.format(name, locale)
+
     def get_attachment(self, name):
+        name = self.localized_attachment_name(name)
         for file in self.files:
             if file.name == name:
                 return file
         return None
 
     def delete_attachment(self, name):
+        name = self.localized_attachment_name(name)
         for file in self.files:
             if file.name == name:
                 self.files.remove(file)
 
     def set_attachment(self, name, attachment):
+        name = self.localized_attachment_name(name)
         assert attachment.reference.content_type == 'application/pdf'
         attachment.name = name
         self.delete_attachment(name)

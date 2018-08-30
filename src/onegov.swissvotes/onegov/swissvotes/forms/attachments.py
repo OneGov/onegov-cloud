@@ -19,6 +19,7 @@ class AttachmentsForm(Form):
             FileSizeLimit(25 * 1024 * 1024)
         ]
     )
+
     federal_council_message = UploadField(
         label=_("Federal council message"),
         validators=[
@@ -26,6 +27,7 @@ class AttachmentsForm(Form):
             FileSizeLimit(25 * 1024 * 1024)
         ]
     )
+
     parliamentary_debate = UploadField(
         label=_("Parliamentary debate"),
         validators=[
@@ -35,6 +37,7 @@ class AttachmentsForm(Form):
     )
 
     def update_model(self, model):
+        locale = self.request.locale
         if self.voting_text.action == 'delete':
             del model.voting_text
         if self.voting_text.action == 'replace':
@@ -42,7 +45,7 @@ class AttachmentsForm(Form):
                 voting_text = SwissVoteFile(id=random_token())
                 voting_text.reference = as_fileintent(
                     self.voting_text.raw_data[-1].file,
-                    'voting_text'
+                    f'voting_text-{locale}'
                 )
                 model.voting_text = voting_text
 
@@ -53,7 +56,7 @@ class AttachmentsForm(Form):
                 federal_council_message = SwissVoteFile(id=random_token())
                 federal_council_message.reference = as_fileintent(
                     self.federal_council_message.raw_data[-1].file,
-                    'federal_council_message'
+                    f'federal_council_message-{locale}'
                 )
                 model.federal_council_message = federal_council_message
 
@@ -64,7 +67,7 @@ class AttachmentsForm(Form):
                 parliamentary_debate = SwissVoteFile(id=random_token())
                 parliamentary_debate.reference = as_fileintent(
                     self.parliamentary_debate.raw_data[-1].file,
-                    'parliamentary_debate'
+                    f'parliamentary_debate-{locale}'
                 )
                 model.parliamentary_debate = parliamentary_debate
 
