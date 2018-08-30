@@ -1230,13 +1230,29 @@
                 </svg>
             </a>
         </div>
-        <div class="columns small-6">
+        <div class="columns small-6 file-publication">
+            <p>
+                <tal:b condition="file.published">
+                    <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='unpublish'))}"
+                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                        <i class="fa fa-fw fa-toggle-on" aria-hidden="true"></i>
+                    </a>
+                    <b i18n:translate>Public</b>
+                </tal:b>
+                <tal:b condition="not:file.published">
+                    <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='publish'))}"
+                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                        <i class="fa fa-fw fa-toggle-off" aria-hidden="true"></i>
+                    </a>
+                    <b i18n:translate>Private</b>
+                </tal:b>
+            </p>
         </div>
-        <div class="columns small-2 file-actions" id="${id}-actions">
-            <a class="button secondary confirm delete" id="${id}-actions"
+        <div class="columns small-2 file-actions">
+            <a class="button secondary confirm delete"
                 ic-delete-from="${request.link(file)}?csrf-token=${layout.csrf_token}"
                 ic-on-success="
-                    var info = $('#${id}-actions').closest('tr');
+                    var info = $(elt).closest('tr');
                     info.prev().remove();
                     info.next().remove();
                     info.remove();
@@ -1260,7 +1276,7 @@
                     value = value.substring(value.length - ext.length, value.length) === ext && value || value + ext;
 
                     jQuery.post(url, {'name': value}, function() {
-                        var actions = $('#${id}-actions');
+                        var actions = $(elt);
 
                         actions.closest('tr').prev().find('td:first').text(value);
                         actions.find('a.prompt').data('prompt-value', value);

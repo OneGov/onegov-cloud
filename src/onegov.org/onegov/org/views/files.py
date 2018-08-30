@@ -153,6 +153,20 @@ def view_file_details(self, request):
     )
 
 
+@OrgApp.view(model=GeneralFile, permission=Private, name='publish',
+             request_method='POST')
+def handle_publish(self, request):
+    request.assert_valid_csrf_token()
+    self.published = True
+
+
+@OrgApp.view(model=GeneralFile, permission=Private, name='unpublish',
+             request_method='POST')
+def handle_unpublish(self, request):
+    request.assert_valid_csrf_token()
+    self.published = False
+
+
 @OrgApp.html(model=ImageFileCollection, template='images.pt',
              permission=Private)
 def view_get_image_collection(self, request):
