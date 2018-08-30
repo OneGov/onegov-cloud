@@ -13,4 +13,9 @@
     </a>
 </metal:b>
 
+<!--! An img element -->
+<metal:b define-macro="img">
+    <img tal:attributes="e.attrs" />
+</metal:b>
+
 </xml>

@@ -2,6 +2,7 @@ from collections import OrderedDict
 from datetime import datetime, timedelta
 from itertools import groupby
 from onegov.core.templates import render_template
+from onegov.file import FileCollection
 from onegov.form import FormSubmission, parse_form
 from onegov.newsletter import Newsletter, NewsletterCollection
 from onegov.org import _, OrgApp
@@ -38,6 +39,11 @@ WEEKDAYS = (
 
 
 @OrgApp.cronjob(hour='*', minute=0, timezone='UTC')
+def hourly_maintenance_tasks(request):
+    publish_files(request)
+    send_scheduled_newsletter(request)
+
+
 def send_scheduled_newsletter(request):
     newsletters = NewsletterCollection(request.session).query().filter(and_(
         Newsletter.scheduled != None,
@@ -47,6 +53,10 @@ def send_scheduled_newsletter(request):
     for newsletter in newsletters:
         send_newsletter(request, newsletter, newsletter.open_recipients)
         newsletter.scheduled = None
+
+
+def publish_files(request):
+    FileCollection(request.session).publish_files()
 
 
 @OrgApp.cronjob(hour=8, minute=30, timezone='Europe/Zurich')

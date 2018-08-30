@@ -4,9 +4,33 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
         <div class="row">
-            <div class="small-12 columns" tal:define="upload_url layout.file_upload_url">
+            <div class="small-12 columns">
                 <h2 i18n:translate="">Upload</h2>
-                <tal:block metal:use-macro="layout.macros.dropzone" />
+                <tal:b metal:use-macro="layout.macros.upload">
+                    <tal:b metal:fill-slot="upload-filelist">
+                        <div class="upload-filelist-header" style="display: none;">
+                            <h2 i18n:translate>Just Uploaded</h2>
+
+                            <table class="files">
+                                <tr>
+                                    <th i18n:translate>
+                                        Name
+                                    </th>
+                                    <th>
+                                    </th>
+                                    <th i18n:translate>
+                                        Extension
+                                    </th>
+                                    <th i18n:translate>
+                                        Upload Date
+                                    </th>
+                                </tr>
+
+                                <tbody class="upload-filelist"></tbody>
+                            </table>
+                        </div>
+                    </tal:b>
+                </tal:b>
             </div>
         </div>
         <div class="row">
@@ -49,34 +73,7 @@
                             </tr>
 
                             <tal:b tal:repeat="file files">
-                                <tr class="file-info">
-                                    <td>
-                                        ${file.name}
-                                    </td>
-                                    <td>
-                                        <a id="button-${file.number}" data-toggle="#details-${file.number}" class="untoggled">
-                                            <i class="fa fa-chevron-down" aria-hidden="true"></i>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <span class="${signed(file) and 'signed' or ''}">
-                                            ${extension(file)}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        ${format_date(file.upload_date)}
-                                    </td>
-                                </tr>
-                                <tr id="details-${file.number}" style="display: none;">
-                                    <td colspan="4">
-                                        <div ic-trigger-from="#button-${file.number}"
-                                             ic-trigger-on="click once"
-                                             ic-get-from="${actions_url(file.id)}">
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr style="display: none"></tr> <!--! keeps odd/even shading on track -->
-
+                                <tal:b metal:use-macro="layout.macros.file_info" />
                             </tal:b>
 
                             <tr tal:condition="len(files) % 2 == 0" style="height: 0;"></tr>

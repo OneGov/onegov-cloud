@@ -1537,6 +1537,10 @@ $editbar-bg-color: $topbar-link-bg-hover;
     padding: .5em;
 }
 
+h2 + .image-grid {
+    margin-top: .5rem;
+}
+
 /*
     imageset view
 */
@@ -1570,83 +1574,6 @@ $editbar-bg-color: $topbar-link-bg-hover;
 
     .delete:hover {
         background-color: $alert-color;
-    }
-}
-
-/*
-    dropzone styling
-*/
-.dropzone {
-    background-color: $topbar-bg-color;
-    border: 1px dashed $primary-color;
-    margin-bottom: 1rem;
-    padding: 1rem;
-
-    .dz-message {
-        margin-bottom: 1em;
-    }
-
-    .dz-preview {
-        float: left;
-        margin-right: 1rem;
-    }
-
-    .dz-success-mark,
-    .dz-error-mark {
-        display: none;
-    }
-
-    .dz-progress {
-        display: block;
-        height: 5px;
-        width: 100%;
-
-        > span {
-            background-color: $info-color;
-            display: block;
-            height: 5px;
-        }
-    }
-
-    .dz-success {
-        .dz-progress span {
-            background-color: $success-color;
-        }
-
-        .dz-size::after {
-            content: ' \f00c';
-            font-family: 'FontAwesome';
-        }
-    }
-
-    .dz-error {
-        .dz-progress span {
-            background-color: $alert-color;
-        }
-
-        .dz-size::after {
-            content: ' \f071';
-            font-family: 'FontAwesome';
-        }
-    }
-
-    .dz-error-message {
-        color: $steel;
-        font-size: rem-calc(12);
-        margin: 1em 0;
-    }
-
-    .dz-filename {
-        font-size: rem-calc(12);
-        margin-bottom: .5em;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        width: 125px;
-    }
-
-    > div:last-child {
-        margin-bottom: 0;
     }
 }
 
@@ -4525,20 +4452,26 @@ h2 + div.timeline {
 
     tr:first-child th {
         padding-top: 1rem;
+    }
 
+    tr:first-child th,
+    tr:first-child td {
         // controls the width of all columns due to the fixed table layout
         &:nth-child(1) {
-            width: 75%;
+            width: 60%;
         }
 
         &:nth-child(2) {
             width: 2.5%;
         }
 
+        &:nth-child(3) {
+            width: 5%;
+        }
+
         &:nth-child(4) {
             width: 15%;
         }
-
     }
 
     th:last-child {
@@ -4575,15 +4508,6 @@ h2 + div.timeline {
             span {
                 display: inline-block;
                 padding: 1px 6px;
-
-                .signed {
-                    @include circle;
-                    background: $green-pastel;
-
-                    &::after {
-                        content: '✔';
-                    }
-                }
             }
         }
 
@@ -4640,5 +4564,52 @@ h2 + div.timeline {
         background: $primary-color !important;
         border-color: $primary-fg-color !important;
         color: $primary-fg-color !important;
+    }
+}
+
+/*
+    Upload
+*/
+.upload-dropzone {
+    border: 1px dashed $gainsboro;
+    display: flex;
+    flex-direction: column;
+    height: 10rem;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.upload-filelist-header {
+    margin-bottom: 1.5rem;
+}
+
+.upload-progress {
+    margin-bottom: 1.5rem;
+
+    .progress {
+        margin-left: 25%;
+        width: 75%;
+
+        &::before {
+            content: attr(data-filename);
+            font-size: .875rem;
+            left: 1rem;
+            overflow: hidden;
+            position: absolute;
+            text-align: left;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 22.5%;
+        }
+
+        &.alert::after {
+            color: $white;
+            content: attr(data-error);
+            font-size: .8rem;
+            margin-left: .75ex;
+            margin-top: -1.2rem;
+            position: absolute;
+        }
     }
 }

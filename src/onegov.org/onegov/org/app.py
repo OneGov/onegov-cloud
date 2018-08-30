@@ -357,9 +357,9 @@ def get_redactor_asset():
     yield 'redactor.css'
 
 
-@OrgApp.webasset('dropzone')
-def get_dropzone_asset():
-    yield 'dropzone.js'
+@OrgApp.webasset('upload')
+def get_upload_asset():
+    yield 'upload.js'
 
 
 @OrgApp.webasset('editalttext')

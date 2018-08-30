@@ -11,7 +11,38 @@ var setupRedirectAfter = function(elements) {
     });
 };
 
-setupRedirectAfter($('a'));
+// sets up the given nodes with the functionality provided by common.js
+// this is done at document.ready and can be repeated for out of band content
+var processCommonNodes = function(elements, out_of_band) {
+    var targets = $(elements);
+
+    // intercooler integration (only done for dynamic content)
+    if (out_of_band !== false) {
+        Intercooler.processNodes(targets);
+    }
+
+    // intercooler redirects
+    setupRedirectAfter(targets.find('a'));
+
+    // initialise zurb foundation (only works on the document level)
+    $(document).foundation();
+
+    // Make sure files open in another window
+    targets.find('.page-text a[href*="/datei/"]').attr('target', '_blank');
+
+    // generic toggle button
+    targets.find('[data-toggle]').toggleButton();
+
+    // send an event to allow optional scripts to hook themselves up
+    // (we only do out of band updates since it's not guaranteed that these
+    // extra scripts are already set up with the event at the initial call)
+    if (out_of_band !== false) {
+        $(document).trigger('process-common-nodes', elements);
+    }
+};
+
+// setup common nodes
+processCommonNodes($(document), false);
 
 // show the new content placeholder when hovering over the add content dropdown
 $('.show-new-content-placeholder')
@@ -26,9 +57,6 @@ $('.show-new-content-placeholder')
     .on('mouseleave', function() {
         $('.new-content-placeholder').remove();
     });
-
-// initialize all foundation functions
-$(document).foundation();
 
 // get the footer height and write it to the footer_height setting if possible
 $(document).find('#footer_height').val($('footer > div').height() + 'px');
@@ -81,8 +109,6 @@ function showAlertMessage(message, type, target) {
 $(document).on('show-alert', function(_, data) {
     showAlertMessage(data.message, data.type, data.target);
 });
-
-$('[data-toggle]').toggleButton();
 
 // handle intercooler errors generically
 $(document).ajaxError(function(_e, xhr, _settings, error) {

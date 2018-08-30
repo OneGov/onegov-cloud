@@ -72,13 +72,19 @@ var onLazyLoadAltText = function(element) {
 };
 
 $('.page-text img[alt][alt!=""], .static-alt').each(function() {
-    if (! $(this).is('[data-no-alt]')) {
+    if (!$(this).is('[data-no-alt]')) {
         appendAltText(this, $(this).attr('alt'));
     }
 });
 
+$(document).on('process-common-nodes', function(_e, elements) {
+    $(elements).find('.static-alt').each(function() {
+        appendAltText(this, $(this).attr('alt'));
+    })
+});
+
 document.addEventListener('lazybeforeunveil', function(e) {
-    if (! $(e.target).is('[data-no-alt]')) {
+    if (!$(e.target).is('[data-no-alt]')) {
         onLazyLoadAltText(e.target);
     }
 });

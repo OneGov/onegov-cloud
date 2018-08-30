@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves and streamlines files/images uploading.
+  [href]
+
 0.32.1 (2018-08-27)
 ~~~~~~~~~~~~~~~~~~~
 

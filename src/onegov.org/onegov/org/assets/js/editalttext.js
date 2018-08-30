@@ -100,13 +100,23 @@ var editAltText = function(target) {
     target.focus();
 };
 
-$('.editable-alt').click(function(e) {
-    var target = $(e.target);
+jQuery.fn.editAltText = function() {
+    $(this).click(function(e) {
+        var target = $(e.target);
 
-    if (!target.hasClass('alt-text')) {
-        return;
-    }
+        if (!target.hasClass('alt-text')) {
+            return;
+        }
 
-    e.preventDefault();
-    editAltText(target);
+        e.preventDefault();
+        editAltText(target);
+    });
+};
+
+$(document).on('process-common-nodes', function(_e, elements) {
+    $(elements).find('.editable-alt').editAltText();
+});
+
+$(document).ready(function() {
+    $('.editable-alt').editAltText();
 });

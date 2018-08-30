@@ -1,7 +1,6 @@
 """ The onegov org collection of files uploaded to the site. """
 
 import morepath
-import random
 
 from babel.core import Locale
 from babel.dates import parse_pattern
@@ -12,7 +11,6 @@ from onegov.core.security import Private, Public
 from onegov.core.templates import render_macro
 from onegov.file import File, FileCollection
 from onegov.org import _, OrgApp
-from onegov.org.elements import Img
 from onegov.org.new_elements import Link
 from onegov.org.layout import DefaultLayout
 from onegov.org.models import (
@@ -25,16 +23,66 @@ from onegov.org.models import (
     LegacyImage,
 )
 from onegov.org import utils
-from sedate import utcnow
+from sedate import to_timezone, utcnow
+from time import time
 from webob import exc
 from uuid import uuid4
+
+
+def get_thumbnail_size(image):
+    if 'thumbnail_small' in image.reference:
+        return image.reference.thumbnail_small['size']
+    else:
+        return ('256', '256')
+
+
+class Img(object):
+    """ Represents an img element. """
+
+    __slots__ = ['src', 'alt', 'title', 'url', 'extra', 'width', 'height']
+
+    def __init__(self, src, alt=None, title=None, url=None, extra=None,
+                 width=None, height=None):
+        #: The src of the image
+        self.src = src
+
+        #: The text for people that can't or won't look at the picture
+        self.alt = alt
+
+        #: The title of the image
+        self.title = title
+
+        #: The target of this image
+        self.url = url
+
+        #: The width of the image in pixel
+        self.width = width
+
+        #: The height of the image in pixel
+        self.height = height
+
+        #: Extra parameters
+        self.extra = extra
+
+    @classmethod
+    def from_image(cls, layout, image):
+        request = layout.request
+
+        return cls(
+            src=request.class_link(File, {'id': image.id}, 'thumbnail'),
+            url=request.class_link(File, {'id': image.id}),
+            alt=(image.note or '').strip(),
+            width=get_thumbnail_size(image)[0],
+            height=get_thumbnail_size(image)[1],
+            extra=layout.csrf_protected_url(request.link(image, 'note'))
+        )
 
 
 @OrgApp.html(model=GeneralFileCollection, template='files.pt',
              permission=Private)
 def view_get_file_collection(self, request):
     request.include('common')
-    request.include('dropzone')
+    request.include('upload')
     request.include('prompt')
 
     layout = DefaultLayout(self, request)
@@ -51,6 +99,7 @@ def view_get_file_collection(self, request):
 
     @lru_cache(maxsize=len(files) // 4)
     def format_date(date):
+        date = to_timezone(date, layout.timezone)
         return pattern.apply(date, locale)
 
     @lru_cache(maxsize=len(files) // 4)
@@ -73,9 +122,11 @@ def view_get_file_collection(self, request):
             f.content_type,
             f.name
         ),
-        'signed': lambda r: random.uniform(0, 1) > 0.9,
         'actions_url': lambda file_id: request.class_link(
             GeneralFile, name="details", variables={'id': file_id}
+        ),
+        'upload_url': layout.csrf_protected_url(
+            request.link(self, name='upload')
         )
     }
 
@@ -106,27 +157,14 @@ def view_file_details(self, request):
              permission=Private)
 def view_get_image_collection(self, request):
     request.include('common')
-    request.include('dropzone')
+    request.include('upload')
     request.include('editalttext')
 
     layout = DefaultLayout(self, request)
 
-    default = ('256', '256')
-
-    def get_thumbnail_size(image):
-        if 'thumbnail_small' in image.reference:
-            return image.reference.thumbnail_small['size']
-        else:
-            return default
-
     images = view_get_image_collection_json(
-        self, request, produce_image=lambda image: Img(
-            src=request.class_link(File, {'id': image.id}, 'thumbnail'),
-            url=request.class_link(File, {'id': image.id}),
-            alt=(image.note or '').strip(),
-            width=get_thumbnail_size(image)[0],
-            height=get_thumbnail_size(image)[1],
-            extra=layout.csrf_protected_url(request.link(image, 'note'))
+        self, request, produce_image=lambda image: Img.from_image(
+            layout, image
         )
     )
 
@@ -139,13 +177,17 @@ def view_get_image_collection(self, request):
         Link(
             text=_("Manage Photo Albums"),
             url=request.class_link(ImageSetCollection),
-            classes=('new-photo-album', ))
+            attrs={'class': 'new-photo-album'}
+        )
     ]
 
     return {
         'layout': layout,
         'title': _('Images'),
-        'images': images
+        'images': images,
+        'upload_url': layout.csrf_protected_url(
+            request.link(self, name='upload')
+        )
     }
 
 
@@ -199,16 +241,51 @@ def handle_file_upload(self, request):
 
 @OrgApp.view(model=FileCollection, name='upload',
              request_method='POST', permission=Private)
-def view_upload_file(self, request):
+def view_upload_file(self, request, return_file=False):
     request.assert_valid_csrf_token()
 
     try:
-        handle_file_upload(self, request)
+        uploaded_file = handle_file_upload(self, request)
     except FileExistsError as e:
         # mark existing files as modified to put them in front of the queue
-        e.args[0].modified = utcnow()
+        uploaded_file = e.args[0]
+
+    if return_file:
+        return uploaded_file
 
     return morepath.redirect(request.link(self))
+
+
+@OrgApp.html(model=GeneralFileCollection, name='upload',
+             request_method='POST', permission=Private)
+def view_upload_general_file(self, request):
+    uploaded_file = view_upload_file(self, request, return_file=True)
+    layout = DefaultLayout(self, request)
+
+    return render_macro(layout.macros['file-info'], request, {
+        'file': uploaded_file,
+        'format_date': lambda dt: layout.format_date(dt, 'datetime'),
+        'actions_url': lambda file_id: request.class_link(
+            GeneralFile, name="details", variables={'id': file_id}
+        ),
+        'extension': lambda file: utils.extension_for_content_type(
+            file.reference.content_type,
+            file.name
+        )
+    })
+
+
+@OrgApp.html(model=ImageFileCollection, name='upload',
+             request_method='POST', permission=Private)
+def view_upload_image_file(self, request):
+    uploaded_file = view_upload_file(self, request, return_file=True)
+    layout = DefaultLayout(self, request)
+
+    return render_macro(layout.macros['uploaded_image'], request, {
+        'image': Img.from_image(layout, uploaded_file),
+        'index': int(time() * 1000),
+        'layout': layout
+    })
 
 
 @OrgApp.json(model=FileCollection, name='upload.json',

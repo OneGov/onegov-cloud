@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-08-21 09:49+0200\n"
+"POT-Creation-Date: 2018-08-30 13:42+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1561,8 +1561,8 @@ msgstr "Aucune personne n'a encore été ajoutée."
 msgid "Upload"
 msgstr "Télécharger"
 
-msgid "All Images"
-msgstr "Toutes les images"
+msgid "Just Uploaded"
+msgstr "Mis en ligne à l'instant"
 
 msgid ""
 "To edit the image descriptions, click on one, enter your descrption and "
@@ -1571,15 +1571,6 @@ msgstr ""
 "Pour modifier les descriptions d'image, cliquez sur une image, saisissez "
 "votre description et appuyez sur retour. Pour interrompre, appuyez sur "
 "sortir."
-
-msgid "Click to add a description"
-msgstr "Cliquez pour ajouter une description"
-
-msgid "Do you really want to delete the image?"
-msgstr "Voulez-vous vraiment supprimer l'image ?"
-
-msgid "Delete Image"
-msgstr "Supprimez l'image"
 
 msgid "No images uploaded yet"
 msgstr "Aucune image téléchargée pour le moment"
@@ -1829,6 +1820,15 @@ msgstr "Veuillez fournir le nouveau nom du fichier "
 
 msgid "Rename"
 msgstr "Renommer"
+
+msgid "Click to add a description"
+msgstr "Cliquez pour ajouter une description"
+
+msgid "Do you really want to delete the image?"
+msgstr "Voulez-vous vraiment supprimer l'image ?"
+
+msgid "Delete Image"
+msgstr "Supprimez l'image"
 
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "
@@ -2206,17 +2206,17 @@ msgstr "L'entrée de répertoire a été adoptée."
 msgid "Directory entry rejected."
 msgstr "L'entrée de répertoire a été rejetée."
 
-msgid "All Files"
-msgstr "Tous les fichiers"
-
-msgid "No files uploaded yet"
-msgstr "Aucun fichier téléchargé pour le moment"
-
 msgid "Extension"
 msgstr "Extension"
 
 msgid "Upload Date"
 msgstr "Date de téléchargement"
+
+msgid "All Files"
+msgstr "Tous les fichiers"
+
+msgid "No files uploaded yet"
+msgstr "Aucun fichier téléchargé pour le moment"
 
 msgid "The OneGov Cloud Team"
 msgstr "L'équipe de OneGov Cloud"
@@ -3001,6 +3001,9 @@ msgstr "Votre paiement a été retiré"
 
 msgid "Your payment has been refunded"
 msgstr "Votre paiement a été remboursé"
+
+#~ msgid "All Images"
+#~ msgstr "Toutes les images"
 
 #~ msgid "Do you really want to delete the file?"
 #~ msgstr "Voulez-vous vraiment supprimer le fichier ?"

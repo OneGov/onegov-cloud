@@ -184,6 +184,10 @@ jQuery.fn.confirmation = function() {
 };
 
 // hooks the targeted elements up
+$(document).on('process-common-nodes', function(_e, elements) {
+    $(elements).find('a.confirm').confirmation();
+});
+
 $(document).ready(function() {
     $('a.confirm').confirmation();
 });

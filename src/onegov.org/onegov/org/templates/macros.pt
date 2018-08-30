@@ -274,23 +274,23 @@
     </tal:block>
 </metal:single_field>
 
-<metal:dropzone define-macro="dropzone" i18n:domain="onegov.org">
-    <form action="${upload_url}"
-          class="dropzone clearfix"
-          method="POST"
-          enctype="multipart/form-data">
-        <div class="dz-message" i18n:translate>
+<metal:upload define-macro="upload" i18n:domain="onegov.org">
+    <form action="${upload_url}" class="upload" method="POST" enctype="multipart/form-data">
+        <div class="upload-dropzone" i18n:translate>
             Drop files to upload
         </div>
 
+        <div class="upload-progress" metal:define-slot='upload-progress'></div>
+        <div class="upload-filelist" metal:define-slot='upload-filelist'></div>
+
         <!--! fallback for integration tests -->
-        <div class="fallback" style="display: none;">
+        <noscript>
             <input name="file" type="file" multiple />
             <input type="submit" value="Submit" class="button" i18n:attributes="value">
-        </div>
+        </noscript>
 
     </form>
-</metal:dropzone>
+</metal:upload>
 
 <metal:newslist define-macro="newslist" i18n:domain="onegov.org">
     <div class="newslist" tal:condition="news">
@@ -1238,6 +1238,7 @@
                 ic-on-success="
                     var info = $('#${id}-actions').closest('tr');
                     info.prev().remove();
+                    info.next().remove();
                     info.remove();
                 "
                 data-confirm="Do you really want to delete this file?"
@@ -1273,3 +1274,52 @@
         </div>
     </div>
 </metal:file_details>
+
+<metal:file_info define-macro="file-info" i18n:domain="onegov.org">
+    <tal:b define="
+        file_number file.number|file.id;
+        file_upload file.upload_date|file.created
+    ">
+        <tr class="file-info">
+            <td>
+                ${file.name}
+            </td>
+            <td>
+                <a id="button-${file_number}" data-toggle="#details-${file_number}" class="untoggled">
+                    <i class="fa fa-chevron-down" aria-hidden="true"></i>
+                </a>
+            </td>
+            <td>
+                ${extension(file)}
+            </td>
+            <td>
+                ${format_date(file_upload)}
+            </td>
+        </tr>
+        <tr id="details-${file_number}" style="display: none;">
+            <td colspan="4">
+                <div ic-trigger-from="#button-${file_number}"
+                     ic-trigger-on="click once"
+                     ic-get-from="${actions_url(file.id)}">
+                </div>
+            </td>
+        </tr>
+        <tr style="display: none"></tr> <!--! keeps odd/even shading on track -->
+    </tal:b>
+</metal:file_info>
+
+<metal:uploaded_image define-macro="uploaded_image" i18n:domain="onegov.org">
+    <li id="image-${index}" class="image-box">
+        <a href="${image.url}" tal:condition="image" class="editable-alt" data-note-update-url="${image.extra}">
+            <img tal:condition="image.alt" data-src="${image.src}" class="lazyload static-alt" alt="${image.alt}" width="${image.width}" height="${image.height}" />
+            <img tal:condition="not:image.alt" data-src="${image.src}" class="lazyload missing-alt static-alt" alt="Click to add a description" i18n:attributes="alt" width="${image.width}" height="${image.height}"/>
+        </a>
+        <a class="delete confirm"
+           ic-delete-from="${image.url}?csrf-token=${layout.csrf_token}"
+           ic-on-success="$('#image-${index}').remove();"
+           data-confirm="Do you really want to delete the image?"
+           data-confirm-yes="Delete Image"
+           data-confirm-no="Cancel"
+           i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"><i class="fa fa-times" aria-hidden="true"></i></a>
+    </li>
+</metal:uploaded_image>

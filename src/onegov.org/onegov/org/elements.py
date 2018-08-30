@@ -184,35 +184,6 @@ class ConfirmLink(DeleteLink):
             extra_information, redirect_after, request_method, classes)
 
 
-class Img(object):
-    """ Represents an img element. """
-
-    __slots__ = ['src', 'alt', 'title', 'url', 'extra', 'width', 'height']
-
-    def __init__(self, src, alt=None, title=None, url=None, extra=None,
-                 width=None, height=None):
-        #: The src of the image
-        self.src = src
-
-        #: The text for people that can't or won't look at the picture
-        self.alt = alt
-
-        #: The title of the image
-        self.title = title
-
-        #: The target of this image
-        self.url = url
-
-        #: The width of the image in pixel
-        self.width = width
-
-        #: The height of the image in pixel
-        self.height = height
-
-        #: Extra parameters
-        self.extra = extra
-
-
 class LinkGroup(HiddenElementMixin):
     """ Represents a list of links. """
 
