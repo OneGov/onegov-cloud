@@ -125,6 +125,17 @@ var setup_datetimepicker = function(type, selector, onChange, extraOptions) {
             client_to_server: function(value) {
                 return convert_date(value, i18n_options.datetimeformat_momentjs, 'Y-m-d H:i:00');
             }
+        },
+        'datetime-local': {
+            timepicker: true,
+            format: i18n_options.datetimeformat,
+            placeholder: i18n_options.placeholder_datetime,
+            server_to_client: function(value) {
+                return convert_date(value, 'YYYY-MM-DD HH:mm', i18n_options.datetimeformat);
+            },
+            client_to_server: function(value) {
+                return convert_date(value, i18n_options.datetimeformat_momentjs, 'Y-m-d H:i:00');
+            }
         }
     }[type];
 
@@ -243,6 +254,10 @@ if (!Modernizr.inputtypes.date) {
 // load the datetimepicker for date inputs if the browser does not support it
 if (!Modernizr.inputtypes.datetime) {
     setup_datetimepicker('datetime', null);
+}
+
+if (!Modernizr.inputtypes['datetime-local']) {
+    setup_datetimepicker('datetime-local', null);
 }
 
 // for time fields we only add time parsing

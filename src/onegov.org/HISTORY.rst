@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes datetime picker not showing up in custom forms in Safari.
+  [href]
+
 - Improves and streamlines files/images uploading.
   [href]
 
