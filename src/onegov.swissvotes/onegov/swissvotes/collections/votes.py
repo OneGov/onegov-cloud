@@ -140,12 +140,16 @@ class SwissVoteCollection(Pagination):
 
         """
 
-        result = (
-            getattr(SwissVote, f'_{self.current_sort_by}', None) or
-            getattr(SwissVote, self.current_sort_by, None)
-        )
-        if not result:
-            raise NotImplementedError()
+        if self.current_sort_by == 'title':
+            from onegov.core.orm.func import unaccent
+            result = unaccent(SwissVote.title)
+        else:
+            result = (
+                getattr(SwissVote, f'_{self.current_sort_by}', None) or
+                getattr(SwissVote, self.current_sort_by, None)
+            )
+            if not result:
+                raise NotImplementedError()
 
         if self.current_sort_order == 'descending':
             result = result.desc()

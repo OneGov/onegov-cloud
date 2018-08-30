@@ -162,7 +162,7 @@
                 <table class="sortable voter-strengths" data-sortlist="[[1,1]]">
                     <thead>
                         <tr>
-                            <th i18n:translate>Party</th>
+                            <th i18n:translate class="column-25">Party</th>
                             <th><tal:block i18n:translate>Percentage of voters in the National Council elections </tal:block> ${vote.national_council_election_year}</th>
                         </tr>
                     </thead>
@@ -259,7 +259,7 @@
                 <table class="sortable voter-strengths" data-sortlist="[[1,1]]">
                     <thead>
                         <tr>
-                            <th i18n:translate>Position</th>
+                            <th i18n:translate class="column-25">Position</th>
                             <th><tal:block i18n:translate>Percentage of voters in the National Council elections </tal:block> ${vote.national_council_election_year}</th>
                         </tr>
                     </thead>

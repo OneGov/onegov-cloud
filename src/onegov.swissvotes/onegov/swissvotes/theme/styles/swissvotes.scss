@@ -139,16 +139,3 @@ h2 small {
         }
     }
 }
-
-/*
-    Vote
-*/
-.vote {
-    table {
-        @media (min-width: 40em) {
-            th:first-child {
-                width: 25%;
-            }
-        }
-    }
-}

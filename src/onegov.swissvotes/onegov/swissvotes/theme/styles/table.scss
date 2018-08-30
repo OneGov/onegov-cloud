@@ -1,3 +1,15 @@
+$unsorted: '\f0dc';
+$ascending: '\f0de';
+$descending: '\f0dd';
+
+@mixin sort($order) {
+    &::after {
+        content: $order;
+        font-family: 'FontAwesome';
+        margin-left: .75ex;
+    }
+}
+
 table {
     border-collapse: separate;
     border-left: solid $table-border-size $table-border-color;
@@ -15,23 +27,22 @@ table {
             color: $black;
         }
 
-        &.sort-unsorted a::after {
-            content: '\f0dc';
-            font-family: 'FontAwesome';
-            margin-left: .75ex;
+        &.sort-unsorted a {
+            @include sort($unsorted);
         }
 
-        &.sort-ascending a::after {
-            content: '\f0de';
-            font-family: 'FontAwesome';
-            margin-left: .75ex;
+        &.sort-ascending a {
+            @include sort($ascending);
         }
 
-        &.sort-descending a::after {
-            content: '\f0dd';
-            font-family: 'FontAwesome';
-            margin-left: .75ex;
+        &.sort-descending a {
+            @include sort($descending);
         }
+
+        &.column-25 {
+            width: 25%;
+        }
+
     }
 
     th[rowspan] {
@@ -64,30 +75,23 @@ table {
 }
 
 .tablesorter {
-    .tablesorter-headerUnSorted:not(.sorter-false) .tablesorter-header-inner::after {
-        content: '\f0dc';
-        font-family: 'FontAwesome';
-        margin-left: .75ex;
+    .tablesorter-headerUnSorted:not(.sorter-false) .tablesorter-header-inner {
+        @include sort($unsorted);
     }
 
-    .tablesorter-headerAsc:not(.sorter-false) .tablesorter-header-inner::after {
-        content: '\f0de';
-        font-family: 'FontAwesome';
-        margin-left: .75ex;
+    .tablesorter-headerAsc:not(.sorter-false) .tablesorter-header-inner {
+        @include sort($ascending);
     }
 
-    .tablesorter-headerDesc:not(.sorter-false) .tablesorter-header-inner::after {
-        content: '\f0dd';
-        font-family: 'FontAwesome';
-        margin-left: .75ex;
+    .tablesorter-headerDesc:not(.sorter-false) .tablesorter-header-inner {
+        @include sort($descending);
     }
 }
 
 .tablesaw {
-    // todo:
-    border-left: solid $table-border-size $table-border-color;
-    border-right: solid $table-border-size $table-border-color;
-    border-top: solid $table-border-size $table-border-color;
+    .sort-title-fix {
+        display: none;
+    }
 
     &.tablesaw-columntoggle {
         border-left: solid $table-border-size $table-border-color;
@@ -96,7 +100,27 @@ table {
     }
 
     &.tablesaw-stack {
-        @media (max-width: 39.9375em) {
+        .sort-unsorted .tablesaw-cell-label a,
+        .tablesaw-cell-content a.sort-unsorted {
+            @include sort($unsorted);
+        }
+
+        .sort-ascending .tablesaw-cell-label a,
+        .tablesaw-cell-content a.sort-ascending {
+            @include sort($ascending);
+        }
+
+        .sort-descending .tablesaw-cell-label a,
+        .tablesaw-cell-content a.sort-descending {
+            @include sort($descending);
+        }
+
+        @media #{$small-only} {
+            .sort-title-fix {
+                color: $black;
+                display: inline;
+            }
+
             tbody,
             tfoot {
                 background-color: $white;
@@ -112,7 +136,8 @@ table {
                 }
 
                 td {
-                    .tablesaw-cell-label {
+                    .tablesaw-cell-label,
+                    .tablesaw-cell-label a {
                         color: $black;
                         font-weight: normal;
                     }
@@ -144,7 +169,7 @@ table {
 }
 
 .tablesaw-modeswitch {
-    @media (min-width: 40em) {
+    @media #{$medium-up} {
         display: none;
     }
 }
