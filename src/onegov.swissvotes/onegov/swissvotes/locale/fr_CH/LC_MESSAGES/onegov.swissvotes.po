@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-28 15:05+0200\n"
+"POT-Creation-Date: 2018-08-30 13:33+0200\n"
 "PO-Revision-Date: 2018-08-23 09:18+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -859,105 +859,6 @@ msgstr ""
 msgid "Details"
 msgstr ""
 
-msgid "New mapping"
-msgstr "Nouvelle cartographie"
-
-msgid "No mappings yet."
-msgstr "Aucune cartographie pour l'instant."
-
-msgid "Actions"
-msgstr "Actions"
-
-msgid "Delete"
-msgstr "Supprimer"
-
-msgid "Edit"
-msgstr "Editer"
-
-msgid "New data source"
-msgstr "Nouvelle source de données"
-
-msgid "No data sources yet."
-msgstr "Aucune source de données pour l'instant."
-
-msgid "Name"
-msgstr "Nom"
-
-msgid "Type"
-msgstr "Type"
-
-msgid "Token"
-msgstr "Token"
-
-msgid "Manage"
-msgstr "Gérer"
-
-msgid "Regenerate token"
-msgstr "Renouveler le token"
-
-msgid "New compound"
-msgstr "Nouvelle composante"
-
-msgid "No compounds yet."
-msgstr "Aucune composante pour le moment."
-
-msgid "Shortcode"
-msgstr "Shortcode"
-
-msgid "View"
-msgstr "Voir"
-
-msgid "Upload party results"
-msgstr "Uploader les résultats par parti"
-
-msgid "Clear results"
-msgstr "Effacer les résultats"
-
-msgid "New election"
-msgstr "Nouveau election"
-
-msgid "No elections yet."
-msgstr "Pas de elections actuellement."
-
-msgid "System"
-msgstr "Système"
-
-msgid "Federal"
-msgstr "Fédéral"
-
-msgid "Regional"
-msgstr "Régional"
-
-msgid "Cantonal"
-msgstr "Cantonal"
-
-msgid "Communal"
-msgstr "Municipal"
-
-msgid "Election based on the simple majority system"
-msgstr "Election selon le système majoritaire"
-
-msgid "Election based on proportional representation"
-msgstr "Election selon le système proportionnel"
-
-msgid "Upload results"
-msgstr "Mettre à jour les résultats"
-
-msgid "Trigger notifications"
-msgstr "Activer les notifications"
-
-msgid "No subscribers yet."
-msgstr "Pas encore d’abonnés."
-
-msgid "Locale"
-msgstr "Locaux"
-
-msgid "New vote"
-msgstr "Nouvelle votation"
-
-msgid "No votes yet."
-msgstr "Pas de votations actuellement."
-
 msgid "Wrong username or password"
 msgstr "Mauvais nom d'utilisateur ou mot de passe"
 
@@ -1006,4 +907,8 @@ msgid "Vote deleted"
 msgstr ""
 
 msgid "Dataset updated"
+msgstr ""
+
+#, python-format
+msgid "The dataset contains unknown descriptors: ${items}."
 msgstr ""

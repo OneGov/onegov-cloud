@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-28 15:05+0200\n"
-"PO-Revision-Date: 2018-08-28 15:06+0200\n"
+"POT-Creation-Date: 2018-08-30 13:33+0200\n"
+"PO-Revision-Date: 2018-08-30 13:33+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -857,105 +857,6 @@ msgstr "Ja Volk"
 
 msgid "Details"
 msgstr "Details"
-
-msgid "New mapping"
-msgstr "Neue Zuordnung"
-
-msgid "No mappings yet."
-msgstr "Noch keine Zuordnungen."
-
-msgid "Actions"
-msgstr "Aktionen"
-
-msgid "Delete"
-msgstr "Löschen"
-
-msgid "Edit"
-msgstr "Bearbeiten"
-
-msgid "New data source"
-msgstr "Neue Datenquelle"
-
-msgid "No data sources yet."
-msgstr "Noch keine Datenquellen."
-
-msgid "Name"
-msgstr "Name"
-
-msgid "Type"
-msgstr "Art"
-
-msgid "Token"
-msgstr "Token"
-
-msgid "Manage"
-msgstr "Verwalten"
-
-msgid "Regenerate token"
-msgstr "Token neu erzeugen"
-
-msgid "New compound"
-msgstr "Neue Verbindung"
-
-msgid "No compounds yet."
-msgstr "Noch keine Verbindungen."
-
-msgid "Shortcode"
-msgstr "Kürzel"
-
-msgid "View"
-msgstr "Anzeigen"
-
-msgid "Upload party results"
-msgstr "Parteiresultate hochladen"
-
-msgid "Clear results"
-msgstr "Resultate löschen"
-
-msgid "New election"
-msgstr "Neue Wahl"
-
-msgid "No elections yet."
-msgstr "Noch keine Wahlen erfasst."
-
-msgid "System"
-msgstr "System"
-
-msgid "Federal"
-msgstr "National"
-
-msgid "Regional"
-msgstr "Regional"
-
-msgid "Cantonal"
-msgstr "Kantonal"
-
-msgid "Communal"
-msgstr "Kommunal"
-
-msgid "Election based on the simple majority system"
-msgstr "Majorzwahl"
-
-msgid "Election based on proportional representation"
-msgstr "Proporzwahl"
-
-msgid "Upload results"
-msgstr "Resultate hochladen"
-
-msgid "Trigger notifications"
-msgstr "Benachrichtigungen auslösen"
-
-msgid "No subscribers yet."
-msgstr "Noch keine Abonnenten."
-
-msgid "Locale"
-msgstr "Gebietsschema"
-
-msgid "New vote"
-msgstr "Neue Abstimmung"
-
-msgid "No votes yet."
-msgstr "Noch keine Abstimmungen erfasst."
 
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"
