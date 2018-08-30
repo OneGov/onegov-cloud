@@ -134,8 +134,9 @@ def test_view_files(org_app):
     assert "Noch keine Dateien hochgeladen" in files_page
 
     files_page.form['file'] = Upload('Test.txt', b'File content.')
-    files_page = files_page.form.submit().follow()
+    files_page.form.submit()
 
+    files_page = client.get('/files')
     assert "Noch keine Dateien hochgeladen" not in files_page
     assert 'Test.txt' in files_page
 
@@ -156,8 +157,9 @@ def test_view_images(org_app):
     assert images_page.form.submit(expect_errors=True).status_code == 415
 
     images_page.form['file'] = Upload('Test.jpg', utils.create_image().read())
-    images_page = images_page.form.submit().follow()
+    images_page.form.submit()
 
+    images_page = client.get('/images')
     assert "Noch keine Bilder hochgeladen" not in images_page
 
 
