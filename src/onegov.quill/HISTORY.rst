@@ -4,6 +4,9 @@ Changelog
 - Adds support for links.
   [msom]
 
+- Adds support for blockquotes.
+  [msom]
+
 0.3.2 (2018-08-13)
 ~~~~~~~~~~~~~~~~~~~~~
 

@@ -14,6 +14,7 @@ def test_field_clean():
         <h2>
             <span class="">A<strong>B</strong><b>C</b></span>
         </h2>
+        <blockquote>Y</blockquote>
         <p>
             <span class="md-line md-end-block">
                 <span class=""><em>D</em><i>E</i></span>
@@ -41,7 +42,7 @@ def test_field_clean():
     field.data = test_data
     assert field.validate(form)
     assert field.data.replace(' ', '').replace('\n', '') == (
-        'ABC<p>DEF<br>XXXX</p>123123'
+        'ABCY<p>DEF<br>XXXX</p>123123'
     )
 
     field = QuillField(tags=['strong'])
@@ -49,7 +50,7 @@ def test_field_clean():
     field.data = test_data
     assert field.validate(form)
     assert field.data.replace(' ', '').replace('\n', '') == (
-        'A<strong>B</strong>C<p>DEF<br>XXXX</p>123123'
+        'A<strong>B</strong>CY<p>DEF<br>XXXX</p>123123'
     )
 
     field = QuillField(tags=['em', 'ol', 'ul'])
@@ -57,7 +58,7 @@ def test_field_clean():
     field.data = test_data
     assert field.validate(form)
     assert field.data.replace(' ', '').replace('\n', '') == (
-        'ABC<p><em>D</em>EF<br>XXXX</p>'
+        'ABCY<p><em>D</em>EF<br>XXXX</p>'
         '<ul><li>1</li><li>2</li><li>3</li></ul>'
         '<ol><li>1</li><li>2</li><li>3</li></ol>'
     )
@@ -67,7 +68,7 @@ def test_field_clean():
     field.data = test_data
     assert field.validate(form)
     assert field.data.replace(' ', '').replace('\n', '') == (
-        'ABC<p>DEF<br>XXXX</p>'
+        'ABCY<p>DEF<br>XXXX</p>'
         '<li>1</li><li>2</li><li>3</li>'
         '<ol><li>1</li><li>2</li><li>3</li></ol>'
     )
@@ -77,9 +78,17 @@ def test_field_clean():
     field.data = test_data
     assert field.validate(form)
     assert field.data.replace(' ', '').replace('\n', '') == (
-        'A<strong>B</strong>C<p>DEF<br>XXXX</p>'
+        'A<strong>B</strong>CY<p>DEF<br>XXXX</p>'
         '<ul><li>1</li><li>2</li><li>3</li></ul>'
         '<li>1</li><li>2</li><li>3</li>'
+    )
+
+    field = QuillField(tags=['blockquote'])
+    field = field.bind(form, 'html')
+    field.data = test_data
+    assert field.validate(form)
+    assert field.data.replace(' ', '').replace('\n', '') == (
+        'ABC<blockquote>Y</blockquote><p>DEF<br>XXXX</p>123123'
     )
 
     field = QuillField()
@@ -87,7 +96,8 @@ def test_field_clean():
     field.data = test_data
     assert field.validate(form)
     assert field.data.replace(' ', '').replace('\n', '') == (
-        'A<strong>B</strong>C<p><em>D</em>E<ahref="xx">F</a><br>XXXX</p>'
+        'A<strong>B</strong>C<blockquote>Y</blockquote>'
+        '<p><em>D</em>E<ahref="xx">F</a><br>XXXX</p>'
         '<ul><li>1</li><li>2</li><li>3</li></ul>'
         '<ol><li>1</li><li>2</li><li>3</li></ol>'
     )
@@ -97,5 +107,5 @@ def test_field_clean():
     field.data = test_data
     assert field.validate(form)
     assert field.data.replace(' ', '').replace('\n', '') == (
-        'ABC<p>DEF<br>XXXX</p>123123'
+        'ABCY<p>DEF<br>XXXX</p>123123'
     )

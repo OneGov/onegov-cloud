@@ -3,7 +3,10 @@ from wtforms.widgets import HiddenInput
 from wtforms.widgets.core import HTMLString
 
 
-TAGS = ('strong', 'em', 'a', 'ol', 'ul')
+TAGS = (
+    'strong', 'em', 'a',
+    'ol', 'ul', 'blockquote'
+)
 
 
 class QuillInput(HiddenInput):
@@ -32,6 +35,8 @@ class QuillInput(HiddenInput):
             self.formats.append("'link'")
         if 'ol' in tags or 'ul' in tags:
             self.formats.append("'list'")
+        if 'blockquote' in tags:
+            self.formats.append("'blockquote'")
         if self.placeholders:
             self.formats.append("'placeholder'")
 
@@ -46,6 +51,8 @@ class QuillInput(HiddenInput):
             self.toolbar.append("{'list': 'ordered'}")
         if 'ul' in tags:
             self.toolbar.append("{'list': 'bullet'}")
+        if 'blockquote' in tags:
+            self.toolbar.append("'blockquote'")
         if self.placeholders:
             options = [f"'{key}'" for key in self.placeholders]
             options = ', '.join(options)
