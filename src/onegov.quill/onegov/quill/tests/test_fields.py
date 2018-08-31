@@ -91,12 +91,20 @@ def test_field_clean():
         'ABC<blockquote>Y</blockquote><p>DEF<br>XXXX</p>123123'
     )
 
+    field = QuillField(tags=['h2'])
+    field = field.bind(form, 'html')
+    field.data = test_data
+    assert field.validate(form)
+    assert field.data.replace(' ', '').replace('\n', '') == (
+        '<h2>ABC</h2>Y<p>DEF<br>XXXX</p>123123'
+    )
+
     field = QuillField()
     field = field.bind(form, 'html')
     field.data = test_data
     assert field.validate(form)
     assert field.data.replace(' ', '').replace('\n', '') == (
-        'A<strong>B</strong>C<blockquote>Y</blockquote>'
+        '<h2>A<strong>B</strong>C</h2><blockquote>Y</blockquote>'
         '<p><em>D</em>E<ahref="xx">F</a><br>XXXX</p>'
         '<ul><li>1</li><li>2</li><li>3</li></ul>'
         '<ol><li>1</li><li>2</li><li>3</li></ol>'

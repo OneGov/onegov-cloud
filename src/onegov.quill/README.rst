@@ -3,6 +3,11 @@ Onegov Quill
 
 Quill rich text editor integration for OneGov.
 
+Updating Quill.js
+-----------------
+
+You need to use a custom build of Quill.js which adds the missing icons for h3-h6.
+
 Run the Tests
 -------------
 

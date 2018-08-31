@@ -3,10 +3,9 @@ from wtforms.widgets import HiddenInput
 from wtforms.widgets.core import HTMLString
 
 
-TAGS = (
-    'strong', 'em', 'a',
-    'ol', 'ul', 'blockquote'
-)
+HEADINGS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
+LISTS = ['ol', 'ul']
+TAGS = ['strong', 'em', 'a'] + HEADINGS + LISTS + ['blockquote']
 
 
 class QuillInput(HiddenInput):
@@ -33,7 +32,9 @@ class QuillInput(HiddenInput):
             self.formats.append("'italic'")
         if 'a' in tags:
             self.formats.append("'link'")
-        if 'ol' in tags or 'ul' in tags:
+        if set(tags) & set(HEADINGS):
+            self.formats.append("'header'")
+        if set(tags) & set(LISTS):
             self.formats.append("'list'")
         if 'blockquote' in tags:
             self.formats.append("'blockquote'")
@@ -47,6 +48,18 @@ class QuillInput(HiddenInput):
             self.toolbar.append("'italic'")
         if 'a' in tags:
             self.toolbar.append("'link'")
+        if 'h1' in tags:
+            self.toolbar.append("{'header': 1}")
+        if 'h2' in tags:
+            self.toolbar.append("{'header': 2}")
+        if 'h3' in tags:
+            self.toolbar.append("{'header': 3}")
+        if 'h4' in tags:
+            self.toolbar.append("{'header': 4}")
+        if 'h5' in tags:
+            self.toolbar.append("{'header': 5}")
+        if 'h6' in tags:
+            self.toolbar.append("{'header': 6}")
         if 'ol' in tags:
             self.toolbar.append("{'list': 'ordered'}")
         if 'ul' in tags:

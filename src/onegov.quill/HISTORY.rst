@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for headings.
+  [msom]
+
 - Adds support for links.
   [msom]
 
