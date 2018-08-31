@@ -160,7 +160,7 @@ class SwissVoteCollection(Pagination):
     def offset(self):
         """ The current position in the batch. """
 
-        return self.page or 0 * self.batch_size
+        return (self.page or 0) * self.batch_size
 
     @property
     def previous(self):

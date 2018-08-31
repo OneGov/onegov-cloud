@@ -4,6 +4,9 @@ Changelog
 - Improves vote(s) views.
   [msom]
 
+- Fixes votes pagination.
+  [msom]
+
 0.0.2 (2018-08-31)
 ~~~~~~~~~~~~~~~~~~~
 
