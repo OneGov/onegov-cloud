@@ -3,7 +3,7 @@ Changelog
 0.71.6 (2018-08-31)
 ~~~~~~~~~~~~~~~~~~~
 
-- Fixes form translations resulting in a MaxRecursionError.
+- Fixes form translations resulting in a RecursionError.
   [href]
 
 0.71.5 (2018-08-30)
