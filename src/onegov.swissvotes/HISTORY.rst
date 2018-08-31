@@ -4,6 +4,9 @@ Changelog
 - Improves vote(s) views.
   [msom]
 
+- Adds editor options.
+  [msom]
+
 - Fixes votes pagination.
   [msom]
 

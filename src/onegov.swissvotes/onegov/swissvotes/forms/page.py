@@ -16,7 +16,7 @@ class PageForm(Form):
 
     content = QuillField(
         label=_("Content"),
-        tags=('strong', 'ol', 'ul'),
+        tags=('strong', 'em', 'a', 'h3', 'ol', 'ul', 'blockquote'),
         validators=[
             InputRequired()
         ]
