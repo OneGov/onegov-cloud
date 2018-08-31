@@ -27,20 +27,20 @@
                     >
                     <thead>
                         <tr>
-                            <th class="left-aligned sort-${votes.sort_order_by_key('title')}" data-tablesaw-priority="2">
+                            <th class="left-aligned sort-${votes.sort_order_by_key('title')}" data-tablesaw-priority="1">
                                 <a href="${request.link(votes.by_order('title'))}" i18n:translate>Title</a>
                             </th>
-                            <th class="left-aligned sort-${votes.sort_order_by_key('date')}" data-tablesaw-priority="1">
+                            <th class="left-aligned sort-${votes.sort_order_by_key('date')}" data-tablesaw-priority="3">
                                 <a href="${request.link(votes.by_order('date'))}" i18n:translate>Date</a>
                             </th>
-                            <th data-tablesaw-priority="4" i18n:translate>Policy area</th>
+                            <th data-tablesaw-priority="5" i18n:translate>Policy area</th>
                             <th class="left-aligned sort-${votes.sort_order_by_key('legal_form')}" data-tablesaw-priority="4">
                                 <a href="${request.link(votes.by_order('legal_form'))}" i18n:translate>Legal form</a>
                             </th>
-                            <th class="left-aligned sort-${votes.sort_order_by_key('result')}" data-tablesaw-priority="1">
+                            <th class="left-aligned sort-${votes.sort_order_by_key('result')}" data-tablesaw-priority="2">
                                 <a href="${request.link(votes.by_order('result'))}" i18n:translate>Voting result</a>
                             </th>
-                            <th class="right-aligned sort-${votes.sort_order_by_key('result_people_yeas_p')}" data-tablesaw-priority="5">
+                            <th class="right-aligned sort-${votes.sort_order_by_key('result_people_yeas_p')}" data-tablesaw-priority="0">
                                 <a href="${request.link(votes.by_order('result_people_yeas_p'))}" i18n:translate>Yeas People</a>
                             </th>
                             <th class="left-aligned" data-tablesaw-priority="persist" i18n:translate>Details</th>
@@ -52,7 +52,7 @@
                             <td class="left-aligned sort-${votes.sort_order_by_key('date')}">${layout.format_date(vote.date, 'date')}</td>
                             <td class="left-aligned">
                                 <tal:block tal:repeat="area vote.policy_areas">
-                                    <tal:block tal:content="structure area.html(request)" /><tal:block tal:condition="not repeat.area.end">,</tal:block>
+                                    <tal:block tal:content="structure area.html(request)" /><tal:block tal:condition="not repeat.area.end">,<br></tal:block>
                                 </tal:block>
                             </td>
                             <td class="left-aligned sort-${votes.sort_order_by_key('legal_form')}">${vote.legal_form}</td>

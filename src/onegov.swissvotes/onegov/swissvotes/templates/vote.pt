@@ -24,7 +24,7 @@
                 </tr>
                 <tr>
                     <th scope="row" i18n:translate>BFS number</th>
-                    <td>${int(vote.bfs_number)}</td>
+                    <td>${layout.format_number(vote.bfs_number, 1).rstrip('.0')}</td>
                 </tr>
                 <tr>
                     <th scope="row" i18n:translate>Procedure number</th>
