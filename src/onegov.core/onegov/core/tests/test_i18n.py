@@ -3,7 +3,7 @@ import os.path
 import polib
 import pytest
 
-from gettext import GNUTranslations, NullTranslations
+from gettext import GNUTranslations
 from onegov.core import i18n, utils
 from webob import Request
 from wtforms import Label
