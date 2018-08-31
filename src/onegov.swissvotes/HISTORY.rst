@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.3 (2018-08-31)
+~~~~~~~~~~~~~~~~~~~
 
 - Improves vote(s) views.
   [msom]
