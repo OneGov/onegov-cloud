@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.4.0 (2018-08-31)
+~~~~~~~~~~~~~~~~~~~~~
 
 - Adds support for headings.
   [msom]
