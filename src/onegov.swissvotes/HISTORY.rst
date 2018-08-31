@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.2 (2018-08-31)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the GitHub deploy key.
   [msom]
