@@ -32,7 +32,7 @@ deploy:
 
   - provider: releases
     api_key:
-        secure: ""
+        secure: "m07JRSjX4s6Kpj2LGwGv8c+jhG8gPKn0YQpzUV8kHPWVax+cADj/o0SE+QoYfe1qM30OrWyxoTIQy8P2PCEszAnhV14GS6pQbKhOikN9C6Q4rKoDKS5kpbe0mjdUt6oS34LJtecRi/hYIwPF8LJd/VOZmyQUqZ6hhKGCiDAQ1ljjMvZnGqRBRi7o8nufnp4lczi6hvcsVMBXVYn9PLyKKedLXmE71XNoSMCr+qi+udbR+6R+cpGgmKJV/+J1bVxDpMA4EtOCXnCzSiFHq6/qpSYVhJp+ztWcT0ijRCwm6CE6R/lL0F1s6VmfNWoyDcAkTVj3KaFUXNT3LXQNzSmTuwc9hWoNuKYfO+akptVEv3adXs+PLYvWMj1DLjW+AOwFvUUjqMSJMHSqqm0gQ27a1cWaHLqvwe/tiGQbJ/Ak05uq5rKOdyoOJKJOlGtk5hit4eZk2m/qCHwk9pqbjxSNQglnUGbYaoxCR8BOmWBcm7fAepzOcHL+MhkmnzEhkYvTMTR+yT3kvZ82itcY8LJA70tmLvyDBMp6Ip6iaurg8k/k+ZIuuq2OX2DO04M78IgAMi5dIm4g7tlJ3dxS1g3yQaOAuBaGlZvcCRNUfU3ebfaovSb/tMc1HABuBC6cwlJtRD5fZ8BRIKUEVkCnJOQmD+XLkrIX2gwPkxTjwPPT1zg="
     file: requirements.txt
     skip_cleanup: true
     on:
