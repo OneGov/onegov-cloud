@@ -30,7 +30,12 @@ class QuillField(TextAreaField):
         tags = ['p', 'br'] + tags
         if 'ol' in tags or 'ul' in tags:
             tags.append('li')
-        self.cleaner = Cleaner(tags=tags, attributes={}, strip=True)
+
+        attributes = {}
+        if 'a' in tags:
+            attributes['a'] = ['href']
+
+        self.cleaner = Cleaner(tags=tags, attributes=attributes, strip=True)
 
     def pre_validate(self, form):
         self.data = self.cleaner.clean(self.data or '')

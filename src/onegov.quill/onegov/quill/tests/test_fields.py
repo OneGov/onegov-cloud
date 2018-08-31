@@ -16,7 +16,8 @@ def test_field_clean():
         </h2>
         <p>
             <span class="md-line md-end-block">
-                <span class=""><em>D</em><i>E</i></span><a href="xx">F</a>
+                <span class=""><em>D</em><i>E</i></span>
+                <a href="xx" target="_blank">F</a>
                 <br>
             </span>
             <span class="md-line md-end-block">
@@ -86,12 +87,12 @@ def test_field_clean():
     field.data = test_data
     assert field.validate(form)
     assert field.data.replace(' ', '').replace('\n', '') == (
-        'A<strong>B</strong>C<p><em>D</em>EF<br>XXXX</p>'
+        'A<strong>B</strong>C<p><em>D</em>E<ahref="xx">F</a><br>XXXX</p>'
         '<ul><li>1</li><li>2</li><li>3</li></ul>'
         '<ol><li>1</li><li>2</li><li>3</li></ol>'
     )
 
-    field = QuillField(tags=['a', 'i', 'b'])
+    field = QuillField(tags=['i', 'b'])
     field = field.bind(form, 'html')
     field.data = test_data
     assert field.validate(form)

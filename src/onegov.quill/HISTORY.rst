@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds support for links.
+  [msom]
+
 0.3.2 (2018-08-13)
 ~~~~~~~~~~~~~~~~~~~~~
 
