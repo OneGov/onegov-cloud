@@ -193,33 +193,20 @@ def wrap_translations_for_chameleon(translations):
     }
 
 
-def add_fallback_to_tail(translation, fallback):
-    """ Adds the given fallback to the given translation, if it isn't already
-    found somewhere in the fallback chain.
+def translation_chain(translation):
+    """ Yields the translation chain with a generator. """
 
-    """
+    stack = [translation]
 
-    assert translation is not fallback
+    while stack:
+        translation = stack.pop()
 
-    while translation._fallback is not None:
-        translation = translation._fallback
+        yield translation
 
-        if translation is fallback:
-            return
-
-    # Avoid creating recursive chains
-    for item in (translation, fallback):
-        while item._fallback is not None:
-            item = item._fallback
-            if item is translation or item is fallback:
-                raise RuntimeError(
-                    "Recursive translation fallback chain detected"
-                )
-
-    translation.add_fallback(fallback)
+        translation._fallback and stack.append(translation._fallback)
 
 
-def get_translation_bound_meta(meta_class, translate):
+def get_translation_bound_meta(meta_class, translations):
     """ Takes a wtforms Meta class and combines our translate class with
     the one provided by WTForms itself.
 
@@ -233,22 +220,41 @@ def get_translation_bound_meta(meta_class, translate):
         cache_translations = False
 
         def get_translations(self, form):
-            translations = translate
+            nonlocal translations
+
             try:
-                default = super().get_translations(form)
+
+                # we create a new instance every time here because we had some
+                # issues before with using cached instances from wtforms -
+                # it might be worth revisiting in the future if we can
+                # enable caching here again, or introduce our own
+                wtf = super().get_translations(form)
+                wtf.is_wtforms = True
+
             except FileNotFoundError:
                 # if there are no locales, the file not found error
                 # can safely be ignored as there are no translations if there
                 # are no locales (a wtforms bug)
                 pass
             else:
-                if translations:
-                    add_fallback_to_tail(
-                        translation=translations,
-                        fallback=default
-                    )
+                if not translations:
+                    translations = wtf
                 else:
-                    translations = default
+                    for t in translation_chain(translations):
+
+                        # add wtforms translations as a fallback..
+                        if not t._fallback:
+                            t._fallback = wtf
+                            break
+
+                        # ..replacing the existing wtforms fallback if needed
+                        if getattr(t._fallback, 'is_wtforms', False):
+                            (
+                                t._fallback, wtf._fallback
+                            ) = (
+                                wtf, t._fallback._fallback
+                            )
+                            break
 
             # Cache for reuse in render_field.
             self._translations = translations

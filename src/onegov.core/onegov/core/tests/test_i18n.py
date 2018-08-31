@@ -144,48 +144,6 @@ def test_default_locale_negotiator():
     assert negotiate(['en', 'de'], request) == 'en'
 
 
-def test_add_fallback_to_tail():
-
-    root = NullTranslations()
-    child = NullTranslations()
-    grandchild = NullTranslations()
-
-    i18n.add_fallback_to_tail(root, child)
-
-    assert root._fallback is child
-    assert child._fallback is None
-
-    i18n.add_fallback_to_tail(root, grandchild)
-
-    assert root._fallback is child
-    assert child._fallback is grandchild
-    assert grandchild._fallback is None
-    assert root._fallback._fallback is grandchild
-
-    i18n.add_fallback_to_tail(root, child)
-
-    assert root._fallback is child
-    assert child._fallback is grandchild
-    assert grandchild._fallback is None
-    assert root._fallback._fallback is grandchild
-
-    i18n.add_fallback_to_tail(root, grandchild)
-
-    assert root._fallback is child
-    assert child._fallback is grandchild
-    assert grandchild._fallback is None
-    assert root._fallback._fallback is grandchild
-
-
-def test_recursive_fallback_chains():
-    fallback = NullTranslations()
-    translation = NullTranslations()
-    i18n.add_fallback_to_tail(translation, fallback)
-
-    with pytest.raises(RuntimeError):
-        i18n.add_fallback_to_tail(fallback, translation)
-
-
 def test_get_translation_bound_form():
 
     class MockTranslation(object):

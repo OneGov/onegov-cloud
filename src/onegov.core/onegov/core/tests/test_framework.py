@@ -5,15 +5,18 @@ import pytest
 
 from base64 import b64decode
 from base64 import b64encode
+from cached_property import cached_property
 from datetime import datetime, timedelta
 from email.header import decode_header
 from email.utils import parseaddr
 from freezegun import freeze_time
+from gettext import NullTranslations
 from itsdangerous import BadSignature, Signer
 from mailthon.enclosure import Attachment
 from onegov.core.custom import json
 from onegov.core.framework import Framework
 from onegov.core.html import html_to_text
+from onegov.core.i18n import translation_chain
 from onegov.core.redirect import Redirect
 from onegov.core.upgrade import UpgradeState
 from onegov.server import Config, Server
@@ -521,6 +524,51 @@ def test_get_localized_form(redis_url):
 
     App.default_locale = 'de'
     assert client.get('/form').text == 'Dieses Feld wird benötigt.'
+
+
+def test_fixed_translation_chain_length(redis_url):
+
+    def translation_chain_length(form):
+        return sum(1 for t in translation_chain(form.meta._translations))
+
+    class LocalizedForm(Form):
+        name = StringField('Name', validators=[InputRequired()])
+
+    class App(Framework):
+        locales = {'de'}
+        default_locale = 'de'
+        translation_chain_length = None
+
+        @cached_property
+        def translations(self):
+            return {'de': NullTranslations()}
+
+    @App.path(path='/')
+    class Root(object):
+        pass
+
+    @App.form(model=Root, form=LocalizedForm, name='form')
+    def view_get_form(self, request, form):
+        form.validate()
+        request.app.translation_chain_length = translation_chain_length(form)
+
+    App.commit()
+
+    app = App()
+    app.application_id = 'test'
+    app.configure_application(
+        identity_secure=False,
+        csrf_time_limit=60,
+        redis_url=redis_url
+    )
+
+    client = Client(app)
+
+    client.get('/form')
+    initial_length = app.translation_chain_length
+
+    client.get('/form')
+    assert app.translation_chain_length == initial_length
 
 
 def test_send_email(smtp):
