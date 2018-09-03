@@ -2,6 +2,8 @@
     <tal:block metal:fill-slot="title">${layout.title}</tal:block>
     <tal:block metal:fill-slot="content">
         <h2>${layout.title}</h2>
-        <tal:block tal:content="structure: layout.model.content"></tal:block>
+        <div class="page-content">
+            <tal:block tal:content="structure: layout.model.content"></tal:block>
+        </div>
     </tal:block>
 </div>

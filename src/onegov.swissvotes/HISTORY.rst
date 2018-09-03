@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Styles content pages.
+  [msom]
+
 0.0.3 (2018-08-31)
 ~~~~~~~~~~~~~~~~~~~
 
