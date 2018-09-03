@@ -1234,29 +1234,39 @@
             <p>
                 <span tal:condition="file.published">
                     <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='unpublish'))}"
-                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                       class="is-published">
                         <i class="fa fa-fw fa-check-circle" aria-hidden="true"></i> <b i18n:translate>Public</b>
                     </a>
                 </span>
                 <span tal:condition="not:file.published">
                     <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='publish'))}"
-                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                       class="is-not-published">
                         <i class="fa fa-fw fa-eye-slash" aria-hidden="true"></i> <b i18n:translate>Private</b>
                     </a>
 
-                    <div class="publication">
+                    <form class="publication" method="POST" tal:define="
+                        post_url layout.csrf_protected_url(request.link(file, name='update-publish-date'));
+                        publish_date file.publish_date and layout.to_timezone(file.publish_date, layout.timezone);
+                    ">
                         <label class="publish-date">
                             <tal:b i18n:translate>Publication Date</tal:b>
-                            <input type="date">
+                            <input type="date" name="date" class="small" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))" value="${publish_date and publish_date.date().isoformat() or ''}" required="required">
                         </label>
 
-                        <div class="publish-time">
+                        <label class="publish-time">
                             <tal:b i18n:translate>Hour</tal:b>
-                            <select>
-                                <option tal:repeat="hour range(24)">${str(hour).rjust(2, '0')}:00</option>
+                            <select name="hour" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                <option tal:condition="not:publish_date"></option>
+                                <tal:b repeat="hour range(24)" tal:define="publish_time publish_date and '{:0>2}:00'.format(publish_date.hour)">
+                                    <option tal:define="time '{:0>2}:00'.format(hour)" tal:attributes="selected publish_time == time">${time}</option>
+                                </tal:b>
                             </select>
-                        </div>
-                    </div>
+                        </label>
+
+                        <a tal:condition="publish_date" i18n:translate ic-post-to="${post_url}&clear=1" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">Reset</a>
+                    </form>
                 </span>
             </p>
         </div>

@@ -149,6 +149,9 @@ var setup_datetimepicker = function(type, selector, onChange, extraOptions) {
             preventDefault: function() {}
         });
 
+        // trigger intercooler requests if any
+        Intercooler.triggerRequest($input);
+
         // there's a bug where the placeholder stays in the input field
         // even though an input is already being shown. This is the sledge-
         // hammer method of working around that issue:
@@ -221,8 +224,8 @@ var setup_datetimepicker = function(type, selector, onChange, extraOptions) {
     $('form').submit(function() {
         var form = $(this);
 
-        if (form.data('submitted' + '-' + selector) !== true) {
-            form.data('submitted' + '-' + selector, true);
+        if (form.data('submitted-' + selector) !== true) {
+            form.data('submitted-' + selector, true);
 
             form.find(selector).each(function() {
                 var field = $(this);
@@ -246,23 +249,28 @@ var setup_datetimepicker = function(type, selector, onChange, extraOptions) {
     });
 };
 
-// load the datepicker for date inputs if the browser does not support it
-if (!Modernizr.inputtypes.date) {
-    setup_datetimepicker('date', null);
-}
+var setupDatetimePickers = function() {
+    // load the datepicker for date inputs if the browser does not support it
+    if (!Modernizr.inputtypes.date) {
+        setup_datetimepicker('date', null);
+    }
 
-// load the datetimepicker for date inputs if the browser does not support it
-if (!Modernizr.inputtypes.datetime) {
-    setup_datetimepicker('datetime', null);
-}
+    // load the datetimepicker for date inputs if the browser does not support it
+    if (!Modernizr.inputtypes.datetime) {
+        setup_datetimepicker('datetime', null);
+    }
 
-if (!Modernizr.inputtypes['datetime-local']) {
-    setup_datetimepicker('datetime-local', null);
-}
+    if (!Modernizr.inputtypes['datetime-local']) {
+        setup_datetimepicker('datetime-local', null);
+    }
 
-// for time fields we only add time parsing
-if (!Modernizr.inputtypes.time) {
-    $('input[type=time]').change(function() {
-        $(this).val(OneGov.utils.inferTime($(this).val()));
-    });
-}
+    // for time fields we only add time parsing
+    if (!Modernizr.inputtypes.time) {
+        $('input[type=time]').change(function() {
+            $(this).val(OneGov.utils.inferTime($(this).val()));
+        });
+    }
+};
+
+$(document).ready(setupDatetimePickers);
+$(document).on('process-common-nodes', setupDatetimePickers);

@@ -4624,10 +4624,43 @@ h2 + div.timeline {
         font-size: .875rem;
         line-height: 1rem;
         margin-bottom: .75rem;
+        margin-top: .3rem;
 
-        &:first-child .fa {
-            @include prefix(transition-duration, .5s);
-            @include prefix(filter, blur(0));
+        &:first-child {
+            .fa {
+                @include prefix(transition-duration, .5s);
+                @include prefix(filter, blur(0));
+            }
+
+            a {
+                border-radius: 5px;
+                padding: 2px 4px 2px 2px;
+
+                &.is-published {
+                    background: $green-pastel;
+                    color: $green-dark;
+                }
+
+                &.is-not-published {
+                    background: $red-pastel;
+                    color: $red-dark;
+                }
+            }
+        }
+    }
+
+    .publication {
+        display: flex;
+        flex-wrap: wrap;
+
+        > label {
+            flex: 0 0 30%;
+            padding-right: 1em;
+        }
+
+        > a {
+            flex: 0 0 30%;
+            margin-top: 1.9rem;
         }
     }
 }

@@ -112,3 +112,7 @@ jQuery.fn.prompt = function() {
 $(document).ready(function() {
     $('[data-prompt]').prompt();
 });
+
+$(document).on('process-common-nodes', function(_e, elements) {
+    $(elements).find('[data-prompt]').prompt();
+});

@@ -1,9 +1,11 @@
 """ The onegov org collection of files uploaded to the site. """
 
+import datetime
 import morepath
 
 from babel.core import Locale
 from babel.dates import parse_pattern
+from dateutil.parser import parse
 from functools import lru_cache
 from itertools import groupby
 from onegov.core.filestorage import view_filestorage_file
@@ -23,7 +25,7 @@ from onegov.org.models import (
     LegacyImage,
 )
 from onegov.org import utils
-from sedate import to_timezone, utcnow
+from sedate import to_timezone, utcnow, standardize_date
 from time import time
 from webob import exc
 from uuid import uuid4
@@ -158,6 +160,7 @@ def view_file_details(self, request):
 def handle_publish(self, request):
     request.assert_valid_csrf_token()
     self.published = True
+    self.publish_date = None
 
 
 @OrgApp.view(model=GeneralFile, permission=Private, name='unpublish',
@@ -165,6 +168,34 @@ def handle_publish(self, request):
 def handle_unpublish(self, request):
     request.assert_valid_csrf_token()
     self.published = False
+
+
+@OrgApp.view(model=GeneralFile, permission=Private, name='update-publish-date',
+             request_method='POST')
+def handle_update_publish_date(self, request):
+    request.assert_valid_csrf_token()
+    layout = DefaultLayout(self, request)
+
+    if request.params.get('clear', None):
+        self.publish_date = None
+        return
+
+    try:
+        date = parse(request.params['date'], dayfirst=True)
+    except (ValueError, KeyError):
+        date = self.publish_date and self.publish_date.date()
+        date = date or layout.today()
+
+    try:
+        hour = next(map(int, request.params.get('hour').split(':')))
+    except ValueError:
+        hour = self.publish_date and self.publish_date.hour
+        hour = hour or 0
+
+    publish_date = datetime.datetime.combine(date, datetime.time(hour, 0))
+    publish_date = standardize_date(publish_date, layout.timezone)
+
+    self.publish_date = publish_date
 
 
 @OrgApp.html(model=ImageFileCollection, template='images.pt',

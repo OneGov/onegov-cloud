@@ -170,13 +170,7 @@ Intercooler.ready(function(element) {
         return;
     }
 
-    $(el).find('a.confirm').confirmation();
-
-    if (jQuery.fn.prompt !== undefined) {
-        $(el).find('[data-prompt]').prompt();
-    }
-
-    setupRedirectAfter(el);
+    processCommonNodes(el, true);
 });
 
 // search reset buttons reset everything
