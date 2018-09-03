@@ -26,6 +26,10 @@ module.exports = {
   'header': {
     '1'       : require('../assets/icons/header.svg'),
     '2'       : require('../assets/icons/header-2.svg'),
+    '3'       : require('../assets/icons/header-3.svg'),
+    '4'       : require('../assets/icons/header-4.svg'),
+    '5'       : require('../assets/icons/header-5.svg'),
+    '6'       : require('../assets/icons/header-6.svg')
   },
   'italic'    : require('../assets/icons/italic.svg'),
   'image'     : require('../assets/icons/image.svg'),
