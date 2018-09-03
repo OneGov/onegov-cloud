@@ -1232,20 +1232,34 @@
         </div>
         <div class="columns small-6 file-publication">
             <p>
-                <tal:b condition="file.published">
+                <span tal:condition="file.published">
                     <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='unpublish'))}"
                        ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
                         <i class="fa fa-fw fa-check-circle" aria-hidden="true"></i>
                     </a>
                     <b i18n:translate>Public</b>
-                </tal:b>
-                <tal:b condition="not:file.published">
+                </span>
+                <span tal:condition="not:file.published">
                     <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='publish'))}"
                        ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
                         <i class="fa fa-fw fa-eye-slash" aria-hidden="true"></i>
                     </a>
                     <b i18n:translate>Private</b>
-                </tal:b>
+
+                    <div class="publication">
+                        <label class="publish-date">
+                            <tal:b i18n:translate>Publication Date</tal:b>
+                            <input type="date">
+                        </label>
+
+                        <div class="publish-time">
+                            <tal:b i18n:translate>Hour</tal:b>
+                            <select>
+                                <option tal:repeat="hour range(24)">${str(hour).rjust(2, '0')}:00</option>
+                            </select>
+                        </div>
+                    </div>
+                </span>
             </p>
         </div>
         <div class="columns small-2 file-actions">

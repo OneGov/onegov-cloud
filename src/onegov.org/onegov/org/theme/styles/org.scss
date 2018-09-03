@@ -4624,5 +4624,17 @@ h2 + div.timeline {
         font-size: .875rem;
         line-height: 1rem;
         margin-bottom: .75rem;
+
+        &:first-child .fa {
+            @include prefix(transition-duration, .5s);
+            @include prefix(filter, blur(0));
+        }
     }
+}
+
+.ic-transitioning .file-publication p:first-child .fa {
+    @include prefix(transform, scale(1.25));
+    @include prefix(transition, transform .5s ease-in);
+
+    color: $white;
 }
