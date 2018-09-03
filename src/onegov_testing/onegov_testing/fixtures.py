@@ -124,7 +124,17 @@ def cache_password_hashing(monkeysession):
 
 
 @pytest.fixture(scope="session")
-def postgres():
+def pg_default_preferred_versions():
+    return ['9.6']
+
+
+@pytest.fixture(scope="session")
+def pg_preferred_versions(pg_default_preferred_versions):
+    return os.environ.get('POSTGRES_VERSIONS', pg_default_preferred_versions)
+
+
+@pytest.fixture(scope="session")
+def postgres(pg_preferred_versions):
     """ Starts a postgres server using `testing.postgresql \
     <https://pypi.python.org/pypi/testing.postgresql/>`_ once per test session.
 
@@ -140,7 +150,10 @@ def postgres():
         "-N 1024"
     ))
 
-    postgres = Postgresql(postgres_args=postgres_args)
+    postgres = Postgresql(
+        postgres_args=postgres_args,
+        preferred_versions=pg_preferred_versions
+    )
     yield postgres
     postgres.stop()
 
