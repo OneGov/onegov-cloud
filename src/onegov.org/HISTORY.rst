@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.33.0 (2018-09-04)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to publish files at specific dates.
   [href]
 
