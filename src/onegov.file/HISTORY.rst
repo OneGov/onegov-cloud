@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.8.0 (2018-09-04)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a "published" state and a publication date to trigger it.
   [href]
 
