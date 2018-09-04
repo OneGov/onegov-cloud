@@ -106,6 +106,7 @@ class FileCollection(object):
 
         for f in self.publishable_files(horizon):
             f.published = True
+            f.publish_date = None
 
         self.session.flush()
 
