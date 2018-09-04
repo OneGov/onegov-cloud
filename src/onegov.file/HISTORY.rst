@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.8.1 (2018-09-04)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes cache busting being overly eager.
   [href]
 
