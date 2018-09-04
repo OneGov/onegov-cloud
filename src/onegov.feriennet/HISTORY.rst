@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.4.0 (2018-09-04)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes duplicated subjects in notifications leading to errors.
   [href]
