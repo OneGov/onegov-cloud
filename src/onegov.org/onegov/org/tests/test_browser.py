@@ -1,8 +1,12 @@
 import pytest
+import requests
 import transaction
 
+from datetime import datetime
 from onegov.directory import DirectoryCollection
+from onegov.file import FileCollection
 from onegov_testing.utils import create_image
+from pytz import UTC
 from tempfile import NamedTemporaryFile
 
 
@@ -253,3 +257,61 @@ def test_browse_directory_coordinates(browser, org_app):
     browser.find_by_css('.popup-title').click()
     assert browser.is_element_present_by_id(
         'page-directories-restaurants-city-wok')
+
+
+def test_publication_workflow(browser, temporary_path, org_app):
+    path = temporary_path / 'foo.txt'
+
+    with path.open('w') as f:
+        f.write('bar')
+
+    browser.login_admin()
+    browser.visit('/files')
+
+    # upload a file
+    assert not browser.is_text_present("Soeben hochgeladen")
+    browser.drop_file('.upload-dropzone', path)
+    assert browser.is_text_present("Soeben hochgeladen")
+
+    # show the details
+    browser.find_by_css('.upload-filelist .untoggled').click()
+    assert browser.is_text_present("Öffentlich")
+    assert not browser.is_text_present("Privat")
+    assert not browser.is_text_present("Publikationsdatum")
+
+    # make sure the file can be downloaded
+    file_url = browser.find_by_css('.file-preview')['href']
+    r = requests.get(file_url)
+    assert r.status_code == 200
+    assert 'public' in r.headers['cache-control']
+
+    # make sure unpublishing works
+    browser.find_by_css('.publication-tag a').click()
+    r = requests.get(file_url)
+    assert r.status_code == 403
+
+    assert not browser.is_text_present("Öffentlich")
+    assert browser.is_text_present("Privat")
+    assert browser.is_text_present("Publikationsdatum")
+
+    # enter a publication date in the past
+    browser.find_by_css('input[type="date"]').value = '04.09.2018'
+    browser.find_by_css('select').select('12:00')
+
+    assert browser.is_text_present("Wird publiziert am", wait_time=1)
+    assert not browser.is_text_present("Publikationsdatum")
+
+    # validate the correct date in the database
+    f = FileCollection(org_app.session()).query().one()
+    assert f.publish_date == datetime(2018, 9, 4, 10, 0, tzinfo=UTC)
+
+    # run the cronjob and make sure it works
+    job = org_app.config.cronjob_registry.cronjobs['hourly_maintenance_tasks']
+    job.app = org_app
+    job_url = f'{browser.url.replace("/files", "")}/cronjobs/{job.id}'
+
+    requests.get(job_url)
+
+    r = requests.get(file_url)
+    assert r.status_code == 200
+    assert 'public' in r.headers['cache-control']

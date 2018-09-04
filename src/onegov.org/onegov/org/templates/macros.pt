@@ -1191,10 +1191,10 @@
 <metal:file_details define-macro="file-details" i18n:domain="onegov.org">
     <div class="row">
         <div class="columns small-4">
-            <a href="${request.link(file)}" tal:condition="extension == 'pdf'">
+            <a class="file-preview" href="${request.link(file)}" tal:condition="extension == 'pdf'">
                 <img class="pdf-preview" src="${request.link(file, name='medium')}">
             </a>
-            <a href="${request.link(file)}" tal:condition="extension != 'pdf'">
+            <a class="file-preview" href="${request.link(file)}" tal:condition="extension != 'pdf'">
                 <svg width="204px" height="261px" viewBox="0 0 204 261" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:relative; left: -6px;">
                     <defs>
                         <filter x="-7.8%" y="-5.9%" width="120.0%" height="115.3%" filterUnits="objectBoundingBox" id="filter-1">
@@ -1261,7 +1261,7 @@
                             <select name="hour" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
                                 <option tal:condition="not:publish_date"></option>
                                 <tal:b repeat="hour range(24)" tal:define="publish_time publish_date and '{:0>2}:00'.format(publish_date.hour)">
-                                    <option tal:define="time '{:0>2}:00'.format(hour)" tal:attributes="selected publish_time == time">${time}</option>
+                                    <option tal:define="time '{:0>2}:00'.format(hour)" tal:attributes="selected publish_time == time" value="${time}">${time}</option>
                                 </tal:b>
                             </select>
 

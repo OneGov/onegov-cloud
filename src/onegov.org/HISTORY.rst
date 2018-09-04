@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to publish files at specific dates.
+  [href]
+
 - Fixes datetime picker not showing up in custom forms in Safari.
   [href]
 
