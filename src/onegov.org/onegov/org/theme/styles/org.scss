@@ -4617,55 +4617,95 @@ h2 + div.timeline {
 /*
     Publication
 */
-.file-publication {
-    padding-top: .25rem;
+.publication {
+    display: flex;
+    margin-left: -2.75rem;
+    padding-top: .35rem;
 
-    p {
+    .publication-tag {
         font-size: .875rem;
         line-height: 1rem;
-        margin-bottom: .75rem;
-        margin-top: .3rem;
+        margin: .3rem 2rem .75rem 0;
 
-        &:first-child {
-            .fa {
-                @include prefix(transition-duration, .5s);
-                @include prefix(filter, blur(0));
+        .fa {
+            @include prefix(transition-duration, .5s);
+            @include prefix(filter, blur(0));
+        }
+
+        a {
+            border-radius: 5px;
+            display: inline-block;
+            padding: 2px 4px 2px 2px;
+
+            &.is-published {
+                background: $green-pastel;
+                color: $green-dark;
             }
 
-            a {
-                border-radius: 5px;
-                padding: 2px 4px 2px 2px;
-
-                &.is-published {
-                    background: $green-pastel;
-                    color: $green-dark;
-                }
-
-                &.is-not-published {
-                    background: $red-pastel;
-                    color: $red-dark;
-                }
+            &.is-not-published {
+                background: $red-pastel;
+                color: $red-dark;
             }
         }
     }
 
-    .publication {
+    .publication-settings {
         display: flex;
         flex-wrap: wrap;
+        margin-top: -1.5rem;
+        width: 77.5%;
 
-        > label {
-            flex: 0 0 30%;
-            padding-right: 1em;
+        legend {
+            font-size: .8rem;
+            font-weight: normal;
+            margin-bottom: .5rem;
+            margin-left: .25rem;
+            text-align: left;
         }
 
-        > a {
-            flex: 0 0 30%;
-            margin-top: 1.9rem;
+        form {
+            width: 100%;
+        }
+
+        fieldset {
+            border: 1px solid $silver;
+            border-radius: 3px;
+
+            &::focus-within {
+                border-color: $silver;
+            }
+        }
+
+        .publication-settings-input {
+            display: flex;
+            padding: 0 0 0 1rem;
+
+            > div {
+                flex: 2 0 40%;
+            }
+
+            > select {
+                flex: 0 0 25%;
+
+                margin-left: .5rem;
+                margin-right: .5rem;
+            }
+
+            > a {
+                display: block;
+                font-size: 1rem !important;
+                margin-top: .5rem;
+                margin-right: 1rem;
+            }
         }
     }
 }
 
-.ic-transitioning .file-publication p:first-child .fa {
+.publication-date-not-set .publication-settings-input > a {
+    visibility: hidden;
+}
+
+.ic-transitioning .publication-tag .fa {
     @include prefix(transform, scale(1.25));
     @include prefix(transition, transform .5s ease-in);
 

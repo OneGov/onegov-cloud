@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-09-03 16:58+0200\n"
+"POT-Creation-Date: 2018-09-04 10:59+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1807,11 +1807,11 @@ msgstr "Öffentlich"
 msgid "Private"
 msgstr "Privat"
 
-msgid "Publication Date"
-msgstr "Publikationsdatum"
+msgid "Will be published on:"
+msgstr "Wird publiziert am:"
 
-msgid "Hour"
-msgstr "Stunde"
+msgid "Publication date:"
+msgstr "Publikationsdatum:"
 
 msgid "Reset"
 msgstr "Zurücksetzen"
@@ -3000,11 +3000,14 @@ msgstr "Ihre Zahlung wurde rückgängig gemacht"
 msgid "Your payment has been refunded"
 msgstr "Ihre Zahlung wurde rückerstattet"
 
+#~ msgid "Publication Date"
+#~ msgstr "Publikationsdatum"
+
+#~ msgid "Hour"
+#~ msgstr "Stunde"
+
 #~ msgid "Not Public"
 #~ msgstr "Nicht öffentlich"
-
-#~ msgid "Publication date:"
-#~ msgstr "Publikationsdatum:"
 
 #~ msgid "None"
 #~ msgstr "Keines"

@@ -142,6 +142,15 @@ def view_file_details(self, request):
     )
     color = utils.get_extension_color(extension)
 
+    # IE 11 caches all ajax requests otherwise
+    @request.after
+    def must_revalidate(response):
+        response.headers.add('cache-control', 'must-revalidate')
+        response.headers.add('cache-control', 'no-cache')
+        response.headers.add('cache-control', 'no-store')
+        response.headers['pragma'] = 'no-cache'
+        response.headers['expires'] = '0'
+
     return render_macro(
         layout.macros['file-details'],
         request,
