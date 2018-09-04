@@ -2,7 +2,12 @@ import time
 
 from contextlib import suppress
 from http.client import RemoteDisconnected
+from onegov.core.utils import module_path
 from time import sleep
+
+
+with open(module_path('onegov_testing', 'drop_file.js')) as f:
+    JS_DROP_FILE = f.read()
 
 
 class InjectedBrowserExtension(object):
@@ -129,3 +134,10 @@ class ExtendedBrowser(InjectedBrowserExtension):
 
         self.execute_script(
             'document.querySelector("{}").scrollIntoView()'.format(css))
+
+    def drop_file(self, selector, path):
+        # https://gist.github.com/z41/c11f8a4072e9f67e5755d4a1a72c8f02
+        dropzone = self.find_by_css(selector)[0]._element
+
+        input = self.driver.execute_script(JS_DROP_FILE, dropzone)
+        input.send_keys(str(path))
