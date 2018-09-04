@@ -290,9 +290,9 @@ def test_publication_workflow(browser, temporary_path, org_app):
     r = requests.get(file_url)
     assert r.status_code == 403
 
-    assert not browser.is_text_present("Öffentlich")
-    assert browser.is_text_present("Privat")
+    assert browser.is_text_present("Privat", wait_time=1)
     assert browser.is_text_present("Publikationsdatum")
+    assert not browser.is_text_present("Öffentlich")
 
     # enter a publication date in the past
     browser.find_by_css('input[type="date"]').value = '04.09.2018'
