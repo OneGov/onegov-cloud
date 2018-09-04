@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes cache busting being overly eager.
+  [href]
+
 0.8.0 (2018-09-04)
 ~~~~~~~~~~~~~~~~~~~
 

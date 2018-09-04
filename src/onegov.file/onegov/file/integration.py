@@ -108,7 +108,8 @@ class DepotApp(App):
             @self.session_manager.on_update.connect_via(ANY, weak=False)
             @self.session_manager.on_delete.connect_via(ANY, weak=False)
             def on_file_change(schema, obj):
-                self.bust_frontend_cache(obj.id)
+                if isinstance(obj, File):
+                    self.bust_frontend_cache(obj.id)
 
     @property
     def bound_depot_id(self):
