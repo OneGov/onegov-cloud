@@ -1,6 +1,34 @@
 Changelog
 ---------
 
+- Fixes duplicated subjects in notifications leading to errors.
+  [href]
+
+- Changes the address field in the userprofile to be required.
+  [href]
+
+- Fixes calendars not showing all dates of multi-day events.
+  [href]
+
+- Show atteneees of cancelled occasions in notifiations.
+  [href]
+
+- Include organisers in notifications to recipients by occasion.
+  [href]
+
+- No longer considers organisers whose occasions have been cancelled as active,
+  in the notifications view.
+  [href]
+
+- Adds an option to pay organisers in cash.
+  [href]
+
+- Redesigns the occasions display.
+  [href]
+
+- Hides the ticket state when an ctivity is in preview.
+  [href]
+
 - Removes the ability to edit the userprofile via the activities.
   [href]
 
