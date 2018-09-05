@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.33.1 (2018-09-05)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes publication workflow browser test.
   [href]
 
