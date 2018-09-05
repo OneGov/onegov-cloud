@@ -294,16 +294,19 @@ def test_publication_workflow(browser, temporary_path, org_app):
     assert browser.is_text_present("Publikationsdatum")
     assert not browser.is_text_present("Öffentlich")
 
-    # enter a publication date in the past
-    browser.find_by_css('input[type="date"]').value = '04.09.2018'
-    browser.find_by_css('select').select('12:00')
+    # enter a publication date in the past (no type date support in selenium)
+    browser.find_by_css('select').select('10:00')
 
     assert browser.is_text_present("Wird publiziert am", wait_time=1)
     assert not browser.is_text_present("Publikationsdatum")
 
-    # validate the correct date in the database
+    dt = datetime.today()
     f = FileCollection(org_app.session()).query().one()
-    assert f.publish_date == datetime(2018, 9, 4, 10, 0, tzinfo=UTC)
+
+    assert f.publish_date in (
+        datetime(dt.year, dt.month, dt.day, 8, tzinfo=UTC),  # dst
+        datetime(dt.year, dt.month, dt.day, 9, tzinfo=UTC)   # !dst
+    )
 
     # run the cronjob and make sure it works
     job = org_app.config.cronjob_registry.cronjobs['hourly_maintenance_tasks']
