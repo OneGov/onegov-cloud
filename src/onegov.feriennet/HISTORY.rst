@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes booking view error concerning attendees with no bookings.
+  [href]
+
 1.4.0 (2018-09-04)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -926,6 +926,10 @@ $booking-left-margin: 2rem;
             margin-bottom: 1.5rem;
         }
 
+        .booking-limit + .no-total-costs {
+            border-top: 0;
+        }
+
         .total {
             font-weight: bold;
         }

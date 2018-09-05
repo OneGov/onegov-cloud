@@ -101,7 +101,7 @@
                                     </a>
                                 </div>
 
-                                <div class="bookings-by-state state-${state} ${repeat.state.end and 'last-state' or ''}" tal:repeat="state grouped_bookings[attendee]">
+                                <div class="bookings-by-state state-${state} ${repeat.state.end and 'last-state' or ''}" tal:repeat="state grouped_bookings[attendee]" tal:condition="attendee in grouped_bookings">
 
                                     <div class="state-title">
                                         <tal:b switch="state">
