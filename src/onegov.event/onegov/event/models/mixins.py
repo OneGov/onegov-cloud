@@ -1,12 +1,14 @@
-import icalendar
-
 from datetime import datetime
+from icalendar import Calendar as vCalendar
+from icalendar import Event as vEvent
+from icalendar import vRecur
+from icalendar import vText
 from onegov.core.orm.types import UTCDateTime
 from pytz import UTC
 from sedate import to_timezone
 from sqlalchemy import Column
-from sqlalchemy import Text
 from sqlalchemy import String
+from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
 
@@ -67,23 +69,23 @@ class OccurrenceMixin(object):
     def as_ical(self, description=None, rrule=None, url=None):
         """ Returns the occurrence as iCalendar string. """
 
-        event = icalendar.Event()
+        event = vEvent()
         event.add('summary', self.title)
         event.add('dtstart', to_timezone(self.start, UTC))
         event.add('dtend', to_timezone(self.end, UTC))
         event.add('last-modified',
                   self.modified or self.created or datetime.utcnow())
-        event['location'] = icalendar.vText(self.location)
+        event['location'] = vText(self.location)
         if description:
-            event['description'] = icalendar.vText(description)
+            event['description'] = vText(description)
         if rrule:
-            event['rrule'] = icalendar.vRecur(
-                icalendar.vRecur.from_ical(rrule.replace('RRULE:', ''))
+            event['rrule'] = vRecur(
+                vRecur.from_ical(rrule.replace('RRULE:', ''))
             )
         if url:
             event.add('url', url)
 
-        cal = icalendar.Calendar()
+        cal = vCalendar()
         cal.add('prodid', '-//OneGov//onegov.event//')
         cal.add('version', '2.0')
         cal.add_component(event)
