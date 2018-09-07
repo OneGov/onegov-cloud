@@ -1,104 +1,26 @@
-import icalendar
-
 from datetime import datetime
 from dateutil import rrule
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import (
-    content_property,
-    ContentMixin,
-    TimestampMixin
-)
-from onegov.core.orm.types import UUID, UTCDateTime
+from onegov.core.orm.mixins import content_property
+from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.types import UUID
+from onegov.event.models.mixins import OccurrenceMixin
+from onegov.event.models.occurrence import Occurrence
 from onegov.gis import CoordinatesMixin
 from onegov.search import ORMSearchable
-from pytz import UTC
-from sedate import standardize_date, to_timezone
-from sqlalchemy import Column, Enum, ForeignKey, Text, String
-from sqlalchemy import func, and_, desc
-from sqlalchemy.dialects.postgresql import HSTORE
-from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy.orm import backref, relationship, object_session
+from sedate import standardize_date
+from sedate import to_timezone
+from sqlalchemy import and_
+from sqlalchemy import Column
+from sqlalchemy import desc
+from sqlalchemy import Enum
+from sqlalchemy import func
+from sqlalchemy import Text
+from sqlalchemy.orm import backref
+from sqlalchemy.orm import object_session
+from sqlalchemy.orm import relationship
 from uuid import uuid4
-
-
-class OccurrenceMixin(object):
-    """ Contains all attributes events and ocurrences share.
-
-    The ``start`` and ``end`` date and times are stored in UTC - that is, they
-    are stored internally without a timezone and are converted to UTC when
-    getting or setting, see :class:`UTCDateTime`. Use the properties
-    ``localized_start`` and ``localized_end`` to get the localized version of
-    the date and times.
-    """
-
-    #: Title of the event
-    title = Column(Text, nullable=False)
-
-    #: A nice id for the url, readable by humans
-    name = Column(Text)
-
-    #: Description of the location of the event
-    location = Column(Text, nullable=True)
-
-    #: Tags/Categories of the event
-    _tags = Column(MutableDict.as_mutable(HSTORE), nullable=True, name='tags')
-
-    @property
-    def tags(self):
-        """ Tags/Categories of the event. """
-
-        return list(self._tags.keys()) if self._tags else []
-
-    @tags.setter
-    def tags(self, value):
-        self._tags = dict(((key.strip(), '') for key in value))
-
-    #: Timezone of the event
-    timezone = Column(String, nullable=False)
-
-    #: Start date and time of the event (of the first event if recurring)
-    start = Column(UTCDateTime, nullable=False)
-
-    @property
-    def localized_start(self):
-        """ The localized version of the start date/time. """
-
-        return to_timezone(self.start, self.timezone)
-
-    #: End date and time of the event (of the first event if recurring)
-    end = Column(UTCDateTime, nullable=False)
-
-    @property
-    def localized_end(self):
-        """ The localized version of the end date/time. """
-
-        return to_timezone(self.end, self.timezone)
-
-    def as_ical(self, description=None, rrule=None, url=None):
-        """ Returns the occurrence as iCalendar string. """
-
-        event = icalendar.Event()
-        event.add('summary', self.title)
-        event.add('dtstart', to_timezone(self.start, UTC))
-        event.add('dtend', to_timezone(self.end, UTC))
-        event.add('last-modified',
-                  self.modified or self.created or datetime.utcnow())
-        event['location'] = icalendar.vText(self.location)
-        if description:
-            event['description'] = icalendar.vText(description)
-        if rrule:
-            event['rrule'] = icalendar.vRecur(
-                icalendar.vRecur.from_ical(rrule.replace('RRULE:', ''))
-            )
-        if url:
-            event.add('url', url)
-
-        cal = icalendar.Calendar()
-        cal.add('prodid', '-//OneGov//onegov.event//')
-        cal.add('version', '2.0')
-        cal.add_component(event)
-
-        return cal.to_ical()
 
 
 class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
@@ -281,25 +203,5 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         return super().as_ical(
             description=self.description,
             rrule=self.recurrence,
-            url=url
-        )
-
-
-class Occurrence(Base, OccurrenceMixin, TimestampMixin):
-    """ Defines an occurrence of an event. """
-
-    __tablename__ = 'event_occurrences'
-
-    #: Internal number of the occurence
-    id = Column(UUID, primary_key=True, default=uuid4)
-
-    #: Event this occurrence belongs to
-    event_id = Column(UUID, ForeignKey(Event.id), nullable=False)
-
-    def as_ical(self, url=None):
-        """ Returns the occurrence as iCalendar string. """
-
-        return super().as_ical(
-            description=self.event.description,
             url=url
         )

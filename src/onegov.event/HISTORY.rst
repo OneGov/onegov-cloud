@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Refactors the package.
+  [msom]
+
 0.6.3 (2018-06-14)
 ~~~~~~~~~~~~~~~~~~~
 
