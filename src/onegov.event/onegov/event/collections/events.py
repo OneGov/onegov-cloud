@@ -1,11 +1,17 @@
 from datetime import datetime
 from datetime import timedelta
+from icalendar import Calendar as vCalendar
+from icalendar import Event as vEvent
+from icalendar import vRecur
+from icalendar import vText
 from onegov.core.collection import Pagination
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
 from onegov.event.models import Event
+from pytz import UTC
 from sedate import replace_timezone
 from sedate import standardize_date
+from sedate import to_timezone
 from sqlalchemy import and_
 from sqlalchemy import or_
 
@@ -124,3 +130,29 @@ class EventCollection(Pagination):
 
         query = self.session.query(Event).filter(Event.id == id)
         return query.first()
+
+    def as_ical(self, request):
+        """ Returns the events as iCalendar string. """
+
+        cal = vCalendar()
+        cal.add('prodid', '-//OneGov//onegov.event//')
+        cal.add('version', '2.0')
+
+        for event in self.query():
+            modified = event.modified or event.created or datetime.utcnow()
+
+            vevent = vEvent()
+            vevent.add('summary', event.title)
+            vevent.add('dtstart', to_timezone(event.start, UTC))
+            vevent.add('dtend', to_timezone(event.end, UTC))
+            vevent.add('last-modified', modified)
+            vevent['location'] = vText(event.location)
+            vevent['description'] = vText(event.description)
+            if event.recurrence:
+                vevent['rrule'] = vRecur(
+                    vRecur.from_ical(event.recurrence.replace('RRULE:', ''))
+                )
+            vevent.add('url', request.link(event))
+            cal.add_component(vevent)
+
+        return cal.to_ical()

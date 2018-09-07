@@ -1,11 +1,21 @@
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
+from freezegun import freeze_time
 from onegov.event import EventCollection
 from onegov.event import Occurrence
 from onegov.event import OccurrenceCollection
 from sedate import replace_timezone
 from sedate import standardize_date
+
+
+class DummyRequest(object):
+
+    def link(self, item):
+        return 'https://example.org/{}/{}'.format(
+            item.__class__.__name__.lower(),
+            getattr(item, 'name' or '?')
+        )
 
 
 def tzdatetime(year, month, day, hour, minute, timezone):
@@ -65,6 +75,123 @@ def test_event_collection_remove_stale_events(session):
     max_stale = standardize_date(datetime.today() + timedelta(days=2), 'UTC')
     events.remove_stale_events(max_stale=max_stale)
     assert events.query().count() == 0
+
+
+def test_event_collection_as_ical(session):
+    events = EventCollection(session)
+
+    ical = events.as_ical(DummyRequest()).decode().strip().split('\r\n')
+    assert sorted(ical) == sorted([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'END:VCALENDAR',
+    ])
+
+    with freeze_time("2014-01-01"):
+        event = events.add(
+            title='Squirrel Park Visit',
+            start=datetime(2015, 6, 16, 9, 30),
+            end=datetime(2015, 6, 16, 18, 00),
+            timezone='US/Eastern',
+            content={
+                'description': '<em>Furry</em> things will happen!'
+            },
+            location='Squirrel Park',
+            tags=['fun', 'animals'],
+            recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5'
+        )
+        event.submit()
+        event.publish()
+
+        event = events.add(
+            title='History of the Squirrel Park',
+            start=datetime(2015, 6, 18, 14, 00),
+            end=datetime(2015, 6, 18, 16, 00),
+            timezone='US/Eastern',
+            content={
+                'description': 'Learn how the Park got so <em>furry</em>!'
+            },
+            location='Squirrel Park',
+            tags=['history']
+        )
+        event.submit()
+
+        session.flush()
+
+    events = events.for_state(None)
+    ical = events.as_ical(DummyRequest()).decode().strip().split('\r\n')
+    assert sorted(ical) == sorted([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'BEGIN:VEVENT',
+        'SUMMARY:Squirrel Park Visit',
+        'DTSTART;VALUE=DATE-TIME:20150616T133000Z',
+        'DTEND;VALUE=DATE-TIME:20150616T220000Z',
+        'RRULE:FREQ=DAILY;COUNT=5;INTERVAL=1',
+        'DESCRIPTION:<em>Furry</em> things will happen!',
+        'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
+        'LOCATION:Squirrel Park',
+        'URL:https://example.org/event/squirrel-park-visit',
+        'END:VEVENT',
+        'BEGIN:VEVENT',
+        'SUMMARY:History of the Squirrel Park',
+        'DTSTART;VALUE=DATE-TIME:20150618T180000Z',
+        'DTEND;VALUE=DATE-TIME:20150618T200000Z',
+        'DESCRIPTION:Learn how the Park got so <em>furry</em>!',
+        'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
+        'LOCATION:Squirrel Park',
+        'URL:https://example.org/event/history-of-the-squirrel-park',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ])
+
+    events = events.for_state('submitted')
+    ical = events.as_ical(DummyRequest()).decode().strip().split('\r\n')
+    assert sorted(ical) == sorted([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'BEGIN:VEVENT',
+        'SUMMARY:History of the Squirrel Park',
+        'DTSTART;VALUE=DATE-TIME:20150618T180000Z',
+        'DTEND;VALUE=DATE-TIME:20150618T200000Z',
+        'DESCRIPTION:Learn how the Park got so <em>furry</em>!',
+        'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
+        'LOCATION:Squirrel Park',
+        'URL:https://example.org/event/history-of-the-squirrel-park',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ])
+
+    events = events.for_state('published')
+    ical = events.as_ical(DummyRequest()).decode().strip().split('\r\n')
+    assert sorted(ical) == sorted([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'BEGIN:VEVENT',
+        'SUMMARY:Squirrel Park Visit',
+        'DTSTART;VALUE=DATE-TIME:20150616T133000Z',
+        'DTEND;VALUE=DATE-TIME:20150616T220000Z',
+        'RRULE:FREQ=DAILY;COUNT=5;INTERVAL=1',
+        'DESCRIPTION:<em>Furry</em> things will happen!',
+        'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
+        'LOCATION:Squirrel Park',
+        'URL:https://example.org/event/squirrel-park-visit',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ])
+
+    events = events.for_state('withdrawn')
+    ical = events.as_ical(DummyRequest()).decode().strip().split('\r\n')
+    assert sorted(ical) == sorted([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'END:VCALENDAR'
+    ])
 
 
 def test_event_collection_pagination(session):
@@ -181,6 +308,146 @@ def test_occurrence_collection(session):
 
     assert query(start=date(2015, 6, 18), end=date(2015, 6, 18),
                  tags=['history']).count() == 1
+
+
+def test_occurrence_collection_as_ical(session):
+    occurrences = OccurrenceCollection(session)
+    ical = occurrences.as_ical(DummyRequest()).decode().strip().split('\r\n')
+    assert sorted(ical) == sorted([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'END:VCALENDAR',
+    ])
+
+    events = EventCollection(session)
+    with freeze_time("2014-01-01"):
+        event = events.add(
+            title='Squirrel Park Visit',
+            start=datetime(2015, 6, 16, 9, 30),
+            end=datetime(2015, 6, 16, 18, 00),
+            timezone='US/Eastern',
+            content={
+                'description': '<em>Furry</em> things will happen!'
+            },
+            location='Squirrel Park',
+            tags=['fun', 'animals'],
+            recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5'
+        )
+        event.submit()
+        event.publish()
+
+        event = events.add(
+            title='History of the Squirrel Park',
+            start=datetime(2015, 6, 18, 14, 00),
+            end=datetime(2015, 6, 18, 16, 00),
+            timezone='US/Eastern',
+            content={
+                'description': 'Learn how the Park got so <em>furry</em>!'
+            },
+            location='Squirrel Park',
+            tags=['history']
+        )
+        event.submit()
+        event.publish()
+
+        session.flush()
+
+    occurrences = OccurrenceCollection(session)
+    ical = occurrences.as_ical(DummyRequest()).decode().strip().split('\r\n')
+    occurrences.query().all()
+    assert sorted(ical) == sorted([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'END:VCALENDAR',
+    ])
+
+    occurrences = occurrences.for_filter(start=date(2015, 6, 1))
+    ical = occurrences.as_ical(DummyRequest()).decode().strip().split('\r\n')
+    assert sorted(ical) == sorted([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'BEGIN:VEVENT',
+        'SUMMARY:Squirrel Park Visit',
+        'DTSTART;VALUE=DATE-TIME:20150616T133000Z',
+        'DTEND;VALUE=DATE-TIME:20150616T220000Z',
+        'DESCRIPTION:<em>Furry</em> things will happen!',
+        'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
+        'LOCATION:Squirrel Park',
+        'URL:https://example.org/occurrence/squirrel-park-visit-2015-06-16',
+        'END:VEVENT',
+        'BEGIN:VEVENT',
+        'SUMMARY:Squirrel Park Visit',
+        'DTSTART;VALUE=DATE-TIME:20150617T133000Z',
+        'DTEND;VALUE=DATE-TIME:20150617T220000Z',
+        'DESCRIPTION:<em>Furry</em> things will happen!',
+        'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
+        'LOCATION:Squirrel Park',
+        'URL:https://example.org/occurrence/squirrel-park-visit-2015-06-17',
+        'END:VEVENT',
+        'BEGIN:VEVENT',
+        'SUMMARY:Squirrel Park Visit',
+        'DTSTART;VALUE=DATE-TIME:20150618T133000Z',
+        'DTEND;VALUE=DATE-TIME:20150618T220000Z',
+        'DESCRIPTION:<em>Furry</em> things will happen!',
+        'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
+        'LOCATION:Squirrel Park',
+        'URL:https://example.org/occurrence/squirrel-park-visit-2015-06-18',
+        'END:VEVENT',
+        'BEGIN:VEVENT',
+        'SUMMARY:History of the Squirrel Park',
+        'DTSTART;VALUE=DATE-TIME:20150618T180000Z',
+        'DTEND;VALUE=DATE-TIME:20150618T200000Z',
+        'DESCRIPTION:Learn how the Park got so <em>furry</em>!',
+        'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
+        'LOCATION:Squirrel Park',
+        'URL:https://example.org/occurrence'
+        '/history-of-the-squirrel-park-2015-06-18',
+        'END:VEVENT',
+        'BEGIN:VEVENT',
+        'SUMMARY:Squirrel Park Visit',
+        'DTSTART;VALUE=DATE-TIME:20150619T133000Z',
+        'DTEND;VALUE=DATE-TIME:20150619T220000Z',
+        'DESCRIPTION:<em>Furry</em> things will happen!',
+        'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
+        'LOCATION:Squirrel Park',
+        'URL:https://example.org/occurrence/squirrel-park-visit-2015-06-19',
+        'END:VEVENT',
+        'BEGIN:VEVENT',
+        'SUMMARY:Squirrel Park Visit',
+        'DTSTART;VALUE=DATE-TIME:20150620T133000Z',
+        'DTEND;VALUE=DATE-TIME:20150620T220000Z',
+        'DESCRIPTION:<em>Furry</em> things will happen!',
+        'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
+        'LOCATION:Squirrel Park',
+        'URL:https://example.org/occurrence/squirrel-park-visit-2015-06-20',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ])
+
+    occurrences = occurrences.for_filter(
+        start=date(2015, 6, 18),
+        end=date(2018, 6, 18),
+        tags=['history'])
+    ical = occurrences.as_ical(DummyRequest()).decode().strip().split('\r\n')
+    assert sorted(ical) == sorted([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'BEGIN:VEVENT',
+        'SUMMARY:History of the Squirrel Park',
+        'DTSTART;VALUE=DATE-TIME:20150618T180000Z',
+        'DTEND;VALUE=DATE-TIME:20150618T200000Z',
+        'DESCRIPTION:Learn how the Park got so <em>furry</em>!',
+        'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
+        'LOCATION:Squirrel Park',
+        'URL:https://example.org/occurrence'
+        '/history-of-the-squirrel-park-2015-06-18',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ])
 
 
 def test_occurrence_collection_pagination(session):

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds ical export functions to collections.
+  [msom]
+
 - Makes the collections fully stateful.
   [msom]
 

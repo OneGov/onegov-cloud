@@ -1,12 +1,18 @@
 from cached_property import cached_property
 from datetime import date
+from datetime import datetime
 from datetime import timedelta
+from icalendar import Calendar as vCalendar
+from icalendar import Event as vEvent
+from icalendar import vText
 from onegov.core.collection import Pagination
 from onegov.core.utils import get_unique_hstore_keys
 from onegov.event.models import Occurrence
+from pytz import UTC
 from sedate import as_datetime
 from sedate import replace_timezone
 from sedate import standardize_date
+from sedate import to_timezone
 from sqlalchemy import and_
 from sqlalchemy import distinct
 from sqlalchemy import or_
@@ -173,3 +179,32 @@ class OccurrenceCollection(Pagination):
 
         query = self.session.query(Occurrence).filter(Occurrence.name == name)
         return query.first()
+
+    def as_ical(self, request):
+        """ Returns the occurrences as iCalendar string.
+
+        This could be made more user friendly by returning the events with
+        the (adjusted) reccurrence instead.
+
+        """
+
+        cal = vCalendar()
+        cal.add('prodid', '-//OneGov//onegov.event//')
+        cal.add('version', '2.0')
+
+        for occurrence in self.query():
+            modified = (
+                occurrence.modified or occurrence.created or datetime.utcnow()
+            )
+
+            vevent = vEvent()
+            vevent.add('summary', occurrence.title)
+            vevent.add('dtstart', to_timezone(occurrence.start, UTC))
+            vevent.add('dtend', to_timezone(occurrence.end, UTC))
+            vevent.add('last-modified', modified)
+            vevent['location'] = vText(occurrence.location)
+            vevent['description'] = vText(occurrence.event.description)
+            vevent.add('url', request.link(occurrence))
+            cal.add_component(vevent)
+
+        return cal.to_ical()
