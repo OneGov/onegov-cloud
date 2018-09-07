@@ -4,6 +4,9 @@ Changelog
 - Refactors the package.
   [msom]
 
+- Removes unused code.
+  [msom]
+
 0.6.3 (2018-06-14)
 ~~~~~~~~~~~~~~~~~~~
 
