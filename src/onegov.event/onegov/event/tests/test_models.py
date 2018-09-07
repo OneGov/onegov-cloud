@@ -2,7 +2,8 @@ import pytest
 import transaction
 
 from datetime import datetime
-from onegov.event import Event, Occurrence
+from onegov.event import Event
+from onegov.event import Occurrence
 from sedate import replace_timezone
 
 
