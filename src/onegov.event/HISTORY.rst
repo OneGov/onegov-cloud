@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Makes the collections fully stateful.
+  [msom]
+
 - Refactors the package.
   [msom]
 

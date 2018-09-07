@@ -35,7 +35,7 @@ class OccurrenceCollection(Pagination):
         return self.page == other.page
 
     def subset(self):
-        return self.query(start=self.start, end=self.end, tags=self.tags)
+        return self.query()
 
     @property
     def page_index(self):
@@ -87,23 +87,23 @@ class OccurrenceCollection(Pagination):
 
         return get_unique_hstore_keys(self.session, Occurrence._tags)
 
-    def query(self, start=None, end=None, tags=None, outdated=False):
-        """ Queries occurrences with the given parameters.
+    def query(self, outdated=False):
+        """ Queries occurrences with the set parameters.
 
-        Finds all occurrences with any of the given tags and within the given
+        Finds all occurrences with any of the set tags and within the set
         start and end date. Start and end date are assumed to be dates only and
         therefore without a timezone - we search for the given date in the
         timezone of the occurrence!.
 
-        If no start date is given and ``outdated`` is not set, only current
+        If no start date is set and ``outdated`` is not set, only current
         occurrences are returned.
         """
 
         query = self.session.query(Occurrence)
 
-        if start is not None:
-            assert type(start) is date
-            start = as_datetime(start)
+        if self.start is not None:
+            assert type(self.start) is date
+            start = as_datetime(self.start)
 
             expressions = []
             for timezone in self.used_timezones:
@@ -133,9 +133,9 @@ class OccurrenceCollection(Pagination):
 
             query = query.filter(or_(*expressions))
 
-        if end is not None:
-            assert type(end) is date
-            end = as_datetime(end)
+        if self.end is not None:
+            assert type(self.end) is date
+            end = as_datetime(self.end)
             end = end + timedelta(days=1)
 
             expressions = []
@@ -151,8 +151,8 @@ class OccurrenceCollection(Pagination):
 
             query = query.filter(or_(*expressions))
 
-        if tags:
-            query = query.filter(Occurrence._tags.has_any(array(tags)))
+        if self.tags:
+            query = query.filter(Occurrence._tags.has_any(array(self.tags)))
 
         query = query.order_by(Occurrence.start, Occurrence.title)
 

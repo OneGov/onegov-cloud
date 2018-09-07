@@ -14,7 +14,7 @@ class EventCollection(Pagination):
 
     """ Manage a list of events. """
 
-    def __init__(self, session, page=0, state='submitted'):
+    def __init__(self, session, page=0, state=None):
         self.session = session
         self.page = page
         self.state = state
@@ -23,11 +23,7 @@ class EventCollection(Pagination):
         return self.state == other.state and self.page == other.page
 
     def subset(self):
-        query = self.query()
-        query = query.order_by(Event.start)
-        query = query.filter(Event.state == self.state)
-
-        return query
+        return self.query()
 
     @property
     def page_index(self):
@@ -42,7 +38,11 @@ class EventCollection(Pagination):
         return self.__class__(self.session, 0, state)
 
     def query(self):
-        return self.session.query(Event)
+        query = self.session.query(Event)
+        if self.state:
+            query = query.filter(Event.state == self.state)
+        query = query.order_by(Event.start)
+        return query
 
     def _get_unique_name(self, name):
         """ Create a unique, URL-friendly name. """

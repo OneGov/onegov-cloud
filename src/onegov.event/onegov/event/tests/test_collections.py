@@ -1,6 +1,11 @@
-from datetime import date, datetime, timedelta
-from onegov.event import EventCollection, Occurrence, OccurrenceCollection
-from sedate import replace_timezone, standardize_date
+from datetime import date
+from datetime import datetime
+from datetime import timedelta
+from onegov.event import EventCollection
+from onegov.event import Occurrence
+from onegov.event import OccurrenceCollection
+from sedate import replace_timezone
+from sedate import standardize_date
 
 
 def tzdatetime(year, month, day, hour, minute, timezone):
@@ -152,7 +157,7 @@ def test_occurrence_collection(session):
     assert sorted(tags) == ['animals', 'fun', 'history', 'park']
 
     def query(**kwargs):
-        return occurrences.query(outdated=True, **kwargs)
+        return occurrences.for_filter(**kwargs).query(outdated=True)
 
     assert query().count() == 6
 
@@ -302,8 +307,9 @@ def test_occurrence_collection_outdated(session):
     occurrences = OccurrenceCollection(session)
     assert occurrences.query().count() == 2
     assert occurrences.query(outdated=True).count() == 3
-    assert occurrences.query(start=date(today.year - 1, 1, 1)).count() == 3
-    assert occurrences.query(start=date(today.year - 1, 1, 1)).count() == 3
+
+    occurrences = occurrences.for_filter(start=date(today.year - 1, 1, 1))
+    assert occurrences.query().count() == 3
 
 
 def test_unique_names(session):
@@ -383,22 +389,24 @@ def test_unicode(session):
     )
     event.submit()
     event.publish()
+    session.flush()
 
     occurrences = OccurrenceCollection(session)
 
+    assert sorted(occurrences.used_tags) == ['congrès', 'salons', 'témoins']
+
     assert occurrences.query(outdated=True).count() == 2
 
-    tags = occurrences.used_tags
-    assert sorted(tags) == ['congrès', 'salons', 'témoins']
-
-    occurrence = occurrences.query(outdated=True, tags=['congrès']).one()
+    occurrences = occurrences.for_filter(tags=['congrès'])
+    occurrence = occurrences.query(outdated=True).one()
     assert occurrence.title == 'Salon du mieux-vivre, 16e édition'
     assert occurrence.location == 'Salon du mieux-vivre à Saignelégier'
     assert sorted(occurrence.tags) == ['congrès', 'salons']
     assert occurrence.event.description \
         == 'Rendez-vous automnal des médecines.'
 
-    occurrence = occurrences.query(outdated=True, tags=['témoins']).one()
+    occurrences = occurrences.for_filter(tags=['témoins'])
+    occurrence = occurrences.query(outdated=True).one()
     assert occurrence.title == 'Témoins de Jéhovah'
     assert occurrence.location == 'Salon du mieux-vivre à Saignelégier'
     assert occurrence.tags == ['témoins']
