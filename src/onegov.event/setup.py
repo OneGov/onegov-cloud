@@ -52,10 +52,14 @@ setup(
             'pytest',
         ],
     ),
-    entry_points="""
-        [onegov]
-        upgrade=onegov.event.upgrade
-    """,
+    entry_points={
+        'onegov': [
+            'upgrade = onegov.event.upgrade'
+        ],
+        'console_scripts': [
+            'onegov-event=onegov.event.cli:cli'
+        ]
+    },
     classifiers=[
         'Intended Audience :: Developers',
         'Programming Language :: Python :: 3 :: Only',
