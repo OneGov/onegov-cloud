@@ -1,7 +1,7 @@
 // set date filter on input change
 var set_date_range_selector_filter = function(name, value) {
     var location = new Url();
-    location.query[name] = convert_date(value, datetimepicker_i18n[get_locale()].dateformat_momentjs, 'Y-m-d');
+    location.query[name] = value;
     delete location.query.page;
     window.location.href = location.toString();
 };
@@ -14,7 +14,7 @@ if (Modernizr.inputtypes.date) {
     $('.date-range-selector input[type="date"]').each(function() {
         $(this).datetimepicker({
             onChangeDateTime: function(_dp, $input) {
-                set_date_range_selector_filter($input.attr('name'), $input.val());
+                set_date_range_selector_filter($input.attr('name'), convert_date($input.val(), datetimepicker_i18n[get_locale()].dateformat_momentjs, 'Y-m-d'));
             }
         });
     });

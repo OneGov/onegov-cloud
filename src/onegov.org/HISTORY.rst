@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Fixes date range filter of event calendar not working in browser with date
+  input support.
+  [msom]
+
 0.33.1 (2018-09-05)
 ~~~~~~~~~~~~~~~~~~~
 
