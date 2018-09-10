@@ -161,6 +161,7 @@ class EventCollection(Pagination):
                 existing.recurrence = event.recurrence
                 existing.state = state
             else:
+                event.name = self._get_unique_name(event.title)
                 self.session.add(event)
                 event.submit()
                 event.publish()
@@ -234,12 +235,12 @@ class EventCollection(Pagination):
                     start=start,
                     end=end,
                     timezone=timezone,
+                    recurrence=recurrence,
                     description=description,
                     organizer=organizer,
-                    recurrence=recurrence,
                     location=location,
                     coordinates=coordinates,
-                    tags=tags,
+                    tags=tags or [],
                     meta={'source': f'ical-{uid}'},
                 )
             )
