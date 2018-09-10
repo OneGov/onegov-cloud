@@ -222,6 +222,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         vevent.add('dtstamp', modified)
         vevent.add('location', self.location)
         vevent.add('description', self.description)
+        vevent.add('categories', self.tags)
         if self.recurrence:
             vevent.add('rrule', self.icalendar_recurrence)
         if url:

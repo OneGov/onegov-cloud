@@ -7,7 +7,7 @@ Changelog
 - Adds ical export to occurrence collection.
   [msom]
 
-- Adds timestamp, uid and coordinates to ical exports.
+- Adds tags, timestamp, uid and coordinates to ical exports.
   [msom]
 
 - Refactors the package.

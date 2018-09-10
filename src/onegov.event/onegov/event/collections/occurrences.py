@@ -205,6 +205,7 @@ class OccurrenceCollection(Pagination):
             vevent.add('dtstamp', modified)
             vevent.add('location', event.location)
             vevent.add('description', event.description)
+            vevent.add('categories', event.tags)
             if event.recurrence:
                 vevent.add('rrule', event.icalendar_recurrence)
             if event.coordinates:

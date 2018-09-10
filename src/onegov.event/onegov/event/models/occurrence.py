@@ -38,6 +38,7 @@ class Occurrence(Base, OccurrenceMixin, TimestampMixin):
         vevent.add('dtstamp', modified)
         vevent.add('location', self.location)
         vevent.add('description', event.description)
+        vevent.add('categories', event.tags)
         if event.coordinates:
             vevent.add('geo', (event.coordinates.lat, event.coordinates.lon))
         if url:
