@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Adds ical export functions to collections.
+- Adds ical export to occurrence collection.
   [msom]
 
 - Makes the collections fully stateful.

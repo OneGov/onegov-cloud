@@ -72,12 +72,12 @@ class OccurrenceMixin(object):
         modified = self.modified or self.created or datetime.utcnow()
 
         vevent = vEvent()
+        vevent.add('uid', f'{self.name}@onegov.event')
         vevent.add('summary', self.title)
         vevent.add('dtstart', to_timezone(self.start, UTC))
         vevent.add('dtend', to_timezone(self.end, UTC))
         vevent.add('last-modified', modified)
         vevent.add('dtstamp', modified)
-        vevent.add('uid', f'{self.name}@onegov.event')
         vevent['location'] = vText(self.location)
         if description:
             vevent['description'] = vText(description)

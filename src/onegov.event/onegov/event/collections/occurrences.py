@@ -4,9 +4,11 @@ from datetime import datetime
 from datetime import timedelta
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
+from icalendar import vRecur
 from icalendar import vText
 from onegov.core.collection import Pagination
 from onegov.core.utils import get_unique_hstore_keys
+from onegov.event.models import Event
 from onegov.event.models import Occurrence
 from pytz import UTC
 from sedate import as_datetime
@@ -181,30 +183,35 @@ class OccurrenceCollection(Pagination):
         return query.first()
 
     def as_ical(self, request):
-        """ Returns the occurrences as iCalendar string.
-
-        This could be made more user friendly by returning the events with
-        the (adjusted) reccurrence instead.
+        """ Returns the the events of the given occurrences as iCalendar
+        string.
 
         """
 
-        cal = vCalendar()
-        cal.add('prodid', '-//OneGov//onegov.event//')
-        cal.add('version', '2.0')
+        vcalendar = vCalendar()
+        vcalendar.add('prodid', '-//OneGov//onegov.event//')
+        vcalendar.add('version', '2.0')
 
-        for occurrence in self.query():
-            modified = (
-                occurrence.modified or occurrence.created or datetime.utcnow()
-            )
+        query = self.query().with_entities(Occurrence.event_id)
+        event_ids = set([r.event_id for r in query])
+        query = self.session.query(Event).filter(Event.id.in_(event_ids))
+        for event in query:
+            modified = event.modified or event.created or datetime.utcnow()
 
             vevent = vEvent()
-            vevent.add('summary', occurrence.title)
-            vevent.add('dtstart', to_timezone(occurrence.start, UTC))
-            vevent.add('dtend', to_timezone(occurrence.end, UTC))
+            vevent.add('uid', f'{event.name}@onegov.event')
+            vevent.add('summary', event.title)
+            vevent.add('dtstart', to_timezone(event.start, UTC))
+            vevent.add('dtend', to_timezone(event.end, UTC))
             vevent.add('last-modified', modified)
-            vevent['location'] = vText(occurrence.location)
-            vevent['description'] = vText(occurrence.event.description)
-            vevent.add('url', request.link(occurrence))
-            cal.add_component(vevent)
+            vevent.add('dtstamp', modified)
+            vevent['location'] = vText(event.location)
+            vevent['description'] = vText(event.description)
+            if event.recurrence:
+                vevent['rrule'] = vRecur(
+                    vRecur.from_ical(event.recurrence.replace('RRULE:', ''))
+                )
+            vevent.add('url', request.link(event))
+            vcalendar.add_component(vevent)
 
-        return cal.to_ical()
+        return vcalendar.to_ical()
