@@ -146,3 +146,23 @@ def import_json(group_context, url, tagmap):
         click.secho(f"Imported/updated {len(events)} events", fg='green')
 
     return _import_json
+
+
+@cli.command('import-ical')
+@pass_group_context
+@click.argument('ical', type=click.File())
+def import_ical(group_context, ical):
+    """ Imports events from an iCalendar file.
+
+    Example:
+
+        onegov-event --select '/veranstaltungen/zug' import-ical import.ics
+
+    """
+
+    def _import_ical(request, app):
+        collection = EventCollection(app.session())
+        collection.from_ical(ical.read())
+        click.secho("Events imported/updated", fg='green')
+
+    return _import_ical
