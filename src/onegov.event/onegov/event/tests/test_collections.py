@@ -8,6 +8,7 @@ from onegov.event import OccurrenceCollection
 from onegov.gis import Coordinates
 from sedate import replace_timezone
 from sedate import standardize_date
+import transaction
 
 
 class DummyRequest(object):
@@ -540,3 +541,54 @@ def test_as_ical(session):
         'END:VEVENT',
         'END:VCALENDAR'
     ])
+
+
+def test_from_ical(session):
+    events = EventCollection(session)
+
+    events.from_ical('\n'.join([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'END:VCALENDAR',
+    ]))
+    assert events.query().count() == 0
+
+    events.from_ical('\n'.join([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'BEGIN:VEVENT',
+        'SUMMARY:Squirrel Park Visit',
+        'UID:squirrel-park-visit@onegov.event',
+        'DTSTART;VALUE=DATE-TIME:20150616T133000Z',
+        'DTEND;VALUE=DATE-TIME:20150616T220000Z',
+        'DTSTAMP;VALUE=DATE-TIME:20140101T000000Z',
+        'RRULE:FREQ=DAILY;COUNT=5;INTERVAL=1',
+        'DESCRIPTION:<em>Furry</em> things will happen!',
+        'CATEGORIES:fun',
+        'CATEGORIES:animals',
+        'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
+        'LOCATION:Squirrel Park',
+        'GEO:47.051752750515746;8.305739625357093',
+        'URL:https://example.org/event/squirrel-park-visit',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ]))
+
+    transaction.commit()
+
+    event = events.query().one()
+    assert event.title == 'Squirrel Park Visit'
+    assert event.description == '<em>Furry</em> things will happen!'
+    assert event.location == 'Squirrel Park'
+    assert event.start == tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern')
+    assert str(event.start.tzinfo) == 'UTC'
+    assert event.end == tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern')
+    assert str(event.end.tzinfo) == 'UTC'
+    assert event.timezone == 'Europe/Zurich'
+    assert event.recurrence == 'RRULE:FREQ=DAILY;COUNT=5;INTERVAL=1'
+    assert [o.start.day for o in event.occurrences] == [16, 17, 18, 19, 20]
+    assert sorted(event.tags) == ['animals', 'fun']
+    assert int(event.coordinates.lat) == 47
+    assert int(event.coordinates.lon) == 8

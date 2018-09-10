@@ -1,11 +1,17 @@
+from datetime import date
 from datetime import datetime
 from datetime import timedelta
+from icalendar import Calendar as vCalendar
 from onegov.core.collection import Pagination
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
 from onegov.event.models import Event
+from onegov.gis import Coordinates
+from pytz import UTC
+from sedate import as_datetime
 from sedate import replace_timezone
 from sedate import standardize_date
+from sedate import to_timezone
 from sqlalchemy import and_
 from sqlalchemy import or_
 
@@ -67,11 +73,16 @@ class EventCollection(Pagination):
 
         Returns the created event or None if already automatically deleted.
         """
+        if not start.tzinfo:
+            start = replace_timezone(start, timezone)
+        if not end.tzinfo:
+            end = replace_timezone(end, timezone)
+
         event = Event(
             state='initiated',
             title=title,
-            start=replace_timezone(start, timezone),
-            end=replace_timezone(end, timezone),
+            start=start,
+            end=end,
             timezone=timezone,
             name=self._get_unique_name(title),
             **optional
@@ -124,3 +135,78 @@ class EventCollection(Pagination):
 
         query = self.session.query(Event).filter(Event.id == id)
         return query.first()
+
+    def from_ical(self, ical):
+        """ Imports the events from an iCalender string.
+
+        We assume the timezone to be Europe/Zurich!
+
+        """
+
+        cal = vCalendar.from_ical(ical)
+        for vevent in cal.walk('vevent'):
+            timezone = 'Europe/Zurich'
+            start = vevent.get('dtstart')
+            start = start.dt if start else None
+            if type(start) is date:
+                start = replace_timezone(as_datetime(start), UTC)
+            elif type(start) is datetime:
+                if start.tzinfo is None:
+                    start = standardize_date(start, timezone)
+                else:
+                    start = to_timezone(start, UTC)
+
+            end = vevent.get('dtend')
+            end = end.dt if end else None
+            if type(end) is date:
+                end = replace_timezone(as_datetime(end), UTC)
+                end = end - timedelta(microseconds=1)
+            elif type(end) is datetime:
+                if end.tzinfo is None:
+                    end = standardize_date(end, timezone)
+                else:
+                    end = to_timezone(end, UTC)
+
+            duration = vevent.get('duration')
+            duration = duration.dt if duration else None
+            if start and not end and duration:
+                end = start + duration
+
+            if not start and not end:
+                raise(ValueError("Invalid date"))
+
+            recurrence = vevent.get('rrule', '')
+            if recurrence:
+                recurrence = 'RRULE:{}'.format(recurrence.to_ical().decode())
+
+            coordinates = vevent.get('geo')
+            if coordinates:
+                coordinates = Coordinates(
+                    coordinates.latitude, coordinates.longitude
+                )
+
+            tags = vevent.get('categories')
+            if tags:
+                tags = [str(tag) for tag in tags]
+
+            uid = str(vevent.get('uid', ''))
+            description = str(vevent.get('description', ''))
+            organizer = str(vevent.get('organizer', ''))
+            location = str(vevent.get('location', ''))
+
+            event = self.add(
+                title=str(vevent.get('summary', '')),
+                start=start,
+                end=end,
+                timezone=timezone,
+                description=description,
+                organizer=organizer,
+                recurrence=recurrence,
+                location=location,
+                coordinates=coordinates,
+                tags=tags,
+                meta={'ical_uid': uid},
+                autoclean=False
+            )
+            event.submit()
+            event.publish()
