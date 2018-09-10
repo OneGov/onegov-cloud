@@ -7,12 +7,6 @@ import py
 import pytest
 
 
-def pytest_configure(config):
-    """Activate log capturing if appropriate."""
-
-    config.pluginmanager.register(CaptureLogPlugin(config), '_capturelog')
-
-
 class CaptureLogPlugin(object):
     """Attaches to the logging module and captures log messages for each test.
 
