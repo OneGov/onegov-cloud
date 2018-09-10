@@ -1,31 +1,55 @@
 import click
 
 from csv import reader as csvreader
-from dateutil import rrule
 from dateutil.parser import parse
+from onegov.core.cli import abort
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.event.collections import EventCollection
 from onegov.event.models import Event
 from onegov.event.models import Occurrence
+from onegov.event.models.event import recurrence_to_dates
 from onegov.gis import Coordinates
 from requests import get
-from sedate import standardize_date
 
 cli = command_group()
+
+
+@cli.command('clear')
+@pass_group_context
+def clear(group_context):
+    """ Deletes all events.
+
+        onegov-event --select '/veranstaltungen/zug' clear
+
+    """
+
+    def _clear(request, app):
+        if not click.confirm("Do you really want to remove all events?"):
+            abort("Deletion process aborted")
+
+        session = app.session()
+        for event in session.query(Event):
+            session.delete(event)
+        for occurrence in session.query(Occurrence):
+            session.delete(occurrence)
+
+    return _clear
 
 
 @cli.command('import-json')
 @pass_group_context
 @click.argument('url')
 @click.option('--tagmap', type=click.File())
-@click.option('--clear', default=False, is_flag=True)
-def import_json(group_context, url, tagmap, clear):
-    """ Fetches the events from a seantis.dir.events instance for migration. This
-    command is intendet to be removed in the future.
+def import_json(group_context, url, tagmap):
+    """ Fetches the events from a seantis.dir.events instance.
 
-    onegov-event --select '/towns/govikon' import-json
-        https://veranstaltungen.zug.ch/veranstaltungen/?type=json&compact=true
+    This command is intended for migration and to be removed in the future.
+
+    Example:
+
+        onegov-event --select '/veranstaltungen/zug' import-json \
+        'https://veranstaltungen.zug.ch/veranstaltungen/?type=json&compact'
 
     """
     if tagmap:
@@ -37,32 +61,17 @@ def import_json(group_context, url, tagmap, clear):
         response = get(url)
         response.raise_for_status()
 
-        session = app.session()
-        collection = EventCollection(session)
-
-        if clear:
-            for event in session.query(Event):
-                session.delete(event)
-            for occurrence in session.query(Occurrence):
-                session.delete(occurrence)
-
+        events = []
         for item in response.json():
-            try:
-                start = parse(item['start'])
-                end = parse(item['end'])
-                recurrence = item['recurrence']
-                timezone = item['timezone']
-                assert all((start, end, timezone))
-                if recurrence:
-                    list(
-                        map(
-                            lambda x: standardize_date(x, timezone),
-                            rrule.rrulestr(recurrence, dtstart=start)
-                        )
-                    )
-            except (AssertionError, TypeError, ValueError) as e:
-                click.secho(f"Skipping {item['url']}! ({e})", fg='red')
-                continue
+            uid = item['id']
+            title = item['title']
+
+            start = parse(item['start'])
+            end = parse(item['end'])
+            timezone = item['timezone']
+            recurrence = item['recurrence']
+            if recurrence:
+                recurrence_to_dates(recurrence, start, timezone)
 
             organizer = ', '.join((line for line in (
                 item['organizer'] or '',
@@ -84,7 +93,6 @@ def import_json(group_context, url, tagmap, clear):
             ) if line))
 
             description = '\r\n\r\n'.join((line for line in (
-                item['url'] or '',  # todo: remove me!
                 item['short_description'] or '',
                 item['long_description'] or '',
                 item['event_url'] or '',
@@ -99,32 +107,42 @@ def import_json(group_context, url, tagmap, clear):
                 tags = {tagmap[tag] for tag in tags if tag in tagmap}
             # todo: handle item['cat1']
 
-            event = Event(state='initiated')
-            event.name = collection._get_unique_name(item['title'])
-            event.title = item['title']
-            event.start = start
-            event.end = end
-            event.recurrence = recurrence
-            event.timezone = timezone
-            event.tags = tags
-            event.description = description
-            event.organizer = organizer
-            event.location = location
-            event.meta = event.meta or {}
-            event.meta['submitter_email'] = item['submitter_email']
-            event.state = 'published'
-            # todo: handle item['attachements']
-            # todo: handle item['images']
+            coordinates = None
             if item['latitude'] and item['longitude']:
-                event.coordinates = Coordinates(
+                coordinates = Coordinates(
                     lat=item['latitude'],
                     lon=item['longitude']
                 )
 
-            session.add(event)
+            events.append(
+                Event(
+                    state='initiated',
+                    title=title,
+                    start=start,
+                    end=end,
+                    recurrence=recurrence,
+                    timezone=timezone,
+                    description=description,
+                    organizer=organizer,
+                    location=location,
+                    coordinates=coordinates,
+                    tags=tags or [],
+                    meta={
+                        'source': f'ical-{uid}',
+                        'submitter_email': item['submitter_email']
+                    },
+                )
+            )
+            # todo: handle item['attachements']
+            # todo: handle item['images']
+
+        collection = EventCollection(app.session())
+        collection.from_import(events)
 
         if unknown_tags:
             unknown_tags = ','.join(unknown_tags)
             click.secho(f"Tags not in tagmap: {unknown_tags}!", fg='yellow')
+
+        click.secho(f"Imported/updated {len(events)} events", fg='green')
 
     return _import_json
