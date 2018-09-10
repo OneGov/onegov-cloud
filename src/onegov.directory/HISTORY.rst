@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.3 (2018-09-10)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to hide the external directory link.
   [href]
 
