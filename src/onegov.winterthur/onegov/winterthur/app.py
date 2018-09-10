@@ -103,4 +103,6 @@ def get_iframe_resizer():
 @WinterthurApp.webasset('common')
 def get_common_asset():
     yield from get_org_common_asset()
+    yield 'proj4js.js'
+    yield 'proj4js-leaflet.js'
     yield 'winterthur.js'

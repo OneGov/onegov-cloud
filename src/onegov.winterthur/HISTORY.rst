@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Switches map mprojection to ESPG:2056.
+  [href]
+
 0.2.12 (2018-07-31)
 ~~~~~~~~~~~~~~~~~~~~~
 
