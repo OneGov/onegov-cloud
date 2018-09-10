@@ -559,6 +559,45 @@ def test_from_ical(session):
         'VERSION:2.0',
         'PRODID:-//OneGov//onegov.event//',
         'BEGIN:VEVENT',
+        'SUMMARY:Squirrel Park Virsit',
+        'UID:squirrel-park-visit@onegov.event',
+        'DTSTART;VALUE=DATE-TIME:20150616T133100Z',
+        'DTEND;VALUE=DATE-TIME:20150616T220100Z',
+        'DTSTAMP;VALUE=DATE-TIME:20140101T000000Z',
+        'RRULE:FREQ=DAILY;COUNT=4;INTERVAL=1',
+        'DESCRIPTION:<em>Furri</em> things will happen!',
+        'CATEGORIES:funn',
+        'CATEGORIES:annimals',
+        'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
+        'LOCATION:Squirrel Par',
+        'GEO:48.051752750515746;9.305739625357093',
+        'URL:https://example.org/event/squirrel-park-visit',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ]))
+
+    transaction.commit()
+
+    event = events.query().one()
+    assert event.title == 'Squirrel Park Virsit'
+    assert event.description == '<em>Furri</em> things will happen!'
+    assert event.location == 'Squirrel Par'
+    assert event.start == tzdatetime(2015, 6, 16, 9, 31, 'US/Eastern')
+    assert str(event.start.tzinfo) == 'UTC'
+    assert event.end == tzdatetime(2015, 6, 16, 18, 1, 'US/Eastern')
+    assert str(event.end.tzinfo) == 'UTC'
+    assert event.timezone == 'Europe/Zurich'
+    assert event.recurrence == 'RRULE:FREQ=DAILY;COUNT=4;INTERVAL=1'
+    assert [o.start.day for o in event.occurrences] == [16, 17, 18, 19]
+    assert sorted(event.tags) == ['annimals', 'funn']
+    assert int(event.coordinates.lat) == 48
+    assert int(event.coordinates.lon) == 9
+
+    events.from_ical('\n'.join([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'BEGIN:VEVENT',
         'SUMMARY:Squirrel Park Visit',
         'UID:squirrel-park-visit@onegov.event',
         'DTSTART;VALUE=DATE-TIME:20150616T133000Z',
@@ -578,13 +617,12 @@ def test_from_ical(session):
 
     transaction.commit()
 
-    event = events.query().one()
     assert event.title == 'Squirrel Park Visit'
     assert event.description == '<em>Furry</em> things will happen!'
     assert event.location == 'Squirrel Park'
     assert event.start == tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern')
     assert str(event.start.tzinfo) == 'UTC'
-    assert event.end == tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern')
+    assert event.end == tzdatetime(2015, 6, 16, 18, 0, 'US/Eastern')
     assert str(event.end.tzinfo) == 'UTC'
     assert event.timezone == 'Europe/Zurich'
     assert event.recurrence == 'RRULE:FREQ=DAILY;COUNT=5;INTERVAL=1'

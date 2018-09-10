@@ -136,12 +136,44 @@ class EventCollection(Pagination):
         query = self.session.query(Event).filter(Event.id == id)
         return query.first()
 
+    def from_import(self, events):
+        """ Add or updates the given events. """
+        assert all([event.meta['source'] for event in events])
+
+        for event in events:
+            existing = self.session.query(Event).filter(
+                Event.meta['source'] == event.meta['source']
+            ).first()
+
+            if existing:
+                state = existing.state  # avoid updating occurrences
+                existing.state = 'initialized'
+                existing.title = event.title
+                existing.location = event.location
+                existing.tags = event.tags
+                existing.timezone = event.timezone
+                existing.start = event.start
+                existing.end = event.end
+                existing.content = event.content
+                existing.coordinates = event.coordinates
+                existing.description = event.description
+                existing.organizer = event.organizer
+                existing.recurrence = event.recurrence
+                existing.state = state
+            else:
+                self.session.add(event)
+                event.submit()
+                event.publish()
+
+        self.session.flush()
+
     def from_ical(self, ical):
         """ Imports the events from an iCalender string.
 
         We assume the timezone to be Europe/Zurich!
 
         """
+        events = []
 
         cal = vCalendar.from_ical(ical)
         for vevent in cal.walk('vevent'):
@@ -190,23 +222,26 @@ class EventCollection(Pagination):
                 tags = [str(tag) for tag in tags]
 
             uid = str(vevent.get('uid', ''))
+            title = str(vevent.get('summary', ''))
             description = str(vevent.get('description', ''))
             organizer = str(vevent.get('organizer', ''))
             location = str(vevent.get('location', ''))
 
-            event = self.add(
-                title=str(vevent.get('summary', '')),
-                start=start,
-                end=end,
-                timezone=timezone,
-                description=description,
-                organizer=organizer,
-                recurrence=recurrence,
-                location=location,
-                coordinates=coordinates,
-                tags=tags,
-                meta={'ical_uid': uid},
-                autoclean=False
+            events.append(
+                Event(
+                    state='initiated',
+                    title=title,
+                    start=start,
+                    end=end,
+                    timezone=timezone,
+                    description=description,
+                    organizer=organizer,
+                    recurrence=recurrence,
+                    location=location,
+                    coordinates=coordinates,
+                    tags=tags,
+                    meta={'source': f'ical-{uid}'},
+                )
             )
-            event.submit()
-            event.publish()
+
+        self.from_import(events)
