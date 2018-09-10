@@ -7,6 +7,9 @@ Changelog
 - Makes the collections fully stateful.
   [msom]
 
+- Adds the timestamp and uid to ical exports.
+  [msom]
+
 - Refactors the package.
   [msom]
 

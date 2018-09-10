@@ -69,25 +69,27 @@ class OccurrenceMixin(object):
     def as_ical(self, description=None, rrule=None, url=None):
         """ Returns the occurrence as iCalendar string. """
 
-        event = vEvent()
-        event.add('summary', self.title)
-        event.add('dtstart', to_timezone(self.start, UTC))
-        event.add('dtend', to_timezone(self.end, UTC))
-        event.add('last-modified',
-                  self.modified or self.created or datetime.utcnow())
-        event['location'] = vText(self.location)
+        modified = self.modified or self.created or datetime.utcnow()
+
+        vevent = vEvent()
+        vevent.add('summary', self.title)
+        vevent.add('dtstart', to_timezone(self.start, UTC))
+        vevent.add('dtend', to_timezone(self.end, UTC))
+        vevent.add('last-modified', modified)
+        vevent.add('dtstamp', modified)
+        vevent.add('uid', f'{self.name}@onegov.event')
+        vevent['location'] = vText(self.location)
         if description:
-            event['description'] = vText(description)
+            vevent['description'] = vText(description)
         if rrule:
-            event['rrule'] = vRecur(
+            vevent['rrule'] = vRecur(
                 vRecur.from_ical(rrule.replace('RRULE:', ''))
             )
         if url:
-            event.add('url', url)
+            vevent.add('url', url)
 
-        cal = vCalendar()
-        cal.add('prodid', '-//OneGov//onegov.event//')
-        cal.add('version', '2.0')
-        cal.add_component(event)
-
-        return cal.to_ical()
+        vcalendar = vCalendar()
+        vcalendar.add('prodid', '-//OneGov//onegov.event//')
+        vcalendar.add('version', '2.0')
+        vcalendar.add_component(vevent)
+        return vcalendar.to_ical()
