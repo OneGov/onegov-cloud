@@ -15,6 +15,10 @@ matrix:
 addons:
     postgresql: "9.6"
 
+    apt:
+      packages:
+        - ghostscript
+
 install:
   - pip install tox
 
