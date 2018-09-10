@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to hide the external directory link.
+  [href]
+
 - Fixes date range filter of event calendar not working in browser with date
   input support.
   [msom]

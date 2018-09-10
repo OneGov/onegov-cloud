@@ -161,6 +161,12 @@ class DirectoryBaseForm(Form):
         fieldset=_("External Link")
     )
 
+    link_visible = BooleanField(
+        label=_("Visible"),
+        fieldset=_("External Link"),
+        default=True
+    )
+
     enable_submissions = BooleanField(
         label=_("Users may propose new entries"),
         fieldset=_("New entries"),
@@ -280,6 +286,7 @@ class DirectoryBaseForm(Form):
             direction=self.order_direction.data,
             link_pattern=self.link_pattern.data,
             link_title=self.link_title.data,
+            link_visible=self.link_visible.data,
             thumbnail=self.thumbnail.data and self.thumbnail.data.split()[0]
         )
 
@@ -293,6 +300,7 @@ class DirectoryBaseForm(Form):
         self.order_direction = cfg.direction == 'desc' and 'desc' or 'asc'
         self.link_pattern.data = cfg.link_pattern
         self.link_title.data = cfg.link_title
+        self.link_visible.data = cfg.link_visible
         self.thumbnail.data = cfg.thumbnail
 
         if safe_format_keys(cfg.title) == cfg.order:
