@@ -1,5 +1,8 @@
 from datetime import datetime
 from dateutil import rrule
+from icalendar import Calendar as vCalendar
+from icalendar import Event as vEvent
+from icalendar import vRecur
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
@@ -9,6 +12,7 @@ from onegov.event.models.mixins import OccurrenceMixin
 from onegov.event.models.occurrence import Occurrence
 from onegov.gis import CoordinatesMixin
 from onegov.search import ORMSearchable
+from pytz import UTC
 from sedate import standardize_date
 from sedate import to_timezone
 from sqlalchemy import and_
@@ -56,6 +60,13 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
 
     #: Recurrence of the event (RRULE, see RFC2445)
     recurrence = Column(Text, nullable=True)
+
+    #: Recurrence of the event as icalendar object
+    @property
+    def icalendar_recurrence(self):
+        if not self.recurrence:
+            return None
+        return vRecur.from_ical(self.recurrence.replace('RRULE:', ''))
 
     #: Occurences of the event
     occurrences = relationship(
@@ -200,8 +211,26 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
     def as_ical(self, url=None):
         """ Returns the event and all its occurrences as iCalendar string. """
 
-        return super().as_ical(
-            description=self.description,
-            rrule=self.recurrence,
-            url=url
-        )
+        modified = self.modified or self.created or datetime.utcnow()
+
+        vevent = vEvent()
+        vevent.add('uid', f'{self.name}@onegov.event')
+        vevent.add('summary', self.title)
+        vevent.add('dtstart', to_timezone(self.start, UTC))
+        vevent.add('dtend', to_timezone(self.end, UTC))
+        vevent.add('last-modified', modified)
+        vevent.add('dtstamp', modified)
+        vevent.add('location', self.location)
+        vevent.add('description', self.description)
+        if self.recurrence:
+            vevent.add('rrule', self.icalendar_recurrence)
+        if url:
+            vevent.add('url', url)
+        if self.coordinates:
+            vevent.add('geo', (self.coordinates.lat, self.coordinates.lon))
+
+        vcalendar = vCalendar()
+        vcalendar.add('prodid', '-//OneGov//onegov.event//')
+        vcalendar.add('version', '2.0')
+        vcalendar.add_component(vevent)
+        return vcalendar.to_ical()

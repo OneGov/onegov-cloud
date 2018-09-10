@@ -4,6 +4,7 @@ import transaction
 from datetime import datetime
 from onegov.event import Event
 from onegov.event import Occurrence
+from onegov.gis import Coordinates
 from sedate import replace_timezone
 
 
@@ -483,6 +484,7 @@ def test_as_ical():
         meta={'submitter': 'fat.pauly@squirrelpark.org'},
         name='event',
         modified=tzdatetime(2008, 2, 7, 10, 15, 'Europe/Zurich'),
+        coordinates=Coordinates(47.051752750515746, 8.305739625357093)
     )
     ical = event.as_ical(url=url).decode().strip().split('\r\n')
     assert sorted(ical) == sorted([
@@ -498,6 +500,7 @@ def test_as_ical():
         'DESCRIPTION:<em>Furry</em> things will happen!',
         'LAST-MODIFIED;VALUE=DATE-TIME:20080207T091500Z',
         'LOCATION:Squirrel Park',
+        'GEO:47.051752750515746;8.305739625357093',
         'RRULE:FREQ=DAILY;COUNT=5;INTERVAL=2',
         'URL:https://example.org/my-event',
         'END:VEVENT',
@@ -523,6 +526,7 @@ def test_as_ical():
         'DESCRIPTION:<em>Furry</em> things will happen!',
         'LAST-MODIFIED;VALUE=DATE-TIME:20080207T091500Z',
         'LOCATION:Squirrel Park',
+        'GEO:47.051752750515746;8.305739625357093',
         'URL:https://example.org/my-event',
         'END:VEVENT',
         'END:VCALENDAR',

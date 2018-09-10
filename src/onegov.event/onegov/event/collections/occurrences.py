@@ -4,8 +4,6 @@ from datetime import datetime
 from datetime import timedelta
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
-from icalendar import vRecur
-from icalendar import vText
 from onegov.core.collection import Pagination
 from onegov.core.utils import get_unique_hstore_keys
 from onegov.event.models import Event
@@ -205,11 +203,13 @@ class OccurrenceCollection(Pagination):
             vevent.add('dtend', to_timezone(event.end, UTC))
             vevent.add('last-modified', modified)
             vevent.add('dtstamp', modified)
-            vevent['location'] = vText(event.location)
-            vevent['description'] = vText(event.description)
+            vevent.add('location', event.location)
+            vevent.add('description', event.description)
             if event.recurrence:
-                vevent['rrule'] = vRecur(
-                    vRecur.from_ical(event.recurrence.replace('RRULE:', ''))
+                vevent.add('rrule', event.icalendar_recurrence)
+            if event.coordinates:
+                vevent.add(
+                    'geo', (event.coordinates.lat, event.coordinates.lon)
                 )
             vevent.add('url', request.link(event))
             vcalendar.add_component(vevent)

@@ -1,13 +1,13 @@
 Changelog
 ---------
 
-- Adds ical export to occurrence collection.
-  [msom]
-
 - Makes the collections fully stateful.
   [msom]
 
-- Adds the timestamp and uid to ical exports.
+- Adds ical export to occurrence collection.
+  [msom]
+
+- Adds timestamp, uid and coordinates to ical exports.
   [msom]
 
 - Refactors the package.

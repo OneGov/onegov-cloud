@@ -1,10 +1,4 @@
-from datetime import datetime
-from icalendar import Calendar as vCalendar
-from icalendar import Event as vEvent
-from icalendar import vRecur
-from icalendar import vText
 from onegov.core.orm.types import UTCDateTime
-from pytz import UTC
 from sedate import to_timezone
 from sqlalchemy import Column
 from sqlalchemy import String
@@ -65,31 +59,3 @@ class OccurrenceMixin(object):
         """ The localized version of the end date/time. """
 
         return to_timezone(self.end, self.timezone)
-
-    def as_ical(self, description=None, rrule=None, url=None):
-        """ Returns the occurrence as iCalendar string. """
-
-        modified = self.modified or self.created or datetime.utcnow()
-
-        vevent = vEvent()
-        vevent.add('uid', f'{self.name}@onegov.event')
-        vevent.add('summary', self.title)
-        vevent.add('dtstart', to_timezone(self.start, UTC))
-        vevent.add('dtend', to_timezone(self.end, UTC))
-        vevent.add('last-modified', modified)
-        vevent.add('dtstamp', modified)
-        vevent['location'] = vText(self.location)
-        if description:
-            vevent['description'] = vText(description)
-        if rrule:
-            vevent['rrule'] = vRecur(
-                vRecur.from_ical(rrule.replace('RRULE:', ''))
-            )
-        if url:
-            vevent.add('url', url)
-
-        vcalendar = vCalendar()
-        vcalendar.add('prodid', '-//OneGov//onegov.event//')
-        vcalendar.add('version', '2.0')
-        vcalendar.add_component(vevent)
-        return vcalendar.to_ical()

@@ -5,6 +5,7 @@ from freezegun import freeze_time
 from onegov.event import EventCollection
 from onegov.event import Occurrence
 from onegov.event import OccurrenceCollection
+from onegov.gis import Coordinates
 from sedate import replace_timezone
 from sedate import standardize_date
 
@@ -215,7 +216,8 @@ def test_occurrence_collection_as_ical(session):
             },
             location='Squirrel Park',
             tags=['fun', 'animals'],
-            recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5'
+            recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5',
+            coordinates=Coordinates(47.051752750515746, 8.305739625357093)
         )
         event.submit()
         event.publish()
@@ -229,7 +231,8 @@ def test_occurrence_collection_as_ical(session):
                 'description': 'Learn how the Park got so <em>furry</em>!'
             },
             location='Squirrel Park',
-            tags=['history']
+            tags=['history'],
+            coordinates=Coordinates(47.051752750515746, 8.305739625357093)
         )
         event.submit()
         event.publish()
@@ -262,6 +265,7 @@ def test_occurrence_collection_as_ical(session):
         'DESCRIPTION:<em>Furry</em> things will happen!',
         'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
         'LOCATION:Squirrel Park',
+        'GEO:47.051752750515746;8.305739625357093',
         'URL:https://example.org/event/squirrel-park-visit',
         'END:VEVENT',
         'BEGIN:VEVENT',
@@ -273,6 +277,7 @@ def test_occurrence_collection_as_ical(session):
         'DESCRIPTION:Learn how the Park got so <em>furry</em>!',
         'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
         'LOCATION:Squirrel Park',
+        'GEO:47.051752750515746;8.305739625357093',
         'URL:https://example.org/event/history-of-the-squirrel-park',
         'END:VEVENT',
         'END:VCALENDAR'
@@ -296,6 +301,7 @@ def test_occurrence_collection_as_ical(session):
         'DESCRIPTION:Learn how the Park got so <em>furry</em>!',
         'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
         'LOCATION:Squirrel Park',
+        'GEO:47.051752750515746;8.305739625357093',
         'URL:https://example.org/event/history-of-the-squirrel-park',
         'END:VEVENT',
         'END:VCALENDAR'
