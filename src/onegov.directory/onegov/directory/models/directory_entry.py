@@ -81,6 +81,10 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         return self.directory.configuration.link_title
 
     @property
+    def external_link_visible(self):
+        return self.directory.configuration.link_visible
+
+    @property
     def directory_name(self):
         return self.directory.name
 

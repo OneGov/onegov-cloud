@@ -34,3 +34,9 @@ def update_ordering(context):
 
         for entry in directory.entries:
             entry.order = config.extract_order(entry.values)
+
+
+@upgrade_task('Make external link visible by default')
+def make_external_link_visible_by_default(context):
+    for directory in context.session.query(Directory):
+        directory.configuration.link_visible = True

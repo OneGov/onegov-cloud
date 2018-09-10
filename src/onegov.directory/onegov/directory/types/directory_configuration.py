@@ -94,12 +94,14 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         'direction',
         'link_pattern',
         'link_title',
+        'link_visible',
         'thumbnail'
     )
 
     def __init__(self, title=None, lead=None, order=None, keywords=None,
                  searchable=None, display=None, direction=None,
-                 link_pattern=None, link_title=None, thumbnail=None):
+                 link_pattern=None, link_title=None, link_visible=None,
+                 thumbnail=None):
 
         self.title = title
         self.lead = lead
@@ -110,6 +112,7 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         self.direction = direction
         self.link_pattern = link_pattern
         self.link_title = link_title
+        self.link_visible = link_visible
         self.thumbnail = thumbnail
 
     def __setattr__(self, name, value):
@@ -136,6 +139,10 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
 
         for name in self.fields:
             if not getattr(self, name):
+                continue
+
+            # booleans
+            if name == 'link_visible':
                 continue
 
             if name in ('title', 'lead'):
