@@ -27,6 +27,25 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
+def recurrence_to_dates(recurrence, dtstart, timezone):
+    """ Returns the dates defined by an RRULE as list of timezone aware
+    datetimes.
+
+    """
+
+    try:
+        return list(map(
+            lambda x: standardize_date(x, timezone),
+            rrule.rrulestr(recurrence, dtstart=dtstart)
+        ))
+    except (TypeError, ValueError):
+        dtstart = to_timezone(dtstart, timezone).replace(tzinfo=None)
+        return list(map(
+            lambda x: standardize_date(x, timezone),
+            rrule.rrulestr(recurrence, dtstart=dtstart)
+        ))
+
+
 class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
             ORMSearchable, CoordinatesMixin):
     """ Defines an event.
@@ -135,9 +154,8 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
 
         occurrences = [self.start]
         if self.recurrence:
-            occurrences = rrule.rrulestr(self.recurrence, dtstart=self.start)
-            occurrences = list(
-                map(lambda x: standardize_date(x, self.timezone), occurrences)
+            occurrences = recurrence_to_dates(
+                self.recurrence, self.start, self.timezone
             )
             if localize:
                 occurrences = list(map(
