@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to show directory coordinates on the entry only.
+  [href]
+
 - Adds the ability to hide the external directory link.
   [href]
 

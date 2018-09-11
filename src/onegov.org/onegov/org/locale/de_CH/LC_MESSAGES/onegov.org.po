@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-09-10 14:31+0200\n"
+"POT-Creation-Date: 2018-09-11 11:39+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1033,9 +1033,6 @@ msgstr "Beschreibt worum es bei diesem Verzeichnis geht"
 msgid "Further Information"
 msgstr "Weitere Informationen"
 
-msgid "Directory entries may have coordinates"
-msgstr "Zu Verzeichnis-Einträgen können Koordinaten erfasst werden"
-
 msgid "Title-Format"
 msgstr "Titel-Format"
 
@@ -1105,6 +1102,15 @@ msgstr "Die folgenden Felder sind unbekannt: ${fields}"
 
 msgid "Please select at most one thumbnail field"
 msgstr "Bitte wählen Sie höchstens ein Thumbnail Feld"
+
+msgid "Entries have no coordinates"
+msgstr "Einträge haben keine Koordinaten"
+
+msgid "Coordinates are shown on each entry"
+msgstr "Koordinaten werden auf den Einträgen angezeigt"
+
+msgid "Coordinates are shown on the directory and on each entry"
+msgstr "Koordinaten werden im Verzeichnis und auf den Einträgen angezeigt"
 
 msgid "Default"
 msgstr "Standard"
@@ -3002,6 +3008,9 @@ msgstr "Ihre Zahlung wurde rückgängig gemacht"
 
 msgid "Your payment has been refunded"
 msgstr "Ihre Zahlung wurde rückerstattet"
+
+#~ msgid "Directory entries may have coordinates"
+#~ msgstr "Zu Verzeichnis-Einträgen können Koordinaten erfasst werden"
 
 #~ msgid "Publication Date"
 #~ msgstr "Publikationsdatum"

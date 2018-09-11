@@ -57,10 +57,24 @@ class DirectoryBaseForm(Form):
         ],
         render_kw={'rows': 32, 'data-editor': 'form'})
 
-    enable_map = BooleanField(
-        label=_("Directory entries may have coordinates"),
+    enable_map = RadioField(
+        label=_("Coordinates"),
         fieldset=_("General"),
-        default=True)
+        choices=[
+            (
+                'no',
+                _("Entries have no coordinates")
+            ),
+            (
+                'entry',
+                _("Coordinates are shown on each entry")
+            ),
+            (
+                'everywhere',
+                _("Coordinates are shown on the directory and on each entry")
+            ),
+        ],
+        default='everywhere')
 
     title_format = StringField(
         label=_("Title-Format"),

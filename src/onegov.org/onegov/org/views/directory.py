@@ -40,7 +40,7 @@ def get_directory_entry_form_class(model, request):
 
     class OptionalMapForm(form_class):
         def on_request(self):
-            if not model.directory.enable_map:
+            if model.directory.enable_map == 'no':
                 self.delete_field('coordinates')
 
     return OptionalMapForm

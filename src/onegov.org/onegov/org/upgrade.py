@@ -78,3 +78,9 @@ def add_new_defaults_to_existing_directories(context):
         directory.enable_submissions = False
         directory.price = 'free'
         directory.currency = 'CHF'
+
+
+@upgrade_task('Migrate enable_map option')
+def migrate_enable_map_option(context):
+    for directory in context.session.query(ExtendedDirectory):
+        directory.enable_map = directory.enable_map and 'everywhere' or 'no'

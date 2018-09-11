@@ -215,7 +215,7 @@ def test_browse_directory_coordinates(browser, org_app):
                     - name
         """,
         meta={
-            'enable_map': True
+            'enable_map': 'everywhere'
         },
         type='extended'
     )
