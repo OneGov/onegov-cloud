@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.34.0 (2018-09-12)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds markdown fields to custom forms and directories.
   [href]
 
