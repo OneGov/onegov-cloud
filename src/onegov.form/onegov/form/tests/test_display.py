@@ -7,6 +7,7 @@ class MockField(object):
     def __init__(self, type, data):
         self.type = type
         self.data = data
+        self.render_kw = None
 
         if isinstance(data, str):
             self.choices = [(data, data)]

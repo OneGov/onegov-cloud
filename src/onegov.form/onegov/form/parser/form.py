@@ -89,7 +89,7 @@ def handle_field(builder, field, dependency=None):
             label=field.label,
             dependency=dependency,
             required=field.required,
-            render_kw={'rows': field.rows}
+            widget=with_options(TextArea, rows=field.rows)
         )
 
     elif field.type == 'password':
