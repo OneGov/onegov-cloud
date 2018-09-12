@@ -593,6 +593,7 @@ class FormSubmissionLayout(DefaultLayout):
 
     def __init__(self, model, request, title=None):
         super().__init__(model, request)
+        self.include_code_editor()
         self.title = title or self.form.title
 
     @cached_property

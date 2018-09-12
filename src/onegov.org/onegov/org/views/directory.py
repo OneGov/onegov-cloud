@@ -289,6 +289,7 @@ def handle_new_directory_entry(self, request, form):
             getattr(form, field).data = {}
 
     layout = DirectoryEntryCollectionLayout(self, request)
+    layout.include_code_editor()
     layout.breadcrumbs.append(Link(_("New"), '#'))
     layout.editbar_links = []
 
@@ -315,6 +316,7 @@ def handle_edit_directory_entry(self, request, form):
         form.process(obj=self)
 
     layout = DirectoryEntryLayout(self, request)
+    layout.include_code_editor()
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
     layout.editbar_links = []
 
@@ -377,6 +379,7 @@ def handle_submit_directory_entry(self, request, form):
         return request.redirect(url.as_string())
 
     layout = DirectoryEntryCollectionLayout(self, request)
+    layout.include_code_editor()
     layout.breadcrumbs.append(Link(title, '#'))
     layout.editbar_links = []
 

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds markdown fields to custom forms and directories.
+  [href]
+
 - Adds the ability to show directory coordinates on the entry only.
   [href]
 

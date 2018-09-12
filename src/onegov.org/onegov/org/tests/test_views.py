@@ -4286,3 +4286,61 @@ def test_registration_not_in_front_of_queue(client):
 
     page = client.get('/tickets/ALL/open').click("Annehmen").follow()
     assert "Dies ist nicht die älteste offene Eingabe" not in page
+
+
+def test_markdown_in_forms(client):
+    collection = FormCollection(client.app.session())
+    collection.definitions.add('Content', definition=textwrap.dedent("""
+        E-Mail *= @@@
+        Content = <markdown>
+    """), type='custom')
+
+    transaction.commit()
+
+    page = client.get('/forms').click('Content')
+    page.form['e_mail'] = 'info@example.org'
+    page.form['content'] = '* foo\n* bar'
+    page = page.form.submit().follow()
+
+    assert '<li>foo</li>' in page
+    assert '<li>bar</li>' in page
+
+
+def test_exploit_markdown_in_forms(client):
+    collection = FormCollection(client.app.session())
+    collection.definitions.add('Content', definition=textwrap.dedent("""
+        E-Mail *= @@@
+        Content = <markdown>
+    """), type='custom')
+
+    transaction.commit()
+
+    page = client.get('/forms').click('Content')
+    page.form['e_mail'] = 'info@example.org'
+    page.form['content'] = '<script>alert();</script>'
+    page = page.form.submit().follow()
+
+    assert '<script>alert' not in page
+    assert '&lt;script&gt;alert' in page
+
+
+def test_markdown_in_directories(client):
+    client.login_admin()
+
+    page = client.get('/directories').click('Verzeichnis')
+    page.form['title'] = "Clubs"
+    page.form['structure'] = """
+        Name *= ___
+        Notes = <markdown>
+    """
+    page.form['title_format'] = '[Name]'
+    page.form['content_fields'] = 'Notes'
+    page.form.submit()
+
+    page = client.get('/directories/clubs')
+    page = page.click('Eintrag', index=0)
+    page.form['name'] = 'Soccer Club'
+    page.form['notes'] = '* Soccer rules!'
+    page.form.submit()
+
+    assert "<li>Soccer rules" in client.get('/directories/clubs/soccer-club')
