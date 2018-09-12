@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for text to markdown migration.
+  [href]
+
 0.4.3 (2018-09-10)
 ~~~~~~~~~~~~~~~~~~~~~
 

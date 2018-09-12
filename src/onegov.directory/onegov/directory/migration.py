@@ -171,6 +171,12 @@ class FieldTypeMigrations(object):
     def textarea_to_text(self, value):
         return value.replace('\n', ' ').strip()
 
+    def textarea_to_code(self, value):
+        return value
+
+    def text_to_code(self, value):
+        return value
+
     def date_to_text(self, value):
         return '{:%d.%m.%Y}'.format(value)
 
