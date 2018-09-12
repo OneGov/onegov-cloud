@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a markdown renderer that accepts untrusted markdown.
+  [href]
+
 0.71.6 (2018-08-31)
 ~~~~~~~~~~~~~~~~~~~
 

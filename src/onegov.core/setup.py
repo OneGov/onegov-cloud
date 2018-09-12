@@ -52,6 +52,7 @@ setup(
         'itsdangerous',
         'isodate',
         'lazy-object-proxy',
+        'mistletoe',
         'mailthon>=0.1.1',
         'morepath>=0.18',
         'more.content_security',
