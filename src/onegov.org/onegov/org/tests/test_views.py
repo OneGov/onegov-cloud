@@ -18,7 +18,6 @@ from onegov.form import FormCollection, FormSubmission
 from onegov.directory import DirectoryEntry
 from onegov.gis import Coordinates
 from onegov.newsletter import RecipientCollection, NewsletterCollection
-from onegov_testing import Client as BaseClient
 from onegov.page import PageCollection
 from onegov.pay import PaymentProviderCollection
 from onegov.people import Person
@@ -29,42 +28,6 @@ from onegov.user import UserCollection
 from sedate import replace_timezone
 from purl import URL
 from webtest import Upload
-
-
-class Client(BaseClient):
-    skip_first_form = True
-    use_intercooler = True
-
-
-def bound_reserve(client, allocation):
-
-    default_start = '{:%H:%M}'.format(allocation.start)
-    default_end = '{:%H:%M}'.format(allocation.end)
-    default_whole_day = allocation.whole_day
-    resource = allocation.resource
-    allocation_id = allocation.id
-
-    def reserve(
-        start=default_start,
-        end=default_end,
-        quota=1,
-        whole_day=default_whole_day
-    ):
-
-        baseurl = '/allocation/{}/{}/reserve'.format(
-            resource,
-            allocation_id
-        )
-        query = '?start={start}&end={end}&quota={quota}&whole_day={whole_day}'
-
-        return client.post(baseurl + query.format(
-            start=start,
-            end=end,
-            quota=quota,
-            whole_day=whole_day and '1' or '0')
-        )
-
-    return reserve
 
 
 def encode_map_value(dictionary):
@@ -79,18 +42,12 @@ def test_view_permissions():
     utils.assert_explicit_permissions(onegov.org, onegov.org.OrgApp)
 
 
-def test_view_form_alert(org_app):
-
-    login = Client(org_app).get('/auth/login')
-    login = login.form.submit()
-
+def test_view_form_alert(client):
+    login = client.get('/auth/login').form.submit()
     assert 'Das Formular enthält Fehler' in login
 
 
-def test_view_login(org_app):
-
-    client = Client(org_app)
-
+def test_view_login(client):
     assert client.get('/auth/logout', expect_errors=True).status_code == 403
 
     response = client.get('/auth/login')
@@ -121,10 +78,7 @@ def test_view_login(org_app):
     assert client.get('/auth/logout', expect_errors=True).status_code == 403
 
 
-def test_view_files(org_app):
-
-    client = Client(org_app)
-
+def test_view_files(client):
     assert client.get('/files', expect_errors=True).status_code == 403
 
     client.login_admin()
@@ -141,10 +95,7 @@ def test_view_files(org_app):
     assert 'Test.txt' in files_page
 
 
-def test_view_images(org_app):
-
-    client = Client(org_app)
-
+def test_view_images(client):
     assert client.get('/images', expect_errors=True).status_code == 403
 
     client.login_admin()
@@ -163,9 +114,7 @@ def test_view_images(org_app):
     assert "Noch keine Bilder hochgeladen" not in images_page
 
 
-def test_login(org_app):
-    client = Client(org_app)
-
+def test_login(client):
     links = client.get('/').pyquery('.globals a.login')
     assert links.text() == 'Login'
 
@@ -197,9 +146,7 @@ def test_login(org_app):
     assert links.text() == 'Login'
 
 
-def test_reset_password(org_app):
-    client = Client(org_app)
-
+def test_reset_password(client):
     links = client.get('/').pyquery('.globals a.login')
     assert links.text() == 'Login'
     login_page = client.get(links.attr('href'))
@@ -209,13 +156,13 @@ def test_reset_password(org_app):
 
     request_page.form['email'] = 'someone@example.org'
     assert 'someone@example.org' in request_page.form.submit().follow()
-    assert len(org_app.smtp.outbox) == 0
+    assert len(client.app.smtp.outbox) == 0
 
     request_page.form['email'] = 'admin@example.org'
     assert 'admin@example.org' in request_page.form.submit().follow()
-    assert len(org_app.smtp.outbox) == 1
+    assert len(client.app.smtp.outbox) == 1
 
-    message = org_app.smtp.outbox[0]
+    message = client.app.smtp.outbox[0]
     message = message.get_payload(1).get_payload(decode=True)
     message = message.decode('iso-8859-1')
     link = list(document_fromstring(message).iterlinks())[0][2]
@@ -258,8 +205,7 @@ def test_reset_password(org_app):
     assert "Sie wurden eingeloggt" in login_page.form.submit().follow().text
 
 
-def test_unauthorized(org_app):
-    client = Client(org_app)
+def test_unauthorized(client):
 
     unauth_page = client.get('/settings', expect_errors=True)
     assert "Zugriff verweigert" in unauth_page.text
@@ -284,17 +230,13 @@ def test_unauthorized(org_app):
     assert "Zugriff verweigert" not in settings_page
 
 
-def test_notfound(org_app):
-    client = Client(org_app)
-
+def test_notfound(client):
     notfound_page = client.get('/foobar', expect_errors=True)
     assert "Seite nicht gefunden" in notfound_page
     assert notfound_page.status_code == 404
 
 
-def test_pages(org_app):
-    client = Client(org_app)
-
+def test_pages(client):
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
     assert len(client.get(root_url).pyquery('.edit-bar')) == 0
 
@@ -347,8 +289,7 @@ def test_pages(org_app):
     assert page.pyquery('.page-text i').text().startswith("Experts say hiring")
 
 
-def test_news(org_app):
-    client = Client(org_app)
+def test_news(client):
     client.login_admin().follow()
 
     page = client.get('/news')
@@ -386,11 +327,9 @@ def test_news(org_app):
     assert "It is lots of fun" not in page.text
 
 
-def test_news_on_homepage(org_app):
-    client = Client(org_app)
+def test_news_on_homepage(client):
     client.login_admin()
-
-    anon = Client(org_app)
+    anon = client.spawn()
 
     news_list = client.get('/news')
 
@@ -416,7 +355,7 @@ def test_news_on_homepage(org_app):
     assert "Foo" not in homepage
 
     # sticky news don't count toward that limit
-    foo = PageCollection(org_app.session()).by_path('news/foo')
+    foo = PageCollection(client.app.session()).by_path('news/foo')
     foo.is_visible_on_homepage = True
 
     transaction.commit()
@@ -427,7 +366,7 @@ def test_news_on_homepage(org_app):
     assert "Foo" in homepage
 
     # hidden news don't count for anonymous users
-    baz = PageCollection(org_app.session()).by_path('news/baz')
+    baz = PageCollection(client.app.session()).by_path('news/baz')
     baz.is_hidden_from_public = True
 
     transaction.commit()
@@ -443,7 +382,7 @@ def test_news_on_homepage(org_app):
     assert "Foo" in homepage
 
     # even if they are stickied
-    baz = PageCollection(org_app.session()).by_path('news/baz')
+    baz = PageCollection(client.app.session()).by_path('news/baz')
     baz.is_hidden_from_public = True
     baz.is_visible_on_homepage = True
 
@@ -460,9 +399,7 @@ def test_news_on_homepage(org_app):
     assert "Foo" in homepage
 
 
-def test_delete_pages(org_app):
-    client = Client(org_app)
-
+def test_delete_pages(client):
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
 
     client.login_admin()
@@ -484,9 +421,7 @@ def test_delete_pages(org_app):
     assert client.delete(delete_link, expect_errors=True).status_code == 404
 
 
-def test_links(org_app):
-    client = Client(org_app)
-
+def test_links(client):
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
     client.login_admin()
     root_page = client.get(root_url)
@@ -511,8 +446,8 @@ def test_links(org_app):
     assert google.location == 'https://www.google.ch'
 
 
-def test_submit_form(org_app):
-    collection = FormCollection(org_app.session())
+def test_submit_form(client):
+    collection = FormCollection(client.app.session())
     collection.definitions.add('Profile', definition=textwrap.dedent("""
         # Your Details
         First name * = ___
@@ -522,7 +457,6 @@ def test_submit_form(org_app):
 
     transaction.commit()
 
-    client = Client(org_app)
     form_page = client.get('/forms').click('Profile')
     assert 'Your Details' in form_page
     assert 'First name' in form_page
@@ -552,14 +486,14 @@ def test_submit_form(org_app):
     assert 'FRM-' in ticket_page
     assert 'ticket-state-open' in ticket_page
 
-    tickets = TicketCollection(org_app.session()).by_handler_code('FRM')
+    tickets = TicketCollection(client.app.session()).by_handler_code('FRM')
     assert len(tickets) == 1
 
     assert tickets[0].title == 'Kung, Fury, kung.fury@example.org'
     assert tickets[0].group == 'Profile'
 
     # the user should have gotten an e-mail with the entered data
-    message = org_app.smtp.outbox[-1]
+    message = client.app.smtp.outbox[-1]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
@@ -576,22 +510,21 @@ def test_submit_form(org_app):
     form_page.form.get('send_by_email', index=0).value = False
     ticket_page = form_page.form.submit().follow()
 
-    message = org_app.smtp.outbox[-1]
+    message = client.app.smtp.outbox[-1]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
     assert 'Fury' not in message
 
 
-def test_pending_submission_error_file_upload(org_app):
-    collection = FormCollection(org_app.session())
+def test_pending_submission_error_file_upload(client):
+    collection = FormCollection(client.app.session())
     collection.definitions.add('Statistics', definition=textwrap.dedent("""
         Name * = ___
         Datei * = *.txt|*.csv
     """), type='custom')
     transaction.commit()
 
-    client = Client(org_app)
     form_page = client.get('/forms').click('Statistics')
     form_page.form['datei'] = Upload('test.jpg', utils.create_image().read())
 
@@ -600,15 +533,14 @@ def test_pending_submission_error_file_upload(org_app):
     assert len(form_page.pyquery('small.error')) == 2
 
 
-def test_pending_submission_successful_file_upload(org_app):
-    collection = FormCollection(org_app.session())
+def test_pending_submission_successful_file_upload(client):
+    collection = FormCollection(client.app.session())
     collection.definitions.add('Statistics', definition=textwrap.dedent("""
         Name * = ___
         Datei * = *.txt|*.csv
     """), type='custom')
     transaction.commit()
 
-    client = Client(org_app)
     form_page = client.get('/forms').click('Statistics')
     form_page.form['datei'] = Upload('README.txt', b'1;2;3')
     form_page = form_page.form.submit().follow()
@@ -622,8 +554,7 @@ def test_pending_submission_successful_file_upload(org_app):
     # multiple differing fields of the same name...
 
 
-def test_add_custom_form(org_app):
-    client = Client(org_app)
+def test_add_custom_form(client):
     client.login_editor()
 
     # this error is not strictly line based, so there's a general error
@@ -663,8 +594,7 @@ def test_add_custom_form(org_app):
     form_page.form.submit().follow()
 
 
-def test_add_duplicate_form(org_app):
-    client = Client(org_app)
+def test_add_duplicate_form(client):
     client.login_editor()
 
     form_page = client.get('/forms/new')
@@ -686,8 +616,7 @@ def test_add_duplicate_form(org_app):
     assert "Ein Formular mit diesem Namen existiert bereits" in form_page
 
 
-def test_delete_builtin_form(org_app):
-    client = Client(org_app)
+def test_delete_builtin_form(client):
     builtin_form = '/form/anmeldung'
 
     response = client.delete(builtin_form, expect_errors=True)
@@ -699,8 +628,7 @@ def test_delete_builtin_form(org_app):
     assert response.status_code == 403
 
 
-def test_delete_custom_form(org_app):
-    client = Client(org_app)
+def test_delete_custom_form(client):
     client.login_editor()
 
     form_page = client.get('/forms/new')
@@ -712,13 +640,12 @@ def test_delete_custom_form(org_app):
         form_page.pyquery('a.delete-link')[0].attrib['ic-delete-from'])
 
 
-def test_show_uploaded_file(org_app):
-    collection = FormCollection(org_app.session())
+def test_show_uploaded_file(client):
+    collection = FormCollection(client.app.session())
     collection.definitions.add(
         'Text', definition="File * = *.txt\nE-Mail * = @@@", type='custom')
     transaction.commit()
 
-    client = Client(org_app)
     client.login_editor()
 
     form_page = client.get('/form/text')
@@ -740,11 +667,10 @@ def test_show_uploaded_file(org_app):
     assert file_response.cache_control.no_cache
     assert not file_response.cache_control.public
 
-    assert Client(org_app).get(file_response.request.url, status=404)
+    assert client.spawn().get(file_response.request.url, status=404)
 
 
-def test_hide_page(org_app):
-    client = Client(org_app)
+def test_hide_page(client):
     client.login_editor()
 
     new_page = client.get('/topics/organisation').click('Thema')
@@ -753,7 +679,7 @@ def test_hide_page(org_app):
     new_page.form['is_hidden_from_public'] = True
     page = new_page.form.submit().follow()
 
-    anonymous = Client(org_app)
+    anonymous = client.spawn()
     response = anonymous.get(page.request.url, expect_errors=True)
     assert response.status_code == 403
 
@@ -765,8 +691,7 @@ def test_hide_page(org_app):
     assert response.status_code == 200
 
 
-def test_hide_news(org_app):
-    client = Client(org_app)
+def test_hide_news(client):
     client.login_editor()
 
     new_page = client.get('/news').click('Nachricht')
@@ -775,7 +700,7 @@ def test_hide_news(org_app):
     new_page.form['is_hidden_from_public'] = True
     page = new_page.form.submit().follow()
 
-    anonymous = Client(org_app)
+    anonymous = client.spawn()
     response = anonymous.get(page.request.url, expect_errors=True)
     assert response.status_code == 403
 
@@ -787,15 +712,14 @@ def test_hide_news(org_app):
     assert response.status_code == 200
 
 
-def test_hide_form(org_app):
-    client = Client(org_app)
+def test_hide_form(client):
     client.login_editor()
 
     form_page = client.get('/form/anmeldung/edit')
     form_page.form['is_hidden_from_public'] = True
     page = form_page.form.submit().follow()
 
-    anonymous = Client(org_app)
+    anonymous = client.spawn()
     response = anonymous.get(
         '/form/anmeldung', expect_errors=True)
     assert response.status_code == 403
@@ -808,8 +732,7 @@ def test_hide_form(org_app):
     assert response.status_code == 200
 
 
-def test_people_view(org_app):
-    client = Client(org_app)
+def test_people_view(client):
     client.login_editor()
 
     people = client.get('/people')
@@ -840,8 +763,7 @@ def test_people_view(org_app):
     assert 'noch keine Personen' in people
 
 
-def test_with_people(org_app):
-    client = Client(org_app)
+def test_with_people(client):
     client.login_editor()
 
     people = client.get('/people')
@@ -861,11 +783,11 @@ def test_with_people(org_app):
     assert 'Gordon Flash' in new_page
     assert 'Ming Merciless' in new_page
 
-    gordon = org_app.session().query(Person)\
+    gordon = client.app.session().query(Person)\
         .filter(Person.last_name == 'Gordon')\
         .one()
 
-    ming = org_app.session().query(Person)\
+    ming = client.app.session().query(Person)\
         .filter(Person.last_name == 'Ming')\
         .one()
 
@@ -882,8 +804,7 @@ def test_with_people(org_app):
     assert edit_page.form['people_' + ming.id.hex + '_function'].value == ''
 
 
-def test_delete_linked_person_issue_149(org_app):
-    client = Client(org_app)
+def test_delete_linked_person_issue_149(client):
     client.login_editor()
 
     people = client.get('/people')
@@ -893,7 +814,7 @@ def test_delete_linked_person_issue_149(org_app):
     new_person.form['last_name'] = 'Gordon'
     new_person.form.submit()
 
-    gordon = org_app.session().query(Person)\
+    gordon = client.app.session().query(Person)\
         .filter(Person.last_name == 'Gordon')\
         .one()
 
@@ -911,8 +832,7 @@ def test_delete_linked_person_issue_149(org_app):
     edit_page.form.submit().follow()
 
 
-def test_tickets(org_app):
-    client = Client(org_app)
+def test_tickets(client):
 
     assert client.get(
         '/tickets/ALL/open', expect_errors=True).status_code == 403
@@ -942,13 +862,13 @@ def test_tickets(org_app):
     form_page = client.get('/form/newsletter')
     form_page.form['e_mail'] = 'info@seantis.ch'
 
-    assert len(org_app.smtp.outbox) == 0
+    assert len(client.app.smtp.outbox) == 0
 
     status_page = form_page.form.submit().follow().form.submit().follow()
 
-    assert len(org_app.smtp.outbox) == 1
+    assert len(client.app.smtp.outbox) == 1
 
-    message = org_app.smtp.outbox[0]
+    message = client.app.smtp.outbox[0]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
@@ -993,9 +913,9 @@ def test_tickets(org_app):
     assert page.pyquery('.pending-tickets').attr('data-count') == '0'
     assert page.pyquery('.closed-tickets').attr('data-count') == '1'
 
-    assert len(org_app.smtp.outbox) == 2
+    assert len(client.app.smtp.outbox) == 2
 
-    message = org_app.smtp.outbox[1]
+    message = client.app.smtp.outbox[1]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
@@ -1020,7 +940,7 @@ def test_tickets(org_app):
     assert page.pyquery('.pending-tickets').attr('data-count') == '1'
     assert page.pyquery('.closed-tickets').attr('data-count') == '0'
 
-    message = org_app.smtp.outbox[2]
+    message = client.app.smtp.outbox[2]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
@@ -1028,8 +948,7 @@ def test_tickets(org_app):
     assert '/status' in message
 
 
-def test_ticket_states_idempotent(org_app):
-    client = Client(org_app)
+def test_ticket_states_idempotent(client):
     client.login_editor()
 
     page = client.get('/forms/new')
@@ -1041,20 +960,20 @@ def test_ticket_states_idempotent(org_app):
     page.form['e_mail'] = 'info@seantis.ch'
 
     page.form.submit().follow().form.submit().follow()
-    assert len(org_app.smtp.outbox) == 1
+    assert len(client.app.smtp.outbox) == 1
     assert len(client.get('/timeline/feed').json['messages']) == 1
 
     page = client.get('/tickets/ALL/open')
     page.click('Annehmen')
     page.click('Annehmen')
     page = page.click('Annehmen').follow()
-    assert len(org_app.smtp.outbox) == 1
+    assert len(client.app.smtp.outbox) == 1
     assert len(client.get('/timeline/feed').json['messages']) == 2
 
     page.click('Ticket abschliessen')
     page.click('Ticket abschliessen')
     page = page.click('Ticket abschliessen').follow()
-    assert len(org_app.smtp.outbox) == 2
+    assert len(client.app.smtp.outbox) == 2
     assert len(client.get('/timeline/feed').json['messages']) == 3
 
     page = client.get(
@@ -1064,16 +983,16 @@ def test_ticket_states_idempotent(org_app):
     page.click('Ticket wieder öffnen')
     page.click('Ticket wieder öffnen')
     page = page.click('Ticket wieder öffnen').follow()
-    assert len(org_app.smtp.outbox) == 3
+    assert len(client.app.smtp.outbox) == 3
     assert len(client.get('/timeline/feed').json['messages']) == 4
 
 
-def test_resource_slots(org_app):
+def test_resource_slots(client):
 
-    resources = ResourceCollection(org_app.libres_context)
+    resources = ResourceCollection(client.app.libres_context)
     resource = resources.add("Foo", 'Europe/Zurich')
 
-    scheduler = resource.get_scheduler(org_app.libres_context)
+    scheduler = resource.get_scheduler(client.app.libres_context)
     scheduler.allocate(
         dates=[
             (datetime(2015, 8, 4), datetime(2015, 8, 4)),
@@ -1095,8 +1014,6 @@ def test_resource_slots(org_app):
     )
 
     transaction.commit()
-
-    client = Client(org_app)
 
     url = '/resource/foo/slots'
     assert client.get(url).json == []
@@ -1124,8 +1041,7 @@ def test_resource_slots(org_app):
     assert result[0]['title'] == "12:00 - 16:00 \nBesetzt"
 
 
-def test_resources(org_app):
-    client = Client(org_app)
+def test_resources(client):
     client.login_admin()
 
     resources = client.get('/resources')
@@ -1149,8 +1065,7 @@ def test_resources(org_app):
     assert client.delete(delete_link, status=200)
 
 
-def test_reserved_resources_fields(org_app):
-    client = Client(org_app)
+def test_reserved_resources_fields(client):
     client.login_admin()
 
     room = client.get('/resources').click('Raum')
@@ -1168,8 +1083,7 @@ def test_reserved_resources_fields(org_app):
     assert "Meeting Room" in room
 
 
-def test_clipboard(org_app):
-    client = Client(org_app)
+def test_clipboard(client):
     client.login_admin()
 
     page = client.get('/topics/organisation')
@@ -1186,8 +1100,7 @@ def test_clipboard(org_app):
     assert '/organisation/organisation' in page.request.url
 
 
-def test_clipboard_separation(org_app):
-    client = Client(org_app)
+def test_clipboard_separation(client):
     client.login_admin()
 
     page = client.get('/topics/organisation')
@@ -1196,14 +1109,13 @@ def test_clipboard_separation(org_app):
     assert 'paste-link' in client.get('/topics/organisation')
 
     # new client (browser) -> new clipboard
-    client = Client(org_app)
+    client = client.spawn()
     client.login_admin()
 
     assert 'paste-link' not in client.get('/topics/organisation')
 
 
-def test_copy_pages_to_news(org_app):
-    client = Client(org_app)
+def test_copy_pages_to_news(client):
     client.login_admin()
 
     page = client.get('/topics/organisation')
@@ -1222,8 +1134,7 @@ def test_copy_pages_to_news(org_app):
     assert '/news/organisation' in page.request.url
 
 
-def test_sitecollection(org_app):
-    client = Client(org_app)
+def test_sitecollection(client):
 
     assert client.get('/sitecollection', expect_errors=True).status_code == 403
 
@@ -1238,8 +1149,7 @@ def test_sitecollection(org_app):
     }
 
 
-def test_allocations(org_app):
-    client = Client(org_app)
+def test_allocations(client):
     client.login_admin()
 
     # create a new daypass allocation
@@ -1331,8 +1241,7 @@ def test_allocations(org_app):
     assert len(slots.json) == 0
 
 
-def test_allocation_times(org_app):
-    client = Client(org_app)
+def test_allocation_times(client):
     client.login_admin()
 
     new = client.get('/resources').click('Raum')
@@ -1393,15 +1302,13 @@ def test_allocation_times(org_app):
     assert slots.json[1]['end'] == '2015-08-26T00:00:00+02:00'
 
 
-def test_reserve_allocation(org_app):
-
-    client = Client(org_app)
+def test_reserve_allocation(client):
 
     # prepate the required data
-    resources = ResourceCollection(org_app.libres_context)
+    resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
     resource.definition = 'Note = ___'
-    scheduler = resource.get_scheduler(org_app.libres_context)
+    scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
         dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
@@ -1410,7 +1317,7 @@ def test_reserve_allocation(org_app):
         quota_limit=4
     )
 
-    reserve = bound_reserve(client, allocations[0])
+    reserve = client.bound_reserve(allocations[0])
     transaction.commit()
 
     # create a reservation
@@ -1426,7 +1333,7 @@ def test_reserve_allocation(org_app):
     ticket = formular.form.submit().follow().form.submit().follow()
 
     assert 'RSV-' in ticket.text
-    assert len(org_app.smtp.outbox) == 1
+    assert len(client.app.smtp.outbox) == 1
 
     # make sure the resulting reservation has no session_id set
     ids = [r.session_id for r in scheduler.managed_reservations()]
@@ -1467,9 +1374,9 @@ def test_reserve_allocation(org_app):
     ticket = ticket.click('Alle Reservationen annehmen').follow()
 
     assert 'Alle Reservationen annehmen' not in ticket
-    assert len(org_app.smtp.outbox) == 2
+    assert len(client.app.smtp.outbox) == 2
 
-    message = org_app.smtp.outbox[1]
+    message = client.app.smtp.outbox[1]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
@@ -1485,23 +1392,23 @@ def test_reserve_allocation(org_app):
     assert '0xdeadbeef' in ticket
 
     # reject it
-    assert org_app.session().query(Reservation).count() == 1
-    assert org_app.session().query(FormSubmission).count() == 1
+    assert client.app.session().query(Reservation).count() == 1
+    assert client.app.session().query(FormSubmission).count() == 1
 
     link = ticket.pyquery('a.delete-link')[0].attrib['ic-get-from']
     ticket = client.get(link).follow()
 
-    assert org_app.session().query(Reservation).count() == 0
-    assert org_app.session().query(FormSubmission).count() == 0
+    assert client.app.session().query(Reservation).count() == 0
+    assert client.app.session().query(FormSubmission).count() == 0
 
     assert "Der hinterlegte Datensatz wurde entfernt" in ticket
     assert '28. August 2015' in ticket
     assert '4' in ticket
     assert '0xdeadbeef' in ticket
 
-    assert len(org_app.smtp.outbox) == 3
+    assert len(client.app.smtp.outbox) == 3
 
-    message = org_app.smtp.outbox[2]
+    message = client.app.smtp.outbox[2]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
@@ -1512,17 +1419,15 @@ def test_reserve_allocation(org_app):
     # close the ticket
     ticket.click('Ticket abschliessen')
 
-    assert len(org_app.smtp.outbox) == 4
+    assert len(client.app.smtp.outbox) == 4
 
 
-def test_reserve_allocation_partially(org_app):
-
-    client = Client(org_app)
+def test_reserve_allocation_partially(client):
 
     # prepate the required data
-    resources = ResourceCollection(org_app.libres_context)
+    resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
-    scheduler = resource.get_scheduler(org_app.libres_context)
+    scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
         dates=(datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 14)),
@@ -1530,7 +1435,7 @@ def test_reserve_allocation_partially(org_app):
         partly_available=True
     )
 
-    reserve = bound_reserve(client, allocations[0])
+    reserve = client.bound_reserve(allocations[0])
     transaction.commit()
 
     # create a reservation
@@ -1543,7 +1448,7 @@ def test_reserve_allocation_partially(org_app):
     ticket = formular.form.submit().follow().form.submit().follow()
 
     assert 'RSV-' in ticket.text
-    assert len(org_app.smtp.outbox) == 1
+    assert len(client.app.smtp.outbox) == 1
 
     # open the created ticket
     client.login_admin()
@@ -1557,7 +1462,7 @@ def test_reserve_allocation_partially(org_app):
     # accept it
     ticket = ticket.click('Alle Reservationen annehmen').follow()
 
-    message = org_app.smtp.outbox[1]
+    message = client.app.smtp.outbox[1]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
@@ -1572,14 +1477,12 @@ def test_reserve_allocation_partially(org_app):
     assert slots[0]['partitions'] == [[50.0, True], [50.0, False]]
 
 
-def test_reserve_no_definition(org_app):
-
-    client = Client(org_app)
+def test_reserve_no_definition(client):
 
     # prepate the required data
-    resources = ResourceCollection(org_app.libres_context)
+    resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
-    scheduler = resource.get_scheduler(org_app.libres_context)
+    scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
         dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
@@ -1588,7 +1491,7 @@ def test_reserve_no_definition(org_app):
         quota_limit=4
     )
 
-    reserve = bound_reserve(client, allocations[0])
+    reserve = client.bound_reserve(allocations[0])
     transaction.commit()
 
     # create a reservation
@@ -1602,16 +1505,14 @@ def test_reserve_no_definition(org_app):
     ticket = formular.form.submit().follow().form.submit().follow()
 
     assert 'RSV-' in ticket.text
-    assert len(org_app.smtp.outbox) == 1
+    assert len(client.app.smtp.outbox) == 1
 
 
-def test_reserve_confirmation_no_definition(org_app):
+def test_reserve_confirmation_no_definition(client):
 
-    client = Client(org_app)
-
-    resources = ResourceCollection(org_app.libres_context)
+    resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
-    scheduler = resource.get_scheduler(org_app.libres_context)
+    scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
         dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
@@ -1620,7 +1521,7 @@ def test_reserve_confirmation_no_definition(org_app):
         quota_limit=4
     )
 
-    reserve = bound_reserve(client, allocations[0])
+    reserve = client.bound_reserve(allocations[0])
     transaction.commit()
 
     # create a reservation
@@ -1648,22 +1549,20 @@ def test_reserve_confirmation_no_definition(org_app):
     assert "changed@example.org" in confirmation
 
 
-def test_reserve_confirmation_with_definition(org_app):
+def test_reserve_confirmation_with_definition(client):
 
-    client = Client(org_app)
-
-    resources = ResourceCollection(org_app.libres_context)
+    resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
     resource.definition = "Vorname *= ___\nNachname *= ___"
 
-    scheduler = resource.get_scheduler(org_app.libres_context)
+    scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
         dates=(datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 12)),
         whole_day=False,
         partly_available=True
     )
-    reserve = bound_reserve(client, allocations[0])
+    reserve = client.bound_reserve(allocations[0])
 
     transaction.commit()
 
@@ -1693,14 +1592,12 @@ def test_reserve_confirmation_with_definition(org_app):
     assert "Alderson" in confirmation
 
 
-def test_reserve_session_bound(org_app):
-
-    client = Client(org_app)
+def test_reserve_session_bound(client):
 
     # prepate the required data
-    resources = ResourceCollection(org_app.libres_context)
+    resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
-    scheduler = resource.get_scheduler(org_app.libres_context)
+    scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
         dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
@@ -1709,7 +1606,7 @@ def test_reserve_session_bound(org_app):
         quota_limit=4
     )
 
-    reserve = bound_reserve(client, allocations[0])
+    reserve = client.bound_reserve(allocations[0])
     transaction.commit()
 
     # create a reservation
@@ -1722,19 +1619,18 @@ def test_reserve_session_bound(org_app):
     complete_url = confirm.pyquery('form:last').attr('action')
 
     # make sure the finalize step can only be called by the original client
-    c2 = Client(org_app)
+    c2 = client.spawn()
 
     assert c2.post(complete_url, expect_errors=True).status_code == 403
     assert client.post(complete_url).follow().status_code == 200
 
 
-def test_delete_reservation_anonymous(org_app):
-    client = Client(org_app)
+def test_delete_reservation_anonymous(client):
 
     # prepate the required data
-    resources = ResourceCollection(org_app.libres_context)
+    resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
-    scheduler = resource.get_scheduler(org_app.libres_context)
+    scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
         dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
@@ -1743,7 +1639,7 @@ def test_delete_reservation_anonymous(org_app):
         quota_limit=4
     )
 
-    reserve = bound_reserve(client, allocations[0])
+    reserve = client.bound_reserve(allocations[0])
     transaction.commit()
 
     # create a reservation
@@ -1759,7 +1655,7 @@ def test_delete_reservation_anonymous(org_app):
     assert url.endswith('?csrf-token=')
 
     # other clients still can't use the link
-    assert Client(org_app).delete(url, status=403)
+    assert client.spawn().delete(url, status=403)
     assert len(client.get(reservations_url).json['reservations']) == 1
 
     # only the original client can
@@ -1767,23 +1663,23 @@ def test_delete_reservation_anonymous(org_app):
     assert len(client.get(reservations_url).json['reservations']) == 0
 
 
-def test_reserve_in_parallel(org_app):
+def test_reserve_in_parallel(client):
 
     # prepate the required data
-    resources = ResourceCollection(org_app.libres_context)
+    resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
-    scheduler = resource.get_scheduler(org_app.libres_context)
+    scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
         dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
         whole_day=True
     )
 
-    c1 = Client(org_app)
-    c2 = Client(org_app)
+    c1 = client.spawn()
+    c2 = client.spawn()
 
-    c1_reserve = bound_reserve(c1, allocations[0])
-    c2_reserve = bound_reserve(c2, allocations[0])
+    c1_reserve = c1.bound_reserve(allocations[0])
+    c2_reserve = c2.bound_reserve(allocations[0])
     transaction.commit()
 
     # create a reservation
@@ -1804,20 +1700,19 @@ def test_reserve_in_parallel(org_app):
         in f2.form.submit().follow()
 
 
-def test_occupancy_view(org_app):
+def test_occupancy_view(client):
 
     # prepate the required data
-    resources = ResourceCollection(org_app.libres_context)
+    resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
-    scheduler = resource.get_scheduler(org_app.libres_context)
+    scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
         dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
         whole_day=True
     )
 
-    client = Client(org_app)
-    reserve = bound_reserve(client, allocations[0])
+    reserve = client.bound_reserve(allocations[0])
     transaction.commit()
 
     client.login_admin()
@@ -1840,22 +1735,21 @@ def test_occupancy_view(org_app):
     assert len(occupancy.pyquery('.occupancy-block')) == 1
 
 
-def test_reservation_export_view(org_app):
+def test_reservation_export_view(client):
 
     # prepate the required data
-    resources = ResourceCollection(org_app.libres_context)
+    resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
     resource.definition = "Vorname *= ___\nNachname *= ___"
 
-    scheduler = resource.get_scheduler(org_app.libres_context)
+    scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
         dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
         whole_day=True
     )
 
-    client = Client(org_app)
-    reserve = bound_reserve(client, allocations[0])
+    reserve = client.bound_reserve(allocations[0])
     transaction.commit()
 
     client.login_admin()
@@ -1890,11 +1784,11 @@ def test_reservation_export_view(org_app):
     assert charlie['form'] == {'vorname': 'Charlie', 'nachname': 'Carson'}
 
 
-def test_reserve_session_separation(org_app):
-    c1 = Client(org_app)
+def test_reserve_session_separation(client):
+    c1 = client.spawn()
     c1.login_admin()
 
-    c2 = Client(org_app)
+    c2 = client.spawn()
     c2.login_admin()
 
     reserve = []
@@ -1905,14 +1799,14 @@ def test_reserve_session_separation(org_app):
         new.form['title'] = room
         new.form.submit()
 
-        resource = org_app.libres_resources.by_name(room)
+        resource = client.app.libres_resources.by_name(room)
         allocations = resource.scheduler.allocate(
             dates=(datetime(2016, 4, 28, 12, 0), datetime(2016, 4, 28, 13, 0)),
             whole_day=False
         )
 
-        reserve.append(bound_reserve(c1, allocations[0]))
-        reserve.append(bound_reserve(c2, allocations[0]))
+        reserve.append(c1.bound_reserve(allocations[0]))
+        reserve.append(c2.bound_reserve(allocations[0]))
         transaction.commit()
 
     c1_reserve_room, c2_reserve_room, c1_reserve_gym, c2_reserve_gym = reserve
@@ -1936,7 +1830,7 @@ def test_reserve_session_separation(org_app):
     # make sure if we confirm one reservation, only one will be written
     formular.form.submit().follow().form.submit().follow()
 
-    resource = org_app.libres_resources.by_name('meeting-room')
+    resource = client.app.libres_resources.by_name('meeting-room')
     assert resource.scheduler.managed_reserved_slots().count() == 1
 
     result = c1.get('/resource/meeting-room/reservations'.format(room)).json
@@ -1952,8 +1846,7 @@ def test_reserve_session_separation(org_app):
     assert len(result['reservations']) == 1
 
 
-def test_reserve_reservation_prediction(org_app):
-    client = Client(org_app)
+def test_reserve_reservation_prediction(client):
     client.login_admin()
 
     new = client.get('/resources').click('Raum')
@@ -1962,7 +1855,7 @@ def test_reserve_reservation_prediction(org_app):
 
     transaction.begin()
 
-    resource = org_app.libres_resources.by_name('gym')
+    resource = client.app.libres_resources.by_name('gym')
 
     a1 = resource.scheduler.allocate(
         dates=(datetime(2017, 1, 1, 12, 0), datetime(2017, 1, 1, 13, 0)),
@@ -1973,8 +1866,8 @@ def test_reserve_reservation_prediction(org_app):
         whole_day=False
     )[0]
 
-    reserve_a1 = bound_reserve(client, a1)
-    reserve_a2 = bound_reserve(client, a2)
+    reserve_a1 = client.bound_reserve(a1)
+    reserve_a2 = client.bound_reserve(a2)
 
     transaction.commit()
 
@@ -1986,7 +1879,7 @@ def test_reserve_reservation_prediction(org_app):
 
     transaction.begin()
 
-    resource = org_app.libres_resources.by_name('gym')
+    resource = client.app.libres_resources.by_name('gym')
     a3 = resource.scheduler.allocate(
         dates=(datetime(2017, 1, 3, 12, 0), datetime(2017, 1, 3, 13, 0)),
         whole_day=False
@@ -1996,7 +1889,7 @@ def test_reserve_reservation_prediction(org_app):
         whole_day=False
     )
 
-    reserve_a3 = bound_reserve(client, a3)
+    reserve_a3 = client.bound_reserve(a3)
     transaction.commit()
 
     reserve_a3()
@@ -2011,13 +1904,12 @@ def test_reserve_reservation_prediction(org_app):
     assert prediction['wholeDay'] is False
 
 
-def test_reserve_multiple_allocations(org_app):
-    client = Client(org_app)
+def test_reserve_multiple_allocations(client):
     client.login_admin()
 
     transaction.begin()
 
-    resource = org_app.libres_resources.by_name('tageskarte')
+    resource = client.app.libres_resources.by_name('tageskarte')
     thursday = resource.scheduler.allocate(
         dates=(datetime(2016, 4, 28), datetime(2016, 4, 28)),
         whole_day=True
@@ -2027,8 +1919,8 @@ def test_reserve_multiple_allocations(org_app):
         whole_day=True
     )[0]
 
-    reserve_thursday = bound_reserve(client, thursday)
-    reserve_friday = bound_reserve(client, friday)
+    reserve_thursday = client.bound_reserve(thursday)
+    reserve_friday = client.bound_reserve(friday)
 
     transaction.commit()
 
@@ -2046,7 +1938,7 @@ def test_reserve_multiple_allocations(org_app):
 
     ticket = confirmation.form.submit().follow()
     assert 'RSV-' in ticket.text
-    assert len(org_app.smtp.outbox) == 1
+    assert len(client.app.smtp.outbox) == 1
 
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
     assert "info@example.org" in ticket
@@ -2056,7 +1948,7 @@ def test_reserve_multiple_allocations(org_app):
     # accept it
     ticket.click('Alle Reservationen annehmen')
 
-    message = org_app.smtp.outbox[1]
+    message = client.app.smtp.outbox[1]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
@@ -2065,7 +1957,7 @@ def test_reserve_multiple_allocations(org_app):
     assert "29. April 2016" in message
 
     # make sure the reservations are no longer pending
-    resource = org_app.libres_resources.by_name('tageskarte')
+    resource = client.app.libres_resources.by_name('tageskarte')
 
     reservations = resource.scheduler.managed_reservations()
     assert reservations.filter(Reservation.status == 'approved').count() == 2
@@ -2075,7 +1967,7 @@ def test_reserve_multiple_allocations(org_app):
     # now deny them
     client.get(ticket.pyquery('a.delete-link')[0].attrib['ic-get-from'])
 
-    message = org_app.smtp.outbox[2]
+    message = client.app.smtp.outbox[2]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
@@ -2090,13 +1982,12 @@ def test_reserve_multiple_allocations(org_app):
     assert resource.scheduler.managed_reserved_slots().count() == 0
 
 
-def test_reserve_and_deny_multiple_dates(org_app):
-    client = Client(org_app)
+def test_reserve_and_deny_multiple_dates(client):
     client.login_admin()
 
     transaction.begin()
 
-    resource = org_app.libres_resources.by_name('tageskarte')
+    resource = client.app.libres_resources.by_name('tageskarte')
     wednesday = resource.scheduler.allocate(
         dates=(datetime(2016, 4, 27), datetime(2016, 4, 27)),
         whole_day=True
@@ -2110,9 +2001,9 @@ def test_reserve_and_deny_multiple_dates(org_app):
         whole_day=True
     )[0]
 
-    reserve_wednesday = bound_reserve(client, wednesday)
-    reserve_thursday = bound_reserve(client, thursday)
-    reserve_friday = bound_reserve(client, friday)
+    reserve_wednesday = client.bound_reserve(wednesday)
+    reserve_thursday = client.bound_reserve(thursday)
+    reserve_friday = client.bound_reserve(friday)
 
     transaction.commit()
 
@@ -2128,7 +2019,7 @@ def test_reserve_and_deny_multiple_dates(org_app):
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
 
     # the resource needs to be refetched after the commit
-    resource = org_app.libres_resources.by_name('tageskarte')
+    resource = client.app.libres_resources.by_name('tageskarte')
     assert resource.scheduler.managed_reserved_slots().count() == 3
 
     # deny the last reservation
@@ -2173,16 +2064,16 @@ def test_reserve_and_deny_multiple_dates(org_app):
     assert "29. April 2016" not in message
 
 
-def test_reserve_failing_multiple(org_app):
-    c1 = Client(org_app)
+def test_reserve_failing_multiple(client):
+    c1 = client.spawn()
     c1.login_admin()
 
-    c2 = Client(org_app)
+    c2 = client.spawn()
     c2.login_admin()
 
     transaction.begin()
 
-    resource = org_app.libres_resources.by_name('tageskarte')
+    resource = client.app.libres_resources.by_name('tageskarte')
     thursday = resource.scheduler.allocate(
         dates=(datetime(2016, 4, 28), datetime(2016, 4, 28)),
         whole_day=True
@@ -2192,10 +2083,10 @@ def test_reserve_failing_multiple(org_app):
         whole_day=True
     )[0]
 
-    c1_reserve_thursday = bound_reserve(c1, thursday)
-    c1_reserve_friday = bound_reserve(c1, friday)
-    c2_reserve_thursday = bound_reserve(c2, thursday)
-    c2_reserve_friday = bound_reserve(c2, friday)
+    c1_reserve_thursday = c1.bound_reserve(thursday)
+    c1_reserve_friday = c1.bound_reserve(friday)
+    c2_reserve_thursday = c2.bound_reserve(thursday)
+    c2_reserve_friday = c2.bound_reserve(friday)
 
     transaction.commit()
 
@@ -2222,12 +2113,12 @@ def test_reserve_failing_multiple(org_app):
     assert 'class="reservation failed"' in confirmation
 
 
-def test_cleanup_allocations(org_app):
+def test_cleanup_allocations(client):
 
     # prepate the required data
-    resources = ResourceCollection(org_app.libres_context)
+    resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
-    scheduler = resource.get_scheduler(org_app.libres_context)
+    scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
         dates=(
@@ -2242,7 +2133,6 @@ def test_cleanup_allocations(org_app):
     transaction.commit()
 
     # clean up the data
-    client = Client(org_app)
     client.login_admin()
 
     cleanup = client.get('/resource/tageskarte').click("Aufräumen")
@@ -2259,8 +2149,7 @@ def test_cleanup_allocations(org_app):
     assert "1 Einteilungen wurden erfolgreich entfernt" in resource
 
 
-def test_view_occurrences(org_app):
-    client = Client(org_app)
+def test_view_occurrences(client):
 
     def events(query=''):
         page = client.get('/events/?{}'.format(query))
@@ -2333,8 +2222,7 @@ def test_view_occurrences(org_app):
     assert max(dates(query)) == unique_dates[-2]
 
 
-def test_view_occurrence(org_app):
-    client = Client(org_app)
+def test_view_occurrence(client):
     events = client.get('/events')
 
     event = events.click("Generalversammlung")
@@ -2360,8 +2248,7 @@ def test_view_occurrence(org_app):
     event.click('Alle Termine exportieren').text.startswith('BEGIN:VCALENDAR')
 
 
-def test_submit_event(org_app):
-    client = Client(org_app)
+def test_submit_event(client):
     form_page = client.get('/events').click("Veranstaltung melden")
 
     assert "Das Formular enthält Fehler" in form_page.form.submit()
@@ -2426,8 +2313,8 @@ def test_submit_event(org_app):
 
     assert "My Event" not in client.get('/events')
 
-    assert len(org_app.smtp.outbox) == 1
-    message = org_app.smtp.outbox[0]
+    assert len(client.app.smtp.outbox) == 1
+    message = client.app.smtp.outbox[0]
     assert message.get('to') == "test@example.org"
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('utf-8')
@@ -2471,8 +2358,8 @@ def test_submit_event(org_app):
 
     assert "My Event" in client.get('/events')
 
-    assert len(org_app.smtp.outbox) == 2
-    message = org_app.smtp.outbox[1]
+    assert len(client.app.smtp.outbox) == 2
+    message = client.app.smtp.outbox[1]
     assert message.get('to') == "test@example.org"
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('utf-8')
@@ -2493,16 +2380,15 @@ def test_submit_event(org_app):
     # Close ticket
     ticket_page.click("Ticket abschliessen").follow()
 
-    assert len(org_app.smtp.outbox) == 3
-    message = org_app.smtp.outbox[2]
+    assert len(client.app.smtp.outbox) == 3
+    message = client.app.smtp.outbox[2]
     assert message.get('to') == "test@example.org"
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('utf-8')
     assert ticket_nr in message
 
 
-def test_edit_event(org_app):
-    client = Client(org_app)
+def test_edit_event(client):
 
     # Submit and publish an event
     form_page = client.get('/events').click("Veranstaltung melden")
@@ -2551,8 +2437,7 @@ def test_edit_event(org_app):
     assert "Stadtfest" in client.get('/events')
 
 
-def test_delete_event(org_app):
-    client = Client(org_app)
+def test_delete_event(client):
 
     # Submit and publish an event
     form_page = client.get('/events').click("Veranstaltung melden")
@@ -2584,8 +2469,8 @@ def test_delete_event(org_app):
     delete_link = ticket_page.pyquery('a.delete-link').attr('ic-delete-from')
     client.delete(delete_link)
 
-    assert len(org_app.smtp.outbox) == 3
-    message = org_app.smtp.outbox[2]
+    assert len(client.app.smtp.outbox) == 3
+    message = client.app.smtp.outbox[2]
     assert message.get('to') == "test@example.org"
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('utf-8')
@@ -2607,8 +2492,8 @@ def test_delete_event(org_app):
 
 
 @pytest.mark.flaky(reruns=3)
-def test_basic_search(es_org_app):
-    client = Client(es_org_app)
+def test_basic_search(client_with_es):
+    client = client_with_es
     client.login_admin()
 
     add_news = client.get('/news').click('Nachricht')
@@ -2617,7 +2502,7 @@ def test_basic_search(es_org_app):
     add_news.form['text'] = "Much <em>wow</em>"
     news = add_news.form.submit().follow()
 
-    es_org_app.es_client.indices.refresh(index='_all')
+    client.app.es_client.indices.refresh(index='_all')
 
     root_page = client.get('/')
     root_page.form['q'] = "fulltext"
@@ -2634,23 +2519,23 @@ def test_basic_search(es_org_app):
     assert "It is pretty awesome" in search_page
 
     # make sure anonymous doesn't see hidden things in the search results
-    assert "fulltext" in Client(es_org_app).get('/search?q=fulltext')
+    assert "fulltext" in client.spawn().get('/search?q=fulltext')
     edit_news = news.click("Bearbeiten")
     edit_news.form['is_hidden_from_public'] = True
     edit_news.form.submit()
 
-    es_org_app.es_client.indices.refresh(index='_all')
+    client.app.es_client.indices.refresh(index='_all')
 
-    assert "Now supporting" not in Client(es_org_app).get('/search?q=fulltext')
+    assert "Now supporting" not in client.spawn().get('/search?q=fulltext')
     assert "Now supporting" in client.get('/search?q=fulltext')
 
 
 @pytest.mark.flaky(reruns=3)
-def test_view_search_is_limiting(es_org_app):
+def test_view_search_is_limiting(client_with_es):
     # ensures that the search doesn't just return all results
     # a regression that occured for anonymous uses only
 
-    client = Client(es_org_app)
+    client = client_with_es
     client.login_admin()
 
     add_news = client.get('/news').click('Nachricht')
@@ -2663,7 +2548,7 @@ def test_view_search_is_limiting(es_org_app):
     add_news.form['lead'] = "Deadbeef"
     add_news.form.submit()
 
-    es_org_app.es_client.indices.refresh(index='_all')
+    client.app.es_client.indices.refresh(index='_all')
 
     root_page = client.get('/')
     root_page.form['q'] = "Foobar"
@@ -2681,9 +2566,8 @@ def test_view_search_is_limiting(es_org_app):
 
 
 @pytest.mark.flaky(reruns=3)
-def test_basic_autocomplete(es_org_app):
-    client = Client(es_org_app)
-
+def test_basic_autocomplete(client_with_es):
+    client = client_with_es
     client.login_editor()
 
     people = client.get('/people')
@@ -2693,21 +2577,21 @@ def test_basic_autocomplete(es_org_app):
     new_person.form['last_name'] = 'Gordon'
     new_person.form.submit()
 
-    es_org_app.es_client.indices.refresh(index='_all')
+    client.app.es_client.indices.refresh(index='_all')
     assert client.get('/search/suggest?q=Go').json == ["Gordon Flash"]
     assert client.get('/search/suggest?q=Fl').json == []
 
 
-def test_unsubscribe_link(org_app):
+def test_unsubscribe_link(client):
 
-    client = Client(org_app)
+    user = UserCollection(client.app.session())\
+        .by_username('editor@example.org')
 
-    user = UserCollection(org_app.session()).by_username('editor@example.org')
     assert not user.data
 
-    request = Bunch(identity_secret=org_app.identity_secret, app=org_app)
+    request = Bunch(identity_secret=client.app.identity_secret, app=client.app)
 
-    token = org_app.request_class.new_url_safe_token(request, {
+    token = client.app.request_class.new_url_safe_token(request, {
         'user': 'editor@example.org'
     }, salt='unsubscribe')
 
@@ -2715,10 +2599,12 @@ def test_unsubscribe_link(org_app):
     page = client.get('/')
     assert "abgemeldet" in page
 
-    user = UserCollection(org_app.session()).by_username('editor@example.org')
+    user = UserCollection(client.app.session())\
+        .by_username('editor@example.org')
+
     assert user.data['daily_ticket_statistics'] == False
 
-    token = org_app.request_class.new_url_safe_token(request, {
+    token = client.app.request_class.new_url_safe_token(request, {
         'user': 'unknown@example.org'
     }, salt='unsubscribe')
 
@@ -2726,7 +2612,7 @@ def test_unsubscribe_link(org_app):
         '/unsubscribe?token={}'.format(token), expect_errors=True)
     assert page.status_code == 403
 
-    token = org_app.request_class.new_url_safe_token(request, {
+    token = client.app.request_class.new_url_safe_token(request, {
         'user': 'editor@example.org'
     }, salt='foobar')
 
@@ -2735,9 +2621,8 @@ def test_unsubscribe_link(org_app):
     assert page.status_code == 403
 
 
-def test_newsletters_crud(org_app):
+def test_newsletters_crud(client):
 
-    client = Client(org_app)
     client.login_editor()
 
     newsletter = client.get('/newsletters')
@@ -2775,7 +2660,7 @@ def test_newsletters_crud(org_app):
     assert "Noch nicht gesendet." in newsletters
 
     # not sent, therefore not visible to the public
-    assert "noch keine Newsletter" in Client(org_app).get('/newsletters')
+    assert "noch keine Newsletter" in client.spawn().get('/newsletters')
 
     delete_link = newsletter.pyquery('a.delete-link').attr('ic-delete-from')
     client.delete(delete_link)
@@ -2784,9 +2669,7 @@ def test_newsletters_crud(org_app):
     assert "noch keine Newsletter" in newsletters
 
 
-def test_newsletter_signup(org_app):
-
-    client = Client(org_app)
+def test_newsletter_signup(client):
 
     page = client.get('/newsletters')
     page.form['address'] = 'asdf'
@@ -2797,13 +2680,13 @@ def test_newsletter_signup(org_app):
     page.form['address'] = 'info@example.org'
     page.form.submit()
 
-    assert len(org_app.smtp.outbox) == 1
+    assert len(client.app.smtp.outbox) == 1
 
     # make sure double submissions don't result in multiple e-mails
     page.form.submit()
-    assert len(org_app.smtp.outbox) == 1
+    assert len(client.app.smtp.outbox) == 1
 
-    message = org_app.smtp.outbox[0]
+    message = client.app.smtp.outbox[0]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('utf-8')
 
@@ -2819,7 +2702,7 @@ def test_newsletter_signup(org_app):
 
     # subscribing still works the same, but there's still no email sent
     page.form.submit()
-    assert len(org_app.smtp.outbox) == 1
+    assert len(client.app.smtp.outbox) == 1
 
     # unsubscribing does not result in an e-mail either
     assert "falsches Token" in client.get(
@@ -2830,24 +2713,22 @@ def test_newsletter_signup(org_app):
     ).follow()
 
     # no e-mail is sent when unsubscribing
-    assert len(org_app.smtp.outbox) == 1
+    assert len(client.app.smtp.outbox) == 1
 
     # however, we can now signup again
     page.form.submit()
-    assert len(org_app.smtp.outbox) == 2
+    assert len(client.app.smtp.outbox) == 2
 
 
-def test_newsletter_subscribers_management(org_app):
-
-    client = Client(org_app)
+def test_newsletter_subscribers_management(client):
 
     page = client.get('/newsletters')
     page.form['address'] = 'info@example.org'
     page.form.submit()
 
-    assert len(org_app.smtp.outbox) == 1
+    assert len(client.app.smtp.outbox) == 1
 
-    message = org_app.smtp.outbox[0]
+    message = client.app.smtp.outbox[0]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('utf-8')
 
@@ -2864,9 +2745,8 @@ def test_newsletter_subscribers_management(org_app):
     assert "info@example.org wurde erfolgreich abgemeldet" in result
 
 
-def test_newsletter_send(org_app):
-    client = Client(org_app)
-    anon = Client(org_app)
+def test_newsletter_send(client):
+    anon = client.spawn()
 
     client.login_editor()
 
@@ -2882,7 +2762,7 @@ def test_newsletter_send(org_app):
     newsletter = new.form.submit().follow()
 
     # add some recipients the quick wqy
-    recipients = RecipientCollection(org_app.session())
+    recipients = RecipientCollection(client.app.session())
     recipients.add('one@example.org', confirmed=True)
     recipients.add('two@example.org', confirmed=True)
     recipients.add('xxx@example.org', confirmed=False)
@@ -2916,9 +2796,9 @@ def test_newsletter_send(org_app):
     assert len(send.pyquery('.previous-recipients li')) == 2
 
     # make sure the mail was sent correctly
-    assert len(org_app.smtp.outbox) == 2
+    assert len(client.app.smtp.outbox) == 2
 
-    message = org_app.smtp.outbox[0]
+    message = client.app.smtp.outbox[0]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('utf-8')
 
@@ -2931,7 +2811,7 @@ def test_newsletter_send(org_app):
     # make sure the unconfirm link is different for each mail
     unconfirm_1 = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)
 
-    message = org_app.smtp.outbox[1]
+    message = client.app.smtp.outbox[1]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('utf-8')
 
@@ -2948,8 +2828,7 @@ def test_newsletter_send(org_app):
     assert recipients.query().count() == 1
 
 
-def test_newsletter_schedule(org_app):
-    client = Client(org_app)
+def test_newsletter_schedule(client):
     client.login_editor()
 
     # add a newsletter
@@ -2963,7 +2842,7 @@ def test_newsletter_schedule(org_app):
     newsletter = new.form.submit().follow()
 
     # add some recipients the quick wqy
-    recipients = RecipientCollection(org_app.session())
+    recipients = RecipientCollection(client.app.session())
     recipients.add('one@example.org', confirmed=True)
     recipients.add('two@example.org', confirmed=True)
 
@@ -2991,8 +2870,7 @@ def test_newsletter_schedule(org_app):
         send.form.submit().follow()
 
 
-def test_newsletter_test_delivery(org_app):
-    client = Client(org_app)
+def test_newsletter_test_delivery(client):
     client.login_editor()
 
     # add a newsletter
@@ -3006,7 +2884,7 @@ def test_newsletter_test_delivery(org_app):
     newsletter = new.form.submit().follow()
 
     # add some recipients the quick wqy
-    recipients = RecipientCollection(org_app.session())
+    recipients = RecipientCollection(client.app.session())
     recipients.add('one@example.org', confirmed=True)
     recipients.add('two@example.org', confirmed=True)
 
@@ -3018,21 +2896,20 @@ def test_newsletter_test_delivery(org_app):
     send.form['selected_recipient'] = recipient
     send.form.submit().follow()
 
-    assert len(org_app.smtp.outbox) == 1
+    assert len(client.app.smtp.outbox) == 1
 
     send = newsletter.click('Test')
     send.form['selected_recipient'] = recipient
     send.form.submit().follow()
 
-    assert len(org_app.smtp.outbox) == 2
+    assert len(client.app.smtp.outbox) == 2
 
-    newsletter = NewsletterCollection(org_app.session()).query().one()
+    newsletter = NewsletterCollection(client.app.session()).query().one()
     assert newsletter.sent is None
     assert not newsletter.recipients
 
 
-def test_map_default_view(org_app):
-    client = Client(org_app)
+def test_map_default_view(client):
     client.login_admin()
 
     settings = client.get('/settings')
@@ -3055,8 +2932,7 @@ def test_map_default_view(org_app):
     assert 'data-default-zoom="12"' in edit
 
 
-def test_map_set_marker(org_app):
-    client = Client(org_app)
+def test_map_set_marker(client):
     client.login_admin()
 
     edit = client.get('/editor/edit/page/1')
@@ -3077,8 +2953,7 @@ def test_map_set_marker(org_app):
     assert 'data-zoom="12"' in page
 
 
-def test_manage_album(org_app):
-    client = Client(org_app)
+def test_manage_album(client):
     client.login_editor()
 
     albums = client.get('/photoalbums')
@@ -3115,8 +2990,7 @@ def test_manage_album(org_app):
     assert "This is an alt text" in album
 
 
-def test_settings(org_app):
-    client = Client(org_app)
+def test_settings(client):
 
     assert client.get('/settings', expect_errors=True).status_code == 403
 
@@ -3158,10 +3032,8 @@ def test_settings(org_app):
     assert '<script>alert("Hi!");</script>' in settings_page.text
 
 
-def test_registration_honeypot(org_app):
-    org_app.enable_user_registration = True
-
-    client = Client(org_app)
+def test_registration_honeypot(client):
+    client.app.enable_user_registration = True
 
     register = client.get('/auth/register')
     register.form['username'] = 'spam@example.org'
@@ -3172,11 +3044,8 @@ def test_registration_honeypot(org_app):
     assert "Das Feld ist nicht leer" in register.form.submit()
 
 
-def test_registration(org_app):
-
-    org_app.enable_user_registration = True
-
-    client = Client(org_app)
+def test_registration(client):
+    client.app.enable_user_registration = True
 
     register = client.get('/auth/register')
     register.form['username'] = 'user@example.org'
@@ -3202,29 +3071,26 @@ def test_registration(org_app):
     assert "eingeloggt" in logged_in
 
 
-def test_registration_disabled(org_app):
+def test_registration_disabled(client):
 
-    client = Client(org_app)
-    org_app.enable_user_registration = False
+    client.app.enable_user_registration = False
 
     assert client.get('/auth/register', status=404)
 
 
-def test_disabled_yubikey(org_app):
-    client = Client(org_app)
+def test_disabled_yubikey(client):
     client.login_admin()
 
-    org_app.enable_yubikey = False
+    client.app.enable_yubikey = False
     assert 'YubiKey' not in client.get('/auth/login')
     assert 'YubiKey' not in client.get('/usermanagement')
 
-    org_app.enable_yubikey = True
+    client.app.enable_yubikey = True
     assert 'YubiKey' in client.get('/auth/login')
     assert 'YubiKey' in client.get('/usermanagement')
 
 
-def test_disable_users(org_app):
-    client = Client(org_app)
+def test_disable_users(client):
     client.login_admin()
 
     users = client.get('/usermanagement')
@@ -3235,7 +3101,7 @@ def test_disable_users(org_app):
     editor.form['state'] = 'inactive'
     editor.form.submit()
 
-    login = Client(org_app).login_editor()
+    login = client.spawn().login_editor()
     assert login.status_code == 200
 
     editor = users.click('Bearbeiten', index=1)
@@ -3243,15 +3109,14 @@ def test_disable_users(org_app):
     editor.form['state'] = 'active'
     editor.form.submit()
 
-    login = Client(org_app).login_editor()
+    login = client.spawn().login_editor()
     assert login.status_code == 302
 
 
-def test_change_role(org_app):
-    client = Client(org_app)
+def test_change_role(client):
     client.login_admin()
 
-    org_app.enable_yubikey = True
+    client.app.enable_yubikey = True
 
     editor = client.get('/usermanagement').click('Bearbeiten', index=1)
     assert "müssen zwingend einen YubiKey" in editor.form.submit()
@@ -3268,18 +3133,17 @@ def test_change_role(org_app):
     editor.form['yubikey'] = 'cccccccdefgh'
     assert editor.form.submit().status_code == 302
 
-    org_app.enable_yubikey = False
+    client.app.enable_yubikey = False
     editor.form['role'] = 'admin'
     editor.form['state'] = 'active'
     editor.form['yubikey'] = ''
     assert editor.form.submit().status_code == 302
 
 
-def test_unique_yubikey(org_app):
-    client = Client(org_app)
+def test_unique_yubikey(client):
     client.login_admin()
 
-    org_app.enable_yubikey = True
+    client.app.enable_yubikey = True
 
     users = client.get('/usermanagement')
     admin = users.click('Bearbeiten', index=0)
@@ -3296,11 +3160,10 @@ def test_unique_yubikey(org_app):
     assert admin.form.submit().status_code == 302
 
 
-def test_add_new_user_without_activation_email(org_app):
-    client = Client(org_app)
+def test_add_new_user_without_activation_email(client):
     client.login_admin()
 
-    org_app.enable_yubikey = True
+    client.app.enable_yubikey = True
 
     new = client.get('/usermanagement').click('Benutzer', index=2)
     new.form['username'] = 'admin@example.org'
@@ -3319,17 +3182,16 @@ def test_add_new_user_without_activation_email(org_app):
     assert "Passwort" in added
     password = added.pyquery('.panel strong').text()
 
-    login = Client(org_app).get('/auth/login')
+    login = client.spawn().get('/auth/login')
     login.form['username'] = 'member@example.org'
     login.form['password'] = password
     assert login.form.submit().status_code == 302
 
 
-def test_add_new_user_with_activation_email(org_app):
-    client = Client(org_app)
+def test_add_new_user_with_activation_email(client):
     client.login_admin()
 
-    org_app.enable_yubikey = False
+    client.app.enable_yubikey = False
 
     new = client.get('/usermanagement').click('Benutzer', index=2)
     new.form['username'] = 'member@example.org'
@@ -3344,29 +3206,28 @@ def test_add_new_user_with_activation_email(org_app):
     reset = re.search(
         r'(http://localhost/auth/reset-password[^)]+)', email).group()
 
-    page = Client(org_app).get(reset)
+    page = client.spawn().get(reset)
     page.form['email'] = 'member@example.org'
     page.form['password'] = 'p@ssw0rd'
     page.form.submit()
 
-    login = Client(org_app).get('/auth/login')
+    login = client.spawn().get('/auth/login')
     login.form['username'] = 'member@example.org'
     login.form['password'] = 'p@ssw0rd'
     assert login.form.submit().status_code == 302
 
 
-def test_edit_user_settings(org_app):
-    client = Client(org_app)
+def test_edit_user_settings(client):
     client.login_admin()
 
-    org_app.enable_yubikey = False
+    client.app.enable_yubikey = False
 
     new = client.get('/usermanagement').click('Benutzer', index=2)
     new.form['username'] = 'new@example.org'
     new.form['role'] = 'member'
     new.form.submit()
 
-    users = UserCollection(org_app.session())
+    users = UserCollection(client.app.session())
     assert not users.by_username('new@example.org').data
 
     edit = client.get('/usermanagement').click('Bearbeiten', index=2)
@@ -3379,9 +3240,9 @@ def test_edit_user_settings(org_app):
         .data['daily_ticket_statistics']
 
 
-def test_homepage(org_app):
-    org_app.org.meta['homepage_cover'] = "<b>0xdeadbeef</b>"
-    org_app.org.meta['homepage_structure'] = """
+def test_homepage(client):
+    client.app.org.meta['homepage_cover'] = "<b>0xdeadbeef</b>"
+    client.app.org.meta['homepage_structure'] = """
         <row>
             <column span="8">
                 <homepage-cover />
@@ -3399,17 +3260,16 @@ def test_homepage(org_app):
 
     transaction.commit()
 
-    client = Client(org_app)
     homepage = client.get('/')
 
     assert '<b>0xdeadbeef</b>' in homepage
     assert '<h2>Veranstaltungen</h2>' in homepage
 
 
-def test_send_ticket_email(org_app):
-    anon = Client(org_app)
+def test_send_ticket_email(client):
+    anon = client.spawn()
 
-    admin = Client(org_app)
+    admin = client.spawn()
     admin.login_admin()
 
     # make sure submitted event emails are sent to everyone, unless the
@@ -3429,18 +3289,18 @@ def test_send_ticket_email(org_app):
 
         page.form.submit().follow().form.submit()
 
-    del org_app.smtp.outbox[:]
+    del client.app.smtp.outbox[:]
 
     submit_event(admin, 'admin@example.org')
-    assert len(org_app.smtp.outbox) == 0
+    assert len(client.app.smtp.outbox) == 0
 
     submit_event(admin, 'someone-else@example.org')
-    assert len(org_app.smtp.outbox) == 1
-    assert 'someone-else@example.org' == org_app.smtp.outbox[0]['To']
+    assert len(client.app.smtp.outbox) == 1
+    assert 'someone-else@example.org' == client.app.smtp.outbox[0]['To']
 
     submit_event(anon, 'admin@example.org')
-    assert len(org_app.smtp.outbox) == 2
-    assert 'admin@example.org' == org_app.smtp.outbox[1]['To']
+    assert len(client.app.smtp.outbox) == 2
+    assert 'admin@example.org' == client.app.smtp.outbox[1]['To']
 
     # ticket notifications can be manually disabled
     page = admin.get('/tickets/ALL/open').click('Annehmen', index=1).follow()
@@ -3450,15 +3310,15 @@ def test_send_ticket_email(org_app):
     ticket_url = page.request.url
     page = page.click('Ticket abschliessen').follow()
 
-    assert len(org_app.smtp.outbox) == 2
+    assert len(client.app.smtp.outbox) == 2
     page = admin.get(ticket_url)
     page = page.click('E-Mails aktivieren').follow()
 
     page = page.click('Ticket wieder öffnen').follow()
-    assert len(org_app.smtp.outbox) == 3
+    assert len(client.app.smtp.outbox) == 3
 
     # make sure the same holds true for forms
-    collection = FormCollection(org_app.session())
+    collection = FormCollection(client.app.session())
     collection.definitions.add('Profile', definition=textwrap.dedent("""
         Name * = ___
         E-Mail * = @@@
@@ -3471,19 +3331,19 @@ def test_send_ticket_email(org_app):
         page.form['e_mail'] = email
         page.form.submit().follow().form.submit()
 
-    del org_app.smtp.outbox[:]
+    del client.app.smtp.outbox[:]
 
     submit_form(admin, 'admin@example.org')
-    assert len(org_app.smtp.outbox) == 0
+    assert len(client.app.smtp.outbox) == 0
 
     submit_form(admin, 'someone-else@example.org')
-    assert len(org_app.smtp.outbox) == 1
-    assert 'someone-else@example.org' == org_app.smtp.outbox[0]['To']
+    assert len(client.app.smtp.outbox) == 1
+    assert 'someone-else@example.org' == client.app.smtp.outbox[0]['To']
 
     # and for reservations
-    resources = ResourceCollection(org_app.libres_context)
+    resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
-    scheduler = resource.get_scheduler(org_app.libres_context)
+    scheduler = resource.get_scheduler(client.app.libres_context)
 
     allocations = scheduler.allocate(
         dates=(datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 14)),
@@ -3492,7 +3352,7 @@ def test_send_ticket_email(org_app):
         quota=10
     )
 
-    reserve = bound_reserve(admin, allocations[0])
+    reserve = admin.bound_reserve(allocations[0])
     transaction.commit()
 
     def submit_reservation(client, email):
@@ -3504,22 +3364,20 @@ def test_send_ticket_email(org_app):
 
         formular.form.submit().follow().form.submit().follow()
 
-    del org_app.smtp.outbox[:]
+    del client.app.smtp.outbox[:]
 
     submit_reservation(admin, 'admin@example.org')
-    assert len(org_app.smtp.outbox) == 0
+    assert len(client.app.smtp.outbox) == 0
 
     submit_reservation(admin, 'someone-else@example.org')
-    assert len(org_app.smtp.outbox) == 1
-    assert 'someone-else@example.org' == org_app.smtp.outbox[0]['To']
+    assert len(client.app.smtp.outbox) == 1
+    assert 'someone-else@example.org' == client.app.smtp.outbox[0]['To']
 
 
-def test_login_with_required_userprofile(org_app):
+def test_login_with_required_userprofile(client):
     # userprofile is not complete
-    org_app.settings.org.require_complete_userprofile = True
-    org_app.settings.org.is_complete_userprofile = lambda r, u: False
-
-    client = Client(org_app)
+    client.app.settings.org.require_complete_userprofile = True
+    client.app.settings.org.is_complete_userprofile = lambda r, u: False
 
     page = client.get('/auth/login?to=/settings')
     page.form['username'] = 'admin@example.org'
@@ -3538,10 +3396,8 @@ def test_login_with_required_userprofile(org_app):
     assert 'settings' in page.request.url
 
     # userprofile is complete
-    org_app.settings.org.require_complete_userprofile = True
-    org_app.settings.org.is_complete_userprofile = lambda r, u: True
-
-    client = Client(org_app)
+    client.app.settings.org.require_complete_userprofile = True
+    client.app.settings.org.is_complete_userprofile = lambda r, u: True
 
     page = client.get('/auth/login?to=/settings')
     page.form['username'] = 'admin@example.org'
@@ -3551,10 +3407,8 @@ def test_login_with_required_userprofile(org_app):
     assert 'settings' in page.request.url
 
     # completeness not required
-    org_app.settings.org.require_complete_userprofile = False
-    org_app.settings.org.is_complete_userprofile = lambda r, u: True
-
-    client = Client(org_app)
+    client.app.settings.org.require_complete_userprofile = False
+    client.app.settings.org.is_complete_userprofile = lambda r, u: True
 
     page = client.get('/auth/login?to=/settings')
     page.form['username'] = 'admin@example.org'
@@ -3564,8 +3418,8 @@ def test_login_with_required_userprofile(org_app):
     assert 'settings' in page.request.url
 
 
-def test_manual_form_payment(org_app):
-    collection = FormCollection(org_app.session())
+def test_manual_form_payment(client):
+    collection = FormCollection(client.app.session())
     collection.definitions.add('Govikon Poster', definition=textwrap.dedent("""
         E-Mail *= @@@
 
@@ -3580,8 +3434,6 @@ def test_manual_form_payment(org_app):
     """), type='custom')
 
     transaction.commit()
-
-    client = Client(org_app)
 
     page = client.get('/form/govikon-poster')
     assert '10.00 CHF' in page
@@ -3623,11 +3475,10 @@ def test_manual_form_payment(org_app):
     assert "Offen" in payments
 
 
-def test_manual_reservation_payment_with_extra(org_app):
-    client = Client(org_app)
+def test_manual_reservation_payment_with_extra(client):
 
     # prepate the required data
-    resources = ResourceCollection(org_app.libres_context)
+    resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
     resource.pricing_method = 'per_item'
     resource.price_per_item = 15.00
@@ -3638,7 +3489,7 @@ def test_manual_reservation_payment_with_extra(org_app):
             ( ) No
     """)
 
-    scheduler = resource.get_scheduler(org_app.libres_context)
+    scheduler = resource.get_scheduler(client.app.libres_context)
     allocations = scheduler.allocate(
         dates=(
             datetime(2017, 7, 9),
@@ -3648,7 +3499,7 @@ def test_manual_reservation_payment_with_extra(org_app):
         quota=4
     )
 
-    reserve = bound_reserve(client, allocations[0])
+    reserve = client.bound_reserve(allocations[0])
     transaction.commit()
 
     # create a reservation
@@ -3690,17 +3541,16 @@ def test_manual_reservation_payment_with_extra(org_app):
     assert "Offen" in payments
 
 
-def test_manual_reservation_payment_without_extra(org_app):
-    client = Client(org_app)
+def test_manual_reservation_payment_without_extra(client):
 
     # prepate the required data
-    resources = ResourceCollection(org_app.libres_context)
+    resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
     resource.pricing_method = 'per_hour'
     resource.price_per_hour = 10.00
     resource.payment_method = 'manual'
 
-    scheduler = resource.get_scheduler(org_app.libres_context)
+    scheduler = resource.get_scheduler(client.app.libres_context)
     allocations = scheduler.allocate(
         dates=(
             datetime(2017, 7, 9, 10),
@@ -3708,7 +3558,7 @@ def test_manual_reservation_payment_without_extra(org_app):
         )
     )
 
-    reserve = bound_reserve(client, allocations[0])
+    reserve = client.bound_reserve(allocations[0])
     transaction.commit()
 
     # create a reservation
@@ -3745,11 +3595,10 @@ def test_manual_reservation_payment_without_extra(org_app):
     assert "Offen" in payments
 
 
-def test_setup_stripe(org_app):
-    client = Client(org_app)
+def test_setup_stripe(client):
     client.login_admin()
 
-    assert org_app.default_payment_provider is None
+    assert client.app.default_payment_provider is None
 
     with requests_mock.Mocker() as m:
         m.post('https://oauth.example.org/register/foo', json={
@@ -3772,7 +3621,7 @@ def test_setup_stripe(org_app):
 
         client.get(url.as_string())
 
-    provider = org_app.default_payment_provider
+    provider = client.app.default_payment_provider
     assert provider.title == 'Stripe Connect'
     assert provider.publishable_key == 'stripe_publishable_key'
     assert provider.user_id == 'stripe_user_id'
@@ -3780,8 +3629,8 @@ def test_setup_stripe(org_app):
     assert provider.access_token == 'access_token'
 
 
-def test_stripe_form_payment(org_app):
-    collection = FormCollection(org_app.session())
+def test_stripe_form_payment(client):
+    collection = FormCollection(client.app.session())
     collection.definitions.add('Donate', definition=textwrap.dedent("""
         E-Mail *= @@@
 
@@ -3790,15 +3639,13 @@ def test_stripe_form_payment(org_app):
             ( ) Medium (100 CHF)
     """), type='custom', payment_method='free')
 
-    providers = PaymentProviderCollection(org_app.session())
+    providers = PaymentProviderCollection(client.app.session())
     providers.add(type='stripe_connect', default=True, meta={
         'publishable_key': '0xdeadbeef',
         'access_token': 'foobar'
     })
 
     transaction.commit()
-
-    client = Client(org_app)
 
     page = client.get('/form/donate')
     page.form['e_mail'] = 'info@example.org'
@@ -3851,8 +3698,8 @@ def test_stripe_form_payment(org_app):
     assert "0.59" in payments
 
 
-def test_stripe_charge_fee_to_customer(org_app):
-    collection = FormCollection(org_app.session())
+def test_stripe_charge_fee_to_customer(client):
+    collection = FormCollection(client.app.session())
     collection.definitions.add('Donate', definition=textwrap.dedent("""
         E-Mail *= @@@
 
@@ -3861,7 +3708,7 @@ def test_stripe_charge_fee_to_customer(org_app):
             ( ) Medium (100 CHF)
     """), type='custom', payment_method='free')
 
-    providers = PaymentProviderCollection(org_app.session())
+    providers = PaymentProviderCollection(client.app.session())
     providers.add(type='stripe_connect', default=True, meta={
         'publishable_key': '0xdeadbeef',
         'access_token': 'foobar',
@@ -3870,7 +3717,6 @@ def test_stripe_charge_fee_to_customer(org_app):
 
     transaction.commit()
 
-    client = Client(org_app)
     client.login_admin()
 
     with requests_mock.Mocker() as m:
@@ -3930,9 +3776,8 @@ def test_stripe_charge_fee_to_customer(org_app):
     assert "0.61" in payments
 
 
-def test_switch_languages(org_app):
+def test_switch_languages(client):
 
-    client = Client(org_app)
     client.login_admin()
 
     page = client.get('/settings')
@@ -3946,9 +3791,8 @@ def test_switch_languages(org_app):
     assert 'Deutsch' not in page
 
 
-def test_directory_visibility(org_app):
+def test_directory_visibility(client):
 
-    client = Client(org_app)
     client.login_admin()
 
     page = client.get('/directories')
@@ -3967,7 +3811,7 @@ def test_directory_visibility(org_app):
     page.form['name'] = 'Soccer Club'
     page.form.submit()
 
-    anon = Client(org_app)
+    anon = client.spawn()
     assert "Clubs" in anon.get('/directories')
     assert "Soccer" in anon.get('/directories/clubs')
     assert "Soccer" in anon.get('/directories/clubs/soccer-club')
@@ -3993,9 +3837,8 @@ def test_directory_visibility(org_app):
     assert anon.get('/directories/clubs/soccer-club')
 
 
-def test_directory_submissions(org_app, postgres):
+def test_directory_submissions(client, postgres):
 
-    client = Client(org_app)
     client.login_admin()
 
     # create a directory does not accept submissions
@@ -4074,7 +3917,9 @@ def test_directory_submissions(org_app, postgres):
     assert 'Washington' in client.get('/directories/points-of-interest')
 
     # the description here is a multiline field
-    desc = org_app.session().query(DirectoryEntry).one().values['description']
+    desc = client.app.session().query(DirectoryEntry)\
+        .one().values['description']
+
     assert '\n' in desc
     transaction.abort()
 
@@ -4135,13 +3980,15 @@ def test_directory_submissions(org_app, postgres):
     client.post(accept_url)
 
     # the description here is no longer a multiline field
-    desc = org_app.session().query(DirectoryEntry).one().values['description']
+    desc = client.app.session().query(DirectoryEntry)\
+        .one().values['description']
+
     assert '\n' not in desc
     transaction.abort()
 
 
-def test_dependent_number_form(org_app):
-    collection = FormCollection(org_app.session())
+def test_dependent_number_form(client):
+    collection = FormCollection(client.app.session())
     collection.definitions.add('Profile', definition=textwrap.dedent("""
         E-Mail *= @@@
         Country =
@@ -4152,7 +3999,6 @@ def test_dependent_number_form(org_app):
 
     transaction.commit()
 
-    client = Client(org_app)
     page = client.get('/form/profile')
     page.form['e_mail'] = 'info@example.org'
     page = page.form.submit().follow()
@@ -4160,12 +4006,11 @@ def test_dependent_number_form(org_app):
     assert "Bitte überprüfen Sie Ihre Angaben" in page
 
 
-def test_registration_form_hints(org_app):
-    collection = FormCollection(org_app.session())
+def test_registration_form_hints(client):
+    collection = FormCollection(client.app.session())
     collection.definitions.add('Meetup', "E-Mail *= @@@", 'custom')
     transaction.commit()
 
-    client = Client(org_app)
     client.login_editor()
 
     page = client.get('/form/meetup')
@@ -4232,8 +4077,8 @@ def test_registration_form_hints(org_app):
         assert "Keine Plätze mehr verfügbar" in page
 
 
-def test_registration_complete_after_deadline(org_app):
-    collection = FormCollection(org_app.session())
+def test_registration_complete_after_deadline(client):
+    collection = FormCollection(client.app.session())
 
     form = collection.definitions.add('Meetup', "E-Mail *= @@@", 'custom')
     form.add_registration_window(
@@ -4242,8 +4087,6 @@ def test_registration_complete_after_deadline(org_app):
     )
 
     transaction.commit()
-
-    client = Client(org_app)
 
     # the registration is started before the end of the deadline
     with freeze_time('2018-01-31 22:59:59'):
@@ -4255,11 +4098,11 @@ def test_registration_complete_after_deadline(org_app):
     with freeze_time('2018-01-31 23:00:00'):
         page = page.form.submit().follow()
         assert "Anmeldungen sind nicht mehr möglich" in page
-        assert TicketCollection(org_app.session()).query().count() == 0
+        assert TicketCollection(client.app.session()).query().count() == 0
 
 
-def test_registration_race_condition(org_app):
-    collection = FormCollection(org_app.session())
+def test_registration_race_condition(client):
+    collection = FormCollection(client.app.session())
 
     form = collection.definitions.add('Meetup', "E-Mail *= @@@", 'custom')
     form.add_registration_window(
@@ -4271,8 +4114,8 @@ def test_registration_race_condition(org_app):
 
     transaction.commit()
 
-    foo = Client(org_app)
-    bar = Client(org_app)
+    foo = client.spawn()
+    bar = client.spawn()
 
     def fill_out_form(client):
         page = client.get('/form/meetup')
@@ -4291,8 +4134,8 @@ def test_registration_race_condition(org_app):
         assert "Anmeldungen sind nicht mehr möglich" in complete_form(bar)
 
 
-def test_registration_change_limit_after_submissions(org_app):
-    collection = FormCollection(org_app.session())
+def test_registration_change_limit_after_submissions(client):
+    collection = FormCollection(client.app.session())
 
     form = collection.definitions.add('Meetup', "E-Mail *= @@@", 'custom')
     form.add_registration_window(
@@ -4304,7 +4147,6 @@ def test_registration_change_limit_after_submissions(org_app):
 
     transaction.commit()
 
-    client = Client(org_app)
     client.login_editor()
 
     with freeze_time('2018-01-01'):
@@ -4349,8 +4191,8 @@ def test_registration_change_limit_after_submissions(org_app):
     assert "Ihre Änderungen wurden gespeichert" in page
 
 
-def test_registration_ticket_workflow(org_app):
-    collection = FormCollection(org_app.session())
+def test_registration_ticket_workflow(client):
+    collection = FormCollection(client.app.session())
 
     form = collection.definitions.add('Meetup', textwrap.dedent("""
         E-Mail *= @@@
@@ -4366,7 +4208,6 @@ def test_registration_ticket_workflow(org_app):
 
     transaction.commit()
 
-    client = Client(org_app)
     client.login_editor()
 
     def register(e_mail, name, include_data_in_email):
@@ -4387,40 +4228,40 @@ def test_registration_ticket_workflow(org_app):
     assert "bestätigen" in page
     assert "ablehnen" in page
 
-    msg = org_app.smtp.sent[-1]
+    msg = client.app.smtp.sent[-1]
     assert "Ein neues Ticket wurde für Sie eröffnet" in msg
     assert "Foobar" in msg
 
     page = page.click("Anmeldung bestätigen").follow()
 
-    msg = org_app.smtp.sent[-1]
+    msg = client.app.smtp.sent[-1]
     assert 'Ihre Anmeldung für "Meetup" wurde bestätigt' in msg
     assert "01.01.2018 - 31.01.2018" in msg
     assert "Foobar" in msg
 
     page = page.click("Anmeldung stornieren").follow()
 
-    msg = org_app.smtp.sent[-1]
+    msg = client.app.smtp.sent[-1]
     assert 'Ihre Anmeldung für "Meetup" wurde storniert' in msg
     assert "01.01.2018 - 31.01.2018" in msg
     assert "Foobar" in msg
 
     page = register('info@example.org', 'Foobar', include_data_in_email=False)
 
-    msg = org_app.smtp.sent[-1]
+    msg = client.app.smtp.sent[-1]
     assert "Ein neues Ticket wurde für Sie eröffnet" in msg
     assert "Foobar" not in msg
 
     page.click("Anmeldung ablehnen")
 
-    msg = org_app.smtp.sent[-1]
+    msg = client.app.smtp.sent[-1]
     assert 'Ihre Anmeldung für "Meetup" wurde abgelehnt' in msg
     assert "01.01.2018 - 31.01.2018" in msg
     assert "Foobar" not in msg
 
 
-def test_registration_not_in_front_of_queue(org_app):
-    collection = FormCollection(org_app.session())
+def test_registration_not_in_front_of_queue(client):
+    collection = FormCollection(client.app.session())
 
     form = collection.definitions.add('Meetup', "E-Mail *= @@@", 'custom')
     form.add_registration_window(
@@ -4432,7 +4273,6 @@ def test_registration_not_in_front_of_queue(org_app):
 
     transaction.commit()
 
-    client = Client(org_app)
     client.login_editor()
 
     with freeze_time('2018-01-01'):

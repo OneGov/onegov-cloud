@@ -6,10 +6,37 @@ from onegov.org import OrgApp
 from onegov.org.initial_content import create_new_organisation
 from onegov.org.layout import DefaultLayout
 from onegov.org.new_elements import Element
-from onegov_testing import Client
-from onegov_testing.utils import create_app
 from onegov.user import User
+from onegov_testing import Client as BaseClient
+from onegov_testing.utils import create_app
 from pytest_localserver.http import WSGIServer
+
+
+class Client(BaseClient):
+    skip_first_form = True
+    use_intercooler = True
+
+    def bound_reserve(self, allocation):
+
+        default_start = '{:%H:%M}'.format(allocation.start)
+        default_end = '{:%H:%M}'.format(allocation.end)
+        default_whole_day = allocation.whole_day
+        resource = allocation.resource
+        allocation_id = allocation.id
+
+        def reserve(
+            start=default_start,
+            end=default_end,
+            quota=1,
+            whole_day=default_whole_day
+        ):
+            return self.post(
+                f'/allocation/{resource}/{allocation_id}/reserve'
+                f'?start={start}&end={end}&quota={quota}'
+                f'&whole_day={whole_day and "1" or "0"}'
+            )
+
+        return reserve
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -38,6 +65,16 @@ def org_app(request):
 @pytest.fixture(scope='function')
 def es_org_app(request):
     yield create_org_app(request, use_elasticsearch=True)
+
+
+@pytest.fixture(scope='function')
+def client(org_app):
+    return Client(org_app)
+
+
+@pytest.fixture(scope='function')
+def client_with_es(es_org_app):
+    return Client(es_org_app)
 
 
 @pytest.fixture(scope='function')
