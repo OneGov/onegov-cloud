@@ -5,6 +5,7 @@ from decimal import Decimal
 from onegov.form.utils import decimal_range
 from onegov.form.parser.grammar import (
     checkbox,
+    code,
     currency,
     date,
     datetime,
@@ -320,3 +321,10 @@ def test_decimal_range():
         == decimal_range('0.0', '-20.0')
     assert field.parseString('-10.00..-20.00')[0] \
         == decimal_range('-10.0', '-20.0')
+
+
+def test_code():
+    field = code()
+
+    assert field.parseString('<markdown>').syntax == 'markdown'
+    assert field.parseString('<markdown>').type == 'code'

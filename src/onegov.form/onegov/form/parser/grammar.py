@@ -83,14 +83,11 @@ def as_regex(tokens):
         return re.compile(tokens[0])
 
 
-def rstrip(tokens):
-    """ Strips whitetext on the right of the token. """
-    return tokens[0].rstrip()
-
-
 def unwrap(tokens):
     """ Unwraps grouped tokens. """
-    return tokens[0]
+
+    if tokens:
+        return tokens[0]
 
 
 def tag(**tags):
@@ -121,6 +118,15 @@ def number_enclosed_in(characters):
     """
     left, right = characters
     return enclosed_in(numeric, characters).setParseAction(as_int)
+
+
+def choices_enclosed_in(characters, choices):
+    """ Wraps the given choices in the given characters, making sure only
+    valid choices are possible.
+
+    """
+    choices = Regex(f'({"|".join(choices)})')
+    return enclosed_in(choices, characters).setParseAction(unwrap)
 
 
 def mark_enclosed_in(characters):
@@ -180,6 +186,23 @@ def textarea():
     textarea.setParseAction(tag(type='textarea'))
 
     return textarea
+
+
+def code():
+    """ Returns a code textfield with a specified syntax.
+
+    Currently only markdown is supported.
+
+    Example::
+
+        <markdown>
+
+    """
+
+    code = choices_enclosed_in('<>', ('markdown', ))('syntax')
+    code.addParseAction(tag(type='code'))
+
+    return code
 
 
 def password():

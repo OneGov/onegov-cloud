@@ -178,6 +178,15 @@ There are two types of number fields. An integer and a float field::
     I'm a float field = 0.00..99.00
     I'm an float field of a different range = -100.00..100.00
 
+Code
+~~~~
+
+To write code in a certain syntax, use the following::
+
+    Description = <markdown>
+
+Currently, only markdown is supported.
+
 Files
 ~~~~~
 
@@ -313,6 +322,7 @@ from decimal import Decimal
 from onegov.core.utils import Bunch
 from onegov.form import errors
 from onegov.form.parser.grammar import checkbox
+from onegov.form.parser.grammar import code
 from onegov.form.parser.grammar import date
 from onegov.form.parser.grammar import datetime
 from onegov.form.parser.grammar import decimal_range_field
@@ -338,6 +348,7 @@ def create_parser_elements():
     elements.fieldset_title = fieldset_title()
     elements.textfield = textfield()
     elements.textarea = textarea()
+    elements.code = code()
     elements.password = password()
     elements.email = email()
     elements.url = url()
@@ -354,6 +365,7 @@ def create_parser_elements():
     elements.single_line_fields = elements.identifier + pp.MatchFirst([
         elements.textfield,
         elements.textarea,
+        elements.code,
         elements.password,
         elements.email,
         elements.url,
@@ -395,6 +407,11 @@ def construct_textfield(loader, node):
 @constructor('!textarea')
 def construct_textarea(loader, node):
     return ELEMENTS.textarea.parseString(node.value)
+
+
+@constructor('!code')
+def construct_syntax(loader, node):
+    return ELEMENTS.code.parseString(node.value)
 
 
 @constructor('!email')
@@ -632,6 +649,20 @@ class TextAreaField(Field):
             parent=parent,
             fieldset=fieldset,
             rows=field.rows or None
+        )
+
+
+class CodeField(Field):
+    type = 'code'
+
+    @classmethod
+    def create(cls, field, identifier, parent=None, fieldset=None):
+        return cls(
+            label=identifier.label,
+            required=identifier.required,
+            parent=parent,
+            fieldset=fieldset,
+            syntax=field.syntax
         )
 
 

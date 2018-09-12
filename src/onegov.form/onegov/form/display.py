@@ -3,6 +3,7 @@
 import humanize
 
 from html import escape
+from onegov.core.markdown import render_untrusted_markdown
 from onegov.form import log
 
 
@@ -62,7 +63,14 @@ class BaseRenderer(object):
     'TextAreaField',
 )
 class StringFieldRenderer(BaseRenderer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def __call__(self, field):
+        if field.render_kw:
+            if field.render_kw.get('data-editor') == 'markdown':
+                return render_untrusted_markdown(field.data)
+
         return self.escape(field.data).replace('\n', '<br>')
 
 

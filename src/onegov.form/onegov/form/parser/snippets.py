@@ -43,6 +43,7 @@ class Snippets(object):
         (_("Swiss social security number"), '# ch.ssn'),
         (_("Swiss business identifier"), '# ch.uid'),
         (_("Swiss vat number"), '# ch.vat'),
+        (_("Markdown"), '<markdown>')
     )
 
     def translated(self, request):

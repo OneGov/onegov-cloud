@@ -164,6 +164,13 @@ def test_parse_fieldsets():
     assert fieldsets[2]['comment'].label.text == 'Comment'
 
 
+def test_parse_syntax():
+    form = parse_form("Text = <markdown>")()
+    assert len(form._fields.values()) == 1
+    assert form.text.label.text == 'Text'
+    assert form.text.render_kw == {'data-editor': 'markdown'}
+
+
 def test_fieldset_field_ids():
     text = dedent("""
         First Name = ___

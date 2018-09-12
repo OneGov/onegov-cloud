@@ -89,7 +89,7 @@ def handle_field(builder, field, dependency=None):
             label=field.label,
             dependency=dependency,
             required=field.required,
-            widget=with_options(TextArea, rows=field.rows)
+            render_kw={'rows': field.rows}
         )
 
     elif field.type == 'password':
@@ -227,6 +227,16 @@ def handle_field(builder, field, dependency=None):
                     field.range.stop
                 )
             ]
+        )
+
+    elif field.type == 'code':
+        builder.add_field(
+            field_class=TextAreaField,
+            field_id=field.id,
+            label=field.label,
+            dependency=dependency,
+            required=field.required,
+            render_kw={'data-editor': field.syntax}
         )
 
     else:

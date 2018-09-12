@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a markdown field to the form syntax.
+  [href]
+
 0.34.0 (2018-08-20)
 ~~~~~~~~~~~~~~~~~~~
 

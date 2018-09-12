@@ -38,6 +38,7 @@ setup(
         'colour>=0.0.4',
         'humanize',
         'jsonpickle',
+        'mistune',
         'more.webassets',
         'onegov.core>=0.70.5',
         'onegov.file',
