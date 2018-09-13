@@ -8,7 +8,6 @@ from onegov.core.cli import pass_group_context
 from onegov.event.collections import EventCollection
 from onegov.event.models import Event
 from onegov.event.models import Occurrence
-from onegov.event.models.event import recurrence_to_dates
 from onegov.gis import Coordinates
 from requests import get
 
@@ -70,8 +69,6 @@ def import_json(group_context, url, tagmap):
             end = parse(item['end'])
             timezone = item['timezone']
             recurrence = item['recurrence']
-            if recurrence:
-                recurrence_to_dates(recurrence, start, timezone)
 
             organizer = ', '.join((line for line in (
                 item['organizer'] or '',
@@ -105,7 +102,7 @@ def import_json(group_context, url, tagmap):
             if tagmap and tags:
                 unknown_tags |= set(tags) - tagmap.keys()
                 tags = {tagmap[tag] for tag in tags if tag in tagmap}
-            # todo: handle item['cat1']
+            # todo: handle item['cat2']
 
             coordinates = None
             if item['latitude'] and item['longitude']:
@@ -140,7 +137,7 @@ def import_json(group_context, url, tagmap):
         collection.from_import(events)
 
         if unknown_tags:
-            unknown_tags = ','.join(unknown_tags)
+            unknown_tags = ', '.join([f'"{tag}"' for tag in unknown_tags])
             click.secho(f"Tags not in tagmap: {unknown_tags}!", fg='yellow')
 
         click.secho(f"Imported/updated {len(events)} events", fg='green')
@@ -162,7 +159,10 @@ def import_ical(group_context, ical):
 
     def _import_ical(request, app):
         collection = EventCollection(app.session())
-        collection.from_ical(ical.read())
-        click.secho("Events imported/updated", fg='green')
+        added, updated, purged = collection.from_ical(ical.read())
+        click.secho(
+            f"Import finished "
+            f"({added} added, {updated} updated, {purged} deleted)",
+            fg='green')
 
     return _import_ical
