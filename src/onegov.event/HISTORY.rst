@@ -13,6 +13,9 @@ Changelog
 - Adds tags, timestamp, uid and coordinates to ical exports.
   [msom]
 
+- Fixes DST issue in occurrence generation.
+  [msom]
+
 - Refactors the package.
   [msom]
 

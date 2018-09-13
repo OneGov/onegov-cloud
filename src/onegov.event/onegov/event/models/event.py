@@ -1,5 +1,5 @@
 from datetime import datetime
-from dateutil import rrule
+from dateutil.rrule import rrulestr
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from icalendar import vRecur
@@ -25,25 +25,6 @@ from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from uuid import uuid4
-
-
-def recurrence_to_dates(recurrence, dtstart, timezone):
-    """ Returns the dates defined by an RRULE as list of timezone aware
-    datetimes.
-
-    """
-
-    try:
-        return list(map(
-            lambda x: standardize_date(x, timezone),
-            rrule.rrulestr(recurrence, dtstart=dtstart)
-        ))
-    except (TypeError, ValueError):
-        dtstart = to_timezone(dtstart, timezone).replace(tzinfo=None)
-        return list(map(
-            lambda x: standardize_date(x, timezone),
-            rrule.rrulestr(recurrence, dtstart=dtstart)
-        ))
 
 
 class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
@@ -152,21 +133,47 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         default to this and the next year.
         """
 
-        occurrences = [self.start]
+        def to_local(dt, timezone):
+            if dt.tzinfo:
+                return to_timezone(dt, timezone).replace(tzinfo=None)
+            return dt
+
+        dates = [self.start]
         if self.recurrence:
-            occurrences = recurrence_to_dates(
-                self.recurrence, self.start, self.timezone
-            )
-            if localize:
-                occurrences = list(map(
-                    lambda x: to_timezone(x, self.timezone), occurrences
-                ))
-            if limit:
-                max_year = datetime.today().year + 1
-                occurrences = list(
-                    filter(lambda x: x.year <= max_year, occurrences)
-                )
-        return occurrences
+            # Make sure the RRULE uses local dates (or else the DST is wrong)
+            start_local = to_local(self.start, self.timezone)
+            try:
+                rrule = rrulestr(self.recurrence, dtstart=self.start)
+                if getattr(rrule, '_dtstart', None):
+                    rrule._dtstart = to_local(rrule._dtstart, self.timezone)
+                if getattr(rrule, '_until', None):
+                    rrule._until = to_local(rrule._until, self.timezone)
+                rrule = rrulestr(str(rrule))
+            except ValueError:
+                # This might happen if only RDATEs and EXDATEs are present
+                rrule = rrulestr(self.recurrence, dtstart=start_local)
+
+            # Make sure, the RDATEs and EXDATEs contain the start times
+            for attribute in ('_exdate', '_rdate'):
+                if hasattr(rrule, attribute):
+                    setattr(rrule, attribute, [
+                        to_local(date_, self.timezone).replace(
+                            hour=start_local.hour, minute=start_local.minute
+                        )
+                        for date_ in getattr(rrule, attribute)
+                    ])
+
+            # Generate the occurences and convert to UTC
+            dates = [standardize_date(date_, self.timezone) for date_ in rrule]
+
+        if localize:
+            dates = [to_timezone(date_, self.timezone) for date_ in dates]
+
+        if limit:
+            max_year = datetime.today().year + 1
+            dates = [date_ for date_ in dates if date_.year <= max_year]
+
+        return dates
 
     def _update_occurrences(self):
         """ Updates the occurrences.

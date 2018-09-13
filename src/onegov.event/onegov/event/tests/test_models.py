@@ -157,6 +157,71 @@ def test_occurrence_dates(session):
     assert str(dates[1].tzinfo) == 'Europe/Zurich'
 
 
+def test_occurrence_dates_dst(session):
+    year = datetime.today().year
+
+    event = Event(state='initiated')
+    event.timezone = 'Europe/Zurich'
+    event.start = tzdatetime(year, 1, 1, 10, 15, 'Europe/Zurich')
+    event.end = tzdatetime(year, 1, 11, 16, 00, 'Europe/Zurich')
+
+    event.recurrence = 'RRULE:FREQ=MONTHLY;COUNT=12'
+    occurrences = event.occurrence_dates(localize=True)
+    assert len(occurrences) == 12
+    assert all((o.hour == 10 for o in occurrences))
+
+    event.recurrence = 'RRULE:FREQ=MONTHLY;INTERVAL=1;COUNT=12'
+    occurrences = event.occurrence_dates(localize=True)
+    assert len(occurrences) == 12
+    assert all((o.hour == 10 for o in occurrences))
+
+    event.recurrence = f'RRULE:FREQ=MONTHLY;UNTIL={year}12310000'
+    occurrences = event.occurrence_dates(localize=True)
+    assert len(occurrences) == 12
+    assert all((o.hour == 10 for o in occurrences))
+
+    event.recurrence = f'RRULE:FREQ=MONTHLY;UNTIL={year}12310000Z'
+    occurrences = event.occurrence_dates(localize=True)
+    assert len(occurrences) == 12
+    assert all((o.hour == 10 for o in occurrences))
+
+    event.recurrence = (
+        f'RRULE:FREQ=YEARLY;COUNT=2\r\n'
+        f'RDATE:{year}0606T000000\r\n'
+        f'EXDATE:{year+1}0101T000000'
+    )
+    occurrences = event.occurrence_dates(localize=True)
+    assert len(occurrences) == 2
+    assert all((o.hour == 10 for o in occurrences))
+
+    event.recurrence = (
+        f'RRULE:FREQ=YEARLY;COUNT=2\r\n'
+        f'RDATE:{year}0606000000\r\n'
+        f'EXDATE:{year+1}0101101500'
+    )
+    occurrences = event.occurrence_dates(localize=True)
+    assert len(occurrences) == 2
+    assert all((o.hour == 10 for o in occurrences))
+
+    event.recurrence = (
+        f'RRULE:FREQ=YEARLY;COUNT=2\r\n'
+        f'RDATE:{year}0606000000Z\r\n'
+        f'EXDATE:{year+1}0101000000Z'
+    )
+    occurrences = event.occurrence_dates(localize=True)
+    assert len(occurrences) == 2
+    assert all((o.hour == 10 for o in occurrences))
+
+    event.recurrence = (
+        f'RRULE:FREQ=YEARLY;COUNT=2\r\n'
+        f'RDATE:{year}0606000000Z\r\n'
+        f'EXDATE:{year+1}0101171700Z'
+    )
+    occurrences = event.occurrence_dates(localize=True)
+    assert len(occurrences) == 2
+    assert all((o.hour == 10 for o in occurrences))
+
+
 def test_create_event_recurring(session):
     timezone = 'Europe/Zurich'
     start = tzdatetime(2008, 2, 7, 10, 15, timezone)
