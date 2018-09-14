@@ -111,6 +111,16 @@ def test_create_event(session):
     assert occurrence.event.id == event.id
 
 
+def test_icalendar_recurrence():
+    event = Event(state='initiated')
+    assert event.icalendar_recurrence == None
+
+    event.recurrence = 'RRULE:FREQ=YEARLY;INTERVAL=1;COUNT=5'
+    assert event.icalendar_recurrence['FREQ'] == ['YEARLY']
+    assert event.icalendar_recurrence['INTERVAL'] == [1]
+    assert event.icalendar_recurrence['COUNT'] == [5]
+
+
 def test_occurrence_dates(session):
     year = datetime.today().year
 
