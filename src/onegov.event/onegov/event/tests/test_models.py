@@ -2,6 +2,7 @@ import pytest
 import transaction
 
 from datetime import datetime
+from datetime import timedelta
 from onegov.event import Event
 from onegov.event import Occurrence
 from onegov.gis import Coordinates
@@ -155,6 +156,42 @@ def test_occurrence_dates(session):
     assert dates[1] == tzdatetime(year + 1, 2, 7, 10, 15, 'Europe/Zurich')
     assert str(dates[0].tzinfo) == 'Europe/Zurich'
     assert str(dates[1].tzinfo) == 'Europe/Zurich'
+
+
+def test_lastest_occurrence(session):
+
+    def create_event(delta):
+        start = datetime.now() + delta
+        end = start + timedelta(hours=6)
+        session.query(Occurrence).delete()
+        session.query(Event).delete()
+        session.add(
+            Event(
+                state='published',
+                title='Event',
+                timezone='Europe/Zurich',
+                start=replace_timezone(start, 'Europe/Zurich'),
+                end=replace_timezone(end, 'Europe/Zurich'),
+                recurrence='RRULE:FREQ=DAILY;COUNT=3'
+            )
+        )
+        transaction.commit()
+        return session.query(Event).one()
+
+    # current
+    event = create_event(timedelta(hours=-3))
+    assert event.latest_occurrence.start == event.occurrence_dates()[0]
+
+    event = create_event(timedelta(days=-1, hours=-3))
+    assert event.latest_occurrence.start == event.occurrence_dates()[1]
+
+    # past
+    event = create_event(timedelta(days=-40))
+    assert event.latest_occurrence.start == event.occurrence_dates()[-1]
+
+    # future
+    event = create_event(timedelta(days=40))
+    assert event.latest_occurrence.start == event.occurrence_dates()[0]
 
 
 def test_occurrence_dates_dst(session):

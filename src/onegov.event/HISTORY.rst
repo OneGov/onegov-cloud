@@ -1,9 +1,6 @@
 Changelog
 ---------
 
-- Makes the collections fully stateful.
-  [msom]
-
 - Adds ical export to occurrence collection.
   [msom]
 
@@ -13,7 +10,13 @@ Changelog
 - Adds tags, timestamp, uid and coordinates to ical exports.
   [msom]
 
+- Makes the collections fully stateful.
+  [msom]
+
 - Fixes DST issue in occurrence generation.
+  [msom]
+
+- Fixes caluclation of the last occurrence of an event.
   [msom]
 
 - Refactors the package.

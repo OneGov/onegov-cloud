@@ -112,17 +112,17 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         base = session.query(Occurrence).filter_by(event_id=self.id)
 
         current = base.filter(and_(
-            Occurrence.start >= func.now(),
-            Occurrence.end <= func.now()
+            Occurrence.start <= func.now(),
+            Occurrence.end >= func.now()
         )).order_by(Occurrence.start).limit(1)
 
-        future = base.filter(and_(
-            func.now() <= Occurrence.start
-        )).order_by(Occurrence.start).limit(1)
+        future = base.filter(
+            Occurrence.start >= func.now()
+        ).order_by(Occurrence.start).limit(1)
 
-        past = base.filter(and_(
+        past = base.filter(
             Occurrence.end <= func.now()
-        )).order_by(desc(Occurrence.start))
+        ).order_by(desc(Occurrence.start))
 
         return current.union_all(future, past).first()
 
