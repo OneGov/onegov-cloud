@@ -139,8 +139,8 @@ class EventCollection(Pagination):
     def from_import(self, events, purge=None):
         """ Add or updates the given events.
 
-        Only updates events which have changed and which are currently
-        published (allowing to permanently withdraw imported events).
+        Only updates events which have changed. Doesn't change the states of
+        events allowing to permanently withdraw imported events.
 
         Optionally removes all events with the given meta-source-prefix not
         present in the given events.
@@ -164,7 +164,7 @@ class EventCollection(Pagination):
             ).first()
 
             if existing:
-                if existing.state == 'published' and (
+                if (
                     existing.title != event.title or
                     existing.location != event.location or
                     set(existing.tags) != set(event.tags) or
@@ -173,13 +173,11 @@ class EventCollection(Pagination):
                     existing.end != event.end or
                     existing.content != event.content or
                     existing.coordinates != event.coordinates or
-                    existing.description != event.description or
-                    existing.organizer != event.organizer or
                     existing.recurrence != event.recurrence
                 ):
                     updated += 1
                     state = existing.state  # avoid updating occurrences
-                    existing.state = 'initialized'
+                    existing.state = 'initiated'
                     existing.title = event.title
                     existing.location = event.location
                     existing.tags = event.tags
@@ -188,14 +186,13 @@ class EventCollection(Pagination):
                     existing.end = event.end
                     existing.content = event.content
                     existing.coordinates = event.coordinates
-                    existing.description = event.description
-                    existing.organizer = event.organizer
                     existing.recurrence = event.recurrence
                     existing.state = state
 
             else:
                 added += 1
                 event.name = self._get_unique_name(event.title)
+                event.state = 'initiated'
                 self.session.add(event)
                 event.submit()
                 event.publish()
