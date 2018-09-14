@@ -669,6 +669,7 @@ def test_from_ical(session):
     ]))
     assert events.query().count() == 0
 
+    # UTC-date
     events.from_ical('\n'.join([
         'BEGIN:VCALENDAR',
         'VERSION:2.0',
@@ -690,9 +691,7 @@ def test_from_ical(session):
         'END:VEVENT',
         'END:VCALENDAR'
     ]))
-
     transaction.commit()
-
     event = events.query().one()
     assert event.title == 'Squirrel Park Virsit'
     assert event.description == '<em>Furri</em> things will happen!'
@@ -708,6 +707,7 @@ def test_from_ical(session):
     assert int(event.coordinates.lat) == 48
     assert int(event.coordinates.lon) == 9
 
+    # update
     events.from_ical('\n'.join([
         'BEGIN:VCALENDAR',
         'VERSION:2.0',
@@ -729,9 +729,8 @@ def test_from_ical(session):
         'END:VEVENT',
         'END:VCALENDAR'
     ]))
-
     transaction.commit()
-
+    event = events.query().one()
     assert event.title == 'Squirrel Park Visit'
     assert event.description == '<em>Furry</em> things will happen!'
     assert event.location == 'Squirrel Park'
@@ -745,3 +744,84 @@ def test_from_ical(session):
     assert sorted(event.tags) == ['animals', 'fun']
     assert int(event.coordinates.lat) == 47
     assert int(event.coordinates.lon) == 8
+
+    # date
+    events.from_ical('\n'.join([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'BEGIN:VEVENT',
+        'SUMMARY:Squirrel Park Virsit',
+        'UID:squirrel-park-visit@onegov.event',
+        'DTSTART;VALUE=DATE:20150616',
+        'DTEND;VALUE=DATE:20150616',
+        'DTSTAMP;VALUE=DATE-TIME:20140101T000000Z',
+        'RRULE:FREQ=DAILY;COUNT=4;INTERVAL=1',
+        'DESCRIPTION:<em>Furri</em> things will happen!',
+        'CATEGORIES:fun',
+        'CATEGORIES:animals',
+        'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
+        'LOCATION:Squirrel Par',
+        'GEO:48.051752750515746;9.305739625357093',
+        'URL:https://example.org/event/squirrel-park-visit',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ]))
+    transaction.commit()
+    event = events.query().one()
+    assert event.start == tzdatetime(2015, 6, 16, 0, 0, 'Europe/Zurich')
+    assert event.end == tzdatetime(2015, 6, 16, 23, 59, 'Europe/Zurich')
+
+    # relative date-time
+    events.from_ical('\n'.join([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'BEGIN:VEVENT',
+        'SUMMARY:Squirrel Park Visit',
+        'UID:squirrel-park-visit@onegov.event',
+        'DTSTART;VALUE=DATE-TIME:20150616T133000',
+        'DTEND;VALUE=DATE-TIME:20150616T220000',
+        'DTSTAMP;VALUE=DATE-TIME:20140101T000000Z',
+        'RRULE:FREQ=DAILY;COUNT=5;INTERVAL=1',
+        'DESCRIPTION:<em>Furry</em> things will happen!',
+        'CATEGORIES:fun',
+        'CATEGORIES:animals',
+        'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
+        'LOCATION:Squirrel Park',
+        'GEO:47.051752750515746;8.305739625357093',
+        'URL:https://example.org/event/squirrel-park-visit',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ]))
+    transaction.commit()
+    event = events.query().one()
+    assert event.start == tzdatetime(2015, 6, 16, 13, 30, 'Europe/Zurich')
+    assert event.end == tzdatetime(2015, 6, 16, 22, 0, 'Europe/Zurich')
+
+    # start and duration
+    events.from_ical('\n'.join([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'BEGIN:VEVENT',
+        'SUMMARY:Squirrel Park Visit',
+        'UID:squirrel-park-visit@onegov.event',
+        'DTSTART;VALUE=DATE-TIME:20150616T133000',
+        'DURATION:PT8H30M',
+        'DTSTAMP;VALUE=DATE-TIME:20140101T000000Z',
+        'RRULE:FREQ=DAILY;COUNT=5;INTERVAL=1',
+        'DESCRIPTION:<em>Furry</em> things will happen!',
+        'CATEGORIES:fun',
+        'CATEGORIES:animals',
+        'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
+        'LOCATION:Squirrel Park',
+        'GEO:47.051752750515746;8.305739625357093',
+        'URL:https://example.org/event/squirrel-park-visit',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ]))
+    transaction.commit()
+    event = events.query().one()
+    assert event.start == tzdatetime(2015, 6, 16, 13, 30, 'Europe/Zurich')
+    assert event.end == tzdatetime(2015, 6, 16, 22, 0, 'Europe/Zurich')

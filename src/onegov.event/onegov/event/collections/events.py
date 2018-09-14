@@ -222,7 +222,7 @@ class EventCollection(Pagination):
             start = vevent.get('dtstart')
             start = start.dt if start else None
             if type(start) is date:
-                start = replace_timezone(as_datetime(start), UTC)
+                start = replace_timezone(as_datetime(start), timezone)
             elif type(start) is datetime:
                 if start.tzinfo is None:
                     start = standardize_date(start, timezone)
@@ -232,8 +232,8 @@ class EventCollection(Pagination):
             end = vevent.get('dtend')
             end = end.dt if end else None
             if type(end) is date:
-                end = replace_timezone(as_datetime(end), UTC)
-                end = end - timedelta(microseconds=1)
+                end = replace_timezone(as_datetime(end), timezone)
+                end = end + timedelta(days=1, minutes=-1)
             elif type(end) is datetime:
                 if end.tzinfo is None:
                     end = standardize_date(end, timezone)
@@ -245,7 +245,7 @@ class EventCollection(Pagination):
             if start and not end and duration:
                 end = start + duration
 
-            if not start and not end:
+            if not start or not end:
                 raise(ValueError("Invalid date"))
 
             recurrence = vevent.get('rrule', '')
