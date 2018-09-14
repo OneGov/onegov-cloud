@@ -10,6 +10,9 @@ Changelog
 - Adds tags, timestamp, uid and coordinates to ical exports.
   [msom]
 
+- Adds guidle import.
+  [msom]
+
 - Makes the collections fully stateful.
   [msom]
 

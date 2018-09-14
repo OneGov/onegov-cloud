@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<guidle:exportData xmlns:guidle="http://www.guidle.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.guidle.com http://www.guidle.com:80/xml/guidle_export_feed_v2.0.xsd">
+    <guidle:groupSet>
+        <guidle:group>
+            <guidle:offer id="551262854">
+                <guidle:offerDetail id="551262857" languageCode="de">
+                    <guidle:title>Theatervorstellung</guidle:title>
+                    <guidle:shortDescription>
+                        <![CDATA[
+Lorem ipsum
+]]>
+                    </guidle:shortDescription>
+                    <guidle:longDescription>
+                        <![CDATA[
+Lorem ipsum
+
+Lorem ipsum dolor sit amet, consetetur <a href="lorem.de">sadipscing</a> elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam.
+]]>
+                    </guidle:longDescription>
+                    <guidle:homepage>www.theatermenzingen.ch</guidle:homepage>
+                    <guidle:images>
+                        <guidle:image id="470305794">
+                            <guidle:url>https://d37dhr5745n0y2.cloudfront.net/uploaded/6/52/54/652543d31e3207ec0e6157d04b924756bf0f9379.jpg</guidle:url>
+                            <guidle:thumbnailUrl>https://d37dhr5745n0y2.cloudfront.net/9/1f/43/91f43b719ee84e243ba2da73d024120ae3ff82ae.jpg</guidle:thumbnailUrl>
+                            <guidle:size label="original" width="526" height="455" dpi="72" url="https://d37dhr5745n0y2.cloudfront.net/uploaded/6/52/54/652543d31e3207ec0e6157d04b924756bf0f9379.jpg"/>
+                            <guidle:size label="medium" url="https://d37dhr5745n0y2.cloudfront.net/f/94/91/f9491662e6f631605c8df9cba124a389c5f67221.jpg"/>
+                            <guidle:size label="small" url="https://d37dhr5745n0y2.cloudfront.net/9/1f/43/91f43b719ee84e243ba2da73d024120ae3ff82ae.jpg"/>
+                            <guidle:size label="thumbnail" url="https://d37dhr5745n0y2.cloudfront.net/3/91/ee/391eeb45885e42bfd2414aa86e0e676cbba3a2bf.jpg"/>
+                        </guidle:image>
+                    </guidle:images>
+                    <guidle:ticketingContact><![CDATA[Der Vorverkauf wird ab September auf der Homepage bekannt gegeben. Ebenso im Programm, sobald dieses zur Verfügung steht.]]></guidle:ticketingContact>
+                    <guidle:ticketingUrl>www.theatermenzingen.ch</guidle:ticketingUrl>
+                    <guidle:externalLink>www.theatermenzingen.ch</guidle:externalLink>
+                    <guidle:openingHours><![CDATA[ anschliessend Apéro ]]></guidle:openingHours>
+                    <guidle:priceInformation><![CDATA[ 1-Tages- oder 2-Tagespass erhältlich ]]></guidle:priceInformation>
+                </guidle:offerDetail>
+                <guidle:address id="7238793" cityId="18427" ownerBpId="7238792">
+                    <guidle:company><![CDATA[ Zentrum Schützenmatt ]]></guidle:company>
+                    <guidle:street><![CDATA[ Luegetenstrasse 3 ]]></guidle:street>
+                    <guidle:zip>6313</guidle:zip>
+                    <guidle:city><![CDATA[ Menzingen ]]></guidle:city>
+                    <guidle:country><![CDATA[ Schweiz ]]></guidle:country>
+                    <guidle:latitude>47.17866843037308</guidle:latitude>
+                    <guidle:longitude>8.591789046279928</guidle:longitude>
+                    <guidle:lastUpdateDate>2018-06-05T15:27:35.547+02:00</guidle:lastUpdateDate>
+                    <guidle:venueName><![CDATA[ Zentrum Schützenmatt ]]></guidle:venueName>
+                </guidle:address>
+                <guidle:contact id="551262852">
+                    <guidle:name><![CDATA[ Peter Muster ]]></guidle:name>
+                    <guidle:zip>6313</guidle:zip>
+                    <guidle:city><![CDATA[ Menzingen ]]></guidle:city>
+                    <guidle:email>peter.muster@theatermenzingen.ch</guidle:email>
+                    <guidle:telephone_1>+41 41 755 35 46</guidle:telephone_1>
+                    <guidle:company><![CDATA[ Theatervereinigung Menzingen ]]></guidle:company>
+                    <guidle:functionCompany><![CDATA[ Präsident ]]></guidle:functionCompany>
+                    <guidle:lastUpdateDate>2018-04-01T17:13:00.639+02:00</guidle:lastUpdateDate>
+                </guidle:contact>
+                <guidle:schedules>
+                    <guidle:date>
+                        <guidle:startDate>2018-10-26</guidle:startDate>
+                        <guidle:endDate>2018-11-03</guidle:endDate>
+                        <guidle:startTime>20:00:00</guidle:startTime>
+                        <guidle:endTime>22:30:00</guidle:endTime>
+                        <guidle:weekdays>
+                            <guidle:day>Tu</guidle:day>
+                            <guidle:day>Fr</guidle:day>
+                            <guidle:day>Sa</guidle:day>
+                        </guidle:weekdays>
+                    </guidle:date>
+                    <guidle:date>
+                        <guidle:startDate>2018-10-28</guidle:startDate>
+                        <guidle:endDate>2018-10-28</guidle:endDate>
+                        <guidle:startTime>17:00:00</guidle:startTime>
+                    </guidle:date>
+                    <guidle:date>
+                        <guidle:startDate>2018-06-15</guidle:startDate>
+                        <guidle:endDate>2018-10-15</guidle:endDate>
+                        <guidle:startTime>08:00:00</guidle:startTime>
+                    </guidle:date>
+                    <guidle:date>
+                        <guidle:startDate>2018-08-18</guidle:startDate>
+                        <guidle:endDate>2018-10-31</guidle:endDate>
+                    </guidle:date>
+                </guidle:schedules>
+                <guidle:classifications>
+                    <guidle:classification id="204591953" name="Veranstaltungskalender" type="PRIMARY">
+                        <guidle:tag id="1584" name="Jazz" subcategoryId="204592148" subcategoryName="Konzert Pop / Rock / Jazz"/>
+                        <guidle:tag id="124253" name="Brunch" subcategoryId="204592096" subcategoryName="Kulinarik"/>
+                        <guidle:tag id="465715" name="Weitere Restaurant- / Barangebote" subcategoryId="204592096" subcategoryName="Kulinarik"/>
+                    </guidle:classification>
+                    <guidle:classification id="6897393" name="Originalname">
+                        <guidle:tag id="28662315" name="Lügen über Lügen" subcategoryId="124249701" subcategoryName="L"/>
+                    </guidle:classification>
+                </guidle:classifications>
+            </guidle:offer>
+        </guidle:group>
+    </guidle:groupSet>
+</guidle:exportData>

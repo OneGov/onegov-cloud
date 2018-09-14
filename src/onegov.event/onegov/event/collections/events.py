@@ -136,37 +136,80 @@ class EventCollection(Pagination):
         query = self.session.query(Event).filter(Event.id == id)
         return query.first()
 
-    def from_import(self, events):
-        """ Add or updates the given events. """
-        assert all([event.meta['source'] for event in events])
+    def from_import(self, events, purge=None):
+        """ Add or updates the given events.
 
+        Only updates events which have changed and which are currently
+        published (allowing to permanently withdraw imported events).
+
+        Optionally removes all events with the given meta-source-prefix not
+        present in the given events.
+
+        """
+
+        sources = set((event.meta['source'] for event in events))
+        assert all(sources) and (len(sources) == len(events))
+
+        if purge:
+            assert all((s.startswith(purge) for s in sources))
+            query = self.session.query(Event.meta['source'].label('source'))
+            query = query.filter(Event.meta['source'].astext.startswith(purge))
+            purge = set((r.source for r in query)) - sources
+
+        added = 0
+        updated = 0
         for event in events:
             existing = self.session.query(Event).filter(
                 Event.meta['source'] == event.meta['source']
             ).first()
 
             if existing:
-                state = existing.state  # avoid updating occurrences
-                existing.state = 'initialized'
-                existing.title = event.title
-                existing.location = event.location
-                existing.tags = event.tags
-                existing.timezone = event.timezone
-                existing.start = event.start
-                existing.end = event.end
-                existing.content = event.content
-                existing.coordinates = event.coordinates
-                existing.description = event.description
-                existing.organizer = event.organizer
-                existing.recurrence = event.recurrence
-                existing.state = state
+                if existing.state == 'published' and (
+                    existing.title != event.title or
+                    existing.location != event.location or
+                    set(existing.tags) != set(event.tags) or
+                    existing.timezone != event.timezone or
+                    existing.start != event.start or
+                    existing.end != event.end or
+                    existing.content != event.content or
+                    existing.coordinates != event.coordinates or
+                    existing.description != event.description or
+                    existing.organizer != event.organizer or
+                    existing.recurrence != event.recurrence
+                ):
+                    updated += 1
+                    state = existing.state  # avoid updating occurrences
+                    existing.state = 'initialized'
+                    existing.title = event.title
+                    existing.location = event.location
+                    existing.tags = event.tags
+                    existing.timezone = event.timezone
+                    existing.start = event.start
+                    existing.end = event.end
+                    existing.content = event.content
+                    existing.coordinates = event.coordinates
+                    existing.description = event.description
+                    existing.organizer = event.organizer
+                    existing.recurrence = event.recurrence
+                    existing.state = state
+
             else:
+                added += 1
                 event.name = self._get_unique_name(event.title)
                 self.session.add(event)
                 event.submit()
                 event.publish()
 
+        if purge:
+            query = self.session.query(Event)
+            query = query.filter(Event.meta['source'].in_(purge))
+            for event in query:
+                event.state = 'withdrawn'  # remove occurrences
+                self.session.delete(event)
+
         self.session.flush()
+
+        return added, updated, len(purge) if purge else 0
 
     def from_ical(self, ical):
         """ Imports the events from an iCalender string.
@@ -245,4 +288,4 @@ class EventCollection(Pagination):
                 )
             )
 
-        self.from_import(events)
+        return self.from_import(events)

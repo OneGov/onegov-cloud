@@ -2,12 +2,15 @@ import click
 
 from csv import reader as csvreader
 from dateutil.parser import parse
+from hashlib import sha1
+from lxml import etree
 from onegov.core.cli import abort
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.event.collections import EventCollection
 from onegov.event.models import Event
 from onegov.event.models import Occurrence
+from onegov.event.utils import GuidleExportData
 from onegov.gis import Coordinates
 from requests import get
 
@@ -166,3 +169,67 @@ def import_ical(group_context, ical):
             fg='green')
 
     return _import_ical
+
+
+@cli.command('import-guidle')
+@pass_group_context
+@click.argument('url')
+@click.option('--tagmap', type=click.File())
+def import_guidle(group_context, url, tagmap):
+    """ Fetches the events from guidle.
+
+    Example:
+
+        onegov-event --select '/veranstaltungen/zug' import-guidle \
+        'http://www.guidle.com/xxxx/'
+
+    """
+    if tagmap:
+        tagmap = {row[0]: row[1] for row in csvreader(tagmap)}
+
+    def _import_guidle(request, app):
+        response = get(url)
+        response.raise_for_status()
+
+        unknown_tags = set()
+        prefix = 'guidle-{}'.format(sha1(url.encode()).hexdigest()[:10])
+
+        events = []
+        root = etree.fromstring(response.text.encode('utf-8'))
+        for offer in GuidleExportData(root).offers():
+            tags, unknown = offer.tags(tagmap)
+            unknown_tags |= unknown
+            for index, schedule in enumerate(offer.schedules()):
+                events.append(
+                    Event(
+                        state='initiated',
+                        title=offer.title,
+                        start=schedule.start,
+                        end=schedule.end,
+                        recurrence=schedule.recurrence,
+                        timezone=schedule.timezone,
+                        description=offer.description,
+                        organizer=offer.organizer,
+                        location=offer.location,
+                        coordinates=offer.coordinates,
+                        tags=tags,
+                        meta={'source': f'{prefix}-{offer.uid}.{index}'},
+                    )
+                )
+            # todo: handle attachements
+            # todo: handle images
+
+        collection = EventCollection(app.session())
+        added, updated, purged = collection.from_import(events, prefix)
+
+        if unknown_tags:
+            unknown_tags = ', '.join([f'"{tag}"' for tag in unknown_tags])
+            click.secho(f"Tags not in tagmap: {unknown_tags}!", fg='yellow')
+
+        click.secho(
+            f"Events successfully imported from '{url}' "
+            f"({added} added, {updated} updated, {purged} deleted)",
+            fg='green'
+        )
+
+    return _import_guidle
