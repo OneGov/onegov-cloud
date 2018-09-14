@@ -271,6 +271,9 @@ def import_issues(ctx, file, clear, dry_run, locale, timezone):
     """
 
     def _import_issues(request, app):
+        if not app.principal:
+            return
+
         request.locale = locale
         headers = {
             'number': request.translate(_("Number")),
@@ -336,6 +339,9 @@ def import_sogc(ctx, clear, dry_run, sentry):
     """
 
     def _import_sogc(request, app):
+        if not app.principal:
+            return
+
         if not getattr(request.app.principal, 'sogc_import', None):
             return
 
