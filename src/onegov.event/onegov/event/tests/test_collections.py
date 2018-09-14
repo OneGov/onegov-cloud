@@ -57,6 +57,9 @@ def test_event_collection(session):
     event_2.publish()
     assert events.query().count() == 2
 
+    assert events.by_id(event_1.id) == event_1
+    assert events.by_id(event_2.id) == event_2
+
     events.delete(event_1)
     events.delete(event_2)
     assert events.query().count() == 0
@@ -106,15 +109,16 @@ def test_event_collection_pagination(session):
     events = EventCollection(session, state='initiated')
     assert events.subset_count == 0
 
-    events = EventCollection(session, state='submitted')
+    events = events.for_state('submitted')
     assert events.subset_count == 12
     assert all([e.start.year == 2008 for e in events.batch])
     assert all([e.start.month < 11 for e in events.batch])
     assert len(events.next.batch) == 12 - events.batch_size
     assert all([e.start.year == 2008 for e in events.next.batch])
     assert all([e.start.month > 10 for e in events.next.batch])
+    assert events.page_by_index(1) == events.next
 
-    events = EventCollection(session, state='published')
+    events = events.for_state('published')
     assert events.subset_count == 12
     assert all([e.start.year == 2009 for e in events.batch])
     assert all([e.start.month < 11 for e in events.batch])
@@ -122,7 +126,7 @@ def test_event_collection_pagination(session):
     assert all([e.start.year == 2009 for e in events.next.batch])
     assert all([e.start.month > 10 for e in events.next.batch])
 
-    events = EventCollection(session, state='withdrawn')
+    events = events.for_state('withdrawn')
     assert events.subset_count == 12
     assert all([e.start.year == 2010 for e in events.batch])
     assert all([e.start.month < 11 for e in events.batch])
@@ -228,6 +232,7 @@ def test_occurrence_collection_pagination(session):
     occurrences = PatchedCollection(session)
     assert occurrences.subset_count == 48
     assert all([o.start.year == 2009 for o in occurrences.batch])
+    assert occurrences.page_by_index(1) == occurrences.next
 
     occurrences = PatchedCollection(session, start=date(2009, 12, 1))
     assert occurrences.subset_count == 4
