@@ -4,10 +4,10 @@ Changelog
 - Adds ical export to occurrence collection.
   [msom]
 
-- Adds ical import to event collection.
+- Adds tags, timestamp, uid and coordinates to ical exports.
   [msom]
 
-- Adds tags, timestamp, uid and coordinates to ical exports.
+- Adds ical import.
   [msom]
 
 - Adds guidle import.

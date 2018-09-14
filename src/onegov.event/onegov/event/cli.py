@@ -164,7 +164,7 @@ def import_ical(group_context, ical):
         collection = EventCollection(app.session())
         added, updated, purged = collection.from_ical(ical.read())
         click.secho(
-            f"Import finished "
+            f"Events successfully imported "
             f"({added} added, {updated} updated, {purged} deleted)",
             fg='green')
 
