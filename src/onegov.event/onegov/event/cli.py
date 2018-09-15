@@ -7,12 +7,15 @@ from lxml import etree
 from onegov.core.cli import abort
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
+from onegov.event import log
 from onegov.event.collections import EventCollection
 from onegov.event.models import Event
 from onegov.event.models import Occurrence
 from onegov.event.utils import GuidleExportData
 from onegov.gis import Coordinates
+from operator import add
 from requests import get
+from sqlalchemy.dialects.postgresql import array
 
 cli = command_group()
 
@@ -62,10 +65,12 @@ def import_json(group_context, url, tagmap):
 
         response = get(url)
         response.raise_for_status()
+        response = response.json()
 
-        events = []
-        for item in response.json():
-            uid = item['id']
+        session = app.session()
+        events = EventCollection(session)
+
+        for item in response:
             title = item['title']
 
             start = parse(item['start'])
@@ -114,36 +119,32 @@ def import_json(group_context, url, tagmap):
                     lon=item['longitude']
                 )
 
-            events.append(
-                Event(
-                    state='initiated',
-                    title=title,
-                    start=start,
-                    end=end,
-                    recurrence=recurrence,
-                    timezone=timezone,
-                    description=description,
-                    organizer=organizer,
-                    location=location,
-                    coordinates=coordinates,
-                    tags=tags or [],
-                    meta={
-                        'source': f'ical-{uid}',
-                        'submitter_email': item['submitter_email']
-                    },
-                )
+            event = Event(
+                state='initiated',
+                name=events._get_unique_name(title),
+                title=title,
+                start=start,
+                end=end,
+                recurrence=recurrence,
+                timezone=timezone,
+                description=description,
+                organizer=organizer,
+                location=location,
+                coordinates=coordinates,
+                tags=tags or [],
+                meta={'submitter_email': item['submitter_email']},
             )
-            # todo: handle item['attachements']
+            # todo: handle item['attachments']
             # todo: handle item['images']
-
-        collection = EventCollection(app.session())
-        collection.from_import(events)
+            session.add(event)
+            event.submit()
+            event.publish()
 
         if unknown_tags:
             unknown_tags = ', '.join([f'"{tag}"' for tag in unknown_tags])
             click.secho(f"Tags not in tagmap: {unknown_tags}!", fg='yellow')
 
-        click.secho(f"Imported/updated {len(events)} events", fg='green')
+        click.secho(f"Imported {len(response)} events", fg='green')
 
     return _import_json
 
@@ -188,48 +189,131 @@ def import_guidle(group_context, url, tagmap):
         tagmap = {row[0]: row[1] for row in csvreader(tagmap)}
 
     def _import_guidle(request, app):
-        response = get(url)
-        response.raise_for_status()
+        try:
+            response = get(url)
+            response.raise_for_status()
 
-        unknown_tags = set()
-        prefix = 'guidle-{}'.format(sha1(url.encode()).hexdigest()[:10])
+            unknown_tags = set()
+            prefix = 'guidle-{}'.format(sha1(url.encode()).hexdigest()[:10])
 
-        events = []
-        root = etree.fromstring(response.text.encode('utf-8'))
-        for offer in GuidleExportData(root).offers():
-            tags, unknown = offer.tags(tagmap)
-            unknown_tags |= unknown
-            for index, schedule in enumerate(offer.schedules()):
-                events.append(
-                    Event(
-                        state='initiated',
-                        title=offer.title,
-                        start=schedule.start,
-                        end=schedule.end,
-                        recurrence=schedule.recurrence,
-                        timezone=schedule.timezone,
-                        description=offer.description,
-                        organizer=offer.organizer,
-                        location=offer.location,
-                        coordinates=offer.coordinates,
-                        tags=tags,
-                        meta={'source': f'{prefix}-{offer.uid}.{index}'},
+            events = []
+            root = etree.fromstring(response.text.encode('utf-8'))
+            for offer in GuidleExportData(root).offers():
+                tags, unknown = offer.tags(tagmap)
+                unknown_tags |= unknown
+                for index, schedule in enumerate(offer.schedules()):
+                    events.append(
+                        Event(
+                            state='initiated',
+                            title=offer.title,
+                            start=schedule.start,
+                            end=schedule.end,
+                            recurrence=schedule.recurrence,
+                            timezone=schedule.timezone,
+                            description=offer.description,
+                            organizer=offer.organizer,
+                            location=offer.location,
+                            coordinates=offer.coordinates,
+                            tags=tags,
+                            meta={'source': f'{prefix}-{offer.uid}.{index}'},
+                        )
                     )
+                # todo: handle attachements
+                # todo: handle images
+
+            collection = EventCollection(app.session())
+            added, updated, purged = collection.from_import(events, prefix)
+
+            if unknown_tags:
+                unknown_tags = ', '.join([f'"{tag}"' for tag in unknown_tags])
+                click.secho(
+                    f"Tags not in tagmap: {unknown_tags}!", fg='yellow'
                 )
-            # todo: handle attachements
-            # todo: handle images
 
-        collection = EventCollection(app.session())
-        added, updated, purged = collection.from_import(events, prefix)
-
-        if unknown_tags:
-            unknown_tags = ', '.join([f'"{tag}"' for tag in unknown_tags])
-            click.secho(f"Tags not in tagmap: {unknown_tags}!", fg='yellow')
-
-        click.secho(
-            f"Events successfully imported from '{url}' "
-            f"({added} added, {updated} updated, {purged} deleted)",
-            fg='green'
-        )
+            click.secho(
+                f"Events successfully imported from '{url}' "
+                f"({added} added, {updated} updated, {purged} deleted)",
+                fg='green'
+            )
+        except Exception as e:
+            log.error("Error importing events", exc_info=True)
+            raise(e)
 
     return _import_guidle
+
+
+@cli.command()
+@pass_group_context
+@click.option('--source', multiple=True)
+@click.option('--tag', multiple=True)
+def fetch(group_context, source, tag):
+    """ Fetches events from other instances.
+
+    Only fetches events from the same namespace which have not been imported
+    themselves.
+
+    Example
+
+        onegov-event --select '/veranstaltungen/zug' fetch \
+            --source menzingen --source steinhausen
+            --tag Sport --tag Konzert
+
+    """
+
+    def vector_add(a, b):
+        return list(map(add, a, b))
+
+    if not len(source):
+        abort("Provide at least one source")
+
+    def _fetch(request, app):
+        try:
+            local_session = app.session()
+            local_events = EventCollection(local_session)
+            assert local_session.info['schema'] == app.schema
+
+            result = [0, 0, 0]
+            for key in source:
+                schema = '{}-{}'.format(app.namespace, key)
+                assert schema in app.session_manager.list_schemas()
+                app.session_manager.set_current_schema(schema)
+                remote_session = app.session_manager.session()
+                assert remote_session.info['schema'] == schema
+
+                query = remote_session.query(Event)
+                query = query.filter(Event.meta['source'].is_(None))
+                if tag:
+                    query = query.filter(Event._tags.has_any(array(tag)))
+                remote_events = [
+                    Event(
+                        state='initiated',
+                        title=event.title,
+                        start=event.start,
+                        end=event.end,
+                        timezone=event.timezone,
+                        recurrence=event.recurrence,
+                        content=event.content,
+                        location=event.location,
+                        tags=event.tags,
+                        meta={'source': f'fetch-{key}-{event.name}'},
+                        coordinates=event.coordinates,
+                    ) for event in query
+                ]
+                result = vector_add(
+                    result,
+                    local_events.from_import(remote_events, f'fetch-{key}')
+                )
+                # todo: attachments
+
+            click.secho(
+                f"Events successfully fetched "
+                f"({result[0]} added, {result[1]} updated, "
+                f"{result[2]} deleted)",
+                fg='green'
+            )
+
+        except Exception as e:
+            log.error("Error fetching events", exc_info=True)
+            raise(e)
+
+    return _fetch

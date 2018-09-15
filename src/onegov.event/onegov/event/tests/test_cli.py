@@ -1,8 +1,12 @@
 from click.testing import CliRunner
+from datetime import datetime
 from onegov.core.utils import module_path
 from onegov.event.cli import cli
+from onegov.event.collections import EventCollection
+from onegov.event.models import Event
 from os import path
 from pytest import mark
+from transaction import commit
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
@@ -156,3 +160,83 @@ def test_import_guidle(cfg_path, temporary_directory, xml):
     assert "Events successfully imported" in result.output
     assert "Tags not in tagmap: \"Kulinarik\"!"
     assert "(0 added, 4 updated, 0 deleted)" in result.output
+
+
+def test_fetch(cfg_path, session_manager):
+    runner = CliRunner()
+
+    session_manager.ensure_schema_exists('foo-baz')
+    session_manager.ensure_schema_exists('foo-qux')
+
+    def get_session(entity):
+        session_manager.set_current_schema(f'foo-{entity}')
+        return session_manager.session()
+
+    for entity, title, meta, tags in (
+        ('bar', '1', {}, []),
+        ('bar', '2', {}, ['A']),
+        ('bar', '3', {}, ['A', 'B']),
+        ('bar', '4', {}, ['A', 'C']),
+        ('bar', '5', {}, ['C']),
+        ('bar', '6', {'source': 'xxx'}, []),
+        ('bar', '7', {'source': 'yyy'}, ['A', 'B']),
+        ('baz', 'a', {}, []),
+        ('baz', 'b', {}, ['A', 'C']),
+        ('baz', 'c', {'source': 'zzz'}, ['B', 'C']),
+    ):
+        EventCollection(get_session(entity)).add(
+            title=title,
+            start=datetime(2015, 6, 16, 9, 30),
+            end=datetime(2015, 6, 16, 18, 00),
+            timezone='Europe/Zurich',
+            tags=tags,
+            meta=meta
+        )
+    commit()
+
+    assert get_session('bar').query(Event).count() == 7
+    assert get_session('baz').query(Event).count() == 3
+    assert get_session('qux').query(Event).count() == 0
+
+    # No sources provided
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/qux',
+        'fetch',
+    ])
+    assert result.exit_code != 0
+    assert "Provide at least one source" in result.output
+
+    # Bar[*] -> Qux
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/qux',
+        'fetch',
+        '--source', 'bar'
+    ])
+    assert result.exit_code == 0
+    assert "(5 added, 0 updated, 0 deleted)" in result.output
+
+    # Bar[B, C] -> Qux
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/qux',
+        'fetch',
+        '--source', 'bar',
+        '--tag', 'A',
+        '--tag', 'B'
+    ])
+    assert result.exit_code == 0
+    assert "(0 added, 0 updated, 2 deleted)" in result.output
+
+    # Bar[C], Baz[C] -> Qux
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/qux',
+        'fetch',
+        '--source', 'bar',
+        '--source', 'baz',
+        '--tag', 'C',
+    ])
+    assert result.exit_code == 0
+    assert "(2 added, 0 updated, 2 deleted)" in result.output

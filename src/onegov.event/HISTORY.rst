@@ -13,6 +13,9 @@ Changelog
 - Adds guidle import.
   [msom]
 
+- Adds a command to fetch events from other instances.
+  [msom]
+
 - Makes the collections fully stateful.
   [msom]
 
