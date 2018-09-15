@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.35.0 (2018-09-15)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to export the filtered occurrences as iCalendar file.
   [msom]
 
