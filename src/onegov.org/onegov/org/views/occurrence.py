@@ -83,6 +83,17 @@ def ical_export_occurence(self, request):
     )
 
 
+@OrgApp.view(model=OccurrenceCollection, name='ical', permission=Public)
+def ical_export_occurences(self, request):
+    """ Returns the occurrences as ics. """
+
+    return Response(
+        self.as_ical(request),
+        content_type='text/calendar',
+        content_disposition='inline; filename=calendar.ics'
+    )
+
+
 @OrgApp.form(model=OccurrenceCollection, name='export', permission=Private,
              form=ExportForm, template='export.pt')
 def view_export(self, request, form):

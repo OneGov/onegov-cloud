@@ -2221,6 +2221,9 @@ def test_view_occurrences(client):
     assert min(dates(query)) == unique_dates[1]
     assert max(dates(query)) == unique_dates[-2]
 
+    assert client.get('/events/').click('Diese Termine exportieren').\
+        text.startswith('BEGIN:VCALENDAR')
+
 
 def test_view_occurrence(client):
     events = client.get('/events')
@@ -2244,8 +2247,10 @@ def test_view_occurrence(client):
     assert len(event.pyquery('.occurrence-occurrences li')) == 9
     assert len(event.pyquery('.occurrence-exports h2')) == 2
 
-    event.click('Diesen Termin exportieren').text.startswith('BEGIN:VCALENDAR')
-    event.click('Alle Termine exportieren').text.startswith('BEGIN:VCALENDAR')
+    assert event.click('Diesen Termin exportieren').\
+        text.startswith('BEGIN:VCALENDAR')
+    assert event.click('Alle Termine exportieren').\
+        text.startswith('BEGIN:VCALENDAR')
 
 
 def test_submit_event(client):
