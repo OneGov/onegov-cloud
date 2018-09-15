@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.7.0 (2018-09-15)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds ical export to occurrence collection.
   [msom]
