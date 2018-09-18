@@ -1658,3 +1658,17 @@ def test_occasion_number(client, scenario):
 
     assert "1. Durchführung" in page.click('Anmelden', index=0)
     assert "2. Durchführung" in page.click('Anmelden', index=1)
+
+
+def test_main_views_without_period(client):
+    client.login_admin()
+
+    # 99.9% of the time, there's a period for the following views -
+    # if there isn't we must be sure to not show an exeption (this happens
+    # because we tend to be very optimistic about periods being there)
+    assert client.get('/activities').status_code == 200
+    assert client.get('/my-bookings').status_code == 200
+    assert client.get('/notifications').status_code == 200
+
+    assert client.get('/matching').status_code == 404
+    assert client.get('/billing').status_code == 404

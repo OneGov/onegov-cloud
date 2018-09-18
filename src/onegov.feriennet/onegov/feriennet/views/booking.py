@@ -204,7 +204,7 @@ def view_my_bookings(self, request):
     period = next((p for p in periods if p.id == self.period_id), None)
 
     bookings = all_bookings(self)
-    grouped_bookings = group_bookings(period, bookings)
+    grouped_bookings = period and group_bookings(period, bookings) or {}
 
     related = request.app.org.meta.get('show_related_contacts') or None
 
