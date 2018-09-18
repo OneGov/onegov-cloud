@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-30 16:17+0200\n"
-"PO-Revision-Date: 2018-08-23 09:18+0200\n"
+"POT-Creation-Date: 2018-09-18 13:35+0200\n"
+"PO-Revision-Date: 2018-09-18 11:29+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -89,6 +89,9 @@ msgstr "Votations"
 msgid "Edit page"
 msgstr ""
 
+msgid "Voter strengths"
+msgstr ""
+
 msgid "Manage attachments"
 msgstr ""
 
@@ -103,6 +106,454 @@ msgstr ""
 
 msgid "Download dataset"
 msgstr ""
+
+msgid "actor-acs-abbreviation"
+msgstr "ACS"
+
+msgid "actor-auns-abbreviation"
+msgstr "ASIN"
+
+msgid "actor-bdp-abbreviation"
+msgstr "PBD"
+
+msgid "actor-bpuk-abbreviation"
+msgstr "DTAP"
+
+msgid "actor-csp-abbreviation"
+msgstr "PCS"
+
+msgid "actor-cvp-fr-abbreviation"
+msgstr "PDC-Fe"
+
+msgid "actor-cvp-abbreviation"
+msgstr "PDC"
+
+msgid "actor-dem-abbreviation"
+msgstr "Dém"
+
+msgid "actor-dsp-abbreviation"
+msgstr "DSP"
+
+msgid "actor-eco-abbreviation"
+msgstr "eco"
+
+msgid "actor-edk-abbreviation"
+msgstr "CDIP"
+
+msgid "actor-edu-abbreviation"
+msgstr "UDF"
+
+msgid "actor-endk-abbreviation"
+msgstr "EnDK"
+
+msgid "actor-evp-abbreviation"
+msgstr "PEV"
+
+msgid "actor-fdk-abbreviation"
+msgstr "CDF"
+
+msgid "actor-fdp-fr-abbreviation"
+msgstr "PRD-Fe"
+
+msgid "actor-fdp-abbreviation"
+msgstr "PRD"
+
+msgid "actor-fmh-abbreviation"
+msgstr "FMH"
+
+msgid "actor-fps-abbreviation"
+msgstr "PSL"
+
+msgid "actor-frap-abbreviation"
+msgstr "FraP"
+
+msgid "actor-ga-abbreviation"
+msgstr "GA"
+
+msgid "actor-gdk-abbreviation"
+msgstr "CDS"
+
+msgid "actor-gem-abbreviation"
+msgstr "Com"
+
+msgid "actor-glp-abbreviation"
+msgstr "PVL"
+
+msgid "actor-gps-abbreviation"
+msgstr "PES"
+
+msgid "actor-gsoa-abbreviation"
+msgstr "GSsA"
+
+msgid "actor-hev-abbreviation"
+msgstr "HEV"
+
+msgid "actor-jcvp-abbreviation"
+msgstr "JDC"
+
+msgid "actor-jfdp-abbreviation"
+msgstr "JR"
+
+msgid "actor-jgps-abbreviation"
+msgstr "JPES"
+
+msgid "actor-jldu-abbreviation"
+msgstr "Jadl"
+
+msgid "actor-jlps-abbreviation"
+msgstr "JL"
+
+msgid "actor-jna-abbreviation"
+msgstr "JDS"
+
+msgid "actor-jsvp-abbreviation"
+msgstr "JUDC"
+
+msgid "actor-juso-abbreviation"
+msgstr "JS"
+
+msgid "actor-kdk-abbreviation"
+msgstr "CDC"
+
+msgid "actor-kkjpd-abbreviation"
+msgstr "CCDJP"
+
+msgid "actor-kvp-abbreviation"
+msgstr "PCC"
+
+msgid "actor-ldk-abbreviation"
+msgstr "CDCA"
+
+msgid "actor-ldu-abbreviation"
+msgstr "AdI"
+
+msgid "actor-lega-abbreviation"
+msgstr "Lega"
+
+msgid "actor-lps-abbreviation"
+msgstr "PLS"
+
+msgid "actor-mcg-abbreviation"
+msgstr "MCG"
+
+msgid "actor-pda-abbreviation"
+msgstr "PST"
+
+msgid "actor-poch-abbreviation"
+msgstr "POCH"
+
+msgid "actor-pps-abbreviation"
+msgstr "PPS"
+
+msgid "actor-psa-abbreviation"
+msgstr "PSA"
+
+msgid "actor-rep-abbreviation"
+msgstr "MRS"
+
+msgid "actor-sab-abbreviation"
+msgstr "SAB"
+
+msgid "actor-sante-abbreviation"
+msgstr "santé"
+
+msgid "actor-sav-abbreviation"
+msgstr "UPS"
+
+msgid "actor-sbk-abbreviation"
+msgstr "CES"
+
+msgid "actor-sblv-abbreviation"
+msgstr "USPF"
+
+msgid "actor-sbv-asb-abbreviation"
+msgstr "ASB"
+
+msgid "actor-sbv-usp-abbreviation"
+msgstr "USP"
+
+msgid "actor-sd-abbreviation"
+msgstr "DS"
+
+msgid "actor-seks-abbreviation"
+msgstr "FEPS"
+
+msgid "actor-sgb-abbreviation"
+msgstr "USS"
+
+msgid "actor-sgv-abbreviation"
+msgstr "USAM"
+
+msgid "actor-skos-abbreviation"
+msgstr "CSIAS"
+
+msgid "actor-sks-abbreviation"
+msgstr "SKS"
+
+msgid "actor-smv-abbreviation"
+msgstr "ASLOCA"
+
+msgid "actor-sodk-abbreviation"
+msgstr "CDAS"
+
+msgid "actor-sol-abbreviation"
+msgstr "Sol."
+
+msgid "actor-sps-abbreviation"
+msgstr "PSS"
+
+msgid "actor-ssv-abbreviation"
+msgstr "UVS"
+
+msgid "actor-svp-abbreviation"
+msgstr "UDC"
+
+msgid "actor-tcs-abbreviation"
+msgstr "TCS"
+
+msgid "actor-travs-abbreviation"
+msgstr "TravS"
+
+msgid "actor-vcs-abbreviation"
+msgstr "ATE"
+
+msgid "actor-vdk-abbreviation"
+msgstr "CDEP"
+
+msgid "actor-voev-abbreviation"
+msgstr "UTP"
+
+msgid "actor-vpod-abbreviation"
+msgstr "SSP"
+
+msgid "actor-vsa-abbreviation"
+msgstr "FSE"
+
+msgid "actor-acs-label"
+msgstr "Automobile Club de Suisse"
+
+msgid "actor-auns-label"
+msgstr "Action pour une Suisse indépendente et neutre"
+
+msgid "actor-bdp-label"
+msgstr "Parti bourgeois-démocratique Suisse"
+
+msgid "actor-bpuk-label"
+msgstr ""
+"Conférence suisse des direct. Cant. Des travaux publics, de l'aménagement du "
+"territoire et de l'environnement"
+
+msgid "actor-csp-label"
+msgstr "Parti chrétien-social"
+
+msgid "actor-cvp-fr-label"
+msgstr "PDC Femmes"
+
+msgid "actor-cvp-label"
+msgstr "Parti démocrate-chrétien suisse"
+
+msgid "actor-dem-label"
+msgstr "Parti démocratique"
+
+msgid "actor-dsp-label"
+msgstr "Demokratisch-Soziale Partei Basel-Stadt"
+
+msgid "actor-eco-label"
+msgstr "economiesuisse"
+
+msgid "actor-edk-label"
+msgstr ""
+"Conférence suisse des directrices et directeurs cantonaux de l'instruction "
+"publique"
+
+msgid "actor-edu-label"
+msgstr "Union Démocratique Fédérale"
+
+msgid "actor-endk-label"
+msgstr "Conférence des directeurs cantonaux de l'énérgie"
+
+msgid "actor-evp-label"
+msgstr "Parti évangélique populaire suisse"
+
+msgid "actor-fdk-label"
+msgstr "Conférence des directeurs cantonaux des finances"
+
+msgid "actor-fdp-fr-label"
+msgstr "Radical démocratique femmes"
+
+msgid "actor-fdp-label"
+msgstr "Parti radical-démocratique suisse"
+
+msgid "actor-fmh-label"
+msgstr "Fédération des médecins suisses"
+
+msgid "actor-fps-label"
+msgstr "Parti de la liberté"
+
+msgid "actor-frap-label"
+msgstr "Frauen macht Politik!"
+
+msgid "actor-ga-label"
+msgstr "Grüne Alternative"
+
+msgid "actor-gdk-label"
+msgstr "Conférence suisse des direct. cant. de la santé"
+
+msgid "actor-gem-label"
+msgstr "Association des Communes Suisses"
+
+msgid "actor-glp-label"
+msgstr "Parti vert'libéral"
+
+msgid "actor-gps-label"
+msgstr "Parti écologiste suisse"
+
+msgid "actor-gsoa-label"
+msgstr "Groupe pour une Suisse sans armée"
+
+msgid "actor-hev-label"
+msgstr "Hauseigentümerverband"
+
+msgid "actor-jcvp-label"
+msgstr "Jeunes démocrates-chrétiens suisses"
+
+msgid "actor-jfdp-label"
+msgstr "Jeunesse radical"
+
+msgid "actor-jgps-label"
+msgstr "Jeunesse Verts"
+
+msgid "actor-jldu-label"
+msgstr "Junger LdU"
+
+msgid "actor-jlps-label"
+msgstr "Junge LPS"
+
+msgid "actor-jna-label"
+msgstr "Jeunes Democrates Suisses"
+
+msgid "actor-jsvp-label"
+msgstr "Jeunes UDC"
+
+msgid "actor-juso-label"
+msgstr "Jeunesse Socialiste Suisse"
+
+msgid "actor-kdk-label"
+msgstr "Conférence des gouvernements cantonaux"
+
+msgid "actor-kkjpd-label"
+msgstr "Conférence suisse des direct. cant. de justice et police"
+
+msgid "actor-kvp-label"
+msgstr "Parti chrétien-conservateur"
+
+msgid "actor-ldk-label"
+msgstr "Conférence des directeurs cantonaux de l'agriculture"
+
+msgid "actor-ldu-label"
+msgstr "Alliance des Indépendants"
+
+msgid "actor-lega-label"
+msgstr "Lega dei Ticinesi"
+
+msgid "actor-lps-label"
+msgstr "Parti libéral suisse"
+
+msgid "actor-mcg-label"
+msgstr "Mouvement Citoyens Genevois"
+
+msgid "actor-pda-label"
+msgstr "Parti suisse du travail"
+
+msgid "actor-poch-label"
+msgstr "Organisations progressistes de Suisse"
+
+msgid "actor-pps-label"
+msgstr "Parti pirate suisse"
+
+msgid "actor-psa-label"
+msgstr "Parti socialiste autonome"
+
+msgid "actor-rep-label"
+msgstr "Mouvement Républicain suisse"
+
+msgid "actor-sab-label"
+msgstr "Schweizerische Arbeitsgemeinschaft für die Berggebiete"
+
+msgid "actor-sante-label"
+msgstr "santésuisse Les assureurs-maladie suisses"
+
+msgid "actor-sav-label"
+msgstr "Union patronale suisse"
+
+msgid "actor-sbk-label"
+msgstr "Conférence des évêques suisses"
+
+msgid "actor-sblv-label"
+msgstr "Union suisse des paysannes et de femmes rurales"
+
+msgid "actor-sbv-asb-label"
+msgstr "Association suisse des banquiers"
+
+msgid "actor-sbv-usp-label"
+msgstr "Union suisse des paysans"
+
+msgid "actor-sd-label"
+msgstr "Démocrates Suisses"
+
+msgid "actor-seks-label"
+msgstr "Fédération des Églises protestantes de Suisse"
+
+msgid "actor-sgb-label"
+msgstr "Union syndicale suisse"
+
+msgid "actor-sgv-label"
+msgstr "Union suisse des arts et métiers"
+
+msgid "actor-skos-label"
+msgstr "Conférence suisse des institutions d'action sociale"
+
+msgid "actor-sks-label"
+msgstr "Stiftung für Konsumentenschutz"
+
+msgid "actor-smv-label"
+msgstr "Association suisse des locataires"
+
+msgid "actor-sodk-label"
+msgstr "Conférence des direct. Cantonaux des affaires sociales"
+
+msgid "actor-sol-label"
+msgstr "Solidarités"
+
+msgid "actor-sps-label"
+msgstr "Parti socialiste suisse"
+
+msgid "actor-ssv-label"
+msgstr "Union des villes suisses"
+
+msgid "actor-svp-label"
+msgstr "Union démocratique du centre"
+
+msgid "actor-tcs-label"
+msgstr "Touring Club Suisse"
+
+msgid "actor-travs-label"
+msgstr "Travail.Suisse"
+
+msgid "actor-vcs-label"
+msgstr "Association transports et environnement"
+
+msgid "actor-vdk-label"
+msgstr "Conférence des chefs des départements cant. De l'économie publique"
+
+msgid "actor-voev-label"
+msgstr "Union des transports publics"
+
+msgid "actor-vpod-label"
+msgstr "Syndicat des Services publics"
+
+msgid "actor-vsa-label"
+msgstr "Fédération des sociétés suisses d'employés"
 
 msgid "d-1-1"
 msgstr "Ordre public"
@@ -632,8 +1083,8 @@ msgstr "Référendum obligatoire"
 msgid "Optional referendum"
 msgstr "Référendum facultatif"
 
-msgid "Popular vote"
-msgstr ""
+msgid "Popular initiative"
+msgstr "Initiative populaire"
 
 msgid "Direct counter-proposal"
 msgstr "Contre-projet direct"
@@ -757,6 +1208,27 @@ msgstr ""
 "Si vous ne souhaitez pas modifier votre mot de passe, vous pouvez ignorer ce "
 "message."
 
+msgid "Voting campaign"
+msgstr ""
+
+msgid "Position"
+msgstr ""
+
+msgid "Percentage of voters in the National Council elections"
+msgstr ""
+
+msgid "Vague"
+msgstr ""
+
+msgid "Parties"
+msgstr "Partis"
+
+msgid "Party"
+msgstr "Parti"
+
+msgid "Others"
+msgstr ""
+
 msgid "General"
 msgstr ""
 
@@ -769,13 +1241,19 @@ msgstr ""
 msgid "BFS number"
 msgstr ""
 
-msgid "Procedure number"
+msgid "Année politique Suisse"
+msgstr ""
+
+msgid "Link"
+msgstr ""
+
+msgid "Submission"
+msgstr ""
+
+msgid "Signatures"
 msgstr ""
 
 msgid "Initiator"
-msgstr ""
-
-msgid "Année politique Suisse"
 msgstr ""
 
 msgid "Pre-parliamentary phase"
@@ -793,6 +1271,9 @@ msgstr ""
 msgid "Legislation"
 msgstr ""
 
+msgid "Procedure number"
+msgstr ""
+
 msgid "Parliament's position"
 msgstr ""
 
@@ -802,13 +1283,16 @@ msgstr ""
 msgid "Position of the Council of States"
 msgstr ""
 
-msgid "Voting campaign"
-msgstr ""
-
 msgid "Recommendations of the Parties"
 msgstr ""
 
 msgid "Recommendations of the Associations"
+msgstr ""
+
+msgid "Cumulative electoral strength"
+msgstr ""
+
+msgid "Details"
 msgstr ""
 
 msgid "Vote"
@@ -820,32 +1304,11 @@ msgstr ""
 msgid "Yeas"
 msgstr "Oui"
 
-msgid "Turnout"
-msgstr "Participation électorale"
-
 msgid "Cantons"
 msgstr ""
 
-msgid "Voter strengths"
-msgstr ""
-
-msgid "Parties"
-msgstr "Partis"
-
-msgid "Party"
-msgstr "Parti"
-
-msgid "Percentage of voters in the National Council elections"
-msgstr ""
-
-msgid "Others"
-msgstr ""
-
-msgid "Position"
-msgstr ""
-
-msgid "Vague"
-msgstr ""
+msgid "Turnout"
+msgstr "Participation électorale"
 
 msgid "Filter"
 msgstr ""
@@ -857,9 +1320,6 @@ msgid "Date"
 msgstr "Date"
 
 msgid "Yeas People"
-msgstr ""
-
-msgid "Details"
 msgstr ""
 
 msgid "Wrong username or password"

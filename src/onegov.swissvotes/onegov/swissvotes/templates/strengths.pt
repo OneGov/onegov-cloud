@@ -1,0 +1,137 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.swissvotes" tal:define="vote layout.model">
+    <tal:block metal:fill-slot="title">
+        ${layout.title}
+        <small tal:condition="vote.keyword">${vote.keyword}</small>
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <h2 i18n:translate>${layout.title}</h2>
+
+        <tal:block tal:condition="vote.has_national_council_share_data">
+
+            <h3 i18n:translate>Voting campaign</h3>
+            <table class="sortable voter-strengths" data-sortlist="[[1,1]]">
+                <thead>
+                    <tr>
+                        <th i18n:translate class="column-25">Position</th>
+                        <th><tal:block i18n:translate>Percentage of voters in the National Council elections </tal:block> ${vote.national_council_election_year}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr tal:condition="vote.national_council_share_yeas">
+                        <td i18n:translate>Yea</td>
+                        <td>${layout.format_number(vote.national_council_share_yeas, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_nays">
+                        <td i18n:translate>Nay</td>
+                        <td>${layout.format_number(vote.national_council_share_nays, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_neutral">
+                        <td i18n:translate>Neutral</td>
+                        <td>${layout.format_number(vote.national_council_share_neutral, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_vague">
+                        <td i18n:translate>Vague</td>
+                        <td>${layout.format_number(vote.national_council_share_vague, 1)}%</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 i18n:translate>Parties</h3>
+            <table class="sortable voter-strengths" data-sortlist="[[1,1]]">
+                <thead>
+                    <tr>
+                        <th i18n:translate class="column-25">Party</th>
+                        <th><tal:block i18n:translate>Percentage of voters in the National Council elections </tal:block> ${vote.national_council_election_year}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr tal:condition="vote.national_council_share_bdp">
+                        <td>BDP</td>
+                        <td>${layout.format_number(vote.national_council_share_bdp, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_csp">
+                        <td>CSP</td>
+                        <td>${layout.format_number(vote.national_council_share_csp, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_cvp">
+                        <td>CVP</td>
+                        <td>${layout.format_number(vote.national_council_share_cvp, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_edu">
+                        <td>EDU</td>
+                        <td>${layout.format_number(vote.national_council_share_edu, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_evp">
+                        <td>EVP</td>
+                        <td>${layout.format_number(vote.national_council_share_evp, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_fdp">
+                        <td>FDP</td>
+                        <td>${layout.format_number(vote.national_council_share_fdp, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_fps">
+                        <td>FPS</td>
+                        <td>${layout.format_number(vote.national_council_share_fps, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_glp">
+                        <td>GLP</td>
+                        <td>${layout.format_number(vote.national_council_share_glp, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_gps">
+                        <td>GPS</td>
+                        <td>${layout.format_number(vote.national_council_share_gps, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_kvp">
+                        <td>KVP</td>
+                        <td>${layout.format_number(vote.national_council_share_kvp, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_ldu">
+                        <td>LDU</td>
+                        <td>${layout.format_number(vote.national_council_share_ldu, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_lega">
+                        <td>Lega</td>
+                        <td>${layout.format_number(vote.national_council_share_lega, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_lps">
+                        <td>LPS</td>
+                        <td>${layout.format_number(vote.national_council_share_lps, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_mcg">
+                        <td>MCG</td>
+                        <td>${layout.format_number(vote.national_council_share_mcg, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_pda">
+                        <td>PDA</td>
+                        <td>${layout.format_number(vote.national_council_share_pda, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_poch">
+                        <td>POCH</td>
+                        <td>${layout.format_number(vote.national_council_share_poch, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_rep">
+                        <td>REP</td>
+                        <td>${layout.format_number(vote.national_council_share_rep, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_sd">
+                        <td>SD</td>
+                        <td>${layout.format_number(vote.national_council_share_sd, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_sp">
+                        <td>SP</td>
+                        <td>${layout.format_number(vote.national_council_share_sp, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_svp">
+                        <td>SVP</td>
+                        <td>${layout.format_number(vote.national_council_share_svp, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_ubrige">
+                        <td i18n:translate>Others</td>
+                        <td>${layout.format_number(vote.national_council_share_ubrige, 1)}%</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </tal:block>
+    </tal:block>
+</div>

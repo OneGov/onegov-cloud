@@ -339,7 +339,7 @@ POLICY_AREA = {
 }
 
 
-class PolicyArea():
+class PolicyArea(object):
     """ Helper class for handling of descriptors. """
 
     def __init__(self, value, level=None):
@@ -388,9 +388,9 @@ class PolicyArea():
             lookup = lookup.get('children', {})
         return result
 
-    def html(self, request):
-        title = ' &gt; '.join(
-            request.translate(part) for part in self.label_path
+    def html(self, request, full=False):
+        label_path = [request.translate(part) for part in self.label_path]
+        title = ' &gt; '.join(label_path)
+        return f'<span>{title}' if full else (
+            f'<span title="{title}">{label_path[-1]}</span>'
         )
-        text = request.translate(self.label)
-        return f'<span title="{title}">{text}</span>'

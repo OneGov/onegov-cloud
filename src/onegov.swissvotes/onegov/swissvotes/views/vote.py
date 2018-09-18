@@ -7,6 +7,7 @@ from onegov.swissvotes.forms import AttachmentsForm
 from onegov.swissvotes.layouts import DeleteVoteLayout
 from onegov.swissvotes.layouts import UploadVoteAttachemtsLayout
 from onegov.swissvotes.layouts import VoteLayout
+from onegov.swissvotes.layouts import VoteStrengthsLayout
 from onegov.swissvotes.models import SwissVote
 
 
@@ -18,6 +19,18 @@ from onegov.swissvotes.models import SwissVote
 def view_vote(self, request):
     return {
         'layout': VoteLayout(self, request)
+    }
+
+
+@SwissvotesApp.html(
+    model=SwissVote,
+    permission=Public,
+    template='strengths.pt',
+    name='strengths'
+)
+def view_vote_strengths(self, request):
+    return {
+        'layout': VoteStrengthsLayout(self, request)
     }
 
 

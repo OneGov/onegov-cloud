@@ -5,7 +5,8 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.file import AssociatedFiles
 from onegov.file import File
 from onegov.swissvotes import _
-from onegov.swissvotes.models import PolicyArea
+from onegov.swissvotes.models.actor import Actor
+from onegov.swissvotes.models.policy_area import PolicyArea
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Integer
@@ -17,7 +18,7 @@ from sqlalchemy.dialects.postgresql import INT4RANGE
 LEGAL_FORM = {
     1: _("Mandatory referendum"),
     2: _("Optional referendum"),
-    3: _("Popular vote"),
+    3: _("Popular initiative"),
     4: _("Direct counter-proposal"),
 }
 
@@ -269,51 +270,51 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
 
     def group_recommendations(self, recommendations):
         result = {}
-        for key, value in recommendations.items():
-            if value is not None and value != 9999:
-                result.setdefault(value, []).append(key)
+        for actor, recommendation in recommendations:
+            if recommendation is not None and recommendation != 9999:
+                result.setdefault(recommendation, []).append(actor)
 
         return OrderedDict([
-            (RECOMMENDATION[key], sorted(result[key]))
+            (RECOMMENDATION[key], result[key])
             for key in sorted(result.keys())
         ])
 
     @cached_property
     def recommendations_parties(self):
-        return self.group_recommendations({
-            'FDP': self._recommendation_fdp,
-            'CVP': self._recommendation_cvp,
-            'SPS': self._recommendation_sps,
-            'SVP': self._recommendation_svp,
-            'LPS': self._recommendation_lps,
-            'LDU': self._recommendation_ldu,
-            'EVP': self._recommendation_evp,
-            'UCSP': self._recommendation_ucsp,
-            'PdA': self._recommendation_pda,
-            'POCH': self._recommendation_poch,
-            'GPS': self._recommendation_gps,
-            'SD': self._recommendation_sd,
-            'REP': self._recommendation_rep,
-            'EDU': self._recommendation_edu,
-            'FPS': self._recommendation_fps,
-            'Lega': self._recommendation_lega,
-            'KVP': self._recommendation_kvp,
-            'GLP': self._recommendation_glp,
-            'BDP': self._recommendation_bdp,
-            'MCG': self._recommendation_mcg,
-        })
+        return self.group_recommendations((
+            (Actor('bdp'), self._recommendation_bdp),
+            (Actor('cvp'), self._recommendation_cvp),
+            (Actor('edu'), self._recommendation_edu),
+            (Actor('evp'), self._recommendation_evp),
+            (Actor('fdp'), self._recommendation_fdp),
+            (Actor('fps'), self._recommendation_fps),
+            (Actor('glp'), self._recommendation_glp),
+            (Actor('gps'), self._recommendation_gps),
+            (Actor('kvp'), self._recommendation_kvp),
+            (Actor('ldu'), self._recommendation_ldu),
+            (Actor('lega'), self._recommendation_lega),
+            (Actor('lps'), self._recommendation_lps),
+            (Actor('mcg'), self._recommendation_mcg),
+            (Actor('pda'), self._recommendation_pda),
+            (Actor('poch'), self._recommendation_poch),
+            (Actor('rep'), self._recommendation_rep),
+            (Actor('sd'), self._recommendation_sd),
+            (Actor('sps'), self._recommendation_sps),
+            (Actor('svp'), self._recommendation_svp),
+            (Actor('csp'), self._recommendation_ucsp),
+        ))
 
     @cached_property
     def recommendations_associations(self):
-        return self.group_recommendations({
-            'ZSA': self._recommendation_zsa,
-            'ECO': self._recommendation_eco,
-            'SGV': self._recommendation_sgv,
-            'SBV': self._recommendation_sbv,
-            'SGB': self._recommendation_sgb,
-            'Travail.Suisse': self._recommendation_cng_travs,
-            'VSA': self._recommendation_vsa,
-        })
+        return self.group_recommendations((
+            (Actor('eco'), self._recommendation_eco),
+            (Actor('sbv-usp'), self._recommendation_sbv),
+            (Actor('sgb'), self._recommendation_sgb),
+            (Actor('sgv'), self._recommendation_sgv),
+            (Actor('travs'), self._recommendation_cng_travs),
+            (Actor('vsa'), self._recommendation_vsa),
+            (Actor('sav'), self._recommendation_zsa),
+        ))
 
     @cached_property
     def has_national_council_share_data(self):

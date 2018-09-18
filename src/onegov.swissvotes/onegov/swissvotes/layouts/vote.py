@@ -35,6 +35,22 @@ class VoteLayout(DefaultLayout):
         ]
 
 
+class VoteStrengthsLayout(DefaultLayout):
+
+    @cached_property
+    def title(self):
+        return _("Voter strengths")
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            (_("Homepage"), self.homepage_link, ''),
+            (_("Votes"), self.votes_link, ''),
+            (self.model.title, self.request.link(self.model), ''),
+            (self.title, '#', 'current'),
+        ]
+
+
 class UploadVoteAttachemtsLayout(DefaultLayout):
 
     @cached_property
