@@ -1,11 +1,11 @@
 import phonenumbers
 
 from onegov.election_day import _
-from onegov.election_day.validators import ValidPhoneNumber
 from onegov.form import Form
+from onegov.form.validators import ValidPhoneNumber
 from wtforms import StringField
-from wtforms.validators import InputRequired
 from wtforms.validators import Email
+from wtforms.validators import InputRequired
 
 
 class EmailSubscriptionForm(Form):
