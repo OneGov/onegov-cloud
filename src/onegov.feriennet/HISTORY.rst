@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Disables new activites when no period is active.
+  [href]
+
 - Shows archived occasions for editors.
   [href]
 

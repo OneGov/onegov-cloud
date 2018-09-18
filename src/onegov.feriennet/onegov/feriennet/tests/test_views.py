@@ -1734,3 +1734,46 @@ def test_view_archived_occasions(client, scenario):
 
     assert '1. Durchführung' in client.get('/activity/fishing')
     assert 'Duplizieren' in client.get('/activity/fishing')
+
+
+def test_no_new_activites_without_active_period(client, scenario):
+    scenario.add_period(
+        title="2017",
+        confirmed=True,
+        finalized=True,
+        archived=True,
+        active=False
+    )
+
+    scenario.add_activity(title="Fishing", state='archived')
+    scenario.add_occasion()
+
+    scenario.add_period(
+        title="2018",
+        confirmed=True,
+        finalized=True,
+        archived=True,
+        active=True
+    )
+
+    scenario.commit()
+
+    client.login_admin()
+
+    page = client.get('/activities')
+    assert "Angebot erneut anbieten" in page
+    assert "Angebot erfassen" in page
+
+    page = client.get('/activity/fishing')
+    assert "Erneut anbieten" in page
+
+    scenario.refresh()
+    scenario.latest_period.active = False
+    scenario.commit()
+
+    page = client.get('/activities')
+    assert "Angebot erneut anbieten" not in page
+    assert "Angebot erfassen" not in page
+
+    page = client.get('/activity/fishing')
+    assert "Erneut anbieten" not in page

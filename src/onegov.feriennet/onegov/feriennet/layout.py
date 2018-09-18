@@ -77,13 +77,14 @@ class VacationActivityCollectionLayout(DefaultLayout):
 
     @property
     def organiser_links(self):
-        yield Link(
-            text=_("Submit Activity"),
-            url=self.request.link(self.model, name='new'),
-            attrs={'class': 'new-activity'}
-        )
+        if self.app.active_period:
+            yield Link(
+                text=_("Submit Activity"),
+                url=self.request.link(self.model, name='new'),
+                attrs={'class': 'new-activity'}
+            )
 
-        yield self.offer_again_links
+            yield self.offer_again_links
 
     @property
     def offer_again_links(self):
