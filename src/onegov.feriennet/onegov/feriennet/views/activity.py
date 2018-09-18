@@ -264,6 +264,11 @@ def view_activity(self, request):
     } or set()
 
     def occasion_links(o):
+
+        # organisers can only edit occasions in active periods
+        if request.is_organiser_only and not o.period.active:
+            return
+
         yield Link(text=_("Edit"), url=request.link(o, name='edit'))
         yield Link(text=_("Clone"), url=request.link(o, name='clone'))
 
@@ -378,7 +383,10 @@ def view_activity(self, request):
             session=session,
             activity=self,
             show_inactive=request.is_organiser,
-            show_archived=request.is_admin
+            show_archived=request.is_admin or (
+                request.is_organiser and
+                self.username == request.current_username
+            )
         ),
     }
 

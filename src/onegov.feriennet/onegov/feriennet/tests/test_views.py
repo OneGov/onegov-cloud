@@ -1698,3 +1698,39 @@ def test_book_alternate_occasion_regression(client, scenario):
     page = page.form.submit()
 
     assert 'bereits für diese Durchführung' not in page
+
+
+def test_view_archived_occasions(client, scenario):
+    scenario.add_period(
+        title="Yesteryear",
+        confirmed=True,
+        finalized=True,
+        archived=True
+    )
+
+    scenario.add_activity(title="Fishing", state='archived')
+    scenario.add_occasion()
+    scenario.commit()
+
+    # anonymous doesn't see archived occasions
+    client.get('/activity/fishing', status=404)
+
+    # editors don't see archived occasions, unless they own them
+    client.login_editor()
+    client.get('/activity/fishing', status=404)
+
+    scenario.refresh()
+    scenario.latest_activity.username = 'editor@example.org'
+    scenario.commit()
+
+    assert '1. Durchführung' in client.get('/activity/fishing')
+
+    # they do not get any action links however
+    assert 'Duplizieren' not in client.get('/activity/fishing')
+
+    # admins see archived occasions
+    client = client.spawn()
+    client.login_admin()
+
+    assert '1. Durchführung' in client.get('/activity/fishing')
+    assert 'Duplizieren' in client.get('/activity/fishing')

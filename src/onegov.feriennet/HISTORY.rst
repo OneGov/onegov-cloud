@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Shows archived occasions for editors.
+  [href]
+
 - Improves look of occasions by period toggle on activity view.
   [href]
 
