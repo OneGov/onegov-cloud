@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.35.1 (2018-09-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a phone number validator.
   [msom]
