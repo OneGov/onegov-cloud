@@ -105,11 +105,26 @@
 
                                     <div class="state-title">
                                         <tal:b switch="state">
-                                            <h4 tal:case="'open'" i18n:translate>Open</h4>
-                                            <h4 tal:case="'blocked'" i18n:translate>Blocked</h4>
-                                            <h4 tal:case="'accepted'" i18n:translate>Booked</h4>
-                                            <h4 tal:case="'denied'" i18n:translate>Denied</h4>
-                                            <h4 tal:case="'cancelled'" i18n:translate>Cancelled</h4>
+                                            <h4 tal:case="'open'">
+                                                <tal:b i18n:translate>Open</tal:b>
+                                                <tal:b>(${len(grouped_bookings[attendee][state])})
+                                            </h4>
+                                            <h4 tal:case="'blocked'">
+                                                <tal:b i18n:translate>Blocked</tal:b>
+                                                <tal:b>(${len(grouped_bookings[attendee][state])})
+                                            </h4>
+                                            <h4 tal:case="'accepted'">
+                                                <tal:b i18n:translate>Booked</tal:b>
+                                                <tal:b>(${len(grouped_bookings[attendee][state])})
+                                            </h4>
+                                            <h4 tal:case="'denied'">
+                                                <tal:b i18n:translate>Denied</tal:b>
+                                                <tal:b>(${len(grouped_bookings[attendee][state])})
+                                            </h4>
+                                            <h4 tal:case="'cancelled'">
+                                                <tal:b i18n:translate>Cancelled</tal:b>
+                                                <tal:b>(${len(grouped_bookings[attendee][state])})
+                                            </h4>
                                         </tal:b>
                                     </div>
 

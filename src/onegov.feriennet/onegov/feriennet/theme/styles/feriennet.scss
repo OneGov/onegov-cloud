@@ -753,8 +753,8 @@ ul.tags {
 
 .occasion {
     margin-bottom: 2rem;
-    position: relative;
     min-height: 3rem;
+    position: relative;
 
     .note p {
         margin-bottom: 0;
@@ -963,7 +963,8 @@ $booking-left-margin: 2rem;
         padding: .75rem 1rem 0 0;
 
         h4 {
-            border-bottom: 5px solid $gray;
+            color: $steel;
+            border-bottom: 5px solid $steel;
             font-size: 1.25rem;
             font-weight: bold;
             padding-bottom: .5rem;
@@ -972,11 +973,19 @@ $booking-left-margin: 2rem;
 
     .state-accepted h4 {
         border-color: $green-dark;
+        color: $green-dark;
+    }
+
+    .state-blocked h4 {
+        border-color: $orange-dark;
+        color: $orange-dark;
     }
 
     .state-denied h4 {
         border-color: $red-dark;
+        color: $red-dark;
     }
+
 
     h5 {
         font-size: 1.2rem;
