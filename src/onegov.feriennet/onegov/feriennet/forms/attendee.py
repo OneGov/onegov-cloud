@@ -198,7 +198,11 @@ class AttendeeSignupForm(AttendeeBase):
             query = bookings.by_occasion(self.model)
             query = query.filter(Booking.attendee_id == self.attendee.data)
             query = query.filter(not_(
-                Booking.state.in_(('cancelled', 'denied'))
+                Booking.state.in_((
+                    'cancelled',
+                    'denied',
+                    'blocked'
+                ))
             ))
 
             booking = query.first()

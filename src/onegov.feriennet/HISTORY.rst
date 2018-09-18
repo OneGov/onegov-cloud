@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes being unable to book over blocked bookings.
+  [href]
+
 1.4.1 (2018-09-05)
 ~~~~~~~~~~~~~~~~~~~
 

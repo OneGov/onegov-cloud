@@ -1672,3 +1672,29 @@ def test_main_views_without_period(client):
 
     assert client.get('/matching', expect_errors=True).status_code == 404
     assert client.get('/billing', expect_errors=True).status_code == 404
+
+
+def test_book_alternate_occasion_regression(client, scenario):
+    scenario.add_period(title="Ferienpass", phase='booking', confirmed=True)
+    scenario.add_attendee(birth_date=date.today() - timedelta(days=8 * 360))
+
+    scenario.add_activity(title="Fishing", state='accepted')
+    scenario.add_occasion()
+    scenario.add_booking(state='accepted')
+
+    scenario.add_activity(title="Hunting", state='accepted')
+    scenario.add_occasion()
+    scenario.add_booking(state='blocked')
+
+    scenario.commit()
+    scenario.refresh()
+
+    client.login_admin()
+    client.fill_out_profile()
+
+    client.get('/my-bookings').click("Stornieren")
+
+    page = client.get('/activity/hunting').click("Anmelden")
+    page = page.form.submit()
+
+    assert 'bereits für diese Durchführung' not in page
