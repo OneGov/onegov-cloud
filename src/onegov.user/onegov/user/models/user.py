@@ -227,6 +227,9 @@ class User(Base, TimestampMixin, ORMSearchable):
     #: tags of this user
     tags = data_property()
 
+    #: the phone number of this user
+    phone_number = data_property()
+
     def cleanup_sessions(self, request):
         """ Removes stored sessions not valid anymore. """
 

@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a phone number property to the user model.
+  [msom]
+
 0.17.7 (2018-08-17)
 ~~~~~~~~~~~~~~~~~~~
 
