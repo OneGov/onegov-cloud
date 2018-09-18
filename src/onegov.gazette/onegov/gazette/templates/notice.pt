@@ -62,7 +62,10 @@
                             <dd tal:condition="notice.at_cost" tal:content="structure layout.format_text(notice.billing_address)"></dd>
 
                             <dt i18n:translate>User</dt>
-                            <dd>${notice.user_name}</dd>
+                            <dd>
+                                ${notice.user_name}
+                                <tal:block tal:condition="notice.user"><br>${notice.user.username}</tal:block>
+                            </dd>
 
                             <dt i18n:translate>Group</dt>
                             <dd>${notice.group_name}</dd>

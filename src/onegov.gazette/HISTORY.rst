@@ -3,6 +3,9 @@ Changelog
 - Allows publishers to manage groups and editors.
   [msom]
 
+- Shows the email address of the owner in the details view of a notice.
+  [msom]
+
 1.16.4 (2018-08-16)
 ~~~~~~~~~~~~~~~~~~~~
 
