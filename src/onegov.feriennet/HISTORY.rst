@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves look of occasions by period toggle on activity view.
+  [href]
+
 - Fixes being unable to book over blocked bookings.
   [href]
 

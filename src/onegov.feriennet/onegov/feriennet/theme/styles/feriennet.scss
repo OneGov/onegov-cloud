@@ -2268,16 +2268,18 @@ $booking-left-margin: 2rem;
     Occasions toggle
 */
 .occasions-by-period {
-    margin-bottom: 1rem;
+    margin-bottom: .5rem;
 }
 
 .title-with-toggle {
     display: flex;
 
     .toggle {
+        color: $anchor-font-color;
         font-size: 1.25rem;
         line-height: 2.5rem;
-        margin-left: .5rem;
+        margin-right: .5rem;
+        width: 1.25rem;
     }
 
     .fa {

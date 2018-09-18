@@ -38,12 +38,12 @@
                 <tal:block define="today layout.today()" condition="occasions_by_period" repeat="(title, occasions) occasions_by_period">
                     <div tal:define="period occasions[0].period" class="occasions-by-period">
                         <div class="title-with-toggle">
-                            <h3>${title}</h3>
-
                             <div class="toggle" data-toggle="#occasions-for-${period.id.hex}" tal:condition="request.is_admin">
                                 <i class="fa fa-plus-circle toggle-on" aria-hidden="true"></i>
                                 <i class="fa fa-minus-circle toggle-off" aria-hidden="true"></i>
                             </div>
+
+                            <h3>${title}</h3>
                         </div>
 
                         <div id="occasions-for-${period.id.hex}" style="display: ${period.active and 'block' or 'none'};">
