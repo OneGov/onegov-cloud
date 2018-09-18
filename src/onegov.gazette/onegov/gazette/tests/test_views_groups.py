@@ -76,9 +76,11 @@ def test_view_groups_permissions(gazette_app):
     delete_link = manage.click('Löschen', index=0).request.url
 
     login_publisher(client)
-    client.get('/groups', status=403)
-    client.get(edit_link, status=403)
-    client.get(delete_link, status=403)
+    manage = client.get('/groups').click("Neu")
+    manage.form['name'] = 'YZ'
+    manage = manage.form.submit().maybe_follow()
+    assert manage.click('Bearbeiten', index=0).request.url == edit_link
+    assert manage.click('Löschen', index=0).request.url == delete_link
 
     login_editor_1(client)
     client.get('/groups', status=403)

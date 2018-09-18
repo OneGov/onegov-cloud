@@ -16,10 +16,7 @@ class UserForm(Form):
 
     role = RadioField(
         label=_("Role"),
-        choices=[
-            ('editor', _("Publisher")),
-            ('member', _("Editor"))
-        ],
+        choices=[],
         default='member',
         validators=[
             InputRequired()
@@ -48,8 +45,14 @@ class UserForm(Form):
     )
 
     def on_request(self):
-        session = self.request.session
-        self.group.choices = session.query(
+        self.role.choices = []
+        model = getattr(self, 'model', None)
+        if self.request.is_private(model):
+            self.role.choices = [('member', _("Editor"))]
+        if self.request.is_secret(model):
+            self.role.choices.append(('editor', _("Publisher")))
+
+        self.group.choices = self.request.session.query(
             cast(UserGroup.id, String), UserGroup.name
         ).all()
         self.group.choices.insert(

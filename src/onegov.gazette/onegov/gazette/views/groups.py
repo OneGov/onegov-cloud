@@ -1,5 +1,5 @@
 from morepath import redirect
-from onegov.core.security import Secret
+from onegov.core.security import Private
 from onegov.gazette import _
 from onegov.gazette import GazetteApp
 from onegov.gazette.forms import EmptyForm
@@ -12,7 +12,7 @@ from onegov.user.forms import UserGroupForm
 @GazetteApp.html(
     model=UserGroupCollection,
     template='groups.pt',
-    permission=Secret
+    permission=Private
 )
 def view_groups(self, request):
     """ View all the user groups.
@@ -34,7 +34,7 @@ def view_groups(self, request):
     model=UserGroupCollection,
     name='new-group',
     template='form.pt',
-    permission=Secret,
+    permission=Private,
     form=UserGroupForm
 )
 def create_group(self, request, form):
@@ -63,7 +63,7 @@ def create_group(self, request, form):
     model=UserGroup,
     name='edit',
     template='form.pt',
-    permission=Secret,
+    permission=Private,
     form=UserGroupForm
 )
 def edit_group(self, request, form):
@@ -96,7 +96,7 @@ def edit_group(self, request, form):
     model=UserGroup,
     name='delete',
     template='form.pt',
-    permission=Secret,
+    permission=Private,
     form=EmptyForm
 )
 def delete_group(self, request, form):

@@ -1,5 +1,8 @@
 Changelog
 ---------
+- Allows publishers to manage groups and editors.
+  [msom]
+
 1.16.4 (2018-08-16)
 ~~~~~~~~~~~~~~~~~~~~
 

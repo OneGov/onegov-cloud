@@ -3,6 +3,7 @@ from io import BytesIO
 from morepath import redirect
 from morepath.request import Response
 from onegov.core.crypto import random_password
+from onegov.core.security import Private
 from onegov.core.security import Secret
 from onegov.core.templates import render_template
 from onegov.gazette import _
@@ -15,25 +16,41 @@ from onegov.user import User
 from onegov.user import UserCollection
 from onegov.user import UserGroup
 from onegov.user.utils import password_reset_url
+from webob.exc import HTTPForbidden
 from xlsxwriter import Workbook
 
 
 @GazetteApp.html(
     model=UserCollection,
     template='users.pt',
-    permission=Secret
+    permission=Private
 )
 def view_users(self, request):
-    """ View all the publishers and editors (but not the admins).
+    """ View the users.
 
-    This view is only visible by an admin.
+    Publishers can see editors, admins can see editors and publishers. Admins
+    are never shown.
 
     """
 
     layout = Layout(self, request)
-    pub = self.for_filter(role='editor').query().order_by(User.username).all()
-    ed = self.for_filter(role='member').query().order_by(User.username).all()
-    roles = [(_("Publishers"), pub), (_("Editors"), ed)]
+    roles = [
+        (
+            _("Editors"),
+            self.for_filter(role='member').query().order_by(
+                User.username
+            ).all()
+        )
+    ]
+    if request.is_secret(self):
+        roles.append(
+            (
+                _("Publishers"),
+                self.for_filter(role='editor').query().order_by(
+                    User.username
+                ).all()
+            )
+        )
     return {
         'layout': layout,
         'roles': roles,
@@ -47,13 +64,13 @@ def view_users(self, request):
     model=UserCollection,
     name='new-user',
     template='form.pt',
-    permission=Secret,
+    permission=Private,
     form=UserForm
 )
 def create_user(self, request, form):
     """ Create a new publisher or editor.
 
-    This view is only visible by an admin.
+    This view is visible for admins and publishers.
 
     """
 
@@ -104,17 +121,20 @@ def create_user(self, request, form):
     model=User,
     name='edit',
     template='form.pt',
-    permission=Secret,
+    permission=Private,
     form=UserForm
 )
 def edit_user(self, request, form):
-    """ Edit the role, name and email of an editor or publisher.
+    """ Edit the role, name and email of a user.
 
-    This view is only visible by an admin.
+    Publishers may only edit members. Admins can not be edited.
 
     """
 
     layout = Layout(self, request)
+
+    if self.role != 'member' and not request.is_secret(self):
+        raise HTTPForbidden()
 
     if form.submitted(request):
         form.update_model(self)
@@ -138,17 +158,20 @@ def edit_user(self, request, form):
     model=User,
     name='delete',
     template='form.pt',
-    permission=Secret,
+    permission=Private,
     form=EmptyForm
 )
 def delete_user(self, request, form):
-    """ Delete an editor or publisher (but not admins).
+    """ Delete a user.
 
-    This view is only visible by an admin.
+    Publishers may only edit members. Admins can not be deleted.
 
     """
 
     layout = Layout(self, request)
+
+    if self.role != 'member' and not request.is_secret(self):
+        raise HTTPForbidden()
 
     if self.official_notices or self.changes:
         request.message(
@@ -239,7 +262,7 @@ def clear_user_sessions(self, request, form):
 @GazetteApp.view(
     model=UserCollection,
     name='export',
-    permission=Secret
+    permission=Private
 )
 def export_users(self, request):
     """ Export all users as XLSX. The exported file can be re-imported

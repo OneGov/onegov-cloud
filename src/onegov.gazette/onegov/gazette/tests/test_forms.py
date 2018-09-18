@@ -32,15 +32,19 @@ class DummyApp(object):
 
 
 class DummyRequest(object):
-    def __init__(self, session, principal=None, private=False):
+    def __init__(self, session, principal=None, private=False, secret=False):
         self.app = DummyApp(session, principal)
         self.session = session
         self.private = private
+        self.secret = secret
         self.locale = 'de_CH'
         self.time_zone = 'Europe/Zurich'
 
     def is_private(self, model):
         return self.private
+
+    def is_secret(self, model):
+        return self.secret
 
     def include(self, resource):
         pass
@@ -387,7 +391,8 @@ def test_user_form(session):
                 'group': ''
             })
         )
-        form.request = DummyRequest(session)
+        form.request = DummyRequest(session, private=True, secret=True)
+        form.on_request()
         assert form.validate() == result
 
     # ... existing email
@@ -399,7 +404,8 @@ def test_user_form(session):
             'group': ''
         })
     )
-    form.request = DummyRequest(session)
+    form.request = DummyRequest(session, private=True, secret=True)
+    form.on_request()
     assert not form.validate()
     assert 'This value already exists.' in form.errors['username']
 
@@ -414,6 +420,7 @@ def test_user_form_on_request(session):
     form.on_request()
     assert form.group.choices == [('', '- none -')]
 
+    # Groups
     groups = UserGroupCollection(session)
     groups.add(name='Group A')
     groups.add(name='Group B')
@@ -423,6 +430,19 @@ def test_user_form_on_request(session):
     assert sorted([choice[1] for choice in form.group.choices]) == [
         '- none -', 'Group A', 'Group B', 'Group C'
     ]
+
+    # Roles
+    form.request = DummyRequest(session)
+    form.on_request()
+    assert form.role.choices == []
+
+    form.request = DummyRequest(session, private=True)
+    form.on_request()
+    assert form.role.choices == [('member', 'Editor')]
+
+    form.request = DummyRequest(session, private=True, secret=True)
+    form.on_request()
+    assert form.role.choices == [('member', 'Editor'), ('editor', 'Publisher')]
 
 
 def test_notice_form(session, categories, organizations, issues):

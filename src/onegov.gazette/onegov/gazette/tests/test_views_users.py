@@ -66,28 +66,43 @@ def test_view_users_permissions(gazette_app):
 
     login_admin(client)
     manage = client.get('/users')
-    edit_link = manage.click("Bearbeiten", href='editor1').request.url
-    delete_link = manage.click("Löschen", href='editor1').request.url
+    assert "<h3>Redaktoren</h3>" in manage
+    assert "<h3>Herausgeber</h3>" in manage
+    edit_editor = manage.click("Bearbeiten", href='editor1').request.url
+    delete_editor = manage.click("Löschen", href='editor1').request.url
+    edit_publisher = manage.click("Bearbeiten", href='publisher').request.url
+    delete_publisher = manage.click("Löschen", href='publisher').request.url
 
     login_publisher(client)
-    client.get('/users', status=403)
-    client.get(edit_link, status=403)
-    client.get(delete_link, status=403)
+    manage = client.get('/users')
+    assert "<h3>Redaktoren</h3>" in manage
+    assert "<h3>Herausgeber</h3>" not in manage
+    assert manage.click("Bearbeiten", href='editor1').request.url == \
+        edit_editor
+    assert manage.click("Löschen", href='editor1').request.url == delete_editor
+    client.get(edit_publisher, status=403)
+    client.get(delete_publisher, status=403)
 
     login_editor_1(client)
     client.get('/users', status=403)
-    client.get(edit_link, status=403)
-    client.get(delete_link, status=403)
+    client.get(edit_editor, status=403)
+    client.get(edit_publisher, status=403)
+    client.get(delete_editor, status=403)
+    client.get(delete_publisher, status=403)
 
     login_editor_2(client)
     client.get('/users', status=403)
-    client.get(edit_link, status=403)
-    client.get(delete_link, status=403)
+    client.get(edit_editor, status=403)
+    client.get(edit_publisher, status=403)
+    client.get(delete_editor, status=403)
+    client.get(delete_publisher, status=403)
 
     login_editor_3(client)
     client.get('/users', status=403)
-    client.get(edit_link, status=403)
-    client.get(delete_link, status=403)
+    client.get(edit_editor, status=403)
+    client.get(edit_publisher, status=403)
+    client.get(delete_editor, status=403)
+    client.get(delete_publisher, status=403)
 
 
 def test_view_user_sessions(gazette_app):
@@ -126,7 +141,7 @@ def test_view_user_sessions(gazette_app):
     client_2.get('/dashboard', status=403)
 
 
-def test_view_user_sessions_delete(gazette_app):
+def test_view_user_delete(gazette_app):
     admin = Client(gazette_app)
     login_admin(admin)
 
@@ -146,7 +161,7 @@ def test_view_user_sessions_delete(gazette_app):
     client_2.get('/dashboard', status=403)
 
 
-def test_view_user_sessions_modify(gazette_app):
+def test_view_user_modify(gazette_app):
     admin = Client(gazette_app)
     login_admin(admin)
 

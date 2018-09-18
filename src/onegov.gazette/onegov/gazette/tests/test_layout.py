@@ -92,7 +92,8 @@ def test_layout_menu():
             ('Issues', '/IssueCollection/', False, []),
             ('Organizations', '/OrganizationCollection/', False, []),
             ('Categories', '/CategoryCollection/', False, []),
-
+            ('Groups', '/UserGroupCollection/', False, []),
+            ('Users', '/UserCollection/', False, []),
         ]),
         ('Statistics', '/GazetteNoticeCollection/statistics/', False, []),
     ]

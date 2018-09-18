@@ -155,7 +155,9 @@ class Layout(ChameleonLayout):
             active = (
                 isinstance(self.model, IssueCollection) or
                 isinstance(self.model, OrganizationCollection) or
-                isinstance(self.model, CategoryCollection)
+                isinstance(self.model, CategoryCollection) or
+                isinstance(self.model, UserCollection) or
+                isinstance(self.model, UserGroupCollection)
             )
             manage = [
                 (
@@ -175,27 +177,20 @@ class Layout(ChameleonLayout):
                     self.manage_categories_link,
                     isinstance(self.model, CategoryCollection),
                     []
-                )
-            ]
-            if self.request.is_secret(self.model):
-                # Admin
-                active = (
-                    active or
-                    isinstance(self.model, UserCollection) or
-                    isinstance(self.model, UserGroupCollection)
-                )
-                manage.append((
+                ),
+                (
                     _("Groups"),
                     self.manage_groups_link,
                     isinstance(self.model, UserGroupCollection),
                     []
-                ))
-                manage.append((
+                ),
+                (
                     _("Users"),
                     self.manage_users_link,
                     isinstance(self.model, UserCollection),
                     []
-                ))
+                )
+            ]
             result.append((_("Manage"), None, active, manage))
 
             result.append((
