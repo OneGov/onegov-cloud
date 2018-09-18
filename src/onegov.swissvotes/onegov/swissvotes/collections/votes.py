@@ -323,13 +323,11 @@ class SwissVoteCollection(Pagination):
                     worksheet.write_string(row, column, value)
                 elif type_ == 'DATE':
                     worksheet.write_datetime(row, column, value)
-                elif type_ == 'INTEGER':
+                elif type_ == 'INTEGER' or type_.startswith('NUMERIC'):
                     worksheet.write_number(row, column, value)
                 elif type_ == 'INT4RANGE':
                     worksheet.write_string(
                         row, column, f'{value.lower}-{value.upper}'
                     )
-                elif type_.startswith('NUMERIC'):
-                    worksheet.write_number(row, column, value)
 
         workbook.close()
