@@ -1,5 +1,15 @@
 Changelog
 ---------
+
+- Adds XLSX export.
+  [msom]
+
+- Improves UI.
+  [msom]
+
+- Enables English.
+  [msom]
+
 0.0.4 (2018-09-03)
 ~~~~~~~~~~~~~~~~~~~
 
