@@ -50,7 +50,7 @@ def get_i18n_localedirs():
 
 @SwissvotesApp.setting(section='i18n', name='locales')
 def get_i18n_used_locales():
-    return {'de_CH', 'fr_CH'}
+    return {'de_CH', 'fr_CH', 'en_US'}
 
 
 @SwissvotesApp.setting(section='i18n', name='default_locale')

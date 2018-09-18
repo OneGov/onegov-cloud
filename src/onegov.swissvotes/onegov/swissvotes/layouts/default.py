@@ -87,7 +87,8 @@ class DefaultLayout(ChameleonLayout):
     @cached_property
     def locales(self):
         result = []
-        for locale_code in self.app.locales:
+        assert self.app.locales == {'de_CH', 'fr_CH', 'en_US'}
+        for locale_code in ('de_CH', 'fr_CH', 'en_US'):
             locale = Locale.parse(locale_code)
             result.append((
                 locale_code,
