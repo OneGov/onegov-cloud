@@ -1670,5 +1670,5 @@ def test_main_views_without_period(client):
     assert client.get('/my-bookings').status_code == 200
     assert client.get('/notifications').status_code == 200
 
-    assert client.get('/matching').status_code == 404
-    assert client.get('/billing').status_code == 404
+    assert client.get('/matching', expect_errors=True).status_code == 404
+    assert client.get('/billing', expect_errors=True).status_code == 404
