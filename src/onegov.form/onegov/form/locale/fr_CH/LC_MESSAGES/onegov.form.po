@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-10-19 14:34+0200\n"
+"POT-Creation-Date: 2018-09-18 15:53+0200\n"
 "PO-Revision-Date: 2015-10-15 09:43+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -48,6 +48,9 @@ msgstr "Le champ '{label}' existe plus d'une fois."
 #, python-format
 msgid "'{label}' is a reserved name. Please use a different name."
 msgstr "'{label}' est un nom réservé. Veuillez utiliser un nom différent."
+
+msgid "Not a valid phone number."
+msgstr "N'est pas un numéro de téléphone valide."
 
 msgid "Uploaded file"
 msgstr "Fichier téléchargé"
@@ -129,3 +132,6 @@ msgstr "Identificateur suisse d'entreprise"
 
 msgid "Swiss vat number"
 msgstr "Numéro de TVA suisse"
+
+msgid "Markdown"
+msgstr ""

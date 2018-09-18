@@ -1,0 +1,135 @@
+#
+# Romansh translations for PACKAGE package
+# This file is distributed under the same license as the PACKAGE package.
+# Marc Sommerhalder <marc.sommerhalder@seantis.c>, 2018.
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE 1.0\n"
+"POT-Creation-Date: 2018-09-18 15:53+0200\n"
+"PO-Revision-Date: 2017-06-28 12:03+0200\n"
+"Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
+"Language-Team: Romansh\n"
+"Language: rm\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Lingua 3.12\n"
+"X-Generator: Poedit 2.0.2\n"
+
+msgid "Required"
+msgstr ""
+
+msgid "Optional"
+msgstr ""
+
+#, python-format
+msgid "The file is too large, please provide a file smaller than {}."
+msgstr ""
+
+msgid "Files of this type are not supported."
+msgstr ""
+
+msgid "The form could not be parsed."
+msgstr ""
+
+msgid "Define at least one required e-mail field ('E-Mail * = @@@')"
+msgstr ""
+
+#, python-format
+msgid "The syntax on line {line} is not valid."
+msgstr ""
+
+#, python-format
+msgid "The field '{label}' exists more than once."
+msgstr ""
+
+#, python-format
+msgid "'{label}' is a reserved name. Please use a different name."
+msgstr ""
+
+msgid "Not a valid phone number."
+msgstr "Numer da telefon nunvalaivel."
+
+msgid "Uploaded file"
+msgstr ""
+
+msgid "Keep file"
+msgstr ""
+
+msgid "Delete file"
+msgstr ""
+
+msgid "Replace file"
+msgstr ""
+
+msgid "General"
+msgstr ""
+
+msgid "Title"
+msgstr ""
+
+msgid "Text"
+msgstr ""
+
+msgid "Multiline"
+msgstr ""
+
+msgid "E-Mail"
+msgstr ""
+
+msgid "Website"
+msgstr ""
+
+msgid "Date and time"
+msgstr ""
+
+msgid "Date"
+msgstr ""
+
+msgid "Time"
+msgstr ""
+
+msgid "Choices"
+msgstr ""
+
+msgid "Choice"
+msgstr ""
+
+msgid "Multiple Choice"
+msgstr ""
+
+msgid "Files"
+msgstr ""
+
+msgid "Image"
+msgstr ""
+
+msgid "Document"
+msgstr ""
+
+msgid "Numbers"
+msgstr ""
+
+msgid "Age"
+msgstr ""
+
+msgid "Percentage"
+msgstr ""
+
+msgid "Extended"
+msgstr ""
+
+msgid "IBAN"
+msgstr ""
+
+msgid "Swiss social security number"
+msgstr ""
+
+msgid "Swiss business identifier"
+msgstr ""
+
+msgid "Swiss vat number"
+msgstr ""
+
+msgid "Markdown"
+msgstr ""

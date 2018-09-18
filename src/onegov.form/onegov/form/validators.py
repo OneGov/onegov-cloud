@@ -1,5 +1,6 @@
 import importlib
 import humanize
+import phonenumbers
 
 from cgi import FieldStorage
 from mimetypes import types_map
@@ -191,3 +192,30 @@ class StrictOptional(Optional):
         if self.is_missing(raw) and self.is_missing(val):
             field.errors[:] = []
             raise StopValidation()
+
+
+class ValidPhoneNumber(object):
+    """ Makes sure the given input is valid phone number.
+
+    Expects an :class:`wtforms.StringField` instance.
+
+    """
+
+    message = _("Not a valid phone number.")
+
+    def __init__(self, country='CH'):
+        self.country = country
+
+    def __call__(self, form, field):
+        if field.data:
+            try:
+                number = phonenumbers.parse(field.data, self.country)
+            except Exception:
+                raise ValidationError(self.message)
+
+            valid = (
+                phonenumbers.is_valid_number(number) and
+                phonenumbers.is_possible_number(number)
+            )
+            if not valid:
+                raise ValidationError(self.message)
