@@ -6,6 +6,7 @@ from onegov.swissvotes.fields.dataset import DatasetDialect
 from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import SwissVote
 from sqlalchemy import or_
+from xlsxwriter.workbook import Workbook
 
 
 class SwissVoteCollection(Pagination):
@@ -276,7 +277,7 @@ class SwissVoteCollection(Pagination):
             else:
                 self.session.add(vote)
 
-    def export(self, file):
+    def export_csv(self, file):
         """ Exports all votes according to the code book. """
 
         csv = writer(file, dialect=DatasetDialect())
@@ -284,7 +285,7 @@ class SwissVoteCollection(Pagination):
 
         for vote in self.query().order_by(None).order_by(SwissVote.bfs_number):
             row = []
-            for attribute, column in COLUMNS.items():
+            for attribute in COLUMNS.keys():
                 value = getattr(vote, attribute)
                 type_ = str(vote.__table__.columns[attribute.lstrip('_')].type)
                 if value is None:
@@ -302,3 +303,33 @@ class SwissVoteCollection(Pagination):
                         f'{value:f}'.replace('.', ',').rstrip('0').rstrip(',')
                     )
             csv.writerow(row)
+
+    def export_xlsx(self, file):
+        """ Exports all votes according to the code book. """
+
+        workbook = Workbook(file, {'default_date_format': 'dd.mm.yyyy'})
+        worksheet = workbook.add_worksheet()
+        worksheet.write_row(0, 0, COLUMNS.values())
+
+        row = 0
+        for vote in self.query().order_by(None).order_by(SwissVote.bfs_number):
+            row += 1
+            for column, attribute in enumerate(COLUMNS.keys()):
+                value = getattr(vote, attribute)
+                type_ = str(vote.__table__.columns[attribute.lstrip('_')].type)
+                if value is None:
+                    pass
+                elif type_ == 'TEXT':
+                    worksheet.write_string(row, column, value)
+                elif type_ == 'DATE':
+                    worksheet.write_datetime(row, column, value)
+                elif type_ == 'INTEGER':
+                    worksheet.write_number(row, column, value)
+                elif type_ == 'INT4RANGE':
+                    worksheet.write_string(
+                        row, column, f'{value.lower}-{value.upper}'
+                    )
+                elif type_.startswith('NUMERIC'):
+                    worksheet.write_number(row, column, value)
+
+        workbook.close()

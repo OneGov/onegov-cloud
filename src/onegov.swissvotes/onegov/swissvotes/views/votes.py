@@ -75,12 +75,28 @@ def update_votes(self, request, form):
     permission=Public,
     name='csv'
 )
-def export_votes(self, request):
+def export_votes_csv(self, request):
     response = Response(
         content_type='text/csv',
         content_disposition='inline; filename=dataset.csv'
     )
-    self.export(response.body_file)
+    self.export_csv(response.body_file)
+    return response
+
+
+@SwissvotesApp.view(
+    model=SwissVoteCollection,
+    permission=Public,
+    name='xlsx'
+)
+def export_votes_xlsx(self, request):
+    response = Response(
+        content_type=(
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        ),
+        content_disposition='inline; filename=dataset.xlsx'
+    )
+    self.export_xlsx(response.body_file)
     return response
 
 

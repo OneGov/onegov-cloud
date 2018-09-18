@@ -21,8 +21,13 @@ class VotesLayout(DefaultLayout):
                 'upload-icon'
             ),
             (
-                _("Download dataset"),
+                _("Download dataset (CSV)"),
                 self.request.link(self.model, name='csv'),
+                'export-icon'
+            ),
+            (
+                _("Download dataset (XLSX)"),
+                self.request.link(self.model, name='xlsx'),
                 'export-icon'
             )
         ]
