@@ -130,7 +130,7 @@ class AttendeeSignupForm(AttendeeBase):
     )
 
     @property
-    def is_new(self):
+    def is_new_attendee(self):
         return self.attendee.data == 'other'
 
     @property
@@ -192,7 +192,7 @@ class AttendeeSignupForm(AttendeeBase):
             return False
 
     def ensure_no_duplicate_booking(self):
-        if not self.is_new:
+        if not self.is_new_attendee:
             bookings = self.booking_collection
 
             query = bookings.by_occasion(self.model)
@@ -250,7 +250,7 @@ class AttendeeSignupForm(AttendeeBase):
             return False
 
     def ensure_not_over_limit(self):
-        if self.is_new:
+        if self.is_new_attendee:
             return True
 
         if self.model.period.confirmed:
@@ -283,7 +283,7 @@ class AttendeeSignupForm(AttendeeBase):
                 return False
 
     def ensure_one_booking_per_activity(self):
-        if self.is_new:
+        if self.is_new_attendee:
             return True
 
         bookings = self.booking_collection
@@ -311,7 +311,7 @@ class AttendeeSignupForm(AttendeeBase):
             return False
 
     def ensure_no_conflict(self):
-        if not self.is_new and self.model.period.confirmed:
+        if not self.is_new_attendee and self.model.period.confirmed:
             if self.model.exclude_from_overlap_check:
                 return
 
@@ -332,10 +332,10 @@ class AttendeeSignupForm(AttendeeBase):
         if self.request.is_admin and self.ignore_age.data is True:
             return True
 
-        if self.is_new and not self.birth_date.data:
+        if self.is_new_attendee and not self.birth_date.data:
             return True  # will be caught by the required validator
 
-        if self.is_new:
+        if self.is_new_attendee:
             birth_date = self.birth_date.data
         else:
             attendees = AttendeeCollection(self.request.session)

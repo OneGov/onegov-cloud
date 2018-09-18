@@ -170,7 +170,7 @@ def book_occasion(self, request, form):
         attendees = AttendeeCollection(request.session)
         user = form.user
 
-        if form.is_new:
+        if form.is_new_attendee:
             attendee = attendees.add(
                 user=user,
                 name=form.name,
@@ -191,7 +191,7 @@ def book_occasion(self, request, form):
         # if there's a cancelled/denied booking blocking the way, reactivate it
         booking = None
 
-        if not form.is_new:
+        if not form.is_new_attendee:
             o = OccasionCollection(request.session).query()
             o = o.with_entities(Occasion.id)
             o = o.filter(Occasion.activity_id == self.activity_id)
