@@ -1,0 +1,1375 @@
+#
+# English translations for PACKAGE package
+# This file is distributed under the same license as the PACKAGE package.
+# Marc Sommerhalder <marc@macbook-pro.seantis.ch>, 2018.
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE 1.0\n"
+"POT-Creation-Date: 2018-09-18 15:04+0200\n"
+"PO-Revision-Date: 2018-09-18 15:04+0200\n"
+"Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
+"Language-Team: English\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Lingua 3.12\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Homepage"
+msgstr "Homepage"
+
+msgid "Dataset"
+msgstr "Dataset"
+
+msgid "About"
+msgstr "About"
+
+msgid "Contact"
+msgstr "Contact"
+
+msgid "Disclaimer"
+msgstr "Disclaimer"
+
+msgid "Imprint"
+msgstr "Imprint"
+
+msgid "Some columns are missing."
+msgstr "Some columns are missing."
+
+msgid "Some column names are ambigous."
+msgstr "Some column names are ambigous."
+
+msgid "Some column names appear twice."
+msgstr "Some column names appear twice."
+
+msgid "The file is empty."
+msgstr "The file is empty."
+
+msgid "The file contains an empty line."
+msgstr "The file contains an empty line."
+
+msgid "Invalid encoding."
+msgstr "Invalid encoding."
+
+msgid "Not a valid csv file."
+msgstr "Not a valid csv file."
+
+msgid "Voting text"
+msgstr "Voting text"
+
+msgid "Federal council message"
+msgstr "Federal council message"
+
+msgid "Parliamentary debate"
+msgstr "Parliamentary debate"
+
+msgid "Title"
+msgstr "Title"
+
+msgid "Content"
+msgstr "Content"
+
+msgid "From date"
+msgstr "From date"
+
+msgid "To date"
+msgstr "To date"
+
+msgid "Policy area"
+msgstr "Policy area"
+
+msgid "Legal form"
+msgstr "Legal form"
+
+msgid "Voting result"
+msgstr "Voting result"
+
+msgid "Votes"
+msgstr "Votes"
+
+msgid "Edit page"
+msgstr "Edit page"
+
+msgid "Voter strengths"
+msgstr "Voter strengths"
+
+msgid "Manage attachments"
+msgstr "Manage attachments"
+
+msgid "Delete vote"
+msgstr "Delete vote"
+
+msgid "Update dataset"
+msgstr "Update dataset"
+
+msgid "Delete all votes"
+msgstr "Delete all votes"
+
+msgid "Download dataset (CSV)"
+msgstr "Download dataset (CSV)"
+
+msgid "Download dataset (XLSX)"
+msgstr "Download dataset (XLSX)"
+
+msgid "actor-acs-abbreviation"
+msgstr "actor-acs-abbreviation"
+
+msgid "actor-auns-abbreviation"
+msgstr "actor-auns-abbreviation"
+
+msgid "actor-bdp-abbreviation"
+msgstr "actor-bdp-abbreviation"
+
+msgid "actor-bpuk-abbreviation"
+msgstr "actor-bpuk-abbreviation"
+
+msgid "actor-csp-abbreviation"
+msgstr "actor-csp-abbreviation"
+
+msgid "actor-cvp-fr-abbreviation"
+msgstr "actor-cvp-fr-abbreviation"
+
+msgid "actor-cvp-abbreviation"
+msgstr "actor-cvp-abbreviation"
+
+msgid "actor-dem-abbreviation"
+msgstr "actor-dem-abbreviation"
+
+msgid "actor-dsp-abbreviation"
+msgstr "actor-dsp-abbreviation"
+
+msgid "actor-eco-abbreviation"
+msgstr "actor-eco-abbreviation"
+
+msgid "actor-edk-abbreviation"
+msgstr "actor-edk-abbreviation"
+
+msgid "actor-edu-abbreviation"
+msgstr "actor-edu-abbreviation"
+
+msgid "actor-endk-abbreviation"
+msgstr "actor-endk-abbreviation"
+
+msgid "actor-evp-abbreviation"
+msgstr "actor-evp-abbreviation"
+
+msgid "actor-fdk-abbreviation"
+msgstr "actor-fdk-abbreviation"
+
+msgid "actor-fdp-fr-abbreviation"
+msgstr "actor-fdp-fr-abbreviation"
+
+msgid "actor-fdp-abbreviation"
+msgstr "actor-fdp-abbreviation"
+
+msgid "actor-fmh-abbreviation"
+msgstr "actor-fmh-abbreviation"
+
+msgid "actor-fps-abbreviation"
+msgstr "actor-fps-abbreviation"
+
+msgid "actor-frap-abbreviation"
+msgstr "actor-frap-abbreviation"
+
+msgid "actor-ga-abbreviation"
+msgstr "actor-ga-abbreviation"
+
+msgid "actor-gdk-abbreviation"
+msgstr "actor-gdk-abbreviation"
+
+msgid "actor-gem-abbreviation"
+msgstr "actor-gem-abbreviation"
+
+msgid "actor-glp-abbreviation"
+msgstr "actor-glp-abbreviation"
+
+msgid "actor-gps-abbreviation"
+msgstr "actor-gps-abbreviation"
+
+msgid "actor-gsoa-abbreviation"
+msgstr "actor-gsoa-abbreviation"
+
+msgid "actor-hev-abbreviation"
+msgstr "actor-hev-abbreviation"
+
+msgid "actor-jcvp-abbreviation"
+msgstr "actor-jcvp-abbreviation"
+
+msgid "actor-jfdp-abbreviation"
+msgstr "actor-jfdp-abbreviation"
+
+msgid "actor-jgps-abbreviation"
+msgstr "actor-jgps-abbreviation"
+
+msgid "actor-jldu-abbreviation"
+msgstr "actor-jldu-abbreviation"
+
+msgid "actor-jlps-abbreviation"
+msgstr "actor-jlps-abbreviation"
+
+msgid "actor-jna-abbreviation"
+msgstr "actor-jna-abbreviation"
+
+msgid "actor-jsvp-abbreviation"
+msgstr "actor-jsvp-abbreviation"
+
+msgid "actor-juso-abbreviation"
+msgstr "actor-juso-abbreviation"
+
+msgid "actor-kdk-abbreviation"
+msgstr "actor-kdk-abbreviation"
+
+msgid "actor-kkjpd-abbreviation"
+msgstr "actor-kkjpd-abbreviation"
+
+msgid "actor-kvp-abbreviation"
+msgstr "actor-kvp-abbreviation"
+
+msgid "actor-ldk-abbreviation"
+msgstr "actor-ldk-abbreviation"
+
+msgid "actor-ldu-abbreviation"
+msgstr "actor-ldu-abbreviation"
+
+msgid "actor-lega-abbreviation"
+msgstr "actor-lega-abbreviation"
+
+msgid "actor-lps-abbreviation"
+msgstr "actor-lps-abbreviation"
+
+msgid "actor-mcg-abbreviation"
+msgstr "actor-mcg-abbreviation"
+
+msgid "actor-pda-abbreviation"
+msgstr "actor-pda-abbreviation"
+
+msgid "actor-poch-abbreviation"
+msgstr "actor-poch-abbreviation"
+
+msgid "actor-pps-abbreviation"
+msgstr "actor-pps-abbreviation"
+
+msgid "actor-psa-abbreviation"
+msgstr "actor-psa-abbreviation"
+
+msgid "actor-rep-abbreviation"
+msgstr "actor-rep-abbreviation"
+
+msgid "actor-sab-abbreviation"
+msgstr "actor-sab-abbreviation"
+
+msgid "actor-sante-abbreviation"
+msgstr "actor-sante-abbreviation"
+
+msgid "actor-sav-abbreviation"
+msgstr "actor-sav-abbreviation"
+
+msgid "actor-sbk-abbreviation"
+msgstr "actor-sbk-abbreviation"
+
+msgid "actor-sblv-abbreviation"
+msgstr "actor-sblv-abbreviation"
+
+msgid "actor-sbv-asb-abbreviation"
+msgstr "actor-sbv-asb-abbreviation"
+
+msgid "actor-sbv-usp-abbreviation"
+msgstr "actor-sbv-usp-abbreviation"
+
+msgid "actor-sd-abbreviation"
+msgstr "actor-sd-abbreviation"
+
+msgid "actor-seks-abbreviation"
+msgstr "actor-seks-abbreviation"
+
+msgid "actor-sgb-abbreviation"
+msgstr "actor-sgb-abbreviation"
+
+msgid "actor-sgv-abbreviation"
+msgstr "actor-sgv-abbreviation"
+
+msgid "actor-skos-abbreviation"
+msgstr "actor-skos-abbreviation"
+
+msgid "actor-sks-abbreviation"
+msgstr "actor-sks-abbreviation"
+
+msgid "actor-smv-abbreviation"
+msgstr "actor-smv-abbreviation"
+
+msgid "actor-sodk-abbreviation"
+msgstr "actor-sodk-abbreviation"
+
+msgid "actor-sol-abbreviation"
+msgstr "actor-sol-abbreviation"
+
+msgid "actor-sps-abbreviation"
+msgstr "actor-sps-abbreviation"
+
+msgid "actor-ssv-abbreviation"
+msgstr "actor-ssv-abbreviation"
+
+msgid "actor-svp-abbreviation"
+msgstr "actor-svp-abbreviation"
+
+msgid "actor-tcs-abbreviation"
+msgstr "actor-tcs-abbreviation"
+
+msgid "actor-travs-abbreviation"
+msgstr "actor-travs-abbreviation"
+
+msgid "actor-vcs-abbreviation"
+msgstr "actor-vcs-abbreviation"
+
+msgid "actor-vdk-abbreviation"
+msgstr "actor-vdk-abbreviation"
+
+msgid "actor-voev-abbreviation"
+msgstr "actor-voev-abbreviation"
+
+msgid "actor-vpod-abbreviation"
+msgstr "actor-vpod-abbreviation"
+
+msgid "actor-vsa-abbreviation"
+msgstr "actor-vsa-abbreviation"
+
+msgid "actor-acs-label"
+msgstr "actor-acs-label"
+
+msgid "actor-auns-label"
+msgstr "actor-auns-label"
+
+msgid "actor-bdp-label"
+msgstr "actor-bdp-label"
+
+msgid "actor-bpuk-label"
+msgstr "actor-bpuk-label"
+
+msgid "actor-csp-label"
+msgstr "actor-csp-label"
+
+msgid "actor-cvp-fr-label"
+msgstr "actor-cvp-fr-label"
+
+msgid "actor-cvp-label"
+msgstr "actor-cvp-label"
+
+msgid "actor-dem-label"
+msgstr "actor-dem-label"
+
+msgid "actor-dsp-label"
+msgstr "actor-dsp-label"
+
+msgid "actor-eco-label"
+msgstr "actor-eco-label"
+
+msgid "actor-edk-label"
+msgstr "actor-edk-label"
+
+msgid "actor-edu-label"
+msgstr "actor-edu-label"
+
+msgid "actor-endk-label"
+msgstr "actor-endk-label"
+
+msgid "actor-evp-label"
+msgstr "actor-evp-label"
+
+msgid "actor-fdk-label"
+msgstr "actor-fdk-label"
+
+msgid "actor-fdp-fr-label"
+msgstr "actor-fdp-fr-label"
+
+msgid "actor-fdp-label"
+msgstr "actor-fdp-label"
+
+msgid "actor-fmh-label"
+msgstr "actor-fmh-label"
+
+msgid "actor-fps-label"
+msgstr "actor-fps-label"
+
+msgid "actor-frap-label"
+msgstr "actor-frap-label"
+
+msgid "actor-ga-label"
+msgstr "actor-ga-label"
+
+msgid "actor-gdk-label"
+msgstr "actor-gdk-label"
+
+msgid "actor-gem-label"
+msgstr "actor-gem-label"
+
+msgid "actor-glp-label"
+msgstr "actor-glp-label"
+
+msgid "actor-gps-label"
+msgstr "actor-gps-label"
+
+msgid "actor-gsoa-label"
+msgstr "actor-gsoa-label"
+
+msgid "actor-hev-label"
+msgstr "actor-hev-label"
+
+msgid "actor-jcvp-label"
+msgstr "actor-jcvp-label"
+
+msgid "actor-jfdp-label"
+msgstr "actor-jfdp-label"
+
+msgid "actor-jgps-label"
+msgstr "actor-jgps-label"
+
+msgid "actor-jldu-label"
+msgstr "actor-jldu-label"
+
+msgid "actor-jlps-label"
+msgstr "actor-jlps-label"
+
+msgid "actor-jna-label"
+msgstr "actor-jna-label"
+
+msgid "actor-jsvp-label"
+msgstr "actor-jsvp-label"
+
+msgid "actor-juso-label"
+msgstr "actor-juso-label"
+
+msgid "actor-kdk-label"
+msgstr "actor-kdk-label"
+
+msgid "actor-kkjpd-label"
+msgstr "actor-kkjpd-label"
+
+msgid "actor-kvp-label"
+msgstr "actor-kvp-label"
+
+msgid "actor-ldk-label"
+msgstr "actor-ldk-label"
+
+msgid "actor-ldu-label"
+msgstr "actor-ldu-label"
+
+msgid "actor-lega-label"
+msgstr "actor-lega-label"
+
+msgid "actor-lps-label"
+msgstr "actor-lps-label"
+
+msgid "actor-mcg-label"
+msgstr "actor-mcg-label"
+
+msgid "actor-pda-label"
+msgstr "actor-pda-label"
+
+msgid "actor-poch-label"
+msgstr "actor-poch-label"
+
+msgid "actor-pps-label"
+msgstr "actor-pps-label"
+
+msgid "actor-psa-label"
+msgstr "actor-psa-label"
+
+msgid "actor-rep-label"
+msgstr "actor-rep-label"
+
+msgid "actor-sab-label"
+msgstr "actor-sab-label"
+
+msgid "actor-sante-label"
+msgstr "actor-sante-label"
+
+msgid "actor-sav-label"
+msgstr "actor-sav-label"
+
+msgid "actor-sbk-label"
+msgstr "actor-sbk-label"
+
+msgid "actor-sblv-label"
+msgstr "actor-sblv-label"
+
+msgid "actor-sbv-asb-label"
+msgstr "actor-sbv-asb-label"
+
+msgid "actor-sbv-usp-label"
+msgstr "actor-sbv-usp-label"
+
+msgid "actor-sd-label"
+msgstr "actor-sd-label"
+
+msgid "actor-seks-label"
+msgstr "actor-seks-label"
+
+msgid "actor-sgb-label"
+msgstr "actor-sgb-label"
+
+msgid "actor-sgv-label"
+msgstr "actor-sgv-label"
+
+msgid "actor-skos-label"
+msgstr "actor-skos-label"
+
+msgid "actor-sks-label"
+msgstr "actor-sks-label"
+
+msgid "actor-smv-label"
+msgstr "actor-smv-label"
+
+msgid "actor-sodk-label"
+msgstr "actor-sodk-label"
+
+msgid "actor-sol-label"
+msgstr "actor-sol-label"
+
+msgid "actor-sps-label"
+msgstr "actor-sps-label"
+
+msgid "actor-ssv-label"
+msgstr "actor-ssv-label"
+
+msgid "actor-svp-label"
+msgstr "actor-svp-label"
+
+msgid "actor-tcs-label"
+msgstr "actor-tcs-label"
+
+msgid "actor-travs-label"
+msgstr "actor-travs-label"
+
+msgid "actor-vcs-label"
+msgstr "actor-vcs-label"
+
+msgid "actor-vdk-label"
+msgstr "actor-vdk-label"
+
+msgid "actor-voev-label"
+msgstr "actor-voev-label"
+
+msgid "actor-vpod-label"
+msgstr "actor-vpod-label"
+
+msgid "actor-vsa-label"
+msgstr "actor-vsa-label"
+
+msgid "d-1-1"
+msgstr "d-1-1"
+
+msgid "d-1-2"
+msgstr "d-1-2"
+
+msgid "d-1-3"
+msgstr "d-1-3"
+
+msgid "d-1-4"
+msgstr "d-1-4"
+
+msgid "d-1-5"
+msgstr "d-1-5"
+
+msgid "d-1-6"
+msgstr "d-1-6"
+
+msgid "d-1-7"
+msgstr "d-1-7"
+
+msgid "d-1-8"
+msgstr "d-1-8"
+
+msgid "d-1-9"
+msgstr "d-1-9"
+
+msgid "d-1-10"
+msgstr "d-1-10"
+
+msgid "d-1-11"
+msgstr "d-1-11"
+
+msgid "d-1-12"
+msgstr "d-1-12"
+
+msgid "d-2-11"
+msgstr "d-2-11"
+
+msgid "d-2-12"
+msgstr "d-2-12"
+
+msgid "d-2-13"
+msgstr "d-2-13"
+
+msgid "d-2-14"
+msgstr "d-2-14"
+
+msgid "d-2-15"
+msgstr "d-2-15"
+
+msgid "d-2-16"
+msgstr "d-2-16"
+
+msgid "d-2-21"
+msgstr "d-2-21"
+
+msgid "d-2-22"
+msgstr "d-2-22"
+
+msgid "d-2-23"
+msgstr "d-2-23"
+
+msgid "d-2-24"
+msgstr "d-2-24"
+
+msgid "d-2-25"
+msgstr "d-2-25"
+
+msgid "d-2-26"
+msgstr "d-2-26"
+
+msgid "d-2-27"
+msgstr "d-2-27"
+
+msgid "d-2-28"
+msgstr "d-2-28"
+
+msgid "d-2-31"
+msgstr "d-2-31"
+
+msgid "d-2-32"
+msgstr "d-2-32"
+
+msgid "d-2-33"
+msgstr "d-2-33"
+
+msgid "d-2-41"
+msgstr "d-2-41"
+
+msgid "d-2-42"
+msgstr "d-2-42"
+
+msgid "d-2-43"
+msgstr "d-2-43"
+
+msgid "d-2-44"
+msgstr "d-2-44"
+
+msgid "d-2-51"
+msgstr "d-2-51"
+
+msgid "d-2-52"
+msgstr "d-2-52"
+
+msgid "d-2-53"
+msgstr "d-2-53"
+
+msgid "d-2-54"
+msgstr "d-2-54"
+
+msgid "d-2-55"
+msgstr "d-2-55"
+
+msgid "d-2-61"
+msgstr "d-2-61"
+
+msgid "d-2-62"
+msgstr "d-2-62"
+
+msgid "d-2-63"
+msgstr "d-2-63"
+
+msgid "d-2-64"
+msgstr "d-2-64"
+
+msgid "d-2-71"
+msgstr "d-2-71"
+
+msgid "d-2-72"
+msgstr "d-2-72"
+
+msgid "d-2-73"
+msgstr "d-2-73"
+
+msgid "d-2-74"
+msgstr "d-2-74"
+
+msgid "d-2-75"
+msgstr "d-2-75"
+
+msgid "d-2-81"
+msgstr "d-2-81"
+
+msgid "d-2-82"
+msgstr "d-2-82"
+
+msgid "d-2-83"
+msgstr "d-2-83"
+
+msgid "d-2-84"
+msgstr "d-2-84"
+
+msgid "d-2-85"
+msgstr "d-2-85"
+
+msgid "d-2-86"
+msgstr "d-2-86"
+
+msgid "d-2-87"
+msgstr "d-2-87"
+
+msgid "d-2-91"
+msgstr "d-2-91"
+
+msgid "d-2-92"
+msgstr "d-2-92"
+
+msgid "d-2-93"
+msgstr "d-2-93"
+
+msgid "d-2-101"
+msgstr "d-2-101"
+
+msgid "d-2-102"
+msgstr "d-2-102"
+
+msgid "d-2-103"
+msgstr "d-2-103"
+
+msgid "d-2-111"
+msgstr "d-2-111"
+
+msgid "d-2-112"
+msgstr "d-2-112"
+
+msgid "d-2-113"
+msgstr "d-2-113"
+
+msgid "d-2-114"
+msgstr "d-2-114"
+
+msgid "d-2-115"
+msgstr "d-2-115"
+
+msgid "d-2-121"
+msgstr "d-2-121"
+
+msgid "d-2-122"
+msgstr "d-2-122"
+
+msgid "d-2-123"
+msgstr "d-2-123"
+
+msgid "d-2-124"
+msgstr "d-2-124"
+
+msgid "d-2-125"
+msgstr "d-2-125"
+
+msgid "d-3-121"
+msgstr "d-3-121"
+
+msgid "d-3-122"
+msgstr "d-3-122"
+
+msgid "d-3-123"
+msgstr "d-3-123"
+
+msgid "d-3-124"
+msgstr "d-3-124"
+
+msgid "d-3-131"
+msgstr "d-3-131"
+
+msgid "d-3-132"
+msgstr "d-3-132"
+
+msgid "d-3-133"
+msgstr "d-3-133"
+
+msgid "d-3-134"
+msgstr "d-3-134"
+
+msgid "d-3-141"
+msgstr "d-3-141"
+
+msgid "d-3-142"
+msgstr "d-3-142"
+
+msgid "d-3-143"
+msgstr "d-3-143"
+
+msgid "d-3-151"
+msgstr "d-3-151"
+
+msgid "d-3-152"
+msgstr "d-3-152"
+
+msgid "d-3-153"
+msgstr "d-3-153"
+
+msgid "d-3-161"
+msgstr "d-3-161"
+
+msgid "d-3-162"
+msgstr "d-3-162"
+
+msgid "d-3-163"
+msgstr "d-3-163"
+
+msgid "d-3-164"
+msgstr "d-3-164"
+
+msgid "d-3-165"
+msgstr "d-3-165"
+
+msgid "d-3-211"
+msgstr "d-3-211"
+
+msgid "d-3-212"
+msgstr "d-3-212"
+
+msgid "d-3-213"
+msgstr "d-3-213"
+
+msgid "d-3-221"
+msgstr "d-3-221"
+
+msgid "d-3-222"
+msgstr "d-3-222"
+
+msgid "d-3-223"
+msgstr "d-3-223"
+
+msgid "d-3-224"
+msgstr "d-3-224"
+
+msgid "d-3-231"
+msgstr "d-3-231"
+
+msgid "d-3-232"
+msgstr "d-3-232"
+
+msgid "d-3-261"
+msgstr "d-3-261"
+
+msgid "d-3-262"
+msgstr "d-3-262"
+
+msgid "d-3-311"
+msgstr "d-3-311"
+
+msgid "d-3-312"
+msgstr "d-3-312"
+
+msgid "d-3-313"
+msgstr "d-3-313"
+
+msgid "d-3-321"
+msgstr "d-3-321"
+
+msgid "d-3-322"
+msgstr "d-3-322"
+
+msgid "d-3-323"
+msgstr "d-3-323"
+
+msgid "d-3-324"
+msgstr "d-3-324"
+
+msgid "d-3-325"
+msgstr "d-3-325"
+
+msgid "d-3-327"
+msgstr "d-3-327"
+
+msgid "d-3-328"
+msgstr "d-3-328"
+
+msgid "d-3-329"
+msgstr "d-3-329"
+
+msgid "d-3-411"
+msgstr "d-3-411"
+
+msgid "d-3-412"
+msgstr "d-3-412"
+
+msgid "d-3-413"
+msgstr "d-3-413"
+
+msgid "d-3-414"
+msgstr "d-3-414"
+
+msgid "d-3-415"
+msgstr "d-3-415"
+
+msgid "d-3-421"
+msgstr "d-3-421"
+
+msgid "d-3-422"
+msgstr "d-3-422"
+
+msgid "d-3-423"
+msgstr "d-3-423"
+
+msgid "d-3-424"
+msgstr "d-3-424"
+
+msgid "d-3-431"
+msgstr "d-3-431"
+
+msgid "d-3-432"
+msgstr "d-3-432"
+
+msgid "d-3-441"
+msgstr "d-3-441"
+
+msgid "d-3-442"
+msgstr "d-3-442"
+
+msgid "d-3-443"
+msgstr "d-3-443"
+
+msgid "d-3-611"
+msgstr "d-3-611"
+
+msgid "d-3-612"
+msgstr "d-3-612"
+
+msgid "d-3-613"
+msgstr "d-3-613"
+
+msgid "d-3-614"
+msgstr "d-3-614"
+
+msgid "d-3-811"
+msgstr "d-3-811"
+
+msgid "d-3-812"
+msgstr "d-3-812"
+
+msgid "d-3-821"
+msgstr "d-3-821"
+
+msgid "d-3-822"
+msgstr "d-3-822"
+
+msgid "d-3-831"
+msgstr "d-3-831"
+
+msgid "d-3-832"
+msgstr "d-3-832"
+
+msgid "d-3-911"
+msgstr "d-3-911"
+
+msgid "d-3-912"
+msgstr "d-3-912"
+
+msgid "d-3-921"
+msgstr "d-3-921"
+
+msgid "d-3-922"
+msgstr "d-3-922"
+
+msgid "d-3-931"
+msgstr "d-3-931"
+
+msgid "d-3-932"
+msgstr "d-3-932"
+
+msgid "d-3-933"
+msgstr "d-3-933"
+
+msgid "d-3-934"
+msgstr "d-3-934"
+
+msgid "d-3-935"
+msgstr "d-3-935"
+
+msgid "d-3-936"
+msgstr "d-3-936"
+
+msgid "d-3-937"
+msgstr "d-3-937"
+
+msgid "d-3-938"
+msgstr "d-3-938"
+
+msgid "d-3-1011"
+msgstr "d-3-1011"
+
+msgid "d-3-1012"
+msgstr "d-3-1012"
+
+msgid "d-3-1013"
+msgstr "d-3-1013"
+
+msgid "d-3-1014"
+msgstr "d-3-1014"
+
+msgid "d-3-1015"
+msgstr "d-3-1015"
+
+msgid "d-3-1021"
+msgstr "d-3-1021"
+
+msgid "d-3-1022"
+msgstr "d-3-1022"
+
+msgid "d-3-1023"
+msgstr "d-3-1023"
+
+msgid "d-3-1024"
+msgstr "d-3-1024"
+
+msgid "d-3-1025"
+msgstr "d-3-1025"
+
+msgid "d-3-1026"
+msgstr "d-3-1026"
+
+msgid "d-3-1027"
+msgstr "d-3-1027"
+
+msgid "d-3-1028"
+msgstr "d-3-1028"
+
+msgid "d-3-1031"
+msgstr "d-3-1031"
+
+msgid "d-3-1032"
+msgstr "d-3-1032"
+
+msgid "d-3-1033"
+msgstr "d-3-1033"
+
+msgid "d-3-1034"
+msgstr "d-3-1034"
+
+msgid "d-3-1035"
+msgstr "d-3-1035"
+
+msgid "d-3-1036"
+msgstr "d-3-1036"
+
+msgid "d-3-1037"
+msgstr "d-3-1037"
+
+msgid "d-3-1038"
+msgstr "d-3-1038"
+
+msgid "d-3-1141"
+msgstr "d-3-1141"
+
+msgid "d-3-1142"
+msgstr "d-3-1142"
+
+msgid "d-3-1251"
+msgstr "d-3-1251"
+
+msgid "d-3-1252"
+msgstr "d-3-1252"
+
+msgid "d-3-1253"
+msgstr "d-3-1253"
+
+msgid "d-3-1254"
+msgstr "d-3-1254"
+
+msgid "Mandatory referendum"
+msgstr "Mandatory referendum"
+
+msgid "Optional referendum"
+msgstr "Optional referendum"
+
+msgid "Popular initiative"
+msgstr "Popular initiative"
+
+msgid "Direct counter-proposal"
+msgstr "Direct counter-proposal"
+
+msgid "Rejected"
+msgstr "Rejected"
+
+msgid "Accepted"
+msgstr "Accepted"
+
+msgid "Majority of the cantons not necessary"
+msgstr "Majority of the cantons not necessary"
+
+msgid "Federal Department of Foreign Affairs (FDFA)"
+msgstr "Federal Department of Foreign Affairs (FDFA)"
+
+msgid "Federal Department of Home Affairs (FDHA)"
+msgstr "Federal Department of Home Affairs (FDHA)"
+
+msgid "Federal Department of Justice and Police (FDJP)"
+msgstr "Federal Department of Justice and Police (FDJP)"
+
+msgid "Federal Department of Defence, Civil Protection and Sport (DDPS)"
+msgstr "Federal Department of Defence, Civil Protection and Sport (DDPS)"
+
+msgid "Federal Department of Finance (FDF)"
+msgstr "Federal Department of Finance (FDF)"
+
+msgid "Federal Department of Economic Affairs, Education and Research (EAER)"
+msgstr "Federal Department of Economic Affairs, Education and Research (EAER)"
+
+msgid ""
+"Federal Department of the Environment, Transport, Energy and Communications "
+"(DETEC)"
+msgstr ""
+"Federal Department of the Environment, Transport, Energy and Communications "
+"(DETEC)"
+
+msgid "Federal Chancellery (FCh)"
+msgstr "Federal Chancellery (FCh)"
+
+msgid "Accepting"
+msgstr "Accepting"
+
+msgid "Rejecting"
+msgstr "Rejecting"
+
+msgid "Neutral"
+msgstr "Neutral"
+
+msgid "Yea"
+msgstr "Yea"
+
+msgid "Nay"
+msgstr "Nay"
+
+msgid "None"
+msgstr "None"
+
+msgid "Empty"
+msgstr "Empty"
+
+msgid "Free vote"
+msgstr "Free vote"
+
+msgid "Organization no longer exists"
+msgstr "Organization no longer exists"
+
+msgid "The form contains errors. Please check the fields marked in red."
+msgstr "The form contains errors. Please check the fields marked in red."
+
+msgid "Login"
+msgstr "Login"
+
+msgid "Logout"
+msgstr "Logout"
+
+msgid "Forgot your password?"
+msgstr "Forgot your password?"
+
+msgid "Reset password"
+msgstr "Reset password"
+
+msgid "You are here"
+msgstr "You are here"
+
+msgid "Previous Page"
+msgstr "Previous Page"
+
+msgid "Next Page"
+msgstr "Next Page"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Submit"
+msgstr "Submit"
+
+msgid "Stack"
+msgstr "Stack"
+
+msgid "Toggle"
+msgstr "Toggle"
+
+msgid "Columns"
+msgstr "Columns"
+
+msgid "Dear Sir or Madam,"
+msgstr "Dear Sir or Madam,"
+
+msgid "Click the following link to set a new password:"
+msgstr "Click the following link to set a new password:"
+
+msgid "If you don't want to change your password, you can ignore this email."
+msgstr "If you don't want to change your password, you can ignore this email."
+
+msgid "Voting campaign"
+msgstr "Voting campaign"
+
+msgid "Position"
+msgstr "Position"
+
+msgid "Percentage of voters in the National Council elections"
+msgstr "Percentage of voters in the National Council elections"
+
+msgid "Vague"
+msgstr "Vague"
+
+msgid "Parties"
+msgstr "Parties"
+
+msgid "Party"
+msgstr "Party"
+
+msgid "Others"
+msgstr "Others"
+
+msgid "General"
+msgstr "General"
+
+msgid "Keyword"
+msgstr "Keyword"
+
+msgid "Vote date"
+msgstr "Vote date"
+
+msgid "BFS number"
+msgstr "BFS number"
+
+msgid "Année politique Suisse"
+msgstr "Année politique Suisse"
+
+msgid "Link"
+msgstr "Link"
+
+msgid "Submission"
+msgstr "Submission"
+
+msgid "Signatures"
+msgstr "Signatures"
+
+msgid "Initiator"
+msgstr "Initiator"
+
+msgid "Pre-parliamentary phase"
+msgstr "Pre-parliamentary phase"
+
+msgid "Position of the Federal Council"
+msgstr "Position of the Federal Council"
+
+msgid "Department in charge"
+msgstr "Department in charge"
+
+msgid "Parliamentary phase"
+msgstr "Parliamentary phase"
+
+msgid "Legislation"
+msgstr "Legislation"
+
+msgid "Procedure number"
+msgstr "Procedure number"
+
+msgid "Parliament's position"
+msgstr "Parliament's position"
+
+msgid "Position of the National Council"
+msgstr "Position of the National Council"
+
+msgid "Position of the Council of States"
+msgstr "Position of the Council of States"
+
+msgid "Recommendations of the Parties"
+msgstr "Recommendations of the Parties"
+
+msgid "Recommendations of the Associations"
+msgstr "Recommendations of the Associations"
+
+msgid "Cumulative electoral strength"
+msgstr "Cumulative electoral strength"
+
+msgid "Details"
+msgstr "Details"
+
+msgid "Vote"
+msgstr "Vote"
+
+msgid "People"
+msgstr "People"
+
+msgid "Yeas"
+msgstr "Yeas"
+
+msgid "Cantons"
+msgstr "Cantons"
+
+msgid "Turnout"
+msgstr "Turnout"
+
+msgid "Filter"
+msgstr "Filter"
+
+msgid "Results"
+msgstr "Results"
+
+msgid "Date"
+msgstr "Date"
+
+msgid "Yeas People"
+msgstr "Yeas People"
+
+msgid "Wrong username or password"
+msgstr "Wrong username or password"
+
+#, python-format
+msgid ""
+"A password reset link has been sent to ${email}, provided an account exists "
+"for this email address."
+msgstr ""
+"A password reset link has been sent to ${email}, provided an account exists "
+"for this email address."
+
+msgid "Wrong username or password reset link not valid any more."
+msgstr "Wrong username or password reset link not valid any more."
+
+msgid "Password changed."
+msgstr "Password changed."
+
+msgid "Password reset"
+msgstr "Password reset"
+
+msgid "Access Denied"
+msgstr "Access Denied"
+
+msgid "You are trying to open a page for which you are not authorized."
+msgstr "You are trying to open a page for which you are not authorized."
+
+msgid "Page not Found"
+msgstr "Page not Found"
+
+msgid "The page you are looking for could not be found."
+msgstr "The page you are looking for could not be found."
+
+msgid "Page modified."
+msgstr "Page modified."
+
+#, python-format
+msgid "Do you really want to delete \"${item}\"?"
+msgstr "Do you really want to delete \"${item}\"?"
+
+msgid "Attachments updated"
+msgstr "Attachments updated"
+
+msgid "Vote deleted"
+msgstr "Vote deleted"
+
+msgid "Do you really want to delete all votes?!"
+msgstr "Do you really want to delete all votes?!"
+
+msgid "Dataset updated"
+msgstr "Dataset updated"
+
+msgid "All votes deleted"
+msgstr "All votes deleted"
+
+#, python-format
+msgid "The dataset contains unknown descriptors: ${items}."
+msgstr "The dataset contains unknown descriptors: ${items}."
