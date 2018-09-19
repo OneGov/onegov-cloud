@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.6.6 (2018-09-19)
+~~~~~~~~~~~~~~~~~~~
 
 - Moves the phone number validator to onegov.form.
   [msom]
