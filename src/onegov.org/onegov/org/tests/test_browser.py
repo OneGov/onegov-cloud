@@ -8,6 +8,7 @@ from onegov.file import FileCollection
 from onegov_testing.utils import create_image
 from pytz import UTC
 from tempfile import NamedTemporaryFile
+from time import sleep
 
 
 def test_browse_activities(browser):
@@ -295,7 +296,7 @@ def test_publication_workflow(browser, temporary_path, org_app):
     assert not browser.is_text_present("Öffentlich")
 
     # enter a publication date in the past (no type date support in selenium)
-    browser.find_by_css('select').select('10:00')
+    browser.find_by_css('select').select('07:00')
 
     assert browser.is_text_present("Wird publiziert am", wait_time=1)
     assert not browser.is_text_present("Publikationsdatum")
@@ -304,8 +305,8 @@ def test_publication_workflow(browser, temporary_path, org_app):
     f = FileCollection(org_app.session()).query().one()
 
     assert f.publish_date in (
-        datetime(dt.year, dt.month, dt.day, 8, tzinfo=UTC),  # dst
-        datetime(dt.year, dt.month, dt.day, 9, tzinfo=UTC)   # !dst
+        datetime(dt.year, dt.month, dt.day, 5, tzinfo=UTC),  # dst
+        datetime(dt.year, dt.month, dt.day, 6, tzinfo=UTC)   # !dst
     )
 
     # run the cronjob and make sure it works
@@ -314,6 +315,7 @@ def test_publication_workflow(browser, temporary_path, org_app):
     job_url = f'{browser.url.replace("/files", "")}/cronjobs/{job.id}'
 
     requests.get(job_url)
+    sleep(0.1)
 
     r = requests.get(file_url)
     assert r.status_code == 200
