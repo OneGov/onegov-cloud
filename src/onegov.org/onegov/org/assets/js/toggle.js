@@ -17,6 +17,17 @@
     Additionally the toggled/untoggled class may be set on the button as well,
     though it will be corrected if it is wrong (so the ultimate source of
     truth is the style element of the target block).
+
+    Example of an initially untoggled element:
+
+        <div data-toggle="#details">Show Details</div>
+        <div id="#details" style="display: none;"></div>
+
+    Example of an initially toggled element:
+
+        <div data-toggle="#details" class="toggled">Show Details</div>
+        <div id="#details"></div>
+
 */
 
 var isToggled = function(target) {
@@ -25,6 +36,12 @@ var isToggled = function(target) {
 
 var ensureToggled = function(button, target, toggled) {
     button.toggleClass('toggled', toggled);
+
+    if (toggled) {
+        button.attr('aria-pressed', 'true');
+    } else {
+        button.attr('aria-pressed', 'false');
+    }
 
     if (target.is(':visible') !== toggled) {
         if (toggled) {
@@ -54,6 +71,8 @@ var ToggleButton = function(button, toggled) {
     } else {
         toggle = toggled;
     }
+
+    button.attr('role', 'button');
 
     ensureToggled(button, target, toggle);
     button.click(clickToggled);
