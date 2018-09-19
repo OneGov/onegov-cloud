@@ -811,9 +811,9 @@ $booking-left-margin: 2rem;
 
 .my-bookings {
     $dark-foreground: scale-color($primary-color, $lightness: -62.5%, $saturation: -12.5%);
-    $dark-background: scale-color($primary-color, $lightness: +75%, $saturation: -15%);
-    $light-background: scale-color($primary-color, $lightness: +90%);
-    $shadow-color: scale-color($primary-color, $saturation: -70%, $lightness: +10%);
+    $dark-background: scale-color($primary-color, $lightness: 75%, $saturation: -15%);
+    $light-background: scale-color($primary-color, $lightness: 90%);
+    $shadow-color: scale-color($primary-color, $saturation: -70%, $lightness: 10%);
 
     .attendee-bookings {
         box-shadow: 0 0 1px $shadow-color;
@@ -829,15 +829,14 @@ $booking-left-margin: 2rem;
             top: 24px;
 
             a::before {
-                margin: 0;
-                background: white;
+                background-color: $light-background;
+                border-radius: 50px;
                 display: inline-block;
                 height: 1.5rem;
-                width: 1.5rem;
                 line-height: 1.5rem;
+                margin: 0;
                 text-align: center;
-                border-radius: 50px;
-                background-color: $light-background;
+                width: 1.5rem;
             }
         }
 
@@ -854,8 +853,8 @@ $booking-left-margin: 2rem;
 
         .panel {
             font-size: .875rem;
-            width: calc(100% - 1rem);
             padding: .5rem 1rem;
+            width: calc(100% - 1rem);
         }
 
         .booking {
@@ -991,7 +990,7 @@ $booking-left-margin: 2rem;
     }
 
     @mixin state-title-block($color) {
-        $bleached: scale-color($color, $lightness: +70%, $saturation: -60%);
+        $bleached: scale-color($color, $lightness: 70%, $saturation: -60%);
 
         h4 {
             border-color: $bleached;
@@ -1007,7 +1006,8 @@ $booking-left-margin: 2rem;
         }
     }
 
-    .state-open, .state-cancelled {
+    .state-open,
+    .state-cancelled {
         @include state-title-block($steel);
     }
 
