@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes occasion state being visible before the start of the wishlist phase.
+  [href]
+
 - Improves the order of activity filters.
   [href]
 

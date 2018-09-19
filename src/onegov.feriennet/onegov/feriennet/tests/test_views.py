@@ -1777,3 +1777,21 @@ def test_no_new_activites_without_active_period(client, scenario):
 
     page = client.get('/activity/fishing')
     assert "Erneut anbieten" not in page
+
+
+def test_no_state_before_wishlist_phase_starts(client, scenario):
+
+    scenario.add_period(
+        title="Ferienpass",
+        prebooking_start=scenario.date_offset(+1),
+        prebooking_end=scenario.date_offset(+2),
+        execution_start=scenario.date_offset(+3),
+        execution_end=scenario.date_offset(+4),
+    )
+    scenario.add_activity(title="Marathon", state='accepted')
+    scenario.add_occasion()
+    scenario.commit()
+
+    page = client.get('/activity/marathon')
+    assert 'Plätze frei' not in page
+    assert not page.pyquery('.state')

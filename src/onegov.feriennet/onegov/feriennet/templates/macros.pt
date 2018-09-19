@@ -270,7 +270,7 @@
         show_links show_links|nothing;
         period occasion.period">
 
-        <div class="state" tal:condition="not period.wishlist_phase">
+        <div class="state" tal:condition="period.phase not in ('inactive', 'wishlist')">
             <div class="full" tal:condition="not occasion.cancelled and occasion.full">
                 <span i18n:translate>Fully booked</span>
             </div>
