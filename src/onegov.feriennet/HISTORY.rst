@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.4.2 (2018-09-19)
+~~~~~~~~~~~~~~~~~~~
 
 - Further improves the look of my-bookings.
   [href]
