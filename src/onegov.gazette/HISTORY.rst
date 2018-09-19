@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.17.0 (2018-09-19)
+~~~~~~~~~~~~~~~~~~~~
 
 - Adds phone numbers to users.
   [msom]
