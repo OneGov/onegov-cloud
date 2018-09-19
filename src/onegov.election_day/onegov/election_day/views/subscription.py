@@ -112,7 +112,7 @@ def subscribe_sms(self, request, form):
     callout = None
     if form.submitted(request):
         subscribers = SmsSubscriberCollection(request.session)
-        subscribers.subscribe(form.formatted_phone_number, request)
+        subscribers.subscribe(form.phone_number.formatted_data, request)
         callout = _(
             "Successfully subscribed to the SMS service. You will receive a "
             "SMS every time new results are published."
@@ -148,7 +148,7 @@ def unsubscribe_sms(self, request, form):
     callout = None
     if form.submitted(request):
         subscribers = SmsSubscriberCollection(request.session)
-        subscribers.unsubscribe(form.formatted_phone_number)
+        subscribers.unsubscribe(form.phone_number.formatted_data)
         callout = _(
             "Successfully unsubscribed from the SMS services. You will no "
             "longer receive SMS when new results are published."

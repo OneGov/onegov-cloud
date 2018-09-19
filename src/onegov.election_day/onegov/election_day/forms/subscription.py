@@ -1,8 +1,6 @@
-import phonenumbers
-
 from onegov.election_day import _
 from onegov.form import Form
-from onegov.form.validators import ValidPhoneNumber
+from onegov.form.fields import PhoneNumberField
 from wtforms import StringField
 from wtforms.validators import Email
 from wtforms.validators import InputRequired
@@ -21,21 +19,10 @@ class EmailSubscriptionForm(Form):
 
 class SmsSubscriptionForm(Form):
 
-    phone_number = StringField(
+    phone_number = PhoneNumberField(
         label=_("Phone number"),
         description="+41791112233",
         validators=[
             InputRequired(),
-            ValidPhoneNumber()
         ],
     )
-
-    @property
-    def formatted_phone_number(self):
-        try:
-            return phonenumbers.format_number(
-                phonenumbers.parse(self.phone_number.data, 'CH'),
-                phonenumbers.PhoneNumberFormat.E164
-            )
-        except Exception:
-            return None

@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Uses the phone number field from onegov.form.
+  [msom]
+
 3.6.6 (2018-09-19)
 ~~~~~~~~~~~~~~~~~~~
 
