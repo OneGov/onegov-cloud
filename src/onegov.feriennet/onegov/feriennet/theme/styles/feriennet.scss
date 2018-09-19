@@ -810,8 +810,13 @@ ul.tags {
 $booking-left-margin: 2rem;
 
 .my-bookings {
+    $dark-foreground: scale-color($primary-color, $lightness: -62.5%, $saturation: -12.5%);
+    $dark-background: scale-color($primary-color, $lightness: +75%, $saturation: -15%);
+    $light-background: scale-color($primary-color, $lightness: +90%);
+    $shadow-color: scale-color($primary-color, $saturation: -70%, $lightness: +10%);
+
     .attendee-bookings {
-        box-shadow: 0 0 5px $iron;
+        box-shadow: 0 0 1px $shadow-color;
         margin-bottom: 2rem;
 
         .alert-box {
@@ -832,12 +837,13 @@ $booking-left-margin: 2rem;
                 line-height: 1.5rem;
                 text-align: center;
                 border-radius: 50px;
-                background-color: lighten($yellow-pastel, 5%);
+                background-color: $light-background;
             }
         }
 
         h3 {
-            background: $yellow-pastel;
+            background: $dark-background;
+            color: $dark-foreground;
             font-weight: 500;
             margin: 0;
 
@@ -877,7 +883,7 @@ $booking-left-margin: 2rem;
         }
 
         .booking-limit {
-            background-color: lighten($yellow-pastel, 5%);
+            background: $light-background;
             font-size: .875rem;
             line-height: .875rem;
             padding: .5rem $column-gutter / 2;
@@ -912,8 +918,6 @@ $booking-left-margin: 2rem;
             margin-bottom: 1.5rem;
             margin-top: 0;
             padding: .75rem 1.2rem .75rem $booking-left-margin + $column-gutter / 2;
-            position: relative;
-            top: -1px;
 
             .columns:last-child {
                 text-align: right;
@@ -953,34 +957,65 @@ $booking-left-margin: 2rem;
 
     .state-title {
         background: $white;
+        cursor: pointer;
         margin-top: 0;
         padding: .75rem 1rem 0 0;
+        position: relative;
 
         h4 {
-            color: $steel;
             border-bottom: 5px solid $steel;
-            border-color: scale-color($steel, $lightness: +70%, $saturation: -60%);
+            color: $steel;
             font-size: 1.1rem;
             font-weight: bold;
             padding-bottom: .5rem;
         }
+
+        &::after {
+            @include icon('\f055');
+
+            font-size: 1.2rem;
+            position: absolute;
+            right: 19px;
+            top: 12px;
+        }
+
+        &.toggled::after {
+            @include icon('\f056');
+        }
     }
 
-    .state-accepted h4 {
-        border-color: scale-color($green, $lightness: +70%, $saturation: -60%);
-        color: $green-dark;
+    @mixin state-title-block($color) {
+        $bleached: scale-color($color, $lightness: +70%, $saturation: -60%);
+
+        h4 {
+            border-color: $bleached;
+            color: $color;
+        }
+
+        .state-title::after {
+            color: $bleached;
+        }
+
+        .state-title:hover::after {
+            color: $color;
+        }
     }
 
-    .state-blocked h4 {
-        border-color: scale-color($orange, $lightness: +70%, $saturation: -60%);
-        color: $orange-dark;
+    .state-open, .state-cancelled {
+        @include state-title-block($steel);
     }
 
-    .state-denied h4 {
-        border-color: scale-color($red, $lightness: +70%, $saturation: -60%);
-        color: $red-dark;
+    .state-accepted {
+        @include state-title-block($green-dark);
     }
 
+    .state-blocked {
+        @include state-title-block($orange-dark);
+    }
+
+    .state-denied {
+        @include state-title-block($red-dark);
+    }
 
     h5 {
         font-size: 1.2rem;
