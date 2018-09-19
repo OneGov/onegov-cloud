@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Further improves the look of my-bookings.
+  [href]
+
 - Disables new activites when no period is active.
   [href]
 
