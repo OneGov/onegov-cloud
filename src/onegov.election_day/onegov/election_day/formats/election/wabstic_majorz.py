@@ -55,6 +55,10 @@ def line_is_relevant(line, number, district=None):
 
 
 def get_entity_id(line, entities):
+    if hasattr(line, 'bfsnrgemeinde'):
+        entity_id = int(line.bfsnrgemeinde or 0)
+        return 0 if entity_id in EXPATS else entity_id
+
     entity_id = int(line.sortgemeinde or 0)
     sub_entity_id = int(line.sortgemeindesub or 0)
     if entity_id not in entities:
@@ -309,7 +313,7 @@ def import_election_wabstic_majorz(
             entity_id = get_entity_id(line, entities)
             candidate_id = line.knr
             assert candidate_id in added_candidates
-            votes = int(line.stimmen)
+            votes = int(line.stimmen) if line.stimmen else None
         except (ValueError, AssertionError):
             line_errors.append(_("Invalid candidate results"))
         else:
