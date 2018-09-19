@@ -811,8 +811,10 @@ $booking-left-margin: 2rem;
 
 .my-bookings {
     .attendee-bookings {
+        box-shadow: 0 0 5px $iron;
+        margin-bottom: 2rem;
+
         .alert-box {
-            box-shadow: 3px 3px 5px $white-smoke;
             margin-bottom: 0;
         }
 
@@ -820,13 +822,22 @@ $booking-left-margin: 2rem;
             position: absolute;
             right: 32px;
             top: 24px;
+
+            a::before {
+                margin: 0;
+                background: white;
+                display: inline-block;
+                height: 1.5rem;
+                width: 1.5rem;
+                line-height: 1.5rem;
+                text-align: center;
+                border-radius: 50px;
+                background-color: lighten($yellow-pastel, 5%);
+            }
         }
 
         h3 {
-            border: 1px solid $gainsboro;
-            border-radius: 2px 2px 0 0;
-            border-width: 1px 1px 0;
-            box-shadow: 3px 3px 5px $white-smoke;
+            background: $yellow-pastel;
             font-weight: 500;
             margin: 0;
 
@@ -867,8 +878,6 @@ $booking-left-margin: 2rem;
 
         .booking-limit {
             background-color: lighten($yellow-pastel, 5%);
-            border: 1px solid $gainsboro;
-            box-shadow: 3px 3px 5px $white-smoke;
             font-size: .875rem;
             line-height: .875rem;
             padding: .5rem $column-gutter / 2;
@@ -885,12 +894,6 @@ $booking-left-margin: 2rem;
         }
 
         .bookings-by-state {
-            background-color: $white;
-            border: 1px solid $gainsboro;
-            border-bottom-color: $white;
-            border-radius: 0 0 2px 2px;
-            border-width: 0 1px 1px;
-            box-shadow: 3px 3px 5px $white-smoke;
             padding-left: $column-gutter / 2;
 
             > ul {
@@ -905,10 +908,6 @@ $booking-left-margin: 2rem;
 
         .total-costs {
             background: $white-smoke;
-            border: 1px solid $gainsboro;
-            border-radius: 2px;
-            border-width: 0 1px 1px;
-            box-shadow: 3px 3px 5px $white-smoke;
             font-family: $font-family-monospace;
             margin-bottom: 1.5rem;
             margin-top: 0;
@@ -922,12 +921,7 @@ $booking-left-margin: 2rem;
         }
 
         .no-total-costs {
-            border-top: 1px solid $gainsboro;
             margin-bottom: 1.5rem;
-        }
-
-        .booking-limit + .no-total-costs {
-            border-top: 0;
         }
 
         .total {
@@ -965,24 +959,25 @@ $booking-left-margin: 2rem;
         h4 {
             color: $steel;
             border-bottom: 5px solid $steel;
-            font-size: 1.25rem;
+            border-color: scale-color($steel, $lightness: +70%, $saturation: -60%);
+            font-size: 1.1rem;
             font-weight: bold;
             padding-bottom: .5rem;
         }
     }
 
     .state-accepted h4 {
-        border-color: $green-dark;
+        border-color: scale-color($green, $lightness: +70%, $saturation: -60%);
         color: $green-dark;
     }
 
     .state-blocked h4 {
-        border-color: $orange-dark;
+        border-color: scale-color($orange, $lightness: +70%, $saturation: -60%);
         color: $orange-dark;
     }
 
     .state-denied h4 {
-        border-color: $red-dark;
+        border-color: scale-color($red, $lightness: +70%, $saturation: -60%);
         color: $red-dark;
     }
 
@@ -2154,7 +2149,7 @@ $booking-left-margin: 2rem;
     Sponsoring banners
 */
 .sponsor-banner {
-    margin-bottom: 1.25rem;
+    margin-bottom: 2rem;
 }
 
 .sponsor-banner-bookings {
