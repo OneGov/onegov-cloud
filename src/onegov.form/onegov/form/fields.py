@@ -1,8 +1,10 @@
 import inspect
+import phonenumbers
 
 from onegov.core.html import sanitize_html
 from onegov.core.utils import binary_to_dictionary
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
+from onegov.form.validators import ValidPhoneNumber
 from onegov.form.widgets import IconWidget
 from onegov.form.widgets import MultiCheckboxWidget
 from onegov.form.widgets import OrderedMultiCheckboxWidget
@@ -141,3 +143,26 @@ class IconField(StringField):
     """ Selects an icon out of a number of icons. """
 
     widget = IconWidget()
+
+
+class PhoneNumberField(StringField):
+    """ A string field with support for phone numbers. """
+
+    def __init__(self, *args, **kwargs):
+        validators = kwargs.pop('validators', [])
+        self.country = kwargs.pop('country', 'CH')
+        if not any([isinstance(v, ValidPhoneNumber) for v in validators]):
+            validators.append(ValidPhoneNumber(self.country))
+        kwargs['validators'] = validators
+
+        super().__init__(*args, **kwargs)
+
+    @property
+    def formatted_data(self):
+        try:
+            return phonenumbers.format_number(
+                phonenumbers.parse(self.data, self.country),
+                phonenumbers.PhoneNumberFormat.E164
+            )
+        except Exception:
+            return self.data

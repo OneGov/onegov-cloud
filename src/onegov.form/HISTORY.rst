@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a phone number field.
+  [msom]
+
 0.36.0 (2018-09-18)
 ~~~~~~~~~~~~~~~~~~~
 
