@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-16 08:48+0200\n"
-"PO-Revision-Date: 2018-06-25 09:01+0200\n"
+"POT-Creation-Date: 2018-09-18 16:15+0200\n"
+"PO-Revision-Date: 2018-09-18 16:15+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.0.8\n"
+"X-Generator: Poedit 2.1.1\n"
 
 msgid "Group"
 msgstr "Gruppe"
@@ -76,17 +76,17 @@ msgstr "Nr. ${issue_number}, ${issue_date}"
 msgid "Official Notices"
 msgstr "Meldungen"
 
-msgid "Manage"
-msgstr "Verwalten"
-
-msgid "Statistics"
-msgstr "Statistiken"
-
 msgid "Groups"
 msgstr "Gruppen"
 
 msgid "Users"
 msgstr "Benutzer"
+
+msgid "Manage"
+msgstr "Verwalten"
+
+msgid "Statistics"
+msgstr "Statistiken"
 
 msgid "Dashboard"
 msgstr "Offene Meldungen"
@@ -167,6 +167,9 @@ msgstr "Ort"
 msgid "Date (usually the date of the issue)"
 msgstr "Datum (entspricht in der Regel dem Ausgabedatum)"
 
+msgid "Phone number for enquiry"
+msgstr "Telefon-Nummer für Rückfrage"
+
 msgid "Author"
 msgstr "Absender (z.B. Einwohnergemeinde Baar, Planung/Bau)"
 
@@ -185,11 +188,14 @@ msgstr "- keine -"
 msgid "Role"
 msgstr "Rolle"
 
-msgid "Publisher"
-msgstr "Herausgeber"
+msgid "Phone number"
+msgstr "Telefonnummer"
 
 msgid "Editor"
 msgstr "Redaktor"
+
+msgid "Publisher"
+msgstr "Herausgeber"
 
 msgid "Archive"
 msgstr "Archiv"
@@ -749,9 +755,6 @@ msgstr "Benutzer löschen"
 msgid "Do you really clear all active sessions?"
 msgstr "Wollen Sie wirklich alle Sitzungen beenden?"
 
-msgid "Publishers"
-msgstr "Herausgeber"
-
 msgid "User added."
 msgstr "Benutzer hinzugefügt."
 
@@ -761,8 +764,14 @@ msgstr "Benutzer geändert."
 msgid "There are official notices linked to this user!"
 msgstr "Dieser Nutzer hat Meldungen!"
 
+msgid "Publishers"
+msgstr "Herausgeber"
+
 msgid "User deleted."
 msgstr "Benutzer gelöscht."
 
 msgid "User account created"
 msgstr "Benutzerkonto Amtsblattredaktion erstellt"
+
+#~ msgid "Not a valid phone number."
+#~ msgstr "Keine gültige Telefonnummer."

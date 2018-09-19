@@ -38,6 +38,7 @@ def create_notice(self, request, form):
     """
 
     layout = Layout(self, request)
+    user = get_user(request)
 
     if form.submitted(request):
         notice = self.add(
@@ -54,14 +55,20 @@ def create_notice(self, request, form):
             user=get_user(request),
             issues=form.issues.data
         )
+        if form.phone_number.data:
+            user.phone_number = form.phone_number.data
         return redirect(request.link(notice))
 
-    if not form.errors and self.source:
-        source = self.query().filter(GazetteNotice.id == self.source).first()
-        if source:
-            form.apply_model(source)
-            if form.print_only:
-                form.print_only.data = False
+    if not form.errors:
+        if self.source:
+            source = self.query().filter(GazetteNotice.id == self.source)
+            source = source.first()
+            if source:
+                form.apply_model(source)
+                if form.print_only:
+                    form.print_only.data = False
+
+        form.phone_number.data = user.phone_number
 
     return {
         'layout': layout,

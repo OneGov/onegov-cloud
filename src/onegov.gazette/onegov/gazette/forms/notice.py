@@ -1,5 +1,6 @@
 from datetime import date
 from onegov.form import Form
+from onegov.form.fields import PhoneNumberField
 from onegov.gazette import _
 from onegov.gazette.fields import MultiCheckboxField
 from onegov.gazette.fields import SelectField
@@ -108,6 +109,11 @@ class NoticeForm(Form):
         ]
     )
 
+    phone_number = PhoneNumberField(
+        label=_("Phone number for enquiry"),
+        description="+41791112233",
+    )
+
     author_name = TextAreaField(
         label=_("Author"),
         validators=[
@@ -190,7 +196,8 @@ class NoticeForm(Form):
         model.issues = self.issues.data
         if self.print_only:
             model.print_only = self.print_only.data
-
+        if self.phone_number.data:
+            model.user.phone_number = self.phone_number.formatted_data
         model.apply_meta(self.request.session)
 
     def apply_model(self, model):
@@ -204,6 +211,7 @@ class NoticeForm(Form):
         self.at_cost.data = 'yes' if model.at_cost else 'no'
         self.billing_address.data = model.billing_address or ''
         self.issues.data = list(model.issues.keys())
+        self.phone_number.data = model.user.phone_number
         if self.print_only:
             self.print_only.data = True if model.print_only else False
 
@@ -277,5 +285,7 @@ class UnrestrictedNoticeForm(NoticeForm):
         model.at_cost = self.at_cost.data
         if model.state != 'published':
             model.issues = self.issues.data
+        if self.phone_number.data:
+            model.user.phone_number = self.phone_number.formatted_data
 
         model.apply_meta(self.request.session)

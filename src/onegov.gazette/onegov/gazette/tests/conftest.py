@@ -172,33 +172,38 @@ def create_gazette(request, temporary_path):
     session.add(User(
         username='admin@example.org',
         password_hash=request.getfixturevalue('gazette_password'),
-        role='admin'
+        role='admin',
+        phone_number='+41415112250'
     ))
     session.add(User(
         realname='Publisher',
         username='publisher@example.org',
         password_hash=request.getfixturevalue('gazette_password'),
-        role='editor'
+        role='editor',
+        phone_number='+41415112260'
     ))
     session.add(User(
         realname='First Editor',
         username='editor1@example.org',
         password_hash=request.getfixturevalue('gazette_password'),
         role='member',
-        group_id=group_id
+        group_id=group_id,
+        phone_number='+41415112271'
     ))
     session.add(User(
         realname='Second Editor',
         username='editor2@example.org',
         password_hash=request.getfixturevalue('gazette_password'),
         role='member',
-        group_id=group_id
+        group_id=group_id,
+        phone_number='+41415112272'
     ))
     session.add(User(
         realname='Third Editor',
         username='editor3@example.org',
         password_hash=request.getfixturevalue('gazette_password'),
-        role='member'
+        role='member',
+        phone_number='+41415112273'
     ))
 
     create_organizations(session)

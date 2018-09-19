@@ -33,14 +33,14 @@ def test_view_notice(gazette_app):
             manage.form.submit()
 
         # check if the notices are displayed correctly
-        for slug, title, owner, email, group in (
-            ('titel-1', 'Titel 1', 'First Editor', 'editor1', True),
-            ('titel-2', 'Titel 2', 'Second Editor', 'editor2', True),
-            ('titel-3', 'Titel 3', 'Third Editor', 'editor3', False),
+        for number, owner, group in (
+            (1, 'First', True),
+            (2, 'Second', True),
+            (3, 'Third', False),
         ):
             for user in (editor_1, editor_2, editor_3, publisher):
-                view = user.get('/notice/{}'.format(slug))
-                assert title in view
+                view = user.get(f'/notice/titel-{number}')
+                assert f"Titel {number}" in view
                 assert "1. Oktober 2017" in view
                 assert "Govikon, 1. Januar 2019" in view
                 assert "State Chancellerist" in view
@@ -48,8 +48,9 @@ def test_view_notice(gazette_app):
                 assert "Education" in view
                 assert "<dd>Ja</dd>" in view
                 assert "someone<br>street<br>place" in view
-                assert owner in view
-                assert f'<br>{email}@example.org' in view
+                assert f"{owner} Editor" in view
+                assert f"+4141511227{number}" in view
+                assert f"<br>editor{number}@example.org" in view
                 if group:
                     assert "TestGroup" in view
                 else:

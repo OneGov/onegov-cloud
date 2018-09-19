@@ -14,6 +14,9 @@ def test_view_notice_edit(gazette_app):
 
     with freeze_time("2017-11-01 11:00"):
         manage = editor_1.get('/notices/drafted/new-notice')
+
+        assert manage.form['phone_number'].value == '+41415112271'
+
         manage.form['title'] = "Notice"
         manage.form['organization'] = '200'
         manage.form['category'] = '11'
@@ -22,6 +25,7 @@ def test_view_notice_edit(gazette_app):
         manage.form['author_place'] = 'Govikon'
         manage.form['author_name'] = 'State Chancellerist'
         manage.form['author_date'] = '2019-01-01'
+        manage.form['phone_number'].value == '+41415112281'
         manage.form.submit()
 
         edit_notice(
@@ -31,6 +35,7 @@ def test_view_notice_edit(gazette_app):
             category='12',
             issues=['2017-46'],
             text="1. Dezember 2017",
+            phone_number='+41415112291'
         )
         view = editor_1.get('/notice/notice')
         assert "Kantonsratswahl" in view
@@ -38,6 +43,8 @@ def test_view_notice_edit(gazette_app):
         assert "Submissions" in view
         assert "Nr. 46, 17.11.2017" in view
         assert "1. Dezember 2017" in view
+        assert "+41415112291" in view
+        assert '+41415112291' in admin.get('/user/editor1%40example.org/edit')
 
         # drafted
         for user, title, forbidden in (
@@ -166,6 +173,9 @@ def test_view_notice_edit_unrestricted(gazette_app):
 
     with freeze_time(then):
         manage = editor_1.get('/notices/drafted/new-notice')
+
+        assert manage.form['phone_number'].value == '+41415112271'
+
         manage.form['title'] = "Notice"
         manage.form['organization'] = '200'
         manage.form['category'] = '11'
@@ -174,14 +184,19 @@ def test_view_notice_edit_unrestricted(gazette_app):
         manage.form['author_place'] = 'Govikon'
         manage.form['author_name'] = 'State Chancellerist'
         manage.form['author_date'] = '2019-01-01'
+        manage.form['phone_number'].value == '+41415112281'
         manage.form.submit()
 
     # drafted
     with freeze_time(future):
         edit_notice_unrestricted(editor_1, 'notice', forbidden=True)
         edit_notice_unrestricted(publisher, 'notice', forbidden=True)
-        edit_notice_unrestricted(admin, 'notice', title='unres_drafted')
+        edit_notice_unrestricted(
+            admin, 'notice', title='unres_drafted', phone_number='+41415112291'
+        )
         assert 'unres_drafted' in editor_1.get('/notice/notice')
+        assert '+41415112291' in editor_1.get('/notice/notice')
+        assert '+41415112291' in admin.get('/user/editor1%40example.org/edit')
 
         manage = admin.get('/notice/notice/edit-unrestricted')
         assert "(Complaints)" in manage

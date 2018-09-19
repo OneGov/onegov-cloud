@@ -1,4 +1,5 @@
 from onegov.form import Form
+from onegov.form.fields import PhoneNumberField
 from onegov.gazette import _
 from onegov.gazette.fields import SelectField
 from onegov.gazette.validators import UniqueColumnValue
@@ -44,6 +45,11 @@ class UserForm(Form):
         ]
     )
 
+    phone_number = PhoneNumberField(
+        label=_("Phone number"),
+        description="+41791112233",
+    )
+
     def on_request(self):
         self.role.choices = []
         model = getattr(self, 'model', None)
@@ -64,9 +70,11 @@ class UserForm(Form):
         model.role = self.role.data
         model.realname = self.name.data
         model.group_id = self.group.data or None
+        model.phone_number = self.phone_number.formatted_data
 
     def apply_model(self, model):
         self.username.data = model.username
         self.role.data = model.role
         self.name.data = model.realname
         self.group.data = str(model.group_id or '')
+        self.phone_number.data = model.phone_number

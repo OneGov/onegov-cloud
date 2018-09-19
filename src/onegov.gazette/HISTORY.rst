@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds phone numbers to users.
+  [msom]
+
 - Allows publishers to manage groups and editors.
   [msom]
 

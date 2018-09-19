@@ -65,6 +65,7 @@
                             <dd>
                                 ${notice.user_name}
                                 <tal:block tal:condition="notice.user"><br>${notice.user.username}</tal:block>
+                                <tal:block tal:condition="notice.user"><br>${notice.user.phone_number}</tal:block>
                             </dd>
 
                             <dt i18n:translate>Group</dt>
