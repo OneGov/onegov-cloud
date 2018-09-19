@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Renames the attendee's notes to "health information".
+  [href]
+
 - Fixes occasion state being visible before the start of the wishlist phase.
   [href]
 

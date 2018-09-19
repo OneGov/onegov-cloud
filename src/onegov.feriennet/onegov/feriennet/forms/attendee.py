@@ -80,7 +80,7 @@ class AttendeeForm(AttendeeBase):
     )
 
     notes = TextAreaField(
-        label=_("Note"),
+        label=_("Health Information"),
         description=_("Allergies, Disabilities, Particulars"),
     )
 
