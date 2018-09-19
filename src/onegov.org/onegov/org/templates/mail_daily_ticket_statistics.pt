@@ -1,8 +1,8 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.org">
-    <tal:block metal:fill-slot="title">
+    <tal:b metal:fill-slot="title">
         ${title}
-    </tal:block>
-    <tal:block metal:fill-slot="body">
+    </tal:b>
+    <tal:b metal:fill-slot="body">
         <p i18n:translate>Good morning,</p>
         <p i18n:translate tal:condition="not:is_monday">This is what happend on the <span tal:replace='org' i18n:name='org' /> website yesterday:</p>
         <p i18n:translate tal:condition="is_monday">This is what happend on the <span tal:replace='org' i18n:name='org' /> website over the weekend:</p>
@@ -29,8 +29,8 @@
         <p i18n:translate tal:condition="not:is_monday">Have a great day!</p>
 
         <tal:b metal:use-macro="layout.macros['sender']" />
-    </tal:block>
-    <tal:block metal:fill-slot="above-footer">
+    </tal:b>
+    <tal:b metal:fill-slot="above-footer">
         <p>
             <span i18n:translate>
                 This is the daily OneGov Cloud status e-mail. If you don't want to receive this e-mail you may deactivate it by clicking on
@@ -41,5 +41,5 @@
             <span i18n:translate>
                 Or by changing the settings in your user profile.
             </span>
-    </tal:block>
+    </tal:b>
 </div>

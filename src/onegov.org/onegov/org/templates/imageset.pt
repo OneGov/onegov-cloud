@@ -1,9 +1,9 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.org">
-    <tal:block metal:fill-slot="title">
+    <tal:b metal:fill-slot="title">
         ${title}
-    </tal:block>
-    <tal:block metal:fill-slot="content">
-        <tal:block metal:use-macro="layout.macros.page_content"
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <tal:b metal:use-macro="layout.macros.page_content"
              tal:define="lead imageset.meta.get('lead'); text None; people None; contact None; coordinates None;" />
 
         <p tal:condition="not:imageset.files" i18n:translate>
@@ -23,15 +23,15 @@
         <div tal:condition="imageset.view == 'grid'" class="page-text grid-imageset photoswipe">
             <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
                 <li tal:repeat="image imageset.files" class="image-box">
-                    <tal:block define="width image.reference.thumbnail_small.size[0]|image.reference.size[0]; height image.reference.thumbnail_small.size[1]|image.reference.size[1]">
+                    <tal:b define="width image.reference.thumbnail_small.size[0]|image.reference.size[0]; height image.reference.thumbnail_small.size[1]|image.reference.size[1]">
                         <!--! the first eight images are loaded conventionally, the rest are loaded lazily -->
                         <img src="${request.link(image, 'thumbnail')}" alt="${image.note}" width="${width}" height="${height}" tal:condition="repeat.image.number <= 8" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
                         <img src="${request.link(image, 'thumbnail')}" alt="${image.note}" width="${width}" height="${height}" class="lazyload" tal:condition="repeat.image.number > 8" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
-                    </tal:block>
+                    </tal:b>
                 </li>
             </ul>
         </div>
 
-        <tal:block metal:use-macro="layout.macros.photoswipe" />
-    </tal:block>
+        <tal:b metal:use-macro="layout.macros.photoswipe" />
+    </tal:b>
 </div>

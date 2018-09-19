@@ -1,8 +1,8 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.org">
-    <tal:block metal:fill-slot="title">
+    <tal:b metal:fill-slot="title">
         ${title}
-    </tal:block>
-    <tal:block metal:fill-slot="body">
+    </tal:b>
+    <tal:b metal:fill-slot="body">
         <p i18n:translate>Dear Sir or Madam,</p>
         <p i18n:translate>Your ticket has been reopened</p>
 
@@ -12,5 +12,5 @@
         been completed. In the meantime you can check the status of your
         ticket at any time:</p>
         <a href="${request.link(model, 'status')}" i18n:translate>Check ticket status</a>
-    </tal:block>
+    </tal:b>
 </div>

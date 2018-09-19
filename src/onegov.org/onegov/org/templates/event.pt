@@ -1,8 +1,8 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.org">
-    <tal:block metal:fill-slot="title">
+    <tal:b metal:fill-slot="title">
         ${title}
-    </tal:block>
-    <tal:block metal:fill-slot="content">
+    </tal:b>
+    <tal:b metal:fill-slot="content">
         <div class="panel callout" tal:condition="completable">
             <p i18n:translate="">
                 Please review your data and press "Complete" to finalize the process.
@@ -13,11 +13,11 @@
 
         <div class="row collapse">
             <div class="large-8 medium-8 columns">
-                <tal:block metal:use-macro="layout.macros['display_event']" tal:define="event event"/>
+                <tal:b metal:use-macro="layout.macros['display_event']" tal:define="event event"/>
             </div>
 
             <div class="large-4 medium-4 columns">
-                <tal:block metal:use-macro="layout.macros['ticket_callout']" tal:define="ticket ticket"/>
+                <tal:b metal:use-macro="layout.macros['ticket_callout']" tal:define="ticket ticket"/>
             </div>
         </div>
 
@@ -30,5 +30,5 @@
                 <a href="${edit_url}" class="button secondary" i18n:translate="">Edit</a>
             </div>
         </div>
-    </tal:block>
+    </tal:b>
 </div>

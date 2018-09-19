@@ -1,8 +1,8 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.org">
-    <tal:block metal:fill-slot="title">
+    <tal:b metal:fill-slot="title">
         ${title}
-    </tal:block>
-    <tal:block metal:fill-slot="content">
+    </tal:b>
+    <tal:b metal:fill-slot="content">
         <div class="row" tal:condition="not:connection">
             <div class="columns small-12 medium-8" i18n:translate>
                 Searching is currently unavailable due to technical difficulties.
@@ -34,7 +34,7 @@
             </div>
         </div>
 
-        <tal:block condition="connection and model.query">
+        <tal:b condition="connection and model.query">
             <h2 i18n:translate>${resultslabel}</h2>
             <div class="row">
                 <div class="columns medium-8 small-12">
@@ -42,21 +42,21 @@
 
                     <ul class="search-results">
                         <li class="search-result-${result.es_type_name}" tal:repeat="result model.batch.load()">
-                            <tal:block
+                            <tal:b
                                 define="macro 'search_result_{}'.format(result.__tablename__)"
                                 metal:use-macro="layout.macros[macro]|layout.macros['search_result_default']"
                             />
 
-                            <tal:block condition="request.is_manager and result.explanation|nothing">
+                            <tal:b condition="request.is_manager and result.explanation|nothing">
                                 <ul class="result-explanation">
                                     <li>Score: ${result.explanation['score']}</li>
-                                    <tal:block repeat="(title, key) [('TF', 'term-frequency'), ('IDF', 'inverse-document-frequency'), ('Field Norm', 'field-norm')]">
+                                    <tal:b repeat="(title, key) [('TF', 'term-frequency'), ('IDF', 'inverse-document-frequency'), ('Field Norm', 'field-norm')]">
                                         <li title="${result.explanation[key]['description']}" tal:condition="result.explanation[key]">
                                             ${title}: ${result.explanation[key]['value']}
                                         </li>
-                                    </tal:block>
+                                    </tal:b>
                                 </ul>
-                            </tal:block>
+                            </tal:b>
                         </li>
                     </ul>
 
@@ -66,6 +66,6 @@
                     </div>
                 </div>
             </div>
-        </tal:block>
-    </tal:block>
+        </tal:b>
+    </tal:b>
 </div>

@@ -7,27 +7,27 @@
 <body>
 
 <metal:reservations define-macro="reservations" i18n:domain="onegov.org">
-    <tal:block condition="reservations">
-        <tal:block repeat="reservation reservations">
-            <tal:block define="start reservation.display_start(); end reservation.display_end()">
+    <tal:b condition="reservations">
+        <tal:b repeat="reservation reservations">
+            <tal:b define="start reservation.display_start(); end reservation.display_end()">
                 <p>
                     <span>
                         ${layout.format_date(start, 'weekday_long')},
                         ${layout.format_date(start, 'date_long')}
                         <!--! simple whole day check: -->
-                        <tal:block condition="start.time() != end.time()">
+                        <tal:b condition="start.time() != end.time()">
                         <br>
                             ${layout.format_time_range(start, end)}
-                        </tal:block>
+                        </tal:b>
                     </span>
                     <br>
                     <span i18n:translate>Quota</span>: <span>
                         ${reservation.quota}
                     </span>
                 </p>
-            </tal:block>
-        </tal:block>
-    </tal:block>
+            </tal:b>
+        </tal:b>
+    </tal:b>
 </metal:reservations>
 
 <metal:event define-macro="event" i18n:domain="onegov.org">
@@ -51,10 +51,10 @@
 
 <metal:display_form define-macro="display_form" i18n:domain="onegov.org">
     <p tal:condition="form" tal:repeat="fieldset form.fieldsets">
-        <tal:block define="fields fieldset.non_empty_fields" condition="fields">
+        <tal:b define="fields fieldset.non_empty_fields" condition="fields">
             <div class="fieldset" tal:condition="fieldset.is_visible">${fieldset.label}</div>
             <metal:b use-macro="layout.macros['display_fields']" tal:define="fields fields.values()">
-        </tal:block>
+        </tal:b>
     </p>
 </metal:display_form>
 

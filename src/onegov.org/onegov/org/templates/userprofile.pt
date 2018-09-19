@@ -1,8 +1,8 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.org">
-    <tal:block metal:fill-slot="title">
+    <tal:b metal:fill-slot="title">
         ${title}
-    </tal:block>
-    <tal:block metal:fill-slot="content">
+    </tal:b>
+    <tal:b metal:fill-slot="content">
         <div class="field-display">
             <div class="field-display-label" i18n:translate>Username</div>
             <div class="field-display-data">
@@ -12,7 +12,7 @@
         <div class="field-display">
             <div class="field-display-label" i18n:translate>Role</div>
             <div class="field-display-data">
-                <tal:block metal:use-macro="layout.macros['role-singular']" />
+                <tal:b metal:use-macro="layout.macros['role-singular']" />
             </div>
         </div>
         <div class="field-display">
@@ -37,5 +37,5 @@
                 </div>
             </div>
         </div>
-    </tal:block>
+    </tal:b>
 </div>

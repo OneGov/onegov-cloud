@@ -1,8 +1,8 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.org">
-    <tal:block metal:fill-slot="title">
+    <tal:b metal:fill-slot="title">
         ${title}
-    </tal:block>
-    <tal:block metal:fill-slot="content">
+    </tal:b>
+    <tal:b metal:fill-slot="content">
         <p tal:condition="not:imagesets" i18n:translate="">No photo albums defined yet.</p>
 
         <ul tal:condition="imagesets" class="with-lead">
@@ -11,5 +11,5 @@
                 <div class="list-lead">${imageset.meta.get('lead')}</div>
             </li>
         </ul>
-    </tal:block>
+    </tal:b>
 </div>

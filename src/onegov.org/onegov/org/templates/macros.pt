@@ -6,13 +6,13 @@
       i18n:domain="onegov.org">
 <body>
 
-<metal:block define-macro="favicon">
+<metal:b define-macro="favicon">
     <!--! To be overridden by other applications -->
-</metal:block>
+</metal:b>
 
-<metal:block define-macro="before_directory_entry_lead">
+<metal:b define-macro="before_directory_entry_lead">
     <!--! To be override by other applications -->
-</metal:block>
+</metal:b>
 
 <metal:navigation define-macro="top_navigation">
     <div class="main-navigation" tal:define="links top_navigation|layout.top_navigation">
@@ -39,21 +39,21 @@
     <div class="row" tal:condition="layout.editbar_links">
         <div class="small-12 columns">
             <div class="edit-bar clearfix">
-                <tal:block repeat="group layout.editbar_links">
-                    <tal:block condition="group.links|nothing" define="dropdown_id 'editbar-dropdown-{}'.format(repeat.group.number)">
+                <tal:b repeat="group layout.editbar_links">
+                    <tal:b condition="group.links|nothing" define="dropdown_id 'editbar-dropdown-{}'.format(repeat.group.number)">
                         <button href="#" data-dropdown="${dropdown_id}" class="${group.right_side and 'right-side'} tiny button dropdown">
                             ${group.title}
                         </button>
                         <ul id="${dropdown_id}" data-dropdown-content class="f-dropdown disable-scroll">
                             <li tal:repeat="link group.links">
-                                <tal:block replace="structure link(layout)" />
+                                <tal:b replace="structure link(layout)" />
                             </li>
                         </ul>
-                    </tal:block>
-                    <tal:block condition="group.url|group.attrs|nothing" define="link group">
-                        <tal:block replace="structure link(layout, ('tiny', 'button'))" />
-                    </tal:block>
-                </tal:block>
+                    </tal:b>
+                    <tal:b condition="group.url|group.attrs|nothing" define="link group">
+                        <tal:b replace="structure link(layout, ('tiny', 'button'))" />
+                    </tal:b>
+                </tal:b>
             </div>
         </div>
     </div>
@@ -62,11 +62,11 @@
 <metal:breadcrumbs define-macro="breadcrumbs">
     <nav role="navigation" aria-label="You are here" i18n:attributes="aria-label">
         <ul class="breadcrumbs" tal:condition="layout.breadcrumbs">
-            <tal:block repeat="link layout.breadcrumbs">
+            <tal:b repeat="link layout.breadcrumbs">
                 <li tal:attributes="class repeat.link.end and 'current' or ''"
                     tal:content="structure link(layout)">
                 </li>
-            </tal:block>
+            </tal:b>
         </ul>
     </nav>
 </metal:breadcrumbs>
@@ -74,7 +74,7 @@
 <metal:panel-links define-macro="panel-links">
     <ul class="panel-links">
         <li tal:repeat="link panel.links">
-            <tal:block content="structure link(layout)" />
+            <tal:b content="structure link(layout)" />
             <small>${link.subtitle}</small>
         </li>
     </ul>
@@ -84,15 +84,15 @@
     <footer>
         <div class="row footer-content">
             <div class="small-12 columns">
-                <metal:block use-macro="layout.macros['footer_columns']" />
-                <metal:block use-macro="layout.macros['footer_links']" />
+                <metal:b use-macro="layout.macros['footer_columns']" />
+                <metal:b use-macro="layout.macros['footer_links']" />
             </div>
         </div>
     </footer>
 </metal:footer>
 
 <metal:footer_columns define-macro="footer_columns">
-    <tal:block define="contact layout.org.meta.contact_html|nothing;
+    <tal:b define="contact layout.org.meta.contact_html|nothing;
                        contact_url layout.org.meta.contact_url|nothing;
                        opening_hours layout.org.meta.opening_hours_html|nothing;
                        opening_hours_url layout.org.meta.opening_hours_url|nothing;
@@ -118,7 +118,7 @@
                 <metal:b use-macro="layout.macros['footer_social_media']" />
             </div>
         </div>
-    </tal:block>
+    </tal:b>
 </metal:footer_columns>
 
 <metal:footer_links define-macro="footer_links">
@@ -174,19 +174,19 @@
 
 <metal:panel define-macro="events-panel">
     <h2 i18n:translate>Events</h2>
-    <metal:block use-macro="layout.macros['panel-links']" tal:define="panel event_panel"/>
+    <metal:b use-macro="layout.macros['panel-links']" tal:define="panel event_panel"/>
 </metal:panel>
 
 <metal:panel define-macro="directories-panel">
     <tal:b condition="directory_panel.links">
         <h2 i18n:translate>Directories</h2>
-        <metal:block use-macro="layout.macros['panel-links']" tal:define="panel directory_panel" />
+        <metal:b use-macro="layout.macros['panel-links']" tal:define="panel directory_panel" />
     </tal:b>
 </metal:panel>
 
 <metal:form define-macro="form">
     <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url; data-sitecollection-url layout.sitecollection_url;" class="${form.css_class|''}" method="${form.method|'POST'}" enctype="multipart/form-data">
-        <tal:block repeat="fieldset form.fieldsets">
+        <tal:b repeat="fieldset form.fieldsets">
             <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower().replace(' ', '-')}">
                 <legend>${fieldset.label}</legend>
                 <div class="formfields">
@@ -194,14 +194,14 @@
                     <div class="clearfix"></div>
                 </div>
             </fieldset>
-            <tal:block condition="not:fieldset.is_visible">
+            <tal:b condition="not:fieldset.is_visible">
                 <div class="formfields">
                     <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
                     <div class="clearfix"></div>
                 </div>
-            </tal:block>
-        </tal:block>
-        <tal:block condition="cancel|nothing">
+            </tal:b>
+        </tal:b>
+        <tal:b condition="cancel|nothing">
             <a class="button secondary cancel-button" href="${cancel}" i18n:translate="">
                 <tal:b condition="not:cancel_text|nothing">
                     Cancel
@@ -210,37 +210,37 @@
                     ${cancel_text}
                 </tal:b>
             </a>
-        </tal:block>
-        <tal:block condition="not: button_text|nothing">
+        </tal:b>
+        <tal:b condition="not: button_text|nothing">
             <input type="submit" value="Submit" class="button" i18n:attributes="value">
-        </tal:block>
-        <tal:block condition="button_text|nothing">
+        </tal:b>
+        <tal:b condition="button_text|nothing">
             <input type="submit" value="${button_text}" class="button">
-        </tal:block>
+        </tal:b>
     </form>
 </metal:form>
 
 <metal:fields define-macro="fields">
-    <tal:block repeat="field fields">
+    <tal:b repeat="field fields">
         <div tal:define="hidden form.is_hidden(field)|False" class="row field-${field.id} field-type-${field.type.lower()} ${hidden and 'field-hidden'}"><div class="large-12 columns">
-        <tal:block define="input_type field.widget.input_type|None">
-            <tal:block condition="input_type == 'hidden'">
+        <tal:b define="input_type field.widget.input_type|None">
+            <tal:b condition="input_type == 'hidden'">
                 ${field()}
                 <small class="error" tal:repeat="error field.errors">${error}</small>
-            </tal:block>
-            <tal:block condition="input_type != 'hidden'">
+            </tal:b>
+            <tal:b condition="input_type != 'hidden'">
                 <label tal:attributes="class field.errors and 'error' or None" tal:condition="not:field.contains_labels|nothing">
-                    <metal:block use-macro="layout.macros['field']" />
+                    <metal:b use-macro="layout.macros['field']" />
                 </label>
 
                 <div tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="field.contains_labels|nothing">
-                    <metal:block use-macro="layout.macros['field']" />
+                    <metal:b use-macro="layout.macros['field']" />
                 </div>
                 <small class="error" tal:repeat="error field.errors">${error}</small>
-            </tal:block>
-        </tal:block>
+            </tal:b>
+        </tal:b>
     </div></div>
-    </tal:block>
+    </tal:b>
 </metal:fields>
 
 <metal:homepage-tiles define-macro="homepage-tiles" i18n:domain="onegov.org">
@@ -253,7 +253,7 @@
                     <h3>${tile.page.text}</h3>
                 </a>
                 <div class="child-links">
-                    <tal:block repeat="link tile.links" tal:content="structure link(layout)" />
+                    <tal:b repeat="link tile.links" tal:content="structure link(layout)" />
                 </div>
             </div>
         </div>
@@ -262,16 +262,16 @@
 
 <metal:single_field define-macro="field">
      <!--! render the label after the field if it's a boolean field -->
-    <tal:block condition="field.type == 'BooleanField'">
+    <tal:b condition="field.type == 'BooleanField'">
         ${field(placeholder=request.translate(field.description))}
         <span class="label-text">${field.label.text}</span>
         <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
-    </tal:block>
-    <tal:block condition="field.type != 'BooleanField'">
+    </tal:b>
+    <tal:b condition="field.type != 'BooleanField'">
         <span class="label-text">${field.label.text}</span>
         <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
         ${field(placeholder=request.translate(field.description))}
-    </tal:block>
+    </tal:b>
 </metal:single_field>
 
 <metal:upload define-macro="upload" i18n:domain="onegov.org">
@@ -315,13 +315,13 @@
 </metal:newslist>
 
 <metal:hidden_page_hint define-macro="hidden_from_public_hint" i18n:domain="onegov.org">
-    <tal:block condition="item.is_hidden_from_public|nothing">
+    <tal:b condition="item.is_hidden_from_public|nothing">
         <i title="This site is hidden from the general public" i18n:attributes="title" class="hidden-from-public-hint"></i>
-    </tal:block>
+    </tal:b>
 </metal:hidden_page_hint>
 
 <metal:hidden_page_hint define-macro="hidden_from_public_hint_long" i18n:domain="onegov.org">
-    <tal:block condition="item.is_hidden_from_public|nothing">
+    <tal:b condition="item.is_hidden_from_public|nothing">
         <div class="row">
             <div class="small-12 columns">
                 <div class="panel callout">
@@ -332,11 +332,11 @@
                 </div>
             </div>
         </div>
-    </tal:block>
+    </tal:b>
 </metal:hidden_page_hint>
 
 <metal:empty_lead_hint define-macro="empty_page_lead_hint" i18n:domain="onegov.org">
-    <tal:block condition="not item.lead and request.is_manager|nothing">
+    <tal:b condition="not item.lead and request.is_manager|nothing">
         <div class="row">
             <div class="small-12 columns">
                 <div class="panel callout">
@@ -344,12 +344,12 @@
                 </div>
             </div>
         </div>
-    </tal:block>
+    </tal:b>
 </metal:empty_lead_hint>
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.org">
     <div class="row" tal:define="show_side_panel show_side_panel|False; location location|False">
-        <tal:block condition="not: people or contact or coordinates or location or show_side_panel">
+        <tal:b condition="not: people or contact or coordinates or location or show_side_panel">
             <div class="small-12 columns page-content-main">
                 <div metal:define-slot="before-lead"></div>
                 <span class="page-lead" tal:condition="lead" tal:content="lead" />
@@ -358,8 +358,8 @@
                 <div class="page-text" tal:condition="text" tal:content="structure text" />
                 <div metal:define-slot="after-text"></div>
             </div>
-        </tal:block>
-        <tal:block condition="people or contact or coordinates or show_side_panel">
+        </tal:b>
+        <tal:b condition="people or contact or coordinates or show_side_panel">
             <div class="small-12 medium-8 columns page-content-main">
                 <span class="page-lead" tal:condition="lead" tal:content="lead" />
                 <div metal:define-slot="after-lead"></div>
@@ -370,7 +370,7 @@
             <div class="small-12 medium-4 columns page-content-sidebar" tal:condition="people or contact or coordinates or show_side_panel" tal:define="highlight_contacts highlight_contacts|True">
                 <div metal:define-slot="before-panels"></div>
                 <div class="side-panel without-title ${highlight_contacts and 'highlighted'}" tal:condition="contact or coordinates or location">
-                    <tal:block condition="contact" content="structure contact" />
+                    <tal:b condition="contact" content="structure contact" />
                     <br tal:condition="coordinates and contact" />
                     <h2 i18n:translate tal:condition="not contact">Map</h2>
                     <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div>
@@ -387,16 +387,16 @@
                 </div>
                 <div metal:define-slot="after-panels"></div>
             </div>
-        </tal:block>
+        </tal:b>
     </div>
 </metal:page_content>
 
 <metal:display_form define-macro="display_form" i18n:domain="onegov.org">
     <div tal:condition="form" tal:repeat="fieldset form.fieldsets">
-        <tal:block define="fields fieldset.non_empty_fields" condition="fields">
+        <tal:b define="fields fieldset.non_empty_fields" condition="fields">
             <h2 tal:condition="fieldset.is_visible">${fieldset.label}</h2>
             <metal:b use-macro="layout.macros['display_fields']" tal:define="fields fields.values()">
-        </tal:block>
+        </tal:b>
     </div>
     <tal:b condition="price|nothing">
         <dl class="field-display">
@@ -414,7 +414,7 @@
                 <tal:b condition="(allow_downloads or allow_views) and field.type == 'UploadField'">
                     <tal:b define="url layout.field_download_link(field)">
                         <a href="${url}" tal:condition="not allow_views or not field.is_image">
-                            <tal:block replace="structure rendered" />
+                            <tal:b replace="structure rendered" />
                         </a>
                         <img src="${url}" tal:condition="allow_views and field.is_image" alt="" />
                     </tal:b>
@@ -503,22 +503,22 @@
 <metal:sidebar define-macro="sidebar" i18n:domain="onegov.org">
     <nav role="navigation">
         <ul class="side-nav" data-sortable data-sortable-url="${layout.sortable_url_template}">
-            <tal:block repeat="link layout.sidebar_links">
+            <tal:b repeat="link layout.sidebar_links">
                 <li tal:define="is_group hasattr(link, 'links')" class="${is_group and 'active' or ''}" data-sortable-id="${request.is_manager and link.model.id}">
-                    <tal:block condition="not:is_group" replace="structure link(layout)" />
-                    <tal:block condition="is_group">
+                    <tal:b condition="not:is_group" replace="structure link(layout)" />
+                    <tal:b condition="is_group">
                         <a href="#" class="group-title">${link.title}
-                            <metal:block use-macro="layout.macros['hidden_from_public_hint']" tal:define="item link"/>
+                            <metal:b use-macro="layout.macros['hidden_from_public_hint']" tal:define="item link"/>
                         </a>
                         <ul class="children" tal:condition="link.links"
                             data-sortable data-sortable-url="${layout.sortable_url_template}">
                             <li tal:repeat="child link.links" data-sortable-id="${request.is_manager and child.model.id}">
-                                <tal:block replace="structure child(layout)" />
+                                <tal:b replace="structure child(layout)" />
                             </li>
                         </ul>
-                    </tal:block>
+                    </tal:b>
                 </li>
-            </tal:block>
+            </tal:b>
         </ul>
     </nav>
 </metal:sidebar>
@@ -574,30 +574,30 @@
 
 <metal:pagination define-macro="pagination" i18n:domain="onegov.org">
     <ul class="pagination" role="menubar" aria-label="Pagination" tal:condition="collection.pages_count > 1">
-        <tal:block repeat="page collection.pages">
-            <tal:block define="
+        <tal:b repeat="page collection.pages">
+            <tal:b define="
                 previous current_page.previous;
                 next current_page.next;
                 is_current current_page == page;
                 is_visible abs(current_page.page-page.page) < 6;
             ">
-                <tal:block condition="repeat.page.start and previous">
+                <tal:b condition="repeat.page.start and previous">
                     <li class="arrow">
                         <a href="${request.link(previous)}" aria-label="Previous Page" i18n:attributes="aria-label"><i class="fa fa-chevron-left"></i></a>
                     </li>
-                </tal:block>
+                </tal:b>
 
                 <li tal:condition="is_visible" class="${is_current and 'current' or ''}">
                     <a href="${request.link(page)}">${page.page + 1}</a>
                 </li>
 
-                <tal:block condition="repeat.page.end and next">
+                <tal:b condition="repeat.page.end and next">
                     <li class="arrow">
                         <a href="${request.link(next)}" aria-label="Next Page" i18n:attributes="aria-label"><i class="fa fa-chevron-right"></i></a>
                     </li>
-                </tal:block>
-            </tal:block>
-        </tal:block>
+                </tal:b>
+            </tal:b>
+        </tal:b>
     </ul>
 </metal:pagination>
 
@@ -625,7 +625,7 @@
 <metal:reservations define-macro="reservations" i18n:domain="onegov.org">
     <ul tal:condition="reservations" class="reservations">
         <li tal:repeat="reservation reservations">
-            <tal:block define="start reservation.display_start(); end reservation.display_end()">
+            <tal:b define="start reservation.display_start(); end reservation.display_end()">
                 <strong>
                     ${layout.format_date(start, 'weekday_long')},
                     ${layout.format_date(start, 'date_long')}
@@ -639,7 +639,7 @@
                 <span>
                     ${reservation.quota}
                 </span>
-            </tal:block>
+            </tal:b>
         </li>
     </ul>
 </metal:reservations>
@@ -726,7 +726,7 @@
 
 <metal:calendar_day define-macro="calendar-day" i18n:domain="onegov.org">
     <h2 class="calendar-day">
-        <metal:block use-macro="layout.macros['calendar-day-content']" />
+        <metal:b use-macro="layout.macros['calendar-day-content']" />
     </h2>
 </metal:calendar_day>
 
@@ -737,14 +737,14 @@
 </metal:calendar_day_box>
 
 <metal:occurrences define-macro="occurrences" i18n:domain="onegov.org">
-    <tal:block tal:define="global lastdaydate 0">
-        <tal:block repeat="occurrence occurrences">
+    <tal:b tal:define="global lastdaydate 0">
+        <tal:b repeat="occurrence occurrences">
             <div class="row">
                 <div class="occurrence">
                     <div class="medium-3 small-12 columns">
-                        <tal:block tal:condition="layout.format_date(occurrence.localized_start, 'date') != lastdaydate">
-                            <metal:block tal:define="date occurrence.localized_start" use-macro="layout.macros['calendar-day']" />
-                        </tal:block>
+                        <tal:b tal:condition="layout.format_date(occurrence.localized_start, 'date') != lastdaydate">
+                            <metal:b tal:define="date occurrence.localized_start" use-macro="layout.macros['calendar-day']" />
+                        </tal:b>
                         <div style="width: 100%; height: 1px;"></div>
                     </div>
                     <div class="medium-9 small-12 columns">
@@ -757,10 +757,10 @@
                     <div class="clearfix"></div>
                 </div>
             </div>
-            <tal:block tal:define="global lastdaydate python: layout.format_date(occurrence.localized_start, 'date')" />
-        </tal:block>
+            <tal:b tal:define="global lastdaydate python: layout.format_date(occurrence.localized_start, 'date')" />
+        </tal:b>
         <div tal:condition="not occurrences" i18n:translate>No events found.</div>
-    </tal:block>
+    </tal:b>
 </metal:occurrences>
 
 <metal:date_range_selector define-macro="date-range-selector" i18n:domain="onegov.org">
@@ -796,27 +796,27 @@
 </metal:date_range_selector>
 
 <metal:role_singular define-macro="role-singular" i18n:domain="onegov.org">
-    <tal:block switch="role">
-        <tal:block case="'admin'" i18n:translate>Administrator</tal:block>
-        <tal:block case="'editor'" i18n:translate>Editor</tal:block>
-        <tal:block case="'member'" i18n:translate>Member</tal:block>
-    </tal:block>
+    <tal:b switch="role">
+        <tal:b case="'admin'" i18n:translate>Administrator</tal:b>
+        <tal:b case="'editor'" i18n:translate>Editor</tal:b>
+        <tal:b case="'member'" i18n:translate>Member</tal:b>
+    </tal:b>
 </metal:role_singular>
 
 <metal:role_plural define-macro="role-plural" i18n:domain="onegov.org">
-    <tal:block switch="role">
-        <tal:block case="'admin'" i18n:translate>Administrators</tal:block>
-        <tal:block case="'editor'" i18n:translate>Editors</tal:block>
-        <tal:block case="'member'" i18n:translate>Members</tal:block>
-    </tal:block>
+    <tal:b switch="role">
+        <tal:b case="'admin'" i18n:translate>Administrators</tal:b>
+        <tal:b case="'editor'" i18n:translate>Editors</tal:b>
+        <tal:b case="'member'" i18n:translate>Members</tal:b>
+    </tal:b>
 </metal:role_plural>
 
 <metal:identicon define-macro="identicon" i18n:domain="onegov.org">
-    <tal:block define="identicon_size size|'small'">
+    <tal:b define="identicon_size size|'small'">
         <span class="user-initials-${identicon_size}" style="background-color: ${layout.get_user_color(username)}" title="${username}">
             ${initials}
         </span>
-    </tal:block>
+    </tal:b>
 </metal:identicon>
 
 <metal:photoswipe define-macro="photoswipe" i18n:domain="onegov.org">
@@ -879,10 +879,10 @@
         </li>
     </ul>
     <div class="slider no-images" tal:condition="not images and request.is_manager">
-        <tal:block i18n:translate>
+        <tal:b i18n:translate>
             This space holds images from your photo-albums. To show photos add a few
             photos to an album and mark it as available for the homepage.
-        </tal:block>
+        </tal:b>
     </div>
 </metal:slider>
 
@@ -928,9 +928,9 @@
 
 <metal:search_result_default define-macro="search_result_default" i18n:domain="onegov.org">
     <a href="${request.link(result)}">${result.title}</a>
-    <tal:block condition="result.lead">
-        ${result.lead[:160]}<tal:block condition="len(result.lead) > 160">…</tal:block>
-    </tal:block>
+    <tal:b condition="result.lead">
+        ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
+    </tal:b>
 </metal:search_result_default>
 
 

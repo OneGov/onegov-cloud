@@ -1,9 +1,9 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.org">
-    <tal:block metal:fill-slot="title">
+    <tal:b metal:fill-slot="title">
         ${title}
-    </tal:block>
-    <tal:block metal:fill-slot="content">
-        <tal:block tal:repeat="letter by_letter">
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <tal:b tal:repeat="letter by_letter">
             <h2>${letter}</h2>
 
             <ul class="subscribers">
@@ -28,6 +28,6 @@
                     </a>
                 </li>
             </ul>
-        </tal:block>
-    </tal:block>
+        </tal:b>
+    </tal:b>
 </div>

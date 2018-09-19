@@ -1,8 +1,8 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.org">
-    <tal:block metal:fill-slot="title">
+    <tal:b metal:fill-slot="title">
         ${title}
-    </tal:block>
-    <tal:block metal:fill-slot="content">
+    </tal:b>
+    <tal:b metal:fill-slot="content">
         <div class="row">
 
             <div class="large-8 medium-8 columns">
@@ -29,26 +29,26 @@
                     </div>
 
                     <div class="occurrences-filter-tags">
-                        <tal:block tal:repeat="tag tags">
+                        <tal:b tal:repeat="tag tags">
                             <span class="blank-label ${tag.active and 'active' or ''}">
-                                <tal:block replace="structure tag(request)"></tal:block>
+                                <tal:b replace="structure tag(request)"></tal:b>
                             </span>
-                        </tal:block>
+                        </tal:b>
                     </div>
 
-                    <metal:block use-macro="layout.macros['date-range-selector']">
-                        <tal:block metal:fill-slot="before-date-range">
-                            <tal:block tal:repeat="tag active_tags">
+                    <metal:b use-macro="layout.macros['date-range-selector']">
+                        <tal:b metal:fill-slot="before-date-range">
+                            <tal:b tal:repeat="tag active_tags">
                                 <input type="hidden" name="tags" value="${tag}">
-                            </tal:block>
-                        </tal:block>
-                    </metal:block>
+                            </tal:b>
+                        </tal:b>
+                    </metal:b>
                 </div>
 
                 <div class="occurrence-exports">
                     <h2>
                         <a href="${request.link(layout.model, name='ical')}">
-                            <i class="fa fa-chevron-right"></i> <tal:block i18n:translate="">Export this events</tal:block>
+                            <i class="fa fa-chevron-right"></i> <tal:b i18n:translate="">Export this events</tal:b>
                         </a>
                     </h2>
                 </div>
@@ -66,5 +66,5 @@
           </div>
 
         </div>
-    </tal:block>
+    </tal:b>
 </div>

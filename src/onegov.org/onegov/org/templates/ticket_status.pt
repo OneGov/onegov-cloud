@@ -1,25 +1,25 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.org">
-    <tal:block metal:fill-slot="title">
+    <tal:b metal:fill-slot="title">
         ${title}
-    </tal:block>
-    <tal:block metal:fill-slot="content">
+    </tal:b>
+    <tal:b metal:fill-slot="content">
         <div class="panel" tal:condition="ticket.state in {'open', 'closed'}">
-            <tal:block metal:use-macro="layout.macros['ticket_status_page_message']" />
+            <tal:b metal:use-macro="layout.macros['ticket_status_page_message']" />
         </div>
         <div class="field-display ticket-status-page">
             <div class="field-display-label" i18n:translate>Ticket Number</div>
             <div class="field-display-data ticket-number">
-                <tal:block condition="request.is_manager">
+                <tal:b condition="request.is_manager">
                     <a href="${request.link(ticket)}">${ticket.number}</a>
-                </tal:block>
-                <tal:block condition="not:request.is_manager">
+                </tal:b>
+                <tal:b condition="not:request.is_manager">
                     ${ticket.number}
-                </tal:block>
+                </tal:b>
             </div>
             <div class="field-display-label" i18n:translate>State</div>
             <div class="field-display-data ticket-state">
-                <tal:block metal:use-macro="layout.macros['ticket_status']" />
+                <tal:b metal:use-macro="layout.macros['ticket_status']" />
             </div>
         </div>
-    </tal:block>
+    </tal:b>
 </div>

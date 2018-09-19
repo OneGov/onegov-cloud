@@ -1,8 +1,8 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.org">
-    <tal:block metal:fill-slot="title">
+    <tal:b metal:fill-slot="title">
         ${title}
-    </tal:block>
-    <tal:block metal:fill-slot="content">
+    </tal:b>
+    <tal:b metal:fill-slot="content">
 
         <p i18n:translate>Sign up to our newsletter to always stay up to date:</p>
         
@@ -27,7 +27,7 @@
 
         <div class="row" tal:condition="request.is_manager">
             <div class="columns small-12 medium-9 large-6">
-                <div i18n:translate>There are currently <tal:block i18n:name="count">${recipients_count}</tal:block> recipients registered.</div>
+                <div i18n:translate>There are currently <tal:b i18n:name="count">${recipients_count}</tal:b> recipients registered.</div>
             </div>
         </div>
 
@@ -44,5 +44,5 @@
                 <div tal:condition="not:newsletter.sent" i18n:translate>Not yet sent.</div>
             </li>
         </ul>
-    </tal:block>
+    </tal:b>
 </div>

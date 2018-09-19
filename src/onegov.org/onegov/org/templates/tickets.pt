@@ -1,8 +1,8 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.org">
-    <tal:block metal:fill-slot="title">
+    <tal:b metal:fill-slot="title">
         ${title}
-    </tal:block>
-    <tal:block metal:fill-slot="content">
+    </tal:b>
+    <tal:b metal:fill-slot="content">
         <table class="tickets-table tickets-state-${tickets_state}">
             <thead>
                 <tr>
@@ -11,11 +11,11 @@
                             <div class="columns small-12 medium-6">
                                 <dl class="sub-nav">
                                     <dt class="show-for-sr" i18n:translate>State:</dt>
-                                    <tal:block repeat="link filters">
+                                    <tal:b repeat="link filters">
                                         <dd class="${link.active and 'active' or ''}">
-                                            <tal:block replace="structure link(layout)"></tal:block>
+                                            <tal:b replace="structure link(layout)"></tal:b>
                                         </dd>
-                                    </tal:block>
+                                    </tal:b>
                                 </dl>
                             </div>
                             <div class="columns small-12 medium-6">
@@ -27,9 +27,9 @@
                                     <ul id="owners" data-dropdown-content class="f-dropdown disable-scroll" aria-hidden="true">
                                         <li tal:repeat="link owners">
                                             <a href="${link.url}" class="${not repeat.link.start and 'ticket-group-filter' or 'ALL-link'}">
-                                                <tal:block condition="link.model|nothing">
+                                                <tal:b condition="link.model|nothing">
                                                     <metal:identicon use-macro="layout.macros.identicon" tal:define="initials link.model.initials; username link.model.username" />
-                                                </tal:block>
+                                                </tal:b>
 
                                                 ${link.text}
                                             </a>
@@ -43,7 +43,7 @@
                                         <span class="${' '.join(handler.classes)}">${handler.text}</span>
                                     </button>
                                     <ul id="handlers" data-dropdown-content class="f-dropdown disable-scroll" aria-hidden="true">
-                                        <li tal:repeat="link handlers"><tal:block replace="structure link(layout)"></tal:block></li>
+                                        <li tal:repeat="link handlers"><tal:b replace="structure link(layout)"></tal:b></li>
                                     </ul>
                                 </span>
                             </div>
@@ -52,7 +52,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tal:block condition="not:tickets">
+                <tal:b condition="not:tickets">
                     <tr>
                         <td class="no-tickets">
                             <svg xmlns="http://www.w3.org/2000/svg" width="143" height="127" viewBox="0 0 143 127">
@@ -64,9 +64,9 @@
                             </svg>
                         </td>
                     </tr>
-                </tal:block>
+                </tal:b>
 
-                <tal:block repeat="ticket tickets">
+                <tal:b repeat="ticket tickets">
                     <tr tal:define="ticket_url request.link(ticket)" class="ticket ticket-handler-${ticket.handler_code} ticket-row-state-${ticket.state}">
                         <td class="ticket-number-plain">
                             <a href="${ticket_url}">
@@ -87,18 +87,18 @@
                             </a>
                         </td>
                         <td class="ticket-state" tal:condition="ticket.state != 'open'">
-                            <tal:block condition="ticket.state == 'pending'" i18n:translate>
+                            <tal:b condition="ticket.state == 'pending'" i18n:translate>
                                 Pending
-                            </tal:block>
-                            <tal:block condition="ticket.state == 'closed'" i18n:translate>
+                            </tal:b>
+                            <tal:b condition="ticket.state == 'closed'" i18n:translate>
                                 Closed
-                            </tal:block>
+                            </tal:b>
                         </td>
                         <td class="ticket-user" tal:condition="ticket.state != 'open'">
                             <metal:identicon use-macro="layout.macros.identicon" tal:define="initials ticket.user.initials; username ticket.user.username" />
                         </td>
                     </tr>
-                </tal:block>
+                </tal:b>
             </tbody>
         </table>
 
@@ -106,5 +106,5 @@
             <div metal:use-macro="layout.macros['pagination']" tal:define="
             collection layout.model; current_page layout.model;" />
         </div>
-    </tal:block>
+    </tal:b>
 </div>

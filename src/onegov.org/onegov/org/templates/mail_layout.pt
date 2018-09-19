@@ -57,14 +57,14 @@
         Elements
     */
     a {
-        color: <tal:block replace="primary_color" />;
+        color: <tal:b replace="primary_color" />;
     }
 
     .btn-primary {
         text-decoration: none;
         color: #FFF;
-        background-color: <tal:block replace="primary_color" />;
-        border: solid <tal:block replace="primary_color" />;
+        background-color: <tal:b replace="primary_color" />;
+        border: solid <tal:b replace="primary_color" />;
         border-width: 10px 20px;
         line-height: 2;
         font-weight: bold;
@@ -300,7 +300,7 @@
                         <tr>
                             <td align="center">
                                 <p metal:define-slot="footer">
-                                    <tal:block replace="structure layout.contact_html|layout.org.title" />
+                                    <tal:b replace="structure layout.contact_html|layout.org.title" />
                                 </p>
                             </td>
                         </tr>
