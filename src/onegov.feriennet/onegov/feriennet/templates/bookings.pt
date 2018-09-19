@@ -132,6 +132,11 @@
 
                                         <ul style="${toggled and 'display: block;' or 'display: none;'}">
                                             <li tal:repeat="booking grouped_bookings[attendee][state]" id="booking-${booking.id}">
+                                                <div class="panel" tal:condition="repeat.booking.index == 0 and state == 'blocked'">
+                                                    <tal:b condition="state == 'blocked'" i18n:translate>
+                                                        These wishes overlap accepted bookings and are therefore blocked.
+                                                    </tal:b>
+                                                </div>
                                                 <div class="booking">
                                                     <div class="star">
                                                         <a ic-post-to="${request.link(booking, 'toggle-star')}">

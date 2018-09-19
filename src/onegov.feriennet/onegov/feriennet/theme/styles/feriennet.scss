@@ -852,6 +852,12 @@ $booking-left-margin: 2rem;
             padding: .75rem 1rem .75rem $column-gutter / 2;
         }
 
+        .panel {
+            font-size: .875rem;
+            width: calc(100% - 1rem);
+            padding: .5rem 1rem;
+        }
+
         .booking {
             display: flex;
             flex-wrap: wrap;
