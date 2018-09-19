@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves the order of activity filters.
+  [href]
+
 1.4.2 (2018-09-19)
 ~~~~~~~~~~~~~~~~~~~
 
