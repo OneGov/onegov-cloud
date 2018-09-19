@@ -10,6 +10,9 @@ Changelog
 - Shows the email address of the owner in the details view of a notice.
   [msom]
 
+- Fixes test.
+  [msom]
+
 1.16.4 (2018-08-16)
 ~~~~~~~~~~~~~~~~~~~~
 

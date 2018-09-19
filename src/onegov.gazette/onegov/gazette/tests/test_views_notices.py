@@ -423,7 +423,7 @@ def test_view_notices_pdf_preview(gazette_app):
         manage.form['title'] = "Erneuerungswahlen"
         manage.form['organization'] = '200'
         manage.form['category'] = '11'
-        manage.form['issues'] = ['2017-44', '2017-45']
+        manage.form['issues'] = ['2017-44']
         manage.form['text'] = "1. Oktober 2017"
         manage.form['author_place'] = 'Govikon'
         manage.form['author_name'] = 'State Chancellerist'
@@ -434,7 +434,7 @@ def test_view_notices_pdf_preview(gazette_app):
         manage.form['title'] = "Kantonsratswahlen"
         manage.form['organization'] = '200'
         manage.form['category'] = '11'
-        manage.form['issues'] = ['2017-44', '2017-45']
+        manage.form['issues'] = ['2017-45']
         manage.form['text'] = "10. Oktober 2017"
         manage.form['author_place'] = 'Govikon'
         manage.form['author_name'] = 'State Chancellerist'
