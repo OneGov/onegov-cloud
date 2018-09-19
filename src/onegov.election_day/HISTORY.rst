@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.6.8 (2018-09-19)
+~~~~~~~~~~~~~~~~~~~
 
 - Makes the WabstiC Majorz import more robust.
   [msom]
