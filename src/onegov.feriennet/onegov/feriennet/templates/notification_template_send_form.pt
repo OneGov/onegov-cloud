@@ -1,9 +1,9 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.feriennet">
-    <tal:block metal:fill-slot="title">
+    <tal:b metal:fill-slot="title">
         ${title}
-    </tal:block>
+    </tal:b>
 
-    <tal:block metal:fill-slot="content">
+    <tal:b metal:fill-slot="content">
 
         <div class="panel callout" i18n:translate>
             Clicking "Send" will send the e-mail below to all selected recipients. You will receive a copy of the e-mail if you are not already on the recipients list.
@@ -23,5 +23,5 @@
             There are no available recipients for your user account.
         </div>
 
-    </tal:block>
+    </tal:b>
 </div>

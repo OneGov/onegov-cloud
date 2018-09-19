@@ -1,8 +1,8 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.feriennet">
-    <tal:block metal:fill-slot="title">
+    <tal:b metal:fill-slot="title">
         ${title}
-    </tal:block>
-    <tal:block metal:fill-slot="body">
-        <tal:block replace="structure notification" />
-    </tal:block>
+    </tal:b>
+    <tal:b metal:fill-slot="body">
+        <tal:b replace="structure notification" />
+    </tal:b>
 </div>

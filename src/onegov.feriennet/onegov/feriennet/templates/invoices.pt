@@ -1,11 +1,11 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.feriennet">
-    <tal:block metal:fill-slot="title">
+    <tal:b metal:fill-slot="title">
         ${title}
-    </tal:block>
-    <tal:block metal:fill-slot="content">
+    </tal:b>
+    <tal:b metal:fill-slot="content">
     <div class="row">
         <div class="columns small-12 medium-8">
-            <tal:block condition="not: bills" i18n:translate>No bills created yet.</tal:block>
+            <tal:b condition="not: bills" i18n:translate>No bills created yet.</tal:b>
 
             <div class="bills" tal:condition="bills">
                 <div class="bills-header show-for-print">
@@ -39,10 +39,10 @@
                     <h3>${details.title}</h3>
 
                     <strong class="outstanding">
-                        <tal:block condition="details.paid" i18n:translate>Paid</tal:block>
-                        <tal:block condition="not: details.paid" i18n:translate>
-                            <tal:block i18n:name="amount" tal:replace="'{:.2f}'.format(details.outstanding)" /> unpaid
-                        </tal:block>
+                        <tal:b condition="details.paid" i18n:translate>Paid</tal:b>
+                        <tal:b condition="not: details.paid" i18n:translate>
+                            <tal:b i18n:name="amount" tal:replace="'{:.2f}'.format(details.outstanding)" /> unpaid
+                        </tal:b>
                     </strong>
 
                     <button id="button-${details.id}" data-toggle="#details-${details.id}" class="${details.paid and 'untoggled' or 'toggled'} hide_for-print">
@@ -52,7 +52,7 @@
 
                     <div id="details-${details.id}" class="invoice-items-list" style="${details.paid and 'display: none;' or ''}">
                         <ul>
-                            <tal:block repeat="(group, groupitems) details.items.items()">
+                            <tal:b repeat="(group, groupitems) details.items.items()">
                                 <li class="item-group">
                                     <strong tal:condition="group != 'manual'">${group}</strong>
                                     <strong tal:condition="group == 'manual'" i18n:translate>Discounts / Surcharges</strong>
@@ -61,7 +61,7 @@
                                     <span class="item-text">${item.text}</span>
                                     <span class="item-amount" tal:content="'{:.2f}'.format(item.amount)"></span>
                                 </li>
-                            </tal:block>
+                            </tal:b>
                             <li class="item-total ${details.paid and 'paid' or 'unpaid'}">
                                 <strong i18n:translate="">Total</strong>
                                 <strong class="item-amount" tal:content="'{:.2f}'.format(details.total)"></strong>
@@ -108,7 +108,7 @@
                                         <span i18n:translate>Amount</span>
                                         <span>${'{:.2f}'.format(details.outstanding)} CHF</span>
                                     </li>
-                                    <tal:block switch="layout.org.bank_payment_order_type">
+                                    <tal:b switch="layout.org.bank_payment_order_type">
                                         <li tal:case="string:esr">
                                             <span i18n:translate>Reference Number</span>
                                             <span>${details.first.display_esr_code}</span>
@@ -117,7 +117,7 @@
                                             <span i18n:translate>Notice</span>
                                             <span>${details.first.display_code}</span>
                                         </li>
-                                    </tal:block>
+                                    </tal:b>
                                 </ul>
                             </div>
                         </div>
@@ -126,9 +126,9 @@
             </div>
         </div>
         <div class="columns small-12 medium-4 hide-for-print">
-            <tal:block metal:use-macro="layout.macros.users" define="model model.for_invoice(invoice=None)"/>
+            <tal:b metal:use-macro="layout.macros.users" define="model model.for_invoice(invoice=None)"/>
         </div>
     </div>
 
-    </tal:block>
+    </tal:b>
 </div>

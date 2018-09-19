@@ -1,8 +1,8 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.feriennet">
-    <tal:block metal:fill-slot="title">
+    <tal:b metal:fill-slot="title">
         ${title}
-    </tal:block>
-    <tal:block metal:fill-slot="content">
+    </tal:b>
+    <tal:b metal:fill-slot="content">
 
         <div tal:condition="not:periods" i18n:translate>
             No periods defined.
@@ -22,25 +22,25 @@
                 <tr tal:repeat="period periods" class="${period.active and 'active' or ''}">
                     <td>${period.title}</td>
                     <td>
-                        <tal:block condition="not:period.confirmed">
+                        <tal:b condition="not:period.confirmed">
                             ${layout.format_date_range(period.prebooking_start, period.prebooking_end)}
-                        </tal:block>
-                        <tal:block condition="period.confirmed" i18n:translate>Completed</tal:block>
+                        </tal:b>
+                        <tal:b condition="period.confirmed" i18n:translate>Completed</tal:b>
                     </td>
                     <td>
                         ${layout.format_date_range(period.execution_start, period.execution_end)}
                     </td>
                     <td>
                         <span tal:condition="period.all_inclusive and period.booking_cost" i18n:translate>
-                            <tal:block i18n:name="cost" tal:replace="period.booking_cost" /> for
-                            <tal:block i18n:name="count" tal:replace="period.max_bookings_per_attendee" /> bookings
+                            <tal:b i18n:name="cost" tal:replace="period.booking_cost" /> for
+                            <tal:b i18n:name="count" tal:replace="period.max_bookings_per_attendee" /> bookings
                         </span>
                         <span tal:condition="period.all_inclusive and not period.booking_cost" i18n:translate>
                             Free of charge for
-                            <tal:block i18n:name="count" tal:replace="period.max_bookings_per_attendee" /> bookings
+                            <tal:b i18n:name="count" tal:replace="period.max_bookings_per_attendee" /> bookings
                         </span>
                         <span tal:condition="not period.all_inclusive and period.booking_cost" i18n:translate>
-                            <tal:block i18n:name="cost" tal:replace="period.booking_cost" /> per booking
+                            <tal:b i18n:name="cost" tal:replace="period.booking_cost" /> per booking
                         </span>
                         <span tal:condition="not period.all_inclusive and not period.booking_cost" i18n:translate>
                             Free of charge
@@ -62,5 +62,5 @@
             </tbody>
         </table>
 
-    </tal:block>
+    </tal:b>
 </div>

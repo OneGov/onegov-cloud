@@ -1,8 +1,8 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.feriennet">
-    <tal:block metal:fill-slot="title">
+    <tal:b metal:fill-slot="title">
         ${title}
-    </tal:block>
-    <tal:block metal:fill-slot="content">
+    </tal:b>
+    <tal:b metal:fill-slot="content">
         <div class="panel" tal:condition="not:layout.app.org.bank_account" i18n:translate>
             No bank account defined. Please define a bank account in the <a href="${request.return_here('/settings')}" i18n:name="link" i18n:translate>settings</a> first.
         </div>
@@ -38,63 +38,63 @@
                                 ${transaction.amount} ${transaction.currency}
                             </div>
                             <div class="columns small-8">
-                                <tal:block condition="transaction.username">
+                                <tal:b condition="transaction.username">
                                     <div class="show-for-sr" i18n:translate>
                                         Username
                                     </div>
                                     ${users[transaction.username]}<span tal:condition="transaction.confidence == 0.5">?</span>
-                                </tal:block>
-                                <tal:block condition="not transaction.username">
+                                </tal:b>
+                                <tal:b condition="not transaction.username">
                                     <div class="show-for-sr" i18n:translate>
                                         Username
                                     </div>
                                     <span i18n:translate>Unknown</span>
-                                </tal:block>
+                                </tal:b>
                             </div>
                         </div>
                         <div class="transaction-details row collapse">
                             <div class="columns small-12 medium-6">
                                 <dl>
-                                    <tal:block condition="transaction.valuta_date">
+                                    <tal:b condition="transaction.valuta_date">
                                         <dt i18n:translate>Valuta Date</dt>
                                         <dd>${layout.format_date(transaction.valuta_date, 'date')}</dd>
-                                    </tal:block>
+                                    </tal:b>
 
-                                    <tal:block condition="transaction.debitor_account">
+                                    <tal:b condition="transaction.debitor_account">
                                         <dt i18n:translate>Account</dt>
                                         <dd>${transaction.debitor_account}</dd>
-                                    </tal:block>
+                                    </tal:b>
 
-                                    <tal:block condition="transaction.debitor">
+                                    <tal:b condition="transaction.debitor">
                                         <dt i18n:translate>Account Owner</dt>
                                         <dd>${transaction.debitor}</dd>
-                                    </tal:block>
+                                    </tal:b>
 
-                                    <tal:block condition="transaction.reference">
+                                    <tal:b condition="transaction.reference">
                                         <dt i18n:translate>Reference Number</dt>
                                         <dd>${transaction.reference}</dd>
-                                    </tal:block>
+                                    </tal:b>
                                 </dl>
                             </div>
 
                             <div class="columns small-12 medium-6">
                                 <dl>
-                                    <tal:block condition="transaction.note">
+                                    <tal:b condition="transaction.note">
                                         <dt i18n:translate>Note</dt>
                                         <dd>${transaction.note}</dd>
-                                    </tal:block>
+                                    </tal:b>
 
-                                    <tal:block condition="transaction.booking_text">
+                                    <tal:b condition="transaction.booking_text">
                                         <dt i18n:translate>Booking Text</dt>
                                         <dd>${transaction.booking_text}</dd>
-                                    </tal:block>
+                                    </tal:b>
 
-                                    <tal:block condition="transaction.username">
+                                    <tal:b condition="transaction.username">
                                         <dt i18n:translate>Investigate</dt>
                                         <dd><a href="${user_link(transaction.username)}" i18n:translate>
-                                            Show <tal:block i18n:name="user" tal:replace="users[transaction.username]"/>'s bills.
+                                            Show <tal:b i18n:name="user" tal:replace="users[transaction.username]"/>'s bills.
                                         </a></dd>
-                                    </tal:block>
+                                    </tal:b>
                                 </dl>
                             </div>
                         </div>
@@ -103,7 +103,7 @@
             </div>
             <div class="columns small-12 medium-4">
                 <div>
-                    <a ic-post-to="${post_url}" redirect-after="${request.link(model)}" class="button expand" i18n:translate>Import <tal:block i18n:name="count">${success_count}</tal:block> payments</a>
+                    <a ic-post-to="${post_url}" redirect-after="${request.link(model)}" class="button expand" i18n:translate>Import <tal:b i18n:name="count">${success_count}</tal:b> payments</a>
                 </div>
                 <div class="side-panel">
                     <h2 i18n:translate>Legend</h2>
@@ -132,5 +132,5 @@
                 </div>
             </div>
         </div>
-    </tal:block>
+    </tal:b>
 </div>

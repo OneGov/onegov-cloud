@@ -1,33 +1,33 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.feriennet">
-    <tal:block metal:fill-slot="title">
+    <tal:b metal:fill-slot="title">
         ${title}
-    </tal:block>
-    <tal:block metal:fill-slot="content">
+    </tal:b>
+    <tal:b metal:fill-slot="content">
         <metal:hint use-macro="layout.macros['empty_page_lead_hint']" tal:define="item activity"/>
 
-        <tal:block condition="activity.state == 'preview'">
+        <tal:b condition="activity.state == 'preview'">
             <div class="panel callout" tal:condition="request.is_organiser_only" i18n:translate>
                 This is a preview. Please edit it until you are satisifed with the result and then press "Request Publication". An administrator will then review your proposal.
             </div>
             <div class="panel callout" tal:condition="request.is_admin" i18n:translate>
                 This is a preview. Please edit it until you are satisifed with the result and then press "Request Publication" to mark the activity ready for review.
             </div>
-        </tal:block>
+        </tal:b>
 
-        <tal:block condition="activity.state == 'proposed' and request.is_organiser_only">
+        <tal:b condition="activity.state == 'proposed' and request.is_organiser_only">
             <div class="panel callout" i18n:translate>
                 This activity is currently being reviewd by an administrator.
             </div>
-        </tal:block>
+        </tal:b>
 
-        <tal:block condition="activity.state == 'archived'">
+        <tal:b condition="activity.state == 'archived'">
             <div class="panel callout" i18n:translate>
                 This activity has been archived.
             </div>
-        </tal:block>
+        </tal:b>
 
-        <tal:block metal:use-macro="layout.macros.activity_detailed" tal:define="show_ticket_panel True">
-            <metal:block fill-slot="after-text">
+        <tal:b metal:use-macro="layout.macros.activity_detailed" tal:define="show_ticket_panel True">
+            <metal:b fill-slot="after-text">
                 <div tal:condition="not: occasions_by_period">
                     <h3 i18n:translate>Occasions</h3>
                     <p i18n:translate>
@@ -35,7 +35,7 @@
                     </p>
                 </div>
 
-                <tal:block define="today layout.today()" condition="occasions_by_period" repeat="(title, occasions) occasions_by_period">
+                <tal:b define="today layout.today()" condition="occasions_by_period" repeat="(title, occasions) occasions_by_period">
                     <div tal:define="period occasions[0].period" class="occasions-by-period">
                         <div class="title-with-toggle">
                             <div class="toggle" data-toggle="#occasions-for-${period.id.hex}" tal:condition="request.is_admin">
@@ -49,20 +49,20 @@
                         <div id="occasions-for-${period.id.hex}" style="display: ${period.active and 'block' or 'none'};">
                             <div class="panel">
                                 <div class="hints">
-                                    <tal:block metal:use-macro="layout.macros.period_hints" />
+                                    <tal:b metal:use-macro="layout.macros.period_hints" />
                                 </div>
                             </div>
 
                             <ul class="occasions">
                                 <li tal:repeat="occasion occasions">
                                     <h4><tal:b>${repeat.occasion.number}.</tal:b> <tal:b i18n:translate>Occasion</tal:b></h4>
-                                    <tal:block metal:use-macro="layout.macros.occasion" tal:define="show_links True; show_enroll show_enroll(occasion)" />
+                                    <tal:b metal:use-macro="layout.macros.occasion" tal:define="show_links True; show_enroll show_enroll(occasion)" />
                                 </li>
                             </ul>
                         </div>
                     </div>
-                </tal:block>
-            </metal:block>
-        </tal:block>
-    </tal:block>
+                </tal:b>
+            </metal:b>
+        </tal:b>
+    </tal:b>
 </div>

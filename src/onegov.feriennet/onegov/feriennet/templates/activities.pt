@@ -1,8 +1,8 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.feriennet">
-    <tal:block metal:fill-slot="title">
+    <tal:b metal:fill-slot="title">
         ${title}
-    </tal:block>
-    <tal:block metal:fill-slot="content">
+    </tal:b>
+    <tal:b metal:fill-slot="content">
         <div class="row">
             <div class="columns medium-8">
                 <div class="activity-list-item" tal:condition="not:activities" i18n:translate>
@@ -28,30 +28,30 @@
                                 available_spots get_available_spots(activity);
                             ">
                                 <div class="small-12 columns factoids activities-list">
-                                    <tal:block condition="ages">
+                                    <tal:b condition="ages">
                                         <span class="age" tal:define="
                                             min_age min(age.lower for age in ages);
                                             max_age max(age.upper - 1 for age in ages);
                                         ">
                                             <span i18n:translate class="show-for-sr">Age</span>
                                             <span i18n:translate>
-                                                <tal:block replace="min_age" i18n:name='min_age' />
+                                                <tal:b replace="min_age" i18n:name='min_age' />
                                                 -
-                                                <tal:block replace="max_age" i18n:name='max_age' />
+                                                <tal:b replace="max_age" i18n:name='max_age' />
                                                 years
                                             </span>
                                         </span>
-                                    </tal:block>
-                                    <tal:block condition="min_cost is not None">
+                                    </tal:b>
+                                    <tal:b condition="min_cost is not None">
                                         <span class="cost">
                                             <span i18n:translate class="show-for-sr">Cost</span>
 
                                             <span i18n:translate>
-                                                starting at <tal:block i18n:name='price'>${'{:.2f}'.format(min_cost)}</tal:block> CHF
+                                                starting at <tal:b i18n:name='price'>${'{:.2f}'.format(min_cost)}</tal:b> CHF
                                             </span>
                                         </span>
-                                    </tal:block>
-                                    <tal:block>
+                                    </tal:b>
+                                    <tal:b>
                                         <span class="${available_spots and 'available-spots' or 'full'}">
                                             <span i18n:translate class="show-for-sr">Free Spots</span>
 
@@ -62,10 +62,10 @@
                                                 1 free spot
                                             </span>
                                             <span i18n:translate tal:condition="available_spots > 1">
-                                                <tal:block i18n:name="count">${available_spots}</tal:block> free spots
+                                                <tal:b i18n:name="count">${available_spots}</tal:b> free spots
                                             </span>
                                         </span>
-                                    </tal:block>
+                                    </tal:b>
                                 </div>
                             </div>
                         </div>
@@ -131,5 +131,5 @@
 
             </div>
         </div>
-    </tal:block>
+    </tal:b>
 </div>

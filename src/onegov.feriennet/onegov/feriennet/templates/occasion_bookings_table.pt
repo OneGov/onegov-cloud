@@ -7,7 +7,7 @@
                 <th i18n:translate>Age</th>
                 <th i18n:translate>State</th>
                 <th>
-                    <tal:block
+                    <tal:b
                         define="
                             action_id 'action-{}'.format(oid);
                             links occasion_links(oid)
@@ -27,20 +27,20 @@
                 <tr tal:repeat="booking bookings[kind]" class="booking booking-${kind} ${booking.state}" id="${booking.id}">
                     <td>
                         <a tal:condition="not period.confirmed" ic-post-to="${request.link(booking, 'toggle-nobble')}">
-                            <tal:block metal:use-macro="layout.macros['nobble']" />
+                            <tal:b metal:use-macro="layout.macros['nobble']" />
                         </a>
-                        <tal:block condition="period.confirmed" metal:use-macro="layout.macros['nobble']" />
+                        <tal:b condition="period.confirmed" metal:use-macro="layout.macros['nobble']" />
                     </td>
                     <td><span>${booking.attendee.name}</span></td>
                     <td><span>${booking.attendee.age}</span></td>
                     <td>
-                        <tal:block
+                        <tal:b
                             define="state booking.state"
                             metal:use-macro="layout.macros.booking_state"
                         />
                     </td>
                     <td>
-                        <tal:block
+                        <tal:b
                             define="
                                 action_id 'action-{}-{}'.format(oid, booking.attendee_id);
                                 links booking_links(booking)

@@ -1,12 +1,12 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.feriennet">
-    <tal:block metal:fill-slot="title">
+    <tal:b metal:fill-slot="title">
         ${title}
-    </tal:block>
-    <tal:block metal:fill-slot="content" tal:define="bills model.bills">
+    </tal:b>
+    <tal:b metal:fill-slot="content" tal:define="bills model.bills">
 
         <div class="callout panel">
             <div class="hints">
-                <tal:block metal:use-macro="layout.macros.period_hints" />
+                <tal:b metal:use-macro="layout.macros.period_hints" />
 
                 <div class="hint hint-costs" i18n:translate tal:condition="bills">
                     The total amount is <strong tal:content="'{:.2f}'.format(total)" i18n:name="amount" /> CHF.
@@ -20,30 +20,30 @@
 
         <div class="row">
             <div class="columns small-12 medium-8">
-                <tal:block condition="not: bills" i18n:translate>No bills created yet.</tal:block>
+                <tal:b condition="not: bills" i18n:translate>No bills created yet.</tal:b>
 
                 <div class="bills billing">
                     <div class="bill ${details.outstanding == 0 and 'paid'} ${details.outstanding > 0 and 'unpaid'} ${details.outstanding < 0 and 'overpaid'}" id="${details.invoice_id}" tal:repeat="(username, details) bills.items()" data-reload-from="${request.link(model.for_username(username).for_expand(True))}" data-reload-from-selector=".bill">
                         <h3>${details.title}</h3>
 
                         <strong class="outstanding">
-                            <tal:block condition="details.outstanding == 0" i18n:translate>Paid</tal:block>
-                            <tal:block condition="details.outstanding > 0" i18n:translate>
-                                <tal:block i18n:name="amount" tal:replace="'{:.2f}'.format(details.outstanding)" /> unpaid
-                            </tal:block>
-                            <tal:block condition="details.outstanding < 0" i18n:translate>
-                                <tal:block i18n:name="amount" tal:replace="'{:.2f}'.format(details.outstanding * -1)" /> overpaid
-                            </tal:block>
+                            <tal:b condition="details.outstanding == 0" i18n:translate>Paid</tal:b>
+                            <tal:b condition="details.outstanding > 0" i18n:translate>
+                                <tal:b i18n:name="amount" tal:replace="'{:.2f}'.format(details.outstanding)" /> unpaid
+                            </tal:b>
+                            <tal:b condition="details.outstanding < 0" i18n:translate>
+                                <tal:b i18n:name="amount" tal:replace="'{:.2f}'.format(details.outstanding * -1)" /> overpaid
+                            </tal:b>
 
-                            <tal:block tal:define="actions tuple(invoice_links(details))" tal:condition="actions">
-                                <tal:block
+                            <tal:b tal:define="actions tuple(invoice_links(details))" tal:condition="actions">
+                                <tal:b
                                     define="
                                         action_id 'item-dropdown-{}'.format(details.id);
                                         links actions
                                     "
                                     metal:use-macro="layout.macros.actions_button"
                                 />
-                            </tal:block>
+                            </tal:b>
                         </strong>
 
                         <button id="button-${details.id}" data-toggle="#details-${details.id}" class="${model.expand and 'toggled' or 'untoggled'} ic-use-transition">
@@ -74,7 +74,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tal:block repeat="item details.items">
+                                        <tal:b repeat="item details.items">
                                             <tr class="group" tal:condition="repeat.item.start or details.items[repeat.item.index - 1].group != item.group">
                                                 <td colspan="4" tal:condition="not:item.family">${item.group}</td>
                                                 <td colspan="4" tal:condition="item.family" i18n:translate>Discounts / Surcharges</td>
@@ -91,18 +91,18 @@
                                                     <i class="fa ${item.source == 'stripe_connect' and 'fa-credit-card' or 'fa-check-circle'}" aria-hidden="true"></i>
                                                 </td>
                                                 <td class="actions">
-                                                    <tal:block tal:define="actions tuple(item_links(item))" tal:condition="actions">
-                                                        <tal:block
+                                                    <tal:b tal:define="actions tuple(item_links(item))" tal:condition="actions">
+                                                        <tal:b
                                                             define="
                                                                 action_id 'item-dropdown-{}-{}-{}'.format(details.id, groupid, repeat.item.index);
                                                                 links actions
                                                             "
                                                             metal:use-macro="layout.macros.actions_button"
                                                         />
-                                                    </tal:block>
+                                                    </tal:b>
                                                 </td>
                                             </tr>
-                                        </tal:block>
+                                        </tal:b>
                                         <tr class="total">
                                             <td i18n:translate>Total</td>
                                             <td class="amount">
@@ -130,45 +130,45 @@
                     <h4 i18n:translate>Billing</h4>
 
                     <div class="form-panel-block">
-                        <tal:block condition="period.active and period.booking_phase">
+                        <tal:b condition="period.active and period.booking_phase">
                             <div metal:use-macro="layout.macros['form']" />
 
                             <a ic-post-to="${request.link(model, 'reset')}" redirect-after="${request.link(model)}" i18n:translate class="reset-billing" tal:condition="bills">
                                 Reset Billing
                             </a>
-                        </tal:block>
+                        </tal:b>
 
-                        <tal:block condition="period.active and not period.confirmed">
+                        <tal:b condition="period.active and not period.confirmed">
                             <p>
                                 <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
                                 <span i18n:translate>
                                     The matching of this period has not been confirmed yet.
                                 </span>
                             </p>
-                        </tal:block>
+                        </tal:b>
 
-                        <tal:block condition="not period.active and not period.finalized">
+                        <tal:b condition="not period.active and not period.finalized">
                             <p>
                                 <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
                                 <span i18n:translate>
                                     This period is not active. Bills may only be created for the active period.
                                 </span>
                             </p>
-                        </tal:block>
+                        </tal:b>
 
-                        <tal:block condition="period.finalized">
+                        <tal:b condition="period.finalized">
                             <p>
                                 <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
                                 <span i18n:translate>
                                     The billing for this period has been confirmed. You can still change the invoices manually but you can no longer generate them automatically.
                                 </span>
                             </p>
-                        </tal:block>
+                        </tal:b>
                     </div>
                 </div>
 
-                <tal:block metal:use-macro="layout.macros.periods" />
+                <tal:b metal:use-macro="layout.macros.periods" />
             </div>
         </div>
-    </tal:block>
+    </tal:b>
 </div>

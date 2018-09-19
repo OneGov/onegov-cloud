@@ -30,9 +30,9 @@
         <div>
             <div class="row footer-content">
                 <div class="small-12 columns">
-                    <metal:block use-macro="layout.macros['footer_columns']" />
-                    <metal:block use-macro="layout.macros['footer_sponsors']" />
-                    <metal:block use-macro="layout.macros['footer_links']" />
+                    <metal:b use-macro="layout.macros['footer_columns']" />
+                    <metal:b use-macro="layout.macros['footer_sponsors']" />
+                    <metal:b use-macro="layout.macros['footer_links']" />
                 </div>
             </div>
         </div>
@@ -123,7 +123,7 @@
 </metal:footer_projuventute>
 
 <metal:activity_ticket_summary define-macro="activity_ticket_summary" i18n:domain="onegov.feriennet">
-    <tal:block define="user activity.user.data.organisation or activity.user.title|activity.user.title">
+    <tal:b define="user activity.user.data.organisation or activity.user.title|activity.user.title">
 
         <div class="panel">
 
@@ -139,7 +139,7 @@
 
             <p>
                 <br>
-                <span i18n:translate>Activity State</span>: <strong><metal:block use-macro="layout.macros.activity_state_text" /></strong>
+                <span i18n:translate>Activity State</span>: <strong><metal:b use-macro="layout.macros.activity_state_text" /></strong>
             </p>
 
             <p tal:condition="activity.state != 'accepted'" i18n:translate>
@@ -158,12 +158,12 @@
             <span>${period.title}</span>
         </p>
 
-    </tal:block>
+    </tal:b>
 </metal:activity_ticket_summary>
 
 <metal:activity_detailed define-macro="activity_detailed" i18n:domain="onegov.feriennet">
 
-    <tal:block metal:use-macro="layout.macros.page_content"
+    <tal:b metal:use-macro="layout.macros.page_content"
         tal:define="lead activity.lead; text activity.text; coordinates activity.coordinates; people None; contact None; show_side_panel True; highlight_contacts False; location activity.location">
 
         <div metal:fill-slot="after-lead" tal:condition="activity.tags">
@@ -177,7 +177,7 @@
         <div metal:fill-slot="before-panels">
             <div class="side-panel highlighted organiser-panel" tal:define="organiser activity.user; public request.app.public_organiser_data" tal:condition="public">
                 <h2 i18n:translate>Organiser</h2>
-                <metal:block use-macro="layout.macros.organiser" />
+                <metal:b use-macro="layout.macros.organiser" />
             </div>
         </div>
 
@@ -190,37 +190,37 @@
                         Activity State
                     </dt>
                     <dd>
-                        <metal:block use-macro="layout.macros.activity_state" />
+                        <metal:b use-macro="layout.macros.activity_state" />
                     </dd>
 
-                    <tal:block condition="layout.ticket and layout.model.state != 'preview'">
+                    <tal:b condition="layout.ticket and layout.model.state != 'preview'">
                         <dt i18n:translate>
                             Ticket State
                         </dt>
                         <dd class="activity-ticket-state" tal:define="ticket layout.ticket">
-                            <metal:block use-macro="layout.macros.ticket_status" />
+                            <metal:b use-macro="layout.macros.ticket_status" />
                         </dd>
-                    </tal:block>
+                    </tal:b>
                 </dl>
             </div>
         </div>
 
-    </tal:block>
+    </tal:b>
 </metal:activity_detailed>
 
 <metal:activity_state define-macro="activity_state" i18n:domain="onegov.feriennet">
     <div class="activity-state activity-state-${activity.state}">
-        <metal:block use-macro="layout.macros.activity_state_text" />
+        <metal:b use-macro="layout.macros.activity_state_text" />
     </div>
 </metal:activity_state>
 
 <metal:activity_state_text define-macro="activity_state_text" i18n:domain="onegov.feriennet">
-    <tal:block switch="activity.state">
-        <tal:block i18n:translate case="string:preview">Preview</tal:block>
-        <tal:block i18n:translate case="string:proposed">Proposed</tal:block>
-        <tal:block i18n:translate case="string:accepted">Published</tal:block>
-        <tal:block i18n:translate case="string:archived">Archived</tal:block>
-    </tal:block>
+    <tal:b switch="activity.state">
+        <tal:b i18n:translate case="string:preview">Preview</tal:b>
+        <tal:b i18n:translate case="string:proposed">Proposed</tal:b>
+        <tal:b i18n:translate case="string:accepted">Published</tal:b>
+        <tal:b i18n:translate case="string:archived">Archived</tal:b>
+    </tal:b>
 </metal:activity_state_text>
 
 <metal:organiser define-macro="organiser" i18n:domain="onegov.feriennet">
@@ -280,11 +280,11 @@
             </div>
 
             <div class="available-spots" tal:condition="not occasion.cancelled and not occasion.full and not period.finalized">
-                <span i18n:translate><tal:block i18n:name="count" replace="occasion.available_spots" /> spots available</span>
+                <span i18n:translate><tal:b i18n:name="count" replace="occasion.available_spots" /> spots available</span>
             </div>
 
             <div class="spots" tal:condition="not occasion.cancelled and period.finalized">
-                <span i18n:translate><tal:block i18n:name="count" replace="occasion.attendee_count" /> attendees</span>
+                <span i18n:translate><tal:b i18n:name="count" replace="occasion.attendee_count" /> attendees</span>
             </div>
         </div>
 
@@ -302,9 +302,9 @@
             <div class="age">
                 <span i18n:translate class="show-for-sr">Age</span>
                 <span i18n:translate>
-                    <tal:block replace="occasion.age.lower" i18n:name='min_age' />
+                    <tal:b replace="occasion.age.lower" i18n:name='min_age' />
                     -
-                    <tal:block replace="occasion.age.upper - 1" i18n:name='max_age' />
+                    <tal:b replace="occasion.age.upper - 1" i18n:name='max_age' />
                     years
                 </span>
             </div>
@@ -313,15 +313,15 @@
                 <span i18n:translate class="show-for-sr">Participants</span>
 
                 <span i18n:translate tal:condition="occasion.spots.lower">
-                    <tal:block replace="occasion.spots.lower" i18n:name='min_spots' />
+                    <tal:b replace="occasion.spots.lower" i18n:name='min_spots' />
                     -
-                    <tal:block replace="occasion.spots.upper - 1" i18n:name='max_spots' />
+                    <tal:b replace="occasion.spots.upper - 1" i18n:name='max_spots' />
                     participants
                 </span>
 
                 <span i18n:translate tal:condition="not:occasion.spots.lower">
                     up to
-                    <tal:block replace="occasion.spots.upper - 1" i18n:name='max_spots' />
+                    <tal:b replace="occasion.spots.upper - 1" i18n:name='max_spots' />
                     participants
                 </span>
             </div>
@@ -329,22 +329,22 @@
             <div class="cost">
                 <span i18n:translate class="show-for-sr">Cost</span>
 
-                <tal:block condition="period.all_inclusive">
-                    <tal:block condition="occasion.cost" i18n:translate>
-                        <tal:block i18n:name="cost" replace="occasion.cost" /> CHF
-                    </tal:block>
-                    <tal:block condition="not:occasion.cost" i18n:translate>
+                <tal:b condition="period.all_inclusive">
+                    <tal:b condition="occasion.cost" i18n:translate>
+                        <tal:b i18n:name="cost" replace="occasion.cost" /> CHF
+                    </tal:b>
+                    <tal:b condition="not:occasion.cost" i18n:translate>
                         No additional costs
-                    </tal:block>
-                </tal:block>
-                <tal:block condition="not:period.all_inclusive">
-                    <tal:block condition="occasion.cost or period.booking_cost" i18n:translate>
-                        <tal:block i18n:name="cost" replace="(occasion.cost or 0) + (period.booking_cost or 0)" /> CHF
-                    </tal:block>
-                    <tal:block condition="not:occasion.cost or period.booking_cost" i18n:translate>
+                    </tal:b>
+                </tal:b>
+                <tal:b condition="not:period.all_inclusive">
+                    <tal:b condition="occasion.cost or period.booking_cost" i18n:translate>
+                        <tal:b i18n:name="cost" replace="(occasion.cost or 0) + (period.booking_cost or 0)" /> CHF
+                    </tal:b>
+                    <tal:b condition="not:occasion.cost or period.booking_cost" i18n:translate>
                         Free of charge
-                    </tal:block>
-                </tal:block>
+                    </tal:b>
+                </tal:b>
             </div>
         </div>
 
@@ -367,9 +367,9 @@
             </div>
 
             <div class="text-links" tal:condition="show_links and layout.is_editable">
-                <tal:block repeat="link occasion_links(occasion)">
-                    <tal:block replace="structure link(layout)" />
-                </tal:block>
+                <tal:b repeat="link occasion_links(occasion)">
+                    <tal:b replace="structure link(layout)" />
+                </tal:b>
             </div>
         </div>
 
@@ -378,37 +378,37 @@
                 Enroll your child now.
             </span>
 
-            <tal:block switch="request.is_logged_in">
+            <tal:b switch="request.is_logged_in">
                 <a tal:case="True" class="button" href="${request.link(occasion, 'book')}" i18n:translate>Enroll</a>
                 <a tal:case="False" class="button" href="${layout.login_to_url(request.link(occasion, 'book'), skip=True)}" i18n:translate>Enroll</a>
-            </tal:block>
+            </tal:b>
         </div>
 
     </div>
 </metal:occasion>
 
 <metal:star define-macro="star" i18n:domain="onegov.feriennet">
-    <tal:block condition="not booking.starred">
+    <tal:b condition="not booking.starred">
         <i id="star-${booking.id}" class="fa fa-star-o" aria-hidden="true"></i>
         <span class="show-for-sr" i18n:translate>Mark activity as favorite</span>
-    </tal:block>
-    <tal:block condition="booking.starred">
+    </tal:b>
+    <tal:b condition="booking.starred">
         <i id="star-${booking.id}" class="fa fa-star" aria-hidden="true"></i>
         <span class="show-for-sr" i18n:translate>Unmark activity as favorite</span>
-    </tal:block>
+    </tal:b>
 </metal:star>
 
 <metal:star define-macro="nobble" i18n:domain="onegov.feriennet">
-    <tal:block define="booking_id booking.id|record.booking_id; nobbled booking.nobbled|record.booking_nobbled">
-        <tal:block condition="not nobbled">
+    <tal:b define="booking_id booking.id|record.booking_id; nobbled booking.nobbled|record.booking_nobbled">
+        <tal:b condition="not nobbled">
             <i id="nobble-${booking_id}" class="fa fa-fw fa-square-o" aria-hidden="true"></i>
             <span class="show-for-sr" i18n:translate>Increase the bookings priority</span>
-        </tal:block>
-        <tal:block condition="nobbled">
+        </tal:b>
+        <tal:b condition="nobbled">
             <i id="nobble-${booking_id}" class="fa fa-fw fa-check-square-o" aria-hidden="true"></i>
             <span class="show-for-sr" i18n:translate>Decrease the bookings priority</span>
-        </tal:block>
-    </tal:block>
+        </tal:b>
+    </tal:b>
 </metal:star>
 
 <metal:hints define-macro="period_hints" i18n:domain="onegov.feriennet">
@@ -434,27 +434,27 @@
 
     <div tal:condition="not period.finalized and period.confirmed and period.deadline_date"
          class="hint hint-deadline" i18n:translate>
-            The deadline for last-minute bookings is the <tal:block i18n:name="date">${layout.format_date(period.deadline_date, 'date')}</tal:block>.
+            The deadline for last-minute bookings is the <tal:b i18n:name="date">${layout.format_date(period.deadline_date, 'date')}</tal:b>.
     </div>
 
     <div tal:condition="not period.finalized and period.confirmed and period.deadline_days"
          class="hint hint-deadline" i18n:translate>
-            Last-minute bookings are possible up to <tal:block i18n:name="days">${period.deadline_days}</tal:block> before each occasion.
+            Last-minute bookings are possible up to <tal:b i18n:name="days">${period.deadline_days}</tal:b> before each occasion.
     </div>
 
     <div tal:condition="period.all_inclusive and period.max_bookings_per_attendee"
          class="hint hint-max-activities" i18n:translate>
-            Each child is assigned up to <tal:block i18n:name="count" tal:replace="period.max_bookings_per_attendee" /> activities. To ensure a good matching you can signup for more activities than those.
+            Each child is assigned up to <tal:b i18n:name="count" tal:replace="period.max_bookings_per_attendee" /> activities. To ensure a good matching you can signup for more activities than those.
     </div>
 
     <div tal:condition="period.all_inclusive and period.booking_cost"
          class="hint hint-costs" i18n:translate>
-            The passport costs <tal:block i18n:name="amount" tal:replace="period.booking_cost" /> CHF per child. Individual activities may incur additional charges.
+            The passport costs <tal:b i18n:name="amount" tal:replace="period.booking_cost" /> CHF per child. Individual activities may incur additional charges.
     </div>
 
     <div tal:condition="period.minutes_between"
          class="hint hint-minutes" i18n:translate>
-            Between each booking we enforce <tal:block i18n:name="minutes" tal:replace="period.minutes_between" /> minutes of block-time in which no other booking is permitted.
+            Between each booking we enforce <tal:b i18n:name="minutes" tal:replace="period.minutes_between" /> minutes of block-time in which no other booking is permitted.
     </div>
 
     <div tal:condition="period.alignment == 'day'"
@@ -464,7 +464,7 @@
 </metal:hints>
 
 <metal:booking_state define-macro="booking_state" i18n:domain="onegov.feriennet">
-    <tal:block switch="state">
+    <tal:b switch="state">
         <div tal:case="'open'" class="state ${state}" i18n:translate>
             Open
         </div>
@@ -480,7 +480,7 @@
         <div tal:case="'blocked'" class="state ${state}" i18n:translate>
             Blocked
         </div>
-    </tal:block>
+    </tal:b>
 </metal:booking_state>
 
 <metal:periods define-macro="periods" i18n:domain="onegov.feriennet" i18n:domain="onegov.feriennet">
