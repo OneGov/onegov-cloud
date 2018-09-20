@@ -40,7 +40,9 @@ setup(
         'onegov.user',
         'raven',
         'requests',
-        'rjsmin'
+        'rjsmin',
+        'xlrd',
+        'xlsxwriter',
     ],
     extras_require=dict(
         test=[

@@ -2,7 +2,6 @@ from cached_property import cached_property
 from csv import writer
 from onegov.core.collection import Pagination
 from onegov.swissvotes.fields.dataset import COLUMNS
-from onegov.swissvotes.fields.dataset import DatasetDialect
 from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import SwissVote
 from sqlalchemy import or_
@@ -280,7 +279,7 @@ class SwissVoteCollection(Pagination):
     def export_csv(self, file):
         """ Exports all votes according to the code book. """
 
-        csv = writer(file, dialect=DatasetDialect())
+        csv = writer(file)
         csv.writerow(COLUMNS.values())
 
         for vote in self.query().order_by(None).order_by(SwissVote.bfs_number):

@@ -1,11 +1,13 @@
 from collections import OrderedDict
-from csv import Dialect
-from csv import QUOTE_ALL
-from dateutil.parser import parse
 from decimal import Decimal
-from onegov.swissvotes.fields.csv import SimpleCsvUploadField
+from onegov.form.fields import UploadField
+from onegov.form.validators import FileSizeLimit
+from onegov.form.validators import WhitelistedMimeType
+from onegov.swissvotes import _
 from onegov.swissvotes.models import SwissVote
 from psycopg2.extras import NumericRange
+from xlrd import open_workbook
+from xlrd import xldate
 
 
 COLUMNS = OrderedDict((
@@ -117,21 +119,23 @@ COLUMNS = OrderedDict((
 ))
 
 
-class DatasetDialect(Dialect):
-    delimiter = ';'
-    lineterminator = '\n'
-    quotechar = '"'
-    quoting = QUOTE_ALL
-    doublequote = True
-    skipinitialspace = False
-
-
-class SwissvoteDatasetField(SimpleCsvUploadField):
-    """ An upload field expecting a Swissvotes dataset. """
+class SwissvoteDatasetField(UploadField):
+    """ An upload field expecting a Swissvotes dataset (XLSX). """
 
     def __init__(self, *args, **kwargs):
-        kwargs.setdefault('dialect', DatasetDialect())
-        kwargs.setdefault('expected_headers', COLUMNS.values())
+        kwargs.setdefault('validators', [])
+        kwargs['validators'].append(
+            WhitelistedMimeType({
+                'application/octet-stream',
+                'application/vnd.openxmlformats-officedocument'
+                '.spreadsheetml.sheet'
+            })
+        )
+        kwargs['validators'].append(FileSizeLimit(10 * 1024 * 1024))
+
+        kwargs.setdefault('render_kw', {})
+        kwargs['render_kw']['force_simple'] = True
+
         super().__init__(*args, **kwargs)
 
     def post_validate(self, form, validation_stopped):
@@ -144,32 +148,59 @@ class SwissvoteDatasetField(SimpleCsvUploadField):
 
         errors = []
         data = []
-        for index, line in enumerate(self.data.lines):
+
+        try:
+            workbook = open_workbook(
+                file_contents=self.raw_data[0].file.read()
+            )
+        except Exception:
+            raise ValueError(_("Not a valid XLSX file."))
+
+        if workbook.nsheets < 1:
+            raise ValueError(_("No data."))
+
+        sheet = workbook.sheet_by_index(0)
+
+        if sheet.nrows <= 1:
+            raise ValueError(_("No data."))
+
+        headers = [column.value for column in sheet.row(0)]
+        missing = set(headers) - set(COLUMNS.values())
+        if missing:
+            raise ValueError(_(
+                "Some columns are missing: ${columns}.",
+                mappping={'columns': ', '.join(missing)}
+            ))
+
+        for index in range(1, sheet.nrows):
+            row = sheet.row(index)
             vote = SwissVote()
             for attribute, column in COLUMNS.items():
-                value = getattr(line, column.replace('-', '_'))
+                cell = row[headers.index(column)]
                 type_ = str(vote.__table__.columns[attribute.lstrip('_')].type)
-
                 try:
-                    if value == '.' or not value:
+                    if not cell.value:
                         value = None
                     elif type_ == 'TEXT':
-                        value = str(value)
+                        value = str(cell.value)
                     elif type_ == 'DATE':
-                        value = parse(value, dayfirst=True)
+                        value = xldate.xldate_as_datetime(
+                            cell.value,
+                            workbook.datemode
+                        ).date()
+                        print(value.year)
                     elif type_ == 'INTEGER':
-                        value = int(value)
+                        value = int(cell.value)
                     elif type_ == 'INT4RANGE':
-                        bounds = [int(bound) for bound in value.split('-')]
-                        if not len(bounds) == 2:
-                            raise ValueError()
-                        value = NumericRange(bounds[0], bounds[1])
+                        value = NumericRange(*[
+                            int(bound) for bound in cell.value.split('-')
+                        ])
                     elif type_.startswith('NUMERIC'):
-                        value = Decimal(value.replace(',', '.'))
+                        value = Decimal(cell.value)
 
-                except ValueError as e:
+                except Exception as e:
                     errors.append((
-                        index, column, f"'{value}' is not a(n) {type_.lower()}"
+                        index, column, f"'{value}' ≠ {type_.lower()}"
                     ))
 
                 setattr(vote, attribute, value)
@@ -177,8 +208,13 @@ class SwissvoteDatasetField(SimpleCsvUploadField):
             data.append(vote)
 
         if errors:
-            raise ValueError(
-                '; '.join(['{}:{} {}'.format(*error) for error in errors])
-            )
+            raise ValueError(_(
+                "Some cells contain invalid values: ${errors}.",
+                mapping={
+                    'errors': '; '.join([
+                        '{}:{} {}'.format(*error) for error in errors
+                    ])
+                }
+            ))
 
         self.data = data

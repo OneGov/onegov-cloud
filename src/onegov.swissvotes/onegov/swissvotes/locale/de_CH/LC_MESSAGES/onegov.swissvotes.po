@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-18 15:04+0200\n"
-"PO-Revision-Date: 2018-09-18 14:18+0200\n"
+"POT-Creation-Date: 2018-09-20 13:53+0200\n"
+"PO-Revision-Date: 2018-09-20 13:54+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -32,26 +32,19 @@ msgstr "Disclaimer"
 msgid "Imprint"
 msgstr "Impressum"
 
-msgid "Some columns are missing."
-msgstr "Einige Spalten fehlen."
+msgid "No data."
+msgstr "Keine Daten."
 
-msgid "Some column names are ambigous."
-msgstr "Einige Spaltennamen sind zweideutig."
+#, python-format
+msgid "Some columns are missing: ${columns}."
+msgstr "Einige Spalten fehlen: ${columns}."
 
-msgid "Some column names appear twice."
-msgstr "Einige Spaltennamen erscheinen doppelt."
+#, python-format
+msgid "Some cells contain invalid values: ${errors}."
+msgstr "Einige Zellen enthalten ungültige Werte: ${errors}."
 
-msgid "The file is empty."
-msgstr "Die Datei ist leer."
-
-msgid "The file contains an empty line."
-msgstr "Die Datei enthält eine leere Zeile."
-
-msgid "Invalid encoding."
-msgstr "Ungültige Kodierung."
-
-msgid "Not a valid csv file."
-msgstr "Keine gültige CSV-Datei."
+msgid "Not a valid XLSX file."
+msgstr "Keine gültige XLSX-Datei."
 
 msgid "Voting text"
 msgstr "Abstimmungstext"
@@ -1377,12 +1370,3 @@ msgstr "Alle Abstimmungen gelöscht"
 #, python-format
 msgid "The dataset contains unknown descriptors: ${items}."
 msgstr "Der Datensatz enthält unbekannte Deskriptoren: ${items}."
-
-#~ msgid "Download dataset"
-#~ msgstr "Datensatz herunterladen"
-
-#~ msgid "Popular vote"
-#~ msgstr "Volksabstimmung"
-
-#~ msgid "Cumulative voter strength"
-#~ msgstr "Kumulierter Wähleranteil"

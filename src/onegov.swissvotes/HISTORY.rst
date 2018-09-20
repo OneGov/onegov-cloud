@@ -1,5 +1,12 @@
 Changelog
 ---------
+
+- Uses XLSX for import.
+  [msom]
+
+- Uses excel format for CSV export.
+  [msom]
+
 0.0.5 (2018-09-18)
 ~~~~~~~~~~~~~~~~~~~
 

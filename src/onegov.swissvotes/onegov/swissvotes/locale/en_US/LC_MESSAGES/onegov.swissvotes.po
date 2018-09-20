@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-09-18 15:04+0200\n"
+"POT-Creation-Date: 2018-09-20 13:53+0200\n"
 "PO-Revision-Date: 2018-09-18 15:04+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: English\n"
@@ -34,26 +34,19 @@ msgstr "Disclaimer"
 msgid "Imprint"
 msgstr "Imprint"
 
-msgid "Some columns are missing."
-msgstr "Some columns are missing."
+msgid "No data."
+msgstr ""
 
-msgid "Some column names are ambigous."
-msgstr "Some column names are ambigous."
+#, python-format
+msgid "Some columns are missing: ${columns}."
+msgstr ""
 
-msgid "Some column names appear twice."
-msgstr "Some column names appear twice."
+#, python-format
+msgid "Some cells contain invalid values: ${errors}."
+msgstr ""
 
-msgid "The file is empty."
-msgstr "The file is empty."
-
-msgid "The file contains an empty line."
-msgstr "The file contains an empty line."
-
-msgid "Invalid encoding."
-msgstr "Invalid encoding."
-
-msgid "Not a valid csv file."
-msgstr "Not a valid csv file."
+msgid "Not a valid XLSX file."
+msgstr ""
 
 msgid "Voting text"
 msgstr "Voting text"
