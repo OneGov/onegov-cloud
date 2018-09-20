@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.72.1 (2018-09-20)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes Windows newlines causing a badly rendered markdown.
   [href]
