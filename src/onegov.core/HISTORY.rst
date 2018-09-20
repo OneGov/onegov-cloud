@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.72.2 (2018-09-20)
+~~~~~~~~~~~~~~~~~~~
 
 - Only loads a minimal set of values during column upgrades with defaults to
   avoid triggering missing column errors.
