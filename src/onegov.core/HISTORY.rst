@@ -1,5 +1,10 @@
 Changelog
 ---------
+
+- Only loads a minimal set of values during column upgrades with defaults to
+  avoid triggering missing column errors.
+  [href]
+
 0.72.1 (2018-09-20)
 ~~~~~~~~~~~~~~~~~~~
 

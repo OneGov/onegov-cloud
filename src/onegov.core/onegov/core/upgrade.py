@@ -13,6 +13,7 @@ from sqlalchemy import Column, Text
 from sqlalchemy import create_engine
 from sqlalchemy.engine.reflection import Inspector
 from sqlalchemy.pool import StaticPool
+from sqlalchemy.orm import load_only
 from toposort import toposort, toposort_flatten
 
 
@@ -413,9 +414,11 @@ class UpgradeContext(object):
         for base in self.request.app.session_manager.bases:
             yield from find_models(base, has_matching_tablename)
 
-    def records_per_table(self, table):
+    def records_per_table(self, table, columns):
         for model in self.models(table):
-            yield from self.session.query(model)
+            yield from self.session.query(model).options(
+                load_only(*(c.name for c in columns))
+            )
 
     def add_column_with_defaults(self, table, column, default):
         # add a nullable column
@@ -425,7 +428,7 @@ class UpgradeContext(object):
         self.operations.add_column(table, nullable_column)
 
         # fill it with defaults
-        for record in self.records_per_table(table):
+        for record in self.records_per_table(table, (column, )):
             value = default(record) if callable(default) else default
             setattr(record, column.name, value)
 
