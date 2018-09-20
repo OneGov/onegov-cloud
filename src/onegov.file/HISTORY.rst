@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a 'signed' property to the file model.
+  [href]
+
 0.8.1 (2018-09-04)
 ~~~~~~~~~~~~~~~~~~~
 
