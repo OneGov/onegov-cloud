@@ -65,6 +65,13 @@ class File(Base, Associable, TimestampMixin):
     #: hour through a cronjob (see :mod:`onegov.core.cronjobs`)!
     publish_date = Column(UTCDateTime, nullable=True)
 
+    #: true if the file was digitally signed in the onegov cloud
+    #:
+    #: (the file could be signed without this being true, but that would
+    #: amount to a signature created outside of our platform, which is
+    #: something we ignore)
+    signed = Column(Boolean, nullable=False, default=False)
+
     #: the type of the file, this can be used to create custom polymorphic
     #: subclasses. See `<http://docs.sqlalchemy.org/en/improve_toc/
     #: orm/extensions/declarative/inheritance.html>`_.

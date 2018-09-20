@@ -150,3 +150,11 @@ def add_publication_dates(context):
         table='files',
         column=Column('published', Boolean, nullable=False),
         default=True)
+
+
+@upgrade_task('Add signed property')
+def add_signed_property(context):
+    context.add_column_with_defaults(
+        table='files',
+        column=Column('signed', Boolean, nullable=False),
+        default=False)
