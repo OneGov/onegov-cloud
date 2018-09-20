@@ -26,6 +26,10 @@ def render_untrusted_markdown(markdown, cls=HTMLRendererWithoutInlineHtml):
 
     renderer = RENDERER_INSTANCES[cls]
 
+    # mistletoe doesn't normalise line-endings, so we have to
+    # see https://github.com/miyuchina/mistletoe/issues/64
+    markdown = markdown.replace('\r\n', '\n')
+
     # render html
     html = renderer.render(Document(markdown))
 

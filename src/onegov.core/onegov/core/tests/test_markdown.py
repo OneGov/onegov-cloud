@@ -17,3 +17,7 @@ def test_render_untrusted_markdown():
     # though we can enable it (it is still sanitized though)
     assert render('<a onclick="alert">foo</a>', cls=HTMLRenderer)\
         == '<p><a>foo</a></p>\n'
+
+
+def test_markdown_line_endings():
+    assert render('foo  \r\nbar') == render('foo  \nbar')
