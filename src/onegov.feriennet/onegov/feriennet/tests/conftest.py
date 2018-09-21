@@ -1,13 +1,14 @@
 import transaction
 import pytest
 
+from onegov.activity.tests.fixtures.scenario import Scenario
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.initial_content import create_new_organisation
+from onegov.feriennet.models import VacationActivity
 from onegov.user import User
+from onegov_testing import Client as BaseClient
 from onegov_testing.utils import create_app
 from pytest_localserver.http import WSGIServer
-from fixtures.scenario import Scenario
-from onegov_testing import Client as BaseClient
 
 
 class Client(BaseClient):
@@ -120,5 +121,9 @@ def create_feriennet_app(request, use_elasticsearch):
 
 
 @pytest.fixture(scope='function')
-def scenario(request):
-    yield Scenario(request)
+def scenario(request, session, test_password):
+    for name in request.fixturenames:
+        if name in ('feriennet_app', 'es_feriennet_app'):
+            session = request.getfixturevalue(name).session()
+
+    yield Scenario(session, test_password, activity_model=VacationActivity)
