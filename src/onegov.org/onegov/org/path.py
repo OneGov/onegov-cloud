@@ -1,66 +1,57 @@
 """ Contains the paths to the different models served by onegov.org. """
 
-import morepath
-
-from collections import defaultdict
 from datetime import date
 from onegov.chat import MessageCollection
-from onegov.core.converters import extended_date_converter, json_converter
+from onegov.core.converters import extended_date_converter
+from onegov.core.converters import json_converter
 from onegov.directory import Directory
 from onegov.directory import DirectoryCollection
-from onegov.directory import DirectoryEntryCollection
 from onegov.directory import DirectoryEntry
-from onegov.event import (
-    Event,
-    EventCollection,
-    Occurrence,
-    OccurrenceCollection
-)
+from onegov.directory import DirectoryEntryCollection
+from onegov.event import Event
+from onegov.event import EventCollection
+from onegov.event import Occurrence
+from onegov.event import OccurrenceCollection
 from onegov.file import File
 from onegov.file.integration import get_file
-from onegov.form import (
-    FormDefinition,
-    FormCollection,
-    FormRegistrationWindow,
-    CompleteFormSubmission,
-    PendingFormSubmission,
-    FormFile,
-)
-from onegov.newsletter import (
-    Newsletter,
-    NewsletterCollection,
-    Subscription,
-    RecipientCollection,
-)
+from onegov.form import CompleteFormSubmission
+from onegov.form import FormCollection
+from onegov.form import FormDefinition
+from onegov.form import FormFile
+from onegov.form import FormRegistrationWindow
+from onegov.form import PendingFormSubmission
+from onegov.newsletter import Newsletter
+from onegov.newsletter import NewsletterCollection
+from onegov.newsletter import RecipientCollection
+from onegov.newsletter import Subscription
 from onegov.org.app import OrgApp
-from onegov.org.models import (
-    AtoZPages,
-    Clipboard,
-    DirectorySubmissionAction,
-    Editor,
-    Export,
-    ExportCollection,
-    FormPersonMove,
-    GeneralFileCollection,
-    ImageFileCollection,
-    ImageSet,
-    ImageSetCollection,
-    LegacyFile,
-    LegacyFileCollection,
-    LegacyImage,
-    LegacyImageCollection,
-    News,
-    Organisation,
-    PageMove,
-    PagePersonMove,
-    ResourcePersonMove,
-    ResourceRecipient,
-    ResourceRecipientCollection,
-    Search,
-    SiteCollection,
-    TicketNote,
-    Topic,
-)
+from onegov.org.converters import keywords_converter
+from onegov.org.models import AtoZPages
+from onegov.org.models import Clipboard
+from onegov.org.models import DirectorySubmissionAction
+from onegov.org.models import Editor
+from onegov.org.models import Export
+from onegov.org.models import ExportCollection
+from onegov.org.models import FormPersonMove
+from onegov.org.models import GeneralFileCollection
+from onegov.org.models import ImageFileCollection
+from onegov.org.models import ImageSet
+from onegov.org.models import ImageSetCollection
+from onegov.org.models import LegacyFile
+from onegov.org.models import LegacyFileCollection
+from onegov.org.models import LegacyImage
+from onegov.org.models import LegacyImageCollection
+from onegov.org.models import News
+from onegov.org.models import Organisation
+from onegov.org.models import PageMove
+from onegov.org.models import PagePersonMove
+from onegov.org.models import ResourcePersonMove
+from onegov.org.models import ResourceRecipient
+from onegov.org.models import ResourceRecipientCollection
+from onegov.org.models import Search
+from onegov.org.models import SiteCollection
+from onegov.org.models import TicketNote
+from onegov.org.models import Topic
 from onegov.page import PageCollection
 from onegov.pay import PaymentProvider, Payment, PaymentCollection
 from onegov.pay import PaymentProviderCollection
@@ -71,8 +62,8 @@ from onegov.reservation import Resource
 from onegov.reservation import ResourceCollection
 from onegov.ticket import Ticket, TicketCollection
 from onegov.user import Auth, User, UserCollection
-from webob import exc
 from uuid import UUID
+from webob import exc
 
 
 @OrgApp.path(model=Organisation, path='/')
@@ -501,33 +492,6 @@ def get_messages(app, channel_id='*', type='*',
     path='/directories')
 def get_directories(app):
     return DirectoryCollection(app.session(), type='extended')
-
-
-def keywords_decode(s):
-    """ Deocdes the directory entry collection keywords. """
-    if not s:
-        return None
-
-    result = defaultdict(list)
-
-    for item in s.split('+'):
-        key, value = item.split(':', 1)
-        result[key].append(value)
-
-    return result
-
-
-def keywords_encode(d):
-    """ Encodes the directory entry collection keywords. """
-    if not d:
-        return ''
-
-    return '+'.join('{}:{}'.format(k, v) for k in d for v in d[k])
-
-
-keywords_converter = morepath.Converter(
-    decode=keywords_decode, encode=keywords_encode
-)
 
 
 @OrgApp.path(

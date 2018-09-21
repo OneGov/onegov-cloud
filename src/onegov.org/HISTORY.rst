@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Moves keyword converters to their own file.
+  [href]
+
 - Improves accessibility of js toggle.
   [href]
 
