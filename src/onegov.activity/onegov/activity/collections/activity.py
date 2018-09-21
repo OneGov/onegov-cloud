@@ -261,25 +261,13 @@ class ActivityCollection(Pagination):
                 model_class.municipality.in_(self.filter.municipalities))
 
         if self.filter.available:
-            spots = set()
-
-        if 'none' in self.filter.available:
-            spots.add(0)
-
-        if 'few' in self.filter.available:
-            spots.update((1, 2))
-
-        if 'many' in self.filter.available:
-            spots.update(range(3, 1000))
-
-        if self.filter.available:
             queries = []
 
             stub = self.session.query(Occasion)
             stub = stub.with_entities(Occasion.activity_id)
             stub = stub.group_by(Occasion.activity_id)
 
-            for amount in self.available:
+            for amount in self.filter.available:
                 if amount == 'none':
                     queries.append(
                         model_class.id.in_(

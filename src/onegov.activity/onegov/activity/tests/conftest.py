@@ -4,7 +4,9 @@ from onegov.activity import AttendeeCollection
 from onegov.activity import BookingCollection
 from onegov.activity import OccasionCollection
 from onegov.activity import PeriodCollection
+from onegov.activity.tests.fixtures.scenario import Scenario
 from onegov.core.utils import Bunch, module_path
+from onegov.user import User
 from onegov.user import UserCollection
 from pytest import fixture
 
@@ -105,3 +107,20 @@ def postfinance_xml():
 
     with open(xml_path, 'r') as f:
         yield f.read()
+
+
+@fixture(scope='function')
+def scenario(request, session, test_password):
+
+    session.add(User(
+        username='admin@example.org',
+        password_hash=test_password,
+        role='admin'
+    ))
+    session.add(User(
+        username='editor@example.org',
+        password_hash=test_password,
+        role='editor'
+    ))
+
+    yield Scenario(session, test_password)

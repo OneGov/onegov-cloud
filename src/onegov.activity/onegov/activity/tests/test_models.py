@@ -2248,3 +2248,47 @@ def test_activity_filter_toggle():
 
     assert not f.toggled(tag='Foo').tags
     assert f.toggled(tag='Bar').tags == {'Foo', 'Bar'}
+
+
+@pytest.mark.xfail(reason='not yet implemented')
+def test_activity_period_filter(scenario):
+    # an activity fully booked in the previous period...
+    scenario.add_period(title="Prev", active=False, confirmed=True)
+    scenario.add_activity(title="Running", state='accepted')
+    scenario.add_occasion(spots=(0, 1))
+
+    scenario.commit()
+    scenario.refresh()
+
+    scenario.add_attendee()
+    scenario.add_booking(state='accepted')
+
+    # ...and unbooked in the current period
+    scenario.add_period(title="Next", active=True, confirmed=True)
+    scenario.add_occasion(spots=(0, 1))
+
+    scenario.commit()
+    scenario.refresh()
+
+    assert scenario.occasions[0].attendee_count == 1
+    assert scenario.occasions[1].attendee_count == 0
+
+    # free spots should now depend on the selected period
+    a = scenario.c.activities
+    a.query().count() == 2
+
+    assert a.for_filter(period_id=scenario.periods[0].id).query().count() == 1
+    assert a.for_filter(period_id=scenario.periods[1].id).query().count() == 1
+
+    assert a.for_filter(available='none').query().count() == 1
+    assert a.for_filter(available='many').query().count() == 1
+
+    assert a.for_filter(
+        period_id=scenario.periods[0].id,
+        available='many'
+    ).query().count() == 0
+
+    assert a.for_filter(
+        period_id=scenario.periods[1].id,
+        available='none'
+    ).query().count() == 0
