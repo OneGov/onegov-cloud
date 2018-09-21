@@ -93,7 +93,7 @@ def view_activities(self, request):
         filters['tags'] = [
             Link(
                 text=request.translate(_(tag)),
-                active=tag in self.tags,
+                active=tag in self.filter.tags,
                 url=request.link(self.for_filter(tag=tag))
             ) for tag in self.used_tags
         ]
@@ -102,7 +102,7 @@ def view_activities(self, request):
         filters['durations'] = tuple(
             Link(
                 text=request.translate(text),
-                active=duration in self.durations,
+                active=duration in self.filter.durations,
                 url=request.link(self.for_filter(duration=duration))
             ) for text, duration in (
                 (_("Half day"), DAYS.half),
@@ -114,7 +114,7 @@ def view_activities(self, request):
         filters['ages'] = tuple(
             Link(
                 text=request.translate(text),
-                active=self.contains_age_range(age_range),
+                active=self.filter.contains_age_range(age_range),
                 url=request.link(self.for_filter(age_range=age_range))
             ) for text, age_range in (
                 (_(" 3 - 6 years"), (3, 6)),
@@ -131,7 +131,7 @@ def view_activities(self, request):
                         layout.format_date(daterange[0], 'date'),
                         layout.format_date(daterange[1], 'date')
                     ),
-                    active=daterange in self.dateranges,
+                    active=daterange in self.filter.dateranges,
                     url=request.link(self.for_filter(daterange=daterange))
                 ) for nth, daterange in enumerate(
                     self.available_weeks(active_period),
@@ -142,7 +142,7 @@ def view_activities(self, request):
         filters['weekdays'] = tuple(
             Link(
                 text=WEEKDAYS[weekday],
-                active=weekday in self.weekdays,
+                active=weekday in self.filter.weekdays,
                 url=request.link(self.for_filter(weekday=weekday))
             ) for weekday in range(0, 7)
         )
@@ -150,7 +150,7 @@ def view_activities(self, request):
         filters['available'] = tuple(
             Link(
                 text=request.translate(text),
-                active=available in self.available,
+                active=available in self.filter.available,
                 url=request.link(self.for_filter(available=available))
             ) for text, available in (
                 (_("None"), 'none'),
@@ -162,7 +162,7 @@ def view_activities(self, request):
         filters['municipalities'] = [
             Link(
                 text=municipality,
-                active=municipality in self.municipalities,
+                active=municipality in self.filter.municipalities,
                 url=request.link(self.for_filter(municipality=municipality))
             ) for municipality in self.used_municipalities
         ]
@@ -173,7 +173,7 @@ def view_activities(self, request):
                 filters['periods'] = [
                     Link(
                         text=period.title,
-                        active=period.id in self.period_ids,
+                        active=period.id in self.filter.period_ids,
                         url=request.link(self.for_filter(period_id=period.id))
                     ) for period in request.app.periods if period
                 ]
@@ -182,7 +182,7 @@ def view_activities(self, request):
             filters['own'] = (
                 Link(
                     text=request.translate(_("Own")),
-                    active=request.current_username in self.owners,
+                    active=request.current_username in self.filter.owners,
                     url=request.link(
                         self.for_filter(owner=request.current_username)
                     )
@@ -192,7 +192,7 @@ def view_activities(self, request):
             filters['states'] = tuple(
                 Link(
                     text=ACTIVITY_STATE_TRANSLATIONS[state],
-                    active=state in self.states,
+                    active=state in self.filter.states,
                     url=request.link(self.for_filter(state=state))
                 ) for state in ACTIVITY_STATES
             )

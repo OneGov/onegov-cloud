@@ -1,67 +1,37 @@
+from onegov.activity import ActivityFilter
+from onegov.activity import Attendee, AttendeeCollection
 from onegov.activity import Booking, BookingCollection
 from onegov.activity import InvoiceItemCollection, InvoiceItem
 from onegov.activity import Occasion, OccasionCollection
 from onegov.activity import Period, PeriodCollection
-from onegov.activity import Attendee, AttendeeCollection
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.collections import VacationActivityCollection
-from onegov.feriennet.converters import age_range_converter
-from onegov.feriennet.converters import date_range_converter
 from onegov.feriennet.models import Calendar
 from onegov.feriennet.models import InvoiceAction, VacationActivity
 from onegov.feriennet.models import NotificationTemplate
+from onegov.org.converters import keywords_converter
 from uuid import UUID
 
 
 @FeriennetApp.path(
     model=VacationActivityCollection,
     path='/activities',
-    converters=dict(
-        tags=[str],
-        states=[str],
-        durations=[int],
-        age_ranges=[age_range_converter],
-        owners=[str],
-        period_ids=[UUID],
-        dateranges=[date_range_converter],
-        weekdays=[int],
-        municipalities=[str],
-        available=[str]
-    ))
-def get_vacation_activities(request, app, page=0,
-                            tags=None,
-                            states=None,
-                            durations=None,
-                            age_ranges=None,
-                            owners=None,
-                            period_ids=None,
-                            dateranges=None,
-                            weekdays=None,
-                            municipalities=None,
-                            available=None):
+    converters={'filter': keywords_converter})
+def get_vacation_activities(request, app, page=0, filter=None):
+    filter = filter and ActivityFilter(**filter) or ActivityFilter()
 
     if not request.is_organiser:
-        period = app.active_period
-        period_ids = period and [period.id] or None
+        filter.period_ids = app.active_period and [app.active_period.id]
 
     return VacationActivityCollection(
         session=app.session(),
         page=page,
         identity=request.identity,
-        tags=tags,
-        states=states,
-        durations=durations,
-        age_ranges=age_ranges,
-        owners=owners,
-        period_ids=period_ids,
-        dateranges=dateranges,
-        weekdays=weekdays,
-        municipalities=municipalities,
-        available=available
+        filter=filter
     )
 
 
