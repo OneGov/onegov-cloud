@@ -2,7 +2,7 @@ import sedate
 
 from copy import copy
 from enum import IntEnum
-from onegov.activity.models import Activity, Occasion, DAYS
+from onegov.activity.models import Activity, Occasion
 from onegov.activity.utils import age_range_decode
 from onegov.activity.utils import age_range_encode
 from onegov.activity.utils import date_range_decode
