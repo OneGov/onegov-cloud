@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.35.2 (2018-09-21)
+~~~~~~~~~~~~~~~~~~~
+
 - Moves keyword converters to their own file.
   [href]
 
