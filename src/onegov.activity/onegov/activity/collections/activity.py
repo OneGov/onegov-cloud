@@ -1,9 +1,17 @@
 import sedate
 
-from onegov.activity.models import Activity, Occasion
-from onegov.activity.utils import merge_ranges, overlaps
+from copy import copy
+from enum import IntEnum
+from onegov.activity.models import Activity, Occasion, DAYS
+from onegov.activity.utils import age_range_decode
+from onegov.activity.utils import age_range_encode
+from onegov.activity.utils import date_range_decode
+from onegov.activity.utils import date_range_encode
+from onegov.activity.utils import merge_ranges
+from onegov.activity.utils import overlaps
 from onegov.core.collection import Pagination
 from onegov.core.utils import increment_name
+from onegov.core.utils import is_uuid
 from onegov.core.utils import normalize_for_url
 from onegov.core.utils import toggle
 from sqlalchemy import bindparam
@@ -15,41 +23,136 @@ from sqlalchemy import or_
 from sqlalchemy import select
 from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import array
+from uuid import UUID
 
 
 AVAILABILITY_VALUES = {'none', 'few', 'many'}
 
 
+class ActivityFilter(object):
+
+    # supported filters - should be named with a plural version that can
+    # be turned into a singular with the removal of the last s
+    # (i.e. slots => slot)
+    __slots__ = (
+        'available',
+        'tags',
+        'states',
+        'durations',
+        'age_ranges',
+        'owners',
+        'period_ids',
+        'dateranges',
+        'weekdays',
+        'municipalities'
+    )
+
+    singular = {
+        'municipalities': 'municipality'
+    }
+
+    def __init__(self, **keywords):
+
+        for key in self.__slots__:
+            if key in keywords:
+                values = set(keywords[key]) if keywords[key] else set()
+
+                if values and hasattr(self, f'adapt_{key}'):
+                    values = getattr(self, f'adapt_{key}')(values)
+
+                setattr(self, key, values)
+            else:
+                setattr(self, key, set())
+
+    @property
+    def keywords(self):
+        keywords = {}
+
+        for key in self.__slots__:
+            if getattr(self, key):
+                keywords[key] = self.encode(key, getattr(self, key))
+
+        return keywords
+
+    def toggled(self, **keywords):
+        # create a new filter with the toggled values
+        toggled = copy(self)
+
+        for key in self.__slots__:
+            # support plural and singular
+            if key.endswith('s'):
+                singular = self.singular.get(key, key[:-1])
+            else:
+                singular = key
+
+            if singular in keywords:
+                value = keywords[singular]
+            elif key in keywords:
+                value = keywords[key]
+            else:
+                continue
+
+            setattr(toggled, key, toggle(getattr(self, key), value))
+
+        return toggled
+
+    def adapt_available(self, values):
+        return values & AVAILABILITY_VALUES
+
+    def adapt_age_ranges(self, values):
+        decoded = set(v for v in map(age_range_decode, values) if v)
+        return decoded and set(merge_ranges(decoded)) or set()
+
+    def adapt_dateranges(self, values):
+        return set(v for v in map(date_range_decode, values) if v)
+
+    def adapt_weekdays(self, values):
+        return set(int(v) for v in values if v.isdigit())
+
+    def adapt_period_ids(self, values):
+        return set(UUID(v) for v in values if is_uuid(v))
+
+    def adapt_durations(self, values):
+        return set(int(v) for v in values)
+
+    def encode(self, key, value):
+        if isinstance(value, str):
+            return value
+
+        if key == 'dateranges':
+            return [date_range_encode(v) for v in value]
+
+        if key == 'age_ranges':
+            return [age_range_encode(v) for v in value]
+
+        if isinstance(value, IntEnum):
+            return str(int(value))
+
+        if isinstance(value, int):
+            return str(value)
+
+        if isinstance(value, UUID):
+            return value.hex
+
+        if isinstance(value, (tuple, list, set)):
+            return [self.encode(key, v) for v in value]
+
+        raise NotImplementedError()
+
+    def contains_age_range(self, age_range):
+        for r in self.age_ranges:
+            if overlaps(r, age_range):
+                return True
+        return False
+
+
 class ActivityCollection(Pagination):
 
-    def __init__(self, session, type='*', page=0,
-                 tags=None,
-                 states=None,
-                 durations=None,
-                 age_ranges=None,
-                 owners=None,
-                 period_ids=None,
-                 dateranges=None,
-                 weekdays=None,
-                 municipalities=None,
-                 available=None):
+    def __init__(self, session, type='*', page=0, filter=None):
         self.session = session
         self.type = type
         self.page = page
-        self.tags = set(tags) if tags else set()
-        self.states = set(states) if states else set()
-        self.durations = set(durations) if durations else set()
-        self.age_ranges = set(merge_ranges(age_ranges)) \
-            if age_ranges else set()
-        self.owners = set(owners) if owners else set()
-        self.period_ids = set(period_ids) if period_ids else set()
-        self.dateranges = set(dateranges) if dateranges else set()
-        self.weekdays = set(weekdays) if weekdays else set()
-        self.municipalities = set(municipalities) if municipalities else set()
-
-        self.available = {
-            a for a in available if a in AVAILABILITY_VALUES
-        } if available else set()
+        self.filter = filter or ActivityFilter()
 
     def __eq__(self, other):
         return self.type == other.type and self.page == other.page
@@ -66,23 +169,8 @@ class ActivityCollection(Pagination):
             self.session,
             type=self.type,
             page=index,
-            tags=self.tags,
-            states=self.states,
-            durations=self.durations,
-            age_ranges=self.age_ranges,
-            owners=self.owners,
-            period_ids=self.period_ids,
-            dateranges=self.dateranges,
-            weekdays=self.weekdays,
-            municipalities=self.municipalities,
-            available=self.available
+            filter=self.filter
         )
-
-    def contains_age_range(self, age_range):
-        for r in self.age_ranges:
-            if overlaps(r, age_range):
-                return True
-        return False
 
     @property
     def model_class(self):
@@ -106,25 +194,29 @@ class ActivityCollection(Pagination):
         if self.type != '*':
             query = query.filter(model_class.type == self.type)
 
-        if self.tags:
-            query = query.filter(model_class._tags.has_any(array(self.tags)))
+        if self.filter.tags:
+            query = query.filter(
+                model_class._tags.has_any(array(self.filter.tags)))
 
-        if self.states:
-            query = query.filter(model_class.state.in_(self.states))
+        if self.filter.states:
+            query = query.filter(
+                model_class.state.in_(self.filter.states))
 
-        if self.durations:
+        if self.filter.durations:
             conditions = tuple(
                 func.coalesce(model_class.durations, 0).op('&')(int(d)) > 0
-                for d in self.durations
+                for d in self.filter.durations
             )
             query = query.filter(or_(*conditions))
 
-        if self.age_ranges:
+        if self.filter.age_ranges:
             conditions = []
 
             # SQLAlchemy needs unique parameter names if multiple text
             # queries with bind params are used
-            for i, (min_age, max_age) in enumerate(self.age_ranges, start=1):
+            enumerated = enumerate(self.filter.age_ranges, start=1)
+
+            for i, (min_age, max_age) in enumerated:
                 stmt = "'[:min_{i},:max_{i}]'::int4range && ANY(ages)".format(
                     i=i)
 
@@ -135,48 +227,52 @@ class ActivityCollection(Pagination):
 
             query = query.filter(or_(*conditions))
 
-        if self.owners:
+        if self.filter.owners:
             conditions = tuple(
-                model_class.username == username for username in self.owners)
+                model_class.username == username
+                for username in self.filter.owners
+            )
 
             query = query.filter(or_(*conditions))
 
-        if self.period_ids:
+        if self.filter.period_ids:
             query = query.filter(
-                model_class.period_ids.op('&&')(array(self.period_ids)))
+                model_class.period_ids.op('&&')(array(
+                    self.filter.period_ids
+                )))
 
-        if self.dateranges:
+        if self.filter.dateranges:
             query = query.filter(
                 model_class.active_days.op('&&')(array(
                     tuple(
                         dt.toordinal()
-                        for start, end in self.dateranges
+                        for start, end in self.filter.dateranges
                         for dt in sedate.dtrange(start, end)
                     )
                 ))
             )
 
-        if self.weekdays:
+        if self.filter.weekdays:
             query = query.filter(
-                model_class.weekdays.op('&&')(array(self.weekdays)))
+                model_class.weekdays.op('&&')(array(self.filter.weekdays)))
 
-        if self.municipalities:
+        if self.filter.municipalities:
             query = query.filter(
-                model_class.municipality.in_(self.municipalities))
+                model_class.municipality.in_(self.filter.municipalities))
 
-        if self.available:
+        if self.filter.available:
             spots = set()
 
-        if 'none' in self.available:
+        if 'none' in self.filter.available:
             spots.add(0)
 
-        if 'few' in self.available:
+        if 'few' in self.filter.available:
             spots.update((1, 2))
 
-        if 'many' in self.available:
+        if 'many' in self.filter.available:
             spots.update(range(3, 1000))
 
-        if self.available and self.available < AVAILABILITY_VALUES:
+        if self.filter.available:
             queries = []
 
             stub = self.session.query(Occasion)
@@ -217,17 +313,7 @@ class ActivityCollection(Pagination):
 
         return query
 
-    def for_filter(self,
-                   tag=None,
-                   state=None,
-                   duration=None,
-                   age_range=None,
-                   owner=None,
-                   period_id=None,
-                   daterange=None,
-                   weekday=None,
-                   municipality=None,
-                   available=None):
+    def for_filter(self, **keywords):
         """ Returns a new collection instance.
 
         The given tag is excluded if already in the list, included if not
@@ -239,24 +325,12 @@ class ActivityCollection(Pagination):
 
         """
 
-        duration = int(duration) if duration is not None else None
-
-        toggled = (
-            toggle(collection, item) for collection, item in (
-                (self.tags, tag),
-                (self.states, state),
-                (self.durations, duration),
-                (self.age_ranges, age_range),
-                (self.owners, owner),
-                (self.period_ids, period_id),
-                (self.dateranges, daterange),
-                (self.weekdays, weekday),
-                (self.municipalities, municipality),
-                (self.available, available)
-            )
+        return self.__class__(
+            session=self.session,
+            type=self.type,
+            page=0,
+            filter=self.filter.toggled(**keywords)
         )
-
-        return self.__class__(self.session, self.type, 0, *toggled)
 
     def by_id(self, id):
         return self.query().filter(Activity.id == id).first()

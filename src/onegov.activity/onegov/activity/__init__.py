@@ -14,6 +14,7 @@ from onegov.activity.models import (
 )
 from onegov.activity.collections import (
     ActivityCollection,
+    ActivityFilter,
     AttendeeCollection,
     BookingCollection,
     InvoiceItemCollection,
@@ -25,6 +26,7 @@ from onegov.activity.collections import (
 
 __all__ = [
     'Activity',
+    'ActivityFilter',
     'Attendee',
     'Booking',
     'InvoiceItem',

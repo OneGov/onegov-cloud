@@ -1,3 +1,4 @@
+from onegov.activity.collections.activity import ActivityFilter
 from onegov.activity.collections.activity import ActivityCollection
 from onegov.activity.collections.attendee import AttendeeCollection
 from onegov.activity.collections.booking import BookingCollection
@@ -9,6 +10,7 @@ from onegov.activity.collections.publication_request import \
 
 __all__ = [
     'ActivityCollection',
+    'ActivityFilter',
     'AttendeeCollection',
     'BookingCollection',
     'InvoiceItemCollection',

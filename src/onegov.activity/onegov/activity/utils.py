@@ -4,7 +4,7 @@ import sedate
 import string
 import re
 
-from datetime import timedelta
+from datetime import date, timedelta
 from functools import partial
 from itertools import chain
 from onegov.core.utils import chunks
@@ -27,6 +27,9 @@ ESR_TO_CODE_MAPPING = {
 }
 
 INTERNAL_IMAGE_EX = re.compile(r'.*/storage/[0-9a-z]{64}')
+
+AGE_RANGE_RE = re.compile(r'\d+-\d+')
+DATE_RANGE_RE = re.compile(r'\d{4}-\d{2}-\d{2}:\d{4}-\d{2}-\d{2}')
 
 MUNICIPALITY_EX = re.compile(r"""
     (?P<zipcode>[1-9]{1}[0-9]{3})
@@ -68,6 +71,44 @@ def merge_ranges(ranges):
             merged.append(tuple(r))
 
     return merged
+
+
+def age_range_decode(s):
+    if not isinstance(s, str):
+        return None
+
+    if not AGE_RANGE_RE.match(s):
+        return None
+
+    age_range = tuple(int(a) for a in s.split('-'))
+
+    if age_range[0] < age_range[1]:
+        return age_range
+    else:
+        return None
+
+
+def age_range_encode(a):
+    return '-'.join(str(n) for n in a)
+
+
+def date_range_decode(s):
+    if not isinstance(s, str):
+        return None
+
+    if not DATE_RANGE_RE.match(s):
+        return None
+
+    s, e = s.split(':')
+
+    return (
+        date(*tuple(int(p) for p in s.split('-'))),
+        date(*tuple(int(p) for p in e.split('-')))
+    )
+
+
+def date_range_encode(d):
+    return ':'.join((d[0].strftime('%Y-%m-%d'), d[1].strftime('%Y-%m-%d')))
 
 
 def generate_checksum(number):

@@ -5,6 +5,7 @@ import transaction
 from datetime import datetime, date, timedelta
 from freezegun import freeze_time
 from onegov.activity import ActivityCollection
+from onegov.activity import ActivityFilter
 from onegov.activity import Attendee
 from onegov.activity import AttendeeCollection
 from onegov.activity import Booking, BookingCollection
@@ -92,19 +93,19 @@ def test_activity_states(session, owner):
     c.add("C", username=owner.username).propose().accept()
     c.add("D", username=owner.username).propose().accept().archive()
 
-    c.states = ('preview', )
+    c.filter.states = ('preview', )
     assert c.query().count() == 1
 
-    c.states = ('preview', 'proposed')
+    c.filter.states = ('preview', 'proposed')
     assert c.query().count() == 2
 
-    c.states = ('preview', 'proposed', 'accepted')
+    c.filter.states = ('preview', 'proposed', 'accepted')
     assert c.query().count() == 3
 
-    c.states = ('preview', 'proposed', 'accepted', 'archived')
+    c.filter.states = ('preview', 'proposed', 'accepted', 'archived')
     assert c.query().count() == 4
 
-    c.states = None
+    c.filter.states = None
     assert c.query().count() == 4
 
 
@@ -263,7 +264,7 @@ def test_activity_date_ranges(session, owner, collections):
     # toggle daterange off
     a = a.for_filter(daterange=(date(2017, 3, 1), date(2017, 3, 30)))
     assert a.query().count() == 2  # no filter -> show all
-    assert not a.dateranges
+    assert not a.filter.dateranges
 
     # only include the first activity
     a = a.for_filter(daterange=(date(2017, 3, 1), date(2017, 3, 5)))
@@ -843,30 +844,33 @@ def test_occasion_ages(session, owner):
     assert activities.for_filter(age_range=(1, 5))\
         .for_filter(age_range=(5, 15)).query().count() == 2
 
-    assert activities.for_filter(age_range=(1, 1)).contains_age_range((0, 2))
-    assert activities.for_filter(age_range=(1, 1)).contains_age_range((1, 1))
-    assert activities.for_filter(age_range=(1, 1)).contains_age_range((1, 2))
+    assert activities.for_filter(age_range=(1, 1))\
+        .filter.contains_age_range((0, 2))
+    assert activities.for_filter(age_range=(1, 1))\
+        .filter.contains_age_range((1, 1))
+    assert activities.for_filter(age_range=(1, 1))\
+        .filter.contains_age_range((1, 2))
 
     assert not activities.for_filter(age_range=(1, 1))\
-        .contains_age_range((0, 0))
+        .filter.contains_age_range((0, 0))
 
     assert not activities.for_filter(age_range=(1, 10))\
-        .contains_age_range((20, 30))
+        .filter.contains_age_range((20, 30))
 
     assert activities\
         .for_filter(age_range=(1, 10))\
         .for_filter(age_range=(20, 30))\
-        .contains_age_range((10, 15))
+        .filter.contains_age_range((10, 15))
 
     assert activities\
         .for_filter(age_range=(1, 10))\
         .for_filter(age_range=(20, 30))\
-        .contains_age_range((10, 20))
+        .filter.contains_age_range((10, 20))
 
     assert not activities\
         .for_filter(age_range=(1, 10))\
         .for_filter(age_range=(20, 30))\
-        .contains_age_range((15, 16))
+        .filter.contains_age_range((15, 16))
 
 
 def test_occasion_owners(session, owner, secondary_owner):
@@ -2237,3 +2241,10 @@ def test_archive_period(session, owner):
     assert sport.state == 'accepted'
     assert games.state == 'archived'
     assert empty.state == 'archived'
+
+
+def test_activity_filter_toggle():
+    f = ActivityFilter(tags=['Foo'])
+
+    assert not f.toggled(tag='Foo').tags
+    assert f.toggled(tag='Bar').tags == {'Foo', 'Bar'}

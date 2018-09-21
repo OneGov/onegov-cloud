@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Moves activity filters to a separate object.
+  [href]
+
 1.9.0 (2018-08-21)
 ~~~~~~~~~~~~~~~~~~~
 
