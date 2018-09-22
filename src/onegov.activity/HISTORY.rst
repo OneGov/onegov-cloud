@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Completely reworks the way activities are filtered, taking the periods
+  properly into account.
+  [href]
+
 - Moves activity filters to a separate object.
   [href]
 

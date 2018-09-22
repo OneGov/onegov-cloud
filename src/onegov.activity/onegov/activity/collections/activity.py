@@ -191,6 +191,7 @@ class ActivityCollection(Pagination):
         query = self.query_base()
         model_class = self.model_class
 
+        # activity based filters
         if self.type != '*':
             query = query.filter(model_class.type == self.type)
 
@@ -202,102 +203,64 @@ class ActivityCollection(Pagination):
             query = query.filter(
                 model_class.state.in_(self.filter.states))
 
-        if self.filter.durations:
-            conditions = tuple(
-                func.coalesce(model_class.durations, 0).op('&')(int(d)) > 0
-                for d in self.filter.durations
-            )
-            query = query.filter(or_(*conditions))
-
-        if self.filter.age_ranges:
-            conditions = []
-
-            # SQLAlchemy needs unique parameter names if multiple text
-            # queries with bind params are used
-            enumerated = enumerate(self.filter.age_ranges, start=1)
-
-            for i, (min_age, max_age) in enumerated:
-                stmt = "'[:min_{i},:max_{i}]'::int4range && ANY(ages)".format(
-                    i=i)
-
-                conditions.append(text(stmt).bindparams(
-                    bindparam('min_' + str(i), min_age, type_=Integer),
-                    bindparam('max_' + str(i), max_age, type_=Integer),
-                ))
-
-            query = query.filter(or_(*conditions))
-
         if self.filter.owners:
-            conditions = tuple(
-                model_class.username == username
-                for username in self.filter.owners
-            )
-
-            query = query.filter(or_(*conditions))
-
-        if self.filter.period_ids:
-            query = query.filter(
-                model_class.period_ids.op('&&')(array(
-                    self.filter.period_ids
-                )))
-
-        if self.filter.dateranges:
-            query = query.filter(
-                model_class.active_days.op('&&')(array(
-                    tuple(
-                        dt.toordinal()
-                        for start, end in self.filter.dateranges
-                        for dt in sedate.dtrange(start, end)
-                    )
-                ))
-            )
-
-        if self.filter.weekdays:
-            query = query.filter(
-                model_class.weekdays.op('&&')(array(self.filter.weekdays)))
+            query = query.filter(model_class.username.in_(
+                self.filter.owners))
 
         if self.filter.municipalities:
             query = query.filter(
                 model_class.municipality.in_(self.filter.municipalities))
 
-        if self.filter.available:
-            queries = []
+        # occasion based filters
+        o = self.session.query(Occasion).with_entities(Occasion.activity_id)
 
-            stub = self.session.query(Occasion)
-            stub = stub.with_entities(Occasion.activity_id)
-            stub = stub.group_by(Occasion.activity_id)
+        if self.filter.period_ids:
+            o = o.filter(Occasion.period_id.in_(self.filter.period_ids))
+
+        if self.filter.durations:
+            o = o.filter(Occasion.duration.in_(
+                int(d) for d in self.filter.durations))
+
+        if self.filter.age_ranges:
+            o = o.filter(or_(
+                *(
+                    Occasion.age.overlaps(func.int4range(min_age, max_age + 1))
+                    for min_age, max_age in self.filter.age_ranges
+                )
+            ))
+
+        if self.filter.dateranges:
+            o = o.filter(Occasion.active_days.op('&&')(array(
+                tuple(
+                    dt.toordinal()
+                    for start, end in self.filter.dateranges
+                    for dt in sedate.dtrange(start, end)
+                )))
+            )
+
+        if self.filter.weekdays:
+            o = o.filter(
+                Occasion.weekdays.op('&&')(array(self.filter.weekdays)))
+
+        if self.filter.available:
+            conditions = []
 
             for amount in self.filter.available:
                 if amount == 'none':
-                    queries.append(
-                        model_class.id.in_(
-                            stub.having(
-                                func.sum(Occasion.available_spots) == 0
-                            )
-                        )
-                    )
-                elif amount == 'few':
-                    queries.append(
-                        model_class.id.in_(
-                            stub.having(
-                                func.sum(Occasion.available_spots).in_(
-                                    (1, 2, 3)
-                                )
-                            )
-                        )
-                    )
-                elif amount == 'many':
-                    queries.append(
-                        model_class.id.in_(
-                            stub.having(
-                                func.sum(Occasion.available_spots) >= 4
-                            )
-                        )
-                    )
-                else:
-                    raise NotImplementedError
+                    conditions.append(Occasion.available_spots == 0)
 
-            query = query.filter(or_(*queries))
+                elif amount == 'few':
+                    conditions.append(Occasion.available_spots.in_((1, 2, 3)))
+
+                elif amount == 'many':
+                    conditions.append(Occasion.available_spots >= 4)
+
+            o = o.filter(or_(*conditions))
+
+        # if no filter was applied to the occasion subquery, we ignore it since
+        # we would otherwise get zero results
+        if o._criterion is not None:
+            query = query.filter(model_class.id.in_(o.subquery()))
 
         return query
 

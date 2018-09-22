@@ -475,3 +475,14 @@ def add_pay_organiser_directly_column(context):
         column=Column('pay_organiser_directly', Boolean, nullable=False),
         default=False
     )
+
+
+@upgrade_task('Remove activity aggregates')
+def remove_activity_aggregates(context):
+    context.operations.drop_index('inverted_weekdays', 'activities')
+    context.operations.drop_index('inverted_active_days', 'activities')
+    context.operations.drop_column('activities', 'durations')
+    context.operations.drop_column('activities', 'ages')
+    context.operations.drop_column('activities', 'period_ids')
+    context.operations.drop_column('activities', 'active_days')
+    context.operations.drop_column('activities', 'weekdays')

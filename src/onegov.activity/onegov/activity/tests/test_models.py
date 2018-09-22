@@ -405,9 +405,11 @@ def test_profiles(session, owner):
     transaction.commit()
 
     sport = activities.query().first()
-    assert len(sport.period_ids) == 2
-    assert winter_id in sport.period_ids
-    assert autumn_id in sport.period_ids
+    period_ids = set(o.period_id for o in sport.occasions)
+
+    assert len(period_ids) == 2
+    assert winter_id in period_ids
+    assert autumn_id in period_ids
 
     # drop the winter occasion
     occasions.delete(
@@ -415,8 +417,10 @@ def test_profiles(session, owner):
     transaction.commit()
 
     sport = activities.query().first()
-    assert len(sport.period_ids) == 1
-    assert autumn_id in sport.period_ids
+    period_ids = set(o.period_id for o in sport.occasions)
+
+    assert len(period_ids) == 1
+    assert autumn_id in period_ids
 
 
 def test_occasion_daterange_constraint(session, owner):
@@ -523,9 +527,16 @@ def test_occasion_duration(session, owner):
 
     retreat = activities.add("Management Retreat", username=owner.username)
 
-    assert not DAYS.has(retreat.durations, DAYS.half)
-    assert not DAYS.has(retreat.durations, DAYS.full)
-    assert not DAYS.has(retreat.durations, DAYS.many)
+    def durations(activity):
+        occasions = session.query(Occasion)\
+            .with_entities(Occasion.duration)\
+            .filter_by(activity_id=activity.id)
+
+        return sum(set(o.duration for o in occasions))
+
+    assert not DAYS.has(durations(retreat), DAYS.half)
+    assert not DAYS.has(durations(retreat), DAYS.full)
+    assert not DAYS.has(durations(retreat), DAYS.many)
 
     periods.add(
         title="2016",
@@ -545,9 +556,9 @@ def test_occasion_duration(session, owner):
     transaction.commit()
 
     retreat = activities.query().first()
-    assert DAYS.has(retreat.durations, DAYS.half)
-    assert not DAYS.has(retreat.durations, DAYS.full)
-    assert not DAYS.has(retreat.durations, DAYS.many)
+    assert DAYS.has(durations(retreat), DAYS.half)
+    assert not DAYS.has(durations(retreat), DAYS.full)
+    assert not DAYS.has(durations(retreat), DAYS.many)
 
     # add another half a day occasion
     tuesday = occasions.add(
@@ -560,9 +571,9 @@ def test_occasion_duration(session, owner):
     transaction.commit()
 
     retreat = activities.query().first()
-    assert DAYS.has(retreat.durations, DAYS.half)
-    assert not DAYS.has(retreat.durations, DAYS.full)
-    assert not DAYS.has(retreat.durations, DAYS.many)
+    assert DAYS.has(durations(retreat), DAYS.half)
+    assert not DAYS.has(durations(retreat), DAYS.full)
+    assert not DAYS.has(durations(retreat), DAYS.many)
 
     # add a full day occasion
     wednesday = occasions.add(
@@ -575,9 +586,9 @@ def test_occasion_duration(session, owner):
     transaction.commit()
 
     retreat = activities.query().first()
-    assert DAYS.has(retreat.durations, DAYS.half)
-    assert DAYS.has(retreat.durations, DAYS.full)
-    assert not DAYS.has(retreat.durations, DAYS.many)
+    assert DAYS.has(durations(retreat), DAYS.half)
+    assert DAYS.has(durations(retreat), DAYS.full)
+    assert not DAYS.has(durations(retreat), DAYS.many)
 
     # add a multi day occasion
     weekend = occasions.add(
@@ -590,45 +601,45 @@ def test_occasion_duration(session, owner):
     transaction.commit()
 
     retreat = activities.query().first()
-    assert DAYS.has(retreat.durations, DAYS.half)
-    assert DAYS.has(retreat.durations, DAYS.full)
-    assert DAYS.has(retreat.durations, DAYS.many)
+    assert DAYS.has(durations(retreat), DAYS.half)
+    assert DAYS.has(durations(retreat), DAYS.full)
+    assert DAYS.has(durations(retreat), DAYS.many)
 
     # remove a the first half-day occasion (nothing should change)
     occasions.delete(monday)
     transaction.commit()
 
     retreat = activities.query().first()
-    assert DAYS.has(retreat.durations, DAYS.half)
-    assert DAYS.has(retreat.durations, DAYS.full)
-    assert DAYS.has(retreat.durations, DAYS.many)
+    assert DAYS.has(durations(retreat), DAYS.half)
+    assert DAYS.has(durations(retreat), DAYS.full)
+    assert DAYS.has(durations(retreat), DAYS.many)
 
     # remove the second half-day occasion (no more half-days)
     occasions.delete(tuesday)
     transaction.commit()
 
     retreat = activities.query().first()
-    assert not DAYS.has(retreat.durations, DAYS.half)
-    assert DAYS.has(retreat.durations, DAYS.full)
-    assert DAYS.has(retreat.durations, DAYS.many)
+    assert not DAYS.has(durations(retreat), DAYS.half)
+    assert DAYS.has(durations(retreat), DAYS.full)
+    assert DAYS.has(durations(retreat), DAYS.many)
 
     # remove the full day occasion
     occasions.delete(wednesday)
     transaction.commit()
 
     retreat = activities.query().first()
-    assert not DAYS.has(retreat.durations, DAYS.half)
-    assert not DAYS.has(retreat.durations, DAYS.full)
-    assert DAYS.has(retreat.durations, DAYS.many)
+    assert not DAYS.has(durations(retreat), DAYS.half)
+    assert not DAYS.has(durations(retreat), DAYS.full)
+    assert DAYS.has(durations(retreat), DAYS.many)
 
     # remove the remaining occasion
     occasions.delete(weekend)
     transaction.commit()
 
     retreat = activities.query().first()
-    assert not DAYS.has(retreat.durations, DAYS.half)
-    assert not DAYS.has(retreat.durations, DAYS.full)
-    assert not DAYS.has(retreat.durations, DAYS.many)
+    assert not DAYS.has(durations(retreat), DAYS.half)
+    assert not DAYS.has(durations(retreat), DAYS.full)
+    assert not DAYS.has(durations(retreat), DAYS.many)
 
     # add an occasion with overnight stay which should be categorised as 'many'
     weekend = occasions.add(
@@ -641,9 +652,9 @@ def test_occasion_duration(session, owner):
     transaction.commit()
 
     retreat = activities.query().first()
-    assert not DAYS.has(retreat.durations, DAYS.half)
-    assert not DAYS.has(retreat.durations, DAYS.full)
-    assert DAYS.has(retreat.durations, DAYS.many)
+    assert not DAYS.has(durations(retreat), DAYS.half)
+    assert not DAYS.has(durations(retreat), DAYS.full)
+    assert DAYS.has(durations(retreat), DAYS.many)
 
 
 def test_occasion_duration_with_multiple_dates(collections, owner):
@@ -2250,7 +2261,6 @@ def test_activity_filter_toggle():
     assert f.toggled(tag='Bar').tags == {'Foo', 'Bar'}
 
 
-@pytest.mark.xfail(reason='not yet implemented')
 def test_activity_period_filter(scenario):
     # an activity fully booked in the previous period...
     scenario.add_period(title="Prev", active=False, confirmed=True)
@@ -2281,7 +2291,7 @@ def test_activity_period_filter(scenario):
     assert a.for_filter(period_id=scenario.periods[1].id).query().count() == 1
 
     assert a.for_filter(available='none').query().count() == 1
-    assert a.for_filter(available='many').query().count() == 1
+    assert a.for_filter(available='few').query().count() == 1
 
     assert a.for_filter(
         period_id=scenario.periods[0].id,

@@ -11,14 +11,14 @@ from onegov.core.orm.mixins import (
 from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
 from onegov.user import User
-from sqlalchemy import Column, Enum, Text, ForeignKey, Integer
+from sqlalchemy import Column, Enum, Text, ForeignKey
 from sqlalchemy import event
-from sqlalchemy import func, distinct, exists, and_, desc
+from sqlalchemy import exists, and_, desc
 from sqlalchemy import Index
-from sqlalchemy.dialects.postgresql import HSTORE, ARRAY
+from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import object_session, relationship
-from sqlalchemy_utils import aggregated, observes, IntRangeType
+from sqlalchemy_utils import observes
 from uuid import uuid4
 
 
@@ -77,26 +77,6 @@ class Activity(Base, ContentMixin, TimestampMixin):
     #: Access the user linked to this activity
     user = relationship('User')
 
-    @aggregated('occasions', Column(Integer, default=0))
-    def durations(self):
-        return func.sum(distinct(Occasion.duration))
-
-    @aggregated('occasions', Column(ARRAY(IntRangeType), default=list))
-    def ages(self):
-        return func.array_agg(distinct(Occasion.age))
-
-    @aggregated('occasions', Column(ARRAY(UUID), default=list))
-    def period_ids(self):
-        return func.array_agg(distinct(Occasion.period_id))
-
-    @aggregated('occasions', Column(ARRAY(Integer), default=list))
-    def active_days(self):
-        return func.array_cat_agg(distinct(Occasion.active_days))
-
-    @aggregated('occasions', Column(ARRAY(Integer), default=list))
-    def weekdays(self):
-        return func.array_cat_agg(distinct(Occasion.weekdays))
-
     #: The occasions linked to this activity
     occasions = relationship(
         'Occasion',
@@ -121,11 +101,6 @@ class Activity(Base, ContentMixin, TimestampMixin):
         'polymorphic_on': 'type',
         'order_by': order,
     }
-
-    __table_args__ = (
-        Index('inverted_active_days', 'active_days', postgresql_using='gin'),
-        Index('inverted_weekdays', 'weekdays', postgresql_using='gin'),
-    )
 
     @observes('title')
     def title_observer(self, title):
