@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to filter activities by price range.
+  [href]
+
 - Completely reworks the way activities are filtered, taking the periods
   properly into account.
   [href]

@@ -15,8 +15,9 @@ from sqlalchemy import Index
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy import Text
-from sqlalchemy import desc, not_, distinct
+from sqlalchemy import case, desc, not_, distinct, func
 from sqlalchemy.orm import object_session, relationship, joinedload, defer
+from sqlalchemy.ext.hybrid import hybrid_property
 from uuid import uuid4
 
 
@@ -112,6 +113,26 @@ class Period(Base, TimestampMixin):
         'Booking',
         backref='period'
     )
+
+    @hybrid_property
+    def occasion_extra_cost(self):
+        """ Returns the cost that has to be added to each occasion to
+        get its actual price. Only relevant if not all-inclusive.
+
+        """
+        if self.all_inclusive:
+            return 0
+        else:
+            return self.booking_cost or 0
+
+    @occasion_extra_cost.expression
+    def occasion_extra_cost(self):
+        return case([
+            (Period.all_inclusive == True, 0),
+            (Period.all_inclusive == False, func.coalesce(
+                Period.booking_cost, 0
+            ))
+        ])
 
     def activate(self):
         """ Activates the current period, causing all occasions and activites

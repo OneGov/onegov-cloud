@@ -28,7 +28,7 @@ ESR_TO_CODE_MAPPING = {
 
 INTERNAL_IMAGE_EX = re.compile(r'.*/storage/[0-9a-z]{64}')
 
-AGE_RANGE_RE = re.compile(r'\d+-\d+')
+NUM_RANGE_RE = re.compile(r'\d+-\d+')
 DATE_RANGE_RE = re.compile(r'\d{4}-\d{2}-\d{2}:\d{4}-\d{2}-\d{2}')
 
 MUNICIPALITY_EX = re.compile(r"""
@@ -73,22 +73,22 @@ def merge_ranges(ranges):
     return merged
 
 
-def age_range_decode(s):
+def num_range_decode(s):
     if not isinstance(s, str):
         return None
 
-    if not AGE_RANGE_RE.match(s):
+    if not NUM_RANGE_RE.match(s):
         return None
 
     age_range = tuple(int(a) for a in s.split('-'))
 
-    if age_range[0] < age_range[1]:
+    if age_range[0] <= age_range[1]:
         return age_range
     else:
         return None
 
 
-def age_range_encode(a):
+def num_range_encode(a):
     return '-'.join(str(n) for n in a)
 
 

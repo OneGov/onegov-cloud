@@ -2,9 +2,9 @@ import sedate
 
 from copy import copy
 from enum import IntEnum
-from onegov.activity.models import Activity, Occasion
-from onegov.activity.utils import age_range_decode
-from onegov.activity.utils import age_range_encode
+from onegov.activity.models import Activity, Occasion, Period
+from onegov.activity.utils import num_range_decode
+from onegov.activity.utils import num_range_encode
 from onegov.activity.utils import date_range_decode
 from onegov.activity.utils import date_range_encode
 from onegov.activity.utils import merge_ranges
@@ -14,12 +14,10 @@ from onegov.core.utils import increment_name
 from onegov.core.utils import is_uuid
 from onegov.core.utils import normalize_for_url
 from onegov.core.utils import toggle
-from sqlalchemy import bindparam
 from sqlalchemy import column
 from sqlalchemy import distinct
 from sqlalchemy import func
-from sqlalchemy import Integer
-from sqlalchemy import or_
+from sqlalchemy import and_, or_
 from sqlalchemy import select
 from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import array
@@ -35,16 +33,17 @@ class ActivityFilter(object):
     # be turned into a singular with the removal of the last s
     # (i.e. slots => slot)
     __slots__ = (
-        'available',
-        'tags',
-        'states',
-        'durations',
         'age_ranges',
+        'available',
+        'price_ranges',
+        'dateranges',
+        'durations',
+        'municipalities',
         'owners',
         'period_ids',
-        'dateranges',
+        'states',
+        'tags',
         'weekdays',
-        'municipalities'
     )
 
     singular = {
@@ -99,9 +98,15 @@ class ActivityFilter(object):
     def adapt_available(self, values):
         return values & AVAILABILITY_VALUES
 
-    def adapt_age_ranges(self, values):
-        decoded = set(v for v in map(age_range_decode, values) if v)
+    def adapt_num_ranges(self, values):
+        decoded = set(v for v in map(num_range_decode, values) if v)
         return decoded and set(merge_ranges(decoded)) or set()
+
+    def adapt_age_ranges(self, values):
+        return self.adapt_num_ranges(values)
+
+    def adapt_price_ranges(self, values):
+        return self.adapt_num_ranges(values)
 
     def adapt_dateranges(self, values):
         return set(v for v in map(date_range_decode, values) if v)
@@ -123,7 +128,10 @@ class ActivityFilter(object):
             return [date_range_encode(v) for v in value]
 
         if key == 'age_ranges':
-            return [age_range_encode(v) for v in value]
+            return [num_range_encode(v) for v in value]
+
+        if key == 'price_ranges':
+            return [num_range_encode(v) for v in value]
 
         if isinstance(value, IntEnum):
             return str(int(value))
@@ -139,11 +147,17 @@ class ActivityFilter(object):
 
         raise NotImplementedError()
 
-    def contains_age_range(self, age_range):
-        for r in self.age_ranges:
-            if overlaps(r, age_range):
+    def contains_num_range(self, value, ranges):
+        for r in ranges:
+            if overlaps(r, value):
                 return True
         return False
+
+    def contains_age_range(self, age_range):
+        return self.contains_num_range(age_range, self.age_ranges)
+
+    def contains_price_range(self, price_range):
+        return self.contains_num_range(price_range, self.price_ranges)
 
 
 class ActivityCollection(Pagination):
@@ -226,6 +240,21 @@ class ActivityCollection(Pagination):
                 *(
                     Occasion.age.overlaps(func.int4range(min_age, max_age + 1))
                     for min_age, max_age in self.filter.age_ranges
+                )
+            ))
+
+        if self.filter.price_ranges:
+            o = o.join(Period)
+            o = o.filter(or_(
+                *(
+                    and_(
+                        min_price <= func.coalesce(
+                            Occasion.cost + Period.occasion_extra_cost
+                        ),
+                        func.coalesce(
+                            Occasion.cost + Period.occasion_extra_cost
+                        ) <= max_price
+                    ) for min_price, max_price in self.filter.price_ranges
                 )
             ))
 

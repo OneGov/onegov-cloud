@@ -2302,3 +2302,45 @@ def test_activity_period_filter(scenario):
         period_id=scenario.periods[1].id,
         available='none'
     ).query().count() == 0
+
+
+def test_activity_cost_filter(scenario):
+    scenario.add_period()
+
+    scenario.add_activity()
+    scenario.add_occasion(cost=0)
+
+    scenario.add_activity()
+    scenario.add_occasion(cost=50)
+
+    scenario.add_activity()
+    scenario.add_occasion(cost=100)
+
+    a = scenario.c.activities
+
+    assert a.for_filter(price_range=(0, 0)).query().count() == 1
+    assert a.for_filter(price_range=(0, 50)).query().count() == 2
+    assert a.for_filter(price_range=(50, 100)).query().count() == 2
+    assert a.for_filter(price_range=(0, 100)).query().count() == 3
+    assert a.for_filter(price_range=(100, 1000)).query().count() == 1
+    assert a.for_filter(price_range=(101, 1000)).query().count() == 0
+
+    scenario.latest_period.all_inclusive = False
+    scenario.latest_period.booking_cost = 1
+
+    assert a.for_filter(price_range=(0, 0)).query().count() == 0
+    assert a.for_filter(price_range=(1, 1)).query().count() == 1
+    assert a.for_filter(price_range=(1, 51)).query().count() == 2
+    assert a.for_filter(price_range=(51, 101)).query().count() == 2
+    assert a.for_filter(price_range=(1, 101)).query().count() == 3
+    assert a.for_filter(price_range=(101, 1000)).query().count() == 1
+    assert a.for_filter(price_range=(102, 1000)).query().count() == 0
+
+    scenario.latest_period.all_inclusive = True
+
+    assert a.for_filter(price_range=(0, 0)).query().count() == 1
+    assert a.for_filter(price_range=(0, 50)).query().count() == 2
+    assert a.for_filter(price_range=(50, 100)).query().count() == 2
+    assert a.for_filter(price_range=(0, 100)).query().count() == 3
+    assert a.for_filter(price_range=(100, 1000)).query().count() == 1
+    assert a.for_filter(price_range=(101, 1000)).query().count() == 0
