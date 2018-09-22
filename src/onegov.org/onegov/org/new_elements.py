@@ -151,7 +151,7 @@ class Trait(object):
 
     __slots__ = ('apply', )
 
-    def __call__(self, attrs):
+    def __call__(self, attrs, **ignored):
         return self.apply(attrs)
 
 

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes traits not working with custom properties.
+  [href]
+
 - Gets click-through working with intercooler.
   [href]
 
