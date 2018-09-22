@@ -1,5 +1,5 @@
 from cached_property import cached_property
-from onegov.activity import Activity, ActivityCollection
+from onegov.activity import Activity, ActivityCollection, Occasion
 from onegov.activity import PublicationRequestCollection
 from onegov.activity.models import DAYS
 from onegov.core.templates import render_macro
@@ -69,11 +69,18 @@ class VacationActivity(Activity, CoordinatesExtension, ORMSearchable):
     def ordered_tags(self, request):
         tags = [request.translate(_(tag)) for tag in self.tags]
 
-        if DAYS.has(self.durations, DAYS.half):
+        durations = sum(o.duration for o in (
+            request.session.query(Occasion)
+            .with_entities(Occasion.duration)
+            .distinct()
+            .filter_by(activity_id=self.id)
+        ))
+
+        if DAYS.has(durations, DAYS.half):
             tags.append(request.translate(_("Half day")))
-        if DAYS.has(self.durations, DAYS.full):
+        if DAYS.has(durations, DAYS.full):
             tags.append(request.translate(_("Full day")))
-        if DAYS.has(self.durations, DAYS.many):
+        if DAYS.has(durations, DAYS.many):
             tags.append(request.translate(_("Multiple days")))
 
         return sorted(tags)
