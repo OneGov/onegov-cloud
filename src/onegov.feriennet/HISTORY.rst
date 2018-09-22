@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.4.3 (2018-09-22)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to filter activites by price range.
   [href]
