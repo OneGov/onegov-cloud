@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Loads filtered activites using AJAX for a better user experience.
+  [href]
+
 - Renames the attendee's notes to "health information".
   [href]
 

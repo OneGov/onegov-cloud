@@ -89,18 +89,23 @@ def view_activities(self, request):
 
     filters = {}
 
+    def link(text, active, url):
+        return Link(text=text, active=active, url=url, attrs={
+            'ic-get-from': url
+        })
+
     if show_activities:
         filters['tags'] = [
-            Link(
+            link(
                 text=request.translate(_(tag)),
                 active=tag in self.filter.tags,
-                url=request.link(self.for_filter(tag=tag))
+                url=request.link(self.for_filter(tag=tag)),
             ) for tag in self.used_tags
         ]
         filters['tags'].sort(key=lambda l: l.text)
 
         filters['durations'] = tuple(
-            Link(
+            link(
                 text=request.translate(text),
                 active=duration in self.filter.durations,
                 url=request.link(self.for_filter(duration=duration))
@@ -112,7 +117,7 @@ def view_activities(self, request):
         )
 
         filters['ages'] = tuple(
-            Link(
+            link(
                 text=request.translate(text),
                 active=self.filter.contains_age_range(age_range),
                 url=request.link(self.for_filter(age_range=age_range))
@@ -126,7 +131,7 @@ def view_activities(self, request):
 
         if active_period:
             filters['weeks'] = tuple(
-                Link(
+                link(
                     text='{} - {}'.format(
                         layout.format_date(daterange[0], 'date'),
                         layout.format_date(daterange[1], 'date')
@@ -140,7 +145,7 @@ def view_activities(self, request):
             )
 
         filters['weekdays'] = tuple(
-            Link(
+            link(
                 text=WEEKDAYS[weekday],
                 active=weekday in self.filter.weekdays,
                 url=request.link(self.for_filter(weekday=weekday))
@@ -148,7 +153,7 @@ def view_activities(self, request):
         )
 
         filters['available'] = tuple(
-            Link(
+            link(
                 text=request.translate(text),
                 active=available in self.filter.available,
                 url=request.link(self.for_filter(available=available))
@@ -160,7 +165,7 @@ def view_activities(self, request):
         )
 
         filters['municipalities'] = [
-            Link(
+            link(
                 text=municipality,
                 active=municipality in self.filter.municipalities,
                 url=request.link(self.for_filter(municipality=municipality))
@@ -171,7 +176,7 @@ def view_activities(self, request):
         if request.is_organiser:
             if request.app.periods:
                 filters['periods'] = [
-                    Link(
+                    link(
                         text=period.title,
                         active=period.id in self.filter.period_ids,
                         url=request.link(self.for_filter(period_id=period.id))
@@ -180,7 +185,7 @@ def view_activities(self, request):
                 filters['periods'].sort(key=lambda l: l.text)
 
             filters['own'] = (
-                Link(
+                link(
                     text=request.translate(_("Own")),
                     active=request.current_username in self.filter.owners,
                     url=request.link(
@@ -190,7 +195,7 @@ def view_activities(self, request):
             )
 
             filters['states'] = tuple(
-                Link(
+                link(
                     text=ACTIVITY_STATE_TRANSLATIONS[state],
                     active=state in self.filter.states,
                     url=request.link(self.for_filter(state=state))
