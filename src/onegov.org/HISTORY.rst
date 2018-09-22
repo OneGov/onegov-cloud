@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Gets click-through working with intercooler.
+  [href]
+
 0.35.2 (2018-09-21)
 ~~~~~~~~~~~~~~~~~~~
 

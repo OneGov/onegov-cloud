@@ -39,6 +39,14 @@ var processCommonNodes = function(elements, out_of_band) {
     if (out_of_band !== false) {
         $(document).trigger('process-common-nodes', elements);
     }
+
+    // send clicks from certain blocks down to the first link
+    $(document).ready(function() {
+        $('.click-through').click(function() {
+            $(this).find('a:first')[0].click();
+            return false;
+        });
+    });
 };
 
 // setup common nodes
@@ -150,13 +158,6 @@ $(document).ready(function() {
                 el.hide();
             }
         }
-    });
-});
-
-// send clicks from certain blocks down to the first link
-$(document).ready(function() {
-    $('.click-through').click(function() {
-        window.location = $(this).find('a:first').attr('href');
     });
 });
 
