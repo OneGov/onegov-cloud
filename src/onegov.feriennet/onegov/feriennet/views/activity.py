@@ -129,6 +129,20 @@ def view_activities(self, request):
             )
         )
 
+        filters['price_range'] = tuple(
+            link(
+                text=request.translate(text),
+                active=self.filter.contains_price_range(price_range),
+                url=request.link(self.for_filter(price_range=price_range))
+            ) for text, price_range in (
+                (_("Free of Charge"), (0, 0)),
+                (_("Up to 25 CHF"), (1, 25)),
+                (_("Up to 50 CHF"), (26, 50)),
+                (_("Up to 100 CHF"), (51, 100)),
+                (_("More than 100 CHF"), (101, 100000)),
+            )
+        )
+
         if active_period:
             filters['weeks'] = tuple(
                 link(

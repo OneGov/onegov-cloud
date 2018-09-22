@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-09-19 16:59+0200\n"
+"POT-Creation-Date: 2018-09-22 11:13+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1487,6 +1487,9 @@ msgstr "Wochentage"
 msgid "Duration"
 msgstr "Dauer"
 
+msgid "Price"
+msgstr "Preis"
+
 msgid "Municipalities"
 msgstr "Gemeinden"
 
@@ -1908,6 +1911,21 @@ msgstr "11 - 13 Jahre"
 
 msgid "14 - 17 years"
 msgstr "14 - 17 Jahre"
+
+msgid "Free of Charge"
+msgstr "Kostenlos"
+
+msgid "Up to 25 CHF"
+msgstr "Bis 25 CHF"
+
+msgid "Up to 50 CHF"
+msgstr "Bis 50 CHF"
+
+msgid "Up to 100 CHF"
+msgstr "Bis 100 CHF"
+
+msgid "More than 100 CHF"
+msgstr "Mehr als 100 CHF"
 
 msgid "None"
 msgstr "Keine"
