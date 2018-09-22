@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.35.3 (2018-09-22)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes traits not working with custom properties.
   [href]
 
