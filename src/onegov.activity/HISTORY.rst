@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.10.0 (2018-09-22)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to filter activities by price range.
   [href]
