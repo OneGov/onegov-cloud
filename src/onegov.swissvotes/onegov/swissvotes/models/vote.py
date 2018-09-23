@@ -163,7 +163,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ORMSearchable):
     _recommendation_lps = Column('recommendation_lps', Integer)
     _recommendation_ldu = Column('recommendation_ldu', Integer)
     _recommendation_evp = Column('recommendation_evp', Integer)
-    _recommendation_ucsp = Column('recommendation_ucsp', Integer)
+    _recommendation_csp = Column('recommendation_csp', Integer)
     _recommendation_pda = Column('recommendation_pda', Integer)
     _recommendation_poch = Column('recommendation_poch', Integer)
     _recommendation_gps = Column('recommendation_gps', Integer)
@@ -177,12 +177,12 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ORMSearchable):
     _recommendation_bdp = Column('recommendation_bdp', Integer)
     _recommendation_mcg = Column('recommendation_mcg', Integer)
 
-    _recommendation_zsa = Column('recommendation_zsa', Integer)
+    _recommendation_sav = Column('recommendation_sav', Integer)
     _recommendation_eco = Column('recommendation_eco', Integer)
     _recommendation_sgv = Column('recommendation_sgv', Integer)
-    _recommendation_sbv = Column('recommendation_sbv', Integer)
+    _recommendation_sbv_usp = Column('recommendation_sbv_usp', Integer)
     _recommendation_sgb = Column('recommendation_sgb', Integer)
-    _recommendation_cng_travs = Column('recommendation_cng_travs', Integer)
+    _recommendation_travs = Column('recommendation_travs', Integer)
     _recommendation_vsa = Column('recommendation_vsa', Integer)
 
     # Electoral strength
@@ -309,19 +309,19 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ORMSearchable):
             (Actor('sd'), self._recommendation_sd),
             (Actor('sps'), self._recommendation_sps),
             (Actor('svp'), self._recommendation_svp),
-            (Actor('csp'), self._recommendation_ucsp),
+            (Actor('csp'), self._recommendation_csp),
         ))
 
     @cached_property
     def recommendations_associations(self):
         return self.group_recommendations((
             (Actor('eco'), self._recommendation_eco),
-            (Actor('sbv-usp'), self._recommendation_sbv),
+            (Actor('sbv-usp'), self._recommendation_sbv_usp),
             (Actor('sgb'), self._recommendation_sgb),
             (Actor('sgv'), self._recommendation_sgv),
-            (Actor('travs'), self._recommendation_cng_travs),
+            (Actor('travs'), self._recommendation_travs),
             (Actor('vsa'), self._recommendation_vsa),
-            (Actor('sav'), self._recommendation_zsa),
+            (Actor('sav'), self._recommendation_sav),
         ))
 
     @cached_property
