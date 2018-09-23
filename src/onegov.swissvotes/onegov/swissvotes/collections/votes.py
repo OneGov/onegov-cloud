@@ -308,8 +308,9 @@ class SwissVoteCollection(Pagination):
 
         added = 0
         updated = 0
+        query = self.session.query(SwissVote)
         for vote in votes:
-            old = self.query().filter_by(bfs_number=vote.bfs_number).first()
+            old = query.filter_by(bfs_number=vote.bfs_number).first()
             if old:
                 changed = False
                 for attribute in COLUMNS.keys():
