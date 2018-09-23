@@ -7,6 +7,7 @@ from onegov.swissvotes import _
 from onegov.swissvotes.models import SwissVote
 from psycopg2.extras import NumericRange
 from xlrd import open_workbook
+from xlrd import XL_CELL_EMPTY
 from xlrd import xldate
 
 
@@ -179,7 +180,7 @@ class SwissvoteDatasetField(UploadField):
                 cell = row[headers.index(column)]
                 type_ = str(vote.__table__.columns[attribute.lstrip('_')].type)
                 try:
-                    if not cell.value:
+                    if cell.ctype == XL_CELL_EMPTY:
                         value = None
                     elif type_ == 'TEXT':
                         value = str(cell.value)
@@ -188,7 +189,6 @@ class SwissvoteDatasetField(UploadField):
                             cell.value,
                             workbook.datemode
                         ).date()
-                        print(value.year)
                     elif type_ == 'INTEGER':
                         value = int(cell.value)
                     elif type_ == 'INT4RANGE':
@@ -196,7 +196,7 @@ class SwissvoteDatasetField(UploadField):
                             int(bound) for bound in cell.value.split('-')
                         ])
                     elif type_.startswith('NUMERIC'):
-                        value = Decimal(cell.value)
+                        value = Decimal(str(cell.value))
 
                 except Exception as e:
                     errors.append((
