@@ -41,8 +41,14 @@ def update_votes(self, request, form):
     layout = UpdateVotesLayout(self, request)
 
     if form.submitted(request):
-        self.update(form.dataset.data)
-        request.message(_("Dataset updated"), 'success')
+        added, updated = self.update(form.dataset.data)
+        request.message(
+            _(
+                "Dataset updated (${added} added, ${updated} updated)",
+                mapping={'added': added, 'updated': updated}
+            ),
+            'success'
+        )
 
         # Warn if descriptor labels are missing
         missing = set()

@@ -19,8 +19,13 @@ class SwissVoteCollection(Pagination):
     max_term_length = 100
     max_search_results = 1000
 
-    SORT_BYS = ('date', 'legal_form', 'result', 'result_people_yeas_p',
-                'title')
+    SORT_BYS = (
+        'date',
+        'legal_form',
+        'result',
+        'result_people_yeas_p',
+        'title'
+    )
     SORT_ORDERS = ('ascending', 'descending')
 
     def __init__(
@@ -304,15 +309,25 @@ class SwissVoteCollection(Pagination):
     def update(self, votes):
         """ Adds or updates the given votes. """
 
-        # return number of updated/added
+        added = 0
+        updated = 0
         for vote in votes:
             old = self.query().filter_by(bfs_number=vote.bfs_number).first()
             if old:
-                # todo: optimize
+                changed = False
                 for attribute in COLUMNS.keys():
-                    setattr(old, attribute, getattr(vote, attribute))
+                    value = getattr(vote, attribute)
+                    if getattr(old, attribute) != value:
+                        setattr(old, attribute, value)
+                        changed = True
+
+                if changed:
+                    updated += 1
             else:
+                added += 1
                 self.session.add(vote)
+
+        return added, updated
 
     def export_csv(self, file):
         """ Exports all votes according to the code book. """
