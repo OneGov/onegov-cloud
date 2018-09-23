@@ -9,6 +9,7 @@ from onegov.swissvotes.models.vote import LEGAL_FORM
 from onegov.swissvotes.models.vote import RESULT
 from wtforms.fields.html5 import DateField
 from wtforms import HiddenField
+from wtforms import StringField
 
 
 class SearchForm(Form):
@@ -19,11 +20,6 @@ class SearchForm(Form):
 
     to_date = DateField(
         label=_("To date")
-    )
-
-    policy_area = PolicyAreaField(
-        label=_("Policy area"),
-        choices=[]
     )
 
     legal_form = MultiCheckboxField(
@@ -38,11 +34,20 @@ class SearchForm(Form):
         coerce=int
     )
 
+    policy_area = PolicyAreaField(
+        label=_("Policy area"),
+        choices=[]
+    )
+
+    term = StringField(
+        label=_("Full-text search"),
+    )
+
     sort_by = HiddenField()
     sort_order = HiddenField()
 
     def populate_policy_area(self):
-        votes = SwissVoteCollection(self.request.session)
+        votes = SwissVoteCollection(self.request.app)
         available = votes.available_descriptors
 
         def add_choice(value, label, level):
@@ -69,11 +74,12 @@ class SearchForm(Form):
         self.populate_policy_area()
 
     def apply_model(self, model):
-        self.policy_area.data = model.policy_area
-        self.legal_form.data = model.legal_form
-        self.result.data = model.result
         self.from_date.data = model.from_date
         self.to_date.data = model.to_date
+        self.legal_form.data = model.legal_form
+        self.result.data = model.result
+        self.policy_area.data = model.policy_area
+        self.term.data = model.term
         self.sort_by.data = model.sort_by
         self.sort_order.data = model.sort_order
 

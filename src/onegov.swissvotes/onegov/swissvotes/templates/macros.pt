@@ -103,43 +103,53 @@
             <tal:block condition="button_text|nothing">
                 <input type="submit" value="${button_text}" class="button ${button_class|nothing}">
             </tal:block>
+            <tal:block condition="reset|nothing">
+                <a class="button secondary reset-button right" href="${reset}" i18n:translate="">Reset</a>
+            </tal:block>
         </form>
     </metal:form>
 
     <metal:fields define-macro="fields" i18n:domain="onegov.swissvotes">
-        <tal:block repeat="field fields">
-            <div class="row"><div class="large-12 columns">
-            <tal:block define="input_type field.widget.input_type|None">
-                <tal:block condition="input_type == 'hidden'">
-                    <tal:block condition="field.type == 'QuillField'">
-                        <label tal:attributes="class field.errors and 'error' or None">
-                            <span class="label-text">${field.label.text}</span>
-                            <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
-                        </label>
-                    </tal:block>
-                    ${field()}
-                    <small class="error" tal:repeat="error field.errors">${error}</small>
-                </tal:block>
-                <tal:block condition="input_type != 'hidden'">
-                    <label tal:attributes="class field.errors and 'error' or None">
-                        <!--! render the label after the field if it's a boolean field -->
-                        <tal:block condition="field.type == 'BooleanField'">
-                            ${field(placeholder=request.translate(field.description))}
-                            <span class="label-text">${field.label.text}</span>
-                            <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
-                        </tal:block>
-                        <tal:block condition="field.type != 'BooleanField'">
-                            <span class="label-text">${field.label.text}</span>
-                            <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
-                            ${field(placeholder=request.translate(field.description))}
-                        </tal:block>
-                    </label>
-                    <small class="error" tal:repeat="error field.errors">${error}</small>
-                </tal:block>
+        <div class="row">
+            <tal:block repeat="field fields">
+                <div class="columns large-6 small-12">
+                    <metal:field use-macro="layout.macros['field']" />
+                </div>
+                <div class="clearfix" tal:condition="repeat.field.odd"></div>
             </tal:block>
-        </div></div>
-        </tal:block>
+        </div>
     </metal:fields>
+
+    <metal:field define-macro="field" i18n:domain="onegov.swissvotes">
+        <tal:block define="input_type field.widget.input_type|None">
+            <tal:block condition="input_type == 'hidden'">
+                <tal:block condition="field.type == 'QuillField'">
+                    <label tal:attributes="class field.errors and 'error' or None">
+                        <span class="label-text">${field.label.text}</span>
+                        <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+                    </label>
+                </tal:block>
+                ${field()}
+                <small class="error" tal:repeat="error field.errors">${error}</small>
+            </tal:block>
+            <tal:block condition="input_type != 'hidden'">
+                <label tal:attributes="class field.errors and 'error' or None">
+                    <!--! render the label after the field if it's a boolean field -->
+                    <tal:block condition="field.type == 'BooleanField'">
+                        ${field(placeholder=request.translate(field.description))}
+                        <span class="label-text">${field.label.text}</span>
+                        <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+                    </tal:block>
+                    <tal:block condition="field.type != 'BooleanField'">
+                        <span class="label-text">${field.label.text}</span>
+                        <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+                        ${field(placeholder=request.translate(field.description))}
+                    </tal:block>
+                </label>
+                <small class="error" tal:repeat="error field.errors">${error}</small>
+            </tal:block>
+        </tal:block>
+    </metal:field>
 
     <metal:tablesaw_translations define-macro="tablesaw_translations" i18n:domain="onegov.swissvotes">
         <script>

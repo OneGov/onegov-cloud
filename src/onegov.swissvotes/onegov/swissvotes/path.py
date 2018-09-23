@@ -44,6 +44,7 @@ def get_locale(request, app, locale, to=None):
         legal_form=[int],
         result=[int],
         policy_area=[str],
+        term=str,
         sort_by=str,
         sort_order=str
     )
@@ -56,17 +57,19 @@ def get_votes(
     legal_form=None,
     result=None,
     policy_area=None,
+    term=None,
     sort_by=None,
     sort_order=None
 ):
     return SwissVoteCollection(
-        app.session(),
+        app,
         page=page,
         from_date=from_date,
         to_date=to_date,
         legal_form=legal_form,
         result=result,
         policy_area=policy_area,
+        term=term,
         sort_by=sort_by,
         sort_order=sort_order
     )
@@ -77,7 +80,7 @@ def get_votes(
     path='/vote/{bfs_number}'
 )
 def get_vote(app, bfs_number):
-    return SwissVoteCollection(app.session()).by_bfs_number(bfs_number)
+    return SwissVoteCollection(app).by_bfs_number(bfs_number)
 
 
 @SwissvotesApp.path(

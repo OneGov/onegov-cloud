@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds search.
+  [msom]
+
 - Uses XLSX for import.
   [msom]
 

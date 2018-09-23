@@ -60,17 +60,6 @@ form {
         border-color: $alert-color;
     }
 
-    .redactor-editor {
-        @include form-element;
-        cursor: text;
-        height: 100%;
-        min-height: 250px;
-    }
-
-    .redactor-box {
-        margin-bottom: .75rem;
-    }
-
     .formcode-select {
         @include form-element;
         height: 100%;
@@ -168,7 +157,12 @@ form {
     }
 
     .chosen-container {
-        margin-bottom: 1rem;
+        margin-bottom: $form-spacing;
+
+        .chosen-choices {
+            min-height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(1));
+            padding: ($form-spacing / 4) ($form-spacing / 2) !important;
+        }
 
         li {
             font-size: .875rem;

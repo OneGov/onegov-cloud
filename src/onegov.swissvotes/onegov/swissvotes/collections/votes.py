@@ -1,5 +1,7 @@
 from cached_property import cached_property
 from csv import writer
+from elasticsearch_dsl.query import MatchPhrase
+from elasticsearch_dsl.query import MultiMatch
 from onegov.core.collection import Pagination
 from onegov.swissvotes.fields.dataset import COLUMNS
 from onegov.swissvotes.models import PolicyArea
@@ -14,6 +16,8 @@ class SwissVoteCollection(Pagination):
     initial_sort_by = 'date'
     initial_sort_order = 'descending'
     default_sort_order = 'ascending'
+    max_term_length = 100
+    max_search_results = 1000
 
     SORT_BYS = ('date', 'legal_form', 'result', 'result_people_yeas_p',
                 'title')
@@ -21,23 +25,26 @@ class SwissVoteCollection(Pagination):
 
     def __init__(
         self,
-        session,
+        app,
         page=None,
         from_date=None,
         to_date=None,
         legal_form=None,
         result=None,
         policy_area=None,
+        term=None,
         sort_by=None,
         sort_order=None
     ):
-        self.session = session
+        self.session = app.session()
+        self.app = app
         self.page = page
         self.from_date = from_date
         self.to_date = to_date
         self.legal_form = legal_form
         self.result = result
         self.policy_area = policy_area
+        self.term = term
         self.sort_by = sort_by
         self.sort_order = sort_order
 
@@ -52,6 +59,7 @@ class SwissVoteCollection(Pagination):
             set(self.legal_form or []) == set(other.legal_form or []) and
             set(self.result or []) == set(other.result or []) and
             set(self.policy_area or []) == set(other.policy_area or []) and
+            (self.term or None) == (other.term or None) and
             (self.sort_by or None) == (other.sort_by or None) and
             (self.sort_order or None) == (other.sort_order or None)
         )
@@ -66,13 +74,14 @@ class SwissVoteCollection(Pagination):
         """ Returns the requested page. """
 
         return self.__class__(
-            self.session,
+            self.app,
             page=page,
             from_date=self.from_date,
             to_date=self.to_date,
             legal_form=self.legal_form,
             result=self.result,
             policy_area=self.policy_area,
+            term=self.term,
             sort_by=self.sort_by,
             sort_order=self.sort_order
         )
@@ -122,13 +131,14 @@ class SwissVoteCollection(Pagination):
                 sort_order = 'ascending'
 
         return self.__class__(
-            self.session,
+            self.app,
             page=None,
             from_date=self.from_date,
             to_date=self.to_date,
             legal_form=self.legal_form,
             result=self.result,
             policy_area=self.policy_area,
+            term=self.term,
             sort_by=sort_by,
             sort_order=sort_order
         )
@@ -225,6 +235,32 @@ class SwissVoteCollection(Pagination):
                         SwissVote.descriptor_3_level_3.in_(levels[2])
                     )
                 )
+        if self.term:
+            term = self.term[:self.max_term_length]
+
+            search = self.app.es_search()
+            search = search.filter(
+                'ids',
+                values=[
+                    r[0] for r in query.with_entities(SwissVote.es_id)
+                ]
+            )
+            search = search.query(
+                MatchPhrase(
+                    title={"query": term, "boost": 3}
+                ) |
+                MultiMatch(
+                    query=term,
+                    fields=['title', 'keyword', 'initiator'],
+                    fuzziness='auto'
+                )
+            )
+            search = search[0:self.max_search_results]
+            search = search.execute()
+
+            query = query.filter(
+                SwissVote.id.in_([r.id for r in search.load()])
+            )
 
         query = query.order_by(self.order_by)
 
@@ -268,9 +304,11 @@ class SwissVoteCollection(Pagination):
     def update(self, votes):
         """ Adds or updates the given votes. """
 
+        # return number of updated/added
         for vote in votes:
             old = self.query().filter_by(bfs_number=vote.bfs_number).first()
             if old:
+                # todo: optimize
                 for attribute in COLUMNS.keys():
                     setattr(old, attribute, getattr(vote, attribute))
             else:

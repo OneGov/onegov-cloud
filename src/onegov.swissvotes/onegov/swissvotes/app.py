@@ -4,11 +4,12 @@ from onegov.core import utils
 from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.quill import QuillApp
+from onegov.search import ElasticsearchApp
 from onegov.swissvotes.models import Principal
 from onegov.swissvotes.theme import SwissvotesTheme
 
 
-class SwissvotesApp(Framework, FormApp, QuillApp, DepotApp):
+class SwissvotesApp(Framework, FormApp, QuillApp, DepotApp, ElasticsearchApp):
     """ The swissvotes application. Include this in your onegov.yml to serve
     it with onegov-server.
 

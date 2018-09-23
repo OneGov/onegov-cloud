@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-09-20 13:53+0200\n"
+"POT-Creation-Date: 2018-09-23 13:45+0200\n"
 "PO-Revision-Date: 2018-09-18 15:04+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: English\n"
@@ -69,14 +69,17 @@ msgstr "From date"
 msgid "To date"
 msgstr "To date"
 
-msgid "Policy area"
-msgstr "Policy area"
-
 msgid "Legal form"
 msgstr "Legal form"
 
 msgid "Voting result"
 msgstr "Voting result"
+
+msgid "Policy area"
+msgstr "Policy area"
+
+msgid "Full-text search"
+msgstr ""
 
 msgid "Votes"
 msgstr "Votes"
@@ -1176,6 +1179,9 @@ msgstr "Cancel"
 
 msgid "Submit"
 msgstr "Submit"
+
+msgid "Reset"
+msgstr ""
 
 msgid "Stack"
 msgstr "Stack"

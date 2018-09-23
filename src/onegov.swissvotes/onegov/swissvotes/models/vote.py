@@ -4,6 +4,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.file import AssociatedFiles
 from onegov.file import File
+from onegov.search import ORMSearchable
 from onegov.swissvotes import _
 from onegov.swissvotes.models.actor import Actor
 from onegov.swissvotes.models.policy_area import PolicyArea
@@ -77,11 +78,18 @@ class SwissVoteFile(File):
     __mapper_args__ = {'polymorphic_identity': 'swissvote'}
 
 
-class SwissVote(Base, TimestampMixin, AssociatedFiles):
+class SwissVote(Base, TimestampMixin, AssociatedFiles, ORMSearchable):
 
     """ A single vote as defined by the code book. """
 
     __tablename__ = 'swissvotes'
+
+    es_public = True
+    es_properties = {
+        'title': {'type': 'localized'},
+        'keyword': {'type': 'localized'},
+        'initiator': {'type': 'localized'},
+    }
 
     id = Column(Integer, nullable=False, primary_key=True)
 
