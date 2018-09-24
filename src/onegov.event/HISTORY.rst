@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.9.0 (2018-09-24)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a source property to events.
   [msom]
