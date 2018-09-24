@@ -15,6 +15,7 @@ from onegov.event.utils import GuidleExportData
 from onegov.gis import Coordinates
 from operator import add
 from requests import get
+from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import array
 
 cli = command_group()
@@ -246,7 +247,8 @@ def import_guidle(group_context, url, tagmap):
 @pass_group_context
 @click.option('--source', multiple=True)
 @click.option('--tag', multiple=True)
-def fetch(group_context, source, tag):
+@click.option('--location', multiple=True)
+def fetch(group_context, source, tag, location):
     """ Fetches events from other instances.
 
     Only fetches events from the same namespace which have not been imported
@@ -284,6 +286,13 @@ def fetch(group_context, source, tag):
                 query = query.filter(Event.meta['source'].is_(None))
                 if tag:
                     query = query.filter(Event._tags.has_any(array(tag)))
+                if location:
+                    query = query.filter(
+                        or_(*[
+                            Event.location.ilike(f'%{term}%')
+                            for term in location
+                        ])
+                    )
                 remote_events = [
                     Event(
                         state='initiated',

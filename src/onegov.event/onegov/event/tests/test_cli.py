@@ -47,7 +47,7 @@ def test_import_ical(cfg_path, temporary_directory):
     ])
     assert result.exit_code == 0
     assert "Events successfully imported" in result.output
-    assert "(1 added, 0 updated, 0 deleted)" in result.output
+    assert "1 added, 0 updated, 0 deleted" in result.output
 
     # Re-import
     result = runner.invoke(cli, [
@@ -57,7 +57,7 @@ def test_import_ical(cfg_path, temporary_directory):
     ])
     assert result.exit_code == 0
     assert "Events successfully imported" in result.output
-    assert "(0 added, 0 updated, 0 deleted)" in result.output
+    assert "0 added, 0 updated, 0 deleted" in result.output
 
     # Clear
     result = runner.invoke(cli, [
@@ -75,7 +75,7 @@ def test_import_ical(cfg_path, temporary_directory):
     ])
     assert result.exit_code == 0
     assert "Events successfully imported" in result.output
-    assert "(1 added, 0 updated, 0 deleted)" in result.output
+    assert "1 added, 0 updated, 0 deleted" in result.output
 
     # Adjust ical
     with open(ical, 'w') as f:
@@ -89,7 +89,7 @@ def test_import_ical(cfg_path, temporary_directory):
     ])
     assert result.exit_code == 0
     assert "Events successfully imported" in result.output
-    assert "(0 added, 1 updated, 0 deleted)" in result.output
+    assert "0 added, 1 updated, 0 deleted" in result.output
 
 
 @mark.parametrize("xml", [
@@ -111,7 +111,7 @@ def test_import_guidle(cfg_path, temporary_directory, xml):
         ])
     assert result.exit_code == 0
     assert "Events successfully imported" in result.output
-    assert "(4 added, 0 updated, 0 deleted)" in result.output
+    assert "4 added, 0 updated, 0 deleted" in result.output
 
     # Reimport
     with patch('onegov.event.cli.get', return_value=response):
@@ -122,7 +122,7 @@ def test_import_guidle(cfg_path, temporary_directory, xml):
         ])
     assert result.exit_code == 0
     assert "Events successfully imported" in result.output
-    assert "(0 added, 0 updated, 0 deleted)" in result.output
+    assert "0 added, 0 updated, 0 deleted" in result.output
 
     # Clear
     result = runner.invoke(cli, [
@@ -141,7 +141,7 @@ def test_import_guidle(cfg_path, temporary_directory, xml):
         ])
     assert result.exit_code == 0
     assert "Events successfully imported" in result.output
-    assert "(4 added, 0 updated, 0 deleted)" in result.output
+    assert "4 added, 0 updated, 0 deleted" in result.output
 
     # Create tagmap
     tagmap = path.join(temporary_directory, 'tagmap.csv')
@@ -159,7 +159,7 @@ def test_import_guidle(cfg_path, temporary_directory, xml):
     assert result.exit_code == 0
     assert "Events successfully imported" in result.output
     assert "Tags not in tagmap: \"Kulinarik\"!"
-    assert "(0 added, 4 updated, 0 deleted)" in result.output
+    assert "0 added, 4 updated, 0 deleted" in result.output
 
 
 def test_fetch(cfg_path, session_manager):
@@ -172,17 +172,17 @@ def test_fetch(cfg_path, session_manager):
         session_manager.set_current_schema(f'foo-{entity}')
         return session_manager.session()
 
-    for entity, title, meta, tags in (
-        ('bar', '1', {}, []),
-        ('bar', '2', {}, ['A']),
-        ('bar', '3', {}, ['A', 'B']),
-        ('bar', '4', {}, ['A', 'C']),
-        ('bar', '5', {}, ['C']),
-        ('bar', '6', {'source': 'xxx'}, []),
-        ('bar', '7', {'source': 'yyy'}, ['A', 'B']),
-        ('baz', 'a', {}, []),
-        ('baz', 'b', {}, ['A', 'C']),
-        ('baz', 'c', {'source': 'zzz'}, ['B', 'C']),
+    for entity, title, meta, tags, location in (
+        ('bar', '1', {}, [], ''),
+        ('bar', '2', {}, ['A'], None),
+        ('bar', '3', {}, ['A', 'B'], 'bar'),
+        ('bar', '4', {}, ['A', 'C'], '1234 Bar'),
+        ('bar', '5', {}, ['C'], 'there in 4321 baz!'),
+        ('bar', '6', {'source': 'xxx'}, [], 'bar'),
+        ('bar', '7', {'source': 'yyy'}, ['A', 'B'], None),
+        ('baz', 'a', {}, [], 'BAZ'),
+        ('baz', 'b', {}, ['A', 'C'], '4321 Baz'),
+        ('baz', 'c', {'source': 'zzz'}, ['B', 'C'], 'bar'),
     ):
         EventCollection(get_session(entity)).add(
             title=title,
@@ -190,6 +190,7 @@ def test_fetch(cfg_path, session_manager):
             end=datetime(2015, 6, 16, 18, 00),
             timezone='Europe/Zurich',
             tags=tags,
+            location=location,
             meta=meta
         )
     commit()
@@ -215,7 +216,7 @@ def test_fetch(cfg_path, session_manager):
         '--source', 'bar'
     ])
     assert result.exit_code == 0
-    assert "(5 added, 0 updated, 0 deleted)" in result.output
+    assert "5 added, 0 updated, 0 deleted" in result.output
 
     # Bar[B, C] -> Qux
     result = runner.invoke(cli, [
@@ -227,7 +228,7 @@ def test_fetch(cfg_path, session_manager):
         '--tag', 'B'
     ])
     assert result.exit_code == 0
-    assert "(0 added, 0 updated, 2 deleted)" in result.output
+    assert "0 added, 0 updated, 2 deleted" in result.output
 
     # Bar[C], Baz[C] -> Qux
     result = runner.invoke(cli, [
@@ -239,4 +240,28 @@ def test_fetch(cfg_path, session_manager):
         '--tag', 'C',
     ])
     assert result.exit_code == 0
-    assert "(2 added, 0 updated, 2 deleted)" in result.output
+    assert "2 added, 0 updated, 2 deleted" in result.output
+
+    # Baz['bar'] qux['bar'] -> Bar
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'fetch',
+        '--source', 'baz',
+        '--source', 'qux',
+        '--location', 'bar',
+    ])
+    assert result.exit_code == 0
+    assert "0 added, 0 updated, 0 deleted" in result.output
+
+    # Bar['baz'] -> Baz
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/baz',
+        'fetch',
+        '--source', 'qux',
+        '--source', 'bar',
+        '--location', 'baz',
+    ])
+    assert result.exit_code == 0
+    assert "1 added, 0 updated, 0 deleted" in result.output
