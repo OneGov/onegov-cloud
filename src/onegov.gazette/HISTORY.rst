@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.17.1 (2018-09-24)
+~~~~~~~~~~~~~~~~~~~~
 
 - Allows publishers to delete accepted notices.
   [msom]
