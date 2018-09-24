@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds filtering activites by occasions (now, future, past, without).
+  [href]
+
 1.4.3 (2018-09-22)
 ~~~~~~~~~~~~~~~~~~~
 

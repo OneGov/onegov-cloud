@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-09-22 11:13+0200\n"
+"POT-Creation-Date: 2018-09-24 16:14+0200\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1920,6 +1920,18 @@ msgstr "Un ticket a été ouvert"
 
 msgid "Clone"
 msgstr "Copier"
+
+msgid "Scheduled"
+msgstr "Prévu"
+
+msgid "Now"
+msgstr "Maintenant"
+
+msgid "Elapsed"
+msgstr "Écoulé"
+
+msgid "Without"
+msgstr "Sans"
 
 msgid "Reinstate"
 msgstr "Rétablir"

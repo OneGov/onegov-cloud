@@ -89,12 +89,35 @@ def view_activities(self, request):
 
     filters = {}
 
-    def link(text, active, url):
-        return Link(text=text, active=active, url=url, attrs={
+    def link(text, active, url, rounded=False):
+        return Link(text=text, active=active, url=url, rounded=rounded, attrs={
             'ic-get-from': url
         })
 
     if show_activities:
+        filters['timelines'] = [
+            link(
+                text=request.translate(_("Scheduled")),
+                active='future' in self.filter.timelines,
+                url=request.link(self.for_filter(timeline='future'))
+            ),
+            link(
+                text=request.translate(_("Now")),
+                active='now' in self.filter.timelines,
+                url=request.link(self.for_filter(timeline='now'))
+            ),
+            link(
+                text=request.translate(_("Elapsed")),
+                active='past' in self.filter.timelines,
+                url=request.link(self.for_filter(timeline='past'))
+            ),
+            link(
+                text=request.translate(_("Without")),
+                active='undated' in self.filter.timelines,
+                url=request.link(self.for_filter(timeline='undated'))
+            ),
+        ]
+
         filters['tags'] = [
             link(
                 text=request.translate(_(tag)),

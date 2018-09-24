@@ -79,6 +79,11 @@
             </div>
 
             <div class="columns medium-4 filter-panel" ic-target="#content" ic-push-url="true" ic-select-from-response="#content">
+                <div tal:condition="filters['timelines']|nothing" class="filter-timelines">
+                    <h2 class="filter-title" i18n:translate>Occasion</h2>
+                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['timelines']" />
+                </div>
+
                 <div tal:condition="filters['periods']|nothing" class="filter-periods">
                     <h2 class="filter-title" i18n:translate>Periods</h2>
                     <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['periods']" />
