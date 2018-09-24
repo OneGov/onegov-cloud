@@ -2344,3 +2344,65 @@ def test_activity_cost_filter(scenario):
     assert a.for_filter(price_range=(0, 100)).query().count() == 3
     assert a.for_filter(price_range=(100, 1000)).query().count() == 1
     assert a.for_filter(price_range=(101, 1000)).query().count() == 0
+
+
+def test_timeline_filter(scenario):
+    with freeze_time('2018-02-01'):
+        scenario.add_period(active=False)
+        scenario.add_activity(title="Winter")
+        scenario.add_occasion()
+
+    with freeze_time('2018-05-01'):
+        scenario.add_period(active=False)
+        scenario.add_activity(title="Spring")
+        scenario.add_occasion()
+
+    with freeze_time('2018-07-01'):
+        scenario.add_period(active=False)
+        scenario.add_activity(title="Summer")
+        scenario.add_occasion()
+
+    with freeze_time('2018-09-01'):
+        scenario.add_period(active=False)
+        scenario.add_activity(title="Autumn")
+
+    a = scenario.c.activities
+
+    with freeze_time('2018-01-01 23:30'):
+        assert a.for_filter(timeline='past').query().count() == 0
+        assert a.for_filter(timeline='now').query().count() == 0
+        assert a.for_filter(timeline='future').query().count() == 3
+        assert a.for_filter(timeline='undated').query().count() == 1
+
+    with freeze_time('2018-02-10 23:30'):
+        assert a.for_filter(timeline='past').query().count() == 0
+        assert a.for_filter(timeline='now').query().count() == 1
+        assert a.for_filter(timeline='future').query().count() == 2
+        assert a.for_filter(timeline='undated').query().count() == 1
+
+    with freeze_time('2018-04-01 23:30'):
+        assert a.for_filter(timeline='past').query().count() == 1
+        assert a.for_filter(timeline='future').query().count() == 2
+        assert a.for_filter(timeline='undated').query().count() == 1
+
+    with freeze_time('2018-05-10 22:30'):
+        assert a.for_filter(timeline='past').query().count() == 1
+        assert a.for_filter(timeline='now').query().count() == 1
+        assert a.for_filter(timeline='future').query().count() == 1
+        assert a.for_filter(timeline='undated').query().count() == 1
+
+    with freeze_time('2018-06-01 22:30'):
+        assert a.for_filter(timeline='past').query().count() == 2
+        assert a.for_filter(timeline='future').query().count() == 1
+        assert a.for_filter(timeline='undated').query().count() == 1
+
+    with freeze_time('2018-07-10 22:30'):
+        assert a.for_filter(timeline='past').query().count() == 2
+        assert a.for_filter(timeline='now').query().count() == 1
+        assert a.for_filter(timeline='future').query().count() == 0
+        assert a.for_filter(timeline='undated').query().count() == 1
+
+    with freeze_time('2018-08-01 22:30'):
+        assert a.for_filter(timeline='past').query().count() == 3
+        assert a.for_filter(timeline='future').query().count() == 0
+        assert a.for_filter(timeline='undated').query().count() == 1

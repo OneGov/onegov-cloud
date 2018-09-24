@@ -248,22 +248,23 @@ class Scenario(object):
             columns[key] = OccasionCollection.to_half_open_interval(
                 *columns[key])
 
-        self.occasions.append(self.add(model=Occasion, **columns))
-
         if not dates and (start and end):
             dates = ((start, end), )
 
         if not dates:
             period = self.latest_period
+            offset = sum(1 for o in self.occasions if o.period == period)
 
             dates = ((
                 datetime.combine(period.execution_start, time()) + timedelta(
-                    hours=len(self.occasions)
+                    hours=offset
                 ),
                 datetime.combine(period.execution_start, time()) + timedelta(
-                    hours=len(self.occasions) + 1
+                    hours=offset + 1
                 )
             ),)
+
+        self.occasions.append(self.add(model=Occasion, **columns))
 
         for start, end in dates:
             self.latest_occasion.dates.append(OccasionDate(

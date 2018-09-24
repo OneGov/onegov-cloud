@@ -2,7 +2,7 @@ import sedate
 
 from copy import copy
 from enum import IntEnum
-from onegov.activity.models import Activity, Occasion, Period
+from onegov.activity.models import Activity, Occasion, OccasionDate, Period
 from onegov.activity.utils import num_range_decode
 from onegov.activity.utils import num_range_encode
 from onegov.activity.utils import date_range_decode
@@ -14,10 +14,11 @@ from onegov.core.utils import increment_name
 from onegov.core.utils import is_uuid
 from onegov.core.utils import normalize_for_url
 from onegov.core.utils import toggle
+from sedate import utcnow
 from sqlalchemy import column
 from sqlalchemy import distinct
 from sqlalchemy import func
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, or_, not_
 from sqlalchemy import select
 from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import array
@@ -43,6 +44,7 @@ class ActivityFilter(object):
         'period_ids',
         'states',
         'tags',
+        'timelines',
         'weekdays',
     )
 
@@ -78,6 +80,7 @@ class ActivityFilter(object):
         toggled = copy(self)
 
         for key in self.__slots__:
+
             # support plural and singular
             if key.endswith('s'):
                 singular = self.singular.get(key, key[:-1])
@@ -226,7 +229,41 @@ class ActivityCollection(Pagination):
                 model_class.municipality.in_(self.filter.municipalities))
 
         # occasion based filters
-        o = self.session.query(Occasion).with_entities(Occasion.activity_id)
+        o = self.session.query(Occasion)\
+            .with_entities(Occasion.activity_id)\
+            .join(OccasionDate)\
+            .distinct()
+
+        # if we are looking at activities without occasions, we do not have
+        # to apply all the filters below which are occasion-based
+        if 'undated' in self.filter.timelines:
+            return query.filter(not_(model_class.id.in_(
+                self.session.query(
+                    distinct(Occasion.activity_id)
+                ).subquery()
+            )))
+
+        now = utcnow()
+
+        if self.filter.timelines:
+            conditions = []
+
+            if 'past' in self.filter.timelines:
+                conditions.append(OccasionDate.end < now)
+
+            if 'now' in self.filter.timelines:
+                conditions.append(and_(
+                    OccasionDate.start <= now, now <= OccasionDate.end
+                ))
+
+            if 'future' in self.filter.timelines:
+                conditions.append(now < OccasionDate.start)
+
+            # the 'undated' option can only be implemented further down
+            # when we apply the occasion conditions to the activites query
+            # since we'd be looking for activities without occasions
+            if conditions:
+                o = o.filter(or_(*conditions))
 
         if self.filter.period_ids:
             o = o.filter(Occasion.period_id.in_(self.filter.period_ids))
