@@ -101,6 +101,7 @@ def view_notice(self, request):
         if admin:
             actions.append(action['edit_un'])
             actions.append(action['attachments'])
+        if publisher:
             actions.append(action['delete'])
     elif self.state == 'imported':
         if publisher:
@@ -316,24 +317,26 @@ def edit_notice_unrestricted(self, request, form):
 def delete_notice(self, request, form):
     """ Delete a notice.
 
-    Only drafted or rejected notices may be deleted (usually by editors).
-    Editors may only delete their own notices, publishers may delete any
-    notice.
+    Editors may only delete their own drafted and rejected notices.
 
-    It is possible for admins to delete submitted and accepted notices too.
+    Publishers may delete any drafted, rejected and accepted notices.
+
+    Admins may delete any drafted, submitted, rejected and accepted notices.
 
     """
     layout = Layout(self, request)
-    is_admin = request.is_secret(self)
+    is_secret = request.is_secret(self)
+    is_private = request.is_private(self)
 
-    if not request.is_private(self):
+    if not is_private:
         user_ids, group_ids = get_user_and_group(request)
         if not ((self.group_id in group_ids) or (self.user_id in user_ids)):
             raise HTTPForbidden()
 
     if (
-        self.state == 'published' or
-        (self.state in ('submitted', 'accepted') and not is_admin)
+        (self.state == 'submitted' and not is_secret) or
+        (self.state == 'accepted' and not is_private) or
+        (self.state == 'published')
     ):
         request.message(
             _(

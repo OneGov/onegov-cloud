@@ -214,10 +214,10 @@ def test_view_notice_actions(gazette_app):
             (admin, 'titel-2', 'ptedc'),
             (admin, 'titel-3', 'ptedc'),
             (admin, 'titel-4', 'ptedc'),
-            (publisher, 'titel-1', 'pc'),
-            (publisher, 'titel-2', 'pc'),
-            (publisher, 'titel-3', 'pc'),
-            (publisher, 'titel-4', 'pc'),
+            (publisher, 'titel-1', 'pdc'),
+            (publisher, 'titel-2', 'pdc'),
+            (publisher, 'titel-3', 'pdc'),
+            (publisher, 'titel-4', 'pdc'),
             (editor_1, 'titel-1', 'pc'),
             (editor_1, 'titel-2', 'pc'),
             (editor_1, 'titel-3', 'pc'),
@@ -394,27 +394,26 @@ def test_view_notice_delete(gazette_app):
             assert "Meldung gelöscht." in manage
 
         # delete an accepted notice
-        for user in (editor_1, publisher):
-            manage = editor_1.get('/notices/drafted/new-notice')
-            manage.form['title'] = "Erneuerungswahlen"
-            manage.form['organization'] = '200'
-            manage.form['category'] = '11'
-            manage.form['issues'] = ['2017-44', '2017-45']
-            manage.form['text'] = "1. Oktober 2017"
-            manage.form['author_place'] = 'Govikon'
-            manage.form['author_name'] = 'State Chancellerist'
-            manage.form['author_date'] = '2019-01-01'
-            manage.form.submit()
+        manage = editor_1.get('/notices/drafted/new-notice')
+        manage.form['title'] = "Erneuerungswahlen"
+        manage.form['organization'] = '200'
+        manage.form['category'] = '11'
+        manage.form['issues'] = ['2017-44', '2017-45']
+        manage.form['text'] = "1. Oktober 2017"
+        manage.form['author_place'] = 'Govikon'
+        manage.form['author_name'] = 'State Chancellerist'
+        manage.form['author_date'] = '2019-01-01'
+        manage.form.submit()
 
-            submit_notice(editor_1, 'erneuerungswahlen')
-            accept_notice(publisher, 'erneuerungswahlen')
+        submit_notice(editor_1, 'erneuerungswahlen')
+        accept_notice(publisher, 'erneuerungswahlen')
 
-            manage = user.get('/notice/erneuerungswahlen/delete')
-            assert manage.forms == {}
+        manage = editor_1.get('/notice/erneuerungswahlen/delete')
+        assert manage.forms == {}
 
-            manage = admin.get('/notice/erneuerungswahlen/delete')
-            assert "Diese Meldung wurde bereits angenommen!" in manage
-            manage.form.submit().maybe_follow()
+        manage = publisher.get('/notice/erneuerungswahlen/delete')
+        assert "Diese Meldung wurde bereits angenommen!" in manage
+        manage.form.submit().maybe_follow()
 
         # delete a published notice
         manage = editor_1.get('/notices/drafted/new-notice')
