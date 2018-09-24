@@ -4,6 +4,15 @@ Changelog
 - Adds an occurrences JSON view for seantis.dir.eventsportlet.
   [msom]
 
+- Hides imported events rather than deleting them.
+  [msom]
+
+- Avoids editing imported events.
+  [msom]
+
+- Shows if an event is an imported event.
+  [msom]
+
 0.35.3 (2018-09-22)
 ~~~~~~~~~~~~~~~~~~~
 

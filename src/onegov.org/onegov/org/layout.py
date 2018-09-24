@@ -1313,6 +1313,38 @@ class OccurrenceLayout(EventBaseLayout):
     @cached_property
     def editbar_links(self):
         if self.request.is_manager:
+            if self.model.event.source:
+                return [
+                    Link(
+                        text=_("Edit"),
+                        attrs={'class': 'edit-link'},
+                        traits=(
+                            Block(
+                                _("This event can't be editet."),
+                                _("Imported events can not be editet.")
+                            )
+                        )
+                    ),
+                    Link(
+                        text=_("Delete"),
+                        url=self.csrf_protected_url(
+                            self.request.link(self.model.event, 'withdraw'),
+                        ),
+                        attrs={'class': 'delete-link'},
+                        traits=(
+                            Confirm(
+                                _("Do you really want to delete this event?"),
+                                _("This cannot be undone."),
+                                _("Delete event")
+                            ),
+                            Intercooler(
+                                request_method='POST',
+                                redirect_after=self.events_url
+                            ),
+                        )
+                    )
+                ]
+
             edit_link = Link(
                 text=_("Edit"),
                 url=self.request.return_to(
@@ -1372,6 +1404,38 @@ class EventLayout(EventBaseLayout):
     @cached_property
     def editbar_links(self):
         if self.request.is_manager:
+            if self.model.source:
+                return [
+                    Link(
+                        text=_("Edit"),
+                        attrs={'class': 'edit-link'},
+                        traits=(
+                            Block(
+                                _("This event can't be editet."),
+                                _("Imported events can not be editet.")
+                            )
+                        )
+                    ),
+                    Link(
+                        text=_("Delete"),
+                        url=self.csrf_protected_url(
+                            self.request.link(self.model, 'withdraw'),
+                        ),
+                        attrs={'class': 'delete-link'},
+                        traits=(
+                            Confirm(
+                                _("Do you really want to delete this event?"),
+                                _("This cannot be undone."),
+                                _("Delete event")
+                            ),
+                            Intercooler(
+                                request_method='POST',
+                                redirect_after=self.events_url
+                            ),
+                        )
+                    )
+                ]
+
             edit_link = Link(
                 text=_("Edit"),
                 url=self.request.link(self.model, 'edit'),

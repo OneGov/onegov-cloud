@@ -34,6 +34,12 @@
                     tal:condition="request.is_manager and ticket"
                 />
 
+                <tal:b condition="occurrence.event.source and request.is_manager|nothing">
+                    <div class="panel callout">
+                        <p><tal:b i18n:translate>This is an imported event</tal:b> (<span>${occurrence.event.source}</span>).</p>
+                    </div>
+                </tal:b>
+
                 <div class="occurrence-exports">
                     <h2>
                         <a href="${request.link(occurrence, name='ical')}">

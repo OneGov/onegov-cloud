@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-09-15 09:02+0200\n"
-"PO-Revision-Date: 2018-09-15 09:03+0200\n"
+"POT-Creation-Date: 2018-09-24 12:20+0200\n"
+"PO-Revision-Date: 2018-09-24 12:21+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -335,6 +335,12 @@ msgstr "Möchten Sie diese Reservations-Ressource wirklich löschen?"
 
 msgid "Delete resource"
 msgstr "Reservations-Ressource löschen"
+
+msgid "This event can't be editet."
+msgstr "Diese Veranstaltung kann nicht bearbeitet werden."
+
+msgid "Imported events can not be editet."
+msgstr "Importierte Veranstaltungen können nicht bearbeitet werden."
 
 msgid "Do you really want to delete this event?"
 msgstr "Möchten Sie die Veranstaltung wirklich löschen?"
@@ -2173,6 +2179,9 @@ msgstr ""
 "Es tut uns leid, aber die Seite nach der Sie suchen konnte nicht gefunden "
 "werden. Bitte überprüfen Sie die Internetadresse oder verwenden Sie die "
 "Suche im Navigationsbereich."
+
+msgid "This is an imported event"
+msgstr "Dies ist eine importierte Veranstaltung"
 
 msgid "Export this event"
 msgstr "Diesen Termin exportieren"

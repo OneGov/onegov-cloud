@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-09-15 09:02+0200\n"
-"PO-Revision-Date: 2018-09-15 09:03+0200\n"
+"POT-Creation-Date: 2018-09-24 12:20+0200\n"
+"PO-Revision-Date: 2018-09-24 12:21+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
 "Language: fr_CH\n"
@@ -334,6 +334,12 @@ msgstr "Voulez-vous vraiment supprimer cette ressource ?"
 
 msgid "Delete resource"
 msgstr "Supprimer la ressource"
+
+msgid "This event can't be editet."
+msgstr "Cet événement ne peut pas être édité."
+
+msgid "Imported events can not be editet."
+msgstr "Les événements importés ne peuvent pas être édités."
 
 msgid "Do you really want to delete this event?"
 msgstr "Voulez-vous vraiment supprimer cet événement ?"
@@ -2178,6 +2184,9 @@ msgstr ""
 "Désolé, la page que vous cherchez n'a pu être trouvée. Essayez de vérifier "
 "qu'il n'y a pas d'erreurs dans l'URL ou utilisez la fenêtre de recherche "
 "située en haut."
+
+msgid "This is an imported event"
+msgstr "Il s'agit d'un événement importé"
 
 msgid "Export this event"
 msgstr "Exporter cet événement"

@@ -48,7 +48,11 @@ def assert_anonymous_access_only_temporary(request, event):
         raise exc.HTTPForbidden()
 
 
-@OrgApp.view(model=Event, name='publish', permission=Private)
+@OrgApp.view(
+    model=Event,
+    name='publish',
+    permission=Private
+)
 def publish_event(self, request):
     """ Publish an event. """
 
@@ -79,8 +83,13 @@ def publish_event(self, request):
     return request.redirect(request.link(self))
 
 
-@OrgApp.form(model=OccurrenceCollection, name='new', template='form.pt',
-             form=EventForm, permission=Public)
+@OrgApp.form(
+    model=OccurrenceCollection,
+    name='new',
+    template='form.pt',
+    form=EventForm,
+    permission=Public
+)
 def handle_new_event(self, request, form):
     """ Add a new event.
 
@@ -132,10 +141,18 @@ def handle_new_event(self, request, form):
     }
 
 
-@OrgApp.html(model=Event, template='event.pt', permission=Public,
-             request_method='GET')
-@OrgApp.html(model=Event, template='event.pt', permission=Public,
-             request_method='POST')
+@OrgApp.html(
+    model=Event,
+    template='event.pt',
+    permission=Public,
+    request_method='GET'
+)
+@OrgApp.html(
+    model=Event,
+    template='event.pt',
+    permission=Public,
+    request_method='POST'
+)
 def view_event(self, request):
     """ View an event.
 
@@ -189,8 +206,13 @@ def view_event(self, request):
     }
 
 
-@OrgApp.form(model=Event, name='edit', template='form.pt',
-             permission=Public, form=EventForm)
+@OrgApp.form(
+    model=Event,
+    name='edit',
+    template='form.pt',
+    permission=Public,
+    form=EventForm
+)
 def handle_edit_event(self, request, form):
     """ Edit an event.
 
@@ -221,7 +243,28 @@ def handle_edit_event(self, request, form):
     }
 
 
-@OrgApp.view(model=Event, request_method='DELETE', permission=Private)
+@OrgApp.view(
+    model=Event,
+    name='withdraw',
+    request_method='POST',
+    permission=Private
+)
+def handle_withdraw_event(self, request):
+    """ Withdraws an (imported) event. """
+
+    request.assert_valid_csrf_token()
+
+    if not self.source:
+        raise exc.HTTPForbidden()
+
+    self.withdraw()
+
+
+@OrgApp.view(
+    model=Event,
+    request_method='DELETE',
+    permission=Private
+)
 def handle_delete_event(self, request):
     """ Delete an event. """
 
@@ -252,7 +295,11 @@ def handle_delete_event(self, request):
     EventCollection(request.session).delete(self)
 
 
-@OrgApp.view(model=Event, name='ical', permission=Public)
+@OrgApp.view(
+    model=Event,
+    name='ical',
+    permission=Public
+)
 def ical_export_event(self, request):
     """ Returns the event with all occurrences as ics. """
 
@@ -268,7 +315,11 @@ def ical_export_event(self, request):
     )
 
 
-@OrgApp.view(model=Event, permission=Public, name='latest')
+@OrgApp.view(
+    model=Event,
+    name='latest',
+    permission=Public
+)
 def view_latest_event(self, request):
     """ Redirects to the latest occurrence of an event that is, either the
     next future event or the last event in the past if there are no more
