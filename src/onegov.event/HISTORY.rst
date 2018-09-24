@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Avoids indexing withdrawn events.
+  [msom]
+
 0.8.0 (2018-09-24)
 ~~~~~~~~~~~~~~~~~~~
 

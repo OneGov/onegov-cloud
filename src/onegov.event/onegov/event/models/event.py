@@ -89,7 +89,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
 
     @property
     def es_skip(self):
-        return self.state == 'submitted'
+        return self.state == 'submitted' or self.state == 'withdrawn'
 
     def __setattr__(self, name, value):
         """ Automatically update the occurrences if shared attributes change.
