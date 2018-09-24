@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a source property to events.
+  [msom]
+
 0.8.1 (2018-09-24)
 ~~~~~~~~~~~~~~~~~~~
 

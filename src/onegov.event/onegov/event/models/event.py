@@ -6,6 +6,7 @@ from icalendar import vRecur
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.event.models.mixins import OccurrenceMixin
@@ -57,6 +58,9 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
 
     #: the event organizer
     organizer = content_property()
+
+    #: the source of the event, if imported
+    source = meta_property()
 
     #: Recurrence of the event (RRULE, see RFC2445)
     recurrence = Column(Text, nullable=True)

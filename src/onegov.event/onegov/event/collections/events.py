@@ -147,7 +147,7 @@ class EventCollection(Pagination):
 
         """
 
-        sources = set((event.meta['source'] for event in events))
+        sources = set((event.source for event in events))
         assert all(sources) and (len(sources) == len(events))
 
         if purge:
@@ -281,7 +281,7 @@ class EventCollection(Pagination):
                     location=location,
                     coordinates=coordinates,
                     tags=tags or [],
-                    meta={'source': f'ical-{uid}'},
+                    source=f'ical-{uid}',
                 )
             )
 

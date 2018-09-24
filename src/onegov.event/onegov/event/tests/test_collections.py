@@ -565,7 +565,7 @@ def test_from_import(session):
             organizer='Organizer A',
             recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5',
             coordinates=Coordinates(48.051752750515746, 9.305739625357093),
-            meta={'source': 'import-1-A'}
+            source='import-1-A'
         ),
         Event(
             state='initiated',
@@ -579,7 +579,7 @@ def test_from_import(session):
             organizer='Organizer B',
             recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5',
             coordinates=Coordinates(48.051752750515746, 9.305739625357093),
-            meta={'source': 'import-1-B'}
+            source='import-1-B'
         ),
     ]) == (2, 0, 0)
 
@@ -596,7 +596,7 @@ def test_from_import(session):
             organizer='Organizer C',
             recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5',
             coordinates=Coordinates(48.051752750515746, 9.305739625357093),
-            meta={'source': 'import-2-C'}
+            source='import-2-C'
         )
     ]) == (1, 0, 0)
 
@@ -614,7 +614,7 @@ def test_from_import(session):
             organizer='Organizer C',
             recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5',
             coordinates=Coordinates(48.051752750515746, 9.305739625357093),
-            meta={'source': 'import-2-C'}
+            source='import-2-C'
         )
     ]) == (0, 0, 0)
 
@@ -632,7 +632,7 @@ def test_from_import(session):
             organizer='Organizer A',
             recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5',
             coordinates=Coordinates(48.051752750515746, 9.305739625357093),
-            meta={'source': 'import-1-A'}
+            source='import-1-A'
         ),
     ], 'import-1') == (0, 1, 1)
     assert events.subset_count == 2
@@ -652,7 +652,7 @@ def test_from_import(session):
             organizer='Organizer C',
             recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5',
             coordinates=Coordinates(48.051752750515746, 9.305739625357093),
-            meta={'source': 'import-2-C'}
+            source='import-2-C'
         )
     ]) == (0, 0, 0)
     assert events.by_name('title-c').state == 'withdrawn'

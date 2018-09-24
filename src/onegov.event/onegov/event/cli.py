@@ -216,7 +216,7 @@ def import_guidle(group_context, url, tagmap):
                             location=offer.location,
                             coordinates=offer.coordinates,
                             tags=tags,
-                            meta={'source': f'{prefix}-{offer.uid}.{index}'},
+                            source=f'{prefix}-{offer.uid}.{index}',
                         )
                     )
                 # todo: handle attachements
@@ -283,7 +283,12 @@ def fetch(group_context, source, tag, location):
                 assert remote_session.info['schema'] == schema
 
                 query = remote_session.query(Event)
-                query = query.filter(Event.meta['source'].is_(None))
+                query = query.filter(
+                    or_(
+                        Event.meta['source'].astext.is_(None),
+                        Event.meta['source'].astext == ''
+                    )
+                )
                 if tag:
                     query = query.filter(Event._tags.has_any(array(tag)))
                 if location:
@@ -304,7 +309,7 @@ def fetch(group_context, source, tag, location):
                         content=event.content,
                         location=event.location,
                         tags=event.tags,
-                        meta={'source': f'fetch-{key}-{event.name}'},
+                        source=f'fetch-{key}-{event.name}',
                         coordinates=event.coordinates,
                     ) for event in query
                 ]

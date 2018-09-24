@@ -89,6 +89,7 @@ def test_create_event(session):
     assert event.description == description
     assert event.content == {'description': description}
     assert event.meta == {'submitter': 'fat.pauly@squirrelpark.org'}
+    assert event.source is None
     assert event.name == 'event'
 
     occurrence = session.query(Occurrence).one()

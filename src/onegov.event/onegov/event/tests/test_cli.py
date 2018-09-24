@@ -172,17 +172,17 @@ def test_fetch(cfg_path, session_manager):
         session_manager.set_current_schema(f'foo-{entity}')
         return session_manager.session()
 
-    for entity, title, meta, tags, location in (
-        ('bar', '1', {}, [], ''),
-        ('bar', '2', {}, ['A'], None),
-        ('bar', '3', {}, ['A', 'B'], 'bar'),
-        ('bar', '4', {}, ['A', 'C'], '1234 Bar'),
-        ('bar', '5', {}, ['C'], 'there in 4321 baz!'),
-        ('bar', '6', {'source': 'xxx'}, [], 'bar'),
-        ('bar', '7', {'source': 'yyy'}, ['A', 'B'], None),
-        ('baz', 'a', {}, [], 'BAZ'),
-        ('baz', 'b', {}, ['A', 'C'], '4321 Baz'),
-        ('baz', 'c', {'source': 'zzz'}, ['B', 'C'], 'bar'),
+    for entity, title, source, tags, location in (
+        ('bar', '1', None, [], ''),
+        ('bar', '2', None, ['A'], None),
+        ('bar', '3', None, ['A', 'B'], 'bar'),
+        ('bar', '4', None, ['A', 'C'], '1234 Bar'),
+        ('bar', '5', None, ['C'], 'there in 4321 baz!'),
+        ('bar', '6', 'xxx', [], 'bar'),
+        ('bar', '7', 'yyy', ['A', 'B'], None),
+        ('baz', 'a', None, [], 'BAZ'),
+        ('baz', 'b', None, ['A', 'C'], '4321 Baz'),
+        ('baz', 'c', 'zzz', ['B', 'C'], 'bar'),
     ):
         EventCollection(get_session(entity)).add(
             title=title,
@@ -191,7 +191,7 @@ def test_fetch(cfg_path, session_manager):
             timezone='Europe/Zurich',
             tags=tags,
             location=location,
-            meta=meta
+            source=source
         )
     commit()
 
