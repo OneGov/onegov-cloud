@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds an occurrences JSON view for seantis.dir.eventsportlet.
+  [msom]
+
 0.35.3 (2018-09-22)
 ~~~~~~~~~~~~~~~~~~~
 

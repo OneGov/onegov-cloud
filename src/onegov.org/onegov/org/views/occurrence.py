@@ -12,6 +12,8 @@ from onegov.org.forms import ExportForm
 from onegov.org.layout import OccurrenceLayout, OccurrencesLayout
 from onegov.ticket import TicketCollection
 from sedate import as_datetime, replace_timezone
+from sqlalchemy import or_
+from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.orm import joinedload
 
 
@@ -50,7 +52,7 @@ def view_occurrences(self, request):
 
 
 @OrgApp.html(model=Occurrence, template='occurrence.pt', permission=Public)
-def view_get_occurrence(self, request):
+def view_occurrence(self, request):
     """ View a single occurrence of an event. """
 
     layout = OccurrenceLayout(self, request)
@@ -96,7 +98,7 @@ def ical_export_occurences(self, request):
 
 @OrgApp.form(model=OccurrenceCollection, name='export', permission=Private,
              form=ExportForm, template='export.pt')
-def view_export(self, request, form):
+def export_occurrences(self, request, form):
     """ Export the occurrences in various formats. """
 
     layout = OccurrencesLayout(self, request)
@@ -147,4 +149,44 @@ def run_export(request, formatter):
         OrderedDict(
             (attr, formatter(get(occasion, attr))) for attr in attributes)
         for occasion in query.all()
+    ]
+
+
+@OrgApp.json(model=OccurrenceCollection, name='json', permission=Public)
+def json_export_occurences(self, request):
+    """ Returns the occurrences as JSON.
+
+    This is used for the senantis.dir.eventsportlet.
+
+    """
+
+    @request.after
+    def cors(response):
+        response.headers.add('Access-Control-Allow-Origin', '*')
+
+    query = self.query()
+
+    tags = request.params.getall('cat1')
+    if tags:
+        query = query.filter(Occurrence._tags.has_any(array(tags)))
+
+    locations = request.params.getall('cat2')
+    if locations:
+        query = query.filter(
+            or_(*[
+                Occurrence.location.ilike(f'%{location}%')
+                for location in locations
+            ])
+        )
+
+    limit = request.params.get('max')
+    if limit and limit.isdigit():
+        query = query.limit(int(limit))
+
+    return [
+        {
+            'start': occurrence.start.isoformat(),
+            'title': occurrence.title,
+            'url': request.link(occurrence),
+        } for occurrence in query
     ]

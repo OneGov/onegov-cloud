@@ -2152,49 +2152,62 @@ def test_cleanup_allocations(client):
 def test_view_occurrences(client):
 
     def events(query=''):
-        page = client.get('/events/?{}'.format(query))
+        page = client.get(f'/events/?{query}')
         return [event.text for event in page.pyquery('h3 a')]
 
     def total_events(query=''):
-        page = client.get('/events/?{}'.format(query))
+        page = client.get(f'/events/?{query}')
         return int(page.pyquery('.date-range-selector-result span')[0].text)
 
     def dates(query=''):
-        page = client.get('/events/?{}'.format(query))
+        page = client.get(f'/events/?{query}')
         return [datetime.strptime(div.text, '%d.%m.%Y').date() for div
                 in page.pyquery('.occurrence-date')]
 
     def tags(query=''):
-        page = client.get('/events/?{}'.format(query))
+        page = client.get(f'/events/?{query}')
         tags = [tag.text.strip() for tag in page.pyquery('.blank-label')]
         return list(set([tag for tag in tags if tag]))
+
+    def as_json(query=''):
+        return client.get(f'/events/json?{query}').json
 
     assert total_events() == 12
     assert len(events()) == 10
     assert total_events('page=1') == 12
     assert len(events('page=1')) == 2
     assert dates() == sorted(dates())
+    assert len(as_json()) == 12
+    assert len(as_json('max=3')) == 3
 
     query = 'tags=Party'
     assert tags(query) == ["Party"]
     assert total_events(query) == 1
     assert events(query) == ["150 Jahre Govikon"]
+    assert len(as_json('cat1=Party')) == 1
+    assert len(as_json('cat1=Party&cat2=Sportanlage')) == 1
 
     query = 'tags=Politics'
     assert tags(query) == ["Politik"]
     assert total_events(query) == 1
     assert events(query) == ["Generalversammlung"]
+    assert len(as_json('cat1=Politics')) == 1
+    assert len(as_json('cat2=Saal')) == 1
 
     query = 'tags=Sports'
     assert tags(query) == ["Sport"]
     assert total_events(query) == 10
     assert set(events(query)) == set(["Gemeinsames Turnen", "Fussballturnier"])
+    assert len(as_json('cat1=Sports')) == 10
+    assert len(as_json('cat2=Turnhalle&cat2=Sportanlage')) == 11
 
     query = 'tags=Politics&tags=Party'
     assert sorted(tags(query)) == ["Party", "Politik"]
     assert total_events(query) == 2
     assert set(events(query)) == set(["150 Jahre Govikon",
                                       "Generalversammlung"])
+    assert len(as_json('cat1=Politics&cat1=Party')) == 2
+    assert len(as_json('max=1&cat1=Politics&cat1=Party')) == 1
 
     unique_dates = sorted(set(dates()))
 
