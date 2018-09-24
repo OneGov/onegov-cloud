@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.8.0 (2018-09-24)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a location parameter to the fetch command.
   [msom]
