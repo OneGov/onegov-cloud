@@ -14,7 +14,6 @@ def test_content_type_from_fileobj():
             return content_type_from_fileobj(f)
 
     assert content_type('example.pdf') == 'application/pdf'
-    assert content_type('example.doc') == 'application/CDFV2'
     assert content_type('example.docx') == (
         'application/vnd.openxmlformats-'
         'officedocument.wordprocessingml.document'
