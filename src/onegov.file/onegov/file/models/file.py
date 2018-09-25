@@ -1,3 +1,5 @@
+import json
+
 from depot.fields.sqlalchemy import UploadedFileField as UploadedFileFieldBase
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
@@ -8,7 +10,11 @@ from onegov.core.utils import normalize_for_url
 from onegov.file.attachments import ProcessedUploadedFile
 from onegov.file.filters import OnlyIfImage, WithThumbnailFilter
 from onegov.file.filters import OnlyIfPDF, WithPDFThumbnailFilter
+from pathlib import Path
 from sqlalchemy import Boolean, Column, Index, Text
+from sqlalchemy import event
+from sqlalchemy.orm import object_session, Session
+from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy_utils import observes
 
 
@@ -150,3 +156,50 @@ class File(Base, Associable, TimestampMixin):
             return None
 
         return self.reference[name]['id']
+
+    def _update_metadata(self, **options):
+        """ Updates the underlying metadata with the give values. This
+        operats on low-level interfaces of Depot and assumes local storage.
+
+        You should have a good reason for using this.
+
+        """
+        assert set(options.keys()).issubset({'content_type', 'filename'})
+
+        path = Path(self.reference.file._metadata_path)
+
+        # store the pending metadata on the session to commit them later
+        session = object_session(self)
+
+        if 'pending_metadata_changes' not in session.info:
+            session.info['pending_metadata_changes'] = []
+
+        # only support upating existing values - do not create new ones
+        for key, value in options.items():
+            session.info['pending_metadata_changes'].append((path, key, value))
+
+        # make sure we cause a commit here
+        flag_modified(self, 'reference')
+
+
+@event.listens_for(Session, 'after_commit')
+def update_metadata_after_commit(session):
+    if 'pending_metadata_changes' not in session.info:
+        return
+
+    for path, key, value in session.info['pending_metadata_changes']:
+        with open(path, 'r') as f:
+            metadata = json.loads(f.read())
+
+        metadata[key] = value
+
+        with open(path, 'w') as f:
+            f.write(json.dumps(metadata))
+
+    del session.info['pending_metadata_changes']
+
+
+@event.listens_for(Session, 'after_soft_rollback')
+def discard_metadata_on_rollback(session):
+    if 'pending_metadata_changes' in session.info:
+        del session.info['pending_metadata_changes']

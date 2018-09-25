@@ -1,42 +1,23 @@
 import magic
-import mimetypes
-import os.path
 
+from contextlib import suppress
 from depot.io.utils import FileIntent
-from io import IOBase, BytesIO
+from io import IOBase, BytesIO, UnsupportedOperation
 from lxml import etree
 from PIL import Image
 
 
-def path_from_fileobj(fileobj):
-    if getattr(fileobj, 'filename', None) is not None:
-        return fileobj.filename
-    elif getattr(fileobj, 'name', None) is not None:
-        if isinstance(fileobj.name, str):
-            return os.path.basename(fileobj.name)
-
-
 def content_type_from_fileobj(fileobj):
     """ Gets the content type from a file obj. Depot has this as well, but it
-    doesn't use python-magic as a fallback, so it's less accurate, but faster.
-
-    We however want to be as accurate as possible.
+    doesn't use python-magic. We use python-magic to be slower, but more
+    accurate.
 
     """
 
-    path = path_from_fileobj(fileobj)
-    content_type = path and mimetypes.guess_type(path)[0] or None
-
-    if not content_type:
-
-        if path:
-            content_type = magic.from_file(path, mime=True)
-        else:
-            content_type = magic.from_buffer(fileobj.read(1024), mime=True)
-
+    with suppress(UnsupportedOperation):
         fileobj.seek(0)
 
-    return content_type
+    return magic.from_buffer(fileobj.read(4096), mime=True)
 
 
 def as_fileintent(content, filename):

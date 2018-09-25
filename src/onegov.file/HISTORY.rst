@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Fixes renames having no effect on the served response.
+  [href]
+
+- Fixes word documents being served with the wrong MIME-type.
+  [href]
+
 - Adds a 'signed' property to the file model.
   [href]
 

@@ -9,11 +9,11 @@ from copy import copy
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task
 from onegov.core.utils import normalize_for_url
-from onegov.file import FileCollection
+from onegov.file import File, FileCollection
 from onegov.file.attachments import get_svg_size_or_default
 from onegov.file.filters import WithPDFThumbnailFilter
 from onegov.file.integration import DepotApp
-from onegov.file.utils import get_image_size
+from onegov.file.utils import get_image_size, content_type_from_fileobj
 from PIL import Image
 from sqlalchemy import Boolean, Column, Text, text
 from sqlalchemy.orm.attributes import flag_modified
@@ -158,3 +158,17 @@ def add_signed_property(context):
         table='files',
         column=Column('signed', Boolean, nullable=False),
         default=False)
+
+
+@upgrade_task('Reclassify office documents')
+def reclassify_office_documents(context):
+    if not isinstance(context.app, DepotApp):
+        return False
+
+    files = FileCollection(context.session).query()
+
+    for f in files.filter(File.name.op('~*')(r'^.*\.(docx|xlsx|pptx)$')):
+        content_type = content_type_from_fileobj(f.reference.file)
+        assert 'application/vnd.openxmlformats' in content_type
+
+        f._update_metadata(content_type=content_type)

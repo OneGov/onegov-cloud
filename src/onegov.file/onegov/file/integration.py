@@ -301,6 +301,7 @@ def handle_note_update(self, request):
 def handle_rename(self, request):
     request.assert_valid_csrf_token()
     self.name = request.POST.get('name')
+    self._update_metadata(filename=self.name)
 
     # when updating the name we offer the option not to update the
     # modified date, which is helpful if the files are in modified order

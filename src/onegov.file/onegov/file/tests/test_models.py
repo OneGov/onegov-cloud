@@ -240,3 +240,30 @@ def test_associated_files(session):
     session.flush()
 
     assert session.query(File).count() == 0
+
+
+def test_update_metadata(session):
+    # note that the name is only stored on the database, not the metadata
+    session.add(File(name='readme.txt', reference=b'README'))
+    transaction.commit()
+
+    def get_file():
+        return session.query(File).one()
+
+    assert get_file().reference.file.filename == 'unnamed'
+
+    get_file()._update_metadata(filename='foobar.txt')
+    transaction.abort()
+
+    assert get_file().reference.file.filename == 'unnamed'
+
+    get_file()._update_metadata(filename='foobar.txt')
+    transaction.commit()
+
+    assert get_file().reference.file.filename == 'foobar.txt'
+
+    get_file()._update_metadata(filename='foo.txt')
+    get_file()._update_metadata(filename='bar.txt')
+    transaction.commit()
+
+    assert get_file().reference.file.filename == 'bar.txt'
