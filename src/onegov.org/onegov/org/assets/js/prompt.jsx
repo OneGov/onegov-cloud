@@ -79,12 +79,12 @@ var showPrompt = function(options) {
     });
 
     prompt_el.find('a.ok').click(function() {
-        options.success(prompt.state.value.trim());
+        options.success.call(options.target, prompt.state.value.trim());
         prompt_el.foundation('reveal', 'close');
     });
 
     prompt_el.find('input, a.ok').enter(function() {
-        options.success(prompt.state.value.trim());
+        options.success.call(options.target, prompt.state.value.trim());
         prompt_el.foundation('reveal', 'close');
     });
 
@@ -103,7 +103,8 @@ jQuery.fn.prompt = function() {
             ok: $(this).data('prompt-ok'),
             cancel: $(this).data('prompt-cancel'),
             value: $(this).data('prompt-value'),
-            success: eval($(this).data('prompt-success'))
+            success: eval($(this).data('prompt-success')),
+            target: $(this)
         });
     });
 };

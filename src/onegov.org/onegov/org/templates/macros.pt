@@ -1299,10 +1299,12 @@
                 data-prompt-success="(function(value) {
                     var url = '${request.link(file, 'rename')}?csrf-token=${layout.csrf_token}';
                     var ext = '.${file.name.split('.')[-1].strip()}';
+                    var elt = $(this);
+
                     value = value.substring(value.length - ext.length, value.length) === ext && value || value + ext;
 
                     jQuery.post(url, {'name': value}, function() {
-                        var actions = $(elt);
+                        var actions = elt;
 
                         actions.closest('tr').prev().find('td:first').text(value);
                         actions.find('a.prompt').data('prompt-value', value);
