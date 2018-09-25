@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.6.9 (2018-09-25)
+~~~~~~~~~~~~~~~~~~~
 
 - Updates the WabstiCExport (majorz, vote) import to the latest version.
   [msom]
