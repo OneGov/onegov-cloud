@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.36.1 (2018-09-25)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes file rename not working.
   [href]
 
