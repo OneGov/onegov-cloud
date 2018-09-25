@@ -92,7 +92,6 @@ def test_import_wabstic_majorz_missing_headers(session):
                 ','.join((
                     'SortWahlkreis',
                     'SortGeschaeft',
-                    'SortGemeindeSub',
                     'Stimmberechtigte',
                 )),
             ))
@@ -100,8 +99,7 @@ def test_import_wabstic_majorz_missing_headers(session):
         BytesIO((
             '\n'.join((
                 ','.join((
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'Stimmberechtigte',
                     'StmAbgegeben',
                     'StmLeer',
@@ -125,8 +123,7 @@ def test_import_wabstic_majorz_missing_headers(session):
             '\n'.join((
                 ','.join((
                     'SortGeschaeft',
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'KNR',
                 )),
             ))
@@ -134,7 +131,7 @@ def test_import_wabstic_majorz_missing_headers(session):
     )
     assert [(e.filename, e.error.interpolate()) for e in errors] == [
         ('wm_wahl', "Missing columns: 'absolutesmehr'"),
-        ('wmstatic_gemeinden', "Missing columns: 'sortgemeinde'"),
+        ('wmstatic_gemeinden', "Missing columns: 'bfsnrgemeinde'"),
         ('wm_gemeinden', "Missing columns: 'sperrung'"),
         ('wm_kandidaten', "Missing columns: 'knr, vorname'"),
         ('wm_kandidatengde', "Missing columns: 'stimmen'")
@@ -175,29 +172,25 @@ def test_import_wabstic_majorz_invalid_values(session):
                 ','.join((
                     'SortWahlkreis',
                     'SortGeschaeft',
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'Stimmberechtigte',
                 )),
                 ','.join((
                     '0',
                     '0',
-                    '100',  # SortGemeinde
-                    '200',  # SortGemeindeSub
+                    '100',  # BfsNrGemeinde
                     'xxx',  # Stimmberechtigte
                 )),
                 ','.join((
                     '0',
                     '0',
-                    '3215',  # SortGemeinde
-                    '200',  # SortGemeindeSub
+                    '3215',  # BfsNrGemeinde
                     '10',  # Stimmberechtigte
                 )),
                 ','.join((
                     '0',
                     '0',
-                    '3215',  # SortGemeinde
-                    '200',  # SortGemeindeSub
+                    '3215',  # BfsNrGemeinde
                     '10',  # Stimmberechtigte
                 )),
             ))
@@ -205,8 +198,7 @@ def test_import_wabstic_majorz_invalid_values(session):
         BytesIO((
             '\n'.join((
                 ','.join((
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'Stimmberechtigte',
                     'Sperrung',
                     'StmAbgegeben',
@@ -216,8 +208,7 @@ def test_import_wabstic_majorz_invalid_values(session):
                     'StimmenUngueltig',
                 )),
                 ','.join((
-                    '3215',  # SortGemeinde
-                    '200',  # SortGemeindeSub
+                    '3215',  # BfsNrGemeinde
                     'xxx',  # Stimmberechtigte
                     'xxx',  # Sperrung
                     'xxx',  # StmAbgegeben
@@ -252,22 +243,19 @@ def test_import_wabstic_majorz_invalid_values(session):
             '\n'.join((
                 ','.join((
                     'SortGeschaeft',
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'KNR',
                     'Stimmen',
                 )),
                 ','.join((
                     '0',
-                    '100',  # SortGemeinde
-                    '200',  # SortGemeindeSub
+                    '100',  # BfsNrGemeinde
                     'yyy',  # KNR
                     'xxx',  # Stimmen
                 )),
                 ','.join((
                     '0',
-                    '3256',  # SortGemeinde
-                    '200',  # SortGemeindeSub
+                    '3256',  # BfsNrGemeinde
                     '100',  # KNR
                     '200',  # Stimmen
                 )),
@@ -304,12 +292,7 @@ def test_import_wabstic_majorz_expats(session):
     election = session.query(Election).one()
     principal = Canton(canton='sg')
 
-    for entity_id, sub_entity_id in (
-        ('9170', ''),
-        ('0', ''),
-        ('', '9170'),
-        ('', '0'),
-    ):
+    for entity_id in ('9170', '0'):
         errors = import_election_wabstic_majorz(
             election, principal, '0', '0',
             BytesIO((
@@ -331,15 +314,13 @@ def test_import_wabstic_majorz_expats(session):
                     ','.join((
                         'SortWahlkreis',
                         'SortGeschaeft',
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'Stimmberechtigte',
                     )),
                     ','.join((
                         '0',
                         '0',
-                        entity_id,  # SortGemeinde
-                        sub_entity_id,  # SortGemeindeSub
+                        entity_id,  # BfsNrGemeinde
                         '10000',  # Stimmberechtigte
                     )),
                 ))
@@ -347,8 +328,7 @@ def test_import_wabstic_majorz_expats(session):
             BytesIO((
                 '\n'.join((
                     ','.join((
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'Stimmberechtigte',
                         'Sperrung',
                         'StmAbgegeben',
@@ -358,8 +338,7 @@ def test_import_wabstic_majorz_expats(session):
                         'StimmenUngueltig',
                     )),
                     ','.join((
-                        entity_id,  # SortGemeinde
-                        sub_entity_id,  # SortGemeindeSub
+                        entity_id,  # BfsNrGemeinde
                         '10000',  # Stimmberechtigte
                         '',  # Sperrung
                         '',  # StmAbgegeben
@@ -394,15 +373,13 @@ def test_import_wabstic_majorz_expats(session):
                 '\n'.join((
                     ','.join((
                         'SortGeschaeft',
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'KNR',
                         'Stimmen',
                     )),
                     ','.join((
                         '0',
-                        entity_id,  # SortGemeinde
-                        sub_entity_id,  # SortGemeindeSub
+                        entity_id,  # BfsNrGemeinde
                         '1',  # KNR
                         '10',  # Stimmen
                     )),
@@ -448,22 +425,19 @@ def test_import_wabstic_majorz_temporary_results(session):
                 ','.join((
                     'SortWahlkreis',
                     'SortGeschaeft',
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'Stimmberechtigte',
                 )),
                 ','.join((
                     '0',
                     '0',
-                    '3203',  # SortGemeinde
-                    '',  # SortGemeindeSub
+                    '3203',  # BfsNrGemeinde
                     '10000',  # Stimmberechtigte
                 )),
                 ','.join((
                     '0',
                     '0',
-                    '3204',  # SortGemeinde
-                    '',  # SortGemeindeSub
+                    '3204',  # BfsNrGemeinde
                     '10000',  # Stimmberechtigte
                 )),
             ))
@@ -471,8 +445,7 @@ def test_import_wabstic_majorz_temporary_results(session):
         BytesIO((
             '\n'.join((
                 ','.join((
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'Stimmberechtigte',
                     'Sperrung',
                     'StmAbgegeben',
@@ -482,8 +455,7 @@ def test_import_wabstic_majorz_temporary_results(session):
                     'StimmenUngueltig',
                 )),
                 ','.join((
-                    '3203',  # SortGemeinde
-                    '',  # SortGemeindeSub
+                    '3203',  # BfsNrGemeinde
                     '10000',  # Stimmberechtigte
                     '1200',  # Sperrung
                     '',  # StmAbgegeben
@@ -493,8 +465,7 @@ def test_import_wabstic_majorz_temporary_results(session):
                     '1',  # StimmenUngueltig
                 )),
                 ','.join((
-                    '3204',  # SortGemeinde
-                    '',  # SortGemeindeSub
+                    '3204',  # BfsNrGemeinde
                     '10000',  # Stimmberechtigte
                     '',  # Sperrung
                     '',  # StmAbgegeben
@@ -529,22 +500,19 @@ def test_import_wabstic_majorz_temporary_results(session):
             '\n'.join((
                 ','.join((
                     'SortGeschaeft',
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'KNR',
                     'Stimmen',
                 )),
                 ','.join((
                     '0',
-                    '3203',  # SortGemeinde
-                    '',  # SortGemeindeSub
+                    '3203',  # BfsNrGemeinde
                     '1',  # KNR
                     '10',  # Stimmen
                 )),
                 ','.join((
                     '0',
-                    '3204',  # SortGemeinde
-                    '',  # SortGemeindeSub
+                    '3204',  # BfsNrGemeinde
                     '1',  # KNR
                     '10',  # Stimmen
                 )),
@@ -598,22 +566,19 @@ def test_import_wabstic_majorz_regional(session):
                     ','.join((
                         'SortWahlkreis',
                         'SortGeschaeft',
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'Stimmberechtigte',
                     )),
                     ','.join((
                         '0',
                         '0',
-                        '1701',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '1701',  # BfsNrGemeinde
                         '10000',  # Stimmberechtigte
                     )),
                     ','.join((
                         '0',
                         '0',
-                        '1702',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '1702',  # BfsNrGemeinde
                         '10000',  # Stimmberechtigte
                     )),
                 ))
@@ -621,8 +586,7 @@ def test_import_wabstic_majorz_regional(session):
             BytesIO((
                 '\n'.join((
                     ','.join((
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'Stimmberechtigte',
                         'Sperrung',
                         'StmAbgegeben',
@@ -632,8 +596,7 @@ def test_import_wabstic_majorz_regional(session):
                         'StimmenUngueltig',
                     )),
                     ','.join((
-                        '1701',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '1701',  # BfsNrGemeinde
                         '10000',  # Stimmberechtigte
                         '1200',  # Sperrung
                         '',  # StmAbgegeben
@@ -643,8 +606,7 @@ def test_import_wabstic_majorz_regional(session):
                         '1',  # StimmenUngueltig
                     )),
                     ','.join((
-                        '1702',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '1702',  # BfsNrGemeinde
                         '10000',  # Stimmberechtigte
                         '',  # Sperrung
                         '',  # StmAbgegeben
@@ -679,22 +641,19 @@ def test_import_wabstic_majorz_regional(session):
                 '\n'.join((
                     ','.join((
                         'SortGeschaeft',
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'KNR',
                         'Stimmen',
                     )),
                     ','.join((
                         '0',
-                        '1701',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '1701',  # BfsNrGemeinde
                         '1',  # KNR
                         '10',  # Stimmen
                     )),
                     ','.join((
                         '0',
-                        '1702',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '1702',  # BfsNrGemeinde
                         '1',  # KNR
                         '10',  # Stimmen
                     )),
@@ -724,22 +683,19 @@ def test_import_wabstic_majorz_regional(session):
                     ','.join((
                         'SortWahlkreis',
                         'SortGeschaeft',
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'Stimmberechtigte',
                     )),
                     ','.join((
                         '0',
                         '0',
-                        '3231',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '3231',  # BfsNrGemeinde
                         '10000',  # Stimmberechtigte
                     )),
                     ','.join((
                         '0',
                         '0',
-                        '3276',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '3276',  # BfsNrGemeinde
                         '10000',  # Stimmberechtigte
                     )),
                 ))
@@ -747,8 +703,7 @@ def test_import_wabstic_majorz_regional(session):
             BytesIO((
                 '\n'.join((
                     ','.join((
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'Stimmberechtigte',
                         'Sperrung',
                         'StmAbgegeben',
@@ -758,8 +713,7 @@ def test_import_wabstic_majorz_regional(session):
                         'StimmenUngueltig',
                     )),
                     ','.join((
-                        '3231',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '3231',  # BfsNrGemeinde
                         '10000',  # Stimmberechtigte
                         '1200',  # Sperrung
                         '',  # StmAbgegeben
@@ -769,8 +723,7 @@ def test_import_wabstic_majorz_regional(session):
                         '1',  # StimmenUngueltig
                     )),
                     ','.join((
-                        '3276',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '3276',  # BfsNrGemeinde
                         '10000',  # Stimmberechtigte
                         '',  # Sperrung
                         '',  # StmAbgegeben
@@ -805,22 +758,19 @@ def test_import_wabstic_majorz_regional(session):
                 '\n'.join((
                     ','.join((
                         'SortGeschaeft',
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'KNR',
                         'Stimmen',
                     )),
                     ','.join((
                         '0',
-                        '3231',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '3231',  # BfsNrGemeinde
                         '1',  # KNR
                         '10',  # Stimmen
                     )),
                     ','.join((
                         '0',
-                        '3276',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '3276',  # BfsNrGemeinde
                         '1',  # KNR
                         '10',  # Stimmen
                     )),
@@ -852,15 +802,13 @@ def test_import_wabstic_majorz_regional(session):
                 ','.join((
                     'SortWahlkreis',
                     'SortGeschaeft',
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'Stimmberechtigte',
                 )),
                 ','.join((
                     '0',
                     '0',
-                    '1701',  # SortGemeinde
-                    '',  # SortGemeindeSub
+                    '1701',  # BfsNrGemeinde
                     '10000',  # Stimmberechtigte
                 )),
             ))
@@ -868,8 +816,7 @@ def test_import_wabstic_majorz_regional(session):
         BytesIO((
             '\n'.join((
                 ','.join((
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'Stimmberechtigte',
                     'Sperrung',
                     'StmAbgegeben',
@@ -879,8 +826,7 @@ def test_import_wabstic_majorz_regional(session):
                     'StimmenUngueltig',
                 )),
                 ','.join((
-                    '1701',  # SortGemeinde
-                    '',  # SortGemeindeSub
+                    '1701',  # BfsNrGemeinde
                     '10000',  # Stimmberechtigte
                     '1200',  # Sperrung
                     '',  # StmAbgegeben
@@ -915,15 +861,13 @@ def test_import_wabstic_majorz_regional(session):
             '\n'.join((
                 ','.join((
                     'SortGeschaeft',
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'KNR',
                     'Stimmen',
                 )),
                 ','.join((
                     '0',
-                    '1701',  # SortGemeinde
-                    '',  # SortGemeindeSub
+                    '1701',  # BfsNrGemeinde
                     '1',  # KNR
                     '10',  # Stimmen
                 )),
@@ -958,15 +902,13 @@ def test_import_wabstic_majorz_regional(session):
                     ','.join((
                         'SortWahlkreis',
                         'SortGeschaeft',
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'Stimmberechtigte',
                     )),
                     ','.join((
                         '0',
                         '0',
-                        '3231',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '3231',  # BfsNrGemeinde
                         '10000',  # Stimmberechtigte
                     )),
                 ))
@@ -974,8 +916,7 @@ def test_import_wabstic_majorz_regional(session):
             BytesIO((
                 '\n'.join((
                     ','.join((
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'Stimmberechtigte',
                         'Sperrung',
                         'StmAbgegeben',
@@ -985,8 +926,7 @@ def test_import_wabstic_majorz_regional(session):
                         'StimmenUngueltig',
                     )),
                     ','.join((
-                        '3231',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '3231',  # BfsNrGemeinde
                         '10000',  # Stimmberechtigte
                         '1200',  # Sperrung
                         '',  # StmAbgegeben
@@ -1021,15 +961,13 @@ def test_import_wabstic_majorz_regional(session):
                 '\n'.join((
                     ','.join((
                         'SortGeschaeft',
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'KNR',
                         'Stimmen',
                     )),
                     ','.join((
                         '0',
-                        '3231',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '3231',  # BfsNrGemeinde
                         '1',  # KNR
                         '10',  # Stimmen
                     )),

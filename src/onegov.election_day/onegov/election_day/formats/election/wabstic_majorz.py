@@ -15,13 +15,11 @@ HEADERS_WM_WAHL = (
 HEADERS_WMSTATIC_GEMEINDEN = (
     'sortwahlkreis',  # provides the link to the election
     'sortgeschaeft',  # provides the link to the election
-    'sortgemeinde',  # id (BFS)
-    'sortgemeindesub',  # id (BFS)
+    'bfsnrgemeinde',
     'stimmberechtigte',  # eligible votes
 )
 HEADERS_WM_GEMEINDEN = (
-    'sortgemeinde',  # id (BFS)
-    'sortgemeindesub',  # id (BFS)
+    'bfsnrgemeinde',
     'stimmberechtigte',  # eligible votes
     'sperrung',  # counted
     'stmabgegeben',  # received ballots
@@ -40,8 +38,7 @@ HEADERS_WM_KANDIDATEN = (
 )
 HEADERS_WM_KANDIDATENGDE = (
     'sortgeschaeft',  # provides the link to the election
-    'sortgemeinde',  # id (BFS)
-    'sortgemeindesub',  # id (BFS)
+    'bfsnrgemeinde',
     'knr',  # candidate id
     'stimmen',  # votes
 )
@@ -55,18 +52,8 @@ def line_is_relevant(line, number, district=None):
 
 
 def get_entity_id(line, entities):
-    if hasattr(line, 'bfsnrgemeinde'):
-        entity_id = int(line.bfsnrgemeinde or 0)
-        return 0 if entity_id in EXPATS else entity_id
-
-    entity_id = int(line.sortgemeinde or 0)
-    sub_entity_id = int(line.sortgemeindesub or 0)
-    if entity_id not in entities:
-        if sub_entity_id in entities:
-            entity_id = sub_entity_id
-        elif entity_id in EXPATS or sub_entity_id in EXPATS:
-            entity_id = 0
-    return entity_id
+    entity_id = int(line.bfsnrgemeinde or 0)
+    return 0 if entity_id in EXPATS else entity_id
 
 
 def import_election_wabstic_majorz(

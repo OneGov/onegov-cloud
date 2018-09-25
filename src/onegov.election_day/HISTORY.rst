@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Updates the WabstiC Majorz import to the latest version.
+  [msom]
+
 3.6.8 (2018-09-19)
 ~~~~~~~~~~~~~~~~~~~
 
