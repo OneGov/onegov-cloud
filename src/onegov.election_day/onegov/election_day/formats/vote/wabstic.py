@@ -16,8 +16,7 @@ HEADERS_SG_GEMEINDEN = (
     'art',  # domain
     'sortwahlkreis',
     'sortgeschaeft',  # vote number
-    'sortgemeinde',  # id (BFS)
-    'sortgemeindesub',  # id (BFS)
+    'bfsnrgemeinde',  # BFS
     'sperrung',  # counted
     'stimmberechtigte',   # eligible votes
     'stmungueltig',  # invalid
@@ -126,16 +125,11 @@ def import_vote_wabstic(vote, principal, number, district,
         # Parse the id of the entity
         entity_id = None
         try:
-            entity_id = int(line.sortgemeinde or 0)
-            sub_entity_id = int(line.sortgemeindesub or 0)
+            entity_id = int(line.bfsnrgemeinde or 0)
         except ValueError:
             line_errors.append(_("Invalid id"))
         else:
-            if entity_id not in entities:
-                if sub_entity_id in entities:
-                    entity_id = sub_entity_id
-                elif entity_id in EXPATS or sub_entity_id in EXPATS:
-                    entity_id = 0
+            entity_id = 0 if entity_id in EXPATS else entity_id
 
             if entity_id in added_entities:
                 line_errors.append(

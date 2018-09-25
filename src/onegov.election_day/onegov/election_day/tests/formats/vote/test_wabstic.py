@@ -145,8 +145,7 @@ def test_import_wabstic_vote_missing_headers(session):
                 ','.join((
                     'SortWahlkreis',
                     'SortGeschaeft',
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'Stimmberechtigte',
                     'StmUngueltig',
                     'StmLeer',
@@ -203,8 +202,7 @@ def test_import_wabstic_vote_invalid_values(session):
                     'Art',
                     'SortWahlkreis',
                     'SortGeschaeft',
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'Sperrung',
                     'Stimmberechtigte',
                     'StmUngueltig',
@@ -223,8 +221,7 @@ def test_import_wabstic_vote_invalid_values(session):
                     'Eidg',
                     '0',
                     '0',
-                    '100',  # 'SortGemeinde',
-                    '200',  # 'SortGemeindeSub',
+                    '100',  # 'BfsNrGemeinde',
                     'xxx',  # 'Sperrung',
                     'aaa',  # 'Stimmberechtigte',
                     'bbb',  # 'StmUngueltig',
@@ -243,8 +240,7 @@ def test_import_wabstic_vote_invalid_values(session):
                     'Eidg',
                     '0',
                     '0',
-                    'xxx',  # 'SortGemeinde',
-                    '200',  # 'SortGemeindeSub',
+                    'xxx',  # 'BfsNrGemeinde',
                     'xxx',  # 'Sperrung',
                     'aaa',  # 'Stimmberechtigte',
                     'bbb',  # 'StmUngueltig',
@@ -292,12 +288,7 @@ def test_import_wabstic_vote_expats(session):
     vote = session.query(Vote).one()
     principal = Canton(canton='sg')
 
-    for entity_id, sub_entity_id in (
-        ('9170', ''),
-        ('0', ''),
-        ('', '9170'),
-        ('', '0'),
-    ):
+    for entity_id in ('9170', '0'):
         errors = import_vote_wabstic(
             vote, principal, '0', '0',
             BytesIO((
@@ -323,8 +314,7 @@ def test_import_wabstic_vote_expats(session):
                         'Art',
                         'SortWahlkreis',
                         'SortGeschaeft',
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'Sperrung',
                         'Stimmberechtigte',
                         'StmUngueltig',
@@ -343,8 +333,7 @@ def test_import_wabstic_vote_expats(session):
                         'Eidg',
                         '0',
                         '0',
-                        entity_id,  # 'SortGemeinde',
-                        sub_entity_id,  # 'SortGemeindeSub',
+                        entity_id,  # 'BfsNrGemeinde',
                         '2000',  # 'Sperrung',
                         '100',  # 'Stimmberechtigte',
                         '0',  # 'StmUngueltig',
@@ -401,8 +390,7 @@ def test_import_wabstic_vote_temporary_results(session):
                     'Art',
                     'SortWahlkreis',
                     'SortGeschaeft',
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'Sperrung',
                     'Stimmberechtigte',
                     'StmUngueltig',
@@ -421,8 +409,7 @@ def test_import_wabstic_vote_temporary_results(session):
                     'Eidg',
                     '0',
                     '0',
-                    '3203',  # 'SortGemeinde',
-                    '3203',  # 'SortGemeindeSub',
+                    '3203',  # 'BfsNrGemeinde',
                     '2000',  # 'Sperrung',
                     '100',  # 'Stimmberechtigte',
                     '0',  # 'StmUngueltig',

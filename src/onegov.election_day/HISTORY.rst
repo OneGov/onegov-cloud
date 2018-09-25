@@ -1,13 +1,13 @@
 Changelog
 ---------
 
-- Updates the WabstiC Majorz import to the latest version.
+- Updates the WabstiCExport (majorz, vote) import to the latest version.
   [msom]
 
 3.6.8 (2018-09-19)
 ~~~~~~~~~~~~~~~~~~~
 
-- Makes the WabstiC Majorz import more robust.
+- Makes the WabstiCExport (majorz) import more robust.
   [msom]
 
 3.6.7 (2018-09-19)
