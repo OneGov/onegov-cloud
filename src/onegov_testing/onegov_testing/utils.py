@@ -44,7 +44,7 @@ def random_namespace():
 
 def create_app(app_class, request, use_elasticsearch=False,
                reuse_filestorage=True, use_smtp=True,
-               depot_backend='depot.io.memory.MemoryFileStorage',
+               depot_backend='depot.io.local.LocalFileStorage',
                depot_storage_path=None):
 
     # filestorage can be reused between tries as it is nowadays mainly (if not
@@ -64,6 +64,10 @@ def create_app(app_class, request, use_elasticsearch=False,
         ]
     else:
         elasticsearch_hosts = []
+
+    if depot_backend == 'depot.io.local.LocalFileStorage':
+        if not depot_storage_path:
+            depot_storage_path = request.getfixturevalue('temporary_directory')
 
     app = app_class()
     app.namespace = random_namespace()
