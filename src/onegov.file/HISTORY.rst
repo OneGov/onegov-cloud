@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.9.1 (2018-09-26)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes depot upgrade failing in certain cases.
   [href]
 
