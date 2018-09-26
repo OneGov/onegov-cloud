@@ -166,6 +166,12 @@ class File(Base, Associable, TimestampMixin):
         """
         assert set(options.keys()).issubset({'content_type', 'filename'})
 
+        if not hasattr(self.reference.file, '_metadata_path'):
+            raise NotImplementedError(
+                "The current depot storage backend does not support "
+                "in-place metadata updates"
+            )
+
         path = Path(self.reference.file._metadata_path)
 
         # store the pending metadata on the session to commit them later
