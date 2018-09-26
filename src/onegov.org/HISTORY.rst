@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.36.2 (2018-09-26)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes directory filter clicks not being handled.
   [href]
 
