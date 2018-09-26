@@ -169,6 +169,4 @@ def reclassify_office_documents(context):
 
     for f in files.filter(File.name.op('~*')(r'^.*\.(docx|xlsx|pptx)$')):
         content_type = content_type_from_fileobj(f.reference.file)
-        assert 'application/vnd.openxmlformats' in content_type
-
         f._update_metadata(content_type=content_type)
