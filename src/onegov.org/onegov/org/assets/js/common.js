@@ -41,11 +41,17 @@ var processCommonNodes = function(elements, out_of_band) {
     }
 
     // send clicks from certain blocks down to the first link
-    $(document).ready(function() {
-        $('.click-through').click(function() {
-            $(this).find('a:first')[0].click();
-            return false;
-        });
+    targets.find('.click-through').click(function() {
+        var link = $(this).find('a:first');
+        var handlers = $._data(link[0]);
+
+        if (handlers && handlers.click && handlers.click.length > 0) {
+            link[0].click();
+        } else {
+            window.location = link.attr('href');
+        }
+
+        return false;
     });
 };
 
