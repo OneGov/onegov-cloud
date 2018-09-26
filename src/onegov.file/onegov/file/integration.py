@@ -91,9 +91,12 @@ class DepotApp(App):
         self.frontend_cache_bust_delay = cfg.get(
             'frontend_cache_bust_delay', 5)
 
-        assert self.depot_backend in SUPPORTED_STORAGE_BACKENDS, """
-            A depot app *must* have a valid storage backend set up.
-        """
+        if self.depot_backend not in SUPPORTED_STORAGE_BACKENDS:
+            raise RuntimeError("Depot app without valid storage backend")
+
+        if self.depot_backend == 'depot.io.local.LocalFileStorage':
+            if not os.path.isdir(self.depot_storage_path):
+                raise FileNotFoundError("Depot storage path does not exist")
 
         if not shutil.which('gs'):
             raise RuntimeError("onegov.file requires ghostscript")
