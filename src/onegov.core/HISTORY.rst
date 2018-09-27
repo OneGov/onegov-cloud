@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.72.3 (2018-09-27)
+~~~~~~~~~~~~~~~~~~~
 
 - Stops search reindexing when adding a new column during upgrades.
   [href]
