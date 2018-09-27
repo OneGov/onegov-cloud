@@ -18,6 +18,7 @@ addons:
         packages:
             - oracle-java8-set-default
             - ghostscript
+            - libpoppler-cpp-dev
 
 script:
     - tox -e $TOXENV
