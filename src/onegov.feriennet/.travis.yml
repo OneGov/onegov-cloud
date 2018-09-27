@@ -12,6 +12,7 @@ addons:
       - oracle-java8-set-default
       - google-chrome-stable
       - ghostscript
+      - libpoppler-cpp-dev
 
 env:
     - TOXENV=py36 DEPLOY=yes
