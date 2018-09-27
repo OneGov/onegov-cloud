@@ -410,6 +410,62 @@ def test_orm_polymorphic(es_url, postgres_dsn):
     assert app.es_search().count() == 0
 
 
+def test_orm_polymorphic_sublcass_only(es_url, postgres_dsn):
+
+    class App(Framework, ElasticsearchApp):
+        pass
+
+    Base = declarative_base()
+
+    class Secret(Base):
+        __tablename__ = 'secrets'
+
+        id = Column(Integer, primary_key=True)
+        content = Column(Text, nullable=True)
+        type = Column(Text, nullable=True)
+
+        __mapper_args__ = {
+            "polymorphic_on": 'type'
+        }
+
+    class Open(Secret, ORMSearchable):
+        __mapper_args__ = {'polymorphic_identity': 'open'}
+
+        es_public = True
+        es_properties = {
+            'content': {'type': 'localized'}
+        }
+
+        @property
+        def es_suggestion(self):
+            return self.content
+
+    scan_morepath_modules(App)
+    morepath.commit()
+
+    app = App()
+    app.configure_application(
+        dsn=postgres_dsn,
+        base=Base,
+        elasticsearch_hosts=[es_url]
+    )
+
+    app.namespace = 'pages'
+    app.set_application_id('pages/site')
+
+    session = app.session()
+
+    session.add(Secret(content="nobody knows"))
+    session.add(Open(content="everybody knows"))
+
+    transaction.commit()
+    app.es_indexer.process()
+    app.es_client.indices.refresh(index='_all')
+
+    assert app.es_search().query('match', content='nobody').count() == 0
+    assert app.es_search().query('match', content='everybody').count() == 1
+
+
 def test_suggestions(es_url, postgres_dsn):
 
     class App(Framework, ElasticsearchApp):
