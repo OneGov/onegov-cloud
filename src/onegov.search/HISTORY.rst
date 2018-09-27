@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to stop the ORM event processing temporarily.
+  [href]
+
 - Updates elasticsearch release.
   [href]
 

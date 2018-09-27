@@ -653,19 +653,23 @@ class ORMEventTranslator(object):
         self.mappings = mappings
         self.queue = Queue(maxsize=max_queue_size)
         self.detector = ORMLanguageDetector(languages)
+        self.stopped = False
 
     def on_insert(self, schema, obj):
-        if isinstance(obj, Searchable):
-            self.index(schema, obj)
+        if not self.stopped:
+            if isinstance(obj, Searchable):
+                self.index(schema, obj)
 
     def on_update(self, schema, obj):
-        if isinstance(obj, Searchable):
-            self.delete(schema, obj)
-            self.index(schema, obj)
+        if not self.stopped:
+            if isinstance(obj, Searchable):
+                self.delete(schema, obj)
+                self.index(schema, obj)
 
     def on_delete(self, schema, obj):
-        if isinstance(obj, Searchable):
-            self.delete(schema, obj)
+        if not self.stopped:
+            if isinstance(obj, Searchable):
+                self.delete(schema, obj)
 
     def put(self, translation):
         try:
