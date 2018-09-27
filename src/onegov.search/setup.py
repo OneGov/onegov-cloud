@@ -4,7 +4,7 @@ name = 'onegov.search'
 description = (
     'Elasticsearch integration for OneGov Cloud'
 )
-version = '1.6.0'
+version = '1.6.1'
 
 
 def get_long_description():

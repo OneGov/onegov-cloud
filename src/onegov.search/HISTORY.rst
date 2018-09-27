@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.6.1 (2018-09-27)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to stop the ORM event processing temporarily.
   [href]
 
