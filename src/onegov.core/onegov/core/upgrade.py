@@ -5,6 +5,7 @@ import transaction
 
 from alembic.migration import MigrationContext
 from alembic.operations import Operations
+from contextlib import contextmanager
 from inspect import getmembers, isfunction, ismethod
 from onegov.core.orm import Base, find_models
 from onegov.core.orm.mixins import TimestampMixin
@@ -420,30 +421,45 @@ class UpgradeContext(object):
                 load_only(*(c.name for c in columns))
             )
 
+    @contextmanager
+    def stop_search_updates(self):
+        # XXX this would be better handled with a more general approach
+        # that doesn't require knowledge of onegov.search
+        getattr(self.app, 'es_orm_events', object()).stopped = True
+        yield
+        getattr(self.app, 'es_orm_events', object()).stopped = False
+
     def add_column_with_defaults(self, table, column, default):
-        # add a nullable column
-        nullable_column = column.copy()
-        nullable_column.nullable = True
+        # XXX while adding default values we shouldn't reindex the data
+        # since this is what the default add_column code does and will be
+        # doing in the future when Postgres 11 supports defaults for
+        # new columns - the way this is implemented now is with tight coupling
+        # that we shouldn't do, but we want to replace this when Postgres 11
+        # comes around
+        with self.stop_search_updates():
+            nullable_column = column.copy()
+            nullable_column.nullable = True
 
-        self.operations.add_column(table, nullable_column)
+            self.operations.add_column(table, nullable_column)
 
-        # fill it with defaults
-        for record in self.records_per_table(table, (column, )):
-            value = default(record) if callable(default) else default
-            setattr(record, column.name, value)
+            # fill it with defaults
+            for record in self.records_per_table(table, (column, )):
+                value = default(record) if callable(default) else default
+                setattr(record, column.name, value)
 
-            if hasattr(getattr(record, column.name), 'changed'):
-                getattr(record, column.name).changed()
+                if hasattr(getattr(record, column.name), 'changed'):
+                    getattr(record, column.name).changed()
 
-        # make sure all generated values are flushed
-        self.session.flush()
+            # make sure all generated values are flushed
+            self.session.flush()
 
-        # activate non-null constraint
-        if not column.nullable:
-            self.operations.alter_column(table, column.name, nullable=False)
+            # activate non-null constraint
+            if not column.nullable:
+                self.operations.alter_column(
+                    table, column.name, nullable=False)
 
-        # propagate to db
-        self.session.flush()
+            # propagate to db
+            self.session.flush()
 
 
 class RawUpgradeRunner(object):
