@@ -267,3 +267,16 @@ def test_update_metadata(session):
     transaction.commit()
 
     assert get_file().reference.file.filename == 'bar.txt'
+
+
+def test_pdf_text_extraction(session):
+    path = module_path('onegov.file', 'tests/fixtures/sample.pdf')
+
+    with open(path, 'rb') as f:
+        session.add(File(name='sample.pdf', reference=f))
+
+    transaction.commit()
+
+    pdf = session.query(File).one()
+    assert 'Adobe® Portable Document Format (PDF)' in pdf.extract
+    assert pdf.pages == 1

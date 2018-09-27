@@ -101,11 +101,6 @@ class DepotApp(App):
         if not shutil.which('gs'):
             raise RuntimeError("onegov.file requires ghostscript")
 
-        if self.depot_backend == 'depot.io.local.LocalFileStorage':
-            assert os.path.isdir(self.depot_storage_path), """
-                The depot storage path must exist.
-            """
-
         if self.frontend_cache_buster:
 
             @self.session_manager.on_update.connect_via(ANY, weak=False)

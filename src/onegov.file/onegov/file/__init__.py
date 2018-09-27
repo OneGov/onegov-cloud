@@ -1,6 +1,6 @@
 from onegov.file.collection import FileCollection, FileSetCollection
 from onegov.file.integration import DepotApp
-from onegov.file.models import File, FileSet, AssociatedFiles
+from onegov.file.models import File, FileSet, AssociatedFiles, SearchableFile
 
 __all__ = [
     'AssociatedFiles',
@@ -8,5 +8,6 @@ __all__ = [
     'File',
     'FileCollection',
     'FileSet',
-    'FileSetCollection'
+    'FileSetCollection',
+    'SearchableFile',
 ]

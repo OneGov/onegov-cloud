@@ -2,6 +2,7 @@ import magic
 
 from contextlib import suppress
 from depot.io.utils import FileIntent
+from mimetypes import guess_extension
 from io import IOBase, BytesIO, UnsupportedOperation
 from lxml import etree
 from PIL import Image
@@ -77,6 +78,21 @@ def get_svg_size(svg):
     # to the browser, instead of using it internally
     root = etree.parse(svg).getroot()
     return root.get('width'), root.get('height')
+
+
+def extension_for_content_type(content_type, filename=None):
+    """ Gets the extension for the given content type. Note that this is
+    *meant for display only*. A file claiming to be a PDF might not be one,
+    but this function would not let you know that.
+
+    """
+
+    if filename is not None:
+        ext = filename.split('.')[-1][:4].lower()
+    else:
+        ext = (guess_extension(content_type, strict=False) or '')
+
+    return ext.strip('. ')
 
 
 def get_image_size(image):

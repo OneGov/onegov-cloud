@@ -4,7 +4,7 @@ from onegov.file.attachments import calculate_checksum
 from onegov.file.models import File, FileSet
 from onegov.file.utils import as_fileintent
 from sedate import utcnow
-from sqlalchemy import and_
+from sqlalchemy import and_, text
 
 
 class FileCollection(object):
@@ -133,9 +133,22 @@ class FileCollection(object):
     def by_content(self, content):
         """ Returns a query that matches the given content (may be more than
         one record).
+
         """
 
         return self.by_checksum(calculate_checksum(file_from_content(content)))
+
+    def by_content_type(self, content_type):
+        """ Returns a query that matches the given MIME content type (may be
+        more than one record).
+
+        """
+
+        return self.query().filter(
+            text("reference->>'content_type' = :content_type").bindparams(
+                content_type=content_type
+            )
+        )
 
 
 class FileSetCollection(object):

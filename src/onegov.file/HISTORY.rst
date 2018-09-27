@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Extracts pdf text and page numbers for pdf uploads.
+  [href]
+
+- Adds the ability to implement searching on File subclasses.
+  [href]
+
 0.9.1 (2018-09-26)
 ~~~~~~~~~~~~~~~~~~~
 
