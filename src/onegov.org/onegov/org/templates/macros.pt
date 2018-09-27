@@ -895,6 +895,32 @@
 </metal:search_result_users>
 
 
+<metal:search_result_files define-macro="search_result_files" i18n:domain="onegov.org">
+    <a href="${request.return_here(request.link(result))}">${result.name_without_extension}</a>
+    <ul>
+        <li class="${result.published and 'published' or 'unpublished'} ${result.signed and 'signed' or 'unsigned'}">
+            <span>
+                ${result.claimed_extension.upper()}
+            </span>
+            <span i18n:translate>
+                uploaded on <tal:b i18n:name="date">
+                    ${layout.format_date(result.created, 'datetime')}
+                </tal:b>
+            </span>
+        </li>
+        <li tal:condition="result.pages">
+            <tal:b i18n:translate tal:condition="result.pages == 1">
+                <tal:b i18n:name="count">${result.pages}</tal:b> page
+            </tal:b>
+
+            <tal:b i18n:translate tal:condition="result.pages > 1">
+                <tal:b i18n:name="count">${result.pages}</tal:b> pages
+            </tal:b>
+        </li>
+    </ul>
+</metal:search_result_files>
+
+
 <metal:search_result_tickets define-macro="search_result_tickets" i18n:domain="onegov.org">
     <a href="${request.link(result)}">${result.number}</a>
     <ul>

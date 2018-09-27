@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-09-24 12:20+0200\n"
+"POT-Creation-Date: 2018-09-27 15:01+0200\n"
 "PO-Revision-Date: 2018-09-24 12:21+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -12,17 +12,6 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.1.1\n"
-
-#, python-format
-msgid "${org} OneGov Cloud Status"
-msgstr "${org} OneGov Cloud Status"
-
-msgid "General"
-msgstr "Allgemein"
-
-#, python-format
-msgid "${org} Reservation Overview"
-msgstr "${org} Reservations-Übersicht"
 
 msgid "Login"
 msgstr "Login"
@@ -75,57 +64,16 @@ msgstr "Benutzerprofil"
 msgid "Logout"
 msgstr "Logout"
 
-msgid "Cancel"
-msgstr "Abbrechen"
+#, python-format
+msgid "${org} OneGov Cloud Status"
+msgstr "${org} OneGov Cloud Status"
 
-msgid "This site is hidden from the general public"
-msgstr "Diese Seite ist nicht öffentlich."
-
-msgid "Daypass"
-msgstr "Tageskarte"
-
-msgid "Conference room"
-msgstr "Konferenzraum"
-
-msgid "Sports facility"
-msgstr "Sportanlage"
-
-msgid "General Assembly"
-msgstr "Generalversammlung"
-
-msgid "Communal hall"
-msgstr "Gemeindesaal"
-
-msgid "Community Gymnastics"
-msgstr "Gemeinsames Turnen"
-
-msgid "Gymnasium"
-msgstr "Turnhalle"
-
-msgid "Football Tournament"
-msgstr "Fussballturnier"
-
-msgid "We celebrate our 150th anniversary."
-msgstr "Wir feiern unser 150 jähriges Bestehen."
-
-msgid "As every year."
-msgstr "Alle Jahre wieder."
-
-msgid "Get fit together."
-msgstr "Zusammen fit werden."
-
-msgid "Women's Club"
-msgstr "Frauenverein"
-
-msgid "Amateurs welcome!"
-msgstr "Anfänger willkommen!"
-
-msgid "Sports Association"
-msgstr "Sporverein"
+msgid "General"
+msgstr "Allgemein"
 
 #, python-format
-msgid "150 years {organisation}"
-msgstr "150 Jahre {organisation}"
+msgid "${org} Reservation Overview"
+msgstr "${org} Reservations-Übersicht"
 
 msgid "Mo"
 msgstr "Mo"
@@ -381,6 +329,9 @@ msgstr "${amount} rückerstatten"
 msgid "Room"
 msgstr "Raum"
 
+msgid "Daypass"
+msgstr "Tageskarte"
+
 msgid "E-Mail Recipient"
 msgstr "E-Mail Empfänger"
 
@@ -410,6 +361,12 @@ msgstr "Verzeichnis löschen"
 
 msgid "Entry"
 msgstr "Eintrag"
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "This site is hidden from the general public"
+msgstr "Diese Seite ist nicht öffentlich."
 
 msgid "Not a valid color."
 msgstr "Ungültige Farbe."
@@ -509,189 +466,118 @@ msgstr ""
 "Um die Einteilung zu löschen, müssen zuerst alle bestehenden Reservationen "
 "abgesagt werden."
 
+msgid "Conference room"
+msgstr "Konferenzraum"
+
+msgid "Sports facility"
+msgstr "Sportanlage"
+
+msgid "General Assembly"
+msgstr "Generalversammlung"
+
+msgid "Communal hall"
+msgstr "Gemeindesaal"
+
+msgid "Community Gymnastics"
+msgstr "Gemeinsames Turnen"
+
+msgid "Gymnasium"
+msgstr "Turnhalle"
+
+msgid "Football Tournament"
+msgstr "Fussballturnier"
+
+msgid "We celebrate our 150th anniversary."
+msgstr "Wir feiern unser 150 jähriges Bestehen."
+
+msgid "As every year."
+msgstr "Alle Jahre wieder."
+
+msgid "Get fit together."
+msgstr "Zusammen fit werden."
+
+msgid "Women's Club"
+msgstr "Frauenverein"
+
+msgid "Amateurs welcome!"
+msgstr "Anfänger willkommen!"
+
+msgid "Sports Association"
+msgstr "Sporverein"
+
+#, python-format
+msgid "150 years {organisation}"
+msgstr "150 Jahre {organisation}"
+
+msgid "Selection"
+msgstr "Auswahl"
+
+msgid "Registration Window"
+msgstr "Anmeldungszeitraum"
+
 msgid "Start"
 msgstr "Von"
-
-msgid "Date"
-msgstr "Datum"
 
 msgid "End"
 msgstr "Bis"
 
-msgid "Except for"
-msgstr "Ausser an"
+msgid "By date"
+msgstr "Nach Datum"
 
-msgid "Daypasses"
-msgstr "Tageskarten"
+msgid "By registration window"
+msgstr "Nach Anmeldezeitraum"
 
-msgid "Daypasses Limit"
-msgstr "Tageskarten pro Person und Tag"
+msgid "Admin"
+msgstr "Administrator"
 
-msgid "Each starting at"
-msgstr "Jeweils von"
+msgid "Editor"
+msgstr "Editor"
 
-msgid "HH:MM"
-msgstr "HH:MM"
+msgid "Member"
+msgstr "Mitglied"
 
-msgid "Each ending at"
-msgstr "Jeweils bis"
+msgid "State"
+msgstr "Status"
 
-msgid "May be partially reserved"
-msgstr "Kann abschnittweise reserviert werden"
+msgid "Role"
+msgstr "Rolle"
 
-msgid "Options"
-msgstr "Optionen"
+msgid "Tags"
+msgstr "Schlagworte"
 
-msgid "From"
-msgstr "Von"
+msgid "Yubikey"
+msgstr "YubiKey"
 
-msgid "Until"
-msgstr "Bis zum"
+msgid "Plug your YubiKey into a USB slot and press it."
+msgstr "YubiKey anschliessen und Knopf drücken."
 
-msgid "New entries"
-msgstr "Neue Einträge"
+msgid "E-Mail"
+msgstr "E-Mail"
 
-msgid "Title"
-msgstr "Titel"
+msgid "The users e-mail address (a.k.a. username)"
+msgstr "Die E-Mail Adresse des Benutzers (bzw. der Benutzername)"
 
-msgid "Lead"
-msgstr "Einleitung"
+msgid "Send Activation E-Mail with Instructions"
+msgstr "Aktivierungs-Email mit Anmelde-Anleitung senden"
 
-msgid "Describes what this directory is about"
-msgstr "Beschreibt worum es bei diesem Verzeichnis geht"
-
-msgid "Further Information"
-msgstr "Weitere Informationen"
-
-msgid "Definition"
-msgstr "Definition"
-
-msgid "Coordinates"
-msgstr "Koordinaten"
-
-msgid "Title-Format"
-msgstr "Titel-Format"
-
-msgid "Display"
-msgstr "Anzeige"
-
-msgid "Lead-Format"
-msgstr "Lead-Format"
-
-msgid "Main view"
-msgstr "Hauptansicht"
-
-msgid "Address"
-msgstr "Adresse"
-
-msgid "Filters"
-msgstr "Filter"
-
-msgid "Thumbnail"
-msgstr "Thumbnail"
-
-msgid "Icon"
-msgstr "Symbol"
-
-msgid "Marker"
-msgstr "Marker"
-
-msgid "Marker Color"
-msgstr "Marker Farbe"
-
-msgid "Color"
-msgstr "Farbe"
-
-msgid "Order"
-msgstr "Sortierung"
-
-msgid "Order-Format"
-msgstr "Sortierungs-Format"
-
-msgid "Direction"
-msgstr "Richtung"
-
-msgid "Pattern"
-msgstr "Muster"
-
-msgid "External Link"
-msgstr "Externer Link"
-
-msgid "Visible"
-msgstr "Sichtbar"
-
-msgid "Users may propose new entries"
-msgstr "Benutzer können neue Einträge vorschlagen"
-
-msgid "Guideline"
-msgstr "Wegleitung"
-
-msgid "Price"
-msgstr "Preis"
-
-msgid "Price per submission"
-msgstr "Preis pro Eingabe"
-
-msgid "Currency"
-msgstr "Währung"
-
-msgid "Apply directory configuration"
-msgstr "Verzeichniskonfiguration anwenden"
-
-msgid "Mode"
-msgstr "Modus"
+msgid "Invalid Yubikey"
+msgstr "Ungültiger YubiKey"
 
 #, python-format
-msgid "The following fields are unknown: ${fields}"
-msgstr "Die folgenden Felder sind unbekannt: ${fields}"
+msgid "This Yubikey is already used by ${username}"
+msgstr "Dieser YubiKey wird bereits von ${username} verwendet"
 
-msgid "Please select at most one thumbnail field"
-msgstr "Bitte wählen Sie höchstens ein Thumbnail Feld"
+msgid "A user with this e-mail address exists already"
+msgstr "Ein Benutzer mit dieser E-Mail Adresse existiert bereits"
 
-msgid "Entries have no coordinates"
-msgstr "Einträge haben keine Koordinaten"
+msgid "Active"
+msgstr "Aktiv"
 
-msgid "Coordinates are shown on each entry"
-msgstr "Koordinaten werden auf den Einträgen angezeigt"
+msgid "Inactive"
+msgstr "Inaktiv"
 
-msgid "Coordinates are shown on the directory and on each entry"
-msgstr "Koordinaten werden im Verzeichnis und auf den Einträgen angezeigt"
-
-msgid "Default"
-msgstr "Standard"
-
-msgid "Custom"
-msgstr "Eigene"
-
-msgid "By title"
-msgstr "Nach Titel"
-
-msgid "By format"
-msgstr "Nach Format"
-
-msgid "Ascending"
-msgstr "Aufsteigend"
-
-msgid "Descending"
-msgstr "Absteigend"
-
-msgid "Free of charge"
-msgstr "Kostenlos"
-
-msgid "Paid"
-msgstr "Bezahlt"
-
-msgid "Yes, import configuration and entries"
-msgstr "Ja, Konfiguration und Einträge importieren"
-
-msgid "No, only import entries"
-msgstr "Nein, nur Einträge importieren"
-
-msgid "Only import new entries"
-msgstr "Nur neue Einträge importieren"
-
-msgid "Replace all entries"
-msgstr "Alle Einträge ersetzen"
+msgid "Administrators and editors must use a Yubikey"
+msgstr "Administratoren und Editoren müssen zwingend einen YubiKey verwenden"
 
 msgid "Exhibition"
 msgstr "Ausstellung"
@@ -747,8 +633,8 @@ msgstr "Treffen"
 msgid "Talk"
 msgstr "Vortrag"
 
-msgid "E-Mail"
-msgstr "E-Mail"
+msgid "Title"
+msgstr "Titel"
 
 msgid "Concerto in the castle garden"
 msgstr "Konzert im Schlossgarten"
@@ -771,11 +657,17 @@ msgstr "Organisator"
 msgid "Music society"
 msgstr "Musikverein"
 
+msgid "Coordinates"
+msgstr "Koordinaten"
+
 msgid "The marker can be moved by dragging it with the mouse"
 msgstr "Der Marker kann mit der Maus verschoben werden"
 
-msgid "Tags"
-msgstr "Schlagworte"
+msgid "Date"
+msgstr "Datum"
+
+msgid "From"
+msgstr "Von"
 
 msgid "To"
 msgstr "Bis"
@@ -798,85 +690,41 @@ msgstr "Das Enddatum muss nach dem Startdatum liegen."
 msgid "The weekday of the start date must be selected."
 msgstr "Der Wochentag der Veranstaltung muss ausgewählt sein."
 
-msgid "Map"
-msgstr "Karte"
+msgid "Send a daily status e-mail."
+msgstr "Ein tägliches Status E-Mail senden."
 
-msgid "Submitter"
-msgstr "Antragsteller/in"
+msgid "E-Mail Address"
+msgstr "E-Mail Adresse"
 
-msgid "Describes what this form is about"
-msgstr "Beschreibt kurz um was es bei diesem Formular geht"
+msgid "First name"
+msgstr "Vorname"
 
-msgid "Text"
-msgstr "Text"
+msgid "Last name"
+msgstr "Nachname"
 
-msgid "Group"
-msgstr "Gruppe"
+msgid "Function"
+msgstr "Funktion"
 
-msgid "Used to group the form in the overview"
-msgstr "Dient zur Gruppierung in der Übersicht"
+msgid "Phone"
+msgstr "Telefon"
 
-msgid "Selection"
-msgstr "Auswahl"
+msgid "Website"
+msgstr "Webseite"
 
-msgid "Registration Window"
-msgstr "Anmeldungszeitraum"
+msgid "Picture"
+msgstr "Bild"
 
-msgid "By date"
-msgstr "Nach Datum"
+msgid "URL pointing to the picture"
+msgstr "Link zum Bild"
 
-msgid "By registration window"
-msgstr "Nach Anmeldezeitraum"
+msgid "Address"
+msgstr "Adresse"
 
-msgid "Limit the number of attendees"
-msgstr "Anzahl Teilnehmer limitieren"
+msgid "Notes"
+msgstr "Notizen"
 
-msgid "Attendees"
-msgstr "Teilnehmer"
-
-msgid "Number of attendees"
-msgstr "Anzahl Teilnehmer"
-
-msgid "Waitinglist"
-msgstr "Warteliste"
-
-msgid "Do not accept any submissions"
-msgstr "Keine Anmeldungen akzeptieren"
-
-msgid "Advanced"
-msgstr "Erweitert"
-
-#, python-format
-msgid ""
-"The limit cannot be lower than the already confirmed number of attendees "
-"(${claimed_spots})"
-msgstr ""
-"Das Limit kann nicht tiefer sein als die Anzahl bereits angemeldeter "
-"Teilnehmer (${claimed_spots})"
-
-#, python-format
-msgid ""
-"The limit cannot be lower than the already confirmed number attendees "
-"(${claimed_spots}) and the number of pending requests (${pending_requests}). "
-"Either enable the waiting list, process the pending requests or increase the "
-"limit. "
-msgstr ""
-"Das Limit kann nicht tiefer sein als die Summe der bereits angemeldeten "
-"Teilnemer (${claimed_spots}) und der offenen Anfragen (${pending_requests}). "
-"Aktivieren Sie entweder die Warteliste, verarbeiten Sie die offenen Anfragen "
-"oder erhöhen Sie das limit. "
-
-msgid "Yes, limit the number of attendees"
-msgstr "Ja, Anzahl Teilnehmer limitieren"
-
-msgid "No, allow an unlimited number of attendees"
-msgstr "Nein, eine unlimitierte Anzahl Teilnehmer zulassen"
-
-msgid "Yes, allow for more submissions than available spots"
-msgstr "Ja, mehr Anfragen als verfügbare Plätze erlauben"
-
-msgid "No, ensure that all submissions can be confirmed"
-msgstr "Nein, sicherstellen dass alle Anfragen bestätigt werden können"
+msgid "Public extra information about this person"
+msgstr "Öffentliche Extra Informationen zu dieser Person"
 
 msgid "Format"
 msgstr "Format"
@@ -911,20 +759,62 @@ msgstr "Kreditkarten-Zahlungen optional"
 msgid "Credit card payments required"
 msgstr "Kreditkarten-Zahlung erforderlich"
 
-msgid "Describes what this photo album is about"
-msgstr "Beschreibt kurz um was es bei dem Fotoalbum geht"
+msgid "Text"
+msgstr "Text"
 
-msgid "View"
-msgstr "Ansicht"
+msgid "Your note about this ticket"
+msgstr "Ihre Notiz zu dem Ticket"
 
-msgid "Show images on homepage"
-msgstr "Bilder auf der Startseite zeigen"
+msgid "Lead"
+msgstr "Einleitung"
 
-msgid "Full size images"
-msgstr "Grosse Bilder"
+msgid "Describes what this reservation resource is about"
+msgstr "Beschreibt um was es bei dieser Reservations-Ressource geht"
 
-msgid "Grid layout"
-msgstr "Raster"
+msgid "Group"
+msgstr "Gruppe"
+
+msgid "Used to group the resource in the overview"
+msgstr "Dient zur Gruppierung in der Übersicht"
+
+msgid "Extra Fields Definition"
+msgstr "Extra-Felder Definition"
+
+msgid "Price"
+msgstr "Preis"
+
+msgid "Price per item"
+msgstr "Preis pro Eintrag"
+
+msgid "Price per hour"
+msgstr "Preis pro Stunde"
+
+msgid "Currency"
+msgstr "Währung"
+
+msgid "Free of charge"
+msgstr "Kostenlos"
+
+msgid "Per item"
+msgstr "Pro Eintrag"
+
+msgid "Per hour"
+msgstr "Pro Stunde"
+
+msgid "The price must be larger than zero"
+msgstr "Der Preis muss grösser als Null sein"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Describes what this page is about"
+msgstr "Beschreibt kurz um was es bei diesem Thema geht"
+
+msgid "Map"
+msgstr "Karte"
+
+msgid "Submitter"
+msgstr "Antragsteller/in"
 
 msgid "Time"
 msgstr "Zeit"
@@ -960,63 +850,6 @@ msgstr ""
 msgid "Recipient"
 msgstr "Empfänger"
 
-msgid "URL"
-msgstr "URL"
-
-msgid "Describes what this page is about"
-msgstr "Beschreibt kurz um was es bei diesem Thema geht"
-
-msgid "First name"
-msgstr "Vorname"
-
-msgid "Last name"
-msgstr "Nachname"
-
-msgid "Function"
-msgstr "Funktion"
-
-msgid "Phone"
-msgstr "Telefon"
-
-msgid "Website"
-msgstr "Webseite"
-
-msgid "Picture"
-msgstr "Bild"
-
-msgid "URL pointing to the picture"
-msgstr "Link zum Bild"
-
-msgid "Notes"
-msgstr "Notizen"
-
-msgid "Public extra information about this person"
-msgstr "Öffentliche Extra Informationen zu dieser Person"
-
-msgid "Describes what this reservation resource is about"
-msgstr "Beschreibt um was es bei dieser Reservations-Ressource geht"
-
-msgid "Used to group the resource in the overview"
-msgstr "Dient zur Gruppierung in der Übersicht"
-
-msgid "Extra Fields Definition"
-msgstr "Extra-Felder Definition"
-
-msgid "Price per item"
-msgstr "Preis pro Eintrag"
-
-msgid "Price per hour"
-msgstr "Preis pro Stunde"
-
-msgid "Per item"
-msgstr "Pro Eintrag"
-
-msgid "Per hour"
-msgstr "Pro Stunde"
-
-msgid "The price must be larger than zero"
-msgstr "Der Preis muss grösser als Null sein"
-
 msgid "Name"
 msgstr "Name"
 
@@ -1025,6 +858,15 @@ msgstr "Senden am"
 
 msgid "Resources"
 msgstr "Reservationen"
+
+msgid "Describes what this form is about"
+msgstr "Beschreibt kurz um was es bei diesem Formular geht"
+
+msgid "Used to group the form in the overview"
+msgstr "Dient zur Gruppierung in der Übersicht"
+
+msgid "Definition"
+msgstr "Definition"
 
 msgid "E-Mail Reply Address"
 msgstr "E-Mail Antwort Adresse"
@@ -1143,6 +985,9 @@ msgstr "Analytics Code"
 msgid "JavaScript for web statistics support"
 msgstr "JavaScript für Web-Statistik"
 
+msgid "Advanced"
+msgstr "Erweitert"
+
 msgid "A beneficiary is required if a bank account is given."
 msgstr "Ein Begünstigter ist nötig wenn ein Bank Konto angegeben wird."
 
@@ -1158,60 +1003,215 @@ msgstr "Einfach"
 msgid "With reference number (ESR)"
 msgstr "Mit Referenznummer (ESR)"
 
-msgid "E-Mail Address"
-msgstr "E-Mail Adresse"
+msgid "Except for"
+msgstr "Ausser an"
 
-msgid "Your note about this ticket"
-msgstr "Ihre Notiz zu dem Ticket"
+msgid "Daypasses"
+msgstr "Tageskarten"
 
-msgid "Admin"
-msgstr "Administrator"
+msgid "Daypasses Limit"
+msgstr "Tageskarten pro Person und Tag"
 
-msgid "Editor"
-msgstr "Editor"
+msgid "Each starting at"
+msgstr "Jeweils von"
 
-msgid "Member"
-msgstr "Mitglied"
+msgid "HH:MM"
+msgstr "HH:MM"
 
-msgid "State"
-msgstr "Status"
+msgid "Each ending at"
+msgstr "Jeweils bis"
 
-msgid "Role"
-msgstr "Rolle"
+msgid "May be partially reserved"
+msgstr "Kann abschnittweise reserviert werden"
 
-msgid "Yubikey"
-msgstr "YubiKey"
+msgid "Options"
+msgstr "Optionen"
 
-msgid "Plug your YubiKey into a USB slot and press it."
-msgstr "YubiKey anschliessen und Knopf drücken."
+msgid "Until"
+msgstr "Bis zum"
 
-msgid "The users e-mail address (a.k.a. username)"
-msgstr "Die E-Mail Adresse des Benutzers (bzw. der Benutzername)"
+msgid "New entries"
+msgstr "Neue Einträge"
 
-msgid "Send Activation E-Mail with Instructions"
-msgstr "Aktivierungs-Email mit Anmelde-Anleitung senden"
+msgid "Describes what this directory is about"
+msgstr "Beschreibt worum es bei diesem Verzeichnis geht"
 
-msgid "Invalid Yubikey"
-msgstr "Ungültiger YubiKey"
+msgid "Further Information"
+msgstr "Weitere Informationen"
+
+msgid "Title-Format"
+msgstr "Titel-Format"
+
+msgid "Display"
+msgstr "Anzeige"
+
+msgid "Lead-Format"
+msgstr "Lead-Format"
+
+msgid "Main view"
+msgstr "Hauptansicht"
+
+msgid "Filters"
+msgstr "Filter"
+
+msgid "Thumbnail"
+msgstr "Thumbnail"
+
+msgid "Icon"
+msgstr "Symbol"
+
+msgid "Marker"
+msgstr "Marker"
+
+msgid "Marker Color"
+msgstr "Marker Farbe"
+
+msgid "Color"
+msgstr "Farbe"
+
+msgid "Order"
+msgstr "Sortierung"
+
+msgid "Order-Format"
+msgstr "Sortierungs-Format"
+
+msgid "Direction"
+msgstr "Richtung"
+
+msgid "Pattern"
+msgstr "Muster"
+
+msgid "External Link"
+msgstr "Externer Link"
+
+msgid "Visible"
+msgstr "Sichtbar"
+
+msgid "Users may propose new entries"
+msgstr "Benutzer können neue Einträge vorschlagen"
+
+msgid "Guideline"
+msgstr "Wegleitung"
+
+msgid "Price per submission"
+msgstr "Preis pro Eingabe"
+
+msgid "Apply directory configuration"
+msgstr "Verzeichniskonfiguration anwenden"
+
+msgid "Mode"
+msgstr "Modus"
 
 #, python-format
-msgid "This Yubikey is already used by ${username}"
-msgstr "Dieser YubiKey wird bereits von ${username} verwendet"
+msgid "The following fields are unknown: ${fields}"
+msgstr "Die folgenden Felder sind unbekannt: ${fields}"
 
-msgid "A user with this e-mail address exists already"
-msgstr "Ein Benutzer mit dieser E-Mail Adresse existiert bereits"
+msgid "Please select at most one thumbnail field"
+msgstr "Bitte wählen Sie höchstens ein Thumbnail Feld"
 
-msgid "Active"
-msgstr "Aktiv"
+msgid "Entries have no coordinates"
+msgstr "Einträge haben keine Koordinaten"
 
-msgid "Inactive"
-msgstr "Inaktiv"
+msgid "Coordinates are shown on each entry"
+msgstr "Koordinaten werden auf den Einträgen angezeigt"
 
-msgid "Administrators and editors must use a Yubikey"
-msgstr "Administratoren und Editoren müssen zwingend einen YubiKey verwenden"
+msgid "Coordinates are shown on the directory and on each entry"
+msgstr "Koordinaten werden im Verzeichnis und auf den Einträgen angezeigt"
 
-msgid "Send a daily status e-mail."
-msgstr "Ein tägliches Status E-Mail senden."
+msgid "Default"
+msgstr "Standard"
+
+msgid "Custom"
+msgstr "Eigene"
+
+msgid "By title"
+msgstr "Nach Titel"
+
+msgid "By format"
+msgstr "Nach Format"
+
+msgid "Ascending"
+msgstr "Aufsteigend"
+
+msgid "Descending"
+msgstr "Absteigend"
+
+msgid "Paid"
+msgstr "Bezahlt"
+
+msgid "Yes, import configuration and entries"
+msgstr "Ja, Konfiguration und Einträge importieren"
+
+msgid "No, only import entries"
+msgstr "Nein, nur Einträge importieren"
+
+msgid "Only import new entries"
+msgstr "Nur neue Einträge importieren"
+
+msgid "Replace all entries"
+msgstr "Alle Einträge ersetzen"
+
+msgid "Describes what this photo album is about"
+msgstr "Beschreibt kurz um was es bei dem Fotoalbum geht"
+
+msgid "View"
+msgstr "Ansicht"
+
+msgid "Show images on homepage"
+msgstr "Bilder auf der Startseite zeigen"
+
+msgid "Full size images"
+msgstr "Grosse Bilder"
+
+msgid "Grid layout"
+msgstr "Raster"
+
+msgid "Limit the number of attendees"
+msgstr "Anzahl Teilnehmer limitieren"
+
+msgid "Attendees"
+msgstr "Teilnehmer"
+
+msgid "Number of attendees"
+msgstr "Anzahl Teilnehmer"
+
+msgid "Waitinglist"
+msgstr "Warteliste"
+
+msgid "Do not accept any submissions"
+msgstr "Keine Anmeldungen akzeptieren"
+
+#, python-format
+msgid ""
+"The limit cannot be lower than the already confirmed number of attendees "
+"(${claimed_spots})"
+msgstr ""
+"Das Limit kann nicht tiefer sein als die Anzahl bereits angemeldeter "
+"Teilnehmer (${claimed_spots})"
+
+#, python-format
+msgid ""
+"The limit cannot be lower than the already confirmed number attendees "
+"(${claimed_spots}) and the number of pending requests (${pending_requests}). "
+"Either enable the waiting list, process the pending requests or increase the "
+"limit. "
+msgstr ""
+"Das Limit kann nicht tiefer sein als die Summe der bereits angemeldeten "
+"Teilnemer (${claimed_spots}) und der offenen Anfragen (${pending_requests}). "
+"Aktivieren Sie entweder die Warteliste, verarbeiten Sie die offenen Anfragen "
+"oder erhöhen Sie das limit. "
+
+msgid "Yes, limit the number of attendees"
+msgstr "Ja, Anzahl Teilnehmer limitieren"
+
+msgid "No, allow an unlimited number of attendees"
+msgstr "Nein, eine unlimitierte Anzahl Teilnehmer zulassen"
+
+msgid "Yes, allow for more submissions than available spots"
+msgstr "Ja, mehr Anfragen als verfügbare Plätze erlauben"
+
+msgid "No, ensure that all submissions can be confirmed"
+msgstr "Nein, sicherstellen dass alle Anfragen bestätigt werden können"
 
 msgid "All directories"
 msgstr "Alle Verzeichnisse"
@@ -1226,56 +1226,11 @@ msgstr "${count} Einträge"
 msgid "1 entry"
 msgstr "1 Eintrag"
 
-msgid "The submission was adopted"
-msgstr "Der Eintrag wurde übernommen"
+msgid "Confirm?"
+msgstr "Bestätigen?"
 
-msgid "The submission was rejected"
-msgstr "Die Eingabe wurde abgelehnt"
-
-msgid "The entry is not valid, please adjust it"
-msgstr "Der Eintrag ist nicht gültig, bitte korrigieren"
-
-msgid "Your directory submission has been adopted"
-msgstr "Ihr Verzeichniseintrag wurde übernommen"
-
-msgid "Your directory submission has been rejected"
-msgstr "Ihre Eingabe wurde abgelehnt"
-
-msgid "An entry with this name already exists"
-msgstr "Ein Eintrag mit diesem Namen existiert bereits"
-
-msgid "Hide from the public"
-msgstr "Vor der Öffentlichkeit verstecken"
-
-msgid "Visibility"
-msgstr "Sichtbarkeit"
-
-msgid "Visible on homepage"
-msgstr "Auf der Startseite anzeigen"
-
-msgid "Older"
-msgstr "Älter"
-
-msgid "This month"
-msgstr "Diesen Monat"
-
-msgid "Last month"
-msgstr "Letzter Monat"
-
-msgid "Last year"
-msgstr "Letztes Jahr"
-
-msgid "This year"
-msgstr "Dieses Jahr"
-
-msgid "Do you really want to delete this note?"
-msgstr "Möchten Sie diese Notiz wirklich löschen?"
-
-msgid "Delete Note"
-msgstr "Notiz löschen"
-
-msgid "Always visible on homepage"
-msgstr "Immer auf der Startseite anzeigen"
+msgid "Extra..."
+msgstr "Extra..."
 
 msgid "Form Submissions"
 msgstr "Formulareingaben"
@@ -1380,6 +1335,39 @@ msgstr "Möchten Sie diese Veranstaltung wirklich absagen?"
 msgid "Rejecting this event can't be undone."
 msgstr "Eine Absage kann nicht rückgängig gemacht werden."
 
+msgid "Always visible on homepage"
+msgstr "Immer auf der Startseite anzeigen"
+
+msgid "Do you really want to delete this note?"
+msgstr "Möchten Sie diese Notiz wirklich löschen?"
+
+msgid "Delete Note"
+msgstr "Notiz löschen"
+
+msgid "Hide from the public"
+msgstr "Vor der Öffentlichkeit verstecken"
+
+msgid "Visibility"
+msgstr "Sichtbarkeit"
+
+msgid "Visible on homepage"
+msgstr "Auf der Startseite anzeigen"
+
+msgid "Older"
+msgstr "Älter"
+
+msgid "This month"
+msgstr "Diesen Monat"
+
+msgid "Last month"
+msgstr "Letzter Monat"
+
+msgid "Last year"
+msgstr "Letztes Jahr"
+
+msgid "This year"
+msgstr "Dieses Jahr"
+
 msgid "Link"
 msgstr "Verknüpfung"
 
@@ -1469,23 +1457,34 @@ msgstr ""
 "Unterseiten löschen. Um diese Seite zu löschen müssen Sie erst alle "
 "Unterseiten löschen, oder Sie wenden sich an einen Administrator."
 
-msgid "No directories defined yet."
-msgstr "Noch keine Verzeichnisse definiert."
+msgid "The submission was adopted"
+msgstr "Der Eintrag wurde übernommen"
 
-msgid "No entries found."
-msgstr "Keine Einträge gefunden."
+msgid "The submission was rejected"
+msgstr "Die Eingabe wurde abgelehnt"
 
-msgid "Propose entry"
-msgstr "Eintrag vorschlagen"
+msgid "The entry is not valid, please adjust it"
+msgstr "Der Eintrag ist nicht gültig, bitte korrigieren"
 
-msgid "Propose a new entry"
-msgstr "Einen neuen Eintrag vorschlagen"
+msgid "Your directory submission has been adopted"
+msgstr "Ihr Verzeichniseintrag wurde übernommen"
 
-msgid "External link"
-msgstr "Externer Link"
+msgid "Your directory submission has been rejected"
+msgstr "Ihre Eingabe wurde abgelehnt"
 
-msgid "More information"
-msgstr "Weiterführende Informationen"
+msgid "An entry with this name already exists"
+msgstr "Ein Eintrag mit diesem Namen existiert bereits"
+
+#. Canonical text for ${event} is: "Event"
+msgid "${event} published."
+msgstr "${event} veröffentlicht."
+
+#. Canonical text for ${event} is: "Event"
+msgid "${event} deleted."
+msgstr "${event} gelöscht."
+
+msgid "No forms defined yet."
+msgstr "Es wurden noch keine Formulare definiert."
 
 msgid ""
 "Your edit requires a migration of existing entries. Please confirm the "
@@ -1534,54 +1533,46 @@ msgstr "Verändert:"
 msgid "Confirm"
 msgstr "Bestätigen"
 
-msgid "There was an error while importing your directory!"
-msgstr "Beim Verzeichnisimport ist ein Fehler aufgetreten!"
+msgid ""
+"The user ${username} was created successfully. Please write down the user's "
+"password, as it won't be shown to you again:"
+msgstr ""
+"Der Benutzer ${username} wurde erfolgreich erstellt. Bitte notieren Sie das "
+"Passwort des Benutzers. Es wird Ihnen nicht wieder gezeigt:"
+
+msgid "Password:"
+msgstr "Passwort:"
 
 msgid ""
-"Please review your data and press \"Complete\" to finalize the process. If "
-"there's anything you'd like to change, click on \"Edit\" to return to the "
-"filled-out form."
+"The user ${username} was created successfully. An e-mail has been sent to "
+"the user with login instructions."
 msgstr ""
-"Bitte überprüfen Sie Ihre Angaben und klicken Sie auf \"Abschliessen\" um "
-"die Anfrage zu übermitteln. Wenn Sie Änderungen vornehmen möchten, klicken "
-"Sie auf \"Bearbeiten\" um zum Formular zurückzukehren."
+"Der Benutzer ${username} wurde erfolgreich erstellt. Eine E-Mail mit einer "
+"Anmeldungs-Anleitung wurde an den Benutzer gesendet."
 
-msgid "Complete"
-msgstr "Abschliessen"
+msgid "Back to usermanagement"
+msgstr "Zurück zur Benutzerverwaltung"
 
-msgid "No exports available."
-msgstr "Keine Exporte verfügbar."
+msgid "Utilised"
+msgstr "Ausgelastet"
+
+msgid "No payment providers defined."
+msgstr "Keine Zahlungsanbieter definiert."
+
+msgid "Connected:"
+msgstr "Verbunden:"
+
+msgid "Fee:"
+msgstr "Gebühr:"
+
+msgid "No people added yet."
+msgstr "Es wurden noch keine Personen hinzugefügt."
 
 msgid "Upload"
 msgstr "Hochladen"
 
 msgid "Just Uploaded"
 msgstr "Soeben hochgeladen"
-
-msgid "Extension"
-msgstr "Erweiterung"
-
-msgid "Upload Date"
-msgstr "Hochlade-Datum"
-
-msgid "All Files"
-msgstr "Alle Dateien"
-
-msgid "No files uploaded yet"
-msgstr "Noch keine Dateien hochgeladen"
-
-msgid "You are trying to open a page for which you are not authorized."
-msgstr "Ihnen fehlt die nötige Berechtigung um diese Seite zu öffnen."
-
-msgid "Please follow this link to login with a different user."
-msgstr ""
-"Bitte folgen Sie diesem Link um sich mit einem anderen Benutzer anzumelden."
-
-msgid "Please follow this link to login."
-msgstr "Bitte folgen Sie diesem Link um sich anzumelden."
-
-msgid "No forms defined yet."
-msgstr "Es wurden noch keine Formulare definiert."
 
 msgid ""
 "To edit the image descriptions, click on one, enter your descrption and "
@@ -1593,36 +1584,66 @@ msgstr ""
 msgid "No images uploaded yet"
 msgstr "Noch keine Bilder hochgeladen"
 
-msgid "This album does not contain any images yet."
-msgstr "Dieses Fotoalbum enthält noch keine Bilder."
+msgid "Dear Sir or Madam,"
+msgstr "Guten Tag"
 
-msgid "No photo albums defined yet."
-msgstr "Noch keine Fotoalben erstellt."
-
-msgid "Skip navigation"
-msgstr "Navigation überspringen"
-
-msgid "Back to the homepage"
-msgstr "Zurück zur Startseite"
-
-msgid "Search"
-msgstr "Suche"
-
-msgid "The form contains errors. Please check the fields marked in red."
+msgid "An administrator just created a new account on ${org} for you."
 msgstr ""
-"Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
+"Ein Administrator hat soeben ein neues Konto auf ${org} für Sie eingerichtet."
 
-msgid "Don't have an account yet?"
-msgstr "Sie haben noch kein Benutzerkonto?"
+msgid "Your username is ${email}."
+msgstr "Ihr Benutzername ist ${email}."
 
-msgid "Register now"
-msgstr "Jetzt registrieren"
+msgid "Click on the following link to set your account password:"
+msgstr "Bitte klicken Sie auf den folgenden Link um Ihr Passwort zu setzen:"
 
-msgid "Forgot your password?"
-msgstr "Sie haben Ihr Passwort vergessen?"
+msgid "Set Account Password"
+msgstr "Passwort setzen"
+
+msgid ""
+"If the password link has expired, you can also request a new password here:"
+msgstr ""
+"Falls der Passwort-Link abgelaufen ist, können Sie hier ein neues Passwort "
+"anfordern:"
 
 msgid "Reset password"
 msgstr "Passwort zurücksetzen"
+
+msgid "To use your account you need the Yubikey with the serial ${number}"
+msgstr ""
+"Um Ihr Konto zu verwenden benötigen Sie den YubiKey mit der Seriennummer "
+"${number}"
+
+msgid ""
+"The following recipients receive a daily e-mail sent at 06:00 containing the "
+"reservation data for all reservations of the day."
+msgstr ""
+"Die folgenden Empfänger erhalten jeden Tag um 06:00 eine E-Mail mit den "
+"Reservationen des Tages."
+
+msgid "No recipients defined yet."
+msgstr "Es wurden noch keine Empfänger definiert."
+
+msgid "This newsletter has not been sent yet."
+msgstr "Dieser Newsletter wurde noch nicht gesendet."
+
+msgid "First sent ${time_ago}."
+msgstr "Zum ersten Mal gesendet ${time_ago}."
+
+msgid "This newsletter was sent to ${n} subscribers."
+msgstr "Dieser Newsletter wurde an ${n} Abonnenten gesendet."
+
+msgid "All subscribers have already received this newsletter."
+msgstr "Dieser Newsletter wurde bereits von allen Abonnenten empfangen."
+
+msgid "The newsletter is scheduled to be sent on ${time}"
+msgstr "Der Newsletter wird am ${time} versendet"
+
+msgid "Delivery"
+msgstr "Versand"
+
+msgid "The newsletter was already sent to the following addresses:"
+msgstr "Der Newsletter wurde bereits an die folgenden Empfänger gesendet:"
 
 msgid "You are here"
 msgstr "Sie sind hier"
@@ -1741,6 +1762,15 @@ msgstr ""
 "ein Fotoalbum, fügen ein paar Bilder hinzu und markieren das Album als auf "
 "der Startseite verfügbar."
 
+msgid "uploaded on ${date}"
+msgstr "hochgeladen am ${date}"
+
+msgid "${count} page"
+msgstr "${count} Seite"
+
+msgid "${count} pages"
+msgstr "${count} Seiten"
+
 msgid ""
 "Your request will be processed shortly. To see the state of your process "
 "your may return to this page at any time. All information on this page has "
@@ -1773,6 +1803,9 @@ msgstr "Kreditkarten-Gebühr"
 
 msgid "Pay Offline later"
 msgstr "Später bezahlen"
+
+msgid "Complete"
+msgstr "Abschliessen"
 
 msgid "at ${time}"
 msgstr "um ${time}"
@@ -1828,54 +1861,36 @@ msgstr "Möchten Sie das Bild wirklich löschen?"
 msgid "Delete Image"
 msgstr "Bild Löschen"
 
-msgid "Dear Sir or Madam,"
-msgstr "Guten Tag"
-
-msgid "Your e-mail address was just used to create an account on ${homepage}."
+msgid ""
+"You are editing a note created by someone else. By saving your changes you "
+"will become the author of the whole note."
 msgstr ""
-"Ihre E-Mail Adresse wurde soeben zur Erstellung eines Accounts auf "
-"${homepage} verwendet."
-
-msgid "To activate your account, click confirm below:"
-msgstr "Um Ihren Account zu aktivieren, bestätigen Sie bitte die Anmeldung:"
-
-msgid "Confirm my account"
-msgstr "Anmeldung bestätigen"
+"Diese Notiz wurde von jemand anderem erstellt. Durch Ihre Änderung werden "
+"Sie der neue Autor der ganzen Notiz."
 
 msgid ""
-"If you believe this is an error, ignore this message and we'll never bother "
-"you again."
+"Notes are private and only shown to logged-in members. You can use links/e-"
+"mail addresses are turned into clickable links."
 msgstr ""
-"Falls Sie sich nicht bei dieser Seite angemeldet haben, können Sie diese "
-"Nachricht ignorieren. Sie erhalten dann keine weiteren E-Mails von uns."
+"Notizen sind privat und werden nur angemeldeten Benutzern angezeigt. E-Mail "
+"Adressen und Links werden klickbar gemacht."
 
-msgid "Hello"
-msgstr "Grüezi"
+msgid "No reservation resources defined yet."
+msgstr "Es wurden noch keine Ressourcen hinzugefügt."
 
 msgid ""
-"You are recieving this mail because you subscribed to the following "
-"newsletter:"
+"Searching is currently unavailable due to technical difficulties. Please "
+"excuse the inconvenience and try again later."
 msgstr ""
-"Sie erhalten diese E-Mail weil Sie sich für den folgenden Newsletter "
-"angemeldet haben:"
+"Die Suche ist zur Zeit aufgrund technischer Schwierigkeiten nicht verfügbar. "
+"Bitte entschuldigen Sie die Unannehmlichkeiten und versuchen Sie es später "
+"wieder."
 
-msgid "Plese click the following link to confirm your subscription:"
-msgstr ""
-"Bitte klicken Sie auf den folgenden Link um Ihre Anmeldung zu bestätigen:"
+msgid "Search"
+msgstr "Suche"
 
-msgid "Confirm subscription"
-msgstr "Anmeldung bestätigen"
-
-msgid ""
-"If you did not subscribe to this newsletter you can simply ignore this e-"
-"mail. We will not bother you again."
-msgstr ""
-"Falls Sie sich nicht für diesen Newsletter angemeldet haben können Sie diese "
-"E-Mail einfach ignorieren. Wir werden Sie in diesem Fall nicht weiter "
-"belästigen."
-
-msgid "Best regards,"
-msgstr "Mit freundlichen Grüssen,"
+msgid "Your search returned no results."
+msgstr "Zu Ihrer Suche wurde nichts gefunden"
 
 msgid "Good morning,"
 msgstr "Guten Morgen"
@@ -1897,6 +1912,195 @@ msgstr ""
 "Dies ist die tägliche Reservations-Übersicht für ${organisation}. Falls Sie "
 "dieses E-Mail nicht mehr bekommen möchten, melden Sie sich bitte bei einem "
 "Administrator damit dieser Sie von der Empfängerliste streichen kann."
+
+msgid "A new ticket has been opened"
+msgstr "Ein neues Ticket wurde für Sie eröffnet"
+
+msgid "The ticket number is"
+msgstr "Ihre Ticket Referenz"
+
+msgid ""
+"We will send another e-mail once your ticket has been completed. In the "
+"meantime you can check the status of your ticket at any time:"
+msgstr ""
+"Sie erhalten ein weiteres E-Mail, sobald Ihr Ticket abgeschlossen wurde. In "
+"der Zwischenzeit sehen Sie den Status Ihres Tickets jederzeit hier:"
+
+msgid "Check ticket status"
+msgstr "Ticket Status abfragen"
+
+msgid "The following reservations have been accepted:"
+msgstr "Die folgenden Reservationen wurden angenommen:"
+
+msgid ""
+"You've reached this site because you are logged in. Visitors are "
+"automatically redirected to the following link:"
+msgstr ""
+"Sie sehen diese Seite weil Sie eingeloggt sind. Besucher werden automatisch "
+"zum folgenden Verweis weitergeleitet:"
+
+msgid ""
+"You are not automatically redirected so you have a chance to edit or delete "
+"this link."
+msgstr ""
+"Sie wurden nicht automatisch weitergeleitet damit Sie die Möglichkeit haben "
+"den Verweis zu bearbeiten oder zu löschen."
+
+msgid "No entries found."
+msgstr "Keine Einträge gefunden."
+
+msgid "Propose entry"
+msgstr "Eintrag vorschlagen"
+
+msgid "Propose a new entry"
+msgstr "Einen neuen Eintrag vorschlagen"
+
+msgid "Don't have an account yet?"
+msgstr "Sie haben noch kein Benutzerkonto?"
+
+msgid "Register now"
+msgstr "Jetzt registrieren"
+
+msgid "Forgot your password?"
+msgstr "Sie haben Ihr Passwort vergessen?"
+
+msgid "${amount} marked as paid."
+msgstr "${amount} als bezahlt markiert."
+
+msgid "${amount} marked as unpaid."
+msgstr "${amount} als unbezahlt markiert."
+
+msgid "${amount} captured."
+msgstr "${amount} eingenommen."
+
+msgid "${amount} refunded."
+msgstr "${amount} rückerstattet."
+
+msgid ""
+"A signup link allows anyone to sign up with a specific role. Those signups "
+"are limited by time and count but they still present a security risk. Be "
+"sure to only share this link with people you trust."
+msgstr ""
+"Mit einem Registrationslink können sich neue Benutzer für bestimmte Rollen "
+"anmelden, sofern sie den Link kennen. Diese Anmeldungen sind zeitlich "
+"limitiert und auf eine bestimmte Anzahl beschränkt. Trotzdem stellen Sie ein "
+"gewisses Sicherheitsrisiko dar. Bitte teilen Sie diese Links nur mit "
+"Personen denen Sie vertrauen."
+
+msgid ""
+"Your signup link has been created as follows. Please copy it before "
+"continuing, it won't be shown to you again:"
+msgstr ""
+"Ihr Registrationslink wurde wie folgt erstellt. Bitte kopieren Sie diesen "
+"bevor Sie weiterfahren, der Link wird Ihnen nicht wieder angezeigt:"
+
+msgid ""
+"You are receiving this e-mail because you signed up for the ${org} "
+"newsletter."
+msgstr ""
+"Sie erhalten Diese E-Mail weil Sie sich für den ${org} Newsletter angemeldet "
+"haben."
+
+msgid "Click here to view web version."
+msgstr "Klicken Sie hier um die Web-Version anzuzeigen."
+
+msgid "Click here to unsubscribe."
+msgstr "Klicken Sie hier um sich abzumelden."
+
+msgid "This album does not contain any images yet."
+msgstr "Dieses Fotoalbum enthält noch keine Bilder."
+
+msgid "Your directory submission has unfortunately been rejected:"
+msgstr "Ihre Verzeichniseintrag Eintabe wurde leider abgelehnt:"
+
+msgid "1 reservation accepted."
+msgstr "1 Reservation angenommen."
+
+msgid "${count} reservations accepted."
+msgstr "${count} Reservationen angenommen"
+
+msgid "1 reservation rejected."
+msgstr "1 Reservation abgelehnt."
+
+msgid "${count} reservations rejected."
+msgstr "${count} Reservationen abgelehnt."
+
+msgid "No dates found, please select dates in the calendar first"
+msgstr "Keine Termine gefunden, bitte wählen Sie erst Termine im Kalender aus"
+
+msgid "Go to calendar"
+msgstr "Zum Kalender"
+
+msgid "Your event has been accepted:"
+msgstr "Ihre Veranstaltung wurde angenommen:"
+
+msgid "Your e-mail address was just used to create an account on ${homepage}."
+msgstr ""
+"Ihre E-Mail Adresse wurde soeben zur Erstellung eines Accounts auf "
+"${homepage} verwendet."
+
+msgid "To activate your account, click confirm below:"
+msgstr "Um Ihren Account zu aktivieren, bestätigen Sie bitte die Anmeldung:"
+
+msgid "Confirm my account"
+msgstr "Anmeldung bestätigen"
+
+msgid ""
+"If you believe this is an error, ignore this message and we'll never bother "
+"you again."
+msgstr ""
+"Falls Sie sich nicht bei dieser Seite angemeldet haben, können Sie diese "
+"Nachricht ignorieren. Sie erhalten dann keine weiteren E-Mails von uns."
+
+msgid ""
+"Please review your data and press \"Complete\" to finalize the process. If "
+"there's anything you'd like to change, click on \"Edit\" to return to the "
+"filled-out form."
+msgstr ""
+"Bitte überprüfen Sie Ihre Angaben und klicken Sie auf \"Abschliessen\" um "
+"die Anfrage zu übermitteln. Wenn Sie Änderungen vornehmen möchten, klicken "
+"Sie auf \"Bearbeiten\" um zum Formular zurückzukehren."
+
+msgid "Export this events"
+msgstr "Diese Termine exportieren"
+
+msgid "Submit your event"
+msgstr "Veranstaltung melden"
+
+msgid "Submit your own event"
+msgstr "Einen eigenen Eintrag für den Veranstaltungskalender erfassen"
+
+msgid "Removes all unreserved allocations between the start and end date."
+msgstr ""
+"Entfernt alle nicht-reservierten Einteilungen zwischen Start- und End-Datum"
+
+msgid "You are trying to open a page for which you are not authorized."
+msgstr "Ihnen fehlt die nötige Berechtigung um diese Seite zu öffnen."
+
+msgid "Please follow this link to login with a different user."
+msgstr ""
+"Bitte folgen Sie diesem Link um sich mit einem anderen Benutzer anzumelden."
+
+msgid "Please follow this link to login."
+msgstr "Bitte folgen Sie diesem Link um sich anzumelden."
+
+msgid "No exports available."
+msgstr "Keine Exporte verfügbar."
+
+msgid "State:"
+msgstr "Status:"
+
+msgid "Owner:"
+msgstr "Besitzer:"
+
+msgid "Kind:"
+msgstr "Art:"
+
+msgid "Accept"
+msgstr "Annehmen"
+
+msgid "Your ticket has been reopened"
+msgstr "Ihr Ticket wurde wieder geöffnet"
 
 msgid "This is what happend on the ${org} website yesterday:"
 msgstr "Folgendes ist gestern auf der ${org} Webseite geschehen:"
@@ -1952,367 +2156,11 @@ msgid "Or by changing the settings in your user profile."
 msgstr ""
 "Alternativ können Sie die Einstellungen in Ihrem Benutzerprofil anpassen."
 
-msgid "Your directory submission has been adopted:"
-msgstr "Ihr Verzeichniseintrag wurde übernommen:"
-
-msgid "The ticket number is"
-msgstr "Ihre Ticket Referenz"
-
-msgid "Check ticket status"
-msgstr "Ticket Status abfragen"
-
-msgid "Your directory submission has unfortunately been rejected:"
-msgstr "Ihre Verzeichniseintrag Eintabe wurde leider abgelehnt:"
-
-msgid "Your event has been accepted:"
-msgstr "Ihre Veranstaltung wurde angenommen:"
-
-msgid "Your event has unfortunately been rejected:"
-msgstr "Ihre Veranstaltung musste leider abgelehnt werden:"
-
-msgid "The OneGov Cloud Team"
-msgstr "Das OneGov Cloud Team"
-
-msgid "An administrator just created a new account on ${org} for you."
-msgstr ""
-"Ein Administrator hat soeben ein neues Konto auf ${org} für Sie eingerichtet."
-
-msgid "Your username is ${email}."
-msgstr "Ihr Benutzername ist ${email}."
-
-msgid "Click on the following link to set your account password:"
-msgstr "Bitte klicken Sie auf den folgenden Link um Ihr Passwort zu setzen:"
-
-msgid "Set Account Password"
-msgstr "Passwort setzen"
-
-msgid ""
-"If the password link has expired, you can also request a new password here:"
-msgstr ""
-"Falls der Passwort-Link abgelaufen ist, können Sie hier ein neues Passwort "
-"anfordern:"
-
-msgid "To use your account you need the Yubikey with the serial ${number}"
-msgstr ""
-"Um Ihr Konto zu verwenden benötigen Sie den YubiKey mit der Seriennummer "
-"${number}"
-
-msgid ""
-"You are receiving this e-mail because you signed up for the ${org} "
-"newsletter."
-msgstr ""
-"Sie erhalten Diese E-Mail weil Sie sich für den ${org} Newsletter angemeldet "
-"haben."
-
-msgid "Click here to view web version."
-msgstr "Klicken Sie hier um die Web-Version anzuzeigen."
-
-msgid "Click here to unsubscribe."
-msgstr "Klicken Sie hier um sich abzumelden."
-
-msgid "Click the following link to set a new password:"
-msgstr "Klicken Sie auf den folgenden Link, um ein neues Passwort zu setzen:"
-
-msgid "If you don't want to change your password, you can ignore this email."
-msgstr ""
-"Sie können dieses E-Mail ignorieren, falls Sie Ihr Passwort nicht ändern "
-"möchten."
-
-msgid "Your ticket has received a payment."
-msgstr "Ihr Ticket hat eine Zahlung erhalten."
-
-msgid "Your ticket was marked as unpaid."
-msgstr "Ihr Ticket wurde als unbezahlt markiert."
-
-msgid ""
-"Your ticket's payment has been refunded. Note that it might take a few days "
-"until your refunded amount is shown on your credit card bill."
-msgstr ""
-"Ihre Ticket Zahlung wurde rückerstattet. Bitte beachten Sie dass es ein paar "
-"Tage dauern kann bis der Betrag auf Ihrer Kreditkartenabrechnung erscheint."
-
-msgid "The payment amount is"
-msgstr "Ihr Betrag"
-
-msgid "Your registration for \"${title}\" has been confirmed."
-msgstr "Ihre Anmeldung für \"${title}\" wurde bestätigt."
-
-msgid "Your registration for \"${title}\" has been denied."
-msgstr "Ihre Anmeldung für \"${title}\" wurde abgelehnt."
-
-msgid "Your registration for \"${title}\" has been cancelled."
-msgstr "Ihre Anmeldung für \"${title}\" wurde storniert."
-
-msgid "Registration"
-msgstr "Anmeldung"
-
-msgid "The following reservations have been accepted:"
-msgstr "Die folgenden Reservationen wurden angenommen:"
-
-msgid "The following reservations have unfortunately been cancelled:"
-msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
-
-msgid "Your ticket has been closed"
-msgstr "Ihr Ticket wurde geschlossen"
-
-msgid "A new ticket has been opened"
-msgstr "Ein neues Ticket wurde für Sie eröffnet"
-
-msgid ""
-"We will send another e-mail once your ticket has been completed. In the "
-"meantime you can check the status of your ticket at any time:"
-msgstr ""
-"Sie erhalten ein weiteres E-Mail, sobald Ihr Ticket abgeschlossen wurde. In "
-"der Zwischenzeit sehen Sie den Status Ihres Tickets jederzeit hier:"
-
-msgid "Your ticket has been reopened"
-msgstr "Ihr Ticket wurde wieder geöffnet"
-
-msgid "Directory entry adopted."
-msgstr "Verzeichniseintrag übernommen."
-
-msgid "Directory entry rejected."
-msgstr "Verzeichniseintrag abgelehnt."
-
-#. Canonical text for ${event} is: "Event"
-msgid "${event} published."
-msgstr "${event} veröffentlicht."
-
-#. Canonical text for ${event} is: "Event"
-msgid "${event} deleted."
-msgstr "${event} gelöscht."
-
-msgid "${amount} marked as paid."
-msgstr "${amount} als bezahlt markiert."
-
-msgid "${amount} marked as unpaid."
-msgstr "${amount} als unbezahlt markiert."
-
-msgid "${amount} captured."
-msgstr "${amount} eingenommen."
-
-msgid "${amount} refunded."
-msgstr "${amount} rückerstattet."
-
-msgid "1 reservation accepted."
-msgstr "1 Reservation angenommen."
-
-msgid "${count} reservations accepted."
-msgstr "${count} Reservationen angenommen"
-
-msgid "1 reservation rejected."
-msgstr "1 Reservation abgelehnt."
-
-msgid "${count} reservations rejected."
-msgstr "${count} Reservationen abgelehnt."
-
-msgid "Registration confirmed."
-msgstr "Anmeldung bestätigt."
-
-msgid "Registration denied."
-msgstr "Anmeldung abgelehnt."
-
-msgid "Registration cancelled."
-msgstr "Anmeldung storniert."
-
-msgid "Ticket opened."
-msgstr "Ticket eröffnet."
-
-msgid "Ticket accepted."
-msgstr "Ticket angenommen."
-
-msgid "Ticket closed."
-msgstr "Ticket geschlossen."
-
-msgid "Ticket reopened."
-msgstr "Ticket wieder geöffnet."
-
-msgid "Ticket e-mails disabled."
-msgstr "Ticket E-Mails deaktiviert."
-
-msgid "Ticket e-mails enabled."
-msgstr "Ticket E-Mails aktiviert."
-
-msgid "Sign up to our newsletter to always stay up to date:"
-msgstr ""
-"Abonnieren Sie unseren Newsletter um immer auf dem Laufenden zu bleiben:"
-
-msgid "Signup"
-msgstr "Abonnieren"
-
-msgid "There are currently ${count} recipients registered."
-msgstr "Zur Zeit sind ${count} Abonnenten registriert."
-
-msgid "Archive"
-msgstr "Archiv"
-
-msgid "No newsletters yet."
-msgstr "Es wurden noch keine Newsletter versendet"
-
-msgid "Not yet sent."
-msgstr "Noch nicht gesendet."
-
-msgid ""
-"The user ${username} was created successfully. Please write down the user's "
-"password, as it won't be shown to you again:"
-msgstr ""
-"Der Benutzer ${username} wurde erfolgreich erstellt. Bitte notieren Sie das "
-"Passwort des Benutzers. Es wird Ihnen nicht wieder gezeigt:"
-
-msgid "Password:"
-msgstr "Passwort:"
-
-msgid ""
-"The user ${username} was created successfully. An e-mail has been sent to "
-"the user with login instructions."
-msgstr ""
-"Der Benutzer ${username} wurde erfolgreich erstellt. Eine E-Mail mit einer "
-"Anmeldungs-Anleitung wurde an den Benutzer gesendet."
-
-msgid "Back to usermanagement"
-msgstr "Zurück zur Benutzerverwaltung"
-
-msgid ""
-"Sorry, the page you are looking for could not be found. Try checking the URL "
-"for errors or use the search box on the top."
-msgstr ""
-"Es tut uns leid, aber die Seite nach der Sie suchen konnte nicht gefunden "
-"werden. Bitte überprüfen Sie die Internetadresse oder verwenden Sie die "
-"Suche im Navigationsbereich."
-
-msgid "This is an imported event"
-msgstr "Dies ist eine importierte Veranstaltung"
-
-msgid "Export this event"
-msgstr "Diesen Termin exportieren"
-
-msgid "Export all occurrences of this event"
-msgstr "Alle Termine exportieren"
-
-msgid "All occurrences of this event"
-msgstr "Alle Termine dieser Veranstaltung"
-
-msgid "Export this events"
-msgstr "Diese Termine exportieren"
-
-msgid "Submit your event"
-msgstr "Veranstaltung melden"
-
-msgid "Submit your own event"
-msgstr "Einen eigenen Eintrag für den Veranstaltungskalender erfassen"
-
-msgid "No payment providers defined."
-msgstr "Keine Zahlungsanbieter definiert."
-
-msgid "Connected:"
-msgstr "Verbunden:"
-
-msgid "Fee:"
-msgstr "Gebühr:"
-
-msgid "No payments yet."
-msgstr "Noch keine Zahlungen."
-
-msgid "No people added yet."
-msgstr "Es wurden noch keine Personen hinzugefügt."
-
-msgid ""
-"Subscribers may always unsubscribe themselves through a link shown at the "
-"bottom of the newsletter. If you unsubscribe them here, they will not be "
-"notified."
-msgstr ""
-"Abonnenten können sich jederzeit selber über den Link am Fuss des Newsletter "
-"abmelden. Hier abgemeldete Personen werden nicht benachrichtigt."
-
-msgid "Unsubscribe"
-msgstr "Abmelden"
-
-msgid "No dates found, please select dates in the calendar first"
-msgstr "Keine Termine gefunden, bitte wählen Sie erst Termine im Kalender aus"
-
-msgid "Go to calendar"
-msgstr "Zum Kalender"
-
-msgid "Select a free time span in the calendar below to create an allocation."
-msgstr ""
-"Wählen Sie eine freie Zeitspanne im Kalender aus um eine Einteilung zu "
-"machen."
-
-msgid "Removes all unreserved allocations between the start and end date."
-msgstr ""
-"Entfernt alle nicht-reservierten Einteilungen zwischen Start- und End-Datum"
-
-msgid "Utilised"
-msgstr "Ausgelastet"
-
-msgid ""
-"The following recipients receive a daily e-mail sent at 06:00 containing the "
-"reservation data for all reservations of the day."
-msgstr ""
-"Die folgenden Empfänger erhalten jeden Tag um 06:00 eine E-Mail mit den "
-"Reservationen des Tages."
-
-msgid "No recipients defined yet."
-msgstr "Es wurden noch keine Empfänger definiert."
-
-msgid "No reservation resources defined yet."
-msgstr "Es wurden noch keine Ressourcen hinzugefügt."
-
-msgid ""
-"Searching is currently unavailable due to technical difficulties. Please "
-"excuse the inconvenience and try again later."
-msgstr ""
-"Die Suche ist zur Zeit aufgrund technischer Schwierigkeiten nicht verfügbar. "
-"Bitte entschuldigen Sie die Unannehmlichkeiten und versuchen Sie es später "
-"wieder."
-
-msgid "Your search returned no results."
-msgstr "Zu Ihrer Suche wurde nichts gefunden"
-
 msgid "Select the images that should be shown inside this album."
 msgstr "Wählen Sie die Bilder aus welche im Album angezeigt werden sollen."
 
 msgid "Confirm selection"
 msgstr "Auswahl bestätigen"
-
-msgid "This newsletter has not been sent yet."
-msgstr "Dieser Newsletter wurde noch nicht gesendet."
-
-msgid "First sent ${time_ago}."
-msgstr "Zum ersten Mal gesendet ${time_ago}."
-
-msgid "This newsletter was sent to ${n} subscribers."
-msgstr "Dieser Newsletter wurde an ${n} Abonnenten gesendet."
-
-msgid "All subscribers have already received this newsletter."
-msgstr "Dieser Newsletter wurde bereits von allen Abonnenten empfangen."
-
-msgid "The newsletter is scheduled to be sent on ${time}"
-msgstr "Der Newsletter wird am ${time} versendet"
-
-msgid "Delivery"
-msgstr "Versand"
-
-msgid "The newsletter was already sent to the following addresses:"
-msgstr "Der Newsletter wurde bereits an die folgenden Empfänger gesendet:"
-
-msgid ""
-"A signup link allows anyone to sign up with a specific role. Those signups "
-"are limited by time and count but they still present a security risk. Be "
-"sure to only share this link with people you trust."
-msgstr ""
-"Mit einem Registrationslink können sich neue Benutzer für bestimmte Rollen "
-"anmelden, sofern sie den Link kennen. Diese Anmeldungen sind zeitlich "
-"limitiert und auf eine bestimmte Anzahl beschränkt. Trotzdem stellen Sie ein "
-"gewisses Sicherheitsrisiko dar. Bitte teilen Sie diese Links nur mit "
-"Personen denen Sie vertrauen."
-
-msgid ""
-"Your signup link has been created as follows. Please copy it before "
-"continuing, it won't be shown to you again:"
-msgstr ""
-"Ihr Registrationslink wurde wie folgt erstellt. Bitte kopieren Sie diesen "
-"bevor Sie weiterfahren, der Link wird Ihnen nicht wieder angezeigt:"
 
 msgid "No e-mails will be sent for this ticket."
 msgstr "Zu diesem Ticket werden keine E-Mails versendet."
@@ -2348,52 +2196,6 @@ msgstr "Reaktionszeit"
 msgid "Process Time"
 msgstr "Bearbeitungszeit"
 
-msgid ""
-"You are editing a note created by someone else. By saving your changes you "
-"will become the author of the whole note."
-msgstr ""
-"Diese Notiz wurde von jemand anderem erstellt. Durch Ihre Änderung werden "
-"Sie der neue Autor der ganzen Notiz."
-
-msgid ""
-"Notes are private and only shown to logged-in members. You can use links/e-"
-"mail addresses are turned into clickable links."
-msgstr ""
-"Notizen sind privat und werden nur angemeldeten Benutzern angezeigt. E-Mail "
-"Adressen und Links werden klickbar gemacht."
-
-msgid "State:"
-msgstr "Status:"
-
-msgid "Owner:"
-msgstr "Besitzer:"
-
-msgid "Kind:"
-msgstr "Art:"
-
-msgid "Accept"
-msgstr "Annehmen"
-
-msgid ""
-"You've reached this site because you are logged in. Visitors are "
-"automatically redirected to the following link:"
-msgstr ""
-"Sie sehen diese Seite weil Sie eingeloggt sind. Besucher werden automatisch "
-"zum folgenden Verweis weitergeleitet:"
-
-msgid ""
-"You are not automatically redirected so you have a chance to edit or delete "
-"this link."
-msgstr ""
-"Sie wurden nicht automatisch weitergeleitet damit Sie die Möglichkeit haben "
-"den Verweis zu bearbeiten oder zu löschen."
-
-msgid "No links found."
-msgstr "Keine Verknüpfungen gefunden."
-
-msgid "Select an item to view it"
-msgstr "Wählen Sie einen Eintrag aus um diesen anzuzeigen"
-
 msgid "Username"
 msgstr "Benutzername"
 
@@ -2403,24 +2205,218 @@ msgstr "Identicon"
 msgid "Password"
 msgstr "Passwort"
 
-msgid "Confirm?"
-msgstr "Bestätigen?"
+msgid "There was an error while importing your directory!"
+msgstr "Beim Verzeichnisimport ist ein Fehler aufgetreten!"
 
-msgid "Extra..."
-msgstr "Extra..."
+msgid "Ticket opened."
+msgstr "Ticket eröffnet."
 
-msgid "New allocation"
-msgstr "Neue Einteilung"
+msgid "Ticket accepted."
+msgstr "Ticket angenommen."
 
-#, python-format
-msgid "Successfully added ${n} allocations"
-msgstr "${n} Einteilungen wurden hinzugefügt"
+msgid "Ticket closed."
+msgstr "Ticket geschlossen."
 
-msgid "Your changes were saved"
-msgstr "Ihre Änderungen wurden gespeichert"
+msgid "Ticket reopened."
+msgstr "Ticket wieder geöffnet."
 
-msgid "Topics A-Z"
-msgstr "Themen A-Z"
+msgid "Ticket e-mails disabled."
+msgstr "Ticket E-Mails deaktiviert."
+
+msgid "Ticket e-mails enabled."
+msgstr "Ticket E-Mails aktiviert."
+
+msgid "No links found."
+msgstr "Keine Verknüpfungen gefunden."
+
+msgid "Select an item to view it"
+msgstr "Wählen Sie einen Eintrag aus um diesen anzuzeigen"
+
+msgid "Directory entry adopted."
+msgstr "Verzeichniseintrag übernommen."
+
+msgid "Directory entry rejected."
+msgstr "Verzeichniseintrag abgelehnt."
+
+msgid "Extension"
+msgstr "Erweiterung"
+
+msgid "Upload Date"
+msgstr "Hochlade-Datum"
+
+msgid "All Files"
+msgstr "Alle Dateien"
+
+msgid "No files uploaded yet"
+msgstr "Noch keine Dateien hochgeladen"
+
+msgid "The OneGov Cloud Team"
+msgstr "Das OneGov Cloud Team"
+
+msgid "No payments yet."
+msgstr "Noch keine Zahlungen."
+
+msgid "The following reservations have unfortunately been cancelled:"
+msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
+
+msgid "This is an imported event"
+msgstr "Dies ist eine importierte Veranstaltung"
+
+msgid "Export this event"
+msgstr "Diesen Termin exportieren"
+
+msgid "Export all occurrences of this event"
+msgstr "Alle Termine exportieren"
+
+msgid "All occurrences of this event"
+msgstr "Alle Termine dieser Veranstaltung"
+
+msgid ""
+"Subscribers may always unsubscribe themselves through a link shown at the "
+"bottom of the newsletter. If you unsubscribe them here, they will not be "
+"notified."
+msgstr ""
+"Abonnenten können sich jederzeit selber über den Link am Fuss des Newsletter "
+"abmelden. Hier abgemeldete Personen werden nicht benachrichtigt."
+
+msgid "Unsubscribe"
+msgstr "Abmelden"
+
+msgid "Click the following link to set a new password:"
+msgstr "Klicken Sie auf den folgenden Link, um ein neues Passwort zu setzen:"
+
+msgid "If you don't want to change your password, you can ignore this email."
+msgstr ""
+"Sie können dieses E-Mail ignorieren, falls Sie Ihr Passwort nicht ändern "
+"möchten."
+
+msgid "Skip navigation"
+msgstr "Navigation überspringen"
+
+msgid "Back to the homepage"
+msgstr "Zurück zur Startseite"
+
+msgid "The form contains errors. Please check the fields marked in red."
+msgstr ""
+"Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
+
+msgid "No directories defined yet."
+msgstr "Noch keine Verzeichnisse definiert."
+
+msgid "Your directory submission has been adopted:"
+msgstr "Ihr Verzeichniseintrag wurde übernommen:"
+
+msgid "Your registration for \"${title}\" has been confirmed."
+msgstr "Ihre Anmeldung für \"${title}\" wurde bestätigt."
+
+msgid "Your registration for \"${title}\" has been denied."
+msgstr "Ihre Anmeldung für \"${title}\" wurde abgelehnt."
+
+msgid "Your registration for \"${title}\" has been cancelled."
+msgstr "Ihre Anmeldung für \"${title}\" wurde storniert."
+
+msgid "Registration"
+msgstr "Anmeldung"
+
+msgid "Hello"
+msgstr "Grüezi"
+
+msgid ""
+"You are recieving this mail because you subscribed to the following "
+"newsletter:"
+msgstr ""
+"Sie erhalten diese E-Mail weil Sie sich für den folgenden Newsletter "
+"angemeldet haben:"
+
+msgid "Plese click the following link to confirm your subscription:"
+msgstr ""
+"Bitte klicken Sie auf den folgenden Link um Ihre Anmeldung zu bestätigen:"
+
+msgid "Confirm subscription"
+msgstr "Anmeldung bestätigen"
+
+msgid ""
+"If you did not subscribe to this newsletter you can simply ignore this e-"
+"mail. We will not bother you again."
+msgstr ""
+"Falls Sie sich nicht für diesen Newsletter angemeldet haben können Sie diese "
+"E-Mail einfach ignorieren. Wir werden Sie in diesem Fall nicht weiter "
+"belästigen."
+
+msgid "Best regards,"
+msgstr "Mit freundlichen Grüssen,"
+
+msgid "No photo albums defined yet."
+msgstr "Noch keine Fotoalben erstellt."
+
+msgid ""
+"Sorry, the page you are looking for could not be found. Try checking the URL "
+"for errors or use the search box on the top."
+msgstr ""
+"Es tut uns leid, aber die Seite nach der Sie suchen konnte nicht gefunden "
+"werden. Bitte überprüfen Sie die Internetadresse oder verwenden Sie die "
+"Suche im Navigationsbereich."
+
+msgid "Registration confirmed."
+msgstr "Anmeldung bestätigt."
+
+msgid "Registration denied."
+msgstr "Anmeldung abgelehnt."
+
+msgid "Registration cancelled."
+msgstr "Anmeldung storniert."
+
+msgid "Your ticket has received a payment."
+msgstr "Ihr Ticket hat eine Zahlung erhalten."
+
+msgid "Your ticket was marked as unpaid."
+msgstr "Ihr Ticket wurde als unbezahlt markiert."
+
+msgid ""
+"Your ticket's payment has been refunded. Note that it might take a few days "
+"until your refunded amount is shown on your credit card bill."
+msgstr ""
+"Ihre Ticket Zahlung wurde rückerstattet. Bitte beachten Sie dass es ein paar "
+"Tage dauern kann bis der Betrag auf Ihrer Kreditkartenabrechnung erscheint."
+
+msgid "The payment amount is"
+msgstr "Ihr Betrag"
+
+msgid "Select a free time span in the calendar below to create an allocation."
+msgstr ""
+"Wählen Sie eine freie Zeitspanne im Kalender aus um eine Einteilung zu "
+"machen."
+
+msgid "Sign up to our newsletter to always stay up to date:"
+msgstr ""
+"Abonnieren Sie unseren Newsletter um immer auf dem Laufenden zu bleiben:"
+
+msgid "Signup"
+msgstr "Abonnieren"
+
+msgid "There are currently ${count} recipients registered."
+msgstr "Zur Zeit sind ${count} Abonnenten registriert."
+
+msgid "Archive"
+msgstr "Archiv"
+
+msgid "No newsletters yet."
+msgstr "Es wurden noch keine Newsletter versendet"
+
+msgid "Not yet sent."
+msgstr "Noch nicht gesendet."
+
+msgid "Your ticket has been closed"
+msgstr "Ihr Ticket wurde geschlossen"
+
+msgid "External link"
+msgstr "Externer Link"
+
+msgid "More information"
+msgstr "Weiterführende Informationen"
+
+msgid "Your event has unfortunately been rejected:"
+msgstr "Ihre Veranstaltung musste leider abgelehnt werden:"
 
 #, python-format
 msgid "Login to ${org}"
@@ -2488,8 +2484,467 @@ msgstr "Der Registrationslink ist abgelaufen"
 msgid "Password reset"
 msgstr "Passwort zurücksetzen"
 
-msgid "A link was added to the clipboard"
-msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
+msgid "Exports the submissions of the given date range."
+msgstr "Exportiert alle Eingaben zwischen Start- und End-Datum."
+
+msgid "Access Denied"
+msgstr "Zugriff verweigert"
+
+msgid "Not Found"
+msgstr "Seite nicht gefunden"
+
+msgid "Your Stripe account was connected successfully."
+msgstr "Ihr Stripe Konto wurde erfolgreich verbunden."
+
+msgid "Your Stripe account could not be connected."
+msgstr "Ihr Stripe Konto konnte nicht verbunden werden."
+
+msgid "Changed the default payment provider."
+msgstr "Der Standard Zahlungsanbieter wurde verändert."
+
+msgid "The payment provider was deleted."
+msgstr "Der Zahlungsanbieter wurde gelöscht."
+
+msgid "Successfully synchronised payments"
+msgstr "Synchronisierung erfolgreich"
+
+msgid "Your changes were saved"
+msgstr "Ihre Änderungen wurden gespeichert"
+
+msgid "As default"
+msgstr "Als Standard"
+
+msgid "Charge fees to customer"
+msgstr "Kreditkarten-Gebühren dem Kunden verrechnen"
+
+msgid "Do you really want to delete this provider?"
+msgstr "Möchten Sie diesen Zahlungsanbieter wirklich löschen?"
+
+msgid "Should this provider really be the new default?"
+msgstr "Soll dieser Zahlungsanbieter wirklich zum Standard gemacht werden?"
+
+msgid "All future payments will be redirected."
+msgstr "Alle zukünftigen Zahlungen werden umgeleitet."
+
+msgid "Make Default"
+msgstr "Als Standard"
+
+msgid "Manage Photo Albums"
+msgstr "Fotoalben verwalten"
+
+msgid "This file type is not supported"
+msgstr "Dieser Dateityp wird nicht unterstützt"
+
+msgid "The file name is too long"
+msgstr "Der Dateiname ist zu lang"
+
+#, python-format
+msgid "New dates for ${title}"
+msgstr "Neue Termine für ${title}"
+
+msgid "Continue"
+msgstr "Weiter"
+
+msgid "Confirm your reservation"
+msgstr "Bestätigen Sie Ihre Reservation"
+
+msgid "Reserve"
+msgstr "Reservieren"
+
+msgid "Thank you for your reservation!"
+msgstr "Vielen Dank für Ihre Reservation!"
+
+msgid "The reservations were accepted"
+msgstr "Die Reservationen wurden angenommen"
+
+msgid "The reservations have already been accepted"
+msgstr "Die Reservationen wurden bereits angenommen"
+
+msgid ""
+"The payment associated with this reservation needs to be refunded before the "
+"reservation can be rejected"
+msgstr ""
+"Die mit der Reservation verknüpfte Zahlung muss rückgängig gemacht werden "
+"bevor die Reservation gelöscht werden kann"
+
+msgid "The reservations were rejected"
+msgstr "Die Reservationen wurden abgelehnt"
+
+msgid "The reservation was rejected"
+msgstr "Die Reservation wurde abgelehnt"
+
+msgid "Your payment could not be processed"
+msgstr "Ihre Zahlung konnte nicht verarbeitet werden"
+
+msgid "The following reservations were rejected"
+msgstr "Die folgenden Reservationen wurden abgelehnt"
+
+msgid "Your reservations were accepted"
+msgstr "Ihre Reservationen wurden angenommen"
+
+msgid "Pay Online and Complete"
+msgstr "Online zahlen und abschliessen"
+
+msgid "A ticket has been opened"
+msgstr "Ein neues Ticket wurde für Sie eröffnet"
+
+msgid "Submit an event"
+msgstr "Veranstaltung melden"
+
+msgid ""
+"Only events taking place inside the town or events related to town societies "
+"are published. Events which are purely commercial are not published. There's "
+"no right to be published and already published events may be removed from "
+"the page without notification or reason."
+msgstr ""
+"Im Veranstaltungskalender werden Anlässe jeglicher Art publiziert, welche "
+"innerhalb der Gemeinde oder im Zusammenhang mit einem Verein der Gemeinde "
+"durchgeführt werden. Nicht publiziert werden rein kommerzielle "
+"Veranstaltungen. Es besteht kein Publikationsrecht und bereits publizierte "
+"Veranstaltungen können jederzeit und ohne Angabe von Gründen gelöscht werden."
+
+#, python-format
+msgid "You have accepted the event ${title}"
+msgstr "Sie haben die Veranstaltung ${title} angenommen"
+
+msgid "Thank you for your submission!"
+msgstr "Vielen Dank für Ihre Eingabe!"
+
+msgid "Your event was accepted"
+msgstr "Ihre Veranstaltung wurde angenommen"
+
+msgid "Your event was rejected"
+msgstr "Ihre Veranstaltung wurde abgelehnt"
+
+msgid "You have been successfully unsubscribed from all regular emails."
+msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+msgid "The note was deleted"
+msgstr "Die Notiz wurde gelöscht"
+
+msgid "Edit Note"
+msgstr "Notiz bearbeiten"
+
+#, python-format
+msgid "You have disabled e-mails for ticket ${number}"
+msgstr "Sie haben E-Mails für das Ticket ${number} deaktiviert"
+
+#, python-format
+msgid "You have enabled e-mails for ticket ${number}"
+msgstr "Sie haben E-Mails für das Ticket ${number} aktiviert"
+
+msgid "Your request has been submitted"
+msgstr "Anfrage eingereicht"
+
+msgid "Your note was added"
+msgstr "Ihre Notiz wurde hinzugefügt"
+
+msgid "Your request is currently pending"
+msgstr "Ihr Anliegen wird zur Zeit bearbeitet"
+
+msgid "Ticket Status"
+msgstr "Ticket Status"
+
+msgid "The ticket cannot be accepted because it's not open"
+msgstr "Das Ticket kann nicht angenommen werden da es nicht offen ist"
+
+#, python-format
+msgid "You have accepted ticket ${number}"
+msgstr "Sie haben das Ticket ${number} angenommen"
+
+msgid "The ticket cannot be closed because it's not pending"
+msgstr ""
+"Das Ticket kann nicht geschlossen werden da es nicht in Bearbeitung ist"
+
+#, python-format
+msgid "You have closed ticket ${number}"
+msgstr "Sie haben das Ticket ${number} abgeschlossen"
+
+msgid "The ticket cannot be re-opened because it's not closed"
+msgstr ""
+"Das Ticket kann nicht wieder geöffnet werden da es nicht geschlossen ist"
+
+#, python-format
+msgid "You have reopened ticket ${number}"
+msgstr "Sie haben das Ticket ${number} wieder geöffnet"
+
+msgid "Your request has been processed"
+msgstr "Ihr Anliegen wurde abgeschlossen"
+
+msgid "All"
+msgstr "Alle"
+
+msgid "All Tickets"
+msgstr "Alle Tickets"
+
+msgid "Your ticket has been repoened"
+msgstr "Das Ticket wurde wieder geöffnet"
+
+msgid "All Users"
+msgstr "Alle Benutzer"
+
+#, python-format
+msgid "the subscription for ${address} was successfully confirmed"
+msgstr "Die Anmeldung für ${address} wurde erfolgreich bestätigt"
+
+#, python-format
+msgid "the subscription for ${address} could not be confirmed, wrong token"
+msgstr ""
+"Die Anmeldung für ${address} konnte nicht bestätigt werden, falsches Token"
+
+#, python-format
+msgid "${address} successfully unsubscribed"
+msgstr "${address} wurde erfolgreich abgemeldet"
+
+#, python-format
+msgid "${address} could not be unsubscribed, wrong token"
+msgstr "${address} konnte nicht abgemeldet werden - falsches Token"
+
+msgid "Your registration has been confirmed"
+msgstr "Ihre Anmeldung wurde bestätigt"
+
+msgid "The registration has been confirmed"
+msgstr "Die Anmledung wurde bestätigt"
+
+msgid "The registration could not be confirmed"
+msgstr "Die Anmeldung konnte nicht bestätigt werden"
+
+msgid "Your registration has been denied"
+msgstr "Ihre Anmeldung wurde abgelehnt"
+
+msgid "The registration has been denied"
+msgstr "Die Anmeldung wurde abgelehnt"
+
+msgid "The registration could not be denied"
+msgstr "Die Anmeldung konnte nicht abgelehnt werden"
+
+msgid "The registration has ended"
+msgstr "Die Anmeldung ist nicht mehr möglich"
+
+#, python-format
+msgid "The registration opens on ${day}, ${date}"
+msgstr "Die Anmeldung beginnt am ${day}, ${date}"
+
+#, python-format
+msgid "The registration closes on ${day}, ${date}"
+msgstr "Die Anmeldung endet am ${day}, ${date}"
+
+msgid "Your registration has been cancelled"
+msgstr "Ihre Anmeldung wurde storniert"
+
+msgid "The registration has been cancelled"
+msgstr "Die Anmeldung wurde storniert"
+
+msgid "The registration could not be cancelled"
+msgstr "Die Anmeldung konnte nicht storniert werden"
+
+msgid "The registration is closed"
+msgstr "Zur Zeit keine Anmeldung möglich"
+
+#, python-format
+msgid "There's a limit of ${count} attendees"
+msgstr "Die Anmeldung ist auf ${count} Teilnehmer begrenzt"
+
+msgid "Registrations are no longer possible"
+msgstr "Anmeldungen sind nicht mehr möglich"
+
+msgid "There are no spots left"
+msgstr "Keine Plätze mehr verfügbar"
+
+msgid "There is one spot left"
+msgstr "Es ist noch ein Platz verfügbar"
+
+#, python-format
+msgid "There are ${count} spots left"
+msgstr "Es sind noch ${count} Plätze verfügbar"
+
+msgid "Event Export"
+msgstr "Veranstaltungs-Export"
+
+msgid "Exports all future events."
+msgstr "Exportiert alle zukünftigen Veranstaltungen."
+
+msgid "Select images"
+msgstr "Bilder auswählen"
+
+msgid "New Photo Album"
+msgstr "Neues Fotoalbum"
+
+msgid "Select"
+msgstr "Auswahl"
+
+msgid "Added a new photo album"
+msgstr "Ein neues Fotoalbum wurde hinzugefügt"
+
+msgid "Added a new daypass"
+msgstr "Eine neue Tageskarte wurde hinzugefügt"
+
+msgid "New daypass"
+msgstr "Neue Tageskarte"
+
+msgid "Added a new room"
+msgstr "Ein neuer Raum wurde hinzugefügt"
+
+msgid "New room"
+msgstr "Neuer Raum"
+
+msgid "Exports the reservations of the given date range."
+msgstr "Exportiert alle Reservationen zwischen Start- und End-Datum."
+
+#, python-format
+msgid "Successfully removed ${count} unused allocations"
+msgstr "${count} Einteilungen wurden erfolgreich entfernt"
+
+msgid "New Registration Window"
+msgstr "Neuer Anmeldezeitraum"
+
+msgid "Edit Registration Window"
+msgstr "Anmeldezeitraum bearbeiten"
+
+msgid ""
+"Registration windows limit forms to a set number of submissions and a "
+"specific time-range."
+msgstr "Anmeldezeiträume limitieren Formulareingaben nach Anzahl und Zeitraum."
+
+msgid "The registration window was deleted"
+msgstr "Der Anmeldezeitraum wurde gelöscht"
+
+msgid "The registration window was added successfully"
+msgstr "Der Anmeldezeitraum wurde erfolgreich hinzugefügt"
+
+msgid "Confirmed"
+msgstr "Bestätigt"
+
+msgid "Cancelled"
+msgstr "Storniert"
+
+msgid "Do you really want to delete this registration window?"
+msgstr "Möchten Sie den Anmeldezeitraum wirklich entfernen?"
+
+msgid "Existing submissions will be disassociated."
+msgstr "Bestehende Eingaben werden vom Anmeldezeitraum losgelöst."
+
+msgid "Delete registration window"
+msgstr "Anmeldezeitraum entfernen"
+
+msgid "Topics A-Z"
+msgstr "Themen A-Z"
+
+msgid "New person"
+msgstr "Neue Person"
+
+msgid "Added a new person"
+msgstr "Eine neue Person wurde hinzugefügt"
+
+msgid "Topics"
+msgstr "Themen"
+
+#, python-format
+msgid "Do you really want to unsubscribe \"{}\"?"
+msgstr "Möchten Sie \"{}\" wirklich abmelden?"
+
+msgid "New Newsletter"
+msgstr "Neuer Newsletter"
+
+msgid "Edit Newsletter"
+msgstr "Newsletter Bearbeiten"
+
+msgid "The newsletter was deleted"
+msgstr "Der Newsletter wurde gelöscht"
+
+msgid "Sends a test newsletter to the given address"
+msgstr "Sendet ein Test-Newsletter an die gewählte Adresse"
+
+#, python-format
+msgid ""
+"Success! We have sent a confirmation link to ${address}, if we didn't send "
+"you one already."
+msgstr ""
+"Erfolg! Wir senden eine E-Mail zur Bestätigung Ihres Abonnements an "
+"${address}, sofern Sie noch nicht angemeldet sind."
+
+#, python-format
+msgid "Sent \"${title}\" to ${recipient}"
+msgstr "\"${title}\" wurde an ${recipient} gesendet"
+
+#, python-format
+msgid "Welcome to the ${org} Newsletter"
+msgstr "Willkommen beim ${org} Newsletter"
+
+msgid "Added a new newsletter"
+msgstr "Ein neuer Newsletter wurde hinzugefügt"
+
+#, python-format
+msgid "Sent \"${title}\" to ${n} recipients"
+msgstr "\"${title}\" wurde an ${n} Empfänger gesendet"
+
+msgid "A newsletter with this name already exists"
+msgstr "Ein Newsletter mit diesem Namen existiert bereits"
+
+#, python-format
+msgid "Scheduled \"${title}\" to be sent on ${date}"
+msgstr "\"${title}\" wurde für den Versand am ${date} eingeplant"
+
+msgid "New Recipient"
+msgstr "Neuer Empfänger"
+
+msgid "Edit Recipient"
+msgstr "Empfänger Bearbeiten"
+
+msgid "Added a new recipient"
+msgstr "Ein neuer Empfänger wurde hinzugefügt"
+
+#, python-format
+msgid "Do you really want to delete \"${name}\"?"
+msgstr "Möchten Sie \"${name}\" wirklich löschen?"
+
+msgid "Delete Recipient"
+msgstr "Empfänger Löschen"
+
+msgid "New Form"
+msgstr "Neues Formular"
+
+msgid "A form with this name already exists"
+msgstr "Ein Formular mit diesem Namen existiert bereits"
+
+msgid "Added a new form"
+msgstr "Ein neues Formular wurd hinzugefügt"
+
+msgid "User Management"
+msgstr "Benutzerverwaltung"
+
+msgid "New Signup Link"
+msgstr "Neuer Registrationslink"
+
+msgid "New User"
+msgstr "Neuer Benutzer"
+
+msgid "The user was created successfully"
+msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+msgid "A user with this e-mail address already exists"
+msgstr "Ein Benutzer mit dieser E-Mail Adresse existiert bereits"
+
+msgid "An account was created for you"
+msgstr "Ein Konto wurde für Sie erstellt"
+
+msgid "New allocation"
+msgstr "Neue Einteilung"
+
+#, python-format
+msgid "Successfully added ${n} allocations"
+msgstr "${n} Einteilungen wurden hinzugefügt"
+
+#, python-format
+msgid "Search through ${count} indexed documents"
+msgstr "Durchsuchen Sie ${count} indizierte Dokumente"
+
+#, python-format
+msgid "${count} Results"
+msgstr "${count} Resultate"
+
+msgid "Search Unavailable"
+msgstr "Suche Nicht Verfügbar"
 
 msgid "Submit a New Directory Entry"
 msgstr "Einen neuen Verzeichniseintrag vorschlagen"
@@ -2563,223 +3018,8 @@ msgstr ""
 "Die verlangte Änderung kann nicht durchgeführt werden, da sie mit den "
 "bereist existierenden Einträgen inkompatibel ist."
 
-msgid "Submit an event"
-msgstr "Veranstaltung melden"
-
-msgid ""
-"Only events taking place inside the town or events related to town societies "
-"are published. Events which are purely commercial are not published. There's "
-"no right to be published and already published events may be removed from "
-"the page without notification or reason."
-msgstr ""
-"Im Veranstaltungskalender werden Anlässe jeglicher Art publiziert, welche "
-"innerhalb der Gemeinde oder im Zusammenhang mit einem Verein der Gemeinde "
-"durchgeführt werden. Nicht publiziert werden rein kommerzielle "
-"Veranstaltungen. Es besteht kein Publikationsrecht und bereits publizierte "
-"Veranstaltungen können jederzeit und ohne Angabe von Gründen gelöscht werden."
-
-#, python-format
-msgid "You have accepted the event ${title}"
-msgstr "Sie haben die Veranstaltung ${title} angenommen"
-
-msgid "Thank you for your submission!"
-msgstr "Vielen Dank für Ihre Eingabe!"
-
-msgid "Your event was accepted"
-msgstr "Ihre Veranstaltung wurde angenommen"
-
-msgid "Your event was rejected"
-msgstr "Ihre Veranstaltung wurde abgelehnt"
-
-msgid "A ticket has been opened"
-msgstr "Ein neues Ticket wurde für Sie eröffnet"
-
-msgid "Access Denied"
-msgstr "Zugriff verweigert"
-
-msgid "Not Found"
-msgstr "Seite nicht gefunden"
-
-msgid "Manage Photo Albums"
-msgstr "Fotoalben verwalten"
-
-msgid "This file type is not supported"
-msgstr "Dieser Dateityp wird nicht unterstützt"
-
-msgid "The file name is too long"
-msgstr "Der Dateiname ist zu lang"
-
-msgid "New Form"
-msgstr "Neues Formular"
-
-msgid "A form with this name already exists"
-msgstr "Ein Formular mit diesem Namen existiert bereits"
-
-msgid "Added a new form"
-msgstr "Ein neues Formular wurd hinzugefügt"
-
-msgid "Exports the submissions of the given date range."
-msgstr "Exportiert alle Eingaben zwischen Start- und End-Datum."
-
-msgid "New Registration Window"
-msgstr "Neuer Anmeldezeitraum"
-
-msgid "Edit Registration Window"
-msgstr "Anmeldezeitraum bearbeiten"
-
-msgid ""
-"Registration windows limit forms to a set number of submissions and a "
-"specific time-range."
-msgstr "Anmeldezeiträume limitieren Formulareingaben nach Anzahl und Zeitraum."
-
-msgid "The registration window was deleted"
-msgstr "Der Anmeldezeitraum wurde gelöscht"
-
-msgid "The registration window was added successfully"
-msgstr "Der Anmeldezeitraum wurde erfolgreich hinzugefügt"
-
-msgid "Confirmed"
-msgstr "Bestätigt"
-
-msgid "Cancelled"
-msgstr "Storniert"
-
-msgid "Do you really want to delete this registration window?"
-msgstr "Möchten Sie den Anmeldezeitraum wirklich entfernen?"
-
-msgid "Existing submissions will be disassociated."
-msgstr "Bestehende Eingaben werden vom Anmeldezeitraum losgelöst."
-
-msgid "Delete registration window"
-msgstr "Anmeldezeitraum entfernen"
-
-msgid "Your registration has been confirmed"
-msgstr "Ihre Anmeldung wurde bestätigt"
-
-msgid "The registration has been confirmed"
-msgstr "Die Anmledung wurde bestätigt"
-
-msgid "The registration could not be confirmed"
-msgstr "Die Anmeldung konnte nicht bestätigt werden"
-
-msgid "Your registration has been denied"
-msgstr "Ihre Anmeldung wurde abgelehnt"
-
-msgid "The registration has been denied"
-msgstr "Die Anmeldung wurde abgelehnt"
-
-msgid "The registration could not be denied"
-msgstr "Die Anmeldung konnte nicht abgelehnt werden"
-
-msgid "The registration has ended"
-msgstr "Die Anmeldung ist nicht mehr möglich"
-
-#, python-format
-msgid "The registration opens on ${day}, ${date}"
-msgstr "Die Anmeldung beginnt am ${day}, ${date}"
-
-#, python-format
-msgid "The registration closes on ${day}, ${date}"
-msgstr "Die Anmeldung endet am ${day}, ${date}"
-
-msgid "Your registration has been cancelled"
-msgstr "Ihre Anmeldung wurde storniert"
-
-msgid "The registration has been cancelled"
-msgstr "Die Anmeldung wurde storniert"
-
-msgid "The registration could not be cancelled"
-msgstr "Die Anmeldung konnte nicht storniert werden"
-
-msgid "The registration is closed"
-msgstr "Zur Zeit keine Anmeldung möglich"
-
-#, python-format
-msgid "There's a limit of ${count} attendees"
-msgstr "Die Anmeldung ist auf ${count} Teilnehmer begrenzt"
-
-msgid "Your payment could not be processed"
-msgstr "Ihre Zahlung konnte nicht verarbeitet werden"
-
-msgid "Registrations are no longer possible"
-msgstr "Anmeldungen sind nicht mehr möglich"
-
-msgid "There are no spots left"
-msgstr "Keine Plätze mehr verfügbar"
-
-msgid "Pay Online and Complete"
-msgstr "Online zahlen und abschliessen"
-
-msgid "There is one spot left"
-msgstr "Es ist noch ein Platz verfügbar"
-
-#, python-format
-msgid "There are ${count} spots left"
-msgstr "Es sind noch ${count} Plätze verfügbar"
-
-msgid "Select images"
-msgstr "Bilder auswählen"
-
-msgid "New Photo Album"
-msgstr "Neues Fotoalbum"
-
-msgid "Select"
-msgstr "Auswahl"
-
-msgid "Added a new photo album"
-msgstr "Ein neues Fotoalbum wurde hinzugefügt"
-
-#, python-format
-msgid "Do you really want to unsubscribe \"{}\"?"
-msgstr "Möchten Sie \"{}\" wirklich abmelden?"
-
-msgid "New Newsletter"
-msgstr "Neuer Newsletter"
-
-msgid "Edit Newsletter"
-msgstr "Newsletter Bearbeiten"
-
-msgid "The newsletter was deleted"
-msgstr "Der Newsletter wurde gelöscht"
-
-msgid "Sends a test newsletter to the given address"
-msgstr "Sendet ein Test-Newsletter an die gewählte Adresse"
-
-#, python-format
-msgid ""
-"Success! We have sent a confirmation link to ${address}, if we didn't send "
-"you one already."
-msgstr ""
-"Erfolg! Wir senden eine E-Mail zur Bestätigung Ihres Abonnements an "
-"${address}, sofern Sie noch nicht angemeldet sind."
-
-#, python-format
-msgid "Sent \"${title}\" to ${recipient}"
-msgstr "\"${title}\" wurde an ${recipient} gesendet"
-
-#, python-format
-msgid "Welcome to the ${org} Newsletter"
-msgstr "Willkommen beim ${org} Newsletter"
-
-msgid "Added a new newsletter"
-msgstr "Ein neuer Newsletter wurde hinzugefügt"
-
-#, python-format
-msgid "Sent \"${title}\" to ${n} recipients"
-msgstr "\"${title}\" wurde an ${n} Empfänger gesendet"
-
-msgid "A newsletter with this name already exists"
-msgstr "Ein Newsletter mit diesem Namen existiert bereits"
-
-#, python-format
-msgid "Scheduled \"${title}\" to be sent on ${date}"
-msgstr "\"${title}\" wurde für den Versand am ${date} eingeplant"
-
-msgid "Event Export"
-msgstr "Veranstaltungs-Export"
-
-msgid "Exports all future events."
-msgstr "Exportiert alle zukünftigen Veranstaltungen."
+msgid "A link was added to the clipboard"
+msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
 
 msgid "Your payment has been received"
 msgstr "Ihre Zahlung ist eingegangen"
@@ -2790,236 +3030,8 @@ msgstr "Ihre Zahlung wurde rückgängig gemacht"
 msgid "Your payment has been refunded"
 msgstr "Ihre Zahlung wurde rückerstattet"
 
-msgid "Your Stripe account was connected successfully."
-msgstr "Ihr Stripe Konto wurde erfolgreich verbunden."
-
-msgid "Your Stripe account could not be connected."
-msgstr "Ihr Stripe Konto konnte nicht verbunden werden."
-
-msgid "Changed the default payment provider."
-msgstr "Der Standard Zahlungsanbieter wurde verändert."
-
-msgid "The payment provider was deleted."
-msgstr "Der Zahlungsanbieter wurde gelöscht."
-
-msgid "Successfully synchronised payments"
-msgstr "Synchronisierung erfolgreich"
-
-msgid "As default"
-msgstr "Als Standard"
-
-msgid "Charge fees to customer"
-msgstr "Kreditkarten-Gebühren dem Kunden verrechnen"
-
-msgid "Do you really want to delete this provider?"
-msgstr "Möchten Sie diesen Zahlungsanbieter wirklich löschen?"
-
-msgid "Should this provider really be the new default?"
-msgstr "Soll dieser Zahlungsanbieter wirklich zum Standard gemacht werden?"
-
-msgid "All future payments will be redirected."
-msgstr "Alle zukünftigen Zahlungen werden umgeleitet."
-
-msgid "Make Default"
-msgstr "Als Standard"
-
-msgid "New person"
-msgstr "Neue Person"
-
-msgid "Added a new person"
-msgstr "Eine neue Person wurde hinzugefügt"
-
-#, python-format
-msgid "New dates for ${title}"
-msgstr "Neue Termine für ${title}"
-
-msgid "Continue"
-msgstr "Weiter"
-
-msgid "Confirm your reservation"
-msgstr "Bestätigen Sie Ihre Reservation"
-
-msgid "Reserve"
-msgstr "Reservieren"
-
-msgid "Thank you for your reservation!"
-msgstr "Vielen Dank für Ihre Reservation!"
-
-msgid "The reservations were accepted"
-msgstr "Die Reservationen wurden angenommen"
-
-msgid "The reservations have already been accepted"
-msgstr "Die Reservationen wurden bereits angenommen"
-
-msgid ""
-"The payment associated with this reservation needs to be refunded before the "
-"reservation can be rejected"
-msgstr ""
-"Die mit der Reservation verknüpfte Zahlung muss rückgängig gemacht werden "
-"bevor die Reservation gelöscht werden kann"
-
-msgid "The reservations were rejected"
-msgstr "Die Reservationen wurden abgelehnt"
-
-msgid "The reservation was rejected"
-msgstr "Die Reservation wurde abgelehnt"
-
-msgid "The following reservations were rejected"
-msgstr "Die folgenden Reservationen wurden abgelehnt"
-
-msgid "Your reservations were accepted"
-msgstr "Ihre Reservationen wurden angenommen"
-
-msgid "Added a new daypass"
-msgstr "Eine neue Tageskarte wurde hinzugefügt"
-
-msgid "New daypass"
-msgstr "Neue Tageskarte"
-
-msgid "Added a new room"
-msgstr "Ein neuer Raum wurde hinzugefügt"
-
-msgid "New room"
-msgstr "Neuer Raum"
-
-msgid "Exports the reservations of the given date range."
-msgstr "Exportiert alle Reservationen zwischen Start- und End-Datum."
-
-#, python-format
-msgid "Successfully removed ${count} unused allocations"
-msgstr "${count} Einteilungen wurden erfolgreich entfernt"
-
-msgid "New Recipient"
-msgstr "Neuer Empfänger"
-
-msgid "Edit Recipient"
-msgstr "Empfänger Bearbeiten"
-
-msgid "Added a new recipient"
-msgstr "Ein neuer Empfänger wurde hinzugefügt"
-
-#, python-format
-msgid "Do you really want to delete \"${name}\"?"
-msgstr "Möchten Sie \"${name}\" wirklich löschen?"
-
-msgid "Delete Recipient"
-msgstr "Empfänger Löschen"
-
-#, python-format
-msgid "Search through ${count} indexed documents"
-msgstr "Durchsuchen Sie ${count} indizierte Dokumente"
-
-#, python-format
-msgid "${count} Results"
-msgstr "${count} Resultate"
-
-msgid "Search Unavailable"
-msgstr "Suche Nicht Verfügbar"
-
-msgid "Topics"
-msgstr "Themen"
-
-#, python-format
-msgid "the subscription for ${address} was successfully confirmed"
-msgstr "Die Anmeldung für ${address} wurde erfolgreich bestätigt"
-
-#, python-format
-msgid "the subscription for ${address} could not be confirmed, wrong token"
-msgstr ""
-"Die Anmeldung für ${address} konnte nicht bestätigt werden, falsches Token"
-
-#, python-format
-msgid "${address} successfully unsubscribed"
-msgstr "${address} wurde erfolgreich abgemeldet"
-
-#, python-format
-msgid "${address} could not be unsubscribed, wrong token"
-msgstr "${address} konnte nicht abgemeldet werden - falsches Token"
-
-msgid "The note was deleted"
-msgstr "Die Notiz wurde gelöscht"
-
-msgid "Edit Note"
-msgstr "Notiz bearbeiten"
-
-#, python-format
-msgid "You have disabled e-mails for ticket ${number}"
-msgstr "Sie haben E-Mails für das Ticket ${number} deaktiviert"
-
-#, python-format
-msgid "You have enabled e-mails for ticket ${number}"
-msgstr "Sie haben E-Mails für das Ticket ${number} aktiviert"
-
-msgid "Your request has been submitted"
-msgstr "Anfrage eingereicht"
-
-msgid "Your note was added"
-msgstr "Ihre Notiz wurde hinzugefügt"
-
-msgid "Your request is currently pending"
-msgstr "Ihr Anliegen wird zur Zeit bearbeitet"
-
-msgid "Ticket Status"
-msgstr "Ticket Status"
-
-msgid "The ticket cannot be accepted because it's not open"
-msgstr "Das Ticket kann nicht angenommen werden da es nicht offen ist"
-
-#, python-format
-msgid "You have accepted ticket ${number}"
-msgstr "Sie haben das Ticket ${number} angenommen"
-
-msgid "The ticket cannot be closed because it's not pending"
-msgstr ""
-"Das Ticket kann nicht geschlossen werden da es nicht in Bearbeitung ist"
-
-#, python-format
-msgid "You have closed ticket ${number}"
-msgstr "Sie haben das Ticket ${number} abgeschlossen"
-
-msgid "The ticket cannot be re-opened because it's not closed"
-msgstr ""
-"Das Ticket kann nicht wieder geöffnet werden da es nicht geschlossen ist"
-
-#, python-format
-msgid "You have reopened ticket ${number}"
-msgstr "Sie haben das Ticket ${number} wieder geöffnet"
-
-msgid "Your request has been processed"
-msgstr "Ihr Anliegen wurde abgeschlossen"
-
-msgid "All"
-msgstr "Alle"
-
-msgid "All Tickets"
-msgstr "Alle Tickets"
-
-msgid "Your ticket has been repoened"
-msgstr "Das Ticket wurde wieder geöffnet"
-
-msgid "All Users"
-msgstr "Alle Benutzer"
-
-msgid "User Management"
-msgstr "Benutzerverwaltung"
-
-msgid "New Signup Link"
-msgstr "Neuer Registrationslink"
-
-msgid "New User"
-msgstr "Neuer Benutzer"
-
-msgid "The user was created successfully"
-msgstr "Der Benutzer wurde erfolgreich erstellt"
-
-msgid "A user with this e-mail address already exists"
-msgstr "Ein Benutzer mit dieser E-Mail Adresse existiert bereits"
-
-msgid "An account was created for you"
-msgstr "Ein Konto wurde für Sie erstellt"
-
-msgid "You have been successfully unsubscribed from all regular emails."
-msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+#~ msgid "Signed"
+#~ msgstr "Signiert"
 
 #~ msgid "Directory entries may have coordinates"
 #~ msgstr "Zu Verzeichnis-Einträgen können Koordinaten erfasst werden"

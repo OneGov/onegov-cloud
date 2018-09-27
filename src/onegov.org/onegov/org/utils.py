@@ -10,7 +10,6 @@ from isodate import parse_date, parse_datetime
 from itertools import groupby
 from libres.modules import errors as libres_errors
 from lxml.html import fragments_fromstring, tostring
-from mimetypes import guess_extension
 from onegov.file import File, FileCollection
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
@@ -673,18 +672,3 @@ def rrulestr(recurrence, **kwargs):
         kwargs['dtstart'] = sedate.utcnow()
 
     return rrule.rrulestr(recurrence, **kwargs)
-
-
-def extension_for_content_type(content_type, filename=None):
-    """ Gets the extension for the given content type. Note that this is
-    *meant for display only*. A file claiming to be a PDF might not be one,
-    but this function would not let you know that.
-
-    """
-
-    if filename is not None:
-        ext = filename.split('.')[-1][:4].lower()
-    else:
-        ext = (guess_extension(content_type, strict=False) or '')
-
-    return ext.strip('. ')

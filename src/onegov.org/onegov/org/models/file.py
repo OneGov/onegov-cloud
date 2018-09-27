@@ -10,6 +10,7 @@ from itertools import chain, groupby
 from onegov.core.orm import as_selectable
 from onegov.core.orm.mixins import meta_property
 from onegov.file import File, FileSet, FileCollection, FileSetCollection
+from onegov.file import SearchableFile
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.org import _
 from onegov.org.models.extensions import HiddenFromPublicExtension
@@ -117,8 +118,12 @@ class GroupFilesByDateMixin(object):
         )
 
 
-class GeneralFile(File):
+class GeneralFile(File, SearchableFile):
     __mapper_args__ = {'polymorphic_identity': 'general'}
+
+    @property
+    def es_public(self):
+        return self.published and self.signed
 
 
 class ImageFile(File):

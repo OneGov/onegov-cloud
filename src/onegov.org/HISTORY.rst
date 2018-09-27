@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to search for PDF files by content.
+  [href]
+
 0.36.2 (2018-09-26)
 ~~~~~~~~~~~~~~~~~~~
 

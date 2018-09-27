@@ -12,6 +12,7 @@ from onegov.core.filestorage import view_filestorage_file
 from onegov.core.security import Private, Public
 from onegov.core.templates import render_macro
 from onegov.file import File, FileCollection
+from onegov.file.utils import extension_for_content_type
 from onegov.org import _, OrgApp
 from onegov.org.new_elements import Link
 from onegov.org.layout import DefaultLayout
@@ -104,10 +105,6 @@ def view_get_file_collection(self, request):
         date = to_timezone(date, layout.timezone)
         return pattern.apply(date, locale)
 
-    @lru_cache(maxsize=len(files) // 4)
-    def extension_for_content_type(content_type, filename):
-        return utils.extension_for_content_type(content_type, filename)
-
     grouped = tuple(
         (group, tuple(files))
         for group, files in groupby(files, key=lambda f: self.group(f))
@@ -136,7 +133,7 @@ def view_get_file_collection(self, request):
 @OrgApp.html(model=GeneralFile, permission=Private, name='details')
 def view_file_details(self, request):
     layout = DefaultLayout(self, request)
-    extension = utils.extension_for_content_type(
+    extension = extension_for_content_type(
         self.reference.content_type,
         self.reference.filename
     )
@@ -322,7 +319,7 @@ def view_upload_general_file(self, request):
         'actions_url': lambda file_id: request.class_link(
             GeneralFile, name="details", variables={'id': file_id}
         ),
-        'extension': lambda file: utils.extension_for_content_type(
+        'extension': lambda file: extension_for_content_type(
             file.reference.content_type,
             file.name
         )
