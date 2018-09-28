@@ -7,6 +7,9 @@ Changelog
 - Adds voting booklet attachments.
   [msom]
 
+- Adds a CLI command for importing attachments.
+  [msom]
+
 - Makes the update, export and delete vote views to be indifferent to the filters.
   [msom]
 
