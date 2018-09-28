@@ -38,6 +38,8 @@ def view_votes(self, request, form):
     name='update'
 )
 def update_votes(self, request, form):
+    self = self.default()
+
     layout = UpdateVotesLayout(self, request)
 
     if form.submitted(request):
@@ -82,6 +84,8 @@ def update_votes(self, request, form):
     name='csv'
 )
 def export_votes_csv(self, request):
+    self = self.default()
+
     response = Response(
         content_type='text/csv',
         content_disposition='inline; filename=dataset.csv'
@@ -96,6 +100,8 @@ def export_votes_csv(self, request):
     name='xlsx'
 )
 def export_votes_xlsx(self, request):
+    self = self.default()
+
     response = Response(
         content_type=(
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -114,6 +120,8 @@ def export_votes_xlsx(self, request):
     name='delete'
 )
 def delete_vote(self, request, form):
+    self = self.default()
+
     layout = DeleteVotesLayout(self, request)
 
     if form.submitted(request):

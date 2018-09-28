@@ -17,24 +17,24 @@ class VotesLayout(DefaultLayout):
         result = [
             (
                 _("Update dataset"),
-                self.request.link(self.model, name='update'),
+                self.request.link(self.model.default(), name='update'),
                 'upload-icon'
             ),
             (
                 _("Download dataset (CSV)"),
-                self.request.link(self.model, name='csv'),
+                self.request.link(self.model.default(), name='csv'),
                 'export-icon'
             ),
             (
                 _("Download dataset (XLSX)"),
-                self.request.link(self.model, name='xlsx'),
+                self.request.link(self.model.default(), name='xlsx'),
                 'export-icon'
             )
         ]
         if self.request.has_role('admin'):
             result.append((
                 _("Delete all votes"),
-                self.request.link(self.model, name='delete'),
+                self.request.link(self.model.default(), name='delete'),
                 'delete-icon'
             ))
         return result

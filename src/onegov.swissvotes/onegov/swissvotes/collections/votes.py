@@ -69,6 +69,11 @@ class SwissVoteCollection(Pagination):
             (self.sort_order or None) == (other.sort_order or None)
         )
 
+    def default(self):
+        """ Returns the votes unfiltered and ordered by default. """
+
+        return self.__class__(self.app)
+
     @property
     def page_index(self):
         """ The current page. """
