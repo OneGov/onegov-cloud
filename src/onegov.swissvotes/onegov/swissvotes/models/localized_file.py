@@ -38,7 +38,7 @@ class LocalizedFile(object):
             instance.files.append(value)
 
     def __set__(self, instance, value):
-        return self.__set_by_locale__(self, instance, value)
+        return self.__set_by_locale__(instance, value)
 
     def __delete_by_locale__(self, instance, locale=None):
         if instance:
@@ -48,4 +48,4 @@ class LocalizedFile(object):
                     instance.files.remove(file)
 
     def __delete__(self, instance):
-        self.delete(instance)
+        self.__delete_by_locale__(instance)
