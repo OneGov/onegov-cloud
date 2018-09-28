@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds full text search support for attachments.
+  [msom]
+
 - Makes the update, export and delete vote views to be indifferent to the filters.
   [msom]
 

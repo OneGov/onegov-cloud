@@ -251,6 +251,7 @@ class SwissVoteCollection(Pagination):
 
         if self.term:
             term = self.term[:self.max_term_length]
+            locale = self.app.session_manager.current_locale
 
             # perform elasticsearch with the filtered subset
             search = self.app.es_search()
@@ -267,7 +268,18 @@ class SwissVoteCollection(Pagination):
                 MultiMatch(
                     query=term,
                     fields=['title', 'keyword', 'initiator'],
-                    fuzziness='auto'
+                    fuzziness=1,
+                    boost=5
+                )
+                |
+                MultiMatch(
+                    query=term,
+                    fields=[
+                        f'voting_text_{locale}',
+                        f'federal_council_message_{locale}',
+                        f'parliamentary_debate_{locale}',
+                    ],
+                    fuzziness=1,
                 )
             )
             search = search[0:self.max_search_results]

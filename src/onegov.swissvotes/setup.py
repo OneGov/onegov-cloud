@@ -33,6 +33,7 @@ setup(
         'cached_property',
         'cssmin',
         'onegov.core',
+        'onegov.file>=0.10.0',
         'onegov.form',
         'onegov.foundation',
         'onegov.quill>=0.4.0',

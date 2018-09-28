@@ -7,6 +7,7 @@ from onegov.file import File
 from onegov.search import ORMSearchable
 from onegov.swissvotes import _
 from onegov.swissvotes.models.actor import Actor
+from onegov.swissvotes.models.localized_file import LocalizedFile
 from onegov.swissvotes.models.policy_area import PolicyArea
 from sqlalchemy import Column
 from sqlalchemy import Date
@@ -89,6 +90,12 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ORMSearchable):
         'title': {'type': 'localized'},
         'keyword': {'type': 'localized'},
         'initiator': {'type': 'localized'},
+        'voting_text_de_CH': {'type': 'localized'},
+        'voting_text_fr_CH': {'type': 'localized'},
+        'federal_council_message_de_CH': {'type': 'localized'},
+        'federal_council_message_fr_CH': {'type': 'localized'},
+        'parliamentary_debate_de_CH': {'type': 'localized'},
+        'parliamentary_debate_fr_CH': {'type': 'localized'},
     }
 
     id = Column(Integer, nullable=False, primary_key=True)
@@ -213,6 +220,11 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ORMSearchable):
     national_council_share_neutral = Column(Numeric(13, 10))
     national_council_share_vague = Column(Numeric(13, 10))
 
+    voting_text = LocalizedFile()
+    federal_council_message = LocalizedFile()
+    parliamentary_debate = LocalizedFile()
+    voting_booklet = LocalizedFile()
+
     @cached_property
     def legal_form(self):
         return LEGAL_FORM.get(self._legal_form, "")
@@ -330,62 +342,30 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ORMSearchable):
             return True
         return False
 
-    def localized_attachment_name(self, name):
-        locale = self.session_manager.current_locale
-        return name if name.endswith(locale) else '{}-{}'.format(name, locale)
-
-    def get_attachment(self, name):
-        name = self.localized_attachment_name(name)
-        for file in self.files:
-            if file.name == name:
-                return file
-        return None
-
-    def delete_attachment(self, name):
-        name = self.localized_attachment_name(name)
-        for file in self.files:
-            if file.name == name:
-                self.files.remove(file)
-
-    def set_attachment(self, name, attachment):
-        name = self.localized_attachment_name(name)
-        assert attachment.reference.content_type == 'application/pdf'
-        attachment.name = name
-        self.delete_attachment(name)
-        self.files.append(attachment)
+    def file_extract(self, file, locale):
+        file = SwissVote.__dict__[file].__get_by_locale__(self, locale)
+        return file.extract if file else ''
 
     @property
-    def voting_text(self):
-        return self.get_attachment('voting_text')
-
-    @voting_text.setter
-    def voting_text(self, value):
-        self.set_attachment('voting_text', value)
-
-    @voting_text.deleter
-    def voting_text(self):
-        self.delete_attachment('voting_text')
+    def voting_text_de_CH(self):
+        return self.file_extract('voting_text', 'de_CH')
 
     @property
-    def federal_council_message(self):
-        return self.get_attachment('federal_council_message')
-
-    @federal_council_message.setter
-    def federal_council_message(self, value):
-        self.set_attachment('federal_council_message', value)
-
-    @federal_council_message.deleter
-    def federal_council_message(self):
-        self.delete_attachment('federal_council_message')
+    def voting_text_fr_CH(self):
+        return self.file_extract('voting_text', 'fr_CH')
 
     @property
-    def parliamentary_debate(self):
-        return self.get_attachment('parliamentary_debate')
+    def federal_council_message_de_CH(self):
+        return self.file_extract('federal_council_message', 'de_CH')
 
-    @parliamentary_debate.setter
-    def parliamentary_debate(self, value):
-        self.set_attachment('parliamentary_debate', value)
+    @property
+    def federal_council_message_fr_CH(self):
+        return self.file_extract('federal_council_message', 'fr_CH')
 
-    @parliamentary_debate.deleter
-    def parliamentary_debate(self):
-        self.delete_attachment('parliamentary_debate')
+    @property
+    def parliamentary_debate_de_CH(self):
+        return self.file_extract('parliamentary_debate', 'de_CH')
+
+    @property
+    def parliamentary_debate_fr_CH(self):
+        return self.file_extract('parliamentary_debate', 'fr_CH')
