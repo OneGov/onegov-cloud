@@ -104,7 +104,7 @@
                 <input type="submit" value="${button_text}" class="button ${button_class|nothing}">
             </tal:block>
             <tal:block condition="reset|nothing">
-                <a class="button secondary reset-button right" href="${reset}" i18n:translate="">Reset</a>
+                <a class="button secondary reset-button" href="${reset}" i18n:translate="">Reset</a>
             </tal:block>
         </form>
     </metal:form>

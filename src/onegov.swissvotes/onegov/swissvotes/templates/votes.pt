@@ -11,7 +11,7 @@
                         <tal:block tal:condition="not:form.error_message|nothing" i18n:translate>The form contains errors. Please check the fields marked in red.</tal:block>
                         <tal:block tal:condition="form.error_message|nothing" i18n:translate>${form.error_message}</tal:block>
                     </div>
-                    <div metal:use-macro="layout.macros['form']" tal:define="form_method 'GET';reset layout.votes_link"/>
+                    <div metal:use-macro="layout.macros['form']" tal:define="form_method 'GET';reset layout.votes_link;button_class 'right'"/>
                 </div>
             </div>
 
