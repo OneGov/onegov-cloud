@@ -4,6 +4,9 @@ Changelog
 - Makes the update, export and delete vote views to be indifferent to the filters.
   [msom]
 
+- Handles search beeing unavailable.
+  [msom]
+
 0.0.6 (2018-09-23)
 ~~~~~~~~~~~~~~~~~~~
 

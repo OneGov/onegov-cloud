@@ -1374,6 +1374,12 @@ msgstr "Datensatz aktualisiert (${added} hinzugefügt, ${updated} geändert)"
 msgid "All votes deleted"
 msgstr "Alle Abstimmungen gelöscht"
 
+msgid ""
+"The full text search is currently not available! The search term was ignored."
+msgstr ""
+"Die Volltextsuche ist derzeit nicht verfügbar! Der Suchbegriff wurde "
+"ignoriert."
+
 #, python-format
 msgid "The dataset contains unknown descriptors: ${items}."
 msgstr "Der Datensatz enthält unbekannte Deskriptoren: ${items}."

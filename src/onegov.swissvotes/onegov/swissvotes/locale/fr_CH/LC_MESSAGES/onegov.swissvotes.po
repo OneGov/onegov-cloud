@@ -1381,6 +1381,10 @@ msgstr ""
 msgid "All votes deleted"
 msgstr ""
 
+msgid ""
+"The full text search is currently not available! The search term was ignored."
+msgstr ""
+
 #, python-format
 msgid "The dataset contains unknown descriptors: ${items}."
 msgstr ""
