@@ -7,6 +7,9 @@ Changelog
 - Handles search beeing unavailable.
   [msom]
 
+- Sorts full tesxt search results by rank.
+  [msom]
+
 0.0.6 (2018-09-23)
 ~~~~~~~~~~~~~~~~~~~
 

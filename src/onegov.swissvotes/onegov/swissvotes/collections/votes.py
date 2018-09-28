@@ -6,6 +6,9 @@ from onegov.core.collection import Pagination
 from onegov.swissvotes.fields.dataset import COLUMNS
 from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import SwissVote
+from onegov.swissvotes.orm import values
+from sqlalchemy import column
+from sqlalchemy import Integer
 from sqlalchemy import or_
 from xlsxwriter.workbook import Workbook
 
@@ -245,9 +248,11 @@ class SwissVoteCollection(Pagination):
                         SwissVote.descriptor_3_level_3.in_(levels[2])
                     )
                 )
+
         if self.term:
             term = self.term[:self.max_term_length]
 
+            # perform elasticsearch with the filtered subset
             search = self.app.es_search()
             search = search.filter(
                 'ids',
@@ -267,12 +272,24 @@ class SwissVoteCollection(Pagination):
             )
             search = search[0:self.max_search_results]
             search = search.execute()
+            search = search.load()
+            search = {r.id: index for index, r in enumerate(search)}
 
-            query = query.filter(
-                SwissVote.id.in_([r.id for r in search.load()])
-            )
+            # return a query with the found results in its order
+            if search:
+                ranking = values(
+                    [column('id', Integer), column('rank', Integer)],
+                    *list(search.items()),
+                    alias_name='ranking'
+                )
+                query = self.session.query(SwissVote)
+                query = query.join(ranking, SwissVote.id == ranking.c.id)
+                query = query.order_by('ranking.rank')
+            else:
+                query = self.session.query(SwissVote).filter_by(id=None)
 
-        query = query.order_by(self.order_by)
+        else:
+            query = query.order_by(self.order_by)
 
         return query
 
@@ -369,20 +386,20 @@ class SwissVoteCollection(Pagination):
         row = 0
         for vote in self.query().order_by(None).order_by(SwissVote.bfs_number):
             row += 1
-            for column, attribute in enumerate(COLUMNS.keys()):
+            for column_, attribute in enumerate(COLUMNS.keys()):
                 value = getattr(vote, attribute)
                 type_ = str(vote.__table__.columns[attribute.lstrip('_')].type)
                 if value is None:
                     pass
                 elif type_ == 'TEXT':
-                    worksheet.write_string(row, column, value)
+                    worksheet.write_string(row, column_, value)
                 elif type_ == 'DATE':
-                    worksheet.write_datetime(row, column, value)
+                    worksheet.write_datetime(row, column_, value)
                 elif type_ == 'INTEGER' or type_.startswith('NUMERIC'):
-                    worksheet.write_number(row, column, value)
+                    worksheet.write_number(row, column_, value)
                 elif type_ == 'INT4RANGE':
                     worksheet.write_string(
-                        row, column, f'{value.lower}-{value.upper}'
+                        row, column_, f'{value.lower}-{value.upper}'
                     )
 
         workbook.close()
