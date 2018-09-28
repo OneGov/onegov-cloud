@@ -150,7 +150,7 @@
                 </tr>
                 <!-- Results -->
                 <tr>
-                    <th scope="rowgroup" rowspan="4" class="hide-for-small" i18n:translate>Vote</th>
+                    <th scope="rowgroup" rowspan="5" class="hide-for-small" i18n:translate>Vote</th>
                     <th scope="row" i18n:translate>Voting result</th>
                     <td>${vote.result}</td>
                 </tr>
@@ -175,6 +175,10 @@
                 <tr>
                     <th scope="row" i18n:translate>Turnout</th>
                     <td><tal:block tal:condition="vote.result_turnout">${layout.format_number(vote.result_turnout, 2)}%</tal:block></td>
+                </tr>
+                <tr>
+                    <th scope="row" i18n:translate>Voting booklet</th>
+                    <td><a tal:condition="vote.voting_booklet" href="${request.link(vote.voting_booklet)}">PDF</a></td>
                 </tr>
             </table>
         </div>

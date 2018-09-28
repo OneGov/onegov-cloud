@@ -96,6 +96,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ORMSearchable):
         'federal_council_message_fr_CH': {'type': 'localized'},
         'parliamentary_debate_de_CH': {'type': 'localized'},
         'parliamentary_debate_fr_CH': {'type': 'localized'},
+        # we don't include the voting_booklet, they contain other votes!
     }
 
     id = Column(Integer, nullable=False, primary_key=True)

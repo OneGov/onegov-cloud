@@ -57,6 +57,9 @@ msgstr "Federal council message"
 msgid "Parliamentary debate"
 msgstr "Parliamentary debate"
 
+msgid "Voting booklet"
+msgstr ""
+
 msgid "Title"
 msgstr "Title"
 

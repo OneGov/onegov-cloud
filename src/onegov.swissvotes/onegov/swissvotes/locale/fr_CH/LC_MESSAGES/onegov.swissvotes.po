@@ -55,6 +55,9 @@ msgstr ""
 msgid "Parliamentary debate"
 msgstr ""
 
+msgid "Voting booklet"
+msgstr ""
+
 msgid "Title"
 msgstr "Titre"
 

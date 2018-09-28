@@ -36,6 +36,14 @@ class AttachmentsForm(Form):
         ]
     )
 
+    voting_booklet = UploadField(
+        label=_("Voting booklet"),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(25 * 1024 * 1024)
+        ]
+    )
+
     def update_model(self, model):
         locale = self.request.locale
         if self.voting_text.action == 'delete':
@@ -71,6 +79,17 @@ class AttachmentsForm(Form):
                 )
                 model.parliamentary_debate = parliamentary_debate
 
+        if self.voting_booklet.action == 'delete':
+            del model.voting_booklet
+        if self.voting_booklet.action == 'replace':
+            if self.voting_booklet.data:
+                voting_booklet = SwissVoteFile(id=random_token())
+                voting_booklet.reference = as_fileintent(
+                    self.voting_booklet.raw_data[-1].file,
+                    f'voting_booklet-{locale}'
+                )
+                model.voting_booklet = voting_booklet
+
     def apply_model(self, model):
         def assign_file(field, file):
             # todo: implement something better
@@ -94,4 +113,9 @@ class AttachmentsForm(Form):
             assign_file(
                 self.parliamentary_debate,
                 self.model.parliamentary_debate
+            )
+        if self.model.voting_booklet:
+            assign_file(
+                self.voting_booklet,
+                self.model.voting_booklet
             )
