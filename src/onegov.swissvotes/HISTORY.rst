@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.7 (2018-09-28)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds full text search support for attachments.
   [msom]
