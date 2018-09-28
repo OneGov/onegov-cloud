@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.10.0 (2018-09-28)
+~~~~~~~~~~~~~~~~~~~
+
 - Extracts pdf text and page numbers for pdf uploads.
   [href]
 
