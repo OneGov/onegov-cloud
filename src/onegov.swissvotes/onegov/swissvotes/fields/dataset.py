@@ -127,9 +127,13 @@ class SwissvoteDatasetField(UploadField):
         kwargs.setdefault('validators', [])
         kwargs['validators'].append(
             WhitelistedMimeType({
+                'application/excel',
                 'application/octet-stream',
-                'application/vnd.openxmlformats-officedocument'
-                '.spreadsheetml.sheet'
+                'application/vnd.ms-excel',
+                'application/vnd.ms-office',
+                'application/vnd.openxmlformats-officedocument.'
+                'spreadsheetml.sheet',
+                'application/zip'
             })
         )
         kwargs['validators'].append(FileSizeLimit(10 * 1024 * 1024))
