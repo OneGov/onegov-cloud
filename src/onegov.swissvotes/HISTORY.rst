@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.8 (2018-09-28)
+~~~~~~~~~~~~~~~~~~~
 
 - Use a wider range of MIME types when updating the dataset.
   [msom]
