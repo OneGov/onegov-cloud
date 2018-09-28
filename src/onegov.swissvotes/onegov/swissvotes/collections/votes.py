@@ -270,8 +270,7 @@ class SwissVoteCollection(Pagination):
                     fields=['title', 'keyword', 'initiator'],
                     fuzziness=1,
                     boost=5
-                )
-                |
+                ) |
                 MultiMatch(
                     query=term,
                     fields=[
