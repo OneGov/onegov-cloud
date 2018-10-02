@@ -283,7 +283,7 @@ def test_import_categories(temporary_directory, redis_url, session_manager):
     assert '4 categorie(s) imported' in result.output
 
     result = run_command(cfg_path, 'govikon', ['import-categories', path])
-    assert result.exit_code == -1
+    assert result.exit_code == 1
 
     result = run_command(
         cfg_path, 'govikon', ['import-categories', path, '--clear']
@@ -381,7 +381,7 @@ def test_import_organizations(temporary_directory, redis_url, session_manager):
     assert '6 organization(s) imported' in result.output
 
     result = run_command(cfg_path, 'govikon', ['import-organizations', path])
-    assert result.exit_code == -1
+    assert result.exit_code == 1
 
     result = run_command(
         cfg_path, 'govikon', ['import-organizations', path, '--clear']
