@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes directory sort order not working.
+  [href]
+
 - Adds the ability to search for PDF files by content.
   [href]
 

@@ -324,7 +324,11 @@ class DirectoryBaseForm(Form):
             self.order_format.data = ''.join(f'[{key}]' for key in cfg.order)
 
     def populate_obj(self, obj):
-        super().populate_obj(obj, exclude={'configuration'})
+        super().populate_obj(obj, exclude={
+            'configuration',
+            'order',
+        })
+
         obj.configuration = self.configuration
 
         if self.marker_color_type.data == 'default':

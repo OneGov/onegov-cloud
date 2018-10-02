@@ -3,10 +3,11 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 from onegov.core.upgrade import upgrade_task
+from onegov.core.utils import normalize_for_url
 from onegov.form import FormDefinition
-from onegov.reservation import Resource
 from onegov.org.models import Organisation, Topic, News, ExtendedDirectory
 from onegov.org.utils import annotate_html
+from onegov.reservation import Resource
 
 
 @upgrade_task('Move from town to organisation', always_run=True)
@@ -84,3 +85,9 @@ def add_new_defaults_to_existing_directories(context):
 def migrate_enable_map_option(context):
     for directory in context.session.query(ExtendedDirectory):
         directory.enable_map = directory.enable_map and 'everywhere' or 'no'
+
+
+@upgrade_task('Fix directory order')
+def fix_directory_order(context):
+    for directory in context.session.query(ExtendedDirectory):
+        directory.order = normalize_for_url(directory.title)
