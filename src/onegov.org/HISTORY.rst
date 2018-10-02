@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.36.3 (2018-10-02)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes directory sort order not working.
   [href]
 
