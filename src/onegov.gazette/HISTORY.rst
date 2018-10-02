@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.17.2 (2018-10-02)
+~~~~~~~~~~~~~~~~~~~~
 
 - Fixes tests failing with latest click release.
   [href]
