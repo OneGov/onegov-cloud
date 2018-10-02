@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.10.1 (2018-10-02)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes pdf extracts sometimes containing NUL characters.
   [href]
 
