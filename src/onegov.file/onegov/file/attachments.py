@@ -70,7 +70,7 @@ def sanitize_svg_images(file, content, content_type):
 
 def extract_pdf_info(content):
     pages = pdftotext.PDF(content)
-    return len(pages), '\n'.join(pages).strip(' \t\r\n\0')
+    return len(pages), '\n'.join(pages).strip(' \t\r\n').replace('\0', '')
 
 
 def store_extract_and_pages(file, content, content_type):
