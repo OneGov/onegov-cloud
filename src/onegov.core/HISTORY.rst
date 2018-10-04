@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.72.4 (2018-10-04)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds support for bleach 3.0.0.
   [href]
