@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.3.5 (2018-10-04)
+~~~~~~~~~~~~~~~~~~~~~
 
 - Adds missing html5lib dependency.
   [href]
