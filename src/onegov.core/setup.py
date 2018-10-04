@@ -38,7 +38,7 @@ setup(
         'babel>=2.6.0',
         'blinker',
         'bcrypt',
-        'bleach>=2.0.0',
+        'bleach>=3.0.0',
         'cached_property',
         'chameleon>=3.0.0',
         'click',
