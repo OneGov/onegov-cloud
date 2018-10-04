@@ -1,6 +1,7 @@
 import arrow
 import babel.dates
 import babel.numbers
+import isodate
 import numbers
 import sedate
 
@@ -131,6 +132,10 @@ class Layout(object):
     def isodate(self, date):
         """ Returns the given date in the ISO 8601 format. """
         return datetime.isoformat(date)
+
+    def parse_isodate(self, string):
+        """ Returns the given ISO 8601 string as datetime. """
+        return isodate.parse_datetime(string)
 
     @lru_cache(maxsize=8)
     def number_symbols(self, locale):

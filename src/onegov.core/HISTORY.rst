@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the ability to parse isodate strings through the layout class.
+  [href]
+
 0.72.4 (2018-10-04)
 ~~~~~~~~~~~~~~~~~~~
 
