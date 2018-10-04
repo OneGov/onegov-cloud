@@ -34,6 +34,7 @@ setup(
     python_requires='>=3.6',
     install_requires=[
         'bleach',
+        'html5lib',
         'onegov.core>=0.4.0',
         'pdfdocument',
         'pdfrw',
