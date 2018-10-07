@@ -116,15 +116,19 @@ def import_data(group_context, folder):
         attachments = {
             name: os.path.join(folder, name)
             for name in os.listdir(folder)
-            if os.path.isdir(os.path.join(folder, name))
-            and hasattr(SwissVote, name)
+            if (
+                os.path.isdir(os.path.join(folder, name)) and
+                hasattr(SwissVote, name)
+            )
         }
         for attachment, attachment_folder in attachments.items():
             locales = {
                 name: os.path.join(attachment_folder, name)
                 for name in os.listdir(attachment_folder)
-                if os.path.isdir(os.path.join(attachment_folder, name))
-                and name in app.locales
+                if (
+                    os.path.isdir(os.path.join(attachment_folder, name)) and
+                    name in app.locales
+                )
             }
             for locale, locale_folder in locales.items():
                 for name in os.listdir(locale_folder):
