@@ -26,16 +26,7 @@
                     data-tablesaw-minimap
                     >
                     <thead>
-                        <tr tal:condition="votes.term">
-                            <th class="left-aligned" data-tablesaw-priority="1" i18n:translate>Title</th>
-                            <th class="left-aligned" data-tablesaw-priority="3" i18n:translate>Date</th>
-                            <th class="left-aligned" data-tablesaw-priority="5" i18n:translate>Policy area</th>
-                            <th class="left-aligned" data-tablesaw-priority="4" i18n:translate>Legal form</th>
-                            <th class="left-aligned" data-tablesaw-priority="2" i18n:translate>Voting result</th>
-                            <th class="right-aligned" data-tablesaw-priority="0" i18n:translate>Yeas People</th>
-                            <th class="left-aligned" data-tablesaw-priority="persist" i18n:translate>Details</th>
-                        </tr>
-                        <tr tal:condition="not: votes.term">
+                        <tr>
                             <th class="left-aligned sort-${votes.sort_order_by_key('title')}" data-tablesaw-priority="1">
                                 <a href="${request.link(votes.by_order('title'))}" i18n:translate>Title</a>
                             </th>

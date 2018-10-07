@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-23 13:50+0200\n"
+"POT-Creation-Date: 2018-10-07 15:24+0200\n"
 "PO-Revision-Date: 2018-09-18 11:29+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1382,10 +1382,6 @@ msgid "Dataset updated (${added} added, ${updated} updated)"
 msgstr ""
 
 msgid "All votes deleted"
-msgstr ""
-
-msgid ""
-"The full text search is currently not available! The search term was ignored."
 msgstr ""
 
 #, python-format

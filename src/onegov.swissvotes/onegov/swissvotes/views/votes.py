@@ -3,7 +3,6 @@ from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.core.security import Secret
 from onegov.form import Form
-from onegov.search import SearchOfflineError
 from onegov.swissvotes import _
 from onegov.swissvotes import SwissvotesApp
 from onegov.swissvotes.collections import SwissVoteCollection
@@ -24,17 +23,6 @@ from translationstring import TranslationString
 def view_votes(self, request, form):
     if not form.errors:
         form.apply_model(self)
-
-    try:
-        self.batch
-    except SearchOfflineError:
-        self.term = None
-        request.message(
-            _(
-                "The full text search is currently not available! "
-                "The search term was ignored."
-            ), 'warning'
-        )
 
     return {
         'layout': VotesLayout(self, request),

@@ -47,7 +47,7 @@ class SearchForm(Form):
     sort_order = HiddenField()
 
     def populate_policy_area(self):
-        votes = SwissVoteCollection(self.request.app)
+        votes = SwissVoteCollection(self.request.session)
         available = votes.available_descriptors
 
         def add_choice(value, label, level):

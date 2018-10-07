@@ -111,7 +111,7 @@ def import_data(group_context, folder):
     """
 
     def _import(request, app):
-        votes = SwissVoteCollection(app)
+        votes = SwissVoteCollection(app.session())
 
         attachments = {
             name: os.path.join(folder, name)

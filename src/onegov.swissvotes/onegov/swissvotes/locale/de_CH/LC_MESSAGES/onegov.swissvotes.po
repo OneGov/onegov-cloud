@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-23 13:50+0200\n"
+"POT-Creation-Date: 2018-10-07 15:24+0200\n"
 "PO-Revision-Date: 2018-09-28 09:23+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1376,12 +1376,6 @@ msgstr "Datensatz aktualisiert (${added} hinzugefügt, ${updated} geändert)"
 
 msgid "All votes deleted"
 msgstr "Alle Abstimmungen gelöscht"
-
-msgid ""
-"The full text search is currently not available! The search term was ignored."
-msgstr ""
-"Die Volltextsuche ist derzeit nicht verfügbar! Der Suchbegriff wurde "
-"ignoriert."
 
 #, python-format
 msgid "The dataset contains unknown descriptors: ${items}."

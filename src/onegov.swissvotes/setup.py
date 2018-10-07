@@ -37,7 +37,6 @@ setup(
         'onegov.form',
         'onegov.foundation',
         'onegov.quill>=0.4.0',
-        'onegov.search',
         'onegov.shared',
         'onegov.user',
         'raven',

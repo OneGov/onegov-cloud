@@ -4,17 +4,19 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.file import AssociatedFiles
 from onegov.file import File
-from onegov.search import ORMSearchable
 from onegov.swissvotes import _
 from onegov.swissvotes.models.actor import Actor
 from onegov.swissvotes.models.localized_file import LocalizedFile
 from onegov.swissvotes.models.policy_area import PolicyArea
 from sqlalchemy import Column
 from sqlalchemy import Date
+from sqlalchemy import func
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy import Text
+from sqlalchemy_utils import observes
 from sqlalchemy.dialects.postgresql import INT4RANGE
+from sqlalchemy.dialects.postgresql import TSVECTOR
 
 
 LEGAL_FORM = {
@@ -79,23 +81,16 @@ class SwissVoteFile(File):
     __mapper_args__ = {'polymorphic_identity': 'swissvote'}
 
 
-class SwissVote(Base, TimestampMixin, AssociatedFiles, ORMSearchable):
+class SwissVote(Base, TimestampMixin, AssociatedFiles):
 
     """ A single vote as defined by the code book. """
 
     __tablename__ = 'swissvotes'
 
-    es_public = True
-    es_properties = {
-        'title': {'type': 'localized'},
-        'keyword': {'type': 'localized'},
-        'initiator': {'type': 'localized'},
-        'voting_text_de_CH': {'type': 'localized'},
-        'voting_text_fr_CH': {'type': 'localized'},
-        'federal_council_message_de_CH': {'type': 'localized'},
-        'federal_council_message_fr_CH': {'type': 'localized'},
-        'parliamentary_debate_de_CH': {'type': 'localized'},
-        'parliamentary_debate_fr_CH': {'type': 'localized'},
+    indexed_files = {
+        'voting_text',
+        'federal_council_message',
+        'parliamentary_debate',
         # we don't include the voting_booklet, they contain other votes!
     }
 
@@ -221,10 +216,33 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ORMSearchable):
     national_council_share_neutral = Column(Numeric(13, 10))
     national_council_share_vague = Column(Numeric(13, 10))
 
+    # attachments
     voting_text = LocalizedFile()
     federal_council_message = LocalizedFile()
     parliamentary_debate = LocalizedFile()
     voting_booklet = LocalizedFile()
+
+    # searchable attachment texts
+    searchable_text_de_CH = Column(TSVECTOR)
+    searchable_text_fr_CH = Column(TSVECTOR)
+
+    def vectorize_files(self):
+        for locale, language in (('de_CH', 'german'), ('fr_CH', 'french')):
+            files = [
+                SwissVote.__dict__[file].__get_by_locale__(self, locale)
+                for file in self.indexed_files
+            ]
+            text = ' '.join([file.extract for file in files if file]).strip()
+            if text:
+                setattr(
+                    self,
+                    f'searchable_text_{locale}',
+                    func.to_tsvector(language, text)
+                )
+
+    @observes('files')
+    def files_observer(self, files):
+        self.vectorize_files()
 
     @cached_property
     def legal_form(self):
@@ -342,31 +360,3 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ORMSearchable):
         if self.national_council_election_year:
             return True
         return False
-
-    def file_extract(self, file, locale):
-        file = SwissVote.__dict__[file].__get_by_locale__(self, locale)
-        return file.extract if file else ''
-
-    @property
-    def voting_text_de_CH(self):
-        return self.file_extract('voting_text', 'de_CH')
-
-    @property
-    def voting_text_fr_CH(self):
-        return self.file_extract('voting_text', 'fr_CH')
-
-    @property
-    def federal_council_message_de_CH(self):
-        return self.file_extract('federal_council_message', 'de_CH')
-
-    @property
-    def federal_council_message_fr_CH(self):
-        return self.file_extract('federal_council_message', 'fr_CH')
-
-    @property
-    def parliamentary_debate_de_CH(self):
-        return self.file_extract('parliamentary_debate', 'de_CH')
-
-    @property
-    def parliamentary_debate_fr_CH(self):
-        return self.file_extract('parliamentary_debate', 'fr_CH')

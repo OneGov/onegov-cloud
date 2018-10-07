@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Uses prostgres for keyword filtering instead of elastic search.
+  [msom]
+
 0.0.8 (2018-09-28)
 ~~~~~~~~~~~~~~~~~~~
 

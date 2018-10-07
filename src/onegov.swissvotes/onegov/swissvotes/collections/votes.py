@@ -1,14 +1,10 @@
 from cached_property import cached_property
 from csv import writer
-from elasticsearch_dsl.query import MatchPhrase
-from elasticsearch_dsl.query import MultiMatch
 from onegov.core.collection import Pagination
 from onegov.swissvotes.fields.dataset import COLUMNS
 from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import SwissVote
-from onegov.swissvotes.orm import values
-from sqlalchemy import column
-from sqlalchemy import Integer
+from sqlalchemy import func
 from sqlalchemy import or_
 from xlsxwriter.workbook import Workbook
 
@@ -19,8 +15,6 @@ class SwissVoteCollection(Pagination):
     initial_sort_by = 'date'
     initial_sort_order = 'descending'
     default_sort_order = 'ascending'
-    max_term_length = 100
-    max_search_results = 1000
 
     SORT_BYS = (
         'date',
@@ -33,7 +27,7 @@ class SwissVoteCollection(Pagination):
 
     def __init__(
         self,
-        app,
+        session,
         page=None,
         from_date=None,
         to_date=None,
@@ -44,8 +38,7 @@ class SwissVoteCollection(Pagination):
         sort_by=None,
         sort_order=None
     ):
-        self.session = app.session()
-        self.app = app
+        self.session = session
         self.page = page
         self.from_date = from_date
         self.to_date = to_date
@@ -75,7 +68,7 @@ class SwissVoteCollection(Pagination):
     def default(self):
         """ Returns the votes unfiltered and ordered by default. """
 
-        return self.__class__(self.app)
+        return self.__class__(self.session)
 
     @property
     def page_index(self):
@@ -87,7 +80,7 @@ class SwissVoteCollection(Pagination):
         """ Returns the requested page. """
 
         return self.__class__(
-            self.app,
+            self.session,
             page=page,
             from_date=self.from_date,
             to_date=self.to_date,
@@ -144,7 +137,7 @@ class SwissVoteCollection(Pagination):
                 sort_order = 'ascending'
 
         return self.__class__(
-            self.app,
+            self.session,
             page=None,
             from_date=self.from_date,
             to_date=self.to_date,
@@ -250,57 +243,25 @@ class SwissVoteCollection(Pagination):
                 )
 
         if self.term:
-            term = self.term[:self.max_term_length]
-            locale = self.app.session_manager.current_locale
 
-            # perform elasticsearch with the filtered subset
-            search = self.app.es_search()
-            search = search.filter(
-                'ids',
-                values=[
-                    r[0] for r in query.with_entities(SwissVote.es_id)
-                ]
-            )
-            search = search.query(
-                MatchPhrase(
-                    title={"query": term, "boost": 3}
-                ) |
-                MultiMatch(
-                    query=term,
-                    fields=['title', 'keyword', 'initiator'],
-                    fuzziness=1,
-                    boost=5
-                ) |
-                MultiMatch(
-                    query=term,
-                    fields=[
-                        f'voting_text_{locale}',
-                        f'federal_council_message_{locale}',
-                        f'parliamentary_debate_{locale}',
-                    ],
-                    fuzziness=1,
+            def match_convert(column, language='german'):
+                return func.to_tsvector(language, column).\
+                    match(self.term, postgresql_regconfig='german')
+
+            def match(column, language='german'):
+                return column.match(self.term, postgresql_regconfig='german')
+
+            query = query.filter(
+                or_(
+                    match_convert(SwissVote.title),
+                    match_convert(SwissVote.keyword),
+                    match_convert(SwissVote.initiator),
+                    match(SwissVote.searchable_text_de_CH),
+                    match(SwissVote.searchable_text_fr_CH, 'french'),
                 )
             )
-            search = search[0:self.max_search_results]
-            search = search.execute()
-            search = search.load()
-            search = {r.id: index for index, r in enumerate(search)}
 
-            # return a query with the found results in its order
-            if search:
-                ranking = values(
-                    [column('id', Integer), column('rank', Integer)],
-                    *list(search.items()),
-                    alias_name='ranking'
-                )
-                query = self.session.query(SwissVote)
-                query = query.join(ranking, SwissVote.id == ranking.c.id)
-                query = query.order_by('ranking.rank')
-            else:
-                query = self.session.query(SwissVote).filter_by(id=None)
-
-        else:
-            query = query.order_by(self.order_by)
+        query = query.order_by(self.order_by)
 
         return query
 
