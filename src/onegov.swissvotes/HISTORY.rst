@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Use tsquery phrases for multipley fulltext terms.
+  [msom]
+
 0.0.9 (2018-10-07)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -243,13 +243,14 @@ class SwissVoteCollection(Pagination):
                 )
 
         if self.term:
+            term = ' <-> '.join([x for x in self.term.split() if x.isalnum()])
 
             def match_convert(column, language='german'):
                 return func.to_tsvector(language, column).\
-                    match(self.term, postgresql_regconfig='german')
+                    match(term, postgresql_regconfig='german')
 
             def match(column, language='german'):
-                return column.match(self.term, postgresql_regconfig='german')
+                return column.match(term, postgresql_regconfig='german')
 
             query = query.filter(
                 or_(
