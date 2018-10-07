@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 name = 'onegov.swissvotes'
 description = 'Database for federal votes'
-version = '0.0.9'
+version = '0.0.10'
 
 
 def get_long_description():
