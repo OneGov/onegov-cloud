@@ -4,11 +4,11 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import data_property, TimestampMixin
 from onegov.core.orm.types import JSON, UUID, LowercaseText
 from onegov.core.security import forget, remembered
+from onegov.core.utils import is_valid_yubikey_format
 from onegov.core.utils import remove_repeated_spaces
+from onegov.core.utils import yubikey_otp_to_serial
 from onegov.search import ORMSearchable
 from onegov.user.models.group import UserGroup
-from onegov.user.utils import is_valid_yubikey_format
-from onegov.user.utils import yubikey_otp_to_serial
 from sqlalchemy import Boolean, Column, Index, Text, func, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref, deferred, relationship

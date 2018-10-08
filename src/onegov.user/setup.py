@@ -38,8 +38,7 @@ setup(
         'itsdangerous',
         'onegov.core>=0.50.0',
         'onegov.form',
-        'sqlalchemy',
-        'yubico-client'
+        'sqlalchemy'
     ],
     extras_require=dict(
         test=[

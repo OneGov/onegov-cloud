@@ -2,11 +2,11 @@ import morepath
 
 from datetime import datetime
 from itsdangerous import URLSafeSerializer, BadSignature
+from onegov.core.utils import is_valid_yubikey
 from onegov.core.utils import relative_url
 from onegov.user import log
 from onegov.user.collections import UserCollection
 from onegov.user.errors import ExpiredSignupLinkError
-from onegov.user.utils import is_valid_yubikey
 
 
 class Auth(object):

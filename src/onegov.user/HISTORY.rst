@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Moves yubikey related functions to onegov.core.
+  [href]
+
 0.18.0 (2018-09-18)
 ~~~~~~~~~~~~~~~~~~~
 

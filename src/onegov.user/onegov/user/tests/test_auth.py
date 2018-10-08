@@ -6,10 +6,7 @@ from datetime import datetime, timedelta
 from onegov.core import Framework
 from onegov.core.utils import Bunch
 from onegov.core.security.identity_policy import IdentityPolicy
-from onegov.user import (
-    Auth, is_valid_yubikey, is_valid_yubikey_format,
-    UserCollection, yubikey_otp_to_serial
-)
+from onegov.user import Auth, UserCollection
 from onegov.user.errors import ExpiredSignupLinkError
 from webtest import TestApp as Client
 from unittest.mock import patch
@@ -49,38 +46,6 @@ def test_auth_login_inactive(session):
     transaction.commit()
 
     assert auth.login(username='AzureDiamond', password='hunter2')
-
-
-def test_is_valid_yubikey_otp(session):
-
-    assert not is_valid_yubikey(
-        client_id='abc',
-        secret_key='dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE=',
-        expected_yubikey_id='ccccccbcgujx',
-        yubikey='ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
-    )
-
-    with patch.object(Yubico, 'verify') as verify:
-        verify.return_value = True
-
-        assert is_valid_yubikey(
-            client_id='abc',
-            secret_key='dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE=',
-            expected_yubikey_id='ccccccbcgujh',
-            yubikey='ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
-        )
-
-
-def test_is_valid_yubikey_format():
-    assert is_valid_yubikey_format('ccccccdefghd')
-    assert is_valid_yubikey_format('cccccccdefg' * 4)
-    assert not is_valid_yubikey_format('ccccccdefghx')
-
-
-def test_yubikey_otp_to_serial():
-    assert yubikey_otp_to_serial(
-        'ccccccdefghdefghdefghdefghdefghdefghdefghklv') == 2311522
-    assert yubikey_otp_to_serial("ceci n'est pas une yubikey") is None
 
 
 def test_auth_login_yubikey(session):
