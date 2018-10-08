@@ -10,6 +10,9 @@ Changelog
 - Enables polymorphic subclasses of people.
   [msom]
 
+- Adds content and meta columns to people.
+  [msom]
+
 0.3.0 (2017-09-26)
 ~~~~~~~~~~~~~~~~~~~
 

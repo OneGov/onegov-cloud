@@ -2,8 +2,10 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
-from sqlalchemy import Column, Text
+from sqlalchemy import Column
+from sqlalchemy import Text
 
 
 @upgrade_task('Rename academic_title to salutation')
@@ -29,3 +31,12 @@ def add_notes_column(context):
 def add_person_type_column(context):
     if not context.has_column('people', 'type'):
         context.operations.add_column('people', Column('type', Text))
+
+
+@upgrade_task('Add meta data and content columns')
+def add_meta_data_and_content_columns(context):
+    if not context.has_column('people', 'meta'):
+        context.operations.add_column('people', Column('meta', JSON()))
+
+    if not context.has_column('people', 'content'):
+        context.operations.add_column('people', Column('content', JSON))
