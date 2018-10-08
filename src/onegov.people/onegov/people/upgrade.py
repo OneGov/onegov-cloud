@@ -23,3 +23,9 @@ def add_function_column(context):
 def add_notes_column(context):
     context.operations.add_column(
         'people', Column('notes', Text, nullable=True))
+
+
+@upgrade_task('Add person type column')
+def add_person_type_column(context):
+    if not context.has_column('people', 'type'):
+        context.operations.add_column('people', Column('type', Text))

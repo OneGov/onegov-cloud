@@ -10,6 +10,17 @@ class Person(Base, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'people'
 
+    #: the type of the item, this can be used to create custom polymorphic
+    #: subclasses of this class. See
+    #: `<http://docs.sqlalchemy.org/en/improve_toc/\
+    #: orm/extensions/declarative/inheritance.html>`_.
+    type = Column(Text, nullable=True)
+
+    __mapper_args__ = {
+        'polymorphic_on': type,
+        'polymorphic_identity': None,
+    }
+
     es_public = True
     es_properties = {
         'title': {'type': 'text'},

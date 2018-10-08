@@ -7,6 +7,9 @@ Changelog
 - Refactors the package.
   [msom]
 
+- Enables polymorphic subclasses of people.
+  [msom]
+
 0.3.0 (2017-09-26)
 ~~~~~~~~~~~~~~~~~~~
 
