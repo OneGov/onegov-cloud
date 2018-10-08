@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.38.0 (2018-10-08)
+~~~~~~~~~~~~~~~~~~~
 
 - Uses the yubikey identity function from the core.
   [href]
