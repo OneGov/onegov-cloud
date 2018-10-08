@@ -12,6 +12,10 @@ matrix:
 
 addons:
     postgresql: "9.6"
+    apt:
+      packages:
+        - ghostscript
+        - libpoppler-cpp-dev
 
 install:
     - pip install tox
