@@ -4,6 +4,9 @@ Changelog
 - Requires Python 3.6.
   [href]
 
+- Refactors the package.
+  [msom]
+
 0.3.0 (2017-09-26)
 ~~~~~~~~~~~~~~~~~~~
 
