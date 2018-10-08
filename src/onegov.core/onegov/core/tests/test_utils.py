@@ -12,6 +12,7 @@ from sqlalchemy import Column, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from unittest.mock import patch
 from uuid import uuid4
+from yubico_client import Yubico
 
 
 def test_normalize_for_url():
@@ -259,3 +260,44 @@ def test_local_lock():
         with pytest.raises(AlreadyLockedError):
             with utils.local_lock('foo', 'bar'):
                 pass
+
+
+def test_is_valid_yubikey_otp():
+
+    assert not utils.is_valid_yubikey(
+        client_id='abc',
+        secret_key='dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE=',
+        expected_yubikey_id='ccccccbcgujx',
+        yubikey='ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
+    )
+
+    with patch.object(Yubico, 'verify') as verify:
+        verify.return_value = True
+
+        assert utils.is_valid_yubikey(
+            client_id='abc',
+            secret_key='dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE=',
+            expected_yubikey_id='ccccccbcgujh',
+            yubikey='ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
+        )
+
+
+def test_is_valid_yubikey_format():
+    assert utils.is_valid_yubikey_format('ccccccdefghd')
+    assert utils.is_valid_yubikey_format('cccccccdefg' * 4)
+    assert not utils.is_valid_yubikey_format('ccccccdefghx')
+
+
+def test_yubikey_otp_to_serial():
+    assert utils.yubikey_otp_to_serial(
+        'ccccccdefghdefghdefghdefghdefghdefghdefghklv') == 2311522
+    assert utils.yubikey_otp_to_serial("ceci n'est pas une yubikey") is None
+
+
+def test_yubikey_public_id():
+    assert utils.yubikey_public_id(
+        'ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
+    ) == 'ccccccbcgujh'
+
+    with pytest.raises(TypeError):
+        utils.yubikey_public_id(None)

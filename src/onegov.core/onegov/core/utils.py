@@ -13,22 +13,25 @@ import re
 import sqlalchemy
 import urllib.request
 
-from io import BytesIO, StringIO
 from collections import Iterable
 from contextlib import contextmanager
 from cProfile import Profile
 from datetime import datetime
+from importlib import import_module
+from io import BytesIO, StringIO
+from itertools import groupby, tee, zip_longest
+from onegov.core import log
 from onegov.core.cache import lru_cache
 from onegov.core.custom import json
 from onegov.core.errors import AlreadyLockedError
-from importlib import import_module
-from itertools import groupby, tee, zip_longest
-from onegov.core import log
 from purl import URL
 from threading import Thread
 from unidecode import unidecode
 from uuid import UUID
 from webob import static
+from yubico_client import Yubico
+from yubico_client.yubico_exceptions import SignatureVerificationError
+from yubico_client.yubico_exceptions import StatusCodeError
 
 
 # http://stackoverflow.com/a/13500078
@@ -45,6 +48,10 @@ _email_regex = re.compile((
     "{|}~-]+)*(@|\sat\s)(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(\.|"
     "\sdot\s))+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)"
 ))
+
+# for yubikeys
+ALPHABET = 'cbdefghijklnrtuv'
+ALPHABET_RE = re.compile(r'^[cbdefghijklnrtuv]{12,44}$')
 
 
 @contextmanager
@@ -670,3 +677,112 @@ def safe_format_keys(format, adapt=None):
     safe_format(format, {}, adapt=adapt_and_record)
 
     return keys
+
+
+def is_valid_yubikey(client_id, secret_key, expected_yubikey_id, yubikey):
+    """ Asks the yubico validation servers if the given yubikey OTP is valid.
+
+    :client_id:
+        The yubico API client id.
+
+    :secret_key:
+        The yubico API secret key.
+
+    :expected_yubikey_id:
+        The expected yubikey id. The yubikey id is defined as the first twelve
+        characters of any yubikey value. Each user should have a yubikey
+        associated with it's account. If the yubikey value comes from a
+        different key, the key is invalid.
+
+    :yubikey:
+        The actual yubikey value that should be verified.
+
+    :return: True if yubico confirmed the validity of the key.
+
+    """
+    assert client_id and secret_key and expected_yubikey_id and yubikey
+    assert len(expected_yubikey_id) == 12
+
+    # if the yubikey doesn't start with the expected yubikey id we do not
+    # need to make a roundtrip to the validation server
+    if not yubikey.startswith(expected_yubikey_id):
+        return False
+
+    try:
+        return Yubico(client_id, secret_key).verify(yubikey)
+    except StatusCodeError as e:
+        if e.status_code != 'REPLAYED_OTP':
+            raise e
+
+        return False
+    except SignatureVerificationError as e:
+        return False
+
+
+def is_valid_yubikey_format(otp):
+    """ Returns True if the given OTP has the correct format. Does not actually
+    contact Yubico, so this function may return true, for some invalid keys.
+
+    """
+
+    return ALPHABET_RE.match(otp) and True or False
+
+
+def yubikey_otp_to_serial(otp):
+    """ Takes a Yubikey OTP and calculates the serial number of the key.
+
+    The serial key is printed on the yubikey, in decimal and as a QR code.
+
+    Example:
+
+        >>> yubikey_otp_to_serial(
+            'ccccccdefghdefghdefghdefghdefghdefghdefghklv')
+        2311522
+
+    Adapted from Java:
+
+        https://github.com/Yubico/yubikey-salesforce-client/blob/
+        e38e46ee90296a852374a8b744555e99d16b6ca7/src/classes/Modhex.cls
+
+    If the key cannot be calculated, None is returned. This can happen if
+    they key is malformed.
+
+    """
+
+    if not is_valid_yubikey_format(otp):
+        return None
+
+    token = 'cccc' + otp[:12]
+
+    toggle = False
+    keep = 0
+
+    bytesarray = []
+
+    for char in token:
+        n = ALPHABET.index(char)
+
+        toggle = not toggle
+
+        if toggle:
+            keep = n
+        else:
+            bytesarray.append((keep << 4) | n)
+
+    value = 0
+
+    # in Java, shifts on integers are masked with 0x1f using AND
+    # https://docs.oracle.com/javase/specs/jls/se8/html/jls-15.html#jls-15.19
+    mask_value = 0x1f
+
+    for i in range(0, 8):
+        shift = (4 - 1 - i) * 8
+        value += (bytesarray[i] & 255) << (shift & mask_value)
+
+    return value
+
+
+def yubikey_public_id(otp):
+    """ Returns the yubikey identity given a token. """
+
+    return otp[:12]

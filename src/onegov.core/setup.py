@@ -82,6 +82,7 @@ setup(
         'wtforms',
         'xlrd',
         'xlsxwriter',
+        'yubico-client',
         'zope.sqlalchemy'
     ],
     extras_require=dict(
