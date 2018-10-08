@@ -1,8 +1,9 @@
+from onegov.core.utils import is_valid_yubikey_format
 from onegov.form import Form, merge_forms
 from onegov.form.fields import TagsField
 from onegov.form.filters import yubikey_identifier
 from onegov.org import _
-from onegov.user import UserCollection, is_valid_yubikey_format
+from onegov.user import UserCollection
 from wtforms import BooleanField, RadioField, TextField, validators
 from wtforms.fields.html5 import EmailField
 
