@@ -1,6 +1,16 @@
 from onegov.people import Person
 
 
+def test_person_title():
+    person = Person(first_name="Hans", last_name="Maulwurf")
+
+    assert person.title == "Maulwurf Hans"
+    assert person.spoken_title == "Hans Maulwurf"
+
+    person.salutation = "Herr"
+    assert person.spoken_title == "Herr Hans Maulwurf"
+
+
 def test_person_polymorphism(session):
 
     class MyPerson(Person):
