@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.73.0 (2018-10-08)
+~~~~~~~~~~~~~~~~~~~
 
 - Moves the yubikey related functions to the core (from onegov.user).
   
