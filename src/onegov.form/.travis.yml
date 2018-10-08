@@ -13,6 +13,10 @@ matrix:
 addons:
     chrome: stable
     postgresql: "9.6"
+    apt:
+      packages:
+        - libpoppler-cpp-dev
+        - ghostscript
 
 install:
     - pip install tox
