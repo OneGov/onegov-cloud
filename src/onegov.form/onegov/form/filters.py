@@ -1,3 +1,6 @@
+from onegov.core.utils import yubikey_public_id
+
+
 def as_float(value):
     return value and float(value) or 0.0
 
@@ -7,4 +10,4 @@ def strip_whitespace(value):
 
 
 def yubikey_identifier(value):
-    return value and value[:12] or ''
+    return value and yubikey_public_id(value) or ''
