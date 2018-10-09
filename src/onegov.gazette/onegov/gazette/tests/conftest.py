@@ -16,30 +16,6 @@ from transaction import commit
 from uuid import uuid4
 
 
-def pytest_addoption(parser):
-    """ Adds a command line argument to scans all the onegov.* sources to
-    make sure that the database tables are created.
-
-    Set this option if you run into  sqlalchemy erorrs like:
-        "relation XXX does not exist"
-
-    Run it like this:
-        py.test src/onegov.election-day/onegov/gazette/tests/
-            -k test_view_notice_attachments
-            --import-scan
-
-    """
-    parser.addoption('--import-scan', action="store_true")
-
-
-def pytest_cmdline_main(config):
-    option = config.getoption('--import-scan')
-    if option:
-        import importscan
-        import onegov
-        importscan.scan(onegov, ignore=['.test', '.tests'])
-
-
 PRINCIPAL = """
     name: Govikon
     color: '#006FB5'
