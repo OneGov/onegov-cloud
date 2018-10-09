@@ -37,18 +37,6 @@ def client_with_es(es_feriennet_app):
     return Client(es_feriennet_app)
 
 
-@pytest.fixture(scope="session", autouse=True)
-def import_scan():
-    """ Scans all the onegov.* sources to make sure that the tables are
-    created.
-
-    """
-
-    import importscan
-    import onegov
-    importscan.scan(onegov, ignore=['.test', '.tests'])
-
-
 @pytest.yield_fixture(scope='function')
 def feriennet_app(request):
     yield create_feriennet_app(request, use_elasticsearch=False)
